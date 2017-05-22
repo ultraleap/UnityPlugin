@@ -822,9 +822,9 @@ namespace Leap.Unity.Interaction {
 
     private bool _disableSoftContactEnqueued = false;
     private IEnumerator _delayedDisableSoftContactCoroutine;
-    private Collider[] _tempColliderArray = new Collider[2];
-    private Vector3[] _bonePositionsLastFrame = new Vector3[32];
-    private float _softContactBoneRadius = 0.015f;
+    //private Collider[] _tempColliderArray = new Collider[2];
+    //private Vector3[] _bonePositionsLastFrame = new Vector3[32];
+    //private float _softContactBoneRadius = 0.015f;
 
     private bool _notTrackedLastFrame = true;
 
@@ -843,34 +843,70 @@ namespace Leap.Unity.Interaction {
       }
 
       if (_softContactEnabled) {
-        // Generate contacts -- todo
-        bool softlyContacting = false;
-        for (int i = 0; i < contactBones.Length; i++) {
-          Vector3    bonePosition = _boneTargetPositions[i];
-          // Quaternion boneRotation = _boneTargetRotations[i];
+        foreach (var colliderCollideesPair in _softContactCollisions) {
+          ContactBone contactBone = colliderCollideesPair.Key.bone;
 
-          // TODO: Next task: Keep track of overlapping collider-trigger<->collidee
-          // relationships and process each of them via individual
-          // PhysicsUtility.generateXContact calls.
+          Collider contactBoneCollider = contactBone.collider;
 
-          // Generate soft contact data based on spheres at each bonePosition
-          // of radius softContactBoneRadius.
-          bool sphereIntersecting;
-          using (new ProfilerSample("Generate Soft Contacts")) {
-            sphereIntersecting = PhysicsUtility.generateSphereContacts(bonePosition,
-                                                                       _softContactBoneRadius,
-                                                                       (bonePosition - _bonePositionsLastFrame[i]) / Time.fixedDeltaTime,
-                                                                       1 << manager.interactionLayer,
-                                                                       ref manager._softContacts,
-                                                                       ref manager._softContactOriginalVelocities,
-                                                                       ref _tempColliderArray);
+          foreach (Collider intObjCollider in colliderCollideesPair.Value) {
+            if (contactBoneCollider is SphereCollider) {
+              var boneSphere = contactBoneCollider as SphereCollider;
+
+              PhysicsUtility.generateSphereContact(boneSphere, 0, intObjCollider,
+                                                   ref manager._softContacts,
+                                                   ref manager._softContactOriginalVelocities);
+            }
+            else if (contactBoneCollider is CapsuleCollider) {
+              var boneCapsule = contactBoneCollider as CapsuleCollider;
+
+              PhysicsUtility.generateCapsuleContact(boneCapsule, 0, intObjCollider,
+                                                    ref manager._softContacts,
+                                                    ref manager._softContactOriginalVelocities);
+            }
+            else {
+              var boneBox = contactBoneCollider as BoxCollider;
+
+              if (boneBox == null) {
+                  Debug.LogError("Unsupported collider type in ContactBone. Supported "
+                               + "types are SphereCollider, CapsuleCollider, and "
+                               + "BoxCollider.", this);
+                continue;
+              }
+
+              PhysicsUtility.generateBoxContact(boneBox, 0, intObjCollider,
+                                                ref manager._softContacts,
+                                                ref manager._softContactOriginalVelocities);
+            }
           }
-          _bonePositionsLastFrame[i] = bonePosition;
-
-          softlyContacting = sphereIntersecting ? true : softlyContacting;
         }
 
-        if (softlyContacting) {
+        //for (int i = 0; i < contactBones.Length; i++) {
+        //  Vector3 bonePosition = _boneTargetPositions[i];
+        //  // Quaternion boneRotation = _boneTargetRotations[i];
+
+        //  // TODO: Next task: Keep track of overlapping collider-trigger<->collidee
+        //  // relationships and process each of them via individual
+        //  // PhysicsUtility.generateXContact calls.
+
+        //  // Generate soft contact data based on spheres at each bonePosition
+        //  // of radius softContactBoneRadius.
+        //  bool sphereIntersecting;
+        //  using (new ProfilerSample("Generate Soft Contacts")) {
+        //    sphereIntersecting = PhysicsUtility.generateSphereContacts(bonePosition,
+        //                                                               _softContactBoneRadius,
+        //                                                               (bonePosition - _bonePositionsLastFrame[i]) / Time.fixedDeltaTime,
+        //                                                               1 << manager.interactionLayer,
+        //                                                               ref manager._softContacts,
+        //                                                               ref manager._softContactOriginalVelocities,
+        //                                                               ref _tempColliderArray);
+        //  }
+
+        //  _bonePositionsLastFrame[i] = bonePosition;
+
+        //  softlyContacting = sphereIntersecting ? true : softlyContacting;
+        //}
+
+        if (_softContactCollisions.Count > 0) {
           _disableSoftContactEnqueued = false;
         }
         else {
@@ -915,13 +951,16 @@ namespace Leap.Unity.Interaction {
           for (int i = 0; i < contactBones.Length; i++) {
             contactBones[i].collider.isTrigger = true;
 
+            // TODO: DELETEME
+            // ASK JOHN if this will re-introduce spurious velocities!!
+
             // Initialize last-frame information with current-frame information
             // to prevent spurious velocities.
-            Vector3    targetPosition;
-            Quaternion targetRotation; // unnecessary here, but needed for the method call.
-            getColliderBoneTargetPositionRotation(i, out targetPosition, out targetRotation);
+            //Vector3    targetPosition;
+            //Quaternion targetRotation; // unnecessary here, but needed for the method call.
+            //getColliderBoneTargetPositionRotation(i, out targetPosition, out targetRotation);
 
-            _bonePositionsLastFrame[i] = targetPosition;
+            //_bonePositionsLastFrame[i] = targetPosition;
           }
         }
       }
@@ -952,6 +991,62 @@ namespace Leap.Unity.Interaction {
       }
     }
 
+    #region Soft Contact Collision Tracking
+
+    // TODO: Maintaining a reference to the interaction object doesn't appear to be
+    // necessary here, so get rid of the Pair class as a small optimization
+    private Dictionary<BoneIntObjPair, HashSet<Collider>> _softContactCollisions = new Dictionary<BoneIntObjPair, HashSet<Collider>>();
+
+    private struct BoneIntObjPair : IEquatable<BoneIntObjPair> {
+      public ContactBone bone;
+      public IInteractionBehaviour intObj;
+
+      public override bool Equals(object obj) {
+        return obj is BoneIntObjPair && this == (BoneIntObjPair)obj;
+      }
+      public bool Equals(BoneIntObjPair other) {
+        return this == other;
+      }
+      public static bool operator !=(BoneIntObjPair one, BoneIntObjPair other) {
+        return !(one == other);
+      }
+      public static bool operator ==(BoneIntObjPair one, BoneIntObjPair other) {
+        return one.bone == other.bone && one.intObj == other.intObj;
+      }
+      public override int GetHashCode() {
+        return bone.GetHashCode() ^ intObj.GetHashCode();
+      }
+    }
+
+    public void NotifySoftContactCollisionEnter(ContactBone bone,
+                                                IInteractionBehaviour intObj, 
+                                                Collider collider) {
+      var pair = new BoneIntObjPair() { bone = bone, intObj = intObj };
+
+      if (!_softContactCollisions.ContainsKey(pair)) {
+        _softContactCollisions[pair] = new HashSet<Collider>();
+      }
+      _softContactCollisions[pair].Add(collider);
+    }
+
+    public void NotifySoftContactCollisionExit(ContactBone bone,
+                                               IInteractionBehaviour intObj,
+                                               Collider collider) {
+      var pair = new BoneIntObjPair() { bone = bone, intObj = intObj };
+
+      if (!_softContactCollisions.ContainsKey(pair)) {
+        Debug.LogError("No collision set found for this pair of collisions; Exit method "
+                     + "was called without a prior, corresponding Enter method!", this);
+      }
+      _softContactCollisions[pair].Remove(collider);
+
+      if (_softContactCollisions[pair].Count == 0) {
+        _softContactCollisions.Remove(pair);
+      }
+    }
+
+    #endregion
+
     #endregion
 
     #region Contact Callbacks
@@ -963,7 +1058,7 @@ namespace Leap.Unity.Interaction {
     private HashSet<IInteractionBehaviour> _contactEndedBuffer = new HashSet<IInteractionBehaviour>();
     private HashSet<IInteractionBehaviour> _contactBeganBuffer = new HashSet<IInteractionBehaviour>();
 
-    internal void ContactBoneCollisionEnter(ContactBone contactBone, IInteractionBehaviour interactionObj, bool wasTrigger) {
+    public void NotifyContactBoneCollisionEnter(ContactBone contactBone, IInteractionBehaviour interactionObj, bool wasTrigger) {
       int count;
       if (_contactBehaviours.TryGetValue(interactionObj, out count)) {
         _contactBehaviours[interactionObj] = count + 1;
@@ -973,7 +1068,7 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    internal void ContactBoneCollisionExit(ContactBone contactBone, IInteractionBehaviour interactionObj, bool wasTrigger) {
+    public void NotifyContactBoneCollisionExit(ContactBone contactBone, IInteractionBehaviour interactionObj, bool wasTrigger) {
       if (interactionObj.ignoreContact) {
         if (_contactBehaviours.ContainsKey(interactionObj)) _contactBehaviours.Remove(interactionObj);
         return;
@@ -1346,18 +1441,15 @@ namespace Leap.Unity.Interaction {
     public virtual void OnDrawRuntimeGizmos(RuntimeGizmoDrawer drawer) {
       if (!this.isActiveAndEnabled) return;
 
-      if (!softContactEnabled) {
-        drawer.color = Color.green;
-        if (contactBoneParent != null) {
-          drawer.DrawColliders(contactBoneParent.gameObject, true, true);
+      if (contactBoneParent != null) {
+        if (!softContactEnabled) {
+          drawer.color = Color.green;
         }
-      }
-      else {
-        drawer.color = Color.white;
-        float radius = _softContactBoneRadius;
-        foreach (var pos in _boneTargetPositions) {
-          drawer.DrawWireSphere(pos, radius);
+        else {
+          drawer.color = Color.white;
         }
+
+        drawer.DrawColliders(contactBoneParent.gameObject, true, true, true);
       }
 
       // Hover Point

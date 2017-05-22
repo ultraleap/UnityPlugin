@@ -136,15 +136,17 @@ namespace Leap.Unity.Interaction.Internal {
           }
         }
 
-        interactionController.ContactBoneCollisionEnter(this, interactionObj, false);
+        interactionController.NotifyContactBoneCollisionEnter(this, interactionObj, false);
       }
     }
+
     void OnCollisionExit(Collision collision) {
       IInteractionBehaviour interactionObj;
       if (interactionController.manager.interactionObjectBodies.TryGetValue(collision.rigidbody, out interactionObj)) {
-        interactionController.ContactBoneCollisionExit(this, interactionObj, false);
+        interactionController.NotifyContactBoneCollisionExit(this, interactionObj, false);
       }
     }
+
     void OnTriggerEnter(Collider collider) {
       if (collider.attachedRigidbody == null) {
         Debug.LogError("Contact Bone collided with non-rigidbody collider: " + collider.name + ". "
@@ -153,13 +155,18 @@ namespace Leap.Unity.Interaction.Internal {
       }
       IInteractionBehaviour interactionObj;
       if (interactionController.manager.interactionObjectBodies.TryGetValue(collider.attachedRigidbody, out interactionObj)) {
-        interactionController.ContactBoneCollisionEnter(this, interactionObj, true);
+        interactionController.NotifyContactBoneCollisionEnter(this, interactionObj, true);
+
+        interactionController.NotifySoftContactCollisionEnter(this, interactionObj, collider);
       }
     }
+
     void OnTriggerExit(Collider collider) {
       IInteractionBehaviour interactionObj;
       if (interactionController.manager.interactionObjectBodies.TryGetValue(collider.attachedRigidbody, out interactionObj)) {
-        interactionController.ContactBoneCollisionExit(this, interactionObj, true);
+        interactionController.NotifyContactBoneCollisionExit(this, interactionObj, true);
+
+        interactionController.NotifySoftContactCollisionExit(this, interactionObj, collider);
       }
     }
 

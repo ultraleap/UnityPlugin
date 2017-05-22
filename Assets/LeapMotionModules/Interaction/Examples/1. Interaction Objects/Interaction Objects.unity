@@ -852,7 +852,7 @@ MonoBehaviour:
   defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
   suspendedColor: {r: 1, g: 0, b: 0, a: 1}
   hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
-  primaryHoverColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  primaryHoverColor: {r: 1, g: 1, b: 1, a: 1}
   pressedColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &129172182
 GameObject:
@@ -1447,7 +1447,7 @@ MonoBehaviour:
   defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
   suspendedColor: {r: 1, g: 0, b: 0, a: 1}
   hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
-  primaryHoverColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  primaryHoverColor: {r: 1, g: 1, b: 1, a: 1}
   pressedColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &236842555
 GameObject:
@@ -1589,7 +1589,7 @@ MonoBehaviour:
   defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
   suspendedColor: {r: 1, g: 0, b: 0, a: 1}
   hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
-  primaryHoverColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  primaryHoverColor: {r: 1, g: 1, b: 1, a: 1}
   pressedColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &237495162
 GameObject:
@@ -2118,7 +2118,7 @@ MonoBehaviour:
   defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
   suspendedColor: {r: 1, g: 0, b: 0, a: 1}
   hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
-  primaryHoverColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  primaryHoverColor: {r: 1, g: 1, b: 1, a: 1}
   pressedColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &309724702
 GameObject:
@@ -2260,7 +2260,7 @@ MonoBehaviour:
   defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
   suspendedColor: {r: 1, g: 0, b: 0, a: 1}
   hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
-  primaryHoverColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  primaryHoverColor: {r: 1, g: 1, b: 1, a: 1}
   pressedColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &344097042
 GameObject:
@@ -2766,7 +2766,7 @@ MonoBehaviour:
   defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
   suspendedColor: {r: 1, g: 0, b: 0, a: 1}
   hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
-  primaryHoverColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  primaryHoverColor: {r: 1, g: 1, b: 1, a: 1}
   pressedColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1001 &435065600
 Prefab:
@@ -3040,7 +3040,7 @@ MonoBehaviour:
   defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
   suspendedColor: {r: 1, g: 0, b: 0, a: 1}
   hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
-  primaryHoverColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  primaryHoverColor: {r: 1, g: 1, b: 1, a: 1}
   pressedColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &445421612
 GameObject:
@@ -3182,7 +3182,7 @@ MonoBehaviour:
   defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
   suspendedColor: {r: 1, g: 0, b: 0, a: 1}
   hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
-  primaryHoverColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  primaryHoverColor: {r: 1, g: 1, b: 1, a: 1}
   pressedColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &486239173
 GameObject:
@@ -3484,7 +3484,7 @@ MonoBehaviour:
   defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
   suspendedColor: {r: 1, g: 0, b: 0, a: 1}
   hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
-  primaryHoverColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  primaryHoverColor: {r: 1, g: 1, b: 1, a: 1}
   pressedColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &660863408
 GameObject:
@@ -3626,7 +3626,7 @@ MonoBehaviour:
   defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
   suspendedColor: {r: 1, g: 0, b: 0, a: 1}
   hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
-  primaryHoverColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  primaryHoverColor: {r: 1, g: 1, b: 1, a: 1}
   pressedColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1001 &759419766
 Prefab:
@@ -3680,7 +3680,7 @@ Prefab:
     - target: {fileID: 114726310233506268, guid: 8998b2da307be7f419e285784a8495a6,
         type: 2}
       propertyPath: _allowMultiGrasp
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 54989536721116318, guid: 8998b2da307be7f419e285784a8495a6,
         type: 2}
@@ -3910,7 +3910,7 @@ MonoBehaviour:
   defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
   suspendedColor: {r: 1, g: 0, b: 0, a: 1}
   hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
-  primaryHoverColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  primaryHoverColor: {r: 1, g: 1, b: 1, a: 1}
   pressedColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &811384329
 GameObject:
@@ -4052,7 +4052,7 @@ MonoBehaviour:
   defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
   suspendedColor: {r: 1, g: 0, b: 0, a: 1}
   hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
-  primaryHoverColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  primaryHoverColor: {r: 1, g: 1, b: 1, a: 1}
   pressedColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &821878207
 GameObject:
@@ -4306,7 +4306,7 @@ MonoBehaviour:
   defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
   suspendedColor: {r: 1, g: 0, b: 0, a: 1}
   hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
-  primaryHoverColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  primaryHoverColor: {r: 1, g: 1, b: 1, a: 1}
   pressedColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &922779605
 GameObject:
@@ -4554,7 +4554,7 @@ MonoBehaviour:
   defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
   suspendedColor: {r: 1, g: 0, b: 0, a: 1}
   hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
-  primaryHoverColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  primaryHoverColor: {r: 1, g: 1, b: 1, a: 1}
   pressedColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &965526031
 GameObject:
@@ -4783,7 +4783,7 @@ MonoBehaviour:
   defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
   suspendedColor: {r: 1, g: 0, b: 0, a: 1}
   hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
-  primaryHoverColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  primaryHoverColor: {r: 1, g: 1, b: 1, a: 1}
   pressedColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &1020742380
 GameObject:
@@ -4965,7 +4965,7 @@ MonoBehaviour:
   defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
   suspendedColor: {r: 1, g: 0, b: 0, a: 1}
   hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
-  primaryHoverColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  primaryHoverColor: {r: 1, g: 1, b: 1, a: 1}
   pressedColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &1087592053
 GameObject:
@@ -5017,7 +5017,7 @@ MonoBehaviour:
   defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
   suspendedColor: {r: 1, g: 0, b: 0, a: 1}
   hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
-  primaryHoverColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  primaryHoverColor: {r: 1, g: 1, b: 1, a: 1}
   pressedColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!114 &1087592056
 MonoBehaviour:
@@ -5250,7 +5250,7 @@ MonoBehaviour:
   defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
   suspendedColor: {r: 1, g: 0, b: 0, a: 1}
   hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
-  primaryHoverColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  primaryHoverColor: {r: 1, g: 1, b: 1, a: 1}
   pressedColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &1155409168
 GameObject:
@@ -6194,7 +6194,7 @@ MonoBehaviour:
   defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
   suspendedColor: {r: 1, g: 0, b: 0, a: 1}
   hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
-  primaryHoverColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  primaryHoverColor: {r: 1, g: 1, b: 1, a: 1}
   pressedColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!4 &1348104502 stripped
 Transform:
@@ -6414,7 +6414,7 @@ MonoBehaviour:
   defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
   suspendedColor: {r: 1, g: 0, b: 0, a: 1}
   hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
-  primaryHoverColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  primaryHoverColor: {r: 1, g: 1, b: 1, a: 1}
   pressedColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!114 &1404227119 stripped
 MonoBehaviour:
@@ -6614,7 +6614,7 @@ MonoBehaviour:
   defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
   suspendedColor: {r: 1, g: 0, b: 0, a: 1}
   hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
-  primaryHoverColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  primaryHoverColor: {r: 1, g: 1, b: 1, a: 1}
   pressedColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &1448879763
 GameObject:
@@ -6884,7 +6884,7 @@ MonoBehaviour:
   defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
   suspendedColor: {r: 1, g: 0, b: 0, a: 1}
   hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
-  primaryHoverColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  primaryHoverColor: {r: 1, g: 1, b: 1, a: 1}
   pressedColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &1500539201
 GameObject:
@@ -6901,7 +6901,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1500539202
 Transform:
   m_ObjectHideFlags: 0
@@ -7290,7 +7290,7 @@ MonoBehaviour:
   defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
   suspendedColor: {r: 1, g: 0, b: 0, a: 1}
   hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
-  primaryHoverColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  primaryHoverColor: {r: 1, g: 1, b: 1, a: 1}
   pressedColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &1803602546
 GameObject:
@@ -7394,7 +7394,7 @@ MonoBehaviour:
   defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
   suspendedColor: {r: 1, g: 0, b: 0, a: 1}
   hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
-  primaryHoverColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  primaryHoverColor: {r: 1, g: 1, b: 1, a: 1}
   pressedColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!114 &1803602552
 MonoBehaviour:
@@ -7575,7 +7575,7 @@ MonoBehaviour:
   defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
   suspendedColor: {r: 1, g: 0, b: 0, a: 1}
   hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
-  primaryHoverColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  primaryHoverColor: {r: 1, g: 1, b: 1, a: 1}
   pressedColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &1844324945
 GameObject:
@@ -7717,7 +7717,7 @@ MonoBehaviour:
   defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
   suspendedColor: {r: 1, g: 0, b: 0, a: 1}
   hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
-  primaryHoverColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  primaryHoverColor: {r: 1, g: 1, b: 1, a: 1}
   pressedColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &1903639699
 GameObject:
@@ -7821,7 +7821,7 @@ MonoBehaviour:
   defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
   suspendedColor: {r: 1, g: 0, b: 0, a: 1}
   hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
-  primaryHoverColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  primaryHoverColor: {r: 1, g: 1, b: 1, a: 1}
   pressedColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!114 &1903639705
 MonoBehaviour:
@@ -8214,7 +8214,7 @@ MonoBehaviour:
   defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
   suspendedColor: {r: 1, g: 0, b: 0, a: 1}
   hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
-  primaryHoverColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  primaryHoverColor: {r: 1, g: 1, b: 1, a: 1}
   pressedColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &2071343626
 GameObject:
@@ -8356,7 +8356,7 @@ MonoBehaviour:
   defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
   suspendedColor: {r: 1, g: 0, b: 0, a: 1}
   hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
-  primaryHoverColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  primaryHoverColor: {r: 1, g: 1, b: 1, a: 1}
   pressedColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &2114047134
 GameObject:
