@@ -1882,7 +1882,7 @@ MonoBehaviour:
     layerIndex: 10
   _drawControllerRuntimeGizmos: 1
   _interactionControllers:
-  - {fileID: 486239175}
+  - {fileID: 0}
   - {fileID: 1500539203}
   - {fileID: 1404227119}
   - {fileID: 1348104503}
@@ -3187,6 +3187,7 @@ MonoBehaviour:
   _contactEnabled: 1
   _graspingEnabled: 1
   _handDataMode: 0
+  primaryHoverFingertips: 0101010000
 --- !u!1 &562917530
 GameObject:
   m_ObjectHideFlags: 0
@@ -6488,11 +6489,6 @@ Prefab:
       propertyPath: manager
       value: 
       objectReference: {fileID: 289258607}
-    - target: {fileID: 114370018576889794, guid: c2f432850d1e97944a20cbab04cab188,
-        type: 2}
-      propertyPath: maxGraspDistance
-      value: 0.06
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: c2f432850d1e97944a20cbab04cab188, type: 2}
   m_IsPrefabParent: 0
@@ -6953,6 +6949,7 @@ MonoBehaviour:
   _contactEnabled: 1
   _graspingEnabled: 1
   _handDataMode: 1
+  primaryHoverFingertips: 0101010000
 --- !u!1 &1574518198
 GameObject:
   m_ObjectHideFlags: 0

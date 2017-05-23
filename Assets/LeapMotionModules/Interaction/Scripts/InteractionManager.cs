@@ -21,7 +21,8 @@ using UnityEditor;
 using UnityEngine;
 
 namespace Leap.Unity.Interaction {
-
+  
+  [DisallowMultipleComponent]
   public partial class InteractionManager : MonoBehaviour, IRuntimeGizmoComponent {
 
     // TODO: Add customization regarding supported InteractionControllers here.

@@ -8,6 +8,7 @@ using UnityEngine.VR;
 
 namespace Leap.Unity.Interaction {
 
+  [DisallowMultipleComponent]
   public class InteractionVRController : InteractionController {
 
     [Header("Controller Configuration")]
@@ -72,13 +73,13 @@ namespace Leap.Unity.Interaction {
       }
       set {
         if (_backingTrackingProvider != null) {
-          _backingTrackingProvider.Unsubscribe(refreshControllerTrackingData);
+          _backingTrackingProvider.OnTrackingDataUpdate -= refreshControllerTrackingData;
         }
 
         _backingTrackingProvider = value;
 
         if (_backingTrackingProvider != null) {
-          _backingTrackingProvider.Subscribe(refreshControllerTrackingData);
+          _backingTrackingProvider.OnTrackingDataUpdate += refreshControllerTrackingData;
         }
       }
     }
@@ -110,7 +111,7 @@ namespace Leap.Unity.Interaction {
     protected override void Start() {
       base.Start();
 
-      trackingProvider.Subscribe(refreshControllerTrackingData);
+      trackingProvider.OnTrackingDataUpdate += refreshControllerTrackingData;
     }
 
     protected virtual void Reset() {
@@ -139,7 +140,7 @@ namespace Leap.Unity.Interaction {
     /// </summary>
     public override bool isTracked {
       get {
-        return trackingProvider != null && trackingProvider.GetIsTracked();
+        return trackingProvider != null && trackingProvider.isTracked;
       }
     }
 
@@ -480,7 +481,11 @@ namespace Leap.Unity.Interaction {
       base.OnDrawRuntimeGizmos(drawer);
 
       // Grasp Point
-      drawer.color = Color.Lerp(Color.blue, Color.white, Input.GetAxis(graspButtonAxis));
+      float graspAmount;
+      if (graspingAxisOverride != null) graspAmount = graspingAxisOverride();
+      else graspAmount = Input.GetAxis(graspButtonAxis);
+
+      drawer.color = Color.Lerp(Color.blue, Color.white, graspAmount);
       drawer.DrawWireSphere(GetGraspPoint(), maxGraspDistance);
 
       // Nearest graspable object

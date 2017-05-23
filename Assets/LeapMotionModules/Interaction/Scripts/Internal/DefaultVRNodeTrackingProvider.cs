@@ -14,6 +14,9 @@ namespace Leap.Unity.Interaction {
   public class DefaultVRNodeTrackingProvider : MonoBehaviour,
                                                IVRControllerTrackingProvider {
 
+    private bool _isTrackingController = false;
+    public bool isTracked { get { return _isTrackingController; } }
+
     private bool _isVRNodeSet = false;
     private VRNode _backingVRNode;
     public VRNode vrNode {
@@ -21,9 +24,7 @@ namespace Leap.Unity.Interaction {
       set { _backingVRNode = value; _isVRNodeSet = true; }
     }
 
-    private bool _isTrackingController = false;
-
-    public Action<Vector3, Quaternion> updateTrackingData = (position, rotation) => { };
+    public event Action<Vector3, Quaternion> OnTrackingDataUpdate = (position, rotation) => { };
 
     void FixedUpdate() {
       if (_isVRNodeSet) {
@@ -36,21 +37,10 @@ namespace Leap.Unity.Interaction {
         // every frame, so it's unusable.
         _isTrackingController = position != Vector3.zero || rotation != Quaternion.identity;
 
-        updateTrackingData(position, rotation);
+        OnTrackingDataUpdate(position, rotation);
       }
     }
 
-    public bool GetIsTracked() {
-      return _isTrackingController;
-    }
-
-    public void Subscribe(Action<Vector3, Quaternion> onTrackingDataUpdate) {
-      updateTrackingData += onTrackingDataUpdate;
-    }
-
-    public void Unsubscribe(Action<Vector3, Quaternion> onTrackingDataUpdate) {
-      updateTrackingData -= onTrackingDataUpdate;
-    }
   }
 
 }

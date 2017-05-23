@@ -394,7 +394,8 @@ namespace Leap.Unity.Interaction {
 
       // Determine values to apply hysteresis to the primary hover state.
       float maxNewPrimaryHoverDistance = float.PositiveInfinity;
-      if (_primaryHoveredLastFrame != null && primaryHoverPointIdxLastFrame != -1) {
+      if (_primaryHoveredLastFrame != null && primaryHoverPointIdxLastFrame != -1
+          && primaryHoverPoints[primaryHoverPointIdxLastFrame] != null) {
         float distanceToLastPrimaryHover = _primaryHoveredLastFrame.GetHoverDistance(
                                               primaryHoverPoints[primaryHoverPointIdxLastFrame].position);
 
@@ -426,11 +427,13 @@ namespace Leap.Unity.Interaction {
 
             // It's possible to disable primary hover points to ignore them for hover
             // consideration.
+            if (primaryHoverPoint == null) continue;
             if (!primaryHoverPoint.gameObject.activeInHierarchy) continue;
 
-            // TODO: ADD THIS BACK! To InteractionHand
-            // Skip non-index fingers if they aren't extended.
-            //if (!hand.Fingers[i].IsExtended && i != 1) { continue; }
+            // Skip non-index fingers for InteractionHands if they aren't extended.
+            if (intHand != null) {
+              if (!(intHand.leapHand).Fingers[i].IsExtended && i != 1) { continue; }
+            }
 
             // Check primary hover for the primary hover point.
             float behaviourDistance = GetHoverDistance(primaryHoverPoint.position, behaviour);
@@ -1468,6 +1471,7 @@ namespace Leap.Unity.Interaction {
       if (hoverEnabled) {
         drawer.color = Color.Lerp(Color.red, Color.yellow, 0.5F);
         foreach (var point in primaryHoverPoints) {
+          if (point == null) continue;
           drawer.DrawWireSphere(point.position, 0.02F);
         }
       }

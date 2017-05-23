@@ -22,6 +22,7 @@ namespace Leap.Unity.Interaction {
 
   public enum HandDataMode { PlayerLeft, PlayerRight, Custom }
 
+  [DisallowMultipleComponent]
   public class InteractionHand : InteractionController {
 
     [Header("Hand Configuration")]
@@ -39,6 +40,14 @@ namespace Leap.Unity.Interaction {
         _handDataMode = value;
       }
     }
+
+    /// <summary>
+    /// Set slots to true to consider the corresponding finger's fingertip for primary
+    /// hover checks. 0 is the thumb, 1 is the index finger, etc. Generally speaking,
+    /// enable the fingertips you'd like users to be able to use to choose and push a
+    /// button, but keep in mind you pay distance check costs for each fingertip enabled!
+    /// </summary>
+    public bool[] primaryHoverFingertips = new bool[5];
 
     private LeapProvider _leapProvider;
     /// <summary>
@@ -89,7 +98,9 @@ namespace Leap.Unity.Interaction {
     /// </summary>
     private Hand _hand;
 
-    #region Unity Events
+    protected virtual void Reset() {
+      primaryHoverFingertips = new bool[] { true, true, true, false, false };
+    }
 
     protected override void Start() {
       base.Start();
@@ -143,12 +154,13 @@ namespace Leap.Unity.Interaction {
       leapProvider.OnFixedFrame -= onProviderFixedFrame; // avoid double-subscribe
       leapProvider.OnFixedFrame += onProviderFixedFrame;
 
-      // Set up primary hover point Transforms for three fingertips.
-      // TODO: Support arbitrary fingertips!!!
-      for (int i = 0; i < 3; i++) {
+      // Set up primary hover point Transforms for the fingertips. We'll only use
+      // some of them, depending on user settings.
+      for (int i = 0; i < 5; i++) {
         Transform fingertipTransform = new GameObject("Fingertip Transform").transform;
         fingertipTransform.parent = this.transform;
-        _fingertipTransforms.Add(fingertipTransform);
+        _backingFingertipTransforms.Add(fingertipTransform);
+        _fingertipTransforms.Add(null);
       }
     }
 
@@ -164,8 +176,6 @@ namespace Leap.Unity.Interaction {
       }
 
     }
-
-    #endregion
 
     #region General InteractionController Implementation
 
@@ -239,10 +249,10 @@ namespace Leap.Unity.Interaction {
       }
     }
 
+    private List<Transform> _backingFingertipTransforms = new List<Transform>();
     private List<Transform> _fingertipTransforms = new List<Transform>();
     protected override List<Transform> _primaryHoverPoints {
       get {
-
         return _fingertipTransforms;
       }
     }
@@ -253,12 +263,17 @@ namespace Leap.Unity.Interaction {
     }
 
     private void refreshPrimaryHoverPoints() {
-      // TODO: Make sure this works when setting up arbitrary fingertips!!!
-      // Also this is really inefficient, if we're using this getter a lot
-      for (int i = 0; i < 3; i++) {
-        Finger finger = leapHand.Fingers[i];
-        _fingertipTransforms[i].position = finger.TipPosition.ToVector3();
-        _fingertipTransforms[i].rotation = finger.bones[3].Rotation.ToQuaternion();
+      for (int i = 0; i < primaryHoverFingertips.Length; i++) {
+        if (primaryHoverFingertips[i]) {
+          _fingertipTransforms[i] = _backingFingertipTransforms[i];
+
+          Finger finger = leapHand.Fingers[i];
+          _fingertipTransforms[i].position = finger.TipPosition.ToVector3();
+          _fingertipTransforms[i].rotation = finger.bones[3].Rotation.ToQuaternion();
+        }
+        else {
+          _fingertipTransforms[i] = null;
+        }
       }
     }
 

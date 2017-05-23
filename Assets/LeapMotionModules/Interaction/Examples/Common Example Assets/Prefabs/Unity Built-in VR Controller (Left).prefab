@@ -219,7 +219,7 @@ MonoBehaviour:
   - {fileID: 4108784069309542}
   graspPoint: {fileID: 4108784069309542}
   maxGraspDistance: 0.06
-  graspButtonAxis: LeftVRGripAxis
+  graspButtonAxis: LeftVRTriggerAxis
   graspTimingSlop: 0.1
 --- !u!136 &136709356728870858
 CapsuleCollider:

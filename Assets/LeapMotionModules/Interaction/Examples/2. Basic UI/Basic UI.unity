@@ -1007,7 +1007,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &418096565
 Transform:
   m_ObjectHideFlags: 0
@@ -1032,12 +1032,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 29207d17cdd06e84d9fecbdef2401c1c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  manager: {fileID: 624523514}
   _hoverEnabled: 1
   _contactEnabled: 1
   _graspingEnabled: 1
-  manager: {fileID: 624523514}
-  softContactDisplacementFraction: 3
   _handDataMode: 0
+  primaryHoverFingertips: 0101010000
 --- !u!1 &517204485
 GameObject:
   m_ObjectHideFlags: 0
@@ -2111,6 +2111,11 @@ MonoBehaviour:
     type: 2}
   m_PrefabInternal: {fileID: 941536322}
   m_Script: {fileID: 11500000, guid: 9e0ed5922e911b343b8400997c95409c, type: 3}
+--- !u!4 &952980534 stripped
+Transform:
+  m_PrefabParentObject: {fileID: 4108784069309542, guid: 2d3679cbbb1638e4d84497b3eaaf0f1e,
+    type: 2}
+  m_PrefabInternal: {fileID: 1907978952}
 --- !u!1 &993508917
 GameObject:
   m_ObjectHideFlags: 0
@@ -2469,6 +2474,10 @@ Prefab:
     - target: {fileID: 4945874923476290, guid: c2f432850d1e97944a20cbab04cab188, type: 2}
       propertyPath: m_RootOrder
       value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 1582248383679134, guid: c2f432850d1e97944a20cbab04cab188, type: 2}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: c2f432850d1e97944a20cbab04cab188, type: 2}
@@ -2832,7 +2841,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1758076499
 Transform:
   m_ObjectHideFlags: 0
@@ -2857,12 +2866,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 29207d17cdd06e84d9fecbdef2401c1c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  manager: {fileID: 624523514}
   _hoverEnabled: 1
   _contactEnabled: 1
   _graspingEnabled: 1
-  manager: {fileID: 624523514}
-  softContactDisplacementFraction: 3
   _handDataMode: 1
+  primaryHoverFingertips: 0101000001
 --- !u!1 &1758933908
 GameObject:
   m_ObjectHideFlags: 0
@@ -3096,6 +3105,11 @@ Prefab:
   m_Modification:
     m_TransformParent: {fileID: 624523515}
     m_Modifications:
+    - target: {fileID: 114804695224471122, guid: 2d3679cbbb1638e4d84497b3eaaf0f1e,
+        type: 2}
+      propertyPath: primaryHoverPoints.Array.size
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4048813689411764, guid: 2d3679cbbb1638e4d84497b3eaaf0f1e, type: 2}
       propertyPath: m_LocalPosition.x
       value: -0.0801
@@ -3128,6 +3142,15 @@ Prefab:
       propertyPath: m_RootOrder
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 1367756815714146, guid: 2d3679cbbb1638e4d84497b3eaaf0f1e, type: 2}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114804695224471122, guid: 2d3679cbbb1638e4d84497b3eaaf0f1e,
+        type: 2}
+      propertyPath: primaryHoverPoints.Array.data[0]
+      value: 
+      objectReference: {fileID: 952980534}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 2d3679cbbb1638e4d84497b3eaaf0f1e, type: 2}
   m_IsPrefabParent: 0
