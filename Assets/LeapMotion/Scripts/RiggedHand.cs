@@ -61,6 +61,7 @@ namespace Leap.Unity {
 
     public override void InitHand() {
       UpdateHand();
+      setDeformPositionsInFingers(deformPositionsState);
     }
 
     public Quaternion Reorientation() {
