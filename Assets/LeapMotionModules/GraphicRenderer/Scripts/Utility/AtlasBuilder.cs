@@ -106,7 +106,6 @@ namespace Leap.Unity.GraphicalRenderer {
     private FilterMode _filterMode = FilterMode.Bilinear;
 
     [Tooltip("The texture format that should be used for the atlas.")]
-    [Compressible]
     [EditTimeOnly, SerializeField]
     private TextureFormat _format = TextureFormat.ARGB32;
 
@@ -198,6 +197,11 @@ namespace Leap.Unity.GraphicalRenderer {
     /// textures to pack.
     /// </summary>
     public void RebuildAtlas(ProgressBar progress, out Texture2D[] packedTextures, out AtlasUvs channelMapping) {
+      if (!Utils.IsCompressible(_format)) {
+        Debug.LogWarning("Format " + _format + " is not compressible!  Using ARGB32 instead.");
+        _format = TextureFormat.ARGB32;
+      }
+
       _atlasHash = _currHash;
 
       packedTextures = new Texture2D[_features.Count];
@@ -349,7 +353,7 @@ namespace Leap.Unity.GraphicalRenderer {
         }
       });
     }
-    
+
     private void prepareForPacking(LeapTextureFeature feature,
                                       out Texture2D defaultTexture,
                                       out Texture2D packedTexture,
