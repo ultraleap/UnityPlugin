@@ -34,6 +34,13 @@ namespace Leap.Unity.Interaction {
     [Tooltip("The minimum and maximum vertical extents that the slider can slide to in world space.")]
     public Vector2 verticalSlideLimits = new Vector2(0f, 0f);
 
+    [Tooltip("The number of discrete quantized notches that this slider can occupy on the horizontal axis.")]
+    [MinValue(0)]
+    public int horizontalSteps = 0;
+    [Tooltip("The number of discrete quantized notches that this slider can occupy on the vertical axis.")]
+    [MinValue(0)]
+    public int verticalSteps = 0;
+
     [System.Serializable]
     public class FloatEvent : UnityEvent<float> { }
     ///<summary> Triggered while this slider is depressed. </summary>
@@ -50,6 +57,8 @@ namespace Leap.Unity.Interaction {
 
         _horizontalSliderPercent = value;
         localPhysicsPosition.x = Mathf.Lerp(initialLocalPosition.x + horizontalSlideLimits.x, initialLocalPosition.x + horizontalSlideLimits.y, _horizontalSliderPercent);
+        physicsPosition = transform.parent.TransformPoint(localPhysicsPosition);
+        rigidbody.position = physicsPosition;
       }
     }
 
@@ -62,6 +71,8 @@ namespace Leap.Unity.Interaction {
 
         _verticalSliderPercent = value;
         localPhysicsPosition.y = Mathf.Lerp(initialLocalPosition.y + verticalSlideLimits.x, initialLocalPosition.y + verticalSlideLimits.y, _verticalSliderPercent);
+        physicsPosition = transform.parent.TransformPoint(localPhysicsPosition);
+        rigidbody.position = physicsPosition;
       }
     }
 
@@ -145,9 +156,24 @@ namespace Leap.Unity.Interaction {
     }
 
     protected override Vector3 getDepressedConstrainedLocalPosition(Vector3 desiredOffset) {
-      return new Vector3(Mathf.Clamp((localPhysicsPosition.x + desiredOffset.x), initialLocalPosition.x + horizontalSlideLimits.x, initialLocalPosition.x + horizontalSlideLimits.y),
-                         Mathf.Clamp((localPhysicsPosition.y + desiredOffset.y), initialLocalPosition.y + verticalSlideLimits.x, initialLocalPosition.y + verticalSlideLimits.y),
-                                     (localPhysicsPosition.z + desiredOffset.z));
+      Vector3 unSnappedPosition = 
+        new Vector3(Mathf.Clamp((localPhysicsPosition.x + desiredOffset.x), initialLocalPosition.x + horizontalSlideLimits.x, initialLocalPosition.x + horizontalSlideLimits.y),
+                    Mathf.Clamp((localPhysicsPosition.y + desiredOffset.y), initialLocalPosition.y + verticalSlideLimits.x, initialLocalPosition.y + verticalSlideLimits.y),
+                                (localPhysicsPosition.z + desiredOffset.z));
+
+      float hSliderPercent = Mathf.InverseLerp(initialLocalPosition.x + horizontalSlideLimits.x, initialLocalPosition.x + horizontalSlideLimits.y, unSnappedPosition.x);
+      if (horizontalSteps > 0) {
+        hSliderPercent = Mathf.Round(hSliderPercent * (horizontalSteps)) / (horizontalSteps);
+      }
+
+      float vSliderPercent = Mathf.InverseLerp(initialLocalPosition.y + verticalSlideLimits.x, initialLocalPosition.y + verticalSlideLimits.y, unSnappedPosition.y);
+      if (verticalSteps > 0) {
+        vSliderPercent = Mathf.Round(vSliderPercent * (verticalSteps)) / (verticalSteps);
+      }
+
+      return new Vector3(Mathf.Lerp(initialLocalPosition.x + horizontalSlideLimits.x, initialLocalPosition.x + horizontalSlideLimits.y, hSliderPercent),
+                         Mathf.Lerp(initialLocalPosition.y + verticalSlideLimits.x, initialLocalPosition.y + verticalSlideLimits.y, vSliderPercent),
+                                   (localPhysicsPosition.z + desiredOffset.z));
     }
 
     protected override void OnDrawGizmosSelected() {

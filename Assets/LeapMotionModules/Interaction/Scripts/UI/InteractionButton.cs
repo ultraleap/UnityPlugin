@@ -67,9 +67,11 @@ namespace Leap.Unity.Interaction {
     ///<summary> The physical position of this element in local space; may diverge from the graphical position. </summary>
     protected Vector3 localPhysicsPosition;
 
+    ///<summary> The physical position of this element in world space; may diverge from the graphical position. </summary>
+    protected Vector3 physicsPosition = Vector3.zero;
+
     private Rigidbody _lastDepressor;
     private Vector3 _localDepressorPosition;
-    private Vector3 _physicsPosition = Vector3.zero;
     private Vector3 _physicsVelocity = Vector3.zero;
     private bool _physicsOccurred;
     private bool _initialIgnoreGrasping = false;
@@ -86,8 +88,8 @@ namespace Leap.Unity.Interaction {
       initialLocalPosition = transform.localPosition;
       transform.localPosition = initialLocalPosition + Vector3.back * Mathf.Lerp(minMaxHeight.x, minMaxHeight.y, restingHeight);
       localPhysicsPosition = transform.localPosition;
-      _physicsPosition = transform.position;
-      rigidbody.position = _physicsPosition;
+      physicsPosition = transform.position;
+      rigidbody.position = physicsPosition;
       _initialIgnoreGrasping = ignoreGrasping;
       _initialLocalRotation = transform.localRotation;
 
@@ -106,11 +108,11 @@ namespace Leap.Unity.Interaction {
           //Sleep the rigidbody if it's not really moving...
 
           float localPhysicsDisplacementPercentage = Mathf.InverseLerp(minMaxHeight.x, minMaxHeight.y, initialLocalPosition.z - localPhysicsPosition.z);
-          if (rigidbody.position == _physicsPosition && _physicsVelocity == Vector3.zero && Mathf.Abs(localPhysicsDisplacementPercentage - restingHeight) < 0.01f) {
+          if (rigidbody.position == physicsPosition && _physicsVelocity == Vector3.zero && Mathf.Abs(localPhysicsDisplacementPercentage - restingHeight) < 0.01f) {
             rigidbody.Sleep();
             //Else, reset the body's position to where it was last time PhysX looked at it...
           } else {
-            rigidbody.position = _physicsPosition;
+            rigidbody.position = physicsPosition;
             rigidbody.velocity = _physicsVelocity;
           }
         }
@@ -155,7 +157,7 @@ namespace Leap.Unity.Interaction {
         }
 
         // Transform the local physics back into world space
-        _physicsPosition = transform.parent.TransformPoint(localPhysicsPosition);
+        physicsPosition = transform.parent.TransformPoint(localPhysicsPosition);
         _physicsVelocity = transform.parent.TransformVector(localPhysicsVelocity);
 
         // Calculate the Depression State of the Button from its Physical Position
@@ -168,7 +170,7 @@ namespace Leap.Unity.Interaction {
           if ((isPrimaryHovered && _lastDepressor!=null) || isGrasped) {
             isDepressed = true;
           } else {
-            _physicsPosition = transform.parent.TransformPoint(new Vector3(localPhysicsPosition.x, localPhysicsPosition.y, initialLocalPosition.z - minMaxHeight.x));
+            physicsPosition = transform.parent.TransformPoint(new Vector3(localPhysicsPosition.x, localPhysicsPosition.y, initialLocalPosition.z - minMaxHeight.x));
             _physicsVelocity = _physicsVelocity * 0.1f;
             isDepressed = false;
             _lastDepressor = null;
@@ -176,7 +178,7 @@ namespace Leap.Unity.Interaction {
           // Else if the button is extended past its limit...
         } else if (localPhysicsPosition.z < initialLocalPosition.z - minMaxHeight.y) {
           transform.localPosition = new Vector3(localPhysicsPosition.x, localPhysicsPosition.y, initialLocalPosition.z - minMaxHeight.y);
-          _physicsPosition = transform.position;
+          physicsPosition = transform.position;
           isDepressed = false;
           _lastDepressor = null;
         } else {
@@ -213,7 +215,7 @@ namespace Leap.Unity.Interaction {
                                              List<InteractionController> graspingControllers) {
       Vector3 newLocalPosition = getDepressedConstrainedLocalPosition(transform.parent.InverseTransformVector(postSolvedPosition - preSolvedPosition));
       newLocalPosition.z = Mathf.Clamp(newLocalPosition.z, initialLocalPosition.z - minMaxHeight.y, initialLocalPosition.z - minMaxHeight.x);
-      _physicsVelocity = 0.5f * (transform.parent.TransformPoint(newLocalPosition) - _physicsPosition) / Time.fixedDeltaTime;
+      _physicsVelocity = 0.5f * (transform.parent.TransformPoint(newLocalPosition) - physicsPosition) / Time.fixedDeltaTime;
     }
 
     protected virtual void onGraspEnd() {

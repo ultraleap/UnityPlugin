@@ -714,7 +714,9 @@ namespace Leap.Unity.Interaction {
     }
 
     protected virtual void OnDestroy() {
-      manager.UnregisterInteractionBehaviour(this);
+      if (manager != null) {
+        manager.UnregisterInteractionBehaviour(this);
+      }
     }
 
     #endregion
