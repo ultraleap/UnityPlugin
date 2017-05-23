@@ -590,7 +590,7 @@ namespace Leap.Unity.Interaction {
       foreach (Transform child in this.transform.GetChildren()) {
         InteractionController controller = child.GetComponent<InteractionController>();
         if (controller is InteractionHand) continue;
-        else {
+        else if (controller is InteractionController) {
           _interactionControllers.Add(controller);
         }
       }

@@ -1,4 +1,6 @@
-﻿using Leap.Unity.Interaction.Internal;
+﻿using Leap.Unity.Attributes;
+using Leap.Unity.Interaction.Internal;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -8,30 +10,126 @@ namespace Leap.Unity.Interaction {
 
   public class InteractionVRController : InteractionController {
 
+    [Header("Controller Configuration")]
+
+    [Tooltip("Which hand will hold this controller?")]
+    [EditTimeOnly]
     public Chirality chirality;
 
+    [Header("Hover Configuration")]
+
+    [Tooltip("This is the point used to determine the distance to objects for the "
+           + "purposes of their 'hovered' state. Generally, it should be somewhere "
+           + "between the tip of the controller and the controller's center of mass.")]
     [SerializeField]
     private Transform _hoverPoint;
 
+    [Tooltip("These points refine the hover point when determining distances to "
+           + "interaction objects for evaluating which object should be the primary hover "
+           + "of this interaction controller. An object's proximity to one of these "
+           + "points is interpreted as the user's intention to interact specifically "
+           + "with that object, and is important when building less accident-prone user "
+           + "interfaces. For example, hands place their primary hover points on the "
+           + "thumb, index finger, and middle finger by default. Controllers generally "
+           + "should have a primary hover point at any tip of the controller you expect "
+           + "users might use to hit a button. Warning: Each point costs distance checks "
+           + "against nearby objects, so making this list large is costly!")]
+    [SerializeField]
     public new List<Transform> primaryHoverPoints;
 
-    public string graspButtonAxis;
+    [Header("Grasping Configuration")]
 
+    [Tooltip("The point around which to check objects eligible for being grasped. Only "
+          + "objects with an InteractionBehaviour component with ignoreGrasping disabled "
+          + "are eligible for grasping. Upon attempting to grasp with a controller, the "
+          + "object closest to the grasp point is chosen for grasping.")]
     public Transform graspPoint;
 
     public float maxGraspDistance = 0.06F;
 
-    private Vector3 _trackedPosition = Vector3.zero;
+    [Tooltip("This string should match an Axis specified in Edit->Project Settings->"
+           + "Input. This is the button to use to listen for grasping.")]
+    public string graspButtonAxis;
+
+    [Tooltip("The duration of time in seconds beyond initially pressing the grasp button "
+           + "that the user can move the grasp point within range of a graspable "
+           + "interaction object and still trigger a grasp. With a value of zero, objects "
+           + "can only be grasped if they are already within the grasp distance of the "
+           + "grasp point.")]
+    public float graspTimingSlop = 0.10F;
 
     private bool _hasTrackedPositionLastFrame = false;
     private Vector3 _trackedPositionLastFrame = Vector3.zero;
 
-    protected virtual void Update() {
-      _trackedPosition = InputTracking.GetLocalPosition(vrNode);
-      this.transform.position = _trackedPosition;
-      this.transform.rotation = InputTracking.GetLocalRotation(vrNode);
+    private IVRControllerTrackingProvider _backingTrackingProvider = null;
+    public IVRControllerTrackingProvider trackingProvider {
+      get {
+        if (_backingDefaultTrackingProvider == null) {
+          _backingDefaultTrackingProvider = _defaultTrackingProvider;
+        }
 
+        return _backingDefaultTrackingProvider;
+      }
+      set {
+        if (_backingTrackingProvider != null) {
+          _backingTrackingProvider.Unsubscribe(refreshControllerTrackingData);
+        }
+
+        _backingTrackingProvider = value;
+
+        if (_backingTrackingProvider != null) {
+          _backingTrackingProvider.Subscribe(refreshControllerTrackingData);
+        }
+      }
+    }
+
+    private IVRControllerTrackingProvider _backingDefaultTrackingProvider;
+    private IVRControllerTrackingProvider _defaultTrackingProvider {
+      get {
+        if (_backingDefaultTrackingProvider == null) {
+          refreshDefaultTrackingProvider();
+        }
+
+        return _backingDefaultTrackingProvider;
+      }
+      set {
+        _backingDefaultTrackingProvider = value;
+      }
+    }
+
+    private void refreshDefaultTrackingProvider() {
+      var defaultProvider = gameObject.GetComponent<DefaultVRNodeTrackingProvider>();
+      if (defaultProvider == null) {
+        defaultProvider = gameObject.AddComponent<DefaultVRNodeTrackingProvider>();
+      }
+      defaultProvider.vrNode = this.vrNode;
+
+      _defaultTrackingProvider = defaultProvider;
+    }
+
+    protected override void Start() {
+      base.Start();
+
+      trackingProvider.Subscribe(refreshControllerTrackingData);
+    }
+
+    protected virtual void Reset() {
+
+    }
+
+    private void refreshControllerTrackingData(Vector3 position, Quaternion rotation) {
+      if (_hasTrackedPositionLastFrame) {
+        _trackedPositionLastFrame = this.transform.position;
+      }
+
+      this.transform.position = position;
+      this.transform.rotation = rotation;
       refreshContactBoneTargets();
+
+      if (!_hasTrackedPositionLastFrame) {
+        _hasTrackedPositionLastFrame = true;
+        _trackedPositionLastFrame = this.transform.position;
+      }
     }
 
     #region General InteractionController Implementation
@@ -41,16 +139,14 @@ namespace Leap.Unity.Interaction {
     /// </summary>
     public override bool isTracked {
       get {
-        // Unfortunately, the only alternative to checking the controller's position for
-        // whether or not it is tracked is to request the _allocated string array_ of
-        // all currently-connected joysticks, which would allocate garbage every frame,
-        // so it's unusable.
-        return _trackedPosition != Vector3.zero;
+        return trackingProvider != null && trackingProvider.GetIsTracked();
       }
     }
 
     /// <summary>
-    /// Gets the VRNode associated with this VR controller.
+    /// Gets the VRNode associated with this VR controller. Note: If the tracking mode 
+    /// for this controller is specified as ControllerTrackingMode.Custom, this value
+    /// may be ignored.
     /// </summary>
     public VRNode vrNode {
       get { return chirality == Chirality.Left ? VRNode.LeftHand : VRNode.RightHand; }
@@ -69,7 +165,7 @@ namespace Leap.Unity.Interaction {
     public override Vector3 velocity {
       get {
         if (_hasTrackedPositionLastFrame) {
-          return (_trackedPosition - _trackedPositionLastFrame) / Time.fixedDeltaTime;
+          return (this.transform.position - _trackedPositionLastFrame) / Time.fixedDeltaTime;
         }
         else {
           return Vector3.zero;
@@ -171,19 +267,19 @@ namespace Leap.Unity.Interaction {
     }
 
     private List<ContactBone> _contactBoneBuffer = new List<ContactBone>();
-    private List<CapsuleCollider> _colliderBuffer = new List<CapsuleCollider>();
+    private List<Collider> _colliderBuffer = new List<Collider>();
     private void initContactBones() {
       _colliderBuffer.Clear();
       _contactBoneBuffer.Clear();
 
       // Scan for existing colliders and construct contact bones out of them.
-      Utils.FindColliders<CapsuleCollider>(this.gameObject, ref _colliderBuffer);
+      Utils.FindColliders<Collider>(this.gameObject, ref _colliderBuffer);
 
-      foreach (var capsule in _colliderBuffer) {
-        ContactBone contactBone = capsule.gameObject.AddComponent<ContactBone>();
-        Rigidbody body = capsule.gameObject.GetComponent<Rigidbody>();
+      foreach (var collider in _colliderBuffer) {
+        ContactBone contactBone = collider.gameObject.AddComponent<ContactBone>();
+        Rigidbody body = collider.gameObject.GetComponent<Rigidbody>();
         if (body == null) {
-          body = capsule.gameObject.AddComponent<Rigidbody>();
+          body = collider.gameObject.AddComponent<Rigidbody>();
         }
 
         body.freezeRotation = true;
@@ -193,7 +289,7 @@ namespace Leap.Unity.Interaction {
 
         contactBone.interactionController = this;
         contactBone.body = body;
-        contactBone.collider = capsule;
+        contactBone.collider = collider;
 
         _contactBoneBuffer.Add(contactBone);
       }
@@ -227,7 +323,39 @@ namespace Leap.Unity.Interaction {
 
     #region Grasping Implementation
 
-    private IInteractionBehaviour _closestGraspableObject = null;
+    /// <summary>
+    /// By default, InteractionVRController uses Input.GetAxis(graspButtonAxis) to
+    /// determine the "depression" state for the grasp button. By setting this value to
+    /// something other than null, it is possible to modify this behavior to instead
+    /// retrieve a grasping axis value based on arbitrary code.
+    /// 
+    /// A grasp is attempted when the grasp button axis value returned by this method
+    /// becomes larger than the graspButtonDepressedValue, and a grasp is released when
+    /// the grasp button axis value returned by this method becomes smaller than the
+    /// graspButtonReleasedValue. Both of these values provide public setters.
+    /// </summary>
+    public Func<float> graspingAxisOverride = null;
+
+    private float _graspDepressedValue = 0.8F;
+    /// <summary>
+    /// The value between 0 and 1 past which the grasping axis value will cause an
+    /// attempt to grasp a graspable interaction object near the grasp point.
+    /// </summary>
+    public float graspDepressedValue {
+      get { return _graspDepressedValue; }
+      set { _graspDepressedValue = value; }
+    }
+
+    private float _graspReleasedValue = 0.7F;
+    /// <summary>
+    /// If the grasping axis value passes the graspDepressedValue, it must then drop
+    /// underneath this value in order to release the grasp attempt (potentially
+    /// releasing a held object) and allow a new grasp attempt to occur.
+    /// </summary>
+    public float graspReleasedValue {
+      get { return _graspReleasedValue; }
+      set { _graspReleasedValue = value; }
+    }
 
     private List<Vector3> _graspManipulatorPointsBuffer = new List<Vector3>();
     /// <summary>
@@ -246,6 +374,13 @@ namespace Leap.Unity.Interaction {
       }
     }
 
+    private IInteractionBehaviour _closestGraspableObject = null;
+
+    private bool _graspButtonLastFrame = false;
+    private bool _graspButtonDown = false;
+    private bool _graspButtonUp = false;
+    private float _graspButtonDownSlopTimer = 0F;
+
     public override Vector3 GetGraspPoint() {
       return graspPoint.transform.position;
     }
@@ -253,7 +388,7 @@ namespace Leap.Unity.Interaction {
     protected override void fixedUpdateGraspingState() {
       refreshClosestGraspableObject();
 
-      updateGraspButtonState();
+      fixedUpdateGraspButtonState();
     }
 
     private void refreshClosestGraspableObject() {
@@ -269,36 +404,58 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    private bool _graspButtonLastFrame = false;
-    private bool _graspButtonDown = false;
-    private bool _graspButtonUp = false;
-
-    private void updateGraspButtonState() {
+    private void fixedUpdateGraspButtonState() {
       _graspButtonDown = false;
       _graspButtonUp = false;
 
       bool graspButton = _graspButtonLastFrame;
 
       if (!_graspButtonLastFrame) {
-        graspButton = Input.GetAxis(graspButtonAxis) > 0.8F;
+        if (graspingAxisOverride == null) {
+          graspButton = Input.GetAxis(graspButtonAxis) > graspDepressedValue;
+        }
+        else {
+          graspButton = graspingAxisOverride() > graspDepressedValue;
+        }
 
         if (graspButton) {
+          // Grasp button was _just_ depressed this frame.
           _graspButtonDown = true;
+          _graspButtonDownSlopTimer = graspTimingSlop;
         }
       }
       else {
-        graspButton = Input.GetAxis(graspButtonAxis) > 0.7F;
+        if (graspReleasedValue > graspDepressedValue) {
+          Debug.LogWarning("The graspReleasedValue should be less than or equal to the "
+                         + "graspDepressedValue!", this);
+          graspReleasedValue = graspDepressedValue;
+        }
+
+        if (graspingAxisOverride == null) {
+          graspButton = Input.GetAxis(graspButtonAxis) > graspReleasedValue;
+        }
+        else {
+          graspButton = graspingAxisOverride() > graspReleasedValue;
+        }
 
         if (!graspButton) {
+          // Grasp button was _just_ released this frame.
           _graspButtonUp = true;
+          _graspButtonDownSlopTimer = 0F;
         }
+      }
+
+      if (_graspButtonDownSlopTimer > 0F) {
+        _graspButtonDownSlopTimer -= Time.fixedDeltaTime;
       }
 
       _graspButtonLastFrame = graspButton;
     }
 
     protected override bool checkShouldGrasp(out IInteractionBehaviour objectToGrasp) {
-      bool shouldGrasp = _graspButtonDown && _closestGraspableObject != null;
+      bool shouldGrasp = !isGraspingObject
+                      && (_graspButtonDown || _graspButtonDownSlopTimer > 0F)
+                      && _closestGraspableObject != null;
 
       objectToGrasp = null;
       if (shouldGrasp) { objectToGrasp = _closestGraspableObject; }

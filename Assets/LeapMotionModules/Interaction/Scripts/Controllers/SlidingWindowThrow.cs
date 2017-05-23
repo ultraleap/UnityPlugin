@@ -134,17 +134,18 @@ namespace Leap.Unity.Interaction {
                                                                      end.position,
                                                                      _windowLength);
 
-      // If trying to throw the object backwards into a hand, project the velocity
-      // onto the plane defined by the hand's palm normal.
-      InteractionHand intHand = throwingController.intHand;
-      if (intHand != null) {
-        Vector3 relativeVelocity = interpolatedVelocity - intHand.velocity;
-        Vector3 palmNormal = intHand.leapHand.PalmNormal.ToVector3();
+      // TODO: DELETEME. The bug this code addresses appears to be fixed.
+      //// If trying to throw the object backwards into a hand, project the velocity
+      //// onto the plane defined by the hand's palm normal.
+      //InteractionHand intHand = throwingController.intHand;
+      //if (intHand != null) {
+      //  Vector3 relativeVelocity = interpolatedVelocity - intHand.velocity;
+      //  Vector3 palmNormal = intHand.leapHand.PalmNormal.ToVector3();
 
-        if (Vector3.Dot(relativeVelocity, palmNormal) < 0) {
-          interpolatedVelocity -= Vector3.Project(relativeVelocity, palmNormal);
-        }
-      }
+      //  if (Vector3.Dot(relativeVelocity, palmNormal) < 0) {
+      //    interpolatedVelocity -= Vector3.Project(relativeVelocity, palmNormal);
+      //  }
+      //}
 
       intObj.rigidbody.velocity = interpolatedVelocity;
       intObj.rigidbody.angularVelocity = PhysicsUtility.ToAngularVelocity(start.rotation,

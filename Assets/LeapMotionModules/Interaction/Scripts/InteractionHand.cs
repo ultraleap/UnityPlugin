@@ -24,6 +24,8 @@ namespace Leap.Unity.Interaction {
 
   public class InteractionHand : InteractionController {
 
+    [Header("Hand Configuration")]
+
     [Tooltip("Should the data for the underlying Leap hand come from the player's left "
            + "hand or their right hand? Alternatively, you can set this mode to Custom "
            + "to specify accessor functions manually via script (recommended for advanced "

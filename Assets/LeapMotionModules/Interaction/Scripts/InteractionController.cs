@@ -34,6 +34,10 @@ namespace Leap.Unity.Interaction {
 
   public abstract class InteractionController : MonoBehaviour {
 
+    [Tooltip("The manager responsible for this interaction controller. Interaction "
+           + "controllers should be children of their interaction manager.")]
+    public InteractionManager manager;
+
     [Header("Interaction Types")]
 
     [Tooltip("If disabled, this interaction controller will not be used to generate "
@@ -145,8 +149,6 @@ namespace Leap.Unity.Interaction {
     public Action<InteractionBehaviour> OnStayPrimaryHoveringObject = (intObj) => { };
 
     #endregion
-
-    public InteractionManager manager;
 
     protected virtual void Start() {
       if (manager == null) manager = InteractionManager.instance;
@@ -636,7 +638,11 @@ namespace Leap.Unity.Interaction {
 
     protected const float DEAD_ZONE_FRACTION = 0.1F;
 
-    public float softContactDislocationFraction = 3.0F;
+    private float _softContactDislocationFraction = 3.0F;
+    protected float softContactDislocationFraction {
+      get { return _softContactDislocationFraction; }
+      set { _softContactDislocationFraction = value; }
+    }
 
     private static PhysicMaterial s_defaultContactBoneMaterial;
     protected static PhysicMaterial defaultContactBoneMaterial {
