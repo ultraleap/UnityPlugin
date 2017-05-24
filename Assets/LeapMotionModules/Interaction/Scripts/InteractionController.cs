@@ -160,6 +160,11 @@ namespace Leap.Unity.Interaction {
       if (manager == null) manager = InteractionManager.instance;
     }
 
+    protected virtual void OnDisable() {
+      EnableSoftContact();
+      ReleaseGrasp();
+    }
+
     /// <summary>
     /// Called by the InteractionManager every fixed (physics) frame to populate the
     /// Interaction Hand with state from the Leap hand and perform bookkeeping operations.
