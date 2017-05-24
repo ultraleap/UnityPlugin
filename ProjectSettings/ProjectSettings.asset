@@ -232,6 +232,7 @@ PlayerSettings:
     m_Enabled: 1
     m_Devices:
     - Oculus
+    - OpenVR
   - m_BuildTarget: Android
     m_Enabled: 0
     m_Devices: []

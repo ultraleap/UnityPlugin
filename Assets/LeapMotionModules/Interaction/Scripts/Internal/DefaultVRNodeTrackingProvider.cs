@@ -28,8 +28,15 @@ namespace Leap.Unity.Interaction {
 
     void FixedUpdate() {
       if (_isVRNodeSet) {
+
         var position = InputTracking.GetLocalPosition(vrNode);
         var rotation = InputTracking.GetLocalRotation(vrNode);
+
+        Transform rigTransform = Camera.main.transform.parent;
+        if (rigTransform != null) {
+          position = rigTransform.TransformPoint(position);
+          rotation = rigTransform.TransformRotation(rotation);
+        }
         
         // Unfortunately, the only alternative to checking the controller's position and
         // rotation for whether or not it is tracked is to request an allocated string

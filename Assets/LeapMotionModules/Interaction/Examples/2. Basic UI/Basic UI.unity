@@ -277,8 +277,7 @@ MonoBehaviour:
 --- !u!114 &138469536
 MonoBehaviour:
   m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 11402294, guid: 18d6bf9063dcb1842be63f411fd9fc26,
-    type: 2}
+  m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 138469533}
   m_Enabled: 1
@@ -1007,7 +1006,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &418096565
 Transform:
   m_ObjectHideFlags: 0
@@ -1032,7 +1031,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 29207d17cdd06e84d9fecbdef2401c1c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  manager: {fileID: 624523514}
+  manager: {fileID: 0}
   _hoverEnabled: 1
   _contactEnabled: 1
   _graspingEnabled: 1
@@ -1251,7 +1250,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0625e574c0d47a241b7dfc7a8c67ca2b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _showAdvancedSettings: 1
+  _interactionControllers:
+    _values:
+    - {fileID: 418096566}
+    - {fileID: 1758076500}
+    - {fileID: 1907978953}
+    - {fileID: 1330813081}
+    - {fileID: 0}
   hoverActivationRadius: 0.2
   touchActivationRadius: 0.075
   _autoGenerateLayers: 1
@@ -1264,26 +1269,21 @@ MonoBehaviour:
   _contactBoneLayer:
     layerIndex: 10
   _drawControllerRuntimeGizmos: 1
-  _interactionControllers:
-  - {fileID: 418096566}
-  - {fileID: 1758076500}
-  - {fileID: 1907978953}
-  - {fileID: 1330813081}
 --- !u!4 &624523515
 Transform:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 624523513}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.0730983, y: 0.13018695, z: 0.67179525}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -0.0730983, y: 0.09418695, z: 0.67179525}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 418096565}
   - {fileID: 1758076499}
   - {fileID: 1907978954}
   - {fileID: 1330813082}
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 1198429509}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &686966365
@@ -2201,6 +2201,22 @@ MonoBehaviour:
   unlockHold: 303
   moreRewind: 276
   lessRewind: 275
+--- !u!1 &1041107943 stripped
+GameObject:
+  m_PrefabParentObject: {fileID: 1582248383679134, guid: c2f432850d1e97944a20cbab04cab188,
+    type: 2}
+  m_PrefabInternal: {fileID: 1330813080}
+--- !u!114 &1041107944
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1041107943}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 64c3b6f9e7a282941977291a82b4e7f4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1057954423
 GameObject:
   m_ObjectHideFlags: 0
@@ -2231,7 +2247,7 @@ Transform:
   - {fileID: 1432746479}
   - {fileID: 2057493649}
   m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 25.724, y: 0, z: 0}
 --- !u!4 &1094640820
 Transform:
@@ -2279,7 +2295,7 @@ MonoBehaviour:
   - DeviceName: oculus
     HeightOffset: 0
   - DeviceName: openvr
-    HeightOffset: -1.4
+    HeightOffset: -1.2
   moveUpKey: 0
   moveDownKey: 0
   stepSize: 0.1
@@ -2295,6 +2311,7 @@ Transform:
   m_Children:
   - {fileID: 1846961981}
   - {fileID: 993508918}
+  - {fileID: 624523515}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -2477,7 +2494,12 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 1582248383679134, guid: c2f432850d1e97944a20cbab04cab188, type: 2}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114370018576889794, guid: c2f432850d1e97944a20cbab04cab188,
+        type: 2}
+      propertyPath: _chirality
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: c2f432850d1e97944a20cbab04cab188, type: 2}
@@ -2767,7 +2789,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 4481135769011950, guid: d53bbce24b78fb742ba7b93ce8a36f86, type: 2}
       propertyPath: m_RootOrder
-      value: 4
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 1648960992352440, guid: d53bbce24b78fb742ba7b93ce8a36f86, type: 2}
       propertyPath: m_Name
@@ -2826,6 +2848,22 @@ Prefab:
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: d53bbce24b78fb742ba7b93ce8a36f86, type: 2}
   m_IsPrefabParent: 0
+--- !u!1 &1737000575 stripped
+GameObject:
+  m_PrefabParentObject: {fileID: 1367756815714146, guid: 2d3679cbbb1638e4d84497b3eaaf0f1e,
+    type: 2}
+  m_PrefabInternal: {fileID: 1907978952}
+--- !u!114 &1737000576
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1737000575}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 64c3b6f9e7a282941977291a82b4e7f4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1758076498
 GameObject:
   m_ObjectHideFlags: 0
@@ -2841,7 +2879,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1758076499
 Transform:
   m_ObjectHideFlags: 0
@@ -2871,7 +2909,7 @@ MonoBehaviour:
   _contactEnabled: 1
   _graspingEnabled: 1
   _handDataMode: 1
-  primaryHoverFingertips: 0101000001
+  primaryHoverFingertips: 0101010000
 --- !u!1 &1758933908
 GameObject:
   m_ObjectHideFlags: 0
@@ -3207,7 +3245,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 5
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2057493648
 GameObject:

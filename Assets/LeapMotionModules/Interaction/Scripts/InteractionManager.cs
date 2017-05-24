@@ -21,18 +21,23 @@ using UnityEditor;
 using UnityEngine;
 
 namespace Leap.Unity.Interaction {
+
+  [Serializable]
+  public class InteractionControllerSet : SerializableHashSet<InteractionController> { }
   
   [DisallowMultipleComponent]
-  public partial class InteractionManager : MonoBehaviour, IRuntimeGizmoComponent {
+  [ExecuteInEditMode]
+  public class InteractionManager : MonoBehaviour, IRuntimeGizmoComponent {
 
-    // TODO: Add customization regarding supported InteractionControllers here.
-
-    [Header("Advanced Settings")]
-
+    // Header "Interaction Controllers" via InteractionManagerEditor.cs.
     [SerializeField]
-    #pragma warning disable 0414
-    private bool _showAdvancedSettings = false; // Used by the custom editor script.
-    #pragma warning restore 0414
+    private InteractionControllerSet _interactionControllers = new InteractionControllerSet();
+    /// <summary>
+    /// Gets the list of interaction controllers managed by this InteractionManager.
+    /// </summary>
+    public ReadonlyHashSet<InteractionController> interactionControllers {
+      get { return _interactionControllers; }
+    }
     
     [Header("Interaction Settings")]
 
@@ -131,15 +136,6 @@ namespace Leap.Unity.Interaction {
     /// </summary>
     public float SimulationScale { get { return _scale; } }
 
-    [SerializeField]
-    private List<InteractionController> _interactionControllers = new List<InteractionController>();
-    /// <summary>
-    /// Gets the list of interaction controllers managed by this InteractionManager.
-    /// </summary>
-    public ReadonlyList<InteractionController> interactionControllers {
-      get { return _interactionControllers; }
-    }
-
     private HashSet<IInteractionBehaviour> _interactionBehaviours = new HashSet<IInteractionBehaviour>();
 
     private Dictionary<Rigidbody, IInteractionBehaviour> _interactionObjectBodies;
@@ -203,13 +199,15 @@ namespace Leap.Unity.Interaction {
         generateAutomaticLayers();
       }
       
-      refreshInteractionHands();
+      refreshInteractionControllers();
     }
 
     void Awake() {
-      if (s_instance == null) s_instance = this;
+      refreshInteractionControllers();
 
-      refreshInteractionHands();
+      if (!Application.isPlaying) return;
+
+      if (s_instance == null) s_instance = this;
 
       if (_autoGenerateLayers) {
         generateAutomaticLayers();
@@ -228,6 +226,10 @@ namespace Leap.Unity.Interaction {
     }
 
     void OnDisable() {
+      #if UNITY_EDITOR
+      if (!Application.isPlaying) return;
+      #endif
+
       foreach (var intController in _interactionControllers) {
         // Disables the colliders in the interaction controller;
         // soft contact won't be applied if the controller is not updating.
@@ -239,8 +241,20 @@ namespace Leap.Unity.Interaction {
       }
     }
 
+    #if UNITY_EDITOR
+    void Update() {
+      refreshInteractionControllers();
+    }
+    #endif
+
     void FixedUpdate() {
       OnPrePhysicalUpdate();
+
+      refreshInteractionControllers();
+
+      #if UNITY_EDITOR
+      if (!Application.isPlaying) return;
+      #endif
 
       using (new ProfilerSample("Interaction Manager FixedUpdate", this.gameObject)) {
         // Ensure scale information is up-to-date.
@@ -542,59 +556,66 @@ namespace Leap.Unity.Interaction {
 
     #region Internal
 
-    private void refreshInteractionHands() {
+    private void refreshInteractionControllers() {
       _interactionControllers.Clear();
 
-      int handsIdx = 0;
-      foreach (var child in this.transform.GetChildren()) {
-        InteractionHand intHand = child.GetComponent<InteractionHand>();
-        if (intHand != null) {
-          if (_interactionControllers.Count == handsIdx) {
-            _interactionControllers.Add(intHand);
-          }
-          else {
-            _interactionControllers[handsIdx] = intHand;
-          }
-          handsIdx++;
-        }
-        if (handsIdx == 2) break;
+      foreach (var controller in this.transform.GetChildren()
+                                               .Query()
+                                               .Select(g => g.GetComponent<InteractionController>())
+                                               .Where(c => c != null)) {
+        _interactionControllers.Add(controller);
       }
 
-#if UNITY_EDITOR
-      PrefabType prefabType = PrefabUtility.GetPrefabType(this.gameObject);
-      if (prefabType == PrefabType.Prefab || prefabType == PrefabType.ModelPrefab) {
-        return;
-      }
-#endif
+//      int handsIdx = 0;
+//      foreach (var child in this.transform.GetChildren()) {
+//        InteractionHand intHand = child.GetComponent<InteractionHand>();
+//        if (intHand != null) {
+//          if (_interactionControllers.Count == handsIdx) {
+//            _interactionControllers.Add(intHand);
+//          }
+//          else {
+//            _interactionControllers[handsIdx] = intHand;
+//          }
+//          handsIdx++;
+//        }
+//        if (handsIdx == 2) break;
+//      }
 
-      if (_interactionControllers[0] == null) {
-        GameObject obj = new GameObject();
-        _interactionControllers[0] = obj.AddComponent<InteractionHand>();
-      }
-      _interactionControllers[0].gameObject.name = "Interaction Hand (Left)";
-      _interactionControllers[0].manager = this;
-      _interactionControllers[0].transform.parent = this.transform;
-      _interactionControllers[0].intHand.handDataMode = HandDataMode.PlayerLeft;
+//#if UNITY_EDITOR
+//      PrefabType prefabType = PrefabUtility.GetPrefabType(this.gameObject);
+//      if (prefabType == PrefabType.Prefab || prefabType == PrefabType.ModelPrefab) {
+//        return;
+//      }
+//#endif
 
-      if (_interactionControllers[1] == null) {
-        GameObject obj = new GameObject();
-        _interactionControllers[1] = obj.AddComponent<InteractionHand>();
-      }
-      _interactionControllers[1].gameObject.name = "Interaction Hand (Right)";
-      _interactionControllers[1].manager = this;
-      _interactionControllers[1].transform.parent = this.transform;
-      _interactionControllers[1].intHand.handDataMode = HandDataMode.PlayerRight;
+//      if (_interactionControllers[0] == null) {
+//        GameObject obj = new GameObject();
+//        _interactionControllers[0] = obj.AddComponent<InteractionHand>();
+//      }
+//      _interactionControllers[0].gameObject.name = "Interaction Hand (Left)";
+//      _interactionControllers[0].manager = this;
+//      _interactionControllers[0].transform.parent = this.transform;
+//      _interactionControllers[0].intHand.handDataMode = HandDataMode.PlayerLeft;
 
-      // TODO: Move me somewhere else.
-      // Scan the Interaction Manager for any other child InteractionController objects
-      // and add them to the interaction controllers list.
-      foreach (Transform child in this.transform.GetChildren()) {
-        InteractionController controller = child.GetComponent<InteractionController>();
-        if (controller is InteractionHand) continue;
-        else if (controller is InteractionController) {
-          _interactionControllers.Add(controller);
-        }
-      }
+//      if (_interactionControllers[1] == null) {
+//        GameObject obj = new GameObject();
+//        _interactionControllers[1] = obj.AddComponent<InteractionHand>();
+//      }
+//      _interactionControllers[1].gameObject.name = "Interaction Hand (Right)";
+//      _interactionControllers[1].manager = this;
+//      _interactionControllers[1].transform.parent = this.transform;
+//      _interactionControllers[1].intHand.handDataMode = HandDataMode.PlayerRight;
+
+//      // TODO: Move me somewhere else.
+//      // Scan the Interaction Manager for any other child InteractionController objects
+//      // and add them to the interaction controllers list.
+//      foreach (Transform child in this.transform.GetChildren()) {
+//        InteractionController controller = child.GetComponent<InteractionController>();
+//        if (controller is InteractionHand) continue;
+//        else if (controller is InteractionController) {
+//          _interactionControllers.Add(controller);
+//        }
+//      }
     }
 
     protected void generateAutomaticLayers() {

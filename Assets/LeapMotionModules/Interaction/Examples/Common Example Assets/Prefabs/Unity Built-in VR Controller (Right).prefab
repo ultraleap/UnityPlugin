@@ -68,6 +68,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4945874923476290}
   - component: {fileID: 114370018576889794}
+  - component: {fileID: 114461489096610158}
   m_Layer: 0
   m_Name: Unity Built-in VR Controller (Right)
   m_TagString: Untagged
@@ -213,7 +214,8 @@ MonoBehaviour:
   _hoverEnabled: 1
   _contactEnabled: 1
   _graspingEnabled: 1
-  chirality: 1
+  _trackingProviderType: Leap.Unity.Interaction.DefaultVRNodeTrackingProvider
+  _chirality: 0
   _hoverPoint: {fileID: 4534796067217558}
   primaryHoverPoints:
   - {fileID: 4534796067217558}
@@ -221,6 +223,17 @@ MonoBehaviour:
   maxGraspDistance: 0.06
   graspButtonAxis: RightVRTriggerAxis
   graspTimingSlop: 0.1
+--- !u!114 &114461489096610158
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1582248383679134}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 64c3b6f9e7a282941977291a82b4e7f4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!136 &136928845570482340
 CapsuleCollider:
   m_ObjectHideFlags: 1

@@ -349,7 +349,6 @@ namespace Leap.Unity.Interaction {
     private void initContactBoneContainer() {
       string name = (_unwarpedHandData.IsLeft ? "Left" : "Right") + " Interaction Hand Contact Bones";
       _contactBoneParent = new GameObject(name);
-      contactBoneParent.transform.parent = manager.transform;
     }
 
     private void initContactBones() {

@@ -141,6 +141,14 @@ namespace Leap.Unity.Query {
     }
 
     /// <summary>
+    /// Converts a ReadonlyHashSet object into a query operation, and returns a query
+    /// wrapper that wraps this new operation.
+    /// </summary>
+    public static QueryWrapper<T, EnumerableQueryOp<T, HashSet<T>.Enumerator>> Query<T>(this ReadonlyHashSet<T> hashSet) {
+      return new QueryWrapper<T, EnumerableQueryOp<T, HashSet<T>.Enumerator>>(new EnumerableQueryOp<T, HashSet<T>.Enumerator>(hashSet.GetEnumerator()));
+    }
+
+    /// <summary>
     /// Converts a Queue object into a query operation, and returns a query wrapper
     /// that wraps this new operation.
     /// </summary>

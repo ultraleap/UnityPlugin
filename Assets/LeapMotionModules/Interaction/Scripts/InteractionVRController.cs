@@ -13,9 +13,24 @@ namespace Leap.Unity.Interaction {
 
     [Header("Controller Configuration")]
 
-    [Tooltip("Which hand will hold this controller?")]
-    [EditTimeOnly]
-    public Chirality chirality;
+    [Tooltip("Read-only. InteractionVRControllers use Unity's built-in VRNode tracking "
+           + "API to receive tracking data for VR controllers by default. If you add a "
+           + "custom script to set this controller's trackingProvider to something "
+           + "other than the DefaultVRNodeTrackingProvider, the change will be reflected "
+           + "here. (Hint: Use the ExecuteInEditMode attribute.)")]
+    [Disable, SerializeField]
+    #pragma warning disable 0414
+    private string _trackingProviderType = "DefaultVRNodeTrackingProvider";
+    #pragma warning restore 0414
+    public bool isUsingCustomTracking {
+      get { return !(trackingProvider is DefaultVRNodeTrackingProvider); }
+    }
+
+    [Tooltip("Which hand will hold this controller? This property cannot be changed "
+           + "at runtime.")]
+    [SerializeField, EditTimeOnly]
+    private Chirality _chirality;
+    public Chirality chirality { get { return _chirality; } }
 
     [Header("Hover Configuration")]
 
@@ -106,6 +121,10 @@ namespace Leap.Unity.Interaction {
       defaultProvider.vrNode = this.vrNode;
 
       _defaultTrackingProvider = defaultProvider;
+    }
+
+    protected virtual void OnValidate() {
+      _trackingProviderType = trackingProvider.GetType().ToString();
     }
 
     protected override void Start() {
@@ -247,9 +266,10 @@ namespace Leap.Unity.Interaction {
     protected override bool initContact() {
       initContactBones();
 
-      _contactBoneParent = new GameObject("VR Controller Contact Bones "
-                                        + (isLeft ? "(Left)" : "(Right"));
-      _contactBoneParent.transform.parent = manager.transform;
+      if (_contactBoneParent == null) {
+        _contactBoneParent = new GameObject("VR Controller Contact Bones "
+                                          + (isLeft ? "(Left)" : "(Right"));
+      }
 
       foreach (var contactBone in _contactBones) {
         contactBone.transform.parent = _contactBoneParent.transform;
@@ -259,11 +279,13 @@ namespace Leap.Unity.Interaction {
     }
 
     private void refreshContactBoneTargets() {
-      for (int i = 0; i < _contactBones.Length; i++) {
-        _contactBoneTargetPositions[i]
-          = this.transform.TransformPoint(_contactBoneLocalPositions[i]);
-        _contactBoneTargetRotations[i]
-          = this.transform.TransformRotation(_contactBoneLocalRotations[i]);
+      if (_wasContactInitialized) {
+        for (int i = 0; i < _contactBones.Length; i++) {
+          _contactBoneTargetPositions[i]
+            = this.transform.TransformPoint(_contactBoneLocalPositions[i]);
+          _contactBoneTargetRotations[i]
+            = this.transform.TransformRotation(_contactBoneLocalRotations[i]);
+        }
       }
     }
 

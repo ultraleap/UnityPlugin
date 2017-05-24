@@ -671,6 +671,7 @@ namespace Leap.Unity.Interaction {
     }
 
     private bool _contactInitialized = false;
+    protected bool _wasContactInitialized { get { return _contactInitialized; } }
     protected abstract ContactBone[] contactBones { get; }
     protected abstract GameObject contactBoneParent { get; }
 
@@ -701,6 +702,14 @@ namespace Leap.Unity.Interaction {
 
     private void finishInitContact() {
       contactBoneParent.gameObject.layer = manager.contactBoneLayer;
+      contactBoneParent.transform.parent = null;
+
+      var comment = contactBoneParent.GetComponent<ContactBoneParentComment>();
+      if (comment == null) {
+        comment = contactBoneParent.AddComponent<ContactBoneParentComment>();
+      }
+      comment.controller = this;
+
       foreach (var contactBone in contactBones) {
         contactBone.gameObject.layer = manager.contactBoneLayer;
       }
@@ -958,6 +967,8 @@ namespace Leap.Unity.Interaction {
             manager.StopCoroutine(_delayedDisableSoftContactCoroutine);
           }
           for (int i = 0; i < contactBones.Length; i++) {
+            if (contactBones[i].collider == null) continue;
+
             contactBones[i].collider.isTrigger = true;
 
             // TODO: DELETEME

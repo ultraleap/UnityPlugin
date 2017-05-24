@@ -319,7 +319,7 @@ namespace Leap.Unity {
       return new ChildrenEnumerator(t);
     }
 
-    public struct ChildrenEnumerator {
+    public struct ChildrenEnumerator : IEnumerator<Transform> {
       private Transform _t;
       private int _idx;
       private int _count;
@@ -340,6 +340,7 @@ namespace Leap.Unity {
       public Transform Current {
         get { return _t == null ? null : _t.GetChild(_idx); }
       }
+      object System.Collections.IEnumerator.Current { get { return Current; } }
       public void Reset() {
         _idx = -1;
         _count = _t.childCount;
