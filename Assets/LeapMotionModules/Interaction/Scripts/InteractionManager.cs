@@ -27,8 +27,7 @@ namespace Leap.Unity.Interaction {
   
   [DisallowMultipleComponent]
   [ExecuteInEditMode]
-  public class InteractionManager : MonoBehaviour,
-                                    IInternalInteractionManager, IRuntimeGizmoComponent {
+  public class InteractionManager : MonoBehaviour, IRuntimeGizmoComponent {
 
     // Header "Interaction Controllers" via InteractionManagerEditor.cs.
     [SerializeField]
@@ -331,7 +330,7 @@ namespace Leap.Unity.Interaction {
         // Check controllers beginning object suspension.
         foreach (var controller in _activeControllersBuffer) {
           IInteractionBehaviour suspendedObj;
-          if (controller.CheckSuspensionBegin(out suspendedObj)) {
+          if ((controller as IInternalInteractionController).CheckSuspensionBegin(out suspendedObj)) {
             suspendedObj.BeginSuspension(controller);
           }
         }
@@ -339,7 +338,7 @@ namespace Leap.Unity.Interaction {
         // Check controllers ending object suspension.
         foreach (var controller in _activeControllersBuffer) {
           IInteractionBehaviour resumedObj;
-          if (controller.CheckSuspensionEnd(out resumedObj)) {
+          if ((controller as IInternalInteractionController).CheckSuspensionEnd(out resumedObj)) {
             resumedObj.EndSuspension(controller);
           }
         }
@@ -374,7 +373,7 @@ namespace Leap.Unity.Interaction {
       remapInteractionObjectStateChecks(
         controllers: interactionControllers,
         stateCheckFunc: (InteractionController maybeReleasingController, out IInteractionBehaviour maybeReleasedObject) => {
-          return maybeReleasingController.CheckGraspEnd(out maybeReleasedObject);
+          return (maybeReleasingController as IInternalInteractionController).CheckGraspEnd(out maybeReleasedObject);
         },
         actionPerInteractionObject: (releasedObject, releasingIntControllers) => {
           releasedObject.EndGrasp(releasingIntControllers);
@@ -385,7 +384,7 @@ namespace Leap.Unity.Interaction {
       remapMultiInteractionObjectStateChecks(
         controllers: interactionControllers,
         multiObjectStateCheckFunc: (InteractionController maybeEndedContactingController, out HashSet<IInteractionBehaviour> endContactedObjects) => {
-          return maybeEndedContactingController.CheckContactEnd(out endContactedObjects);
+          return (maybeEndedContactingController as IInternalInteractionController).CheckContactEnd(out endContactedObjects);
         },
         actionPerInteractionObject: (endContactedObject, endContactedIntControllers) => {
           endContactedObject.EndContact(endContactedIntControllers);
@@ -396,7 +395,7 @@ namespace Leap.Unity.Interaction {
       remapInteractionObjectStateChecks(
         controllers: interactionControllers,
         stateCheckFunc: (InteractionController maybeEndedPrimaryHoveringController, out IInteractionBehaviour endPrimaryHoveredObject) => {
-          return maybeEndedPrimaryHoveringController.CheckPrimaryHoverEnd(out endPrimaryHoveredObject);
+          return (maybeEndedPrimaryHoveringController as IInternalInteractionController).CheckPrimaryHoverEnd(out endPrimaryHoveredObject);
         },
         actionPerInteractionObject: (endPrimaryHoveredObject, noLongerPrimaryHoveringControllers) => {
           endPrimaryHoveredObject.EndPrimaryHover(noLongerPrimaryHoveringControllers);
@@ -407,7 +406,7 @@ namespace Leap.Unity.Interaction {
       remapMultiInteractionObjectStateChecks(
         controllers: interactionControllers,
         multiObjectStateCheckFunc: (InteractionController maybeEndedHoveringController, out HashSet<IInteractionBehaviour> endHoveredObjects) => {
-          return maybeEndedHoveringController.CheckHoverEnd(out endHoveredObjects);
+          return (maybeEndedHoveringController as IInternalInteractionController).CheckHoverEnd(out endHoveredObjects);
         },
         actionPerInteractionObject: (endHoveredObject, endHoveringIntControllers) => {
           endHoveredObject.EndHover(endHoveringIntControllers);
@@ -418,7 +417,7 @@ namespace Leap.Unity.Interaction {
       remapMultiInteractionObjectStateChecks(
         controllers: interactionControllers,
         multiObjectStateCheckFunc: (InteractionController maybeBeganHoveringController, out HashSet<IInteractionBehaviour> beganHoveredObjects) => {
-          return maybeBeganHoveringController.CheckHoverBegin(out beganHoveredObjects);
+          return (maybeBeganHoveringController as IInternalInteractionController).CheckHoverBegin(out beganHoveredObjects);
         },
         actionPerInteractionObject: (beganHoveredObject, beganHoveringIntControllers) => {
           beganHoveredObject.BeginHover(beganHoveringIntControllers);
@@ -429,7 +428,7 @@ namespace Leap.Unity.Interaction {
       remapInteractionObjectStateChecks(
         controllers: interactionControllers,
         stateCheckFunc: (InteractionController maybeBeganPrimaryHoveringController, out IInteractionBehaviour primaryHoveredObject) => {
-          return maybeBeganPrimaryHoveringController.CheckPrimaryHoverBegin(out primaryHoveredObject);
+          return (maybeBeganPrimaryHoveringController as IInternalInteractionController).CheckPrimaryHoverBegin(out primaryHoveredObject);
         },
         actionPerInteractionObject: (newlyPrimaryHoveredObject, beganPrimaryHoveringControllers) => {
           newlyPrimaryHoveredObject.BeginPrimaryHover(beganPrimaryHoveringControllers);
@@ -440,7 +439,7 @@ namespace Leap.Unity.Interaction {
       remapMultiInteractionObjectStateChecks(
         controllers: interactionControllers,
         multiObjectStateCheckFunc: (InteractionController maybeBeganContactingController, out HashSet<IInteractionBehaviour> beganContactedObjects) => {
-          return maybeBeganContactingController.CheckContactBegin(out beganContactedObjects);
+          return (maybeBeganContactingController as IInternalInteractionController).CheckContactBegin(out beganContactedObjects);
         },
         actionPerInteractionObject: (beganContactedObject, beganContactingIntControllers) => {
           beganContactedObject.BeginContact(beganContactingIntControllers);
@@ -451,7 +450,7 @@ namespace Leap.Unity.Interaction {
       remapInteractionObjectStateChecks(
         controllers: interactionControllers,
         stateCheckFunc: (InteractionController maybeBeganGraspingController, out IInteractionBehaviour graspedObject) => {
-          return maybeBeganGraspingController.CheckGraspBegin(out graspedObject);
+          return (maybeBeganGraspingController as IInternalInteractionController).CheckGraspBegin(out graspedObject);
         },
         actionPerInteractionObject: (newlyGraspedObject, beganGraspingIntControllers) => {
           newlyGraspedObject.BeginGrasp(beganGraspingIntControllers);
@@ -462,7 +461,7 @@ namespace Leap.Unity.Interaction {
       remapMultiInteractionObjectStateChecks(
         controllers: interactionControllers,
         multiObjectStateCheckFunc: (InteractionController maybeSustainedHoveringController, out HashSet<IInteractionBehaviour> hoveredObjects) => {
-          return maybeSustainedHoveringController.CheckHoverStay(out hoveredObjects);
+          return (maybeSustainedHoveringController as IInternalInteractionController).CheckHoverStay(out hoveredObjects);
         },
         actionPerInteractionObject: (hoveredObject, hoveringIntControllers) => {
           hoveredObject.StayHovered(hoveringIntControllers);
@@ -473,7 +472,7 @@ namespace Leap.Unity.Interaction {
       remapInteractionObjectStateChecks(
         controllers: interactionControllers,
         stateCheckFunc: (InteractionController maybeSustainedPrimaryHoveringController, out IInteractionBehaviour primaryHoveredObject) => {
-          return maybeSustainedPrimaryHoveringController.CheckPrimaryHoverStay(out primaryHoveredObject);
+          return (maybeSustainedPrimaryHoveringController as IInternalInteractionController).CheckPrimaryHoverStay(out primaryHoveredObject);
         },
         actionPerInteractionObject: (primaryHoveredObject, primaryHoveringControllers) => {
           primaryHoveredObject.StayPrimaryHovered(primaryHoveringControllers);
@@ -484,7 +483,7 @@ namespace Leap.Unity.Interaction {
       remapMultiInteractionObjectStateChecks(
         controllers: interactionControllers,
         multiObjectStateCheckFunc: (InteractionController maybeSustainedContactingController, out HashSet<IInteractionBehaviour> contactedObjects) => {
-          return maybeSustainedContactingController.CheckContactStay(out contactedObjects);
+          return (maybeSustainedContactingController as IInternalInteractionController).CheckContactStay(out contactedObjects);
         },
         actionPerInteractionObject: (contactedObject, contactingIntControllers) => {
           contactedObject.StayContacted(contactingIntControllers);
@@ -495,7 +494,7 @@ namespace Leap.Unity.Interaction {
       remapInteractionObjectStateChecks(
         controllers: interactionControllers,
         stateCheckFunc: (InteractionController maybeSustainedGraspingController, out IInteractionBehaviour graspedObject) => {
-          return maybeSustainedGraspingController.CheckGraspHold(out graspedObject);
+          return (maybeSustainedGraspingController as IInternalInteractionController).CheckGraspHold(out graspedObject);
         },
         actionPerInteractionObject: (contactedObject, contactingIntControllers) => {
           contactedObject.StayGrasped(contactingIntControllers);

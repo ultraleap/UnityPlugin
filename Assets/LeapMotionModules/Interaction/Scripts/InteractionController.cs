@@ -604,7 +604,7 @@ namespace Leap.Unity.Interaction {
     /// Outputs objects that stopped being hovered by this hand this frame into hoverEndedObjects and returns whether
     /// the output set is empty.
     /// </summary>
-    public bool CheckHoverEnd(out HashSet<IInteractionBehaviour> hoverEndedObjects) {
+    bool IInternalInteractionController.CheckHoverEnd(out HashSet<IInteractionBehaviour> hoverEndedObjects) {
       // Hover checks via the activity manager are robust to destroyed or made-invalid objects,
       // so no additional validity checking is required.
       hoverEndedObjects = _hoverEndedBuffer;
@@ -617,7 +617,7 @@ namespace Leap.Unity.Interaction {
     /// Outputs objects that began being hovered by this hand this frame into hoverBeganObjects and returns whether
     /// the output set is empty.
     /// </summary>
-    public bool CheckHoverBegin(out HashSet<IInteractionBehaviour> hoverBeganObjects) {
+    bool IInternalInteractionController.CheckHoverBegin(out HashSet<IInteractionBehaviour> hoverBeganObjects) {
       hoverBeganObjects = _hoverBeganBuffer;
       return _hoverBeganBuffer.Count > 0;
     }
@@ -627,7 +627,7 @@ namespace Leap.Unity.Interaction {
     /// Outputs objects that are currently hovered by this hand into hoveredObjects and returns whether the
     /// output set is empty.
     /// </summary>
-    public bool CheckHoverStay(out HashSet<IInteractionBehaviour> hoveredObjects) {
+    bool IInternalInteractionController.CheckHoverStay(out HashSet<IInteractionBehaviour> hoveredObjects) {
       hoveredObjects = _hoveredObjects;
       return hoveredObjects.Count > 0;
     }
@@ -685,7 +685,7 @@ namespace Leap.Unity.Interaction {
     /// Returns whether an object stopped being primarily hovered by this hand this frame and, if so,
     /// outputs the object into primaryHoverEndedObject (it will be null otherwise).
     /// </summary>
-    public bool CheckPrimaryHoverEnd(out IInteractionBehaviour primaryHoverEndedObject) {
+    bool IInternalInteractionController.CheckPrimaryHoverEnd(out IInteractionBehaviour primaryHoverEndedObject) {
       primaryHoverEndedObject = _primaryHoverEndedObject;
       bool primaryHoverEnded = primaryHoverEndedObject != null;
 
@@ -701,7 +701,7 @@ namespace Leap.Unity.Interaction {
     /// Returns whether an object began being primarily hovered by this hand this frame and, if so,
     /// outputs the object into primaryHoverBeganObject (it will be null otherwise).
     /// </summary>
-    public bool CheckPrimaryHoverBegin(out IInteractionBehaviour primaryHoverBeganObject) {
+    bool IInternalInteractionController.CheckPrimaryHoverBegin(out IInteractionBehaviour primaryHoverBeganObject) {
       primaryHoverBeganObject = _primaryHoverBeganObject;
       bool primaryHoverBegan = primaryHoverBeganObject != null;
 
@@ -717,7 +717,7 @@ namespace Leap.Unity.Interaction {
     /// Returns whether any object is the primary hover of this hand and, if so, outputs
     /// the object into primaryHoveredObject.
     /// </summary>
-    public bool CheckPrimaryHoverStay(out IInteractionBehaviour primaryHoveredObject) {
+    bool IInternalInteractionController.CheckPrimaryHoverStay(out IInteractionBehaviour primaryHoveredObject) {
       primaryHoveredObject = _primaryHoveredObject;
       bool primaryHoverStayed = primaryHoveredObject != null;
 
@@ -830,7 +830,7 @@ namespace Leap.Unity.Interaction {
     protected abstract bool initContact();
 
     private void finishInitContact() {
-      contactBoneParent.gameObject.layer = manager.contactBoneLayer;
+      contactBoneParent.layer = manager.contactBoneLayer;
       contactBoneParent.transform.parent = null;
 
       var comment = contactBoneParent.GetComponent<ContactBoneParent>();
@@ -868,24 +868,20 @@ namespace Leap.Unity.Interaction {
 
       // Disable contact bone parent if we lose tracking.
       if (!isTracked) {
-        contactBoneParent.gameObject.SetActive(false);
+        contactBoneParent.SetActive(false);
         return;
       }
       else {
-        if (!contactBoneParent.gameObject.activeSelf) {
-          contactBoneParent.gameObject.SetActive(true);
+        if (!contactBoneParent.activeSelf) {
+          contactBoneParent.SetActive(true);
         }
       }
       
       // Request and store target bone positions and rotations
       // for use during the contact update.
       for (int i = 0; i < contactBones.Length; i++) {
-        Vector3 targetPosition;
-        Quaternion targetRotation;
-        getColliderBoneTargetPositionRotation(i, out targetPosition, out targetRotation);
-
-        _boneTargetPositions[i] = targetPosition;
-        _boneTargetRotations[i] = targetRotation;
+        getColliderBoneTargetPositionRotation(i, out _boneTargetPositions[i],
+                                                 out _boneTargetRotations[i]);
       }
 
       using (new ProfilerSample("Update Contact Bones")) {
@@ -1302,7 +1298,7 @@ namespace Leap.Unity.Interaction {
       _contactBehaviourRemovalCache.Clear();
       foreach (var interactionObj in _contactBehavioursLastFrame) {
         if (!_contactBehaviours.ContainsKey(interactionObj)
-         || !contactBoneParent.gameObject.activeInHierarchy
+         || !contactBoneParent.activeInHierarchy
          /* || !contactEnabled TODO: Use properties to support disabling contact at runtime! */) {
           _contactEndedBuffer.Add(interactionObj);
           _contactBehaviourRemovalCache.Add(interactionObj);
@@ -1313,7 +1309,7 @@ namespace Leap.Unity.Interaction {
       }
 
       // Update contact began state.
-      if (contactBoneParent.gameObject.activeInHierarchy /* && contactEnabled TODO: can this just be removed cleanly?*/) {
+      if (contactBoneParent.activeInHierarchy /* && contactEnabled TODO: can this just be removed cleanly?*/) {
         foreach (var intObjCountPair in _contactBehaviours) {
           var interactionObj = intObjCountPair.Key;
           if (!_contactBehavioursLastFrame.Contains(interactionObj)) {
@@ -1330,7 +1326,7 @@ namespace Leap.Unity.Interaction {
     /// Outputs interaction objects that stopped being touched by this hand this frame into contactEndedObjects
     /// and returns whether the output set is empty.
     /// </summary>
-    public bool CheckContactEnd(out HashSet<IInteractionBehaviour> contactEndedObjects) {
+    bool IInternalInteractionController.CheckContactEnd(out HashSet<IInteractionBehaviour> contactEndedObjects) {
       // Ensure contact objects haven't been destroyed or set to ignore contact
       _removeContactObjsBuffer.Clear();
       foreach (var objTouchCountPair in _contactBehaviours) {
@@ -1357,7 +1353,7 @@ namespace Leap.Unity.Interaction {
     /// Outputs interaction objects that started being touched by this hand this frame into contactBeganObjects
     /// and returns whether the output set is empty.
     /// </summary>
-    public bool CheckContactBegin(out HashSet<IInteractionBehaviour> contactBeganObjects) {
+    bool IInternalInteractionController.CheckContactBegin(out HashSet<IInteractionBehaviour> contactBeganObjects) {
       contactBeganObjects = _contactBeganBuffer;
       return _contactBeganBuffer.Count > 0;
     }
@@ -1368,7 +1364,7 @@ namespace Leap.Unity.Interaction {
     /// Outputs interaction objects that are currently being touched by the hand into contactedObjects
     /// and returns whether the output set is empty.
     /// </summary>
-    public bool CheckContactStay(out HashSet<IInteractionBehaviour> contactedObjects) {
+    bool IInternalInteractionController.CheckContactStay(out HashSet<IInteractionBehaviour> contactedObjects) {
       _contactedObjects.Clear();
       foreach (var objCountPair in _contactBehaviours) {
         _contactedObjects.Add(objCountPair.Key);
@@ -1569,7 +1565,7 @@ namespace Leap.Unity.Interaction {
     /// Called by the Interaction Manager every fixed frame.
     /// Returns true if the hand just released an object and outputs the released object into releasedObject.
     /// </summary>
-    public bool CheckGraspEnd(out IInteractionBehaviour releasedObject) {
+    bool IInternalInteractionController.CheckGraspEnd(out IInteractionBehaviour releasedObject) {
       releasedObject = null;
 
       bool shouldReleaseObject = false;
@@ -1601,7 +1597,7 @@ namespace Leap.Unity.Interaction {
     /// Called by the Interaction Manager every fixed frame.
     /// Returns true if the hand just grasped an object and outputs the grasped object into graspedObject.
     /// </summary>
-    public bool CheckGraspBegin(out IInteractionBehaviour newlyGraspedObject) {
+    bool IInternalInteractionController.CheckGraspBegin(out IInteractionBehaviour newlyGraspedObject) {
       newlyGraspedObject = null;
 
       // Check grasping against interaction state.
@@ -1626,7 +1622,7 @@ namespace Leap.Unity.Interaction {
     /// Returns whether there the hand is currently grasping an object and, if it is, outputs that
     /// object into graspedObject.
     /// </summary>
-    public bool CheckGraspHold(out IInteractionBehaviour graspedObject) {
+    bool IInternalInteractionController.CheckGraspHold(out IInteractionBehaviour graspedObject) {
       graspedObject = _graspedObject;
       return graspedObject != null;
     }
@@ -1636,7 +1632,7 @@ namespace Leap.Unity.Interaction {
     /// Returns whether the hand began suspending an object this frame and, if it did, outputs that
     /// object into suspendedObject.
     /// </summary>
-    public bool CheckSuspensionBegin(out IInteractionBehaviour suspendedObject) {
+    bool IInternalInteractionController.CheckSuspensionBegin(out IInteractionBehaviour suspendedObject) {
       suspendedObject = null;
 
       if (_graspedObject != null && !isTracked && !_graspedObject.isSuspended) {
@@ -1651,7 +1647,7 @@ namespace Leap.Unity.Interaction {
     /// Returns whether the hand stopped suspending an object this frame and, if it did, outputs that
     /// object into resumedObject.
     /// </summary>
-    public bool CheckSuspensionEnd(out IInteractionBehaviour resumedObject) {
+    bool IInternalInteractionController.CheckSuspensionEnd(out IInteractionBehaviour resumedObject) {
       resumedObject = null;
 
       if (_graspedObject != null && isTracked && _graspedObject.isSuspended) {
@@ -1684,7 +1680,7 @@ namespace Leap.Unity.Interaction {
           drawer.color = Color.white;
         }
 
-        drawer.DrawColliders(contactBoneParent.gameObject, true, true, true);
+        drawer.DrawColliders(contactBoneParent, true, true, true);
       }
 
       // Hover Point

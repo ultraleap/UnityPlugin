@@ -140,13 +140,11 @@ namespace Leap.Unity.Interaction {
         if (handAccessorFunc == null) {
           if (handDataMode == HandDataMode.PlayerLeft) {
             handAccessorFunc = (frame) => frame.Hands.Query()
-                                                     .Where(hand => hand.IsLeft)
-                                                     .FirstOrDefault();
+                                                     .FirstOrDefault(hand => hand.IsLeft);
           }
           else {
             handAccessorFunc = (frame) => frame.Hands.Query()
-                                                     .Where(hand => hand.IsRight)
-                                                     .FirstOrDefault();
+                                                     .FirstOrDefault(hand => hand.IsRight);
           }
         }
       }
