@@ -185,6 +185,11 @@ namespace Leap.Unity.Interaction {
     public override bool isTracked { get { return _hand != null; } }
 
     /// <summary>
+    /// Gets whether the underlying Leap hand is currently being moved in worldspace.
+    /// </summary>
+    public override bool isBeingMoved { get { return isTracked; } }
+
+    /// <summary>
     /// Gets the last tracked state of the Leap hand.
     /// 
     /// Note for those using the Leap Graphical Renderer: If the hand required warping

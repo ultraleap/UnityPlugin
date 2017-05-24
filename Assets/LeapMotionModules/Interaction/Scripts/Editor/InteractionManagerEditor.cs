@@ -150,13 +150,20 @@ namespace Leap.Unity.Interaction {
                                      List<ControllerStatusMessage> messages) {
       if (Application.isPlaying) {
         if (controller.isTracked) {
-          messages.Add(new ControllerStatusMessage() {
-            message = "Tracked",
-            tooltip = "This interaction controller is currently being tracked.",
-            color = Colors.Good
-          });
-        }
-        else {
+          if (controller.isBeingMoved) {
+            messages.Add(new ControllerStatusMessage() {
+              message = "Tracked",
+              tooltip = "This interaction controller is currently being tracked.",
+              color = Colors.Good
+            });
+          } else {
+            messages.Add(new ControllerStatusMessage() {
+              message = "Not Moving",
+              tooltip = "This interaction controller is currently not being moved.",
+              color = Colors.Caution
+            });
+          }
+        } else {
           messages.Add(new ControllerStatusMessage() {
             message = "Untracked",
             tooltip = "This interaction controller is not currently being tracked.",

@@ -95,6 +95,12 @@ namespace Leap.Unity.Interaction {
     public abstract bool isTracked { get; }
 
     /// <summary>
+    /// Gets whether the underlying object (Leap hand or a held controller) is currently 
+    /// being moved or being actively manipulated by the player.
+    /// </summary>
+    public abstract bool isBeingMoved { get; }
+
+    /// <summary>
     /// Gets whether the underlying object (Leap hand or a held controller) represents
     /// or is held by a left hand (true) or a right hand (false).
     /// </summary>
@@ -1097,12 +1103,13 @@ namespace Leap.Unity.Interaction {
         return;
       }
 
-      int count = _contactBehaviours[interactionObj];
-      if (count == 1) {
-        _contactBehaviours.Remove(interactionObj);
-      }
-      else {
-        _contactBehaviours[interactionObj] = count - 1;
+      if (_contactBehaviours.ContainsKey(interactionObj)) {
+        int count = _contactBehaviours[interactionObj];
+        if (count == 1) {
+          _contactBehaviours.Remove(interactionObj);
+        } else {
+          _contactBehaviours[interactionObj] = count - 1;
+        }
       }
     }
 

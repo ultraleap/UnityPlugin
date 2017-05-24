@@ -76,6 +76,7 @@ namespace Leap.Unity.Interaction {
 
     private bool _hasTrackedPositionLastFrame = false;
     private Vector3 _trackedPositionLastFrame = Vector3.zero;
+    private Quaternion _trackedRotationLastFrame = Quaternion.identity;
 
     private IVRControllerTrackingProvider _backingTrackingProvider = null;
     public IVRControllerTrackingProvider trackingProvider {
@@ -137,9 +138,17 @@ namespace Leap.Unity.Interaction {
 
     }
 
+    private float lastTimeMoved = 0f;
     private void refreshControllerTrackingData(Vector3 position, Quaternion rotation) {
+      Transform baseTransform = Camera.main.transform.parent;
+      if ((             (baseTransform.InverseTransformPoint(position)  -  baseTransform.InverseTransformPoint(_trackedPositionLastFrame)) / Time.fixedDeltaTime).magnitude > 0.005f ||
+        Quaternion.Angle(baseTransform.InverseTransformRotation(rotation), baseTransform.InverseTransformRotation(_trackedRotationLastFrame)) > 0.06f) {
+        lastTimeMoved = Time.fixedTime;
+      }
+
       if (_hasTrackedPositionLastFrame) {
         _trackedPositionLastFrame = this.transform.position;
+        _trackedRotationLastFrame = this.transform.rotation;
       }
 
       this.transform.position = position;
@@ -149,6 +158,7 @@ namespace Leap.Unity.Interaction {
       if (!_hasTrackedPositionLastFrame) {
         _hasTrackedPositionLastFrame = true;
         _trackedPositionLastFrame = this.transform.position;
+        _trackedRotationLastFrame = this.transform.rotation;
       }
     }
 
@@ -160,6 +170,15 @@ namespace Leap.Unity.Interaction {
     public override bool isTracked {
       get {
         return trackingProvider != null && trackingProvider.isTracked;
+      }
+    }
+
+    /// <summary>
+    /// Gets whether or not the underlying controller is currently being moved in worldspace.
+    /// </summary>
+    public override bool isBeingMoved {
+      get {
+        return trackingProvider != null && trackingProvider.isTracked && Time.fixedTime - lastTimeMoved < 3f;
       }
     }
 
