@@ -50,22 +50,6 @@ namespace Leap.Unity.Interaction {
 
         newPoints.SetWorldPosition(i, manipulatorPosition);
       }
-
-      // TODO: Delete me. Make sure InteractionHands provide correct manipulator positions
-      //for (int f = 0; f < NUM_FINGERS; f++) {
-      //  Finger finger = controller.GetLastTrackedLeapHand().Fingers[f];
-      //  Finger.FingerType fingerType = finger.Type;
-
-      //  for (int j = 0; j < NUM_BONES; j++) {
-      //    Bone.BoneType boneType = (Bone.BoneType)j;
-      //    Bone bone = finger.Bone(boneType);
-
-      //    Vector3 bonePos = bone.NextJoint.ToVector3();
-
-      //    // Global position of the point is just the position of the joint itself.
-      //    newPoints.SetGlobalPosition(bonePos, fingerType, boneType);
-      //  }
-      //}
     }
 
     public void RemoveController(InteractionController controller) {

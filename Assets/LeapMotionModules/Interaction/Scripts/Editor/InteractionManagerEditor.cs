@@ -97,8 +97,7 @@ namespace Leap.Unity.Interaction {
     private void drawControllerStatusEditor(InteractionController controller) {
       // Controller object
       EditorGUI.BeginDisabledGroup(true);
-      EditorGUILayout.ObjectField(controller, typeof(InteractionController), true,
-                                  GUILayout.MinHeight(20));
+      EditorGUILayout.ObjectField(controller, typeof(InteractionController), true);
       EditorGUI.EndDisabledGroup();
 
       // Status

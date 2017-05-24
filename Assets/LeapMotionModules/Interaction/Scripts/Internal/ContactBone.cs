@@ -34,7 +34,11 @@ namespace Leap.Unity.Interaction.Internal {
     /// The Rigidbody of this ContactBone. This field must not be null for the ContactBone
     /// to work correctly.
     /// </summary>
-    public Rigidbody body;
+    public
+    #if UNITY_EDITOR
+    new
+    #endif
+    Rigidbody rigidbody;
 
     /// <summary>
     /// The Collider of this ContactBone. This field must not be null for the ContactBone
@@ -106,11 +110,11 @@ namespace Leap.Unity.Interaction.Internal {
     Dictionary<IInteractionBehaviour, float> contactingInteractionBehaviours = new Dictionary<IInteractionBehaviour, float>();
 
     void Start() {
-      interactionController.manager.contactBoneBodies[body] = this;
+      interactionController.manager.contactBoneBodies[rigidbody] = this;
     }
 
     void OnDestroy() {
-      interactionController.manager.contactBoneBodies.Remove(body);
+      interactionController.manager.contactBoneBodies.Remove(rigidbody);
     }
 
     void OnCollisionEnter(Collision collision) {
@@ -125,10 +129,10 @@ namespace Leap.Unity.Interaction.Internal {
         _lastObjectTouchedAdjustedMass = collision.rigidbody.mass;
         if (interactionObj is InteractionBehaviour) {
           switch ((interactionObj as InteractionBehaviour).contactForceMode) {
-            case InteractionBehaviour.ContactForceMode.UI:
+            case ContactForceMode.UI:
               _lastObjectTouchedAdjustedMass *= 10F;
               break;
-            case InteractionBehaviour.ContactForceMode.Object: default:
+            case ContactForceMode.Object: default:
               if (interactionHand != null) {
                 _lastObjectTouchedAdjustedMass *= 0.1F;
               }
@@ -141,7 +145,7 @@ namespace Leap.Unity.Interaction.Internal {
 
         if (collision.impulse.magnitude > 0f) {
           if (!contactingInteractionBehaviours.ContainsKey(interactionObj)) {
-            interactionController.NotifyContactBoneCollisionEnter(this, interactionObj, false);
+            interactionController.NotifyContactBoneCollisionEnter(this, interactionObj);
             contactingInteractionBehaviours.Add(interactionObj, Time.fixedTime);
           }
         }
@@ -153,10 +157,10 @@ namespace Leap.Unity.Interaction.Internal {
       float timeEntered = 0;
       if (interactionController.manager.interactionObjectBodies.TryGetValue(collision.rigidbody, out interactionObj)) {
         if (collision.impulse.magnitude > 0f && !contactingInteractionBehaviours.ContainsKey(interactionObj)) {
-          interactionController.NotifyContactBoneCollisionEnter(this, interactionObj, false);
+          interactionController.NotifyContactBoneCollisionEnter(this, interactionObj);
           contactingInteractionBehaviours.Add(interactionObj, Time.fixedTime);
         } else if (contactingInteractionBehaviours.TryGetValue(interactionObj, out timeEntered) && Time.fixedTime - timeEntered > Time.fixedDeltaTime * 10f) {
-          interactionController.NotifyContactBoneCollisionExit(this, interactionObj, false);
+          interactionController.NotifyContactBoneCollisionExit(this, interactionObj);
           contactingInteractionBehaviours.Remove(interactionObj);
         }
       }
@@ -166,7 +170,7 @@ namespace Leap.Unity.Interaction.Internal {
       IInteractionBehaviour interactionObj;
       if (interactionController.manager.interactionObjectBodies.TryGetValue(collision.rigidbody, out interactionObj)) {
         if (contactingInteractionBehaviours.ContainsKey(interactionObj)) {
-          interactionController.NotifyContactBoneCollisionExit(this, interactionObj, false);
+          interactionController.NotifyContactBoneCollisionExit(this, interactionObj);
           contactingInteractionBehaviours.Remove(interactionObj);
         }
       }
@@ -180,7 +184,7 @@ namespace Leap.Unity.Interaction.Internal {
       }
       IInteractionBehaviour interactionObj;
       if (interactionController.manager.interactionObjectBodies.TryGetValue(collider.attachedRigidbody, out interactionObj)) {
-        interactionController.NotifyContactBoneCollisionEnter(this, interactionObj, true);
+        interactionController.NotifyContactBoneCollisionEnter(this, interactionObj);
 
         interactionController.NotifySoftContactCollisionEnter(this, interactionObj, collider);
       }
@@ -189,7 +193,7 @@ namespace Leap.Unity.Interaction.Internal {
     void OnTriggerExit(Collider collider) {
       IInteractionBehaviour interactionObj;
       if (interactionController.manager.interactionObjectBodies.TryGetValue(collider.attachedRigidbody, out interactionObj)) {
-        interactionController.NotifyContactBoneCollisionExit(this, interactionObj, true);
+        interactionController.NotifyContactBoneCollisionExit(this, interactionObj);
 
         interactionController.NotifySoftContactCollisionExit(this, interactionObj, collider);
       }

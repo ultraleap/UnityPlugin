@@ -14,13 +14,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Leap.Unity.Interaction.Internal {
+namespace Leap.Unity.Interaction {
 
   /// <summary>
   /// IInteractionBehaviour is the interface that defines all Interaction objects,
   /// specifying the minimum set of functionality required to make objects interactable.
   /// </summary>
-  public interface IInteractionBehaviour {
+  public interface IInteractionBehaviour /* : IInternalInteractionBehaviour */ {
 
     // Properties from MonoBehaviour.
     string              name       { get; } // (subclass MonoBehaviour to satisfy)
