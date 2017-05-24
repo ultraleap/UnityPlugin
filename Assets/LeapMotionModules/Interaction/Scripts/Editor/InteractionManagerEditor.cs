@@ -11,6 +11,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
+using Leap.Unity.RuntimeGizmos;
 
 namespace Leap.Unity.Interaction {
 
@@ -31,10 +32,28 @@ namespace Leap.Unity.Interaction {
                                 "_interactionLayer",
                                 "_interactionNoContactLayer",
                                 "_contactBoneLayer");
+
+      specifyCustomDecorator("_drawControllerRuntimeGizmos", drawControllerRuntimeGizmoDecorator);
     }
 
     public override bool RequiresConstantRepaint() {
       return Application.isPlaying;
+    }
+
+    private RuntimeGizmoManager _runtimeGizmoManager;
+
+    private void drawControllerRuntimeGizmoDecorator(SerializedProperty property) {
+      if (property.boolValue && _runtimeGizmoManager == null) {
+        _runtimeGizmoManager = FindObjectOfType<RuntimeGizmoManager>();
+
+        if (_runtimeGizmoManager == null) {
+          EditorGUILayout.Space();
+          EditorGUILayout.Space();
+          EditorGUILayout.HelpBox("Draw Controller Runtime Gizmos is checked, but there "
+                                + "is no RuntimeGizmoManager in your scene, or it is "
+                                + "disabled.", MessageType.Warning);
+        }
+      }
     }
 
     private void drawControllersStatusEditor(SerializedProperty property) {
@@ -116,12 +135,13 @@ namespace Leap.Unity.Interaction {
       foreach (var statusMessage in messages) {
         var messageColorStyle = new GUIStyle(EditorStyles.label);
         messageColorStyle.normal.textColor = statusMessage.color;
-        messageColorStyle.padding.top += 1;
 
         EditorGUILayout.LabelField(new GUIContent("[" + statusMessage.message + "]",
                                                   statusMessage.tooltip),
                                    messageColorStyle);
+        GUILayout.Space(1);
       }
+      GUILayout.Space(1);
 
       EditorGUILayout.EndVertical();
     }
@@ -208,7 +228,11 @@ namespace Leap.Unity.Interaction {
       // Check if the controller is configured correctly if it is set up with a custom
       // tracking provider.
       if (controller.isUsingCustomTracking) {
-        
+        messages.Add(new ControllerStatusMessage() {
+          message = "Custom Tracking Provider",
+          tooltip = "You are using a custom tracking provider for this VR controller.",
+          color = Colors.Caution
+        });
       }
 
       // Check if the player has duplicate VRNode left controllers or right controllers.
@@ -225,18 +249,6 @@ namespace Leap.Unity.Interaction {
                   + "scene. You should remove one of the duplicates.",
           color = Colors.Problem
         });
-        //messages.Add(new ControllerStatusMessage() {
-        //  message = "Duplicate VR Controller",
-        //  tooltip = "You already have a VRNode controller with this chirality in your "
-        //          + "scene. You should remove one of the duplicates.",
-        //  color = Colors.Problem
-        //});
-        //messages.Add(new ControllerStatusMessage() {
-        //  message = "Duplicate VR Controller",
-        //  tooltip = "You already have a VRNode controller with this chirality in your "
-        //          + "scene. You should remove one of the duplicates.",
-        //  color = Colors.Problem
-        //});
       }
       if (isLeftVRNodeController) {
         _leftVRNodeController = controller;

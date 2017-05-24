@@ -32,17 +32,17 @@ namespace Leap.Unity.Interaction {
         var position = InputTracking.GetLocalPosition(vrNode);
         var rotation = InputTracking.GetLocalRotation(vrNode);
 
-        Transform rigTransform = Camera.main.transform.parent;
-        if (rigTransform != null) {
-          position = rigTransform.TransformPoint(position);
-          rotation = rigTransform.TransformRotation(rotation);
-        }
-        
         // Unfortunately, the only alternative to checking the controller's position and
         // rotation for whether or not it is tracked is to request an allocated string
         // array of all currently-connected joysticks, which would allocate garbage
         // every frame, so it's unusable.
         _isTrackingController = position != Vector3.zero || rotation != Quaternion.identity;
+
+        Transform rigTransform = Camera.main.transform.parent;
+        if (rigTransform != null) {
+          position = rigTransform.TransformPoint(position);
+          rotation = rigTransform.TransformRotation(rotation);
+        }
 
         OnTrackingDataUpdate(position, rotation);
       }
