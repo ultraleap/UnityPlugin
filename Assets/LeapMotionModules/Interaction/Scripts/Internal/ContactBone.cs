@@ -8,13 +8,14 @@
  ******************************************************************************/
 
 using UnityEngine;
+using System.Collections.Generic;
 
 namespace Leap.Unity.Interaction.Internal {
 
   /// <summary>
   /// Contact Bones store data for the colliders and rigidbodies in each
-  /// bone of the contact-related representation of an InteractionHand.
-  /// They also notify the InteractionHand of collisions for further
+  /// bone of the contact-related representation of an InteractionController.
+  /// They also notify the InteractionController of collisions for further
   /// processing.
   /// 
   /// To correctly initialize a newly-constructed ContactBone, you must
@@ -60,7 +61,7 @@ namespace Leap.Unity.Interaction.Internal {
           CapsuleCollider capsule = collider as CapsuleCollider;
           return Mathf.Min(capsule.radius * scale.x,
                  Mathf.Min(capsule.radius * scale.y,
-                           capsule.radius * scale.z)) * 2F;
+                           capsule.radius * scale.z)) * 1F;
         }
         else if (collider is BoxCollider) {
           BoxCollider box = collider as BoxCollider;
@@ -102,6 +103,8 @@ namespace Leap.Unity.Interaction.Internal {
 
     public float _lastObjectTouchedAdjustedMass;
 
+    Dictionary<IInteractionBehaviour, float> contactingInteractionBehaviours = new Dictionary<IInteractionBehaviour, float>();
+
     void Start() {
       interactionController.manager.contactBoneBodies[body] = this;
     }
@@ -136,14 +139,36 @@ namespace Leap.Unity.Interaction.Internal {
           }
         }
 
-        interactionController.NotifyContactBoneCollisionEnter(this, interactionObj, false);
+        if (collision.impulse.magnitude > 0f) {
+          if (!contactingInteractionBehaviours.ContainsKey(interactionObj)) {
+            interactionController.NotifyContactBoneCollisionEnter(this, interactionObj, false);
+            contactingInteractionBehaviours.Add(interactionObj, Time.fixedTime);
+          }
+        }
+      }
+    }
+
+    private void OnCollisionStay(Collision collision) {
+      IInteractionBehaviour interactionObj;
+      float timeEntered = 0;
+      if (interactionController.manager.interactionObjectBodies.TryGetValue(collision.rigidbody, out interactionObj)) {
+        if (collision.impulse.magnitude > 0f && !contactingInteractionBehaviours.ContainsKey(interactionObj)) {
+          interactionController.NotifyContactBoneCollisionEnter(this, interactionObj, false);
+          contactingInteractionBehaviours.Add(interactionObj, Time.fixedTime);
+        } else if (contactingInteractionBehaviours.TryGetValue(interactionObj, out timeEntered) && Time.fixedTime - timeEntered > Time.fixedDeltaTime * 10f) {
+          interactionController.NotifyContactBoneCollisionExit(this, interactionObj, false);
+          contactingInteractionBehaviours.Remove(interactionObj);
+        }
       }
     }
 
     void OnCollisionExit(Collision collision) {
       IInteractionBehaviour interactionObj;
       if (interactionController.manager.interactionObjectBodies.TryGetValue(collision.rigidbody, out interactionObj)) {
-        interactionController.NotifyContactBoneCollisionExit(this, interactionObj, false);
+        if (contactingInteractionBehaviours.ContainsKey(interactionObj)) {
+          interactionController.NotifyContactBoneCollisionExit(this, interactionObj, false);
+          contactingInteractionBehaviours.Remove(interactionObj);
+        }
       }
     }
 
