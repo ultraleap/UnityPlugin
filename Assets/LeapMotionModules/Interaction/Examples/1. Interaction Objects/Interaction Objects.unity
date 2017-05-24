@@ -2203,6 +2203,7 @@ GameObject:
   m_Component:
   - component: {fileID: 289258608}
   - component: {fileID: 289258607}
+  - component: {fileID: 289258609}
   m_Layer: 0
   m_Name: Interaction Manager
   m_TagString: Untagged
@@ -2249,13 +2250,31 @@ Transform:
   m_LocalPosition: {x: 0, y: -0.074, z: -0.074}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
-  - {fileID: 486239174}
-  - {fileID: 1500539202}
   - {fileID: 1404227120}
   - {fileID: 1348104502}
+  - {fileID: 486239174}
+  - {fileID: 1500539202}
   m_Father: {fileID: 1155409170}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &289258609
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 289258606}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7d7eaf54dc14a5e4a89bc7fac55ca11a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  interactionManager: {fileID: 289258607}
+  LeftHandControllers:
+  - {fileID: 1404227119}
+  - {fileID: 486239175}
+  RightHandControllers:
+  - {fileID: 1348104503}
+  - {fileID: 1500539203}
 --- !u!1 &294561429
 GameObject:
   m_ObjectHideFlags: 0
@@ -3522,7 +3541,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 289258608}
-  m_RootOrder: 0
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &486239175
 MonoBehaviour:
@@ -3987,7 +4006,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 4961079091640058, guid: 5aacce27e80778a468f931abea7e762b, type: 2}
       propertyPath: m_RootOrder
-      value: 2
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 114573286513584610, guid: 5aacce27e80778a468f931abea7e762b,
         type: 2}
@@ -7193,7 +7212,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 4397032457836324, guid: d1d99d5a6a1071a42829fc947c35ddd0, type: 2}
       propertyPath: m_RootOrder
-      value: 3
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 114199948784266472, guid: d1d99d5a6a1071a42829fc947c35ddd0,
         type: 2}
@@ -7696,7 +7715,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 289258608}
-  m_RootOrder: 1
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1500539203
 MonoBehaviour:

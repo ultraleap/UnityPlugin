@@ -182,9 +182,11 @@ namespace Leap.Unity.Interaction {
     #endregion
 
     protected virtual void OnEnable() {
-      EnableSoftContact();
+      if (_contactInitialized) {
+        EnableSoftContact();
 
-      if (_contactInitialized) resetContactBonePose();
+        resetContactBonePose();
+      }
     }
 
     protected virtual void Start() {
@@ -192,7 +194,9 @@ namespace Leap.Unity.Interaction {
     }
 
     protected virtual void OnDisable() {
-      EnableSoftContact();
+      if (_contactInitialized) {
+        EnableSoftContact();
+      }
       ReleaseGrasp();
 
       ClearHoverTracking();

@@ -141,8 +141,11 @@ namespace Leap.Unity.Interaction {
     private float lastTimeMoved = 0f;
     private void refreshControllerTrackingData(Vector3 position, Quaternion rotation) {
       Transform baseTransform = Camera.main.transform.parent;
-      if ((             (baseTransform.InverseTransformPoint(position)  -  baseTransform.InverseTransformPoint(_trackedPositionLastFrame)) / Time.fixedDeltaTime).magnitude > 0.005f ||
-        Quaternion.Angle(baseTransform.InverseTransformRotation(rotation), baseTransform.InverseTransformRotation(_trackedRotationLastFrame)) > 0.06f) {
+      if (((baseTransform.InverseTransformPoint(position)
+            - baseTransform.InverseTransformPoint(_trackedPositionLastFrame))
+           / Time.fixedDeltaTime).magnitude > 0.15F
+           || Quaternion.Angle(baseTransform.InverseTransformRotation(rotation),
+                               baseTransform.InverseTransformRotation(_trackedRotationLastFrame)) > 0.6F) {
         lastTimeMoved = Time.fixedTime;
       }
 
@@ -178,7 +181,7 @@ namespace Leap.Unity.Interaction {
     /// </summary>
     public override bool isBeingMoved {
       get {
-        return trackingProvider != null && trackingProvider.isTracked && Time.fixedTime - lastTimeMoved < 3f;
+        return trackingProvider != null && trackingProvider.isTracked && Time.fixedTime - lastTimeMoved < 0.1f;
       }
     }
 
