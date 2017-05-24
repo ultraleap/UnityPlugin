@@ -315,7 +315,7 @@ namespace Leap.Unity.Interaction {
       _contactBoneBuffer.Clear();
 
       // Scan for existing colliders and construct contact bones out of them.
-      Utils.FindColliders<Collider>(this.gameObject, ref _colliderBuffer);
+      Utils.FindColliders<Collider>(this.gameObject, _colliderBuffer);
 
       foreach (var collider in _colliderBuffer) {
         ContactBone contactBone = collider.gameObject.AddComponent<ContactBone>();
@@ -330,7 +330,7 @@ namespace Leap.Unity.Interaction {
         body.mass = 1F;
 
         contactBone.interactionController = this;
-        contactBone.body = body;
+        contactBone.rigidbody = body;
         contactBone.collider = collider;
 
         _contactBoneBuffer.Add(contactBone);

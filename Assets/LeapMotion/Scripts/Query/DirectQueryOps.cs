@@ -368,8 +368,10 @@ namespace Leap.Unity.Query {
     }
 
     public void AppendHashSet(HashSet<QueryType> hashSet) {
+      var op = _op;
+
       QueryType obj;
-      while (_op.TryGetNext(out obj)) {
+      while (op.TryGetNext(out obj)) {
         hashSet.Add(obj);
       }
     }

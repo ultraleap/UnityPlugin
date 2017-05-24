@@ -32,7 +32,9 @@ namespace Leap.Unity.Interaction {
   /// </summary>
   public enum ControllerType { Hand, VRController }
 
-  public abstract class InteractionController : MonoBehaviour {
+  [DisallowMultipleComponent]
+  public abstract class InteractionController : MonoBehaviour,
+                                                IInternalInteractionController {
 
     [Tooltip("The manager responsible for this interaction controller. Interaction "
            + "controllers should be children of their interaction manager.")]
@@ -51,9 +53,11 @@ namespace Leap.Unity.Interaction {
     public bool hoverEnabled {
       get { return _hoverEnabled; }
       set {
-        // TODO: If hovering is disabled, make sure proper EndHover state is handled!
-
         _hoverEnabled = value;
+
+        if (!_hoverEnabled) {
+          ClearHoverTracking();
+        }
       }
     }
     
@@ -65,10 +69,20 @@ namespace Leap.Unity.Interaction {
     public bool contactEnabled {
       get { return _contactEnabled; }
       set {
-        // TODO: If contact is disabled, make sure proper EndContact state and 
-        // collider trigger state is handled!
-
         _contactEnabled = value;
+
+        if (!_contactEnabled) {
+          disableContactBones();
+
+          ClearContactTracking();
+        }
+        else {
+          enableContactBones();
+
+          resetContactBonePose();
+
+          EnableSoftContact();
+        }
       }
     }
 
@@ -80,9 +94,11 @@ namespace Leap.Unity.Interaction {
     public bool graspingEnabled {
       get { return _graspingEnabled; }
       set {
-        // TODO: If grasping is disabled, make sure proper EndGrasp state is handled!
-
         _graspingEnabled = value;
+
+        if (!_graspingEnabled) {
+          ReleaseGrasp();
+        }
       }
     }
 
@@ -137,6 +153,9 @@ namespace Leap.Unity.Interaction {
     /// </summary>
     public float scale { get { return this.transform.lossyScale.x; } }
 
+    // A list of InteractionControllers for use as a temporary buffer.
+    private List<InteractionController> _controllerListBuffer = new List<InteractionController>();
+
     #region Events
 
     /// <summary>
@@ -162,6 +181,12 @@ namespace Leap.Unity.Interaction {
 
     #endregion
 
+    protected virtual void OnEnable() {
+      EnableSoftContact();
+
+      if (_contactInitialized) resetContactBonePose();
+    }
+
     protected virtual void Start() {
       if (manager == null) manager = InteractionManager.instance;
     }
@@ -169,6 +194,10 @@ namespace Leap.Unity.Interaction {
     protected virtual void OnDisable() {
       EnableSoftContact();
       ReleaseGrasp();
+
+      ClearHoverTracking();
+      ClearPrimaryHoverTracking();
+      ClearContactTracking();
     }
 
     /// <summary>
@@ -482,6 +511,58 @@ namespace Leap.Unity.Interaction {
       }
     }
 
+    /// <summary>
+    /// Clears all hover tracking state and fires the hover-end callbacks immediately.
+    /// If objects are still in the hover radius around this controller and the
+    /// controller and manager are still active, HoverBegin callbacks will be invoked
+    /// again on the next fixed frame.
+    /// </summary>
+    public void ClearHoverTracking() {
+      _controllerListBuffer.Clear();
+      _controllerListBuffer.Add(this);
+
+      var tempObjs = Pool<HashSet<IInteractionBehaviour>>.Spawn();
+      try {
+        foreach (var intObj in hoveredObjects) {
+          tempObjs.Add(intObj);
+        }
+
+        foreach (var intObj in tempObjs) {
+          // Prevents normal hover state checking on the next frame from firing duplicate
+          // hover-end callbacks. If the object is still hovered (and the controller is
+          // still in an enabled state), the object WILL receive a hover begin callback
+          // on the next frame.
+          _hoveredObjects.Remove(intObj);
+          _hoveredLastFrame.Remove(intObj);
+
+          intObj.EndHover(_controllerListBuffer);
+        }
+      }
+      finally {
+        tempObjs.Clear();
+        Pool<HashSet<IInteractionBehaviour>>.Recycle(tempObjs);
+      }
+    }
+
+    /// <summary>
+    /// Clears the hover tracking state for an object and fires the hover-end callback
+    /// for that object immediately.
+    /// 
+    /// If the object is still in the hover radius of this controller and the controller
+    /// and manager are still active, the hover will begin anew on the next fixed frame.
+    /// </summary>
+    public void ClearHoverTrackingForObject(IInteractionBehaviour intObj) {
+      if (!hoveredObjects.Contains(intObj)) return;
+
+      _hoveredObjects.Remove(intObj);
+      _hoveredLastFrame.Remove(intObj);
+
+      _controllerListBuffer.Clear();
+      _controllerListBuffer.Add(this);
+
+      intObj.EndHover(_controllerListBuffer);
+    }
+
     #region Hover State Checks
 
     private HashSet<IInteractionBehaviour> _hoverEndedBuffer = new HashSet<IInteractionBehaviour>();
@@ -529,10 +610,11 @@ namespace Leap.Unity.Interaction {
     /// Outputs objects that stopped being hovered by this hand this frame into hoverEndedObjects and returns whether
     /// the output set is empty.
     /// </summary>
-    public bool CheckHoverEnd(out HashSet<IInteractionBehaviour> hoverEndedObjects) {
+    bool IInternalInteractionController.CheckHoverEnd(out HashSet<IInteractionBehaviour> hoverEndedObjects) {
       // Hover checks via the activity manager are robust to destroyed or made-invalid objects,
       // so no additional validity checking is required.
       hoverEndedObjects = _hoverEndedBuffer;
+
       return _hoverEndedBuffer.Count > 0;
     }
 
@@ -541,7 +623,7 @@ namespace Leap.Unity.Interaction {
     /// Outputs objects that began being hovered by this hand this frame into hoverBeganObjects and returns whether
     /// the output set is empty.
     /// </summary>
-    public bool CheckHoverBegin(out HashSet<IInteractionBehaviour> hoverBeganObjects) {
+    bool IInternalInteractionController.CheckHoverBegin(out HashSet<IInteractionBehaviour> hoverBeganObjects) {
       hoverBeganObjects = _hoverBeganBuffer;
       return _hoverBeganBuffer.Count > 0;
     }
@@ -551,12 +633,37 @@ namespace Leap.Unity.Interaction {
     /// Outputs objects that are currently hovered by this hand into hoveredObjects and returns whether the
     /// output set is empty.
     /// </summary>
-    public bool CheckHoverStay(out HashSet<IInteractionBehaviour> hoveredObjects) {
+    bool IInternalInteractionController.CheckHoverStay(out HashSet<IInteractionBehaviour> hoveredObjects) {
       hoveredObjects = _hoveredObjects;
       return hoveredObjects.Count > 0;
     }
 
     #endregion
+
+    /// <summary>
+    /// Clears primary hover tracking state for the current primary hovered object.
+    /// 
+    /// If the current primary hover is still the most eligible hovered object and this
+    /// controller and its manager are still active, primary hover will begin anew on
+    /// the next fixed frame.
+    /// </summary>
+    public void ClearPrimaryHoverTracking() {
+      if (!isPrimaryHovering) return;
+
+      // This will cause the primary-hover-end check to return this object, and prevent
+      // a duplicate primary-hover-end call when refreshPrimaryHoverStateBuffers() is
+      // called on the next frame.
+      var formerlyPrimaryHoveredObj = _primaryHoveredObject;
+      _primaryHoveredObject = null;
+      _primaryHoveredLastFrame = null;
+
+      if (primaryHoverLocked) primaryHoverLocked = false;
+
+      _controllerListBuffer.Clear();
+      _controllerListBuffer.Add(this);
+
+      formerlyPrimaryHoveredObj.EndPrimaryHover(_controllerListBuffer);
+    }
 
     #region Primary Hover State Checks
 
@@ -584,7 +691,7 @@ namespace Leap.Unity.Interaction {
     /// Returns whether an object stopped being primarily hovered by this hand this frame and, if so,
     /// outputs the object into primaryHoverEndedObject (it will be null otherwise).
     /// </summary>
-    public bool CheckPrimaryHoverEnd(out IInteractionBehaviour primaryHoverEndedObject) {
+    bool IInternalInteractionController.CheckPrimaryHoverEnd(out IInteractionBehaviour primaryHoverEndedObject) {
       primaryHoverEndedObject = _primaryHoverEndedObject;
       bool primaryHoverEnded = primaryHoverEndedObject != null;
 
@@ -600,7 +707,7 @@ namespace Leap.Unity.Interaction {
     /// Returns whether an object began being primarily hovered by this hand this frame and, if so,
     /// outputs the object into primaryHoverBeganObject (it will be null otherwise).
     /// </summary>
-    public bool CheckPrimaryHoverBegin(out IInteractionBehaviour primaryHoverBeganObject) {
+    bool IInternalInteractionController.CheckPrimaryHoverBegin(out IInteractionBehaviour primaryHoverBeganObject) {
       primaryHoverBeganObject = _primaryHoverBeganObject;
       bool primaryHoverBegan = primaryHoverBeganObject != null;
 
@@ -616,7 +723,7 @@ namespace Leap.Unity.Interaction {
     /// Returns whether any object is the primary hover of this hand and, if so, outputs
     /// the object into primaryHoveredObject.
     /// </summary>
-    public bool CheckPrimaryHoverStay(out IInteractionBehaviour primaryHoveredObject) {
+    bool IInternalInteractionController.CheckPrimaryHoverStay(out IInteractionBehaviour primaryHoveredObject) {
       primaryHoveredObject = _primaryHoveredObject;
       bool primaryHoverStayed = primaryHoveredObject != null;
 
@@ -658,6 +765,12 @@ namespace Leap.Unity.Interaction {
     #endregion
 
     #region Contact
+
+    /// <summary>
+    /// Gets the set of interaction objects that are currently touching this 
+    /// interaction controller.
+    /// </summary>
+    public ReadonlyHashSet<IInteractionBehaviour> contactingObjects { get { return _contactBehavioursSet; } }
 
     #region Contact Bones
 
@@ -723,16 +836,18 @@ namespace Leap.Unity.Interaction {
     protected abstract bool initContact();
 
     private void finishInitContact() {
-      contactBoneParent.gameObject.layer = manager.contactBoneLayer;
+      contactBoneParent.layer = manager.contactBoneLayer;
       contactBoneParent.transform.parent = null;
 
-      var comment = contactBoneParent.GetComponent<ContactBoneParentComment>();
+      var comment = contactBoneParent.GetComponent<ContactBoneParent>();
       if (comment == null) {
-        comment = contactBoneParent.AddComponent<ContactBoneParentComment>();
+        comment = contactBoneParent.AddComponent<ContactBoneParent>();
       }
       comment.controller = this;
 
       foreach (var contactBone in contactBones) {
+        contactBone.rigidbody.maxAngularVelocity = 30F;
+
         contactBone.gameObject.layer = manager.contactBoneLayer;
       }
 
@@ -759,24 +874,20 @@ namespace Leap.Unity.Interaction {
 
       // Disable contact bone parent if we lose tracking.
       if (!isTracked) {
-        contactBoneParent.gameObject.SetActive(false);
+        contactBoneParent.SetActive(false);
         return;
       }
       else {
-        if (!contactBoneParent.gameObject.activeSelf) {
-          contactBoneParent.gameObject.SetActive(true);
+        if (!contactBoneParent.activeSelf) {
+          contactBoneParent.SetActive(true);
         }
       }
       
       // Request and store target bone positions and rotations
       // for use during the contact update.
       for (int i = 0; i < contactBones.Length; i++) {
-        Vector3 targetPosition;
-        Quaternion targetRotation;
-        getColliderBoneTargetPositionRotation(i, out targetPosition, out targetRotation);
-
-        _boneTargetPositions[i] = targetPosition;
-        _boneTargetRotations[i] = targetRotation;
+        getColliderBoneTargetPositionRotation(i, out _boneTargetPositions[i],
+                                                 out _boneTargetRotations[i]);
       }
 
       using (new ProfilerSample("Update Contact Bones")) {
@@ -806,7 +917,7 @@ namespace Leap.Unity.Interaction {
 
     private void updateContactBone(int contactBoneIndex, Vector3 targetPosition, Quaternion targetRotation) {
       ContactBone contactBone = contactBones[contactBoneIndex];
-      Rigidbody   body = contactBone.body;
+      Rigidbody   body = contactBone.rigidbody;
 
       // Set a fixed rotation for bones; otherwise most friction is lost
       // as any capsule or spherical bones will roll on contact.
@@ -828,12 +939,12 @@ namespace Leap.Unity.Interaction {
           && speed < 1.5F
        /* && boneArrayIndex != NUM_FINGERS * BONES_PER_FINGER */) {
          EnableSoftContact();
-         return;
       }
 
-      // Attempt to move the contact bone to its target position by setting
-      // its target velocity. Include a "deadzone" to avoid tiny vibrations.
-      float deadzone = Mathf.Min(DEAD_ZONE_FRACTION * contactBone.width, 0.015F * scale);
+      // Attempt to move the contact bone to its target position and rotation 
+      // by setting its target velocity and angular velocity. Include a "deadzone"
+      // for position to avoid tiny vibrations.
+      float deadzone = Mathf.Min(DEAD_ZONE_FRACTION * contactBone.width, 0.01F * scale);
       Vector3 delta = targetPosition - body.position;
       float deltaMag = delta.magnitude;
       if (deltaMag <= deadzone) {
@@ -849,6 +960,8 @@ namespace Leap.Unity.Interaction {
         body.velocity = (targetVelocity / targetVelocityMag)
                       * Mathf.Clamp(targetVelocityMag, 0F, 100F);
       }
+      Quaternion deltaRot = targetRotation * Quaternion.Inverse(body.rotation);
+      body.angularVelocity = PhysicsUtility.ToAngularVelocity(deltaRot, Time.fixedDeltaTime);
     }
 
     #endregion
@@ -860,6 +973,8 @@ namespace Leap.Unity.Interaction {
 
     private bool _disableSoftContactEnqueued = false;
     private IEnumerator _delayedDisableSoftContactCoroutine;
+
+    // TODO: DELETEME
     //private Collider[] _tempColliderArray = new Collider[2];
     //private Vector3[] _bonePositionsLastFrame = new Vector3[32];
     //private float _softContactBoneRadius = 0.015f;
@@ -905,9 +1020,9 @@ namespace Leap.Unity.Interaction {
               var boneBox = contactBoneCollider as BoxCollider;
 
               if (boneBox == null) {
-                  Debug.LogError("Unsupported collider type in ContactBone. Supported "
-                               + "types are SphereCollider, CapsuleCollider, and "
-                               + "BoxCollider.", this);
+                Debug.LogError("Unsupported collider type in ContactBone. Supported "
+                             + "types are SphereCollider, CapsuleCollider, and "
+                             + "BoxCollider.", this);
                 continue;
               }
 
@@ -920,14 +1035,10 @@ namespace Leap.Unity.Interaction {
 
         //for (int i = 0; i < contactBones.Length; i++) {
         //  Vector3 bonePosition = _boneTargetPositions[i];
-        //  // Quaternion boneRotation = _boneTargetRotations[i];
+        //   Quaternion boneRotation = _boneTargetRotations[i];
 
-        //  // TODO: Next task: Keep track of overlapping collider-trigger<->collidee
-        //  // relationships and process each of them via individual
-        //  // PhysicsUtility.generateXContact calls.
-
-        //  // Generate soft contact data based on spheres at each bonePosition
-        //  // of radius softContactBoneRadius.
+        //   Generate soft contact data based on spheres at each bonePosition
+        //   of radius softContactBoneRadius.
         //  bool sphereIntersecting;
         //  using (new ProfilerSample("Generate Soft Contacts")) {
         //    sphereIntersecting = PhysicsUtility.generateSphereContacts(bonePosition,
@@ -1080,6 +1191,8 @@ namespace Leap.Unity.Interaction {
 
     #region Contact Callbacks
 
+    private HashSet<IInteractionBehaviour> _contactBehavioursSet = new HashSet<IInteractionBehaviour>();
+
     private Dictionary<IInteractionBehaviour, int> _contactBehaviours = new Dictionary<IInteractionBehaviour, int>();
     private HashSet<IInteractionBehaviour> _contactBehavioursLastFrame = new HashSet<IInteractionBehaviour>();
     private List<IInteractionBehaviour> _contactBehaviourRemovalCache = new List<IInteractionBehaviour>();
@@ -1087,30 +1200,96 @@ namespace Leap.Unity.Interaction {
     private HashSet<IInteractionBehaviour> _contactEndedBuffer = new HashSet<IInteractionBehaviour>();
     private HashSet<IInteractionBehaviour> _contactBeganBuffer = new HashSet<IInteractionBehaviour>();
 
-    public void NotifyContactBoneCollisionEnter(ContactBone contactBone, IInteractionBehaviour interactionObj, bool wasTrigger) {
+    public void NotifyContactBoneCollisionEnter(ContactBone contactBone, IInteractionBehaviour interactionObj) {
       int count;
       if (_contactBehaviours.TryGetValue(interactionObj, out count)) {
         _contactBehaviours[interactionObj] = count + 1;
       }
       else {
         _contactBehaviours[interactionObj] = 1;
+        _contactBehavioursSet.Add(interactionObj);
       }
     }
 
-    public void NotifyContactBoneCollisionExit(ContactBone contactBone, IInteractionBehaviour interactionObj, bool wasTrigger) {
+    public void NotifyContactBoneCollisionStay(ContactBone contactBone, IInteractionBehaviour interactionObj) {
+      // If Contact state is cleared manually or due to the controller being disabled,
+      // it will be restored here.
+
+      int count;
+      if (!_contactBehaviours.TryGetValue(interactionObj, out count)) {
+        _contactBehaviours[interactionObj] = 1;
+        _contactBehavioursSet.Add(interactionObj);
+      }
+    }
+
+    public void NotifyContactBoneCollisionExit(ContactBone contactBone, IInteractionBehaviour interactionObj) {
       if (interactionObj.ignoreContact) {
         if (_contactBehaviours.ContainsKey(interactionObj)) _contactBehaviours.Remove(interactionObj);
         return;
       }
 
-      if (_contactBehaviours.ContainsKey(interactionObj)) {
-        int count = _contactBehaviours[interactionObj];
-        if (count == 1) {
-          _contactBehaviours.Remove(interactionObj);
-        } else {
-          _contactBehaviours[interactionObj] = count - 1;
+      // Sometimes when the controller is disabled and re-enabled, we might be missing the
+      // key in the dictionary already.
+      if (!_contactBehaviours.ContainsKey(interactionObj)) return;
+
+      int count = _contactBehaviours[interactionObj];
+      if (count == 1) {
+        _contactBehaviours.Remove(interactionObj);
+        _contactBehavioursSet.Remove(interactionObj);
+      }
+      else {
+        _contactBehaviours[interactionObj] = count - 1;
+      }
+    }
+
+    /// <summary>
+    /// Clears contact state for this controller and fires the appropriate ContactEnd
+    /// callbacks on currently-contacted interaction objects immediately.
+    /// 
+    /// If the controller is still contacting objects and it and its manager are still
+    /// active, contact will begin anew on the next fixed frame.
+    /// </summary>
+    public void ClearContactTracking() {
+      _controllerListBuffer.Clear();
+      _controllerListBuffer.Add(this);
+
+      var tempObjs = Pool<HashSet<IInteractionBehaviour>>.Spawn();
+      try {
+        foreach (var intObj in contactingObjects) {
+          tempObjs.Add(intObj);
+        }
+
+        foreach (var intObj in tempObjs) {
+          _contactBehavioursSet.Remove(intObj);
+          _contactBehaviours.Remove(intObj);
+          _contactBehavioursLastFrame.Remove(intObj);
+
+          intObj.EndContact(_controllerListBuffer);
         }
       }
+      finally {
+        Pool<HashSet<IInteractionBehaviour>>.Recycle(tempObjs);
+      }
+    }
+
+    /// <summary>
+    /// Clears contact state for the specified object and fires its ContactEnd callbacks
+    /// immediately.
+    /// 
+    /// If the controller is still contacting the object and it and its manager are still
+    /// active, contact will begin anew on the next fixed frame.
+    /// </summary>
+    public void  ClearContactTrackingForObject(IInteractionBehaviour intObj) {
+      if (!contactingObjects.Contains(intObj)) return;
+
+      _contactBehavioursSet.Remove(intObj);
+      _contactBehaviours.Remove(intObj);
+      _contactBehavioursLastFrame.Remove(intObj);
+
+      _controllerListBuffer.Clear();
+      _controllerListBuffer.Add(this);
+
+      intObj.EndContact(_controllerListBuffer);
     }
 
     /// <summary>
@@ -1125,7 +1304,7 @@ namespace Leap.Unity.Interaction {
       _contactBehaviourRemovalCache.Clear();
       foreach (var interactionObj in _contactBehavioursLastFrame) {
         if (!_contactBehaviours.ContainsKey(interactionObj)
-         || !contactBoneParent.gameObject.activeInHierarchy
+         || !contactBoneParent.activeInHierarchy
          /* || !contactEnabled TODO: Use properties to support disabling contact at runtime! */) {
           _contactEndedBuffer.Add(interactionObj);
           _contactBehaviourRemovalCache.Add(interactionObj);
@@ -1136,7 +1315,7 @@ namespace Leap.Unity.Interaction {
       }
 
       // Update contact began state.
-      if (contactBoneParent.gameObject.activeInHierarchy /* && contactEnabled TODO: can this just be removed cleanly?*/) {
+      if (contactBoneParent.activeInHierarchy /* && contactEnabled TODO: can this just be removed cleanly?*/) {
         foreach (var intObjCountPair in _contactBehaviours) {
           var interactionObj = intObjCountPair.Key;
           if (!_contactBehavioursLastFrame.Contains(interactionObj)) {
@@ -1153,7 +1332,7 @@ namespace Leap.Unity.Interaction {
     /// Outputs interaction objects that stopped being touched by this hand this frame into contactEndedObjects
     /// and returns whether the output set is empty.
     /// </summary>
-    public bool CheckContactEnd(out HashSet<IInteractionBehaviour> contactEndedObjects) {
+    bool IInternalInteractionController.CheckContactEnd(out HashSet<IInteractionBehaviour> contactEndedObjects) {
       // Ensure contact objects haven't been destroyed or set to ignore contact
       _removeContactObjsBuffer.Clear();
       foreach (var objTouchCountPair in _contactBehaviours) {
@@ -1180,7 +1359,7 @@ namespace Leap.Unity.Interaction {
     /// Outputs interaction objects that started being touched by this hand this frame into contactBeganObjects
     /// and returns whether the output set is empty.
     /// </summary>
-    public bool CheckContactBegin(out HashSet<IInteractionBehaviour> contactBeganObjects) {
+    bool IInternalInteractionController.CheckContactBegin(out HashSet<IInteractionBehaviour> contactBeganObjects) {
       contactBeganObjects = _contactBeganBuffer;
       return _contactBeganBuffer.Count > 0;
     }
@@ -1191,7 +1370,7 @@ namespace Leap.Unity.Interaction {
     /// Outputs interaction objects that are currently being touched by the hand into contactedObjects
     /// and returns whether the output set is empty.
     /// </summary>
-    public bool CheckContactStay(out HashSet<IInteractionBehaviour> contactedObjects) {
+    bool IInternalInteractionController.CheckContactStay(out HashSet<IInteractionBehaviour> contactedObjects) {
       _contactedObjects.Clear();
       foreach (var objCountPair in _contactBehaviours) {
         _contactedObjects.Add(objCountPair.Key);
@@ -1202,6 +1381,32 @@ namespace Leap.Unity.Interaction {
     }
 
     #endregion
+
+    private void disableContactBones() {
+      foreach (var contactBone in contactBones) {
+        contactBone.collider.enabled = false;
+      }
+    }
+
+    private void enableContactBones() {
+      foreach (var contactBone in contactBones) {
+        contactBone.collider.enabled = true;
+      }
+    }
+
+    private void resetContactBonePose() {
+      int index = 0;
+      foreach (var contactBone in contactBones) {
+        Vector3    position;
+        Quaternion rotation;
+        getColliderBoneTargetPositionRotation(index++, out position, out rotation);
+
+        contactBone.rigidbody.position = position;
+        contactBone.rigidbody.rotation = rotation;
+        contactBone.rigidbody.velocity = Vector3.zero;
+        contactBone.rigidbody.angularVelocity = Vector3.zero;
+      }
+    }
 
     #endregion
 
@@ -1214,7 +1419,7 @@ namespace Leap.Unity.Interaction {
     public IInteractionBehaviour graspedObject { get { return _graspedObject; } }
 
     /// <summary> Gets the set of objects currently considered graspable. </summary>
-    public HashSet<IInteractionBehaviour> graspCandidates { get { return graspActivityManager.ActiveObjects; } }
+    public ReadonlyHashSet<IInteractionBehaviour> graspCandidates { get { return graspActivityManager.ActiveObjects; } }
 
     /// <summary>
     /// Gets the points of the controller to add to the calculation to determine how
@@ -1349,6 +1554,8 @@ namespace Leap.Unity.Interaction {
     /// grasped by this hand. If the hand was holding the argument object, returns true, otherwise returns false.
     /// </summary>
     public bool ReleaseObject(IInteractionBehaviour toRelease) {
+      if (toRelease == null) return false;
+
       if (_graspedObject == toRelease) {
         ReleaseGrasp();
         return true;
@@ -1364,7 +1571,7 @@ namespace Leap.Unity.Interaction {
     /// Called by the Interaction Manager every fixed frame.
     /// Returns true if the hand just released an object and outputs the released object into releasedObject.
     /// </summary>
-    public bool CheckGraspEnd(out IInteractionBehaviour releasedObject) {
+    bool IInternalInteractionController.CheckGraspEnd(out IInteractionBehaviour releasedObject) {
       releasedObject = null;
 
       bool shouldReleaseObject = false;
@@ -1396,7 +1603,7 @@ namespace Leap.Unity.Interaction {
     /// Called by the Interaction Manager every fixed frame.
     /// Returns true if the hand just grasped an object and outputs the grasped object into graspedObject.
     /// </summary>
-    public bool CheckGraspBegin(out IInteractionBehaviour newlyGraspedObject) {
+    bool IInternalInteractionController.CheckGraspBegin(out IInteractionBehaviour newlyGraspedObject) {
       newlyGraspedObject = null;
 
       // Check grasping against interaction state.
@@ -1421,7 +1628,7 @@ namespace Leap.Unity.Interaction {
     /// Returns whether there the hand is currently grasping an object and, if it is, outputs that
     /// object into graspedObject.
     /// </summary>
-    public bool CheckGraspHold(out IInteractionBehaviour graspedObject) {
+    bool IInternalInteractionController.CheckGraspHold(out IInteractionBehaviour graspedObject) {
       graspedObject = _graspedObject;
       return graspedObject != null;
     }
@@ -1431,7 +1638,7 @@ namespace Leap.Unity.Interaction {
     /// Returns whether the hand began suspending an object this frame and, if it did, outputs that
     /// object into suspendedObject.
     /// </summary>
-    public bool CheckSuspensionBegin(out IInteractionBehaviour suspendedObject) {
+    bool IInternalInteractionController.CheckSuspensionBegin(out IInteractionBehaviour suspendedObject) {
       suspendedObject = null;
 
       if (_graspedObject != null && !isTracked && !_graspedObject.isSuspended) {
@@ -1446,7 +1653,7 @@ namespace Leap.Unity.Interaction {
     /// Returns whether the hand stopped suspending an object this frame and, if it did, outputs that
     /// object into resumedObject.
     /// </summary>
-    public bool CheckSuspensionEnd(out IInteractionBehaviour resumedObject) {
+    bool IInternalInteractionController.CheckSuspensionEnd(out IInteractionBehaviour resumedObject) {
       resumedObject = null;
 
       if (_graspedObject != null && isTracked && _graspedObject.isSuspended) {
@@ -1479,7 +1686,7 @@ namespace Leap.Unity.Interaction {
           drawer.color = Color.white;
         }
 
-        drawer.DrawColliders(contactBoneParent.gameObject, true, true, true);
+        drawer.DrawColliders(contactBoneParent, true, true, true);
       }
 
       // Hover Point

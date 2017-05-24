@@ -21,6 +21,8 @@ using Leap.Unity.RuntimeGizmos;
 
 namespace Leap.Unity.Interaction {
 
+  public enum ContactForceMode { Object, UI };
+
   /// <summary>
   /// InteractionBehaviours are components that enable GameObjects to interact with
   /// interaction controllers (InteractionControllerBase) in a physically intuitive way.
@@ -79,7 +81,7 @@ namespace Leap.Unity.Interaction {
     /// Gets all of the interaction controllers hovering near this object, whether they
     /// are Leap hands or supported VR controllers.
     /// </summary>
-    public HashSet<InteractionController> hoveringControllers {
+    public ReadonlyHashSet<InteractionController> hoveringControllers {
       get {
         return _hoveringControllers;
       }
@@ -106,7 +108,7 @@ namespace Leap.Unity.Interaction {
     /// <summary>
     /// Gets the set of all interaction controllers primarily hovering over this object.
     /// </summary>
-    public HashSet<InteractionController> primaryHoveringControllers {
+    public ReadonlyHashSet<InteractionController> primaryHoveringControllers {
       get {
         return _primaryHoveringControllers;
       }
@@ -295,13 +297,13 @@ namespace Leap.Unity.Interaction {
     /// Gets the set of all interaction controllers currently grasping this object. Interaction
     /// controllers include Leap hands via InteractionHand and supported VR controllers.
     /// </summary>
-    public HashSet<InteractionController> graspingControllers { get { return _graspingControllers; } }
+    public ReadonlyHashSet<InteractionController> graspingControllers { get { return _graspingControllers; } }
 
     private HashSet<InteractionHand> _graspingHandsBuffer = new HashSet<InteractionHand>();
     /// <summary>
     /// Gets a set of all Leap hands currently grasping this object.
     /// </summary>
-    public HashSet<InteractionHand> graspingHands {
+    public ReadonlyHashSet<InteractionHand> graspingHands {
       get {
         _graspingHandsBuffer.Clear();
         _graspingControllers.Query().OfType<InteractionHand>().FillHashSet(_graspingHandsBuffer);
@@ -450,7 +452,13 @@ namespace Leap.Unity.Interaction {
 
     #region Contact API
 
-    public enum ContactForceMode { Object, UI };
+    /// <summary>
+    /// Gets a set of all InteractionControllers currently contacting this interaction
+    /// object.
+    /// </summary>
+    public ReadonlyHashSet<InteractionController> contactingControllers {
+      get { return _contactingControllers; }
+    }
 
     /// <summary>
     /// Called when this object begins colliding with any interaction controllers, if the
@@ -554,8 +562,10 @@ namespace Leap.Unity.Interaction {
       get { return _ignoreHoverMode; }
       set {
         _ignoreHoverMode = value;
-        // TODO: If _ignoreHover is set to anything other than None, need to fire
-        // appropriate EndHover events immediately.
+
+        if (_ignoreHoverMode != IgnoreHoverMode.None) {
+          ClearHoverTracking(onlyInvalidControllers: true);
+        }
       }
     }
     [SerializeField, HideInInspector]
@@ -571,8 +581,10 @@ namespace Leap.Unity.Interaction {
       get { return _ignorePrimaryHover; }
       set {
         _ignorePrimaryHover = value;
-        // TODO: If _ignorePrimaryHover is set to false, need to fire
-        // appropriate EndPrimaryHover events immediately.
+
+        if (_ignorePrimaryHover) {
+          ClearPrimaryHoverTracking();
+        }
       }
     }
 
@@ -584,8 +596,10 @@ namespace Leap.Unity.Interaction {
       get { return _ignoreContact; }
       set {
         _ignoreContact = value;
-        // TODO: If _ignoreContact is set to false, need to fire
-        // appropriate EndContact events immediately.
+
+        if (_ignoreContact) {
+          ClearContactTracking();
+        }
       }
     }
 
@@ -597,8 +611,10 @@ namespace Leap.Unity.Interaction {
       get { return _ignoreGrasping; }
       set {
         _ignoreGrasping = value;
-        // TODO: If _ignoreGrasping is set to false, need to fire
-        // appropriate EndGrasp events immediately.
+
+        if (_ignoreGrasping && isGrasped) {
+          graspingController.ReleaseGrasp();
+        }
       } 
     }
 
@@ -860,6 +876,33 @@ namespace Leap.Unity.Interaction {
       return closestHoveringController;
     }
 
+    /// <summary>
+    /// Clears hover tracking state for this object on all of the currently-hovering
+    /// controllers. New hover state will begin anew on the next fixed frame if the
+    /// appropriate conditions for hover are still fulfilled.
+    /// 
+    /// Optionally, only clear hover tracking state for controllers that should be
+    /// ignoring hover for this interaction object due to its ignoreHoverMode.
+    /// </summary>
+    public void ClearHoverTracking(bool onlyInvalidControllers = false) {
+      var tempControllers = Pool<HashSet<InteractionController>>.Spawn();
+      try {
+        foreach (var controller in hoveringControllers) {
+          if (onlyInvalidControllers && this.ShouldIgnoreHover(controller)) {
+            tempControllers.Add(controller);
+          }
+        }
+
+        foreach (var controller in tempControllers) {
+          controller.ClearHoverTrackingForObject(this);
+        }
+      }
+      finally {
+        tempControllers.Clear();
+        Pool<HashSet<InteractionController>>.Recycle(tempControllers);
+      }
+    }
+
     private HashSet<InteractionController> _primaryHoveringControllers = new HashSet<InteractionController>();
     private InteractionController _closestPrimaryHoveringController = null;
     private InteractionHand _closestPrimaryHoveringHand = null;
@@ -918,6 +961,27 @@ namespace Leap.Unity.Interaction {
         }
       }
       return closestController;
+    }
+    /// <summary>
+    /// Clears primary hover tracking state for this object on all of the currently-
+    /// primary-hovering controllers. New priamry hover state will begin anew on the next
+    /// fixed frame if the appropriate conditions for primary hover are still fulfilled.
+    /// </summary>
+    public void ClearPrimaryHoverTracking() {
+      var tempControllers = Pool<HashSet<InteractionController>>.Spawn();
+      try {
+        foreach (var controller in primaryHoveringControllers) {
+          tempControllers.Add(controller);
+        }
+
+        foreach (var controller in tempControllers) {
+          controller.ClearPrimaryHoverTracking();
+        }
+      }
+      finally {
+        tempControllers.Clear();
+        Pool<HashSet<InteractionController>>.Recycle(tempControllers);
+      }
     }
 
     /// <summary>
@@ -980,6 +1044,28 @@ namespace Leap.Unity.Interaction {
 
     public void StayContacted(List<InteractionController> controllers) {
       OnContactStay();
+    }
+
+    /// <summary>
+    /// Clears contact tracking for this object on any currently-contacting controllers.
+    /// If the object is still contacting controllers and they are appropriately enabled,
+    /// contact will begin anew on the next fixed frame.
+    /// </summary>
+    public void ClearContactTracking() {
+      var tempControllers = Pool<HashSet<InteractionController>>.Spawn();
+      try {
+        foreach (var controller in contactingControllers) {
+          tempControllers.Add(controller);
+        }
+
+        foreach (var controller in tempControllers) {
+          controller.ClearContactTrackingForObject(this);
+        }
+      }
+      finally {
+        tempControllers.Clear();
+        Pool<HashSet<InteractionController>>.Recycle(tempControllers);
+      }
     }
 
     #endregion
@@ -1250,7 +1336,7 @@ namespace Leap.Unity.Interaction {
     /// after its Start() method has been called! (Called automatically on Start().)
     /// </summary>
     public void RefreshInteractionColliders() {
-      Utils.FindColliders<Collider>(this.gameObject, ref _interactionColliders);
+      Utils.FindColliders<Collider>(this.gameObject, _interactionColliders);
     }
 
     protected void FixedUpdateLayer() {

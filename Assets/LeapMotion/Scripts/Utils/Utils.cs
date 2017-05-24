@@ -441,34 +441,44 @@ namespace Leap.Unity {
     /// Colliders that are the children of other Rigidbody elements beneath the argument
     /// object are ignored.
     /// </summary>
-    public static void FindColliders<T>(GameObject obj, ref List<T> colliders) where T : Collider {
+    public static void FindColliders<T>(GameObject obj, List<T> colliders) where T : Collider {
       colliders.Clear();
       Stack<Transform> toVisit = Pool<Stack<Transform>>.Spawn();
+      List<T> collidersBuffer = Pool<List<T>>.Spawn();
 
-      // Traverse the hierarchy of this object's transform to find
-      // all of its Colliders.
-      toVisit.Push(obj.transform);
-      Transform curTransform;
-      while (toVisit.Count > 0) {
-        curTransform = toVisit.Pop();
+      try {
+        // Traverse the hierarchy of this object's transform to find
+        // all of its Colliders.
+        toVisit.Push(obj.transform);
+        Transform curTransform;
+        while (toVisit.Count > 0) {
+          curTransform = toVisit.Pop();
 
-        // Recursively search children and children's children
-        foreach (var child in curTransform.GetChildren()) {
-          // Ignore children with Rigidbodies of their own; its own Rigidbody
-          // owns its own colliders and the colliders of its children
-          if (child.GetComponent<Rigidbody>() == null) {
-            toVisit.Push(child);
+          // Recursively search children and children's children
+          foreach (var child in curTransform.GetChildren()) {
+            // Ignore children with Rigidbodies of their own; its own Rigidbody
+            // owns its own colliders and the colliders of its children
+            if (child.GetComponent<Rigidbody>() == null) {
+              toVisit.Push(child);
+            }
+          }
+
+          // Since we'll visit every child, all we need to do is add the colliders
+          // of every transform we visit.
+          collidersBuffer.Clear();
+          curTransform.GetComponents<T>(collidersBuffer);
+          foreach (var collider in collidersBuffer) {
+            colliders.Add(collider);
           }
         }
-
-        // Since we'll visit every child, all we need to do is add the colliders
-        // of every transform we visit.
-        foreach (var collider in curTransform.GetComponents<T>()) {
-          colliders.Add(collider);
-        }
       }
+      finally {
+        toVisit.Clear();
+        Pool<Stack<Transform>>.Recycle(toVisit);
 
-      Pool<Stack<Transform>>.Recycle(toVisit);
+        collidersBuffer.Clear();
+        Pool<List<T>>.Recycle(collidersBuffer);
+      }
     }
 
     #endregion

@@ -140,13 +140,11 @@ namespace Leap.Unity.Interaction {
         if (handAccessorFunc == null) {
           if (handDataMode == HandDataMode.PlayerLeft) {
             handAccessorFunc = (frame) => frame.Hands.Query()
-                                                     .Where(hand => hand.IsLeft)
-                                                     .FirstOrDefault();
+                                                     .FirstOrDefault(hand => hand.IsLeft);
           }
           else {
             handAccessorFunc = (frame) => frame.Hands.Query()
-                                                     .Where(hand => hand.IsRight)
-                                                     .FirstOrDefault();
+                                                     .FirstOrDefault(hand => hand.IsRight);
           }
         }
       }
@@ -441,7 +439,7 @@ namespace Leap.Unity.Interaction {
 
       Rigidbody body = contactBoneObj.GetComponent<Rigidbody>();
       body.freezeRotation = true;
-      contactBone.body = body;
+      contactBone.rigidbody = body;
       body.useGravity = false;
       body.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic; // TODO: Allow different collision detection modes as an optimization.
 
@@ -466,13 +464,13 @@ namespace Leap.Unity.Interaction {
           joint.autoConfigureConnectedAnchor = false;
           if (jointIndex != 0) {
             Bone prevBone = _unwarpedHandData.Fingers[fingerIndex].Bone((Bone.BoneType)(jointIndex));
-            joint.connectedBody = _contactBones[boneArrayIndex - 1].body;
+            joint.connectedBody = _contactBones[boneArrayIndex - 1].rigidbody;
             joint.anchor = Vector3.back * bone.Length / 2f;
             joint.connectedAnchor = Vector3.forward * prevBone.Length / 2f;
             _contactBones[boneArrayIndex].joint = joint;
           }
           else {
-            joint.connectedBody = _contactBones[NUM_FINGERS * BONES_PER_FINGER].body;
+            joint.connectedBody = _contactBones[NUM_FINGERS * BONES_PER_FINGER].rigidbody;
             joint.anchor = Vector3.back * bone.Length / 2f;
             joint.connectedAnchor = _contactBones[NUM_FINGERS * BONES_PER_FINGER].transform.InverseTransformPoint(bone.PrevJoint.ToVector3());
             _contactBones[boneArrayIndex].metacarpalJoint = joint;
@@ -492,12 +490,12 @@ namespace Leap.Unity.Interaction {
 
           if (jointIndex != 0 && _contactBones[boneArrayIndex].joint != null) {
             Bone prevBone = _unwarpedHandData.Fingers[fingerIndex].Bone((Bone.BoneType)(jointIndex));
-            _contactBones[boneArrayIndex].joint.connectedBody = _contactBones[boneArrayIndex - 1].body;
+            _contactBones[boneArrayIndex].joint.connectedBody = _contactBones[boneArrayIndex - 1].rigidbody;
             _contactBones[boneArrayIndex].joint.anchor = Vector3.back * bone.Length / 2f;
             _contactBones[boneArrayIndex].joint.connectedAnchor = Vector3.forward * prevBone.Length / 2f;
           }
           else if (_contactBones[boneArrayIndex].metacarpalJoint != null) {
-            _contactBones[boneArrayIndex].metacarpalJoint.connectedBody = _contactBones[NUM_FINGERS * BONES_PER_FINGER].body;
+            _contactBones[boneArrayIndex].metacarpalJoint.connectedBody = _contactBones[NUM_FINGERS * BONES_PER_FINGER].rigidbody;
             _contactBones[boneArrayIndex].metacarpalJoint.anchor = Vector3.back * bone.Length / 2f;
             _contactBones[boneArrayIndex].metacarpalJoint.connectedAnchor = _contactBones[NUM_FINGERS * BONES_PER_FINGER].transform
                                                                             .InverseTransformPoint(bone.PrevJoint.ToVector3());
@@ -514,17 +512,17 @@ namespace Leap.Unity.Interaction {
       if (softContactEnabled) { return; }
       if (Application.isPlaying && _contactBones.Length == NUM_FINGERS * BONES_PER_FINGER + 1) {
         Vector elbowPos = inHand.Arm.ElbowPosition;
-        inHand.SetTransform(_contactBones[NUM_FINGERS * BONES_PER_FINGER].body.position, _contactBones[NUM_FINGERS * BONES_PER_FINGER].body.rotation);
+        inHand.SetTransform(_contactBones[NUM_FINGERS * BONES_PER_FINGER].rigidbody.position, _contactBones[NUM_FINGERS * BONES_PER_FINGER].rigidbody.rotation);
 
         for (int fingerIndex = 0; fingerIndex < NUM_FINGERS; fingerIndex++) {
           for (int jointIndex = 0; jointIndex < BONES_PER_FINGER; jointIndex++) {
             Bone bone = inHand.Fingers[fingerIndex].Bone((Bone.BoneType)(jointIndex) + 1);
             int boneArrayIndex = fingerIndex * BONES_PER_FINGER + jointIndex;
-            Vector displacement = _contactBones[boneArrayIndex].body.position.ToVector() - bone.Center;
+            Vector displacement = _contactBones[boneArrayIndex].rigidbody.position.ToVector() - bone.Center;
             bone.Center += displacement;
             bone.PrevJoint += displacement;
             bone.NextJoint += displacement;
-            bone.Rotation = _contactBones[boneArrayIndex].body.rotation.ToLeapQuaternion();
+            bone.Rotation = _contactBones[boneArrayIndex].rigidbody.rotation.ToLeapQuaternion();
           }
         }
 
