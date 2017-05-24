@@ -116,13 +116,11 @@ namespace Leap.Unity.Interaction {
       foreach (var statusMessage in messages) {
         var messageColorStyle = new GUIStyle(EditorStyles.label);
         messageColorStyle.normal.textColor = statusMessage.color;
+        messageColorStyle.padding.top += 1;
 
-        var messageRect = EditorGUILayout.GetControlRect();
-        messageRect.y += 1;
-        EditorGUI.LabelField(messageRect,
-                             new GUIContent("[" + statusMessage.message + "]",
-                                            statusMessage.tooltip),
-                             messageColorStyle);
+        EditorGUILayout.LabelField(new GUIContent("[" + statusMessage.message + "]",
+                                                  statusMessage.tooltip),
+                                   messageColorStyle);
       }
 
       EditorGUILayout.EndVertical();
@@ -207,9 +205,13 @@ namespace Leap.Unity.Interaction {
 
     private void checkInteractionVRControllerStatus(InteractionVRController controller,
                                                     List<ControllerStatusMessage> messages) {
-      // Check if the VRNode 
+      // Check if the controller is configured correctly if it is set up with a custom
+      // tracking provider.
+      if (controller.isUsingCustomTracking) {
+        
+      }
 
-      // Check if the player has multiple left controllers or multiple right controllers.
+      // Check if the player has duplicate VRNode left controllers or right controllers.
       bool isLeftVRNodeController  = controller.trackingProvider is DefaultVRNodeTrackingProvider
                                   && controller.chirality == Chirality.Left;
       bool isRightVRNodeController = controller.trackingProvider is DefaultVRNodeTrackingProvider
@@ -223,6 +225,18 @@ namespace Leap.Unity.Interaction {
                   + "scene. You should remove one of the duplicates.",
           color = Colors.Problem
         });
+        //messages.Add(new ControllerStatusMessage() {
+        //  message = "Duplicate VR Controller",
+        //  tooltip = "You already have a VRNode controller with this chirality in your "
+        //          + "scene. You should remove one of the duplicates.",
+        //  color = Colors.Problem
+        //});
+        //messages.Add(new ControllerStatusMessage() {
+        //  message = "Duplicate VR Controller",
+        //  tooltip = "You already have a VRNode controller with this chirality in your "
+        //          + "scene. You should remove one of the duplicates.",
+        //  color = Colors.Problem
+        //});
       }
       if (isLeftVRNodeController) {
         _leftVRNodeController = controller;

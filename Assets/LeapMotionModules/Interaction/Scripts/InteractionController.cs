@@ -125,6 +125,12 @@ namespace Leap.Unity.Interaction {
     /// </summary>
     public abstract InteractionHand intHand { get; }
 
+    /// <summary>
+    /// Contact requires knowledge of the controller's scale.
+    /// TODO: Warn if the controller is scaled non-uniformly.
+    /// </summary>
+    public float scale { get { return this.transform.lossyScale.x; } }
+
     #region Events
 
     /// <summary>
@@ -396,16 +402,21 @@ namespace Leap.Unity.Interaction {
       float maxNewPrimaryHoverDistance = float.PositiveInfinity;
       if (_primaryHoveredLastFrame != null && primaryHoverPointIdxLastFrame != -1
           && primaryHoverPoints[primaryHoverPointIdxLastFrame] != null) {
-        float distanceToLastPrimaryHover = _primaryHoveredLastFrame.GetHoverDistance(
-                                              primaryHoverPoints[primaryHoverPointIdxLastFrame].position);
 
-        // The distance to a new object must be even closer than the current primary hover
-        // distance in order for that object to become the new primary hover.
-        maxNewPrimaryHoverDistance = distanceToLastPrimaryHover
-                                    * distanceToLastPrimaryHover.Map(0.009F, 0.018F, 0.4F, 0.95F);
+        if (_contactBehaviours.ContainsKey(_primaryHoveredLastFrame)) {
+          // If we're actually touching the last primary hover, prevent the primary hover from changing at all.
+          maxNewPrimaryHoverDistance = 0F;
+        }
+        else {
+          float distanceToLastPrimaryHover = _primaryHoveredLastFrame.GetHoverDistance(
+                                               primaryHoverPoints[primaryHoverPointIdxLastFrame].position);
+          // Otherwise...
+          // The distance to a new object must be even closer than the current primary hover
+          // distance in order for that object to become the new primary hover.
+          maxNewPrimaryHoverDistance = distanceToLastPrimaryHover
+                                       * distanceToLastPrimaryHover.Map(0.009F, 0.018F, 0.4F, 0.95F);
 
-        // If we're very close, prevent the primary hover from changing at all.
-        if (maxNewPrimaryHoverDistance < 0.008F) maxNewPrimaryHoverDistance = 0F;
+        }
       }
 
       foreach (IInteractionBehaviour behaviour in hoverCandidates) {
@@ -639,12 +650,12 @@ namespace Leap.Unity.Interaction {
 
     #region Contact Bones
 
-    protected const float DEAD_ZONE_FRACTION = 0.1F;
+    protected const float DEAD_ZONE_FRACTION = 0.04F;
 
-    private float _softContactDislocationFraction = 3.0F;
-    protected float softContactDislocationFraction {
-      get { return _softContactDislocationFraction; }
-      set { _softContactDislocationFraction = value; }
+    private float _softContactDislocationDistance = 0.03F;
+    protected float softContactDislocationDistance {
+      get { return _softContactDislocationDistance; }
+      set { _softContactDislocationDistance = value; }
     }
 
     private static PhysicMaterial s_defaultContactBoneMaterial;
@@ -791,7 +802,8 @@ namespace Leap.Unity.Interaction {
       body.MoveRotation(targetRotation);
 
       // Calculate how far off its target the contact bone is.
-      float errorFraction = Vector3.Distance(contactBone.lastTargetPosition, body.position) / contactBone.width;
+      float errorDistance = Vector3.Distance(contactBone.lastTargetPosition, body.position);
+      float errorFraction = errorDistance / contactBone.width;
 
       // Adjust the mass of the contact bone based on the mass of
       // the object it is currently touching.
@@ -801,7 +813,7 @@ namespace Leap.Unity.Interaction {
       body.mass = massScale * contactBone._lastObjectTouchedAdjustedMass;
 
       // Potentially enable Soft Contact if our error is too large.
-      if (!_softContactEnabled && errorFraction >= softContactDislocationFraction
+      if (!_softContactEnabled && errorDistance >= softContactDislocationDistance
           && speed < 1.5F
        /* && boneArrayIndex != NUM_FINGERS * BONES_PER_FINGER */) {
          EnableSoftContact();
@@ -810,10 +822,7 @@ namespace Leap.Unity.Interaction {
 
       // Attempt to move the contact bone to its target position by setting
       // its target velocity. Include a "deadzone" to avoid tiny vibrations.
-      float deadzone = DEAD_ZONE_FRACTION * contactBone.width;
-      // TODO: Delete me once deadzone is resolved.
-      // deadzone = DEAD_ZONE_FRACTION
-      //          * _unwarpedHandData.Fingers[1].Bone((Bone.BoneType)1).Width;
+      float deadzone = Mathf.Min(DEAD_ZONE_FRACTION * contactBone.width, 0.015F * scale);
       Vector3 delta = targetPosition - body.position;
       float deltaMag = delta.magnitude;
       if (deltaMag <= deadzone) {
@@ -970,17 +979,6 @@ namespace Leap.Unity.Interaction {
             if (contactBones[i].collider == null) continue;
 
             contactBones[i].collider.isTrigger = true;
-
-            // TODO: DELETEME
-            // ASK JOHN if this will re-introduce spurious velocities!!
-
-            // Initialize last-frame information with current-frame information
-            // to prevent spurious velocities.
-            //Vector3    targetPosition;
-            //Quaternion targetRotation; // unnecessary here, but needed for the method call.
-            //getColliderBoneTargetPositionRotation(i, out targetPosition, out targetRotation);
-
-            //_bonePositionsLastFrame[i] = targetPosition;
           }
         }
       }
