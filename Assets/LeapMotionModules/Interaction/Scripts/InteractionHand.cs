@@ -582,6 +582,7 @@ namespace Leap.Unity.Interaction {
     /// This method will print an error if the controller is not currently grasping an object.
     /// </summary>
     public override Vector3 GetGraspPoint() {
+      // TODO: Reimplement this
       throw new NotImplementedException();
     }
 

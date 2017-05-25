@@ -95,6 +95,7 @@ namespace Leap.Unity.Interaction {
         _graspingEnabled = value;
 
         if (!_graspingEnabled) {
+          EnableSoftContact();
           ReleaseGrasp();
         }
       }
@@ -1635,7 +1636,8 @@ namespace Leap.Unity.Interaction {
 
       // Check grasping against interaction state.
       if (_graspedObject != null) {
-        // Can't grasp any object if we're already grasping one
+        // Can't grasp any object if we're already grasping one or
+        // if grasping is disabled.
         return false;
       }
 

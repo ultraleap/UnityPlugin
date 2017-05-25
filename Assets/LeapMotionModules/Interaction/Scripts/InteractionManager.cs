@@ -289,12 +289,24 @@ namespace Leap.Unity.Interaction {
     #region Controller Interaction State & Callbacks Update
 
     private HashSet<InteractionController> _activeControllersBuffer = new HashSet<InteractionController>();
+    private HashSet<InteractionController> _hoverControllersBuffer = new HashSet<InteractionController>();
+    private HashSet<InteractionController> _contactControllersBuffer = new HashSet<InteractionController>();
+    private HashSet<InteractionController> _graspingControllersBuffer = new HashSet<InteractionController>();
 
     private void fixedUpdateInteractionControllers() {
+
+      _hoverControllersBuffer.Clear();
+      _contactControllersBuffer.Clear();
+      _graspingControllersBuffer.Clear();
       _activeControllersBuffer.Clear();
       foreach (var controller in interactionControllers) {
         if (!controller.isActiveAndEnabled) continue;
+
         _activeControllersBuffer.Add(controller);
+
+        if (controller.hoverEnabled) _hoverControllersBuffer.Add(controller);
+        if (controller.contactEnabled) _contactControllersBuffer.Add(controller);
+        if (controller.graspingEnabled) _graspingControllersBuffer.Add(controller);
       }
 
       using (new ProfilerSample("Fixed Update Controllers (General Update)")) {
@@ -328,7 +340,7 @@ namespace Leap.Unity.Interaction {
         // Suspension //
 
         // Check controllers beginning object suspension.
-        foreach (var controller in _activeControllersBuffer) {
+        foreach (var controller in _graspingControllersBuffer) {
           IInteractionBehaviour suspendedObj;
           if ((controller as IInternalInteractionController).CheckSuspensionBegin(out suspendedObj)) {
             suspendedObj.BeginSuspension(controller);
@@ -336,7 +348,7 @@ namespace Leap.Unity.Interaction {
         }
 
         // Check controllers ending object suspension.
-        foreach (var controller in _activeControllersBuffer) {
+        foreach (var controller in _graspingControllersBuffer) {
           IInteractionBehaviour resumedObj;
           if ((controller as IInternalInteractionController).CheckSuspensionEnd(out resumedObj)) {
             resumedObj.EndSuspension(controller);
@@ -345,24 +357,24 @@ namespace Leap.Unity.Interaction {
 
         // Ending Interactions //
 
-        checkEndingGrasps(_activeControllersBuffer);
-        checkEndingContacts(_activeControllersBuffer);
-        checkEndingPrimaryHovers(_activeControllersBuffer);
-        checkEndingHovers(_activeControllersBuffer);
+        checkEndingGrasps(_graspingControllersBuffer);
+        checkEndingContacts(_contactControllersBuffer);
+        checkEndingPrimaryHovers(_hoverControllersBuffer);
+        checkEndingHovers(_hoverControllersBuffer);
 
         // Beginning Interactions //
 
-        checkBeginningHovers(_activeControllersBuffer);
-        checkBeginningPrimaryHovers(_activeControllersBuffer);
-        checkBeginningContacts(_activeControllersBuffer);
-        checkBeginningGrasps(_activeControllersBuffer);
+        checkBeginningHovers(_hoverControllersBuffer);
+        checkBeginningPrimaryHovers(_hoverControllersBuffer);
+        checkBeginningContacts(_contactControllersBuffer);
+        checkBeginningGrasps(_graspingControllersBuffer);
 
         // Sustained Interactions //
 
-        checkSustainingHovers(_activeControllersBuffer);
-        checkSustainingPrimaryHovers(_activeControllersBuffer);
-        checkSustainingContacts(_activeControllersBuffer);
-        checkSustainingGrasps(_activeControllersBuffer);
+        checkSustainingHovers(_hoverControllersBuffer);
+        checkSustainingPrimaryHovers(_hoverControllersBuffer);
+        checkSustainingContacts(_contactControllersBuffer);
+        checkSustainingGrasps(_graspingControllersBuffer);
 
       }
     }
