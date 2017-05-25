@@ -49,6 +49,9 @@ namespace Leap.Unity.GraphicalRenderer {
     [NonSerialized]
     private bool _isRepresentationDirty = true;
 
+    public Action<LeapGraphicGroup> OnAttachedToGroupEvent;
+    public Action OnDetachedFromGroupEvent;
+
     /// <summary>
     /// An internal flag that returns true if the visual representation of
     /// this graphic needs to be updated.  You can set this to true to request
@@ -261,6 +264,10 @@ namespace Leap.Unity.GraphicalRenderer {
       _anchor = anchor;
 
       patchReferences();
+
+      if (OnAttachedToGroupEvent != null) {
+        OnAttachedToGroupEvent(group);
+      }
     }
 
     /// <summary>
@@ -276,6 +283,10 @@ namespace Leap.Unity.GraphicalRenderer {
 
       for (int i = 0; i < _featureData.Count; i++) {
         _featureData[i].feature = null;
+      }
+
+      if (OnDetachedFromGroupEvent != null) {
+        OnDetachedFromGroupEvent();
       }
     }
 
