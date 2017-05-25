@@ -80,7 +80,7 @@ public abstract class LeapGraphicEditorBase<T> : CustomEditorBase<T> where T : L
       if (!targets.Query().All(g => g.attachedGroup == mainGroup)) {
         buttonText = "-";
       } else {
-        buttonText = LeapGraphicTagAttribute.GetTagName(mainGroup.renderingMethod.GetType());
+        buttonText = mainGroup.name;
       }
 
       if (GUILayout.Button(buttonText, EditorStyles.miniButton, GUILayout.Width(60))) {
