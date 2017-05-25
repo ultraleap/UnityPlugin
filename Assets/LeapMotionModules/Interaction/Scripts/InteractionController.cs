@@ -72,13 +72,11 @@ namespace Leap.Unity.Interaction {
         _contactEnabled = value;
 
         if (!_contactEnabled) {
-          disableContactBones();
+          disableContactBoneCollision();
 
           ClearContactTracking();
         }
         else {
-          enableContactBones();
-
           resetContactBonePose();
 
           EnableSoftContact();
@@ -983,6 +981,8 @@ namespace Leap.Unity.Interaction {
     //private Vector3[] _bonePositionsLastFrame = new Vector3[32];
     //private float _softContactBoneRadius = 0.015f;
 
+    private Collider[] _softContactColliderBuffer = new Collider[32];
+
     private bool _notTrackedLastFrame = true;
 
     private void fixedUpdateSoftContact() {
@@ -1000,37 +1000,60 @@ namespace Leap.Unity.Interaction {
       }
 
       if (_softContactEnabled) {
-        foreach (var colliderCollideesPair in _softContactCollisions) {
-          ContactBone contactBone = colliderCollideesPair.Key.bone;
-
+        foreach (var contactBone in contactBones) {
           Collider contactBoneCollider = contactBone.collider;
 
-          foreach (Collider intObjCollider in colliderCollideesPair.Value) {
-            if (contactBoneCollider is SphereCollider) {
-              var boneSphere = contactBoneCollider as SphereCollider;
+          if (contactBoneCollider is SphereCollider) {
+            var boneSphere = contactBoneCollider as SphereCollider;
 
-              PhysicsUtility.generateSphereContact(boneSphere, 0, intObjCollider,
+            int numCollisions = Physics.OverlapSphereNonAlloc(contactBone.transform.TransformPoint(boneSphere.center),
+                                                              contactBone.transform.lossyScale.x * boneSphere.radius,
+                                                              _softContactColliderBuffer,
+                                                              manager.interactionLayer.layerMask,
+                                                              QueryTriggerInteraction.Ignore);
+            for (int i = 0; i < numCollisions; i++) {
+              PhysicsUtility.generateSphereContact(boneSphere, 0, _softContactColliderBuffer[i],
                                                    ref manager._softContacts,
                                                    ref manager._softContactOriginalVelocities);
             }
-            else if (contactBoneCollider is CapsuleCollider) {
-              var boneCapsule = contactBoneCollider as CapsuleCollider;
+          }
+          else if (contactBoneCollider is CapsuleCollider) {
+            var boneCapsule = contactBoneCollider as CapsuleCollider;
 
-              PhysicsUtility.generateCapsuleContact(boneCapsule, 0, intObjCollider,
+            Vector3 point0, point1;
+            boneCapsule.GetCapsulePoints(out point0, out point1);
+
+            int numCollisions = Physics.OverlapCapsuleNonAlloc(point0, point1,
+                                                               contactBone.transform.lossyScale.x * boneCapsule.radius,
+                                                               _softContactColliderBuffer,
+                                                               manager.interactionLayer.layerMask,
+                                                               QueryTriggerInteraction.Ignore);
+            for (int i = 0; i < numCollisions; i++) {
+
+              PhysicsUtility.generateCapsuleContact(boneCapsule, 0,
+                                                    _softContactColliderBuffer[i],
                                                     ref manager._softContacts,
                                                     ref manager._softContactOriginalVelocities);
             }
-            else {
-              var boneBox = contactBoneCollider as BoxCollider;
+          }
+          else {
+            var boneBox = contactBoneCollider as BoxCollider;
 
-              if (boneBox == null) {
-                Debug.LogError("Unsupported collider type in ContactBone. Supported "
-                             + "types are SphereCollider, CapsuleCollider, and "
-                             + "BoxCollider.", this);
-                continue;
-              }
+            if (boneBox == null) {
+              Debug.LogError("Unsupported collider type in ContactBone. Supported "
+                           + "types are SphereCollider, CapsuleCollider, and "
+                           + "BoxCollider.", this);
+              continue;
+            }
 
-              PhysicsUtility.generateBoxContact(boneBox, 0, intObjCollider,
+            int numCollisions = Physics.OverlapBoxNonAlloc(boneBox.transform.TransformPoint(boneBox.center),
+                                                           Vector3.Scale(boneBox.size * 0.5F, contactBone.transform.lossyScale),
+                                                           _softContactColliderBuffer,
+                                                           boneBox.transform.rotation,
+                                                           manager.interactionLayer.layerMask,
+                                                           QueryTriggerInteraction.Ignore);
+            for (int i = 0; i < numCollisions; i++) {
+              PhysicsUtility.generateBoxContact(boneBox, 0, _softContactColliderBuffer[i],
                                                 ref manager._softContacts,
                                                 ref manager._softContactOriginalVelocities);
             }
@@ -1104,7 +1127,7 @@ namespace Leap.Unity.Interaction {
           for (int i = 0; i < contactBones.Length; i++) {
             if (contactBones[i].collider == null) continue;
 
-            contactBones[i].collider.isTrigger = true;
+            disableContactBoneCollision();
           }
         }
       }
@@ -1127,7 +1150,7 @@ namespace Leap.Unity.Interaction {
         using (new ProfilerSample("Disable Soft Contact")) {
           _softContactEnabled = false;
           for (int i = 0; i < contactBones.Length; i++) {
-            contactBones[i].collider.isTrigger = false;
+            enableContactBoneCollision();
           }
 
           onPostDisableSoftContact();
@@ -1386,15 +1409,15 @@ namespace Leap.Unity.Interaction {
 
     #endregion
 
-    private void disableContactBones() {
+    private void disableContactBoneCollision() {
       foreach (var contactBone in contactBones) {
-        contactBone.collider.enabled = false;
+        contactBone.collider.isTrigger = true;
       }
     }
 
-    private void enableContactBones() {
+    private void enableContactBoneCollision() {
       foreach (var contactBone in contactBones) {
-        contactBone.collider.enabled = true;
+        contactBone.collider.isTrigger = false;
       }
     }
 

@@ -411,6 +411,15 @@ namespace Leap.Unity {
       }
     }
 
+    public static void GetCapsulePoints(this CapsuleCollider capsule, out Vector3 a,
+                                                                      out Vector3 b) {
+      a = capsule.GetDirection() * ((capsule.height * 0.5f) - capsule.radius);
+      b = -a;
+
+      a = capsule.transform.TransformPoint(a);
+      b = capsule.transform.TransformPoint(b);
+    }
+
     /// <summary>
     /// Manipulates capsule.transform.position, capsule.transform.rotation, and capsule.height
     /// so that the line segment defined by the capsule connects world-space points a and b.
