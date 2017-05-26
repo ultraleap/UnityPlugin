@@ -20,20 +20,20 @@ namespace Leap.Unity.Interaction {
     protected override void OnEnable() {
       base.OnEnable();
       leftList = new ReorderableList(serializedObject,
-                                 serializedObject.FindProperty("LeftHandControllers"),
+                                 serializedObject.FindProperty("leftHandControllers"),
                                  true, true, false, false);
       leftList.drawHeaderCallback = (Rect rect) => { EditorGUI.LabelField(rect, "Left Controller Priority"); };
       leftList.drawElementCallback = (Rect rect, int index, bool isActive, bool isFocused) => { EditorGUI.PropertyField(rect, leftList.serializedProperty.GetArrayElementAtIndex(index)); };
       leftList.elementHeight = EditorGUIUtility.singleLineHeight;
-      specifyCustomDrawer("LeftHandControllers", (SerializedProperty p) => { leftList.DoLayoutList(); });
+      specifyCustomDrawer("leftHandControllers", (SerializedProperty p) => { leftList.DoLayoutList(); });
 
       rightList = new ReorderableList(serializedObject,
-                           serializedObject.FindProperty("RightHandControllers"),
+                           serializedObject.FindProperty("rightHandControllers"),
                            true, true, false, false);
       rightList.drawHeaderCallback = (Rect rect) => { EditorGUI.LabelField(rect, "Right Controller Priority"); };
       rightList.drawElementCallback = (Rect rect, int index, bool isActive, bool isFocused) => { EditorGUI.PropertyField(rect, rightList.serializedProperty.GetArrayElementAtIndex(index)); };
       rightList.elementHeight = EditorGUIUtility.singleLineHeight;
-      specifyCustomDrawer("RightHandControllers", (SerializedProperty p) => { rightList.DoLayoutList(); });
+      specifyCustomDrawer("rightHandControllers", (SerializedProperty p) => { rightList.DoLayoutList(); });
     }
   }
 }

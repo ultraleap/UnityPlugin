@@ -7548,6 +7548,11 @@ Prefab:
       propertyPath: manager
       value: 
       objectReference: {fileID: 289258607}
+    - target: {fileID: 114961213528822752, guid: edcc5ee563218a84ab541a00a47ea5c8,
+        type: 2}
+      propertyPath: _handDataMode
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: edcc5ee563218a84ab541a00a47ea5c8, type: 2}
   m_IsPrefabParent: 0
@@ -7756,6 +7761,7 @@ GameObject:
   - component: {fileID: 289258608}
   - component: {fileID: 289258607}
   - component: {fileID: 1562916757}
+  - component: {fileID: 1562916758}
   m_Layer: 0
   m_Name: Interaction Manager
   m_TagString: Untagged
@@ -7776,10 +7782,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   interactionManager: {fileID: 289258607}
-  prioritizeControllers: 1
-  LeftHandControllers:
+  leftHandControllers:
+  - {fileID: 1357959193}
   - {fileID: 486239175}
-  RightHandControllers:
+  rightHandControllers:
+  - {fileID: 117112161}
   - {fileID: 1500539203}
   OnLeftHandActive:
     m_PersistentCalls:
@@ -7843,6 +7850,44 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+--- !u!114 &1562916758
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1562916756}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7d7eaf54dc14a5e4a89bc7fac55ca11a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  interactionManager: {fileID: 289258607}
+  leftHandControllers:
+  - {fileID: 486239175}
+  - {fileID: 1357959193}
+  rightHandControllers:
+  - {fileID: 117112161}
+  - {fileID: 1500539203}
+  OnLeftHandActive:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  OnLeftHandInactive:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  OnRightHandActive:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  OnRightHandInactive:
+    m_PersistentCalls:
+      m_Calls: []
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
 --- !u!1 &1574518198

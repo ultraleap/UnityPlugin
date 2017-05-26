@@ -9,15 +9,8 @@ public class InteractionControllerSwitcher : MonoBehaviour {
 
   public InteractionManager interactionManager;
 
-  [Tooltip("When a controller is tracking and moving, the user is probably "
-         + "intending to be using their controller instead of their hand to "
-         + "interact with objects. Without this option checked, hands may be "
-         + "sorted earlier in the list, which will cause their own movement to "
-         + "override controllers, unless they aren't tracked at all.")]
-  public bool prioritizeControllers = true;
-
-  public List<InteractionController> LeftHandControllers = new List<InteractionController>();
-  public List<InteractionController> RightHandControllers = new List<InteractionController>();
+  public List<InteractionController> leftHandControllers = new List<InteractionController>();
+  public List<InteractionController> rightHandControllers = new List<InteractionController>();
 
   public UnityEvent OnLeftHandActive = new UnityEvent();
   public UnityEvent OnLeftHandInactive = new UnityEvent();
@@ -33,13 +26,14 @@ public class InteractionControllerSwitcher : MonoBehaviour {
       OnValidate();
     }
   }
+
   void Awake() {
     refreshControllers();
   }
 
 	void FixedUpdate () {
-    setControllersActive(RightHandControllers, false);
-    setControllersActive(LeftHandControllers, true);
+    setControllersActive(rightHandControllers, false);
+    setControllersActive(leftHandControllers, true);
   }
 
   private void refreshControllers() {
@@ -47,40 +41,39 @@ public class InteractionControllerSwitcher : MonoBehaviour {
 
     // Add new controllers from the Interaction Manager.
     foreach (var controller in interactionManager.interactionControllers) {
-      if (controller.isLeft && !LeftHandControllers.Contains(controller) && controller.gameObject.activeInHierarchy && controller.enabled) {
-        LeftHandControllers.Add(controller);
+      if (controller.isLeft && !leftHandControllers.Contains(controller) && controller.gameObject.activeInHierarchy && controller.enabled) {
+        addController(leftHandControllers, controller);
       }
-      else if (controller.isRight && !RightHandControllers.Contains(controller) && controller.gameObject.activeInHierarchy && controller.enabled) {
-        RightHandControllers.Add(controller);
+      else if (controller.isRight && !rightHandControllers.Contains(controller) && controller.gameObject.activeInHierarchy && controller.enabled) {
+        addController(rightHandControllers, controller);
       }
     }
 
     // Remove old Controllers that no longer exist.
-    pruneControllers(LeftHandControllers, expectingLeft: true);
-    pruneControllers(RightHandControllers, expectingLeft: false);
-
-    // Prioritize VR controllers over hands for more intuitive switching.
-    if (prioritizeControllers) {
-      swapSortControllersBeforeHands(LeftHandControllers);
-      swapSortControllersBeforeHands(RightHandControllers);
-    }
-
+    pruneControllers(leftHandControllers, expectingLeft: true);
+    pruneControllers(rightHandControllers, expectingLeft: false);
   }
 
-  private void swapSortControllersBeforeHands(List<InteractionController> controllers) {
-    if (controllers.Count == 0) return;
-
-    int i = 0;
-    int j = controllers.Count - 1;
-
-    do {
-      if (controllers[i] is InteractionHand && controllers[j] is InteractionController) {
-        Utils.Swap(controllers, i, j);
+  /// <summary>
+  /// Adds the InteractionController, but inserts it before any InteractionHands if it's
+  /// an InteractionVRController.
+  /// </summary>
+  private void addController(List<InteractionController> controllers, InteractionController toAdd) {
+    int insertionIndex = -1;
+    if (toAdd is InteractionVRController) {
+      for (int i = 0; i < controllers.Count; i++) {
+        if (controllers[i] is InteractionHand) {
+          insertionIndex = i; break;
+        }
       }
+    }
 
-      i++;
-      j--;
-    } while (i < j);
+    if (insertionIndex > -1) {
+      controllers.Insert(insertionIndex, toAdd);
+    }
+    else {
+      controllers.Add(toAdd);
+    }
   }
 
   private void pruneControllers(List<InteractionController> controllers, bool expectingLeft) {
