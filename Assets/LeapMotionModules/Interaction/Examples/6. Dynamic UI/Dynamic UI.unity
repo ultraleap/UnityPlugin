@@ -3102,7 +3102,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &350964332
 Transform:
   m_ObjectHideFlags: 0
@@ -3132,7 +3132,7 @@ MonoBehaviour:
   _contactEnabled: 1
   _graspingEnabled: 1
   _handDataMode: 0
-  primaryHoverFingertips: 0000000000
+  primaryHoverFingertips: 0101010000
 --- !u!1 &353591240
 GameObject:
   m_ObjectHideFlags: 0
@@ -7198,9 +7198,9 @@ MonoBehaviour:
   ModelPool:
   - GroupName: Rigged Hands
     _handPool: {fileID: 0}
-    LeftModel: {fileID: 0}
+    LeftModel: {fileID: 1884369103}
     IsLeftToBeSpawned: 0
-    RightModel: {fileID: 0}
+    RightModel: {fileID: 1893088118}
     IsRightToBeSpawned: 0
     modelList: []
     modelsCheckedOut: []
@@ -8683,7 +8683,7 @@ MonoBehaviour:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 870077124}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 81dc33a21758b384586807f3656587d1, type: 3}
   m_Name: 
@@ -10087,6 +10087,10 @@ Prefab:
       propertyPath: m_RootOrder
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 1367756815714146, guid: 2d3679cbbb1638e4d84497b3eaaf0f1e, type: 2}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 2d3679cbbb1638e4d84497b3eaaf0f1e, type: 2}
   m_IsPrefabParent: 0
@@ -10095,12 +10099,6 @@ Transform:
   m_PrefabParentObject: {fileID: 4048813689411764, guid: 2d3679cbbb1638e4d84497b3eaaf0f1e,
     type: 2}
   m_PrefabInternal: {fileID: 1060690195}
---- !u!114 &1060690197 stripped
-MonoBehaviour:
-  m_PrefabParentObject: {fileID: 114804695224471122, guid: 2d3679cbbb1638e4d84497b3eaaf0f1e,
-    type: 2}
-  m_PrefabInternal: {fileID: 1060690195}
-  m_Script: {fileID: 11500000, guid: e55d3703de8ab5d418cb97104179cb49, type: 3}
 --- !u!1 &1067715899
 GameObject:
   m_ObjectHideFlags: 0
@@ -14130,8 +14128,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _interactionControllers:
     _values:
-    - {fileID: 1060690197}
-    - {fileID: 1717364969}
+    - {fileID: 350964334}
+    - {fileID: 1581846410}
   hoverActivationRadius: 0.2
   touchActivationRadius: 0.075
   _autoGenerateLayers: 1
@@ -15804,7 +15802,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1581846409
 Transform:
   m_ObjectHideFlags: 0
@@ -15834,7 +15832,7 @@ MonoBehaviour:
   _contactEnabled: 1
   _graspingEnabled: 1
   _handDataMode: 1
-  primaryHoverFingertips: 0000000000
+  primaryHoverFingertips: 0101010000
 --- !u!1 &1587379321
 GameObject:
   m_ObjectHideFlags: 0
@@ -17781,6 +17779,10 @@ Prefab:
       propertyPath: m_RootOrder
       value: 3
       objectReference: {fileID: 0}
+    - target: {fileID: 1582248383679134, guid: c2f432850d1e97944a20cbab04cab188, type: 2}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: c2f432850d1e97944a20cbab04cab188, type: 2}
   m_IsPrefabParent: 0
@@ -17789,12 +17791,6 @@ Transform:
   m_PrefabParentObject: {fileID: 4945874923476290, guid: c2f432850d1e97944a20cbab04cab188,
     type: 2}
   m_PrefabInternal: {fileID: 1717364967}
---- !u!114 &1717364969 stripped
-MonoBehaviour:
-  m_PrefabParentObject: {fileID: 114370018576889794, guid: c2f432850d1e97944a20cbab04cab188,
-    type: 2}
-  m_PrefabInternal: {fileID: 1717364967}
-  m_Script: {fileID: 11500000, guid: e55d3703de8ab5d418cb97104179cb49, type: 3}
 --- !u!1 &1727852116
 GameObject:
   m_ObjectHideFlags: 0
@@ -18714,6 +18710,18 @@ MeshFilter:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1868337444}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &1884369103 stripped
+MonoBehaviour:
+  m_PrefabParentObject: {fileID: 114994683550464134, guid: 2aa010a1e75292e49a24f3f71bb9cddb,
+    type: 2}
+  m_PrefabInternal: {fileID: 451343058}
+  m_Script: {fileID: 11500000, guid: 9e0ed5922e911b343b8400997c95409c, type: 3}
+--- !u!114 &1893088118 stripped
+MonoBehaviour:
+  m_PrefabParentObject: {fileID: 114245269363414434, guid: 2276723046d707c4f94d431ceb80ab92,
+    type: 2}
+  m_PrefabInternal: {fileID: 1505285768}
+  m_Script: {fileID: 11500000, guid: 9e0ed5922e911b343b8400997c95409c, type: 3}
 --- !u!1 &1894661408
 GameObject:
   m_ObjectHideFlags: 0
