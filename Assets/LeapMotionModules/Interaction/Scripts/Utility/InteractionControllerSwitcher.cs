@@ -89,7 +89,11 @@ public class InteractionControllerSwitcher : MonoBehaviour {
     try {
       foreach (InteractionController switcherController in controllers) {
         bool containsController = interactionManager.interactionControllers.Contains(switcherController);
-        if (!containsController || (switcherController.isLeft && !expectingLeft) || !switcherController.gameObject.activeInHierarchy || !switcherController.enabled) {
+        if (!containsController
+            || (switcherController.isLeft  && !expectingLeft)
+            || (switcherController.isRight &&  expectingLeft)
+            || !switcherController.gameObject.activeInHierarchy
+            || !switcherController.enabled) {
           tempControllers.Add(switcherController);
         }
       }
