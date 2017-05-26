@@ -79,12 +79,12 @@ namespace Leap.Unity.Interaction {
 
                            targetHand.primaryHoverFingertips[fingerIndex])) {
         foreach (var singleTarget in targetHands) {
-          singleTarget.primaryHoverFingertips[fingerIndex] = true;
+          serializedObject.FindProperty("primaryHoverFingertips").GetArrayElementAtIndex(fingerIndex).boolValue = true;
         }
       }
       else {
         foreach (var singleTarget in targetHands) {
-          singleTarget.primaryHoverFingertips[fingerIndex] = false;
+          serializedObject.FindProperty("primaryHoverFingertips").GetArrayElementAtIndex(fingerIndex).boolValue = false;
         }
       }
     }

@@ -169,7 +169,7 @@ namespace Leap.Unity.Interaction {
 
       drawWireSphereGizmo(Vector3.zero, radius);
 
-      drawSphereCirclesGizmo(8, Vector3.zero, radius, Vector3.forward);
+      drawSphereCirclesGizmo(5, Vector3.zero, radius, Vector3.forward);
 
       Gizmos.matrix = origMatrix;
     }
@@ -178,6 +178,7 @@ namespace Leap.Unity.Interaction {
 
     private void drawWireSphereGizmo(Vector3 pos, float radius) {
       foreach (var dir in worldDirs) {
+        if (dir == Vector3.forward) continue;
         Utils.DrawCircle(pos, dir, radius, AnchorGizmoColor, quality: 24, depthTest: true);
       }
     }

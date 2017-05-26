@@ -33,6 +33,7 @@ namespace Leap.Unity {
   public class CustomEditorBase : Editor {
     protected Dictionary<string, Action<SerializedProperty>> _specifiedDrawers;
     protected Dictionary<string, List<Action<SerializedProperty>>> _specifiedDecorators;
+    protected Dictionary<string, List<Action<SerializedProperty>>> _specifiedPostDecorators;
     protected Dictionary<string, List<Func<bool>>> _conditionalProperties;
     protected List<string> _deferredProperties;
     protected bool _showScriptField = true;
@@ -59,8 +60,6 @@ namespace Leap.Unity {
     /// <summary>
     /// Specify a callback to be used to draw a decorator for a specific named property.  Should be called in OnEnable.
     /// </summary>
-    /// <param name="propertyName"></param>
-    /// <param name="decoratorDrawer"></param>
     protected void specifyCustomDecorator(string propertyName, Action<SerializedProperty> decoratorDrawer) {
       if (!validateProperty(propertyName)) {
         return;
@@ -70,6 +69,25 @@ namespace Leap.Unity {
       if (!_specifiedDecorators.TryGetValue(propertyName, out list)) {
         list = new List<Action<SerializedProperty>>();
         _specifiedDecorators[propertyName] = list;
+      }
+
+      list.Add(decoratorDrawer);
+    }
+
+    /// <summary>
+    /// Specify a callback to be used to draw a decorator AFTER a specific named property.
+    /// 
+    /// Should be called in OnEnable.
+    /// </summary>
+    protected void specifyCustomPostDecorator(string propertyName, Action<SerializedProperty> decoratorDrawer) {
+      if (!validateProperty(propertyName)) {
+        return;
+      }
+
+      List<Action<SerializedProperty>> list;
+      if (!_specifiedPostDecorators.TryGetValue(propertyName, out list)) {
+        list = new List<Action<SerializedProperty>>();
+        _specifiedPostDecorators[propertyName] = list;
       }
 
       list.Add(decoratorDrawer);
@@ -162,6 +180,7 @@ namespace Leap.Unity {
 
       _specifiedDrawers = new Dictionary<string, Action<SerializedProperty>>();
       _specifiedDecorators = new Dictionary<string, List<Action<SerializedProperty>>>();
+      _specifiedPostDecorators = new Dictionary<string, List<Action<SerializedProperty>>>();
       _conditionalProperties = new Dictionary<string, List<Func<bool>>>();
       _deferredProperties = new List<string>();
     }
@@ -238,6 +257,14 @@ namespace Leap.Unity {
 
       if (EditorGUI.EndChangeCheck()) {
         _modifiedProperties.Add(property.Copy());
+      }
+
+
+      List<Action<SerializedProperty>> postDecoratorList;
+      if (_specifiedPostDecorators.TryGetValue(property.name, out postDecoratorList)) {
+        for (int i = 0; i < postDecoratorList.Count; i++) {
+          postDecoratorList[i](property);
+        }
       }
     }
   }

@@ -34,6 +34,7 @@ namespace Leap.Unity.Interaction {
                                 "_contactBoneLayer");
 
       specifyCustomDecorator("_drawControllerRuntimeGizmos", drawControllerRuntimeGizmoDecorator);
+      specifyCustomPostDecorator("_drawControllerRuntimeGizmos", drawPostControllerRuntimeGizmoDecorator);
     }
 
     public override bool RequiresConstantRepaint() {
@@ -56,9 +57,63 @@ namespace Leap.Unity.Interaction {
       }
     }
 
+    private void drawPostControllerRuntimeGizmoDecorator(SerializedProperty property) {
+      if (property.boolValue && _runtimeGizmoManager != null) {
+        drawControllerRuntimeGizmosColorLegend();
+      }
+    }
+
+    public void drawControllerRuntimeGizmosColorLegend() {
+      EditorGUILayout.Space();
+      EditorGUILayout.LabelField("Controller Gizmos Legend", EditorStyles.boldLabel);
+
+      EditorGUI.BeginDisabledGroup(true);
+
+      EditorGUILayout.ColorField(new GUIContent("Contact Bone Colliders",
+                                                "The gizmo color for contact bone colliders "
+                                              + "when soft contact is disabled."),
+                                InteractionController.GizmoColors.ContactBone);
+      EditorGUILayout.ColorField(new GUIContent("Soft Contact Bone Colliders",
+                                                "The gizmo color for contact bones colliders "
+                                              + "when soft contact is enabled."),
+                                 InteractionController.GizmoColors.SoftContactBone);
+
+      EditorGUILayout.Space();
+      EditorGUILayout.ColorField(new GUIContent("Hover Points",
+                                                "The gizmo color for hover points. Gizmo "
+                                              + "does not reflect the actual hover radius."),
+                                 InteractionController.GizmoColors.HoverPoint);
+      EditorGUILayout.ColorField(new GUIContent("Primary Hover Points",
+                                                "The gizmo color for primary hover points."),
+                                 InteractionController.GizmoColors.PrimaryHoverPoint);
+
+      EditorGUILayout.Space();
+      EditorGUILayout.ColorField(new GUIContent("Grasp Points",
+                                                "The gizmo color for grasp points. "
+                                              + "InteractionHands do not use grasp points, "
+                                              + "so no gizmo is drawn for them."),
+                                 InteractionController.GizmoColors.GraspPoint);
+      EditorGUILayout.ColorField(new GUIContent("Graspable Objects",
+                                                "The gizmo color for the wire sphere "
+                                              + "that appears at objects when they are "
+                                              + "graspable by an interaction controller. "),
+                                 InteractionController.GizmoColors.Graspable);
+
+      EditorGUI.EndDisabledGroup();
+    }
+
     private void drawControllersStatusEditor(SerializedProperty property) {
       EditorGUILayout.Space();
       EditorGUILayout.LabelField("Interaction Controller Status", EditorStyles.boldLabel);
+
+      if (target.interactionControllers.Count == 0) {
+        EditorGUILayout.HelpBox("This Interaction Manager has no interaction controllers "
+                              + "assigned to it. Please add at least one InteractionHand "
+                              + "or an InteractionVRController as a child of this object.",
+                              MessageType.Warning);
+
+        return;
+      }
 
       EditorGUILayout.BeginVertical();
 

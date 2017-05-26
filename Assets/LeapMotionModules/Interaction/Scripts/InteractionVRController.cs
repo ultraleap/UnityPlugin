@@ -135,19 +135,21 @@ namespace Leap.Unity.Interaction {
     }
 
     protected virtual void Reset() {
+      hoverEnabled = true;
+      contactEnabled = true;
+      graspingEnabled = true;
 
+      trackingProvider = _defaultTrackingProvider;
+      _hoverPoint = null;
+      primaryHoverPoints.Clear();
+      graspPoint = null;
+
+      maxGraspDistance = 0.06F;
+      graspTimingSlop = 0.1F;
     }
 
-    private float lastTimeMoved = 0f;
     private void refreshControllerTrackingData(Vector3 position, Quaternion rotation) {
-      Transform baseTransform = Camera.main.transform.parent;
-      if (((baseTransform.InverseTransformPoint(position)
-            - baseTransform.InverseTransformPoint(_trackedPositionLastFrame))
-           / Time.fixedDeltaTime).magnitude > 0.15F
-           || Quaternion.Angle(baseTransform.InverseTransformRotation(rotation),
-                               baseTransform.InverseTransformRotation(_trackedRotationLastFrame)) > 0.6F) {
-        lastTimeMoved = Time.fixedTime;
-      }
+      refreshIsBeingMoved(position, rotation);
 
       if (_hasTrackedPositionLastFrame) {
         _trackedPositionLastFrame = this.transform.position;
@@ -163,6 +165,24 @@ namespace Leap.Unity.Interaction {
         _trackedPositionLastFrame = this.transform.position;
         _trackedRotationLastFrame = this.transform.rotation;
       }
+    }
+
+    private const float RIG_LOCAL_MOVEMENT_SPEED_THRESHOLD = 00.07F;
+    private const float RIG_LOCAL_ROTATION_SPEED_THRESHOLD = 10.00F;
+    private const float BEING_MOVED_TIMEOUT = 0.5F;
+
+    private float _lastTimeMoved = 0F;
+    private bool  _isBeingMoved = false;
+    private void refreshIsBeingMoved(Vector3 position, Quaternion rotation) {
+      Transform baseTransform = Camera.main.transform.parent;
+      if (((baseTransform.InverseTransformPoint(position)
+            - baseTransform.InverseTransformPoint(_trackedPositionLastFrame)) / Time.fixedDeltaTime).magnitude > RIG_LOCAL_MOVEMENT_SPEED_THRESHOLD
+           || Quaternion.Angle(baseTransform.InverseTransformRotation(rotation),
+                               baseTransform.InverseTransformRotation(_trackedRotationLastFrame)) / Time.fixedDeltaTime > RIG_LOCAL_ROTATION_SPEED_THRESHOLD) {
+        _lastTimeMoved = Time.fixedTime;
+      }
+
+      _isBeingMoved = trackingProvider != null && trackingProvider.isTracked && Time.fixedTime - _lastTimeMoved < BEING_MOVED_TIMEOUT;
     }
 
     #region General InteractionController Implementation
@@ -181,7 +201,7 @@ namespace Leap.Unity.Interaction {
     /// </summary>
     public override bool isBeingMoved {
       get {
-        return trackingProvider != null && trackingProvider.isTracked && Time.fixedTime - lastTimeMoved < 0.1f;
+        return _isBeingMoved;
       }
     }
 
@@ -379,7 +399,7 @@ namespace Leap.Unity.Interaction {
     /// the grasp button axis value returned by this method becomes smaller than the
     /// graspButtonReleasedValue. Both of these values provide public setters.
     /// </summary>
-    public Func<float> graspingAxisOverride = null;
+    public Func<float> graspAxisOverride = null;
 
     private float _graspDepressedValue = 0.8F;
     /// <summary>
@@ -456,11 +476,11 @@ namespace Leap.Unity.Interaction {
       bool graspButton = _graspButtonLastFrame;
 
       if (!_graspButtonLastFrame) {
-        if (graspingAxisOverride == null) {
+        if (graspAxisOverride == null) {
           graspButton = Input.GetAxis(graspButtonAxis) > graspDepressedValue;
         }
         else {
-          graspButton = graspingAxisOverride() > graspDepressedValue;
+          graspButton = graspAxisOverride() > graspDepressedValue;
         }
 
         if (graspButton) {
@@ -476,11 +496,11 @@ namespace Leap.Unity.Interaction {
           graspReleasedValue = graspDepressedValue;
         }
 
-        if (graspingAxisOverride == null) {
+        if (graspAxisOverride == null) {
           graspButton = Input.GetAxis(graspButtonAxis) > graspReleasedValue;
         }
         else {
-          graspButton = graspingAxisOverride() > graspReleasedValue;
+          graspButton = graspAxisOverride() > graspReleasedValue;
         }
 
         if (!graspButton) {
@@ -525,17 +545,22 @@ namespace Leap.Unity.Interaction {
       base.OnDrawRuntimeGizmos(drawer);
 
       // Grasp Point
-      float graspAmount;
-      if (graspingAxisOverride != null) graspAmount = graspingAxisOverride();
-      else graspAmount = Input.GetAxis(graspButtonAxis);
+      float graspAmount = 0F;
+      if (graspAxisOverride != null) graspAmount = graspAxisOverride();
+      else {
+        try {
+          graspAmount = Input.GetAxis(graspButtonAxis);
+        }
+        catch (ArgumentException) { }
+      }
 
-      drawer.color = Color.Lerp(Color.blue, Color.white, graspAmount);
+      drawer.color = Color.Lerp(GizmoColors.GraspPoint, Color.white, graspAmount);
       drawer.DrawWireSphere(GetGraspPoint(), maxGraspDistance);
 
       // Nearest graspable object
       if (_closestGraspableObject != null) {
-        drawer.color = Color.Lerp(Color.red, Color.white, Mathf.Sin(Time.time * 2 * Mathf.PI));
-        drawer.DrawWireSphere(_closestGraspableObject.rigidbody.position, maxGraspDistance * 0.5F);
+        drawer.color = Color.Lerp(GizmoColors.Graspable, Color.white, Mathf.Sin(Time.time * 2 * Mathf.PI * 2F));
+        drawer.DrawWireSphere(_closestGraspableObject.rigidbody.position, maxGraspDistance * 0.75F);
       }
     }
 

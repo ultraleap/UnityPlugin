@@ -702,7 +702,7 @@ namespace Leap.Unity.Interaction {
       foreach (var controller in this.transform.GetChildren()
                                                .Query()
                                                .Select(g => g.GetComponent<InteractionController>())
-                                               .Where(c => c != null)) {
+                                               .Where(c => c != null && c.gameObject.activeSelf)) {
         _interactionControllers.Add(controller);
       }
     }

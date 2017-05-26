@@ -1698,6 +1698,19 @@ namespace Leap.Unity.Interaction {
 
     #region Gizmos
 
+    public static class GizmoColors {
+
+      public static Color ContactBone       { get { return Color.green.WithAlpha(0.5F); } }
+      public static Color SoftContactBone   { get { return Color.white.WithAlpha(0.5F); } }
+                                     
+      public static Color HoverPoint        { get { return Color.yellow.WithAlpha(0.5F); } }
+      public static Color PrimaryHoverPoint { get { return Color.Lerp(Color.red, Color.yellow, 0.5F).WithAlpha(0.5F); } }
+
+      public static Color GraspPoint        { get { return Color.Lerp(Color.blue, Color.cyan, 0.3F).WithAlpha(0.5F); } }
+      public static Color Graspable         { get { return Color.cyan.WithAlpha(0.5F); } }
+
+    }
+
     /// <summary>
     /// By default, this method will draw all of the colliders found in the
     /// contactBoneParent hierarchy, or draw the controller's soft contact
@@ -1709,10 +1722,10 @@ namespace Leap.Unity.Interaction {
 
       if (contactBoneParent != null) {
         if (!softContactEnabled) {
-          drawer.color = Color.green;
+          drawer.color = GizmoColors.ContactBone;
         }
         else {
-          drawer.color = Color.white;
+          drawer.color = GizmoColors.SoftContactBone;
         }
 
         drawer.DrawColliders(contactBoneParent, true, true, true);
@@ -1720,18 +1733,26 @@ namespace Leap.Unity.Interaction {
 
       // Hover Point
       if (hoverEnabled) {
-        drawer.color = Color.yellow;
-        drawer.DrawWireSphere(hoverPoint, 0.015F);
+        drawHoverPoint(drawer, hoverPoint);
       }
 
       // Primary Hover Points
       if (hoverEnabled) {
-        drawer.color = Color.Lerp(Color.red, Color.yellow, 0.5F);
         foreach (var point in primaryHoverPoints) {
           if (point == null) continue;
-          drawer.DrawWireSphere(point.position, 0.02F);
+          drawPrimaryHoverPoint(drawer, point.position);
         }
       }
+    }
+
+    protected static void drawHoverPoint(RuntimeGizmoDrawer drawer, Vector3 pos) {
+      drawer.color = GizmoColors.HoverPoint;
+      drawer.DrawWireSphere(pos, 0.03F);
+    }
+
+    protected static void drawPrimaryHoverPoint(RuntimeGizmoDrawer drawer, Vector3 pos) {
+      drawer.color = GizmoColors.PrimaryHoverPoint;
+      drawer.DrawWireSphere(pos, 0.015F);
     }
 
     #endregion

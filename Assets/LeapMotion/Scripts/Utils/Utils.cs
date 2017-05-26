@@ -492,6 +492,14 @@ namespace Leap.Unity {
 
     #endregion
 
+    #region Color Utils
+
+    public static Color WithAlpha(this Color color, float alpha) {
+      return new Color(color.r, color.g, color.b, alpha);
+    }
+
+    #endregion
+
     #region Gizmo Utils
 
     public static void DrawCircle(Vector3 center,

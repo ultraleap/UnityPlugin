@@ -604,6 +604,44 @@ namespace Leap.Unity.Interaction {
 
     #endregion
 
+    #region Gizmos
+
+    #if UNITY_EDITOR
+
+    private Leap.Hand _testHand = null;
+
+    public override void OnDrawRuntimeGizmos(RuntimeGizmoDrawer drawer) {
+      if (Application.isPlaying) {
+        base.OnDrawRuntimeGizmos(drawer);
+      }
+      else {
+        var provider = leapProvider;
+        if (provider == null) {
+          provider = Hands.Provider;
+        }
+
+        if (_testHand == null && provider != null) {
+          _testHand = TestHandFactory.MakeTestHand(0, 0, this.isLeft)
+                                     .TransformedCopy(UnityMatrixExtension.GetLeapMatrix(provider.transform));
+        }
+
+        // Hover Point
+        _unwarpedHandData = _testHand; // hoverPoint is driven by this backing variable
+        drawHoverPoint(drawer, hoverPoint);
+
+        // Primary Hover Points
+        for (int i = 0; i < NUM_FINGERS; i++) {
+          if (primaryHoverFingertips[i]) {
+            drawPrimaryHoverPoint(drawer, _testHand.Fingers[i].TipPosition.ToVector3());
+          }
+        }
+      }
+    }
+
+    #endif
+
+    #endregion
+
   }
 
 }
