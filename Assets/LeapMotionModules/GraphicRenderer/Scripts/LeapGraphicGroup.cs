@@ -21,7 +21,7 @@ using Leap.Unity.Query;
 namespace Leap.Unity.GraphicalRenderer {
 
   [Serializable]
-  public partial class LeapGraphicGroup : ISerializationCallbackReceiver {
+  public partial class LeapGraphicGroup : ISerializationCallbackReceiver, ILeapInternalGraphicGroup {
 
     #region INSPECTOR FIELDS
     [SerializeField]
@@ -60,13 +60,18 @@ namespace Leap.Unity.GraphicalRenderer {
     }
 
     /// <summary>
-    /// Gets the renderer this group is attached to.  The set method is 
-    /// for internal use only and should not be used.
+    /// Gets the renderer this group is attached to.
     /// </summary>
     public LeapGraphicRenderer renderer {
       get {
         return _renderer;
       }
+    }
+
+    /// <summary>
+    /// Sets the renderer this group is attached to.
+    /// </summary>
+    LeapGraphicRenderer ILeapInternalGraphicGroup.renderer {
       set {
         _renderer = value;
       }
@@ -562,8 +567,9 @@ namespace Leap.Unity.GraphicalRenderer {
                          "LeapGraphicGroup make sure to annotate it with a [NonSerialized] attribute, or else " +
                          "Unity will automatically create invalid instances of the class.");
       } else {
-        _renderingMethod.Value.group = this;
-        _renderingMethod.Value.renderer = renderer;
+        ILeapInternalRenderingMethod renderingMethodInternal = _renderingMethod.Value;
+        renderingMethodInternal.group = this;
+        renderingMethodInternal.renderer = renderer;
       }
     }
 

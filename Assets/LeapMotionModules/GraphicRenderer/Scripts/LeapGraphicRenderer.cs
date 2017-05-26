@@ -209,7 +209,7 @@ namespace Leap.Unity.GraphicalRenderer {
 
     public void OnAfterDeserialize() {
       foreach (var group in _groups) {
-        group.renderer = this;
+        (group as ILeapInternalGraphicGroup).renderer = this;
       }
     }
     #endregion

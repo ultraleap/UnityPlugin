@@ -18,6 +18,10 @@ using Leap.Unity.Query;
 
 namespace Leap.Unity.GraphicalRenderer {
 
+  public interface ILeapInternalGraphicGroup {
+    LeapGraphicRenderer renderer { set; }
+  }
+
   public partial class LeapGraphicGroup {
 
 #if UNITY_EDITOR
@@ -83,8 +87,10 @@ namespace Leap.Unity.GraphicalRenderer {
 
         _group._renderingMethod.Value = Activator.CreateInstance(renderingMethodType) as LeapRenderingMethod;
         Assert.IsNotNull(_group._renderingMethod.Value);
-        _group._renderingMethod.Value.renderer = _group._renderer;
-        _group._renderingMethod.Value.group = _group;
+
+        ILeapInternalRenderingMethod renderingMethodInternal = _group._renderingMethod.Value;
+        renderingMethodInternal.renderer = _group._renderer;
+        renderingMethodInternal.group = _group;
 
         if (addFeatures) {
           List<Type> dataObjTypes = new List<Type>();
