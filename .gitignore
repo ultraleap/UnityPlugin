@@ -9,7 +9,7 @@
 *.booproj
 *.unitypackage
 
-/Library
+/Library/*
 /Library/FailedAssetImports.txt
 /Library/cache/
 /Library/previews/
@@ -30,3 +30,5 @@ Thumbs.db
 
 .DS_Store
 .DS_Store?
+
+*_ElementData*

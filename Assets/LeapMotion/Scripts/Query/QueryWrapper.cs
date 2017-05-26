@@ -117,6 +117,14 @@ namespace Leap.Unity.Query {
     }
 
     /// <summary>
+    /// Converts a ReadonlyList object into a query operation, and returns a query wrapper
+    /// that wraps this new operation.
+    /// </summary>
+    public static QueryWrapper<T, ReadonlyListQueryOp<T>> Query<T>(this ReadonlyList<T> list) {
+      return new QueryWrapper<T, ReadonlyListQueryOp<T>>(new ReadonlyListQueryOp<T>(list));
+    }
+
+    /// <summary>
     /// Converts a Dictionary object into a query operation, and returns a query wrapper
     /// that wraps this new operation.
     /// </summary>
@@ -129,6 +137,14 @@ namespace Leap.Unity.Query {
     /// that wraps this new operation.
     /// </summary>
     public static QueryWrapper<T, EnumerableQueryOp<T, HashSet<T>.Enumerator>> Query<T>(this HashSet<T> hashSet) {
+      return new QueryWrapper<T, EnumerableQueryOp<T, HashSet<T>.Enumerator>>(new EnumerableQueryOp<T, HashSet<T>.Enumerator>(hashSet.GetEnumerator()));
+    }
+
+    /// <summary>
+    /// Converts a ReadonlyHashSet object into a query operation, and returns a query
+    /// wrapper that wraps this new operation.
+    /// </summary>
+    public static QueryWrapper<T, EnumerableQueryOp<T, HashSet<T>.Enumerator>> Query<T>(this ReadonlyHashSet<T> hashSet) {
       return new QueryWrapper<T, EnumerableQueryOp<T, HashSet<T>.Enumerator>>(new EnumerableQueryOp<T, HashSet<T>.Enumerator>(hashSet.GetEnumerator()));
     }
 
@@ -174,6 +190,31 @@ namespace Leap.Unity.Query {
           t = default(T);
           return false;
         } else {
+          t = _list[_index++];
+          return true;
+        }
+      }
+
+      public void Reset() {
+        _index = 0;
+      }
+    }
+
+    public struct ReadonlyListQueryOp<T> : IQueryOp<T> {
+      private ReadonlyList<T> _list;
+      private int _index;
+
+      public ReadonlyListQueryOp(ReadonlyList<T> list) {
+        _list = list;
+        _index = 0;
+      }
+
+      public bool TryGetNext(out T t) {
+        if (_index >= _list.Count) {
+          t = default(T);
+          return false;
+        }
+        else {
           t = _list[_index++];
           return true;
         }

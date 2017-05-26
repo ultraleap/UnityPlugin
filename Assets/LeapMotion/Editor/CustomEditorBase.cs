@@ -33,9 +33,9 @@ namespace Leap.Unity {
   public class CustomEditorBase : Editor {
     protected Dictionary<string, Action<SerializedProperty>> _specifiedDrawers;
     protected Dictionary<string, List<Action<SerializedProperty>>> _specifiedDecorators;
+    protected Dictionary<string, List<Action<SerializedProperty>>> _specifiedPostDecorators;
     protected Dictionary<string, List<Func<bool>>> _conditionalProperties;
-    protected HashSet<string> _beginHorizontalProperties;
-    protected HashSet<string> _endHorizontalProperties;
+    protected List<string> _deferredProperties;
     protected bool _showScriptField = true;
 
     protected List<SerializedProperty> _modifiedProperties = new List<SerializedProperty>();
@@ -60,8 +60,6 @@ namespace Leap.Unity {
     /// <summary>
     /// Specify a callback to be used to draw a decorator for a specific named property.  Should be called in OnEnable.
     /// </summary>
-    /// <param name="propertyName"></param>
-    /// <param name="decoratorDrawer"></param>
     protected void specifyCustomDecorator(string propertyName, Action<SerializedProperty> decoratorDrawer) {
       if (!validateProperty(propertyName)) {
         return;
@@ -71,6 +69,25 @@ namespace Leap.Unity {
       if (!_specifiedDecorators.TryGetValue(propertyName, out list)) {
         list = new List<Action<SerializedProperty>>();
         _specifiedDecorators[propertyName] = list;
+      }
+
+      list.Add(decoratorDrawer);
+    }
+
+    /// <summary>
+    /// Specify a callback to be used to draw a decorator AFTER a specific named property.
+    /// 
+    /// Should be called in OnEnable.
+    /// </summary>
+    protected void specifyCustomPostDecorator(string propertyName, Action<SerializedProperty> decoratorDrawer) {
+      if (!validateProperty(propertyName)) {
+        return;
+      }
+
+      List<Action<SerializedProperty>> list;
+      if (!_specifiedPostDecorators.TryGetValue(propertyName, out list)) {
+        list = new List<Action<SerializedProperty>>();
+        _specifiedPostDecorators[propertyName] = list;
       }
 
       list.Add(decoratorDrawer);
@@ -112,6 +129,10 @@ namespace Leap.Unity {
       }, dependantProperties);
     }
 
+    protected void hideField(string propertyName) {
+      specifyConditionalDrawing(() => false, propertyName);
+    }
+
     protected void specifyConditionalDrawing(Func<bool> conditional, params string[] dependantProperties) {
       for (int i = 0; i < dependantProperties.Length; i++) {
         string dependant = dependantProperties[i];
@@ -129,19 +150,39 @@ namespace Leap.Unity {
       }
     }
 
-    protected void createHorizonalSection(string beginProperty, string endProperty) {
-      validateProperty(beginProperty);
-      validateProperty(endProperty);
-      _beginHorizontalProperties.Add(beginProperty);
-      _endHorizontalProperties.Add(endProperty);
+    /// <summary>
+    /// Defer rendering of a property until the end of the inspector.  Deferred properties
+    /// are drawn in the REVERSE order they are deferred!  NOT by the order they appear in the 
+    /// serialized object!
+    /// </summary>
+    protected void deferProperty(string propertyName) {
+      if (!validateProperty(propertyName)) {
+        return;
+      }
+
+      _deferredProperties.Insert(0, propertyName);
+    }
+
+    protected void drawScriptField(bool disable = true) {
+      var scriptProp = serializedObject.FindProperty("m_Script");
+      EditorGUI.BeginDisabledGroup(disable);
+      EditorGUILayout.PropertyField(scriptProp);
+      EditorGUI.EndDisabledGroup();
     }
 
     protected virtual void OnEnable() {
+      try {
+        if (serializedObject == null) { }
+      } catch (NullReferenceException) {
+        DestroyImmediate(this);
+        throw new Exception("Cleaning up an editor of type " + GetType() + ".  Make sure to always destroy your editors when you are done with them!");
+      }
+
       _specifiedDrawers = new Dictionary<string, Action<SerializedProperty>>();
       _specifiedDecorators = new Dictionary<string, List<Action<SerializedProperty>>>();
+      _specifiedPostDecorators = new Dictionary<string, List<Action<SerializedProperty>>>();
       _conditionalProperties = new Dictionary<string, List<Func<bool>>>();
-      _beginHorizontalProperties = new HashSet<string>();
-      _endHorizontalProperties = new HashSet<string>();
+      _deferredProperties = new List<string>();
     }
 
     protected bool validateProperty(string propertyName) {
@@ -167,52 +208,64 @@ namespace Leap.Unity {
           continue;
         }
 
-        List<Func<bool>> conditionalList;
-        if (_conditionalProperties.TryGetValue(iterator.name, out conditionalList)) {
-          bool allTrue = true;
-          for (int i = 0; i < conditionalList.Count; i++) {
-            allTrue &= conditionalList[i]();
-          }
-          if (!allTrue) {
-            continue;
-          }
+        if (_deferredProperties.Contains(iterator.name)) {
+          continue;
         }
 
-        if (_beginHorizontalProperties.Contains(iterator.name)) {
-          EditorGUILayout.BeginHorizontal();
-        }
-
-        Action<SerializedProperty> customDrawer;
-
-        List<Action<SerializedProperty>> decoratorList;
-        if (_specifiedDecorators.TryGetValue(iterator.name, out decoratorList)) {
-          for (int i = 0; i < decoratorList.Count; i++) {
-            decoratorList[i](iterator);
-          }
-        }
-
-        EditorGUI.BeginChangeCheck();
-
-        if (_specifiedDrawers.TryGetValue(iterator.name, out customDrawer)) {
-          customDrawer(iterator);
-        } else {
-          using (new EditorGUI.DisabledGroupScope(isFirst)) {
-            EditorGUILayout.PropertyField(iterator, true);
-          }
-        }
-
-        if (EditorGUI.EndChangeCheck()) {
-          _modifiedProperties.Add(iterator.Copy());
-        }
-
-        if (_endHorizontalProperties.Contains(iterator.name)) {
-          EditorGUILayout.EndHorizontal();
+        using (new EditorGUI.DisabledGroupScope(isFirst)) {
+          drawProperty(iterator);
         }
 
         isFirst = false;
       }
 
+      foreach (var deferredProperty in _deferredProperties) {
+        drawProperty(serializedObject.FindProperty(deferredProperty));
+      }
+
       serializedObject.ApplyModifiedProperties();
+    }
+
+    private void drawProperty(SerializedProperty property) {
+      List<Func<bool>> conditionalList;
+      if (_conditionalProperties.TryGetValue(property.name, out conditionalList)) {
+        bool allTrue = true;
+        for (int i = 0; i < conditionalList.Count; i++) {
+          allTrue &= conditionalList[i]();
+        }
+        if (!allTrue) {
+          return;
+        }
+      }
+
+      Action<SerializedProperty> customDrawer;
+
+      List<Action<SerializedProperty>> decoratorList;
+      if (_specifiedDecorators.TryGetValue(property.name, out decoratorList)) {
+        for (int i = 0; i < decoratorList.Count; i++) {
+          decoratorList[i](property);
+        }
+      }
+
+      EditorGUI.BeginChangeCheck();
+
+      if (_specifiedDrawers.TryGetValue(property.name, out customDrawer)) {
+        customDrawer(property);
+      } else {
+        EditorGUILayout.PropertyField(property, true);
+      }
+
+      if (EditorGUI.EndChangeCheck()) {
+        _modifiedProperties.Add(property.Copy());
+      }
+
+
+      List<Action<SerializedProperty>> postDecoratorList;
+      if (_specifiedPostDecorators.TryGetValue(property.name, out postDecoratorList)) {
+        for (int i = 0; i < postDecoratorList.Count; i++) {
+          postDecoratorList[i](property);
+        }
+      }
     }
   }
 }

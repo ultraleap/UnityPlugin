@@ -15,10 +15,10 @@ namespace Leap.Unity {
   /// An object you can use to represent a single Unity layer 
   /// as a dropdown in the inspector.  Can be converted back and 
   /// forth between the integer representation Unity usually
-  /// uses in it's own methods.
+  /// uses in its own methods.
   /// </summary>
   [Serializable]
-  public struct SingleLayer {
+  public struct SingleLayer : IEquatable<SingleLayer> {
     public int layerIndex;
 
     public int layerMask {
@@ -52,6 +52,10 @@ namespace Leap.Unity {
       SingleLayer singleLayer = new SingleLayer();
       singleLayer.layerIndex = layerIndex;
       return singleLayer;
+    }
+
+    public bool Equals(SingleLayer other) {
+      return this.layerIndex == other.layerIndex;
     }
   }
 }

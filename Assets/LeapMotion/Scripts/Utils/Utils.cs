@@ -8,8 +8,10 @@
  ******************************************************************************/
 
 using UnityEngine;
+using UnityEngine.Assertions;
 using System;
 using System.Collections.Generic;
+using Leap.Unity.Query;
 
 namespace Leap.Unity {
 
@@ -62,6 +64,55 @@ namespace Leap.Unity {
       array = newArray;
     }
 
+    /// <summary>
+    /// Returns whether or not two lists contain the same elements ignoring order.
+    /// </summary>
+    public static bool AreEqualUnordered<T>(IList<T> a, IList<T> b) {
+      var _count = Pool<Dictionary<T, int>>.Spawn();
+      try {
+        int _nullCount = 0;
+
+        foreach (var i in a) {
+          if (i == null) {
+            _nullCount++;
+          } else {
+            int count;
+            if (!_count.TryGetValue(i, out count)) {
+              count = 0;
+            }
+            _count[i] = count + 1;
+          }
+        }
+
+        foreach (var i in b) {
+          if (i == null) {
+            _nullCount--;
+          } else {
+            int count;
+            if (!_count.TryGetValue(i, out count)) {
+              return false;
+            }
+            _count[i] = count - 1;
+          }
+        }
+
+        if (_nullCount != 0) {
+          return false;
+        }
+
+        foreach (var pair in _count) {
+          if (pair.Value != 0) {
+            return false;
+          }
+        }
+
+        return true;
+      } finally {
+        _count.Clear();
+        Pool<Dictionary<T, int>>.Recycle(_count);
+      }
+    }
+
     // http://stackoverflow.com/a/19317229/2471635
     /// <summary>
     /// Returns whether this type implements the argument interface type.
@@ -77,9 +128,32 @@ namespace Leap.Unity {
       return false;
     }
 
+    public static float Area(this Rect rect) {
+      return rect.width * rect.height;
+    }
+
+    public static bool IsActiveRelativeToParent(this Transform obj, Transform parent) {
+      Assert.IsTrue(obj.IsChildOf(parent));
+
+      if (!obj.gameObject.activeSelf) {
+        return false;
+      } else {
+        if (obj.parent == null || obj.parent == parent) {
+          return true;
+        } else {
+          return obj.parent.IsActiveRelativeToParent(parent);
+        }
+      }
+    }
+
     #endregion
 
     #region Math Utils
+
+    public static int Repeat(int x, int m) {
+      int r = x % m;
+      return r < 0 ? r + m : r;
+    }
 
     /// <summary>
     /// Returns a vector that is perpendicular to this vector.
@@ -122,6 +196,175 @@ namespace Leap.Unity {
 
     #endregion
 
+    #region Value Mapping Utils
+
+    /// <summary>
+    /// Maps the value between valueMin and valueMax to its linearly proportional equivalent between resultMin and resultMax.
+    /// The input value is clamped between valueMin and valueMax; if this is not desired, see MapUnclamped.
+    /// </summary>
+    public static float Map(this float value, float valueMin, float valueMax, float resultMin, float resultMax) {
+      if (valueMin == valueMax) return resultMin;
+      return Mathf.Lerp(resultMin, resultMax, ((value - valueMin) / (valueMax - valueMin)));
+    }
+
+    /// <summary>
+    /// Maps the value between valueMin and valueMax to its linearly proportional equivalent between resultMin and resultMax,
+    /// without clamping the result value between resultMin and resultMax.
+    /// </summary>
+    public static float MapUnclamped(this float value, float valueMin, float valueMax, float resultMin, float resultMax) {
+      if (valueMin == valueMax) return resultMin;
+      return Mathf.LerpUnclamped(resultMin, resultMax, ((value - valueMin) / (valueMax - valueMin)));
+    }
+
+    /// <summary>
+    /// Maps each Vector2 component between valueMin and valueMax to its linearly proportional equivalent between resultMin and resultMax.
+    /// The input values are clamped between valueMin and valueMax; if this is not desired, see MapUnclamped.
+    /// </summary>
+    public static Vector2 Map(this Vector2 value, float valueMin, float valueMax, float resultMin, float resultMax) {
+      return new Vector2(value.x.Map(valueMin, valueMax, resultMin, resultMax),
+                        value.y.Map(valueMin, valueMax, resultMin, resultMax));
+    }
+
+    /// <summary>
+    /// Maps each Vector2 component between valueMin and valueMax to its linearly proportional equivalent between resultMin and resultMax,
+    /// without clamping the result value between resultMin and resultMax.
+    /// </summary>
+    public static Vector2 MapUnclamped(this Vector2 value, float valueMin, float valueMax, float resultMin, float resultMax) {
+      return new Vector2(value.x.MapUnclamped(valueMin, valueMax, resultMin, resultMax),
+                        value.y.MapUnclamped(valueMin, valueMax, resultMin, resultMax));
+    }
+
+    /// <summary>
+    /// Maps each Vector3 component between valueMin and valueMax to its linearly proportional equivalent between resultMin and resultMax.
+    /// The input values are clamped between valueMin and valueMax; if this is not desired, see MapUnclamped.
+    /// </summary>
+    public static Vector3 Map(this Vector3 value, float valueMin, float valueMax, float resultMin, float resultMax) {
+      return new Vector3(value.x.Map(valueMin, valueMax, resultMin, resultMax),
+                        value.y.Map(valueMin, valueMax, resultMin, resultMax),
+                        value.z.Map(valueMin, valueMax, resultMin, resultMax));
+    }
+
+    /// <summary>
+    /// Maps each Vector3 component between valueMin and valueMax to its linearly proportional equivalent between resultMin and resultMax,
+    /// without clamping the result value between resultMin and resultMax.
+    /// </summary>
+    public static Vector3 MapUnclamped(this Vector3 value, float valueMin, float valueMax, float resultMin, float resultMax) {
+      return new Vector3(value.x.MapUnclamped(valueMin, valueMax, resultMin, resultMax),
+                        value.y.MapUnclamped(valueMin, valueMax, resultMin, resultMax),
+                        value.z.MapUnclamped(valueMin, valueMax, resultMin, resultMax));
+    }
+
+    /// <summary>
+    /// Maps each Vector4 component between valueMin and valueMax to its linearly proportional equivalent between resultMin and resultMax.
+    /// The input values are clamped between valueMin and valueMax; if this is not desired, see MapUnclamped.
+    /// </summary>
+    public static Vector4 Map(this Vector4 value, float valueMin, float valueMax, float resultMin, float resultMax) {
+      return new Vector4(value.x.Map(valueMin, valueMax, resultMin, resultMax),
+                        value.y.Map(valueMin, valueMax, resultMin, resultMax),
+                        value.z.Map(valueMin, valueMax, resultMin, resultMax),
+                        value.w.Map(valueMin, valueMax, resultMin, resultMax));
+    }
+
+    /// <summary>
+    /// Maps each Vector4 component between valueMin and valueMax to its linearly proportional equivalent between resultMin and resultMax,
+    /// without clamping the result value between resultMin and resultMax.
+    /// </summary>
+    public static Vector4 MapUnclamped(this Vector4 value, float valueMin, float valueMax, float resultMin, float resultMax) {
+      return new Vector4(value.x.MapUnclamped(valueMin, valueMax, resultMin, resultMax),
+                        value.y.MapUnclamped(valueMin, valueMax, resultMin, resultMax),
+                        value.z.MapUnclamped(valueMin, valueMax, resultMin, resultMax),
+                        value.w.MapUnclamped(valueMin, valueMax, resultMin, resultMax));
+    }
+
+    /// <summary>
+    /// Returns a new Vector2 via component-wise multiplication.
+    /// This operation is equivalent to Vector3.Scale(A, B).
+    /// </summary>
+    public static Vector2 CompMul(this Vector2 A, Vector2 B) {
+      return new Vector2(A.x * B.x, A.y * B.y);
+    }
+
+    /// <summary>
+    /// Returns a new Vector3 via component-wise multiplication.
+    /// This operation is equivalent to Vector3.Scale(A, B).
+    /// </summary>
+    public static Vector3 CompMul(this Vector3 A, Vector3 B) {
+      return new Vector3(A.x * B.x, A.y * B.y, A.z * B.z);
+    }
+
+    /// <summary>
+    /// Returns a new Vector4 via component-wise multiplication.
+    /// This operation is equivalent to Vector3.Scale(A, B).
+    /// </summary>
+    public static Vector4 CompMul(this Vector4 A, Vector4 B) {
+      return new Vector4(A.x * B.x, A.y * B.y, A.z * B.z, A.w * B.w);
+    }
+
+    /// <summary>
+    /// Returns a new Vector3 via component-wise division.
+    /// This operation is the inverse of A.CompMul(B).
+    /// </summary>
+    public static Vector2 CompDiv(this Vector2 A, Vector2 B) {
+      return new Vector2(A.x / B.x, A.y / B.y);
+    }
+
+    /// <summary>
+    /// Returns a new Vector3 via component-wise division.
+    /// This operation is the inverse of A.CompMul(B).
+    /// </summary>
+    public static Vector3 CompDiv(this Vector3 A, Vector3 B) {
+      return new Vector3(A.x / B.x, A.y / B.y, A.z / B.z);
+    }
+
+    /// <summary>
+    /// Returns a new Vector4 via component-wise division.
+    /// This operation is the inverse of A.CompMul(B).
+    /// </summary>
+    public static Vector4 CompDiv(this Vector4 A, Vector4 B) {
+      return new Vector4(A.x / B.x, A.y / B.y, A.z / B.z, A.w / B.w);
+    }
+
+    #endregion
+
+    #region Transform Utils
+
+    /// <summary>
+    /// Returns the children of this Transform in sibling index order.
+    /// </summary>
+    public static ChildrenEnumerator GetChildren(this Transform t) {
+      return new ChildrenEnumerator(t);
+    }
+
+    public struct ChildrenEnumerator : IEnumerator<Transform> {
+      private Transform _t;
+      private int _idx;
+      private int _count;
+
+      public ChildrenEnumerator(Transform t) {
+        _t = t;
+        _idx = -1;
+        _count = t.childCount;
+      }
+
+      public ChildrenEnumerator GetEnumerator() { return this; }
+
+      public bool MoveNext() {
+        if (_idx < _count) _idx += 1;
+        if (_idx == _count) { return false; } else { return true; }
+      }
+      public Transform Current {
+        get { return _t == null ? null : _t.GetChild(_idx); }
+      }
+      object System.Collections.IEnumerator.Current { get { return Current; } }
+      public void Reset() {
+        _idx = -1;
+        _count = _t.childCount;
+      }
+      public void Dispose() { }
+    }
+
+    #endregion
+
     #region Orientation Utils
 
     /// <summary>
@@ -129,7 +372,10 @@ namespace Leap.Unity {
     /// Transform to point away from the argument Transform.
     /// 
     /// Useful for billboarding Quads and UI elements whose forward vectors should match
-    /// rather than oppose the Main Camera.
+    /// rather than oppose the Main Camera's forward vector.
+    /// 
+    /// Optionally, you may also pass an upwards vector, which will be provided to the underlying
+    /// Quaternion.LookRotation. Vector3.up will be used by default.
     /// </summary>
     public static void LookAwayFrom(this Transform thisTransform, Transform transform) {
       thisTransform.rotation = Quaternion.LookRotation(thisTransform.position - transform.position, Vector3.up);
@@ -180,6 +426,15 @@ namespace Leap.Unity {
       }
     }
 
+    public static void GetCapsulePoints(this CapsuleCollider capsule, out Vector3 a,
+                                                                      out Vector3 b) {
+      a = capsule.GetDirection() * ((capsule.height * 0.5f) - capsule.radius);
+      b = -a;
+
+      a = capsule.transform.TransformPoint(a);
+      b = capsule.transform.TransformPoint(b);
+    }
+
     /// <summary>
     /// Manipulates capsule.transform.position, capsule.transform.rotation, and capsule.height
     /// so that the line segment defined by the capsule connects world-space points a and b.
@@ -198,6 +453,64 @@ namespace Leap.Unity {
       Vector3 aCapsuleSpace = capsule.transform.InverseTransformPoint(a);
       float capsuleSpaceDistToA = aCapsuleSpace.magnitude;
       capsule.height = (capsuleSpaceDistToA + capsule.radius) * 2;
+    }
+
+    /// <summary>
+    /// Recursively searches the hierarchy of the argument GameObject to find all of the
+    /// Colliders that are attached to the object's Rigidbody (or that _would_ be 
+    /// attached to its Rigidbody if it doesn't have one) and adds them to the provided
+    /// colliders list. Warning: The provided "colliders" List will be cleared before
+    /// use.
+    /// 
+    /// Colliders that are the children of other Rigidbody elements beneath the argument
+    /// object are ignored.
+    /// </summary>
+    public static void FindColliders<T>(GameObject obj, List<T> colliders) where T : Collider {
+      colliders.Clear();
+      Stack<Transform> toVisit = Pool<Stack<Transform>>.Spawn();
+      List<T> collidersBuffer = Pool<List<T>>.Spawn();
+
+      try {
+        // Traverse the hierarchy of this object's transform to find
+        // all of its Colliders.
+        toVisit.Push(obj.transform);
+        Transform curTransform;
+        while (toVisit.Count > 0) {
+          curTransform = toVisit.Pop();
+
+          // Recursively search children and children's children
+          foreach (var child in curTransform.GetChildren()) {
+            // Ignore children with Rigidbodies of their own; its own Rigidbody
+            // owns its own colliders and the colliders of its children
+            if (child.GetComponent<Rigidbody>() == null) {
+              toVisit.Push(child);
+            }
+          }
+
+          // Since we'll visit every child, all we need to do is add the colliders
+          // of every transform we visit.
+          collidersBuffer.Clear();
+          curTransform.GetComponents<T>(collidersBuffer);
+          foreach (var collider in collidersBuffer) {
+            colliders.Add(collider);
+          }
+        }
+      }
+      finally {
+        toVisit.Clear();
+        Pool<Stack<Transform>>.Recycle(toVisit);
+
+        collidersBuffer.Clear();
+        Pool<List<T>>.Recycle(collidersBuffer);
+      }
+    }
+
+    #endregion
+
+    #region Color Utils
+
+    public static Color WithAlpha(this Color color, float alpha) {
+      return new Color(color.r, color.g, color.b, alpha);
     }
 
     #endregion
@@ -254,6 +567,31 @@ namespace Leap.Unity {
       for (float q = step; q <= height; q += step) {
         DrawCircle(origin + direction * q, direction, Mathf.Tan(angle * Constants.DEG_TO_RAD) * q, color, quality * 8, duration, depthTest);
       }
+    }
+
+    #endregion
+
+    #region Texture Utils
+
+    private static TextureFormat[] _incompressibleFormats = new TextureFormat[] {
+      TextureFormat.R16,
+      TextureFormat.EAC_R,
+      TextureFormat.EAC_R_SIGNED,
+      TextureFormat.EAC_RG,
+      TextureFormat.EAC_RG_SIGNED,
+      TextureFormat.ETC_RGB4_3DS,
+      TextureFormat.ETC_RGBA8_3DS
+    };
+
+    /// <summary>
+    /// Returns whether or not the given format is a valid input to EditorUtility.CompressTexture();
+    /// </summary>
+    public static bool IsCompressible(TextureFormat format) {
+      if (format < 0) {
+        return false;
+      }
+
+      return Array.IndexOf(_incompressibleFormats, format) < 0;
     }
 
     #endregion
