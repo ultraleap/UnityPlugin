@@ -73,7 +73,7 @@ namespace Leap.Unity.GraphicalRenderer {
       }
 
       /// <summary>
-      /// Creates a new group for this graphic renderer, and assign it the
+      /// Creates a new group for this graphic renderer, and assigns it the
       /// given rendering method.  This is an editor only api, as creating new
       /// groups cannot be done at runtime.
       /// </summary>
@@ -116,7 +116,7 @@ namespace Leap.Unity.GraphicalRenderer {
       /// <summary>
       /// Schedules a full editor rebuild of all graphic groups and their representations.
       /// This method only schedules the rebuild, it does not actually execute it.  The
-      /// rebuilt will happen on during the next editor tick.
+      /// rebuild will happen on during the next editor tick.
       /// 
       /// This is an editor-only api.  During runtime rebuilding is handled automatically,
       /// and full rebuilds do not occur.
@@ -303,39 +303,43 @@ namespace Leap.Unity.GraphicalRenderer {
         _renderer.GetComponentsInChildren(includeInactive: true, result: _tempGraphicList);
 
         HashSet<LeapGraphic> graphicsInGroup = Pool<HashSet<LeapGraphic>>.Spawn();
-        foreach (var group in _renderer._groups) {
+        try {
+          foreach (var group in _renderer._groups) {
 
-          for (int i = group.graphics.Count; i-- != 0;) {
-            if (group.graphics[i] == null) {
-              group.graphics.RemoveAt(i);
-            } else {
-              graphicsInGroup.Add(group.graphics[i]);
-            }
-          }
-
-          foreach (var graphic in _tempGraphicList) {
-            if (graphic.isAttachedToGroup) {
-              //If the graphic claims it is attached to this group, but it really isn't, remove
-              //it and re-add it.
-              bool graphicThinksItsInGroup = graphic.attachedGroup == group;
-              bool isActuallyInGroup = graphicsInGroup.Contains(graphic);
-
-              //Also re add it if it is attached to a completely different renderer!
-              if (graphicThinksItsInGroup != isActuallyInGroup ||
-                  graphic.attachedGroup.renderer != _renderer) {
-                if (!group.TryRemoveGraphic(graphic)) {
-                  //If we fail, detach using force!!
-                  graphic.OnDetachedFromGroup();
-                }
-                
-                group.TryAddGraphic(graphic);
+            for (int i = group.graphics.Count; i-- != 0;) {
+              if (group.graphics[i] == null) {
+                group.graphics.RemoveAt(i);
+              } else {
+                graphicsInGroup.Add(group.graphics[i]);
               }
             }
-          }
 
+            foreach (var graphic in _tempGraphicList) {
+              if (graphic.isAttachedToGroup) {
+                //If the graphic claims it is attached to this group, but it really isn't, remove
+                //it and re-add it.
+                bool graphicThinksItsInGroup = graphic.attachedGroup == group;
+                bool isActuallyInGroup = graphicsInGroup.Contains(graphic);
+
+                //Also re add it if it is attached to a completely different renderer!
+                if (graphicThinksItsInGroup != isActuallyInGroup ||
+                    graphic.attachedGroup.renderer != _renderer) {
+                  if (!group.TryRemoveGraphic(graphic)) {
+                    //If we fail, detach using force!!
+                    graphic.OnDetachedFromGroup();
+                  }
+
+                  group.TryAddGraphic(graphic);
+                }
+              }
+            }
+
+            graphicsInGroup.Clear();
+          }
+        } finally {
           graphicsInGroup.Clear();
+          Pool<HashSet<LeapGraphic>>.Recycle(graphicsInGroup);
         }
-        Pool<HashSet<LeapGraphic>>.Recycle(graphicsInGroup);
 
         foreach (var graphic in _tempGraphicList) {
           if (graphic.isAttachedToGroup) {

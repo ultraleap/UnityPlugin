@@ -64,10 +64,6 @@ namespace Leap.Unity.GraphicalRenderer {
     public Action<Texture2D, AtlasUvs> OnPostProcessAtlas;
 
     #region INSPECTOR FIELDS
-    /// <summary>
-    /// asdasdasdasdasd
-    /// </summary>
-
     //BEGIN MESH SETTINGS
     [Tooltip("Should this renderer include uv0 coordinates in the generated meshes.")]
     [EditTimeOnly, SerializeField, HideInInspector]

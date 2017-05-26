@@ -56,7 +56,7 @@ namespace Leap.Unity.GraphicalRenderer {
     /// An internal flag that returns true if the visual representation of
     /// this graphic needs to be updated.  You can set this to true to request
     /// a regeneration of the graphic during the next update cycle of the
-    /// renderer.  Note however, than not all renderers support updating the
+    /// renderer.  Note however, that not all renderers support updating the
     /// representation at runtime.
     /// </summary>
     public bool isRepresentationDirty {
@@ -218,7 +218,7 @@ namespace Leap.Unity.GraphicalRenderer {
 
     /// <summary>
     /// Called by the system to notify that a previous notification that this 
-    /// graphic would be attached has been canceled due to a call to TryRemoveGraphic.
+    /// graphic would be attached has been cancelled due to a call to TryRemoveGraphic.
     /// </summary>
     public virtual void CancelWillBeAttached() {
       Assert.IsTrue(_willBeAttached);
@@ -240,7 +240,7 @@ namespace Leap.Unity.GraphicalRenderer {
 
     /// <summary>
     /// Called by the system to notify that a previous notification that this 
-    /// graphic would be detached has been canceled due to a call to TryAddGraphic.
+    /// graphic would be detached has been cancelled due to a call to TryAddGraphic.
     /// </summary>
     public virtual void CancelWillBeDetached() {
       Assert.IsTrue(_willBeDetached);

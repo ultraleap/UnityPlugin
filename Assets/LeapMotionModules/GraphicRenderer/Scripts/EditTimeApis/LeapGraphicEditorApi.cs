@@ -62,7 +62,7 @@ namespace Leap.Unity.GraphicalRenderer {
       }
 
       /// <summary>
-      /// Called whenever this graphic needs to rebuild it's editor picking mesh.
+      /// Called whenever this graphic needs to rebuild its editor picking mesh.
       /// This mesh is a fully warped representation of the graphic, which allows
       /// it to be accurately picked when the user clicks in the scene view.
       /// </summary>
