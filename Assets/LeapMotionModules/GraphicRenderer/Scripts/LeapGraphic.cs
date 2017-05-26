@@ -310,6 +310,12 @@ namespace Leap.Unity.GraphicalRenderer {
       patchReferences();
     }
 
+    protected virtual void Awake() {
+      if (isAttachedToGroup && !attachedGroup.graphics.Contains(this)) {
+        OnDetachedFromGroup();
+      }
+    }
+
     protected virtual void OnEnable() {
 #if UNITY_EDITOR
       if (InternalUtility.IsPrefab(this)) {
