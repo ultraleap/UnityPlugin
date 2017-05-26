@@ -11,7 +11,7 @@ using System;
 
 namespace Leap.Unity.GraphicalRenderer {
 
-  [LeapGraphicTag("Custom Channel/Vector")]
+  [LeapGraphicTag("Custom Channel/Vector", 120)]
   [Serializable]
   public class CustomVectorChannelFeature : CustomChannelFeatureBase<CustomVectorChannelData> { }
 }

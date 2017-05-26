@@ -11,7 +11,7 @@ using System;
 
 namespace Leap.Unity.GraphicalRenderer {
 
-  [LeapGraphicTag("Custom Channel/Color")]
+  [LeapGraphicTag("Custom Channel/Color", 130)]
   [Serializable]
   public class CustomColorChannelFeature : CustomChannelFeatureBase<CustomColorChannelData> { }
 }

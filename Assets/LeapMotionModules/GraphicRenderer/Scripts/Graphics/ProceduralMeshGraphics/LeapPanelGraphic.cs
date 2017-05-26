@@ -15,6 +15,13 @@ using Leap.Unity.Attributes;
 
 namespace Leap.Unity.GraphicalRenderer {
 
+  /// <summary>
+  /// The Panel Graphic is a type of procedural mesh graphic that can generate flat
+  /// panels with a number of useful features:
+  ///  - It allows nine slicing when using a sprite as the source for the texture data.
+  ///  - It allows automatic tessellation such that it can be correctly warped by a space.
+  ///  - It allows automatic resizing based on an attached RectTransform.
+  /// </summary>
   [DisallowMultipleComponent]
   public class LeapPanelGraphic : LeapMeshGraphicBase {
 
@@ -24,6 +31,8 @@ namespace Leap.Unity.GraphicalRenderer {
     [SerializeField]
     private int _sourceDataIndex = -1;
 
+    [Tooltip("Specifies whether or not this panel has a specific resolution, or whether this " +
+             "panel automatically changes its resolution based on its size")]
     [EditTimeOnly]
     [SerializeField]
     private ResolutionType _resolutionType = ResolutionType.Vertices;
@@ -46,11 +55,19 @@ namespace Leap.Unity.GraphicalRenderer {
     [SerializeField]
     private bool _nineSliced = false;
 
+    /// <summary>
+    /// Returns whether or not a feature data object is a valid object 
+    /// that can be used to drive texture data for this panel.  Only
+    /// a TextureData object or a SpriteData object are currently valid.
+    /// </summary>
     public static bool IsValidDataSource(LeapFeatureData dataSource) {
       return dataSource is LeapTextureData ||
              dataSource is LeapSpriteData;
     }
 
+    /// <summary>
+    /// Returns the current feature data object being used as source.
+    /// </summary>
     public LeapFeatureData sourceData {
       get {
         if (_sourceDataIndex == -1) {
@@ -66,12 +83,20 @@ namespace Leap.Unity.GraphicalRenderer {
 #endif
     }
 
+    /// <summary>
+    /// Returns the current resolution type being used for this panel.
+    /// </summary>
     public ResolutionType resolutionType {
       get {
         return _resolutionType;
       }
     }
 
+    /// <summary>
+    /// Returns the current local-space rect of this panel.  If there is a 
+    /// RectTransform attached to this panel, this value is the same as calling
+    /// rectTransform.rect.
+    /// </summary>
     public Rect rect {
       get {
         RectTransform rectTransform = GetComponent<RectTransform>();
@@ -84,6 +109,9 @@ namespace Leap.Unity.GraphicalRenderer {
       }
     }
 
+    /// <summary>
+    /// Gets or sets whether or not this panel is currently using nine slicing.
+    /// </summary>
     public bool nineSliced {
       get {
         return _nineSliced && canNineSlice;
@@ -94,6 +122,9 @@ namespace Leap.Unity.GraphicalRenderer {
       }
     }
 
+    /// <summary>
+    /// Returns whether or not the current source supports nine slicing.
+    /// </summary>
     public bool canNineSlice {
       get {
         var spriteData = sourceData as LeapSpriteData;
@@ -101,6 +132,10 @@ namespace Leap.Unity.GraphicalRenderer {
       }
     }
 
+    /// <summary>
+    /// Returns which uv channel is being used for this panel.  It will
+    /// always match the uv channel being used by the source.
+    /// </summary>
     public UVChannelFlags uvChannel {
       get {
         if (sourceData == null) {

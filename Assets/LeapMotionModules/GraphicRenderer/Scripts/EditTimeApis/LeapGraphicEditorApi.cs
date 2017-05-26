@@ -39,7 +39,7 @@ namespace Leap.Unity.GraphicalRenderer {
           }
 
           if (_graphic.isAttachedToGroup) {
-            _graphic._attachedRenderer.editor.ScheduleEditorUpdate();
+            _graphic._attachedRenderer.editor.ScheduleRebuild();
             _graphic._preferredRendererType = _graphic.attachedGroup.renderingMethod.GetType();
           }
         } else {
@@ -61,8 +61,17 @@ namespace Leap.Unity.GraphicalRenderer {
         }
       }
 
+      /// <summary>
+      /// Called whenever this graphic needs to rebuild its editor picking mesh.
+      /// This mesh is a fully warped representation of the graphic, which allows
+      /// it to be accurately picked when the user clicks in the scene view.
+      /// </summary>
       public virtual void RebuildEditorPickingMesh() { }
 
+      /// <summary>
+      /// Called whenever this graphic is attached to a specific group.  This method
+      /// is only called at edit time!
+      /// </summary>
       public virtual void OnAttachedToGroup(LeapGraphicGroup group, LeapSpaceAnchor anchor) {
         if (!Application.isPlaying) {
           _graphic._preferredRendererType = group.renderingMethod.GetType();

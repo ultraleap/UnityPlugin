@@ -52,6 +52,8 @@ namespace Leap.Unity.GraphicalRenderer {
         finishMesh();
         _generation.mesh = null;
       }
+
+      prepareMaterial();
     }
 
     public override SupportInfo GetSpaceSupportInfo(LeapSpace space) {
@@ -69,13 +71,14 @@ namespace Leap.Unity.GraphicalRenderer {
 
       for (int i = 0; i < group.graphics.Count; i++) {
         var graphic = group.graphics[i];
-        if (graphic.isRepresentationDirty) {
+        if (graphic.isRepresentationDirty || _meshes[i] == null) {
           beginMesh(_meshes[i]);
           _generation.graphic = graphic as LeapMeshGraphic;
           _generation.graphicIndex = i;
           _generation.graphicId = i;
           base.buildGraphic();
           finishMesh();
+          _meshes[i] = _generation.mesh;
           _generation.mesh = null;
 
           graphic.isRepresentationDirty = false;
@@ -91,7 +94,6 @@ namespace Leap.Unity.GraphicalRenderer {
         }
       } else if (renderer.space is LeapRadialSpace) {
         var curvedSpace = renderer.space as LeapRadialSpace;
-
         using (new ProfilerSample("Build Material Data")) {
           _curved_worldToAnchor.Clear();
           _curved_meshTransforms.Clear();
@@ -136,12 +138,12 @@ namespace Leap.Unity.GraphicalRenderer {
     }
 #endif
 
-    protected override void setupForBuilding() {
+    protected override void prepareMaterial() {
       if (_shader == null) {
         _shader = Shader.Find(DEFAULT_SHADER);
       }
 
-      base.setupForBuilding();
+      base.prepareMaterial();
 
       if (renderer.space != null) {
         if (renderer.space is LeapCylindricalSpace) {

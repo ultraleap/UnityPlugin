@@ -17,14 +17,15 @@ using Leap.Unity.Attributes;
 
 namespace Leap.Unity.GraphicalRenderer {
 
-  [LeapGraphicTag("Texture")]
+  [LeapGraphicTag("Texture", 10)]
   [Serializable]
   public class LeapTextureFeature : LeapGraphicFeature<LeapTextureData> {
 
-    //[EditTimeOnly]
+    [Delayed]
+    [EditTimeOnly]
     public string propertyName = "_MainTex";
-
-    //[EditTimeOnly]
+    
+    [EditTimeOnly]
     public UVChannelFlags channel = UVChannelFlags.UV0;
   }
 }

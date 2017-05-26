@@ -12,6 +12,11 @@ using Leap.Unity.Query;
 
 namespace Leap.Unity.GraphicalRenderer {
 
+  /// <summary>
+  /// The Sprite Graphic is a type of procedural mesh graphic that allows you to directly
+  /// use sprite objects as meshes.  This component grabs mesh data directly from the sprite
+  /// itself, and so supports non-rectangular meshes.
+  /// </summary>
   [DisallowMultipleComponent]
   public class LeapSpriteGraphic : LeapMeshGraphicBase {
 

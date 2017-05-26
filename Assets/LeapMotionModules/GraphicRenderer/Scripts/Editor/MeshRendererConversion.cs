@@ -98,7 +98,7 @@ namespace Leap.Unity.GraphicalRenderer {
         Undo.DestroyObjectImmediate(meshFilter);
       }
 
-      group.renderer.editor.ScheduleEditorUpdate();
+      group.renderer.editor.ScheduleRebuild();
     }
 
     [MenuItem(CONTEXT_PATH, validate = true)]

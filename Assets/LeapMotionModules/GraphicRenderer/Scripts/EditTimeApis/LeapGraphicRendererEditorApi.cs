@@ -72,6 +72,11 @@ namespace Leap.Unity.GraphicalRenderer {
         }
       }
 
+      /// <summary>
+      /// Creates a new group for this graphic renderer, and assigns it the
+      /// given rendering method.  This is an editor only api, as creating new
+      /// groups cannot be done at runtime.
+      /// </summary>
       public void CreateGroup(Type rendererType) {
         AssertHelper.AssertEditorOnly();
         Assert.IsNotNull(rendererType);
@@ -82,6 +87,10 @@ namespace Leap.Unity.GraphicalRenderer {
         _renderer._groups.Add(group);
       }
 
+      /// <summary>
+      /// Destroys the currently selected group.  This is an editor-only api,
+      /// as destroying groups cannot be done at runtime.
+      /// </summary>
       public void DestroySelectedGroup() {
         AssertHelper.AssertEditorOnly();
 
@@ -95,17 +104,35 @@ namespace Leap.Unity.GraphicalRenderer {
         }
       }
 
+      /// <summary>
+      /// Returns the rendering method of the currently selected group.  This
+      /// is an editor-only api, as the notion of selection does not exist at
+      /// runtime.
+      /// </summary>
       public LeapRenderingMethod GetSelectedRenderingMethod() {
         return _renderer._groups[_renderer._selectedGroup].renderingMethod;
       }
 
-      public void ScheduleEditorUpdate() {
+      /// <summary>
+      /// Schedules a full editor rebuild of all graphic groups and their representations.
+      /// This method only schedules the rebuild, it does not actually execute it.  The
+      /// rebuild will happen on during the next editor tick.
+      /// 
+      /// This is an editor-only api.  During runtime rebuilding is handled automatically,
+      /// and full rebuilds do not occur.
+      /// </summary>
+      public void ScheduleRebuild() {
         AssertHelper.AssertEditorOnly();
 
         //Dirty the hash by changing it to something else
         _previousHierarchyHash++;
       }
 
+      /// <summary>
+      /// Force a rebuild of all editor picking meshes for all graphics attached to all
+      /// groups.  Editor picking meshes are what allow graphics to be accurately picked
+      /// in the scene view even if they are in a curved space.
+      /// </summary>
       public void RebuildEditorPickingMeshes() {
         //No picking meshes for prefabs
         if (InternalUtility.IsPrefab(_renderer)) {
@@ -133,15 +160,27 @@ namespace Leap.Unity.GraphicalRenderer {
         }
       }
 
-      public void ChangeRenderingMethod(Type renderingMethod, bool addFeatures) {
+      /// <summary>
+      /// Changes the rendering method of the selected group.  This method is just
+      /// a helpful wrapper around the ChangeRenderingMethod of the LeapGraphicGroup class.
+      /// </summary>
+      public void ChangeRenderingMethodOfSelectedGroup(Type renderingMethod, bool addFeatures) {
         _renderer._groups[_renderer._selectedGroup].editor.ChangeRenderingMethod(renderingMethod, addFeatures);
       }
 
-      public void AddFeature(Type featureType) {
+      /// <summary>
+      /// Adds a feature to the currently selected group.  This method is just 
+      /// a helpful wrapper around the AddFeature method of the LeapGraphicGroup class.
+      /// </summary>
+      public void AddFeatureToSelectedGroup(Type featureType) {
         _renderer._groups[_renderer._selectedGroup].editor.AddFeature(featureType);
       }
 
-      public void RemoveFeature(int featureIndex) {
+      /// <summary>
+      /// Removes a feature from the currently selected group.  This method is just
+      /// a helpful wrapper around the RemoveFeature method of the LeapGraphicGroup class.
+      /// </summary>
+      public void RemoveFeatureFromSelectedGroup(int featureIndex) {
         _renderer._groups[_renderer._selectedGroup].editor.RemoveFeature(featureIndex);
       }
 
@@ -223,8 +262,6 @@ namespace Leap.Unity.GraphicalRenderer {
               group.editor.UpdateRendererEditor();
             }
           }
-
-          _renderer._hasFinishedSetup = true;
         }
 
         using (new ProfilerSample("Update Renderer")) {
@@ -265,36 +302,44 @@ namespace Leap.Unity.GraphicalRenderer {
 
         _renderer.GetComponentsInChildren(includeInactive: true, result: _tempGraphicList);
 
-        HashSet<LeapGraphic> set = Pool<HashSet<LeapGraphic>>.Spawn();
-        foreach (var group in _renderer._groups) {
+        HashSet<LeapGraphic> graphicsInGroup = Pool<HashSet<LeapGraphic>>.Spawn();
+        try {
+          foreach (var group in _renderer._groups) {
 
-          for (int i = group.graphics.Count; i-- != 0;) {
-            if (group.graphics[i] == null) {
-              group.graphics.RemoveAt(i);
-            } else {
-              set.Add(group.graphics[i]);
-            }
-          }
-
-          foreach (var graphic in _tempGraphicList) {
-            if (graphic.isAttachedToGroup) {
-              //If the graphic claims it is attached to this group, but it really isn't, remove
-              //it and re-add it.
-              bool graphicThinksItsInGroup = graphic.attachedGroup == group;
-              bool isActuallyInGroup = set.Contains(graphic);
-
-              //Also re add it if it is attached to a completely different renderer!
-              if (graphicThinksItsInGroup != isActuallyInGroup ||
-                  graphic.attachedGroup.renderer != _renderer) {
-                group.TryRemoveGraphic(graphic);
-                group.TryAddGraphic(graphic);
+            for (int i = group.graphics.Count; i-- != 0;) {
+              if (group.graphics[i] == null) {
+                group.graphics.RemoveAt(i);
+              } else {
+                graphicsInGroup.Add(group.graphics[i]);
               }
             }
-          }
 
-          set.Clear();
+            foreach (var graphic in _tempGraphicList) {
+              if (graphic.isAttachedToGroup) {
+                //If the graphic claims it is attached to this group, but it really isn't, remove
+                //it and re-add it.
+                bool graphicThinksItsInGroup = graphic.attachedGroup == group;
+                bool isActuallyInGroup = graphicsInGroup.Contains(graphic);
+
+                //Also re add it if it is attached to a completely different renderer!
+                if (graphicThinksItsInGroup != isActuallyInGroup ||
+                    graphic.attachedGroup.renderer != _renderer) {
+                  if (!group.TryRemoveGraphic(graphic)) {
+                    //If we fail, detach using force!!
+                    graphic.OnDetachedFromGroup();
+                  }
+
+                  group.TryAddGraphic(graphic);
+                }
+              }
+            }
+
+            graphicsInGroup.Clear();
+          }
+        } finally {
+          graphicsInGroup.Clear();
+          Pool<HashSet<LeapGraphic>>.Recycle(graphicsInGroup);
         }
-        Pool<HashSet<LeapGraphic>>.Recycle(set);
 
         foreach (var graphic in _tempGraphicList) {
           if (graphic.isAttachedToGroup) {
@@ -310,8 +355,7 @@ namespace Leap.Unity.GraphicalRenderer {
               }
             }
 
-            //Debug.Log(graphic.gameObject.activeInHierarchy + " : " + graphic.gameObject.activeSelf);
-            if (!graphic.enabled || !graphic.gameObject.activeInHierarchy) {
+            if (!graphic.enabled || !graphic.transform.IsActiveRelativeToParent(_renderer.transform)) {
               graphic.attachedGroup.TryRemoveGraphic(graphic);
             }
           }

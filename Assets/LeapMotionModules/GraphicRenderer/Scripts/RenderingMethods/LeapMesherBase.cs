@@ -65,28 +65,36 @@ namespace Leap.Unity.GraphicalRenderer {
 
     #region INSPECTOR FIELDS
     //BEGIN MESH SETTINGS
+    [Tooltip("Should this renderer include uv0 coordinates in the generated meshes.")]
     [EditTimeOnly, SerializeField, HideInInspector]
     private bool _useUv0 = true;
 
+    [Tooltip("Should this renderer include uv1 coordinates in the generated meshes.")]
     [EditTimeOnly, SerializeField, HideInInspector]
     private bool _useUv1 = false;
 
+    [Tooltip("Should this renderer include uv2 coordinates in the generated meshes.")]
     [EditTimeOnly, SerializeField, HideInInspector]
     private bool _useUv2 = false;
 
+    [Tooltip("Should this renderer include uv3 coordinates in the generated meshes.")]
     [EditTimeOnly, SerializeField, HideInInspector]
     private bool _useUv3 = false;
 
+    [Tooltip("Should this renderer include vertex colors in the generated meshes.")]
     [EditTimeOnly, SerializeField, HideInInspector]
     private bool _useColors = false;
 
+    [Tooltip("Multiply all vertex colors for all graphics by this color.")]
     [EditTimeOnly, SerializeField, HideInInspector]
     private Color _bakedTint = Color.white;
 
+    [Tooltip("Should this renderer include normals in the generated meshes.")]
     [EditTimeOnly, SerializeField, HideInInspector]
     private bool _useNormals = false;
 
     //BEGIN RENDERING SETTINGS
+    [Tooltip("Shader to use to display the graphics.")]
     [EditTimeOnly, SerializeField]
     protected Shader _shader;
 
@@ -94,6 +102,8 @@ namespace Leap.Unity.GraphicalRenderer {
     [SerializeField]
     private SingleLayer _visualLayer = 0;
 
+    [Tooltip("The atlas combines multiple textures into a single texture automatically, allowing each graphic to have a different " +
+             "texture but still allow the graphics as a whole to render efficiently.")]
     [SerializeField]
     private AtlasBuilder _atlas = new AtlasBuilder();
     #endregion
@@ -117,15 +127,15 @@ namespace Leap.Unity.GraphicalRenderer {
     protected List<CustomMatrixChannelFeature> _matrixChannelFeatures = new List<CustomMatrixChannelFeature>();
 
     //### Generated Data ###
-    [SerializeField, HideInInspector]
+    [SerializeField]
     protected Material _material;
-    [SerializeField, HideInInspector]
+    [SerializeField]
     protected RendererMeshData _meshes;
-    [SerializeField, HideInInspector]
+    [SerializeField]
     protected RendererTextureData _packedTextures;
 
     //#### Sprite/Texture Remapping ####
-    [SerializeField, HideInInspector]
+    [SerializeField]
     private AtlasUvs _atlasUvs;
     [NonSerialized]
     protected MaterialPropertyBlock _spriteTextureBlock;
@@ -144,6 +154,12 @@ namespace Leap.Unity.GraphicalRenderer {
     protected List<Vector4> _customVectorChannelData = new List<Vector4>();
     protected List<Color> _customColorChannelData = new List<Color>();
     protected List<Matrix4x4> _customMatrixChannelData = new List<Matrix4x4>();
+
+    public Material material {
+      get {
+        return _material;
+      }
+    }
 
 #if UNITY_EDITOR
     public virtual bool IsAtlasDirty {
@@ -200,7 +216,7 @@ namespace Leap.Unity.GraphicalRenderer {
     }
 
     public virtual void GetSupportInfo(List<LeapSpriteFeature> features, List<SupportInfo> info) {
-      SupportUtil.OnlySupportFirstFeature(features, info);
+      SupportUtil.OnlySupportFirstFeature<LeapSpriteFeature>(info);
 
 #if UNITY_EDITOR
       if (!Application.isPlaying) {
@@ -229,11 +245,11 @@ namespace Leap.Unity.GraphicalRenderer {
     }
 
     public virtual void GetSupportInfo(List<LeapRuntimeTintFeature> features, List<SupportInfo> info) {
-      SupportUtil.OnlySupportFirstFeature(features, info);
+      SupportUtil.OnlySupportFirstFeature<LeapRuntimeTintFeature>(info);
     }
 
     public virtual void GetSupportInfo(List<LeapBlendShapeFeature> features, List<SupportInfo> info) {
-      SupportUtil.OnlySupportFirstFeature(features, info);
+      SupportUtil.OnlySupportFirstFeature<LeapBlendShapeFeature>(info);
     }
 
     //Full unconditional support for all custom channels
@@ -244,6 +260,7 @@ namespace Leap.Unity.GraphicalRenderer {
 
     public override void OnEnableRenderer() {
       loadAllSupportedFeatures();
+      prepareMaterial();
 
       //Sprite textures cannot be accessed at edit time, so we need to make sure
       //to upload them to the material right as the renderer is enabled
@@ -347,31 +364,8 @@ namespace Leap.Unity.GraphicalRenderer {
         prepareMeshes();
         prepareMaterial();
 
-        if (_doesRequireColors) {
-          _material.EnableKeyword(COLORS_FEATURE);
-        }
-
-        if (_doesRequireNormals) {
-          _material.EnableKeyword(NORMALS_FEATURE);
-        }
-
-        foreach (var channel in _requiredUvChannels) {
-          _material.EnableKeyword(GetUvFeature(channel));
-        }
-
-        if (_customColorChannelData.Count > 0 ||
-           _customFloatChannelData.Count > 0 ||
-           _customVectorChannelData.Count > 0 ||
-           _customMatrixChannelData.Count > 0) {
-          _material.EnableKeyword(CUSTOM_CHANNEL_KEYWORD);
-        }
-
         if (_textureFeatures.Count != 0) {
           _atlas.UpdateTextureList(_textureFeatures);
-
-          foreach (var feature in _textureFeatures) {
-            _material.SetTexture(feature.propertyName, _packedTextures.GetTexture(feature.propertyName));
-          }
         }
 
         if (_spriteFeatures.Count != 0) {
@@ -380,14 +374,6 @@ namespace Leap.Unity.GraphicalRenderer {
 #endif
           extractSpriteRects();
           uploadSpriteTextures();
-        }
-
-        if (_tintFeatures.Count != 0) {
-          _material.EnableKeyword(LeapRuntimeTintFeature.FEATURE_NAME);
-        }
-
-        if (_blendShapeFeatures.Count != 0) {
-          _material.EnableKeyword(LeapBlendShapeFeature.FEATURE_NAME);
         }
       }
     }
@@ -444,6 +430,39 @@ namespace Leap.Unity.GraphicalRenderer {
         _spriteTextureBlock = new MaterialPropertyBlock();
       }
       _spriteTextureBlock.Clear();
+
+      if (_doesRequireColors) {
+        _material.EnableKeyword(COLORS_FEATURE);
+      }
+
+      if (_doesRequireNormals) {
+        _material.EnableKeyword(NORMALS_FEATURE);
+      }
+
+      foreach (var channel in _requiredUvChannels) {
+        _material.EnableKeyword(GetUvFeature(channel));
+      }
+
+      if (_customColorChannelData.Count > 0 ||
+         _customFloatChannelData.Count > 0 ||
+         _customVectorChannelData.Count > 0 ||
+         _customMatrixChannelData.Count > 0) {
+        _material.EnableKeyword(CUSTOM_CHANNEL_KEYWORD);
+      }
+
+      if (_textureFeatures.Count != 0) {
+        foreach (var feature in _textureFeatures) {
+          _material.SetTexture(feature.propertyName, _packedTextures.GetTexture(feature.propertyName));
+        }
+      }
+
+      if (_tintFeatures.Count != 0) {
+        _material.EnableKeyword(LeapRuntimeTintFeature.FEATURE_NAME);
+      }
+
+      if (_blendShapeFeatures.Count != 0) {
+        _material.EnableKeyword(LeapBlendShapeFeature.FEATURE_NAME);
+      }
     }
 
     protected virtual void extractSpriteRects() {

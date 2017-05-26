@@ -64,7 +64,7 @@ namespace Leap.Unity.GraphicalRenderer {
     }
 
     public void GetSupportInfo(List<LeapRuntimeTintFeature> features, List<SupportInfo> info) {
-      SupportUtil.OnlySupportFirstFeature(features, info);
+      SupportUtil.OnlySupportFirstFeature<LeapRuntimeTintFeature>(info);
     }
 
     public override void OnEnableRenderer() {

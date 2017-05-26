@@ -80,15 +80,14 @@ public abstract class LeapGraphicEditorBase<T> : CustomEditorBase<T> where T : L
       if (!targets.Query().All(g => g.attachedGroup == mainGroup)) {
         buttonText = "-";
       } else {
-        buttonText = LeapGraphicTagAttribute.GetTag(mainGroup.renderingMethod.GetType());
+        buttonText = mainGroup.name;
       }
 
       if (GUILayout.Button(buttonText, EditorStyles.miniButton, GUILayout.Width(60))) {
         GenericMenu groupMenu = new GenericMenu();
         int index = 0;
         foreach (var group in mainGroup.renderer.groups.Query().Where(g => g.renderingMethod.IsValidGraphic(targets[0]))) {
-          string tag = LeapGraphicTagAttribute.GetTag(group.renderingMethod.GetType());
-          groupMenu.AddItem(new GUIContent(index.ToString() + ": " + tag), false, () => {
+          groupMenu.AddItem(new GUIContent(index.ToString() + ": " + group.name), false, () => {
 
             bool areFeaturesUnequal = false;
             var typesA = group.features.Query().Select(f => f.GetType()).ToList();
@@ -123,7 +122,7 @@ public abstract class LeapGraphicEditorBase<T> : CustomEditorBase<T> where T : L
               serializedObject.Update();
             }
 
-            mainGroup.renderer.editor.ScheduleEditorUpdate();
+            mainGroup.renderer.editor.ScheduleRebuild();
           });
           index++;
         }
@@ -169,7 +168,7 @@ public abstract class LeapGraphicEditorBase<T> : CustomEditorBase<T> where T : L
           if (meshRendering.IsAtlasDirty && !EditorApplication.isPlaying) {
             if (GUILayout.Button("Refresh Atlas", GUILayout.MaxHeight(EditorGUIUtility.singleLineHeight))) {
               meshRendering.RebuildAtlas(new ProgressBar());
-              sharedGroup.renderer.editor.ScheduleEditorUpdate();
+              sharedGroup.renderer.editor.ScheduleRebuild();
             }
           }
         }
@@ -178,7 +177,7 @@ public abstract class LeapGraphicEditorBase<T> : CustomEditorBase<T> where T : L
       for (int i = 0; i < _featureTable.arraySize; i++) {
         var idIndex = _featureTable.GetArrayElementAtIndex(i);
         var dataProp = MultiTypedListUtil.GetReferenceProperty(_featureList, idIndex);
-        EditorGUILayout.LabelField(LeapGraphicTagAttribute.GetTag(dataProp.type));
+        EditorGUILayout.LabelField(LeapGraphicTagAttribute.GetTagName(dataProp.type));
 
         if (mainGraphic.attachedGroup != null) {
           currentFeature = mainGraphic.attachedGroup.features[i];
