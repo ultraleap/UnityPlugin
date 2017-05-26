@@ -17,12 +17,14 @@ using System.Text.RegularExpressions;
 namespace Leap.Unity.GraphicalRenderer {
 
   public class LeapGraphicPreferences : MonoBehaviour {
-    public const int GRAPHIC_COUNT_CEILING = 800;
+    public const int GRAPHIC_COUNT_SOFT_CEILING = 144;
     public const string LEAP_GRAPHIC_CGINC_PATH = "LeapMotionModules/GraphicRenderer/Resources/GraphicRenderer.cginc";
     public const string LEAP_GRAPHIC_SHADER_FOLDER = "Assets/LeapMotionModules/GraphicRenderer/Shaders/";
     private static Regex _graphicMaxRegex = new Regex(@"^#define\s+GRAPHIC_MAX\s+(\d+)\s*$");
 
     public const string PROMPT_WHEN_GROUP_CHANGE_KEY = "LeapGraphicRenderer_ShouldPromptWhenGroupChange";
+
+    public const string PROMP_WHEN_ADD_CUSTOM_CHANNEL_LEY = "LeapGraphicRenderer_ShouldPrompWhenAddCustomChannel";
 
     private static int _cachedGraphicMax = -1; //-1 signals dirty
     public static int graphicMax {
@@ -53,14 +55,29 @@ namespace Leap.Unity.GraphicalRenderer {
       }
     }
 
+    public static bool promptWhenAddCustomChannel {
+      get {
+        return EditorPrefs.GetBool(PROMP_WHEN_ADD_CUSTOM_CHANNEL_LEY, true);
+      }
+      set {
+        EditorPrefs.SetBool(PROMP_WHEN_ADD_CUSTOM_CHANNEL_LEY, value);
+      }
+    }
+
     [PreferenceItem("Leap Graphics")]
     private static void preferencesGUI() {
       drawGraphicMaxField();
 
-      GUIContent prompContent = new GUIContent("Prompt When Group Changed", "Should the system prompt the user when they change the group of a graphic to a group with different features.");
-      bool newPromptValue = EditorGUILayout.Toggle(prompContent, promptWhenGroupChange);
+      GUIContent groupChangedContent = new GUIContent("Prompt When Group Changed", "Should the system prompt the user when they change the group of a graphic to a group with different features.");
+      bool newPromptValue = EditorGUILayout.Toggle(groupChangedContent, promptWhenGroupChange);
       if (promptWhenGroupChange != newPromptValue) {
         promptWhenGroupChange = newPromptValue;
+      }
+
+      GUIContent addChannelContent = new GUIContent("Prompt For Custom Channel", "Should the system warn the user about writing custom shaders when they try to add a Custom Channel feature?");
+      bool newPromptWhenAddCustomChannelValue = EditorGUILayout.Toggle(addChannelContent, promptWhenAddCustomChannel);
+      if (newPromptWhenAddCustomChannelValue != promptWhenAddCustomChannel) {
+        promptWhenAddCustomChannel = newPromptWhenAddCustomChannelValue;
       }
 
       EditorGUILayout.Space();
@@ -106,8 +123,17 @@ namespace Leap.Unity.GraphicalRenderer {
         return;
       }
 
-      int newGraphicMax = EditorGUILayout.DelayedIntField("Maximum Graphics", graphicMax);
-      newGraphicMax = Mathf.Clamp(newGraphicMax, 1, GRAPHIC_COUNT_CEILING);
+      int newGraphicMax = EditorGUILayout.DelayedIntField("Max Graphics Per-Group", graphicMax);
+      newGraphicMax = Mathf.Min(newGraphicMax, 1023); //maximum array length for Unity shaders is 1023
+
+      if (newGraphicMax > GRAPHIC_COUNT_SOFT_CEILING) {
+        if (!EditorUtility.DisplayDialog("Large Graphic Count",
+                                        "Setting the graphic count larger than 144 can cause incorrect rendering " +
+                                        "or shader compilation failure on certain systems, are you sure you want " +
+                                        "to continue?", "Yes", "Cancel")) {
+          return;
+        }
+      }
 
       if (newGraphicMax == graphicMax) {
         return; //Work here is done!  Nothing to change!

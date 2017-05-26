@@ -28,13 +28,11 @@ public class ExampleArrayController : MonoBehaviour {
   private void Start() {
     _graphics.AddRange(GetComponentsInChildren<LeapGraphic>());
     _graphics.Query().Select(g => g.transform.localPosition).FillList(_originalPositions);
-    _graphics.Query().Select(g => g.GetFirstFeatureData<LeapBlendShapeData>()).FillList(_blendShapeData);
-    _graphics.Query().Select(g => g.GetFirstFeatureData<LeapRuntimeTintData>()).FillList(_tintData);
+    _graphics.Query().Select(g => g.GetFeatureData<LeapBlendShapeData>()).FillList(_blendShapeData);
+    _graphics.Query().Select(g => g.GetFeatureData<LeapRuntimeTintData>()).FillList(_tintData);
   }
 
   private void Update() {
-    Random.InitState(0);
-
     float fade = Mathf.Clamp01(Time.time * 0.5f - 0.5f);
 
     for (int i = 0; i < _graphics.Count; i++) {

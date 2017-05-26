@@ -15,16 +15,18 @@ using UnityEngine.Assertions;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
-using Leap.Unity;
 using Leap.Unity.Space;
 using Leap.Unity.Query;
 
 namespace Leap.Unity.GraphicalRenderer {
 
   [Serializable]
-  public partial class LeapGraphicGroup : ISerializationCallbackReceiver {
+  public partial class LeapGraphicGroup : ISerializationCallbackReceiver, ILeapInternalGraphicGroup {
 
     #region INSPECTOR FIELDS
+    [SerializeField]
+    private string _groupName;
+
     [SerializeField]
     private RenderingMethodReference _renderingMethod = new RenderingMethodReference();
 
@@ -51,28 +53,58 @@ namespace Leap.Unity.GraphicalRenderer {
 
     #region PUBLIC RUNTIME API
 
+    public string name {
+      get {
+        return _groupName;
+      }
+    }
+
+    /// <summary>
+    /// Gets the renderer this group is attached to.
+    /// </summary>
     public LeapGraphicRenderer renderer {
       get {
         return _renderer;
       }
+    }
+
+    /// <summary>
+    /// Sets the renderer this group is attached to.
+    /// </summary>
+    LeapGraphicRenderer ILeapInternalGraphicGroup.renderer {
       set {
         _renderer = value;
       }
     }
 
+    /// <summary>
+    /// Gets the rendering method used for this group.  This can only be changed
+    /// at edit time using either the inspector interface, or the editor method
+    /// ChangeRenderingMethod.
+    /// </summary>
     public LeapRenderingMethod renderingMethod {
       get {
         return _renderingMethod.Value;
       }
     }
 
-    public FeatureList features {
+    /// <summary>
+    /// Returns the list of features attached to this group.  This can only be 
+    /// changed at edit time using either the inspector interface, or the editor
+    /// methods AddFeature and RemoveFeature.
+    /// </summary>
+    public IList<LeapGraphicFeatureBase> features {
       get {
         Assert.IsNotNull(_features, "The feature list of graphic group was null!");
         return _features;
       }
     }
 
+    /// <summary>
+    /// Returns the list of graphics attached to this group.  This getter returns
+    /// a regular mutable list for simplicity and efficiency, but the user is 
+    /// still not allowed to mutate this list in any way.
+    /// </summary>
     public List<LeapGraphic> graphics {
       get {
         Assert.IsNotNull(_graphics, "The graphic list of graphic group was null!");
@@ -81,7 +113,18 @@ namespace Leap.Unity.GraphicalRenderer {
     }
 
     /// <summary>
-    /// Maps 1-to-1 with the feature list, where each graphic represents the
+    /// Returns the total number of graphics that will be part of this group after
+    /// the next update cycle.  Since attachments are delayed, this number can be
+    /// larger than graphics.Count.
+    /// </summary>
+    public int toBeAttachedCount {
+      get {
+        return _graphics.Count + _toAttach.Count;
+      }
+    }
+
+    /// <summary>
+    /// Maps 1-to-1 with the feature list, where each element represents the
     /// support that feature currently has.
     /// </summary>
     public List<SupportInfo> supportInfo {
@@ -92,14 +135,35 @@ namespace Leap.Unity.GraphicalRenderer {
       }
     }
 
+    /// <summary>
+    /// Returns whether or not add/remove operations are supported at runtime by
+    /// this group.  If this returns false, TryAddGraphic and TryRemoveGraphic will
+    /// always fail at runtime.
+    /// </summary>
     public bool addRemoveSupported {
       get {
         return _addRemoveSupported;
       }
     }
 
+    /// <summary>
+    /// Tries to add the given graphic to this group.  This can safely be called
+    /// during runtime or edit time.  This method can fail under the following 
+    /// conditions:
+    ///    - The graphic is already attached to this group.
+    ///    - The graphic is already attached to a different group.
+    ///    - It is runtime and add/remove is not supported by this group.
+    ///    
+    /// At runtime the actual attachment is delayed until LateUpdate for efficiency
+    /// reasons.  Expect that even if this method returns true that the graphic will
+    /// not actually be attached until the end of LateUpdate.
+    /// </summary>
     public bool TryAddGraphic(LeapGraphic graphic) {
       Assert.IsNotNull(graphic);
+
+      if (graphic.willbeAttached || (graphic.isAttachedToGroup && !graphic.willbeDetached)) {
+        return false;
+      }
 
       if (!addRemoveSupportedOrEditTime()) {
         return false;
@@ -151,7 +215,7 @@ namespace Leap.Unity.GraphicalRenderer {
           _renderer.space.RecalculateTransformers();
         }
 
-        _renderer.editor.ScheduleEditorUpdate();
+        _renderer.editor.ScheduleRebuild();
       } else
 #endif
       {
@@ -166,6 +230,17 @@ namespace Leap.Unity.GraphicalRenderer {
       return true;
     }
 
+    /// <summary>
+    /// Tries to remove the given graphic from this group.  This can safely be called
+    /// during runtime or edit time.  This method can fail under the following 
+    /// conditions:
+    ///    - The graphic is not attached to this group.
+    ///    - It is runtime and add/remove is not supported by this group.
+    ///    
+    /// At runtime the actual detachment is delayed until LateUpdate for efficiency
+    /// reasons.  Expect that even if this method returns true that the graphic will
+    /// not actually be detached until the end of LateUpdate.
+    /// </summary>
     public bool TryRemoveGraphic(LeapGraphic graphic) {
       Assert.IsNotNull(graphic);
 
@@ -209,7 +284,7 @@ namespace Leap.Unity.GraphicalRenderer {
           _renderer.space.RecalculateTransformers();
         }
 
-        _renderer.editor.ScheduleEditorUpdate();
+        _renderer.editor.ScheduleRebuild();
       } else
 #endif
       {
@@ -224,6 +299,11 @@ namespace Leap.Unity.GraphicalRenderer {
       return true;
     }
 
+    /// <summary>
+    /// Fills the argument list with all of the currently supported features 
+    /// of type T.  Returns true if there are any supported features, and 
+    /// returns false if there are no supported features.
+    /// </summary>
     public bool GetSupportedFeatures<T>(List<T> features) where T : LeapGraphicFeatureBase {
       features.Clear();
       for (int i = 0; i < _features.Count; i++) {
@@ -300,7 +380,6 @@ namespace Leap.Unity.GraphicalRenderer {
 
           list.Add(feature);
         }
-
 
         var featureToInfo = new Dictionary<LeapGraphicFeatureBase, SupportInfo>();
 
@@ -458,6 +537,10 @@ namespace Leap.Unity.GraphicalRenderer {
             renderer.space.RecalculateTransformers();
           }
 
+          foreach (var feature in _features) {
+            feature.isDirty = true;
+          }
+
           (_renderingMethod.Value as ISupportsAddRemove).OnAddRemoveGraphics(dirtyIndexes);
         } finally {
           dirtyIndexes.Clear();
@@ -479,8 +562,15 @@ namespace Leap.Unity.GraphicalRenderer {
     public void OnBeforeSerialize() { }
 
     public void OnAfterDeserialize() {
-      _renderingMethod.Value.group = this;
-      _renderingMethod.Value.renderer = renderer;
+      if (_renderingMethod.Value == null || renderer == null) {
+        Debug.LogWarning("The rendering group did not find the needed data!  If you have a variable of type " +
+                         "LeapGraphicGroup make sure to annotate it with a [NonSerialized] attribute, or else " +
+                         "Unity will automatically create invalid instances of the class.");
+      } else {
+        ILeapInternalRenderingMethod renderingMethodInternal = _renderingMethod.Value;
+        renderingMethodInternal.group = this;
+        renderingMethodInternal.renderer = renderer;
+      }
     }
 
     [Serializable]

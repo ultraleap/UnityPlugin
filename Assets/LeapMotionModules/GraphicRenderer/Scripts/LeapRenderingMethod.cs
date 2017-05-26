@@ -19,15 +19,56 @@ using Leap.Unity.Space;
 
 namespace Leap.Unity.GraphicalRenderer {
 
+  public interface ILeapInternalRenderingMethod {
+    LeapGraphicRenderer renderer { set; }
+    LeapGraphicGroup group { set; }
+  }
+
   [Serializable]
-  public abstract class LeapRenderingMethod {
+  public abstract class LeapRenderingMethod : ILeapInternalRenderingMethod {
     public const string DATA_FOLDER_NAME = "_ElementData";
 
     [NonSerialized]
-    public LeapGraphicRenderer renderer;
+    private LeapGraphicRenderer _renderer;
 
     [NonSerialized]
-    public LeapGraphicGroup group;
+    private LeapGraphicGroup _group;
+
+    /// <summary>
+    /// Gets the renderer this rendering method is attached to.
+    /// </summary>
+    public LeapGraphicRenderer renderer {
+      get {
+        return _renderer;
+      }
+    }
+
+    /// <summary>
+    /// Gets the group this rendering method is attached to.
+    /// </summary>
+    public LeapGraphicGroup group {
+      get {
+        return _group;
+      }
+    }
+
+    /// <summary>
+    /// Sets the renderer this rendering method is attached to.
+    /// </summary>
+    LeapGraphicRenderer ILeapInternalRenderingMethod.renderer {
+      set {
+        _renderer = value;
+      }
+    }
+
+    /// <summary>
+    /// Sets the group this rendering methid is attached to.
+    /// </summary>
+    LeapGraphicGroup ILeapInternalRenderingMethod.group {
+      set {
+        _group = value;
+      }
+    }
 
     public abstract SupportInfo GetSpaceSupportInfo(LeapSpace space);
 

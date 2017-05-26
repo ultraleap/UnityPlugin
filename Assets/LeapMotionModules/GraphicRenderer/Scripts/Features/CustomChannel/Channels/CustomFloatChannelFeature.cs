@@ -10,8 +10,8 @@
 using System;
 
 namespace Leap.Unity.GraphicalRenderer {
-  
-  [LeapGraphicTag("Custom Channel/Float")]
+
+  [LeapGraphicTag("Custom Channel/Float", 110)]
   [Serializable]
   public class CustomFloatChannelFeature : CustomChannelFeatureBase<CustomFloatChannelData> { }
 }

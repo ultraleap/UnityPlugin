@@ -56,15 +56,15 @@ namespace Leap.Unity.GraphicalRenderer {
 
       _addRenderingMethodMenu = new GenericMenu();
       foreach (var renderingMethod in allRenderingMethods) {
-        _addRenderingMethodMenu.AddItem(new GUIContent(LeapGraphicTagAttribute.GetTag(renderingMethod)),
+        _addRenderingMethodMenu.AddItem(new GUIContent(LeapGraphicTagAttribute.GetTagName(renderingMethod)),
                                         false,
                                         () => {
                                           serializedObject.ApplyModifiedProperties();
                                           Undo.RecordObject(_renderer, "Changed rendering method");
                                           EditorUtility.SetDirty(_renderer);
-                                          _renderer.editor.ChangeRenderingMethod(renderingMethod, addFeatures: false);
+                                          _renderer.editor.ChangeRenderingMethodOfSelectedGroup(renderingMethod, addFeatures: false);
                                           serializedObject.Update();
-                                          _renderer.editor.ScheduleEditorUpdate();
+                                          _renderer.editor.ScheduleRebuild();
                                           _serializedObject.SetIsDifferentCacheDirty();
                                         });
       }
@@ -72,17 +72,49 @@ namespace Leap.Unity.GraphicalRenderer {
       var allFeatures = allTypes.Query().
                                  Where(t => !t.IsAbstract &&
                                             !t.IsGenericType &&
-                                             t.IsSubclassOf(typeof(LeapGraphicFeatureBase)));
+                                             t.IsSubclassOf(typeof(LeapGraphicFeatureBase))).ToList();
+
+      allFeatures.Sort((a, b) => {
+        var tagA = LeapGraphicTagAttribute.GetTag(a);
+        var tagB = LeapGraphicTagAttribute.GetTag(b);
+        var orderA = tagA == null ? 0 : tagA.order;
+        var orderB = tagB == null ? 0 : tagB.order;
+        return orderA - orderB;
+      });
 
       _addFeatureMenu = new GenericMenu();
-      foreach (var feature in allFeatures) {
-        _addFeatureMenu.AddItem(new GUIContent(LeapGraphicTagAttribute.GetTag(feature)),
+      foreach (var item in allFeatures.Query().WithPrevious(includeStart: true)) {
+        var tag = LeapGraphicTagAttribute.GetTag(item.value);
+        var order = tag == null ? 0 : tag.order;
+
+        if (item.hasPrev) {
+          var prevTag = LeapGraphicTagAttribute.GetTag(item.prev);
+          var prevOrder = prevTag == null ? 0 : prevTag.order;
+          if ((prevOrder / 100) != (order / 100)) {
+            _addFeatureMenu.AddSeparator("");
+          }
+        }
+
+        _addFeatureMenu.AddItem(new GUIContent(tag.name),
                                 false,
                                 () => {
+                                  if (item.value.ImplementsInterface(typeof(ICustomChannelFeature)) && LeapGraphicPreferences.promptWhenAddCustomChannel) {
+                                    int result = EditorUtility.DisplayDialogComplex("Adding Custom Channel", "Custom channels can only be utilized by writing custom shaders, are you sure you want to continue?", "Add it", "Cancel", "Add it from now on");
+                                    switch (result) {
+                                      case 0:
+                                        break;
+                                      case 1:
+                                        return;
+                                      case 2:
+                                        LeapGraphicPreferences.promptWhenAddCustomChannel = false;
+                                        break;
+                                    }
+                                  }
+
                                   serializedObject.ApplyModifiedProperties();
                                   Undo.RecordObject(_renderer, "Added feature");
                                   EditorUtility.SetDirty(_renderer);
-                                  _renderer.editor.AddFeature(feature);
+                                  _renderer.editor.AddFeatureToSelectedGroup(item.value);
                                   _serializedObject.Update();
                                   _serializedObject.SetIsDifferentCacheDirty();
                                 });
@@ -100,6 +132,8 @@ namespace Leap.Unity.GraphicalRenderer {
 
         drawRendererHeader();
 
+        drawGroupName();
+
         drawMonoScript();
 
         drawStatsArea();
@@ -113,6 +147,8 @@ namespace Leap.Unity.GraphicalRenderer {
         drawFeatureHeader();
 
         _featureList.DoLayoutList();
+
+        drawWarningDialogs();
       }
     }
 
@@ -170,6 +206,17 @@ namespace Leap.Unity.GraphicalRenderer {
       }
     }
 
+    private void drawGroupName() {
+      var nameProperty = _groupProperty.FindPropertyRelative("_groupName");
+      EditorGUILayout.PropertyField(nameProperty);
+
+      nameProperty.stringValue = nameProperty.stringValue.Trim();
+
+      if (string.IsNullOrEmpty(nameProperty.stringValue)) {
+        nameProperty.stringValue = "MyGroupName";
+      }
+    }
+
     private void drawRendererHeader() {
       Rect rect = EditorGUILayout.GetControlRect(GUILayout.MaxHeight(EditorGUIUtility.singleLineHeight));
       Rect left, right;
@@ -191,7 +238,7 @@ namespace Leap.Unity.GraphicalRenderer {
             Undo.RecordObject(_renderer, "Refreshed atlas");
             EditorUtility.SetDirty(_renderer);
             mesher.RebuildAtlas(new ProgressBar());
-            _renderer.editor.ScheduleEditorUpdate();
+            _renderer.editor.ScheduleRebuild();
             _serializedObject.Update();
           }
 
@@ -238,6 +285,37 @@ namespace Leap.Unity.GraphicalRenderer {
       }
     }
 
+    private void drawWarningDialogs() {
+      HashSet<string> shownMessages = Pool<HashSet<string>>.Spawn();
+      try {
+        for (int i = 0; i < _cachedPropertyList.Count; i++) {
+          if (!EditorApplication.isPlaying) {
+            var supportInfo = _supportInfo.GetArrayElementAtIndex(i);
+            var supportProperty = supportInfo.FindPropertyRelative("support");
+            var messageProperty = supportInfo.FindPropertyRelative("message");
+
+            if (shownMessages.Contains(messageProperty.stringValue)) {
+              continue;
+            }
+            shownMessages.Add(messageProperty.stringValue);
+
+            switch ((SupportType)supportProperty.intValue) {
+              case SupportType.Warning:
+                EditorGUILayout.HelpBox(messageProperty.stringValue, MessageType.Warning);
+                break;
+              case SupportType.Error:
+                EditorGUILayout.HelpBox(messageProperty.stringValue, MessageType.Error);
+                break;
+            }
+          }
+        }
+      } finally {
+        shownMessages.Clear();
+        Pool<HashSet<string>>.Recycle(shownMessages);
+      }
+
+    }
+
     private void drawFeatureHeader() {
       Rect rect = EditorGUILayout.GetControlRect(GUILayout.MaxHeight(EditorGUIUtility.singleLineHeight));
       Rect left, middle, right;
@@ -252,7 +330,7 @@ namespace Leap.Unity.GraphicalRenderer {
           _serializedObject.ApplyModifiedProperties();
           Undo.RecordObject(_renderer, "Removed Feature");
           EditorUtility.SetDirty(_renderer);
-          _renderer.editor.RemoveFeature(_featureList.index);
+          _renderer.editor.RemoveFeatureFromSelectedGroup(_featureList.index);
           _serializedObject.Update();
           init(_groupProperty);
         }
@@ -287,7 +365,7 @@ namespace Leap.Unity.GraphicalRenderer {
       var featureProperty = _cachedPropertyList[index];
 
       rect = rect.SingleLine();
-      string featureName = LeapGraphicTagAttribute.GetTag(featureProperty.type);
+      string featureName = LeapGraphicTagAttribute.GetTagName(featureProperty.type);
 
       int lastIndexOf = featureName.LastIndexOf('/');
       if (lastIndexOf >= 0) {
@@ -330,7 +408,7 @@ namespace Leap.Unity.GraphicalRenderer {
     }
 
     private void onReorderFeaturesCallback(ReorderableList list) {
-      _renderer.editor.ScheduleEditorUpdate();
+      _renderer.editor.ScheduleRebuild();
     }
   }
 }

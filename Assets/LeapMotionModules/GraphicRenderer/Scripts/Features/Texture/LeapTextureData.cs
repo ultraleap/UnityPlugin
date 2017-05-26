@@ -9,13 +9,14 @@
 
 using System;
 using UnityEngine;
+using UnityEngine.Serialization;
 using Leap.Unity.Attributes;
 
 namespace Leap.Unity.GraphicalRenderer {
 
   public static class LeapTextureFeatureExtension {
     public static LeapTextureData Texture(this LeapGraphic graphic) {
-      return graphic.GetFirstFeatureData<LeapTextureData>();
+      return graphic.GetFeatureData<LeapTextureData>();
     }
   }
 
@@ -23,7 +24,19 @@ namespace Leap.Unity.GraphicalRenderer {
   [Serializable]
   public class LeapTextureData : LeapFeatureData {
 
-    [EditTimeOnly]
-    public Texture2D texture;
+    [FormerlySerializedAs("texture")]
+    [EditTimeOnly, SerializeField]
+    private Texture2D _texture;
+
+    public Texture2D texture {
+      get {
+        return _texture;
+      }
+      set {
+        _texture = value;
+        graphic.isRepresentationDirty = true;
+        MarkFeatureDirty();
+      }
+    }
   }
 }

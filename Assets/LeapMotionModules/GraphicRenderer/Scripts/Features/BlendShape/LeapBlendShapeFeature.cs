@@ -12,7 +12,7 @@ using UnityEngine;
 
 namespace Leap.Unity.GraphicalRenderer {
 
-  [LeapGraphicTag("Blend Shape")]
+  [LeapGraphicTag("Blend Shape", 40)]
   [Serializable]
   public class LeapBlendShapeFeature : LeapGraphicFeature<LeapBlendShapeData> {
     public const string FEATURE_NAME = LeapGraphicRenderer.FEATURE_PREFIX + "BLEND_SHAPES";
