@@ -432,6 +432,7 @@ MonoBehaviour:
   _contactEnabled: 1
   _graspingEnabled: 1
   _trackingProviderType: Leap.Unity.Interaction.DefaultVRNodeTrackingProvider
+  _deviceString: openvr controller right
   _chirality: 1
   _hoverPoint: {fileID: 4981927146387146}
   primaryHoverPoints:

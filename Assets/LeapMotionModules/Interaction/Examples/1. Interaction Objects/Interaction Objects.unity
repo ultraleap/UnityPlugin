@@ -2276,6 +2276,8 @@ MonoBehaviour:
     - {fileID: 1500539203}
     - {fileID: 1357959193}
     - {fileID: 117112161}
+    - {fileID: 873843858}
+    - {fileID: 1962152602}
   hoverActivationRadius: 0.2
   touchActivationRadius: 0.075
   _autoGenerateLayers: 1
@@ -4560,13 +4562,15 @@ Prefab:
       propertyPath: manager
       value: 
       objectReference: {fileID: 289258607}
-    - target: {fileID: 1393620680427892, guid: 80e9754fad44e784f97f6c76a2c7255b, type: 2}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 80e9754fad44e784f97f6c76a2c7255b, type: 2}
   m_IsPrefabParent: 0
+--- !u!114 &873843858 stripped
+MonoBehaviour:
+  m_PrefabParentObject: {fileID: 114384944290433142, guid: 80e9754fad44e784f97f6c76a2c7255b,
+    type: 2}
+  m_PrefabInternal: {fileID: 873843857}
+  m_Script: {fileID: 11500000, guid: e55d3703de8ab5d418cb97104179cb49, type: 3}
 --- !u!1001 &881898385
 Prefab:
   m_ObjectHideFlags: 0
@@ -7761,7 +7765,6 @@ GameObject:
   - component: {fileID: 289258608}
   - component: {fileID: 289258607}
   - component: {fileID: 1562916757}
-  - component: {fileID: 1562916758}
   m_Layer: 0
   m_Name: Interaction Manager
   m_TagString: Untagged
@@ -7784,9 +7787,11 @@ MonoBehaviour:
   interactionManager: {fileID: 289258607}
   leftHandControllers:
   - {fileID: 1357959193}
+  - {fileID: 873843858}
   - {fileID: 486239175}
   rightHandControllers:
   - {fileID: 117112161}
+  - {fileID: 1962152602}
   - {fileID: 1500539203}
   OnLeftHandActive:
     m_PersistentCalls:
@@ -7850,44 +7855,6 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
-      PublicKeyToken=null
---- !u!114 &1562916758
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1562916756}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7d7eaf54dc14a5e4a89bc7fac55ca11a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  interactionManager: {fileID: 289258607}
-  leftHandControllers:
-  - {fileID: 486239175}
-  - {fileID: 1357959193}
-  rightHandControllers:
-  - {fileID: 117112161}
-  - {fileID: 1500539203}
-  OnLeftHandActive:
-    m_PersistentCalls:
-      m_Calls: []
-    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
-      PublicKeyToken=null
-  OnLeftHandInactive:
-    m_PersistentCalls:
-      m_Calls: []
-    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
-      PublicKeyToken=null
-  OnRightHandActive:
-    m_PersistentCalls:
-      m_Calls: []
-    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
-      PublicKeyToken=null
-  OnRightHandInactive:
-    m_PersistentCalls:
-      m_Calls: []
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
 --- !u!1 &1574518198
@@ -8880,13 +8847,15 @@ Prefab:
       propertyPath: manager
       value: 
       objectReference: {fileID: 289258607}
-    - target: {fileID: 1257637052428748, guid: 72368278d054cda4bb18e5aa08ce971d, type: 2}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 72368278d054cda4bb18e5aa08ce971d, type: 2}
   m_IsPrefabParent: 0
+--- !u!114 &1962152602 stripped
+MonoBehaviour:
+  m_PrefabParentObject: {fileID: 114446365300099102, guid: 72368278d054cda4bb18e5aa08ce971d,
+    type: 2}
+  m_PrefabInternal: {fileID: 1962152601}
+  m_Script: {fileID: 11500000, guid: e55d3703de8ab5d418cb97104179cb49, type: 3}
 --- !u!1 &2015465360
 GameObject:
   m_ObjectHideFlags: 0

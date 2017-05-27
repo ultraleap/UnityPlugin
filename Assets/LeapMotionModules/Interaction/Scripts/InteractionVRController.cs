@@ -10,10 +10,10 @@
 using Leap.Unity.Attributes;
 using Leap.Unity.Interaction.Internal;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.VR;
+using Leap.Unity.Query;
 
 namespace Leap.Unity.Interaction {
 
@@ -34,6 +34,12 @@ namespace Leap.Unity.Interaction {
     public bool isUsingCustomTracking {
       get { return !(trackingProvider is DefaultVRNodeTrackingProvider); }
     }
+
+    [Tooltip("If this string is non-empty, but does not match a controller in Input.GetJoystickNames()"
+       + ", then this game object will disable itself.")]
+    [SerializeField, EditTimeOnly]
+    private string _deviceString = "oculus touch right"; //or "openvr controller right/left"
+    public string deviceString { get { return _deviceString; } }
 
     [Tooltip("Which hand will hold this controller? This property cannot be changed "
            + "at runtime.")]
@@ -135,6 +141,22 @@ namespace Leap.Unity.Interaction {
 
     protected virtual void OnValidate() {
       _trackingProviderType = trackingProvider.GetType().ToString();
+    }
+
+    protected virtual void Awake() {
+      if (deviceString.Length > 0) {
+        string[] joysticksConnected = Input.GetJoystickNames().Query().Select(s => s.ToLower()).ToArray();
+        string[] controllerSupportTokens = deviceString.ToLower().Split(" ".ToCharArray());
+        bool matchesController = joysticksConnected.Query()
+                                 .Any(joystick => controllerSupportTokens.Query()
+                                                 .All(token => joystick.Contains(token)));
+        if (!matchesController) {
+          Debug.Log("No joystick containing the tokens '" + deviceString + "' was detected; "
+                  + "disabling controller object. Please check the device string if this "
+                  + "was in error.", gameObject);
+          gameObject.SetActive(false);
+        }
+      }
     }
 
     protected override void Start() {
