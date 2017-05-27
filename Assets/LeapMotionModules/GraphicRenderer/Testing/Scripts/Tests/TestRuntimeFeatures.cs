@@ -7,6 +7,7 @@
  * between Leap Motion and you, your company or other organization.           *
  ******************************************************************************/
 
+#if UNITY_EDITOR
 using UnityEngine.TestTools;
 using NUnit.Framework;
 using System.Collections;
@@ -93,3 +94,4 @@ namespace Leap.Unity.GraphicalRenderer.Tests {
     }
   }
 }
+#endif

@@ -7,6 +7,7 @@
  * between Leap Motion and you, your company or other organization.           *
  ******************************************************************************/
 
+#if UNITY_EDITOR
 using System;
 using NUnit.Framework;
 using System.Reflection;
@@ -67,7 +68,7 @@ namespace Leap.Unity.GraphicalRenderer.Tests {
       }
 
       if (obj == null) {
-        var prefab = Resources.Load<GameObject>(objectName);
+        var prefab = EditorResources.Load<GameObject>(objectName);
 
         if (prefab == null) {
           throw new Exception("Could not find an object or prefab with the name " + objectName);
@@ -101,7 +102,7 @@ namespace Leap.Unity.GraphicalRenderer.Tests {
     /// this method will assign the newly spawned graphic to it.
     /// </summary>
     protected LeapGraphic CreateGraphic(string prefabName) {
-      var prefab = Resources.Load<GameObject>(prefabName);
+      var prefab = EditorResources.Load<GameObject>(prefabName);
       var obj = UnityEngine.Object.Instantiate(prefab);
       obj.transform.SetParent(renderer.transform);
 
@@ -152,3 +153,4 @@ namespace Leap.Unity.GraphicalRenderer.Tests {
     }
   }
 }
+#endif

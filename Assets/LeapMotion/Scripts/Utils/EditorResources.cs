@@ -9,10 +9,13 @@
 
 using System.IO;
 using UnityEngine;
+#if UNITY_EDITOR
 using UnityEditor;
+#endif
 
 namespace Leap.Unity {
 
+#if UNITY_EDITOR
   public static class EditorResources {
 
     /// <summary>
@@ -21,8 +24,16 @@ namespace Leap.Unity {
     /// extension, just like when using Resources!
     /// </summary>
     public static T Load<T>(string name) where T : Object {
-      foreach (var dir in Directory.GetDirectories("Assets", "EditorResources", SearchOption.AllDirectories)) {
-        foreach (var filename in Directory.GetFiles(dir, name + ".*")) {
+      foreach (var rootDir in Directory.GetDirectories("Assets", "EditorResources", SearchOption.AllDirectories)) {
+        string fullPath = Path.Combine(rootDir, name + ".dummy");
+        string fullDir = Path.GetDirectoryName(fullPath);
+        string fileName = Path.GetFileNameWithoutExtension(fullPath);
+
+        if (!Directory.Exists(fullDir)) {
+          continue;
+        }
+
+        foreach (var filename in Directory.GetFiles(fullDir, fileName + ".*")) {
           if (!string.IsNullOrEmpty(AssetDatabase.AssetPathToGUID(filename))) {
             return AssetDatabase.LoadAssetAtPath<T>(filename);
           }
@@ -31,4 +42,5 @@ namespace Leap.Unity {
       return null;
     }
   }
+#endif
 }
