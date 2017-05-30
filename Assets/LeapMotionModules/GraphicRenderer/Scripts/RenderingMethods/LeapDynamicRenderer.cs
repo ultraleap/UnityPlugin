@@ -18,7 +18,7 @@ namespace Leap.Unity.GraphicalRenderer {
   [LeapGraphicTag("Dynamic")]
   [Serializable]
   public class LeapDynamicRenderer : LeapMesherBase, ISupportsAddRemove {
-    public const string DEFAULT_SHADER = "LeapMotion/GraphicRenderer/Unlit/Dynamic";
+    public const string DEFAULT_SHADER = "LeapMotion/GraphicRenderer/Unlit/Dynamic Transparent";
 
     #region PRIVATE VARIABLES
 

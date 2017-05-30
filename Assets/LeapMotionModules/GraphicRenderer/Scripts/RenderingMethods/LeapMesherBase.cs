@@ -83,7 +83,7 @@ namespace Leap.Unity.GraphicalRenderer {
 
     [Tooltip("Should this renderer include vertex colors in the generated meshes.")]
     [EditTimeOnly, SerializeField, HideInInspector]
-    private bool _useColors = false;
+    private bool _useColors = true;
 
     [Tooltip("Multiply all vertex colors for all graphics by this color.")]
     [EditTimeOnly, SerializeField, HideInInspector]
