@@ -225,16 +225,20 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    protected virtual void OnCollisionEnter(Collision collision) { trySetDepressor(collision); }
-    protected virtual void OnCollisionStay(Collision collision) { trySetDepressor(collision); }
+    protected virtual void OnCollisionEnter(Collision collision) { trySetDepressor(collision.collider); }
+    protected virtual void OnCollisionStay(Collision collision) { trySetDepressor(collision.collider); }
+
+    // during Soft Contact, controller colliders are triggers
+    protected virtual void OnTriggerEnter(Collider collider) { trySetDepressor(collider); }
+    protected virtual void OnTriggerStay(Collider collider) { trySetDepressor(collider); }
 
     // Try grabbing the offset between the fingertip and this object...
-    private void trySetDepressor(Collision collision) {
-      if (collision.rigidbody != null && _lastDepressor == null && (localPhysicsPosition.z > initialLocalPosition.z - minMaxHeight.x)
-        && (manager.contactBoneBodies.ContainsKey(collision.collider.attachedRigidbody)
-            && !this.ShouldIgnoreHover(manager.contactBoneBodies[collision.collider.attachedRigidbody].interactionController))) {
-        _lastDepressor = collision.rigidbody;
-        _localDepressorPosition = transform.InverseTransformPoint(collision.rigidbody.position);
+    private void trySetDepressor(Collider collider) {
+      if (collider.attachedRigidbody != null && _lastDepressor == null && (localPhysicsPosition.z > initialLocalPosition.z - minMaxHeight.x)
+        && (manager.contactBoneBodies.ContainsKey(collider.attachedRigidbody)
+            && !this.ShouldIgnoreHover(manager.contactBoneBodies[collider.attachedRigidbody].interactionController))) {
+        _lastDepressor = collider.attachedRigidbody;
+        _localDepressorPosition = transform.InverseTransformPoint(collider.attachedRigidbody.position);
       }
     }
 
