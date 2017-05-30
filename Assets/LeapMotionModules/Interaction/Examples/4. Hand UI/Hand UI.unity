@@ -3059,7 +3059,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 1257637052428748, guid: 72368278d054cda4bb18e5aa08ce971d, type: 2}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 72368278d054cda4bb18e5aa08ce971d, type: 2}
@@ -3677,7 +3677,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 1180994678239160, guid: 9361ab6d13ee87644bc370bccb524144, type: 2}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 9361ab6d13ee87644bc370bccb524144, type: 2}
@@ -3687,6 +3687,12 @@ Transform:
   m_PrefabParentObject: {fileID: 4911511504652324, guid: 9361ab6d13ee87644bc370bccb524144,
     type: 2}
   m_PrefabInternal: {fileID: 1061012171}
+--- !u!114 &1061012173 stripped
+MonoBehaviour:
+  m_PrefabParentObject: {fileID: 114252805458954098, guid: 9361ab6d13ee87644bc370bccb524144,
+    type: 2}
+  m_PrefabInternal: {fileID: 1061012171}
+  m_Script: {fileID: 11500000, guid: e55d3703de8ab5d418cb97104179cb49, type: 3}
 --- !u!1 &1066343638
 GameObject:
   m_ObjectHideFlags: 0
@@ -5040,6 +5046,10 @@ MonoBehaviour:
     _values:
     - {fileID: 208420374}
     - {fileID: 634234965}
+    - {fileID: 2007413266}
+    - {fileID: 1061012173}
+    - {fileID: 1852415754}
+    - {fileID: 841628018}
   hoverActivationRadius: 0.2
   touchActivationRadius: 0.075
   _autoGenerateLayers: 1
@@ -5064,12 +5074,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   interactionManager: {fileID: 1454829696}
-  prioritizeControllers: 1
-  LeftHandControllers:
-  - {fileID: 1852415754}
+  leftHandControllers:
   - {fileID: 208420374}
-  RightHandControllers:
-  - {fileID: 841628018}
+  rightHandControllers:
   - {fileID: 634234965}
   OnLeftHandActive:
     m_PersistentCalls:
@@ -6371,7 +6378,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 1393620680427892, guid: 80e9754fad44e784f97f6c76a2c7255b, type: 2}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 80e9754fad44e784f97f6c76a2c7255b, type: 2}
@@ -6881,7 +6888,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 1135166102121244, guid: 40e809833d307ef4983e1e71fe56e23b, type: 2}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 40e809833d307ef4983e1e71fe56e23b, type: 2}
@@ -6891,6 +6898,12 @@ Transform:
   m_PrefabParentObject: {fileID: 4829828358790816, guid: 40e809833d307ef4983e1e71fe56e23b,
     type: 2}
   m_PrefabInternal: {fileID: 2007413264}
+--- !u!114 &2007413266 stripped
+MonoBehaviour:
+  m_PrefabParentObject: {fileID: 114205148317838364, guid: 40e809833d307ef4983e1e71fe56e23b,
+    type: 2}
+  m_PrefabInternal: {fileID: 2007413264}
+  m_Script: {fileID: 11500000, guid: e55d3703de8ab5d418cb97104179cb49, type: 3}
 --- !u!1 &2040206149
 GameObject:
   m_ObjectHideFlags: 0

@@ -11,6 +11,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
+using Leap.Unity.Query;
 using Leap.Unity.RuntimeGizmos;
 
 namespace Leap.Unity.Interaction {
@@ -302,21 +303,53 @@ namespace Leap.Unity.Interaction {
       bool isRightVRNodeController = controller.trackingProvider is DefaultVRNodeTrackingProvider
                                   && controller.chirality == Chirality.Right;
 
-      if (isLeftVRNodeController  &&  _leftVRNodeController != null
-       || isRightVRNodeController && _rightVRNodeController != null) {
+      if (isLeftVRNodeController && _leftVRNodeController != null
+             || isRightVRNodeController && _rightVRNodeController != null) {
+
+        var alreadyExistsController = isLeftVRNodeController ? _leftVRNodeController : _rightVRNodeController;
+
+        string message;
+        string tooltip;
+        Color color;
+
+        if (controller.deviceString.Equals(alreadyExistsController.deviceString)) {
+          message = "Duplicate VR Controller";
+          tooltip = "You already have a VRNode controller with this chirality and device "
+                  + "string in your scene. You should remove one of the duplicates.";
+          color = Colors.Problem;
+        } else {
+          message = "Multiple VR Controllers";
+          tooltip = "You have multiple VR controllers of the same chirality enabled with "
+                  + "different device strings. If both device strings match attached "
+                  + "Unity joysticks, you may get duplicate controllers.";
+          color = Colors.Caution;
+        }
+
         messages.Add(new ControllerStatusMessage() {
-          message = "Duplicate VR Controller",
-          tooltip = "You already have a VRNode controller with this chirality in your "
-                  + "scene. You should remove one of the duplicates.",
-          color = Colors.Problem
+          message = message,
+          tooltip = tooltip,
+          color = color
         });
       }
+
       if (isLeftVRNodeController) {
         _leftVRNodeController = controller;
       }
       if (isRightVRNodeController) {
         _rightVRNodeController = controller;
       }
+
+      string wrongChiralityToken = controller.isLeft ? "right" : "left";
+      if (controller.deviceString.Contains(wrongChiralityToken)) {
+        messages.Add(new ControllerStatusMessage() {
+          message = "Wrong Chirality?",
+          tooltip = "This VR controller's device string specifies a chirality that is "
+                  + "different from the chirality of the controller itself. You should "
+                  + "confirm this controller's device string or chirality setting.",
+          color = Colors.Warning
+        });
+      }
+
     }
 
   }

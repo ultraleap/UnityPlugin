@@ -7478,7 +7478,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 1135166102121244, guid: 40e809833d307ef4983e1e71fe56e23b, type: 2}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 40e809833d307ef4983e1e71fe56e23b, type: 2}
@@ -7488,6 +7488,12 @@ Transform:
   m_PrefabParentObject: {fileID: 4829828358790816, guid: 40e809833d307ef4983e1e71fe56e23b,
     type: 2}
   m_PrefabInternal: {fileID: 581075618}
+--- !u!114 &581075620 stripped
+MonoBehaviour:
+  m_PrefabParentObject: {fileID: 114205148317838364, guid: 40e809833d307ef4983e1e71fe56e23b,
+    type: 2}
+  m_PrefabInternal: {fileID: 581075618}
+  m_Script: {fileID: 11500000, guid: e55d3703de8ab5d418cb97104179cb49, type: 3}
 --- !u!1 &592858565
 GameObject:
   m_ObjectHideFlags: 0
@@ -8932,7 +8938,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 1180994678239160, guid: 9361ab6d13ee87644bc370bccb524144, type: 2}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 9361ab6d13ee87644bc370bccb524144, type: 2}
@@ -8942,6 +8948,12 @@ Transform:
   m_PrefabParentObject: {fileID: 4911511504652324, guid: 9361ab6d13ee87644bc370bccb524144,
     type: 2}
   m_PrefabInternal: {fileID: 695586572}
+--- !u!114 &695586574 stripped
+MonoBehaviour:
+  m_PrefabParentObject: {fileID: 114252805458954098, guid: 9361ab6d13ee87644bc370bccb524144,
+    type: 2}
+  m_PrefabInternal: {fileID: 695586572}
+  m_Script: {fileID: 11500000, guid: e55d3703de8ab5d418cb97104179cb49, type: 3}
 --- !u!1 &704737755
 GameObject:
   m_ObjectHideFlags: 0
@@ -11120,6 +11132,10 @@ MonoBehaviour:
     _values:
     - {fileID: 1448265358}
     - {fileID: 1164372599}
+    - {fileID: 581075620}
+    - {fileID: 695586574}
+    - {fileID: 1882797917}
+    - {fileID: 1281910586}
   hoverActivationRadius: 0.2
   touchActivationRadius: 0.075
   _autoGenerateLayers: 1
@@ -11144,12 +11160,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   interactionManager: {fileID: 892104473}
-  prioritizeControllers: 1
-  LeftHandControllers:
-  - {fileID: 1882797917}
+  leftHandControllers:
   - {fileID: 1448265358}
-  RightHandControllers:
-  - {fileID: 1281910586}
+  rightHandControllers:
   - {fileID: 1164372599}
   OnLeftHandActive:
     m_PersistentCalls:
@@ -16186,7 +16199,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 1257637052428748, guid: 72368278d054cda4bb18e5aa08ce971d, type: 2}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 72368278d054cda4bb18e5aa08ce971d, type: 2}
@@ -24397,7 +24410,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 1393620680427892, guid: 80e9754fad44e784f97f6c76a2c7255b, type: 2}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 80e9754fad44e784f97f6c76a2c7255b, type: 2}
