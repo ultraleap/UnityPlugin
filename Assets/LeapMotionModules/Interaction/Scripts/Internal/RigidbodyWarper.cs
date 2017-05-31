@@ -12,6 +12,10 @@ using System;
 
 namespace Leap.Unity.Interaction.Internal {
 
+  /// <summary>
+  /// Note: This class is incomplete; it will be integrated in a future version of the
+  /// Interaction Engine.
+  /// </summary>
   public class RigidbodyWarper : IDisposable {
     protected enum CallbackState {
       Physical,

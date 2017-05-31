@@ -13,7 +13,16 @@ using UnityEngine;
 
 namespace Leap.Unity.Interaction {
 
-  public class KabschGraspedPose : IGraspedPoseController {
+  /// <summary>
+  /// This pose handler is the default implementation of IGraspedPoseHandler provided by
+  /// the Interaction Engine and is most likely the only implementation you will need. It
+  /// uses a Kabsch solve from frame to frame based on the points at which any grasping
+  /// controller are grasping the interaction object to determine where the object should
+  /// move and rotate in the grasp. Note that IGraspedPoseHandlers only determine the
+  /// target position and rotation of a held object; actually moving the object is the
+  /// domain of an IGraspedMovementHandler.
+  /// </summary>
+  public class KabschGraspedPose : IGraspedPoseHandler {
     public const int NUM_FINGERS = 5;
     public const int NUM_BONES = 4;
 

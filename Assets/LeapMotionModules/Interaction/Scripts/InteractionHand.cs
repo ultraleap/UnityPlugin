@@ -481,8 +481,12 @@ namespace Leap.Unity.Interaction {
 
     /// <summary> Reconnects and resets all the joints in the hand. </summary>
     private void resetContactBoneJoints() {
+      // If the palm contact bone is null, we can't reset bone joints.
+      if (_contactBones[NUM_FINGERS * BONES_PER_FINGER] == null) return;
+
       _contactBones[NUM_FINGERS * BONES_PER_FINGER].transform.position = _unwarpedHandData.PalmPosition.ToVector3();
       _contactBones[NUM_FINGERS * BONES_PER_FINGER].transform.rotation = _unwarpedHandData.Rotation.ToQuaternion();
+
       for (int fingerIndex = 0; fingerIndex < NUM_FINGERS; fingerIndex++) {
         for (int jointIndex = 0; jointIndex < BONES_PER_FINGER; jointIndex++) {
           Bone bone = _unwarpedHandData.Fingers[fingerIndex].Bone((Bone.BoneType)(jointIndex) + 1); // +1 to skip first bone.

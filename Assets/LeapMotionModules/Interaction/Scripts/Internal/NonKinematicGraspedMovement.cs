@@ -9,18 +9,21 @@
 
 using InteractionEngineUtility;
 using Leap.Unity.Query;
-using Leap.Unity.Interaction.Internal;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace Leap.Unity.Interaction {
 
-  public class NonKinematicGraspedMovement : IGraspedMovementController {
+  /// <summary>
+  /// This implementation of IGraspedMovementHandler moves an interaction object to its
+  /// target position and rotation by setting its rigidbody's velocity and angular
+  /// velocity such that it will reach the target position and rotation on the next
+  /// physics update.
+  /// </summary>
+  public class NonKinematicGraspedMovement : IGraspedMovementHandler {
 
     protected float _maxVelocity = 6F;
-
-    //protected float _maxVelocityHandSpace = 2F;
 
     private bool _useLastSolvedPosition = false;
     private Vector3 _lastSolvedPosition = Vector3.zero;
@@ -32,11 +35,7 @@ namespace Leap.Unity.Interaction {
       Vector3 targetVelocity = PhysicsUtility.ToLinearVelocity(intObj.rigidbody.position, solvedPosition, Time.fixedDeltaTime);
       Vector3 targetAngularVelocity = PhysicsUtility.ToAngularVelocity(intObj.rigidbody.rotation, solvedRotation, Time.fixedDeltaTime);
 
-      // Clamp in hand space
-      //Vector3 graspingHandVelocity = interactionObj.graspingHands.Query().First().GetLastTrackedLeapHand().PalmVelocity.ToVector3();
-      //targetVelocity -= graspingHandVelocity;
-
-      // Clamp by _maxVelocityHandSpace
+      // Clamp by _maxVelocity.
       float maxScaledVelocity = _maxVelocity * intObj.manager.SimulationScale;
       float targetSpeedSqrd = targetVelocity.sqrMagnitude;
       if (targetSpeedSqrd > maxScaledVelocity * maxScaledVelocity) {
@@ -44,9 +43,6 @@ namespace Leap.Unity.Interaction {
         targetVelocity *= targetPercent;
         targetAngularVelocity *= targetPercent;
       }
-
-      // Back to world space from hand space
-      //targetVelocity += graspingHandVelocity;
 
       _useLastSolvedPosition = !justGrasped;
       float followStrength = 1F;

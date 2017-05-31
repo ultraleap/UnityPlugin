@@ -15,12 +15,12 @@ using UnityEngine;
 namespace Leap.Unity.Interaction {
 
   /// <summary>
-  /// The sliding window throw controller implements a simple heuristic that provides a
+  /// The sliding window throw handler implements a simple heuristic that provides a
   /// reasonably accurate measure of the user's intended "throw direction" for a physical
   /// object. It is used as the default implementation of an Interaction Behaviour's
-  /// throw controller.
+  /// throw handler.
   /// </summary>
-  public class SlidingWindowThrow : IThrowController {
+  public class SlidingWindowThrow : IThrowHandler {
 
     /// <summary>
     /// The length of the averaging window in seconds.
@@ -133,19 +133,6 @@ namespace Leap.Unity.Interaction {
       Vector3 interpolatedVelocity = PhysicsUtility.ToLinearVelocity(start.position,
                                                                      end.position,
                                                                      _windowLength);
-
-      // TODO: DELETEME. The bug this code addresses appears to be fixed.
-      //// If trying to throw the object backwards into a hand, project the velocity
-      //// onto the plane defined by the hand's palm normal.
-      //InteractionHand intHand = throwingController.intHand;
-      //if (intHand != null) {
-      //  Vector3 relativeVelocity = interpolatedVelocity - intHand.velocity;
-      //  Vector3 palmNormal = intHand.leapHand.PalmNormal.ToVector3();
-
-      //  if (Vector3.Dot(relativeVelocity, palmNormal) < 0) {
-      //    interpolatedVelocity -= Vector3.Project(relativeVelocity, palmNormal);
-      //  }
-      //}
 
       intObj.rigidbody.velocity = interpolatedVelocity;
       intObj.rigidbody.angularVelocity = PhysicsUtility.ToAngularVelocity(start.rotation,

@@ -7,18 +7,17 @@
  * between Leap Motion and you, your company or other organization.           *
  ******************************************************************************/
 
-using Leap.Unity.Interaction.Internal;
 using UnityEngine;
 
 namespace Leap.Unity.Interaction {
 
   /// <summary>
-  /// Interaction Behaviours feed their throw controllers callbacks when they are
-  /// held (for data collection) and when they are released so that the controller
-  /// can manipulate the Interaction object's thrown direction and velocity to match
-  /// the user's intention.
+  /// Interaction objects feed their throw handlers callbacks when they are held (for
+  /// data collection) and then fire OnThrow when they are released from all grasping
+  /// hands or controllers so that the throw handler can manipulate the interaction
+  /// object's trajectory to better match the user's intention.
   /// </summary>
-  public interface IThrowController {
+  public interface IThrowHandler {
 
     /// <summary>
     /// Called every FixedUpdate frame while an interaction object is being held.

@@ -14,17 +14,17 @@ using UnityEngine;
 namespace Leap.Unity.Interaction {
 
   /// <summary>
-  /// IGraspedPoseController specifies where an object grasped by a Leap hand or
+  /// An IGraspedPoseHandler specifies where an object grasped by a Leap hand or
   /// controller (or multiple hands/controllers) should move as the grasping
   /// controllers(s) move. The default implementation provided by the Interaction Engine
   /// is the KabschGraspedPose, which produces a physically-intuitive following motion
   /// for the object no matter how a grasping hand moves.
   /// 
-  /// IGraspedPoseControllers do not actually move an object; they only calculate where
+  /// IGraspedPoseHandlers do not actually move an object; they only calculate where
   /// an object should be moved. Actually moving the object is the concern of an
-  /// IGraspedMovementController.
+  /// IGraspedMovementHandler.
   /// </summary>
-  public interface IGraspedPoseController {
+  public interface IGraspedPoseHandler {
 
     /// <summary>
     /// Called when a new InteractionController begins grasping a certain object.
@@ -45,8 +45,8 @@ namespace Leap.Unity.Interaction {
     void ClearControllers();
 
     /// <summary>
-    /// Calculate the best holding position and orientation given the current
-    /// state of added InteractionControllers (added via AddController()).
+    /// Calculate the best holding position and orientation given the current state of
+    /// all InteractionControllers (added via AddController()).
     /// </summary>
     void GetGraspedPosition(out Vector3 position, out Quaternion rotation);
 

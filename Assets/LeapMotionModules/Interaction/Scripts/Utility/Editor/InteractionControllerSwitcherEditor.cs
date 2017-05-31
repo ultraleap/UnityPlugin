@@ -12,6 +12,7 @@ using UnityEditor;
 using UnityEditorInternal;
 
 namespace Leap.Unity.Interaction {
+
   [CustomEditor(typeof(InteractionControllerSwitcher))]
   public class InteractionControllerSwitcherEditor : CustomEditorBase<InteractionControllerSwitcher> {
 
@@ -36,4 +37,5 @@ namespace Leap.Unity.Interaction {
       specifyCustomDrawer("rightHandControllers", (SerializedProperty p) => { rightList.DoLayoutList(); });
     }
   }
+
 }

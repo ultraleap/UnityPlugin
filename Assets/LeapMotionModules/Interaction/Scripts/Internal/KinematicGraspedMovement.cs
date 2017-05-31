@@ -7,14 +7,20 @@
  * between Leap Motion and you, your company or other organization.           *
  ******************************************************************************/
 
-using Leap.Unity.Interaction.Internal;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace Leap.Unity.Interaction {
 
-  public class KinematicGraspedMovement : IGraspedMovementController {
+  /// <summary>
+  /// This implementation of IGraspedMovementHandler moves its interaction object to a
+  /// target position and rotation by setting its rigidbody position and rotation
+  /// directly to that target position and rotation. This is required when working with
+  /// kinematic rigidbodies, which do not move based on their velocity and angular
+  /// velocity.
+  /// </summary>
+  public class KinematicGraspedMovement : IGraspedMovementHandler {
 
     public void MoveTo(Vector3 solvedPosition, Quaternion solvedRotation,
                        InteractionBehaviour interactionObj, bool justGrasped) {

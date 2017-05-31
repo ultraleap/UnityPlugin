@@ -1082,42 +1082,42 @@ namespace Leap.Unity.Interaction {
     private float _dragBeforeGrasp = 0F;
     private float _angularDragBeforeGrasp = 0.05F;
 
-    private IGraspedPoseController _graspedPositionController;
-    /// <summary> Gets or sets the grasped pose controller for this Interaction object. </summary>
-    public IGraspedPoseController graspedPoseController {
+    private IGraspedPoseHandler _graspedPoseHandler;
+    /// <summary> Gets or sets the grasped pose handler for this Interaction object. </summary>
+    public IGraspedPoseHandler graspedPoseHandler {
       get {
-        if (_graspedPositionController == null) {
-          _graspedPositionController = new KabschGraspedPose(this);
+        if (_graspedPoseHandler == null) {
+          _graspedPoseHandler = new KabschGraspedPose(this);
         }
-        return _graspedPositionController;
+        return _graspedPoseHandler;
       }
       set {
-        _graspedPositionController = value;
+        _graspedPoseHandler = value;
       }
     }
 
-    private KinematicGraspedMovement _kinematicHoldingMovement;
-    private NonKinematicGraspedMovement _nonKinematicHoldingMovement;
+    private KinematicGraspedMovement _kinematicGraspedMovement;
+    private NonKinematicGraspedMovement _nonKinematicGraspedMovement;
 
-    private IThrowController _throwController;
-    /// <summary> Gets or sets the throw controller for this Interaction object. </summary>
-    public IThrowController throwController {
+    private IThrowHandler _throwHandler;
+    /// <summary> Gets or sets the throw handler for this Interaction object. </summary>
+    public IThrowHandler throwHandler {
       get {
-        if (_throwController == null) {
-          _throwController = new SlidingWindowThrow();
+        if (_throwHandler == null) {
+          _throwHandler = new SlidingWindowThrow();
         }
-        return _throwController;
+        return _throwHandler;
       }
       set {
-        _throwController = value;
+        _throwHandler = value;
       }
     }
 
     private void InitGrasping() {
       _moveObjectWhenGrasped__WasEnabledLastFrame = moveObjectWhenGrasped;
 
-      _kinematicHoldingMovement = new KinematicGraspedMovement();
-      _nonKinematicHoldingMovement = new NonKinematicGraspedMovement();
+      _kinematicGraspedMovement = new KinematicGraspedMovement();
+      _nonKinematicGraspedMovement = new NonKinematicGraspedMovement();
 
       _graspingInitialized = true;
     }
@@ -1128,7 +1128,7 @@ namespace Leap.Unity.Interaction {
       }
 
       if (!moveObjectWhenGrasped && _moveObjectWhenGrasped__WasEnabledLastFrame) {
-        graspedPoseController.ClearControllers();
+        graspedPoseHandler.ClearControllers();
       }
       _moveObjectWhenGrasped__WasEnabledLastFrame = moveObjectWhenGrasped;
     }
@@ -1152,7 +1152,7 @@ namespace Leap.Unity.Interaction {
         _graspingControllers.Add(controller);
 
         if (moveObjectWhenGrasped) {
-          graspedPoseController.AddController(controller);
+          graspedPoseHandler.AddController(controller);
         }
         
         // Fire interaction callback.
@@ -1200,12 +1200,12 @@ namespace Leap.Unity.Interaction {
 
         if (moveObjectWhenGrasped) {
           // Remove each hand from the pose solver.
-          graspedPoseController.RemoveController(controller);
+          graspedPoseHandler.RemoveController(controller);
         }
       }
 
       // If the object is no longer grasped by any hands, restore state and
-      // activate throw controller.
+      // activate throw handler.
       if (_graspingControllers.Count == 0) {
         // Restore drag settings from prior to the grasp.
         rigidbody.drag = _dragBeforeGrasp;
@@ -1215,7 +1215,7 @@ namespace Leap.Unity.Interaction {
         rigidbody.isKinematic = _wasKinematicBeforeGrasp;
 
         if (controllers.Count == 1) {
-          throwController.OnThrow(this, controllers.Query().First());
+          throwHandler.OnThrow(this, controllers.Query().First());
         }
 
         OnGraspEnd();
@@ -1231,16 +1231,16 @@ namespace Leap.Unity.Interaction {
         Vector3    newPosition;
         Quaternion newRotation;
 
-        graspedPoseController.GetGraspedPosition(out newPosition, out newRotation);
+        graspedPoseHandler.GetGraspedPosition(out newPosition, out newRotation);
 
-        IGraspedMovementController holdingMovementController = rigidbody.isKinematic ?
-                                                                 (IGraspedMovementController)_kinematicHoldingMovement
-                                                               : (IGraspedMovementController)_nonKinematicHoldingMovement;
-        holdingMovementController.MoveTo(newPosition, newRotation, this, _justGrasped);
+        IGraspedMovementHandler graspedMovementHandler = rigidbody.isKinematic ?
+                                                       (IGraspedMovementHandler)_kinematicGraspedMovement
+                                                     : (IGraspedMovementHandler)_nonKinematicGraspedMovement;
+        graspedMovementHandler.MoveTo(newPosition, newRotation, this, _justGrasped);
 
         OnGraspedMovement(origPosition, origRotation, newPosition, newRotation, controllers);
 
-        throwController.OnHold(this, controllers);
+        throwHandler.OnHold(this, controllers);
       }
 
       OnGraspStay();
