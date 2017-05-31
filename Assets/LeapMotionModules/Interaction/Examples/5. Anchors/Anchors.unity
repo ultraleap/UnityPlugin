@@ -11147,7 +11147,7 @@ MonoBehaviour:
     layerIndex: 9
   _contactBoneLayer:
     layerIndex: 10
-  _drawControllerRuntimeGizmos: 1
+  _drawControllerRuntimeGizmos: 0
 --- !u!114 &892104474
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11161,8 +11161,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   interactionManager: {fileID: 892104473}
   leftHandControllers:
+  - {fileID: 581075620}
+  - {fileID: 1882797917}
   - {fileID: 1448265358}
   rightHandControllers:
+  - {fileID: 695586574}
+  - {fileID: 1281910586}
   - {fileID: 1164372599}
   OnLeftHandActive:
     m_PersistentCalls:
