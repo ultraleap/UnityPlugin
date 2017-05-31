@@ -73,7 +73,7 @@ namespace Leap.Unity.GraphicalRenderer {
         var graphic = group.graphics[i];
         if (graphic.isRepresentationDirty || _meshes[i] == null) {
           beginMesh(_meshes[i]);
-          _generation.graphic = graphic as LeapMeshGraphic;
+          _generation.graphic = graphic as LeapMeshGraphicBase;
           _generation.graphicIndex = i;
           _generation.graphicId = i;
           base.buildGraphic();

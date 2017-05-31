@@ -73,6 +73,9 @@ namespace Leap.Unity.GraphicalRenderer {
         if (_sourceDataIndex == -1) {
           assignDefaultSourceValue();
         }
+        if (_sourceDataIndex < 0 || _sourceDataIndex >= featureData.Count) {
+          return null;
+        }
         return featureData[_sourceDataIndex];
       }
 #if UNITY_EDITOR

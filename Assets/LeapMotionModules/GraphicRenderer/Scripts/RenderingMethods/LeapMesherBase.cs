@@ -173,6 +173,9 @@ namespace Leap.Unity.GraphicalRenderer {
 
       progress.Begin(2, "Rebuilding Atlas", "", () => {
         Texture2D[] packedTextures;
+
+        group.GetSupportedFeatures(_textureFeatures);
+        _atlas.UpdateTextureList(_textureFeatures);
         _atlas.RebuildAtlas(progress, out packedTextures, out _atlasUvs);
 
         progress.Begin(3, "", "", () => {
