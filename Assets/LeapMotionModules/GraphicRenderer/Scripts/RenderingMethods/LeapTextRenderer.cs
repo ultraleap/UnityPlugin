@@ -26,8 +26,7 @@ namespace Leap.Unity.GraphicalRenderer {
     public const string DEFAULT_FONT = "Arial.ttf";
     public const string DEFAULT_SHADER = "LeapMotion/GraphicRenderer/Text/Dynamic";
     public const float SCALE_CONSTANT = 0.001f;
-
-    [Header("Text Settings")]
+    
     [EditTimeOnly, SerializeField]
     private Font _font;
 
