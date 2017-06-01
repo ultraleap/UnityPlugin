@@ -21,13 +21,11 @@ namespace Leap.Unity.GraphicalRenderer {
 
   [LeapGraphicTag("Text")]
   [Serializable]
-  public class LeapTextRenderer : LeapRenderingMethod<LeapTextGraphic>,
-  ISupportsFeature<LeapRuntimeTintFeature> {
+  public class LeapTextRenderer : LeapRenderingMethod<LeapTextGraphic> {
     public const string DEFAULT_FONT = "Arial.ttf";
     public const string DEFAULT_SHADER = "LeapMotion/GraphicRenderer/Text/Dynamic";
     public const float SCALE_CONSTANT = 0.001f;
 
-    [Header("Text Settings")]
     [EditTimeOnly, SerializeField]
     private Font _font;
 
@@ -61,10 +59,6 @@ namespace Leap.Unity.GraphicalRenderer {
 
     public override SupportInfo GetSpaceSupportInfo(LeapSpace space) {
       return SupportInfo.FullSupport();
-    }
-
-    public void GetSupportInfo(List<LeapRuntimeTintFeature> features, List<SupportInfo> info) {
-      SupportUtil.OnlySupportFirstFeature<LeapRuntimeTintFeature>(info);
     }
 
     public override void OnEnableRenderer() {
@@ -176,7 +170,7 @@ namespace Leap.Unity.GraphicalRenderer {
       Undo.RecordObject(_material, "Touched material");
 #endif
 
-      //_material.mainTexture = _font.material.mainTexture;
+      _material.mainTexture = _font.material.mainTexture;
       _material.name = "Font material";
       _material.shader = _shader;
 
@@ -212,6 +206,27 @@ namespace Leap.Unity.GraphicalRenderer {
       _font.RequestCharactersInTexture(graphic.text,
                                        scaledFontSize,
                                        graphic.fontStyle);
+
+      //Check for characters not found in the font
+      {
+        HashSet<char> unfoundCharacters = null;
+        CharacterInfo info;
+        foreach (var character in graphic.text) {
+          if (character == '\n') {
+            continue;
+          }
+
+          if (unfoundCharacters != null && unfoundCharacters.Contains(character)) {
+            continue;
+          }
+
+          if (!_font.GetCharacterInfo(character, out info, scaledFontSize, graphic.fontStyle)) {
+            if (unfoundCharacters == null) unfoundCharacters = new HashSet<char>();
+            unfoundCharacters.Add(character);
+            Debug.LogError("Could not find character [" + character + "] in font " + _font + "!");
+          }
+        }
+      }
 
       var textGraphic = graphic as LeapTextGraphic;
       var text = textGraphic.text;
