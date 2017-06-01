@@ -173,7 +173,7 @@ namespace Leap.Unity.Interaction {
     private Vector3 _prevPosition = Vector3.zero;
     public Vector3 transformVelocity {
       get {
-        return (this.transform.position - _prevPosition) / Time.deltaTime;
+        return (this.transform.position - _prevPosition) / Time.fixedDeltaTime;
       }
     }
 
@@ -255,8 +255,6 @@ namespace Leap.Unity.Interaction {
       #if UNITY_EDITOR
       refreshInteractionControllers();
       #endif
-
-      _prevPosition = this.transform.position;
     }
 
     void FixedUpdate() {
@@ -292,6 +290,7 @@ namespace Leap.Unity.Interaction {
       }
 
       OnPostPhysicalUpdate();
+      _prevPosition = this.transform.position;
     }
 
     void LateUpdate() {
