@@ -21,8 +21,7 @@ namespace Leap.Unity.GraphicalRenderer {
 
   [LeapGraphicTag("Text")]
   [Serializable]
-  public class LeapTextRenderer : LeapRenderingMethod<LeapTextGraphic>,
-  ISupportsFeature<LeapRuntimeTintFeature> {
+  public class LeapTextRenderer : LeapRenderingMethod<LeapTextGraphic> {
     public const string DEFAULT_FONT = "Arial.ttf";
     public const string DEFAULT_SHADER = "LeapMotion/GraphicRenderer/Text/Dynamic";
     public const float SCALE_CONSTANT = 0.001f;
@@ -60,10 +59,6 @@ namespace Leap.Unity.GraphicalRenderer {
 
     public override SupportInfo GetSpaceSupportInfo(LeapSpace space) {
       return SupportInfo.FullSupport();
-    }
-
-    public void GetSupportInfo(List<LeapRuntimeTintFeature> features, List<SupportInfo> info) {
-      SupportUtil.OnlySupportFirstFeature<LeapRuntimeTintFeature>(info);
     }
 
     public override void OnEnableRenderer() {
