@@ -54,12 +54,12 @@ namespace Leap.Unity.Interaction {
         string message;
         if (pluralObjects) {
           message = "One or more of the currently selected interaction objects have no "
-                  + "colliders. Interaction objects without any Colliders will not be "
-                  + "able to be grasped or touched.";
+                  + "colliders. Interaction objects without any Colliders cannot be "
+                  + "interacted with.";
         }
         else {
           message = "This interaction object has no Colliders. Interaction objects "
-                  + "without any Colliders will not be able to be grasped or touched.";
+                  + "without any Colliders cannot be interacted with.";
         }
 
         EditorGUILayout.HelpBox(message, MessageType.Warning);
