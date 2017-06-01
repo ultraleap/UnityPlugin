@@ -131,7 +131,13 @@ namespace Leap.Unity.GraphicalRenderer {
 
       Rect rect = EditorGUILayout.GetControlRect();
 
-      EditorGUI.LabelField(rect, "Resolution");
+      GUIContent resolutionContent = new GUIContent("Resolution");
+      if(mainType == LeapPanelGraphic.ResolutionType.Vertices) {
+        resolutionContent.tooltip = "How many vertices this panel should have in the x and y direction.  These values ignore the edges (0 is a valid resolution).";
+      } else {
+        resolutionContent.tooltip = "How many vertices this panel should spawn relative to the width and height of the panel.  The panel will always have enough vertices to form a quad.";
+      }
+      EditorGUI.LabelField(rect, resolutionContent);
 
       rect.x += EditorGUIUtility.labelWidth - 2;
       rect.width -= EditorGUIUtility.labelWidth;
