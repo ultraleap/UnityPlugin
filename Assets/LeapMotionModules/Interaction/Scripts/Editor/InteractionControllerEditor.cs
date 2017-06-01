@@ -38,8 +38,8 @@ namespace Leap.Unity.Interaction {
         }
 
         if (singleTarget.intHand != null) {
-          for (int i = 0; i < singleTarget.intHand.primaryHoverFingertips.Length; i++) {
-            if (singleTarget.intHand.primaryHoverFingertips[i]) {
+          for (int i = 0; i < singleTarget.intHand.enabledPrimaryHoverFingertips.Length; i++) {
+            if (singleTarget.intHand.enabledPrimaryHoverFingertips[i]) {
               anyPrimaryHoverPoints = true;
               break;
             }

@@ -15,6 +15,8 @@ namespace Leap.Unity.Interaction {
 
   public interface IInternalInteractionController {
 
+    void FixedUpdateController();
+
     bool CheckHoverEnd(out HashSet<IInteractionBehaviour> hoverEndedObjects);
     bool CheckHoverBegin(out HashSet<IInteractionBehaviour> hoverBeganObjects);
     bool CheckHoverStay(out HashSet<IInteractionBehaviour> hoveredObjects);

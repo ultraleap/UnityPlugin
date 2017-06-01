@@ -47,7 +47,7 @@ namespace Leap.Unity.Interaction {
     /// enable the fingertips you'd like users to be able to use to choose and push a
     /// button, but keep in mind you pay distance check costs for each fingertip enabled!
     /// </summary>
-    public bool[] primaryHoverFingertips = new bool[5];
+    public bool[] enabledPrimaryHoverFingertips = new bool[5];
 
     private LeapProvider _leapProvider;
     /// <summary>
@@ -99,7 +99,7 @@ namespace Leap.Unity.Interaction {
     private Hand _hand;
 
     protected virtual void Reset() {
-      primaryHoverFingertips = new bool[] { true, true, true, false, false };
+      enabledPrimaryHoverFingertips = new bool[] { true, true, true, false, false };
     }
 
     protected override void Start() {
@@ -247,6 +247,19 @@ namespace Leap.Unity.Interaction {
       grabClassifier.UnregisterInteractionBehaviour(intObj);
     }
 
+    protected override void fixedUpdateController() {
+      // Transform the hand ahead if the manager is in a moving reference frame.
+      if (manager.hasMovingFrameOfReference) {
+        Vector3 transformAheadPosition;
+        Quaternion transformAheadRotation;
+        manager.TransformAheadByFixedUpdate(_unwarpedHandData.PalmPosition.ToVector3(),
+                                            _unwarpedHandData.Rotation.ToQuaternion(),
+                                            out transformAheadPosition,
+                                            out transformAheadRotation);
+        _unwarpedHandData.SetTransform(transformAheadPosition, transformAheadRotation);
+      }
+    }
+
     #endregion
 
     #region Hovering Controller Implementation
@@ -283,8 +296,8 @@ namespace Leap.Unity.Interaction {
     }
 
     private void refreshPrimaryHoverPoints() {
-      for (int i = 0; i < primaryHoverFingertips.Length; i++) {
-        if (primaryHoverFingertips[i]) {
+      for (int i = 0; i < enabledPrimaryHoverFingertips.Length; i++) {
+        if (enabledPrimaryHoverFingertips[i]) {
           _fingertipTransforms[i] = _backingFingertipTransforms[i];
 
           Finger finger = leapHand.Fingers[i];
@@ -299,20 +312,20 @@ namespace Leap.Unity.Interaction {
 
     protected override void unwarpColliders(Transform primaryHoverPoint,
                                             ISpaceComponent warpedSpaceElement) {
-      // Extension method calculates "unwarped" pose, both in world space.
-      Vector3 unwarpedPosition;
+      // Extension method calculates "unwarped" pose in world space.
+      Vector3    unwarpedPosition;
       Quaternion unwarpedRotation;
       warpedSpaceElement.anchor.transformer.WorldSpaceUnwarp(primaryHoverPoint.position, 
-                                                              primaryHoverPoint.rotation,
-                                                              out unwarpedPosition,
-                                                              out unwarpedRotation);
+                                                             primaryHoverPoint.rotation,
+                                                             out unwarpedPosition,
+                                                             out unwarpedRotation);
         
-      // First shift the hand to be centered on the fingertip position so that
-      // rotations applied to the hand pivot around the fingertip, then apply the rest
-      // of the transformation.
+      // First shift the hand to be centered on the fingertip position so that rotations
+      // applied to the hand will pivot around the fingertip, then apply the rest of the
+      // transformation.
       _unwarpedHandData.Transform(-primaryHoverPoint.position, Quaternion.identity);
       _unwarpedHandData.Transform(unwarpedPosition, unwarpedRotation
-                                              * Quaternion.Inverse(primaryHoverPoint.rotation));
+                                                    * Quaternion.Inverse(primaryHoverPoint.rotation));
 
       // Hand data was modified, so refresh point data.
       refreshPointDataFromHand();
@@ -652,7 +665,7 @@ namespace Leap.Unity.Interaction {
 
         // Primary Hover Points
         for (int i = 0; i < NUM_FINGERS; i++) {
-          if (primaryHoverFingertips[i]) {
+          if (enabledPrimaryHoverFingertips[i]) {
             drawPrimaryHoverPoint(drawer, _testHand.Fingers[i].TipPosition.ToVector3());
           }
         }

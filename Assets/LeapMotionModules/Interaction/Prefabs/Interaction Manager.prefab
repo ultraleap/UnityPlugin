@@ -1819,7 +1819,7 @@ MonoBehaviour:
   _contactEnabled: 1
   _graspingEnabled: 1
   _handDataMode: 0
-  primaryHoverFingertips: 0101010000
+  enabledPrimaryHoverFingertips: 0101010000
 --- !u!114 &114626465001590180
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1985,7 +1985,7 @@ MonoBehaviour:
   _contactEnabled: 1
   _graspingEnabled: 1
   _handDataMode: 1
-  primaryHoverFingertips: 0101010000
+  enabledPrimaryHoverFingertips: 0101010000
 --- !u!114 &114876551195846980
 MonoBehaviour:
   m_ObjectHideFlags: 1

@@ -207,8 +207,10 @@ namespace Leap.Unity.Interaction {
     /// Called by the InteractionManager every fixed (physics) frame to populate the
     /// Interaction Hand with state from the Leap hand and perform bookkeeping operations.
     /// </summary>
-    public void FixedUpdateController() {
+    void IInternalInteractionController.FixedUpdateController() {
       using (new ProfilerSample("Fixed Update InteractionController", contactBoneParent)) {
+        fixedUpdateController();
+
         if (hoverEnabled)    fixedUpdateHovering();
         if (contactEnabled)  fixedUpdateContact();
         if (graspingEnabled) fixedUpdateGrasping();
@@ -228,6 +230,8 @@ namespace Leap.Unity.Interaction {
     /// Interaction Manager anymore.
     /// </summary>
     protected abstract void onObjectUnregistered(IInteractionBehaviour intObj);
+
+    protected virtual void fixedUpdateController() { }
 
     #region Hovering
 
@@ -373,13 +377,14 @@ namespace Leap.Unity.Interaction {
         refreshHoverStateBuffers();
         refreshPrimaryHoverStateBuffers();
 
-        // Support interactions in curved ("warped") space.
+        // Support interactions in curved ("warped") space by "unwarping" hands into
+        // the curved space's physics (rectilinear) space.
         if (isTracked && isPrimaryHovering) {
           ISpaceComponent space = primaryHoveredObject.space;
 
           if (space != null
-              && space.anchor != null
-              && space.anchor.space != null) {
+           && space.anchor != null
+           && space.anchor.space != null) {
             unwarpColliders(primaryHoverPoints[_primaryHoverPointIdx], space);
           }
         }
@@ -920,9 +925,10 @@ namespace Leap.Unity.Interaction {
 
     private void updateContactBone(int contactBoneIndex, Vector3 targetPosition, Quaternion targetRotation) {
       ContactBone contactBone = contactBones[contactBoneIndex];
-      Rigidbody   body = contactBone.rigidbody;
+      Rigidbody body = contactBone.rigidbody;
 
-      manager.transformAheadByFixedUpdate(targetPosition, targetRotation, out targetPosition, out targetRotation);
+      // Infer ahead if the Interaction Manager has a moving frame of reference.
+      //manager.TransformAheadByFixedUpdate(targetPosition, targetRotation, out targetPosition, out targetRotation);
 
       // Set a fixed rotation for bones; otherwise most friction is lost
       // as any capsule or spherical bones will roll on contact.

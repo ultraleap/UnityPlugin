@@ -276,6 +276,10 @@ namespace Leap.Unity.Interaction {
     void Reset() {
       contactForceMode = ContactForceMode.UI;
       graspedMovementType = GraspedMovementType.Nonkinematic;
+
+      if (rigidbody != null) {
+        rigidbody.useGravity = false;
+      }
     }
   }
 }

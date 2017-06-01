@@ -36,6 +36,10 @@ namespace Leap.Unity.Interaction {
     public event Action<Vector3, Quaternion> OnTrackingDataUpdate = (position, rotation) => { };
 
     void FixedUpdate() {
+      updateTrackingData();
+    }
+
+    void updateTrackingData() {
       if (_isVRNodeSet) {
 
         var position = InputTracking.GetLocalPosition(vrNode);

@@ -1,5 +1,0 @@
-This example will contain missing scripts until you
-download and import the Graphic Renderer package.
-
-You can download Leap Motion's Graphic Renderer here:
-https://developer.leapmotion.com/unity

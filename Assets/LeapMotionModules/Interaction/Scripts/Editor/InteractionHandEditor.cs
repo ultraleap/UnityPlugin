@@ -27,7 +27,7 @@ namespace Leap.Unity.Interaction {
       
       _handTex = EditorResources.Load<Texture2D>("HandTex");
 
-      specifyCustomDrawer("primaryHoverFingertips", drawPrimaryHoverFingertipsEditor);
+      specifyCustomDrawer("enabledPrimaryHoverFingertips", drawPrimaryHoverFingertipsEditor);
     }
 
     private void drawPrimaryHoverFingertipsEditor(SerializedProperty property) {
@@ -86,14 +86,14 @@ namespace Leap.Unity.Interaction {
                                           + new Vector2(offCenterPosImgSpace.x * _handTexRect.width,
                                                         offCenterPosImgSpace.y * _handTexRect.height)),
 
-                           targetHand.primaryHoverFingertips[fingerIndex])) {
+                           targetHand.enabledPrimaryHoverFingertips[fingerIndex])) {
         foreach (var singleTarget in targetHands) {
-          serializedObject.FindProperty("primaryHoverFingertips").GetArrayElementAtIndex(fingerIndex).boolValue = true;
+          serializedObject.FindProperty("enabledPrimaryHoverFingertips").GetArrayElementAtIndex(fingerIndex).boolValue = true;
         }
       }
       else {
         foreach (var singleTarget in targetHands) {
-          serializedObject.FindProperty("primaryHoverFingertips").GetArrayElementAtIndex(fingerIndex).boolValue = false;
+          serializedObject.FindProperty("enabledPrimaryHoverFingertips").GetArrayElementAtIndex(fingerIndex).boolValue = false;
         }
       }
     }

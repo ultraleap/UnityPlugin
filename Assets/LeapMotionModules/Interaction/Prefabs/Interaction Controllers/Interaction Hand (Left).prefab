@@ -56,4 +56,4 @@ MonoBehaviour:
   _contactEnabled: 1
   _graspingEnabled: 1
   _handDataMode: 0
-  primaryHoverFingertips: 0101010000
+  enabledPrimaryHoverFingertips: 0101010000

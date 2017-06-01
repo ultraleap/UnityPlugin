@@ -136,9 +136,20 @@ namespace Leap.Unity.Interaction {
     /// </summary>
     public float SimulationScale { get { return _scale; } }
 
-    private HashSet<IInteractionBehaviour> _interactionBehaviours = new HashSet<IInteractionBehaviour>();
+    private HashSet<IInteractionBehaviour> _interactionObjects = new HashSet<IInteractionBehaviour>();
+    /// <summary>
+    /// Gets a set of all interaction objects currently registered with this Interaction 
+    /// Manager.
+    /// </summary>
+    public ReadonlyHashSet<IInteractionBehaviour> interactionObjects {
+      get { return _interactionObjects; }
+    }
 
     private Dictionary<Rigidbody, IInteractionBehaviour> _interactionObjectBodies;
+    /// <summary>
+    /// Maps a Rigidbody to its attached interaction object, if the Rigidbody is part of
+    /// and interaction object.
+    /// </summary>
     public Dictionary<Rigidbody, IInteractionBehaviour> interactionObjectBodies {
       get {
         if (_interactionObjectBodies == null) {
@@ -149,6 +160,10 @@ namespace Leap.Unity.Interaction {
     }
 
     private Dictionary<Rigidbody, ContactBone> _contactBoneBodies;
+    /// <summary>
+    /// Maps a Rigidbody to its attached ContactBone, if the Rigidbody is part of an 
+    /// interaction controller.
+    /// </summary>
     public Dictionary<Rigidbody, ContactBone> contactBoneBodies {
       get {
         if (_contactBoneBodies == null) {
@@ -156,31 +171,6 @@ namespace Leap.Unity.Interaction {
         }
         return _contactBoneBodies;
       }
-    }
-
-    /// <summary>
-    /// Stores data for implementing Soft Contact for interaction controllers.
-    /// </summary>
-    [NonSerialized]
-    public List<PhysicsUtility.SoftContact> _softContacts = new List<PhysicsUtility.SoftContact>(80);
-    /// <summary>
-    /// Stores data for implementing Soft Contact for interaction controllers.
-    /// </summary>
-    [NonSerialized]
-    public Dictionary<Rigidbody, PhysicsUtility.Velocities> _softContactOriginalVelocities = new Dictionary<Rigidbody, PhysicsUtility.Velocities>(5);
-
-    // Support for moving Transform parents.
-    private Vector3 _prevPosition = Vector3.zero;
-    private Quaternion _prevRotation = Quaternion.identity;
-    /// <summary>
-    /// Transforms a position+rotation ahead by one FixedUpdate based on the prior motion of the InteractionManager.
-    /// Use this if your Player/InteractionManager's frame of reference is moving.
-    /// </summary>
-    public void transformAheadByFixedUpdate(Vector3 position, Quaternion rotation, out Vector3 newPosition, out Quaternion newRotation) {
-      Vector3 worldDisplacement = this.transform.position - _prevPosition;
-      Quaternion worldRotation = transform.rotation * Quaternion.Inverse(_prevRotation);
-      newPosition = ((worldRotation * (position - transform.position + worldDisplacement))) + transform.position;
-      newRotation = worldRotation * rotation;
     }
 
     private static InteractionManager s_instance;
@@ -282,7 +272,7 @@ namespace Leap.Unity.Interaction {
 
         // Perform each interaction object's FixedUpdateObject.
         using (new ProfilerSample("FixedUpdateObject per-InteractionBehaviour")) {
-          foreach (var interactionObj in _interactionBehaviours) {
+          foreach (var interactionObj in _interactionObjects) {
             interactionObj.FixedUpdateObject();
           }
         }
@@ -297,8 +287,8 @@ namespace Leap.Unity.Interaction {
       }
 
       OnPostPhysicalUpdate();
-      _prevPosition = this.transform.position;
-      _prevRotation = this.transform.rotation;
+
+      updateMovingFrameOfReferenceSupport();
     }
 
     void LateUpdate() {
@@ -333,7 +323,7 @@ namespace Leap.Unity.Interaction {
         // representations.
         foreach (var controller in _activeControllersBuffer) {
           if (!controller.isActiveAndEnabled) continue;
-          controller.FixedUpdateController();
+          (controller as IInternalInteractionController).FixedUpdateController();
         }
       }
 
@@ -685,7 +675,7 @@ namespace Leap.Unity.Interaction {
     #region Object Registration
 
     public void RegisterInteractionBehaviour(IInteractionBehaviour interactionObj) {
-      _interactionBehaviours.Add(interactionObj);
+      _interactionObjects.Add(interactionObj);
       interactionObjectBodies[interactionObj.rigidbody] = interactionObj;
     }
 
@@ -695,7 +685,7 @@ namespace Leap.Unity.Interaction {
     /// Behaviour registered after calling this method.
     /// </summary>
     public bool UnregisterInteractionBehaviour(IInteractionBehaviour interactionObj) {
-      bool wasRemovalSuccessful = _interactionBehaviours.Remove(interactionObj);
+      bool wasRemovalSuccessful = _interactionObjects.Remove(interactionObj);
       if (wasRemovalSuccessful) {
         foreach (var intController in _interactionControllers) {
           intController.ReleaseObject(interactionObj);
@@ -708,12 +698,63 @@ namespace Leap.Unity.Interaction {
     }
 
     public bool IsBehaviourRegistered(IInteractionBehaviour interactionObj) {
-      return _interactionBehaviours.Contains(interactionObj);
+      return _interactionObjects.Contains(interactionObj);
+    }
+
+    #endregion
+
+    #region Moving Frame of Reference Support
+
+    public bool hasMovingFrameOfReference {
+      get {
+        return (this.transform.position - _prevPosition).magnitude > 0.0001F
+            || Quaternion.Angle(transform.rotation * Quaternion.Inverse(_prevRotation),
+                                Quaternion.identity) > 0.01F;
+      }
+    }
+
+    // Support for a moving frame of reference.
+    private Vector3    _prevPosition = Vector3.zero;
+    private Quaternion _prevRotation = Quaternion.identity;
+
+    private void updateMovingFrameOfReferenceSupport() {
+      _prevPosition = this.transform.position;
+      _prevRotation = this.transform.rotation;
+    }
+
+    /// <summary>
+    /// Transforms a position and rotation ahead by one FixedUpdate based on the prior
+    /// motion of the InteractionManager. Use this if your player/InteractionManager's
+    /// frame of reference is moving.
+    /// </summary>
+    public void TransformAheadByFixedUpdate(Vector3 position, Quaternion rotation, out Vector3 newPosition, out Quaternion newRotation) {
+      Vector3    worldDisplacement = this.transform.position - _prevPosition;
+      Quaternion worldRotation     = this.transform.rotation * Quaternion.Inverse(_prevRotation);
+      newPosition = ((worldRotation * (position - this.transform.position + worldDisplacement))) + this.transform.position;
+      newRotation = worldRotation * rotation;
     }
 
     #endregion
 
     #region Internal
+
+    #region Soft Contact Support
+
+    /// <summary>
+    /// Stores data for implementing Soft Contact for interaction controllers.
+    /// </summary>
+    [NonSerialized]
+    public List<PhysicsUtility.SoftContact> _softContacts = new List<PhysicsUtility.SoftContact>(80);
+
+    /// <summary>
+    /// Stores data for implementing Soft Contact for interaction controllers.
+    /// </summary>
+    [NonSerialized]
+    public Dictionary<Rigidbody, PhysicsUtility.Velocities> _softContactOriginalVelocities = new Dictionary<Rigidbody, PhysicsUtility.Velocities>(5);
+
+    #endregion
+
+    #region Interaction Controllers
 
     private void refreshInteractionControllers() {
       _interactionControllers.Clear();
@@ -725,6 +766,10 @@ namespace Leap.Unity.Interaction {
         _interactionControllers.Add(controller);
       }
     }
+
+    #endregion
+
+    #region Layers
 
     protected void generateAutomaticLayers() {
       _interactionLayer = -1;
@@ -771,6 +816,8 @@ namespace Leap.Unity.Interaction {
       //After copy and set we enable the interaction between the brushes and interaction objects
       Physics.IgnoreLayerCollision(_contactBoneLayer, _interactionLayer, false);
     }
+
+    #endregion
 
     #endregion
 
