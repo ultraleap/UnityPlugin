@@ -948,7 +948,8 @@ namespace Leap.Unity.Interaction {
       // by setting its target velocity and angular velocity. Include a "deadzone"
       // for position to avoid tiny vibrations.
       float deadzone = Mathf.Min(DEAD_ZONE_FRACTION * contactBone.width, 0.01F * scale);
-      Vector3 delta = targetPosition - body.position;
+      Vector3 delta = (targetPosition - body.position)
+                    + (manager.transformVelocity * Time.fixedDeltaTime);
       float deltaMag = delta.magnitude;
       if (deltaMag <= deadzone) {
         body.velocity = Vector3.zero;

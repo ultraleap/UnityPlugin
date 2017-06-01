@@ -169,6 +169,14 @@ namespace Leap.Unity.Interaction {
     [NonSerialized]
     public Dictionary<Rigidbody, PhysicsUtility.Velocities> _softContactOriginalVelocities = new Dictionary<Rigidbody, PhysicsUtility.Velocities>(5);
 
+    // Support for moving Transform parents.
+    private Vector3 _prevPosition = Vector3.zero;
+    public Vector3 transformVelocity {
+      get {
+        return (this.transform.position - _prevPosition) / Time.deltaTime;
+      }
+    }
+
     private static InteractionManager s_instance;
     /// <summary> Often, only one InteractionManager is necessary per Unity scene.
     /// This property will contain that InteractionManager as soon as its Awake()
@@ -214,6 +222,8 @@ namespace Leap.Unity.Interaction {
         setupAutomaticCollisionLayers();
       }
 
+      _prevPosition = this.transform.position;
+
       #if UNITY_EDITOR
       if (_drawControllerRuntimeGizmos == true) {
         if (FindObjectOfType<RuntimeGizmoManager>() == null) {
@@ -241,11 +251,13 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    #if UNITY_EDITOR
     void Update() {
+      #if UNITY_EDITOR
       refreshInteractionControllers();
+      #endif
+
+      _prevPosition = this.transform.position;
     }
-    #endif
 
     void FixedUpdate() {
       OnPrePhysicalUpdate();
