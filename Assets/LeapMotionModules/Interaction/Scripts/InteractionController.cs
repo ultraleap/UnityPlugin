@@ -840,14 +840,7 @@ namespace Leap.Unity.Interaction {
 
     private void finishInitContact() {
       contactBoneParent.layer = manager.contactBoneLayer;
-
-      // Try to intelligently set the Interaction Manager parent.
-      if (manager.transform.parent == null) {
-        contactBoneParent.transform.parent = null;
-      }
-      else {
-        contactBoneParent.transform.parent = manager.transform.parent.parent;
-      }
+      contactBoneParent.transform.parent = manager.transform;
 
       var comment = contactBoneParent.GetComponent<ContactBoneParent>();
       if (comment == null) {
