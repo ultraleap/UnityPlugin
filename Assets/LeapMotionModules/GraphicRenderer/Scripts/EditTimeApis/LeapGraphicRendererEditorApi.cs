@@ -194,6 +194,12 @@ namespace Leap.Unity.GraphicalRenderer {
 
         using (new ProfilerSample("Calculate Should Rebuild")) {
           foreach (var group in _renderer._groups) {
+#if UNITY_EDITOR
+            if (!Application.isPlaying) {
+              group.editor.ValidateGraphicList();
+            }
+#endif
+
             foreach (var graphic in group.graphics) {
               if (graphic.isRepresentationDirty) {
                 needsRebuild = true;
