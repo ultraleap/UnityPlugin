@@ -1124,6 +1124,7 @@ GameObject:
   m_Component:
   - component: {fileID: 210432285}
   - component: {fileID: 210432284}
+  - component: {fileID: 210432286}
   m_Layer: 0
   m_Name: Main Control Panel Text
   m_TagString: Untagged
@@ -1180,6 +1181,21 @@ Transform:
   m_Father: {fileID: 1319112419}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &210432286
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 210432283}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e58d7e2b630ea5c448aa5f9f515e29eb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  textGraphic: {fileID: 210432284}
+  prefixText: 'Current Speed: '
+  ship: {fileID: 1268022672}
+  postfixText: ' m/s'
 --- !u!1 &215917219
 GameObject:
   m_ObjectHideFlags: 0
@@ -4906,8 +4922,8 @@ MonoBehaviour:
     _graphics:
     - {fileID: 210432284}
     _supportInfo:
-    - support: 0
-      message: 
+    - support: 2
+      message: This renderer does not support this feature.
     _addRemoveSupported: 0
 --- !u!114 &1072707723
 MonoBehaviour:
@@ -5177,7 +5193,7 @@ Transform:
   - {fileID: 354232631}
   - {fileID: 1913301697}
   - {fileID: 1924829189}
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 1268022671}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1200891188
@@ -5186,7 +5202,7 @@ MonoBehaviour:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1200891185}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f620869389aec5147a6ea693d8e38491, type: 3}
   m_Name: 
@@ -5428,6 +5444,7 @@ Transform:
   m_Children:
   - {fileID: 4568074}
   - {fileID: 201659379}
+  - {fileID: 1200891187}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

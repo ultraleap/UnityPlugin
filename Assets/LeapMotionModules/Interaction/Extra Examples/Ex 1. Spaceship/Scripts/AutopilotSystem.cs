@@ -13,16 +13,14 @@ public class AutopilotSystem : MonoBehaviour {
 
   public void IncreaseSpeed() {
     _targetSpeed += 5F;
-
-    Debug.Log("OK! Target speed is currently " + _targetSpeed);
   }
 
-  private float _speedErrorSum = 0F;
-  private float _lastSpeedError = 0F;
+  //private float _speedErrorSum = 0F;
+  //private float _lastSpeedError = 0F;
 
-  private float kP = -1.0F;
-  private float kI = -0.5F;
-  private float kD = -3.0F;
+  //private float kP = -1.0F;
+  //private float kI = -0.5F;
+  //private float kD = -3.0F;
 
   void Update() {
     // Simple PID on throttle output to get to target speed

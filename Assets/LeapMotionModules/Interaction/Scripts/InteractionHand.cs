@@ -152,6 +152,11 @@ namespace Leap.Unity.Interaction {
       leapProvider.OnFixedFrame -= onProviderFixedFrame; // avoid double-subscribe
       leapProvider.OnFixedFrame += onProviderFixedFrame;
 
+      // Set up hover point Transform for the palm.
+      Transform palmTransform = new GameObject("Palm Transform").transform;
+      palmTransform.parent = this.transform;
+      _backingHoverPointTransform = palmTransform;
+
       // Set up primary hover point Transforms for the fingertips. We'll only use
       // some of them, depending on user settings.
       for (int i = 0; i < 5; i++) {
@@ -246,9 +251,15 @@ namespace Leap.Unity.Interaction {
 
     #region Hovering Controller Implementation
 
+    private Transform _backingHoverPointTransform = null;
     public override Vector3 hoverPoint {
       get {
-        return leapHand.PalmPosition.ToVector3();
+        if (_backingHoverPointTransform == null) {
+          return leapHand.PalmPosition.ToVector3();
+        }
+        else {
+          return _backingHoverPointTransform.position;
+        }
       }
     }
 
@@ -261,8 +272,14 @@ namespace Leap.Unity.Interaction {
     }
 
     private void refreshPointDataFromHand() {
+      refreshHoverPoint();
       refreshPrimaryHoverPoints();
       refreshGraspManipulatorPoints();
+    }
+
+    private void refreshHoverPoint() {
+      _backingHoverPointTransform.position = leapHand.PalmPosition.ToVector3();
+      _backingHoverPointTransform.rotation = leapHand.Rotation.ToQuaternion();
     }
 
     private void refreshPrimaryHoverPoints() {

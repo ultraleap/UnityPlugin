@@ -840,7 +840,14 @@ namespace Leap.Unity.Interaction {
 
     private void finishInitContact() {
       contactBoneParent.layer = manager.contactBoneLayer;
-      contactBoneParent.transform.parent = null;
+
+      // Try to intelligently set the Interaction Manager parent.
+      if (manager.transform.parent == null) {
+        contactBoneParent.transform.parent = null;
+      }
+      else {
+        contactBoneParent.transform.parent = manager.transform.parent.parent;
+      }
 
       var comment = contactBoneParent.GetComponent<ContactBoneParent>();
       if (comment == null) {
@@ -1014,6 +1021,8 @@ namespace Leap.Unity.Interaction {
                                                               manager.interactionLayer.layerMask,
                                                               QueryTriggerInteraction.Ignore);
             for (int i = 0; i < numCollisions; i++) {
+              NotifySoftContactOverlap(contactBone, _softContactColliderBuffer[i]);
+
               PhysicsUtility.generateSphereContact(boneSphere, 0, _softContactColliderBuffer[i],
                                                    ref manager._softContacts,
                                                    ref manager._softContactOriginalVelocities);
@@ -1031,6 +1040,7 @@ namespace Leap.Unity.Interaction {
                                                                manager.interactionLayer.layerMask,
                                                                QueryTriggerInteraction.Ignore);
             for (int i = 0; i < numCollisions; i++) {
+              NotifySoftContactOverlap(contactBone, _softContactColliderBuffer[i]);
 
               PhysicsUtility.generateCapsuleContact(boneCapsule, 0,
                                                     _softContactColliderBuffer[i],
@@ -1055,12 +1065,17 @@ namespace Leap.Unity.Interaction {
                                                            manager.interactionLayer.layerMask,
                                                            QueryTriggerInteraction.Ignore);
             for (int i = 0; i < numCollisions; i++) {
+              NotifySoftContactOverlap(contactBone, _softContactColliderBuffer[i]);
+
               PhysicsUtility.generateBoxContact(boneBox, 0, _softContactColliderBuffer[i],
                                                 ref manager._softContacts,
                                                 ref manager._softContactOriginalVelocities);
             }
           }
         }
+
+        // TODO: Implement me to replace trigger colliders
+        FinishSoftContactOverlapChecks();
 
         //for (int i = 0; i < contactBones.Length; i++) {
         //  Vector3 bonePosition = _boneTargetPositions[i];
@@ -1161,6 +1176,16 @@ namespace Leap.Unity.Interaction {
     }
 
     #region Soft Contact Collision Tracking
+
+    // TODO: Make this a thing so we aren't using triggers
+    private void NotifySoftContactOverlap(ContactBone contactBone, Collider otherCollider) {
+
+    }
+
+    // TODO: Make this a thing so we aren't using triggers
+    private void FinishSoftContactOverlapChecks() {
+
+    }
 
     // TODO: Maintaining a reference to the interaction object doesn't appear to be
     // necessary here, so get rid of the Pair class as a small optimization

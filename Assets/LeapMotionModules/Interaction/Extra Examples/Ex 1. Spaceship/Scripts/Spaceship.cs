@@ -1,5 +1,6 @@
 ﻿using Leap.Unity;
 using Leap.Unity.Interaction;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -12,23 +13,33 @@ public class Spaceship : MonoBehaviour {
   #endif
   Rigidbody rigidbody { get { return _body; } }
 
-  public Vector3 velocity { get { return _velocity; } set { _velocity = value; } }
-
-  private Vector3 _velocity;
-  private Vector3 _angularVelocity;
+  private Rigidbody _body;
   private float _mass = 10F;
 
-  private Rigidbody _body;
-  private Vector3 _accumulatedForce;
-  private Vector3 _accumulatedTorque;
+  private Vector3 _velocity;
+  public Vector3 velocity {
+    get { return _velocity; }
+    set { _velocity = value; }
+  }
 
-  public Vector3 ShipAlignedAngularVelocity {
+  public Vector3 shipAlignedVelocity {
+    get { return Quaternion.Inverse(this.transform.rotation) * _velocity; }
+  }
+
+  private Vector3 _angularVelocity;
+  public Vector3 angularVelocity {
+    get { return _angularVelocity; }
+    set { _angularVelocity = value; }
+  }
+
+  public Vector3 shipAlignedAngularVelocity {
     get { return Quaternion.Inverse(this.transform.rotation) * _angularVelocity; }
   }
 
-  public Vector3 ShipAlignedVelocity {
-    get { return Quaternion.Inverse(this.transform.rotation) * _velocity; }
-  }
+  private Vector3 _accumulatedForce;
+  private Vector3 _accumulatedTorque;
+
+  public Action OnMovement = () => { };
 
   void Awake() {
     _body = GetComponent<Rigidbody>();
@@ -36,8 +47,43 @@ public class Spaceship : MonoBehaviour {
   }
 
   void Start() {
-    //PhysicsCallbacks.OnPrePhysics += onPrePhysics;
+    InteractionManager.instance.OnPrePhysicalUpdate += updateShipPhysics;
   }
+
+  void Update() {
+   // updateShipPhysics();
+  }
+
+  private void updateShipPhysics() {
+    // Update velocity.
+    Vector3 acceleration = _accumulatedForce / _mass;
+    _velocity += acceleration * Time.deltaTime;
+
+    this.rigidbody.velocity = _velocity;
+    _accumulatedForce = Vector3.zero;
+
+    // Update position.
+    Vector3 newPosition = this.transform.position + _velocity * Time.deltaTime;
+    //this.rigidbody.position = newPosition;
+    this.transform.position = newPosition;
+
+
+    // Update angular velocity.
+    Vector3 eulerAcceleration = _accumulatedTorque;
+    _angularVelocity += eulerAcceleration * Time.deltaTime;
+
+    this.rigidbody.angularVelocity = _angularVelocity;
+    _accumulatedTorque = Vector3.zero;
+
+    // Update rotation.
+    Quaternion newRotation = Quaternion.Euler(_angularVelocity * Time.deltaTime) * this.transform.rotation;
+    //this.rigidbody.rotation = newRotation;
+    this.transform.rotation = newRotation;
+    
+    OnMovement();
+  }
+
+  #region Ship Forces API
 
   public void AddForce(Vector3 force) {
     _accumulatedForce += force;
@@ -66,26 +112,6 @@ public class Spaceship : MonoBehaviour {
     _accumulatedForce += this.transform.rotation * shipAlignedForce;
   }
 
-  private void Update() {
-    Vector3 acceleration = _accumulatedForce / _mass;
-    _velocity += acceleration * Time.deltaTime;
-
-    this.transform.position += _velocity * Time.deltaTime;
-    this.rigidbody.velocity = _velocity;
-
-    _accumulatedForce = Vector3.zero;
-
-    //// torque + inertia tensor calculations (not working right)
-    ////Quaternion worldInertiaTensorRot = this.transform.rotation * _body.inertiaTensorRotation;
-    ////Vector3 eulerAcceleration = worldInertiaTensorRot * ((Quaternion.Inverse(worldInertiaTensorRot) * accumulatedTorque).CompDiv(Vector3.one/*_body.inertiaTensor*/));
-
-    Vector3 eulerAcceleration = _accumulatedTorque;
-    _angularVelocity += eulerAcceleration * Time.deltaTime;
-
-    this.rigidbody.angularVelocity = _angularVelocity;
-    this.transform.rotation = Quaternion.Euler(_angularVelocity * Time.deltaTime) * this.transform.rotation;
-
-    _accumulatedTorque = Vector3.zero;
-  }
+  #endregion
 
 }

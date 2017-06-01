@@ -11,30 +11,19 @@ public class FollowSpaceship : MonoBehaviour {
   public InteractionManager manager;
   
   private Vector3    _positionFromSpaceship;
-  private Quaternion _rotationFromSpaceship;
+  //private Quaternion _rotationFromSpaceship;
 
   void Start() {
-    _positionFromSpaceship = this.transform.position - spaceship.rigidbody.position;
+    _positionFromSpaceship = this.transform.position - spaceship.transform.position;
     //_rotationFromSpaceship = this.transform.rotation * Quaternion.Inverse(spaceship.rigidbody.rotation);
 
-    //manager.OnPrePhysicalUpdate += onPrePhysicalUpdate;
-    
-    //manager.OnPostPhysicalUpdate += onPostPhysicalUpdate;
+    spaceship.OnMovement += onSpaceshipMovement;
   }
 
-  private void Update() {
+  private void onSpaceshipMovement() {
     this.transform.position = spaceship.transform.position + _positionFromSpaceship;
 
-    //this.transform.position = spaceship.transform.TransformPoint(_positionFromSpaceship);
-    //this.transform.rotation = spaceship.transform.rotation * _rotationFromSpaceship;
-
-    //Hands.Provider.ReTransformFrames();
-  }
-
-  private void onPostPhysicalUpdate() {
-    //this.transform.position = (spaceship.rigidbody.position + (spaceship.velocity * Time.fixedDeltaTime)) + _positionFromSpaceship;
-
-    //Hands.Provider.ReTransformFrames();
+    Hands.Provider.ReTransformFrames();
   }
 
 }
