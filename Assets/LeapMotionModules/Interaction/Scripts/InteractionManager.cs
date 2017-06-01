@@ -171,10 +171,16 @@ namespace Leap.Unity.Interaction {
 
     // Support for moving Transform parents.
     private Vector3 _prevPosition = Vector3.zero;
-    public Vector3 transformVelocity {
-      get {
-        return (this.transform.position - _prevPosition) / Time.fixedDeltaTime;
-      }
+    private Quaternion _prevRotation = Quaternion.identity;
+    /// <summary>
+    /// Transforms a position+rotation ahead by one FixedUpdate based on the prior motion of the InteractionManager.
+    /// Use this if your Player/InteractionManager's frame of reference is moving.
+    /// </summary>
+    public void transformAheadByFixedUpdate(Vector3 position, Quaternion rotation, out Vector3 newPosition, out Quaternion newRotation) {
+      Vector3 worldDisplacement = this.transform.position - _prevPosition;
+      Quaternion worldRotation = transform.rotation * Quaternion.Inverse(_prevRotation);
+      newPosition = ((worldRotation * (position - transform.position + worldDisplacement))) + transform.position;
+      newRotation = worldRotation * rotation;
     }
 
     private static InteractionManager s_instance;
@@ -223,6 +229,7 @@ namespace Leap.Unity.Interaction {
       }
 
       _prevPosition = this.transform.position;
+      _prevRotation = this.transform.rotation;
 
       #if UNITY_EDITOR
       if (_drawControllerRuntimeGizmos == true) {
@@ -291,6 +298,7 @@ namespace Leap.Unity.Interaction {
 
       OnPostPhysicalUpdate();
       _prevPosition = this.transform.position;
+      _prevRotation = this.transform.rotation;
     }
 
     void LateUpdate() {

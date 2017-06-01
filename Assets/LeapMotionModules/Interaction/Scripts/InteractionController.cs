@@ -922,6 +922,8 @@ namespace Leap.Unity.Interaction {
       ContactBone contactBone = contactBones[contactBoneIndex];
       Rigidbody   body = contactBone.rigidbody;
 
+      manager.transformAheadByFixedUpdate(targetPosition, targetRotation, out targetPosition, out targetRotation);
+
       // Set a fixed rotation for bones; otherwise most friction is lost
       // as any capsule or spherical bones will roll on contact.
       body.MoveRotation(targetRotation);
@@ -948,8 +950,7 @@ namespace Leap.Unity.Interaction {
       // by setting its target velocity and angular velocity. Include a "deadzone"
       // for position to avoid tiny vibrations.
       float deadzone = Mathf.Min(DEAD_ZONE_FRACTION * contactBone.width, 0.01F * scale);
-      Vector3 delta = (targetPosition - body.position)
-                    + (manager.transformVelocity * Time.fixedDeltaTime);
+      Vector3 delta = (targetPosition - body.position);
       float deltaMag = delta.magnitude;
       if (deltaMag <= deadzone) {
         body.velocity = Vector3.zero;
