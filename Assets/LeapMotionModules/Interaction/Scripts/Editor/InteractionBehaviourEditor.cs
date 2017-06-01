@@ -8,6 +8,7 @@
  ******************************************************************************/
 
 using UnityEditor;
+using UnityEngine;
 
 namespace Leap.Unity.Interaction {
 
@@ -31,6 +32,38 @@ namespace Leap.Unity.Interaction {
                                 "_moveObjectWhenGrasped",
                                 "graspedMovementType",
                                 "graspHoldWarpingEnabled__curIgnored");
+    }
+
+    public override void OnInspectorGUI() {
+      checkHasColliders();
+      
+      base.OnInspectorGUI();
+    }
+
+    private void checkHasColliders() {
+      bool anyMissingColliders = false;
+      foreach (var singleTarget in targets) {
+        if (singleTarget.GetComponentsInChildren<Collider>().Length == 0) {
+          anyMissingColliders = true; break;
+        }
+      }
+
+      if (anyMissingColliders) {
+        bool pluralObjects = targets.Length > 1;
+
+        string message;
+        if (pluralObjects) {
+          message = "One or more of the currently selected interaction objects have no "
+                  + "colliders. Interaction objects without any Colliders will not be "
+                  + "able to be grasped or touched.";
+        }
+        else {
+          message = "This interaction object has no Colliders. Interaction objects "
+                  + "without any Colliders will not be able to be grasped or touched.";
+        }
+
+        EditorGUILayout.HelpBox(message, MessageType.Warning);
+      }
     }
 
     private void drawEventTable(SerializedProperty property) {
