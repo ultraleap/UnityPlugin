@@ -142,7 +142,7 @@ MonoBehaviour:
       index: 0
     _a: []
     _b:
-    - sprite: {fileID: 21300000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
+    - _sprite: {fileID: 21300000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
     _c: []
     _d: []
     _e: []
@@ -341,7 +341,7 @@ MonoBehaviour:
       index: 0
     _a: []
     _b:
-    - sprite: {fileID: 21300000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
+    - _sprite: {fileID: 21300000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
     _c: []
     _d: []
     _e: []
@@ -412,7 +412,7 @@ MonoBehaviour:
       index: 0
     _a: []
     _b:
-    - sprite: {fileID: 21300000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
+    - _sprite: {fileID: 21300000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
     _c: []
     _d: []
     _e: []
@@ -501,7 +501,7 @@ MonoBehaviour:
       index: 0
     _a: []
     _b:
-    - sprite: {fileID: 21300000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
+    - _sprite: {fileID: 21300000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
     _c: []
     _d: []
     _e: []
@@ -712,7 +712,7 @@ MonoBehaviour:
       index: 0
     _a: []
     _b:
-    - sprite: {fileID: 21300000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
+    - _sprite: {fileID: 21300000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
     _c: []
     _d: []
     _e: []
@@ -1010,7 +1010,7 @@ MonoBehaviour:
       index: 0
     _a: []
     _b:
-    - sprite: {fileID: 21300000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
+    - _sprite: {fileID: 21300000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
     _c: []
     _d: []
     _e: []
@@ -1081,7 +1081,7 @@ MonoBehaviour:
       index: 0
     _a: []
     _b:
-    - sprite: {fileID: 21300000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
+    - _sprite: {fileID: 21300000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
     _c: []
     _d: []
     _e: []
@@ -1327,7 +1327,7 @@ MonoBehaviour:
       index: 0
     _a: []
     _b:
-    - sprite: {fileID: 21300000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
+    - _sprite: {fileID: 21300000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
     _c: []
     _d: []
     _e: []
@@ -1531,7 +1531,7 @@ MonoBehaviour:
       index: 0
     _a: []
     _b:
-    - sprite: {fileID: 21300000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
+    - _sprite: {fileID: 21300000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
     _c: []
     _d: []
     _e: []
@@ -1602,7 +1602,7 @@ MonoBehaviour:
       index: 0
     _a: []
     _b:
-    - sprite: {fileID: 21300000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
+    - _sprite: {fileID: 21300000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
     _c: []
     _d: []
     _e: []
@@ -1959,7 +1959,7 @@ MonoBehaviour:
       index: 0
     _a: []
     _b:
-    - sprite: {fileID: 21300000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
+    - _sprite: {fileID: 21300000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
     _c: []
     _d: []
     _e: []
@@ -2030,7 +2030,7 @@ MonoBehaviour:
       index: 0
     _a: []
     _b:
-    - sprite: {fileID: 21300000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
+    - _sprite: {fileID: 21300000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
     _c: []
     _d: []
     _e: []
@@ -2254,7 +2254,7 @@ MonoBehaviour:
       index: 0
     _a: []
     _b:
-    - sprite: {fileID: 21300000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
+    - _sprite: {fileID: 21300000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
     _c: []
     _d: []
     _e: []
@@ -2329,7 +2329,7 @@ MonoBehaviour:
       index: 0
     _a: []
     _b:
-    - sprite: {fileID: 21300000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
+    - _sprite: {fileID: 21300000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
     _c: []
     _d: []
     _e: []
@@ -2382,7 +2382,7 @@ MonoBehaviour:
       index: 0
     _a: []
     _b:
-    - sprite: {fileID: 21300000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
+    - _sprite: {fileID: 21300000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
     _c: []
     _d: []
     _e: []
@@ -2475,7 +2475,7 @@ Camera:
     y: 0
     width: 1
     height: 1
-  near clip plane: 0.3
+  near clip plane: 0.01
   far clip plane: 1000
   field of view: 60
   orthographic: 0
