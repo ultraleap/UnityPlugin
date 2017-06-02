@@ -15,8 +15,5 @@ MonoBehaviour:
   _generateBuildDropdown: 1
   _dependantFolders:
   - Assets\LeapMotion\Core
-  _dependantFiles:
-  - Assets\LeapMotion\Core\Plugins\LeapCSharp.NET3.5.dll
-  - Assets\LeapMotion\Core\Plugins\x86\LeapC.dll
-  - Assets\LeapMotion\Core\Plugins\x86_64\LeapC.dll
+  _dependantFiles: []
   _dependantPackages: []
