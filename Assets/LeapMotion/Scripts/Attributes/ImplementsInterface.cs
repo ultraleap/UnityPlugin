@@ -18,7 +18,9 @@ namespace Leap.Unity.Attributes {
 
   public class ImplementsInterfaceAttribute : CombinablePropertyAttribute, IPropertyConstrainer {
 
+#pragma warning disable 0414
     private Type type;
+#pragma warning restore 0414
 
     public ImplementsInterfaceAttribute(Type type) {
       if (!type.IsInterface) {

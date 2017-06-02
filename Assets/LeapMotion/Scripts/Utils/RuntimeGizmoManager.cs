@@ -586,7 +586,9 @@ namespace Leap.Unity.RuntimeGizmos {
     }
 
     private List<Collider> _colliderList = new List<Collider>();
-    public void DrawColliders(GameObject gameObject, bool useWireframe = true, bool traverseHierarchy = true) {
+    public void DrawColliders(GameObject gameObject, bool useWireframe = true,
+                                                     bool traverseHierarchy = true,
+                                                     bool drawTriggers = false) {
       PushMatrix();
 
       if (traverseHierarchy) {
@@ -599,7 +601,7 @@ namespace Leap.Unity.RuntimeGizmos {
         Collider collider = _colliderList[i];
         RelativeTo(collider.transform);
 
-        if (collider.isTrigger) { continue; }
+        if (collider.isTrigger && !drawTriggers) { continue; }
 
         if (collider is BoxCollider) {
           BoxCollider box = collider as BoxCollider;

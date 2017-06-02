@@ -18,10 +18,14 @@ namespace Leap.Unity {
 
     [TextArea]
     [SerializeField]
-    private string _comment;
+    protected string _comment;
+    public string text {
+      get { return _comment; }
+      set { _comment = value; }
+    }
 
     [SerializeField, HideInInspector]
-    private bool _isEditing = true;
+    protected bool _isEditing = true;
 
 #if UNITY_EDITOR
     [ContextMenu("Edit")]
@@ -31,5 +35,6 @@ namespace Leap.Unity {
       _isEditing = true;
     }
 #endif
+
   }
 }
