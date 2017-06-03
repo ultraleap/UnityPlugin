@@ -47,7 +47,7 @@ namespace Leap.Unity.Interaction {
     /// enable the fingertips you'd like users to be able to use to choose and push a
     /// button, but keep in mind you pay distance check costs for each fingertip enabled!
     /// </summary>
-    public bool[] enabledPrimaryHoverFingertips = new bool[5];
+    public bool[] enabledPrimaryHoverFingertips = new bool[5] { true, true, true, false, false };
 
     private LeapProvider _leapProvider;
     /// <summary>

@@ -1202,7 +1202,7 @@ MonoBehaviour:
   _contactEnabled: 1
   _graspingEnabled: 1
   _handDataMode: 0
-  primaryHoverFingertips: 0101010000
+  enabledPrimaryHoverFingertips: 0101010000
 --- !u!1 &211414037
 GameObject:
   m_ObjectHideFlags: 0
@@ -2897,7 +2897,7 @@ MonoBehaviour:
   _contactEnabled: 1
   _graspingEnabled: 1
   _handDataMode: 1
-  primaryHoverFingertips: 0101010000
+  enabledPrimaryHoverFingertips: 0101010000
 --- !u!137 &656684081 stripped
 SkinnedMeshRenderer:
   m_PrefabParentObject: {fileID: 137723638835135990, guid: 2276723046d707c4f94d431ceb80ab92,
@@ -5075,8 +5075,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   interactionManager: {fileID: 1454829696}
   leftHandControllers:
+  - {fileID: 2007413266}
+  - {fileID: 1852415754}
   - {fileID: 208420374}
   rightHandControllers:
+  - {fileID: 1061012173}
+  - {fileID: 841628018}
   - {fileID: 634234965}
   OnLeftHandActive:
     m_PersistentCalls:
