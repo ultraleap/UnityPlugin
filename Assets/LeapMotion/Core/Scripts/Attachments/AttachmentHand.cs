@@ -118,6 +118,11 @@ namespace Leap.Unity.Attachments {
       initializeAttachmentPointFlagConstants();
     }
 
+    private bool _isBeingDestroyed = false;
+    void OnDestroy() {
+      _isBeingDestroyed = true;
+    }
+
     /// <summary>
     /// Returns the AttachmentPointBehaviour child object of this AttachmentHand given a
     /// reference to a single AttachmentPointFlags flag, or null if there is no such child object.
@@ -204,6 +209,9 @@ namespace Leap.Unity.Attachments {
 
     public void notifyPointBehaviourDeleted(AttachmentPointBehaviour point) {
       #if UNITY_EDITOR
+      // Only valid if the AttachmentHand itself is also not being destroyed.
+      if (_isBeingDestroyed) return;
+
       // Refresh this hand's attachment transforms on a slight delay.
       // Only AttachmentHands can _truly_ remove attachment points!
       AttachmentHands attachHands = GetComponentInParent<AttachmentHands>();
