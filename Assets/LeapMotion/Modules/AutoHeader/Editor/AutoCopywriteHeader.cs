@@ -36,8 +36,7 @@ public static class AutoCopywriteHeader {
                                              " * between Leap Motion and you, your company or other organization.           *",
                                              " ******************************************************************************/"};
 
-  private static string[] searchFolders = { "LeapMotion",
-                                            "LeapMotionModules"};
+  private static string[] searchFolders = { "LeapMotion" };
 
   [MenuItem("Assets/Update Copywrite Headers")]
   public static void PopulateAutoHeaders() {

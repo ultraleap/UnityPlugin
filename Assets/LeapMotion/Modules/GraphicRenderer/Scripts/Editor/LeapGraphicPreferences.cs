@@ -18,8 +18,8 @@ namespace Leap.Unity.GraphicalRenderer {
 
   public class LeapGraphicPreferences : MonoBehaviour {
     public const int GRAPHIC_COUNT_SOFT_CEILING = 144;
-    public const string LEAP_GRAPHIC_CGINC_PATH = "LeapMotionModules/GraphicRenderer/Resources/GraphicRenderer.cginc";
-    public const string LEAP_GRAPHIC_SHADER_FOLDER = "Assets/LeapMotionModules/GraphicRenderer/Shaders/";
+    public const string LEAP_GRAPHIC_CGINC_PATH = "LeapMotion/Modules/GraphicRenderer/Resources/GraphicRenderer.cginc";
+    public const string LEAP_GRAPHIC_SHADER_FOLDER = "Assets/LeapMotion/Modules/GraphicRenderer/Shaders/";
     private static Regex _graphicMaxRegex = new Regex(@"^#define\s+GRAPHIC_MAX\s+(\d+)\s*$");
 
     public const string PROMPT_WHEN_GROUP_CHANGE_KEY = "LeapGraphicRenderer_ShouldPromptWhenGroupChange";

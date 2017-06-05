@@ -210,7 +210,7 @@ namespace Leap.Unity.Packaging {
       builder.AppendLine("}");
       builder.AppendLine();
 
-      File.WriteAllText("Assets/LeapMotionModules/Package/Editor/PackageDefinitionBuildMenuItems.cs", builder.ToString());
+      File.WriteAllText("Assets/LeapMotion/Modules/Package/Editor/PackageDefinitionBuildMenuItems.cs", builder.ToString());
       AssetDatabase.Refresh();
     }
   }
