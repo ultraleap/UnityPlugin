@@ -23,6 +23,7 @@
   //#pragma shader_feature _ GRAPHIC_RENDERER_VERTEX_COLORS
   //#pragma shader_feature _ GRAPHIC_RENDERER_TINTING
   //#pragma shader_feature _ GRAPHIC_RENDERER_BLEND_SHAPES
+  //#pragma shader_feature _ GRAPHIC_RENDERER_ENABLE_CUSTOM_CHANNELS
     
     #include "Assets/LeapMotion/Modules/GraphicRenderer/Resources/DynamicRenderer.cginc"
     #include "UnityCG.cginc"

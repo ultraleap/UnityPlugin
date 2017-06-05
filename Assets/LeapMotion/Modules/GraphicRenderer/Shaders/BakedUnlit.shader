@@ -20,6 +20,7 @@
       #pragma shader_feature _ GRAPHIC_RENDERER_MOVEMENT_TRANSLATION GRAPHIC_RENDERER_MOVEMENT_FULL
       #pragma shader_feature _ GRAPHIC_RENDERER_TINTING
       #pragma shader_feature _ GRAPHIC_RENDERER_BLEND_SHAPES
+      #pragma shader_feature _ GRAPHIC_RENDERER_ENABLE_CUSTOM_CHANNELS
       #include "Assets/LeapMotion/Modules/GraphicRenderer/Resources/BakedRenderer.cginc"
       #include "UnityCG.cginc"
 

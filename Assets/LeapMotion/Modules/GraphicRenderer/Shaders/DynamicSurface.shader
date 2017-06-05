@@ -23,6 +23,7 @@ Shader "LeapMotion/Graphic Renderer/Surface/Dynamic" {
   //#pragma shader_feature _ GRAPHIC_RENDERER_VERTEX_COLORS
   //#pragma shader_feature _ GRAPHIC_RENDERER_TINTING
   //#pragma shader_feature _ GRAPHIC_RENDERER_BLEND_SHAPES
+  //#pragma shader_feature _ GRAPHIC_RENDERER_ENABLE_CUSTOM_CHANNELS
     
     #include "../Resources/DynamicRenderer.cginc"
     #include "UnityCG.cginc"
