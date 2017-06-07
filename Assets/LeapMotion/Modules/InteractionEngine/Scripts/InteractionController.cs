@@ -1028,8 +1028,16 @@ namespace Leap.Unity.Interaction {
 
       if (_softContactEnabled) {
         foreach (var contactBone in contactBones) {
+#if UNITY_ANDROID
+          PhysicsUtility.generateSphereContacts(contactBone.rigidbody.position, 
+                                                0.02f * manager.SimulationScale,
+                                                contactBone.rigidbody.velocity,
+                                                manager.interactionLayer.layerMask,
+                                                ref manager._softContacts,
+                                                ref manager._softContactOriginalVelocities,
+                                                ref _softContactColliderBuffer);
+#else
           Collider contactBoneCollider = contactBone.collider;
-
           if (contactBoneCollider is SphereCollider) {
             var boneSphere = contactBoneCollider as SphereCollider;
 
@@ -1090,6 +1098,7 @@ namespace Leap.Unity.Interaction {
                                                 ref manager._softContactOriginalVelocities);
             }
           }
+#endif
         }
 
         // TODO: Implement me to replace trigger colliders
