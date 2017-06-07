@@ -152,7 +152,7 @@ namespace Leap.Unity.Interaction {
           localPhysicsVelocity = Vector3.back * 0.05f;
           localPhysicsPosition = getDepressedConstrainedLocalPosition(curLocalDepressorPos - origLocalDepressorPos);
         } else {
-          localPhysicsVelocity += _springForce * Vector3.forward * (initialLocalPosition.z - Mathf.Lerp(minMaxHeight.x, minMaxHeight.y, restingHeight) - localPhysicsPosition.z) / Time.fixedDeltaTime;
+          localPhysicsVelocity += Mathf.Clamp(_springForce * (initialLocalPosition.z - Mathf.Lerp(minMaxHeight.x, minMaxHeight.y, restingHeight) - localPhysicsPosition.z) / Time.fixedDeltaTime, -1f, 1f) * Vector3.forward;
           localPhysicsVelocity *= Mathf.Pow(0.0000000001f, Time.fixedDeltaTime);
         }
 
