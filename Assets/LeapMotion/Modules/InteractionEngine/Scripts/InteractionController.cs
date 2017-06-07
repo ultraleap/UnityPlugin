@@ -1029,6 +1029,10 @@ namespace Leap.Unity.Interaction {
       if (_softContactEnabled) {
         foreach (var contactBone in contactBones) {
 #if UNITY_ANDROID
+          //for(int i = 0; i < _softContactColliderBuffer.Length; i++) {
+          //  _softContactColliderBuffer[i] = null;
+          //}
+          // HACK: assume only using hands on android
           PhysicsUtility.generateSphereContacts(contactBone.rigidbody.position, 
                                                 0.02f * manager.SimulationScale,
                                                 contactBone.rigidbody.velocity,
@@ -1036,6 +1040,12 @@ namespace Leap.Unity.Interaction {
                                                 ref manager._softContacts,
                                                 ref manager._softContactOriginalVelocities,
                                                 ref _softContactColliderBuffer);
+
+          //for (int i = 0; i < _softContactColliderBuffer.Length; i++) {
+          //  if (_softContactColliderBuffer[i] != null) {
+          //    NotifySoftContactOverlap(contactBone, _softContactColliderBuffer[i]);
+          //  }
+          //}
 #else
           Collider contactBoneCollider = contactBone.collider;
           if (contactBoneCollider is SphereCollider) {
@@ -1047,7 +1057,7 @@ namespace Leap.Unity.Interaction {
                                                               manager.interactionLayer.layerMask,
                                                               QueryTriggerInteraction.Ignore);
             for (int i = 0; i < numCollisions; i++) {
-              NotifySoftContactOverlap(contactBone, _softContactColliderBuffer[i]);
+              //NotifySoftContactOverlap(contactBone, _softContactColliderBuffer[i]);
 
               PhysicsUtility.generateSphereContact(boneSphere, 0, _softContactColliderBuffer[i],
                                                    ref manager._softContacts,
@@ -1066,7 +1076,7 @@ namespace Leap.Unity.Interaction {
                                                                manager.interactionLayer.layerMask,
                                                                QueryTriggerInteraction.Ignore);
             for (int i = 0; i < numCollisions; i++) {
-              NotifySoftContactOverlap(contactBone, _softContactColliderBuffer[i]);
+              //NotifySoftContactOverlap(contactBone, _softContactColliderBuffer[i]);
 
               PhysicsUtility.generateCapsuleContact(boneCapsule, 0,
                                                     _softContactColliderBuffer[i],
@@ -1091,7 +1101,7 @@ namespace Leap.Unity.Interaction {
                                                            manager.interactionLayer.layerMask,
                                                            QueryTriggerInteraction.Ignore);
             for (int i = 0; i < numCollisions; i++) {
-              NotifySoftContactOverlap(contactBone, _softContactColliderBuffer[i]);
+              //NotifySoftContactOverlap(contactBone, _softContactColliderBuffer[i]);
 
               PhysicsUtility.generateBoxContact(boneBox, 0, _softContactColliderBuffer[i],
                                                 ref manager._softContacts,
@@ -1102,7 +1112,7 @@ namespace Leap.Unity.Interaction {
         }
 
         // TODO: Implement me to replace trigger colliders
-        FinishSoftContactOverlapChecks();
+        //FinishSoftContactOverlapChecks();
 
         //for (int i = 0; i < contactBones.Length; i++) {
         //  Vector3 bonePosition = _boneTargetPositions[i];
@@ -1203,7 +1213,7 @@ namespace Leap.Unity.Interaction {
     }
 
     #region Soft Contact Collision Tracking
-
+    /*
     // TODO: Make this a thing so we aren't using triggers
     private void NotifySoftContactOverlap(ContactBone contactBone, Collider otherCollider) {
 
@@ -1212,7 +1222,7 @@ namespace Leap.Unity.Interaction {
     // TODO: Make this a thing so we aren't using triggers
     private void FinishSoftContactOverlapChecks() {
 
-    }
+    }*/
 
     // TODO: Maintaining a reference to the interaction object doesn't appear to be
     // necessary here, so get rid of the Pair class as a small optimization
