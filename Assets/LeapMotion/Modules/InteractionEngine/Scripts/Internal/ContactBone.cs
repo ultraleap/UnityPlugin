@@ -130,7 +130,7 @@ namespace Leap.Unity.Interaction {
         if (interactionObj is InteractionBehaviour) {
           switch ((interactionObj as InteractionBehaviour).contactForceMode) {
             case ContactForceMode.UI:
-              _lastObjectTouchedAdjustedMass *= 1F;
+              _lastObjectTouchedAdjustedMass *= 2F;
               break;
             case ContactForceMode.Object: default:
               if (interactionHand != null) {

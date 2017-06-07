@@ -817,6 +817,7 @@ namespace Leap.Unity.Interaction {
     protected bool _wasContactInitialized { get { return _contactInitialized; } }
     protected abstract ContactBone[] contactBones { get; }
     protected abstract GameObject contactBoneParent { get; }
+    protected float lastObjectTouchedAdjustedMassMass = 0.2f;
 
     private Vector3[]    _boneTargetPositions;
     private Quaternion[] _boneTargetRotations;
@@ -899,6 +900,7 @@ namespace Leap.Unity.Interaction {
       }
 
       using (new ProfilerSample("Update Contact Bones")) {
+        normalizeBoneMasses();
         for (int i = 0; i < contactBones.Length; i++) {
           updateContactBone(i, _boneTargetPositions[i], _boneTargetRotations[i]);
         }
@@ -922,6 +924,22 @@ namespace Leap.Unity.Interaction {
     protected abstract void getColliderBoneTargetPositionRotation(int contactBoneIndex,
                                                           out Vector3 targetPosition,
                                                           out Quaternion targetRotation);
+
+    private void normalizeBoneMasses() {
+      //If any of the contact bones have contacted an object that the others have not
+      //Propagate that change in mass to the rest of the bones in the hand
+      float tempAdjustedMass = lastObjectTouchedAdjustedMassMass;
+      for (int i = 0; i < contactBones.Length; i++) {
+        if (contactBones[i]._lastObjectTouchedAdjustedMass != tempAdjustedMass) {
+          tempAdjustedMass = contactBones[i]._lastObjectTouchedAdjustedMass;
+          for (int j = 0; j < contactBones.Length; j++) {
+            contactBones[j]._lastObjectTouchedAdjustedMass = tempAdjustedMass;
+          }
+          break;
+        }
+      }
+      lastObjectTouchedAdjustedMassMass = tempAdjustedMass;
+    }
 
     private void updateContactBone(int contactBoneIndex, Vector3 targetPosition, Quaternion targetRotation) {
       ContactBone contactBone = contactBones[contactBoneIndex];
