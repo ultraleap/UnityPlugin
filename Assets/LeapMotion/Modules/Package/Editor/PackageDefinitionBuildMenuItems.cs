@@ -4,12 +4,6 @@ namespace Leap.Unity.Packaging {
 
   public class PackageDefinitionBuildMenuItems {
 
-    // Android
-    [MenuItem("Build/Android")]
-    public static void Build_f1acba439a0394b43a768a06a42c039f() {
-      PackageDefinition.BuildPackage("f1acba439a0394b43a768a06a42c039f");
-    }
-
     // Attachments
     [MenuItem("Build/Attachments")]
     public static void Build_75ae930456fc07049858fdc6fc70393b() {
