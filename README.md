@@ -4,7 +4,7 @@ To download Leap Motion's latest stable modules as .unitypackages, visit [our Un
 
 For detailed information about using our Unity Modules, or contributing to this repo, [check out the Wiki][wiki]!
 
-**UnityModules supports Unity 5.5 and up.**
+**UnityModules supports Unity 5.6 and up.**
 
 ## This repository
 
