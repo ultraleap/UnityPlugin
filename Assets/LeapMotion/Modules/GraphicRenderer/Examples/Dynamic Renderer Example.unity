@@ -144,6 +144,7 @@ GameObject:
   - component: {fileID: 95075868}
   - component: {fileID: 95075867}
   - component: {fileID: 95075866}
+  - component: {fileID: 95075871}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -221,6 +222,23 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &95075871
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 95075865}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fb8f8839ee256bb458e1657c1ee40572, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _deviceOffsets:
+  - DeviceName: openvr
+    HeightOffset: -1.7
+  moveUpKey: 0
+  moveDownKey: 0
+  stepSize: 0.1
 --- !u!1 &104233742
 GameObject:
   m_ObjectHideFlags: 0
@@ -254,7 +272,7 @@ MonoBehaviour:
     - id: 0
       index: 0
     _a:
-    - texture: {fileID: 2800000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
+    - _texture: {fileID: 2800000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
     _b: []
     _c: []
     _d: []
@@ -347,7 +365,7 @@ MonoBehaviour:
     - id: 0
       index: 0
     _a:
-    - texture: {fileID: 2800000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
+    - _texture: {fileID: 2800000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
     _b: []
     _c: []
     _d: []
@@ -497,7 +515,7 @@ MonoBehaviour:
     - id: 0
       index: 0
     _a:
-    - texture: {fileID: 2800000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
+    - _texture: {fileID: 2800000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
     _b: []
     _c: []
     _d: []
@@ -814,7 +832,7 @@ MonoBehaviour:
     - id: 0
       index: 0
     _a:
-    - texture: {fileID: 2800000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
+    - _texture: {fileID: 2800000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
     _b: []
     _c: []
     _d: []
@@ -875,7 +893,7 @@ MonoBehaviour:
     - id: 0
       index: 0
     _a:
-    - texture: {fileID: 2800000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
+    - _texture: {fileID: 2800000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
     _b: []
     _c: []
     _d: []
@@ -1070,7 +1088,7 @@ MonoBehaviour:
     - id: 0
       index: 0
     _a:
-    - texture: {fileID: 2800000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
+    - _texture: {fileID: 2800000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
     _b: []
     _c: []
     _d: []
@@ -1131,7 +1149,7 @@ MonoBehaviour:
     - id: 0
       index: 0
     _a:
-    - texture: {fileID: 2800000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
+    - _texture: {fileID: 2800000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
     _b: []
     _c: []
     _d: []
@@ -1222,7 +1240,7 @@ MonoBehaviour:
     - id: 0
       index: 0
     _a:
-    - texture: {fileID: 2800000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
+    - _texture: {fileID: 2800000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
     _b: []
     _c: []
     _d: []
@@ -1504,7 +1522,7 @@ MonoBehaviour:
     - id: 0
       index: 0
     _a:
-    - texture: {fileID: 2800000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
+    - _texture: {fileID: 2800000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
     _b: []
     _c: []
     _d: []
