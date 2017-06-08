@@ -3338,7 +3338,7 @@ MonoBehaviour:
   - DeviceName: oculus
     HeightOffset: 0
   - DeviceName: openvr
-    HeightOffset: -0.8
+    HeightOffset: -1.7
   moveUpKey: 0
   moveDownKey: 0
   stepSize: 0.1
