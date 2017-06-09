@@ -14,9 +14,10 @@ MonoBehaviour:
   _packageName: Graphic Renderer
   _generateBuildDropdown: 1
   _dependantFolders:
-  - Assets\LeapMotion\Modules\GraphicRenderer\Resources
-  - Assets\LeapMotion\Modules\GraphicRenderer\Scripts
-  - Assets\LeapMotion\Modules\GraphicRenderer\Shaders
-  - Assets\LeapMotion\Modules\GraphicRenderer\Examples
+  - Assets\LeapMotion\Modules\GraphicRenderer
+  - Assets\LeapMotion\Modules\GraphicRenderer\Testing
+  _ignoredFolders:
+  - Assets\LeapMotion\Modules\GraphicRenderer\Testing
   _dependantFiles: []
+  _ignoredFiles: []
   _dependantPackages: []
