@@ -6,7 +6,12 @@ namespace Leap.Unity.Interaction.Internal {
 #if UNITY_EDITOR
   public static class InteractionPreferences {
     public const float MAX_GRAVITY_MAGNITUDE = 4.905f;
+
+#if UNITY_ANDROID
+    public const float MAX_TIMESTEP = 1.0f / 60.0f;
+#else
     public const float MAX_TIMESTEP = 1.0f / 90.0f;
+#endif
 
     public const string PROMPT_FOR_GRAVITY_KEY = "InteractionEngine_ShouldPrompForGravity";
     public const string PROMPT_FOR_PHYSICS_TIMESTEP = "InteractionEngine_ShouldPrompForTimestep";

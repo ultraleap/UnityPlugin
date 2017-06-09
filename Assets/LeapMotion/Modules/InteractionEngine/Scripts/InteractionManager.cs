@@ -221,7 +221,8 @@ namespace Leap.Unity.Interaction {
 
       if (InteractionPreferences.shouldPrompForPhysicsTimestep && Application.isPlaying) {
         if (Time.fixedDeltaTime > InteractionPreferences.MAX_TIMESTEP + Mathf.Epsilon) {
-          if (!EditorUtility.DisplayDialog("Timestep too slow!", "Your fixed timestep is " + Time.fixedDeltaTime + ", which is slower than the recommended value of 0.01111.\n\nGo to Edit->ProjectSettings->Time to change the timestep.", "Ok", "Don't Show Again")) {
+          float roundedTimestep = (float)Math.Round(InteractionPreferences.MAX_TIMESTEP, 4);
+          if (!EditorUtility.DisplayDialog("Timestep too slow!", "Your fixed timestep is " + Time.fixedDeltaTime + ", which is slower than the recommended value of " + roundedTimestep + ".\n\nGo to Edit->ProjectSettings->Time to change the fixed timestep.", "Ok", "Don't Show Again")) {
             InteractionPreferences.shouldPrompForPhysicsTimestep = false;
           }
           EditorApplication.isPlaying = false;
