@@ -127,7 +127,7 @@ namespace Leap.Unity.Packaging {
       var packageDef = AssetDatabase.LoadAssetAtPath<PackageDefinition>(assetPath);
 
       if (packageDef != null) {
-        packageDef.BuildPackage(interactive: false);
+        packageDef.BuildPackage(interactive: true);
       }
     }
 
