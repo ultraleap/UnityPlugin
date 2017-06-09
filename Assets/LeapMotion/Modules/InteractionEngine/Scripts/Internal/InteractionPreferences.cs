@@ -1,9 +1,13 @@
 ﻿using UnityEngine;
 using UnityEditor;
 
-namespace Leap.Unity.Interaction {
+namespace Leap.Unity.Interaction.Internal {
 
+#if UNITY_EDITOR
   public static class InteractionPreferences {
+    public const float MAX_GRAVITY_MAGNITUDE = 4.905f;
+    public const float MAX_TIMESTEP = 1.0f / 90.0f;
+
     public const string PROMPT_FOR_GRAVITY_KEY = "InteractionEngine_ShouldPrompForGravity";
     public const string PROMPT_FOR_PHYSICS_TIMESTEP = "InteractionEngine_ShouldPrompForTimestep";
 
@@ -46,4 +50,5 @@ namespace Leap.Unity.Interaction {
       }
     }
   }
+#endif
 }
