@@ -22,10 +22,19 @@ namespace Leap.Unity.Packaging {
   public class PackageDefinitionEditor : CustomEditorBase<PackageDefinition> {
     private List<PackageDefinition> _childPackages;
 
+    private SerializedProperty _ignoredFiles;
+    private SerializedProperty _ignoredFolders;
+
     protected override void OnEnable() {
       base.OnEnable();
 
       _childPackages = target.GetChildPackages();
+
+      _ignoredFiles = serializedObject.FindProperty("_ignoredFiles");
+      _ignoredFolders = serializedObject.FindProperty("_ignoredFolders");
+
+      hideField("_ignoredFolders");
+      hideField("_ignoredFiles");
 
       createList("_dependantFolders", drawFolderElement);
       createList("_dependantFiles", drawFileElement);
@@ -105,11 +114,11 @@ namespace Leap.Unity.Packaging {
     }
 
     private void drawFolderElement(Rect rect, SerializedProperty property) {
-      drawExplorerElement(rect, property, EditorUtility.OpenFolderPanel);
+      drawExplorerElement(rect, property, _ignoredFolders, EditorUtility.OpenFolderPanel);
     }
 
     private void drawFileElement(Rect rect, SerializedProperty property) {
-      drawExplorerElement(rect, property, EditorUtility.OpenFilePanel);
+      drawExplorerElement(rect, property, _ignoredFiles, EditorUtility.OpenFilePanel);
     }
 
     private void drawPackageElement(Rect rect, SerializedProperty property) {
@@ -142,23 +151,45 @@ namespace Leap.Unity.Packaging {
       return list;
     }
 
-    private void drawExplorerElement(Rect rect, SerializedProperty property, Func<string, string, string, string> openAction) {
-      Rect leftRect = rect;
-      Rect rightRect = rect;
+    private void drawExplorerElement(Rect rect, SerializedProperty property, SerializedProperty ignoredList, Func<string, string, string, string> openAction) {
+      Rect left, middle, right;
 
-      leftRect.width -= 100;
+      rect.SplitHorizontallyWithRight(out rect, out right, 100);
+      rect.SplitHorizontallyWithRight(out left, out middle, EditorGUIUtility.singleLineHeight);
 
-      rightRect.x = leftRect.x + leftRect.width;
-      rightRect.width = 100;
+      EditorGUI.TextField(left, property.stringValue);
 
-      EditorGUI.TextField(leftRect, property.stringValue);
+      bool isIncluded = true;
+      for (int i = 0; i < ignoredList.arraySize; i++) {
+        if (ignoredList.GetArrayElementAtIndex(i).stringValue == property.stringValue) {
+          isIncluded = false;
+          break;
+        }
+      }
 
-      if (GUI.Button(rightRect, "Change")) {
+      bool shouldBeIncluded = EditorGUI.Toggle(middle, isIncluded);
+
+      if (shouldBeIncluded != isIncluded) {
+        if (shouldBeIncluded) {
+          for (int i = ignoredList.arraySize; i-- != 0;) {
+            if (ignoredList.GetArrayElementAtIndex(i).stringValue == property.stringValue) {
+              ignoredList.DeleteArrayElementAtIndex(i);
+            }
+          }
+        } else {
+          ignoredList.InsertArrayElementAtIndex(0);
+          ignoredList.GetArrayElementAtIndex(0).stringValue = property.stringValue;
+        }
+      }
+
+      if (GUI.Button(right, "Change")) {
         string chosenFolder = openAction("Select Folder", Application.dataPath, "");
         if (!string.IsNullOrEmpty(chosenFolder)) {
           string relativePath = makeRelativePath(Application.dataPath, chosenFolder);
           if (!string.IsNullOrEmpty(relativePath) && !relativePath.StartsWith("..")) {
-            property.stringValue = relativePath;
+            if (relativePath != property.stringValue) {
+              property.stringValue = relativePath;
+            }
           }
         }
       }

@@ -35,9 +35,15 @@ namespace Leap.Unity.Packaging {
     [SerializeField]
     protected string[] _dependantFolders;
 
+    [SerializeField]
+    protected string[] _ignoredFolders;
+
     [Tooltip("All files specified in this list will be included in this package when built.")]
     [SerializeField]
     protected string[] _dependantFiles;
+
+    [SerializeField]
+    protected string[] _ignoredFiles;
 
     [Tooltip("All files specified in each package will be included in this package when built.")]
     [SerializeField]
