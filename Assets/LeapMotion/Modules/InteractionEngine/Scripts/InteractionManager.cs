@@ -24,7 +24,7 @@ namespace Leap.Unity.Interaction {
 
   [Serializable]
   public class InteractionControllerSet : SerializableHashSet<InteractionController> { }
-  
+
   [DisallowMultipleComponent]
   [ExecuteInEditMode]
   public class InteractionManager : MonoBehaviour, IRuntimeGizmoComponent {
@@ -38,7 +38,7 @@ namespace Leap.Unity.Interaction {
     public ReadonlyHashSet<InteractionController> interactionControllers {
       get { return _interactionControllers; }
     }
-    
+
     [Header("Interaction Settings")]
 
     [SerializeField]
@@ -202,11 +202,35 @@ namespace Leap.Unity.Interaction {
       if (!Application.isPlaying && _autoGenerateLayers) {
         generateAutomaticLayers();
       }
-      
+
       refreshInteractionControllers();
     }
 
     void Awake() {
+#if UNITY_EDITOR
+      if (InteractionPreferences.shouldPrompForGravity && Application.isPlaying) {
+        float magnitude = Physics.gravity.y;
+        if (Mathf.Abs(magnitude) > InteractionPreferences.MAX_GRAVITY_MAGNITUDE) {
+          if (!EditorUtility.DisplayDialog("Gravity magnitude too strong!", "Your gravity magnitude is " + magnitude + " which is stronger than the recommended value of -4.905!\n\nGo to Edit->Project Settings->Physics to change the magnitude.", "Ok", "Don't Show Again")) {
+            InteractionPreferences.shouldPrompForGravity = false;
+          }
+          EditorApplication.isPlaying = false;
+          return;
+        }
+      }
+
+      if (InteractionPreferences.shouldPrompForPhysicsTimestep && Application.isPlaying) {
+        if (Time.fixedDeltaTime > InteractionPreferences.MAX_TIMESTEP + Mathf.Epsilon) {
+          float roundedTimestep = (float)Math.Round(InteractionPreferences.MAX_TIMESTEP, 4);
+          if (!EditorUtility.DisplayDialog("Timestep too slow!", "Your fixed timestep is " + Time.fixedDeltaTime + ", which is slower than the recommended value of " + roundedTimestep + ".\n\nGo to Edit->ProjectSettings->Time to change the fixed timestep.", "Ok", "Don't Show Again")) {
+            InteractionPreferences.shouldPrompForPhysicsTimestep = false;
+          }
+          EditorApplication.isPlaying = false;
+          return;
+        }
+      }
+#endif
+
       refreshInteractionControllers();
 
       if (!Application.isPlaying) return;
@@ -221,7 +245,7 @@ namespace Leap.Unity.Interaction {
       _prevPosition = this.transform.position;
       _prevRotation = this.transform.rotation;
 
-      #if UNITY_EDITOR
+#if UNITY_EDITOR
       if (_drawControllerRuntimeGizmos == true) {
         if (FindObjectOfType<RuntimeGizmoManager>() == null) {
           Debug.LogWarning("'_drawControllerRuntimeGizmos' is enabled, but there is no "
@@ -229,13 +253,13 @@ namespace Leap.Unity.Interaction {
                          + "like to render gizmos in the editor and in your headset.");
         }
       }
-      #endif
+#endif
     }
 
     void OnDisable() {
-      #if UNITY_EDITOR
+#if UNITY_EDITOR
       if (!Application.isPlaying) return;
-      #endif
+#endif
 
       foreach (var intController in _interactionControllers) {
         // Disables the colliders in the interaction controller;
@@ -249,9 +273,9 @@ namespace Leap.Unity.Interaction {
     }
 
     void Update() {
-      #if UNITY_EDITOR
+#if UNITY_EDITOR
       refreshInteractionControllers();
-      #endif
+#endif
     }
 
     void FixedUpdate() {
@@ -259,14 +283,14 @@ namespace Leap.Unity.Interaction {
 
       refreshInteractionControllers();
 
-      #if UNITY_EDITOR
+#if UNITY_EDITOR
       if (!Application.isPlaying) return;
-      #endif
+#endif
 
       using (new ProfilerSample("Interaction Manager FixedUpdate", this.gameObject)) {
         // Ensure scale information is up-to-date.
         _scale = this.transform.lossyScale.x;
-        
+
         // Update each interaction controller (Leap hands or supported VR controllers).
         fixedUpdateInteractionControllers();
 
@@ -521,7 +545,7 @@ namespace Leap.Unity.Interaction {
           contactedObject.StayGrasped(contactingIntControllers);
         });
     }
-    
+
     private delegate bool StateChangeCheckFunc(InteractionController controller, out IInteractionBehaviour obj);
     private delegate bool MultiStateChangeCheckFunc(InteractionController controller, out HashSet<IInteractionBehaviour> objs);
 
@@ -536,7 +560,7 @@ namespace Leap.Unity.Interaction {
                                                    Action<IInteractionBehaviour, List<InteractionController>> actionPerInteractionObject) {
 
       // Ensure the object->controllers buffer is non-null (ThreadStatic quirk) and clean.
-      if (s_objControllersMap == null) s_objControllersMap = new Dictionary<IInteractionBehaviour,List<InteractionController>>();
+      if (s_objControllersMap == null) s_objControllersMap = new Dictionary<IInteractionBehaviour, List<InteractionController>>();
       s_objControllersMap.Clear();
 
       // In a nutshell, this remaps methods per-controller that output an interaction object if the controller changed that object's state
@@ -714,7 +738,7 @@ namespace Leap.Unity.Interaction {
     }
 
     // Support for a moving frame of reference.
-    private Vector3    _prevPosition = Vector3.zero;
+    private Vector3 _prevPosition = Vector3.zero;
     private Quaternion _prevRotation = Quaternion.identity;
 
     private void updateMovingFrameOfReferenceSupport() {
@@ -728,8 +752,8 @@ namespace Leap.Unity.Interaction {
     /// frame of reference is moving.
     /// </summary>
     public void TransformAheadByFixedUpdate(Vector3 position, Quaternion rotation, out Vector3 newPosition, out Quaternion newRotation) {
-      Vector3    worldDisplacement = this.transform.position - _prevPosition;
-      Quaternion worldRotation     = this.transform.rotation * Quaternion.Inverse(_prevRotation);
+      Vector3 worldDisplacement = this.transform.position - _prevPosition;
+      Quaternion worldRotation = this.transform.rotation * Quaternion.Inverse(_prevRotation);
       newPosition = ((worldRotation * (position - this.transform.position + worldDisplacement))) + this.transform.position;
       newRotation = worldRotation * rotation;
     }
@@ -780,11 +804,9 @@ namespace Leap.Unity.Interaction {
         if (string.IsNullOrEmpty(layerName)) {
           if (_interactionLayer == -1) {
             _interactionLayer = i;
-          }
-          else if (_interactionNoContactLayer == -1) {
+          } else if (_interactionNoContactLayer == -1) {
             _interactionNoContactLayer = i;
-          }
-          else if (_contactBoneLayer == -1) {
+          } else if (_contactBoneLayer == -1) {
             _contactBoneLayer = i;
             break;
           }
