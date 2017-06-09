@@ -18,12 +18,9 @@ namespace Leap.Unity.Interaction {
 
   [CustomEditor(typeof(InteractionManager))]
   public class InteractionManagerEditor : CustomEditorBase<InteractionManager> {
-    public const float MAX_GRAVITY_MAGNITUDE = 4.905f;
 
     protected override void OnEnable() {
       base.OnEnable();
-
-      specifyCustomDecorator("_interactionControllers", drawGravityWarning);
 
       // Interaction Controllers
       specifyCustomDrawer("_interactionControllers", drawControllersStatusEditor);
@@ -43,20 +40,6 @@ namespace Leap.Unity.Interaction {
 
     public override bool RequiresConstantRepaint() {
       return Application.isPlaying;
-    }
-
-    public void drawGravityWarning(SerializedProperty prop) {
-      if (Mathf.Abs(Physics.gravity.y) - MAX_GRAVITY_MAGNITUDE > Mathf.Epsilon) {
-        using (new GUILayout.HorizontalScope()) {
-          EditorGUILayout.HelpBox("Gravity is stronger than the recommended amount!  Weaker gravity is recommended for a more pleasent experience.", MessageType.Warning);
-          if (GUILayout.Button("Auto-Fix")) {
-
-            Vector3 gravity = Physics.gravity;
-            gravity.y = MAX_GRAVITY_MAGNITUDE * Mathf.Sign(gravity.y);
-            Physics.gravity = gravity;
-          }
-        }
-      }
     }
 
     private RuntimeGizmoManager _runtimeGizmoManager;
@@ -151,13 +134,13 @@ namespace Leap.Unity.Interaction {
     }
 
     public static class Colors {
-      public static Color DarkGray { get { return new Color(0.4F, 0.4F, 0.4F); } }
+      public static Color DarkGray  { get { return new Color(0.4F, 0.4F, 0.4F); } }
       public static Color LightGray { get { return new Color(0.7F, 0.7F, 0.7F); } }
 
-      public static Color Good { get { return Color.Lerp(Color.green, LightGray, 0.2F); } }
-      public static Color Caution { get { return Color.Lerp(Good, Color.yellow, 0.8F); } }
-      public static Color Warning { get { return Color.Lerp(Color.yellow, Problem, 0.5F); } }
-      public static Color Problem { get { return Color.Lerp(Color.red, Color.yellow, 0.3F); } }
+      public static Color Good      { get { return Color.Lerp(Color.green, LightGray, 0.2F); } }
+      public static Color Caution   { get { return Color.Lerp(Good, Color.yellow, 0.8F); } }
+      public static Color Warning   { get { return Color.Lerp(Color.yellow, Problem, 0.5F); } }
+      public static Color Problem   { get { return Color.Lerp(Color.red, Color.yellow, 0.3F); } }
     }
 
     private struct ControllerStatusMessage {
@@ -182,7 +165,8 @@ namespace Leap.Unity.Interaction {
 
       if (controller.intHand != null) {
         checkInteractionHandStatus(controller.intHand, messages);
-      } else if (controller is InteractionVRController) {
+      }
+      else if (controller is InteractionVRController) {
         checkInteractionVRControllerStatus(controller as InteractionVRController, messages);
       }
 
@@ -261,7 +245,8 @@ namespace Leap.Unity.Interaction {
                     + "be raised by the hand itself if it is misconfigured.",
             color = Colors.Caution
           });
-        } else {
+        }
+        else {
           // Check for a LeapProvider in the scene somewhere.
           if (_provider == null) {
             _provider = FindObjectOfType<LeapProvider>();
@@ -291,7 +276,8 @@ namespace Leap.Unity.Interaction {
       }
       if (_leftHand == null && intHand.handDataMode == HandDataMode.PlayerLeft) {
         _leftHand = intHand;
-      } else if (_rightHand == null && intHand.handDataMode == HandDataMode.PlayerRight) {
+      }
+      else if (_rightHand == null && intHand.handDataMode == HandDataMode.PlayerRight) {
         _rightHand = intHand;
       }
     }
@@ -312,7 +298,7 @@ namespace Leap.Unity.Interaction {
       }
 
       // Check if the player has duplicate VRNode left controllers or right controllers.
-      bool isLeftVRNodeController = controller.trackingProvider is DefaultVRNodeTrackingProvider
+      bool isLeftVRNodeController  = controller.trackingProvider is DefaultVRNodeTrackingProvider
                                   && controller.chirality == Chirality.Left;
       bool isRightVRNodeController = controller.trackingProvider is DefaultVRNodeTrackingProvider
                                   && controller.chirality == Chirality.Right;
