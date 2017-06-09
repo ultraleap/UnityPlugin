@@ -190,9 +190,13 @@ namespace Leap.Unity.Packaging {
       // - paths that point to existing files
       // - paths that do not point to package definitions
       // - paths that do not point to meta files (let the exporter take care of that)
+      // - paths that are not ignored
+      // - paths that are not in an ignored folder
       var filteredAssets = assets.Where(path => File.Exists(path)).
                                   Where(path => !packagePaths.Contains(Path.GetFullPath(path))).
                                   Where(path => Path.GetExtension(path) != ".meta").
+                                  Where(path => !_ignoredFiles.Select(Path.GetFullPath).Contains(Path.GetFullPath(path))).
+                                  Where(path => _ignoredFolders.All(folder => !Path.GetFullPath(path).Contains(Path.GetFullPath(folder)))).
                                   ToArray();
 
       ExportPackageOptions options = ExportPackageOptions.Recurse;
