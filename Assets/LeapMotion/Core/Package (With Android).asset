@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Name: Package (With Android)
   m_EditorClassIdentifier: 
   _packageName: CoreAndroid
-  _generateBuildDropdown: 0
+  _generateBuildDropdown: 1
   _dependantFolders:
   - Assets\LeapMotion\Core
   _ignoredFolders: []
