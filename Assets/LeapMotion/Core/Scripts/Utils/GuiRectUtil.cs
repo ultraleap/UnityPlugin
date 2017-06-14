@@ -12,7 +12,7 @@ using UnityEngine;
 using UnityEditor;
 #endif
 
-namespace Leap.Unity.GraphicalRenderer {
+namespace Leap.Unity {
 
   public static class GuiRectUtil {
 
