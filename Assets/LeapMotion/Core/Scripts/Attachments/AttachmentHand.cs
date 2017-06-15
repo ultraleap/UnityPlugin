@@ -117,8 +117,14 @@ namespace Leap.Unity.Attachments {
     void Awake() {
       initializeAttachmentPointFlagConstants();
     }
-
+    
+    #if !UNITY_EDITOR
+    #pragma warning disable 0414
+    #endif
     private bool _isBeingDestroyed = false;
+    #if !UNITY_EDITOR
+    #pragma warning restore 0414
+    #endif
     void OnDestroy() {
       _isBeingDestroyed = true;
     }
