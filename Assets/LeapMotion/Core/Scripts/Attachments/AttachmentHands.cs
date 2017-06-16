@@ -73,14 +73,18 @@ namespace Leap.Unity.Attachments {
     /// </summary>
     public AttachmentHand[] attachmentHands { get { return _attachmentHands; } set { _attachmentHands = value; } }
 
+#if UNITY_EDITOR
     void OnValidate() {
       if (getIsPrefab()) return;
 
       reinitialize();
     }
+#endif
 
     void Awake() {
+#if UNITY_EDITOR
       if (getIsPrefab()) return;
+#endif
 
       reinitialize();
     }
@@ -237,10 +241,12 @@ namespace Leap.Unity.Attachments {
       }
     }
 
+#if UNITY_EDITOR
     private bool getIsPrefab() {
       PrefabType prefabType = PrefabUtility.GetPrefabType(this.gameObject);
       return (prefabType == PrefabType.Prefab || prefabType == PrefabType.ModelPrefab);
     }
+#endif
 
   }
 
