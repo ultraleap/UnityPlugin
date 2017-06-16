@@ -73,11 +73,19 @@ namespace Leap.Unity.Attachments {
     /// </summary>
     public AttachmentHand[] attachmentHands { get { return _attachmentHands; } set { _attachmentHands = value; } }
 
+#if UNITY_EDITOR
     void OnValidate() {
+      if (getIsPrefab()) return;
+
       reinitialize();
     }
+#endif
 
     void Awake() {
+#if UNITY_EDITOR
+      if (getIsPrefab()) return;
+#endif
+
       reinitialize();
     }
 
@@ -148,10 +156,7 @@ namespace Leap.Unity.Attachments {
       // If we're a prefab, we'll be unable to set parent transforms, so we shouldn't create new objects in general.
       bool isPrefab = false;
       #if UNITY_EDITOR
-      PrefabType prefabType = PrefabUtility.GetPrefabType(this.gameObject);
-      if (prefabType == PrefabType.Prefab || prefabType == PrefabType.ModelPrefab) {
-        isPrefab = true;
-      }
+      isPrefab = getIsPrefab();
       #endif
 
       // If necessary, generate a left and right AttachmentHand.
@@ -207,10 +212,7 @@ namespace Leap.Unity.Attachments {
       if (this == null) return;
 
       #if UNITY_EDITOR
-      PrefabType prefabType = PrefabUtility.GetPrefabType(this.gameObject);
-      if (prefabType == PrefabType.Prefab || prefabType == PrefabType.ModelPrefab) {
-        return;
-      }
+      if (getIsPrefab()) return;
       #endif
 
       bool requiresReinitialization = false;
@@ -238,6 +240,13 @@ namespace Leap.Unity.Attachments {
         reinitialize();
       }
     }
+
+#if UNITY_EDITOR
+    private bool getIsPrefab() {
+      PrefabType prefabType = PrefabUtility.GetPrefabType(this.gameObject);
+      return (prefabType == PrefabType.Prefab || prefabType == PrefabType.ModelPrefab);
+    }
+#endif
 
   }
 
