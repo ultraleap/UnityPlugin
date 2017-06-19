@@ -119,6 +119,9 @@ namespace Leap.Unity.Interaction {
       }
     }
 
+    private const float FRICTION_COEFFICIENT = 30F;
+    private const float DRAG_COEFFICIENT = 50F;
+
     protected virtual void Update() {
       //Reset our convenience state variables...
       depressedThisFrame = false;
@@ -152,8 +155,25 @@ namespace Leap.Unity.Interaction {
           localPhysicsVelocity = Vector3.back * 0.05f;
           localPhysicsPosition = getDepressedConstrainedLocalPosition(curLocalDepressorPos - origLocalDepressorPos);
         } else {
-          localPhysicsVelocity += (Mathf.Clamp(_springForce * (initialLocalPosition.z - Mathf.Lerp(minMaxHeight.x, minMaxHeight.y, restingHeight) - localPhysicsPosition.z), -0.01f, 0.01f) / Time.fixedDeltaTime) * Vector3.forward;
-          localPhysicsVelocity *= Mathf.Pow(0.0000000001f, Time.fixedDeltaTime);
+          Vector3 originalLocalVelocity = localPhysicsVelocity;
+
+          // Spring force
+          localPhysicsVelocity += (Mathf.Clamp(_springForce*10000f * (initialLocalPosition.z - Mathf.Lerp(minMaxHeight.x, minMaxHeight.y, restingHeight) - localPhysicsPosition.z), -100f, 100f) * Time.fixedDeltaTime) * Vector3.forward;
+
+          // Friction & Drag
+          float velMag = originalLocalVelocity.magnitude;
+          if (velMag > 0F) {
+            Vector3 resistanceDir = -originalLocalVelocity / velMag;
+
+            // Friction force
+            Vector3 frictionForce = resistanceDir * velMag * FRICTION_COEFFICIENT;
+            localPhysicsVelocity = localPhysicsVelocity + (frictionForce /* assume unit mass */ * Time.fixedDeltaTime);
+
+            // Drag force
+            float velSqrMag = velMag * velMag;
+            Vector3 dragForce = resistanceDir * velSqrMag * DRAG_COEFFICIENT;
+            localPhysicsVelocity = localPhysicsVelocity + (dragForce /* assume unit mass */ * Time.fixedDeltaTime);
+          }
         }
 
         // Transform the local physics back into world space
