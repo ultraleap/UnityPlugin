@@ -158,7 +158,7 @@ namespace Leap.Unity.Interaction {
           Vector3 originalLocalVelocity = localPhysicsVelocity;
 
           // Spring force
-          localPhysicsVelocity += (Mathf.Clamp(_springForce * (initialLocalPosition.z - Mathf.Lerp(minMaxHeight.x, minMaxHeight.y, restingHeight) - localPhysicsPosition.z), -0.01f, 0.01f) / Time.fixedDeltaTime) * Vector3.forward;
+          localPhysicsVelocity += (Mathf.Clamp(_springForce*10000f * (initialLocalPosition.z - Mathf.Lerp(minMaxHeight.x, minMaxHeight.y, restingHeight) - localPhysicsPosition.z), -100f, 100f) * Time.fixedDeltaTime) * Vector3.forward;
 
           // Friction & Drag
           float velMag = originalLocalVelocity.magnitude;
