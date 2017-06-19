@@ -170,7 +170,7 @@ namespace Leap.Unity.Interaction {
             localPhysicsVelocity = localPhysicsVelocity + (frictionForce /* assume unit mass */ * Time.fixedDeltaTime);
 
             // Drag force
-            float velSqrMag = localPhysicsVelocity.sqrMagnitude;
+            float velSqrMag = velMag * velMag;
             Vector3 dragForce = resistanceDir * velSqrMag * DRAG_COEFFICIENT;
             localPhysicsVelocity = localPhysicsVelocity + (dragForce /* assume unit mass */ * Time.fixedDeltaTime);
           }
