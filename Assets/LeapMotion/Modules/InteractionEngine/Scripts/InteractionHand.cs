@@ -339,7 +339,7 @@ namespace Leap.Unity.Interaction {
     private const int BONES_PER_FINGER = 3;
 
     private ContactBone[] _contactBones;
-    protected override ContactBone[] contactBones {
+    public override ContactBone[] contactBones {
       get { return _contactBones; }
     }
 

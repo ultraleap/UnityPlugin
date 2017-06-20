@@ -7,17 +7,16 @@
  * between Leap Motion and you, your company or other organization.           *
  ******************************************************************************/
 
+using InteractionEngineUtility;
 using Leap.Unity.Attributes;
-using Leap.Unity.Query;
 using Leap.Unity.Interaction.Internal;
+using Leap.Unity.Query;
+using Leap.Unity.Space;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
-using Leap.Unity.Space;
-using InteractionEngineUtility;
-using Leap.Unity.RuntimeGizmos;
 
 namespace Leap.Unity.Interaction {
 
@@ -530,7 +529,7 @@ namespace Leap.Unity.Interaction {
     private InteractionManager _manager;
     public InteractionManager manager {
       get { return _manager; }
-      protected set {
+      set {
         if (_manager != null && _manager.IsBehaviourRegistered(this)) {
           _manager.UnregisterInteractionBehaviour(this);
         }
@@ -675,6 +674,47 @@ namespace Leap.Unity.Interaction {
            + "objects based on the movement of the grasping interaction controller so "
            + "the objects appear to move with less latency.")]
     public bool graspHoldWarpingEnabled__curIgnored = true; // TODO: Warping not yet implemented.
+
+    [Header("Layer Overrides")]
+
+    [SerializeField]
+    [OnEditorChange("overrideInteractionLayer")]
+    [Tooltip("If set to true, this interaction object will override the Interaction "
+           + "Manager's layer setting for its default layer.")]
+    private bool _overrideInteractionLayer = false;
+    public bool overrideInteractionLayer {
+      get {
+        return _overrideInteractionLayer;
+      }
+      set {
+        _overrideInteractionLayer = value;
+      }
+    }
+    
+    [Tooltip("Overrides the layer this interaction object should be on under most "
+           + "circumstances.")]
+    public SingleLayer interactionLayer;
+
+    [SerializeField]
+    [OnEditorChange("overrideNoContactLayer")]
+    [Tooltip("If set to true, this interaction object will override the Interaction "
+           + "Manager's layer setting for its default no-contact layer. The no-contact "
+           + "layer should not collide with the contact bone layer; it is used when the "
+           + "interaction object is grasped or when it has contact disabled.")]
+    private bool _overrideNoContactLayer = false;
+    public bool overrideNoContactLayer {
+      get {
+        return _overrideNoContactLayer;
+      }
+      set {
+        _overrideNoContactLayer = value;
+      }
+    }
+
+    [Tooltip("Overrides the layer this interaction object should be on when it is grasped "
+           + "or ignoring contact. This layer should not collide with the contact bone "
+           + "layer -- the layer interaction controllers' colliders are on.")]
+    public SingleLayer noContactLayer;
 
     #region Unity Callbacks
 
@@ -1293,7 +1333,7 @@ namespace Leap.Unity.Interaction {
 
     #region Internal
 
-    private List<Collider> _interactionColliders = new List<Collider>();
+    protected List<Collider> _interactionColliders = new List<Collider>();
 
     protected void InitInternal() {
       InitLayer();
@@ -1343,13 +1383,15 @@ namespace Leap.Unity.Interaction {
       int layer;
 
       if (ignoreContact) {
-        layer = manager.interactionNoContactLayer;
+        layer = overrideNoContactLayer ? manager.interactionNoContactLayer : this.noContactLayer;
       } else {
         switch (_collisionMode) {
           case CollisionMode.Normal:
-            layer = manager.interactionLayer; break;
+            layer = overrideInteractionLayer ? manager.interactionLayer : this.interactionLayer;
+            break;
           case CollisionMode.Grasped:
-            layer = manager.interactionNoContactLayer; break;
+            layer = overrideNoContactLayer ? manager.interactionNoContactLayer : this.noContactLayer;
+            break;
           default:
             Debug.LogError("Invalid collision mode, can't update layer.");
             return;

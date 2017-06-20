@@ -350,7 +350,7 @@ namespace Leap.Unity.Interaction {
     private Quaternion[] _contactBoneTargetRotations;
 
     private ContactBone[] _contactBones;
-    protected override ContactBone[] contactBones {
+    public override ContactBone[] contactBones {
       get { return _contactBones; }
     }
 

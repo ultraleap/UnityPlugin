@@ -236,6 +236,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _manager: {fileID: 0}
   _ignoreHoverMode: 0
+  _isIgnoringAllHoverState: 0
+  _ignorePrimaryHover: 0
   _ignoreContact: 0
   _ignoreGrasping: 1
   _contactForceMode: 1
@@ -243,6 +245,12 @@ MonoBehaviour:
   _moveObjectWhenGrasped: 1
   graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
+  _overrideInteractionLayer: 1
+  interactionLayer:
+    layerIndex: 5
+  _overrideNoContactLayer: 0
+  noContactLayer:
+    layerIndex: 0
   _eventTable:
     _entries: []
   minMaxHeight: {x: 0, y: 0.03}
@@ -271,3 +279,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   useHover: 0
   usePrimaryHover: 1
+  defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
+  suspendedColor: {r: 1, g: 0, b: 0, a: 1}
+  hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
+  primaryHoverColor: {r: 0.8, g: 0.8, b: 0.8, a: 1}
+  pressedColor: {r: 1, g: 1, b: 1, a: 1}

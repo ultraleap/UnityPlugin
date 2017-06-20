@@ -1367,6 +1367,12 @@ MonoBehaviour:
   _moveObjectWhenGrasped: 1
   graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
+  _overrideInteractionLayer: 0
+  interactionLayer:
+    layerIndex: 0
+  _overrideNoContactLayer: 0
+  noContactLayer:
+    layerIndex: 0
   _eventTable:
     _entries: []
   minMaxHeight: {x: 0, y: 0.02}
@@ -1474,6 +1480,12 @@ MonoBehaviour:
   _moveObjectWhenGrasped: 1
   graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
+  _overrideInteractionLayer: 0
+  interactionLayer:
+    layerIndex: 0
+  _overrideNoContactLayer: 0
+  noContactLayer:
+    layerIndex: 0
   _eventTable:
     _entries: []
   minMaxHeight: {x: 0, y: 0.02}
@@ -1993,7 +2005,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0ebbb41b110e5794ab82d986ca172460, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _manager: {fileID: 0}
+  _manager: {fileID: 1454829696}
   _ignoreHoverMode: 1
   _isIgnoringAllHoverState: 0
   _ignorePrimaryHover: 0
@@ -2004,6 +2016,12 @@ MonoBehaviour:
   _moveObjectWhenGrasped: 1
   graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
+  _overrideInteractionLayer: 1
+  interactionLayer:
+    layerIndex: 5
+  _overrideNoContactLayer: 0
+  noContactLayer:
+    layerIndex: 0
   _eventTable:
     _entries: []
   minMaxHeight: {x: 0, y: 0.02}
@@ -2356,6 +2374,12 @@ MonoBehaviour:
   _moveObjectWhenGrasped: 1
   graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
+  _overrideInteractionLayer: 0
+  interactionLayer:
+    layerIndex: 0
+  _overrideNoContactLayer: 0
+  noContactLayer:
+    layerIndex: 0
   _eventTable:
     _entries: []
   minMaxHeight: {x: 0, y: 0.02}
@@ -5707,6 +5731,12 @@ MonoBehaviour:
   _moveObjectWhenGrasped: 1
   graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
+  _overrideInteractionLayer: 0
+  interactionLayer:
+    layerIndex: 0
+  _overrideNoContactLayer: 0
+  noContactLayer:
+    layerIndex: 0
   _eventTable:
     _entries: []
   minMaxHeight: {x: 0, y: 0.02}
@@ -5974,6 +6004,12 @@ MonoBehaviour:
   _moveObjectWhenGrasped: 1
   graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
+  _overrideInteractionLayer: 0
+  interactionLayer:
+    layerIndex: 0
+  _overrideNoContactLayer: 0
+  noContactLayer:
+    layerIndex: 0
   _eventTable:
     _entries: []
   minMaxHeight: {x: 0, y: 0.02}
@@ -6187,6 +6223,12 @@ MonoBehaviour:
   _moveObjectWhenGrasped: 1
   graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
+  _overrideInteractionLayer: 0
+  interactionLayer:
+    layerIndex: 0
+  _overrideNoContactLayer: 0
+  noContactLayer:
+    layerIndex: 0
   _eventTable:
     _entries: []
   minMaxHeight: {x: 0, y: 0.02}
@@ -6299,7 +6341,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5cba520a60e47274cb1e5afbb57aae0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _manager: {fileID: 0}
+  _manager: {fileID: 1454829696}
   _ignoreHoverMode: 1
   _isIgnoringAllHoverState: 0
   _ignorePrimaryHover: 0
@@ -6310,6 +6352,12 @@ MonoBehaviour:
   _moveObjectWhenGrasped: 1
   graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
+  _overrideInteractionLayer: 1
+  interactionLayer:
+    layerIndex: 5
+  _overrideNoContactLayer: 0
+  noContactLayer:
+    layerIndex: 0
   _eventTable:
     _entries: []
   minMaxHeight: {x: 0, y: 0.02}
@@ -6634,7 +6682,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5cba520a60e47274cb1e5afbb57aae0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _manager: {fileID: 0}
+  _manager: {fileID: 1454829696}
   _ignoreHoverMode: 1
   _isIgnoringAllHoverState: 0
   _ignorePrimaryHover: 0
@@ -6645,6 +6693,12 @@ MonoBehaviour:
   _moveObjectWhenGrasped: 1
   graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
+  _overrideInteractionLayer: 1
+  interactionLayer:
+    layerIndex: 5
+  _overrideNoContactLayer: 0
+  noContactLayer:
+    layerIndex: 0
   _eventTable:
     _entries: []
   minMaxHeight: {x: 0, y: 0.02}

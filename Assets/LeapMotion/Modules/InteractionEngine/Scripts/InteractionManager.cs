@@ -63,7 +63,7 @@ namespace Leap.Unity.Interaction {
     [Header("Layer Settings")]
     [Tooltip("Whether or not to create the layers used for interaction when the scene "
            + "runs. Interactions require an interaction layer (for objects), a grasped "
-           + "object layer, and a contact bone layer (for interaction controller 'bone'"
+           + "object layer, and a contact bone layer (for interaction controller 'bone' "
            + "colliders). Keep this checked to have these layers created for you, but be "
            + "aware that the generated layers will have blank names due to Unity "
            + "limitations.")]

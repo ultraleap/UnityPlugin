@@ -93,7 +93,7 @@ namespace Leap.Unity.Interaction {
       _initialIgnoreGrasping = ignoreGrasping;
       _initialLocalRotation = transform.localRotation;
 
-      //Add a custom grasp controller
+      // Add a custom grasp controller.
       OnGraspedMovement += onGraspedMovement;
       OnGraspEnd += onGraspEnd;
 

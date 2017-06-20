@@ -33,6 +33,7 @@ namespace Leap.Unity.Interaction {
                                 "_interactionLayer",
                                 "_interactionNoContactLayer",
                                 "_contactBoneLayer");
+      specifyCustomDecorator("_interactionLayer", drawInteractionLayerDecorator);
 
       specifyCustomDecorator("_drawControllerRuntimeGizmos", drawControllerRuntimeGizmoDecorator);
       specifyCustomPostDecorator("_drawControllerRuntimeGizmos", drawPostControllerRuntimeGizmoDecorator);
@@ -40,6 +41,14 @@ namespace Leap.Unity.Interaction {
 
     public override bool RequiresConstantRepaint() {
       return Application.isPlaying;
+    }
+
+    private void drawInteractionLayerDecorator(SerializedProperty property) {
+      if (!Physics.GetIgnoreLayerCollision(target.interactionNoContactLayer.layerIndex,
+                                           target.contactBoneLayer.layerIndex)) {
+        EditorGUILayout.HelpBox("The No Contact layer should not collide with the Contact "
+                              + "Bone layer.", MessageType.Error);
+      }
     }
 
     private RuntimeGizmoManager _runtimeGizmoManager;
