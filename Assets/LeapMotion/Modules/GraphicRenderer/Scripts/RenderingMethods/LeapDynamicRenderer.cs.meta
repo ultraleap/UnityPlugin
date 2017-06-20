@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: e4e826f61fa76194f87130a5030b287d
+timeCreated: 1493235745
+licenseType: Free
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences:
+  - renderer: {instanceID: 0}
+  - group: {instanceID: 0}
+  - _shader: {fileID: 4800000, guid: 474347a7dd23a1743b7bdfa349be986b, type: 3}
+  - _material: {instanceID: 0}
+  - _meshes: {instanceID: 0}
+  - _packedTextures: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
