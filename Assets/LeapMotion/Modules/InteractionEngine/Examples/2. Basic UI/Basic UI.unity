@@ -292,7 +292,7 @@ MonoBehaviour:
   _frameOptimization: 0
   _overrideDeviceType: 0
   _overrideDeviceTypeWith: 1
-  _updateHandInPrecull: 0
+  _updateHandInPrecull: 1
 --- !u!114 &138469537
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3183,13 +3183,13 @@ MonoBehaviour:
   _headTransform: {fileID: 1846961981}
   _trackingAnchor: {fileID: 1198429509}
   recenter: 114
-  tweenImageWarping: 0
+  tweenImageWarping: 1
   tweenRotationalWarping: 1
-  tweenPositionalWarping: 0
-  syncMode: 0
-  allowManualTimeAlignment: 0
-  warpingAdjustment: 30
-  unlockHold: 303
+  tweenPositionalWarping: 1
+  syncMode: 1
+  allowManualTimeAlignment: 1
+  warpingAdjustment: 50
+  unlockHold: 0
   moreRewind: 276
   lessRewind: 275
 --- !u!114 &1036247346 stripped

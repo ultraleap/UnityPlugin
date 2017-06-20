@@ -2998,10 +2998,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _isHeadMounted: 1
   _temporalWarping: {fileID: 107275865}
-  _frameOptimization: 1
-  _overrideDeviceType: 1
+  _frameOptimization: 0
+  _overrideDeviceType: 0
   _overrideDeviceTypeWith: 1
-  _updateHandInPrecull: 0
+  _updateHandInPrecull: 1
 --- !u!114 &1067244361
 MonoBehaviour:
   m_ObjectHideFlags: 0

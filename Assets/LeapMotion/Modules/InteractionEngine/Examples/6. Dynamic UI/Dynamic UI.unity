@@ -7226,9 +7226,9 @@ MonoBehaviour:
   _isHeadMounted: 1
   _temporalWarping: {fileID: 353591242}
   _frameOptimization: 0
-  _overrideDeviceType: 1
+  _overrideDeviceType: 0
   _overrideDeviceTypeWith: 1
-  _updateHandInPrecull: 0
+  _updateHandInPrecull: 1
 --- !u!114 &710336404
 MonoBehaviour:
   m_ObjectHideFlags: 0

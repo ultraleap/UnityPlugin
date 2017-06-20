@@ -9463,13 +9463,13 @@ MonoBehaviour:
   _headTransform: {fileID: 922779606}
   _trackingAnchor: {fileID: 1155409170}
   recenter: 114
-  tweenImageWarping: 0
+  tweenImageWarping: 1
   tweenRotationalWarping: 1
-  tweenPositionalWarping: 0
-  syncMode: 0
-  allowManualTimeAlignment: 0
-  warpingAdjustment: 30
-  unlockHold: 303
+  tweenPositionalWarping: 1
+  syncMode: 1
+  allowManualTimeAlignment: 1
+  warpingAdjustment: 50
+  unlockHold: 0
   moreRewind: 276
   lessRewind: 275
 --- !u!1 &2145183717
