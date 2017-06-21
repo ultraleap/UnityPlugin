@@ -38,10 +38,10 @@ namespace Leap.Unity.Interaction {
 
       // Layer Overrides
       specifyConditionalDrawing(() => target.overrideInteractionLayer,
-                                "interactionLayer");
+                                "_interactionLayer");
       specifyConditionalDrawing(() => target.overrideNoContactLayer,
-                                "noContactLayer");
-      specifyCustomDecorator("noContactLayer", drawNoContactLayerDecorator);
+                                "_noContactLayer");
+      specifyCustomDecorator("_noContactLayer", drawNoContactLayerDecorator);
     }
 
     private void drawInteractionManagerDecorator(SerializedProperty property) {

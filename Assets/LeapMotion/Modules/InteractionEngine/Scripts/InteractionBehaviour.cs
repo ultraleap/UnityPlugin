@@ -13,10 +13,8 @@ using Leap.Unity.Interaction.Internal;
 using Leap.Unity.Query;
 using Leap.Unity.Space;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Assertions;
 
 namespace Leap.Unity.Interaction {
 
@@ -524,6 +522,8 @@ namespace Leap.Unity.Interaction {
 
     #endregion
 
+    #region Inspector
+
     [Tooltip("The Interaction Manager responsible for this interaction object.")]
     [SerializeField]
     private InteractionManager _manager;
@@ -693,7 +693,12 @@ namespace Leap.Unity.Interaction {
     
     [Tooltip("Overrides the layer this interaction object should be on under most "
            + "circumstances.")]
-    public SingleLayer interactionLayer;
+    [SerializeField]
+    private SingleLayer _interactionLayer;
+    public SingleLayer interactionLayer {
+      get { return _interactionLayer; }
+      protected set { _interactionLayer = value; }
+    }
 
     [SerializeField]
     [OnEditorChange("overrideNoContactLayer")]
@@ -714,7 +719,14 @@ namespace Leap.Unity.Interaction {
     [Tooltip("Overrides the layer this interaction object should be on when it is grasped "
            + "or ignoring contact. This layer should not collide with the contact bone "
            + "layer -- the layer interaction controllers' colliders are on.")]
-    public SingleLayer noContactLayer;
+    [SerializeField]
+    private SingleLayer _noContactLayer;
+    public SingleLayer noContactLayer {
+      get { return _noContactLayer; }
+      protected set { _noContactLayer = value; }
+    }
+
+    #endregion
 
     #region Unity Callbacks
 
@@ -748,31 +760,28 @@ namespace Leap.Unity.Interaction {
         manager.RegisterInteractionBehaviour(this);
       }
 
+      // Make sure we have a list of all of this object's colliders.
+      RefreshInteractionColliders();
+
+      // Ensure physics layers are set up properly.
+      initLayers();
+
       space = GetComponentInChildren<ISpaceComponent>();
     }
 
     protected virtual void OnDisable() {
+      // Remove this object's layer tracking from the manager.
+      finalizeLayers();
+
       if (manager != null && manager.IsBehaviourRegistered(this)) {
         manager.UnregisterInteractionBehaviour(this);
       }
     }
 
     protected virtual void Start() {
-      // Make sure we have a list of all of this object's colliders.
-      RefreshInteractionColliders();
-
       // Check any Joint attachments to automatically be able to choose Kabsch pivot
       // setting (grasping).
       RefreshPositionLockedState();
-       
-      // Ensure physics layers are set up properly.
-      InitInternal();
-    }
-
-    protected virtual void OnDestroy() {
-      if (manager != null) {
-        manager.UnregisterInteractionBehaviour(this);
-      }
     }
 
     #endregion
@@ -783,8 +792,9 @@ namespace Leap.Unity.Interaction {
     /// FixedUpdate().
     /// </summary>
     public void FixedUpdateObject() {
-      if (!ignoreGrasping) FixedUpdateGrasping();
-      FixedUpdateCollisionMode();
+      if (!ignoreGrasping) fixedUpdateGrasping();
+      fixedUpdateLayers();
+
       if (_appliedForces) { FixedUpdateForces(); }
     }
 
@@ -1153,7 +1163,7 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    private void InitGrasping() {
+    private void initGrasping() {
       _moveObjectWhenGrasped__WasEnabledLastFrame = moveObjectWhenGrasped;
 
       _kinematicGraspedMovement = new KinematicGraspedMovement();
@@ -1162,9 +1172,9 @@ namespace Leap.Unity.Interaction {
       _graspingInitialized = true;
     }
 
-    private void FixedUpdateGrasping() {
+    private void fixedUpdateGrasping() {
       if (!_graspingInitialized) {
-        InitGrasping();
+        initGrasping();
       }
 
       if (!moveObjectWhenGrasped && _moveObjectWhenGrasped__WasEnabledLastFrame) {
@@ -1331,40 +1341,9 @@ namespace Leap.Unity.Interaction {
 
     #endregion
 
-    #region Internal
+    #region Colliders
 
     protected List<Collider> _interactionColliders = new List<Collider>();
-
-    protected void InitInternal() {
-      InitLayer();
-      FixedUpdateLayer();
-    }
-
-    #region Interaction Layers
-
-    protected enum CollisionMode {
-      Normal,
-      Grasped
-    }
-    protected CollisionMode _collisionMode;
-
-    protected void FixedUpdateCollisionMode() {
-      CollisionMode desiredCollisionMode = CollisionMode.Normal;
-      if (isGrasped) {
-        desiredCollisionMode = CollisionMode.Grasped;
-      }
-
-      _collisionMode = desiredCollisionMode;
-      FixedUpdateLayer();
-
-      Assert.IsTrue((_collisionMode == CollisionMode.Grasped) == isGrasped);
-    }
-
-    protected SingleLayer _initialLayer;
-
-    protected void InitLayer() {
-      _initialLayer = gameObject.layer;
-    }
 
     /// <summary>
     /// Recursively searches the hierarchy of this Interaction object to
@@ -1373,31 +1352,57 @@ namespace Leap.Unity.Interaction {
     /// which object will become the primary hover.
     /// 
     /// Call this method manually if you change an Interaction object's colliders
-    /// after its Start() method has been called! (Called automatically on Start().)
+    /// after its Start() method has been called! (Called automatically in OnEnable.)
     /// </summary>
     public void RefreshInteractionColliders() {
       Utils.FindColliders<Collider>(this.gameObject, _interactionColliders);
     }
 
-    protected void FixedUpdateLayer() {
-      int layer;
+    #endregion
 
+    #region Interaction Layers
+
+    private int _lastInteractionLayer = -1;
+    private int _lastNoContactLayer = -1;
+
+    private void initLayers() {
+      refreshInteractionLayer();
+      refreshNoContactLayer();
+      
+      (manager as IInternalInteractionManager).NotifyIntObjAddedInteractionLayer(this, interactionLayer, false);
+      (manager as IInternalInteractionManager).NotifyIntObjAddedNoContactLayer(this, noContactLayer, false);
+      (manager as IInternalInteractionManager).RefreshLayersNow();
+
+      _lastInteractionLayer = interactionLayer;
+      _lastNoContactLayer = noContactLayer;
+    }
+
+    private void refreshInteractionLayer() {
+      interactionLayer = overrideInteractionLayer ? this.interactionLayer
+                                                  : manager.interactionLayer;
+    }
+
+    private void refreshNoContactLayer() {
+      noContactLayer = overrideNoContactLayer ? this.noContactLayer
+                                              : manager.interactionNoContactLayer;
+    }
+    
+    private void fixedUpdateLayers() {
+      int layer;
+      refreshInteractionLayer();
+      refreshNoContactLayer();
+
+      // Update the object's layer based on interaction state.
       if (ignoreContact) {
-        layer = overrideNoContactLayer ? manager.interactionNoContactLayer : this.noContactLayer;
+        layer = noContactLayer;
       } else {
-        switch (_collisionMode) {
-          case CollisionMode.Normal:
-            layer = overrideInteractionLayer ? manager.interactionLayer : this.interactionLayer;
-            break;
-          case CollisionMode.Grasped:
-            layer = overrideNoContactLayer ? manager.interactionNoContactLayer : this.noContactLayer;
-            break;
-          default:
-            Debug.LogError("Invalid collision mode, can't update layer.");
-            return;
+        if (isGrasped) {
+          layer = noContactLayer;
+        }
+        else {
+          layer = interactionLayer;
         }
       }
-
       if (this.gameObject.layer != layer) {
         this.gameObject.layer = layer;
         for (int i = 0; i < _interactionColliders.Count; i++) {
@@ -1406,6 +1411,26 @@ namespace Leap.Unity.Interaction {
           }
         }
       }
+
+      // Update the manager if necessary.
+      
+      if (interactionLayer != _lastInteractionLayer) {
+        (manager as IInternalInteractionManager).NotifyIntObjHasNewInteractionLayer(this, oldInteractionLayer: _lastInteractionLayer,
+                                                                                          newInteractionLayer: interactionLayer);
+        _lastInteractionLayer = noContactLayer;
+      }
+
+      if (noContactLayer != _lastNoContactLayer) {
+        (manager as IInternalInteractionManager).NotifyIntObjHasNewNoContactLayer(this, oldNoContactLayer: _lastNoContactLayer,
+                                                                                        newNoContactLayer: noContactLayer);
+        _lastInteractionLayer = noContactLayer;
+      }
+    }
+
+    private void finalizeLayers() {
+      (manager as IInternalInteractionManager).NotifyIntObjRemovedInteractionLayer(this, interactionLayer, false);
+      (manager as IInternalInteractionManager).NotifyIntObjRemovedNoContactLayer(this, noContactLayer, false);
+      (manager as IInternalInteractionManager).RefreshLayersNow();
     }
 
     #endregion
@@ -1476,8 +1501,6 @@ namespace Leap.Unity.Interaction {
         }
       }
     }
-
-    #endregion
 
     #endregion
 

@@ -45,14 +45,12 @@ namespace Leap.Unity.Interaction.Internal {
       _defaultGrabParams = new GrabClassifierHeuristics.ClassifierParameters(
         fingerStickiness, thumbStickiness, maxCurl, minCurl, fingerRadius,
         thumbRadius, grabCooldown, maxCurlVel, maxGrabDistance,
-        layerMask == 0 ? (interactionHand.manager.interactionLayer.layerMask
-                          | interactionHand.manager.interactionNoContactLayer.layerMask) : layerMask,
+        layerMask == 0 ? interactionHand.manager.GetInteractionLayerMask() : layerMask,
         queryTriggers);
       _scaledGrabParams = new GrabClassifierHeuristics.ClassifierParameters(
         fingerStickiness, thumbStickiness, maxCurl, minCurl, fingerRadius,
         thumbRadius, grabCooldown, maxCurlVel, maxGrabDistance,
-        layerMask == 0 ? (interactionHand.manager.interactionLayer.layerMask
-                          | interactionHand.manager.interactionNoContactLayer.layerMask) : layerMask,
+        layerMask == 0 ? interactionHand.manager.GetInteractionLayerMask() : layerMask,
         queryTriggers);
 
       for (int i = 0; i < _collidingCandidates.Length; i++) {
@@ -72,6 +70,9 @@ namespace Leap.Unity.Interaction.Internal {
                                             * interactionHand.manager.SimulationScale;
           _scaledGrabParams.MAXIMUM_DISTANCE_FROM_HAND = _defaultGrabParams.MAXIMUM_DISTANCE_FROM_HAND
                                                        * interactionHand.manager.SimulationScale;
+
+          // Ensure layer mask is up-to-date.
+          _scaledGrabParams.LAYER_MASK = interactionHand.manager.GetInteractionLayerMask();
       
           // Ensure that the temporally variant variables are updated.
           // scaledGrabParams.LAYER_MASK = 1 << _manager.InteractionLayer;

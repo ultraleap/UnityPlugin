@@ -19,6 +19,9 @@ using Leap.Unity.Attributes;
 
 namespace Leap.Unity.Interaction {
 
+  [Serializable]
+  public class InteractionControllerSet : SerializableHashSet<InteractionController> { }
+
   /// <summary>
   /// Specified on a per-object basis to allow Interaction objects
   /// to ignore hover for the left hand, right hand, or both hands.
@@ -257,18 +260,21 @@ namespace Leap.Unity.Interaction {
       else return null;
     }
 
+    // Layer mask for the hover acitivity manager.
+    private Func<int> hoverLayerMaskAccessor;
+
     // Hover Activity Manager
     private ActivityManager<IInteractionBehaviour> _hoverActivityManager;
     public ActivityManager<IInteractionBehaviour> hoverActivityManager {
       get {
         if (_hoverActivityManager == null) {
           if (hoverActivityFilter == null) hoverActivityFilter = hoverFilterFunc;
+          if (hoverLayerMaskAccessor == null) hoverLayerMaskAccessor = manager.GetInteractionLayerMask;
 
           _hoverActivityManager = new ActivityManager<IInteractionBehaviour>(manager.hoverActivationRadius,
                                                                              hoverActivityFilter);
 
-          _hoverActivityManager.activationLayerMask = manager.interactionLayer.layerMask
-                                                    | manager.interactionNoContactLayer.layerMask;
+          _hoverActivityManager.activationLayerFunction = hoverLayerMaskAccessor;
         }
         return _hoverActivityManager;
       }
@@ -285,6 +291,17 @@ namespace Leap.Unity.Interaction {
     public bool primaryHoverLocked {
       get { return _primaryHoverLocked; }
       set { _primaryHoverLocked = value; }
+    }
+
+    /// <summary>
+    /// Sets the argument interaction object to be the current primary hover of this
+    /// interaction controller and locks the primary hover state of the interaction
+    /// controller.
+    /// <see cref="primaryHoverLocked"/>
+    /// </summary>
+    public void LockPrimaryHover(InteractionBehaviour intObj) {
+      _primaryHoveredObject = intObj;
+      _primaryHoverLocked = true;
     }
 
     /// <summary>
@@ -358,18 +375,16 @@ namespace Leap.Unity.Interaction {
           _primaryHoverLocked = false;
         }
 
-        // Update hover state if it's not currently locked.
-        if (!primaryHoverLocked) {
-          hoverActivityManager.activationRadius = manager.WorldHoverActivationRadius;
+        // Update hover state.
+        hoverActivityManager.activationRadius = manager.WorldHoverActivationRadius;
 
-          Vector3? queryPosition = isTracked ? (Vector3?)hoverPoint : null;
-          hoverActivityManager.UpdateActivityQuery(queryPosition, LeapSpace.allEnabled);
+        Vector3? queryPosition = isTracked ? (Vector3?)hoverPoint : null;
+        hoverActivityManager.UpdateActivityQuery(queryPosition, LeapSpace.allEnabled);
 
-          // Add all returned objects as "hovered".
-          // Find closest objects per primary hover point to update primary hover state.
-          using (new ProfilerSample("Find Closest Objects for Primary Hover")) {
-            refreshHoverState(_hoverActivityManager.ActiveObjects);
-          }
+        // Add all returned objects as "hovered".
+        // Find closest objects per primary hover point to update primary hover state.
+        using (new ProfilerSample("Find Closest Objects for Primary Hover")) {
+          refreshHoverState(_hoverActivityManager.ActiveObjects);
         }
 
         // Refresh buffer information from the previous frame to be able to fire
@@ -433,6 +448,11 @@ namespace Leap.Unity.Interaction {
       int primaryHoverPointIdxLastFrame = _primaryHoveredLastFrame != null ? _primaryHoverPointIdx : -1;
 
       _hoveredObjects.Clear();
+
+      IInteractionBehaviour lockedPrimaryHoveredObject = null;
+      if (primaryHoverLocked) {
+        lockedPrimaryHoveredObject = _primaryHoveredObject;
+      }
       _primaryHoveredObject = null;
       _primaryHoverDistance = float.PositiveInfinity;
       _primaryHoverPointIdx = -1;
@@ -475,45 +495,63 @@ namespace Leap.Unity.Interaction {
         // optimization, since it can require a lot of distance checks.
         if (behaviour.ignorePrimaryHover) continue;
 
-        // Do further processing to determine the primary hover.
-        else {
+        // Do further processing to determine the primary hover if primary hover isn't
+        // locked.
+        else if (!primaryHoverLocked) {
+          processPrimaryHover(behaviour, maxNewPrimaryHoverDistance);
+        }
+      }
 
-          // Check against all positions currently registered as primary hover points,
-          // finding the closest one and updating hover data accordingly.
-          float shortestPointDistance = float.PositiveInfinity;
-          for (int i = 0; i < primaryHoverPoints.Count; i++) {
-            var primaryHoverPoint = primaryHoverPoints[i];
+      // If the primary hover is locked, we need to process primary hover specifically
+      // for the locked object.
+      if (primaryHoverLocked && lockedPrimaryHoveredObject != null) {
+        processPrimaryHover(lockedPrimaryHoveredObject, float.PositiveInfinity);
+      }
+    }
+    
+    private void processPrimaryHover(IInteractionBehaviour behaviour, float maxNewPrimaryHoverDistance) {
+      // Check against all positions currently registered as primary hover points,
+      // finding the closest one and updating hover data accordingly.
+      float shortestPointDistance = float.PositiveInfinity;
+      for (int i = 0; i < primaryHoverPoints.Count; i++) {
+        var primaryHoverPoint = primaryHoverPoints[i];
 
-            // It's possible to disable primary hover points to ignore them for hover
-            // consideration.
-            if (primaryHoverPoint == null) continue;
-            if (!primaryHoverPoint.gameObject.activeInHierarchy) continue;
+        // It's possible to disable primary hover points to ignore them for hover
+        // consideration.
+        if (primaryHoverPoint == null) continue;
+        if (!primaryHoverPoint.gameObject.activeInHierarchy) continue;
 
-            // Skip non-index fingers for InteractionHands if they aren't extended.
-            if (intHand != null) {
-              if (!(intHand.leapHand).Fingers[i].IsExtended && i != 1) { continue; }
-            }
+        // Skip non-index fingers for InteractionHands if they aren't extended.
+        if (intHand != null) {
+          if (!(intHand.leapHand).Fingers[i].IsExtended && i != 1) { continue; }
+        }
 
-            // Check primary hover for the primary hover point.
-            float behaviourDistance = GetHoverDistance(primaryHoverPoint.position, behaviour);
-            if (behaviourDistance < shortestPointDistance) {
+        // Check primary hover for the primary hover point.
+        float behaviourDistance = GetHoverDistance(primaryHoverPoint.position, behaviour);
+        if (behaviourDistance < shortestPointDistance) {
 
-              // This is the closest behaviour to this primary hover point.
-              _perPointPrimaryHovered[i] = behaviour;
-              _perPointPrimaryHoverDistance[i] = behaviourDistance;
-              shortestPointDistance = behaviourDistance;
+          // This is the closest behaviour to this primary hover point.
+          _perPointPrimaryHovered[i] = behaviour;
+          _perPointPrimaryHoverDistance[i] = behaviourDistance;
+          shortestPointDistance = behaviourDistance;
 
-              if (shortestPointDistance < _primaryHoverDistance
-                  && (behaviour == _primaryHoveredLastFrame || behaviourDistance < maxNewPrimaryHoverDistance)) {
+          if (primaryHoverLocked) {
+            // If primary hover is locked, there's only one object to consider,
+            // and the current primary hover point is the closest one to the object
+            // so far, so update primary hover accordingly.
+            _primaryHoveredObject = _perPointPrimaryHovered[i]; // (redundant)
+            _primaryHoverDistance = _perPointPrimaryHoverDistance[i];
+            _primaryHoverPointIdx = i;
+          }
+          else if (shortestPointDistance < _primaryHoverDistance
+                   && (behaviour == _primaryHoveredLastFrame || behaviourDistance < maxNewPrimaryHoverDistance)) {
 
-                // This is the closest behaviour to ANY primary hover point, and the
-                // distance is less than the hysteresis distance to transition away from
-                // the previous primary hovered object.
-                _primaryHoveredObject = _perPointPrimaryHovered[i];
-                _primaryHoverDistance = _perPointPrimaryHoverDistance[i];
-                _primaryHoverPointIdx = i;
-              }
-            }
+            // This is the closest behaviour to ANY primary hover point, and the
+            // distance is less than the hysteresis distance to transition away from
+            // the previous primary hovered object.
+            _primaryHoveredObject = _perPointPrimaryHovered[i];
+            _primaryHoverDistance = _perPointPrimaryHoverDistance[i];
+            _primaryHoverPointIdx = i;
           }
         }
       }
@@ -1543,6 +1581,9 @@ namespace Leap.Unity.Interaction {
       return null;
     }
 
+    // Layer mask for the hover acitivity manager.
+    private Func<int> graspLayerMaskAccessor;
+
     // Grasp Activity Manager
     private ActivityManager<IInteractionBehaviour> _graspActivityManager;
     /// <summary> Determines which objects are graspable any given frame. </summary>
@@ -1550,11 +1591,11 @@ namespace Leap.Unity.Interaction {
       get {
         if (_graspActivityManager == null) {
           if (graspActivityFilter == null) graspActivityFilter = graspFilterFunc;
+          if (graspLayerMaskAccessor == null) graspLayerMaskAccessor = manager.GetInteractionLayerMask;
 
           _graspActivityManager = new ActivityManager<IInteractionBehaviour>(1F, graspActivityFilter);
 
-          _graspActivityManager.activationLayerMask = manager.interactionLayer.layerMask
-                                                    | manager.interactionNoContactLayer.layerMask;
+          _graspActivityManager.activationLayerFunction = graspLayerMaskAccessor;
         }
         return _graspActivityManager;
       }
@@ -1704,7 +1745,7 @@ namespace Leap.Unity.Interaction {
         return false;
       }
 
-      // Update the grab classifier to determine if we should grasp an object.
+      // Actually check whether the controller implementation will grasp.
       bool shouldGraspObject = checkShouldGrasp(out newlyGraspedObject);
       if (shouldGraspObject) {
         _graspedObject = newlyGraspedObject;
