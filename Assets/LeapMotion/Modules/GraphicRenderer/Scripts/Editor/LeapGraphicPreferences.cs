@@ -63,7 +63,7 @@ namespace Leap.Unity.GraphicalRenderer {
         EditorPrefs.SetBool(PROMP_WHEN_ADD_CUSTOM_CHANNEL_LEY, value);
       }
     }
-    
+
     [LeapPreferences("Graphic Renderer", 20)]
     private static void preferencesGUI() {
       drawGraphicMaxField();
