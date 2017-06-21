@@ -53,9 +53,9 @@ namespace Leap.Unity {
       [HideInInspector]
       public bool IsRightToBeSpawned;
       [HideInInspector]
-      public List<IHandModel> modelList;
+      public List<IHandModel> modelList = new List<IHandModel>();
       [HideInInspector]
-      public List<IHandModel> modelsCheckedOut;
+      public List<IHandModel> modelsCheckedOut = new List<IHandModel>();
       public bool IsEnabled = true;
       public bool CanDuplicate;
 
@@ -132,13 +132,22 @@ namespace Leap.Unity {
       }
       
       for(int i=0; i<ModelPool.Count; i++) {
-        var collectionGroup = ModelPool[i];
+        InitializeModelGroup(ModelPool[i]);
+      }
+    }
+
+    private void InitializeModelGroup(ModelGroup collectionGroup) {
+        // Prevent the ModelGroup be initialized by multiple times
+        if (modelGroupMapping.ContainsValue(collectionGroup)) {
+          return;
+        }
+        
         collectionGroup._handPool = this;
         IHandModel leftModel;
         IHandModel rightModel;
         if (collectionGroup.IsLeftToBeSpawned) {
           IHandModel modelToSpawn = collectionGroup.LeftModel;
-          GameObject spawnedGO = GameObject.Instantiate(modelToSpawn.gameObject);
+          GameObject spawnedGO = Instantiate(modelToSpawn.gameObject);
           leftModel = spawnedGO.GetComponent<IHandModel>();
           leftModel.transform.parent = ModelsParent;
         } else {
@@ -151,7 +160,7 @@ namespace Leap.Unity {
 
         if (collectionGroup.IsRightToBeSpawned) {
           IHandModel modelToSpawn = collectionGroup.RightModel;
-          GameObject spawnedGO = GameObject.Instantiate(modelToSpawn.gameObject);
+          GameObject spawnedGO = Instantiate(modelToSpawn.gameObject);
           rightModel = spawnedGO.GetComponent<IHandModel>();
           rightModel.transform.parent = ModelsParent;
         } else {
@@ -161,7 +170,6 @@ namespace Leap.Unity {
           collectionGroup.modelList.Add(rightModel);
           modelGroupMapping.Add(rightModel, collectionGroup);
         }
-      }
     }
 
     /**
@@ -271,6 +279,7 @@ namespace Leap.Unity {
       newGroup.CanDuplicate = false;
       newGroup.IsEnabled = true;
       ModelPool.Add(newGroup);
+      InitializeModelGroup(newGroup);
     }
     public void RemoveGroup(string groupName) {
       while (ModelPool.Find(i => i.GroupName == groupName) != null) {
