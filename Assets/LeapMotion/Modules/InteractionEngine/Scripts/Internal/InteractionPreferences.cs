@@ -44,7 +44,7 @@ namespace Leap.Unity.Interaction.Internal {
       }
     }
 
-    [PreferenceItem("Leap Interaction")]
+    [LeapPreferences("Interaction Engine", 10)]
     private static void preferencesGUI() {
       bool newGravityValue = EditorGUILayout.Toggle(_gravityPrompContent, shouldPrompForGravity);
       if (newGravityValue != shouldPrompForGravity) {
