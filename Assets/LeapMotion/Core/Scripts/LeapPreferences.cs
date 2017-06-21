@@ -30,6 +30,7 @@ namespace Leap.Unity {
       this.order = order;
     }
 
+#if UNITY_EDITOR
     private static List<LeapPreferenceItem> _leapPreferenceItems = null;
 
     private struct LeapPreferenceItem {
@@ -77,5 +78,6 @@ namespace Leap.Unity {
         item.drawPreferenceGui();
       }
     }
+#endif
   }
 }
