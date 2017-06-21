@@ -47,8 +47,6 @@ namespace Leap.Unity{
     }
   
     protected void SetPositions() {
-      Debug.Log("SkeletalHand.SetPositions()");
-  
       for (int f = 0; f < fingers.Length; ++f) {
         if (fingers[f] != null) {
           fingers[f].UpdateFinger();

@@ -2015,6 +2015,21 @@ Prefab:
       propertyPath: m_RootOrder
       value: 13
       objectReference: {fileID: 0}
+    - target: {fileID: 114955916709611338, guid: 6d3e45125c02bea4c9c28f57a82c3f6a,
+        type: 2}
+      propertyPath: _manager
+      value: 
+      objectReference: {fileID: 1455061516}
+    - target: {fileID: 114526305417502982, guid: 6d3e45125c02bea4c9c28f57a82c3f6a,
+        type: 2}
+      propertyPath: _manager
+      value: 
+      objectReference: {fileID: 1455061516}
+    - target: {fileID: 114626066090088948, guid: 6d3e45125c02bea4c9c28f57a82c3f6a,
+        type: 2}
+      propertyPath: _manager
+      value: 
+      objectReference: {fileID: 1455061516}
     - target: {fileID: 114098093262600044, guid: 6d3e45125c02bea4c9c28f57a82c3f6a,
         type: 2}
       propertyPath: _anchor
@@ -2025,23 +2040,6 @@ Prefab:
       propertyPath: _anchorGroup
       value: 
       objectReference: {fileID: 185592193}
-    - target: {fileID: 114831251513606100, guid: 6d3e45125c02bea4c9c28f57a82c3f6a,
-        type: 2}
-      propertyPath: _comment
-      value: 'We use the Ignore Collisions In Children script to prevent UI elements
-        from colliding each other, which is commonly desired when building an interface.
-
-
-        In your application, we recommend using layers instead of this script, especially
-        if your UI consists of more than just a few objects. Layers will achieve the
-        same results with a significant performance boost over the Physics.IgnoreCollision()
-        method utilized by this script.'
-      objectReference: {fileID: 0}
-    - target: {fileID: 114831251513606100, guid: 6d3e45125c02bea4c9c28f57a82c3f6a,
-        type: 2}
-      propertyPath: _isEditing
-      value: 0
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 6d3e45125c02bea4c9c28f57a82c3f6a, type: 2}
   m_IsPrefabParent: 0
@@ -8091,12 +8089,12 @@ Prefab:
       propertyPath: m_RootOrder
       value: 11
       objectReference: {fileID: 0}
-    - target: {fileID: 114895219577629756, guid: 42e8bd39fe145a8419d212958fac6589,
+    - target: {fileID: 114164194550939312, guid: 42e8bd39fe145a8419d212958fac6589,
         type: 2}
       propertyPath: _manager
       value: 
       objectReference: {fileID: 1455061516}
-    - target: {fileID: 114870554283010206, guid: 42e8bd39fe145a8419d212958fac6589,
+    - target: {fileID: 114617174908622162, guid: 42e8bd39fe145a8419d212958fac6589,
         type: 2}
       propertyPath: _manager
       value: 
@@ -8106,7 +8104,12 @@ Prefab:
       propertyPath: _manager
       value: 
       objectReference: {fileID: 1455061516}
-    - target: {fileID: 114617174908622162, guid: 42e8bd39fe145a8419d212958fac6589,
+    - target: {fileID: 114870554283010206, guid: 42e8bd39fe145a8419d212958fac6589,
+        type: 2}
+      propertyPath: _manager
+      value: 
+      objectReference: {fileID: 1455061516}
+    - target: {fileID: 114895219577629756, guid: 42e8bd39fe145a8419d212958fac6589,
         type: 2}
       propertyPath: _manager
       value: 
@@ -8121,22 +8124,45 @@ Prefab:
       propertyPath: _anchorGroup
       value: 
       objectReference: {fileID: 1836065993}
-    - target: {fileID: 114433831543061492, guid: 42e8bd39fe145a8419d212958fac6589,
+    - target: {fileID: 114870554283010206, guid: 42e8bd39fe145a8419d212958fac6589,
         type: 2}
-      propertyPath: _comment
-      value: 'We use the Ignore Collisions In Children script to prevent UI elements
-        from colliding each other, which is commonly desired when building an interface.
-
-
-        In your application, we recommend using layers instead of this script, especially
-        if your UI consists of more than just a few objects. Layers will achieve the
-        same results with a significant performance boost over the Physics.IgnoreCollision()
-        method utilized by this script.'
+      propertyPath: _overrideInteractionLayer
+      value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 114433831543061492, guid: 42e8bd39fe145a8419d212958fac6589,
+    - target: {fileID: 114617174908622162, guid: 42e8bd39fe145a8419d212958fac6589,
         type: 2}
-      propertyPath: _isEditing
-      value: 0
+      propertyPath: _overrideInteractionLayer
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114455807356359938, guid: 42e8bd39fe145a8419d212958fac6589,
+        type: 2}
+      propertyPath: _overrideInteractionLayer
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114895219577629756, guid: 42e8bd39fe145a8419d212958fac6589,
+        type: 2}
+      propertyPath: _overrideInteractionLayer
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114870554283010206, guid: 42e8bd39fe145a8419d212958fac6589,
+        type: 2}
+      propertyPath: _interactionLayer.layerIndex
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 114617174908622162, guid: 42e8bd39fe145a8419d212958fac6589,
+        type: 2}
+      propertyPath: _interactionLayer.layerIndex
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 114455807356359938, guid: 42e8bd39fe145a8419d212958fac6589,
+        type: 2}
+      propertyPath: _interactionLayer.layerIndex
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 114895219577629756, guid: 42e8bd39fe145a8419d212958fac6589,
+        type: 2}
+      propertyPath: _interactionLayer.layerIndex
+      value: 5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 42e8bd39fe145a8419d212958fac6589, type: 2}
@@ -15844,6 +15870,21 @@ Prefab:
       propertyPath: m_RootOrder
       value: 12
       objectReference: {fileID: 0}
+    - target: {fileID: 114735003379409898, guid: 73dde5b40fafb9f439cae744996d7913,
+        type: 2}
+      propertyPath: _manager
+      value: 
+      objectReference: {fileID: 1455061516}
+    - target: {fileID: 114558132121249320, guid: 73dde5b40fafb9f439cae744996d7913,
+        type: 2}
+      propertyPath: _manager
+      value: 
+      objectReference: {fileID: 1455061516}
+    - target: {fileID: 114207954377536858, guid: 73dde5b40fafb9f439cae744996d7913,
+        type: 2}
+      propertyPath: _manager
+      value: 
+      objectReference: {fileID: 1455061516}
     - target: {fileID: 114185678842112410, guid: 73dde5b40fafb9f439cae744996d7913,
         type: 2}
       propertyPath: _anchor
@@ -15854,23 +15895,6 @@ Prefab:
       propertyPath: _anchorGroup
       value: 
       objectReference: {fileID: 1608356547}
-    - target: {fileID: 114883897659658424, guid: 73dde5b40fafb9f439cae744996d7913,
-        type: 2}
-      propertyPath: _comment
-      value: 'We use the Ignore Collisions In Children script to prevent UI elements
-        from colliding each other, which is commonly desired when building an interface.
-
-
-        In your application, we recommend using layers instead of this script, especially
-        if your UI consists of more than just a few objects. Layers will achieve the
-        same results with a significant performance boost over the Physics.IgnoreCollision()
-        method utilized by this script.'
-      objectReference: {fileID: 0}
-    - target: {fileID: 114883897659658424, guid: 73dde5b40fafb9f439cae744996d7913,
-        type: 2}
-      propertyPath: _isEditing
-      value: 0
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 73dde5b40fafb9f439cae744996d7913, type: 2}
   m_IsPrefabParent: 0

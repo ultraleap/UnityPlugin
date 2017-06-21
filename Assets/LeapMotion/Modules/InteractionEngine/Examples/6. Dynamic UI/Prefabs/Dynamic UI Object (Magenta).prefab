@@ -4097,6 +4097,12 @@ MonoBehaviour:
   _moveObjectWhenGrasped: 1
   graspedMovementType: 1
   graspHoldWarpingEnabled__curIgnored: 1
+  _overrideInteractionLayer: 0
+  _interactionLayer:
+    layerIndex: 0
+  _overrideNoContactLayer: 0
+  _noContactLayer:
+    layerIndex: 0
   _eventTable:
     _entries: []
 --- !u!114 &114235318587237026
@@ -4166,8 +4172,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e933f13d48c681d48b14750922ac906d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _comment: 
-  _isEditing: 1
+  _comment: 'We use the Ignore Collisions In Children script to prevent UI elements
+    from colliding each other, which is commonly desired when building an interface.
+
+
+    In your application, we recommend using layers instead of this script, especially
+    if your UI consists of more than just a few objects. Layers will achieve the same
+    results with a significant performance boost over the Physics.IgnoreCollision()
+    method utilized by this script.'
+  _isEditing: 0
 --- !u!114 &114444887319324106
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -4208,6 +4221,12 @@ MonoBehaviour:
   _moveObjectWhenGrasped: 1
   graspedMovementType: 2
   graspHoldWarpingEnabled__curIgnored: 1
+  _overrideInteractionLayer: 0
+  _interactionLayer:
+    layerIndex: 0
+  _overrideNoContactLayer: 0
+  _noContactLayer:
+    layerIndex: 0
   _eventTable:
     _entries: []
   minMaxHeight: {x: 0, y: 0.02}
@@ -4268,6 +4287,12 @@ MonoBehaviour:
   _moveObjectWhenGrasped: 1
   graspedMovementType: 2
   graspHoldWarpingEnabled__curIgnored: 1
+  _overrideInteractionLayer: 0
+  _interactionLayer:
+    layerIndex: 0
+  _overrideNoContactLayer: 0
+  _noContactLayer:
+    layerIndex: 0
   _eventTable:
     _entries: []
   minMaxHeight: {x: 0, y: 0.02}
@@ -4397,6 +4422,12 @@ MonoBehaviour:
   _moveObjectWhenGrasped: 1
   graspedMovementType: 2
   graspHoldWarpingEnabled__curIgnored: 1
+  _overrideInteractionLayer: 0
+  _interactionLayer:
+    layerIndex: 0
+  _overrideNoContactLayer: 0
+  _noContactLayer:
+    layerIndex: 0
   _eventTable:
     _entries: []
   minMaxHeight: {x: 0, y: 0.02}
@@ -4434,6 +4465,12 @@ MonoBehaviour:
   _moveObjectWhenGrasped: 1
   graspedMovementType: 2
   graspHoldWarpingEnabled__curIgnored: 1
+  _overrideInteractionLayer: 0
+  _interactionLayer:
+    layerIndex: 0
+  _overrideNoContactLayer: 0
+  _noContactLayer:
+    layerIndex: 0
   _eventTable:
     _entries: []
   minMaxHeight: {x: 0, y: 0.02}

@@ -95,7 +95,6 @@ namespace Leap.Unity.Interaction {
 
       //Add a custom grasp controller
       OnGraspBegin += onGraspBegin;
-      OnGraspedMovement += onGraspedMovement;
       OnGraspEnd += onGraspEnd;
 
       base.Start();
@@ -105,7 +104,7 @@ namespace Leap.Unity.Interaction {
       if (!_physicsOccurred) {
         _physicsOccurred = true;
 
-        if (!rigidbody.IsSleeping()) {
+        if (!isGrasped && !rigidbody.IsSleeping()) {
           //Sleep the rigidbody if it's not really moving...
 
           float localPhysicsDisplacementPercentage = Mathf.InverseLerp(minMaxHeight.x, minMaxHeight.y, initialLocalPosition.z - localPhysicsPosition.z);
@@ -119,6 +118,9 @@ namespace Leap.Unity.Interaction {
         }
       }
     }
+
+    private const float FRICTION_COEFFICIENT = 30F;
+    private const float DRAG_COEFFICIENT = 50F;
 
     protected virtual void Update() {
       //Reset our convenience state variables...
@@ -152,9 +154,32 @@ namespace Leap.Unity.Interaction {
           Vector3 origLocalDepressorPos = transform.parent.InverseTransformPoint(transform.TransformPoint(_localDepressorPosition));
           localPhysicsVelocity = Vector3.back * 0.05f;
           localPhysicsPosition = getDepressedConstrainedLocalPosition(curLocalDepressorPos - origLocalDepressorPos);
-        } else {
-          localPhysicsVelocity += (Mathf.Clamp(_springForce * (initialLocalPosition.z - Mathf.Lerp(minMaxHeight.x, minMaxHeight.y, restingHeight) - localPhysicsPosition.z), -0.01f, 0.01f) / Time.fixedDeltaTime) * Vector3.forward;
-          localPhysicsVelocity *= Mathf.Pow(0.0000000001f, Time.fixedDeltaTime);
+        }
+        else if (isGrasped) {
+          // Do nothing!
+        }
+        else {
+          Vector3 originalLocalVelocity = localPhysicsVelocity;
+
+          // Spring force
+          localPhysicsVelocity += Mathf.Clamp(_springForce * 10000F * (initialLocalPosition.z - Mathf.Lerp(minMaxHeight.x, minMaxHeight.y, restingHeight) - localPhysicsPosition.z), -100f, 100f)
+                                * Time.fixedDeltaTime
+                                * Vector3.forward;
+
+          // Friction & Drag
+          float velMag = originalLocalVelocity.magnitude;
+          if (velMag > 0F) {
+            Vector3 resistanceDir = -originalLocalVelocity / velMag;
+
+            // Friction force
+            Vector3 frictionForce = resistanceDir * velMag * FRICTION_COEFFICIENT;
+            localPhysicsVelocity = localPhysicsVelocity + (frictionForce /* assume unit mass */ * Time.fixedDeltaTime);
+
+            // Drag force
+            float velSqrMag = velMag * velMag;
+            Vector3 dragForce = resistanceDir * velSqrMag * DRAG_COEFFICIENT;
+            localPhysicsVelocity = localPhysicsVelocity + (dragForce /* assume unit mass */ * Time.fixedDeltaTime);
+          }
         }
 
         // Transform the local physics back into world space
@@ -226,18 +251,6 @@ namespace Leap.Unity.Interaction {
     protected virtual void onGraspBegin() {
       primaryHoveringController.LockPrimaryHover(this);
       _lockedInteractingController = primaryHoveringController;
-    }
-
-    protected virtual void onGraspedMovement(Vector3 preSolvedPosition, Quaternion preSolvedRotation,
-                                             Vector3 postSolvedPosition, Quaternion postSolvedRotation,
-                                             List<InteractionController> graspingControllers) {
-      // Calculate new local position for custom button physics.
-      Vector3 newLocalPosition = getDepressedConstrainedLocalPosition(transform.parent.InverseTransformVector(postSolvedPosition - physicsPosition));
-      newLocalPosition.z = Mathf.Clamp(newLocalPosition.z, initialLocalPosition.z - minMaxHeight.y, initialLocalPosition.z - minMaxHeight.x);
-      _physicsVelocity = 0.5F * (transform.parent.TransformPoint(newLocalPosition) - physicsPosition) / Time.fixedDeltaTime;
-
-      // Undo the effect of grasped movement via velocity.
-      this.rigidbody.velocity = _physicsVelocity;
     }
 
     protected virtual void onGraspEnd() {

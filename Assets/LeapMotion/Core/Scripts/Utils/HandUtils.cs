@@ -16,7 +16,7 @@ namespace Leap.Unity {
 
   public static class Hands {
 
-    private static LeapServiceProvider s_provider;
+    private static LeapProvider s_provider;
     private static GameObject s_leapRig;
 
     static Hands() {
@@ -28,7 +28,7 @@ namespace Leap.Unity {
       InitStatic();
     }
     private static void InitStatic() {
-      s_provider = GameObject.FindObjectOfType<LeapServiceProvider>();
+      s_provider = GameObject.FindObjectOfType<LeapProvider>();
       if (s_provider == null) return;
       Camera providerCamera = s_provider.GetComponentInParent<Camera>();
       if (providerCamera == null) return;
@@ -38,7 +38,7 @@ namespace Leap.Unity {
 
     /// <summary>
     /// Static convenience accessor for the Leap camera rig. This is the parent
-    /// of the Camera that contains a LeapServiceProvider in one of its children,
+    /// of the Camera that contains a LeapProvider in one of its children,
     /// or null if there is no such GameObject.
     /// </summary>
     public static GameObject Rig {
@@ -54,14 +54,14 @@ namespace Leap.Unity {
     }
 
     /// <summary>
-    /// Static convenience accessor for the LeapServiceProvider.
+    /// Static convenience accessor for the LeapProvider.
     /// </summary>
-    public static LeapServiceProvider Provider {
+    public static LeapProvider Provider {
       get {
         if (s_provider == null) {
           InitStatic();
           if (s_provider == null) {
-            Debug.LogWarning("No LeapServiceProvider found in the scene.");
+            Debug.LogWarning("No LeapProvider found in the scene.");
           }
         }
         return s_provider;
