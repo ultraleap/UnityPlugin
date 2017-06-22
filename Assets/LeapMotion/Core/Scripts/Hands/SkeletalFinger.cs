@@ -25,9 +25,7 @@ namespace Leap.Unity{
     }
   
     /** Updates the finger bones and joints by setting their positions and rotations. */
-    public override void UpdateFinger() {
-      Debug.Log("SkeletalFinger.SetPositions()");
-  
+    public override void UpdateFinger() {  
       SetPositions();
     }
   
