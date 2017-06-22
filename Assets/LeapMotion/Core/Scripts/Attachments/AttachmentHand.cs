@@ -7,6 +7,7 @@
  * between Leap Motion and you, your company or other organization.           *
  ******************************************************************************/
 
+using Leap.Unity.Attributes;
 using Leap.Unity.Query;
 using System;
 using System.Collections;
@@ -101,7 +102,7 @@ namespace Leap.Unity.Attachments {
     /// Used by AttachmentHands as a hint to help prevent mixing up hand chiralities
     /// when refreshing its AttachmentHand references.
     /// </summary>
-    [SerializeField, HideInInspector]
+    [SerializeField, Disable]
     private Chirality _chirality;
 
     /// <summary>

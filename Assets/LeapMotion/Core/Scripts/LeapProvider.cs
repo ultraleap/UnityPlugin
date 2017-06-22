@@ -56,5 +56,15 @@ namespace Leap.Unity {
         OnFixedFrame(frame);
       }
     }
+
+  }
+
+  public static class LeapProviderExtensions {
+
+    public static Leap.Hand MakeTestHand(this LeapProvider provider, bool isLeft) {
+      return TestHandFactory.MakeTestHand(isLeft, Hands.Provider.editTimePose)
+                            .Transform(UnityMatrixExtension.GetLeapMatrix(Hands.Provider.transform));
+    }
+
   }
 }
