@@ -146,6 +146,17 @@ namespace Leap.Unity.Interaction {
           }
         }
       }
+      #if UNITY_EDITOR
+      else {
+        // If we hit something that isn't an Interaction Behaviour, there's probably an issue.
+        Debug.LogError("Contact bone collided with something that's not an Interaction"
+                     + "Behaviour! This is liable to cause contact bones to build unstable "
+                     + "velocities and produce bad behavior. Please check your layer "
+                     + "settings in the Interaction Manager, and avoid placing any non-"
+                     + "Interaction objects in layers that contain Interaction objects.",
+                     this);
+      }
+      #endif
     }
 
     private void OnCollisionStay(Collision collision) {
