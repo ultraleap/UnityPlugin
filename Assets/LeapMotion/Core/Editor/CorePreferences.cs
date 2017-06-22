@@ -8,7 +8,7 @@ namespace Leap.Unity {
     private const string ALLOW_CLEAR_TRANSFORM_HOTKEY_KEY = "LeapMotion_AllowClearTransformHotkey";
     private const string ALLOW_GROUP_OBJECTS_HOTKEY_KEY = "LeapMotion_AllowGroupObjectsHotkey";
 
-    public static bool allowCleartransformHotkey {
+    public static bool allowClearTransformHotkey {
       get {
         return EditorPrefs.GetBool(ALLOW_CLEAR_TRANSFORM_HOTKEY_KEY, defaultValue: false);
       }
