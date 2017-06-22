@@ -40,6 +40,7 @@ namespace Leap.Unity.Interaction {
       // Layer Overrides
       specifyConditionalDrawing(() => targets.Query().Any(intObj => intObj.overrideInteractionLayer),
                                 "_interactionLayer");
+      specifyCustomDecorator("_interactionLayer", drawInteractionLayerDecorator);
       specifyConditionalDrawing(() => targets.Query().Any(intObj => intObj.overrideNoContactLayer),
                                 "_noContactLayer");
       specifyCustomDecorator("_noContactLayer", drawNoContactLayerDecorator);
@@ -109,12 +110,47 @@ namespace Leap.Unity.Interaction {
       EditorGUILayout.Space();
     }
 
+    private void drawInteractionLayerDecorator(SerializedProperty property) {
+      bool shouldDrawWarning = false;
+      foreach (var target in targets) {
+        if (target.manager == null) continue; // Can't check.
+
+        if (target.overrideInteractionLayer
+            && !target.manager.autoGenerateLayers
+            && Physics.GetIgnoreLayerCollision(target.interactionLayer.layerIndex,
+                                               target.manager.contactBoneLayer.layerIndex)) {
+
+          shouldDrawWarning = true;
+          break;
+        }
+      }
+
+      if (shouldDrawWarning) {
+        bool pluralTargets = targets.Length > 1;
+        string message;
+        if (pluralTargets) {
+          message = "One or more of the selected interaction objects has its "
+                  + "Interaction layer set NOT to collide with the contact bone "
+                  + "layer. ";
+        }
+        else {
+          message = "The selected interaction object has its Interaction layer set "
+                  + "NOT to collide with the contact bone layer. ";
+        }
+        message += "This will prevent an interaction object from supporting contact with "
+                 + "any hands or controllers.";
+
+        EditorGUILayout.HelpBox(message, MessageType.Warning);
+      }
+    }
+
     private void drawNoContactLayerDecorator(SerializedProperty property) {
       bool shouldDrawCollisionWarning = false;
       foreach (var target in targets) {
         if (target.manager == null) continue; // Can't check.
 
         if (target.overrideNoContactLayer
+            && !target.manager.autoGenerateLayers
             && !Physics.GetIgnoreLayerCollision(target.noContactLayer.layerIndex,
                                                 target.manager.contactBoneLayer.layerIndex)) {
           shouldDrawCollisionWarning = true;

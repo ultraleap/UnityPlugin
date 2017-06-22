@@ -333,6 +333,10 @@ namespace Leap.Unity.Interaction {
       OnPostPhysicalUpdate();
 
       updateMovingFrameOfReferenceSupport();
+
+      if (autoGenerateLayers) {
+        autoUpdateContactBoneLayerCollision();
+      }
     }
 
     void LateUpdate() {
@@ -854,7 +858,10 @@ namespace Leap.Unity.Interaction {
         bool shouldIgnore = Physics.GetIgnoreLayerCollision(_templateLayer, i);
         Physics.IgnoreLayerCollision(_interactionLayer, i, shouldIgnore);
         Physics.IgnoreLayerCollision(_interactionNoContactLayer, i, shouldIgnore);
-        Physics.IgnoreLayerCollision(_contactBoneLayer, i, shouldIgnore);
+
+        // Contact bones, generally, shouldn't collide with anything except interaction
+        // layers.
+        Physics.IgnoreLayerCollision(_contactBoneLayer, i, true);
       }
 
       // Enable interactions between the contact bones and the interaction layer.
@@ -894,6 +901,40 @@ namespace Leap.Unity.Interaction {
         if (layerObjSetPair.Value.Count == 0) continue;
 
         _interactionLayerMask = layerObjSetPair.Key.layerMask | _interactionLayerMask;
+      }
+    }
+
+    private bool[] _contactBoneIgnoreCollisionLayers = new bool[32];
+    /// <summary>
+    /// Updates the contact bone layer to collide against any layers that may contain
+    /// interaction objects and ignore any layers that don't.
+    /// 
+    /// (Obviously, this ignores NoContact layers.)
+    /// </summary>
+    private void autoUpdateContactBoneLayerCollision() {
+      // Make sure we ignore all layers by default!
+      for (int i = 0; i < 32; i++) {
+        _contactBoneIgnoreCollisionLayers[i] = true;
+      }
+
+      // Ignore everything except those layers that we know are at least one
+      // interaction object's interaction layer.
+      foreach (var layerObjSetPair in _intObjInteractionLayers) {
+        bool ignoreLayerCollision;
+
+        if (layerObjSetPair.Value.Count == 0) {
+          ignoreLayerCollision = true;
+        }
+        else {
+          ignoreLayerCollision = false;
+        }
+
+        _contactBoneIgnoreCollisionLayers[layerObjSetPair.Key.layerIndex] = ignoreLayerCollision;
+      }
+
+      for (int i = 0; i < 32; i++) {
+        Physics.IgnoreLayerCollision(contactBoneLayer.layerIndex, i,
+                                     _contactBoneIgnoreCollisionLayers[i]);
       }
     }
 
