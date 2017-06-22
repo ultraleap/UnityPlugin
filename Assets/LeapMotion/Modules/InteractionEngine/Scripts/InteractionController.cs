@@ -39,6 +39,8 @@ namespace Leap.Unity.Interaction {
   public abstract class InteractionController : MonoBehaviour,
                                                 IInternalInteractionController {
 
+    #region Inspector
+
     [Tooltip("The manager responsible for this interaction controller. Interaction "
            + "controllers should be children of their interaction manager.")]
     public InteractionManager manager;
@@ -104,6 +106,10 @@ namespace Leap.Unity.Interaction {
       }
     }
 
+    #endregion
+
+    #region Public API
+
     /// <summary>
     /// Gets whether the underlying object (Leap hand or a held controller) is currently 
     /// in a tracked state. Objects grasped by a controller that becomes untracked will
@@ -155,8 +161,7 @@ namespace Leap.Unity.Interaction {
     /// </summary>
     public float scale { get { return this.transform.lossyScale.x; } }
 
-    // A list of InteractionControllers for use as a temporary buffer.
-    private List<InteractionController> _controllerListBuffer = new List<InteractionController>();
+    #endregion
 
     #region Events
 
@@ -183,6 +188,8 @@ namespace Leap.Unity.Interaction {
 
     #endregion
 
+    #region Unity Events
+
     protected virtual void OnEnable() {
       if (_contactInitialized) {
         EnableSoftContact();
@@ -205,6 +212,11 @@ namespace Leap.Unity.Interaction {
       ClearPrimaryHoverTracking();
       ClearContactTracking();
     }
+
+    #endregion
+
+    // A list of InteractionControllers for use as a temporary buffer.
+    private List<InteractionController> _controllerListBuffer = new List<InteractionController>();
 
     /// <summary>
     /// Called by the InteractionManager every fixed (physics) frame to populate the
@@ -1041,11 +1053,6 @@ namespace Leap.Unity.Interaction {
     private bool _disableSoftContactEnqueued = false;
     private IEnumerator _delayedDisableSoftContactCoroutine;
 
-    // TODO: DELETEME
-    //private Collider[] _tempColliderArray = new Collider[2];
-    //private Vector3[] _bonePositionsLastFrame = new Vector3[32];
-    //private float _softContactBoneRadius = 0.015f;
-
     private Collider[] _softContactColliderBuffer = new Collider[32];
 
     private bool _notTrackedLastFrame = true;
@@ -1092,7 +1099,7 @@ namespace Leap.Unity.Interaction {
             int numCollisions = Physics.OverlapSphereNonAlloc(contactBone.transform.TransformPoint(boneSphere.center),
                                                               contactBone.transform.lossyScale.x * boneSphere.radius,
                                                               _softContactColliderBuffer,
-                                                              manager.interactionLayer.layerMask,
+                                                              manager.GetInteractionLayerMask(),
                                                               QueryTriggerInteraction.Ignore);
             for (int i = 0; i < numCollisions; i++) {
               //NotifySoftContactOverlap(contactBone, _softContactColliderBuffer[i]);
@@ -1111,7 +1118,7 @@ namespace Leap.Unity.Interaction {
             int numCollisions = Physics.OverlapCapsuleNonAlloc(point0, point1,
                                                                contactBone.transform.lossyScale.x * boneCapsule.radius,
                                                                _softContactColliderBuffer,
-                                                               manager.interactionLayer.layerMask,
+                                                               manager.GetInteractionLayerMask(),
                                                                QueryTriggerInteraction.Ignore);
             for (int i = 0; i < numCollisions; i++) {
               //NotifySoftContactOverlap(contactBone, _softContactColliderBuffer[i]);
@@ -1136,7 +1143,7 @@ namespace Leap.Unity.Interaction {
                                                            Vector3.Scale(boneBox.size * 0.5F, contactBone.transform.lossyScale),
                                                            _softContactColliderBuffer,
                                                            boneBox.transform.rotation,
-                                                           manager.interactionLayer.layerMask,
+                                                           manager.GetInteractionLayerMask(),
                                                            QueryTriggerInteraction.Ignore);
             for (int i = 0; i < numCollisions; i++) {
               //NotifySoftContactOverlap(contactBone, _softContactColliderBuffer[i]);

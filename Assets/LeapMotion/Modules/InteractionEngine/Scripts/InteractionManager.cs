@@ -884,9 +884,15 @@ namespace Leap.Unity.Interaction {
 
       // Accumulate single-layer layer masks into the combined interaction layer mask.
       foreach (var layerObjSetPair in _intObjInteractionLayers) {
+        // Skip any layers that may no longer have interaction objects.
+        if (layerObjSetPair.Value.Count == 0) continue;
+
         _interactionLayerMask = layerObjSetPair.Key.layerMask | _interactionLayerMask;
       }
       foreach (var layerObjSetPair in _intObjNoContactLayers) {
+        // Skip any layers that may no longer have interaction objects.
+        if (layerObjSetPair.Value.Count == 0) continue;
+
         _interactionLayerMask = layerObjSetPair.Key.layerMask | _interactionLayerMask;
       }
     }
@@ -929,10 +935,6 @@ namespace Leap.Unity.Interaction {
 
     void IInternalInteractionManager.NotifyIntObjRemovedNoContactLayer(IInteractionBehaviour intObj, int layer, bool refreshImmediately) {
       _intObjNoContactLayers[layer].Remove(intObj);
-
-      if (_intObjNoContactLayers[layer].Count == 0) {
-        _intObjNoContactLayers.Remove(layer);
-      }
 
       if (refreshImmediately) {
         refreshInteractionLayerMask();

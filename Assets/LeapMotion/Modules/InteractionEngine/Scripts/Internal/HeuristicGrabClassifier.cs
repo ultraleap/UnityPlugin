@@ -74,8 +74,6 @@ namespace Leap.Unity.Interaction.Internal {
           // Ensure layer mask is up-to-date.
           _scaledGrabParams.LAYER_MASK = interactionHand.manager.GetInteractionLayerMask();
       
-          // Ensure that the temporally variant variables are updated.
-          // scaledGrabParams.LAYER_MASK = 1 << _manager.InteractionLayer;
           for (int i = 0; i < hand.Fingers.Count; i++) {
             _fingerTipPositions[i] = hand.Fingers[i].TipPosition.ToVector3();
           }
