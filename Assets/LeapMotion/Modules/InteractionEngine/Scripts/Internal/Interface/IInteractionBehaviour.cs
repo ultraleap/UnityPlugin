@@ -41,7 +41,11 @@ namespace Leap.Unity.Interaction {
 
     // Interaction settings.
     bool allowMultiGrasp { get; }
-    
+
+    // Interaction layers.
+    SingleLayer interactionLayer { get; }
+    SingleLayer noContactLayer { get; }
+
     // Called by the Interaction Manager manually
     // every fixed (physics) frame.
     void FixedUpdateObject();
