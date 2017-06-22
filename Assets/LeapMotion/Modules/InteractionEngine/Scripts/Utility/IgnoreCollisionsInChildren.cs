@@ -14,7 +14,6 @@ namespace Leap.Unity.Examples {
   /// application to put interface objects on a layer and disable self-collision for that
   /// layer in your Physics settings (Edit / Project Settings / Physics).
   /// </summary>
-  [AddComponentMenu("")]
   public class IgnoreCollisionsInChildren : MonoBehaviour {
 
     void Start() {

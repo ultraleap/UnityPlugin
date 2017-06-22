@@ -530,12 +530,18 @@ namespace Leap.Unity.Interaction {
     public InteractionManager manager {
       get { return _manager; }
       set {
-        if (_manager != null && _manager.IsBehaviourRegistered(this)) {
-          _manager.UnregisterInteractionBehaviour(this);
+        if (Application.isPlaying) {
+          if (_manager != null && _manager.IsBehaviourRegistered(this)) {
+            _manager.UnregisterInteractionBehaviour(this);
+          }
         }
+
         _manager = value;
-        if (_manager != null && !manager.IsBehaviourRegistered(this)) {
-          _manager.RegisterInteractionBehaviour(this);
+
+        if (Application.isPlaying) {
+          if (_manager != null && !manager.IsBehaviourRegistered(this)) {
+            _manager.RegisterInteractionBehaviour(this);
+          }
         }
       }
     }
@@ -680,7 +686,8 @@ namespace Leap.Unity.Interaction {
     [SerializeField]
     [OnEditorChange("overrideInteractionLayer")]
     [Tooltip("If set to true, this interaction object will override the Interaction "
-           + "Manager's layer setting for its default layer.")]
+           + "Manager's layer setting for its default layer. The interaction layer is "
+           + "used for an object when it is not grasped and not ignoring contact.")]
     private bool _overrideInteractionLayer = false;
     public bool overrideInteractionLayer {
       get {
@@ -691,8 +698,8 @@ namespace Leap.Unity.Interaction {
       }
     }
     
-    [Tooltip("Overrides the layer this interaction object should be on under most "
-           + "circumstances.")]
+    [Tooltip("Sets the override layer to use for this object when it is not grasped and "
+           + "not ignoring contact.")]
     [SerializeField]
     private SingleLayer _interactionLayer;
     public SingleLayer interactionLayer {
@@ -705,7 +712,7 @@ namespace Leap.Unity.Interaction {
     [Tooltip("If set to true, this interaction object will override the Interaction "
            + "Manager's layer setting for its default no-contact layer. The no-contact "
            + "layer should not collide with the contact bone layer; it is used when the "
-           + "interaction object is grasped or when it has contact disabled.")]
+           + "interaction object is grasped or when it is ignoring contact.")]
     private bool _overrideNoContactLayer = false;
     public bool overrideNoContactLayer {
       get {

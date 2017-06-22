@@ -7,6 +7,7 @@
  * between Leap Motion and you, your company or other organization.           *
  ******************************************************************************/
 
+using Leap.Unity.Query;
 using UnityEditor;
 using UnityEngine;
 
@@ -27,30 +28,28 @@ namespace Leap.Unity.Interaction {
       deferProperty("_eventTable");
       specifyCustomDrawer("_eventTable", drawEventTable);
 
-      specifyConditionalDrawing(() => !target.ignoreContact,
+      specifyConditionalDrawing(() => !targets.Query().All(intObj => intObj.ignoreContact),
                                 "_contactForceMode");
 
-      specifyConditionalDrawing(() => !target.ignoreGrasping,
+      specifyConditionalDrawing(() => !targets.Query().All(intObj => intObj.ignoreGrasping),
                                 "_allowMultiGrasp",
                                 "_moveObjectWhenGrasped",
                                 "graspedMovementType",
                                 "graspHoldWarpingEnabled__curIgnored");
 
       // Layer Overrides
-      specifyConditionalDrawing(() => target.overrideInteractionLayer,
+      specifyConditionalDrawing(() => targets.Query().Any(intObj => intObj.overrideInteractionLayer),
                                 "_interactionLayer");
-      specifyConditionalDrawing(() => target.overrideNoContactLayer,
+      specifyConditionalDrawing(() => targets.Query().Any(intObj => intObj.overrideNoContactLayer),
                                 "_noContactLayer");
       specifyCustomDecorator("_noContactLayer", drawNoContactLayerDecorator);
     }
 
     private void drawInteractionManagerDecorator(SerializedProperty property) {
-      if (PrefabUtility.GetPrefabType(target) == PrefabType.Prefab) {
-        return;
-      }
-
       bool shouldDrawInteractionManagerNotSetWarning = false;
       foreach (var target in targets) {
+        if (PrefabUtility.GetPrefabType(target) == PrefabType.Prefab) continue;
+
         if (target.manager == null) {
           shouldDrawInteractionManagerNotSetWarning = true;
           break;
@@ -79,23 +78,31 @@ namespace Leap.Unity.Interaction {
 
       EditorGUILayout.HelpBox(warningMessage, messageType);
 
-      Rect buttonRect = EditorGUILayout.GetControlRect(GUILayout.MaxWidth(100F), GUILayout.ExpandHeight(true));
+      Rect buttonRect = EditorGUILayout.GetControlRect(GUILayout.MaxWidth(100F),
+                                                       GUILayout.ExpandHeight(true),
+                                                       GUILayout.MaxHeight(40F));
+      InteractionManager manager = InteractionManager.instance;
+      EditorGUI.BeginDisabledGroup(manager == null);
       if (GUI.Button(buttonRect, new GUIContent("Auto-Fix",
-                                                "Use InteractionManager.instance to "
-                                              + "attempt to automatically set the manager "
-                                              + "of selected interaction objects."))) {
-        InteractionManager manager = InteractionManager.instance;
+                                  manager == null ? "Please add an Interaction Manager to "
+                                                  + "your scene."
+                                              : "Use InteractionManager.instance to "
+                                              + "automatically set the manager of the "
+                                              + "selected interaction objects."))) {
         if (manager == null) {
           Debug.LogError("Attempt to find an InteractionManager instance failed. Is there "
                        + "an InteractionManager in your scene?");
         }
         else {
           foreach (var target in targets) {
+            if (PrefabUtility.GetPrefabType(target) == PrefabType.Prefab) continue;
+
             Undo.RecordObject(target, "Auto-set Interaction Manager");
             target.manager = manager;
           }
         }
       }
+      EditorGUI.EndDisabledGroup();
 
       EditorGUILayout.EndHorizontal();
 

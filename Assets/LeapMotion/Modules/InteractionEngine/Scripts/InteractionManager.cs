@@ -910,10 +910,6 @@ namespace Leap.Unity.Interaction {
     void IInternalInteractionManager.NotifyIntObjRemovedInteractionLayer(IInteractionBehaviour intObj, int layer, bool refreshImmediately) {
       _intObjInteractionLayers[layer].Remove(intObj);
 
-      if (_intObjInteractionLayers[layer].Count == 0) {
-        _intObjInteractionLayers.Remove(layer);
-      }
-
       if (refreshImmediately) {
         refreshInteractionLayerMask();
       }
