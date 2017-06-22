@@ -118,36 +118,48 @@ namespace Leap.Unity.Interaction {
     }
 
     void OnCollisionEnter(Collision collision) {
-      if (collision.rigidbody == null) { return; }
+      bool hitNonInteractionObject = false;
 
-      IInteractionBehaviour interactionObj;
-      if (interactionController.manager.interactionObjectBodies.TryGetValue(collision.rigidbody, out interactionObj)) {
-        _lastObjectTouchedAdjustedMass = collision.rigidbody.mass;
-        if (interactionObj is InteractionBehaviour) {
-          switch ((interactionObj as InteractionBehaviour).contactForceMode) {
-            case ContactForceMode.UI:
-              _lastObjectTouchedAdjustedMass *= 2F;
-              break;
-            case ContactForceMode.Object: default:
-              if (interactionHand != null) {
-                _lastObjectTouchedAdjustedMass *= 0.2F;
-              }
-              else {
-                _lastObjectTouchedAdjustedMass *= 3F;
-              }
-              break;
+      if (collision.rigidbody == null) {
+        #if UNITY_EDITOR
+        hitNonInteractionObject = true;
+        #endif
+      }
+      else {
+        IInteractionBehaviour interactionObj;
+        if (interactionController.manager.interactionObjectBodies.TryGetValue(collision.rigidbody, out interactionObj)) {
+          _lastObjectTouchedAdjustedMass = collision.rigidbody.mass;
+          if (interactionObj is InteractionBehaviour) {
+            switch ((interactionObj as InteractionBehaviour).contactForceMode) {
+              case ContactForceMode.UI:
+                _lastObjectTouchedAdjustedMass *= 2F;
+                break;
+              case ContactForceMode.Object:
+              default:
+                if (interactionHand != null) {
+                  _lastObjectTouchedAdjustedMass *= 0.2F;
+                }
+                else {
+                  _lastObjectTouchedAdjustedMass *= 3F;
+                }
+                break;
+            }
+          }
+
+          if (collision.impulse.magnitude > 0f) {
+            if (!contactingInteractionBehaviours.ContainsKey(interactionObj)) {
+              interactionController.NotifyContactBoneCollisionEnter(this, interactionObj);
+              contactingInteractionBehaviours.Add(interactionObj, Time.fixedTime);
+            }
           }
         }
-
-        if (collision.impulse.magnitude > 0f) {
-          if (!contactingInteractionBehaviours.ContainsKey(interactionObj)) {
-            interactionController.NotifyContactBoneCollisionEnter(this, interactionObj);
-            contactingInteractionBehaviours.Add(interactionObj, Time.fixedTime);
-          }
+        else {
+          hitNonInteractionObject = true;
         }
       }
+
       #if UNITY_EDITOR
-      else {
+      if (hitNonInteractionObject) {
         // If we hit something that isn't an Interaction Behaviour, there's probably an issue.
         Debug.LogError("Contact bone collided with something that's not an Interaction"
                      + "Behaviour! This is liable to cause contact bones to build unstable "
