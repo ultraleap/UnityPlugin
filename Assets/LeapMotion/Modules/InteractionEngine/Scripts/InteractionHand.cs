@@ -339,7 +339,7 @@ namespace Leap.Unity.Interaction {
     private const int BONES_PER_FINGER = 3;
 
     private ContactBone[] _contactBones;
-    protected override ContactBone[] contactBones {
+    public override ContactBone[] contactBones {
       get { return _contactBones; }
     }
 
@@ -610,14 +610,33 @@ namespace Leap.Unity.Interaction {
       }
     }
 
+    private Vector3[] _fingertipPositionsBuffer = new Vector3[5];
     /// <summary>
-    /// Returns approximately where the controller is grasping the currently grasped
-    /// InteractionBehaviour.
-    /// This method will print an error if the controller is not currently grasping an object.
+    /// Returns approximately where the controller is grasping the currently-grasped
+    /// InteractionBehaviour. Specifically, returns the average position of all grasping
+    /// fingertips of the InteractionHand.
+    /// 
+    /// This method will print an error if the hand is not currently grasping an object.
     /// </summary>
     public override Vector3 GetGraspPoint() {
-      // TODO: Reimplement this
-      throw new NotImplementedException();
+      if (!isGraspingObject) {
+        Debug.LogError("Tried to get grasp point of InteractionHand, but it is not "
+                     + "currently grasping an object.", this);
+        return leapHand.PalmPosition.ToVector3();
+      }
+
+      int numGraspingFingertips = 0;
+      _grabClassifier.GetGraspingFingertipPositions(graspedObject, _fingertipPositionsBuffer, out numGraspingFingertips);
+      if (numGraspingFingertips > 0) {
+        Vector3 sum = Vector3.zero;
+        for (int i = 0; i < numGraspingFingertips; i++) {
+          sum += _fingertipPositionsBuffer[i];
+        }
+        return sum / numGraspingFingertips;
+      }
+      else {
+        return leapHand.PalmPosition.ToVector3();
+      }
     }
 
     protected override void fixedUpdateGraspingState() {

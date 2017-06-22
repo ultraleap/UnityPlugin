@@ -84,7 +84,6 @@ GameObject:
   m_Component:
   - component: {fileID: 4280761798635332}
   - component: {fileID: 33893377497003312}
-  - component: {fileID: 65293713470010732}
   - component: {fileID: 23167333120583094}
   m_Layer: 0
   m_Name: Cube (2)
@@ -134,7 +133,6 @@ GameObject:
   m_Component:
   - component: {fileID: 4360874184650288}
   - component: {fileID: 33934334839966892}
-  - component: {fileID: 65045568795545872}
   - component: {fileID: 23935494451455434}
   m_Layer: 0
   m_Name: Cube (1)
@@ -372,7 +370,6 @@ GameObject:
   m_Component:
   - component: {fileID: 4193672699927838}
   - component: {fileID: 33100974816965904}
-  - component: {fileID: 65654907686211272}
   - component: {fileID: 23478824586569272}
   m_Layer: 0
   m_Name: Cube (4)
@@ -492,7 +489,6 @@ GameObject:
   m_Component:
   - component: {fileID: 4091547367843310}
   - component: {fileID: 33083894181535954}
-  - component: {fileID: 65855436179415614}
   - component: {fileID: 23998871270981302}
   m_Layer: 0
   m_Name: Cube (1)
@@ -528,6 +524,7 @@ GameObject:
   - component: {fileID: 4754278044759552}
   - component: {fileID: 54757883203877810}
   - component: {fileID: 114955916709611338}
+  - component: {fileID: 114182520322452120}
   m_Layer: 0
   m_Name: 2D Slider
   m_TagString: Untagged
@@ -595,6 +592,7 @@ GameObject:
   - component: {fileID: 4275089971556662}
   - component: {fileID: 54783115363902762}
   - component: {fileID: 114526305417502982}
+  - component: {fileID: 114568347097340038}
   m_Layer: 0
   m_Name: 2D Slider
   m_TagString: Untagged
@@ -611,7 +609,6 @@ GameObject:
   m_Component:
   - component: {fileID: 4868362510522466}
   - component: {fileID: 33397951252294898}
-  - component: {fileID: 65943841918034466}
   - component: {fileID: 23816407513904390}
   m_Layer: 0
   m_Name: Cube
@@ -645,6 +642,8 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4156237895884118}
+  - component: {fileID: 114831251513606100}
+  - component: {fileID: 114663390758595046}
   m_Layer: 0
   m_Name: Workstation Panel
   m_TagString: Untagged
@@ -829,7 +828,6 @@ GameObject:
   m_Component:
   - component: {fileID: 4125868985682296}
   - component: {fileID: 33379279426756880}
-  - component: {fileID: 65406915687350322}
   - component: {fileID: 23814278648181762}
   m_Layer: 0
   m_Name: Cube (5)
@@ -880,7 +878,6 @@ GameObject:
   m_Component:
   - component: {fileID: 4961213572145682}
   - component: {fileID: 33055333635529928}
-  - component: {fileID: 65544736933178866}
   - component: {fileID: 23279552472812714}
   m_Layer: 0
   m_Name: Cube (3)
@@ -898,7 +895,6 @@ GameObject:
   m_Component:
   - component: {fileID: 4145633471176582}
   - component: {fileID: 33418245998935062}
-  - component: {fileID: 65981937330555232}
   - component: {fileID: 23618601447849190}
   m_Layer: 0
   m_Name: Cube
@@ -1310,8 +1306,8 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1284443966656062}
-  m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
-  m_LocalPosition: {x: -0.7803, y: -0.06, z: 0.5788}
+  m_LocalRotation: {x: -0.00000008940697, y: 0.00000020663208, z: 7.1054274e-15, w: -1}
+  m_LocalPosition: {x: -0.17060006, y: -0.05130004, z: 0.119999915}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4825133181250094}
@@ -1667,9 +1663,9 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1234304293458748}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0.7071068, y: 0, z: 0, w: 0.7071068}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.01, y: 0.01, z: 0.01}
   m_Children:
   - {fileID: 4156237895884118}
   m_Father: {fileID: 4342971396213660}
@@ -3710,7 +3706,7 @@ Rigidbody:
   m_Drag: 5
   m_AngularDrag: 5
   m_UseGravity: 0
-  m_IsKinematic: 0
+  m_IsKinematic: 1
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
@@ -3724,7 +3720,7 @@ Rigidbody:
   m_Mass: 1
   m_Drag: 0
   m_AngularDrag: 0.05
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 112
@@ -3739,23 +3735,11 @@ Rigidbody:
   m_Mass: 1
   m_Drag: 0
   m_AngularDrag: 0.05
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 112
   m_CollisionDetection: 0
---- !u!65 &65045568795545872
-BoxCollider:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1181966998313410}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!65 &65099339487229104
 BoxCollider:
   m_ObjectHideFlags: 1
@@ -3763,22 +3747,10 @@ BoxCollider:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1706603448879554}
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
---- !u!65 &65293713470010732
-BoxCollider:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1112453519295510}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
+  m_Size: {x: 1.4, y: 1.4, z: 1.4}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!65 &65370750363491788
 BoxCollider:
@@ -3786,54 +3758,6 @@ BoxCollider:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1302481672841178}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
---- !u!65 &65406915687350322
-BoxCollider:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1695317868022886}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
---- !u!65 &65544736933178866
-BoxCollider:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1706949943226968}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
---- !u!65 &65654907686211272
-BoxCollider:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1345143238578960}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
---- !u!65 &65855436179415614
-BoxCollider:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1421062777906842}
   m_Material: {fileID: 0}
   m_IsTrigger: 0
   m_Enabled: 1
@@ -3852,30 +3776,6 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!65 &65943841918034466
-BoxCollider:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1541302722189588}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
---- !u!65 &65981937330555232
-BoxCollider:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1707108556099492}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &114098093262600044
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -3887,7 +3787,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1aceea2f5c70da64e893474302ff53e6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _isAttached: 0
+  _isAttached: 1
   _anchor: {fileID: 0}
   _anchorGroup: {fileID: 0}
   maxAnchorRange: 0.3
@@ -3914,6 +3814,24 @@ MonoBehaviour:
     m_RotationOrder: 4
   _eventTable:
     _entries: []
+--- !u!114 &114182520322452120
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1479338265924126}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4b02e2f8ae628ac4f9faca951fe12db4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  useHover: 0
+  usePrimaryHover: 1
+  defaultColor: {r: 0.15592562, g: 0.31113267, b: 0.75735295, a: 1}
+  suspendedColor: {r: 1, g: 0, b: 0, a: 1}
+  hoverColor: {r: 0.10802336, g: 0.4938448, b: 0.8161765, a: 1}
+  primaryHoverColor: {r: 0.185013, g: 0.55666924, b: 0.86764705, a: 1}
+  pressedColor: {r: 0.63235295, g: 0.923935, b: 1, a: 1}
 --- !u!114 &114526305417502982
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -3927,6 +3845,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _manager: {fileID: 0}
   _ignoreHoverMode: 0
+  _isIgnoringAllHoverState: 0
+  _ignorePrimaryHover: 0
   _ignoreContact: 0
   _ignoreGrasping: 0
   _contactForceMode: 1
@@ -3934,6 +3854,12 @@ MonoBehaviour:
   _moveObjectWhenGrasped: 1
   graspedMovementType: 2
   graspHoldWarpingEnabled__curIgnored: 1
+  _overrideInteractionLayer: 1
+  _interactionLayer:
+    layerIndex: 5
+  _overrideNoContactLayer: 0
+  _noContactLayer:
+    layerIndex: 0
   _eventTable:
     _entries: []
   minMaxHeight: {x: 0, y: 0.02}
@@ -3953,6 +3879,8 @@ MonoBehaviour:
   verticalValueRange: {x: 0, y: 1}
   horizontalSlideLimits: {x: -0.023, y: 0.023}
   verticalSlideLimits: {x: -0.013, y: 0.013}
+  horizontalSteps: 0
+  verticalSteps: 0
   horizontalSlideEvent:
     m_PersistentCalls:
       m_Calls: []
@@ -3963,6 +3891,24 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: Leap.Unity.Interaction.InteractionSlider+FloatEvent, Assembly-CSharp,
       Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+--- !u!114 &114568347097340038
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1518170993950910}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4b02e2f8ae628ac4f9faca951fe12db4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  useHover: 0
+  usePrimaryHover: 1
+  defaultColor: {r: 0.15592562, g: 0.31113267, b: 0.75735295, a: 1}
+  suspendedColor: {r: 1, g: 0, b: 0, a: 1}
+  hoverColor: {r: 0.10802336, g: 0.4938448, b: 0.8161765, a: 1}
+  primaryHoverColor: {r: 0.185013, g: 0.55666924, b: 0.86764705, a: 1}
+  pressedColor: {r: 0.63235295, g: 0.923935, b: 1, a: 1}
 --- !u!114 &114626066090088948
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -3975,7 +3921,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _manager: {fileID: 0}
-  _ignoreHoverMode: 0
+  _ignoreHoverMode: 1
+  _isIgnoringAllHoverState: 0
+  _ignorePrimaryHover: 0
   _ignoreContact: 0
   _ignoreGrasping: 0
   _contactForceMode: 0
@@ -3983,8 +3931,25 @@ MonoBehaviour:
   _moveObjectWhenGrasped: 1
   graspedMovementType: 1
   graspHoldWarpingEnabled__curIgnored: 1
+  _overrideInteractionLayer: 0
+  _interactionLayer:
+    layerIndex: 0
+  _overrideNoContactLayer: 0
+  _noContactLayer:
+    layerIndex: 0
   _eventTable:
     _entries: []
+--- !u!114 &114663390758595046
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1554924526829272}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 63f706a66d7747347b05af75d89b00e3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &114683622187974152
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -3997,6 +3962,26 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   workstationModeTween: {fileID: 114900713033648358}
+--- !u!114 &114831251513606100
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1554924526829272}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e933f13d48c681d48b14750922ac906d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _comment: 'We use the Ignore Collisions In Children script to prevent UI elements
+    from colliding each other, which is commonly desired when building an interface.
+
+
+    In your application, we recommend using layers instead of this script, especially
+    if your UI consists of more than just a few objects. Layers will achieve the same
+    results with a significant performance boost over the Physics.IgnoreCollision()
+    method utilized by this script.'
+  _isEditing: 0
 --- !u!114 &114900713033648358
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -4011,58 +3996,48 @@ MonoBehaviour:
   targetTransform: {fileID: 4763853199398006}
   startTransform: {fileID: 4355541230239870}
   endTransform: {fileID: 4052967747132462}
+  startAtEnd: 0
   tweenLocalPosition: 1
   tweenLocalRotation: 1
   tweenLocalScale: 1
   tweenDuration: 0.2
   tweenSmoothType: 2
-  OnProgress:
-    m_PersistentCalls:
-      m_Calls: []
-    m_TypeName: Leap.Unity.Animation.TransformTweenBehaviour+FloatEvent, Assembly-CSharp,
-      Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-  OnLeaveStart:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1234304293458748}
-        m_MethodName: SetActive
-        m_Mode: 6
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 1
-        m_CallState: 2
-    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
-      PublicKeyToken=null
-  OnReachEnd:
-    m_PersistentCalls:
-      m_Calls: []
-    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
-      PublicKeyToken=null
-  OnLeaveEnd:
-    m_PersistentCalls:
-      m_Calls: []
-    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
-      PublicKeyToken=null
-  OnReachStart:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1234304293458748}
-        m_MethodName: SetActive
-        m_Mode: 6
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
-      PublicKeyToken=null
+  _eventTable:
+    _entries:
+    - enumValue: 110
+      callback:
+        m_PersistentCalls:
+          m_Calls:
+          - m_Target: {fileID: 1234304293458748}
+            m_MethodName: SetActive
+            m_Mode: 6
+            m_Arguments:
+              m_ObjectArgument: {fileID: 0}
+              m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+              m_IntArgument: 0
+              m_FloatArgument: 0
+              m_StringArgument: 
+              m_BoolArgument: 1
+            m_CallState: 2
+        m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+          PublicKeyToken=null
+    - enumValue: 140
+      callback:
+        m_PersistentCalls:
+          m_Calls:
+          - m_Target: {fileID: 1234304293458748}
+            m_MethodName: SetActive
+            m_Mode: 6
+            m_Arguments:
+              m_ObjectArgument: {fileID: 0}
+              m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+              m_IntArgument: 0
+              m_FloatArgument: 0
+              m_StringArgument: 
+              m_BoolArgument: 0
+            m_CallState: 2
+        m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+          PublicKeyToken=null
 --- !u!114 &114955916709611338
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -4076,6 +4051,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _manager: {fileID: 0}
   _ignoreHoverMode: 0
+  _isIgnoringAllHoverState: 0
+  _ignorePrimaryHover: 0
   _ignoreContact: 0
   _ignoreGrasping: 0
   _contactForceMode: 1
@@ -4083,6 +4060,12 @@ MonoBehaviour:
   _moveObjectWhenGrasped: 1
   graspedMovementType: 2
   graspHoldWarpingEnabled__curIgnored: 1
+  _overrideInteractionLayer: 1
+  _interactionLayer:
+    layerIndex: 5
+  _overrideNoContactLayer: 0
+  _noContactLayer:
+    layerIndex: 0
   _eventTable:
     _entries: []
   minMaxHeight: {x: 0, y: 0.02}
@@ -4102,6 +4085,8 @@ MonoBehaviour:
   verticalValueRange: {x: 0, y: 1}
   horizontalSlideLimits: {x: -0.05, y: 0.05}
   verticalSlideLimits: {x: -0.013, y: 0.013}
+  horizontalSteps: 0
+  verticalSteps: 0
   horizontalSlideEvent:
     m_PersistentCalls:
       m_Calls: []

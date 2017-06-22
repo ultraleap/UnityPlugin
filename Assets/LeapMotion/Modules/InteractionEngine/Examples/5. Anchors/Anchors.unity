@@ -22114,7 +22114,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _manager: {fileID: 0}
+  _manager: {fileID: 892104473}
   _ignoreHoverMode: 0
   _isIgnoringAllHoverState: 0
   _ignorePrimaryHover: 0
@@ -22125,6 +22125,12 @@ MonoBehaviour:
   _moveObjectWhenGrasped: 1
   graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
+  _overrideInteractionLayer: 0
+  interactionLayer:
+    layerIndex: 0
+  _overrideNoContactLayer: 1
+  noContactLayer:
+    layerIndex: 0
   _eventTable:
     _entries: []
 --- !u!54 &1680547686
@@ -23586,7 +23592,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _manager: {fileID: 0}
+  _manager: {fileID: 892104473}
   _ignoreHoverMode: 0
   _isIgnoringAllHoverState: 0
   _ignorePrimaryHover: 0
@@ -23597,6 +23603,12 @@ MonoBehaviour:
   _moveObjectWhenGrasped: 1
   graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
+  _overrideInteractionLayer: 0
+  interactionLayer:
+    layerIndex: 0
+  _overrideNoContactLayer: 1
+  noContactLayer:
+    layerIndex: 0
   _eventTable:
     _entries: []
 --- !u!54 &1817611768
@@ -28365,7 +28377,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _manager: {fileID: 0}
+  _manager: {fileID: 892104473}
   _ignoreHoverMode: 0
   _isIgnoringAllHoverState: 0
   _ignorePrimaryHover: 0
@@ -28376,6 +28388,12 @@ MonoBehaviour:
   _moveObjectWhenGrasped: 1
   graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
+  _overrideInteractionLayer: 0
+  interactionLayer:
+    layerIndex: 0
+  _overrideNoContactLayer: 0
+  noContactLayer:
+    layerIndex: 0
   _eventTable:
     _entries:
     - enumValue: 152
