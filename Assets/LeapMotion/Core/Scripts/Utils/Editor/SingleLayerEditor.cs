@@ -50,8 +50,18 @@ namespace Leap.Unity {
         label.tooltip = tooltipAttribute.tooltip;
       }
 
+      bool originalMixedValue = EditorGUI.showMixedValue;
+      if (layerProperty.hasMultipleDifferentValues) {
+        EditorGUI.showMixedValue = true;
+      }
+
+      EditorGUI.BeginChangeCheck();
       index = EditorGUI.Popup(position, label, index, _layerNames);
-      layerProperty.intValue = _layerValues[index];
+      if (EditorGUI.EndChangeCheck()) {
+        layerProperty.intValue = _layerValues[index];
+      }
+
+      EditorGUI.showMixedValue = originalMixedValue;
     }
 
     private void ensureLayersInitialized() {

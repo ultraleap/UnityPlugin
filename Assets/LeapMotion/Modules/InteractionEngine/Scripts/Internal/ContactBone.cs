@@ -118,41 +118,62 @@ namespace Leap.Unity.Interaction {
     }
 
     void OnCollisionEnter(Collision collision) {
-      IInteractionBehaviour interactionObj;
+      bool hitNonInteractionObject = false;
+
       if (collision.rigidbody == null) {
-        Debug.LogError("Contact Bone collided with non-rigidbody collider: " + collision.collider.name + ". "
-                     + "Please enable automatic layer generation in the Interaction Manager, "
-                     + "or ensure the Interaction layer only contains Interaction Behaviours.");
+        #if UNITY_EDITOR
+        hitNonInteractionObject = true;
+        #endif
       }
+      else {
+        IInteractionBehaviour interactionObj;
+        if (interactionController.manager.interactionObjectBodies.TryGetValue(collision.rigidbody, out interactionObj)) {
+          _lastObjectTouchedAdjustedMass = collision.rigidbody.mass;
+          if (interactionObj is InteractionBehaviour) {
+            switch ((interactionObj as InteractionBehaviour).contactForceMode) {
+              case ContactForceMode.UI:
+                _lastObjectTouchedAdjustedMass *= 2F;
+                break;
+              case ContactForceMode.Object:
+              default:
+                if (interactionHand != null) {
+                  _lastObjectTouchedAdjustedMass *= 0.2F;
+                }
+                else {
+                  _lastObjectTouchedAdjustedMass *= 3F;
+                }
+                break;
+            }
+          }
 
-      if (interactionController.manager.interactionObjectBodies.TryGetValue(collision.rigidbody, out interactionObj)) {
-        _lastObjectTouchedAdjustedMass = collision.rigidbody.mass;
-        if (interactionObj is InteractionBehaviour) {
-          switch ((interactionObj as InteractionBehaviour).contactForceMode) {
-            case ContactForceMode.UI:
-              _lastObjectTouchedAdjustedMass *= 2F;
-              break;
-            case ContactForceMode.Object: default:
-              if (interactionHand != null) {
-                _lastObjectTouchedAdjustedMass *= 0.2F;
-              }
-              else {
-                _lastObjectTouchedAdjustedMass *= 3F;
-              }
-              break;
+          if (collision.impulse.magnitude > 0f) {
+            if (!contactingInteractionBehaviours.ContainsKey(interactionObj)) {
+              interactionController.NotifyContactBoneCollisionEnter(this, interactionObj);
+              contactingInteractionBehaviours.Add(interactionObj, Time.fixedTime);
+            }
           }
         }
-
-        if (collision.impulse.magnitude > 0f) {
-          if (!contactingInteractionBehaviours.ContainsKey(interactionObj)) {
-            interactionController.NotifyContactBoneCollisionEnter(this, interactionObj);
-            contactingInteractionBehaviours.Add(interactionObj, Time.fixedTime);
-          }
+        else {
+          hitNonInteractionObject = true;
         }
       }
+
+      #if UNITY_EDITOR
+      if (hitNonInteractionObject) {
+        // If we hit something that isn't an Interaction Behaviour, there's probably an issue.
+        Debug.LogError("Contact bone collided with something that's not an Interaction"
+                     + "Behaviour! This is liable to cause contact bones to build unstable "
+                     + "velocities and produce bad behavior. Please check your layer "
+                     + "settings in the Interaction Manager, and avoid placing any non-"
+                     + "Interaction objects in layers that contain Interaction objects.",
+                     this);
+      }
+      #endif
     }
 
     private void OnCollisionStay(Collision collision) {
+      if (collision.rigidbody == null) { return; }
+
       IInteractionBehaviour interactionObj;
       float timeEntered = 0;
       if (interactionController.manager.interactionObjectBodies.TryGetValue(collision.rigidbody, out interactionObj)) {
@@ -167,6 +188,8 @@ namespace Leap.Unity.Interaction {
     }
 
     void OnCollisionExit(Collision collision) {
+      if (collision.rigidbody == null) { return; }
+
       IInteractionBehaviour interactionObj;
       if (interactionController.manager.interactionObjectBodies.TryGetValue(collision.rigidbody, out interactionObj)) {
         if (contactingInteractionBehaviours.ContainsKey(interactionObj)) {
@@ -177,11 +200,8 @@ namespace Leap.Unity.Interaction {
     }
 
     void OnTriggerEnter(Collider collider) {
-      if (collider.attachedRigidbody == null) {
-        Debug.LogError("Contact Bone collided with non-rigidbody collider: " + collider.name + ". "
-                     + "Please enable automatic layer generation in the Interaction Manager, "
-                     + "or ensure the Interaction layer only contains Interaction Behaviours.");
-      }
+      if (collider.attachedRigidbody == null) { return; }
+
       IInteractionBehaviour interactionObj;
       if (interactionController.manager.interactionObjectBodies.TryGetValue(collider.attachedRigidbody, out interactionObj)) {
         interactionController.NotifyContactBoneCollisionEnter(this, interactionObj);
@@ -191,6 +211,8 @@ namespace Leap.Unity.Interaction {
     }
 
     void OnTriggerExit(Collider collider) {
+      if (collider.attachedRigidbody == null) { return; }
+
       IInteractionBehaviour interactionObj;
       if (interactionController.manager.interactionObjectBodies.TryGetValue(collider.attachedRigidbody, out interactionObj)) {
         interactionController.NotifyContactBoneCollisionExit(this, interactionObj);

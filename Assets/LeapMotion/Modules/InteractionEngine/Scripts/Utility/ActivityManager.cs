@@ -38,6 +38,13 @@ namespace Leap.Unity.Interaction {
     public int activationLayerMask = ~0;
 
     /// <summary>
+    /// This function, if set to a non-null value, overrides the activationLayerMask
+    /// setting with the result of calling the function. Use this if your application
+    /// state will modify the layer mask to use for the activity manager.
+    /// </summary>
+    public Func<int> activationLayerFunction = null;
+
+    /// <summary>
     /// This is the function by which the ActivityManager converts the Colliders it finds
     /// through PhysX queries into Ts to be placed in the ActiveObjects set.
     /// 
@@ -141,12 +148,13 @@ namespace Leap.Unity.Interaction {
     private int GetSphereColliderResults(Vector3 position, ref Collider[] resultsBuffer) {
       using (new ProfilerSample("GetSphereColliderResults()")) {
 
+        int layerMask = activationLayerFunction == null ? activationLayerMask : activationLayerFunction();
         int overlapCount = 0;
         while (true) {
           overlapCount = Physics.OverlapSphereNonAlloc(position,
                                                        activationRadius,
                                                        resultsBuffer,
-                                                       activationLayerMask,
+                                                       layerMask,
                                                        QueryTriggerInteraction.Collide);
           if (overlapCount < resultsBuffer.Length) {
             break;

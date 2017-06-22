@@ -8,10 +8,10 @@
  ******************************************************************************/
 
 ﻿using Leap.Unity.Interaction.Internal;
+using Leap.Unity.Query;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
-using System.Collections.Generic;
-using Leap.Unity.Query;
 
 namespace Leap.Unity.Interaction {
 
@@ -94,7 +94,7 @@ namespace Leap.Unity.Interaction {
       _initialLocalRotation = transform.localRotation;
 
       //Add a custom grasp controller
-      OnGraspedMovement += onGraspedMovement;
+      OnGraspBegin += onGraspBegin;
       OnGraspEnd += onGraspEnd;
 
       base.Start();
@@ -104,7 +104,7 @@ namespace Leap.Unity.Interaction {
       if (!_physicsOccurred) {
         _physicsOccurred = true;
 
-        if (!rigidbody.IsSleeping()) {
+        if (!isGrasped && !rigidbody.IsSleeping()) {
           //Sleep the rigidbody if it's not really moving...
 
           float localPhysicsDisplacementPercentage = Mathf.InverseLerp(minMaxHeight.x, minMaxHeight.y, initialLocalPosition.z - localPhysicsPosition.z);
@@ -118,6 +118,9 @@ namespace Leap.Unity.Interaction {
         }
       }
     }
+
+    private const float FRICTION_COEFFICIENT = 30F;
+    private const float DRAG_COEFFICIENT = 50F;
 
     protected virtual void Update() {
       //Reset our convenience state variables...
@@ -151,9 +154,32 @@ namespace Leap.Unity.Interaction {
           Vector3 origLocalDepressorPos = transform.parent.InverseTransformPoint(transform.TransformPoint(_localDepressorPosition));
           localPhysicsVelocity = Vector3.back * 0.05f;
           localPhysicsPosition = getDepressedConstrainedLocalPosition(curLocalDepressorPos - origLocalDepressorPos);
-        } else {
-          localPhysicsVelocity += (Mathf.Clamp(_springForce * (initialLocalPosition.z - Mathf.Lerp(minMaxHeight.x, minMaxHeight.y, restingHeight) - localPhysicsPosition.z), -0.01f, 0.01f) / Time.fixedDeltaTime) * Vector3.forward;
-          localPhysicsVelocity *= Mathf.Pow(0.0000000001f, Time.fixedDeltaTime);
+        }
+        else if (isGrasped) {
+          // Do nothing!
+        }
+        else {
+          Vector3 originalLocalVelocity = localPhysicsVelocity;
+
+          // Spring force
+          localPhysicsVelocity += Mathf.Clamp(_springForce * 10000F * (initialLocalPosition.z - Mathf.Lerp(minMaxHeight.x, minMaxHeight.y, restingHeight) - localPhysicsPosition.z), -100f, 100f)
+                                * Time.fixedDeltaTime
+                                * Vector3.forward;
+
+          // Friction & Drag
+          float velMag = originalLocalVelocity.magnitude;
+          if (velMag > 0F) {
+            Vector3 resistanceDir = -originalLocalVelocity / velMag;
+
+            // Friction force
+            Vector3 frictionForce = resistanceDir * velMag * FRICTION_COEFFICIENT;
+            localPhysicsVelocity = localPhysicsVelocity + (frictionForce /* assume unit mass */ * Time.fixedDeltaTime);
+
+            // Drag force
+            float velSqrMag = velMag * velMag;
+            Vector3 dragForce = resistanceDir * velSqrMag * DRAG_COEFFICIENT;
+            localPhysicsVelocity = localPhysicsVelocity + (dragForce /* assume unit mass */ * Time.fixedDeltaTime);
+          }
         }
 
         // Transform the local physics back into world space
@@ -167,25 +193,33 @@ namespace Leap.Unity.Interaction {
         // If the button is depressed past its limit...
         if (localPhysicsPosition.z > initialLocalPosition.z - minMaxHeight.x) {
           transform.localPosition = new Vector3(localPhysicsPosition.x, localPhysicsPosition.y, initialLocalPosition.z - minMaxHeight.x);
-          if ((isPrimaryHovered && _lastDepressor!=null) || isGrasped) {
+          if ((isPrimaryHovered && _lastDepressor != null) || isGrasped) {
             isDepressed = true;
-          } else {
+          }
+          else {
             physicsPosition = transform.parent.TransformPoint(new Vector3(localPhysicsPosition.x, localPhysicsPosition.y, initialLocalPosition.z - minMaxHeight.x));
             _physicsVelocity = _physicsVelocity * 0.1f;
             isDepressed = false;
             _lastDepressor = null;
           }
           // Else if the button is extended past its limit...
-        } else if (localPhysicsPosition.z < initialLocalPosition.z - minMaxHeight.y) {
+        }
+        else if (localPhysicsPosition.z < initialLocalPosition.z - minMaxHeight.y) {
           transform.localPosition = new Vector3(localPhysicsPosition.x, localPhysicsPosition.y, initialLocalPosition.z - minMaxHeight.y);
           physicsPosition = transform.position;
           isDepressed = false;
           _lastDepressor = null;
-        } else {
+        }
+        else {
           // Else, just make the physical and graphical motion of the button match
           transform.localPosition = localPhysicsPosition;
-          isDepressed = false;
-          _lastDepressor = null;
+
+          // Allow some hysteresis before setting isDepressed to false.
+          if (!isDepressed
+              || !(localPhysicsPosition.z > initialLocalPosition.z - (minMaxHeight.y - minMaxHeight.x) * 0.1F)) {
+            isDepressed = false;
+            _lastDepressor = null;
+          }
         }
 
         // If our depression state has changed since last time...
@@ -199,7 +233,11 @@ namespace Leap.Unity.Interaction {
         } else if (!isDepressed && oldDepressed) {
           unDepressedThisFrame = true;
           OnUnpress.Invoke();
-          _lockedInteractingController.primaryHoverLocked = false;
+
+          if (!(isGrasped && graspingController == _lockedInteractingController)) {
+            _lockedInteractingController.primaryHoverLocked = false;
+          }
+
           _lastDepressor = null;
         }
       }
@@ -210,18 +248,20 @@ namespace Leap.Unity.Interaction {
       return new Vector3(initialLocalPosition.x, initialLocalPosition.y, localPhysicsPosition.z + desiredOffset.z);
     }
 
-    protected virtual void onGraspedMovement(Vector3 preSolvedPosition, Quaternion preSolvedRotation,
-                                             Vector3 postSolvedPosition, Quaternion postSolvedRotation,
-                                             List<InteractionController> graspingControllers) {
-      Vector3 newLocalPosition = getDepressedConstrainedLocalPosition(transform.parent.InverseTransformVector(postSolvedPosition - preSolvedPosition));
-      newLocalPosition.z = Mathf.Clamp(newLocalPosition.z, initialLocalPosition.z - minMaxHeight.y, initialLocalPosition.z - minMaxHeight.x);
-      _physicsVelocity = 0.5f * (transform.parent.TransformPoint(newLocalPosition) - physicsPosition) / Time.fixedDeltaTime;
+    protected virtual void onGraspBegin() {
+      primaryHoveringController.LockPrimaryHover(this);
+      _lockedInteractingController = primaryHoveringController;
     }
 
     protected virtual void onGraspEnd() {
       if (localPhysicsPosition.z > initialLocalPosition.z - minMaxHeight.x) {
         transform.localPosition = new Vector3(localPhysicsPosition.x, localPhysicsPosition.y, initialLocalPosition.z - minMaxHeight.x);
         _physicsVelocity = _physicsVelocity * 0.1f;
+      }
+
+      if (_lockedInteractingController != null && !isDepressed) {
+        _lockedInteractingController.primaryHoverLocked = false;
+        _lockedInteractingController = null;
       }
     }
 
