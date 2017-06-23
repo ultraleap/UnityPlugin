@@ -56,8 +56,10 @@ namespace Leap.Unity {
           var attribute = attributes[0] as LeapPreferences;
           _leapPreferenceItems.Add(new LeapPreferenceItem() {
             drawPreferenceGui = () => {
-              EditorGUILayout.LabelField(attribute.header, EditorStyles.whiteLargeLabel);
-              method.Invoke(null, null);
+              EditorGUILayout.LabelField(attribute.header, EditorStyles.boldLabel);
+              using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox)) {
+                method.Invoke(null, null);
+              }
               EditorGUILayout.Space();
               EditorGUILayout.Space();
               EditorGUILayout.Space();
