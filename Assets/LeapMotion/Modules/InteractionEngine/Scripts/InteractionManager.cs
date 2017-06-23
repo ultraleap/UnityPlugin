@@ -807,11 +807,16 @@ namespace Leap.Unity.Interaction {
     private void refreshInteractionControllers() {
       _interactionControllers.Clear();
 
-      foreach (var controller in this.transform.GetChildren()
-                                               .Query()
-                                               .Select(g => g.GetComponent<InteractionController>())
-                                               .Where(c => c != null && c.gameObject.activeSelf)) {
-        _interactionControllers.Add(controller);
+      var tempControllers = Pool<List<InteractionController>>.Spawn();
+      try {
+        this.transform.GetComponentsInChildren<InteractionController>(false, tempControllers);
+        foreach (var controller in tempControllers) {
+          _interactionControllers.Add(controller);
+        }
+      }
+      finally {
+        tempControllers.Clear();
+        Pool<List<InteractionController>>.Recycle(tempControllers);
       }
     }
 
