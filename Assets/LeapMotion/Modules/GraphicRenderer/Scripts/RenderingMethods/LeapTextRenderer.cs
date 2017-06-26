@@ -68,11 +68,20 @@ namespace Leap.Unity.GraphicalRenderer {
       }
 
       generateMaterial();
+
+      Font.textureRebuilt += onFontTextureRebuild;
     }
 
-    public override void OnDisableRenderer() { }
+    public override void OnDisableRenderer() {
+      Font.textureRebuilt -= onFontTextureRebuild;
+    }
 
     public override void OnUpdateRenderer() {
+      for (int i = 0; i < group.graphics.Count; i++) {
+        var graphic = group.graphics[i] as LeapTextGraphic;
+        prepareFontWithGraphic(graphic);
+      }
+
       for (int i = 0; i < group.graphics.Count; i++) {
         var graphic = group.graphics[i] as LeapTextGraphic;
 
@@ -161,6 +170,16 @@ namespace Leap.Unity.GraphicalRenderer {
     }
 #endif
 
+    private void onFontTextureRebuild(Font font) {
+      if (font != _font) {
+        return;
+      }
+
+      foreach (var graphic in group.graphics) {
+        graphic.isRepresentationDirty = true;
+      }
+    }
+
     private void generateMaterial() {
       if (_material == null) {
         _material = new Material(_font.material);
@@ -191,6 +210,14 @@ namespace Leap.Unity.GraphicalRenderer {
       }
     }
 
+    private void prepareFontWithGraphic(LeapTextGraphic graphic) {
+      int scaledFontSize = Mathf.RoundToInt(graphic.fontSize * _dynamicPixelsPerUnit);
+
+      _font.RequestCharactersInTexture(graphic.text,
+                                       scaledFontSize,
+                                       graphic.fontStyle);
+    }
+
     private List<TextWrapper.Line> _tempLines = new List<TextWrapper.Line>();
     private List<Vector3> _verts = new List<Vector3>();
     private List<Vector4> _uvs = new List<Vector4>();
@@ -202,10 +229,6 @@ namespace Leap.Unity.GraphicalRenderer {
       graphic.isRepresentationDirty = false;
 
       int scaledFontSize = Mathf.RoundToInt(graphic.fontSize * _dynamicPixelsPerUnit);
-
-      _font.RequestCharactersInTexture(graphic.text,
-                                       scaledFontSize,
-                                       graphic.fontStyle);
 
       //Check for characters not found in the font
       {
