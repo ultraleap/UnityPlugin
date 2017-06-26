@@ -25,6 +25,16 @@ namespace Leap.Unity.GraphicalRenderer {
     }
 
     /// <summary>
+    /// Overload of SetRuntimeTint that takes in a Html style string
+    /// code that represents a color.  Any string that can be parsed
+    /// by ColorUtility.TryParseHtmlString can be used as an argument
+    /// to this method.
+    /// </summary>
+    public void SetRuntimeTint(string htmlString) {
+      SetRuntimeTint(Utils.ParseHtmlColorString(htmlString));
+    }
+
+    /// <summary>
     /// Helper method to get the runtime tint color for a runtime 
     /// tint data object attached to this graphic.  This method will
     /// throw an exception if there is no tint data obj attached to 

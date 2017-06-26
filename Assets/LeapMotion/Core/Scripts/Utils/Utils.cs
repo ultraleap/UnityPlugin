@@ -495,8 +495,7 @@ namespace Leap.Unity {
             colliders.Add(collider);
           }
         }
-      }
-      finally {
+      } finally {
         toVisit.Clear();
         Pool<Stack<Transform>>.Recycle(toVisit);
 
@@ -511,6 +510,24 @@ namespace Leap.Unity {
 
     public static Color WithAlpha(this Color color, float alpha) {
       return new Color(color.r, color.g, color.b, alpha);
+    }
+
+    /// <summary>
+    /// Just like ColorUtility.TryParseHtmlString but throws a useful
+    /// error message if it fails.
+    /// </summary>
+    public static Color ParseHtmlColorString(string htmlString) {
+      Color color;
+      if (!ColorUtility.TryParseHtmlString(htmlString, out color)) {
+        throw new ArgumentException("The string [" + htmlString + "] is not a valid color code.  Valid color codes include:\n" +
+                                    "#RGB\n" +
+                                    "#RGBA\n" +
+                                    "#RRGGBB\n" +
+                                    "#RRGGBBAA\n" +
+                                    "For more information, see the documentation for ColorUtility.TryParseHtmlString.");
+      }
+
+      return color;
     }
 
     #endregion
