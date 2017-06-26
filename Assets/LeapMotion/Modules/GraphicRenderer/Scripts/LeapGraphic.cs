@@ -303,6 +303,15 @@ namespace Leap.Unity.GraphicalRenderer {
     #endregion
 
     #region UNITY CALLBACKS
+    protected virtual void Reset() {
+      var rectTransform = GetComponent<RectTransform>();
+      if (rectTransform != null &&
+          Mathf.Abs(rectTransform.sizeDelta.x - 100) < Mathf.Epsilon &&
+          Mathf.Abs(rectTransform.sizeDelta.y - 100) < Mathf.Epsilon) {
+        rectTransform.sizeDelta = Vector3.one * 0.1f;
+      }
+    }
+
     protected virtual void OnValidate() {
 #if UNITY_EDITOR
       editor.OnValidate();

@@ -156,7 +156,9 @@ namespace Leap.Unity.GraphicalRenderer {
       }
     }
 
-    private void Reset() {
+    protected override void Reset() {
+      base.Reset();
+
       assignDefaultSourceValue();
       setSourceFeatureDirty();
     }
@@ -186,11 +188,6 @@ namespace Leap.Unity.GraphicalRenderer {
     public override void RefreshMeshData() {
       if (sourceData == null) {
         assignDefaultSourceValue();
-      }
-
-      //No valid source was found :(
-      if (_sourceDataIndex == -1) {
-        return;
       }
 
       Vector4 borderSize = Vector4.zero;
