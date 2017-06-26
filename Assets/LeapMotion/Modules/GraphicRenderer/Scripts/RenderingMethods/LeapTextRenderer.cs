@@ -79,7 +79,10 @@ namespace Leap.Unity.GraphicalRenderer {
     public override void OnUpdateRenderer() {
       for (int i = 0; i < group.graphics.Count; i++) {
         var graphic = group.graphics[i] as LeapTextGraphic;
-        prepareFontWithGraphic(graphic);
+
+        if (graphic.isRepresentationDirtyOrEditTime) {
+          prepareFontWithGraphic(graphic);
+        }
       }
 
       for (int i = 0; i < group.graphics.Count; i++) {
