@@ -447,6 +447,7 @@ MonoBehaviour:
   _contactEnabled: 1
   _graspingEnabled: 1
   _trackingProviderType: Leap.Unity.Interaction.DefaultVRNodeTrackingProvider
+  _deviceString: oculus touch controller - right
   _chirality: 1
   _hoverPoint: {fileID: 4806976238791452}
   primaryHoverPoints:
