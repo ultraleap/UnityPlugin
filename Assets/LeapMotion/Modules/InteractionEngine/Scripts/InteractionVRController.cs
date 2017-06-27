@@ -39,7 +39,7 @@ namespace Leap.Unity.Interaction {
     [Tooltip("If this string is non-empty, but does not match a controller in Input.GetJoystickNames()"
        + ", then this game object will disable itself.")]
     [SerializeField, EditTimeOnly]
-    private string _deviceString = "oculus touch right"; //or "openvr controller right/left"
+    private string _deviceString = "oculus touch controller - right"; //or "openvr controller right/left"
     public string deviceString { get { return _deviceString; } }
 
     [Tooltip("Which hand will hold this controller? This property cannot be changed "
