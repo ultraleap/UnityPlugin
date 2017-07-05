@@ -17,6 +17,9 @@ namespace Leap.Unity.Examples {
     public Spaceship spaceship;
     public GameObject toSpawn;
 
+    public float forwardSpawnMultiplier = 1F;
+    public Vector3 spawnOffset = Vector3.left * 1.5F;
+
     private GameObject _spawnedObj;
 
     void Update() {
@@ -28,11 +31,20 @@ namespace Leap.Unity.Examples {
 
       if (justSpawned
           || (_spawnedObj.transform.position - spaceship.transform.position).z < -1F) {
-        Vector3 spawnPos = spaceship.transform.position;
-        spawnPos += spaceship.velocity;
-        spawnPos += Vector3.left * 1.33F;
-        _spawnedObj.transform.position = spawnPos;
+        setSpawnPosition();
+        if (justSpawned) _spawnedObj.transform.position += Vector3.forward * 2F;
       }
+    }
+
+    private void setSpawnPosition() {
+      Vector3 spawnPos = spaceship.transform.position;
+      spawnPos += spaceship.velocity * forwardSpawnMultiplier;
+      spawnPos += spawnOffset;
+      _spawnedObj.transform.position = spawnPos;
+    }
+
+    public void Respawn() {
+      setSpawnPosition();
     }
 
   }

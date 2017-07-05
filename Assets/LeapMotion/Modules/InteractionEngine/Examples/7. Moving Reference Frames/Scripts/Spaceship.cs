@@ -55,6 +55,7 @@ namespace Leap.Unity.Examples {
     void Awake() {
       _body = GetComponent<Rigidbody>();
       _body.mass = _mass;
+      _body.isKinematic = true;
     }
 
     void Start() {
