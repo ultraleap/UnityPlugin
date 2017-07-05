@@ -47,10 +47,14 @@ namespace Leap.Unity.Interaction {
     [Tooltip("The minimum and maximum vertical extents that the slider can slide to in world space.")]
     public Vector2 verticalSlideLimits = new Vector2(0f, 0f);
 
-    [Tooltip("The number of discrete quantized notches that this slider can occupy on the horizontal axis.")]
+    [Tooltip("The number of discrete quantized notches **beyond the first** that this "
+           + "slider can occupy on the horizontal axis. A value of zero indicates a "
+           + "continuous (non-quantized) slider for this axis.")]
     [MinValue(0)]
     public int horizontalSteps = 0;
-    [Tooltip("The number of discrete quantized notches that this slider can occupy on the vertical axis.")]
+    [Tooltip("The number of discrete quantized notches **beyond the first** that this "
+           + "slider can occupy on the vertical axis. A value of zero indicates a "
+           + "continuous (non-quantized) slider for this axis.")]
     [MinValue(0)]
     public int verticalSteps = 0;
 
