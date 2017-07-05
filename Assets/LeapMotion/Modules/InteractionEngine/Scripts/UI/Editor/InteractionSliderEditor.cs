@@ -17,11 +17,39 @@ namespace Leap.Unity.Interaction {
   public class InteractionSliderEditor : InteractionButtonEditor {
     public override void OnInspectorGUI() {
       bool noRectTransformParent = !(target.transform.parent != null && target.transform.parent.GetComponent<RectTransform>() != null);
-      specifyConditionalDrawing(() => noRectTransformParent, "horizontalSlideLimits", "verticalSlideLimits");
       if (!noRectTransformParent) {
         EditorGUILayout.HelpBox("This slider's limits are being controlled by the rect transform in its parent.", MessageType.Info);
       }
+
+      specifyCustomDecorator("horizontalSlideLimits", decorateHorizontalSlideLimits);
+      specifyCustomDecorator("verticalSlideLimits",   decorateVerticalSlideLimits);
+      specifyCustomDecorator("horizontalSteps", decorateHorizontalSteps);
+
+      // specifyConditionalDrawing(() => noRectTransformParent, "horizontalSlideLimits", "verticalSlideLimits");
+
+      if (!Application.isPlaying) {
+        (target as InteractionSlider).RecalculateSliderLimits();
+      }
+
       base.OnInspectorGUI();
     }
+
+    public override bool RequiresConstantRepaint() {
+      return true;
+    }
+
+    private void decorateHorizontalSlideLimits(SerializedProperty property) {
+      EditorGUI.BeginDisabledGroup(target.transform.parent != null && target.transform.parent.GetComponent<RectTransform>() != null);
+    }
+
+    private void decorateVerticalSlideLimits(SerializedProperty property) {
+      EditorGUI.EndDisabledGroup();
+      EditorGUI.BeginDisabledGroup(target.transform.parent != null && target.transform.parent.GetComponent<RectTransform>() != null);
+    }
+
+    private void decorateHorizontalSteps(SerializedProperty property) {
+      EditorGUI.EndDisabledGroup();
+    }
+
   }
 }
