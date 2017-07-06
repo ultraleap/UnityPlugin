@@ -231,7 +231,13 @@ namespace Leap.Unity.Interaction {
       if (InteractionPreferences.shouldPrompForGravity && Application.isPlaying) {
         float magnitude = Physics.gravity.y;
         if (Mathf.Abs(magnitude) > InteractionPreferences.MAX_GRAVITY_MAGNITUDE) {
-          if (!EditorUtility.DisplayDialog("Gravity magnitude too strong!", "Your gravity magnitude is " + magnitude + " which is stronger than the recommended value of -4.905!\n\nGo to Edit->Project Settings->Physics to change the magnitude.", "Ok", "Don't Show Again")) {
+          if (EditorUtility.DisplayDialog("Gravity magnitude too strong!",
+                                          "Your gravity magnitude is " + magnitude
+                                        + " which is stronger than the recommended value "
+                                        + "of -4.905!\n\nGo to Edit/Project Settings/Physics "
+                                        + "to change the magnitude.",
+                                          "I understand, don't show this again",
+                                          "OK, I'll go fix it")) {
             InteractionPreferences.shouldPrompForGravity = false;
           }
           EditorApplication.isPlaying = false;
@@ -242,7 +248,13 @@ namespace Leap.Unity.Interaction {
       if (InteractionPreferences.shouldPrompForPhysicsTimestep && Application.isPlaying) {
         if (Time.fixedDeltaTime > InteractionPreferences.MAX_TIMESTEP + Mathf.Epsilon) {
           float roundedTimestep = (float)Math.Round(InteractionPreferences.MAX_TIMESTEP, 4);
-          if (!EditorUtility.DisplayDialog("Timestep too slow!", "Your fixed timestep is " + Time.fixedDeltaTime + ", which is slower than the recommended value of " + roundedTimestep + ".\n\nGo to Edit->ProjectSettings->Time to change the fixed timestep.", "Ok", "Don't Show Again")) {
+          if (EditorUtility.DisplayDialog("Timestep too slow!",
+                                           "Your fixed timestep is " + Time.fixedDeltaTime
+                                         + ", which is slower than the recommended value "
+                                         + "of " + roundedTimestep + ".\n\nGo to Edit/Project Settings/Time "
+                                         + "to change the fixed timestep.",
+                                           "I understand, don't show this again",
+                                           "OK, I'll go fix it")) {
             InteractionPreferences.shouldPrompForPhysicsTimestep = false;
           }
           EditorApplication.isPlaying = false;
