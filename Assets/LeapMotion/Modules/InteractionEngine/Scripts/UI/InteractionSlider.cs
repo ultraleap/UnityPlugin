@@ -77,7 +77,10 @@ namespace Leap.Unity.Interaction {
         return _horizontalSliderPercent;
       }
       set {
-        if (!_started) Start();
+        if (!_started) {
+          Debug.LogWarning("An object is attempting to access this slider's value before it has been initialized!  Initializing now; this could yield unpected behaviour...", this);
+          Start();
+        }
 
         _horizontalSliderPercent = value;
         localPhysicsPosition.x = Mathf.Lerp(initialLocalPosition.x + horizontalSlideLimits.x, initialLocalPosition.x + horizontalSlideLimits.y, _horizontalSliderPercent);
@@ -91,7 +94,10 @@ namespace Leap.Unity.Interaction {
         return _verticalSliderPercent;
       }
       set {
-        if (!_started) Start();
+        if (!_started) {
+          Debug.LogWarning("An object is attempting to access this slider's value before it has been initialized!  Initializing now; this could yield unpected behaviour...", this);
+          Start();
+        }
 
         _verticalSliderPercent = value;
         localPhysicsPosition.y = Mathf.Lerp(initialLocalPosition.y + verticalSlideLimits.x, initialLocalPosition.y + verticalSlideLimits.y, _verticalSliderPercent);
