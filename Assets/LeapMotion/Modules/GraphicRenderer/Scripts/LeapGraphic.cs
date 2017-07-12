@@ -321,7 +321,12 @@ namespace Leap.Unity.GraphicalRenderer {
 
     protected virtual void Awake() {
       if (isAttachedToGroup && !attachedGroup.graphics.Contains(this)) {
+        var preferredGroup = attachedGroup;
         OnDetachedFromGroup();
+
+        //If this fails for any reason don't worry, we will be auto-added
+        //to a group if we can.
+        preferredGroup.TryAddGraphic(this);
       }
     }
 
