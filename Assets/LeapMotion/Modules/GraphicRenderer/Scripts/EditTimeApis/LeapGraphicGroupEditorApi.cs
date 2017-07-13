@@ -199,7 +199,7 @@ namespace Leap.Unity.GraphicalRenderer {
         }
 
         for (int i = _group._graphics.Count; i-- != 0;) {
-          if (_group._graphics[i] == null) {
+          if (_group._graphics[i] == null || _group.graphics[i].attachedGroup != _group) {
             _group._graphics.RemoveAt(i);
             continue;
           }
