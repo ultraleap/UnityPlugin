@@ -79,7 +79,7 @@ namespace Leap.Unity.GraphicalRenderer {
     public bool TryAddGraphic(LeapGraphic graphic) {
       LeapGraphicGroup targetGroup = null;
 
-      //First just try to attach to a group that is it's favorite
+      //First just try to attach to a group that is its favorite
       foreach (var group in groups) {
         if (group.name == graphic.favoriteGroupName) {
           if (group.TryAddGraphic(graphic)) {
