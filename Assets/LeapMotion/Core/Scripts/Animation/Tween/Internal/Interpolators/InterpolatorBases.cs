@@ -31,6 +31,8 @@ namespace Leap.Unity.Animation.Internal {
 
     public void OnSpawn() { }
 
+    public void OnRecycle() { }
+
     public abstract void Dispose();
   }
 
@@ -141,6 +143,8 @@ namespace Leap.Unity.Animation.Internal {
     public void OnSpawn() { }
 
     public void Dispose() { }
+
+    public void OnRecycle() { }
   }
 
 }

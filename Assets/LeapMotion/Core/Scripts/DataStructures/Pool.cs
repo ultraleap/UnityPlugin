@@ -9,6 +9,7 @@
 
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace Leap.Unity {
 
@@ -20,6 +21,7 @@ namespace Leap.Unity {
   /// </summary>
   public interface IPoolable {
     void OnSpawn();
+    void OnRecycle();
   }
 
   /// <summary>
@@ -27,7 +29,7 @@ namespace Leap.Unity {
   /// of type T will be returned.  If the pool was not empty, the T will be
   /// taken from the pool.  If the pool was empty, a new T will be constructed
   /// and returned instead.  Calling recycle will return a T to the pool.
-  /// 
+  ///
   /// It is not required to implement the IPoolable interface to use the Pool
   /// class, which allows you to pool types such as List or Dictionary, types
   /// which you have no control over.  But make sure that you clean up these
@@ -37,15 +39,15 @@ namespace Leap.Unity {
   ///   Example workflow for types you DO NOT have control over:
   ///   <code>
   ///     // <![CDATA[" // (XML fix for Visual Studio)
-  ///     
+  ///
   ///     var obj = Pool<T>.Spawn();
   ///     obj.Init(stuff);
-  ///   
+  ///
   ///     //Do something with obj
-  ///   
+  ///
   ///     obj.Clear();
   ///     Pool<T>.Recycle(obj);
-  ///     
+  ///
   ///     // "]]> // (Close XML fix for Visual Studio)
   ///   </code>
   /// </example>
@@ -53,14 +55,14 @@ namespace Leap.Unity {
   ///   Example workflow for types you DO have control over:
   ///   <code>
   ///     // <![CDATA[" // (XML fix for Visual Studio)
-  ///     
+  ///
   ///     var obj = Pool<T>.Spawn();
   ///     obj.Init(stuff);
-  ///    
+  ///
   ///     // Do something with obj
-  ///    
+  ///
   ///     obj.Dispose(); // e.g. call Recycle(this) in the Dispose() implementation
-  ///     
+  ///
   ///     // "]]> // (Close XML fix for Visual Studio)
   ///   </code>
   /// </example>
@@ -72,11 +74,7 @@ namespace Leap.Unity {
       if (_pool == null) _pool = new Stack<T>();
 
       T value;
-      if (_pool.Count > 0) {
-        value = _pool.Pop();
-      } else {
-        value = new T();
-      }
+      value = spawnValue();
 
       if (value is IPoolable) {
         (value as IPoolable).OnSpawn();
@@ -85,7 +83,29 @@ namespace Leap.Unity {
       return value;
     }
 
+    private static T spawnValue() {
+      T value;
+      int count = 0;
+      do {
+        if (_pool.Count > 0) {
+          value = _pool.Pop();
+        }
+        else {
+          value = new T();
+        }
+        count++;
+      } while (value == null && count < 100);
+      if (count == 100) {
+        Debug.LogError("Couldn't construct a valid T...");
+      }
+      return value;
+    }
+
     public static void Recycle(T t) {
+      if (t is IPoolable) {
+        (t as IPoolable).OnRecycle();
+      }
+
       _pool.Push(t);
     }
   }
