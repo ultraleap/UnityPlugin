@@ -79,12 +79,23 @@ namespace Leap.Unity.GraphicalRenderer {
     public bool TryAddGraphic(LeapGraphic graphic) {
       LeapGraphicGroup targetGroup = null;
 
-      //First try to attatch to a group that is preferred
+      //First just try to attach to a group that is it's favorite
+      foreach (var group in groups) {
+        if (group.name == graphic.favoriteGroupName) {
+          if (group.TryAddGraphic(graphic)) {
+            return true;
+          }
+        }
+      }
+
+      //Then try to attatch to a group that is of the preferred type
+      //Choose the preferred group with the least graphics
       Type preferredType = graphic.preferredRendererType;
       if (preferredType != null) {
         foreach (var group in groups) {
           Type rendererType = group.renderingMethod.GetType();
-          if (preferredType == rendererType || rendererType.IsSubclassOf(preferredType)) {
+          if (preferredType == rendererType ||
+              rendererType.IsSubclassOf(preferredType)) {
             if (targetGroup == null || group.toBeAttachedCount < targetGroup.toBeAttachedCount) {
               targetGroup = group;
             }
@@ -96,7 +107,7 @@ namespace Leap.Unity.GraphicalRenderer {
         return true;
       }
 
-      //If we failed, try to attach to a group that will take us
+      //If we failed, just try to attach to any group that will take us
       foreach (var group in groups) {
         if (group.renderingMethod.IsValidGraphic(graphic)) {
           if (targetGroup == null || group.toBeAttachedCount < targetGroup.toBeAttachedCount) {
@@ -109,6 +120,7 @@ namespace Leap.Unity.GraphicalRenderer {
         return true;
       }
 
+      //Unable to find any group that would accept the graphic :(
       return false;
     }
 

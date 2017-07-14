@@ -35,6 +35,9 @@ namespace Leap.Unity.GraphicalRenderer {
     protected int _attachedGroupIndex = -1;
 
     [SerializeField]
+    protected string _favoriteGroupName;
+
+    [SerializeField]
     protected SerializableType _preferredRendererType;
     #endregion
 
@@ -80,6 +83,21 @@ namespace Leap.Unity.GraphicalRenderer {
         }
 #endif
         return _isRepresentationDirty;
+      }
+    }
+
+    /// <summary>
+    /// Gets or sets the name of the group that this graphic likes to be 
+    /// attached to.  Whenever a graphic is enabled, it will try to attach
+    /// to its favorite group.  Whenever a graphic gets attached to a group,
+    /// that group becomes its new favorite.
+    /// </summary>
+    public string favoriteGroupName {
+      get {
+        return _favoriteGroupName;
+      }
+      set {
+        _favoriteGroupName = value;
       }
     }
 
@@ -258,6 +276,7 @@ namespace Leap.Unity.GraphicalRenderer {
 #endif
       _willBeAttached = false;
       _groupToBeAttachedTo = null;
+      _favoriteGroupName = group.name;
 
       _attachedRenderer = group.renderer;
       _attachedGroupIndex = _attachedRenderer.groups.IndexOf(group);
