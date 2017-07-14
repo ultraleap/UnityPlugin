@@ -40,6 +40,7 @@ public abstract class LeapGraphicEditorBase<T> : CustomEditorBase<T> where T : L
     hideField("_attachedRenderer");
     hideField("_attachedGroupIndex");
     hideField("_preferredRendererType");
+    hideField("_favoriteGroupName");
 
     _featureList = serializedObject.FindProperty("_featureData");
     _featureTable = MultiTypedListUtil.GetTableProperty(_featureList);
