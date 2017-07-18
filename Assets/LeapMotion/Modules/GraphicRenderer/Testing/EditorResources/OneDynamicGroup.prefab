@@ -180,7 +180,8 @@ MonoBehaviour:
   _selectedGroup: 0
   _space: {fileID: 0}
   _groups:
-  - _renderingMethod:
+  - _groupName: MyGroupName
+    _renderingMethod:
       _index: 1
       _a: []
       _b:

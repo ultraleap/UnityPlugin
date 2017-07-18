@@ -265,6 +265,48 @@ namespace Leap.Unity.GraphicalRenderer.Tests {
       Assert.IsFalse(oneGraphic.isAttachedToGroup);
       Assert.That(firstGroup.graphics, Is.Empty);
     }
+
+    /// <summary>
+    /// Verify that when we switch a graphic from one group to another
+    /// that everything still works correctly even if they have different
+    /// feature sets.
+    /// </summary>
+    [UnityTest]
+    public IEnumerator CanSwitchToAGroupWithADifferentFeatureSet([Values(true, false)] bool reverseGroup) {
+      InitTest("TwoDynamicGroupsWithDifferentFeatures");
+      yield return null;
+
+      LeapGraphicGroup first, second;
+      if (reverseGroup) {
+        first = secondGroup;
+        second = firstGroup;
+      } else {
+        first = firstGroup;
+        second = secondGroup;
+      }
+
+      CreateGraphic("DisabledMeshGraphic");
+
+      bool didAddToFirst = first.TryAddGraphic(oneGraphic);
+      Assert.That(didAddToFirst);
+
+      yield return null;
+
+      bool didDetatchFromFirst = oneGraphic.TryDetach();
+      Assert.That(didDetatchFromFirst);
+
+      yield return null;
+
+      bool didAddToSecond = second.TryAddGraphic(oneGraphic);
+      Assert.That(didAddToSecond);
+
+      yield return null;
+
+      bool didDetatchFromSecond = oneGraphic.TryDetach();
+      Assert.That(didDetatchFromSecond);
+
+      yield return null;
+    }
   }
 }
 #endif
