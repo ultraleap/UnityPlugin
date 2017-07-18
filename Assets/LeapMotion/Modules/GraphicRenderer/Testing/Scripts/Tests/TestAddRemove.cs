@@ -307,6 +307,50 @@ namespace Leap.Unity.GraphicalRenderer.Tests {
 
       yield return null;
     }
+
+    /// <summary>
+    /// Verify behavior when we add/remove graphics on the same frame.  Validate both the
+    /// case where we add more than we remove, and when we remove more than we add.
+    /// </summary>
+    [UnityTest]
+    public IEnumerator CanAddAndRemoveManyOnSameFrame([Values(true, false)] bool addMany) {
+      InitTest("OneEmptyDynamicGroupWith4Features");
+      yield return null;
+
+      var first = CreateGraphic("DisabledMeshGraphic");
+      var second = CreateGraphic("DisabledMeshGraphic");
+      var third = CreateGraphic("DisabledMeshGraphic");
+
+      if (addMany) {
+        firstGroup.TryAddGraphic(first);
+      } else {
+        firstGroup.TryAddGraphic(second);
+        firstGroup.TryAddGraphic(third);
+      }
+
+      yield return null;
+
+      if (addMany) {
+        firstGroup.TryAddGraphic(second);
+        firstGroup.TryAddGraphic(third);
+        first.TryDetach();
+      } else {
+        firstGroup.TryAddGraphic(first);
+        second.TryDetach();
+        third.TryDetach();
+      }
+
+      yield return null;
+
+      foreach (var feature in firstGroup.features) {
+        var featureData = feature.GetField("featureData") as IList;
+        Assert.That(featureData.Count, Is.EqualTo(firstGroup.graphics.Count));
+        for (int i = 0; i < featureData.Count; i++) {
+          LeapFeatureData data = featureData[i] as LeapFeatureData;
+          Assert.That(data.graphic, Is.EqualTo(firstGroup.graphics[i]));
+        }
+      }
+    }
   }
 }
 #endif
