@@ -2,45 +2,92 @@
 
 namespace Leap.Unity {
 
+  /// <summary>
+  /// A struct that represents a value that could or could not exist.  Unlike
+  /// the built-int nullable types, you are unable to access the value unless
+  /// it does exist, and will never recieve a null value.
+  /// </summary>
   public struct Maybe<T> : IEquatable<Maybe<T>>, IComparable, IComparable<Maybe<T>> {
-    public static readonly Maybe<T> None = new Maybe<T>();
 
+    /// <summary>
+    /// Returns a Maybe for this type that represents no value.
+    /// </summary>
+    public static Maybe<T> None = new Maybe<T>();
+
+    /// <summary>
+    /// Returns whether or not this Maybe contains a value or not.
+    /// </summary>
     public readonly bool hasValue;
 
     private readonly T _t;
 
+    /// <summary>
+    /// Constructs a Maybe given a value.  If the value is non-null, this maybe
+    /// will have a value.  If the value is null, this maybe will have no value.
+    /// </summary>
     public Maybe(T t) {
       hasValue = t != null;
       _t = t;
     }
 
+    /// <summary>
+    /// Constructs a Maybe given a value.  If the value is non-null, this maybe
+    /// will have a value.  If the value is null, this maybe will have no value.
+    /// </summary>
     public Maybe(ref T t) {
       hasValue = t != null;
       _t = t;
     }
 
+    /// <summary>
+    /// Constructs a Maybe given a specific value.  This value needs to always be
+    /// non-null.
+    /// </summary>
     public static Maybe<T> Some(T t) {
+      if (t == null) {
+        throw new ArgumentNullException("Cannot use Some with a null argument.");
+      }
+
       return new Maybe<T>(ref t);
     }
 
+    /// <summary>
+    /// Constructs a Maybe given a specific value.  This value needs to always be
+    /// non-null.
+    /// </summary>
     public static Maybe<T> Some(ref T t) {
+      if (t == null) {
+        throw new ArgumentNullException("Cannot use Some with a null argument.");
+      }
+
       return new Maybe<T>(ref t);
     }
 
+    /// <summary>
+    /// If this Maybe has a value, the out argument is filled with that value and
+    /// this method returns true, else it returns false.
+    /// </summary>
     public bool TryGetValue(out T t) {
       t = _t;
       return hasValue;
     }
 
+    /// <summary>
+    /// If this Maybe has a value, the delegate is called with that value.
+    /// </summary>
     public void Match(Action<T> ifValue) {
       if (hasValue) {
         ifValue(_t);
       }
     }
 
+    /// <summary>
+    /// If this Maybe has a value, the first delegate is called with that value,
+    /// else the second delegate is called.
+    /// </summary>
     public void Match(Action<T> ifValue, Action ifNot) {
       if (hasValue) {
-        ifValue(_t);
+        if (ifValue != null) ifValue(_t);
       } else {
         ifNot();
       }

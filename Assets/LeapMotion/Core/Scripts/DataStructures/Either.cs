@@ -2,11 +2,20 @@
 
 namespace Leap.Unity {
 
+  /// <summary>
+  /// A data structure that represents either a value of type A or
+  /// a value of type B.  The value can never be both A and B.
+  /// Neither A nor B can ever be null.
+  /// </summary>
   public struct Either<A, B> : IEquatable<Either<A, B>>, IComparable, IComparable<Either<A, B>> {
     private bool _isA;
     private readonly A _a;
     private readonly B _b;
 
+    /// <summary>
+    /// Returns a Maybe that contains the value of A if it exists,
+    /// or no value if it doesn't.
+    /// </summary>
     public Maybe<A> a {
       get {
         if (_isA) {
@@ -17,6 +26,10 @@ namespace Leap.Unity {
       }
     }
 
+    /// <summary>
+    /// Returns a Maybe that contains the value of B if it exists,
+    /// or no value if it doesn't.
+    /// </summary>
     public Maybe<B> b {
       get {
         if (_isA) {
@@ -27,83 +40,121 @@ namespace Leap.Unity {
       }
     }
 
+    /// <summary>
+    /// Constructs an Either with a value of A.
+    /// </summary>
     public Either(A a) {
+      if (a == null) {
+        throw new ArgumentException("Cannot initialize an Either with a null value.");
+      }
+
       _isA = true;
       _a = a;
       _b = default(B);
     }
 
+    /// <summary>
+    /// Constructs an Either with a value of A passed by reference.
+    /// This is only for efficiency for passing large structs.
+    /// </summary>
     public Either(ref A a) {
+      if (a == null) {
+        throw new ArgumentException("Cannot initialize an Either with a null value.");
+      }
+
       _isA = true;
       _a = a;
       _b = default(B);
     }
 
+    /// <summary>
+    /// Constructs an Either with a value of B.
+    /// </summary>
     public Either(B b) {
+      if (b == null) {
+        throw new ArgumentException("Cannot initialize an Either with a null value.");
+      }
+
       _isA = false;
       _b = b;
       _a = default(A);
     }
 
+    /// <summary>
+    /// Constructs an Either with a value of B passed by reference.
+    /// This is only for efficiency for passing large structs.
+    /// </summary>
     public Either(ref B b) {
+      if (b == null) {
+        throw new ArgumentException("Cannot initialize an Either with a null value.");
+      }
+
       _isA = false;
       _b = b;
       _a = default(A);
     }
 
-    public void IfA(Action<A> ifA) {
-      if (_isA) {
-        ifA(_a);
-      }
-    }
-
-    public void IfA(Action ifA) {
-      if (_isA) {
-        ifA();
-      }
-    }
-
-    public void IfB(Action<B> ifB) {
-      if (!_isA) {
-        ifB(_b);
-      }
-    }
-
-    public void IfB(Action ifB) {
-      if (!_isA) {
-        ifB();
-      }
-    }
-
+    /// <summary>
+    /// Calls the first delegate with the value of A if it is present,
+    /// else calls the second delegate with the value of B.
+    /// </summary>
     public void Match(Action<A> ifA, Action<B> ifB) {
       if (_isA) {
-        ifA(_a);
+        if (ifA != null) ifA(_a);
       } else {
-        ifB(_b);
+        if (ifB != null) ifB(_b);
       }
     }
 
+    /// <summary>
+    /// Calls the first delegate if the value of A is present,
+    /// else calls the second delegate with the value of B.
+    /// </summary>
     public void Match(Action ifA, Action<B> ifB) {
       if (_isA) {
-        ifA();
+        if (ifA != null) ifA();
       } else {
-        ifB(_b);
+        if (ifB != null) ifB(_b);
       }
     }
 
+    /// <summary>
+    /// Calls the first delegate with the value of A if it is present,
+    /// else calls the second delegate.
+    /// </summary>
     public void Match(Action<A> ifA, Action ifB) {
       if (_isA) {
-        ifA(_a);
+        if (ifA != null) ifA(_a);
       } else {
-        ifB();
+        if (ifB != null) ifB();
       }
     }
 
+    /// <summary>
+    /// Calls the first delegate if the value of A is present,
+    /// else calls the second delegate.
+    /// </summary>
+    public void Match(Action ifA, Action ifB) {
+      if (_isA) {
+        if (ifA != null) ifA();
+      } else {
+        if (ifB != null) ifB();
+      }
+    }
+
+    /// <summary>
+    /// If this either contains the value of A, the out argument is filled with
+    /// that value and this method returns true, else it returns false.
+    /// </summary>
     public bool TryGetA(out A a) {
       a = _a;
       return _isA;
     }
 
+    /// <summary>
+    /// If this either contains the value of B, the out argument is filled with
+    /// that value and this method returns true, else it returns false.
+    /// </summary>
     public bool TryGetB(out B b) {
       b = _b;
       return !_isA;
