@@ -308,6 +308,10 @@ namespace Leap.Unity.GraphicalRenderer.Tests {
       yield return null;
     }
 
+    /// <summary>
+    /// Verify behavior when we add/remove graphics on the same frame.  Validate both the
+    /// case where we add more than we remove, and when we remove more than we add.
+    /// </summary>
     [UnityTest]
     public IEnumerator CanAddAndRemoveManyOnSameFrame([Values(true, false)] bool addMany) {
       InitTest("OneEmptyDynamicGroupWith4Features");
