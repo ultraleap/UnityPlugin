@@ -39,7 +39,7 @@ namespace Leap.Unity {
         throw new ArgumentNullException("Cannot use Some with a null argument.");
       }
 
-      return new Maybe<T>(ref t);
+      return new Maybe<T>(t);
     }
 
     /// <summary>
