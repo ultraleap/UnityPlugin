@@ -93,42 +93,6 @@ namespace Leap.Unity {
     }
 
     /// <summary>
-    /// Calls the first delegate if the value of A is present,
-    /// else calls the second delegate with the value of B.
-    /// </summary>
-    public void Match(Action ifA, Action<B> ifB) {
-      if (isA) {
-        if (ifA != null) ifA();
-      } else {
-        if (ifB != null) ifB(_b);
-      }
-    }
-
-    /// <summary>
-    /// Calls the first delegate with the value of A if it is present,
-    /// else calls the second delegate.
-    /// </summary>
-    public void Match(Action<A> ifA, Action ifB) {
-      if (isA) {
-        if (ifA != null) ifA(_a);
-      } else {
-        if (ifB != null) ifB();
-      }
-    }
-
-    /// <summary>
-    /// Calls the first delegate if the value of A is present,
-    /// else calls the second delegate.
-    /// </summary>
-    public void Match(Action ifA, Action ifB) {
-      if (isA) {
-        if (ifA != null) ifA();
-      } else {
-        if (ifB != null) ifB();
-      }
-    }
-
-    /// <summary>
     /// If this either contains the value of A, the out argument is filled with
     /// that value and this method returns true, else it returns false.
     /// </summary>
