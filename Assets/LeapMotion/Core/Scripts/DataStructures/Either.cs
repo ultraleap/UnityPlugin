@@ -59,7 +59,7 @@ namespace Leap.Unity {
     /// </summary>
     public Either(A a) {
       if (a == null) {
-        throw new ArgumentException("Cannot initialize an Either with a null value.");
+        throw new ArgumentNullException("Cannot initialize an Either with a null value.");
       }
 
       isA = true;
@@ -72,7 +72,7 @@ namespace Leap.Unity {
     /// </summary>
     public Either(B b) {
       if (b == null) {
-        throw new ArgumentException("Cannot initialize an Either with a null value.");
+        throw new ArgumentNullException("Cannot initialize an Either with a null value.");
       }
 
       isA = false;
