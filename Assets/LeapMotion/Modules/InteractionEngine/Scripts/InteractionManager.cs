@@ -150,7 +150,7 @@ namespace Leap.Unity.Interaction {
 
     private HashSet<IInteractionBehaviour> _interactionObjects = new HashSet<IInteractionBehaviour>();
     /// <summary>
-    /// Gets a set of all interaction objects currently registered with this Interaction 
+    /// Gets a set of all interaction objects currently registered with this Interaction
     /// Manager.
     /// </summary>
     public ReadonlyHashSet<IInteractionBehaviour> interactionObjects {
@@ -173,7 +173,7 @@ namespace Leap.Unity.Interaction {
 
     private Dictionary<Rigidbody, ContactBone> _contactBoneBodies;
     /// <summary>
-    /// Maps a Rigidbody to its attached ContactBone, if the Rigidbody is part of an 
+    /// Maps a Rigidbody to its attached ContactBone, if the Rigidbody is part of an
     /// interaction controller.
     /// </summary>
     public Dictionary<Rigidbody, ContactBone> contactBoneBodies {
@@ -195,13 +195,13 @@ namespace Leap.Unity.Interaction {
     /// method is called. Using more than one InteractionManager is valid, but be
     /// sure to assign any InteractionBehaviour's desired manager appropriately.
     /// </summary>
-    /// 
+    ///
     /// <remarks> By default, this static property contains the first InteractionManager
     /// that has had its Awake() method called in the current scene. If an
     /// InteractionBehaviourBase does not have a non-null interactionManager by the
     /// time it has Start() called, it will default to using the InteractionManager
     /// referenced here.
-    /// 
+    ///
     /// If you have multiple InteractionManagers in your scene, you should be sure to
     /// assign InteractionBehaviours' managers appropriately. If you instantiate an
     /// InteractionBehaviour at runtime, you should assign its InteractionManager
@@ -379,16 +379,16 @@ namespace Leap.Unity.Interaction {
 
       using (new ProfilerSample("Fixed Update Controllers (Interaction State and Callbacks)")) {
 
-        /* 
+        /*
          * Interactions are checked here in a very specific manner so that interaction
          * callbacks always occur in a strict order and interaction object state is
          * always updated directly before the relevant callbacks occur.
-         * 
+         *
          * Interaction callbacks will only occur outside this order if a script
          * manually forces interaction state-changes; for example, calling
          * interactionController.ReleaseGrasp() will immediately call
          * interactionObject.OnPerControllerGraspEnd() on the formerly grasped object.
-         * 
+         *
          * Callback order:
          * - Suspension (when a grasped object's grasping controller loses tracking)
          * - Just-Ended Interactions (Grasps, then Contacts, then Hovers)
@@ -774,14 +774,27 @@ namespace Leap.Unity.Interaction {
 
     /// <summary>
     /// Transforms a position and rotation ahead by one FixedUpdate based on the prior
-    /// motion of the InteractionManager. Use this if your player/InteractionManager's
-    /// frame of reference is moving.
+    /// motion of the InteractionManager.
+    ///
+    /// This method is used to support having the player in a moving frame of reference.
     /// </summary>
     public void TransformAheadByFixedUpdate(Vector3 position, Quaternion rotation, out Vector3 newPosition, out Quaternion newRotation) {
       Vector3 worldDisplacement = this.transform.position - _prevPosition;
       Quaternion worldRotation = this.transform.rotation * Quaternion.Inverse(_prevRotation);
       newPosition = ((worldRotation * (position - this.transform.position + worldDisplacement))) + this.transform.position;
       newRotation = worldRotation * rotation;
+    }
+
+    /// <summary>
+    /// Transforms a position ahead by one FixedUpdate based on the prior motion (position
+    /// AND rotation) of the InteractionManager.
+    ///
+    /// This method is used to support having the player in a moving frame of reference.
+    /// </summary>
+    public void TransformAheadByFixedUpdate(Vector3 position, out Vector3 newPosition) {
+      Vector3 worldDisplacement = this.transform.position - _prevPosition;
+      Quaternion worldRotation = this.transform.rotation * Quaternion.Inverse(_prevRotation);
+      newPosition = ((worldRotation * (position - this.transform.position + worldDisplacement))) + this.transform.position;
     }
 
     #endregion
@@ -913,7 +926,7 @@ namespace Leap.Unity.Interaction {
     /// <summary>
     /// Updates the contact bone layer to collide against any layers that may contain
     /// interaction objects and ignore any layers that don't.
-    /// 
+    ///
     /// (Obviously, this ignores NoContact layers.)
     /// </summary>
     private void autoUpdateContactBoneLayerCollision() {
