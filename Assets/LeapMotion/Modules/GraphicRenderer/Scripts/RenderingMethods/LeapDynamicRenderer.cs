@@ -30,6 +30,8 @@ namespace Leap.Unity.GraphicalRenderer {
     #endregion
 
     public void OnAddRemoveGraphics(List<int> dirtyIndexes) {
+      MeshCache.Clear();
+
       while (_meshes.Count > group.graphics.Count) {
         _meshes.RemoveMesh(_meshes.Count - 1);
       }

@@ -88,7 +88,9 @@ namespace Leap.Unity.GraphicalRenderer {
     }
 
     public override LeapFeatureData CreateFeatureDataForGraphic(LeapGraphic graphic) {
-      return new DataType();
+      DataType data = new DataType();
+      data.graphic = graphic;
+      return data;
     }
   }
 

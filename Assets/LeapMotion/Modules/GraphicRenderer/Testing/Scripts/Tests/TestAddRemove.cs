@@ -265,6 +265,92 @@ namespace Leap.Unity.GraphicalRenderer.Tests {
       Assert.IsFalse(oneGraphic.isAttachedToGroup);
       Assert.That(firstGroup.graphics, Is.Empty);
     }
+
+    /// <summary>
+    /// Verify that when we switch a graphic from one group to another
+    /// that everything still works correctly even if they have different
+    /// feature sets.
+    /// </summary>
+    [UnityTest]
+    public IEnumerator CanSwitchToAGroupWithADifferentFeatureSet([Values(true, false)] bool reverseGroup) {
+      InitTest("TwoDynamicGroupsWithDifferentFeatures");
+      yield return null;
+
+      LeapGraphicGroup first, second;
+      if (reverseGroup) {
+        first = secondGroup;
+        second = firstGroup;
+      } else {
+        first = firstGroup;
+        second = secondGroup;
+      }
+
+      CreateGraphic("DisabledMeshGraphic");
+
+      bool didAddToFirst = first.TryAddGraphic(oneGraphic);
+      Assert.That(didAddToFirst);
+
+      yield return null;
+
+      bool didDetatchFromFirst = oneGraphic.TryDetach();
+      Assert.That(didDetatchFromFirst);
+
+      yield return null;
+
+      bool didAddToSecond = second.TryAddGraphic(oneGraphic);
+      Assert.That(didAddToSecond);
+
+      yield return null;
+
+      bool didDetatchFromSecond = oneGraphic.TryDetach();
+      Assert.That(didDetatchFromSecond);
+
+      yield return null;
+    }
+
+    /// <summary>
+    /// Verify behavior when we add/remove graphics on the same frame.  Validate both the
+    /// case where we add more than we remove, and when we remove more than we add.
+    /// </summary>
+    [UnityTest]
+    public IEnumerator CanAddAndRemoveManyOnSameFrame([Values(true, false)] bool addMany) {
+      InitTest("OneEmptyDynamicGroupWith4Features");
+      yield return null;
+
+      var first = CreateGraphic("DisabledMeshGraphic");
+      var second = CreateGraphic("DisabledMeshGraphic");
+      var third = CreateGraphic("DisabledMeshGraphic");
+
+      if (addMany) {
+        firstGroup.TryAddGraphic(first);
+      } else {
+        firstGroup.TryAddGraphic(second);
+        firstGroup.TryAddGraphic(third);
+      }
+
+      yield return null;
+
+      if (addMany) {
+        firstGroup.TryAddGraphic(second);
+        firstGroup.TryAddGraphic(third);
+        first.TryDetach();
+      } else {
+        firstGroup.TryAddGraphic(first);
+        second.TryDetach();
+        third.TryDetach();
+      }
+
+      yield return null;
+
+      foreach (var feature in firstGroup.features) {
+        var featureData = feature.GetField("featureData") as IList;
+        Assert.That(featureData.Count, Is.EqualTo(firstGroup.graphics.Count));
+        for (int i = 0; i < featureData.Count; i++) {
+          LeapFeatureData data = featureData[i] as LeapFeatureData;
+          Assert.That(data.graphic, Is.EqualTo(firstGroup.graphics[i]));
+        }
+      }
+    }
   }
 }
 #endif
