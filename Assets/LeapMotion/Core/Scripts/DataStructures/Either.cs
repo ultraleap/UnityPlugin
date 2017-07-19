@@ -54,37 +54,9 @@ namespace Leap.Unity {
     }
 
     /// <summary>
-    /// Constructs an Either with a value of A passed by reference.
-    /// This is only for efficiency for passing large structs.
-    /// </summary>
-    public Either(ref A a) {
-      if (a == null) {
-        throw new ArgumentException("Cannot initialize an Either with a null value.");
-      }
-
-      _isA = true;
-      _a = a;
-      _b = default(B);
-    }
-
-    /// <summary>
     /// Constructs an Either with a value of B.
     /// </summary>
     public Either(B b) {
-      if (b == null) {
-        throw new ArgumentException("Cannot initialize an Either with a null value.");
-      }
-
-      _isA = false;
-      _b = b;
-      _a = default(A);
-    }
-
-    /// <summary>
-    /// Constructs an Either with a value of B passed by reference.
-    /// This is only for efficiency for passing large structs.
-    /// </summary>
-    public Either(ref B b) {
       if (b == null) {
         throw new ArgumentException("Cannot initialize an Either with a null value.");
       }
@@ -249,11 +221,11 @@ namespace Leap.Unity {
     }
 
     public static implicit operator Either<A, B>(A a) {
-      return new Either<A, B>(ref a);
+      return new Either<A, B>(a);
     }
 
     public static implicit operator Either<A, B>(B b) {
-      return new Either<A, B>(ref b);
+      return new Either<A, B>(b);
     }
   }
 }

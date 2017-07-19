@@ -31,31 +31,10 @@ namespace Leap.Unity {
     }
 
     /// <summary>
-    /// Constructs a Maybe given a value.  If the value is non-null, this maybe
-    /// will have a value.  If the value is null, this maybe will have no value.
-    /// </summary>
-    public Maybe(ref T t) {
-      hasValue = t != null;
-      _t = t;
-    }
-
-    /// <summary>
     /// Constructs a Maybe given a specific value.  This value needs to always be
     /// non-null.
     /// </summary>
     public static Maybe<T> Some(T t) {
-      if (t == null) {
-        throw new ArgumentNullException("Cannot use Some with a null argument.");
-      }
-
-      return new Maybe<T>(ref t);
-    }
-
-    /// <summary>
-    /// Constructs a Maybe given a specific value.  This value needs to always be
-    /// non-null.
-    /// </summary>
-    public static Maybe<T> Some(ref T t) {
       if (t == null) {
         throw new ArgumentNullException("Cannot use Some with a null argument.");
       }
@@ -168,7 +147,7 @@ namespace Leap.Unity {
     }
 
     public static implicit operator Maybe<T>(T t) {
-      return new Maybe<T>(ref t);
+      return new Maybe<T>(t);
     }
   }
 }
