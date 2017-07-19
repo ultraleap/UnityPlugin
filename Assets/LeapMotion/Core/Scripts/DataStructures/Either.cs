@@ -8,7 +8,21 @@ namespace Leap.Unity {
   /// Neither A nor B can ever be null.
   /// </summary>
   public struct Either<A, B> : IEquatable<Either<A, B>>, IComparable, IComparable<Either<A, B>> {
-    private bool _isA;
+
+    /// <summary>
+    /// Returns whether or not this Either contains the first value.
+    /// </summary>
+    public readonly bool isA;
+
+    /// <summary>
+    /// Returns whether or not this Either contains the second value.
+    /// </summary>
+    public bool isB {
+      get {
+        return !isA;
+      }
+    }
+
     private readonly A _a;
     private readonly B _b;
 
@@ -18,7 +32,7 @@ namespace Leap.Unity {
     /// </summary>
     public Maybe<A> a {
       get {
-        if (_isA) {
+        if (isA) {
           return Maybe<A>.Some(_a);
         } else {
           return Maybe<A>.None;
@@ -32,7 +46,7 @@ namespace Leap.Unity {
     /// </summary>
     public Maybe<B> b {
       get {
-        if (_isA) {
+        if (isA) {
           return Maybe<B>.None;
         } else {
           return Maybe<B>.Some(_b);
@@ -48,7 +62,7 @@ namespace Leap.Unity {
         throw new ArgumentException("Cannot initialize an Either with a null value.");
       }
 
-      _isA = true;
+      isA = true;
       _a = a;
       _b = default(B);
     }
@@ -61,7 +75,7 @@ namespace Leap.Unity {
         throw new ArgumentException("Cannot initialize an Either with a null value.");
       }
 
-      _isA = false;
+      isA = false;
       _b = b;
       _a = default(A);
     }
@@ -71,7 +85,7 @@ namespace Leap.Unity {
     /// else calls the second delegate with the value of B.
     /// </summary>
     public void Match(Action<A> ifA, Action<B> ifB) {
-      if (_isA) {
+      if (isA) {
         if (ifA != null) ifA(_a);
       } else {
         if (ifB != null) ifB(_b);
@@ -83,7 +97,7 @@ namespace Leap.Unity {
     /// else calls the second delegate with the value of B.
     /// </summary>
     public void Match(Action ifA, Action<B> ifB) {
-      if (_isA) {
+      if (isA) {
         if (ifA != null) ifA();
       } else {
         if (ifB != null) ifB(_b);
@@ -95,7 +109,7 @@ namespace Leap.Unity {
     /// else calls the second delegate.
     /// </summary>
     public void Match(Action<A> ifA, Action ifB) {
-      if (_isA) {
+      if (isA) {
         if (ifA != null) ifA(_a);
       } else {
         if (ifB != null) ifB();
@@ -107,7 +121,7 @@ namespace Leap.Unity {
     /// else calls the second delegate.
     /// </summary>
     public void Match(Action ifA, Action ifB) {
-      if (_isA) {
+      if (isA) {
         if (ifA != null) ifA();
       } else {
         if (ifB != null) ifB();
@@ -120,7 +134,7 @@ namespace Leap.Unity {
     /// </summary>
     public bool TryGetA(out A a) {
       a = _a;
-      return _isA;
+      return isA;
     }
 
     /// <summary>
@@ -129,11 +143,11 @@ namespace Leap.Unity {
     /// </summary>
     public bool TryGetB(out B b) {
       b = _b;
-      return !_isA;
+      return !isA;
     }
 
     public override int GetHashCode() {
-      if (_isA) {
+      if (isA) {
         return _a.GetHashCode();
       } else {
         return _b.GetHashCode();
@@ -149,9 +163,9 @@ namespace Leap.Unity {
     }
 
     public bool Equals(Either<A, B> other) {
-      if (_isA != other._isA) {
+      if (isA != other.isA) {
         return false;
-      } else if (_isA) {
+      } else if (isA) {
         return _a.Equals(other._a);
       } else {
         return _b.Equals(other._b);
@@ -167,9 +181,9 @@ namespace Leap.Unity {
     }
 
     public int CompareTo(Either<A, B> other) {
-      if (_isA != other._isA) {
-        return _isA ? -1 : 1;
-      } else if (_isA) {
+      if (isA != other.isA) {
+        return isA ? -1 : 1;
+      } else if (isA) {
         IComparable<A> ca = _a as IComparable<A>;
         if (ca != null) {
           return ca.CompareTo(other._a);

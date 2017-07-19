@@ -12,7 +12,7 @@ namespace Leap.Unity {
     /// <summary>
     /// Returns a Maybe for this type that represents no value.
     /// </summary>
-    public static Maybe<T> None = new Maybe<T>();
+    public readonly static Maybe<T> None = new Maybe<T>();
 
     /// <summary>
     /// Returns whether or not this Maybe contains a value or not.
