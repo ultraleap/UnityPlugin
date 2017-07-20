@@ -27,10 +27,13 @@ namespace Leap.Unity.Interaction {
     [Header("UI Control")]
     [Tooltip("When set to false, this UI control will not be functional. Use this instead "
            + "of disabling the component itself when you want to disable the user's "
-           + "ability to affect this UI control.")]
-    public bool controlEnabled = true;
-    public void SetControlEnabled(bool enableControl) {
-      controlEnabled = enableControl;
+           + "ability to affect this UI control while keeping the GameObject active and, "
+           + "for example, rendering, and able to receive primaryHover state.")]
+    [SerializeField, FormerlySerializedAs("controlEnabled")]
+    private bool _controlEnabled = true;
+    public bool controlEnabled {
+      get { return _controlEnabled; }
+      set { _controlEnabled = value; }
     }
 
     public enum StartingPositionMode {
@@ -152,7 +155,7 @@ namespace Leap.Unity.Interaction {
           //Sleep the rigidbody if it's not really moving...
 
           float localPhysicsDisplacementPercentage = Mathf.InverseLerp(minMaxHeight.x, minMaxHeight.y, initialLocalPosition.z - localPhysicsPosition.z);
-          if (rigidbody.position == physicsPosition && _physicsVelocity == Vector3.zero && Mathf.Abs(localPhysicsDisplacementPercentage - restingHeight) < 0.01f) {
+          if (rigidbody.position == physicsPosition && _physicsVelocity == Vector3.zero && Mathf.Abs(localPhysicsDisplacementPercentage - restingHeight) < 0.01F) {
             rigidbody.Sleep();
             //Else, reset the body's position to where it was last time PhysX looked at it...
           } else {

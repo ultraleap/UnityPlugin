@@ -24,8 +24,8 @@ namespace Leap.Unity.Interaction {
     ///<summary> The height that this toggle rests at when it is toggled. </summary>
     public float toggledRestingHeight = 0.25f;
 
-    [SerializeField]
-    private bool _toggled = false;
+    [SerializeField, FormerlySerializedAs("_toggled")]
+    private bool _isToggled = false;
 
     [SerializeField]
     private bool _startToggled = false;
@@ -33,12 +33,12 @@ namespace Leap.Unity.Interaction {
     ///<summary> Whether or not this toggle is currently toggled. </summary>
     public bool isToggled {
       get {
-        return _toggled;
+        return _isToggled;
       }
       set {
-        if (_toggled != value) {
-          _toggled = value;
-          if (_toggled) {
+        if (_isToggled != value) {
+          _isToggled = value;
+          if (_isToggled) {
             OnToggle();
           } else {
             OnUntoggle();

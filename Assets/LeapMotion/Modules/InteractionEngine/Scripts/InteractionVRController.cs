@@ -15,6 +15,7 @@ using UnityEngine;
 using UnityEngine.VR;
 using Leap.Unity.Query;
 using Leap.Unity.Space;
+using UnityEngine.Serialization;
 
 namespace Leap.Unity.Interaction {
 
@@ -36,11 +37,12 @@ namespace Leap.Unity.Interaction {
       get { return !(trackingProvider is DefaultVRNodeTrackingProvider); }
     }
 
-    [Tooltip("If this string is non-empty, but does not match a controller in Input.GetJoystickNames()"
-       + ", then this game object will disable itself.")]
+    [Tooltip("If this string is not empty and does not match a controller in Input.GetJoystickNames()"
+           + ", then this game object will disable itself.")]
     [SerializeField, EditTimeOnly]
-    private string _deviceString = "oculus touch right"; //or "openvr controller right/left"
-    public string deviceString { get { return _deviceString; } }
+    [FormerlySerializedAs("_deviceString")]
+    private string _deviceJoystickTokens = "oculus touch right"; // or, e.g., "openvr controller right"
+    public string deviceJoystickTokens { get { return _deviceJoystickTokens; } }
 
     [Tooltip("Which hand will hold this controller? This property cannot be changed "
            + "at runtime.")]
@@ -145,16 +147,27 @@ namespace Leap.Unity.Interaction {
     }
 
     protected virtual void Awake() {
-      if (deviceString.Length > 0) {
+      if (deviceJoystickTokens.Length > 0) {
         string[] joysticksConnected = Input.GetJoystickNames().Query().Select(s => s.ToLower()).ToArray();
-        string[] controllerSupportTokens = deviceString.ToLower().Split(" ".ToCharArray());
+        string[] controllerSupportTokens = deviceJoystickTokens.ToLower().Split(" ".ToCharArray());
         bool matchesController = joysticksConnected.Query()
                                  .Any(joystick => controllerSupportTokens.Query()
                                                  .All(token => joystick.Contains(token)));
         if (!matchesController) {
-          Debug.Log("No joystick containing the tokens '" + deviceString + "' was detected; "
-                  + "disabling controller object. Please check the device string if this "
-                  + "was in error.", gameObject);
+          string message = "";
+          message += "No joystick name containing the tokens ";
+          for (int i = 0; i < controllerSupportTokens.Length; i++) {
+            message += "'" + controllerSupportTokens[i] + "'";
+            if (i < controllerSupportTokens.Length - 2) {
+              message += ", ";
+            }
+            else if (i == controllerSupportTokens.Length - 2) {
+              message += ", and ";
+            }
+          }
+          message += " was detected; disabling controller object. Please check the "
+                   + "device string if this was in error.";
+          Debug.Log(message, gameObject);
           gameObject.SetActive(false);
         }
       }

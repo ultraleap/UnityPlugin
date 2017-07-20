@@ -17,7 +17,7 @@ using System;
 namespace Leap.Unity.Interaction {
 
   ///<summary>
-  /// A physics-enabled slider. Sliding is triggered by physically pushing the slider to its compressed position. 
+  /// A physics-enabled slider. Sliding is triggered by physically pushing the slider to its compressed position.
   /// Increasing the horizontal and vertical slide limits allows it to act as either a 1D or 2D slider.
   ///</summary>
   public class InteractionSlider : InteractionButton {
@@ -28,18 +28,11 @@ namespace Leap.Unity.Interaction {
       TwoDimensional
     }
 
+    [Header("Slider Settings")]
     public SliderType sliderType = SliderType.Horizonal;
-    public float defaultHorizontalValue;
-    public float defaultVerticalValue;
+
     public bool dispatchSlideValueOnStart = true;
 
-    [Space, Space]
-    [Tooltip("The minimum and maximum values that the slider reports on the horizontal axis.")]
-    public Vector2 horizontalValueRange = new Vector2(0f, 1f);
-    [Tooltip("The minimum and maximum values that the slider reports on the horizontal axis.")]
-    public Vector2 verticalValueRange = new Vector2(0f, 1f);
-
-    [Space]
     [Tooltip("Manually specify slider limits even if the slider's parent has a RectTransform.")]
     [DisableIf("_parentHasRectTransform", isEqualTo: false)]
     public bool overrideRectLimits = false;
@@ -47,19 +40,22 @@ namespace Leap.Unity.Interaction {
     #pragma warning disable 0414
     private bool _parentHasRectTransform = false;
     #pragma warning restore 0414
+
+    [Header("Horizontal Axis")]
+    public float defaultHorizontalValue;
+
+    [Tooltip("The minimum and maximum values that the slider reports on the horizontal axis.")]
+    public Vector2 horizontalValueRange = new Vector2(0f, 1f);
+
     [Tooltip("The minimum and maximum horizontal extents that the slider can slide to in world space.")]
     [MinMax(-0.5f, 0.5f)]
     public Vector2 horizontalSlideLimits = new Vector2(-0.05f, 0.05f);
-    [MinMax(-0.5f, 0.5f)]
-    [Tooltip("The minimum and maximum vertical extents that the slider can slide to in world space.")]
-    public Vector2 verticalSlideLimits = new Vector2(0f, 0f);
 
-    [Tooltip("The number of discrete quantized notches that this slider can occupy on the horizontal axis.")]
+    [Tooltip("The number of discrete quantized notches **beyond the first** that this "
+           + "slider can occupy on the horizontal axis. A value of zero indicates a "
+           + "continuous (non-quantized) slider for this axis.")]
     [MinValue(0)]
     public int horizontalSteps = 0;
-    [Tooltip("The number of discrete quantized notches that this slider can occupy on the vertical axis.")]
-    [MinValue(0)]
-    public int verticalSteps = 0;
 
     [System.Serializable]
     public class FloatEvent : UnityEvent<float> { }
@@ -67,6 +63,23 @@ namespace Leap.Unity.Interaction {
     [SerializeField]
     [FormerlySerializedAs("horizontalSlideEvent")]
     private FloatEvent _horizontalSlideEvent = new FloatEvent();
+
+    [Header("Vertical Axis")]
+    public float defaultVerticalValue;
+
+    [Tooltip("The minimum and maximum values that the slider reports on the horizontal axis.")]
+    public Vector2 verticalValueRange = new Vector2(0f, 1f);
+
+    [MinMax(-0.5f, 0.5f)]
+    [Tooltip("The minimum and maximum vertical extents that the slider can slide to in world space.")]
+    public Vector2 verticalSlideLimits = new Vector2(0f, 0f);
+
+    [Tooltip("The number of discrete quantized notches **beyond the first** that this "
+           + "slider can occupy on the vertical axis. A value of zero indicates a "
+           + "continuous (non-quantized) slider for this axis.")]
+    [MinValue(0)]
+    public int verticalSteps = 0;
+
     ///<summary> Triggered while this slider is depressed. </summary>
     [SerializeField]
     [FormerlySerializedAs("verticalSlideEvent")]
@@ -80,7 +93,10 @@ namespace Leap.Unity.Interaction {
         return _horizontalSliderPercent;
       }
       set {
-        if (!_started) Start();
+        if (!_started) {
+          Debug.LogWarning("An object is attempting to access this slider's value before it has been initialized!  Initializing now; this could yield unexpected behaviour...", this);
+          Start();
+        }
 
         _horizontalSliderPercent = value;
         localPhysicsPosition.x = Mathf.Lerp(initialLocalPosition.x + horizontalSlideLimits.x, initialLocalPosition.x + horizontalSlideLimits.y, _horizontalSliderPercent);
@@ -94,7 +110,10 @@ namespace Leap.Unity.Interaction {
         return _verticalSliderPercent;
       }
       set {
-        if (!_started) Start();
+        if (!_started) {
+          Debug.LogWarning("An object is attempting to access this slider's value before it has been initialized!  Initializing now; this could yield unpected behaviour...", this);
+          Start();
+        }
 
         _verticalSliderPercent = value;
         localPhysicsPosition.y = Mathf.Lerp(initialLocalPosition.y + verticalSlideLimits.x, initialLocalPosition.y + verticalSlideLimits.y, _verticalSliderPercent);
@@ -148,22 +167,7 @@ namespace Leap.Unity.Interaction {
 
       _started = true;
 
-      if (hackModeOn) {
-        if (transform.parent != null) {
-          parent = transform.parent.GetComponent<RectTransform>();
-          if (parent != null) {
-            if (parent.rect.width < 0f || parent.rect.height < 0f) {
-              Debug.LogError("Parent Rectangle dimensions negative; can't set slider boundaries!", parent.gameObject);
-              enabled = false;
-            } else {
-              horizontalSlideLimits = new Vector2(parent.rect.xMin - transform.localPosition.x, parent.rect.xMax - transform.localPosition.x);
-              verticalSlideLimits = new Vector2(parent.rect.yMin - transform.localPosition.y, parent.rect.yMax - transform.localPosition.y);
-            }
-          }
-        }
-      } else {
-        calculateSliderLimits();
-      }
+      calculateSliderLimits();
 
       switch (sliderType) {
         case SliderType.Horizonal:
@@ -189,16 +193,10 @@ namespace Leap.Unity.Interaction {
     }
 
     public void RecalculateSliderLimits() {
-      if (!hackModeOn) {
-        calculateSliderLimits();
-      }
+      calculateSliderLimits();
     }
 
     private void calculateSliderLimits() {
-      if (hackModeOn) {
-        return;
-      }
-
       if (transform.parent != null) {
         parent = transform.parent.GetComponent<RectTransform>();
 
@@ -209,7 +207,6 @@ namespace Leap.Unity.Interaction {
             Debug.LogError("Parent Rectangle dimensions negative; can't set slider boundaries!", parent.gameObject);
             enabled = false;
           } else {
-
             var self = transform.GetComponent<RectTransform>();
             if (self != null) {
               horizontalSlideLimits = new Vector2(parent.rect.xMin - transform.localPosition.x + self.rect.width / 2F, parent.rect.xMax - transform.localPosition.x - self.rect.width / 2F);
@@ -223,7 +220,7 @@ namespace Leap.Unity.Interaction {
                 horizontalSlideLimits.y = 0F;
               }
 
-              verticalSlideLimits = new Vector2(parent.rect.yMin - transform.localPosition.y + self.rect.height / 2F, parent.rect.yMax - transform.localPosition.y - self.rect.width / 2F);
+              verticalSlideLimits = new Vector2(parent.rect.yMin - transform.localPosition.y + self.rect.height / 2F, parent.rect.yMax - transform.localPosition.y - self.rect.height / 2F);
               if (verticalSlideLimits.x > verticalSlideLimits.y) {
                 verticalSlideLimits = new Vector2(0F, 0F);
               }
@@ -244,6 +241,8 @@ namespace Leap.Unity.Interaction {
 
     protected override void Update() {
       base.Update();
+
+      if (!Application.isPlaying) { return; }
 
       if (isDepressed || isGrasped) {
         calculateSliderValues();

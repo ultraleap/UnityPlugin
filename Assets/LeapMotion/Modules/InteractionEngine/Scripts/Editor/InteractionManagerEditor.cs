@@ -13,6 +13,7 @@ using UnityEngine;
 using UnityEditor;
 using Leap.Unity.Query;
 using Leap.Unity.RuntimeGizmos;
+using Leap.Unity.Interaction.Internal;
 
 namespace Leap.Unity.Interaction {
 
@@ -37,6 +38,43 @@ namespace Leap.Unity.Interaction {
 
       specifyCustomDecorator("_drawControllerRuntimeGizmos", drawControllerRuntimeGizmoDecorator);
       specifyCustomPostDecorator("_drawControllerRuntimeGizmos", drawPostControllerRuntimeGizmoDecorator);
+    }
+
+    public override void OnInspectorGUI() {
+      checkForRigidHands();
+
+      base.OnInspectorGUI();
+    }
+
+    private void checkForRigidHands() {
+      var rigidHandObjects = FindObjectsOfType<RigidHand>().Query().Select(x => x.gameObject).ToArray();
+      if (rigidHandObjects.Length != 0 && InteractionPreferences.shouldCheckForRigidHands) {
+        EditorGUILayout.BeginHorizontal();
+
+        EditorGUILayout.HelpBox("Rigid Hands are present in your scene. Rigid Hands are "
+                              + "not compatible with the Interaction Engine and should "
+                              + "never be used in tandem with it. You should remove them "
+                              + "from your scene.", MessageType.Error);
+
+        EditorGUILayout.BeginVertical();
+        if (GUILayout.Button(new GUIContent("Ignore", "Don't show this warning anymore."), GUILayout.ExpandHeight(true), GUILayout.MaxHeight(40F))) {
+          if (EditorUtility.DisplayDialog("Really ignore this warning?",
+                                          "Your interactions will not work correctly if "
+                                        + "Rigid Hands are enabled at the same time as "
+                                        + "Interaction Hands.",
+                                          "Yes, ignore this warning",
+                                          "Cancel")) {
+            InteractionPreferences.shouldCheckForRigidHands = false;
+          }
+        }
+
+        if (GUILayout.Button(new GUIContent("Select Rigid Hands", "Select RigidHand objects in the current scene."), GUILayout.ExpandHeight(true), GUILayout.MaxHeight(40F))) {
+          Selection.objects = rigidHandObjects;
+        }
+        EditorGUILayout.EndVertical();
+
+        EditorGUILayout.EndHorizontal();
+      }
     }
 
     public override bool RequiresConstantRepaint() {
@@ -329,7 +367,7 @@ namespace Leap.Unity.Interaction {
         string tooltip;
         Color color;
 
-        if (controller.deviceString.Equals(alreadyExistsController.deviceString)) {
+        if (controller.deviceJoystickTokens.Equals(alreadyExistsController.deviceJoystickTokens)) {
           message = "Duplicate VR Controller";
           tooltip = "You already have a VRNode controller with this chirality and device "
                   + "string in your scene. You should remove one of the duplicates.";
@@ -357,12 +395,12 @@ namespace Leap.Unity.Interaction {
       }
 
       string wrongChiralityToken = controller.isLeft ? "right" : "left";
-      if (controller.deviceString.Contains(wrongChiralityToken)) {
+      if (controller.deviceJoystickTokens.Contains(wrongChiralityToken)) {
         messages.Add(new ControllerStatusMessage() {
           message = "Wrong Chirality?",
-          tooltip = "This VR controller's device string specifies a chirality that is "
-                  + "different from the chirality of the controller itself. You should "
-                  + "confirm this controller's device string or chirality setting.",
+          tooltip = "This VR controller's device joystick string specifies a chirality "
+                  + "that is different from the chirality of the controller itself. You "
+                  + "should confirm this controller's device string or chirality setting.",
           color = Colors.Warning
         });
       }
