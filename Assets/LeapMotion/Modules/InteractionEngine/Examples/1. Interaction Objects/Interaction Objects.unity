@@ -2318,15 +2318,15 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 4299111203110852, guid: 8998b2da307be7f419e285784a8495a6, type: 2}
       propertyPath: m_LocalPosition.x
-      value: 0.132
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4299111203110852, guid: 8998b2da307be7f419e285784a8495a6, type: 2}
       propertyPath: m_LocalPosition.y
-      value: 0.461
+      value: 0.1
       objectReference: {fileID: 0}
     - target: {fileID: 4299111203110852, guid: 8998b2da307be7f419e285784a8495a6, type: 2}
       propertyPath: m_LocalPosition.z
-      value: -0.057650566
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4299111203110852, guid: 8998b2da307be7f419e285784a8495a6, type: 2}
       propertyPath: m_LocalRotation.x
@@ -2382,7 +2382,7 @@ Prefab:
         type: 2}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 2100000, guid: 95c889baf756fd84ba2f1ab36adf3687, type: 2}
+      objectReference: {fileID: 2100000, guid: c72f96eddcce18e40b75a40fd5b472f8, type: 2}
     - target: {fileID: 114726310233506268, guid: 8998b2da307be7f419e285784a8495a6,
         type: 2}
       propertyPath: _eventTable._entries.Array.data[0].callback.m_TypeName
