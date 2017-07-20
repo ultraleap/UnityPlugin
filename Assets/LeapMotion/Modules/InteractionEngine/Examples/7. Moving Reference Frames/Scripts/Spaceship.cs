@@ -12,21 +12,32 @@ namespace Leap.Unity.Examples {
   /// a rigidbody on your Interaction Manager's reference frame is entirely optional. Any
   /// moving transform can provide a frame of reference for the Interaction Manager and
   /// encompassing interfaces.
-  /// 
-  /// Essentially, this script simply provides a "velocity" and "angular velocity"
-  /// abstraction for the AutopilotSystem in the example, and moves the ship's transform
-  /// appropriately.
+  ///
+  /// This script provides a "velocity" and "angular velocity" abstraction for the
+  /// AutopilotSystem in the example, and moves the ship's transform appropriately.
+  ///
+  /// The important thing when using a moving reference frame is that you move the
+  /// Interaction Manager's transform before its FixedUpdate runs. This script uses
+  /// the manager's OnPrePhysicalUpdate to ensure this, which it calls at the beginning
+  /// of its FixedUpdate.
   /// </summary>
   [AddComponentMenu("")]
   public class Spaceship : MonoBehaviour {
 
+    private Rigidbody _body;
+    /// <summary>
+    /// The ship contains Colliders, so it is given a kinematic Rigidbody to prevent
+    /// the overhead of moving Colliders every frame.
+    ///
+    /// Setting the rigidbody's position is not important for the Interaction Manager;
+    /// only the transform's positional movement establishes a moving reference frame!
+    /// </summary>
     public
     #if UNITY_EDITOR
     new
     #endif
     Rigidbody rigidbody { get { return _body; } }
 
-    private Rigidbody _body;
     private float _mass = 10F;
 
     private Vector3 _velocity;
@@ -62,7 +73,7 @@ namespace Leap.Unity.Examples {
       // The ship is moved in the manager's OnPrePhysicalUpdate callback, which ensures
       // (1) the ship's transform is updated before the Interaction Manager runs, and
       // (2) the ship's transform is updated in FixedUpdate.
-      // 
+      //
       // The Interaction Manager takes into account how it has moved since its last
       // update, and informs interaction controllers appropriately, allowing
       // interfaces to function properly.
@@ -75,7 +86,6 @@ namespace Leap.Unity.Examples {
       Vector3 acceleration = _accumulatedForce / _mass;
       _velocity += acceleration * Time.deltaTime;
 
-      this.rigidbody.velocity = _velocity;
       _accumulatedForce = Vector3.zero;
 
       // Update position.
@@ -87,7 +97,6 @@ namespace Leap.Unity.Examples {
       Vector3 eulerAcceleration = _accumulatedTorque;
       _angularVelocity += eulerAcceleration * Time.deltaTime;
 
-      this.rigidbody.angularVelocity = _angularVelocity;
       _accumulatedTorque = Vector3.zero;
 
       // Update rotation.
