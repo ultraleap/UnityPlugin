@@ -20,6 +20,12 @@ namespace Leap.Unity.Interaction {
     protected override void OnEnable() {
       base.OnEnable();
 
+      // specifyConditionalDrawing(() => noRectTransformParent, "horizontalSlideLimits", "verticalSlideLimits");
+
+      specifyCustomDecorator("horizontalSlideLimits", decorateHorizontalSlideLimits);
+      specifyCustomDecorator("verticalSlideLimits", decorateVerticalSlideLimits);
+      specifyCustomDecorator("horizontalSteps", decorateHorizontalSteps);
+
       // Only display vertical properties if relevant
       InteractionSlider[] sliders = targets.Query().Cast<InteractionSlider>().ToArray();
       specifyConditionalDrawing(() => {
@@ -47,12 +53,6 @@ namespace Leap.Unity.Interaction {
       if (!noRectTransformParent) {
         EditorGUILayout.HelpBox("This slider's limits are being controlled by the rect transform in its parent.", MessageType.Info);
       }
-
-      specifyCustomDecorator("horizontalSlideLimits", decorateHorizontalSlideLimits);
-      specifyCustomDecorator("verticalSlideLimits",   decorateVerticalSlideLimits);
-      specifyCustomDecorator("horizontalSteps", decorateHorizontalSteps);
-
-      // specifyConditionalDrawing(() => noRectTransformParent, "horizontalSlideLimits", "verticalSlideLimits");
 
       if (!Application.isPlaying) {
         (target as InteractionSlider).RecalculateSliderLimits();
