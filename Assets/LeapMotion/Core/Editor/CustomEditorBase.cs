@@ -38,6 +38,8 @@ namespace Leap.Unity {
     protected List<string> _deferredProperties;
     protected bool _showScriptField = true;
 
+    private bool _canCallSpecifyFunctions = false;
+
     protected List<SerializedProperty> _modifiedProperties = new List<SerializedProperty>();
 
     protected void dontShowScriptField() {
@@ -50,6 +52,8 @@ namespace Leap.Unity {
     /// <param name="propertyName"></param>
     /// <param name="propertyDrawer"></param>
     protected void specifyCustomDrawer(string propertyName, Action<SerializedProperty> propertyDrawer) {
+      throwIfNotInOnEnable("specifyCustomDrawer");
+
       if (!validateProperty(propertyName)) {
         return;
       }
@@ -61,6 +65,8 @@ namespace Leap.Unity {
     /// Specify a callback to be used to draw a decorator for a specific named property.  Should be called in OnEnable.
     /// </summary>
     protected void specifyCustomDecorator(string propertyName, Action<SerializedProperty> decoratorDrawer) {
+      throwIfNotInOnEnable("specifyCustomDecorator");
+
       if (!validateProperty(propertyName)) {
         return;
       }
@@ -80,6 +86,8 @@ namespace Leap.Unity {
     /// Should be called in OnEnable.
     /// </summary>
     protected void specifyCustomPostDecorator(string propertyName, Action<SerializedProperty> decoratorDrawer) {
+      throwIfNotInOnEnable("specifyCustomPostDecorator");
+
       if (!validateProperty(propertyName)) {
         return;
       }
@@ -100,6 +108,8 @@ namespace Leap.Unity {
     /// <param name="conditionalName"></param>
     /// <param name="dependantProperties"></param>
     protected void specifyConditionalDrawing(string conditionalName, params string[] dependantProperties) {
+      throwIfNotInOnEnable("specifyConditionalDrawing");
+
       if (!validateProperty(conditionalName)) {
         return;
       }
@@ -115,6 +125,8 @@ namespace Leap.Unity {
     }
 
     protected void specifyConditionalDrawing(string enumName, int enumValue, params string[] dependantProperties) {
+      throwIfNotInOnEnable("specifyConditionalDrawing");
+
       if (!validateProperty(enumName)) {
         return;
       }
@@ -130,10 +142,14 @@ namespace Leap.Unity {
     }
 
     protected void hideField(string propertyName) {
+      throwIfNotInOnEnable("hideField");
+
       specifyConditionalDrawing(() => false, propertyName);
     }
 
     protected void specifyConditionalDrawing(Func<bool> conditional, params string[] dependantProperties) {
+      throwIfNotInOnEnable("specifyConditionalDrawing");
+
       for (int i = 0; i < dependantProperties.Length; i++) {
         string dependant = dependantProperties[i];
 
@@ -156,6 +172,8 @@ namespace Leap.Unity {
     /// serialized object!
     /// </summary>
     protected void deferProperty(string propertyName) {
+      throwIfNotInOnEnable("deferProperty");
+
       if (!validateProperty(propertyName)) {
         return;
       }
@@ -183,6 +201,7 @@ namespace Leap.Unity {
       _specifiedPostDecorators = new Dictionary<string, List<Action<SerializedProperty>>>();
       _conditionalProperties = new Dictionary<string, List<Func<bool>>>();
       _deferredProperties = new List<string>();
+      _canCallSpecifyFunctions = true;
     }
 
     protected bool validateProperty(string propertyName) {
@@ -198,6 +217,8 @@ namespace Leap.Unity {
      * Individual properties can be specified to have custom drawers.
      */
     public override void OnInspectorGUI() {
+      _canCallSpecifyFunctions = false;
+
       _modifiedProperties.Clear();
       SerializedProperty iterator = serializedObject.GetIterator();
       bool isFirst = true;
@@ -265,6 +286,12 @@ namespace Leap.Unity {
         for (int i = 0; i < postDecoratorList.Count; i++) {
           postDecoratorList[i](property);
         }
+      }
+    }
+
+    private void throwIfNotInOnEnable(string methodName) {
+      if (!_canCallSpecifyFunctions) {
+        throw new InvalidOperationException("Cannot call " + methodName + " from within any other function but OnEnable.  Make sure you also call base.OnEnable as well!");
       }
     }
   }
