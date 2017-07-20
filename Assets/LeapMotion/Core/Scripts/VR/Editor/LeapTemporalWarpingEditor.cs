@@ -28,7 +28,7 @@ namespace Leap.Unity {
 
     private void warningDecorator(SerializedProperty prop) {
       if (!PlayerSettings.virtualRealitySupported) {
-        EditorGUILayout.HelpBox("Unity VR Disabled.  ManualyUpdateTemporalWarping must be called right after " +
+        EditorGUILayout.HelpBox("Unity VR Disabled.  ManuallyUpdateTemporalWarping must be called right after " +
                                 "the Head transform has been updated.", MessageType.Warning);
       }
     }

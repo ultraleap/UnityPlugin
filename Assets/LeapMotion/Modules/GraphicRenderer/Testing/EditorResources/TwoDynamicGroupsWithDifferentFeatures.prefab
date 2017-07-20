@@ -9,20 +9,36 @@ Prefab:
     m_Modifications: []
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
-  m_RootGameObject: {fileID: 1754347655177074}
+  m_RootGameObject: {fileID: 1243588591050376}
   m_IsPrefabParent: 1
---- !u!1 &1233188563480064
+--- !u!1 &1243588591050376
 GameObject:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   serializedVersion: 5
   m_Component:
-  - component: {fileID: 4764015986109242}
-  - component: {fileID: 20521304588440746}
-  - component: {fileID: 124873903426262256}
-  - component: {fileID: 92113058402630886}
-  - component: {fileID: 81414599874630160}
+  - component: {fileID: 4298563854159680}
+  - component: {fileID: 114321084613700002}
+  m_Layer: 0
+  m_Name: TwoDynamicGroupsWithDifferentFeatures
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!1 &1859848156116858
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 4035554807621504}
+  - component: {fileID: 20728572469611704}
+  - component: {fileID: 124707357748559398}
+  - component: {fileID: 92282258600723570}
+  - component: {fileID: 81293197737325214}
   m_Layer: 0
   m_Name: Camera
   m_TagString: Untagged
@@ -30,86 +46,39 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!1 &1385660132750668
-GameObject:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  serializedVersion: 5
-  m_Component:
-  - component: {fileID: 4770101957515416}
-  - component: {fileID: 114851952197704544}
-  - component: {fileID: 114601521423222430}
-  m_Layer: 0
-  m_Name: Graphic
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!1 &1754347655177074
-GameObject:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  serializedVersion: 5
-  m_Component:
-  - component: {fileID: 4756375625261218}
-  - component: {fileID: 114260558165832564}
-  m_Layer: 0
-  m_Name: TwoDynamicGroups
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &4756375625261218
+--- !u!4 &4035554807621504
 Transform:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1754347655177074}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children:
-  - {fileID: 4764015986109242}
-  - {fileID: 4770101957515416}
-  m_Father: {fileID: 0}
-  m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!4 &4764015986109242
-Transform:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1233188563480064}
+  m_GameObject: {fileID: 1859848156116858}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 4756375625261218}
+  m_Father: {fileID: 4298563854159680}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!4 &4770101957515416
+--- !u!4 &4298563854159680
 Transform:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1385660132750668}
+  m_GameObject: {fileID: 1243588591050376}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 4756375625261218}
-  m_RootOrder: 1
+  m_Children:
+  - {fileID: 4035554807621504}
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!20 &20521304588440746
+--- !u!20 &20728572469611704
 Camera:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1233188563480064}
+  m_GameObject: {fileID: 1859848156116858}
   m_Enabled: 0
   serializedVersion: 2
   m_ClearFlags: 2
@@ -140,32 +109,32 @@ Camera:
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
   m_StereoMirrorMode: 0
---- !u!81 &81414599874630160
+--- !u!81 &81293197737325214
 AudioListener:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1233188563480064}
+  m_GameObject: {fileID: 1859848156116858}
   m_Enabled: 1
---- !u!92 &92113058402630886
+--- !u!92 &92282258600723570
 Behaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1233188563480064}
+  m_GameObject: {fileID: 1859848156116858}
   m_Enabled: 1
---- !u!114 &114260558165832564
+--- !u!114 &114321084613700002
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1754347655177074}
+  m_GameObject: {fileID: 1243588591050376}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: adb71699a7372344cb4e7a163c6c6922, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _selectedGroup: 0
+  _selectedGroup: 1
   _space: {fileID: 0}
   _groups:
   - _groupName: MyGroupName
@@ -193,8 +162,7 @@ MonoBehaviour:
           _extraTextures: []
         _material: {fileID: 0}
         _meshes:
-          meshes:
-          - {fileID: 0}
+          meshes: []
         _packedTextures:
           packedTextures: []
         _atlasUvs:
@@ -233,8 +201,13 @@ MonoBehaviour:
             height: 0
       _c: []
     _features:
-      _table: []
-      _a: []
+      _table:
+      - id: 0
+        index: 0
+      _a:
+      - _dummyBool: 0
+        propertyName: _MainTex
+        channel: 1
       _b: []
       _c: []
       _d: []
@@ -242,10 +215,11 @@ MonoBehaviour:
       _f: []
       _g: []
       _h: []
-    _renderer: {fileID: 114260558165832564}
-    _graphics:
-    - {fileID: 114851952197704544}
-    _supportInfo: []
+    _renderer: {fileID: 114321084613700002}
+    _graphics: []
+    _supportInfo:
+    - support: 0
+      message: 
     _addRemoveSupported: 1
   - _groupName: MyGroupName
     _renderingMethod:
@@ -311,63 +285,33 @@ MonoBehaviour:
             height: 0
       _c: []
     _features:
-      _table: []
+      _table:
+      - id: 3
+        index: 0
+      - id: 2
+        index: 0
       _a: []
       _b: []
-      _c: []
-      _d: []
+      _c:
+      - _dummyBool: 0
+      _d:
+      - _dummyBool: 0
       _e: []
       _f: []
       _g: []
       _h: []
-    _renderer: {fileID: 114260558165832564}
+    _renderer: {fileID: 114321084613700002}
     _graphics: []
-    _supportInfo: []
+    _supportInfo:
+    - support: 0
+      message: 
+    - support: 0
+      message: 
     _addRemoveSupported: 1
---- !u!114 &114601521423222430
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1385660132750668}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ff37e7c7420aa5e4cb595e6d65d13a72, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &114851952197704544
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1385660132750668}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8fb726b2ea51dd94d8601fa443872ec2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _anchor: {fileID: 0}
-  _featureData:
-    _table: []
-    _a: []
-    _b: []
-    _c: []
-    _d: []
-    _e: []
-    _f: []
-    _g: []
-    _h: []
-  _attachedRenderer: {fileID: 114260558165832564}
-  _attachedGroupIndex: 0
-  _preferredRendererType:
-    _fullName: Leap.Unity.GraphicalRenderer.LeapDynamicRenderer
-  vertexColor: {r: 1, g: 1, b: 1, a: 1}
-  _mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
-  _remappableChannels: -1
---- !u!124 &124873903426262256
+--- !u!124 &124707357748559398
 Behaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1233188563480064}
+  m_GameObject: {fileID: 1859848156116858}
   m_Enabled: 1
