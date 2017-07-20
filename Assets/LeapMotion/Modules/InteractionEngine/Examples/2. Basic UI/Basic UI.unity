@@ -117,7 +117,7 @@ GameObject:
   m_PrefabInternal: {fileID: 0}
   serializedVersion: 5
   m_Component:
-  - component: {fileID: 1094640820}
+  - component: {fileID: 112263980}
   - component: {fileID: 112263978}
   - component: {fileID: 112263977}
   - component: {fileID: 112263979}
@@ -159,31 +159,37 @@ MonoBehaviour:
     layerIndex: 0
   _eventTable:
     _entries: []
+  controlEnabled: 1
+  startingPositionMode: 0
   minMaxHeight: {x: 0, y: 0.02}
   restingHeight: 0.5
   _springForce: 0.1
-  OnPress:
+  _OnPress:
     m_PersistentCalls:
       m_Calls: []
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
-  OnUnpress:
+  _OnUnpress:
     m_PersistentCalls:
       m_Calls: []
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
+  sliderType: 2
+  dispatchSlideValueOnStart: 1
+  defaultHorizontalValue: 0.5
   horizontalValueRange: {x: 0, y: 1}
-  verticalValueRange: {x: 0, y: 1}
-  horizontalSlideLimits: {x: -0.09, y: 0.09}
-  verticalSlideLimits: {x: -0.065, y: 0.065}
+  horizontalSlideLimits: {x: -0.08882, y: 0.08882}
   horizontalSteps: 0
-  verticalSteps: 0
-  horizontalSlideEvent:
+  _horizontalSlideEvent:
     m_PersistentCalls:
       m_Calls: []
     m_TypeName: Leap.Unity.Interaction.InteractionSlider+FloatEvent, Assembly-CSharp,
       Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-  verticalSlideEvent:
+  defaultVerticalValue: 0.5
+  verticalValueRange: {x: 0, y: 1}
+  verticalSlideLimits: {x: -0.065655, y: 0.065655}
+  verticalSteps: 0
+  _verticalSlideEvent:
     m_PersistentCalls:
       m_Calls: []
     m_TypeName: Leap.Unity.Interaction.InteractionSlider+FloatEvent, Assembly-CSharp,
@@ -222,6 +228,25 @@ MonoBehaviour:
   hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
   primaryHoverColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   pressedColor: {r: 1, g: 1, b: 1, a: 1}
+--- !u!224 &112263980
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 112263976}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: -0.0046}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 2123190531}
+  m_Father: {fileID: 1432746479}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0.035, y: 0.035}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &138469533
 GameObject:
   m_ObjectHideFlags: 0
@@ -1823,12 +1848,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   interactionManager: {fileID: 708822598}
   leftHandControllers:
-  - {fileID: 1120977480}
   - {fileID: 738521178}
+  - {fileID: 1120977480}
   - {fileID: 265548107}
   rightHandControllers:
-  - {fileID: 218407822}
   - {fileID: 1036247346}
+  - {fileID: 218407822}
   - {fileID: 833115646}
   OnLeftHandActive:
     m_PersistentCalls:
@@ -3239,6 +3264,7 @@ MonoBehaviour:
   tweenRotationalWarping: 1
   tweenPositionalWarping: 0
   syncMode: 0
+  forceCustomUpdate: 0
   allowManualTimeAlignment: 0
   warpingAdjustment: 30
   unlockHold: 303
@@ -3313,21 +3339,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 25.724, y: 0, z: 0}
---- !u!4 &1094640820
-Transform:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 4836511281976174, guid: b765f0033afcf97499e39815434229cc,
-    type: 2}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 112263976}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: -0, z: -0.0046}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children:
-  - {fileID: 2123190531}
-  m_Father: {fileID: 1432746479}
-  m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1120977479
 Prefab:
   m_ObjectHideFlags: 0
@@ -3655,21 +3666,26 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &1432746479
-Transform:
+--- !u!224 &1432746479
+RectTransform:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1432746478}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.116500005, y: 0.040299993, z: -0.0118000135}
+  m_LocalPosition: {x: 0, y: 0, z: -0.0118000135}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1449745822}
-  - {fileID: 1094640820}
+  - {fileID: 112263980}
   m_Father: {fileID: 1057954427}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: -0.116500005, y: 0.040299993}
+  m_SizeDelta: {x: 0.21264, y: 0.16631}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1001 &1449210903
 Prefab:
   m_ObjectHideFlags: 0
@@ -3997,21 +4013,25 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &1758933909
-Transform:
+--- !u!224 &1758933909
+RectTransform:
   m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 4836511281976174, guid: b765f0033afcf97499e39815434229cc,
-    type: 2}
+  m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1758933908}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: -0, z: -0.0046}
+  m_LocalPosition: {x: 0, y: 0, z: -0.0046}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 517204486}
   m_Father: {fileID: 2057493649}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: -0}
+  m_SizeDelta: {x: 0.035, y: 0.035}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1758933910
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4043,31 +4063,37 @@ MonoBehaviour:
     layerIndex: 0
   _eventTable:
     _entries: []
+  controlEnabled: 1
+  startingPositionMode: 0
   minMaxHeight: {x: 0, y: 0.02}
   restingHeight: 0.5
   _springForce: 0.1
-  OnPress:
+  _OnPress:
     m_PersistentCalls:
       m_Calls: []
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
-  OnUnpress:
+  _OnUnpress:
     m_PersistentCalls:
       m_Calls: []
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
+  sliderType: 1
+  dispatchSlideValueOnStart: 1
+  defaultHorizontalValue: 0.5
   horizontalValueRange: {x: 0, y: 1}
-  verticalValueRange: {x: 0, y: 1}
-  horizontalSlideLimits: {x: -0.205, y: 0.205}
-  verticalSlideLimits: {x: 0, y: 0}
+  horizontalSlideLimits: {x: -0.2075, y: 0.2075}
   horizontalSteps: 0
-  verticalSteps: 0
-  horizontalSlideEvent:
+  _horizontalSlideEvent:
     m_PersistentCalls:
       m_Calls: []
     m_TypeName: Leap.Unity.Interaction.InteractionSlider+FloatEvent, Assembly-CSharp,
       Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-  verticalSlideEvent:
+  defaultVerticalValue: 0
+  verticalValueRange: {x: 0, y: 1}
+  verticalSlideLimits: {x: -0.005000001, y: 0.005000001}
+  verticalSteps: 0
+  _verticalSlideEvent:
     m_PersistentCalls:
       m_Calls: []
     m_TypeName: Leap.Unity.Interaction.InteractionSlider+FloatEvent, Assembly-CSharp,
@@ -4277,14 +4303,14 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &2057493649
-Transform:
+--- !u!224 &2057493649
+RectTransform:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 2057493648}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.1, z: -0.012}
+  m_LocalPosition: {x: 0, y: 0, z: -0.012}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 165965325}
@@ -4292,6 +4318,11 @@ Transform:
   m_Father: {fileID: 1057954427}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: -0.1}
+  m_SizeDelta: {x: 0.45, y: 0.045}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1001 &2058780618
 Prefab:
   m_ObjectHideFlags: 0
@@ -4435,7 +4466,7 @@ Transform:
   m_LocalScale: {x: 0.032584533, y: 0.032584537, z: 0.009123394}
   m_Children:
   - {fileID: 1237833285}
-  m_Father: {fileID: 1094640820}
+  m_Father: {fileID: 112263980}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!23 &2123190532

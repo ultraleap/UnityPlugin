@@ -7,6 +7,7 @@
  * between Leap Motion and you, your company or other organization.           *
  ******************************************************************************/
 
+using Leap.Unity.Query;
 using UnityEditor;
 using UnityEngine;
 
@@ -20,6 +21,23 @@ namespace Leap.Unity.Interaction {
       if (!noRectTransformParent) {
         EditorGUILayout.HelpBox("This slider's limits are being controlled by the rect transform in its parent.", MessageType.Info);
       }
+
+      // Only display vertical properties if relevant
+      InteractionSlider[] sliders = targets.Query().Cast<InteractionSlider>().ToArray();
+      specifyConditionalDrawing(() => { return sliders.Query().Any(slider => slider.sliderType == InteractionSlider.SliderType.Vertical
+                                                                          || slider.sliderType == InteractionSlider.SliderType.TwoDimensional); },
+                                "defaultVerticalValue",
+                                "verticalValueRange",
+                                "verticalSlideLimits",
+                                "verticalSteps",
+                                "_verticalSlideEvent");
+      specifyConditionalDrawing(() => { return sliders.Query().Any(slider => slider.sliderType == InteractionSlider.SliderType.Horizonal
+                                                                          || slider.sliderType == InteractionSlider.SliderType.TwoDimensional); },
+                                "defaultHorizontalValue",
+                                "horizontalValueRange",
+                                "horizontalSlideLimits",
+                                "horizontalSteps",
+                                "_horizontalSlideEvent");
 
       specifyCustomDecorator("horizontalSlideLimits", decorateHorizontalSlideLimits);
       specifyCustomDecorator("verticalSlideLimits",   decorateVerticalSlideLimits);
