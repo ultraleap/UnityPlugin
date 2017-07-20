@@ -7,6 +7,7 @@
  * between Leap Motion and you, your company or other organization.           *
  ******************************************************************************/
 
+using Leap.Unity.Query;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
@@ -20,12 +21,18 @@ namespace Leap.Unity.Interaction {
 
     protected override void OnEnable() {
       base.OnEnable();
+
+      specifyCustomDecorator("primaryHoverPoints", checkPrimaryHoverPoints);
     }
 
     public override void OnInspectorGUI() {
-      base.OnInspectorGUI();
+      checkParentedToManager();
+      checkWithinHandPoolParent();
 
-      // Check if any selected InteractionHands have no Primary Hover points checked.
+      base.OnInspectorGUI();
+    }
+
+    private void checkPrimaryHoverPoints(SerializedProperty property) {
       bool anyPrimaryHoverPoints = false;
       bool anyWithNoPrimaryHoverPoints = false;
       foreach (var singleTarget in targets) {
@@ -58,6 +65,58 @@ namespace Leap.Unity.Interaction {
                        + "UI elements such as InteractionButton and InteractionSlider "
                        + "will not be able to interact with this interaction controller.";
         EditorGUILayout.HelpBox(message, MessageType.Warning);
+      }
+    }
+
+    private void checkParentedToManager() {
+      bool plural = targets.Length > 1;
+      bool anyNotParentedToInteractionManager;
+
+      anyNotParentedToInteractionManager = targets.Query()
+                                                  .Any(c => c.GetComponentInParent<InteractionManager>() == null);
+
+      if (anyNotParentedToInteractionManager) {
+        string message = "";
+        if (plural) {
+          message += "One of more currently selected controllers ";
+        }
+        else {
+          message += "The currently selected controller ";
+        }
+
+        message += "is not the child of an Interaction Manager. Interaction Controllers "
+                 + "must be childed to an Interaction Manager in order to function.";
+
+        EditorGUILayout.HelpBox(message, MessageType.Warning);
+      }
+    }
+
+    private void checkWithinHandPoolParent() {
+      bool plural = targets.Length > 1;
+      bool anyWithinHandPool;
+
+      HandPool handPool = FindObjectOfType<HandPool>();
+      if (handPool == null) return;
+
+      anyWithinHandPool = targets.Query()
+                                 .Any(c => c.transform.parent == handPool.modelsParent
+                                        && handPool.modelsParent != null);
+
+      if (anyWithinHandPool) {
+        string message = "";
+        if (plural) {
+          message += "One or more of the currently selected controllers ";
+        }
+        else {
+          message += "The currently selected controller ";
+        }
+
+        message += "is a within the HandPool model parent. Interaction controllers, such "
+                 + "as InteractionHands, are not HandModels and are not spawned by the "
+                 + "HandPool. InteractionHands and all Interaction controllers should "
+                 + "be childed to the Interaction Manager.";
+
+        EditorGUILayout.HelpBox(message, MessageType.Error);
       }
     }
 
