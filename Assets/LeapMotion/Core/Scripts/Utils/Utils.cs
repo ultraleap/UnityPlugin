@@ -326,6 +326,16 @@ namespace Leap.Unity {
 
     #endregion
 
+    #region Vector Utils
+
+    public static bool ContainsNaN(this Vector3 v) {
+      return float.IsNaN(v.x)
+          || float.IsNaN(v.y)
+          || float.IsNaN(v.z);
+    }
+
+    #endregion
+
     #region Transform Utils
 
     /// <summary>
@@ -370,10 +380,10 @@ namespace Leap.Unity {
     /// <summary>
     /// Similar to Unity's Transform.LookAt(), but resolves the forward vector of this
     /// Transform to point away from the argument Transform.
-    /// 
+    ///
     /// Useful for billboarding Quads and UI elements whose forward vectors should match
     /// rather than oppose the Main Camera's forward vector.
-    /// 
+    ///
     /// Optionally, you may also pass an upwards vector, which will be provided to the underlying
     /// Quaternion.LookRotation. Vector3.up will be used by default.
     /// </summary>
@@ -384,7 +394,7 @@ namespace Leap.Unity {
     /// <summary>
     /// Similar to Unity's Transform.LookAt(), but resolves the forward vector of this
     /// Transform to point away from the argument Transform.
-    /// 
+    ///
     /// Allows specifying an upwards parameter; this is passed as the upwards vector to the Quaternion.LookRotation.
     /// </summary>
     /// <param name="thisTransform"></param>
@@ -457,11 +467,11 @@ namespace Leap.Unity {
 
     /// <summary>
     /// Recursively searches the hierarchy of the argument GameObject to find all of the
-    /// Colliders that are attached to the object's Rigidbody (or that _would_ be 
+    /// Colliders that are attached to the object's Rigidbody (or that _would_ be
     /// attached to its Rigidbody if it doesn't have one) and adds them to the provided
     /// colliders list. Warning: The provided "colliders" List will be cleared before
     /// use.
-    /// 
+    ///
     /// Colliders that are the children of other Rigidbody elements beneath the argument
     /// object are ignored.
     /// </summary>
@@ -545,7 +555,7 @@ namespace Leap.Unity {
       DrawArc(360, center, planeA, normal, radius, color, quality);
     }
 
-    /* Adapted from: Zarrax (http://math.stackexchange.com/users/3035/zarrax), Parametric Equation of a Circle in 3D Space?, 
+    /* Adapted from: Zarrax (http://math.stackexchange.com/users/3035/zarrax), Parametric Equation of a Circle in 3D Space?,
      * URL (version: 2014-09-09): http://math.stackexchange.com/q/73242 */
     public static void DrawArc(float arc,
                            Vector3 center,
