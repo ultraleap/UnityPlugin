@@ -500,17 +500,6 @@ namespace Leap.Unity.GraphicalRenderer {
             canAttach = attachEnum.MoveNext();
           }
 
-          //TODO: this is gonna need to be optimized
-          //Make sure to call this before OnAttachedToGroup or else the graphic
-          //will not have the correct feature data when it gets attached!
-          RebuildFeatureData();
-          RebuildFeatureSupportInfo();
-
-          for (int i = newGraphicStart; i < _graphics.Count; i++) {
-            var anchor = _renderer.space == null ? null : LeapSpaceAnchor.GetAnchor(attachEnum.Current.transform);
-            _graphics[i].OnAttachedToGroup(this, anchor);
-          }
-
           //We remove any graphics that did not have a matching add.  This 
           //only happens if more graphics were removed than were added this
           //frame.
@@ -523,6 +512,20 @@ namespace Leap.Unity.GraphicalRenderer {
             detachEnum.Current.OnDetachedFromGroup();
 
             canDetach = detachEnum.MoveNext();
+          }
+
+          //TODO: this is gonna need to be optimized
+          //Make sure to call this before OnAttachedToGroup or else the graphic
+          //will not have the correct feature data when it gets attached!
+          RebuildFeatureData();
+          RebuildFeatureSupportInfo();
+
+          //newGraphicStart is either less than _graphics.Count because we added 
+          //new graphics, or it is greater than _graphics.Count because we removed
+          //some graphics.
+          for (int i = newGraphicStart; i < _graphics.Count; i++) {
+            var anchor = _renderer.space == null ? null : LeapSpaceAnchor.GetAnchor(attachEnum.Current.transform);
+            _graphics[i].OnAttachedToGroup(this, anchor);
           }
 
           attachEnum.Dispose();

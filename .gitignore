@@ -10,6 +10,9 @@
 *.unitypackage
 *.apk
 
+*.exe
+*_Data/
+
 /Library/*
 /Library/FailedAssetImports.txt
 /Library/cache/

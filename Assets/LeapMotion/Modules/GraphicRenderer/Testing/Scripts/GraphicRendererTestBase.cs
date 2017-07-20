@@ -7,7 +7,7 @@
  * between Leap Motion and you, your company or other organization.           *
  ******************************************************************************/
 
-#if UNITY_EDITOR
+#if LEAP_TESTS
 using System;
 using NUnit.Framework;
 using System.Reflection;
