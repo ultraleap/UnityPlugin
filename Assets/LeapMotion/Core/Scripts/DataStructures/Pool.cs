@@ -84,24 +84,17 @@ namespace Leap.Unity {
     }
 
     private static T spawnValue() {
-      T value;
-      int count = 0;
-      do {
-        if (_pool.Count > 0) {
-          value = _pool.Pop();
-        }
-        else {
-          value = new T();
-        }
-        count++;
-      } while (value == null && count < 100);
-      if (count == 100) {
-        Debug.LogError("Couldn't construct a valid T...");
-      }
+      T value = new T();
+
       return value;
     }
 
     public static void Recycle(T t) {
+      if (t == null) {
+        Debug.LogError("Cannot recycle a null object.");
+        return;
+      }
+
       if (t is IPoolable) {
         (t as IPoolable).OnRecycle();
       }
