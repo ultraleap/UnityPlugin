@@ -33,12 +33,11 @@ namespace Leap.Unity.Interaction {
 
     public void MoveTo(Vector3 solvedPosition, Quaternion solvedRotation,
                        InteractionBehaviour intObj, bool justGrasped) {
-      Vector3 targetVelocity = PhysicsUtility.ToLinearVelocity(intObj.rigidbody.position, solvedPosition, Time.fixedDeltaTime);
-      Vector3 targetAngularVelocity = PhysicsUtility.ToAngularVelocity(intObj.rigidbody.rotation, solvedRotation, Time.fixedDeltaTime);
+      Vector3 solvedCenterOfMass = solvedRotation * intObj.rigidbody.centerOfMass + solvedPosition;
+      Vector3 currCenterOfMass = intObj.rigidbody.rotation * intObj.rigidbody.centerOfMass + intObj.rigidbody.position;
 
-      Vector3 curCoMPosition = intObj.rigidbody.position + intObj.rigidbody.rotation * intObj.rigidbody.centerOfMass;
-      Vector3 curSolvedCoMPosition = solvedPosition + solvedRotation * intObj.rigidbody.centerOfMass;
-      Vector3 CoMTargetVelocity = PhysicsUtility.ToLinearVelocity(curCoMPosition, curSolvedCoMPosition, Time.fixedDeltaTime);
+      Vector3 targetVelocity = PhysicsUtility.ToLinearVelocity(currCenterOfMass, solvedCenterOfMass, Time.fixedDeltaTime);
+      Vector3 targetAngularVelocity = PhysicsUtility.ToAngularVelocity(intObj.rigidbody.rotation, solvedRotation, Time.fixedDeltaTime);
 
       // Clamp targetVelocity by _maxVelocity on **CoMTargetVelocity**.
       //float maxScaledVelocity = _maxVelocity * intObj.manager.SimulationScale;
@@ -52,30 +51,18 @@ namespace Leap.Unity.Interaction {
       _useLastSolvedCoMPosition = !justGrasped;
       float followStrength = 1F;
       if (_useLastSolvedCoMPosition) {
-        float remainingDistanceLastFrame = Vector3.Distance(_lastSolvedCoMPosition, curCoMPosition);
-        Debug.Log("COM: " + remainingDistanceLastFrame);
-        remainingDistanceLastFrame = Vector3.Distance(_lastSolvedPosition, intObj.rigidbody.position);
-        Debug.Log("Body: " + remainingDistanceLastFrame);
-        //followStrength = _strengthByDistance.Evaluate(remainingDistanceLastFrame / intObj.manager.SimulationScale);
+        float remainingDistanceLastFrame = Vector3.Distance(_lastSolvedCoMPosition, currCenterOfMass);
+        followStrength = _strengthByDistance.Evaluate(remainingDistanceLastFrame / intObj.manager.SimulationScale);
       }
 
       Vector3 lerpedVelocity = Vector3.Lerp(intObj.rigidbody.velocity, targetVelocity, followStrength);
       Vector3 lerpedAngularVelocity = Vector3.Lerp(intObj.rigidbody.angularVelocity, targetAngularVelocity, followStrength);
 
-      Vector3 centerOfMassOffset = intObj.rigidbody.rotation * intObj.rigidbody.centerOfMass;
-
-      // To support heavily off-center rigidbodies, we need to dampen the effect of followStrength.
-      //float offCenterMassAmount = intObj.rigidbody.centerOfMass.CompSum().Map(0F, 0.1F, 0F, 1F);
-      //lerpedVelocity = Vector3.Lerp(lerpedVelocity, targetVelocity, offCenterMassAmount);
-      //lerpedAngularVelocity = Vector3.Lerp(lerpedAngularVelocity, targetAngularVelocity, offCenterMassAmount);
-
-      //intObj.rigidbody.velocity = lerpedVelocity + Vector3.Cross(lerpedAngularVelocity, centerOfMassOffset);
-      //intObj.rigidbody.angularVelocity = lerpedAngularVelocity;
       intObj.rigidbody.velocity = lerpedVelocity;
       intObj.rigidbody.angularVelocity = lerpedAngularVelocity;
 
       _lastSolvedPosition = solvedPosition;
-      _lastSolvedCoMPosition = curSolvedCoMPosition;
+      _lastSolvedCoMPosition = currCenterOfMass;
     }
   }
 
