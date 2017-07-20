@@ -159,7 +159,7 @@ MonoBehaviour:
     layerIndex: 0
   _eventTable:
     _entries: []
-  controlEnabled: 1
+  _controlEnabled: 1
   startingPositionMode: 0
   minMaxHeight: {x: 0, y: 0.02}
   restingHeight: 0.5
@@ -4063,7 +4063,7 @@ MonoBehaviour:
     layerIndex: 0
   _eventTable:
     _entries: []
-  controlEnabled: 1
+  _controlEnabled: 1
   startingPositionMode: 0
   minMaxHeight: {x: 0, y: 0.02}
   restingHeight: 0.5
@@ -4461,8 +4461,8 @@ Transform:
     type: 2}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 2123190530}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: -0, z: 0.0009}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0.032584533, y: 0.032584537, z: 0.009123394}
   m_Children:
   - {fileID: 1237833285}

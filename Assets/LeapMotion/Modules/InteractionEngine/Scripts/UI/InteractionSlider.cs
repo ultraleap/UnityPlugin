@@ -83,7 +83,7 @@ namespace Leap.Unity.Interaction {
       }
       set {
         if (!_started) {
-          Debug.LogWarning("An object is attempting to access this slider's value before it has been initialized!  Initializing now; this could yield unpected behaviour...", this);
+          Debug.LogWarning("An object is attempting to access this slider's value before it has been initialized!  Initializing now; this could yield unexpected behaviour...", this);
           Start();
         }
 
@@ -214,6 +214,8 @@ namespace Leap.Unity.Interaction {
 
     protected override void Update() {
       base.Update();
+
+      if (!Application.isPlaying) { return; }
 
       if (isDepressed || isGrasped) {
         calculateSliderValues();

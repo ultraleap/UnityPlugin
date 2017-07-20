@@ -145,7 +145,7 @@ namespace Leap.Unity.Interaction {
           //Sleep the rigidbody if it's not really moving...
 
           float localPhysicsDisplacementPercentage = Mathf.InverseLerp(minMaxHeight.x, minMaxHeight.y, initialLocalPosition.z - localPhysicsPosition.z);
-          if (rigidbody.position == physicsPosition && _physicsVelocity == Vector3.zero && Mathf.Abs(localPhysicsDisplacementPercentage - restingHeight) < 0.01f) {
+          if (rigidbody.position == physicsPosition && _physicsVelocity == Vector3.zero && Mathf.Abs(localPhysicsDisplacementPercentage - restingHeight) < 0.01F) {
             rigidbody.Sleep();
             //Else, reset the body's position to where it was last time PhysX looked at it...
           } else {
