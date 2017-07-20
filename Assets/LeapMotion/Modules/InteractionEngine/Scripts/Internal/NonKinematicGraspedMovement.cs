@@ -55,6 +55,12 @@ namespace Leap.Unity.Interaction {
       Vector3 lerpedAngularVelocity = Vector3.Lerp(intObj.rigidbody.angularVelocity, targetAngularVelocity, followStrength);
 
       Vector3 centerOfMassOffset = intObj.rigidbody.rotation * intObj.rigidbody.centerOfMass;
+
+      // To support heavily off-center rigidbodies, we need to dampen the effect of followStrength.
+      float offCenterMassAmount = intObj.rigidbody.centerOfMass.CompSum().Map(0F, 0.1F, 0F, 1F);
+      lerpedVelocity = Vector3.Lerp(lerpedVelocity, targetVelocity, offCenterMassAmount);
+      lerpedAngularVelocity = Vector3.Lerp(lerpedAngularVelocity, targetAngularVelocity, offCenterMassAmount);
+
       intObj.rigidbody.velocity = lerpedVelocity + Vector3.Cross(lerpedAngularVelocity, centerOfMassOffset);
       intObj.rigidbody.angularVelocity = lerpedAngularVelocity;
 
