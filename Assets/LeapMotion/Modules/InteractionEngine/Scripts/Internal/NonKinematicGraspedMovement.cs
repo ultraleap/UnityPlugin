@@ -27,7 +27,6 @@ namespace Leap.Unity.Interaction {
 
     private bool _useLastSolvedCoMPosition = false;
     private Vector3 _lastSolvedCoMPosition = Vector3.zero;
-    private Vector3 _lastSolvedPosition = Vector3.zero;
     protected AnimationCurve _strengthByDistance = new AnimationCurve(new Keyframe(0.0f, 1.0f, 0.0f, 0.0f),
                                                                       new Keyframe(0.02f, 0.3f, 0.0f, 0.0f));
 
@@ -39,14 +38,14 @@ namespace Leap.Unity.Interaction {
       Vector3 targetVelocity = PhysicsUtility.ToLinearVelocity(currCenterOfMass, solvedCenterOfMass, Time.fixedDeltaTime);
       Vector3 targetAngularVelocity = PhysicsUtility.ToAngularVelocity(intObj.rigidbody.rotation, solvedRotation, Time.fixedDeltaTime);
 
-      // Clamp targetVelocity by _maxVelocity on **CoMTargetVelocity**.
-      //float maxScaledVelocity = _maxVelocity * intObj.manager.SimulationScale;
-      //float targetSpeedSqrd = CoMTargetVelocity.sqrMagnitude;
-      //if (targetSpeedSqrd > maxScaledVelocity * maxScaledVelocity) {
-      //  float targetPercent = maxScaledVelocity / Mathf.Sqrt(targetSpeedSqrd);
-      //  targetVelocity *= targetPercent;
-      //  targetAngularVelocity *= targetPercent;
-      //}
+      // Clamp targetVelocity by _maxVelocity.
+      float maxScaledVelocity = _maxVelocity * intObj.manager.SimulationScale;
+      float targetSpeedSqrd = targetVelocity.sqrMagnitude;
+      if (targetSpeedSqrd > maxScaledVelocity * maxScaledVelocity) {
+        float targetPercent = maxScaledVelocity / Mathf.Sqrt(targetSpeedSqrd);
+        targetVelocity *= targetPercent;
+        targetAngularVelocity *= targetPercent;
+      }
 
       _useLastSolvedCoMPosition = !justGrasped;
       float followStrength = 1F;
@@ -61,7 +60,6 @@ namespace Leap.Unity.Interaction {
       intObj.rigidbody.velocity = lerpedVelocity;
       intObj.rigidbody.angularVelocity = lerpedAngularVelocity;
 
-      _lastSolvedPosition = solvedPosition;
       _lastSolvedCoMPosition = currCenterOfMass;
     }
   }
