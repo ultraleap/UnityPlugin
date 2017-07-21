@@ -183,12 +183,28 @@ namespace Leap.Unity {
       transformFrame(_untransformedFixedFrame, _transformedFixedFrame);
     }
 
+    protected virtual void Reset() {
+      bool shouldEnableHeadMounted;
+      checkIsHeadMounted(out shouldEnableHeadMounted);
+
+      if (shouldEnableHeadMounted) {
+        _isHeadMounted = true;
+      }
+      
+      _temporalWarping = GetComponentInParent<LeapVRTemporalWarping>();
+      _frameOptimization = FrameOptimizationMode.None;
+      _overrideDeviceType = false;
+      _updateHandInPrecull = false;
+    }
+
     protected virtual void Awake() {
       _fixedOffset.delay = 0.4f;
       _smoothedTrackingLatency.SetBlend(0.99f, 0.0111f);
     }
 
     protected virtual void Start() {
+      checkIsHeadMounted();
+
       createController();
       _transformedUpdateFrame = new Frame();
       _transformedFixedFrame = new Frame();
@@ -290,6 +306,31 @@ namespace Leap.Unity {
     protected virtual void OnDisable() {
       Camera.onPreCull -= LateUpdateHandTransforms;
       resetTransforms();
+    }
+
+    private void checkIsHeadMounted() {
+      bool unused;
+      checkIsHeadMounted(out unused);
+    }
+
+    private void checkIsHeadMounted(out bool shouldEnable) {
+      if (UnityEngine.VR.VRSettings.enabled) {
+        var parentCamera = GetComponentInParent<Camera>();
+        if (parentCamera != null && parentCamera.stereoTargetEye != StereoTargetEyeMask.None) {
+
+          if (!_isHeadMounted) {
+            if (Application.isPlaying) {
+              Debug.LogError("VR is enabled and the LeapServiceProvider is the child of a "
+                           + "camera targeting one or both stereo eyes; You should "
+                           + "check the isHeadMounted option on the LeapServiceProvider "
+                           + "if the Leap is mounted or attached to your VR headset!",
+                             this);
+            }
+            shouldEnable = true;
+          }
+        }
+      }
+      shouldEnable = false;
     }
 
     /*
