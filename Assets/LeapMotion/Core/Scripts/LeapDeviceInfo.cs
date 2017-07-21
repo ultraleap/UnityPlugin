@@ -11,11 +11,6 @@ using UnityEngine;
 using System.Collections;
 
 namespace Leap.Unity{
-  public enum LeapDeviceType {
-    Invalid,
-    Peripheral,
-    Dragonfly
-  }
   
   /// <summary>
   /// Leap device info struct.
@@ -24,7 +19,6 @@ namespace Leap.Unity{
   /// Default values are for Leap peripheral.
   /// </remarks>
   public struct LeapDeviceInfo {
-    public LeapDeviceType type;
     public bool isEmbedded;
     // TODO: Is head mounted
     public float baseline; //(meters) Distance between focal points of cameras
@@ -33,38 +27,18 @@ namespace Leap.Unity{
     public float verticalViewAngle; //(degrees) Field of view angle perpendicular to baseline axis
     public float trackingRange; //(degrees) Maximum radius for reliable tracking
     public string serialID; //Device alphanumeric unique hardware ID
-  
-    public LeapDeviceInfo(LeapDeviceType initialization = LeapDeviceType.Invalid) {
-      type = initialization;
-      switch (type) {
-      case LeapDeviceType.Peripheral:
-        isEmbedded = false;
-        baseline = 0.04f;
-        focalPlaneOffset = 0.10F;
-        horizontalViewAngle = 2.303835f * Mathf.Rad2Deg;
-        verticalViewAngle = 2.007129f * Mathf.Rad2Deg;
-        trackingRange = 470f / 1000f;
-        serialID = "";
-        break;
-      case LeapDeviceType.Dragonfly:
-        isEmbedded = false;
-        baseline = 0.064f;
-        focalPlaneOffset = 0.08f;
-        horizontalViewAngle = 2.303835f * Mathf.Rad2Deg;
-        verticalViewAngle = 2.007129f * Mathf.Rad2Deg;
-        trackingRange = 470f / 1000f;
-        serialID = "";
-        break;
-      default:
-        isEmbedded = false;
-        baseline = 0f;
-        focalPlaneOffset = 0f;
-        horizontalViewAngle = 0f;
-        verticalViewAngle = 0f;
-        trackingRange = 0f;
-        serialID = "";
-        break;
-      }
+    
+    public static LeapDeviceInfo GetLeapDeviceInfo() {
+      LeapDeviceInfo deviceInfo;
+      deviceInfo.isEmbedded = false;
+      deviceInfo.baseline = 0.04f;
+      deviceInfo.focalPlaneOffset = 0.10F;
+      deviceInfo.horizontalViewAngle = 2.303835f * Mathf.Rad2Deg;
+      deviceInfo.verticalViewAngle = 2.007129f * Mathf.Rad2Deg;
+      deviceInfo.trackingRange = 470f / 1000f;
+      deviceInfo.serialID = "";
+
+      return deviceInfo;
     }
   }
 }
