@@ -11,22 +11,31 @@ using UnityEngine;
 using UnityEngine.Assertions;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.Serialization;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
 using Leap;
 
 namespace Leap.Unity {
-  /** 
-   * HandPool holds a pool of IHandModels and makes HandRepresentations 
+  /**
+   * HandPool holds a pool of IHandModels and makes HandRepresentations
    * when given a Leap Hand and a model type of graphics or physics.
    * When a HandRepresentation is created, an IHandModel is removed from the pool.
    * When a HandRepresentation is finished, its IHandModel is returned to the pool.
    */
   public class HandPool : MonoBehaviour {
     [SerializeField]
-    [Tooltip("Reference for the transform that is a child of the camera rig's root and is a parent to all hand models")]
-    private Transform ModelsParent;
+    [Tooltip("Reference for the transform that is a child of the camera rig's root and is a parent to all hand models.")]
+    [FormerlySerializedAs("ModelsParent")]
+    private Transform _modelsParent;
+    /// <summary>
+    /// Gets the parent transform of models available to the HandPool.
+    /// </summary>
+    public Transform modelsParent {
+      get { return _modelsParent; }
+    }
+
     [SerializeField]
     private List<ModelGroup> ModelPool;
     private List<HandRepresentation> activeHandReps = new List<HandRepresentation>();
@@ -34,7 +43,7 @@ namespace Leap.Unity {
     private Dictionary<IHandModel, ModelGroup> modelGroupMapping = new Dictionary<IHandModel, ModelGroup>();
     private Dictionary<IHandModel, HandRepresentation> modelToHandRepMapping = new Dictionary<IHandModel, HandRepresentation>();
     /**
-     * ModelGroup contains a left/right pair of IHandModel's 
+     * ModelGroup contains a left/right pair of IHandModel's
      * @param modelList The IHandModels available for use by HandRepresentations
      * @param modelsCheckedOut The IHandModels currently in use by active HandRepresentations
      * @param IsEnabled determines whether the ModelGroup is active at app Start(), though ModelGroup's are controlled with the EnableGroup() & DisableGroup methods.
@@ -77,7 +86,7 @@ namespace Leap.Unity {
             if (modelsCheckedOut[i].HandModelType == modelType && modelsCheckedOut[i].Handedness == chirality) {
               IHandModel modelToSpawn = modelsCheckedOut[i];
               IHandModel spawnedModel = GameObject.Instantiate(modelToSpawn);
-              spawnedModel.transform.parent = _handPool.ModelsParent;
+              spawnedModel.transform.parent = _handPool.modelsParent;
               _handPool.modelGroupMapping.Add(spawnedModel, this);
               modelsCheckedOut.Add(spawnedModel);
               return spawnedModel;
@@ -127,10 +136,10 @@ namespace Leap.Unity {
     }
     /** Popuates the ModelPool with the contents of the ModelCollection */
     void Start() {
-      if (ModelsParent == null) {
+      if (modelsParent == null) {
         Debug.LogWarning("HandPool.ModelsParent needs to reference the parent transform of the hand models.  This transform should be a child of the LMHeadMountedRig transform.");
       }
-      
+
       for(int i=0; i<ModelPool.Count; i++) {
         InitializeModelGroup(ModelPool[i]);
       }
@@ -141,7 +150,7 @@ namespace Leap.Unity {
         if (modelGroupMapping.ContainsValue(collectionGroup)) {
           return;
         }
-        
+
         collectionGroup._handPool = this;
         IHandModel leftModel;
         IHandModel rightModel;
@@ -149,7 +158,7 @@ namespace Leap.Unity {
           IHandModel modelToSpawn = collectionGroup.LeftModel;
           GameObject spawnedGO = Instantiate(modelToSpawn.gameObject);
           leftModel = spawnedGO.GetComponent<IHandModel>();
-          leftModel.transform.parent = ModelsParent;
+          leftModel.transform.parent = modelsParent;
         } else {
           leftModel = collectionGroup.LeftModel;
         }
@@ -162,7 +171,7 @@ namespace Leap.Unity {
           IHandModel modelToSpawn = collectionGroup.RightModel;
           GameObject spawnedGO = Instantiate(modelToSpawn.gameObject);
           rightModel = spawnedGO.GetComponent<IHandModel>();
-          rightModel.transform.parent = ModelsParent;
+          rightModel.transform.parent = modelsParent;
         } else {
           rightModel = collectionGroup.RightModel;
         }

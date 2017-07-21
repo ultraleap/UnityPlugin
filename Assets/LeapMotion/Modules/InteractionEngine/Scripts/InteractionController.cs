@@ -1119,6 +1119,7 @@ namespace Leap.Unity.Interaction {
               //NotifySoftContactOverlap(contactBone, _softContactColliderBuffer[i]);
 
               // Skip soft contact if the object is ignoring contact
+              if (_softContactColliderBuffer[i].attachedRigidbody == null) continue;
               if (manager.interactionObjectBodies[_softContactColliderBuffer[i].attachedRigidbody].ignoreContact) continue;
 
               PhysicsUtility.generateSphereContact(boneSphere, 0, _softContactColliderBuffer[i],
@@ -1141,6 +1142,7 @@ namespace Leap.Unity.Interaction {
               //NotifySoftContactOverlap(contactBone, _softContactColliderBuffer[i]);
 
               // Skip soft contact if the object is ignoring contact
+              if (_softContactColliderBuffer[i].attachedRigidbody == null) continue;
               if (manager.interactionObjectBodies[_softContactColliderBuffer[i].attachedRigidbody].ignoreContact) continue;
 
               PhysicsUtility.generateCapsuleContact(boneCapsule, 0,
@@ -1169,6 +1171,7 @@ namespace Leap.Unity.Interaction {
               //NotifySoftContactOverlap(contactBone, _softContactColliderBuffer[i]);
 
               // Skip soft contact if the object is ignoring contact
+              if (_softContactColliderBuffer[i].attachedRigidbody == null) continue;
               if (manager.interactionObjectBodies[_softContactColliderBuffer[i].attachedRigidbody].ignoreContact) continue;
 
               PhysicsUtility.generateBoxContact(boneBox, 0, _softContactColliderBuffer[i],

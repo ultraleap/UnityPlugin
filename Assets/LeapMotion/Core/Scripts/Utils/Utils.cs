@@ -330,6 +330,27 @@ namespace Leap.Unity {
       return new Vector4(A.x / B.x, A.y / B.y, A.z / B.z, A.w / B.w);
     }
 
+    /// <summary>
+    /// Returns the sum of the components of the input vector.
+    /// </summary>
+    public static float CompSum(this Vector2 v) {
+      return v.x + v.y;
+    }
+
+    /// <summary>
+    /// Returns the sum of the components of the input vector.
+    /// </summary>
+    public static float CompSum(this Vector3 v) {
+      return v.x + v.y + v.z;
+    }
+
+    /// <summary>
+    /// Returns the sum of the components of the input vector.
+    /// </summary>
+    public static float CompSum(this Vector4 v) {
+      return v.x + v.y + v.z + v.w;
+    }
+
     #endregion
 
     #region Transform Utils

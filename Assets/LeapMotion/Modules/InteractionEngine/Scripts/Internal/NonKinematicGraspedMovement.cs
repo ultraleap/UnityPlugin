@@ -25,17 +25,19 @@ namespace Leap.Unity.Interaction {
 
     protected float _maxVelocity = 6F;
 
-    private bool _useLastSolvedPosition = false;
-    private Vector3 _lastSolvedPosition = Vector3.zero;
+    private Vector3 _lastSolvedCoMPosition = Vector3.zero;
     protected AnimationCurve _strengthByDistance = new AnimationCurve(new Keyframe(0.0f, 1.0f, 0.0f, 0.0f),
                                                                       new Keyframe(0.02f, 0.3f, 0.0f, 0.0f));
 
     public void MoveTo(Vector3 solvedPosition, Quaternion solvedRotation,
                        InteractionBehaviour intObj, bool justGrasped) {
-      Vector3 targetVelocity = PhysicsUtility.ToLinearVelocity(intObj.rigidbody.position, solvedPosition, Time.fixedDeltaTime);
+      Vector3 solvedCenterOfMass = solvedRotation * intObj.rigidbody.centerOfMass + solvedPosition;
+      Vector3 currCenterOfMass = intObj.rigidbody.rotation * intObj.rigidbody.centerOfMass + intObj.rigidbody.position;
+
+      Vector3 targetVelocity = PhysicsUtility.ToLinearVelocity(currCenterOfMass, solvedCenterOfMass, Time.fixedDeltaTime);
       Vector3 targetAngularVelocity = PhysicsUtility.ToAngularVelocity(intObj.rigidbody.rotation, solvedRotation, Time.fixedDeltaTime);
 
-      // Clamp by _maxVelocity.
+      // Clamp targetVelocity by _maxVelocity.
       float maxScaledVelocity = _maxVelocity * intObj.manager.SimulationScale;
       float targetSpeedSqrd = targetVelocity.sqrMagnitude;
       if (targetSpeedSqrd > maxScaledVelocity * maxScaledVelocity) {
@@ -44,21 +46,19 @@ namespace Leap.Unity.Interaction {
         targetAngularVelocity *= targetPercent;
       }
 
-      _useLastSolvedPosition = !justGrasped;
       float followStrength = 1F;
-      if (_useLastSolvedPosition) {
-        float remainingDistanceLastFrame = Vector3.Distance(_lastSolvedPosition, intObj.rigidbody.position);
+      if (!justGrasped) {
+        float remainingDistanceLastFrame = Vector3.Distance(_lastSolvedCoMPosition, currCenterOfMass);
         followStrength = _strengthByDistance.Evaluate(remainingDistanceLastFrame / intObj.manager.SimulationScale);
       }
 
       Vector3 lerpedVelocity = Vector3.Lerp(intObj.rigidbody.velocity, targetVelocity, followStrength);
       Vector3 lerpedAngularVelocity = Vector3.Lerp(intObj.rigidbody.angularVelocity, targetAngularVelocity, followStrength);
 
-      Vector3 centerOfMassOffset = intObj.rigidbody.rotation * intObj.rigidbody.centerOfMass;
-      intObj.rigidbody.velocity = lerpedVelocity + Vector3.Cross(lerpedAngularVelocity, centerOfMassOffset);
+      intObj.rigidbody.velocity = lerpedVelocity;
       intObj.rigidbody.angularVelocity = lerpedAngularVelocity;
 
-      _lastSolvedPosition = solvedPosition;
+      _lastSolvedCoMPosition = currCenterOfMass;
     }
   }
 
