@@ -7,8 +7,10 @@
  * between Leap Motion and you, your company or other organization.           *
  ******************************************************************************/
 
+using System;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.Serialization;
 
 namespace Leap.Unity.Interaction {
 
@@ -25,6 +27,9 @@ namespace Leap.Unity.Interaction {
     [SerializeField]
     private bool _toggled = false;
 
+    [SerializeField]
+    private bool _startToggled = false;
+
     ///<summary> Whether or not this toggle is currently toggled. </summary>
     public bool toggled {
       get {
@@ -34,9 +39,9 @@ namespace Leap.Unity.Interaction {
         if (_toggled != value) {
           _toggled = value;
           if (_toggled) {
-            toggleEvent.Invoke();
+            OnToggle();
           } else {
-            unToggleEvent.Invoke();
+            OnUntoggle();
           }
           restingHeight = toggled ? toggledRestingHeight : _originalRestingHeight;
           rigidbody.WakeUp();
@@ -46,31 +51,49 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    ///<summary> Triggered when this toggle is togggled. </summary>
-    public UnityEvent toggleEvent = new UnityEvent();
-    ///<summary> Triggered when this toggle is untogggled. </summary>
-    public UnityEvent unToggleEvent = new UnityEvent();
+    ///<summary> Triggered when this toggle is toggled. </summary>
+    [FormerlySerializedAs("toggleEvent")]
+    [SerializeField]
+    private UnityEvent _toggleEvent = new UnityEvent();
 
-    ///<summary> The minimum and maximum heights the button can exist at. </summary>
+    /// <summary>
+    /// Called when the toggle is ticked (not when unticked; for that, use OnUntoggle.)
+    /// </summary>
+    public Action OnToggle = () => { };
+
+    ///<summary> Triggered when this toggle is untoggled. </summary>
+    [FormerlySerializedAs("unToggleEvent")]
+    [SerializeField]
+    public UnityEvent _untoggleEvent = new UnityEvent();
+
+    /// <summary>
+    /// Called when the toggle is unticked.
+    /// </summary>
+    public Action OnUntoggle = () => { };
+    
     private float _originalRestingHeight;
 
     protected override void Start() {
-      _originalRestingHeight = restingHeight;
-      if (toggled) {
-        restingHeight = toggledRestingHeight;
-        toggleEvent.Invoke();
-      }
       base.Start();
+
+      _originalRestingHeight = restingHeight;
+
+      if (_startToggled) {
+        toggled = true;
+      }
+
+      OnToggle += _toggleEvent.Invoke;
+      OnUntoggle += _untoggleEvent.Invoke;
     }
 
     protected override void OnEnable() {
-      OnPress.AddListener(OnPressed);
+      OnPress += OnPressed;
       base.OnEnable();
     }
 
     protected override void OnDisable() {
       base.OnDisable();
-      OnPress.RemoveListener(OnPressed);
+      OnPress -= OnPressed;
     }
 
     private void OnPressed() {

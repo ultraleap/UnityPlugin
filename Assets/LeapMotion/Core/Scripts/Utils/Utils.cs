@@ -194,6 +194,12 @@ namespace Leap.Unity {
       }
     }
 
+    public static bool ContainsNaN(this Vector3 v) {
+      return float.IsNaN(v.x)
+          || float.IsNaN(v.y)
+          || float.IsNaN(v.z);
+    }
+
     #endregion
 
     #region Value Mapping Utils
