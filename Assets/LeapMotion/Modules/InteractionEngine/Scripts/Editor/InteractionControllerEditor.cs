@@ -19,20 +19,15 @@ namespace Leap.Unity.Interaction {
   [CustomEditor(typeof(InteractionController), true)]
   public class InteractionControllerEditor : CustomEditorBase<InteractionController> {
 
-    protected override void OnEnable() {
-      base.OnEnable();
-
-      specifyCustomDecorator("primaryHoverPoints", checkPrimaryHoverPoints);
-    }
-
     public override void OnInspectorGUI() {
       checkParentedToManager();
       checkWithinHandPoolParent();
+      checkPrimaryHoverPoints();
 
       base.OnInspectorGUI();
     }
 
-    private void checkPrimaryHoverPoints(SerializedProperty property) {
+    private void checkPrimaryHoverPoints() {
       bool anyPrimaryHoverPoints = false;
       bool anyWithNoPrimaryHoverPoints = false;
       foreach (var singleTarget in targets) {
