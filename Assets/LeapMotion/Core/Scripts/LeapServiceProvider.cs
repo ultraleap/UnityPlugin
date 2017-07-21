@@ -144,10 +144,7 @@ namespace Leap.Unity {
     }
 
     protected virtual void Reset() {
-      bool shouldEnableHeadMounted;
-      checkIsHeadMounted(out shouldEnableHeadMounted);
-
-      if (shouldEnableHeadMounted) {
+      if (checkShouldEnableHeadMounted()) {
         _isHeadMounted = true;
       }
       
@@ -162,7 +159,7 @@ namespace Leap.Unity {
     }
 
     protected virtual void Start() {
-      checkIsHeadMounted();
+      checkShouldEnableHeadMounted();
 
       createController();
       _transformedUpdateFrame = new Frame();
@@ -267,12 +264,7 @@ namespace Leap.Unity {
       resetTransforms();
     }
 
-    private void checkIsHeadMounted() {
-      bool unused;
-      checkIsHeadMounted(out unused);
-    }
-
-    private void checkIsHeadMounted(out bool shouldEnable) {
+    private bool checkShouldEnableHeadMounted() {
       if (UnityEngine.VR.VRSettings.enabled) {
         var parentCamera = GetComponentInParent<Camera>();
         if (parentCamera != null && parentCamera.stereoTargetEye != StereoTargetEyeMask.None) {
@@ -285,11 +277,11 @@ namespace Leap.Unity {
                            + "if the Leap is mounted or attached to your VR headset!",
                              this);
             }
-            shouldEnable = true;
+            return true;
           }
         }
       }
-      shouldEnable = false;
+      return false;
     }
 
     /*
