@@ -335,7 +335,7 @@ namespace Leap.Unity.Examples {
 
       // Calculate a placement position along the placement direction between min and max placement distances.
       float minPlacementDistance = 0.25F;
-      float maxPlacementDistance = 0.55F;
+      float maxPlacementDistance = 0.51F;
       Vector3 placementPosition = userEyePosition + placementDirection * Mathf.Lerp(minPlacementDistance, maxPlacementDistance,
                                                                                     (groundPlaneDirectedness * workstationObjInitVelocity.magnitude)
                                                                                     .Map(0F, 1.50F, 0F, 1F));

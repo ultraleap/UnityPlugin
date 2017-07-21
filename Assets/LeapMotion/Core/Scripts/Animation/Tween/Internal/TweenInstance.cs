@@ -55,6 +55,8 @@ namespace Leap.Unity.Animation.Internal {
       yieldInstruction = new TweenYieldInstruction(this);
     }
 
+    public void OnRecycle() { }
+
     public void ResetDefaults() {
       returnToPoolUponStop = true;
 

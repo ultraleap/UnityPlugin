@@ -13,21 +13,21 @@ using Leap.Unity.RuntimeGizmos;
 using Leap.Unity.Query;
 using Leap.Unity.Interaction.Internal;
 using System;
-using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
+
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
-using UnityEngine;
 
 namespace Leap.Unity.Interaction {
 
-  [Serializable]
-  public class InteractionControllerSet : SerializableHashSet<InteractionController> { }
-
   [DisallowMultipleComponent]
   [ExecuteInEditMode]
-  public class InteractionManager : MonoBehaviour, IRuntimeGizmoComponent {
+  public class InteractionManager : MonoBehaviour, IInternalInteractionManager,
+                                                   IRuntimeGizmoComponent {
+
+    #region Inspector
 
     // Header "Interaction Controllers" via InteractionManagerEditor.cs.
     [SerializeField]
@@ -63,7 +63,7 @@ namespace Leap.Unity.Interaction {
     [Header("Layer Settings")]
     [Tooltip("Whether or not to create the layers used for interaction when the scene "
            + "runs. Interactions require an interaction layer (for objects), a grasped "
-           + "object layer, and a contact bone layer (for interaction controller 'bone'"
+           + "object layer, and a contact bone layer (for interaction controller 'bone' "
            + "colliders). Keep this checked to have these layers created for you, but be "
            + "aware that the generated layers will have blank names due to Unity "
            + "limitations.")]
@@ -111,9 +111,17 @@ namespace Leap.Unity.Interaction {
            + "in the scene.")]
     private bool _drawControllerRuntimeGizmos = false;
 
+    #endregion
+
+    #region Events
+
     public Action OnGraphicalUpdate = () => { };
     public Action OnPrePhysicalUpdate = () => { };
     public Action OnPostPhysicalUpdate = () => { };
+
+    #endregion
+
+    #region Scale Support
 
     private float _scale = 1F;
 
@@ -136,9 +144,13 @@ namespace Leap.Unity.Interaction {
     /// </summary>
     public float SimulationScale { get { return _scale; } }
 
+    #endregion
+
+    #region Object Tracking
+
     private HashSet<IInteractionBehaviour> _interactionObjects = new HashSet<IInteractionBehaviour>();
     /// <summary>
-    /// Gets a set of all interaction objects currently registered with this Interaction 
+    /// Gets a set of all interaction objects currently registered with this Interaction
     /// Manager.
     /// </summary>
     public ReadonlyHashSet<IInteractionBehaviour> interactionObjects {
@@ -161,7 +173,7 @@ namespace Leap.Unity.Interaction {
 
     private Dictionary<Rigidbody, ContactBone> _contactBoneBodies;
     /// <summary>
-    /// Maps a Rigidbody to its attached ContactBone, if the Rigidbody is part of an 
+    /// Maps a Rigidbody to its attached ContactBone, if the Rigidbody is part of an
     /// interaction controller.
     /// </summary>
     public Dictionary<Rigidbody, ContactBone> contactBoneBodies {
@@ -173,19 +185,23 @@ namespace Leap.Unity.Interaction {
       }
     }
 
+    #endregion
+
+    #region Singleton Pattern (Optional)
+
     private static InteractionManager s_instance;
     /// <summary> Often, only one InteractionManager is necessary per Unity scene.
     /// This property will contain that InteractionManager as soon as its Awake()
     /// method is called. Using more than one InteractionManager is valid, but be
     /// sure to assign any InteractionBehaviour's desired manager appropriately.
     /// </summary>
-    /// 
+    ///
     /// <remarks> By default, this static property contains the first InteractionManager
     /// that has had its Awake() method called in the current scene. If an
     /// InteractionBehaviourBase does not have a non-null interactionManager by the
     /// time it has Start() called, it will default to using the InteractionManager
     /// referenced here.
-    /// 
+    ///
     /// If you have multiple InteractionManagers in your scene, you should be sure to
     /// assign InteractionBehaviours' managers appropriately. If you instantiate an
     /// InteractionBehaviour at runtime, you should assign its InteractionManager
@@ -197,6 +213,10 @@ namespace Leap.Unity.Interaction {
       }
       set { s_instance = value; }
     }
+
+    #endregion
+
+    #region Unity Events
 
     void OnValidate() {
       if (!Application.isPlaying && _autoGenerateLayers) {
@@ -211,7 +231,13 @@ namespace Leap.Unity.Interaction {
       if (InteractionPreferences.shouldPrompForGravity && Application.isPlaying) {
         float magnitude = Physics.gravity.y;
         if (Mathf.Abs(magnitude) > InteractionPreferences.MAX_GRAVITY_MAGNITUDE) {
-          if (!EditorUtility.DisplayDialog("Gravity magnitude too strong!", "Your gravity magnitude is " + magnitude + " which is stronger than the recommended value of -4.905!\n\nGo to Edit->Project Settings->Physics to change the magnitude.", "Ok", "Don't Show Again")) {
+          if (EditorUtility.DisplayDialog("Gravity magnitude too strong!",
+                                          "Your gravity magnitude is " + magnitude
+                                        + " which is stronger than the recommended value "
+                                        + "of -4.905!\n\nGo to Edit/Project Settings/Physics "
+                                        + "to change the magnitude.",
+                                          "I understand, don't show this again",
+                                          "OK, I'll go fix it")) {
             InteractionPreferences.shouldPrompForGravity = false;
           }
           EditorApplication.isPlaying = false;
@@ -222,7 +248,13 @@ namespace Leap.Unity.Interaction {
       if (InteractionPreferences.shouldPrompForPhysicsTimestep && Application.isPlaying) {
         if (Time.fixedDeltaTime > InteractionPreferences.MAX_TIMESTEP + Mathf.Epsilon) {
           float roundedTimestep = (float)Math.Round(InteractionPreferences.MAX_TIMESTEP, 4);
-          if (!EditorUtility.DisplayDialog("Timestep too slow!", "Your fixed timestep is " + Time.fixedDeltaTime + ", which is slower than the recommended value of " + roundedTimestep + ".\n\nGo to Edit->ProjectSettings->Time to change the fixed timestep.", "Ok", "Don't Show Again")) {
+          if (EditorUtility.DisplayDialog("Timestep too slow!",
+                                           "Your fixed timestep is " + Time.fixedDeltaTime
+                                         + ", which is slower than the recommended value "
+                                         + "of " + roundedTimestep + ".\n\nGo to Edit/Project Settings/Time "
+                                         + "to change the fixed timestep.",
+                                           "I understand, don't show this again",
+                                           "OK, I'll go fix it")) {
             InteractionPreferences.shouldPrompForPhysicsTimestep = false;
           }
           EditorApplication.isPlaying = false;
@@ -313,11 +345,17 @@ namespace Leap.Unity.Interaction {
       OnPostPhysicalUpdate();
 
       updateMovingFrameOfReferenceSupport();
+
+      if (autoGenerateLayers) {
+        autoUpdateContactBoneLayerCollision();
+      }
     }
 
     void LateUpdate() {
       OnGraphicalUpdate();
     }
+
+    #endregion
 
     #region Controller Interaction State & Callbacks Update
 
@@ -353,16 +391,16 @@ namespace Leap.Unity.Interaction {
 
       using (new ProfilerSample("Fixed Update Controllers (Interaction State and Callbacks)")) {
 
-        /* 
+        /*
          * Interactions are checked here in a very specific manner so that interaction
          * callbacks always occur in a strict order and interaction object state is
          * always updated directly before the relevant callbacks occur.
-         * 
+         *
          * Interaction callbacks will only occur outside this order if a script
          * manually forces interaction state-changes; for example, calling
          * interactionController.ReleaseGrasp() will immediately call
          * interactionObject.OnPerControllerGraspEnd() on the formerly grasped object.
-         * 
+         *
          * Callback order:
          * - Suspension (when a grasped object's grasping controller loses tracking)
          * - Just-Ended Interactions (Grasps, then Contacts, then Hovers)
@@ -748,8 +786,9 @@ namespace Leap.Unity.Interaction {
 
     /// <summary>
     /// Transforms a position and rotation ahead by one FixedUpdate based on the prior
-    /// motion of the InteractionManager. Use this if your player/InteractionManager's
-    /// frame of reference is moving.
+    /// motion of the InteractionManager.
+    ///
+    /// This method is used to support having the player in a moving frame of reference.
     /// </summary>
     public void TransformAheadByFixedUpdate(Vector3 position, Quaternion rotation, out Vector3 newPosition, out Quaternion newRotation) {
       Vector3 worldDisplacement = this.transform.position - _prevPosition;
@@ -758,9 +797,19 @@ namespace Leap.Unity.Interaction {
       newRotation = worldRotation * rotation;
     }
 
-    #endregion
+    /// <summary>
+    /// Transforms a position ahead by one FixedUpdate based on the prior motion (position
+    /// AND rotation) of the InteractionManager.
+    ///
+    /// This method is used to support having the player in a moving frame of reference.
+    /// </summary>
+    public void TransformAheadByFixedUpdate(Vector3 position, out Vector3 newPosition) {
+      Vector3 worldDisplacement = this.transform.position - _prevPosition;
+      Quaternion worldRotation = this.transform.rotation * Quaternion.Inverse(_prevRotation);
+      newPosition = ((worldRotation * (position - this.transform.position + worldDisplacement))) + this.transform.position;
+    }
 
-    #region Internal
+    #endregion
 
     #region Soft Contact Support
 
@@ -783,17 +832,24 @@ namespace Leap.Unity.Interaction {
     private void refreshInteractionControllers() {
       _interactionControllers.Clear();
 
-      foreach (var controller in this.transform.GetChildren()
-                                               .Query()
-                                               .Select(g => g.GetComponent<InteractionController>())
-                                               .Where(c => c != null && c.gameObject.activeSelf)) {
-        _interactionControllers.Add(controller);
+      var tempControllers = Pool<List<InteractionController>>.Spawn();
+      try {
+        this.transform.GetComponentsInChildren<InteractionController>(false, tempControllers);
+        foreach (var controller in tempControllers) {
+          _interactionControllers.Add(controller);
+        }
+      }
+      finally {
+        tempControllers.Clear();
+        Pool<List<InteractionController>>.Recycle(tempControllers);
       }
     }
 
     #endregion
 
     #region Layers
+
+    #region Automatic Layers
 
     protected void generateAutomaticLayers() {
       _interactionLayer = -1;
@@ -804,9 +860,11 @@ namespace Leap.Unity.Interaction {
         if (string.IsNullOrEmpty(layerName)) {
           if (_interactionLayer == -1) {
             _interactionLayer = i;
-          } else if (_interactionNoContactLayer == -1) {
+          }
+          else if (_interactionNoContactLayer == -1) {
             _interactionNoContactLayer = i;
-          } else if (_contactBoneLayer == -1) {
+          }
+          else if (_contactBoneLayer == -1) {
             _contactBoneLayer = i;
             break;
           }
@@ -831,12 +889,127 @@ namespace Leap.Unity.Interaction {
         Physics.IgnoreLayerCollision(_interactionLayer, i, shouldIgnore);
         Physics.IgnoreLayerCollision(_interactionNoContactLayer, i, shouldIgnore);
 
-        // Set brush layer to collide with nothing
+        // Contact bones, generally, shouldn't collide with anything except interaction
+        // layers.
         Physics.IgnoreLayerCollision(_contactBoneLayer, i, true);
       }
 
-      //After copy and set we enable the interaction between the brushes and interaction objects
+      // Enable interactions between the contact bones and the interaction layer.
       Physics.IgnoreLayerCollision(_contactBoneLayer, _interactionLayer, false);
+
+      // Disable interactions between the contact bones and the no-contact layer.
+      Physics.IgnoreLayerCollision(_contactBoneLayer, _interactionNoContactLayer, true);
+    }
+
+    #endregion
+
+    #region Interaction Object Layer Tracking
+
+    private Dictionary<SingleLayer, HashSet<IInteractionBehaviour>> _intObjInteractionLayers = new Dictionary<SingleLayer, HashSet<IInteractionBehaviour>>();
+    private Dictionary<SingleLayer, HashSet<IInteractionBehaviour>> _intObjNoContactLayers   = new Dictionary<SingleLayer, HashSet<IInteractionBehaviour>>();
+
+    private int _interactionLayerMask = 0;
+    /// <summary>
+    /// Returns a layer mask containing all layers that might contain interaction objects.
+    /// </summary>
+    public int GetInteractionLayerMask() {
+      return _interactionLayerMask;
+    }
+
+    private void refreshInteractionLayerMask() {
+      _interactionLayerMask = 0;
+
+      // Accumulate single-layer layer masks into the combined interaction layer mask.
+      foreach (var layerObjSetPair in _intObjInteractionLayers) {
+        // Skip any layers that may no longer have interaction objects.
+        if (layerObjSetPair.Value.Count == 0) continue;
+
+        _interactionLayerMask = layerObjSetPair.Key.layerMask | _interactionLayerMask;
+      }
+      foreach (var layerObjSetPair in _intObjNoContactLayers) {
+        // Skip any layers that may no longer have interaction objects.
+        if (layerObjSetPair.Value.Count == 0) continue;
+
+        _interactionLayerMask = layerObjSetPair.Key.layerMask | _interactionLayerMask;
+      }
+    }
+
+    private bool[] _contactBoneIgnoreCollisionLayers = new bool[32];
+    /// <summary>
+    /// Updates the contact bone layer to collide against any layers that may contain
+    /// interaction objects and ignore any layers that don't.
+    ///
+    /// (Obviously, this ignores NoContact layers.)
+    /// </summary>
+    private void autoUpdateContactBoneLayerCollision() {
+      // Make sure we ignore all layers by default!
+      for (int i = 0; i < 32; i++) {
+        _contactBoneIgnoreCollisionLayers[i] = true;
+      }
+
+      // Ignore everything except those layers that we know are at least one
+      // interaction object's interaction layer.
+      foreach (var layerObjSetPair in _intObjInteractionLayers) {
+        bool ignoreLayerCollision;
+
+        if (layerObjSetPair.Value.Count == 0) {
+          ignoreLayerCollision = true;
+        }
+        else {
+          ignoreLayerCollision = false;
+        }
+
+        _contactBoneIgnoreCollisionLayers[layerObjSetPair.Key.layerIndex] = ignoreLayerCollision;
+      }
+
+      for (int i = 0; i < 32; i++) {
+        Physics.IgnoreLayerCollision(contactBoneLayer.layerIndex, i,
+                                     _contactBoneIgnoreCollisionLayers[i]);
+      }
+    }
+
+    void IInternalInteractionManager.RefreshLayersNow() {
+      refreshInteractionLayerMask();
+    }
+
+    void IInternalInteractionManager.NotifyIntObjAddedInteractionLayer(IInteractionBehaviour intObj, int layer, bool refreshImmediately) {
+      if (!_intObjInteractionLayers.ContainsKey(layer)) {
+        _intObjInteractionLayers[layer] = new HashSet<IInteractionBehaviour>();
+      }
+
+      _intObjInteractionLayers[layer].Add(intObj);
+
+      if (refreshImmediately) {
+        refreshInteractionLayerMask();
+      }
+    }
+
+    void IInternalInteractionManager.NotifyIntObjRemovedInteractionLayer(IInteractionBehaviour intObj, int layer, bool refreshImmediately) {
+      _intObjInteractionLayers[layer].Remove(intObj);
+
+      if (refreshImmediately) {
+        refreshInteractionLayerMask();
+      }
+    }
+
+    void IInternalInteractionManager.NotifyIntObjAddedNoContactLayer(IInteractionBehaviour intObj, int layer, bool refreshImmediately) {
+      if (!_intObjNoContactLayers.ContainsKey(layer)) {
+        _intObjNoContactLayers[layer] = new HashSet<IInteractionBehaviour>();
+      }
+
+      _intObjNoContactLayers[layer].Add(intObj);
+
+      if (refreshImmediately) {
+        refreshInteractionLayerMask();
+      }
+    }
+
+    void IInternalInteractionManager.NotifyIntObjRemovedNoContactLayer(IInteractionBehaviour intObj, int layer, bool refreshImmediately) {
+      _intObjNoContactLayers[layer].Remove(intObj);
+
+      if (refreshImmediately) {
+        refreshInteractionLayerMask();
+      }
     }
 
     #endregion

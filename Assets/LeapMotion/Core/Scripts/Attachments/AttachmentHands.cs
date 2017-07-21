@@ -124,7 +124,7 @@ namespace Leap.Unity.Attachments {
           #if UNITY_EDITOR
           if (Hands.Provider != null) {
             if (leapHand == null && !Application.isPlaying) {
-              leapHand = TestHandFactory.MakeTestHand(0, i, i == 0).TransformedCopy(UnityMatrixExtension.GetLeapMatrix(Hands.Provider.transform));
+              leapHand = Hands.Provider.MakeTestHand(attachmentHand.chirality == Chirality.Left);
             }
           }
           #endif

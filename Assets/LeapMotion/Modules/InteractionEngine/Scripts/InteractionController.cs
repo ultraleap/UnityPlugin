@@ -19,6 +19,9 @@ using Leap.Unity.Attributes;
 
 namespace Leap.Unity.Interaction {
 
+  [Serializable]
+  public class InteractionControllerSet : SerializableHashSet<InteractionController> { }
+
   /// <summary>
   /// Specified on a per-object basis to allow Interaction objects
   /// to ignore hover for the left hand, right hand, or both hands.
@@ -35,6 +38,8 @@ namespace Leap.Unity.Interaction {
   [DisallowMultipleComponent]
   public abstract class InteractionController : MonoBehaviour,
                                                 IInternalInteractionController {
+
+    #region Inspector
 
     [Tooltip("The manager responsible for this interaction controller. Interaction "
            + "controllers should be children of their interaction manager.")]
@@ -60,7 +65,7 @@ namespace Leap.Unity.Interaction {
         }
       }
     }
-    
+
     [Tooltip("If disabled, this interaction controller will not collide with interaction "
            + "objects and objects will not receive contact callbacks.")]
     [SerializeField]
@@ -101,8 +106,12 @@ namespace Leap.Unity.Interaction {
       }
     }
 
+    #endregion
+
+    #region Public API
+
     /// <summary>
-    /// Gets whether the underlying object (Leap hand or a held controller) is currently 
+    /// Gets whether the underlying object (Leap hand or a held controller) is currently
     /// in a tracked state. Objects grasped by a controller that becomes untracked will
     /// become "suspended" and receive specific suspension callbacks. (Implementing any
     /// behaviour during the suspension state is left up to the developer, however.)
@@ -110,7 +119,7 @@ namespace Leap.Unity.Interaction {
     public abstract bool isTracked { get; }
 
     /// <summary>
-    /// Gets whether the underlying object (Leap hand or a held controller) is currently 
+    /// Gets whether the underlying object (Leap hand or a held controller) is currently
     /// being moved or being actively manipulated by the player.
     /// </summary>
     public abstract bool isBeingMoved { get; }
@@ -139,7 +148,7 @@ namespace Leap.Unity.Interaction {
     /// from.
     /// </summary>
     public abstract ControllerType controllerType { get; }
-    
+
     /// <summary>
     /// If this InteractionController's controllerType is ControllerType.Hand,
     /// this gets the InteractionHand, otherwise this returns null.
@@ -152,8 +161,7 @@ namespace Leap.Unity.Interaction {
     /// </summary>
     public float scale { get { return this.transform.lossyScale.x; } }
 
-    // A list of InteractionControllers for use as a temporary buffer.
-    private List<InteractionController> _controllerListBuffer = new List<InteractionController>();
+    #endregion
 
     #region Events
 
@@ -180,6 +188,8 @@ namespace Leap.Unity.Interaction {
 
     #endregion
 
+    #region Unity Events
+
     protected virtual void OnEnable() {
       if (_contactInitialized) {
         EnableSoftContact();
@@ -202,6 +212,11 @@ namespace Leap.Unity.Interaction {
       ClearPrimaryHoverTracking();
       ClearContactTracking();
     }
+
+    #endregion
+
+    // A list of InteractionControllers for use as a temporary buffer.
+    private List<InteractionController> _controllerListBuffer = new List<InteractionController>();
 
     /// <summary>
     /// Called by the InteractionManager every fixed (physics) frame to populate the
@@ -231,6 +246,13 @@ namespace Leap.Unity.Interaction {
     /// </summary>
     protected abstract void onObjectUnregistered(IInteractionBehaviour intObj);
 
+    /// <summary>
+    /// Called just before the InteractionController proceeds with its usual FixedUpdate.
+    ///
+    /// It's generally better to override this method instead of having your
+    /// InteractionController implement FixedUpdate because its execution order relative
+    /// to the Interaction Manager is fixed.
+    /// </summary>
     protected virtual void fixedUpdateController() { }
 
     #region Hovering
@@ -257,18 +279,21 @@ namespace Leap.Unity.Interaction {
       else return null;
     }
 
+    // Layer mask for the hover acitivity manager.
+    private Func<int> hoverLayerMaskAccessor;
+
     // Hover Activity Manager
     private ActivityManager<IInteractionBehaviour> _hoverActivityManager;
     public ActivityManager<IInteractionBehaviour> hoverActivityManager {
       get {
         if (_hoverActivityManager == null) {
           if (hoverActivityFilter == null) hoverActivityFilter = hoverFilterFunc;
+          if (hoverLayerMaskAccessor == null) hoverLayerMaskAccessor = manager.GetInteractionLayerMask;
 
           _hoverActivityManager = new ActivityManager<IInteractionBehaviour>(manager.hoverActivationRadius,
                                                                              hoverActivityFilter);
 
-          _hoverActivityManager.activationLayerMask = manager.interactionLayer.layerMask
-                                                    | manager.interactionNoContactLayer.layerMask;
+          _hoverActivityManager.activationLayerFunction = hoverLayerMaskAccessor;
         }
         return _hoverActivityManager;
       }
@@ -285,6 +310,17 @@ namespace Leap.Unity.Interaction {
     public bool primaryHoverLocked {
       get { return _primaryHoverLocked; }
       set { _primaryHoverLocked = value; }
+    }
+
+    /// <summary>
+    /// Sets the argument interaction object to be the current primary hover of this
+    /// interaction controller and locks the primary hover state of the interaction
+    /// controller.
+    /// <see cref="primaryHoverLocked"/>
+    /// </summary>
+    public void LockPrimaryHover(InteractionBehaviour intObj) {
+      _primaryHoveredObject = intObj;
+      _primaryHoverLocked = true;
     }
 
     /// <summary>
@@ -358,18 +394,16 @@ namespace Leap.Unity.Interaction {
           _primaryHoverLocked = false;
         }
 
-        // Update hover state if it's not currently locked.
-        if (!primaryHoverLocked) {
-          hoverActivityManager.activationRadius = manager.WorldHoverActivationRadius;
+        // Update hover state.
+        hoverActivityManager.activationRadius = manager.WorldHoverActivationRadius;
 
-          Vector3? queryPosition = isTracked ? (Vector3?)hoverPoint : null;
-          hoverActivityManager.UpdateActivityQuery(queryPosition, LeapSpace.allEnabled);
+        Vector3? queryPosition = isTracked ? (Vector3?)hoverPoint : null;
+        hoverActivityManager.UpdateActivityQuery(queryPosition, LeapSpace.allEnabled);
 
-          // Add all returned objects as "hovered".
-          // Find closest objects per primary hover point to update primary hover state.
-          using (new ProfilerSample("Find Closest Objects for Primary Hover")) {
-            refreshHoverState(_hoverActivityManager.ActiveObjects);
-          }
+        // Add all returned objects as "hovered".
+        // Find closest objects per primary hover point to update primary hover state.
+        using (new ProfilerSample("Find Closest Objects for Primary Hover")) {
+          refreshHoverState(_hoverActivityManager.ActiveObjects);
         }
 
         // Refresh buffer information from the previous frame to be able to fire
@@ -401,10 +435,10 @@ namespace Leap.Unity.Interaction {
     /// Warps the collider transforms of this controller by the inverse of the
     /// transformation that is applied on the provided warpedSpaceElement, using
     /// the primaryHoverPoint as the pivot transform for the transformation.
-    /// 
+    ///
     /// ITransformer.WorldSpaceUnwarp is a useful method here. (ISpaceComponents
     /// contain references to their transformers via their anchors.)
-    /// 
+    ///
     /// ISpaceComponents denote game objects whose visual positions are warped
     /// from rectilinear (non-warped) space into a curved space (via, for example,
     /// a LeapCylindricalSpace, which can only be rendered correctly by the Leap
@@ -412,7 +446,7 @@ namespace Leap.Unity.Interaction {
     /// bringing it into the object's rectilinear space, allowing objects curved
     /// in this way to correctly collide with the bones in the hand or collider of
     /// a held controller.
-    /// 
+    ///
     /// The provided Transform is the closest primary hover point to any given
     /// primary hover candidate, so it is used as the pivot point for unwarping
     /// the colliders of this InteractionController.
@@ -433,6 +467,11 @@ namespace Leap.Unity.Interaction {
       int primaryHoverPointIdxLastFrame = _primaryHoveredLastFrame != null ? _primaryHoverPointIdx : -1;
 
       _hoveredObjects.Clear();
+
+      IInteractionBehaviour lockedPrimaryHoveredObject = null;
+      if (primaryHoverLocked) {
+        lockedPrimaryHoveredObject = _primaryHoveredObject;
+      }
       _primaryHoveredObject = null;
       _primaryHoverDistance = float.PositiveInfinity;
       _primaryHoverPointIdx = -1;
@@ -475,45 +514,63 @@ namespace Leap.Unity.Interaction {
         // optimization, since it can require a lot of distance checks.
         if (behaviour.ignorePrimaryHover) continue;
 
-        // Do further processing to determine the primary hover.
-        else {
+        // Do further processing to determine the primary hover if primary hover isn't
+        // locked.
+        else if (!primaryHoverLocked) {
+          processPrimaryHover(behaviour, maxNewPrimaryHoverDistance);
+        }
+      }
 
-          // Check against all positions currently registered as primary hover points,
-          // finding the closest one and updating hover data accordingly.
-          float shortestPointDistance = float.PositiveInfinity;
-          for (int i = 0; i < primaryHoverPoints.Count; i++) {
-            var primaryHoverPoint = primaryHoverPoints[i];
+      // If the primary hover is locked, we need to process primary hover specifically
+      // for the locked object.
+      if (primaryHoverLocked && lockedPrimaryHoveredObject != null) {
+        processPrimaryHover(lockedPrimaryHoveredObject, float.PositiveInfinity);
+      }
+    }
 
-            // It's possible to disable primary hover points to ignore them for hover
-            // consideration.
-            if (primaryHoverPoint == null) continue;
-            if (!primaryHoverPoint.gameObject.activeInHierarchy) continue;
+    private void processPrimaryHover(IInteractionBehaviour behaviour, float maxNewPrimaryHoverDistance) {
+      // Check against all positions currently registered as primary hover points,
+      // finding the closest one and updating hover data accordingly.
+      float shortestPointDistance = float.PositiveInfinity;
+      for (int i = 0; i < primaryHoverPoints.Count; i++) {
+        var primaryHoverPoint = primaryHoverPoints[i];
 
-            // Skip non-index fingers for InteractionHands if they aren't extended.
-            if (intHand != null) {
-              if (!(intHand.leapHand).Fingers[i].IsExtended && i != 1) { continue; }
-            }
+        // It's possible to disable primary hover points to ignore them for hover
+        // consideration.
+        if (primaryHoverPoint == null) continue;
+        if (!primaryHoverPoint.gameObject.activeInHierarchy) continue;
 
-            // Check primary hover for the primary hover point.
-            float behaviourDistance = GetHoverDistance(primaryHoverPoint.position, behaviour);
-            if (behaviourDistance < shortestPointDistance) {
+        // Skip non-index fingers for InteractionHands if they aren't extended.
+        if (intHand != null) {
+          if (!(intHand.leapHand).Fingers[i].IsExtended && i != 1) { continue; }
+        }
 
-              // This is the closest behaviour to this primary hover point.
-              _perPointPrimaryHovered[i] = behaviour;
-              _perPointPrimaryHoverDistance[i] = behaviourDistance;
-              shortestPointDistance = behaviourDistance;
+        // Check primary hover for the primary hover point.
+        float behaviourDistance = GetHoverDistance(primaryHoverPoint.position, behaviour);
+        if (behaviourDistance < shortestPointDistance) {
 
-              if (shortestPointDistance < _primaryHoverDistance
-                  && (behaviour == _primaryHoveredLastFrame || behaviourDistance < maxNewPrimaryHoverDistance)) {
+          // This is the closest behaviour to this primary hover point.
+          _perPointPrimaryHovered[i] = behaviour;
+          _perPointPrimaryHoverDistance[i] = behaviourDistance;
+          shortestPointDistance = behaviourDistance;
 
-                // This is the closest behaviour to ANY primary hover point, and the
-                // distance is less than the hysteresis distance to transition away from
-                // the previous primary hovered object.
-                _primaryHoveredObject = _perPointPrimaryHovered[i];
-                _primaryHoverDistance = _perPointPrimaryHoverDistance[i];
-                _primaryHoverPointIdx = i;
-              }
-            }
+          if (primaryHoverLocked) {
+            // If primary hover is locked, there's only one object to consider,
+            // and the current primary hover point is the closest one to the object
+            // so far, so update primary hover accordingly.
+            _primaryHoveredObject = _perPointPrimaryHovered[i]; // (redundant)
+            _primaryHoverDistance = _perPointPrimaryHoverDistance[i];
+            _primaryHoverPointIdx = i;
+          }
+          else if (shortestPointDistance < _primaryHoverDistance
+                   && (behaviour == _primaryHoveredLastFrame || behaviourDistance < maxNewPrimaryHoverDistance)) {
+
+            // This is the closest behaviour to ANY primary hover point, and the
+            // distance is less than the hysteresis distance to transition away from
+            // the previous primary hovered object.
+            _primaryHoveredObject = _perPointPrimaryHovered[i];
+            _primaryHoverDistance = _perPointPrimaryHoverDistance[i];
+            _primaryHoverPointIdx = i;
           }
         }
       }
@@ -555,7 +612,7 @@ namespace Leap.Unity.Interaction {
     /// <summary>
     /// Clears the hover tracking state for an object and fires the hover-end callback
     /// for that object immediately.
-    /// 
+    ///
     /// If the object is still in the hover radius of this controller and the controller
     /// and manager are still active, the hover will begin anew on the next fixed frame.
     /// </summary>
@@ -650,7 +707,7 @@ namespace Leap.Unity.Interaction {
 
     /// <summary>
     /// Clears primary hover tracking state for the current primary hovered object.
-    /// 
+    ///
     /// If the current primary hover is still the most eligible hovered object and this
     /// controller and its manager are still active, primary hover will begin anew on
     /// the next fixed frame.
@@ -775,7 +832,7 @@ namespace Leap.Unity.Interaction {
     #region Contact
 
     /// <summary>
-    /// Gets the set of interaction objects that are currently touching this 
+    /// Gets the set of interaction objects that are currently touching this
     /// interaction controller.
     /// </summary>
     public ReadonlyHashSet<IInteractionBehaviour> contactingObjects { get { return _contactBehavioursSet; } }
@@ -815,7 +872,7 @@ namespace Leap.Unity.Interaction {
 
     private bool _contactInitialized = false;
     protected bool _wasContactInitialized { get { return _contactInitialized; } }
-    protected abstract ContactBone[] contactBones { get; }
+    public abstract ContactBone[] contactBones { get; }
     protected abstract GameObject contactBoneParent { get; }
     protected float lastObjectTouchedAdjustedMassMass = 0.2f;
 
@@ -835,10 +892,10 @@ namespace Leap.Unity.Interaction {
     ///   contact colliders.
     ///   - (Construct the contact bone parent if it doesn't already exist.)
     /// - Return true if initialization was successful.
-    ///   
+    ///
     /// Contact will only begin updating after initialization succeeds, otherwise
     /// it will try to initialize again on the next fixed frame.
-    /// 
+    ///
     /// After initialization, the contact bone parent's layer will be set to
     /// the Interaction Manager's contactBoneLayer.
     /// </remarks>
@@ -891,12 +948,14 @@ namespace Leap.Unity.Interaction {
           contactBoneParent.SetActive(true);
         }
       }
-      
+
       // Request and store target bone positions and rotations
       // for use during the contact update.
-      for (int i = 0; i < contactBones.Length; i++) {
-        getColliderBoneTargetPositionRotation(i, out _boneTargetPositions[i],
-                                                 out _boneTargetRotations[i]);
+      using (new ProfilerSample("Update Contact Bone Targets")) {
+        for (int i = 0; i < contactBones.Length; i++) {
+          getColliderBoneTargetPositionRotation(i, out _boneTargetPositions[i],
+                                                   out _boneTargetRotations[i]);
+        }
       }
 
       using (new ProfilerSample("Update Contact Bones")) {
@@ -908,7 +967,7 @@ namespace Leap.Unity.Interaction {
       using (new ProfilerSample("Update Soft Contact")) {
         fixedUpdateSoftContact();
       }
-      using (new ProfilerSample("Update ContactCallbacks")) {
+      using (new ProfilerSample("Update Contact Callbacks")) {
         fixedUpdateContactState();
       }
     }
@@ -953,7 +1012,11 @@ namespace Leap.Unity.Interaction {
       body.MoveRotation(targetRotation);
 
       // Calculate how far off its target the contact bone is.
-      float errorDistance = Vector3.Distance(contactBone.lastTargetPosition, body.position);
+      Vector3 lastTargetPositionTransformedAhead = contactBone.lastTargetPosition;
+      if (manager.hasMovingFrameOfReference) {
+        manager.TransformAheadByFixedUpdate(contactBone.lastTargetPosition, out lastTargetPositionTransformedAhead);
+      }
+      float errorDistance = Vector3.Distance(lastTargetPositionTransformedAhead, body.position);
       float errorFraction = errorDistance / contactBone.width;
 
       // Adjust the mass of the contact bone based on the mass of
@@ -970,7 +1033,7 @@ namespace Leap.Unity.Interaction {
          EnableSoftContact();
       }
 
-      // Attempt to move the contact bone to its target position and rotation 
+      // Attempt to move the contact bone to its target position and rotation
       // by setting its target velocity and angular velocity. Include a "deadzone"
       // for position to avoid tiny vibrations.
       float deadzone = Mathf.Min(DEAD_ZONE_FRACTION * contactBone.width, 0.01F * scale);
@@ -1003,11 +1066,6 @@ namespace Leap.Unity.Interaction {
     private bool _disableSoftContactEnqueued = false;
     private IEnumerator _delayedDisableSoftContactCoroutine;
 
-    // TODO: DELETEME
-    //private Collider[] _tempColliderArray = new Collider[2];
-    //private Vector3[] _bonePositionsLastFrame = new Vector3[32];
-    //private float _softContactBoneRadius = 0.015f;
-
     private Collider[] _softContactColliderBuffer = new Collider[32];
 
     private bool _notTrackedLastFrame = true;
@@ -1033,7 +1091,8 @@ namespace Leap.Unity.Interaction {
           //  _softContactColliderBuffer[i] = null;
           //}
           // HACK: assume only using hands on android
-          PhysicsUtility.generateSphereContacts(contactBone.rigidbody.position, 
+          // TODO: This probably doesn't take into accoutn ignoreContact settings
+          PhysicsUtility.generateSphereContacts(contactBone.rigidbody.position,
                                                 0.02f * manager.SimulationScale,
                                                 contactBone.rigidbody.velocity,
                                                 manager.interactionLayer.layerMask,
@@ -1054,10 +1113,14 @@ namespace Leap.Unity.Interaction {
             int numCollisions = Physics.OverlapSphereNonAlloc(contactBone.transform.TransformPoint(boneSphere.center),
                                                               contactBone.transform.lossyScale.x * boneSphere.radius,
                                                               _softContactColliderBuffer,
-                                                              manager.interactionLayer.layerMask,
+                                                              manager.GetInteractionLayerMask(),
                                                               QueryTriggerInteraction.Ignore);
             for (int i = 0; i < numCollisions; i++) {
               //NotifySoftContactOverlap(contactBone, _softContactColliderBuffer[i]);
+
+              // Skip soft contact if the object is ignoring contact
+              if (_softContactColliderBuffer[i].attachedRigidbody == null) continue;
+              if (manager.interactionObjectBodies[_softContactColliderBuffer[i].attachedRigidbody].ignoreContact) continue;
 
               PhysicsUtility.generateSphereContact(boneSphere, 0, _softContactColliderBuffer[i],
                                                    ref manager._softContacts,
@@ -1073,10 +1136,14 @@ namespace Leap.Unity.Interaction {
             int numCollisions = Physics.OverlapCapsuleNonAlloc(point0, point1,
                                                                contactBone.transform.lossyScale.x * boneCapsule.radius,
                                                                _softContactColliderBuffer,
-                                                               manager.interactionLayer.layerMask,
+                                                               manager.GetInteractionLayerMask(),
                                                                QueryTriggerInteraction.Ignore);
             for (int i = 0; i < numCollisions; i++) {
               //NotifySoftContactOverlap(contactBone, _softContactColliderBuffer[i]);
+
+              // Skip soft contact if the object is ignoring contact
+              if (_softContactColliderBuffer[i].attachedRigidbody == null) continue;
+              if (manager.interactionObjectBodies[_softContactColliderBuffer[i].attachedRigidbody].ignoreContact) continue;
 
               PhysicsUtility.generateCapsuleContact(boneCapsule, 0,
                                                     _softContactColliderBuffer[i],
@@ -1098,10 +1165,14 @@ namespace Leap.Unity.Interaction {
                                                            Vector3.Scale(boneBox.size * 0.5F, contactBone.transform.lossyScale),
                                                            _softContactColliderBuffer,
                                                            boneBox.transform.rotation,
-                                                           manager.interactionLayer.layerMask,
+                                                           manager.GetInteractionLayerMask(),
                                                            QueryTriggerInteraction.Ignore);
             for (int i = 0; i < numCollisions; i++) {
               //NotifySoftContactOverlap(contactBone, _softContactColliderBuffer[i]);
+
+              // Skip soft contact if the object is ignoring contact
+              if (_softContactColliderBuffer[i].attachedRigidbody == null) continue;
+              if (manager.interactionObjectBodies[_softContactColliderBuffer[i].attachedRigidbody].ignoreContact) continue;
 
               PhysicsUtility.generateBoxContact(boneBox, 0, _softContactColliderBuffer[i],
                                                 ref manager._softContacts,
@@ -1149,7 +1220,7 @@ namespace Leap.Unity.Interaction {
     /// <summary>
     /// Optionally override this method to perform logic just before soft contact
     /// is enabled for this controller.
-    /// 
+    ///
     /// The InteractionHand implementation takes the opportunity to reset its contact
     /// bone's joints, which may have initialized slightly out of alignment on initial
     /// construction.
@@ -1159,7 +1230,7 @@ namespace Leap.Unity.Interaction {
     /// <summary>
     /// Optioanlly override this method to perform logic just after soft contact
     /// is disabled for this controller.
-    /// 
+    ///
     /// The InteractionHand implementation takes the opportunity to reset its contact
     /// bone's joints, which my have initialized slightly out of alignment on initial
     /// construction.
@@ -1250,7 +1321,7 @@ namespace Leap.Unity.Interaction {
     }
 
     public void NotifySoftContactCollisionEnter(ContactBone bone,
-                                                IInteractionBehaviour intObj, 
+                                                IInteractionBehaviour intObj,
                                                 Collider collider) {
       var pair = new BoneIntObjPair() { bone = bone, intObj = intObj };
 
@@ -1336,7 +1407,7 @@ namespace Leap.Unity.Interaction {
     /// <summary>
     /// Clears contact state for this controller and fires the appropriate ContactEnd
     /// callbacks on currently-contacted interaction objects immediately.
-    /// 
+    ///
     /// If the controller is still contacting objects and it and its manager are still
     /// active, contact will begin anew on the next fixed frame.
     /// </summary>
@@ -1366,7 +1437,7 @@ namespace Leap.Unity.Interaction {
     /// <summary>
     /// Clears contact state for the specified object and fires its ContactEnd callbacks
     /// immediately.
-    /// 
+    ///
     /// If the controller is still contacting the object and it and its manager are still
     /// active, contact will begin anew on the next fixed frame.
     /// </summary>
@@ -1390,7 +1461,7 @@ namespace Leap.Unity.Interaction {
     private void fixedUpdateContactState() {
       _contactEndedBuffer.Clear();
       _contactBeganBuffer.Clear();
-      
+
       // Update contact ended state.
       _contactBehaviourRemovalCache.Clear();
       foreach (var interactionObj in _contactBehavioursLastFrame) {
@@ -1543,6 +1614,9 @@ namespace Leap.Unity.Interaction {
       return null;
     }
 
+    // Layer mask for the hover acitivity manager.
+    private Func<int> graspLayerMaskAccessor;
+
     // Grasp Activity Manager
     private ActivityManager<IInteractionBehaviour> _graspActivityManager;
     /// <summary> Determines which objects are graspable any given frame. </summary>
@@ -1550,11 +1624,11 @@ namespace Leap.Unity.Interaction {
       get {
         if (_graspActivityManager == null) {
           if (graspActivityFilter == null) graspActivityFilter = graspFilterFunc;
+          if (graspLayerMaskAccessor == null) graspLayerMaskAccessor = manager.GetInteractionLayerMask;
 
           _graspActivityManager = new ActivityManager<IInteractionBehaviour>(1F, graspActivityFilter);
 
-          _graspActivityManager.activationLayerMask = manager.interactionLayer.layerMask
-                                                    | manager.interactionNoContactLayer.layerMask;
+          _graspActivityManager.activationLayerFunction = graspLayerMaskAccessor;
         }
         return _graspActivityManager;
       }
@@ -1573,7 +1647,7 @@ namespace Leap.Unity.Interaction {
 
     /// <summary>
     /// Called every fixed frame if grasping is enabled in the Interaction Manager.
-    /// 
+    ///
     /// graspActivityManager.ActiveObjects will contain objects around the hoverPoint
     /// within the grasping radius -- in other words, objects eligible to be grasped
     /// by the controller. Refer to it to avoid checking grasp eligibility against all
@@ -1704,7 +1778,7 @@ namespace Leap.Unity.Interaction {
         return false;
       }
 
-      // Update the grab classifier to determine if we should grasp an object.
+      // Actually check whether the controller implementation will grasp.
       bool shouldGraspObject = checkShouldGrasp(out newlyGraspedObject);
       if (shouldGraspObject) {
         _graspedObject = newlyGraspedObject;
@@ -1765,7 +1839,7 @@ namespace Leap.Unity.Interaction {
 
       public static Color ContactBone       { get { return Color.green.WithAlpha(0.5F); } }
       public static Color SoftContactBone   { get { return Color.white.WithAlpha(0.5F); } }
-                                     
+
       public static Color HoverPoint        { get { return Color.yellow.WithAlpha(0.5F); } }
       public static Color PrimaryHoverPoint { get { return Color.Lerp(Color.red, Color.yellow, 0.5F).WithAlpha(0.5F); } }
 

@@ -194,6 +194,12 @@ namespace Leap.Unity {
       }
     }
 
+    public static bool ContainsNaN(this Vector3 v) {
+      return float.IsNaN(v.x)
+          || float.IsNaN(v.y)
+          || float.IsNaN(v.z);
+    }
+
     #endregion
 
     #region Value Mapping Utils
@@ -324,6 +330,27 @@ namespace Leap.Unity {
       return new Vector4(A.x / B.x, A.y / B.y, A.z / B.z, A.w / B.w);
     }
 
+    /// <summary>
+    /// Returns the sum of the components of the input vector.
+    /// </summary>
+    public static float CompSum(this Vector2 v) {
+      return v.x + v.y;
+    }
+
+    /// <summary>
+    /// Returns the sum of the components of the input vector.
+    /// </summary>
+    public static float CompSum(this Vector3 v) {
+      return v.x + v.y + v.z;
+    }
+
+    /// <summary>
+    /// Returns the sum of the components of the input vector.
+    /// </summary>
+    public static float CompSum(this Vector4 v) {
+      return v.x + v.y + v.z + v.w;
+    }
+
     #endregion
 
     #region Transform Utils
@@ -370,10 +397,10 @@ namespace Leap.Unity {
     /// <summary>
     /// Similar to Unity's Transform.LookAt(), but resolves the forward vector of this
     /// Transform to point away from the argument Transform.
-    /// 
+    ///
     /// Useful for billboarding Quads and UI elements whose forward vectors should match
     /// rather than oppose the Main Camera's forward vector.
-    /// 
+    ///
     /// Optionally, you may also pass an upwards vector, which will be provided to the underlying
     /// Quaternion.LookRotation. Vector3.up will be used by default.
     /// </summary>
@@ -384,7 +411,7 @@ namespace Leap.Unity {
     /// <summary>
     /// Similar to Unity's Transform.LookAt(), but resolves the forward vector of this
     /// Transform to point away from the argument Transform.
-    /// 
+    ///
     /// Allows specifying an upwards parameter; this is passed as the upwards vector to the Quaternion.LookRotation.
     /// </summary>
     /// <param name="thisTransform"></param>
@@ -457,11 +484,11 @@ namespace Leap.Unity {
 
     /// <summary>
     /// Recursively searches the hierarchy of the argument GameObject to find all of the
-    /// Colliders that are attached to the object's Rigidbody (or that _would_ be 
+    /// Colliders that are attached to the object's Rigidbody (or that _would_ be
     /// attached to its Rigidbody if it doesn't have one) and adds them to the provided
     /// colliders list. Warning: The provided "colliders" List will be cleared before
     /// use.
-    /// 
+    ///
     /// Colliders that are the children of other Rigidbody elements beneath the argument
     /// object are ignored.
     /// </summary>
@@ -495,8 +522,7 @@ namespace Leap.Unity {
             colliders.Add(collider);
           }
         }
-      }
-      finally {
+      } finally {
         toVisit.Clear();
         Pool<Stack<Transform>>.Recycle(toVisit);
 
@@ -511,6 +537,24 @@ namespace Leap.Unity {
 
     public static Color WithAlpha(this Color color, float alpha) {
       return new Color(color.r, color.g, color.b, alpha);
+    }
+
+    /// <summary>
+    /// Just like ColorUtility.TryParseHtmlString but throws a useful
+    /// error message if it fails.
+    /// </summary>
+    public static Color ParseHtmlColorString(string htmlString) {
+      Color color;
+      if (!ColorUtility.TryParseHtmlString(htmlString, out color)) {
+        throw new ArgumentException("The string [" + htmlString + "] is not a valid color code.  Valid color codes include:\n" +
+                                    "#RGB\n" +
+                                    "#RGBA\n" +
+                                    "#RRGGBB\n" +
+                                    "#RRGGBBAA\n" +
+                                    "For more information, see the documentation for ColorUtility.TryParseHtmlString.");
+      }
+
+      return color;
     }
 
     #endregion
@@ -528,7 +572,7 @@ namespace Leap.Unity {
       DrawArc(360, center, planeA, normal, radius, color, quality);
     }
 
-    /* Adapted from: Zarrax (http://math.stackexchange.com/users/3035/zarrax), Parametric Equation of a Circle in 3D Space?, 
+    /* Adapted from: Zarrax (http://math.stackexchange.com/users/3035/zarrax), Parametric Equation of a Circle in 3D Space?,
      * URL (version: 2014-09-09): http://math.stackexchange.com/q/73242 */
     public static void DrawArc(float arc,
                            Vector3 center,

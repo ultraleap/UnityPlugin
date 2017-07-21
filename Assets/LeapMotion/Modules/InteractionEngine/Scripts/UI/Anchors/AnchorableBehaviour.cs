@@ -46,13 +46,22 @@ namespace Leap.Unity.Interaction {
           }
           else {
             _isAttached = false;
-            if (_isLockedToAnchor) _isLockedToAnchor = false;
+            _isLockedToAnchor = false;
+            _isRotationLockedToAnchor = false;
 
             OnDetachedFromAnchor.Invoke(this, _anchor);
             _anchor.NotifyDetached(this);
 
             _hasTargetPositionLastUpdate = false;
             _hasTargetRotationLastUpdate = false;
+
+            // TODO: A more robust gravity fix.
+            if (_reactivateGravityOnDetach) {
+              if (interactionBehaviour != null) {
+                interactionBehaviour.rigidbody.useGravity = true;
+              }
+              _reactivateGravityOnDetach = false;
+            }
           }
         }
       }
@@ -252,7 +261,7 @@ namespace Leap.Unity.Interaction {
     /// <summary>
     /// Called just after this anchorable behaviour's InteractionBehaviour OnObjectGraspEnd for
     /// this anchor. This callback will never fire if tryAttachAnchorOnGraspEnd is not enabled.
-    /// 
+    ///
     /// If tryAttachAnchorOnGraspEnd is enabled, the anchor will be attached to
     /// an anchor only if its preferredAnchor property is false; otherwise, the attempt to
     /// anchor failed.
@@ -301,10 +310,20 @@ namespace Leap.Unity.Interaction {
       }
     }
 
+    private bool _reactivateGravityOnDetach = false;
+
     void Update() {
       updateAttractionToHand();
 
       if (anchor != null && isAttached) {
+        if (interactionBehaviour != null && interactionBehaviour.rigidbody.useGravity) {
+          // TODO: This is a temporary fix for gravity to be fixed in a future IE PR.
+          // The proper solution involves switching the behaviour to FixedUpdate and more
+          // intelligently communicating with the attached InteractionBehaviour.
+          interactionBehaviour.rigidbody.useGravity = false;
+          _reactivateGravityOnDetach = true;
+        }
+
         updateAnchorAttachment();
         updateAnchorAttachmentRotation();
 
@@ -319,12 +338,7 @@ namespace Leap.Unity.Interaction {
     }
 
     void OnDisable() {
-      _isLockedToAnchor = false;
-      _isRotationLockedToAnchor = false;
-
-      // Reset anchor position storage; it can't be updated from this state.
-      _hasTargetPositionLastUpdate = false;
-      _hasTargetRotationLastUpdate = false;
+      Detach();
 
       // Make sure we don't leave dangling anchor-preference state.
       endAnchorPreference();
@@ -389,7 +403,7 @@ namespace Leap.Unity.Interaction {
     /// and may return null if the object is moving away from all of its possible anchors.
     /// Otherwise, the object will simply return the nearest valid anchor, or null if there
     /// is no valid anchor nearby.
-    /// 
+    ///
     /// This method is called every Update() automatically by anchorable objects, and its
     /// result is stored in preferredAnchor. Only call this if you need a new calculation.
     /// </summary>
@@ -427,7 +441,7 @@ namespace Leap.Unity.Interaction {
     /// anchorable object has its anchorGroup property set, only anchors within that AnchorGroup
     /// will be returned. By default, this method will only return anchors that have space for
     /// an object to attach to it.
-    /// 
+    ///
     /// Warning: This method checks squared-distance for all anchors in teh scene if this
     /// AnchorableBehaviour has no AnchorGroup.
     /// </summary>
@@ -461,7 +475,7 @@ namespace Leap.Unity.Interaction {
     /// anchor. If there is no valid anchor within range, returns null. By default, this method will
     /// only return anchors that are within the max anchor range of this object and that have space for
     /// an object to attach to it.
-    /// 
+    ///
     /// Warning: This method checks squared-distance for all anchors in the scene if this AnchorableBehaviour
     /// has no AnchorGroup.
     /// </summary>
@@ -796,7 +810,7 @@ namespace Leap.Unity.Interaction {
       action += (anchObj, anchor) => _eventTable.Invoke((int)type);
     }
 
-    private void setupCallback<T>(ref Action<T> action, EventType type) 
+    private void setupCallback<T>(ref Action<T> action, EventType type)
                                   where T : AnchorableBehaviour         {
       action += (anchObj) => _eventTable.Invoke((int)type);
     }
