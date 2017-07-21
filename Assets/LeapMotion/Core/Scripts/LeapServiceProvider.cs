@@ -43,14 +43,6 @@ namespace Leap.Unity {
     [SerializeField]
     protected FrameOptimizationMode _frameOptimization = FrameOptimizationMode.None;
 
-    [Header("Device Type")]
-    [SerializeField]
-    protected bool _overrideDeviceType = false;
-
-    [Tooltip("If overrideDeviceType is enabled, the hand controller will return a device of this type.")]
-    [SerializeField]
-    protected LeapDeviceType _overrideDeviceTypeWith = LeapDeviceType.Peripheral;
-
     [Header("[Experimental]")]
     [Tooltip("Pass updated transform matrices to objects with materials using the VertexOffsetShader.")]
     [SerializeField]
@@ -143,44 +135,22 @@ namespace Leap.Unity {
 
     /** Returns information describing the device hardware. */
     public LeapDeviceInfo GetDeviceInfo() {
-      if (_overrideDeviceType) {
-        return new LeapDeviceInfo(_overrideDeviceTypeWith);
-      }
-
-      DeviceList devices = GetLeapController().Devices;
-      if (devices.Count == 1) {
-        LeapDeviceInfo info = new LeapDeviceInfo(LeapDeviceType.Peripheral);
-        // TODO: DeviceList does not tell us the device type. Dragonfly serial starts with "LE" and peripheral starts with "LP"
-        if (devices[0].SerialNumber.Length >= 2) {
-          switch (devices[0].SerialNumber.Substring(0, 2)) {
-            case ("LP"):
-              info = new LeapDeviceInfo(LeapDeviceType.Peripheral);
-              break;
-            case ("LE"):
-              info = new LeapDeviceInfo(LeapDeviceType.Dragonfly);
-              break;
-            default:
-              break;
-          }
-        }
-
-        // TODO: Add baseline & offset when included in API
-        // NOTE: Alternative is to use device type since all parameters are invariant
-        info.isEmbedded = devices[0].Type != Device.DeviceType.TYPE_PERIPHERAL;
-        info.horizontalViewAngle = devices[0].HorizontalViewAngle * Mathf.Rad2Deg;
-        info.verticalViewAngle = devices[0].VerticalViewAngle * Mathf.Rad2Deg;
-        info.trackingRange = devices[0].Range / 1000f;
-        info.serialID = devices[0].SerialNumber;
-        return info;
-      } else if (devices.Count > 1) {
-        return new LeapDeviceInfo(LeapDeviceType.Peripheral);
-      }
-      return new LeapDeviceInfo(LeapDeviceType.Invalid);
+      return LeapDeviceInfo.GetLeapDeviceInfo();
     }
 
     public void ReTransformFrames() {
       transformFrame(_untransformedUpdateFrame, _transformedUpdateFrame);
       transformFrame(_untransformedFixedFrame, _transformedFixedFrame);
+    }
+
+    protected virtual void Reset() {
+      if (checkShouldEnableHeadMounted()) {
+        _isHeadMounted = true;
+      }
+      
+      _temporalWarping = GetComponentInParent<LeapVRTemporalWarping>();
+      _frameOptimization = FrameOptimizationMode.None;
+      _updateHandInPrecull = false;
     }
 
     protected virtual void Awake() {
@@ -189,6 +159,8 @@ namespace Leap.Unity {
     }
 
     protected virtual void Start() {
+      checkShouldEnableHeadMounted();
+
       createController();
       _transformedUpdateFrame = new Frame();
       _transformedFixedFrame = new Frame();
@@ -290,6 +262,26 @@ namespace Leap.Unity {
     protected virtual void OnDisable() {
       Camera.onPreCull -= LateUpdateHandTransforms;
       resetTransforms();
+    }
+
+    private bool checkShouldEnableHeadMounted() {
+      if (UnityEngine.VR.VRSettings.enabled) {
+        var parentCamera = GetComponentInParent<Camera>();
+        if (parentCamera != null && parentCamera.stereoTargetEye != StereoTargetEyeMask.None) {
+
+          if (!_isHeadMounted) {
+            if (Application.isPlaying) {
+              Debug.LogError("VR is enabled and the LeapServiceProvider is the child of a "
+                           + "camera targeting one or both stereo eyes; You should "
+                           + "check the isHeadMounted option on the LeapServiceProvider "
+                           + "if the Leap is mounted or attached to your VR headset!",
+                             this);
+            }
+            return true;
+          }
+        }
+      }
+      return false;
     }
 
     /*

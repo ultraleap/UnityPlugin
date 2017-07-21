@@ -57,7 +57,7 @@ namespace Leap.Unity {
       }
 #endif
 
-      _deviceInfo = new LeapDeviceInfo(LeapDeviceType.Peripheral);
+      _deviceInfo = LeapDeviceInfo.GetLeapDeviceInfo();
     }
 
     void Update() {

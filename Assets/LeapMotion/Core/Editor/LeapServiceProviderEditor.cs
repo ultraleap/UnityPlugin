@@ -16,9 +16,6 @@ namespace Leap.Unity {
     protected override void OnEnable() {
       base.OnEnable();
 
-      specifyConditionalDrawing("_overrideDeviceType",
-                                "_overrideDeviceTypeWith");
-
       specifyCustomDecorator("_frameOptimization", frameOptimizationWarning);
     }
 
