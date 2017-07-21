@@ -72,7 +72,7 @@ namespace Leap.Unity {
       Vector3 placeAnimatorUnderCam = new Vector3(Camera.main.transform.position.x, transform.position.y, Camera.main.transform.position.z);
 
       if (IsCentering || !WalkingEnabled) {
-        animator.transform.position = Vector3.Lerp(animator.rootPosition, placeAnimatorUnderCam, .05f);
+        animator.transform.position = Vector3.Lerp(animator.rootPosition, placeAnimatorUnderCam, .03f);
         animator.transform.Translate(BodyCameraOffset.x, 0f, BodyCameraOffset.z, animator.transform);
         var lookPos = Target.position - transform.position;
         lookPos.y = 0;
