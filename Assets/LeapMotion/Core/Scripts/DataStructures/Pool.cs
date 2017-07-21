@@ -74,17 +74,15 @@ namespace Leap.Unity {
       if (_pool == null) _pool = new Stack<T>();
 
       T value;
-      value = spawnValue();
+      if (_pool.Count > 0) {
+        value = _pool.Pop();
+      } else {
+        value = new T();
+      }
 
       if (value is IPoolable) {
         (value as IPoolable).OnSpawn();
       }
-
-      return value;
-    }
-
-    private static T spawnValue() {
-      T value = new T();
 
       return value;
     }
