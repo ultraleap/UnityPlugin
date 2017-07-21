@@ -274,6 +274,7 @@ namespace Leap.Unity.GraphicalRenderer {
 #if UNITY_EDITOR
       editor.OnAttachedToGroup(group, anchor);
 #endif
+      isRepresentationDirty = true;
       _willBeAttached = false;
       _groupToBeAttachedTo = null;
       _favoriteGroupName = group.name;

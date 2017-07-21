@@ -507,6 +507,7 @@ namespace Leap.Unity.GraphicalRenderer {
             int toDetachIndex = _graphics.IndexOf(detachEnum.Current);
             dirtyIndexes.Add(toDetachIndex);
 
+            _graphics[_graphics.Count - 1].isRepresentationDirty = true;
             _graphics.RemoveAtUnordered(toDetachIndex);
 
             detachEnum.Current.OnDetachedFromGroup();

@@ -21,7 +21,7 @@ namespace Leap.Unity.GraphicalRenderer {
 
   [LeapGraphicTag("Text")]
   [Serializable]
-  public class LeapTextRenderer : LeapRenderingMethod<LeapTextGraphic> {
+  public class LeapTextRenderer : LeapRenderingMethod<LeapTextGraphic>, ISupportsAddRemove {
     public const string DEFAULT_FONT = "Arial.ttf";
     public const string DEFAULT_SHADER = "LeapMotion/GraphicRenderer/Text/Dynamic";
     public const float SCALE_CONSTANT = 0.001f;
@@ -61,6 +61,17 @@ namespace Leap.Unity.GraphicalRenderer {
       return SupportInfo.FullSupport();
     }
 
+    public void OnAddRemoveGraphics(List<int> dirtyIndexes) {
+      while(_meshData.Count > group.graphics.Count) {
+        _meshData.RemoveMesh(_meshData.Count - 1);
+      }
+
+      while(_meshData.Count < group.graphics.Count) {
+        group.graphics[_meshData.Count].isRepresentationDirty = true;
+        _meshData.AddMesh(new Mesh());
+      }
+    }
+
     public override void OnEnableRenderer() {
       foreach (var graphic in group.graphics) {
         var textGraphic = graphic as LeapTextGraphic;
@@ -77,13 +88,7 @@ namespace Leap.Unity.GraphicalRenderer {
     }
 
     public override void OnUpdateRenderer() {
-      for (int i = 0; i < group.graphics.Count; i++) {
-        var graphic = group.graphics[i] as LeapTextGraphic;
-
-        if (graphic.isRepresentationDirtyOrEditTime) {
-          prepareFontWithGraphic(graphic);
-        }
-      }
+      ensureFontIsUpToDate();
 
       for (int i = 0; i < group.graphics.Count; i++) {
         var graphic = group.graphics[i] as LeapTextGraphic;
@@ -170,6 +175,8 @@ namespace Leap.Unity.GraphicalRenderer {
       }
 
       generateMaterial();
+
+      PreventDuplication(ref _material);
     }
 #endif
 
@@ -213,12 +220,43 @@ namespace Leap.Unity.GraphicalRenderer {
       }
     }
 
-    private void prepareFontWithGraphic(LeapTextGraphic graphic) {
-      int scaledFontSize = Mathf.RoundToInt(graphic.fontSize * _dynamicPixelsPerUnit);
+    private void ensureFontIsUpToDate() {
+      CharacterInfo info;
+      bool doesNeedRebuild = false;
 
-      _font.RequestCharactersInTexture(graphic.text,
-                                       scaledFontSize,
-                                       graphic.fontStyle);
+      for (int i = 0; i < group.graphics.Count; i++) {
+        var graphic = group.graphics[i] as LeapTextGraphic;
+        int scaledFontSize = Mathf.RoundToInt(graphic.fontSize * _dynamicPixelsPerUnit);
+
+        if (graphic.isRepresentationDirtyOrEditTime) {
+          for (int j = 0; j < graphic.text.Length; j++) {
+            char character = graphic.text[j];
+
+            if (!_font.GetCharacterInfo(character, out info, scaledFontSize, graphic.fontStyle)) {
+              doesNeedRebuild = true;
+              break;
+            }
+          }
+
+          if (doesNeedRebuild) {
+            break;
+          }
+        }
+      }
+
+      if (!doesNeedRebuild) {
+        return;
+      }
+
+      for (int i = 0; i < group.graphics.Count; i++) {
+        var graphic = group.graphics[i] as LeapTextGraphic;
+        int scaledFontSize = Mathf.RoundToInt(graphic.fontSize * _dynamicPixelsPerUnit);
+
+        graphic.isRepresentationDirty = true;
+        _font.RequestCharactersInTexture(graphic.text,
+                                         scaledFontSize,
+                                         graphic.fontStyle);
+      }
     }
 
     private List<TextWrapper.Line> _tempLines = new List<TextWrapper.Line>();
@@ -227,153 +265,175 @@ namespace Leap.Unity.GraphicalRenderer {
     private List<Color> _colors = new List<Color>();
     private List<int> _tris = new List<int>();
     private void generateTextMesh(int index, LeapTextGraphic graphic, Mesh mesh) {
-      mesh.Clear();
+      using (new ProfilerSample("Generate Text Mesh")) {
+        mesh.Clear();
 
-      graphic.isRepresentationDirty = false;
+        graphic.isRepresentationDirty = false;
 
-      int scaledFontSize = Mathf.RoundToInt(graphic.fontSize * _dynamicPixelsPerUnit);
+        int scaledFontSize = Mathf.RoundToInt(graphic.fontSize * _dynamicPixelsPerUnit);
 
-      //Check for characters not found in the font
-      {
-        HashSet<char> unfoundCharacters = null;
-        CharacterInfo info;
-        foreach (var character in graphic.text) {
-          if (character == '\n') {
-            continue;
-          }
+        //Check for characters not found in the font
+        {
+          HashSet<char> unfoundCharacters = null;
+          CharacterInfo info;
+          foreach (var character in graphic.text) {
+            if (character == '\n') {
+              continue;
+            }
 
-          if (unfoundCharacters != null && unfoundCharacters.Contains(character)) {
-            continue;
-          }
+            if (unfoundCharacters != null && unfoundCharacters.Contains(character)) {
+              continue;
+            }
 
-          if (!_font.GetCharacterInfo(character, out info, scaledFontSize, graphic.fontStyle)) {
-            if (unfoundCharacters == null) unfoundCharacters = new HashSet<char>();
-            unfoundCharacters.Add(character);
-            Debug.LogError("Could not find character [" + character + "] in font " + _font + "!");
+            if (!_font.GetCharacterInfo(character, out info, scaledFontSize, graphic.fontStyle)) {
+              if (unfoundCharacters == null) unfoundCharacters = new HashSet<char>();
+              unfoundCharacters.Add(character);
+              Debug.LogError("Could not find character [" + character + "] in font " + _font + "!");
+            }
           }
         }
-      }
 
-      var textGraphic = graphic as LeapTextGraphic;
-      var text = textGraphic.text;
+        var textGraphic = graphic as LeapTextGraphic;
+        var text = textGraphic.text;
 
-      float _charScale = this._scale * SCALE_CONSTANT / _dynamicPixelsPerUnit;
-      float _scale = _charScale * graphic.fontSize / _font.fontSize;
-      float lineHeight = _scale * textGraphic.lineSpacing * _font.lineHeight * _dynamicPixelsPerUnit;
+        float _charScale = this._scale * SCALE_CONSTANT / _dynamicPixelsPerUnit;
+        float _scale = _charScale * graphic.fontSize / _font.fontSize;
+        float lineHeight = _scale * textGraphic.lineSpacing * _font.lineHeight * _dynamicPixelsPerUnit;
 
-      RectTransform rectTransform = textGraphic.transform as RectTransform;
-      float maxWidth;
-      if (rectTransform != null) {
-        maxWidth = rectTransform.rect.width;
-      } else {
-        maxWidth = float.MaxValue;
-      }
-
-      TextWrapper.Wrap(text, textGraphic.tokens, _tempLines, c => {
-        CharacterInfo info;
-        _font.GetCharacterInfo(c, out info, scaledFontSize, graphic.fontStyle);
-        return info.advance * _charScale;
-      }, maxWidth);
-
-      float textHeight = _tempLines.Count * lineHeight;
-
-      Vector3 origin = Vector3.zero;
-      origin.y -= _font.ascent * _scale * _dynamicPixelsPerUnit;
-
-      if (rectTransform != null) {
-        origin.y -= rectTransform.rect.y;
-
-        switch (textGraphic.verticalAlignment) {
-          case LeapTextGraphic.VerticalAlignment.Center:
-            origin.y -= (rectTransform.rect.height - textHeight) / 2;
-            break;
-          case LeapTextGraphic.VerticalAlignment.Bottom:
-            origin.y -= (rectTransform.rect.height - textHeight);
-            break;
+        RectTransform rectTransform = textGraphic.transform as RectTransform;
+        float maxWidth;
+        if (rectTransform != null) {
+          maxWidth = rectTransform.rect.width;
+        } else {
+          maxWidth = float.MaxValue;
         }
-      }
 
-      foreach (var line in _tempLines) {
+        _widthCalculator.font = _font;
+        _widthCalculator.charScale = _charScale;
+        _widthCalculator.fontStyle = graphic.fontStyle;
+        _widthCalculator.scaledFontSize = scaledFontSize;
+        TextWrapper.Wrap(text, textGraphic.tokens, _tempLines, _widthCalculator.func, maxWidth);
+
+        float textHeight = _tempLines.Count * lineHeight;
+
+        Vector3 origin = Vector3.zero;
+        origin.y -= _font.ascent * _scale * _dynamicPixelsPerUnit;
 
         if (rectTransform != null) {
-          origin.x = rectTransform.rect.x;
-          switch (textGraphic.horizontalAlignment) {
-            case LeapTextGraphic.HorizontalAlignment.Center:
-              origin.x += (rectTransform.rect.width - line.width) / 2;
+          origin.y -= rectTransform.rect.y;
+
+          switch (textGraphic.verticalAlignment) {
+            case LeapTextGraphic.VerticalAlignment.Center:
+              origin.y -= (rectTransform.rect.height - textHeight) / 2;
               break;
-            case LeapTextGraphic.HorizontalAlignment.Right:
-              origin.x += (rectTransform.rect.width - line.width);
-              break;
-          }
-        } else {
-          switch (textGraphic.horizontalAlignment) {
-            case LeapTextGraphic.HorizontalAlignment.Left:
-              origin.x = 0;
-              break;
-            case LeapTextGraphic.HorizontalAlignment.Center:
-              origin.x = -line.width / 2;
-              break;
-            case LeapTextGraphic.HorizontalAlignment.Right:
-              origin.x = -line.width;
+            case LeapTextGraphic.VerticalAlignment.Bottom:
+              origin.y -= (rectTransform.rect.height - textHeight);
               break;
           }
         }
 
-        for (int i = line.start; i < line.end; i++) {
-          char c = text[i];
+        foreach (var line in _tempLines) {
 
-          CharacterInfo info;
-          if (!_font.GetCharacterInfo(c, out info, scaledFontSize, graphic.fontStyle)) {
-            continue;
+          if (rectTransform != null) {
+            origin.x = rectTransform.rect.x;
+            switch (textGraphic.horizontalAlignment) {
+              case LeapTextGraphic.HorizontalAlignment.Center:
+                origin.x += (rectTransform.rect.width - line.width) / 2;
+                break;
+              case LeapTextGraphic.HorizontalAlignment.Right:
+                origin.x += (rectTransform.rect.width - line.width);
+                break;
+            }
+          } else {
+            switch (textGraphic.horizontalAlignment) {
+              case LeapTextGraphic.HorizontalAlignment.Left:
+                origin.x = 0;
+                break;
+              case LeapTextGraphic.HorizontalAlignment.Center:
+                origin.x = -line.width / 2;
+                break;
+              case LeapTextGraphic.HorizontalAlignment.Right:
+                origin.x = -line.width;
+                break;
+            }
           }
 
-          int offset = _verts.Count;
-          _tris.Add(offset + 0);
-          _tris.Add(offset + 1);
-          _tris.Add(offset + 2);
+          for (int i = line.start; i < line.end; i++) {
+            char c = text[i];
 
-          _tris.Add(offset + 0);
-          _tris.Add(offset + 2);
-          _tris.Add(offset + 3);
+            CharacterInfo info;
+            if (!_font.GetCharacterInfo(c, out info, scaledFontSize, graphic.fontStyle)) {
+              continue;
+            }
 
-          _verts.Add(_charScale * new Vector3(info.minX, info.maxY, 0) + origin);
-          _verts.Add(_charScale * new Vector3(info.maxX, info.maxY, 0) + origin);
-          _verts.Add(_charScale * new Vector3(info.maxX, info.minY, 0) + origin);
-          _verts.Add(_charScale * new Vector3(info.minX, info.minY, 0) + origin);
+            int offset = _verts.Count;
+            _tris.Add(offset + 0);
+            _tris.Add(offset + 1);
+            _tris.Add(offset + 2);
 
-          _uvs.Add(info.uvTopLeft);
-          _uvs.Add(info.uvTopRight);
-          _uvs.Add(info.uvBottomRight);
-          _uvs.Add(info.uvBottomLeft);
+            _tris.Add(offset + 0);
+            _tris.Add(offset + 2);
+            _tris.Add(offset + 3);
 
-          if (_useColor) {
-            _colors.Append(4, _globalTint * graphic.color);
+            _verts.Add(_charScale * new Vector3(info.minX, info.maxY, 0) + origin);
+            _verts.Add(_charScale * new Vector3(info.maxX, info.maxY, 0) + origin);
+            _verts.Add(_charScale * new Vector3(info.maxX, info.minY, 0) + origin);
+            _verts.Add(_charScale * new Vector3(info.minX, info.minY, 0) + origin);
+
+            _uvs.Add(info.uvTopLeft);
+            _uvs.Add(info.uvTopRight);
+            _uvs.Add(info.uvBottomRight);
+            _uvs.Add(info.uvBottomLeft);
+
+            if (_useColor) {
+              _colors.Append(4, _globalTint * graphic.color);
+            }
+
+            origin.x += info.advance * _charScale;
           }
-
-          origin.x += info.advance * _charScale;
+          origin.y -= lineHeight;
         }
-        origin.y -= lineHeight;
+
+        for (int i = 0; i < _uvs.Count; i++) {
+          Vector4 uv = _uvs[i];
+          uv.w = index;
+          _uvs[i] = uv;
+        }
+
+        mesh.SetVertices(_verts);
+        mesh.SetTriangles(_tris, 0);
+        mesh.SetUVs(0, _uvs);
+
+        if (_useColor) {
+          mesh.SetColors(_colors);
+        }
+
+        _verts.Clear();
+        _uvs.Clear();
+        _tris.Clear();
+        _colors.Clear();
+        _tempLines.Clear();
+      }
+    }
+
+    private CharWidthCalculator _widthCalculator = new CharWidthCalculator();
+    private class CharWidthCalculator {
+      public Font font;
+      public int scaledFontSize;
+      public FontStyle fontStyle;
+      public float charScale;
+
+      public Func<char, float> func;
+
+      public CharWidthCalculator() {
+        func = funcMethod;
       }
 
-      for (int i = 0; i < _uvs.Count; i++) {
-        Vector4 uv = _uvs[i];
-        uv.w = index;
-        _uvs[i] = uv;
+      private float funcMethod(char c) {
+        CharacterInfo info;
+        font.GetCharacterInfo(c, out info, scaledFontSize, fontStyle);
+        return info.advance * charScale;
       }
-
-      mesh.SetVertices(_verts);
-      mesh.SetTriangles(_tris, 0);
-      mesh.SetUVs(0, _uvs);
-
-      if (_useColor) {
-        mesh.SetColors(_colors);
-      }
-
-      _verts.Clear();
-      _uvs.Clear();
-      _tris.Clear();
-      _colors.Clear();
-      _tempLines.Clear();
     }
   }
 }
