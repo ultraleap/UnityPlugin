@@ -174,9 +174,9 @@ namespace Leap.Unity.GraphicalRenderer {
         _meshData.AddMesh(new Mesh());
       }
 
-      PreventDuplication(ref _material);
-
       generateMaterial();
+
+      PreventDuplication(ref _material);
     }
 #endif
 
