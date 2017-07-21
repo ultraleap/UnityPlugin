@@ -40,7 +40,7 @@ namespace Leap.Unity{
       case LeapDeviceType.Peripheral:
         isEmbedded = false;
         baseline = 0.04f;
-        focalPlaneOffset = 0.07f;
+        focalPlaneOffset = 0.10F;
         horizontalViewAngle = 2.303835f * Mathf.Rad2Deg;
         verticalViewAngle = 2.007129f * Mathf.Rad2Deg;
         trackingRange = 470f / 1000f;
