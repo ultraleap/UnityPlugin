@@ -1,5 +1,4 @@
-﻿using Leap.Unity.GraphicalRenderer;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
