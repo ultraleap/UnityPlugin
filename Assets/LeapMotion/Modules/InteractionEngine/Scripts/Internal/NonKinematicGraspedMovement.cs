@@ -25,7 +25,6 @@ namespace Leap.Unity.Interaction {
 
     protected float _maxVelocity = 6F;
 
-    private bool _useLastSolvedCoMPosition = false;
     private Vector3 _lastSolvedCoMPosition = Vector3.zero;
     protected AnimationCurve _strengthByDistance = new AnimationCurve(new Keyframe(0.0f, 1.0f, 0.0f, 0.0f),
                                                                       new Keyframe(0.02f, 0.3f, 0.0f, 0.0f));
@@ -47,9 +46,8 @@ namespace Leap.Unity.Interaction {
         targetAngularVelocity *= targetPercent;
       }
 
-      _useLastSolvedCoMPosition = !justGrasped;
       float followStrength = 1F;
-      if (_useLastSolvedCoMPosition) {
+      if (!justGrasped) {
         float remainingDistanceLastFrame = Vector3.Distance(_lastSolvedCoMPosition, currCenterOfMass);
         followStrength = _strengthByDistance.Evaluate(remainingDistanceLastFrame / intObj.manager.SimulationScale);
       }
