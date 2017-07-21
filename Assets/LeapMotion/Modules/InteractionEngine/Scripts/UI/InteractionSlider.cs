@@ -30,10 +30,20 @@ namespace Leap.Unity.Interaction {
 
     [Header("Slider Settings")]
     public SliderType sliderType = SliderType.Horizonal;
+
     public bool dispatchSlideValueOnStart = true;
+
+    [Tooltip("Manually specify slider limits even if the slider's parent has a RectTransform.")]
+    [DisableIf("_parentHasRectTransform", isEqualTo: false)]
+    public bool overrideRectLimits = false;
+    [SerializeField, HideInInspector]
+    #pragma warning disable 0414
+    private bool _parentHasRectTransform = false;
+    #pragma warning restore 0414
 
     [Header("Horizontal Axis")]
     public float defaultHorizontalValue;
+
     [Tooltip("The minimum and maximum values that the slider reports on the horizontal axis.")]
     public Vector2 horizontalValueRange = new Vector2(0f, 1f);
 
@@ -46,6 +56,7 @@ namespace Leap.Unity.Interaction {
            + "continuous (non-quantized) slider for this axis.")]
     [MinValue(0)]
     public int horizontalSteps = 0;
+
     [System.Serializable]
     public class FloatEvent : UnityEvent<float> { }
     ///<summary> Triggered while this slider is depressed. </summary>
@@ -138,6 +149,19 @@ namespace Leap.Unity.Interaction {
 
     private bool _started = false;
 
+    public bool hackModeOn = false;
+
+    protected override void OnValidate() {
+      base.OnValidate();
+
+      if (this.transform.parent != null && this.transform.parent.GetComponent<RectTransform>() != null) {
+        _parentHasRectTransform = true;
+      }
+      else {
+        _parentHasRectTransform = false;
+      }
+    }
+
     protected override void Start() {
       if (_started) return;
 
@@ -175,6 +199,9 @@ namespace Leap.Unity.Interaction {
     private void calculateSliderLimits() {
       if (transform.parent != null) {
         parent = transform.parent.GetComponent<RectTransform>();
+
+        if (overrideRectLimits) return;
+
         if (parent != null) {
           if (parent.rect.width < 0f || parent.rect.height < 0f) {
             Debug.LogError("Parent Rectangle dimensions negative; can't set slider boundaries!", parent.gameObject);

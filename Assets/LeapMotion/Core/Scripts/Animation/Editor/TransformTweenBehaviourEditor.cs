@@ -22,6 +22,8 @@ namespace Leap.Unity.Animation {
     protected override void OnEnable() {
       base.OnEnable();
 
+      dontShowScriptField();
+
       deferProperty("_eventTable");
       specifyCustomDrawer("_eventTable", drawEventTable);
     }
@@ -36,6 +38,9 @@ namespace Leap.Unity.Animation {
     }
 
     public override void OnInspectorGUI() {
+
+      drawScriptField();
+
       EditorGUI.BeginDisabledGroup(target.targetTransform == null
                                   || target.startTransform == null
                                   || PrefabUtility.GetPrefabType(target.gameObject) == PrefabType.Prefab);
