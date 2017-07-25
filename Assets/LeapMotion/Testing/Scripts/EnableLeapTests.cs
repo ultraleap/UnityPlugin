@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
+
+#if UNITY_EDITOR
 using UnityEditor;
 
 namespace Leap.Unity.Testing {
@@ -29,3 +31,4 @@ namespace Leap.Unity.Testing {
     }
   }
 }
+#endif
