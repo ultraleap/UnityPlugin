@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEditor;
 using Leap.Unity.Query;
 
 public static class AnimationCurveUtil {
@@ -48,7 +49,11 @@ public static class AnimationCurveUtil {
                                   dstRot.z = dst[2].Evaluate(t);
                                   dstRot.w = dst[3].Evaluate(t);
 
-                                  return Quaternion.Angle(srcRot, dstRot) < maxAngleError;
+                                  float angle;
+                                  Vector3 axis;
+                                  (Quaternion.Inverse(dstRot) * srcRot).ToAngleAxis(out angle, out axis);
+
+                                  return angle < maxAngleError;
                                 },
                                 checkSteps);
 
@@ -164,20 +169,6 @@ public static class AnimationCurveUtil {
           Keyframe currKeyframe = keyframes[i][position[i]];
           Keyframe prevKeyframe = keyframes[i][position[i] - 1];
 
-          for (int k = 0; k < checkSteps; k++) {
-            float percent = k / (checkSteps - 1.0f);
-
-            float prevTime = Mathf.Lerp(currKeyframe.time, prevKeyframe.time, percent * 5);
-            float nextTime = Mathf.Lerp(currKeyframe.time, nextKeyframe.time, percent * 5);
-
-            bool isPrevGood = isGood(curves, compressedCurves, prevTime);
-            bool isNextgood = isGood(curves, compressedCurves, nextTime);
-
-            if (!isPrevGood || !isNextgood) {
-              throw new Exception("I broke it for real fo real!");
-            }
-          }
-
           compressedCurves[i].RemoveKey(position[i]);
 
           for (int k = 0; k < checkSteps; k++) {
@@ -196,31 +187,10 @@ public static class AnimationCurveUtil {
             }
           }
 
-          for (int k = 0; k < checkSteps; k++) {
-            float percent = k / (checkSteps - 1.0f);
-
-            float prevTime = Mathf.LerpUnclamped(currKeyframe.time, prevKeyframe.time, percent * 5);
-            float nextTime = Mathf.LerpUnclamped(currKeyframe.time, nextKeyframe.time, percent * 5);
-
-            bool isPrevGood = isGood(curves, compressedCurves, prevTime);
-            bool isNextgood = isGood(curves, compressedCurves, nextTime);
-
-            if (!isPrevGood || !isNextgood) {
-              throw new Exception("I broke it!");
-            }
-          }
-
           position[i]--;
         }
       }
     } while (position.Query().Any(p => p > 0));
-
-    float maxTime = curves.Query().Select(t => t.keys[t.keys.Length - 1].time).Fold((a, b) => Mathf.Max(a, b));
-    for (float t = 0; t < maxTime; t += 0.01f) {
-      if (!isGood(curves, compressedCurves, t)) {
-        throw new Exception("Was not good!");
-      }
-    }
 
     return compressedCurves;
   }
