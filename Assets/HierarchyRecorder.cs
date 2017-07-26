@@ -72,9 +72,11 @@ public class HierarchyRecorder : MonoBehaviour {
 
     gameObject.AddComponent<HierarchyPostProcess>();
 
+    GameObject myGameObject = gameObject;
+
     DestroyImmediate(this);
 
-    PrefabUtility.CreatePrefab("Assets/Recording.prefab", gameObject);
+    PrefabUtility.CreatePrefab("Assets/Template.prefab", myGameObject);
   }
 
   private void recordData() {

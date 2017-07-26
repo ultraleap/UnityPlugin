@@ -27,7 +27,7 @@ namespace Leap.Unity {
       });
     }
 
-    public static void MatchAll<A, B, C>(Maybe<A> maybeA, Maybe<B> maybeB, Maybe<C> maybeC, Maybe<D> maybeD, Action<A, B, C, D> action) {
+    public static void MatchAll<A, B, C, D>(Maybe<A> maybeA, Maybe<B> maybeB, Maybe<C> maybeC, Maybe<D> maybeD, Action<A, B, C, D> action) {
       maybeA.Match(a => {
         maybeB.Match(b => {
           maybeC.Match(c => {
