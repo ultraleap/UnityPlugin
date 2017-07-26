@@ -66,6 +66,4 @@ public class PropertyRecorder : MonoBehaviour {
   private string getKey(EditorCurveBinding binding) {
     return binding.type.Name + " : " + binding.propertyName;
   }
-
-
 }

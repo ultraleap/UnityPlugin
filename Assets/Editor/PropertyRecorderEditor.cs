@@ -75,7 +75,7 @@ public class PropertyRecorderEditor : CustomEditorBase<PropertyRecorder> {
         bool isEnabled = target.IsBindingEnabled(binding);
 
         EditorGUI.BeginChangeCheck();
-        isEnabled = EditorGUILayout.ToggleLeft(ObjectNames.NicifyVariableName(binding.propertyName), isEnabled);
+        isEnabled = EditorGUILayout.ToggleLeft(binding.propertyName, isEnabled);
 
         if (EditorGUI.EndChangeCheck()) {
           foreach (var target in targets) {
