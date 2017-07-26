@@ -1,143 +1,100 @@
-﻿using System.Collections;
+﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEditor;
 using Leap.Unity;
+using Leap.Unity.Query;
 
+[CanEditMultipleObjects]
 [CustomEditor(typeof(PropertyRecorder))]
 public class PropertyRecorderEditor : CustomEditorBase<PropertyRecorder> {
 
   protected override void OnEnable() {
     base.OnEnable();
 
-    specifyCustomDrawer("serializedComponents", drawProperties);
+    specifyCustomDrawer("bindings", drawProperties);
+    hideField("expandedTypes");
   }
 
   private List<Component> _components = new List<Component>();
   private void drawProperties(SerializedProperty list) {
-    //Clear out the nulls
-    for (int i = list.arraySize; i-- != 0;) {
-      SerializedProperty componentInfoProp = list.GetArrayElementAtIndex(i);
-      SerializedProperty componentProp = componentInfoProp.FindPropertyRelative("component");
+    List<EditorCurveBinding> bindings = null;
 
-      if (componentProp.objectReferenceValue == null) {
-        list.DeleteArrayElementAtIndex(i);
-      }
-    }
-
-    target.GetComponents(_components);
-
-    int indexOfRecorder = _components.IndexOf(target);
-    if (indexOfRecorder < 0) {
-      Debug.LogError("Should alwayus be able to find the recorder!");
-      return;
-    }
-
-    _components.RemoveAt(indexOfRecorder);
-
-    //Make sure every component is accounted for
-    foreach (var component in _components) {
-      bool alreadyExists = false;
-      for (int i = 0; i < list.arraySize; i++) {
-        SerializedProperty componentInfoProp = list.GetArrayElementAtIndex(i);
-        SerializedProperty componentProp = componentInfoProp.FindPropertyRelative("component");
-
-        if (componentProp.objectReferenceValue == component) {
-          alreadyExists = true;
-          break;
-        }
-      }
-
-      if (!alreadyExists) {
-        list.InsertArrayElementAtIndex(list.arraySize);
-        SerializedProperty componentInfoprop = list.GetArrayElementAtIndex(list.arraySize - 1);
-        SerializedProperty componentProp = componentInfoprop.FindPropertyRelative("component");
-        componentProp.objectReferenceValue = component;
-      }
-    }
-
-    foreach (var component in _components) {
-      SerializedProperty expandedProp = null, propertiesProp = null;
-
-      for (int i = 0; i < list.arraySize; i++) {
-        SerializedProperty componentInfoProp = list.GetArrayElementAtIndex(i);
-        SerializedProperty componentProp = componentInfoProp.FindPropertyRelative("component");
-        if (componentProp.objectReferenceValue == component) {
-          expandedProp = componentInfoProp.FindPropertyRelative("expanded");
-          propertiesProp = componentInfoProp.FindPropertyRelative("bindings");
-          break;
-        }
-      }
-
-      if (expandedProp == null || propertiesProp == null) {
-        Debug.LogError("Should always be able to find a property for a component.");
-        continue;
-      }
-
-      EditorGUILayout.BeginHorizontal();
-      expandedProp.boolValue = EditorGUILayout.Foldout(expandedProp.boolValue, component.GetType().Name);
-
-      bool recordAll = false;
-      if (GUILayout.Button("Record All")) {
-        recordAll = true;
-      }
-
-      bool clearAll = false;
-      if (GUILayout.Button("Clear All")) {
-        clearAll = true;
-      }
-
-      EditorGUILayout.EndHorizontal();
-
-      EditorGUI.indentLevel++;
-
-      var allBindings = AnimationUtility.GetAnimatableBindings(target.gameObject, target.gameObject);
-      foreach (var binding in allBindings) {
-        if (binding.type != component.GetType()) {
-          continue;
-        }
-
-        var bindingName = ObjectNames.NicifyVariableName(binding.propertyName);
-        var bindingProperty = binding.propertyName;
-
-        int isRecordedIndex = -1;
-        for (int i = 0; i < propertiesProp.arraySize; i++) {
-          if (propertiesProp.GetArrayElementAtIndex(i).stringValue == bindingProperty) {
-            isRecordedIndex = i;
-            break;
+    foreach (var target in targets) {
+      var singleBinding = new List<EditorCurveBinding>(AnimationUtility.GetAnimatableBindings(target.gameObject, target.gameObject));
+      if (bindings == null) {
+        bindings = new List<EditorCurveBinding>(singleBinding);
+      } else {
+        for (int i = bindings.Count; i-- != 0;) {
+          if (!singleBinding.Contains(bindings[i])) {
+            bindings.RemoveAt(i);
           }
         }
+      }
+    }
 
-        bool isRecorded = isRecordedIndex >= 0;
-        bool shouldBeRecorded = isRecorded;
+    bindings = bindings.Query().Where(t => t.type != typeof(PropertyRecorder)).ToList();
 
-        if (expandedProp.boolValue) {
-          shouldBeRecorded = EditorGUILayout.ToggleLeft(bindingName, isRecorded);
+    bool shouldOverride = false;
+    bool overrideValue = false;
+    Type currType = null;
+    EditorGUI.indentLevel++;
+
+    foreach (var binding in bindings) {
+      bool isTypeExpanded = targets.All(t => t.expandedTypes.Contains(binding.type.Name));
+
+      if (binding.type != currType) {
+        currType = binding.type;
+        shouldOverride = false;
+
+        EditorGUI.indentLevel--;
+        EditorGUILayout.BeginHorizontal();
+
+        isTypeExpanded = EditorGUILayout.Foldout(isTypeExpanded, binding.type.Name);
+        foreach (var target in targets) {
+          target.SetTypeExpanded(binding.type.Name, isTypeExpanded);
         }
 
-        if (recordAll) {
-          shouldBeRecorded = true;
+        if (GUILayout.Button("Record All")) {
+          shouldOverride = true;
+          overrideValue = true;
         }
 
-        if (clearAll) {
-          shouldBeRecorded = false;
+        if (GUILayout.Button("Clear All")) {
+          shouldOverride = true;
+          overrideValue = false;
         }
 
-        if (shouldBeRecorded && !isRecorded) {
-          propertiesProp.InsertArrayElementAtIndex(propertiesProp.arraySize);
-          propertiesProp.GetArrayElementAtIndex(propertiesProp.arraySize - 1).stringValue = bindingProperty;
-        } else if (!shouldBeRecorded && isRecorded) {
-          int arraySizeBefore = propertiesProp.arraySize;
-          propertiesProp.DeleteArrayElementAtIndex(isRecordedIndex);
-          if (arraySizeBefore == propertiesProp.arraySize) {
-            propertiesProp.DeleteArrayElementAtIndex(isRecordedIndex);
+        EditorGUILayout.EndHorizontal();
+        EditorGUI.indentLevel++;
+      }
+
+      if (isTypeExpanded) {
+        EditorGUI.showMixedValue = !targets.Query().Select(t => t.IsBindingEnabled(binding)).AllEqual();
+        bool isEnabled = target.IsBindingEnabled(binding);
+
+        EditorGUI.BeginChangeCheck();
+        isEnabled = EditorGUILayout.ToggleLeft(ObjectNames.NicifyVariableName(binding.propertyName), isEnabled);
+
+        if (EditorGUI.EndChangeCheck()) {
+          foreach (var target in targets) {
+            target.SetBindingEnabled(binding, isEnabled);
           }
         }
       }
 
-      EditorGUI.indentLevel--;
+      if (shouldOverride) {
+        foreach (var target in targets) {
+          target.SetBindingEnabled(binding, overrideValue);
+        }
+      }
     }
+
+    EditorGUI.indentLevel--;
+
+    serializedObject.Update();
   }
 
 

@@ -18,7 +18,7 @@ public class CreateTimeline : MonoBehaviour {
 
     foreach (var recorder in _recorders) {
       var transformPath = AnimationUtility.CalculateTransformPath(recorder.transform, transform);
-
+      /*
       foreach (var properties in recorder.serializedComponents) {
         foreach (var bindingName in properties.bindings) {
           EditorCurveBinding binding = EditorCurveBinding.FloatCurve(transformPath, properties.component.GetType(), bindingName);
@@ -27,6 +27,7 @@ public class CreateTimeline : MonoBehaviour {
           }
         }
       }
+      */
     }
 
     foreach (var pair in _curves) {
