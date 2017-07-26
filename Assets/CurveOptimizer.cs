@@ -11,25 +11,136 @@ public static class AnimationCurveUtil {
                                 (src, dst, t) => {
                                   float originalValue = src[0].Evaluate(t);
                                   float compressedValue = dst[0].Evaluate(t);
-                                  return Mathf.Abs(originalValue - compressedValue);
+                                  return Mathf.Abs(originalValue - compressedValue) < maxDelta;
                                 },
-                                maxDelta,
                                 checkSteps);
     return result[0];
   }
 
-  //public static void CompressPositions(AnimationCurve xCurve,
-  //                                     AnimationCurve yCurve,
-  //                                     AnimationCurve zCurve,
-  //                                 out AnimationCurve compressedXCurve,
-  //                                 out AnimationCurve compressedYCurve,
-  //                                 out AnimationCurve compressedZCurve,
-  //                                     float maxDelta = 0.005f, int checkSteps = 8) {
-  //}
+  public static void CompressRotations(AnimationCurve xCurve,
+                                       AnimationCurve yCurve,
+                                       AnimationCurve zCurve,
+                                       AnimationCurve wCurve,
+                                   out AnimationCurve compressedXCurve,
+                                   out AnimationCurve compressedYCurve,
+                                   out AnimationCurve compressedZCurve,
+                                   out AnimationCurve compressedWCurve,
+                                       float maxAngleError = 1,
+                                       int checkSteps = 8) {
+    var curveArray = new AnimationCurve[] {
+      xCurve,
+      yCurve,
+      zCurve,
+      wCurve
+    };
+
+    var result = CompressCurves(curveArray,
+                                (src, dst, t) => {
+                                  Quaternion srcRot;
+                                  srcRot.x = src[0].Evaluate(t);
+                                  srcRot.y = src[1].Evaluate(t);
+                                  srcRot.z = src[2].Evaluate(t);
+                                  srcRot.w = src[3].Evaluate(t);
+
+                                  Quaternion dstRot;
+                                  dstRot.x = dst[0].Evaluate(t);
+                                  dstRot.y = dst[1].Evaluate(t);
+                                  dstRot.z = dst[2].Evaluate(t);
+                                  dstRot.w = dst[3].Evaluate(t);
+
+                                  return Quaternion.Angle(srcRot, dstRot) < maxAngleError;
+                                },
+                                checkSteps);
+
+    compressedXCurve = result[0];
+    compressedYCurve = result[1];
+    compressedZCurve = result[2];
+    compressedWCurve = result[3];
+  }
+
+  public static void CompressPositions(AnimationCurve xCurve,
+                                       AnimationCurve yCurve,
+                                       AnimationCurve zCurve,
+                                   out AnimationCurve compressedXCurve,
+                                   out AnimationCurve compressedYCurve,
+                                   out AnimationCurve compressedZCurve,
+                                      float maxDistanceError = 0.005f,
+                                      int checkSteps = 8) {
+    var curveArray = new AnimationCurve[] {
+      xCurve,
+      yCurve,
+      zCurve
+    };
+
+    var results = CompressCurves(curveArray,
+                                 (src, dst, t) => {
+                                   Vector3 srcPos;
+                                   srcPos.x = src[0].Evaluate(t);
+                                   srcPos.y = src[1].Evaluate(t);
+                                   srcPos.z = src[2].Evaluate(t);
+
+                                   Vector3 dstPos;
+                                   dstPos.x = dst[0].Evaluate(t);
+                                   dstPos.y = dst[1].Evaluate(t);
+                                   dstPos.z = dst[2].Evaluate(t);
+
+                                   return Vector3.Distance(srcPos, dstPos) < maxDistanceError;
+                                 },
+                                 checkSteps);
+
+    compressedXCurve = results[0];
+    compressedYCurve = results[1];
+    compressedZCurve = results[2];
+  }
+
+  public static void CompressColorsHSV(AnimationCurve rCurve,
+                                       AnimationCurve gCurve,
+                                       AnimationCurve bCurve,
+                                   out AnimationCurve compressedRCurve,
+                                   out AnimationCurve compressedGCurve,
+                                   out AnimationCurve compressedBCurve,
+                                       float maxHueError,
+                                       float maxSaturationError,
+                                       float maxValueError,
+                                       int checkSteps = 8) {
+    var curveArray = new AnimationCurve[] {
+      rCurve,
+      gCurve,
+      bCurve
+    };
+
+    var results = CompressCurves(curveArray,
+                                 (src, dst, t) => {
+                                   Color srcColor;
+                                   srcColor.r = src[0].Evaluate(t);
+                                   srcColor.g = src[1].Evaluate(t);
+                                   srcColor.b = src[2].Evaluate(t);
+                                   srcColor.a = 1;
+
+                                   Color dstColor;
+                                   dstColor.r = dst[0].Evaluate(t);
+                                   dstColor.g = dst[1].Evaluate(t);
+                                   dstColor.b = dst[2].Evaluate(t);
+                                   dstColor.a = 1;
+
+                                   float sH, sS, sV;
+                                   float dH, dS, dV;
+                                   Color.RGBToHSV(srcColor, out sH, out sS, out sV);
+                                   Color.RGBToHSV(dstColor, out dH, out dS, out dV);
+
+                                   return Mathf.Abs(sH - dH) < maxHueError &&
+                                          Mathf.Abs(sS - dS) < maxSaturationError &&
+                                          Mathf.Abs(sV - dV) < maxValueError;
+                                 },
+                                 checkSteps);
+
+    compressedRCurve = results[0];
+    compressedGCurve = results[1];
+    compressedBCurve = results[2];
+  }
 
   public static AnimationCurve[] CompressCurves(AnimationCurve[] curves,
-                                                Func<AnimationCurve[], AnimationCurve[], float, float> costFunc,
-                                                float maxCost,
+                                                Func<AnimationCurve[], AnimationCurve[], float, bool> isGood,
                                                 int checkSteps = 8) {
     var keyframes = new Keyframe[curves.Length][];
     var position = new int[curves.Length];
@@ -61,10 +172,10 @@ public static class AnimationCurveUtil {
             float prevTime = Mathf.Lerp(currKeyframe.time, prevKeyframe.time, percent);
             float nextTime = Mathf.Lerp(currKeyframe.time, nextKeyframe.time, percent);
 
-            float prevCost = costFunc(curves, compressedCurves, prevTime);
-            float nextCost = costFunc(curves, compressedCurves, nextTime);
+            bool isPrevGood = isGood(curves, compressedCurves, prevTime);
+            bool isNextgood = isGood(curves, compressedCurves, nextTime);
 
-            if (prevCost > maxCost || nextCost > maxCost) {
+            if (!isPrevGood || !isNextgood) {
               compressedCurves[i].AddKey(currKeyframe);
               nextFrame[i] = position[i];
               break;

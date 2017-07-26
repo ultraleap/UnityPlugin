@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Timeline;
 using UnityEditor;
+using Leap.Unity;
 using Leap.Unity.Query;
 using Leap.Unity.Attributes;
 
@@ -70,26 +71,31 @@ public class HierarchyPostProcess : MonoBehaviour {
           }
         }
 
-        ////First do all rotations
-        //while (true) {
-        //  var wProp = toCompress.Query().Select(t => t.Key).FirstOrDefault(p => p.EndsWith(".w"));
-        //  if (wProp == null) {
-        //    break;
-        //  }
+        //First do all rotations
+        while (true) {
+          var wMaybe = toCompress.Keys.Query().FirstOrNone(b => b.propertyName.EndsWith(".w"));
+          wMaybe.Match(wBinding => {
+            string property = wBinding.propertyName.Substring(0, wBinding.propertyName.Length - 2);
+            string xProp = property + ".x";
+            string yProp = property + ".y";
+            string zProp = property + ".z";
 
-        //  string property = wProp.Substring(0, wProp.Length - 2);
-        //  string xProp = property + ".x";
-        //  string yProp = property + ".y";
-        //  string zProp = property + ".z";
+            var xMaybe = toCompress.Keys.Query().FirstOrNone(t => t.propertyName == xProp);
+            var yMaybe = toCompress.Keys.Query().FirstOrNone(t => t.propertyName == yProp);
+            var zMaybe = toCompress.Keys.Query().FirstOrNone(t => t.propertyName == zProp);
 
-        //  bool hasX = toCompress.Query().Any(t => t.Key.propertyName == xProp);
-        //  bool hasY = toCompress.Query().Any(t => t.Key.propertyName == yProp);
-        //  bool hasZ = toCompress.Query().Any(t => t.Key.propertyName == zProp);
+            Maybe.MatchAll(xMaybe, yMaybe, zMaybe, (xBinding, yBinding, zBinding) => {
+              float errorRate;
+              if (!propertyToMaxError.TryGetValue(property, out errorRate)) {
+                errorRate = rotationMaxError;
+              }
 
-        //  if (!(hasX && hasY && hasZ)) {
 
-        //  }
-        //}
+
+
+            });
+          });
+        }
 
 
 

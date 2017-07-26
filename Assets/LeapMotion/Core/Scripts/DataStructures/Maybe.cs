@@ -2,6 +2,46 @@
 
 namespace Leap.Unity {
 
+  public static class Maybe {
+    public static readonly NoneType None = new NoneType();
+
+    public static Maybe<T> Some<T>(T value) {
+      return Maybe<T>.Some(value);
+    }
+
+    public static void MatchAll<A, B>(Maybe<A> maybeA, Maybe<B> maybeB, Action<A, B> action) {
+      maybeA.Match(a => {
+        maybeB.Match(b => {
+          action(a, b);
+        });
+      });
+    }
+
+    public static void MatchAll<A, B, C>(Maybe<A> maybeA, Maybe<B> maybeB, Maybe<C> maybeC, Action<A, B, C> action) {
+      maybeA.Match(a => {
+        maybeB.Match(b => {
+          maybeC.Match(c => {
+            action(a, b, c);
+          });
+        });
+      });
+    }
+
+    public static void MatchAll<A, B, C>(Maybe<A> maybeA, Maybe<B> maybeB, Maybe<C> maybeC, Maybe<D> maybeD, Action<A, B, C, D> action) {
+      maybeA.Match(a => {
+        maybeB.Match(b => {
+          maybeC.Match(c => {
+            maybeD.Match(d => {
+              action(a, b, c, d);
+            });
+          });
+        });
+      });
+    }
+
+    public struct NoneType { }
+  }
+
   /// <summary>
   /// A struct that represents a value that could or could not exist.  Unlike
   /// the built-int nullable types, you are unable to access the value unless
@@ -148,6 +188,10 @@ namespace Leap.Unity {
 
     public static implicit operator Maybe<T>(T t) {
       return new Maybe<T>(t);
+    }
+
+    public static implicit operator Maybe<T>(Maybe.NoneType none) {
+      return Maybe<T>.None;
     }
   }
 }
