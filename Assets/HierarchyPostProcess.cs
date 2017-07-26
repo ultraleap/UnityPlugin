@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Playables;
 using UnityEngine.Timeline;
 using UnityEditor;
 using Leap.Unity;
@@ -54,6 +55,12 @@ public class HierarchyPostProcess : MonoBehaviour {
     GameObject myGameObject = gameObject;
 
     DestroyImmediate(this);
+
+    var director = myGameObject.AddComponent<PlayableDirector>();
+    director.playableAsset = timeline;
+
+    var animator = myGameObject.AddComponent<Animator>();
+    director.SetGenericBinding(track.outputs.Query().First().sourceObject, animator);
 
     PrefabUtility.CreatePrefab("Assets/Recording.prefab", myGameObject);
   }
