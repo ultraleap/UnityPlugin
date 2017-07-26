@@ -95,7 +95,4 @@ public class PropertyRecorderEditor : CustomEditorBase<PropertyRecorder> {
 
     serializedObject.Update();
   }
-
-
-
 }
