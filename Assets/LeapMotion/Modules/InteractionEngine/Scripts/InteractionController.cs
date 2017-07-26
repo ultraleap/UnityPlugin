@@ -190,6 +190,10 @@ namespace Leap.Unity.Interaction {
 
     #region Unity Events
 
+    protected virtual void Reset() {
+      if (manager == null) manager = GetComponentInParent<InteractionManager>();
+    }
+
     protected virtual void OnEnable() {
       if (_contactInitialized) {
         EnableSoftContact();
@@ -233,6 +237,9 @@ namespace Leap.Unity.Interaction {
     }
 
     public void NotifyObjectUnregistered(IInteractionBehaviour intObj) {
+      ClearHoverTrackingForObject(intObj);
+      ClearContactTrackingForObject(intObj);
+
       onObjectUnregistered(intObj);
     }
 

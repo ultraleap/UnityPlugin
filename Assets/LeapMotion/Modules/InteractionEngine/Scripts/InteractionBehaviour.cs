@@ -827,6 +827,12 @@ namespace Leap.Unity.Interaction {
       bool hasColliders = false;
       float testDistance = float.PositiveInfinity;
 
+      if (rigidbody == null) {
+        // The Interaction Object is probably being destroyed, or is otherwise in an
+        // invalid state.
+        return float.PositiveInfinity;
+      }
+
       foreach (var collider in _interactionColliders) {
         if (!hasColliders) hasColliders = true;
 
