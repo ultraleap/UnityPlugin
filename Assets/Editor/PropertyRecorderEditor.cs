@@ -21,12 +21,13 @@ public class PropertyRecorderEditor : CustomEditorBase<PropertyRecorder> {
     List<EditorCurveBinding> bindings = null;
 
     foreach (var target in targets) {
-      var singleBinding = new List<EditorCurveBinding>(AnimationUtility.GetAnimatableBindings(target.gameObject, target.gameObject));
+      var parent = target.transform.root.gameObject;
+      var singleBinding = new List<EditorCurveBinding>(AnimationUtility.GetAnimatableBindings(target.gameObject, parent));
       if (bindings == null) {
         bindings = new List<EditorCurveBinding>(singleBinding);
       } else {
         for (int i = bindings.Count; i-- != 0;) {
-          if (!singleBinding.Contains(bindings[i])) {
+          if (!singleBinding.Query().Any(t => t.propertyName == bindings[i].propertyName && t.type == bindings[i].type)) {
             bindings.RemoveAt(i);
           }
         }

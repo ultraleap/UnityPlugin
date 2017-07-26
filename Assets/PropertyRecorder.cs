@@ -12,10 +12,10 @@ public class PropertyRecorder : MonoBehaviour {
   public class BindingSet : SerializableHashSet<string> { }
 
   [SerializeField]
-  private BindingSet _bindings = new BindingSet();
+  private List<string> _bindings = new List<string>();
 
   [SerializeField]
-  private BindingSet _expandedTypes = new BindingSet();
+  private List<string> _expandedTypes = new List<string>();
 
   [NonSerialized]
   private List<EditorCurveBinding> _cachedBindings;
@@ -36,6 +36,10 @@ public class PropertyRecorder : MonoBehaviour {
 
   public void SetBindingEnabled(EditorCurveBinding binding, bool enabled) {
     var key = getKey(binding);
+    if (enabled == IsBindingEnabled(binding)) {
+      return;
+    }
+
     if (enabled) {
       _bindings.Add(key);
     } else {
@@ -48,6 +52,10 @@ public class PropertyRecorder : MonoBehaviour {
   }
 
   public void SetBindingExpanded(EditorCurveBinding binding, bool expanded) {
+    if (expanded == IsBindingExpanded(binding)) {
+      return;
+    }
+
     if (expanded) {
       _expandedTypes.Add(binding.type.Name);
     } else {
