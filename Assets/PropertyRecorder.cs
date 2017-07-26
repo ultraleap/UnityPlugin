@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 using Leap.Unity;
+using Leap.Unity.Query;
 
 [DisallowMultipleComponent]
 public class PropertyRecorder : MonoBehaviour {
@@ -11,33 +12,46 @@ public class PropertyRecorder : MonoBehaviour {
   public class BindingSet : SerializableHashSet<string> { }
 
   [SerializeField]
-  public BindingSet bindings = new BindingSet();
+  private BindingSet _bindings = new BindingSet();
 
   [SerializeField]
-  public BindingSet expandedTypes = new BindingSet();
+  private BindingSet _expandedTypes = new BindingSet();
+
+  [NonSerialized]
+  private List<EditorCurveBinding> _cachedBindings;
+  public List<EditorCurveBinding> GetBindings(GameObject root) {
+    if (_cachedBindings == null) {
+      _cachedBindings =
+      AnimationUtility.GetAnimatableBindings(gameObject, root).Query().
+                                                               Where(IsBindingEnabled).
+                                                               ToList();
+    }
+
+    return _cachedBindings;
+  }
 
   public bool IsBindingEnabled(EditorCurveBinding binding) {
-    return bindings.Contains(getKey(binding));
+    return _bindings.Contains(getKey(binding));
   }
 
   public void SetBindingEnabled(EditorCurveBinding binding, bool enabled) {
     var key = getKey(binding);
     if (enabled) {
-      bindings.Add(key);
+      _bindings.Add(key);
     } else {
-      bindings.Remove(key);
+      _bindings.Remove(key);
     }
   }
 
-  public bool IsTypeExpanded(string typeName) {
-    return expandedTypes.Contains(typeName);
+  public bool IsBindingExpanded(EditorCurveBinding binding) {
+    return _expandedTypes.Contains(binding.type.Name);
   }
 
-  public void SetTypeExpanded(string typeName, bool expanded) {
+  public void SetBindingExpanded(EditorCurveBinding binding, bool expanded) {
     if (expanded) {
-      expandedTypes.Add(typeName);
+      _expandedTypes.Add(binding.type.Name);
     } else {
-      expandedTypes.Remove(typeName);
+      _expandedTypes.Remove(binding.type.Name);
     }
   }
 

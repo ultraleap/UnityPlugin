@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Assertions;
 using UnityEditor;
 using Leap.Unity;
 using Leap.Unity.Query;
@@ -14,11 +13,10 @@ public class PropertyRecorderEditor : CustomEditorBase<PropertyRecorder> {
   protected override void OnEnable() {
     base.OnEnable();
 
-    specifyCustomDrawer("bindings", drawProperties);
-    hideField("expandedTypes");
+    specifyCustomDrawer("_bindings", drawProperties);
+    hideField("_expandedTypes");
   }
 
-  private List<Component> _components = new List<Component>();
   private void drawProperties(SerializedProperty list) {
     List<EditorCurveBinding> bindings = null;
 
@@ -43,7 +41,7 @@ public class PropertyRecorderEditor : CustomEditorBase<PropertyRecorder> {
     EditorGUI.indentLevel++;
 
     foreach (var binding in bindings) {
-      bool isTypeExpanded = targets.All(t => t.expandedTypes.Contains(binding.type.Name));
+      bool isTypeExpanded = targets.All(t => t.IsBindingExpanded(binding));
 
       if (binding.type != currType) {
         currType = binding.type;
@@ -54,7 +52,7 @@ public class PropertyRecorderEditor : CustomEditorBase<PropertyRecorder> {
 
         isTypeExpanded = EditorGUILayout.Foldout(isTypeExpanded, binding.type.Name);
         foreach (var target in targets) {
-          target.SetTypeExpanded(binding.type.Name, isTypeExpanded);
+          target.SetBindingExpanded(binding, isTypeExpanded);
         }
 
         if (GUILayout.Button("Record All")) {

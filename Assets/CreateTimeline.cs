@@ -6,9 +6,6 @@ using UnityEditor;
 
 public class CreateTimeline : MonoBehaviour {
 
-  public AnimationCurve curve;
-  public GameObject obj;
-
   private AnimationClip _clip;
   private List<PropertyRecorder> _recorders = new List<PropertyRecorder>();
   private Dictionary<EditorCurveBinding, AnimationCurve> _curves = new Dictionary<EditorCurveBinding, AnimationCurve>();
@@ -17,17 +14,11 @@ public class CreateTimeline : MonoBehaviour {
     GetComponentsInChildren(_recorders);
 
     foreach (var recorder in _recorders) {
-      var transformPath = AnimationUtility.CalculateTransformPath(recorder.transform, transform);
-      /*
-      foreach (var properties in recorder.serializedComponents) {
-        foreach (var bindingName in properties.bindings) {
-          EditorCurveBinding binding = EditorCurveBinding.FloatCurve(transformPath, properties.component.GetType(), bindingName);
-          if (!_curves.ContainsKey(binding)) {
-            _curves[binding] = new AnimationCurve();
-          }
+      foreach (var bindings in recorder.GetBindings(gameObject)) {
+        if (!_curves.ContainsKey(bindings)) {
+          _curves[bindings] = new AnimationCurve();
         }
       }
-      */
     }
 
     foreach (var pair in _curves) {
@@ -71,36 +62,4 @@ public class CreateTimeline : MonoBehaviour {
       enabled = false;
     }
   }
-
-  [ContextMenu("constrain")]
-  void constrin() {
-    AnimationUtility.ConstrainToPolynomialCurve(curve);
-  }
-
-  [ContextMenu("bindings")]
-  void getbindings() {
-    var bindings = AnimationUtility.GetAnimatableBindings(obj, gameObject);
-    foreach (var binding in bindings) {
-      Debug.Log(binding.path + " : " + binding.propertyName);
-    }
-  }
-
-
-  [ContextMenu("try do it")]
-  void tryCreateTimeline() {
-    var timeline = ScriptableObject.CreateInstance<TimelineAsset>();
-
-    var track = timeline.CreateTrack<AnimationTrack>(null, "my animation");
-
-    var clip = new AnimationClip();
-
-    var timelineClip = track.CreateClip(clip);
-
-    AssetDatabase.CreateAsset(timeline, "Assets/timeline.asset");
-    AssetDatabase.AddObjectToAsset(track, timeline);
-    AssetDatabase.AddObjectToAsset(clip, timeline);
-  }
-
-
-
 }
