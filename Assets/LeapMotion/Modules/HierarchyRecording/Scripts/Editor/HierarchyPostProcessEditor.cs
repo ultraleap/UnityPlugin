@@ -4,23 +4,28 @@ using UnityEngine;
 using UnityEditor;
 using Leap.Unity;
 
-[CustomEditor(typeof(HierarchyPostProcess))]
-public class HierarchyPostProcessEditor : CustomEditorBase<HierarchyPostProcess> {
+namespace Leap.Unity.Recording {
 
-  public override void OnInspectorGUI() {
-    base.OnInspectorGUI();
+  [CustomEditor(typeof(HierarchyPostProcess))]
+  public class HierarchyPostProcessEditor : CustomEditorBase<HierarchyPostProcess> {
 
-    bool isPrefab = PrefabUtility.GetPrefabType(target) == PrefabType.Prefab;
-    EditorGUI.BeginDisabledGroup(isPrefab);
+    public override void OnInspectorGUI() {
+      base.OnInspectorGUI();
 
-    if (GUILayout.Button(new GUIContent("Build Playback Prefab",
-                                        isPrefab ? "Draw this object into the scene "
-                                                 + "before converting its raw recording "
-                                                 + "data into AnimationClip data."
-                                                 : ""))) {
-      target.BuildPlaybackPrefab();
+      bool isPrefab = PrefabUtility.GetPrefabType(target) == PrefabType.Prefab;
+      EditorGUI.BeginDisabledGroup(isPrefab);
+
+      if (GUILayout.Button(new GUIContent("Build Playback Prefab",
+                                          isPrefab ? "Draw this object into the scene "
+                                                   + "before converting its raw recording "
+                                                   + "data into AnimationClip data."
+                                                   : ""))) {
+        target.BuildPlaybackPrefab();
+      }
+
+      EditorGUI.EndDisabledGroup();
     }
-
-    EditorGUI.EndDisabledGroup();
   }
+
+
 }

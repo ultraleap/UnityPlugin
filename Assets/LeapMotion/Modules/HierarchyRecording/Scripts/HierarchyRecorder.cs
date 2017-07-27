@@ -4,102 +4,110 @@ using UnityEngine;
 using UnityEngine.Timeline;
 using UnityEditor;
 
-public class HierarchyRecorder : MonoBehaviour {
+namespace Leap.Unity.Recording {
 
-  public KeyCode beginRecordingKey = KeyCode.F5;
-  public KeyCode finishRecordingKey = KeyCode.F6;
+  public class HierarchyRecorder : MonoBehaviour {
 
-  private AnimationClip _clip;
-  private List<PropertyRecorder> _recorders;
-  private Dictionary<EditorCurveBinding, AnimationCurve> _curves;
+    public KeyCode beginRecordingKey = KeyCode.F5;
+    public KeyCode finishRecordingKey = KeyCode.F6;
 
-  private bool _isRecording = false;
-  private float _startTime = 0;
+    private AnimationClip _clip;
+    private List<PropertyRecorder> _recorders;
+    private Dictionary<EditorCurveBinding, AnimationCurve> _curves;
 
-  private void LateUpdate() {
-    if (Input.GetKeyDown(beginRecordingKey)) {
-      beginRecording();
-    }
+    private bool _isRecording = false;
+    private float _startTime = 0;
 
-    if (Input.GetKeyDown(finishRecordingKey)) {
-      finishRecording();
-    }
-
-    if (_isRecording) {
-      recordData();
-    }
-  }
-
-  private void beginRecording() {
-    if (_isRecording) return;
-    _isRecording = true;
-    _startTime = Time.time;
-
-    _recorders = new List<PropertyRecorder>();
-    _curves = new Dictionary<EditorCurveBinding, AnimationCurve>();
-  }
-
-  private void finishRecording() {
-    if (!_isRecording) return;
-    _isRecording = false;
-
-    GetComponentsInChildren(true, _recorders);
-    foreach (var recorder in _recorders) {
-      DestroyImmediate(recorder);
-    }
-
-    foreach (var pair in _curves) {
-      Transform targetTransform = null;
-      var targetObj = AnimationUtility.GetAnimatedObject(gameObject, pair.Key);
-      if (targetObj is GameObject) {
-        targetTransform = (targetObj as GameObject).transform;
-      } else if (targetObj is Component) {
-        targetTransform = (targetObj as Component).transform;
-      } else {
-        Debug.LogError("Target obj was of type " + targetObj.GetType().Name);
+    private void LateUpdate() {
+      if (Input.GetKeyDown(beginRecordingKey)) {
+        beginRecording();
       }
 
-      var dataRecorder = targetTransform.GetComponent<RecordedData>();
-      if (dataRecorder == null) {
-        dataRecorder = targetTransform.gameObject.AddComponent<RecordedData>();
+      if (Input.GetKeyDown(finishRecordingKey)) {
+        finishRecording();
       }
 
-      dataRecorder.data.Add(new RecordedData.EditorCurveBindingData() {
-        path = pair.Key.path,
-        propertyName = pair.Key.propertyName,
-        typeName = pair.Key.type.Name,
-        curve = pair.Value
-      });
+      if (_isRecording) {
+        recordData();
+      }
     }
 
-    gameObject.AddComponent<HierarchyPostProcess>();
+    private void beginRecording() {
+      if (_isRecording) return;
+      _isRecording = true;
+      _startTime = Time.time;
 
-    GameObject myGameObject = gameObject;
+      _recorders = new List<PropertyRecorder>();
+      _curves = new Dictionary<EditorCurveBinding, AnimationCurve>();
+    }
 
-    DestroyImmediate(this);
+    private void finishRecording() {
+      if (!_isRecording) return;
+      _isRecording = false;
 
-    PrefabUtility.CreatePrefab("Assets/LeapMotion/Modules/HierarchyRecording/RawRecording.prefab", myGameObject);
-  }
+      GetComponentsInChildren(true, _recorders);
+      foreach (var recorder in _recorders) {
+        DestroyImmediate(recorder);
+      }
 
-  private void recordData() {
-    GetComponentsInChildren(_recorders);
+      foreach (var pair in _curves) {
+        Transform targetTransform = null;
+        var targetObj = AnimationUtility.GetAnimatedObject(gameObject, pair.Key);
+        if (targetObj is GameObject) {
+          targetTransform = (targetObj as GameObject).transform;
+        }
+        else if (targetObj is Component) {
+          targetTransform = (targetObj as Component).transform;
+        }
+        else {
+          Debug.LogError("Target obj was of type " + targetObj.GetType().Name);
+        }
 
-    foreach (var recorder in _recorders) {
-      foreach (var bindings in recorder.GetBindings(gameObject)) {
-        if (!_curves.ContainsKey(bindings)) {
-          _curves[bindings] = new AnimationCurve();
+        var dataRecorder = targetTransform.GetComponent<RecordedData>();
+        if (dataRecorder == null) {
+          dataRecorder = targetTransform.gameObject.AddComponent<RecordedData>();
+        }
+
+        dataRecorder.data.Add(new RecordedData.EditorCurveBindingData() {
+          path = pair.Key.path,
+          propertyName = pair.Key.propertyName,
+          typeName = pair.Key.type.Name,
+          curve = pair.Value
+        });
+      }
+
+      gameObject.AddComponent<HierarchyPostProcess>();
+
+      GameObject myGameObject = gameObject;
+
+      DestroyImmediate(this);
+
+      PrefabUtility.CreatePrefab("Assets/LeapMotion/Modules/HierarchyRecording/RawRecording.prefab", myGameObject);
+    }
+
+    private void recordData() {
+      GetComponentsInChildren(_recorders);
+
+      foreach (var recorder in _recorders) {
+        foreach (var bindings in recorder.GetBindings(gameObject)) {
+          if (!_curves.ContainsKey(bindings)) {
+            _curves[bindings] = new AnimationCurve();
+          }
+        }
+      }
+
+      foreach (var pair in _curves) {
+        float value;
+        bool gotValue = AnimationUtility.GetFloatValue(gameObject, pair.Key, out value);
+        if (gotValue) {
+          pair.Value.AddKey(Time.time - _startTime, value);
+        }
+        else {
+          Debug.Log(pair.Key.path + " : " + pair.Key.propertyName + " : " + pair.Key.type.Name);
         }
       }
     }
-
-    foreach (var pair in _curves) {
-      float value;
-      bool gotValue = AnimationUtility.GetFloatValue(gameObject, pair.Key, out value);
-      if (gotValue) {
-        pair.Value.AddKey(Time.time - _startTime, value);
-      } else {
-        Debug.Log(pair.Key.path + " : " + pair.Key.propertyName + " : " + pair.Key.type.Name);
-      }
-    }
   }
+
+
 }

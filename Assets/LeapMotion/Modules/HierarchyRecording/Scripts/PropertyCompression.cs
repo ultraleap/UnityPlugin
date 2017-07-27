@@ -3,15 +3,19 @@ using System.Collections.Generic;
 using UnityEngine;
 using Leap.Unity.Attributes;
 
-public class PropertyCompression : MonoBehaviour {
+namespace Leap.Unity.Recording {
 
-  public NamedCompression[] compressionOverrides;
+  public class PropertyCompression : MonoBehaviour {
 
-  [Serializable]
-  public class NamedCompression {
-    public string propertyName;
+    public NamedCompression[] compressionOverrides;
 
-    [MinValue(0)]
-    public float maxError;
+    [Serializable]
+    public class NamedCompression {
+      public string propertyName;
+
+      [MinValue(0)]
+      public float maxError;
+    }
   }
+
 }

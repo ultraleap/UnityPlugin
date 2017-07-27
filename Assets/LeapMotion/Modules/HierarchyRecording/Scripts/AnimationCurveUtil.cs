@@ -3,39 +3,42 @@ using UnityEngine;
 using UnityEditor;
 using Leap.Unity.Query;
 
-public static class AnimationCurveUtil {
+namespace Leap.Unity {
 
-  public static AnimationCurve Compress(AnimationCurve curve, float maxDelta = 0.005f, int checkSteps = 8) {
-    var curveArray = new AnimationCurve[] { curve };
+  // TODO: Move me to Core!
+  public static class AnimationCurveUtil {
 
-    var result = CompressCurves(curveArray,
+    public static AnimationCurve Compress(AnimationCurve curve, float maxDelta = 0.005f, int checkSteps = 8) {
+      var curveArray = new AnimationCurve[] { curve };
+
+      var result = CompressCurves(curveArray,
                                 (src, dst, t) => {
                                   float originalValue = src[0].Evaluate(t);
                                   float compressedValue = dst[0].Evaluate(t);
                                   return Mathf.Abs(originalValue - compressedValue) < maxDelta;
                                 },
                                 checkSteps);
-    return result[0];
-  }
+      return result[0];
+    }
 
-  public static void CompressRotations(AnimationCurve xCurve,
-                                       AnimationCurve yCurve,
-                                       AnimationCurve zCurve,
-                                       AnimationCurve wCurve,
-                                   out AnimationCurve compressedXCurve,
-                                   out AnimationCurve compressedYCurve,
-                                   out AnimationCurve compressedZCurve,
-                                   out AnimationCurve compressedWCurve,
-                                       float maxAngleError = 1,
-                                       int checkSteps = 8) {
-    var curveArray = new AnimationCurve[] {
+    public static void CompressRotations(AnimationCurve xCurve,
+                                         AnimationCurve yCurve,
+                                         AnimationCurve zCurve,
+                                         AnimationCurve wCurve,
+                                     out AnimationCurve compressedXCurve,
+                                     out AnimationCurve compressedYCurve,
+                                     out AnimationCurve compressedZCurve,
+                                     out AnimationCurve compressedWCurve,
+                                         float maxAngleError = 1,
+                                         int checkSteps = 8) {
+      var curveArray = new AnimationCurve[] {
       xCurve,
       yCurve,
       zCurve,
       wCurve
     };
 
-    var result = CompressCurves(curveArray,
+      var result = CompressCurves(curveArray,
                                 (src, dst, t) => {
                                   Quaternion srcRot;
                                   srcRot.x = src[0].Evaluate(t);
@@ -57,27 +60,27 @@ public static class AnimationCurveUtil {
                                 },
                                 checkSteps);
 
-    compressedXCurve = result[0];
-    compressedYCurve = result[1];
-    compressedZCurve = result[2];
-    compressedWCurve = result[3];
-  }
+      compressedXCurve = result[0];
+      compressedYCurve = result[1];
+      compressedZCurve = result[2];
+      compressedWCurve = result[3];
+    }
 
-  public static void CompressPositions(AnimationCurve xCurve,
-                                       AnimationCurve yCurve,
-                                       AnimationCurve zCurve,
-                                   out AnimationCurve compressedXCurve,
-                                   out AnimationCurve compressedYCurve,
-                                   out AnimationCurve compressedZCurve,
-                                      float maxDistanceError = 0.005f,
-                                      int checkSteps = 8) {
-    var curveArray = new AnimationCurve[] {
+    public static void CompressPositions(AnimationCurve xCurve,
+                                         AnimationCurve yCurve,
+                                         AnimationCurve zCurve,
+                                     out AnimationCurve compressedXCurve,
+                                     out AnimationCurve compressedYCurve,
+                                     out AnimationCurve compressedZCurve,
+                                        float maxDistanceError = 0.005f,
+                                        int checkSteps = 8) {
+      var curveArray = new AnimationCurve[] {
       xCurve,
       yCurve,
       zCurve
     };
 
-    var results = CompressCurves(curveArray,
+      var results = CompressCurves(curveArray,
                                  (src, dst, t) => {
                                    Vector3 srcPos;
                                    srcPos.x = src[0].Evaluate(t);
@@ -93,51 +96,52 @@ public static class AnimationCurveUtil {
                                  },
                                  checkSteps);
 
-    compressedXCurve = results[0];
-    compressedYCurve = results[1];
-    compressedZCurve = results[2];
-  }
+      compressedXCurve = results[0];
+      compressedYCurve = results[1];
+      compressedZCurve = results[2];
+    }
 
-  public static AnimationCurve CompressScale(AnimationCurve curve,
-                                             float maxScaleFactor,
-                                             int checkSteps = 8) {
-    var curveArray = new AnimationCurve[] {
+    public static AnimationCurve CompressScale(AnimationCurve curve,
+                                               float maxScaleFactor,
+                                               int checkSteps = 8) {
+      var curveArray = new AnimationCurve[] {
       curve,
     };
 
-    var results = CompressCurves(curveArray,
+      var results = CompressCurves(curveArray,
                                  (src, dst, t) => {
                                    float srcValue = src[0].Evaluate(t);
                                    float dstValue = dst[0].Evaluate(t);
 
                                    if (Mathf.Sign(srcValue) == Mathf.Sign(dstValue)) {
                                      return srcValue / dstValue < maxScaleFactor && dstValue / srcValue < maxScaleFactor;
-                                   } else {
+                                   }
+                                   else {
                                      return false;
                                    }
                                  },
                                  checkSteps);
 
-    return results[0];
-  }
+      return results[0];
+    }
 
-  public static void CompressColorsHSV(AnimationCurve rCurve,
-                                       AnimationCurve gCurve,
-                                       AnimationCurve bCurve,
-                                   out AnimationCurve compressedRCurve,
-                                   out AnimationCurve compressedGCurve,
-                                   out AnimationCurve compressedBCurve,
-                                       float maxHueError,
-                                       float maxSaturationError,
-                                       float maxValueError,
-                                       int checkSteps = 8) {
-    var curveArray = new AnimationCurve[] {
+    public static void CompressColorsHSV(AnimationCurve rCurve,
+                                         AnimationCurve gCurve,
+                                         AnimationCurve bCurve,
+                                     out AnimationCurve compressedRCurve,
+                                     out AnimationCurve compressedGCurve,
+                                     out AnimationCurve compressedBCurve,
+                                         float maxHueError,
+                                         float maxSaturationError,
+                                         float maxValueError,
+                                         int checkSteps = 8) {
+      var curveArray = new AnimationCurve[] {
       rCurve,
       gCurve,
       bCurve
     };
 
-    var results = CompressCurves(curveArray,
+      var results = CompressCurves(curveArray,
                                  (src, dst, t) => {
                                    Color srcColor;
                                    srcColor.r = src[0].Evaluate(t);
@@ -162,60 +166,63 @@ public static class AnimationCurveUtil {
                                  },
                                  checkSteps);
 
-    compressedRCurve = results[0];
-    compressedGCurve = results[1];
-    compressedBCurve = results[2];
-  }
-
-  public static AnimationCurve[] CompressCurves(AnimationCurve[] curves,
-                                                Func<AnimationCurve[], AnimationCurve[], float, bool> isGood,
-                                                int checkSteps = 8) {
-    var keyframes = new Keyframe[curves.Length][];
-    var position = new int[curves.Length];
-    var nextFrame = new int[curves.Length];
-    var compressedCurves = new AnimationCurve[curves.Length];
-
-    for (int i = 0; i < curves.Length; i++) {
-      var keys = curves[i].keys;
-
-      compressedCurves[i] = new AnimationCurve(keys);
-      keyframes[i] = keys;
-      position[i] = keys.Length - 2;
-      nextFrame[i] = keys.Length - 1;
+      compressedRCurve = results[0];
+      compressedGCurve = results[1];
+      compressedBCurve = results[2];
     }
 
-    do {
+    public static AnimationCurve[] CompressCurves(AnimationCurve[] curves,
+                                                  Func<AnimationCurve[], AnimationCurve[], float, bool> isGood,
+                                                  int checkSteps = 8) {
+      var keyframes = new Keyframe[curves.Length][];
+      var position = new int[curves.Length];
+      var nextFrame = new int[curves.Length];
+      var compressedCurves = new AnimationCurve[curves.Length];
+
       for (int i = 0; i < curves.Length; i++) {
+        var keys = curves[i].keys;
 
-        if (position[i] > 0) {
-          Keyframe nextKeyframe = keyframes[i][nextFrame[i]];
-          Keyframe currKeyframe = keyframes[i][position[i]];
-          Keyframe prevKeyframe = keyframes[i][position[i] - 1];
-
-          compressedCurves[i].RemoveKey(position[i]);
-
-          for (int k = 0; k < checkSteps; k++) {
-            float percent = k / (checkSteps - 1.0f);
-
-            float prevTime = Mathf.Lerp(currKeyframe.time, prevKeyframe.time, percent);
-            float nextTime = Mathf.Lerp(currKeyframe.time, nextKeyframe.time, percent);
-
-            bool isPrevGood = isGood(curves, compressedCurves, prevTime);
-            bool isNextgood = isGood(curves, compressedCurves, nextTime);
-
-            if (!isPrevGood || !isNextgood) {
-              compressedCurves[i].AddKey(currKeyframe);
-              nextFrame[i] = position[i];
-              break;
-            }
-          }
-
-          position[i]--;
-        }
+        compressedCurves[i] = new AnimationCurve(keys);
+        keyframes[i] = keys;
+        position[i] = keys.Length - 2;
+        nextFrame[i] = keys.Length - 1;
       }
-    } while (position.Query().Any(p => p > 0));
 
-    return compressedCurves;
+      do {
+        for (int i = 0; i < curves.Length; i++) {
+
+          if (position[i] > 0) {
+            Keyframe nextKeyframe = keyframes[i][nextFrame[i]];
+            Keyframe currKeyframe = keyframes[i][position[i]];
+            Keyframe prevKeyframe = keyframes[i][position[i] - 1];
+
+            compressedCurves[i].RemoveKey(position[i]);
+
+            for (int k = 0; k < checkSteps; k++) {
+              float percent = k / (checkSteps - 1.0f);
+
+              float prevTime = Mathf.Lerp(currKeyframe.time, prevKeyframe.time, percent);
+              float nextTime = Mathf.Lerp(currKeyframe.time, nextKeyframe.time, percent);
+
+              bool isPrevGood = isGood(curves, compressedCurves, prevTime);
+              bool isNextgood = isGood(curves, compressedCurves, nextTime);
+
+              if (!isPrevGood || !isNextgood) {
+                compressedCurves[i].AddKey(currKeyframe);
+                nextFrame[i] = position[i];
+                break;
+              }
+            }
+
+            position[i]--;
+          }
+        }
+      } while (position.Query().Any(p => p > 0));
+
+      return compressedCurves;
+    }
+
   }
+
 
 }
