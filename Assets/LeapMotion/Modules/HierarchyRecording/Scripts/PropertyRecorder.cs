@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
-using Leap.Unity;
 using Leap.Unity.Query;
 
 namespace Leap.Unity.Recording {

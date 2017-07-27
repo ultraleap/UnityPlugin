@@ -8,6 +8,27 @@ namespace Leap.Unity {
   // TODO: Move me to Core!
   public static class AnimationCurveUtil {
 
+    public static bool IsConstant(this AnimationCurve curve) {
+      var keys = curve.keys;
+      var first = keys[0];
+      for (int i = 0; i < keys.Length; i++) {
+        var key = keys[i];
+
+        if (!Mathf.Approximately(first.value, key.value)) {
+          return false;
+        }
+
+        if (!Mathf.Approximately(key.inTangent, 0)) {
+          return false;
+        }
+
+        if (!Mathf.Approximately(key.outTangent, 0)) {
+          return false;
+        }
+      }
+      return true;
+    }
+
     public static AnimationCurve Compress(AnimationCurve curve, float maxDelta = 0.005f, int checkSteps = 8) {
       var curveArray = new AnimationCurve[] { curve };
 
@@ -115,8 +136,7 @@ namespace Leap.Unity {
 
                                    if (Mathf.Sign(srcValue) == Mathf.Sign(dstValue)) {
                                      return srcValue / dstValue < maxScaleFactor && dstValue / srcValue < maxScaleFactor;
-                                   }
-                                   else {
+                                   } else {
                                      return false;
                                    }
                                  },

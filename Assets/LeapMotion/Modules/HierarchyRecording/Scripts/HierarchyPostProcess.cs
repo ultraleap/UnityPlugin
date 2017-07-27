@@ -4,12 +4,12 @@ using UnityEngine;
 using UnityEngine.Playables;
 using UnityEngine.Timeline;
 using UnityEditor;
-using Leap.Unity;
 using Leap.Unity.Query;
 using Leap.Unity.Attributes;
 
 namespace Leap.Unity.Recording {
 
+  [RecordingFriendly]
   public class HierarchyPostProcess : MonoBehaviour {
 
     [MinValue(0)]
@@ -35,6 +35,122 @@ namespace Leap.Unity.Recording {
 
     [MinValue(0)]
     public float genericMaxError = 0.05f;
+
+    [Header("Clear Settings")]
+    [Tooltip("Deletes all scripts not marked as Recording Friendly.")]
+    public bool clearScripts = true;
+
+    [Tooltip("Deletes all physics joints.")]
+    public bool clearJoints = true;
+
+    [Tooltip("Deletes all Rigidbody components.")]
+    public bool clearRigidbodies = true;
+
+    [Tooltip("Deletes all Collider components.")]
+    public bool clearColliders = true;
+
+    [Tooltip("Deletes all Camera components.")]
+    public bool clearCameras = true;
+
+    [Tooltip("Deletes all Audio Listener components.")]
+    public bool clearAudioListeners = true;
+
+    [Tooltip("Deletes all empty transforms that have no interesting children.")]
+    public bool clearLeafEmpties = true;
+
+    [Tooltip("Deletes all transforms that have the identity transformation.")]
+    public bool collapseIdentityTransforms = true;
+
+    public void ClearComponents() {
+      Transform[] transforms = GetComponentsInChildren<Transform>(includeInactive: true);
+
+      foreach (var transform in transforms) {
+        if (clearScripts) {
+          var scripts = transform.GetComponents<MonoBehaviour>().
+                                  Query().
+                                  Where(t => !RecordingFriendlyAttribute.IsRecordingFriendly(t)).
+                                  ToList();
+          do {
+            foreach (var script in scripts) {
+              DestroyImmediate(script);
+            }
+          } while (scripts.Query().ValidUnityObjs().Any());
+        }
+
+        if (clearJoints) {
+          var joints = transform.GetComponents<Joint>();
+          foreach (var joint in joints) {
+            DestroyImmediate(joint);
+          }
+        }
+
+        if (clearRigidbodies) {
+          var rigidbodies = transform.GetComponents<Rigidbody>();
+          foreach (var rigidbody in rigidbodies) {
+            DestroyImmediate(rigidbody);
+          }
+        }
+
+        if (clearColliders) {
+          var colliders = transform.GetComponents<Collider>();
+          foreach (var collider in colliders) {
+            DestroyImmediate(collider);
+          }
+        }
+
+        if (clearCameras) {
+          var cameras = transform.GetComponents<Camera>();
+          foreach (var camera in cameras) {
+            DestroyImmediate(camera);
+          }
+        }
+
+        if (clearAudioListeners) {
+          var audioListeners = transform.GetComponents<AudioListener>();
+          foreach (var listener in audioListeners) {
+            DestroyImmediate(listener);
+          }
+        }
+      }
+
+      if (clearLeafEmpties) {
+        while (true) {
+          transforms = GetComponentsInChildren<Transform>(includeInactive: true);
+          var empty = transforms.Query().FirstOrDefault(t => t.childCount == 0 &&
+                                                             t.GetComponents<Component>().Length == 1);
+
+          if (empty == null) {
+            break;
+          }
+
+          DestroyImmediate(empty.gameObject);
+        }
+      }
+
+      if (collapseIdentityTransforms) {
+        while (true) {
+          transforms = GetComponentsInChildren<Transform>(includeInactive: true);
+          var empty = transforms.Query().FirstOrDefault(t => t.GetComponents<Component>().Length == 1 &&
+                                                             t.localPosition == Vector3.zero &&
+                                                             t.localRotation == Quaternion.identity &&
+                                                             t.localScale == Vector3.one);
+          if (empty == null) {
+            break;
+          }
+
+          List<Transform> children = new List<Transform>();
+          for (int i = 0; i < empty.childCount; i++) {
+            children.Add(empty.GetChild(i));
+          }
+
+          foreach (var child in children) {
+            child.SetParent(empty.parent, worldPositionStays: true);
+          }
+
+          DestroyImmediate(empty.gameObject);
+        }
+      }
+    }
 
     public void BuildPlaybackPrefab() {
       var timeline = ScriptableObject.CreateInstance<TimelineAsset>();
@@ -98,8 +214,7 @@ namespace Leap.Unity.Recording {
 
           doCompression(recordingData, toCompress, bindingMap);
         }
-      }
-      finally {
+      } finally {
         EditorUtility.ClearProgressBar();
       }
 

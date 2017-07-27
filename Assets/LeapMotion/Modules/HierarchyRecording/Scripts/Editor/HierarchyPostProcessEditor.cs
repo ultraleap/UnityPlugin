@@ -15,6 +15,10 @@ namespace Leap.Unity.Recording {
       bool isPrefab = PrefabUtility.GetPrefabType(target) == PrefabType.Prefab;
       EditorGUI.BeginDisabledGroup(isPrefab);
 
+      if (GUILayout.Button("Clear")) {
+        target.ClearComponents();
+      }
+
       if (GUILayout.Button(new GUIContent("Build Playback Prefab",
                                           isPrefab ? "Draw this object into the scene "
                                                    + "before converting its raw recording "

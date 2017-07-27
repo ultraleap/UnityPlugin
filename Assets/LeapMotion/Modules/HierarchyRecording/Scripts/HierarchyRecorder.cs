@@ -1,7 +1,6 @@
 ﻿using System.IO;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Timeline;
 using UnityEditor;
 
 namespace Leap.Unity.Recording {
@@ -12,7 +11,11 @@ namespace Leap.Unity.Recording {
     public KeyCode finishRecordingKey = KeyCode.F6;
 
     private AnimationClip _clip;
+
     private List<PropertyRecorder> _recorders;
+    private List<Transform> _transforms;
+    private HashSet<Transform> _recordedTransforms;
+
     private Dictionary<EditorCurveBinding, AnimationCurve> _curves;
 
     private bool _isRecording = false;
@@ -38,6 +41,8 @@ namespace Leap.Unity.Recording {
       _startTime = Time.time;
 
       _recorders = new List<PropertyRecorder>();
+      _transforms = new List<Transform>();
+      _recordedTransforms = new HashSet<Transform>();
       _curves = new Dictionary<EditorCurveBinding, AnimationCurve>();
     }
 
@@ -51,16 +56,22 @@ namespace Leap.Unity.Recording {
       }
 
       foreach (var pair in _curves) {
-        Debug.Log(pair.Key.path);
+        //First do a lossless compression
+        var curve = AnimationCurveUtil.Compress(pair.Value, Mathf.Epsilon);
+
+        //But if the curve is constant, just get rid of it!
+        if (curve.IsConstant()) {
+          Debug.Log("Oh no!");
+          continue;
+        }
+
         Transform targetTransform = null;
         var targetObj = AnimationUtility.GetAnimatedObject(gameObject, pair.Key);
         if (targetObj is GameObject) {
           targetTransform = (targetObj as GameObject).transform;
-        }
-        else if (targetObj is Component) {
+        } else if (targetObj is Component) {
           targetTransform = (targetObj as Component).transform;
-        }
-        else {
+        } else {
           Debug.LogError("Target obj was of type " + targetObj.GetType().Name);
         }
 
@@ -73,7 +84,7 @@ namespace Leap.Unity.Recording {
           path = pair.Key.path,
           propertyName = pair.Key.propertyName,
           typeName = pair.Key.type.Name,
-          curve = pair.Value
+          curve = curve
         });
       }
 
@@ -88,11 +99,30 @@ namespace Leap.Unity.Recording {
 
     private void recordData() {
       GetComponentsInChildren(true, _recorders);
+      GetComponentsInChildren(true, _transforms);
 
+      //Record all properties specified by recorders
       foreach (var recorder in _recorders) {
         foreach (var bindings in recorder.GetBindings(gameObject)) {
           if (!_curves.ContainsKey(bindings)) {
             _curves[bindings] = new AnimationCurve();
+          }
+        }
+      }
+
+      //Record ALL transform and gameObject data, no matter what
+      foreach (var transform in _transforms) {
+        if (!_recordedTransforms.Contains(transform)) {
+          _recordedTransforms.Add(transform);
+
+          var bindings = AnimationUtility.GetAnimatableBindings(transform.gameObject, gameObject);
+          foreach (var binding in bindings) {
+            if (binding.type != typeof(GameObject) &&
+                binding.type != typeof(Transform)) {
+              continue;
+            }
+
+            _curves.Add(binding, new AnimationCurve());
           }
         }
       }
@@ -102,8 +132,7 @@ namespace Leap.Unity.Recording {
         bool gotValue = AnimationUtility.GetFloatValue(gameObject, pair.Key, out value);
         if (gotValue) {
           pair.Value.AddKey(Time.time - _startTime, value);
-        }
-        else {
+        } else {
           Debug.Log(pair.Key.path + " : " + pair.Key.propertyName + " : " + pair.Key.type.Name);
         }
       }
