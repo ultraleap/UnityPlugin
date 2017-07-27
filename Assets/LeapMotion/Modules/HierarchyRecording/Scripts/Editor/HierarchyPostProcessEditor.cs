@@ -23,7 +23,4 @@ public class HierarchyPostProcessEditor : CustomEditorBase<HierarchyPostProcess>
 
     EditorGUI.EndDisabledGroup();
   }
-
-
-
 }
