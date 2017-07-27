@@ -17,7 +17,7 @@ public class HierarchyPostProcess : MonoBehaviour {
   public float rotationMaxError = 1;
 
   [MinValue(1)]
-  public float scaleMaxError = 1.1f;
+  public float scaleMaxError = 1.02f;
 
   [Range(0, 1)]
   public float colorHueMaxError = 0.05f;
