@@ -17,6 +17,9 @@ namespace Leap.Unity.Recording {
     private List<Transform> _transforms;
     private HashSet<Transform> _recordedTransforms;
 
+    private List<AudioSource> _audioSources;
+    private Dictionary<AudioSource, RecordedAudio> _audioData;
+
     private Dictionary<EditorCurveBinding, AnimationCurve> _curves;
 
     private bool _isRecording = false;
@@ -44,6 +47,8 @@ namespace Leap.Unity.Recording {
       _recorders = new List<PropertyRecorder>();
       _transforms = new List<Transform>();
       _recordedTransforms = new HashSet<Transform>();
+      _audioSources = new List<AudioSource>();
+      _audioData = new Dictionary<AudioSource, RecordedAudio>();
       _curves = new Dictionary<EditorCurveBinding, AnimationCurve>();
     }
 
@@ -121,6 +126,17 @@ namespace Leap.Unity.Recording {
     private void recordData() {
       GetComponentsInChildren(true, _recorders);
       GetComponentsInChildren(true, _transforms);
+      GetComponentsInChildren(true, _audioSources);
+
+      //Update all audio sources
+      foreach (var source in _audioSources) {
+        RecordedAudio data;
+        if (!_audioData.TryGetValue(source, out data)) {
+          data = source.gameObject.AddComponent<RecordedAudio>();
+          data.target = source;
+          _audioData[source] = data;
+        }
+      }
 
       //Record all properties specified by recorders
       foreach (var recorder in _recorders) {
