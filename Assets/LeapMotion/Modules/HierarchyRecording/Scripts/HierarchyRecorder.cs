@@ -57,7 +57,10 @@ namespace Leap.Unity.Recording {
       }
 
       //Patch up renderer references to materials
-      var allMaterials = Resources.FindObjectsOfTypeAll<Material>();
+      var allMaterials = Resources.FindObjectsOfTypeAll<Material>().
+                                   Query().
+                                   Where(AssetDatabase.IsMainAsset).
+                                   ToList();
       foreach (var renderer in GetComponentsInChildren<Renderer>(includeInactive: true)) {
         var materials = renderer.sharedMaterials;
         for (int i = 0; i < materials.Length; i++) {
@@ -65,7 +68,10 @@ namespace Leap.Unity.Recording {
           if (!AssetDatabase.IsMainAsset(material)) {
             var matchingMaterial = allMaterials.Query().FirstOrDefault(m => material.name.Contains(m.name) &&
                                                                             material.shader == m.shader);
-            materials[i] = matchingMaterial;
+
+            if (matchingMaterial != null) {
+              materials[i] = matchingMaterial;
+            }
           }
         }
         renderer.sharedMaterials = materials;
@@ -77,7 +83,6 @@ namespace Leap.Unity.Recording {
 
         //But if the curve is constant, just get rid of it!
         if (curve.IsConstant()) {
-          Debug.Log("Oh no!");
           continue;
         }
 
