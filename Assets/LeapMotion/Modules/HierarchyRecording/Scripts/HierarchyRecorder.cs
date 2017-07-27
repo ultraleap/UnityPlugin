@@ -82,13 +82,23 @@ namespace Leap.Unity.Recording {
         renderer.sharedMaterials = materials;
       }
 
+
+
       foreach (var pair in _curves) {
         //First do a lossless compression
         var curve = AnimationCurveUtil.Compress(pair.Value, Mathf.Epsilon);
 
         //But if the curve is constant, just get rid of it!
         if (curve.IsConstant()) {
-          continue;
+          //Check to make sure there are no other matching curves that are
+          //non constant.  If X and Y are constant but Z is not, we need to 
+          //keep them all :(
+          if (_curves.Query().Where(k => k.Key.path == pair.Key.path &&
+                                         k.Key.type == pair.Key.type &&
+                                         k.Key.propertyName.TrimEnd(2) == pair.Key.propertyName.TrimEnd(2)).
+                              All(k => k.Value.IsConstant())) {
+            continue;
+          }
         }
 
         Transform targetTransform = null;
@@ -134,6 +144,7 @@ namespace Leap.Unity.Recording {
         if (!_audioData.TryGetValue(source, out data)) {
           data = source.gameObject.AddComponent<RecordedAudio>();
           data.target = source;
+          data.recordingStartTime = _startTime;
           _audioData[source] = data;
         }
       }

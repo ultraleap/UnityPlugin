@@ -173,22 +173,39 @@ namespace Leap.Unity.Recording {
         DestroyImmediate(recording);
       }
 
-      GameObject myGameObject = gameObject;
-
-      DestroyImmediate(this);
-
-      var director = myGameObject.AddComponent<PlayableDirector>();
+      var director = gameObject.AddComponent<PlayableDirector>();
       director.playableAsset = timeline;
 
-      var animator = myGameObject.AddComponent<Animator>();
+      var animator = gameObject.AddComponent<Animator>();
       director.SetGenericBinding(track.outputs.Query().First().sourceObject, animator);
+
+      buildAudioTracks(director, timeline);
+
+      GameObject myGameObject = gameObject;
+      DestroyImmediate(this);
 
       PrefabUtility.CreatePrefab("Assets/LeapMotion/Modules/HierarchyRecording/Recording.prefab", myGameObject);
     }
 
+    private void buildAudioTracks(PlayableDirector director, TimelineAsset timeline) {
+      var audioData = GetComponentsInChildren<RecordedAudio>(includeInactive: true);
+      var sourceToData = audioData.Query().ToDictionary(a => a.target, a => a);
+
+      foreach (var pair in sourceToData) {
+        var track = timeline.CreateTrack<AudioTrack>(null, pair.Value.name);
+        director.SetGenericBinding(track.outputs.Query().First().sourceObject, pair.Key);
+
+        foreach (var clipData in pair.Value.data) {
+          var clip = track.CreateClip(clipData.clip);
+          clip.start = clipData.startTime;
+          clip.timeScale = clipData.pitch;
+          clip.duration = clipData.clip.length;
+        }
+      }
+    }
+
     private AnimationClip generateCompressedClip() {
       var bindingMap = new Dictionary<EditorCurveBinding, AnimationCurve>();
-
 
       try {
         var recordings = GetComponentsInChildren<RecordedData>(includeInactive: true);

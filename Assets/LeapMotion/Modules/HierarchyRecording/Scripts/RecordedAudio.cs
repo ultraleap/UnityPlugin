@@ -1,49 +1,55 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
-public class RecordedAudio : MonoBehaviour {
+namespace Leap.Unity.Recording {
 
-  public AudioSource target;
-  public List<ClipData> data = new List<ClipData>();
+  [RecordingFriendly]
+  public class RecordedAudio : MonoBehaviour {
 
-  private bool _prevWasPlaying = false;
-  private float _prevTime = 0;
-  private AudioClip _prevClip = null;
+    public float recordingStartTime;
+    public AudioSource target;
+    public List<ClipData> data = new List<ClipData>();
 
-  private void LateUpdate() {
-    bool didStartNewClip = false;
+    private bool _prevWasPlaying = false;
+    private float _prevTime = 0;
+    private AudioClip _prevClip = null;
 
-    if (target.isPlaying && !_prevWasPlaying) {
-      didStartNewClip = true;
+    private void LateUpdate() {
+      bool didStartNewClip = false;
+
+      if (target.isPlaying && !_prevWasPlaying) {
+        didStartNewClip = true;
+      }
+
+      if (target.time < _prevTime && target.isPlaying) {
+        didStartNewClip = true;
+      }
+
+      if (target.clip != null && target.clip != _prevClip && target.isPlaying) {
+        didStartNewClip = true;
+      }
+
+      if (didStartNewClip) {
+        data.Add(new ClipData() {
+          clip = target.clip,
+          startTime = Time.time - recordingStartTime,
+          pitch = target.pitch,
+          volume = target.volume
+        });
+      }
+
+      _prevWasPlaying = target.isPlaying;
+      _prevTime = target.time;
+      _prevClip = target.clip;
     }
 
-    if (target.time < _prevTime) {
-      didStartNewClip = true;
+    [Serializable]
+    public class ClipData {
+      public AudioClip clip;
+      public float startTime;
+      public float pitch;
+      public float volume;
     }
-
-    if (target.clip != _prevClip) {
-      didStartNewClip = true;
-    }
-
-    if (didStartNewClip) {
-      data.Add(new ClipData() {
-        clip = target.clip,
-        startTime = Time.time,
-        pitch = target.pitch,
-        volume = target.volume
-      });
-    }
-
-    _prevWasPlaying = target.isPlaying;
-    _prevTime = target.time;
-    _prevClip = target.clip;
   }
-
-  public class ClipData {
-    public AudioClip clip;
-    public float startTime;
-    public float pitch;
-    public float volume;
-  }
-
 }

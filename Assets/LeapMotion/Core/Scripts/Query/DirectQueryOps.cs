@@ -398,5 +398,29 @@ namespace Leap.Unity.Query {
         hashSet.Add(obj);
       }
     }
+
+    public Dictionary<K, V> ToDictionary<K, V>(Func<QueryType, K> keySelector, Func<QueryType, V> valueSelector) {
+      var dictionary = new Dictionary<K, V>();
+
+      var op = _op;
+      QueryType obj;
+      while (op.TryGetNext(out obj)) {
+        dictionary[keySelector(obj)] = valueSelector(obj);
+      }
+
+      return dictionary;
+    }
+
+    public Dictionary<QueryType, V> ToDictionary<V>(Func<QueryType, V> valueSelector) {
+      var dictionary = new Dictionary<QueryType, V>();
+
+      var op = _op;
+      QueryType obj;
+      while (op.TryGetNext(out obj)) {
+        dictionary[obj] = valueSelector(obj);
+      }
+
+      return dictionary;
+    }
   }
 }
