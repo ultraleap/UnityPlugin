@@ -111,6 +111,7 @@ public static class AnimationCurveUtil {
                                    float dstValue = dst[0].Evaluate(t);
 
                                    if (Mathf.Sign(srcValue) == Mathf.Sign(dstValue)) {
+                                     return srcValue / dstValue < maxScaleFactor && dstValue / srcValue < maxScaleFactor;
                                    } else {
                                      return false;
                                    }
