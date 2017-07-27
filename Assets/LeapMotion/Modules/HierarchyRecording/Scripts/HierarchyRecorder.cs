@@ -1,4 +1,4 @@
-﻿using System.IO;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
@@ -7,6 +7,7 @@ using Leap.Unity.Query;
 namespace Leap.Unity.Recording {
 
   public class HierarchyRecorder : MonoBehaviour {
+    public static Action OnPreRecordFrame;
 
     public KeyCode beginRecordingKey = KeyCode.F5;
     public KeyCode finishRecordingKey = KeyCode.F6;
@@ -82,27 +83,57 @@ namespace Leap.Unity.Recording {
         renderer.sharedMaterials = materials;
       }
 
-
-
       foreach (var pair in _curves) {
+        EditorCurveBinding binding = pair.Key;
+        AnimationCurve curve = pair.Value;
+
+        GameObject animationGameObject;
+        {
+          var animatedObj = AnimationUtility.GetAnimatedObject(gameObject, binding);
+          if (animatedObj is GameObject) {
+            animationGameObject = animatedObj as GameObject;
+          } else {
+            animationGameObject = (animatedObj as Component).gameObject;
+          }
+        }
+
+        //If the binding controls a proxy object, destroy the proxy object.  We will
+        //spawn the playback component after we pass the constant-curve check
+        if (AnimationProxyAttribute.IsAnimationProxy(binding.type)) {
+          DestroyImmediate(AnimationUtility.GetAnimatedObject(gameObject, binding));
+        }
+
         //First do a lossless compression
-        var curve = AnimationCurveUtil.Compress(pair.Value, Mathf.Epsilon);
+        curve = AnimationCurveUtil.Compress(curve, Mathf.Epsilon);
 
         //But if the curve is constant, just get rid of it!
         if (curve.IsConstant()) {
           //Check to make sure there are no other matching curves that are
           //non constant.  If X and Y are constant but Z is not, we need to 
           //keep them all :(
-          if (_curves.Query().Where(k => k.Key.path == pair.Key.path &&
-                                         k.Key.type == pair.Key.type &&
-                                         k.Key.propertyName.TrimEnd(2) == pair.Key.propertyName.TrimEnd(2)).
+          if (_curves.Query().Where(p => p.Key.path == binding.path &&
+                                         p.Key.type == binding.type &&
+                                         p.Key.propertyName.TrimEnd(2) == binding.propertyName.TrimEnd(2)).
                               All(k => k.Value.IsConstant())) {
             continue;
           }
         }
 
+        //If the curve controls a proxy object, convert the binding to the playback
+        //type and spawn the playback component
+        if (AnimationProxyAttribute.IsAnimationProxy(binding.type)) {
+          Type playbackType = AnimationProxyAttribute.ConvertToPlaybackType(binding.type);
+          animationGameObject.AddComponent(playbackType);
+
+          binding = new EditorCurveBinding() {
+            path = binding.path,
+            propertyName = binding.propertyName,
+            type = playbackType
+          };
+        }
+
         Transform targetTransform = null;
-        var targetObj = AnimationUtility.GetAnimatedObject(gameObject, pair.Key);
+        var targetObj = AnimationUtility.GetAnimatedObject(gameObject, binding);
         if (targetObj is GameObject) {
           targetTransform = (targetObj as GameObject).transform;
         } else if (targetObj is Component) {
@@ -117,9 +148,9 @@ namespace Leap.Unity.Recording {
         }
 
         dataRecorder.data.Add(new RecordedData.EditorCurveBindingData() {
-          path = pair.Key.path,
-          propertyName = pair.Key.propertyName,
-          typeName = pair.Key.type.Name,
+          path = binding.path,
+          propertyName = binding.propertyName,
+          typeName = binding.type.Name,
           curve = curve
         });
       }
@@ -134,6 +165,10 @@ namespace Leap.Unity.Recording {
     }
 
     private void recordData() {
+      if (OnPreRecordFrame != null) {
+        OnPreRecordFrame();
+      }
+
       GetComponentsInChildren(true, _recorders);
       GetComponentsInChildren(true, _transforms);
       GetComponentsInChildren(true, _audioSources);
