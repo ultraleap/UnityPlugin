@@ -16,12 +16,12 @@ namespace Leap.Unity.Recording {
 
     private List<PropertyRecorder> _recorders;
     private List<Transform> _transforms;
-    private HashSet<Transform> _recordedTransforms;
 
     private List<AudioSource> _audioSources;
     private Dictionary<AudioSource, RecordedAudio> _audioData;
 
     private Dictionary<EditorCurveBinding, AnimationCurve> _curves;
+    private Dictionary<Transform, List<TransformData>> _transformData;
 
     private bool _isRecording = false;
     private float _startTime = 0;
@@ -45,12 +45,23 @@ namespace Leap.Unity.Recording {
       _isRecording = true;
       _startTime = Time.time;
 
+      foreach (var transform in GetComponentsInChildren<Transform>(true)) {
+        HashSet<string> takenNames = new HashSet<string>();
+        for (int i = 0; i < transform.childCount; i++) {
+          Transform child = transform.GetChild(i);
+          if (takenNames.Contains(child.name)) {
+            child.name = child.name + " " + Mathf.Abs(child.GetInstanceID());
+          }
+          takenNames.Add(child.name);
+        }
+      }
+
       _recorders = new List<PropertyRecorder>();
       _transforms = new List<Transform>();
-      _recordedTransforms = new HashSet<Transform>();
       _audioSources = new List<AudioSource>();
       _audioData = new Dictionary<AudioSource, RecordedAudio>();
       _curves = new Dictionary<EditorCurveBinding, AnimationCurve>();
+      _transformData = new Dictionary<Transform, List<TransformData>>();
     }
 
     private void finishRecording() {
@@ -81,6 +92,24 @@ namespace Leap.Unity.Recording {
           }
         }
         renderer.sharedMaterials = materials;
+      }
+
+      foreach (var pair in _transformData) {
+        string path = AnimationUtility.CalculateTransformPath(pair.Key, transform);
+        Type type = typeof(Transform);
+
+        for (int i = 0; i < TransformData.CURVE_COUNT; i++) {
+          string propertyName = TransformData.GetName(i);
+          AnimationCurve curve = new AnimationCurve();
+
+          for (int j = 0; j < pair.Value.Count; j++) {
+            curve.AddKey(pair.Value[j].time, pair.Value[j].GetFloat(i));
+          }
+
+          var binding = EditorCurveBinding.FloatCurve(path, type, propertyName);
+
+          _curves.Add(binding, curve);
+        }
       }
 
       foreach (var pair in _curves) {
@@ -167,55 +196,113 @@ namespace Leap.Unity.Recording {
         OnPreRecordFrame();
       }
 
-      GetComponentsInChildren(true, _recorders);
-      GetComponentsInChildren(true, _transforms);
-      GetComponentsInChildren(true, _audioSources);
-
-      //Update all audio sources
-      foreach (var source in _audioSources) {
-        RecordedAudio data;
-        if (!_audioData.TryGetValue(source, out data)) {
-          data = source.gameObject.AddComponent<RecordedAudio>();
-          data.target = source;
-          data.recordingStartTime = _startTime;
-          _audioData[source] = data;
-        }
+      using (new ProfilerSample("Get Components")) {
+        GetComponentsInChildren(true, _recorders);
+        GetComponentsInChildren(true, _transforms);
+        GetComponentsInChildren(true, _audioSources);
       }
 
-      //Record all properties specified by recorders
-      foreach (var recorder in _recorders) {
-        foreach (var bindings in recorder.GetBindings(gameObject)) {
-          if (!_curves.ContainsKey(bindings)) {
-            _curves[bindings] = new AnimationCurve();
+      using (new ProfilerSample("Update Audio Sources")) {
+        //Update all audio sources
+        foreach (var source in _audioSources) {
+          RecordedAudio data;
+          if (!_audioData.TryGetValue(source, out data)) {
+            data = source.gameObject.AddComponent<RecordedAudio>();
+            data.target = source;
+            data.recordingStartTime = _startTime;
+            _audioData[source] = data;
           }
         }
       }
 
-      //Record ALL transform and gameObject data, no matter what
-      foreach (var transform in _transforms) {
-        if (!_recordedTransforms.Contains(transform)) {
-          _recordedTransforms.Add(transform);
-
-          var bindings = AnimationUtility.GetAnimatableBindings(transform.gameObject, gameObject);
-          foreach (var binding in bindings) {
-            if (binding.type != typeof(GameObject) &&
-                binding.type != typeof(Transform)) {
-              continue;
+      using (new ProfilerSample("Record Properties")) {
+        //Record all properties specified by recorders
+        foreach (var recorder in _recorders) {
+          foreach (var bindings in recorder.GetBindings(gameObject)) {
+            if (!_curves.ContainsKey(bindings)) {
+              _curves[bindings] = new AnimationCurve();
             }
-
-            _curves.Add(binding, new AnimationCurve());
           }
         }
       }
 
-      foreach (var pair in _curves) {
-        float value;
-        bool gotValue = AnimationUtility.GetFloatValue(gameObject, pair.Key, out value);
-        if (gotValue) {
-          pair.Value.AddKey(Time.time - _startTime, value);
-        } else {
-          Debug.Log(pair.Key.path + " : " + pair.Key.propertyName + " : " + pair.Key.type.Name);
+      using (new ProfilerSample("Sample Custom Data")) {
+        foreach (var pair in _curves) {
+          float value;
+          bool gotValue = AnimationUtility.GetFloatValue(gameObject, pair.Key, out value);
+          if (gotValue) {
+            pair.Value.AddKey(Time.time - _startTime, value);
+          } else {
+            Debug.Log(pair.Key.path + " : " + pair.Key.propertyName + " : " + pair.Key.type.Name);
+          }
         }
+      }
+
+      using (new ProfilerSample("Update Transform List")) {
+        //Record ALL transform and gameObject data, no matter what
+        foreach (var transform in _transforms) {
+          if (!_transformData.ContainsKey(transform)) {
+            _transformData[transform] = new List<TransformData>();
+          }
+        }
+      }
+
+      using (new ProfilerSample("Record Transform Data")) {
+        foreach (var pair in _transformData) {
+          pair.Value.Add(new TransformData() {
+            time = Time.time - _startTime,
+            localPosition = pair.Key.localPosition,
+            localRotation = pair.Key.localRotation,
+            localScale = pair.Key.localScale
+          });
+        }
+      }
+    }
+
+    private struct TransformData {
+      public const int CURVE_COUNT = 10;
+
+      public float time;
+      public Vector3 localPosition;
+      public Quaternion localRotation;
+      public Vector3 localScale;
+
+      public float GetFloat(int index) {
+        switch (index) {
+          case 0:
+          case 1:
+          case 2:
+            return localPosition[index];
+          case 3:
+          case 4:
+          case 5:
+          case 6:
+            return localRotation[index - 3];
+          case 7:
+          case 8:
+          case 9:
+            return localScale[index - 7];
+        }
+        throw new Exception();
+      }
+
+      public static string GetName(int index) {
+        switch (index) {
+          case 0:
+          case 1:
+          case 2:
+            return "m_LocalPosition." + "xyz"[index];
+          case 3:
+          case 4:
+          case 5:
+          case 6:
+            return "m_LocalRotation." + "xyzw"[index - 3];
+          case 7:
+          case 8:
+          case 9:
+            return "m_LocalScale" + "xyz"[index - 7];
+        }
+        throw new Exception();
       }
     }
   }
