@@ -1,17 +1,21 @@
 ﻿using UnityEngine;
 using Leap.Unity.GraphicalRenderer;
 
-public class PlaybackRuntimeTint : MonoBehaviour {
+namespace Leap.Unity.Recording {
 
-  public Color color;
+  [RecordingFriendly]
+  public class PlaybackRuntimeTint : MonoBehaviour {
 
-  private LeapRuntimeTintData _tintData;
+    public Color color;
 
-  private void Start() {
-    _tintData = GetComponent<LeapGraphic>().GetFeatureData<LeapRuntimeTintData>();
-  }
+    private LeapRuntimeTintData _tintData;
 
-  private void Update() {
-    _tintData.color = color;
+    private void Start() {
+      _tintData = GetComponent<LeapGraphic>().GetFeatureData<LeapRuntimeTintData>();
+    }
+
+    private void Update() {
+      _tintData.color = color;
+    }
   }
 }

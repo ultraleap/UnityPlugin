@@ -97,12 +97,6 @@ namespace Leap.Unity.Recording {
           }
         }
 
-        //If the binding controls a proxy object, destroy the proxy object.  We will
-        //spawn the playback component after we pass the constant-curve check
-        if (AnimationProxyAttribute.IsAnimationProxy(binding.type)) {
-          DestroyImmediate(AnimationUtility.GetAnimatedObject(gameObject, binding));
-        }
-
         //First do a lossless compression
         curve = AnimationCurveUtil.Compress(curve, Mathf.Epsilon);
 
@@ -123,7 +117,11 @@ namespace Leap.Unity.Recording {
         //type and spawn the playback component
         if (AnimationProxyAttribute.IsAnimationProxy(binding.type)) {
           Type playbackType = AnimationProxyAttribute.ConvertToPlaybackType(binding.type);
-          animationGameObject.AddComponent(playbackType);
+
+          //If we have not yet spawned the playback component, spawn it now
+          if (animationGameObject.GetComponent(playbackType) == null) {
+            animationGameObject.AddComponent(playbackType);
+          }
 
           binding = new EditorCurveBinding() {
             path = binding.path,
