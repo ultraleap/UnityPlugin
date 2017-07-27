@@ -51,6 +51,7 @@ namespace Leap.Unity.Recording {
       }
 
       foreach (var pair in _curves) {
+        Debug.Log(pair.Key.path);
         Transform targetTransform = null;
         var targetObj = AnimationUtility.GetAnimatedObject(gameObject, pair.Key);
         if (targetObj is GameObject) {
@@ -86,7 +87,7 @@ namespace Leap.Unity.Recording {
     }
 
     private void recordData() {
-      GetComponentsInChildren(_recorders);
+      GetComponentsInChildren(true, _recorders);
 
       foreach (var recorder in _recorders) {
         foreach (var bindings in recorder.GetBindings(gameObject)) {
