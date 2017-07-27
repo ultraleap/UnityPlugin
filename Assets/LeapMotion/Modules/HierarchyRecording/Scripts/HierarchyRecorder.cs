@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
+using Leap.Unity.Query;
 
 namespace Leap.Unity.Recording {
 
@@ -53,6 +54,21 @@ namespace Leap.Unity.Recording {
       GetComponentsInChildren(true, _recorders);
       foreach (var recorder in _recorders) {
         DestroyImmediate(recorder);
+      }
+
+      //Patch up renderer references to materials
+      var allMaterials = Resources.FindObjectsOfTypeAll<Material>();
+      foreach (var renderer in GetComponentsInChildren<Renderer>(includeInactive: true)) {
+        var materials = renderer.sharedMaterials;
+        for (int i = 0; i < materials.Length; i++) {
+          var material = materials[i];
+          if (!AssetDatabase.IsMainAsset(material)) {
+            var matchingMaterial = allMaterials.Query().FirstOrDefault(m => material.name.Contains(m.name) &&
+                                                                            material.shader == m.shader);
+            materials[i] = matchingMaterial;
+          }
+        }
+        renderer.sharedMaterials = materials;
       }
 
       foreach (var pair in _curves) {
