@@ -26,6 +26,8 @@ namespace Leap.Unity.Recording {
         _cachedBindings =
         AnimationUtility.GetAnimatableBindings(gameObject, root).Query().
                                                                  Where(IsBindingEnabled).
+                                                                 Where(b => b.type != typeof(Transform) &&
+                                                                            b.type != typeof(GameObject)).
                                                                  ToList();
       }
 
@@ -44,8 +46,7 @@ namespace Leap.Unity.Recording {
 
       if (enabled) {
         _bindings.Add(key);
-      }
-      else {
+      } else {
         _bindings.Remove(key);
       }
     }
@@ -61,8 +62,7 @@ namespace Leap.Unity.Recording {
 
       if (expanded) {
         _expandedTypes.Add(binding.type.Name);
-      }
-      else {
+      } else {
         _expandedTypes.Remove(binding.type.Name);
       }
     }

@@ -27,8 +27,7 @@ namespace Leap.Unity.Recording {
         var singleBinding = new List<EditorCurveBinding>(AnimationUtility.GetAnimatableBindings(target.gameObject, parent));
         if (bindings == null) {
           bindings = new List<EditorCurveBinding>(singleBinding);
-        }
-        else {
+        } else {
           for (int i = bindings.Count; i-- != 0;) {
             if (!singleBinding.Query().Any(t => t.propertyName == bindings[i].propertyName && t.type == bindings[i].type)) {
               bindings.RemoveAt(i);
@@ -37,7 +36,11 @@ namespace Leap.Unity.Recording {
         }
       }
 
-      bindings = bindings.Query().Where(t => t.type != typeof(PropertyRecorder)).ToList();
+      bindings = bindings.Query().
+                          Where(t => t.type != typeof(PropertyRecorder) &&
+                                     t.type != typeof(GameObject) &&
+                                     t.type != typeof(Transform)).
+                          ToList();
 
       bool shouldOverride = false;
       bool overrideValue = false;
