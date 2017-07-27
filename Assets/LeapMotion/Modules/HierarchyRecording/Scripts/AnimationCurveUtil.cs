@@ -98,6 +98,28 @@ public static class AnimationCurveUtil {
     compressedZCurve = results[2];
   }
 
+  public static AnimationCurve CompressScale(AnimationCurve curve,
+                                             float maxScaleFactor,
+                                             int checkSteps = 8) {
+    var curveArray = new AnimationCurve[] {
+      curve,
+    };
+
+    var results = CompressCurves(curveArray,
+                                 (src, dst, t) => {
+                                   float srcValue = src[0].Evaluate(t);
+                                   float dstValue = dst[0].Evaluate(t);
+
+                                   if (Mathf.Sign(srcValue) == Mathf.Sign(dstValue)) {
+                                   } else {
+                                     return false;
+                                   }
+                                 },
+                                 checkSteps);
+
+    return results[0];
+  }
+
   public static void CompressColorsHSV(AnimationCurve rCurve,
                                        AnimationCurve gCurve,
                                        AnimationCurve bCurve,

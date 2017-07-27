@@ -16,6 +16,9 @@ public class HierarchyPostProcess : MonoBehaviour {
   [Range(0, 90)]
   public float rotationMaxError = 1;
 
+  [MinValue(1)]
+  public float scaleMaxError = 1.1f;
+
   [Range(0, 1)]
   public float colorHueMaxError = 0.05f;
 
@@ -155,6 +158,23 @@ public class HierarchyPostProcess : MonoBehaviour {
         toCompress.Remove(zBinding);
         toCompress.Remove(wBinding);
       });
+    }
+
+    //Next do scales
+    bindings = toCompress.Keys.Query().ToList();
+    foreach (var binding in bindings) {
+      if (!binding.propertyName.EndsWith(".x") &&
+          !binding.propertyName.EndsWith(".y") &&
+          !binding.propertyName.EndsWith(".z")) {
+        continue;
+      }
+
+      if (!binding.propertyName.Contains("LocalScale")) {
+        continue;
+      }
+
+      bindingMap[binding] = AnimationCurveUtil.CompressScale(toCompress[binding], scaleMaxError);
+      toCompress.Remove(binding);
     }
 
     //Next do positions
