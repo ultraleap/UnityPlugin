@@ -1,4 +1,4 @@
-﻿using System.Collections;
+﻿using System.IO;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Timeline;
@@ -14,6 +14,7 @@ public class HierarchyRecorder : MonoBehaviour {
   private Dictionary<EditorCurveBinding, AnimationCurve> _curves;
 
   private bool _isRecording = false;
+  private float _startTime = 0;
 
   private void LateUpdate() {
     if (Input.GetKeyDown(beginRecordingKey)) {
@@ -32,6 +33,7 @@ public class HierarchyRecorder : MonoBehaviour {
   private void beginRecording() {
     if (_isRecording) return;
     _isRecording = true;
+    _startTime = Time.time;
 
     _recorders = new List<PropertyRecorder>();
     _curves = new Dictionary<EditorCurveBinding, AnimationCurve>();
@@ -76,7 +78,7 @@ public class HierarchyRecorder : MonoBehaviour {
 
     DestroyImmediate(this);
 
-    PrefabUtility.CreatePrefab("Assets/Template.prefab", myGameObject);
+    PrefabUtility.CreatePrefab("Assets/LeapMotion/Modules/HierarchyRecording/RawRecording.prefab", myGameObject);
   }
 
   private void recordData() {
@@ -94,7 +96,7 @@ public class HierarchyRecorder : MonoBehaviour {
       float value;
       bool gotValue = AnimationUtility.GetFloatValue(gameObject, pair.Key, out value);
       if (gotValue) {
-        pair.Value.AddKey(Time.time, value);
+        pair.Value.AddKey(Time.time - _startTime, value);
       } else {
         Debug.Log(pair.Key.path + " : " + pair.Key.propertyName + " : " + pair.Key.type.Name);
       }

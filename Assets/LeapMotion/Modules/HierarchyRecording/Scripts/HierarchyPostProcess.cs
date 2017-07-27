@@ -42,7 +42,7 @@ public class HierarchyPostProcess : MonoBehaviour {
     timelineClip.asset = clip;
     timelineClip.underlyingAsset = clip;
 
-    AssetDatabase.CreateAsset(timeline, "Assets/Timeline.asset");
+    AssetDatabase.CreateAsset(timeline, "Assets/LeapMotion/Modules/HierarchyRecording/RecordingTimeline.asset");
     AssetDatabase.AddObjectToAsset(track, timeline);
     AssetDatabase.AddObjectToAsset(clip, timeline);
     AssetDatabase.SaveAssets();
@@ -62,7 +62,7 @@ public class HierarchyPostProcess : MonoBehaviour {
     var animator = myGameObject.AddComponent<Animator>();
     director.SetGenericBinding(track.outputs.Query().First().sourceObject, animator);
 
-    PrefabUtility.CreatePrefab("Assets/Recording.prefab", myGameObject);
+    PrefabUtility.CreatePrefab("Assets/LeapMotion/Modules/HierarchyRecording/Recording.prefab", myGameObject);
   }
 
   private AnimationClip generateCompressedClip() {
