@@ -189,7 +189,12 @@ namespace Leap.Unity.Recording {
                                             Query().
                                             Select(c => c.GetType()).
                                             Concat(typeof(GameObject)).
-                                            First(t => t.Name == bindingData.typeName);
+                                            FirstOrDefault(t => t.Name == bindingData.typeName);
+
+                  if (type == null) {
+                    //If could not find the type, the component must have been deleted
+                    continue;
+                  }
 
                   var binding = EditorCurveBinding.FloatCurve(bindingData.path, type, bindingData.propertyName);
                   toCompress[binding] = bindingData.curve;

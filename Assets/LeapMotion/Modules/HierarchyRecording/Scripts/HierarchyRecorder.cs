@@ -10,6 +10,7 @@ namespace Leap.Unity.Recording {
   public class HierarchyRecorder : MonoBehaviour {
     public static Action OnPreRecordFrame;
 
+    public bool recordOnStart = false;
     public KeyCode beginRecordingKey = KeyCode.F5;
     public KeyCode finishRecordingKey = KeyCode.F6;
 
@@ -27,8 +28,16 @@ namespace Leap.Unity.Recording {
     private Dictionary<Transform, List<TransformData>> _transformData;
     private Dictionary<Component, List<ActivityData>> _behaviourActivity;
 
+    private HashSet<string> _takenNames = new HashSet<string>();
+
     private bool _isRecording = false;
     private float _startTime = 0;
+
+    private void Start() {
+      if (recordOnStart) {
+        beginRecording();
+      }
+    }
 
     private void LateUpdate() {
       if (Input.GetKeyDown(beginRecordingKey)) {
@@ -48,17 +57,6 @@ namespace Leap.Unity.Recording {
       if (_isRecording) return;
       _isRecording = true;
       _startTime = Time.time;
-
-      foreach (var transform in GetComponentsInChildren<Transform>(true)) {
-        HashSet<string> takenNames = new HashSet<string>();
-        for (int i = 0; i < transform.childCount; i++) {
-          Transform child = transform.GetChild(i);
-          if (takenNames.Contains(child.name)) {
-            child.name = child.name + " " + Mathf.Abs(child.GetInstanceID());
-          }
-          takenNames.Add(child.name);
-        }
-      }
 
       _components = new List<Component>();
 
@@ -126,7 +124,9 @@ namespace Leap.Unity.Recording {
 
             AnimationCurve curve = new AnimationCurve();
             foreach (var dataPoint in activityData) {
-              curve.AddKey(dataPoint.time, dataPoint.enabled ? 1 : 0);
+              int index = curve.AddKey(dataPoint.time, dataPoint.enabled ? 1 : 0);
+              AnimationUtility.SetKeyLeftTangentMode(curve, index, AnimationUtility.TangentMode.Constant);
+              AnimationUtility.SetKeyRightTangentMode(curve, index, AnimationUtility.TangentMode.Constant);
             }
 
             if (curve.IsConstant()) {
@@ -170,10 +170,10 @@ namespace Leap.Unity.Recording {
               Type type = typeof(Transform);
 
               AnimationCurve curve = new AnimationCurve();
+              var dataType = TransformData.GetDataType(i);
 
-              switch (TransformData.GetDataType(i)) {
+              switch (dataType) {
                 case TransformDataType.Position:
-
                   if (isPositionConstant) continue;
                   break;
                 case TransformDataType.Rotation:
@@ -189,7 +189,11 @@ namespace Leap.Unity.Recording {
               }
 
               for (int j = 0; j < targetData.Count; j++) {
-                curve.AddKey(targetData[j].time, targetData[j].GetFloat(i));
+                int index = curve.AddKey(targetData[j].time, targetData[j].GetFloat(i));
+                if (dataType == TransformDataType.Activity) {
+                  AnimationUtility.SetKeyLeftTangentMode(curve, index, AnimationUtility.TangentMode.Constant);
+                  AnimationUtility.SetKeyRightTangentMode(curve, index, AnimationUtility.TangentMode.Constant);
+                }
               }
 
               var binding = EditorCurveBinding.FloatCurve(path, type, propertyName);
@@ -297,7 +301,7 @@ namespace Leap.Unity.Recording {
         }
       }
 
-      using (new ProfilerSample("Get Component References")) {
+      using (new ProfilerSample("Get Components In Hierarchy")) {
         GetComponentsInChildren(true, _components);
 
         _transforms.Clear();
@@ -314,6 +318,19 @@ namespace Leap.Unity.Recording {
           if (component is Behaviour) _behaviours.Add(component);
           if (component is Renderer) _behaviours.Add(component);
           if (component is Collider) _behaviours.Add(component);
+        }
+      }
+
+      using (new ProfilerSample("Ensure Names Are Unique")) {
+        foreach (var transform in _transforms) {
+          for (int i = 0; i < transform.childCount; i++) {
+            Transform child = transform.GetChild(i);
+            if (_takenNames.Contains(child.name)) {
+              child.name = child.name + " " + Mathf.Abs(child.GetInstanceID());
+            }
+            _takenNames.Add(child.name);
+          }
+          _takenNames.Clear();
         }
       }
 
@@ -364,6 +381,20 @@ namespace Leap.Unity.Recording {
 
       using (new ProfilerSample("Record Transform Data")) {
         foreach (var pair in _transformData) {
+          //If we have no data for this object BUT we also are not
+          //on the first frame of recording, this object must have
+          //been spawned, make sure to record a frame with it being
+          //disabled right before this
+          if (pair.Value.Count == 0 && Time.time > _startTime) {
+            pair.Value.Add(new TransformData() {
+              time = Time.time - _startTime - Time.deltaTime,
+              enabled = false,
+              localPosition = pair.Key.localPosition,
+              localRotation = pair.Key.localRotation,
+              localScale = pair.Key.localScale
+            });
+          }
+
           pair.Value.Add(new TransformData() {
             time = Time.time - _startTime,
             enabled = pair.Key.gameObject.activeInHierarchy,
@@ -384,6 +415,15 @@ namespace Leap.Unity.Recording {
 
       using (new ProfilerSample("Record Behaviour Activity Data")) {
         foreach (var pair in _behaviourActivity) {
+          //Same logic as above, if this is the first frame for a spawned
+          //object make sure to also record a disabled frame previously
+          if (pair.Value.Count == 0 && Time.time > _startTime) {
+            pair.Value.Add(new ActivityData() {
+              time = Time.time - _startTime - Time.deltaTime,
+              enabled = false
+            });
+          }
+
           pair.Value.Add(new ActivityData() {
             time = Time.time - _startTime,
             enabled = EditorUtility.GetObjectEnabled(pair.Key) == 1
