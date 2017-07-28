@@ -18,11 +18,11 @@ namespace Leap.Unity {
           return false;
         }
 
-        if (!Mathf.Approximately(key.inTangent, 0)) {
+        if (!Mathf.Approximately(key.inTangent, 0) && !float.IsInfinity(key.inTangent)) {
           return false;
         }
 
-        if (!Mathf.Approximately(key.outTangent, 0)) {
+        if (!Mathf.Approximately(key.outTangent, 0) && !float.IsInfinity(key.outTangent)) {
           return false;
         }
       }
@@ -39,6 +39,7 @@ namespace Leap.Unity {
                                   return Mathf.Abs(originalValue - compressedValue) < maxDelta;
                                 },
                                 checkSteps);
+
       return result[0];
     }
 
@@ -203,6 +204,15 @@ namespace Leap.Unity {
         var keys = curves[i].keys;
 
         compressedCurves[i] = new AnimationCurve(keys);
+
+        for (int j = 0; j < keys.Length; j++) {
+          var leftT = AnimationUtility.GetKeyLeftTangentMode(curves[i], j);
+          var rightT = AnimationUtility.GetKeyRightTangentMode(curves[i], j);
+
+          AnimationUtility.SetKeyLeftTangentMode(compressedCurves[i], j, leftT);
+          AnimationUtility.SetKeyRightTangentMode(compressedCurves[i], j, rightT);
+        }
+
         keyframes[i] = keys;
         position[i] = keys.Length - 2;
         nextFrame[i] = keys.Length - 1;
@@ -216,6 +226,8 @@ namespace Leap.Unity {
             Keyframe currKeyframe = keyframes[i][position[i]];
             Keyframe prevKeyframe = keyframes[i][position[i] - 1];
 
+            var leftT = AnimationUtility.GetKeyLeftTangentMode(compressedCurves[i], position[i]);
+            var rightT = AnimationUtility.GetKeyRightTangentMode(compressedCurves[i], position[i]);
             compressedCurves[i].RemoveKey(position[i]);
 
             for (int k = 0; k < checkSteps; k++) {
@@ -228,7 +240,10 @@ namespace Leap.Unity {
               bool isNextgood = isGood(curves, compressedCurves, nextTime);
 
               if (!isPrevGood || !isNextgood) {
-                compressedCurves[i].AddKey(currKeyframe);
+                int index = compressedCurves[i].AddKey(currKeyframe);
+                AnimationUtility.SetKeyLeftTangentMode(compressedCurves[i], index, leftT);
+                AnimationUtility.SetKeyRightTangentMode(compressedCurves[i], index, rightT);
+
                 nextFrame[i] = position[i];
                 break;
               }
