@@ -109,8 +109,6 @@ namespace Leap.Unity.Recording {
           }
 
           string path = AnimationUtility.CalculateTransformPath(targetTransform, transform);
-          Type type = typeof(Transform);
-
 
           bool isActivityConstant = true;
           bool isPositionConstant = true;
@@ -132,10 +130,13 @@ namespace Leap.Unity.Recording {
 
           for (int i = 0; i < TransformData.CURVE_COUNT; i++) {
             string propertyName = TransformData.GetName(i);
+            Type type = typeof(Transform);
+
             AnimationCurve curve = new AnimationCurve();
 
             switch (TransformData.GetDataType(i)) {
               case TransformDataType.Position:
+
                 if (isPositionConstant) continue;
                 break;
               case TransformDataType.Rotation:
@@ -146,6 +147,7 @@ namespace Leap.Unity.Recording {
                 break;
               case TransformDataType.Activity:
                 if (isActivityConstant) continue;
+                type = typeof(GameObject);
                 break;
             }
 
