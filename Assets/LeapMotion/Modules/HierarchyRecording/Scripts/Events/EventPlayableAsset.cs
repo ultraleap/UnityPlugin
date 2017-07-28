@@ -1,24 +1,8 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.Events;
+﻿using UnityEngine;
 using UnityEngine.Playables;
 using UnityEngine.Timeline;
 
 namespace Leap.Unity.Recording {
-
-  public enum SerializedArgumentType {
-    None,
-    Color,
-    Float,
-    Int,
-    Quaternion,
-    String,
-    Vector2,
-    Vector3,
-    Vector4
-  }
 
   public class EventPlayableAsset : PlayableAsset, ITimelineClipAsset {
 
@@ -74,6 +58,18 @@ namespace Leap.Unity.Recording {
         default:
           return null;
       }
+    }
+
+    public enum SerializedArgumentType {
+      None,
+      Color,
+      Float,
+      Int,
+      Quaternion,
+      String,
+      Vector2,
+      Vector3,
+      Vector4
     }
 
   }
