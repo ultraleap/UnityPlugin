@@ -30,6 +30,7 @@ namespace Leap.Unity.Recording {
         yield return typeof(TextMesh);
         yield return typeof(MeshFilter);
         yield return typeof(Renderer);
+        yield return typeof(Light);
 
         yield return typeof(Canvas);
         yield return typeof(CanvasScaler);
