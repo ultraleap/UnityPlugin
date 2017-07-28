@@ -22,19 +22,24 @@ namespace Leap.Unity.GraphicalRenderer {
     [SerializeField, HideInInspector]
     private string _fullName;
 
-    private static Assembly _cachedAssembly = null;
-    private static Assembly _assembly {
+    private static Assembly[] _cachedAssemblies = null;
+    private static Assembly[] _assemblies {
       get {
-        if (_cachedAssembly == null) {
-          _cachedAssembly = Assembly.GetAssembly(typeof(LeapGraphicRenderer));
+        if (_cachedAssemblies == null) {
+          _cachedAssemblies = AppDomain.CurrentDomain.GetAssemblies();
         }
-        return _cachedAssembly;
+        return _cachedAssemblies;
       }
     }
 
     public void OnAfterDeserialize() {
       if (!string.IsNullOrEmpty(_fullName)) {
-        _type = _assembly.GetType(_fullName);
+        foreach (var assembly in _assemblies) {
+          _type = assembly.GetType(_fullName, throwOnError: false);
+          if (_type != null) {
+            break;
+          }
+        }
       } else {
         _type = null;
       }
