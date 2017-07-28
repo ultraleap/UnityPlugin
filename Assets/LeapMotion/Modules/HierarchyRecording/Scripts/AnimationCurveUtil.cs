@@ -18,11 +18,11 @@ namespace Leap.Unity {
           return false;
         }
 
-        if (!Mathf.Approximately(key.inTangent, 0)) {
+        if (!Mathf.Approximately(key.inTangent, 0) && !float.IsInfinity(key.inTangent)) {
           return false;
         }
 
-        if (!Mathf.Approximately(key.outTangent, 0)) {
+        if (!Mathf.Approximately(key.outTangent, 0) && !float.IsInfinity(key.outTangent)) {
           return false;
         }
       }
