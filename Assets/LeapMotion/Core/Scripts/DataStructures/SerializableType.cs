@@ -11,7 +11,7 @@ using System;
 using System.Reflection;
 using UnityEngine;
 
-namespace Leap.Unity.GraphicalRenderer {
+namespace Leap.Unity {
 
   [Serializable]
   public struct SerializableType : ISerializationCallbackReceiver {
