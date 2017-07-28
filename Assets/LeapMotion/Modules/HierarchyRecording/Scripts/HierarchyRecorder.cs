@@ -1,4 +1,4 @@
-﻿using System.IO;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
@@ -7,6 +7,7 @@ using Leap.Unity.Query;
 namespace Leap.Unity.Recording {
 
   public class HierarchyRecorder : MonoBehaviour {
+    public static Action OnPreRecordFrame;
 
     public KeyCode beginRecordingKey = KeyCode.F5;
     public KeyCode finishRecordingKey = KeyCode.F6;
@@ -16,6 +17,9 @@ namespace Leap.Unity.Recording {
     private List<PropertyRecorder> _recorders;
     private List<Transform> _transforms;
     private HashSet<Transform> _recordedTransforms;
+
+    private List<AudioSource> _audioSources;
+    private Dictionary<AudioSource, RecordedAudio> _audioData;
 
     private Dictionary<EditorCurveBinding, AnimationCurve> _curves;
 
@@ -44,6 +48,8 @@ namespace Leap.Unity.Recording {
       _recorders = new List<PropertyRecorder>();
       _transforms = new List<Transform>();
       _recordedTransforms = new HashSet<Transform>();
+      _audioSources = new List<AudioSource>();
+      _audioData = new Dictionary<AudioSource, RecordedAudio>();
       _curves = new Dictionary<EditorCurveBinding, AnimationCurve>();
     }
 
@@ -78,16 +84,54 @@ namespace Leap.Unity.Recording {
       }
 
       foreach (var pair in _curves) {
+        EditorCurveBinding binding = pair.Key;
+        AnimationCurve curve = pair.Value;
+
+        GameObject animationGameObject;
+        {
+          var animatedObj = AnimationUtility.GetAnimatedObject(gameObject, binding);
+          if (animatedObj is GameObject) {
+            animationGameObject = animatedObj as GameObject;
+          } else {
+            animationGameObject = (animatedObj as Component).gameObject;
+          }
+        }
+
         //First do a lossless compression
-        var curve = AnimationCurveUtil.Compress(pair.Value, Mathf.Epsilon);
+        curve = AnimationCurveUtil.Compress(curve, Mathf.Epsilon);
 
         //But if the curve is constant, just get rid of it!
         if (curve.IsConstant()) {
-          continue;
+          //Check to make sure there are no other matching curves that are
+          //non constant.  If X and Y are constant but Z is not, we need to 
+          //keep them all :(
+          if (_curves.Query().Where(p => p.Key.path == binding.path &&
+                                         p.Key.type == binding.type &&
+                                         p.Key.propertyName.TrimEnd(2) == binding.propertyName.TrimEnd(2)).
+                              All(k => k.Value.IsConstant())) {
+            continue;
+          }
+        }
+
+        //If the curve controls a proxy object, convert the binding to the playback
+        //type and spawn the playback component
+        if (AnimationProxyAttribute.IsAnimationProxy(binding.type)) {
+          Type playbackType = AnimationProxyAttribute.ConvertToPlaybackType(binding.type);
+
+          //If we have not yet spawned the playback component, spawn it now
+          if (animationGameObject.GetComponent(playbackType) == null) {
+            animationGameObject.AddComponent(playbackType);
+          }
+
+          binding = new EditorCurveBinding() {
+            path = binding.path,
+            propertyName = binding.propertyName,
+            type = playbackType
+          };
         }
 
         Transform targetTransform = null;
-        var targetObj = AnimationUtility.GetAnimatedObject(gameObject, pair.Key);
+        var targetObj = AnimationUtility.GetAnimatedObject(gameObject, binding);
         if (targetObj is GameObject) {
           targetTransform = (targetObj as GameObject).transform;
         } else if (targetObj is Component) {
@@ -102,9 +146,9 @@ namespace Leap.Unity.Recording {
         }
 
         dataRecorder.data.Add(new RecordedData.EditorCurveBindingData() {
-          path = pair.Key.path,
-          propertyName = pair.Key.propertyName,
-          typeName = pair.Key.type.Name,
+          path = binding.path,
+          propertyName = binding.propertyName,
+          typeName = binding.type.Name,
           curve = curve
         });
       }
@@ -119,8 +163,24 @@ namespace Leap.Unity.Recording {
     }
 
     private void recordData() {
+      if (OnPreRecordFrame != null) {
+        OnPreRecordFrame();
+      }
+
       GetComponentsInChildren(true, _recorders);
       GetComponentsInChildren(true, _transforms);
+      GetComponentsInChildren(true, _audioSources);
+
+      //Update all audio sources
+      foreach (var source in _audioSources) {
+        RecordedAudio data;
+        if (!_audioData.TryGetValue(source, out data)) {
+          data = source.gameObject.AddComponent<RecordedAudio>();
+          data.target = source;
+          data.recordingStartTime = _startTime;
+          _audioData[source] = data;
+        }
+      }
 
       //Record all properties specified by recorders
       foreach (var recorder in _recorders) {

@@ -148,6 +148,16 @@ namespace Leap.Unity {
 
     #endregion
 
+    #region String Utils
+    public static string TrimEnd(this string str, int characters) {
+      return str.Substring(0, Mathf.Max(0, str.Length - characters));
+    }
+
+    public static string TrimStart(this string str, int characters) {
+      return str.Substring(characters);
+    }
+    #endregion
+
     #region Math Utils
 
     public static int Repeat(int x, int m) {

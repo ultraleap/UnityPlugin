@@ -38,22 +38,7 @@ namespace Leap.Unity.Recording {
 
     [Header("Clear Settings")]
     [Tooltip("Deletes all scripts not marked as Recording Friendly.")]
-    public bool clearScripts = true;
-
-    [Tooltip("Deletes all physics joints.")]
-    public bool clearJoints = true;
-
-    [Tooltip("Deletes all Rigidbody components.")]
-    public bool clearRigidbodies = true;
-
-    [Tooltip("Deletes all Collider components.")]
-    public bool clearColliders = true;
-
-    [Tooltip("Deletes all Camera components.")]
-    public bool clearCameras = true;
-
-    [Tooltip("Deletes all Audio Listener components.")]
-    public bool clearAudioListeners = true;
+    public bool clearUnfriendlyComponents = true;
 
     [Tooltip("Deletes all empty transforms that have no interesting children.")]
     public bool clearLeafEmpties = true;
@@ -65,8 +50,8 @@ namespace Leap.Unity.Recording {
       Transform[] transforms = GetComponentsInChildren<Transform>(includeInactive: true);
 
       foreach (var transform in transforms) {
-        if (clearScripts) {
-          var scripts = transform.GetComponents<MonoBehaviour>().
+        if (clearUnfriendlyComponents) {
+          var scripts = transform.GetComponents<Component>().
                                   Query().
                                   Where(t => !RecordingFriendlyAttribute.IsRecordingFriendly(t)).
                                   ToList();
@@ -75,41 +60,6 @@ namespace Leap.Unity.Recording {
               DestroyImmediate(script);
             }
           } while (scripts.Query().ValidUnityObjs().Any());
-        }
-
-        if (clearJoints) {
-          var joints = transform.GetComponents<Joint>();
-          foreach (var joint in joints) {
-            DestroyImmediate(joint);
-          }
-        }
-
-        if (clearRigidbodies) {
-          var rigidbodies = transform.GetComponents<Rigidbody>();
-          foreach (var rigidbody in rigidbodies) {
-            DestroyImmediate(rigidbody);
-          }
-        }
-
-        if (clearColliders) {
-          var colliders = transform.GetComponents<Collider>();
-          foreach (var collider in colliders) {
-            DestroyImmediate(collider);
-          }
-        }
-
-        if (clearCameras) {
-          var cameras = transform.GetComponents<Camera>();
-          foreach (var camera in cameras) {
-            DestroyImmediate(camera);
-          }
-        }
-
-        if (clearAudioListeners) {
-          var audioListeners = transform.GetComponents<AudioListener>();
-          foreach (var listener in audioListeners) {
-            DestroyImmediate(listener);
-          }
         }
       }
 
@@ -173,22 +123,39 @@ namespace Leap.Unity.Recording {
         DestroyImmediate(recording);
       }
 
-      GameObject myGameObject = gameObject;
-
-      DestroyImmediate(this);
-
-      var director = myGameObject.AddComponent<PlayableDirector>();
+      var director = gameObject.AddComponent<PlayableDirector>();
       director.playableAsset = timeline;
 
-      var animator = myGameObject.AddComponent<Animator>();
+      var animator = gameObject.AddComponent<Animator>();
       director.SetGenericBinding(track.outputs.Query().First().sourceObject, animator);
+
+      buildAudioTracks(director, timeline);
+
+      GameObject myGameObject = gameObject;
+      DestroyImmediate(this);
 
       PrefabUtility.CreatePrefab("Assets/LeapMotion/Modules/HierarchyRecording/Recording.prefab", myGameObject);
     }
 
+    private void buildAudioTracks(PlayableDirector director, TimelineAsset timeline) {
+      var audioData = GetComponentsInChildren<RecordedAudio>(includeInactive: true);
+      var sourceToData = audioData.Query().ToDictionary(a => a.target, a => a);
+
+      foreach (var pair in sourceToData) {
+        var track = timeline.CreateTrack<AudioTrack>(null, pair.Value.name);
+        director.SetGenericBinding(track.outputs.Query().First().sourceObject, pair.Key);
+
+        foreach (var clipData in pair.Value.data) {
+          var clip = track.CreateClip(clipData.clip);
+          clip.start = clipData.startTime;
+          clip.timeScale = clipData.pitch;
+          clip.duration = clipData.clip.length;
+        }
+      }
+    }
+
     private AnimationClip generateCompressedClip() {
       var bindingMap = new Dictionary<EditorCurveBinding, AnimationCurve>();
-
 
       try {
         var recordings = GetComponentsInChildren<RecordedData>(includeInactive: true);
