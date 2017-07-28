@@ -158,7 +158,41 @@ namespace Leap.Unity.Recording {
         }
       }
     }
-  }
 
+    #region GUI
+
+    private Vector2 _guiMargins = new Vector2(5F, 5F);
+    private Vector2 _guiSize    = new Vector2(175F, 60F);
+
+    private void OnGUI() {
+      var guiRect = new Rect(_guiMargins.x, _guiMargins.y, _guiSize.x, _guiSize.y);
+
+      GUI.Box(guiRect, "");
+
+      GUILayout.BeginArea(guiRect.PadInner(5F));
+      GUILayout.BeginVertical();
+
+      if (!_isRecording) {
+        GUILayout.Label("Ready to record.");
+        if (GUILayout.Button("Start Recording (" + beginRecordingKey.ToString() + ")",
+                             GUILayout.ExpandHeight(true))) {
+          beginRecording();
+        }
+      }
+      else {
+        GUILayout.Label("Recording.");
+        if (GUILayout.Button("Stop Recording (" + finishRecordingKey.ToString() + ")",
+                             GUILayout.ExpandHeight(true))) {
+          finishRecording();
+        }
+      }
+
+      GUILayout.EndVertical();
+      GUILayout.EndArea();
+    }
+
+    #endregion
+
+  }
 
 }

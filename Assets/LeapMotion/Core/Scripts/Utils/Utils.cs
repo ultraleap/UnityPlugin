@@ -640,6 +640,18 @@ namespace Leap.Unity {
 
     #endregion
 
+    #region Rect Utils
+    
+    /// <summary>
+    /// Returns a new Rect with the argument padding as a margin relative to each
+    /// border of the provided Rect.
+    /// </summary>
+    public static Rect PadInner(this Rect r, float padding) {
+      return new Rect(r.x + padding, r.y + padding, r.width - (padding * 2), r.height - (padding * 2));
+    }
+
+    #endregion
+
   }
 
 }
