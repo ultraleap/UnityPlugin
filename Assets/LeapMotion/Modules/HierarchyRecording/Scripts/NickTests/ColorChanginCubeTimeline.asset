@@ -1966,15 +1966,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 575aa15fedd9f49439390076921f968b, type: 3}
   m_Name: EventPlayableAsset
   m_EditorClassIdentifier: 
-  recipientPath: relative/path/to/recipient
+  recipient:
+    exposedName: 
+    defaultValue: {fileID: 0}
   message: MyMethod
   argumentType: 0
-  intArg: 0
+  colorArg: {r: 1, g: 0, b: 1, a: 1}
   floatArg: 0
+  intArg: 0
+  quaternionArg: {x: 0, y: 0, z: 0, w: 1}
+  stringArg: 
   vector2Arg: {x: 0, y: 0}
   vector3Arg: {x: 0, y: 0, z: 0}
-  stringArg: 
-  colorArg: {r: 1, g: 0, b: 1, a: 1}
+  vector4Arg: {x: 0, y: 0, z: 0, w: 0}
 --- !u!114 &114413661228800702
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1986,15 +1990,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 575aa15fedd9f49439390076921f968b, type: 3}
   m_Name: EventPlayableAsset
   m_EditorClassIdentifier: 
-  recipientPath: Recorded Cube
+  recipient:
+    exposedName: 9e9704f8a4a5e194493ef65dfd5035bc
+    defaultValue: {fileID: 0}
   message: SetColorEvent
-  argumentType: 6
-  intArg: 0
+  argumentType: 1
+  colorArg: {r: 0.1544118, g: 0.33519268, b: 1, a: 1}
   floatArg: 0
+  intArg: 0
+  quaternionArg: {x: 0, y: 0, z: 0, w: 1}
+  stringArg: HELLO!!!!
   vector2Arg: {x: 0, y: 0}
   vector3Arg: {x: 1, y: 1, z: 1}
-  stringArg: HELLO!!!!
-  colorArg: {r: 0.1544118, g: 0.33519268, b: 1, a: 1}
+  vector4Arg: {x: 0, y: 0, z: 0, w: 0}
 --- !u!114 &114765029946040974
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2108,12 +2116,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 575aa15fedd9f49439390076921f968b, type: 3}
   m_Name: EventPlayableAsset
   m_EditorClassIdentifier: 
-  recipientPath: Recorded Cube
+  recipient:
+    exposedName: ed0074e70fa4e844c80fb3cd7ee162d7
+    defaultValue: {fileID: 0}
   message: SetColorEvent
-  argumentType: 6
-  intArg: 0
+  argumentType: 1
+  colorArg: {r: 1, g: 0, b: 0, a: 1}
   floatArg: 0
+  intArg: 0
+  quaternionArg: {x: 0, y: 0, z: 0, w: 1}
+  stringArg: sdfsdf
   vector2Arg: {x: 0, y: 0}
   vector3Arg: {x: 0, y: 0, z: 0}
-  stringArg: sdfsdf
-  colorArg: {r: 1, g: 0, b: 0, a: 1}
+  vector4Arg: {x: 0, y: 0, z: 0, w: 0}
