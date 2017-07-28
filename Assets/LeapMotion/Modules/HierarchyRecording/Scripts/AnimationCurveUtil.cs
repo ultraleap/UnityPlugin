@@ -40,16 +40,6 @@ namespace Leap.Unity {
                                 },
                                 checkSteps);
 
-      var keys = curve.keys;
-      for (int i = 0; i < keys.Length; i++) {
-        var key = keys[i];
-        var compressedValue = result[0].Evaluate(key.time);
-        if (Mathf.Abs(compressedValue - key.value) > maxDelta) {
-          Debug.LogError("I failed");
-          break;
-        }
-      }
-
       return result[0];
     }
 

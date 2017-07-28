@@ -104,39 +104,37 @@ namespace Leap.Unity.Recording {
     }
 
     public void BuildPlaybackPrefab(ProgressBar progress) {
-      progress.Begin(2, "Building Playback Prefab", "", () => {
-        var timeline = ScriptableObject.CreateInstance<TimelineAsset>();
+      var timeline = ScriptableObject.CreateInstance<TimelineAsset>();
 
-        var track = timeline.CreateTrack<AnimationTrack>(null, "Playback Animation");
+      var track = timeline.CreateTrack<AnimationTrack>(null, "Playback Animation");
 
-        var clip = generateCompressedClip(progress);
+      var clip = generateCompressedClip(progress);
 
-        var timelineClip = track.CreateClip(clip);
-        timelineClip.asset = clip;
-        timelineClip.underlyingAsset = clip;
+      var timelineClip = track.CreateClip(clip);
+      timelineClip.asset = clip;
+      timelineClip.underlyingAsset = clip;
 
-        AssetDatabase.CreateAsset(timeline, "Assets/LeapMotion/Modules/HierarchyRecording/RecordingTimeline.asset");
-        AssetDatabase.AddObjectToAsset(track, timeline);
-        AssetDatabase.AddObjectToAsset(clip, timeline);
-        AssetDatabase.SaveAssets();
-        AssetDatabase.Refresh();
+      AssetDatabase.CreateAsset(timeline, "Assets/LeapMotion/Modules/HierarchyRecording/RecordingTimeline.asset");
+      AssetDatabase.AddObjectToAsset(track, timeline);
+      AssetDatabase.AddObjectToAsset(clip, timeline);
+      AssetDatabase.SaveAssets();
+      AssetDatabase.Refresh();
 
-        foreach (var recording in GetComponentsInChildren<RecordedData>(includeInactive: true)) {
-          DestroyImmediate(recording);
-        }
+      foreach (var recording in GetComponentsInChildren<RecordedData>(includeInactive: true)) {
+        DestroyImmediate(recording);
+      }
 
-        var director = gameObject.AddComponent<PlayableDirector>();
-        director.playableAsset = timeline;
+      var director = gameObject.AddComponent<PlayableDirector>();
+      director.playableAsset = timeline;
 
-        var animator = gameObject.AddComponent<Animator>();
-        director.SetGenericBinding(track.outputs.Query().First().sourceObject, animator);
+      var animator = gameObject.AddComponent<Animator>();
+      director.SetGenericBinding(track.outputs.Query().First().sourceObject, animator);
 
-        buildAudioTracks(progress, director, timeline);
+      buildAudioTracks(progress, director, timeline);
 
+      progress.Begin(1, "", "Finalizing Prefab", () => {
         GameObject myGameObject = gameObject;
         DestroyImmediate(this);
-
-        progress.Step("Finalizing Prefab");
 
         PrefabUtility.CreatePrefab("Assets/LeapMotion/Modules/HierarchyRecording/Recording.prefab", myGameObject);
       });
