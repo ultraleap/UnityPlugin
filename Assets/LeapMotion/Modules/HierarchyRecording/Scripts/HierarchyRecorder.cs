@@ -15,14 +15,17 @@ namespace Leap.Unity.Recording {
 
     private AnimationClip _clip;
 
-    private List<PropertyRecorder> _recorders;
-    private List<Transform> _transforms;
+    private List<Component> _components;
 
+    private List<Transform> _transforms;
+    private List<Component> _behaviours;
     private List<AudioSource> _audioSources;
-    private Dictionary<AudioSource, RecordedAudio> _audioData;
+    private List<PropertyRecorder> _recorders;
 
     private Dictionary<EditorCurveBinding, AnimationCurve> _curves;
+    private Dictionary<AudioSource, RecordedAudio> _audioData;
     private Dictionary<Transform, List<TransformData>> _transformData;
+    private Dictionary<Component, List<ActivityData>> _behaviourActivity;
 
     private bool _isRecording = false;
     private float _startTime = 0;
@@ -57,16 +60,21 @@ namespace Leap.Unity.Recording {
         }
       }
 
-      _recorders = new List<PropertyRecorder>();
+      _components = new List<Component>();
+
       _transforms = new List<Transform>();
+      _behaviours = new List<Component>();
+      _recorders = new List<PropertyRecorder>();
       _audioSources = new List<AudioSource>();
-      _audioData = new Dictionary<AudioSource, RecordedAudio>();
+
       _curves = new Dictionary<EditorCurveBinding, AnimationCurve>();
+      _audioData = new Dictionary<AudioSource, RecordedAudio>();
       _transformData = new Dictionary<Transform, List<TransformData>>();
+      _behaviourActivity = new Dictionary<Component, List<ActivityData>>();
     }
 
     private void finishRecording(ProgressBar progress) {
-      progress.Begin(3, "Saving Recording", "", () => {
+      progress.Begin(4, "Saving Recording", "", () => {
         if (!_isRecording) return;
         _isRecording = false;
 
@@ -103,6 +111,31 @@ namespace Leap.Unity.Recording {
               renderer.sharedMaterials = materials;
             }
           });
+        });
+
+        progress.Begin(_behaviourActivity.Count, "", "Converting Activity Data: ", () => {
+          foreach (var pair in _behaviourActivity) {
+            var targetBehaviour = pair.Key;
+            var activityData = pair.Value;
+
+            progress.Step(targetBehaviour.name);
+
+            string path = AnimationUtility.CalculateTransformPath(targetBehaviour.transform, transform);
+            Type type = targetBehaviour.GetType();
+            string propertyName = "m_Enabled";
+
+            AnimationCurve curve = new AnimationCurve();
+            foreach (var dataPoint in activityData) {
+              curve.AddKey(dataPoint.time, dataPoint.enabled ? 1 : 0);
+            }
+
+            if (curve.IsConstant()) {
+              continue;
+            }
+
+            var binding = EditorCurveBinding.FloatCurve(path, type, propertyName);
+            _curves.Add(binding, curve);
+          }
         });
 
         progress.Begin(_transformData.Count, "", "Converting Transform Data: ", () => {
@@ -265,9 +298,23 @@ namespace Leap.Unity.Recording {
       }
 
       using (new ProfilerSample("Get Component References")) {
-        GetComponentsInChildren(true, _recorders);
-        GetComponentsInChildren(true, _transforms);
-        GetComponentsInChildren(true, _audioSources);
+        GetComponentsInChildren(true, _components);
+
+        _transforms.Clear();
+        _audioSources.Clear();
+        _recorders.Clear();
+        _behaviours.Clear();
+        for (int i = 0; i < _components.Count; i++) {
+          var component = _components[i];
+
+          if (component is Transform) _transforms.Add(component as Transform);
+          if (component is AudioSource) _audioSources.Add(component as AudioSource);
+          if (component is PropertyRecorder) _recorders.Add(component as PropertyRecorder);
+
+          if (component is Behaviour) _behaviours.Add(component);
+          if (component is Renderer) _behaviours.Add(component);
+          if (component is Collider) _behaviours.Add(component);
+        }
       }
 
       using (new ProfilerSample("Discover Audio Sources")) {
@@ -326,6 +373,28 @@ namespace Leap.Unity.Recording {
           });
         }
       }
+
+      using (new ProfilerSample("Discover Behaviours")) {
+        foreach (var behaviour in _behaviours) {
+          if (!_behaviourActivity.ContainsKey(behaviour)) {
+            _behaviourActivity[behaviour] = new List<ActivityData>();
+          }
+        }
+      }
+
+      using (new ProfilerSample("Record Behaviour Activity Data")) {
+        foreach (var pair in _behaviourActivity) {
+          pair.Value.Add(new ActivityData() {
+            time = Time.time - _startTime,
+            enabled = EditorUtility.GetObjectEnabled(pair.Key) == 1
+          });
+        }
+      }
+    }
+
+    private struct ActivityData {
+      public float time;
+      public bool enabled;
     }
 
     private enum TransformDataType {
