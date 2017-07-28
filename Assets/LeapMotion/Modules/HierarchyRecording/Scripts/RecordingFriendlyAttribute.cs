@@ -27,11 +27,9 @@ namespace Leap.Unity.Recording {
         yield return typeof(LeapGraphic);
 
         yield return typeof(Transform);
-        yield return typeof(MeshFilter);
-        yield return typeof(MeshRenderer);
-        yield return typeof(SpriteRenderer);
-        yield return typeof(LineRenderer);
         yield return typeof(TextMesh);
+        yield return typeof(MeshFilter);
+        yield return typeof(Renderer);
 
         yield return typeof(Canvas);
         yield return typeof(CanvasScaler);
