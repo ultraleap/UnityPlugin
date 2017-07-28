@@ -39,7 +39,8 @@ namespace Leap.Unity.Recording {
       bindings = bindings.Query().
                           Where(t => t.type != typeof(PropertyRecorder) &&
                                      t.type != typeof(GameObject) &&
-                                     t.type != typeof(Transform)).
+                                     t.type != typeof(Transform) &&
+                                     t.propertyName != "m_Enabled").
                           ToList();
 
       bool shouldOverride = false;
