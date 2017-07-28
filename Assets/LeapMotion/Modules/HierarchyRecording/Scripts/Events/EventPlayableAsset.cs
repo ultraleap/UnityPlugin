@@ -60,18 +60,18 @@ namespace Leap.Unity.Recording {
       }
     }
 
-    public enum SerializedArgumentType {
-      None,
-      Color,
-      Float,
-      Int,
-      Quaternion,
-      String,
-      Vector2,
-      Vector3,
-      Vector4
-    }
+  }
 
+  public enum SerializedArgumentType {
+    None,
+    Color,
+    Float,
+    Int,
+    Quaternion,
+    String,
+    Vector2,
+    Vector3,
+    Vector4
   }
 
 }
