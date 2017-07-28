@@ -10,27 +10,30 @@ namespace Leap.Unity.Recording {
 
   public enum SerializedArgumentType {
     None,
-    Int,
+    Color,
     Float,
+    Int,
+    Quaternion,
+    String,
     Vector2,
     Vector3,
-    String,
-    Color
+    Vector4
   }
 
   public class EventPlayableAsset : PlayableAsset, ITimelineClipAsset {
 
-    public string recipientPath = "relative/path/to/recipient";
-
+    public ExposedReference<GameObject> recipient;
     public string message = "MyMethod";
 
     public SerializedArgumentType argumentType;
-    public int intArg = 0;
+    public Color colorArg = Color.magenta;
     public float floatArg = 0F;
+    public int intArg = 0;
+    public Quaternion quaternionArg = Quaternion.identity;
+    public string stringArg = "";
     public Vector2 vector2Arg = Vector2.zero;
     public Vector3 vector3Arg = Vector3.zero;
-    public string stringArg = "";
-    public Color colorArg = Color.magenta;
+    public Vector4 vector4Arg = Vector4.zero;
 
     public ClipCaps clipCaps {
       get { return ClipCaps.None; }
@@ -41,10 +44,9 @@ namespace Leap.Unity.Recording {
     }
 
     public override Playable CreatePlayable(PlayableGraph graph, GameObject owner) {
-      var playable = ScriptPlayable<EventPlayable>.Create(graph, inputCount: 0);
+      var playable = ScriptPlayable<EventPlayableBehaviour>.Create(graph, inputCount: 0);
       var behaviour = playable.GetBehaviour();
-      behaviour.rootObject = owner;
-      behaviour.recipientPath = recipientPath;
+      behaviour.recipient = recipient.Resolve(graph.GetResolver());
       behaviour.message = message;
       behaviour.argument = getArgument();
 
@@ -53,18 +55,22 @@ namespace Leap.Unity.Recording {
 
     private object getArgument() {
       switch (argumentType) {
-        case SerializedArgumentType.Int:
-          return intArg;
+        case SerializedArgumentType.Color:
+          return colorArg;
         case SerializedArgumentType.Float:
           return floatArg;
+        case SerializedArgumentType.Int:
+          return intArg;
+        case SerializedArgumentType.Quaternion:
+          return quaternionArg;
+        case SerializedArgumentType.String:
+          return stringArg;
         case SerializedArgumentType.Vector2:
           return vector2Arg;
         case SerializedArgumentType.Vector3:
           return vector3Arg;
-        case SerializedArgumentType.String:
-          return stringArg;
-        case SerializedArgumentType.Color:
-          return colorArg;
+        case SerializedArgumentType.Vector4:
+          return vector4Arg;
         default:
           return null;
       }

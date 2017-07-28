@@ -5,10 +5,9 @@ using UnityEngine.Playables;
 
 namespace Leap.Unity.Recording {
 
-  public class EventPlayable : PlayableBehaviour {
-
-    public GameObject rootObject = null;
-    public string recipientPath = "path/to/recipient";
+  public class EventPlayableBehaviour : PlayableBehaviour {
+    
+    public GameObject recipient;
     public string message = "MyMethod";
     public object argument;
 
@@ -20,15 +19,12 @@ namespace Leap.Unity.Recording {
 
       var time = playable.GetTime();
       if (time < playable.GetDuration() / 2) {
-        var target = rootObject.transform.Find(recipientPath);
+        var target = recipient;
 
         if (target == null) {
-          var totalPath = rootObject.name + "/" + recipientPath;
-          Debug.LogError("Unable to find target at " + totalPath);
+          Debug.LogError("Unable to find event message recipient.");
           return;
         }
-
-        Debug.Log("FIRE -- " + time + " target is " + target);
 
         if (argument == null) {
           target.SendMessage(message);
