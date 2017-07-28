@@ -2,8 +2,8 @@
 
 namespace Leap.Unity.Recording {
 
-  [CustomEditor(typeof(EventPlayableAsset))]
-  public class EventPlayableAssetEditor : CustomEditorBase<EventPlayableAsset> {
+  [CustomEditor(typeof(EventClip))]
+  public class EventClipEditor : CustomEditorBase<EventClip> {
 
     protected override void OnEnable() {
       base.OnEnable();

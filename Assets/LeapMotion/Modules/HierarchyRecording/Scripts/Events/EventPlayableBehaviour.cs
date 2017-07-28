@@ -9,29 +9,27 @@ namespace Leap.Unity.Recording {
     public string message = "MyMethod";
     public object argument;
 
-    public override void OnBehaviourPlay(Playable playable, FrameData info) {
-      base.OnBehaviourPlay(playable, info);
+    public void FireEvent() {
+      if (recipient == null) {
+        Debug.LogError("Unable to fire event: Recipient is null.");
+        return;
+      }
+      
+      if (argument == null) {
+        //Debug.Log("Target: " + recipient.name + "; Sending message: " + message);
 
-      // Can't send messages at edit-time.
-      if (!Application.isPlaying) return;
-
-      var time = playable.GetTime();
-      if (time < playable.GetDuration() / 2) {
-        var target = recipient;
-
-        if (target == null) {
-          Debug.LogError("Unable to find event message recipient.");
-          return;
-        }
-
-        if (argument == null) {
-          target.SendMessage(message);
-        }
-        else {
-          target.SendMessage(message, argument);
+        if (Application.isPlaying) {
+          recipient.SendMessage(message);
         }
       }
+      else {
+        //Debug.Log("Target: " + recipient.name + "; Sending message: " + message
+        //        + "with arg: " + argument);
 
+        if (Application.isPlaying) {
+          recipient.SendMessage(message, argument);
+        }
+      }
     }
 
   }

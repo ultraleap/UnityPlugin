@@ -210,6 +210,18 @@ namespace Leap.Unity {
           || float.IsNaN(v.z);
     }
 
+    public static bool IsBetween(this float f, float f0, float f1) {
+      if (f0 > f1) Utils.Swap(ref f0, ref f1);
+
+      return f0 <= f && f <= f1;
+    }
+
+    public static bool IsBetween(this double d, double d0, double d1) {
+      if (d0 > d1) Utils.Swap(ref d0, ref d1);
+
+      return d0 <= d && d <= d1;
+    }
+
     #endregion
 
     #region Value Mapping Utils

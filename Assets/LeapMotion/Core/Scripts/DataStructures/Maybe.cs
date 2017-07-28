@@ -59,6 +59,19 @@ namespace Leap.Unity {
     /// </summary>
     public readonly bool hasValue;
 
+    /// <summary>
+    /// Gets the value, or the type's default if it doesn't exist.
+    /// </summary>
+    public T valueOrDefault {
+      get {
+        T value;
+        if (TryGetValue(out value)) {
+          return value;
+        }
+        return default(T);
+      }
+    }
+
     private readonly T _t;
 
     /// <summary>
