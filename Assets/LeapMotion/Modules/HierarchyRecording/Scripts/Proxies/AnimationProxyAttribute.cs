@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 
 [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = true)]
 public class AnimationProxyAttribute : Attribute {
+  private static Dictionary<Type, Type> _typeToPlayback = new Dictionary<Type, Type>();
+
   public readonly Type playbackType;
 
   public AnimationProxyAttribute(Type playbackType) {
@@ -13,15 +16,22 @@ public class AnimationProxyAttribute : Attribute {
   }
 
   public static bool IsAnimationProxy(Type type) {
-    return type.GetCustomAttributes(typeof(AnimationProxyAttribute), inherit: true).Length > 0;
+    return ConvertToPlaybackType(type) != null;
   }
 
   public static Type ConvertToPlaybackType(Type recordingType) {
-    var attributes = recordingType.GetCustomAttributes(typeof(AnimationProxyAttribute), inherit: true);
-    if (attributes.Length > 0) {
-      return (attributes[0] as AnimationProxyAttribute).playbackType;
-    } else {
-      throw new Exception("Not a proxy type!");
+    Type playbackType;
+    if (!_typeToPlayback.TryGetValue(recordingType, out playbackType)) {
+      var attributes = recordingType.GetCustomAttributes(typeof(AnimationProxyAttribute), inherit: true);
+      if (attributes.Length > 0) {
+        playbackType = (attributes[0] as AnimationProxyAttribute).playbackType;
+      } else {
+        playbackType = null;
+      }
     }
+
+    return playbackType;
   }
+
+
 }

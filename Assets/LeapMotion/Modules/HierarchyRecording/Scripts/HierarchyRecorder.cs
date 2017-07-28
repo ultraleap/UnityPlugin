@@ -73,113 +73,177 @@ namespace Leap.Unity.Recording {
         DestroyImmediate(recorder);
       }
 
-      //Patch up renderer references to materials
-      var allMaterials = Resources.FindObjectsOfTypeAll<Material>().
-                                   Query().
-                                   Where(AssetDatabase.IsMainAsset).
-                                   ToList();
-      foreach (var renderer in GetComponentsInChildren<Renderer>(includeInactive: true)) {
-        var materials = renderer.sharedMaterials;
-        for (int i = 0; i < materials.Length; i++) {
-          var material = materials[i];
-          if (!AssetDatabase.IsMainAsset(material)) {
-            var matchingMaterial = allMaterials.Query().FirstOrDefault(m => material.name.Contains(m.name) &&
-                                                                            material.shader == m.shader);
+      try {
 
-            if (matchingMaterial != null) {
-              materials[i] = matchingMaterial;
+        //Patch up renderer references to materials
+        var allMaterials = Resources.FindObjectsOfTypeAll<Material>().
+                                     Query().
+                                     Where(AssetDatabase.IsMainAsset).
+                                     ToList();
+        foreach (var renderer in GetComponentsInChildren<Renderer>(includeInactive: true)) {
+          var materials = renderer.sharedMaterials;
+          for (int i = 0; i < materials.Length; i++) {
+            var material = materials[i];
+            if (!AssetDatabase.IsMainAsset(material)) {
+              var matchingMaterial = allMaterials.Query().FirstOrDefault(m => material.name.Contains(m.name) &&
+                                                                              material.shader == m.shader);
+
+              if (matchingMaterial != null) {
+                materials[i] = matchingMaterial;
+              }
+            }
+          }
+          renderer.sharedMaterials = materials;
+        }
+
+        int index;
+        index = 0;
+        foreach (var pair in _transformData) {
+          var transform = pair.Key;
+          var transformData = pair.Value;
+
+          index++;
+          if (EditorUtility.DisplayCancelableProgressBar("Saving Recording",
+                                                         "Converting Transform Data: " + pair.Key.name,
+                                                         index / (float)_transformData.Count)) {
+            return;
+          }
+
+          string path = AnimationUtility.CalculateTransformPath(pair.Key, transform);
+          Type type = typeof(Transform);
+
+
+          bool isActivityConstant = true;
+          bool isPositionConstant = true;
+          bool isRotationConstant = true;
+          bool isScaleConstant = true;
+
+          {
+            bool startEnabled = transformData[0].enabled;
+            Vector3 startPosition = transformData[0].localPosition;
+            Quaternion startRotation = transformData[0].localRotation;
+            Vector3 startScale = transformData[0].localScale;
+            for (int i = 1; i < transformData.Count; i++) {
+              isActivityConstant &= transformData[i].enabled == startEnabled;
+              isPositionConstant &= transformData[i].localPosition == startPosition;
+              isRotationConstant &= transformData[i].localRotation == startRotation;
+              isScaleConstant &= transformData[i].localScale == startScale;
+            }
+          }
+
+          for (int i = 0; i < TransformData.CURVE_COUNT; i++) {
+            string propertyName = TransformData.GetName(i);
+            AnimationCurve curve = new AnimationCurve();
+
+            switch (TransformData.GetDataType(i)) {
+              case TransformDataType.Position:
+                if (isPositionConstant) continue;
+                break;
+              case TransformDataType.Rotation:
+                if (isRotationConstant) continue;
+                break;
+              case TransformDataType.Scale:
+                if (isScaleConstant) continue;
+                break;
+              case TransformDataType.Activity:
+                if (isActivityConstant) continue;
+                break;
+            }
+
+            for (int j = 0; j < pair.Value.Count; j++) {
+              curve.AddKey(pair.Value[j].time, pair.Value[j].GetFloat(i));
+            }
+
+            var binding = EditorCurveBinding.FloatCurve(path, type, propertyName);
+
+            if (_curves.ContainsKey(binding)) {
+              Debug.LogError("Duplicate object was created??");
+              Debug.LogError("Named " + pair.Key.name + " : " + binding.propertyName);
+            } else {
+              _curves.Add(binding, curve);
             }
           }
         }
-        renderer.sharedMaterials = materials;
-      }
 
-      foreach (var pair in _transformData) {
-        string path = AnimationUtility.CalculateTransformPath(pair.Key, transform);
-        Type type = typeof(Transform);
-
-        for (int i = 0; i < TransformData.CURVE_COUNT; i++) {
-          string propertyName = TransformData.GetName(i);
-          AnimationCurve curve = new AnimationCurve();
-
-          for (int j = 0; j < pair.Value.Count; j++) {
-            curve.AddKey(pair.Value[j].time, pair.Value[j].GetFloat(i));
+        index = 0;
+        foreach (var pair in _curves) {
+          index++;
+          if (EditorUtility.DisplayCancelableProgressBar("Saving Recording",
+                                                         "Compressing Data:\n" + pair.Key.path,
+                                                         index / (float)_curves.Count)) {
+            return;
           }
 
-          var binding = EditorCurveBinding.FloatCurve(path, type, propertyName);
+          EditorCurveBinding binding = pair.Key;
+          AnimationCurve curve = pair.Value;
 
-          _curves.Add(binding, curve);
-        }
-      }
+          GameObject animationGameObject;
+          {
+            var animatedObj = AnimationUtility.GetAnimatedObject(gameObject, binding);
+            if (animatedObj is GameObject) {
+              animationGameObject = animatedObj as GameObject;
+            } else {
+              animationGameObject = (animatedObj as Component).gameObject;
+            }
+          }
 
-      foreach (var pair in _curves) {
-        EditorCurveBinding binding = pair.Key;
-        AnimationCurve curve = pair.Value;
+          //But if the curve is constant, just get rid of it!
+          if (curve.IsConstant()) {
+            //Check to make sure there are no other matching curves that are
+            //non constant.  If X and Y are constant but Z is not, we need to 
+            //keep them all :(
+            if (_curves.Query().Where(p => p.Key.path == binding.path &&
+                                           p.Key.type == binding.type &&
+                                           p.Key.propertyName.TrimEnd(2) == binding.propertyName.TrimEnd(2)).
+                                All(k => k.Value.IsConstant())) {
+              continue;
+            }
+          }
 
-        GameObject animationGameObject;
-        {
-          var animatedObj = AnimationUtility.GetAnimatedObject(gameObject, binding);
-          if (animatedObj is GameObject) {
-            animationGameObject = animatedObj as GameObject;
+          //First do a lossless compression
+          curve = AnimationCurveUtil.Compress(curve, Mathf.Epsilon);
+
+          //If the curve controls a proxy object, convert the binding to the playback
+          //type and spawn the playback component
+          if (AnimationProxyAttribute.IsAnimationProxy(binding.type)) {
+            Type playbackType = AnimationProxyAttribute.ConvertToPlaybackType(binding.type);
+
+            //If we have not yet spawned the playback component, spawn it now
+            if (animationGameObject.GetComponent(playbackType) == null) {
+              animationGameObject.AddComponent(playbackType);
+            }
+
+            binding = new EditorCurveBinding() {
+              path = binding.path,
+              propertyName = binding.propertyName,
+              type = playbackType
+            };
+          }
+
+          Transform targetTransform = null;
+          var targetObj = AnimationUtility.GetAnimatedObject(gameObject, binding);
+          if (targetObj is GameObject) {
+            targetTransform = (targetObj as GameObject).transform;
+          } else if (targetObj is Component) {
+            targetTransform = (targetObj as Component).transform;
           } else {
-            animationGameObject = (animatedObj as Component).gameObject;
-          }
-        }
-
-        //First do a lossless compression
-        curve = AnimationCurveUtil.Compress(curve, Mathf.Epsilon);
-
-        //But if the curve is constant, just get rid of it!
-        if (curve.IsConstant()) {
-          //Check to make sure there are no other matching curves that are
-          //non constant.  If X and Y are constant but Z is not, we need to 
-          //keep them all :(
-          if (_curves.Query().Where(p => p.Key.path == binding.path &&
-                                         p.Key.type == binding.type &&
-                                         p.Key.propertyName.TrimEnd(2) == binding.propertyName.TrimEnd(2)).
-                              All(k => k.Value.IsConstant())) {
-            continue;
-          }
-        }
-
-        //If the curve controls a proxy object, convert the binding to the playback
-        //type and spawn the playback component
-        if (AnimationProxyAttribute.IsAnimationProxy(binding.type)) {
-          Type playbackType = AnimationProxyAttribute.ConvertToPlaybackType(binding.type);
-
-          //If we have not yet spawned the playback component, spawn it now
-          if (animationGameObject.GetComponent(playbackType) == null) {
-            animationGameObject.AddComponent(playbackType);
+            Debug.LogError("Target obj was of type " + targetObj.GetType().Name);
           }
 
-          binding = new EditorCurveBinding() {
+          var dataRecorder = targetTransform.GetComponent<RecordedData>();
+          if (dataRecorder == null) {
+            dataRecorder = targetTransform.gameObject.AddComponent<RecordedData>();
+          }
+
+          dataRecorder.data.Add(new RecordedData.EditorCurveBindingData() {
             path = binding.path,
             propertyName = binding.propertyName,
-            type = playbackType
-          };
+            typeName = binding.type.Name,
+            curve = curve
+          });
         }
-
-        Transform targetTransform = null;
-        var targetObj = AnimationUtility.GetAnimatedObject(gameObject, binding);
-        if (targetObj is GameObject) {
-          targetTransform = (targetObj as GameObject).transform;
-        } else if (targetObj is Component) {
-          targetTransform = (targetObj as Component).transform;
-        } else {
-          Debug.LogError("Target obj was of type " + targetObj.GetType().Name);
-        }
-
-        var dataRecorder = targetTransform.GetComponent<RecordedData>();
-        if (dataRecorder == null) {
-          dataRecorder = targetTransform.gameObject.AddComponent<RecordedData>();
-        }
-
-        dataRecorder.data.Add(new RecordedData.EditorCurveBindingData() {
-          path = binding.path,
-          propertyName = binding.propertyName,
-          typeName = binding.type.Name,
-          curve = curve
-        });
+      } finally {
+        EditorUtility.ClearProgressBar();
       }
 
       gameObject.AddComponent<HierarchyPostProcess>();
@@ -251,6 +315,7 @@ namespace Leap.Unity.Recording {
         foreach (var pair in _transformData) {
           pair.Value.Add(new TransformData() {
             time = Time.time - _startTime,
+            enabled = pair.Key.gameObject.activeInHierarchy,
             localPosition = pair.Key.localPosition,
             localRotation = pair.Key.localRotation,
             localScale = pair.Key.localScale
@@ -259,10 +324,19 @@ namespace Leap.Unity.Recording {
       }
     }
 
+    private enum TransformDataType {
+      Activity,
+      Position,
+      Rotation,
+      Scale
+    }
+
     private struct TransformData {
-      public const int CURVE_COUNT = 10;
+      public const int CURVE_COUNT = 11;
 
       public float time;
+
+      public bool enabled;
       public Vector3 localPosition;
       public Quaternion localRotation;
       public Vector3 localScale;
@@ -282,6 +356,8 @@ namespace Leap.Unity.Recording {
           case 8:
           case 9:
             return localScale[index - 7];
+          case 10:
+            return enabled ? 1 : 0;
         }
         throw new Exception();
       }
@@ -301,6 +377,29 @@ namespace Leap.Unity.Recording {
           case 8:
           case 9:
             return "m_LocalScale" + "xyz"[index - 7];
+          case 10:
+            return "m_IsActive";
+        }
+        throw new Exception();
+      }
+
+      public static TransformDataType GetDataType(int index) {
+        switch (index) {
+          case 0:
+          case 1:
+          case 2:
+            return TransformDataType.Position;
+          case 3:
+          case 4:
+          case 5:
+          case 6:
+            return TransformDataType.Rotation;
+          case 7:
+          case 8:
+          case 9:
+            return TransformDataType.Scale;
+          case 10:
+            return TransformDataType.Activity;
         }
         throw new Exception();
       }
