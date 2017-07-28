@@ -14,7 +14,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
-namespace Leap.Unity.GraphicalRenderer {
+namespace Leap.Unity {
 
   public interface IProgressView {
     void Clear();
