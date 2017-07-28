@@ -1994,7 +1994,7 @@ MonoBehaviour:
     exposedName: 9e9704f8a4a5e194493ef65dfd5035bc
     defaultValue: {fileID: 0}
   message: SetColorEvent
-  argumentType: 6
+  argumentType: 1
   colorArg: {r: 0.1544118, g: 0.33519268, b: 1, a: 1}
   floatArg: 0
   intArg: 0
@@ -2120,7 +2120,7 @@ MonoBehaviour:
     exposedName: ed0074e70fa4e844c80fb3cd7ee162d7
     defaultValue: {fileID: 0}
   message: SetColorEvent
-  argumentType: 6
+  argumentType: 1
   colorArg: {r: 1, g: 0, b: 0, a: 1}
   floatArg: 0
   intArg: 0
