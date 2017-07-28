@@ -1,8 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEditor;
-using Leap.Unity;
+using Leap.Unity.GraphicalRenderer;
 
 namespace Leap.Unity.Recording {
 
@@ -24,7 +22,7 @@ namespace Leap.Unity.Recording {
                                                    + "before converting its raw recording "
                                                    + "data into AnimationClip data."
                                                    : ""))) {
-        target.BuildPlaybackPrefab();
+        target.BuildPlaybackPrefab(new ProgressBar());
       }
 
       EditorGUI.EndDisabledGroup();
