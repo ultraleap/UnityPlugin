@@ -74,7 +74,6 @@ namespace Leap.Unity.Recording {
       }
 
       try {
-
         //Patch up renderer references to materials
         var allMaterials = Resources.FindObjectsOfTypeAll<Material>().
                                      Query().
@@ -99,17 +98,17 @@ namespace Leap.Unity.Recording {
         int index;
         index = 0;
         foreach (var pair in _transformData) {
-          var transform = pair.Key;
-          var transformData = pair.Value;
+          var targetTransform = pair.Key;
+          var targetData = pair.Value;
 
           index++;
           if (EditorUtility.DisplayCancelableProgressBar("Saving Recording",
-                                                         "Converting Transform Data: " + pair.Key.name,
+                                                         "Converting Transform Data: " + targetTransform.name,
                                                          index / (float)_transformData.Count)) {
             return;
           }
 
-          string path = AnimationUtility.CalculateTransformPath(pair.Key, transform);
+          string path = AnimationUtility.CalculateTransformPath(targetTransform, transform);
           Type type = typeof(Transform);
 
 
@@ -119,15 +118,15 @@ namespace Leap.Unity.Recording {
           bool isScaleConstant = true;
 
           {
-            bool startEnabled = transformData[0].enabled;
-            Vector3 startPosition = transformData[0].localPosition;
-            Quaternion startRotation = transformData[0].localRotation;
-            Vector3 startScale = transformData[0].localScale;
-            for (int i = 1; i < transformData.Count; i++) {
-              isActivityConstant &= transformData[i].enabled == startEnabled;
-              isPositionConstant &= transformData[i].localPosition == startPosition;
-              isRotationConstant &= transformData[i].localRotation == startRotation;
-              isScaleConstant &= transformData[i].localScale == startScale;
+            bool startEnabled = targetData[0].enabled;
+            Vector3 startPosition = targetData[0].localPosition;
+            Quaternion startRotation = targetData[0].localRotation;
+            Vector3 startScale = targetData[0].localScale;
+            for (int i = 1; i < targetData.Count; i++) {
+              isActivityConstant &= targetData[i].enabled == startEnabled;
+              isPositionConstant &= targetData[i].localPosition == startPosition;
+              isRotationConstant &= targetData[i].localRotation == startRotation;
+              isScaleConstant &= targetData[i].localScale == startScale;
             }
           }
 
@@ -150,15 +149,15 @@ namespace Leap.Unity.Recording {
                 break;
             }
 
-            for (int j = 0; j < pair.Value.Count; j++) {
-              curve.AddKey(pair.Value[j].time, pair.Value[j].GetFloat(i));
+            for (int j = 0; j < targetData.Count; j++) {
+              curve.AddKey(targetData[j].time, targetData[j].GetFloat(i));
             }
 
             var binding = EditorCurveBinding.FloatCurve(path, type, propertyName);
 
             if (_curves.ContainsKey(binding)) {
               Debug.LogError("Duplicate object was created??");
-              Debug.LogError("Named " + pair.Key.name + " : " + binding.propertyName);
+              Debug.LogError("Named " + targetTransform.name + " : " + binding.path + " : " + binding.propertyName);
             } else {
               _curves.Add(binding, curve);
             }
@@ -408,7 +407,7 @@ namespace Leap.Unity.Recording {
     #region GUI
 
     private Vector2 _guiMargins = new Vector2(5F, 5F);
-    private Vector2 _guiSize    = new Vector2(175F, 60F);
+    private Vector2 _guiSize = new Vector2(175F, 60F);
 
     private void OnGUI() {
       var guiRect = new Rect(_guiMargins.x, _guiMargins.y, _guiSize.x, _guiSize.y);
@@ -424,8 +423,7 @@ namespace Leap.Unity.Recording {
                              GUILayout.ExpandHeight(true))) {
           beginRecording();
         }
-      }
-      else {
+      } else {
         GUILayout.Label("Recording.");
         if (GUILayout.Button("Stop Recording (" + finishRecordingKey.ToString() + ")",
                              GUILayout.ExpandHeight(true))) {
