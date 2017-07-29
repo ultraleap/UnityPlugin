@@ -7,8 +7,6 @@
  * between Leap Motion and you, your company or other organization.           *
  ******************************************************************************/
 
-#if LEAP_TESTS
-
 namespace Leap.Unity {
 
   public class StationaryTestLeapProvider : LeapProvider {
@@ -57,4 +55,3 @@ namespace Leap.Unity {
   }
 
 }
-#endif
