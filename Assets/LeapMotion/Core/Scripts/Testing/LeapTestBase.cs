@@ -11,6 +11,7 @@
 
 using Leap.Unity.Query;
 using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -58,6 +59,36 @@ namespace Leap.Unity {
 
       testObj = obj;
     }
+
+    #region Spawn Utilities
+
+    protected T Spawn<T>(T original, Vector3 position) where T : MonoBehaviour {
+      return GameObject.Instantiate<T>(original,
+                                       position,
+                                       original.transform.rotation,
+                                       original.transform.parent);
+    }
+
+    #endregion
+
+    #region Frame Utilities
+
+    protected const bool GO_SLOW = false;
+
+    protected int aBit { get { return GO_SLOW ? 50 : 5; } }
+    protected int aWhile { get { return GO_SLOW ? 200 : 20; } }
+    protected int aLot { get { return GO_SLOW ? 1000 : 100; } }
+
+    protected int beginningTestWait { get { return aBit; } }
+    protected int endingTestWait { get { return aWhile; } }
+
+    protected IEnumerator wait(int numFrames) {
+      for (int i = 0; i < numFrames; i++) {
+        yield return null;
+      }
+    }
+
+    #endregion
 
   }
 

@@ -8,14 +8,10 @@
  ******************************************************************************/
 
 #if LEAP_TESTS
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 
-namespace Leap.Unity.Interaction.Tests {
+namespace Leap.Unity {
 
-  public class IETestLeapProvider : LeapProvider {
+  public class StationaryTestLeapProvider : LeapProvider {
 
     private Frame _curFrame;
 

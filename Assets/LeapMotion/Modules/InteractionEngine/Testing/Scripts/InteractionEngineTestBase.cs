@@ -21,7 +21,9 @@ namespace Leap.Unity.Interaction.Tests {
 
   public abstract class InteractionEngineTestBase : LeapTestBase {
 
-    protected IETestLeapProvider testProvider;
+    protected const int WAIT_FOR_INTERACTION_FRAME_LIMIT = 500;
+
+    protected StationaryTestLeapProvider testProvider;
 
     protected InteractionManager manager;
 
@@ -60,7 +62,7 @@ namespace Leap.Unity.Interaction.Tests {
     protected override void InitTest(string objectName) {
       base.InitTest(objectName);
 
-      testProvider = testObj.GetComponentInChildren<IETestLeapProvider>();
+      testProvider = testObj.GetComponentInChildren<StationaryTestLeapProvider>();
 
       manager = testObj.GetComponentInChildren<InteractionManager>();
 
@@ -115,38 +117,6 @@ namespace Leap.Unity.Interaction.Tests {
       //  _sceneToUnload = null;
       //}
     }
-
-    #region Spawn Utilities
-
-    protected T Spawn<T>(T original, Vector3 position) where T : MonoBehaviour {
-      return GameObject.Instantiate<T>(original,
-                                       position,
-                                       original.transform.rotation,
-                                       original.transform.parent);
-    }
-
-    #endregion
-
-    #region Frame Utilities
-
-    protected const int WAIT_FOR_INTERACTION_FRAME_LIMIT = 500;
-
-    protected const bool GO_SLOW = false;
-
-    protected int aBit   { get { return GO_SLOW ? 50 : 5; } }
-    protected int aWhile { get { return GO_SLOW ? 200 : 20; } }
-    protected int aLot   { get { return GO_SLOW ? 1000 : 100; } }
-
-    protected int beginningTestWait { get { return aBit; } }
-    protected int endingTestWait    { get { return aWhile; } }
-
-    protected IEnumerator wait(int numFrames) {
-      for (int i = 0; i < numFrames; i++) {
-        yield return null;
-      }
-    }
-
-    #endregion
 
   }
 
