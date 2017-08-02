@@ -15,7 +15,7 @@ using UnityEngine.TestTools;
 
 namespace Leap.Unity.Interaction.Tests {
 
-  public class TestCreationDeletion : InteractionEngineTestBase {
+  public class CreationAndDeletionTests : InteractionEngineTestBase {
 
     #region General Tests
 
