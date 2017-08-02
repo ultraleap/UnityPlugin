@@ -44,7 +44,7 @@ namespace Leap.Unity.GraphicalRenderer {
     [MinValue(0)]
     [EditTimeOnly]
     [SerializeField]
-    private Vector3 _size = new Vector3(0.1f, 0.1f, 0.1f);
+    private Vector3 _size = new Vector3(0.1f, 0.1f, 0.01f);
     /// <summary>
     /// Gets the dimensions of the box graphic in local space.
     /// </summary>
@@ -386,7 +386,7 @@ namespace Leap.Unity.GraphicalRenderer {
         uvs.Add(uv);
       }
       for (int vy = 0; vy < vertsY - 1; vy++) { // Add quads
-        addQuad(tris, frontVertIdx + vy, backVertIdx + vy, backVertIdx + vy + 1, frontVertIdx + vy + 1);
+        addQuad(tris, frontVertIdx + vy + 1, backVertIdx + vy + 1, backVertIdx + vy, frontVertIdx + vy);
       }
 
       // Top
@@ -454,7 +454,7 @@ namespace Leap.Unity.GraphicalRenderer {
         uvs.Add(uv);
       }
       for (int vx = 0; vx < vertsX - 1; vx++) { // Add quads
-        addQuad(tris, frontVertIdx + vx, backVertIdx + vx, backVertIdx + vx + 1, frontVertIdx + vx + 1);
+        addQuad(tris, frontVertIdx + vx + 1, backVertIdx + vx + 1, backVertIdx + vx, frontVertIdx + vx);
       }
 
       mesh = new Mesh();
