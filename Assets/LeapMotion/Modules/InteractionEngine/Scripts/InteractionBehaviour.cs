@@ -1370,7 +1370,8 @@ namespace Leap.Unity.Interaction {
     /// after its Start() method has been called! (Called automatically in OnEnable.)
     /// </summary>
     public void RefreshInteractionColliders() {
-      Utils.FindColliders<Collider>(this.gameObject, _interactionColliders);
+      Utils.FindColliders<Collider>(this.gameObject, _interactionColliders,
+                                    includeInactiveObjects: false);
     }
 
     #endregion
