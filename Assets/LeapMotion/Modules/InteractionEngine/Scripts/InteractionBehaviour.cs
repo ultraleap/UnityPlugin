@@ -416,13 +416,15 @@ namespace Leap.Unity.Interaction {
     /// <summary>
     /// Releases this object from the interaction controller currently grasping it, if it
     /// is grasped, and returns true. If the object was not grasped, this method returns 
-    /// false. Directly after calling this method, the object is guaranteed not to be held.
+    /// false. Directly after calling this method, the object is guaranteed not to be
+    /// held. However, a grasp may retrigger on the next frame, if the Interaction
+    /// Controller determines that the released object should be grasped. The safest way
+    /// to ensure an object is released and ungraspable is to use the interaction
+    /// object's ignoreGrasp property.
     /// </summary>
     public bool ReleaseFromGrasp() {
       if (isGrasped) {
-        foreach (var controller in graspingControllers) {
-          controller.ReleaseGrasp();
-        }
+        InteractionController.ReleaseGrasps(this, graspingControllers);
         return true;
       }
 
