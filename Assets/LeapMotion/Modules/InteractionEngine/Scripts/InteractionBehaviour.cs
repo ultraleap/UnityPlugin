@@ -1552,6 +1552,10 @@ namespace Leap.Unity.Interaction {
     }
 
     private void InitUnityEvents() {
+      // If the interaction component is added at runtime, _eventTable won't have been
+      // constructed yet.
+      if (_eventTable == null) _eventTable = new EnumEventTable();
+
       setupCallback(ref OnHoverBegin,                     EventType.HoverBegin);
       setupCallback(ref OnHoverEnd,                       EventType.HoverEnd);
       setupCallback(ref OnHoverStay,                      EventType.HoverStay);

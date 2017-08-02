@@ -17,6 +17,8 @@ namespace Leap.Unity.Interaction.Tests {
 
   public class TestCreationDeletion : InteractionEngineTestBase {
 
+    #region General Tests
+
     [UnityTest]
     public IEnumerator CanCreateAndDelete() {
       yield return wait(beginningTestWait);
@@ -39,6 +41,32 @@ namespace Leap.Unity.Interaction.Tests {
 
       yield return wait(endingTestWait);
     }
+
+    [UnityTest]
+    public IEnumerator CanCreateInteractionBehaviourAtRuntime() {
+      yield return wait(beginningTestWait);
+
+      InitTest("Simple Boxes IE Test");
+      testProvider.editTimePose = TestHandFactory.TestHandPose.PoseB;
+      
+      var rHandPos = rightHand.leapHand.PalmPosition.ToVector3();
+
+      var spawnPos = rHandPos;
+      var newBox = GameObject.CreatePrimitive(PrimitiveType.Cube);
+      newBox.transform.parent = testObj.transform;
+      newBox.transform.position = spawnPos;
+      newBox.transform.localScale = Vector3.one * 0.1F;
+      var newBody = newBox.AddComponent<Rigidbody>();
+      newBody.useGravity = true;
+      newBody.isKinematic = false;
+      newBox.AddComponent<InteractionBehaviour>();
+
+      yield return wait(aWhile);
+
+      yield return wait(endingTestWait);
+    }
+
+    #endregion
 
     #region Hover Tests
 
