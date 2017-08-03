@@ -335,7 +335,7 @@ namespace Leap.Unity.GraphicalRenderer {
         frontVertIdx += 1;
 
         Vector2 uv;
-        uv.x = calculateVertAxis(ex, vertsX, 1, borderUvs.x, borderUvs.z);
+        uv.x = calculateVertAxis(ex, vertsX, 1, borderUvs.x, borderUvs.z) + 0.01F /* cheat UVs in, prevents edge tearing */;
         uv.y = calculateVertAxis(vy, vertsY, 1, borderUvs.y, borderUvs.w);
         uvs.Add(uv);
       }
@@ -369,7 +369,7 @@ namespace Leap.Unity.GraphicalRenderer {
         frontVertIdx += 1;
 
         Vector2 uv;
-        uv.x = calculateVertAxis(ex, vertsX, 1, borderUvs.x, borderUvs.z);
+        uv.x = calculateVertAxis(ex, vertsX, 1, borderUvs.x, borderUvs.z) - 0.01F /* cheat UVs in, prevents edge tearing */;
         uv.y = calculateVertAxis(vy, vertsY, 1, borderUvs.y, borderUvs.w);
         uvs.Add(uv);
       }
@@ -404,7 +404,7 @@ namespace Leap.Unity.GraphicalRenderer {
 
         Vector2 uv;
         uv.x = calculateVertAxis(vx, vertsX, 1, borderUvs.x, borderUvs.z);
-        uv.y = calculateVertAxis(ey, vertsY, 1, borderUvs.y, borderUvs.w);
+        uv.y = calculateVertAxis(ey, vertsY, 1, borderUvs.y, borderUvs.w) - 0.01F /* cheat UVs in, prevents edge tearing */;
         uvs.Add(uv);
       }
       for (int vx = 0; vx < vertsX; vx++) { // Repeat front edge, upper side
@@ -438,7 +438,7 @@ namespace Leap.Unity.GraphicalRenderer {
 
         Vector2 uv;
         uv.x = calculateVertAxis(vx, vertsX, 1, borderUvs.x, borderUvs.z);
-        uv.y = calculateVertAxis(ey, vertsY, 1, borderUvs.y, borderUvs.w);
+        uv.y = calculateVertAxis(ey, vertsY, 1, borderUvs.y, borderUvs.w) + 0.01F /* cheat UVs in, prevents edge tearing */;
         uvs.Add(uv);
       }
       for (int vx = 0; vx < vertsX; vx++) { // Repeat front edge, upper side
@@ -515,12 +515,6 @@ namespace Leap.Unity.GraphicalRenderer {
     public enum ResolutionType {
       Vertices,
       VerticesPerRectilinearMeter
-    }
-
-    void OnDrawGizmosSelected() {
-      Gizmos.matrix = transform.localToWorldMatrix;
-      Gizmos.color = new Color(1F, 1F, 1F, 0.4F);
-      Gizmos.DrawWireCube(-Vector3.forward * this.size.z / 2F, this.size);
     }
   }
 }
