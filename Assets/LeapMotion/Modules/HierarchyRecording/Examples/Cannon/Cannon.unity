@@ -433,6 +433,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   recordOnStart: 1
+  recordingName: Cannon
+  targetFolder:
+    _assetFolder: {fileID: 0}
   beginRecordingKey: 286
   finishRecordingKey: 287
 --- !u!1 &1103834309

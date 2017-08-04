@@ -303,7 +303,8 @@ namespace Leap.Unity.Recording {
         string targetFolderPath = targetFolder.Path;
         if (targetFolderPath == null) {
           if (myGameObject.scene.IsValid() && !string.IsNullOrEmpty(myGameObject.scene.path)) {
-            targetFolderPath = Path.Combine(myGameObject.scene.path, "Recordings");
+            string sceneFolder = Path.GetDirectoryName(myGameObject.scene.path);
+            targetFolderPath = Path.Combine(sceneFolder, "Recordings");
           } else {
             targetFolderPath = Path.Combine("Assets", "Recordings");
           }
