@@ -313,8 +313,8 @@ namespace Leap.Unity.GraphicalRenderer {
     /// If the sliced graphic has nine-slicing enabled, or if alwaysRespectBorder is 
     /// set to true, the second and second-to-last vertices along an edge will reflect
     /// the border margin arguments instead of a uniform tesselation along the whole
-    /// width of the dimension. Inner vertices will respect then respect this
-    /// non-uniformity, slicing the rest of the inner width evenly.
+    /// width of the dimension. Inner vertices will then respect this non-uniformity,
+    /// slicing the rest of the inner width evenly.
     /// 
     /// e.g. Determine the distance along the X axis for:
     /// - vertIdx = 4, the fifth vertex along the X axis
