@@ -16,7 +16,13 @@ namespace Leap.Unity.Recording {
     public string recordingName;
     public AssetFolder targetFolder;
 
-    [Header("Leap Data Settings")]
+    [Header("Animation Recording Settings")]
+    public RecordingSelection transformMode = RecordingSelection.Everything;
+    public Transform[] specificTransforms = new Transform[0];
+    public RecordingSelection audioSourceMode = RecordingSelection.Everything;
+    public AudioSource[] specificAudioSources = new AudioSource[0];
+
+    [Header("Leap Recording Settings")]
     public LeapProvider provider;
     public bool recordLeapData = false;
 
@@ -41,10 +47,15 @@ namespace Leap.Unity.Recording {
 
     private HashSet<string> _takenNames = new HashSet<string>();
 
-
     private bool _isRecording = false;
     private float _startTime = 0;
     private int _startFrame = 0;
+
+    public enum RecordingSelection {
+      Everything,
+      Nothing,
+      Specific
+    }
 
     private void Reset() {
       recordingName = gameObject.name;
@@ -365,6 +376,26 @@ namespace Leap.Unity.Recording {
           if (component is Behaviour) _behaviours.Add(component);
           if (component is Renderer) _behaviours.Add(component);
           if (component is Collider) _behaviours.Add(component);
+        }
+
+        switch (audioSourceMode) {
+          case RecordingSelection.Nothing:
+            _audioSources.Clear();
+            break;
+          case RecordingSelection.Specific:
+            _audioSources.Clear();
+            _audioSources.AddRange(specificAudioSources);
+            break;
+        }
+
+        switch (transformMode) {
+          case RecordingSelection.Nothing:
+            _transforms.Clear();
+            break;
+          case RecordingSelection.Specific:
+            _transforms.Clear();
+            _transforms.AddRange(specificTransforms);
+            break;
         }
       }
 
