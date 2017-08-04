@@ -10,6 +10,7 @@
 using UnityEngine;
 using UnityEngine.Assertions;
 using System;
+using System.IO;
 using System.Collections.Generic;
 using Leap.Unity.Query;
 
@@ -144,6 +145,25 @@ namespace Leap.Unity {
           return obj.parent.IsActiveRelativeToParent(parent);
         }
       }
+    }
+
+    public static string MakeRelativePath(string relativeTo, string path) {
+      if (string.IsNullOrEmpty(relativeTo)) throw new ArgumentNullException("relativeTo");
+      if (string.IsNullOrEmpty(path)) throw new ArgumentNullException("path");
+
+      Uri relativeToUri = new Uri(relativeTo);
+      Uri pathUri = new Uri(path);
+
+      if (relativeToUri.Scheme != pathUri.Scheme) { return path; } // path can't be made relative.
+
+      Uri relativeUri = relativeToUri.MakeRelativeUri(pathUri);
+      string relativePath = Uri.UnescapeDataString(relativeUri.ToString());
+
+      if (pathUri.Scheme.Equals("file", StringComparison.InvariantCultureIgnoreCase)) {
+        relativePath = relativePath.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
+      }
+
+      return relativePath;
     }
 
     #endregion
