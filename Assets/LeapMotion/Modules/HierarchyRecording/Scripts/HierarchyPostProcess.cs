@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Playables;
@@ -13,6 +14,7 @@ namespace Leap.Unity.Recording {
   [RecordingFriendly]
   public class HierarchyPostProcess : MonoBehaviour {
 
+    public string recordingName;
     public AssetFolder assetFolder;
 
     [MinValue(0)]
@@ -116,7 +118,8 @@ namespace Leap.Unity.Recording {
       timelineClip.asset = clip;
       timelineClip.underlyingAsset = clip;
 
-      AssetDatabase.CreateAsset(timeline, "Assets/LeapMotion/Modules/HierarchyRecording/RecordingTimeline.asset");
+      string assetPath = Path.Combine(assetFolder.Path, recordingName + ".asset");
+      AssetDatabase.CreateAsset(timeline, assetPath);
       AssetDatabase.AddObjectToAsset(track, timeline);
       AssetDatabase.AddObjectToAsset(clip, timeline);
       AssetDatabase.SaveAssets();
@@ -138,7 +141,8 @@ namespace Leap.Unity.Recording {
         GameObject myGameObject = gameObject;
         DestroyImmediate(this);
 
-        PrefabUtility.CreatePrefab("Assets/LeapMotion/Modules/HierarchyRecording/Recording.prefab", myGameObject);
+        string prefabPath = Path.Combine(assetFolder.Path, recordingName + ".prefab");
+        PrefabUtility.CreatePrefab(prefabPath.Replace('\\', '/'), myGameObject);
       });
     }
 

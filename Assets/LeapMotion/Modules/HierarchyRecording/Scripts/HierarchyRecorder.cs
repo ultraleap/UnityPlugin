@@ -13,7 +13,10 @@ namespace Leap.Unity.Recording {
     public static Action OnPreRecordFrame;
 
     public bool recordOnStart = false;
+
+    public string recordingName;
     public AssetFolder targetFolder;
+
     public KeyCode beginRecordingKey = KeyCode.F5;
     public KeyCode finishRecordingKey = KeyCode.F6;
 
@@ -35,6 +38,10 @@ namespace Leap.Unity.Recording {
 
     private bool _isRecording = false;
     private float _startTime = 0;
+
+    private void Reset() {
+      recordingName = gameObject.name;
+    }
 
     private void Start() {
       if (recordOnStart) {
@@ -305,16 +312,17 @@ namespace Leap.Unity.Recording {
         int folderSuffix = 1;
         string finalSubFolder;
         do {
-          finalSubFolder = Path.Combine(targetFolderPath, myGameObject.name + " " + folderSuffix.ToString().PadLeft(2, '0'));
+          finalSubFolder = Path.Combine(targetFolderPath, recordingName + " " + folderSuffix.ToString().PadLeft(2, '0'));
           folderSuffix++;
         } while (Directory.Exists(finalSubFolder));
 
         Directory.CreateDirectory(finalSubFolder);
         AssetDatabase.Refresh();
 
+        postProcessComponent.recordingName = recordingName;
         postProcessComponent.assetFolder.Path = finalSubFolder;
 
-        string prefabPath = Path.Combine(finalSubFolder, "RawRecording.prefab");
+        string prefabPath = Path.Combine(finalSubFolder, recordingName + " Raw.prefab");
         PrefabUtility.CreatePrefab(prefabPath.Replace('\\', '/'), myGameObject);
         AssetDatabase.Refresh();
 
