@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEditor;
+using Leap.Unity.Query;
 
 namespace Leap.Unity {
 
@@ -41,6 +42,21 @@ namespace Leap.Unity {
       }
 
       EditorGUI.showMixedValue = false;
+
+      if (position.Contains(Event.current.mousePosition)) {
+        var draggedFolder = DragAndDrop.objectReferences.Query().OfType<DefaultAsset>().FirstOrDefault();
+        if (draggedFolder != null) {
+          switch (Event.current.type) {
+            case EventType.DragUpdated:
+              DragAndDrop.visualMode = DragAndDropVisualMode.Link;
+              break;
+            case EventType.DragPerform:
+              DragAndDrop.AcceptDrag();
+              folderProp.objectReferenceValue = draggedFolder;
+              break;
+          }
+        }
+      }
     }
 
     public override float GetPropertyHeight(SerializedProperty property, GUIContent label) {
