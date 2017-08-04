@@ -480,7 +480,10 @@ namespace Leap.Unity.Recording {
 
       if (provider != null && recordLeapData) {
         using (new ProfilerSample("Record Leap Data")) {
-          _leapData.Add(new Frame().CopyFrom(provider.CurrentFrame));
+          Frame newFrame = new Frame();
+          newFrame.CopyFrom(provider.CurrentFrame);
+          newFrame.Timestamp = (long)(Time.time * 1e6);
+          _leapData.Add(newFrame);
         }
       }
     }
