@@ -416,13 +416,15 @@ namespace Leap.Unity.Interaction {
     /// <summary>
     /// Releases this object from the interaction controller currently grasping it, if it
     /// is grasped, and returns true. If the object was not grasped, this method returns 
-    /// false. Directly after calling this method, the object is guaranteed not to be held.
+    /// false. Directly after calling this method, the object is guaranteed not to be
+    /// held. However, a grasp may retrigger on the next frame, if the Interaction
+    /// Controller determines that the released object should be grasped. The safest way
+    /// to ensure an object is released and ungraspable is to use the interaction
+    /// object's ignoreGrasp property.
     /// </summary>
     public bool ReleaseFromGrasp() {
       if (isGrasped) {
-        foreach (var controller in graspingControllers) {
-          controller.ReleaseGrasp();
-        }
+        InteractionController.ReleaseGrasps(this, graspingControllers);
         return true;
       }
 
@@ -1053,9 +1055,9 @@ namespace Leap.Unity.Interaction {
     /// interaction controller's primary hover, as well as for determining this object's
     /// closest hovering controller.
     /// 
-    /// RefreshColliderState() will automatically populate the colliders List with
+    /// RefreshInteractionColliders() will automatically populate the colliders List with
     /// the this rigidbody's colliders, but is only called once on Start(). If you change
-    /// the colliders for this object at runtime, you should call RefreshColliderState()
+    /// the colliders for this object at runtime, you should call RefreshInteractionColliders()
     /// to keep the _hoverColliders list up-to-date.
     /// </summary>
     /// <remarks>
@@ -1368,7 +1370,12 @@ namespace Leap.Unity.Interaction {
     /// after its Start() method has been called! (Called automatically in OnEnable.)
     /// </summary>
     public void RefreshInteractionColliders() {
-      Utils.FindColliders<Collider>(this.gameObject, _interactionColliders);
+      Utils.FindColliders<Collider>(this.gameObject, _interactionColliders,
+                                    includeInactiveObjects: false);
+
+      // Since the interaction colliders might have changed, or appeared for the first
+      // time, set their layers appropriately.
+      refreshInteractionColliderLayers();
     }
 
     #endregion
@@ -1418,11 +1425,8 @@ namespace Leap.Unity.Interaction {
       }
       if (this.gameObject.layer != layer) {
         this.gameObject.layer = layer;
-        for (int i = 0; i < _interactionColliders.Count; i++) {
-          if (_interactionColliders[i].gameObject.layer != layer) {
-            _interactionColliders[i].gameObject.layer = layer;
-          }
-        }
+
+        refreshInteractionColliderLayers();
       }
 
       // Update the manager if necessary.
@@ -1444,6 +1448,24 @@ namespace Leap.Unity.Interaction {
       (manager as IInternalInteractionManager).NotifyIntObjRemovedInteractionLayer(this, interactionLayer, false);
       (manager as IInternalInteractionManager).NotifyIntObjRemovedNoContactLayer(this, noContactLayer, false);
       (manager as IInternalInteractionManager).RefreshLayersNow();
+    }
+
+    /// <summary>
+    /// Sets the layer state of the _interactionColliders to match the root interaction
+    /// object if their layer differs from it.
+    /// 
+    /// This method does NOT modify the interaction object's own layer (unless the 
+    /// interaction object has a collider on itself; which would result in a no-op).
+    /// 
+    /// This needs to be called if the layer of the interaction object changes or if the
+    /// object gains new colliders.
+    /// </summary>
+    private void refreshInteractionColliderLayers() {
+      for (int i = 0; i < _interactionColliders.Count; i++) {
+        if (_interactionColliders[i].gameObject.layer != this.gameObject.layer) {
+          _interactionColliders[i].gameObject.layer = this.gameObject.layer;
+        }
+      }
     }
 
     #endregion

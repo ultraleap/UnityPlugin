@@ -8,6 +8,7 @@
  ******************************************************************************/
 
 using Leap.Unity;
+using Leap.Unity.Query;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
@@ -84,7 +85,9 @@ namespace Leap.Unity.Interaction {
         // Attach / Detach Object
         EditorGUILayout.BeginHorizontal();
 
-        EditorGUI.BeginDisabledGroup(!(targets.Length > 1) || target.anchor == null || target.isAttached);
+        var anyTargetsCanAnchor = targets.Query().Any(t => t.anchor != null && !target.isAttached);
+
+        EditorGUI.BeginDisabledGroup(!anyTargetsCanAnchor);
         if (GUILayout.Button(new GUIContent("Attach Object" + (targets.Length > 1 ? "s" : ""),
                                             "Will attach the object to its anchor. If the object is not currently at its anchor, "
                                           + "currently at its anchor, it will begin move to it when play mode begins."))) {
@@ -96,7 +99,9 @@ namespace Leap.Unity.Interaction {
         }
         EditorGUI.EndDisabledGroup();
 
-        EditorGUI.BeginDisabledGroup(!(targets.Length > 1) || !target.isAttached);
+        var anyTargetsCanDetach = targets.Query().Any(t => t.isAttached);
+
+        EditorGUI.BeginDisabledGroup(!anyTargetsCanDetach);
         if (GUILayout.Button(new GUIContent("Detach Object" + (targets.Length > 1 ? "s" : ""),
                                             "Will detach the object from its anchor. AnchorableBehaviours won't seek out an anchor "
                                           + "until they are specifically told to attach to one."))) {

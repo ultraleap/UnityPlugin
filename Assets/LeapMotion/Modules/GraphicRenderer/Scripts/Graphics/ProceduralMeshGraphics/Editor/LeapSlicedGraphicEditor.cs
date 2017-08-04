@@ -1,4 +1,4 @@
-/******************************************************************************
+﻿/******************************************************************************
  * Copyright (C) Leap Motion, Inc. 2011-2017.                                 *
  * Leap Motion proprietary and  confidential.                                 *
  *                                                                            *
@@ -16,8 +16,8 @@ using Leap.Unity.Query;
 namespace Leap.Unity.GraphicalRenderer {
 
   [CanEditMultipleObjects]
-  [CustomEditor(typeof(LeapBoxGraphic))]
-  public class LeapBoxGraphicEditor : LeapGraphicEditorBase<LeapBoxGraphic> {
+  [CustomEditor(typeof(LeapSlicedGraphic), editorForChildClasses: true)]
+  public class LeapSlicedGraphicEditor : LeapGraphicEditorBase<LeapSlicedGraphic> {
 
     protected override void OnEnable() {
       base.OnEnable();
@@ -26,10 +26,8 @@ namespace Leap.Unity.GraphicalRenderer {
 
       specifyCustomDrawer("_resolution_verts_per_meter", drawResolution);
 
-      //Func<bool> shouldDrawSize = () => {
-      //  return targets.Query().All(p => p.GetComponent<RectTransform>() == null);
-      //};
-      //specifyConditionalDrawing(shouldDrawSize, "_size");
+      specifyCustomDecorator("_size", decorateSize);
+      specifyCustomPostDecorator("_size", postDecorateSize);
 
       specifyCustomDrawer("_nineSliced", drawSize);
     }
@@ -85,7 +83,8 @@ namespace Leap.Unity.GraphicalRenderer {
 
         if (index == -1) {
           index = dataIndex;
-        } else if (index != dataIndex) {
+        }
+        else if (index != dataIndex) {
           index = -1;
           break;
         }
@@ -94,7 +93,8 @@ namespace Leap.Unity.GraphicalRenderer {
       string[] options = features.Query().Select(f => {
         if (f is LeapTextureFeature) {
           return (f as LeapTextureFeature).propertyName + " (Texture)";
-        } else {
+        }
+        else {
           return (f as LeapSpriteFeature).propertyName + " (Sprite)";
         }
       }).ToArray();
@@ -122,7 +122,7 @@ namespace Leap.Unity.GraphicalRenderer {
     }
 
     private void drawResolution(SerializedProperty property) {
-      LeapBoxGraphic.ResolutionType mainType = targets[0].resolutionType;
+      LeapPanelOutlineGraphic.ResolutionType mainType = targets[0].resolutionType;
       bool allSameType = targets.Query().All(p => p.resolutionType == mainType);
 
       if (!allSameType) {
@@ -132,9 +132,10 @@ namespace Leap.Unity.GraphicalRenderer {
       Rect rect = EditorGUILayout.GetControlRect();
 
       GUIContent resolutionContent = new GUIContent("Resolution");
-      if(mainType == LeapBoxGraphic.ResolutionType.Vertices) {
+      if (mainType == LeapPanelOutlineGraphic.ResolutionType.Vertices) {
         resolutionContent.tooltip = "How many vertices this panel should have in the x and y direction.  These values ignore the edges (0 is a valid resolution).";
-      } else {
+      }
+      else {
         resolutionContent.tooltip = "How many vertices this panel should spawn relative to the width and height of the panel.  The panel will always have enough vertices to form a quad.";
       }
       EditorGUI.LabelField(rect, resolutionContent);
@@ -151,13 +152,14 @@ namespace Leap.Unity.GraphicalRenderer {
       Rect right = left;
       right.x += right.width + 1;
 
-      if (mainType == LeapBoxGraphic.ResolutionType.Vertices) {
+      if (mainType == LeapPanelOutlineGraphic.ResolutionType.Vertices) {
         SerializedProperty x = serializedObject.FindProperty("_resolution_vert_x");
         SerializedProperty y = serializedObject.FindProperty("_resolution_vert_y");
 
         x.intValue = EditorGUI.IntField(left, "X", x.intValue);
         y.intValue = EditorGUI.IntField(right, "Y", y.intValue);
-      } else {
+      }
+      else {
         Vector2 value = property.vector2Value;
 
         value.x = EditorGUI.FloatField(left, "X", value.x);
@@ -167,6 +169,14 @@ namespace Leap.Unity.GraphicalRenderer {
       }
 
       EditorGUIUtility.labelWidth = originalWidth;
+    }
+
+    private void decorateSize(SerializedProperty property) {
+      EditorGUI.BeginDisabledGroup(targets.Query().Any((t) => t.GetComponent<RectTransform>() != null));
+    }
+
+    private void postDecorateSize(SerializedProperty property) {
+      EditorGUI.EndDisabledGroup();
     }
 
     private void drawSize(SerializedProperty property) {
