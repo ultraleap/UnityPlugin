@@ -28,7 +28,7 @@ namespace Leap.Unity.GraphicalRenderer {
 
     #region Constants
 
-    public const int MAX_VERTS_PER_AXIS = 128;
+    public const int MAX_RESOLUTION = 128;
 
     #endregion
 
@@ -279,8 +279,8 @@ namespace Leap.Unity.GraphicalRenderer {
       vertsX += _nineSliced ? 4 : 2;
       vertsY += _nineSliced ? 4 : 2;
 
-      vertsX = Mathf.Min(vertsX, MAX_VERTS_PER_AXIS);
-      vertsY = Mathf.Min(vertsY, MAX_VERTS_PER_AXIS);
+      vertsX = Mathf.Min(vertsX, MAX_RESOLUTION);
+      vertsY = Mathf.Min(vertsY, MAX_RESOLUTION);
 
       RefreshSlicedMeshData(new Vector2i() { x = vertsX, y = vertsY },
                             borderSize,
@@ -364,9 +364,16 @@ namespace Leap.Unity.GraphicalRenderer {
     }
     
     public struct RectMargins {
+      /// <summary> Margin width from the left edge. </summary>
       public float left;
+
+      /// <summary> Margin width from the top edge. </summary>
       public float top;
+
+      /// <summary> Margin width from the right edge. </summary>
       public float right;
+
+      /// <summary> Margin width from the bottom edge. </summary>
       public float bottom;
 
       public RectMargins(float left, float top, float right, float bottom) {
