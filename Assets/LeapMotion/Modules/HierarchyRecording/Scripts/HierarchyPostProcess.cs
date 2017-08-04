@@ -14,9 +14,16 @@ namespace Leap.Unity.Recording {
   [RecordingFriendly]
   public class HierarchyPostProcess : MonoBehaviour {
 
+    [Header("Recording Settings")]
     public string recordingName;
     public AssetFolder assetFolder;
 
+    [Header("Leap Data")]
+    public List<Frame> leapData;
+
+    public LeapRecordingType leapRecordingType = LeapRecordingType.Raw;
+
+    [Header("Compression Settings")]
     [MinValue(0)]
     public float positionMaxError = 0.005f;
 
@@ -50,6 +57,11 @@ namespace Leap.Unity.Recording {
 
     [Tooltip("Deletes all transforms that have the identity transformation.")]
     public bool collapseIdentityTransforms = true;
+
+    public enum LeapRecordingType {
+      None,
+      Raw
+    }
 
     public void ClearComponents() {
       Transform[] transforms = GetComponentsInChildren<Transform>(includeInactive: true);
@@ -118,10 +130,30 @@ namespace Leap.Unity.Recording {
       timelineClip.asset = clip;
       timelineClip.underlyingAsset = clip;
 
+      LeapRecording leapRecording = null;
+      switch (leapRecordingType) {
+        case LeapRecordingType.Raw:
+          var rawRecording = ScriptableObject.CreateInstance<RawLeapRecording>();
+          rawRecording.frameList = leapData;
+          leapRecording = rawRecording;
+          break;
+      }
+
       string assetPath = Path.Combine(assetFolder.Path, recordingName + ".asset");
       AssetDatabase.CreateAsset(timeline, assetPath);
       AssetDatabase.AddObjectToAsset(track, timeline);
       AssetDatabase.AddObjectToAsset(clip, timeline);
+
+      if (leapRecording != null) {
+        var recordingTrack = timeline.CreateTrack<RecordingTrack>(null, "Leap Recording");
+        var recordingClip = recordingTrack.CreateDefaultClip().asset as RecordingClip;
+        recordingClip.recording = leapRecording;
+
+        AssetDatabase.AddObjectToAsset(leapRecording, timeline);
+        AssetDatabase.AddObjectToAsset(recordingTrack, timeline);
+        AssetDatabase.AddObjectToAsset(recordingClip, timeline);
+      }
+
       AssetDatabase.SaveAssets();
       AssetDatabase.Refresh();
 

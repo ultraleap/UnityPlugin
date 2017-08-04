@@ -14,9 +14,15 @@ namespace Leap.Unity.Recording {
 
     public bool recordOnStart = false;
 
+    [Header("Recording Settings")]
     public string recordingName;
     public AssetFolder targetFolder;
 
+    [Header("Leap Data Settings")]
+    public LeapProvider provider;
+    public bool recordLeapData = false;
+
+    [Header("Key Bindings")]
     public KeyCode beginRecordingKey = KeyCode.F5;
     public KeyCode finishRecordingKey = KeyCode.F6;
 
@@ -29,12 +35,14 @@ namespace Leap.Unity.Recording {
     private List<AudioSource> _audioSources;
     private List<PropertyRecorder> _recorders;
 
+    private List<Frame> _leapData;
     private Dictionary<EditorCurveBinding, AnimationCurve> _curves;
     private Dictionary<AudioSource, RecordedAudio> _audioData;
     private Dictionary<Transform, List<TransformData>> _transformData;
     private Dictionary<Component, List<ActivityData>> _behaviourActivity;
 
     private HashSet<string> _takenNames = new HashSet<string>();
+
 
     private bool _isRecording = false;
     private float _startTime = 0;
@@ -74,6 +82,7 @@ namespace Leap.Unity.Recording {
       _behaviours = new List<Component>();
       _recorders = new List<PropertyRecorder>();
       _audioSources = new List<AudioSource>();
+      _leapData = new List<Frame>();
 
       _curves = new Dictionary<EditorCurveBinding, AnimationCurve>();
       _audioData = new Dictionary<AudioSource, RecordedAudio>();
@@ -322,6 +331,7 @@ namespace Leap.Unity.Recording {
 
         postProcessComponent.recordingName = recordingName;
         postProcessComponent.assetFolder.Path = finalSubFolder;
+        postProcessComponent.leapData = _leapData;
 
         string prefabPath = Path.Combine(finalSubFolder, recordingName + " Raw.prefab");
         PrefabUtility.CreatePrefab(prefabPath.Replace('\\', '/'), myGameObject);
@@ -465,6 +475,12 @@ namespace Leap.Unity.Recording {
             time = Time.time - _startTime,
             enabled = EditorUtility.GetObjectEnabled(pair.Key) == 1
           });
+        }
+      }
+
+      if (provider != null && recordLeapData) {
+        using (new ProfilerSample("Record Leap Data")) {
+          _leapData.Add(new Frame().CopyFrom(provider.CurrentFrame));
         }
       }
     }
