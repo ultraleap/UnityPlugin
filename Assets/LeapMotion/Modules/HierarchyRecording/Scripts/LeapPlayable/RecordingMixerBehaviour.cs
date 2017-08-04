@@ -1,11 +1,16 @@
-using System;
-using UnityEngine;
 using UnityEngine.Playables;
-using UnityEngine.Timeline;
 
 namespace Leap.Unity.Recording {
 
   public class RecordingMixerBehaviour : PlayableBehaviour {
+
+    private Frame _frame;
+
+    public override void OnGraphStart(Playable playable) {
+      base.OnGraphStart(playable);
+
+      _frame = new Frame();
+    }
 
     // NOTE: This function is called at runtime and edit time.  Keep that in mind when setting the values of properties.
     public override void ProcessFrame(Playable playable, FrameData info, object playerData) {
@@ -21,8 +26,11 @@ namespace Leap.Unity.Recording {
         var inputPlayable = (ScriptPlayable<RecordingBehaviour>)playable.GetInput(i);
         var input = inputPlayable.GetBehaviour();
 
-        // Use the above variables to process each frame of this playable.
-
+        if (inputWeight > 0 && input.recording != null) {
+          if (input.recording.Sample((float)inputPlayable.GetTime(), _frame, clampTimeToValid: true)) {
+            break;
+          }
+        }
       }
     }
   }
