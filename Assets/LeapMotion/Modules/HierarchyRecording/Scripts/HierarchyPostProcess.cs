@@ -122,14 +122,17 @@ namespace Leap.Unity.Recording {
     public void BuildPlaybackPrefab(ProgressBar progress) {
       var timeline = ScriptableObject.CreateInstance<TimelineAsset>();
 
-      var track = timeline.CreateTrack<AnimationTrack>(null, "Playback Animation");
+      var animationTrack = timeline.CreateTrack<AnimationTrack>(null, "Playback Animation");
 
       var clip = generateCompressedClip(progress);
 
-      var timelineClip = track.CreateClip(clip);
+      var timelineClip = animationTrack.CreateClip(clip);
+      timelineClip.duration = clip.length;
       timelineClip.asset = clip;
       timelineClip.underlyingAsset = clip;
 
+      //Try to generate a leap recording if we have leap data
+      RecordingTrack recordingTrack = null;
       LeapRecording leapRecording = null;
       switch (leapRecordingType) {
         case LeapRecordingType.Raw:
@@ -141,17 +144,20 @@ namespace Leap.Unity.Recording {
 
       string assetPath = Path.Combine(assetFolder.Path, recordingName + ".asset");
       AssetDatabase.CreateAsset(timeline, assetPath);
-      AssetDatabase.AddObjectToAsset(track, timeline);
+      AssetDatabase.AddObjectToAsset(animationTrack, timeline);
       AssetDatabase.AddObjectToAsset(clip, timeline);
 
+      //If we do have a leap recording, create a recording track to house it
       if (leapRecording != null) {
-        var recordingTrack = timeline.CreateTrack<RecordingTrack>(null, "Leap Recording");
-        var recordingClip = recordingTrack.CreateDefaultClip().asset as RecordingClip;
-        recordingClip.recording = leapRecording;
+        recordingTrack = timeline.CreateTrack<RecordingTrack>(null, "Leap Recording");
+
+        var recordingClip = recordingTrack.CreateDefaultClip();
+        recordingClip.duration = leapRecording.Length;
+
+        var recordingAsset = recordingClip.asset as RecordingClip;
+        recordingAsset.recording = leapRecording;
 
         AssetDatabase.AddObjectToAsset(leapRecording, timeline);
-        AssetDatabase.AddObjectToAsset(recordingTrack, timeline);
-        AssetDatabase.AddObjectToAsset(recordingClip, timeline);
       }
 
       AssetDatabase.SaveAssets();
@@ -161,11 +167,23 @@ namespace Leap.Unity.Recording {
         DestroyImmediate(recording);
       }
 
+      //Create the playable director and link it to the new timeline
       var director = gameObject.AddComponent<PlayableDirector>();
       director.playableAsset = timeline;
 
+      //Create the animator and link it to the animation track
       var animator = gameObject.AddComponent<Animator>();
-      director.SetGenericBinding(track.outputs.Query().First().sourceObject, animator);
+      director.SetGenericBinding(animationTrack.outputs.Query().First().sourceObject, animator);
+
+      //Destroy existing provider
+      var provider = gameObject.GetComponentInChildren<LeapProvider>();
+      GameObject providerObj = provider.gameObject;
+      DestroyImmediate(provider);
+      //If a leap recording track exists, spawn a playable provider and link it to the track
+      if (recordingTrack != null) {
+        var playableProvider = providerObj.AddComponent<LeapPlayableProvider>();
+        director.SetGenericBinding(recordingTrack.outputs.Query().First().sourceObject, playableProvider);
+      }
 
       buildAudioTracks(progress, director, timeline);
 

@@ -28,6 +28,7 @@ namespace Leap.Unity.Recording {
 
         if (inputWeight > 0 && input.recording != null) {
           if (input.recording.Sample((float)inputPlayable.GetTime(), _frame, clampTimeToValid: true)) {
+            provider.SetCurrentFrame(_frame);
             break;
           }
         }

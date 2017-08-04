@@ -25,6 +25,7 @@ namespace Leap.Unity.Recording {
       get {
         yield return typeof(LeapGraphicRenderer);
         yield return typeof(LeapGraphic);
+        yield return typeof(LeapProvider);
 
         yield return typeof(Transform);
         yield return typeof(TextMesh);

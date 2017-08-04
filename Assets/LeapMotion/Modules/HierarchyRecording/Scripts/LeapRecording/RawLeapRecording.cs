@@ -47,10 +47,10 @@ namespace Leap.Unity.Recording {
         return false;
       }
 
-      long timestap = (long)(time * S_TO_NS) + EarliestTimestamp;
+      long timestamp = (long)(time * S_TO_NS) + EarliestTimestamp;
 
       int index = 0;
-      while (index < frameList.Count && frameList[index].Timestamp > timestap) {
+      while (index < frameList.Count && frameList[index].Timestamp < timestamp) {
         index++;
       }
 

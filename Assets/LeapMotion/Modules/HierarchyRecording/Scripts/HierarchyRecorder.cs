@@ -13,8 +13,6 @@ namespace Leap.Unity.Recording {
     public static Action OnPreRecordFrame;
 
     public bool recordOnStart = false;
-
-    [Header("Recording Settings")]
     public string recordingName;
     public AssetFolder targetFolder;
 
@@ -46,6 +44,7 @@ namespace Leap.Unity.Recording {
 
     private bool _isRecording = false;
     private float _startTime = 0;
+    private int _startFrame = 0;
 
     private void Reset() {
       recordingName = gameObject.name;
@@ -75,6 +74,7 @@ namespace Leap.Unity.Recording {
       if (_isRecording) return;
       _isRecording = true;
       _startTime = Time.time;
+      _startFrame = Time.frameCount;
 
       _components = new List<Component>();
 
@@ -483,6 +483,7 @@ namespace Leap.Unity.Recording {
           Frame newFrame = new Frame();
           newFrame.CopyFrom(provider.CurrentFrame);
           newFrame.Timestamp = (long)((Time.time - _startTime) * 1e6);
+          newFrame.Id = Time.frameCount - _startFrame;
           _leapData.Add(newFrame);
         }
       }
