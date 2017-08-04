@@ -1,6 +1,8 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEditor;
 using Leap.Unity.Query;
 using Leap.Unity.GraphicalRenderer;
@@ -11,6 +13,7 @@ namespace Leap.Unity.Recording {
     public static Action OnPreRecordFrame;
 
     public bool recordOnStart = false;
+    public AssetFolder targetFolder;
     public KeyCode beginRecordingKey = KeyCode.F5;
     public KeyCode finishRecordingKey = KeyCode.F6;
 
@@ -284,13 +287,38 @@ namespace Leap.Unity.Recording {
 
         progress.Step("Finalizing Prefab...");
 
-        gameObject.AddComponent<HierarchyPostProcess>();
+        var postProcessComponent = gameObject.AddComponent<HierarchyPostProcess>();
 
         GameObject myGameObject = gameObject;
 
         DestroyImmediate(this);
 
-        PrefabUtility.CreatePrefab("Assets/LeapMotion/Modules/HierarchyRecording/RawRecording.prefab", myGameObject);
+        string targetFolderPath = targetFolder.Path;
+        if (targetFolderPath == null) {
+          if (myGameObject.scene.IsValid() && !string.IsNullOrEmpty(myGameObject.scene.path)) {
+            targetFolderPath = Path.Combine(myGameObject.scene.path, "Recordings");
+          } else {
+            targetFolderPath = Path.Combine("Assets", "Recordings");
+          }
+        }
+
+        int folderSuffix = 1;
+        string finalSubFolder;
+        do {
+          finalSubFolder = Path.Combine(targetFolderPath, myGameObject.name + " " + folderSuffix.ToString().PadLeft(2, '0'));
+          folderSuffix++;
+        } while (Directory.Exists(finalSubFolder));
+
+        Directory.CreateDirectory(finalSubFolder);
+        AssetDatabase.Refresh();
+
+        postProcessComponent.assetFolder.Path = finalSubFolder;
+
+        string prefabPath = Path.Combine(finalSubFolder, "RawRecording.prefab");
+        PrefabUtility.CreatePrefab(prefabPath.Replace('\\', '/'), myGameObject);
+        AssetDatabase.Refresh();
+
+        EditorApplication.isPlaying = false;
       });
     }
 

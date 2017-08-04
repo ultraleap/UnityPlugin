@@ -13,6 +13,8 @@ namespace Leap.Unity.Recording {
   [RecordingFriendly]
   public class HierarchyPostProcess : MonoBehaviour {
 
+    public AssetFolder assetFolder;
+
     [MinValue(0)]
     public float positionMaxError = 0.005f;
 
