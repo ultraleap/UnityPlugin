@@ -19,6 +19,8 @@ namespace Leap.Unity.Recording {
 
     public void SetCurrentFrame(Frame frame) {
       _frame = frame;
+      DispatchUpdateFrameEvent(frame);
+      DispatchFixedFrameEvent(frame);
     }
   }
 }

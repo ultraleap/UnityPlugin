@@ -164,6 +164,12 @@ namespace Leap.Unity.Recording {
             }
 
             var binding = EditorCurveBinding.FloatCurve(path, type, propertyName);
+
+            if (_curves.ContainsKey(binding)) {
+              Debug.LogError("Binding already existed?");
+              Debug.LogError(binding.path + " : " + binding.propertyName);
+              continue;
+            }
             _curves.Add(binding, curve);
           }
         });
@@ -391,10 +397,16 @@ namespace Leap.Unity.Recording {
         switch (transformMode) {
           case RecordingSelection.Nothing:
             _transforms.Clear();
+            _behaviours.Clear();
             break;
           case RecordingSelection.Specific:
             _transforms.Clear();
             _transforms.AddRange(specificTransforms);
+
+            _behaviours.Clear();
+            _transforms.Query().SelectMany(t => t.GetComponents<Behaviour>().Query()).Cast<Component>().AppendList(_behaviours);
+            _transforms.Query().SelectMany(t => t.GetComponents<Renderer>().Query()).Cast<Component>().AppendList(_behaviours);
+            _transforms.Query().SelectMany(t => t.GetComponents<Collider>().Query()).Cast<Component>().AppendList(_behaviours);
             break;
         }
       }
