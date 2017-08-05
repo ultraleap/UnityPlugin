@@ -39,6 +39,10 @@ namespace Leap.Unity.Recording {
     private List<AudioSource> _audioSources;
     private List<PropertyRecorder> _recorders;
 
+    private List<Behaviour> _tempBehaviour = new List<Behaviour>();
+    private List<Renderer> _tempRenderer = new List<Renderer>();
+    private List<Collider> _tempCollider = new List<Collider>();
+
     private List<Frame> _leapData;
     private Dictionary<EditorCurveBinding, AnimationCurve> _curves;
     private Dictionary<AudioSource, RecordedAudio> _audioData;
@@ -438,9 +442,22 @@ namespace Leap.Unity.Recording {
             _transforms.AddRange(specificTransforms);
 
             _behaviours.Clear();
-            _transforms.Query().SelectMany(t => t.GetComponents<Behaviour>().Query()).Cast<Component>().AppendList(_behaviours);
-            _transforms.Query().SelectMany(t => t.GetComponents<Renderer>().Query()).Cast<Component>().AppendList(_behaviours);
-            _transforms.Query().SelectMany(t => t.GetComponents<Collider>().Query()).Cast<Component>().AppendList(_behaviours);
+
+            foreach (var t in _transforms) {
+              t.GetComponents(_tempBehaviour);
+              t.GetComponents(_tempRenderer);
+              t.GetComponents(_tempCollider);
+
+              foreach (var b in _tempBehaviour) {
+                _behaviours.Add(b);
+              }
+              foreach (var b in _tempRenderer) {
+                _behaviours.Add(b);
+              }
+              foreach (var b in _tempCollider) {
+                _behaviours.Add(b);
+              }
+            }
             break;
         }
       }
