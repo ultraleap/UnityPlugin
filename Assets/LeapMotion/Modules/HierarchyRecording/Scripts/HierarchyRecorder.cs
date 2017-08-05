@@ -43,6 +43,8 @@ namespace Leap.Unity.Recording {
     private Dictionary<EditorCurveBinding, AnimationCurve> _curves;
     private Dictionary<AudioSource, RecordedAudio> _audioData;
     private Dictionary<Transform, List<TransformData>> _transformData;
+    private Dictionary<Transform, TransformData> _initialTransformData;
+    private Dictionary<Component, bool> _initialActivityData;
     private Dictionary<Component, List<ActivityData>> _behaviourActivity;
 
     private HashSet<string> _takenNames = new HashSet<string>();
@@ -98,13 +100,28 @@ namespace Leap.Unity.Recording {
       _curves = new Dictionary<EditorCurveBinding, AnimationCurve>();
       _audioData = new Dictionary<AudioSource, RecordedAudio>();
       _transformData = new Dictionary<Transform, List<TransformData>>();
+      _initialTransformData = new Dictionary<Transform, TransformData>();
+      _initialActivityData = new Dictionary<Component, bool>();
       _behaviourActivity = new Dictionary<Component, List<ActivityData>>();
     }
 
     private void finishRecording(ProgressBar progress) {
-      progress.Begin(4, "Saving Recording", "", () => {
+      progress.Begin(5, "Saving Recording", "", () => {
         if (!_isRecording) return;
         _isRecording = false;
+
+        progress.Begin(1, "", "Reverting Scene State", () => {
+          foreach (var pair in _initialTransformData) {
+            pair.Key.localPosition = pair.Value.localPosition;
+            pair.Key.localRotation = pair.Value.localRotation;
+            pair.Key.localScale = pair.Value.localScale;
+            pair.Key.gameObject.SetActive(pair.Value.enabled);
+          }
+
+          foreach (var pair in _initialActivityData) {
+            EditorUtility.SetObjectEnabled(pair.Key, pair.Value);
+          }
+        });
 
         progress.Begin(1, "", "Patching Materials: ", () => {
           GetComponentsInChildren(true, _recorders);
@@ -382,6 +399,23 @@ namespace Leap.Unity.Recording {
           if (component is Behaviour) _behaviours.Add(component);
           if (component is Renderer) _behaviours.Add(component);
           if (component is Collider) _behaviours.Add(component);
+        }
+
+        foreach (var transform in _transforms) {
+          if (!_initialTransformData.ContainsKey(transform)) {
+            _initialTransformData[transform] = new TransformData() {
+              localPosition = transform.localPosition,
+              localRotation = transform.localRotation,
+              localScale = transform.localScale,
+              enabled = transform.gameObject.activeSelf
+            };
+          }
+        }
+
+        foreach (var behaviour in _behaviours) {
+          if (!_initialActivityData.ContainsKey(behaviour)) {
+            _initialActivityData[behaviour] = EditorUtility.GetObjectEnabled(behaviour) == 1;
+          }
         }
 
         switch (audioSourceMode) {
