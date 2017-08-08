@@ -33,7 +33,7 @@ namespace Leap.Unity.GraphicalRenderer {
     public void Clear() {
       foreach (var mesh in meshes) {
         if (mesh != null) {
-          mesh.Clear();
+          mesh.Clear(keepVertexLayout: false);
           _tempMeshPool.Enqueue(mesh);
         }
       }

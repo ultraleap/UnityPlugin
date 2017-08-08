@@ -266,7 +266,7 @@ namespace Leap.Unity.GraphicalRenderer {
     private List<int> _tris = new List<int>();
     private void generateTextMesh(int index, LeapTextGraphic graphic, Mesh mesh) {
       using (new ProfilerSample("Generate Text Mesh")) {
-        mesh.Clear();
+        mesh.Clear(keepVertexLayout: false);
 
         graphic.isRepresentationDirty = false;
 
