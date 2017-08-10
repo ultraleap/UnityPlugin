@@ -155,6 +155,11 @@ namespace Leap.Unity {
       }
     }
 
+    /// <summary>
+    /// Given a list of comparable types, return an ordering that orders the
+    /// elements into sorted order.  The ordering is a list of indices where each
+    /// index refers to the element located at that index in the original list.
+    /// </summary>
     public static List<int> GetSortedOrder<T>(this IList<T> list) where T : IComparable<T> {
       Assert.IsNotNull(list);
 
@@ -168,6 +173,10 @@ namespace Leap.Unity {
       return ordering;
     }
 
+    /// <summary>
+    /// Given a list and an ordering, order the list according to the ordering.
+    /// This method assumes the ordering is a valid ordering.
+    /// </summary>
     public static void ApplyOrdering<T>(this IList<T> list, List<int> ordering) {
       Assert.IsNotNull(list);
       Assert.IsNotNull(ordering);
