@@ -676,7 +676,7 @@ namespace Leap.Unity.GraphicalRenderer {
       if (mesh == null) {
         mesh = _meshes.GetMeshFromPoolOrNew();
       } else {
-        mesh.Clear();
+        mesh.Clear(keepVertexLayout: false);
       }
 
       mesh.name = "Procedural Graphic Mesh";
