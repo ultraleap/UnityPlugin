@@ -47,7 +47,7 @@ namespace Leap.Unity {
           if (asset != null) {
             folderProp.objectReferenceValue = asset;
           } else {
-            EditorUtility.DisplayDialog("Could not select folder!", "That folder is not an asset folder, make sure to select a folder that is located inside of the project Assets directory.", "ok");
+            EditorUtility.DisplayDialog("Could not select folder.", "The specified folder is not an asset folder. Asset folders must be inside project's Assets directory.", "OK");
           }
         }
       }
