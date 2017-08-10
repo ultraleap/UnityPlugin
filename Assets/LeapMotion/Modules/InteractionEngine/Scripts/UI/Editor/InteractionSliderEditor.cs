@@ -38,7 +38,7 @@ namespace Leap.Unity.Interaction {
                                 "verticalSteps",
                                 "_verticalSlideEvent");
       specifyConditionalDrawing(() => {
-        return sliders.Query().Any(slider => slider.sliderType == InteractionSlider.SliderType.Horizonal
+        return sliders.Query().Any(slider => slider.sliderType == InteractionSlider.SliderType.Horizontal
                                           || slider.sliderType == InteractionSlider.SliderType.TwoDimensional);
       },
                                 "defaultHorizontalValue",

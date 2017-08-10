@@ -3969,7 +3969,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0ebbb41b110e5794ab82d986ca172460, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _manager: {fileID: 0}
+  _manager: {fileID: 1924829190}
   _ignoreHoverMode: 0
   _isIgnoringAllHoverState: 0
   _ignorePrimaryHover: 0
@@ -3988,35 +3988,44 @@ MonoBehaviour:
     layerIndex: 0
   _eventTable:
     _entries: []
+  _controlEnabled: 1
+  startingPositionMode: 0
   minMaxHeight: {x: 0, y: 0.02}
   restingHeight: 0.5
   _springForce: 0.1
-  OnPress:
+  _OnPress:
     m_PersistentCalls:
       m_Calls: []
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
-  OnUnpress:
+  _OnUnpress:
     m_PersistentCalls:
       m_Calls: []
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
+  sliderType: 2
+  dispatchSlideValueOnStart: 1
+  overrideRectLimits: 0
+  _parentHasRectTransform: 0
+  defaultHorizontalValue: 0.5
   horizontalValueRange: {x: 0, y: 1}
-  verticalValueRange: {x: 0, y: 1}
   horizontalSlideLimits: {x: -0.09, y: 0.09}
-  verticalSlideLimits: {x: -0.065, y: 0.065}
   horizontalSteps: 0
+  _horizontalSlideEvent:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: Leap.Unity.Interaction.InteractionSlider+FloatEvent, Assembly-CSharp,
+      Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+  defaultVerticalValue: 0.5
+  verticalValueRange: {x: 0, y: 1}
+  verticalSlideLimits: {x: -0.065, y: 0.065}
   verticalSteps: 0
-  horizontalSlideEvent:
+  _verticalSlideEvent:
     m_PersistentCalls:
       m_Calls: []
     m_TypeName: Leap.Unity.Interaction.InteractionSlider+FloatEvent, Assembly-CSharp,
       Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-  verticalSlideEvent:
-    m_PersistentCalls:
-      m_Calls: []
-    m_TypeName: Leap.Unity.Interaction.InteractionSlider+FloatEvent, Assembly-CSharp,
-      Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+  hackModeOn: 0
 --- !u!54 &753195707
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -4850,35 +4859,44 @@ MonoBehaviour:
     layerIndex: 0
   _eventTable:
     _entries: []
+  _controlEnabled: 1
+  startingPositionMode: 0
   minMaxHeight: {x: 0, y: 0.02}
   restingHeight: 0.5
   _springForce: 0.1
-  OnPress:
+  _OnPress:
     m_PersistentCalls:
       m_Calls: []
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
-  OnUnpress:
+  _OnUnpress:
     m_PersistentCalls:
       m_Calls: []
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
+  sliderType: 1
+  dispatchSlideValueOnStart: 1
+  overrideRectLimits: 0
+  _parentHasRectTransform: 0
+  defaultHorizontalValue: 0
   horizontalValueRange: {x: 0, y: 1}
-  verticalValueRange: {x: 0, y: 1}
   horizontalSlideLimits: {x: -0.205, y: 0.205}
-  verticalSlideLimits: {x: 0, y: 0}
   horizontalSteps: 0
+  _horizontalSlideEvent:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: Leap.Unity.Interaction.InteractionSlider+FloatEvent, Assembly-CSharp,
+      Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+  defaultVerticalValue: 0
+  verticalValueRange: {x: 0, y: 1}
+  verticalSlideLimits: {x: 0, y: 0}
   verticalSteps: 0
-  horizontalSlideEvent:
+  _verticalSlideEvent:
     m_PersistentCalls:
       m_Calls: []
     m_TypeName: Leap.Unity.Interaction.InteractionSlider+FloatEvent, Assembly-CSharp,
       Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-  verticalSlideEvent:
-    m_PersistentCalls:
-      m_Calls: []
-    m_TypeName: Leap.Unity.Interaction.InteractionSlider+FloatEvent, Assembly-CSharp,
-      Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+  hackModeOn: 0
 --- !u!54 &1019750854
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -5763,7 +5781,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c592f16851a620743868a31232613370, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ModelsParent: {fileID: 1913301697}
+  _modelsParent: {fileID: 1913301697}
   ModelPool:
   - GroupName: Rigged Hands
     _handPool: {fileID: 0}
@@ -5796,8 +5814,6 @@ MonoBehaviour:
   _isHeadMounted: 1
   _temporalWarping: {fileID: 1464037410}
   _frameOptimization: 0
-  _overrideDeviceType: 1
-  _overrideDeviceTypeWith: 1
   _updateHandInPrecull: 0
 --- !u!114 &1331178860
 MonoBehaviour:
@@ -6024,13 +6040,13 @@ MonoBehaviour:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1446671499}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 81dc33a21758b384586807f3656587d1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _displayInGameView: 1
-  _enabledForBuild: 1
+  _enabledForBuild: 0
   _sphereMesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
   _gizmoShader: {fileID: 4800000, guid: 309635e4933310a4d98f0e016c806769, type: 3}
 --- !u!4 &1446671501

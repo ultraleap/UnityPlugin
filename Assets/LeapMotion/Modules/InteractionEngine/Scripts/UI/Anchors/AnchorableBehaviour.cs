@@ -338,7 +338,9 @@ namespace Leap.Unity.Interaction {
     }
 
     void OnDisable() {
-      Detach();
+      if (!this.enabled) {
+        Detach();
+      }
 
       // Make sure we don't leave dangling anchor-preference state.
       endAnchorPreference();

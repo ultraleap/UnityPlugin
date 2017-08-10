@@ -24,12 +24,12 @@ namespace Leap.Unity.Interaction {
 
     public enum SliderType {
       Vertical,
-      Horizonal,
+      Horizontal,
       TwoDimensional
     }
 
     [Header("Slider Settings")]
-    public SliderType sliderType = SliderType.Horizonal;
+    public SliderType sliderType = SliderType.Horizontal;
 
     public bool dispatchSlideValueOnStart = true;
 
@@ -149,8 +149,6 @@ namespace Leap.Unity.Interaction {
 
     private bool _started = false;
 
-    public bool hackModeOn = false;
-
     protected override void OnValidate() {
       base.OnValidate();
 
@@ -170,7 +168,7 @@ namespace Leap.Unity.Interaction {
       calculateSliderLimits();
 
       switch (sliderType) {
-        case SliderType.Horizonal:
+        case SliderType.Horizontal:
           verticalSlideLimits = new Vector2(0, 0);
           break;
         case SliderType.Vertical:
@@ -335,8 +333,12 @@ namespace Leap.Unity.Interaction {
         // Actual slider slide limits
         Gizmos.color = Color.blue;
         Gizmos.DrawWireCube(originPosition +
-          new Vector3((horizontalSlideLimits.x + horizontalSlideLimits.y) * 0.5f, (verticalSlideLimits.x + verticalSlideLimits.y) * 0.5f, 0f),
-          new Vector3(horizontalSlideLimits.y - horizontalSlideLimits.x, verticalSlideLimits.y - verticalSlideLimits.x, 0f));
+          new Vector3((sliderType == SliderType.Vertical ? 0F : (horizontalSlideLimits.x + horizontalSlideLimits.y) * 0.5f),
+                      (sliderType == SliderType.Horizontal ? 0F : (verticalSlideLimits.x + verticalSlideLimits.y) * 0.5f),
+                      0f),
+          new Vector3((sliderType == SliderType.Vertical ? 0F : horizontalSlideLimits.y - horizontalSlideLimits.x),
+                      (sliderType == SliderType.Horizontal ? 0F : verticalSlideLimits.y - verticalSlideLimits.x),
+                      0f));
 
         var self = GetComponent<RectTransform>();
         if (self != null) {

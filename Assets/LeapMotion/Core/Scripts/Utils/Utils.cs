@@ -510,9 +510,12 @@ namespace Leap.Unity {
     /// use.
     ///
     /// Colliders that are the children of other Rigidbody elements beneath the argument
-    /// object are ignored.
+    /// object are ignored. Optionally, colliders of inactive GameObjects can be included
+    /// in the returned list; by default, these colliders are skipped.
     /// </summary>
-    public static void FindColliders<T>(GameObject obj, List<T> colliders) where T : Collider {
+    public static void FindColliders<T>(GameObject obj, List<T> colliders,
+                                        bool includeInactiveObjects = false)
+                                    where T : Collider {
       colliders.Clear();
       Stack<Transform> toVisit = Pool<Stack<Transform>>.Spawn();
       List<T> collidersBuffer = Pool<List<T>>.Spawn();
@@ -529,12 +532,13 @@ namespace Leap.Unity {
           foreach (var child in curTransform.GetChildren()) {
             // Ignore children with Rigidbodies of their own; its own Rigidbody
             // owns its own colliders and the colliders of its children
-            if (child.GetComponent<Rigidbody>() == null) {
+            if (child.GetComponent<Rigidbody>() == null
+                && (includeInactiveObjects || child.gameObject.activeSelf)) {
               toVisit.Push(child);
             }
           }
 
-          // Since we'll visit every child, all we need to do is add the colliders
+          // Since we'll visit every valid child, all we need to do is add the colliders
           // of every transform we visit.
           collidersBuffer.Clear();
           curTransform.GetComponents<T>(collidersBuffer);
