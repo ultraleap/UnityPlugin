@@ -190,6 +190,10 @@ namespace Leap.Unity.Interaction {
 
     #region Unity Events
 
+    protected virtual void Reset() {
+      if (manager == null) manager = GetComponentInParent<InteractionManager>();
+    }
+
     protected virtual void OnEnable() {
       if (_contactInitialized) {
         EnableSoftContact();
@@ -233,6 +237,9 @@ namespace Leap.Unity.Interaction {
     }
 
     public void NotifyObjectUnregistered(IInteractionBehaviour intObj) {
+      ClearHoverTrackingForObject(intObj);
+      ClearContactTrackingForObject(intObj);
+
       onObjectUnregistered(intObj);
     }
 
@@ -1686,15 +1693,78 @@ namespace Leap.Unity.Interaction {
         return false;
       }
       else {
+        // Release this controller's grasp.
         _releasingControllersBuffer.Clear();
         _releasingControllersBuffer.Add(this);
 
-        onGraspedObjectForciblyReleased(_graspedObject);
+        // Calling things in the right order requires we remember the object we're
+        // releasing.
+        var tempGraspedObject = _graspedObject;
 
-        _graspedObject.EndGrasp(_releasingControllersBuffer);
+        // Clear controller grasped object, and enable soft contact.
+        EnableSoftContact();
         _graspedObject = null;
 
+        // Fire object's grasp-end callback.
+        tempGraspedObject.EndGrasp(_releasingControllersBuffer);
+
+        // The grasped object was forcibly released; some controllers hook into this
+        // by virtual method implementation.
+        onGraspedObjectForciblyReleased(tempGraspedObject);
+
         return true;
+      }
+    }
+
+    /// <summary>
+    /// Helper static method for forcing multiple controllers to release their grasps
+    /// on a single object simultaneously. All of the provided controllers must be
+    /// grasping the argument interaction object.
+    /// </summary>
+    /// <details>
+    /// The input controllers List is copied to a temporary (pooled) buffer before 
+    /// release operations are actually carried out. This prevents errors that might
+    /// arise from modifying a held-controllers list while enumerating through the same
+    /// list.
+    /// </details>
+    public static void ReleaseGrasps(IInteractionBehaviour graspedObj,
+                                     ReadonlyHashSet<InteractionController> controllers) {
+      var controllersBuffer = Pool<List<InteractionController>>.Spawn();
+      try {
+        foreach (var controller in controllers) {
+          if (controller.graspedObject != graspedObj) {
+            Debug.LogError("Argument intObj " + graspedObj.name + " is not held by "
+                         + "controller " + controller.name + "; skipping release for this "
+                         + "controller.");
+            continue;
+          }
+
+          controllersBuffer.Add(controller);
+        }
+
+        // Enable soft contact on releasing controllers, and clear grasp state.
+        // Note: controllersBuffer is iterated twice to preserve state modification order.
+        // For reference order, see InteractionController.ReleaseGrasp() above.
+        foreach (var controller in controllersBuffer) {
+          // Avoid "popping" of released objects by enabling soft contact on releasing
+          // controllers.
+          controller.EnableSoftContact();
+
+          // Clear grasped object state.
+          controller._graspedObject = null;
+        }
+
+        // Evaluate object logic for being released by each controller.
+        graspedObj.EndGrasp(controllersBuffer);
+
+        // Object was forcibly released, so fire virtual callbacks on each controller.
+        foreach (var controller in controllersBuffer) {
+          controller.onGraspedObjectForciblyReleased(graspedObj);
+        }
+      }
+      finally {
+        controllersBuffer.Clear();
+        Pool<List<InteractionController>>.Recycle(controllersBuffer);
       }
     }
 

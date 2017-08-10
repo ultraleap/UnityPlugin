@@ -15,5 +15,9 @@ MonoBehaviour:
   _generateBuildDropdown: 1
   _dependantFolders:
   - Assets\LeapMotion\Modules\InteractionEngine
+  - Assets\LeapMotion\Modules\InteractionEngine\Testing
+  _ignoredFolders:
+  - Assets\LeapMotion\Modules\InteractionEngine\Testing
   _dependantFiles: []
+  _ignoredFiles: []
   _dependantPackages: []

@@ -98,7 +98,9 @@ namespace Leap.Unity.Interaction {
     /// </summary>
     private Hand _hand;
 
-    protected virtual void Reset() {
+    protected override void Reset() {
+      base.Reset();
+
       enabledPrimaryHoverFingertips = new bool[] { true, true, true, false, false };
     }
 

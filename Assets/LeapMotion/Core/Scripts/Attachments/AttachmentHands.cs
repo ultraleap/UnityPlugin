@@ -120,6 +120,7 @@ namespace Leap.Unity.Attachments {
           }
 
           var leapHand = handAccessors[i]();
+          attachmentHand.isTracked = leapHand != null;
 
           #if UNITY_EDITOR
           if (Hands.Provider != null) {
