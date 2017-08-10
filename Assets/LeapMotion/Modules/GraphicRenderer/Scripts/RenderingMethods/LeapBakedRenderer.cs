@@ -82,43 +82,45 @@ namespace Leap.Unity.GraphicalRenderer {
     }
 
     public override void OnUpdateRenderer() {
-      base.OnUpdateRenderer();
+      using (new ProfilerSample("Update Baked Renderer")) {
+        base.OnUpdateRenderer();
 
-      if (_motionType != MotionType.None) {
-        if (renderer.space == null) {
-          using (new ProfilerSample("Build Material Data")) {
-            _rect_graphicPositions.Clear();
-            foreach (var graphic in group.graphics) {
-              var localSpace = renderer.transform.InverseTransformPoint(graphic.transform.position);
-              _rect_graphicPositions.Add(localSpace);
+        if (_motionType != MotionType.None) {
+          if (renderer.space == null) {
+            using (new ProfilerSample("Build Material Data")) {
+              _rect_graphicPositions.Clear();
+              foreach (var graphic in group.graphics) {
+                var localSpace = renderer.transform.InverseTransformPoint(graphic.transform.position);
+                _rect_graphicPositions.Add(localSpace);
+              }
             }
-          }
 
-          using (new ProfilerSample("Upload Material Data")) {
-            _material.SetVectorArraySafe(RECT_POSITIONS, _rect_graphicPositions);
-          }
-        } else if (renderer.space is LeapRadialSpace) {
-          var radialSpace = renderer.space as LeapRadialSpace;
-
-          using (new ProfilerSample("Build Material Data")) {
-            _curved_graphicParameters.Clear();
-            foreach (var graphic in group.graphics) {
-              var t = graphic.anchor.transformer as IRadialTransformer;
-              _curved_graphicParameters.Add(t.GetVectorRepresentation(graphic.transform));
+            using (new ProfilerSample("Upload Material Data")) {
+              _material.SetVectorArraySafe(RECT_POSITIONS, _rect_graphicPositions);
             }
-          }
+          } else if (renderer.space is LeapRadialSpace) {
+            var radialSpace = renderer.space as LeapRadialSpace;
 
-          using (new ProfilerSample("Upload Material Data")) {
-            _material.SetFloat(SpaceProperties.RADIAL_SPACE_RADIUS, radialSpace.radius);
-            _material.SetVectorArraySafe(CURVED_PARAMETERS, _curved_graphicParameters);
+            using (new ProfilerSample("Build Material Data")) {
+              _curved_graphicParameters.Clear();
+              foreach (var graphic in group.graphics) {
+                var t = graphic.anchor.transformer as IRadialTransformer;
+                _curved_graphicParameters.Add(t.GetVectorRepresentation(graphic.transform));
+              }
+            }
+
+            using (new ProfilerSample("Upload Material Data")) {
+              _material.SetFloat(SpaceProperties.RADIAL_SPACE_RADIUS, radialSpace.radius);
+              _material.SetVectorArraySafe(CURVED_PARAMETERS, _curved_graphicParameters);
+            }
           }
         }
-      }
 
-      if (!_createMeshRenderers) {
-        using (new ProfilerSample("Draw Meshes")) {
-          for (int i = 0; i < _meshes.Count; i++) {
-            drawMesh(_meshes[i], renderer.transform.localToWorldMatrix);
+        if (!_createMeshRenderers) {
+          using (new ProfilerSample("Draw Meshes")) {
+            for (int i = 0; i < _meshes.Count; i++) {
+              drawMesh(_meshes[i], renderer.transform.localToWorldMatrix);
+            }
           }
         }
       }
