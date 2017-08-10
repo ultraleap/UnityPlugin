@@ -10,6 +10,7 @@
 using UnityEngine;
 using UnityEngine.Assertions;
 using System;
+using System.IO;
 using System.Collections.Generic;
 using Leap.Unity.Query;
 
@@ -144,6 +145,25 @@ namespace Leap.Unity {
           return obj.parent.IsActiveRelativeToParent(parent);
         }
       }
+    }
+
+    public static string MakeRelativePath(string relativeTo, string path) {
+      if (string.IsNullOrEmpty(relativeTo)) throw new ArgumentNullException("relativeTo");
+      if (string.IsNullOrEmpty(path)) throw new ArgumentNullException("path");
+
+      Uri relativeToUri = new Uri(relativeTo);
+      Uri pathUri = new Uri(path);
+
+      if (relativeToUri.Scheme != pathUri.Scheme) { return path; } // path can't be made relative.
+
+      Uri relativeUri = relativeToUri.MakeRelativeUri(pathUri);
+      string relativePath = Uri.UnescapeDataString(relativeUri.ToString());
+
+      if (pathUri.Scheme.Equals("file", StringComparison.InvariantCultureIgnoreCase)) {
+        relativePath = relativePath.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
+      }
+
+      return relativePath;
     }
 
     #endregion
@@ -490,9 +510,12 @@ namespace Leap.Unity {
     /// use.
     ///
     /// Colliders that are the children of other Rigidbody elements beneath the argument
-    /// object are ignored.
+    /// object are ignored. Optionally, colliders of inactive GameObjects can be included
+    /// in the returned list; by default, these colliders are skipped.
     /// </summary>
-    public static void FindColliders<T>(GameObject obj, List<T> colliders) where T : Collider {
+    public static void FindColliders<T>(GameObject obj, List<T> colliders,
+                                        bool includeInactiveObjects = false)
+                                    where T : Collider {
       colliders.Clear();
       Stack<Transform> toVisit = Pool<Stack<Transform>>.Spawn();
       List<T> collidersBuffer = Pool<List<T>>.Spawn();
@@ -509,12 +532,13 @@ namespace Leap.Unity {
           foreach (var child in curTransform.GetChildren()) {
             // Ignore children with Rigidbodies of their own; its own Rigidbody
             // owns its own colliders and the colliders of its children
-            if (child.GetComponent<Rigidbody>() == null) {
+            if (child.GetComponent<Rigidbody>() == null
+                && (includeInactiveObjects || child.gameObject.activeSelf)) {
               toVisit.Push(child);
             }
           }
 
-          // Since we'll visit every child, all we need to do is add the colliders
+          // Since we'll visit every valid child, all we need to do is add the colliders
           // of every transform we visit.
           collidersBuffer.Clear();
           curTransform.GetComponents<T>(collidersBuffer);

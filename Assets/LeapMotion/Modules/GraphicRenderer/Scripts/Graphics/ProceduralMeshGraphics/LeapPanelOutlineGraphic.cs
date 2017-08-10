@@ -16,281 +16,126 @@ using Leap.Unity.Attributes;
 namespace Leap.Unity.GraphicalRenderer {
 
   /// <summary>
-  /// The Panel Graphic is a type of procedural mesh graphic that can generate flat
-  /// panels with a number of useful features:
-  ///  - It allows nine slicing when using a sprite as the source for the texture data.
-  ///  - It allows automatic tessellation such that it can be correctly warped by a space.
-  ///  - It allows automatic resizing based on an attached RectTransform.
+  /// The Panel Outline Graphic acts just like a Panel Graphic, but only produces quads
+  /// for the outermost edges of the panel.
   /// </summary>
   [DisallowMultipleComponent]
-  public class LeapPanelOutlineGraphic : LeapMeshGraphicBase {
+  public class LeapPanelOutlineGraphic : LeapSlicedGraphic {
 
-    public const int MAX_VERTS = 128;
+    #region Inspector
 
-    [EditTimeOnly]
-    [SerializeField]
-    private int _sourceDataIndex = -1;
+    [Header("Outline Thickness")]
 
-    [Tooltip("Specifies whether or not this panel has a specific resolution, or whether this " +
-             "panel automatically changes its resolution based on its size")]
-    [EditTimeOnly]
-    [SerializeField]
-    private ResolutionType _resolutionType = ResolutionType.VerticesPerRectilinearMeter;
+    [Tooltip("Check this option to override the thickness of the sprite's borders with "
+           + "a custom thickness. This will stretch the sprite's borders to match the "
+           + "custom thickness.")]
+    [SerializeField, EditTimeOnly]
+    private bool _overrideSpriteBorders = false;
+    /// <summary>
+    /// Gets whether the Panel Outline Graphic is overriding the borders of its sprite
+    /// data source. This property only has an effect if the graphic has a sprite set as
+    /// its data source (instead of a texture).
+    /// </summary>
+    public bool overrideSpriteBorders {
+      get {
+        return _overrideSpriteBorders;
+      }
+    }
 
-    [HideInInspector]
-    [SerializeField]
-    private int _resolution_vert_x, _resolution_vert_y;
-
-    [EditTimeOnly]
-    [SerializeField]
-    private Vector2 _resolution_verts_per_meter = new Vector2(20, 20);
-
-    [MinValue(0)]
-    [EditTimeOnly]
-    [SerializeField]
+    [Tooltip("The local-space thickness of the panel edges that are constructed. If the"
+           + "source data for the panel is a Sprite, this value is overridden to reflect "
+           + "the sprite's nine-slicing.")]
+    [MinValue(0f)]
+    [SerializeField, EditTimeOnly]
     private Vector2 _thickness = new Vector2(0.01F, 0.01F);
-
-    [MinValue(0)]
-    [EditTimeOnly]
-    [SerializeField]
-    private Vector2 _size = new Vector2(0.1f, 0.1f);
-
-    [Tooltip("Uses sprite data to generate a nine sliced panel.")]
-    [EditTimeOnly]
-    [SerializeField]
-    private bool _nineSliced = false;
-
     /// <summary>
-    /// Returns whether or not a feature data object is a valid object
-    /// that can be used to drive texture data for this panel.  Only
-    /// a TextureData object or a SpriteData object are currently valid.
+    /// Gets the thickness of the panel edges.
     /// </summary>
-    public static bool IsValidDataSource(LeapFeatureData dataSource) {
-      return dataSource is LeapTextureData ||
-             dataSource is LeapSpriteData;
-    }
-
-    /// <summary>
-    /// Returns the current feature data object being used as source.
-    /// </summary>
-    public LeapFeatureData sourceData {
+    public Vector2 thickness {
       get {
-        if (_sourceDataIndex == -1) {
-          assignDefaultSourceValue();
-        }
-        if (_sourceDataIndex < 0 || _sourceDataIndex >= featureData.Count) {
-          return null;
-        }
-        return featureData[_sourceDataIndex];
-      }
-#if UNITY_EDITOR
-      set {
-        _sourceDataIndex = _featureData.IndexOf(value);
-        setSourceFeatureDirty();
-      }
-#endif
-    }
-
-    /// <summary>
-    /// Returns the current resolution type being used for this panel.
-    /// </summary>
-    public ResolutionType resolutionType {
-      get {
-        return _resolutionType;
+        return _thickness;
       }
     }
 
-    /// <summary>
-    /// Returns the current local-space rect of this panel.  If there is a
-    /// RectTransform attached to this panel, this value is the same as calling
-    /// rectTransform.rect.
-    /// </summary>
-    public Rect rect {
-      get {
-        RectTransform rectTransform = GetComponent<RectTransform>();
-        if (rectTransform != null) {
-          _size = rectTransform.rect.size;
-          return rectTransform.rect;
-        } else {
-          return new Rect(-_size / 2, _size);
-        }
-      }
-    }
+    #endregion
 
-    /// <summary>
-    /// Gets or sets whether or not this panel is currently using nine slicing.
-    /// </summary>
-    public bool nineSliced {
-      get {
-        return _nineSliced && canNineSlice;
-      }
-      set {
-        _nineSliced = value;
-        setSourceFeatureDirty();
-      }
-    }
-
-    /// <summary>
-    /// Returns whether or not the current source supports nine slicing.
-    /// </summary>
-    public bool canNineSlice {
-      get {
-        var spriteData = sourceData as LeapSpriteData;
-        return spriteData != null && spriteData.sprite != null;
-      }
-    }
-
-    /// <summary>
-    /// Returns which uv channel is being used for this panel.  It will
-    /// always match the uv channel being used by the source.
-    /// </summary>
-    public UVChannelFlags uvChannel {
-      get {
-        if (sourceData == null) {
-          return UVChannelFlags.UV0;
-        }
-
-        var feature = sourceData.feature;
-        if (feature is LeapTextureFeature) {
-          return (feature as LeapTextureFeature).channel;
-        } else if (feature is LeapSpriteFeature) {
-          return (feature as LeapSpriteFeature).channel;
-        } else {
-          return UVChannelFlags.UV0;
-        }
-      }
-    }
-
-    protected override void Reset() {
-      base.Reset();
-
-      assignDefaultSourceValue();
-      setSourceFeatureDirty();
-    }
+    #region Unity Events
 
     protected override void OnValidate() {
       base.OnValidate();
 
-      if (sourceData == null) {
-        assignDefaultSourceValue();
-      }
-
-      _resolution_vert_x = Mathf.Max(0, _resolution_vert_x);
-      _resolution_vert_y = Mathf.Max(0, _resolution_vert_y);
-      _resolution_verts_per_meter = Vector2.Max(_resolution_verts_per_meter, Vector2.zero);
-
-      if (_resolutionType == ResolutionType.Vertices) {
-        _resolution_verts_per_meter.x = _resolution_vert_x / rect.width;
-        _resolution_verts_per_meter.y = _resolution_vert_y / rect.height;
-      } else {
-        _resolution_vert_x = Mathf.RoundToInt(_resolution_verts_per_meter.x * rect.width);
-        _resolution_vert_y = Mathf.RoundToInt(_resolution_verts_per_meter.y * rect.height);
-      }
-
-      setSourceFeatureDirty();
+      RefreshMeshData();
     }
 
-    public override void RefreshMeshData() {
-      if (sourceData == null) {
-        assignDefaultSourceValue();
+    #endregion
+
+    public override void RefreshSlicedMeshData(Vector2i    resolution,
+                                               RectMargins meshMargins,
+                                               RectMargins uvMargins) {
+      resolution.x = Mathf.Max(resolution.x, 4);
+      resolution.y = Mathf.Max(resolution.y, 4);
+
+      if (overrideSpriteBorders || !nineSliced) {
+        // For this calculation, we ignore the provided meshMargins because the Outline
+        // graphic allows the user to override its default nine-slicing behaviour for
+        // borders.
+        meshMargins = new RectMargins(_thickness.x, _thickness.y, _thickness.x, _thickness.y);
       }
-
-      Vector4 borderSize = Vector4.zero;
-      Vector4 borderUvs = Vector4.zero;
-
-      Rect rect;
-      RectTransform rectTransform = GetComponent<RectTransform>();
-      if (rectTransform != null) {
-        rect = rectTransform.rect;
-        _size = rect.size;
-      } else {
-        rect = new Rect(-_size / 2, _size);
-      }
-
-      if (_nineSliced && sourceData is LeapSpriteData) {
-        var spriteData = sourceData as LeapSpriteData;
-        if (spriteData.sprite == null) {
-          mesh = null;
-          remappableChannels = 0;
-          return;
-        }
-
-        var sprite = spriteData.sprite;
-
-        Vector4 border = sprite.border;
-        borderSize = border / sprite.pixelsPerUnit;
-
-        borderUvs = border;
-        borderUvs.x /= sprite.textureRect.width;
-        borderUvs.z /= sprite.textureRect.width;
-        borderUvs.y /= sprite.textureRect.height;
-        borderUvs.w /= sprite.textureRect.height;
+      if (!nineSliced) {
+        float xRatio = _thickness.x / rect.width;
+        float yRatio = _thickness.y / rect.height;
+        xRatio = Mathf.Clamp(xRatio, 0F, 0.5F);
+        yRatio = Mathf.Clamp(yRatio, 0F, 0.5F);
+        uvMargins = new RectMargins(left: xRatio, right: xRatio,
+                                    top: yRatio, bottom: yRatio);
       }
 
       List<Vector3> verts = new List<Vector3>();
       List<Vector2> uvs = new List<Vector2>();
       List<int> tris = new List<int>();
 
-      int vertsX, vertsY;
-      if (_resolutionType == ResolutionType.Vertices) {
-        vertsX = Mathf.RoundToInt(_resolution_vert_x);
-        vertsY = Mathf.RoundToInt(_resolution_vert_y);
-      } else {
-        vertsX = Mathf.RoundToInt(rect.width * _resolution_verts_per_meter.x);
-        vertsY = Mathf.RoundToInt(rect.height * _resolution_verts_per_meter.y);
-      }
-
-      vertsX += _nineSliced ? 4 : 2;
-      vertsY += _nineSliced ? 4 : 2;
-
-      vertsX = Mathf.Min(vertsX, MAX_VERTS);
-      vertsY = Mathf.Min(vertsY, MAX_VERTS);
-
-      vertsX = Mathf.Max(vertsX, 4);
-      vertsY = Mathf.Max(vertsY, 4);
-
-      for (int vy = 0; vy < vertsY; vy++) {
-        for (int vx = 0; vx < vertsX; vx++) {
-          // Outline only
-          if ((vy > 1 && vy < vertsY - 2) && (vx > 1 && vx < vertsX - 2)) continue;
+      for (int vy = 0; vy < resolution.y; vy++) {
+        for (int vx = 0; vx < resolution.x; vx++) {
+          // Outline verts only.
+          if ((vy > 1 && vy < resolution.y - 2) && (vx > 1 && vx < resolution.x - 2)) continue;
 
           Vector2 vert;
-          vert.x = calculateVertAxis(vx, vertsX, rect.width, _thickness.x, _thickness.x);
-          vert.y = calculateVertAxis(vy, vertsY, rect.height, _thickness.y, _thickness.y);
+          vert.x = calculateVertAxis(vx, resolution.x, rect.width, meshMargins.left, meshMargins.right, true);
+          vert.y = calculateVertAxis(vy, resolution.y, rect.height, meshMargins.top, meshMargins.bottom, true);
           verts.Add(vert + new Vector2(rect.x, rect.y));
 
           Vector2 uv;
-          uv.x = calculateVertAxis(vx, vertsX, 1, borderUvs.x, borderUvs.z);
-          uv.y = calculateVertAxis(vy, vertsY, 1, borderUvs.y, borderUvs.w);
+          uv.x = calculateVertAxis(vx, resolution.x, 1, uvMargins.left, uvMargins.right, true);
+          uv.y = calculateVertAxis(vy, resolution.y, 1, uvMargins.top, uvMargins.bottom, true);
           uvs.Add(uv);
         }
       }
 
-      int indicesSkippedPerRow = vertsX - 4;
+      int indicesSkippedPerRow = resolution.x - 4;
       int indicesSkipped = 0;
-      for (int vy = 0; vy < vertsY; vy++) {
-        for (int vx = 0; vx < vertsX; vx++) {
+      for (int vy = 0; vy < resolution.y; vy++) {
+        for (int vx = 0; vx < resolution.x; vx++) {
 
-          if (vx == vertsX - 1 || vy == vertsY - 1) {
+          if (vx == resolution.x - 1 || vy == resolution.y - 1) {
             continue;
           }
-          if ((vx == 1 && (vy > 0 && vy < vertsY - 2)) || (vy == 1 && (vx > 0 && vx < vertsX - 2))) {
+          if ((vx == 1 && (vy > 0 && vy < resolution.y - 2)) || (vy == 1 && (vx > 0 && vx < resolution.x - 2))) {
             continue;
           }
-          if ((vx > 1 && vx < vertsX - 2) && (vy > 1 && vy < vertsY - 2)) {
+          if ((vx > 1 && vx < resolution.x - 2) && (vy > 1 && vy < resolution.y - 2)) {
             indicesSkipped += 1;
             continue;
           }
 
-          int vertIndex = vy * vertsX + vx - indicesSkipped;
+          int vertIndex = vy * resolution.x + vx - indicesSkipped;
 
           int right = 1;
           int down;
-          if (vy == 0 || (vy == 1 && vx < 2) || (vy == vertsY - 3 && vx > vertsX - 3) || (vy == vertsY - 2)) {
-            down = vertsX;
+          if (vy == 0 || (vy == 1 && vx < 2) || (vy == resolution.y - 3 && vx > resolution.x - 3) || (vy == resolution.y - 2)) {
+            down = resolution.x;
           }
           else {
-            down = vertsX - indicesSkippedPerRow;
+            down = resolution.x - indicesSkippedPerRow;
           }
 
           // Add quad
@@ -305,7 +150,7 @@ namespace Leap.Unity.GraphicalRenderer {
       }
 
       mesh = new Mesh();
-      mesh.name = "Panel Mesh";
+      mesh.name = "Panel Outline Mesh";
       mesh.hideFlags = HideFlags.HideAndDontSave;
       mesh.SetVertices(verts);
       mesh.SetTriangles(tris, 0);
@@ -315,37 +160,5 @@ namespace Leap.Unity.GraphicalRenderer {
       remappableChannels = UVChannelFlags.UV0;
     }
 
-    private float calculateVertAxis(int dv, int vertCount, float size, float border0, float border1) {
-      if (dv == 0) {
-        return 0;
-      }
-      else if (dv == (vertCount - 1)) {
-        return size;
-      }
-      else if (dv == 1) {
-        return border0;
-      }
-      else if (dv == (vertCount - 2)) {
-        return size - border1;
-      }
-      else {
-        return ((dv - 1.0f) / (vertCount - 3.0f)) * (size - border0 - border1) + border0;
-      }
-    }
-
-    private void assignDefaultSourceValue() {
-      _sourceDataIndex = featureData.Query().IndexOf(IsValidDataSource);
-    }
-
-    private void setSourceFeatureDirty() {
-      if (sourceData != null) {
-        sourceData.MarkFeatureDirty();
-      }
-    }
-
-    public enum ResolutionType {
-      Vertices,
-      VerticesPerRectilinearMeter
-    }
   }
 }

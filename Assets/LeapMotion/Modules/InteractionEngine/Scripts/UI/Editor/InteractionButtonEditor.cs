@@ -16,9 +16,13 @@ namespace Leap.Unity.Interaction {
   [CustomEditor(typeof(InteractionButton), editorForChildClasses: true)]
   public class InteractionButtonEditor : InteractionBehaviourEditor {
 
-    public override void OnInspectorGUI() {
-      specifyConditionalDrawing(() => false, "graspedMovementType");
+    protected override void OnEnable() {
+      base.OnEnable();
 
+      specifyConditionalDrawing(() => false, "graspedMovementType");
+    }
+
+    public override void OnInspectorGUI() {
       InteractionButton button = target as InteractionButton;
 
       bool nonzeroRotation = button.transform.localRotation != Quaternion.identity;
