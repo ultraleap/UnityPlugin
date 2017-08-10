@@ -179,7 +179,9 @@ namespace Leap.Unity.Interaction {
       trackingProvider.OnTrackingDataUpdate += refreshControllerTrackingData;
     }
 
-    protected virtual void Reset() {
+    protected override void Reset() {
+      base.Reset();
+
       hoverEnabled = true;
       contactEnabled = true;
       graspingEnabled = true;

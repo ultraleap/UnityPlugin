@@ -25,7 +25,7 @@ namespace Leap.Unity.Examples {
 
         anchObj.gameObject.SetActive(anchObj.anchor.gameObject.activeInHierarchy);
 
-        if (!anchObj.isActiveAndEnabled) {
+        if (!anchObj.gameObject.activeInHierarchy) {
           anchObj.transform.position = anchObj.anchor.transform.position;
           if (anchObj.anchorRotation) anchObj.transform.rotation = anchObj.anchor.transform.rotation;
         }
