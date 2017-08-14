@@ -62,9 +62,11 @@ namespace Leap.Unity.GraphicalRenderer {
         }
       }
       set {
-        _tokensDirty = true;
-        _text = value;
-        isRepresentationDirty = true;
+        if (value != _text) {
+          _tokensDirty = true;
+          _text = value;
+          isRepresentationDirty = true;
+        }
       }
     }
 
@@ -73,8 +75,10 @@ namespace Leap.Unity.GraphicalRenderer {
         return _fontStyle;
       }
       set {
-        _fontStyle = value;
-        isRepresentationDirty = true;
+        if (value != _fontStyle) {
+          _fontStyle = value;
+          isRepresentationDirty = true;
+        }
       }
     }
 
@@ -83,8 +87,10 @@ namespace Leap.Unity.GraphicalRenderer {
         return _fontSize;
       }
       set {
-        _fontSize = value;
-        isRepresentationDirty = true;
+        if (value != _fontSize) {
+          _fontSize = value;
+          isRepresentationDirty = true;
+        }
       }
     }
 
@@ -93,8 +99,10 @@ namespace Leap.Unity.GraphicalRenderer {
         return _lineSpacing;
       }
       set {
-        _lineSpacing = value;
-        isRepresentationDirty = true;
+        if (value != _lineSpacing) {
+          _lineSpacing = value;
+          isRepresentationDirty = true;
+        }
       }
     }
 
@@ -103,8 +111,10 @@ namespace Leap.Unity.GraphicalRenderer {
         return _horizontalAlignment;
       }
       set {
-        _horizontalAlignment = value;
-        isRepresentationDirty = true;
+        if (value != _horizontalAlignment) {
+          _horizontalAlignment = value;
+          isRepresentationDirty = true;
+        }
       }
     }
 
@@ -113,8 +123,10 @@ namespace Leap.Unity.GraphicalRenderer {
         return _verticalAlignment;
       }
       set {
-        _verticalAlignment = value;
-        isRepresentationDirty = true;
+        if (value != _verticalAlignment) {
+          _verticalAlignment = value;
+          isRepresentationDirty = true;
+        }
       }
     }
 
@@ -123,8 +135,10 @@ namespace Leap.Unity.GraphicalRenderer {
         return _color;
       }
       set {
-        _color = value;
-        isRepresentationDirty = true;
+        if (value != _color) {
+          _color = value;
+          isRepresentationDirty = true;
+        }
       }
     }
 

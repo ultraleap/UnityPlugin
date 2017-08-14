@@ -490,30 +490,43 @@ namespace Leap.Unity.GraphicalRenderer {
             canDetach = detachEnum.MoveNext();
           }
 
+          int newGraphicStart = _graphics.Count;
+
           //Then we append all the new graphics if there are any left.  This
           //only happens if more graphics were added than were remove this
           //frame.
           while (canAttach) {
             _graphics.Add(attachEnum.Current);
-
-            var anchor = _renderer.space == null ? null : LeapSpaceAnchor.GetAnchor(attachEnum.Current.transform);
-            attachEnum.Current.OnAttachedToGroup(this, anchor);
-
             canAttach = attachEnum.MoveNext();
           }
 
-          //Or remove any graphics that did not have a matching add.  This 
+          //We remove any graphics that did not have a matching add.  This 
           //only happens if more graphics were removed than were added this
           //frame.
           while (canDetach) {
             int toDetachIndex = _graphics.IndexOf(detachEnum.Current);
             dirtyIndexes.Add(toDetachIndex);
 
+            _graphics[_graphics.Count - 1].isRepresentationDirty = true;
             _graphics.RemoveAtUnordered(toDetachIndex);
 
             detachEnum.Current.OnDetachedFromGroup();
 
             canDetach = detachEnum.MoveNext();
+          }
+
+          //TODO: this is gonna need to be optimized
+          //Make sure to call this before OnAttachedToGroup or else the graphic
+          //will not have the correct feature data when it gets attached!
+          RebuildFeatureData();
+          RebuildFeatureSupportInfo();
+
+          //newGraphicStart is either less than _graphics.Count because we added 
+          //new graphics, or it is greater than _graphics.Count because we removed
+          //some graphics.
+          for (int i = newGraphicStart; i < _graphics.Count; i++) {
+            var anchor = _renderer.space == null ? null : LeapSpaceAnchor.GetAnchor(attachEnum.Current.transform);
+            _graphics[i].OnAttachedToGroup(this, anchor);
           }
 
           attachEnum.Dispose();
@@ -529,9 +542,6 @@ namespace Leap.Unity.GraphicalRenderer {
             }
           }
 
-          //TODO: this is gonna need to be optimized
-          RebuildFeatureData();
-          RebuildFeatureSupportInfo();
           if (renderer.space != null) {
             renderer.space.RebuildHierarchy();
             renderer.space.RecalculateTransformers();

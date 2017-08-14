@@ -73,7 +73,7 @@ namespace Leap.Unity.GraphicalRenderer {
       /// This method changes the rendering method used for this group.  You must provide the type
       /// of the rendering method to switch to, as well as if features should be added to match
       /// the existing feature data objects present in the graphics that are attached.
-      /// 
+      ///
       /// This is an editor only method, as rendering types cannot be changed at runtime!
       /// </summary>
       public void ChangeRenderingMethod(Type renderingMethodType, bool addFeatures) {
@@ -132,7 +132,7 @@ namespace Leap.Unity.GraphicalRenderer {
       /// Adds a feature of a specific type to this group.  Even if the feature is not
       /// a supported feature it will still be added, it will just not be supported and
       /// will show up in red in the inspector.
-      /// 
+      ///
       /// This is an editor only api, as features cannot be added/removed at runtime.
       /// </summary>
       public LeapGraphicFeatureBase AddFeature(Type featureType) {
@@ -199,7 +199,7 @@ namespace Leap.Unity.GraphicalRenderer {
         }
 
         for (int i = _group._graphics.Count; i-- != 0;) {
-          if (_group._graphics[i] == null) {
+          if (_group._graphics[i] == null || _group.graphics[i].attachedGroup != _group) {
             _group._graphics.RemoveAt(i);
             continue;
           }

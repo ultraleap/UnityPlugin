@@ -7,13 +7,15 @@
  * between Leap Motion and you, your company or other organization.           *
  ******************************************************************************/
 
+using System;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.Serialization;
 
 namespace Leap.Unity.Interaction {
 
   /// <summary>
-  /// A physics-enabled toggle. Toggling is triggered by physically pushing the toggle to its compressed position. 
+  /// A physics-enabled toggle. Toggling is triggered by physically pushing the toggle to its compressed position.
   /// </summary>
   public class InteractionToggle : InteractionButton {
 
@@ -22,23 +24,26 @@ namespace Leap.Unity.Interaction {
     ///<summary> The height that this toggle rests at when it is toggled. </summary>
     public float toggledRestingHeight = 0.25f;
 
+    [SerializeField, FormerlySerializedAs("_toggled")]
+    private bool _isToggled = false;
+
     [SerializeField]
-    private bool _toggled = false;
+    private bool _startToggled = false;
 
     ///<summary> Whether or not this toggle is currently toggled. </summary>
-    public bool toggled {
+    public bool isToggled {
       get {
-        return _toggled;
+        return _isToggled;
       }
       set {
-        if (_toggled != value) {
-          _toggled = value;
-          if (_toggled) {
-            toggleEvent.Invoke();
+        if (_isToggled != value) {
+          _isToggled = value;
+          if (_isToggled) {
+            OnToggle();
           } else {
-            unToggleEvent.Invoke();
+            OnUntoggle();
           }
-          restingHeight = toggled ? toggledRestingHeight : _originalRestingHeight;
+          restingHeight = isToggled ? toggledRestingHeight : _originalRestingHeight;
           rigidbody.WakeUp();
           depressedThisFrame = value;
           unDepressedThisFrame = !value;
@@ -46,35 +51,53 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    ///<summary> Triggered when this toggle is togggled. </summary>
-    public UnityEvent toggleEvent = new UnityEvent();
-    ///<summary> Triggered when this toggle is untogggled. </summary>
-    public UnityEvent unToggleEvent = new UnityEvent();
+    ///<summary> Triggered when this toggle is toggled. </summary>
+    [FormerlySerializedAs("toggleEvent")]
+    [SerializeField]
+    private UnityEvent _toggleEvent = new UnityEvent();
 
-    ///<summary> The minimum and maximum heights the button can exist at. </summary>
+    /// <summary>
+    /// Called when the toggle is ticked (not when unticked; for that, use OnUntoggle.)
+    /// </summary>
+    public Action OnToggle = () => { };
+
+    ///<summary> Triggered when this toggle is untoggled. </summary>
+    [FormerlySerializedAs("unToggleEvent")]
+    [SerializeField]
+    public UnityEvent _untoggleEvent = new UnityEvent();
+
+    /// <summary>
+    /// Called when the toggle is unticked.
+    /// </summary>
+    public Action OnUntoggle = () => { };
+
     private float _originalRestingHeight;
 
     protected override void Start() {
-      _originalRestingHeight = restingHeight;
-      if (toggled) {
-        restingHeight = toggledRestingHeight;
-        toggleEvent.Invoke();
-      }
       base.Start();
+
+      _originalRestingHeight = restingHeight;
+
+      if (_startToggled) {
+        isToggled = true;
+      }
+
+      OnToggle += _toggleEvent.Invoke;
+      OnUntoggle += _untoggleEvent.Invoke;
     }
 
     protected override void OnEnable() {
-      OnPress.AddListener(OnPressed);
+      OnPress += OnPressed;
       base.OnEnable();
     }
 
     protected override void OnDisable() {
       base.OnDisable();
-      OnPress.RemoveListener(OnPressed);
+      OnPress -= OnPressed;
     }
 
     private void OnPressed() {
-      toggled = !toggled;
+      isToggled = !isToggled;
     }
   }
 }

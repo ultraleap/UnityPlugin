@@ -16,6 +16,12 @@ namespace Leap.Unity.Packaging {
       PackageDefinition.BuildPackage("39b6898d05b13f54082394c350c88ed1");
     }
 
+    // CoreWithAndroid
+    [MenuItem("Build/CoreWithAndroid")]
+    public static void Build_828092ac76618d349a96555173177a8f() {
+      PackageDefinition.BuildPackage("828092ac76618d349a96555173177a8f");
+    }
+
     // Detection Examples
     [MenuItem("Build/Detection Examples")]
     public static void Build_904a61d077ec8a6408978b1184f66599() {

@@ -7,7 +7,7 @@
  * between Leap Motion and you, your company or other organization.           *
  ******************************************************************************/
 
-#if UNITY_EDITOR
+#if LEAP_TESTS
 using System;
 using NUnit.Framework;
 using System.Reflection;
@@ -17,7 +17,7 @@ using Leap.Unity.Query;
 
 namespace Leap.Unity.GraphicalRenderer.Tests {
 
-  public abstract class GraphicRendererTestBase {
+  public abstract class GraphicRendererTestBase : LeapTestBase {
 
     protected LeapGraphicRenderer renderer { get; private set; }
 
@@ -51,33 +51,10 @@ namespace Leap.Unity.GraphicalRenderer.Tests {
     ///  - firstGroup : the first group attached to the renderer
     ///  - secondGroup : the second group attached to the renderer, if any
     /// </summary>
-    protected void InitTest(string objectName) {
-      GameObject obj = null;
+    protected override void InitTest(string objectName) {
+      base.InitTest(objectName);
 
-      for (int i = 0; i < SceneManager.sceneCount; i++) {
-        var scene = SceneManager.GetSceneAt(i);
-
-        obj = scene.GetRootGameObjects().
-                    Query().
-                    FirstOrDefault(g => g.name == objectName);
-
-        if (obj != null) {
-          obj.SetActive(true);
-          break;
-        }
-      }
-
-      if (obj == null) {
-        var prefab = EditorResources.Load<GameObject>(objectName);
-
-        if (prefab == null) {
-          throw new Exception("Could not find an object or prefab with the name " + objectName);
-        }
-
-        obj = UnityEngine.Object.Instantiate(prefab);
-      }
-
-      renderer = obj.GetComponent<LeapGraphicRenderer>();
+      renderer = testObj.GetComponent<LeapGraphicRenderer>();
 
       oneGraphic = renderer.GetComponentInChildren<LeapGraphic>(includeInactive: true);
 

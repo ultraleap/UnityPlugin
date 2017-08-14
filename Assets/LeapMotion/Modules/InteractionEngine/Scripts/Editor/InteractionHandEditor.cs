@@ -16,7 +16,7 @@ using UnityEngine;
 namespace Leap.Unity.Interaction {
 
   [CanEditMultipleObjects]
-  [CustomEditor(typeof(InteractionHand))]
+  [CustomEditor(typeof(InteractionHand), editorForChildClasses: true)]
   public class InteractionHandEditor : InteractionControllerEditor {
 
     private Texture _handTex;

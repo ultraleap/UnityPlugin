@@ -82,15 +82,21 @@ namespace Leap.Unity.GraphicalRenderer {
       }
     }
 
+    /// <summary>
+    /// Returns the blended vertices based on the current mesh 
+    /// this blend shape is attached to.  If you want to ensure
+    /// this blend shape data is up-to-date, make sure to call
+    /// RefreshMeshData on the graphic itself first.
+    /// </summary>
     public bool TryGetBlendShape(List<Vector3> blendVerts) {
       if (!(graphic is LeapMeshGraphicBase)) {
         return false;
       }
 
       var meshGraphic = graphic as LeapMeshGraphicBase;
-      meshGraphic.RefreshMeshData();
 
       var mesh = meshGraphic.mesh;
+
       if (mesh == null) {
         return false;
       }

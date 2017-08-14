@@ -165,10 +165,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: adb71699a7372344cb4e7a163c6c6922, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _selectedGroup: 1
+  _selectedGroup: 0
   _space: {fileID: 0}
   _groups:
-  - _renderingMethod:
+  - _groupName: MyGroupName
+    _renderingMethod:
       _index: 1
       _a: []
       _b:
@@ -246,7 +247,8 @@ MonoBehaviour:
     - {fileID: 114851952197704544}
     _supportInfo: []
     _addRemoveSupported: 1
-  - _renderingMethod:
+  - _groupName: MyGroupName
+    _renderingMethod:
       _index: 1
       _a: []
       _b:

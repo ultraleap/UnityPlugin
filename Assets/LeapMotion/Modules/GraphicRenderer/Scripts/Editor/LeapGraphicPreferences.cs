@@ -64,7 +64,7 @@ namespace Leap.Unity.GraphicalRenderer {
       }
     }
 
-    [PreferenceItem("Leap Graphics")]
+    [LeapPreferences("Graphic Renderer", 20)]
     private static void preferencesGUI() {
       drawGraphicMaxField();
 

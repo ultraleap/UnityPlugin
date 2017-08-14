@@ -33,11 +33,17 @@ namespace Leap.Unity.Packaging {
 
     [Tooltip("All files within each folder will be included in this package when built.")]
     [SerializeField]
-    protected string[] _dependantFolders;
+    protected string[] _dependantFolders = new string[0];
+
+    [SerializeField]
+    protected string[] _ignoredFolders = new string[0];
 
     [Tooltip("All files specified in this list will be included in this package when built.")]
     [SerializeField]
-    protected string[] _dependantFiles;
+    protected string[] _dependantFiles = new string[0];
+
+    [SerializeField]
+    protected string[] _ignoredFiles = new string[0];
 
     [Tooltip("All files specified in each package will be included in this package when built.")]
     [SerializeField]
@@ -127,7 +133,7 @@ namespace Leap.Unity.Packaging {
       var packageDef = AssetDatabase.LoadAssetAtPath<PackageDefinition>(assetPath);
 
       if (packageDef != null) {
-        packageDef.BuildPackage(interactive: false);
+        packageDef.BuildPackage(interactive: true);
       }
     }
 
@@ -184,9 +190,13 @@ namespace Leap.Unity.Packaging {
       // - paths that point to existing files
       // - paths that do not point to package definitions
       // - paths that do not point to meta files (let the exporter take care of that)
+      // - paths that are not ignored
+      // - paths that are not in an ignored folder
       var filteredAssets = assets.Where(path => File.Exists(path)).
                                   Where(path => !packagePaths.Contains(Path.GetFullPath(path))).
                                   Where(path => Path.GetExtension(path) != ".meta").
+                                  Where(path => !_ignoredFiles.Select(Path.GetFullPath).Contains(Path.GetFullPath(path))).
+                                  Where(path => _ignoredFolders.All(folder => !Path.GetFullPath(path).Contains(Path.GetFullPath(folder)))).
                                   ToArray();
 
       ExportPackageOptions options = ExportPackageOptions.Recurse;

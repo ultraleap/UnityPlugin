@@ -54,7 +54,7 @@ namespace Leap.Unity {
         };
       }
     }
-    
+
     [SerializeField]
     private LeapServiceProvider provider;
 
@@ -89,6 +89,12 @@ namespace Leap.Unity {
     [Tooltip("Controls when this script synchronizes the time warp of images.  Use LowLatency for VR, and SyncWithImages for AR.")]
     [SerializeField]
     private SyncMode syncMode = SyncMode.LOW_LATENCY;
+
+    [Header("Advanced")]
+    [Tooltip("Forces an update of the temporal warping to happen in Late Update using the existing head transform.  Should not be enabled if you " +
+             "are using the default Unity VR integration!")]
+    [SerializeField]
+    private bool forceCustomUpdate = false;
 
     // Manual Time Alignment
     [Tooltip("Allow manual adjustment of the rewind time.")]
@@ -165,7 +171,7 @@ namespace Leap.Unity {
         return false;
       }
 
-      TransformData past = transformAtTime((leapTime - warpingAdjustment * 1000) + (syncMode == SyncMode.SYNC_WITH_IMAGES?20000:0));
+      TransformData past = transformAtTime((leapTime - warpingAdjustment * 1000) + (syncMode == SyncMode.SYNC_WITH_IMAGES ? 20000 : 0));
 
       // Rewind position and rotation
       if (_trackingAnchor == null) {
@@ -207,7 +213,7 @@ namespace Leap.Unity {
     /// Use this method when not using Unity default VR integration.  This method should be called directly after
     /// the head transform has been updated using your input tracking solution.
     /// </summary>
-    public void ManualyUpdateTemporalWarping() {
+    public void ManuallyUpdateTemporalWarping() {
       if (_trackingAnchor == null) {
         updateHistory(_headTransform.position, _headTransform.rotation);
         updateTemporalWarping(_headTransform.position, _headTransform.rotation);
@@ -241,11 +247,6 @@ namespace Leap.Unity {
         deviceInfo = provider.GetDeviceInfo();
         _shouldSetLocalPosition = true;
         LeapVRCameraControl.OnValidCameraParams += onValidCameraParams;
-        if (deviceInfo.type == LeapDeviceType.Invalid) {
-          Debug.LogWarning("Invalid Leap Device -> enabled = false");
-          enabled = false;
-          return;
-        }
       } else {
         StartCoroutine(waitForConnection());
         Controller controller = provider.GetLeapController();
@@ -265,22 +266,15 @@ namespace Leap.Unity {
     protected void OnDevice(object sender, DeviceEventArgs args) {
       deviceInfo = provider.GetDeviceInfo();
       _shouldSetLocalPosition = true;
-
-      if (deviceInfo.type == LeapDeviceType.Invalid) {
-        Debug.LogWarning("Invalid Leap Device -> enabled = false");
-        enabled = false;
-        return;
-      }
+      
       //Get a callback right as rendering begins for this frame so we can update the history and warping.
       LeapVRCameraControl.OnValidCameraParams -= onValidCameraParams; //avoid multiple subscription
       LeapVRCameraControl.OnValidCameraParams += onValidCameraParams;
     }
 
     protected void OnEnable() {
-      if (deviceInfo.type != LeapDeviceType.Invalid) {
-        LeapVRCameraControl.OnValidCameraParams -= onValidCameraParams; //avoid multiple subscription
-        LeapVRCameraControl.OnValidCameraParams += onValidCameraParams;
-      }
+      LeapVRCameraControl.OnValidCameraParams -= onValidCameraParams; //avoid multiple subscription
+      LeapVRCameraControl.OnValidCameraParams += onValidCameraParams;
     }
 
     protected void OnDisable() {
@@ -315,7 +309,9 @@ namespace Leap.Unity {
     }
 
     protected void LateUpdate() {
-      if (VRSettings.enabled) {
+      if (forceCustomUpdate) {
+        ManuallyUpdateTemporalWarping();
+      } else if (VRSettings.enabled) {
         updateTemporalWarping(InputTracking.GetLocalPosition(VRNode.CenterEye),
                               InputTracking.GetLocalRotation(VRNode.CenterEye));
       }

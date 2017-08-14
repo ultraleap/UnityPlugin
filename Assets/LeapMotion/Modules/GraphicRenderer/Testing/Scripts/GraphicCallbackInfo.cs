@@ -7,7 +7,6 @@
  * between Leap Motion and you, your company or other organization.           *
  ******************************************************************************/
 
-#if UNITY_EDITOR
 using System;
 using UnityEngine;
 
@@ -79,4 +78,3 @@ namespace Leap.Unity.GraphicalRenderer.Tests {
     }
   }
 }
-#endif

@@ -471,6 +471,8 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4811901624305206}
+  - component: {fileID: 114433831543061492}
+  - component: {fileID: 114589237550455110}
   m_Layer: 0
   m_Name: Workstation Panel
   m_TagString: Untagged
@@ -1760,9 +1762,9 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1724470782025482}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0.7071068, y: 0, z: 0, w: 0.7071068}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.01, y: 0.01, z: 0.01}
   m_Children:
   - {fileID: 4811901624305206}
   m_Father: {fileID: 4854436900119490}
@@ -1871,9 +1873,8 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1294726134686968}
-  m_LocalRotation: {x: -0.0000000038999377, y: -0.99904823, z: -0.00000008932188,
-    w: -0.043620273}
-  m_LocalPosition: {x: -0.142, y: -0.06, z: 0.635}
+  m_LocalRotation: {x: -0.00000008940697, y: 0.00000020663208, z: -0, w: -1}
+  m_LocalPosition: {x: -0.17570005, y: 0.050299995, z: 0.119999945}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4890599414873736}
@@ -4033,10 +4034,10 @@ BoxCollider:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1732126764506280}
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
+  m_Size: {x: 1.4, y: 1.4, z: 1.4}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!65 &65471268348012942
 BoxCollider:
@@ -4086,7 +4087,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _manager: {fileID: 0}
-  _ignoreHoverMode: 0
+  _ignoreHoverMode: 1
+  _isIgnoringAllHoverState: 0
+  _ignorePrimaryHover: 0
   _ignoreContact: 0
   _ignoreGrasping: 0
   _contactForceMode: 0
@@ -4094,6 +4097,12 @@ MonoBehaviour:
   _moveObjectWhenGrasped: 1
   graspedMovementType: 1
   graspHoldWarpingEnabled__curIgnored: 1
+  _overrideInteractionLayer: 0
+  _interactionLayer:
+    layerIndex: 0
+  _overrideNoContactLayer: 0
+  _noContactLayer:
+    layerIndex: 0
   _eventTable:
     _entries: []
 --- !u!114 &114235318587237026
@@ -4107,7 +4116,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1aceea2f5c70da64e893474302ff53e6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _isAttached: 0
+  _isAttached: 1
   _anchor: {fileID: 0}
   _anchorGroup: {fileID: 0}
   maxAnchorRange: 0.3
@@ -4151,6 +4160,27 @@ MonoBehaviour:
   suspendedColor: {r: 1, g: 0, b: 0, a: 1}
   hoverColor: {r: 0.9073022, g: 0.5790441, b: 0.9264706, a: 1}
   primaryHoverColor: {r: 0.9058824, g: 0.5803922, b: 0.92549026, a: 1}
+  pressedColor: {r: 1, g: 1, b: 1, a: 1}
+--- !u!114 &114433831543061492
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1405972787930296}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e933f13d48c681d48b14750922ac906d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _comment: 'We use the Ignore Collisions In Children script to prevent UI elements
+    from colliding each other, which is commonly desired when building an interface.
+
+
+    In your application, we recommend using layers instead of this script, especially
+    if your UI consists of more than just a few objects. Layers will achieve the same
+    results with a significant performance boost over the Physics.IgnoreCollision()
+    method utilized by this script.'
+  _isEditing: 0
 --- !u!114 &114444887319324106
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -4168,6 +4198,7 @@ MonoBehaviour:
   suspendedColor: {r: 1, g: 0, b: 0, a: 1}
   hoverColor: {r: 0.9073022, g: 0.5790441, b: 0.9264706, a: 1}
   primaryHoverColor: {r: 0.9058824, g: 0.5803922, b: 0.92549026, a: 1}
+  pressedColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!114 &114455807356359938
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -4181,6 +4212,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _manager: {fileID: 0}
   _ignoreHoverMode: 0
+  _isIgnoringAllHoverState: 0
+  _ignorePrimaryHover: 0
   _ignoreContact: 0
   _ignoreGrasping: 1
   _contactForceMode: 1
@@ -4188,6 +4221,12 @@ MonoBehaviour:
   _moveObjectWhenGrasped: 1
   graspedMovementType: 2
   graspHoldWarpingEnabled__curIgnored: 1
+  _overrideInteractionLayer: 0
+  _interactionLayer:
+    layerIndex: 0
+  _overrideNoContactLayer: 0
+  _noContactLayer:
+    layerIndex: 0
   _eventTable:
     _entries: []
   minMaxHeight: {x: 0, y: 0.02}
@@ -4215,6 +4254,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   workstationModeTween: {fileID: 114646831576360292}
+--- !u!114 &114589237550455110
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1405972787930296}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 63f706a66d7747347b05af75d89b00e3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &114617174908622162
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -4228,6 +4278,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _manager: {fileID: 0}
   _ignoreHoverMode: 0
+  _isIgnoringAllHoverState: 0
+  _ignorePrimaryHover: 0
   _ignoreContact: 0
   _ignoreGrasping: 1
   _contactForceMode: 1
@@ -4235,6 +4287,12 @@ MonoBehaviour:
   _moveObjectWhenGrasped: 1
   graspedMovementType: 2
   graspHoldWarpingEnabled__curIgnored: 1
+  _overrideInteractionLayer: 0
+  _interactionLayer:
+    layerIndex: 0
+  _overrideNoContactLayer: 0
+  _noContactLayer:
+    layerIndex: 0
   _eventTable:
     _entries: []
   minMaxHeight: {x: 0, y: 0.02}
@@ -4264,58 +4322,48 @@ MonoBehaviour:
   targetTransform: {fileID: 4759032735542720}
   startTransform: {fileID: 4930831435519816}
   endTransform: {fileID: 4543241950730136}
+  startAtEnd: 0
   tweenLocalPosition: 1
   tweenLocalRotation: 1
   tweenLocalScale: 1
   tweenDuration: 0.2
   tweenSmoothType: 2
-  OnProgress:
-    m_PersistentCalls:
-      m_Calls: []
-    m_TypeName: Leap.Unity.Animation.TransformTweenBehaviour+FloatEvent, Assembly-CSharp,
-      Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-  OnLeaveStart:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1724470782025482}
-        m_MethodName: SetActive
-        m_Mode: 6
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 1
-        m_CallState: 2
-    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
-      PublicKeyToken=null
-  OnReachEnd:
-    m_PersistentCalls:
-      m_Calls: []
-    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
-      PublicKeyToken=null
-  OnLeaveEnd:
-    m_PersistentCalls:
-      m_Calls: []
-    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
-      PublicKeyToken=null
-  OnReachStart:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1724470782025482}
-        m_MethodName: SetActive
-        m_Mode: 6
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
-      PublicKeyToken=null
+  _eventTable:
+    _entries:
+    - enumValue: 110
+      callback:
+        m_PersistentCalls:
+          m_Calls:
+          - m_Target: {fileID: 1724470782025482}
+            m_MethodName: SetActive
+            m_Mode: 6
+            m_Arguments:
+              m_ObjectArgument: {fileID: 0}
+              m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+              m_IntArgument: 0
+              m_FloatArgument: 0
+              m_StringArgument: 
+              m_BoolArgument: 1
+            m_CallState: 2
+        m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+          PublicKeyToken=null
+    - enumValue: 140
+      callback:
+        m_PersistentCalls:
+          m_Calls:
+          - m_Target: {fileID: 1724470782025482}
+            m_MethodName: SetActive
+            m_Mode: 6
+            m_Arguments:
+              m_ObjectArgument: {fileID: 0}
+              m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+              m_IntArgument: 0
+              m_FloatArgument: 0
+              m_StringArgument: 
+              m_BoolArgument: 0
+            m_CallState: 2
+        m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+          PublicKeyToken=null
 --- !u!114 &114706762822881516
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -4333,6 +4381,7 @@ MonoBehaviour:
   suspendedColor: {r: 1, g: 0, b: 0, a: 1}
   hoverColor: {r: 0.9073022, g: 0.5790441, b: 0.9264706, a: 1}
   primaryHoverColor: {r: 0.9058824, g: 0.5803922, b: 0.92549026, a: 1}
+  pressedColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!114 &114826643023674994
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -4350,6 +4399,7 @@ MonoBehaviour:
   suspendedColor: {r: 1, g: 0, b: 0, a: 1}
   hoverColor: {r: 0.9073022, g: 0.5790441, b: 0.9264706, a: 1}
   primaryHoverColor: {r: 0.9058824, g: 0.5803922, b: 0.92549026, a: 1}
+  pressedColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!114 &114870554283010206
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -4363,6 +4413,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _manager: {fileID: 0}
   _ignoreHoverMode: 0
+  _isIgnoringAllHoverState: 0
+  _ignorePrimaryHover: 0
   _ignoreContact: 0
   _ignoreGrasping: 1
   _contactForceMode: 1
@@ -4370,6 +4422,12 @@ MonoBehaviour:
   _moveObjectWhenGrasped: 1
   graspedMovementType: 2
   graspHoldWarpingEnabled__curIgnored: 1
+  _overrideInteractionLayer: 0
+  _interactionLayer:
+    layerIndex: 0
+  _overrideNoContactLayer: 0
+  _noContactLayer:
+    layerIndex: 0
   _eventTable:
     _entries: []
   minMaxHeight: {x: 0, y: 0.02}
@@ -4398,6 +4456,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _manager: {fileID: 0}
   _ignoreHoverMode: 0
+  _isIgnoringAllHoverState: 0
+  _ignorePrimaryHover: 0
   _ignoreContact: 0
   _ignoreGrasping: 1
   _contactForceMode: 1
@@ -4405,6 +4465,12 @@ MonoBehaviour:
   _moveObjectWhenGrasped: 1
   graspedMovementType: 2
   graspHoldWarpingEnabled__curIgnored: 1
+  _overrideInteractionLayer: 0
+  _interactionLayer:
+    layerIndex: 0
+  _overrideNoContactLayer: 0
+  _noContactLayer:
+    layerIndex: 0
   _eventTable:
     _entries: []
   minMaxHeight: {x: 0, y: 0.02}

@@ -7,6 +7,7 @@
  * between Leap Motion and you, your company or other organization.           *
  ******************************************************************************/
 
+using Leap.Unity.Attributes;
 using Leap.Unity.Query;
 using System;
 using System.Collections;
@@ -101,7 +102,7 @@ namespace Leap.Unity.Attachments {
     /// Used by AttachmentHands as a hint to help prevent mixing up hand chiralities
     /// when refreshing its AttachmentHand references.
     /// </summary>
-    [SerializeField, HideInInspector]
+    [SerializeField, Disable]
     private Chirality _chirality;
 
     /// <summary>
@@ -109,6 +110,19 @@ namespace Leap.Unity.Attachments {
     /// AttachmentHands parent object of this AttachmentHand.
     /// </summary>
     public Chirality chirality { get { return _chirality; } set { _chirality = value; } }
+
+    /// <summary>
+    /// Used by AttachmentHands as a hint to help prevent mixing up hand chiralities
+    /// when refreshing its AttachmentHand references.
+    /// </summary>
+    [SerializeField, Disable]
+    private bool _isTracked;
+
+    /// <summary>
+    /// Gets the chirality of this AttachmentHand. This is set automatically by the
+    /// AttachmentHands parent object of this AttachmentHand.
+    /// </summary>
+    public bool isTracked { get { return _isTracked; } set { _isTracked = value; } }
 
     void OnValidate() {
       initializeAttachmentPointFlagConstants();
