@@ -12,7 +12,6 @@ using UnityEngine.Assertions;
 using System;
 using System.IO;
 using System.Collections.Generic;
-using Leap.Unity.Query;
 
 namespace Leap.Unity {
 
@@ -33,7 +32,7 @@ namespace Leap.Unity {
     /// <summary>
     /// Utility extension to swap the elements at index a and index b.
     /// </summary>
-    public static void Swap<T>(this List<T> list, int a, int b) {
+    public static void Swap<T>(this IList<T> list, int a, int b) {
       T temp = list[a];
       list[a] = list[b];
       list[b] = temp;
@@ -56,6 +55,15 @@ namespace Leap.Unity {
       int j = array.Length;
       while (i < mid) {
         array.Swap(i++, --j);
+      }
+    }
+
+    /// <summary>
+    /// Shuffle the given list into a different permutation.
+    /// </summary>
+    public static void Shuffle<T>(this IList<T> list) {
+      for (int i = 0; i < list.Count; i++) {
+        Utils.Swap(list, i, UnityEngine.Random.Range(0, list.Count));
       }
     }
 
@@ -144,6 +152,45 @@ namespace Leap.Unity {
         } else {
           return obj.parent.IsActiveRelativeToParent(parent);
         }
+      }
+    }
+
+    /// <summary>
+    /// Given a list of comparable types, return an ordering that orders the
+    /// elements into sorted order.  The ordering is a list of indices where each
+    /// index refers to the element located at that index in the original list.
+    /// </summary>
+    public static List<int> GetSortedOrder<T>(this IList<T> list) where T : IComparable<T> {
+      Assert.IsNotNull(list);
+
+      List<int> ordering = new List<int>();
+      for (int i = 0; i < list.Count; i++) {
+        ordering.Add(i);
+      }
+
+      ordering.Sort((a, b) => list[a].CompareTo(list[b]));
+
+      return ordering;
+    }
+
+    /// <summary>
+    /// Given a list and an ordering, order the list according to the ordering.
+    /// This method assumes the ordering is a valid ordering.
+    /// </summary>
+    public static void ApplyOrdering<T>(this IList<T> list, List<int> ordering) {
+      Assert.IsNotNull(list);
+      Assert.IsNotNull(ordering);
+      Assert.AreEqual(list.Count, ordering.Count, "List must be the same length as the ordering.");
+
+      List<T> copy = Pool<List<T>>.Spawn();
+      try {
+        copy.AddRange(list);
+        for (int i = 0; i < list.Count; i++) {
+          list[i] = copy[ordering[i]];
+        }
+      } finally {
+        copy.Clear();
+        Pool<List<T>>.Recycle(copy);
       }
     }
 
@@ -439,10 +486,10 @@ namespace Leap.Unity {
     /// <summary>
     /// Similar to Unity's Transform.LookAt(), but resolves the forward vector of this
     /// Transform to point away from the argument Transform.
-    ///
+    /// 
     /// Useful for billboarding Quads and UI elements whose forward vectors should match
     /// rather than oppose the Main Camera's forward vector.
-    ///
+    /// 
     /// Optionally, you may also pass an upwards vector, which will be provided to the underlying
     /// Quaternion.LookRotation. Vector3.up will be used by default.
     /// </summary>
@@ -453,7 +500,7 @@ namespace Leap.Unity {
     /// <summary>
     /// Similar to Unity's Transform.LookAt(), but resolves the forward vector of this
     /// Transform to point away from the argument Transform.
-    ///
+    /// 
     /// Allows specifying an upwards parameter; this is passed as the upwards vector to the Quaternion.LookRotation.
     /// </summary>
     /// <param name="thisTransform"></param>
@@ -618,7 +665,7 @@ namespace Leap.Unity {
       DrawArc(360, center, planeA, normal, radius, color, quality);
     }
 
-    /* Adapted from: Zarrax (http://math.stackexchange.com/users/3035/zarrax), Parametric Equation of a Circle in 3D Space?,
+    /* Adapted from: Zarrax (http://math.stackexchange.com/users/3035/zarrax), Parametric Equation of a Circle in 3D Space?, 
      * URL (version: 2014-09-09): http://math.stackexchange.com/q/73242 */
     public static void DrawArc(float arc,
                            Vector3 center,

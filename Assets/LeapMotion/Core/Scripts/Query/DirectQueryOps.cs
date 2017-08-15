@@ -113,6 +113,38 @@ namespace Leap.Unity.Query {
     }
 
     /// <summary>
+    /// Counts the number of distinct elements in the sequence.
+    /// </summary>
+    public int CountUnique() {
+      int unique = 0;
+      var set = Pool<HashSet<QueryType>>.Spawn();
+      try {
+        var op = _op;
+
+        QueryType t;
+        while (op.TryGetNext(out t)) {
+          if (!set.Contains(t)) {
+            unique++;
+            set.Add(t);
+          }
+        }
+      } finally {
+        set.Clear();
+        Pool<HashSet<QueryType>>.Recycle(set);
+      }
+
+      return unique;
+    }
+
+    /// <summary>
+    /// Returns the number of distinct elements in the sequence once it has been mapped
+    /// using a selector function.
+    /// </summary>
+    public int CountUnique<T>(Func<QueryType, T> mapping) {
+      return Select(t => mapping(t)).CountUnique();
+    }
+
+    /// <summary>
     /// Returns the element at a specific index in the sequence.  Will throw an error
     /// if the sequence has no element at that index.
     /// </summary>

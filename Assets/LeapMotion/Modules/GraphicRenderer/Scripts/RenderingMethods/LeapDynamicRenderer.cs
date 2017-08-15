@@ -69,64 +69,68 @@ namespace Leap.Unity.GraphicalRenderer {
     }
 
     public override void OnUpdateRenderer() {
-      base.OnUpdateRenderer();
+      using (new ProfilerSample("Update Dynamic Renderer")) {
+        base.OnUpdateRenderer();
 
-      for (int i = 0; i < group.graphics.Count; i++) {
-        var graphic = group.graphics[i];
-        if (graphic.isRepresentationDirty || _meshes[i] == null) {
-          beginMesh(_meshes[i]);
-          _generation.graphic = graphic as LeapMeshGraphicBase;
-          _generation.graphicIndex = i;
-          _generation.graphicId = i;
-          base.buildGraphic();
-          finishMesh();
-          _meshes[i] = _generation.mesh;
-          _generation.mesh = null;
-
-          graphic.isRepresentationDirty = false;
-        }
-      }
-
-      if (renderer.space == null) {
-        using (new ProfilerSample("Draw Meshes")) {
-          Assert.AreEqual(group.graphics.Count, _meshes.Count);
+        using (new ProfilerSample("Check For Dirty Graphics")) {
           for (int i = 0; i < group.graphics.Count; i++) {
-            drawMesh(_meshes[i], group.graphics[i].transform.localToWorldMatrix);
-          }
-        }
-      } else if (renderer.space is LeapRadialSpace) {
-        var curvedSpace = renderer.space as LeapRadialSpace;
-        using (new ProfilerSample("Build Material Data")) {
-          _curved_worldToAnchor.Clear();
-          _curved_meshTransforms.Clear();
-          _curved_graphicParameters.Clear();
-          for (int i = 0; i < _meshes.Count; i++) {
             var graphic = group.graphics[i];
-            var transformer = graphic.anchor.transformer;
+            if (graphic.isRepresentationDirty || _meshes[i] == null) {
+              beginMesh(_meshes[i]);
+              _generation.graphic = graphic as LeapMeshGraphicBase;
+              _generation.graphicIndex = i;
+              _generation.graphicId = i;
+              base.buildGraphic();
+              finishMesh();
+              _meshes[i] = _generation.mesh;
+              _generation.mesh = null;
 
-            Vector3 localPos = renderer.transform.InverseTransformPoint(graphic.transform.position);
-
-            Matrix4x4 mainTransform = renderer.transform.localToWorldMatrix * transformer.GetTransformationMatrix(localPos);
-            Matrix4x4 deform = renderer.transform.worldToLocalMatrix * Matrix4x4.TRS(renderer.transform.position - graphic.transform.position, Quaternion.identity, Vector3.one) * graphic.transform.localToWorldMatrix;
-            Matrix4x4 total = mainTransform * deform;
-
-            _curved_graphicParameters.Add((transformer as IRadialTransformer).GetVectorRepresentation(graphic.transform));
-            _curved_meshTransforms.Add(total);
-
-            _curved_worldToAnchor.Add(mainTransform.inverse);
+              graphic.isRepresentationDirty = false;
+            }
           }
         }
 
-        using (new ProfilerSample("Upload Material Data")) {
-          _material.SetFloat(SpaceProperties.RADIAL_SPACE_RADIUS, curvedSpace.radius);
-          _material.SetMatrixArraySafe("_GraphicRendererCurved_WorldToAnchor", _curved_worldToAnchor);
-          _material.SetMatrix("_GraphicRenderer_LocalToWorld", renderer.transform.localToWorldMatrix);
-          _material.SetVectorArraySafe("_GraphicRendererCurved_GraphicParameters", _curved_graphicParameters);
-        }
+        if (renderer.space == null) {
+          using (new ProfilerSample("Draw Meshes")) {
+            Assert.AreEqual(group.graphics.Count, _meshes.Count);
+            for (int i = 0; i < group.graphics.Count; i++) {
+              drawMesh(_meshes[i], group.graphics[i].transform.localToWorldMatrix);
+            }
+          }
+        } else if (renderer.space is LeapRadialSpace) {
+          var curvedSpace = renderer.space as LeapRadialSpace;
+          using (new ProfilerSample("Build Material Data")) {
+            _curved_worldToAnchor.Clear();
+            _curved_meshTransforms.Clear();
+            _curved_graphicParameters.Clear();
+            for (int i = 0; i < _meshes.Count; i++) {
+              var graphic = group.graphics[i];
+              var transformer = graphic.anchor.transformer;
 
-        using (new ProfilerSample("Draw Meshes")) {
-          for (int i = 0; i < _meshes.Count; i++) {
-            drawMesh(_meshes[i], _curved_meshTransforms[i]);
+              Vector3 localPos = renderer.transform.InverseTransformPoint(graphic.transform.position);
+
+              Matrix4x4 mainTransform = renderer.transform.localToWorldMatrix * transformer.GetTransformationMatrix(localPos);
+              Matrix4x4 deform = renderer.transform.worldToLocalMatrix * Matrix4x4.TRS(renderer.transform.position - graphic.transform.position, Quaternion.identity, Vector3.one) * graphic.transform.localToWorldMatrix;
+              Matrix4x4 total = mainTransform * deform;
+
+              _curved_graphicParameters.Add((transformer as IRadialTransformer).GetVectorRepresentation(graphic.transform));
+              _curved_meshTransforms.Add(total);
+
+              _curved_worldToAnchor.Add(mainTransform.inverse);
+            }
+          }
+
+          using (new ProfilerSample("Upload Material Data")) {
+            _material.SetFloat(SpaceProperties.RADIAL_SPACE_RADIUS, curvedSpace.radius);
+            _material.SetMatrixArraySafe("_GraphicRendererCurved_WorldToAnchor", _curved_worldToAnchor);
+            _material.SetMatrix("_GraphicRenderer_LocalToWorld", renderer.transform.localToWorldMatrix);
+            _material.SetVectorArraySafe("_GraphicRendererCurved_GraphicParameters", _curved_graphicParameters);
+          }
+
+          using (new ProfilerSample("Draw Meshes")) {
+            for (int i = 0; i < _meshes.Count; i++) {
+              drawMesh(_meshes[i], _curved_meshTransforms[i]);
+            }
           }
         }
       }
