@@ -515,7 +515,7 @@ namespace Leap.Unity.RuntimeGizmos {
     public void DrawSphere(Vector3 center, float radius) {
       //Throw an error here so we can give a more specific error than the more
       //general one which will be thrown later for a null mesh.
-      if (sphereMesh) {
+      if (sphereMesh == null) {
         throw new InvalidOperationException("Cannot draw a sphere because the Runtime Gizmo Manager does not have a sphere mesh assigned!");
       }
 
