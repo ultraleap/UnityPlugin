@@ -13,7 +13,7 @@ using Leap.Unity.Query;
 
 namespace Leap.Unity {
 
-  [CustomPropertyDrawer(typeof(AssetFolder))]
+  [CustomPropertyDrawer(typeof(AssetFolder), useForChildren: true)]
   public class AssetFolderPropertyDrawer : PropertyDrawer {
 
     public override void OnGUI(Rect position, SerializedProperty property, GUIContent label) {
@@ -44,10 +44,11 @@ namespace Leap.Unity {
           string relativePath = Utils.MakeRelativePath(Application.dataPath, resultPath);
           var asset = AssetDatabase.LoadAssetAtPath<DefaultAsset>(relativePath);
 
-          if (asset != null) {
-            folderProp.objectReferenceValue = asset;
+          string errorMessage;
+          if(!ValidatePath(resultPath, relativePath, out errorMessage)) {
+            EditorUtility.DisplayDialog("Could not select folder.", errorMessage, "OK");
           } else {
-            EditorUtility.DisplayDialog("Could not select folder.", "The specified folder is not an asset folder. Asset folders must be inside project's Assets directory.", "OK");
+            folderProp.objectReferenceValue = asset;
           }
         }
       }
@@ -72,6 +73,17 @@ namespace Leap.Unity {
 
     public override float GetPropertyHeight(SerializedProperty property, GUIContent label) {
       return EditorGUIUtility.singleLineHeight;
+    }
+
+    protected virtual bool ValidatePath(string fullPath, string relativePath, out string errorMessage) {
+      var asset = AssetDatabase.LoadAssetAtPath<DefaultAsset>(relativePath);
+      if(asset != null) {
+        errorMessage = null;
+        return true;
+      } else {
+        errorMessage = "The specified folder is not an asset folder. Asset folders must be inside project's Assets directory.";
+        return false;
+      }
     }
   }
 }
