@@ -7,6 +7,8 @@
  * between Leap Motion and you, your company or other organization.           *
  ******************************************************************************/
 
+using System;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace Leap.Unity.Query {
@@ -55,7 +57,7 @@ namespace Leap.Unity.Query {
       return new Enumerator(_op);
     }
 
-    public struct Enumerator {
+    public struct Enumerator : IEnumerator<QueryType> {
       private QueryOp _op;
       private QueryType _current;
 
@@ -68,9 +70,24 @@ namespace Leap.Unity.Query {
         return _op.TryGetNext(out _current);
       }
 
+      public void Reset() {
+        _op.Reset();
+        _current = default(QueryType);
+      }
+
+      public void Dispose() {
+        _op.Reset();
+      }
+
       public QueryType Current {
         get {
           return _current;
+        }
+      }
+
+      object IEnumerator.Current {
+        get {
+          throw new NotImplementedException();
         }
       }
     }
@@ -213,8 +230,7 @@ namespace Leap.Unity.Query {
         if (_index >= _list.Count) {
           t = default(T);
           return false;
-        }
-        else {
+        } else {
           t = _list[_index++];
           return true;
         }
