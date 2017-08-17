@@ -7,6 +7,8 @@
  * between Leap Motion and you, your company or other organization.           *
  ******************************************************************************/
 
+using System.IO;
+using System.Linq;
 using UnityEngine;
 using UnityEditor;
 using Leap.Unity.Query;
@@ -39,14 +41,14 @@ namespace Leap.Unity {
       var content = EditorGUIUtility.IconContent("Folder Icon");
 
       if (GUI.Button(right, content, GUIStyle.none)) {
-        string resultPath = EditorUtility.OpenFolderPanel("Select Folder", folderPath, "");
+        string resultPath = PrompUserForPath(folderPath);
         if (!string.IsNullOrEmpty(resultPath)) {
           string relativePath = Utils.MakeRelativePath(Application.dataPath, resultPath);
           var asset = AssetDatabase.LoadAssetAtPath<DefaultAsset>(relativePath);
 
           string errorMessage;
-          if(!ValidatePath(resultPath, relativePath, out errorMessage)) {
-            EditorUtility.DisplayDialog("Could not select folder.", errorMessage, "OK");
+          if (!ValidatePath(resultPath, relativePath, out errorMessage)) {
+            EditorUtility.DisplayDialog("Invalid selection.", errorMessage, "OK");
           } else {
             folderProp.objectReferenceValue = asset;
           }
@@ -56,15 +58,22 @@ namespace Leap.Unity {
       EditorGUI.showMixedValue = false;
 
       if (position.Contains(Event.current.mousePosition)) {
-        var draggedFolder = DragAndDrop.objectReferences.Query().OfType<DefaultAsset>().FirstOrDefault();
-        if (draggedFolder != null) {
+        var draggedObject = DragAndDrop.objectReferences.FirstOrDefault();
+        string errorMessage;
+        if (draggedObject != null) {
           switch (Event.current.type) {
             case EventType.DragUpdated:
-              DragAndDrop.visualMode = DragAndDropVisualMode.Link;
+              if (ValidateObject(draggedObject, out errorMessage)) {
+                DragAndDrop.visualMode = DragAndDropVisualMode.Link;
+              } else {
+                DragAndDrop.visualMode = DragAndDropVisualMode.Rejected;
+              }
               break;
             case EventType.DragPerform:
-              DragAndDrop.AcceptDrag();
-              folderProp.objectReferenceValue = draggedFolder;
+              if (ValidateObject(draggedObject, out errorMessage)) {
+                DragAndDrop.AcceptDrag();
+                folderProp.objectReferenceValue = draggedObject;
+              }
               break;
           }
         }
@@ -75,9 +84,24 @@ namespace Leap.Unity {
       return EditorGUIUtility.singleLineHeight;
     }
 
+    protected virtual string PrompUserForPath(string currentPath) {
+      return EditorUtility.OpenFolderPanel("Select Folder", currentPath, "");
+    }
+
+    protected virtual bool ValidateObject(Object asset, out string errorMessage) {
+      string relativePath = AssetDatabase.GetAssetPath(asset);
+      string fullPath = Path.GetFullPath(relativePath);
+      return ValidatePath(fullPath, relativePath, out errorMessage);
+    }
+
     protected virtual bool ValidatePath(string fullPath, string relativePath, out string errorMessage) {
+      if (!Directory.Exists(fullPath)) {
+        errorMessage = "The specified folder does not exist!";
+        return false;
+      }
+
       var asset = AssetDatabase.LoadAssetAtPath<DefaultAsset>(relativePath);
-      if(asset != null) {
+      if (asset != null) {
         errorMessage = null;
         return true;
       } else {
