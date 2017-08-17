@@ -32,7 +32,8 @@ namespace Leap.Unity {
     /// <summary>
     /// Gets or sets the folder path.  This path will always be a path
     /// relative to the asset folder, and matches the format expected and
-    /// returned by AssetDatabase.
+    /// returned by AssetDatabase.  This operation cannot be performed
+    /// from inside of a build due to Assets no longer existing.
     /// </summary>
     public virtual string Path {
       get {

@@ -13,12 +13,18 @@ namespace Leap.Unity {
     [SerializeField]
     private string _relativePath;
 
+    /// <summary>
+    /// Gets the full path to the streaming folder.  This operation is safe to be
+    /// called from within a build or from within the editor, and will always return
+    /// the correct full path to the streaming folder.  Setting the path via code
+    /// is not supported.
+    /// </summary>
     public override string Path {
       get {
         return System.IO.Path.Combine(Application.streamingAssetsPath, _relativePath);
       }
       set {
-        throw new NotImplementedException();
+        throw new InvalidOperationException();
       }
     }
 
