@@ -215,6 +215,16 @@ namespace Leap.Unity {
 
     #endregion
 
+    #region String Utils
+    public static string TrimEnd(this string str, int characters) {
+      return str.Substring(0, Mathf.Max(0, str.Length - characters));
+    }
+
+    public static string TrimStart(this string str, int characters) {
+      return str.Substring(characters);
+    }
+    #endregion
+
     #region Math Utils
 
     public static int Repeat(int x, int m) {
@@ -265,6 +275,18 @@ namespace Leap.Unity {
       return float.IsNaN(v.x)
           || float.IsNaN(v.y)
           || float.IsNaN(v.z);
+    }
+
+    public static bool IsBetween(this float f, float f0, float f1) {
+      if (f0 > f1) Utils.Swap(ref f0, ref f1);
+
+      return f0 <= f && f <= f1;
+    }
+
+    public static bool IsBetween(this double d, double d0, double d1) {
+      if (d0 > d1) Utils.Swap(ref d0, ref d1);
+
+      return d0 <= d && d <= d1;
     }
 
     #endregion
@@ -707,6 +729,18 @@ namespace Leap.Unity {
       }
 
       return Array.IndexOf(_incompressibleFormats, format) < 0;
+    }
+
+    #endregion
+
+    #region Rect Utils
+    
+    /// <summary>
+    /// Returns a new Rect with the argument padding as a margin relative to each
+    /// border of the provided Rect.
+    /// </summary>
+    public static Rect PadInner(this Rect r, float padding) {
+      return new Rect(r.x + padding, r.y + padding, r.width - (padding * 2), r.height - (padding * 2));
     }
 
     #endregion

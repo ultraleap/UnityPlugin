@@ -184,6 +184,29 @@ namespace Leap.Unity.Query {
     }
 
     /// <summary>
+    /// Returns Some value that represents the first value in the sequence, or None
+    /// if there is no such value.
+    /// </summary>
+    public Maybe<QueryType> FirstOrNone() {
+      var op = _op;
+
+      QueryType obj;
+      if (op.TryGetNext(out obj)) {
+        return Maybe.Some(obj);
+      } else {
+        return Maybe.None;
+      }
+    }
+
+    /// <summary>
+    /// Returns the Some value representing the first value that satisfies the predicate,
+    /// or None if there is no such value.
+    /// </summary>
+    public Maybe<QueryType> FirstOrNone(Func<QueryType, bool> predicate) {
+      return Where(predicate).FirstOrNone();
+    }
+
+    /// <summary>
     /// Returns the first element in the sequence.  Will return the default value
     /// if the sequence is empty.
     /// </summary>
@@ -406,6 +429,30 @@ namespace Leap.Unity.Query {
       while (op.TryGetNext(out obj)) {
         hashSet.Add(obj);
       }
+    }
+
+    public Dictionary<K, V> ToDictionary<K, V>(Func<QueryType, K> keySelector, Func<QueryType, V> valueSelector) {
+      var dictionary = new Dictionary<K, V>();
+
+      var op = _op;
+      QueryType obj;
+      while (op.TryGetNext(out obj)) {
+        dictionary[keySelector(obj)] = valueSelector(obj);
+      }
+
+      return dictionary;
+    }
+
+    public Dictionary<QueryType, V> ToDictionary<V>(Func<QueryType, V> valueSelector) {
+      var dictionary = new Dictionary<QueryType, V>();
+
+      var op = _op;
+      QueryType obj;
+      while (op.TryGetNext(out obj)) {
+        dictionary[obj] = valueSelector(obj);
+      }
+
+      return dictionary;
     }
   }
 }
