@@ -511,7 +511,7 @@ PlayerSettings:
   webGLCompressionFormat: 1
   scriptingDefineSymbols:
     1: 
-    7: 
+    7: LEAP_TESTS
   platformArchitecture: {}
   scriptingBackend: {}
   incrementalIl2cppBuild: {}

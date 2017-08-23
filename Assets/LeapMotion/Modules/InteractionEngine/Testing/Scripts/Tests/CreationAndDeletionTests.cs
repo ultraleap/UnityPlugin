@@ -136,7 +136,20 @@ namespace Leap.Unity.Interaction.Tests {
 
     #endregion Contact
 
-  }
+    #region Grasping Tests
+
+    [UnityTest]
+    public IEnumerator CanDeleteObjectDuringGrasp() {
+      yield return wait(beginningTestWait);
+
+
+
+      yield return wait(endingTestWait);
+    }
+
+    #endregion
+
+    }
 
 }
 #endif
