@@ -394,6 +394,12 @@ namespace Leap.Unity.Query {
       }
     }
 
+    public HashSet<QueryType> ToHashSet() {
+      HashSet<QueryType> set = new HashSet<QueryType>();
+      AppendHashSet(set);
+      return set;
+    }
+
     public void FillHashSet(HashSet<QueryType> hashSet) {
       hashSet.Clear();
       AppendHashSet(hashSet);
