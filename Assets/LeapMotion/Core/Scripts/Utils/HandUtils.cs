@@ -11,9 +11,13 @@ using Leap.Unity.Query;
 using UnityEngine.Events;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using System.Collections.Generic;
 
 namespace Leap.Unity {
 
+  /// <summary>
+  /// Static convenience methods and extension methods for getting useful Hand data.
+  /// </summary>
   public static class Hands {
 
     private static LeapProvider s_provider;
@@ -323,6 +327,138 @@ namespace Leap.Unity {
     public static void SetTransform(this Hand hand, Vector3 position, Quaternion rotation) {
       hand.Transform(Vector3.zero, (rotation * Quaternion.Inverse(hand.Rotation.ToQuaternion())));
       hand.Transform(position - hand.PalmPosition.ToVector3(), Quaternion.identity);
+    }
+
+  }
+
+  /// <summary>
+  /// Utility methods for constructing and manipulating Leap hand object data.
+  /// </summary>
+  public static class HandUtils {
+
+    /// <summary>
+    /// Fills the Hand object with the provided hand data. You can pass null for the
+    /// fingers input; this will leave the hand's finger data unmodified.
+    /// </summary>
+    public static void Fill(this Hand toFill,
+                            long frameID,
+                            int id,
+                            float confidence,
+                            float grabStrength,
+                            float grabAngle,
+                            float pinchStrength,
+                            float pinchDistance,
+                            float palmWidth,
+                            bool isLeft,
+                            float timeVisible,
+                            /* Arm arm,*/
+                            List<Finger> fingers,
+                            Vector palmPosition,
+                            Vector stabilizedPalmPosition,
+                            Vector palmVelocity,
+                            Vector palmNormal,
+                            LeapQuaternion rotation,
+                            Vector direction,
+                            Vector wristPosition) {
+      toFill.FrameId                      = frameID;
+      toFill.Id                           = id;
+      toFill.Confidence                   = confidence;
+      toFill.GrabStrength                 = grabStrength;
+      toFill.GrabAngle                    = grabAngle;
+      toFill.PinchStrength                = pinchStrength;
+      toFill.PinchDistance                = pinchDistance;
+      toFill.PalmWidth                    = palmWidth;
+      toFill.IsLeft                       = isLeft;
+      toFill.TimeVisible                  = timeVisible;
+      if (fingers != null) toFill.Fingers = fingers;
+      toFill.PalmPosition                 = palmPosition;
+      toFill.StabilizedPalmPosition       = stabilizedPalmPosition;
+      toFill.PalmVelocity                 = palmVelocity;
+      toFill.PalmNormal                   = palmNormal;
+      toFill.Rotation                     = rotation;
+      toFill.Direction                    = direction;
+      toFill.WristPosition                = wristPosition;
+    }
+
+    /// <summary>
+    /// Fills the Bone object with the provided bone data.
+    /// </summary>
+    public static void Fill(this Bone toFill,
+                            Vector prevJoint,
+                            Vector nextJoint,
+                            Vector center,
+                            Vector direction,
+                            float length,
+                            float width,
+                            Bone.BoneType type,
+                            LeapQuaternion rotation) {
+      toFill.PrevJoint  = prevJoint;
+      toFill.NextJoint  = nextJoint;
+      toFill.Center     = center;
+      toFill.Direction  = direction;
+      toFill.Length     = length;
+      toFill.Width      = width;
+      toFill.Type       = type;
+      toFill.Rotation   = rotation;
+    }
+
+    /// <summary>
+    /// Fills the Finger object with the provided finger data. You can pass null for
+    /// bones; A null bone will not modify the underlying hand's data for that bone.
+    /// </summary>
+    public static void Fill(this Finger toFill,
+                            long frameId,
+                            int handId,
+                            int fingerId,
+                            float timeVisible,
+                            Vector tipPosition,
+                            Vector tipVelocity,
+                            Vector direction,
+                            Vector stabilizedTipPosition,
+                            float width,
+                            float length,
+                            bool isExtended,
+                            Finger.FingerType type,
+                            Bone metacarpal   = null,
+                            Bone proximal     = null,
+                            Bone intermediate = null,
+                            Bone distal       = null) {
+      toFill.Id                     = handId;
+      toFill.HandId                 = handId;
+      toFill.TimeVisible            = timeVisible;
+      toFill.TipPosition            = tipPosition;
+      toFill.TipVelocity            = tipVelocity;
+      toFill.StabilizedTipPosition  = stabilizedTipPosition;
+      toFill.Direction              = direction;
+      toFill.Width                  = width;
+      toFill.Length                 = length;
+      toFill.IsExtended             = isExtended;
+      toFill.Type                   = type;
+
+      if (metacarpal   != null) toFill.bones[0] = metacarpal;
+      if (proximal     != null) toFill.bones[1] = proximal;
+      if (intermediate != null) toFill.bones[2] = intermediate;
+      if (distal       != null) toFill.bones[3] = distal;
+    }
+
+    /// <summary>
+    /// Fills the Arm object with the provided arm data.
+    /// </summary>
+    public static void Fill(this Arm toFill,
+                            Vector elbow,
+                            Vector wrist,
+                            Vector center,
+                            Vector direction,
+                            float length,
+                            float width,
+                            LeapQuaternion rotation) {
+      toFill.PrevJoint  = elbow;
+      toFill.NextJoint  = wrist;
+      toFill.Center     = center;
+      toFill.Direction  = direction;
+      toFill.Length     = length;
+      toFill.Width      = width;
+      toFill.Rotation   = rotation;
     }
 
   }

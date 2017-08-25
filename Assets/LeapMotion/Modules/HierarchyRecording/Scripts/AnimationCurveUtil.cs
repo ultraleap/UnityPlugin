@@ -54,11 +54,11 @@ namespace Leap.Unity {
                                          float maxAngleError = 1,
                                          int checkSteps = 8) {
       var curveArray = new AnimationCurve[] {
-      xCurve,
-      yCurve,
-      zCurve,
-      wCurve
-    };
+        xCurve,
+        yCurve,
+        zCurve,
+        wCurve
+      };
 
       var result = CompressCurves(curveArray,
                                 (src, dst, t) => {
@@ -136,7 +136,8 @@ namespace Leap.Unity {
                                    float dstValue = dst[0].Evaluate(t);
 
                                    if (Mathf.Sign(srcValue) == Mathf.Sign(dstValue)) {
-                                     return srcValue / dstValue < maxScaleFactor && dstValue / srcValue < maxScaleFactor;
+                                     return srcValue / dstValue < maxScaleFactor
+                                         && dstValue / srcValue < maxScaleFactor;
                                    } else {
                                      return false;
                                    }
