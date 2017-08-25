@@ -114,6 +114,27 @@ namespace Leap.Unity {
     [SerializeField]
     private KeyCode lessRewind = KeyCode.RightArrow;
 
+    // Manual Device Offset
+    [Tooltip("Allow manual adjustment of the Leap device's virtual offset and tilt.  These settings can be used to match the physical position and orientation of the Leap Motion sensor")]
+    [SerializeField]
+    private bool allowManualDeviceOffset;
+
+    [Tooltip("Adjusts the Leap Motion device's virtual height offset.")]
+    [SerializeField]
+    [Range(-0.5F, 0.5F)]
+    private float deviceOffsetYaxis;
+
+    [Tooltip("Adjusts the Leap Motion device's virtual depth offset.")]
+    [SerializeField]
+    [Range(-0.5F, 0.5F)]
+    private float deviceOffsetZaxis;
+    private Vector3 deviceOffset;
+
+    [Tooltip("Adjusts the Leap Motion device's virtual X axis tilt.")]
+    [SerializeField]
+    [Range(-90.0F, 90.0F)]
+    private float deviceTiltXaxis;
+
     public float TweenImageWarping {
       get {
         return tweenImageWarping;
@@ -156,6 +177,38 @@ namespace Leap.Unity {
       }
     }
 
+    public float DeviceOffsetYaxis {
+      get {
+        return deviceOffsetYaxis;
+      }
+
+      set {
+        deviceOffsetYaxis = value;
+        deviceOffset.y = value;
+      }
+    }
+
+    public float DeviceOffsetZaxis {
+      get {
+        return deviceOffsetZaxis;
+      }
+
+      set {
+        deviceOffsetZaxis = value;
+        deviceOffset.z = value;
+      }
+    }
+
+    public float DeviceTiltXaxis {
+      get {
+        return deviceTiltXaxis;
+      }
+
+      set {
+        deviceTiltXaxis = value;
+      }
+    }
+
     private LeapDeviceInfo deviceInfo;
 
     private Matrix4x4 _projectionMatrix;
@@ -175,11 +228,11 @@ namespace Leap.Unity {
 
       // Rewind position and rotation
       if (_trackingAnchor == null) {
-        rewoundRotation = past.localRotation;
-        rewoundPosition = past.localPosition + rewoundRotation * Vector3.forward * deviceInfo.focalPlaneOffset;
+        rewoundRotation = past.localRotation * Quaternion.Euler(DeviceTiltXaxis, 0f, 0f);
+        rewoundPosition = past.localPosition + rewoundRotation * deviceOffset;
       } else {
-        rewoundRotation = _trackingAnchor.rotation * past.localRotation;
-        rewoundPosition = _trackingAnchor.TransformPoint(past.localPosition) + rewoundRotation * Vector3.forward * deviceInfo.focalPlaneOffset;
+        rewoundRotation = _trackingAnchor.rotation * past.localRotation * Quaternion.Euler(DeviceTiltXaxis, 0f, 0f);
+        rewoundPosition = _trackingAnchor.TransformPoint(past.localPosition) + rewoundRotation * deviceOffset;
       }
 
       switch (anchor) {
@@ -239,10 +292,14 @@ namespace Leap.Unity {
       if (_headTransform != null && UnityEditor.PlayerSettings.virtualRealitySupported) {
         _trackingAnchor = _headTransform.parent;
       }
-    }
+
+      DeviceOffsetYaxis = deviceOffsetYaxis;
+      DeviceOffsetZaxis = deviceOffsetZaxis;
+      DeviceTiltXaxis = deviceTiltXaxis;
+  }
 #endif
 
-    protected void Start() {
+  protected void Start() {
       if (provider.IsConnected()) {
         deviceInfo = provider.GetDeviceInfo();
         _shouldSetLocalPosition = true;
