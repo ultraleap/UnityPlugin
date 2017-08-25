@@ -21,7 +21,8 @@ namespace Leap.Unity.Recording {
     [Header("Leap Data")]
     public List<Frame> leapData;
 
-    public LeapRecordingType leapRecordingType = LeapRecordingType.Raw;
+    [SerializeField, ImplementsTypeNameDropdown(typeof(LeapRecording))]
+    private string _leapRecordingType;
 
     [Header("Compression Settings")]
     [MinValue(0)]
@@ -57,11 +58,6 @@ namespace Leap.Unity.Recording {
 
     [Tooltip("Deletes all transforms that have the identity transformation.")]
     public bool collapseIdentityTransforms = true;
-
-    public enum LeapRecordingType {
-      None,
-      Raw
-    }
 
     public void ClearComponents() {
       Transform[] transforms = GetComponentsInChildren<Transform>(includeInactive: true);
@@ -133,13 +129,14 @@ namespace Leap.Unity.Recording {
 
       //Try to generate a leap recording if we have leap data
       RecordingTrack recordingTrack = null;
-      LeapRecording leapRecording = null;
-      switch (leapRecordingType) {
-        case LeapRecordingType.Raw:
-          var rawRecording = ScriptableObject.CreateInstance<RawLeapRecording>();
-          rawRecording.frameList = leapData;
-          leapRecording = rawRecording;
-          break;
+      LeapRecording leapRecording = ScriptableObject.CreateInstance(_leapRecordingType)
+                                      as LeapRecording;
+      if (leapRecording != null) {
+        leapRecording.LoadFrames(leapData);
+      }
+      else {
+        Debug.LogError("Unable to create Leap recording: Invalid type specification for "
+                     + "LeapRecording implementation.", this);
       }
 
       string assetPath = Path.Combine(assetFolder.Path, recordingName + ".asset");
@@ -152,7 +149,7 @@ namespace Leap.Unity.Recording {
         recordingTrack = timeline.CreateTrack<RecordingTrack>(null, "Leap Recording");
 
         var recordingClip = recordingTrack.CreateDefaultClip();
-        recordingClip.duration = leapRecording.Length;
+        recordingClip.duration = leapRecording.length;
 
         var recordingAsset = recordingClip.asset as RecordingClip;
         recordingAsset.recording = leapRecording;

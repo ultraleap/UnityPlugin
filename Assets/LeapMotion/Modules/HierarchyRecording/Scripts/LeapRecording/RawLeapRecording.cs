@@ -1,12 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Leap.Unity.Recording {
 
   public class RawLeapRecording : LeapRecording {
-    public const double NS_TO_S = 1e-6;
-    public const double S_TO_NS = 1e6;
 
-    public List<Frame> frameList = new List<Frame>();
+    public List<Frame> frameList;
 
     public long EarliestTimestamp {
       get {
@@ -28,7 +27,11 @@ namespace Leap.Unity.Recording {
       }
     }
 
-    public override float Length {
+    public override void LoadFrames(List<Frame> frames) {
+      this.frameList = frames;
+    }
+
+    public override float length {
       get {
         if (frameList.Count != 0) {
           return (float)((frameList[frameList.Count - 1].Timestamp - frameList[0].Timestamp) * NS_TO_S);
@@ -43,7 +46,7 @@ namespace Leap.Unity.Recording {
         return false;
       }
 
-      if (!clampTimeToValid && time < 0 || time > Length) {
+      if (!clampTimeToValid && time < 0 || time > length) {
         return false;
       }
 

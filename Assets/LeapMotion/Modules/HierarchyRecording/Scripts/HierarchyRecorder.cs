@@ -62,6 +62,10 @@ namespace Leap.Unity.Recording {
       Nothing,
       Specific
     }
+    
+    public bool isRecording {
+      get { return _isRecording; }
+    }
 
     private void Reset() {
       recordingName = gameObject.name;
@@ -69,13 +73,13 @@ namespace Leap.Unity.Recording {
 
     private void Start() {
       if (recordOnStart) {
-        beginRecording();
+        BeginRecording();
       }
     }
 
     private void LateUpdate() {
       if (Input.GetKeyDown(beginRecordingKey)) {
-        beginRecording();
+        BeginRecording();
       }
 
       if (Input.GetKeyDown(finishRecordingKey)) {
@@ -87,7 +91,10 @@ namespace Leap.Unity.Recording {
       }
     }
 
-    private void beginRecording() {
+    /// <summary>
+    /// Starts recording with this Hierarchy Recorder.
+    /// </summary>
+    public void BeginRecording() {
       if (_isRecording) return;
       _isRecording = true;
       _startTime = Time.time;
@@ -107,6 +114,13 @@ namespace Leap.Unity.Recording {
       _initialTransformData = new Dictionary<Transform, TransformData>();
       _initialActivityData = new Dictionary<Component, bool>();
       _behaviourActivity = new Dictionary<Component, List<ActivityData>>();
+    }
+
+    /// <summary>
+    /// Finishes recording with this Hierarchy Recorder.
+    /// </summary>
+    public void FinishRecording() {
+      finishRecording(new ProgressBar());
     }
 
     private void finishRecording(ProgressBar progress) {
@@ -686,7 +700,7 @@ namespace Leap.Unity.Recording {
         GUILayout.Label("Ready to record.");
         if (GUILayout.Button("Start Recording (" + beginRecordingKey.ToString() + ")",
                              GUILayout.ExpandHeight(true))) {
-          beginRecording();
+          BeginRecording();
         }
       } else {
         GUILayout.Label("Recording.");
