@@ -23,8 +23,8 @@ namespace Leap.Unity.Interaction.Tests {
     public IEnumerator CanCreateAndDelete() {
       yield return wait(beginningTestWait);
 
-      InitTest("Simple Boxes IE Test");
-      testProvider.editTimePose = TestHandFactory.TestHandPose.PoseB;
+      InitTest();
+      provider.editTimePose = TestHandFactory.TestHandPose.PoseB;
 
       yield return wait(aBit);
 
@@ -46,14 +46,14 @@ namespace Leap.Unity.Interaction.Tests {
     public IEnumerator CanCreateInteractionBehaviourAtRuntime() {
       yield return wait(beginningTestWait);
 
-      InitTest("Simple Boxes IE Test");
-      testProvider.editTimePose = TestHandFactory.TestHandPose.PoseB;
+      InitTest();
+      provider.editTimePose = TestHandFactory.TestHandPose.PoseB;
       
       var rHandPos = rightHand.leapHand.PalmPosition.ToVector3();
 
       var spawnPos = rHandPos;
       var newBox = GameObject.CreatePrimitive(PrimitiveType.Cube);
-      newBox.transform.parent = testObj.transform;
+      newBox.transform.parent = rigObj.transform;
       newBox.transform.position = spawnPos;
       newBox.transform.localScale = Vector3.one * 0.1F;
       var newBody = newBox.AddComponent<Rigidbody>();
@@ -74,8 +74,8 @@ namespace Leap.Unity.Interaction.Tests {
     public IEnumerator CanDeleteObjectWhileHovering() {
       yield return wait(beginningTestWait);
 
-      InitTest("Simple Boxes IE Test");
-      testProvider.editTimePose = TestHandFactory.TestHandPose.PoseB;
+      InitTest();
+      provider.editTimePose = TestHandFactory.TestHandPose.PoseB;
 
       yield return wait(aBit);
       
@@ -100,8 +100,8 @@ namespace Leap.Unity.Interaction.Tests {
     public IEnumerator CanDeleteObjectDuringContact() {
       yield return wait(beginningTestWait);
 
-      InitTest("Simple Boxes IE Test");
-      testProvider.editTimePose = TestHandFactory.TestHandPose.PoseB;
+      InitTest();
+      provider.editTimePose = TestHandFactory.TestHandPose.PoseB;
 
       yield return wait(aWhile);
       
@@ -142,7 +142,28 @@ namespace Leap.Unity.Interaction.Tests {
     public IEnumerator CanDeleteObjectDuringGrasp() {
       yield return wait(beginningTestWait);
 
+      InitTest(GRASP_THROW_RIG, DEFAULT_STAGE);
 
+      // Wait for boxes to rest on the ground.
+      yield return wait(aBit);
+
+      // Play the grasping animation.
+      recording.Play();
+
+      // Wait for box0 to be grasped.
+      bool graspOccurred = false;
+      box0.OnGraspBegin += () => {
+        graspOccurred = true;
+      };
+      int framesWaited = 0;
+      while (!graspOccurred && framesWaited < WAIT_FOR_INTERACTION_FRAME_LIMIT) {
+        yield return null;
+        framesWaited++;
+      }
+      Assert.That(framesWaited != WAIT_FOR_INTERACTION_FRAME_LIMIT);
+
+      // We should have box0 grasped now.
+      GameObject.Destroy(box0);
 
       yield return wait(endingTestWait);
     }
@@ -152,4 +173,5 @@ namespace Leap.Unity.Interaction.Tests {
     }
 
 }
-#endif
+
+#endif // LEAP_TESTS

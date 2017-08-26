@@ -10,6 +10,12 @@ public class RecorderBuddy : MonoBehaviour {
 
   private float _curDuration = 0f;
 
+  void Reset() {
+    if (recorder == null) {
+      recorder = GetComponent<HierarchyRecorder>();
+    }
+  }
+
   void Update() {
     if (_curDuration > recordingDuration) {
       recorder.FinishRecording();

@@ -47,6 +47,11 @@ namespace Leap.Unity.Recording {
     }
 
     /// <summary>
+    /// The data for the last hand these VectorHandCurves sampled. This is used to
+    /// generate velocity data for hands sampled in sequence. </summary>
+    private Hand _lastHand;
+
+    /// <summary>
     /// Adds keyframe data into these VectorHandCurves at the specified time using the
     /// provided hand data.
     /// </summary>
@@ -106,6 +111,16 @@ namespace Leap.Unity.Recording {
         }
 
         VectorHand.Decode(ref vectorHand, intoHand);
+
+        // Fill temporal data if we have a hand from the previous sampling.
+        if (_lastHand != null) {
+          intoHand.FillTemporalData(_lastHand, Time.deltaTime);
+
+          _lastHand.CopyFrom(intoHand);
+        }
+        else {
+          _lastHand = new Hand();
+        }
       }
       finally {
         Pool<VectorHand>.Recycle(vectorHand);

@@ -1125,9 +1125,13 @@ namespace Leap.Unity.Interaction {
             for (int i = 0; i < numCollisions; i++) {
               //NotifySoftContactOverlap(contactBone, _softContactColliderBuffer[i]);
 
-              // Skip soft contact if the object is ignoring contact
+              // If the rigidbody is null, the object may have been destroyed.
               if (_softContactColliderBuffer[i].attachedRigidbody == null) continue;
-              if (manager.interactionObjectBodies[_softContactColliderBuffer[i].attachedRigidbody].ignoreContact) continue;
+              IInteractionBehaviour intObj;
+              if (manager.interactionObjectBodies.TryGetValue(_softContactColliderBuffer[i].attachedRigidbody, out intObj)) {
+                // Skip soft contact if the object is ignoring contact.
+                if (manager.interactionObjectBodies[_softContactColliderBuffer[i].attachedRigidbody].ignoreContact) continue;
+              }
 
               PhysicsUtility.generateSphereContact(boneSphere, 0, _softContactColliderBuffer[i],
                                                    ref manager._softContacts,
@@ -1148,9 +1152,13 @@ namespace Leap.Unity.Interaction {
             for (int i = 0; i < numCollisions; i++) {
               //NotifySoftContactOverlap(contactBone, _softContactColliderBuffer[i]);
 
-              // Skip soft contact if the object is ignoring contact
+              // If the rigidbody is null, the object may have been destroyed.
               if (_softContactColliderBuffer[i].attachedRigidbody == null) continue;
-              if (manager.interactionObjectBodies[_softContactColliderBuffer[i].attachedRigidbody].ignoreContact) continue;
+              IInteractionBehaviour intObj;
+              if (manager.interactionObjectBodies.TryGetValue(_softContactColliderBuffer[i].attachedRigidbody, out intObj)) {
+                // Skip soft contact if the object is ignoring contact.
+                if (manager.interactionObjectBodies[_softContactColliderBuffer[i].attachedRigidbody].ignoreContact) continue;
+              }
 
               PhysicsUtility.generateCapsuleContact(boneCapsule, 0,
                                                     _softContactColliderBuffer[i],
@@ -1177,9 +1185,13 @@ namespace Leap.Unity.Interaction {
             for (int i = 0; i < numCollisions; i++) {
               //NotifySoftContactOverlap(contactBone, _softContactColliderBuffer[i]);
 
-              // Skip soft contact if the object is ignoring contact
+              // If the rigidbody is null, the object may have been destroyed.
               if (_softContactColliderBuffer[i].attachedRigidbody == null) continue;
-              if (manager.interactionObjectBodies[_softContactColliderBuffer[i].attachedRigidbody].ignoreContact) continue;
+              IInteractionBehaviour intObj;
+              if (manager.interactionObjectBodies.TryGetValue(_softContactColliderBuffer[i].attachedRigidbody, out intObj)) {
+                // Skip soft contact if the object is ignoring contact.
+                if (manager.interactionObjectBodies[_softContactColliderBuffer[i].attachedRigidbody].ignoreContact) continue;
+              }
 
               PhysicsUtility.generateBoxContact(boneBox, 0, _softContactColliderBuffer[i],
                                                 ref manager._softContacts,
@@ -1606,6 +1618,34 @@ namespace Leap.Unity.Interaction {
     /// This method will print an error if the controller is not currently grasping an object.
     /// </summary>
     public abstract Vector3 GetGraspPoint();
+
+    /// <summary>
+    /// Checks if the provided interaction object can be grasped by this interaction
+    /// controller in its current state. If so, the controller will initiate a grasp and
+    /// this method will return true, otherwise this method returns false.
+    /// </summary>
+    public bool TryGrasp(IInteractionBehaviour intObj) {
+      if (checkShouldGraspAtemporal(intObj)) {
+        _graspedObject = intObj;
+        return true;
+      }
+
+      return false;
+    }
+
+    /// <summary>
+    /// Checks if the provided interaction object can be grasped by this interaction
+    /// controller in its current state. If so, the controller will initiate a grasp and
+    /// this method will return true, otherwise this method returns false.
+    /// 
+    /// This method is useful if the controller requires conditions to initiate a grasp
+    /// that differ from the conditions necessary to maintain a grasp after it has been
+    /// initiated. This method allows a grasp to occur if certain initiation conditions
+    /// are not met, such as the motion of a hand's fingers towards the palm,
+    /// but if the grasp holding conditions are met, such as the penetration of a hand's
+    /// fingers inside the interaction object.
+    /// </summary>
+    protected abstract bool checkShouldGraspAtemporal(IInteractionBehaviour intObj);
 
     private Func<Collider, IInteractionBehaviour> graspActivityFilter;
     private IInteractionBehaviour graspFilterFunc(Collider collider) {

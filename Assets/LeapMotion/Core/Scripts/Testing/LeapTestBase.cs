@@ -31,14 +31,32 @@ namespace Leap.Unity {
     /// the testing object by overriding this method.
     /// </summary>
     protected virtual void InitTest(string objectName) {
+      testObj = LoadObject(objectName);
+    }
+
+    #region Spawn Utilities
+
+    protected T Spawn<T>(T original, Vector3 position) where T : MonoBehaviour {
+      return GameObject.Instantiate<T>(original,
+                                       position,
+                                       original.transform.rotation,
+                                       original.transform.parent);
+    }
+
+    /// <summary>
+    /// Attempts to load the GameObject by name in one of the currently-loaded scenes,
+    /// or from an EditorResources folder if there is no GameObject with that name in any
+    /// loaded scene.
+    /// </summary>
+    protected GameObject LoadObject(string objectName) {
       GameObject obj = null;
 
       for (int i = 0; i < SceneManager.sceneCount; i++) {
         var scene = SceneManager.GetSceneAt(i);
 
-        obj = scene.GetRootGameObjects().
-                    Query().
-                    FirstOrDefault(g => g.name == objectName);
+        obj = scene.GetRootGameObjects()
+                   .Query()
+                   .FirstOrDefault(g => g.name == objectName);
 
         if (obj != null) {
           obj.SetActive(true);
@@ -57,16 +75,7 @@ namespace Leap.Unity {
         obj = UnityEngine.Object.Instantiate(prefab);
       }
 
-      testObj = obj;
-    }
-
-    #region Spawn Utilities
-
-    protected T Spawn<T>(T original, Vector3 position) where T : MonoBehaviour {
-      return GameObject.Instantiate<T>(original,
-                                       position,
-                                       original.transform.rotation,
-                                       original.transform.parent);
+      return obj;
     }
 
     #endregion
