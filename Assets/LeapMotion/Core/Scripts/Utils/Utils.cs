@@ -216,12 +216,24 @@ namespace Leap.Unity {
     #endregion
 
     #region String Utils
+    /// <summary>
+    /// Trims a specific number of characters off of the end of the
+    /// provided string.  When the number of trimmed characters is
+    /// equal to or greater than the length of the string, the empty
+    /// string is always returned.
+    /// </summary>
     public static string TrimEnd(this string str, int characters) {
       return str.Substring(0, Mathf.Max(0, str.Length - characters));
     }
 
+    /// <summary>
+    /// Trims a specific number of characters off of the begining of
+    /// the provided string.  When the number of trimmed characters is
+    /// equal to or greater than the length of the string, the empty
+    /// string is always returned.
+    /// </summary>
     public static string TrimStart(this string str, int characters) {
-      return str.Substring(characters);
+      return str.Substring(Mathf.Min(str.Length, characters));
     }
     #endregion
 
