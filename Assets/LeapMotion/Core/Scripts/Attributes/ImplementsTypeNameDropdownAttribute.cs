@@ -18,17 +18,19 @@ namespace Leap.Unity.Attributes {
     
     private Type _baseType;
     private List<Type> _implementingTypes = new List<Type>();
+    private GUIContent[] _typeOptions;
 
     public ImplementsTypeNameDropdownAttribute(Type type) {
       _baseType = type;
+
+      refreshImplementingTypes();
+      refreshTypeOptions();
     }
 
     public void DrawProperty(Rect rect, SerializedProperty property, GUIContent label) {
-      refreshImplementingTypes();
-
       int curSelectedIdx = getCurSelectedIdx(property);
 
-      int selectedIdx = EditorGUI.Popup(rect, label, curSelectedIdx, getTypeOptions());
+      int selectedIdx = EditorGUI.Popup(rect, label, curSelectedIdx, _typeOptions);
       if (selectedIdx != curSelectedIdx) {
         property.stringValue = _implementingTypes[selectedIdx].FullName;
       }
@@ -51,18 +53,16 @@ namespace Leap.Unity.Attributes {
       }
     }
 
-    private int getCurSelectedIdx(SerializedProperty property) {
-      return _implementingTypes.FindIndex((t => property.stringValue.Equals(t.FullName)));
+    private void refreshTypeOptions() {
+      _typeOptions = new GUIContent[_implementingTypes.Count];
+
+      for (int i = 0; i < _typeOptions.Length; i++) {
+        _typeOptions[i] = new GUIContent(_implementingTypes[i].Name);
+      }
     }
 
-    private GUIContent[] getTypeOptions() {
-      GUIContent[] typeOptions = new GUIContent[_implementingTypes.Count];
-
-      for (int i = 0; i < typeOptions.Length; i++) {
-        typeOptions[i] = new GUIContent(_implementingTypes[i].Name);
-      }
-
-      return typeOptions;
+    private int getCurSelectedIdx(SerializedProperty property) {
+      return _implementingTypes.FindIndex((t => property.stringValue.Equals(t.FullName)));
     }
   }
 

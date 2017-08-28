@@ -62,11 +62,12 @@ namespace Leap.Unity.Recording {
     /// Compresses the curves in these QuaternionCurves using
     /// AnimationCurveUtil.CompressRotations.
     /// </summary>
-    public void Compress() {
+    public void Compress(float maxAngleError = 1f) {
       AnimationCurve outXCurve, outYCurve, outZCurve, outWCurve;
       AnimationCurveUtil.CompressRotations(xCurve, yCurve, zCurve, wCurve,
                                            out outXCurve, out outYCurve,
-                                           out outZCurve, out outWCurve);
+                                           out outZCurve, out outWCurve,
+                                           maxAngleError: maxAngleError);
       xCurve = outXCurve;
       yCurve = outYCurve;
       zCurve = outZCurve;

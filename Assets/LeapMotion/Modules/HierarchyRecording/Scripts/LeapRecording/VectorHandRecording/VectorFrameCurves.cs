@@ -44,7 +44,7 @@ namespace Leap.Unity.Recording {
     /// provided frame.
     /// </summary>
     public void Sample(float time, Frame intoFrame, Hand intoLeftHand, Hand intoRightHand) {
-      bool leftHandTracked  = leftHandCurves .Sample(time, intoLeftHand, true);
+      bool leftHandTracked  = leftHandCurves .Sample(time, intoLeftHand,  true);
       bool rightHandTracked = rightHandCurves.Sample(time, intoRightHand, false);
 
       intoFrame.Hands.Clear();

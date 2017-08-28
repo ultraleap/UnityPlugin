@@ -4,10 +4,4 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes:
-  - enabled: 1
-    path: Assets/LeapMotion/Modules/GraphicRenderer/Testing/EditorResources/ShaderOutputTestScenes/StationaryBakedRendererShaderTestScene.unity
-    guid: efe54fc03a98df14abb7455fe018e0bd
-  - enabled: 1
-    path: Assets/LeapMotion/Modules/GraphicRenderer/Testing/EditorResources/ShaderOutputTestScenes/TranslationBakedRendererShaderTestScene.unity
-    guid: 18c0852c7d1623e4cb7e721b2c279236
+  m_Scenes: []

@@ -257,6 +257,17 @@ namespace Leap.Unity {
 
       return compressedCurves;
     }
+    
+    public static void AddBooleanKey(this AnimationCurve curve, float time, bool value) {
+      var keyframe = new Keyframe() { time = time, value = value ? 1 : 0 };
+      int keyframeIdx = curve.AddKey(keyframe);
+
+      AnimationUtility.SetKeyBroken(curve, keyframeIdx, true);
+      AnimationUtility.SetKeyLeftTangentMode(curve, keyframeIdx,
+                                             AnimationUtility.TangentMode.Constant);
+      AnimationUtility.SetKeyRightTangentMode(curve, keyframeIdx,
+                                             AnimationUtility.TangentMode.Constant);
+    }
 
   }
 

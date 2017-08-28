@@ -20,11 +20,13 @@ namespace Leap.Unity.Recording {
       }
     }
 
+    [SerializeField]
     private float _minKeyframeTime = 0f;
     public float minKeyframeTime {
       get { return _minKeyframeTime; }
     }
 
+    [SerializeField]
     private float _maxKeyframeTime = 0f;
     public float maxKeyframeTime {
       get { return _maxKeyframeTime; }

@@ -510,7 +510,7 @@ PlayerSettings:
   webGLUseWasm: 0
   webGLCompressionFormat: 1
   scriptingDefineSymbols:
-    1: 
+    1: LEAP_TESTS
     7: LEAP_TESTS
   platformArchitecture: {}
   scriptingBackend: {}

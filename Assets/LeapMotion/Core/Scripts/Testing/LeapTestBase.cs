@@ -43,6 +43,17 @@ namespace Leap.Unity {
                                        original.transform.parent);
     }
 
+    protected GameObject Spawn(GameObject original, Vector3 position) {
+      return GameObject.Instantiate(original,
+                                    position,
+                                    original.transform.rotation,
+                                    original.transform.parent);
+    }
+
+    protected UnityEngine.Object Spawn(UnityEngine.Object original, Vector3 position) {
+      return UnityEngine.Object.Instantiate(original, position, Quaternion.identity);
+    }
+
     /// <summary>
     /// Attempts to load the GameObject by name in one of the currently-loaded scenes,
     /// or from an EditorResources folder if there is no GameObject with that name in any
