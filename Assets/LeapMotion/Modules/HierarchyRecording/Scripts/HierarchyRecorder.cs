@@ -128,6 +128,11 @@ namespace Leap.Unity.Recording {
         if (!_isRecording) return;
         _isRecording = false;
 
+        //Turn on auto-pushing for all auto-proxy components
+        foreach (var autoProxy in GetComponentsInChildren<AutoValueProxy>()) {
+          autoProxy.autoPushingEnabled = true;
+        }
+
         progress.Begin(1, "", "Reverting Scene State", () => {
           foreach (var pair in _initialTransformData) {
             pair.Key.localPosition = pair.Value.localPosition;
