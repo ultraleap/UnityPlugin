@@ -41,7 +41,7 @@ namespace Leap.Unity {
       var content = EditorGUIUtility.IconContent("Folder Icon");
 
       if (GUI.Button(right, content, GUIStyle.none)) {
-        string resultPath = PrompUserForPath(folderPath);
+        string resultPath = PromptUserForPath(folderPath);
         if (!string.IsNullOrEmpty(resultPath)) {
           string relativePath = Utils.MakeRelativePath(Application.dataPath, resultPath);
           var asset = AssetDatabase.LoadAssetAtPath<DefaultAsset>(relativePath);
@@ -84,7 +84,7 @@ namespace Leap.Unity {
       return EditorGUIUtility.singleLineHeight;
     }
 
-    protected virtual string PrompUserForPath(string currentPath) {
+    protected virtual string PromptUserForPath(string currentPath) {
       return EditorUtility.OpenFolderPanel("Select Folder", currentPath, "");
     }
 
