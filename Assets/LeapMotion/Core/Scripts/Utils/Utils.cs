@@ -215,6 +215,28 @@ namespace Leap.Unity {
 
     #endregion
 
+    #region String Utils
+    /// <summary>
+    /// Trims a specific number of characters off of the end of the
+    /// provided string.  When the number of trimmed characters is
+    /// equal to or greater than the length of the string, the empty
+    /// string is always returned.
+    /// </summary>
+    public static string TrimEnd(this string str, int characters) {
+      return str.Substring(0, Mathf.Max(0, str.Length - characters));
+    }
+
+    /// <summary>
+    /// Trims a specific number of characters off of the begining of
+    /// the provided string.  When the number of trimmed characters is
+    /// equal to or greater than the length of the string, the empty
+    /// string is always returned.
+    /// </summary>
+    public static string TrimStart(this string str, int characters) {
+      return str.Substring(Mathf.Min(str.Length, characters));
+    }
+    #endregion
+
     #region Math Utils
 
     public static int Repeat(int x, int m) {
@@ -265,6 +287,18 @@ namespace Leap.Unity {
       return float.IsNaN(v.x)
           || float.IsNaN(v.y)
           || float.IsNaN(v.z);
+    }
+
+    public static bool IsBetween(this float f, float f0, float f1) {
+      if (f0 > f1) Utils.Swap(ref f0, ref f1);
+
+      return f0 <= f && f <= f1;
+    }
+
+    public static bool IsBetween(this double d, double d0, double d1) {
+      if (d0 > d1) Utils.Swap(ref d0, ref d1);
+
+      return d0 <= d && d <= d1;
     }
 
     #endregion
@@ -707,6 +741,18 @@ namespace Leap.Unity {
       }
 
       return Array.IndexOf(_incompressibleFormats, format) < 0;
+    }
+
+    #endregion
+
+    #region Rect Utils
+    
+    /// <summary>
+    /// Returns a new Rect with the argument padding as a margin relative to each
+    /// border of the provided Rect.
+    /// </summary>
+    public static Rect PadInner(this Rect r, float padding) {
+      return new Rect(r.x + padding, r.y + padding, r.width - (padding * 2), r.height - (padding * 2));
     }
 
     #endregion
