@@ -62,7 +62,7 @@ namespace Leap.Unity.Recording {
       Nothing,
       Specific
     }
-    
+
     public bool isRecording {
       get { return _isRecording; }
     }
@@ -127,6 +127,11 @@ namespace Leap.Unity.Recording {
       progress.Begin(5, "Saving Recording", "", () => {
         if (!_isRecording) return;
         _isRecording = false;
+
+        //Turn on auto-pushing for all auto-proxy components
+        foreach (var autoProxy in GetComponentsInChildren<AutoValueProxy>()) {
+          autoProxy.autoPushingEnabled = true;
+        }
 
         progress.Begin(1, "", "Reverting Scene State", () => {
           foreach (var pair in _initialTransformData) {
@@ -312,23 +317,6 @@ namespace Leap.Unity.Recording {
             //First do a lossless compression
             curve = AnimationCurveUtil.Compress(curve, Mathf.Epsilon);
 
-            //If the curve controls a proxy object, convert the binding to the playback
-            //type and spawn the playback component
-            if (AnimationProxyAttribute.IsAnimationProxy(binding.type)) {
-              Type playbackType = AnimationProxyAttribute.ConvertToPlaybackType(binding.type);
-
-              //If we have not yet spawned the playback component, spawn it now
-              if (animationGameObject.GetComponent(playbackType) == null) {
-                animationGameObject.AddComponent(playbackType);
-              }
-
-              binding = new EditorCurveBinding() {
-                path = binding.path,
-                propertyName = binding.propertyName,
-                type = playbackType
-              };
-            }
-
             Transform targetTransform = null;
             var targetObj = AnimationUtility.GetAnimatedObject(gameObject, binding);
             if (targetObj is GameObject) {
@@ -417,6 +405,7 @@ namespace Leap.Unity.Recording {
           if (component is Behaviour) _behaviours.Add(component);
           if (component is Renderer) _behaviours.Add(component);
           if (component is Collider) _behaviours.Add(component);
+          if (component is IValueProxy) (component as IValueProxy).OnPullValue();
         }
 
         foreach (var transform in _transforms) {
