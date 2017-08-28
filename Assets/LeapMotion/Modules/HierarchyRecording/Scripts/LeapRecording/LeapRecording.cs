@@ -21,9 +21,10 @@ namespace Leap.Unity.Recording {
     public abstract float length { get; }
 
     /// <summary>
-    /// Loads this recording with data from the provided list of frames. These frames
-    /// reflect raw recorded Leap data. The actual frame storage scheme utilized is up to
-    /// the implementation.
+    /// Loads this recording with data from the provided TEMPORARY list of frames. These
+    /// frames reflect raw recorded Leap data. The actual frame storage scheme utilized
+    /// is up to the implementation, but if the implementation wishes to store data from
+    /// these frames, that data must be copied!
     /// 
     /// If this recording already has frame data, a call to this method should overwrite
     /// that data.

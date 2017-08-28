@@ -28,7 +28,13 @@ namespace Leap.Unity.Recording {
     }
 
     public override void LoadFrames(List<Frame> frames) {
-      this.frameList = frames;
+      frameList.Clear();
+
+      foreach (var frame in frames) {
+        var copy = new Frame();
+        copy.CopyFrom(frame);
+        frameList.Add(copy);
+      }
     }
 
     public override float length {
