@@ -134,6 +134,14 @@ namespace Leap.Unity.Query {
     }
 
     /// <summary>
+    /// Convers a two dimensional array into a query operation, and returns a query
+    /// wrapper that wraps this new operation.
+    /// </summary>
+    public static QueryWrapper<T, Array2DQueryOp<T>> Query<T>(this T[,] array) {
+      return new QueryWrapper<T, Array2DQueryOp<T>>(new Array2DQueryOp<T>(array));
+    }
+
+    /// <summary>
     /// Converts a ReadonlyList object into a query operation, and returns a query wrapper
     /// that wraps this new operation.
     /// </summary>
@@ -214,6 +222,40 @@ namespace Leap.Unity.Query {
 
       public void Reset() {
         _index = 0;
+      }
+    }
+
+    public struct Array2DQueryOp<T> : IQueryOp<T> {
+      private T[,] _array;
+      private int _width, _height;
+      private int _indexX, _indexY;
+
+      public Array2DQueryOp(T[,] array) {
+        _array = array;
+        _width = array.GetLength(0);
+        _height = array.GetLength(1);
+        _indexX = 0;
+        _indexY = 0;
+      }
+
+      public bool TryGetNext(out T t) {
+        if (_indexY >= _height) {
+          t = default(T);
+          return false;
+        }
+
+        t = _array[_indexX, _indexY];
+        _indexX++;
+        if (_indexX >= _width) {
+          _indexX = 0;
+          _indexY++;
+        }
+        return true;
+      }
+
+      public void Reset() {
+        _indexX = 0;
+        _indexY = 0;
       }
     }
 
