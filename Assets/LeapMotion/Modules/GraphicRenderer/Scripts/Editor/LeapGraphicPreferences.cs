@@ -126,7 +126,7 @@ namespace Leap.Unity.GraphicalRenderer {
       int newGraphicMax = EditorGUILayout.DelayedIntField("Max Graphics Per-Group", graphicMax);
       newGraphicMax = Mathf.Min(newGraphicMax, 1023); //maximum array length for Unity shaders is 1023
 
-      if (newGraphicMax > GRAPHIC_COUNT_SOFT_CEILING) {
+      if (newGraphicMax > GRAPHIC_COUNT_SOFT_CEILING && graphicMax <= GRAPHIC_COUNT_SOFT_CEILING) {
         if (!EditorUtility.DisplayDialog("Large Graphic Count",
                                         "Setting the graphic count larger than 144 can cause incorrect rendering " +
                                         "or shader compilation failure on certain systems, are you sure you want " +
