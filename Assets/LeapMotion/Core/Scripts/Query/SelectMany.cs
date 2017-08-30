@@ -71,7 +71,8 @@ namespace Leap.Unity.Query {
     /// <summary>
     /// Returns a new query operation representing the current query sequence where each element has been
     /// mapped onto an entire query sequence, and then all sequences are concatenated into a single long 
-    /// sequence.
+    /// sequence. Note that your selector function must call .Query() on the collection it returns, or you
+    /// will get a type inference error at compile time!
     /// 
     /// For example:
     ///   (1, 2, 3, 4).Query().SelectMany(count => new List().Fill(count, count.ToString()).Query())
