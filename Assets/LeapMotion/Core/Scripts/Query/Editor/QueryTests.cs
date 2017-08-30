@@ -175,6 +175,29 @@ namespace Leap.Unity.Query.Test {
     }
 
     [Test]
+    public void Repeat([Values(0, 1, 2, 3, 100)] int repetitions) {
+      List<int> list = new List<int>();
+      for (int i = 0; i < repetitions; i++) {
+        list.AddRange(LIST_0);
+      }
+
+      Assert.That(list.SequenceEqual(
+                  LIST_0.Query().Repeat(repetitions).ToList()));
+    }
+
+    [Test]
+    public void RepeatForever() {
+      int count = 0;
+      foreach (var value in LIST_0.Query().Repeat()) {
+        count++;
+        if (count >= 10000) {
+          Assert.Pass();
+          return;
+        }
+      }
+    }
+
+    [Test]
     public void SelectTest() {
       Assert.That(LIST_0.Select(i => i * 23).SequenceEqual(
                   LIST_0.Query().Select(i => i * 23).ToList()));
