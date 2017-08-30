@@ -361,6 +361,39 @@ namespace Leap.Unity.Query {
       return Where(predicate).Single();
     }
 
+    /// <summary>
+    /// Returns the single value that is present in the entire sequence.  If there is more
+    /// than one value in the sequence or there are no values at all, this method will return
+    /// the default value.
+    /// </summary>
+    public QueryType UniformOrDefault() {
+      return UniformOrNone().valueOrDefault;
+    }
+
+    /// <summary>
+    /// Returns Some single value that is present in the entire sequence.  If there is more
+    /// than one value in the sequence or there are no values at all, this method will return
+    /// None.
+    /// </summary>
+    public Maybe<QueryType> UniformOrNone() {
+      var op = _op;
+
+      QueryType obj;
+      if (!op.TryGetNext(out obj)) {
+        return Maybe.None;
+      }
+
+      QueryType dummy;
+      while (op.TryGetNext(out dummy)) {
+        if ((dummy == null) != (obj == null) ||
+           !dummy.Equals(obj)) {
+          return Maybe.None;
+        }
+      }
+
+      return obj;
+    }
+
     private static List<QueryType> _utilityList = new List<QueryType>();
 
     /// <summary>
