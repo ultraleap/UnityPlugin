@@ -21,7 +21,7 @@ namespace Leap.Unity.Attributes {
     private static Dictionary<FieldInfo, List<CombinablePropertyAttribute>> _cachedAttributes = new Dictionary<FieldInfo, List<CombinablePropertyAttribute>>();
 
     private List<CombinablePropertyAttribute> attributes = new List<CombinablePropertyAttribute>();
-    private void getAtrributes(SerializedProperty property) {
+    private void getAttributes(SerializedProperty property) {
       if (!_cachedAttributes.TryGetValue(fieldInfo, out attributes)) {
         attributes = new List<CombinablePropertyAttribute>();
 
@@ -44,7 +44,7 @@ namespace Leap.Unity.Attributes {
     }
 
     public override void OnGUI(Rect position, SerializedProperty property, GUIContent label) {
-      getAtrributes(property);
+      getAttributes(property);
 
       float defaultLabelWidth = EditorGUIUtility.labelWidth;
       float fieldWidth = position.width - EditorGUIUtility.labelWidth;
@@ -91,7 +91,7 @@ namespace Leap.Unity.Attributes {
       }
 
       if (fullPropertyDrawer != null && !canUseDefaultDrawer) {
-        Debug.LogError("Cannot have an advanced attribute drawer that draws a custom field, and also have an adavanced attribute drawer that draws between label and field!");
+        Debug.LogError("Cannot have an advanced attribute drawer that draws a custom field, and also have an advanced attribute drawer that draws between label and field!");
         return;
       }
 

@@ -118,7 +118,9 @@ namespace Leap.Unity.Interaction {
     }
 
     void OnCollisionEnter(Collision collision) {
+      #if UNITY_EDITOR
       bool hitNonInteractionObject = false;
+      #endif
 
       if (collision.rigidbody == null) {
         #if UNITY_EDITOR
@@ -154,7 +156,9 @@ namespace Leap.Unity.Interaction {
           }
         }
         else {
+          #if UNITY_EDITOR
           hitNonInteractionObject = true;
+          #endif
         }
       }
 

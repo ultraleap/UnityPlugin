@@ -112,5 +112,19 @@ namespace Leap.Unity {
         obj.transform.localScale = Vector3.one;
       }
     }
+
+    [MenuItem("GameObject/Reset Local Position and Rotation %#e")]
+    public static void ResetPositionRotation() {
+      if (!CorePreferences.allowClearTransformHotkey) {
+        return;
+      }
+
+      GameObject[] objs = Selection.GetFiltered<GameObject>(SelectionMode.ExcludePrefab | SelectionMode.OnlyUserModifiable | SelectionMode.Editable);
+      foreach (var obj in objs) {
+        Undo.RecordObject(obj.transform, "Cleared local position and rotation for " + obj.name + ".");
+        obj.transform.localPosition = Vector3.zero;
+        obj.transform.localRotation = Quaternion.identity;
+      }
+    }
   }
 }

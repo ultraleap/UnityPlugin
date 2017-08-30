@@ -11,11 +11,9 @@
 
 using Leap.Unity.Query;
 using NUnit.Framework;
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
+using UnityEngine.Playables;
 
 namespace Leap.Unity.Interaction.Tests {
 
@@ -23,48 +21,81 @@ namespace Leap.Unity.Interaction.Tests {
 
     protected const int WAIT_FOR_INTERACTION_FRAME_LIMIT = 500;
 
-    protected StationaryTestLeapProvider testProvider;
+    #region Test Object Names
 
+    /// <summary> Name of the default testing rig. The hands don't move. </summary>
+    protected const string DEFAULT_RIG = "IE Test Simple Rig";
+    /// <summary> Name of the default testing stage. Consists of three boxes. </summary>
+    protected const string DEFAULT_STAGE = "IE Test Simple Boxes";
+    /// <summary>
+    /// Plays back a recording of a grasping and throwing motion if Play is called on
+    /// the "recording" object. In the default stage, this can grab the center cube
+    /// (box0).
+    /// </summary>
+    protected const string GRASP_THROW_RIG = "IE Test Playback Rig - Grasp and Throw";
+
+    #endregion
+
+    #region Test Rig Objects
+
+    protected GameObject rigObj;
+
+    /// <summary>
+    /// A playable director loaded from a playback-enabled rig object, if one exists.
+    /// </summary>
+    protected PlayableDirector recording;
+
+    /// <summary>
+    /// The provider found in the test rig object.
+    /// </summary>
+    protected LeapProvider provider;
+
+    /// <summary>
+    /// The InteractionManager found in the test rig object.
+    /// </summary>
     protected InteractionManager manager;
-
+    
     protected InteractionHand leftHand;
     protected InteractionHand rightHand;
     protected InteractionVRController leftVRController;
     protected InteractionVRController rightVRController;
 
-    protected InteractionBehaviour box0;
-    protected InteractionBehaviour box1;
-    protected InteractionBehaviour box2;
+    #endregion
+
+    #region Test Stage Objects
+
+    protected GameObject stageObj;
 
     /// <summary>
-    /// To be called at the start of an Interaction Engine test. Loads the named object
-    /// by finding it in the current scene or otherwise by spawning it by prefab name.
-    /// 
-    /// After calling this method, the following fields are set:
-    /// 
-    /// PROVIDERS
-    /// - testProvider: The LeapProvider designed for IE unit tests.
-    /// 
-    /// MANAGERS
-    /// - manager: The Interaction Manager.
-    /// 
-    /// CONTROLLERS
-    /// - leftHand: The left Interaction Hand, if there is one.
-    /// - rightHand: The right Interaction Hand, if there is one.
-    /// - leftVRController: The left VR controller, if there is one.
-    /// - rightVRController: The right VR Controller, if there is one.
-    /// 
-    /// OBJECTS
-    /// - box0: An InteractionBehaviour with an attached BoxCollider, if there is one.
-    /// - box1: Another InteractionBehaviour with an attached BoxCollider, if it exists.
-    /// - box2: Yet another InteractionBehaviour with a BoxCollider, if it exists.
+    /// The first single-box-collider interaction object found in the test stage object.
     /// </summary>
-    protected override void InitTest(string objectName) {
-      base.InitTest(objectName);
+    protected InteractionBehaviour box0;
 
-      testProvider = testObj.GetComponentInChildren<StationaryTestLeapProvider>();
+    /// <summary>
+    /// The second single-box-collider interaction object found in the test stage object.
+    /// </summary>
+    protected InteractionBehaviour box1;
 
-      manager = testObj.GetComponentInChildren<InteractionManager>();
+    /// <summary>
+    /// The third single-box-collider interaction object found in the test stage object.
+    /// </summary>
+    protected InteractionBehaviour box2;
+
+    #endregion
+
+    /// <summary>
+    /// Call this at the start of an Interaction engine test with the name of a stage
+    /// object and the name of a rig object to load those objects and fill utility
+    /// parameters such as manager, leftHand, box0, etc. for testing.
+    /// </summary>
+    protected void InitTest(string rigObjName, string stageObjName) {
+
+      // Load test rig objects.
+      base.InitTest(rigObjName);
+      rigObj = testObj;
+      recording = rigObj.GetComponentInChildren<PlayableDirector>();
+      provider = rigObj.GetComponentInChildren<LeapProvider>();
+      manager = rigObj.GetComponentInChildren<InteractionManager>();
 
       foreach (var controller in manager.interactionControllers) {
         if (controller.intHand != null && controller.isLeft) {
@@ -87,9 +118,12 @@ namespace Leap.Unity.Interaction.Tests {
         }
       }
 
+      // Load stage objects.
+      stageObj = LoadObject(stageObjName);
+
       var intObjs = Pool<List<InteractionBehaviour>>.Spawn();
       try {
-        testObj.GetComponentsInChildren<InteractionBehaviour>(true, intObjs);
+        stageObj.GetComponentsInChildren<InteractionBehaviour>(true, intObjs);
 
         // Load "simple box" interaction objects.
         foreach (var simpleBoxObj in intObjs.Query().Where(o => o.primaryHoverColliders.Count == 1
@@ -105,20 +139,30 @@ namespace Leap.Unity.Interaction.Tests {
       }
     }
 
+    /// <summary>
+    /// Loads the provided object as the test stage object using the default IE test rig.
+    /// </summary>
+    protected override void InitTest(string stageObjName) {
+      InitTest(DEFAULT_RIG, stageObjName);
+    }
+
+    /// <summary>
+    /// Loads the default rig and stage objects for testing.
+    /// </summary>
+    protected void InitTest() {
+      InitTest(DEFAULT_RIG, DEFAULT_STAGE);
+    }
+
     [TearDown]
     protected virtual void Teardown() {
-      UnityEngine.Object.DestroyImmediate(testObj);
+      UnityEngine.Object.DestroyImmediate(rigObj);
+      UnityEngine.Object.DestroyImmediate(stageObj);
 
       Debug.ClearDeveloperConsole();
-
-      // Test scene loading NYI (refactor into LeapTestBase?)
-      //if (!string.IsNullOrEmpty(_sceneToUnload)) {
-      //  SceneManager.UnloadSceneAsync(_sceneToUnload);
-      //  _sceneToUnload = null;
-      //}
     }
 
   }
 
 }
-#endif
+
+#endif // LEAP_TESTS
