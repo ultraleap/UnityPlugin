@@ -384,10 +384,17 @@ namespace Leap.Unity.Query {
       }
 
       QueryType dummy;
-      while (op.TryGetNext(out dummy)) {
-        if ((dummy == null) != (obj == null) ||
-           !dummy.Equals(obj)) {
-          return Maybe.None;
+      if (obj == null) {
+        while (op.TryGetNext(out dummy)) {
+          if (dummy != null) {
+            return Maybe.None;
+          }
+        }
+      } else {
+        while (op.TryGetNext(out dummy)) {
+          if (!obj.Equals(dummy)) {
+            return Maybe.None;
+          }
         }
       }
 
