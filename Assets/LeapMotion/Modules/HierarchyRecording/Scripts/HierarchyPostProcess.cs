@@ -4,7 +4,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Playables;
 using UnityEngine.Timeline;
+#if UNITY_EDITOR
 using UnityEditor;
+#endif
 using Leap.Unity.Query;
 using Leap.Unity.Attributes;
 using Leap.Unity.GraphicalRenderer;
@@ -59,6 +61,7 @@ namespace Leap.Unity.Recording {
     [Tooltip("Deletes all transforms that have the identity transformation.")]
     public bool collapseIdentityTransforms = true;
 
+#if UNITY_EDITOR
     public void ClearComponents() {
       Transform[] transforms = GetComponentsInChildren<Transform>(includeInactive: true);
 
@@ -133,8 +136,7 @@ namespace Leap.Unity.Recording {
                                       as LeapRecording;
       if (leapRecording != null) {
         leapRecording.LoadFrames(leapData);
-      }
-      else {
+      } else {
         Debug.LogError("Unable to create Leap recording: Invalid type specification for "
                      + "LeapRecording implementation.", this);
       }
@@ -481,6 +483,6 @@ namespace Leap.Unity.Recording {
 
       return propertyToMaxError;
     }
+#endif
   }
-
 }

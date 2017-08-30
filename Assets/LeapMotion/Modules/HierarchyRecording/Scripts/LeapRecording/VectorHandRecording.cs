@@ -54,8 +54,10 @@ namespace Leap.Unity.Recording {
         _frameCurves.AddKeyframes(keyframeTime, frame);
       }
 
+#if UNITY_EDITOR
       // Compress these keyframes.
       _frameCurves.CompressCurves();
+#endif
 
       Debug.Log("Finished loading frames.");
     }

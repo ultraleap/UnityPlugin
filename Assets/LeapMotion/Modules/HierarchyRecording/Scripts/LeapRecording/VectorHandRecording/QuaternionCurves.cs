@@ -58,6 +58,7 @@ namespace Leap.Unity.Recording {
       return Quaternion.Lerp(evaluated, evaluated, 1.0f);
     }
 
+#if UNITY_EDITOR
     /// <summary>
     /// Compresses the curves in these QuaternionCurves using
     /// AnimationCurveUtil.CompressRotations.
@@ -73,7 +74,7 @@ namespace Leap.Unity.Recording {
       zCurve = outZCurve;
       wCurve = outWCurve;
     }
-
+#endif
   }
 
 }

@@ -3,7 +3,9 @@ using System.IO;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+#if UNITY_EDITOR
 using UnityEditor;
+#endif
 using Leap.Unity.Query;
 using Leap.Unity.GraphicalRenderer;
 
@@ -30,32 +32,24 @@ namespace Leap.Unity.Recording {
     public KeyCode beginRecordingKey = KeyCode.F5;
     public KeyCode finishRecordingKey = KeyCode.F6;
 
-    private AnimationClip _clip;
+    protected AnimationClip _clip;
 
-    private List<Component> _components;
+    protected List<Component> _components;
 
-    private List<Transform> _transforms;
-    private List<Component> _behaviours;
-    private List<AudioSource> _audioSources;
-    private List<PropertyRecorder> _recorders;
+    protected List<Transform> _transforms;
+    protected List<Component> _behaviours;
+    protected List<AudioSource> _audioSources;
+    protected List<PropertyRecorder> _recorders;
 
-    private List<Behaviour> _tempBehaviour = new List<Behaviour>();
-    private List<Renderer> _tempRenderer = new List<Renderer>();
-    private List<Collider> _tempCollider = new List<Collider>();
+    protected List<Behaviour> _tempBehaviour = new List<Behaviour>();
+    protected List<Renderer> _tempRenderer = new List<Renderer>();
+    protected List<Collider> _tempCollider = new List<Collider>();
 
-    private List<Frame> _leapData;
-    private Dictionary<EditorCurveBinding, AnimationCurve> _curves;
-    private Dictionary<AudioSource, RecordedAudio> _audioData;
-    private Dictionary<Transform, List<TransformData>> _transformData;
-    private Dictionary<Transform, TransformData> _initialTransformData;
-    private Dictionary<Component, bool> _initialActivityData;
-    private Dictionary<Component, List<ActivityData>> _behaviourActivity;
+    protected HashSet<string> _takenNames = new HashSet<string>();
 
-    private HashSet<string> _takenNames = new HashSet<string>();
-
-    private bool _isRecording = false;
-    private float _startTime = 0;
-    private int _startFrame = 0;
+    protected bool _isRecording = false;
+    protected float _startTime = 0;
+    protected int _startFrame = 0;
 
     public enum RecordingSelection {
       Everything,
@@ -63,21 +57,30 @@ namespace Leap.Unity.Recording {
       Specific
     }
 
+#if UNITY_EDITOR
+    protected List<Frame> _leapData;
+    protected Dictionary<EditorCurveBinding, AnimationCurve> _curves;
+    protected Dictionary<AudioSource, RecordedAudio> _audioData;
+    protected Dictionary<Transform, List<TransformData>> _transformData;
+    protected Dictionary<Transform, TransformData> _initialTransformData;
+    protected Dictionary<Component, bool> _initialActivityData;
+    protected Dictionary<Component, List<ActivityData>> _behaviourActivity;
+
     public bool isRecording {
       get { return _isRecording; }
     }
 
-    private void Reset() {
+    protected void Reset() {
       recordingName = gameObject.name;
     }
 
-    private void Start() {
+    protected void Start() {
       if (recordOnStart) {
         BeginRecording();
       }
     }
 
-    private void LateUpdate() {
+    protected void LateUpdate() {
       if (Input.GetKeyDown(beginRecordingKey)) {
         BeginRecording();
       }
@@ -123,7 +126,7 @@ namespace Leap.Unity.Recording {
       finishRecording(new ProgressBar());
     }
 
-    private void finishRecording(ProgressBar progress) {
+    protected void finishRecording(ProgressBar progress) {
       progress.Begin(5, "Saving Recording", "", () => {
         if (!_isRecording) return;
         _isRecording = false;
@@ -381,7 +384,7 @@ namespace Leap.Unity.Recording {
       });
     }
 
-    private void recordData() {
+    protected void recordData() {
       using (new ProfilerSample("Dispatch PreRecord Event")) {
         if (OnPreRecordFrame != null) {
           OnPreRecordFrame();
@@ -586,19 +589,19 @@ namespace Leap.Unity.Recording {
       }
     }
 
-    private struct ActivityData {
+    protected struct ActivityData {
       public float time;
       public bool enabled;
     }
 
-    private enum TransformDataType {
+    protected enum TransformDataType {
       Activity,
       Position,
       Rotation,
       Scale
     }
 
-    private struct TransformData {
+    protected struct TransformData {
       public const int CURVE_COUNT = 11;
 
       public float time;
@@ -674,10 +677,10 @@ namespace Leap.Unity.Recording {
 
     #region GUI
 
-    private Vector2 _guiMargins = new Vector2(5F, 5F);
-    private Vector2 _guiSize = new Vector2(175F, 60F);
+    protected Vector2 _guiMargins = new Vector2(5F, 5F);
+    protected Vector2 _guiSize = new Vector2(175F, 60F);
 
-    private void OnGUI() {
+    protected void OnGUI() {
       var guiRect = new Rect(_guiMargins.x, _guiMargins.y, _guiSize.x, _guiSize.y);
 
       GUI.Box(guiRect, "");
@@ -705,6 +708,6 @@ namespace Leap.Unity.Recording {
 
     #endregion
 
+#endif
   }
-
 }
