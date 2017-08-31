@@ -1315,8 +1315,6 @@ MonoBehaviour:
   _isHeadMounted: 1
   _temporalWarping: {fileID: 2114047136}
   _frameOptimization: 0
-  _overrideDeviceType: 0
-  _overrideDeviceTypeWith: 1
   _updateHandInPrecull: 1
 --- !u!114 &129172186
 MonoBehaviour:
@@ -9676,10 +9674,14 @@ MonoBehaviour:
   syncMode: 1
   forceCustomUpdate: 0
   allowManualTimeAlignment: 1
-  warpingAdjustment: 50
+  warpingAdjustment: 30
   unlockHold: 0
   moreRewind: 276
   lessRewind: 275
+  allowManualDeviceOffset: 1
+  deviceOffsetYaxis: 0
+  deviceOffsetZaxis: 0.13
+  deviceTiltXaxis: 6.3
 --- !u!1 &2145183717
 GameObject:
   m_ObjectHideFlags: 0
