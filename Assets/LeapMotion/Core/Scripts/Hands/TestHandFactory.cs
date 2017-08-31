@@ -202,7 +202,7 @@ namespace Leap {
       handId,
       fingerId,
       0.0f,
-      position,
+      distal.NextJoint,
       new Vector(0, 0, 0),
       forward,
       position,

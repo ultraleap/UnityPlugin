@@ -41,6 +41,7 @@ namespace Leap.Unity.Interaction.Internal {
                                    float maxGrabDistance = 0.05F,
                                    int layerMask = 0,
                                    QueryTriggerInteraction queryTriggers = QueryTriggerInteraction.UseGlobal) {
+
       interactionHand = intHand;
       _defaultGrabParams = new GrabClassifierHeuristics.ClassifierParameters(
         fingerStickiness, thumbStickiness, maxCurl, minCurl, fingerRadius,
@@ -93,7 +94,7 @@ namespace Leap.Unity.Interaction.Internal {
         }
 
         foreach (var interactionObj in interactionHand.graspCandidates) {
-          if (UpdateBehaviour(interactionObj, interactionHand.leapHand, graspMode: GraspUpdateMode.BeginGrasp)) {
+          if (updateBehaviour(interactionObj, interactionHand.leapHand, graspMode: GraspUpdateMode.BeginGrasp)) {
             graspedObject = interactionObj;
             return true;
           }
@@ -111,7 +112,7 @@ namespace Leap.Unity.Interaction.Internal {
           return false;
         }
 
-        if (UpdateBehaviour(interactionHand.graspedObject, interactionHand.leapHand, graspMode: GraspUpdateMode.ReleaseGrasp)) {
+        if (updateBehaviour(interactionHand.graspedObject, interactionHand.leapHand, graspMode: GraspUpdateMode.ReleaseGrasp)) {
           releasedObject = interactionHand.graspedObject;
           return true;
         }
@@ -129,7 +130,7 @@ namespace Leap.Unity.Interaction.Internal {
     /// Returns true if the behaviour reflects the state-change (grasped or released) as specified by
     /// the graspMode.
     /// </summary>
-    private bool UpdateBehaviour(IInteractionBehaviour behaviour, Hand hand, GraspUpdateMode graspMode) {
+    private bool updateBehaviour(IInteractionBehaviour behaviour, Hand hand, GraspUpdateMode graspMode, bool ignoreTemporal = false) {
       using (new ProfilerSample("Update Individual Grab Classifier", behaviour.gameObject)) {
         // Ensure a classifier exists for this Interaction Behaviour.
         GrabClassifierHeuristics.GrabClassifier classifier;
@@ -142,7 +143,8 @@ namespace Leap.Unity.Interaction.Internal {
         FillClassifier(hand, ref classifier);
         GrabClassifierHeuristics.UpdateClassifier(classifier, _scaledGrabParams,
                                                               ref _collidingCandidates,
-                                                              ref _numberOfColliders);
+                                                              ref _numberOfColliders,
+                                                              ignoreTemporal);
 
         // Determine whether there was a state change.
         bool didStateChange = false;
@@ -156,9 +158,9 @@ namespace Leap.Unity.Interaction.Internal {
           didStateChange = true;
 
           classifier.coolDownProgress = 0f;
-
           classifier.prevGrabbing = classifier.isGrabbing;
         }
+
         return didStateChange;
       }
     }
@@ -193,6 +195,13 @@ namespace Leap.Unity.Interaction.Internal {
       else {
         numGraspingFingertips = 0;
       }
+    }
+
+    public bool TryGrasp(IInteractionBehaviour intObj, Hand hand) {
+      FixedUpdateClassifierHandState();
+
+      return updateBehaviour(intObj, hand, GraspUpdateMode.BeginGrasp,
+                             ignoreTemporal: true);
     }
 
     protected void FillClassifier(Hand hand, ref GrabClassifierHeuristics.GrabClassifier classifier) {

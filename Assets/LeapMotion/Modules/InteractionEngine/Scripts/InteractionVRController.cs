@@ -22,6 +22,8 @@ namespace Leap.Unity.Interaction {
   [DisallowMultipleComponent]
   public class InteractionVRController : InteractionController {
 
+    #region Inspector
+
     [Header("Controller Configuration")]
 
     [Tooltip("Read-only. InteractionVRControllers use Unity's built-in VRNode tracking "
@@ -92,6 +94,10 @@ namespace Leap.Unity.Interaction {
            + "grasp point.")]
     public float graspTimingSlop = 0.10F;
 
+    #endregion // Inspector
+
+    #region Controller Tracking
+
     private bool _hasTrackedPositionLastFrame = false;
     private Vector3 _trackedPositionLastFrame = Vector3.zero;
     private Quaternion _trackedRotationLastFrame = Quaternion.identity;
@@ -142,6 +148,45 @@ namespace Leap.Unity.Interaction {
       _defaultTrackingProvider = defaultProvider;
     }
 
+    private void refreshControllerTrackingData(Vector3 position, Quaternion rotation) {
+      refreshIsBeingMoved(position, rotation);
+
+      if (_hasTrackedPositionLastFrame) {
+        _trackedPositionLastFrame = this.transform.position;
+        _trackedRotationLastFrame = this.transform.rotation;
+      }
+
+      this.transform.position = position;
+      this.transform.rotation = rotation;
+      refreshContactBoneTargets();
+
+      if (!_hasTrackedPositionLastFrame) {
+        _hasTrackedPositionLastFrame = true;
+        _trackedPositionLastFrame = this.transform.position;
+        _trackedRotationLastFrame = this.transform.rotation;
+      }
+    }
+
+    #endregion
+
+    #region Unity Events
+
+    protected override void Reset() {
+      base.Reset();
+
+      hoverEnabled = true;
+      contactEnabled = true;
+      graspingEnabled = true;
+
+      trackingProvider = _defaultTrackingProvider;
+      _hoverPoint = null;
+      primaryHoverPoints.Clear();
+      graspPoint = null;
+
+      maxGraspDistance = 0.06F;
+      graspTimingSlop = 0.1F;
+    }
+
     protected virtual void OnValidate() {
       _trackingProviderType = trackingProvider.GetType().ToString();
     }
@@ -179,44 +224,13 @@ namespace Leap.Unity.Interaction {
       trackingProvider.OnTrackingDataUpdate += refreshControllerTrackingData;
     }
 
-    protected override void Reset() {
-      base.Reset();
-
-      hoverEnabled = true;
-      contactEnabled = true;
-      graspingEnabled = true;
-
-      trackingProvider = _defaultTrackingProvider;
-      _hoverPoint = null;
-      primaryHoverPoints.Clear();
-      graspPoint = null;
-
-      maxGraspDistance = 0.06F;
-      graspTimingSlop = 0.1F;
-    }
-
     protected override void fixedUpdateController() {
       refreshContactBoneTargets();
     }
 
-    private void refreshControllerTrackingData(Vector3 position, Quaternion rotation) {
-      refreshIsBeingMoved(position, rotation);
+    #endregion
 
-      if (_hasTrackedPositionLastFrame) {
-        _trackedPositionLastFrame = this.transform.position;
-        _trackedRotationLastFrame = this.transform.rotation;
-      }
-
-      this.transform.position = position;
-      this.transform.rotation = rotation;
-      refreshContactBoneTargets();
-
-      if (!_hasTrackedPositionLastFrame) {
-        _hasTrackedPositionLastFrame = true;
-        _trackedPositionLastFrame = this.transform.position;
-        _trackedRotationLastFrame = this.transform.rotation;
-      }
-    }
+    #region Movement Detection
 
     private const float RIG_LOCAL_MOVEMENT_SPEED_THRESHOLD = 00.07F;
     private const float RIG_LOCAL_ROTATION_SPEED_THRESHOLD = 10.00F;
@@ -235,6 +249,8 @@ namespace Leap.Unity.Interaction {
 
       _isBeingMoved = trackingProvider != null && trackingProvider.isTracked && Time.fixedTime - _lastTimeMoved < BEING_MOVED_TIMEOUT;
     }
+
+    #endregion
 
     #region General InteractionController Implementation
 
@@ -557,7 +573,7 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    private void fixedUpdateGraspButtonState() {
+    private void fixedUpdateGraspButtonState(bool ignoreTemporal = false) {
       _graspButtonDown = false;
       _graspButtonUp = false;
 
@@ -611,17 +627,40 @@ namespace Leap.Unity.Interaction {
       if (_graspButtonDownSlopTimer > 0F) {
         _graspButtonDownSlopTimer -= Time.fixedDeltaTime;
       }
-
+      
       _graspButtonLastFrame = graspButton;
     }
 
     protected override bool checkShouldGrasp(out IInteractionBehaviour objectToGrasp) {
       bool shouldGrasp = !isGraspingObject
-                      && (_graspButtonDown || _graspButtonDownSlopTimer > 0F)
-                      && _closestGraspableObject != null;
+                         && (_graspButtonDown || _graspButtonDownSlopTimer > 0F)
+                         && _closestGraspableObject != null;
 
       objectToGrasp = null;
       if (shouldGrasp) { objectToGrasp = _closestGraspableObject; }
+
+      return shouldGrasp;
+    }
+
+    /// <summary>
+    /// If the provided object is within range of this VR controller's grasp point and
+    /// the grasp button is currently held down, this method will manually initiate a
+    /// grasp and return true. Otherwise, the method returns false.
+    /// </summary>
+    protected override bool checkShouldGraspAtemporal(IInteractionBehaviour intObj) {
+      bool shouldGrasp = !isGraspingObject
+                         && _graspButtonLastFrame
+                         && intObj.GetHoverDistance(graspPoint.position) < maxGraspDistance;
+      if (shouldGrasp) {
+        var tempControllers = Pool<List<InteractionController>>.Spawn();
+        try {
+          intObj.BeginGrasp(tempControllers);
+        }
+        finally {
+          tempControllers.Clear();
+          Pool<List<InteractionController>>.Recycle(tempControllers);
+        }
+      }
 
       return shouldGrasp;
     }

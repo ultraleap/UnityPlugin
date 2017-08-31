@@ -25,6 +25,8 @@ namespace Leap.Unity.Interaction {
   [DisallowMultipleComponent]
   public class InteractionHand : InteractionController {
 
+    #region Inspector
+
     [Header("Hand Configuration")]
 
     [Tooltip("Should the data for the underlying Leap hand come from the player's left "
@@ -48,6 +50,10 @@ namespace Leap.Unity.Interaction {
     /// button, but keep in mind you pay distance check costs for each fingertip enabled!
     /// </summary>
     public bool[] enabledPrimaryHoverFingertips = new bool[5] { true, true, true, false, false };
+
+    #endregion
+
+    #region Hand Data
 
     private LeapProvider _leapProvider;
     /// <summary>
@@ -97,6 +103,10 @@ namespace Leap.Unity.Interaction {
     /// Will be null when not tracked, otherwise contains the same data as _handData.
     /// </summary>
     private Hand _hand;
+
+    #endregion
+
+    #region Unity Events
 
     protected override void Reset() {
       base.Reset();
@@ -181,6 +191,8 @@ namespace Leap.Unity.Interaction {
       }
 
     }
+
+    #endregion
 
     #region General InteractionController Implementation
 
@@ -639,6 +651,29 @@ namespace Leap.Unity.Interaction {
       else {
         return leapHand.PalmPosition.ToVector3();
       }
+    }
+
+    /// <summary>
+    /// Attempts to manually initiate a grasp on the argument interaction object. A grasp
+    /// will only begin if a finger and thumb are both in contact with the interaction
+    /// object. If this method successfully initiates a grasp, it will return true,
+    /// otherwise it will return false.
+    /// </summary>
+    protected override bool checkShouldGraspAtemporal(IInteractionBehaviour intObj) {
+      if (grabClassifier.TryGrasp(intObj, leapHand)) {
+        var tempControllers = Pool<List<InteractionController>>.Spawn();
+        try {
+          tempControllers.Add(this);
+          intObj.BeginGrasp(tempControllers);
+          return true;
+        }
+        finally {
+          tempControllers.Clear();
+          Pool<List<InteractionController>>.Recycle(tempControllers);
+        }
+      }
+
+      return false;
     }
 
     protected override void fixedUpdateGraspingState() {

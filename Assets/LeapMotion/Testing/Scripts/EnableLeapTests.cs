@@ -10,9 +10,9 @@
 using System;
 using System.Linq;
 using System.Reflection;
-
 #if UNITY_EDITOR
 using UnityEditor;
+#endif
 
 namespace Leap.Unity.Testing {
 
@@ -21,6 +21,7 @@ namespace Leap.Unity.Testing {
 
   public static class EnableLeapTests {
 
+#if UNITY_EDITOR
     [MenuItem("Assets/Enable Leap Tests")]
     public static void enableTests() {
       var assemblies = AppDomain.CurrentDomain.GetAssemblies();
@@ -38,6 +39,6 @@ namespace Leap.Unity.Testing {
       string defines = PlayerSettings.GetScriptingDefineSymbolsForGroup(EditorUserBuildSettings.selectedBuildTargetGroup);
       PlayerSettings.SetScriptingDefineSymbolsForGroup(EditorUserBuildSettings.selectedBuildTargetGroup, defines + " LEAP_TESTS");
     }
+#endif
   }
 }
-#endif

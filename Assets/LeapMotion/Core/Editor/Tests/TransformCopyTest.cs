@@ -42,12 +42,12 @@ namespace Leap.Unity.Tests {
 
     [Test]
     public void AreBinaryEqual() {
-      assertObjectsEqual(_originalFrame, _frame);
+      assertObjectsEqual("Frame", _originalFrame, _frame);
     }
 
-    private void assertObjectsEqual(object a, object b) {
+    private void assertObjectsEqual(string objectName, object a, object b) {
       if ((a == null) != (b == null)) {
-        Assert.Fail("One object was null an the other was not.");
+        Assert.Fail("For " + objectName + ", one object was null an the other was not.");
         return;
       }
 
@@ -55,11 +55,11 @@ namespace Leap.Unity.Tests {
       Type typeB = b.GetType();
 
       if (typeA != typeB) {
-        Assert.Fail("Type " + typeA + " is not equal to type " + typeB + ".");
+        Assert.Fail("For " + objectName + ", object Type " + typeA + " is not equal to type " + typeB + ".");
       }
 
       if (typeA.IsValueType) {
-        Assert.That(a, Is.EqualTo(b));
+        Assert.That(a, Is.EqualTo(b), objectName);
         return;
       }
 
@@ -67,15 +67,15 @@ namespace Leap.Unity.Tests {
         IList aList = a as IList;
         IList bList = b as IList;
 
-        Assert.That(aList.Count, Is.EqualTo(bList.Count));
+        Assert.That(aList.Count, Is.EqualTo(bList.Count), objectName + ".Count");
 
         for (int i = 0; i < aList.Count; i++) {
-          assertObjectsEqual(aList[i], bList[i]);
+          assertObjectsEqual(objectName + "[" + i + "]", aList[i], bList[i]);
         }
       } else {
         FieldInfo[] fields = typeA.GetFields(BindingFlags.Public | BindingFlags.Instance);
         foreach (FieldInfo field in fields) {
-          assertObjectsEqual(field.GetValue(a), field.GetValue(b));
+          assertObjectsEqual(objectName + "." + field.Name, field.GetValue(a), field.GetValue(b));
         }
 
         PropertyInfo[] properties = typeA.GetProperties(BindingFlags.Public | BindingFlags.Instance);
@@ -87,17 +87,17 @@ namespace Leap.Unity.Tests {
             } catch (Exception exceptionA) {
               try {
                 property.GetValue(b, null);
-                Assert.Fail("One property threw an exception where the other did not.");
+                Assert.Fail("For " + objectName + ", one property threw an exception where the other did not.");
                 return;
               } catch (Exception exceptionB) {
-                Assert.That(exceptionA.GetType(), Is.EqualTo(exceptionB.GetType()), "Both properties threw exceptions but their types were different.");
+                Assert.That(exceptionA.GetType(), Is.EqualTo(exceptionB.GetType()), "For " + objectName + ", both properties threw exceptions but their types were different.");
                 return;
               }
             }
 
             object propB = property.GetValue(b, null);
 
-            assertObjectsEqual(propA, propB);
+            assertObjectsEqual(objectName + "." + property.Name, propA, propB);
           }
         }
       }
@@ -120,13 +120,13 @@ namespace Leap.Unity.Tests {
         Hand oldHand = _originalFrame.Hands[i];
         Hand newHand = _frame.Hands[i];
 
-        assertVectorsEqual(oldHand.PalmPosition + translation, newHand.PalmPosition);
+        assertVectorsEqual(oldHand.PalmPosition + translation, newHand.PalmPosition, "Palm Position");
 
         for (int j = 0; j < 5; j++) {
           Finger oldFinger = oldHand.Fingers[j];
           Finger newFinger = newHand.Fingers[j];
 
-          assertVectorsEqual(oldFinger.TipPosition + translation, newFinger.TipPosition);
+          assertVectorsEqual(oldFinger.TipPosition + translation, newFinger.TipPosition, oldFinger.Type.ToString());
         }
       }
     }
