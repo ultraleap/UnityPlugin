@@ -132,13 +132,15 @@ namespace Leap.Unity.Recording {
 
       //Try to generate a leap recording if we have leap data
       RecordingTrack recordingTrack = null;
-      LeapRecording leapRecording = ScriptableObject.CreateInstance(_leapRecordingType)
-                                      as LeapRecording;
-      if (leapRecording != null) {
-        leapRecording.LoadFrames(leapData);
-      } else {
-        Debug.LogError("Unable to create Leap recording: Invalid type specification for "
-                     + "LeapRecording implementation.", this);
+      LeapRecording leapRecording = null;
+      if (leapData.Count > 0) {
+        leapRecording = ScriptableObject.CreateInstance(_leapRecordingType) as LeapRecording;
+        if (leapRecording != null) {
+          leapRecording.LoadFrames(leapData);
+        } else {
+          Debug.LogError("Unable to create Leap recording: Invalid type specification for "
+                       + "LeapRecording implementation.", this);
+        }
       }
 
       string assetPath = Path.Combine(assetFolder.Path, recordingName + ".asset");
