@@ -176,12 +176,14 @@ namespace Leap.Unity.Recording {
 
       //Destroy existing provider
       var provider = gameObject.GetComponentInChildren<LeapProvider>();
-      GameObject providerObj = provider.gameObject;
-      DestroyImmediate(provider);
-      //If a leap recording track exists, spawn a playable provider and link it to the track
-      if (recordingTrack != null) {
-        var playableProvider = providerObj.AddComponent<LeapPlayableProvider>();
-        director.SetGenericBinding(recordingTrack.outputs.Query().First().sourceObject, playableProvider);
+      if (provider != null) {
+        GameObject providerObj = provider.gameObject;
+        DestroyImmediate(provider);
+        //If a leap recording track exists, spawn a playable provider and link it to the track
+        if (recordingTrack != null) {
+          var playableProvider = providerObj.AddComponent<LeapPlayableProvider>();
+          director.SetGenericBinding(recordingTrack.outputs.Query().First().sourceObject, playableProvider);
+        }
       }
 
       buildAudioTracks(progress, director, timeline);
