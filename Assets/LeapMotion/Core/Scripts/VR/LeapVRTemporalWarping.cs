@@ -424,7 +424,7 @@ namespace Leap.Unity {
       transform.position = Vector3.Lerp(currCenterPos, pastCenterPos, _tweenPositionalWarping);
       transform.rotation = Quaternion.Slerp(currCenterRot, pastCenterRot, _tweenRotationalWarping);
 
-      transform.position += transform.forward * _deviceInfo.forwardOffset;
+      transform.position += transform.forward * deviceOffsetZAxis;
     }
 
     /* Returns the VR Center Eye Transform information interpolated to the given leap timestamp.  If the desired
