@@ -281,10 +281,6 @@ namespace Leap.Unity {
         _trackingAnchor = _headTransform.parent;
       }
 #endif
-
-      deviceOffsetYAxis = _deviceOffsetYAxis;
-      deviceOffsetZAxis = _deviceOffsetZAxis;
-      deviceTiltXAxis = _deviceTiltXAxis;
     }
 
     protected void OnEnable() {
