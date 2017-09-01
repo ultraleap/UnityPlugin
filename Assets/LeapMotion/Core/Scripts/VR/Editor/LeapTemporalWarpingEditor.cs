@@ -24,9 +24,9 @@ namespace Leap.Unity {
                                 "lessRewind");
 
       specifyConditionalDrawing("allowManualDeviceOffset",
-                                "deviceOffsetYaxis",
-                                "deviceOffsetZaxis",
-                                "deviceTiltXaxis");
+                                "_deviceOffsetYAxis",
+                                "_deviceOffsetZAxis",
+                                "_deviceTiltXAxis");
 
       specifyCustomDecorator("provider", warningDecorator);
     }

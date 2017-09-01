@@ -115,25 +115,29 @@ namespace Leap.Unity {
     private KeyCode lessRewind = KeyCode.RightArrow;
 
     // Manual Device Offset
-    [Tooltip("Allow manual adjustment of the Leap device's virtual offset and tilt.  These settings can be used to match the physical position and orientation of the Leap Motion sensor")]
+    [Tooltip("Allow manual adjustment of the Leap device's virtual offset and tilt. These "
+           + "settings can be used to match the physical position and orientation of the "
+           + "Leap Motion sensor on a tracked device it is mounted on (such as a VR "
+           + "headset.)")]
     [SerializeField]
     private bool allowManualDeviceOffset;
 
-    [Tooltip("Adjusts the Leap Motion device's virtual height offset.")]
+    [Tooltip("Adjusts the Leap Motion device's virtual height offset from the tracked "
+           + "headset position.")]
     [SerializeField]
     [Range(-0.5F, 0.5F)]
-    private float deviceOffsetYaxis;
+    private float _deviceOffsetYAxis = 0f; // Default: 0 cm.
 
-    [Tooltip("Adjusts the Leap Motion device's virtual depth offset.")]
+    [Tooltip("Adjusts the Leap Motion device's virtual depth offset from the tracked "
+           + "headset position.")]
     [SerializeField]
     [Range(-0.5F, 0.5F)]
-    private float deviceOffsetZaxis;
-    private Vector3 deviceOffset;
+    private float _deviceOffsetZAxis = 0.12f; // Default: 12 cm.
 
     [Tooltip("Adjusts the Leap Motion device's virtual X axis tilt.")]
     [SerializeField]
     [Range(-90.0F, 90.0F)]
-    private float deviceTiltXaxis;
+    private float _deviceTiltXAxis = 5f; // Default: 5 deg.
 
     public float TweenImageWarping {
       get {
@@ -177,35 +181,33 @@ namespace Leap.Unity {
       }
     }
 
-    public float DeviceOffsetYaxis {
+    public float deviceOffsetYAxis {
       get {
-        return deviceOffsetYaxis;
+        return _deviceOffsetYAxis;
       }
 
       set {
-        deviceOffsetYaxis = value;
-        deviceOffset.y = value;
+        _deviceOffsetYAxis = value;
       }
     }
 
-    public float DeviceOffsetZaxis {
+    public float deviceOffsetZAxis {
       get {
-        return deviceOffsetZaxis;
+        return _deviceOffsetZAxis;
       }
 
       set {
-        deviceOffsetZaxis = value;
-        deviceOffset.z = value;
+        _deviceOffsetZAxis = value;
       }
     }
 
-    public float DeviceTiltXaxis {
+    public float deviceTiltXAxis {
       get {
-        return deviceTiltXaxis;
+        return _deviceTiltXAxis;
       }
 
       set {
-        deviceTiltXaxis = value;
+        _deviceTiltXAxis = value;
       }
     }
 
@@ -218,23 +220,33 @@ namespace Leap.Unity {
     /// Provides the position of a Leap Anchor at a given Leap Time.  Cannot extrapolate.
     /// </summary>
     public bool TryGetWarpedTransform(WarpedAnchor anchor, out Vector3 rewoundPosition, out Quaternion rewoundRotation, long leapTime) {
+      // Operation is only valid if we have a head transform.
       if (_headTransform == null) {
         rewoundPosition = Vector3.one;
         rewoundRotation = Quaternion.identity;
         return false;
       }
 
+      // Prepare past transform data.
       TransformData past = transformAtTime((leapTime - warpingAdjustment * 1000) + (syncMode == SyncMode.SYNC_WITH_IMAGES ? 20000 : 0));
 
-      // Rewind position and rotation
+      // Prepare device offset parameters.
+      Quaternion deviceTilt   = Quaternion.Euler(deviceTiltXAxis, 0f, 0f);
+      Vector3    deviceOffset = new Vector3(0f, deviceOffsetYAxis, deviceOffsetZAxis);
+
+      // TODO: We no longer use deviceInfo.forwardOffset. We should consider removing it
+      // entirely or more approrpriately when we collapse the rig hierarchy. 9/1/17
+
+      // Rewind position and rotation.
       if (_trackingAnchor == null) {
-        rewoundRotation = past.localRotation * Quaternion.Euler(DeviceTiltXaxis, 0f, 0f);
+        rewoundRotation = past.localRotation * deviceTilt;
         rewoundPosition = past.localPosition + rewoundRotation * deviceOffset;
       } else {
-        rewoundRotation = _trackingAnchor.rotation * past.localRotation * Quaternion.Euler(DeviceTiltXaxis, 0f, 0f);
+        rewoundRotation = _trackingAnchor.rotation * past.localRotation * deviceTilt;
         rewoundPosition = _trackingAnchor.TransformPoint(past.localPosition) + rewoundRotation * deviceOffset;
       }
 
+      // Move position if we are left-eye-only or right-eye-only.
       switch (anchor) {
         case WarpedAnchor.CENTER:
           break;
@@ -242,7 +254,7 @@ namespace Leap.Unity {
           rewoundPosition += rewoundRotation * Vector3.left * deviceInfo.baseline * 0.5f;
           break;
         case WarpedAnchor.RIGHT:
-          rewoundPosition += rewoundRotation * Vector3.right * deviceInfo.baseline * 0.5F;
+          rewoundPosition += rewoundRotation * Vector3.right * deviceInfo.baseline * 0.5f;
           break;
         default:
           throw new Exception("Unexpected Rewind Type " + anchor);
@@ -293,9 +305,9 @@ namespace Leap.Unity {
         _trackingAnchor = _headTransform.parent;
       }
 
-      DeviceOffsetYaxis = deviceOffsetYaxis;
-      DeviceOffsetZaxis = deviceOffsetZaxis;
-      DeviceTiltXaxis = deviceTiltXaxis;
+      deviceOffsetYAxis = _deviceOffsetYAxis;
+      deviceOffsetZAxis = _deviceOffsetZAxis;
+      deviceTiltXAxis = _deviceTiltXAxis;
   }
 #endif
 
@@ -344,7 +356,7 @@ namespace Leap.Unity {
 
     protected void Update() {
       if (_shouldSetLocalPosition) {
-        transform.localPosition = transform.forward * deviceInfo.focalPlaneOffset;
+        transform.localPosition = transform.forward * deviceInfo.forwardOffset;
         _shouldSetLocalPosition = false;
       }
 
@@ -436,7 +448,7 @@ namespace Leap.Unity {
       transform.position = Vector3.Lerp(currCenterPos, pastCenterPos, tweenPositionalWarping);
       transform.rotation = Quaternion.Slerp(currCenterRot, pastCenterRot, tweenRotationalWarping);
 
-      transform.position += transform.forward * deviceInfo.focalPlaneOffset;
+      transform.position += transform.forward * deviceInfo.forwardOffset;
     }
 
     /* Returns the VR Center Eye Transform information interpolated to the given leap timestamp.  If the desired
