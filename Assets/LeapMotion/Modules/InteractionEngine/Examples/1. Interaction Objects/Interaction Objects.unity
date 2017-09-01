@@ -9678,10 +9678,10 @@ MonoBehaviour:
   unlockHold: 0
   moreRewind: 276
   lessRewind: 275
-  allowManualDeviceOffset: 1
-  deviceOffsetYaxis: 0
-  deviceOffsetZaxis: 0.13
-  deviceTiltXaxis: 4
+  allowManualDeviceOffset: 0
+  _deviceOffsetYAxis: 0
+  _deviceOffsetZAxis: 0.12
+  _deviceTiltXAxis: 5
 --- !u!1 &2145183717
 GameObject:
   m_ObjectHideFlags: 0
