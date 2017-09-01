@@ -12,6 +12,7 @@ using UnityEngine.VR;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Leap.Unity.Attributes;
 
 namespace Leap.Unity {
 
@@ -121,18 +122,32 @@ namespace Leap.Unity {
     private KeyCode _lessRewind = KeyCode.RightArrow;
 
     // Manual Device Offset
+    private const float DEFAULT_DEVICE_OFFSET_Y_AXIS = 0f;
+    private const float DEFAULT_DEVICE_OFFSET_Z_AXIS = 0.12f;
+    private const float DEFAULT_DEVICE_TILT_X_AXIS = 5f;
     [Tooltip("Allow manual adjustment of the Leap device's virtual offset and tilt. These "
            + "settings can be used to match the physical position and orientation of the "
            + "Leap Motion sensor on a tracked device it is mounted on (such as a VR "
            + "headset.)")]
-    [SerializeField]
+    [SerializeField, OnEditorChange("allowManualDeviceOffset")]
     private bool _allowManualDeviceOffset;
+    public bool allowManualDeviceOffset {
+      get { return _allowManualDeviceOffset; }
+      set {
+        _allowManualDeviceOffset = value;
+        if (!_allowManualDeviceOffset) {
+          deviceOffsetYAxis = DEFAULT_DEVICE_OFFSET_Y_AXIS;
+          deviceOffsetZAxis = DEFAULT_DEVICE_OFFSET_Z_AXIS;
+          deviceTiltXAxis = DEFAULT_DEVICE_TILT_X_AXIS;
+        }
+      }
+    }
 
     [Tooltip("Adjusts the Leap Motion device's virtual height offset from the tracked "
            + "headset position.")]
     [SerializeField]
     [Range(-0.5F, 0.5F)]
-    private float _deviceOffsetYAxis = 0f; // Default: 0 cm.
+    private float _deviceOffsetYAxis = DEFAULT_DEVICE_OFFSET_Y_AXIS;
     public float deviceOffsetYAxis {
       get {
         return _deviceOffsetYAxis;
@@ -146,7 +161,7 @@ namespace Leap.Unity {
            + "headset position.")]
     [SerializeField]
     [Range(-0.5F, 0.5F)]
-    private float _deviceOffsetZAxis = 0.12f; // Default: 12 cm.
+    private float _deviceOffsetZAxis = DEFAULT_DEVICE_OFFSET_Z_AXIS;
     public float deviceOffsetZAxis {
       get {
         return _deviceOffsetZAxis;
@@ -159,7 +174,7 @@ namespace Leap.Unity {
     [Tooltip("Adjusts the Leap Motion device's virtual X axis tilt.")]
     [SerializeField]
     [Range(-90.0F, 90.0F)]
-    private float _deviceTiltXAxis = 5f; // Default: 5 deg.
+    private float _deviceTiltXAxis = DEFAULT_DEVICE_TILT_X_AXIS;
     public float deviceTiltXAxis {
       get {
         return _deviceTiltXAxis;

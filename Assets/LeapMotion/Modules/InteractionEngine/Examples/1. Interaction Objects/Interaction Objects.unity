@@ -9667,18 +9667,18 @@ MonoBehaviour:
   provider: {fileID: 129172185}
   _headTransform: {fileID: 922779606}
   _trackingAnchor: {fileID: 1155409170}
-  recenter: 114
-  tweenImageWarping: 1
-  tweenRotationalWarping: 1
-  tweenPositionalWarping: 1
-  syncMode: 1
-  forceCustomUpdate: 0
-  allowManualTimeAlignment: 1
-  warpingAdjustment: 30
-  unlockHold: 0
-  moreRewind: 276
-  lessRewind: 275
-  allowManualDeviceOffset: 0
+  _recenter: 114
+  _tweenImageWarping: 0
+  _tweenRotationalWarping: 0
+  _tweenPositionalWarping: 0
+  _syncMode: 1
+  _forceCustomUpdate: 0
+  _allowManualTimeAlignment: 0
+  _warpingAdjustment: 60
+  _unlockHold: 303
+  _moreRewind: 276
+  _lessRewind: 275
+  _allowManualDeviceOffset: 0
   _deviceOffsetYAxis: 0
   _deviceOffsetZAxis: 0.12
   _deviceTiltXAxis: 5
