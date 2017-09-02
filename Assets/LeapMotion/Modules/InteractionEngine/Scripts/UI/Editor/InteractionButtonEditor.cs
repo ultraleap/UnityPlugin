@@ -56,6 +56,10 @@ namespace Leap.Unity.Interaction {
         }
       }
 
+      EditorGUILayout.EndHorizontal();
+
+      EditorGUILayout.BeginHorizontal();
+
       if (!isRoot) {
         bool isUniform = (button.transform.parent.lossyScale.x.NearlyEquals(button.transform.parent.lossyScale.y) &&
                           button.transform.parent.lossyScale.y.NearlyEquals(button.transform.parent.lossyScale.z) &&
