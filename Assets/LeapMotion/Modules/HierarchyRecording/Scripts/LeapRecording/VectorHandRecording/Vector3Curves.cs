@@ -41,6 +41,7 @@ namespace Leap.Unity.Recording {
                          zCurve.Evaluate(time));
     }
 
+#if UNITY_EDITOR
     /// <summary>
     /// Compresses these Vector3Curves using AnimationCurveUtil.CompressPositions.
     /// </summary>
@@ -53,7 +54,7 @@ namespace Leap.Unity.Recording {
       yCurve = outYCurve;
       zCurve = outZCurve;
     }
-
+#endif
   }
 
 }
