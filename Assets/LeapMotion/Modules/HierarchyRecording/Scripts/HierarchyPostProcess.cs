@@ -4,7 +4,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Playables;
 using UnityEngine.Timeline;
+#if UNITY_EDITOR
 using UnityEditor;
+#endif
 using Leap.Unity.Query;
 using Leap.Unity.Attributes;
 using Leap.Unity.GraphicalRenderer;
@@ -59,6 +61,7 @@ namespace Leap.Unity.Recording {
     [Tooltip("Deletes all transforms that have the identity transformation.")]
     public bool collapseIdentityTransforms = true;
 
+#if UNITY_EDITOR
     public void ClearComponents() {
       Transform[] transforms = GetComponentsInChildren<Transform>(includeInactive: true);
 
@@ -133,8 +136,7 @@ namespace Leap.Unity.Recording {
                                       as LeapRecording;
       if (leapRecording != null) {
         leapRecording.LoadFrames(leapData);
-      }
-      else {
+      } else {
         Debug.LogError("Unable to create Leap recording: Invalid type specification for "
                      + "LeapRecording implementation.", this);
       }
@@ -174,12 +176,14 @@ namespace Leap.Unity.Recording {
 
       //Destroy existing provider
       var provider = gameObject.GetComponentInChildren<LeapProvider>();
-      GameObject providerObj = provider.gameObject;
-      DestroyImmediate(provider);
-      //If a leap recording track exists, spawn a playable provider and link it to the track
-      if (recordingTrack != null) {
-        var playableProvider = providerObj.AddComponent<LeapPlayableProvider>();
-        director.SetGenericBinding(recordingTrack.outputs.Query().First().sourceObject, playableProvider);
+      if (provider != null) {
+        GameObject providerObj = provider.gameObject;
+        DestroyImmediate(provider);
+        //If a leap recording track exists, spawn a playable provider and link it to the track
+        if (recordingTrack != null) {
+          var playableProvider = providerObj.AddComponent<LeapPlayableProvider>();
+          director.SetGenericBinding(recordingTrack.outputs.Query().First().sourceObject, playableProvider);
+        }
       }
 
       buildAudioTracks(progress, director, timeline);
@@ -481,6 +485,6 @@ namespace Leap.Unity.Recording {
 
       return propertyToMaxError;
     }
+#endif
   }
-
 }

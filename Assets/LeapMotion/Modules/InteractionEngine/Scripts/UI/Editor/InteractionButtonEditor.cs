@@ -55,6 +55,20 @@ namespace Leap.Unity.Interaction {
           Undo.SetTransformParent(button.transform, buttonBaseTransform.transform, "Child " + button.gameObject.name + " to its Base");
         }
       }
+
+      EditorGUILayout.EndHorizontal();
+
+      EditorGUILayout.BeginHorizontal();
+
+      if (!isRoot) {
+        bool isUniform = (button.transform.parent.lossyScale.x.NearlyEquals(button.transform.parent.lossyScale.y) &&
+                          button.transform.parent.lossyScale.y.NearlyEquals(button.transform.parent.lossyScale.z) &&
+                          button.transform.parent.lossyScale.x.NearlyEquals(button.transform.parent.lossyScale.z));
+        if (!isUniform) {
+          EditorGUILayout.HelpBox("This button exists within a non-uniformly scaled space!  Please check the parent transforms for non-uniform scale...", MessageType.Warning);
+        }
+      }
+
       EditorGUILayout.EndHorizontal();
 
       Rigidbody currentBody = button.GetComponent<Rigidbody>();

@@ -8,31 +8,57 @@
  ******************************************************************************/
 
 using UnityEngine;
-using System.Collections;
 
 namespace Leap.Unity{
   
   /// <summary>
   /// Leap device info struct.
   /// </summary>
-  /// <remarks>
-  /// Default values are for Leap peripheral.
-  /// </remarks>
   public struct LeapDeviceInfo {
+
     public bool isEmbedded;
-    // TODO: Is head mounted
-    public float baseline; //(meters) Distance between focal points of cameras
-    public float focalPlaneOffset; //(meters) Distance from mount center to focal plane of cameras
-    public float horizontalViewAngle; //(degrees) Field of view angle in parallel to baseline axis
-    public float verticalViewAngle; //(degrees) Field of view angle perpendicular to baseline axis
-    public float trackingRange; //(degrees) Maximum radius for reliable tracking
-    public string serialID; //Device alphanumeric unique hardware ID
+
+    /// <summary>
+    /// Distance between focal points of cameras in meters.
+    /// </summary>
+    public float baseline;
+  
+
+    // TODO: LeapDeviceInfo.forwardOffset is no longer used for Temporal Warping as
+    // of 9/1/17. To be removed / refactored as part of the Collapsing the Rig Hierarchy.
+
+    /// <summary>
+    /// The distance on the camera-facing axis from the tracked headset position to the
+    /// focal point of the Leap cameras. In Leap space, cameras face upward, Vector3.up!
+    /// </summary>
+    public float forwardOffset;
+
+    /// <summary>
+    /// The field of view in degrees along the baseline axis.
+    /// </summary>
+    public float horizontalViewAngle;
+
+    /// <summary>
+    /// The field of view in degress perpendicular to the baseline axis.
+    /// </summary>
+    public float verticalViewAngle;
+
+    /// <summary>
+    /// The maximum radius for reliable tracking in meters.
+    /// </summary>
+    public float trackingRange;
+
+    /// <summary>
+    /// A unique alphanumeric device hardware ID.
+    /// </summary>
+    public string serialID;
     
     public static LeapDeviceInfo GetLeapDeviceInfo() {
+
       LeapDeviceInfo deviceInfo;
       deviceInfo.isEmbedded = false;
       deviceInfo.baseline = 0.04f;
-      deviceInfo.focalPlaneOffset = 0.10F;
+      deviceInfo.forwardOffset = 0.12F;
       deviceInfo.horizontalViewAngle = 2.303835f * Mathf.Rad2Deg;
       deviceInfo.verticalViewAngle = 2.007129f * Mathf.Rad2Deg;
       deviceInfo.trackingRange = 470f / 1000f;

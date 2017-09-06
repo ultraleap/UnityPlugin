@@ -5,7 +5,7 @@ namespace Leap.Unity.Recording {
 
   public class RawLeapRecording : LeapRecording {
 
-    public List<Frame> frameList;
+    public List<Frame> frameList = new List<Frame>();
 
     public long EarliestTimestamp {
       get {
