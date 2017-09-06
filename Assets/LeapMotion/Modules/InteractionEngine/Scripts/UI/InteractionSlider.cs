@@ -11,7 +11,6 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Serialization;
 using Leap.Unity.Attributes;
-using System.Collections.Generic;
 using System;
 
 namespace Leap.Unity.Interaction {
@@ -45,7 +44,32 @@ namespace Leap.Unity.Interaction {
     public float defaultHorizontalValue;
 
     [Tooltip("The minimum and maximum values that the slider reports on the horizontal axis.")]
-    public Vector2 horizontalValueRange = new Vector2(0f, 1f);
+    [FormerlySerializedAs("horizontalValueRange")]
+    [SerializeField]
+    private Vector2 _horizontalValueRange = new Vector2(0f, 1f);
+    public float minHorizontalValue {
+      get {
+        return _horizontalValueRange.x;
+      }
+      set {
+        if (value != _horizontalValueRange.x) {
+          _horizontalValueRange.x = value;
+          HorizontalSlideEvent(HorizontalSliderValue);
+        }
+      }
+    }
+
+    public float maxHorizontalValue {
+      get {
+        return _horizontalValueRange.y;
+      }
+      set {
+        if (value != _horizontalValueRange.y) {
+          _horizontalValueRange.y = value;
+          HorizontalSlideEvent(HorizontalSliderValue);
+        }
+      }
+    }
 
     [Tooltip("The minimum and maximum horizontal extents that the slider can slide to in world space.")]
     [MinMax(-0.5f, 0.5f)]
@@ -68,7 +92,32 @@ namespace Leap.Unity.Interaction {
     public float defaultVerticalValue;
 
     [Tooltip("The minimum and maximum values that the slider reports on the horizontal axis.")]
-    public Vector2 verticalValueRange = new Vector2(0f, 1f);
+    [FormerlySerializedAs("verticalValueRange")]
+    [SerializeField]
+    private Vector2 _verticalValueRange = new Vector2(0f, 1f);
+    public float minVerticalValue {
+      get {
+        return _verticalValueRange.x;
+      }
+      set {
+        if (value != _verticalValueRange.x) {
+          _verticalValueRange.x = value;
+          VerticalSlideEvent(VerticalSliderValue);
+        }
+      }
+    }
+
+    public float maxVerticalValue {
+      get {
+        return _verticalValueRange.y;
+      }
+      set {
+        if (value != _verticalValueRange.y) {
+          _verticalValueRange.y = value;
+          VerticalSlideEvent(VerticalSliderValue);
+        }
+      }
+    }
 
     [MinMax(-0.5f, 0.5f)]
     [Tooltip("The minimum and maximum vertical extents that the slider can slide to in world space.")]
@@ -125,20 +174,20 @@ namespace Leap.Unity.Interaction {
     ///<summary> This slider's horizontal slider value, mapped between the values in the HorizontalValueRange. </summary>
     public float HorizontalSliderValue {
       get {
-        return Mathf.Lerp(horizontalValueRange.x, horizontalValueRange.y, _horizontalSliderPercent);
+        return Mathf.Lerp(_horizontalValueRange.x, _horizontalValueRange.y, _horizontalSliderPercent);
       }
       set {
-        HorizontalSliderPercent = Mathf.InverseLerp(horizontalValueRange.x, horizontalValueRange.y, value);
+        HorizontalSliderPercent = Mathf.InverseLerp(_horizontalValueRange.x, _horizontalValueRange.y, value);
       }
     }
 
     ///<summary> This slider's current vertical slider value, mapped between the values in the VerticalValueRange. </summary>
     public float VerticalSliderValue {
       get {
-        return Mathf.Lerp(verticalValueRange.x, verticalValueRange.y, _verticalSliderPercent);
+        return Mathf.Lerp(_verticalValueRange.x, _verticalValueRange.y, _verticalSliderPercent);
       }
       set {
-        VerticalSliderPercent = Mathf.InverseLerp(verticalValueRange.x, verticalValueRange.y, value);
+        VerticalSliderPercent = Mathf.InverseLerp(_verticalValueRange.x, _verticalValueRange.y, value);
       }
     }
 
@@ -292,7 +341,7 @@ namespace Leap.Unity.Interaction {
     /// </summary>
     public int horizontalStepValue {
       get {
-        float range = horizontalValueRange.y - horizontalValueRange.x;
+        float range = _horizontalValueRange.y - _horizontalValueRange.x;
         if (range == 0F) return 0;
         else {
           return (int)(_horizontalSliderPercent * horizontalSteps * 1.001F);
