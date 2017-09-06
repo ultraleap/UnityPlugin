@@ -1,6 +1,8 @@
 using System;
 using UnityEngine;
+#if UNITY_EDITOR
 using UnityEditor;
+#endif
 using Leap.Unity.Query;
 
 namespace Leap.Unity {
@@ -29,6 +31,7 @@ namespace Leap.Unity {
       return true;
     }
 
+#if UNITY_EDITOR
     public static AnimationCurve Compress(AnimationCurve curve, float maxDelta = 0.005f, int checkSteps = 8) {
       var curveArray = new AnimationCurve[] { curve };
 
@@ -257,18 +260,22 @@ namespace Leap.Unity {
 
       return compressedCurves;
     }
-    
+#endif
+
     public static void AddBooleanKey(this AnimationCurve curve, float time, bool value) {
       var keyframe = new Keyframe() { time = time, value = value ? 1 : 0 };
-      int keyframeIdx = curve.AddKey(keyframe);
 
+#if UNITY_EDITOR
+      int keyframeIdx = curve.AddKey(keyframe);
       AnimationUtility.SetKeyBroken(curve, keyframeIdx, true);
       AnimationUtility.SetKeyLeftTangentMode(curve, keyframeIdx,
                                              AnimationUtility.TangentMode.Constant);
       AnimationUtility.SetKeyRightTangentMode(curve, keyframeIdx,
                                              AnimationUtility.TangentMode.Constant);
+#else
+      curve.AddKey(keyframe);
+#endif
     }
-
   }
 
 
