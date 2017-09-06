@@ -30,6 +30,7 @@ namespace Leap.Unity.Recording {
       rightHandCurves.AddKeyframes(keyframeTime, rightHand);
     }
 
+#if UNITY_EDITOR
     /// <summary>
     /// Processes all of the current keyframe data and compresses them using
     /// AnimationCurveUtil.
@@ -38,6 +39,7 @@ namespace Leap.Unity.Recording {
       leftHandCurves .Compress();
       rightHandCurves.Compress();
     }
+#endif
 
     /// <summary>
     /// Samples the data in these VectorFrameCurves at the specified time into the

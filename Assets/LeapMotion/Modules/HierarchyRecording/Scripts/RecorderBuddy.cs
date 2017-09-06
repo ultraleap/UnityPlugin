@@ -8,8 +8,9 @@ public class RecorderBuddy : MonoBehaviour {
   public float recordingDuration = 1f;
   public KeyCode recordButton = KeyCode.Space;
 
-  private float _curDuration = 0f;
+  protected float _curDuration = 0f;
 
+#if UNITY_EDITOR
   void Reset() {
     if (recorder == null) {
       recorder = GetComponent<HierarchyRecorder>();
@@ -29,5 +30,5 @@ public class RecorderBuddy : MonoBehaviour {
       _curDuration += Time.deltaTime;
     }
   }
-
+#endif
 }

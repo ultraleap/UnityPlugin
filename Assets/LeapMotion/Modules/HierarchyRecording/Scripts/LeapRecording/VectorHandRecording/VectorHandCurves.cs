@@ -1,5 +1,4 @@
-﻿using UnityEditor;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Leap.Unity.Recording {
 
@@ -57,6 +56,7 @@ namespace Leap.Unity.Recording {
     /// </summary>
     public void AddKeyframes(float time, Hand hand) {
       bool isTracked = hand != null;
+      
       isTrackedCurve.AddBooleanKey(time, isTracked);
 
       if (isTracked) {
@@ -77,6 +77,7 @@ namespace Leap.Unity.Recording {
       }
     }
 
+#if UNITY_EDITOR
     /// <summary>
     /// Compresses the AnimationCurve data currently held in these VectorHandCurves.
     /// </summary>
@@ -90,6 +91,7 @@ namespace Leap.Unity.Recording {
         jointPositionCurves[i].Compress(maxDistanceError: 0.001f);
       }
     }
+#endif
 
     /// <summary>
     /// Samples hand curve data into the provided hand object at the specified time.

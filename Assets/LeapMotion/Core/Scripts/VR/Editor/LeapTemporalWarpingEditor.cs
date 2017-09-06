@@ -17,11 +17,16 @@ namespace Leap.Unity {
     protected override void OnEnable() {
       base.OnEnable();
 
-      specifyConditionalDrawing("allowManualTimeAlignment",
-                                "warpingAdjustment",
-                                "unlockHold",
-                                "moreRewind",
-                                "lessRewind");
+      specifyConditionalDrawing("_allowManualTimeAlignment",
+                                "_warpingAdjustment",
+                                "_unlockHold",
+                                "_moreRewind",
+                                "_lessRewind");
+
+      specifyConditionalDrawing("_allowManualDeviceOffset",
+                                "_deviceOffsetYAxis",
+                                "_deviceOffsetZAxis",
+                                "_deviceTiltXAxis");
 
       specifyCustomDecorator("provider", warningDecorator);
     }
