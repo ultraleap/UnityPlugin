@@ -7,6 +7,8 @@
  * between Leap Motion and you, your company or other organization.           *
  ******************************************************************************/
 
+using System;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace Leap.Unity.Query {
@@ -55,7 +57,7 @@ namespace Leap.Unity.Query {
       return new Enumerator(_op);
     }
 
-    public struct Enumerator {
+    public struct Enumerator : IEnumerator<QueryType> {
       private QueryOp _op;
       private QueryType _current;
 
@@ -68,9 +70,24 @@ namespace Leap.Unity.Query {
         return _op.TryGetNext(out _current);
       }
 
+      public void Reset() {
+        _op.Reset();
+        _current = default(QueryType);
+      }
+
+      public void Dispose() {
+        _op.Reset();
+      }
+
       public QueryType Current {
         get {
           return _current;
+        }
+      }
+
+      object IEnumerator.Current {
+        get {
+          throw new NotImplementedException();
         }
       }
     }
@@ -114,6 +131,15 @@ namespace Leap.Unity.Query {
     /// </summary>
     public static QueryWrapper<T, ListQueryOp<T>> Query<T>(this IList<T> list) {
       return new QueryWrapper<T, ListQueryOp<T>>(new ListQueryOp<T>(list));
+    }
+
+    /// <summary>
+    /// Converts a two dimensional array into a query operation, and returns a query
+    /// wrapper that wraps this new operation. Elements are traversed in row-major
+    /// (C-style) order.
+    /// </summary>
+    public static QueryWrapper<T, Array2DQueryOp<T>> Query<T>(this T[,] array) {
+      return new QueryWrapper<T, Array2DQueryOp<T>>(new Array2DQueryOp<T>(array));
     }
 
     /// <summary>
@@ -200,6 +226,40 @@ namespace Leap.Unity.Query {
       }
     }
 
+    public struct Array2DQueryOp<T> : IQueryOp<T> {
+      private T[,] _array;
+      private int _numCols, _numRows;
+      private int _colIdx, _rowIdx;
+
+      public Array2DQueryOp(T[,] array) {
+        _array = array;
+        _numRows = array.GetLength(0);
+        _numCols = array.GetLength(1);
+        _rowIdx = 0;
+        _colIdx = 0;
+      }
+
+      public bool TryGetNext(out T t) {
+        if (_rowIdx >= _numRows) {
+          t = default(T);
+          return false;
+        }
+
+        t = _array[_rowIdx, _colIdx]; // C-style, row-major (C# standard)
+        _colIdx++;
+        if (_colIdx >= _numCols) {
+          _colIdx = 0;
+          _rowIdx++;
+        }
+        return true;
+      }
+
+      public void Reset() {
+        _rowIdx = 0;
+        _colIdx = 0;
+      }
+    }
+
     public struct ReadonlyListQueryOp<T> : IQueryOp<T> {
       private ReadonlyList<T> _list;
       private int _index;
@@ -213,8 +273,7 @@ namespace Leap.Unity.Query {
         if (_index >= _list.Count) {
           t = default(T);
           return false;
-        }
-        else {
+        } else {
           t = _list[_index++];
           return true;
         }

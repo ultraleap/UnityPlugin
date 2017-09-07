@@ -7,12 +7,10 @@
  * between Leap Motion and you, your company or other organization.           *
  ******************************************************************************/
 
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace Leap.Unity.Examples {
-  
+
   [AddComponentMenu("")]
   public class LinearSpeedTextBehaviour : MonoBehaviour {
 
@@ -27,7 +25,5 @@ namespace Leap.Unity.Examples {
     void Update() {
       textMesh.text = linearSpeedPrefixText + ship.shipAlignedVelocity.magnitude.ToString("G3") + linearSpeedPostfixText;
     }
-
   }
-
 }

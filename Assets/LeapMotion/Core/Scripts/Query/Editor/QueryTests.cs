@@ -34,6 +34,25 @@ namespace Leap.Unity.Query.Test {
     }
 
     [Test]
+    public void Array2DTest() {
+      const int WIDTH = 23;
+      const int HEIGHT = 17;
+
+      int[,] array = new int[WIDTH, HEIGHT];
+      int counter = 0;
+      for (int i = 0; i < WIDTH; i++) {
+        for (int j = 0; j < HEIGHT; j++) {
+          array[i, j] = counter++;
+        }
+      }
+
+      Assert.That(array.Query().Count(), Is.EqualTo(WIDTH * HEIGHT));
+      foreach (var value in Enumerable.Range(0, WIDTH * HEIGHT)) {
+        Assert.That(array.Query().Contains(value));
+      }
+    }
+
+    [Test]
     public void CastTest() {
       object[] objs = new object[] { "Hello", "World", "These", "Are", "All", "Strings" };
 

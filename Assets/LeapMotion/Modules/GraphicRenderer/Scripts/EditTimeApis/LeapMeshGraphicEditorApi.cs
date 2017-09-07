@@ -43,7 +43,7 @@ namespace Leap.Unity.GraphicalRenderer {
           pickingMesh.hideFlags = HideFlags.HideAndDontSave;
           pickingMesh.name = "Graphic Picking Mesh";
         }
-        pickingMesh.Clear();
+        pickingMesh.Clear(keepVertexLayout: false);
 
         if (_meshGraphic.mesh == null) return;
 
