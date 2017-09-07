@@ -10,6 +10,7 @@
 using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
 using NUnit.Framework;
 
 namespace Leap.Unity.Query.Test {
@@ -191,6 +192,51 @@ namespace Leap.Unity.Query.Test {
 
       Assert.That(objs.OfType<string>().SequenceEqual(
                   objs.Query().OfType(typeof(string)).Cast<string>().ToList()));
+    }
+
+    [Test]
+    public void RangeFrom([Values(0, 1, 2, 100, -1, -2, -100)] int startValue) {
+      int index = startValue;
+      int itterations = 0;
+      foreach (var value in Values.From(startValue)) {
+        Assert.That(value, Is.EqualTo(index));
+        index++;
+        itterations++;
+
+        if (itterations > 1000) {
+          Assert.Pass();
+          return;
+        }
+      }
+    }
+
+    [Test]
+    [Pairwise]
+    public void RangeFromTo([Values(0, 1, 100, -1, -100)] int startValue,
+                            [Values(0, 1, 100, -1, -100)] int endValue,
+                            [Values(1, 2, -1, -2, 0)] int step) {
+      List<int> items = new List<int>();
+      if (step != 0) {
+        int i = startValue;
+        while (true) {
+          if (i == endValue) {
+            break;
+          }
+
+          if ((i > endValue) == (endValue > startValue)) {
+            break;
+          }
+
+          items.Add(i);
+          if (endValue > startValue) {
+            i += Mathf.Abs(step);
+          } else {
+            i -= Mathf.Abs(step);
+          }
+        }
+      }
+
+      Assert.That(Values.From(startValue).To(endValue).By(step).ToList(), Is.EquivalentTo(items));
     }
 
     [Test]

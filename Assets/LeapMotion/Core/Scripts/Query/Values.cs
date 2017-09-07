@@ -36,5 +36,52 @@ namespace Leap.Unity.Query {
       }
     }
 
+    public static QueryWrapper<int, RangeOp> From(int from) {
+      return new QueryWrapper<int, RangeOp>(new RangeOp(from, int.MaxValue, step: 1));
+    }
+
+    public static QueryWrapper<int, RangeOp> To(int to) {
+      return new QueryWrapper<int, RangeOp>(new RangeOp(0, to, step: 1));
+    }
+
+    public static QueryWrapper<int, RangeOp> To(this QueryWrapper<int, RangeOp> wrapper, int to) {
+      return new QueryWrapper<int, RangeOp>(new RangeOp(wrapper.op.from, to, wrapper.op.step));
+    }
+
+    public static QueryWrapper<int, RangeOp> By(this QueryWrapper<int, RangeOp> wrapper, int step) {
+      return new QueryWrapper<int, RangeOp>(new RangeOp(wrapper.op.from, wrapper.op.to, step));
+    }
+
+    public struct RangeOp : IQueryOp<int> {
+      public readonly int from, to, step;
+      private int _curr;
+
+      public RangeOp(int from, int to, int step) {
+        this.from = from;
+        this.to = step == 0 ? from : to;
+        this.step = to > from ? Mathf.Abs(step) : -Mathf.Abs(step);
+
+        _curr = this.from;
+      }
+
+      public bool TryGetNext(out int t) {
+        t = _curr;
+
+        if (_curr == to) {
+          return false;
+        }
+
+        if ((_curr > to) == (to > from)) {
+          return false;
+        }
+
+        _curr += step;
+        return true;
+      }
+
+      public void Reset() {
+        _curr = from;
+      }
+    }
   }
 }

@@ -6,13 +6,11 @@ namespace Leap.Unity.Query {
     private SourceOp _source;
     private int _repeatTimes;
     private int _currTimes;
-    private bool _didReturnValue;
 
     public RepeatOp(SourceOp source, int times) {
       _source = source;
       _repeatTimes = times;
       _currTimes = 0;
-      _didReturnValue = false;
     }
 
     public bool TryGetNext(out SourceType t) {
@@ -22,7 +20,6 @@ namespace Leap.Unity.Query {
       }
 
       if (_source.TryGetNext(out t)) {
-        _didReturnValue = true;
         return true;
       }
 
