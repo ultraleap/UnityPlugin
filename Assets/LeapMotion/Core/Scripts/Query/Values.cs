@@ -40,6 +40,23 @@ namespace Leap.Unity.Query {
     }
 
     /// <summary>
+    /// Generates a new sequence of a specific type that has no elements.
+    /// </summary>
+    public static QueryWrapper<T, EmptyOp<T>> Empty<T>() {
+      return new QueryWrapper<T, EmptyOp<T>>(new EmptyOp<T>());
+    }
+
+    public struct EmptyOp<T> : IQueryOp<T> {
+
+      public bool TryGetNext(out T t) {
+        t = default(T);
+        return false;
+      }
+
+      public void Reset() { }
+    }
+
+    /// <summary>
     /// Generates a new sequence that returns the integers starting at
     /// the given value and incrementing by one for each successive value.
     /// This sequence is unbounded and will never terminate.
