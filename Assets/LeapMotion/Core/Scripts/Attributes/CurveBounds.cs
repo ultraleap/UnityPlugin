@@ -11,26 +11,26 @@ namespace Leap.Unity.Attributes {
   /// values that fall within specific bounds.  The user will be prevented from
   /// entering a curve that lies outside of these bounds.
   /// </summary>
-  public class CurveBounds : CombinablePropertyAttribute, IFullPropertyDrawer {
+  public class CurveBoundsAttribute : CombinablePropertyAttribute, IFullPropertyDrawer {
     public readonly Rect bounds;
     public readonly Color color;
 
-    public CurveBounds(Rect bounds) {
+    public CurveBoundsAttribute(Rect bounds) {
       this.bounds = bounds;
       color = Color.green;
     }
 
-    public CurveBounds(Rect bounds, Color color) {
+    public CurveBoundsAttribute(Rect bounds, Color color) {
       this.bounds = bounds;
       this.color = color;
     }
 
-    public CurveBounds(float width, float height) {
+    public CurveBoundsAttribute(float width, float height) {
       bounds = new Rect(0, 0, width, height);
       color = Color.green;
     }
 
-    public CurveBounds(float width, float height, Color color) {
+    public CurveBoundsAttribute(float width, float height, Color color) {
       bounds = new Rect(0, 0, width, height);
       this.color = color;
     }
@@ -53,8 +53,8 @@ namespace Leap.Unity.Attributes {
   /// that range from 0 to 1.  The user will be prevented from entering a curve that
   /// lies outside of these bounds.
   /// </summary>
-  public class UnitCurve : CurveBounds {
-    public UnitCurve() : base(new Rect(0, 0, 1, 1), Color.green) { }
-    public UnitCurve(Color color) : base(new Rect(0, 0, 1, 1), color) { }
+  public class UnitCurveAttribute : CurveBoundsAttribute {
+    public UnitCurveAttribute() : base(new Rect(0, 0, 1, 1), Color.green) { }
+    public UnitCurveAttribute(Color color) : base(new Rect(0, 0, 1, 1), color) { }
   }
 }
