@@ -740,10 +740,29 @@ namespace Leap.Unity {
       float h1, s1, v1;
       Color.RGBToHSV(towardsColor, out h1, out s1, out v1);
 
-      float hL = Mathf.Lerp(h0, h1, t);
+      // Cyclically lerp hue. (Input hues are always between 0 and 1.)
+      if (h0 - h1 < -0.5f) h0 += 1f;
+      if (h0 - h1 > 0.5f) h1 += 1f;
+      float hL = Mathf.Lerp(h0, h1, t) % 1f;
+
       float sL = Mathf.Lerp(s0, s1, t);
       float vL = Mathf.Lerp(v0, v1, t);
       return Color.HSVToRGB(hL, sL, vL);
+    }
+
+    /// <summary>
+    /// Cyclically lerps hue arguments by t.
+    /// </summary>
+    public static float LerpHue(float h0, float h1, float t) {
+      // Enforce hue values between 0f and 1f.
+      if (h0 < 0f) h0 = 1f - (-h0 % 1f);
+      if (h1 < 0f) h1 = 1f - (-h1 % 1f);
+      if (h0 > 1f) h0 = h0 % 1f;
+      if (h1 > 1f) h1 = h1 % 1f;
+
+      if (h0 - h1 < -0.5f) h0 += 1f;
+      if (h0 - h1 > 0.5f) h1 += 1f;
+      return Mathf.Lerp(h0, h1, t) % 1f;
     }
 
     #endregion
@@ -800,53 +819,6 @@ namespace Leap.Unity {
       for (float q = step; q <= height; q += step) {
         DrawCircle(origin + direction * q, direction, Mathf.Tan(angle * Constants.DEG_TO_RAD) * q, color, quality * 8, duration, depthTest);
       }
-    }
-
-    #endregion
-
-    #region Runtime Gizmo Utils
-
-    /// <summary>
-    /// Draws a simple XYZ-cross position gizmo at the target position, whose size is
-    /// scaled relative to the main camera's distance to the target position (for reliable
-    /// visibility).
-    /// 
-    /// You can also provide a color argument and lerp coefficient towards that color from
-    /// the axes' default colors (red, green, blue). Colors are lerped in HSV space.
-    /// </summary>
-    public static void DrawPosition(this RuntimeGizmoDrawer drawer, Vector3 pos,
-                                    Color lerpColor, float lerpCoeff) {
-      float targetScale = 0.06f; // 6 cm at 1m away.
-
-      var mainCam = Camera.main;
-      if (mainCam != null) {
-        float camDistance = Vector3.Distance(pos, mainCam.transform.position);
-
-        targetScale *= camDistance;
-      }
-
-      float extent = (targetScale / 2f);
-
-      drawer.color = Color.red;
-      if (lerpCoeff != 0f) { drawer.color = drawer.color.LerpHSV(lerpColor, lerpCoeff); }
-      drawer.DrawLine(pos - Vector3.right * extent, pos + Vector3.right * extent);
-
-      drawer.color = Color.green;
-      if (lerpCoeff != 0f) { drawer.color = drawer.color.LerpHSV(lerpColor, lerpCoeff); }
-      drawer.DrawLine(pos - Vector3.up * extent, pos + Vector3.up * extent);
-
-      drawer.color = Color.blue;
-      if (lerpCoeff != 0f) { drawer.color = drawer.color.LerpHSV(lerpColor, lerpCoeff); }
-      drawer.DrawLine(pos - Vector3.forward * extent, pos + Vector3.forward * extent);
-    }
-
-    /// <summary>
-    /// Draws a simple XYZ-cross position gizmo at the target position, whose size is
-    /// scaled relative to the main camera's distance to the target position (for reliable
-    /// visibility).
-    /// </summary>
-    public static void DrawPosition(this RuntimeGizmoDrawer drawer, Vector3 pos) {
-      drawer.DrawPosition(pos, Color.white, 0f);
     }
 
     #endregion
