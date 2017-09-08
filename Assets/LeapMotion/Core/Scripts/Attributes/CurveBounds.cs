@@ -43,27 +43,8 @@ namespace Leap.Unity.Attributes {
 #endif
   }
 
-  public class UnitCurve : CombinablePropertyAttribute, IFullPropertyDrawer {
-    public readonly Color color;
-
-    public UnitCurve() {
-      color = Color.green;
-    }
-
-    public UnitCurve(Color color) {
-      this.color = color;
-    }
-
-#if UNITY_EDITOR
-    public void DrawProperty(Rect rect, SerializedProperty property, GUIContent label) {
-      EditorGUI.CurveField(rect, property, color, new Rect(0, 0, 1, 1));
-    }
-
-    public override IEnumerable<SerializedPropertyType> SupportedTypes {
-      get {
-        yield return SerializedPropertyType.AnimationCurve;
-      }
-    }
-#endif
+  public class UnitCurve : CurveBounds {
+    public UnitCurve() : base(new Rect(0, 0, 1, 1), Color.green) { }
+    public UnitCurve(Color color) : base(new Rect(0, 0, 1, 1), color) { }
   }
 }

@@ -32,12 +32,6 @@ namespace Leap.Unity {
       return new Vector3(rect.x + rect.width, rect.y + rect.height);
     }
 
-    public static Vector2 Map(this Vector2 point, Rect inRect, Rect outRect) {
-      point.x = Mathf.Lerp(outRect.x, outRect.x + outRect.width, Mathf.InverseLerp(inRect.x, inRect.x + inRect.width, point.x));
-      point.y = Mathf.Lerp(outRect.y, outRect.y + outRect.height, Mathf.InverseLerp(inRect.y, inRect.y + inRect.height, point.y));
-      return point;
-    }
-
     public static Rect Encapsulate(this Rect rect, Vector2 point) {
       if (point.x < rect.x) {
         rect.width += rect.x - point.x;
