@@ -689,8 +689,8 @@ namespace Leap.Unity.RuntimeGizmos {
     /// scaled relative to the main camera's distance to the target position (for reliable
     /// visibility).
     /// </summary>
-    public static void DrawPosition(this RuntimeGizmoDrawer drawer, Vector3 pos) {
-      drawer.DrawPosition(pos, Color.white, 0f);
+    public void DrawPosition(Vector3 pos) {
+      DrawPosition(pos, Color.white, 0f);
     }
 
     public void ClearAllGizmos() {
