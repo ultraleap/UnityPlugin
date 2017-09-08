@@ -496,8 +496,18 @@ namespace Leap.Unity.Interaction {
       Anchor closestAnchor = null;
       float closestDistSqrd = float.PositiveInfinity;
       foreach (var testAnchor in anchorsToCheck) {
-        if ((requireAnchorHasSpace && (!anchor.allowMultipleObjects || anchor.anchoredObjects.Count == 0))
-            || (requireAnchorActiveAndEnabled && !anchor.isActiveAndEnabled)) continue;
+        if (requireAnchorHasSpace) {
+          bool anchorHasSpace = testAnchor.anchoredObjects.Count == 0
+                                || testAnchor.allowMultipleObjects;
+          if (!anchorHasSpace) {
+            // Skip the anchor for consideration.
+            continue;
+          }
+        }
+        if (requireAnchorActiveAndEnabled && !testAnchor.isActiveAndEnabled) {
+          // Skip the anchor for consideration.
+          continue;
+        }
 
         float testDistanceSqrd = (testAnchor.transform.position - this.transform.position).sqrMagnitude;
         if (testDistanceSqrd < closestDistSqrd) {
