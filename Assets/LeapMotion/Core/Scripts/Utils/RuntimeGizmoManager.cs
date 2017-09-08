@@ -650,6 +650,49 @@ namespace Leap.Unity.RuntimeGizmos {
       PopMatrix();
     }
 
+    /// <summary>
+    /// Draws a simple XYZ-cross position gizmo at the target position, whose size is
+    /// scaled relative to the main camera's distance to the target position (for reliable
+    /// visibility).
+    /// 
+    /// You can also provide a color argument and lerp coefficient towards that color from
+    /// the axes' default colors (red, green, blue). Colors are lerped in HSV space.
+    /// </summary>
+    public void DrawPosition(Vector3 pos, Color lerpColor, float lerpCoeff) {
+      float targetScale = 0.06f; // 6 cm at 1m away.
+
+      var mainCam = Camera.main;
+      var posWorldSpace = matrix * pos;
+      if (mainCam != null) {
+        float camDistance = Vector3.Distance(posWorldSpace, mainCam.transform.position);
+
+        targetScale *= camDistance;
+      }
+
+      float extent = (targetScale / 2f);
+
+      color = Color.red;
+      if (lerpCoeff != 0f) { color = color.LerpHSV(lerpColor, lerpCoeff); }
+      DrawLine(pos - Vector3.right * extent, pos + Vector3.right * extent);
+
+      color = Color.green;
+      if (lerpCoeff != 0f) { color = color.LerpHSV(lerpColor, lerpCoeff); }
+      DrawLine(pos - Vector3.up * extent, pos + Vector3.up * extent);
+
+      color = Color.blue;
+      if (lerpCoeff != 0f) { color = color.LerpHSV(lerpColor, lerpCoeff); }
+      DrawLine(pos - Vector3.forward * extent, pos + Vector3.forward * extent);
+    }
+
+    /// <summary>
+    /// Draws a simple XYZ-cross position gizmo at the target position, whose size is
+    /// scaled relative to the main camera's distance to the target position (for reliable
+    /// visibility).
+    /// </summary>
+    public void DrawPosition(Vector3 pos) {
+      DrawPosition(pos, Color.white, 0f);
+    }
+
     public void ClearAllGizmos() {
       _operations.Clear();
       _matrices.Clear();
