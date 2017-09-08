@@ -12,7 +12,7 @@ namespace Leap.Unity.Attributes {
 
     public CurveBounds(Rect bounds) {
       this.bounds = bounds;
-      color = Color.white;
+      color = Color.green;
     }
 
     public CurveBounds(Rect bounds, Color color) {
@@ -22,7 +22,7 @@ namespace Leap.Unity.Attributes {
 
     public CurveBounds(float width, float height) {
       bounds = new Rect(0, 0, width, height);
-      color = Color.white;
+      color = Color.green;
     }
 
     public CurveBounds(float width, float height, Color color) {
@@ -32,7 +32,7 @@ namespace Leap.Unity.Attributes {
 
 #if UNITY_EDITOR
     public void DrawProperty(Rect rect, SerializedProperty property, GUIContent label) {
-      property.animationCurveValue = EditorGUILayout.CurveField(label, property.animationCurveValue, color, bounds);
+      EditorGUI.CurveField(rect, property, color, bounds);
     }
 
     public override IEnumerable<SerializedPropertyType> SupportedTypes {
@@ -47,7 +47,7 @@ namespace Leap.Unity.Attributes {
     public readonly Color color;
 
     public UnitCurve() {
-      color = Color.white;
+      color = Color.green;
     }
 
     public UnitCurve(Color color) {
@@ -56,7 +56,7 @@ namespace Leap.Unity.Attributes {
 
 #if UNITY_EDITOR
     public void DrawProperty(Rect rect, SerializedProperty property, GUIContent label) {
-      property.animationCurveValue = EditorGUILayout.CurveField(label, property.animationCurveValue, color, new Rect(0, 0, 1, 1));
+      EditorGUI.CurveField(rect, property, color, new Rect(0, 0, 1, 1));
     }
 
     public override IEnumerable<SerializedPropertyType> SupportedTypes {
