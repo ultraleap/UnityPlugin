@@ -12,6 +12,8 @@ using UnityEngine.Assertions;
 using System;
 using System.IO;
 using System.Collections.Generic;
+using Leap.Unity.RuntimeGizmos;
+using Leap.Unity.Query;
 
 namespace Leap.Unity {
 
@@ -135,10 +137,6 @@ namespace Leap.Unity {
         }
       }
       return false;
-    }
-
-    public static float Area(this Rect rect) {
-      return rect.width * rect.height;
     }
 
     public static bool IsActiveRelativeToParent(this Transform obj, Transform parent) {
@@ -452,6 +450,75 @@ namespace Leap.Unity {
       return v.x + v.y + v.z + v.w;
     }
 
+    /// <summary>
+    /// Returns the largest component of the input vector.
+    /// </summary>
+    public static float CompMax(this Vector2 v) {
+      return Mathf.Max(v.x, v.y);
+    }
+
+    /// <summary>
+    /// Returns the largest component of the input vector.
+    /// </summary>
+    public static float CompMax(this Vector3 v) {
+      return Mathf.Max(Mathf.Max(v.x, v.y), v.z);
+    }
+
+    /// <summary>
+    /// Returns the largest component of the input vector.
+    /// </summary>
+    public static float CompMax(this Vector4 v) {
+      return Mathf.Max(Mathf.Max(Mathf.Max(v.x, v.y), v.z), v.w);
+    }
+
+    /// <summary>
+    /// Returns the smallest component of the input vector.
+    /// </summary>
+    public static float CompMin(this Vector2 v) {
+      return Mathf.Min(v.x, v.y);
+    }
+
+    /// <summary>
+    /// Returns the smallest component of the input vector.
+    /// </summary>
+    public static float CompMin(this Vector3 v) {
+      return Mathf.Min(Mathf.Min(v.x, v.y), v.z);
+    }
+
+    /// <summary>
+    /// Returns the smallest component of the input vector.
+    /// </summary>
+    public static float CompMin(this Vector4 v) {
+      return Mathf.Min(Mathf.Min(Mathf.Min(v.x, v.y), v.z), v.w);
+    }
+
+    #endregion
+
+    #region Unity Object Utils
+
+    /// <summary>
+    /// Usage is the same as FindObjectOfType, but this method will also return objects
+    /// that are inactive.
+    /// 
+    /// Use this method to search for singleton-pattern objects even if they are disabled,
+    /// but be warned that it's not cheap to call!
+    /// </summary>
+    public static T FindObjectInHierarchy<T>() where T : UnityEngine.Object {
+      T obj = Resources.FindObjectsOfTypeAll<T>().Query().FirstOrDefault();
+      if (obj == null) return null;
+
+#if UNITY_EDITOR
+      // Exclude prefabs.
+      var prefabType = UnityEditor.PrefabUtility.GetPrefabType(obj);
+      if (prefabType == UnityEditor.PrefabType.ModelPrefab
+          || prefabType == UnityEditor.PrefabType.Prefab) {
+        return null;
+      }
+#endif
+
+      return obj;
+    }
+
     #endregion
 
     #region Transform Utils
@@ -662,6 +729,23 @@ namespace Leap.Unity {
       return color;
     }
 
+    /// <summary>
+    /// Lerps this color towards the argument color in HSV space and returns the lerped
+    /// color.
+    /// </summary>
+    public static Color LerpHSV(this Color color, Color towardsColor, float t) {
+      float h0, s0, v0;
+      Color.RGBToHSV(color, out h0, out s0, out v0);
+
+      float h1, s1, v1;
+      Color.RGBToHSV(towardsColor, out h1, out s1, out v1);
+
+      float hL = Mathf.Lerp(h0, h1, t);
+      float sL = Mathf.Lerp(s0, s1, t);
+      float vL = Mathf.Lerp(v0, v1, t);
+      return Color.HSVToRGB(hL, sL, vL);
+    }
+
     #endregion
 
     #region Gizmo Utils
@@ -720,6 +804,53 @@ namespace Leap.Unity {
 
     #endregion
 
+    #region Runtime Gizmo Utils
+
+    /// <summary>
+    /// Draws a simple XYZ-cross position gizmo at the target position, whose size is
+    /// scaled relative to the main camera's distance to the target position (for reliable
+    /// visibility).
+    /// 
+    /// You can also provide a color argument and lerp coefficient towards that color from
+    /// the axes' default colors (red, green, blue). Colors are lerped in HSV space.
+    /// </summary>
+    public static void DrawPosition(this RuntimeGizmoDrawer drawer, Vector3 pos,
+                                    Color lerpColor, float lerpCoeff) {
+      float targetScale = 0.06f; // 6 cm at 1m away.
+
+      var mainCam = Camera.main;
+      if (mainCam != null) {
+        float camDistance = Vector3.Distance(pos, mainCam.transform.position);
+
+        targetScale *= camDistance;
+      }
+
+      float extent = (targetScale / 2f);
+
+      drawer.color = Color.red;
+      if (lerpCoeff != 0f) { drawer.color = drawer.color.LerpHSV(lerpColor, lerpCoeff); }
+      drawer.DrawLine(pos - Vector3.right * extent, pos + Vector3.right * extent);
+
+      drawer.color = Color.green;
+      if (lerpCoeff != 0f) { drawer.color = drawer.color.LerpHSV(lerpColor, lerpCoeff); }
+      drawer.DrawLine(pos - Vector3.up * extent, pos + Vector3.up * extent);
+
+      drawer.color = Color.blue;
+      if (lerpCoeff != 0f) { drawer.color = drawer.color.LerpHSV(lerpColor, lerpCoeff); }
+      drawer.DrawLine(pos - Vector3.forward * extent, pos + Vector3.forward * extent);
+    }
+
+    /// <summary>
+    /// Draws a simple XYZ-cross position gizmo at the target position, whose size is
+    /// scaled relative to the main camera's distance to the target position (for reliable
+    /// visibility).
+    /// </summary>
+    public static void DrawPosition(this RuntimeGizmoDrawer drawer, Vector3 pos) {
+      drawer.DrawPosition(pos, Color.white, 0f);
+    }
+
+    #endregion
+
     #region Texture Utils
 
     private static TextureFormat[] _incompressibleFormats = new TextureFormat[] {
@@ -746,7 +877,14 @@ namespace Leap.Unity {
     #endregion
 
     #region Rect Utils
-    
+
+    /// <summary>
+    /// Returns the area of the Rect, width * height.
+    /// </summary>
+    public static float Area(this Rect rect) {
+      return rect.width * rect.height;
+    }
+
     /// <summary>
     /// Returns a new Rect with the argument padding as a margin relative to each
     /// border of the provided Rect.
