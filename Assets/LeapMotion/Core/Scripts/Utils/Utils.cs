@@ -504,24 +504,24 @@ namespace Leap.Unity {
     /// but be warned that it's not cheap to call!
     /// </summary>
     public static T FindObjectInHierarchy<T>() where T : UnityEngine.Object {
-      T obj = Resources.FindObjectsOfTypeAll<T>().Query().FirstOrDefault();
-      if (obj == null) return null;
-
+      return Resources.FindObjectsOfTypeAll<T>().Query()
+        .Where(o => {
 #if UNITY_EDITOR
-      // Exclude prefabs.
-      var prefabType = UnityEditor.PrefabUtility.GetPrefabType(obj);
-      if (prefabType == UnityEditor.PrefabType.ModelPrefab
+          // Exclude prefabs.
+          var prefabType = UnityEditor.PrefabUtility.GetPrefabType(o);
+          if (prefabType == UnityEditor.PrefabType.ModelPrefab
           || prefabType == UnityEditor.PrefabType.Prefab) {
-        return null;
-      }
+            return false;
+          }
 #endif
-
-      return obj;
+          return true;
+        })
+        .FirstOrDefault();
     }
 
     #endregion
 
-    #region Transform Utils
+#region Transform Utils
 
     /// <summary>
     /// Returns the children of this Transform in sibling index order.
@@ -558,9 +558,9 @@ namespace Leap.Unity {
       public void Dispose() { }
     }
 
-    #endregion
+#endregion
 
-    #region Orientation Utils
+#region Orientation Utils
 
     /// <summary>
     /// Similar to Unity's Transform.LookAt(), but resolves the forward vector of this
@@ -588,9 +588,9 @@ namespace Leap.Unity {
       thisTransform.rotation = Quaternion.LookRotation(thisTransform.position - transform.position, upwards);
     }
 
-    #endregion
+#endregion
 
-    #region Physics Utils
+#region Physics Utils
 
     public static void IgnoreCollisions(GameObject first, GameObject second, bool ignore = true) {
       if (first == null || second == null)
@@ -609,9 +609,9 @@ namespace Leap.Unity {
       }
     }
 
-    #endregion
+#endregion
 
-    #region Collider Utils
+#region Collider Utils
 
     public static Vector3 GetDirection(this CapsuleCollider capsule) {
       switch (capsule.direction) {
@@ -703,9 +703,9 @@ namespace Leap.Unity {
       }
     }
 
-    #endregion
+#endregion
 
-    #region Color Utils
+#region Color Utils
 
     public static Color WithAlpha(this Color color, float alpha) {
       return new Color(color.r, color.g, color.b, alpha);
@@ -746,9 +746,9 @@ namespace Leap.Unity {
       return Color.HSVToRGB(hL, sL, vL);
     }
 
-    #endregion
+#endregion
 
-    #region Gizmo Utils
+#region Gizmo Utils
 
     public static void DrawCircle(Vector3 center,
                            Vector3 normal,
@@ -802,9 +802,9 @@ namespace Leap.Unity {
       }
     }
 
-    #endregion
+#endregion
 
-    #region Runtime Gizmo Utils
+#region Runtime Gizmo Utils
 
     /// <summary>
     /// Draws a simple XYZ-cross position gizmo at the target position, whose size is
@@ -849,9 +849,9 @@ namespace Leap.Unity {
       drawer.DrawPosition(pos, Color.white, 0f);
     }
 
-    #endregion
+#endregion
 
-    #region Texture Utils
+#region Texture Utils
 
     private static TextureFormat[] _incompressibleFormats = new TextureFormat[] {
       TextureFormat.R16,
@@ -874,9 +874,9 @@ namespace Leap.Unity {
       return Array.IndexOf(_incompressibleFormats, format) < 0;
     }
 
-    #endregion
+#endregion
 
-    #region Rect Utils
+#region Rect Utils
 
     /// <summary>
     /// Returns the area of the Rect, width * height.
@@ -893,7 +893,7 @@ namespace Leap.Unity {
       return new Rect(r.x + padding, r.y + padding, r.width - (padding * 2), r.height - (padding * 2));
     }
 
-    #endregion
+#endregion
 
   }
 
