@@ -135,6 +135,19 @@ namespace Leap.Unity {
       }
     }
 
+    public float CalculatePhysicsExtrapolation() {
+      switch (_physicsExtrapolation) {
+        case PhysicsExtrapolationMode.None:
+          return 0;
+        case PhysicsExtrapolationMode.Auto:
+          return Time.fixedDeltaTime;
+        case PhysicsExtrapolationMode.Manual:
+          return _physicsExtrapolationTime;
+        default:
+          throw new InvalidOperationException("Unexpected physics extrapolation mode: " + _physicsExtrapolation);
+      }
+    }
+
     /** Returns the Leap Controller instance. */
     public Controller GetLeapController() {
 #if UNITY_EDITOR
@@ -232,8 +245,26 @@ namespace Leap.Unity {
       }
 
       if (_useInterpolation) {
-        long timestamp = (long)(Time.fixedTime * S_TO_NS) + _unityToLeapOffset;
+
+        long timestamp;
+        switch (_frameOptimization) {
+          case FrameOptimizationMode.None:
+            //By default we use Time.fixedTime to ensure that our hands are on the same timeline
+            //as Update.  We add an extrapolation value to help compensate for latency.
+            float extrapolatedTime = Time.fixedTime + CalculatePhysicsExtrapolation();
+            timestamp = (long)(extrapolatedTime * S_TO_NS) + _unityToLeapOffset;
+            break;
+          case FrameOptimizationMode.ReusePhysicsForUpdate:
+            //If we are re-using physics frames for update, we don't even want to care about
+            //Time.fixedTime, just grab the most recent interpolated timestamp like we are
+            //in Update
+            timestamp = CalculateInterpolationTime() + (ExtrapolationAmount * 1000);
+            break;
+          default:
+            throw new InvalidOperationException("Unexpected frame optimization mode: " + _frameOptimization);
+        }
         leap_controller_.GetInterpolatedFrame(_untransformedFixedFrame, timestamp);
+
       } else {
         leap_controller_.Frame(_untransformedFixedFrame);
       }
