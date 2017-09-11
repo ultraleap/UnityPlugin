@@ -32,6 +32,12 @@ namespace Leap.Unity {
       ReusePhysicsForUpdate,
     }
 
+    public enum PhysicsExtrapolationMode {
+      None,
+      Auto,
+      Manual
+    }
+
     [Tooltip("Set true if the Leap Motion hardware is mounted on an HMD; otherwise, leave false.")]
     [SerializeField]
     protected bool _isHeadMounted = false;
@@ -42,6 +48,17 @@ namespace Leap.Unity {
     [Tooltip("When enabled, the provider will only calculate one leap frame instead of two.")]
     [SerializeField]
     protected FrameOptimizationMode _frameOptimization = FrameOptimizationMode.None;
+
+    [Tooltip("The mode to use when extrapolating physics.\n" +
+             " None - No extrapolation is used at all.\n" +
+             " Auto - Extrapolation is chosen based on the fixed timestep.\n" +
+             " Manual - Extrapolation time is chosen manually by the user.")]
+    [SerializeField]
+    protected PhysicsExtrapolationMode _physicsExtrapolation = PhysicsExtrapolationMode.Auto;
+
+    [Tooltip("The amount of time (in seconds) to extrapolate the phyiscs data by.")]
+    [SerializeField]
+    protected float _physicsExtrapolationTime = 1.0f / 90.0f;
 
     [Header("[Experimental]")]
     [Tooltip("Pass updated transform matrices to objects with materials using the VertexOffsetShader.")]
