@@ -7,7 +7,63 @@ using Leap.Unity.Query;
 
 namespace Leap.Unity {
 
-  // TODO: Move me to Core!
+  public static class DefaultCurve {
+
+    public static AnimationCurve Zero {
+      get {
+        AnimationCurve curve = new AnimationCurve();
+        curve.AddKey(0, 0);
+        curve.AddKey(1, 0);
+        return curve;
+      }
+    }
+
+    public static AnimationCurve One {
+      get {
+        AnimationCurve curve = new AnimationCurve();
+        curve.AddKey(0, 1);
+        curve.AddKey(1, 1);
+        return curve;
+      }
+    }
+
+    public static AnimationCurve LinearUp {
+      get {
+        AnimationCurve curve = new AnimationCurve();
+        curve.AddKey(new Keyframe(0, 0, 1, 1));
+        curve.AddKey(new Keyframe(1, 1, 1, 1));
+        return curve;
+      }
+    }
+
+    public static AnimationCurve LinearDown {
+      get {
+        AnimationCurve curve = new AnimationCurve();
+        curve.AddKey(new Keyframe(0, 1, -1, -1));
+        curve.AddKey(new Keyframe(1, 0, -1, -1));
+        return curve;
+      }
+    }
+
+    public static AnimationCurve SigmoidUp {
+      get {
+        AnimationCurve curve = new AnimationCurve();
+        curve.AddKey(new Keyframe(0, 0, 0, 0));
+        curve.AddKey(new Keyframe(1, 1, 0, 0));
+        return curve;
+      }
+    }
+
+    public static AnimationCurve SigmoidDown {
+      get {
+        AnimationCurve curve = new AnimationCurve();
+        curve.AddKey(new Keyframe(0, 1, 0, 0));
+        curve.AddKey(new Keyframe(1, 0, 0, 0));
+        return curve;
+      }
+    }
+  }
+
   public static class AnimationCurveUtil {
 
     public static bool IsConstant(this AnimationCurve curve) {

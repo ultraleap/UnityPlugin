@@ -12,6 +12,8 @@ using UnityEngine.Assertions;
 using System;
 using System.IO;
 using System.Collections.Generic;
+using Leap.Unity.RuntimeGizmos;
+using Leap.Unity.Query;
 
 namespace Leap.Unity {
 
@@ -135,10 +137,6 @@ namespace Leap.Unity {
         }
       }
       return false;
-    }
-
-    public static float Area(this Rect rect) {
-      return rect.width * rect.height;
     }
 
     public static bool IsActiveRelativeToParent(this Transform obj, Transform parent) {
@@ -452,6 +450,75 @@ namespace Leap.Unity {
       return v.x + v.y + v.z + v.w;
     }
 
+    /// <summary>
+    /// Returns the largest component of the input vector.
+    /// </summary>
+    public static float CompMax(this Vector2 v) {
+      return Mathf.Max(v.x, v.y);
+    }
+
+    /// <summary>
+    /// Returns the largest component of the input vector.
+    /// </summary>
+    public static float CompMax(this Vector3 v) {
+      return Mathf.Max(Mathf.Max(v.x, v.y), v.z);
+    }
+
+    /// <summary>
+    /// Returns the largest component of the input vector.
+    /// </summary>
+    public static float CompMax(this Vector4 v) {
+      return Mathf.Max(Mathf.Max(Mathf.Max(v.x, v.y), v.z), v.w);
+    }
+
+    /// <summary>
+    /// Returns the smallest component of the input vector.
+    /// </summary>
+    public static float CompMin(this Vector2 v) {
+      return Mathf.Min(v.x, v.y);
+    }
+
+    /// <summary>
+    /// Returns the smallest component of the input vector.
+    /// </summary>
+    public static float CompMin(this Vector3 v) {
+      return Mathf.Min(Mathf.Min(v.x, v.y), v.z);
+    }
+
+    /// <summary>
+    /// Returns the smallest component of the input vector.
+    /// </summary>
+    public static float CompMin(this Vector4 v) {
+      return Mathf.Min(Mathf.Min(Mathf.Min(v.x, v.y), v.z), v.w);
+    }
+
+    #endregion
+
+    #region Unity Object Utils
+
+    /// <summary>
+    /// Usage is the same as FindObjectOfType, but this method will also return objects
+    /// that are inactive.
+    /// 
+    /// Use this method to search for singleton-pattern objects even if they are disabled,
+    /// but be warned that it's not cheap to call!
+    /// </summary>
+    public static T FindObjectInHierarchy<T>() where T : UnityEngine.Object {
+      return Resources.FindObjectsOfTypeAll<T>().Query()
+        .Where(o => {
+#if UNITY_EDITOR
+          // Exclude prefabs.
+          var prefabType = UnityEditor.PrefabUtility.GetPrefabType(o);
+          if (prefabType == UnityEditor.PrefabType.ModelPrefab
+          || prefabType == UnityEditor.PrefabType.Prefab) {
+            return false;
+          }
+#endif
+          return true;
+        })
+        .FirstOrDefault();
+    }
+
     #endregion
 
     #region Transform Utils
@@ -662,6 +729,42 @@ namespace Leap.Unity {
       return color;
     }
 
+    /// <summary>
+    /// Lerps this color towards the argument color in HSV space and returns the lerped
+    /// color.
+    /// </summary>
+    public static Color LerpHSV(this Color color, Color towardsColor, float t) {
+      float h0, s0, v0;
+      Color.RGBToHSV(color, out h0, out s0, out v0);
+
+      float h1, s1, v1;
+      Color.RGBToHSV(towardsColor, out h1, out s1, out v1);
+
+      // Cyclically lerp hue. (Input hues are always between 0 and 1.)
+      if (h0 - h1 < -0.5f) h0 += 1f;
+      if (h0 - h1 > 0.5f) h1 += 1f;
+      float hL = Mathf.Lerp(h0, h1, t) % 1f;
+
+      float sL = Mathf.Lerp(s0, s1, t);
+      float vL = Mathf.Lerp(v0, v1, t);
+      return Color.HSVToRGB(hL, sL, vL);
+    }
+
+    /// <summary>
+    /// Cyclically lerps hue arguments by t.
+    /// </summary>
+    public static float LerpHue(float h0, float h1, float t) {
+      // Enforce hue values between 0f and 1f.
+      if (h0 < 0f) h0 = 1f - (-h0 % 1f);
+      if (h1 < 0f) h1 = 1f - (-h1 % 1f);
+      if (h0 > 1f) h0 = h0 % 1f;
+      if (h1 > 1f) h1 = h1 % 1f;
+
+      if (h0 - h1 < -0.5f) h0 += 1f;
+      if (h0 - h1 > 0.5f) h1 += 1f;
+      return Mathf.Lerp(h0, h1, t) % 1f;
+    }
+
     #endregion
 
     #region Gizmo Utils
@@ -746,7 +849,14 @@ namespace Leap.Unity {
     #endregion
 
     #region Rect Utils
-    
+
+    /// <summary>
+    /// Returns the area of the Rect, width * height.
+    /// </summary>
+    public static float Area(this Rect rect) {
+      return rect.width * rect.height;
+    }
+
     /// <summary>
     /// Returns a new Rect with the argument padding as a margin relative to each
     /// border of the provided Rect.
