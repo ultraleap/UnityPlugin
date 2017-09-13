@@ -94,17 +94,25 @@ namespace Leap.Unity.GraphicalRenderer {
           using (new ProfilerSample("Draw Meshes")) {
             Assert.AreEqual(group.graphics.Count, _meshes.Count);
             for (int i = 0; i < group.graphics.Count; i++) {
+              if (!group.graphics[i].isActiveAndEnabled) {
+                continue;
+              }
+
               drawMesh(_meshes[i], group.graphics[i].transform.localToWorldMatrix);
             }
           }
         } else if (renderer.space is LeapRadialSpace) {
           var curvedSpace = renderer.space as LeapRadialSpace;
-          using (new ProfilerSample("Build Material Data")) {
+          using (new ProfilerSample("Build Material Data And Draw Meshes")) {
             _curved_worldToAnchor.Clear();
             _curved_meshTransforms.Clear();
             _curved_graphicParameters.Clear();
             for (int i = 0; i < _meshes.Count; i++) {
               var graphic = group.graphics[i];
+              if (!graphic.isActiveAndEnabled) {
+                continue;
+              }
+
               var transformer = graphic.anchor.transformer;
 
               Vector3 localPos = renderer.transform.InverseTransformPoint(graphic.transform.position);
@@ -117,6 +125,10 @@ namespace Leap.Unity.GraphicalRenderer {
               _curved_meshTransforms.Add(total);
 
               _curved_worldToAnchor.Add(mainTransform.inverse);
+
+              //Safe to do this before we upload material data
+              //meshes are drawn at end of frame anyway!
+              drawMesh(_meshes[i], _curved_meshTransforms[i]);
             }
           }
 
@@ -125,12 +137,6 @@ namespace Leap.Unity.GraphicalRenderer {
             _material.SetMatrixArraySafe("_GraphicRendererCurved_WorldToAnchor", _curved_worldToAnchor);
             _material.SetMatrix("_GraphicRenderer_LocalToWorld", renderer.transform.localToWorldMatrix);
             _material.SetVectorArraySafe("_GraphicRendererCurved_GraphicParameters", _curved_graphicParameters);
-          }
-
-          using (new ProfilerSample("Draw Meshes")) {
-            for (int i = 0; i < _meshes.Count; i++) {
-              drawMesh(_meshes[i], _curved_meshTransforms[i]);
-            }
           }
         }
       }
