@@ -87,6 +87,40 @@ namespace Leap.Unity {
 
     //#endregion
 
+//    void OnPreRender() {
+//#if UNITY_EDITOR
+//      if (!Application.isPlaying) {
+//        return;
+//      }
+//#endif
+
+//      _eyeType.BeginCamera();
+
+//      if (_eyeType.IsLeftEye) {
+//        Shader.SetGlobalVector(GLOBAL_EYE_UV_OFFSET_NAME, LEFT_EYE_UV_OFFSET);
+//        if (OnLeftPreRender != null) OnLeftPreRender(_cachedCamera);
+//      }
+//      else {
+//        Shader.SetGlobalVector(GLOBAL_EYE_UV_OFFSET_NAME, RIGHT_EYE_UV_OFFSET);
+//        if (OnRightPreRender != null) OnRightPreRender(_cachedCamera);
+//      }
+
+//      Matrix4x4 offsetMatrix;
+
+//      if (_overrideEyePosition) {
+//        offsetMatrix = _finalCenterMatrix;
+//        //Debug.Log(_deviceInfo.baseline);
+//        Vector3 ipdOffset = (_eyeType.IsLeftEye ? 1 : -1) * transform.right * _deviceInfo.baseline * 0.5f;
+//        Vector3 forwardOffset = -transform.forward * _deviceInfo.focalPlaneOffset;
+//        offsetMatrix *= Matrix4x4.TRS(ipdOffset + forwardOffset, Quaternion.identity, Vector3.one);
+//      }
+//      else {
+//        offsetMatrix = _camera.worldToCameraMatrix;
+//      }
+
+//      _camera.worldToCameraMatrix = offsetMatrix;
+//    }
+
 
 
     //private Camera _cachedCamera;
