@@ -20,9 +20,9 @@ namespace Leap.Unity {
   /**LeapServiceProvider creates a Controller and supplies Leap Hands and images */
   public class LeapServiceProvider : LeapProvider {
     /** Conversion factor for nanoseconds to seconds. */
-    protected const float NS_TO_S = 1e-6f;
+    protected const double NS_TO_S = 1e-6;
     /** Conversion factor for seconds to nanoseconds. */
-    protected const float S_TO_NS = 1e6f;
+    protected const double S_TO_NS = 1e6;
     /** Transform Array for Precull Latching **/
     protected const string HAND_ARRAY = "_LeapHandTransforms";
 
@@ -35,7 +35,7 @@ namespace Leap.Unity {
     [Tooltip("Set true if the Leap Motion hardware is mounted on an HMD; otherwise, leave false.")]
     [SerializeField]
     protected bool _isHeadMounted = false;
-    
+
     [SerializeField]
     protected LeapVRTemporalWarping _temporalWarping;
 
@@ -50,7 +50,7 @@ namespace Leap.Unity {
 
     protected bool _useInterpolation = true;
 
-//Extrapolate on Android to compensate for the latency introduced by its graphics pipeline
+    //Extrapolate on Android to compensate for the latency introduced by its graphics pipeline
 #if UNITY_ANDROID
     protected int ExtrapolationAmount = 15;
     protected int BounceAmount = 70;
@@ -66,6 +66,7 @@ namespace Leap.Unity {
     protected Quaternion warpedRotation;
     protected SmoothedFloat _fixedOffset = new SmoothedFloat();
     protected SmoothedFloat _smoothedTrackingLatency = new SmoothedFloat();
+    protected long _unityToLeapOffset;
 
     protected Frame _untransformedUpdateFrame;
     protected Frame _transformedUpdateFrame;
@@ -147,7 +148,7 @@ namespace Leap.Unity {
       if (checkShouldEnableHeadMounted()) {
         _isHeadMounted = true;
       }
-      
+
       _temporalWarping = GetComponentInParent<LeapVRTemporalWarping>();
       _frameOptimization = FrameOptimizationMode.None;
       _updateHandInPrecull = false;
@@ -190,7 +191,10 @@ namespace Leap.Unity {
         _smoothedTrackingLatency.value = Mathf.Min(_smoothedTrackingLatency.value, 30000f);
         _smoothedTrackingLatency.Update((float)(leap_controller_.Now() - leap_controller_.FrameTimestamp()), Time.deltaTime);
 #endif
-        leap_controller_.GetInterpolatedFrameFromTime(_untransformedUpdateFrame, CalculateInterpolationTime() + (ExtrapolationAmount * 1000), CalculateInterpolationTime() - (BounceAmount * 1000));
+        long timestamp = CalculateInterpolationTime() + (ExtrapolationAmount * 1000);
+        _unityToLeapOffset = timestamp - (long)(Time.time * S_TO_NS);
+
+        leap_controller_.GetInterpolatedFrameFromTime(_untransformedUpdateFrame, timestamp, CalculateInterpolationTime() - (BounceAmount * 1000));
       } else {
         leap_controller_.Frame(_untransformedUpdateFrame);
       }
@@ -211,7 +215,8 @@ namespace Leap.Unity {
       }
 
       if (_useInterpolation) {
-        leap_controller_.GetInterpolatedFrame(_untransformedFixedFrame, CalculateInterpolationTime());
+        long timestamp = (long)(Time.fixedTime * S_TO_NS) + _unityToLeapOffset;
+        leap_controller_.GetInterpolatedFrame(_untransformedFixedFrame, timestamp);
       } else {
         leap_controller_.Frame(_untransformedFixedFrame);
       }
