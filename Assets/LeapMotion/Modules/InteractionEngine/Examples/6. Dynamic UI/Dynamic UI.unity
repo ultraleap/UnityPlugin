@@ -2078,6 +2078,21 @@ Prefab:
       propertyPath: sliderType
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 54783115363902762, guid: 6d3e45125c02bea4c9c28f57a82c3f6a,
+        type: 2}
+      propertyPath: m_Interpolate
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 54757883203877810, guid: 6d3e45125c02bea4c9c28f57a82c3f6a,
+        type: 2}
+      propertyPath: m_Interpolate
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 54108310109255444, guid: 6d3e45125c02bea4c9c28f57a82c3f6a,
+        type: 2}
+      propertyPath: m_Interpolate
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 6d3e45125c02bea4c9c28f57a82c3f6a, type: 2}
   m_IsPrefabParent: 0
@@ -3076,6 +3091,7 @@ MonoBehaviour:
   pinkyDistalJoint: {fileID: 0}
   pinkyTip: {fileID: 0}
   _chirality: 1
+  _isTracked: 0
 --- !u!1 &340834012
 GameObject:
   m_ObjectHideFlags: 0
@@ -3278,17 +3294,21 @@ MonoBehaviour:
   provider: {fileID: 710336403}
   _headTransform: {fileID: 292423863}
   _trackingAnchor: {fileID: 1728480836}
-  recenter: 114
-  tweenImageWarping: 1
-  tweenRotationalWarping: 1
-  tweenPositionalWarping: 1
-  syncMode: 1
-  forceCustomUpdate: 0
-  allowManualTimeAlignment: 1
-  warpingAdjustment: 50
-  unlockHold: 0
-  moreRewind: 276
-  lessRewind: 275
+  _recenter: 114
+  _tweenImageWarping: 0
+  _tweenRotationalWarping: 0
+  _tweenPositionalWarping: 0
+  _syncMode: 1
+  _forceCustomUpdate: 0
+  _allowManualTimeAlignment: 0
+  _warpingAdjustment: 60
+  _unlockHold: 303
+  _moreRewind: 276
+  _lessRewind: 275
+  _allowManualDeviceOffset: 0
+  _deviceOffsetYAxis: 0
+  _deviceOffsetZAxis: 0.12
+  _deviceTiltXAxis: 5
 --- !u!1 &359975977
 GameObject:
   m_ObjectHideFlags: 0
@@ -7342,6 +7362,8 @@ MonoBehaviour:
   _isHeadMounted: 1
   _temporalWarping: {fileID: 353591242}
   _frameOptimization: 0
+  _physicsExtrapolation: 1
+  _physicsExtrapolationTime: 0.011111111
   _updateHandInPrecull: 1
 --- !u!114 &710336404
 MonoBehaviour:
@@ -8216,6 +8238,31 @@ Prefab:
       propertyPath: _interactionLayer.layerIndex
       value: 5
       objectReference: {fileID: 0}
+    - target: {fileID: 54111658736148914, guid: 42e8bd39fe145a8419d212958fac6589,
+        type: 2}
+      propertyPath: m_Interpolate
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 54213554177137496, guid: 42e8bd39fe145a8419d212958fac6589,
+        type: 2}
+      propertyPath: m_Interpolate
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 54955733275588830, guid: 42e8bd39fe145a8419d212958fac6589,
+        type: 2}
+      propertyPath: m_Interpolate
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 54861704079955536, guid: 42e8bd39fe145a8419d212958fac6589,
+        type: 2}
+      propertyPath: m_Interpolate
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 54155246584505174, guid: 42e8bd39fe145a8419d212958fac6589,
+        type: 2}
+      propertyPath: m_Interpolate
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 42e8bd39fe145a8419d212958fac6589, type: 2}
   m_IsPrefabParent: 0
@@ -8528,6 +8575,7 @@ MonoBehaviour:
   pinkyDistalJoint: {fileID: 0}
   pinkyTip: {fileID: 0}
   _chirality: 0
+  _isTracked: 0
 --- !u!1 &870077124
 GameObject:
   m_ObjectHideFlags: 0
@@ -16241,6 +16289,21 @@ Prefab:
       propertyPath: _anchorGroup
       value: 
       objectReference: {fileID: 1608356547}
+    - target: {fileID: 54580840187329922, guid: 73dde5b40fafb9f439cae744996d7913,
+        type: 2}
+      propertyPath: m_Interpolate
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 54030523836961090, guid: 73dde5b40fafb9f439cae744996d7913,
+        type: 2}
+      propertyPath: m_Interpolate
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 54341614193047630, guid: 73dde5b40fafb9f439cae744996d7913,
+        type: 2}
+      propertyPath: m_Interpolate
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 73dde5b40fafb9f439cae744996d7913, type: 2}
   m_IsPrefabParent: 0

@@ -7354,6 +7354,8 @@ MonoBehaviour:
   _isHeadMounted: 1
   _temporalWarping: {fileID: 1571381170}
   _frameOptimization: 0
+  _physicsExtrapolation: 1
+  _physicsExtrapolationTime: 0.011111111
   _updateHandInPrecull: 1
 --- !u!114 &575511663
 MonoBehaviour:
@@ -19730,17 +19732,21 @@ MonoBehaviour:
   provider: {fileID: 575511662}
   _headTransform: {fileID: 11486573}
   _trackingAnchor: {fileID: 13100235}
-  recenter: 114
-  tweenImageWarping: 1
-  tweenRotationalWarping: 1
-  tweenPositionalWarping: 1
-  syncMode: 1
-  forceCustomUpdate: 0
-  allowManualTimeAlignment: 1
-  warpingAdjustment: 50
-  unlockHold: 0
-  moreRewind: 276
-  lessRewind: 275
+  _recenter: 114
+  _tweenImageWarping: 0
+  _tweenRotationalWarping: 0
+  _tweenPositionalWarping: 0
+  _syncMode: 1
+  _forceCustomUpdate: 0
+  _allowManualTimeAlignment: 0
+  _warpingAdjustment: 60
+  _unlockHold: 303
+  _moreRewind: 276
+  _lessRewind: 275
+  _allowManualDeviceOffset: 0
+  _deviceOffsetYAxis: 0
+  _deviceOffsetZAxis: 0.12
+  _deviceTiltXAxis: 5
 --- !u!1 &1575844947
 GameObject:
   m_ObjectHideFlags: 0
@@ -22473,7 +22479,7 @@ Rigidbody:
   m_AngularDrag: 5
   m_UseGravity: 0
   m_IsKinematic: 0
-  m_Interpolate: 0
+  m_Interpolate: 1
   m_Constraints: 0
   m_CollisionDetection: 0
 --- !u!4 &1680547687
@@ -22854,6 +22860,7 @@ MonoBehaviour:
   pinkyDistalJoint: {fileID: 0}
   pinkyTip: {fileID: 0}
   _chirality: 0
+  _isTracked: 0
 --- !u!1 &1723731512
 GameObject:
   m_ObjectHideFlags: 0
@@ -23965,7 +23972,7 @@ Rigidbody:
   m_AngularDrag: 5
   m_UseGravity: 0
   m_IsKinematic: 0
-  m_Interpolate: 0
+  m_Interpolate: 1
   m_Constraints: 0
   m_CollisionDetection: 0
 --- !u!114 &1817611769
@@ -25975,6 +25982,7 @@ MonoBehaviour:
   pinkyDistalJoint: {fileID: 0}
   pinkyTip: {fileID: 0}
   _chirality: 1
+  _isTracked: 0
 --- !u!1 &1960190928
 GameObject:
   m_ObjectHideFlags: 0

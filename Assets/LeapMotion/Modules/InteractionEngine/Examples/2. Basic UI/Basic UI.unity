@@ -176,8 +176,10 @@ MonoBehaviour:
       PublicKeyToken=null
   sliderType: 2
   dispatchSlideValueOnStart: 1
+  overrideRectLimits: 0
+  _parentHasRectTransform: 1
   defaultHorizontalValue: 0.5
-  horizontalValueRange: {x: 0, y: 1}
+  _horizontalValueRange: {x: 0, y: 1}
   horizontalSlideLimits: {x: -0.08882, y: 0.08882}
   horizontalSteps: 0
   _horizontalSlideEvent:
@@ -186,7 +188,7 @@ MonoBehaviour:
     m_TypeName: Leap.Unity.Interaction.InteractionSlider+FloatEvent, Assembly-CSharp,
       Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
   defaultVerticalValue: 0.5
-  verticalValueRange: {x: 0, y: 1}
+  _verticalValueRange: {x: 0, y: 1}
   verticalSlideLimits: {x: -0.065655, y: 0.065655}
   verticalSteps: 0
   _verticalSlideEvent:
@@ -207,7 +209,7 @@ Rigidbody:
   m_AngularDrag: 0.05
   m_UseGravity: 0
   m_IsKinematic: 0
-  m_Interpolate: 0
+  m_Interpolate: 1
   m_Constraints: 112
   m_CollisionDetection: 0
 --- !u!114 &112263979
@@ -290,7 +292,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c592f16851a620743868a31232613370, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ModelsParent: {fileID: 993508918}
+  _modelsParent: {fileID: 993508918}
   ModelPool:
   - GroupName: Rigged Hands
     _handPool: {fileID: 0}
@@ -322,8 +324,8 @@ MonoBehaviour:
   _isHeadMounted: 1
   _temporalWarping: {fileID: 1007747395}
   _frameOptimization: 0
-  _overrideDeviceType: 0
-  _overrideDeviceTypeWith: 1
+  _physicsExtrapolation: 1
+  _physicsExtrapolationTime: 0.011111111
   _updateHandInPrecull: 0
 --- !u!114 &138469537
 MonoBehaviour:
@@ -1700,6 +1702,11 @@ Prefab:
       propertyPath: _manager
       value: 
       objectReference: {fileID: 708822598}
+    - target: {fileID: 54104857292544158, guid: df84af96020c94b4695aec5c3427db16,
+        type: 2}
+      propertyPath: m_Interpolate
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: df84af96020c94b4695aec5c3427db16, type: 2}
   m_IsPrefabParent: 0
@@ -1756,6 +1763,11 @@ Prefab:
       propertyPath: _manager
       value: 
       objectReference: {fileID: 708822598}
+    - target: {fileID: 54104857292544158, guid: df84af96020c94b4695aec5c3427db16,
+        type: 2}
+      propertyPath: m_Interpolate
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: df84af96020c94b4695aec5c3427db16, type: 2}
   m_IsPrefabParent: 0
@@ -1973,6 +1985,11 @@ Prefab:
       propertyPath: _manager
       value: 
       objectReference: {fileID: 708822598}
+    - target: {fileID: 54104857292544158, guid: df84af96020c94b4695aec5c3427db16,
+        type: 2}
+      propertyPath: m_Interpolate
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: df84af96020c94b4695aec5c3427db16, type: 2}
   m_IsPrefabParent: 0
@@ -2098,6 +2115,11 @@ Prefab:
       propertyPath: _manager
       value: 
       objectReference: {fileID: 708822598}
+    - target: {fileID: 54104857292544158, guid: df84af96020c94b4695aec5c3427db16,
+        type: 2}
+      propertyPath: m_Interpolate
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: df84af96020c94b4695aec5c3427db16, type: 2}
   m_IsPrefabParent: 0
@@ -3259,17 +3281,21 @@ MonoBehaviour:
   provider: {fileID: 138469536}
   _headTransform: {fileID: 1846961981}
   _trackingAnchor: {fileID: 1198429509}
-  recenter: 114
-  tweenImageWarping: 0
-  tweenRotationalWarping: 1
-  tweenPositionalWarping: 0
-  syncMode: 0
-  forceCustomUpdate: 0
-  allowManualTimeAlignment: 0
-  warpingAdjustment: 30
-  unlockHold: 303
-  moreRewind: 276
-  lessRewind: 275
+  _recenter: 114
+  _tweenImageWarping: 0
+  _tweenRotationalWarping: 0
+  _tweenPositionalWarping: 0
+  _syncMode: 1
+  _forceCustomUpdate: 0
+  _allowManualTimeAlignment: 0
+  _warpingAdjustment: 60
+  _unlockHold: 303
+  _moreRewind: 276
+  _lessRewind: 275
+  _allowManualDeviceOffset: 0
+  _deviceOffsetYAxis: 0
+  _deviceOffsetZAxis: 0.12
+  _deviceTiltXAxis: 5
 --- !u!114 &1036247346 stripped
 MonoBehaviour:
   m_PrefabParentObject: {fileID: 114446365300099102, guid: 72368278d054cda4bb18e5aa08ce971d,
@@ -3643,6 +3669,11 @@ Prefab:
       propertyPath: _manager
       value: 
       objectReference: {fileID: 708822598}
+    - target: {fileID: 54104857292544158, guid: df84af96020c94b4695aec5c3427db16,
+        type: 2}
+      propertyPath: m_Interpolate
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: df84af96020c94b4695aec5c3427db16, type: 2}
   m_IsPrefabParent: 0
@@ -3734,6 +3765,11 @@ Prefab:
       propertyPath: _manager
       value: 
       objectReference: {fileID: 708822598}
+    - target: {fileID: 54104857292544158, guid: df84af96020c94b4695aec5c3427db16,
+        type: 2}
+      propertyPath: m_Interpolate
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: df84af96020c94b4695aec5c3427db16, type: 2}
   m_IsPrefabParent: 0
@@ -4080,8 +4116,10 @@ MonoBehaviour:
       PublicKeyToken=null
   sliderType: 1
   dispatchSlideValueOnStart: 1
+  overrideRectLimits: 0
+  _parentHasRectTransform: 1
   defaultHorizontalValue: 0.5
-  horizontalValueRange: {x: 0, y: 1}
+  _horizontalValueRange: {x: 0, y: 1}
   horizontalSlideLimits: {x: -0.2075, y: 0.2075}
   horizontalSteps: 0
   _horizontalSlideEvent:
@@ -4090,7 +4128,7 @@ MonoBehaviour:
     m_TypeName: Leap.Unity.Interaction.InteractionSlider+FloatEvent, Assembly-CSharp,
       Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
   defaultVerticalValue: 0
-  verticalValueRange: {x: 0, y: 1}
+  _verticalValueRange: {x: 0, y: 1}
   verticalSlideLimits: {x: -0.005000001, y: 0.005000001}
   verticalSteps: 0
   _verticalSlideEvent:
@@ -4111,7 +4149,7 @@ Rigidbody:
   m_AngularDrag: 0.05
   m_UseGravity: 0
   m_IsKinematic: 0
-  m_Interpolate: 0
+  m_Interpolate: 1
   m_Constraints: 112
   m_CollisionDetection: 0
 --- !u!114 &1758933912
@@ -4371,6 +4409,11 @@ Prefab:
       propertyPath: _manager
       value: 
       objectReference: {fileID: 708822598}
+    - target: {fileID: 54104857292544158, guid: df84af96020c94b4695aec5c3427db16,
+        type: 2}
+      propertyPath: m_Interpolate
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: df84af96020c94b4695aec5c3427db16, type: 2}
   m_IsPrefabParent: 0
@@ -4427,6 +4470,11 @@ Prefab:
       propertyPath: _manager
       value: 
       objectReference: {fileID: 708822598}
+    - target: {fileID: 54104857292544158, guid: df84af96020c94b4695aec5c3427db16,
+        type: 2}
+      propertyPath: m_Interpolate
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: df84af96020c94b4695aec5c3427db16, type: 2}
   m_IsPrefabParent: 0
@@ -4567,6 +4615,11 @@ Prefab:
       propertyPath: _manager
       value: 
       objectReference: {fileID: 708822598}
+    - target: {fileID: 54104857292544158, guid: df84af96020c94b4695aec5c3427db16,
+        type: 2}
+      propertyPath: m_Interpolate
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: df84af96020c94b4695aec5c3427db16, type: 2}
   m_IsPrefabParent: 0
