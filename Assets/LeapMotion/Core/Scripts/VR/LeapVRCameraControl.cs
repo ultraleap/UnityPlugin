@@ -12,146 +12,195 @@ using UnityEngine.Rendering;
 using System;
 
 namespace Leap.Unity {
-  /**Provides a variety of VR related camera utilities, for example controlling IPD and camera distance */
-  [RequireComponent(typeof(Camera))]
+
+  /// <summary>
+  /// Provides a variety of VR related camera utilities, for example controlling IPD and camera distance.
+  /// </summary>
+  //[RequireComponent(typeof(Camera))]
   [ExecuteInEditMode]
   public class LeapVRCameraControl : MonoBehaviour {
-    public const string GLOBAL_EYE_UV_OFFSET_NAME = "_LeapGlobalStereoUVOffset";
-    private static Vector2 LEFT_EYE_UV_OFFSET = new Vector2(0, 0);
-    private static Vector2 RIGHT_EYE_UV_OFFSET = new Vector2(0, 0.5f);
 
-    //When using VR, the cameras do not have valid parameters until the first frame begins rendering, 
-    //so if you need valid parameters for initialization, you can use this callback to get notified 
-    //when they become available.
-    public static event Action<CameraParams> OnValidCameraParams;
-    private static bool _hasDispatchedValidCameraParams = false;
+    #region IR Viewer Support
 
-    public static event Action<Camera> OnLeftPreRender;
-    public static event Action<Camera> OnRightPreRender;
+    public const string LEAP_IMAGE_LEFT_UV_OFFSET_NAME  = "_LeapImageLeftUVOffset";
+    public const string LEAP_IMAGE_RIGHT_UV_OFFSET_NAME = "_LeapImageRightUVOffset";
 
-    [SerializeField]
-    private EyeType _eyeType = new EyeType(EyeType.OrderType.CENTER);
+    private static Vector2 LEFT_IMAGE_UV_OFFSET = new Vector2(0, 0);
+    private static Vector2 RIGHT_IMAGE_UV_OFFSET = new Vector2(0, 0.5f);
 
-    [SerializeField]
-    private bool _overrideEyePosition = true;
-
-    public bool OverrideEyePosition { get { return _overrideEyePosition; } set { _overrideEyePosition = value; } }
-
-    private Camera _cachedCamera;
-    private Camera _camera {
-      get {
-        if (_cachedCamera == null) {
-          _cachedCamera = GetComponent<Camera>();
-        }
-        return _cachedCamera;
-      }
+    /// <summary>
+    /// Sets shader globals that define the UV offsets necessary to access only the left
+    /// or right images from the combined image retrieved from the Leap device.
+    /// </summary>
+    private void setLeapImageUVOffsetGlobals() {
+      Shader.SetGlobalVector(LEAP_IMAGE_LEFT_UV_OFFSET_NAME, LEFT_IMAGE_UV_OFFSET);
+      Shader.SetGlobalVector(LEAP_IMAGE_RIGHT_UV_OFFSET_NAME, RIGHT_IMAGE_UV_OFFSET);
     }
 
-    private Matrix4x4 _finalCenterMatrix;
-    private LeapDeviceInfo _deviceInfo;
+    #endregion
 
     void Start() {
-#if UNITY_EDITOR
-      if (!Application.isPlaying) {
-        return;
-      }
-#endif
+      //#if UNITY_EDITOR
+      //      if (!Application.isPlaying) {
+      //        return;
+      //      }
+      //#endif
 
-      _deviceInfo = LeapDeviceInfo.GetLeapDeviceInfo();
+      setLeapImageUVOffsetGlobals();
+
+      //_deviceInfo = LeapDeviceInfo.GetLeapDeviceInfo();
     }
 
-    void Update() {
-#if UNITY_EDITOR
-      _eyeType.UpdateOrderGivenComponent(this);
+    //#region Inspector
 
-      if (!Application.isPlaying) {
-        return;
-      }
-#endif
+    //[SerializeField]
+    //private EyeType _eyeType = EyeType.CENTER;
 
-      _hasDispatchedValidCameraParams = false;
-    }
+    //[SerializeField]
+    //private bool _overrideEyePosition = true;
+    //public bool overrideEyePosition { get { return _overrideEyePosition; } set { _overrideEyePosition = value; } }
 
-    void OnPreCull() {
-#if UNITY_EDITOR
-      if (!Application.isPlaying) {
-        return;
-      }
-#endif
+    //#endregion
 
-      _camera.ResetWorldToCameraMatrix();
-      _finalCenterMatrix = _camera.worldToCameraMatrix;
 
-      if (!_hasDispatchedValidCameraParams) {
-        CameraParams cameraParams = new CameraParams(_cachedCamera);
 
-        if (OnValidCameraParams != null) {
-          OnValidCameraParams(cameraParams);
-        }
+    //#region Events
 
-        _hasDispatchedValidCameraParams = true;
-      }
-    }
+    ///// <summary>
+    ///// When using VR, the cameras do not have valid parameters until the first frame
+    ///// begins rendering, so if you need valid parameters for initialization, you can use
+    ///// this callback to get notified when they become available.
+    ///// </summary>
+    //public static Action<CameraParams> OnValidCameraParams;
 
-    void OnPreRender() {
-#if UNITY_EDITOR
-      if (!Application.isPlaying) {
-        return;
-      }
-#endif
+    //private static bool _hasDispatchedValidCameraParams = false;
 
-      _eyeType.BeginCamera();
+    ///// <summary>
+    ///// Called during the left eye camera's OnPreRender Unity callback.
+    ///// </summary>
+    //public static Action<Camera> OnLeftPreRender;
 
-      if (_eyeType.IsLeftEye) {
-        Shader.SetGlobalVector(GLOBAL_EYE_UV_OFFSET_NAME, LEFT_EYE_UV_OFFSET);
-        if (OnLeftPreRender != null) OnLeftPreRender(_cachedCamera);
-      } else {
-        Shader.SetGlobalVector(GLOBAL_EYE_UV_OFFSET_NAME, RIGHT_EYE_UV_OFFSET);
-        if (OnRightPreRender != null) OnRightPreRender(_cachedCamera);
-      }
+    ///// <summary>
+    ///// Called during the right eye camera's OnPreRender Unity callback.
+    ///// </summary>
+    //public static Action<Camera> OnRightPreRender;
 
-      Matrix4x4 offsetMatrix;
+    //#endregion
 
-      if (_overrideEyePosition) {
-        offsetMatrix = _finalCenterMatrix;
-        //Debug.Log(_deviceInfo.baseline);
-        Vector3 ipdOffset = (_eyeType.IsLeftEye ? 1 : -1) * transform.right * _deviceInfo.baseline * 0.5f;
-        Vector3 forwardOffset = -transform.forward * _deviceInfo.focalPlaneOffset;
-        offsetMatrix *= Matrix4x4.TRS(ipdOffset + forwardOffset, Quaternion.identity, Vector3.one);
-      } else {
-        offsetMatrix = _camera.worldToCameraMatrix;
-      }
 
-      _camera.worldToCameraMatrix = offsetMatrix;
-    }
 
-    public struct CameraParams {
-      public readonly Transform CenterEyeTransform;
-      public readonly Matrix4x4 ProjectionMatrix;
-      public readonly int Width;
-      public readonly int Height;
+    //private Camera _cachedCamera;
+    //private Camera _camera {
+    //  get {
+    //    if (_cachedCamera == null) {
+    //      _cachedCamera = GetComponent<Camera>();
+    //    }
+    //    return _cachedCamera;
+    //  }
+    //}
 
-      public CameraParams(Camera camera) {
-        CenterEyeTransform = camera.transform;
-        ProjectionMatrix = camera.projectionMatrix;
+    //private Matrix4x4 _finalCenterMatrix;
 
-        switch (SystemInfo.graphicsDeviceType) {
-          case GraphicsDeviceType.Direct3D9:
-          case GraphicsDeviceType.Direct3D11:
-          case GraphicsDeviceType.Direct3D12:
-            for (int i = 0; i < 4; i++) {
-              ProjectionMatrix[1, i] = -ProjectionMatrix[1, i];
-            }
-            // Scale and bias from OpenGL -> D3D depth range
-            for (int i = 0; i < 4; i++) {
-              ProjectionMatrix[2, i] = ProjectionMatrix[2, i] * 0.5f + ProjectionMatrix[3, i] * 0.5f;
-            }
-            break;
-        }
+    //private LeapDeviceInfo _deviceInfo;
 
-        Width = camera.pixelWidth;
-        Height = camera.pixelHeight;
-      }
-    }
+    //#region Unity Events
+
+    //    void Update() {
+    //#if UNITY_EDITOR
+    //      _eyeType.UpdateOrderGivenComponent(this);
+
+    //      if (!Application.isPlaying) {
+    //        return;
+    //      }
+    //#endif
+
+    //      _hasDispatchedValidCameraParams = false;
+    //    }
+
+    //    void OnPreCull() {
+    //#if UNITY_EDITOR
+    //      if (!Application.isPlaying) {
+    //        return;
+    //      }
+    //#endif
+
+    //      _camera.ResetWorldToCameraMatrix();
+    //      _finalCenterMatrix = _camera.worldToCameraMatrix;
+
+    //      if (!_hasDispatchedValidCameraParams) {
+    //        CameraParams cameraParams = new CameraParams(_cachedCamera);
+
+    //        if (OnValidCameraParams != null) {
+    //          OnValidCameraParams(cameraParams);
+    //        }
+
+    //        _hasDispatchedValidCameraParams = true;
+    //      }
+    //    }
+
+    //    void OnPreRender() {
+    //#if UNITY_EDITOR
+    //      if (!Application.isPlaying) {
+    //        return;
+    //      }
+    //#endif
+
+    //      _eyeType.BeginCamera();
+
+    //      Matrix4x4 offsetMatrix;
+
+    //      if (_overrideEyePosition) {
+    //        offsetMatrix = _finalCenterMatrix;
+    //        //Debug.Log(_deviceInfo.baseline);
+    //        Vector3 ipdOffset = (_eyeType.IsLeftEye ? 1 : -1) * transform.right * _deviceInfo.baseline * 0.5f;
+    //        Vector3 forwardOffset = -transform.forward * _deviceInfo.focalPlaneOffset;
+    //        offsetMatrix *= Matrix4x4.TRS(ipdOffset + forwardOffset, Quaternion.identity, Vector3.one);
+    //      } else {
+    //        offsetMatrix = _camera.worldToCameraMatrix;
+    //      }
+
+    //      _camera.worldToCameraMatrix = offsetMatrix;
+    //    }
+
+    //public struct CameraParams {
+    //  public readonly Transform CenterEyeTransform;
+    //  public readonly Matrix4x4 ProjectionMatrix;
+    //  public readonly int Width;
+    //  public readonly int Height;
+
+    //  public CameraParams(Camera camera) {
+    //    CenterEyeTransform = camera.transform;
+    //    ProjectionMatrix = camera.projectionMatrix;
+
+    //    switch (SystemInfo.graphicsDeviceType) {
+    //      case GraphicsDeviceType.Direct3D9:
+    //      case GraphicsDeviceType.Direct3D11:
+    //      case GraphicsDeviceType.Direct3D12:
+    //        for (int i = 0; i < 4; i++) {
+    //          ProjectionMatrix[1, i] = -ProjectionMatrix[1, i];
+    //        }
+    //        // Scale and bias from OpenGL -> D3D depth range
+    //        for (int i = 0; i < 4; i++) {
+    //          ProjectionMatrix[2, i] = ProjectionMatrix[2, i] * 0.5f + ProjectionMatrix[3, i] * 0.5f;
+    //        }
+    //        break;
+    //    }
+
+    //    Width = camera.pixelWidth;
+    //    Height = camera.pixelHeight;
+    //  }
+    //}
   }
+
+  //#region Support
+
+  //[System.Serializable]
+  //public enum EyeType {
+  //  CENTER = 0,
+  //  LEFT = 1,
+  //  RIGHT = 2,
+  //}
+
+  //#endregion
+
 }

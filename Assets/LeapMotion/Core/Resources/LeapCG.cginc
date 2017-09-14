@@ -15,7 +15,8 @@ uniform float4 _LeapGlobalProjection;
 
 uniform float _LeapGlobalGammaCorrectionExponent;
 
-uniform float2 _LeapGlobalStereoUVOffset;
+uniform float2 _LeapImageLeftUVOffset;
+uniform float2 _LeapImageRightUVOffset;
 
 uniform float4x4 _LeapGlobalWarpedOffset;
 

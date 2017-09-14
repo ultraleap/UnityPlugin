@@ -126,7 +126,6 @@ GameObject:
   - component: {fileID: 266907298}
   - component: {fileID: 266907294}
   - component: {fileID: 266907295}
-  - component: {fileID: 266907293}
   m_Layer: 0
   m_Name: CenterEyeAnchor
   m_TagString: MainCamera
@@ -147,21 +146,6 @@ Transform:
   m_Father: {fileID: 1805543667}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &266907293
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 11407670, guid: 18d6bf9063dcb1842be63f411fd9fc26,
-    type: 2}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 266907291}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cfb12777e12bf9941b23356a343f5016, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _eyeType:
-    _orderType: 3
-  _overrideEyePosition: 0
 --- !u!114 &266907294
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -244,7 +228,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _modelsParent: {fileID: 395650195}
   ModelPool:
-  - GroupName: Graphics_Hands
+  - GroupName: Graphics Hands
     _handPool: {fileID: 0}
     LeftModel: {fileID: 1545945338}
     IsLeftToBeSpawned: 0
@@ -253,13 +237,13 @@ MonoBehaviour:
     modelList: []
     modelsCheckedOut: []
     IsEnabled: 1
-    CanDuplicate: 1
+    CanDuplicate: 0
     HandPostProcesses:
       m_PersistentCalls:
         m_Calls: []
       m_TypeName: Leap.Unity.Hands+HandEvent, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
         PublicKeyToken=null
-  - GroupName: Physics_Hands
+  - GroupName: Physics Hands
     _handPool: {fileID: 0}
     LeftModel: {fileID: 1414805578}
     IsLeftToBeSpawned: 0
@@ -268,7 +252,7 @@ MonoBehaviour:
     modelList: []
     modelsCheckedOut: []
     IsEnabled: 1
-    CanDuplicate: 1
+    CanDuplicate: 0
     HandPostProcesses:
       m_PersistentCalls:
         m_Calls: []
