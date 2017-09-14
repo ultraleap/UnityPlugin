@@ -14,8 +14,8 @@ using System;
 namespace Leap.Unity {
   /**LeapServiceProvider creates a Controller and supplies Leap Hands and images */
   public class LeapVRServiceProvider : LeapServiceProvider {
-    public static event Action<Camera> OnLeftPreRender;
-    public static event Action<Camera> OnRightPreRender;
+    //public static event Action<Camera> OnLeftPreRender;
+    //public static event Action<Camera> OnRightPreRender;
 
     [Header("[Experimental]")]
     [Tooltip("Pass updated transform matrices to objects with materials using the VertexOffsetShader.")]
@@ -24,16 +24,19 @@ namespace Leap.Unity {
 
     protected TransformHistory transformHistory = new TransformHistory();
     protected bool manualUpdateHasBeenCalledSinceUpdate;
-    protected Vector3 warpedPosition = Vector3.zero;
+    protected Vector3    warpedPosition = Vector3.zero;
     protected Quaternion warpedRotation = Quaternion.identity;
     protected Matrix4x4[] _transformArray = new Matrix4x4[2];
 
     private Camera _cachedCamera;
-    public const string GLOBAL_EYE_UV_OFFSET_NAME = "_LeapGlobalStereoUVOffset";
-    private static Vector2 LEFT_EYE_UV_OFFSET = new Vector2(0, 0);
-    private static Vector2 RIGHT_EYE_UV_OFFSET = new Vector2(0, 0.5f);
-    private Matrix4x4 _projectionMatrix;
-    private bool IsLeftEye = true;
+    //public const string GLOBAL_EYE_UV_OFFSET_NAME = "_LeapGlobalStereoUVOffset";
+    //private static Vector2 LEFT_EYE_UV_OFFSET = new Vector2(0, 0);
+    //private static Vector2 RIGHT_EYE_UV_OFFSET = new Vector2(0, 0.5f);
+    //private Matrix4x4 _projectionMatrix;
+    //private bool IsLeftEye = true;
+
+    [Range(-0.30f, 0.30f)]
+    public float deviceZOffset = 0.12f;
 
     [NonSerialized]
     public long imageTimeStamp = 0;
@@ -85,29 +88,31 @@ namespace Leap.Unity {
 
       LateUpdateHandTransforms(_cachedCamera);
 
-      _projectionMatrix = _cachedCamera.projectionMatrix;
+      var projectionMatrix = _cachedCamera.projectionMatrix;
 
       switch (SystemInfo.graphicsDeviceType) {
         case UnityEngine.Rendering.GraphicsDeviceType.Direct3D9:
         case UnityEngine.Rendering.GraphicsDeviceType.Direct3D11:
         case UnityEngine.Rendering.GraphicsDeviceType.Direct3D12:
           for (int i = 0; i < 4; i++) {
-            _projectionMatrix[1, i] = -_projectionMatrix[1, i];
+            projectionMatrix[1, i] = -projectionMatrix[1, i];
           }
           // Scale and bias from OpenGL -> D3D depth range
           for (int i = 0; i < 4; i++) {
-            _projectionMatrix[2, i] = _projectionMatrix[2, i] * 0.5f + _projectionMatrix[3, i] * 0.5f;
+            projectionMatrix[2, i] = projectionMatrix[2, i] * 0.5f + projectionMatrix[3, i] * 0.5f;
           }
           break;
       }
 
-      //Update Image Warping
+      // Update Image Warping
       Vector3 position; Quaternion rotation;
       transformHistory.SampleTransform(imageTimeStamp /*- ((long)_smoothedTrackingLatency.value+20000)*/, out position, out rotation);
       Quaternion imageQuatWarp = Quaternion.Inverse(InputTracking.GetLocalRotation(VRNode.CenterEye)) * rotation;
       imageQuatWarp = Quaternion.Euler(imageQuatWarp.eulerAngles.x, imageQuatWarp.eulerAngles.y, -imageQuatWarp.eulerAngles.z);
-      Matrix4x4 imageMatWarp = _projectionMatrix * Matrix4x4.TRS(Vector3.zero, imageQuatWarp, Vector3.one) * _projectionMatrix.inverse;
+      Matrix4x4 imageMatWarp = projectionMatrix * Matrix4x4.TRS(Vector3.zero, imageQuatWarp, Vector3.one) * projectionMatrix.inverse;
       Shader.SetGlobalMatrix("_LeapGlobalWarpedOffset", imageMatWarp);
+      // Temporary replacement(remove this when we fix image warping):
+      //Shader.SetGlobalMatrix("_LeapGlobalWarpedOffset", Matrix4x4.identity);
     }
 
     protected virtual void OnEnable() {
@@ -126,16 +131,16 @@ namespace Leap.Unity {
       _transformArray[1] = Matrix4x4.identity;
       Shader.SetGlobalMatrixArray(HAND_ARRAY, _transformArray);
     }
-
-    /*
-     * Initializes the Leap Motion policy flags.
-     * The POLICY_OPTIMIZE_HMD flag improves tracking for head-mounted devices.
-     */
+    
+    /// <summary>
+    /// Initializes the Leap Motion policy flags.
+    /// The POLICY_OPTIMIZE_HMD flag improves tracking for head-mounted devices.
+    /// </summary>
     protected override void initializeFlags() {
       if (leap_controller_ == null) {
         return;
       }
-      //Optimize for top-down tracking if on head mounted display.
+      // Optimize for top-down tracking if on head mounted display.
       leap_controller_.SetPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
     }
 
@@ -147,10 +152,18 @@ namespace Leap.Unity {
         }
 
         warpedRotation *= Quaternion.Euler(-90f, 180f, 0f);
-        warpedPosition += warpedRotation * Vector3.up * 0.07f; //Should be replaced with a device info focal plane, but it looks like the provider just shits out a new device info every time you request one.
+        //warpedRotation = Quaternion.Euler(0f, 5f, 0f) * warpedRotation; // Tilt
+        //warpedPosition += warpedRotation * Vector3.up * 0.12f;          // Forward offset
+        // TODO: Add back Manual Device Offset, replacing the manual 12cm up above
+        // TEMPORARY: Use a forward offset of zero instead, to get hands to align in
+        // the AR scene.
+        warpedPosition += warpedRotation * Vector3.up * deviceZOffset;
 
         if (transform.parent != null) {
-          leapTransform = new LeapTransform(transform.parent.TransformPoint(warpedPosition).ToVector(), (transform.parent.rotation * warpedRotation).ToLeapQuaternion(), transform.lossyScale.ToVector() * 1e-3f);
+          leapTransform = new LeapTransform(
+            transform.parent.TransformPoint(warpedPosition).ToVector(),
+            (transform.parent.rotation * warpedRotation).ToLeapQuaternion(),
+            transform.lossyScale.ToVector() * 1e-3f);
         } else {
           leapTransform = new LeapTransform(warpedPosition.ToVector(), warpedRotation.ToLeapQuaternion(), transform.lossyScale.ToVector() * 1e-3f);
         }
