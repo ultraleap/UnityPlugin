@@ -530,11 +530,20 @@ namespace Leap.Unity.Interaction {
 
       _contactBones[NUM_FINGERS * BONES_PER_FINGER].transform.position = _unwarpedHandData.PalmPosition.ToVector3();
       _contactBones[NUM_FINGERS * BONES_PER_FINGER].transform.rotation = _unwarpedHandData.Rotation.ToQuaternion();
+      _contactBones[NUM_FINGERS * BONES_PER_FINGER].rigidbody.velocity = Vector3.zero;
+      _contactBones[NUM_FINGERS * BONES_PER_FINGER].rigidbody.angularVelocity = Vector3.zero;
 
       for (int fingerIndex = 0; fingerIndex < NUM_FINGERS; fingerIndex++) {
         for (int jointIndex = 0; jointIndex < BONES_PER_FINGER; jointIndex++) {
           Bone bone = _unwarpedHandData.Fingers[fingerIndex].Bone((Bone.BoneType)(jointIndex) + 1); // +1 to skip first bone.
           int boneArrayIndex = fingerIndex * BONES_PER_FINGER + jointIndex;
+
+          _contactBones[boneArrayIndex].transform.position = bone.Center.ToVector3();
+          _contactBones[boneArrayIndex].transform.rotation = bone.Rotation.ToQuaternion();
+          _contactBones[boneArrayIndex].rigidbody.position = bone.Center.ToVector3();
+          _contactBones[boneArrayIndex].rigidbody.rotation = bone.Rotation.ToQuaternion();
+          _contactBones[boneArrayIndex].rigidbody.velocity = Vector3.zero;
+          _contactBones[boneArrayIndex].rigidbody.angularVelocity = Vector3.zero;
 
           if (jointIndex != 0 && _contactBones[boneArrayIndex].joint != null) {
             Bone prevBone = _unwarpedHandData.Fingers[fingerIndex].Bone((Bone.BoneType)(jointIndex));

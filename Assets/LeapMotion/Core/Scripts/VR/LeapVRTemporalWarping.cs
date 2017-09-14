@@ -204,7 +204,7 @@ namespace Leap.Unity {
 
       // Prepare device offset parameters.
       Quaternion deviceTilt   = Quaternion.Euler(deviceTiltXAxis, 0f, 0f);
-      Vector3    deviceOffset = new Vector3(0f, deviceOffsetYAxis, deviceOffsetZAxis);
+      Vector3    deviceOffset = new Vector3(0f, deviceOffsetYAxis, deviceOffsetZAxis).CompMul(this.transform.lossyScale);
 
       // TODO: We no longer use deviceInfo.forwardOffset. We should consider removing it
       // entirely or more approrpriately when we collapse the rig hierarchy. 9/1/17

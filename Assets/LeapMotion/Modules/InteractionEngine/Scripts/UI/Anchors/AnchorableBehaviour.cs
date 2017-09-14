@@ -325,7 +325,9 @@ namespace Leap.Unity.Interaction {
         }
 
         updateAnchorAttachment();
-        updateAnchorAttachmentRotation();
+        if (anchorRotation) {
+          updateAnchorAttachmentRotation();
+        }
 
         WhileAttachedToAnchor.Invoke(this, anchor);
 
