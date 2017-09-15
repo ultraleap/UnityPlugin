@@ -24,6 +24,7 @@ ExportedObj/
 Temp/
 Build/
 
+.vs/
 .vscode/
 
 *~

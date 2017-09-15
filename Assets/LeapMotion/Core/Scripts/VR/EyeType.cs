@@ -95,7 +95,8 @@ namespace Leap.Unity {
       if (!_hasBegun) {
         _isOnFirst = true;
         _hasBegun = true;
-      } else {
+      }
+      else {
         _isOnFirst = !_isOnFirst;
       }
     }

@@ -14,10 +14,14 @@ using System.Collections;
 using Leap.Unity.Attributes;
 
 namespace Leap.Unity {
-  // To use the LeapImageRetriever you must be on version 2.1+
-  // and enable "Allow Images" in the Leap Motion settings.
 
-  /** LeapImageRetriever acquires images from a LeapServiceProvider and uploads them to gpu for use by shaders */
+  /// <summary>
+  /// Acquires images from a LeapServiceProvider and uploads image data as shader global
+  /// data for use by any shaders that render those images.
+  /// 
+  /// Note: To use the LeapImageRetriever, you must be on version 2.1 or newer and you
+  /// must enable "Allow Images" in your Leap Motion settings.
+  /// </summary>
   [RequireComponent(typeof(Camera))]
   public class LeapImageRetriever : MonoBehaviour {
     public const string GLOBAL_COLOR_SPACE_GAMMA_NAME = "_LeapGlobalColorSpaceGamma";
@@ -284,7 +288,7 @@ namespace Leap.Unity {
       }
 
       ApplyGammaCorrectionValues();
-      ApplyCameraProjectionValues(GetComponent<Camera>());
+      // ApplyCameraProjectionValues(GetComponent<Camera>());
     }
 
     void OnEnable() {
@@ -295,8 +299,8 @@ namespace Leap.Unity {
         StartCoroutine(waitForController());
       }
 
-      LeapVRCameraControl.OnLeftPreRender += ApplyCameraProjectionValues;
-      LeapVRCameraControl.OnRightPreRender += ApplyCameraProjectionValues;
+      //LeapVRCameraControl.OnLeftPreRender += ApplyCameraProjectionValues;
+      //LeapVRCameraControl.OnRightPreRender += ApplyCameraProjectionValues;
     }
 
     void OnDisable() {
@@ -306,8 +310,8 @@ namespace Leap.Unity {
         _provider.GetLeapController().DistortionChange -= onDistortionChange;
       }
 
-      LeapVRCameraControl.OnLeftPreRender -= ApplyCameraProjectionValues;
-      LeapVRCameraControl.OnRightPreRender -= ApplyCameraProjectionValues;
+      //LeapVRCameraControl.OnLeftPreRender -= ApplyCameraProjectionValues;
+      //LeapVRCameraControl.OnRightPreRender -= ApplyCameraProjectionValues;
     }
 
     void OnDestroy() {
@@ -386,14 +390,14 @@ namespace Leap.Unity {
     }
 
     public void ApplyCameraProjectionValues(Camera camera) {
-      //These parameters are used during undistortion of the images to ensure they
-      //line up properly with the scene
+      // These parameters are used during undistortion of the images to ensure they
+      // line up properly with the scene.
       Vector4 projection = new Vector4();
       projection.x = camera.projectionMatrix[0, 2];
       projection.y = 0f;
       projection.z = camera.projectionMatrix[0, 0];
       projection.w = camera.projectionMatrix[1, 1];
-      Shader.SetGlobalVector(GLOBAL_CAMERA_PROJECTION_NAME, projection);
+      //Shader.SetGlobalVector(GLOBAL_CAMERA_PROJECTION_NAME, projection);
     }
 
     void onDistortionChange(object sender, LeapEventArgs args) {
