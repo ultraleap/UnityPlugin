@@ -34,16 +34,25 @@ namespace Leap.Unity.Attributes {
     public void ConstrainValue(SerializedProperty property) {
       if (property.objectReferenceValue != null) {
         var objectReferenceValue = property.objectReferenceValue;
-        var implementer = (objectReferenceValue as Component)
+
+        if (objectReferenceValue.GetType().ImplementsInterface(type)) {
+          // All good! This Component implements the interface.
+          return;
+        }
+        else {
+          // Search the rest of the GameObject for a component that implements the
+          // interface.
+          var implementer = (objectReferenceValue as Component)
                             .GetComponents<Component>()
                             .Query()
                             .Where(c => c.GetType().ImplementsInterface(type))
                             .FirstOrDefault();
-        if (implementer == null) {
-          Debug.LogError(property.objectReferenceValue.GetType().Name + " does not implement " + type.Name);
-        }
+          if (implementer == null) {
+            Debug.LogError(property.objectReferenceValue.GetType().Name + " does not implement " + type.Name);
+          }
 
-        property.objectReferenceValue = implementer;
+          property.objectReferenceValue = implementer;
+        }
       }
     }
 
