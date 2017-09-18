@@ -13,6 +13,7 @@ using UnityEditor;
 #endif
 using System.Collections.Generic;
 using System;
+using Leap.Unity.Query;
 
 namespace Leap.Unity.Attributes {
 
@@ -32,10 +33,17 @@ namespace Leap.Unity.Attributes {
 #if UNITY_EDITOR
     public void ConstrainValue(SerializedProperty property) {
       if (property.objectReferenceValue != null) {
-        if (!property.objectReferenceValue.GetType().ImplementsInterface(type)) {
+        var objectReferenceValue = property.objectReferenceValue;
+        var implementer = (objectReferenceValue as Component)
+                            .GetComponents<Component>()
+                            .Query()
+                            .Where(c => c.GetType().ImplementsInterface(type))
+                            .FirstOrDefault();
+        if (implementer == null) {
           Debug.LogError(property.objectReferenceValue.GetType().Name + " does not implement " + type.Name);
-          property.objectReferenceValue = null;
         }
+
+        property.objectReferenceValue = implementer;
       }
     }
 
