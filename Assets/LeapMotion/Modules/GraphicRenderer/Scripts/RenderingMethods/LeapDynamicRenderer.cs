@@ -25,7 +25,6 @@ namespace Leap.Unity.GraphicalRenderer {
     //Curved space
     private const string CURVED_PARAMETERS = LeapGraphicRenderer.PROPERTY_PREFIX + "Curved_GraphicParameters";
     private List<Matrix4x4> _curved_worldToAnchor = new List<Matrix4x4>();
-    private List<Matrix4x4> _curved_meshTransforms = new List<Matrix4x4>();
     private List<Vector4> _curved_graphicParameters = new List<Vector4>();
     #endregion
 
@@ -105,11 +104,12 @@ namespace Leap.Unity.GraphicalRenderer {
           var curvedSpace = renderer.space as LeapRadialSpace;
           using (new ProfilerSample("Build Material Data And Draw Meshes")) {
             _curved_worldToAnchor.Clear();
-            _curved_meshTransforms.Clear();
             _curved_graphicParameters.Clear();
             for (int i = 0; i < _meshes.Count; i++) {
               var graphic = group.graphics[i];
               if (!graphic.isActiveAndEnabled) {
+                _curved_graphicParameters.Add(Vector4.zero);
+                _curved_worldToAnchor.Add(Matrix4x4.identity);
                 continue;
               }
 
@@ -122,13 +122,11 @@ namespace Leap.Unity.GraphicalRenderer {
               Matrix4x4 total = mainTransform * deform;
 
               _curved_graphicParameters.Add((transformer as IRadialTransformer).GetVectorRepresentation(graphic.transform));
-              _curved_meshTransforms.Add(total);
-
               _curved_worldToAnchor.Add(mainTransform.inverse);
 
               //Safe to do this before we upload material data
               //meshes are drawn at end of frame anyway!
-              drawMesh(_meshes[i], _curved_meshTransforms[i]);
+              drawMesh(_meshes[i], total);
             }
           }
 
