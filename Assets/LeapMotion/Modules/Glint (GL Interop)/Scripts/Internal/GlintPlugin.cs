@@ -14,13 +14,44 @@ namespace Leap.Unity.Glint.Internal {
     #region DLLImport
 
     [DllImport("Glint")]
-    private static extern int GetLastStatus();
+    private static extern int getLastStatus();
 
+    /// <summary>
+    /// Initiates a Glint texture request. This is the first step in the chain.
+    /// 
+    /// Should be called on Update.
+    /// </summary>
     [DllImport("Glint")]
     private static extern int RequestTextureData(IntPtr nativeTexPtr,
                                                 int width, int height, int pixelSize);
 
     /// <summary>
+    /// Returns a function pointer to the render thread RequestTexture function.
+    /// 
+    /// This is the second step. This method needs to be called on the render thread,
+    /// and then some time should be allowed to pass to allow the GPU to process the
+    /// request.
+    /// </summary>
+    [DllImport("Glint")]
+    private static extern IntPtr GetRequestTextureEventFunc();
+
+    /// <summary>
+    /// Returns a function pointer to the render thread CopyTexture function.
+    /// 
+    /// This is the third step. This function should be called after some time has passed
+    /// from the RequestTexture call on the render thread.
+    /// 
+    /// Currently this function will BLOCK in OpenGL due to a Map() call. Let time pass
+    /// before calling this to prevent halting!
+    /// </summary>
+    [DllImport("Glint")]
+    private static extern IntPtr GetCopyTextureEventFunc();
+
+    /// <summary>
+    /// The fourth and final step in retrieving the texture data; it must be called on
+    /// the main Unity thread. This is ideally called as directly after the CopyTexture
+    /// render thread call as possible, since the data will be ready after the Copy call.
+    /// 
     /// dataSize should be the length of data and should be width * height * pixelSize.
     /// 
     /// The profileBuffer is passed so the plugin can surface how long each step took
@@ -32,12 +63,6 @@ namespace Leap.Unity.Glint.Internal {
                                                   float[] data, int dataSize,
                                                   float[] profileBuffer, int profileSize);
 
-    [DllImport("Glint")]
-    private static extern IntPtr GetRequestTextureEventFunc();
-
-    [DllImport("Glint")]
-    private static extern IntPtr GetCopyTextureEventFunc();
-
     #endregion
 
     private static Dictionary<Texture, IntPtr> _texturePointers
@@ -45,6 +70,10 @@ namespace Leap.Unity.Glint.Internal {
 
     // Profiling.
     private static float[] profilingDataBuffer = new float[3];
+
+    public static Status GetLastStatus() {
+      return (Status)getLastStatus();
+    }
 
     public static void RequestTextureData(Texture texture) {
       if (texture == null) {
@@ -59,10 +88,11 @@ namespace Leap.Unity.Glint.Internal {
 
       if (requestIdx == -1) {
         Debug.LogError("[Glint] Unable to request texture data. "
-                      + "Plugin status: " + (Status)GetLastStatus());
+                      + "Plugin status: " + (Status)getLastStatus());
         return;
       }
 
+      // Call the RequestTextureEventFunc.
       GL.IssuePluginEvent(GetRequestTextureEventFunc(), requestIdx);
     }
 
@@ -97,8 +127,8 @@ namespace Leap.Unity.Glint.Internal {
       renderCopyMs = profilingDataBuffer[1];
       mainCopyMs = profilingDataBuffer[2];
 
-      Status lastStatus = (Status)GetLastStatus();
-      if (lastStatus == Status.Success) {
+      Status lastStatus = (Status)getLastStatus();
+      if (lastStatus == Status.Success_3_CopySuccessful) {
         // We successfully retrieved the texture data!
         return true;
       }

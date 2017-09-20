@@ -12,7 +12,7 @@ namespace Leap.Unity.Glint.Internal {
   public class GlintRequestRunner : MonoBehaviour {
 
     private static List<Request> _pendingRequests = new List<Request>();
-    private static List<Request> _readyRequests = new List<Request>();
+    private static List<Request> _readyRequests   = new List<Request>();
 
     private static GlintRequestRunner _instance = null;
     public static GlintRequestRunner instance {
@@ -25,7 +25,7 @@ namespace Leap.Unity.Glint.Internal {
       }
     }
     private static void ensureInstanceExists() { // sigh
-      if (_instance == null) { var unused = instance; }
+      if (_instance == null) { var _ = instance; }
     }
 
     public static void CreateRequest(Texture gpuTexture, float[] cpuData,
@@ -33,6 +33,7 @@ namespace Leap.Unity.Glint.Internal {
       ensureInstanceExists();
 
       var req = Pool<Request>.Spawn();
+      req.status = Status.Ready;
       req.gpuTexture = gpuTexture;
       req.cpuData = cpuData;
       req.onRetrieved = onRetrieved;
@@ -40,9 +41,16 @@ namespace Leap.Unity.Glint.Internal {
       
       GlintPlugin.RequestTextureData(req.gpuTexture);
 
-      _pendingRequests.Add(req);
+      req.status = GlintPlugin.GetLastStatus();
+      if (req.status != Status.Success_0_ReadyForRenderThreadRequest) {
+        Debug.LogError("[Glint] Aborting request for texture: " + req.gpuTexture + "; "
+                     + "expected status " + Status.Success_0_ReadyForRenderThreadRequest
+                     + ", got " + req.status);
+      }
+      else {
+        _pendingRequests.Add(req);
+      }
     }
-
 
     private static void finalizeRequest(Request req) {
       req.Clear();

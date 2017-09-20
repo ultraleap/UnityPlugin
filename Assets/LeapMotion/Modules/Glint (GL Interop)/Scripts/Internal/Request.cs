@@ -6,7 +6,7 @@ namespace Leap.Unity.Glint.Internal {
   public class Request {
     //public Status status = Status.NotReady;
     public Texture gpuTexture = null;
-    public float[] cpuData = null;
+    public float[] cpuData    = null;
     public Action onRetrieved = null;
 
     private int _waitTimeInFrames = 0;
@@ -18,6 +18,8 @@ namespace Leap.Unity.Glint.Internal {
         _framesRemaining = value;
       }
     }
+
+    public Status status = Status.Ready;
 
     public bool readyForRetrieval {
       get { return _framesRemaining < 0; }
@@ -47,8 +49,8 @@ namespace Leap.Unity.Glint.Internal {
 
     public void Clear() {
       //status = Status.NotReady;
-      gpuTexture = null;
-      cpuData = null;
+      gpuTexture  = null;
+      cpuData     = null;
       onRetrieved = null;
 
       waitTimeInFrames = 0;

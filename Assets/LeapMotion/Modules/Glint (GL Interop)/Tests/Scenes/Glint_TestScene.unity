@@ -420,7 +420,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e6192ffaa1763914083372bb827ea916, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  initTexSize: 64
+  initTexSize: 512
   blitMaterial: {fileID: 2100000, guid: ea70d30273dfe00478eecddf97ded2b9, type: 2}
   previewMaterial: {fileID: 2100000, guid: 95ef31a7e48ace54f97bf3edc6090f20, type: 2}
 --- !u!33 &521410174
