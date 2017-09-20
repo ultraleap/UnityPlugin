@@ -102,7 +102,9 @@ namespace Leap.Unity.GraphicalRenderer {
           using (new ProfilerSample("Draw Meshes")) {
             for (int i = 0; i < group.graphics.Count; i++) {
               var graphic = group.graphics[i];
-              Graphics.DrawMesh(_meshData[i], graphic.transform.localToWorldMatrix, _material, 0);
+              if (graphic.isActiveAndEnabled) {
+                Graphics.DrawMesh(_meshData[i], graphic.transform.localToWorldMatrix, _material, 0);
+              }
             }
           }
         } else if (renderer.space is LeapRadialSpace) {
