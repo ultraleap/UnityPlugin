@@ -8,7 +8,7 @@ namespace Leap.Unity {
 
   public static class ResaveUtility {
 
-    [MenuItem("Assets/Save All Scenes\\Assets")]
+    [MenuItem("Assets/Save All Scenes And Assets")]
     public static void SaveAllScenesAndAssets() {
       SaveAllScenes();
       SaveAllAssets();
