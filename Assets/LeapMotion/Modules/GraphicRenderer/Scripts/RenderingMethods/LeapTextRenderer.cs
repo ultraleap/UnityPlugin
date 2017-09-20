@@ -114,6 +114,8 @@ namespace Leap.Unity.GraphicalRenderer {
             for (int i = 0; i < _meshData.Count; i++) {
               var graphic = group.graphics[i];
               if (!graphic.isActiveAndEnabled) {
+                _curved_graphicParameters.Add(Vector4.zero);
+                _curved_worldToAnchor.Add(Matrix4x4.identity);
                 continue;
               }
 
