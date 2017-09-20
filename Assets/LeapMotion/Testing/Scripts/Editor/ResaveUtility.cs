@@ -38,7 +38,6 @@ namespace Leap.Unity {
       }
     }
 
-    [MenuItem("Assets/Save All Assets For Reals")]
     public static void SaveAllAssets() {
       var paths = AssetDatabase.FindAssets("t:ScriptableObject").
                                 Query().
