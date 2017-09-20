@@ -5,9 +5,9 @@ using UnityEditor.SceneManagement;
 namespace Leap.Unity {
   using Query;
 
-  public static class ResaveScenesUtility {
+  public static class ResaveUtility {
 
-    [MenuItem("Assets/Re-Save All Scenes")]
+    [MenuItem("Assets/Save All Scenes/Assets")]
     public static void ReSaveAllScenes() {
       EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo();
 
