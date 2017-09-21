@@ -1,1 +1,1 @@
-Leap Motion Core Version 4.3.2
+Leap Motion Core Version 4.3.3
