@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Leap.Unity.Glint.Tests {
+namespace Leap.Unity.ZZOLD_GLINT.Tests {
 
   public class BlittingScript : MonoBehaviour {
 

@@ -286,7 +286,7 @@ GameObject:
   - component: {fileID: 346888889}
   - component: {fileID: 346888890}
   m_Layer: 0
-  m_Name: Readback Quad + TinyRex Usage
+  m_Name: Readback Quad + Glint Usage
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
