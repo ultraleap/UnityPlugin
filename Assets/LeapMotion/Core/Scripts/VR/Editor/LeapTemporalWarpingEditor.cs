@@ -18,7 +18,7 @@ namespace Leap.Unity {
       base.OnEnable();
 
       specifyConditionalDrawing("_allowManualTimeAlignment",
-                                "_warpingAdjustment",
+                                "_customWarpAdjustment",
                                 "_unlockHold",
                                 "_moreRewind",
                                 "_lessRewind");
