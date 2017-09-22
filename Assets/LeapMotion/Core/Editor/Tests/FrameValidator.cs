@@ -143,10 +143,10 @@ namespace Leap.Unity.Tests {
       return null;
     }
 
-    protected void assertVectorsEqual(Vector a, Vector b) {
-      Assert.That(a.x, Is.EqualTo(b.x).Within(TOLERANCE));
-      Assert.That(a.y, Is.EqualTo(b.y).Within(TOLERANCE));
-      Assert.That(a.z, Is.EqualTo(b.z).Within(TOLERANCE));
+    protected void assertVectorsEqual(Vector a, Vector b, string vectorName = "Vector") {
+      Assert.That(a.x, Is.EqualTo(b.x).Within(TOLERANCE), vectorName + ".x");
+      Assert.That(a.y, Is.EqualTo(b.y).Within(TOLERANCE), vectorName + ".y");
+      Assert.That(a.z, Is.EqualTo(b.z).Within(TOLERANCE), vectorName + ".z");
     }
   }
 }

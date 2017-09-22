@@ -486,13 +486,23 @@ namespace Leap.Unity.Attachments {
       public AttachmentPointsEnumerator GetEnumerator() { return this; }
 
       public AttachmentPointsEnumerator(AttachmentHand hand) {
-        _curIdx = -1;
-        _hand = hand;
-        _flagsCount = hand._attachmentPointFlagConstants.Length;
+        if (hand != null && hand._attachmentPointFlagConstants != null) {
+          _curIdx = -1;
+          _hand = hand;
+          _flagsCount = hand._attachmentPointFlagConstants.Length;
+        }
+        else {
+          // Hand doesn't exist (destroyed?) or isn't initialized yet.
+          _curIdx = -1;
+          _hand = null;
+          _flagsCount = 0;
+        }
       }
 
       public AttachmentPointBehaviour Current {
         get {
+          if (_hand == null) return null;
+
           return _hand.GetBehaviourForPoint(GetFlagFromFlagIdx(_curIdx));
         }
       }

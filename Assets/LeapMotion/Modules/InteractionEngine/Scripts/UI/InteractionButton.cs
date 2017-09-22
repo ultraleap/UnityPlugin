@@ -110,6 +110,16 @@ namespace Leap.Unity.Interaction {
     ///<summary> The physical position of this element in world space; may diverge from the graphical position. </summary>
     protected Vector3 physicsPosition = Vector3.zero;
 
+    /// <summary>
+    /// Returns the local position of this button when it is able to relax into its target
+    /// position.
+    /// </summary>
+    public virtual Vector3 RelaxedLocalPosition {
+      get {
+        return initialLocalPosition + Vector3.back * Mathf.Lerp(minMaxHeight.x, minMaxHeight.y, restingHeight);
+      }
+    }
+
     private Rigidbody _lastDepressor;
     private Vector3 _localDepressorPosition;
     private Vector3 _physicsVelocity = Vector3.zero;
@@ -213,9 +223,9 @@ namespace Leap.Unity.Interaction {
           Vector3 originalLocalVelocity = localPhysicsVelocity;
 
           // Spring force
-          localPhysicsVelocity += Mathf.Clamp(_springForce * 10000F * (initialLocalPosition.z - Mathf.Lerp(minMaxHeight.x, minMaxHeight.y, restingHeight) - localPhysicsPosition.z), -100f, 100f)
-                                * Time.fixedDeltaTime
-                                * Vector3.forward;
+          localPhysicsVelocity += Mathf.Clamp(_springForce * 10000F * (initialLocalPosition.z - Mathf.Lerp(minMaxHeight.x, minMaxHeight.y, restingHeight) - localPhysicsPosition.z), -100f / transform.parent.lossyScale.x, 100f / transform.parent.lossyScale.x)
+                                              * Time.fixedDeltaTime
+                                              * Vector3.forward;
 
           // Friction & Drag
           float velMag = originalLocalVelocity.magnitude;
@@ -224,12 +234,12 @@ namespace Leap.Unity.Interaction {
 
             // Friction force
             Vector3 frictionForce = resistanceDir * velMag * FRICTION_COEFFICIENT;
-            localPhysicsVelocity = localPhysicsVelocity + (frictionForce /* assume unit mass */ * Time.fixedDeltaTime);
+            localPhysicsVelocity += (frictionForce /* assume unit mass */ * Time.fixedDeltaTime * transform.parent.lossyScale.x);
 
             // Drag force
             float velSqrMag = velMag * velMag;
             Vector3 dragForce = resistanceDir * velSqrMag * DRAG_COEFFICIENT;
-            localPhysicsVelocity = localPhysicsVelocity + (dragForce /* assume unit mass */ * Time.fixedDeltaTime);
+            localPhysicsVelocity += (dragForce /* assume unit mass */ * Time.fixedDeltaTime * transform.parent.lossyScale.x);
           }
         }
 

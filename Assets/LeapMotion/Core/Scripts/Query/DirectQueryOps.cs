@@ -184,6 +184,29 @@ namespace Leap.Unity.Query {
     }
 
     /// <summary>
+    /// Returns Some value that represents the first value in the sequence, or None
+    /// if there is no such value.
+    /// </summary>
+    public Maybe<QueryType> FirstOrNone() {
+      var op = _op;
+
+      QueryType obj;
+      if (op.TryGetNext(out obj)) {
+        return Maybe.Some(obj);
+      } else {
+        return Maybe.None;
+      }
+    }
+
+    /// <summary>
+    /// Returns the Some value representing the first value that satisfies the predicate,
+    /// or None if there is no such value.
+    /// </summary>
+    public Maybe<QueryType> FirstOrNone(Func<QueryType, bool> predicate) {
+      return Where(predicate).FirstOrNone();
+    }
+
+    /// <summary>
     /// Returns the first element in the sequence.  Will return the default value
     /// if the sequence is empty.
     /// </summary>
@@ -338,6 +361,46 @@ namespace Leap.Unity.Query {
       return Where(predicate).Single();
     }
 
+    /// <summary>
+    /// Returns the single value that is present in the entire sequence.  If there is more
+    /// than one value in the sequence or there are no values at all, this method will return
+    /// the default value.
+    /// </summary>
+    public QueryType UniformOrDefault() {
+      return UniformOrNone().valueOrDefault;
+    }
+
+    /// <summary>
+    /// Returns Some single value that is present in the entire sequence.  If there is more
+    /// than one value in the sequence or there are no values at all, this method will return
+    /// None.
+    /// </summary>
+    public Maybe<QueryType> UniformOrNone() {
+      var op = _op;
+
+      QueryType obj;
+      if (!op.TryGetNext(out obj)) {
+        return Maybe.None;
+      }
+
+      QueryType dummy;
+      if (obj == null) {
+        while (op.TryGetNext(out dummy)) {
+          if (dummy != null) {
+            return Maybe.None;
+          }
+        }
+      } else {
+        while (op.TryGetNext(out dummy)) {
+          if (!obj.Equals(dummy)) {
+            return Maybe.None;
+          }
+        }
+      }
+
+      return obj;
+    }
+
     private static List<QueryType> _utilityList = new List<QueryType>();
 
     /// <summary>
@@ -394,6 +457,12 @@ namespace Leap.Unity.Query {
       }
     }
 
+    public HashSet<QueryType> ToHashSet() {
+      HashSet<QueryType> set = new HashSet<QueryType>();
+      AppendHashSet(set);
+      return set;
+    }
+
     public void FillHashSet(HashSet<QueryType> hashSet) {
       hashSet.Clear();
       AppendHashSet(hashSet);
@@ -406,6 +475,30 @@ namespace Leap.Unity.Query {
       while (op.TryGetNext(out obj)) {
         hashSet.Add(obj);
       }
+    }
+
+    public Dictionary<K, V> ToDictionary<K, V>(Func<QueryType, K> keySelector, Func<QueryType, V> valueSelector) {
+      var dictionary = new Dictionary<K, V>();
+
+      var op = _op;
+      QueryType obj;
+      while (op.TryGetNext(out obj)) {
+        dictionary[keySelector(obj)] = valueSelector(obj);
+      }
+
+      return dictionary;
+    }
+
+    public Dictionary<QueryType, V> ToDictionary<V>(Func<QueryType, V> valueSelector) {
+      var dictionary = new Dictionary<QueryType, V>();
+
+      var op = _op;
+      QueryType obj;
+      while (op.TryGetNext(out obj)) {
+        dictionary[obj] = valueSelector(obj);
+      }
+
+      return dictionary;
     }
   }
 }

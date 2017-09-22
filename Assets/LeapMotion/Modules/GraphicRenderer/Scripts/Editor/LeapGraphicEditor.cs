@@ -73,61 +73,93 @@ public abstract class LeapGraphicEditorBase<T> : CustomEditorBase<T> where T : L
     using (new GUILayout.HorizontalScope()) {
       drawScriptField();
 
-      if (mainGroup == null) {
-        return;
-      }
+      Color originalColor = GUI.color;
+      try {
+        string buttonText;
+        if (!targets.Query().All(g => g.attachedGroup == mainGroup)) {
+          buttonText = "-";
+        } else if (mainGroup == null) {
+          buttonText = "None";
+          GUI.color = Color.yellow;
+        } else {
+          buttonText = mainGroup.name;
+        }
 
-      string buttonText;
-      if (!targets.Query().All(g => g.attachedGroup == mainGroup)) {
-        buttonText = "-";
-      } else {
-        buttonText = mainGroup.name;
-      }
+        var renderer = targets.Query().
+                               Select(t => t.GetComponentInParent<LeapGraphicRenderer>()).
+                               UniformOrDefault();
 
-      if (GUILayout.Button(buttonText, EditorStyles.miniButton, GUILayout.Width(60))) {
-        GenericMenu groupMenu = new GenericMenu();
-        int index = 0;
-        foreach (var group in mainGroup.renderer.groups.Query().Where(g => g.renderingMethod.IsValidGraphic(targets[0]))) {
-          groupMenu.AddItem(new GUIContent(index.ToString() + ": " + group.name), false, () => {
-
-            bool areFeaturesUnequal = false;
-            var typesA = group.features.Query().Select(f => f.GetType()).ToList();
-            foreach (var graphic in targets) {
-              var typesB = graphic.attachedGroup.features.Query().Select(f => f.GetType()).ToList();
-              if (!Utils.AreEqualUnordered(typesA, typesB)) {
-                areFeaturesUnequal = true;
-                break;
-              }
-            }
-
-            if (areFeaturesUnequal && LeapGraphicPreferences.promptWhenGroupChange) {
-              if (!EditorUtility.DisplayDialog("Features Are Different!",
-                                               "The group you are moving to has a different feature set than the current group, " +
-                                               "this can result in data loss!  Are you sure you want to change group?",
-                                               "Continue",
-                                               "Cancel")) {
-                return;
-              }
-            }
-
+        if (GUILayout.Button(buttonText, EditorStyles.miniButton, GUILayout.Width(60))) {
+          GenericMenu groupMenu = new GenericMenu();
+          groupMenu.AddItem(new GUIContent("None"), false, () => {
             foreach (var graphic in targets) {
               serializedObject.ApplyModifiedProperties();
-              if (graphic.attachedGroup.TryRemoveGraphic(graphic)) {
-                group.TryAddGraphic(graphic);
-              }
+              graphic.TryDetach();
 
               EditorUtility.SetDirty(graphic);
-              EditorUtility.SetDirty(group.renderer);
 
               serializedObject.SetIsDifferentCacheDirty();
               serializedObject.Update();
             }
-
-            mainGroup.renderer.editor.ScheduleRebuild();
           });
-          index++;
+
+          if (renderer != null) {
+            int index = 0;
+            foreach (var group in renderer.groups.Query().Where(g => g.renderingMethod.IsValidGraphic(targets[0]))) {
+              groupMenu.AddItem(new GUIContent(index.ToString() + ": " + group.name), false, () => {
+
+                bool areFeaturesUnequal = false;
+                var typesA = group.features.Query().Select(f => f.GetType()).ToList();
+                foreach (var graphic in targets) {
+                  if (!graphic.isAttachedToGroup) {
+                    continue;
+                  }
+
+                  var typesB = graphic.attachedGroup.features.Query().Select(f => f.GetType()).ToList();
+                  if (!Utils.AreEqualUnordered(typesA, typesB)) {
+                    areFeaturesUnequal = true;
+                    break;
+                  }
+                }
+
+                if (areFeaturesUnequal && LeapGraphicPreferences.promptWhenGroupChange) {
+                  if (!EditorUtility.DisplayDialog("Features Are Different!",
+                                                   "The group you are moving to has a different feature set than the current group, " +
+                                                   "this can result in data loss!  Are you sure you want to change group?",
+                                                   "Continue",
+                                                   "Cancel")) {
+                    return;
+                  }
+                }
+
+                foreach (var graphic in targets) {
+                  serializedObject.ApplyModifiedProperties();
+
+                  if (graphic.isAttachedToGroup) {
+                    if (graphic.TryDetach()) {
+                      group.TryAddGraphic(graphic);
+                    }
+                  } else {
+                    group.TryAddGraphic(graphic);
+                  }
+
+                  EditorUtility.SetDirty(graphic);
+                  EditorUtility.SetDirty(renderer);
+
+                  serializedObject.SetIsDifferentCacheDirty();
+                  serializedObject.Update();
+                }
+
+                renderer.editor.ScheduleRebuild();
+              });
+              index++;
+            }
+          }
+
+          groupMenu.ShowAsContext();
         }
-        groupMenu.ShowAsContext();
+      } finally {
+        GUI.color = originalColor;
       }
     }
   }

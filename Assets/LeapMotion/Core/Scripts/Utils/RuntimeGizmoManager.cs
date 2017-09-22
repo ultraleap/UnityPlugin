@@ -102,13 +102,6 @@ namespace Leap.Unity.RuntimeGizmos {
         _gizmoShader = Shader.Find(DEFAULT_SHADER_NAME);
       }
 
-      if (_sphereMesh == null) {
-        GameObject tempSphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-        tempSphere.hideFlags = HideFlags.HideAndDontSave;
-        _sphereMesh = tempSphere.GetComponent<MeshFilter>().sharedMesh;
-        tempSphere.GetComponent<MeshFilter>().sharedMesh = null;
-      }
-
       if (_frontDrawer != null && _backDrawer != null) {
         assignDrawerParams();
       }
@@ -520,6 +513,12 @@ namespace Leap.Unity.RuntimeGizmos {
     /// Draws a filled gizmo sphere at the given position with the given radius.
     /// </summary>
     public void DrawSphere(Vector3 center, float radius) {
+      //Throw an error here so we can give a more specific error than the more
+      //general one which will be thrown later for a null mesh.
+      if (sphereMesh == null) {
+        throw new InvalidOperationException("Cannot draw a sphere because the Runtime Gizmo Manager does not have a sphere mesh assigned!");
+      }
+
       DrawMesh(sphereMesh, center, Quaternion.identity, Vector3.one * radius * 2);
     }
 
@@ -628,8 +627,7 @@ namespace Leap.Unity.RuntimeGizmos {
             }
             DrawWireCapsule(capsule.center + capsuleDir * (capsule.height / 2F - capsule.radius),
                             capsule.center - capsuleDir * (capsule.height / 2F - capsule.radius), capsule.radius);
-          }
-          else {
+          } else {
             Vector3 size = Vector3.zero;
             size += Vector3.one * capsule.radius * 2;
             size += new Vector3(capsule.direction == 0 ? 1 : 0,
@@ -650,6 +648,49 @@ namespace Leap.Unity.RuntimeGizmos {
       }
 
       PopMatrix();
+    }
+
+    /// <summary>
+    /// Draws a simple XYZ-cross position gizmo at the target position, whose size is
+    /// scaled relative to the main camera's distance to the target position (for reliable
+    /// visibility).
+    /// 
+    /// You can also provide a color argument and lerp coefficient towards that color from
+    /// the axes' default colors (red, green, blue). Colors are lerped in HSV space.
+    /// </summary>
+    public void DrawPosition(Vector3 pos, Color lerpColor, float lerpCoeff) {
+      float targetScale = 0.06f; // 6 cm at 1m away.
+
+      var mainCam = Camera.main;
+      var posWorldSpace = matrix * pos;
+      if (mainCam != null) {
+        float camDistance = Vector3.Distance(posWorldSpace, mainCam.transform.position);
+
+        targetScale *= camDistance;
+      }
+
+      float extent = (targetScale / 2f);
+
+      color = Color.red;
+      if (lerpCoeff != 0f) { color = color.LerpHSV(lerpColor, lerpCoeff); }
+      DrawLine(pos - Vector3.right * extent, pos + Vector3.right * extent);
+
+      color = Color.green;
+      if (lerpCoeff != 0f) { color = color.LerpHSV(lerpColor, lerpCoeff); }
+      DrawLine(pos - Vector3.up * extent, pos + Vector3.up * extent);
+
+      color = Color.blue;
+      if (lerpCoeff != 0f) { color = color.LerpHSV(lerpColor, lerpCoeff); }
+      DrawLine(pos - Vector3.forward * extent, pos + Vector3.forward * extent);
+    }
+
+    /// <summary>
+    /// Draws a simple XYZ-cross position gizmo at the target position, whose size is
+    /// scaled relative to the main camera's distance to the target position (for reliable
+    /// visibility).
+    /// </summary>
+    public void DrawPosition(Vector3 pos) {
+      DrawPosition(pos, Color.white, 0f);
     }
 
     public void ClearAllGizmos() {

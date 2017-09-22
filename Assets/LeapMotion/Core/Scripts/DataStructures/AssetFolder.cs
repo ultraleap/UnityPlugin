@@ -24,29 +24,36 @@ namespace Leap.Unity {
   /// property will not be available.
   /// </summary>
   [Serializable]
-  public struct AssetFolder {
+  public class AssetFolder {
 
     [SerializeField]
-    private UnityObject _assetFolder;
+    protected UnityObject _assetFolder;
 
-#if UNITY_EDITOR
     /// <summary>
     /// Gets or sets the folder path.  This path will always be a path
     /// relative to the asset folder, and matches the format expected and
-    /// returned by AssetDatabase.
+    /// returned by AssetDatabase.  This operation cannot be performed
+    /// from inside of a build due to Assets no longer existing.
     /// </summary>
-    public string Path {
+    public virtual string Path {
       get {
+#if UNITY_EDITOR
         if (_assetFolder != null) {
           return AssetDatabase.GetAssetPath(_assetFolder);
         } else {
           return null;
         }
+#else
+        throw new InvalidOperationException("Cannot access the Path of an Asset Folder in a build.");
+#endif
       }
       set {
+#if UNITY_EDITOR
         _assetFolder = AssetDatabase.LoadAssetAtPath<DefaultAsset>(value);
+#else
+        throw new InvalidOperationException("Cannot set the Path of an Asset Folder in a build.");
+#endif
       }
     }
-#endif
   }
 }
