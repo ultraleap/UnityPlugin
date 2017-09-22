@@ -20,7 +20,7 @@ namespace Leap.Unity {
   /// Implements spatial alignment of cameras and synchronization with images.
   /// </summary>
   public class LeapVRTemporalWarping : MonoBehaviour {
-
+    private const int DEFAULT_WARP_ADJUSTMENT = 17;
     private const long MAX_LATENCY = 200000;
 
     #region Inspector
@@ -102,13 +102,20 @@ namespace Leap.Unity {
     [Tooltip("Allow manual adjustment of the rewind time.")]
     [SerializeField]
     private bool _allowManualTimeAlignment;
-
-    [Tooltip("Timestamps and other uncertanties can lead to sub-optimal alignment, this value can be tuned to get desired alignment.")]
+    
+    [Tooltip("Time in milliseconds between the current frame's Leap position (offset from "
+           + "the headset) and the time at which the Leap frame was captured. This "
+           + "prevents 'swimming' behavior when the headset moves and the user's hands "
+           + "don't. This value can be tuned if using a non-standard VR headset.")]
     [SerializeField]
-    private int _warpingAdjustment = 60; //Milliseconds
-    public float warpingAdjustment {
+    private int _customWarpAdjustment = DEFAULT_WARP_ADJUSTMENT; //Milliseconds
+    public int warpingAdjustment {
       get {
-        return _warpingAdjustment;
+        if (_allowManualTimeAlignment) {
+          return _customWarpAdjustment;
+        } else {
+          return DEFAULT_WARP_ADJUSTMENT;
+        }
       }
     }
 
@@ -200,7 +207,7 @@ namespace Leap.Unity {
       }
 
       // Prepare past transform data.
-      TransformData past = transformAtTime((leapTime - _warpingAdjustment * 1000) + (_syncMode == SyncMode.SYNC_WITH_IMAGES ? 20000 : 0));
+      TransformData past = transformAtTime((leapTime - warpingAdjustment * 1000) + (_syncMode == SyncMode.SYNC_WITH_IMAGES ? 20000 : 0));
 
       // Prepare device offset parameters.
       Quaternion deviceTilt   = Quaternion.Euler(deviceTiltXAxis, 0f, 0f);
@@ -276,6 +283,10 @@ namespace Leap.Unity {
         _headTransform = transform.parent;
       }
 
+      if (!_allowManualTimeAlignment) {
+        _customWarpAdjustment = DEFAULT_WARP_ADJUSTMENT;
+      }
+
 #if UNITY_EDITOR
       if (_headTransform != null && UnityEditor.PlayerSettings.virtualRealitySupported) {
         _trackingAnchor = _headTransform.parent;
@@ -336,10 +347,10 @@ namespace Leap.Unity {
       if (_allowManualTimeAlignment) {
         if (_unlockHold == KeyCode.None || Input.GetKey(_unlockHold)) {
           if (Input.GetKeyDown(_moreRewind)) {
-            _warpingAdjustment += 1;
+            _customWarpAdjustment += 1;
           }
           if (Input.GetKeyDown(_lessRewind)) {
-            _warpingAdjustment -= 1;
+            _customWarpAdjustment -= 1;
           }
         }
       }
@@ -402,8 +413,8 @@ namespace Leap.Unity {
       Quaternion currCenterRot = _trackingAnchor.rotation * currLocalRotation;
 
       //Get the transform at the time when the latest frame was captured
-      long rewindTime = provider.CurrentFrame.Timestamp - _warpingAdjustment * 1000;
-      long imageRewindTime = provider.imageTimeStamp - _warpingAdjustment * 1000;
+      long rewindTime = provider.CurrentFrame.Timestamp - warpingAdjustment * 1000;
+      long imageRewindTime = provider.imageTimeStamp - warpingAdjustment * 1000;
 
       TransformData imagePast = transformAtTime(imageRewindTime);
       Quaternion imagePastCenterRot = _trackingAnchor.rotation * imagePast.localRotation;
