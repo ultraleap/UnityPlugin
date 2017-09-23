@@ -1,8 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
-namespace Leap.Unity.Glint.Tests {
+namespace Leap.Unity.Glint.Examples {
 
   [AddComponentMenu("")]
   public class GlintUsageExample : MonoBehaviour {

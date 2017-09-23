@@ -102,8 +102,7 @@ namespace Leap.Unity {
       }
 
       public void UpdateTexture(Image image) {
-        Array.Copy(image.Data, 0, _intermediateArray, 0, _intermediateArray.Length);
-        _combinedTexture.LoadRawTextureData(_intermediateArray);
+        _combinedTexture.LoadRawTextureData(image.Data);
         _combinedTexture.Apply();
       }
 
