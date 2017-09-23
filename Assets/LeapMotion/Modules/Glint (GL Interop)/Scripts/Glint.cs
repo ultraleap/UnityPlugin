@@ -236,6 +236,10 @@ namespace Leap.Unity.Glint {
           return 8;
         case RenderTextureFormat.BGRA32:
           return 4;
+        case RenderTextureFormat.R8:
+          return 1;
+        case RenderTextureFormat.RFloat:
+          return 4;
         default:
           Debug.Log("Unsupported render texture format: " + renderTex.format);
           return -1;
@@ -250,6 +254,10 @@ namespace Leap.Unity.Glint {
       switch (texture2D.format) {
         case TextureFormat.Alpha8:
           return 1;
+        case TextureFormat.R8:
+          return 1;
+        case TextureFormat.RFloat:
+          return 4;
         case TextureFormat.ARGB32:
           return 4;
         case TextureFormat.ARGB4444:

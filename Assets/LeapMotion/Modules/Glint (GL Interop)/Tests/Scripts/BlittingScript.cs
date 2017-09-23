@@ -19,7 +19,6 @@ namespace Leap.Unity.Glint.Tests {
     public RenderTexture renderTex {
       get { return _renderTex; }
     }
-    private Texture2D _whiteTex;
 
     void Start() {
       _renderTex = new RenderTexture(initTexSize, initTexSize, 0,
@@ -27,12 +26,6 @@ namespace Leap.Unity.Glint.Tests {
                                      RenderTextureReadWrite.Default);
       _renderTex.filterMode = FilterMode.Point;
       _renderTex.Create();
-
-      _whiteTex = new Texture2D(initTexSize, initTexSize, TextureFormat.RGBAFloat, false);
-      _whiteTex.filterMode = FilterMode.Point;
-      var pixels = new Color[initTexSize * initTexSize]; for (int i = 0; i < pixels.Length; i++) { pixels[i] = Color.white; }
-      _whiteTex.SetPixels(pixels);
-      _whiteTex.Apply();
 
       previewMaterial.SetTexture("_MainTex", _renderTex);
     }
@@ -42,7 +35,7 @@ namespace Leap.Unity.Glint.Tests {
     }
 
     private void DoBlit(RenderTexture renderTex) {
-      Graphics.Blit(_whiteTex, _renderTex, blitMaterial);
+      Graphics.Blit(null, _renderTex, blitMaterial);
     }
 
   }

@@ -23,7 +23,7 @@ namespace Leap.Unity.Glint.Tests {
     void Update() {
       if (_firstUpdate) {
         initDataForTex(ref _data, blittingScript.renderTex);
-        _previewTexture = new Texture2D(blittingScript.renderTex.width, blittingScript.renderTex.height);
+        _previewTexture = new Texture2D(blittingScript.renderTex.width, blittingScript.renderTex.height, TextureFormat.RGBAFloat, false);
         _previewTexture.filterMode = FilterMode.Point;
         resultMaterial.SetTexture("_MainTex", _previewTexture);
 
@@ -68,24 +68,9 @@ namespace Leap.Unity.Glint.Tests {
       data = new byte[tex.width * tex.height * Glint.GetBytesPerPixel(tex)];
     }
 
-    private static float[] _floats = null;
-    private static Color[] _pixels = null;
     private static void fillTextureWithData(byte[] data,
                                             Texture2D tex) {
-
-      if (_pixels == null) {
-        _pixels = new Color[tex.width * tex.height];
-      }
-
-      if (_floats == null) {
-        _floats = new float[tex.width * tex.height * 4];
-      }
-
-      fillFloatsFromBytes(data, _floats);
-
-      fillPixelsFromFloats(_floats, _pixels);
-
-      tex.SetPixels(_pixels);
+      tex.LoadRawTextureData(data);
       tex.Apply();
     }
 
