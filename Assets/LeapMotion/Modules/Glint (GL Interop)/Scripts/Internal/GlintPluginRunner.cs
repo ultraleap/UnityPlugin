@@ -15,8 +15,13 @@ namespace Leap.Unity.Glint {
     #region Static Loading
 
     private static GlintPluginRunner s_instance = null;
-    static GlintPluginRunner() {
-      if (s_instance == null && Application.isPlaying) {
+
+    public static void EnsureRunnerExists() {
+      if (s_instance == null) {
+        // Initialize the plugin. This clears up any dangling plugin state in the editor
+        // between plays.
+        GlintPlugin.InitializeGlintPlugin();
+
         var obj = new GameObject(RUNNER_OBJECT_NAME);
         DontDestroyOnLoad(obj);
         s_instance = obj.AddComponent<GlintPluginRunner>();

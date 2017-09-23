@@ -5,6 +5,14 @@ namespace Leap.Unity.Glint {
 
   class GlintPlugin {
 
+    #region Initialization
+
+    [DllImport("Glint")]
+    public static extern void InitializeGlintPlugin();
+
+    #endregion
+
+
     #region Updates
 
     [DllImport("Glint")]

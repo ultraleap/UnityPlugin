@@ -63,7 +63,7 @@ namespace Leap.Unity.Glint {
     #endregion
 
 
-    #region Requests
+    #region Request Results
 
     public class Request {
       public byte[] resultData;
@@ -109,6 +109,8 @@ namespace Leap.Unity.Glint {
       }
 
       trackedRequest.onRequestResult();
+
+      s_requests.Remove(requestId);
     }
 
     #endregion
@@ -116,6 +118,15 @@ namespace Leap.Unity.Glint {
 
     #region Public API
 
+    /// <summary>
+    /// Creates an asynchronous Glint request to download texture data as a byte array
+    /// from GPU memory to a CPU memory location specified by resultDataToFill.
+    /// 
+    /// When the request has completed, onRequestResult will be fired on the main thread
+    /// as soon as possible.
+    /// 
+    /// Only one texture download request can be active for a given texture at one time.
+    /// </summary>
     public static void RequestTextureDownload(Texture texture,
                                               byte[] resultDataToFill,
                                               Action onRequestResult) {
@@ -124,6 +135,8 @@ namespace Leap.Unity.Glint {
         return;
       }
 #endif
+
+      GlintPluginRunner.EnsureRunnerExists();
 
       IntPtr texHandle = GetTextureHandle(texture);
       if (texHandle == IntPtr.Zero) {

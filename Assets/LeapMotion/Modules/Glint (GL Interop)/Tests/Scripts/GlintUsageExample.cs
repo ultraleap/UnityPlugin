@@ -18,6 +18,7 @@ namespace Leap.Unity.Glint.Tests {
     private Texture2D _previewTexture = null;
 
     private bool _firstUpdate = true;
+    private bool _readyForAnotherRequest = true;
 
     void Update() {
       if (_firstUpdate) {
@@ -26,9 +27,13 @@ namespace Leap.Unity.Glint.Tests {
         _previewTexture.filterMode = FilterMode.Point;
         resultMaterial.SetTexture("_MainTex", _previewTexture);
 
+        _firstUpdate = false;
+      }
+
+      if (_readyForAnotherRequest) {
         Glint.RequestTextureDownload(blittingScript.renderTex, _data, onDataRetrieved);
 
-        _firstUpdate = false;
+        _readyForAnotherRequest = false;
       }
     }
 
@@ -39,6 +44,9 @@ namespace Leap.Unity.Glint.Tests {
       // to display on the "CPU" side of the scene.
       fillTextureWithData(_data,
                           _previewTexture);
+
+      // TODO: Much faster if this is made to work
+      // _previewTexture.LoadRawTextureData(_data);
 
       //_sb.Remove(0, _sb.Length);
       //_sb.Append("Render thread map (ms):\t");
@@ -51,7 +59,7 @@ namespace Leap.Unity.Glint.Tests {
       //_sb.Append(ZZOLD_Glint.Profiling.lastMainCopyMs.ToString("F3"));
       //textMesh.text = _sb.ToString();
 
-      Glint.RequestTextureDownload(blittingScript.renderTex, _data, onDataRetrieved);
+      _readyForAnotherRequest = true;
     }
 
     #region Support
@@ -60,28 +68,34 @@ namespace Leap.Unity.Glint.Tests {
       data = new byte[tex.width * tex.height * Glint.GetBytesPerPixel(tex)];
     }
 
+    private static float[] _floats = null;
     private static Color[] _pixels = null;
     private static void fillTextureWithData(byte[] data,
                                             Texture2D tex) {
+
       if (_pixels == null) {
         _pixels = new Color[tex.width * tex.height];
       }
 
-      fillPixelsFromBytes_RGBAFloat32(data, ref _pixels);
+      if (_floats == null) {
+        _floats = new float[tex.width * tex.height * 4];
+      }
+
+      fillFloatsFromBytes(data, _floats);
+
+      fillPixelsFromFloats(_floats, _pixels);
 
       tex.SetPixels(_pixels);
       tex.Apply();
     }
 
-    private static void fillPixelsFromBytes_RGBAFloat32(byte[] data, ref Color[] pixels) {
-      unsafe {
-        int increment = 16; // 4 bytes per color, 4 colors per pixel
-        for (int i = 0; i + increment - 1 < data.Length; i += increment) {
-          
-        }
-      }
-      for (int i = 0; i + 3 < data.Length; i += 4) {
-        pixels[i / 4] = new Color(data[i], data[i + 1], data[i + 2], data[i + 3]);
+    private static void fillFloatsFromBytes(byte[] bytes, float[] floats) {
+      System.Buffer.BlockCopy(bytes, 0, floats, 0, bytes.Length);
+    }
+
+    private static void fillPixelsFromFloats(float[] floats, Color[] pixels) {
+      for (int i = 0; i + 3 < floats.Length; i += 4) {
+        pixels[i / 4] = new Color(floats[i], floats[i + 1], floats[i + 2], floats[i + 3]);
       }
     }
 
