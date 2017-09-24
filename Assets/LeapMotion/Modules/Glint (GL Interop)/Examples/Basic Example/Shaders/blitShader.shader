@@ -1,4 +1,4 @@
-﻿Shader "LeapMotion/Test/Glint/blitShader" {
+﻿Shader "LeapMotion/Glint/Examples/blitShader" {
 	Properties {
     _MainTex("Texture", 2D) = "white" {}
   }

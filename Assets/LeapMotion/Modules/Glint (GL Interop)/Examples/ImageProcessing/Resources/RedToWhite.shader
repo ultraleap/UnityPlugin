@@ -1,4 +1,4 @@
-﻿Shader "Unlit/AlphaToWhite"
+﻿Shader "Unlit/RedToWhite"
 {
 	Properties
 	{

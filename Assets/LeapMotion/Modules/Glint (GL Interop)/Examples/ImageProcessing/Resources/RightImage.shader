@@ -1,4 +1,4 @@
-﻿Shader "LeapMotion/Unlit/RightImage"
+﻿Shader "LeapMotion/Glint/Examples/RightImage"
 {
 	Properties
 	{
