@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace Leap.Unity.Glint.Examples {
 
@@ -18,6 +19,8 @@ namespace Leap.Unity.Glint.Examples {
     private bool _firstUpdate = true;
     private bool _readyForAnotherRequest = true;
 
+    private Action onDataRetrievedAction;
+
     void Update() {
       if (_firstUpdate) {
         initDataForTex(ref _data, blittingScript.renderTex);
@@ -25,11 +28,13 @@ namespace Leap.Unity.Glint.Examples {
         _previewTexture.filterMode = FilterMode.Point;
         resultMaterial.SetTexture("_MainTex", _previewTexture);
 
+        onDataRetrievedAction = onDataRetrieved;
+
         _firstUpdate = false;
       }
 
       if (_readyForAnotherRequest) {
-        Glint.RequestTextureDownload(blittingScript.renderTex, _data, onDataRetrieved);
+        Glint.RequestTextureDownload(blittingScript.renderTex, _data, onDataRetrievedAction);
 
         _readyForAnotherRequest = false;
       }
@@ -42,9 +47,6 @@ namespace Leap.Unity.Glint.Examples {
       // to display on the "CPU" side of the scene.
       fillTextureWithData(_data,
                           _previewTexture);
-
-      // TODO: Much faster if this is made to work
-      // _previewTexture.LoadRawTextureData(_data);
 
       //_sb.Remove(0, _sb.Length);
       //_sb.Append("Render thread map (ms):\t");

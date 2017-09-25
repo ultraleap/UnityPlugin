@@ -63,8 +63,12 @@ namespace Leap.Unity.Glint {
     #endregion
 
 
-    #region Request Results
+    #region Request Management
 
+    /// <summary>
+    /// A minimal class containing tracked request data. These objects are pooled to
+    /// prevent garbage allocation.
+    /// </summary>
     public class Request {
       public byte[] resultData;
       public Action onRequestResult;
@@ -81,7 +85,7 @@ namespace Leap.Unity.Glint {
         return;
       }
 
-      Request trackedRequest = new Request();
+      Request trackedRequest;
       if (!s_requests.TryGetValue(requestId, out trackedRequest)) {
         Debug.LogError("No tracked request exists on the Unity side for request ID "
                      + requestId);
@@ -109,6 +113,10 @@ namespace Leap.Unity.Glint {
       }
 
       trackedRequest.onRequestResult();
+
+      trackedRequest.onRequestResult = null;
+      trackedRequest.resultData = null;
+      Pool<Request>.Recycle(trackedRequest);
 
       s_requests.Remove(requestId);
     }
@@ -160,10 +168,10 @@ namespace Leap.Unity.Glint {
                 + "request ID from native code.");
       }
 
-      var trackedRequest = new Request() {
-        resultData      = resultDataToFill,
-        onRequestResult = onRequestResult
-      };
+      var trackedRequest = Pool<Request>.Spawn();
+      trackedRequest.resultData = resultDataToFill;
+      trackedRequest.onRequestResult = onRequestResult;
+
       s_requests.Add(requestId, trackedRequest);
     }
 
