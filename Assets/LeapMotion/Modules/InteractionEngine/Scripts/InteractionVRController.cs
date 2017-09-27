@@ -289,6 +289,15 @@ namespace Leap.Unity.Interaction {
     }
 
     /// <summary>
+    /// Gets the last-tracked position of the controller.
+    /// </summary>
+    public override Vector3 position {
+      get {
+        return this.transform.position;
+      }
+    }
+
+    /// <summary>
     /// Gets the current velocity of the controller.
     /// </summary>
     public override Vector3 velocity {
