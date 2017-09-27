@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 
-namespace Leap.Unity.GraphicalRenderer {
-  using Space;
+namespace Leap.Unity.Space {
 
   [CustomEditor(typeof(LeapRadialSpace), editorForChildClasses: true)]
   public class LeapRadialSpaceEditor : CustomEditorBase<LeapRadialSpace> {
