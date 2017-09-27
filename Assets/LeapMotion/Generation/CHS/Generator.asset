@@ -17,7 +17,7 @@ MonoBehaviour:
   definitions:
   - name: CHS
     type: float
-  - name: 
-    type: 
-  - name: 
-    type: 
+  - name: CHS2
+    type: Vector2
+  - name: CHS3
+    type: Vector3
