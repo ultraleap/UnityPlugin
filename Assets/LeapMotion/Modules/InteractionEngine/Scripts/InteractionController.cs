@@ -137,6 +137,11 @@ namespace Leap.Unity.Interaction {
     public bool isRight { get { return !isLeft; } }
 
     /// <summary>
+    /// Returns the current position of this controller.
+    /// </summary>
+    public abstract Vector3 position { get; }
+
+    /// <summary>
     /// Returns the current velocity of this controller.
     /// </summary>
     public abstract Vector3 velocity { get; }
