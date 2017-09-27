@@ -17,8 +17,11 @@ namespace Leap.Unity.Space {
   }
 
   public abstract class LeapRadialSpace : LeapSpace {
+    public const float MAX_ABS_RADIUS = 1000;
+    public const float MAX_ABS_CURVATURE = 40;
 
-    [MinValue(0.001f)]
+    [MinValue(-MAX_ABS_RADIUS)]
+    [MaxValue(MAX_ABS_RADIUS)]
     [SerializeField]
     private float _radius = 1;
 
@@ -27,7 +30,28 @@ namespace Leap.Unity.Space {
         return _radius;
       }
       set {
-        _radius = value;
+        _radius = Mathf.Clamp(value, -MAX_ABS_RADIUS, MAX_ABS_RADIUS);
+      }
+    }
+
+    public float curvature {
+      get {
+        return 1.0f / _radius;
+      }
+      set {
+        _radius = GetRadiusFromCurvature(value);
+      }
+    }
+
+    public static float GetRadiusFromCurvature(float curvature) {
+      if (Mathf.Abs(curvature) < 1.0f / LeapRadialSpace.MAX_ABS_RADIUS) {
+        if (curvature > 0) {
+          return LeapRadialSpace.MAX_ABS_RADIUS;
+        } else {
+          return -LeapRadialSpace.MAX_ABS_RADIUS;
+        }
+      } else {
+        return 1.0f / curvature;
       }
     }
 
