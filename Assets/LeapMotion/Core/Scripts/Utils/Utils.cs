@@ -932,7 +932,7 @@ namespace Leap.Unity {
       }
     }
 
-    public static void EnsureListCount<T>(this List<T> list, int count, Func<T> createT, Action<T> deleteT) {
+    public static void EnsureListCount<T>(this List<T> list, int count, Func<T> createT, Action<T> deleteT = null) {
       while (list.Count < count) {
         list.Add(createT());
       }
@@ -940,7 +940,10 @@ namespace Leap.Unity {
       while (list.Count > count) {
         T tempT = list[list.Count - 1];
         list.RemoveAt(list.Count - 1);
-        deleteT(tempT);
+        
+        if (deleteT != null) {
+          deleteT(tempT);
+        }
       }
     }
 
