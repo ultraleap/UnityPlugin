@@ -245,7 +245,7 @@ namespace Leap.Unity.Interaction {
     /// Gets the velocity of the underlying tracked Leap hand.
     /// </summary>
     public override Vector3 velocity {
-      get { return isTracked ? Vector3.zero : leapHand.PalmVelocity.ToVector3(); }
+      get { return isTracked ? leapHand.PalmVelocity.ToVector3() : Vector3.zero; }
     }
 
     /// <summary>
