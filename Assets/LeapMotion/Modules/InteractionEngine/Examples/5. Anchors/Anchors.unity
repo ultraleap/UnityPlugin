@@ -19739,7 +19739,7 @@ MonoBehaviour:
   _syncMode: 1
   _forceCustomUpdate: 0
   _allowManualTimeAlignment: 0
-  _warpingAdjustment: 60
+  _customWarpAdjustment: 17
   _unlockHold: 303
   _moreRewind: 276
   _lessRewind: 275
@@ -22418,6 +22418,7 @@ MonoBehaviour:
   _motionlessRangeFraction: 0.4
   _maxMotionlessRange: 0.120000005
   _maxAttachmentAngle: 66
+  _alwaysAttachDistance: 0
   lockToAnchor: 0
   lockWhenAttached: 1
   matchAnchorMotionWhileAttaching: 1
@@ -22479,7 +22480,7 @@ Rigidbody:
   m_AngularDrag: 5
   m_UseGravity: 0
   m_IsKinematic: 0
-  m_Interpolate: 1
+  m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
 --- !u!4 &1680547687
@@ -23972,7 +23973,7 @@ Rigidbody:
   m_AngularDrag: 5
   m_UseGravity: 0
   m_IsKinematic: 0
-  m_Interpolate: 1
+  m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
 --- !u!114 &1817611769
@@ -23994,6 +23995,7 @@ MonoBehaviour:
   _motionlessRangeFraction: 0.4
   _maxMotionlessRange: 0.120000005
   _maxAttachmentAngle: 66
+  _alwaysAttachDistance: 0
   lockToAnchor: 0
   lockWhenAttached: 1
   matchAnchorMotionWhileAttaching: 1
@@ -28881,6 +28883,7 @@ MonoBehaviour:
   _motionlessRangeFraction: 0.4
   _maxMotionlessRange: 0.120000005
   _maxAttachmentAngle: 66
+  _alwaysAttachDistance: 0
   lockToAnchor: 0
   lockWhenAttached: 1
   matchAnchorMotionWhileAttaching: 1
@@ -28942,7 +28945,7 @@ Rigidbody:
   m_AngularDrag: 5
   m_UseGravity: 0
   m_IsKinematic: 0
-  m_Interpolate: 1
+  m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
 --- !u!4 &2122011967

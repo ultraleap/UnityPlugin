@@ -2081,17 +2081,17 @@ Prefab:
     - target: {fileID: 54783115363902762, guid: 6d3e45125c02bea4c9c28f57a82c3f6a,
         type: 2}
       propertyPath: m_Interpolate
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 54757883203877810, guid: 6d3e45125c02bea4c9c28f57a82c3f6a,
         type: 2}
       propertyPath: m_Interpolate
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 54108310109255444, guid: 6d3e45125c02bea4c9c28f57a82c3f6a,
         type: 2}
       propertyPath: m_Interpolate
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 6d3e45125c02bea4c9c28f57a82c3f6a, type: 2}
@@ -3301,7 +3301,7 @@ MonoBehaviour:
   _syncMode: 1
   _forceCustomUpdate: 0
   _allowManualTimeAlignment: 0
-  _warpingAdjustment: 60
+  _customWarpAdjustment: 17
   _unlockHold: 303
   _moreRewind: 276
   _lessRewind: 275
@@ -8241,27 +8241,27 @@ Prefab:
     - target: {fileID: 54111658736148914, guid: 42e8bd39fe145a8419d212958fac6589,
         type: 2}
       propertyPath: m_Interpolate
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 54213554177137496, guid: 42e8bd39fe145a8419d212958fac6589,
         type: 2}
       propertyPath: m_Interpolate
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 54955733275588830, guid: 42e8bd39fe145a8419d212958fac6589,
         type: 2}
       propertyPath: m_Interpolate
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 54861704079955536, guid: 42e8bd39fe145a8419d212958fac6589,
         type: 2}
       propertyPath: m_Interpolate
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 54155246584505174, guid: 42e8bd39fe145a8419d212958fac6589,
         type: 2}
       propertyPath: m_Interpolate
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 42e8bd39fe145a8419d212958fac6589, type: 2}
@@ -16292,17 +16292,17 @@ Prefab:
     - target: {fileID: 54580840187329922, guid: 73dde5b40fafb9f439cae744996d7913,
         type: 2}
       propertyPath: m_Interpolate
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 54030523836961090, guid: 73dde5b40fafb9f439cae744996d7913,
         type: 2}
       propertyPath: m_Interpolate
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 54341614193047630, guid: 73dde5b40fafb9f439cae744996d7913,
         type: 2}
       propertyPath: m_Interpolate
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 73dde5b40fafb9f439cae744996d7913, type: 2}
