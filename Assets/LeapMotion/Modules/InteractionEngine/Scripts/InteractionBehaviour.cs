@@ -331,7 +331,7 @@ namespace Leap.Unity.Interaction {
     /// also valid to move the Interaction object (via its Rigidbody) in OnGraspStay, although OnGraspStay does
     /// not provide pre- and post-solve data in its callback signature.
     /// </remarks>
-    public Action<Vector3, Quaternion, Vector3, Quaternion, List<InteractionController>> OnGraspedMovement
+    public Leap.Unity.Interaction.Internal.Action<Vector3, Quaternion, Vector3, Quaternion, List<InteractionController>> OnGraspedMovement
       = (preSolvedPos, preSolvedRot, solvedPos, solvedRot, graspingControllers) => { };
 
     /// <summary>
