@@ -1,4 +1,4 @@
-﻿Shader "LeapMotion/Glint/Examples/RedToWhite"
+﻿Shader "LeapMotion/Glint/Examples/AlphaToWhite"
 {
 	Properties
 	{
@@ -47,7 +47,7 @@
 			fixed4 frag (v2f i) : SV_Target
 			{
 				// sample the texture
-				fixed4 col = tex2D(_MainTex, i.uv).r;
+				fixed4 col = tex2D(_MainTex, i.uv).a;
 				// apply fog
 				UNITY_APPLY_FOG(i.fogCoord, col);
 				return col;
