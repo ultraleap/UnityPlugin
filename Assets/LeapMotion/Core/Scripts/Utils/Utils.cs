@@ -299,6 +299,24 @@ namespace Leap.Unity {
       return d0 <= d && d <= d1;
     }
 
+    /// <summary>
+    /// Extrapolates using time values for positions a and b at extrapolatedTime.
+    /// </summary>
+    public static Vector3 TimedExtrapolate(Vector3 a, float aTime,
+                                           Vector3 b, float bTime,
+                                           float extrapolatedTime) {
+      return Vector3.LerpUnclamped(a, b, extrapolatedTime.MapUnclamped(aTime, bTime, 0f, 1f));
+    }
+
+    /// <summary>
+    /// Extrapolates using time values for rotations a and b at extrapolatedTime.
+    /// </summary>
+    public static Quaternion TimedExtrapolate(Quaternion a, float aTime,
+                                              Quaternion b, float bTime,
+                                              float extrapolatedTime) {
+      return Quaternion.SlerpUnclamped(a, b, extrapolatedTime.MapUnclamped(aTime, bTime, 0f, 1f));
+    }
+
     #endregion
 
     #region Value Mapping Utils
@@ -379,6 +397,33 @@ namespace Leap.Unity {
                         value.y.MapUnclamped(valueMin, valueMax, resultMin, resultMax),
                         value.z.MapUnclamped(valueMin, valueMax, resultMin, resultMax),
                         value.w.MapUnclamped(valueMin, valueMax, resultMin, resultMax));
+    }
+
+    /// <summary>
+    /// Returns a vector between resultMin and resultMax based on the input value's position
+    /// between valueMin and valueMax.
+    /// The input value is clamped between valueMin and valueMax.
+    /// </summary>
+    public static Vector2 Map(float input, float valueMin, float valueMax, Vector2 resultMin, Vector2 resultMax) {
+      return Vector2.Lerp(resultMin, resultMax, Mathf.InverseLerp(valueMin, valueMax, input));
+    }
+
+    /// <summary>
+    /// Returns a vector between resultMin and resultMax based on the input value's position
+    /// between valueMin and valueMax.
+    /// The input value is clamped between valueMin and valueMax.
+    /// </summary>
+    public static Vector3 Map(float input, float valueMin, float valueMax, Vector3 resultMin, Vector3 resultMax) {
+      return Vector3.Lerp(resultMin, resultMax, Mathf.InverseLerp(valueMin, valueMax, input));
+    }
+
+    /// <summary>
+    /// Returns a vector between resultMin and resultMax based on the input value's position
+    /// between valueMin and valueMax.
+    /// The input value is clamped between valueMin and valueMax.
+    /// </summary>
+    public static Vector4 Map(float input, float valueMin, float valueMax, Vector4 resultMin, Vector4 resultMax) {
+      return Vector4.Lerp(resultMin, resultMax, Mathf.InverseLerp(valueMin, valueMax, input));
     }
 
     /// <summary>
@@ -863,6 +908,43 @@ namespace Leap.Unity {
     /// </summary>
     public static Rect PadInner(this Rect r, float padding) {
       return new Rect(r.x + padding, r.y + padding, r.width - (padding * 2), r.height - (padding * 2));
+    }
+
+    #endregion
+
+    #region List Utils
+
+    public static void EnsureListExists<T>(ref List<T> list) {
+      if (list == null) {
+        list = new List<T>();
+      }
+    }
+
+    public static void EnsureListCount<T>(this List<T> list, int count) {
+      if (list.Count == count) return;
+
+      while (list.Count < count) {
+        list.Add(default(T));
+      }
+
+      while (list.Count > count) {
+        list.RemoveAt(list.Count - 1);
+      }
+    }
+
+    public static void EnsureListCount<T>(this List<T> list, int count, Func<T> createT, Action<T> deleteT = null) {
+      while (list.Count < count) {
+        list.Add(createT());
+      }
+
+      while (list.Count > count) {
+        T tempT = list[list.Count - 1];
+        list.RemoveAt(list.Count - 1);
+        
+        if (deleteT != null) {
+          deleteT(tempT);
+        }
+      }
     }
 
     #endregion

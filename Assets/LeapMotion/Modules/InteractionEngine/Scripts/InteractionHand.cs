@@ -235,10 +235,17 @@ namespace Leap.Unity.Interaction {
     }
 
     /// <summary>
+    /// Gets the last-tracked position of the underlying Leap hand.
+    /// </summary>
+    public override Vector3 position {
+      get { return _handData.PalmPosition.ToVector3(); }
+    }
+
+    /// <summary>
     /// Gets the velocity of the underlying tracked Leap hand.
     /// </summary>
     public override Vector3 velocity {
-      get { return isTracked ? Vector3.zero : leapHand.PalmVelocity.ToVector3(); }
+      get { return isTracked ? leapHand.PalmVelocity.ToVector3() : Vector3.zero; }
     }
 
     /// <summary>

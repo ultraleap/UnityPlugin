@@ -149,6 +149,12 @@ namespace Leap.Unity.Interaction {
     /// <summary> Calculated via _maxAttachmentAngle. </summary>
     private float _minAttachmentDotProduct;
 
+    [Tooltip("Always attach an anchor if there is one within this distance, regardless "
+           + "of trajectory.")]
+    [SerializeField]
+    [MinValue(0f)]
+    private float _alwaysAttachDistance = 0f;
+
     [Header("Motion")]
 
     [Tooltip("Should the object move instantly to the anchor position?")]
@@ -263,8 +269,8 @@ namespace Leap.Unity.Interaction {
     /// this anchor. This callback will never fire if tryAttachAnchorOnGraspEnd is not enabled.
     ///
     /// If tryAttachAnchorOnGraspEnd is enabled, the anchor will be attached to
-    /// an anchor only if its preferredAnchor property is false; otherwise, the attempt to
-    /// anchor failed.
+    /// an anchor only if its preferredAnchor property is non-null; otherwise, the
+    /// attempt to anchor failed.
     /// </summary>
     public Action<AnchorableBehaviour> OnPostTryAnchorOnGraspEnd = (anchObj) => { };
 
@@ -566,7 +572,8 @@ namespace Leap.Unity.Interaction {
                             anchor.transform.position,
                             maxAnchorRange,
                             _maxMotionlessRange,
-                            _minAttachmentDotProduct);
+                            _minAttachmentDotProduct,
+                            _alwaysAttachDistance);
     }
 
     /// <summary>
@@ -576,13 +583,16 @@ namespace Leap.Unity.Interaction {
     /// anchor no matter what; a non-zero score indicates a possible anchor, with more optimal
     /// anchors receiving a score closer to 1.
     /// </summary>
-    public static float GetAnchorScore(Vector3 anchObjPos, Vector3 anchObjVel, Vector3 anchorPos, float maxDistance, float nonDirectedMaxDistance, float minAngleProduct) {
+    public static float GetAnchorScore(Vector3 anchObjPos, Vector3 anchObjVel, Vector3 anchorPos, float maxDistance, float nonDirectedMaxDistance, float minAngleProduct,
+                                       float alwaysAttachDistance = 0f) {
       // Calculated a "directedness" heuristic for determining whether the user is throwing or releasing without directed motion.
-      float directedness = anchObjVel.magnitude.Map(0.2F, 1F, 0F, 1F);
+      float directedness = anchObjVel.magnitude.Map(0.20F, 1F, 0F, 1F);
 
-      float distanceSqrd = (anchorPos - anchObjPos).sqrMagnitude;
       float effMaxDistance = directedness.Map(0F, 1F, nonDirectedMaxDistance, maxDistance);
+      Vector3 effPos = NewUtils.Map(Mathf.Sqrt(Mathf.Sqrt(directedness)), 0f, 1f,
+                                    anchObjPos, (anchObjPos - anchObjVel.normalized * effMaxDistance * 0.30f));
 
+      float distanceSqrd = (anchorPos - effPos).sqrMagnitude;
       float distanceScore;
       if (distanceSqrd > effMaxDistance * effMaxDistance) {
         distanceScore = 0F;
@@ -592,18 +602,19 @@ namespace Leap.Unity.Interaction {
       }
 
       float angleScore;
-      float dotProduct = Vector3.Dot(anchObjVel.normalized, (anchorPos - anchObjPos).normalized);
+      float dotProduct = Vector3.Dot(anchObjVel.normalized, (anchorPos - effPos).normalized);
 
       // Angular score only factors in based on how directed the motion of the object is.
       dotProduct = Mathf.Lerp(1F, dotProduct, directedness);
+      
+      angleScore = dotProduct.Map(minAngleProduct, 1f, 0f, 1f);
+      angleScore *= angleScore;
 
-      if (dotProduct < minAngleProduct) {
-        angleScore = 0F;
-      }
-      else {
-        angleScore = dotProduct.Map(minAngleProduct, 1F, 0F, 1F);
-        angleScore *= angleScore;
-      }
+      // Support an "always-attach distance" within which only distanceScore matters
+      float semiDistanceSqrd = (anchorPos - Vector3.Lerp(anchObjPos, effPos, 0.5f)).sqrMagnitude;
+      float useAlwaysAttachDistanceAmount = semiDistanceSqrd.Map(0f, Mathf.Max(0.0001f, (0.25f * alwaysAttachDistance * alwaysAttachDistance)),
+                                                                 1f, 0f);
+      angleScore = useAlwaysAttachDistanceAmount.Map(0f, 1f, angleScore, 1f);
 
       return distanceScore * angleScore;
     }
