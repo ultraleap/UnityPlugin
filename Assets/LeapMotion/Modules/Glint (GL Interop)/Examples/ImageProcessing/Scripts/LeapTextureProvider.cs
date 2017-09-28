@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace Leap.Unity.Glint.Examples {
   public class LeapTextureProvider : MonoBehaviour {
@@ -22,6 +23,9 @@ namespace Leap.Unity.Glint.Examples {
     byte[] leftPixels;
     byte[] rightPixels;
 
+    Action onLeftDataRetrievedAction;
+    Action onRightDataRetrievedAction;
+
     int whichImage = 0;
 
     // Use this for initialization
@@ -41,6 +45,9 @@ namespace Leap.Unity.Glint.Examples {
       leftPixels = new byte[WIDTH * HEIGHT];
       rightPixels = new byte[WIDTH * HEIGHT];
 
+      onLeftDataRetrievedAction = onLeftDataRetrieved;
+      onRightDataRetrievedAction = onRightDataRetrieved;
+
       if (leftTextureMaterial != null) {
         leftTextureMaterial.mainTexture = leftTexture;
       }
@@ -56,20 +63,20 @@ namespace Leap.Unity.Glint.Examples {
       if (whichImage == 0) {
         Graphics.Blit(null, leftRenderTexture[0], leftImageMaterial);
         Graphics.Blit(null, rightRenderTexture[0], rightImageMaterial);
-        Glint.RequestTextureDownload(leftRenderTexture[0], leftPixels, onLeftDataRetrieved);
-        Glint.RequestTextureDownload(rightRenderTexture[0], rightPixels, onRightDataRetrieved);
+        Glint.RequestTextureDownload(leftRenderTexture[0], leftPixels, onLeftDataRetrievedAction);
+        Glint.RequestTextureDownload(rightRenderTexture[0], rightPixels, onRightDataRetrievedAction);
         whichImage++;
       } else if (whichImage == 1) {
         Graphics.Blit(null, leftRenderTexture[1], leftImageMaterial);
         Graphics.Blit(null, rightRenderTexture[1], rightImageMaterial);
-        Glint.RequestTextureDownload(leftRenderTexture[1], leftPixels, onLeftDataRetrieved);
-        Glint.RequestTextureDownload(rightRenderTexture[1], rightPixels, onRightDataRetrieved);
+        Glint.RequestTextureDownload(leftRenderTexture[1], leftPixels, onLeftDataRetrievedAction);
+        Glint.RequestTextureDownload(rightRenderTexture[1], rightPixels, onRightDataRetrievedAction);
         whichImage++;
       } else if (whichImage == 2) {
         Graphics.Blit(null, leftRenderTexture[2], leftImageMaterial);
         Graphics.Blit(null, rightRenderTexture[2], rightImageMaterial);
-        Glint.RequestTextureDownload(leftRenderTexture[2], leftPixels, onLeftDataRetrieved);
-        Glint.RequestTextureDownload(rightRenderTexture[2], rightPixels, onRightDataRetrieved);
+        Glint.RequestTextureDownload(leftRenderTexture[2], leftPixels, onLeftDataRetrievedAction);
+        Glint.RequestTextureDownload(rightRenderTexture[2], rightPixels, onRightDataRetrievedAction);
         whichImage = 0;
       }
     }
