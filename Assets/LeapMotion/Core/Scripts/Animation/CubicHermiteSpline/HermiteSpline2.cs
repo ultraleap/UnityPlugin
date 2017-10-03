@@ -22,22 +22,22 @@ namespace Leap.Unity.Animation {
   /// during the splines duration.
   /// </summary>
   [Serializable]
-  public struct CHS {
+  public struct HermiteSpline2 {
     public float t0, t1;
-    public float pos0, pos1;
-    public float vel0, vel1;
+    public Vector2 pos0, pos1;
+    public Vector2 vel0, vel1;
 
     /// <summary>
     /// Constructs a spline by specifying the positions of the
     /// two endpoints.  The velocity at each endpoint is zero,
     /// and the time range of the spline is 0 to 1.
     /// </summary>
-    public CHS(float pos0, float pos1) {
+    public HermiteSpline2(Vector2 pos0, Vector2 pos1) {
       t0 = 0;
       t1 = 1;
 
-      vel0 = default(float);
-      vel1 = default(float);
+      vel0 = default(Vector2);
+      vel1 = default(Vector2);
 
       this.pos0 = pos0;
       this.pos1 = pos1;
@@ -48,7 +48,7 @@ namespace Leap.Unity.Animation {
     /// velocities of the two endpoints.  The time range of
     /// the spline is 0 to 1.
     /// </summary>
-    public CHS(float pos0, float pos1, float vel0, float vel1) {
+    public HermiteSpline2(Vector2 pos0, Vector2 pos1, Vector2 vel0, Vector2 vel1) {
       t0 = 0;
       t1 = 1;
 
@@ -64,7 +64,7 @@ namespace Leap.Unity.Animation {
     /// velocities of the two endpoints.  The time range of
     /// the spline is 0 to length.
     /// </summary>
-    public CHS(float pos0, float pos1, float vel0, float vel1, float length) {
+    public HermiteSpline2(Vector2 pos0, Vector2 pos1, Vector2 vel0, Vector2 vel1, float length) {
       t0 = 0;
       t1 = length;
 
@@ -79,7 +79,7 @@ namespace Leap.Unity.Animation {
     /// Constructs a spline by specifying the positions,
     /// velocities, and times of the endpoints.
     /// </summary>
-    public CHS(float t0, float t1, float pos0, float pos1, float vel0, float vel1) {
+    public HermiteSpline2(float t0, float t1, Vector2 pos0, Vector2 pos1, Vector2 vel0, Vector2 vel1) {
       this.t0 = 0;
       this.t1 = 1;
 
@@ -94,15 +94,15 @@ namespace Leap.Unity.Animation {
     /// Gets the position at time t along this spline.  
     /// The time is clamped within the t0 - t1 range.
     /// </summary>
-    public float PositionAt(float t) {
+    public Vector2 PositionAt(float t) {
       float i = Mathf.Clamp01((t - t0) / (t1 - t0));
       float i2 = i * i;
       float i3 = i2 * i;
 
-      float h00 = (2 * i3 - 3 * i2 + 1) * pos0;
-      float h10 = (i3 - 2 * i2 + i) * (t1 - t0) * vel0;
-      float h01 = (-2 * i3 + 3 * i2) * pos1;
-      float h11 = (i3 - i2) * (t1 - t0) * vel1;
+      Vector2 h00 = (2 * i3 - 3 * i2 + 1) * pos0;
+      Vector2 h10 = (i3 - 2 * i2 + i) * (t1 - t0) * vel0;
+      Vector2 h01 = (-2 * i3 + 3 * i2) * pos1;
+      Vector2 h11 = (i3 - i2) * (t1 - t0) * vel1;
 
       return h00 + h10 + h01 + h11;
     }
@@ -111,7 +111,7 @@ namespace Leap.Unity.Animation {
     /// Gets the first derivative of position at time t.
     /// The time is clamped within the t0 - t1 range.
     /// </summary>
-    public float VelocityAt(float t) {
+    public Vector2 VelocityAt(float t) {
       float C00 = t1 - t0;
       float C1 = 1.0f / C00;
 
@@ -127,10 +127,10 @@ namespace Leap.Unity.Animation {
         i3_ = i2_ * i + i_ * i2;
       }
 
-      float h00_ = (i3_ * 2 - i2_ * 3) * pos0;
-      float h10_ = (i3_ - 2 * i2_ + i_) * C00 * vel0;
-      float h01_ = (i2_ * 3 - 2 * i3_) * pos1;
-      float h11_ = (i3_ - i2_) * C00 * vel1;
+      Vector2 h00_ = (i3_ * 2 - i2_ * 3) * pos0;
+      Vector2 h10_ = (i3_ - 2 * i2_ + i_) * C00 * vel0;
+      Vector2 h01_ = (i2_ * 3 - 2 * i3_) * pos1;
+      Vector2 h11_ = (i3_ - i2_) * C00 * vel1;
 
       return h00_ + h01_ + h10_ + h11_;
     }
@@ -139,7 +139,7 @@ namespace Leap.Unity.Animation {
     /// Gets both the position and the first derivative of position
     /// at time ti.  The time is clamped within the t0 - t1 range.
     /// </summary>
-    public void PositionAndVelAt(float t, out float position, out float velocity) {
+    public void PositionAndVelAt(float t, out Vector2 position, out Vector2 velocity) {
       float C00 = t1 - t0;
       float C1 = 1.0f / C00;
 
@@ -156,17 +156,17 @@ namespace Leap.Unity.Animation {
         i3_ = i2_ * i + i_ * i2;
       }
 
-      float h00 = (2 * i3 - 3 * i2 + 1) * pos0;
-      float h00_ = (i3_ * 2 - i2_ * 3) * pos0;
+      Vector2 h00 = (2 * i3 - 3 * i2 + 1) * pos0;
+      Vector2 h00_ = (i3_ * 2 - i2_ * 3) * pos0;
 
-      float h10 = (i3 - 2 * i2 + i) * C00 * vel0;
-      float h10_ = (i3_ - 2 * i2_ + i_) * C00 * vel0;
+      Vector2 h10 = (i3 - 2 * i2 + i) * C00 * vel0;
+      Vector2 h10_ = (i3_ - 2 * i2_ + i_) * C00 * vel0;
 
-      float h01 = (3 * i2 - 2 * i3) * pos1;
-      float h01_ = (i2_ * 3 - 2 * i3_) * pos1;
+      Vector2 h01 = (3 * i2 - 2 * i3) * pos1;
+      Vector2 h01_ = (i2_ * 3 - 2 * i3_) * pos1;
 
-      float h11 = (i3 - i2) * C00 * vel1;
-      float h11_ = (i3_ - i2_) * C00 * vel1;
+      Vector2 h11 = (i3 - i2) * C00 * vel1;
+      Vector2 h11_ = (i3_ - i2_) * C00 * vel1;
 
       position = h00 + h01 + h10 + h11;
       velocity = h00_ + h01_ + h10_ + h11_;

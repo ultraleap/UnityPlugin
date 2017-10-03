@@ -15,9 +15,9 @@ MonoBehaviour:
   destFolder:
     _assetFolder: {fileID: 102900000, guid: 08ec98467401eff4dadc79dea350399f, type: 3}
   definitions:
-  - name: CHS
+  - name: HermiteSpline
     type: float
-  - name: CHS2
+  - name: HermiteSpline2
     type: Vector2
-  - name: CHS3
+  - name: HermiteSpline3
     type: Vector3
