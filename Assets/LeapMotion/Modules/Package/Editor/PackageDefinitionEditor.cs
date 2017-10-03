@@ -9,17 +9,13 @@
 
 using UnityEngine;
 using UnityEditor;
-using UnityEditorInternal;
 using System;
-using System.IO;
-using System.Linq;
-using System.Text;
 using System.Collections.Generic;
 
 namespace Leap.Unity.Packaging {
 
   [CustomEditor(typeof(PackageDefinition))]
-  public class PackageDefinitionEditor : CustomEditorBase<PackageDefinition> {
+  public class PackageDefinitionEditor : DefinitionBaseEditor<PackageDefinition> {
     private List<PackageDefinition> _childPackages;
 
     private SerializedProperty _ignoredFiles;
@@ -40,10 +36,7 @@ namespace Leap.Unity.Packaging {
       createList("_dependantFiles", drawFileElement);
       createList("_dependantPackages", drawPackageElement);
 
-      specifyCustomDrawer("_packageName", drawPackageName);
-      specifyCustomDrawer("_generateBuildDropdown", drawGenerateBuildDropdown);
-
-      specifyCustomDecorator("_dependantFolders", drawPackageExportFolder);
+      specifyCustomDecorator("_dependantFolders", prop => drawExportFolder(prop, "Build Package", "Package Export Folder"));
     }
 
     public override void OnInspectorGUI() {
@@ -68,49 +61,16 @@ namespace Leap.Unity.Packaging {
       }
     }
 
-    private void drawPackageName(SerializedProperty property) {
-      string newName = EditorGUILayout.DelayedTextField("Package Name", property.stringValue);
-      string filteredName = new string(newName.Where(c => char.IsLetterOrDigit(c) || c == ' ').ToArray()).Trim();
-
-      if (filteredName != "" && filteredName != property.stringValue) {
-        property.stringValue = filteredName;
-
-        if (target.GenerateBuildDropdown) {
-          property.serializedObject.ApplyModifiedProperties();
-          generateBuildMenuScript();
-        }
-      }
+    protected override void OnBuild() {
+      target.BuildPackage(interactive: true);
     }
 
-    private void drawGenerateBuildDropdown(SerializedProperty property) {
-      EditorGUI.BeginChangeCheck();
-      EditorGUILayout.PropertyField(property);
-      if (EditorGUI.EndChangeCheck()) {
-        property.serializedObject.ApplyModifiedProperties();
-        generateBuildMenuScript();
-      }
+    protected override int GetBuildMenuPriority() {
+      return 50;
     }
 
-    private void drawPackageExportFolder(SerializedProperty property) {
-      EditorGUILayout.BeginHorizontal();
-
-      string folder;
-      if (target.TryGetPackageExportFolder(out folder, promptIfNotDefined: false)) {
-        EditorGUILayout.TextField("Package Export Folder", folder);
-      } else {
-        EditorGUILayout.LabelField("Package Export Folder");
-      }
-
-      if (GUILayout.Button("Change")) {
-        target.PrompUserToSetExportPath();
-      }
-
-      EditorGUILayout.EndHorizontal();
-
-      if (GUILayout.Button("Build Package", GUILayout.MinHeight(EditorGUIUtility.singleLineHeight * 2))) {
-        target.BuildPackage(interactive: true);
-      }
-      GUILayout.Space(EditorGUIUtility.singleLineHeight * 2);
+    protected override string GetBuildMethodName() {
+      return "BuildPackage";
     }
 
     private void drawFolderElement(Rect rect, SerializedProperty property) {
@@ -123,32 +83,6 @@ namespace Leap.Unity.Packaging {
 
     private void drawPackageElement(Rect rect, SerializedProperty property) {
       EditorGUI.PropertyField(rect, property, GUIContent.none);
-    }
-
-    private ReorderableList createList(string propertyName, Action<Rect, SerializedProperty> drawMethod) {
-      SerializedProperty listProperty = serializedObject.FindProperty(propertyName);
-
-      var list = new ReorderableList(serializedObject, listProperty,
-                                     draggable: true,
-                                     displayHeader: true,
-                                     displayAddButton: true,
-                                     displayRemoveButton: true);
-
-      list.drawElementCallback += (rect, index, isActive, isFocused) => {
-        SerializedProperty property = list.serializedProperty.GetArrayElementAtIndex(index);
-        drawMethod(rect, property);
-      };
-
-      list.drawHeaderCallback += (rect) => {
-        GUI.Label(rect, listProperty.displayName);
-      };
-
-      list.elementHeight = EditorGUIUtility.singleLineHeight;
-
-
-      specifyCustomDrawer(propertyName, p => list.DoLayoutList());
-
-      return list;
     }
 
     private void drawExplorerElement(Rect rect, SerializedProperty property, SerializedProperty ignoredList, Func<string, string, string, string> openAction) {
@@ -193,37 +127,6 @@ namespace Leap.Unity.Packaging {
           }
         }
       }
-    }
-
-    private void generateBuildMenuScript() {
-      var definitions = PackageDefinition.FindAll();
-
-      StringBuilder builder = new StringBuilder();
-      builder.AppendLine("using UnityEditor;");
-      builder.AppendLine();
-      builder.AppendLine("namespace Leap.Unity.Packaging {");
-      builder.AppendLine();
-      builder.AppendLine("  public class PackageDefinitionBuildMenuItems {");
-
-      foreach (var def in definitions) {
-        if (!def.GenerateBuildDropdown) continue;
-
-        string guid = AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(def));
-
-        builder.AppendLine("");
-        builder.AppendLine("    // " + def.PackageName);
-        builder.AppendLine("    [MenuItem(\"Build/" + def.PackageName + "\")]");
-        builder.AppendLine("    public static void Build_" + guid + "() {");
-        builder.AppendLine("      PackageDefinition.BuildPackage(\"" + guid + "\");");
-        builder.AppendLine("    }");
-      }
-
-      builder.AppendLine("  }");
-      builder.AppendLine("}");
-      builder.AppendLine();
-
-      File.WriteAllText("Assets/LeapMotion/Modules/Package/Editor/PackageDefinitionBuildMenuItems.cs", builder.ToString());
-      AssetDatabase.Refresh();
     }
   }
 }
