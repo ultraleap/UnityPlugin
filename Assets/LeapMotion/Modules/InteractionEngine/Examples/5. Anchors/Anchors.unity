@@ -24000,7 +24000,7 @@ MonoBehaviour:
   lockWhenAttached: 1
   matchAnchorMotionWhileAttaching: 1
   anchorLerpCoeffPerSec: 10
-  anchorRotation: 0
+  anchorRotation: 1
   interactionBehaviour: {fileID: 1817611767}
   _interactionBehaviourIsNull: 0
   detachWhenGrasped: 1
@@ -28888,7 +28888,7 @@ MonoBehaviour:
   lockWhenAttached: 1
   matchAnchorMotionWhileAttaching: 1
   anchorLerpCoeffPerSec: 10
-  anchorRotation: 0
+  anchorRotation: 1
   interactionBehaviour: {fileID: 2122011965}
   _interactionBehaviourIsNull: 0
   detachWhenGrasped: 1
