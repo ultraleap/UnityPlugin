@@ -1504,18 +1504,18 @@ namespace Leap.Unity.Interaction {
 
         Joint[] joints = rigidbody.GetComponents<Joint>();
         foreach (var joint in joints) {
-          if (joint is FixedJoint) {
+          if (joint is FixedJoint && joint.connectedBody.isKinematic) {
             _isPositionLocked = true;
             return;
           }
-          if (joint is HingeJoint) {
+          if (joint is HingeJoint && joint.connectedBody.isKinematic) {
             _isPositionLocked = true;
             return;
           }
           // if (joint is SpringJoint) {
           // no check required; spring joints never fully lock position.
           // }
-          if (joint is CharacterJoint) {
+          if (joint is CharacterJoint && joint.connectedBody.isKinematic) {
             _isPositionLocked = true;
             return;
           }
