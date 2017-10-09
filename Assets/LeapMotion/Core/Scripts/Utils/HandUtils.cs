@@ -325,7 +325,7 @@ namespace Leap.Unity {
     /// Transforms a hand to a position and rotation.
     /// </summary>
     public static void SetTransform(this Hand hand, Vector3 position, Quaternion rotation) {
-      hand.Transform(Vector3.zero, (rotation * Quaternion.Inverse(hand.Rotation.ToQuaternion())));
+      hand.Transform(Vector3.zero, Quaternion.Slerp((rotation * Quaternion.Inverse(hand.Rotation.ToQuaternion())), Quaternion.identity, 0f));
       hand.Transform(position - hand.PalmPosition.ToVector3(), Quaternion.identity);
     }
 
