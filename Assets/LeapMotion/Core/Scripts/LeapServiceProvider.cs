@@ -32,6 +32,12 @@ namespace Leap.Unity {
       ReusePhysicsForUpdate,
     }
 
+    public enum PhysicsExtrapolationMode {
+      None,
+      Auto,
+      Manual
+    }
+
     [Tooltip("Set true if the Leap Motion hardware is mounted on an HMD; otherwise, leave false.")]
     [SerializeField]
     protected bool _isHeadMounted = false;
@@ -42,6 +48,17 @@ namespace Leap.Unity {
     [Tooltip("When enabled, the provider will only calculate one leap frame instead of two.")]
     [SerializeField]
     protected FrameOptimizationMode _frameOptimization = FrameOptimizationMode.None;
+
+    [Tooltip("The mode to use when extrapolating physics.\n" +
+             " None - No extrapolation is used at all.\n" +
+             " Auto - Extrapolation is chosen based on the fixed timestep.\n" +
+             " Manual - Extrapolation time is chosen manually by the user.")]
+    [SerializeField]
+    protected PhysicsExtrapolationMode _physicsExtrapolation = PhysicsExtrapolationMode.Auto;
+
+    [Tooltip("The amount of time (in seconds) to extrapolate the phyiscs data by.")]
+    [SerializeField]
+    protected float _physicsExtrapolationTime = 1.0f / 90.0f;
 
     [Header("[Experimental]")]
     [Tooltip("Pass updated transform matrices to objects with materials using the VertexOffsetShader.")]
@@ -115,6 +132,19 @@ namespace Leap.Unity {
       set {
         resetTransforms();
         _updateHandInPrecull = value;
+      }
+    }
+
+    public float CalculatePhysicsExtrapolation() {
+      switch (_physicsExtrapolation) {
+        case PhysicsExtrapolationMode.None:
+          return 0;
+        case PhysicsExtrapolationMode.Auto:
+          return Time.fixedDeltaTime;
+        case PhysicsExtrapolationMode.Manual:
+          return _physicsExtrapolationTime;
+        default:
+          throw new InvalidOperationException("Unexpected physics extrapolation mode: " + _physicsExtrapolation);
       }
     }
 
@@ -215,8 +245,26 @@ namespace Leap.Unity {
       }
 
       if (_useInterpolation) {
-        long timestamp = (long)(Time.fixedTime * S_TO_NS) + _unityToLeapOffset;
+
+        long timestamp;
+        switch (_frameOptimization) {
+          case FrameOptimizationMode.None:
+            //By default we use Time.fixedTime to ensure that our hands are on the same timeline
+            //as Update.  We add an extrapolation value to help compensate for latency.
+            float extrapolatedTime = Time.fixedTime + CalculatePhysicsExtrapolation();
+            timestamp = (long)(extrapolatedTime * S_TO_NS) + _unityToLeapOffset;
+            break;
+          case FrameOptimizationMode.ReusePhysicsForUpdate:
+            //If we are re-using physics frames for update, we don't even want to care about
+            //Time.fixedTime, just grab the most recent interpolated timestamp like we are
+            //in Update
+            timestamp = CalculateInterpolationTime() + (ExtrapolationAmount * 1000);
+            break;
+          default:
+            throw new InvalidOperationException("Unexpected frame optimization mode: " + _frameOptimization);
+        }
         leap_controller_.GetInterpolatedFrame(_untransformedFixedFrame, timestamp);
+
       } else {
         leap_controller_.Frame(_untransformedFixedFrame);
       }
