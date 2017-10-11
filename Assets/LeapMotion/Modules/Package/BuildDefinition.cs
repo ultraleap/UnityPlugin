@@ -48,12 +48,14 @@ namespace Leap.Unity.Packaging {
         return;
       }
 
+      string fullPath = Path.Combine(exportFolder, DefinitionName);
+
       var buildOptions = new BuildPlayerOptions() {
         scenes = _scenes.Where(s => s != null).
                                     Select(s => AssetDatabase.GetAssetPath(s)).
                                     ToArray(),
         options = _options,
-        locationPathName = exportFolder
+        locationPathName = fullPath
       };
 
       foreach (var target in _targets) {

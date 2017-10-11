@@ -11,7 +11,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e58c151f0d00e9649b15495e395f62f3, type: 3}
   m_Name: Create Me Pls
   m_EditorClassIdentifier: 
-  _definitionName: 
+  _definitionName: TEHFUCKINGTHING
   _generateBuildDropdown: 0
   _trySuffixWithGitHash: 0
   _options: 0
