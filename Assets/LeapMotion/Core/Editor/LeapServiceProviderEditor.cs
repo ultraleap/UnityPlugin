@@ -17,6 +17,13 @@ namespace Leap.Unity {
       base.OnEnable();
 
       specifyCustomDecorator("_frameOptimization", frameOptimizationWarning);
+
+      specifyConditionalDrawing("_frameOptimization", (int)LeapServiceProvider.FrameOptimizationMode.None,
+                                "_physicsExtrapolation",
+                                "_physicsExtrapolationTime");
+
+      specifyConditionalDrawing("_physicsExtrapolation", (int)LeapServiceProvider.PhysicsExtrapolationMode.Manual,
+                                "_physicsExtrapolationTime");
     }
 
     private void frameOptimizationWarning(SerializedProperty property) {
