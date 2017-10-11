@@ -233,6 +233,127 @@ namespace Leap.Unity {
     public static string TrimStart(this string str, int characters) {
       return str.Substring(Mathf.Min(str.Length, characters));
     }
+
+    /// <summary>
+    /// Capitalizes a simple string.  Only looks at the first character,
+    /// so if your string has any kind of non-letter character as the first
+    /// character this method will do nothing.
+    /// </summary>
+    public static string Capitalize(this string str) {
+      char c = str[0];
+      if (char.IsLetter(c)) {
+        return char.ToUpper(c) + str.Substring(1);
+      } else {
+        return str;
+      }
+    }
+
+    /// <summary>
+    /// Takes a variable-like name and turns it into a nice human readable
+    /// name.  Examples:
+    /// 
+    /// _privateVar     =>  Private Var
+    /// multBy32        =>  Mult By 32
+    /// the_key_code    =>  The Key Code
+    /// CamelCaseToo    =>  Camel Case Too
+    /// _is2_equalTo_5  =>  Is 2 Equal To 5
+    /// GetTheSCUBANow  =>  Get The SCUBA Now
+    /// </summary>
+    public static string GenerateNiceName(string value) {
+      string result = "";
+      string curr = "";
+
+      Func<char, bool> wordFunc = c => {
+        //Can't build any further if it's already capitalized
+        if (curr.Length > 0 && char.IsUpper(curr[0])) {
+          return false;
+        }
+
+        //Can't add non-letters to words
+        if (!char.IsLetter(c)) {
+          return false;
+        }
+
+        curr = c + curr;
+        return true;
+      };
+
+      Func<char, bool> acronymFunc = c => {
+        //Can't add non-letters to acronyms
+        if (!char.IsLetter(c)) {
+          return false;
+        }
+
+        //Can't add lowercase letters to acronyms
+        if (char.IsLower(c)) {
+          return false;
+        }
+
+        curr = c + curr;
+        return true;
+      };
+
+      Func<char, bool> numberFunc = c => {
+        //Can't add non-digits to a number
+        if (!char.IsDigit(c)) {
+          return false;
+        }
+
+        curr = c + curr;
+        return true;
+      };
+
+      Func<char, bool> fluffFunc = c => {
+        //Can't add digits or numbers to 'fluff'
+        if (char.IsDigit(c) || char.IsLetter(c)) {
+          return false;
+        }
+
+        return true;
+      };
+
+
+      Func<char, bool> currFunc = null;
+      int currIndex = value.Length;
+
+      while (currIndex != 0) {
+        currIndex--;
+        char c = value[currIndex];
+
+        if (currFunc != null) {
+          if (currFunc(c)) {
+            continue;
+          } else {
+            currFunc = null;
+          }
+        }
+
+        if (currFunc == null) {
+          if (curr != "") {
+            result = " " + curr.Capitalize() + result;
+            curr = "";
+          }
+
+          if (acronymFunc(c)) {
+            currFunc = acronymFunc;
+          } else if (wordFunc(c)) {
+            currFunc = wordFunc;
+          } else if (numberFunc(c)) {
+            currFunc = numberFunc;
+          } else if (fluffFunc(c)) {
+            currFunc = fluffFunc;
+          } else {
+            throw new Exception("Unexpected state, no function matched character " + c);
+          }
+        }
+      }
+
+      if (curr != "") {
+        result = curr.Capitalize() + result;
+      }
+
+      return result.Trim();
+    }
     #endregion
 
     #region Math Utils
