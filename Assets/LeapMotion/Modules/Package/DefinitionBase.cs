@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
+#if UNITY_EDITOR
 using UnityEditor;
+#endif
 
 namespace Leap.Unity.Packaging {
 
@@ -28,6 +30,7 @@ namespace Leap.Unity.Packaging {
       }
     }
 
+#if UNITY_EDITOR
     [ContextMenu("Reset Export Folder")]
     public void ResetExportFolder() {
       EditorPrefs.DeleteKey(getExportFolderKey());
@@ -83,5 +86,6 @@ namespace Leap.Unity.Packaging {
       //a given computer.
       return PACKAGE_EXPORT_FOLDER_KEY + "_" + AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(this));
     }
+#endif
   }
 }

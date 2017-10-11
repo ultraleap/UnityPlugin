@@ -7,9 +7,7 @@
  * between Leap Motion and you, your company or other organization.           *
  ******************************************************************************/
 
-using System;
 using UnityEngine;
-using UnityEditor;
 
 namespace Leap.Unity.Generation {
 
