@@ -15,5 +15,7 @@ MonoBehaviour:
   _generateBuildDropdown: 1
   _dependantFolders:
   - Assets\LeapMotion\Modules\DetectionExamples
+  _ignoredFolders: []
   _dependantFiles: []
+  _ignoredFiles: []
   _dependantPackages: []

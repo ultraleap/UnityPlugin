@@ -279,6 +279,7 @@ MonoBehaviour:
   pinkyDistalJoint: {fileID: 0}
   pinkyTip: {fileID: 0}
   _chirality: 1
+  _isTracked: 0
 --- !u!114 &114553000557697698
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -337,6 +338,7 @@ MonoBehaviour:
   pinkyDistalJoint: {fileID: 0}
   pinkyTip: {fileID: 0}
   _chirality: 0
+  _isTracked: 0
 --- !u!114 &114990173483565386
 MonoBehaviour:
   m_ObjectHideFlags: 1

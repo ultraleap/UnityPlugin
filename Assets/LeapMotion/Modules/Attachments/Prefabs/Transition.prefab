@@ -16,10 +16,10 @@ GameObject:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  serializedVersion: 4
+  serializedVersion: 5
   m_Component:
-  - 4: {fileID: 4000012721778902}
-  - 114: {fileID: 114000012958230866}
+  - component: {fileID: 4000012721778902}
+  - component: {fileID: 114000012958230866}
   m_Layer: 0
   m_Name: Transition
   m_TagString: Untagged
@@ -36,10 +36,10 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &114000012958230866
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -58,17 +58,20 @@ MonoBehaviour:
   PositionCurve:
     serializedVersion: 2
     m_Curve:
-    - time: -1
+    - serializedVersion: 2
+      time: -1
       value: 1
       inSlope: 0
       outSlope: 0
       tangentMode: 0
-    - time: 0
+    - serializedVersion: 2
+      time: 0
       value: 0
       inSlope: 0
       outSlope: 0
       tangentMode: 0
-    - time: 1
+    - serializedVersion: 2
+      time: 1
       value: 1
       inSlope: 0
       outSlope: 0
@@ -82,17 +85,20 @@ MonoBehaviour:
   RotationCurve:
     serializedVersion: 2
     m_Curve:
-    - time: -1
+    - serializedVersion: 2
+      time: -1
       value: 1
       inSlope: 0
       outSlope: 0
       tangentMode: 0
-    - time: 0
+    - serializedVersion: 2
+      time: 0
       value: 0
       inSlope: 0
       outSlope: 0
       tangentMode: 0
-    - time: 1
+    - serializedVersion: 2
+      time: 1
       value: 1
       inSlope: 0
       outSlope: 0
@@ -106,17 +112,20 @@ MonoBehaviour:
   ScaleCurve:
     serializedVersion: 2
     m_Curve:
-    - time: -1
+    - serializedVersion: 2
+      time: -1
       value: 1
       inSlope: 0
       outSlope: 0
       tangentMode: 0
-    - time: 0
+    - serializedVersion: 2
+      time: 0
       value: 0
       inSlope: 0
       outSlope: 0
       tangentMode: 0
-    - time: 1
+    - serializedVersion: 2
+      time: 1
       value: 1
       inSlope: 0
       outSlope: 0
@@ -130,17 +139,20 @@ MonoBehaviour:
   ColorCurve:
     serializedVersion: 2
     m_Curve:
-    - time: -1
+    - serializedVersion: 2
+      time: -1
       value: 1
       inSlope: 0
       outSlope: 0
       tangentMode: 0
-    - time: 0
+    - serializedVersion: 2
+      time: 0
       value: 0
       inSlope: 0
       outSlope: 0
       tangentMode: 0
-    - time: 1
+    - serializedVersion: 2
+      time: 1
       value: 1
       inSlope: 0
       outSlope: 0
@@ -153,8 +165,8 @@ MonoBehaviour:
   _onStart:
     m_PersistentCalls:
       m_Calls: []
-    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
-      PublicKeyToken=null
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
   _onAnimationStep:
     m_PersistentCalls:
       m_Calls: []
@@ -163,5 +175,5 @@ MonoBehaviour:
   _onComplete:
     m_PersistentCalls:
       m_Calls: []
-    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
-      PublicKeyToken=null
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
