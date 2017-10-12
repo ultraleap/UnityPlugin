@@ -5,12 +5,12 @@ GameObject:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  serializedVersion: 4
+  serializedVersion: 5
   m_Component:
-  - 224: {fileID: 22458224}
-  - 222: {fileID: 22204108}
-  - 114: {fileID: 11446796}
-  - 114: {fileID: 11406834}
+  - component: {fileID: 22458224}
+  - component: {fileID: 22204108}
+  - component: {fileID: 11446796}
+  - component: {fileID: 11406834}
   m_Layer: 5
   m_Name: HandleShadow
   m_TagString: Untagged
@@ -23,11 +23,11 @@ GameObject:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  serializedVersion: 4
+  serializedVersion: 5
   m_Component:
-  - 224: {fileID: 22428218}
-  - 222: {fileID: 22269208}
-  - 114: {fileID: 11438712}
+  - component: {fileID: 22428218}
+  - component: {fileID: 22269208}
+  - component: {fileID: 11438712}
   m_Layer: 5
   m_Name: Fill
   m_TagString: Untagged
@@ -40,16 +40,16 @@ GameObject:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  serializedVersion: 4
+  serializedVersion: 5
   m_Component:
-  - 224: {fileID: 22490904}
-  - 114: {fileID: 11475534}
-  - 222: {fileID: 22254268}
-  - 114: {fileID: 11491604}
-  - 114: {fileID: 11498930}
-  - 82: {fileID: 8294126}
-  - 114: {fileID: 11498694}
-  - 114: {fileID: 11406732}
+  - component: {fileID: 22490904}
+  - component: {fileID: 11475534}
+  - component: {fileID: 22254268}
+  - component: {fileID: 11491604}
+  - component: {fileID: 11498930}
+  - component: {fileID: 8294126}
+  - component: {fileID: 11498694}
+  - component: {fileID: 11406732}
   m_Layer: 5
   m_Name: Slider
   m_TagString: Untagged
@@ -62,11 +62,11 @@ GameObject:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  serializedVersion: 4
+  serializedVersion: 5
   m_Component:
-  - 224: {fileID: 22438182}
-  - 222: {fileID: 22299814}
-  - 114: {fileID: 11475722}
+  - component: {fileID: 22438182}
+  - component: {fileID: 22299814}
+  - component: {fileID: 11475722}
   m_Layer: 5
   m_Name: Background
   m_TagString: Untagged
@@ -79,12 +79,12 @@ GameObject:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  serializedVersion: 4
+  serializedVersion: 5
   m_Component:
-  - 224: {fileID: 22407934}
-  - 222: {fileID: 22265642}
-  - 114: {fileID: 11427430}
-  - 82: {fileID: 8255302}
+  - component: {fileID: 22407934}
+  - component: {fileID: 22265642}
+  - component: {fileID: 11427430}
+  - component: {fileID: 8255302}
   m_Layer: 5
   m_Name: Handle
   m_TagString: Untagged
@@ -97,9 +97,9 @@ GameObject:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  serializedVersion: 4
+  serializedVersion: 5
   m_Component:
-  - 224: {fileID: 22471362}
+  - component: {fileID: 22471362}
   m_Layer: 5
   m_Name: Handle Slide Area
   m_TagString: Untagged
@@ -112,12 +112,12 @@ GameObject:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  serializedVersion: 4
+  serializedVersion: 5
   m_Component:
-  - 224: {fileID: 22443340}
-  - 114: {fileID: 11402230}
-  - 222: {fileID: 22274596}
-  - 114: {fileID: 11447180}
+  - component: {fileID: 22443340}
+  - component: {fileID: 11402230}
+  - component: {fileID: 22274596}
+  - component: {fileID: 11447180}
   m_Layer: 5
   m_Name: Fill Area
   m_TagString: Untagged
@@ -141,6 +141,7 @@ AudioSource:
   Loop: 1
   Mute: 0
   Spatialize: 0
+  SpatializePostEffects: 0
   Priority: 128
   DopplerLevel: 1
   MinDistance: 1
@@ -153,12 +154,14 @@ AudioSource:
   rolloffCustomCurve:
     serializedVersion: 2
     m_Curve:
-    - time: 0
+    - serializedVersion: 2
+      time: 0
       value: 1
       inSlope: 0
       outSlope: 0
       tangentMode: 0
-    - time: 1
+    - serializedVersion: 2
+      time: 1
       value: 0
       inSlope: 0
       outSlope: 0
@@ -169,7 +172,8 @@ AudioSource:
   panLevelCustomCurve:
     serializedVersion: 2
     m_Curve:
-    - time: 0
+    - serializedVersion: 2
+      time: 0
       value: 1
       inSlope: 0
       outSlope: 0
@@ -180,7 +184,8 @@ AudioSource:
   spreadCustomCurve:
     serializedVersion: 2
     m_Curve:
-    - time: 0
+    - serializedVersion: 2
+      time: 0
       value: 0
       inSlope: 0
       outSlope: 0
@@ -191,7 +196,8 @@ AudioSource:
   reverbZoneMixCustomCurve:
     serializedVersion: 2
     m_Curve:
-    - time: 0
+    - serializedVersion: 2
+      time: 0
       value: 1
       inSlope: 0
       outSlope: 0
@@ -215,6 +221,7 @@ AudioSource:
   Loop: 0
   Mute: 0
   Spatialize: 0
+  SpatializePostEffects: 0
   Priority: 128
   DopplerLevel: 1
   MinDistance: 1
@@ -227,12 +234,14 @@ AudioSource:
   rolloffCustomCurve:
     serializedVersion: 2
     m_Curve:
-    - time: 0
+    - serializedVersion: 2
+      time: 0
       value: 1
       inSlope: 0
       outSlope: 0
       tangentMode: 0
-    - time: 1
+    - serializedVersion: 2
+      time: 1
       value: 0
       inSlope: 0
       outSlope: 0
@@ -243,7 +252,8 @@ AudioSource:
   panLevelCustomCurve:
     serializedVersion: 2
     m_Curve:
-    - time: 0
+    - serializedVersion: 2
+      time: 0
       value: 1
       inSlope: 0
       outSlope: 0
@@ -254,7 +264,8 @@ AudioSource:
   spreadCustomCurve:
     serializedVersion: 2
     m_Curve:
-    - time: 0
+    - serializedVersion: 2
+      time: 0
       value: 0
       inSlope: 0
       outSlope: 0
@@ -265,7 +276,8 @@ AudioSource:
   reverbZoneMixCustomCurve:
     serializedVersion: 2
     m_Curve:
-    - time: 0
+    - serializedVersion: 2
+      time: 0
       value: 1
       inSlope: 0
       outSlope: 0
@@ -631,7 +643,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Layers:
-  - LayerTransform: {fileID: 22438182}
+  - Label: Background Layer
+    LayerTransform: {fileID: 22438182}
     MaxFloatDistance: 0.005
     MinFloatDistance: 0
     Shadow: {fileID: 11491604}
@@ -642,7 +655,8 @@ MonoBehaviour:
     touchingFinger: 0
     distanceToAboveLayer: 0
     maxDistanceToAboveLayer: 0
-  - LayerTransform: {fileID: 22443340}
+  - Label: Fill Area Layer
+    LayerTransform: {fileID: 22443340}
     MaxFloatDistance: 0.005
     MinFloatDistance: 0
     Shadow: {fileID: 0}
@@ -653,7 +667,8 @@ MonoBehaviour:
     touchingFinger: 0
     distanceToAboveLayer: 0
     maxDistanceToAboveLayer: 0
-  - LayerTransform: {fileID: 22471362}
+  - Label: Handle Slide Area Layer
+    LayerTransform: {fileID: 22471362}
     MaxFloatDistance: 0.01
     MinFloatDistance: 0
     Shadow: {fileID: 11446796}
@@ -667,11 +682,21 @@ MonoBehaviour:
   ExpandSpeed: 0.2
   ContractSpeed: 0.2
   PushPaddingDistance: 0
-  LayerCollapseStateChange:
+  LayerDepress:
     m_PersistentCalls:
       m_Calls: []
-    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
-      PublicKeyToken=null
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  LayerCollapse:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  LayerExpand:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
 --- !u!222 &22204108
 CanvasRenderer:
   m_ObjectHideFlags: 1
@@ -715,12 +740,12 @@ RectTransform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 172600}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: -186.94998, y: -40, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 22471362}
   m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0.000015258789, y: 0}
@@ -733,12 +758,12 @@ RectTransform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 134094}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -0.00001071}
+  m_LocalPosition: {x: -184.45001, y: -20, z: -0.00001071}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 22443340}
   m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 2.4999847, y: 0}
@@ -751,12 +776,12 @@ RectTransform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 171538}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 1.04039, y: 2, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 22490904}
   m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 1.0403948, y: 2}
@@ -769,14 +794,14 @@ RectTransform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 195914}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -3.553e-12}
+  m_LocalPosition: {x: 0.000030517578, y: 2, z: -3.553e-12}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children:
   - {fileID: 22428218}
   - {fileID: 22458224}
   m_Father: {fileID: 22490904}
   m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0.000036597252, y: 2}
@@ -789,12 +814,12 @@ RectTransform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 127278}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 54.949997, y: -0.0000076293945, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 22443340}
   m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 241.9, y: -0.000002861023}
@@ -807,13 +832,13 @@ RectTransform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 178996}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -0}
+  m_LocalPosition: {x: 0, y: 2, z: -0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children:
   - {fileID: 22407934}
   m_Father: {fileID: 22490904}
   m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 2}
@@ -826,15 +851,15 @@ RectTransform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 134108}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: -60, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children:
   - {fileID: 22438182}
   - {fileID: 22443340}
   - {fileID: 22471362}
   m_Father: {fileID: 0}
   m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: -60}
