@@ -42,7 +42,7 @@ RenderSettings:
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
-  serializedVersion: 9
+  serializedVersion: 11
   m_GIWorkflowMode: 0
   m_GISettings:
     serializedVersion: 2
@@ -54,7 +54,7 @@ LightmapSettings:
     m_EnableBakedLightmaps: 1
     m_EnableRealtimeLightmaps: 1
   m_LightmapEditorSettings:
-    serializedVersion: 8
+    serializedVersion: 9
     m_Resolution: 2
     m_BakeResolution: 40
     m_TextureWidth: 1024
@@ -71,23 +71,25 @@ LightmapSettings:
     m_FinalGatherFiltering: 1
     m_FinalGatherRayCount: 256
     m_ReflectionCompression: 2
-    m_MixedBakeMode: 3
+    m_MixedBakeMode: 2
     m_BakeBackend: 0
     m_PVRSampling: 1
     m_PVRDirectSampleCount: 32
     m_PVRSampleCount: 500
     m_PVRBounces: 2
-    m_PVRFiltering: 0
+    m_PVRFilterTypeDirect: 0
+    m_PVRFilterTypeIndirect: 0
+    m_PVRFilterTypeAO: 0
     m_PVRFilteringMode: 1
     m_PVRCulling: 1
     m_PVRFilteringGaussRadiusDirect: 1
     m_PVRFilteringGaussRadiusIndirect: 5
     m_PVRFilteringGaussRadiusAO: 2
-    m_PVRFilteringAtrousColorSigma: 1
-    m_PVRFilteringAtrousNormalSigma: 1
-    m_PVRFilteringAtrousPositionSigma: 1
+    m_PVRFilteringAtrousPositionSigmaDirect: 0.5
+    m_PVRFilteringAtrousPositionSigmaIndirect: 2
+    m_PVRFilteringAtrousPositionSigmaAO: 1
   m_LightingDataAsset: {fileID: 0}
-  m_ShadowMaskMode: 2
+  m_UseShadowmask: 1
 --- !u!196 &4
 NavMeshSettings:
   serializedVersion: 2
@@ -107,6 +109,8 @@ NavMeshSettings:
     manualTileSize: 0
     tileSize: 256
     accuratePlacement: 0
+    debug:
+      m_Flags: 0
   m_NavMeshData: {fileID: 0}
 --- !u!1 &10200333
 GameObject:
@@ -151,6 +155,7 @@ MonoBehaviour:
     _h: []
   _attachedRenderer: {fileID: 1561875137}
   _attachedGroupIndex: 0
+  _favoriteGroupName: 
   _preferredRendererType:
     _fullName: Leap.Unity.GraphicalRenderer.LeapBakedRenderer
   vertexColor: {r: 0, g: 0.21379304, b: 1, a: 1}
@@ -212,6 +217,7 @@ MonoBehaviour:
     _h: []
   _attachedRenderer: {fileID: 1561875137}
   _attachedGroupIndex: 0
+  _favoriteGroupName: 
   _preferredRendererType:
     _fullName: Leap.Unity.GraphicalRenderer.LeapBakedRenderer
   vertexColor: {r: 1, g: 1, b: 1, a: 1}
@@ -433,7 +439,6 @@ Camera:
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
-  m_StereoMirrorMode: 0
 --- !u!4 &95075870
 Transform:
   m_ObjectHideFlags: 0
@@ -618,6 +623,7 @@ MonoBehaviour:
     _h: []
   _attachedRenderer: {fileID: 1561875137}
   _attachedGroupIndex: 0
+  _favoriteGroupName: 
   _preferredRendererType:
     _fullName: Leap.Unity.GraphicalRenderer.LeapBakedRenderer
   vertexColor: {r: 1, g: 0, b: 0, a: 1}
@@ -679,6 +685,7 @@ MonoBehaviour:
     _h: []
   _attachedRenderer: {fileID: 1561875137}
   _attachedGroupIndex: 0
+  _favoriteGroupName: 
   _preferredRendererType:
     _fullName: Leap.Unity.GraphicalRenderer.LeapBakedRenderer
   vertexColor: {r: 0.32413793, g: 1, b: 0, a: 1}
@@ -740,6 +747,7 @@ MonoBehaviour:
     _h: []
   _attachedRenderer: {fileID: 1561875137}
   _attachedGroupIndex: 0
+  _favoriteGroupName: 
   _preferredRendererType:
     _fullName: Leap.Unity.GraphicalRenderer.LeapBakedRenderer
   vertexColor: {r: 0, g: 0.21379304, b: 1, a: 1}
@@ -866,6 +874,7 @@ MonoBehaviour:
     _h: []
   _attachedRenderer: {fileID: 1561875137}
   _attachedGroupIndex: 0
+  _favoriteGroupName: 
   _preferredRendererType:
     _fullName: Leap.Unity.GraphicalRenderer.LeapBakedRenderer
   vertexColor: {r: 0, g: 0.21379304, b: 1, a: 1}
@@ -904,10 +913,13 @@ Texture2D:
   m_ImageCount: 1
   m_TextureDimension: 2
   m_TextureSettings:
+    serializedVersion: 2
     m_FilterMode: 1
     m_Aniso: 1
     m_MipBias: 0
-    m_WrapMode: 0
+    m_WrapU: 0
+    m_WrapV: 0
+    m_WrapW: 0
   m_LightmapFormat: 0
   m_ColorSpace: 0
   image data: 21844
@@ -959,6 +971,7 @@ MonoBehaviour:
     _h: []
   _attachedRenderer: {fileID: 1561875137}
   _attachedGroupIndex: 0
+  _favoriteGroupName: 
   _preferredRendererType:
     _fullName: Leap.Unity.GraphicalRenderer.LeapBakedRenderer
   vertexColor: {r: 1, g: 0, b: 0, a: 1}
@@ -1020,6 +1033,7 @@ MonoBehaviour:
     _h: []
   _attachedRenderer: {fileID: 1561875137}
   _attachedGroupIndex: 0
+  _favoriteGroupName: 
   _preferredRendererType:
     _fullName: Leap.Unity.GraphicalRenderer.LeapBakedRenderer
   vertexColor: {r: 0.32413793, g: 1, b: 0, a: 1}
@@ -1049,6 +1063,7 @@ Material:
   m_ShaderKeywords: 
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
   stringTagMap: {}
   disabledShaderPasses: []
@@ -1149,6 +1164,7 @@ MonoBehaviour:
     _h: []
   _attachedRenderer: {fileID: 1561875137}
   _attachedGroupIndex: 1
+  _favoriteGroupName: 
   _preferredRendererType:
     _fullName: Leap.Unity.GraphicalRenderer.LeapTextRenderer
   _text: This is an example of using the Baked Renderer.  Each graphic can have a
@@ -1167,7 +1183,7 @@ RectTransform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1027488249}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0.0425}
+  m_LocalPosition: {x: 0, y: 0.2872, z: 0.0425}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1561875138}
@@ -1221,6 +1237,7 @@ MonoBehaviour:
     _h: []
   _attachedRenderer: {fileID: 1561875137}
   _attachedGroupIndex: 0
+  _favoriteGroupName: 
   _preferredRendererType:
     _fullName: Leap.Unity.GraphicalRenderer.LeapBakedRenderer
   vertexColor: {r: 0, g: 0.21379304, b: 1, a: 1}
@@ -1404,7 +1421,7 @@ MonoBehaviour:
     _graphics:
     - {fileID: 1027488250}
     _supportInfo: []
-    _addRemoveSupported: 0
+    _addRemoveSupported: 1
 --- !u!4 &1561875138
 Transform:
   m_ObjectHideFlags: 0
@@ -1440,6 +1457,7 @@ Material:
     GRAPHIC_RENDERER_VERTEX_UV_0
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
   stringTagMap: {}
   disabledShaderPasses: []
