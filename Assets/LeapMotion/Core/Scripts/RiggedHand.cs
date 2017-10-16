@@ -12,6 +12,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Leap;
+using Leap.Unity.Attributes;
 
 namespace Leap.Unity {
   /** This version of IHandModel supports a hand respresentation based on a skinned and jointed 3D model asset.*/
@@ -44,13 +45,14 @@ namespace Leap.Unity {
     [HideInInspector]
     private bool deformPositionsState = false;
 
-
-    [Tooltip("Hands are typically rigged in 3D packages with the palm transform near the wrist. Uncheck this is your model's palm transform is at the center of the palm similar to Leap's API drives")]
-    public bool ModelPalmAtLeapWrist = true;
-    [Tooltip("Set to True if each finger has an extra trasform between palm and base of the finger.")]
-    public bool UseMetaCarpals;
     public Vector3 modelFingerPointing = new Vector3(0, 0, 0);
     public Vector3 modelPalmFacing = new Vector3(0, 0, 0);
+
+    [Header("Auto Rigging Settings")]
+    [Tooltip("Hands are typically rigged in 3D packages with the palm transform near the wrist. Uncheck this is your model's palm transform is at the center of the palm similar to Leap's API")]
+    public bool ModelPalmAtLeapWrist = true;
+    [Tooltip("Set to True if each finger has an extra trasform between palm and base of the finger.")]
+    public bool UseMetaCarpalsOnSetup = true;
     [Header("Values for Stored Start Pose")]
     [SerializeField]
     private List<Transform> jointList = new List<Transform>();
@@ -58,7 +60,6 @@ namespace Leap.Unity {
     private List<Quaternion> localRotations = new List<Quaternion>();
     [SerializeField]
     private List<Vector3> localPositions = new List<Vector3>();
-
     public override void InitHand() {
       UpdateHand();
       setDeformPositionsInFingers(deformPositionsState);
@@ -204,7 +205,7 @@ namespace Leap.Unity {
       for (int i = 0; i < 5; i++) {
         int fingersIndex = fingerModelList[i].fingerType.indexOf();
         fingers[fingersIndex] = fingerModelList[i];
-        fingerModelList[i].SetupRiggedFinger(UseMetaCarpals);
+        fingerModelList[i].SetupRiggedFinger(UseMetaCarpalsOnSetup);
       }
     }
     /**Sets the modelPalmFacing vector in each RiggedFinger to match this RiggedHand */
@@ -258,6 +259,9 @@ namespace Leap.Unity {
     /**Stores a snapshot of original joint positions */
     [ContextMenu("StoreJointsStartPose")]
     public void StoreJointsStartPose() {
+      jointList = new List<Transform>();
+      localRotations = new List<Quaternion>();
+      localPositions = new List<Vector3>();
       foreach (Transform t in palm.parent.GetComponentsInChildren<Transform>()) {
         jointList.Add(t);
         localRotations.Add(t.localRotation);
@@ -267,7 +271,6 @@ namespace Leap.Unity {
     /**Restores original joint positions, particularly after model has been placed in Leap's editor pose */
     [ContextMenu("RestoreJointsStartPose")]
     public void RestoreJointsStartPose() {
-      Debug.Log("RestoreJointsStartPose()");
       for (int i = 0; i < jointList.Count; i++) {
         Transform jointTrans = jointList[i];
         jointTrans.localRotation = localRotations[i];

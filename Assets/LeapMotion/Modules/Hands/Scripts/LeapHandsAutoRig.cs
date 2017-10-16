@@ -15,13 +15,14 @@ using System.Linq;
 namespace Leap.Unity {
   /**LeapHandAutoRig automates setting up the scripts that drive 3D skinned mesh hands. */
   [AddComponentMenu("Leap/Auto Rig Hands")]
+  [ExecuteInEditMode]
   public class LeapHandsAutoRig : MonoBehaviour {
     private HandPool HandPoolToPopulate;
     public Animator AnimatorForMapping;
-
+    private RuntimeAnimatorController runtimeAnimatorController;
     public string ModelGroupName = null;
     [Tooltip("Set to True if each finger has an extra trasform between palm and base of the finger.")] 
-    public bool UseMetaCarpals;
+    public bool ModelHasMetaCarpals = true;
     [Header("RiggedHand Components")]
     public RiggedHand RiggedHand_L;
     public RiggedHand RiggedHand_R;
@@ -51,16 +52,20 @@ namespace Leap.Unity {
     [SerializeField]
     [HideInInspector]
     private bool flippedPalmsState = false;
+    private IKMarkersAssembly ikMarkersAssemblyPrefab;
+    private IKMarkersAssembly iKMarkersAssembly;
 
     /**AutoRig() Calls AutoRigMecanim() if a Unity Avatar exists.  Otherwise, AutoRigByName() is called.  
      * Then it immediately RiggedHand.StoreJointStartPose() to store the rigged asset's original state.*/
-    [ContextMenu("AutoRig")]
-    public void AutoRig() {
+    [ContextMenu("AutoRigHands")]
+    public void AutoRigHands() {
       HandPoolToPopulate = GameObject.FindObjectOfType<HandPool>();
       AnimatorForMapping = gameObject.GetComponent<Animator>();
       if (AnimatorForMapping != null) {
         if (AnimatorForMapping.isHuman == true) {
           AutoRigMecanim();
+          HandTransitionBehavior_L.OnSetup();
+          HandTransitionBehavior_R.OnSetup();
           RiggedHand_L.StoreJointsStartPose();
           RiggedHand_R.StoreJointsStartPose();
           return;
@@ -88,7 +93,7 @@ namespace Leap.Unity {
       List<string> RightHandStrings = new List<string> { "right" };
 
       //Assigning these here since this component gets added and used at editor time
-      HandPoolToPopulate = GameObject.FindObjectOfType<HandPool>();
+      //HandPoolToPopulate = GameObject.FindObjectOfType<HandPool>();
       Reset();
 
       //Find hands and assigns RiggedHands
@@ -103,7 +108,7 @@ namespace Leap.Unity {
         HandTransitionBehavior_L = Hand_L.gameObject.AddComponent<HandEnableDisable>();
         RiggedHand_L.Handedness = Chirality.Left;
         RiggedHand_L.SetEditorLeapPose = false;
-        RiggedHand_L.UseMetaCarpals = UseMetaCarpals;
+        RiggedHand_L.UseMetaCarpalsOnSetup = ModelHasMetaCarpals;
         RiggedHand_L.SetupRiggedHand();
 
         RiggedFinger_L_Thumb = (RiggedFinger)RiggedHand_L.fingers[0];
@@ -128,7 +133,7 @@ namespace Leap.Unity {
         HandTransitionBehavior_R = Hand_R.gameObject.AddComponent<HandEnableDisable>();
         RiggedHand_R.Handedness = Chirality.Right;
         RiggedHand_R.SetEditorLeapPose = false;
-        RiggedHand_R.UseMetaCarpals = UseMetaCarpals;
+        RiggedHand_R.UseMetaCarpalsOnSetup = ModelHasMetaCarpals;
         RiggedHand_R.SetupRiggedHand();
 
         RiggedFinger_R_Thumb = (RiggedFinger)RiggedHand_R.fingers[0];
@@ -158,9 +163,10 @@ namespace Leap.Unity {
     [ContextMenu("AutoRigMecanim")]
     void AutoRigMecanim() {
       //Assigning these here since this component gets added and used at editor time
-      AnimatorForMapping = gameObject.GetComponent<Animator>();
-      HandPoolToPopulate = GameObject.FindObjectOfType<HandPool>();
+      //AnimatorForMapping = gameObject.GetComponent<Animator>();
+      //HandPoolToPopulate = GameObject.FindObjectOfType<HandPool>();
       Reset();
+
 
       //Find hands and assign RiggedHands
       Transform Hand_L = AnimatorForMapping.GetBoneTransform(HumanBodyBones.LeftHand);
@@ -168,7 +174,8 @@ namespace Leap.Unity {
         RiggedHand_L = Hand_L.GetComponent<RiggedHand>();
       }
       else RiggedHand_L = Hand_L.gameObject.AddComponent<RiggedHand>();
-      HandTransitionBehavior_L =Hand_L.gameObject.AddComponent<HandDrop>();
+      HandEnableDisable handEnableDisable_L = Hand_L.gameObject.AddComponent<HandEnableDisable>();
+      HandTransitionBehavior_L = handEnableDisable_L;
       RiggedHand_L.Handedness = Chirality.Left;
       RiggedHand_L.SetEditorLeapPose = false;
 
@@ -177,23 +184,22 @@ namespace Leap.Unity {
         RiggedHand_R = Hand_R.GetComponent<RiggedHand>();
       }
       else RiggedHand_R = Hand_R.gameObject.AddComponent<RiggedHand>();
-      HandTransitionBehavior_R = Hand_R.gameObject.AddComponent<HandDrop>();
+      HandEnableDisable handEnableDisable_R = Hand_R.gameObject.AddComponent<HandEnableDisable>();
+      HandTransitionBehavior_R = handEnableDisable_R;
       RiggedHand_R.Handedness = Chirality.Right;
       RiggedHand_R.SetEditorLeapPose = false;
 
       //Find palms and assign to RiggedHands
       RiggedHand_L.palm = AnimatorForMapping.GetBoneTransform(HumanBodyBones.LeftHand);
       RiggedHand_R.palm = AnimatorForMapping.GetBoneTransform(HumanBodyBones.RightHand);
-      RiggedHand_R.UseMetaCarpals = UseMetaCarpals;
-      RiggedHand_L.UseMetaCarpals = UseMetaCarpals;
+      RiggedHand_R.UseMetaCarpalsOnSetup = ModelHasMetaCarpals;
+      RiggedHand_L.UseMetaCarpalsOnSetup = ModelHasMetaCarpals;
 
-      findAndAssignRiggedFingers(UseMetaCarpals);
+      findAndAssignRiggedFingers(ModelHasMetaCarpals);
 
       RiggedHand_L.AutoRigRiggedHand(RiggedHand_L.palm, RiggedFinger_L_Pinky.transform, RiggedFinger_L_Index.transform);
       RiggedHand_R.AutoRigRiggedHand(RiggedHand_R.palm, RiggedFinger_R_Pinky.transform, RiggedFinger_R_Index.transform);
-      if (ModelGroupName == "" || ModelGroupName != null) {
-        ModelGroupName = transform.name;
-      }
+      ModelGroupName = transform.name;
       HandPoolToPopulate.AddNewGroup(ModelGroupName, RiggedHand_L, RiggedHand_R);
 
       modelFingerPointing_L = RiggedHand_L.modelFingerPointing;
@@ -254,6 +260,67 @@ namespace Leap.Unity {
         HandPoolToPopulate.RemoveGroup(ModelGroupName);
       }
     }
+    [ContextMenu("AutoRigArms")]
+    public void AutoRigArms() {
+      VRHeightOffset vRHeightOffset = GameObject.FindObjectOfType<VRHeightOffset>();
+      float characterHeadHeight = AnimatorForMapping.GetBoneTransform(HumanBodyBones.Head).transform.position.y;
+      vRHeightOffset._deviceOffsets[0].HeightOffset = characterHeadHeight + .1f;//small offset above head for eye height 
+      AnimatorForMapping.runtimeAnimatorController = Resources.Load<RuntimeAnimatorController>("LeapIKArmsController");
+      ikMarkersAssemblyPrefab = Resources.Load<IKMarkersAssembly>("IKMarkersAssembly");
+      iKMarkersAssembly = GameObject.Instantiate(ikMarkersAssemblyPrefab) as IKMarkersAssembly;
+      iKMarkersAssembly.transform.parent = transform;
+      iKMarkersAssembly.transform.localPosition = new Vector3(0, 0, 0);
+
+      if (HandTransitionBehavior_L != null) {
+        DestroyImmediate(HandTransitionBehavior_L);
+      }
+      WristLeapToIKBlend WristLeapToIKBlend_L = RiggedHand_L.gameObject.AddComponent<WristLeapToIKBlend>();
+      HandTransitionBehavior_L = WristLeapToIKBlend_L;
+      WristLeapToIKBlend_L.m_IKMarkerAssembly = iKMarkersAssembly;
+      WristLeapToIKBlend_L.AssignIKMarkers();
+      HandTransitionBehavior_L.OnSetup();
+
+      if (HandTransitionBehavior_R != null) {
+        DestroyImmediate(HandTransitionBehavior_R);
+      }
+      WristLeapToIKBlend WristLeapToIKBlend_R = RiggedHand_R.gameObject.AddComponent<WristLeapToIKBlend>();
+      HandTransitionBehavior_R = WristLeapToIKBlend_R;
+      WristLeapToIKBlend_R.m_IKMarkerAssembly = iKMarkersAssembly;
+      WristLeapToIKBlend_R.AssignIKMarkers();
+      HandTransitionBehavior_R.OnSetup();
+
+      OnAnimatorIKCaller onAnimatorIKCaller =  gameObject.AddComponent<OnAnimatorIKCaller>();
+      onAnimatorIKCaller.wristLeapToIKBlend_L = (WristLeapToIKBlend)HandTransitionBehavior_L;
+      onAnimatorIKCaller.wristLeapToIKBlend_R = (WristLeapToIKBlend)HandTransitionBehavior_R;
+
+      WristLeapToIKBlend_L.ArmDropDuration = .001f;
+      WristLeapToIKBlend_R.ArmDropDuration = .001f;
+
+      //Assign and configure Animator Controller to Animator
+      //AnimatorForMapping.runtimeAnimatorController = runtimeAnimatorController;
+      AnimatorForMapping.updateMode = AnimatorUpdateMode.AnimatePhysics;
+      AnimatorForMapping.cullingMode = AnimatorCullingMode.AlwaysAnimate;
+    }
+    [ContextMenu("AutoRigUpperBody")]
+    public void AutoRigUpperBody() {
+      AnimatorForMapping.runtimeAnimatorController = Resources.Load<RuntimeAnimatorController>("LeapUpperBodyController");
+      SpineFollowTargetBehavior spineFollowTargetBehavior = gameObject.AddComponent<SpineFollowTargetBehavior>();
+      WristLeapToIKBlend WristLeapToIKBlend_L = RiggedHand_L.gameObject.GetComponent<WristLeapToIKBlend>();
+      WristLeapToIKBlend WristLeapToIKBlend_R = RiggedHand_R.gameObject.GetComponent<WristLeapToIKBlend>();
+      WristLeapToIKBlend_L.ArmDropDuration = 1.5f;
+      WristLeapToIKBlend_R.ArmDropDuration = 1.5f;
+      spineFollowTargetBehavior.wristLeapToIKBlend_L = WristLeapToIKBlend_L;
+      spineFollowTargetBehavior.wristLeapToIKBlend_R = WristLeapToIKBlend_R;
+      ShoulderTurnBehavior shoulderTurnBehavior = gameObject.AddComponent<ShoulderTurnBehavior>();
+    }
+    [ContextMenu("AutoRigLocomotion")]
+    public void AutoRigLocomotion() {
+      AnimatorForMapping.runtimeAnimatorController = Resources.Load<RuntimeAnimatorController>("LeapAvatarController");
+      LocomotionAvatar locomotionAvatar = gameObject.AddComponent<LocomotionAvatar>();
+      SpineFollowTargetBehavior spineFollowTargetBehavior = gameObject.GetComponent<SpineFollowTargetBehavior>();
+      spineFollowTargetBehavior.AlwaysDriveSpine = false;
+    }
+
     public void PushVectorValues() {
       //push palm and finger facing values to RiggedHand's and RiggedFinger's
       if (RiggedHand_L) {

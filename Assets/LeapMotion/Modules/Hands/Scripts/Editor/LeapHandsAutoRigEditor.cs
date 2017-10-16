@@ -23,8 +23,14 @@ namespace Leap.Unity {
 
       DrawDefaultInspector();
       LeapHandsAutoRig autoRigger = (LeapHandsAutoRig)target;
-      if (GUILayout.Button("AutoRig")) {
-        autoRigger.AutoRig();
+      if (GUILayout.Button("1: AutoRigHands")) {
+        autoRigger.AutoRigHands();
+      }
+      if (GUILayout.Button("2: AutoRigArms")) {
+        autoRigger.AutoRigArms();
+      }
+      if (GUILayout.Button("3: AutoRigUpperBody")) {
+        autoRigger.AutoRigUpperBody();
       }
       if (GUILayout.Button("Push Vector Values")) {
         autoRigger.PushVectorValues();
