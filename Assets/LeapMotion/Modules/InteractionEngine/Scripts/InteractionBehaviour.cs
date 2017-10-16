@@ -1504,34 +1504,36 @@ namespace Leap.Unity.Interaction {
 
         Joint[] joints = rigidbody.GetComponents<Joint>();
         foreach (var joint in joints) {
-          if (joint is FixedJoint && (joint.connectedBody != null && joint.connectedBody.isKinematic)) {
-            _isPositionLocked = true;
-            return;
-          }
-          if (joint is HingeJoint && (joint.connectedBody != null && joint.connectedBody.isKinematic)) {
-            _isPositionLocked = true;
-            return;
-          }
-          // if (joint is SpringJoint) {
-          // no check required; spring joints never fully lock position.
-          // }
-          if (joint is CharacterJoint && (joint.connectedBody != null && joint.connectedBody.isKinematic)) {
-            _isPositionLocked = true;
-            return;
-          }
-          ConfigurableJoint configJoint = joint as ConfigurableJoint;
-          if (configJoint != null
-            && (configJoint.xMotion == ConfigurableJointMotion.Locked
-              || (configJoint.xMotion == ConfigurableJointMotion.Limited
-                && configJoint.linearLimit.limit == 0F))
-            && (configJoint.yMotion == ConfigurableJointMotion.Locked
-              || (configJoint.yMotion == ConfigurableJointMotion.Limited
-                && configJoint.linearLimit.limit == 0F))
-            && (configJoint.zMotion == ConfigurableJointMotion.Locked
-              || (configJoint.zMotion == ConfigurableJointMotion.Limited
-                && configJoint.linearLimit.limit == 0F))) {
-            _isPositionLocked = true;
-            return;
+          if (joint.connectedBody == null || joint.connectedBody.isKinematic) {
+            if (joint is FixedJoint) {
+              _isPositionLocked = true;
+              return;
+            }
+            if (joint is HingeJoint) {
+              _isPositionLocked = true;
+              return;
+            }
+            // if (joint is SpringJoint) {
+            // no check required; spring joints never fully lock position.
+            // }
+            if (joint is CharacterJoint) {
+              _isPositionLocked = true;
+              return;
+            }
+            ConfigurableJoint configJoint = joint as ConfigurableJoint;
+            if (configJoint != null
+              && (configJoint.xMotion == ConfigurableJointMotion.Locked
+                || (configJoint.xMotion == ConfigurableJointMotion.Limited
+                  && configJoint.linearLimit.limit == 0F))
+              && (configJoint.yMotion == ConfigurableJointMotion.Locked
+                || (configJoint.yMotion == ConfigurableJointMotion.Limited
+                  && configJoint.linearLimit.limit == 0F))
+              && (configJoint.zMotion == ConfigurableJointMotion.Locked
+                || (configJoint.zMotion == ConfigurableJointMotion.Limited
+                  && configJoint.linearLimit.limit == 0F))) {
+              _isPositionLocked = true;
+              return;
+            }
           }
         }
       }
