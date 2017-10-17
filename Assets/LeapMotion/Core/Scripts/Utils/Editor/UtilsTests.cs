@@ -20,13 +20,17 @@ namespace Leap.Unity {
                                       "the_key_code",
                                       "CamelCaseToo",
                                       "_is2_equalTo_5",
-                                      "GetTheSCUBANow")] string source,
+                                      "GetTheSCUBANow",
+                                      "m_privateVar",
+                                      "kConstantVar")] string source,
                               [Values("Private Var",
                                       "Mult By 32",
                                       "The Key Code",
                                       "Camel Case Too",
                                       "Is 2 Equal To 5",
-                                      "Get The SCUBA Now")] string result) {
+                                      "Get The SCUBA Now",
+                                      "Private Var",
+                                      "Constant Var")] string result) {
       Assert.That(Utils.GenerateNiceName(source), Is.EqualTo(result));
     }
   }

@@ -258,6 +258,8 @@ namespace Leap.Unity {
     /// CamelCaseToo    =>  Camel Case Too
     /// _is2_equalTo_5  =>  Is 2 Equal To 5
     /// GetTheSCUBANow  =>  Get The SCUBA Now
+    /// m_privateVar    =>  Private Var
+    /// kConstantVar    =>  Constant Var
     /// </summary>
     public static string GenerateNiceName(string value) {
       string result = "";
@@ -350,6 +352,12 @@ namespace Leap.Unity {
 
       if (curr != "") {
         result = curr.Capitalize() + result;
+      }
+
+      result = result.Trim();
+
+      if (result.StartsWith("M ") || result.StartsWith("K ")) {
+        result = result.Substring(2);
       }
 
       return result.Trim();
@@ -1061,7 +1069,7 @@ namespace Leap.Unity {
       while (list.Count > count) {
         T tempT = list[list.Count - 1];
         list.RemoveAt(list.Count - 1);
-        
+
         if (deleteT != null) {
           deleteT(tempT);
         }
