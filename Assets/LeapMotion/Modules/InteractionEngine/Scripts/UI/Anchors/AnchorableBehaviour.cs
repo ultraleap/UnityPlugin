@@ -38,7 +38,7 @@ namespace Leap.Unity.Interaction {
             if (_anchor != null) {
               _isAttached = value;
               _anchor.NotifyAttached(this);
-              OnAttachedToAnchor.Invoke(this, _anchor);
+              OnAttachedToAnchor.Invoke();
             }
             else {
               Debug.LogWarning("Tried to attach an anchorable behaviour, but it has no assigned anchor.", this.gameObject);
@@ -49,7 +49,7 @@ namespace Leap.Unity.Interaction {
             _isLockedToAnchor = false;
             _isRotationLockedToAnchor = false;
 
-            OnDetachedFromAnchor.Invoke(this, _anchor);
+            OnDetachedFromAnchor.Invoke();
             _anchor.NotifyDetached(this);
 
             _hasTargetPositionLastUpdate = false;
@@ -78,7 +78,7 @@ namespace Leap.Unity.Interaction {
         if (_anchor != value) {
           if (IsValidAnchor(value)) {
             if (_anchor != null) {
-              OnDetachedFromAnchor.Invoke(this, _anchor);
+              OnDetachedFromAnchor.Invoke();
               _anchor.NotifyDetached(this);
             }
 
@@ -242,27 +242,27 @@ namespace Leap.Unity.Interaction {
     /// <summary>
     /// Called when this AnchorableBehaviour attaches to an Anchor.
     /// </summary>
-    public Action<AnchorableBehaviour, Anchor> OnAttachedToAnchor = (anchObj, anchor) => { };
+    public Action OnAttachedToAnchor = () => { };
 
     /// <summary>
     /// Called when this AnchorableBehaviour locks to an Anchor.
     /// </summary>
-    public Action<AnchorableBehaviour, Anchor> OnLockedToAnchor = (anchObj, anchor) => { };
+    public Action OnLockedToAnchor = () => { };
 
     /// <summary>
     /// Called when this AnchorableBehaviour detaches from an Anchor.
     /// </summary>
-    public Action<AnchorableBehaviour, Anchor> OnDetachedFromAnchor = (anchObj, anchor) => { };
+    public Action OnDetachedFromAnchor = () => { };
 
     /// <summary>
     /// Called during every Update() in which this AnchorableBehaviour is attached to an Anchor.
     /// </summary>
-    public Action<AnchorableBehaviour, Anchor> WhileAttachedToAnchor = (anchObj, anchor) => { };
+    public Action WhileAttachedToAnchor = () => { };
 
     /// <summary>
     /// Called during every Update() in which this AnchorableBehaviour is locked to an Anchor.
     /// </summary>
-    public Action<AnchorableBehaviour, Anchor> WhileLockedToAnchor = (anchObj, anchor) => { };
+    public Action WhileLockedToAnchor = () => { };
 
     /// <summary>
     /// Called just after this anchorable behaviour's InteractionBehaviour OnObjectGraspEnd for
@@ -272,7 +272,7 @@ namespace Leap.Unity.Interaction {
     /// an anchor only if its preferredAnchor property is non-null; otherwise, the
     /// attempt to anchor failed.
     /// </summary>
-    public Action<AnchorableBehaviour> OnPostTryAnchorOnGraspEnd = (anchObj) => { };
+    public Action OnPostTryAnchorOnGraspEnd = () => { };
 
     #endregion
 
@@ -312,7 +312,7 @@ namespace Leap.Unity.Interaction {
     void Start() {
       if (anchor != null && _isAttached) {
         anchor.NotifyAttached(this);
-        OnAttachedToAnchor(this, anchor);
+        OnAttachedToAnchor();
       }
     }
 
@@ -335,10 +335,10 @@ namespace Leap.Unity.Interaction {
           updateAnchorAttachmentRotation();
         }
 
-        WhileAttachedToAnchor.Invoke(this, anchor);
+        WhileAttachedToAnchor.Invoke();
 
         if (_isLockedToAnchor) {
-          WhileLockedToAnchor.Invoke(this, anchor);
+          WhileLockedToAnchor.Invoke();
         }
       }
 
@@ -803,7 +803,7 @@ namespace Leap.Unity.Interaction {
     private void tryToAnchorOnGraspEnd() {
       TryAttachToNearestAnchor();
 
-      OnPostTryAnchorOnGraspEnd(this);
+      OnPostTryAnchorOnGraspEnd();
     }
 
     #region Unity Events (Internal)
@@ -829,15 +829,13 @@ namespace Leap.Unity.Interaction {
       setupCallback(ref OnPostTryAnchorOnGraspEnd, EventType.OnPostTryAnchorOnGraspEnd);
     }
 
-    private void setupCallback<T1, T2>(ref Action<T1, T2> action, EventType type)
-                                       where T1 : AnchorableBehaviour
-                                       where T2 : Anchor                          {
-      action += (anchObj, anchor) => _eventTable.Invoke((int)type);
-    }
-
-    private void setupCallback<T>(ref Action<T> action, EventType type)
-                                  where T : AnchorableBehaviour         {
-      action += (anchObj) => _eventTable.Invoke((int)type);
+    private void setupCallback(ref Action action, EventType type) {
+      if (_eventTable.HasUnityEvent((int)type)) {
+        action += () => _eventTable.Invoke((int)type);
+      }
+      else {
+        action += () => { };
+      }
     }
 
     #endregion
