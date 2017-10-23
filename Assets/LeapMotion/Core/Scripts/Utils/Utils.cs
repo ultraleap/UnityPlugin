@@ -986,9 +986,9 @@ namespace Leap.Unity {
 
     /// <summary>
     /// Rightward syntax for applying a Quaternion rotation to this vector; literally
-    /// byQuaternion * thisVector.
+    /// returns byQuaternion * thisVector -- does NOT modify the input vector.
     /// </summary>
-    public static Vector3 Rotate(this Vector3 thisVector, Quaternion byQuaternion) {
+    public static Vector3 RotatedBy(this Vector3 thisVector, Quaternion byQuaternion) {
       return byQuaternion * thisVector;
     }
 
