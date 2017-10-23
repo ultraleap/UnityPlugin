@@ -775,8 +775,6 @@ namespace Leap.Unity {
       List<ComponentType> componentsBuffer = Pool<List<ComponentType>>.Spawn();
 
       try {
-        // Traverse the hierarchy of this object's transform to find
-        // all of its Colliders.
         toVisit.Push(rootObj.transform);
         Transform curTransform;
         while (toVisit.Count > 0) {
@@ -788,7 +786,7 @@ namespace Leap.Unity {
             // component owns its own ComponentType components and the ComponentType
             // components of its children.
             if (child.GetComponent<OwnerType>() == null
-                && (includeInactiveObjects || child.gameObject.activeSelf)) {
+                && (includeInactiveObjects || child.gameObject.activeInHierarchy)) {
               toVisit.Push(child);
             }
           }
@@ -847,7 +845,9 @@ namespace Leap.Unity {
 
     /// <summary>
     /// Converts the quaternion into an axis and an angle and returns the vector
-    /// axis * angle.
+    /// axis * angle. Angle magnitude is measured in degrees, not radians; this requires
+    /// conversion to radians if being used to set the angular velocity of a PhysX
+    /// Rigidbody.
     /// </summary>
     public static Vector3 ToAngleAxisVector(this Quaternion q) {
       float angle;
@@ -857,11 +857,12 @@ namespace Leap.Unity {
     }
 
     /// <summary>
-    /// Returns a Quaternion described by the provided angle axis vector.
+    /// Returns a Quaternion described by the provided angle axis vector. Expects the
+    /// magnitude (angle) to be in degrees, not radians.
     /// </summary>
     public static Quaternion QuaternionFromAngleAxisVector(Vector3 angleAxisVector) {
       if (angleAxisVector == Vector3.zero) return Quaternion.identity;
-      return Quaternion.AngleAxis(angleAxisVector.magnitude, angleAxisVector.normalized);
+      return Quaternion.AngleAxis(angleAxisVector.magnitude, angleAxisVector);
     }
 
     /// <summary>
@@ -871,6 +872,15 @@ namespace Leap.Unity {
     /// </summary>
     public static Quaternion From(this Quaternion thisQuaternion, Quaternion otherQuaternion) {
       return thisQuaternion * Quaternion.Inverse(otherQuaternion);
+    }
+
+    /// <summary>
+    /// A.To(B) produces the quaternion that rotates from A to B.
+    /// Combines with Then() to produce readable, predictable results:
+    /// B.Then(B.To(A)) == A.
+    /// </summary>
+    public static Quaternion To(this Quaternion thisQuaternion, Quaternion otherQuaternion) {
+      return otherQuaternion * Quaternion.Inverse(thisQuaternion);
     }
 
     /// <summary>
@@ -897,6 +907,17 @@ namespace Leap.Unity {
     }
 
     /// <summary>
+    /// Additive To syntax for floats. Evaluated as this float plus the additive
+    /// inverse of the other float, usually expressed as otherFloat - thisFloat.
+    /// 
+    /// For less trivial uses of From/Then syntax, refer to their implementations for
+    /// Quaternions and Matrix4x4s.
+    /// </summary>
+    public static float To(this float thisFloat, float otherFloat) {
+      return otherFloat - thisFloat;
+    }
+
+    /// <summary>
     /// Additive Then syntax for floats. Literally, thisFloat + otherFloat.
     /// </summary>
     public static float Then(this float thisFloat, float otherFloat) {
@@ -919,6 +940,17 @@ namespace Leap.Unity {
     }
 
     /// <summary>
+    /// A.To(B) produces the matrix that transforms from A to B.
+    /// Combines with Then() to produce readable, predictable results:
+    /// B.Then(B.To(A)) == A.
+    /// 
+    /// Warning: Scale factors of zero will invalidate this behavior.
+    /// </summary>
+    public static Matrix4x4 To(this Matrix4x4 thisMatrix, Matrix4x4 otherMatrix) {
+      return otherMatrix * thisMatrix.inverse;
+    }
+
+    /// <summary>
     /// Transforms this matrix by the other matrix. This is a rightward syntax for
     /// matrix multiplication, which normally obeys left-multiply ordering.
     /// </summary>
@@ -938,6 +970,13 @@ namespace Leap.Unity {
     }
 
     /// <summary>
+    /// Additive To syntax for Vector3. Literally otherVector - thisVector.
+    /// </summary>
+    public static Vector3 To(this Vector3 thisVector, Vector3 otherVector) {
+      return otherVector - thisVector;
+    }
+
+    /// <summary>
     /// Additive Then syntax for Vector3. Literally thisVector + otherVector.
     /// For example: A.Then(B.From(A)) == B.
     /// </summary>
@@ -951,6 +990,41 @@ namespace Leap.Unity {
     /// </summary>
     public static Vector3 Rotate(this Vector3 thisVector, Quaternion byQuaternion) {
       return byQuaternion * thisVector;
+    }
+
+    #endregion
+
+    #region Pose Utils
+
+    /// <summary>
+    /// From syntax for Pose structs; A.From(B) returns the Pose that transforms to
+    /// Pose A from Pose B. Also see To() and Then().
+    /// 
+    /// For example, A.Then(B.From(A)) == B.
+    /// </summary>
+    public static Pose From(this Pose thisPose, Pose otherPose) {
+      return thisPose * otherPose.inverse;
+    }
+
+    /// <summary>
+    /// To syntax for Pose structs; A.To(B) returns the Pose that transforms from Pose A
+    /// to Pose B. Also see From() and Then().
+    /// 
+    /// For example, A.Then(A.To(B)) == B.
+    /// </summary>
+    public static Pose To(this Pose thisPose, Pose otherPose) {
+      return otherPose * thisPose.inverse;
+    }
+
+    /// <summary>
+    /// Returns thisPose transformed by otherPose. The other Pose can be understood as
+    /// the parent pose, and the returned pose is this pose transformed from the other
+    /// pose's local space to world space.
+    /// 
+    /// Unlike matrix multiplication, this syntax is rightward: A * B == B.Then(A).
+    /// </summary>
+    public static Pose Then(this Pose thisPose, Pose otherPose) {
+      return otherPose * thisPose;
     }
 
     #endregion
@@ -1223,38 +1297,61 @@ namespace Leap.Unity {
     }
 
     /// <summary>
+    /// Returns a new Rect with the argument as an outward margin on each border of this
+    /// Rect; the result is a larger Rect.
+    /// </summary>
+    public static Rect Extrude(this Rect r, float margin) {
+      return new Rect(r.x - margin, r.y - margin,
+                      r.width + (margin * 2f), r.height + (margin * 2f));
+    }
+
+    /// <summary>
     /// Returns a new Rect with the argument padding as a margin relative to each
     /// border of the provided Rect.
     /// </summary>
     public static Rect PadInner(this Rect r, float padding) {
-      return new Rect(r.x + padding, r.y + padding, r.width - (padding * 2), r.height - (padding * 2));
+      return PadInner(r, padding, padding, padding, padding);
     }
 
     /// <summary>
-    /// Returns a new Rect with the argument padding as an outward margin on each border
-    /// of this Rect; the result is a larger Rect.
+    /// Returns a new Rect with the argument padding as a margin inward from each
+    /// corresponding border of the provided Rect. The returned Rect will never collapse
+    /// to have a width or height less than zero, and its resulting size will never be
+    /// larger than the input rect.
     /// </summary>
-    public static Rect PadOuter(this Rect r, float width) {
-      return new Rect(r.x - width, r.y - width,
-                      r.width + (width * 2f), r.height + (width * 2f));
+    public static Rect PadInner(this Rect r, float padTop, float padBottom,
+                                             float padLeft, float padRight) {
+      var x = r.x + padLeft;
+      var y = r.y + padBottom;
+      var w = r.width - padRight - padLeft;
+      var h = r.height - padTop - padBottom;
+      if (w < 0f) {
+        x = r.x + (padLeft / (padLeft + padRight)) * r.width;
+        w = 0;
+      }
+      if (h < 0f) {
+        y = r.y + (padBottom / (padBottom + padTop)) * r.height;
+        h = 0;
+      }
+      return new Rect(x, y, w, h);
     }
 
     #region Pad, No Out
 
     public static Rect PadTop(this Rect r, float padding) {
-      return new Rect(r.x, r.y + padding, r.width, r.height - padding);
+      return PadInner(r, padding, 0f, 0f, 0f);
     }
 
     public static Rect PadBottom(this Rect r, float padding) {
-      return new Rect(r.x, r.y, r.width, r.height - padding);
+      return PadInner(r, 0f, padding, 0f, 0f);
     }
 
     public static Rect PadLeft(this Rect r, float padding) {
-      return new Rect(r.x + padding, r.y, r.width - padding, r.height);
+      return PadInner(r, 0f, 0f, padding, 0f);
     }
 
     public static Rect PadRight(this Rect r, float padding) {
-      return new Rect(r.x, r.y, r.width - padding, r.height);
+      return PadInner(r, 0f, 0f, 0f, padding);
     }
 
     #endregion
@@ -1266,7 +1363,7 @@ namespace Leap.Unity {
     /// outputs the remaining margin into marginRect.
     /// </summary>
     public static Rect PadTop(this Rect r, float padding, out Rect marginRect) {
-      marginRect = new Rect(r.x, r.y, r.width, padding);
+      marginRect = r.TakeTop(padding);
       return PadTop(r, padding);
     }
 
@@ -1275,7 +1372,7 @@ namespace Leap.Unity {
     /// outputs the remaining margin into marginRect.
     /// </summary>
     public static Rect PadBottom(this Rect r, float padding, out Rect marginRect) {
-      marginRect = new Rect(r.x, r.y + r.height - padding, padding, r.height);
+      marginRect = r.TakeBottom(padding);
       return PadBottom(r, padding);
     }
 
@@ -1284,7 +1381,7 @@ namespace Leap.Unity {
     /// outputs the remaining margin into marginRect.
     /// </summary>
     public static Rect PadLeft(this Rect r, float padding, out Rect marginRect) {
-      marginRect = new Rect(r.x, r.y, padding, r.height);
+      marginRect = r.TakeLeft(padding);
       return PadLeft(r, padding);
     }
 
@@ -1293,7 +1390,7 @@ namespace Leap.Unity {
     /// outputs the remaining margin into marginRect.
     /// </summary>
     public static Rect PadRight(this Rect r, float padding, out Rect marginRect) {
-      marginRect = new Rect(r.x + r.width - padding, r.y, padding, r.height);
+      marginRect = r.TakeRight(padding);
       return PadRight(r, padding);
     }
 
@@ -1303,12 +1400,12 @@ namespace Leap.Unity {
 
     public static Rect PadTopBottomPercent(this Rect r, float padPercent) {
       float padHeight = r.height * padPercent;
-      return new Rect(r.x, r.y + padHeight, r.width, r.height - padHeight * 2f);
+      return r.PadInner(padHeight, padHeight, 0f, 0f);
     }
 
     public static Rect PadLeftRightPercent(this Rect r, float padPercent) {
       float padWidth = r.width * padPercent;
-      return new Rect(r.x + padWidth, r.y, r.width - padWidth * 2f, r.height);
+      return r.PadInner(0f, 0f, padWidth, padWidth);
     }
 
     #endregion
@@ -1338,19 +1435,39 @@ namespace Leap.Unity {
     #region Take, No Out
 
     /// <summary>
-    /// Return a margin of the given width on the left side of the input Rect.
+    /// Return a margin of the given height on the top of the input Rect.
+    /// You can't Take more than there is Rect to take from.
     /// <summary>
-    public static Rect TakeLeft(this Rect r, float widthFromLeft) {
-      Rect theRest;
-      return TakeLeft(r, widthFromLeft, out theRest);
+    public static Rect TakeTop(this Rect r, float heightFromTop) {
+      heightFromTop = Mathf.Clamp(heightFromTop, 0f, r.height);
+      return new Rect(r.x, r.y + r.height - heightFromTop, r.width, heightFromTop);
+    }
+
+    /// <summary>
+    /// Return a margin of the given height on the bottom of the input Rect.
+    /// You can't Take more than there is Rect to take from.
+    /// <summary>
+    public static Rect TakeBottom(this Rect r, float heightFromBottom) {
+      heightFromBottom = Mathf.Clamp(heightFromBottom, 0f, r.height);
+      return new Rect(r.x, r.y, r.width, heightFromBottom);
     }
 
     /// <summary>
     /// Return a margin of the given width on the left side of the input Rect.
+    /// You can't Take more than there is Rect to take from.
+    /// <summary>
+    public static Rect TakeLeft(this Rect r, float widthFromLeft) {
+      widthFromLeft = Mathf.Clamp(widthFromLeft, 0f, r.width);
+      return new Rect(r.x, r.y, widthFromLeft, r.height);
+    }
+
+    /// <summary>
+    /// Return a margin of the given width on the right side of the input Rect.
+    /// You can't Take more than there is Rect to take from.
     /// <summary>
     public static Rect TakeRight(this Rect r, float widthFromRight) {
-      Rect theRest;
-      return TakeRight(r, widthFromRight, out theRest);
+      widthFromRight = Mathf.Clamp(widthFromRight, 0f, r.width);
+      return new Rect(r.x + r.width - widthFromRight, r.y, r.height, widthFromRight);
     }
 
     #endregion
@@ -1358,23 +1475,39 @@ namespace Leap.Unity {
     #region Take, With Out
 
     /// <summary>
+    /// Return a margin of the given width on the top of the input Rect, and
+    /// optionally outputs the rest of the Rect into theRest.
+    /// <summary>
+    public static Rect TakeTop(this Rect r, float padding, out Rect theRest) {
+      theRest = r.PadTop(padding);
+      return r.TakeTop(padding);
+    }
+
+    /// <summary>
+    /// Return a margin of the given width on the bottom of the input Rect, and
+    /// optionally outputs the rest of the Rect into theRest.
+    /// <summary>
+    public static Rect TakeBottom(this Rect r, float padding, out Rect theRest) {
+      theRest = r.PadBottom(padding);
+      return r.TakeBottom(padding);
+    }
+
+    /// <summary>
     /// Return a margin of the given width on the left side of the input Rect, and
     /// optionally outputs the rest of the Rect into theRest.
     /// <summary>
-    public static Rect TakeLeft(this Rect r, float padWidth, out Rect theRest) {
-      Rect thePadding;
-      theRest = PadLeft(r, padWidth, out thePadding);
-      return thePadding;
+    public static Rect TakeLeft(this Rect r, float padding, out Rect theRest) {
+      theRest = r.PadLeft(padding);
+      return r.TakeLeft(padding);
     }
 
     /// <summary>
     /// Return a margin of the given width on the right side of the input Rect, and
     /// optionally outputs the rest of the Rect into theRest.
     /// <summary>
-    public static Rect TakeRight(this Rect r, float padWidth, out Rect theRest) {
-      Rect thePadding;
-      theRest = PadRight(r, padWidth, out thePadding);
-      return thePadding;
+    public static Rect TakeRight(this Rect r, float padding, out Rect theRest) {
+      theRest = r.PadRight(padding);
+      return r.TakeRight(padding);
     }
 
     #endregion
@@ -1384,8 +1517,8 @@ namespace Leap.Unity {
     /// provides what's left of this rect after the line is removed as theRest.
     /// </summary>
     public static Rect TakeHorizontal(this Rect r, float lineHeight,
-                                out Rect theRest,
-                                bool fromTop = true) {
+                                      out Rect theRest,
+                                      bool fromTop = true) {
       theRest = new Rect(r.x, (fromTop ? r.y + lineHeight : r.y), r.width, r.height - lineHeight);
       return new Rect(r.x, (fromTop ? r.y : r.y + r.height - lineHeight), r.width, lineHeight);
     }
@@ -1458,7 +1591,9 @@ namespace Leap.Unity {
     /// maintaining the alignment of text and other elements with the horizon line.
     /// </summary>
     /// <returns></returns>
-    public static Quaternion FaceTargetWithoutTwist(Vector3 fromPosition, Vector3 targetPosition, bool flip180 = false) {
+    public static Quaternion FaceTargetWithoutTwist(Vector3 fromPosition,
+                                                    Vector3 targetPosition,
+                                                    bool flip180 = false) {
       return FaceTargetWithoutTwist(fromPosition, targetPosition, Vector3.up, flip180);
     }
 
@@ -1470,8 +1605,11 @@ namespace Leap.Unity {
     /// For example, this will point an interface panel at a user camera while
     /// maintaining the alignment of text and other elements with the horizon line.
     /// </summary>
-    public static Quaternion FaceTargetWithoutTwist(Vector3 objectPosition, Vector3 targetPosition, Vector3 upwardDirection, bool flip180 = false) {
-      Vector3 objToTarget = -1f * (Camera.main.transform.position - objectPosition);
+    public static Quaternion FaceTargetWithoutTwist(Vector3 objectPosition,
+                                                    Vector3 targetPosition,
+                                                    Vector3 upwardDirection,
+                                                    bool flip180 = false) {
+      Vector3 objToTarget = -1f * (targetPosition - objectPosition);
       Vector3 horizonRight = Vector3.Cross(upwardDirection, objToTarget);
       Vector3 objUp = Vector3.Cross(objToTarget.normalized, horizonRight.normalized);
       return Quaternion.LookRotation((flip180 ? -1 : 1) * objToTarget, objUp);

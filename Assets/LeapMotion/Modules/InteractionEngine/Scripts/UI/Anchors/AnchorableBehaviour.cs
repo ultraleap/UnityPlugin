@@ -833,9 +833,6 @@ namespace Leap.Unity.Interaction {
       if (_eventTable.HasUnityEvent((int)type)) {
         action += () => _eventTable.Invoke((int)type);
       }
-      else {
-        action += () => { };
-      }
     }
 
     #endregion

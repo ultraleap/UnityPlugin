@@ -3,7 +3,8 @@
 namespace Leap.Unity {
 
   /// <summary>
-  /// A position and rotation.
+  /// A position and rotation. You can multiply two poses; this acts like Matrix4x4
+  /// multiplication, but Poses always have unit scale.
   /// </summary>
   [System.Serializable]
   public struct Pose {
@@ -16,28 +17,22 @@ namespace Leap.Unity {
       this.rotation = rotation;
     }
 
-    public static Pose identity {
-      get { return new Pose(); }
+    public static readonly Pose identity = new Pose(Vector3.zero, Quaternion.identity);
+
+    public Pose inverse {
+      get {
+        var invQ = Quaternion.Inverse(this.rotation);
+        return new Pose(-(invQ * this.position), invQ);
+      }
     }
 
     /// <summary>
-    /// Returns a delta Pose such that (other Pose).Then(delta Pose) == this Pose.
+    /// Returns Pose B transformed by Pose A, like a transform hierarchy with A as the
+    /// parent of B.
     /// </summary>
-    public Pose From(Pose other) {
-      return new Pose(this.position - other.position,
-                      this.rotation * Quaternion.Inverse(other.rotation));
-    }
-
-    /// <summary>
-    /// Accumulates the provided Pose onto this Pose. For example:
-    /// PoseB.Then(PoseA.From(PoseB)) == PoseA.
-    /// 
-    /// Position and rotation are handled independently; Pose rotations do not affect
-    /// Pose positions.
-    /// </summary>
-    public Pose Then(Pose other) {
-      return new Pose(this.position + other.position,
-                      other.rotation * this.rotation);
+    public static Pose operator *(Pose A, Pose B) {
+      return new Pose(A.position + (A.rotation * B.position),
+                      A.rotation * B.rotation);
     }
 
     public bool ApproxEquals(Pose other) {
@@ -45,11 +40,11 @@ namespace Leap.Unity {
     }
 
     /// <summary>
-    /// Returns a pose interpolated (Lerp for position, Slerp for rotation)
+    /// Returns a pose interpolated (Lerp for position, Slerp, NOT Lerp for rotation)
     /// between a and b by t from 0 to 1. This method clamps t between 0 and 1; if
     /// extrapolation is desired, see Extrapolate.
     /// </summary>
-    public static Pose Interpolate(Pose a, Pose b, float t) {
+    public static Pose Lerp(Pose a, Pose b, float t) {
       if (t >= 1f) return b;
       if (t <= 0f) return a;
       return new Pose(Vector3.Lerp(a.position, b.position, t),
@@ -57,25 +52,32 @@ namespace Leap.Unity {
     }
 
     /// <summary>
-    /// As Interpolate, but doesn't clamp t between 0 and 1. Values above one extrapolate
+    /// As Lerp, but doesn't clamp t between 0 and 1. Values above one extrapolate
     /// forwards beyond b, while values less than zero extrapolate backwards past a.
     /// </summary>
-    public static Pose Extrapolate(Pose a, Pose b, float t) {
+    public static Pose LerpUnclamped(Pose a, Pose b, float t) {
       return new Pose(Vector3.LerpUnclamped(a.position, b.position, t),
                       Quaternion.SlerpUnclamped(a.rotation, b.rotation, t));
     }
 
     /// <summary>
-    /// As Extrapolate, but extrapolates using time values for a and b, and a target time
-    /// at which to determine the extrapolated pose.
+    /// As LerpUnclamped, but extrapolates using time values for a and b, and a target
+    /// time at which to determine the extrapolated pose.
     /// </summary>
-    public static Pose TimedExtrapolate(Pose a, float aTime, Pose b, float bTime,
-                                        float extrapolateTime) {
-      return Extrapolate(a, b, extrapolateTime.MapUnclamped(aTime, bTime, 0f, 1f));
+    public static Pose LerpUnclampedTimed(Pose a, float aTime,
+                                          Pose b, float bTime,
+                                          float extrapolateTime) {
+      return LerpUnclamped(a, b, extrapolateTime.MapUnclamped(aTime, bTime, 0f, 1f));
     }
 
     public override string ToString() {
-      return "[Pose | Position: " + this.position.ToString() + ", Rotation: " + this.rotation.ToString() + "]";
+      return "[Pose | Position: " + this.position.ToString()
+           + ", Rotation: " + this.rotation.ToString() + "]";
+    }
+
+    public string ToString(string format) {
+      return "[Pose | Position: " + this.position.ToString(format)
+           + ", Rotation: " + this.rotation.ToString(format) + "]";
     }
 
     public override bool Equals(object obj) {
@@ -87,7 +89,10 @@ namespace Leap.Unity {
     }
 
     public override int GetHashCode() {
-      return this.position.GetHashCode() ^ this.rotation.GetHashCode() * 7;
+      return new Hash() {
+        position,
+        rotation
+      };
     }
 
     public static bool operator ==(Pose a, Pose b) {

@@ -16,11 +16,15 @@ using NUnit.Framework;
 namespace Leap.Unity.Tests {
 
   /// <summary>
-  /// Tests for From() and Then() extension methods.
+  /// Tests for From(), To(), and Then() extension methods.
+  /// 
+  /// These extension methods provide a consistent rightward syntax for mathematical
+  /// transformations, e.g. Quaternions and matrices as well as more trivial types like
+  /// float and Vector3.
   /// </summary>
   public class FromThenTests {
 
-    public static float EPSILON = 0.0001f;
+    public static float EPSILON = 0.0006f;
 
     #region Vector3
 
@@ -28,13 +32,23 @@ namespace Leap.Unity.Tests {
     private static Vector3 VEC_B = new Vector3(0.13f, 0.98f, 3000f);
 
     [Test]
-    public void FromAVecToBVec() {
+    public void FromVecAToVecB() {
       Assert.That(AreVector3sEqual(VEC_A.Then(VEC_B.From(VEC_A)), VEC_B));
     }
 
     [Test]
-    public void FromBVecToAVec() {
+    public void ToVecBFromVecA() {
+      Assert.That(AreVector3sEqual(VEC_A.Then(VEC_A.To(VEC_B)), VEC_B));
+    }
+
+    [Test]
+    public void FromVecBToVecA() {
       Assert.That(AreVector3sEqual(VEC_B.Then(VEC_A.From(VEC_B)), VEC_A));
+    }
+
+    [Test]
+    public void ToVecAFromVecB() {
+      Assert.That(AreVector3sEqual(VEC_B.Then(VEC_B.To(VEC_A)), VEC_A));
     }
 
     private static bool AreVector3sEqual(Vector3 a, Vector3 b) {
@@ -53,13 +67,23 @@ namespace Leap.Unity.Tests {
     }
 
     [Test]
-    public void FromAQuatToBQuat() {
+    public void FromQuatAToQuatB() {
       Assert.That(AreQuaternionsEqual(QUAT_A.Then(QUAT_B.From(QUAT_A)), QUAT_B));
     }
 
     [Test]
-    public void FromBQuatToAQuat() {
+    public void ToQuatAFromQuatB() {
+      Assert.That(AreQuaternionsEqual(QUAT_A.Then(QUAT_A.To(QUAT_B)), QUAT_B));
+    }
+
+    [Test]
+    public void FromQuatBToQuatA() {
       Assert.That(AreQuaternionsEqual(QUAT_B.Then(QUAT_A.From(QUAT_B)), QUAT_A));
+    }
+
+    [Test]
+    public void ToQuatBFromQuatA() {
+      Assert.That(AreQuaternionsEqual(QUAT_B.Then(QUAT_B.To(QUAT_A)), QUAT_A));
     }
 
     private static bool AreQuaternionsEqual(Quaternion a, Quaternion b) {
@@ -78,23 +102,28 @@ namespace Leap.Unity.Tests {
     }
 
     [Test]
-    public void FromAPoseToBPose() {
-      Pose aFromB = POSE_A.From(POSE_B);
-
-      Pose recoverA = POSE_B.Then(aFromB);
-
-      Assert.That(AreVector3sEqual(recoverA.position, VEC_A));
-      Assert.That(AreQuaternionsEqual(recoverA.rotation, QUAT_A));
+    public void FromPoseAToPoseB() {
+      Assert.That(ArePosesEqual(POSE_B.Then(POSE_A.From(POSE_B)), POSE_A));
     }
 
     [Test]
-    public void FromBPoseToAPose() {
-      Pose bFromA = POSE_B.From(POSE_A);
+    public void ToPoseAFromPoseB() {
+      Assert.That(ArePosesEqual(POSE_B.Then(POSE_B.To(POSE_A)), POSE_A));
+    }
 
-      Pose recoverB = POSE_A.Then(bFromA);
+    [Test]
+    public void FromPoseBToPoseA() {
+      Assert.That(ArePosesEqual(POSE_A.Then(POSE_B.From(POSE_A)), POSE_B));
+    }
 
-      Assert.That(AreVector3sEqual(recoverB.position, VEC_B));
-      Assert.That(AreQuaternionsEqual(recoverB.rotation, QUAT_B));
+    [Test]
+    public void ToPoseBFromPoseA() {
+      Assert.That(ArePosesEqual(POSE_A.Then(POSE_A.To(POSE_B)), POSE_B));
+    }
+
+    private bool ArePosesEqual(Pose a, Pose b) {
+      return AreVector3sEqual(a.position, b.position)
+          && AreQuaternionsEqual(a.rotation, b.rotation);
     }
 
     #endregion
@@ -120,6 +149,11 @@ namespace Leap.Unity.Tests {
     [Test]
     public void FromMatrixBToMatrixA() {
       Assert.That(AreMatricesEqual(MAT_B.Then(MAT_A.From(MAT_B)), MAT_A));
+    }
+
+    [Test]
+    public void ToMatrixAFromMatrixB() {
+      Assert.That(AreMatricesEqual(MAT_B.Then(MAT_B.To(MAT_A)), MAT_A));
     }
 
     [Test]

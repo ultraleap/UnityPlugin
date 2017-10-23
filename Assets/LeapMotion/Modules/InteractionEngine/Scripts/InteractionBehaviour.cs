@@ -819,27 +819,25 @@ namespace Leap.Unity.Interaction {
     #region Pose & Movement
 
     private Pose _worldPose;
-    private Pose _worldPoseLastFrame = new Pose();
-    private bool _hasWorldPoseLastFrame = false;
+    private Maybe<Pose> _worldPoseLastFrame = Maybe.None;
 
     public Pose worldPose {
       get {
-        return _worldPose;
+        return new Pose(rigidbody.position, rigidbody.rotation);
       }
     }
 
     public Pose worldDeltaPose {
       get {
-        if (!_hasWorldPoseLastFrame) return Pose.identity;
+        if (!_worldPoseLastFrame.hasValue) return Pose.identity;
         else {
-          return _worldPose.From(_worldPoseLastFrame);
+          return _worldPose.From(_worldPoseLastFrame.valueOrDefault);
         }
       }
     }
 
     private void fixedUpdatePose() {
       _worldPoseLastFrame = _worldPose;
-      _hasWorldPoseLastFrame = true;
 
       _worldPose = new Pose(rigidbody.position, rigidbody.rotation);
     }
