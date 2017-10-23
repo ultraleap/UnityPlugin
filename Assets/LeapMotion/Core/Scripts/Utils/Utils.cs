@@ -734,6 +734,83 @@ namespace Leap.Unity {
 
     #endregion
 
+    #region Component Utils
+
+    /// <summary>
+    /// Recursively searches the hierarchy of the argument Transform to find all of the
+    /// Components of type ComponentType (the first type argument) that should be "owned"
+    /// by the OwnerType component type (the second type argument).
+    /// 
+    /// If a child GameObject itself has an OwnerType component, that
+    /// child is ignored, and its children are ignored -- the assumption being that such
+    /// a child owns itself and any ComponentType components beneath it.
+    /// 
+    /// For example, a call to FindOwnedChildComponents with ComponentType Collider and
+    /// OwnerType Rigidbody would return all of the Colliders that are attached to the
+    /// rootObj Rigidbody, but none of the colliders that are attached to a rootObj's
+    /// child's own Rigidbody.
+    /// 
+    /// Optionally, ComponentType components of inactive GameObjects can be included
+    /// in the returned list; by default, these components are skipped.
+    /// 
+    /// This is not a cheap method to call, but it does not allocate garbage, so it is safe
+    /// for use at runtime.
+    /// </summary>
+    /// 
+    /// <typeparam name="ComponentType">
+    /// The component type to search for.
+    /// </typeparam>
+    /// 
+    /// <typeparam name="OwnerType">
+    /// The component type that assumes ownership of any ComponentType in its own Transform
+    /// or its Transform's children/grandchildren.
+    /// </typeparam>
+    public static void FindOwnedChildComponents<ComponentType, OwnerType>
+                                               (OwnerType rootObj,
+                                                List<ComponentType> ownedComponents,
+                                                bool includeInactiveObjects = false)
+                                               where OwnerType : Component {
+      ownedComponents.Clear();
+      Stack<Transform> toVisit = Pool<Stack<Transform>>.Spawn();
+      List<ComponentType> componentsBuffer = Pool<List<ComponentType>>.Spawn();
+
+      try {
+        toVisit.Push(rootObj.transform);
+        Transform curTransform;
+        while (toVisit.Count > 0) {
+          curTransform = toVisit.Pop();
+
+          // Recursively search children and children's children.
+          foreach (var child in curTransform.GetChildren()) {
+            // Ignore children with OwnerType components of their own; its own OwnerType
+            // component owns its own ComponentType components and the ComponentType
+            // components of its children.
+            if (child.GetComponent<OwnerType>() == null
+                && (includeInactiveObjects || child.gameObject.activeInHierarchy)) {
+              toVisit.Push(child);
+            }
+          }
+
+          // Since we'll visit every valid child, all we need to do is add the
+          // ComponentType components of every transform we visit.
+          componentsBuffer.Clear();
+          curTransform.GetComponents<ComponentType>(componentsBuffer);
+          foreach (var component in componentsBuffer) {
+            ownedComponents.Add(component);
+          }
+        }
+      }
+      finally {
+        toVisit.Clear();
+        Pool<Stack<Transform>>.Recycle(toVisit);
+
+        componentsBuffer.Clear();
+        Pool<List<ComponentType>>.Recycle(componentsBuffer);
+      }
+    }
+
+    #endregion
+
     #region Orientation Utils
 
     /// <summary>
@@ -760,6 +837,226 @@ namespace Leap.Unity {
     /// <param name="transform"></param>
     public static void LookAwayFrom(this Transform thisTransform, Transform transform, Vector3 upwards) {
       thisTransform.rotation = Quaternion.LookRotation(thisTransform.position - transform.position, upwards);
+    }
+
+    /// <summary>
+    /// Returns the rotation that makes a transform at objectPosition point its forward
+    /// vector at targetPosition and keep its rightward vector parallel with the horizon
+    /// defined by a normal of Vector3.up.
+    /// 
+    /// For example, this will point an interface panel at a user camera while
+    /// maintaining the alignment of text and other elements with the horizon line.
+    /// </summary>
+    /// <returns></returns>
+    public static Quaternion FaceTargetWithoutTwist(Vector3 fromPosition,
+                                                    Vector3 targetPosition,
+                                                    bool flip180 = false) {
+      return FaceTargetWithoutTwist(fromPosition, targetPosition, Vector3.up, flip180);
+    }
+
+    /// <summary>
+    /// Returns the rotation that makes a transform at objectPosition point its forward
+    /// vector at targetPosition and keep its rightward vector parallel with the horizon
+    /// defined by the upwardDirection normal.
+    /// 
+    /// For example, this will point an interface panel at a user camera while
+    /// maintaining the alignment of text and other elements with the horizon line.
+    /// </summary>
+    public static Quaternion FaceTargetWithoutTwist(Vector3 objectPosition,
+                                                    Vector3 targetPosition,
+                                                    Vector3 upwardDirection,
+                                                    bool flip180 = false) {
+      Vector3 objToTarget = targetPosition - objectPosition;
+      return Quaternion.LookRotation((flip180 ? -1 : 1) * objToTarget,
+                                     upwardDirection);
+    }
+
+    #endregion
+
+    #region Quaternion Utils
+
+    /// <summary>
+    /// Converts the quaternion into an axis and an angle and returns the vector
+    /// axis * angle. Angle magnitude is measured in degrees, not radians; this requires
+    /// conversion to radians if being used to set the angular velocity of a PhysX
+    /// Rigidbody.
+    /// </summary>
+    public static Vector3 ToAngleAxisVector(this Quaternion q) {
+      float angle;
+      Vector3 axis;
+      q.ToAngleAxis(out angle, out axis);
+      return axis * angle;
+    }
+
+    /// <summary>
+    /// Returns a Quaternion described by the provided angle axis vector. Expects the
+    /// magnitude (angle) to be in degrees, not radians.
+    /// </summary>
+    public static Quaternion QuaternionFromAngleAxisVector(Vector3 angleAxisVector) {
+      if (angleAxisVector == Vector3.zero) return Quaternion.identity;
+      return Quaternion.AngleAxis(angleAxisVector.magnitude, angleAxisVector);
+    }
+
+    /// <summary>
+    /// A.From(B) produces the quaternion that rotates from B to A.
+    /// Combines with Then() to produce readable, predictable results:
+    /// B.Then(A.From(B)) == A.
+    /// </summary>
+    public static Quaternion From(this Quaternion thisQuaternion, Quaternion otherQuaternion) {
+      return thisQuaternion * Quaternion.Inverse(otherQuaternion);
+    }
+
+    /// <summary>
+    /// A.To(B) produces the quaternion that rotates from A to B.
+    /// Combines with Then() to produce readable, predictable results:
+    /// B.Then(B.To(A)) == A.
+    /// </summary>
+    public static Quaternion To(this Quaternion thisQuaternion, Quaternion otherQuaternion) {
+      return otherQuaternion * Quaternion.Inverse(thisQuaternion);
+    }
+
+    /// <summary>
+    /// Rotates this quaternion by the other quaternion. This is a rightward syntax for
+    /// Quaternion multiplication, which normally obeys left-multiply ordering.
+    /// </summary>
+    public static Quaternion Then(this Quaternion thisQuaternion, Quaternion otherQuaternion) {
+      return otherQuaternion * thisQuaternion;
+    }
+
+    #endregion
+    
+    #region Float Utils
+
+    /// <summary>
+    /// Additive From syntax for floats. Evaluated as this float plus the additive
+    /// inverse of the other float, usually expressed as thisFloat - otherFloat.
+    /// 
+    /// For less trivial uses of From/Then syntax, refer to their implementations for
+    /// Quaternions and Matrix4x4s.
+    /// </summary>
+    public static float From(this float thisFloat, float otherFloat) {
+      return thisFloat - otherFloat;
+    }
+
+    /// <summary>
+    /// Additive To syntax for floats. Evaluated as this float plus the additive
+    /// inverse of the other float, usually expressed as otherFloat - thisFloat.
+    /// 
+    /// For less trivial uses of From/Then syntax, refer to their implementations for
+    /// Quaternions and Matrix4x4s.
+    /// </summary>
+    public static float To(this float thisFloat, float otherFloat) {
+      return otherFloat - thisFloat;
+    }
+
+    /// <summary>
+    /// Additive Then syntax for floats. Literally, thisFloat + otherFloat.
+    /// </summary>
+    public static float Then(this float thisFloat, float otherFloat) {
+      return thisFloat + otherFloat;
+    }
+
+    #endregion
+
+    #region Matrix4x4 Utils
+
+    /// <summary>
+    /// A.From(B) produces the matrix that transforms from B to A.
+    /// Combines with Then() to produce readable, predictable results:
+    /// B.Then(A.From(B)) == A.
+    /// 
+    /// Warning: Scale factors of zero will invalidate this behavior.
+    /// </summary>
+    public static Matrix4x4 From(this Matrix4x4 thisMatrix, Matrix4x4 otherMatrix) {
+      return thisMatrix * otherMatrix.inverse;
+    }
+
+    /// <summary>
+    /// A.To(B) produces the matrix that transforms from A to B.
+    /// Combines with Then() to produce readable, predictable results:
+    /// B.Then(B.To(A)) == A.
+    /// 
+    /// Warning: Scale factors of zero will invalidate this behavior.
+    /// </summary>
+    public static Matrix4x4 To(this Matrix4x4 thisMatrix, Matrix4x4 otherMatrix) {
+      return otherMatrix * thisMatrix.inverse;
+    }
+
+    /// <summary>
+    /// Transforms this matrix by the other matrix. This is a rightward syntax for
+    /// matrix multiplication, which normally obeys left-multiply ordering.
+    /// </summary>
+    public static Matrix4x4 Then(this Matrix4x4 thisMatrix, Matrix4x4 otherMatrix) {
+      return otherMatrix * thisMatrix;
+    }
+
+    #endregion
+
+    #region Vector3 Utils
+
+    /// <summary>
+    /// Additive From syntax for Vector3. Literally thisVector - otherVector.
+    /// </summary>
+    public static Vector3 From(this Vector3 thisVector, Vector3 otherVector) {
+      return thisVector - otherVector;
+    }
+
+    /// <summary>
+    /// Additive To syntax for Vector3. Literally otherVector - thisVector.
+    /// </summary>
+    public static Vector3 To(this Vector3 thisVector, Vector3 otherVector) {
+      return otherVector - thisVector;
+    }
+
+    /// <summary>
+    /// Additive Then syntax for Vector3. Literally thisVector + otherVector.
+    /// For example: A.Then(B.From(A)) == B.
+    /// </summary>
+    public static Vector3 Then(this Vector3 thisVector, Vector3 otherVector) {
+      return thisVector + otherVector;
+    }
+
+    /// <summary>
+    /// Rightward syntax for applying a Quaternion rotation to this vector; literally
+    /// returns byQuaternion * thisVector -- does NOT modify the input vector.
+    /// </summary>
+    public static Vector3 RotatedBy(this Vector3 thisVector, Quaternion byQuaternion) {
+      return byQuaternion * thisVector;
+    }
+
+    #endregion
+
+    #region Pose Utils
+
+    /// <summary>
+    /// From syntax for Pose structs; A.From(B) returns the Pose that transforms to
+    /// Pose A from Pose B. Also see To() and Then().
+    /// 
+    /// For example, A.Then(B.From(A)) == B.
+    /// </summary>
+    public static Pose From(this Pose thisPose, Pose otherPose) {
+      return thisPose * otherPose.inverse;
+    }
+
+    /// <summary>
+    /// To syntax for Pose structs; A.To(B) returns the Pose that transforms from Pose A
+    /// to Pose B. Also see From() and Then().
+    /// 
+    /// For example, A.Then(A.To(B)) == B.
+    /// </summary>
+    public static Pose To(this Pose thisPose, Pose otherPose) {
+      return otherPose * thisPose.inverse;
+    }
+
+    /// <summary>
+    /// Returns thisPose transformed by otherPose. The other Pose can be understood as
+    /// the parent pose, and the returned pose is this pose transformed from the other
+    /// pose's local space to world space.
+    /// 
+    /// Unlike matrix multiplication, this syntax is rightward: A * B == B.Then(A).
+    /// </summary>
+    public static Pose Then(this Pose thisPose, Pose otherPose) {
+      return otherPose * thisPose;
     }
 
     #endregion
@@ -1032,12 +1329,286 @@ namespace Leap.Unity {
     }
 
     /// <summary>
+    /// Returns a new Rect with the argument as an outward margin on each border of this
+    /// Rect; the result is a larger Rect.
+    /// </summary>
+    public static Rect Extrude(this Rect r, float margin) {
+      return new Rect(r.x - margin, r.y - margin,
+                      r.width + (margin * 2f), r.height + (margin * 2f));
+    }
+
+    /// <summary>
     /// Returns a new Rect with the argument padding as a margin relative to each
     /// border of the provided Rect.
     /// </summary>
     public static Rect PadInner(this Rect r, float padding) {
-      return new Rect(r.x + padding, r.y + padding, r.width - (padding * 2), r.height - (padding * 2));
+      return PadInner(r, padding, padding, padding, padding);
     }
+
+    /// <summary>
+    /// Returns a new Rect with the argument padding as a margin inward from each
+    /// corresponding border of the provided Rect. The returned Rect will never collapse
+    /// to have a width or height less than zero, and its resulting size will never be
+    /// larger than the input rect.
+    /// </summary>
+    public static Rect PadInner(this Rect r, float padTop, float padBottom,
+                                             float padLeft, float padRight) {
+      var x = r.x + padLeft;
+      var y = r.y + padBottom;
+      var w = r.width - padRight - padLeft;
+      var h = r.height - padTop - padBottom;
+      if (w < 0f) {
+        x = r.x + (padLeft / (padLeft + padRight)) * r.width;
+        w = 0;
+      }
+      if (h < 0f) {
+        y = r.y + (padBottom / (padBottom + padTop)) * r.height;
+        h = 0;
+      }
+      return new Rect(x, y, w, h);
+    }
+
+    #region Pad, No Out
+
+    public static Rect PadTop(this Rect r, float padding) {
+      return PadInner(r, padding, 0f, 0f, 0f);
+    }
+
+    public static Rect PadBottom(this Rect r, float padding) {
+      return PadInner(r, 0f, padding, 0f, 0f);
+    }
+
+    public static Rect PadLeft(this Rect r, float padding) {
+      return PadInner(r, 0f, 0f, padding, 0f);
+    }
+
+    public static Rect PadRight(this Rect r, float padding) {
+      return PadInner(r, 0f, 0f, 0f, padding);
+    }
+
+    #endregion
+
+    #region Pad, With Out
+
+    /// <summary>
+    /// Returns the Rect if padded on the top by the padding amount, and optionally
+    /// outputs the remaining margin into marginRect.
+    /// </summary>
+    public static Rect PadTop(this Rect r, float padding, out Rect marginRect) {
+      marginRect = r.TakeTop(padding);
+      return PadTop(r, padding);
+    }
+
+    /// <summary>
+    /// Returns the Rect if padded on the bottom by the padding amount, and optionally
+    /// outputs the remaining margin into marginRect.
+    /// </summary>
+    public static Rect PadBottom(this Rect r, float padding, out Rect marginRect) {
+      marginRect = r.TakeBottom(padding);
+      return PadBottom(r, padding);
+    }
+
+    /// <summary>
+    /// Returns the Rect if padded on the left by the padding amount, and optionally
+    /// outputs the remaining margin into marginRect.
+    /// </summary>
+    public static Rect PadLeft(this Rect r, float padding, out Rect marginRect) {
+      marginRect = r.TakeLeft(padding);
+      return PadLeft(r, padding);
+    }
+
+    /// <summary>
+    /// Returns the Rect if padded on the right by the padding amount, and optionally
+    /// outputs the remaining margin into marginRect.
+    /// </summary>
+    public static Rect PadRight(this Rect r, float padding, out Rect marginRect) {
+      marginRect = r.TakeRight(padding);
+      return PadRight(r, padding);
+    }
+
+    #endregion
+
+    #region Pad Percent, Two Sides
+
+    public static Rect PadTopBottomPercent(this Rect r, float padPercent) {
+      float padHeight = r.height * padPercent;
+      return r.PadInner(padHeight, padHeight, 0f, 0f);
+    }
+
+    public static Rect PadLeftRightPercent(this Rect r, float padPercent) {
+      float padWidth = r.width * padPercent;
+      return r.PadInner(0f, 0f, padWidth, padWidth);
+    }
+
+    #endregion
+
+    #region Pad Percent
+
+    public static Rect PadTopPercent(this Rect r, float padPercent) {
+      float padHeight = r.height * padPercent;
+      return PadTop(r, padHeight);
+    }
+
+    public static Rect PadBottomPercent(this Rect r, float padPercent) {
+      float padHeight = r.height * padPercent;
+      return PadBottom(r, padHeight);
+    }
+
+    public static Rect PadLeftPercent(this Rect r, float padPercent) {
+      return PadLeft(r, r.width * padPercent);
+    }
+
+    public static Rect PadRightPercent(this Rect r, float padPercent) {
+      return PadRight(r, r.width * padPercent);
+    }
+
+    #endregion
+
+    #region Take, No Out
+
+    /// <summary>
+    /// Return a margin of the given height on the top of the input Rect.
+    /// You can't Take more than there is Rect to take from.
+    /// <summary>
+    public static Rect TakeTop(this Rect r, float heightFromTop) {
+      heightFromTop = Mathf.Clamp(heightFromTop, 0f, r.height);
+      return new Rect(r.x, r.y + r.height - heightFromTop, r.width, heightFromTop);
+    }
+
+    /// <summary>
+    /// Return a margin of the given height on the bottom of the input Rect.
+    /// You can't Take more than there is Rect to take from.
+    /// <summary>
+    public static Rect TakeBottom(this Rect r, float heightFromBottom) {
+      heightFromBottom = Mathf.Clamp(heightFromBottom, 0f, r.height);
+      return new Rect(r.x, r.y, r.width, heightFromBottom);
+    }
+
+    /// <summary>
+    /// Return a margin of the given width on the left side of the input Rect.
+    /// You can't Take more than there is Rect to take from.
+    /// <summary>
+    public static Rect TakeLeft(this Rect r, float widthFromLeft) {
+      widthFromLeft = Mathf.Clamp(widthFromLeft, 0f, r.width);
+      return new Rect(r.x, r.y, widthFromLeft, r.height);
+    }
+
+    /// <summary>
+    /// Return a margin of the given width on the right side of the input Rect.
+    /// You can't Take more than there is Rect to take from.
+    /// <summary>
+    public static Rect TakeRight(this Rect r, float widthFromRight) {
+      widthFromRight = Mathf.Clamp(widthFromRight, 0f, r.width);
+      return new Rect(r.x + r.width - widthFromRight, r.y, r.height, widthFromRight);
+    }
+
+    #endregion
+
+    #region Take, With Out
+
+    /// <summary>
+    /// Return a margin of the given width on the top of the input Rect, and
+    /// optionally outputs the rest of the Rect into theRest.
+    /// <summary>
+    public static Rect TakeTop(this Rect r, float padding, out Rect theRest) {
+      theRest = r.PadTop(padding);
+      return r.TakeTop(padding);
+    }
+
+    /// <summary>
+    /// Return a margin of the given width on the bottom of the input Rect, and
+    /// optionally outputs the rest of the Rect into theRest.
+    /// <summary>
+    public static Rect TakeBottom(this Rect r, float padding, out Rect theRest) {
+      theRest = r.PadBottom(padding);
+      return r.TakeBottom(padding);
+    }
+
+    /// <summary>
+    /// Return a margin of the given width on the left side of the input Rect, and
+    /// optionally outputs the rest of the Rect into theRest.
+    /// <summary>
+    public static Rect TakeLeft(this Rect r, float padding, out Rect theRest) {
+      theRest = r.PadLeft(padding);
+      return r.TakeLeft(padding);
+    }
+
+    /// <summary>
+    /// Return a margin of the given width on the right side of the input Rect, and
+    /// optionally outputs the rest of the Rect into theRest.
+    /// <summary>
+    public static Rect TakeRight(this Rect r, float padding, out Rect theRest) {
+      theRest = r.PadRight(padding);
+      return r.TakeRight(padding);
+    }
+
+    #endregion
+
+    /// <summary>
+    /// Returns a horizontal strip of lineHeight of this rect (from the top by default) and
+    /// provides what's left of this rect after the line is removed as theRest.
+    /// </summary>
+    public static Rect TakeHorizontal(this Rect r, float lineHeight,
+                                      out Rect theRest,
+                                      bool fromTop = true) {
+      theRest = new Rect(r.x, (fromTop ? r.y + lineHeight : r.y), r.width, r.height - lineHeight);
+      return new Rect(r.x, (fromTop ? r.y : r.y + r.height - lineHeight), r.width, lineHeight);
+    }
+
+    #region Enumerators
+
+    /// <summary>
+    /// Slices numLines horizontal line Rects from this Rect and returns an enumerator that
+    /// will return each line Rect.
+    /// 
+    /// The height of each line is the height of the Rect divided by the number of lines
+    /// requested.
+    /// </summary>
+    public static HorizontalLineRectEnumerator TakeAllLines(this Rect r, int numLines) {
+      return new HorizontalLineRectEnumerator(r, numLines);
+    }
+
+    public struct HorizontalLineRectEnumerator : IQueryOp<Rect> {
+      Rect rect;
+      int numLines;
+      int index;
+
+      public HorizontalLineRectEnumerator(Rect rect, int numLines) {
+        this.rect = rect;
+        this.numLines = numLines;
+        this.index = -1;
+      }
+
+      public float eachHeight { get { return this.rect.height / numLines; } }
+
+      public Rect Current {
+        get { return new Rect(rect.x, rect.y + eachHeight * index, rect.width, eachHeight); }
+      }
+      public bool MoveNext() {
+        index += 1;
+        return index < numLines;
+      }
+      public HorizontalLineRectEnumerator GetEnumerator() { return this; }
+
+      public bool TryGetNext(out Rect t) {
+        if (MoveNext()) {
+          t = Current; return true;
+        }
+        else {
+          t = default(Rect); return false;
+        }
+      }
+
+      public void Reset() {
+        index = -1;
+      }
+
+      public QueryWrapper<Rect, HorizontalLineRectEnumerator> Query() {
+        return new QueryWrapper<Rect, HorizontalLineRectEnumerator>(this);
+      }
+    }
+
+    #endregion
 
     #endregion
 
