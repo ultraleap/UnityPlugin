@@ -831,7 +831,7 @@ namespace Leap.Unity.Interaction {
       get {
         if (!_worldPoseLastFrame.hasValue) return Pose.identity;
         else {
-          return _worldPose.From(_worldPoseLastFrame.valueOrDefault);
+          return worldPose.From(_worldPoseLastFrame.valueOrDefault);
         }
       }
     }
