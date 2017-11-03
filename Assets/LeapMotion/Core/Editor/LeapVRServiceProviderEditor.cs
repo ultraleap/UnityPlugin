@@ -18,6 +18,10 @@ namespace Leap.Unity {
     protected override void OnEnable() {
       base.OnEnable();
       isVRProvider = true;
+      
+      specifyConditionalDrawing("_allowManualDeviceOffset",
+                                  "_deviceOffsetYAxis", "_deviceOffsetZAxis",
+                                  "_deviceTiltXAxis");
     }
 
     public override void OnSceneGUI() {
