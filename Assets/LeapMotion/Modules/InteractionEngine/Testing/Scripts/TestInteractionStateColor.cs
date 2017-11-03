@@ -23,7 +23,7 @@ namespace Leap.Unity.Interaction.Tests {
         intObj = GetComponent<InteractionBehaviour>();
       }
 
-      _mat = intObj.GetComponent<Renderer>().material;
+      _mat = intObj.GetComponentInChildren<Renderer>().material;
     }
 
     void Update() {
@@ -41,6 +41,13 @@ namespace Leap.Unity.Interaction.Tests {
         }
         else if (intObj.isSuspended) {
           color = Color.red;
+        }
+
+        var intButton = intObj as InteractionButton;
+        if (intButton != null) {
+          if (intButton.isPressed) {
+            color = Color.yellow;
+          }
         }
 
         _mat.color = color;

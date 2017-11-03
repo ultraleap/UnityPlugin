@@ -20,7 +20,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4461388108141520}
   m_Layer: 0
-  m_Name: IE Test Simple Boxes
+  m_Name: IE Test Default Stage
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
