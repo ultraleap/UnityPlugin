@@ -112,3 +112,50 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1001 &1578187231
+Prefab:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 4461388108141520, guid: ab5725f4252388e4b8a5b4555825d54d, type: 2}
+      propertyPath: m_LocalPosition.x
+      value: -0.06843566
+      objectReference: {fileID: 0}
+    - target: {fileID: 4461388108141520, guid: ab5725f4252388e4b8a5b4555825d54d, type: 2}
+      propertyPath: m_LocalPosition.y
+      value: -0.12037164
+      objectReference: {fileID: 0}
+    - target: {fileID: 4461388108141520, guid: ab5725f4252388e4b8a5b4555825d54d, type: 2}
+      propertyPath: m_LocalPosition.z
+      value: 0.3694373
+      objectReference: {fileID: 0}
+    - target: {fileID: 4461388108141520, guid: ab5725f4252388e4b8a5b4555825d54d, type: 2}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4461388108141520, guid: ab5725f4252388e4b8a5b4555825d54d, type: 2}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4461388108141520, guid: ab5725f4252388e4b8a5b4555825d54d, type: 2}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4461388108141520, guid: ab5725f4252388e4b8a5b4555825d54d, type: 2}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4461388108141520, guid: ab5725f4252388e4b8a5b4555825d54d, type: 2}
+      propertyPath: m_RootOrder
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 23016055955022910, guid: ab5725f4252388e4b8a5b4555825d54d,
+        type: 2}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_ParentPrefab: {fileID: 100100000, guid: ab5725f4252388e4b8a5b4555825d54d, type: 2}
+  m_IsPrefabParent: 0
