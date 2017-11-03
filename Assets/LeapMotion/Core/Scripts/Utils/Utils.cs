@@ -65,7 +65,7 @@ namespace Leap.Unity {
     /// </summary>
     public static void Shuffle<T>(this IList<T> list) {
       for (int i = 0; i < list.Count; i++) {
-        Utils.Swap(list, i, UnityEngine.Random.Range(0, list.Count));
+        Utils.Swap(list, i, UnityEngine.Random.Range(i, list.Count));
       }
     }
 
