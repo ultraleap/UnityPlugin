@@ -38,11 +38,11 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.37311953, g: 0.38074014, b: 0.3587274, a: 1}
+  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
-  serializedVersion: 9
+  serializedVersion: 11
   m_GIWorkflowMode: 0
   m_GISettings:
     serializedVersion: 2
@@ -54,7 +54,7 @@ LightmapSettings:
     m_EnableBakedLightmaps: 1
     m_EnableRealtimeLightmaps: 1
   m_LightmapEditorSettings:
-    serializedVersion: 8
+    serializedVersion: 9
     m_Resolution: 2
     m_BakeResolution: 40
     m_TextureWidth: 1024
@@ -71,23 +71,25 @@ LightmapSettings:
     m_FinalGatherFiltering: 1
     m_FinalGatherRayCount: 256
     m_ReflectionCompression: 2
-    m_MixedBakeMode: 3
+    m_MixedBakeMode: 2
     m_BakeBackend: 0
     m_PVRSampling: 1
     m_PVRDirectSampleCount: 32
     m_PVRSampleCount: 500
     m_PVRBounces: 2
-    m_PVRFiltering: 0
+    m_PVRFilterTypeDirect: 0
+    m_PVRFilterTypeIndirect: 0
+    m_PVRFilterTypeAO: 0
     m_PVRFilteringMode: 1
     m_PVRCulling: 1
     m_PVRFilteringGaussRadiusDirect: 1
     m_PVRFilteringGaussRadiusIndirect: 5
     m_PVRFilteringGaussRadiusAO: 2
-    m_PVRFilteringAtrousColorSigma: 1
-    m_PVRFilteringAtrousNormalSigma: 1
-    m_PVRFilteringAtrousPositionSigma: 1
+    m_PVRFilteringAtrousPositionSigmaDirect: 0.5
+    m_PVRFilteringAtrousPositionSigmaIndirect: 2
+    m_PVRFilteringAtrousPositionSigmaAO: 1
   m_LightingDataAsset: {fileID: 0}
-  m_ShadowMaskMode: 2
+  m_UseShadowmask: 1
 --- !u!196 &4
 NavMeshSettings:
   serializedVersion: 2
@@ -107,6 +109,8 @@ NavMeshSettings:
     manualTileSize: 0
     tileSize: 256
     accuratePlacement: 0
+    debug:
+      m_Flags: 0
   m_NavMeshData: {fileID: 0}
 --- !u!1 &46805729
 GameObject:
@@ -151,6 +155,7 @@ MonoBehaviour:
     _h: []
   _attachedRenderer: {fileID: 916399172}
   _attachedGroupIndex: 0
+  _favoriteGroupName: 
   _preferredRendererType:
     _fullName: Leap.Unity.GraphicalRenderer.LeapBakedRenderer
   vertexColor: {r: 1, g: 1, b: 1, a: 1}
@@ -249,7 +254,6 @@ Camera:
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
-  m_StereoMirrorMode: 0
 --- !u!21 &248929267
 Material:
   serializedVersion: 6
@@ -261,6 +265,7 @@ Material:
   m_ShaderKeywords: GRAPHIC_RENDERER_BLEND_SHAPES GRAPHIC_RENDERER_VERTEX_UV_0
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
   stringTagMap: {}
   disabledShaderPasses: []
@@ -325,6 +330,7 @@ MonoBehaviour:
     _h: []
   _attachedRenderer: {fileID: 665615809}
   _attachedGroupIndex: 0
+  _favoriteGroupName: 
   _preferredRendererType:
     _fullName: Leap.Unity.GraphicalRenderer.LeapBakedRenderer
   vertexColor: {r: 1, g: 1, b: 1, a: 1}
@@ -399,6 +405,7 @@ MonoBehaviour:
     _h: []
   _attachedRenderer: {fileID: 746592127}
   _attachedGroupIndex: 0
+  _favoriteGroupName: 
   _preferredRendererType:
     _fullName: Leap.Unity.GraphicalRenderer.LeapBakedRenderer
   vertexColor: {r: 1, g: 1, b: 1, a: 1}
@@ -478,7 +485,8 @@ MonoBehaviour:
   _selectedGroup: 0
   _space: {fileID: 521804392}
   _groups:
-  - _renderingMethod:
+  - _groupName: 
+    _renderingMethod:
       _index: 0
       _a:
       - _useUv0: 1
@@ -612,7 +620,8 @@ MonoBehaviour:
   _selectedGroup: 0
   _space: {fileID: 0}
   _groups:
-  - _renderingMethod:
+  - _groupName: 
+    _renderingMethod:
       _index: 0
       _a:
       - _useUv0: 1
@@ -874,7 +883,8 @@ MonoBehaviour:
   _selectedGroup: 0
   _space: {fileID: 0}
   _groups:
-  - _renderingMethod:
+  - _groupName: 
+    _renderingMethod:
       _index: 0
       _a:
       - _useUv0: 1
@@ -1038,7 +1048,6 @@ Camera:
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
-  m_StereoMirrorMode: 0
 --- !u!43 &834371583
 Mesh:
   m_ObjectHideFlags: 3
@@ -1234,7 +1243,6 @@ Camera:
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
-  m_StereoMirrorMode: 0
 --- !u!1 &916399170
 GameObject:
   m_ObjectHideFlags: 0
@@ -1283,7 +1291,8 @@ MonoBehaviour:
   _selectedGroup: 0
   _space: {fileID: 916399171}
   _groups:
-  - _renderingMethod:
+  - _groupName: 
+    _renderingMethod:
       _index: 0
       _a:
       - _useUv0: 1
@@ -1391,6 +1400,7 @@ Material:
   m_ShaderKeywords: GRAPHIC_RENDERER_BLEND_SHAPES GRAPHIC_RENDERER_VERTEX_UV_0
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
   stringTagMap: {}
   disabledShaderPasses: []
@@ -1599,7 +1609,6 @@ Camera:
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
-  m_StereoMirrorMode: 0
 --- !u!1 &1270927490
 GameObject:
   m_ObjectHideFlags: 0
@@ -1648,7 +1657,8 @@ MonoBehaviour:
   _selectedGroup: 0
   _space: {fileID: 1270927491}
   _groups:
-  - _renderingMethod:
+  - _groupName: 
+    _renderingMethod:
       _index: 0
       _a:
       - _useUv0: 1
@@ -1756,6 +1766,7 @@ Material:
   m_ShaderKeywords: GRAPHIC_RENDERER_BLEND_SHAPES GRAPHIC_RENDERER_VERTEX_UV_0
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
   stringTagMap: {}
   disabledShaderPasses: []
@@ -1836,7 +1847,6 @@ Camera:
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
-  m_StereoMirrorMode: 0
 --- !u!1 &1358472653
 GameObject:
   m_ObjectHideFlags: 0
@@ -1888,6 +1898,7 @@ MonoBehaviour:
     _h: []
   _attachedRenderer: {fileID: 1747900046}
   _attachedGroupIndex: 0
+  _favoriteGroupName: 
   _preferredRendererType:
     _fullName: Leap.Unity.GraphicalRenderer.LeapBakedRenderer
   vertexColor: {r: 1, g: 1, b: 1, a: 1}
@@ -1986,7 +1997,6 @@ Camera:
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
-  m_StereoMirrorMode: 0
 --- !u!1 &1588242068
 GameObject:
   m_ObjectHideFlags: 0
@@ -2030,6 +2040,7 @@ MonoBehaviour:
     _h: []
   _attachedRenderer: {fileID: 1270927492}
   _attachedGroupIndex: 0
+  _favoriteGroupName: 
   _preferredRendererType:
     _fullName: Leap.Unity.GraphicalRenderer.LeapBakedRenderer
   vertexColor: {r: 1, g: 1, b: 1, a: 1}
@@ -2240,6 +2251,7 @@ MonoBehaviour:
     _h: []
   _attachedRenderer: {fileID: 521804393}
   _attachedGroupIndex: 0
+  _favoriteGroupName: 
   _preferredRendererType:
     _fullName: Leap.Unity.GraphicalRenderer.LeapBakedRenderer
   vertexColor: {r: 1, g: 1, b: 1, a: 1}
@@ -2282,6 +2294,7 @@ Material:
   m_ShaderKeywords: GRAPHIC_RENDERER_VERTEX_UV_0
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
   stringTagMap: {}
   disabledShaderPasses: []
@@ -2306,6 +2319,7 @@ Material:
   m_ShaderKeywords: GRAPHIC_RENDERER_VERTEX_UV_0
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
   stringTagMap: {}
   disabledShaderPasses: []
@@ -2367,7 +2381,8 @@ MonoBehaviour:
   _selectedGroup: 0
   _space: {fileID: 1747900045}
   _groups:
-  - _renderingMethod:
+  - _groupName: 
+    _renderingMethod:
       _index: 0
       _a:
       - _useUv0: 1
@@ -2736,6 +2751,7 @@ Material:
   m_ShaderKeywords: GRAPHIC_RENDERER_VERTEX_UV_0
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
   stringTagMap: {}
   disabledShaderPasses: []

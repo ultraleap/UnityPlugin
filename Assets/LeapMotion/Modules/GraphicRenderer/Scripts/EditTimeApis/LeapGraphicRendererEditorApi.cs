@@ -360,14 +360,6 @@ namespace Leap.Unity.GraphicalRenderer {
                 group.TryAddGraphic(graphic);
               }
             }
-
-            if (!graphic.enabled || !graphic.transform.IsActiveRelativeToParent(_renderer.transform)) {
-              graphic.attachedGroup.TryRemoveGraphic(graphic);
-            }
-          }
-
-          if (!graphic.isAttachedToGroup && graphic.enabled && graphic.gameObject.activeInHierarchy) {
-            _renderer.TryAddGraphic(graphic);
           }
         }
       }

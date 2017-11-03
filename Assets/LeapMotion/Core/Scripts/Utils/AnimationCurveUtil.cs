@@ -1,11 +1,78 @@
+/******************************************************************************
+ * Copyright (C) Leap Motion, Inc. 2011-2017.                                 *
+ * Leap Motion proprietary and  confidential.                                 *
+ *                                                                            *
+ * Use subject to the terms of the Leap Motion SDK Agreement available at     *
+ * https://developer.leapmotion.com/sdk_agreement, or another agreement       *
+ * between Leap Motion and you, your company or other organization.           *
+ ******************************************************************************/
+
 using System;
 using UnityEngine;
+#if UNITY_EDITOR
 using UnityEditor;
+#endif
 using Leap.Unity.Query;
 
 namespace Leap.Unity {
 
-  // TODO: Move me to Core!
+  public static class DefaultCurve {
+
+    public static AnimationCurve Zero {
+      get {
+        AnimationCurve curve = new AnimationCurve();
+        curve.AddKey(0, 0);
+        curve.AddKey(1, 0);
+        return curve;
+      }
+    }
+
+    public static AnimationCurve One {
+      get {
+        AnimationCurve curve = new AnimationCurve();
+        curve.AddKey(0, 1);
+        curve.AddKey(1, 1);
+        return curve;
+      }
+    }
+
+    public static AnimationCurve LinearUp {
+      get {
+        AnimationCurve curve = new AnimationCurve();
+        curve.AddKey(new Keyframe(0, 0, 1, 1));
+        curve.AddKey(new Keyframe(1, 1, 1, 1));
+        return curve;
+      }
+    }
+
+    public static AnimationCurve LinearDown {
+      get {
+        AnimationCurve curve = new AnimationCurve();
+        curve.AddKey(new Keyframe(0, 1, -1, -1));
+        curve.AddKey(new Keyframe(1, 0, -1, -1));
+        return curve;
+      }
+    }
+
+    public static AnimationCurve SigmoidUp {
+      get {
+        AnimationCurve curve = new AnimationCurve();
+        curve.AddKey(new Keyframe(0, 0, 0, 0));
+        curve.AddKey(new Keyframe(1, 1, 0, 0));
+        return curve;
+      }
+    }
+
+    public static AnimationCurve SigmoidDown {
+      get {
+        AnimationCurve curve = new AnimationCurve();
+        curve.AddKey(new Keyframe(0, 1, 0, 0));
+        curve.AddKey(new Keyframe(1, 0, 0, 0));
+        return curve;
+      }
+    }
+  }
+
   public static class AnimationCurveUtil {
 
     public static bool IsConstant(this AnimationCurve curve) {
@@ -29,6 +96,7 @@ namespace Leap.Unity {
       return true;
     }
 
+#if UNITY_EDITOR
     public static AnimationCurve Compress(AnimationCurve curve, float maxDelta = 0.005f, int checkSteps = 8) {
       var curveArray = new AnimationCurve[] { curve };
 
@@ -257,18 +325,22 @@ namespace Leap.Unity {
 
       return compressedCurves;
     }
-    
+#endif
+
     public static void AddBooleanKey(this AnimationCurve curve, float time, bool value) {
       var keyframe = new Keyframe() { time = time, value = value ? 1 : 0 };
-      int keyframeIdx = curve.AddKey(keyframe);
 
+#if UNITY_EDITOR
+      int keyframeIdx = curve.AddKey(keyframe);
       AnimationUtility.SetKeyBroken(curve, keyframeIdx, true);
       AnimationUtility.SetKeyLeftTangentMode(curve, keyframeIdx,
                                              AnimationUtility.TangentMode.Constant);
       AnimationUtility.SetKeyRightTangentMode(curve, keyframeIdx,
                                              AnimationUtility.TangentMode.Constant);
+#else
+      curve.AddKey(keyframe);
+#endif
     }
-
   }
 
 

@@ -45,7 +45,7 @@ namespace Leap.Unity {
     /// of the Camera that contains a LeapProvider in one of its children,
     /// or null if there is no such GameObject.
     /// </summary>
-    public static GameObject Rig {
+    public static GameObject CameraRig {
       get {
         if (s_leapRig == null) {
           InitStatic();

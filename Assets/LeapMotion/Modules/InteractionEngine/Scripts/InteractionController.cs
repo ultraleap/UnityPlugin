@@ -137,6 +137,11 @@ namespace Leap.Unity.Interaction {
     public bool isRight { get { return !isLeft; } }
 
     /// <summary>
+    /// Returns the current position of this controller.
+    /// </summary>
+    public abstract Vector3 position { get; }
+
+    /// <summary>
     /// Returns the current velocity of this controller.
     /// </summary>
     public abstract Vector3 velocity { get; }
@@ -1130,7 +1135,8 @@ namespace Leap.Unity.Interaction {
               IInteractionBehaviour intObj;
               if (manager.interactionObjectBodies.TryGetValue(_softContactColliderBuffer[i].attachedRigidbody, out intObj)) {
                 // Skip soft contact if the object is ignoring contact.
-                if (manager.interactionObjectBodies[_softContactColliderBuffer[i].attachedRigidbody].ignoreContact) continue;
+                if (intObj.ignoreContact) continue;
+                if (intObj.isGrasped) continue;
               }
 
               PhysicsUtility.generateSphereContact(boneSphere, 0, _softContactColliderBuffer[i],
@@ -1157,7 +1163,8 @@ namespace Leap.Unity.Interaction {
               IInteractionBehaviour intObj;
               if (manager.interactionObjectBodies.TryGetValue(_softContactColliderBuffer[i].attachedRigidbody, out intObj)) {
                 // Skip soft contact if the object is ignoring contact.
-                if (manager.interactionObjectBodies[_softContactColliderBuffer[i].attachedRigidbody].ignoreContact) continue;
+                if (intObj.ignoreContact) continue;
+                if (intObj.isGrasped) continue;
               }
 
               PhysicsUtility.generateCapsuleContact(boneCapsule, 0,
@@ -1190,7 +1197,8 @@ namespace Leap.Unity.Interaction {
               IInteractionBehaviour intObj;
               if (manager.interactionObjectBodies.TryGetValue(_softContactColliderBuffer[i].attachedRigidbody, out intObj)) {
                 // Skip soft contact if the object is ignoring contact.
-                if (manager.interactionObjectBodies[_softContactColliderBuffer[i].attachedRigidbody].ignoreContact) continue;
+                if (intObj.ignoreContact) continue;
+                if (intObj.isGrasped) continue;
               }
 
               PhysicsUtility.generateBoxContact(boneBox, 0, _softContactColliderBuffer[i],

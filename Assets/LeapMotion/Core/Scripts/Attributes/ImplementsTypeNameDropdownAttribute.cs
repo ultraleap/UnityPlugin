@@ -1,7 +1,18 @@
-﻿using System;
+/******************************************************************************
+ * Copyright (C) Leap Motion, Inc. 2011-2017.                                 *
+ * Leap Motion proprietary and  confidential.                                 *
+ *                                                                            *
+ * Use subject to the terms of the Leap Motion SDK Agreement available at     *
+ * https://developer.leapmotion.com/sdk_agreement, or another agreement       *
+ * between Leap Motion and you, your company or other organization.           *
+ ******************************************************************************/
+
+using System;
 using System.Collections;
 using System.Collections.Generic;
+#if UNITY_EDITOR
 using UnityEditor;
+#endif
 using UnityEngine;
 
 namespace Leap.Unity.Attributes {
@@ -16,17 +27,20 @@ namespace Leap.Unity.Attributes {
   public class ImplementsTypeNameDropdownAttribute : CombinablePropertyAttribute,
                                                      IFullPropertyDrawer {
     
-    private Type _baseType;
-    private List<Type> _implementingTypes = new List<Type>();
-    private GUIContent[] _typeOptions;
+    protected Type _baseType;
+    protected List<Type> _implementingTypes = new List<Type>();
+    protected GUIContent[] _typeOptions;
 
     public ImplementsTypeNameDropdownAttribute(Type type) {
       _baseType = type;
 
+#if UNITY_EDITOR
       refreshImplementingTypes();
       refreshTypeOptions();
+#endif
     }
 
+#if UNITY_EDITOR
     public void DrawProperty(Rect rect, SerializedProperty property, GUIContent label) {
       int curSelectedIdx = getCurSelectedIdx(property);
 
@@ -64,6 +78,7 @@ namespace Leap.Unity.Attributes {
     private int getCurSelectedIdx(SerializedProperty property) {
       return _implementingTypes.FindIndex((t => property.stringValue.Equals(t.FullName)));
     }
+#endif
   }
 
 

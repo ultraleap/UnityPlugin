@@ -115,10 +115,11 @@ namespace Leap.Unity {
 
     private void drawElementCallback(Rect rect, int index, bool isActive, bool isFocused) {
       Rect leftRect = rect;
-      leftRect.width *= 0.5f;
+      leftRect.width *= (fieldInfo.GetValue(_currProperty.serializedObject.targetObject) as ISerializableDictionary).KeyDisplayRatio();
 
-      Rect rightRect = leftRect;
-      rightRect.x += rightRect.width;
+      Rect rightRect = rect;
+      rightRect.x += leftRect.width;
+      rightRect.width -= leftRect.width;
 
       Pair pair = _pairs[index];
 

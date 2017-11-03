@@ -1,7 +1,18 @@
-﻿using System;
+/******************************************************************************
+ * Copyright (C) Leap Motion, Inc. 2011-2017.                                 *
+ * Leap Motion proprietary and  confidential.                                 *
+ *                                                                            *
+ * Use subject to the terms of the Leap Motion SDK Agreement available at     *
+ * https://developer.leapmotion.com/sdk_agreement, or another agreement       *
+ * between Leap Motion and you, your company or other organization.           *
+ ******************************************************************************/
+
+using System;
 using System.Collections.Generic;
 using UnityEngine;
+#if UNITY_EDITOR
 using UnityEditor;
+#endif
 using Leap.Unity.Query;
 
 namespace Leap.Unity.Recording {
@@ -13,13 +24,14 @@ namespace Leap.Unity.Recording {
     public class BindingSet : SerializableHashSet<string> { }
 
     [SerializeField]
-    private List<string> _bindings = new List<string>();
+    protected List<string> _bindings = new List<string>();
 
     [SerializeField]
-    private List<string> _expandedTypes = new List<string>();
+    protected List<string> _expandedTypes = new List<string>();
 
+#if UNITY_EDITOR
     [NonSerialized]
-    private List<EditorCurveBinding> _cachedBindings;
+    protected List<EditorCurveBinding> _cachedBindings;
     public List<EditorCurveBinding> GetBindings(GameObject root) {
       if (_cachedBindings == null) {
         _cachedBindings =
@@ -69,6 +81,6 @@ namespace Leap.Unity.Recording {
     private string getKey(EditorCurveBinding binding) {
       return binding.type.Name + " : " + binding.propertyName;
     }
+#endif
   }
-
 }

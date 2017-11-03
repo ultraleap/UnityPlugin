@@ -1,4 +1,13 @@
-﻿using Leap.Unity.Recording;
+/******************************************************************************
+ * Copyright (C) Leap Motion, Inc. 2011-2017.                                 *
+ * Leap Motion proprietary and  confidential.                                 *
+ *                                                                            *
+ * Use subject to the terms of the Leap Motion SDK Agreement available at     *
+ * https://developer.leapmotion.com/sdk_agreement, or another agreement       *
+ * between Leap Motion and you, your company or other organization.           *
+ ******************************************************************************/
+
+using Leap.Unity.Recording;
 using UnityEngine;
 
 public class RecorderBuddy : MonoBehaviour {
@@ -8,8 +17,9 @@ public class RecorderBuddy : MonoBehaviour {
   public float recordingDuration = 1f;
   public KeyCode recordButton = KeyCode.Space;
 
-  private float _curDuration = 0f;
+  protected float _curDuration = 0f;
 
+#if UNITY_EDITOR
   void Reset() {
     if (recorder == null) {
       recorder = GetComponent<HierarchyRecorder>();
@@ -29,5 +39,5 @@ public class RecorderBuddy : MonoBehaviour {
       _curDuration += Time.deltaTime;
     }
   }
-
+#endif
 }

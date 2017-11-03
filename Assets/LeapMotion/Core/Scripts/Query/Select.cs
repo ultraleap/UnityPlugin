@@ -54,10 +54,26 @@ namespace Leap.Unity.Query {
 
     /// <summary>
     /// Returns a new query operation representing the current query sequence where each element is cast
-    /// to a new type.
+    /// to a new type.  This method ONLY works for casting to types that are reference types.  If you want
+    /// to cast to a specific primitive like float or int, you can use one of the methods defined in
+    /// the DirectQueryExtensions, like ToFloats or ToInts. For casting to a sequence of structs, you will 
+    /// need to use an explicit Select statement like.
     /// </summary>
     public QueryWrapper<NewType, SelectOp<QueryType, NewType, QueryOp>> Cast<NewType>() where NewType : class {
       return Select(obj => obj as NewType);
+    }
+
+    /// <summary>
+    /// Returns a new query operation representing the string representation of each of the elements
+    /// in the source sequence.
+    /// 
+    /// For example:
+    ///   (1, 2, 3, 4).Query().ToStrings()
+    /// Would result in:
+    ///   ("1", "2", "3", "4")
+    /// </summary>
+    public QueryWrapper<string, SelectOp<QueryType, string, QueryOp>> ToStrings() {
+      return Select(obj => obj.ToString());
     }
   }
 }

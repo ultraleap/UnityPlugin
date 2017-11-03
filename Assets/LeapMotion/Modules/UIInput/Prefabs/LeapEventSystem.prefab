@@ -5,11 +5,11 @@ GameObject:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  serializedVersion: 4
+  serializedVersion: 5
   m_Component:
-  - 4: {fileID: 479714}
-  - 114: {fileID: 11418986}
-  - 114: {fileID: 11484536}
+  - component: {fileID: 479714}
+  - component: {fileID: 11418986}
+  - component: {fileID: 11484536}
   m_Layer: 0
   m_Name: LeapEventSystem
   m_TagString: Untagged
@@ -26,10 +26,10 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &11418986
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -99,12 +99,14 @@ MonoBehaviour:
   PointerDistanceScale:
     serializedVersion: 2
     m_Curve:
-    - time: 0
+    - serializedVersion: 2
+      time: 0
       value: 0.1
       inSlope: 0
       outSlope: 0.15
       tangentMode: 0
-    - time: 6
+    - serializedVersion: 2
+      time: 6
       value: 1
       inSlope: 0.15
       outSlope: 0
@@ -115,12 +117,14 @@ MonoBehaviour:
   PointerPinchScale:
     serializedVersion: 2
     m_Curve:
-    - time: 29.960255
+    - serializedVersion: 2
+      time: 29.960255
       value: 0.6020917
       inSlope: 0.018969504
       outSlope: 0.018969504
       tangentMode: 0
-    - time: 70.01795
+    - serializedVersion: 2
+      time: 70.01795
       value: 1.101783
       inSlope: 0.0040388247
       outSlope: 0.0040388247
@@ -142,6 +146,7 @@ MonoBehaviour:
   OverrideScrollViewClicks: 0
   DrawDebug: 0
   RetractUI: 0
+  MovingReferenceFrame: 0
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1

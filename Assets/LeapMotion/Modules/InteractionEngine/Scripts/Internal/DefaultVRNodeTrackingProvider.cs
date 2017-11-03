@@ -11,7 +11,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.VR;
+using UnityEngine.XR;
 
 namespace Leap.Unity.Interaction {
   
@@ -27,8 +27,8 @@ namespace Leap.Unity.Interaction {
     public bool isTracked { get { return _isTrackingController; } }
 
     private bool _isVRNodeSet = false;
-    private VRNode _backingVRNode;
-    public VRNode vrNode {
+    private XRNode _backingVRNode;
+    public XRNode vrNode {
       get { return _backingVRNode; }
       set { _backingVRNode = value; _isVRNodeSet = true; }
     }

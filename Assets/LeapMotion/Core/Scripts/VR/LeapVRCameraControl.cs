@@ -14,9 +14,9 @@ using System;
 namespace Leap.Unity {
 
   /// <summary>
-  /// Provides a variety of VR related camera utilities, for example controlling IPD and camera distance.
+  /// Provides a handful of VR related camera utilities, such as controlling IPD and
+  /// camera distance.
   /// </summary>
-  //[RequireComponent(typeof(Camera))]
   public class LeapVRCameraControl : MonoBehaviour {
 
     private Matrix4x4 _finalCenterMatrix;
@@ -76,11 +76,10 @@ namespace Leap.Unity {
       }
 
       Matrix4x4 offsetMatrix;
-
+      
       offsetMatrix = _finalCenterMatrix;
-      //Debug.Log(_deviceInfo.baseline);
       Vector3 ipdOffset = (_eyeType.IsLeftEye ? 1 : -1) * transform.right * _deviceInfo.baseline * 0.5f;
-      Vector3 forwardOffset = -transform.forward * _deviceInfo.focalPlaneOffset;
+      Vector3 forwardOffset = -transform.forward * _deviceInfo.forwardOffset;
       offsetMatrix *= Matrix4x4.TRS(ipdOffset + forwardOffset, Quaternion.identity, Vector3.one);
 
       _camera.worldToCameraMatrix = offsetMatrix;

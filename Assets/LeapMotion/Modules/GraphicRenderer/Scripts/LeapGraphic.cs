@@ -330,6 +330,11 @@ namespace Leap.Unity.GraphicalRenderer {
           Mathf.Abs(rectTransform.sizeDelta.y - 100) < Mathf.Epsilon) {
         rectTransform.sizeDelta = Vector3.one * 0.1f;
       }
+
+      var parentRenderer = GetComponentInParent<LeapGraphicRenderer>();
+      if (parentRenderer != null) {
+        parentRenderer.TryAddGraphic(this);
+      }
     }
 
     protected virtual void OnValidate() {
@@ -351,63 +356,7 @@ namespace Leap.Unity.GraphicalRenderer {
     }
 
     protected virtual void OnEnable() {
-#if UNITY_EDITOR
-      if (InternalUtility.IsPrefab(this)) {
-        return;
-      }
-
-      if (Application.isPlaying) {
-#endif
-        //If we are not attached, and if we are about not about to become attached
-        if (!isAttachedToGroup && !_willBeAttached) {
-          var parentRenderer = GetComponentInParent<LeapGraphicRenderer>();
-          if (parentRenderer != null) {
-            parentRenderer.TryAddGraphic(this);
-          }
-        }
-
-        patchReferences();
-#if UNITY_EDITOR
-      }
-#endif
-    }
-
-    protected virtual void Start() {
-#if UNITY_EDITOR
-      if (InternalUtility.IsPrefab(this)) {
-        return;
-      }
-
-      if (Application.isPlaying) {
-#endif
-        //If we are not attached, and if we are about not about to become attached
-        if (!isAttachedToGroup && !_willBeAttached) {
-          var parentRenderer = GetComponentInParent<LeapGraphicRenderer>();
-          if (parentRenderer != null) {
-            parentRenderer.TryAddGraphic(this);
-          }
-        }
-#if UNITY_EDITOR
-      }
-#endif
-    }
-
-    protected virtual void OnDisable() {
-#if UNITY_EDITOR
-      if (InternalUtility.IsPrefab(this)) {
-        return;
-      }
-
-      if (Application.isPlaying) {
-#endif
-        if (isAttachedToGroup) {
-          attachedGroup.TryRemoveGraphic(this);
-        } else if (_willBeAttached) {
-          _groupToBeAttachedTo.TryRemoveGraphic(this);
-        }
-#if UNITY_EDITOR
-      }
-#endif
+      patchReferences();
     }
 
     protected virtual void OnDrawGizmos() {
@@ -415,7 +364,6 @@ namespace Leap.Unity.GraphicalRenderer {
       editor.OnDrawGizmos();
 #endif
     }
-
 
     #endregion
 

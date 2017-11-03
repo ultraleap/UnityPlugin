@@ -1,4 +1,12 @@
-﻿using UnityEditor;
+/******************************************************************************
+ * Copyright (C) Leap Motion, Inc. 2011-2017.                                 *
+ * Leap Motion proprietary and  confidential.                                 *
+ *                                                                            *
+ * Use subject to the terms of the Leap Motion SDK Agreement available at     *
+ * https://developer.leapmotion.com/sdk_agreement, or another agreement       *
+ * between Leap Motion and you, your company or other organization.           *
+ ******************************************************************************/
+
 using UnityEngine;
 
 namespace Leap.Unity.Recording {
@@ -57,6 +65,7 @@ namespace Leap.Unity.Recording {
     /// </summary>
     public void AddKeyframes(float time, Hand hand) {
       bool isTracked = hand != null;
+      
       isTrackedCurve.AddBooleanKey(time, isTracked);
 
       if (isTracked) {
@@ -77,6 +86,7 @@ namespace Leap.Unity.Recording {
       }
     }
 
+#if UNITY_EDITOR
     /// <summary>
     /// Compresses the AnimationCurve data currently held in these VectorHandCurves.
     /// </summary>
@@ -90,6 +100,7 @@ namespace Leap.Unity.Recording {
         jointPositionCurves[i].Compress(maxDistanceError: 0.001f);
       }
     }
+#endif
 
     /// <summary>
     /// Samples hand curve data into the provided hand object at the specified time.

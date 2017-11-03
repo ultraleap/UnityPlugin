@@ -108,7 +108,6 @@ Camera:
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
-  m_StereoMirrorMode: 0
 --- !u!81 &81757824912882912
 AudioListener:
   m_ObjectHideFlags: 1

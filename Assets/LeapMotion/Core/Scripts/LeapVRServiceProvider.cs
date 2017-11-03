@@ -8,11 +8,19 @@
  ******************************************************************************/
 
 using UnityEngine;
-using UnityEngine.VR;
+using UnityEngine.XR;
 using System;
+using Leap.Unity.Attributes;
 
 namespace Leap.Unity {
-  /**LeapServiceProvider creates a Controller and supplies Leap Hands and images */
+  /*LeapServiceProvider creates a Controller and supplies Leap Hands and images */
+
+  /// <summary>
+  /// The LeapVRServiceProvider expands on the standard LeapServiceProvider to
+  /// account for the offset of the Leap device with respect to the attached HMD and
+  /// warp tracked hand positions based on the motion of the headset to account for the
+  /// differing latencies of the two tracking systems.
+  /// </summary>
   public class LeapVRServiceProvider : LeapServiceProvider {
     //public static event Action<Camera> OnLeftPreRender;
     //public static event Action<Camera> OnRightPreRender;
@@ -35,8 +43,75 @@ namespace Leap.Unity {
     //private Matrix4x4 _projectionMatrix;
     //private bool IsLeftEye = true;
 
-    [Range(-0.30f, 0.30f)]
-    public float deviceZOffset = 0.12f;
+    #region Device Offset
+      
+    private const float DEFAULT_DEVICE_OFFSET_Y_AXIS = 0f;
+    private const float DEFAULT_DEVICE_OFFSET_Z_AXIS = 0.12f;
+    private const float DEFAULT_DEVICE_TILT_X_AXIS = 5f;
+
+    [Tooltip("Allow manual adjustment of the Leap device's virtual offset and tilt. These "
+           + "settings can be used to match the physical position and orientation of the "
+           + "Leap Motion sensor on a tracked device it is mounted on (such as a VR "
+           + "headset.)")]
+    [SerializeField, OnEditorChange("allowManualDeviceOffset")]
+    private bool _allowManualDeviceOffset;
+    public bool allowManualDeviceOffset {
+      get { return _allowManualDeviceOffset; }
+      set {
+        _allowManualDeviceOffset = value;
+        if (!_allowManualDeviceOffset) {
+          deviceOffsetYAxis = DEFAULT_DEVICE_OFFSET_Y_AXIS;
+          deviceOffsetZAxis = DEFAULT_DEVICE_OFFSET_Z_AXIS;
+          deviceTiltXAxis   = DEFAULT_DEVICE_TILT_X_AXIS;
+        }
+      }
+    }
+
+    [Tooltip("Adjusts the Leap Motion device's virtual height offset from the tracked "
+           + "headset position. This should match the vertical offset of the physical "
+           + "device with respect to the headset in meters.")]
+    [SerializeField]
+    [Range(-0.50F, 0.50F)]
+    private float _deviceOffsetYAxis = DEFAULT_DEVICE_OFFSET_Y_AXIS;
+    public float deviceOffsetYAxis {
+      get {
+        return _deviceOffsetYAxis;
+      }
+      set {
+        _deviceOffsetYAxis = value;
+      }
+    }
+
+    [Tooltip("Adjusts the Leap Motion device's virtual depth offset from the tracked "
+           + "headset position. This should match the forward offset of the physical "
+           + "device with respect to the headset in meters.")]
+    [SerializeField]
+    [Range(-0.50F, 0.50F)]
+    private float _deviceOffsetZAxis = DEFAULT_DEVICE_OFFSET_Z_AXIS;
+    public float deviceOffsetZAxis {
+      get {
+        return _deviceOffsetZAxis;
+      }
+      set {
+        _deviceOffsetZAxis = value;
+      }
+    }
+
+    [Tooltip("Adjusts the Leap Motion device's virtual X axis tilt. This should match "
+           + "the tilt of the physical device with respect to the headset in degrees.")]
+    [SerializeField]
+    [Range(-90.0F, 90.0F)]
+    private float _deviceTiltXAxis = DEFAULT_DEVICE_TILT_X_AXIS;
+    public float deviceTiltXAxis {
+      get {
+        return _deviceTiltXAxis;
+      }
+      set {
+        _deviceTiltXAxis = value;
+      }
+    }
+
+    #endregion
 
     [NonSerialized]
     public long imageTimeStamp = 0;
@@ -59,15 +134,19 @@ namespace Leap.Unity {
     protected override void Update() {
       manualUpdateHasBeenCalledSinceUpdate = false;
       base.Update();
-      imageTimeStamp = leap_controller_.FrameTimestamp();
+      imageTimeStamp = _leapController.FrameTimestamp();
     }
 
     protected override long CalculateInterpolationTime(bool endOfFrame = false) {
 #if UNITY_ANDROID
       return leap_controller_.Now() - 16000;
 #else
-      if (leap_controller_ != null) {
-        return leap_controller_.Now() - (long)_smoothedTrackingLatency.value + (_updateHandInPrecull && !endOfFrame ? (long)(Time.smoothDeltaTime * S_TO_NS / Time.timeScale) : 0);
+      if (_leapController != null) {
+        return _leapController.Now()
+               - (long)_smoothedTrackingLatency.value
+               + ((_updateHandInPrecull && !endOfFrame)?
+                    (long)(Time.smoothDeltaTime * S_TO_NS / Time.timeScale)
+                  : 0);
       } else {
         return 0;
       }
@@ -82,9 +161,9 @@ namespace Leap.Unity {
 #endif
 
       transformHistory.UpdateDelay(
-        InputTracking.GetLocalPosition(VRNode.CenterEye),
-        InputTracking.GetLocalRotation(VRNode.CenterEye),
-        leap_controller_.Now());
+        InputTracking.GetLocalPosition(XRNode.CenterEye),
+        InputTracking.GetLocalRotation(XRNode.CenterEye),
+        _leapController.Now());
 
       LateUpdateHandTransforms(_cachedCamera);
 
@@ -107,7 +186,7 @@ namespace Leap.Unity {
       // Update Image Warping
       Vector3 position; Quaternion rotation;
       transformHistory.SampleTransform(imageTimeStamp /*- ((long)_smoothedTrackingLatency.value+20000)*/, out position, out rotation);
-      Quaternion imageQuatWarp = Quaternion.Inverse(InputTracking.GetLocalRotation(VRNode.CenterEye)) * rotation;
+      Quaternion imageQuatWarp = Quaternion.Inverse(InputTracking.GetLocalRotation(XRNode.CenterEye)) * rotation;
       imageQuatWarp = Quaternion.Euler(imageQuatWarp.eulerAngles.x, imageQuatWarp.eulerAngles.y, -imageQuatWarp.eulerAngles.z);
       Matrix4x4 imageMatWarp = projectionMatrix * Matrix4x4.TRS(Vector3.zero, imageQuatWarp, Vector3.one) * projectionMatrix.inverse;
       Shader.SetGlobalMatrix("_LeapGlobalWarpedOffset", imageMatWarp);
@@ -137,27 +216,26 @@ namespace Leap.Unity {
     /// The POLICY_OPTIMIZE_HMD flag improves tracking for head-mounted devices.
     /// </summary>
     protected override void initializeFlags() {
-      if (leap_controller_ == null) {
+      if (_leapController == null) {
         return;
       }
       // Optimize for top-down tracking if on head mounted display.
-      leap_controller_.SetPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
+      _leapController.SetPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
     }
 
     protected virtual LeapTransform GetWarpedMatrix(long timestamp, bool updateTemporalCompensation = true) {
       LeapTransform leapTransform;
-      if (VRSettings.enabled && VRDevice.isPresent && transformHistory != null) {
+      if (XRSettings.enabled && XRDevice.isPresent && transformHistory != null) {
         if (updateTemporalCompensation && transformHistory.history.IsFull) {
           transformHistory.SampleTransform(timestamp - ((long)_smoothedTrackingLatency.value), out warpedPosition, out warpedRotation);
         }
 
+        warpedRotation *= Quaternion.Euler(deviceTiltXAxis, 0f, 0f);
         warpedRotation *= Quaternion.Euler(-90f, 180f, 0f);
-        //warpedRotation = Quaternion.Euler(0f, 5f, 0f) * warpedRotation; // Tilt
-        //warpedPosition += warpedRotation * Vector3.up * 0.12f;          // Forward offset
-        // TODO: Add back Manual Device Offset, replacing the manual 12cm up above
-        // TEMPORARY: Use a forward offset of zero instead, to get hands to align in
-        // the AR scene.
-        warpedPosition += warpedRotation * Vector3.up * deviceZOffset;
+
+        // Yes, up corresponds to Z and forward corresponds to Y post-rotation.
+        warpedPosition += warpedRotation * Vector3.up * deviceOffsetZAxis
+                        + warpedRotation * Vector3.forward * deviceOffsetYAxis;
 
         if (transform.parent != null) {
           leapTransform = new LeapTransform(
@@ -199,7 +277,7 @@ namespace Leap.Unity {
         }
 #endif
 
-        if (Application.isPlaying && !manualUpdateHasBeenCalledSinceUpdate && leap_controller_ != null) {
+        if (Application.isPlaying && !manualUpdateHasBeenCalledSinceUpdate && _leapController != null) {
           manualUpdateHasBeenCalledSinceUpdate = true;
           //Find the Left and/or Right Hand(s) to Latch
           Hand leftHand = null, rightHand = null;
@@ -214,7 +292,7 @@ namespace Leap.Unity {
           }
 
           //Determine their new Transforms
-          leap_controller_.GetInterpolatedLeftRightTransform(CalculateInterpolationTime() + (ExtrapolationAmount * 1000), CalculateInterpolationTime() - (BounceAmount * 1000), (leftHand != null ? leftHand.Id : 0), (rightHand != null ? rightHand.Id : 0), out PrecullLeftHand, out PrecullRightHand);
+          _leapController.GetInterpolatedLeftRightTransform(CalculateInterpolationTime() + (ExtrapolationAmount * 1000), CalculateInterpolationTime() - (BounceAmount * 1000), (leftHand != null ? leftHand.Id : 0), (rightHand != null ? rightHand.Id : 0), out PrecullLeftHand, out PrecullRightHand);
           bool LeftValid = PrecullLeftHand.translation != Vector.Zero; bool RightValid = PrecullRightHand.translation != Vector.Zero;
           transformHands(ref PrecullLeftHand, ref PrecullRightHand);
 

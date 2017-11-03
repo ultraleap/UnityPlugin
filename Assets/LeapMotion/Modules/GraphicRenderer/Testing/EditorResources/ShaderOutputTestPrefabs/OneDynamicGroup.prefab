@@ -136,7 +136,6 @@ Camera:
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
-  m_StereoMirrorMode: 0
 --- !u!114 &114539252627584896
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -161,6 +160,7 @@ MonoBehaviour:
     _h: []
   _attachedRenderer: {fileID: 114714561821751832}
   _attachedGroupIndex: 0
+  _favoriteGroupName: 
   _preferredRendererType:
     _fullName: Leap.Unity.GraphicalRenderer.LeapDynamicRenderer
   vertexColor: {r: 1, g: 1, b: 1, a: 1}
@@ -180,7 +180,8 @@ MonoBehaviour:
   _selectedGroup: 0
   _space: {fileID: 0}
   _groups:
-  - _renderingMethod:
+  - _groupName: 
+    _renderingMethod:
       _index: 1
       _a: []
       _b:

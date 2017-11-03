@@ -134,6 +134,15 @@ namespace Leap.Unity.Query {
     }
 
     /// <summary>
+    /// Converts a two dimensional array into a query operation, and returns a query
+    /// wrapper that wraps this new operation. Elements are traversed in row-major
+    /// (C-style) order.
+    /// </summary>
+    public static QueryWrapper<T, Array2DQueryOp<T>> Query<T>(this T[,] array) {
+      return new QueryWrapper<T, Array2DQueryOp<T>>(new Array2DQueryOp<T>(array));
+    }
+
+    /// <summary>
     /// Converts a ReadonlyList object into a query operation, and returns a query wrapper
     /// that wraps this new operation.
     /// </summary>
@@ -214,6 +223,40 @@ namespace Leap.Unity.Query {
 
       public void Reset() {
         _index = 0;
+      }
+    }
+
+    public struct Array2DQueryOp<T> : IQueryOp<T> {
+      private T[,] _array;
+      private int _numCols, _numRows;
+      private int _colIdx, _rowIdx;
+
+      public Array2DQueryOp(T[,] array) {
+        _array = array;
+        _numRows = array.GetLength(0);
+        _numCols = array.GetLength(1);
+        _rowIdx = 0;
+        _colIdx = 0;
+      }
+
+      public bool TryGetNext(out T t) {
+        if (_rowIdx >= _numRows) {
+          t = default(T);
+          return false;
+        }
+
+        t = _array[_rowIdx, _colIdx]; // C-style, row-major (C# standard)
+        _colIdx++;
+        if (_colIdx >= _numCols) {
+          _colIdx = 0;
+          _rowIdx++;
+        }
+        return true;
+      }
+
+      public void Reset() {
+        _rowIdx = 0;
+        _colIdx = 0;
       }
     }
 

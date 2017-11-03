@@ -10,6 +10,7 @@
 using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
 using NUnit.Framework;
 
 namespace Leap.Unity.Query.Test {
@@ -31,6 +32,25 @@ namespace Leap.Unity.Query.Test {
     public void AnyTest() {
       Assert.AreEqual(LIST_0.Any(i => i == 4),
                       LIST_0.Query().Any(i => i == 4));
+    }
+
+    [Test]
+    public void Array2DTest() {
+      const int WIDTH = 23;
+      const int HEIGHT = 17;
+
+      int[,] array = new int[WIDTH, HEIGHT];
+      int counter = 0;
+      for (int i = 0; i < WIDTH; i++) {
+        for (int j = 0; j < HEIGHT; j++) {
+          array[i, j] = counter++;
+        }
+      }
+
+      Assert.That(array.Query().Count(), Is.EqualTo(WIDTH * HEIGHT));
+      foreach (var value in Enumerable.Range(0, WIDTH * HEIGHT)) {
+        Assert.That(array.Query().Contains(value));
+      }
     }
 
     [Test]
@@ -172,6 +192,74 @@ namespace Leap.Unity.Query.Test {
 
       Assert.That(objs.OfType<string>().SequenceEqual(
                   objs.Query().OfType(typeof(string)).Cast<string>().ToList()));
+    }
+
+    [Test]
+    public void RangeFrom([Values(0, 1, 2, 100, -1, -2, -100)] int startValue) {
+      int index = startValue;
+      int itterations = 0;
+      foreach (var value in Values.From(startValue)) {
+        Assert.That(value, Is.EqualTo(index));
+        index++;
+        itterations++;
+
+        if (itterations > 1000) {
+          Assert.Pass();
+          return;
+        }
+      }
+    }
+
+    [Test]
+    [Pairwise]
+    public void RangeFromTo([Values(0, 1, 100, -1, -100)] int startValue,
+                            [Values(0, 1, 100, -1, -100)] int endValue,
+                            [Values(1, 2, -1, -2, 0)] int step) {
+      List<int> items = new List<int>();
+      if (step != 0) {
+        int i = startValue;
+        while (true) {
+          if (i == endValue) {
+            break;
+          }
+
+          if ((i > endValue) == (endValue > startValue)) {
+            break;
+          }
+
+          items.Add(i);
+          if (endValue > startValue) {
+            i += Mathf.Abs(step);
+          } else {
+            i -= Mathf.Abs(step);
+          }
+        }
+      }
+
+      Assert.That(Values.From(startValue).To(endValue).By(step).ToList(), Is.EquivalentTo(items));
+    }
+
+    [Test]
+    public void Repeat([Values(0, 1, 2, 3, 100)] int repetitions) {
+      List<int> list = new List<int>();
+      for (int i = 0; i < repetitions; i++) {
+        list.AddRange(LIST_0);
+      }
+
+      Assert.That(list.SequenceEqual(
+                  LIST_0.Query().Repeat(repetitions).ToList()));
+    }
+
+    [Test]
+    public void RepeatForever() {
+      int count = 0;
+      foreach (var value in LIST_0.Query().Repeat()) {
+        count++;
+        if (count >= 10000) {
+          Assert.Pass();
+          return;
+        }
+      }
     }
 
     [Test]

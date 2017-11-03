@@ -1,4 +1,13 @@
-﻿using Leap.Unity.Query;
+/******************************************************************************
+ * Copyright (C) Leap Motion, Inc. 2011-2017.                                 *
+ * Leap Motion proprietary and  confidential.                                 *
+ *                                                                            *
+ * Use subject to the terms of the Leap Motion SDK Agreement available at     *
+ * https://developer.leapmotion.com/sdk_agreement, or another agreement       *
+ * between Leap Motion and you, your company or other organization.           *
+ ******************************************************************************/
+
+using Leap.Unity.Query;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -30,6 +39,7 @@ namespace Leap.Unity.Recording {
       rightHandCurves.AddKeyframes(keyframeTime, rightHand);
     }
 
+#if UNITY_EDITOR
     /// <summary>
     /// Processes all of the current keyframe data and compresses them using
     /// AnimationCurveUtil.
@@ -38,6 +48,7 @@ namespace Leap.Unity.Recording {
       leftHandCurves .Compress();
       rightHandCurves.Compress();
     }
+#endif
 
     /// <summary>
     /// Samples the data in these VectorFrameCurves at the specified time into the

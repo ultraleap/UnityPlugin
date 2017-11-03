@@ -156,7 +156,7 @@ namespace Leap.Unity.Examples {
       }
     }
 
-    private void onPostObjectGraspEnd(AnchorableBehaviour anchObj) {
+    private void onPostObjectGraspEnd() {
       if (_anchObj.preferredAnchor == null) {
         // Choose a good position and rotation for workstation mode and begin traveling there.
         Vector3 targetPosition;

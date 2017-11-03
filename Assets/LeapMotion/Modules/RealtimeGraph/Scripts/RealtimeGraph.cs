@@ -301,7 +301,7 @@ namespace Leap.Unity.Graphing {
 
         float gpuTime;
 #if UNITY_5_6_OR_NEWER
-        UnityEngine.VR.VRStats.TryGetGPUTimeLastFrame(out gpuTime);
+        UnityEngine.XR.XRStats.TryGetGPUTimeLastFrame(out gpuTime);
 #else
         gpuTime = UnityEngine.VR.VRStats.gpuTimeLastFrame;
 #endif
