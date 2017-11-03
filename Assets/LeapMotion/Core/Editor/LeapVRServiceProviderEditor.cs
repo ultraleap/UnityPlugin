@@ -14,6 +14,7 @@ namespace Leap.Unity {
 
   [CustomEditor(typeof(LeapVRServiceProvider))]
   public class LeapVRServiceProviderEditor : LeapServiceProviderEditor {
+
     protected override void OnEnable() {
       base.OnEnable();
       isVRProvider = true;
@@ -22,6 +23,15 @@ namespace Leap.Unity {
     public override void OnSceneGUI() {
       arcDirection = Vector3.up;
       deviceRotation = Quaternion.Euler(90f, 0f, 0f);
+
+      var vrProvider = target as LeapVRServiceProvider;
+
+      deviceRotation *= Quaternion.Euler(vrProvider.deviceTiltXAxis, 0f, 0f);
+
+      controllerOffset = new Vector3(0f,
+                                     vrProvider.deviceOffsetYAxis,
+                                     vrProvider.deviceOffsetZAxis);
+
       base.OnSceneGUI();
     }
   }
