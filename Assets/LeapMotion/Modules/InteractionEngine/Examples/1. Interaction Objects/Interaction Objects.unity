@@ -3647,7 +3647,7 @@ GameObject:
   - component: {fileID: 562705183}
   - component: {fileID: 562705184}
   m_Layer: 0
-  m_Name: LMHeadMountedRig
+  m_Name: Leap Rig
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6935,7 +6935,7 @@ GameObject:
   - component: {fileID: 1213026095}
   - component: {fileID: 1213026094}
   m_Layer: 0
-  m_Name: CenterEyeAnchor
+  m_Name: Center Eye Anchor
   m_TagString: MainCamera
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
