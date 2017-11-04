@@ -727,8 +727,7 @@ namespace Leap.Unity.Interaction {
         }
 
         if (_testHand == null && provider != null) {
-          _testHand = TestHandFactory.MakeTestHand(0, 0, this.isLeft)
-                                     .TransformedCopy(UnityMatrixExtension.GetLeapMatrix(provider.transform));
+          _testHand = provider.MakeTestHand(this.isLeft);
         }
 
         // Hover Point
