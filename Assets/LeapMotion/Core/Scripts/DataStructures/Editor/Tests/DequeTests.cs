@@ -10,7 +10,8 @@
 using System;
 using NUnit.Framework;
 
-namespace Leap.Unity {
+namespace Leap.Unity.Tests {
+
   public class DequeTests {
 
     private Deque<int> _buffer;
@@ -109,4 +110,5 @@ namespace Leap.Unity {
       }
     }
   }
+
 }
