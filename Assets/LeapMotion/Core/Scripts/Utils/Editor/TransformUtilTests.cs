@@ -10,7 +10,7 @@
 using UnityEngine;
 using NUnit.Framework;
 
-namespace Leap.Unity {
+namespace Leap.Unity.Tests {
 
   public class TransformUtilTests {
 
