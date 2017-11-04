@@ -25,29 +25,13 @@ namespace Leap.Unity {
     //public static event Action<Camera> OnLeftPreRender;
     //public static event Action<Camera> OnRightPreRender;
 
-    [Header("[Experimental]")]
-    [Tooltip("Pass updated transform matrices to objects with materials using the VertexOffsetShader.")]
-    [SerializeField]
-    protected bool _updateHandInPrecull = false;
-
-    protected TransformHistory transformHistory = new TransformHistory();
-    protected bool manualUpdateHasBeenCalledSinceUpdate;
-    protected Vector3    warpedPosition = Vector3.zero;
-    protected Quaternion warpedRotation = Quaternion.identity;
-    protected Matrix4x4[] _transformArray = new Matrix4x4[2];
-
-    private Camera _cachedCamera;
-    //public const string GLOBAL_EYE_UV_OFFSET_NAME = "_LeapGlobalStereoUVOffset";
-    //private static Vector2 LEFT_EYE_UV_OFFSET = new Vector2(0, 0);
-    //private static Vector2 RIGHT_EYE_UV_OFFSET = new Vector2(0, 0.5f);
-    //private Matrix4x4 _projectionMatrix;
-    //private bool IsLeftEye = true;
-
     #region Device Offset
-      
+
     private const float DEFAULT_DEVICE_OFFSET_Y_AXIS = 0f;
     private const float DEFAULT_DEVICE_OFFSET_Z_AXIS = 0.12f;
     private const float DEFAULT_DEVICE_TILT_X_AXIS = 5f;
+
+    [Header("Manual Device Offset")]
 
     [Tooltip("Allow manual adjustment of the Leap device's virtual offset and tilt. These "
            + "settings can be used to match the physical position and orientation of the "
@@ -62,7 +46,7 @@ namespace Leap.Unity {
         if (!_allowManualDeviceOffset) {
           deviceOffsetYAxis = DEFAULT_DEVICE_OFFSET_Y_AXIS;
           deviceOffsetZAxis = DEFAULT_DEVICE_OFFSET_Z_AXIS;
-          deviceTiltXAxis   = DEFAULT_DEVICE_TILT_X_AXIS;
+          deviceTiltXAxis = DEFAULT_DEVICE_TILT_X_AXIS;
         }
       }
     }
@@ -112,6 +96,24 @@ namespace Leap.Unity {
     }
 
     #endregion
+
+    [Header("[Experimental]")]
+    [Tooltip("Pass updated transform matrices to objects with materials using the VertexOffsetShader.")]
+    [SerializeField]
+    protected bool _updateHandInPrecull = false;
+
+    protected TransformHistory transformHistory = new TransformHistory();
+    protected bool manualUpdateHasBeenCalledSinceUpdate;
+    protected Vector3    warpedPosition = Vector3.zero;
+    protected Quaternion warpedRotation = Quaternion.identity;
+    protected Matrix4x4[] _transformArray = new Matrix4x4[2];
+
+    private Camera _cachedCamera;
+    //public const string GLOBAL_EYE_UV_OFFSET_NAME = "_LeapGlobalStereoUVOffset";
+    //private static Vector2 LEFT_EYE_UV_OFFSET = new Vector2(0, 0);
+    //private static Vector2 RIGHT_EYE_UV_OFFSET = new Vector2(0, 0.5f);
+    //private Matrix4x4 _projectionMatrix;
+    //private bool IsLeftEye = true;
 
     [NonSerialized]
     public long imageTimeStamp = 0;
