@@ -22,9 +22,6 @@ namespace Leap.Unity {
     protected Dictionary<int, HandRepresentation> graphicsHandReps = new Dictionary<int, HandRepresentation>();
     protected Dictionary<int, HandRepresentation> physicsHandReps = new Dictionary<int, HandRepresentation>();
 
-    // Reference distance from thumb base to pinky base in mm.
-    protected const float GIZMO_SCALE = 5.0f;
-
     protected bool graphicsEnabled = true;
     protected bool physicsEnabled = true;
 
@@ -44,12 +41,6 @@ namespace Leap.Unity {
       set {
         physicsEnabled = value;
       }
-    }
-
-    /** Draws the Leap Motion gizmo when in the Unity editor. */
-    void OnDrawGizmos() {
-      Gizmos.matrix = Matrix4x4.Scale(GIZMO_SCALE * Vector3.one);
-      Gizmos.DrawIcon(transform.position, "leap_motion.png");
     }
 
     protected virtual void OnEnable() {
