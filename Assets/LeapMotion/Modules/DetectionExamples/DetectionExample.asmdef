@@ -1,0 +1,8 @@
+{
+    "name": "DetectionExample",
+    "references": [
+        "Core"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": []
+}

@@ -1,0 +1,8 @@
+{
+    "name": "Hands",
+    "references": [
+        "Core"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": []
+}

@@ -1,0 +1,8 @@
+{
+    "name": "RealtimeGraph",
+    "references": [
+        "Core"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": []
+}

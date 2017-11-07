@@ -1,0 +1,8 @@
+{
+    "name": "Testing",
+    "references": [
+        "Core"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": []
+}

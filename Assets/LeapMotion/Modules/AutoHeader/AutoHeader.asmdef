@@ -1,0 +1,8 @@
+{
+    "name": "AutoHeader",
+    "references": [
+        "Core"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": []
+}

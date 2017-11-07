@@ -1,0 +1,10 @@
+{
+    "name": "GraphicRendererTests",
+    "references": [
+        "Core",
+        "Testing",
+        "GraphicRenderer"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": []
+}

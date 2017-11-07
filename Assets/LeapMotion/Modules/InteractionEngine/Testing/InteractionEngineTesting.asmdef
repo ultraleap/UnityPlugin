@@ -1,0 +1,10 @@
+{
+    "name": "InteractionEngineTesting",
+    "references": [
+        "Core",
+        "Testing",
+        "InteractionEngine"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": []
+}

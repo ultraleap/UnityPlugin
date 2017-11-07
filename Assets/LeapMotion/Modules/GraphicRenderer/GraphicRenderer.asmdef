@@ -1,0 +1,8 @@
+{
+    "name": "GraphicRenderer",
+    "references": [
+        "Core"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": []
+}

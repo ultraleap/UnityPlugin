@@ -1,0 +1,8 @@
+{
+    "name": "InteractionEngine",
+    "references": [
+        "Core"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": []
+}

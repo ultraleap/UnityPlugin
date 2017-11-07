@@ -1,0 +1,8 @@
+{
+    "name": "VRVisualizer",
+    "references": [
+        "Core"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": []
+}

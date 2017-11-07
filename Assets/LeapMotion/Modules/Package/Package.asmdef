@@ -1,0 +1,8 @@
+{
+    "name": "Package",
+    "references": [
+        "Core"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": []
+}
