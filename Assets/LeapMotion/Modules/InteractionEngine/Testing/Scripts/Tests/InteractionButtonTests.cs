@@ -17,146 +17,83 @@ using UnityEngine.TestTools;
 namespace Leap.Unity.Interaction.Tests {
 
   public class InteractionButtonTests : InteractionEngineTestBase {
-    
-    #region Primary Hover Lock
+
+    public enum ButtonEventType {
+      OnPress,
+      OnUnpress
+    }
+
+    public enum ButtonActionType {
+      DisableIt,
+      DestroyIt
+    }
 
     [UnityTest]
-    public IEnumerator CanDestroyButtonWhenPressed() {
+    public IEnumerator TestButtonActionsDuringEvents(
+        [Values(ButtonEventType.OnPress,
+                ButtonEventType.OnUnpress)] ButtonEventType buttonEventType,
+        [Values(ButtonActionType.DisableIt,
+                ButtonActionType.DestroyIt)] ButtonActionType buttonActionType
+      ) {
+
       yield return wait(beginningTestWait);
 
       InitTest(PRESS_BUTTON_RIG, DEFAULT_STAGE);
 
       // Wait before starting the test.
       yield return wait(aWhile);
-
-      // Play the grasping animation.
+      
+      // Play the button-pressing animation.
       recording.Play();
 
-      // Schedule the deletion of the button when the button is pressed.
-      bool pressed = false;
-      button.OnPress += () => {
-        pressed = true;
+      // Create the test action to perform when the event is fired.
+      System.Action buttonAction;
+      switch (buttonActionType) {
+        case ButtonActionType.DestroyIt:
+          buttonAction = () => { GameObject.Destroy(button); }; break;
+        case ButtonActionType.DisableIt:
+          buttonAction = () => { button.gameObject.SetActive(false); }; break;
+        default:
+          throw new System.NotImplementedException("This action is not implemented.");
+      }
 
-        GameObject.Destroy(button);
+      // Schedule the test action when the specified button event fires.
+      bool eventFired = false;
+      System.Action doOnEvent = () => {
+        eventFired = true;
+
+        buttonAction();
       };
+      switch (buttonEventType) {
+        case ButtonEventType.OnPress:
+          button.OnPress += doOnEvent; break;
+        case ButtonEventType.OnUnpress:
+          button.OnUnpress += doOnEvent; break;
+        default:
+          throw new System.NotImplementedException("This button event is not implemented.");
+      }
 
       // Wait until the button is pressed.
       int framesWaited = 0;
-      while (!pressed && framesWaited < WAIT_FOR_INTERACTION_FRAME_LIMIT) {
+      while (!eventFired && framesWaited < WAIT_FOR_INTERACTION_FRAME_LIMIT) {
         yield return null;
         framesWaited++;
       }
-      Assert.That(framesWaited != WAIT_FOR_INTERACTION_FRAME_LIMIT);
+      Assert.That(framesWaited != WAIT_FOR_INTERACTION_FRAME_LIMIT,
+                  "Test recording failed to press the button (fire the event).");
 
-      // Primary hover lock should NOT be active once the button is destroyed.
-      Assert.That(rightHand.primaryHoverLocked == false);
+      // If the button was disabled or destroyed, the primary hover lock should not
+      // be engaged.
+      if (buttonActionType == ButtonActionType.DestroyIt
+          || buttonActionType == ButtonActionType.DisableIt) {
 
-      yield return wait(endingTestWait);
-    }
-
-    [UnityTest]
-    public IEnumerator CanDestroyButtonWhenUnpressed() {
-      yield return wait(beginningTestWait);
-
-      InitTest(PRESS_BUTTON_RIG, DEFAULT_STAGE);
-
-      // Wait before starting the test.
-      yield return wait(aWhile);
-
-      // Play the grasping animation.
-      recording.Play();
-
-      // Schedule the deletion of the button when the button is pressed.
-      bool unpressed = false;
-      button.OnUnpress += () => {
-        unpressed = true;
-
-        GameObject.Destroy(button);
-      };
-
-      // Wait until the button is pressed.
-      int framesWaited = 0;
-      while (!unpressed && framesWaited < WAIT_FOR_INTERACTION_FRAME_LIMIT) {
-        yield return null;
-        framesWaited++;
+        Assert.That(rightHand.primaryHoverLocked == false,
+                    "Primary hover lock was active even after the button was disabled "
+                  + "or destroyed.");
       }
-      Assert.That(framesWaited != WAIT_FOR_INTERACTION_FRAME_LIMIT);
-
-      // Primary hover lock should NOT be active once the button is destroyed.
-      Assert.That(rightHand.primaryHoverLocked == false);
 
       yield return wait(endingTestWait);
     }
-
-    [UnityTest]
-    public IEnumerator CanDisableButtonWhenPressed() {
-      yield return wait(beginningTestWait);
-
-      InitTest(PRESS_BUTTON_RIG, DEFAULT_STAGE);
-
-      // Wait before starting the test.
-      yield return wait(aWhile);
-
-      // Play the grasping animation.
-      recording.Play();
-
-      // Schedule the deletion of the button when the button is pressed.
-      bool pressed = false;
-      button.OnPress += () => {
-        pressed = true;
-
-        button.gameObject.SetActive(false);
-      };
-
-      // Wait until the button is pressed.
-      int framesWaited = 0;
-      while (!pressed && framesWaited < WAIT_FOR_INTERACTION_FRAME_LIMIT) {
-        yield return null;
-        framesWaited++;
-      }
-      Assert.That(framesWaited != WAIT_FOR_INTERACTION_FRAME_LIMIT);
-
-      // Primary hover lock should NOT be active once the button is destroyed.
-      Assert.That(rightHand.primaryHoverLocked == false);
-
-      yield return wait(endingTestWait);
-    }
-
-    [UnityTest]
-    public IEnumerator CanDisableButtonWhenUnpressed() {
-      yield return wait(beginningTestWait);
-
-      InitTest(PRESS_BUTTON_RIG, DEFAULT_STAGE);
-
-      // Wait before starting the test.
-      yield return wait(aWhile);
-
-      // Play the grasping animation.
-      recording.Play();
-
-      // Schedule the deletion of the button when the button is pressed.
-      bool unpressed = false;
-      button.OnUnpress += () => {
-        unpressed = true;
-
-        button.gameObject.SetActive(false);
-      };
-
-      // Wait until the button is pressed.
-      int framesWaited = 0;
-      while (!unpressed && framesWaited < WAIT_FOR_INTERACTION_FRAME_LIMIT) {
-        yield return null;
-        framesWaited++;
-      }
-      Assert.That(framesWaited != WAIT_FOR_INTERACTION_FRAME_LIMIT);
-
-      // Primary hover lock should NOT be active once the button is destroyed.
-      Assert.That(rightHand.primaryHoverLocked == false);
-
-      yield return wait(endingTestWait);
-    }
-
-    #endregion
 
   }
 
