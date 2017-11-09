@@ -8,17 +8,20 @@
  ******************************************************************************/
 
 using UnityEngine;
-using UnityObject = UnityEngine.Object;
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
 using System;
 using System.Collections.Generic;
 using Leap.Unity.Query;
 
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
+
+using UnityObject = UnityEngine.Object;
+
 namespace Leap.Unity.Attributes {
 
-  public class ImplementsInterfaceAttribute : CombinablePropertyAttribute, IPropertyConstrainer {
+  public class ImplementsInterfaceAttribute : CombinablePropertyAttribute,
+                                              IPropertyConstrainer {
 
 #pragma warning disable 0414
     private Type type;
@@ -37,21 +40,21 @@ namespace Leap.Unity.Attributes {
         var objectReferenceValue = property.objectReferenceValue;
 
         if (objectReferenceValue.GetType().ImplementsInterface(type)) {
-          // All good! This Component implements the interface.
+          // All good! This object reference implements the interface.
           return;
         }
         else {
           UnityObject implementingObject;
 
           if (objectReferenceValue is Component) {
-            // If the object is a Component, first Search the rest of the GameObject 
-            // for a component that implements the interface.  If found, assign it instead,
+            // If the object is a Component, first search the rest of the GameObject 
+            // for a component that implements the interface. If found, assign it instead,
             // otherwise null out the property.
             implementingObject = (objectReferenceValue as Component)
-                                            .GetComponents<Component>()
-                                            .Query()
-                                            .Where(c => c.GetType().ImplementsInterface(type))
-                                            .FirstOrDefault();
+                                 .GetComponents<Component>()
+                                 .Query()
+                                 .Where(c => c.GetType().ImplementsInterface(type))
+                                 .FirstOrDefault();
           } 
           else {
             // If the object is not a Component, just null out the property.
