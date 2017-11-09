@@ -8,16 +8,20 @@
  ******************************************************************************/
 
 using UnityEngine;
+using System;
+using System.Collections.Generic;
+using Leap.Unity.Query;
+
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
-using System.Collections.Generic;
-using System;
-using Leap.Unity.Query;
+
+using UnityObject = UnityEngine.Object;
 
 namespace Leap.Unity.Attributes {
 
-  public class ImplementsInterfaceAttribute : CombinablePropertyAttribute, IPropertyConstrainer {
+  public class ImplementsInterfaceAttribute : CombinablePropertyAttribute,
+                                              IPropertyConstrainer {
 
 #pragma warning disable 0414
     private Type type;
@@ -36,22 +40,32 @@ namespace Leap.Unity.Attributes {
         var objectReferenceValue = property.objectReferenceValue;
 
         if (objectReferenceValue.GetType().ImplementsInterface(type)) {
-          // All good! This Component implements the interface.
+          // All good! This object reference implements the interface.
           return;
         }
         else {
-          // Search the rest of the GameObject for a component that implements the
-          // interface.
-          var implementer = (objectReferenceValue as Component)
-                            .GetComponents<Component>()
-                            .Query()
-                            .Where(c => c.GetType().ImplementsInterface(type))
-                            .FirstOrDefault();
-          if (implementer == null) {
+          UnityObject implementingObject;
+
+          if (objectReferenceValue is Component) {
+            // If the object is a Component, first search the rest of the GameObject 
+            // for a component that implements the interface. If found, assign it instead,
+            // otherwise null out the property.
+            implementingObject = (objectReferenceValue as Component)
+                                 .GetComponents<Component>()
+                                 .Query()
+                                 .Where(c => c.GetType().ImplementsInterface(type))
+                                 .FirstOrDefault();
+          } 
+          else {
+            // If the object is not a Component, just null out the property.
+            implementingObject = null;
+          }
+
+          if (implementingObject == null) {
             Debug.LogError(property.objectReferenceValue.GetType().Name + " does not implement " + type.Name);
           }
 
-          property.objectReferenceValue = implementer;
+          property.objectReferenceValue = implementingObject;
         }
       }
     }
@@ -61,8 +75,6 @@ namespace Leap.Unity.Attributes {
         yield return SerializedPropertyType.ObjectReference;
       }
     }
-
 #endif
   }
-
 }
