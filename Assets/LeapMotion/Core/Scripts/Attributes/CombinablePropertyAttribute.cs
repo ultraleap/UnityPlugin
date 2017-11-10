@@ -42,6 +42,14 @@ namespace Leap.Unity.Attributes {
 #endif
   }
 
+  public interface ISupportDragAndDrop {
+#if UNITY_EDITOR
+    Rect GetDropArea(Rect r, SerializedProperty property);
+    bool IsDropValid(UnityEngine.Object obj, SerializedProperty property);
+    void ProcessDroppedObject(UnityEngine.Object droppedObj, SerializedProperty property);
+#endif
+  }
+
   public interface IBeforeLabelAdditiveDrawer : IAdditiveDrawer { }
   public interface IAfterLabelAdditiveDrawer : IAdditiveDrawer { }
   public interface IBeforeFieldAdditiveDrawer : IAdditiveDrawer { }

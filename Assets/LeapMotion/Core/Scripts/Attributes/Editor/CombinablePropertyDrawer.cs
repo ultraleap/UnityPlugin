@@ -54,6 +54,8 @@ namespace Leap.Unity.Attributes {
 
       RangeAttribute rangeAttribute = fieldInfo.GetCustomAttributes(typeof(RangeAttribute), true).FirstOrDefault() as RangeAttribute;
 
+      ISupportDragAndDrop dragAndDropSupport = null;
+
       IFullPropertyDrawer fullPropertyDrawer = null;
       foreach (var a in attributes) {
         a.fieldInfo = fieldInfo;
@@ -88,6 +90,10 @@ namespace Leap.Unity.Attributes {
           }
           fullPropertyDrawer = a as IFullPropertyDrawer;
         }
+
+        if (a is ISupportDragAndDrop) {
+          dragAndDropSupport = (a as ISupportDragAndDrop);
+        }
       }
 
       if (fullPropertyDrawer != null && !canUseDefaultDrawer) {
@@ -96,6 +102,11 @@ namespace Leap.Unity.Attributes {
       }
 
       Rect r = position;
+      
+      if (dragAndDropSupport != null) {
+        processDragAndDrop(dragAndDropSupport, ref r, property);
+      }
+
       EditorGUI.BeginChangeCheck();
       EditorGUI.BeginDisabledGroup(shouldDisable);
 
@@ -163,6 +174,42 @@ namespace Leap.Unity.Attributes {
           t.Draw(r, property);
           r.x += r.width;
         }
+      }
+    }
+
+    private void processDragAndDrop(ISupportDragAndDrop dragAndDropSupport,
+                                    ref Rect r, SerializedProperty property) {
+      Event curEvent = Event.current;
+      Rect dropArea = dragAndDropSupport.GetDropArea(r, property);
+
+      switch (curEvent.type) {
+        case EventType.DragUpdated:
+        case EventType.DragPerform:
+          if (!dropArea.Contains(curEvent.mousePosition, allowInverse: true)) {
+            break;
+          }
+
+          bool isValidDrop = DragAndDrop.objectReferences
+                                        .Query()
+                                        .All(o => dragAndDropSupport
+                                                    .IsDropValid(o, property));
+
+          if (isValidDrop) {
+            DragAndDrop.visualMode = DragAndDropVisualMode.Link;
+          }
+          else {
+            DragAndDrop.visualMode = DragAndDropVisualMode.Rejected;
+          }
+
+          if (curEvent.type == EventType.DragPerform && isValidDrop) {
+            DragAndDrop.AcceptDrag();
+
+            foreach (var draggedObj in DragAndDrop.objectReferences) {
+              dragAndDropSupport.ProcessDroppedObject(draggedObj, property);
+            }
+          }
+
+          break;
       }
     }
   }
