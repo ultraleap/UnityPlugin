@@ -290,11 +290,11 @@ namespace Leap.Unity.Interaction {
 
         // If our depression state has changed since last time...
         if (isDepressed && !oldDepressed) {
-          OnPress();
-          depressedThisFrame = true;
-
           primaryHoveringController.primaryHoverLocked = true;
           _lockedInteractingController = primaryHoveringController;
+
+          OnPress();
+          depressedThisFrame = true;
 
         } else if (!isDepressed && oldDepressed) {
           unDepressedThisFrame = true;
@@ -360,7 +360,9 @@ namespace Leap.Unity.Interaction {
         unDepressedThisFrame = true;
         OnUnpress();
 
-        _lockedInteractingController.primaryHoverLocked = false;
+        if (_lockedInteractingController != null) {
+          _lockedInteractingController.primaryHoverLocked = false;
+        }
       }
 
       base.OnDisable();

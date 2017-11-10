@@ -923,6 +923,22 @@ namespace Leap.Unity {
       return otherQuaternion * thisQuaternion;
     }
 
+    /// <summary>
+    /// Returns a normalized Quaternion from the input quaternion. If the input
+    /// quaternion is zero-length (AKA the default Quaternion), the identity Quaternion
+    /// is returned.
+    /// </summary>
+    public static Quaternion ToNormalized(this Quaternion quaternion) {
+      float x = quaternion.x, y = quaternion.y, z = quaternion.z, w = quaternion.w;
+      float magnitude = Mathf.Sqrt(x*x + y*y + z*z + w*w);
+
+      if (Mathf.Approximately(magnitude, 0f)) {
+        return Quaternion.identity;
+      }
+
+      return new Quaternion(x / magnitude, y / magnitude, z / magnitude, w / magnitude);
+    }
+
     #endregion
     
     #region Float Utils
