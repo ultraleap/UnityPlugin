@@ -63,6 +63,10 @@ namespace Leap.Unity.Attributes {
       else {
         UnityObject implementingObject;
 
+        if (obj is GameObject) {
+          obj = (obj as GameObject).transform;
+        }
+
         if (obj is Component) {
           // If the object is a Component, first search the rest of the GameObject 
           // for a component that implements the interface. If found, assign it instead,
@@ -95,11 +99,11 @@ namespace Leap.Unity.Attributes {
       return rect;
     }
 
-    public bool IsDropValid(UnityEngine.Object obj, SerializedProperty property) {
+    public bool IsDropValid(UnityObject obj, SerializedProperty property) {
       return FindImplementer(obj) != null;
     }
 
-    public void ProcessDroppedObject(UnityEngine.Object droppedObj, SerializedProperty property) {
+    public void ProcessDroppedObject(UnityObject droppedObj, SerializedProperty property) {
       var implementer = FindImplementer(droppedObj);
 
       if (implementer == null) {

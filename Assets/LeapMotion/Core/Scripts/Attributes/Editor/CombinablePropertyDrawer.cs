@@ -12,6 +12,7 @@ using UnityEditor;
 using System.Linq;
 using System.Reflection;
 using System.Collections.Generic;
+using Leap.Unity.Query;
 
 namespace Leap.Unity.Attributes {
 
