@@ -1024,51 +1024,64 @@ namespace Leap.Unity.Interaction {
 
       // Set a fixed rotation for bones; otherwise most friction is lost
       // as any capsule or spherical bones will roll on contact.
-      body.MoveRotation(targetRotation);
+      using (new ProfilerSample("updateContactBone: MoveRotation")) {
+        body.MoveRotation(targetRotation);
+      }
 
       // Calculate how far off its target the contact bone is.
-      Vector3 lastTargetPositionTransformedAhead = contactBone.lastTargetPosition;
-      if (manager.hasMovingFrameOfReference) {
-        manager.TransformAheadByFixedUpdate(contactBone.lastTargetPosition, out lastTargetPositionTransformedAhead);
+      float errorDistance = 0f;
+      float errorFraction = 0f;
+      using (new ProfilerSample("updateContactBone: errorDistance, errorFraction")) {
+        Vector3 lastTargetPositionTransformedAhead = contactBone.lastTargetPosition;
+        if (manager.hasMovingFrameOfReference) {
+          manager.TransformAheadByFixedUpdate(contactBone.lastTargetPosition, out lastTargetPositionTransformedAhead);
+        }
+        errorDistance = Vector3.Distance(lastTargetPositionTransformedAhead, body.position);
+        errorFraction = errorDistance / contactBone.width;
       }
-      float errorDistance = Vector3.Distance(lastTargetPositionTransformedAhead, body.position);
-      float errorFraction = errorDistance / contactBone.width;
 
       // Adjust the mass of the contact bone based on the mass of
       // the object it is currently touching.
-      float speed = velocity.magnitude;
-      float massScale = Mathf.Clamp(1.0F - (errorFraction * 2.0F), 0.1F, 1.0F)
+      float speed = 0f;
+      using (new ProfilerSample("updateContactBone: speed & massScale")) {
+        speed = velocity.magnitude;
+        float massScale = Mathf.Clamp(1.0F - (errorFraction * 2.0F), 0.1F, 1.0F)
                       * Mathf.Clamp(speed * 10F, 1F, 10F);
-      body.mass = massScale * contactBone._lastObjectTouchedAdjustedMass;
+        body.mass = massScale * contactBone._lastObjectTouchedAdjustedMass;
+      }
 
       // Potentially enable Soft Contact if our error is too large.
-      if (!_softContactEnabled && errorDistance >= softContactDislocationDistance
+      using (new ProfilerSample("updateContactBone: maybe enable Soft Contact")) {
+        if (!_softContactEnabled && errorDistance >= softContactDislocationDistance
           && speed < 1.5F
        /* && boneArrayIndex != NUM_FINGERS * BONES_PER_FINGER */) {
-         EnableSoftContact();
+          EnableSoftContact();
+        }
       }
 
       // Attempt to move the contact bone to its target position and rotation
       // by setting its target velocity and angular velocity. Include a "deadzone"
       // for position to avoid tiny vibrations.
-      float deadzone = Mathf.Min(DEAD_ZONE_FRACTION * contactBone.width, 0.01F * scale);
-      Vector3 delta = (targetPosition - body.position);
-      float deltaMag = delta.magnitude;
-      if (deltaMag <= deadzone) {
-        body.velocity = Vector3.zero;
-        contactBone.lastTargetPosition = body.position;
-      }
-      else {
-        delta *= (deltaMag - deadzone) / deltaMag;
-        contactBone.lastTargetPosition = body.position + delta;
+      using (new ProfilerSample("updateContactBone: Move to target, with deadzone")) {
+        float deadzone = Mathf.Min(DEAD_ZONE_FRACTION * contactBone.width, 0.01F * scale);
+        Vector3 delta = (targetPosition - body.position);
+        float deltaMag = delta.magnitude;
+        if (deltaMag <= deadzone) {
+          body.velocity = Vector3.zero;
+          contactBone.lastTargetPosition = body.position;
+        }
+        else {
+          delta *= (deltaMag - deadzone) / deltaMag;
+          contactBone.lastTargetPosition = body.position + delta;
 
-        Vector3 targetVelocity = delta / Time.fixedDeltaTime;
-        float targetVelocityMag = targetVelocity.magnitude;
-        body.velocity = (targetVelocity / targetVelocityMag)
-                      * Mathf.Clamp(targetVelocityMag, 0F, 100F);
+          Vector3 targetVelocity = delta / Time.fixedDeltaTime;
+          float targetVelocityMag = targetVelocity.magnitude;
+          body.velocity = (targetVelocity / targetVelocityMag)
+                        * Mathf.Clamp(targetVelocityMag, 0F, 100F);
+        }
+        Quaternion deltaRot = targetRotation * Quaternion.Inverse(body.rotation);
+        body.angularVelocity = PhysicsUtility.ToAngularVelocity(deltaRot, Time.fixedDeltaTime);
       }
-      Quaternion deltaRot = targetRotation * Quaternion.Inverse(body.rotation);
-      body.angularVelocity = PhysicsUtility.ToAngularVelocity(deltaRot, Time.fixedDeltaTime);
     }
 
     #endregion

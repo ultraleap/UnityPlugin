@@ -267,6 +267,9 @@ namespace Leap.Unity.Interaction {
 
       if (!Application.isPlaying) return;
 
+      // Physics should only be synced once at the beginning of the physics simulation.
+      Physics.autoSyncTransforms = false;
+
       if (s_instance == null) s_instance = this;
 
       if (_autoGenerateLayers) {

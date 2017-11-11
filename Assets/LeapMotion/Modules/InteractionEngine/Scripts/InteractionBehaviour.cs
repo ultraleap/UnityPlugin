@@ -820,6 +820,9 @@ namespace Leap.Unity.Interaction {
 
     private Pose _worldPose;
     private Maybe<Pose> _worldPoseLastFrame = Maybe.None;
+    private bool _recordLastPose = false;
+    private int _framesSinceLastDeltaPoseRequest = 0;
+    private const int DELTA_POSE_FRAMES_TIMEOUT = 20;
 
     public Pose worldPose {
       get {
@@ -829,6 +832,9 @@ namespace Leap.Unity.Interaction {
 
     public Pose worldDeltaPose {
       get {
+        if (!_recordLastPose) _recordLastPose = true;
+        _framesSinceLastDeltaPoseRequest = 0;
+
         if (!_worldPoseLastFrame.hasValue) return Pose.identity;
         else {
           return worldPose.From(_worldPoseLastFrame.valueOrDefault);
@@ -837,9 +843,27 @@ namespace Leap.Unity.Interaction {
     }
 
     private void fixedUpdatePose() {
-      _worldPoseLastFrame = _worldPose;
+      using (new ProfilerSample("InteractionBehaviour: fixedUpdatePose")) {
+        if (!_recordLastPose) { return; }
+        else {
+          if (_framesSinceLastDeltaPoseRequest >= DELTA_POSE_FRAMES_TIMEOUT) {
+            _recordLastPose = false;
+            _worldPoseLastFrame = Maybe.None;
+            return;
+          }
+          else {
+            using (new ProfilerSample("InteractionBehaviour: set _worldPoseLastFrame")) {
+              _worldPoseLastFrame = _worldPose;
+            }
 
-      _worldPose = new Pose(rigidbody.position, rigidbody.rotation);
+            using (new ProfilerSample("InteractionBehaviour: set _worldPose with new Pose")) {
+              _worldPose = new Pose(rigidbody.position, rigidbody.rotation);
+            }
+          }
+
+          _framesSinceLastDeltaPoseRequest += 1;
+        }
+      }
     }
 
     #endregion
@@ -1225,14 +1249,16 @@ namespace Leap.Unity.Interaction {
     }
 
     private void fixedUpdateGrasping() {
-      if (!_graspingInitialized) {
-        initGrasping();
-      }
+      using (new ProfilerSample("Interaction Behaviour: fixedUpdateGrasping")) {
+        if (!_graspingInitialized) {
+          initGrasping();
+        }
 
-      if (!moveObjectWhenGrasped && _moveObjectWhenGrasped__WasEnabledLastFrame) {
-        graspedPoseHandler.ClearControllers();
+        if (!moveObjectWhenGrasped && _moveObjectWhenGrasped__WasEnabledLastFrame) {
+          graspedPoseHandler.ClearControllers();
+        }
+        _moveObjectWhenGrasped__WasEnabledLastFrame = moveObjectWhenGrasped;
       }
-      _moveObjectWhenGrasped__WasEnabledLastFrame = moveObjectWhenGrasped;
     }
 
     public void BeginGrasp(List<InteractionController> controllers) {
@@ -1445,40 +1471,42 @@ namespace Leap.Unity.Interaction {
     }
 
     private void fixedUpdateLayers() {
-      int layer;
-      refreshInteractionLayer();
-      refreshNoContactLayer();
+      using (new ProfilerSample("Interaction Behaviour: fixedUpdateLayers")) {
+        int layer;
+        refreshInteractionLayer();
+        refreshNoContactLayer();
 
-      // Update the object's layer based on interaction state.
-      if (ignoreContact) {
-        layer = noContactLayer;
-      }
-      else {
-        if (isGrasped) {
+        // Update the object's layer based on interaction state.
+        if (ignoreContact) {
           layer = noContactLayer;
         }
         else {
-          layer = interactionLayer;
+          if (isGrasped) {
+            layer = noContactLayer;
+          }
+          else {
+            layer = interactionLayer;
+          }
         }
-      }
-      if (this.gameObject.layer != layer) {
-        this.gameObject.layer = layer;
+        if (this.gameObject.layer != layer) {
+          this.gameObject.layer = layer;
 
-        refreshInteractionColliderLayers();
-      }
+          refreshInteractionColliderLayers();
+        }
 
-      // Update the manager if necessary.
+        // Update the manager if necessary.
 
-      if (interactionLayer != _lastInteractionLayer) {
-        (manager as IInternalInteractionManager).NotifyIntObjHasNewInteractionLayer(this, oldInteractionLayer: _lastInteractionLayer,
-                                                                                          newInteractionLayer: interactionLayer);
-        _lastInteractionLayer = noContactLayer;
-      }
+        if (interactionLayer != _lastInteractionLayer) {
+          (manager as IInternalInteractionManager).NotifyIntObjHasNewInteractionLayer(this, oldInteractionLayer: _lastInteractionLayer,
+                                                                                            newInteractionLayer: interactionLayer);
+          _lastInteractionLayer = noContactLayer;
+        }
 
-      if (noContactLayer != _lastNoContactLayer) {
-        (manager as IInternalInteractionManager).NotifyIntObjHasNewNoContactLayer(this, oldNoContactLayer: _lastNoContactLayer,
-                                                                                        newNoContactLayer: noContactLayer);
-        _lastInteractionLayer = noContactLayer;
+        if (noContactLayer != _lastNoContactLayer) {
+          (manager as IInternalInteractionManager).NotifyIntObjHasNewNoContactLayer(this, oldNoContactLayer: _lastNoContactLayer,
+                                                                                          newNoContactLayer: noContactLayer);
+          _lastInteractionLayer = noContactLayer;
+        }
       }
     }
 

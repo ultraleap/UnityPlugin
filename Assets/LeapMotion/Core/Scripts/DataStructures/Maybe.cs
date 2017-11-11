@@ -89,8 +89,12 @@ namespace Leap.Unity {
     /// will have a value.  If the value is null, this maybe will have no value.
     /// </summary>
     public Maybe(T t) {
-      hasValue = t != null;
-      _t = t;
+      using (new ProfilerSample("set hasValue")) {
+        hasValue = t != null;
+      }
+      using (new ProfilerSample("_t = t")) {
+        _t = t;
+      }
     }
 
     /// <summary>
