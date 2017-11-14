@@ -65,7 +65,7 @@ namespace Leap.Unity {
     /// </summary>
     public static void Shuffle<T>(this IList<T> list) {
       for (int i = 0; i < list.Count; i++) {
-        Utils.Swap(list, i, UnityEngine.Random.Range(0, list.Count));
+        Utils.Swap(list, i, UnityEngine.Random.Range(i, list.Count));
       }
     }
 
@@ -921,6 +921,22 @@ namespace Leap.Unity {
     /// </summary>
     public static Quaternion Then(this Quaternion thisQuaternion, Quaternion otherQuaternion) {
       return otherQuaternion * thisQuaternion;
+    }
+
+    /// <summary>
+    /// Returns a normalized Quaternion from the input quaternion. If the input
+    /// quaternion is zero-length (AKA the default Quaternion), the identity Quaternion
+    /// is returned.
+    /// </summary>
+    public static Quaternion ToNormalized(this Quaternion quaternion) {
+      float x = quaternion.x, y = quaternion.y, z = quaternion.z, w = quaternion.w;
+      float magnitude = Mathf.Sqrt(x*x + y*y + z*z + w*w);
+
+      if (Mathf.Approximately(magnitude, 0f)) {
+        return Quaternion.identity;
+      }
+
+      return new Quaternion(x / magnitude, y / magnitude, z / magnitude, w / magnitude);
     }
 
     #endregion

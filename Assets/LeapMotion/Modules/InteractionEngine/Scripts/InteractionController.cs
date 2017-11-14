@@ -948,6 +948,9 @@ namespace Leap.Unity.Interaction {
       // Clear contact data if we lose tracking.
       if (!isTracked && _contactBehaviours.Count > 0) {
         _contactBehaviours.Clear();
+
+        // Also clear soft contact state if tracking is lost.
+        _softContactCollisions.Clear();
       }
 
       // Disable contact bone parent if we lose tracking.
