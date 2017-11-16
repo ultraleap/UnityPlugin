@@ -446,6 +446,25 @@ namespace Leap.Unity {
       return Quaternion.SlerpUnclamped(a, b, extrapolatedTime.MapUnclamped(aTime, bTime, 0f, 1f));
     }
 
+    public static void NextPermutation(IList<int> values, int maxValue) {
+      NextPermutation(values, i => (i + 1) % maxValue);
+    }
+
+    public static void NextPermutation<T>(IList<T> values, Func<T, T> getNext) where T : IComparable<T> {
+      int index = 0;
+      while (index < values.Count) {
+        T value = values[index];
+        T newValue = getNext(value);
+        values[index] = newValue;
+
+        if (newValue.CompareTo(value) > 0) {
+          return;
+        }
+
+        index++;
+      }
+    }
+
     #endregion
 
     #region Value Mapping Utils
@@ -799,8 +818,7 @@ namespace Leap.Unity {
             ownedComponents.Add(component);
           }
         }
-      }
-      finally {
+      } finally {
         toVisit.Clear();
         Pool<Stack<Transform>>.Recycle(toVisit);
 
@@ -930,7 +948,7 @@ namespace Leap.Unity {
     /// </summary>
     public static Quaternion ToNormalized(this Quaternion quaternion) {
       float x = quaternion.x, y = quaternion.y, z = quaternion.z, w = quaternion.w;
-      float magnitude = Mathf.Sqrt(x*x + y*y + z*z + w*w);
+      float magnitude = Mathf.Sqrt(x * x + y * y + z * z + w * w);
 
       if (Mathf.Approximately(magnitude, 0f)) {
         return Quaternion.identity;
@@ -940,7 +958,7 @@ namespace Leap.Unity {
     }
 
     #endregion
-    
+
     #region Float Utils
 
     /// <summary>
@@ -1609,8 +1627,7 @@ namespace Leap.Unity {
       public bool TryGetNext(out Rect t) {
         if (MoveNext()) {
           t = Current; return true;
-        }
-        else {
+        } else {
           t = default(Rect); return false;
         }
       }
