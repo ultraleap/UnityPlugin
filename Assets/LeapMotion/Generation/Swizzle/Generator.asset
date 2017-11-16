@@ -9,7 +9,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 33fdb33fdd5b79b4f9653b0ba6f57da7, type: 3}
-  m_Name: New Swizzle Generator
+  m_Name: Generator
   m_EditorClassIdentifier: 
   templateAsset: {fileID: 11500000, guid: 346d7352e600f814b94cb7c71b4fa8fe, type: 3}
   destFolder:
