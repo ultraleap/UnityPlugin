@@ -8,7 +8,7 @@
  ******************************************************************************/
 
 using UnityEngine;
-using UnityEngine.VR;
+using UnityEngine.XR;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -339,7 +339,7 @@ namespace Leap.Unity {
         _shouldSetLocalPosition = false;
       }
 
-      if (Input.GetKeyDown(_recenter) && VRSettings.enabled && VRDevice.isPresent) {
+      if (Input.GetKeyDown(_recenter) && XRSettings.enabled && XRDevice.isPresent) {
         InputTracking.Recenter();
       }
 
@@ -359,24 +359,24 @@ namespace Leap.Unity {
     protected void LateUpdate() {
       if (_forceCustomUpdate) {
         ManuallyUpdateTemporalWarping();
-      } else if (VRSettings.enabled) {
-        updateTemporalWarping(InputTracking.GetLocalPosition(VRNode.CenterEye),
-                              InputTracking.GetLocalRotation(VRNode.CenterEye));
+      } else if (XRSettings.enabled) {
+        updateTemporalWarping(InputTracking.GetLocalPosition(XRNode.CenterEye),
+                              InputTracking.GetLocalRotation(XRNode.CenterEye));
       }
     }
 
     private void onValidCameraParams(LeapVRCameraControl.CameraParams cameraParams) {
       _projectionMatrix = cameraParams.ProjectionMatrix;
 
-      if (VRSettings.enabled) {
+      if (XRSettings.enabled) {
         if (provider != null) {
-          updateHistory(InputTracking.GetLocalPosition(VRNode.CenterEye),
-                        InputTracking.GetLocalRotation(VRNode.CenterEye));
+          updateHistory(InputTracking.GetLocalPosition(XRNode.CenterEye),
+                        InputTracking.GetLocalRotation(XRNode.CenterEye));
         }
 
         if (_syncMode == SyncMode.LOW_LATENCY) {
-          updateTemporalWarping(InputTracking.GetLocalPosition(VRNode.CenterEye),
-                                InputTracking.GetLocalRotation(VRNode.CenterEye));
+          updateTemporalWarping(InputTracking.GetLocalPosition(XRNode.CenterEye),
+                                InputTracking.GetLocalRotation(XRNode.CenterEye));
         }
       }
     }

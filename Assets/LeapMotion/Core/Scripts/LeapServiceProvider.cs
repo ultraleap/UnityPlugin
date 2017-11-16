@@ -318,7 +318,7 @@ namespace Leap.Unity {
     }
 
     private bool checkShouldEnableHeadMounted() {
-      if (UnityEngine.VR.VRSettings.enabled) {
+      if (UnityEngine.XR.XRSettings.enabled) {
         var parentCamera = GetComponentInParent<Camera>();
         if (parentCamera != null && parentCamera.stereoTargetEye != StereoTargetEyeMask.None) {
 

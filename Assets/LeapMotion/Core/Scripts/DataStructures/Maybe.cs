@@ -10,6 +10,7 @@
 using System;
 
 namespace Leap.Unity {
+  using Query;
 
   public static class Maybe {
     public static readonly NoneType None = new NoneType();
@@ -134,6 +135,26 @@ namespace Leap.Unity {
       }
     }
 
+    /// <summary>
+    /// If this Maybe has a value, the first delegate is called with that value,
+    /// else the second delegate is called.
+    /// </summary>
+    public K Match<K>(Func<T, K> ifValue, Func<K> ifNot) {
+      if (hasValue) {
+        if (ifValue != null) {
+          return ifValue(_t);
+        } else {
+          return default(K);
+        }
+      } else {
+        return ifNot();
+      }
+    }
+
+    public QueryWrapper<T, Maybe<T>.MaybeOp> Query() {
+      return new QueryWrapper<T, MaybeOp>(new MaybeOp(this));
+    }
+
     public override int GetHashCode() {
       return hasValue ? _t.GetHashCode() : 0;
     }
@@ -214,6 +235,37 @@ namespace Leap.Unity {
 
     public static implicit operator Maybe<T>(Maybe.NoneType none) {
       return Maybe<T>.None;
+    }
+
+    public struct MaybeOp : IQueryOp<T> {
+      public Maybe<T> _value;
+      public bool _hasReturned;
+
+      public MaybeOp(Maybe<T> value) {
+        _value = value;
+        _hasReturned = false;
+      }
+
+      public bool TryGetNext(out T t) {
+        if (_hasReturned) {
+          t = default(T);
+          return false;
+        } else {
+          if (_value.hasValue) {
+            t = _value._t;
+            _hasReturned = true;
+            return true;
+          } else {
+            t = default(T);
+            _hasReturned = true;
+            return false;
+          }
+        }
+      }
+
+      public void Reset() {
+        _hasReturned = false;
+      }
     }
   }
 }

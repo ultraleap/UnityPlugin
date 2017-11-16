@@ -23,16 +23,29 @@ namespace Leap.Unity.Interaction.Tests {
 
     #region Test Object Names
 
-    /// <summary> Name of the default testing rig. The hands don't move. </summary>
-    protected const string DEFAULT_RIG = "IE Test Simple Rig";
-    /// <summary> Name of the default testing stage. Consists of three boxes. </summary>
-    protected const string DEFAULT_STAGE = "IE Test Simple Boxes";
     /// <summary>
-    /// Plays back a recording of a grasping and throwing motion if Play is called on
-    /// the "recording" object. In the default stage, this can grab the center cube
+    /// Name of the default testing rig prefab. The hands don't move.
+    /// </summary>
+    protected const string DEFAULT_RIG = "IE Test Default Rig";
+
+    /// <summary>
+    /// Name of the default testing stage. Consists of three boxes.
+    /// </summary>
+    protected const string DEFAULT_STAGE = "IE Test Default Stage";
+
+    /// <summary>
+    /// Plays a recording of a grasping and throwing motion when Play is called on
+    /// the recording object. In the default stage, this can grab the center cube
     /// (box0).
     /// </summary>
     protected const string GRASP_THROW_RIG = "IE Test Playback Rig - Grasp and Throw";
+
+    /// <summary>
+    /// Plays a recording of a grasping and throwing motion when Play is called on
+    /// the "recording" object. In the default stage, this will press an Interaction
+    /// Button with the right hand.
+    /// </summary>
+    protected const string PRESS_BUTTON_RIG = "IE Test Playback Rig - Press Button";
 
     #endregion
 
@@ -81,6 +94,11 @@ namespace Leap.Unity.Interaction.Tests {
     /// </summary>
     protected InteractionBehaviour box2;
 
+    /// <summary>
+    /// The first Interaction Button found in the test stage object.
+    /// </summary>
+    protected InteractionButton button;
+
     #endregion
 
     /// <summary>
@@ -126,11 +144,20 @@ namespace Leap.Unity.Interaction.Tests {
         stageObj.GetComponentsInChildren<InteractionBehaviour>(true, intObjs);
 
         // Load "simple box" interaction objects.
-        foreach (var simpleBoxObj in intObjs.Query().Where(o => o.primaryHoverColliders.Count == 1
-                                                             && o.primaryHoverColliders[0] is BoxCollider)) {
+        foreach (var simpleBoxObj in intObjs
+                                       .Query()
+                                       .Where(o => o.primaryHoverColliders.Count == 1
+                                              && o.primaryHoverColliders[0] is BoxCollider
+                                              && !o.ignoreContact
+                                              && !o.ignoreGrasping)) {
           if (box0 == null) { box0 = simpleBoxObj; continue; }
           if (box1 == null) { box1 = simpleBoxObj; continue; }
           if (box2 == null) { box2 = simpleBoxObj; continue; }
+        }
+
+        foreach (var interactionButtonObj in intObjs.Query()
+                                                    .Where(o => o is InteractionButton)) {
+          if (button == null) button = interactionButtonObj as InteractionButton;
         }
       }
       finally {

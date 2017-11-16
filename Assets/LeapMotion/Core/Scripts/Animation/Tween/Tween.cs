@@ -165,7 +165,7 @@ namespace Leap.Unity.Animation {
     /// </summary>
     public Tween OverTime(float seconds) {
       throwIfInvalid();
-      _instance.velPercent = (int)_instance.direction / seconds;
+      _instance.velPercent = 1.0f / seconds;
       return this;
     }
 
@@ -175,7 +175,7 @@ namespace Leap.Unity.Animation {
     /// </summary>
     public Tween AtRate(float unitsPerSecond) {
       throwIfInvalid();
-      _instance.velPercent = (int)_instance.direction * unitsPerSecond / _instance.interpolators[0].length;
+      _instance.velPercent = unitsPerSecond / _instance.interpolators[0].length;
       return this;
     }
 

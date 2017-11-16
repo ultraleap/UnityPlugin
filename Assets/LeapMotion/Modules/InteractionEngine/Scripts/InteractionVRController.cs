@@ -12,7 +12,7 @@ using Leap.Unity.Interaction.Internal;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.VR;
+using UnityEngine.XR;
 using Leap.Unity.Query;
 using Leap.Unity.Space;
 using UnityEngine.Serialization;
@@ -277,8 +277,8 @@ namespace Leap.Unity.Interaction {
     /// for this controller is specified as ControllerTrackingMode.Custom, this value
     /// may be ignored.
     /// </summary>
-    public VRNode vrNode {
-      get { return chirality == Chirality.Left ? VRNode.LeftHand : VRNode.RightHand; }
+    public XRNode vrNode {
+      get { return chirality == Chirality.Left ? XRNode.LeftHand : XRNode.RightHand; }
     }
 
     /// <summary>

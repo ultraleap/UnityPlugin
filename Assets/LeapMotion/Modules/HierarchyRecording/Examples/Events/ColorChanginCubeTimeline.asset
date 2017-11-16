@@ -11,7 +11,6 @@ MonoBehaviour:
   m_Script: {fileID: 337831424, guid: 6a10b2909283487f913b00d94cd3faf5, type: 3}
   m_Name: ColorChanginCubeTimeline
   m_EditorClassIdentifier: 
-  m_Id: 0
   m_NextId: 15
   m_Tracks:
   - {fileID: 114271844789157940}
@@ -19,8 +18,6 @@ MonoBehaviour:
   m_FixedDuration: 0
   m_EditorSettings:
     fps: 60
-  m_UpdateMode: 0
-  m_ParameterName: 
   m_DurationMode: 0
 --- !u!74 &74336127168638980
 AnimationClip:
@@ -1722,9 +1719,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Locked: 0
   m_Muted: 0
-  m_Soloed: 0
-  m_Height: 0
-  m_InlineAnimationCurveHeight: 102
   m_CustomPlayableFullTypename: 
   m_AnimClip: {fileID: 0}
   m_Parent: {fileID: 11400000}
@@ -1735,14 +1729,7 @@ MonoBehaviour:
     m_Asset: {fileID: 114881387950868052}
     m_UnderlyingAsset: {fileID: 114960040370635278}
     m_Duration: 0.9
-    m_ParentID: 0
     m_TimeScale: 1
-    m_BlendCurve:
-      serializedVersion: 2
-      m_Curve: []
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
     m_ParentTrack: {fileID: 114157881862211982}
     m_EaseInDuration: 0
     m_EaseOutDuration: 0
@@ -1788,26 +1775,19 @@ MonoBehaviour:
     m_BlendOutCurveMode: 0
     m_ExposedParameterNames: []
     m_AnimationCurves: {fileID: 0}
-    m_ID: 1850921850
     m_Recordable: 0
     m_PostExtrapolationMode: 0
     m_PreExtrapolationMode: 0
     m_PostExtrapolationTime: 0
     m_PreExtrapolationTime: 0
     m_DisplayName: EventPlayableAsset
+    m_Version: 1
   - m_Start: 2.283333333333333
     m_ClipIn: 0
     m_Asset: {fileID: 114960040370635278}
     m_UnderlyingAsset: {fileID: 114960040370635278}
     m_Duration: 0.9
-    m_ParentID: 0
     m_TimeScale: 1
-    m_BlendCurve:
-      serializedVersion: 2
-      m_Curve: []
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
     m_ParentTrack: {fileID: 114157881862211982}
     m_EaseInDuration: 0
     m_EaseOutDuration: 0
@@ -1853,26 +1833,19 @@ MonoBehaviour:
     m_BlendOutCurveMode: 0
     m_ExposedParameterNames: []
     m_AnimationCurves: {fileID: 0}
-    m_ID: 1646337196
     m_Recordable: 0
     m_PostExtrapolationMode: 0
     m_PreExtrapolationMode: 0
     m_PostExtrapolationTime: 0
     m_PreExtrapolationTime: 0
     m_DisplayName: EventPlayableAsset
+    m_Version: 1
   - m_Start: 4.783333333333333
     m_ClipIn: 0
     m_Asset: {fileID: 114413661228800702}
     m_UnderlyingAsset: {fileID: 114413661228800702}
     m_Duration: 0.8666666666666667
-    m_ParentID: 0
     m_TimeScale: 1
-    m_BlendCurve:
-      serializedVersion: 2
-      m_Curve: []
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
     m_ParentTrack: {fileID: 114157881862211982}
     m_EaseInDuration: 0
     m_EaseOutDuration: 0
@@ -1918,13 +1891,13 @@ MonoBehaviour:
     m_BlendOutCurveMode: 0
     m_ExposedParameterNames: []
     m_AnimationCurves: {fileID: 0}
-    m_ID: 1646337199
     m_Recordable: 0
     m_PostExtrapolationMode: 0
     m_PreExtrapolationMode: 0
     m_PostExtrapolationTime: 0
     m_PreExtrapolationTime: 0
     m_DisplayName: EventPlayableAsset
+    m_Version: 1
 --- !u!114 &114271844789157940
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1938,9 +1911,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Locked: 0
   m_Muted: 0
-  m_Soloed: 0
-  m_Height: 0
-  m_InlineAnimationCurveHeight: 100
   m_CustomPlayableFullTypename: 
   m_AnimClip: {fileID: 0}
   m_Parent: {fileID: 11400000}
@@ -1951,14 +1921,7 @@ MonoBehaviour:
     m_Asset: {fileID: 114765029946040974}
     m_UnderlyingAsset: {fileID: 74336127168638980}
     m_Duration: 8.166666666666666
-    m_ParentID: 0
     m_TimeScale: 1
-    m_BlendCurve:
-      serializedVersion: 2
-      m_Curve: []
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
     m_ParentTrack: {fileID: 114271844789157940}
     m_EaseInDuration: 0
     m_EaseOutDuration: 0
@@ -2004,13 +1967,13 @@ MonoBehaviour:
     m_BlendOutCurveMode: 0
     m_ExposedParameterNames: []
     m_AnimationCurves: {fileID: 0}
-    m_ID: -1
     m_Recordable: 0
     m_PostExtrapolationMode: 1
     m_PreExtrapolationMode: 1
     m_PostExtrapolationTime: Infinity
     m_PreExtrapolationTime: 0
     m_DisplayName: AnimationPlayableAsset
+    m_Version: 1
   m_OpenClipPreExtrapolation: 0
   m_OpenClipPostExtrapolation: 0
   m_OpenClipOffsetPosition: {x: 0, y: 0, z: 0}
@@ -2020,6 +1983,8 @@ MonoBehaviour:
   m_Position: {x: 0, y: 0, z: 0}
   m_Rotation: {x: 0, y: 0, z: 0, w: 1}
   m_ApplyOffsets: 0
+  m_AvatarMask: {fileID: 0}
+  m_ApplyAvatarMask: 1
 --- !u!114 &114317260007579368
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2114,6 +2079,7 @@ MonoBehaviour:
   m_Rotation: {x: 0, y: 0, z: 0, w: 1}
   m_UseTrackMatchFields: 0
   m_MatchTargetFields: 63
+  m_RemoveStartOffset: 1
 --- !u!114 &114805024755627122
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2127,9 +2093,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Locked: 0
   m_Muted: 0
-  m_Soloed: 0
-  m_Height: 0
-  m_InlineAnimationCurveHeight: 100
   m_CustomPlayableFullTypename: 
   m_AnimClip: {fileID: 0}
   m_Parent: {fileID: 11400000}
@@ -2140,14 +2103,7 @@ MonoBehaviour:
     m_Asset: {fileID: 114317260007579368}
     m_UnderlyingAsset: {fileID: 114317260007579368}
     m_Duration: 1
-    m_ParentID: 0
     m_TimeScale: 1
-    m_BlendCurve:
-      serializedVersion: 2
-      m_Curve: []
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
     m_ParentTrack: {fileID: 114805024755627122}
     m_EaseInDuration: 0
     m_EaseOutDuration: 0
@@ -2193,13 +2149,13 @@ MonoBehaviour:
     m_BlendOutCurveMode: 0
     m_ExposedParameterNames: []
     m_AnimationCurves: {fileID: 0}
-    m_ID: 1646337198
     m_Recordable: 0
     m_PostExtrapolationMode: 0
     m_PreExtrapolationMode: 0
     m_PostExtrapolationTime: 0
     m_PreExtrapolationTime: 0
     m_DisplayName: EventPlayableAsset
+    m_Version: 1
 --- !u!114 &114881387950868052
 MonoBehaviour:
   m_ObjectHideFlags: 1

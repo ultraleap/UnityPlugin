@@ -5,10 +5,10 @@ GameObject:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  serializedVersion: 4
+  serializedVersion: 5
   m_Component:
-  - 4: {fileID: 463568}
-  - 114: {fileID: 11408536}
+  - component: {fileID: 463568}
+  - component: {fileID: 11408536}
   m_Layer: 0
   m_Name: Palm
   m_TagString: Untagged
@@ -21,10 +21,10 @@ GameObject:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  serializedVersion: 4
+  serializedVersion: 5
   m_Component:
-  - 4: {fileID: 473886}
-  - 114: {fileID: 11499148}
+  - component: {fileID: 473886}
+  - component: {fileID: 11499148}
   m_Layer: 0
   m_Name: Pinky
   m_TagString: Untagged
@@ -37,10 +37,10 @@ GameObject:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  serializedVersion: 4
+  serializedVersion: 5
   m_Component:
-  - 4: {fileID: 454304}
-  - 114: {fileID: 11453046}
+  - component: {fileID: 454304}
+  - component: {fileID: 11453046}
   m_Layer: 0
   m_Name: GrabPoint
   m_TagString: Untagged
@@ -53,10 +53,10 @@ GameObject:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  serializedVersion: 4
+  serializedVersion: 5
   m_Component:
-  - 4: {fileID: 462434}
-  - 114: {fileID: 11445584}
+  - component: {fileID: 462434}
+  - component: {fileID: 11445584}
   m_Layer: 0
   m_Name: Thumb
   m_TagString: Untagged
@@ -69,10 +69,10 @@ GameObject:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  serializedVersion: 4
+  serializedVersion: 5
   m_Component:
-  - 4: {fileID: 456454}
-  - 114: {fileID: 11478258}
+  - component: {fileID: 456454}
+  - component: {fileID: 11478258}
   m_Layer: 0
   m_Name: PinchPoint
   m_TagString: Untagged
@@ -85,10 +85,10 @@ GameObject:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  serializedVersion: 4
+  serializedVersion: 5
   m_Component:
-  - 4: {fileID: 451880}
-  - 114: {fileID: 11494032}
+  - component: {fileID: 451880}
+  - component: {fileID: 11494032}
   m_Layer: 0
   m_Name: Arm
   m_TagString: Untagged
@@ -101,10 +101,10 @@ GameObject:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  serializedVersion: 4
+  serializedVersion: 5
   m_Component:
-  - 4: {fileID: 434398}
-  - 114: {fileID: 11458088}
+  - component: {fileID: 434398}
+  - component: {fileID: 11458088}
   m_Layer: 0
   m_Name: Index
   m_TagString: Untagged
@@ -117,10 +117,10 @@ GameObject:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  serializedVersion: 4
+  serializedVersion: 5
   m_Component:
-  - 4: {fileID: 487112}
-  - 114: {fileID: 11473994}
+  - component: {fileID: 487112}
+  - component: {fileID: 11473994}
   m_Layer: 0
   m_Name: Middle
   m_TagString: Untagged
@@ -133,11 +133,11 @@ GameObject:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  serializedVersion: 4
+  serializedVersion: 5
   m_Component:
-  - 4: {fileID: 448170}
-  - 114: {fileID: 11449018}
-  - 114: {fileID: 11429166}
+  - component: {fileID: 448170}
+  - component: {fileID: 11449018}
+  - component: {fileID: 11429166}
   m_Layer: 0
   m_Name: HandAttachments-L
   m_TagString: Untagged
@@ -150,10 +150,10 @@ GameObject:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  serializedVersion: 4
+  serializedVersion: 5
   m_Component:
-  - 4: {fileID: 418796}
-  - 114: {fileID: 11451000}
+  - component: {fileID: 418796}
+  - component: {fileID: 11451000}
   m_Layer: 0
   m_Name: Ring
   m_TagString: Untagged
@@ -170,10 +170,10 @@ Transform:
   m_LocalRotation: {x: 0.06845518, y: -0.067679256, z: -0.9898138, w: -0.10489073}
   m_LocalPosition: {x: -0.1076767, y: 0.12850806, z: 0.10003643}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 448170}
   m_RootOrder: 6
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &434398
 Transform:
   m_ObjectHideFlags: 1
@@ -183,10 +183,10 @@ Transform:
   m_LocalRotation: {x: -0.08401715, y: -0.0741118, z: -0.9936847, w: 0.006266191}
   m_LocalPosition: {x: -0.04387058, y: 0.1295676, z: 0.099171825}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 448170}
   m_RootOrder: 4
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &448170
 Transform:
   m_ObjectHideFlags: 1
@@ -196,7 +196,6 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children:
   - {fileID: 463568}
   - {fileID: 451880}
@@ -209,6 +208,7 @@ Transform:
   - {fileID: 454304}
   m_Father: {fileID: 0}
   m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &451880
 Transform:
   m_ObjectHideFlags: 1
@@ -218,10 +218,10 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: -1, w: -0.00000004371139}
   m_LocalPosition: {x: -0.087058105, y: 0.116000004, z: -0.17500001}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 448170}
   m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &454304
 Transform:
   m_ObjectHideFlags: 1
@@ -231,10 +231,10 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_LocalEulerAnglesHint: {x: 0, y: -360, z: 0}
   m_Children: []
   m_Father: {fileID: 448170}
   m_RootOrder: 8
+  m_LocalEulerAnglesHint: {x: 0, y: -360, z: 0}
 --- !u!4 &456454
 Transform:
   m_ObjectHideFlags: 1
@@ -244,10 +244,10 @@ Transform:
   m_LocalRotation: {x: -0.009242244, y: -0.07527788, z: -0.99437046, w: -0.07399498}
   m_LocalPosition: {x: -0.05874023, y: 0.12200001, z: -0.01500957}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 448170}
   m_RootOrder: 3
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &462434
 Transform:
   m_ObjectHideFlags: 1
@@ -257,10 +257,10 @@ Transform:
   m_LocalRotation: {x: -0.35755518, y: -0.019904846, z: -0.7650837, w: 0.53516835}
   m_LocalPosition: {x: 0.0026275637, y: 0.17573, z: 0.03632434}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 448170}
   m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &463568
 Transform:
   m_ObjectHideFlags: 1
@@ -270,10 +270,10 @@ Transform:
   m_LocalRotation: {x: -0.009242244, y: -0.07527788, z: -0.99437046, w: -0.07399498}
   m_LocalPosition: {x: -0.080000006, y: 0.120000005, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 448170}
   m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &473886
 Transform:
   m_ObjectHideFlags: 1
@@ -283,10 +283,10 @@ Transform:
   m_LocalRotation: {x: 0.13843814, y: -0.02914566, z: -0.9739429, w: -0.17725918}
   m_LocalPosition: {x: -0.13266322, y: 0.12707193, z: 0.07386437}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 448170}
   m_RootOrder: 7
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &487112
 Transform:
   m_ObjectHideFlags: 1
@@ -296,10 +296,10 @@ Transform:
   m_LocalRotation: {x: -0.009242244, y: -0.07527788, z: -0.99437046, w: -0.07399498}
   m_LocalPosition: {x: -0.07460276, y: 0.12910737, z: 0.110595584}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 448170}
   m_RootOrder: 5
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &11408536
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -324,6 +324,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9cb0408b952744949b897cdb0548d306, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  group:
+    GroupName: 
+    _handPool: {fileID: 0}
+    LeftModel: {fileID: 0}
+    IsLeftToBeSpawned: 0
+    RightModel: {fileID: 0}
+    IsRightToBeSpawned: 0
+    modelList: []
+    modelsCheckedOut: []
+    IsEnabled: 1
+    CanDuplicate: 0
+    HandPostProcesses:
+      m_PersistentCalls:
+        m_Calls: []
+      m_TypeName: Leap.Unity.Hands+HandEvent, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
+        PublicKeyToken=null
   Palm: {fileID: 463568}
   Arm: {fileID: 451880}
   Thumb: {fileID: 462434}

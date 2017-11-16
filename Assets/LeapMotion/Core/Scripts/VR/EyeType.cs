@@ -8,14 +8,14 @@
  ******************************************************************************/
 
 using UnityEngine;
-using UnityEngine.VR;
+using UnityEngine.XR;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
 using System;
 
 namespace Leap.Unity {
-  [System.Serializable]
+  [Serializable]
   public class EyeType {
     private const string TARGET_EYE_PROPERTY_NAME = "m_TargetEye";
     private const int TARGET_EYE_LEFT_INDEX = 1;
@@ -72,7 +72,7 @@ namespace Leap.Unity {
       }
 
       //Allow the user to specify themselves if VR is disabled
-      if (!VRSettings.enabled || !PlayerSettings.virtualRealitySupported) {
+      if (!XRSettings.enabled || !PlayerSettings.virtualRealitySupported) {
         return;
       }
 

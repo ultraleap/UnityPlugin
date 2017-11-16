@@ -16,11 +16,11 @@ GameObject:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  serializedVersion: 4
+  serializedVersion: 5
   m_Component:
-  - 224: {fileID: 224000011665479544}
-  - 222: {fileID: 222000010215554698}
-  - 114: {fileID: 114000013573996878}
+  - component: {fileID: 224000011665479544}
+  - component: {fileID: 222000010215554698}
+  - component: {fileID: 114000013573996878}
   m_Layer: 5
   m_Name: Text
   m_TagString: Untagged
@@ -33,16 +33,16 @@ GameObject:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  serializedVersion: 4
+  serializedVersion: 5
   m_Component:
-  - 224: {fileID: 224000013526304634}
-  - 222: {fileID: 222000013275236678}
-  - 114: {fileID: 114000011873562570}
-  - 114: {fileID: 114000010199426536}
-  - 114: {fileID: 114000011211648930}
-  - 54: {fileID: 54000012095325200}
-  - 114: {fileID: 114000010560643842}
-  - 82: {fileID: 82000010280837202}
+  - component: {fileID: 224000013526304634}
+  - component: {fileID: 222000013275236678}
+  - component: {fileID: 114000011873562570}
+  - component: {fileID: 114000010199426536}
+  - component: {fileID: 114000011211648930}
+  - component: {fileID: 54000012095325200}
+  - component: {fileID: 114000010560643842}
+  - component: {fileID: 82000010280837202}
   m_Layer: 5
   m_Name: PhysicsButton
   m_TagString: Untagged
@@ -55,14 +55,14 @@ GameObject:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  serializedVersion: 4
+  serializedVersion: 5
   m_Component:
-  - 224: {fileID: 224000010998320070}
-  - 222: {fileID: 222000011727148776}
-  - 114: {fileID: 114000013232067512}
-  - 54: {fileID: 54000011900107070}
-  - 65: {fileID: 65000012384655472}
-  - 145: {fileID: 145000012655653226}
+  - component: {fileID: 224000010998320070}
+  - component: {fileID: 222000011727148776}
+  - component: {fileID: 114000013232067512}
+  - component: {fileID: 54000011900107070}
+  - component: {fileID: 65000012384655472}
+  - component: {fileID: 145000012655653226}
   m_Layer: 5
   m_Name: ButtonBackdrop
   m_TagString: Untagged
@@ -128,6 +128,7 @@ AudioSource:
   Loop: 0
   Mute: 0
   Spatialize: 0
+  SpatializePostEffects: 0
   Priority: 128
   DopplerLevel: 1
   MinDistance: 1
@@ -140,12 +141,14 @@ AudioSource:
   rolloffCustomCurve:
     serializedVersion: 2
     m_Curve:
-    - time: 0
+    - serializedVersion: 2
+      time: 0
       value: 1
       inSlope: 0
       outSlope: 0
       tangentMode: 0
-    - time: 1
+    - serializedVersion: 2
+      time: 1
       value: 0
       inSlope: 0
       outSlope: 0
@@ -156,7 +159,8 @@ AudioSource:
   panLevelCustomCurve:
     serializedVersion: 2
     m_Curve:
-    - time: 0
+    - serializedVersion: 2
+      time: 0
       value: 0
       inSlope: 0
       outSlope: 0
@@ -167,7 +171,8 @@ AudioSource:
   spreadCustomCurve:
     serializedVersion: 2
     m_Curve:
-    - time: 0
+    - serializedVersion: 2
+      time: 0
       value: 0
       inSlope: 0
       outSlope: 0
@@ -178,7 +183,8 @@ AudioSource:
   reverbZoneMixCustomCurve:
     serializedVersion: 2
     m_Curve:
-    - time: 0
+    - serializedVersion: 2
+      time: 0
       value: 1
       inSlope: 0
       outSlope: 0
@@ -396,6 +402,8 @@ SpringJoint:
   m_BreakTorque: Infinity
   m_EnableCollision: 0
   m_EnablePreprocessing: 1
+  m_MassScale: 1
+  m_ConnectedMassScale: 1
 --- !u!222 &222000010215554698
 CanvasRenderer:
   m_ObjectHideFlags: 1
@@ -421,13 +429,13 @@ RectTransform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1000013750043278}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 3.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children:
   - {fileID: 224000011665479544}
   m_Father: {fileID: 224000013526304634}
   m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 3.5}
@@ -440,12 +448,12 @@ RectTransform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1000010192689096}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -5}
+  m_LocalPosition: {x: -1.4990082, y: 1.1197367, z: -5}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 224000010998320070}
   m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.10072446, y: 0.21576102}
   m_AnchorMax: {x: 0.86036485, y: 0.8426822}
   m_AnchoredPosition: {x: 0.15080339, y: -0.03159387}
@@ -460,11 +468,11 @@ RectTransform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children:
   - {fileID: 224000010998320070}
   m_Father: {fileID: 0}
   m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
