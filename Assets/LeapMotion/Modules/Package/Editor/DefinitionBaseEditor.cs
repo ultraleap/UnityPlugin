@@ -41,7 +41,7 @@ namespace Leap.Unity.Packaging {
       EditorGUILayout.EndHorizontal();
 
       if (GUILayout.Button(buildText, GUILayout.MinHeight(EditorGUIUtility.singleLineHeight * 2))) {
-        OnBuild();
+        EditorApplication.delayCall += () => OnBuild();
       }
       GUILayout.Space(EditorGUIUtility.singleLineHeight * 2);
     }

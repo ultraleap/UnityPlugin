@@ -34,7 +34,6 @@ namespace Leap.Unity.Packaging {
     [SerializeField]
     private BuildTarget[] _targets = { BuildTarget.StandaloneWindows64 };
 
-
     public static void Build(string guid) {
       var path = AssetDatabase.GUIDToAssetPath(guid);
       var def = AssetDatabase.LoadAssetAtPath<BuildDefinition>(path);
@@ -48,6 +47,15 @@ namespace Leap.Unity.Packaging {
         return;
       }
 
+      if (_trySuffixWithGitHash) {
+        string hash;
+        if (tryGetGitCommitHash(out hash)) {
+          exportFolder = Path.Combine(exportFolder, DefinitionName + "_" + hash);
+        } else {
+          UnityEngine.Debug.LogWarning("Failed to get git hash.");
+        }
+      }
+
       string fullPath = Path.Combine(exportFolder, DefinitionName);
 
       var buildOptions = new BuildPlayerOptions() {
@@ -55,13 +63,25 @@ namespace Leap.Unity.Packaging {
                                     Select(s => AssetDatabase.GetAssetPath(s)).
                                     ToArray(),
         options = _options,
-        locationPathName = fullPath
       };
 
       foreach (var target in _targets) {
         buildOptions.target = target;
+        buildOptions.locationPathName = fullPath + "." + getFileSuffix(target);
 
         BuildPipeline.BuildPlayer(buildOptions);
+      }
+    }
+
+    private static string getFileSuffix(BuildTarget target) {
+      switch (target) {
+        case BuildTarget.StandaloneWindows:
+        case BuildTarget.StandaloneWindows64:
+          return "exe";
+        case BuildTarget.Android:
+          return "apk";
+        default:
+          return "";
       }
     }
 
@@ -75,6 +95,7 @@ namespace Leap.Unity.Packaging {
           Arguments = "/C git log -1",
           WorkingDirectory = Directory.GetParent(Application.dataPath).FullName,
           RedirectStandardOutput = true,
+          CreateNoWindow = true,
           UseShellExecute = false
         };
 

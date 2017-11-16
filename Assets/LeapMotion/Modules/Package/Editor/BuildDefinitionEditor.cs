@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using UnityEngine;
 using UnityEditor;
 
@@ -11,6 +12,7 @@ namespace Leap.Unity.Packaging {
       base.OnEnable();
 
       specifyCustomDecorator("_options", prop => drawExportFolder(prop, "Build", "Build Folder"));
+      specifyCustomDrawer("_options", drawOptions);
 
       createList("_scenes", drawScene);
       createList("_targets", drawBuildTarget);
@@ -40,6 +42,21 @@ namespace Leap.Unity.Packaging {
 
     private void drawBuildTarget(Rect rect, SerializedProperty property) {
       EditorGUI.PropertyField(rect, property, GUIContent.none);
+    }
+
+    private void drawOptions(SerializedProperty prop) {
+      EditorGUILayout.BeginHorizontal();
+
+      EditorGUILayout.PropertyField(prop);
+
+      if (GUILayout.Button("Release")) {
+
+      }
+      if (GUILayout.Button("Debug")) {
+
+      }
+
+      EditorGUILayout.EndHorizontal();
     }
   }
 }
