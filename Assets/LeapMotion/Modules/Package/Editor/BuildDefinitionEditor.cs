@@ -49,11 +49,11 @@ namespace Leap.Unity.Packaging {
 
       EditorGUILayout.PropertyField(prop);
 
-      if (GUILayout.Button("Release")) {
-
-      }
-      if (GUILayout.Button("Debug")) {
-
+      if (GUILayout.Button("Debug", GUILayout.ExpandWidth(false))) {
+        prop.intValue = (int)(BuildOptions.AllowDebugging |
+                              BuildOptions.ConnectWithProfiler |
+                              BuildOptions.Development |
+                              BuildOptions.ForceEnableAssertions);
       }
 
       EditorGUILayout.EndHorizontal();

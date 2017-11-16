@@ -34,7 +34,7 @@ namespace Leap.Unity.Packaging {
         EditorGUILayout.LabelField(label);
       }
 
-      if (GUILayout.Button("Change")) {
+      if (GUILayout.Button("Change", GUILayout.ExpandWidth(false))) {
         target.PrompUserToSetExportPath();
       }
 

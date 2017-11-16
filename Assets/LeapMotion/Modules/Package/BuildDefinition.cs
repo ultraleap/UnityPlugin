@@ -23,7 +23,7 @@ namespace Leap.Unity.Packaging {
     [Tooltip("The options to enable for this build.")]
     [EnumFlags]
     [SerializeField]
-    private BuildOptions _options;
+    private BuildOptions _options = BuildOptions.None;
 
     [Tooltip("The scenes that should be included in this build, " + "" +
              "in the order they should be included.")]

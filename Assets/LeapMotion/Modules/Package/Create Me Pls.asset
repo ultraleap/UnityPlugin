@@ -14,6 +14,6 @@ MonoBehaviour:
   _definitionName: My Super Build
   _generateBuildDropdown: 1
   _trySuffixWithGitHash: 1
-  _options: 1
+  _options: 0
   _scenes: []
   _targets: 0d000000
