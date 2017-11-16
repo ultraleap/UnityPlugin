@@ -33,7 +33,7 @@ namespace Leap.Unity.Swizzle.Generation {
             builder.AppendLine();
 
             builder.Append("    ");
-            builder.Append("    public static " + sourceType + " ");
+            builder.Append("public static " + sourceType + " ");
             for (int k = 0; k < components.Length; k++) {
               builder.Append("xyzw"[components[k]]);
             }
