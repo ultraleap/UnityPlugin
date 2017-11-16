@@ -13,10 +13,10 @@ namespace Leap.Unity.Packaging {
 
     [SerializeField]
     [FormerlySerializedAs("_packageName")]
-    private string _definitionName;
+    protected string _definitionName;
 
     [SerializeField]
-    private bool _generateBuildDropdown = false;
+    protected bool _generateBuildDropdown = false;
 
     public string DefinitionName {
       get {

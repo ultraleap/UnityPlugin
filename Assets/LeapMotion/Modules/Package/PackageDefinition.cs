@@ -40,6 +40,10 @@ namespace Leap.Unity.Packaging {
     [SerializeField]
     protected PackageDefinition[] _dependantPackages;
 
+    public PackageDefinition() {
+      _definitionName = "MyPackage";
+    }
+
 #if UNITY_EDITOR
     public static PackageDefinition[] FindAll() {
       return AssetDatabase.FindAssets("t:PackageDefinition").

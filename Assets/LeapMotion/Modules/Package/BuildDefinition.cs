@@ -11,7 +11,6 @@ using UnityEditor;
 namespace Leap.Unity.Packaging {
   using Attributes;
 
-  [CreateAssetMenu(fileName = "Create Me Pls")]
   public class BuildDefinition : DefinitionBase {
     private const string BUILD_EXPORT_FOLDER_KEY = "LeapBuildDefExportFolder";
     private const string DEFAULT_BUILD_NAME = "Build.asset";
@@ -33,6 +32,10 @@ namespace Leap.Unity.Packaging {
     [Tooltip("The build targets to use for this build definition.")]
     [SerializeField]
     private BuildTarget[] _targets = { BuildTarget.StandaloneWindows64 };
+
+    public BuildDefinition() {
+      _definitionName = "MyBuild";
+    }
 
     public static void Build(string guid) {
       var path = AssetDatabase.GUIDToAssetPath(guid);
@@ -68,7 +71,6 @@ namespace Leap.Unity.Packaging {
       foreach (var target in _targets) {
         buildOptions.target = target;
         buildOptions.locationPathName = fullPath + "." + getFileSuffix(target);
-
         BuildPipeline.BuildPlayer(buildOptions);
       }
     }
@@ -121,7 +123,32 @@ namespace Leap.Unity.Packaging {
 
     [MenuItem("Build/All Apps", priority = 1)]
     public static void BuildAll() {
+      foreach (var item in Resources.FindObjectsOfTypeAll<BuildDefinition>()) {
+        item.Build();
+      }
+    }
 
+    [MenuItem("Assets/Create/Build Definition", priority = 201)]
+    private static void createNewPackageDef() {
+      string path = "Assets";
+
+      foreach (UnityEngine.Object obj in Selection.GetFiltered(typeof(UnityEngine.Object), SelectionMode.Assets)) {
+        path = AssetDatabase.GetAssetPath(obj);
+        if (!string.IsNullOrEmpty(path) && File.Exists(path)) {
+          path = Path.GetDirectoryName(path);
+          break;
+        }
+      }
+
+      path = Path.Combine(path, DEFAULT_BUILD_NAME);
+      path = AssetDatabase.GenerateUniqueAssetPath(path);
+
+      BuildDefinition build = CreateInstance<BuildDefinition>();
+      AssetDatabase.CreateAsset(build, path);
+      AssetDatabase.SaveAssets();
+      AssetDatabase.Refresh();
+
+      Selection.activeObject = build;
     }
 #endif
   }
