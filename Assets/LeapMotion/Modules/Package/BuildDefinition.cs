@@ -73,6 +73,8 @@ namespace Leap.Unity.Packaging {
         buildOptions.locationPathName = fullPath + "." + getFileSuffix(target);
         BuildPipeline.BuildPlayer(buildOptions);
       }
+
+      Process.Start(exportFolder);
     }
 
     private static string getFileSuffix(BuildTarget target) {
