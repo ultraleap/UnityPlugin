@@ -40,7 +40,7 @@ namespace Leap.Unity.Generation {
                                Select(s => s + "\n").
                                Fold((a, b) => a + b);
 
-      using (var writer = File.CreateText(Path.Combine(targetFolder.Path, "BitConverterNoAlloc.cs"))) {
+      using (var writer = File.CreateText(Path.Combine(targetFolder.Path, "BitConverterNonAlloc.cs"))) {
         writer.Write(beforeCode);
 
         foreach (var primitiveType in primitiveTypes) {
