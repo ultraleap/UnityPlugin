@@ -29,7 +29,6 @@ namespace Leap.Unity.Swizzle.Generation {
 
           int[] components = new int[j];
           do {
-
             builder.AppendLine();
 
             builder.Append("    ");
@@ -54,9 +53,7 @@ namespace Leap.Unity.Swizzle.Generation {
             builder.Append("    ");
             builder.Append("}");
             builder.AppendLine();
-
-            Utils.NextPermutation(components, i);
-          } while (components.Query().Any(c => c != 0));
+          } while (Utils.NextPermutation(components, i));
         }
       }
 

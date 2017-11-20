@@ -446,11 +446,25 @@ namespace Leap.Unity {
       return Quaternion.SlerpUnclamped(a, b, extrapolatedTime.MapUnclamped(aTime, bTime, 0f, 1f));
     }
 
-    public static void NextPermutation(IList<int> values, int maxValue) {
-      NextPermutation(values, i => (i + 1) % maxValue);
+    /// <summary>
+    /// A specification of the generic NextPermutation method that only works for integers ranging
+    /// from 0 inclusive to maxValue exclusive.
+    /// </summary>
+    public static bool NextPermutation(IList<int> values, int maxValue) {
+      return NextPermutation(values, i => (i + 1) % maxValue);
     }
 
-    public static void NextPermutation<T>(IList<T> values, Func<T, T> getNext) where T : IComparable<T> {
+    /// <summary>
+    /// Given one permutation of a sequence, mutate it into the next permutation in the sequence, or
+    /// into the first permutation if the last permutation has been reached.
+    /// 
+    /// The values must be comparable to each other.  The getNext function takes an element and returns
+    /// the next element in the sequence, or the first element if there is no next element.
+    /// </summary>
+    /// <returns>
+    /// Returns true if the new permutation comes after the input permutation, false otherwise.
+    /// </returns>
+    public static bool NextPermutation<T>(IList<T> values, Func<T, T> getNext) where T : IComparable<T> {
       int index = 0;
       while (index < values.Count) {
         T value = values[index];
@@ -458,11 +472,13 @@ namespace Leap.Unity {
         values[index] = newValue;
 
         if (newValue.CompareTo(value) > 0) {
-          return;
+          return true;
         }
 
         index++;
       }
+
+      return false;
     }
 
     #endregion
