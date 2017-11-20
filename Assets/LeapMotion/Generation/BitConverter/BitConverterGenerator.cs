@@ -14,13 +14,22 @@ namespace Leap.Unity.Generation {
     public const string TEMPLATE_NAMESPACE = "Leap.Unity.Generation";
     public const string TARGET_NAMESPACE = "Leap.Unity";
 
-    public TextAsset template;
+    public TextAsset codeTemplate;
+    public TextAsset testTemplate;
+
     public AssetFolder targetFolder;
+    public AssetFolder testFolder;
+
     public string[] primitiveTypes;
 
     public override void Generate() {
+      replaceCenterCode(codeTemplate, targetFolder, "_Primitive_", "BitConverterNonAlloc.cs");
+      replaceCenterCode(testTemplate, testFolder, "Single", "BitConverterNonAllocTests.cs");
+    }
+
+    private void replaceCenterCode(TextAsset template, AssetFolder folder, string toReplace, string filename) {
       string[] lines = template.text.Replace(TEMPLATE_NAMESPACE, TARGET_NAMESPACE).
-                                     Split('\n');
+                                 Split('\n');
 
       string codeTemplate = lines.Query().
                                   SkipWhile(l => !l.Contains(BEGIN_KEY)).
@@ -40,11 +49,11 @@ namespace Leap.Unity.Generation {
                                Select(s => s + "\n").
                                Fold((a, b) => a + b);
 
-      using (var writer = File.CreateText(Path.Combine(targetFolder.Path, "BitConverterNonAlloc.cs"))) {
+      using (var writer = File.CreateText(Path.Combine(folder.Path, filename))) {
         writer.Write(beforeCode);
 
         foreach (var primitiveType in primitiveTypes) {
-          writer.Write(codeTemplate.Replace("_Primitive_", primitiveType));
+          writer.Write(codeTemplate.Replace(toReplace, primitiveType));
         }
 
         writer.Write(afterCode);
