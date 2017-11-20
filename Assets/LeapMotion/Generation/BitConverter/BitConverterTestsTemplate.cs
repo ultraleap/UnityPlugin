@@ -6,7 +6,7 @@ using NUnit.Framework;
 
 namespace Leap.Unity.Generation {
 
-  public class BitConverterTests {
+  public class BitConverterTests_Template_ {
 
     private byte[] _bytes;
 
@@ -22,7 +22,7 @@ namespace Leap.Unity.Generation {
     [Test]
     public void TestToSingle() {
       Single expected = BitConverter.ToSingle(_bytes, 0);
-      Single actual = BitConverterNonAlloc.ToSingle(_bytes, 0);
+      Single actual = _BitConverterTestMock_.ToSingle(_bytes, 0);
 
       Assert.That(actual, Is.EqualTo(expected));
     }
@@ -33,7 +33,7 @@ namespace Leap.Unity.Generation {
       var actual = BitConverter.GetBytes(value);
 
       int offset = 0;
-      BitConverterNonAlloc.GetBytes(value, _bytes, ref offset);
+      _BitConverterTestMock_.GetBytes(value, _bytes, ref offset);
 
       Assert.That(offset, Is.EqualTo(actual.Length));
       Assert.That(_bytes.Take(offset), Is.EquivalentTo(actual));

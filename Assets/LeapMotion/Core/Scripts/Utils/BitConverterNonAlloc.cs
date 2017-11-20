@@ -1,8 +1,9 @@
 using System;
+using NUnit.Framework;
 
 namespace Leap.Unity {
 
-  public static class BitConverterNonAlloc {
+  public class BitConverterNonAlloc {
 
     public static UInt16 ToUInt16(byte[] bytes, int offset = 0) {
       unsafe {
@@ -309,4 +310,3 @@ namespace Leap.Unity {
     }
   }
 }
-

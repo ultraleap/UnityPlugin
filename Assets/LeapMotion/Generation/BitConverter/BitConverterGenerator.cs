@@ -28,8 +28,19 @@ namespace Leap.Unity.Generation {
     }
 
     private void replaceCenterCode(TextAsset template, AssetFolder folder, string toReplace, string filename) {
-      string[] lines = template.text.Replace(TEMPLATE_NAMESPACE, TARGET_NAMESPACE).
-                                 Split('\n');
+      List<string> lines = new List<string>();
+      using (var reader = new StringReader(template.text)) {
+        while (true) {
+          string line = reader.ReadLine();
+          if (line == null) {
+            break;
+          }
+
+          lines.Add(line.Replace(TEMPLATE_NAMESPACE, TARGET_NAMESPACE).
+                         Replace("_Template_", "").
+                         Replace("_BitConverterTestMock_", "BitConverterNonAlloc"));
+        }
+      }
 
       string codeTemplate = lines.Query().
                                   SkipWhile(l => !l.Contains(BEGIN_KEY)).
@@ -62,4 +73,9 @@ namespace Leap.Unity.Generation {
   }
 
   public struct _Primitive_ { }
+
+  public static class _BitConverterTestMock_ {
+    public static System.Single ToSingle(byte[] bytes, int offset) { return 0; }
+    public static void GetBytes(System.Single value, byte[] bytes, ref int offset) { return; }
+  }
 }
