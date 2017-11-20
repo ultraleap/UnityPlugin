@@ -465,8 +465,8 @@ namespace Leap.Unity {
     /// Returns true if the new permutation comes after the input permutation, false otherwise.
     /// </returns>
     public static bool NextPermutation<T>(IList<T> values, Func<T, T> getNext) where T : IComparable<T> {
-      int index = 0;
-      while (index < values.Count) {
+      int index = values.Count - 1;
+      while (index >= 0) {
         T value = values[index];
         T newValue = getNext(value);
         values[index] = newValue;
@@ -475,7 +475,7 @@ namespace Leap.Unity {
           return true;
         }
 
-        index++;
+        index--;
       }
 
       return false;
