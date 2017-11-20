@@ -29,135 +29,135 @@ namespace Leap.Unity.Swizzle {
       return new Vector2(vector.y, vector.y);
     }
 
-    public static Vector2 xxx(this Vector2 vector) {
+    public static Vector3 xxx(this Vector2 vector) {
       return new Vector3(vector.x, vector.x, vector.x);
     }
 
-    public static Vector2 yxx(this Vector2 vector) {
+    public static Vector3 yxx(this Vector2 vector) {
       return new Vector3(vector.y, vector.x, vector.x);
     }
 
-    public static Vector2 xyx(this Vector2 vector) {
+    public static Vector3 xyx(this Vector2 vector) {
       return new Vector3(vector.x, vector.y, vector.x);
     }
 
-    public static Vector2 yyx(this Vector2 vector) {
+    public static Vector3 yyx(this Vector2 vector) {
       return new Vector3(vector.y, vector.y, vector.x);
     }
 
-    public static Vector2 xxy(this Vector2 vector) {
+    public static Vector3 xxy(this Vector2 vector) {
       return new Vector3(vector.x, vector.x, vector.y);
     }
 
-    public static Vector2 yxy(this Vector2 vector) {
+    public static Vector3 yxy(this Vector2 vector) {
       return new Vector3(vector.y, vector.x, vector.y);
     }
 
-    public static Vector2 xyy(this Vector2 vector) {
+    public static Vector3 xyy(this Vector2 vector) {
       return new Vector3(vector.x, vector.y, vector.y);
     }
 
-    public static Vector2 yyy(this Vector2 vector) {
+    public static Vector3 yyy(this Vector2 vector) {
       return new Vector3(vector.y, vector.y, vector.y);
     }
 
-    public static Vector2 xxxx(this Vector2 vector) {
+    public static Vector4 xxxx(this Vector2 vector) {
       return new Vector4(vector.x, vector.x, vector.x, vector.x);
     }
 
-    public static Vector2 yxxx(this Vector2 vector) {
+    public static Vector4 yxxx(this Vector2 vector) {
       return new Vector4(vector.y, vector.x, vector.x, vector.x);
     }
 
-    public static Vector2 xyxx(this Vector2 vector) {
+    public static Vector4 xyxx(this Vector2 vector) {
       return new Vector4(vector.x, vector.y, vector.x, vector.x);
     }
 
-    public static Vector2 yyxx(this Vector2 vector) {
+    public static Vector4 yyxx(this Vector2 vector) {
       return new Vector4(vector.y, vector.y, vector.x, vector.x);
     }
 
-    public static Vector2 xxyx(this Vector2 vector) {
+    public static Vector4 xxyx(this Vector2 vector) {
       return new Vector4(vector.x, vector.x, vector.y, vector.x);
     }
 
-    public static Vector2 yxyx(this Vector2 vector) {
+    public static Vector4 yxyx(this Vector2 vector) {
       return new Vector4(vector.y, vector.x, vector.y, vector.x);
     }
 
-    public static Vector2 xyyx(this Vector2 vector) {
+    public static Vector4 xyyx(this Vector2 vector) {
       return new Vector4(vector.x, vector.y, vector.y, vector.x);
     }
 
-    public static Vector2 yyyx(this Vector2 vector) {
+    public static Vector4 yyyx(this Vector2 vector) {
       return new Vector4(vector.y, vector.y, vector.y, vector.x);
     }
 
-    public static Vector2 xxxy(this Vector2 vector) {
+    public static Vector4 xxxy(this Vector2 vector) {
       return new Vector4(vector.x, vector.x, vector.x, vector.y);
     }
 
-    public static Vector2 yxxy(this Vector2 vector) {
+    public static Vector4 yxxy(this Vector2 vector) {
       return new Vector4(vector.y, vector.x, vector.x, vector.y);
     }
 
-    public static Vector2 xyxy(this Vector2 vector) {
+    public static Vector4 xyxy(this Vector2 vector) {
       return new Vector4(vector.x, vector.y, vector.x, vector.y);
     }
 
-    public static Vector2 yyxy(this Vector2 vector) {
+    public static Vector4 yyxy(this Vector2 vector) {
       return new Vector4(vector.y, vector.y, vector.x, vector.y);
     }
 
-    public static Vector2 xxyy(this Vector2 vector) {
+    public static Vector4 xxyy(this Vector2 vector) {
       return new Vector4(vector.x, vector.x, vector.y, vector.y);
     }
 
-    public static Vector2 yxyy(this Vector2 vector) {
+    public static Vector4 yxyy(this Vector2 vector) {
       return new Vector4(vector.y, vector.x, vector.y, vector.y);
     }
 
-    public static Vector2 xyyy(this Vector2 vector) {
+    public static Vector4 xyyy(this Vector2 vector) {
       return new Vector4(vector.x, vector.y, vector.y, vector.y);
     }
 
-    public static Vector2 yyyy(this Vector2 vector) {
+    public static Vector4 yyyy(this Vector2 vector) {
       return new Vector4(vector.y, vector.y, vector.y, vector.y);
     }
 
-    public static Vector3 xx(this Vector3 vector) {
+    public static Vector2 xx(this Vector3 vector) {
       return new Vector2(vector.x, vector.x);
     }
 
-    public static Vector3 yx(this Vector3 vector) {
+    public static Vector2 yx(this Vector3 vector) {
       return new Vector2(vector.y, vector.x);
     }
 
-    public static Vector3 zx(this Vector3 vector) {
+    public static Vector2 zx(this Vector3 vector) {
       return new Vector2(vector.z, vector.x);
     }
 
-    public static Vector3 xy(this Vector3 vector) {
+    public static Vector2 xy(this Vector3 vector) {
       return new Vector2(vector.x, vector.y);
     }
 
-    public static Vector3 yy(this Vector3 vector) {
+    public static Vector2 yy(this Vector3 vector) {
       return new Vector2(vector.y, vector.y);
     }
 
-    public static Vector3 zy(this Vector3 vector) {
+    public static Vector2 zy(this Vector3 vector) {
       return new Vector2(vector.z, vector.y);
     }
 
-    public static Vector3 xz(this Vector3 vector) {
+    public static Vector2 xz(this Vector3 vector) {
       return new Vector2(vector.x, vector.z);
     }
 
-    public static Vector3 yz(this Vector3 vector) {
+    public static Vector2 yz(this Vector3 vector) {
       return new Vector2(vector.y, vector.z);
     }
 
-    public static Vector3 zz(this Vector3 vector) {
+    public static Vector2 zz(this Vector3 vector) {
       return new Vector2(vector.z, vector.z);
     }
 
@@ -269,647 +269,647 @@ namespace Leap.Unity.Swizzle {
       return new Vector3(vector.z, vector.z, vector.z);
     }
 
-    public static Vector3 xxxx(this Vector3 vector) {
+    public static Vector4 xxxx(this Vector3 vector) {
       return new Vector4(vector.x, vector.x, vector.x, vector.x);
     }
 
-    public static Vector3 yxxx(this Vector3 vector) {
+    public static Vector4 yxxx(this Vector3 vector) {
       return new Vector4(vector.y, vector.x, vector.x, vector.x);
     }
 
-    public static Vector3 zxxx(this Vector3 vector) {
+    public static Vector4 zxxx(this Vector3 vector) {
       return new Vector4(vector.z, vector.x, vector.x, vector.x);
     }
 
-    public static Vector3 xyxx(this Vector3 vector) {
+    public static Vector4 xyxx(this Vector3 vector) {
       return new Vector4(vector.x, vector.y, vector.x, vector.x);
     }
 
-    public static Vector3 yyxx(this Vector3 vector) {
+    public static Vector4 yyxx(this Vector3 vector) {
       return new Vector4(vector.y, vector.y, vector.x, vector.x);
     }
 
-    public static Vector3 zyxx(this Vector3 vector) {
+    public static Vector4 zyxx(this Vector3 vector) {
       return new Vector4(vector.z, vector.y, vector.x, vector.x);
     }
 
-    public static Vector3 xzxx(this Vector3 vector) {
+    public static Vector4 xzxx(this Vector3 vector) {
       return new Vector4(vector.x, vector.z, vector.x, vector.x);
     }
 
-    public static Vector3 yzxx(this Vector3 vector) {
+    public static Vector4 yzxx(this Vector3 vector) {
       return new Vector4(vector.y, vector.z, vector.x, vector.x);
     }
 
-    public static Vector3 zzxx(this Vector3 vector) {
+    public static Vector4 zzxx(this Vector3 vector) {
       return new Vector4(vector.z, vector.z, vector.x, vector.x);
     }
 
-    public static Vector3 xxyx(this Vector3 vector) {
+    public static Vector4 xxyx(this Vector3 vector) {
       return new Vector4(vector.x, vector.x, vector.y, vector.x);
     }
 
-    public static Vector3 yxyx(this Vector3 vector) {
+    public static Vector4 yxyx(this Vector3 vector) {
       return new Vector4(vector.y, vector.x, vector.y, vector.x);
     }
 
-    public static Vector3 zxyx(this Vector3 vector) {
+    public static Vector4 zxyx(this Vector3 vector) {
       return new Vector4(vector.z, vector.x, vector.y, vector.x);
     }
 
-    public static Vector3 xyyx(this Vector3 vector) {
+    public static Vector4 xyyx(this Vector3 vector) {
       return new Vector4(vector.x, vector.y, vector.y, vector.x);
     }
 
-    public static Vector3 yyyx(this Vector3 vector) {
+    public static Vector4 yyyx(this Vector3 vector) {
       return new Vector4(vector.y, vector.y, vector.y, vector.x);
     }
 
-    public static Vector3 zyyx(this Vector3 vector) {
+    public static Vector4 zyyx(this Vector3 vector) {
       return new Vector4(vector.z, vector.y, vector.y, vector.x);
     }
 
-    public static Vector3 xzyx(this Vector3 vector) {
+    public static Vector4 xzyx(this Vector3 vector) {
       return new Vector4(vector.x, vector.z, vector.y, vector.x);
     }
 
-    public static Vector3 yzyx(this Vector3 vector) {
+    public static Vector4 yzyx(this Vector3 vector) {
       return new Vector4(vector.y, vector.z, vector.y, vector.x);
     }
 
-    public static Vector3 zzyx(this Vector3 vector) {
+    public static Vector4 zzyx(this Vector3 vector) {
       return new Vector4(vector.z, vector.z, vector.y, vector.x);
     }
 
-    public static Vector3 xxzx(this Vector3 vector) {
+    public static Vector4 xxzx(this Vector3 vector) {
       return new Vector4(vector.x, vector.x, vector.z, vector.x);
     }
 
-    public static Vector3 yxzx(this Vector3 vector) {
+    public static Vector4 yxzx(this Vector3 vector) {
       return new Vector4(vector.y, vector.x, vector.z, vector.x);
     }
 
-    public static Vector3 zxzx(this Vector3 vector) {
+    public static Vector4 zxzx(this Vector3 vector) {
       return new Vector4(vector.z, vector.x, vector.z, vector.x);
     }
 
-    public static Vector3 xyzx(this Vector3 vector) {
+    public static Vector4 xyzx(this Vector3 vector) {
       return new Vector4(vector.x, vector.y, vector.z, vector.x);
     }
 
-    public static Vector3 yyzx(this Vector3 vector) {
+    public static Vector4 yyzx(this Vector3 vector) {
       return new Vector4(vector.y, vector.y, vector.z, vector.x);
     }
 
-    public static Vector3 zyzx(this Vector3 vector) {
+    public static Vector4 zyzx(this Vector3 vector) {
       return new Vector4(vector.z, vector.y, vector.z, vector.x);
     }
 
-    public static Vector3 xzzx(this Vector3 vector) {
+    public static Vector4 xzzx(this Vector3 vector) {
       return new Vector4(vector.x, vector.z, vector.z, vector.x);
     }
 
-    public static Vector3 yzzx(this Vector3 vector) {
+    public static Vector4 yzzx(this Vector3 vector) {
       return new Vector4(vector.y, vector.z, vector.z, vector.x);
     }
 
-    public static Vector3 zzzx(this Vector3 vector) {
+    public static Vector4 zzzx(this Vector3 vector) {
       return new Vector4(vector.z, vector.z, vector.z, vector.x);
     }
 
-    public static Vector3 xxxy(this Vector3 vector) {
+    public static Vector4 xxxy(this Vector3 vector) {
       return new Vector4(vector.x, vector.x, vector.x, vector.y);
     }
 
-    public static Vector3 yxxy(this Vector3 vector) {
+    public static Vector4 yxxy(this Vector3 vector) {
       return new Vector4(vector.y, vector.x, vector.x, vector.y);
     }
 
-    public static Vector3 zxxy(this Vector3 vector) {
+    public static Vector4 zxxy(this Vector3 vector) {
       return new Vector4(vector.z, vector.x, vector.x, vector.y);
     }
 
-    public static Vector3 xyxy(this Vector3 vector) {
+    public static Vector4 xyxy(this Vector3 vector) {
       return new Vector4(vector.x, vector.y, vector.x, vector.y);
     }
 
-    public static Vector3 yyxy(this Vector3 vector) {
+    public static Vector4 yyxy(this Vector3 vector) {
       return new Vector4(vector.y, vector.y, vector.x, vector.y);
     }
 
-    public static Vector3 zyxy(this Vector3 vector) {
+    public static Vector4 zyxy(this Vector3 vector) {
       return new Vector4(vector.z, vector.y, vector.x, vector.y);
     }
 
-    public static Vector3 xzxy(this Vector3 vector) {
+    public static Vector4 xzxy(this Vector3 vector) {
       return new Vector4(vector.x, vector.z, vector.x, vector.y);
     }
 
-    public static Vector3 yzxy(this Vector3 vector) {
+    public static Vector4 yzxy(this Vector3 vector) {
       return new Vector4(vector.y, vector.z, vector.x, vector.y);
     }
 
-    public static Vector3 zzxy(this Vector3 vector) {
+    public static Vector4 zzxy(this Vector3 vector) {
       return new Vector4(vector.z, vector.z, vector.x, vector.y);
     }
 
-    public static Vector3 xxyy(this Vector3 vector) {
+    public static Vector4 xxyy(this Vector3 vector) {
       return new Vector4(vector.x, vector.x, vector.y, vector.y);
     }
 
-    public static Vector3 yxyy(this Vector3 vector) {
+    public static Vector4 yxyy(this Vector3 vector) {
       return new Vector4(vector.y, vector.x, vector.y, vector.y);
     }
 
-    public static Vector3 zxyy(this Vector3 vector) {
+    public static Vector4 zxyy(this Vector3 vector) {
       return new Vector4(vector.z, vector.x, vector.y, vector.y);
     }
 
-    public static Vector3 xyyy(this Vector3 vector) {
+    public static Vector4 xyyy(this Vector3 vector) {
       return new Vector4(vector.x, vector.y, vector.y, vector.y);
     }
 
-    public static Vector3 yyyy(this Vector3 vector) {
+    public static Vector4 yyyy(this Vector3 vector) {
       return new Vector4(vector.y, vector.y, vector.y, vector.y);
     }
 
-    public static Vector3 zyyy(this Vector3 vector) {
+    public static Vector4 zyyy(this Vector3 vector) {
       return new Vector4(vector.z, vector.y, vector.y, vector.y);
     }
 
-    public static Vector3 xzyy(this Vector3 vector) {
+    public static Vector4 xzyy(this Vector3 vector) {
       return new Vector4(vector.x, vector.z, vector.y, vector.y);
     }
 
-    public static Vector3 yzyy(this Vector3 vector) {
+    public static Vector4 yzyy(this Vector3 vector) {
       return new Vector4(vector.y, vector.z, vector.y, vector.y);
     }
 
-    public static Vector3 zzyy(this Vector3 vector) {
+    public static Vector4 zzyy(this Vector3 vector) {
       return new Vector4(vector.z, vector.z, vector.y, vector.y);
     }
 
-    public static Vector3 xxzy(this Vector3 vector) {
+    public static Vector4 xxzy(this Vector3 vector) {
       return new Vector4(vector.x, vector.x, vector.z, vector.y);
     }
 
-    public static Vector3 yxzy(this Vector3 vector) {
+    public static Vector4 yxzy(this Vector3 vector) {
       return new Vector4(vector.y, vector.x, vector.z, vector.y);
     }
 
-    public static Vector3 zxzy(this Vector3 vector) {
+    public static Vector4 zxzy(this Vector3 vector) {
       return new Vector4(vector.z, vector.x, vector.z, vector.y);
     }
 
-    public static Vector3 xyzy(this Vector3 vector) {
+    public static Vector4 xyzy(this Vector3 vector) {
       return new Vector4(vector.x, vector.y, vector.z, vector.y);
     }
 
-    public static Vector3 yyzy(this Vector3 vector) {
+    public static Vector4 yyzy(this Vector3 vector) {
       return new Vector4(vector.y, vector.y, vector.z, vector.y);
     }
 
-    public static Vector3 zyzy(this Vector3 vector) {
+    public static Vector4 zyzy(this Vector3 vector) {
       return new Vector4(vector.z, vector.y, vector.z, vector.y);
     }
 
-    public static Vector3 xzzy(this Vector3 vector) {
+    public static Vector4 xzzy(this Vector3 vector) {
       return new Vector4(vector.x, vector.z, vector.z, vector.y);
     }
 
-    public static Vector3 yzzy(this Vector3 vector) {
+    public static Vector4 yzzy(this Vector3 vector) {
       return new Vector4(vector.y, vector.z, vector.z, vector.y);
     }
 
-    public static Vector3 zzzy(this Vector3 vector) {
+    public static Vector4 zzzy(this Vector3 vector) {
       return new Vector4(vector.z, vector.z, vector.z, vector.y);
     }
 
-    public static Vector3 xxxz(this Vector3 vector) {
+    public static Vector4 xxxz(this Vector3 vector) {
       return new Vector4(vector.x, vector.x, vector.x, vector.z);
     }
 
-    public static Vector3 yxxz(this Vector3 vector) {
+    public static Vector4 yxxz(this Vector3 vector) {
       return new Vector4(vector.y, vector.x, vector.x, vector.z);
     }
 
-    public static Vector3 zxxz(this Vector3 vector) {
+    public static Vector4 zxxz(this Vector3 vector) {
       return new Vector4(vector.z, vector.x, vector.x, vector.z);
     }
 
-    public static Vector3 xyxz(this Vector3 vector) {
+    public static Vector4 xyxz(this Vector3 vector) {
       return new Vector4(vector.x, vector.y, vector.x, vector.z);
     }
 
-    public static Vector3 yyxz(this Vector3 vector) {
+    public static Vector4 yyxz(this Vector3 vector) {
       return new Vector4(vector.y, vector.y, vector.x, vector.z);
     }
 
-    public static Vector3 zyxz(this Vector3 vector) {
+    public static Vector4 zyxz(this Vector3 vector) {
       return new Vector4(vector.z, vector.y, vector.x, vector.z);
     }
 
-    public static Vector3 xzxz(this Vector3 vector) {
+    public static Vector4 xzxz(this Vector3 vector) {
       return new Vector4(vector.x, vector.z, vector.x, vector.z);
     }
 
-    public static Vector3 yzxz(this Vector3 vector) {
+    public static Vector4 yzxz(this Vector3 vector) {
       return new Vector4(vector.y, vector.z, vector.x, vector.z);
     }
 
-    public static Vector3 zzxz(this Vector3 vector) {
+    public static Vector4 zzxz(this Vector3 vector) {
       return new Vector4(vector.z, vector.z, vector.x, vector.z);
     }
 
-    public static Vector3 xxyz(this Vector3 vector) {
+    public static Vector4 xxyz(this Vector3 vector) {
       return new Vector4(vector.x, vector.x, vector.y, vector.z);
     }
 
-    public static Vector3 yxyz(this Vector3 vector) {
+    public static Vector4 yxyz(this Vector3 vector) {
       return new Vector4(vector.y, vector.x, vector.y, vector.z);
     }
 
-    public static Vector3 zxyz(this Vector3 vector) {
+    public static Vector4 zxyz(this Vector3 vector) {
       return new Vector4(vector.z, vector.x, vector.y, vector.z);
     }
 
-    public static Vector3 xyyz(this Vector3 vector) {
+    public static Vector4 xyyz(this Vector3 vector) {
       return new Vector4(vector.x, vector.y, vector.y, vector.z);
     }
 
-    public static Vector3 yyyz(this Vector3 vector) {
+    public static Vector4 yyyz(this Vector3 vector) {
       return new Vector4(vector.y, vector.y, vector.y, vector.z);
     }
 
-    public static Vector3 zyyz(this Vector3 vector) {
+    public static Vector4 zyyz(this Vector3 vector) {
       return new Vector4(vector.z, vector.y, vector.y, vector.z);
     }
 
-    public static Vector3 xzyz(this Vector3 vector) {
+    public static Vector4 xzyz(this Vector3 vector) {
       return new Vector4(vector.x, vector.z, vector.y, vector.z);
     }
 
-    public static Vector3 yzyz(this Vector3 vector) {
+    public static Vector4 yzyz(this Vector3 vector) {
       return new Vector4(vector.y, vector.z, vector.y, vector.z);
     }
 
-    public static Vector3 zzyz(this Vector3 vector) {
+    public static Vector4 zzyz(this Vector3 vector) {
       return new Vector4(vector.z, vector.z, vector.y, vector.z);
     }
 
-    public static Vector3 xxzz(this Vector3 vector) {
+    public static Vector4 xxzz(this Vector3 vector) {
       return new Vector4(vector.x, vector.x, vector.z, vector.z);
     }
 
-    public static Vector3 yxzz(this Vector3 vector) {
+    public static Vector4 yxzz(this Vector3 vector) {
       return new Vector4(vector.y, vector.x, vector.z, vector.z);
     }
 
-    public static Vector3 zxzz(this Vector3 vector) {
+    public static Vector4 zxzz(this Vector3 vector) {
       return new Vector4(vector.z, vector.x, vector.z, vector.z);
     }
 
-    public static Vector3 xyzz(this Vector3 vector) {
+    public static Vector4 xyzz(this Vector3 vector) {
       return new Vector4(vector.x, vector.y, vector.z, vector.z);
     }
 
-    public static Vector3 yyzz(this Vector3 vector) {
+    public static Vector4 yyzz(this Vector3 vector) {
       return new Vector4(vector.y, vector.y, vector.z, vector.z);
     }
 
-    public static Vector3 zyzz(this Vector3 vector) {
+    public static Vector4 zyzz(this Vector3 vector) {
       return new Vector4(vector.z, vector.y, vector.z, vector.z);
     }
 
-    public static Vector3 xzzz(this Vector3 vector) {
+    public static Vector4 xzzz(this Vector3 vector) {
       return new Vector4(vector.x, vector.z, vector.z, vector.z);
     }
 
-    public static Vector3 yzzz(this Vector3 vector) {
+    public static Vector4 yzzz(this Vector3 vector) {
       return new Vector4(vector.y, vector.z, vector.z, vector.z);
     }
 
-    public static Vector3 zzzz(this Vector3 vector) {
+    public static Vector4 zzzz(this Vector3 vector) {
       return new Vector4(vector.z, vector.z, vector.z, vector.z);
     }
 
-    public static Vector4 xx(this Vector4 vector) {
+    public static Vector2 xx(this Vector4 vector) {
       return new Vector2(vector.x, vector.x);
     }
 
-    public static Vector4 yx(this Vector4 vector) {
+    public static Vector2 yx(this Vector4 vector) {
       return new Vector2(vector.y, vector.x);
     }
 
-    public static Vector4 zx(this Vector4 vector) {
+    public static Vector2 zx(this Vector4 vector) {
       return new Vector2(vector.z, vector.x);
     }
 
-    public static Vector4 wx(this Vector4 vector) {
+    public static Vector2 wx(this Vector4 vector) {
       return new Vector2(vector.w, vector.x);
     }
 
-    public static Vector4 xy(this Vector4 vector) {
+    public static Vector2 xy(this Vector4 vector) {
       return new Vector2(vector.x, vector.y);
     }
 
-    public static Vector4 yy(this Vector4 vector) {
+    public static Vector2 yy(this Vector4 vector) {
       return new Vector2(vector.y, vector.y);
     }
 
-    public static Vector4 zy(this Vector4 vector) {
+    public static Vector2 zy(this Vector4 vector) {
       return new Vector2(vector.z, vector.y);
     }
 
-    public static Vector4 wy(this Vector4 vector) {
+    public static Vector2 wy(this Vector4 vector) {
       return new Vector2(vector.w, vector.y);
     }
 
-    public static Vector4 xz(this Vector4 vector) {
+    public static Vector2 xz(this Vector4 vector) {
       return new Vector2(vector.x, vector.z);
     }
 
-    public static Vector4 yz(this Vector4 vector) {
+    public static Vector2 yz(this Vector4 vector) {
       return new Vector2(vector.y, vector.z);
     }
 
-    public static Vector4 zz(this Vector4 vector) {
+    public static Vector2 zz(this Vector4 vector) {
       return new Vector2(vector.z, vector.z);
     }
 
-    public static Vector4 wz(this Vector4 vector) {
+    public static Vector2 wz(this Vector4 vector) {
       return new Vector2(vector.w, vector.z);
     }
 
-    public static Vector4 xw(this Vector4 vector) {
+    public static Vector2 xw(this Vector4 vector) {
       return new Vector2(vector.x, vector.w);
     }
 
-    public static Vector4 yw(this Vector4 vector) {
+    public static Vector2 yw(this Vector4 vector) {
       return new Vector2(vector.y, vector.w);
     }
 
-    public static Vector4 zw(this Vector4 vector) {
+    public static Vector2 zw(this Vector4 vector) {
       return new Vector2(vector.z, vector.w);
     }
 
-    public static Vector4 ww(this Vector4 vector) {
+    public static Vector2 ww(this Vector4 vector) {
       return new Vector2(vector.w, vector.w);
     }
 
-    public static Vector4 xxx(this Vector4 vector) {
+    public static Vector3 xxx(this Vector4 vector) {
       return new Vector3(vector.x, vector.x, vector.x);
     }
 
-    public static Vector4 yxx(this Vector4 vector) {
+    public static Vector3 yxx(this Vector4 vector) {
       return new Vector3(vector.y, vector.x, vector.x);
     }
 
-    public static Vector4 zxx(this Vector4 vector) {
+    public static Vector3 zxx(this Vector4 vector) {
       return new Vector3(vector.z, vector.x, vector.x);
     }
 
-    public static Vector4 wxx(this Vector4 vector) {
+    public static Vector3 wxx(this Vector4 vector) {
       return new Vector3(vector.w, vector.x, vector.x);
     }
 
-    public static Vector4 xyx(this Vector4 vector) {
+    public static Vector3 xyx(this Vector4 vector) {
       return new Vector3(vector.x, vector.y, vector.x);
     }
 
-    public static Vector4 yyx(this Vector4 vector) {
+    public static Vector3 yyx(this Vector4 vector) {
       return new Vector3(vector.y, vector.y, vector.x);
     }
 
-    public static Vector4 zyx(this Vector4 vector) {
+    public static Vector3 zyx(this Vector4 vector) {
       return new Vector3(vector.z, vector.y, vector.x);
     }
 
-    public static Vector4 wyx(this Vector4 vector) {
+    public static Vector3 wyx(this Vector4 vector) {
       return new Vector3(vector.w, vector.y, vector.x);
     }
 
-    public static Vector4 xzx(this Vector4 vector) {
+    public static Vector3 xzx(this Vector4 vector) {
       return new Vector3(vector.x, vector.z, vector.x);
     }
 
-    public static Vector4 yzx(this Vector4 vector) {
+    public static Vector3 yzx(this Vector4 vector) {
       return new Vector3(vector.y, vector.z, vector.x);
     }
 
-    public static Vector4 zzx(this Vector4 vector) {
+    public static Vector3 zzx(this Vector4 vector) {
       return new Vector3(vector.z, vector.z, vector.x);
     }
 
-    public static Vector4 wzx(this Vector4 vector) {
+    public static Vector3 wzx(this Vector4 vector) {
       return new Vector3(vector.w, vector.z, vector.x);
     }
 
-    public static Vector4 xwx(this Vector4 vector) {
+    public static Vector3 xwx(this Vector4 vector) {
       return new Vector3(vector.x, vector.w, vector.x);
     }
 
-    public static Vector4 ywx(this Vector4 vector) {
+    public static Vector3 ywx(this Vector4 vector) {
       return new Vector3(vector.y, vector.w, vector.x);
     }
 
-    public static Vector4 zwx(this Vector4 vector) {
+    public static Vector3 zwx(this Vector4 vector) {
       return new Vector3(vector.z, vector.w, vector.x);
     }
 
-    public static Vector4 wwx(this Vector4 vector) {
+    public static Vector3 wwx(this Vector4 vector) {
       return new Vector3(vector.w, vector.w, vector.x);
     }
 
-    public static Vector4 xxy(this Vector4 vector) {
+    public static Vector3 xxy(this Vector4 vector) {
       return new Vector3(vector.x, vector.x, vector.y);
     }
 
-    public static Vector4 yxy(this Vector4 vector) {
+    public static Vector3 yxy(this Vector4 vector) {
       return new Vector3(vector.y, vector.x, vector.y);
     }
 
-    public static Vector4 zxy(this Vector4 vector) {
+    public static Vector3 zxy(this Vector4 vector) {
       return new Vector3(vector.z, vector.x, vector.y);
     }
 
-    public static Vector4 wxy(this Vector4 vector) {
+    public static Vector3 wxy(this Vector4 vector) {
       return new Vector3(vector.w, vector.x, vector.y);
     }
 
-    public static Vector4 xyy(this Vector4 vector) {
+    public static Vector3 xyy(this Vector4 vector) {
       return new Vector3(vector.x, vector.y, vector.y);
     }
 
-    public static Vector4 yyy(this Vector4 vector) {
+    public static Vector3 yyy(this Vector4 vector) {
       return new Vector3(vector.y, vector.y, vector.y);
     }
 
-    public static Vector4 zyy(this Vector4 vector) {
+    public static Vector3 zyy(this Vector4 vector) {
       return new Vector3(vector.z, vector.y, vector.y);
     }
 
-    public static Vector4 wyy(this Vector4 vector) {
+    public static Vector3 wyy(this Vector4 vector) {
       return new Vector3(vector.w, vector.y, vector.y);
     }
 
-    public static Vector4 xzy(this Vector4 vector) {
+    public static Vector3 xzy(this Vector4 vector) {
       return new Vector3(vector.x, vector.z, vector.y);
     }
 
-    public static Vector4 yzy(this Vector4 vector) {
+    public static Vector3 yzy(this Vector4 vector) {
       return new Vector3(vector.y, vector.z, vector.y);
     }
 
-    public static Vector4 zzy(this Vector4 vector) {
+    public static Vector3 zzy(this Vector4 vector) {
       return new Vector3(vector.z, vector.z, vector.y);
     }
 
-    public static Vector4 wzy(this Vector4 vector) {
+    public static Vector3 wzy(this Vector4 vector) {
       return new Vector3(vector.w, vector.z, vector.y);
     }
 
-    public static Vector4 xwy(this Vector4 vector) {
+    public static Vector3 xwy(this Vector4 vector) {
       return new Vector3(vector.x, vector.w, vector.y);
     }
 
-    public static Vector4 ywy(this Vector4 vector) {
+    public static Vector3 ywy(this Vector4 vector) {
       return new Vector3(vector.y, vector.w, vector.y);
     }
 
-    public static Vector4 zwy(this Vector4 vector) {
+    public static Vector3 zwy(this Vector4 vector) {
       return new Vector3(vector.z, vector.w, vector.y);
     }
 
-    public static Vector4 wwy(this Vector4 vector) {
+    public static Vector3 wwy(this Vector4 vector) {
       return new Vector3(vector.w, vector.w, vector.y);
     }
 
-    public static Vector4 xxz(this Vector4 vector) {
+    public static Vector3 xxz(this Vector4 vector) {
       return new Vector3(vector.x, vector.x, vector.z);
     }
 
-    public static Vector4 yxz(this Vector4 vector) {
+    public static Vector3 yxz(this Vector4 vector) {
       return new Vector3(vector.y, vector.x, vector.z);
     }
 
-    public static Vector4 zxz(this Vector4 vector) {
+    public static Vector3 zxz(this Vector4 vector) {
       return new Vector3(vector.z, vector.x, vector.z);
     }
 
-    public static Vector4 wxz(this Vector4 vector) {
+    public static Vector3 wxz(this Vector4 vector) {
       return new Vector3(vector.w, vector.x, vector.z);
     }
 
-    public static Vector4 xyz(this Vector4 vector) {
+    public static Vector3 xyz(this Vector4 vector) {
       return new Vector3(vector.x, vector.y, vector.z);
     }
 
-    public static Vector4 yyz(this Vector4 vector) {
+    public static Vector3 yyz(this Vector4 vector) {
       return new Vector3(vector.y, vector.y, vector.z);
     }
 
-    public static Vector4 zyz(this Vector4 vector) {
+    public static Vector3 zyz(this Vector4 vector) {
       return new Vector3(vector.z, vector.y, vector.z);
     }
 
-    public static Vector4 wyz(this Vector4 vector) {
+    public static Vector3 wyz(this Vector4 vector) {
       return new Vector3(vector.w, vector.y, vector.z);
     }
 
-    public static Vector4 xzz(this Vector4 vector) {
+    public static Vector3 xzz(this Vector4 vector) {
       return new Vector3(vector.x, vector.z, vector.z);
     }
 
-    public static Vector4 yzz(this Vector4 vector) {
+    public static Vector3 yzz(this Vector4 vector) {
       return new Vector3(vector.y, vector.z, vector.z);
     }
 
-    public static Vector4 zzz(this Vector4 vector) {
+    public static Vector3 zzz(this Vector4 vector) {
       return new Vector3(vector.z, vector.z, vector.z);
     }
 
-    public static Vector4 wzz(this Vector4 vector) {
+    public static Vector3 wzz(this Vector4 vector) {
       return new Vector3(vector.w, vector.z, vector.z);
     }
 
-    public static Vector4 xwz(this Vector4 vector) {
+    public static Vector3 xwz(this Vector4 vector) {
       return new Vector3(vector.x, vector.w, vector.z);
     }
 
-    public static Vector4 ywz(this Vector4 vector) {
+    public static Vector3 ywz(this Vector4 vector) {
       return new Vector3(vector.y, vector.w, vector.z);
     }
 
-    public static Vector4 zwz(this Vector4 vector) {
+    public static Vector3 zwz(this Vector4 vector) {
       return new Vector3(vector.z, vector.w, vector.z);
     }
 
-    public static Vector4 wwz(this Vector4 vector) {
+    public static Vector3 wwz(this Vector4 vector) {
       return new Vector3(vector.w, vector.w, vector.z);
     }
 
-    public static Vector4 xxw(this Vector4 vector) {
+    public static Vector3 xxw(this Vector4 vector) {
       return new Vector3(vector.x, vector.x, vector.w);
     }
 
-    public static Vector4 yxw(this Vector4 vector) {
+    public static Vector3 yxw(this Vector4 vector) {
       return new Vector3(vector.y, vector.x, vector.w);
     }
 
-    public static Vector4 zxw(this Vector4 vector) {
+    public static Vector3 zxw(this Vector4 vector) {
       return new Vector3(vector.z, vector.x, vector.w);
     }
 
-    public static Vector4 wxw(this Vector4 vector) {
+    public static Vector3 wxw(this Vector4 vector) {
       return new Vector3(vector.w, vector.x, vector.w);
     }
 
-    public static Vector4 xyw(this Vector4 vector) {
+    public static Vector3 xyw(this Vector4 vector) {
       return new Vector3(vector.x, vector.y, vector.w);
     }
 
-    public static Vector4 yyw(this Vector4 vector) {
+    public static Vector3 yyw(this Vector4 vector) {
       return new Vector3(vector.y, vector.y, vector.w);
     }
 
-    public static Vector4 zyw(this Vector4 vector) {
+    public static Vector3 zyw(this Vector4 vector) {
       return new Vector3(vector.z, vector.y, vector.w);
     }
 
-    public static Vector4 wyw(this Vector4 vector) {
+    public static Vector3 wyw(this Vector4 vector) {
       return new Vector3(vector.w, vector.y, vector.w);
     }
 
-    public static Vector4 xzw(this Vector4 vector) {
+    public static Vector3 xzw(this Vector4 vector) {
       return new Vector3(vector.x, vector.z, vector.w);
     }
 
-    public static Vector4 yzw(this Vector4 vector) {
+    public static Vector3 yzw(this Vector4 vector) {
       return new Vector3(vector.y, vector.z, vector.w);
     }
 
-    public static Vector4 zzw(this Vector4 vector) {
+    public static Vector3 zzw(this Vector4 vector) {
       return new Vector3(vector.z, vector.z, vector.w);
     }
 
-    public static Vector4 wzw(this Vector4 vector) {
+    public static Vector3 wzw(this Vector4 vector) {
       return new Vector3(vector.w, vector.z, vector.w);
     }
 
-    public static Vector4 xww(this Vector4 vector) {
+    public static Vector3 xww(this Vector4 vector) {
       return new Vector3(vector.x, vector.w, vector.w);
     }
 
-    public static Vector4 yww(this Vector4 vector) {
+    public static Vector3 yww(this Vector4 vector) {
       return new Vector3(vector.y, vector.w, vector.w);
     }
 
-    public static Vector4 zww(this Vector4 vector) {
+    public static Vector3 zww(this Vector4 vector) {
       return new Vector3(vector.z, vector.w, vector.w);
     }
 
-    public static Vector4 www(this Vector4 vector) {
+    public static Vector3 www(this Vector4 vector) {
       return new Vector3(vector.w, vector.w, vector.w);
     }
 
