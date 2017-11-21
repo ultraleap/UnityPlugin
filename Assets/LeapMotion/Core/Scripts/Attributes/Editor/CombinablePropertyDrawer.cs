@@ -103,7 +103,7 @@ namespace Leap.Unity.Attributes {
       }
 
       Rect r = position;
-      
+
       if (dragAndDropSupport != null) {
         processDragAndDrop(dragAndDropSupport, ref r, property);
       }
@@ -148,6 +148,7 @@ namespace Leap.Unity.Attributes {
       drawAdditive<IAfterFieldAdditiveDrawer>(ref r, property);
 
       EditorGUI.EndDisabledGroup();
+
       bool didChange = EditorGUI.EndChangeCheck();
 
       if (didChange || !property.hasMultipleDifferentValues) {
@@ -184,16 +185,15 @@ namespace Leap.Unity.Attributes {
       Rect dropArea = dragAndDropSupport.GetDropArea(r, property);
 
       switch (curEvent.type) {
+        case EventType.Repaint:
         case EventType.DragUpdated:
         case EventType.DragPerform:
           if (!dropArea.Contains(curEvent.mousePosition, allowInverse: true)) {
             break;
           }
 
-          bool isValidDrop = DragAndDrop.objectReferences
-                                        .Query()
-                                        .All(o => dragAndDropSupport
-                                                    .IsDropValid(o, property));
+          bool isValidDrop = dragAndDropSupport.IsDropValid(
+                               DragAndDrop.objectReferences, property);
 
           if (isValidDrop) {
             DragAndDrop.visualMode = DragAndDropVisualMode.Link;
@@ -205,9 +205,8 @@ namespace Leap.Unity.Attributes {
           if (curEvent.type == EventType.DragPerform && isValidDrop) {
             DragAndDrop.AcceptDrag();
 
-            foreach (var draggedObj in DragAndDrop.objectReferences) {
-              dragAndDropSupport.ProcessDroppedObject(draggedObj, property);
-            }
+            dragAndDropSupport.ProcessDroppedObjects(
+                                 DragAndDrop.objectReferences, property);
           }
 
           break;

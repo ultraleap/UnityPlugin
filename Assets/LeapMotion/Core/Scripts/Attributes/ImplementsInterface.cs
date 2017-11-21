@@ -56,6 +56,18 @@ namespace Leap.Unity.Attributes {
     /// that implements that interface, or null if none was found.
     /// </summary>
     public UnityObject FindImplementer(UnityObject obj) {
+
+      if (!fieldInfo.FieldType.IsAssignableFrom(obj.GetType())
+          && !(typeof(Component).IsAssignableFrom(fieldInfo.FieldType)
+               && obj.GetType() == typeof(GameObject))) {
+        // Even if the object implements the correct interface, the field isn't
+        // compatible with this object. E.g. A ScriptableObject can't be assigned to a
+        // MonoBehaviour field.
+        // We have to make an exception when a GameObject is dragged into a field whose
+        // type is a Component; we use GetComponent to satisfy that case.
+        return null;
+      }
+
       if (obj.GetType().ImplementsInterface(type)) {
         // All good! This object reference implements the interface.
         return obj;
@@ -99,12 +111,14 @@ namespace Leap.Unity.Attributes {
       return rect;
     }
 
-    public bool IsDropValid(UnityObject obj, SerializedProperty property) {
-      return FindImplementer(obj) != null;
+    public bool IsDropValid(UnityObject[] draggedObjects, SerializedProperty property) {
+      return draggedObjects.Query().Any(o => FindImplementer(o) != null);
     }
 
-    public void ProcessDroppedObject(UnityObject droppedObj, SerializedProperty property) {
-      var implementer = FindImplementer(droppedObj);
+    public void ProcessDroppedObjects(UnityObject[] droppedObjects,
+                                      SerializedProperty property) {
+      var implementer = droppedObjects.Query()
+                                      .FirstOrDefault(o => FindImplementer(o));
 
       if (implementer == null) {
         Debug.LogError(property.objectReferenceValue.GetType().Name
