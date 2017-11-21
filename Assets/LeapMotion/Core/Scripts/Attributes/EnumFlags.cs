@@ -56,7 +56,7 @@ namespace Leap.Unity.Attributes {
       int propertyMask = 0;
       {
         int index = 0;
-        while (resultMask != 0) {
+        while (resultMask != 0 && index < _enumValues.Length) {
           if ((resultMask & 1) != 0) {
             propertyMask |= _enumValues[index];
           }
