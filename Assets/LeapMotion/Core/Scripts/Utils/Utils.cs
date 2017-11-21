@@ -364,23 +364,25 @@ namespace Leap.Unity {
     }
     #endregion
 
-    #region Array Utils
+    #region Print Utils
 
     /// <summary>
     /// Prints the elements of an array in a bracket-enclosed, comma-delimited list,
     /// prefixed by the elements' type.
     /// </summary>
-    public static string ToArrayString<T>(this T[] arr) {
+    public static string ToArrayString<T>(this IEnumerable<T> enumerable) {
       var str = "[" + typeof(T).Name + ": ";
-      for (int i = 0; i < arr.Length; i++) {
-        if (i == arr.Length - 1) {
-          str += arr[i];
+      bool addedFirstElement = false;
+      foreach (var t in enumerable) {
+        if (addedFirstElement) {
+          str += ", ";
         }
-        else {
-          str += arr[i].ToString() + ", ";
-        }
+        str += t.ToString();
+
+        addedFirstElement = true;
       }
       str += "]";
+
       return str;
     }
 
