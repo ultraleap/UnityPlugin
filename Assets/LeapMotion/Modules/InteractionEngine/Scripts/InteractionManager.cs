@@ -267,9 +267,6 @@ namespace Leap.Unity.Interaction {
 
       if (!Application.isPlaying) return;
 
-      // Physics should only be synced once at the beginning of the physics simulation.
-      Physics.autoSyncTransforms = false;
-
       if (s_instance == null) s_instance = this;
 
       if (_autoGenerateLayers) {
@@ -316,6 +313,11 @@ namespace Leap.Unity.Interaction {
     void FixedUpdate() {
       OnPrePhysicalUpdate();
 
+      // Physics should only be synced once at the beginning of the physics simulation.
+      // (Will be re-set to its original value at the end of the update.)
+      var preUpdateAutoSyncTransforms = Physics.autoSyncTransforms;
+      Physics.autoSyncTransforms = false;
+
       refreshInteractionControllers();
 
 #if UNITY_EDITOR
@@ -352,6 +354,10 @@ namespace Leap.Unity.Interaction {
       if (autoGenerateLayers) {
         autoUpdateContactBoneLayerCollision();
       }
+
+      // Restore the autoSyncTransforms setting to whatever the user had it as before
+      // the Manager FixedUpdate.
+      Physics.autoSyncTransforms = preUpdateAutoSyncTransforms;
     }
 
     void LateUpdate() {

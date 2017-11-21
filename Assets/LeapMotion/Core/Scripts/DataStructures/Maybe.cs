@@ -105,7 +105,7 @@ namespace Leap.Unity {
     /// non-null if the type is a reference type.
     /// </summary>
     public static Maybe<T> Some(T t) {
-      if (Type<T>.isValueType && t == null) {
+      if (!Type<T>.isValueType && t == null) {
         throw new ArgumentNullException("Cannot use Some with a null argument.");
       }
 
