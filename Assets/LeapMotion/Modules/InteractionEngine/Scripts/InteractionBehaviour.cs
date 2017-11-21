@@ -811,62 +811,9 @@ namespace Leap.Unity.Interaction {
     public void FixedUpdateObject() {
       if (!ignoreGrasping) fixedUpdateGrasping();
       fixedUpdateLayers();
-      fixedUpdatePose();
 
       if (_appliedForces) { FixedUpdateForces(); }
     }
-
-    #region Pose & Movement
-
-    private Pose _worldPose;
-    private Maybe<Pose> _worldPoseLastFrame = Maybe.None;
-    private bool _recordLastPose = false;
-    private int _framesSinceLastDeltaPoseRequest = 0;
-    private const int DELTA_POSE_FRAMES_TIMEOUT = 20;
-
-    public Pose worldPose {
-      get {
-        return new Pose(rigidbody.position, rigidbody.rotation);
-      }
-    }
-
-    public Pose worldDeltaPose {
-      get {
-        if (!_recordLastPose) _recordLastPose = true;
-        _framesSinceLastDeltaPoseRequest = 0;
-
-        if (!_worldPoseLastFrame.hasValue) return Pose.identity;
-        else {
-          return worldPose.From(_worldPoseLastFrame.valueOrDefault);
-        }
-      }
-    }
-
-    private void fixedUpdatePose() {
-      using (new ProfilerSample("InteractionBehaviour: fixedUpdatePose")) {
-        if (!_recordLastPose) { return; }
-        else {
-          if (_framesSinceLastDeltaPoseRequest >= DELTA_POSE_FRAMES_TIMEOUT) {
-            _recordLastPose = false;
-            _worldPoseLastFrame = Maybe.None;
-            return;
-          }
-          else {
-            using (new ProfilerSample("InteractionBehaviour: set _worldPoseLastFrame")) {
-              _worldPoseLastFrame = _worldPose;
-            }
-
-            using (new ProfilerSample("InteractionBehaviour: set _worldPose with new Pose")) {
-              _worldPose = new Pose(rigidbody.position, rigidbody.rotation);
-            }
-          }
-
-          _framesSinceLastDeltaPoseRequest += 1;
-        }
-      }
-    }
-
-    #endregion
 
     #region Hovering
 
