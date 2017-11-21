@@ -24,8 +24,9 @@ namespace Leap.Unity.Packaging {
     [FormerlySerializedAs("_packageName")]
     protected string _definitionName;
 
+    [FormerlySerializedAs("_generateBuildDropdown")]
     [SerializeField]
-    protected bool _generateBuildDropdown = false;
+    protected bool _showInBuildMenu = false;
 
     public string DefinitionName {
       get {
@@ -33,9 +34,9 @@ namespace Leap.Unity.Packaging {
       }
     }
 
-    public bool GenerateBuildDropdown {
+    public bool ShowInBuildMenu {
       get {
-        return _generateBuildDropdown;
+        return _showInBuildMenu;
       }
     }
 

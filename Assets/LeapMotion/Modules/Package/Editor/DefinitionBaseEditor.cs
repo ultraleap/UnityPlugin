@@ -24,7 +24,7 @@ namespace Leap.Unity.Packaging {
       base.OnEnable();
 
       specifyCustomDrawer("_definitionName", drawDefName);
-      specifyCustomDrawer("_generateBuildDropdown", drawGenerateBuildDropdown);
+      specifyCustomDrawer("_showInBuildMenu", drawGenerateBuildDropdown);
     }
 
     protected abstract void OnBuild();
@@ -62,7 +62,7 @@ namespace Leap.Unity.Packaging {
       if (filteredName != "" && filteredName != property.stringValue) {
         property.stringValue = filteredName;
 
-        if (target.GenerateBuildDropdown) {
+        if (target.ShowInBuildMenu) {
           property.serializedObject.ApplyModifiedProperties();
           generateBuildMenuScript();
         }
@@ -95,7 +95,7 @@ namespace Leap.Unity.Packaging {
       builder.AppendLine("  public class " + typeName + "BuildMenuItems { ");
 
       foreach (var def in definitions) {
-        if (!def.GenerateBuildDropdown) continue;
+        if (!def.ShowInBuildMenu) continue;
 
         string guid = AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(def));
 
