@@ -470,6 +470,42 @@ namespace Leap.Unity {
       return Quaternion.SlerpUnclamped(a, b, extrapolatedTime.MapUnclamped(aTime, bTime, 0f, 1f));
     }
 
+    /// <summary>
+    /// A specification of the generic NextTuple method that only works for integers ranging
+    /// from 0 inclusive to maxValue exclusive.
+    /// </summary>
+    public static bool NextTuple(IList<int> tuple, int maxValue) {
+      return NextTuple(tuple, i => (i + 1) % maxValue);
+    }
+
+    /// <summary>
+    /// Given one tuple of a collection of possible tuples, mutate it into the next tuple in the 
+    /// in the lexicographic sequence, or into the first tuple if the last tuple has been reached.
+    /// 
+    /// The items of the tuple must be comparable to each other.  The getNext function takes an 
+    /// item and returns the next item in the lexicographic sequence, or the first item if there
+    /// is no next item.
+    /// </summary>
+    /// <returns>
+    /// Returns true if the new tuple comes after the input tuple, false otherwise.
+    /// </returns>
+    public static bool NextTuple<T>(IList<T> tuple, Func<T, T> nextItem) where T : IComparable<T> {
+      int index = tuple.Count - 1;
+      while (index >= 0) {
+        T value = tuple[index];
+        T newValue = nextItem(value);
+        tuple[index] = newValue;
+
+        if (newValue.CompareTo(value) > 0) {
+          return true;
+        }
+
+        index--;
+      }
+
+      return false;
+    }
+
     #endregion
 
     #region Value Mapping Utils
@@ -823,8 +859,7 @@ namespace Leap.Unity {
             ownedComponents.Add(component);
           }
         }
-      }
-      finally {
+      } finally {
         toVisit.Clear();
         Pool<Stack<Transform>>.Recycle(toVisit);
 
@@ -954,7 +989,7 @@ namespace Leap.Unity {
     /// </summary>
     public static Quaternion ToNormalized(this Quaternion quaternion) {
       float x = quaternion.x, y = quaternion.y, z = quaternion.z, w = quaternion.w;
-      float magnitude = Mathf.Sqrt(x*x + y*y + z*z + w*w);
+      float magnitude = Mathf.Sqrt(x * x + y * y + z * z + w * w);
 
       if (Mathf.Approximately(magnitude, 0f)) {
         return Quaternion.identity;
@@ -964,7 +999,7 @@ namespace Leap.Unity {
     }
 
     #endregion
-    
+
     #region Float Utils
 
     /// <summary>
@@ -1633,8 +1668,7 @@ namespace Leap.Unity {
       public bool TryGetNext(out Rect t) {
         if (MoveNext()) {
           t = Current; return true;
-        }
-        else {
+        } else {
           t = default(Rect); return false;
         }
       }
