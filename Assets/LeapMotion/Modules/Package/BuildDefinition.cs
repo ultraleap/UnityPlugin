@@ -26,22 +26,22 @@ namespace Leap.Unity.Packaging {
     private const string DEFAULT_BUILD_NAME = "Build.asset";
 
     [SerializeField]
-    private bool _trySuffixWithGitHash = false;
+    protected bool _trySuffixWithGitHash = false;
 
 #if UNITY_EDITOR
     [Tooltip("The options to enable for this build.")]
     [EnumFlags]
     [SerializeField]
-    private BuildOptions _options = BuildOptions.None;
+    protected BuildOptions _options = BuildOptions.None;
 
     [Tooltip("The scenes that should be included in this build, " + "" +
              "in the order they should be included.")]
     [SerializeField]
-    private SceneAsset[] _scenes;
+    protected SceneAsset[] _scenes;
 
     [Tooltip("The build targets to use for this build definition.")]
     [SerializeField]
-    private BuildTarget[] _targets = { BuildTarget.StandaloneWindows64 };
+    protected BuildTarget[] _targets = { BuildTarget.StandaloneWindows64 };
 
     public BuildDefinition() {
       _definitionName = "Build";
