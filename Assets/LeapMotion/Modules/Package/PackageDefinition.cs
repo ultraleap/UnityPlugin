@@ -19,6 +19,7 @@ using System.Diagnostics;
 
 namespace Leap.Unity.Packaging {
 
+  [CreateAssetMenu(fileName = "Package", menuName = "Package Definition", order = 202)]
   public class PackageDefinition : DefinitionBase {
     private const string DEFAULT_PACKAGE_NAME = "Package.asset";
 
@@ -41,7 +42,7 @@ namespace Leap.Unity.Packaging {
     protected PackageDefinition[] _dependantPackages;
 
     public PackageDefinition() {
-      _definitionName = "MyPackage";
+      _definitionName = "Package";
     }
 
 #if UNITY_EDITOR
@@ -207,29 +208,6 @@ namespace Leap.Unity.Packaging {
     [MenuItem("Build/All Packages", priority = 0)]
     private static void buildAllPackages() {
       buildPackages(FindAll());
-    }
-
-    [MenuItem("Assets/Create/Package Definition", priority = 201)]
-    private static void createNewPackageDef() {
-      string path = "Assets";
-
-      foreach (UnityEngine.Object obj in Selection.GetFiltered(typeof(UnityEngine.Object), SelectionMode.Assets)) {
-        path = AssetDatabase.GetAssetPath(obj);
-        if (!string.IsNullOrEmpty(path) && File.Exists(path)) {
-          path = Path.GetDirectoryName(path);
-          break;
-        }
-      }
-
-      path = Path.Combine(path, DEFAULT_PACKAGE_NAME);
-      path = AssetDatabase.GenerateUniqueAssetPath(path);
-
-      PackageDefinition package = CreateInstance<PackageDefinition>();
-      AssetDatabase.CreateAsset(package, path);
-      AssetDatabase.SaveAssets();
-      AssetDatabase.Refresh();
-
-      Selection.activeObject = package;
     }
 #endif
   }

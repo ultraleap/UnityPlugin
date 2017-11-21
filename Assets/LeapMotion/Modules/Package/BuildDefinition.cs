@@ -20,6 +20,7 @@ using UnityEditor;
 namespace Leap.Unity.Packaging {
   using Attributes;
 
+  [CreateAssetMenu(fileName = "Build", menuName = "Build Definition", order = 201)]
   public class BuildDefinition : DefinitionBase {
     private const string BUILD_EXPORT_FOLDER_KEY = "LeapBuildDefExportFolder";
     private const string DEFAULT_BUILD_NAME = "Build.asset";
@@ -43,7 +44,7 @@ namespace Leap.Unity.Packaging {
     private BuildTarget[] _targets = { BuildTarget.StandaloneWindows64 };
 
     public BuildDefinition() {
-      _definitionName = "MyBuild";
+      _definitionName = "Build";
     }
 
     public static void Build(string guid) {
@@ -137,29 +138,6 @@ namespace Leap.Unity.Packaging {
       foreach (var item in Resources.FindObjectsOfTypeAll<BuildDefinition>()) {
         item.Build();
       }
-    }
-
-    [MenuItem("Assets/Create/Build Definition", priority = 201)]
-    private static void createNewPackageDef() {
-      string path = "Assets";
-
-      foreach (UnityEngine.Object obj in Selection.GetFiltered(typeof(UnityEngine.Object), SelectionMode.Assets)) {
-        path = AssetDatabase.GetAssetPath(obj);
-        if (!string.IsNullOrEmpty(path) && File.Exists(path)) {
-          path = Path.GetDirectoryName(path);
-          break;
-        }
-      }
-
-      path = Path.Combine(path, DEFAULT_BUILD_NAME);
-      path = AssetDatabase.GenerateUniqueAssetPath(path);
-
-      BuildDefinition build = CreateInstance<BuildDefinition>();
-      AssetDatabase.CreateAsset(build, path);
-      AssetDatabase.SaveAssets();
-      AssetDatabase.Refresh();
-
-      Selection.activeObject = build;
     }
 #endif
   }
