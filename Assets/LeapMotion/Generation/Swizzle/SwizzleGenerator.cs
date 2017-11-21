@@ -62,7 +62,7 @@ namespace Leap.Unity.Swizzle.Generation {
             builder.Append("    ");
             builder.Append("}");
             builder.AppendLine();
-          } while (Utils.NextPermutation(components, i));
+          } while (Utils.NextTuple(components, i));
         }
       }
 

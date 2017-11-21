@@ -447,29 +447,30 @@ namespace Leap.Unity {
     }
 
     /// <summary>
-    /// A specification of the generic NextPermutation method that only works for integers ranging
+    /// A specification of the generic NextTuple method that only works for integers ranging
     /// from 0 inclusive to maxValue exclusive.
     /// </summary>
-    public static bool NextPermutation(IList<int> values, int maxValue) {
-      return NextPermutation(values, i => (i + 1) % maxValue);
+    public static bool NextTuple(IList<int> tuple, int maxValue) {
+      return NextTuple(tuple, i => (i + 1) % maxValue);
     }
 
     /// <summary>
-    /// Given one permutation of a sequence, mutate it into the next permutation in the sequence, or
-    /// into the first permutation if the last permutation has been reached.
+    /// Given one tuple of a collection of possible tuples, mutate it into the next tuple in the 
+    /// in the lexicographic sequence, or into the first tuple if the last tuple has been reached.
     /// 
-    /// The values must be comparable to each other.  The getNext function takes an element and returns
-    /// the next element in the sequence, or the first element if there is no next element.
+    /// The items of the tuple must be comparable to each other.  The getNext function takes an 
+    /// item and returns the next item in the lexicographic sequence, or the first item if there
+    /// is no next item.
     /// </summary>
     /// <returns>
-    /// Returns true if the new permutation comes after the input permutation, false otherwise.
+    /// Returns true if the new tuple comes after the input tuple, false otherwise.
     /// </returns>
-    public static bool NextPermutation<T>(IList<T> values, Func<T, T> getNext) where T : IComparable<T> {
-      int index = values.Count - 1;
+    public static bool NextTuple<T>(IList<T> tuple, Func<T, T> nextItem) where T : IComparable<T> {
+      int index = tuple.Count - 1;
       while (index >= 0) {
-        T value = values[index];
-        T newValue = getNext(value);
-        values[index] = newValue;
+        T value = tuple[index];
+        T newValue = nextItem(value);
+        tuple[index] = newValue;
 
         if (newValue.CompareTo(value) > 0) {
           return true;
