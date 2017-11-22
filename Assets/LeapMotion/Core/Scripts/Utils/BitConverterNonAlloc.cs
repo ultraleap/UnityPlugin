@@ -8,7 +8,6 @@
  ******************************************************************************/
 
 using System;
-using NUnit.Framework;
 
 namespace Leap.Unity {
 
