@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace Leap.Unity {
 
@@ -7,7 +8,7 @@ namespace Leap.Unity {
   /// multiplication, but Poses always have unit scale.
   /// </summary>
   [System.Serializable]
-  public struct Pose {
+  public struct Pose : IEquatable<Pose> {
 
     public Vector3    position;
     public Quaternion rotation;

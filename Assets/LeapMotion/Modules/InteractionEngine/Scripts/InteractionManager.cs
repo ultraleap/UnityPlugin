@@ -313,41 +313,54 @@ namespace Leap.Unity.Interaction {
     void FixedUpdate() {
       OnPrePhysicalUpdate();
 
-      refreshInteractionControllers();
+      // Physics should only be synced once at the beginning of the physics simulation.
+      // (Will be re-set to its original value at the end of the update.)
+      var preUpdateAutoSyncTransforms = Physics.autoSyncTransforms;
+      Physics.autoSyncTransforms = false;
+      try {
+
+        refreshInteractionControllers();
 
 #if UNITY_EDITOR
-      if (!Application.isPlaying) return;
+        if (!Application.isPlaying) return;
 #endif
 
-      using (new ProfilerSample("Interaction Manager FixedUpdate", this.gameObject)) {
-        // Ensure scale information is up-to-date.
-        _scale = this.transform.lossyScale.x;
+        using (new ProfilerSample("Interaction Manager FixedUpdate", this.gameObject)) {
+          // Ensure scale information is up-to-date.
+          _scale = this.transform.lossyScale.x;
 
-        // Update each interaction controller (Leap hands or supported VR controllers).
-        fixedUpdateInteractionControllers();
+          // Update each interaction controller (Leap hands or supported VR controllers).
+          fixedUpdateInteractionControllers();
 
-        // Perform each interaction object's FixedUpdateObject.
-        using (new ProfilerSample("FixedUpdateObject per-InteractionBehaviour")) {
-          foreach (var interactionObj in _interactionObjects) {
-            interactionObj.FixedUpdateObject();
+          // Perform each interaction object's FixedUpdateObject.
+          using (new ProfilerSample("FixedUpdateObject per-InteractionBehaviour")) {
+            foreach (var interactionObj in _interactionObjects) {
+              interactionObj.FixedUpdateObject();
+            }
+          }
+
+          // Apply soft contacts from all controllers in a unified solve.
+          // (This will clear softContacts and originalVelocities as well.)
+          using (new ProfilerSample("Apply Soft Contacts")) {
+            if (_softContacts.Count > 0) {
+              PhysicsUtility.applySoftContacts(_softContacts, _softContactOriginalVelocities);
+            }
           }
         }
 
-        // Apply soft contacts from all controllers in a unified solve.
-        // (This will clear softContacts and originalVelocities as well.)
-        using (new ProfilerSample("Apply Soft Contacts")) {
-          if (_softContacts.Count > 0) {
-            PhysicsUtility.applySoftContacts(_softContacts, _softContactOriginalVelocities);
-          }
+        OnPostPhysicalUpdate();
+
+        updateMovingFrameOfReferenceSupport();
+
+        if (autoGenerateLayers) {
+          autoUpdateContactBoneLayerCollision();
         }
+
       }
-
-      OnPostPhysicalUpdate();
-
-      updateMovingFrameOfReferenceSupport();
-
-      if (autoGenerateLayers) {
-        autoUpdateContactBoneLayerCollision();
+      finally {
+        // Restore the autoSyncTransforms setting to whatever the user had it as before
+        // the Manager FixedUpdate.
+        Physics.autoSyncTransforms = preUpdateAutoSyncTransforms;
       }
     }
 
