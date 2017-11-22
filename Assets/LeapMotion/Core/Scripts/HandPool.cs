@@ -62,10 +62,10 @@ namespace Leap.Unity {
       public IHandModel RightModel;
       [HideInInspector]
       public bool IsRightToBeSpawned;
+      [NonSerialized]
       public List<IHandModel> modelList = new List<IHandModel>();
+      [NonSerialized]
       public List<IHandModel> modelsCheckedOut = new List<IHandModel>();
-      [NonSerialized]
-      [NonSerialized]
       public bool IsEnabled = true;
       public bool CanDuplicate;
 
@@ -325,7 +325,7 @@ namespace Leap.Unity {
       }
     }
 
-    private bool shouldBeSpawned(Object model) {
+    private bool shouldBeSpawned(UnityEngine.Object model) {
       var prefabType = PrefabUtility.GetPrefabType(model);
       if (PrefabUtility.GetPrefabType(this) != PrefabType.Prefab) {
         return prefabType == PrefabType.Prefab;
