@@ -19,7 +19,7 @@ namespace Leap.Unity {
    * not in the Game view. Use debug hands when you aren't using visible hands in a scene
    * so that you can see where the hands are in the scene view.
    * */
-  public class DebugHand : IHandModel {
+  public class DebugHand : HandModelBase {
     private Hand hand_;
 
     [SerializeField]

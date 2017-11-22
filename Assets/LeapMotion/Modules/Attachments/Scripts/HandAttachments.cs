@@ -15,7 +15,7 @@ using Leap.Unity.RuntimeGizmos;
 namespace Leap.Unity.Attachments {
 
   /**
-  * An IHandModel object that has no graphics of its own, but which allows you to 
+  * An HandModelBase object that has no graphics of its own, but which allows you to 
   * add transforms matched to points on the hand, fingertips, and arm.
   *
   * To enable an attachment point, add an empty GameObject as a child of the 
@@ -32,7 +32,7 @@ namespace Leap.Unity.Attachments {
   * hand poses.
   *  @since 4.1.1
   */
-  public class HandAttachments : IHandModel, IRuntimeGizmoComponent {
+  public class HandAttachments : HandModelBase, IRuntimeGizmoComponent {
   
     /** The palm of the hand. */
     [Tooltip("The palm of the hand.")]
