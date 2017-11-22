@@ -7,10 +7,13 @@
  * between Leap Motion and you, your company or other organization.           *
  ******************************************************************************/
 
+using System.Collections.Generic;
+using UnityEngine;
+
 namespace Leap.Unity.Interaction.Internal {
 
-#if !NET_4_6
-  public delegate void Action<T1, T2, T3, T4, T5>(T1 p1, T2 p2, T3 p3, T4 p4, T5 p5);
-#endif
+  public delegate void GraspedMovementEvent(Vector3 oldPosition, Quaternion oldRotation,
+                                            Vector3 newPosition, Quaternion newRotation,
+                                            List<InteractionController> graspingControllers);
 
 }
