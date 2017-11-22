@@ -322,7 +322,7 @@ namespace Leap.Unity.Interaction {
     /// by its currently grasping controller(s). Subscribe to this callback if you'd like to override
     /// the default behaviour for grasping objects, for example, to constrain the object's position or rotation.
     /// 
-    /// Use InteractionBehaviour.Rigidbody.position and InteractionBehaviour.Rigidbody.rotation to set the
+    /// Use InteractionBehaviour.rigidbody.position and InteractionBehaviour.rigidbody.rotation to set the
     /// object's position and rotation. Merely setting the object's Transform's position and rotation is not
     /// recommended unless you understand the difference.
     /// </summary>
@@ -331,8 +331,9 @@ namespace Leap.Unity.Interaction {
     /// also valid to move the Interaction object (via its Rigidbody) in OnGraspStay, although OnGraspStay does
     /// not provide pre- and post-solve data in its callback signature.
     /// </remarks>
-    public Action<Vector3, Quaternion, Vector3, Quaternion, List<InteractionController>> OnGraspedMovement
-      = (preSolvedPos, preSolvedRot, solvedPos, solvedRot, graspingControllers) => { };
+    public GraspedMovementEvent OnGraspedMovement = (preSolvedPos, preSolvedRot,
+                                                     solvedPos,    solvedRot,
+                                                     graspingControllers) => { };
 
     /// <summary>
     /// Called when the object becomes grasped, if it was not already held by any interaction controllers on the
