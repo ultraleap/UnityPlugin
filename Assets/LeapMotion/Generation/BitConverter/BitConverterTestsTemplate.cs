@@ -7,6 +7,8 @@
  * between Leap Motion and you, your company or other organization.           *
  ******************************************************************************/
 
+#if UNITY_EDITOR
+
 using System;
 using System.Linq;
 using System.Collections.Generic;
@@ -50,3 +52,5 @@ namespace Leap.Unity.Generation {
     //END
   }
 }
+
+#endif
