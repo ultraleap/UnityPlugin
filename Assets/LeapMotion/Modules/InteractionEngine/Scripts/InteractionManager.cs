@@ -972,7 +972,9 @@ namespace Leap.Unity.Interaction {
           ignoreLayerCollision = false;
         }
 
-        _contactBoneIgnoreCollisionLayers[layerObjSetPair.Key.layerIndex] = ignoreLayerCollision;
+        if (layerObjSetPair.Key.layerIndex < _contactBoneIgnoreCollisionLayers.Length) {
+          _contactBoneIgnoreCollisionLayers[layerObjSetPair.Key.layerIndex] = ignoreLayerCollision;
+        }
       }
 
       for (int i = 0; i < 32; i++) {
