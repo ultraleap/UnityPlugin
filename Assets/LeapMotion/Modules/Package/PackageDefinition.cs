@@ -19,17 +19,9 @@ using System.Diagnostics;
 
 namespace Leap.Unity.Packaging {
 
-  public class PackageDefinition : ScriptableObject {
-    private const string PACKAGE_EXPORT_FOLDER_KEY = "LeapPackageDefExportFolder";
+  [CreateAssetMenu(fileName = "Package", menuName = "Package Definition", order = 202)]
+  public class PackageDefinition : DefinitionBase {
     private const string DEFAULT_PACKAGE_NAME = "Package.asset";
-
-    [Tooltip("The name of the package.  Used to define the name of the export package file.")]
-    [SerializeField]
-    protected string _packageName = "New Package";
-
-    [Tooltip("If true, will generate a menu item to build this package.")]
-    [SerializeField]
-    protected bool _generateBuildDropdown = false;
 
     [Tooltip("All files within each folder will be included in this package when built.")]
     [SerializeField]
@@ -49,16 +41,8 @@ namespace Leap.Unity.Packaging {
     [SerializeField]
     protected PackageDefinition[] _dependantPackages;
 
-    public string PackageName {
-      get {
-        return _packageName;
-      }
-    }
-
-    public bool GenerateBuildDropdown {
-      get {
-        return _generateBuildDropdown;
-      }
+    public PackageDefinition() {
+      _definitionName = "Package";
     }
 
 #if UNITY_EDITOR
@@ -66,66 +50,8 @@ namespace Leap.Unity.Packaging {
       return AssetDatabase.FindAssets("t:PackageDefinition").
              Select(guid => AssetDatabase.GUIDToAssetPath(guid)).
              Select(path => AssetDatabase.LoadAssetAtPath<PackageDefinition>(path)).
-             OrderBy(def => def._packageName).
+             OrderBy(def => def.DefinitionName).
              ToArray();
-    }
-
-    [ContextMenu("Reset Export Folder")]
-    public void ResetExportFolder() {
-      EditorPrefs.DeleteKey(getExportFolderKey());
-    }
-
-    [ContextMenu("Reset Export Folder For All")]
-    public void ResetAllExportFolders() {
-      var allPackageDefs = FindAll();
-      foreach (var package in allPackageDefs) {
-        package.ResetExportFolder();
-      }
-    }
-
-    /// <summary>
-    /// Forces a save prompt for the user to select the export path.  Returns whether or not
-    /// the path was updated.
-    /// </summary>
-    public bool PrompUserToSetExportPath() {
-      string promptFolder;
-      if (!TryGetPackageExportFolder(out promptFolder, promptIfNotDefined: false)) {
-        promptFolder = Application.dataPath;
-      }
-
-      string chosenFolder = EditorUtility.OpenFolderPanel("Select export folder for " + _packageName, promptFolder, "Packages");
-      if (string.IsNullOrEmpty(chosenFolder)) {
-        return false;
-      }
-
-      EditorPrefs.SetString(getExportFolderKey(), chosenFolder);
-      return true;
-    }
-
-    /// <summary>
-    /// Returns whether or not the export folder has been defined for this user.
-    /// </summary>
-    public bool HasExportFolderBeenDefined() {
-      string key = getExportFolderKey();
-      return EditorPrefs.HasKey(key);
-    }
-
-    /// <summary>
-    /// Tries to get the package export folder.  This method can be configured to auto-promp
-    /// the user for the export folder if it is not yet defined.  Returns whether or not this
-    /// method returned a valid export folder.
-    /// </summary>
-    public bool TryGetPackageExportFolder(out string folder, bool promptIfNotDefined) {
-      string key = getExportFolderKey();
-      if (!EditorPrefs.HasKey(key)) {
-        if (!promptIfNotDefined || !PrompUserToSetExportPath()) {
-          folder = null;
-          return false;
-        }
-      }
-
-      folder = EditorPrefs.GetString(key);
-      return true;
     }
 
     public static void BuildPackage(string packageGUID) {
@@ -145,11 +71,11 @@ namespace Leap.Unity.Packaging {
     public void BuildPackage(bool interactive) {
       string exportFolder;
       if (!TryGetPackageExportFolder(out exportFolder, promptIfNotDefined: true)) {
-        UnityEngine.Debug.LogWarning("Did not build package " + _packageName + " because no path was defined.");
+        UnityEngine.Debug.LogWarning("Did not build package " + DefinitionName + " because no path was defined.");
         return;
       }
 
-      string exportPath = Path.Combine(exportFolder, _packageName + ".unitypackage");
+      string exportPath = Path.Combine(exportFolder, DefinitionName + ".unitypackage");
 
       HashSet<string> assets = new HashSet<string>();
 
@@ -162,7 +88,7 @@ namespace Leap.Unity.Packaging {
         //Check for missing files.  Any dependant file that is missing is an error and build cannot continue!
         var missingFiles = package._dependantFiles.Distinct().Where(path => !File.Exists(path));
         if (missingFiles.Any()) {
-          string message = "Could not build package [" + package.PackageName + "] because the following dependant files were not found:\n";
+          string message = "Could not build package [" + package.DefinitionName + "] because the following dependant files were not found:\n";
           foreach (var missingFile in missingFiles) {
             message += "\n" + missingFile;
           }
@@ -253,26 +179,20 @@ namespace Leap.Unity.Packaging {
       return children;
     }
 
-    private string getExportFolderKey() {
-      //Tie the key to the guid of the asset, as it will never change for the duration of the asset's life and will be unique for
-      //a given computer.
-      return PACKAGE_EXPORT_FOLDER_KEY + "_" + AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(this));
-    }
-
     private static void buildPackages(PackageDefinition[] packages) {
       string validPath = null;
       try {
         for (int i = 0; i < packages.Length; i++) {
           var package = packages[i];
 
-          if (EditorUtility.DisplayCancelableProgressBar("Building Packages", "Building " + package._packageName + "...", i / (float)packages.Length)) {
+          if (EditorUtility.DisplayCancelableProgressBar("Building Packages", "Building " + package.DefinitionName + "...", i / (float)packages.Length)) {
             break;
           }
           try {
             package.BuildPackage(interactive: false);
             package.TryGetPackageExportFolder(out validPath, promptIfNotDefined: false);
           } catch (Exception e) {
-            UnityEngine.Debug.LogError("Exception thrown while trying to build package " + package._packageName);
+            UnityEngine.Debug.LogError("Exception thrown while trying to build package " + package.DefinitionName);
             UnityEngine.Debug.LogException(e);
           }
         }
@@ -285,32 +205,9 @@ namespace Leap.Unity.Packaging {
       }
     }
 
-    [MenuItem("Build/All", priority = -20)]
+    [MenuItem("Build/All Packages", priority = 0)]
     private static void buildAllPackages() {
       buildPackages(FindAll());
-    }
-
-    [MenuItem("Assets/Create/Package Definition", priority = 201)]
-    private static void createNewPackageDef() {
-      string path = "Assets";
-
-      foreach (UnityEngine.Object obj in Selection.GetFiltered(typeof(UnityEngine.Object), SelectionMode.Assets)) {
-        path = AssetDatabase.GetAssetPath(obj);
-        if (!string.IsNullOrEmpty(path) && File.Exists(path)) {
-          path = Path.GetDirectoryName(path);
-          break;
-        }
-      }
-
-      path = Path.Combine(path, DEFAULT_PACKAGE_NAME);
-      path = AssetDatabase.GenerateUniqueAssetPath(path);
-
-      PackageDefinition package = CreateInstance<PackageDefinition>();
-      AssetDatabase.CreateAsset(package, path);
-      AssetDatabase.SaveAssets();
-      AssetDatabase.Refresh();
-
-      Selection.activeObject = package;
     }
 #endif
   }
