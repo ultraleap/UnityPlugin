@@ -12,6 +12,7 @@ using UnityEngine.Assertions;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.Serialization;
+using System;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -61,9 +62,9 @@ namespace Leap.Unity {
       public IHandModel RightModel;
       [HideInInspector]
       public bool IsRightToBeSpawned;
-      [HideInInspector]
+      [NonSerialized]
       public List<IHandModel> modelList = new List<IHandModel>();
-      [HideInInspector]
+      [NonSerialized]
       public List<IHandModel> modelsCheckedOut = new List<IHandModel>();
       public bool IsEnabled = true;
       public bool CanDuplicate;
@@ -324,7 +325,7 @@ namespace Leap.Unity {
       }
     }
 
-    private bool shouldBeSpawned(Object model) {
+    private bool shouldBeSpawned(UnityEngine.Object model) {
       var prefabType = PrefabUtility.GetPrefabType(model);
       if (PrefabUtility.GetPrefabType(this) != PrefabType.Prefab) {
         return prefabType == PrefabType.Prefab;
