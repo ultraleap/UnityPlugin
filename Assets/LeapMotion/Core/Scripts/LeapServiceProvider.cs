@@ -68,7 +68,7 @@ namespace Leap.Unity {
     protected bool _useInterpolation = true;
 
     //Extrapolate on Android to compensate for the latency introduced by its graphics pipeline
-#if UNITY_ANDROID
+#if UNITY_ANDROID && !UNITY_EDITOR
     protected int ExtrapolationAmount = 15;
     protected int BounceAmount = 70;
 #else
