@@ -291,6 +291,13 @@ namespace Leap.Unity.GraphicalRenderer {
     }
 
     /// <summary>
+    /// Called by graphic groups when a renderer's attached space changes.
+    /// </summary>
+    public void SetAnchor(LeapSpaceAnchor anchor) {
+      _anchor = anchor;
+    }
+
+    /// <summary>
     /// Called by the system when this graphic is detached from a group.  This method
     /// is invoked both at runtime and at edit time.
     /// </summary>

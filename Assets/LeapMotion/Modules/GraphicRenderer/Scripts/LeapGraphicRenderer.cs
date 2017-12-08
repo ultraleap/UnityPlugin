@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Leap.Unity.Space;
 using Leap.Unity.Query;
+using Leap.Unity.Attributes;
 
 namespace Leap.Unity.GraphicalRenderer {
 
@@ -26,6 +27,7 @@ namespace Leap.Unity.GraphicalRenderer {
     #region INSPECTOR FIELDS
     [SerializeField]
     private LeapSpace _space;
+    private bool _lastSpaceWasNull = true;
 
     [SerializeField]
     private List<LeapGraphicGroup> _groups = new List<LeapGraphicGroup>();
@@ -34,10 +36,7 @@ namespace Leap.Unity.GraphicalRenderer {
     #region PUBLIC RUNTIME API
 
     /// <summary>
-    /// Returns the leap space that is currently attached to this graphic renderer.  The only
-    /// way to attach a space to a graphic renderer is by adding the space component onto the
-    /// same gameObject at edit time.  There is no support for adding or removing spaces at
-    /// runtime.
+    /// Returns the leap space that is currently attached to this graphic renderer.
     /// </summary>
     public LeapSpace space {
       get {
@@ -163,6 +162,7 @@ namespace Leap.Unity.GraphicalRenderer {
         if (_space != null) {
           _space.RebuildHierarchy();
           _space.RecalculateTransformers();
+          _lastSpaceWasNull = false;
         }
 
         foreach (var group in _groups) {
@@ -177,6 +177,11 @@ namespace Leap.Unity.GraphicalRenderer {
           group.OnDisable();
         }
       }
+    }
+
+    private void Update() {
+      // Validate the attached space to support it changing at runtime.
+      validateSpaceComponent();
     }
 
     private void LateUpdate() {
@@ -214,6 +219,48 @@ namespace Leap.Unity.GraphicalRenderer {
 
       foreach (var group in _groups) {
         group.UpdateRenderer();
+      }
+    }
+
+    private void validateSpaceComponent() {
+      var origSpace = _space;
+      
+      var spaces = Pool<List<LeapSpace>>.Spawn();
+      spaces.Clear();
+      try {
+        GetComponents<LeapSpace>(spaces);
+        _space = spaces.Query().FirstOrDefault(s => s.enabled);
+      }
+      finally {
+        spaces.Clear();
+        Pool<List<LeapSpace>>.Recycle(spaces);
+      }
+
+      if (Application.isPlaying
+          && (origSpace != _space || (_space == null && !_lastSpaceWasNull))) {
+        onRuntimeSpaceChanged();
+      }
+
+      _lastSpaceWasNull = _space == null;
+    }
+
+    private void onRuntimeSpaceChanged() {
+      // The space was modified, so refresh a bunch of things..
+
+      if (_space != null) {
+        _space.RebuildHierarchy();
+        _space.RecalculateTransformers();
+      }
+
+      // Need to update material keywords appropriately.
+      // This involves re-preparing materials, which happens OnEnable,
+      // so we'll "power-cycle" the whole renderer for simplicity's sake.
+      OnDisable();
+      OnEnable();
+      
+
+      foreach (var group in _groups) {
+        group.RefreshGraphicAnchors();
       }
     }
 
