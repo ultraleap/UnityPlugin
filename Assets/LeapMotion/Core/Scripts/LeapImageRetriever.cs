@@ -11,6 +11,7 @@ using UnityEngine;
 using UnityEngine.Serialization;
 using System;
 using System.Collections;
+using Leap.Unity.Query;
 using Leap.Unity.Attributes;
 
 namespace Leap.Unity {
@@ -27,7 +28,7 @@ namespace Leap.Unity {
     public const int LEFT_IMAGE_INDEX = 0;
     public const int RIGHT_IMAGE_INDEX = 1;
     public const float IMAGE_SETTING_POLL_RATE = 2.0f;
-    
+
     [SerializeField]
     LeapServiceProvider _provider;
 
@@ -42,10 +43,8 @@ namespace Leap.Unity {
     private EyeTextureData _eyeTextureData = new EyeTextureData();
 
     //Image that we have requested from the service.  Are requested in Update and retrieved in OnPreRender
-    protected Image _requestedImage = new Image();
-
-    protected bool imagesEnabled = true;
-    private bool checkingImageState = false;
+    protected ProduceConsumeBuffer<Image> _imageQueue = new ProduceConsumeBuffer<Image>(32);
+    protected Image _currentImage = null;
 
     public EyeTextureData TextureData {
       get {
@@ -102,8 +101,7 @@ namespace Leap.Unity {
       }
 
       public void UpdateTexture(Image image) {
-        Array.Copy(image.Data, 0, _intermediateArray, 0, _intermediateArray.Length);
-        _combinedTexture.LoadRawTextureData(_intermediateArray);
+        _combinedTexture.LoadRawTextureData(image.Data(Image.CameraType.LEFT));
         _combinedTexture.Apply();
       }
 
@@ -111,11 +109,8 @@ namespace Leap.Unity {
         switch (image.Format) {
           case Image.FormatType.INFRARED:
             return TextureFormat.Alpha8;
-          case Image.FormatType.IBRG:
-          case (Image.FormatType)4:       //Hack, Dragonfly still reports a weird format type
-            return TextureFormat.RGBA32;
           default:
-            throw new System.Exception("Unexpected image format " + image.Format + "!");
+            throw new Exception("Unexpected image format " + image.Format + "!");
         }
       }
 
@@ -123,12 +118,8 @@ namespace Leap.Unity {
         switch (format) {
           case TextureFormat.Alpha8:
             return 1;
-          case TextureFormat.RGBA32:
-          case TextureFormat.BGRA32:
-          case TextureFormat.ARGB32:
-            return 4;
           default:
-            throw new System.Exception("Unexpected texture format " + format);
+            throw new Exception("Unexpected texture format " + format);
         }
       }
     }
@@ -169,7 +160,10 @@ namespace Leap.Unity {
       }
 
       private void addDistortionData(Image image, Color32[] colors, int startIndex) {
-        float[] distortionData = image.Distortion;
+        float[] distortionData = image.Distortion(Image.CameraType.LEFT).
+                                       Query().
+                                       Concat(image.Distortion(Image.CameraType.RIGHT)).
+                                       ToArray();
 
         for (int i = 0; i < distortionData.Length; i += 2) {
           byte b0, b1, b2, b3;
@@ -288,26 +282,17 @@ namespace Leap.Unity {
     }
 
     void OnEnable() {
-      Controller controller = _provider.GetLeapController();
-      if (controller != null) {
-        onController(controller);
-      } else {
-        StartCoroutine(waitForController());
-      }
-
       LeapVRCameraControl.OnLeftPreRender += ApplyCameraProjectionValues;
       LeapVRCameraControl.OnRightPreRender += ApplyCameraProjectionValues;
+
+      subscribeToService();
     }
 
     void OnDisable() {
-      StopAllCoroutines();
-      Controller controller = _provider.GetLeapController();
-      if (controller != null) {
-        _provider.GetLeapController().DistortionChange -= onDistortionChange;
-      }
-
       LeapVRCameraControl.OnLeftPreRender -= ApplyCameraProjectionValues;
       LeapVRCameraControl.OnRightPreRender -= ApplyCameraProjectionValues;
+
+      unsubscribeFromService();
     }
 
     void OnDestroy() {
@@ -319,61 +304,68 @@ namespace Leap.Unity {
     }
 
     void OnPreRender() {
-      if (imagesEnabled) {
-        Controller controller = _provider.GetLeapController();
-        long start = controller.Now();
-        while (!_requestedImage.IsComplete) {
-          if (controller.Now() - start > ImageTimeout) break;
+      if (_currentImage != null) {
+        if (_eyeTextureData.CheckStale(_currentImage, _currentImage)) {
+          _eyeTextureData.Reconstruct(_currentImage, _currentImage);
         }
-        if (_requestedImage.IsComplete) {
-          if (_eyeTextureData.CheckStale(_requestedImage, _requestedImage)) {
-            _eyeTextureData.Reconstruct(_requestedImage, _requestedImage);
-          }
-          _eyeTextureData.UpdateTextures(_requestedImage, _requestedImage);
-        } else if (!checkingImageState) {
-          StartCoroutine(checkImageMode());
+
+        _eyeTextureData.UpdateTextures(_currentImage, _currentImage);
+      }
+    }
+
+    void LateUpdate() {
+      Frame imageFrame = _provider.CurrentFrame;
+
+      _currentImage = null;
+      while (true) {
+        if (!_imageQueue.TryDequeue(out _currentImage)) {
+          break;
+        }
+
+        if (_currentImage.SequenceId == imageFrame.Id) {
+          break;
         }
       }
     }
 
-    void Update() {
-      if (imagesEnabled) {
-        Frame imageFrame = _provider.CurrentFrame;
-        Controller controller = _provider.GetLeapController();
-        _requestedImage = controller.RequestImages(imageFrame.Id, Image.ImageType.DEFAULT);
-      } else if (!checkingImageState) {
-        StartCoroutine(checkImageMode());
+    private void subscribeToService() {
+      if (_serviceCoroutine != null) {
+        return;
+      }
+
+      _serviceCoroutine = StartCoroutine(serviceCoroutine());
+    }
+
+    private void unsubscribeFromService() {
+      if (_serviceCoroutine != null) {
+        StopCoroutine(_serviceCoroutine);
+        _serviceCoroutine = null;
+      }
+
+      var controller = _provider.GetLeapController();
+      if (controller != null) {
+        controller.ClearPolicy(Controller.PolicyFlag.POLICY_IMAGES);
+        controller.ImageReady -= onImageReady;
+        controller.DistortionChange -= onDistortionChange;
       }
     }
 
-    private IEnumerator waitForController() {
+    private Coroutine _serviceCoroutine = null;
+    private IEnumerator serviceCoroutine() {
       Controller controller = null;
       do {
         controller = _provider.GetLeapController();
         yield return null;
       } while (controller == null);
-      onController(controller);
-    }
 
-    private IEnumerator checkImageMode() {
-      checkingImageState = true;
-      yield return new WaitForSeconds(IMAGE_SETTING_POLL_RATE);
-      _provider.GetLeapController().Config.Get<Int32>("images_mode", delegate (Int32 enabled) {
-        this.imagesEnabled = enabled == 0 ? false : true;
-        checkingImageState = false;
-      });
-    }
-
-    private void onController(Controller controller) {
+      controller.SetPolicy(Controller.PolicyFlag.POLICY_IMAGES);
+      controller.ImageReady += onImageReady;
       controller.DistortionChange += onDistortionChange;
-      controller.Connect += delegate {
-        _provider.GetLeapController().Config.Get("images_mode", (Int32 enabled) => {
-          this.imagesEnabled = enabled == 0 ? false : true;
-        });
-      };
-      if (!checkingImageState) {
-        StartCoroutine(checkImageMode());
-      }
+    }
+
+    private void onImageReady(object sender, ImageEventArgs argsd) {
+      Image image = argsd.image;
+      _imageQueue.TryEnqueue(ref image);
     }
 
     public void ApplyGammaCorrectionValues() {
