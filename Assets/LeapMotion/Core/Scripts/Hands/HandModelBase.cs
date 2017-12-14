@@ -13,13 +13,13 @@ using System;
 using UnityEditor;
 #endif
 
-/** IHandModel defines abstract methods as a template for building Leap hand models*/
+/** HandModelBase defines abstract methods as a template for building Leap hand models*/
 namespace Leap.Unity {
   public enum Chirality { Left, Right };
   public enum ModelType { Graphics, Physics };
 
   [ExecuteInEditMode]
-  public abstract class IHandModel : MonoBehaviour {
+  public abstract class HandModelBase : MonoBehaviour {
     public event Action OnBegin;
     public event Action OnFinish;
     private bool isTracked = false;
