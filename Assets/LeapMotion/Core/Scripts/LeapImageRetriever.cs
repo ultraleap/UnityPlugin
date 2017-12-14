@@ -36,10 +36,6 @@ namespace Leap.Unity {
     [FormerlySerializedAs("gammaCorrection")]
     private float _gammaCorrection = 1.0f;
 
-    [MinValue(0)]
-    [SerializeField]
-    protected long ImageTimeout = 9000; //microseconds
-
     private EyeTextureData _eyeTextureData = new EyeTextureData();
 
     //Image that we have requested from the service.  Are requested in Update and retrieved in OnPreRender
