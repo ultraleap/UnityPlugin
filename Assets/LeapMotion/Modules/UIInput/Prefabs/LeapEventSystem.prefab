@@ -76,23 +76,23 @@ MonoBehaviour:
   onClickDown:
     m_PersistentCalls:
       m_Calls: []
-    m_TypeName: Leap.Unity.InputModule.LeapInputModule+PositionEvent, Assembly-CSharp,
-      Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+    m_TypeName: Leap.Unity.InputModule.LeapInputModule+PositionEvent, UIInput, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
   onClickUp:
     m_PersistentCalls:
       m_Calls: []
-    m_TypeName: Leap.Unity.InputModule.LeapInputModule+PositionEvent, Assembly-CSharp,
-      Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+    m_TypeName: Leap.Unity.InputModule.LeapInputModule+PositionEvent, UIInput, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
   onHover:
     m_PersistentCalls:
       m_Calls: []
-    m_TypeName: Leap.Unity.InputModule.LeapInputModule+PositionEvent, Assembly-CSharp,
-      Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+    m_TypeName: Leap.Unity.InputModule.LeapInputModule+PositionEvent, UIInput, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
   whileClickHeld:
     m_PersistentCalls:
       m_Calls: []
-    m_TypeName: Leap.Unity.InputModule.LeapInputModule+PositionEvent, Assembly-CSharp,
-      Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+    m_TypeName: Leap.Unity.InputModule.LeapInputModule+PositionEvent, UIInput, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
   ShowExperimentalOptions: 0
   InteractionMode: 1
   ProjectiveToTactileTransitionDistance: 0.4
@@ -138,8 +138,8 @@ MonoBehaviour:
   environmentPinch:
     m_PersistentCalls:
       m_Calls: []
-    m_TypeName: Leap.Unity.InputModule.LeapInputModule+PositionEvent, Assembly-CSharp,
-      Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+    m_TypeName: Leap.Unity.InputModule.LeapInputModule+PositionEvent, UIInput, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
   InnerPointer: 0
   InnerPointerOpacityScalar: 0.77
   TriggerHoverOnElementSwitch: 0

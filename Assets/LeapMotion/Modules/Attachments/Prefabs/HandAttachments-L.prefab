@@ -331,14 +331,12 @@ MonoBehaviour:
     IsLeftToBeSpawned: 0
     RightModel: {fileID: 0}
     IsRightToBeSpawned: 0
-    modelList: []
-    modelsCheckedOut: []
     IsEnabled: 1
     CanDuplicate: 0
     HandPostProcesses:
       m_PersistentCalls:
         m_Calls: []
-      m_TypeName: Leap.Unity.Hands+HandEvent, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
+      m_TypeName: Leap.Unity.Hands+HandEvent, Core, Version=0.0.0.0, Culture=neutral,
         PublicKeyToken=null
   Palm: {fileID: 463568}
   Arm: {fileID: 451880}

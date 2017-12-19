@@ -88,6 +88,7 @@ LightmapSettings:
     m_PVRFilteringAtrousPositionSigmaDirect: 0.5
     m_PVRFilteringAtrousPositionSigmaIndirect: 2
     m_PVRFilteringAtrousPositionSigmaAO: 1
+    m_ShowResolutionOverlay: 1
   m_LightingDataAsset: {fileID: 0}
   m_UseShadowmask: 1
 --- !u!196 &4
@@ -768,6 +769,7 @@ Camera:
   m_TargetEye: 3
   m_HDR: 0
   m_AllowMSAA: 1
+  m_AllowDynamicResolution: 0
   m_ForceIntoRT: 0
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
@@ -3049,14 +3051,12 @@ MonoBehaviour:
     IsLeftToBeSpawned: 0
     RightModel: {fileID: 1638555951}
     IsRightToBeSpawned: 0
-    modelList: []
-    modelsCheckedOut: []
     IsEnabled: 1
     CanDuplicate: 0
     HandPostProcesses:
       m_PersistentCalls:
         m_Calls: []
-      m_TypeName: Leap.Unity.Hands+HandEvent, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
+      m_TypeName: Leap.Unity.Hands+HandEvent, Core, Version=0.0.0.0, Culture=neutral,
         PublicKeyToken=null
 --- !u!114 &1067244360
 MonoBehaviour:

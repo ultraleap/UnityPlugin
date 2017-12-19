@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Name: Package
   m_EditorClassIdentifier: 
   _definitionName: Graphic Renderer
-  _generateBuildDropdown: 1
+  _showInBuildMenu: 1
   _dependantFolders:
   - Assets\LeapMotion\Modules\GraphicRenderer
   - Assets\LeapMotion\Modules\GraphicRenderer\Testing
