@@ -376,9 +376,11 @@ namespace Leap.Unity.Interaction {
     protected override void getColliderBoneTargetPositionRotation(int contactBoneIndex,
                                                                   out Vector3 targetPosition,
                                                                   out Quaternion targetRotation) {
-      _handContactBoneMapFunctions[contactBoneIndex](_unwarpedHandData,
-                                                     out targetPosition,
-                                                     out targetRotation);
+      using (new ProfilerSample("InteractionHand: getColliderBoneTargetPositionRotation")) {
+        _handContactBoneMapFunctions[contactBoneIndex](_unwarpedHandData,
+                                                       out targetPosition,
+                                                       out targetRotation);
+      }
     }
 
     protected override bool initContact() {

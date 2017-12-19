@@ -322,7 +322,7 @@ namespace Leap.Unity.Interaction {
     /// by its currently grasping controller(s). Subscribe to this callback if you'd like to override
     /// the default behaviour for grasping objects, for example, to constrain the object's position or rotation.
     /// 
-    /// Use InteractionBehaviour.Rigidbody.position and InteractionBehaviour.Rigidbody.rotation to set the
+    /// Use InteractionBehaviour.rigidbody.position and InteractionBehaviour.rigidbody.rotation to set the
     /// object's position and rotation. Merely setting the object's Transform's position and rotation is not
     /// recommended unless you understand the difference.
     /// </summary>
@@ -331,8 +331,9 @@ namespace Leap.Unity.Interaction {
     /// also valid to move the Interaction object (via its Rigidbody) in OnGraspStay, although OnGraspStay does
     /// not provide pre- and post-solve data in its callback signature.
     /// </remarks>
-    public Action<Vector3, Quaternion, Vector3, Quaternion, List<InteractionController>> OnGraspedMovement
-      = (preSolvedPos, preSolvedRot, solvedPos, solvedRot, graspingControllers) => { };
+    public GraspedMovementEvent OnGraspedMovement = (preSolvedPos, preSolvedRot,
+                                                     solvedPos,    solvedRot,
+                                                     graspingControllers) => { };
 
     /// <summary>
     /// Called when the object becomes grasped, if it was not already held by any interaction controllers on the
@@ -811,38 +812,9 @@ namespace Leap.Unity.Interaction {
     public void FixedUpdateObject() {
       if (!ignoreGrasping) fixedUpdateGrasping();
       fixedUpdateLayers();
-      fixedUpdatePose();
 
       if (_appliedForces) { FixedUpdateForces(); }
     }
-
-    #region Pose & Movement
-
-    private Pose _worldPose;
-    private Maybe<Pose> _worldPoseLastFrame = Maybe.None;
-
-    public Pose worldPose {
-      get {
-        return new Pose(rigidbody.position, rigidbody.rotation);
-      }
-    }
-
-    public Pose worldDeltaPose {
-      get {
-        if (!_worldPoseLastFrame.hasValue) return Pose.identity;
-        else {
-          return worldPose.From(_worldPoseLastFrame.valueOrDefault);
-        }
-      }
-    }
-
-    private void fixedUpdatePose() {
-      _worldPoseLastFrame = _worldPose;
-
-      _worldPose = new Pose(rigidbody.position, rigidbody.rotation);
-    }
-
-    #endregion
 
     #region Hovering
 
@@ -1225,14 +1197,16 @@ namespace Leap.Unity.Interaction {
     }
 
     private void fixedUpdateGrasping() {
-      if (!_graspingInitialized) {
-        initGrasping();
-      }
+      using (new ProfilerSample("Interaction Behaviour: fixedUpdateGrasping")) {
+        if (!_graspingInitialized) {
+          initGrasping();
+        }
 
-      if (!moveObjectWhenGrasped && _moveObjectWhenGrasped__WasEnabledLastFrame) {
-        graspedPoseHandler.ClearControllers();
+        if (!moveObjectWhenGrasped && _moveObjectWhenGrasped__WasEnabledLastFrame) {
+          graspedPoseHandler.ClearControllers();
+        }
+        _moveObjectWhenGrasped__WasEnabledLastFrame = moveObjectWhenGrasped;
       }
-      _moveObjectWhenGrasped__WasEnabledLastFrame = moveObjectWhenGrasped;
     }
 
     public void BeginGrasp(List<InteractionController> controllers) {
@@ -1445,40 +1419,42 @@ namespace Leap.Unity.Interaction {
     }
 
     private void fixedUpdateLayers() {
-      int layer;
-      refreshInteractionLayer();
-      refreshNoContactLayer();
+      using (new ProfilerSample("Interaction Behaviour: fixedUpdateLayers")) {
+        int layer;
+        refreshInteractionLayer();
+        refreshNoContactLayer();
 
-      // Update the object's layer based on interaction state.
-      if (ignoreContact) {
-        layer = noContactLayer;
-      }
-      else {
-        if (isGrasped) {
+        // Update the object's layer based on interaction state.
+        if (ignoreContact) {
           layer = noContactLayer;
         }
         else {
-          layer = interactionLayer;
+          if (isGrasped) {
+            layer = noContactLayer;
+          }
+          else {
+            layer = interactionLayer;
+          }
         }
-      }
-      if (this.gameObject.layer != layer) {
-        this.gameObject.layer = layer;
+        if (this.gameObject.layer != layer) {
+          this.gameObject.layer = layer;
 
-        refreshInteractionColliderLayers();
-      }
+          refreshInteractionColliderLayers();
+        }
 
-      // Update the manager if necessary.
+        // Update the manager if necessary.
 
       if (interactionLayer != _lastInteractionLayer) {
         (manager as IInternalInteractionManager).NotifyIntObjHasNewInteractionLayer(this, oldInteractionLayer: _lastInteractionLayer,
                                                                                           newInteractionLayer: interactionLayer);
-        _lastInteractionLayer = noContactLayer;
+        _lastInteractionLayer = interactionLayer;
       }
 
-      if (noContactLayer != _lastNoContactLayer) {
-        (manager as IInternalInteractionManager).NotifyIntObjHasNewNoContactLayer(this, oldNoContactLayer: _lastNoContactLayer,
-                                                                                        newNoContactLayer: noContactLayer);
-        _lastInteractionLayer = noContactLayer;
+        if (noContactLayer != _lastNoContactLayer) {
+          (manager as IInternalInteractionManager).NotifyIntObjHasNewNoContactLayer(this, oldNoContactLayer: _lastNoContactLayer,
+                                                                                          newNoContactLayer: noContactLayer);
+          _lastInteractionLayer = noContactLayer;
+        }
       }
     }
 

@@ -14,7 +14,7 @@ using System.Linq;
 using Leap;
 
 namespace Leap.Unity {
-  /** This version of IHandModel supports a hand respresentation based on a skinned and jointed 3D model asset.*/
+  /** This version of HandModelBase supports a hand respresentation based on a skinned and jointed 3D model asset.*/
   public class RiggedHand : HandModel {
     public override ModelType HandModelType {
       get {

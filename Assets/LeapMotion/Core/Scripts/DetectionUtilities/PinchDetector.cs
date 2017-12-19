@@ -14,7 +14,7 @@ using UnityEngine.Serialization;
 namespace Leap.Unity {
 
   /// <summary>
-  /// A basic utility class to aid in creating pinch based actions.  Once linked with an IHandModel, it can
+  /// A basic utility class to aid in creating pinch based actions.  Once linked with a HandModelBase, it can
   /// be used to detect pinch gestures that the hand makes.
   /// </summary>
   public class PinchDetector : AbstractHoldDetector {

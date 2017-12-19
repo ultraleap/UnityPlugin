@@ -16,7 +16,7 @@ namespace Leap.Unity {
     public static readonly NoneType None = new NoneType();
 
     public static Maybe<T> Some<T>(T value) {
-      return Maybe<T>.Some(value);
+      return new Maybe<T>(value);
     }
 
     public static void MatchAll<A, B>(Maybe<A> maybeA, Maybe<B> maybeB, Action<A, B> action) {
@@ -65,7 +65,7 @@ namespace Leap.Unity {
     public readonly static Maybe<T> None = new Maybe<T>();
 
     /// <summary>
-    /// Returns whether or not this Maybe contains a value or not.
+    /// Returns whether or not this Maybe contains a value.
     /// </summary>
     public readonly bool hasValue;
 
@@ -85,20 +85,27 @@ namespace Leap.Unity {
     private readonly T _t;
 
     /// <summary>
-    /// Constructs a Maybe given a value.  If the value is non-null, this maybe
-    /// will have a value.  If the value is null, this maybe will have no value.
+    /// Constructs a Maybe given a value. If the value is not null, this maybe will have
+    /// a value. If the value is null, this maybe will have no value. For value types,
+    /// the Maybe struct will always have a value. (Use Maybe.None to refer to "no value.")
     /// </summary>
     public Maybe(T t) {
-      hasValue = t != null;
+      if (Type<T>.isValueType) {
+        hasValue = true;
+      }
+      else {
+        hasValue = t != null;
+      }
+
       _t = t;
     }
 
     /// <summary>
-    /// Constructs a Maybe given a specific value.  This value needs to always be
-    /// non-null.
+    /// Constructs a Maybe given a specific value. This value needs to always be
+    /// non-null if the type is a reference type.
     /// </summary>
     public static Maybe<T> Some(T t) {
-      if (t == null) {
+      if (!Type<T>.isValueType && t == null) {
         throw new ArgumentNullException("Cannot use Some with a null argument.");
       }
 
