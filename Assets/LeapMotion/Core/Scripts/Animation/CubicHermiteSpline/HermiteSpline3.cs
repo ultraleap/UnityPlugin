@@ -80,8 +80,8 @@ namespace Leap.Unity.Animation {
     /// velocities, and times of the endpoints.
     /// </summary>
     public HermiteSpline3(float t0, float t1, Vector3 pos0, Vector3 pos1, Vector3 vel0, Vector3 vel1) {
-      this.t0 = 0;
-      this.t1 = 1;
+      this.t0 = t0;
+      this.t1 = t1;
 
       this.vel0 = vel0;
       this.vel1 = vel1;
