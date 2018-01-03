@@ -1,8 +1,0 @@
-{
-    "name": "UIInput",
-    "references": [
-        "Core"
-    ],
-    "includePlatforms": [],
-    "excludePlatforms": []
-}

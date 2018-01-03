@@ -1,8 +1,0 @@
-{
-    "name": "Generation",
-    "references": [
-        "Core"
-    ],
-    "includePlatforms": [],
-    "excludePlatforms": []
-}
