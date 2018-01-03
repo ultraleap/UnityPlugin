@@ -1,8 +1,0 @@
-{
-    "name": "Attachments",
-    "references": [
-        "Core"
-    ],
-    "includePlatforms": [],
-    "excludePlatforms": []
-}

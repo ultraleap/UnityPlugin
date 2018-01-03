@@ -1,9 +1,0 @@
-{
-    "name": "HierarchyRecorder",
-    "references": [
-        "Core",
-        "GraphicRenderer"
-    ],
-    "includePlatforms": [],
-    "excludePlatforms": []
-}
