@@ -1670,6 +1670,10 @@ namespace Leap.Unity.Interaction {
         throw new InvalidOperationException("Cannot swap grasp if we are not currently grasping.");
       }
 
+      if (replacement == null) {
+        throw new ArgumentNullException("replacement");
+      }
+
       if (replacement.isGrasped) {
         throw new InvalidOperationException("Cannot swap grasp to an object that is already being grasped.");
       }
