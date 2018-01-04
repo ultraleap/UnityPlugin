@@ -135,7 +135,6 @@ namespace Leap.Unity {
         ProjectionMatrix = camera.projectionMatrix;
 
         switch (SystemInfo.graphicsDeviceType) {
-          case GraphicsDeviceType.Direct3D9:
           case GraphicsDeviceType.Direct3D11:
           case GraphicsDeviceType.Direct3D12:
             for (int i = 0; i < 4; i++) {
