@@ -204,6 +204,27 @@ namespace Leap.Unity.Interaction.Internal {
                              ignoreTemporal: true);
     }
 
+    public void SwapClassifierState(IInteractionBehaviour original, IInteractionBehaviour replacement) {
+      if (original == null) {
+        throw new ArgumentNullException("original");
+      }
+
+      if (replacement == null) {
+        throw new ArgumentNullException("replacement");
+      }
+
+      GrabClassifierHeuristics.GrabClassifier classifier;
+      if (!_classifiers.TryGetValue(original, out classifier)) {
+        throw new InvalidOperationException("Cannot swap from something that is not currently grasped!");
+      }
+
+      classifier.body = replacement.rigidbody;
+      classifier.transform = replacement.transform;
+
+      _classifiers.Remove(original);
+      _classifiers[replacement] = classifier;
+    }
+
     protected void FillClassifier(Hand hand, ref GrabClassifierHeuristics.GrabClassifier classifier) {
       classifier.handChirality = hand.IsLeft;
       classifier.handDirection = hand.Direction.ToVector3();

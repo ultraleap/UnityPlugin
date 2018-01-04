@@ -1658,6 +1658,39 @@ namespace Leap.Unity.Interaction {
     }
 
     /// <summary>
+    /// Seamlessly swap the currently grasped object for a replacement object.  It will
+    /// behave like the hand released the current object, and then grasped the new object.
+    /// </summary>
+    public virtual void SwapGrasp(IInteractionBehaviour replacement) {
+      if (_graspedObject == null) {
+        throw new InvalidOperationException("Cannot swap grasp if we are not currently grasping.");
+      }
+
+      if (replacement.isGrasped) {
+        throw new InvalidOperationException("Cannot swap grasp to an object that is already being grasped.");
+      }
+
+      //Notify the currently grasped object that it is being released
+      _releasingControllersBuffer.Clear();
+      _releasingControllersBuffer.Add(this);
+      _graspedObject.EndGrasp(_releasingControllersBuffer);
+
+      //Switch to the replacement object
+      _graspedObject = replacement;
+
+      var tempControllers = Pool<List<InteractionController>>.Spawn();
+      try {
+        //Let the replacement object know that it is being grasped
+        tempControllers.Add(this);
+        replacement.BeginGrasp(tempControllers);
+      } 
+      finally {
+        tempControllers.Clear();
+        Pool<List<InteractionController>>.Recycle(tempControllers);
+      }
+    }
+
+    /// <summary>
     /// Checks if the provided interaction object can be grasped by this interaction
     /// controller in its current state. If so, the controller will initiate a grasp and
     /// this method will return true, otherwise this method returns false.

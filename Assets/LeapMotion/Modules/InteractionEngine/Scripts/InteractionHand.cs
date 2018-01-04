@@ -694,6 +694,14 @@ namespace Leap.Unity.Interaction {
       return false;
     }
 
+    public override void SwapGrasp(IInteractionBehaviour replacement) {
+      var original = graspedObject;
+
+      base.SwapGrasp(replacement);
+
+      grabClassifier.SwapClassifierState(original, replacement);
+    }
+
     protected override void fixedUpdateGraspingState() {
       grabClassifier.FixedUpdateClassifierHandState();
     }
