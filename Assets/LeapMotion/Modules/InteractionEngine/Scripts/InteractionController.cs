@@ -232,13 +232,11 @@ namespace Leap.Unity.Interaction {
     /// Interaction Hand with state from the Leap hand and perform bookkeeping operations.
     /// </summary>
     void IInternalInteractionController.FixedUpdateController() {
-      using (new ProfilerSample("Fixed Update InteractionController", contactBoneParent)) {
-        fixedUpdateController();
+      fixedUpdateController();
 
-        if (hoverEnabled)    fixedUpdateHovering();
-        if (contactEnabled)  fixedUpdateContact();
-        if (graspingEnabled) fixedUpdateGrasping();
-      }
+      if (hoverEnabled)    fixedUpdateHovering();
+      if (contactEnabled)  fixedUpdateContact();
+      if (graspingEnabled) fixedUpdateGrasping();
     }
 
     public void NotifyObjectUnregistered(IInteractionBehaviour intObj) {

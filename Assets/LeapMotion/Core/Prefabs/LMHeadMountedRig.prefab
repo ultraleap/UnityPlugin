@@ -186,6 +186,7 @@ Camera:
   m_TargetEye: 3
   m_HDR: 0
   m_AllowMSAA: 1
+  m_AllowDynamicResolution: 0
   m_ForceIntoRT: 0
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
@@ -273,14 +274,12 @@ MonoBehaviour:
     IsLeftToBeSpawned: 0
     RightModel: {fileID: 114000013187629126}
     IsRightToBeSpawned: 0
-    modelList: []
-    modelsCheckedOut: []
     IsEnabled: 1
     CanDuplicate: 0
     HandPostProcesses:
       m_PersistentCalls:
         m_Calls: []
-      m_TypeName: Leap.Unity.Hands+HandEvent, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
+      m_TypeName: Leap.Unity.Hands+HandEvent, Core, Version=0.0.0.0, Culture=neutral,
         PublicKeyToken=null
 --- !u!114 &11451106
 MonoBehaviour:
@@ -415,14 +414,12 @@ MonoBehaviour:
     IsLeftToBeSpawned: 0
     RightModel: {fileID: 0}
     IsRightToBeSpawned: 0
-    modelList: []
-    modelsCheckedOut: []
     IsEnabled: 1
     CanDuplicate: 0
     HandPostProcesses:
       m_PersistentCalls:
         m_Calls: []
-      m_TypeName: Leap.Unity.Hands+HandEvent, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
+      m_TypeName: Leap.Unity.Hands+HandEvent, Core, Version=0.0.0.0, Culture=neutral,
         PublicKeyToken=null
   handedness: 0
   _showArm: 1
@@ -458,14 +455,12 @@ MonoBehaviour:
     IsLeftToBeSpawned: 0
     RightModel: {fileID: 0}
     IsRightToBeSpawned: 0
-    modelList: []
-    modelsCheckedOut: []
     IsEnabled: 1
     CanDuplicate: 0
     HandPostProcesses:
       m_PersistentCalls:
         m_Calls: []
-      m_TypeName: Leap.Unity.Hands+HandEvent, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
+      m_TypeName: Leap.Unity.Hands+HandEvent, Core, Version=0.0.0.0, Culture=neutral,
         PublicKeyToken=null
   handedness: 1
   _showArm: 1

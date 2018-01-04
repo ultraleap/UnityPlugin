@@ -3983,7 +3983,7 @@ MonoBehaviour:
   _horizontalSlideEvent:
     m_PersistentCalls:
       m_Calls: []
-    m_TypeName: Leap.Unity.Interaction.InteractionSlider+FloatEvent, Assembly-CSharp,
+    m_TypeName: Leap.Unity.Interaction.InteractionSlider+FloatEvent, InteractionEngine,
       Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
   defaultVerticalValue: 0
   _verticalValueRange: {x: 0, y: 1}
@@ -3992,7 +3992,7 @@ MonoBehaviour:
   _verticalSlideEvent:
     m_PersistentCalls:
       m_Calls: []
-    m_TypeName: Leap.Unity.Interaction.InteractionSlider+FloatEvent, Assembly-CSharp,
+    m_TypeName: Leap.Unity.Interaction.InteractionSlider+FloatEvent, InteractionEngine,
       Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
 --- !u!114 &114568347097340038
 MonoBehaviour:
@@ -4197,7 +4197,7 @@ MonoBehaviour:
   _horizontalSlideEvent:
     m_PersistentCalls:
       m_Calls: []
-    m_TypeName: Leap.Unity.Interaction.InteractionSlider+FloatEvent, Assembly-CSharp,
+    m_TypeName: Leap.Unity.Interaction.InteractionSlider+FloatEvent, InteractionEngine,
       Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
   defaultVerticalValue: 0
   _verticalValueRange: {x: 0, y: 1}
@@ -4206,5 +4206,5 @@ MonoBehaviour:
   _verticalSlideEvent:
     m_PersistentCalls:
       m_Calls: []
-    m_TypeName: Leap.Unity.Interaction.InteractionSlider+FloatEvent, Assembly-CSharp,
+    m_TypeName: Leap.Unity.Interaction.InteractionSlider+FloatEvent, InteractionEngine,
       Version=0.0.0.0, Culture=neutral, PublicKeyToken=null

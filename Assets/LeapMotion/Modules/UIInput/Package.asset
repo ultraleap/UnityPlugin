@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Name: Package
   m_EditorClassIdentifier: 
   _definitionName: UIInput
-  _generateBuildDropdown: 1
+  _showInBuildMenu: 1
   _dependantFolders:
   - Assets\LeapMotion\Modules\UIInput
   _ignoredFolders: []
