@@ -1660,6 +1660,10 @@ namespace Leap.Unity.Interaction {
     /// <summary>
     /// Seamlessly swap the currently grasped object for a replacement object.  It will
     /// behave like the hand released the current object, and then grasped the new object.
+    /// 
+    /// This method will not teleport the replacement object or move it in any way, it will
+    /// just cause it to be grasped.  That means that you will be responsible for moving
+    /// the replacement object into a reasonable position for it to be grasped.
     /// </summary>
     public virtual void SwapGrasp(IInteractionBehaviour replacement) {
       if (_graspedObject == null) {
