@@ -89,6 +89,7 @@ LightmapSettings:
     m_PVRFilteringAtrousPositionSigmaDirect: 0.5
     m_PVRFilteringAtrousPositionSigmaIndirect: 2
     m_PVRFilteringAtrousPositionSigmaAO: 1
+    m_ShowResolutionOverlay: 1
   m_LightingDataAsset: {fileID: 112000020, guid: c08cd0cb71160c24e99b86362ddb5437,
     type: 2}
   m_UseShadowmask: 1
@@ -1696,6 +1697,7 @@ Camera:
   m_TargetEye: 3
   m_HDR: 0
   m_AllowMSAA: 1
+  m_AllowDynamicResolution: 0
   m_ForceIntoRT: 0
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
@@ -3984,7 +3986,7 @@ MonoBehaviour:
   _horizontalSlideEvent:
     m_PersistentCalls:
       m_Calls: []
-    m_TypeName: Leap.Unity.Interaction.InteractionSlider+FloatEvent, Assembly-CSharp,
+    m_TypeName: Leap.Unity.Interaction.InteractionSlider+FloatEvent, InteractionEngine,
       Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
   defaultVerticalValue: 0.5
   _verticalValueRange: {x: 0, y: 1}
@@ -3993,7 +3995,7 @@ MonoBehaviour:
   _verticalSlideEvent:
     m_PersistentCalls:
       m_Calls: []
-    m_TypeName: Leap.Unity.Interaction.InteractionSlider+FloatEvent, Assembly-CSharp,
+    m_TypeName: Leap.Unity.Interaction.InteractionSlider+FloatEvent, InteractionEngine,
       Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
 --- !u!54 &753195707
 Rigidbody:
@@ -4820,7 +4822,7 @@ MonoBehaviour:
   _horizontalSlideEvent:
     m_PersistentCalls:
       m_Calls: []
-    m_TypeName: Leap.Unity.Interaction.InteractionSlider+FloatEvent, Assembly-CSharp,
+    m_TypeName: Leap.Unity.Interaction.InteractionSlider+FloatEvent, InteractionEngine,
       Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
   defaultVerticalValue: 0
   _verticalValueRange: {x: 0, y: 1}
@@ -4829,7 +4831,7 @@ MonoBehaviour:
   _verticalSlideEvent:
     m_PersistentCalls:
       m_Calls: []
-    m_TypeName: Leap.Unity.Interaction.InteractionSlider+FloatEvent, Assembly-CSharp,
+    m_TypeName: Leap.Unity.Interaction.InteractionSlider+FloatEvent, InteractionEngine,
       Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
 --- !u!54 &1019750854
 Rigidbody:
@@ -5694,14 +5696,12 @@ MonoBehaviour:
     IsLeftToBeSpawned: 0
     RightModel: {fileID: 2022914024}
     IsRightToBeSpawned: 0
-    modelList: []
-    modelsCheckedOut: []
     IsEnabled: 1
     CanDuplicate: 0
     HandPostProcesses:
       m_PersistentCalls:
         m_Calls: []
-      m_TypeName: Leap.Unity.Hands+HandEvent, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
+      m_TypeName: Leap.Unity.Hands+HandEvent, Core, Version=0.0.0.0, Culture=neutral,
         PublicKeyToken=null
 --- !u!114 &1331178859
 MonoBehaviour:

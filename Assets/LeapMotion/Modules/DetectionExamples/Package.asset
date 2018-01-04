@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Name: Package
   m_EditorClassIdentifier: 
   _definitionName: Detection Examples
-  _generateBuildDropdown: 1
+  _showInBuildMenu: 1
   _dependantFolders:
   - Assets\LeapMotion\Modules\DetectionExamples
   _ignoredFolders: []

@@ -19,6 +19,7 @@ using UnityEditor;
 using Leap;
 
 namespace Leap.Unity {
+  //
   /**
    * HandPool holds a pool of HandModelBases and makes HandRepresentations
    * when given a Leap Hand and a model type of graphics or physics.
