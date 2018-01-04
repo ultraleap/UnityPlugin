@@ -656,10 +656,18 @@ namespace Leap.Unity.Interaction {
            + "Without this property checked, objects will still receive grasp callbacks, "
            + "but you will need to move them manually via script.")]
     [SerializeField]
+    [OnEditorChange("moveObjectWhenGrasped")]
     private bool _moveObjectWhenGrasped = true;
     public bool moveObjectWhenGrasped {
       get { return _moveObjectWhenGrasped; }
-      set { _moveObjectWhenGrasped = value; }
+      set {
+        if (_moveObjectWhenGrasped != value && value == false) {
+          if (graspedPoseHandler != null) {
+            graspedPoseHandler.ClearControllers();
+          }
+        }
+        _moveObjectWhenGrasped = value;
+      }
     }
 
     public enum GraspedMovementType {
@@ -810,7 +818,6 @@ namespace Leap.Unity.Interaction {
     /// FixedUpdate().
     /// </summary>
     public void FixedUpdateObject() {
-      if (!ignoreGrasping) fixedUpdateGrasping();
       fixedUpdateLayers();
 
       if (_appliedForces) { FixedUpdateForces(); }
@@ -1147,9 +1154,7 @@ namespace Leap.Unity.Interaction {
     #region Grasping
 
     private HashSet<InteractionController> _graspingControllers = new HashSet<InteractionController>();
-
-    private bool _graspingInitialized = false;
-    private bool _moveObjectWhenGrasped__WasEnabledLastFrame;
+    
     private bool _wasKinematicBeforeGrasp;
     private bool _justGrasped = false;
 
@@ -1170,8 +1175,25 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    private KinematicGraspedMovement _kinematicGraspedMovement;
-    private NonKinematicGraspedMovement _nonKinematicGraspedMovement;
+    private KinematicGraspedMovement _lazyKinematicGraspedMovement;
+    private KinematicGraspedMovement _kinematicGraspedMovement {
+      get {
+        if (_lazyKinematicGraspedMovement == null) {
+          _lazyKinematicGraspedMovement = new KinematicGraspedMovement();
+        }
+        return _lazyKinematicGraspedMovement;
+      }
+    }
+
+    private NonKinematicGraspedMovement _lazyNonKinematicGraspedMovement;
+    private NonKinematicGraspedMovement _nonKinematicGraspedMovement {
+      get {
+        if (_lazyNonKinematicGraspedMovement == null) {
+          _lazyNonKinematicGraspedMovement = new NonKinematicGraspedMovement();
+        }
+        return _lazyNonKinematicGraspedMovement;
+      }
+    }
 
     private IThrowHandler _throwHandler;
     /// <summary> Gets or sets the throw handler for this Interaction object. </summary>
@@ -1184,28 +1206,6 @@ namespace Leap.Unity.Interaction {
       }
       set {
         _throwHandler = value;
-      }
-    }
-
-    private void initGrasping() {
-      _moveObjectWhenGrasped__WasEnabledLastFrame = moveObjectWhenGrasped;
-
-      _kinematicGraspedMovement = new KinematicGraspedMovement();
-      _nonKinematicGraspedMovement = new NonKinematicGraspedMovement();
-
-      _graspingInitialized = true;
-    }
-
-    private void fixedUpdateGrasping() {
-      using (new ProfilerSample("Interaction Behaviour: fixedUpdateGrasping")) {
-        if (!_graspingInitialized) {
-          initGrasping();
-        }
-
-        if (!moveObjectWhenGrasped && _moveObjectWhenGrasped__WasEnabledLastFrame) {
-          graspedPoseHandler.ClearControllers();
-        }
-        _moveObjectWhenGrasped__WasEnabledLastFrame = moveObjectWhenGrasped;
       }
     }
 
