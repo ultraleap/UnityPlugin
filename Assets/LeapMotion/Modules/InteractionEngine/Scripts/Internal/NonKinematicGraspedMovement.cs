@@ -58,7 +58,7 @@ namespace Leap.Unity.Interaction {
       intObj.rigidbody.velocity = lerpedVelocity;
       intObj.rigidbody.angularVelocity = lerpedAngularVelocity;
 
-      _lastSolvedCoMPosition = currCenterOfMass;
+      _lastSolvedCoMPosition = solvedCenterOfMass;
     }
   }
 
