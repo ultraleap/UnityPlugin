@@ -11,6 +11,7 @@ using UnityEngine;
 using UnityEngine.Serialization;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using Leap.Unity.Query;
 using Leap.Unity.Attributes;
 
@@ -39,7 +40,7 @@ namespace Leap.Unity {
     private EyeTextureData _eyeTextureData = new EyeTextureData();
 
     //Image that we have requested from the service.  Are requested in Update and retrieved in OnPreRender
-    protected ProduceConsumeBuffer<Image> _imageQueue = new ProduceConsumeBuffer<Image>(32);
+    protected Queue<Image> _imageQueue = new Queue<Image>(32);
     protected Image _currentImage = null;
 
     public EyeTextureData TextureData {
@@ -316,13 +317,17 @@ namespace Leap.Unity {
       Frame imageFrame = _provider.CurrentFrame;
 
       _currentImage = null;
-      while (true) {
-        if (!_imageQueue.TryDequeue(out _currentImage)) {
-          break;
+      lock (_imageQueue) {
+        //Get rid of images that are older then the desired image frame
+        while (_imageQueue.Count > 0 &&
+              _imageQueue.Peek().SequenceId < imageFrame.Id) {
+          _imageQueue.Dequeue();
         }
 
-        if (_currentImage.SequenceId == imageFrame.Id) {
-          break;
+        //If we have an image in the queue that matches our current frame id, use it!
+        if (_imageQueue.Count > 0 &&
+           _imageQueue.Peek().SequenceId == imageFrame.Id) {
+          _currentImage = _imageQueue.Dequeue();
         }
       }
     }
@@ -374,7 +379,9 @@ namespace Leap.Unity {
 
       _expectedSequenceId = image.SequenceId + 1;
 
-      _imageQueue.TryEnqueue(ref image);
+      lock (_imageQueue) {
+        _imageQueue.Enqueue(image);
+      }
     }
 
     public void ApplyGammaCorrectionValues() {
