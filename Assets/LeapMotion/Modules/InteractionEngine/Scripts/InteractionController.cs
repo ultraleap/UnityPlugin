@@ -1672,8 +1672,8 @@ namespace Leap.Unity.Interaction {
         throw new ArgumentNullException("replacement");
       }
 
-      if (replacement.isGrasped) {
-        throw new InvalidOperationException("Cannot swap grasp to an object that is already being grasped.");
+      if (replacement.isGrasped && !replacement.allowMultiGrasp) {
+        throw new InvalidOperationException("Cannot swap grasp if the replacement object is already grasped and does not support multi grasp.");
       }
 
       //Notify the currently grasped object that it is being released
