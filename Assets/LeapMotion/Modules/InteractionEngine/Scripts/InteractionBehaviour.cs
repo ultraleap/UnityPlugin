@@ -315,6 +315,20 @@ namespace Leap.Unity.Interaction {
     /// </summary>
     public bool isSuspended { get { return _suspendingController != null; } }
 
+    /// <summary>
+    /// Nonkinematic grasping motion applies clamped velocities to Interaction Behaviours
+    /// when they are grasped to move them to their target position and rotation in the
+    /// grasping hand. If a controller applies its SwapGrasp method to an interaction
+    /// object that didn't reach its target pose due to velocity clamping, the
+    /// swapped-out object will inherit the offset as a new target pose relative to the
+    /// hand.
+    /// 
+    /// To prevent slippage in this scenario, we always track the latest scheduled grasp
+    /// pose for interaction objects here, and use it whenever possible in the SwapGrasp
+    /// method.
+    /// </summary>
+    public Pose? latestScheduledGraspPose = null;
+
     #region Grasp Events
 
     /// <summary>

@@ -142,6 +142,11 @@ namespace Leap.Unity.Interaction {
     public abstract Vector3 position { get; }
 
     /// <summary>
+    /// Returns the current rotation of this controller.
+    /// </summary>
+    public abstract Quaternion rotation { get; }
+
+    /// <summary>
     /// Returns the current velocity of this controller.
     /// </summary>
     public abstract Vector3 velocity { get; }

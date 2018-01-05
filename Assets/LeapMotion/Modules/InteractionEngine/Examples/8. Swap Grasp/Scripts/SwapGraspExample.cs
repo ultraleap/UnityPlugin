@@ -1,38 +1,80 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using Leap.Unity.Interaction;
 
-[AddComponentMenu("")]
-public class SwapGraspExample : MonoBehaviour {
+namespace Leap.Unity.Examples {
 
-  public InteractionBehaviour objA, objB;
-  public float startSwapDist = 0.03f;
-  public float endSwapDist = 0.1f;
+  using IntObj = InteractionBehaviour;
 
-  private IEnumerator Start() {
+  [AddComponentMenu("")]
+  public class SwapGraspExample : MonoBehaviour {
 
-    while (true) {
-      yield return new WaitUntil(() => Vector3.Distance(objA.transform.position, objB.transform.position) < startSwapDist);
+    public IntObj objA, objB;
 
-      var graspingA = new List<InteractionController>();
-      var graspingB = new List<InteractionController>();
+    public InteractionButton swapButton;
 
-      foreach (var controller in objA.graspingControllers) {
-        graspingA.Add(controller);
+    private bool _swapScheduled = false;
+
+    void Start() {
+      swapButton.OnUnpress += scheduleSwap;
+
+      // Wait for just after the PhysX update to swap a grasp;
+      // this allows the swapped object to inherit the _latest_ rigidbody position and
+      // rotation from the original held object (which needs the PhysX update to receive
+      // scheduled force / MovePosition / MoveRotation changes from the grasped movement
+      // system).
+      PhysicsCallbacks.OnPostPhysics += onPostPhysics;
+    }
+
+    private void scheduleSwap() {
+      _swapScheduled = true;
+    }
+
+    private void onPostPhysics() {
+      if (_swapScheduled && (objA.isGrasped || objB.isGrasped)) {
+
+        // Swap "a" for "b"; a will be whichever object is the grasped one.
+        IntObj a, b;
+        if (objA.isGrasped) {
+          a = objA;
+          b = objB;
+        }
+        else  {
+          a = objB;
+          b = objA;
+        }
+
+        // (Optional) Remember B's pose and motion to apply to A post-swap.
+        var bPose = new Pose(b.rigidbody.position, b.rigidbody.rotation);
+        var bVel = b.rigidbody.velocity;
+        var bAngVel = b.rigidbody.angularVelocity;
+
+        // Match the rigidbody pose of the originally held object before swapping.
+        // If it exists, always use the latestScheduledGraspPose to perform a SwapGrasp!
+        // This prevents subtle slippage with non-kinematic objects that may experience
+        // gravity forces, drag, or hit other objects, which can leak into the new
+        // grasping pose when the SwapGrasp is performed.
+        if (a.latestScheduledGraspPose.HasValue) {
+          b.rigidbody.position = a.latestScheduledGraspPose.Value.position;
+          b.rigidbody.rotation = a.latestScheduledGraspPose.Value.rotation;
+        }
+        else {
+          b.rigidbody.position = a.rigidbody.position;
+          b.rigidbody.rotation = a.rigidbody.rotation;
+        }
+
+        // Swap!
+        a.graspingController.SwapGrasp(b);
+
+        // Move A over to where B was, and for fun, let's give it B's motion as well.
+        a.rigidbody.position = bPose.position;
+        a.rigidbody.rotation = bPose.rotation;
+        a.rigidbody.velocity = bVel;
+        a.rigidbody.angularVelocity = bAngVel;
       }
-      foreach (var controller in objB.graspingControllers) {
-        graspingB.Add(controller);
-      }
 
-      foreach (var controller in graspingA) {
-        controller.SwapGrasp(objB);
-      }
-      foreach (var controller in graspingB) {
-        controller.SwapGrasp(objA);
-      }
-
-      yield return new WaitUntil(() => Vector3.Distance(objA.transform.position, objB.transform.position) > endSwapDist);
+      _swapScheduled = false;
     }
   }
+
 }
+
