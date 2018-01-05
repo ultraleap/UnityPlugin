@@ -11,9 +11,7 @@ using UnityEngine;
 using UnityEngine.Serialization;
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using Leap.Unity.Query;
-using Leap.Unity.Attributes;
 
 namespace Leap.Unity {
   // To use the LeapImageRetriever you must be on version 2.1+
@@ -40,7 +38,7 @@ namespace Leap.Unity {
     private EyeTextureData _eyeTextureData = new EyeTextureData();
 
     //Image that we have requested from the service.  Are requested in Update and retrieved in OnPreRender
-    protected Queue<Image> _imageQueue = new Queue<Image>(32);
+    protected ProduceConsumeBuffer<Image> _imageQueue = new ProduceConsumeBuffer<Image>(32);
     protected Image _currentImage = null;
 
     public EyeTextureData TextureData {
@@ -317,17 +315,22 @@ namespace Leap.Unity {
       Frame imageFrame = _provider.CurrentFrame;
 
       _currentImage = null;
-      lock (_imageQueue) {
-        //Get rid of images that are older then the desired image frame
-        while (_imageQueue.Count > 0 &&
-              _imageQueue.Peek().SequenceId < imageFrame.Id) {
-          _imageQueue.Dequeue();
-        }
 
-        //If we have an image in the queue that matches our current frame id, use it!
-        if (_imageQueue.Count > 0 &&
-           _imageQueue.Peek().SequenceId == imageFrame.Id) {
-          _currentImage = _imageQueue.Dequeue();
+      //Get rid of images that are older then the desired image frame
+      Image staleImage;
+      while (_imageQueue.TryPeek(out staleImage)) {
+        if (staleImage.SequenceId < imageFrame.Id) {
+          _imageQueue.TryDequeue();
+        } else {
+          break;
+        }
+      }
+
+      Image newImage;
+      if (_imageQueue.TryPeek(out newImage)) {
+        if (newImage.SequenceId == imageFrame.Id) {
+          _currentImage = newImage;
+          _imageQueue.TryDequeue();
         }
       }
     }
@@ -367,21 +370,9 @@ namespace Leap.Unity {
       controller.DistortionChange += onDistortionChange;
     }
 
-    private long _expectedSequenceId = -1;
     private void onImageReady(object sender, ImageEventArgs argsd) {
       Image image = argsd.image;
-
-      if (_expectedSequenceId != -1) {
-        if (image.SequenceId != _expectedSequenceId) {
-          Debug.LogWarning("Image with sequenceId " + image.SequenceId + " was unexpected.  Expected " + _expectedSequenceId);
-        }
-      }
-
-      _expectedSequenceId = image.SequenceId + 1;
-
-      lock (_imageQueue) {
-        _imageQueue.Enqueue(image);
-      }
+      _imageQueue.TryEnqueue(image);
     }
 
     public void ApplyGammaCorrectionValues() {

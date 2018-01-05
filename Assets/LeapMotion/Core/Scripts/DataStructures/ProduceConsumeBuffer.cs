@@ -99,6 +99,27 @@ namespace Leap.Unity {
     }
 
     /// <summary>
+    /// Tries to get the next element that would be dequeued from this
+    /// buffer.  If there is no element yet, this method will return false.
+    /// If there is an element ready to be dequeued, it will be copied to
+    /// the out param and this method will return true.
+    /// 
+    /// This method is only safe to be called from a single consumer thread.
+    /// </summary>
+    public bool TryPeek(out T t) {
+      if (Count == 0) {
+        t = default(T);
+        return false;
+      } else {
+        //No risk of an enqueue corrupting this element 
+        //since we don't modify head or tail, an enqueue targeting this element
+        //would fail.
+        t = _buffer[_head];
+        return true;
+      }
+    }
+
+    /// <summary>
     /// Tries to dequeue a value off of the buffer.  If the buffer is empty this method
     /// will perform no action and return false.  This method is only safe to be
     /// called from a single consumer thread.
@@ -110,6 +131,20 @@ namespace Leap.Unity {
       }
 
       t = _buffer[_head];
+      _head = (_head + 1) & _bufferMask;
+      return true;
+    }
+
+    /// <summary>
+    /// Tries to dequeue a value off of the buffer.  If the buffer is empty this method
+    /// will perform no action and return false.  This method is only safe to be
+    /// called from a single consumer thread.
+    /// </summary>
+    public bool TryDequeue() {
+      if (_tail == _head) {
+        return false;
+      }
+
       _head = (_head + 1) & _bufferMask;
       return true;
     }
