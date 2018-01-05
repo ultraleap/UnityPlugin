@@ -362,8 +362,18 @@ namespace Leap.Unity {
       controller.DistortionChange += onDistortionChange;
     }
 
+    private long _expectedSequenceId = -1;
     private void onImageReady(object sender, ImageEventArgs argsd) {
       Image image = argsd.image;
+
+      if (_expectedSequenceId != -1) {
+        if (image.SequenceId != _expectedSequenceId) {
+          Debug.LogWarning("Image with sequenceId " + image.SequenceId + " was unexpected.  Expected " + _expectedSequenceId);
+        }
+      }
+
+      _expectedSequenceId = image.SequenceId + 1;
+
       _imageQueue.TryEnqueue(ref image);
     }
 
