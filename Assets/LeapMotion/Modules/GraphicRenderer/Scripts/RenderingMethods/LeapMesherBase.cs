@@ -476,8 +476,12 @@ namespace Leap.Unity.GraphicalRenderer {
             var sprite = dataObj.sprite;
             if (sprite == null) continue;
 
-            Rect rect = SpriteAtlasUtil.GetAtlasedRect(sprite);
-            _atlasUvs.SetRect(spriteFeature.channel.Index(), sprite, rect);
+            Rect rect;
+            if (SpriteAtlasUtil.TryGetAtlasedRect(sprite, out rect)) {
+              _atlasUvs.SetRect(spriteFeature.channel.Index(), sprite, rect);
+            } else {
+              _atlasUvs.SetRect(spriteFeature.channel.Index(), sprite, default(Rect));
+            }
           }
         }
       }
