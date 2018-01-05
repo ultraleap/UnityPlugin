@@ -273,6 +273,9 @@ namespace Leap.Unity {
         return;
       }
 
+      //Enable pooling to reduce overhead of images
+      LeapInternal.MemoryManager.EnablePooling = true;
+
       ApplyGammaCorrectionValues();
       ApplyCameraProjectionValues(GetComponent<Camera>());
     }
