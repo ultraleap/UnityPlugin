@@ -35,7 +35,12 @@ namespace Leap.Unity.GraphicalRenderer {
       mesh.hideFlags = HideFlags.HideAndDontSave;
       mesh.vertices = sprite.vertices.Query().Select(v => (Vector3)v).ToArray();
       mesh.triangles = sprite.triangles.Query().Select(i => (int)i).ToArray();
-      mesh.uv = SpriteAtlasUtil.GetAtlasedUvs(sprite);
+
+      Vector2[] uvs;
+      if (SpriteAtlasUtil.TryGetAtlasedUvs(sprite, out uvs)) {
+        mesh.uv = uvs;
+      }
+
       mesh.RecalculateBounds();
 
       //We are using atlas uvs, so no remapping allowed!
