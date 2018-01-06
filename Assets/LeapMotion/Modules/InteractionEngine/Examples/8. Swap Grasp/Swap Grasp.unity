@@ -4564,7 +4564,6 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 1896032244}
-  - component: {fileID: 1896032243}
   m_Layer: 0
   m_Name: Stage
   m_TagString: Untagged
@@ -4572,18 +4571,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 4294967295
   m_IsActive: 1
---- !u!114 &1896032243
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 114637211336798562, guid: 9b0d46ef9e6296640baaf7bac58ac47b,
-    type: 2}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1896032242}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 0}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!4 &1896032244
 Transform:
   m_ObjectHideFlags: 0
