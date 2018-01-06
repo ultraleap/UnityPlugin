@@ -242,6 +242,13 @@ namespace Leap.Unity.Interaction {
     }
 
     /// <summary>
+    /// Gets the last-tracked rotation of the underlying Leap hand.
+    /// </summary>
+    public override Quaternion rotation {
+      get { return _handData.Rotation.ToQuaternion(); }
+    }
+
+    /// <summary>
     /// Gets the velocity of the underlying tracked Leap hand.
     /// </summary>
     public override Vector3 velocity {
@@ -692,6 +699,14 @@ namespace Leap.Unity.Interaction {
       }
 
       return false;
+    }
+
+    public override void SwapGrasp(IInteractionBehaviour replacement) {
+      var original = graspedObject;
+
+      base.SwapGrasp(replacement);
+
+      grabClassifier.SwapClassifierState(original, replacement);
     }
 
     protected override void fixedUpdateGraspingState() {

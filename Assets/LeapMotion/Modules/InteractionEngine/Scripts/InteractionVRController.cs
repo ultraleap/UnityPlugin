@@ -298,6 +298,15 @@ namespace Leap.Unity.Interaction {
     }
 
     /// <summary>
+    /// Gets the last-tracked rotation of the controller.
+    /// </summary>
+    public override Quaternion rotation {
+      get {
+        return this.transform.rotation;
+      }
+    }
+
+    /// <summary>
     /// Gets the current velocity of the controller.
     /// </summary>
     public override Vector3 velocity {
