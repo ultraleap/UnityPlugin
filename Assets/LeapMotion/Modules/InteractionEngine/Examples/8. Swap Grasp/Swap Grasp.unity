@@ -1173,7 +1173,6 @@ MonoBehaviour:
   _physicsExtrapolation: 1
   _physicsExtrapolationTime: 0.011111111
   _updateHandInPrecull: 1
-  _enableDllProfiling: 0
 --- !u!114 &129172186
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2711,6 +2710,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 603390c2fa71ebd4abe0b67385eb3709, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  objA: {fileID: 759419769}
+  objB: {fileID: 1841141646}
+  swapButton: {fileID: 1541347213}
 --- !u!1 &1155409168
 GameObject:
   m_ObjectHideFlags: 0
@@ -4043,6 +4045,12 @@ Transform:
   m_PrefabParentObject: {fileID: 4493201980653798, guid: df84af96020c94b4695aec5c3427db16,
     type: 2}
   m_PrefabInternal: {fileID: 1541347211}
+--- !u!114 &1541347213 stripped
+MonoBehaviour:
+  m_PrefabParentObject: {fileID: 114193398573130750, guid: df84af96020c94b4695aec5c3427db16,
+    type: 2}
+  m_PrefabInternal: {fileID: 1541347211}
+  m_Script: {fileID: 11500000, guid: 5cba520a60e47274cb1e5afbb57aae0c, type: 3}
 --- !u!1 &1560680363
 GameObject:
   m_ObjectHideFlags: 0
@@ -4556,7 +4564,6 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 1896032244}
-  - component: {fileID: 1896032243}
   m_Layer: 0
   m_Name: Stage
   m_TagString: Untagged
@@ -4564,18 +4571,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 4294967295
   m_IsActive: 1
---- !u!114 &1896032243
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 114637211336798562, guid: 9b0d46ef9e6296640baaf7bac58ac47b,
-    type: 2}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1896032242}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 0}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!4 &1896032244
 Transform:
   m_ObjectHideFlags: 0
