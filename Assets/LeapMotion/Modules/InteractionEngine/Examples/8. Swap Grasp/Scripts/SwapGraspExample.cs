@@ -30,6 +30,9 @@ namespace Leap.Unity.Examples {
     }
 
     private void onPostPhysics() {
+      //Swapping when both objects are grasped is unsupported
+      if(objA.isGrasped && objB.isGrasped) { return; }
+  
       if (_swapScheduled && (objA.isGrasped || objB.isGrasped)) {
 
         // Swap "a" for "b"; a will be whichever object is the grasped one.

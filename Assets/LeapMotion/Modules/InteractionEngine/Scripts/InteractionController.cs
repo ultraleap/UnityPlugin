@@ -1674,7 +1674,7 @@ namespace Leap.Unity.Interaction {
       }
 
       if (replacement == null) {
-        throw new ArgumentNullException("replacement");
+        throw new ArgumentNullException("The replacement object is null!");
       }
 
       if (replacement.isGrasped && !replacement.allowMultiGrasp) {
