@@ -1107,7 +1107,6 @@ GameObject:
   - component: {fileID: 129172186}
   - component: {fileID: 129172185}
   - component: {fileID: 129172184}
-  - component: {fileID: 129172187}
   m_Layer: 0
   m_Name: LeapHandController
   m_TagString: Untagged
@@ -1174,6 +1173,7 @@ MonoBehaviour:
   _physicsExtrapolation: 1
   _physicsExtrapolationTime: 0.011111111
   _updateHandInPrecull: 1
+  _enableDllProfiling: 0
 --- !u!114 &129172186
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1186,18 +1186,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 215a4d49fc705b74a9d3c5cbfa2c9601, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &129172187
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 129172182}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d36a3162def06a34ca35e46991ae50f1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  theCountOfStuff: 0
 --- !u!1 &164961376
 GameObject:
   m_ObjectHideFlags: 0
