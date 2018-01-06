@@ -66,6 +66,7 @@ namespace Leap.Unity {
     protected bool _updateHandInPrecull = false;
 
     [Tooltip("When checked, profiling data from the LeapCSharp dll will be used to populate the UnityProfiler.")]
+    [EditTimeOnly]
     [SerializeField]
     protected bool _enableDllProfiling = false;
 
