@@ -65,6 +65,10 @@ namespace Leap.Unity {
     [SerializeField]
     protected bool _updateHandInPrecull = false;
 
+    [Tooltip("When checked, profiling data from the LeapCSharp dll will be used to populate the UnityProfiler.")]
+    [SerializeField]
+    protected bool _enableDllProfiling = false;
+
     protected bool _useInterpolation = true;
 
     //Extrapolate on Android to compensate for the latency introduced by its graphics pipeline
@@ -200,6 +204,10 @@ namespace Leap.Unity {
     }
 
     protected virtual void Update() {
+      if (_enableDllProfiling) {
+        LeapProfiling.Update();
+      }
+
 #if UNITY_EDITOR
       if (EditorApplication.isCompiling) {
         EditorApplication.isPlaying = false;
@@ -373,6 +381,16 @@ namespace Leap.Unity {
         initializeFlags();
       } else {
         leap_controller_.Device += onHandControllerConnect;
+      }
+
+      if (_enableDllProfiling) {
+        //A controller will report profiling statistics for the duration of it's lifetime
+        //so these events will never be unsubscribed from.
+        leap_controller_.EndProfilingBlock += LeapProfiling.EndProfilingBlock;
+        leap_controller_.BeginProfilingBlock += LeapProfiling.BeginProfilingBlock;
+
+        leap_controller_.EndProfilingForThread += LeapProfiling.EndProfilingForThread;
+        leap_controller_.BeginProfilingForThread += LeapProfiling.BeginProfilingForThread;
       }
     }
 

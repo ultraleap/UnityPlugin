@@ -225,17 +225,7 @@ namespace LeapInternal
           LEAP_CONNECTION_MESSAGE _msg = new LEAP_CONNECTION_MESSAGE();
           uint timeout = 1000;
 
-          if (LeapBeginProfilingBlock != null && hasBegunProfilingForThread) 
-          {
-            LeapBeginProfilingBlock(new BeginProfilingBlockArgs(POLL_CONNECTION_PROFILER_BLOCk));
-          }
-
           result = LeapC.PollConnection(_leapConnection, timeout, ref _msg);
-
-          if (LeapEndProfilingBlock != null && hasBegunProfilingForThread) 
-          {
-            LeapEndProfilingBlock(new EndProfilingBlockArgs(POLL_CONNECTION_PROFILER_BLOCk));
-          }
 
           if (result != eLeapRS.eLeapRS_Success) {
             reportAbnormalResults("LeapC PollConnection call was ", result);

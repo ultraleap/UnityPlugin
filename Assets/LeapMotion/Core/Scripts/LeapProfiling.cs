@@ -1,71 +1,34 @@
-﻿using System;
-using System.Threading;
+﻿using System.Threading;
 using System.Collections.Generic;
-using UnityEngine;
 using UnityEngine.Profiling;
 
 namespace Leap.Unity {
 
-  [RequireComponent(typeof(LeapServiceProvider))]
-  public class LeapProfiling : MonoBehaviour {
+  /// <summary>
+  /// Utility class used by the LeapServiceProvider for profiling the LeapCSharp dll
+  /// </summary>
+  public static class LeapProfiling {
 
-    private Dictionary<string, CustomSampler> _samplers = new Dictionary<string, CustomSampler>();
+    //Maps a block name to the sampler for it
+    private static Dictionary<string, CustomSampler> _samplers = new Dictionary<string, CustomSampler>();
 
-    private int _samplersToCreateCount = 0;
-    private Queue<string> _samplersToCreate = new Queue<string>();
+    //Represents a queue of samplers that need to be created.
+    //Samplers can only be created on the main thread, so we need some way for the info given
+    //on alternate threads to be passed to the main thread.
+    private static Queue<string> _samplersToCreate = new Queue<string>();
 
-    private bool _isEnabled;
-    private int _activeThreads = 0;
+    //We keep track of the size of the queue in a member variable
+    private static int _samplersToCreateCount = 0;
 
-    private void OnEnable() {
-      var provider = GetComponent<LeapServiceProvider>();
-      if (provider == null) {
-        Debug.LogError("LeapProfiling component must be placed next to a LeapServiceProvider.");
-        enabled = false;
-        return;
-      }
-
-      var controller = provider.GetLeapController();
-      if (controller == null) {
-        Debug.LogError("Could not get a reference to the leap controller, profiling will not be performed.");
-        enabled = false;
-        return;
-      }
-
-      controller.BeginProfilingForThread += beginProfilingForThread;
-      controller.EndProfilingForThread += endProfilingForThread;
-      controller.BeginProfilingBlock += beginProfilingBlock;
-      controller.EndProfilingBlock += endProfilingBlock;
-
-      _isEnabled = true;
-    }
-
-    private void OnDisable() {
-      var provider = GetComponent<LeapServiceProvider>();
-      if (provider == null) {
-        return;
-      }
-
-      var controller = provider.GetLeapController();
-      if (controller == null) {
-        return;
-      }
-
-      controller.BeginProfilingForThread -= beginProfilingForThread;
-      controller.EndProfilingForThread -= endProfilingForThread;
-      controller.BeginProfilingBlock -= beginProfilingBlock;
-      controller.EndProfilingBlock -= endProfilingBlock;
-
-      _isEnabled = false;
-    }
-
-    private void Update() {
+    public static void Update() {
       //Read of _samplersToCreateCount is atomic
       if (_samplersToCreateCount > 0) {
+        //Only if the count is nonzero do we do an expensive lock 
         lock (_samplersToCreate) {
-          //First duplicate the dictionary
+          //First duplicate the existing dictionary
           var newDictionary = new Dictionary<string, CustomSampler>(_samplers);
 
+          //Then construct all of the new samplers and add them to the new dictionary
           while (_samplersToCreate.Count > 0) {
             string blockName = _samplersToCreate.Dequeue();
 
@@ -77,14 +40,19 @@ namespace Leap.Unity {
 
           //Reference assignments are atomic in C#
           //All new callbacks will now reference the updated dictionary
+          //Old dictionary will be collected by GC
           _samplers = newDictionary;
         }
       }
     }
 
-    private void beginProfilingForThread(BeginProfilingForThreadArgs eventData) {
-      Debug.Log("BEGIN:" + Thread.CurrentThread.ManagedThreadId);
+    public static void BeginProfilingForThread(BeginProfilingForThreadArgs eventData) {
+      //Enable unity profiling for this thread
+      Profiler.BeginThreadProfiling("LeapCSharp", eventData.threadName);
 
+      //Assume that threads are not stopping and starting frequently
+      //so we can get away with less-than-optimal strategies when starting a thread.
+      //in this case we use a naive queue with a lock.
       lock (_samplersToCreate) {
         foreach (var blockName in eventData.blockNames) {
           _samplersToCreate.Enqueue(blockName);
@@ -94,21 +62,26 @@ namespace Leap.Unity {
       }
     }
 
-    private void endProfilingForThread(EndProfilingForThreadArgs eventData) {
+    public static void EndProfilingForThread(EndProfilingForThreadArgs eventData) {
+      Profiler.EndThreadProfiling();
     }
 
-    private void beginProfilingBlock(BeginProfilingBlockArgs eventData) {
-      Profiler.BeginThreadProfiling("LeapCSharp", "Worker Thread");
-
+    public static void BeginProfilingBlock(BeginProfilingBlockArgs eventData) {
       //Sampler might not have been created yet because samplers can only be created
-      //on the main thread.
+      //on the main thread.  We will simply not be able to report all blocks until
+      //a sampler is available.
+
+      //Note that the Dictionary type is thread safe for read operations
+      //Dictionary is only used once and so there is no risk of the dictionary 
+      //being swapped out from underneath us
+
       CustomSampler sampler;
       if (_samplers.TryGetValue(eventData.blockName, out sampler)) {
         sampler.Begin();
       }
     }
 
-    private void endProfilingBlock(EndProfilingBlockArgs eventData) {
+    public static void EndProfilingBlock(EndProfilingBlockArgs eventData) {
       CustomSampler sampler;
       if (_samplers.TryGetValue(eventData.blockName, out sampler)) {
         sampler.End();
