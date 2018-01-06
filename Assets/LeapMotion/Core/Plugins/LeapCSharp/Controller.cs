@@ -276,6 +276,15 @@ namespace Leap
       }
     }
 
+    /**
+     * Dispatched whenever a thread wants to start profiling for a custom thread.
+     * The event is always dispatched from the thread itself.
+     * 
+     * The event data will contain the name of the thread, as well as an array of
+     * all possible profiling blocks that could be entered on that thread.
+     * 
+     * @since 4.0
+     */
     public event Action<BeginProfilingForThreadArgs> BeginProfilingForThread 
     {
       add 
@@ -288,6 +297,12 @@ namespace Leap
       }
     }
 
+    /**
+     * Dispatched whenever a thread is finished profiling.  The event is always
+     * dispatched from the thread itself.
+     * 
+     * @since 4.0
+     */
     public event Action<EndProfilingForThreadArgs> EndProfilingForThread 
     {
       add 
@@ -300,6 +315,14 @@ namespace Leap
       }
     }
 
+    /**
+     * Dispatched whenever a thread enters a profiling block.  The event is always
+     * dispatched from the thread itself.
+     * 
+     * The event data will contain the name of the profiling block.
+     * 
+     * @since 4.0
+     */
     public event Action<BeginProfilingBlockArgs> BeginProfilingBlock 
     {
       add 
@@ -312,6 +335,14 @@ namespace Leap
       }
     }
 
+    /**
+     * Dispatched whenever a thread ends a profiling block.  The event is always
+     * dispatched from the thread itself.
+     * 
+     * The event data will contain the name of the profiling block.
+     * 
+     * @since 4.0
+     */
     public event Action<EndProfilingBlockArgs> EndProfilingBlock 
     {
       add 

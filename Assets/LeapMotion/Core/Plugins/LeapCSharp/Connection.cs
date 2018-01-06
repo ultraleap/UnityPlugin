@@ -204,7 +204,7 @@ namespace LeapInternal
     //Run in Polster thread, fills in object queues
     private void processMessages()
     {
-      const string POLL_CONNECTION_PROFILER_BLOCk = "Poll Connection";
+      //Only profiling block currently is the Handle Event block
       const string HANDLE_EVENT_PROFILER_BLOCK = "Handle Event";
       bool hasBegunProfilingForThread = false;
 
@@ -217,7 +217,6 @@ namespace LeapInternal
           if (LeapBeginProfilingForThread != null && !hasBegunProfilingForThread) 
           {
             LeapBeginProfilingForThread(new BeginProfilingForThreadArgs("Worker Thread", 
-                                                                        POLL_CONNECTION_PROFILER_BLOCk, 
                                                                         HANDLE_EVENT_PROFILER_BLOCK));
             hasBegunProfilingForThread = true;
           }
