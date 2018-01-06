@@ -26,6 +26,10 @@ namespace Leap.Unity.Interaction {
                        InteractionBehaviour interactionObj, bool justGrasped) {
       interactionObj.rigidbody.MovePosition(solvedPosition);
       interactionObj.rigidbody.MoveRotation(solvedRotation);
+
+      // Store the target position and rotation to prevent slippage in SwapGrasp
+      // scenarios.
+      interactionObj.latestScheduledGraspPose = new Pose(solvedPosition, solvedRotation);
     }
   }
 }

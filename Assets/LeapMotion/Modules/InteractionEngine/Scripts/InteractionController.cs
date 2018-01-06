@@ -142,6 +142,11 @@ namespace Leap.Unity.Interaction {
     public abstract Vector3 position { get; }
 
     /// <summary>
+    /// Returns the current rotation of this controller.
+    /// </summary>
+    public abstract Quaternion rotation { get; }
+
+    /// <summary>
     /// Returns the current velocity of this controller.
     /// </summary>
     public abstract Vector3 velocity { get; }
@@ -1653,6 +1658,47 @@ namespace Leap.Unity.Interaction {
       }
 
       return false;
+    }
+
+    /// <summary>
+    /// Seamlessly swap the currently grasped object for a replacement object.  It will
+    /// behave like the hand released the current object, and then grasped the new object.
+    /// 
+    /// This method will not teleport the replacement object or move it in any way, it will
+    /// just cause it to be grasped.  That means that you will be responsible for moving
+    /// the replacement object into a reasonable position for it to be grasped.
+    /// </summary>
+    public virtual void SwapGrasp(IInteractionBehaviour replacement) {
+      if (_graspedObject == null) {
+        throw new InvalidOperationException("Cannot swap grasp if we are not currently grasping.");
+      }
+
+      if (replacement == null) {
+        throw new ArgumentNullException("The replacement object is null!");
+      }
+
+      if (replacement.isGrasped && !replacement.allowMultiGrasp) {
+        throw new InvalidOperationException("Cannot swap grasp if the replacement object is already grasped and does not support multi grasp.");
+      }
+
+      //Notify the currently grasped object that it is being released
+      _releasingControllersBuffer.Clear();
+      _releasingControllersBuffer.Add(this);
+      _graspedObject.EndGrasp(_releasingControllersBuffer);
+
+      //Switch to the replacement object
+      _graspedObject = replacement;
+
+      var tempControllers = Pool<List<InteractionController>>.Spawn();
+      try {
+        //Let the replacement object know that it is being grasped
+        tempControllers.Add(this);
+        replacement.BeginGrasp(tempControllers);
+      } 
+      finally {
+        tempControllers.Clear();
+        Pool<List<InteractionController>>.Recycle(tempControllers);
+      }
     }
 
     /// <summary>
