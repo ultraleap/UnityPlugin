@@ -23,7 +23,7 @@ namespace Leap.Unity{
   * and in the Unity FixedUpdate() phase for physics objects. InitHand() is called once,
   * when the hand is created and is followed by a call to UpdateHand().
   */
-  public abstract class HandModel : IHandModel {
+  public abstract class HandModel : HandModelBase {
 
     [SerializeField]
     private Chirality handedness;

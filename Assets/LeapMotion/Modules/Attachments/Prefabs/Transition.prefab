@@ -170,7 +170,7 @@ MonoBehaviour:
   _onAnimationStep:
     m_PersistentCalls:
       m_Calls: []
-    m_TypeName: Leap.Unity.Attachments.AnimationStepEvent, Assembly-CSharp, Version=0.0.0.0,
+    m_TypeName: Leap.Unity.Attachments.AnimationStepEvent, Attachments, Version=0.0.0.0,
       Culture=neutral, PublicKeyToken=null
   _onComplete:
     m_PersistentCalls:

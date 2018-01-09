@@ -21,7 +21,7 @@ namespace Leap.Unity {
    * 
    * You can alternatively specify a target game object.
    * 
-   * If added to a IHandModel instance or one of its children, this detector checks the
+   * If added to a HandModelBase instance or one of its children, this detector checks the
    * finger direction at the interval specified by the Period variable. You can also specify
    * which hand model to observe explicitly by setting handModel in the Unity editor or 
    * in code.
@@ -39,12 +39,12 @@ namespace Leap.Unity {
     public float Period = .1f; //seconds
 
     /**
-     * The IHandModel instance to observe. 
+     * The HandModelBase instance to observe. 
      * Set automatically if not explicitly set in the editor.
      * @since 4.1.2
      */
     [Tooltip("The hand model to watch. Set automatically if detector is on a hand.")]
-    public IHandModel HandModel = null;  
+    public HandModelBase HandModel = null;  
 
     /**
      * The finger to compare to the specified direction.
