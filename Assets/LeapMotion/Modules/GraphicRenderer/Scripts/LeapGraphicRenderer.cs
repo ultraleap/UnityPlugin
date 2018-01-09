@@ -179,11 +179,6 @@ namespace Leap.Unity.GraphicalRenderer {
       }
     }
 
-    private void Update() {
-      // Validate the attached space to support it changing at runtime.
-      validateSpaceComponent();
-    }
-
     private void LateUpdate() {
 #if UNITY_EDITOR
       //No updates for prefabs!
@@ -210,6 +205,9 @@ namespace Leap.Unity.GraphicalRenderer {
     }
 
     private void doLateUpdateRuntime() {
+      // Validate the attached space to support it changing at runtime.
+      validateSpaceComponent();
+
       if (_space != null) {
         //TODO, optimize this!  Don't do it every frame for the whole thing!
         using (new ProfilerSample("Refresh space data")) {

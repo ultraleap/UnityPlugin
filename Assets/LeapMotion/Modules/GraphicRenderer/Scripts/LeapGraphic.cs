@@ -293,7 +293,7 @@ namespace Leap.Unity.GraphicalRenderer {
     /// <summary>
     /// Called by graphic groups when a renderer's attached space changes.
     /// </summary>
-    public void SetAnchor(LeapSpaceAnchor anchor) {
+    public void OnUpdateAnchor(LeapSpaceAnchor anchor) {
       _anchor = anchor;
     }
 

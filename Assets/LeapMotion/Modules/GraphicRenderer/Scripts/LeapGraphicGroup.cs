@@ -233,7 +233,7 @@ namespace Leap.Unity.GraphicalRenderer {
     public void RefreshGraphicAnchors() {
       foreach (var graphic in _graphics) {
         var anchor = _renderer.space == null ? null : LeapSpaceAnchor.GetAnchor(graphic.transform);
-        graphic.SetAnchor(anchor);
+        graphic.OnUpdateAnchor(anchor);
       }
     }
 
