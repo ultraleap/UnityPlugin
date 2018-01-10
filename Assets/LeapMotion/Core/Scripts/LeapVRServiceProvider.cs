@@ -97,6 +97,90 @@ namespace Leap.Unity {
 
     #endregion
 
+    #region Temporal Warping Tweens
+
+    [Header("Temporal Warping Adjustments")]
+
+    [Tooltip("Allows smooth enabling or disabling of the Image-Warping feature. "
+           + "Usually should match rotation warping.")]
+    [Range(0, 1)]
+    [SerializeField]
+    [OnEditorChange("tweenImageWarping")]
+    private float _tweenImageWarping = 0f;
+    public float tweenImageWarping {
+      get {
+        return _tweenImageWarping;
+      }
+      set {
+        _tweenImageWarping = Mathf.Clamp01(value);
+      }
+    }
+
+    [Tooltip("Allows smooth enabling or disabling of the Rotational warping of Leap Space. "
+           + "Usually should match image warping.")]
+    [Range(0, 1)]
+    [SerializeField]
+    [OnEditorChange("tweenRotationalWarping")]
+    private float _tweenRotationalWarping = 0f;
+    public float tweenRotationalWarping {
+      get {
+        return _tweenRotationalWarping;
+      }
+      set {
+        _tweenRotationalWarping = Mathf.Clamp01(value);
+      }
+    }
+
+    [Tooltip("Allows smooth enabling or disabling of the Positional warping of Leap Space. "
+           + "Usually should be disabled when using image warping.")]
+    [Range(0, 1)]
+    [SerializeField]
+    [OnEditorChange("tweenPositionalWarping")]
+    private float _tweenPositionalWarping = 0f;
+    public float tweenPositionalWarping {
+      get {
+        return _tweenPositionalWarping;
+      }
+      set {
+        _tweenPositionalWarping = Mathf.Clamp01(value);
+      }
+    }
+
+    // Manual Time Alignment
+    [Tooltip("Allow manual adjustment of the rewind time.")]
+    [SerializeField]
+    private bool _allowManualTimeAlignment;
+
+    private const int DEFAULT_WARP_ADJUSTMENT = 17;
+
+    [Tooltip("Time in milliseconds between the current frame's Leap position (offset from "
+           + "the headset) and the time at which the Leap frame was captured. This "
+           + "prevents 'swimming' behavior when the headset moves and the user's hands "
+           + "don't. This value can be tuned if using a non-standard VR headset.")]
+    [SerializeField]
+    private int _customWarpAdjustment = DEFAULT_WARP_ADJUSTMENT; //Milliseconds
+    public int warpingAdjustment {
+      get {
+        if (_allowManualTimeAlignment) {
+          return _customWarpAdjustment;
+        }
+        else {
+          return DEFAULT_WARP_ADJUSTMENT;
+        }
+      }
+    }
+
+    [SerializeField]
+    private KeyCode _unlockHold = KeyCode.RightShift;
+
+    [SerializeField]
+    private KeyCode _moreRewind = KeyCode.LeftArrow;
+
+    [SerializeField]
+    private KeyCode _lessRewind = KeyCode.RightArrow;
+
+    #endregion
+
     [Header("[Experimental]")]
     [Tooltip("Pass updated transform matrices to objects with materials using the VertexOffsetShader.")]
     [SerializeField]
@@ -137,6 +221,18 @@ namespace Leap.Unity {
       manualUpdateHasBeenCalledSinceUpdate = false;
       base.Update();
       imageTimeStamp = _leapController.FrameTimestamp();
+
+      // Manual Time Alignment
+      if (_allowManualTimeAlignment) {
+        if (_unlockHold == KeyCode.None || Input.GetKey(_unlockHold)) {
+          if (Input.GetKeyDown(_moreRewind)) {
+            _customWarpAdjustment += 1;
+          }
+          if (Input.GetKeyDown(_lessRewind)) {
+            _customWarpAdjustment -= 1;
+          }
+        }
+      }
     }
 
     protected override long CalculateInterpolationTime(bool endOfFrame = false) {
@@ -188,9 +284,17 @@ namespace Leap.Unity {
       }
 
       // Update Image Warping
-      Vector3 position; Quaternion rotation;
-      transformHistory.SampleTransform(imageTimeStamp /*- ((long)_smoothedTrackingLatency.value+20000)*/, out position, out rotation);
-      Quaternion imageQuatWarp = Quaternion.Inverse(InputTracking.GetLocalRotation(XRNode.CenterEye)) * rotation;
+      Vector3 pastPosition; Quaternion pastRotation;
+      transformHistory.SampleTransform(imageTimeStamp
+                                         - (long)(warpingAdjustment * 1000f)
+                                         - (long)(_smoothedTrackingLatency.value),
+                                       out pastPosition, out pastRotation);
+
+      // Use _tweenImageWarping
+      var currCenterRotation = InputTracking.GetLocalRotation(XRNode.CenterEye);
+      var imageReferenceRotation = Quaternion.Slerp(currCenterRotation, pastRotation, _tweenImageWarping);
+
+      Quaternion imageQuatWarp = Quaternion.Inverse(currCenterRotation) * imageReferenceRotation;
       imageQuatWarp = Quaternion.Euler(imageQuatWarp.eulerAngles.x, imageQuatWarp.eulerAngles.y, -imageQuatWarp.eulerAngles.z);
       Matrix4x4 imageMatWarp = projectionMatrix * Matrix4x4.TRS(Vector3.zero, imageQuatWarp, Vector3.one) * projectionMatrix.inverse;
       Shader.SetGlobalMatrix("_LeapGlobalWarpedOffset", imageMatWarp);
@@ -231,8 +335,18 @@ namespace Leap.Unity {
       LeapTransform leapTransform;
       if (XRSettings.enabled && XRDevice.isPresent && transformHistory != null) {
         if (updateTemporalCompensation && transformHistory.history.IsFull) {
-          transformHistory.SampleTransform(timestamp - ((long)_smoothedTrackingLatency.value), out warpedPosition, out warpedRotation);
+          transformHistory.SampleTransform(timestamp
+                                           - (long)(warpingAdjustment * 1000f)
+                                           - (long)(_smoothedTrackingLatency.value),
+                                           out warpedPosition, out warpedRotation);
         }
+
+        // Apply position/rotation warp tween values.
+        Vector3    currentPosition;
+        Quaternion currentRotation;
+        transformHistory.SampleTransform(timestamp, out currentPosition, out currentRotation);
+        warpedPosition = Vector3.Lerp(currentPosition, warpedPosition, _tweenPositionalWarping);
+        warpedRotation = Quaternion.Slerp(currentRotation, warpedRotation, _tweenRotationalWarping);
 
         warpedRotation *= Quaternion.Euler(deviceTiltXAxis, 0f, 0f);
         warpedRotation *= Quaternion.Euler(-90f, 180f, 0f);
