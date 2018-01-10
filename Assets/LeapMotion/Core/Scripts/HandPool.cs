@@ -12,17 +12,19 @@ using UnityEngine.Assertions;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.Serialization;
+using System;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
 using Leap;
 
 namespace Leap.Unity {
+  //
   /**
-   * HandPool holds a pool of IHandModels and makes HandRepresentations
+   * HandPool holds a pool of HandModelBases and makes HandRepresentations
    * when given a Leap Hand and a model type of graphics or physics.
-   * When a HandRepresentation is created, an IHandModel is removed from the pool.
-   * When a HandRepresentation is finished, its IHandModel is returned to the pool.
+   * When a HandRepresentation is created, a HandModelBase is removed from the pool.
+   * When a HandRepresentation is finished, its HandModelBase is returned to the pool.
    */
   public class HandPool : MonoBehaviour {
     [SerializeField]
@@ -40,14 +42,14 @@ namespace Leap.Unity {
     private List<ModelGroup> ModelPool;
     private List<HandRepresentation> activeHandReps = new List<HandRepresentation>();
 
-    private Dictionary<IHandModel, ModelGroup> modelGroupMapping = new Dictionary<IHandModel, ModelGroup>();
-    private Dictionary<IHandModel, HandRepresentation> modelToHandRepMapping = new Dictionary<IHandModel, HandRepresentation>();
+    private Dictionary<HandModelBase, ModelGroup> modelGroupMapping = new Dictionary<HandModelBase, ModelGroup>();
+    private Dictionary<HandModelBase, HandRepresentation> modelToHandRepMapping = new Dictionary<HandModelBase, HandRepresentation>();
     /**
-     * ModelGroup contains a left/right pair of IHandModel's
-     * @param modelList The IHandModels available for use by HandRepresentations
-     * @param modelsCheckedOut The IHandModels currently in use by active HandRepresentations
+     * ModelGroup contains a left/right pair of HandModelBase's
+     * @param modelList The HandModelBases available for use by HandRepresentations
+     * @param modelsCheckedOut The HandModelBases currently in use by active HandRepresentations
      * @param IsEnabled determines whether the ModelGroup is active at app Start(), though ModelGroup's are controlled with the EnableGroup() & DisableGroup methods.
-     * @param CanDuplicate Allows a IHandModels in the ModelGroup to be cloned at runtime if a suitable IHandModel isn't available.
+     * @param CanDuplicate Allows a HandModelBases in the ModelGroup to be cloned at runtime if a suitable HandModelBase isn't available.
      */
     [System.Serializable]
     public class ModelGroup {
@@ -55,27 +57,27 @@ namespace Leap.Unity {
       [HideInInspector]
       public HandPool _handPool;
 
-      public IHandModel LeftModel;
+      public HandModelBase LeftModel;
       [HideInInspector]
       public bool IsLeftToBeSpawned;
-      public IHandModel RightModel;
+      public HandModelBase RightModel;
       [HideInInspector]
       public bool IsRightToBeSpawned;
-      [HideInInspector]
-      public List<IHandModel> modelList = new List<IHandModel>();
-      [HideInInspector]
-      public List<IHandModel> modelsCheckedOut = new List<IHandModel>();
+      [NonSerialized]
+      public List<HandModelBase> modelList = new List<HandModelBase>();
+      [NonSerialized]
+      public List<HandModelBase> modelsCheckedOut = new List<HandModelBase>();
       public bool IsEnabled = true;
       public bool CanDuplicate;
 
       public Hands.HandEvent HandPostProcesses;
 
-      /*Looks for suitable IHandModel is the ModelGroup's modelList, if found, it is added to modelsCheckedOut.
+      /*Looks for suitable HandModelBase is the ModelGroup's modelList, if found, it is added to modelsCheckedOut.
        * If not, one can be cloned*/
-      public IHandModel TryGetModel(Chirality chirality, ModelType modelType) {
+      public HandModelBase TryGetModel(Chirality chirality, ModelType modelType) {
         for (int i = 0; i < modelList.Count; i++) {
           if (modelList[i].HandModelType == modelType && modelList[i].Handedness == chirality) {
-            IHandModel model = modelList[i];
+            HandModelBase model = modelList[i];
             modelList.RemoveAt(i);
             modelsCheckedOut.Add(model);
             return model;
@@ -84,8 +86,8 @@ namespace Leap.Unity {
         if (CanDuplicate) {
           for (int i = 0; i < modelsCheckedOut.Count; i++) {
             if (modelsCheckedOut[i].HandModelType == modelType && modelsCheckedOut[i].Handedness == chirality) {
-              IHandModel modelToSpawn = modelsCheckedOut[i];
-              IHandModel spawnedModel = GameObject.Instantiate(modelToSpawn);
+              HandModelBase modelToSpawn = modelsCheckedOut[i];
+              HandModelBase spawnedModel = GameObject.Instantiate(modelToSpawn);
               spawnedModel.transform.parent = _handPool.modelsParent;
               _handPool.modelGroupMapping.Add(spawnedModel, this);
               modelsCheckedOut.Add(spawnedModel);
@@ -95,13 +97,13 @@ namespace Leap.Unity {
         }
         return null;
       }
-      public void ReturnToGroup(IHandModel model) {
+      public void ReturnToGroup(HandModelBase model) {
         modelsCheckedOut.Remove(model);
         modelList.Add(model);
         this._handPool.modelToHandRepMapping.Remove(model);
       }
     }
-    public void ReturnToPool(IHandModel model) {
+    public void ReturnToPool(HandModelBase model) {
       ModelGroup modelGroup;
       bool groupFound = modelGroupMapping.TryGetValue(model, out modelGroup);
       Assert.IsTrue(groupFound);
@@ -113,7 +115,7 @@ namespace Leap.Unity {
           if (rep.handModels != null) {
             //And that Represention does not contain a model from this model's modelGroup
             for (int j = 0; j < modelGroup.modelsCheckedOut.Count; j++) {
-              IHandModel modelToCompare = modelGroup.modelsCheckedOut[j];
+              HandModelBase modelToCompare = modelGroup.modelsCheckedOut[j];
               for (int k = 0; k < rep.handModels.Count; k++) {
                 if (rep.handModels[k] == modelToCompare) {
                   modelFromGroupFound = true;
@@ -152,12 +154,12 @@ namespace Leap.Unity {
         }
 
         collectionGroup._handPool = this;
-        IHandModel leftModel;
-        IHandModel rightModel;
+        HandModelBase leftModel;
+        HandModelBase rightModel;
         if (collectionGroup.IsLeftToBeSpawned) {
-          IHandModel modelToSpawn = collectionGroup.LeftModel;
+          HandModelBase modelToSpawn = collectionGroup.LeftModel;
           GameObject spawnedGO = Instantiate(modelToSpawn.gameObject);
-          leftModel = spawnedGO.GetComponent<IHandModel>();
+          leftModel = spawnedGO.GetComponent<HandModelBase>();
           leftModel.transform.parent = modelsParent;
         } else {
           leftModel = collectionGroup.LeftModel;
@@ -168,9 +170,9 @@ namespace Leap.Unity {
         }
 
         if (collectionGroup.IsRightToBeSpawned) {
-          IHandModel modelToSpawn = collectionGroup.RightModel;
+          HandModelBase modelToSpawn = collectionGroup.RightModel;
           GameObject spawnedGO = Instantiate(modelToSpawn.gameObject);
-          rightModel = spawnedGO.GetComponent<IHandModel>();
+          rightModel = spawnedGO.GetComponent<HandModelBase>();
           rightModel.transform.parent = modelsParent;
         } else {
           rightModel = collectionGroup.RightModel;
@@ -182,8 +184,8 @@ namespace Leap.Unity {
     }
 
     /**
-     * MakeHandRepresentation receives a Hand and combines that with an IHandModel to create a HandRepresentation
-     * @param hand The Leap Hand data to be drive an IHandModel
+     * MakeHandRepresentation receives a Hand and combines that with a HandModelBase to create a HandRepresentation
+     * @param hand The Leap Hand data to be drive a HandModelBase
      * @param modelType Filters for a type of hand model, for example, physics or graphics hands.
      */
 
@@ -193,7 +195,7 @@ namespace Leap.Unity {
       for (int i = 0; i < ModelPool.Count; i++) {
         ModelGroup group = ModelPool[i];
         if (group.IsEnabled) {
-          IHandModel model = group.TryGetModel(handChirality, modelType);
+          HandModelBase model = group.TryGetModel(handChirality, modelType);
           if (model != null ) {
             handRep.AddModel(model);
             if (!modelToHandRepMapping.ContainsKey(model)) {
@@ -207,7 +209,7 @@ namespace Leap.Unity {
       return handRep;
     }
     /**
-    * EnableGroup finds suitable HandRepresentations and adds IHandModels from the ModelGroup, returns them to their ModelGroup and sets the groups IsEnabled to true.
+    * EnableGroup finds suitable HandRepresentations and adds HandModelBases from the ModelGroup, returns them to their ModelGroup and sets the groups IsEnabled to true.
      * @param groupName Takes a string that matches the ModelGroup's groupName serialized in the Inspector
     */
     public void EnableGroup(string groupName) {
@@ -221,7 +223,7 @@ namespace Leap.Unity {
           group = ModelPool[i];
           for (int hp = 0; hp < activeHandReps.Count; hp++) {
             HandRepresentation handRep = activeHandReps[hp];
-            IHandModel model = group.TryGetModel(handRep.RepChirality, handRep.RepType);
+            HandModelBase model = group.TryGetModel(handRep.RepChirality, handRep.RepType);
             if (model != null) {
               handRep.AddModel(model);
               modelToHandRepMapping.Add(model, handRep);
@@ -235,7 +237,7 @@ namespace Leap.Unity {
       }
     }
     /**
-     * DisableGroup finds and removes the ModelGroup's IHandModels from their HandRepresentations, returns them to their ModelGroup and sets the groups IsEnabled to false.
+     * DisableGroup finds and removes the ModelGroup's HandModelBases from their HandRepresentations, returns them to their ModelGroup and sets the groups IsEnabled to false.
      * @param groupName Takes a string that matches the ModelGroup's groupName serialized in the Inspector
      */
     public void DisableGroup(string groupName) {
@@ -248,7 +250,7 @@ namespace Leap.Unity {
         if (ModelPool[i].GroupName == groupName) {
           group = ModelPool[i];
           for (int m = 0; m < group.modelsCheckedOut.Count; m++) {
-            IHandModel model = group.modelsCheckedOut[m];
+            HandModelBase model = group.modelsCheckedOut[m];
             HandRepresentation handRep;
             if (modelToHandRepMapping.TryGetValue(model, out handRep)) {
               handRep.RemoveModel(model);
@@ -280,7 +282,7 @@ namespace Leap.Unity {
         }
       } else Debug.LogWarning("A group matching that name does not exisit in the modelPool");
     }
-    public void AddNewGroup(string groupName, IHandModel leftModel, IHandModel rightModel) {
+    public void AddNewGroup(string groupName, HandModelBase leftModel, HandModelBase rightModel) {
       ModelGroup newGroup = new ModelGroup();
       newGroup.LeftModel = leftModel;
       newGroup.RightModel = rightModel;
@@ -298,9 +300,9 @@ namespace Leap.Unity {
         }
       }
     }
-    public T GetHandModel<T>(int handId) where T : IHandModel {
+    public T GetHandModel<T>(int handId) where T : HandModelBase {
       foreach (ModelGroup group in ModelPool) {
-        foreach (IHandModel handModel in group.modelsCheckedOut) {
+        foreach (HandModelBase handModel in group.modelsCheckedOut) {
           if (handModel.GetLeapHand().Id == handId && handModel is T) {
             return handModel as T;
           }
@@ -310,7 +312,7 @@ namespace Leap.Unity {
     }
 
 #if UNITY_EDITOR
-    /**In the Unity Editor, Validate that the IHandModel is an instance of a prefab from the scene vs. a prefab from the project. */
+    /**In the Unity Editor, Validate that the HandModelBase is an instance of a prefab from the scene vs. a prefab from the project. */
     void OnValidate() {
       for (int i = 0; i < ModelPool.Count; i++) {
         if (ModelPool[i] != null) {
@@ -324,7 +326,7 @@ namespace Leap.Unity {
       }
     }
 
-    private bool shouldBeSpawned(Object model) {
+    private bool shouldBeSpawned(UnityEngine.Object model) {
       var prefabType = PrefabUtility.GetPrefabType(model);
       if (PrefabUtility.GetPrefabType(this) != PrefabType.Prefab) {
         return prefabType == PrefabType.Prefab;

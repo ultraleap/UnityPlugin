@@ -111,6 +111,12 @@ namespace Leap.Unity.Examples {
       // Update rotation.
       Quaternion newRotation = Quaternion.Euler(_angularVelocity * Time.deltaTime) * this.transform.rotation;
       this.transform.rotation = newRotation;
+
+      // Sync transforms with the Physics engine so Rigidbody changes reflect
+      // the movement of the ship. (Required for 2017.3 and newer.)
+#if UNITY_2017_3_OR_NEWER
+      Physics.SyncTransforms();
+#endif
     }
 
     #region Ship Forces API

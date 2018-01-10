@@ -65,7 +65,7 @@ namespace Leap.Unity {
     /// </summary>
     public static void Shuffle<T>(this IList<T> list) {
       for (int i = 0; i < list.Count; i++) {
-        Utils.Swap(list, i, UnityEngine.Random.Range(0, list.Count));
+        Utils.Swap(list, i, UnityEngine.Random.Range(i, list.Count));
       }
     }
 
@@ -364,6 +364,30 @@ namespace Leap.Unity {
     }
     #endregion
 
+    #region Print Utils
+
+    /// <summary>
+    /// Prints the elements of an array in a bracket-enclosed, comma-delimited list,
+    /// prefixed by the elements' type.
+    /// </summary>
+    public static string ToArrayString<T>(this IEnumerable<T> enumerable) {
+      var str = "[" + typeof(T).Name + ": ";
+      bool addedFirstElement = false;
+      foreach (var t in enumerable) {
+        if (addedFirstElement) {
+          str += ", ";
+        }
+        str += t.ToString();
+
+        addedFirstElement = true;
+      }
+      str += "]";
+
+      return str;
+    }
+
+    #endregion
+
     #region Math Utils
 
     public static int Repeat(int x, int m) {
@@ -444,6 +468,42 @@ namespace Leap.Unity {
                                               Quaternion b, float bTime,
                                               float extrapolatedTime) {
       return Quaternion.SlerpUnclamped(a, b, extrapolatedTime.MapUnclamped(aTime, bTime, 0f, 1f));
+    }
+
+    /// <summary>
+    /// A specification of the generic NextTuple method that only works for integers ranging
+    /// from 0 inclusive to maxValue exclusive.
+    /// </summary>
+    public static bool NextTuple(IList<int> tuple, int maxValue) {
+      return NextTuple(tuple, i => (i + 1) % maxValue);
+    }
+
+    /// <summary>
+    /// Given one tuple of a collection of possible tuples, mutate it into the next tuple in the 
+    /// in the lexicographic sequence, or into the first tuple if the last tuple has been reached.
+    /// 
+    /// The items of the tuple must be comparable to each other.  The getNext function takes an 
+    /// item and returns the next item in the lexicographic sequence, or the first item if there
+    /// is no next item.
+    /// </summary>
+    /// <returns>
+    /// Returns true if the new tuple comes after the input tuple, false otherwise.
+    /// </returns>
+    public static bool NextTuple<T>(IList<T> tuple, Func<T, T> nextItem) where T : IComparable<T> {
+      int index = tuple.Count - 1;
+      while (index >= 0) {
+        T value = tuple[index];
+        T newValue = nextItem(value);
+        tuple[index] = newValue;
+
+        if (newValue.CompareTo(value) > 0) {
+          return true;
+        }
+
+        index--;
+      }
+
+      return false;
     }
 
     #endregion
@@ -799,8 +859,7 @@ namespace Leap.Unity {
             ownedComponents.Add(component);
           }
         }
-      }
-      finally {
+      } finally {
         toVisit.Clear();
         Pool<Stack<Transform>>.Recycle(toVisit);
 
@@ -923,8 +982,24 @@ namespace Leap.Unity {
       return otherQuaternion * thisQuaternion;
     }
 
+    /// <summary>
+    /// Returns a normalized Quaternion from the input quaternion. If the input
+    /// quaternion is zero-length (AKA the default Quaternion), the identity Quaternion
+    /// is returned.
+    /// </summary>
+    public static Quaternion ToNormalized(this Quaternion quaternion) {
+      float x = quaternion.x, y = quaternion.y, z = quaternion.z, w = quaternion.w;
+      float magnitude = Mathf.Sqrt(x * x + y * y + z * z + w * w);
+
+      if (Mathf.Approximately(magnitude, 0f)) {
+        return Quaternion.identity;
+      }
+
+      return new Quaternion(x / magnitude, y / magnitude, z / magnitude, w / magnitude);
+    }
+
     #endregion
-    
+
     #region Float Utils
 
     /// <summary>
@@ -1593,8 +1668,7 @@ namespace Leap.Unity {
       public bool TryGetNext(out Rect t) {
         if (MoveNext()) {
           t = Current; return true;
-        }
-        else {
+        } else {
           t = default(Rect); return false;
         }
       }

@@ -60,11 +60,13 @@ namespace Leap.Unity.Recording {
     }
 
     public Quaternion Evaluate(float time) {
-      Quaternion evaluated = new Quaternion(xCurve.Evaluate(time),
-                                            yCurve.Evaluate(time),
-                                            zCurve.Evaluate(time),
-                                            wCurve.Evaluate(time));
-      return Quaternion.Lerp(evaluated, evaluated, 1.0f);
+      var x = xCurve.Evaluate(time);
+      var y = yCurve.Evaluate(time);
+      var z = zCurve.Evaluate(time);
+      var w = wCurve.Evaluate(time);
+
+      Quaternion evaluated = new Quaternion(x, y, z, w);
+      return evaluated.ToNormalized();
     }
 
 #if UNITY_EDITOR

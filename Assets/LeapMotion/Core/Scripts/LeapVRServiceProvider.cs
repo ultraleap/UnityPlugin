@@ -172,7 +172,9 @@ namespace Leap.Unity {
       var projectionMatrix = _cachedCamera.projectionMatrix;
 
       switch (SystemInfo.graphicsDeviceType) {
+#if !UNITY_2017_2_OR_NEWER
         case UnityEngine.Rendering.GraphicsDeviceType.Direct3D9:
+#endif
         case UnityEngine.Rendering.GraphicsDeviceType.Direct3D11:
         case UnityEngine.Rendering.GraphicsDeviceType.Direct3D12:
           for (int i = 0; i < 4; i++) {

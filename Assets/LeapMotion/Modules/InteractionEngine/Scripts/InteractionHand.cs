@@ -242,6 +242,13 @@ namespace Leap.Unity.Interaction {
     }
 
     /// <summary>
+    /// Gets the last-tracked rotation of the underlying Leap hand.
+    /// </summary>
+    public override Quaternion rotation {
+      get { return _handData.Rotation.ToQuaternion(); }
+    }
+
+    /// <summary>
     /// Gets the velocity of the underlying tracked Leap hand.
     /// </summary>
     public override Vector3 velocity {
@@ -376,9 +383,11 @@ namespace Leap.Unity.Interaction {
     protected override void getColliderBoneTargetPositionRotation(int contactBoneIndex,
                                                                   out Vector3 targetPosition,
                                                                   out Quaternion targetRotation) {
-      _handContactBoneMapFunctions[contactBoneIndex](_unwarpedHandData,
-                                                     out targetPosition,
-                                                     out targetRotation);
+      using (new ProfilerSample("InteractionHand: getColliderBoneTargetPositionRotation")) {
+        _handContactBoneMapFunctions[contactBoneIndex](_unwarpedHandData,
+                                                       out targetPosition,
+                                                       out targetRotation);
+      }
     }
 
     protected override bool initContact() {
@@ -690,6 +699,14 @@ namespace Leap.Unity.Interaction {
       }
 
       return false;
+    }
+
+    public override void SwapGrasp(IInteractionBehaviour replacement) {
+      var original = graspedObject;
+
+      base.SwapGrasp(replacement);
+
+      grabClassifier.SwapClassifierState(original, replacement);
     }
 
     protected override void fixedUpdateGraspingState() {

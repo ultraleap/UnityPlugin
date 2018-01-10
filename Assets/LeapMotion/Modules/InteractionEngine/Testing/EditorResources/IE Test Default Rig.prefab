@@ -893,7 +893,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4170293775221130}
   m_Layer: 0
-  m_Name: IE Test Simple Rig
+  m_Name: IE Test Default Rig
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

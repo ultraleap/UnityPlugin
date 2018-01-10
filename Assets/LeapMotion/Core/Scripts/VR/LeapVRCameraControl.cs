@@ -84,7 +84,6 @@ namespace Leap.Unity {
 
       _camera.worldToCameraMatrix = offsetMatrix;
     }
-
   }
 
 }
