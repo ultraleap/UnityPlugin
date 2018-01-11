@@ -31,9 +31,16 @@ namespace Leap.Unity {
     private static void InitStaticOnNewScene(Scene unused, Scene unused2) {
       InitStatic();
     }
+
     private static void InitStatic() {
-      s_provider = GameObject.FindObjectOfType<LeapProvider>();
-      if (s_provider == null) return;
+      s_provider = Object.FindObjectOfType<LeapServiceProvider>();
+      if (s_provider == null) {
+        s_provider = Object.FindObjectOfType<LeapProvider>();
+        if (s_provider == null) {
+          return;
+        }
+      }
+
       Camera providerCamera = s_provider.GetComponentInParent<Camera>();
       if (providerCamera == null) return;
       if (providerCamera.transform.parent == null) return;
