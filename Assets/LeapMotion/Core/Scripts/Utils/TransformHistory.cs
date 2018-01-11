@@ -60,7 +60,18 @@ namespace Leap.Unity {
             return Lerp(history.Get(i - 1), history.Get(i), desiredTime);
           }
         }
-        return history.GetLatest();
+
+        if (history.Length > 0) {
+          return history.GetLatest();
+        }
+        else {
+          // No history data available.
+          return new TransformData() {
+            time = desiredTime,
+            position = Vector3.zero,
+            rotation = Quaternion.identity
+          };
+        }
       }
     }
   }
