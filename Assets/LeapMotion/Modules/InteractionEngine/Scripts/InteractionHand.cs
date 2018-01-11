@@ -180,6 +180,12 @@ namespace Leap.Unity.Interaction {
       }
     }
 
+    private void OnDestroy() {
+      if (_leapProvider != null) {
+        _leapProvider.OnFixedFrame -= onProviderFixedFrame;
+      }
+    }
+
     private void onProviderFixedFrame(Leap.Frame frame) {
       _hand = handAccessorFunc(frame);
 

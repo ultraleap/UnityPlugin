@@ -172,7 +172,7 @@ namespace Leap.Unity.Interaction {
       }
 
       EditorGUILayout.BeginVertical();
-      
+
       _leftVRNodeController = null;
       _rightVRNodeController = null;
       foreach (var controller in target.interactionControllers) {
