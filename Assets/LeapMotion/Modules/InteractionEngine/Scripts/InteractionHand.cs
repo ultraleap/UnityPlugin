@@ -27,6 +27,9 @@ namespace Leap.Unity.Interaction {
 
     #region Inspector
 
+    [SerializeField]
+    private LeapProvider _leapProvider;
+
     [Header("Hand Configuration")]
 
     [Tooltip("Should the data for the underlying Leap hand come from the player's left "
@@ -54,8 +57,6 @@ namespace Leap.Unity.Interaction {
     #endregion
 
     #region Hand Data
-
-    private LeapProvider _leapProvider;
     /// <summary>
     /// If the hand data mode for this InteractionHand is set to Custom, you must also
     /// manually specify the provider from which to retrieve Leap frames containing
