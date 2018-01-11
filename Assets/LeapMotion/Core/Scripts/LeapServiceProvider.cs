@@ -96,6 +96,28 @@ namespace Leap.Unity {
     [NonSerialized]
     public long imageTimeStamp = 0;
 
+    private Action<Device> _onDeviceSafe;
+    /// <summary>
+    /// A utility event to get a callback whenever a new device is connected to the service.
+    /// This callback will ALSO trigger a callback upon subscription if a device is already
+    /// connected.
+    /// 
+    /// For situations with multiple devices OnDeviceSafe will be dispatched once for each device.
+    /// </summary>
+    public event Action<Device> OnDeviceSafe {
+      add {
+        if (leap_controller_ != null && leap_controller_.IsConnected) {
+          foreach (var device in leap_controller_.Devices) {
+            value(device);
+          }
+        }
+        _onDeviceSafe += value;
+      }
+      remove {
+        _onDeviceSafe -= value;
+      }
+    }
+
     public override Frame CurrentFrame {
       get {
         if (_frameOptimization == FrameOptimizationMode.ReusePhysicsForUpdate) {
@@ -369,6 +391,8 @@ namespace Leap.Unity {
       }
 
       leap_controller_ = new Controller();
+      leap_controller_.Device += (s, e) => _onDeviceSafe(e.Device);
+
       if (leap_controller_.IsConnected) {
         initializeFlags();
       } else {
