@@ -8,11 +8,16 @@
  ******************************************************************************/
 
 using Leap.Unity.Attributes;
-using Leap.Unity.Interaction.Internal;
+
+#if UNITY_5
+using UnityEngine.VR;
+#else
+using UnityEngine.XR;
+#endif
+
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.XR;
 using Leap.Unity.Query;
 using Leap.Unity.Space;
 using UnityEngine.Serialization;
@@ -20,23 +25,23 @@ using UnityEngine.Serialization;
 namespace Leap.Unity.Interaction {
 
   [DisallowMultipleComponent]
-  public class InteractionVRController : InteractionController {
+  public class InteractionXRController : InteractionController {
 
-    #region Inspector
+#region Inspector
 
     [Header("Controller Configuration")]
 
-    [Tooltip("Read-only. InteractionVRControllers use Unity's built-in VRNode tracking "
-           + "API to receive tracking data for VR controllers by default. If you add a "
+    [Tooltip("Read-only. InteractionXRControllers use Unity's built-in XRNode tracking "
+           + "API to receive tracking data for XR controllers by default. If you add a "
            + "custom script to set this controller's trackingProvider to something "
-           + "other than the DefaultVRNodeTrackingProvider, the change will be reflected "
+           + "other than the DefaultXRNodeTrackingProvider, the change will be reflected "
            + "here. (Hint: Use the ExecuteInEditMode attribute.)")]
     [Disable, SerializeField]
-    #pragma warning disable 0414
-    private string _trackingProviderType = "DefaultVRNodeTrackingProvider";
-    #pragma warning restore 0414
+#pragma warning disable 0414
+    private string _trackingProviderType = "DefaultXRNodeTrackingProvider";
+#pragma warning restore 0414
     public bool isUsingCustomTracking {
-      get { return !(trackingProvider is DefaultVRNodeTrackingProvider); }
+      get { return !(trackingProvider is DefaultXRNodeTrackingProvider); }
     }
 
     [Tooltip("If this string is not empty and does not match a controller in Input.GetJoystickNames()"
@@ -94,16 +99,16 @@ namespace Leap.Unity.Interaction {
            + "grasp point.")]
     public float graspTimingSlop = 0.10F;
 
-    #endregion // Inspector
+#endregion // Inspector
 
-    #region Controller Tracking
+#region Controller Tracking
 
     private bool _hasTrackedPositionLastFrame = false;
     private Vector3 _trackedPositionLastFrame = Vector3.zero;
     private Quaternion _trackedRotationLastFrame = Quaternion.identity;
 
-    private IVRControllerTrackingProvider _backingTrackingProvider = null;
-    public IVRControllerTrackingProvider trackingProvider {
+    private IXRControllerTrackingProvider _backingTrackingProvider = null;
+    public IXRControllerTrackingProvider trackingProvider {
       get {
         if (_backingDefaultTrackingProvider == null) {
           _backingDefaultTrackingProvider = _defaultTrackingProvider;
@@ -124,8 +129,8 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    private IVRControllerTrackingProvider _backingDefaultTrackingProvider;
-    private IVRControllerTrackingProvider _defaultTrackingProvider {
+    private IXRControllerTrackingProvider _backingDefaultTrackingProvider;
+    private IXRControllerTrackingProvider _defaultTrackingProvider {
       get {
         if (_backingDefaultTrackingProvider == null) {
           refreshDefaultTrackingProvider();
@@ -139,11 +144,11 @@ namespace Leap.Unity.Interaction {
     }
 
     private void refreshDefaultTrackingProvider() {
-      var defaultProvider = gameObject.GetComponent<DefaultVRNodeTrackingProvider>();
+      var defaultProvider = gameObject.GetComponent<DefaultXRNodeTrackingProvider>();
       if (defaultProvider == null) {
-        defaultProvider = gameObject.AddComponent<DefaultVRNodeTrackingProvider>();
+        defaultProvider = gameObject.AddComponent<DefaultXRNodeTrackingProvider>();
       }
-      defaultProvider.vrNode = this.vrNode;
+      defaultProvider.xrNode = this.xrNode;
 
       _defaultTrackingProvider = defaultProvider;
     }
@@ -167,9 +172,9 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    #endregion
+#endregion
 
-    #region Unity Events
+#region Unity Events
 
     protected override void Reset() {
       base.Reset();
@@ -228,9 +233,9 @@ namespace Leap.Unity.Interaction {
       refreshContactBoneTargets();
     }
 
-    #endregion
+#endregion
 
-    #region Movement Detection
+#region Movement Detection
 
     private const float RIG_LOCAL_MOVEMENT_SPEED_THRESHOLD = 00.07F;
     private const float RIG_LOCAL_ROTATION_SPEED_THRESHOLD = 10.00F;
@@ -250,9 +255,9 @@ namespace Leap.Unity.Interaction {
       _isBeingMoved = trackingProvider != null && trackingProvider.isTracked && Time.fixedTime - _lastTimeMoved < BEING_MOVED_TIMEOUT;
     }
 
-    #endregion
+#endregion
 
-    #region General InteractionController Implementation
+#region General InteractionController Implementation
 
     /// <summary>
     /// Gets whether or not the underlying controller is currently tracked.
@@ -273,13 +278,19 @@ namespace Leap.Unity.Interaction {
     }
 
     /// <summary>
-    /// Gets the VRNode associated with this VR controller. Note: If the tracking mode 
+    /// Gets the XRNode associated with this XR controller. Note: If the tracking mode 
     /// for this controller is specified as ControllerTrackingMode.Custom, this value
     /// may be ignored.
     /// </summary>
-    public XRNode vrNode {
+#if UNITY_5
+    public VRNode xrNode {
+      get { return chirality == Chirality.Left ? VRNode.LeftHand : VRNode.RightHand; }
+    }
+#else
+    public XRNode xrNode {
       get { return chirality == Chirality.Left ? XRNode.LeftHand : XRNode.RightHand; }
     }
+#endif
 
     /// <summary>
     /// Gets whether the controller is a left-hand controller.
@@ -325,7 +336,7 @@ namespace Leap.Unity.Interaction {
     /// always ControllerType.VRController.
     /// </summary>
     public override ControllerType controllerType {
-      get { return ControllerType.VRController; }
+      get { return ControllerType.XRController; }
     }
 
     /// <summary>
@@ -342,9 +353,9 @@ namespace Leap.Unity.Interaction {
     /// </summary>
     protected override void onObjectUnregistered(IInteractionBehaviour intObj) { }
 
-    #endregion
+#endregion
 
-    #region Hover Implementation
+#region Hover Implementation
 
     /// <summary>
     /// Gets the center point used for hover distance checking.
@@ -388,9 +399,9 @@ namespace Leap.Unity.Interaction {
       refreshContactBoneTargets(useUnwarpingData: true);
     }
 
-    #endregion
+#endregion
 
-    #region Contact Implementation
+#region Contact Implementation
 
     private Vector3[] _contactBoneLocalPositions;
     private Quaternion[] _contactBoneLocalRotations;
@@ -506,9 +517,9 @@ namespace Leap.Unity.Interaction {
       targetRotation = _contactBoneTargetRotations[contactBoneIndex];
     }
 
-    #endregion
+#endregion
 
-    #region Grasping Implementation
+#region Grasping Implementation
 
     /// <summary>
     /// By default, InteractionVRController uses Input.GetAxis(graspButtonAxis) to
@@ -692,9 +703,9 @@ namespace Leap.Unity.Interaction {
       return shouldRelease;
     }
 
-    #endregion
+#endregion
 
-    #region Gizmos
+#region Gizmos
 
     public override void OnDrawRuntimeGizmos(RuntimeGizmos.RuntimeGizmoDrawer drawer) {
       base.OnDrawRuntimeGizmos(drawer);
@@ -719,7 +730,7 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    #endregion
+#endregion
 
   }
 
