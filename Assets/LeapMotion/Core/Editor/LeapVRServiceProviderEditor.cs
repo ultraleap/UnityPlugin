@@ -22,6 +22,12 @@ namespace Leap.Unity {
       specifyCustomDecorator("_allowManualTimeAlignment",
                              decorateAllowManualTimeAlignment);
 
+      specifyConditionalDrawing(() => { return serializedObject
+                                                 .FindProperty("_disableTemporalWarping")
+                                                   .boolValue == false; },
+                                "_allowManualTimeAlignment",
+                                "_customWarpAdjustment");
+
       specifyConditionalDrawing("_allowManualTimeAlignment",
                                 "_customWarpAdjustment");
 
