@@ -114,13 +114,7 @@ namespace Leap.Unity {
            + "should NOT use a manual warp alignment value, as the correct value is "
            + "chosen automatically for these platforms.")]
     [SerializeField]
-    private bool _useTemporalWarping = true;
-
-    [Tooltip("Forces a temporal warping update to occur in Late Update using the "
-           + "existing head transform. Should not be enabled if you are using the "
-           + "default Unity VR integration.")]
-    [SerializeField]
-    private bool _forceCustomUpdate = false;
+    private bool _disableTemporalWarping = false;
     
     [Tooltip("Keep this option unchecked for PC VR and Android VR target platforms. "
            + "Some non-standard platforms may utilize this value to adjust their "
@@ -249,8 +243,8 @@ namespace Leap.Unity {
 
       // Use _tweenImageWarping
       var currCenterRotation = InputTracking.GetLocalRotation(XRNode.CenterEye);
-      var imageReferenceRotation = _useTemporalWarping ? pastRotation
-                                                       : currCenterRotation;
+      var imageReferenceRotation = _disableTemporalWarping ? currCenterRotation
+                                                           : pastRotation;
 
       Quaternion imageQuatWarp = Quaternion.Inverse(currCenterRotation)
                                  * imageReferenceRotation;
@@ -309,8 +303,8 @@ namespace Leap.Unity {
         transformHistory.SampleTransform(timestamp, out currentPosition,
                                                     out currentRotation);
 
-        warpedPosition = _useTemporalWarping ? warpedPosition : currentPosition;
-        warpedRotation = _useTemporalWarping ? warpedRotation : currentRotation;
+        warpedPosition = _disableTemporalWarping ? currentPosition : warpedPosition;
+        warpedRotation = _disableTemporalWarping ? currentRotation : warpedRotation;
 
         warpedRotation *= Quaternion.Euler(deviceTiltXAxis, 0f, 0f);
         warpedRotation *= Quaternion.Euler(-90f, 180f, 0f);
