@@ -237,7 +237,7 @@ namespace Leap.Unity {
       // Update Image Warping
       Vector3 pastPosition; Quaternion pastRotation;
       transformHistory.SampleTransform(imageTimeStamp
-                                         - (long)(warpingAdjustment * 1000f)
+                                         - (long)(imageWarpingAdjustment * 1000f)
                                          - (long)(_smoothedTrackingLatency.value),
                                        out pastPosition, out pastRotation);
 
@@ -256,6 +256,9 @@ namespace Leap.Unity {
                                * projectionMatrix.inverse;
       Shader.SetGlobalMatrix("_LeapGlobalWarpedOffset", imageMatWarp);
     }
+
+    // TODO: DELETEME
+    public int imageWarpingAdjustment = 17;
 
     protected virtual void OnEnable() {
       resetTransforms();

@@ -394,6 +394,7 @@ MonoBehaviour:
   _allowManualTimeAlignment: 0
   _customWarpAdjustment: 17
   _updateHandInPrecull: 0
+  imageWarpingAdjustment: 17
 --- !u!1001 &741169083
 Prefab:
   m_ObjectHideFlags: 0
@@ -1384,9 +1385,10 @@ MonoBehaviour:
   _deviceOffsetZAxis: 0.12
   _deviceTiltXAxis: 0
   _disableTemporalWarping: 0
-  _allowManualTimeAlignment: 0
-  _customWarpAdjustment: 17
+  _allowManualTimeAlignment: 1
+  _customWarpAdjustment: -17
   _updateHandInPrecull: 0
+  imageWarpingAdjustment: 10
 --- !u!114 &831525801
 MonoBehaviour:
   m_ObjectHideFlags: 0
