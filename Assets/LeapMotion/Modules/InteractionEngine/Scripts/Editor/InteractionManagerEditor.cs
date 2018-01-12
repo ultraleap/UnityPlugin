@@ -173,8 +173,6 @@ namespace Leap.Unity.Interaction {
 
       EditorGUILayout.BeginVertical();
 
-      _leftHand = null;
-      _rightHand = null;
       _leftVRNodeController = null;
       _rightVRNodeController = null;
       foreach (var controller in target.interactionControllers) {
@@ -284,8 +282,6 @@ namespace Leap.Unity.Interaction {
     }
 
     private LeapProvider _provider = null;
-    private InteractionHand _leftHand = null;
-    private InteractionHand _rightHand = null;
 
     private void checkInteractionHandStatus(InteractionHand intHand,
                                             List<ControllerStatusMessage> messages) {
@@ -320,20 +316,22 @@ namespace Leap.Unity.Interaction {
       }
 
       // Check if the player has multiple left hands or multiple right hands.
-      if (intHand.handDataMode == HandDataMode.PlayerLeft && _leftHand != null
-       || intHand.handDataMode == HandDataMode.PlayerRight && _rightHand != null) {
-        messages.Add(new ControllerStatusMessage() {
-          message = "Duplicate Hand",
-          tooltip = "You already have a hand with this data mode in your scene. "
-                  + "You should remove one of the duplicates.",
-          color = Colors.Problem
-        });
-      }
-      if (_leftHand == null && intHand.handDataMode == HandDataMode.PlayerLeft) {
-        _leftHand = intHand;
-      }
-      else if (_rightHand == null && intHand.handDataMode == HandDataMode.PlayerRight) {
-        _rightHand = intHand;
+      if (intHand.handDataMode != HandDataMode.Custom) {
+        int index = target.interactionControllers.Query().IndexOf(intHand);
+
+        if (target.interactionControllers.Query().
+                                          Take(index).
+                                          OfType<InteractionHand>().
+                                          Where(h => h.handDataMode == intHand.handDataMode).
+                                          Where(h => h.leapProvider == intHand.leapProvider).
+                                          Any()) {
+          messages.Add(new ControllerStatusMessage() {
+            message = "Duplicate Hand",
+            tooltip = "You already have a hand with this data mode in your scene. "
+                    + "You should remove one of the duplicates.",
+            color = Colors.Problem
+          });
+        }
       }
     }
 
