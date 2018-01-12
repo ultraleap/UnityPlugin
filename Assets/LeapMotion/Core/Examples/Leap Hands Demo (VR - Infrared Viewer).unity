@@ -1379,10 +1379,10 @@ MonoBehaviour:
   _frameOptimization: 0
   _physicsExtrapolation: 1
   _physicsExtrapolationTime: 0.011111111
-  _allowManualDeviceOffset: 0
+  _allowManualDeviceOffset: 1
   _deviceOffsetYAxis: 0
   _deviceOffsetZAxis: 0.12
-  _deviceTiltXAxis: 5
+  _deviceTiltXAxis: 0
   _disableTemporalWarping: 0
   _allowManualTimeAlignment: 0
   _customWarpAdjustment: 17
