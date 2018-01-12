@@ -156,6 +156,9 @@ namespace Leap.Unity.GraphicalRenderer {
           }
         }
       }
+
+      UnityEditor.Undo.undoRedoPerformed -= onUndoRedoPerformed;
+      UnityEditor.Undo.undoRedoPerformed += onUndoRedoPerformed;
 #endif
 
       if (Application.isPlaying) {
@@ -177,6 +180,10 @@ namespace Leap.Unity.GraphicalRenderer {
           group.OnDisable();
         }
       }
+
+#if UNITY_EDITOR
+      UnityEditor.Undo.undoRedoPerformed += onUndoRedoPerformed;
+#endif
     }
 
     private void LateUpdate() {
@@ -220,7 +227,7 @@ namespace Leap.Unity.GraphicalRenderer {
       }
     }
 
-    private void validateSpaceComponent() {
+    public void validateSpaceComponent() {
       var origSpace = _space;
       
       var spaces = Pool<List<LeapSpace>>.Spawn();
@@ -234,13 +241,39 @@ namespace Leap.Unity.GraphicalRenderer {
         Pool<List<LeapSpace>>.Recycle(spaces);
       }
 
+      // Support Undo/Redo with runtime space changes in-editor
+      #pragma warning disable 0169
+      bool didUndoRedo = false;
+      #pragma warning restore 0169
+      #if UNITY_EDITOR
+      if (_didUndoRedoThisFrame) {
+        didUndoRedo = true;
+        _didUndoRedoThisFrame = false;
+      }
+      #endif
+
       if (Application.isPlaying
-          && (origSpace != _space || (_space == null && !_lastSpaceWasNull))) {
+          && (origSpace != _space
+              || (_space == null && !_lastSpaceWasNull))
+              || didUndoRedo
+              ) {
         onRuntimeSpaceChanged();
+      }
+
+      if (_lastSpaceWasNull && _space != null) {
+        Debug.Log("REMOVAL UNDO DETECTED");
       }
 
       _lastSpaceWasNull = _space == null;
     }
+
+#if UNITY_EDITOR
+    private bool _didUndoRedoThisFrame = false;
+
+    private void onUndoRedoPerformed() {
+      _didUndoRedoThisFrame = true;
+    }
+#endif
 
     private void onRuntimeSpaceChanged() {
       // The space was modified, so refresh a bunch of things..
