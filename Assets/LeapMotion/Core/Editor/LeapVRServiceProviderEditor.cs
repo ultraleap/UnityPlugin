@@ -19,15 +19,33 @@ namespace Leap.Unity {
       base.OnEnable();
       isVRProvider = true;
 
+      specifyCustomDecorator("_allowManualTimeAlignment",
+                             decorateAllowManualTimeAlignment);
+
       specifyConditionalDrawing("_allowManualTimeAlignment",
-                                "_customWarpAdjustment",
-                                "_unlockHold",
-                                "_moreRewind",
-                                "_lessRewind");
+                                "_customWarpAdjustment");
 
       specifyConditionalDrawing("_allowManualDeviceOffset",
                                   "_deviceOffsetYAxis", "_deviceOffsetZAxis",
                                   "_deviceTiltXAxis");
+    }
+
+    private void decorateAllowManualTimeAlignment(SerializedProperty property) {
+      bool pcOrAndroidPlatformDetected = false;
+      string targetPlatform = "";
+#if UNITY_STANDALONE
+      pcOrAndroidPlatformDetected = true;
+      targetPlatform = "Standalone (Desktop)";
+#elif UNITY_ANDROID
+      pcOrAndroidPlatformDetected = true;
+      targetPlatform = "Android"
+#endif
+
+      if (pcOrAndroidPlatformDetected && property.boolValue) {
+        EditorGUILayout.HelpBox(targetPlatform + " target platform detected; "
+                              + "manual time alignment should not be enabled under most "
+                              + "circumstances.", MessageType.Warning);
+      }
     }
 
     public override void OnSceneGUI() {

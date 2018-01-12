@@ -13,7 +13,6 @@ using System;
 using Leap.Unity.Attributes;
 
 namespace Leap.Unity {
-  /*LeapServiceProvider creates a Controller and supplies Leap Hands and images */
 
   /// <summary>
   /// The LeapVRServiceProvider expands on the standard LeapServiceProvider to
@@ -22,8 +21,6 @@ namespace Leap.Unity {
   /// differing latencies of the two tracking systems.
   /// </summary>
   public class LeapVRServiceProvider : LeapServiceProvider {
-    //public static event Action<Camera> OnLeftPreRender;
-    //public static event Action<Camera> OnRightPreRender;
 
     #region Device Offset
 
@@ -31,7 +28,7 @@ namespace Leap.Unity {
     private const float DEFAULT_DEVICE_OFFSET_Z_AXIS = 0.12f;
     private const float DEFAULT_DEVICE_TILT_X_AXIS = 5f;
 
-    [Header("Manual Device Offset")]
+    [Header("Advanced")]
 
     [Tooltip("Allow manual adjustment of the Leap device's virtual offset and tilt. These "
            + "settings can be used to match the physical position and orientation of the "
@@ -97,68 +94,48 @@ namespace Leap.Unity {
 
     #endregion
 
-    #region Temporal Warping Tweens
+    #region Temporal Warping
 
-    [Header("Temporal Warping Adjustments")]
-
-    [Tooltip("Allows smooth enabling or disabling of the Image-Warping feature. "
-           + "Usually should match rotation warping.")]
-    [Range(0, 1)]
-    [SerializeField]
-    [OnEditorChange("tweenImageWarping")]
-    private float _tweenImageWarping = 0f;
-    public float tweenImageWarping {
-      get {
-        return _tweenImageWarping;
-      }
-      set {
-        _tweenImageWarping = Mathf.Clamp01(value);
-      }
-    }
-
-    [Tooltip("Allows smooth enabling or disabling of the Rotational warping of Leap Space. "
-           + "Usually should match image warping.")]
-    [Range(0, 1)]
-    [SerializeField]
-    [OnEditorChange("tweenRotationalWarping")]
-    private float _tweenRotationalWarping = 0f;
-    public float tweenRotationalWarping {
-      get {
-        return _tweenRotationalWarping;
-      }
-      set {
-        _tweenRotationalWarping = Mathf.Clamp01(value);
-      }
-    }
-
-    [Tooltip("Allows smooth enabling or disabling of the Positional warping of Leap Space. "
-           + "Usually should be disabled when using image warping.")]
-    [Range(0, 1)]
-    [SerializeField]
-    [OnEditorChange("tweenPositionalWarping")]
-    private float _tweenPositionalWarping = 0f;
-    public float tweenPositionalWarping {
-      get {
-        return _tweenPositionalWarping;
-      }
-      set {
-        _tweenPositionalWarping = Mathf.Clamp01(value);
-      }
-    }
-
-    // Manual Time Alignment
-    [Tooltip("Allow manual adjustment of the rewind time.")]
-    [SerializeField]
-    private bool _allowManualTimeAlignment;
-
+    [Header("Temporal Warping")]
+    
+#if UNITY_STANDALONE
     private const int DEFAULT_WARP_ADJUSTMENT = 17;
+#elif UNITY_ANDROID
+    private const int DEFAULT_WARP_ADJUSTMENT = 45;
+#else
+    private const int DEFAULT_WARP_ADJUSTMENT = 17;
+#endif
 
-    [Tooltip("Time in milliseconds between the current frame's Leap position (offset from "
-           + "the headset) and the time at which the Leap frame was captured. This "
-           + "prevents 'swimming' behavior when the headset moves and the user's hands "
-           + "don't. This value can be tuned if using a non-standard VR headset.")]
+    [Tooltip("Temporal warping prevents the hand coordinate system from 'swimming' or "
+           + "'bouncing' when the headset moves and the user's hands stay still. "
+           + "This phenomenon is caused by the differing amounts of latencies inherent "
+           + "in the two systems. "
+           + "For PC VR and Android VR, temporal warping should be enabled, and you "
+           + "should NOT use a manual warp alignment value, as the correct value is "
+           + "chosen automatically for these platforms.")]
     [SerializeField]
-    private int _customWarpAdjustment = DEFAULT_WARP_ADJUSTMENT; //Milliseconds
+    private bool _useTemporalWarping = true;
+
+    [Tooltip("Forces a temporal warping update to occur in Late Update using the "
+           + "existing head transform. Should not be enabled if you are using the "
+           + "default Unity VR integration.")]
+    [SerializeField]
+    private bool _forceCustomUpdate = false;
+    
+    [Tooltip("Keep this option unchecked for PC VR and Android VR target platforms. "
+           + "Some non-standard platforms may utilize this value to adjust their "
+           + "latency compensation amount for temporal warping.")]
+    [SerializeField]
+    private bool _allowManualTimeAlignment = false;
+
+    /// <summary>
+    /// The time in milliseconds between the current frame's headset position and the
+    /// time at which the Leap frame was captured.
+    /// </summary>
+    [Tooltip("The time in milliseconds between the current frame's headset position and "
+           + "the time at which the Leap frame was captured.")]
+    [SerializeField]
+    private int _customWarpAdjustment = DEFAULT_WARP_ADJUSTMENT;
     public int warpingAdjustment {
       get {
         if (_allowManualTimeAlignment) {
@@ -170,19 +147,11 @@ namespace Leap.Unity {
       }
     }
 
-    [SerializeField]
-    private KeyCode _unlockHold = KeyCode.RightShift;
-
-    [SerializeField]
-    private KeyCode _moreRewind = KeyCode.LeftArrow;
-
-    [SerializeField]
-    private KeyCode _lessRewind = KeyCode.RightArrow;
-
     #endregion
 
     [Header("[Experimental]")]
-    [Tooltip("Pass updated transform matrices to objects with materials using the VertexOffsetShader.")]
+    [Tooltip("Pass updated transform matrices to objects with materials using the "
+           + "VertexOffsetShader.")]
     [SerializeField]
     protected bool _updateHandInPrecull = false;
 
@@ -193,11 +162,6 @@ namespace Leap.Unity {
     protected Matrix4x4[] _transformArray = new Matrix4x4[2];
 
     private Camera _cachedCamera;
-    //public const string GLOBAL_EYE_UV_OFFSET_NAME = "_LeapGlobalStereoUVOffset";
-    //private static Vector2 LEFT_EYE_UV_OFFSET = new Vector2(0, 0);
-    //private static Vector2 RIGHT_EYE_UV_OFFSET = new Vector2(0, 0.5f);
-    //private Matrix4x4 _projectionMatrix;
-    //private bool IsLeftEye = true;
 
     [NonSerialized]
     public long imageTimeStamp = 0;
@@ -212,6 +176,10 @@ namespace Leap.Unity {
       }
     }
 
+    protected virtual void Reset() {
+      _customWarpAdjustment = DEFAULT_WARP_ADJUSTMENT;
+    }
+
     protected override void Start() {
       base.Start();
       _cachedCamera = GetComponent<Camera>();
@@ -221,18 +189,6 @@ namespace Leap.Unity {
       manualUpdateHasBeenCalledSinceUpdate = false;
       base.Update();
       imageTimeStamp = _leapController.FrameTimestamp();
-
-      // Manual Time Alignment
-      if (_allowManualTimeAlignment) {
-        if (_unlockHold == KeyCode.None || Input.GetKey(_unlockHold)) {
-          if (Input.GetKeyDown(_moreRewind)) {
-            _customWarpAdjustment += 1;
-          }
-          if (Input.GetKeyDown(_lessRewind)) {
-            _customWarpAdjustment -= 1;
-          }
-        }
-      }
     }
 
     protected override long CalculateInterpolationTime(bool endOfFrame = false) {
@@ -278,7 +234,8 @@ namespace Leap.Unity {
           }
           // Scale and bias from OpenGL -> D3D depth range
           for (int i = 0; i < 4; i++) {
-            projectionMatrix[2, i] = projectionMatrix[2, i] * 0.5f + projectionMatrix[3, i] * 0.5f;
+            projectionMatrix[2, i] = projectionMatrix[2, i] * 0.5f
+                                   + projectionMatrix[3, i] * 0.5f;
           }
           break;
       }
@@ -292,14 +249,18 @@ namespace Leap.Unity {
 
       // Use _tweenImageWarping
       var currCenterRotation = InputTracking.GetLocalRotation(XRNode.CenterEye);
-      var imageReferenceRotation = Quaternion.Slerp(currCenterRotation, pastRotation, _tweenImageWarping);
+      var imageReferenceRotation = _useTemporalWarping ? pastRotation
+                                                       : currCenterRotation;
 
-      Quaternion imageQuatWarp = Quaternion.Inverse(currCenterRotation) * imageReferenceRotation;
-      imageQuatWarp = Quaternion.Euler(imageQuatWarp.eulerAngles.x, imageQuatWarp.eulerAngles.y, -imageQuatWarp.eulerAngles.z);
-      Matrix4x4 imageMatWarp = projectionMatrix * Matrix4x4.TRS(Vector3.zero, imageQuatWarp, Vector3.one) * projectionMatrix.inverse;
+      Quaternion imageQuatWarp = Quaternion.Inverse(currCenterRotation)
+                                 * imageReferenceRotation;
+      imageQuatWarp = Quaternion.Euler(imageQuatWarp.eulerAngles.x,
+                                       imageQuatWarp.eulerAngles.y,
+                                      -imageQuatWarp.eulerAngles.z);
+      Matrix4x4 imageMatWarp = projectionMatrix
+                               * Matrix4x4.TRS(Vector3.zero, imageQuatWarp, Vector3.one)
+                               * projectionMatrix.inverse;
       Shader.SetGlobalMatrix("_LeapGlobalWarpedOffset", imageMatWarp);
-      // Temporary replacement(remove this when we fix image warping):
-      //Shader.SetGlobalMatrix("_LeapGlobalWarpedOffset", Matrix4x4.identity);
     }
 
     protected virtual void OnEnable() {
@@ -327,11 +288,13 @@ namespace Leap.Unity {
       if (_leapController == null) {
         return;
       }
+
       // Optimize for top-down tracking if on head mounted display.
       _leapController.SetPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
     }
 
-    protected virtual LeapTransform GetWarpedMatrix(long timestamp, bool updateTemporalCompensation = true) {
+    protected virtual LeapTransform GetWarpedMatrix(long timestamp,
+                                                    bool updateTemporalCompensation = true) {
       LeapTransform leapTransform;
       if (XRSettings.enabled && XRDevice.isPresent && transformHistory != null) {
         if (updateTemporalCompensation && transformHistory.history.IsFull) {
@@ -340,13 +303,14 @@ namespace Leap.Unity {
                                            - (long)(_smoothedTrackingLatency.value),
                                            out warpedPosition, out warpedRotation);
         }
-
-        // Apply position/rotation warp tween values.
+        
         Vector3    currentPosition;
         Quaternion currentRotation;
-        transformHistory.SampleTransform(timestamp, out currentPosition, out currentRotation);
-        warpedPosition = Vector3.Lerp(currentPosition, warpedPosition, _tweenPositionalWarping);
-        warpedRotation = Quaternion.Slerp(currentRotation, warpedRotation, _tweenRotationalWarping);
+        transformHistory.SampleTransform(timestamp, out currentPosition,
+                                                    out currentRotation);
+
+        warpedPosition = _useTemporalWarping ? warpedPosition : currentPosition;
+        warpedRotation = _useTemporalWarping ? warpedRotation : currentRotation;
 
         warpedRotation *= Quaternion.Euler(deviceTiltXAxis, 0f, 0f);
         warpedRotation *= Quaternion.Euler(-90f, 180f, 0f);
@@ -361,7 +325,9 @@ namespace Leap.Unity {
             (transform.parent.rotation * warpedRotation).ToLeapQuaternion(),
             transform.lossyScale.ToVector() * 1e-3f);
         } else {
-          leapTransform = new LeapTransform(warpedPosition.ToVector(), warpedRotation.ToLeapQuaternion(), transform.lossyScale.ToVector() * 1e-3f);
+          leapTransform = new LeapTransform(warpedPosition.ToVector(),
+                                            warpedRotation.ToLeapQuaternion(),
+                                            transform.lossyScale.ToVector() * 1e-3f);
         }
         leapTransform.MirrorZ();
       } else {
@@ -377,8 +343,10 @@ namespace Leap.Unity {
 
     protected void transformHands(ref LeapTransform LeftHand, ref LeapTransform RightHand) {
       LeapTransform leapTransform = GetWarpedMatrix(0, false);
-      LeftHand = new LeapTransform(leapTransform.TransformPoint(LeftHand.translation), leapTransform.TransformQuaternion(LeftHand.rotation));
-      RightHand = new LeapTransform(leapTransform.TransformPoint(RightHand.translation), leapTransform.TransformQuaternion(RightHand.rotation));
+      LeftHand = new LeapTransform(leapTransform.TransformPoint(LeftHand.translation),
+                                   leapTransform.TransformQuaternion(LeftHand.rotation));
+      RightHand = new LeapTransform(leapTransform.TransformPoint(RightHand.translation),
+                                    leapTransform.TransformQuaternion(RightHand.rotation));
     }
 
     public void LateUpdateHandTransforms(Camera camera) {
@@ -395,11 +363,15 @@ namespace Leap.Unity {
         }
 #endif
 
-        if (Application.isPlaying && !manualUpdateHasBeenCalledSinceUpdate && _leapController != null) {
+        if (Application.isPlaying
+            && !manualUpdateHasBeenCalledSinceUpdate
+            && _leapController != null) {
           manualUpdateHasBeenCalledSinceUpdate = true;
-          //Find the Left and/or Right Hand(s) to Latch
+
+          //Find the left and/or right hand(s) to latch
           Hand leftHand = null, rightHand = null;
-          LeapTransform PrecullLeftHand = LeapTransform.Identity, PrecullRightHand = LeapTransform.Identity;
+          LeapTransform precullLeftHand = LeapTransform.Identity;
+          LeapTransform precullRightHand = LeapTransform.Identity;
           for (int i = 0; i < CurrentFrame.Hands.Count; i++) {
             Hand updateHand = CurrentFrame.Hands[i];
             if (updateHand.IsLeft && leftHand == null) {
@@ -410,20 +382,36 @@ namespace Leap.Unity {
           }
 
           //Determine their new Transforms
-          _leapController.GetInterpolatedLeftRightTransform(CalculateInterpolationTime() + (ExtrapolationAmount * 1000), CalculateInterpolationTime() - (BounceAmount * 1000), (leftHand != null ? leftHand.Id : 0), (rightHand != null ? rightHand.Id : 0), out PrecullLeftHand, out PrecullRightHand);
-          bool LeftValid = PrecullLeftHand.translation != Vector.Zero; bool RightValid = PrecullRightHand.translation != Vector.Zero;
-          transformHands(ref PrecullLeftHand, ref PrecullRightHand);
+          var interpolationTime = CalculateInterpolationTime();
+          _leapController.GetInterpolatedLeftRightTransform(
+                            interpolationTime + (ExtrapolationAmount * 1000),
+                            interpolationTime - (BounceAmount * 1000),
+                            (leftHand != null ? leftHand.Id : 0),
+                            (rightHand != null ? rightHand.Id : 0),
+                            out precullLeftHand,
+                            out precullRightHand);
+          bool leftValid = precullLeftHand.translation != Vector.Zero;
+          bool rightValid = precullRightHand.translation != Vector.Zero;
+          transformHands(ref precullLeftHand, ref precullRightHand);
 
-          //Calculate the Delta Transforms
-          if (rightHand != null && RightValid) {
+          //Calculate the delta Transforms
+          if (rightHand != null && rightValid) {
             _transformArray[0] =
-                               Matrix4x4.TRS(PrecullRightHand.translation.ToVector3(), PrecullRightHand.rotation.ToQuaternion(), Vector3.one) *
-             Matrix4x4.Inverse(Matrix4x4.TRS(rightHand.PalmPosition.ToVector3(), rightHand.Rotation.ToQuaternion(), Vector3.one));
+              Matrix4x4.TRS(precullRightHand.translation.ToVector3(),
+                            precullRightHand.rotation.ToQuaternion(),
+                            Vector3.one)
+              * Matrix4x4.Inverse(Matrix4x4.TRS(rightHand.PalmPosition.ToVector3(),
+                                                rightHand.Rotation.ToQuaternion(),
+                                                Vector3.one));
           }
-          if (leftHand != null && LeftValid) {
+          if (leftHand != null && leftValid) {
             _transformArray[1] =
-                               Matrix4x4.TRS(PrecullLeftHand.translation.ToVector3(), PrecullLeftHand.rotation.ToQuaternion(), Vector3.one) *
-             Matrix4x4.Inverse(Matrix4x4.TRS(leftHand.PalmPosition.ToVector3(), leftHand.Rotation.ToQuaternion(), Vector3.one));
+              Matrix4x4.TRS(precullLeftHand.translation.ToVector3(),
+                            precullLeftHand.rotation.ToQuaternion(),
+                            Vector3.one)
+              * Matrix4x4.Inverse(Matrix4x4.TRS(leftHand.PalmPosition.ToVector3(),
+                                                leftHand.Rotation.ToQuaternion(),
+                                                Vector3.one));
           }
 
           //Apply inside of the vertex shader
