@@ -23,8 +23,8 @@ namespace Leap.Unity {
                              decorateAllowManualTimeAlignment);
 
       specifyConditionalDrawing(() => { return serializedObject
-                                                 .FindProperty("_disableTemporalWarping")
-                                                   .boolValue == false; },
+                                                 .FindProperty("_enableTemporalWarping")
+                                                   .boolValue == true; },
                                 "_allowManualTimeAlignment",
                                 "_customWarpAdjustment");
 
