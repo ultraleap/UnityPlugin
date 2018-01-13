@@ -278,9 +278,9 @@ MonoBehaviour:
   _deviceOffsetYAxis: 0
   _deviceOffsetZAxis: 0.12
   _deviceTiltXAxis: 5
-  _disableTemporalWarping: 0
+  _enableTemporalWarping: 1
   _allowManualTimeAlignment: 1
-  _customWarpAdjustment: 0
+  _customWarpAdjustment: 17
   _updateHandInPrecull: 0
   imageWarpingAdjustment: 17
 --- !u!1 &395650194
