@@ -106,21 +106,25 @@ namespace Leap.Unity {
     private const int DEFAULT_WARP_ADJUSTMENT = 17;
 #endif
 
+    public enum TemporalWarpingMode {
+      Auto,
+      Manual,
+      Images,
+      Off
+    }
+
     [Tooltip("Temporal warping prevents the hand coordinate system from 'swimming' or "
            + "'bouncing' when the headset moves and the user's hands stay still. "
            + "This phenomenon is caused by the differing amounts of latencies inherent "
            + "in the two systems. "
-           + "For PC VR and Android VR, temporal warping should be enabled, and you "
+           + "For PC VR and Android VR, temporal warping should set to 'Auto', and you "
            + "should NOT use a manual warp alignment value, as the correct value is "
-           + "chosen automatically for these platforms.")]
+           + "chosen automatically for these platforms."
+           + "Some non-standard platforms may utilize 'Manual' to adjust their "
+           + "latency compensation amount for temporal warping."
+           + "Image Passthrough should use `Images`.")]
     [SerializeField]
-    private bool _enableTemporalWarping = true;
-    
-    [Tooltip("Keep this option unchecked for PC VR and Android VR target platforms. "
-           + "Some non-standard platforms may utilize this value to adjust their "
-           + "latency compensation amount for temporal warping.")]
-    [SerializeField]
-    private bool _allowManualTimeAlignment = false;
+    private TemporalWarpingMode _temporalWarpingMode = TemporalWarpingMode.Auto;
 
     /// <summary>
     /// The time in milliseconds between the current frame's headset position and the
@@ -132,7 +136,7 @@ namespace Leap.Unity {
     private int _customWarpAdjustment = DEFAULT_WARP_ADJUSTMENT;
     public int warpingAdjustment {
       get {
-        if (_allowManualTimeAlignment) {
+        if (_temporalWarpingMode == TemporalWarpingMode.Manual) {
           return _customWarpAdjustment;
         }
         else {
@@ -214,9 +218,10 @@ namespace Leap.Unity {
         _leapController.Now());
 
       LateUpdateHandTransforms(_cachedCamera);
+    }
 
+    void LateUpdate() {
       var projectionMatrix = _cachedCamera.projectionMatrix;
-
       switch (SystemInfo.graphicsDeviceType) {
 #if !UNITY_2017_2_OR_NEWER
         case UnityEngine.Rendering.GraphicsDeviceType.Direct3D9:
@@ -237,14 +242,14 @@ namespace Leap.Unity {
       // Update Image Warping
       Vector3 pastPosition; Quaternion pastRotation;
       transformHistory.SampleTransform(imageTimeStamp
-                                         - (long)(imageWarpingAdjustment * 1000f)
-                                         - (long)(_smoothedTrackingLatency.value),
+                                         - (long)(warpingAdjustment * 1000f),
                                        out pastPosition, out pastRotation);
 
       // Use _tweenImageWarping
       var currCenterRotation = InputTracking.GetLocalRotation(XRNode.CenterEye);
-      var imageReferenceRotation = _enableTemporalWarping ? pastRotation
-                                                          : currCenterRotation;
+      var imageReferenceRotation = _temporalWarpingMode != TemporalWarpingMode.Off 
+                                                        ? pastRotation
+                                                        : currCenterRotation;
 
       Quaternion imageQuatWarp = Quaternion.Inverse(currCenterRotation)
                                  * imageReferenceRotation;
@@ -256,9 +261,6 @@ namespace Leap.Unity {
                                * projectionMatrix.inverse;
       Shader.SetGlobalMatrix("_LeapGlobalWarpedOffset", imageMatWarp);
     }
-
-    // TODO: DELETEME
-    public int imageWarpingAdjustment = 17;
 
     protected virtual void OnEnable() {
       resetTransforms();
@@ -297,7 +299,9 @@ namespace Leap.Unity {
         if (updateTemporalCompensation && transformHistory.history.IsFull) {
           transformHistory.SampleTransform(timestamp
                                            - (long)(warpingAdjustment * 1000f)
-                                           - (long)(_smoothedTrackingLatency.value),
+                                           - (_temporalWarpingMode ==
+                                           TemporalWarpingMode.Images ? -20000 : 
+                                           (long)(_smoothedTrackingLatency.value)),
                                            out warpedPosition, out warpedRotation);
         }
         
@@ -306,8 +310,10 @@ namespace Leap.Unity {
         transformHistory.SampleTransform(timestamp, out currentPosition,
                                                     out currentRotation);
 
-        warpedPosition = _enableTemporalWarping ? warpedPosition : currentPosition;
-        warpedRotation = _enableTemporalWarping ? warpedRotation : currentRotation;
+        warpedPosition = _temporalWarpingMode != TemporalWarpingMode.Off ? 
+                                              warpedPosition : currentPosition;
+        warpedRotation = _temporalWarpingMode != TemporalWarpingMode.Off ? 
+                                              warpedRotation : currentRotation;
 
         warpedRotation *= Quaternion.Euler(deviceTiltXAxis, 0f, 0f);
         warpedRotation *= Quaternion.Euler(-90f, 180f, 0f);

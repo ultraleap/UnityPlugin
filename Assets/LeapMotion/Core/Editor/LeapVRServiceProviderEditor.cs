@@ -19,16 +19,9 @@ namespace Leap.Unity {
       base.OnEnable();
       isVRProvider = true;
 
-      specifyCustomDecorator("_allowManualTimeAlignment",
-                             decorateAllowManualTimeAlignment);
-
       specifyConditionalDrawing(() => { return serializedObject
-                                                 .FindProperty("_enableTemporalWarping")
-                                                   .boolValue == true; },
-                                "_allowManualTimeAlignment",
-                                "_customWarpAdjustment");
-
-      specifyConditionalDrawing("_allowManualTimeAlignment",
+                                                 .FindProperty("_temporalWarpingMode")
+                                                   .enumValueIndex == 1; },
                                 "_customWarpAdjustment");
 
       specifyConditionalDrawing("_allowManualDeviceOffset",
