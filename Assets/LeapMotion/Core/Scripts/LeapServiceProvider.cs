@@ -12,11 +12,13 @@ using UnityEngine;
 namespace Leap.Unity {
 
   /// <summary>
-  /// The LeapServiceProvider provides tracked Leap hand data and images from the device
+  /// The LeapServiceProvider provides tracked Leap Hand data and images from the device
   /// via the Leap service running on the client machine.
   /// </summary>
   public class LeapServiceProvider : LeapProvider {
-    
+
+    #region Constants
+
     /// <summary>
     /// Converts nanoseconds to seconds.
     /// </summary>
@@ -30,24 +32,26 @@ namespace Leap.Unity {
     /// <summary>
     /// The transform array used for late-latching.
     /// </summary>
-    protected const string HAND_ARRAY = "_LeapHandTransforms";
+    protected const string HAND_ARRAY_GLOBAL_NAME = "_LeapHandTransforms";
+
+    #endregion
+
+    #region Inspector
 
     public enum FrameOptimizationMode {
       None,
       ReuseUpdateForPhysics,
       ReusePhysicsForUpdate,
     }
-    
+    [Tooltip("When enabled, the provider will only calculate one leap frame instead of two.")]
+    [SerializeField]
+    protected FrameOptimizationMode _frameOptimization = FrameOptimizationMode.None;
+
     public enum PhysicsExtrapolationMode {
       None,
       Auto,
       Manual
     }
-    
-    [Tooltip("When enabled, the provider will only calculate one leap frame instead of two.")]
-    [SerializeField]
-    protected FrameOptimizationMode _frameOptimization = FrameOptimizationMode.None;
-    
     [Tooltip("The mode to use when extrapolating physics.\n" +
              " None - No extrapolation is used at all.\n" +
              " Auto - Extrapolation is chosen based on the fixed timestep.\n" +
@@ -58,9 +62,13 @@ namespace Leap.Unity {
     [Tooltip("The amount of time (in seconds) to extrapolate the phyiscs data by.")]
     [SerializeField]
     protected float _physicsExtrapolationTime = 1.0f / 90.0f;
-    
+
+    #endregion
+
+    #region Internal Settings & Memory
+
     protected bool _useInterpolation = true;
-    
+
     // Extrapolate on Android to compensate for the latency introduced by its graphics
     // pipeline.
 #if UNITY_ANDROID && !UNITY_EDITOR
@@ -82,6 +90,10 @@ namespace Leap.Unity {
     protected Frame _untransformedFixedFrame;
     protected Frame _transformedFixedFrame;
 
+    #endregion
+
+    #region LeapProvider Implementation
+
     public override Frame CurrentFrame {
       get {
         if (_frameOptimization == FrameOptimizationMode.ReusePhysicsForUpdate) {
@@ -102,55 +114,10 @@ namespace Leap.Unity {
       }
     }
 
-    protected bool UseInterpolation {
-      get {
-        return _useInterpolation;
-      }
-      set {
-        _useInterpolation = value;
-      }
-    }
+    #endregion
 
-    public float CalculatePhysicsExtrapolation() {
-      switch (_physicsExtrapolation) {
-        case PhysicsExtrapolationMode.None:
-          return 0;
-        case PhysicsExtrapolationMode.Auto:
-          return Time.fixedDeltaTime;
-        case PhysicsExtrapolationMode.Manual:
-          return _physicsExtrapolationTime;
-        default:
-          throw new System.InvalidOperationException(
-            "Unexpected physics extrapolation mode: " + _physicsExtrapolation);
-      }
-    }
-    
-    /** Returns the Leap Controller instance. */
-    public Controller GetLeapController() {
-#if UNITY_EDITOR
-      //Null check to deal with hot reloading
-      if (_leapController == null) {
-        createController();
-      }
-#endif
-      return _leapController;
-    }
+    #region Unity Events
 
-    /** True, if the Leap Motion hardware is plugged in and this application is connected to the Leap Motion service. */
-    public bool IsConnected() {
-      return GetLeapController().IsConnected;
-    }
-
-    /** Returns information describing the device hardware. */
-    public LeapDeviceInfo GetDeviceInfo() {
-      return LeapDeviceInfo.GetLeapDeviceInfo();
-    }
-
-    public void RetransformFrames() {
-      transformFrame(_untransformedUpdateFrame, _transformedUpdateFrame);
-      transformFrame(_untransformedFixedFrame, _transformedFixedFrame);
-    }
-    
     protected virtual void Awake() {
       _fixedOffset.delay = 0.4f;
       _smoothedTrackingLatency.SetBlend(0.99f, 0.0111f);
@@ -189,7 +156,8 @@ namespace Leap.Unity {
         _unityToLeapOffset = timestamp - (long)(Time.time * S_TO_NS);
 
         _leapController.GetInterpolatedFrameFromTime(_untransformedUpdateFrame, timestamp, CalculateInterpolationTime() - (BounceAmount * 1000));
-      } else {
+      }
+      else {
         _leapController.Frame(_untransformedUpdateFrame);
       }
 
@@ -229,7 +197,8 @@ namespace Leap.Unity {
         }
         _leapController.GetInterpolatedFrame(_untransformedFixedFrame, timestamp);
 
-      } else {
+      }
+      else {
         _leapController.Frame(_untransformedFixedFrame);
       }
 
@@ -238,18 +207,6 @@ namespace Leap.Unity {
 
         DispatchFixedFrameEvent(_transformedFixedFrame);
       }
-    }
-    
-    protected virtual long CalculateInterpolationTime(bool endOfFrame = false) {
-#if UNITY_ANDROID && !UNITY_EDITOR
-      return leap_controller_.Now() - 16000;
-#else
-      if (_leapController != null) {
-        return _leapController.Now() - (long)_smoothedTrackingLatency.value;
-      } else {
-        return 0;
-      }
-#endif
     }
 
     protected virtual void OnDestroy() {
@@ -260,7 +217,8 @@ namespace Leap.Unity {
       if (_leapController != null) {
         if (isPaused) {
           _leapController.StopConnection();
-        } else {
+        }
+        else {
           _leapController.StartConnection();
         }
       }
@@ -269,17 +227,88 @@ namespace Leap.Unity {
     protected virtual void OnApplicationQuit() {
       destroyController();
     }
+
+    public float CalculatePhysicsExtrapolation() {
+      switch (_physicsExtrapolation) {
+        case PhysicsExtrapolationMode.None:
+          return 0;
+        case PhysicsExtrapolationMode.Auto:
+          return Time.fixedDeltaTime;
+        case PhysicsExtrapolationMode.Manual:
+          return _physicsExtrapolationTime;
+        default:
+          throw new System.InvalidOperationException(
+            "Unexpected physics extrapolation mode: " + _physicsExtrapolation);
+      }
+    }
+
+    #endregion
+
+    #region Public API
+
+    /// <summary>
+    /// Returns the Leap Controller instance.
+    /// </summary>
+    public Controller GetLeapController() {
+      #if UNITY_EDITOR
+      // Null check to deal with hot reloading.
+      if (_leapController == null) {
+        createController();
+      }
+      #endif
+      return _leapController;
+    }
+
+    /// <summary>
+    /// Returns true if the Leap Motion hardware is plugged in and this application is
+    /// connected to the Leap Motion service.
+    /// </summary>
+    public bool IsConnected() {
+      return GetLeapController().IsConnected;
+    }
+
+    /// <summary>
+    /// Returns information describing the device hardware.
+    /// </summary>
+    public LeapDeviceInfo GetDeviceInfo() {
+      return LeapDeviceInfo.GetLeapDeviceInfo();
+    }
+
+    /// <summary>
+    /// Retransforms hand data from Leap space to the space of the Unity transform.
+    /// This is only necessary if you're moving the LeapServiceProvider around in a
+    /// custom script and trying to access Hand data from it directly afterward.
+    /// </summary>
+    public void RetransformFrames() {
+      transformFrame(_untransformedUpdateFrame, _transformedUpdateFrame);
+      transformFrame(_untransformedFixedFrame, _transformedFixedFrame);
+    }
+
+    #endregion
+
+    #region Internal Methods
+
+    protected virtual long CalculateInterpolationTime(bool endOfFrame = false) {
+      #if UNITY_ANDROID && !UNITY_EDITOR
+      return leap_controller_.Now() - 16000;
+      #else
+      if (_leapController != null) {
+        return _leapController.Now() - (long)_smoothedTrackingLatency.value;
+      } else {
+        return 0;
+      }
+      #endif
+    }
     
     /// <summary>
     /// Initializes Leap Motion policy flags.
-    /// The POLY_OPTIMIZE_HMD flag improves tracking for head-mounted devices.
     /// </summary>
     protected virtual void initializeFlags() {
       if (_leapController == null) {
         return;
       }
 
-      _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
+      _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_DEFAULT);
     }
     
     /// <summary>
@@ -321,5 +350,9 @@ namespace Leap.Unity {
     protected virtual void transformFrame(Frame source, Frame dest) {
       dest.CopyFrom(source).Transform(transform.GetLeapMatrix());
     }
+
+    #endregion
+
   }
+
 }

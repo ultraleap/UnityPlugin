@@ -22,6 +22,8 @@ namespace Leap.Unity {
   /// </summary>
   public class LeapVRServiceProvider : LeapServiceProvider {
 
+    #region Inspector
+
     #region Device Offset
 
     private const float DEFAULT_DEVICE_OFFSET_Y_AXIS = 0f;
@@ -98,13 +100,13 @@ namespace Leap.Unity {
 
     [Header("Temporal Warping")]
     
-#if UNITY_STANDALONE
+    #if UNITY_STANDALONE
     private const int DEFAULT_WARP_ADJUSTMENT = 17;
-#elif UNITY_ANDROID
+    #elif UNITY_ANDROID
     private const int DEFAULT_WARP_ADJUSTMENT = 45;
-#else
+    #else
     private const int DEFAULT_WARP_ADJUSTMENT = 17;
-#endif
+    #endif
 
     public enum TemporalWarpingMode {
       Auto,
@@ -112,17 +114,16 @@ namespace Leap.Unity {
       Images,
       Off
     }
-
     [Tooltip("Temporal warping prevents the hand coordinate system from 'swimming' or "
            + "'bouncing' when the headset moves and the user's hands stay still. "
            + "This phenomenon is caused by the differing amounts of latencies inherent "
            + "in the two systems. "
-           + "For PC VR and Android VR, temporal warping should set to 'Auto', and you "
-           + "should NOT use a manual warp alignment value, as the correct value is "
-           + "chosen automatically for these platforms."
-           + "Some non-standard platforms may utilize 'Manual' to adjust their "
-           + "latency compensation amount for temporal warping."
-           + "Image Passthrough should use `Images`.")]
+           + "For PC VR and Android VR, temporal warping should set to 'Auto', as the "
+           + "correct value can be chosen automatically for these platforms. "
+           + "Some non-standard platforms may use 'Manual' mode to adjust their "
+           + "latency compensation amount for temporal warping. "
+           + "Use 'Images' for scenarios that overlay Leap device images on tracked "
+           + "hand data.")]
     [SerializeField]
     private TemporalWarpingMode _temporalWarpingMode = TemporalWarpingMode.Auto;
 
@@ -147,11 +148,29 @@ namespace Leap.Unity {
 
     #endregion
 
-    [Header("[Experimental]")]
-    [Tooltip("Pass updated transform matrices to objects with materials using the "
-           + "VertexOffsetShader.")]
+    #region Pre-Cull Latching
+    
+    [Tooltip("Pass updated transform matrices to hands with materials that utilize the "
+           + "VertexOffsetShader. Won't have any effect on hands that don't take into "
+           + "account shader-global vertex offsets in their material shaders.")]
     [SerializeField]
     protected bool _updateHandInPrecull = false;
+    public bool updateHandInPrecull {
+      get {
+        return _updateHandInPrecull;
+      }
+      set {
+        resetShaderTransforms();
+
+        _updateHandInPrecull = value;
+      }
+    }
+
+    #endregion
+
+    #endregion
+
+    #region Internal Memory
 
     protected TransformHistory transformHistory = new TransformHistory();
     protected bool manualUpdateHasBeenCalledSinceUpdate;
@@ -164,18 +183,20 @@ namespace Leap.Unity {
     [NonSerialized]
     public long imageTimeStamp = 0;
 
-    public bool UpdateHandInPrecull {
-      get {
-        return _updateHandInPrecull;
-      }
-      set {
-        resetTransforms();
-        _updateHandInPrecull = value;
-      }
-    }
+    #endregion
+
+    #region Unity Events
 
     protected virtual void Reset() {
       _customWarpAdjustment = DEFAULT_WARP_ADJUSTMENT;
+    }
+
+    protected virtual void OnEnable() {
+      resetShaderTransforms();
+    }
+
+    protected virtual void OnDisable() {
+      resetShaderTransforms();
     }
 
     protected override void Start() {
@@ -189,43 +210,27 @@ namespace Leap.Unity {
       imageTimeStamp = _leapController.FrameTimestamp();
     }
 
-    protected override long CalculateInterpolationTime(bool endOfFrame = false) {
-#if UNITY_ANDROID
-      return leap_controller_.Now() - 16000;
-#else
-      if (_leapController != null) {
-        return _leapController.Now()
-               - (long)_smoothedTrackingLatency.value
-               + ((_updateHandInPrecull && !endOfFrame)?
-                    (long)(Time.smoothDeltaTime * S_TO_NS / Time.timeScale)
-                  : 0);
-      } else {
-        return 0;
-      }
-#endif
-    }
-
     void OnPreCull() {
-#if UNITY_EDITOR
+      #if UNITY_EDITOR
       if (!Application.isPlaying) {
         return;
       }
-#endif
+      #endif
 
       transformHistory.UpdateDelay(
         InputTracking.GetLocalPosition(XRNode.CenterEye),
         InputTracking.GetLocalRotation(XRNode.CenterEye),
         _leapController.Now());
 
-      LateUpdateHandTransforms(_cachedCamera);
+      OnPreCullHandTransforms(_cachedCamera);
     }
 
     void LateUpdate() {
       var projectionMatrix = _cachedCamera.projectionMatrix;
       switch (SystemInfo.graphicsDeviceType) {
-#if !UNITY_2017_2_OR_NEWER
+        #if !UNITY_2017_2_OR_NEWER
         case UnityEngine.Rendering.GraphicsDeviceType.Direct3D9:
-#endif
+        #endif
         case UnityEngine.Rendering.GraphicsDeviceType.Direct3D11:
         case UnityEngine.Rendering.GraphicsDeviceType.Direct3D12:
           for (int i = 0; i < 4; i++) {
@@ -262,23 +267,26 @@ namespace Leap.Unity {
       Shader.SetGlobalMatrix("_LeapGlobalWarpedOffset", imageMatWarp);
     }
 
-    protected virtual void OnEnable() {
-      resetTransforms();
+    #endregion
+
+    #region LeapServiceProvider Overrides
+
+    protected override long CalculateInterpolationTime(bool endOfFrame = false) {
+      #if UNITY_ANDROID
+      return leap_controller_.Now() - 16000;
+      #else
+      if (_leapController != null) {
+        return _leapController.Now()
+               - (long)_smoothedTrackingLatency.value
+               + ((updateHandInPrecull && !endOfFrame)?
+                    (long)(Time.smoothDeltaTime * S_TO_NS / Time.timeScale)
+                  : 0);
+      } else {
+        return 0;
+      }
+      #endif
     }
 
-    protected virtual void OnDisable() {
-      resetTransforms();
-    }
-
-    /*
-    * Resets the Global Hand Transform Shader Matrices
-    */
-    protected void resetTransforms() {
-      _transformArray[0] = Matrix4x4.identity;
-      _transformArray[1] = Matrix4x4.identity;
-      Shader.SetGlobalMatrixArray(HAND_ARRAY, _transformArray);
-    }
-    
     /// <summary>
     /// Initializes the Leap Motion policy flags.
     /// The POLICY_OPTIMIZE_HMD flag improves tracking for head-mounted devices.
@@ -288,8 +296,26 @@ namespace Leap.Unity {
         return;
       }
 
-      // Optimize for top-down tracking if on head mounted display.
+      // Optimize for head-mounted tracking if on head-mounted display.
       _leapController.SetPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
+    }
+
+    protected override void transformFrame(Frame source, Frame dest) {
+      LeapTransform leapTransform = GetWarpedMatrix(source.Timestamp);
+      dest.CopyFrom(source).Transform(leapTransform);
+    }
+
+    #endregion
+
+    #region Internal Methods
+
+    /// <summary>
+    /// Resets shader globals for the Hand transforms.
+    /// </summary>
+    protected void resetShaderTransforms() {
+      _transformArray[0] = Matrix4x4.identity;
+      _transformArray[1] = Matrix4x4.identity;
+      Shader.SetGlobalMatrixArray(HAND_ARRAY_GLOBAL_NAME, _transformArray);
     }
 
     protected virtual LeapTransform GetWarpedMatrix(long timestamp,
@@ -339,11 +365,6 @@ namespace Leap.Unity {
       return leapTransform;
     }
 
-    protected override void transformFrame(Frame source, Frame dest) {
-      LeapTransform leapTransform = GetWarpedMatrix(source.Timestamp);
-      dest.CopyFrom(source).Transform(leapTransform);
-    }
-
     protected void transformHands(ref LeapTransform LeftHand, ref LeapTransform RightHand) {
       LeapTransform leapTransform = GetWarpedMatrix(0, false);
       LeftHand = new LeapTransform(leapTransform.TransformPoint(LeftHand.translation),
@@ -352,9 +373,9 @@ namespace Leap.Unity {
                                     leapTransform.TransformQuaternion(RightHand.rotation));
     }
 
-    public void LateUpdateHandTransforms(Camera camera) {
-      if (_updateHandInPrecull) {
-#if UNITY_EDITOR
+    protected void OnPreCullHandTransforms(Camera camera) {
+      if (updateHandInPrecull) {
+        #if UNITY_EDITOR
         //Hard-coded name of the camera used to generate the pre-render view
         if (camera.gameObject.name == "PreRenderCamera") {
           return;
@@ -364,7 +385,7 @@ namespace Leap.Unity {
         if (isScenePreviewCamera) {
           return;
         }
-#endif
+        #endif
 
         if (Application.isPlaying
             && !manualUpdateHasBeenCalledSinceUpdate
@@ -418,9 +439,13 @@ namespace Leap.Unity {
           }
 
           //Apply inside of the vertex shader
-          Shader.SetGlobalMatrixArray(HAND_ARRAY, _transformArray);
+          Shader.SetGlobalMatrixArray(HAND_ARRAY_GLOBAL_NAME, _transformArray);
         }
       }
     }
+
+    #endregion
+
   }
+
 }
