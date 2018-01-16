@@ -20,7 +20,12 @@ public class XRHeightOffset : MonoBehaviour {
 
   [SerializeField]
   [OnEditorChange("stationaryHeightOffset")]
-  [Tooltip("This offset only used when the XR space tracking type is 'Stationary.'")]
+  [Tooltip("This offset only used when the XR space tracking type is 'Stationary.' This "
+         + "is the tracking type for Oculus setups with a single tracking camera and "
+         + "for Android VR devices without position tracking. Two-camera Oculus setups "
+         + "and Vive headsets, for example, do not require a height offset. They center "
+         + "the room-scale floor on the Rig transform, and this script will not apply "
+         + "a height offset when the RoomScale space-tracking type is detected.")]
   private float _stationaryHeightOffset = 1.6f; // average human height (or so)
   public float stationaryHeightOffset {
     get { return _stationaryHeightOffset; }

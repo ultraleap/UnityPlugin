@@ -7,6 +7,7 @@
  * between Leap Motion and you, your company or other organization.           *
  ******************************************************************************/
 
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Leap.Unity {
@@ -92,10 +93,68 @@ namespace Leap.Unity {
 
     #endregion
 
+    #region Edit-time Frame Data
+
+    #if UNITY_EDITOR
+
+    private Frame _backingEditTimeFrame = null;
+    private Frame _editTimeFrame {
+      get {
+        if (_backingEditTimeFrame == null) {
+          _backingEditTimeFrame = new Frame();
+        }
+        return _backingEditTimeFrame;
+      }
+    }
+
+    private Dictionary<TestHandFactory.TestHandPose, Hand> _cachedLeftHands
+      = new Dictionary<TestHandFactory.TestHandPose, Hand>();
+    private Hand _editTimeLeftHand {
+      get {
+        Hand cachedHand;
+        if (_cachedLeftHands.TryGetValue(editTimePose, out cachedHand)) {
+          return cachedHand;
+        }
+        else {
+          cachedHand = TestHandFactory.MakeTestHand(isLeft: true, pose: editTimePose);
+          _cachedLeftHands[editTimePose] = cachedHand;
+          return cachedHand;
+        }
+      }
+    }
+
+    private Dictionary<TestHandFactory.TestHandPose, Hand> _cachedRightHands
+      = new Dictionary<TestHandFactory.TestHandPose, Hand>();
+    private Hand _editTimeRightHand {
+      get {
+        Hand cachedHand;
+        if (_cachedRightHands.TryGetValue(editTimePose, out cachedHand)) {
+          return cachedHand;
+        }
+        else {
+          cachedHand = TestHandFactory.MakeTestHand(isLeft: false, pose: editTimePose);
+          _cachedRightHands[editTimePose] = cachedHand;
+          return cachedHand;
+        }
+      }
+    }
+
+    #endif
+
+    #endregion
+
     #region LeapProvider Implementation
 
     public override Frame CurrentFrame {
       get {
+        #if UNITY_EDITOR
+        if (!Application.isPlaying) {
+          _editTimeFrame.Hands.Clear();
+          _editTimeFrame.Hands.Add(_editTimeLeftHand);
+          _editTimeFrame.Hands.Add(_editTimeRightHand);
+          return _editTimeFrame;
+        }
+        #endif
         if (_frameOptimization == FrameOptimizationMode.ReusePhysicsForUpdate) {
           return _transformedFixedFrame;
         } else {
@@ -106,6 +165,14 @@ namespace Leap.Unity {
 
     public override Frame CurrentFixedFrame {
       get {
+        #if UNITY_EDITOR
+        if (!Application.isPlaying) {
+          _editTimeFrame.Hands.Clear();
+          _editTimeFrame.Hands.Add(_editTimeLeftHand);
+          _editTimeFrame.Hands.Add(_editTimeRightHand);
+          return _editTimeFrame;
+        }
+        #endif
         if (_frameOptimization == FrameOptimizationMode.ReuseUpdateForPhysics) {
           return _transformedUpdateFrame;
         } else {
