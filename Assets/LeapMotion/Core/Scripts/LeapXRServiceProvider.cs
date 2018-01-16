@@ -20,7 +20,7 @@ namespace Leap.Unity {
   /// warp tracked hand positions based on the motion of the headset to account for the
   /// differing latencies of the two tracking systems.
   /// </summary>
-  public class LeapVRServiceProvider : LeapServiceProvider {
+  public class LeapXRServiceProvider : LeapServiceProvider {
 
     #region Inspector
 

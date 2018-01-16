@@ -17,7 +17,7 @@ namespace Leap.Unity {
   /// Provides a handful of VR related camera utilities, such as controlling IPD and
   /// camera distance.
   /// </summary>
-  public class LeapVRCameraControl : MonoBehaviour {
+  public class LeapXRCameraControl : MonoBehaviour {
 
     private Matrix4x4 _finalCenterMatrix;
 

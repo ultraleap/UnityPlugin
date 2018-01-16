@@ -1,0 +1,124 @@
+/******************************************************************************
+ * Copyright (C) Leap Motion, Inc. 2011-2017.                                 *
+ * Leap Motion proprietary and  confidential.                                 *
+ *                                                                            *
+ * Use subject to the terms of the Leap Motion SDK Agreement available at     *
+ * https://developer.leapmotion.com/sdk_agreement, or another agreement       *
+ * between Leap Motion and you, your company or other organization.           *
+ ******************************************************************************/
+
+using UnityEngine;
+using System;
+using System.Linq;
+using Leap.Unity.Attributes;
+
+public class XRHeightOffset : MonoBehaviour {
+
+  #region Inspector
+
+  [Header("Height Offset When XR Space Tracking Type Is Stationary")]
+
+  [SerializeField]
+  [OnEditorChange("stationaryHeightOffset")]
+  [Tooltip("This offset only used when the XR space tracking type is 'Stationary.'")]
+  private float _stationaryHeightOffset = 1.6f; // average human height (or so)
+  public float stationaryHeightOffset {
+    get { return _stationaryHeightOffset; }
+    set {
+      _stationaryHeightOffset = value;
+
+      applyHeightOffset();
+    }
+  }
+
+  #region Auto Recenter
+
+  [Header("Auto Recenter")]
+
+  [SerializeField]
+  [Tooltip("If the detected XR device is present and supports userPresence, "
+         + "checking this option will detect when the user puts on the device headset "
+         + "and call InputTracking.Recenter.")]
+  private bool autoRecenterOnUserPresence = true;
+
+  private UnityEngine.XR.UserPresenceState _lastUserPresence;
+
+  #endregion
+
+  #region Runtime Height Adjustment
+
+  [Header("Runtime Height Adjustment")]
+
+  public bool enableRuntimeAdjustment = true;
+
+  [DisableIf("enableRuntimeAdjustment", isEqualTo: false)]
+  [Tooltip("Press this key on the keyboard to adjust the height offset up by stepSize.")]
+  public string stepUpKey = "up";
+
+  [DisableIf("enableRuntimeAdjustment", isEqualTo: false)]
+  [Tooltip("Press this key on the keyboard to adjust the height offset down by stepSize.")]
+  public string stepDownKey = "down";
+
+  [DisableIf("enableRuntimeAdjustment", isEqualTo: false)]
+  public float stepSize = 0.1f;
+
+  #endregion
+
+  #endregion
+
+  #region Unity Events
+
+  private Vector3 _startingPosition = Vector3.zero;
+
+  private void Start() {
+    _startingPosition = this.transform.position;
+    applyHeightOffset();
+
+    // Auto recenter
+    var userPresence = UnityEngine.XR.XRDevice.userPresence;
+
+    if (userPresence == UnityEngine.XR.UserPresenceState.Unsupported) {
+      Debug.Log("[XRAutoRecenter] XR UserPresenceState unsupported; "
+              + "disabling autoRecenterOnUserPresence.");
+      autoRecenterOnUserPresence = false;
+    }
+  }
+
+  private void Update() {
+    var deviceIsPresent = UnityEngine.XR.XRDevice.isPresent;
+    if (deviceIsPresent) {
+      
+      if (enableRuntimeAdjustment) {
+        if (Input.GetKeyDown(stepUpKey)) {
+          stationaryHeightOffset += stepSize;
+        }
+
+        if (Input.GetKeyDown(stepDownKey)) {
+          stationaryHeightOffset -= stepSize;
+        }
+      }
+
+      var trackingSpaceType = UnityEngine.XR.XRDevice.GetTrackingSpaceType();
+      if (trackingSpaceType == UnityEngine.XR.TrackingSpaceType.Stationary
+          && autoRecenterOnUserPresence) {
+        var userPresence = UnityEngine.XR.XRDevice.userPresence;
+
+        if (_lastUserPresence != userPresence) {
+          if (userPresence == UnityEngine.XR.UserPresenceState.Present) {
+            UnityEngine.XR.InputTracking.Recenter();
+          }
+
+          _lastUserPresence = userPresence;
+        }
+      }
+    }
+  }
+
+  #endregion
+
+  private void applyHeightOffset() {
+    this.transform.position = _startingPosition;
+    this.transform.position += this.transform.up * stationaryHeightOffset;
+  }
+
+}
