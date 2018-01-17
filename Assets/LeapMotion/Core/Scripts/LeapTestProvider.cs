@@ -29,10 +29,10 @@ namespace Leap.Unity {
     private Hand _cachedRightHand = null;
 
     void Awake() {
-      _cachedLeftHand = TestHandFactory.MakeTestHand(isLeft: true);
-      _cachedLeftHand.TransformToUnityUnits(); // Note: sucks that this has to be here
-      _cachedRightHand = TestHandFactory.MakeTestHand(isLeft: false);
-      _cachedRightHand.TransformToUnityUnits(); // Note: like really this is terrible
+      _cachedLeftHand  = TestHandFactory.MakeTestHand(isLeft: true,
+                                           unitType: TestHandFactory.UnitType.UnityUnits);
+      _cachedRightHand = TestHandFactory.MakeTestHand(isLeft: false,
+                                           unitType: TestHandFactory.UnitType.UnityUnits);
     }
 
     void Update() {
@@ -65,24 +65,6 @@ namespace Leap.Unity {
 
     void FixedUpdate() {
       DispatchFixedFrameEvent(frame);
-    }
-
-  }
-
-  // Note: The fact that this class needs to exist is ridiculous
-  public static class LeapTestProviderExtensions {
-
-    public static readonly float MM_TO_M = 1e-3f;
-
-    public static LeapTransform GetLeapTransform(Vector3 position, Quaternion rotation) {
-      Vector scale = new Vector(MM_TO_M, MM_TO_M, MM_TO_M); // Leap units -> Unity units.
-      LeapTransform transform = new LeapTransform(position.ToVector(), rotation.ToLeapQuaternion(), scale);
-      transform.MirrorZ(); // Unity is left handed.
-      return transform;
-    }
-
-    public static void TransformToUnityUnits(this Hand hand) {
-      hand.Transform(GetLeapTransform(Vector3.zero, Quaternion.identity));
     }
 
   }

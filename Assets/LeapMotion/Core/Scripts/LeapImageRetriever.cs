@@ -288,7 +288,6 @@ namespace Leap.Unity {
       }
 
       ApplyGammaCorrectionValues();
-      // ApplyCameraProjectionValues(GetComponent<Camera>());
     }
 
     void OnEnable() {
@@ -298,9 +297,6 @@ namespace Leap.Unity {
       } else {
         StartCoroutine(waitForController());
       }
-
-      //LeapVRCameraControl.OnLeftPreRender += ApplyCameraProjectionValues;
-      //LeapVRCameraControl.OnRightPreRender += ApplyCameraProjectionValues;
     }
 
     void OnDisable() {
@@ -309,9 +305,6 @@ namespace Leap.Unity {
       if (controller != null) {
         _provider.GetLeapController().DistortionChange -= onDistortionChange;
       }
-
-      //LeapVRCameraControl.OnLeftPreRender -= ApplyCameraProjectionValues;
-      //LeapVRCameraControl.OnRightPreRender -= ApplyCameraProjectionValues;
     }
 
     void OnDestroy() {
@@ -387,17 +380,6 @@ namespace Leap.Unity {
       }
       Shader.SetGlobalFloat(GLOBAL_COLOR_SPACE_GAMMA_NAME, gamma);
       Shader.SetGlobalFloat(GLOBAL_GAMMA_CORRECTION_EXPONENT_NAME, 1.0f / _gammaCorrection);
-    }
-
-    public void ApplyCameraProjectionValues(Camera camera) {
-      // These parameters are used during undistortion of the images to ensure they
-      // line up properly with the scene.
-      Vector4 projection = new Vector4();
-      projection.x = camera.projectionMatrix[0, 2];
-      projection.y = 0f;
-      projection.z = camera.projectionMatrix[0, 0];
-      projection.w = camera.projectionMatrix[1, 1];
-      //Shader.SetGlobalVector(GLOBAL_CAMERA_PROJECTION_NAME, projection);
     }
 
     void onDistortionChange(object sender, LeapEventArgs args) {

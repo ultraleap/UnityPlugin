@@ -57,7 +57,8 @@ namespace Leap.Unity{
 
       LeapDeviceInfo deviceInfo;
       deviceInfo.isEmbedded = false;
-      deviceInfo.baseline = 0.064f;
+      //deviceInfo.baseline = 0.064f;
+      deviceInfo.baseline = 0.04f; // Peripheral
       deviceInfo.forwardOffset = 0.12F;
       deviceInfo.horizontalViewAngle = 2.303835f * Mathf.Rad2Deg;
       deviceInfo.verticalViewAngle = 2.007129f * Mathf.Rad2Deg;

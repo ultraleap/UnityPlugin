@@ -18,6 +18,11 @@ namespace Leap {
 
     #region Test Frame / Hand API
 
+    public enum UnitType {
+      LeapUnits,
+      UnityUnits
+    }
+
     /// <summary>
     /// Creates a test Frame that contains two Hands (by default). You can also
     /// optionally specify a TestHandPose to produce a frame with a different test pose.
@@ -45,7 +50,9 @@ namespace Leap {
     /// mirrored along the X axis (so you can provide LeapTransform to construct both
     /// left and right hands.
     /// </summary>
-    public static Hand MakeTestHand(bool isLeft, LeapTransform leftHandTransform, int frameId = 0, int handId = 0) {
+    public static Hand MakeTestHand(bool isLeft, LeapTransform leftHandTransform,
+                                    int frameId = 0, int handId = 0,
+                                    UnitType unitType = UnitType.LeapUnits) {
 
       // Apply the appropriate mirroring if this is a right hand.
       if (!isLeft) {
@@ -69,21 +76,34 @@ namespace Leap {
                                                         correctingQuaternion.z,
                                                         correctingQuaternion.w);
 
-      return hand.Transform(new LeapTransform(Vector.Zero, correctingLeapQuaternion));
+      var transformedHand = hand.Transform(new LeapTransform(Vector.Zero,
+                                                             correctingLeapQuaternion));
+
+      if (unitType == UnitType.UnityUnits) {
+        transformedHand.TransformToUnityUnits();
+      }
+
+      return transformedHand;
     }
 
     /// <summary>
     /// Returns a test Hand object.
     /// </summary>
-    public static Hand MakeTestHand(bool isLeft, int frameId = 0, int handId = 0) {
-      return MakeTestHand(isLeft, LeapTransform.Identity, frameId, handId);
+    public static Hand MakeTestHand(bool isLeft,
+                                    int frameId = 0, int handId = 0,
+                                    UnitType unitType = UnitType.LeapUnits) {
+      return MakeTestHand(isLeft, LeapTransform.Identity, frameId, handId, unitType);
     }
 
     /// <summary>
     /// Returns a test Leap Hand object in the argument TestHandPose.
     /// </summary>
-    public static Hand MakeTestHand(bool isLeft, TestHandPose pose, int frameId = 0, int handId = 0) {
-      return MakeTestHand(isLeft, GetTestPoseLeftHandTransform(pose), frameId, handId);
+    public static Hand MakeTestHand(bool isLeft, TestHandPose pose,
+                                    int frameId = 0, int handId = 0,
+                                    UnitType unitType = UnitType.LeapUnits) {
+      return MakeTestHand(isLeft, GetTestPoseLeftHandTransform(pose),
+                          frameId, handId,
+                          unitType);
     }
 
     #endregion
@@ -275,4 +295,25 @@ namespace Leap {
     #endregion
 
   }
+
+  // Note: The fact that this class needs to exist is ridiculous
+  // TODO: Look into automatically returning things in Unity units? Would require changes
+  // for everything that uses the TestHandFactory.
+  public static class LeapTestProviderExtensions {
+
+    public static readonly float MM_TO_M = 1e-3f;
+
+    public static LeapTransform GetLeapTransform(Vector3 position, Quaternion rotation) {
+      Vector scale = new Vector(MM_TO_M, MM_TO_M, MM_TO_M); // Leap units -> Unity units.
+      LeapTransform transform = new LeapTransform(position.ToVector(), rotation.ToLeapQuaternion(), scale);
+      transform.MirrorZ(); // Unity is left handed.
+      return transform;
+    }
+
+    public static void TransformToUnityUnits(this Hand hand) {
+      hand.Transform(GetLeapTransform(Vector3.zero, Quaternion.identity));
+    }
+
+  }
+
 }

@@ -242,9 +242,7 @@ namespace Leap.Unity.GraphicalRenderer {
       }
 
       // Support Undo/Redo with runtime space changes in-editor
-      #pragma warning disable 0169
       bool didUndoRedo = false;
-      #pragma warning restore 0169
       #if UNITY_EDITOR
       if (_didUndoRedoThisFrame) {
         didUndoRedo = true;

@@ -14,10 +14,12 @@ using System;
 namespace Leap.Unity {
 
   /// <summary>
-  /// Provides a handful of VR related camera utilities, such as controlling IPD and
-  /// camera distance.
+  /// Moves the camera to each eye position on pre-render. Only necessary for image
+  /// pass-through (IR viewer) scenarios.
+  /// 
+  /// Note: This script will be removed in a future version of UnityModules.
   /// </summary>
-  public class LeapXRCameraControl : MonoBehaviour {
+  public class LeapEyeDislocator : MonoBehaviour {
 
     private Matrix4x4 _finalCenterMatrix;
 
@@ -40,40 +42,21 @@ namespace Leap.Unity {
     [SerializeField]
     private EyeType _eyeType = new EyeType(EyeType.OrderType.CENTER);
 
-    /// <summary>
-    /// Called during the left eye camera's OnPreRender Unity callback.
-    /// </summary>
-    public static Action<Camera> OnLeftPreRender;
-
-    /// <summary>
-    /// Called during the right eye camera's OnPreRender Unity callback.
-    /// </summary>
-    public static Action<Camera> OnRightPreRender;
-
     void OnPreCull() {
-#if UNITY_EDITOR
+      #if UNITY_EDITOR
       if (!Application.isPlaying) return;
-#endif
+      #endif
 
       _camera.ResetWorldToCameraMatrix();
       _finalCenterMatrix = _camera.worldToCameraMatrix;
     }
 
     void OnPreRender() {
-#if UNITY_EDITOR
+      #if UNITY_EDITOR
       if (!Application.isPlaying) return;
-#endif
+      #endif
 
       _eyeType.BeginCamera(); // swaps eye
-
-      if (_eyeType.IsLeftEye) {
-        //Shader.SetGlobalVector(GLOBAL_EYE_UV_OFFSET_NAME, LEFT_EYE_UV_OFFSET);
-        if (OnLeftPreRender != null) OnLeftPreRender(_camera);
-      }
-      else {
-        //Shader.SetGlobalVector(GLOBAL_EYE_UV_OFFSET_NAME, RIGHT_EYE_UV_OFFSET);
-        if (OnRightPreRender != null) OnRightPreRender(_camera);
-      }
 
       Matrix4x4 offsetMatrix;
       
