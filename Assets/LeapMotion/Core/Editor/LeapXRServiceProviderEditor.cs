@@ -13,7 +13,7 @@
 namespace Leap.Unity {
 
   [CustomEditor(typeof(LeapXRServiceProvider))]
-  public class LeapVRServiceProviderEditor : LeapServiceProviderEditor {
+  public class LeapXRServiceProviderEditor : LeapServiceProviderEditor {
 
     protected override void OnEnable() {
       base.OnEnable();

@@ -64,7 +64,7 @@ namespace Leap.Unity {
       if (UnityEditor.PlayerSettings.virtualRealitySupported && !isVRProvider) {
         EditorGUILayout.HelpBox(
           "VR support is enabled. If your Leap is mounted to your headset, you should be "
-          + "using LeapVRServiceProvider instead of LeapServiceProvider. (If your Leap "
+          + "using LeapXRServiceProvider instead of LeapServiceProvider. (If your Leap "
           + "is not mounted to your headset, you can safely ignore this warning.)",
           MessageType.Warning);
       }

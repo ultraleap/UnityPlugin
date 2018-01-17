@@ -15,7 +15,7 @@ using Leap.Unity.Attributes;
 namespace Leap.Unity {
 
   /// <summary>
-  /// The LeapVRServiceProvider expands on the standard LeapServiceProvider to
+  /// The LeapXRServiceProvider expands on the standard LeapServiceProvider to
   /// account for the offset of the Leap device with respect to the attached HMD and
   /// warp tracked hand positions based on the motion of the headset to account for the
   /// differing latencies of the two tracking systems.
