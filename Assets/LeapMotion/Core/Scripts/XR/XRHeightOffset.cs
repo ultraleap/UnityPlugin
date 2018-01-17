@@ -79,6 +79,10 @@ namespace Leap.Unity {
     #region Unity Events
 
     private void Start() {
+      var trackingSpaceType = UnityEngine.XR.XRDevice.GetTrackingSpaceType();
+      if (trackingSpaceType == UnityEngine.XR.TrackingSpaceType.RoomScale) {
+        _stationaryHeightOffset = 0f;
+      }
       stationaryHeightOffset = _stationaryHeightOffset;
 
       // Auto recenter
