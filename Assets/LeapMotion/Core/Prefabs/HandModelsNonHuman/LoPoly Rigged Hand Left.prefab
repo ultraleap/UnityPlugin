@@ -130,7 +130,7 @@ GameObject:
   - component: {fileID: 114994683550464134}
   - component: {fileID: 114281837189665976}
   m_Layer: 0
-  m_Name: LoPoly_Rigged_Hand_Left
+  m_Name: LoPoly Rigged Hand Left
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1002,7 +1002,7 @@ MonoBehaviour:
     HandPostProcesses:
       m_PersistentCalls:
         m_Calls: []
-      m_TypeName: Leap.Unity.Hands+HandEvent, Core, Version=0.0.0.0, Culture=neutral,
+      m_TypeName: Leap.Unity.Hands+HandEvent, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
         PublicKeyToken=null
   handedness: 0
   handModelPalmWidth: 0.085

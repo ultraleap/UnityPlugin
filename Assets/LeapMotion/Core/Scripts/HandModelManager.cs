@@ -13,37 +13,159 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.Serialization;
 using System;
+using Leap.Unity.Attributes;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
-using Leap;
 
 namespace Leap.Unity {
-  //
-  /**
-   * HandPool holds a pool of HandModelBases and makes HandRepresentations
-   * when given a Leap Hand and a model type of graphics or physics.
-   * When a HandRepresentation is created, a HandModelBase is removed from the pool.
-   * When a HandRepresentation is finished, its HandModelBase is returned to the pool.
-   */
-  public class HandPool : MonoBehaviour {
+
+  /// <summary>
+  /// The HandModelManager manages a pool of HandModelBases and makes HandRepresentations
+  /// when a it detects a Leap Hand from its configured LeapProvider.
+  /// 
+  /// When a HandRepresentation is created, a HandModelBase is removed from the pool.
+  /// When a HandRepresentation is finished, its HandModelBase is returned to the pool.
+  /// 
+  /// This class was formerly known as HandPool.
+  /// </summary>
+  public class HandModelManager : MonoBehaviour {
+    
+    #region Formerly in LeapHandController
+
+    protected LeapProvider provider;
+
+    protected Dictionary<int, HandRepresentation> graphicsHandReps = new Dictionary<int, HandRepresentation>();
+    protected Dictionary<int, HandRepresentation> physicsHandReps = new Dictionary<int, HandRepresentation>();
+
+    protected bool graphicsEnabled = true;
+    protected bool physicsEnabled = true;
+
+    public bool GraphicsEnabled {
+      get {
+        return graphicsEnabled;
+      }
+      set {
+        graphicsEnabled = value;
+      }
+    }
+
+    public bool PhysicsEnabled {
+      get {
+        return physicsEnabled;
+      }
+      set {
+        physicsEnabled = value;
+      }
+    }
+
+    /** Updates the graphics HandRepresentations. */
+    protected virtual void OnUpdateFrame(Frame frame) {
+      if (frame != null && graphicsEnabled) {
+        UpdateHandRepresentations(graphicsHandReps, ModelType.Graphics, frame);
+      }
+    }
+
+    /** Updates the physics HandRepresentations. */
+    protected virtual void OnFixedFrame(Frame frame) {
+      if (frame != null && physicsEnabled) {
+        UpdateHandRepresentations(physicsHandReps, ModelType.Physics, frame);
+      }
+    }
+
+    /** 
+    * Updates HandRepresentations based in the specified HandRepresentation Dictionary.
+    * Active HandRepresentation instances are updated if the hand they represent is still
+    * present in the Provider's CurrentFrame; otherwise, the HandRepresentation is removed. If new
+    * Leap Hand objects are present in the Leap HandRepresentation Dictionary, new HandRepresentations are 
+    * created and added to the dictionary. 
+    * @param all_hand_reps = A dictionary of Leap Hand ID's with a paired HandRepresentation
+    * @param modelType Filters for a type of hand model, for example, physics or graphics hands.
+    * @param frame The Leap Frame containing Leap Hand data for each currently tracked hand
+    */
+    protected virtual void UpdateHandRepresentations(Dictionary<int, HandRepresentation> all_hand_reps, ModelType modelType, Frame frame) {
+      for (int i = 0; i < frame.Hands.Count; i++) {
+        var curHand = frame.Hands[i];
+        HandRepresentation rep;
+        if (!all_hand_reps.TryGetValue(curHand.Id, out rep)) {
+          rep = MakeHandRepresentation(curHand, modelType);
+          if (rep != null) {
+            all_hand_reps.Add(curHand.Id, rep);
+          }
+        }
+        if (rep != null) {
+          rep.IsMarked = true;
+          rep.UpdateRepresentation(curHand);
+          rep.LastUpdatedTime = (int)frame.Timestamp;
+        }
+      }
+
+      /** Mark-and-sweep to finish unused HandRepresentations */
+      HandRepresentation toBeDeleted = null;
+      for (var it = all_hand_reps.GetEnumerator(); it.MoveNext();) {
+        var r = it.Current;
+        if (r.Value != null) {
+          if (r.Value.IsMarked) {
+            r.Value.IsMarked = false;
+          }
+          else {
+            /** Initialize toBeDeleted with a value to be deleted */
+            //Debug.Log("Finishing");
+            toBeDeleted = r.Value;
+          }
+        }
+      }
+      /**Inform the representation that we will no longer be giving it any hand updates 
+       * because the corresponding hand has gone away */
+      if (toBeDeleted != null) {
+        all_hand_reps.Remove(toBeDeleted.HandID);
+        toBeDeleted.Finish();
+      }
+    }
+
+    #endregion
+
+    #region HandPool Inspector
+
+    [Tooltip("The LeapProvider to use to drive hand representations in the defined "
+           + "model pool groups.")]
     [SerializeField]
-    [Tooltip("Reference for the transform that is a child of the camera rig's root and is a parent to all hand models.")]
-    [FormerlySerializedAs("ModelsParent")]
-    private Transform _modelsParent;
-    /// <summary>
-    /// Gets the parent transform of models available to the HandPool.
-    /// </summary>
-    public Transform modelsParent {
-      get { return _modelsParent; }
+    [OnEditorChange("leapProvider")]
+    private LeapProvider _leapProvider;
+    public LeapProvider leapProvider {
+      get { return _leapProvider; }
+      set {
+        if (_leapProvider != null) {
+          _leapProvider.OnFixedFrame  -= OnFixedFrame;
+          _leapProvider.OnUpdateFrame -= OnUpdateFrame;
+        }
+
+        _leapProvider = value;
+
+        if (_leapProvider != null) {
+          _leapProvider.OnFixedFrame  += OnFixedFrame;
+          _leapProvider.OnUpdateFrame += OnUpdateFrame;
+        }
+      }
     }
 
     [SerializeField]
-    private List<ModelGroup> ModelPool;
+    [Tooltip("To add a new set of Hand Models, first add the Left and Right objects as "
+           + "children of this object. Then create a new Model Pool entry referencing "
+           + "the new Hand Models and configure it as desired. "
+           + "Once configured, the Hand Model Manager object pipes Leap tracking data "
+           + "to the Hand Models as hands are tracked, and spawns duplicates as needed "
+           + "if \"Can Duplicate\" is enabled.")]
+    private List<ModelGroup> ModelPool = new List<ModelGroup>();
     private List<HandRepresentation> activeHandReps = new List<HandRepresentation>();
 
     private Dictionary<HandModelBase, ModelGroup> modelGroupMapping = new Dictionary<HandModelBase, ModelGroup>();
     private Dictionary<HandModelBase, HandRepresentation> modelToHandRepMapping = new Dictionary<HandModelBase, HandRepresentation>();
+
+    #endregion
+
+    #region ModelGroup Class
+
     /**
      * ModelGroup contains a left/right pair of HandModelBase's
      * @param modelList The HandModelBases available for use by HandRepresentations
@@ -55,7 +177,7 @@ namespace Leap.Unity {
     public class ModelGroup {
       public string GroupName;
       [HideInInspector]
-      public HandPool _handPool;
+      public HandModelManager _handModelManager;
 
       public HandModelBase LeftModel;
       [HideInInspector]
@@ -88,8 +210,8 @@ namespace Leap.Unity {
             if (modelsCheckedOut[i].HandModelType == modelType && modelsCheckedOut[i].Handedness == chirality) {
               HandModelBase modelToSpawn = modelsCheckedOut[i];
               HandModelBase spawnedModel = GameObject.Instantiate(modelToSpawn);
-              spawnedModel.transform.parent = _handPool.modelsParent;
-              _handPool.modelGroupMapping.Add(spawnedModel, this);
+              spawnedModel.transform.parent = _handModelManager.transform;
+              _handModelManager.modelGroupMapping.Add(spawnedModel, this);
               modelsCheckedOut.Add(spawnedModel);
               return spawnedModel;
             }
@@ -100,9 +222,14 @@ namespace Leap.Unity {
       public void ReturnToGroup(HandModelBase model) {
         modelsCheckedOut.Remove(model);
         modelList.Add(model);
-        this._handPool.modelToHandRepMapping.Remove(model);
+        this._handModelManager.modelToHandRepMapping.Remove(model);
       }
     }
+
+    #endregion
+
+    #region HandPool Methods
+
     public void ReturnToPool(HandModelBase model) {
       ModelGroup modelGroup;
       bool groupFound = modelGroupMapping.TryGetValue(model, out modelGroup);
@@ -133,19 +260,68 @@ namespace Leap.Unity {
       //Otherwise return to pool
       modelGroup.ReturnToGroup(model);
     }
+
+    #endregion
+
+    #region Hand Representations
+
+    /**
+     * MakeHandRepresentation receives a Hand and combines that with a HandModelBase to create a HandRepresentation
+     * @param hand The Leap Hand data to be drive a HandModelBase
+     * @param modelType Filters for a type of hand model, for example, physics or graphics hands.
+     */
+    public HandRepresentation MakeHandRepresentation(Hand hand, ModelType modelType) {
+      Chirality handChirality = hand.IsRight ? Chirality.Right : Chirality.Left;
+      HandRepresentation handRep = new HandRepresentation(this, hand, handChirality, modelType);
+      for (int i = 0; i < ModelPool.Count; i++) {
+        ModelGroup group = ModelPool[i];
+        if (group.IsEnabled) {
+          HandModelBase model = group.TryGetModel(handChirality, modelType);
+          if (model != null) {
+            handRep.AddModel(model);
+            if (!modelToHandRepMapping.ContainsKey(model)) {
+              model.group = group;
+              modelToHandRepMapping.Add(model, handRep);
+            }
+          }
+        }
+      }
+      activeHandReps.Add(handRep);
+      return handRep;
+    }
+
     public void RemoveHandRepresentation(HandRepresentation handRepresentation) {
       activeHandReps.Remove(handRepresentation);
     }
-    /** Popuates the ModelPool with the contents of the ModelCollection */
-    void Start() {
-      if (modelsParent == null) {
-        Debug.LogWarning("HandPool.ModelsParent needs to reference the parent transform of the hand models.  This transform should be a child of the LMHeadMountedRig transform.");
+
+    #endregion
+
+    #region Unity Events
+
+    protected virtual void OnEnable() {
+      if (provider == null) {
+        provider = Hands.Provider;
       }
 
+      provider.OnUpdateFrame += OnUpdateFrame;
+      provider.OnFixedFrame += OnFixedFrame;
+    }
+
+    protected virtual void OnDisable() {
+      provider.OnUpdateFrame -= OnUpdateFrame;
+      provider.OnFixedFrame -= OnFixedFrame;
+    }
+
+    /** Popuates the ModelPool with the contents of the ModelCollection */
+    void Start() {
       for(int i=0; i<ModelPool.Count; i++) {
         InitializeModelGroup(ModelPool[i]);
       }
     }
+
+    #endregion
+
+    #region Group Methods
 
     private void InitializeModelGroup(ModelGroup collectionGroup) {
         // Prevent the ModelGroup be initialized by multiple times
@@ -153,14 +329,14 @@ namespace Leap.Unity {
           return;
         }
 
-        collectionGroup._handPool = this;
+        collectionGroup._handModelManager = this;
         HandModelBase leftModel;
         HandModelBase rightModel;
         if (collectionGroup.IsLeftToBeSpawned) {
           HandModelBase modelToSpawn = collectionGroup.LeftModel;
           GameObject spawnedGO = Instantiate(modelToSpawn.gameObject);
           leftModel = spawnedGO.GetComponent<HandModelBase>();
-          leftModel.transform.parent = modelsParent;
+          leftModel.transform.parent = this.transform;
         } else {
           leftModel = collectionGroup.LeftModel;
         }
@@ -173,7 +349,7 @@ namespace Leap.Unity {
           HandModelBase modelToSpawn = collectionGroup.RightModel;
           GameObject spawnedGO = Instantiate(modelToSpawn.gameObject);
           rightModel = spawnedGO.GetComponent<HandModelBase>();
-          rightModel.transform.parent = modelsParent;
+          rightModel.transform.parent = this.transform;
         } else {
           rightModel = collectionGroup.RightModel;
         }
@@ -183,31 +359,6 @@ namespace Leap.Unity {
         }
     }
 
-    /**
-     * MakeHandRepresentation receives a Hand and combines that with a HandModelBase to create a HandRepresentation
-     * @param hand The Leap Hand data to be drive a HandModelBase
-     * @param modelType Filters for a type of hand model, for example, physics or graphics hands.
-     */
-
-    public HandRepresentation MakeHandRepresentation(Hand hand, ModelType modelType) {
-      Chirality handChirality = hand.IsRight ? Chirality.Right : Chirality.Left;
-      HandRepresentation handRep = new HandRepresentation(this, hand, handChirality, modelType);
-      for (int i = 0; i < ModelPool.Count; i++) {
-        ModelGroup group = ModelPool[i];
-        if (group.IsEnabled) {
-          HandModelBase model = group.TryGetModel(handChirality, modelType);
-          if (model != null ) {
-            handRep.AddModel(model);
-            if (!modelToHandRepMapping.ContainsKey(model)) {
-              model.group = group;
-              modelToHandRepMapping.Add(model, handRep);
-            }
-          }
-        }
-      }
-      activeHandReps.Add(handRep);
-      return handRep;
-    }
     /**
     * EnableGroup finds suitable HandRepresentations and adds HandModelBases from the ModelGroup, returns them to their ModelGroup and sets the groups IsEnabled to true.
      * @param groupName Takes a string that matches the ModelGroup's groupName serialized in the Inspector
@@ -236,6 +387,7 @@ namespace Leap.Unity {
         Debug.LogWarning("A group matching that name does not exisit in the modelPool");
       }
     }
+
     /**
      * DisableGroup finds and removes the ModelGroup's HandModelBases from their HandRepresentations, returns them to their ModelGroup and sets the groups IsEnabled to false.
      * @param groupName Takes a string that matches the ModelGroup's groupName serialized in the Inspector
@@ -266,6 +418,7 @@ namespace Leap.Unity {
         Debug.LogWarning("A group matching that name does not exisit in the modelPool");
       }
     }
+
     public void ToggleGroup(string groupName) {
       StartCoroutine(toggleGroup(groupName));
     }
@@ -282,6 +435,7 @@ namespace Leap.Unity {
         }
       } else Debug.LogWarning("A group matching that name does not exisit in the modelPool");
     }
+
     public void AddNewGroup(string groupName, HandModelBase leftModel, HandModelBase rightModel) {
       ModelGroup newGroup = new ModelGroup();
       newGroup.LeftModel = leftModel;
@@ -292,6 +446,7 @@ namespace Leap.Unity {
       ModelPool.Add(newGroup);
       InitializeModelGroup(newGroup);
     }
+
     public void RemoveGroup(string groupName) {
       while (ModelPool.Find(i => i.GroupName == groupName) != null) {
         ModelGroup modelGroup = ModelPool.Find(i => i.GroupName == groupName);
@@ -300,6 +455,7 @@ namespace Leap.Unity {
         }
       }
     }
+
     public T GetHandModel<T>(int handId) where T : HandModelBase {
       foreach (ModelGroup group in ModelPool) {
         foreach (HandModelBase handModel in group.modelsCheckedOut) {
@@ -311,7 +467,11 @@ namespace Leap.Unity {
       return null;
     }
 
-#if UNITY_EDITOR
+    #endregion
+
+    #region Editor-only Methods
+
+    #if UNITY_EDITOR
     /**In the Unity Editor, Validate that the HandModelBase is an instance of a prefab from the scene vs. a prefab from the project. */
     void OnValidate() {
       for (int i = 0; i < ModelPool.Count; i++) {
@@ -335,7 +495,10 @@ namespace Leap.Unity {
       }
     }
 
-#endif
+    #endif
+
+    #endregion
+
   }
 }
 

@@ -185,6 +185,10 @@ namespace Leap.Unity {
 
     #region Unity Events
 
+    protected virtual void Reset() {
+      editTimePose = TestHandFactory.TestHandPose.DesktopModeA;
+    }
+
     protected virtual void Awake() {
       _fixedOffset.delay = 0.4f;
       _smoothedTrackingLatency.SetBlend(0.99f, 0.0111f);

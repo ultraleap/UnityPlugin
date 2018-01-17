@@ -24,7 +24,7 @@ namespace Leap.Unity {
 
     #region Inspector
 
-    #region Device Offset
+    // Manual Device Offset
 
     private const float DEFAULT_DEVICE_OFFSET_Y_AXIS = 0f;
     private const float DEFAULT_DEVICE_OFFSET_Z_AXIS = 0.12f;
@@ -94,11 +94,7 @@ namespace Leap.Unity {
       }
     }
 
-    #endregion
-
-    #region Temporal Warping
-
-    [Header("Temporal Warping")]
+    // Temporal Warping
     
     #if UNITY_STANDALONE
     private const int DEFAULT_WARP_ADJUSTMENT = 17;
@@ -146,9 +142,7 @@ namespace Leap.Unity {
       }
     }
 
-    #endregion
-
-    #region Pre-Cull Latching
+    // Pre-cull Latching
     
     [Tooltip("Pass updated transform matrices to hands with materials that utilize the "
            + "VertexOffsetShader. Won't have any effect on hands that don't take into "
@@ -165,8 +159,6 @@ namespace Leap.Unity {
         _updateHandInPrecull = value;
       }
     }
-
-    #endregion
 
     #endregion
 
@@ -187,8 +179,10 @@ namespace Leap.Unity {
 
     #region Unity Events
 
-    protected virtual void Reset() {
-      _customWarpAdjustment = DEFAULT_WARP_ADJUSTMENT;
+    protected override void Reset() {
+      base.Reset();
+
+      editTimePose = TestHandFactory.TestHandPose.HeadMountedB;
     }
 
     protected virtual void OnEnable() {

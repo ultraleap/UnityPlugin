@@ -25,7 +25,7 @@ namespace Leap {
     public static Frame MakeTestFrame(int frameId,
                                       bool includeLeftHand = true,
                                       bool includeRightHand = true,
-                                      TestHandPose handPose = TestHandPose.PoseA) {
+                                      TestHandPose handPose = TestHandPose.HeadMountedA) {
 
       var testFrame = new Frame(frameId, 0, 120.0f,
                                 new InteractionBox(),
@@ -91,20 +91,27 @@ namespace Leap {
     #region Test Hand Poses
 
     public enum TestHandPose {
-      PoseA,
-      PoseB
+      HeadMountedA,
+      HeadMountedB,
+      DesktopModeA
     }
 
     public static LeapTransform GetTestPoseLeftHandTransform(TestHandPose pose) {
       LeapTransform transform = LeapTransform.Identity;
       switch (pose) {
-        case TestHandPose.PoseA:
+        case TestHandPose.HeadMountedA:
           transform.rotation = angleAxis(180 * Constants.DEG_TO_RAD, Vector.Forward);
           transform.translation = new Vector(80f, 120f, 0f);
           break;
-        case TestHandPose.PoseB:
+        case TestHandPose.HeadMountedB:
           transform.rotation = Quaternion.Euler(30F, -10F, -20F).ToLeapQuaternion();
           transform.translation = new Vector(220f, 270f, 130f);
+          break;
+        case TestHandPose.DesktopModeA:
+          transform.rotation = angleAxis(0f * Constants.DEG_TO_RAD, Vector.Forward)
+                                .Multiply(angleAxis(-90f * Constants.DEG_TO_RAD, Vector.Right))
+                                .Multiply(angleAxis(180f * Constants.DEG_TO_RAD, Vector.Up));
+          transform.translation = new Vector(120f, 0f, -170f);
           break;
       }
       return transform;

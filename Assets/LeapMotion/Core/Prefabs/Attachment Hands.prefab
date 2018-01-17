@@ -35,6 +35,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4139101302111182}
+  - component: {fileID: 114626281574833694}
   - component: {fileID: 114805386573115904}
   m_Layer: 0
   m_Name: Attachment Hands
@@ -144,8 +145,8 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1928007728237488}
-  m_LocalRotation: {x: 0.7071067, y: 0.00000014611093, z: 0.00000014611093, w: -0.7071068}
-  m_LocalPosition: {x: 0.08436384, y: -0.031011164, z: 0.11350003}
+  m_LocalRotation: {x: 0.12940957, y: 0.4829629, z: -0.86272997, w: 0.07547912}
+  m_LocalPosition: {x: 212.8275, y: -159.86491, z: -261.07666}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 4917671769262128}
@@ -172,8 +173,8 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1009499250135820}
-  m_LocalRotation: {x: 0.7071067, y: 0.00000014611093, z: 0.00000014611093, w: -0.7071068}
-  m_LocalPosition: {x: 0.079999976, y: -0.000000029802322, z: 0.120000005}
+  m_LocalRotation: {x: 0.12940957, y: 0.4829629, z: -0.86272997, w: 0.07547912}
+  m_LocalPosition: {x: 220.00003, y: -130, z: -269.99997}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 4917671769262128}
@@ -185,8 +186,8 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1751175551953068}
-  m_LocalRotation: {x: 0.7071067, y: 0.00000014611093, z: 0.00000014611093, w: -0.7071068}
-  m_LocalPosition: {x: -0.08000005, y: -0.000000029802322, z: 0.119999975}
+  m_LocalRotation: {x: 0.12940949, y: -0.48296294, z: 0.86272997, w: 0.07547909}
+  m_LocalPosition: {x: -219.99997, y: -130, z: -270.00003}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 4411216943293902}
@@ -198,8 +199,8 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1280746833785604}
-  m_LocalRotation: {x: 0.7071067, y: 0.00000014611093, z: 0.00000014611093, w: -0.7071068}
-  m_LocalPosition: {x: -0.084363915, y: -0.031011164, z: 0.11349997}
+  m_LocalRotation: {x: 0.12940949, y: -0.48296294, z: 0.86272997, w: 0.07547909}
+  m_LocalPosition: {x: -212.82747, y: -159.86491, z: -261.07672}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 4411216943293902}
@@ -279,7 +280,7 @@ MonoBehaviour:
   pinkyDistalJoint: {fileID: 0}
   pinkyTip: {fileID: 0}
   _chirality: 1
-  _isTracked: 0
+  _isTracked: 1
 --- !u!114 &114553000557697698
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -293,6 +294,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   attachmentHand: {fileID: 0}
   attachmentPoint: 2
+--- !u!114 &114626281574833694
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1049534810953736}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e933f13d48c681d48b14750922ac906d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _comment: Add this prefab as a child of the Leap Rig to use Attachment Hands.
+  _isEditing: 0
 --- !u!114 &114805386573115904
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -338,7 +352,7 @@ MonoBehaviour:
   pinkyDistalJoint: {fileID: 0}
   pinkyTip: {fileID: 0}
   _chirality: 0
-  _isTracked: 0
+  _isTracked: 1
 --- !u!114 &114990173483565386
 MonoBehaviour:
   m_ObjectHideFlags: 1

@@ -84,7 +84,7 @@ public class XRHeightOffset : MonoBehaviour {
 
     if (userPresence == UnityEngine.XR.UserPresenceState.Unsupported) {
       Debug.Log("[XRAutoRecenter] XR UserPresenceState unsupported; "
-              + "disabling autoRecenterOnUserPresence.");
+              + "disabling autoRecenterOnUserPresence. (XR support is probably disabled.)");
       autoRecenterOnUserPresence = false;
     }
   }
