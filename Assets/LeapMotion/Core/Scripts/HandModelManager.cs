@@ -33,8 +33,6 @@ namespace Leap.Unity {
     
     #region Formerly in LeapHandController
 
-    protected LeapProvider provider;
-
     protected Dictionary<int, HandRepresentation> graphicsHandReps = new Dictionary<int, HandRepresentation>();
     protected Dictionary<int, HandRepresentation> physicsHandReps = new Dictionary<int, HandRepresentation>();
 
@@ -299,17 +297,20 @@ namespace Leap.Unity {
     #region Unity Events
 
     protected virtual void OnEnable() {
-      if (provider == null) {
-        provider = Hands.Provider;
+      if (_leapProvider == null) {
+        _leapProvider = Hands.Provider;
       }
 
-      provider.OnUpdateFrame += OnUpdateFrame;
-      provider.OnFixedFrame += OnFixedFrame;
+      _leapProvider.OnUpdateFrame -= OnUpdateFrame;
+      _leapProvider.OnUpdateFrame += OnUpdateFrame;
+
+      _leapProvider.OnFixedFrame -= OnFixedFrame;
+      _leapProvider.OnFixedFrame += OnFixedFrame;
     }
 
     protected virtual void OnDisable() {
-      provider.OnUpdateFrame -= OnUpdateFrame;
-      provider.OnFixedFrame -= OnFixedFrame;
+      _leapProvider.OnUpdateFrame -= OnUpdateFrame;
+      _leapProvider.OnFixedFrame -= OnFixedFrame;
     }
 
     /** Popuates the ModelPool with the contents of the ModelCollection */
