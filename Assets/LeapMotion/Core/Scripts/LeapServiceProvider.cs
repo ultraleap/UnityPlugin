@@ -116,7 +116,8 @@ namespace Leap.Unity {
           return cachedHand;
         }
         else {
-          cachedHand = TestHandFactory.MakeTestHand(isLeft: true, pose: editTimePose);
+          cachedHand = TestHandFactory.MakeTestHand(isLeft: true, pose: editTimePose,
+                                         unitType: TestHandFactory.UnitType.UnityUnits);
           _cachedLeftHands[editTimePose] = cachedHand;
           return cachedHand;
         }
@@ -132,7 +133,8 @@ namespace Leap.Unity {
           return cachedHand;
         }
         else {
-          cachedHand = TestHandFactory.MakeTestHand(isLeft: false, pose: editTimePose);
+          cachedHand = TestHandFactory.MakeTestHand(isLeft: false, pose: editTimePose,
+                                         unitType: TestHandFactory.UnitType.UnityUnits);
           _cachedRightHands[editTimePose] = cachedHand;
           return cachedHand;
         }
