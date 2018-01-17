@@ -208,10 +208,6 @@ PlayableDirector:
     value: {fileID: 563919150}
   m_ExposedReferences:
     m_References: []
---- !u!4 &977502592 stripped
-Transform:
-  m_PrefabParentObject: {fileID: 414974, guid: 18d6bf9063dcb1842be63f411fd9fc26, type: 2}
-  m_PrefabInternal: {fileID: 1027978382}
 --- !u!1001 &1027978382
 Prefab:
   m_ObjectHideFlags: 0
@@ -255,6 +251,10 @@ Prefab:
     - {fileID: 11412806, guid: 18d6bf9063dcb1842be63f411fd9fc26, type: 2}
   m_ParentPrefab: {fileID: 100100000, guid: 18d6bf9063dcb1842be63f411fd9fc26, type: 2}
   m_IsPrefabParent: 0
+--- !u!4 &1027978383 stripped
+Transform:
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 1027978382}
 --- !u!1001 &1054278004
 Prefab:
   m_ObjectHideFlags: 0
@@ -372,7 +372,7 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
-  - {fileID: 977502592}
+  - {fileID: 1027978383}
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

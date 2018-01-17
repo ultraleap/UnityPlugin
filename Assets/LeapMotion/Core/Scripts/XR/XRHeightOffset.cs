@@ -58,11 +58,11 @@ public class XRHeightOffset : MonoBehaviour {
 
   [DisableIf("enableRuntimeAdjustment", isEqualTo: false)]
   [Tooltip("Press this key on the keyboard to adjust the height offset up by stepSize.")]
-  public string stepUpKey = "up";
+  public KeyCode stepUpKey = KeyCode.UpArrow;
 
   [DisableIf("enableRuntimeAdjustment", isEqualTo: false)]
   [Tooltip("Press this key on the keyboard to adjust the height offset down by stepSize.")]
-  public string stepDownKey = "down";
+  public KeyCode stepDownKey = KeyCode.DownArrow;
 
   [DisableIf("enableRuntimeAdjustment", isEqualTo: false)]
   public float stepSize = 0.1f;

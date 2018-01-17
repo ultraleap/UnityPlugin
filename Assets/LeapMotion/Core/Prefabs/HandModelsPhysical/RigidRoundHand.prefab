@@ -1096,7 +1096,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   group:
     GroupName: 
-    _handPool: {fileID: 0}
+    _handModelManager: {fileID: 0}
     LeftModel: {fileID: 0}
     IsLeftToBeSpawned: 0
     RightModel: {fileID: 0}
@@ -1106,7 +1106,7 @@ MonoBehaviour:
     HandPostProcesses:
       m_PersistentCalls:
         m_Calls: []
-      m_TypeName: Leap.Unity.Hands+HandEvent, Core, Version=0.0.0.0, Culture=neutral,
+      m_TypeName: Leap.Unity.Hands+HandEvent, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
         PublicKeyToken=null
   handedness: 2
   handModelPalmWidth: 0.085

@@ -5105,10 +5105,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c592f16851a620743868a31232613370, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _modelsParent: {fileID: 0}
+  _leapProvider: {fileID: 0}
   ModelPool:
   - GroupName: Graphics
-    _handPool: {fileID: 0}
+    _handModelManager: {fileID: 0}
     LeftModel: {fileID: 795012429}
     IsLeftToBeSpawned: 0
     RightModel: {fileID: 422496980}
@@ -5118,10 +5118,10 @@ MonoBehaviour:
     HandPostProcesses:
       m_PersistentCalls:
         m_Calls: []
-      m_TypeName: Leap.Unity.Hands+HandEvent, Core, Version=0.0.0.0, Culture=neutral,
+      m_TypeName: Leap.Unity.Hands+HandEvent, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
         PublicKeyToken=null
   - GroupName: Physics
-    _handPool: {fileID: 0}
+    _handModelManager: {fileID: 0}
     LeftModel: {fileID: 2146837084}
     IsLeftToBeSpawned: 0
     RightModel: {fileID: 1850174496}
@@ -5131,7 +5131,7 @@ MonoBehaviour:
     HandPostProcesses:
       m_PersistentCalls:
         m_Calls: []
-      m_TypeName: Leap.Unity.Hands+HandEvent, Core, Version=0.0.0.0, Culture=neutral,
+      m_TypeName: Leap.Unity.Hands+HandEvent, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
         PublicKeyToken=null
 --- !u!114 &1419902426
 MonoBehaviour:
@@ -5358,12 +5358,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   editTimePose: 0
-  _isHeadMounted: 1
-  _temporalWarping: {fileID: 531819953}
   _frameOptimization: 0
   _physicsExtrapolation: 1
   _physicsExtrapolationTime: 0.011111111
-  _updateHandInPrecull: 0
 --- !u!4 &1587970164
 Transform:
   m_ObjectHideFlags: 0
@@ -6482,7 +6479,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _eyeType:
     _orderType: 3
-  _overrideEyePosition: 0
 --- !u!114 &2098797252
 MonoBehaviour:
   m_ObjectHideFlags: 0

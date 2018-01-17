@@ -12667,6 +12667,7 @@ MonoBehaviour:
   _hoverEnabled: 1
   _contactEnabled: 1
   _graspingEnabled: 1
+  _leapProvider: {fileID: 0}
   _handDataMode: 1
   enabledPrimaryHoverFingertips: 0101010000
 --- !u!114 &114564453463860592
@@ -12706,7 +12707,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c592f16851a620743868a31232613370, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _modelsParent: {fileID: 0}
+  _leapProvider: {fileID: 0}
   ModelPool: []
 --- !u!114 &114631939688201826
 MonoBehaviour:
@@ -13036,6 +13037,7 @@ MonoBehaviour:
   _hoverEnabled: 1
   _contactEnabled: 1
   _graspingEnabled: 1
+  _leapProvider: {fileID: 0}
   _handDataMode: 0
   enabledPrimaryHoverFingertips: 0101010000
 --- !u!114 &114951262622273250

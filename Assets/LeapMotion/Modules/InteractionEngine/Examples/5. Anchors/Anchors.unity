@@ -411,8 +411,8 @@ MonoBehaviour:
   _stationaryHeightOffset: 1.6
   autoRecenterOnUserPresence: 1
   enableRuntimeAdjustment: 1
-  stepUpKey: up
-  stepDownKey: down
+  stepUpKey: 273
+  stepDownKey: 274
   stepSize: 0.1
 --- !u!4 &13100235
 Transform:
@@ -15277,6 +15277,7 @@ MonoBehaviour:
   _hoverEnabled: 1
   _contactEnabled: 1
   _graspingEnabled: 1
+  _leapProvider: {fileID: 0}
   _handDataMode: 1
   enabledPrimaryHoverFingertips: 0101010000
 --- !u!1 &1175230011
@@ -18595,6 +18596,7 @@ MonoBehaviour:
   _hoverEnabled: 1
   _contactEnabled: 1
   _graspingEnabled: 1
+  _leapProvider: {fileID: 0}
   _handDataMode: 0
   enabledPrimaryHoverFingertips: 0101010000
 --- !u!1 &1448770149

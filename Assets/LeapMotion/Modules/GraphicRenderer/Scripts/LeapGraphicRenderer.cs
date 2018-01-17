@@ -260,10 +260,6 @@ namespace Leap.Unity.GraphicalRenderer {
         onRuntimeSpaceChanged();
       }
 
-      if (_lastSpaceWasNull && _space != null) {
-        Debug.Log("REMOVAL UNDO DETECTED");
-      }
-
       _lastSpaceWasNull = _space == null;
     }
 

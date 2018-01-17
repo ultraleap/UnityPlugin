@@ -886,7 +886,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   group:
     GroupName: 
-    _handPool: {fileID: 0}
+    _handModelManager: {fileID: 0}
     LeftModel: {fileID: 0}
     IsLeftToBeSpawned: 0
     RightModel: {fileID: 0}

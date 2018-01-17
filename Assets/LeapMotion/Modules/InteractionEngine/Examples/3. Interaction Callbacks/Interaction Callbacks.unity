@@ -6929,8 +6929,8 @@ MonoBehaviour:
   _stationaryHeightOffset: 1.6
   autoRecenterOnUserPresence: 1
   enableRuntimeAdjustment: 1
-  stepUpKey: up
-  stepDownKey: down
+  stepUpKey: 273
+  stepDownKey: 274
   stepSize: 0.1
 --- !u!4 &1865366725
 Transform:
