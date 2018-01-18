@@ -371,7 +371,7 @@ namespace Leap.Unity {
 
     protected virtual long CalculateInterpolationTime(bool endOfFrame = false) {
       #if UNITY_ANDROID && !UNITY_EDITOR
-      return leap_controller_.Now() - 16000;
+      return _leapController.Now() - 16000;
       #else
       if (_leapController != null) {
         return _leapController.Now() - (long)_smoothedTrackingLatency.value;
