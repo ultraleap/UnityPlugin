@@ -14,30 +14,34 @@ using Leap.Unity.Attributes;
 
 namespace Leap.Unity {
 
+  [ExecuteInEditMode]
   public class XRHeightOffset : MonoBehaviour {
 
     #region Inspector
 
-    [Header("Height Offset When XR Space Tracking Type Is Stationary")]
+    [Header("Room-scale Height Offset")]
 
     [SerializeField]
-    [OnEditorChange("stationaryHeightOffset")]
-    [Tooltip("This offset only used when the XR space tracking type is 'Stationary.' This "
-         + "is the tracking type for Oculus setups with a single tracking camera and "
-         + "for Android VR devices without position tracking. Two-camera Oculus setups "
-         + "and Vive headsets, for example, do not require a height offset. They center "
-         + "the room-scale floor on the Rig transform, and this script will not apply "
-         + "a height offset when the RoomScale space-tracking type is detected.")]
-    private float _stationaryHeightOffset = 1.6f; // average human height (or so)
-    private float _lastKnownStationaryHeightOffset = 0f;
-    public float stationaryHeightOffset {
-      get { return _stationaryHeightOffset; }
+    [OnEditorChange("roomScaleHeightOffset")]
+    [Tooltip("This height offset allows you to place your Rig's base location at the "
+           + "approximate head position of your player during edit-time, while still "
+           + "providing correct cross-platform XR rig heights. If the tracking space "
+           + "type is detected as RoomScale, the Rig will be shifted DOWN by this height "
+           + "on Start, matching the expected floor height for, e.g., SteamVR, "
+           + "while the rig remains unchanged for Android VR and Oculus single-camera "
+           + "targets. "
+           + "Use the magenta gizmo as a reference; the circles represent where your "
+           + "floor will be in a Room-scale experience.")]
+    [MinValue(0f)]
+    private float _roomScaleHeightOffset = 1.6f; // average human height (or so)
+    private float _lastKnownHeightOffset = 0f;
+    public float roomScaleHeightOffset {
+      get { return _roomScaleHeightOffset; }
       set {
-        _stationaryHeightOffset = value;
+        _roomScaleHeightOffset = value;
         this.transform.position += this.transform.up
-                                   * (_stationaryHeightOffset
-                                      - _lastKnownStationaryHeightOffset);
-        _lastKnownStationaryHeightOffset = value;
+                                   * (_roomScaleHeightOffset - _lastKnownHeightOffset);
+        _lastKnownHeightOffset = value;
       }
     }
 
@@ -59,6 +63,8 @@ namespace Leap.Unity {
 
     [Header("Runtime Height Adjustment")]
 
+    [Tooltip("If enabled, then you can use the chosen keys to step the player's height "
+           + "up and down at runtime. This method ")]
     public bool enableRuntimeAdjustment = true;
 
     [DisableIf("enableRuntimeAdjustment", isEqualTo: false)]
@@ -79,49 +85,92 @@ namespace Leap.Unity {
     #region Unity Events
 
     private void Start() {
+      _lastKnownHeightOffset = _roomScaleHeightOffset;
       var trackingSpaceType = UnityEngine.XR.XRDevice.GetTrackingSpaceType();
       if (trackingSpaceType == UnityEngine.XR.TrackingSpaceType.RoomScale) {
-        _stationaryHeightOffset = 0f;
+        this.transform.position -= this.transform.up * _roomScaleHeightOffset;
       }
-      stationaryHeightOffset = _stationaryHeightOffset;
 
       // Auto recenter
-      var userPresence = UnityEngine.XR.XRDevice.userPresence;
+      if (Application.isPlaying) {
+        var userPresence = UnityEngine.XR.XRDevice.userPresence;
 
-      if (userPresence == UnityEngine.XR.UserPresenceState.Unsupported) {
-        Debug.Log("[XRAutoRecenter] XR UserPresenceState unsupported; "
-                + "disabling autoRecenterOnUserPresence. (XR support is probably disabled.)");
-        autoRecenterOnUserPresence = false;
+        if (userPresence == UnityEngine.XR.UserPresenceState.Unsupported) {
+          Debug.Log("[XRAutoRecenter] XR UserPresenceState unsupported; "
+                  + "disabling autoRecenterOnUserPresence. (XR support is probably disabled.)");
+          autoRecenterOnUserPresence = false;
+        }
       }
     }
 
     private void Update() {
-      var deviceIsPresent = UnityEngine.XR.XRDevice.isPresent;
-      if (deviceIsPresent) {
+      if (Application.isPlaying) {
+        var deviceIsPresent = UnityEngine.XR.XRDevice.isPresent;
+        if (deviceIsPresent) {
 
-        if (enableRuntimeAdjustment) {
-          if (Input.GetKeyDown(stepUpKey)) {
-            stationaryHeightOffset += stepSize;
-          }
-
-          if (Input.GetKeyDown(stepDownKey)) {
-            stationaryHeightOffset -= stepSize;
-          }
-        }
-
-        var trackingSpaceType = UnityEngine.XR.XRDevice.GetTrackingSpaceType();
-        if (trackingSpaceType == UnityEngine.XR.TrackingSpaceType.Stationary
-            && autoRecenterOnUserPresence) {
-          var userPresence = UnityEngine.XR.XRDevice.userPresence;
-
-          if (_lastUserPresence != userPresence) {
-            if (userPresence == UnityEngine.XR.UserPresenceState.Present) {
-              UnityEngine.XR.InputTracking.Recenter();
+          if (enableRuntimeAdjustment) {
+            if (Input.GetKeyDown(stepUpKey)) {
+              roomScaleHeightOffset += stepSize;
             }
 
-            _lastUserPresence = userPresence;
+            if (Input.GetKeyDown(stepDownKey)) {
+              roomScaleHeightOffset -= stepSize;
+            }
+          }
+
+          var trackingSpaceType = UnityEngine.XR.XRDevice.GetTrackingSpaceType();
+          if (trackingSpaceType == UnityEngine.XR.TrackingSpaceType.Stationary
+              && autoRecenterOnUserPresence) {
+            var userPresence = UnityEngine.XR.XRDevice.userPresence;
+
+            if (_lastUserPresence != userPresence) {
+              if (userPresence == UnityEngine.XR.UserPresenceState.Present) {
+                UnityEngine.XR.InputTracking.Recenter();
+              }
+
+              _lastUserPresence = userPresence;
+            }
           }
         }
+      }
+    }
+
+    #endregion
+
+    #region 
+
+    private void OnDrawGizmos() {
+      Gizmos.color = Color.magenta.WithAlpha(0.5f);
+
+      var totalHeight = roomScaleHeightOffset;
+      var segmentsPerMeter = 32;
+      var numSegments = totalHeight * segmentsPerMeter;
+      var segmentLength = totalHeight / numSegments;
+      var rigPos = this.transform.position;
+      var down = this.transform.rotation * Vector3.down;
+
+      for (int i = 0; i < numSegments; i += 2) {
+        var segStart = rigPos + down * segmentLength * i;
+        var segEnd   = rigPos + down * segmentLength * (i + 1);
+
+        Gizmos.DrawLine(segStart, segEnd);
+      }
+
+      var groundPos = rigPos + down * totalHeight;
+      drawCircle(groundPos, down, 0.01f);
+      Gizmos.color = Color.magenta.WithAlpha(0.3f);
+      drawCircle(groundPos, down, 0.10f);
+      Gizmos.color = Color.magenta.WithAlpha(0.2f);
+      drawCircle(groundPos, down, 0.20f);
+    }
+
+    private void drawCircle(Vector3 position, Vector3 normal, float radius) {
+      var r = normal.Perpendicular() * radius;
+      var q = Quaternion.AngleAxis(360f / 32, normal);
+      for (int i = 0; i < 32; i++) {
+        var tempR = q * r;
+        Gizmos.DrawLine(position + r, position + tempR);
+        r = tempR;
       }
     }
 

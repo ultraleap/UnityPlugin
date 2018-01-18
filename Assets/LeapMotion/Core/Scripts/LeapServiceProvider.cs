@@ -97,6 +97,15 @@ namespace Leap.Unity {
 
     #if UNITY_EDITOR
 
+    private Frame _backingUntransformedEditTimeFrame = null;
+    private Frame _untransformedEditTimeFrame {
+      get {
+        if (_backingUntransformedEditTimeFrame == null) {
+          _backingUntransformedEditTimeFrame = new Frame();
+        }
+        return _backingUntransformedEditTimeFrame;
+      }
+    }
     private Frame _backingEditTimeFrame = null;
     private Frame _editTimeFrame {
       get {
@@ -116,8 +125,7 @@ namespace Leap.Unity {
           return cachedHand;
         }
         else {
-          cachedHand = TestHandFactory.MakeTestHand(isLeft: true, pose: editTimePose,
-                                         unitType: TestHandFactory.UnitType.UnityUnits);
+          cachedHand = TestHandFactory.MakeTestHand(isLeft: true, pose: editTimePose);
           _cachedLeftHands[editTimePose] = cachedHand;
           return cachedHand;
         }
@@ -133,8 +141,7 @@ namespace Leap.Unity {
           return cachedHand;
         }
         else {
-          cachedHand = TestHandFactory.MakeTestHand(isLeft: false, pose: editTimePose,
-                                         unitType: TestHandFactory.UnitType.UnityUnits);
+          cachedHand = TestHandFactory.MakeTestHand(isLeft: false, pose: editTimePose);
           _cachedRightHands[editTimePose] = cachedHand;
           return cachedHand;
         }
@@ -151,9 +158,10 @@ namespace Leap.Unity {
       get {
         #if UNITY_EDITOR
         if (!Application.isPlaying) {
-          _editTimeFrame.Hands.Clear();
-          _editTimeFrame.Hands.Add(_editTimeLeftHand);
-          _editTimeFrame.Hands.Add(_editTimeRightHand);
+          _untransformedEditTimeFrame.Hands.Clear();
+          _untransformedEditTimeFrame.Hands.Add(_editTimeLeftHand);
+          _untransformedEditTimeFrame.Hands.Add(_editTimeRightHand);
+          transformFrame(_untransformedEditTimeFrame, _editTimeFrame);
           return _editTimeFrame;
         }
         #endif
