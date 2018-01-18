@@ -169,8 +169,10 @@ namespace Leap.Unity {
     protected Vector3    warpedPosition = Vector3.zero;
     protected Quaternion warpedRotation = Quaternion.identity;
     protected Matrix4x4[] _transformArray = new Matrix4x4[2];
+    private Pose _trackingBaseDeltaPose = Pose.identity;
 
     private Camera _cachedCamera;
+
 
     [NonSerialized]
     public long imageTimeStamp = 0;
@@ -196,6 +198,10 @@ namespace Leap.Unity {
     protected override void Start() {
       base.Start();
       _cachedCamera = GetComponent<Camera>();
+
+      _trackingBaseDeltaPose = Camera.main.transform.ToLocalPose()
+                                 .From(new Pose(InputTracking.GetLocalPosition(XRNode.CenterEye),
+                                                InputTracking.GetLocalRotation(XRNode.CenterEye)));
     }
 
     protected override void Update() {
@@ -211,10 +217,10 @@ namespace Leap.Unity {
       }
       #endif
 
-      transformHistory.UpdateDelay(
-        InputTracking.GetLocalPosition(XRNode.CenterEye),
-        InputTracking.GetLocalRotation(XRNode.CenterEye),
-        _leapController.Now());
+      var effTransformPose = new Pose(InputTracking.GetLocalPosition(XRNode.CenterEye),
+                                      InputTracking.GetLocalRotation(XRNode.CenterEye))
+                               .Then(_trackingBaseDeltaPose);
+      transformHistory.UpdateDelay(effTransformPose, _leapController.Now());
 
       OnPreCullHandTransforms(_cachedCamera);
     }

@@ -19,12 +19,12 @@ namespace Leap.Unity {
     }
 
     //Store current Transform in History
-    public void UpdateDelay(Vector3 curPos, Quaternion curRot, long timestamp) {
+    public void UpdateDelay(Pose curPose, long timestamp) {
       TransformData currentTransform =
         new TransformData() {
           time = timestamp,
-          position = curPos,
-          rotation = curRot,
+          position = curPose.position,
+          rotation = curPose.rotation,
         };
 
       history.Add(currentTransform);
