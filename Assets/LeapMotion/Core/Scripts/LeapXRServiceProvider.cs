@@ -220,7 +220,7 @@ namespace Leap.Unity {
       // If we don't know of any pose offset yet, account for it by finding the pose
       // delta from the "local" tracked pose to the actual camera pose.
       if (!_trackingBaseDeltaPose.HasValue) {
-        _trackingBaseDeltaPose = _cachedCamera.transform.ToWorldPose().From(trackedPose);
+        _trackingBaseDeltaPose = _cachedCamera.transform.ToLocalPose().From(trackedPose);
       }
       
       // This way, we always track a scene-space tracked pose.
