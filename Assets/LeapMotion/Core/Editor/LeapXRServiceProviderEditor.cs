@@ -37,7 +37,7 @@ namespace Leap.Unity {
       targetPlatform = "Standalone (Desktop)";
 #elif UNITY_ANDROID
       pcOrAndroidPlatformDetected = true;
-      targetPlatform = "Android"
+      targetPlatform = "Android";
 #endif
 
       if (pcOrAndroidPlatformDetected && property.boolValue) {
