@@ -206,31 +206,6 @@ namespace Leap.Unity {
       imageTimeStamp = _leapController.FrameTimestamp();
     }
 
-    void OnPreCull() {
-      #if UNITY_EDITOR
-      if (!Application.isPlaying) {
-        return;
-      }
-      #endif
-
-      // Get most recent tracked pose.
-      var trackedPose = new Pose(InputTracking.GetLocalPosition(XRNode.CenterEye),
-                                 InputTracking.GetLocalRotation(XRNode.CenterEye));
-
-      // If we don't know of any pose offset yet, account for it by finding the pose
-      // delta from the "local" tracked pose to the actual camera pose.
-      if (!_trackingBaseDeltaPose.HasValue) {
-        _trackingBaseDeltaPose = _cachedCamera.transform.ToLocalPose().From(trackedPose);
-      }
-      
-      // This way, we always track a scene-space tracked pose.
-      var effTransformPose = trackedPose.Then(_trackingBaseDeltaPose.Value);
-
-      transformHistory.UpdateDelay(effTransformPose, _leapController.Now());
-
-      OnPreCullHandTransforms(_cachedCamera);
-    }
-
     void LateUpdate() {
       var projectionMatrix = _cachedCamera.projectionMatrix;
       switch (SystemInfo.graphicsDeviceType) {
@@ -271,6 +246,31 @@ namespace Leap.Unity {
                                * Matrix4x4.TRS(Vector3.zero, imageQuatWarp, Vector3.one)
                                * projectionMatrix.inverse;
       Shader.SetGlobalMatrix("_LeapGlobalWarpedOffset", imageMatWarp);
+    }
+
+    void OnPreCull() {
+      #if UNITY_EDITOR
+      if (!Application.isPlaying) {
+        return;
+      }
+#endif
+
+      // Get most recent tracked pose.
+      var trackedPose = new Pose(InputTracking.GetLocalPosition(XRNode.CenterEye),
+                                 InputTracking.GetLocalRotation(XRNode.CenterEye));
+
+      // If we don't know of any pose offset yet, account for it by finding the pose
+      // delta from the "local" tracked pose to the actual camera pose.
+      if (!_trackingBaseDeltaPose.HasValue) {
+        _trackingBaseDeltaPose = _cachedCamera.transform.ToLocalPose().From(trackedPose);
+      }
+      
+      // This way, we always track a scene-space tracked pose.
+      var effTransformPose = trackedPose.Then(_trackingBaseDeltaPose.Value);
+
+      transformHistory.UpdateDelay(effTransformPose, _leapController.Now());
+
+      OnPreCullHandTransforms(_cachedCamera);
     }
 
     #endregion
@@ -327,47 +327,48 @@ namespace Leap.Unity {
     protected virtual LeapTransform GetWarpedMatrix(long timestamp,
                                                     bool updateTemporalCompensation = true) {
       LeapTransform leapTransform;
-      if (XRSettings.enabled && XRDevice.isPresent && transformHistory != null) {
-        if (updateTemporalCompensation && transformHistory.history.IsFull) {
-          transformHistory.SampleTransform(timestamp
-                                           - (long)(warpingAdjustment * 1000f)
-                                           - (_temporalWarpingMode ==
-                                           TemporalWarpingMode.Images ? -20000 : 
-                                           (long)(_smoothedTrackingLatency.value)),
-                                           out warpedPosition, out warpedRotation);
-        }
-        
-        Vector3    currentPosition;
-        Quaternion currentRotation;
-        transformHistory.SampleTransform(timestamp, out currentPosition,
-                                                    out currentRotation);
 
-        warpedPosition = _temporalWarpingMode != TemporalWarpingMode.Off ? 
-                                              warpedPosition : currentPosition;
-        warpedRotation = _temporalWarpingMode != TemporalWarpingMode.Off ? 
-                                              warpedRotation : currentRotation;
-
-        warpedRotation *= Quaternion.Euler(deviceTiltXAxis, 0f, 0f);
-        warpedRotation *= Quaternion.Euler(-90f, 180f, 0f);
-
-        // Yes, up corresponds to Z and forward corresponds to Y post-rotation.
-        warpedPosition += warpedRotation * Vector3.up * deviceOffsetZAxis
-                        + warpedRotation * Vector3.forward * deviceOffsetYAxis;
-
-        if (transform.parent != null) {
-          leapTransform = new LeapTransform(
-            transform.parent.TransformPoint(warpedPosition).ToVector(),
-            (transform.parent.rotation * warpedRotation).ToLeapQuaternion(),
-            transform.lossyScale.ToVector() * 1e-3f);
-        } else {
-          leapTransform = new LeapTransform(warpedPosition.ToVector(),
-                                            warpedRotation.ToLeapQuaternion(),
-                                            transform.lossyScale.ToVector() * 1e-3f);
-        }
-        leapTransform.MirrorZ();
-      } else {
-        leapTransform = transform.GetLeapMatrix();
+      if (updateTemporalCompensation && transformHistory.history.IsFull) {
+        transformHistory.SampleTransform(timestamp
+                                         - (long)(warpingAdjustment * 1000f)
+                                         - (_temporalWarpingMode ==
+                                         TemporalWarpingMode.Images ? -20000 :
+                                         (long)(_smoothedTrackingLatency.value)),
+                                         out warpedPosition, out warpedRotation);
       }
+
+      Vector3    currentPosition;
+      Quaternion currentRotation;
+      transformHistory.SampleTransform(timestamp, out currentPosition,
+                                                  out currentRotation);
+
+      warpedPosition = _temporalWarpingMode != TemporalWarpingMode.Off ?
+                                            warpedPosition : currentPosition;
+      warpedRotation = _temporalWarpingMode != TemporalWarpingMode.Off ?
+                                            warpedRotation : currentRotation;
+
+      warpedRotation *= Quaternion.Euler(deviceTiltXAxis, 0f, 0f);
+      warpedRotation *= Quaternion.Euler(-90f, 180f, 0f);
+
+      // Yes, up corresponds to Z and forward corresponds to Y post-rotation.
+      warpedPosition += warpedRotation * Vector3.up * deviceOffsetZAxis
+                      + warpedRotation * Vector3.forward * deviceOffsetYAxis;
+
+      if (transform.parent != null) {
+        leapTransform = new LeapTransform(
+          transform.parent.TransformPoint(warpedPosition).ToVector(),
+          (transform.parent.rotation * warpedRotation).ToLeapQuaternion(),
+          transform.lossyScale.ToVector() * 1e-3f);
+      }
+      else {
+        leapTransform = new LeapTransform(warpedPosition.ToVector(),
+                                          warpedRotation.ToLeapQuaternion(),
+                                          transform.lossyScale.ToVector() * 1e-3f);
+      }
+
+      leapTransform.MirrorZ();
+
+
       return leapTransform;
     }
 
