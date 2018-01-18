@@ -38,12 +38,13 @@ namespace Leap.Unity.VRVisualizer{
 
     private void goVR() {
       m_PCVisualizer.gameObject.SetActive(false);
-      m_VRVisualizer.gameObject.SetActive(true);
 
       var provider = m_VRVisualizer.gameObject
                                    .GetComponentInChildren<LeapXRServiceProvider>();
       m_VRVisualizer.gameObject.GetComponentInChildren<HandModelManager>()
                                .leapProvider = provider;
+      m_VRVisualizer.gameObject.SetActive(true);
+
 
       m_warningText.text = "Please put on your head-mounted display";      
     }

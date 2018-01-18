@@ -137,10 +137,10 @@ namespace Leap.Unity {
 
     #endregion
 
-    #region 
+    #region Gizmos
 
     private void OnDrawGizmos() {
-      Gizmos.color = Color.magenta.WithAlpha(0.5f);
+      Gizmos.color = Color.Lerp(Color.magenta, Color.white, 0.3f).WithAlpha(0.5f);
 
       var totalHeight = roomScaleHeightOffset;
       var segmentsPerMeter = 32;
@@ -148,6 +148,14 @@ namespace Leap.Unity {
       var segmentLength = totalHeight / numSegments;
       var rigPos = this.transform.position;
       var down = this.transform.rotation * Vector3.down;
+      
+      if (Application.isPlaying
+          && UnityEngine.XR.XRDevice.GetTrackingSpaceType()
+             == UnityEngine.XR.TrackingSpaceType.RoomScale) {
+        var roomScaleGizmoOffset = Vector3.up * totalHeight;
+
+        rigPos += roomScaleGizmoOffset;
+      }
 
       for (int i = 0; i < numSegments; i += 2) {
         var segStart = rigPos + down * segmentLength * i;
@@ -158,9 +166,9 @@ namespace Leap.Unity {
 
       var groundPos = rigPos + down * totalHeight;
       drawCircle(groundPos, down, 0.01f);
-      Gizmos.color = Color.magenta.WithAlpha(0.3f);
+      Gizmos.color = Gizmos.color.WithAlpha(0.3f);
       drawCircle(groundPos, down, 0.10f);
-      Gizmos.color = Color.magenta.WithAlpha(0.2f);
+      Gizmos.color = Gizmos.color.WithAlpha(0.2f);
       drawCircle(groundPos, down, 0.20f);
     }
 
