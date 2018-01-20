@@ -412,6 +412,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 193323430}
+  - component: {fileID: 193323431}
   m_Layer: 0
   m_Name: LMHeadMountedRig
   m_TagString: Untagged
@@ -426,7 +427,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 193323429}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.112, z: 0}
+  m_LocalPosition: {x: 0, y: 0.258, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 2098797247}
@@ -434,6 +435,25 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &193323431
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 193323429}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fb8f8839ee256bb458e1657c1ee40572, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _deviceOffsets:
+  - DeviceName: oculus
+    HeightOffset: 0
+  - DeviceName: openvr
+    HeightOffset: -1.7
+  moveUpKey: 0
+  moveDownKey: 0
+  stepSize: 0.1
 --- !u!1001 &328274767
 Prefab:
   m_ObjectHideFlags: 0
@@ -510,8 +530,8 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 420189611}
-  m_LocalRotation: {x: 0.045787137, y: -0.7563554, z: 0.64989686, w: 0.058857676}
-  m_LocalPosition: {x: -0.026117375, y: 0.059976786, z: 0.14833032}
+  m_LocalRotation: {x: 0.000000084293724, y: -0.7071066, z: 0.70710695, w: 0.00000008429367}
+  m_LocalPosition: {x: -0.026117375, y: 0.05997677, z: 0.14833032}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 795012431}
@@ -838,6 +858,11 @@ Prefab:
         type: 2}
       propertyPath: m_LocalPosition.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 224000011045273006, guid: ed811e274f5753b478b84e8424f730ef,
+        type: 2}
+      propertyPath: m_AnchorMin.x
+      value: 0.00000003196227
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: ed811e274f5753b478b84e8424f730ef, type: 2}
@@ -1234,8 +1259,8 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1188448098}
-  m_LocalRotation: {x: -0.045786973, y: -0.75635546, z: 0.6498968, w: -0.05885749}
-  m_LocalPosition: {x: 0.026117463, y: 0.059976786, z: 0.14833029}
+  m_LocalRotation: {x: 0.00000014611095, y: -0.7071066, z: 0.70710695, w: 0.00000014611092}
+  m_LocalPosition: {x: 0.02611747, y: 0.05997677, z: 0.14833032}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 422496982}
@@ -1310,7 +1335,7 @@ MonoBehaviour:
     HandPostProcesses:
       m_PersistentCalls:
         m_Calls: []
-      m_TypeName: Leap.Unity.Hands+HandEvent, Core, Version=0.0.0.0, Culture=neutral,
+      m_TypeName: Leap.Unity.Hands+HandEvent, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
         PublicKeyToken=null
 --- !u!114 &1419902426
 MonoBehaviour:
