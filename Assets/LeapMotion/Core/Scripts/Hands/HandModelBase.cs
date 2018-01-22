@@ -56,6 +56,7 @@ namespace Leap.Unity {
       return false;
     }
 
+    [NonSerialized]
     public HandModelManager.ModelGroup group;
 
 #if UNITY_EDITOR
