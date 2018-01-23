@@ -8,7 +8,6 @@
  ******************************************************************************/
 
 using UnityEngine;
-using UnityEngine.XR;
 using Leap.Unity;
 using Leap;
 using System.Collections;
@@ -78,7 +77,9 @@ namespace Leap.Unity.InputModule {
     void Update() {
       Frame curFrame = LeapDataProvider.CurrentFrame.TransformedCopy(LeapTransform.Identity);
 
-      Quaternion HeadYaw = Quaternion.Euler(0f, InputTracking.GetLocalRotation(XRNode.Head).eulerAngles.y, 0f);
+
+
+      Quaternion HeadYaw = Quaternion.Euler(0f, XRSupportUtil.GetXRNodeHeadLocalRotation().eulerAngles.y, 0f);
       CurrentRotation = Quaternion.Slerp(CurrentRotation, HeadYaw, 0.1f);
 
       for (int whichHand = 0; whichHand < 2; whichHand++) {
@@ -96,10 +97,10 @@ namespace Leap.Unity.InputModule {
         Vector3 ProjectionOrigin = Vector3.zero;
         switch (curFrame.Hands[whichHand].IsRight) {
           case true:
-            ProjectionOrigin = InputTracking.GetLocalPosition(XRNode.Head) + CurrentRotation * new Vector3(0.15f, -0.13f, 0.1f);
+            ProjectionOrigin = XRSupportUtil.GetXRNodeHeadLocalPosition() + CurrentRotation * new Vector3(0.15f, -0.13f, 0.1f);
             break;
           case false:
-            ProjectionOrigin = InputTracking.GetLocalPosition(XRNode.Head) + CurrentRotation * new Vector3(-0.15f, -0.13f, 0.1f);
+            ProjectionOrigin = XRSupportUtil.GetXRNodeHeadLocalPosition() + CurrentRotation * new Vector3(-0.15f, -0.13f, 0.1f);
             break;
         }
 

@@ -33,7 +33,7 @@ namespace Leap.Unity.Interaction {
   /// Leap Motion Controller, or by remote-style held controllers
   /// such as the Oculus Touch or Vive controller.
   /// </summary>
-  public enum ControllerType { Hand, VRController }
+  public enum ControllerType { Hand, XRController }
 
   [DisallowMultipleComponent]
   public abstract class InteractionController : MonoBehaviour,

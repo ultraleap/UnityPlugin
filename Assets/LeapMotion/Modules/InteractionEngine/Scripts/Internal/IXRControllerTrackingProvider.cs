@@ -22,7 +22,7 @@ namespace Leap.Unity.Interaction {
   /// 
   /// For a reference implementation, refer to DefaultVRNodeTrackingProvider.
   /// </summary>
-  public interface IVRControllerTrackingProvider {
+  public interface IXRControllerTrackingProvider {
 
     /// <summary>
     /// Gets whether or not this provider is currently tracking the controller for which
