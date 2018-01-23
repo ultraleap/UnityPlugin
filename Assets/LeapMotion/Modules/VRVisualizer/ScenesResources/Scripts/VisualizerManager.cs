@@ -8,7 +8,6 @@
  ******************************************************************************/
 
 using UnityEngine;
-using UnityEngine.VR;
 using UnityEngine.SceneManagement;
 using Leap;
 
@@ -56,7 +55,7 @@ namespace Leap.Unity.VRVisualizer{
       if (m_controller != null)
         m_leapConnected = m_controller.IsConnected;
 
-      if (VRDevice.isPresent)
+      if (XRSupportUtil.IsXRDevicePresent())
       {
         Screen.SetResolution(640, 480, false);
         goVR();    

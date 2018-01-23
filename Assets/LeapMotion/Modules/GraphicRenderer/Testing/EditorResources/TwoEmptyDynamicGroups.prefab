@@ -104,11 +104,11 @@ Camera:
   m_TargetEye: 3
   m_HDR: 1
   m_AllowMSAA: 1
+  m_AllowDynamicResolution: 0
   m_ForceIntoRT: 0
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
-  m_StereoMirrorMode: 0
 --- !u!81 &81584541988369508
 AudioListener:
   m_ObjectHideFlags: 1
@@ -137,7 +137,8 @@ MonoBehaviour:
   _selectedGroup: 1
   _space: {fileID: 0}
   _groups:
-  - _renderingMethod:
+  - _groupName: 
+    _renderingMethod:
       _index: 1
       _a: []
       _b:
@@ -213,7 +214,8 @@ MonoBehaviour:
     _graphics: []
     _supportInfo: []
     _addRemoveSupported: 1
-  - _renderingMethod:
+  - _groupName: 
+    _renderingMethod:
       _index: 1
       _a: []
       _b:

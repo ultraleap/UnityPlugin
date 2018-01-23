@@ -12,8 +12,8 @@ using UnityEngine;
 using UnityEditor;
 using UnityEditor.Sprites;
 #endif
+using System;
 using System.Collections.Generic;
-using Leap.Unity.Query;
 
 namespace Leap.Unity.GraphicalRenderer {
 
@@ -21,13 +21,23 @@ namespace Leap.Unity.GraphicalRenderer {
 
 #if UNITY_EDITOR
     public static void ShowInvalidSpriteWarning(IList<LeapGraphicFeatureBase> features) {
-      var anyRectsInvalid = features.Query().
-                                     OfType<LeapSpriteFeature>().
-                                     SelectMany(f => f.featureData.Query().
-                                                                   Select(d => d.sprite)).
-                                     ValidUnityObjs().
-                                     Select(s => GetAtlasedRect(s)).
-                                     Any(r => r.Area() == 0);
+      bool anyRectsInvalid = false;
+      foreach (var feature in features) {
+        var spriteFeature = feature as LeapSpriteFeature;
+        if (spriteFeature == null) continue;
+
+        foreach (var spriteData in spriteFeature.featureData) {
+          var sprite = spriteData.sprite;
+          if (sprite == null) continue;
+
+          Rect rect;
+          if (TryGetAtlasedRect(sprite, out rect)) {
+            if (rect.Area() == 0) {
+              anyRectsInvalid = true;
+            }
+          }
+        }
+      }
 
       if (anyRectsInvalid) {
         EditorGUILayout.HelpBox("Due to a Unity bug, packed sprites may be invalid until " +
@@ -36,8 +46,12 @@ namespace Leap.Unity.GraphicalRenderer {
     }
 #endif
 
-    public static Rect GetAtlasedRect(Sprite sprite) {
-      Vector2[] uvs = GetAtlasedUvs(sprite);
+    public static bool TryGetAtlasedRect(Sprite sprite, out Rect rect) {
+      Vector2[] uvs;
+      if (!TryGetAtlasedUvs(sprite, out uvs)) {
+        rect = default(Rect);
+        return false;
+      }
 
       float minX, minY, maxX, maxY;
       minX = maxX = uvs[0].x;
@@ -50,25 +64,38 @@ namespace Leap.Unity.GraphicalRenderer {
         maxY = Mathf.Max(maxY, uvs[j].y);
       }
 
-      return Rect.MinMaxRect(minX, minY, maxX, maxY);
+      rect = Rect.MinMaxRect(minX, minY, maxX, maxY);
+      return true;
     }
 
-    public static Vector2[] GetAtlasedUvs(Sprite sprite) {
+    public static bool TryGetAtlasedUvs(Sprite sprite, out Vector2[] uvs) {
 #if UNITY_EDITOR
       if (!Application.isPlaying)
-        return getAtlasedUvsEditor(sprite);
+        return tryGetAtlasedUvsEditor(sprite, out uvs);
       else
 #endif
-        return getAtlasedUvsRuntime(sprite);
+        return tryGetAtlasedUvs(sprite, out uvs);
     }
 
-    private static Vector2[] getAtlasedUvsRuntime(Sprite sprite) {
-      return sprite.uv;
+    private static bool tryGetAtlasedUvs(Sprite sprite, out Vector2[] uvs) {
+      if (sprite.packed) {
+        uvs = sprite.uv;
+        return true;
+      } else {
+        uvs = null;
+        return false;
+      }
     }
 
 #if UNITY_EDITOR
-    private static Vector2[] getAtlasedUvsEditor(Sprite sprite) {
-      return SpriteUtility.GetSpriteUVs(sprite, getAtlasData: true);
+    private static bool tryGetAtlasedUvsEditor(Sprite sprite, out Vector2[] uvs) {
+      try {
+        uvs = SpriteUtility.GetSpriteUVs(sprite, getAtlasData: true);
+        return true;
+      } catch (Exception) {
+        uvs = null;
+        return false;
+      }
     }
 #endif
   }

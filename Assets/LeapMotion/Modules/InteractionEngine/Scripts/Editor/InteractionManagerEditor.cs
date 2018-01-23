@@ -221,8 +221,8 @@ namespace Leap.Unity.Interaction {
       if (controller.intHand != null) {
         checkInteractionHandStatus(controller.intHand, messages);
       }
-      else if (controller is InteractionVRController) {
-        checkInteractionVRControllerStatus(controller as InteractionVRController, messages);
+      else if (controller is InteractionXRController) {
+        checkInteractionVRControllerStatus(controller as InteractionXRController, messages);
       }
 
       // Render the status messages.
@@ -337,10 +337,10 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    private InteractionVRController _leftVRNodeController;
-    private InteractionVRController _rightVRNodeController;
+    private InteractionXRController _leftVRNodeController;
+    private InteractionXRController _rightVRNodeController;
 
-    private void checkInteractionVRControllerStatus(InteractionVRController controller,
+    private void checkInteractionVRControllerStatus(InteractionXRController controller,
                                                     List<ControllerStatusMessage> messages) {
       // Check if the controller is configured correctly if it is set up with a custom
       // tracking provider.
@@ -353,9 +353,9 @@ namespace Leap.Unity.Interaction {
       }
 
       // Check if the player has duplicate VRNode left controllers or right controllers.
-      bool isLeftVRNodeController  = controller.trackingProvider is DefaultVRNodeTrackingProvider
+      bool isLeftVRNodeController  = controller.trackingProvider is DefaultXRNodeTrackingProvider
                                   && controller.chirality == Chirality.Left;
-      bool isRightVRNodeController = controller.trackingProvider is DefaultVRNodeTrackingProvider
+      bool isRightVRNodeController = controller.trackingProvider is DefaultXRNodeTrackingProvider
                                   && controller.chirality == Chirality.Right;
 
       if (isLeftVRNodeController && _leftVRNodeController != null

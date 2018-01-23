@@ -62,8 +62,10 @@ namespace Leap.Unity.GraphicalRenderer {
         return _color;
       }
       set {
-        MarkFeatureDirty();
-        _color = value;
+        if (value != _color) {
+          MarkFeatureDirty();
+          _color = value;
+        }
       }
     }
   }

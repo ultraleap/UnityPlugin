@@ -14,7 +14,7 @@ using Leap.Unity.Attributes;
 
 namespace Leap.Unity {
   /** A basic Leap hand model constructed dynamically vs. using pre-existing geometry*/
-  public class CapsuleHand : IHandModel {
+  public class CapsuleHand : HandModelBase {
     private const int TOTAL_JOINT_COUNT = 4 * 5;
     private const float CYLINDER_MESH_RESOLUTION = 0.1f; //in centimeters, meshes within this resolution will be re-used
     private const int THUMB_BASE_INDEX = (int)Finger.FingerType.TYPE_THUMB * 4;
@@ -189,14 +189,14 @@ namespace Leap.Unity {
 
     private void drawSphere(Vector3 position, float radius = SPHERE_RADIUS) {
       //multiply radius by 2 because the default unity sphere has a radius of 0.5 meters at scale 1.
-      Graphics.DrawMesh(_sphereMesh, Matrix4x4.TRS(position, Quaternion.identity, Vector3.one * radius * 2.0f), _sphereMat, 0);
+      Graphics.DrawMesh(_sphereMesh, Matrix4x4.TRS(position, Quaternion.identity, Vector3.one * radius * 2.0f * transform.lossyScale.x), _sphereMat, 0);
     }
 
     private void drawCylinder(Vector3 a, Vector3 b) {
       float length = (a - b).magnitude;
 
       Graphics.DrawMesh(getCylinderMesh(length),
-                        Matrix4x4.TRS(a, Quaternion.LookRotation(b - a), Vector3.one),
+                        Matrix4x4.TRS(a, Quaternion.LookRotation(b - a), new Vector3(transform.lossyScale.x, transform.lossyScale.x, 1)),
                         _material,
                         gameObject.layer);
     }
@@ -239,8 +239,8 @@ namespace Leap.Unity {
 
         Vector3 spoke = new Vector3(dx, dy, 0);
 
-        verts.Add((p0 + spoke) * transform.lossyScale.x);
-        verts.Add((p1 + spoke) * transform.lossyScale.x);
+        verts.Add(p0 + spoke);
+        verts.Add(p1 + spoke);
 
         colors.Add(Color.white);
         colors.Add(Color.white);

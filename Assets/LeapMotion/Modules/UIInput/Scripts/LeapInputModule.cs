@@ -48,19 +48,15 @@ namespace Leap.Unity.InputModule {
     /** The cursor material. */
     public Material PointerMaterial;
     [Tooltip("The color of the pointer when it is hovering over blank canvas.")]
-    [ColorUsageAttribute(true, false, 0, 8, 0.125f, 3)]
     /** The color for the cursor when it is not in a special state. */
     public Color StandardColor = Color.white;
     [Tooltip("The color of the pointer when it is hovering over any other UI element.")]
-    [ColorUsageAttribute(true, false, 0, 8, 0.125f, 3)]
     /** The color for the cursor when it is hovering over a control. */
     public Color HoveringColor = Color.green;
     [Tooltip("The color of the pointer when it is triggering a UI element.")]
-    [ColorUsageAttribute(true, false, 0, 8, 0.125f, 3)]
     /** The color for the cursor when it is actively interacting with a control. */
     public Color TriggeringColor = Color.gray;
     [Tooltip("The color of the pointer when it is triggering blank canvas.")]
-    [ColorUsageAttribute(true, false, 0, 8, 0.125f, 3)]
     /** The color for the cursor when it is touching or triggering a non-active part of the UI (such as the canvas). */
     public Color TriggerMissedColor = Color.gray;
 
@@ -200,7 +196,7 @@ namespace Leap.Unity.InputModule {
     private GameObject[] currentGoing;
     private Vector3 OldCameraPos = Vector3.zero;
     private Quaternion OldCameraRot = Quaternion.identity;
-    private float OldCameraFoV;
+    //private float OldCameraFoV;
     private bool forceProjective = false;
     private bool forceTactile = false;
 
@@ -346,7 +342,7 @@ namespace Leap.Unity.InputModule {
 
       OldCameraPos = Camera.main.transform.position;
       OldCameraRot = Camera.main.transform.rotation;
-      OldCameraFoV = Camera.main.fieldOfView;
+      //OldCameraFoV = Camera.main.fieldOfView;
 
       //Send update events if there is a selected object
       //This is important for InputField to receive keyboard events
@@ -628,7 +624,7 @@ namespace Leap.Unity.InputModule {
 
       Camera.main.transform.position = OldCameraPos;
       Camera.main.transform.rotation = OldCameraRot;
-      Camera.main.fieldOfView = OldCameraFoV;
+      //Camera.main.fieldOfView = OldCameraFoV;
     }
 
     //Raycast from the EventCamera into UI Space
@@ -693,7 +689,7 @@ namespace Leap.Unity.InputModule {
         DebugSphereQueue.Enqueue(Camera.main.transform.position);
 
       //Set EventCamera's FoV
-      Camera.main.fieldOfView = 179f;
+      //Camera.main.fieldOfView = 179f;
 
       //Set the Raycast Direction and Delta
       PointEvents[whichPointer].position = Vector2.Lerp(PrevScreenPosition[whichPointer], Camera.main.WorldToScreenPoint(IndexFingerPosition), 1.0f);//new Vector2(Screen.width / 2, Screen.height / 2);

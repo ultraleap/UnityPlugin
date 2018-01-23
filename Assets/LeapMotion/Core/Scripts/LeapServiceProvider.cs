@@ -20,9 +20,9 @@ namespace Leap.Unity {
   /**LeapServiceProvider creates a Controller and supplies Leap Hands and images */
   public class LeapServiceProvider : LeapProvider {
     /** Conversion factor for nanoseconds to seconds. */
-    protected const float NS_TO_S = 1e-6f;
+    protected const double NS_TO_S = 1e-6;
     /** Conversion factor for seconds to nanoseconds. */
-    protected const float S_TO_NS = 1e6f;
+    protected const double S_TO_NS = 1e6;
     /** Transform Array for Precull Latching **/
     protected const string HAND_ARRAY = "_LeapHandTransforms";
 
@@ -32,16 +32,33 @@ namespace Leap.Unity {
       ReusePhysicsForUpdate,
     }
 
+    public enum PhysicsExtrapolationMode {
+      None,
+      Auto,
+      Manual
+    }
+
     [Tooltip("Set true if the Leap Motion hardware is mounted on an HMD; otherwise, leave false.")]
     [SerializeField]
     protected bool _isHeadMounted = false;
-    
+
     [SerializeField]
     protected LeapVRTemporalWarping _temporalWarping;
 
     [Tooltip("When enabled, the provider will only calculate one leap frame instead of two.")]
     [SerializeField]
     protected FrameOptimizationMode _frameOptimization = FrameOptimizationMode.None;
+
+    [Tooltip("The mode to use when extrapolating physics.\n" +
+             " None - No extrapolation is used at all.\n" +
+             " Auto - Extrapolation is chosen based on the fixed timestep.\n" +
+             " Manual - Extrapolation time is chosen manually by the user.")]
+    [SerializeField]
+    protected PhysicsExtrapolationMode _physicsExtrapolation = PhysicsExtrapolationMode.Auto;
+
+    [Tooltip("The amount of time (in seconds) to extrapolate the phyiscs data by.")]
+    [SerializeField]
+    protected float _physicsExtrapolationTime = 1.0f / 90.0f;
 
     [Header("[Experimental]")]
     [Tooltip("Pass updated transform matrices to objects with materials using the VertexOffsetShader.")]
@@ -50,8 +67,8 @@ namespace Leap.Unity {
 
     protected bool _useInterpolation = true;
 
-//Extrapolate on Android to compensate for the latency introduced by its graphics pipeline
-#if UNITY_ANDROID
+    //Extrapolate on Android to compensate for the latency introduced by its graphics pipeline
+#if UNITY_ANDROID && !UNITY_EDITOR
     protected int ExtrapolationAmount = 15;
     protected int BounceAmount = 70;
 #else
@@ -66,6 +83,7 @@ namespace Leap.Unity {
     protected Quaternion warpedRotation;
     protected SmoothedFloat _fixedOffset = new SmoothedFloat();
     protected SmoothedFloat _smoothedTrackingLatency = new SmoothedFloat();
+    protected long _unityToLeapOffset;
 
     protected Frame _untransformedUpdateFrame;
     protected Frame _transformedUpdateFrame;
@@ -117,6 +135,19 @@ namespace Leap.Unity {
       }
     }
 
+    public float CalculatePhysicsExtrapolation() {
+      switch (_physicsExtrapolation) {
+        case PhysicsExtrapolationMode.None:
+          return 0;
+        case PhysicsExtrapolationMode.Auto:
+          return Time.fixedDeltaTime;
+        case PhysicsExtrapolationMode.Manual:
+          return _physicsExtrapolationTime;
+        default:
+          throw new InvalidOperationException("Unexpected physics extrapolation mode: " + _physicsExtrapolation);
+      }
+    }
+
     /** Returns the Leap Controller instance. */
     public Controller GetLeapController() {
 #if UNITY_EDITOR
@@ -147,7 +178,7 @@ namespace Leap.Unity {
       if (checkShouldEnableHeadMounted()) {
         _isHeadMounted = true;
       }
-      
+
       _temporalWarping = GetComponentInParent<LeapVRTemporalWarping>();
       _frameOptimization = FrameOptimizationMode.None;
       _updateHandInPrecull = false;
@@ -186,11 +217,14 @@ namespace Leap.Unity {
       }
 
       if (_useInterpolation) {
-#if !UNITY_ANDROID
+#if !UNITY_ANDROID || UNITY_EDITOR
         _smoothedTrackingLatency.value = Mathf.Min(_smoothedTrackingLatency.value, 30000f);
         _smoothedTrackingLatency.Update((float)(leap_controller_.Now() - leap_controller_.FrameTimestamp()), Time.deltaTime);
 #endif
-        leap_controller_.GetInterpolatedFrameFromTime(_untransformedUpdateFrame, CalculateInterpolationTime() + (ExtrapolationAmount * 1000), CalculateInterpolationTime() - (BounceAmount * 1000));
+        long timestamp = CalculateInterpolationTime() + (ExtrapolationAmount * 1000);
+        _unityToLeapOffset = timestamp - (long)(Time.time * S_TO_NS);
+
+        leap_controller_.GetInterpolatedFrameFromTime(_untransformedUpdateFrame, timestamp, CalculateInterpolationTime() - (BounceAmount * 1000));
       } else {
         leap_controller_.Frame(_untransformedUpdateFrame);
       }
@@ -211,7 +245,26 @@ namespace Leap.Unity {
       }
 
       if (_useInterpolation) {
-        leap_controller_.GetInterpolatedFrame(_untransformedFixedFrame, CalculateInterpolationTime());
+
+        long timestamp;
+        switch (_frameOptimization) {
+          case FrameOptimizationMode.None:
+            //By default we use Time.fixedTime to ensure that our hands are on the same timeline
+            //as Update.  We add an extrapolation value to help compensate for latency.
+            float extrapolatedTime = Time.fixedTime + CalculatePhysicsExtrapolation();
+            timestamp = (long)(extrapolatedTime * S_TO_NS) + _unityToLeapOffset;
+            break;
+          case FrameOptimizationMode.ReusePhysicsForUpdate:
+            //If we are re-using physics frames for update, we don't even want to care about
+            //Time.fixedTime, just grab the most recent interpolated timestamp like we are
+            //in Update
+            timestamp = CalculateInterpolationTime() + (ExtrapolationAmount * 1000);
+            break;
+          default:
+            throw new InvalidOperationException("Unexpected frame optimization mode: " + _frameOptimization);
+        }
+        leap_controller_.GetInterpolatedFrame(_untransformedFixedFrame, timestamp);
+
       } else {
         leap_controller_.Frame(_untransformedFixedFrame);
       }
@@ -224,7 +277,7 @@ namespace Leap.Unity {
     }
 
     long CalculateInterpolationTime(bool endOfFrame = false) {
-#if UNITY_ANDROID
+#if UNITY_ANDROID && !UNITY_EDITOR
       return leap_controller_.Now() - 16000;
 #else
       if (leap_controller_ != null) {
@@ -265,7 +318,7 @@ namespace Leap.Unity {
     }
 
     private bool checkShouldEnableHeadMounted() {
-      if (UnityEngine.VR.VRSettings.enabled) {
+      if (XRSupportUtil.IsXREnabled()) {
         var parentCamera = GetComponentInParent<Camera>();
         if (parentCamera != null && parentCamera.stereoTargetEye != StereoTargetEyeMask.None) {
 

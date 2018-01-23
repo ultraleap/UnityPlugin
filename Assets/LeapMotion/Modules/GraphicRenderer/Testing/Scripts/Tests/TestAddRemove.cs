@@ -37,45 +37,6 @@ namespace Leap.Unity.GraphicalRenderer.Tests {
     }
 
     /// <summary>
-    /// Validate that we can add a graphic that was spawned in
-    /// as a prefab and then added by enabling the gameobject.
-    /// </summary>
-    [UnityTest]
-    public IEnumerator CanAddPrefabByEnabling() {
-      InitTest("OneEmptyDynamicGroup");
-      yield return null;
-
-      CreateGraphic("DisabledMeshGraphic");
-
-      Assert.That(oneGraphic.OnAwake().hasNotFired);
-      Assert.That(oneGraphic.OnEnable().hasNotFired);
-      Assert.That(oneGraphic.OnStart().hasNotFired);
-
-      Assert.That(oneGraphic.isAttachedToGroup, Is.False);
-      Assert.That(firstGroup.graphics, Is.Empty);
-
-      yield return null;
-
-      Assert.That(oneGraphic.isAttachedToGroup, Is.False);
-      Assert.That(firstGroup.graphics, Is.Empty);
-
-      yield return null;
-
-      oneGraphic.gameObject.SetActive(true);
-
-      Assert.That(oneGraphic.OnAwake().hasFired);
-      Assert.That(oneGraphic.OnEnable().hasFired);
-
-      yield return null;
-
-      Assert.That(oneGraphic.OnStart().hasFired);
-
-      Assert.That(oneGraphic.isAttachedToGroup);
-      Assert.That(oneGraphic.attachedGroup, Is.EqualTo(firstGroup));
-      Assert.That(firstGroup.graphics, Contains.Item(oneGraphic));
-    }
-
-    /// <summary>
     /// Test whether or not it is possible to detach and reattach
     /// a graphic.
     /// </summary>

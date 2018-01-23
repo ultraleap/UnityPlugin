@@ -35,7 +35,7 @@ namespace Leap.Unity.GraphicalRenderer.Tests {
       }
 
       string path = AssetDatabase.GetAssetPath(sceneAsset);
-      scenes.Add(new EditorBuildSettingsScene(path, enable: true));
+      scenes.Add(new EditorBuildSettingsScene(path, true));
     }
   }
 }

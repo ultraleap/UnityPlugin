@@ -1,344 +1,320 @@
-﻿using System.Runtime.InteropServices;
+/******************************************************************************
+ * Copyright (C) Leap Motion, Inc. 2011-2017.                                 *
+ * Leap Motion proprietary and  confidential.                                 *
+ *                                                                            *
+ * Use subject to the terms of the Leap Motion SDK Agreement available at     *
+ * https://developer.leapmotion.com/sdk_agreement, or another agreement       *
+ * between Leap Motion and you, your company or other organization.           *
+ ******************************************************************************/
 
-public static class BitConverterNonAlloc {
-  private static ConverterHelper _c;
+using System;
 
-  public static ushort ToUInt16(byte[] bytes, ref int offset) {
-    _c._byte0 = bytes[offset++];
-    _c._byte1 = bytes[offset++];
-    return _c._ushort;
-  }
+namespace Leap.Unity {
 
-  public static ushort ToUInt16(byte[] bytes, int offset = 0) {
-    _c._byte0 = bytes[offset++];
-    _c._byte1 = bytes[offset++];
-    return _c._ushort;
-  }
+  public class BitConverterNonAlloc {
 
-  public static short ToInt16(byte[] bytes, ref int offset) {
-    _c._byte0 = bytes[offset++];
-    _c._byte1 = bytes[offset++];
-    return _c._short;
-  }
+    public static UInt16 ToUInt16(byte[] bytes, int offset = 0) {
+      unsafe {
+        fixed (byte* ptr = &bytes[offset]) {
+          UInt16* primitivePtr = (UInt16*)ptr;
+          return *primitivePtr;
+        }
+      }
+    }
 
-  public static short ToInt16(byte[] bytes, int offset = 0) {
-    _c._byte0 = bytes[offset++];
-    _c._byte1 = bytes[offset++];
-    return _c._short;
-  }
+    public static UInt16 ToUInt16(byte[] bytes, ref int offset) {
+      unsafe {
+        fixed (byte* ptr = &bytes[offset]) {
+          offset += sizeof(UInt16);
+          UInt16* primitivePtr = (UInt16*)ptr;
+          return *primitivePtr;
+        }
+      }
+    }
 
-  public static uint ToUInt32(byte[] bytes, ref int offset) {
-    _c._byte0 = bytes[offset++];
-    _c._byte1 = bytes[offset++];
-    _c._byte2 = bytes[offset++];
-    _c._byte3 = bytes[offset++];
-    return _c._uint;
-  }
+    public static void GetBytes(UInt16 primitive, byte[] bytes, int offset = 0) {
+      unsafe {
+        fixed (byte* ptr = &bytes[offset]) {
+          UInt16* primitivePtr = (UInt16*)ptr;
+          *primitivePtr = primitive;
+        }
+      }
+    }
 
-  public static uint ToUInt32(byte[] bytes, int offset = 0) {
-    _c._byte0 = bytes[offset++];
-    _c._byte1 = bytes[offset++];
-    _c._byte2 = bytes[offset++];
-    _c._byte3 = bytes[offset++];
-    return _c._uint;
-  }
+    public static void GetBytes(UInt16 primitive, byte[] bytes, ref int offset) {
+      unsafe {
+        fixed (byte* ptr = &bytes[offset]) {
+          offset += sizeof(UInt16);
+          UInt16* primitivePtr = (UInt16*)ptr;
+          *primitivePtr = primitive;
+        }
+      }
+    }
 
-  public static int ToInt32(byte[] bytes, ref int offset) {
-    _c._byte0 = bytes[offset++];
-    _c._byte1 = bytes[offset++];
-    _c._byte2 = bytes[offset++];
-    _c._byte3 = bytes[offset++];
-    return _c._int;
-  }
+    public static Int16 ToInt16(byte[] bytes, int offset = 0) {
+      unsafe {
+        fixed (byte* ptr = &bytes[offset]) {
+          Int16* primitivePtr = (Int16*)ptr;
+          return *primitivePtr;
+        }
+      }
+    }
 
-  public static int ToInt32(byte[] bytes, int offset = 0) {
-    _c._byte0 = bytes[offset++];
-    _c._byte1 = bytes[offset++];
-    _c._byte2 = bytes[offset++];
-    _c._byte3 = bytes[offset++];
-    return _c._int;
-  }
+    public static Int16 ToInt16(byte[] bytes, ref int offset) {
+      unsafe {
+        fixed (byte* ptr = &bytes[offset]) {
+          offset += sizeof(Int16);
+          Int16* primitivePtr = (Int16*)ptr;
+          return *primitivePtr;
+        }
+      }
+    }
 
-  public static ulong ToUInt64(byte[] bytes, ref int offset) {
-    _c._byte0 = bytes[offset++];
-    _c._byte1 = bytes[offset++];
-    _c._byte2 = bytes[offset++];
-    _c._byte3 = bytes[offset++];
-    _c._byte4 = bytes[offset++];
-    _c._byte5 = bytes[offset++];
-    _c._byte6 = bytes[offset++];
-    _c._byte7 = bytes[offset++];
-    return _c._ulong;
-  }
+    public static void GetBytes(Int16 primitive, byte[] bytes, int offset = 0) {
+      unsafe {
+        fixed (byte* ptr = &bytes[offset]) {
+          Int16* primitivePtr = (Int16*)ptr;
+          *primitivePtr = primitive;
+        }
+      }
+    }
 
-  public static ulong ToUInt64(byte[] bytes, int offset = 0) {
-    _c._byte0 = bytes[offset++];
-    _c._byte1 = bytes[offset++];
-    _c._byte2 = bytes[offset++];
-    _c._byte3 = bytes[offset++];
-    _c._byte4 = bytes[offset++];
-    _c._byte5 = bytes[offset++];
-    _c._byte6 = bytes[offset++];
-    _c._byte7 = bytes[offset++];
-    return _c._ulong;
-  }
+    public static void GetBytes(Int16 primitive, byte[] bytes, ref int offset) {
+      unsafe {
+        fixed (byte* ptr = &bytes[offset]) {
+          offset += sizeof(Int16);
+          Int16* primitivePtr = (Int16*)ptr;
+          *primitivePtr = primitive;
+        }
+      }
+    }
 
-  public static long ToInt64(byte[] bytes, ref int offset) {
-    _c._byte0 = bytes[offset++];
-    _c._byte1 = bytes[offset++];
-    _c._byte2 = bytes[offset++];
-    _c._byte3 = bytes[offset++];
-    _c._byte4 = bytes[offset++];
-    _c._byte5 = bytes[offset++];
-    _c._byte6 = bytes[offset++];
-    _c._byte7 = bytes[offset++];
-    return _c._long;
-  }
+    public static UInt32 ToUInt32(byte[] bytes, int offset = 0) {
+      unsafe {
+        fixed (byte* ptr = &bytes[offset]) {
+          UInt32* primitivePtr = (UInt32*)ptr;
+          return *primitivePtr;
+        }
+      }
+    }
 
-  public static long ToInt64(byte[] bytes, int offset = 0) {
-    _c._byte0 = bytes[offset++];
-    _c._byte1 = bytes[offset++];
-    _c._byte2 = bytes[offset++];
-    _c._byte3 = bytes[offset++];
-    _c._byte4 = bytes[offset++];
-    _c._byte5 = bytes[offset++];
-    _c._byte6 = bytes[offset++];
-    _c._byte7 = bytes[offset++];
-    return _c._long;
-  }
+    public static UInt32 ToUInt32(byte[] bytes, ref int offset) {
+      unsafe {
+        fixed (byte* ptr = &bytes[offset]) {
+          offset += sizeof(UInt32);
+          UInt32* primitivePtr = (UInt32*)ptr;
+          return *primitivePtr;
+        }
+      }
+    }
 
-  public static float ToSingle(byte[] bytes, ref int offset) {
-    _c._byte0 = bytes[offset++];
-    _c._byte1 = bytes[offset++];
-    _c._byte2 = bytes[offset++];
-    _c._byte3 = bytes[offset++];
-    return _c._float;
-  }
+    public static void GetBytes(UInt32 primitive, byte[] bytes, int offset = 0) {
+      unsafe {
+        fixed (byte* ptr = &bytes[offset]) {
+          UInt32* primitivePtr = (UInt32*)ptr;
+          *primitivePtr = primitive;
+        }
+      }
+    }
 
-  public static float ToSingle(byte[] bytes, int offset = 0) {
-    _c._byte0 = bytes[offset++];
-    _c._byte1 = bytes[offset++];
-    _c._byte2 = bytes[offset++];
-    _c._byte3 = bytes[offset++];
-    return _c._float;
-  }
+    public static void GetBytes(UInt32 primitive, byte[] bytes, ref int offset) {
+      unsafe {
+        fixed (byte* ptr = &bytes[offset]) {
+          offset += sizeof(UInt32);
+          UInt32* primitivePtr = (UInt32*)ptr;
+          *primitivePtr = primitive;
+        }
+      }
+    }
 
-  public static double ToDouble(byte[] bytes, ref int offset) {
-    _c._byte0 = bytes[offset++];
-    _c._byte1 = bytes[offset++];
-    _c._byte2 = bytes[offset++];
-    _c._byte3 = bytes[offset++];
-    _c._byte4 = bytes[offset++];
-    _c._byte5 = bytes[offset++];
-    _c._byte6 = bytes[offset++];
-    _c._byte7 = bytes[offset++];
-    return _c._double;
-  }
+    public static Int32 ToInt32(byte[] bytes, int offset = 0) {
+      unsafe {
+        fixed (byte* ptr = &bytes[offset]) {
+          Int32* primitivePtr = (Int32*)ptr;
+          return *primitivePtr;
+        }
+      }
+    }
 
-  public static double ToDouble(byte[] bytes, int offset = 0) {
-    _c._byte0 = bytes[offset++];
-    _c._byte1 = bytes[offset++];
-    _c._byte2 = bytes[offset++];
-    _c._byte3 = bytes[offset++];
-    _c._byte4 = bytes[offset++];
-    _c._byte5 = bytes[offset++];
-    _c._byte6 = bytes[offset++];
-    _c._byte7 = bytes[offset++];
-    return _c._double;
-  }
+    public static Int32 ToInt32(byte[] bytes, ref int offset) {
+      unsafe {
+        fixed (byte* ptr = &bytes[offset]) {
+          offset += sizeof(Int32);
+          Int32* primitivePtr = (Int32*)ptr;
+          return *primitivePtr;
+        }
+      }
+    }
 
-  public static void GetBytes(ushort value, byte[] bytes, ref int offset) {
-    _c._ushort = value;
-    bytes[offset++] = _c._byte0;
-    bytes[offset++] = _c._byte1;
-  }
+    public static void GetBytes(Int32 primitive, byte[] bytes, int offset = 0) {
+      unsafe {
+        fixed (byte* ptr = &bytes[offset]) {
+          Int32* primitivePtr = (Int32*)ptr;
+          *primitivePtr = primitive;
+        }
+      }
+    }
 
-  public static void GetBytes(ushort value, byte[] bytes, int offset = 0) {
-    _c._ushort = value;
-    bytes[offset++] = _c._byte0;
-    bytes[offset++] = _c._byte1;
-  }
+    public static void GetBytes(Int32 primitive, byte[] bytes, ref int offset) {
+      unsafe {
+        fixed (byte* ptr = &bytes[offset]) {
+          offset += sizeof(Int32);
+          Int32* primitivePtr = (Int32*)ptr;
+          *primitivePtr = primitive;
+        }
+      }
+    }
 
-  public static void GetBytes(short value, byte[] bytes, ref int offset) {
-    _c._short = value;
-    bytes[offset++] = _c._byte0;
-    bytes[offset++] = _c._byte1;
-  }
+    public static UInt64 ToUInt64(byte[] bytes, int offset = 0) {
+      unsafe {
+        fixed (byte* ptr = &bytes[offset]) {
+          UInt64* primitivePtr = (UInt64*)ptr;
+          return *primitivePtr;
+        }
+      }
+    }
 
-  public static void GetBytes(short value, byte[] bytes, int offset = 0) {
-    _c._short = value;
-    bytes[offset++] = _c._byte0;
-    bytes[offset++] = _c._byte1;
-  }
+    public static UInt64 ToUInt64(byte[] bytes, ref int offset) {
+      unsafe {
+        fixed (byte* ptr = &bytes[offset]) {
+          offset += sizeof(UInt64);
+          UInt64* primitivePtr = (UInt64*)ptr;
+          return *primitivePtr;
+        }
+      }
+    }
 
-  public static void GetBytes(uint value, byte[] bytes, ref int offset) {
-    _c._uint = value;
-    bytes[offset++] = _c._byte0;
-    bytes[offset++] = _c._byte1;
-    bytes[offset++] = _c._byte2;
-    bytes[offset++] = _c._byte3;
-  }
+    public static void GetBytes(UInt64 primitive, byte[] bytes, int offset = 0) {
+      unsafe {
+        fixed (byte* ptr = &bytes[offset]) {
+          UInt64* primitivePtr = (UInt64*)ptr;
+          *primitivePtr = primitive;
+        }
+      }
+    }
 
-  public static void GetBytes(uint value, byte[] bytes, int offset = 0) {
-    _c._uint = value;
-    bytes[offset++] = _c._byte0;
-    bytes[offset++] = _c._byte1;
-    bytes[offset++] = _c._byte2;
-    bytes[offset++] = _c._byte3;
-  }
+    public static void GetBytes(UInt64 primitive, byte[] bytes, ref int offset) {
+      unsafe {
+        fixed (byte* ptr = &bytes[offset]) {
+          offset += sizeof(UInt64);
+          UInt64* primitivePtr = (UInt64*)ptr;
+          *primitivePtr = primitive;
+        }
+      }
+    }
 
-  public static void GetBytes(int value, byte[] bytes, ref int offset) {
-    _c._int = value;
-    bytes[offset++] = _c._byte0;
-    bytes[offset++] = _c._byte1;
-    bytes[offset++] = _c._byte2;
-    bytes[offset++] = _c._byte3;
-  }
+    public static Int64 ToInt64(byte[] bytes, int offset = 0) {
+      unsafe {
+        fixed (byte* ptr = &bytes[offset]) {
+          Int64* primitivePtr = (Int64*)ptr;
+          return *primitivePtr;
+        }
+      }
+    }
 
-  public static void GetBytes(int value, byte[] bytes, int offset = 0) {
-    _c._int = value;
-    bytes[offset++] = _c._byte0;
-    bytes[offset++] = _c._byte1;
-    bytes[offset++] = _c._byte2;
-    bytes[offset++] = _c._byte3;
-  }
+    public static Int64 ToInt64(byte[] bytes, ref int offset) {
+      unsafe {
+        fixed (byte* ptr = &bytes[offset]) {
+          offset += sizeof(Int64);
+          Int64* primitivePtr = (Int64*)ptr;
+          return *primitivePtr;
+        }
+      }
+    }
 
-  public static void GetBytes(ulong value, byte[] bytes, ref int offset) {
-    _c._ulong = value;
-    bytes[offset++] = _c._byte0;
-    bytes[offset++] = _c._byte1;
-    bytes[offset++] = _c._byte2;
-    bytes[offset++] = _c._byte3;
-    bytes[offset++] = _c._byte4;
-    bytes[offset++] = _c._byte5;
-    bytes[offset++] = _c._byte6;
-    bytes[offset++] = _c._byte7;
-  }
+    public static void GetBytes(Int64 primitive, byte[] bytes, int offset = 0) {
+      unsafe {
+        fixed (byte* ptr = &bytes[offset]) {
+          Int64* primitivePtr = (Int64*)ptr;
+          *primitivePtr = primitive;
+        }
+      }
+    }
 
-  public static void GetBytes(ulong value, byte[] bytes, int offset = 0) {
-    _c._ulong = value;
-    bytes[offset++] = _c._byte0;
-    bytes[offset++] = _c._byte1;
-    bytes[offset++] = _c._byte2;
-    bytes[offset++] = _c._byte3;
-    bytes[offset++] = _c._byte4;
-    bytes[offset++] = _c._byte5;
-    bytes[offset++] = _c._byte6;
-    bytes[offset++] = _c._byte7;
-  }
+    public static void GetBytes(Int64 primitive, byte[] bytes, ref int offset) {
+      unsafe {
+        fixed (byte* ptr = &bytes[offset]) {
+          offset += sizeof(Int64);
+          Int64* primitivePtr = (Int64*)ptr;
+          *primitivePtr = primitive;
+        }
+      }
+    }
 
-  public static void GetBytes(long value, byte[] bytes, ref int offset) {
-    _c._long = value;
-    bytes[offset++] = _c._byte0;
-    bytes[offset++] = _c._byte1;
-    bytes[offset++] = _c._byte2;
-    bytes[offset++] = _c._byte3;
-    bytes[offset++] = _c._byte4;
-    bytes[offset++] = _c._byte5;
-    bytes[offset++] = _c._byte6;
-    bytes[offset++] = _c._byte7;
-  }
+    public static Single ToSingle(byte[] bytes, int offset = 0) {
+      unsafe {
+        fixed (byte* ptr = &bytes[offset]) {
+          Single* primitivePtr = (Single*)ptr;
+          return *primitivePtr;
+        }
+      }
+    }
 
-  public static void GetBytes(long value, byte[] bytes, int offset = 0) {
-    _c._long = value;
-    bytes[offset++] = _c._byte0;
-    bytes[offset++] = _c._byte1;
-    bytes[offset++] = _c._byte2;
-    bytes[offset++] = _c._byte3;
-    bytes[offset++] = _c._byte4;
-    bytes[offset++] = _c._byte5;
-    bytes[offset++] = _c._byte6;
-    bytes[offset++] = _c._byte7;
-  }
+    public static Single ToSingle(byte[] bytes, ref int offset) {
+      unsafe {
+        fixed (byte* ptr = &bytes[offset]) {
+          offset += sizeof(Single);
+          Single* primitivePtr = (Single*)ptr;
+          return *primitivePtr;
+        }
+      }
+    }
 
-  public static void GetBytes(float value, byte[] bytes, ref int offset) {
-    _c._float = value;
-    bytes[offset++] = _c._byte0;
-    bytes[offset++] = _c._byte1;
-    bytes[offset++] = _c._byte2;
-    bytes[offset++] = _c._byte3;
-  }
+    public static void GetBytes(Single primitive, byte[] bytes, int offset = 0) {
+      unsafe {
+        fixed (byte* ptr = &bytes[offset]) {
+          Single* primitivePtr = (Single*)ptr;
+          *primitivePtr = primitive;
+        }
+      }
+    }
 
-  public static void GetBytes(float value, byte[] bytes, int offset = 0) {
-    _c._float = value;
-    bytes[offset++] = _c._byte0;
-    bytes[offset++] = _c._byte1;
-    bytes[offset++] = _c._byte2;
-    bytes[offset++] = _c._byte3;
-  }
+    public static void GetBytes(Single primitive, byte[] bytes, ref int offset) {
+      unsafe {
+        fixed (byte* ptr = &bytes[offset]) {
+          offset += sizeof(Single);
+          Single* primitivePtr = (Single*)ptr;
+          *primitivePtr = primitive;
+        }
+      }
+    }
 
-  public static void GetBytes(double value, byte[] bytes, ref int offset) {
-    _c._double = value;
-    bytes[offset++] = _c._byte0;
-    bytes[offset++] = _c._byte1;
-    bytes[offset++] = _c._byte2;
-    bytes[offset++] = _c._byte3;
-    bytes[offset++] = _c._byte4;
-    bytes[offset++] = _c._byte5;
-    bytes[offset++] = _c._byte6;
-    bytes[offset++] = _c._byte7;
-  }
+    public static Double ToDouble(byte[] bytes, int offset = 0) {
+      unsafe {
+        fixed (byte* ptr = &bytes[offset]) {
+          Double* primitivePtr = (Double*)ptr;
+          return *primitivePtr;
+        }
+      }
+    }
 
-  public static void GetBytes(double value, byte[] bytes, int offset = 0) {
-    _c._double = value;
-    bytes[offset++] = _c._byte0;
-    bytes[offset++] = _c._byte1;
-    bytes[offset++] = _c._byte2;
-    bytes[offset++] = _c._byte3;
-    bytes[offset++] = _c._byte4;
-    bytes[offset++] = _c._byte5;
-    bytes[offset++] = _c._byte6;
-    bytes[offset++] = _c._byte7;
-  }
+    public static Double ToDouble(byte[] bytes, ref int offset) {
+      unsafe {
+        fixed (byte* ptr = &bytes[offset]) {
+          offset += sizeof(Double);
+          Double* primitivePtr = (Double*)ptr;
+          return *primitivePtr;
+        }
+      }
+    }
 
-  [StructLayout(LayoutKind.Explicit)]
-  private struct ConverterHelper {
-    [FieldOffset(0)]
-    public byte _byte0;
+    public static void GetBytes(Double primitive, byte[] bytes, int offset = 0) {
+      unsafe {
+        fixed (byte* ptr = &bytes[offset]) {
+          Double* primitivePtr = (Double*)ptr;
+          *primitivePtr = primitive;
+        }
+      }
+    }
 
-    [FieldOffset(1)]
-    public byte _byte1;
-
-    [FieldOffset(2)]
-    public byte _byte2;
-
-    [FieldOffset(3)]
-    public byte _byte3;
-
-    [FieldOffset(4)]
-    public byte _byte4;
-
-    [FieldOffset(5)]
-    public byte _byte5;
-
-    [FieldOffset(6)]
-    public byte _byte6;
-
-    [FieldOffset(7)]
-    public byte _byte7;
-
-    [FieldOffset(0)]
-    public ushort _ushort;
-
-    [FieldOffset(0)]
-    public short _short;
-
-    [FieldOffset(0)]
-    public uint _uint;
-
-    [FieldOffset(0)]
-    public int _int;
-
-    [FieldOffset(0)]
-    public ulong _ulong;
-
-    [FieldOffset(0)]
-    public long _long;
-
-    [FieldOffset(0)]
-    public float _float;
-
-    [FieldOffset(0)]
-    public double _double;
+    public static void GetBytes(Double primitive, byte[] bytes, ref int offset) {
+      unsafe {
+        fixed (byte* ptr = &bytes[offset]) {
+          offset += sizeof(Double);
+          Double* primitivePtr = (Double*)ptr;
+          *primitivePtr = primitive;
+        }
+      }
+    }
   }
 }

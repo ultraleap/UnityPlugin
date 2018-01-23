@@ -11,8 +11,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 437f3e9ccf671e241b2a1697e38ddc2b, type: 3}
   m_Name: Package
   m_EditorClassIdentifier: 
-  _packageName: Interaction Engine
-  _generateBuildDropdown: 1
+  _definitionName: Interaction Engine
+  _showInBuildMenu: 1
   _dependantFolders:
   - Assets\LeapMotion\Modules\InteractionEngine
   - Assets\LeapMotion\Modules\InteractionEngine\Testing

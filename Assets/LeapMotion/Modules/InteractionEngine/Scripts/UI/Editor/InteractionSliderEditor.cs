@@ -33,7 +33,7 @@ namespace Leap.Unity.Interaction {
                                           || slider.sliderType == InteractionSlider.SliderType.TwoDimensional);
       },
                                 "defaultVerticalValue",
-                                "verticalValueRange",
+                                "_verticalValueRange",
                                 "verticalSlideLimits",
                                 "verticalSteps",
                                 "_verticalSlideEvent");
@@ -42,7 +42,7 @@ namespace Leap.Unity.Interaction {
                                           || slider.sliderType == InteractionSlider.SliderType.TwoDimensional);
       },
                                 "defaultHorizontalValue",
-                                "horizontalValueRange",
+                                "_horizontalValueRange",
                                 "horizontalSlideLimits",
                                 "horizontalSteps",
                                 "_horizontalSlideEvent");

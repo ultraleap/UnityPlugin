@@ -110,6 +110,16 @@ namespace Leap.Unity.Interaction {
     ///<summary> The physical position of this element in world space; may diverge from the graphical position. </summary>
     protected Vector3 physicsPosition = Vector3.zero;
 
+    /// <summary>
+    /// Returns the local position of this button when it is able to relax into its target
+    /// position.
+    /// </summary>
+    public virtual Vector3 RelaxedLocalPosition {
+      get {
+        return initialLocalPosition + Vector3.back * Mathf.Lerp(minMaxHeight.x, minMaxHeight.y, restingHeight);
+      }
+    }
+
     private Rigidbody _lastDepressor;
     private Vector3 _localDepressorPosition;
     private Vector3 _physicsVelocity = Vector3.zero;
@@ -280,11 +290,11 @@ namespace Leap.Unity.Interaction {
 
         // If our depression state has changed since last time...
         if (isDepressed && !oldDepressed) {
-          OnPress();
-          depressedThisFrame = true;
-
           primaryHoveringController.primaryHoverLocked = true;
           _lockedInteractingController = primaryHoveringController;
+
+          OnPress();
+          depressedThisFrame = true;
 
         } else if (!isDepressed && oldDepressed) {
           unDepressedThisFrame = true;
@@ -350,7 +360,9 @@ namespace Leap.Unity.Interaction {
         unDepressedThisFrame = true;
         OnUnpress();
 
-        _lockedInteractingController.primaryHoverLocked = false;
+        if (_lockedInteractingController != null) {
+          _lockedInteractingController.primaryHoverLocked = false;
+        }
       }
 
       base.OnDisable();

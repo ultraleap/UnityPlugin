@@ -1,4 +1,13 @@
-﻿using UnityEngine;
+/******************************************************************************
+ * Copyright (C) Leap Motion, Inc. 2011-2017.                                 *
+ * Leap Motion proprietary and  confidential.                                 *
+ *                                                                            *
+ * Use subject to the terms of the Leap Motion SDK Agreement available at     *
+ * https://developer.leapmotion.com/sdk_agreement, or another agreement       *
+ * between Leap Motion and you, your company or other organization.           *
+ ******************************************************************************/
+
+using UnityEngine;
 
 namespace Leap.Unity.Recording {
 
@@ -51,11 +60,13 @@ namespace Leap.Unity.Recording {
     }
 
     public Quaternion Evaluate(float time) {
-      Quaternion evaluated = new Quaternion(xCurve.Evaluate(time),
-                                            yCurve.Evaluate(time),
-                                            zCurve.Evaluate(time),
-                                            wCurve.Evaluate(time));
-      return Quaternion.Lerp(evaluated, evaluated, 1.0f);
+      var x = xCurve.Evaluate(time);
+      var y = yCurve.Evaluate(time);
+      var z = zCurve.Evaluate(time);
+      var w = wCurve.Evaluate(time);
+
+      Quaternion evaluated = new Quaternion(x, y, z, w);
+      return evaluated.ToNormalized();
     }
 
 #if UNITY_EDITOR

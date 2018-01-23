@@ -17,6 +17,8 @@ using System.Collections.Generic;
 
 namespace Leap.Unity.Attributes {
 
+  using UnityObject = UnityEngine.Object;
+
   public interface IPropertyConstrainer {
 #if UNITY_EDITOR
     void ConstrainValue(SerializedProperty property);
@@ -42,6 +44,14 @@ namespace Leap.Unity.Attributes {
 #endif
   }
 
+  public interface ISupportDragAndDrop {
+#if UNITY_EDITOR
+    Rect GetDropArea(Rect r, SerializedProperty property);
+    bool IsDropValid(UnityObject[] draggedObjects, SerializedProperty property);
+    void ProcessDroppedObjects(UnityObject[] droppedObjects, SerializedProperty property);
+#endif
+  }
+
   public interface IBeforeLabelAdditiveDrawer : IAdditiveDrawer { }
   public interface IAfterLabelAdditiveDrawer : IAdditiveDrawer { }
   public interface IBeforeFieldAdditiveDrawer : IAdditiveDrawer { }
@@ -49,7 +59,7 @@ namespace Leap.Unity.Attributes {
 
   public abstract class CombinablePropertyAttribute : PropertyAttribute {
     public FieldInfo fieldInfo;
-    public UnityEngine.Object[] targets;
+    public UnityObject[] targets;
 
 #if UNITY_EDITOR
     public virtual IEnumerable<SerializedPropertyType> SupportedTypes {

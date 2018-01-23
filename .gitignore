@@ -9,6 +9,7 @@
 *.booproj
 *.unitypackage
 *.apk
+*.vs
 
 *.exe
 *_Data/

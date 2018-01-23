@@ -315,6 +315,20 @@ namespace Leap.Unity.Interaction {
     /// </summary>
     public bool isSuspended { get { return _suspendingController != null; } }
 
+    /// <summary>
+    /// Nonkinematic grasping motion applies clamped velocities to Interaction Behaviours
+    /// when they are grasped to move them to their target position and rotation in the
+    /// grasping hand. If a controller applies its SwapGrasp method to an interaction
+    /// object that didn't reach its target pose due to velocity clamping, the
+    /// swapped-out object will inherit the offset as a new target pose relative to the
+    /// hand.
+    /// 
+    /// To prevent slippage in this scenario, we always track the latest scheduled grasp
+    /// pose for interaction objects here, and use it whenever possible in the SwapGrasp
+    /// method.
+    /// </summary>
+    public Pose? latestScheduledGraspPose = null;
+
     #region Grasp Events
 
     /// <summary>
@@ -322,7 +336,7 @@ namespace Leap.Unity.Interaction {
     /// by its currently grasping controller(s). Subscribe to this callback if you'd like to override
     /// the default behaviour for grasping objects, for example, to constrain the object's position or rotation.
     /// 
-    /// Use InteractionBehaviour.Rigidbody.position and InteractionBehaviour.Rigidbody.rotation to set the
+    /// Use InteractionBehaviour.rigidbody.position and InteractionBehaviour.rigidbody.rotation to set the
     /// object's position and rotation. Merely setting the object's Transform's position and rotation is not
     /// recommended unless you understand the difference.
     /// </summary>
@@ -331,8 +345,9 @@ namespace Leap.Unity.Interaction {
     /// also valid to move the Interaction object (via its Rigidbody) in OnGraspStay, although OnGraspStay does
     /// not provide pre- and post-solve data in its callback signature.
     /// </remarks>
-    public Action<Vector3, Quaternion, Vector3, Quaternion, List<InteractionController>> OnGraspedMovement
-      = (preSolvedPos, preSolvedRot, solvedPos, solvedRot, graspingControllers) => { };
+    public GraspedMovementEvent OnGraspedMovement = (preSolvedPos, preSolvedRot,
+                                                     solvedPos,    solvedRot,
+                                                     graspingControllers) => { };
 
     /// <summary>
     /// Called when the object becomes grasped, if it was not already held by any interaction controllers on the
@@ -553,13 +568,15 @@ namespace Leap.Unity.Interaction {
     new 
     #endif
     /// <summary> The Rigidbody associated with this interaction object. </summary>
-    public Rigidbody rigidbody { get { return _rigidbody; }
-                                 protected set { _rigidbody = value; } }
+    public Rigidbody rigidbody {
+      get { return _rigidbody; }
+      protected set { _rigidbody = value; }
+    }
 
     public ISpaceComponent space { get; protected set; }
 
     [Header("Interaction Overrides")]
-    
+
     [Tooltip("This object will not receive callbacks from left controllers, right "
            + "controllers, or either hand if this mode is set to anything other than "
            + "None.")]
@@ -622,7 +639,7 @@ namespace Leap.Unity.Interaction {
         if (_ignoreGrasping && isGrasped) {
           graspingController.ReleaseGrasp();
         }
-      } 
+      }
     }
 
     [Header("Contact Settings")]
@@ -633,8 +650,10 @@ namespace Leap.Unity.Interaction {
            + "touches; for normal physical objects, you'll almost always want Object.")]
     [SerializeField]
     private ContactForceMode _contactForceMode = ContactForceMode.Object;
-    public ContactForceMode contactForceMode { get { return _contactForceMode; }
-                                               set { _contactForceMode = value; } }
+    public ContactForceMode contactForceMode {
+      get { return _contactForceMode; }
+      set { _contactForceMode = value; }
+    }
 
     [Header("Grasp Settings")]
 
@@ -642,16 +661,28 @@ namespace Leap.Unity.Interaction {
            + "controllers?")]
     [SerializeField]
     private bool _allowMultiGrasp = false;
-    public bool allowMultiGrasp { get { return _allowMultiGrasp; }
-                                  set { _allowMultiGrasp = value; } }
+    public bool allowMultiGrasp {
+      get { return _allowMultiGrasp; }
+      set { _allowMultiGrasp = value; }
+    }
 
     [Tooltip("Should interaction controllers move this object when it is grasped? "
            + "Without this property checked, objects will still receive grasp callbacks, "
            + "but you will need to move them manually via script.")]
     [SerializeField]
+    [OnEditorChange("moveObjectWhenGrasped")]
     private bool _moveObjectWhenGrasped = true;
-    public bool moveObjectWhenGrasped { get { return _moveObjectWhenGrasped; }
-                                        set { _moveObjectWhenGrasped = value; } }
+    public bool moveObjectWhenGrasped {
+      get { return _moveObjectWhenGrasped; }
+      set {
+        if (_moveObjectWhenGrasped != value && value == false) {
+          if (graspedPoseHandler != null) {
+            graspedPoseHandler.ClearControllers();
+          }
+        }
+        _moveObjectWhenGrasped = value;
+      }
+    }
 
     public enum GraspedMovementType {
       Inherit,
@@ -699,7 +730,7 @@ namespace Leap.Unity.Interaction {
         _overrideInteractionLayer = value;
       }
     }
-    
+
     [Tooltip("Sets the override layer to use for this object when it is not grasped and "
            + "not ignoring contact.")]
     [SerializeField]
@@ -801,7 +832,6 @@ namespace Leap.Unity.Interaction {
     /// FixedUpdate().
     /// </summary>
     public void FixedUpdateObject() {
-      if (!ignoreGrasping) fixedUpdateGrasping();
       fixedUpdateLayers();
 
       if (_appliedForces) { FixedUpdateForces(); }
@@ -838,7 +868,6 @@ namespace Leap.Unity.Interaction {
       foreach (var collider in _interactionColliders) {
         if (!hasColliders) hasColliders = true;
 
-        // Custom, slower ClosestPoint
         if (collider is MeshCollider) {
           // Native, faster ClosestPoint, but no support for off-center colliders; use to
           // support MeshColliders.
@@ -848,6 +877,7 @@ namespace Leap.Unity.Interaction {
                                                collider.attachedRigidbody.rotation)
                           - worldPosition).magnitude;
         }
+        // Custom, slower ClosestPoint
         else {
           // Note: Should be using rigidbody position instead of transform; this will
           // cause problems when colliders are moving very fast (one-frame delay).
@@ -932,8 +962,8 @@ namespace Leap.Unity.Interaction {
         float distance = GetHoverDistance(controller.hoverPoint);
         if (closestHoveringHand == null
             || distance < closestHoveringControllerDist) {
-              closestHoveringController = controller;
-              closestHoveringControllerDist = distance;
+          closestHoveringController = controller;
+          closestHoveringControllerDist = distance;
         }
       }
 
@@ -1138,9 +1168,7 @@ namespace Leap.Unity.Interaction {
     #region Grasping
 
     private HashSet<InteractionController> _graspingControllers = new HashSet<InteractionController>();
-
-    private bool _graspingInitialized = false;
-    private bool _moveObjectWhenGrasped__WasEnabledLastFrame;
+    
     private bool _wasKinematicBeforeGrasp;
     private bool _justGrasped = false;
 
@@ -1161,8 +1189,25 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    private KinematicGraspedMovement _kinematicGraspedMovement;
-    private NonKinematicGraspedMovement _nonKinematicGraspedMovement;
+    private KinematicGraspedMovement _lazyKinematicGraspedMovement;
+    private KinematicGraspedMovement _kinematicGraspedMovement {
+      get {
+        if (_lazyKinematicGraspedMovement == null) {
+          _lazyKinematicGraspedMovement = new KinematicGraspedMovement();
+        }
+        return _lazyKinematicGraspedMovement;
+      }
+    }
+
+    private NonKinematicGraspedMovement _lazyNonKinematicGraspedMovement;
+    private NonKinematicGraspedMovement _nonKinematicGraspedMovement {
+      get {
+        if (_lazyNonKinematicGraspedMovement == null) {
+          _lazyNonKinematicGraspedMovement = new NonKinematicGraspedMovement();
+        }
+        return _lazyNonKinematicGraspedMovement;
+      }
+    }
 
     private IThrowHandler _throwHandler;
     /// <summary> Gets or sets the throw handler for this Interaction object. </summary>
@@ -1176,26 +1221,6 @@ namespace Leap.Unity.Interaction {
       set {
         _throwHandler = value;
       }
-    }
-
-    private void initGrasping() {
-      _moveObjectWhenGrasped__WasEnabledLastFrame = moveObjectWhenGrasped;
-
-      _kinematicGraspedMovement = new KinematicGraspedMovement();
-      _nonKinematicGraspedMovement = new NonKinematicGraspedMovement();
-
-      _graspingInitialized = true;
-    }
-
-    private void fixedUpdateGrasping() {
-      if (!_graspingInitialized) {
-        initGrasping();
-      }
-
-      if (!moveObjectWhenGrasped && _moveObjectWhenGrasped__WasEnabledLastFrame) {
-        graspedPoseHandler.ClearControllers();
-      }
-      _moveObjectWhenGrasped__WasEnabledLastFrame = moveObjectWhenGrasped;
     }
 
     public void BeginGrasp(List<InteractionController> controllers) {
@@ -1219,7 +1244,7 @@ namespace Leap.Unity.Interaction {
         if (moveObjectWhenGrasped) {
           graspedPoseHandler.AddController(controller);
         }
-        
+
         // Fire interaction callback.
         OnPerControllerGraspBegin(controller);
       }
@@ -1388,7 +1413,7 @@ namespace Leap.Unity.Interaction {
     private void initLayers() {
       refreshInteractionLayer();
       refreshNoContactLayer();
-      
+
       (manager as IInternalInteractionManager).NotifyIntObjAddedInteractionLayer(this, interactionLayer, false);
       (manager as IInternalInteractionManager).NotifyIntObjAddedNoContactLayer(this, noContactLayer, false);
       (manager as IInternalInteractionManager).RefreshLayersNow();
@@ -1406,41 +1431,44 @@ namespace Leap.Unity.Interaction {
       noContactLayer = overrideNoContactLayer ? this.noContactLayer
                                               : manager.interactionNoContactLayer;
     }
-    
-    private void fixedUpdateLayers() {
-      int layer;
-      refreshInteractionLayer();
-      refreshNoContactLayer();
 
-      // Update the object's layer based on interaction state.
-      if (ignoreContact) {
-        layer = noContactLayer;
-      } else {
-        if (isGrasped) {
+    private void fixedUpdateLayers() {
+      using (new ProfilerSample("Interaction Behaviour: fixedUpdateLayers")) {
+        int layer;
+        refreshInteractionLayer();
+        refreshNoContactLayer();
+
+        // Update the object's layer based on interaction state.
+        if (ignoreContact) {
           layer = noContactLayer;
         }
         else {
-          layer = interactionLayer;
+          if (isGrasped) {
+            layer = noContactLayer;
+          }
+          else {
+            layer = interactionLayer;
+          }
         }
-      }
-      if (this.gameObject.layer != layer) {
-        this.gameObject.layer = layer;
+        if (this.gameObject.layer != layer) {
+          this.gameObject.layer = layer;
 
-        refreshInteractionColliderLayers();
-      }
+          refreshInteractionColliderLayers();
+        }
 
-      // Update the manager if necessary.
-      
+        // Update the manager if necessary.
+
       if (interactionLayer != _lastInteractionLayer) {
         (manager as IInternalInteractionManager).NotifyIntObjHasNewInteractionLayer(this, oldInteractionLayer: _lastInteractionLayer,
                                                                                           newInteractionLayer: interactionLayer);
-        _lastInteractionLayer = noContactLayer;
+        _lastInteractionLayer = interactionLayer;
       }
 
-      if (noContactLayer != _lastNoContactLayer) {
-        (manager as IInternalInteractionManager).NotifyIntObjHasNewNoContactLayer(this, oldNoContactLayer: _lastNoContactLayer,
-                                                                                        newNoContactLayer: noContactLayer);
-        _lastInteractionLayer = noContactLayer;
+        if (noContactLayer != _lastNoContactLayer) {
+          (manager as IInternalInteractionManager).NotifyIntObjHasNewNoContactLayer(this, oldNoContactLayer: _lastNoContactLayer,
+                                                                                          newNoContactLayer: noContactLayer);
+          _lastInteractionLayer = noContactLayer;
+        }
       }
     }
 
@@ -1499,7 +1527,8 @@ namespace Leap.Unity.Interaction {
        && (rigidbody.constraints & RigidbodyConstraints.FreezePositionZ) > 0) {
         _isPositionLocked = true;
         return;
-      } else {
+      }
+      else {
         _isPositionLocked = false;
 
         Joint[] joints = rigidbody.GetComponents<Joint>();

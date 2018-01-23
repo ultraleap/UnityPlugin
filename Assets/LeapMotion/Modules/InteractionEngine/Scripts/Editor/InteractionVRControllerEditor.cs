@@ -17,10 +17,10 @@ using UnityEngine;
 namespace Leap.Unity.Interaction {
 
   [CanEditMultipleObjects]
-  [CustomEditor(typeof(InteractionVRController), true)]
+  [CustomEditor(typeof(InteractionXRController), true)]
   public class InteractionVRControllerEditor : InteractionControllerEditor {
 
-    private List<InteractionVRController> _vrControllers;
+    private List<InteractionXRController> _vrControllers;
 
     bool _pluralPossibleControllers = false;
 
@@ -29,8 +29,8 @@ namespace Leap.Unity.Interaction {
 
       //_vrController = (target as InteractionVRController);
       _vrControllers = targets.Query()
-                              .Where(c => c is InteractionVRController)
-                              .Cast<InteractionVRController>()
+                              .Where(c => c is InteractionXRController)
+                              .Cast<InteractionXRController>()
                               .ToList();
       _pluralPossibleControllers = _vrControllers.Count > 1;
 
@@ -85,7 +85,7 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    private bool isGraspAxisConfigured(InteractionVRController controller) {
+    private bool isGraspAxisConfigured(InteractionXRController controller) {
       try {
         Input.GetAxis(controller.graspButtonAxis);
         return true;

@@ -434,6 +434,7 @@ namespace Leap.Unity.GraphicalRenderer {
       for (int i = 0; i < _features.Count; i++) {
         _features[i].AssignFeatureReferences();
         _features[i].ClearDataObjectReferences();
+        _features[i].isDirty = true;
         foreach (var graphic in _graphics) {
           _features[i].AddFeatureData(graphic.featureData[i]);
         }

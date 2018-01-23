@@ -12,6 +12,8 @@ using UnityEngine.Assertions;
 using System;
 using System.IO;
 using System.Collections.Generic;
+using Leap.Unity.RuntimeGizmos;
+using Leap.Unity.Query;
 
 namespace Leap.Unity {
 
@@ -63,7 +65,7 @@ namespace Leap.Unity {
     /// </summary>
     public static void Shuffle<T>(this IList<T> list) {
       for (int i = 0; i < list.Count; i++) {
-        Utils.Swap(list, i, UnityEngine.Random.Range(0, list.Count));
+        Utils.Swap(list, i, UnityEngine.Random.Range(i, list.Count));
       }
     }
 
@@ -135,10 +137,6 @@ namespace Leap.Unity {
         }
       }
       return false;
-    }
-
-    public static float Area(this Rect rect) {
-      return rect.width * rect.height;
     }
 
     public static bool IsActiveRelativeToParent(this Transform obj, Transform parent) {
@@ -235,6 +233,159 @@ namespace Leap.Unity {
     public static string TrimStart(this string str, int characters) {
       return str.Substring(Mathf.Min(str.Length, characters));
     }
+
+    /// <summary>
+    /// Capitalizes a simple string.  Only looks at the first character,
+    /// so if your string has any kind of non-letter character as the first
+    /// character this method will do nothing.
+    /// </summary>
+    public static string Capitalize(this string str) {
+      char c = str[0];
+      if (char.IsLetter(c)) {
+        return char.ToUpper(c) + str.Substring(1);
+      } else {
+        return str;
+      }
+    }
+
+    /// <summary>
+    /// Takes a variable-like name and turns it into a nice human readable
+    /// name.  Examples:
+    /// 
+    /// _privateVar     =>  Private Var
+    /// multBy32        =>  Mult By 32
+    /// the_key_code    =>  The Key Code
+    /// CamelCaseToo    =>  Camel Case Too
+    /// _is2_equalTo_5  =>  Is 2 Equal To 5
+    /// GetTheSCUBANow  =>  Get The SCUBA Now
+    /// m_privateVar    =>  Private Var
+    /// kConstantVar    =>  Constant Var
+    /// </summary>
+    public static string GenerateNiceName(string value) {
+      string result = "";
+      string curr = "";
+
+      Func<char, bool> wordFunc = c => {
+        //Can't build any further if it's already capitalized
+        if (curr.Length > 0 && char.IsUpper(curr[0])) {
+          return false;
+        }
+
+        //Can't add non-letters to words
+        if (!char.IsLetter(c)) {
+          return false;
+        }
+
+        curr = c + curr;
+        return true;
+      };
+
+      Func<char, bool> acronymFunc = c => {
+        //Can't add non-letters to acronyms
+        if (!char.IsLetter(c)) {
+          return false;
+        }
+
+        //Can't add lowercase letters to acronyms
+        if (char.IsLower(c)) {
+          return false;
+        }
+
+        curr = c + curr;
+        return true;
+      };
+
+      Func<char, bool> numberFunc = c => {
+        //Can't add non-digits to a number
+        if (!char.IsDigit(c)) {
+          return false;
+        }
+
+        curr = c + curr;
+        return true;
+      };
+
+      Func<char, bool> fluffFunc = c => {
+        //Can't add digits or numbers to 'fluff'
+        if (char.IsDigit(c) || char.IsLetter(c)) {
+          return false;
+        }
+
+        return true;
+      };
+
+
+      Func<char, bool> currFunc = null;
+      int currIndex = value.Length;
+
+      while (currIndex != 0) {
+        currIndex--;
+        char c = value[currIndex];
+
+        if (currFunc != null) {
+          if (currFunc(c)) {
+            continue;
+          } else {
+            currFunc = null;
+          }
+        }
+
+        if (currFunc == null) {
+          if (curr != "") {
+            result = " " + curr.Capitalize() + result;
+            curr = "";
+          }
+
+          if (acronymFunc(c)) {
+            currFunc = acronymFunc;
+          } else if (wordFunc(c)) {
+            currFunc = wordFunc;
+          } else if (numberFunc(c)) {
+            currFunc = numberFunc;
+          } else if (fluffFunc(c)) {
+            currFunc = fluffFunc;
+          } else {
+            throw new Exception("Unexpected state, no function matched character " + c);
+          }
+        }
+      }
+
+      if (curr != "") {
+        result = curr.Capitalize() + result;
+      }
+
+      result = result.Trim();
+
+      if (result.StartsWith("M ") || result.StartsWith("K ")) {
+        result = result.Substring(2);
+      }
+
+      return result.Trim();
+    }
+    #endregion
+
+    #region Print Utils
+
+    /// <summary>
+    /// Prints the elements of an array in a bracket-enclosed, comma-delimited list,
+    /// prefixed by the elements' type.
+    /// </summary>
+    public static string ToArrayString<T>(this IEnumerable<T> enumerable) {
+      var str = "[" + typeof(T).Name + ": ";
+      bool addedFirstElement = false;
+      foreach (var t in enumerable) {
+        if (addedFirstElement) {
+          str += ", ";
+        }
+        str += t.ToString();
+
+        addedFirstElement = true;
+      }
+      str += "]";
+
+      return str;
+    }
+
     #endregion
 
     #region Math Utils
@@ -299,6 +450,60 @@ namespace Leap.Unity {
       if (d0 > d1) Utils.Swap(ref d0, ref d1);
 
       return d0 <= d && d <= d1;
+    }
+
+    /// <summary>
+    /// Extrapolates using time values for positions a and b at extrapolatedTime.
+    /// </summary>
+    public static Vector3 TimedExtrapolate(Vector3 a, float aTime,
+                                           Vector3 b, float bTime,
+                                           float extrapolatedTime) {
+      return Vector3.LerpUnclamped(a, b, extrapolatedTime.MapUnclamped(aTime, bTime, 0f, 1f));
+    }
+
+    /// <summary>
+    /// Extrapolates using time values for rotations a and b at extrapolatedTime.
+    /// </summary>
+    public static Quaternion TimedExtrapolate(Quaternion a, float aTime,
+                                              Quaternion b, float bTime,
+                                              float extrapolatedTime) {
+      return Quaternion.SlerpUnclamped(a, b, extrapolatedTime.MapUnclamped(aTime, bTime, 0f, 1f));
+    }
+
+    /// <summary>
+    /// A specification of the generic NextTuple method that only works for integers ranging
+    /// from 0 inclusive to maxValue exclusive.
+    /// </summary>
+    public static bool NextTuple(IList<int> tuple, int maxValue) {
+      return NextTuple(tuple, i => (i + 1) % maxValue);
+    }
+
+    /// <summary>
+    /// Given one tuple of a collection of possible tuples, mutate it into the next tuple in the 
+    /// in the lexicographic sequence, or into the first tuple if the last tuple has been reached.
+    /// 
+    /// The items of the tuple must be comparable to each other.  The getNext function takes an 
+    /// item and returns the next item in the lexicographic sequence, or the first item if there
+    /// is no next item.
+    /// </summary>
+    /// <returns>
+    /// Returns true if the new tuple comes after the input tuple, false otherwise.
+    /// </returns>
+    public static bool NextTuple<T>(IList<T> tuple, Func<T, T> nextItem) where T : IComparable<T> {
+      int index = tuple.Count - 1;
+      while (index >= 0) {
+        T value = tuple[index];
+        T newValue = nextItem(value);
+        tuple[index] = newValue;
+
+        if (newValue.CompareTo(value) > 0) {
+          return true;
+        }
+
+        index--;
+      }
+
+      return false;
     }
 
     #endregion
@@ -384,6 +589,33 @@ namespace Leap.Unity {
     }
 
     /// <summary>
+    /// Returns a vector between resultMin and resultMax based on the input value's position
+    /// between valueMin and valueMax.
+    /// The input value is clamped between valueMin and valueMax.
+    /// </summary>
+    public static Vector2 Map(float input, float valueMin, float valueMax, Vector2 resultMin, Vector2 resultMax) {
+      return Vector2.Lerp(resultMin, resultMax, Mathf.InverseLerp(valueMin, valueMax, input));
+    }
+
+    /// <summary>
+    /// Returns a vector between resultMin and resultMax based on the input value's position
+    /// between valueMin and valueMax.
+    /// The input value is clamped between valueMin and valueMax.
+    /// </summary>
+    public static Vector3 Map(float input, float valueMin, float valueMax, Vector3 resultMin, Vector3 resultMax) {
+      return Vector3.Lerp(resultMin, resultMax, Mathf.InverseLerp(valueMin, valueMax, input));
+    }
+
+    /// <summary>
+    /// Returns a vector between resultMin and resultMax based on the input value's position
+    /// between valueMin and valueMax.
+    /// The input value is clamped between valueMin and valueMax.
+    /// </summary>
+    public static Vector4 Map(float input, float valueMin, float valueMax, Vector4 resultMin, Vector4 resultMax) {
+      return Vector4.Lerp(resultMin, resultMax, Mathf.InverseLerp(valueMin, valueMax, input));
+    }
+
+    /// <summary>
     /// Returns a new Vector2 via component-wise multiplication.
     /// This operation is equivalent to Vector3.Scale(A, B).
     /// </summary>
@@ -452,6 +684,75 @@ namespace Leap.Unity {
       return v.x + v.y + v.z + v.w;
     }
 
+    /// <summary>
+    /// Returns the largest component of the input vector.
+    /// </summary>
+    public static float CompMax(this Vector2 v) {
+      return Mathf.Max(v.x, v.y);
+    }
+
+    /// <summary>
+    /// Returns the largest component of the input vector.
+    /// </summary>
+    public static float CompMax(this Vector3 v) {
+      return Mathf.Max(Mathf.Max(v.x, v.y), v.z);
+    }
+
+    /// <summary>
+    /// Returns the largest component of the input vector.
+    /// </summary>
+    public static float CompMax(this Vector4 v) {
+      return Mathf.Max(Mathf.Max(Mathf.Max(v.x, v.y), v.z), v.w);
+    }
+
+    /// <summary>
+    /// Returns the smallest component of the input vector.
+    /// </summary>
+    public static float CompMin(this Vector2 v) {
+      return Mathf.Min(v.x, v.y);
+    }
+
+    /// <summary>
+    /// Returns the smallest component of the input vector.
+    /// </summary>
+    public static float CompMin(this Vector3 v) {
+      return Mathf.Min(Mathf.Min(v.x, v.y), v.z);
+    }
+
+    /// <summary>
+    /// Returns the smallest component of the input vector.
+    /// </summary>
+    public static float CompMin(this Vector4 v) {
+      return Mathf.Min(Mathf.Min(Mathf.Min(v.x, v.y), v.z), v.w);
+    }
+
+    #endregion
+
+    #region Unity Object Utils
+
+    /// <summary>
+    /// Usage is the same as FindObjectOfType, but this method will also return objects
+    /// that are inactive.
+    /// 
+    /// Use this method to search for singleton-pattern objects even if they are disabled,
+    /// but be warned that it's not cheap to call!
+    /// </summary>
+    public static T FindObjectInHierarchy<T>() where T : UnityEngine.Object {
+      return Resources.FindObjectsOfTypeAll<T>().Query()
+        .Where(o => {
+#if UNITY_EDITOR
+          // Exclude prefabs.
+          var prefabType = UnityEditor.PrefabUtility.GetPrefabType(o);
+          if (prefabType == UnityEditor.PrefabType.ModelPrefab
+          || prefabType == UnityEditor.PrefabType.Prefab) {
+            return false;
+          }
+#endif
+          return true;
+        })
+        .FirstOrDefault();
+    }
+
     #endregion
 
     #region Transform Utils
@@ -493,6 +794,82 @@ namespace Leap.Unity {
 
     #endregion
 
+    #region Component Utils
+
+    /// <summary>
+    /// Recursively searches the hierarchy of the argument Transform to find all of the
+    /// Components of type ComponentType (the first type argument) that should be "owned"
+    /// by the OwnerType component type (the second type argument).
+    /// 
+    /// If a child GameObject itself has an OwnerType component, that
+    /// child is ignored, and its children are ignored -- the assumption being that such
+    /// a child owns itself and any ComponentType components beneath it.
+    /// 
+    /// For example, a call to FindOwnedChildComponents with ComponentType Collider and
+    /// OwnerType Rigidbody would return all of the Colliders that are attached to the
+    /// rootObj Rigidbody, but none of the colliders that are attached to a rootObj's
+    /// child's own Rigidbody.
+    /// 
+    /// Optionally, ComponentType components of inactive GameObjects can be included
+    /// in the returned list; by default, these components are skipped.
+    /// 
+    /// This is not a cheap method to call, but it does not allocate garbage, so it is safe
+    /// for use at runtime.
+    /// </summary>
+    /// 
+    /// <typeparam name="ComponentType">
+    /// The component type to search for.
+    /// </typeparam>
+    /// 
+    /// <typeparam name="OwnerType">
+    /// The component type that assumes ownership of any ComponentType in its own Transform
+    /// or its Transform's children/grandchildren.
+    /// </typeparam>
+    public static void FindOwnedChildComponents<ComponentType, OwnerType>
+                                               (OwnerType rootObj,
+                                                List<ComponentType> ownedComponents,
+                                                bool includeInactiveObjects = false)
+                                               where OwnerType : Component {
+      ownedComponents.Clear();
+      Stack<Transform> toVisit = Pool<Stack<Transform>>.Spawn();
+      List<ComponentType> componentsBuffer = Pool<List<ComponentType>>.Spawn();
+
+      try {
+        toVisit.Push(rootObj.transform);
+        Transform curTransform;
+        while (toVisit.Count > 0) {
+          curTransform = toVisit.Pop();
+
+          // Recursively search children and children's children.
+          foreach (var child in curTransform.GetChildren()) {
+            // Ignore children with OwnerType components of their own; its own OwnerType
+            // component owns its own ComponentType components and the ComponentType
+            // components of its children.
+            if (child.GetComponent<OwnerType>() == null
+                && (includeInactiveObjects || child.gameObject.activeInHierarchy)) {
+              toVisit.Push(child);
+            }
+          }
+
+          // Since we'll visit every valid child, all we need to do is add the
+          // ComponentType components of every transform we visit.
+          componentsBuffer.Clear();
+          curTransform.GetComponents<ComponentType>(componentsBuffer);
+          foreach (var component in componentsBuffer) {
+            ownedComponents.Add(component);
+          }
+        }
+      } finally {
+        toVisit.Clear();
+        Pool<Stack<Transform>>.Recycle(toVisit);
+
+        componentsBuffer.Clear();
+        Pool<List<ComponentType>>.Recycle(componentsBuffer);
+      }
+    }
+
+    #endregion
+
     #region Orientation Utils
 
     /// <summary>
@@ -519,6 +896,242 @@ namespace Leap.Unity {
     /// <param name="transform"></param>
     public static void LookAwayFrom(this Transform thisTransform, Transform transform, Vector3 upwards) {
       thisTransform.rotation = Quaternion.LookRotation(thisTransform.position - transform.position, upwards);
+    }
+
+    /// <summary>
+    /// Returns the rotation that makes a transform at objectPosition point its forward
+    /// vector at targetPosition and keep its rightward vector parallel with the horizon
+    /// defined by a normal of Vector3.up.
+    /// 
+    /// For example, this will point an interface panel at a user camera while
+    /// maintaining the alignment of text and other elements with the horizon line.
+    /// </summary>
+    /// <returns></returns>
+    public static Quaternion FaceTargetWithoutTwist(Vector3 fromPosition,
+                                                    Vector3 targetPosition,
+                                                    bool flip180 = false) {
+      return FaceTargetWithoutTwist(fromPosition, targetPosition, Vector3.up, flip180);
+    }
+
+    /// <summary>
+    /// Returns the rotation that makes a transform at objectPosition point its forward
+    /// vector at targetPosition and keep its rightward vector parallel with the horizon
+    /// defined by the upwardDirection normal.
+    /// 
+    /// For example, this will point an interface panel at a user camera while
+    /// maintaining the alignment of text and other elements with the horizon line.
+    /// </summary>
+    public static Quaternion FaceTargetWithoutTwist(Vector3 objectPosition,
+                                                    Vector3 targetPosition,
+                                                    Vector3 upwardDirection,
+                                                    bool flip180 = false) {
+      Vector3 objToTarget = targetPosition - objectPosition;
+      return Quaternion.LookRotation((flip180 ? -1 : 1) * objToTarget,
+                                     upwardDirection);
+    }
+
+    #endregion
+
+    #region Quaternion Utils
+
+    /// <summary>
+    /// Converts the quaternion into an axis and an angle and returns the vector
+    /// axis * angle. Angle magnitude is measured in degrees, not radians; this requires
+    /// conversion to radians if being used to set the angular velocity of a PhysX
+    /// Rigidbody.
+    /// </summary>
+    public static Vector3 ToAngleAxisVector(this Quaternion q) {
+      float angle;
+      Vector3 axis;
+      q.ToAngleAxis(out angle, out axis);
+      return axis * angle;
+    }
+
+    /// <summary>
+    /// Returns a Quaternion described by the provided angle axis vector. Expects the
+    /// magnitude (angle) to be in degrees, not radians.
+    /// </summary>
+    public static Quaternion QuaternionFromAngleAxisVector(Vector3 angleAxisVector) {
+      if (angleAxisVector == Vector3.zero) return Quaternion.identity;
+      return Quaternion.AngleAxis(angleAxisVector.magnitude, angleAxisVector);
+    }
+
+    /// <summary>
+    /// A.From(B) produces the quaternion that rotates from B to A.
+    /// Combines with Then() to produce readable, predictable results:
+    /// B.Then(A.From(B)) == A.
+    /// </summary>
+    public static Quaternion From(this Quaternion thisQuaternion, Quaternion otherQuaternion) {
+      return thisQuaternion * Quaternion.Inverse(otherQuaternion);
+    }
+
+    /// <summary>
+    /// A.To(B) produces the quaternion that rotates from A to B.
+    /// Combines with Then() to produce readable, predictable results:
+    /// B.Then(B.To(A)) == A.
+    /// </summary>
+    public static Quaternion To(this Quaternion thisQuaternion, Quaternion otherQuaternion) {
+      return otherQuaternion * Quaternion.Inverse(thisQuaternion);
+    }
+
+    /// <summary>
+    /// Rotates this quaternion by the other quaternion. This is a rightward syntax for
+    /// Quaternion multiplication, which normally obeys left-multiply ordering.
+    /// </summary>
+    public static Quaternion Then(this Quaternion thisQuaternion, Quaternion otherQuaternion) {
+      return otherQuaternion * thisQuaternion;
+    }
+
+    /// <summary>
+    /// Returns a normalized Quaternion from the input quaternion. If the input
+    /// quaternion is zero-length (AKA the default Quaternion), the identity Quaternion
+    /// is returned.
+    /// </summary>
+    public static Quaternion ToNormalized(this Quaternion quaternion) {
+      float x = quaternion.x, y = quaternion.y, z = quaternion.z, w = quaternion.w;
+      float magnitude = Mathf.Sqrt(x * x + y * y + z * z + w * w);
+
+      if (Mathf.Approximately(magnitude, 0f)) {
+        return Quaternion.identity;
+      }
+
+      return new Quaternion(x / magnitude, y / magnitude, z / magnitude, w / magnitude);
+    }
+
+    #endregion
+
+    #region Float Utils
+
+    /// <summary>
+    /// Additive From syntax for floats. Evaluated as this float plus the additive
+    /// inverse of the other float, usually expressed as thisFloat - otherFloat.
+    /// 
+    /// For less trivial uses of From/Then syntax, refer to their implementations for
+    /// Quaternions and Matrix4x4s.
+    /// </summary>
+    public static float From(this float thisFloat, float otherFloat) {
+      return thisFloat - otherFloat;
+    }
+
+    /// <summary>
+    /// Additive To syntax for floats. Evaluated as this float plus the additive
+    /// inverse of the other float, usually expressed as otherFloat - thisFloat.
+    /// 
+    /// For less trivial uses of From/Then syntax, refer to their implementations for
+    /// Quaternions and Matrix4x4s.
+    /// </summary>
+    public static float To(this float thisFloat, float otherFloat) {
+      return otherFloat - thisFloat;
+    }
+
+    /// <summary>
+    /// Additive Then syntax for floats. Literally, thisFloat + otherFloat.
+    /// </summary>
+    public static float Then(this float thisFloat, float otherFloat) {
+      return thisFloat + otherFloat;
+    }
+
+    #endregion
+
+    #region Matrix4x4 Utils
+
+    /// <summary>
+    /// A.From(B) produces the matrix that transforms from B to A.
+    /// Combines with Then() to produce readable, predictable results:
+    /// B.Then(A.From(B)) == A.
+    /// 
+    /// Warning: Scale factors of zero will invalidate this behavior.
+    /// </summary>
+    public static Matrix4x4 From(this Matrix4x4 thisMatrix, Matrix4x4 otherMatrix) {
+      return thisMatrix * otherMatrix.inverse;
+    }
+
+    /// <summary>
+    /// A.To(B) produces the matrix that transforms from A to B.
+    /// Combines with Then() to produce readable, predictable results:
+    /// B.Then(B.To(A)) == A.
+    /// 
+    /// Warning: Scale factors of zero will invalidate this behavior.
+    /// </summary>
+    public static Matrix4x4 To(this Matrix4x4 thisMatrix, Matrix4x4 otherMatrix) {
+      return otherMatrix * thisMatrix.inverse;
+    }
+
+    /// <summary>
+    /// Transforms this matrix by the other matrix. This is a rightward syntax for
+    /// matrix multiplication, which normally obeys left-multiply ordering.
+    /// </summary>
+    public static Matrix4x4 Then(this Matrix4x4 thisMatrix, Matrix4x4 otherMatrix) {
+      return otherMatrix * thisMatrix;
+    }
+
+    #endregion
+
+    #region Vector3 Utils
+
+    /// <summary>
+    /// Additive From syntax for Vector3. Literally thisVector - otherVector.
+    /// </summary>
+    public static Vector3 From(this Vector3 thisVector, Vector3 otherVector) {
+      return thisVector - otherVector;
+    }
+
+    /// <summary>
+    /// Additive To syntax for Vector3. Literally otherVector - thisVector.
+    /// </summary>
+    public static Vector3 To(this Vector3 thisVector, Vector3 otherVector) {
+      return otherVector - thisVector;
+    }
+
+    /// <summary>
+    /// Additive Then syntax for Vector3. Literally thisVector + otherVector.
+    /// For example: A.Then(B.From(A)) == B.
+    /// </summary>
+    public static Vector3 Then(this Vector3 thisVector, Vector3 otherVector) {
+      return thisVector + otherVector;
+    }
+
+    /// <summary>
+    /// Rightward syntax for applying a Quaternion rotation to this vector; literally
+    /// returns byQuaternion * thisVector -- does NOT modify the input vector.
+    /// </summary>
+    public static Vector3 RotatedBy(this Vector3 thisVector, Quaternion byQuaternion) {
+      return byQuaternion * thisVector;
+    }
+
+    #endregion
+
+    #region Pose Utils
+
+    /// <summary>
+    /// From syntax for Pose structs; A.From(B) returns the Pose that transforms to
+    /// Pose A from Pose B. Also see To() and Then().
+    /// 
+    /// For example, A.Then(B.From(A)) == B.
+    /// </summary>
+    public static Pose From(this Pose thisPose, Pose otherPose) {
+      return thisPose * otherPose.inverse;
+    }
+
+    /// <summary>
+    /// To syntax for Pose structs; A.To(B) returns the Pose that transforms from Pose A
+    /// to Pose B. Also see From() and Then().
+    /// 
+    /// For example, A.Then(A.To(B)) == B.
+    /// </summary>
+    public static Pose To(this Pose thisPose, Pose otherPose) {
+      return otherPose * thisPose.inverse;
+    }
+
+    /// <summary>
+    /// Returns thisPose transformed by otherPose. The other Pose can be understood as
+    /// the parent pose, and the returned pose is this pose transformed from the other
+    /// pose's local space to world space.
+    /// 
+    /// Unlike matrix multiplication, this syntax is rightward: A * B == B.Then(A).
+    /// </summary>
+    public static Pose Then(this Pose thisPose, Pose otherPose) {
+      return otherPose * thisPose;
     }
 
     #endregion
@@ -662,6 +1275,42 @@ namespace Leap.Unity {
       return color;
     }
 
+    /// <summary>
+    /// Lerps this color towards the argument color in HSV space and returns the lerped
+    /// color.
+    /// </summary>
+    public static Color LerpHSV(this Color color, Color towardsColor, float t) {
+      float h0, s0, v0;
+      Color.RGBToHSV(color, out h0, out s0, out v0);
+
+      float h1, s1, v1;
+      Color.RGBToHSV(towardsColor, out h1, out s1, out v1);
+
+      // Cyclically lerp hue. (Input hues are always between 0 and 1.)
+      if (h0 - h1 < -0.5f) h0 += 1f;
+      if (h0 - h1 > 0.5f) h1 += 1f;
+      float hL = Mathf.Lerp(h0, h1, t) % 1f;
+
+      float sL = Mathf.Lerp(s0, s1, t);
+      float vL = Mathf.Lerp(v0, v1, t);
+      return Color.HSVToRGB(hL, sL, vL);
+    }
+
+    /// <summary>
+    /// Cyclically lerps hue arguments by t.
+    /// </summary>
+    public static float LerpHue(float h0, float h1, float t) {
+      // Enforce hue values between 0f and 1f.
+      if (h0 < 0f) h0 = 1f - (-h0 % 1f);
+      if (h1 < 0f) h1 = 1f - (-h1 % 1f);
+      if (h0 > 1f) h0 = h0 % 1f;
+      if (h1 > 1f) h1 = h1 % 1f;
+
+      if (h0 - h1 < -0.5f) h0 += 1f;
+      if (h0 - h1 > 0.5f) h1 += 1f;
+      return Mathf.Lerp(h0, h1, t) % 1f;
+    }
+
     #endregion
 
     #region Gizmo Utils
@@ -746,13 +1395,330 @@ namespace Leap.Unity {
     #endregion
 
     #region Rect Utils
-    
+
+    /// <summary>
+    /// Returns the area of the Rect, width * height.
+    /// </summary>
+    public static float Area(this Rect rect) {
+      return rect.width * rect.height;
+    }
+
+    /// <summary>
+    /// Returns a new Rect with the argument as an outward margin on each border of this
+    /// Rect; the result is a larger Rect.
+    /// </summary>
+    public static Rect Extrude(this Rect r, float margin) {
+      return new Rect(r.x - margin, r.y - margin,
+                      r.width + (margin * 2f), r.height + (margin * 2f));
+    }
+
     /// <summary>
     /// Returns a new Rect with the argument padding as a margin relative to each
     /// border of the provided Rect.
     /// </summary>
     public static Rect PadInner(this Rect r, float padding) {
-      return new Rect(r.x + padding, r.y + padding, r.width - (padding * 2), r.height - (padding * 2));
+      return PadInner(r, padding, padding, padding, padding);
+    }
+
+    /// <summary>
+    /// Returns a new Rect with the argument padding as a margin inward from each
+    /// corresponding border of the provided Rect. The returned Rect will never collapse
+    /// to have a width or height less than zero, and its resulting size will never be
+    /// larger than the input rect.
+    /// </summary>
+    public static Rect PadInner(this Rect r, float padTop, float padBottom,
+                                             float padLeft, float padRight) {
+      var x = r.x + padLeft;
+      var y = r.y + padBottom;
+      var w = r.width - padRight - padLeft;
+      var h = r.height - padTop - padBottom;
+      if (w < 0f) {
+        x = r.x + (padLeft / (padLeft + padRight)) * r.width;
+        w = 0;
+      }
+      if (h < 0f) {
+        y = r.y + (padBottom / (padBottom + padTop)) * r.height;
+        h = 0;
+      }
+      return new Rect(x, y, w, h);
+    }
+
+    #region Pad, No Out
+
+    public static Rect PadTop(this Rect r, float padding) {
+      return PadInner(r, padding, 0f, 0f, 0f);
+    }
+
+    public static Rect PadBottom(this Rect r, float padding) {
+      return PadInner(r, 0f, padding, 0f, 0f);
+    }
+
+    public static Rect PadLeft(this Rect r, float padding) {
+      return PadInner(r, 0f, 0f, padding, 0f);
+    }
+
+    public static Rect PadRight(this Rect r, float padding) {
+      return PadInner(r, 0f, 0f, 0f, padding);
+    }
+
+    #endregion
+
+    #region Pad, With Out
+
+    /// <summary>
+    /// Returns the Rect if padded on the top by the padding amount, and optionally
+    /// outputs the remaining margin into marginRect.
+    /// </summary>
+    public static Rect PadTop(this Rect r, float padding, out Rect marginRect) {
+      marginRect = r.TakeTop(padding);
+      return PadTop(r, padding);
+    }
+
+    /// <summary>
+    /// Returns the Rect if padded on the bottom by the padding amount, and optionally
+    /// outputs the remaining margin into marginRect.
+    /// </summary>
+    public static Rect PadBottom(this Rect r, float padding, out Rect marginRect) {
+      marginRect = r.TakeBottom(padding);
+      return PadBottom(r, padding);
+    }
+
+    /// <summary>
+    /// Returns the Rect if padded on the left by the padding amount, and optionally
+    /// outputs the remaining margin into marginRect.
+    /// </summary>
+    public static Rect PadLeft(this Rect r, float padding, out Rect marginRect) {
+      marginRect = r.TakeLeft(padding);
+      return PadLeft(r, padding);
+    }
+
+    /// <summary>
+    /// Returns the Rect if padded on the right by the padding amount, and optionally
+    /// outputs the remaining margin into marginRect.
+    /// </summary>
+    public static Rect PadRight(this Rect r, float padding, out Rect marginRect) {
+      marginRect = r.TakeRight(padding);
+      return PadRight(r, padding);
+    }
+
+    #endregion
+
+    #region Pad Percent, Two Sides
+
+    public static Rect PadTopBottomPercent(this Rect r, float padPercent) {
+      float padHeight = r.height * padPercent;
+      return r.PadInner(padHeight, padHeight, 0f, 0f);
+    }
+
+    public static Rect PadLeftRightPercent(this Rect r, float padPercent) {
+      float padWidth = r.width * padPercent;
+      return r.PadInner(0f, 0f, padWidth, padWidth);
+    }
+
+    #endregion
+
+    #region Pad Percent
+
+    public static Rect PadTopPercent(this Rect r, float padPercent) {
+      float padHeight = r.height * padPercent;
+      return PadTop(r, padHeight);
+    }
+
+    public static Rect PadBottomPercent(this Rect r, float padPercent) {
+      float padHeight = r.height * padPercent;
+      return PadBottom(r, padHeight);
+    }
+
+    public static Rect PadLeftPercent(this Rect r, float padPercent) {
+      return PadLeft(r, r.width * padPercent);
+    }
+
+    public static Rect PadRightPercent(this Rect r, float padPercent) {
+      return PadRight(r, r.width * padPercent);
+    }
+
+    #endregion
+
+    #region Take, No Out
+
+    /// <summary>
+    /// Return a margin of the given height on the top of the input Rect.
+    /// You can't Take more than there is Rect to take from.
+    /// <summary>
+    public static Rect TakeTop(this Rect r, float heightFromTop) {
+      heightFromTop = Mathf.Clamp(heightFromTop, 0f, r.height);
+      return new Rect(r.x, r.y + r.height - heightFromTop, r.width, heightFromTop);
+    }
+
+    /// <summary>
+    /// Return a margin of the given height on the bottom of the input Rect.
+    /// You can't Take more than there is Rect to take from.
+    /// <summary>
+    public static Rect TakeBottom(this Rect r, float heightFromBottom) {
+      heightFromBottom = Mathf.Clamp(heightFromBottom, 0f, r.height);
+      return new Rect(r.x, r.y, r.width, heightFromBottom);
+    }
+
+    /// <summary>
+    /// Return a margin of the given width on the left side of the input Rect.
+    /// You can't Take more than there is Rect to take from.
+    /// <summary>
+    public static Rect TakeLeft(this Rect r, float widthFromLeft) {
+      widthFromLeft = Mathf.Clamp(widthFromLeft, 0f, r.width);
+      return new Rect(r.x, r.y, widthFromLeft, r.height);
+    }
+
+    /// <summary>
+    /// Return a margin of the given width on the right side of the input Rect.
+    /// You can't Take more than there is Rect to take from.
+    /// <summary>
+    public static Rect TakeRight(this Rect r, float widthFromRight) {
+      widthFromRight = Mathf.Clamp(widthFromRight, 0f, r.width);
+      return new Rect(r.x + r.width - widthFromRight, r.y, r.height, widthFromRight);
+    }
+
+    #endregion
+
+    #region Take, With Out
+
+    /// <summary>
+    /// Return a margin of the given width on the top of the input Rect, and
+    /// optionally outputs the rest of the Rect into theRest.
+    /// <summary>
+    public static Rect TakeTop(this Rect r, float padding, out Rect theRest) {
+      theRest = r.PadTop(padding);
+      return r.TakeTop(padding);
+    }
+
+    /// <summary>
+    /// Return a margin of the given width on the bottom of the input Rect, and
+    /// optionally outputs the rest of the Rect into theRest.
+    /// <summary>
+    public static Rect TakeBottom(this Rect r, float padding, out Rect theRest) {
+      theRest = r.PadBottom(padding);
+      return r.TakeBottom(padding);
+    }
+
+    /// <summary>
+    /// Return a margin of the given width on the left side of the input Rect, and
+    /// optionally outputs the rest of the Rect into theRest.
+    /// <summary>
+    public static Rect TakeLeft(this Rect r, float padding, out Rect theRest) {
+      theRest = r.PadLeft(padding);
+      return r.TakeLeft(padding);
+    }
+
+    /// <summary>
+    /// Return a margin of the given width on the right side of the input Rect, and
+    /// optionally outputs the rest of the Rect into theRest.
+    /// <summary>
+    public static Rect TakeRight(this Rect r, float padding, out Rect theRest) {
+      theRest = r.PadRight(padding);
+      return r.TakeRight(padding);
+    }
+
+    #endregion
+
+    /// <summary>
+    /// Returns a horizontal strip of lineHeight of this rect (from the top by default) and
+    /// provides what's left of this rect after the line is removed as theRest.
+    /// </summary>
+    public static Rect TakeHorizontal(this Rect r, float lineHeight,
+                                      out Rect theRest,
+                                      bool fromTop = true) {
+      theRest = new Rect(r.x, (fromTop ? r.y + lineHeight : r.y), r.width, r.height - lineHeight);
+      return new Rect(r.x, (fromTop ? r.y : r.y + r.height - lineHeight), r.width, lineHeight);
+    }
+
+    #region Enumerators
+
+    /// <summary>
+    /// Slices numLines horizontal line Rects from this Rect and returns an enumerator that
+    /// will return each line Rect.
+    /// 
+    /// The height of each line is the height of the Rect divided by the number of lines
+    /// requested.
+    /// </summary>
+    public static HorizontalLineRectEnumerator TakeAllLines(this Rect r, int numLines) {
+      return new HorizontalLineRectEnumerator(r, numLines);
+    }
+
+    public struct HorizontalLineRectEnumerator : IQueryOp<Rect> {
+      Rect rect;
+      int numLines;
+      int index;
+
+      public HorizontalLineRectEnumerator(Rect rect, int numLines) {
+        this.rect = rect;
+        this.numLines = numLines;
+        this.index = -1;
+      }
+
+      public float eachHeight { get { return this.rect.height / numLines; } }
+
+      public Rect Current {
+        get { return new Rect(rect.x, rect.y + eachHeight * index, rect.width, eachHeight); }
+      }
+      public bool MoveNext() {
+        index += 1;
+        return index < numLines;
+      }
+      public HorizontalLineRectEnumerator GetEnumerator() { return this; }
+
+      public bool TryGetNext(out Rect t) {
+        if (MoveNext()) {
+          t = Current; return true;
+        } else {
+          t = default(Rect); return false;
+        }
+      }
+
+      public void Reset() {
+        index = -1;
+      }
+
+      public QueryWrapper<Rect, HorizontalLineRectEnumerator> Query() {
+        return new QueryWrapper<Rect, HorizontalLineRectEnumerator>(this);
+      }
+    }
+
+    #endregion
+
+    #endregion
+
+    #region List Utils
+
+    public static void EnsureListExists<T>(ref List<T> list) {
+      if (list == null) {
+        list = new List<T>();
+      }
+    }
+
+    public static void EnsureListCount<T>(this List<T> list, int count) {
+      if (list.Count == count) return;
+
+      while (list.Count < count) {
+        list.Add(default(T));
+      }
+
+      while (list.Count > count) {
+        list.RemoveAt(list.Count - 1);
+      }
+    }
+
+    public static void EnsureListCount<T>(this List<T> list, int count, Func<T> createT, Action<T> deleteT = null) {
+      while (list.Count < count) {
+        list.Add(createT());
+      }
+
+      while (list.Count > count) {
+        T tempT = list[list.Count - 1];
+        list.RemoveAt(list.Count - 1);
+
+        if (deleteT != null) {
+          deleteT(tempT);
+        }
+      }
     }
 
     #endregion

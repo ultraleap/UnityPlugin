@@ -90,7 +90,13 @@ namespace Leap.Unity.GraphicalRenderer {
             using (new ProfilerSample("Build Material Data")) {
               _rect_graphicPositions.Clear();
               foreach (var graphic in group.graphics) {
-                var localSpace = renderer.transform.InverseTransformPoint(graphic.transform.position);
+                Vector3 localSpace;
+                if (graphic.isActiveAndEnabled) {
+                  localSpace = renderer.transform.InverseTransformPoint(graphic.transform.position);
+                } else {
+                  localSpace = Vector3.one * float.NaN;
+                }
+
                 _rect_graphicPositions.Add(localSpace);
               }
             }
@@ -105,7 +111,14 @@ namespace Leap.Unity.GraphicalRenderer {
               _curved_graphicParameters.Clear();
               foreach (var graphic in group.graphics) {
                 var t = graphic.anchor.transformer as IRadialTransformer;
-                _curved_graphicParameters.Add(t.GetVectorRepresentation(graphic.transform));
+                Vector4 vectorRepresentation;
+                if (graphic.isActiveAndEnabled) {
+                  vectorRepresentation = t.GetVectorRepresentation(graphic.transform);
+                } else {
+                  vectorRepresentation = Vector4.one * float.NaN;
+                }
+
+                _curved_graphicParameters.Add(vectorRepresentation);
               }
             }
 

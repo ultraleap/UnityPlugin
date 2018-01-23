@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 03f89ae7832dd974a96fc05433dfeb23, type: 3}
+  m_Name: Generator
+  m_EditorClassIdentifier: 
+  codeTemplate: {fileID: 11500000, guid: 93193477e709b024f9a9ba8fb918c656, type: 3}
+  testTemplate: {fileID: 11500000, guid: c85d1edff44b9984e80c29551547bbb5, type: 3}
+  targetFolder:
+    _assetFolder: {fileID: 102900000, guid: 4fcf99c18a49d488c8539ce26b4c250d, type: 3}
+  testFolder:
+    _assetFolder: {fileID: 102900000, guid: fee5b94b8dc90b846ada0e63ac4ee5f3, type: 3}
+  primitiveTypes:
+  - UInt16
+  - Int16
+  - UInt32
+  - Int32
+  - UInt64
+  - Int64
+  - Single
+  - Double

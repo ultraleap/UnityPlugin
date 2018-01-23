@@ -313,41 +313,58 @@ namespace Leap.Unity.Interaction {
     void FixedUpdate() {
       OnPrePhysicalUpdate();
 
-      refreshInteractionControllers();
+      // Physics should only be synced once at the beginning of the physics simulation.
+      // (Will be re-set to its original value at the end of the update.)
+      #if UNITY_2017_1_OR_NEWER
+      var preUpdateAutoSyncTransforms = Physics.autoSyncTransforms;
+      Physics.autoSyncTransforms = false;
+      #endif
+      try {
+
+        refreshInteractionControllers();
 
 #if UNITY_EDITOR
-      if (!Application.isPlaying) return;
+        if (!Application.isPlaying) return;
 #endif
 
-      using (new ProfilerSample("Interaction Manager FixedUpdate", this.gameObject)) {
-        // Ensure scale information is up-to-date.
-        _scale = this.transform.lossyScale.x;
+        using (new ProfilerSample("Interaction Manager FixedUpdate", this.gameObject)) {
+          // Ensure scale information is up-to-date.
+          _scale = this.transform.lossyScale.x;
 
-        // Update each interaction controller (Leap hands or supported VR controllers).
-        fixedUpdateInteractionControllers();
+          // Update each interaction controller (Leap hands or supported VR controllers).
+          fixedUpdateInteractionControllers();
 
-        // Perform each interaction object's FixedUpdateObject.
-        using (new ProfilerSample("FixedUpdateObject per-InteractionBehaviour")) {
-          foreach (var interactionObj in _interactionObjects) {
-            interactionObj.FixedUpdateObject();
+          // Perform each interaction object's FixedUpdateObject.
+          using (new ProfilerSample("FixedUpdateObject per-InteractionBehaviour")) {
+            foreach (var interactionObj in _interactionObjects) {
+              interactionObj.FixedUpdateObject();
+            }
+          }
+
+          // Apply soft contacts from all controllers in a unified solve.
+          // (This will clear softContacts and originalVelocities as well.)
+          using (new ProfilerSample("Apply Soft Contacts")) {
+            if (_softContacts.Count > 0) {
+              PhysicsUtility.applySoftContacts(_softContacts, _softContactOriginalVelocities);
+            }
           }
         }
 
-        // Apply soft contacts from all controllers in a unified solve.
-        // (This will clear softContacts and originalVelocities as well.)
-        using (new ProfilerSample("Apply Soft Contacts")) {
-          if (_softContacts.Count > 0) {
-            PhysicsUtility.applySoftContacts(_softContacts, _softContactOriginalVelocities);
-          }
+        OnPostPhysicalUpdate();
+
+        updateMovingFrameOfReferenceSupport();
+
+        if (autoGenerateLayers) {
+          autoUpdateContactBoneLayerCollision();
         }
+
       }
-
-      OnPostPhysicalUpdate();
-
-      updateMovingFrameOfReferenceSupport();
-
-      if (autoGenerateLayers) {
-        autoUpdateContactBoneLayerCollision();
+      finally {
+        #if UNITY_2017_1_OR_NEWER
+        // Restore the autoSyncTransforms setting to whatever the user had it as before
+        // the Manager FixedUpdate.
+        Physics.autoSyncTransforms = preUpdateAutoSyncTransforms;
+        #endif
       }
     }
 
@@ -355,9 +372,9 @@ namespace Leap.Unity.Interaction {
       OnGraphicalUpdate();
     }
 
-    #endregion
+#endregion
 
-    #region Controller Interaction State & Callbacks Update
+#region Controller Interaction State & Callbacks Update
 
     private HashSet<InteractionController> _activeControllersBuffer = new HashSet<InteractionController>();
     private HashSet<InteractionController> _hoverControllersBuffer = new HashSet<InteractionController>();
@@ -450,7 +467,7 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    #region State-Check Remapping Functions
+#region State-Check Remapping Functions
 
     private void checkEndingGrasps(ReadonlyHashSet<InteractionController> interactionControllers) {
       remapInteractionObjectStateChecks(
@@ -655,9 +672,9 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    #endregion
+#endregion
 
-    #region State Notifications
+#region State Notifications
 
     // TODO: Delete this whole sction
 
@@ -730,11 +747,11 @@ namespace Leap.Unity.Interaction {
     //  checkEndingContacts(controllerSetBuffer);
     //}
 
-    #endregion
+#endregion
 
-    #endregion
+#endregion
 
-    #region Object Registration
+#region Object Registration
 
     public void RegisterInteractionBehaviour(IInteractionBehaviour interactionObj) {
       _interactionObjects.Add(interactionObj);
@@ -763,9 +780,9 @@ namespace Leap.Unity.Interaction {
       return _interactionObjects.Contains(interactionObj);
     }
 
-    #endregion
+#endregion
 
-    #region Moving Frame of Reference Support
+#region Moving Frame of Reference Support
 
     public bool hasMovingFrameOfReference {
       get {
@@ -809,9 +826,9 @@ namespace Leap.Unity.Interaction {
       newPosition = ((worldRotation * (position - this.transform.position + worldDisplacement))) + this.transform.position;
     }
 
-    #endregion
+#endregion
 
-    #region Soft Contact Support
+#region Soft Contact Support
 
     /// <summary>
     /// Stores data for implementing Soft Contact for interaction controllers.
@@ -825,9 +842,9 @@ namespace Leap.Unity.Interaction {
     [NonSerialized]
     public Dictionary<Rigidbody, PhysicsUtility.Velocities> _softContactOriginalVelocities = new Dictionary<Rigidbody, PhysicsUtility.Velocities>(5);
 
-    #endregion
+#endregion
 
-    #region Interaction Controllers
+#region Interaction Controllers
 
     private void refreshInteractionControllers() {
       _interactionControllers.Clear();
@@ -845,11 +862,11 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    #endregion
+#endregion
 
-    #region Layers
+#region Layers
 
-    #region Automatic Layers
+#region Automatic Layers
 
     protected void generateAutomaticLayers() {
       _interactionLayer = -1;
@@ -901,9 +918,9 @@ namespace Leap.Unity.Interaction {
       Physics.IgnoreLayerCollision(_contactBoneLayer, _interactionNoContactLayer, true);
     }
 
-    #endregion
+#endregion
 
-    #region Interaction Object Layer Tracking
+#region Interaction Object Layer Tracking
 
     private Dictionary<SingleLayer, HashSet<IInteractionBehaviour>> _intObjInteractionLayers = new Dictionary<SingleLayer, HashSet<IInteractionBehaviour>>();
     private Dictionary<SingleLayer, HashSet<IInteractionBehaviour>> _intObjNoContactLayers   = new Dictionary<SingleLayer, HashSet<IInteractionBehaviour>>();
@@ -959,7 +976,9 @@ namespace Leap.Unity.Interaction {
           ignoreLayerCollision = false;
         }
 
-        _contactBoneIgnoreCollisionLayers[layerObjSetPair.Key.layerIndex] = ignoreLayerCollision;
+        if (layerObjSetPair.Key.layerIndex < _contactBoneIgnoreCollisionLayers.Length) {
+          _contactBoneIgnoreCollisionLayers[layerObjSetPair.Key.layerIndex] = ignoreLayerCollision;
+        }
       }
 
       for (int i = 0; i < 32; i++) {
@@ -1012,11 +1031,11 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    #endregion
+#endregion
 
-    #endregion
+#endregion
 
-    #region Runtime Gizmos
+#region Runtime Gizmos
 
     public void OnDrawRuntimeGizmos(RuntimeGizmoDrawer drawer) {
       if (_drawControllerRuntimeGizmos) {
@@ -1028,7 +1047,7 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    #endregion
+#endregion
 
   }
 

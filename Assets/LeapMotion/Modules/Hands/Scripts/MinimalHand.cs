@@ -13,7 +13,7 @@ using System;
 using Leap;
 
 namespace Leap.Unity{
-  public class MinimalHand : IHandModel {
+  public class MinimalHand : HandModelBase {
     public override bool SupportsEditorPersistence() {
       return true;
     }
