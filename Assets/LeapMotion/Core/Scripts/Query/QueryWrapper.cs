@@ -25,7 +25,7 @@ namespace Leap.Unity.Query {
   ///
   /// myList.Query().Where(someCondition).First();
   /// </summary>
-  public partial struct QueryWrapper<QueryType, QueryOp> where QueryOp : IQueryOp<QueryType> {
+  public partial struct QueryWrapper<QueryType, QueryOp> where QueryOp : struct, IQueryOp<QueryType> {
     private QueryOp _op;
 
     /// <summary>

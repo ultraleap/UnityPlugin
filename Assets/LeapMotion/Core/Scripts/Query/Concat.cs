@@ -42,7 +42,7 @@ namespace Leap.Unity.Query {
     }
   }
 
-  public partial struct QueryWrapper<QueryType, QueryOp> where QueryOp : IQueryOp<QueryType> {
+  public partial struct QueryWrapper<QueryType, QueryOp> {
 
     /// <summary>
     /// Returns a new query operation representing the concatenation of the current query sequence to
@@ -54,7 +54,7 @@ namespace Leap.Unity.Query {
     ///   (A, B, C, D, E, F, G, H)
     /// </summary>
     public QueryWrapper<QueryType, ConcatOp<QueryType, QueryOp, SourceBOp>> Concat<SourceBOp>(QueryWrapper<QueryType, SourceBOp> sourceB)
-      where SourceBOp : IQueryOp<QueryType> {
+      where SourceBOp : struct, IQueryOp<QueryType> {
       return new QueryWrapper<QueryType, ConcatOp<QueryType, QueryOp, SourceBOp>>(new ConcatOp<QueryType, QueryOp, SourceBOp>(_op, sourceB._op));
     }
 

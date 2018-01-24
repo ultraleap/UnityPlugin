@@ -41,7 +41,7 @@ namespace Leap.Unity.Query {
     }
   }
 
-  public partial struct QueryWrapper<QueryType, QueryOp> where QueryOp : IQueryOp<QueryType> {
+  public partial struct QueryWrapper<QueryType, QueryOp> {
 
     /// <summary>
     /// Returns a new query operation representing the current query operation but without a
