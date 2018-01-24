@@ -72,8 +72,8 @@ namespace Leap.Unity {
           editorPoseSpace = transform;
         }
 
-        Hand hand = TestHandFactory.MakeTestHand(Handedness == Chirality.Left, poseTransform).TransformedCopy(UnityMatrixExtension.GetLeapMatrix(editorPoseSpace));
-        //Hand hand = TestHandFactory.MakeTestHand(0, 0, Handedness == Chirality.Left).TransformedCopy(UnityMatrixExtension.GetLeapMatrix(editorPoseSpace));
+        Hand hand = TestHandFactory.MakeTestHand(Handedness == Chirality.Left, poseTransform)
+                                   .TransformedCopy(UnityMatrixExtension.GetLeapMatrix(editorPoseSpace));
 
         if (GetLeapHand() == null) {
           SetLeapHand(hand);

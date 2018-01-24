@@ -11,27 +11,40 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+
+#if UNITY_5
+using UnityEngine.VR;
+#else
 using UnityEngine.XR;
+#endif
 
 namespace Leap.Unity.Interaction {
   
   /// <summary>
-  /// Implements IVRControllerTrackingProvider using Unity.VR.InputTracking for VRNodes.
-  /// This tracking should support all native VR controller integrations in Unity,
+  /// Implements IVRControllerTrackingProvider using Unity.XR.InputTracking for XRNodes.
+  /// This tracking should support all native XR controller integrations in Unity,
   /// including Oculus Touch and HTC Vive.
   /// </summary>
-  public class DefaultVRNodeTrackingProvider : MonoBehaviour,
-                                               IVRControllerTrackingProvider {
+  public class DefaultXRNodeTrackingProvider : MonoBehaviour,
+                                               IXRControllerTrackingProvider {
 
     private bool _isTrackingController = false;
     public bool isTracked { get { return _isTrackingController; } }
 
-    private bool _isVRNodeSet = false;
-    private XRNode _backingVRNode;
-    public XRNode vrNode {
-      get { return _backingVRNode; }
-      set { _backingVRNode = value; _isVRNodeSet = true; }
+    private bool _isXRNodeSet = false;
+    #if UNITY_5
+    private VRNode _backingXRNode;
+    public VRNode xrNode {
+      get { return _backingXRNode; }
+      set { _backingXRNode = value; _isXRNodeSet = true; }
     }
+    #else
+    private XRNode _backingXRNode;
+    public XRNode xrNode {
+      get { return _backingXRNode; }
+      set { _backingXRNode = value; _isXRNodeSet = true; }
+    }
+    #endif
 
     public event Action<Vector3, Quaternion> OnTrackingDataUpdate = (position, rotation) => { };
 
@@ -40,10 +53,10 @@ namespace Leap.Unity.Interaction {
     }
 
     void updateTrackingData() {
-      if (_isVRNodeSet) {
+      if (_isXRNodeSet) {
 
-        var position = InputTracking.GetLocalPosition(vrNode);
-        var rotation = InputTracking.GetLocalRotation(vrNode);
+        var position = InputTracking.GetLocalPosition(xrNode);
+        var rotation = InputTracking.GetLocalRotation(xrNode);
 
         // Unfortunately, the only alternative to checking the controller's position and
         // rotation for whether or not it is tracked is to request an allocated string

@@ -324,7 +324,7 @@ namespace Leap.Unity {
     }
 
     #endregion
-
+    
     #region Public API
 
     /// <summary>

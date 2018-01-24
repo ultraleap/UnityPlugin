@@ -76,7 +76,7 @@ namespace Leap.Unity.Interaction {
     /// </summary>
     private void addController(List<InteractionController> controllers, InteractionController toAdd) {
       int insertionIndex = -1;
-      if (toAdd is InteractionVRController) {
+      if (toAdd is InteractionXRController) {
         for (int i = 0; i < controllers.Count; i++) {
           if (controllers[i] is InteractionHand) {
             insertionIndex = i; break;
@@ -121,8 +121,8 @@ namespace Leap.Unity.Interaction {
       bool foundATrackedController = false;
       for (int i = 0; i < controllers.Count; i++) {
         bool isActive = false;
-        if (controllers[i] is InteractionVRController) {
-          isActive = (controllers[i] as InteractionVRController).trackingProvider.isTracked && controllers[i].isBeingMoved;
+        if (controllers[i] is InteractionXRController) {
+          isActive = (controllers[i] as InteractionXRController).trackingProvider.isTracked && controllers[i].isBeingMoved;
         }
         else if (controllers[i] is InteractionHand) {
           isActive = (isLeft ? Hands.Left : Hands.Right) != null && controllers[i].isBeingMoved;
