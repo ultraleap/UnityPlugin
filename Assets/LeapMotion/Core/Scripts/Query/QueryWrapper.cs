@@ -99,6 +99,10 @@ namespace Leap.Unity.Query {
   /// TryGetNext method with an out param instead of a single MoveNext method with a
   /// current getter.  By combining these two concepts into a single method we can get
   /// a roughly 2x speedup compared to using IEnumerator.
+  /// 
+  /// Sequences must be deterministic!  Any randomization must be seeded so that a given
+  /// query op will always return the same sequence, otherwise undefined behavior will
+  /// occur.
   /// </summary>
   public interface IQueryOp<T> {
 
