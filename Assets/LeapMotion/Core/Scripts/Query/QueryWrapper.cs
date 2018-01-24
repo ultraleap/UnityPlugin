@@ -95,7 +95,10 @@ namespace Leap.Unity.Query {
 
   /// <summary>
   /// The interface all query operations must follow.  It is a modified version of the 
-  /// IEnumerator interface, optimized for speed and conciseness.
+  /// IEnumerator interface, optimized for speed and conciseness.  It uses a single
+  /// TryGetNext method with an out param instead of a single MoveNext method with a
+  /// current getter.  By combining these two concepts into a single method we can get
+  /// a roughly 2x speedup compared to using IEnumerator.
   /// </summary>
   public interface IQueryOp<T> {
 
