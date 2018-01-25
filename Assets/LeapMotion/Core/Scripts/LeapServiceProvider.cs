@@ -161,9 +161,6 @@ namespace Leap.Unity {
           _editTimeFrame.Hands.Clear();
           _untransformedEditTimeFrame.Hands.Clear();
 
-          //_untransformedEditTimeFrame.Hands.Add(TestHandFactory.MakeTestHand(isLeft: true, pose: editTimePose));
-          //_untransformedEditTimeFrame.Hands.Add(TestHandFactory.MakeTestHand(isLeft: false, pose: editTimePose));
-
           _untransformedEditTimeFrame.Hands.Add(_editTimeLeftHand);
           _untransformedEditTimeFrame.Hands.Add(_editTimeRightHand);
 
@@ -185,9 +182,6 @@ namespace Leap.Unity {
         if (!Application.isPlaying) {
           _editTimeFrame.Hands.Clear();
           _untransformedEditTimeFrame.Hands.Clear();
-
-          //_untransformedEditTimeFrame.Hands.Add(TestHandFactory.MakeTestHand(isLeft: true, pose: editTimePose));
-          //_untransformedEditTimeFrame.Hands.Add(TestHandFactory.MakeTestHand(isLeft: false, pose: editTimePose));
 
           _untransformedEditTimeFrame.Hands.Add(_editTimeLeftHand);
           _untransformedEditTimeFrame.Hands.Add(_editTimeRightHand);

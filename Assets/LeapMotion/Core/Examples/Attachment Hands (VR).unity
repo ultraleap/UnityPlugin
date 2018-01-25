@@ -3114,11 +3114,11 @@ MonoBehaviour:
   _frameOptimization: 0
   _physicsExtrapolation: 1
   _physicsExtrapolationTime: 0.011111111
-  _allowManualDeviceOffset: 1
+  _allowManualDeviceOffset: 0
   _deviceOffsetYAxis: 0
   _deviceOffsetZAxis: 0.12
   _deviceTiltXAxis: 5
-  _temporalWarpingMode: 1
+  _temporalWarpingMode: 0
   _customWarpAdjustment: 17
   _updateHandInPrecull: 0
 --- !u!20 &513781814
