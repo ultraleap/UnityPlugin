@@ -269,11 +269,12 @@ namespace Leap.Unity {
       // If we don't know of any pose offset yet, account for it by finding the pose
       // delta from the "local" tracked pose to the actual camera pose.
       if (!_trackingBaseDeltaPose.HasValue) {
-        _trackingBaseDeltaPose = _cachedCamera.transform.ToLocalPose().From(trackedPose);
+        _trackingBaseDeltaPose = _cachedCamera.transform.ToLocalPose()
+                                   * trackedPose.inverse;
       }
       
       // This way, we always track a scene-space tracked pose.
-      var effTransformPose = trackedPose.Then(_trackingBaseDeltaPose.Value);
+      var effTransformPose = _trackingBaseDeltaPose.Value * trackedPose;
 
       transformHistory.UpdateDelay(effTransformPose, _leapController.Now());
 
