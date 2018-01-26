@@ -800,7 +800,7 @@ Prefab:
     - target: {fileID: 224000011045273006, guid: ed811e274f5753b478b84e8424f730ef,
         type: 2}
       propertyPath: m_AnchorMin.x
-      value: 0.00000003196227
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: ed811e274f5753b478b84e8424f730ef, type: 2}
