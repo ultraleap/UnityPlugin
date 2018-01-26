@@ -426,7 +426,7 @@ namespace Leap.Unity {
 
       _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_DEFAULT);
     }
-    
+
     /// <summary>
     /// Creates an instance of a Controller, initializing its policy flags and
     /// subscribing to its connection event.
@@ -435,7 +435,7 @@ namespace Leap.Unity {
       if (_leapController != null) {
         destroyController();
       }
-      
+
       _leapController = new Controller();
       _leapController.Device += (s, e) => _onDeviceSafe(e.Device);
 
