@@ -173,8 +173,6 @@ namespace Leap.Unity.Interaction {
 
       EditorGUILayout.BeginVertical();
 
-      _leftHand = null;
-      _rightHand = null;
       _leftVRNodeController = null;
       _rightVRNodeController = null;
       foreach (var controller in target.interactionControllers) {
@@ -221,8 +219,8 @@ namespace Leap.Unity.Interaction {
       if (controller.intHand != null) {
         checkInteractionHandStatus(controller.intHand, messages);
       }
-      else if (controller is InteractionVRController) {
-        checkInteractionVRControllerStatus(controller as InteractionVRController, messages);
+      else if (controller is InteractionXRController) {
+        checkInteractionVRControllerStatus(controller as InteractionXRController, messages);
       }
 
       // Render the status messages.
@@ -284,8 +282,6 @@ namespace Leap.Unity.Interaction {
     }
 
     private LeapProvider _provider = null;
-    private InteractionHand _leftHand = null;
-    private InteractionHand _rightHand = null;
 
     private void checkInteractionHandStatus(InteractionHand intHand,
                                             List<ControllerStatusMessage> messages) {
@@ -320,27 +316,29 @@ namespace Leap.Unity.Interaction {
       }
 
       // Check if the player has multiple left hands or multiple right hands.
-      if (intHand.handDataMode == HandDataMode.PlayerLeft && _leftHand != null
-       || intHand.handDataMode == HandDataMode.PlayerRight && _rightHand != null) {
-        messages.Add(new ControllerStatusMessage() {
-          message = "Duplicate Hand",
-          tooltip = "You already have a hand with this data mode in your scene. "
-                  + "You should remove one of the duplicates.",
-          color = Colors.Problem
-        });
-      }
-      if (_leftHand == null && intHand.handDataMode == HandDataMode.PlayerLeft) {
-        _leftHand = intHand;
-      }
-      else if (_rightHand == null && intHand.handDataMode == HandDataMode.PlayerRight) {
-        _rightHand = intHand;
+      if (intHand.handDataMode != HandDataMode.Custom) {
+        int index = target.interactionControllers.Query().IndexOf(intHand);
+
+        if (target.interactionControllers.Query().
+                                          Take(index).
+                                          OfType<InteractionHand>().
+                                          Where(h => h.handDataMode == intHand.handDataMode).
+                                          Where(h => h.leapProvider == intHand.leapProvider).
+                                          Any()) {
+          messages.Add(new ControllerStatusMessage() {
+            message = "Duplicate Hand",
+            tooltip = "You already have a hand with this data mode in your scene. "
+                    + "You should remove one of the duplicates.",
+            color = Colors.Problem
+          });
+        }
       }
     }
 
-    private InteractionVRController _leftVRNodeController;
-    private InteractionVRController _rightVRNodeController;
+    private InteractionXRController _leftVRNodeController;
+    private InteractionXRController _rightVRNodeController;
 
-    private void checkInteractionVRControllerStatus(InteractionVRController controller,
+    private void checkInteractionVRControllerStatus(InteractionXRController controller,
                                                     List<ControllerStatusMessage> messages) {
       // Check if the controller is configured correctly if it is set up with a custom
       // tracking provider.
@@ -353,9 +351,9 @@ namespace Leap.Unity.Interaction {
       }
 
       // Check if the player has duplicate VRNode left controllers or right controllers.
-      bool isLeftVRNodeController  = controller.trackingProvider is DefaultVRNodeTrackingProvider
+      bool isLeftVRNodeController  = controller.trackingProvider is DefaultXRNodeTrackingProvider
                                   && controller.chirality == Chirality.Left;
-      bool isRightVRNodeController = controller.trackingProvider is DefaultVRNodeTrackingProvider
+      bool isRightVRNodeController = controller.trackingProvider is DefaultXRNodeTrackingProvider
                                   && controller.chirality == Chirality.Right;
 
       if (isLeftVRNodeController && _leftVRNodeController != null

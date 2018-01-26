@@ -8,7 +8,6 @@
  ******************************************************************************/
 
 using UnityEngine;
-using UnityEngine.XR;
 using UnityEngine.SceneManagement;
 using Leap;
 
@@ -30,23 +29,29 @@ namespace Leap.Unity.VRVisualizer{
     private int m_framrateUpdateCount = 0;
     private int m_framerateUpdateInterval = 30;
 
-    private void FindController()
-    {
+    private void FindController() {
       LeapServiceProvider provider = FindObjectOfType<LeapServiceProvider>();
       if (provider != null)
         m_controller = provider.GetLeapController();
     }
 
     private void goVR() {
-        m_PCVisualizer.gameObject.SetActive(false);
-        m_VRVisualizer.gameObject.SetActive(true);
-        m_warningText.text = "Please put on your head-mounted display";      
+      m_PCVisualizer.gameObject.SetActive(false);
+
+      var provider = m_VRVisualizer.gameObject
+                                   .GetComponentInChildren<LeapXRServiceProvider>();
+      m_VRVisualizer.gameObject.GetComponentInChildren<HandModelManager>()
+                               .leapProvider = provider;
+      m_VRVisualizer.gameObject.SetActive(true);
+
+
+      m_warningText.text = "Please put on your head-mounted display";      
     }
 
     private void goDesktop() {
-        m_VRVisualizer.gameObject.SetActive(false);
-        m_PCVisualizer.gameObject.SetActive(true);
-        m_warningText.text = "No head-mounted display detected. Orion performs best in a head-mounted display";      
+      m_PCVisualizer.gameObject.SetActive(true);
+      m_VRVisualizer.gameObject.SetActive(false);
+      m_warningText.text = "No head-mounted display detected. Orion performs best in a head-mounted display";      
     }
 
     void Start()
@@ -56,7 +61,7 @@ namespace Leap.Unity.VRVisualizer{
       if (m_controller != null)
         m_leapConnected = m_controller.IsConnected;
 
-      if (XRDevice.isPresent)
+      if (XRSupportUtil.IsXRDevicePresent())
       {
         Screen.SetResolution(640, 480, false);
         goVR();    

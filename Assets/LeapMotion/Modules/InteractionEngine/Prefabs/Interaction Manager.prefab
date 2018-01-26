@@ -1834,6 +1834,7 @@ MonoBehaviour:
   _hoverEnabled: 1
   _contactEnabled: 1
   _graspingEnabled: 1
+  _leapProvider: {fileID: 0}
   _handDataMode: 0
   enabledPrimaryHoverFingertips: 0101010000
 --- !u!114 &114626465001590180
@@ -2000,6 +2001,7 @@ MonoBehaviour:
   _hoverEnabled: 1
   _contactEnabled: 1
   _graspingEnabled: 1
+  _leapProvider: {fileID: 0}
   _handDataMode: 1
   enabledPrimaryHoverFingertips: 0101010000
 --- !u!114 &114876551195846980

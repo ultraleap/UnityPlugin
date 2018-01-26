@@ -27,6 +27,9 @@ namespace Leap.Unity.Interaction {
 
     #region Inspector
 
+    [SerializeField]
+    private LeapProvider _leapProvider;
+
     [Header("Hand Configuration")]
 
     [Tooltip("Should the data for the underlying Leap hand come from the player's left "
@@ -54,8 +57,6 @@ namespace Leap.Unity.Interaction {
     #endregion
 
     #region Hand Data
-
-    private LeapProvider _leapProvider;
     /// <summary>
     /// If the hand data mode for this InteractionHand is set to Custom, you must also
     /// manually specify the provider from which to retrieve Leap frames containing
@@ -176,6 +177,12 @@ namespace Leap.Unity.Interaction {
         fingertipTransform.parent = this.transform;
         _backingFingertipTransforms.Add(fingertipTransform);
         _fingertipTransforms.Add(null);
+      }
+    }
+
+    private void OnDestroy() {
+      if (_leapProvider != null) {
+        _leapProvider.OnFixedFrame -= onProviderFixedFrame;
       }
     }
 
@@ -744,8 +751,7 @@ namespace Leap.Unity.Interaction {
         }
 
         if (_testHand == null && provider != null) {
-          _testHand = TestHandFactory.MakeTestHand(0, 0, this.isLeft)
-                                     .TransformedCopy(UnityMatrixExtension.GetLeapMatrix(provider.transform));
+          _testHand = provider.MakeTestHand(this.isLeft);
         }
 
         // Hover Point

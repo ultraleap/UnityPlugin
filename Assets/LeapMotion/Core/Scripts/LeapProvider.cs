@@ -20,7 +20,7 @@ namespace Leap.Unity {
   /// </summary>
   public abstract class LeapProvider : MonoBehaviour {
 
-    public TestHandFactory.TestHandPose editTimePose = TestHandFactory.TestHandPose.PoseA;
+    public TestHandFactory.TestHandPose editTimePose = TestHandFactory.TestHandPose.HeadMountedA;
 
     public event Action<Frame> OnUpdateFrame;
     public event Action<Frame> OnFixedFrame;

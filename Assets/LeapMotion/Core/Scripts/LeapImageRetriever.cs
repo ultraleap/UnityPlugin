@@ -14,11 +14,16 @@ using System.Collections;
 using Leap.Unity.Query;
 
 namespace Leap.Unity {
-  // To use the LeapImageRetriever you must be on version 2.1+
-  // and enable "Allow Images" in the Leap Motion settings.
 
-  /** LeapImageRetriever acquires images from a LeapServiceProvider and uploads them to gpu for use by shaders */
+  /// <summary>
+  /// Acquires images from a LeapServiceProvider and uploads image data as shader global
+  /// data for use by any shaders that render those images.
+  /// 
+  /// Note: To use the LeapImageRetriever, you must be on version 2.1 or newer and you
+  /// must enable "Allow Images" in your Leap Motion settings.
+  /// </summary>
   [RequireComponent(typeof(Camera))]
+  [RequireComponent(typeof(LeapServiceProvider))]
   public class LeapImageRetriever : MonoBehaviour {
     public const string GLOBAL_COLOR_SPACE_GAMMA_NAME = "_LeapGlobalColorSpaceGamma";
     public const string GLOBAL_GAMMA_CORRECTION_EXPONENT_NAME = "_LeapGlobalGammaCorrectionExponent";
@@ -29,12 +34,10 @@ namespace Leap.Unity {
     public const float IMAGE_SETTING_POLL_RATE = 2.0f;
 
     [SerializeField]
-    LeapServiceProvider _provider;
-
-    [SerializeField]
     [FormerlySerializedAs("gammaCorrection")]
     private float _gammaCorrection = 1.0f;
 
+    private LeapServiceProvider _provider;
     private EyeTextureData _eyeTextureData = new EyeTextureData();
 
     //Image that we have requested from the service.  Are requested in Update and retrieved in OnPreRender
@@ -266,30 +269,19 @@ namespace Leap.Unity {
 #endif
 
     void Start() {
-      if (_provider == null) {
-        Debug.LogWarning("Cannot use LeapImageRetriever if there is no LeapProvider!");
-        enabled = false;
-        return;
-      }
+      _provider = GetComponent<LeapServiceProvider>();
 
       //Enable pooling to reduce overhead of images
       LeapInternal.MemoryManager.EnablePooling = true;
 
       ApplyGammaCorrectionValues();
-      ApplyCameraProjectionValues(GetComponent<Camera>());
     }
 
     void OnEnable() {
-      LeapVRCameraControl.OnLeftPreRender += ApplyCameraProjectionValues;
-      LeapVRCameraControl.OnRightPreRender += ApplyCameraProjectionValues;
-
       subscribeToService();
     }
 
     void OnDisable() {
-      LeapVRCameraControl.OnLeftPreRender -= ApplyCameraProjectionValues;
-      LeapVRCameraControl.OnRightPreRender -= ApplyCameraProjectionValues;
-
       unsubscribeFromService();
     }
 
@@ -382,17 +374,6 @@ namespace Leap.Unity {
       }
       Shader.SetGlobalFloat(GLOBAL_COLOR_SPACE_GAMMA_NAME, gamma);
       Shader.SetGlobalFloat(GLOBAL_GAMMA_CORRECTION_EXPONENT_NAME, 1.0f / _gammaCorrection);
-    }
-
-    public void ApplyCameraProjectionValues(Camera camera) {
-      //These parameters are used during undistortion of the images to ensure they
-      //line up properly with the scene
-      Vector4 projection = new Vector4();
-      projection.x = camera.projectionMatrix[0, 2];
-      projection.y = 0f;
-      projection.z = camera.projectionMatrix[0, 0];
-      projection.w = camera.projectionMatrix[1, 1];
-      Shader.SetGlobalVector(GLOBAL_CAMERA_PROJECTION_NAME, projection);
     }
 
     void onDistortionChange(object sender, LeapEventArgs args) {

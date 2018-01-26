@@ -196,7 +196,7 @@ namespace Leap.Unity.InputModule {
     private GameObject[] currentGoing;
     private Vector3 OldCameraPos = Vector3.zero;
     private Quaternion OldCameraRot = Quaternion.identity;
-    private float OldCameraFoV;
+    //private float OldCameraFoV;
     private bool forceProjective = false;
     private bool forceTactile = false;
 
@@ -337,12 +337,12 @@ namespace Leap.Unity.InputModule {
     //Process is called by UI system to process events
     public override void Process() {
       if (MovingReferenceFrame) {
-        (LeapDataProvider as LeapServiceProvider).ReTransformFrames();
+        (LeapDataProvider as LeapServiceProvider).RetransformFrames();
       }
 
       OldCameraPos = Camera.main.transform.position;
       OldCameraRot = Camera.main.transform.rotation;
-      OldCameraFoV = Camera.main.fieldOfView;
+      //OldCameraFoV = Camera.main.fieldOfView;
 
       //Send update events if there is a selected object
       //This is important for InputField to receive keyboard events
@@ -624,7 +624,7 @@ namespace Leap.Unity.InputModule {
 
       Camera.main.transform.position = OldCameraPos;
       Camera.main.transform.rotation = OldCameraRot;
-      Camera.main.fieldOfView = OldCameraFoV;
+      //Camera.main.fieldOfView = OldCameraFoV;
     }
 
     //Raycast from the EventCamera into UI Space
@@ -689,7 +689,7 @@ namespace Leap.Unity.InputModule {
         DebugSphereQueue.Enqueue(Camera.main.transform.position);
 
       //Set EventCamera's FoV
-      Camera.main.fieldOfView = 179f;
+      //Camera.main.fieldOfView = 179f;
 
       //Set the Raycast Direction and Delta
       PointEvents[whichPointer].position = Vector2.Lerp(PrevScreenPosition[whichPointer], Camera.main.WorldToScreenPoint(IndexFingerPosition), 1.0f);//new Vector2(Screen.width / 2, Screen.height / 2);

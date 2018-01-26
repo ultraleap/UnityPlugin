@@ -11,7 +11,7 @@ using UnityEngine;
 using NUnit.Framework;
 using System.Collections.Generic;
 
-namespace Leap.Unity {
+namespace Leap.Unity.Tests {
 
   public class SlidingMaxTest {
     public const int MAX_HISTORY = 64;
