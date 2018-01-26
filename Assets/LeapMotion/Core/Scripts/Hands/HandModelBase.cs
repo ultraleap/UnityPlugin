@@ -62,18 +62,11 @@ namespace Leap.Unity {
 #if UNITY_EDITOR
     void Update() {
       if (!EditorApplication.isPlaying && SupportsEditorPersistence()) {
-        Transform editorPoseSpace;
-        LeapServiceProvider leapServiceProvider = FindObjectOfType<LeapServiceProvider>();
-        LeapTransform poseTransform = LeapTransform.Identity;
-        if (leapServiceProvider != null) {
-          editorPoseSpace = leapServiceProvider.transform;
-          poseTransform = TestHandFactory.GetTestPoseLeftHandTransform(leapServiceProvider.editTimePose);
-        } else {
-          editorPoseSpace = transform;
+        Hand hand = Handedness == Chirality.Left ? Hands.Left : Hands.Right;
+        if (hand == null) {
+          hand = TestHandFactory.MakeTestHand(Handedness == Chirality.Left, unitType: TestHandFactory.UnitType.LeapUnits);
+          hand.Transform(transform.GetLeapMatrix());
         }
-
-        Hand hand = TestHandFactory.MakeTestHand(Handedness == Chirality.Left, poseTransform)
-                                   .TransformedCopy(UnityMatrixExtension.GetLeapMatrix(editorPoseSpace));
 
         if (GetLeapHand() == null) {
           SetLeapHand(hand);
