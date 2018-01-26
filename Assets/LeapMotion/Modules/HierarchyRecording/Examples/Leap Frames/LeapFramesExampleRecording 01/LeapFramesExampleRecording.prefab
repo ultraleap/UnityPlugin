@@ -2363,7 +2363,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   group:
     GroupName: Physics Hands
-    _handPool: {fileID: 114504759696623608}
+    _handModelManager: {fileID: 0}
     LeftModel: {fileID: 114886428951018368}
     IsLeftToBeSpawned: 0
     RightModel: {fileID: 114349532671042780}
@@ -2373,7 +2373,7 @@ MonoBehaviour:
     HandPostProcesses:
       m_PersistentCalls:
         m_Calls: []
-      m_TypeName: Leap.Unity.Hands+HandEvent, Core, Version=0.0.0.0, Culture=neutral,
+      m_TypeName: Leap.Unity.Hands+HandEvent, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
         PublicKeyToken=null
   handedness: 1
   handModelPalmWidth: 0.085
@@ -2412,7 +2412,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   group:
     GroupName: Capsule Hands
-    _handPool: {fileID: 114504759696623608}
+    _handModelManager: {fileID: 0}
     LeftModel: {fileID: 114869016056562662}
     IsLeftToBeSpawned: 0
     RightModel: {fileID: 114410249492536316}
@@ -2422,7 +2422,7 @@ MonoBehaviour:
     HandPostProcesses:
       m_PersistentCalls:
         m_Calls: []
-      m_TypeName: Leap.Unity.Hands+HandEvent, Core, Version=0.0.0.0, Culture=neutral,
+      m_TypeName: Leap.Unity.Hands+HandEvent, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
         PublicKeyToken=null
   handedness: 1
   _showArm: 1
@@ -2440,10 +2440,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c592f16851a620743868a31232613370, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _modelsParent: {fileID: 4888564453278200}
+  _leapProvider: {fileID: 0}
   ModelPool:
   - GroupName: Capsule Hands
-    _handPool: {fileID: 114504759696623608}
+    _handModelManager: {fileID: 0}
     LeftModel: {fileID: 114869016056562662}
     IsLeftToBeSpawned: 0
     RightModel: {fileID: 114410249492536316}
@@ -2453,10 +2453,10 @@ MonoBehaviour:
     HandPostProcesses:
       m_PersistentCalls:
         m_Calls: []
-      m_TypeName: Leap.Unity.Hands+HandEvent, Core, Version=0.0.0.0, Culture=neutral,
+      m_TypeName: Leap.Unity.Hands+HandEvent, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
         PublicKeyToken=null
   - GroupName: Physics Hands
-    _handPool: {fileID: 114504759696623608}
+    _handModelManager: {fileID: 0}
     LeftModel: {fileID: 114886428951018368}
     IsLeftToBeSpawned: 0
     RightModel: {fileID: 114349532671042780}
@@ -2466,7 +2466,7 @@ MonoBehaviour:
     HandPostProcesses:
       m_PersistentCalls:
         m_Calls: []
-      m_TypeName: Leap.Unity.Hands+HandEvent, Core, Version=0.0.0.0, Culture=neutral,
+      m_TypeName: Leap.Unity.Hands+HandEvent, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
         PublicKeyToken=null
 --- !u!114 &114597251871403098
 MonoBehaviour:
@@ -2559,7 +2559,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   group:
     GroupName: Capsule Hands
-    _handPool: {fileID: 114504759696623608}
+    _handModelManager: {fileID: 0}
     LeftModel: {fileID: 114869016056562662}
     IsLeftToBeSpawned: 0
     RightModel: {fileID: 114410249492536316}
@@ -2569,7 +2569,7 @@ MonoBehaviour:
     HandPostProcesses:
       m_PersistentCalls:
         m_Calls: []
-      m_TypeName: Leap.Unity.Hands+HandEvent, Core, Version=0.0.0.0, Culture=neutral,
+      m_TypeName: Leap.Unity.Hands+HandEvent, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
         PublicKeyToken=null
   handedness: 0
   _showArm: 1
@@ -2589,7 +2589,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   group:
     GroupName: Physics Hands
-    _handPool: {fileID: 114504759696623608}
+    _handModelManager: {fileID: 0}
     LeftModel: {fileID: 114886428951018368}
     IsLeftToBeSpawned: 0
     RightModel: {fileID: 114349532671042780}
@@ -2599,7 +2599,7 @@ MonoBehaviour:
     HandPostProcesses:
       m_PersistentCalls:
         m_Calls: []
-      m_TypeName: Leap.Unity.Hands+HandEvent, Core, Version=0.0.0.0, Culture=neutral,
+      m_TypeName: Leap.Unity.Hands+HandEvent, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
         PublicKeyToken=null
   handedness: 0
   handModelPalmWidth: 0.085

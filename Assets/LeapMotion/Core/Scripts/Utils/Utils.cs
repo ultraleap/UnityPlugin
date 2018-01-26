@@ -899,7 +899,7 @@ namespace Leap.Unity {
     }
 
     /// <summary>
-    /// Returns the rotation that makes a transform at objectPosition point its forward
+    /// Returns the rotation that makes a transform at fromPosition point its forward
     /// vector at targetPosition and keep its rightward vector parallel with the horizon
     /// defined by a normal of Vector3.up.
     /// 
@@ -914,18 +914,18 @@ namespace Leap.Unity {
     }
 
     /// <summary>
-    /// Returns the rotation that makes a transform at objectPosition point its forward
+    /// Returns the rotation that makes a transform at fromPosition point its forward
     /// vector at targetPosition and keep its rightward vector parallel with the horizon
     /// defined by the upwardDirection normal.
     /// 
     /// For example, this will point an interface panel at a user camera while
     /// maintaining the alignment of text and other elements with the horizon line.
     /// </summary>
-    public static Quaternion FaceTargetWithoutTwist(Vector3 objectPosition,
+    public static Quaternion FaceTargetWithoutTwist(Vector3 fromPosition,
                                                     Vector3 targetPosition,
                                                     Vector3 upwardDirection,
                                                     bool flip180 = false) {
-      Vector3 objToTarget = targetPosition - objectPosition;
+      Vector3 objToTarget = targetPosition - fromPosition;
       return Quaternion.LookRotation((flip180 ? -1 : 1) * objToTarget,
                                      upwardDirection);
     }
@@ -962,7 +962,7 @@ namespace Leap.Unity {
     /// B.Then(A.From(B)) == A.
     /// </summary>
     public static Quaternion From(this Quaternion thisQuaternion, Quaternion otherQuaternion) {
-      return thisQuaternion * Quaternion.Inverse(otherQuaternion);
+      return Quaternion.Inverse(otherQuaternion) * thisQuaternion;
     }
 
     /// <summary>
@@ -971,7 +971,7 @@ namespace Leap.Unity {
     /// B.Then(B.To(A)) == A.
     /// </summary>
     public static Quaternion To(this Quaternion thisQuaternion, Quaternion otherQuaternion) {
-      return otherQuaternion * Quaternion.Inverse(thisQuaternion);
+      return Quaternion.Inverse(thisQuaternion) * otherQuaternion;
     }
 
     /// <summary>
@@ -979,7 +979,7 @@ namespace Leap.Unity {
     /// Quaternion multiplication, which normally obeys left-multiply ordering.
     /// </summary>
     public static Quaternion Then(this Quaternion thisQuaternion, Quaternion otherQuaternion) {
-      return otherQuaternion * thisQuaternion;
+      return thisQuaternion * otherQuaternion;
     }
 
     /// <summary>
@@ -1110,7 +1110,7 @@ namespace Leap.Unity {
     /// For example, A.Then(B.From(A)) == B.
     /// </summary>
     public static Pose From(this Pose thisPose, Pose otherPose) {
-      return thisPose * otherPose.inverse;
+      return otherPose.inverse * thisPose;
     }
 
     /// <summary>
@@ -1120,18 +1120,19 @@ namespace Leap.Unity {
     /// For example, A.Then(A.To(B)) == B.
     /// </summary>
     public static Pose To(this Pose thisPose, Pose otherPose) {
-      return otherPose * thisPose.inverse;
+      return thisPose.inverse * otherPose;
     }
 
     /// <summary>
-    /// Returns thisPose transformed by otherPose. The other Pose can be understood as
-    /// the parent pose, and the returned pose is this pose transformed from the other
-    /// pose's local space to world space.
+    /// Returns the other pose transformed by this pose. This pose could be understood as
+    /// the parent pose, and the other pose transformed from local this-pose space to
+    /// world space.
     /// 
-    /// Unlike matrix multiplication, this syntax is rightward: A * B == B.Then(A).
+    /// This is similar to matrix multiplication: A * B == A.Then(B). However, order of
+    /// operations is more explicit with this syntax.
     /// </summary>
     public static Pose Then(this Pose thisPose, Pose otherPose) {
-      return otherPose * thisPose;
+      return thisPose * otherPose;
     }
 
     #endregion
@@ -1167,13 +1168,40 @@ namespace Leap.Unity {
       }
     }
 
+    public static float GetEffectiveRadius(this CapsuleCollider capsule) {
+      return capsule.radius * capsule.GetEffectiveRadiusMultiplier();
+    }
+
+    public static float GetEffectiveRadiusMultiplier(this CapsuleCollider capsule) {
+      var effRadiusMult = 0f;
+      switch (capsule.direction) {
+        case 0:
+          effRadiusMult = Swizzle.Swizzle.yz(capsule.transform.lossyScale).CompMax();
+          break;
+        case 1:
+          effRadiusMult = Swizzle.Swizzle.xz(capsule.transform.lossyScale).CompMax();
+          break;
+        case 2:
+        default:
+          effRadiusMult = Swizzle.Swizzle.xy(capsule.transform.lossyScale).CompMax();
+          break;
+      }
+      return effRadiusMult;
+    }
+
     public static void GetCapsulePoints(this CapsuleCollider capsule, out Vector3 a,
                                                                       out Vector3 b) {
-      a = capsule.GetDirection() * ((capsule.height * 0.5f) - capsule.radius);
+      var effRadiusMult = capsule.GetEffectiveRadiusMultiplier();
+      var capsuleDir = capsule.GetDirection();
+
+      a = capsuleDir * (capsule.height / 2f);
       b = -a;
 
       a = capsule.transform.TransformPoint(a);
       b = capsule.transform.TransformPoint(b);
+
+      a -= capsuleDir * effRadiusMult * capsule.radius;
+      b += capsuleDir * effRadiusMult * capsule.radius;
     }
 
     /// <summary>

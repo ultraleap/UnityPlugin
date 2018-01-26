@@ -122,14 +122,6 @@ namespace Leap.Unity.Attachments {
           var leapHand = handAccessors[i]();
           attachmentHand.isTracked = leapHand != null;
 
-          #if UNITY_EDITOR
-          if (Hands.Provider != null) {
-            if (leapHand == null && !Application.isPlaying) {
-              leapHand = Hands.Provider.MakeTestHand(attachmentHand.chirality == Chirality.Left);
-            }
-          }
-          #endif
-
           using (new ProfilerSample(attachmentHand.gameObject.name + " Update Points")) {
             foreach (var point in attachmentHand.points) {
               point.SetTransformUsingHand(leapHand);

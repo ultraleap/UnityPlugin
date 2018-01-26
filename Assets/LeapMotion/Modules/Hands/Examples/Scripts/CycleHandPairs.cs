@@ -12,7 +12,7 @@ using System.Collections;
 using Leap.Unity;
 
 public class CycleHandPairs : MonoBehaviour {
-  public HandPool HandPool;
+  public HandModelManager HandPool;
   public string[] GroupNames;
   private int currentGroup;
   public int CurrentGroup {
@@ -34,7 +34,7 @@ public class CycleHandPairs : MonoBehaviour {
 
   // Use this for initialization
   void Start () {
-    HandPool = GetComponent<HandPool>();
+    HandPool = GetComponent<HandModelManager>();
     disableAllGroups();
     CurrentGroup = 0;
   }
