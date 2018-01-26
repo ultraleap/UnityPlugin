@@ -435,16 +435,11 @@ namespace Leap.Unity {
       if (_leapController != null) {
         destroyController();
       }
-
-<<<<<<< HEAD
-      leap_controller_ = new Controller();
-      leap_controller_.Device += (s, e) => _onDeviceSafe(e.Device);
-
-      if (leap_controller_.IsConnected) {
-=======
+      
       _leapController = new Controller();
+      _leapController.Device += (s, e) => _onDeviceSafe(e.Device);
+
       if (_leapController.IsConnected) {
->>>>>>> develop
         initializeFlags();
       } else {
         _leapController.Device += onHandControllerConnect;
@@ -453,11 +448,11 @@ namespace Leap.Unity {
       if (_enableDllProfiling) {
         //A controller will report profiling statistics for the duration of it's lifetime
         //so these events will never be unsubscribed from.
-        leap_controller_.EndProfilingBlock += LeapProfiling.EndProfilingBlock;
-        leap_controller_.BeginProfilingBlock += LeapProfiling.BeginProfilingBlock;
+        _leapController.EndProfilingBlock += LeapProfiling.EndProfilingBlock;
+        _leapController.BeginProfilingBlock += LeapProfiling.BeginProfilingBlock;
 
-        leap_controller_.EndProfilingForThread += LeapProfiling.EndProfilingForThread;
-        leap_controller_.BeginProfilingForThread += LeapProfiling.BeginProfilingForThread;
+        _leapController.EndProfilingForThread += LeapProfiling.EndProfilingForThread;
+        _leapController.BeginProfilingForThread += LeapProfiling.BeginProfilingForThread;
       }
     }
     
