@@ -39,7 +39,7 @@ namespace Leap.Unity {
     }
 
     [SerializeField]
-    private List<ModelGroup> ModelPool;
+    private List<ModelGroup> ModelPool = new List<ModelGroup>();
     private List<HandRepresentation> activeHandReps = new List<HandRepresentation>();
 
     private Dictionary<HandModelBase, ModelGroup> modelGroupMapping = new Dictionary<HandModelBase, ModelGroup>();
