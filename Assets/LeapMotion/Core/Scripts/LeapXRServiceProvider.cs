@@ -414,7 +414,9 @@ namespace Leap.Unity {
         //Don't update pre cull for preview, reflection, or scene view cameras
         switch (camera.cameraType) {
           case CameraType.Preview:
+          #if UNITY_2017_1_OR_NEWER
           case CameraType.Reflection:
+          #endif
           case CameraType.SceneView:
             return;
         }

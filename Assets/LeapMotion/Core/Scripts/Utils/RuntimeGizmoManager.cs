@@ -175,7 +175,9 @@ namespace Leap.Unity.RuntimeGizmos {
       //Never draw preview or reflection
       switch (camera.cameraType) {
         case CameraType.Preview:
+#if UNITY_2017_1_OR_NEWER
         case CameraType.Reflection:
+#endif
           return;
         case CameraType.Game:
         case CameraType.VR:
