@@ -19,14 +19,13 @@ namespace Leap.Unity {
   /// 
   /// Note: This script will be removed in a future version of UnityModules.
   /// </summary>
+  [RequireComponent(typeof(LeapXRServiceProvider))]
   public class LeapEyeDislocator : MonoBehaviour {
-
-    [SerializeField]
-    private LeapXRServiceProvider _provider;
 
     [SerializeField]
     private EyeType _eyeType = new EyeType(EyeType.OrderType.CENTER);
 
+    private LeapXRServiceProvider _provider;
     private Matrix4x4 _finalCenterMatrix;
     private float? _baseline = null;
 
@@ -45,6 +44,12 @@ namespace Leap.Unity {
     }
 
     private void OnEnable() {
+      _provider = GetComponent<LeapXRServiceProvider>();
+      if (_provider == null) {
+        enabled = false;
+        return;
+      }
+
       _provider.OnDeviceSafe += onDevice;
     }
 
