@@ -190,14 +190,11 @@ namespace Leap.Unity {
     public class EyeTextureData {
       private const string IR_SHADER_VARIANT_NAME = "LEAP_FORMAT_IR";
       private const string RGB_SHADER_VARIANT_NAME = "LEAP_FORMAT_RGB";
-      private const string GLOBAL_BRIGHT_TEXTURE_NAME = "_LeapGlobalBrightnessTexture";
       private const string GLOBAL_RAW_TEXTURE_NAME = "_LeapGlobalRawTexture";
       private const string GLOBAL_DISTORTION_TEXTURE_NAME = "_LeapGlobalDistortion";
-      private const string GLOBAL_BRIGHT_PIXEL_SIZE_NAME = "_LeapGlobalBrightnessPixelSize";
       private const string GLOBAL_RAW_PIXEL_SIZE_NAME = "_LeapGlobalRawPixelSize";
 
-      public readonly LeapTextureData BrightTexture;
-      public readonly LeapTextureData RawTexture;
+      public readonly LeapTextureData TextureData;
       public readonly LeapDistortionData Distortion;
       private bool _isStale = false;
 
@@ -207,20 +204,17 @@ namespace Leap.Unity {
         empty.hideFlags = HideFlags.DontSave;
         empty.SetPixel(0, 0, new Color(0, 0, 0, 0));
 
-        Shader.SetGlobalTexture(GLOBAL_BRIGHT_TEXTURE_NAME, empty);
         Shader.SetGlobalTexture(GLOBAL_RAW_TEXTURE_NAME, empty);
         Shader.SetGlobalTexture(GLOBAL_DISTORTION_TEXTURE_NAME, empty);
       }
 
       public EyeTextureData() {
-        BrightTexture = new LeapTextureData();
-        RawTexture = new LeapTextureData();
+        TextureData = new LeapTextureData();
         Distortion = new LeapDistortionData();
       }
 
-      public bool CheckStale(Image bright, Image raw) {
-        return BrightTexture.CheckStale(bright) ||
-               RawTexture.CheckStale(raw) ||
+      public bool CheckStale(Image image) {
+        return TextureData.CheckStale(image) ||
                Distortion.CheckStale() ||
                _isStale;
       }
@@ -229,13 +223,12 @@ namespace Leap.Unity {
         _isStale = true;
       }
 
-      public void Reconstruct(Image bright, Image raw) {
-        BrightTexture.Reconstruct(bright, GLOBAL_BRIGHT_TEXTURE_NAME, GLOBAL_BRIGHT_PIXEL_SIZE_NAME);
-        RawTexture.Reconstruct(raw, GLOBAL_RAW_TEXTURE_NAME, GLOBAL_RAW_PIXEL_SIZE_NAME);
+      public void Reconstruct(Image image) {
+        TextureData.Reconstruct(image, GLOBAL_RAW_TEXTURE_NAME, GLOBAL_RAW_PIXEL_SIZE_NAME);
 
-        Distortion.Reconstruct(raw, GLOBAL_DISTORTION_TEXTURE_NAME);
+        Distortion.Reconstruct(image, GLOBAL_DISTORTION_TEXTURE_NAME);
 
-        switch (raw.Format) {
+        switch (image.Format) {
           case Image.FormatType.INFRARED:
             Shader.DisableKeyword(RGB_SHADER_VARIANT_NAME);
             Shader.EnableKeyword(IR_SHADER_VARIANT_NAME);
@@ -245,16 +238,15 @@ namespace Leap.Unity {
             Shader.EnableKeyword(RGB_SHADER_VARIANT_NAME);
             break;
           default:
-            Debug.LogWarning("Unexpected format type " + raw.Format);
+            Debug.LogWarning("Unexpected format type " + image.Format);
             break;
         }
 
         _isStale = false;
       }
 
-      public void UpdateTextures(Image bright, Image raw) {
-        BrightTexture.UpdateTexture(bright);
-        RawTexture.UpdateTexture(raw);
+      public void UpdateTextures(Image image) {
+        TextureData.UpdateTexture(image);
       }
     }
 
@@ -318,11 +310,11 @@ namespace Leap.Unity {
 
     private void OnPreRender() {
       if (_currentImage != null) {
-        if (_eyeTextureData.CheckStale(_currentImage, _currentImage)) {
-          _eyeTextureData.Reconstruct(_currentImage, _currentImage);
+        if (_eyeTextureData.CheckStale(_currentImage)) {
+          _eyeTextureData.Reconstruct(_currentImage);
         }
 
-        _eyeTextureData.UpdateTextures(_currentImage, _currentImage);
+        _eyeTextureData.UpdateTextures(_currentImage);
       }
     }
 

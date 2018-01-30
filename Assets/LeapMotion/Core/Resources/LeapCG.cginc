@@ -1,12 +1,7 @@
 
-uniform sampler2D _LeapGlobalBrightnessTexture;
-
 uniform sampler2D _LeapGlobalRawTexture;
 
 uniform sampler2D _LeapGlobalDistortion;
-
-
-uniform float2 _LeapGlobalBrightnessPixelSize;
 
 uniform float2 _LeapGlobalRawPixelSize;
 
@@ -81,8 +76,6 @@ float2 LeapGetStereoUndistortedUV(float4 screenPos){
   } else { // Right Eye
     return LeapGetRightUndistortedUV(screenPos);
   }
-
-  //return LeapGetUndistortedUVWithOffset(screenPos, _LeapGlobalStereoUVOffset);
 }
 
 
@@ -98,25 +91,6 @@ float4 LeapGetWarpedScreenPos(float4 transformedVertex){
 
 float4 LeapGetLateVertexPos(float4 vertex, int isLeft){
 	return mul(unity_WorldToObject, mul(_LeapHandTransforms[isLeft], mul(unity_ObjectToWorld, vertex)));
-}
-
-
-/*** LEAP BRIGHTNESS ***/
-
-float LeapGetUVBrightness(float2 uv){
-    return tex2D(_LeapGlobalBrightnessTexture, uv).a;
-}
-
-float LeapGetLeftBrightness(float4 screenPos){
-  return LeapGetUVBrightness(LeapGetLeftUndistortedUV(screenPos));
-}
-
-float LeapGetRightBrightness(float4 screenPos){
-  return LeapGetUVBrightness(LeapGetRightUndistortedUV(screenPos));
-}
-
-float LeapGetStereoBrightness(float4 screenPos){
-  return LeapGetUVBrightness(LeapGetStereoUndistortedUV(screenPos));
 }
 
 
