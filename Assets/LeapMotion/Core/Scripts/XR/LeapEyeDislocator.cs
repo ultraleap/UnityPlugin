@@ -21,13 +21,14 @@ namespace Leap.Unity {
   /// </summary>
   public class LeapEyeDislocator : MonoBehaviour {
 
+    [SerializeField]
+    private LeapXRServiceProvider _provider;
+
+    [SerializeField]
+    private EyeType _eyeType = new EyeType(EyeType.OrderType.CENTER);
+
     private Matrix4x4 _finalCenterMatrix;
-
-    private LeapDeviceInfo _deviceInfo;
-
-    void Start() {
-      _deviceInfo = LeapDeviceInfo.GetLeapDeviceInfo();
-    }
+    private float? _baseline = null;
 
     private Camera _cachedCamera;
     private Camera _camera {
@@ -39,33 +40,40 @@ namespace Leap.Unity {
       }
     }
 
-    [SerializeField]
-    private EyeType _eyeType = new EyeType(EyeType.OrderType.CENTER);
+    private void onDevice(Device device) {
+      _baseline = device.Baseline;
+    }
 
-    void OnPreCull() {
-      #if UNITY_EDITOR
-      if (!Application.isPlaying) return;
-      #endif
+    private void OnEnable() {
+      _provider.OnDeviceSafe += onDevice;
+    }
 
+    private void OnDisable() {
+      _provider.OnDeviceSafe -= onDevice;
+    }
+
+    private void Update() {
+      _eyeType.Reset();
+    }
+
+    private void OnPreCull() {
       _camera.ResetWorldToCameraMatrix();
       _finalCenterMatrix = _camera.worldToCameraMatrix;
     }
 
-    void OnPreRender() {
-      #if UNITY_EDITOR
-      if (!Application.isPlaying) return;
-      #endif
-
+    private void OnPreRender() {
       _eyeType.BeginCamera(); // swaps eye
 
-      Matrix4x4 offsetMatrix;
-      
-      offsetMatrix = _finalCenterMatrix;
-      Vector3 ipdOffset = (_eyeType.IsLeftEye ? 1 : -1) * transform.right * _deviceInfo.baseline * 0.5f;
-      Vector3 forwardOffset = -transform.forward * _deviceInfo.forwardOffset;
-      offsetMatrix *= Matrix4x4.TRS(ipdOffset + forwardOffset, Quaternion.identity, Vector3.one);
+      if (_baseline.HasValue) {
+        Matrix4x4 offsetMatrix;
 
-      _camera.worldToCameraMatrix = offsetMatrix;
+        offsetMatrix = _finalCenterMatrix;
+        Vector3 ipdOffset = (_eyeType.IsLeftEye ? 1 : -1) * transform.right * _baseline.Value * 0.5f;
+        Vector3 forwardOffset = -transform.forward * _provider.deviceOffsetZAxis;
+        offsetMatrix *= Matrix4x4.TRS(ipdOffset + forwardOffset, Quaternion.identity, Vector3.one);
+
+        _camera.worldToCameraMatrix = offsetMatrix;
+      }
     }
   }
 

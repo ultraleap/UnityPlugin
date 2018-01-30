@@ -384,13 +384,6 @@ namespace Leap.Unity {
     }
 
     /// <summary>
-    /// Returns information describing the device hardware.
-    /// </summary>
-    public LeapDeviceInfo GetDeviceInfo() {
-      return LeapDeviceInfo.GetLeapDeviceInfo();
-    }
-
-    /// <summary>
     /// Retransforms hand data from Leap space to the space of the Unity transform.
     /// This is only necessary if you're moving the LeapServiceProvider around in a
     /// custom script and trying to access Hand data from it directly afterward.

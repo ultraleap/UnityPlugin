@@ -91,12 +91,11 @@ namespace Leap.Unity {
     }
 #endif
 
-      public void BeginCamera() {
+    public void BeginCamera() {
       if (!_hasBegun) {
         _isOnFirst = true;
         _hasBegun = true;
-      }
-      else {
+      } else {
         _isOnFirst = !_isOnFirst;
       }
     }
