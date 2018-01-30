@@ -171,14 +171,20 @@ namespace Leap.Unity.RuntimeGizmos {
 
     protected void onPostRender(Camera camera) {
 #if UNITY_EDITOR
-      //Hard-coded name of the camera used to generate the pre-render view
-      if (camera.gameObject.name == "PreRenderCamera") {
-        return;
-      }
-
-      bool isSceneCamera = camera.gameObject.hideFlags == HideFlags.HideAndDontSave;
-      if (!isSceneCamera && !_displayInGameView) {
-        return;
+      //Always draw scene view
+      //Never draw preview or reflection
+      switch (camera.cameraType) {
+        case CameraType.Preview:
+#if UNITY_2017_1_OR_NEWER
+        case CameraType.Reflection:
+#endif
+          return;
+        case CameraType.Game:
+        case CameraType.VR:
+          if (!_displayInGameView) {
+            return;
+          }
+          break;
       }
 #endif
 
