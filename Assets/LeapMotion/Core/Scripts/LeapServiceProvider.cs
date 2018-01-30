@@ -469,7 +469,10 @@ namespace Leap.Unity {
 
     protected void onHandControllerConnect(object sender, LeapEventArgs args) {
       initializeFlags();
-      _leapController.Device -= onHandControllerConnect;
+
+      if (_leapController != null) {
+        _leapController.Device -= onHandControllerConnect;
+      }
     }
 
     protected virtual void transformFrame(Frame source, Frame dest) {

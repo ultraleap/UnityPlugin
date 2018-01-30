@@ -308,22 +308,21 @@ namespace Leap.Unity {
 
       _currentImage = null;
 
-      //Get rid of images that are older then the desired image frame
-      Image staleImage;
-      while (_imageQueue.TryPeek(out staleImage)) {
-        if (staleImage.SequenceId < imageFrame.Id) {
-          _imageQueue.TryDequeue();
-        } else {
+      /* Use the most recent image that is not newer than the current frame
+       * This means that the shown image might be slightly older than the current
+       * frame if for some reason a frame arrived before an image did.
+       * 
+       * Usually however, this is just important when robust mode is enabled.
+       * At that time, image ids never line up with tracking ids.
+       */
+      Image potentialImage;
+      while (_imageQueue.TryPeek(out potentialImage)) {
+        if (potentialImage.SequenceId > imageFrame.Id) {
           break;
         }
-      }
 
-      Image newImage;
-      if (_imageQueue.TryPeek(out newImage)) {
-        if (newImage.SequenceId == imageFrame.Id) {
-          _currentImage = newImage;
-          _imageQueue.TryDequeue();
-        }
+        _currentImage = potentialImage;
+        _imageQueue.TryDequeue();
       }
     }
 
@@ -362,8 +361,8 @@ namespace Leap.Unity {
       controller.DistortionChange += onDistortionChange;
     }
 
-    private void onImageReady(object sender, ImageEventArgs argsd) {
-      Image image = argsd.image;
+    private void onImageReady(object sender, ImageEventArgs args) {
+      Image image = args.image;
       _imageQueue.TryEnqueue(image);
     }
 
