@@ -277,15 +277,15 @@ namespace Leap.Unity {
       ApplyGammaCorrectionValues();
     }
 
-    void OnEnable() {
+    private void OnEnable() {
       subscribeToService();
     }
 
-    void OnDisable() {
+    private void OnDisable() {
       unsubscribeFromService();
     }
 
-    void OnDestroy() {
+    private void OnDestroy() {
       StopAllCoroutines();
       Controller controller = _provider.GetLeapController();
       if (controller != null) {
@@ -293,7 +293,7 @@ namespace Leap.Unity {
       }
     }
 
-    void OnPreRender() {
+    private void OnPreRender() {
       if (_currentImage != null) {
         if (_eyeTextureData.CheckStale(_currentImage, _currentImage)) {
           _eyeTextureData.Reconstruct(_currentImage, _currentImage);
@@ -303,7 +303,7 @@ namespace Leap.Unity {
       }
     }
 
-    void LateUpdate() {
+    private void LateUpdate() {
       Frame imageFrame = _provider.CurrentFrame;
 
       _currentImage = null;
