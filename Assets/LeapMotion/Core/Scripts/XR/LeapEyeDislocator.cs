@@ -29,7 +29,7 @@ namespace Leap.Unity {
 
     [MinValue(0), Units("MM"), InspectorName("Baseline")]
     [SerializeField]
-    private float _customBaselineValue = 60;
+    private float _customBaselineValue = 64;
 
     private LeapXRServiceProvider _provider;
     private Matrix4x4 _finalCenterMatrix;
