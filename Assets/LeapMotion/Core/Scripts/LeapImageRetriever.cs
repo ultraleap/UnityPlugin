@@ -268,7 +268,7 @@ namespace Leap.Unity {
     }
 #endif
 
-    void Start() {
+    private void Awake() {
       _provider = GetComponent<LeapServiceProvider>();
 
       //Enable pooling to reduce overhead of images
