@@ -293,16 +293,6 @@ namespace Leap.Unity {
       }
     }
 
-    private void OnPreRender() {
-      if (_currentImage != null) {
-        if (_eyeTextureData.CheckStale(_currentImage, _currentImage)) {
-          _eyeTextureData.Reconstruct(_currentImage, _currentImage);
-        }
-
-        _eyeTextureData.UpdateTextures(_currentImage, _currentImage);
-      }
-    }
-
     private void LateUpdate() {
       Frame imageFrame = _provider.CurrentFrame;
 
@@ -323,6 +313,16 @@ namespace Leap.Unity {
 
         _currentImage = potentialImage;
         _imageQueue.TryDequeue();
+      }
+    }
+
+    private void OnPreRender() {
+      if (_currentImage != null) {
+        if (_eyeTextureData.CheckStale(_currentImage, _currentImage)) {
+          _eyeTextureData.Reconstruct(_currentImage, _currentImage);
+        }
+
+        _eyeTextureData.UpdateTextures(_currentImage, _currentImage);
       }
     }
 
