@@ -8,10 +8,9 @@
  ******************************************************************************/
 
 using UnityEngine;
-using UnityEngine.Rendering;
-using System;
 
 namespace Leap.Unity {
+  using Attributes;
 
   /// <summary>
   /// Moves the camera to each eye position on pre-render. Only necessary for image
@@ -24,6 +23,13 @@ namespace Leap.Unity {
 
     [SerializeField]
     private EyeType _eyeType = new EyeType(EyeType.OrderType.CENTER);
+
+    [SerializeField]
+    private bool _useCustomBaseline = false;
+
+    [MinValue(0), Units("MM"), InspectorName("Baseline")]
+    [SerializeField]
+    private float _customBaselineValue = 60;
 
     private LeapXRServiceProvider _provider;
     private Matrix4x4 _finalCenterMatrix;
@@ -69,11 +75,18 @@ namespace Leap.Unity {
     private void OnPreRender() {
       _eyeType.BeginCamera(); // swaps eye
 
-      if (_baseline.HasValue) {
+      float? baselineToUse = null;
+      if (_useCustomBaseline) {
+        baselineToUse = _customBaselineValue;
+      } else if (_baseline.HasValue) {
+        baselineToUse = _baseline.Value;
+      }
+
+      if (baselineToUse.HasValue) {
         Matrix4x4 offsetMatrix;
 
         offsetMatrix = _finalCenterMatrix;
-        Vector3 ipdOffset = (_eyeType.IsLeftEye ? 1 : -1) * transform.right * _baseline.Value * 0.5f * 1e-3f;
+        Vector3 ipdOffset = (_eyeType.IsLeftEye ? 1 : -1) * transform.right * baselineToUse.Value * 0.5f * 1e-3f;
         Vector3 forwardOffset = -transform.forward * _provider.deviceOffsetZAxis;
         offsetMatrix *= Matrix4x4.TRS(ipdOffset + forwardOffset, Quaternion.identity, Vector3.one);
 
@@ -81,5 +94,4 @@ namespace Leap.Unity {
       }
     }
   }
-
 }
