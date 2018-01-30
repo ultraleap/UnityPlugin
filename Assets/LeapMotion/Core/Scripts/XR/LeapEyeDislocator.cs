@@ -73,7 +73,7 @@ namespace Leap.Unity {
         Matrix4x4 offsetMatrix;
 
         offsetMatrix = _finalCenterMatrix;
-        Vector3 ipdOffset = (_eyeType.IsLeftEye ? 1 : -1) * transform.right * _baseline.Value * 0.5f;
+        Vector3 ipdOffset = (_eyeType.IsLeftEye ? 1 : -1) * transform.right * _baseline.Value * 0.5f * 1e-3f;
         Vector3 forwardOffset = -transform.forward * _provider.deviceOffsetZAxis;
         offsetMatrix *= Matrix4x4.TRS(ipdOffset + forwardOffset, Quaternion.identity, Vector3.one);
 

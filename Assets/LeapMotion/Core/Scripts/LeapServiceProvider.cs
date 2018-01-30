@@ -430,7 +430,11 @@ namespace Leap.Unity {
       }
 
       _leapController = new Controller();
-      _leapController.Device += (s, e) => _onDeviceSafe(e.Device);
+      _leapController.Device += (s, e) => {
+        if (_onDeviceSafe != null) {
+          _onDeviceSafe(e.Device);
+        }
+      };
 
       if (_leapController.IsConnected) {
         initializeFlags();
