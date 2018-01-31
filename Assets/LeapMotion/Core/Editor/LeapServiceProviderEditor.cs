@@ -38,6 +38,8 @@ namespace Leap.Unity {
       specifyConditionalDrawing("_physicsExtrapolation",
                                 (int)LeapServiceProvider.PhysicsExtrapolationMode.Manual,
                                 "_physicsExtrapolationTime");
+
+      deferProperty("_enableDllProfiling");
     }
 
     private void frameOptimizationWarning(SerializedProperty property) {

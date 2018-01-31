@@ -66,15 +66,14 @@ namespace Leap.Unity {
     [SerializeField]
     protected float _physicsExtrapolationTime = 1.0f / 90.0f;
 
-    #endregion
-
-    #region Internal Settings & Memory
-
     [Tooltip("When checked, profiling data from the LeapCSharp dll will be used to populate the UnityProfiler.")]
     [EditTimeOnly]
     [SerializeField]
     protected bool _enableDllProfiling = false;
 
+    #endregion
+
+    #region Internal Settings & Memory
     protected bool _useInterpolation = true;
 
     // Extrapolate on Android to compensate for the latency introduced by its graphics
