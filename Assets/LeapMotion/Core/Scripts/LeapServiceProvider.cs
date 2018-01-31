@@ -425,7 +425,7 @@ namespace Leap.Unity {
     /// </summary>
     protected void createController() {
       if (_leapController != null) {
-        destroyController();
+        return;
       }
 
       _leapController = new Controller();
