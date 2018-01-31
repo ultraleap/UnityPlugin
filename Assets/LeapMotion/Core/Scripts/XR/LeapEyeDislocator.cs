@@ -33,7 +33,7 @@ namespace Leap.Unity {
 
     private LeapXRServiceProvider _provider;
     private Matrix4x4 _finalCenterMatrix;
-    private float? _baseline = null;
+    private float? _deviceBaseline = null;
 
     private Camera _cachedCamera;
     private Camera _camera {
@@ -46,7 +46,7 @@ namespace Leap.Unity {
     }
 
     private void onDevice(Device device) {
-      _baseline = device.Baseline;
+      _deviceBaseline = device.Baseline;
     }
 
     private void OnEnable() {
@@ -78,8 +78,8 @@ namespace Leap.Unity {
       float? baselineToUse = null;
       if (_useCustomBaseline) {
         baselineToUse = _customBaselineValue;
-      } else if (_baseline.HasValue) {
-        baselineToUse = _baseline.Value;
+      } else if (_deviceBaseline.HasValue) {
+        baselineToUse = _deviceBaseline.Value;
       }
 
       if (baselineToUse.HasValue) {
