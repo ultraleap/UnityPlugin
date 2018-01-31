@@ -11,10 +11,8 @@
 			LOD 200
 
 			CGPROGRAM
-			// Physically based Standard lighting model, and enable shadows on all light types
 #pragma surface surf Standard fullforwardshadows vertex:vert
-#include "LeapCG.cginc"
-			// Use shader model 3.0 target, to get nicer looking lighting
+#include "Assets/LeapMotion/Core/Resources/LeapCG.cginc"
 #pragma target 3.0
 
 			int _isLeftHand;
