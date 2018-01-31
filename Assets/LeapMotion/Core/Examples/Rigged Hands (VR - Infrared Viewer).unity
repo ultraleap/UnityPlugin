@@ -1169,7 +1169,6 @@ GameObject:
   - component: {fileID: 1690402816}
   - component: {fileID: 1690402817}
   - component: {fileID: 1690402823}
-  - component: {fileID: 1690402822}
   - component: {fileID: 1690402821}
   - component: {fileID: 1690402820}
   - component: {fileID: 1690402819}
@@ -1216,6 +1215,7 @@ MonoBehaviour:
   _frameOptimization: 0
   _physicsExtrapolation: 1
   _physicsExtrapolationTime: 0.011111111
+  _enableDllProfiling: 0
   _allowManualDeviceOffset: 1
   _deviceOffsetYAxis: 0
   _deviceOffsetZAxis: 0.12
@@ -1234,9 +1234,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fd815635398474cbbba564563a209f82, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _provider: {fileID: 1690402819}
   _gammaCorrection: 1
-  ImageTimeout: 9000
 --- !u!114 &1690402821
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1250,18 +1248,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _eyeType:
     _orderType: 3
---- !u!114 &1690402822
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1690402815}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4499ae867a57a90449cb9069c466ade0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _depthTextureMode: 0
+  _useCustomBaseline: 0
+  _customBaselineValue: 64
 --- !u!20 &1690402823
 Camera:
   m_ObjectHideFlags: 0
