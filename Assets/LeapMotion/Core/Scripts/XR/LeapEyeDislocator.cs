@@ -83,14 +83,13 @@ namespace Leap.Unity {
       }
 
       if (baselineToUse.HasValue) {
-        Matrix4x4 offsetMatrix;
+        Vector3 ipdOffset = (_eyeType.IsLeftEye ? 1 : -1) * Vector3.right * baselineToUse.Value * 0.5f * 1e-3f;
+        Vector3 providerOffset = Vector3.forward * _provider.deviceOffsetZAxis - Vector3.up * _provider.deviceOffsetYAxis;
+        Quaternion providerRotation = Quaternion.AngleAxis(_provider.deviceTiltXAxis, Vector3.right);
 
-        offsetMatrix = _finalCenterMatrix;
-        Vector3 ipdOffset = (_eyeType.IsLeftEye ? 1 : -1) * transform.right * baselineToUse.Value * 0.5f * 1e-3f;
-        Vector3 forwardOffset = -transform.forward * _provider.deviceOffsetZAxis;
-        offsetMatrix *= Matrix4x4.TRS(ipdOffset + forwardOffset, Quaternion.identity, Vector3.one);
-
-        _camera.worldToCameraMatrix = offsetMatrix;
+        _camera.worldToCameraMatrix = Matrix4x4.Translate(providerOffset + ipdOffset) *
+                                      Matrix4x4.Rotate(providerRotation) *
+                                      _finalCenterMatrix;
       }
     }
   }
