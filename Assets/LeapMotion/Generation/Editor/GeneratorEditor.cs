@@ -26,6 +26,8 @@ namespace Leap.Unity.Generation {
           Debug.LogException(e);
         }
       }
+      AssetDatabase.Refresh();
+      AssetDatabase.SaveAssets();
     }
 
     protected override void OnEnable() {
@@ -41,6 +43,9 @@ namespace Leap.Unity.Generation {
         foreach (var target in targets) {
           target.Generate();
         }
+
+        AssetDatabase.Refresh();
+        AssetDatabase.SaveAssets();
       }
 
       base.OnInspectorGUI();

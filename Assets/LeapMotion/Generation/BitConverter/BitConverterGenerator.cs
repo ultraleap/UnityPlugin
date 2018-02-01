@@ -73,7 +73,10 @@ namespace Leap.Unity.Generation {
         writer.Write(beforeCode);
 
         foreach (var primitiveType in primitiveTypes) {
-          writer.Write(codeTemplate.Replace(toReplace, primitiveType));
+          //Replace Single with the actual primitive
+          //Also uncomment the Test attribute
+          writer.Write(codeTemplate.Replace(toReplace, primitiveType).
+                                    Replace("//[Test]", "[Test]"));
         }
 
         writer.Write(afterCode);

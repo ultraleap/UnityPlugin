@@ -7,12 +7,8 @@
  * between Leap Motion and you, your company or other organization.           *
  ******************************************************************************/
 
-#if UNITY_EDITOR
-
 using System;
 using System.Linq;
-using System.Collections.Generic;
-using UnityEngine;
 using NUnit.Framework;
 
 namespace Leap.Unity.Generation {
@@ -30,7 +26,7 @@ namespace Leap.Unity.Generation {
     }
     //BEGIN
 
-    [Test]
+    //[Test]
     public void TestToSingle() {
       Single expected = BitConverter.ToSingle(_bytes, 0);
       Single actual = _BitConverterTestMock_.ToSingle(_bytes, 0);
@@ -38,7 +34,7 @@ namespace Leap.Unity.Generation {
       Assert.That(actual, Is.EqualTo(expected));
     }
 
-    [Test]
+    //[Test]
     public void TestFromSingle() {
       Single value = (Single)UnityEngine.Random.Range(float.MinValue, float.MaxValue);
       var actual = BitConverter.GetBytes(value);
@@ -52,5 +48,3 @@ namespace Leap.Unity.Generation {
     //END
   }
 }
-
-#endif
