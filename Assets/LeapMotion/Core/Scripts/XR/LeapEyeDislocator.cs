@@ -33,7 +33,7 @@ namespace Leap.Unity {
 
     private LeapXRServiceProvider _provider;
     private Matrix4x4 _finalCenterMatrix;
-    private float? _deviceBaseline = null;
+    private Maybe<float> _deviceBaseline = Maybe.None;
 
     private Camera _cachedCamera;
     private Camera _camera {
@@ -46,7 +46,7 @@ namespace Leap.Unity {
     }
 
     private void onDevice(Device device) {
-      _deviceBaseline = device.Baseline;
+      _deviceBaseline = Maybe.Some(device.Baseline);
     }
 
     private void OnEnable() {
@@ -75,15 +75,16 @@ namespace Leap.Unity {
     private void OnPreRender() {
       _eyeType.BeginCamera(); // swaps eye
 
-      float? baselineToUse = null;
+      Maybe<float> baselineToUse = Maybe.None;
       if (_useCustomBaseline) {
-        baselineToUse = _customBaselineValue;
-      } else if (_deviceBaseline.HasValue) {
-        baselineToUse = _deviceBaseline.Value;
+        baselineToUse = Maybe.Some(_customBaselineValue);
+      } else {
+        baselineToUse = _deviceBaseline;
       }
 
-      if (baselineToUse.HasValue) {
-        Vector3 ipdOffset = (_eyeType.IsLeftEye ? 1 : -1) * Vector3.right * baselineToUse.Value * 0.5f * 1e-3f;
+      float baseline;
+      if (baselineToUse.TryGetValue(out baseline)) {
+        Vector3 ipdOffset = (_eyeType.IsLeftEye ? 1 : -1) * Vector3.right * baseline * 0.5f * 1e-3f;
         Vector3 providerOffset = Vector3.forward * _provider.deviceOffsetZAxis - Vector3.up * _provider.deviceOffsetYAxis;
         Quaternion providerRotation = Quaternion.AngleAxis(_provider.deviceTiltXAxis, Vector3.right);
 
