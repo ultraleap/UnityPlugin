@@ -21,7 +21,7 @@ namespace Leap.Unity.Generation {
     public const string BEGIN_KEY = "//BEGIN";
     public const string END_KEY = "//END";
     public const string TEMPLATE_NAMESPACE = "Leap.Unity.Generation";
-    public const string TARGET_NAMESPACE = "Leap.Unity";
+    public const string TARGET_NAMESPACE = "Leap.Unity.Tests";
 
     public TextAsset codeTemplate;
     public TextAsset testTemplate;
