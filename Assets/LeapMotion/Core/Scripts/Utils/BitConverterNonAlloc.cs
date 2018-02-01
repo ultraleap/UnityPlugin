@@ -9,7 +9,7 @@
 
 using System;
 
-namespace Leap.Unity {
+namespace Leap.Unity.Tests {
 
   public class BitConverterNonAlloc {
 
