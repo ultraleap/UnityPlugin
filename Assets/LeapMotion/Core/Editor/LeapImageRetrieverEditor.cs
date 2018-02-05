@@ -14,13 +14,13 @@ namespace Leap.Unity{
   [CustomEditor(typeof(LeapImageRetriever))]
   public class LeapImageRetrieverEditor : CustomEditorBase<LeapImageRetriever> {
 
-    private GUIContent _TextureGUIContent;
+    private GUIContent _textureGUIContent;
     private GUIContent _distortionTextureGUIContent;
 
     protected override void OnEnable() {
       base.OnEnable();
 
-      _TextureGUIContent = new GUIContent("Sensor Texture");
+      _textureGUIContent = new GUIContent("Sensor Texture");
       _distortionTextureGUIContent = new GUIContent("Distortion Texture");
     }
 
@@ -32,7 +32,7 @@ namespace Leap.Unity{
         var dataType = typeof(Object);
 
         EditorGUI.BeginDisabledGroup(true);
-        EditorGUILayout.ObjectField(_TextureGUIContent, data.TextureData.CombinedTexture, dataType, true);
+        EditorGUILayout.ObjectField(_textureGUIContent, data.TextureData.CombinedTexture, dataType, true);
         EditorGUILayout.ObjectField(_distortionTextureGUIContent, data.Distortion.CombinedTexture, dataType, true);
         EditorGUI.EndDisabledGroup();
       }
