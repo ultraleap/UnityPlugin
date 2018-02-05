@@ -72,7 +72,7 @@ namespace Leap.Unity.Query {
     }
   }
 
-  public partial struct QueryWrapper<QueryType, QueryOp> where QueryOp : IQueryOp<QueryType> {
+  public partial struct QueryWrapper<QueryType, QueryOp> {
 
     /// <summary>
     /// Returns a new query operation where each new element in the sequence is an instance of the PrevPair struct.

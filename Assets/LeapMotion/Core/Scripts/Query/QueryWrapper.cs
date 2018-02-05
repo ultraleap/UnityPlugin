@@ -25,7 +25,7 @@ namespace Leap.Unity.Query {
   ///
   /// myList.Query().Where(someCondition).First();
   /// </summary>
-  public partial struct QueryWrapper<QueryType, QueryOp> where QueryOp : IQueryOp<QueryType> {
+  public partial struct QueryWrapper<QueryType, QueryOp> where QueryOp : struct, IQueryOp<QueryType> {
     private QueryOp _op;
 
     /// <summary>
@@ -94,8 +94,18 @@ namespace Leap.Unity.Query {
   }
 
   /// <summary>
-  /// The interface all query operations must follow.  It is a modified version of the 
-  /// IEnumerator interface, optimized for speed and conciseness.
+  /// The interface all query operations must follow.  Implementers of IQueryOp must be
+  /// non-nullable value types -- i.e., structs. If you attempt to construct a
+  /// QueryWrapper around a non-struct IQueryOp, you will get a compile error.
+  /// 
+  /// IQueryOp is a modified version of the IEnumerator interface, optimized for speed
+  /// and conciseness.  It uses a single TryGetNext method with an out param instead of
+  /// a single MoveNext method with a current getter.  By combining these two concepts
+  /// into a single method we can get a roughly 2x speedup compared to using IEnumerator.
+  /// 
+  /// Sequences must be deterministic!  Any randomization must be seeded so that a given
+  /// query op will always return the same sequence, otherwise undefined behavior will
+  /// occur.
   /// </summary>
   public interface IQueryOp<T> {
 
