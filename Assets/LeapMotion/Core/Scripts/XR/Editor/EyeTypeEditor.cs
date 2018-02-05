@@ -19,5 +19,4 @@ namespace Leap.Unity {
       EditorGUI.PropertyField(position, property.FindPropertyRelative("_orderType"));
     }
   }
-
 }

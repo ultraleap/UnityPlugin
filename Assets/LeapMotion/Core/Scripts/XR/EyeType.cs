@@ -17,15 +17,11 @@ using System;
 namespace Leap.Unity {
   [Serializable]
   public class EyeType {
-    private const string TARGET_EYE_PROPERTY_NAME = "m_TargetEye";
-    private const int TARGET_EYE_LEFT_INDEX = 1;
-    private const int TARGET_EYE_RIGHT_INDEX = 2;
-    private const int TARGET_EYE_CENTER_INDEX = 3;
 
     public enum OrderType {
-      LEFT = TARGET_EYE_LEFT_INDEX,
-      RIGHT = TARGET_EYE_RIGHT_INDEX,
-      CENTER = TARGET_EYE_CENTER_INDEX
+      LEFT = 1,
+      RIGHT = 2,
+      CENTER = 3
     }
 
     [SerializeField]
@@ -64,32 +60,6 @@ namespace Leap.Unity {
     public EyeType(OrderType type) {
       _orderType = type;
     }
-
-#if UNITY_EDITOR
-    public void UpdateOrderGivenComponent(Component component) {
-      if (Application.isPlaying) {
-        return;
-      }
-
-      //Allow the user to specify themselves if VR is disabled.
-      if (!XRSupportUtil.IsXREnabled()) {
-        return;
-      }
-
-      Camera camera = component.GetComponent<Camera>();
-      if (camera == null) {
-        camera = component.gameObject.AddComponent<Camera>();
-      }
-
-      SerializedObject obj = new SerializedObject(camera);
-      SerializedProperty targetEyeProp = obj.FindProperty(TARGET_EYE_PROPERTY_NAME);
-      OrderType newOrder = (OrderType)targetEyeProp.intValue;
-      if (_orderType != newOrder) {
-        _orderType = newOrder;
-        EditorUtility.SetDirty(component);
-      }
-    }
-#endif
 
     public void BeginCamera() {
       if (!_hasBegun) {
