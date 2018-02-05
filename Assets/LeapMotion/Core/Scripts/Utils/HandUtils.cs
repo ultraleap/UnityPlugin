@@ -482,6 +482,30 @@ namespace Leap.Unity {
                                          / deltaTime;
       }
     }
+    
+    #region Frame Utils
+
+    public static Hand Get(this Frame frame, Chirality whichHand) {
+      return frame.Hands.Query().FirstOrDefault(h => h.IsLeft == (whichHand == Chirality.Left));
+    }
+
+    #endregion
+
+    #region Provider Utils
+
+    public static Hand Get(this LeapProvider provider, Chirality whichHand) {
+      List<Hand> hands;
+      if (Time.inFixedTimeStep) {
+        hands = provider.CurrentFixedFrame.Hands;
+      }
+      else {
+        hands = provider.CurrentFrame.Hands;
+      }
+
+      return hands.Query().FirstOrDefault(h => h.IsLeft == (whichHand == Chirality.Left));
+    }
+
+    #endregion
 
   }
 
