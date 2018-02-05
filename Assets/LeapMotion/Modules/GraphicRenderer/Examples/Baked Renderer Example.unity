@@ -1112,7 +1112,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fb8f8839ee256bb458e1657c1ee40572, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _stationaryHeightOffset: 1.6
+  _roomScaleHeightOffset: 1.6
   autoRecenterOnUserPresence: 1
   enableRuntimeAdjustment: 1
   stepUpKey: 273
