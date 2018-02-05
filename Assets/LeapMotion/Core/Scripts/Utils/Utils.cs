@@ -12,7 +12,6 @@ using UnityEngine.Assertions;
 using System;
 using System.IO;
 using System.Collections.Generic;
-using Leap.Unity.RuntimeGizmos;
 using Leap.Unity.Query;
 
 namespace Leap.Unity {

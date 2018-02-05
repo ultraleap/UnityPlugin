@@ -8,7 +8,6 @@
  ******************************************************************************/
 
 using UnityEngine;
-using System.Collections;
 
 namespace Leap.Unity {
 
