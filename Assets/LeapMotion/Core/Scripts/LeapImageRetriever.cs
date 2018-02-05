@@ -188,8 +188,6 @@ namespace Leap.Unity {
     }
 
     public class EyeTextureData {
-      private const string IR_SHADER_VARIANT_NAME = "LEAP_FORMAT_IR";
-      private const string RGB_SHADER_VARIANT_NAME = "LEAP_FORMAT_RGB";
       private const string GLOBAL_RAW_TEXTURE_NAME = "_LeapGlobalRawTexture";
       private const string GLOBAL_DISTORTION_TEXTURE_NAME = "_LeapGlobalDistortion";
       private const string GLOBAL_RAW_PIXEL_SIZE_NAME = "_LeapGlobalRawPixelSize";
@@ -225,23 +223,7 @@ namespace Leap.Unity {
 
       public void Reconstruct(Image image) {
         TextureData.Reconstruct(image, GLOBAL_RAW_TEXTURE_NAME, GLOBAL_RAW_PIXEL_SIZE_NAME);
-
         Distortion.Reconstruct(image, GLOBAL_DISTORTION_TEXTURE_NAME);
-
-        switch (image.Format) {
-          case Image.FormatType.INFRARED:
-            Shader.DisableKeyword(RGB_SHADER_VARIANT_NAME);
-            Shader.EnableKeyword(IR_SHADER_VARIANT_NAME);
-            break;
-          case (Image.FormatType)4:
-            Shader.DisableKeyword(IR_SHADER_VARIANT_NAME);
-            Shader.EnableKeyword(RGB_SHADER_VARIANT_NAME);
-            break;
-          default:
-            Debug.LogWarning("Unexpected format type " + image.Format);
-            break;
-        }
-
         _isStale = false;
       }
 
