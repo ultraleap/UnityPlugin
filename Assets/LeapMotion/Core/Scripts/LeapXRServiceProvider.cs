@@ -1,5 +1,5 @@
-﻿/******************************************************************************
- * Copyright (C) Leap Motion, Inc. 2011-2017.                                 *
+/******************************************************************************
+ * Copyright (C) Leap Motion, Inc. 2011-2018.                                 *
  * Leap Motion proprietary and  confidential.                                 *
  *                                                                            *
  * Use subject to the terms of the Leap Motion SDK Agreement available at     *
@@ -411,17 +411,15 @@ namespace Leap.Unity {
 
     protected void OnPreCullHandTransforms(Camera camera) {
       if (updateHandInPrecull) {
-        #if UNITY_EDITOR
-        //Hard-coded name of the camera used to generate the pre-render view
-        if (camera.gameObject.name == "PreRenderCamera") {
-          return;
+        //Don't update pre cull for preview, reflection, or scene view cameras
+        switch (camera.cameraType) {
+          case CameraType.Preview:
+          #if UNITY_2017_1_OR_NEWER
+          case CameraType.Reflection:
+          #endif
+          case CameraType.SceneView:
+            return;
         }
-
-        bool isScenePreviewCamera = camera.gameObject.hideFlags == HideFlags.HideAndDontSave;
-        if (isScenePreviewCamera) {
-          return;
-        }
-        #endif
 
         if (Application.isPlaying
             && !manualUpdateHasBeenCalledSinceUpdate

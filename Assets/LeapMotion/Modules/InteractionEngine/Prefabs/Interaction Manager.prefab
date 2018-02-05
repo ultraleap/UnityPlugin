@@ -1756,7 +1756,7 @@ MonoBehaviour:
   _hoverEnabled: 1
   _contactEnabled: 1
   _graspingEnabled: 1
-  _trackingProviderType: Leap.Unity.Interaction.DefaultVRNodeTrackingProvider
+  _trackingProviderType: Leap.Unity.Interaction.DefaultXRNodeTrackingProvider
   _deviceJoystickTokens: oculus touch left
   _chirality: 0
   _hoverPoint: {fileID: 4124005749955138}
@@ -1782,7 +1782,7 @@ MonoBehaviour:
   _hoverEnabled: 1
   _contactEnabled: 1
   _graspingEnabled: 1
-  _trackingProviderType: Leap.Unity.Interaction.DefaultVRNodeTrackingProvider
+  _trackingProviderType: Leap.Unity.Interaction.DefaultXRNodeTrackingProvider
   _deviceJoystickTokens: oculus touch right
   _chirality: 1
   _hoverPoint: {fileID: 4048898786076064}
@@ -1975,7 +1975,7 @@ MonoBehaviour:
   _hoverEnabled: 1
   _contactEnabled: 1
   _graspingEnabled: 1
-  _trackingProviderType: Leap.Unity.Interaction.DefaultVRNodeTrackingProvider
+  _trackingProviderType: Leap.Unity.Interaction.DefaultXRNodeTrackingProvider
   _deviceJoystickTokens: openvr controller left
   _chirality: 0
   _hoverPoint: {fileID: 4929993856360548}
@@ -2019,7 +2019,7 @@ MonoBehaviour:
   _hoverEnabled: 1
   _contactEnabled: 1
   _graspingEnabled: 1
-  _trackingProviderType: Leap.Unity.Interaction.DefaultVRNodeTrackingProvider
+  _trackingProviderType: Leap.Unity.Interaction.DefaultXRNodeTrackingProvider
   _deviceJoystickTokens: openvr controller right
   _chirality: 1
   _hoverPoint: {fileID: 4646715249737296}
