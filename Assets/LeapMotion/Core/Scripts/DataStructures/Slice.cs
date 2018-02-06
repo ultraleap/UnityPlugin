@@ -67,11 +67,11 @@ namespace Leap.Unity {
 
     public T this[int index] {
       get {
-        if (index > Count - 1) { throw new System.IndexOutOfRangeException(); }
+        if (index < 0 || index > Count - 1) { throw new IndexOutOfRangeException(); }
         return _list[_beginIdx + index * _direction];
       }
       set {
-        if (index > Count - 1) { throw new System.IndexOutOfRangeException(); }
+        if (index < 0 || index > Count - 1) { throw new IndexOutOfRangeException(); }
         _list[_beginIdx + index * _direction] = value;
       }
     }
