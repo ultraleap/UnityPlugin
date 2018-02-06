@@ -73,24 +73,4 @@ namespace Leap.Unity.Attributes {
 
   }
 
-  public static class RectExtensions {
-
-    /// <summary>
-    /// Returns a new Rect centered on the original Rect but with the specified amount of
-    /// inner edge padding for each edge.
-    /// </summary>
-    public static Rect PadInner(this Rect r, float padding) {
-      return new Rect(r.x + padding, r.y + padding, r.width - padding, r.height - padding);
-    }
-
-    /// <summary>
-    /// Returns a new Rect centered on the original Rect but with the specified amount of
-    /// inner edge padding for each edge.
-    /// </summary>
-    public static Rect PadInner(this Rect r, float top, float bottom, float left, float right) {
-      return new Rect(r.x + left, r.y + bottom, r.width - right, r.height - top);
-    }
-
-  }
-
 }
