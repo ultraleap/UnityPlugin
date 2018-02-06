@@ -837,17 +837,15 @@ namespace Leap.Unity {
     }
 
     /// <summary>
+    /// Infix sugar for Vector3.MoveTowards(a, b).
+    /// 
     /// Returns this position moved towards the argument position, up to but no more than
-    /// the max movement amount from the original position.
+    /// the max distance from the original position specified by maxDistanceDelta.
     /// </summary>
     public static Vector3 MovedTowards(this Vector3 thisPosition,
                                       Vector3 otherPosition,
-                                      float maxMovementAmount) {
-      var delta = thisPosition - otherPosition;
-      if (delta.sqrMagnitude > maxMovementAmount * maxMovementAmount) {
-        delta = Vector3.ClampMagnitude(delta, maxMovementAmount);
-      }
-      return thisPosition + delta;
+                                      float maxDistanceDelta) {
+      return Vector3.MoveTowards(thisPosition, otherPosition, maxDistanceDelta);
     }
 
     public static Vector3 ToVector3(this Vector4 v4) {
