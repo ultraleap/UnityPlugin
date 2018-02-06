@@ -21,7 +21,7 @@ namespace Leap.Unity {
   /// change type (in many cases the these are the same) and implement the Delta()
   /// function to compute the average change of samples currently in the buffer.
   /// </summary>
-  public abstract class DeltaBuffer<SampleType, DerivativeType> {
+  public abstract class DeltaBuffer<SampleType, DerivativeType> : IIndexable<SampleType> {
 
     protected struct ValueTimePair {
       public SampleType value;
@@ -42,11 +42,14 @@ namespace Leap.Unity {
 
     public int Capacity { get { return _buffer.Capacity; } }
 
-    public void Clear() { _buffer.Clear(); }
+    public SampleType this[int idx] {
+      get { return _buffer[idx].value; }
+    }
 
-    private float _previousSampleTime = 0F;
+    public void Clear() { _buffer.Clear(); }
+    
     public void Add(SampleType sample, float sampleTime) {
-      if (!IsEmpty && sampleTime == _previousSampleTime) {
+      if (!IsEmpty && sampleTime == GetLatestTime()) {
         SetLatest(sample, sampleTime);
         return;
       }
@@ -73,6 +76,10 @@ namespace Leap.Unity {
 
     public float GetTime(int idx) {
       return _buffer.Get(idx).time;
+    }
+
+    public float GetLatestTime() {
+      return _buffer.Get(Count - 1).time;
     }
 
     /// <summary>

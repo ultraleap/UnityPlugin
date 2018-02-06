@@ -7,9 +7,11 @@
  * between Leap Motion and you, your company or other organization.           *
  ******************************************************************************/
 
- namespace Leap.Unity {
+using System;
 
-  public class RingBuffer<T> {
+namespace Leap.Unity {
+
+  public class RingBuffer<T> : IIndexable<T> {
 
     private T[] arr;
     private int firstIdx = 0;
@@ -44,6 +46,11 @@
       get { return lastIdx == -1; }
     }
 
+    public T this[int idx] {
+      get { return Get(idx); }
+      set { Set(idx, value); }
+    }
+
     public void Clear() {
       firstIdx = 0;
       lastIdx = -1;
@@ -64,23 +71,39 @@
     /// Oldest element is at index 0, youngest is at Count - 1.
     /// </summary>
     public T Get(int idx) {
+      if (idx < 0 || idx > Count - 1) { throw new IndexOutOfRangeException(); }
+
       return arr[(firstIdx + idx) % arr.Length];
     }
 
     public T GetLatest() {
+      if (Count == 0) {
+        throw new IndexOutOfRangeException("Can't get latest value in an empty RingBuffer.");
+      }
+
       return Get(Count - 1);
     }
 
     public T GetOldest() {
+      if (Count == 0) {
+        throw new IndexOutOfRangeException("Can't get oldest value in an empty RingBuffer.");
+      }
+
       return Get(0);
     }
 
     public void Set(int idx, T t) {
+      if (idx < 0 || idx > Count - 1) { throw new IndexOutOfRangeException(); }
+
       int actualIdx = (firstIdx + idx) % arr.Length;
       arr[actualIdx] = t;
     }
 
     public void SetLatest(T t) {
+      if (Count == 0) {
+        throw new IndexOutOfRangeException("Can't set latest value in an empty RingBuffer.");
+      }
+
       Set(Count - 1, t);
     }
 
