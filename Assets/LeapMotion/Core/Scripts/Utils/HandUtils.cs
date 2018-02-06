@@ -494,15 +494,15 @@ namespace Leap.Unity {
     #region Provider Utils
 
     public static Hand Get(this LeapProvider provider, Chirality whichHand) {
-      List<Hand> hands;
+      Frame frame;
       if (Time.inFixedTimeStep) {
-        hands = provider.CurrentFixedFrame.Hands;
+        frame = provider.CurrentFixedFrame;
       }
       else {
-        hands = provider.CurrentFrame.Hands;
+        frame = provider.CurrentFrame;
       }
 
-      return hands.Query().FirstOrDefault(h => h.IsLeft == (whichHand == Chirality.Left));
+      return frame.Get(whichHand);
     }
 
     #endregion
