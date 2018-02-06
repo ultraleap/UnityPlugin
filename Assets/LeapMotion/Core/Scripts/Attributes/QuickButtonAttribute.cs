@@ -24,6 +24,10 @@ namespace Leap.Unity.Attributes {
       this.tooltip = tooltip;
     }
 
+    /// <summary>
+    /// IBeforeFieldAdditiveDrawer uses this to determine the width of the rect to pass
+    /// to the Draw method.
+    /// </summary>
     public float GetWidth() {
       return GUI.skin.label.CalcSize(new GUIContent(label)).x + 12f + PADDING_RIGHT;
     }
@@ -53,7 +57,14 @@ namespace Leap.Unity.Attributes {
           Undo.RegisterFullObjectHierarchyUndo(target, "Perform QuickButton Action");
         }
         foreach (var target in targets) {
-          method.Invoke(target, new object[] { });
+          try {
+            method.Invoke(target, new object[] { });
+          }
+          catch (Exception e) {
+            Debug.LogError(e.GetType().Name + " thrown trying to call method "
+              + method.Name + " on target " + target.name + ":\n"
+              + e.ToString());
+          }
         }
       }
 
