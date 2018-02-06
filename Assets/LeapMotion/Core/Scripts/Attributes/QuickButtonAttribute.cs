@@ -36,9 +36,17 @@ namespace Leap.Unity.Attributes {
     public void Draw(Rect rect, SerializedProperty property) {
       
       var type = targets.Query().FirstOrDefault().GetType();
-      var method = type.GetMethod(methodOnPress, System.Reflection.BindingFlags.Instance
-                                               | System.Reflection.BindingFlags.Public
-                                               | System.Reflection.BindingFlags.NonPublic);
+      System.Reflection.MethodInfo method;
+      try {
+        method = type.GetMethod(methodOnPress, System.Reflection.BindingFlags.Instance
+                                             | System.Reflection.BindingFlags.Public
+                                             | System.Reflection.BindingFlags.NonPublic);
+      }
+      catch (System.Reflection.AmbiguousMatchException e) {
+        Debug.LogError("QuickButton tried to prepare " + methodOnPress + " for calling, "
+                     + "but received an AmbiguousMatchException:\n" + e.ToString());
+        return;
+      }
 
       if (method == null) {
         Debug.LogError("QuickButton tried to prepare " + methodOnPress + " for calling, "
