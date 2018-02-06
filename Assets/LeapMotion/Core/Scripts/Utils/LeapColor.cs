@@ -40,7 +40,7 @@ namespace Leap.Unity {
     /// Warning: Not VERY distinct from magenta.
     /// </summary>
     public static Color fuschia {
-      get { return Lerp(Color.magenta, Color.blue, 0.1f); }
+      get { return lerp(Color.magenta, Color.blue, 0.1f); }
     }
 
     public static Color red {
@@ -60,7 +60,7 @@ namespace Leap.Unity {
     }
 
     public static Color orange {
-      get { return Lerp(red, yellow, 0.5f); }
+      get { return lerp(red, yellow, 0.5f); }
     }
 
     public static Color khaki {
@@ -148,7 +148,7 @@ namespace Leap.Unity {
     }
 
     public static Color purple {
-      get { return Lerp(magenta, blue, 0.3f); }
+      get { return lerp(magenta, blue, 0.3f); }
     }
 
     public static Color violet {
@@ -163,7 +163,7 @@ namespace Leap.Unity {
 
     #region Shorthand
 
-    private static Color Lerp(Color a, Color b, float amount) {
+    private static Color lerp(Color a, Color b, float amount) {
       return Color.Lerp(a, b, amount);
     }
 
