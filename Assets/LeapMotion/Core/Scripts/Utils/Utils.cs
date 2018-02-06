@@ -509,24 +509,6 @@ namespace Leap.Unity {
 
     #endregion
 
-    #region Float Utils
-    
-    /// <summary>
-    /// Infix sugar for Mathf.Clamp01(f).
-    /// </summary>
-    public static float Clamped01(this float f) {
-      return Mathf.Clamp01(f);
-    }
-
-    /// <summary>
-    /// Infix sugar for Mathf.Clamp(f, min, max).
-    /// </summary>
-    public static float Clamped(this float f, float min, float max) {
-      return Mathf.Clamp(f, min, max);
-    }
-
-    #endregion
-
     #region Array Utils
 
     /// <summary>
@@ -829,25 +811,10 @@ namespace Leap.Unity {
     #region Vector3 Utils
 
     /// <summary>
-    /// Rightward syntax for applying a Quaternion rotation to this vector; literally
-    /// returns byQuaternion * thisVector -- does NOT modify the input vector.
+    /// Returns a Vector3 containing the X, Y, and Z components of this Vector4. Note
+    /// that an implicit conversion exists from Vector4 to Vector3 already, so this
+    /// extension method is only useful if you specifically want an explicit conversion.
     /// </summary>
-    public static Vector3 RotatedBy(this Vector3 thisVector, Quaternion byQuaternion) {
-      return byQuaternion * thisVector;
-    }
-
-    /// <summary>
-    /// Infix sugar for Vector3.MoveTowards(a, b).
-    /// 
-    /// Returns this position moved towards the argument position, up to but no more than
-    /// the max distance from the original position specified by maxDistanceDelta.
-    /// </summary>
-    public static Vector3 MovedTowards(this Vector3 thisPosition,
-                                      Vector3 otherPosition,
-                                      float maxDistanceDelta) {
-      return Vector3.MoveTowards(thisPosition, otherPosition, maxDistanceDelta);
-    }
-
     public static Vector3 ToVector3(this Vector4 v4) {
       return new Vector3(v4.x, v4.y, v4.z);
     }
@@ -860,33 +827,7 @@ namespace Leap.Unity {
       return t.InverseTransformPoint(v);
     }
 
-    /// <summary>
-    /// Infix sugar for Vector3.Dot(a, b).
-    /// </summary>
-    public static float Dot(this Vector3 a, Vector3 b) {
-      return Vector3.Dot(a, b);
-    }
-
-    /// <summary>
-    /// Infix sugar for Vector3.Cross(a, b).
-    /// </summary>
-    public static Vector3 Cross(this Vector3 a, Vector3 b) {
-      return Vector3.Cross(a, b);
-    }
-
-    /// <summary>
-    /// Infix sugar for Vector3.Angle(a, b).
-    /// </summary>
-    public static float Angle(this Vector3 a, Vector3 b) {
-      return Vector3.Angle(a, b);
-    }
-
-    /// <summary>
-    /// Infix sugar for Vector3.SignedAngle(a, b).
-    /// </summary>
-    public static float SignedAngle(this Vector3 a, Vector3 b, Vector3 axis) {
-      return Vector3.SignedAngle(a, b, axis);
-    }
+    
 
     #endregion
 
@@ -960,18 +901,6 @@ namespace Leap.Unity {
       Vector3 objToTarget = targetPosition - fromPosition;
       return Quaternion.LookRotation((flip180 ? -1 : 1) * objToTarget,
                                      upwardDirection);
-    }
-
-    public static Vector3 GetRight(this Quaternion q) {
-      return q * Vector3.right;
-    }
-
-    public static Vector3 GetUp(this Quaternion q) {
-      return q * Vector3.up;
-    }
-
-    public static Vector3 GetForward(this Quaternion q) {
-      return q * Vector3.forward;
     }
 
     public static Quaternion Flipped(this Quaternion q) {
