@@ -13,7 +13,7 @@ using UnityEditor;
 
 namespace Leap.Unity.Attributes {
 
-  public class RunTimeOnly : CombinablePropertyAttribute, IPropertyDisabler {
+  public class RunTimeOnlyAttribute : CombinablePropertyAttribute, IPropertyDisabler {
 
 #if UNITY_EDITOR
     public bool ShouldDisable(SerializedProperty property) {
