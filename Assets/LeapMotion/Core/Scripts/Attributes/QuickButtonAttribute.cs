@@ -18,9 +18,6 @@ namespace Leap.Unity.Attributes {
     public string methodOnPress = null;
     public string tooltip = "";
 
-    public Type type;
-    public System.Reflection.MethodInfo method;
-
     public QuickButtonAttribute(string buttonLabel, string methodOnPress, string tooltip = "") {
       this.label = buttonLabel;
       this.methodOnPress = methodOnPress;
@@ -34,10 +31,10 @@ namespace Leap.Unity.Attributes {
 #if UNITY_EDITOR
     public void Draw(Rect rect, SerializedProperty property) {
       
-      type = targets.Query().FirstOrDefault().GetType();
-      method = type.GetMethod(methodOnPress, System.Reflection.BindingFlags.Instance
-                                             | System.Reflection.BindingFlags.Public
-                                             | System.Reflection.BindingFlags.NonPublic);
+      var type = targets.Query().FirstOrDefault().GetType();
+      var method = type.GetMethod(methodOnPress, System.Reflection.BindingFlags.Instance
+                                               | System.Reflection.BindingFlags.Public
+                                               | System.Reflection.BindingFlags.NonPublic);
 
       if (method == null) {
         Debug.LogError("QuickButton tried to prepare " + methodOnPress + " for calling, "
