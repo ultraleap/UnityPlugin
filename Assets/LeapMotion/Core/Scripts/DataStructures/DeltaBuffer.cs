@@ -32,11 +32,13 @@ namespace Leap.Unity {
       _buffer = new RingBuffer<ValueTimePair>(bufferSize);
     }
 
-    protected RingBuffer<ValueTimePair> _buffer; 
+    protected RingBuffer<ValueTimePair> _buffer;
     
     public int  Count { get { return _buffer.Count; } }
 
     public bool IsFull { get { return _buffer.IsFull; } }
+
+    public bool IsEmpty { get { return _buffer.IsEmpty; } }
 
     public int Capacity { get { return _buffer.Capacity; } }
 
@@ -44,7 +46,7 @@ namespace Leap.Unity {
 
     private float _previousSampleTime = 0F;
     public void Add(SampleType sample, float sampleTime) {
-      if (sampleTime == _previousSampleTime) {
+      if (!IsEmpty && sampleTime == _previousSampleTime) {
         SetLatest(sample, sampleTime);
         return;
       }
@@ -95,26 +97,27 @@ namespace Leap.Unity {
 
     /// <summary>
     /// Returns the average change between each sample per unit time, or zero if the
-    /// buffer is empty.
+    /// buffer contains one or fewer elements.
     /// 
     /// The larger the buffer, the more stable but also delayed the resulting average
     /// change over time. A buffer size of 5 is a good start for 60-90 Hz updates.
     /// </summary>
     public override Vector3 Delta() {
-      if (Count == 0) { return Vector3.zero; }
+      if (Count <= 1) { return Vector3.zero; }
 
       Vector3 deltaPerTimeSum = Vector3.zero;
       for (int i = 0; i < Count - 1; i++) {
         deltaPerTimeSum += (Get(i + 1) - Get(i)) / (GetTime(i + 1) - GetTime(i));
       }
-      return deltaPerTimeSum / Count;
+      return deltaPerTimeSum / (Count - 1);
     }
 
   }
 
   /// <summary>
   /// A ring buffer of floats with a Delta() function that computes the buffer's
-  /// average change over time.
+  /// average change over time. Delta() will return zero if the buffer contains one
+  /// or fewer samples.
   /// 
   /// The larger the buffer, the more stable but also delayed the resulting average
   /// change over time. A buffer size of 5 is a good start for 60-90 Hz updates.
@@ -128,20 +131,21 @@ namespace Leap.Unity {
     /// buffer is empty.
     /// </summary>
     public override float Delta() {
-      if (Count == 0) { return 0f; }
+      if (Count <= 1) { return 0f; }
 
       float deltaPerTimeSum = 0f;
       for (int i = 0; i < Count - 1; i++) {
         deltaPerTimeSum += (Get(i + 1) - Get(i)) / (GetTime(i + 1) - GetTime(i));
       }
-      return deltaPerTimeSum / Count;
+      return deltaPerTimeSum / (Count - 1);
     }
 
   }
 
   /// <summary>
   /// A ring buffer of Quaternions with a Delta() function that computes the buffer's
-  /// average change over time as an angle-axis vector.
+  /// average change over time as an angle-axis vector. Returns Vector3.zero if the
+  /// buffer contains one or fewer samples.
   /// 
   /// The larger the buffer, the more stable but also delayed the resulting average
   /// change over time. A buffer size of 5 is a good start for 60-90 Hz updates.
@@ -158,7 +162,7 @@ namespace Leap.Unity {
       if (Count <= 1) return Vector3.zero;
 
       var deltaSum = Vector3.zero;
-      for (int i = 0; i + 1 < Count; i++) {
+      for (int i = 0; i < Count - 1; i++) {
         var sample0 = _buffer.Get(i);
         var sample1 = _buffer.Get(i + 1);
         var r0 = sample0.value;
@@ -172,7 +176,7 @@ namespace Leap.Unity {
         deltaSum += delta / deltaTime;
       }
 
-      return deltaSum / Count;
+      return deltaSum / (Count - 1);
     }
 
   }

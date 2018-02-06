@@ -11,28 +11,38 @@ namespace Leap.Unity {
 
   public class DelayBuffer<T> {
 
-    private RingBuffer<T> buffer;
+    private RingBuffer<T> _buffer;
 
     /// <summary> Returns the underlying Buffer object. </summary>
-    public RingBuffer<T> Buffer { get { return buffer; } }
+    public RingBuffer<T> Buffer { get { return _buffer; } }
+
+    public int Count { get { return _buffer.Count; } }
+
+    public bool IsFull { get { return _buffer.IsFull; } }
+
+    public bool IsEmpty { get { return _buffer.IsEmpty; } }
+
+    public int Capacity { get { return _buffer.Capacity; } }
+
+    public void Clear() { _buffer.Clear(); }
 
     public DelayBuffer(int bufferSize) {
-      buffer = new RingBuffer<T>(bufferSize);
+      _buffer = new RingBuffer<T>(bufferSize);
     }
 
     /// <summary> Returns true if the buffer was full and out "delayedT" will
     /// contain the oldest value in the buffer, otherwise returns false. </summary>
     public bool Add(T t, out T delayedT) {
       bool willOutputValue;
-      if (buffer.IsFull) {
+      if (_buffer.IsFull) {
         willOutputValue = true;
-        delayedT = buffer.GetOldest();
+        delayedT = _buffer.GetOldest();
       }
       else {
         willOutputValue = false;
         delayedT = default(T);
       }
-      buffer.Add(t);
+      _buffer.Add(t);
       return willOutputValue;
     }
 
