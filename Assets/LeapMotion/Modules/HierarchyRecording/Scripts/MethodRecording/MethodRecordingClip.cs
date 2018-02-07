@@ -8,30 +8,25 @@
  ******************************************************************************/
 
 using UnityEngine;
-using Leap.Unity.RuntimeGizmos;
+using UnityEngine.Playables;
+using UnityEngine.Timeline;
 
 namespace Leap.Unity.Recording {
 
-  public class LeapPlayableProvider : LeapProvider {
+  public class MethodRecordingClip : PlayableAsset, ITimelineClipAsset {
 
-    private Frame _frame;
+    public bool invokeAtEditTime = false;
 
-    public override Frame CurrentFixedFrame {
+    public ClipCaps clipCaps {
       get {
-        return _frame;
+        return ClipCaps.ClipIn | ClipCaps.SpeedMultiplier;
       }
     }
 
-    public override Frame CurrentFrame {
-      get {
-        return _frame;
-      }
-    }
-
-    public void SetCurrentFrame(Frame frame) {
-      _frame = frame;
-      DispatchUpdateFrameEvent(frame);
-      DispatchFixedFrameEvent(frame);
+    public override Playable CreatePlayable(PlayableGraph graph, GameObject owner) {
+      var playable = ScriptPlayable<MethodRecordingPlayable>.Create(graph);
+      playable.GetBehaviour().invokeAtEditTime = invokeAtEditTime;
+      return playable;
     }
   }
 }
