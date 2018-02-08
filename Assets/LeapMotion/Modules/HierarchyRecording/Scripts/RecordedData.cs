@@ -13,9 +13,13 @@ using UnityEngine;
 
 namespace Leap.Unity.Recording {
 
-  [RecordingFriendly]
-  public class RecordedData : MonoBehaviour {
+  [Serializable]
+  public class RecordedLeapData {
+    public List<Frame> frames;
+  }
 
+  [Serializable]
+  public class RecordedDataAsset {
     public List<EditorCurveBindingData> data = new List<EditorCurveBindingData>();
 
     [Serializable]
@@ -26,5 +30,4 @@ namespace Leap.Unity.Recording {
       public AnimationCurve curve;
     }
   }
-
 }

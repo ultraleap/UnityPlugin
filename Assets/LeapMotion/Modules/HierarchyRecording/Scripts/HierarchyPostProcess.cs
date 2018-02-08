@@ -16,21 +16,22 @@ using UnityEngine.Timeline;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
+using Leap.Unity;
 using Leap.Unity.Query;
 using Leap.Unity.Attributes;
 using Leap.Unity.GraphicalRenderer;
 
 namespace Leap.Unity.Recording {
 
-  [RecordingFriendly]
   public class HierarchyPostProcess : MonoBehaviour {
 
     [Header("Recording Settings")]
     public string recordingName;
     public AssetFolder assetFolder;
 
-    [Header("Leap Data")]
-    public List<Frame> leapData;
+    public string curveDataFilename;
+
+    public string leapDataFilename;
 
     [SerializeField, ImplementsTypeNameDropdown(typeof(LeapRecording))]
     private string _leapRecordingType;
@@ -60,73 +61,7 @@ namespace Leap.Unity.Recording {
     [MinValue(0)]
     public float genericMaxError = 0.05f;
 
-    [Header("Clear Settings")]
-    [Tooltip("Deletes all scripts not marked as Recording Friendly.")]
-    public bool clearUnfriendlyComponents = true;
-
-    [Tooltip("Deletes all empty transforms that have no interesting children.")]
-    public bool clearLeafEmpties = true;
-
-    [Tooltip("Deletes all transforms that have the identity transformation.")]
-    public bool collapseIdentityTransforms = true;
-
 #if UNITY_EDITOR
-    public void ClearComponents() {
-      Transform[] transforms = GetComponentsInChildren<Transform>(includeInactive: true);
-
-      foreach (var transform in transforms) {
-        if (clearUnfriendlyComponents) {
-          var scripts = transform.GetComponents<Component>().
-                                  Query().
-                                  Where(t => !RecordingFriendlyAttribute.IsRecordingFriendly(t)).
-                                  ToList();
-          do {
-            foreach (var script in scripts) {
-              DestroyImmediate(script);
-            }
-          } while (scripts.Query().ValidUnityObjs().Any());
-        }
-      }
-
-      if (clearLeafEmpties) {
-        while (true) {
-          transforms = GetComponentsInChildren<Transform>(includeInactive: true);
-          var empty = transforms.Query().FirstOrDefault(t => t.childCount == 0 &&
-                                                             t.GetComponents<Component>().Length == 1);
-
-          if (empty == null) {
-            break;
-          }
-
-          DestroyImmediate(empty.gameObject);
-        }
-      }
-
-      if (collapseIdentityTransforms) {
-        while (true) {
-          transforms = GetComponentsInChildren<Transform>(includeInactive: true);
-          var empty = transforms.Query().FirstOrDefault(t => t.GetComponents<Component>().Length == 1 &&
-                                                             t.localPosition == Vector3.zero &&
-                                                             t.localRotation == Quaternion.identity &&
-                                                             t.localScale == Vector3.one);
-          if (empty == null) {
-            break;
-          }
-
-          List<Transform> children = new List<Transform>();
-          for (int i = 0; i < empty.childCount; i++) {
-            children.Add(empty.GetChild(i));
-          }
-
-          foreach (var child in children) {
-            child.SetParent(empty.parent, worldPositionStays: true);
-          }
-
-          DestroyImmediate(empty.gameObject);
-        }
-      }
-    }
-
     public void BuildPlaybackPrefab(ProgressBar progress) {
       var timeline = ScriptableObject.CreateInstance<TimelineAsset>();
 
@@ -134,18 +69,31 @@ namespace Leap.Unity.Recording {
 
       var clip = generateCompressedClip(progress);
 
+      var playableAsset = ScriptableObject.CreateInstance<AnimationPlayableAsset>();
+      playableAsset.clip = clip;
+      playableAsset.hideFlags = HideFlags.HideInInspector | HideFlags.HideInHierarchy;
+      playableAsset.name = "Recorded Animation";
+
       var timelineClip = animationTrack.CreateClip(clip);
       timelineClip.duration = clip.length;
-      timelineClip.asset = clip;
-      timelineClip.underlyingAsset = clip;
+      timelineClip.asset = playableAsset;
+      timelineClip.displayName = "Recorded Animation";
+
+      //If a clip is not recordable, it will not show up as editable in the timeline view.
+      //For whatever reason unity decided that imported clips are not recordable, so we hack a
+      //private variable to force them to be!  This seems to have no ill effects but if things go 
+      //wrong we can just revert this line
+      timelineClip.GetType().GetField("m_Recordable", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance).SetValue(timelineClip, true);
 
       //Try to generate a leap recording if we have leap data
       RecordingTrack recordingTrack = null;
       LeapRecording leapRecording = null;
-      if (leapData.Count > 0) {
+      if (!string.IsNullOrEmpty(leapDataFilename)) {
+        var leapData = JsonUtility.FromJson<RecordedLeapData>(File.ReadAllText(Path.Combine(assetFolder.Path, leapDataFilename)));
         leapRecording = ScriptableObject.CreateInstance(_leapRecordingType) as LeapRecording;
         if (leapRecording != null) {
-          leapRecording.LoadFrames(leapData);
+          leapRecording.name = "Recorded Leap Data";
+          leapRecording.LoadFrames(leapData.frames);
         } else {
           Debug.LogError("Unable to create Leap recording: Invalid type specification for "
                        + "LeapRecording implementation.", this);
@@ -154,6 +102,7 @@ namespace Leap.Unity.Recording {
 
       string assetPath = Path.Combine(assetFolder.Path, recordingName + ".asset");
       AssetDatabase.CreateAsset(timeline, assetPath);
+      AssetDatabase.AddObjectToAsset(playableAsset, timeline);
       AssetDatabase.AddObjectToAsset(animationTrack, timeline);
       AssetDatabase.AddObjectToAsset(clip, timeline);
 
@@ -173,17 +122,16 @@ namespace Leap.Unity.Recording {
       AssetDatabase.SaveAssets();
       AssetDatabase.Refresh();
 
-      foreach (var recording in GetComponentsInChildren<RecordedData>(includeInactive: true)) {
-        DestroyImmediate(recording);
-      }
-
       //Create the playable director and link it to the new timeline
       var director = gameObject.AddComponent<PlayableDirector>();
       director.playableAsset = timeline;
 
-      //Create the animator and link it to the animation track
-      var animator = gameObject.AddComponent<Animator>();
-      director.SetGenericBinding(animationTrack.outputs.Query().First().sourceObject, animator);
+      //Create the animator
+      gameObject.AddComponent<Animator>();
+
+      //Link the animation track to the animator
+      //(it likes to point to gameobject instead of the animator directly)
+      director.SetGenericBinding(animationTrack.outputs.Query().First().sourceObject, gameObject);
 
       //Destroy existing provider
       var provider = gameObject.GetComponentInChildren<LeapProvider>();
@@ -198,6 +146,7 @@ namespace Leap.Unity.Recording {
       }
 
       buildAudioTracks(progress, director, timeline);
+      buildMethodRecordingTracks(progress, director, timeline);
 
       progress.Begin(1, "", "Finalizing Prefab", () => {
         GameObject myGameObject = gameObject;
@@ -206,6 +155,23 @@ namespace Leap.Unity.Recording {
         string prefabPath = Path.Combine(assetFolder.Path, recordingName + ".prefab");
         PrefabUtility.CreatePrefab(prefabPath.Replace('\\', '/'), myGameObject);
       });
+    }
+
+    private void buildMethodRecordingTracks(ProgressBar progress, PlayableDirector director, TimelineAsset timeline) {
+      var recordings = GetComponentsInChildren<MethodRecording>();
+      if (recordings.Length > 0) {
+        progress.Begin(recordings.Length, "", "Building Method Tracks: ", () => {
+          foreach (var recording in recordings) {
+            progress.Step(recording.gameObject.name);
+
+            var track = timeline.CreateTrack<MethodRecordingTrack>(null, recording.gameObject.name);
+            director.SetGenericBinding(track.outputs.Query().First().sourceObject, recording);
+
+            var clip = track.CreateClip<MethodRecordingClip>();
+            clip.duration = recording.GetDuration();
+          }
+        });
+      }
     }
 
     private void buildAudioTracks(ProgressBar progress, PlayableDirector director, TimelineAsset timeline) {
@@ -233,65 +199,76 @@ namespace Leap.Unity.Recording {
 
     private AnimationClip generateCompressedClip(ProgressBar progress) {
       var clip = new AnimationClip();
+      clip.name = "Recorded Animation";
 
-      var bindingMap = new Dictionary<EditorCurveBinding, AnimationCurve>();
-      var recordings = GetComponentsInChildren<RecordedData>(includeInactive: true);
+      RecordedDataAsset curves = null;
+      progress.Begin(1, "Opening Curve File...", "", () => {
+        progress.Step();
+        curves = JsonUtility.FromJson<RecordedDataAsset>(File.ReadAllText(Path.Combine(assetFolder.Path, curveDataFilename)));
+      });
 
       progress.Begin(2, "", "", () => {
-        progress.Begin(recordings.Length, "", "Compressing: ", () => {
-          for (int i = 0; i < recordings.Length; i++) {
-            progress.Begin(2, "", "", () => {
-              var recordingData = recordings[i];
+        var bindingMap = new Dictionary<EditorCurveBinding, AnimationCurve>();
 
-              progress.Step(recordingData.name);
+        Dictionary<string, Type> nameToType = new Dictionary<string, Type>();
+        foreach (var component in GetComponentsInChildren<Component>()) {
+          nameToType[component.GetType().Name] = component.GetType();
+        }
+        nameToType[typeof(GameObject).Name] = typeof(GameObject);
 
-              var toCompress = new Dictionary<EditorCurveBinding, AnimationCurve>();
+        var toCompress = new Dictionary<EditorCurveBinding, AnimationCurve>();
+        var targetObjects = new HashSet<UnityEngine.Object>();
 
-              progress.Begin(recordingData.data.Count, "", "", () => {
-                foreach (var bindingData in recordingData.data) {
-                  progress.Step(recordingData.name + " : " + bindingData.propertyName);
+        foreach (var data in curves.data) {
+          Type type;
+          if (!nameToType.TryGetValue(data.typeName, out type)) {
+            continue;
+          }
 
-                  Type type = recordingData.GetComponents<Component>().
-                                            Query().
-                                            Select(c => c.GetType()).
-                                            Concat(typeof(GameObject)).
-                                            FirstOrDefault(t => t.Name == bindingData.typeName);
+          var binding = EditorCurveBinding.FloatCurve(data.path, type, data.propertyName);
 
-                  if (type == null) {
-                    //If could not find the type, the component must have been deleted
-                    continue;
-                  }
+          var targetObj = AnimationUtility.GetAnimatedObject(gameObject, binding);
+          if (targetObj == null) {
+            continue;
+          }
 
-                  var binding = EditorCurveBinding.FloatCurve(bindingData.path, type, bindingData.propertyName);
-                  toCompress[binding] = bindingData.curve;
-                }
-              });
+          toCompress[binding] = data.curve;
+          targetObjects.Add(targetObj);
+        }
 
-              doCompression(progress, recordingData, toCompress, bindingMap);
-            });
+        progress.Begin(targetObjects.Count, "Compressing Curves", "", () => {
+          foreach (var targetObj in targetObjects) {
+
+            var filteredCurves = new Dictionary<EditorCurveBinding, AnimationCurve>();
+            foreach (var curve in toCompress) {
+              if (AnimationUtility.GetAnimatedObject(gameObject, curve.Key) == targetObj) {
+                filteredCurves[curve.Key] = curve.Value;
+              }
+            }
+
+            doCompression(progress, targetObj, filteredCurves, bindingMap);
           }
         });
 
-        progress.Begin(bindingMap.Count, "", "Assigning Curves: ", () => {
+        progress.Begin(bindingMap.Count, "Assigning Curves", "", () => {
           foreach (var binding in bindingMap) {
             progress.Step(binding.Key.propertyName);
             AnimationUtility.SetEditorCurve(clip, binding.Key, binding.Value);
           }
         });
       });
-
       return clip;
     }
 
     private void doCompression(ProgressBar progress,
-                               RecordedData recordingData,
+                               UnityEngine.Object targetObject,
                                Dictionary<EditorCurveBinding, AnimationCurve> toCompress,
                                Dictionary<EditorCurveBinding, AnimationCurve> bindingMap) {
-      var propertyToMaxError = calculatePropertyErrors(recordingData);
+      var propertyToMaxError = calculatePropertyErrors(targetObject);
 
       List<EditorCurveBinding> bindings;
 
-      progress.Begin(6, "", "", () => {
+      progress.Begin(6, "", targetObject.name, () => {
 
         //First do rotations
         bindings = toCompress.Keys.Query().ToList();
@@ -479,9 +456,18 @@ namespace Leap.Unity.Recording {
       });
     }
 
-    private Dictionary<string, float> calculatePropertyErrors(RecordedData recordingData) {
+    private Dictionary<string, float> calculatePropertyErrors(UnityEngine.Object targetObject) {
+      Transform targetTransform;
+      if (targetObject is GameObject) {
+        targetTransform = (targetObject as GameObject).transform;
+      } else if (targetObject is Component) {
+        targetTransform = (targetObject as Component).transform;
+      } else {
+        throw new InvalidOperationException("Unexpected target object type " + targetObject);
+      }
+
       var propertyToMaxError = new Dictionary<string, float>();
-      Transform currTransform = recordingData.transform;
+      Transform currTransform = targetTransform;
       while (currTransform != null) {
         var compressionSettings = currTransform.GetComponent<PropertyCompression>();
         if (compressionSettings != null) {

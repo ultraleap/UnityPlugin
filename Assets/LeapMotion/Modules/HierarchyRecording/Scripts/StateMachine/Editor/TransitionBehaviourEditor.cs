@@ -7,31 +7,25 @@
  * between Leap Motion and you, your company or other organization.           *
  ******************************************************************************/
 
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
-using Leap.Unity.RuntimeGizmos;
+using UnityEditor;
 
 namespace Leap.Unity.Recording {
 
-  public class LeapPlayableProvider : LeapProvider {
+  [CanEditMultipleObjects]
+  [CustomEditor(typeof(TransitionBehaviour), editorForChildClasses: true, isFallback = true)]
+  public class TransitionBehaviourEditor : CustomEditorBase<TransitionBehaviour> {
 
-    private Frame _frame;
+    public override void OnInspectorGUI() {
+      base.OnInspectorGUI();
 
-    public override Frame CurrentFixedFrame {
-      get {
-        return _frame;
+      if (targets.Length == 1 && Application.isPlaying) {
+        if (GUILayout.Button("Execute Transition")) {
+          target.Transition();
+        }
       }
-    }
-
-    public override Frame CurrentFrame {
-      get {
-        return _frame;
-      }
-    }
-
-    public void SetCurrentFrame(Frame frame) {
-      _frame = frame;
-      DispatchUpdateFrameEvent(frame);
-      DispatchFixedFrameEvent(frame);
     }
   }
 }

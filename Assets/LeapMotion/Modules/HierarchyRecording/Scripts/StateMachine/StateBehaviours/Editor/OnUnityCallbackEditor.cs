@@ -7,31 +7,27 @@
  * between Leap Motion and you, your company or other organization.           *
  ******************************************************************************/
 
-using UnityEngine;
-using Leap.Unity.RuntimeGizmos;
+using UnityEditor;
 
 namespace Leap.Unity.Recording {
 
-  public class LeapPlayableProvider : LeapProvider {
+  [CustomEditor(typeof(OnUnityCallback))]
+  public class OnUnityCallbackEditor : CustomEditorBase<OnUnityCallback> {
 
-    private Frame _frame;
+    private SerializedProperty _tableProp;
+    private EnumEventTableEditor _tableEditor;
 
-    public override Frame CurrentFixedFrame {
-      get {
-        return _frame;
-      }
+    protected override void OnEnable() {
+      base.OnEnable();
+
+      _tableProp = serializedObject.FindProperty("_table");
+      _tableEditor = new EnumEventTableEditor(_tableProp, typeof(OnUnityCallback.CallbackType));
+
+      specifyCustomDrawer("_table", drawTable);
     }
 
-    public override Frame CurrentFrame {
-      get {
-        return _frame;
-      }
-    }
-
-    public void SetCurrentFrame(Frame frame) {
-      _frame = frame;
-      DispatchUpdateFrameEvent(frame);
-      DispatchFixedFrameEvent(frame);
+    private void drawTable(SerializedProperty p) {
+      _tableEditor.DoGuiLayout();
     }
   }
 }

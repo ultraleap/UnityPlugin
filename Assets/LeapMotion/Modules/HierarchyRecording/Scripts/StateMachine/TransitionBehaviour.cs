@@ -7,31 +7,32 @@
  * between Leap Motion and you, your company or other organization.           *
  ******************************************************************************/
 
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
-using Leap.Unity.RuntimeGizmos;
 
 namespace Leap.Unity.Recording {
 
-  public class LeapPlayableProvider : LeapProvider {
+  public class TransitionBehaviour : MonoBehaviour {
+    private static List<TransitionBehaviour> _transitionBehaviours = new List<TransitionBehaviour>();
 
-    private Frame _frame;
+    public GameObject destination;
+    public GameObject transitionState;
 
-    public override Frame CurrentFixedFrame {
-      get {
-        return _frame;
+    [ContextMenu("Trigger Transition")]
+    public void Transition() {
+      gameObject.SetActive(false);
+
+      if (transitionState != null) {
+        transitionState.GetComponents(_transitionBehaviours);
+        foreach (var tb in _transitionBehaviours) {
+          tb.destination = destination;
+        }
+
+        transitionState.SetActive(true);
+      } else {
+        destination.SetActive(true);
       }
-    }
-
-    public override Frame CurrentFrame {
-      get {
-        return _frame;
-      }
-    }
-
-    public void SetCurrentFrame(Frame frame) {
-      _frame = frame;
-      DispatchUpdateFrameEvent(frame);
-      DispatchFixedFrameEvent(frame);
     }
   }
 }

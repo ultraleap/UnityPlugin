@@ -7,31 +7,26 @@
  * between Leap Motion and you, your company or other organization.           *
  ******************************************************************************/
 
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
-using Leap.Unity.RuntimeGizmos;
 
 namespace Leap.Unity.Recording {
 
-  public class LeapPlayableProvider : LeapProvider {
+  public class TransitionAfterDelay : TransitionBehaviour {
 
-    private Frame _frame;
+    public float delay = 1;
 
-    public override Frame CurrentFixedFrame {
-      get {
-        return _frame;
-      }
+    private float _enterTime;
+
+    private void OnEnable() {
+      _enterTime = Time.time;
     }
 
-    public override Frame CurrentFrame {
-      get {
-        return _frame;
+    private void Update() {
+      if ((Time.time - _enterTime) > delay) {
+        Transition();
       }
-    }
-
-    public void SetCurrentFrame(Frame frame) {
-      _frame = frame;
-      DispatchUpdateFrameEvent(frame);
-      DispatchFixedFrameEvent(frame);
     }
   }
 }

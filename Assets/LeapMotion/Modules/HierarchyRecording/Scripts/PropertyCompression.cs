@@ -14,7 +14,6 @@ using Leap.Unity.Attributes;
 
 namespace Leap.Unity.Recording {
 
-  [RecordingFriendly]
   public class PropertyCompression : MonoBehaviour {
 
     public NamedCompression[] compressionOverrides;
