@@ -22,6 +22,7 @@ namespace Leap.Unity.Generation {
     public const string END_KEY = "//END";
     public const string TEMPLATE_NAMESPACE = "Leap.Unity.Generation";
     public const string TARGET_NAMESPACE = "Leap.Unity.Tests";
+    public const string TEST_NAMESPACE = "Leap.Unity";
 
     public TextAsset codeTemplate;
     public TextAsset testTemplate;
@@ -32,11 +33,11 @@ namespace Leap.Unity.Generation {
     public string[] primitiveTypes;
 
     public override void Generate() {
-      replaceCenterCode(codeTemplate, targetFolder, "_Primitive_", "BitConverterNonAlloc.cs");
-      replaceCenterCode(testTemplate, testFolder, "Single", "BitConverterNonAllocTests.cs");
+      replaceCenterCode(codeTemplate, targetFolder, "_Primitive_", "BitConverterNonAlloc.cs", TARGET_NAMESPACE);
+      replaceCenterCode(testTemplate, testFolder, "Single", "BitConverterNonAllocTests.cs", TEST_NAMESPACE);
     }
 
-    private void replaceCenterCode(TextAsset template, AssetFolder folder, string toReplace, string filename) {
+    private void replaceCenterCode(TextAsset template, AssetFolder folder, string toReplace, string filename, string targetNamespace) {
       List<string> lines = new List<string>();
       using (var reader = new StringReader(template.text)) {
         while (true) {
@@ -45,7 +46,7 @@ namespace Leap.Unity.Generation {
             break;
           }
 
-          lines.Add(line.Replace(TEMPLATE_NAMESPACE, TARGET_NAMESPACE).
+          lines.Add(line.Replace(TEMPLATE_NAMESPACE, targetNamespace).
                          Replace("_Template_", "").
                          Replace("_BitConverterTestMock_", "BitConverterNonAlloc"));
         }
