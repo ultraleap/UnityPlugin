@@ -46,6 +46,7 @@ namespace Leap.Unity.Recording {
     public float floatArg = 0F;
     public int intArg = 0;
     public Quaternion quaternionArg = Quaternion.identity;
+    [TextArea]
     public string stringArg = "";
     public Vector2 vector2Arg = Vector2.zero;
     public Vector3 vector3Arg = Vector3.zero;

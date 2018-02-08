@@ -8,30 +8,29 @@
  ******************************************************************************/
 
 using UnityEngine;
-using Leap.Unity.RuntimeGizmos;
+using UnityEngine.Playables;
 
 namespace Leap.Unity.Recording {
+  
+  public class TransitionAfterPlayable : TransitionBehaviour {
 
-  public class LeapPlayableProvider : LeapProvider {
+    [SerializeField]
+    private PlayableDirector _director;
 
-    private Frame _frame;
+    private bool _hasStartedPlaying = false;
 
-    public override Frame CurrentFixedFrame {
-      get {
-        return _frame;
-      }
+    private void OnEnable() {
+      _hasStartedPlaying = false;
     }
 
-    public override Frame CurrentFrame {
-      get {
-        return _frame;
+    private void Update() {
+      if (_hasStartedPlaying) {
+        if (_director.state != PlayState.Playing) {
+          Transition();
+        }
+      } else if (_director.state == PlayState.Playing) {
+        _hasStartedPlaying = true;
       }
-    }
-
-    public void SetCurrentFrame(Frame frame) {
-      _frame = frame;
-      DispatchUpdateFrameEvent(frame);
-      DispatchFixedFrameEvent(frame);
     }
   }
 }

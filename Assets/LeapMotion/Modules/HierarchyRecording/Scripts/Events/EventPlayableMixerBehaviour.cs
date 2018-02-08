@@ -17,15 +17,13 @@ using UnityEngine.Timeline;
 namespace Leap.Unity.Recording {
 
   public class EventPlayableMixerBehaviour : PlayableBehaviour {
-
-    public PlayableDirector director;
+    
     public EventTrack eventTrack;
 
     private List<TimelineClip> _clips;
     private TimelineClipComparerer _clipComparer;
 
     private bool _firstFrameFired = false;
-    private double _lastTime = 0;
 
     #region PlayableBehaviour Events
 
@@ -40,7 +38,6 @@ namespace Leap.Unity.Recording {
       }
 
       _firstFrameFired = false;
-      _lastTime = 0;
     }
 
     public override void OnGraphStop(Playable playable) {
@@ -56,7 +53,6 @@ namespace Leap.Unity.Recording {
       }
 
       _firstFrameFired = false;
-      _lastTime = 0;
     }
 
     public override void PrepareFrame(Playable playable, FrameData info) {
@@ -68,28 +64,28 @@ namespace Leap.Unity.Recording {
     public override void ProcessFrame(Playable playable, FrameData info, object playerData) {
       base.ProcessFrame(playable, info, playerData);
 
+      // Get time of the root playable in the playable graph, which is the timeline itself.
+      var curTime = playable.GetGraph().GetRootPlayable(0).GetTime();
+      var prevTime = playable.GetGraph().GetRootPlayable(0).GetPreviousTime();
+
       // If there's an event at the beginning of the track, and we're currently at the
       // beginning of the track, we should fire it now.
-      checkFireTimeZeroEvent();
+      checkFireTimeZeroEvent(curTime);
 
       if (!_firstFrameFired) {
         _firstFrameFired = true;
       }
       else {
-        double curTime = director.time;
-        
-        if (_lastTime <= curTime) {
+        if (prevTime <= curTime) {
           // Sweep forward from prevTime to curTime if moving forward.
-          sweepFireEvents(_lastTime, curTime);
+          sweepFireEvents(prevTime, curTime);
         }
         else {
           // When scrubbing backwards, sweep from the beginning of the track, potentially
           // firing events based on the eventScrubType.
-          sweepFireFromBeginning(_lastTime, curTime);
+          sweepFireFromBeginning(prevTime, curTime);
         }
       }
-
-      _lastTime = director.time;
     }
 
     #endregion
@@ -133,8 +129,8 @@ namespace Leap.Unity.Recording {
     /// requires a previous frame time and a current frame time, which is unavailable
     /// at the beginning of a timeline.
     /// </summary>
-    private void checkFireTimeZeroEvent() {
-      if (director.time == 0 && Application.isPlaying) {
+    private void checkFireTimeZeroEvent(double curLocalTime) {
+      if (curLocalTime == 0f && Application.isPlaying) {
         if (_clips.Count > 0) {
           var firstClip = _clips[0];
           if (firstClip.start == 0) {

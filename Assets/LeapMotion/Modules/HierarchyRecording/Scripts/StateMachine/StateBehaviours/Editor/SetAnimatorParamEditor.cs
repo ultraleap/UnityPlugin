@@ -8,30 +8,20 @@
  ******************************************************************************/
 
 using UnityEngine;
-using Leap.Unity.RuntimeGizmos;
+using UnityEditor;
 
 namespace Leap.Unity.Recording {
 
-  public class LeapPlayableProvider : LeapProvider {
+  [CanEditMultipleObjects]
+  [CustomEditor(typeof(SetAnimatorParam))]
+  public class SetAnimatorParamEditor : CustomEditorBase<SetAnimatorParam> {
 
-    private Frame _frame;
+    protected override void OnEnable() {
+      base.OnEnable();
 
-    public override Frame CurrentFixedFrame {
-      get {
-        return _frame;
-      }
-    }
-
-    public override Frame CurrentFrame {
-      get {
-        return _frame;
-      }
-    }
-
-    public void SetCurrentFrame(Frame frame) {
-      _frame = frame;
-      DispatchUpdateFrameEvent(frame);
-      DispatchFixedFrameEvent(frame);
+      specifyConditionalDrawing("_type", (int)AnimatorControllerParameterType.Bool, "_boolValue");
+      specifyConditionalDrawing("_type", (int)AnimatorControllerParameterType.Int, "_intValue");
+      specifyConditionalDrawing("_type", (int)AnimatorControllerParameterType.Float, "_floatValue");
     }
   }
 }

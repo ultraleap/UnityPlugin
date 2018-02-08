@@ -7,31 +7,36 @@
  * between Leap Motion and you, your company or other organization.           *
  ******************************************************************************/
 
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
-using Leap.Unity.RuntimeGizmos;
+using UnityEngine.Playables;
 
 namespace Leap.Unity.Recording {
+  using Animation;
 
-  public class LeapPlayableProvider : LeapProvider {
+  public class SetPlayableDirector : MonoBehaviour {
 
-    private Frame _frame;
+    [SerializeField]
+    private PlayableDirector _director;
 
-    public override Frame CurrentFixedFrame {
-      get {
-        return _frame;
-      }
+    [SerializeField]
+    private PlayableAsset _playable;
+
+    [SerializeField]
+    private DirectorWrapMode _wrapMode = DirectorWrapMode.None;
+
+    private void OnEnable() {
+      _director.extrapolationMode = _wrapMode;
+      _director.Play(_playable);
     }
 
-    public override Frame CurrentFrame {
-      get {
-        return _frame;
-      }
+    public void PauseAndHold() {
+      _director.playableGraph.GetRootPlayable(0).SetSpeed(0);
     }
 
-    public void SetCurrentFrame(Frame frame) {
-      _frame = frame;
-      DispatchUpdateFrameEvent(frame);
-      DispatchFixedFrameEvent(frame);
+    public void ResumeFromPauseAndHold() {
+      _director.playableGraph.GetRootPlayable(0).SetSpeed(1);
     }
   }
 }

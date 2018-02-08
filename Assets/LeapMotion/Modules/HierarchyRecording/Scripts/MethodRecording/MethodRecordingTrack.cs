@@ -7,31 +7,16 @@
  * between Leap Motion and you, your company or other organization.           *
  ******************************************************************************/
 
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
-using Leap.Unity.RuntimeGizmos;
+using UnityEngine.Playables;
+using UnityEngine.Timeline;
 
 namespace Leap.Unity.Recording {
 
-  public class LeapPlayableProvider : LeapProvider {
-
-    private Frame _frame;
-
-    public override Frame CurrentFixedFrame {
-      get {
-        return _frame;
-      }
-    }
-
-    public override Frame CurrentFrame {
-      get {
-        return _frame;
-      }
-    }
-
-    public void SetCurrentFrame(Frame frame) {
-      _frame = frame;
-      DispatchUpdateFrameEvent(frame);
-      DispatchFixedFrameEvent(frame);
-    }
-  }
+  [TrackColor(0.1f, 0.1f, 1.0f)]
+  [TrackClipType(typeof(MethodRecordingClip))]
+  [TrackBindingType(typeof(MethodRecording))]
+  public class MethodRecordingTrack : TrackAsset { }
 }
