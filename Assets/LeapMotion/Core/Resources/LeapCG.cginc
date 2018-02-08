@@ -24,7 +24,13 @@ uniform float4x4 _LeapHandTransforms[2];
 #define USE_GLOBAL_PROJECTION 0
 
 float2 LeapGetUndistortedUVWithOffset(float4 screenPos, float2 uvOffset){
-  float2 screenUV = (screenPos.xy / screenPos.w) * 2 - float2(1,1);
+  float2 screenUV = screenPos.xy / screenPos.w;
+#if UNITY_SINGLE_PASS_STEREO
+  float4 scaleOffset = unity_StereoScaleOffset[unity_StereoEyeIndex];
+  screenUV = (screenUV - scaleOffset.zw) / scaleOffset.xy;
+#endif
+
+  screenUV = screenUV * 2 - float2(1,1);
 
   // Removed: Replaced with below
 #if USE_GLOBAL_PROJECTION
@@ -70,12 +76,8 @@ float2 LeapGetRightUndistortedUV(float4 screenPos){
 }
 
 float2 LeapGetStereoUndistortedUV(float4 screenPos){
-  // Fix: Remove _LeapGlobalStereoUVOffset
-  if (unity_StereoEyeIndex == 0) { // Left Eye
-    return LeapGetLeftUndistortedUV(screenPos);
-  } else { // Right Eye
-    return LeapGetRightUndistortedUV(screenPos);
-  }
+  float offset = unity_StereoEyeIndex == 0 ? 0 : 0.5;
+  return LeapGetUndistortedUVWithOffset(screenPos, float2(0.0, offset));
 }
 
 
