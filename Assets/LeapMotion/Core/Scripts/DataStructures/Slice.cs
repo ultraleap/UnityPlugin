@@ -58,9 +58,10 @@ namespace Leap.Unity {
     /// A slice whose endIdx is smaller than its beginIdx will index backwards along the
     /// underlying List.
     /// </summary>
-    public Slice(IList<T> list, int beginIdx, int endIdx) {
+    public Slice(IList<T> list, int beginIdx = 0, int endIdx = -1) {
       _list = list;
       _beginIdx = beginIdx;
+      if (endIdx == -1) endIdx = _list.Count;
       _endIdx = endIdx;
       _direction = beginIdx <= endIdx ? 1 : -1;
     }
@@ -82,7 +83,19 @@ namespace Leap.Unity {
       }
     }
 
-    public IIndexableEnumerator<T> GetEnumerator() { return this.GetEnumerator(); }
+    /// <summary>
+    /// Slices support allocation-free <code>foreach</code> enumeration.
+    /// </summary>
+    public IIndexableEnumerator<T, Slice<T>> GetEnumerator() {
+      return this.GetEnumerator<T, Slice<T>>();
+    }
+
+    /// <summary>
+    /// Slices support Query() operations on their elements.
+    /// </summary>
+    public QueryWrapper<T, IIndexableEnumerator<T, Slice<T>>> Query() {
+      return this.Query<T, Slice<T>>();
+    }
 
   }
 

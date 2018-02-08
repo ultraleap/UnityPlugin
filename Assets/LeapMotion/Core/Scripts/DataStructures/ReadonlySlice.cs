@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Leap.Unity.Query;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -77,7 +78,19 @@ namespace Leap.Unity {
       }
     }
 
-    public IIndexableEnumerator<T> GetEnumerator() { return this.GetEnumerator(); }
+    /// <summary>
+    /// ReadonlySlices support allocation-free <code>foreach</code> enumeration.
+    /// </summary>
+    public IIndexableEnumerator<T, ReadonlySlice<T>> GetEnumerator() {
+      return this.GetEnumerator<T, ReadonlySlice<T>>();
+    }
+
+    /// <summary>
+    /// ReadonlySlices support Query() operations on their elements.
+    /// </summary>
+    public QueryWrapper<T, IIndexableEnumerator<T, ReadonlySlice<T>>> Query() {
+      return this.Query<T, ReadonlySlice<T>>();
+    }
 
   }
 

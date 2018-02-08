@@ -7,6 +7,7 @@
  * between Leap Motion and you, your company or other organization.           *
  ******************************************************************************/
 
+using Leap.Unity.Query;
 using UnityEngine;
 
 namespace Leap.Unity {
@@ -33,8 +34,8 @@ namespace Leap.Unity {
     }
 
     protected RingBuffer<ValueTimePair> _buffer;
-    
-    public int  Count { get { return _buffer.Count; } }
+
+    public int Count { get { return _buffer.Count; } }
 
     public bool IsFull { get { return _buffer.IsFull; } }
 
@@ -47,7 +48,7 @@ namespace Leap.Unity {
     }
 
     public void Clear() { _buffer.Clear(); }
-    
+
     public void Add(SampleType sample, float sampleTime) {
       if (!IsEmpty && sampleTime == GetLatestTime()) {
         SetLatest(sample, sampleTime);
@@ -88,6 +89,31 @@ namespace Leap.Unity {
     /// If the buffer is empty, you should return the identity for your derivative type.
     /// </summary>
     public abstract DerivativeType Delta();
+
+
+    #region foreach and Query()
+
+    /// <summary>
+    /// DeltaBuffers support allocation-free <code>foreach</code> enumeration.
+    /// </summary>
+    public IIndexableEnumerator<SampleType,
+             DeltaBuffer<SampleType, DerivativeType>> GetEnumerator() {
+      return new IIndexableEnumerator<SampleType,
+                   DeltaBuffer<SampleType, DerivativeType>>();
+    }
+
+    /// <summary>
+    /// DeltaBuffers support Query() operations on their elements.
+    /// </summary>
+    public QueryWrapper<SampleType,
+             IIndexableEnumerator<SampleType,
+               DeltaBuffer<SampleType, DerivativeType>>> Query() {
+      return new QueryWrapper<SampleType,
+                   IIndexableEnumerator<SampleType,
+                     DeltaBuffer<SampleType, DerivativeType>>>();
+    }
+
+    #endregion
 
   }
 
