@@ -11,7 +11,7 @@ using System;
 using System.Linq;
 using NUnit.Framework;
 
-namespace Leap.Unity.Tests {
+namespace Leap.Unity {
 
   public class BitConverterTests {
 
