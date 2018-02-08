@@ -98,4 +98,47 @@ namespace Leap.Unity {
 
   }
 
+  #region Older Enumerator -- causes allocation on "Element" is struct due to boxing.
+
+  //public struct IIndexableEnumerator<Element> : IQueryOp<Element>  {
+
+  //  IIndexable<Element> indexable;
+  //  int index;
+
+  //  public IIndexableEnumerator(IIndexable<Element> indexable) {
+  //    this.indexable = indexable;
+  //    index = -1;
+  //  }
+
+  //  public IIndexableEnumerator<Element> GetEnumerator() {
+  //    return this;
+  //  }
+
+  //  public bool MoveNext() {
+  //    if (indexable == null) return false;
+  //    index++; return index < indexable.Count;
+  //  }
+
+  //  public bool TryGetNext(out Element t) {
+  //    var hasNext = MoveNext();
+  //    if (!hasNext) {
+  //      t = default(Element);
+  //      return false;
+  //    }
+  //    else {
+  //      t = Current;
+  //      return true;
+  //    }
+  //  }
+
+  //  public void Reset() {
+  //    index = -1;
+  //  }
+
+  //  public Element Current { get { return indexable[index]; } }
+
+  //}
+
+  #endregion
+
 }
