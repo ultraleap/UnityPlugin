@@ -29,6 +29,12 @@ namespace Leap.Unity {
     [SerializeField]
     protected UnityObject _assetFolder;
 
+    public AssetFolder() { }
+
+    public AssetFolder(string path) {
+      Path = path;
+    }
+
     /// <summary>
     /// Gets or sets the folder path.  This path will always be a path
     /// relative to the asset folder, and matches the format expected and
