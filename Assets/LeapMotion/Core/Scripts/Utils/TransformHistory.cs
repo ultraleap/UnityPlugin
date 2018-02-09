@@ -55,13 +55,13 @@ namespace Leap.Unity {
       }
 
       public static TransformData GetTransformAtTime(RingBuffer<TransformData> history, long desiredTime) {
-        for (int i = history.Length - 1; i > 0; i--) {
+        for (int i = history.Count - 1; i > 0; i--) {
           if (history.Get(i).time >= desiredTime && history.Get(i - 1).time < desiredTime) {
             return Lerp(history.Get(i - 1), history.Get(i), desiredTime);
           }
         }
 
-        if (history.Length > 0) {
+        if (history.Count > 0) {
           return history.GetLatest();
         }
         else {
