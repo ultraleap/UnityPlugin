@@ -89,28 +89,11 @@ namespace Leap.Unity {
     /// If the buffer is empty, you should return the identity for your derivative type.
     /// </summary>
     public abstract DerivativeType Delta();
-
-
-    #region foreach and Query()
-
-    /// <summary>
-    /// DeltaBuffers support allocation-free <code>foreach</code> enumeration.
-    /// </summary>
-    public IIndexableEnumerator<SampleType,
-             DeltaBuffer<SampleType, DerivativeType>> GetEnumerator() {
-      return new IIndexableEnumerator<SampleType,
-                   DeltaBuffer<SampleType, DerivativeType>>();
-    }
-
-    /// <summary>
-    /// DeltaBuffers support Query() operations on their elements.
-    /// </summary>
-    public QueryWrapper<SampleType,
-             IIndexableEnumerator<SampleType,
-               DeltaBuffer<SampleType, DerivativeType>>> Query() {
-      return new QueryWrapper<SampleType,
-                   IIndexableEnumerator<SampleType,
-                     DeltaBuffer<SampleType, DerivativeType>>>();
+    
+    #region foreach Support
+    
+    public IndexableEnumerator<SampleType> GetEnumerator() {
+      return new IndexableEnumerator<SampleType>(this);
     }
 
     #endregion
@@ -207,6 +190,11 @@ namespace Leap.Unity {
         var deltaTime = t1.From(t0);
 
         deltaSum += delta / deltaTime;
+      }
+
+      Slice<float> floats = new Slice<float>(new float[] { 0f, 1f });
+      foreach (var f in floats.Query()) {
+
       }
 
       return deltaSum / (Count - 1);

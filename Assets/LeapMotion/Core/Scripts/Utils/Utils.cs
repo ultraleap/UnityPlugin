@@ -531,40 +531,6 @@ namespace Leap.Unity {
       return arr;
     }
 
-    public static IIndexable<T> ToIndexable<T>(this T[] arr) {
-      return new ArrayIndexable<T>(arr);
-    }
-
-    public struct ArrayIndexable<T> : IIndexable<T> {
-      private T[] _arr;
-
-      public ArrayIndexable(T[] arr) {
-        _arr = arr;
-      }
-
-      public T this[int idx] { get { return _arr[idx]; } }
-
-      public int Count { get { return _arr.Length; } }
-
-      public static implicit operator ArrayIndexable<T>(T[] arr) {
-        return new ArrayIndexable<T>(arr);
-      }
-
-      /// <summary>
-      /// Allocation-free <code>foreach</code> support for ArrayIndexables.
-      /// </summary>
-      public IIndexableEnumerator<T, ArrayIndexable<T>> GetEnumerator() {
-        return this.GetEnumerator<T, ArrayIndexable<T>>();
-      }
-
-      /// <summary>
-      /// ArrayIndexables support Query() operations on their array elements.
-      /// </summary>
-      public QueryWrapper<T, IIndexableEnumerator<T, ArrayIndexable<T>>> Query() {
-        return this.Query<T, ArrayIndexable<T>>();
-      }
-    }
-
     #endregion
 
     #region List Utils

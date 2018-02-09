@@ -15,9 +15,7 @@ namespace Leap.Unity {
 
   /// <summary>
   /// Implement this interface to recieve a callback whenever your object is
-  /// spawned from a pool.  You do not recieve a callback during recycle because
-  /// the recommended workflow is to have the object implement IDisposable and
-  /// recycle itself within the Dispose method.
+  /// spawned from a pool.
   /// </summary>
   public interface IPoolable {
     void OnSpawn();

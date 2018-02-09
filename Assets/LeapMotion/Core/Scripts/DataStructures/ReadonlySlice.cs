@@ -42,7 +42,7 @@ namespace Leap.Unity {
 
   }
 
-  public struct ReadonlySlice<T> : IIndexable<T> {
+  public struct ReadonlySlice<T> : IIndexableStruct<T, ReadonlySlice<T>> {
 
     private ReadonlyList<T> _list;
 
@@ -78,19 +78,18 @@ namespace Leap.Unity {
       }
     }
 
-    /// <summary>
-    /// ReadonlySlices support allocation-free <code>foreach</code> enumeration.
-    /// </summary>
-    public IIndexableEnumerator<T, ReadonlySlice<T>> GetEnumerator() {
-      return this.GetEnumerator<T, ReadonlySlice<T>>();
+    #region foreach and Query()
+
+    public IndexableStructEnumerator<T, ReadonlySlice<T>> GetEnumerator() {
+      return new IndexableStructEnumerator<T, ReadonlySlice<T>>(this);
     }
 
-    /// <summary>
-    /// ReadonlySlices support Query() operations on their elements.
-    /// </summary>
-    public QueryWrapper<T, IIndexableEnumerator<T, ReadonlySlice<T>>> Query() {
-      return this.Query<T, ReadonlySlice<T>>();
+    public QueryWrapper<T, IndexableStructEnumerator<T, ReadonlySlice<T>>> Query() {
+      return new QueryWrapper<T, IndexableStructEnumerator<T,
+                                   ReadonlySlice<T>>>(GetEnumerator());
     }
+
+    #endregion
 
   }
 

@@ -42,7 +42,7 @@ namespace Leap.Unity {
 
   }
 
-  public struct Slice<T> : IIndexable<T> {
+  public struct Slice<T> : IIndexableStruct<T, Slice<T>> {
 
     private IList<T> _list;
 
@@ -83,19 +83,17 @@ namespace Leap.Unity {
       }
     }
 
-    /// <summary>
-    /// Slices support allocation-free <code>foreach</code> enumeration.
-    /// </summary>
-    public IIndexableEnumerator<T, Slice<T>> GetEnumerator() {
-      return this.GetEnumerator<T, Slice<T>>();
+    #region foreach and Query()
+
+    public IndexableStructEnumerator<T, Slice<T>> GetEnumerator() {
+      return new IndexableStructEnumerator<T, Slice<T>>(this);
     }
 
-    /// <summary>
-    /// Slices support Query() operations on their elements.
-    /// </summary>
-    public QueryWrapper<T, IIndexableEnumerator<T, Slice<T>>> Query() {
-      return this.Query<T, Slice<T>>();
+    public QueryWrapper<T, IndexableStructEnumerator<T, Slice<T>>> Query() {
+      return new QueryWrapper<T, IndexableStructEnumerator<T, Slice<T>>>(GetEnumerator());
     }
+
+    #endregion
 
   }
 
