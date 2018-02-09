@@ -12,12 +12,13 @@ using UnityEngine.Assertions;
 using System;
 using System.IO;
 using System.Collections.Generic;
-using Leap.Unity.RuntimeGizmos;
 using Leap.Unity.Query;
 
 namespace Leap.Unity {
 
   public static class Utils {
+
+    #region C# Utilities
 
     #region Generic Utils
 
@@ -508,225 +509,97 @@ namespace Leap.Unity {
 
     #endregion
 
-    #region Value Mapping Utils
+    #region Array Utils
 
     /// <summary>
-    /// Maps the value between valueMin and valueMax to its linearly proportional equivalent between resultMin and resultMax.
-    /// The input value is clamped between valueMin and valueMax; if this is not desired, see MapUnclamped.
+    /// Sets all elements in the array of type T to default(T).
     /// </summary>
-    public static float Map(this float value, float valueMin, float valueMax, float resultMin, float resultMax) {
-      if (valueMin == valueMax) return resultMin;
-      return Mathf.Lerp(resultMin, resultMax, ((value - valueMin) / (valueMax - valueMin)));
+    public static T[] ClearWithDefaults<T>(this T[] arr) {
+      for (int i = 0; i < arr.Length; i++) {
+        arr[i] = default(T);
+      }
+      return arr;
     }
 
     /// <summary>
-    /// Maps the value between valueMin and valueMax to its linearly proportional equivalent between resultMin and resultMax,
-    /// without clamping the result value between resultMin and resultMax.
+    /// Sets all elements in the array of type T to the argument value.
     /// </summary>
-    public static float MapUnclamped(this float value, float valueMin, float valueMax, float resultMin, float resultMax) {
-      if (valueMin == valueMax) return resultMin;
-      return Mathf.LerpUnclamped(resultMin, resultMax, ((value - valueMin) / (valueMax - valueMin)));
-    }
-
-    /// <summary>
-    /// Maps each Vector2 component between valueMin and valueMax to its linearly proportional equivalent between resultMin and resultMax.
-    /// The input values are clamped between valueMin and valueMax; if this is not desired, see MapUnclamped.
-    /// </summary>
-    public static Vector2 Map(this Vector2 value, float valueMin, float valueMax, float resultMin, float resultMax) {
-      return new Vector2(value.x.Map(valueMin, valueMax, resultMin, resultMax),
-                        value.y.Map(valueMin, valueMax, resultMin, resultMax));
-    }
-
-    /// <summary>
-    /// Maps each Vector2 component between valueMin and valueMax to its linearly proportional equivalent between resultMin and resultMax,
-    /// without clamping the result value between resultMin and resultMax.
-    /// </summary>
-    public static Vector2 MapUnclamped(this Vector2 value, float valueMin, float valueMax, float resultMin, float resultMax) {
-      return new Vector2(value.x.MapUnclamped(valueMin, valueMax, resultMin, resultMax),
-                        value.y.MapUnclamped(valueMin, valueMax, resultMin, resultMax));
-    }
-
-    /// <summary>
-    /// Maps each Vector3 component between valueMin and valueMax to its linearly proportional equivalent between resultMin and resultMax.
-    /// The input values are clamped between valueMin and valueMax; if this is not desired, see MapUnclamped.
-    /// </summary>
-    public static Vector3 Map(this Vector3 value, float valueMin, float valueMax, float resultMin, float resultMax) {
-      return new Vector3(value.x.Map(valueMin, valueMax, resultMin, resultMax),
-                        value.y.Map(valueMin, valueMax, resultMin, resultMax),
-                        value.z.Map(valueMin, valueMax, resultMin, resultMax));
-    }
-
-    /// <summary>
-    /// Maps each Vector3 component between valueMin and valueMax to its linearly proportional equivalent between resultMin and resultMax,
-    /// without clamping the result value between resultMin and resultMax.
-    /// </summary>
-    public static Vector3 MapUnclamped(this Vector3 value, float valueMin, float valueMax, float resultMin, float resultMax) {
-      return new Vector3(value.x.MapUnclamped(valueMin, valueMax, resultMin, resultMax),
-                        value.y.MapUnclamped(valueMin, valueMax, resultMin, resultMax),
-                        value.z.MapUnclamped(valueMin, valueMax, resultMin, resultMax));
-    }
-
-    /// <summary>
-    /// Maps each Vector4 component between valueMin and valueMax to its linearly proportional equivalent between resultMin and resultMax.
-    /// The input values are clamped between valueMin and valueMax; if this is not desired, see MapUnclamped.
-    /// </summary>
-    public static Vector4 Map(this Vector4 value, float valueMin, float valueMax, float resultMin, float resultMax) {
-      return new Vector4(value.x.Map(valueMin, valueMax, resultMin, resultMax),
-                        value.y.Map(valueMin, valueMax, resultMin, resultMax),
-                        value.z.Map(valueMin, valueMax, resultMin, resultMax),
-                        value.w.Map(valueMin, valueMax, resultMin, resultMax));
-    }
-
-    /// <summary>
-    /// Maps each Vector4 component between valueMin and valueMax to its linearly proportional equivalent between resultMin and resultMax,
-    /// without clamping the result value between resultMin and resultMax.
-    /// </summary>
-    public static Vector4 MapUnclamped(this Vector4 value, float valueMin, float valueMax, float resultMin, float resultMax) {
-      return new Vector4(value.x.MapUnclamped(valueMin, valueMax, resultMin, resultMax),
-                        value.y.MapUnclamped(valueMin, valueMax, resultMin, resultMax),
-                        value.z.MapUnclamped(valueMin, valueMax, resultMin, resultMax),
-                        value.w.MapUnclamped(valueMin, valueMax, resultMin, resultMax));
-    }
-
-    /// <summary>
-    /// Returns a vector between resultMin and resultMax based on the input value's position
-    /// between valueMin and valueMax.
-    /// The input value is clamped between valueMin and valueMax.
-    /// </summary>
-    public static Vector2 Map(float input, float valueMin, float valueMax, Vector2 resultMin, Vector2 resultMax) {
-      return Vector2.Lerp(resultMin, resultMax, Mathf.InverseLerp(valueMin, valueMax, input));
-    }
-
-    /// <summary>
-    /// Returns a vector between resultMin and resultMax based on the input value's position
-    /// between valueMin and valueMax.
-    /// The input value is clamped between valueMin and valueMax.
-    /// </summary>
-    public static Vector3 Map(float input, float valueMin, float valueMax, Vector3 resultMin, Vector3 resultMax) {
-      return Vector3.Lerp(resultMin, resultMax, Mathf.InverseLerp(valueMin, valueMax, input));
-    }
-
-    /// <summary>
-    /// Returns a vector between resultMin and resultMax based on the input value's position
-    /// between valueMin and valueMax.
-    /// The input value is clamped between valueMin and valueMax.
-    /// </summary>
-    public static Vector4 Map(float input, float valueMin, float valueMax, Vector4 resultMin, Vector4 resultMax) {
-      return Vector4.Lerp(resultMin, resultMax, Mathf.InverseLerp(valueMin, valueMax, input));
-    }
-
-    /// <summary>
-    /// Returns a new Vector2 via component-wise multiplication.
-    /// This operation is equivalent to Vector3.Scale(A, B).
-    /// </summary>
-    public static Vector2 CompMul(this Vector2 A, Vector2 B) {
-      return new Vector2(A.x * B.x, A.y * B.y);
-    }
-
-    /// <summary>
-    /// Returns a new Vector3 via component-wise multiplication.
-    /// This operation is equivalent to Vector3.Scale(A, B).
-    /// </summary>
-    public static Vector3 CompMul(this Vector3 A, Vector3 B) {
-      return new Vector3(A.x * B.x, A.y * B.y, A.z * B.z);
-    }
-
-    /// <summary>
-    /// Returns a new Vector4 via component-wise multiplication.
-    /// This operation is equivalent to Vector3.Scale(A, B).
-    /// </summary>
-    public static Vector4 CompMul(this Vector4 A, Vector4 B) {
-      return new Vector4(A.x * B.x, A.y * B.y, A.z * B.z, A.w * B.w);
-    }
-
-    /// <summary>
-    /// Returns a new Vector3 via component-wise division.
-    /// This operation is the inverse of A.CompMul(B).
-    /// </summary>
-    public static Vector2 CompDiv(this Vector2 A, Vector2 B) {
-      return new Vector2(A.x / B.x, A.y / B.y);
-    }
-
-    /// <summary>
-    /// Returns a new Vector3 via component-wise division.
-    /// This operation is the inverse of A.CompMul(B).
-    /// </summary>
-    public static Vector3 CompDiv(this Vector3 A, Vector3 B) {
-      return new Vector3(A.x / B.x, A.y / B.y, A.z / B.z);
-    }
-
-    /// <summary>
-    /// Returns a new Vector4 via component-wise division.
-    /// This operation is the inverse of A.CompMul(B).
-    /// </summary>
-    public static Vector4 CompDiv(this Vector4 A, Vector4 B) {
-      return new Vector4(A.x / B.x, A.y / B.y, A.z / B.z, A.w / B.w);
-    }
-
-    /// <summary>
-    /// Returns the sum of the components of the input vector.
-    /// </summary>
-    public static float CompSum(this Vector2 v) {
-      return v.x + v.y;
-    }
-
-    /// <summary>
-    /// Returns the sum of the components of the input vector.
-    /// </summary>
-    public static float CompSum(this Vector3 v) {
-      return v.x + v.y + v.z;
-    }
-
-    /// <summary>
-    /// Returns the sum of the components of the input vector.
-    /// </summary>
-    public static float CompSum(this Vector4 v) {
-      return v.x + v.y + v.z + v.w;
-    }
-
-    /// <summary>
-    /// Returns the largest component of the input vector.
-    /// </summary>
-    public static float CompMax(this Vector2 v) {
-      return Mathf.Max(v.x, v.y);
-    }
-
-    /// <summary>
-    /// Returns the largest component of the input vector.
-    /// </summary>
-    public static float CompMax(this Vector3 v) {
-      return Mathf.Max(Mathf.Max(v.x, v.y), v.z);
-    }
-
-    /// <summary>
-    /// Returns the largest component of the input vector.
-    /// </summary>
-    public static float CompMax(this Vector4 v) {
-      return Mathf.Max(Mathf.Max(Mathf.Max(v.x, v.y), v.z), v.w);
-    }
-
-    /// <summary>
-    /// Returns the smallest component of the input vector.
-    /// </summary>
-    public static float CompMin(this Vector2 v) {
-      return Mathf.Min(v.x, v.y);
-    }
-
-    /// <summary>
-    /// Returns the smallest component of the input vector.
-    /// </summary>
-    public static float CompMin(this Vector3 v) {
-      return Mathf.Min(Mathf.Min(v.x, v.y), v.z);
-    }
-
-    /// <summary>
-    /// Returns the smallest component of the input vector.
-    /// </summary>
-    public static float CompMin(this Vector4 v) {
-      return Mathf.Min(Mathf.Min(Mathf.Min(v.x, v.y), v.z), v.w);
+    public static T[] ClearWith<T>(this T[] arr, T value) {
+      for (int i = 0; i < arr.Length; i++) {
+        arr[i] = value;
+      }
+      return arr;
     }
 
     #endregion
+
+    #region List Utils
+
+    public static void EnsureListExists<T>(ref List<T> list) {
+      if (list == null) {
+        list = new List<T>();
+      }
+    }
+
+    public static void EnsureListCount<T>(this List<T> list, int count) {
+      if (list.Count == count) return;
+
+      while (list.Count < count) {
+        list.Add(default(T));
+      }
+
+      while (list.Count > count) {
+        list.RemoveAt(list.Count - 1);
+      }
+    }
+
+    public static void EnsureListCount<T>(this List<T> list, int count, Func<T> createT, Action<T> deleteT = null) {
+      while (list.Count < count) {
+        list.Add(createT());
+      }
+
+      while (list.Count > count) {
+        T tempT = list[list.Count - 1];
+        list.RemoveAt(list.Count - 1);
+
+        if (deleteT != null) {
+          deleteT(tempT);
+        }
+      }
+    }
+
+    /// <summary>
+    /// Adds t0, then t1 to this list.
+    /// </summary>
+    public static void Add<T>(this List<T> list, T t0, T t1) {
+      list.Add(t0);
+      list.Add(t1);
+    }
+
+    /// <summary>
+    /// Adds t0, t1, then t2 to this list.
+    /// </summary>
+    public static void Add<T>(this List<T> list, T t0, T t1, T t2) {
+      list.Add(t0);
+      list.Add(t1);
+      list.Add(t2);
+    }
+
+    /// <summary>
+    /// Adds t0, t1, t2, then t3 to this list.
+    /// </summary>
+    public static void Add<T>(this List<T> list, T t0, T t1, T t2, T t3) {
+      list.Add(t0);
+      list.Add(t1);
+      list.Add(t2);
+      list.Add(t3);
+    }
+
+    #endregion
+
+    #endregion
+
+    #region Unity Utilities
 
     #region Unity Object Utils
 
@@ -790,6 +663,25 @@ namespace Leap.Unity {
         _count = _t.childCount;
       }
       public void Dispose() { }
+    }
+
+    /// <summary>
+    /// Sets the localPosition, localRotation, and localScale to their default values:
+    /// Vector3.zero, Quaternion.identity, and Vector3.one.
+    /// </summary>
+    public static void ResetLocalTransform(this Transform t) {
+      t.localPosition = Vector3.zero;
+      t.localRotation = Quaternion.identity;
+      t.localScale = Vector3.one;
+    }
+
+    /// <summary>
+    /// Sets the localPosition and localRotation of this Transform to Vector3.zero and
+    /// Quaternion.identity. Doesn't affect localScale.
+    /// </summary>
+    public static void ResetLocalPose(this Transform t) {
+      t.localPosition = Vector3.zero;
+      t.localRotation = Quaternion.identity;
     }
 
     #endregion
@@ -898,6 +790,71 @@ namespace Leap.Unity {
       thisTransform.rotation = Quaternion.LookRotation(thisTransform.position - transform.position, upwards);
     }
 
+    #endregion
+
+    #region Vector3 Utils
+
+    /// <summary>
+    /// Returns a Vector3 containing the X, Y, and Z components of this Vector4. Note
+    /// that an implicit conversion exists from Vector4 to Vector3 already, so this
+    /// extension method is only useful if you specifically want an explicit conversion.
+    /// </summary>
+    public static Vector3 ToVector3(this Vector4 v4) {
+      return new Vector3(v4.x, v4.y, v4.z);
+    }
+
+    /// <summary>
+    /// Returns this vector converted from world space to the local space of the argument
+    /// Transform.
+    /// </summary>
+    public static Vector3 InLocalSpace(this Vector3 v, Transform t) {
+      return t.InverseTransformPoint(v);
+    }
+
+    
+
+    #endregion
+
+    #region Quaternion Utils
+
+    /// <summary>
+    /// Converts the quaternion into an axis and an angle and returns the vector
+    /// axis * angle. Angle magnitude is measured in degrees, not radians; this requires
+    /// conversion to radians if being used to set the angular velocity of a PhysX
+    /// Rigidbody.
+    /// </summary>
+    public static Vector3 ToAngleAxisVector(this Quaternion q) {
+      float angle;
+      Vector3 axis;
+      q.ToAngleAxis(out angle, out axis);
+      return axis * angle;
+    }
+
+    /// <summary>
+    /// Returns a Quaternion described by the provided angle axis vector. Expects the
+    /// magnitude (angle) to be in degrees, not radians.
+    /// </summary>
+    public static Quaternion QuaternionFromAngleAxisVector(Vector3 angleAxisVector) {
+      if (angleAxisVector == Vector3.zero) return Quaternion.identity;
+      return Quaternion.AngleAxis(angleAxisVector.magnitude, angleAxisVector);
+    }
+
+    /// <summary>
+    /// Returns a normalized Quaternion from the input quaternion. If the input
+    /// quaternion is zero-length (AKA the default Quaternion), the identity Quaternion
+    /// is returned.
+    /// </summary>
+    public static Quaternion ToNormalized(this Quaternion quaternion) {
+      float x = quaternion.x, y = quaternion.y, z = quaternion.z, w = quaternion.w;
+      float magnitude = Mathf.Sqrt(x * x + y * y + z * z + w * w);
+
+      if (Mathf.Approximately(magnitude, 0f)) {
+        return Quaternion.identity;
+      }
+
+      return new Quaternion(x / magnitude, y / magnitude, z / magnitude, w / magnitude);
+    }
+
     /// <summary>
     /// Returns the rotation that makes a transform at fromPosition point its forward
     /// vector at targetPosition and keep its rightward vector parallel with the horizon
@@ -930,235 +887,63 @@ namespace Leap.Unity {
                                      upwardDirection);
     }
 
-    #endregion
-
-    #region Quaternion Utils
-
-    /// <summary>
-    /// Converts the quaternion into an axis and an angle and returns the vector
-    /// axis * angle. Angle magnitude is measured in degrees, not radians; this requires
-    /// conversion to radians if being used to set the angular velocity of a PhysX
-    /// Rigidbody.
-    /// </summary>
-    public static Vector3 ToAngleAxisVector(this Quaternion q) {
-      float angle;
-      Vector3 axis;
-      q.ToAngleAxis(out angle, out axis);
-      return axis * angle;
-    }
-
-    /// <summary>
-    /// Returns a Quaternion described by the provided angle axis vector. Expects the
-    /// magnitude (angle) to be in degrees, not radians.
-    /// </summary>
-    public static Quaternion QuaternionFromAngleAxisVector(Vector3 angleAxisVector) {
-      if (angleAxisVector == Vector3.zero) return Quaternion.identity;
-      return Quaternion.AngleAxis(angleAxisVector.magnitude, angleAxisVector);
-    }
-
-    /// <summary>
-    /// A.From(B) produces the quaternion that rotates from B to A.
-    /// Combines with Then() to produce readable, predictable results:
-    /// B.Then(A.From(B)) == A.
-    /// </summary>
-    public static Quaternion From(this Quaternion thisQuaternion, Quaternion otherQuaternion) {
-      return Quaternion.Inverse(otherQuaternion) * thisQuaternion;
-    }
-
-    /// <summary>
-    /// A.To(B) produces the quaternion that rotates from A to B.
-    /// Combines with Then() to produce readable, predictable results:
-    /// B.Then(B.To(A)) == A.
-    /// </summary>
-    public static Quaternion To(this Quaternion thisQuaternion, Quaternion otherQuaternion) {
-      return Quaternion.Inverse(thisQuaternion) * otherQuaternion;
-    }
-
-    /// <summary>
-    /// Rotates this quaternion by the other quaternion. This is a rightward syntax for
-    /// Quaternion multiplication, which normally obeys left-multiply ordering.
-    /// </summary>
-    public static Quaternion Then(this Quaternion thisQuaternion, Quaternion otherQuaternion) {
-      return thisQuaternion * otherQuaternion;
-    }
-
-    /// <summary>
-    /// Returns a normalized Quaternion from the input quaternion. If the input
-    /// quaternion is zero-length (AKA the default Quaternion), the identity Quaternion
-    /// is returned.
-    /// </summary>
-    public static Quaternion ToNormalized(this Quaternion quaternion) {
-      float x = quaternion.x, y = quaternion.y, z = quaternion.z, w = quaternion.w;
-      float magnitude = Mathf.Sqrt(x * x + y * y + z * z + w * w);
-
-      if (Mathf.Approximately(magnitude, 0f)) {
-        return Quaternion.identity;
-      }
-
-      return new Quaternion(x / magnitude, y / magnitude, z / magnitude, w / magnitude);
-    }
-
-    #endregion
-
-    #region Float Utils
-
-    /// <summary>
-    /// Additive From syntax for floats. Evaluated as this float plus the additive
-    /// inverse of the other float, usually expressed as thisFloat - otherFloat.
-    /// 
-    /// For less trivial uses of From/Then syntax, refer to their implementations for
-    /// Quaternions and Matrix4x4s.
-    /// </summary>
-    public static float From(this float thisFloat, float otherFloat) {
-      return thisFloat - otherFloat;
-    }
-
-    /// <summary>
-    /// Additive To syntax for floats. Evaluated as this float plus the additive
-    /// inverse of the other float, usually expressed as otherFloat - thisFloat.
-    /// 
-    /// For less trivial uses of From/Then syntax, refer to their implementations for
-    /// Quaternions and Matrix4x4s.
-    /// </summary>
-    public static float To(this float thisFloat, float otherFloat) {
-      return otherFloat - thisFloat;
-    }
-
-    /// <summary>
-    /// Additive Then syntax for floats. Literally, thisFloat + otherFloat.
-    /// </summary>
-    public static float Then(this float thisFloat, float otherFloat) {
-      return thisFloat + otherFloat;
+    public static Quaternion Flipped(this Quaternion q) {
+      return new Quaternion(-q.x, -q.y, -q.z, -q.w);
     }
 
     #endregion
 
     #region Matrix4x4 Utils
 
-    /// <summary>
-    /// A.From(B) produces the matrix that transforms from B to A.
-    /// Combines with Then() to produce readable, predictable results:
-    /// B.Then(A.From(B)) == A.
-    /// 
-    /// Warning: Scale factors of zero will invalidate this behavior.
-    /// </summary>
-    public static Matrix4x4 From(this Matrix4x4 thisMatrix, Matrix4x4 otherMatrix) {
-      return thisMatrix * otherMatrix.inverse;
-    }
-
-    /// <summary>
-    /// A.To(B) produces the matrix that transforms from A to B.
-    /// Combines with Then() to produce readable, predictable results:
-    /// B.Then(B.To(A)) == A.
-    /// 
-    /// Warning: Scale factors of zero will invalidate this behavior.
-    /// </summary>
-    public static Matrix4x4 To(this Matrix4x4 thisMatrix, Matrix4x4 otherMatrix) {
-      return otherMatrix * thisMatrix.inverse;
-    }
-
-    /// <summary>
-    /// Transforms this matrix by the other matrix. This is a rightward syntax for
-    /// matrix multiplication, which normally obeys left-multiply ordering.
-    /// </summary>
-    public static Matrix4x4 Then(this Matrix4x4 thisMatrix, Matrix4x4 otherMatrix) {
-      return otherMatrix * thisMatrix;
-    }
-
-    #endregion
-
-    #region Vector3 Utils
-
-    /// <summary>
-    /// Additive From syntax for Vector3. Literally thisVector - otherVector.
-    /// </summary>
-    public static Vector3 From(this Vector3 thisVector, Vector3 otherVector) {
-      return thisVector - otherVector;
-    }
-
-    /// <summary>
-    /// Additive To syntax for Vector3. Literally otherVector - thisVector.
-    /// </summary>
-    public static Vector3 To(this Vector3 thisVector, Vector3 otherVector) {
-      return otherVector - thisVector;
-    }
-
-    /// <summary>
-    /// Additive Then syntax for Vector3. Literally thisVector + otherVector.
-    /// For example: A.Then(B.From(A)) == B.
-    /// </summary>
-    public static Vector3 Then(this Vector3 thisVector, Vector3 otherVector) {
-      return thisVector + otherVector;
-    }
-
-    /// <summary>
-    /// Rightward syntax for applying a Quaternion rotation to this vector; literally
-    /// returns byQuaternion * thisVector -- does NOT modify the input vector.
-    /// </summary>
-    public static Vector3 RotatedBy(this Vector3 thisVector, Quaternion byQuaternion) {
-      return byQuaternion * thisVector;
-    }
-
-    #endregion
-
-    #region Pose Utils
-
-    /// <summary>
-    /// From syntax for Pose structs; A.From(B) returns the Pose that transforms to
-    /// Pose A from Pose B. Also see To() and Then().
-    /// 
-    /// For example, A.Then(B.From(A)) == B.
-    /// </summary>
-    public static Pose From(this Pose thisPose, Pose otherPose) {
-      return otherPose.inverse * thisPose;
-    }
-
-    /// <summary>
-    /// To syntax for Pose structs; A.To(B) returns the Pose that transforms from Pose A
-    /// to Pose B. Also see From() and Then().
-    /// 
-    /// For example, A.Then(A.To(B)) == B.
-    /// </summary>
-    public static Pose To(this Pose thisPose, Pose otherPose) {
-      return thisPose.inverse * otherPose;
-    }
-
-    /// <summary>
-    /// Returns the other pose transformed by this pose. This pose could be understood as
-    /// the parent pose, and the other pose transformed from local this-pose space to
-    /// world space.
-    /// 
-    /// This is similar to matrix multiplication: A * B == A.Then(B). However, order of
-    /// operations is more explicit with this syntax.
-    /// </summary>
-    public static Pose Then(this Pose thisPose, Pose otherPose) {
-      return thisPose * otherPose;
+    public static Matrix4x4 CompMul(Matrix4x4 m, float f) {
+      return new Matrix4x4(m.GetColumn(0) * f,
+                           m.GetColumn(1) * f,
+                           m.GetColumn(2) * f,
+                           m.GetColumn(3) * f);
     }
 
     #endregion
 
     #region Physics Utils
 
-    public static void IgnoreCollisions(GameObject first, GameObject second, bool ignore = true) {
+    /// <summary>
+    /// Calls Physics.IgnoreCollision for each Collider in the first GameObject against
+    /// each Collider in the second GameObject.
+    /// 
+    /// If you have many colliders that need to ignore collisions, consider utilizing
+    /// Layer collision settings as an optimization.
+    /// </summary>
+    public static void IgnoreCollisions(GameObject first, GameObject second,
+                                        bool ignore = true) {
       if (first == null || second == null)
         return;
 
-      Collider[] first_colliders = first.GetComponentsInChildren<Collider>();
-      Collider[] second_colliders = second.GetComponentsInChildren<Collider>();
+      var firstColliders = Pool<List<Collider>>.Spawn(); firstColliders.Clear();
+      var secondColliders = Pool<List<Collider>>.Spawn(); secondColliders.Clear();
+      try {
+        first.GetComponentsInChildren(firstColliders);
+        second.GetComponentsInChildren(secondColliders);
 
-      for (int i = 0; i < first_colliders.Length; ++i) {
-        for (int j = 0; j < second_colliders.Length; ++j) {
-          if (first_colliders[i] != second_colliders[j] &&
-              first_colliders[i].enabled && second_colliders[j].enabled) {
-            Physics.IgnoreCollision(first_colliders[i], second_colliders[j], ignore);
+        for (int i = 0; i < firstColliders.Count; ++i) {
+          for (int j = 0; j < secondColliders.Count; ++j) {
+            if (firstColliders[i] != secondColliders[j] &&
+                firstColliders[i].enabled && secondColliders[j].enabled) {
+              Physics.IgnoreCollision(firstColliders[i], secondColliders[j], ignore);
+            }
           }
         }
+      }
+      finally {
+        firstColliders.Clear(); Pool<List<Collider>>.Recycle(firstColliders);
+        secondColliders.Clear(); Pool<List<Collider>>.Recycle(secondColliders);
       }
     }
 
     #endregion
 
     #region Collider Utils
+
+    #region Capsule Collider Utils
 
     public static Vector3 GetDirection(this CapsuleCollider capsule) {
       switch (capsule.direction) {
@@ -1223,6 +1008,8 @@ namespace Leap.Unity {
       float capsuleSpaceDistToA = aCapsuleSpace.magnitude;
       capsule.height = (capsuleSpaceDistToA + capsule.radius) * 2;
     }
+
+    #endregion
 
     /// <summary>
     /// Recursively searches the hierarchy of the argument GameObject to find all of the
@@ -1344,12 +1131,12 @@ namespace Leap.Unity {
     #region Gizmo Utils
 
     public static void DrawCircle(Vector3 center,
-                           Vector3 normal,
-                           float radius,
-                           Color color,
-                           int quality = 32,
-                           float duration = 0,
-                           bool depthTest = true) {
+                                  Vector3 normal,
+                                  float radius,
+                                  Color color,
+                                  int quality = 32,
+                                  float duration = 0,
+                                  bool depthTest = true) {
       Vector3 planeA = Vector3.Slerp(normal, -normal, 0.5f);
       DrawArc(360, center, planeA, normal, radius, color, quality);
     }
@@ -1357,12 +1144,12 @@ namespace Leap.Unity {
     /* Adapted from: Zarrax (http://math.stackexchange.com/users/3035/zarrax), Parametric Equation of a Circle in 3D Space?, 
      * URL (version: 2014-09-09): http://math.stackexchange.com/q/73242 */
     public static void DrawArc(float arc,
-                           Vector3 center,
-                           Vector3 forward,
-                           Vector3 normal,
-                           float radius,
-                           Color color,
-                           int quality = 32) {
+                               Vector3 center,
+                               Vector3 forward,
+                               Vector3 normal,
+                               float radius,
+                               Color color,
+                               int quality = 32) {
 
       Gizmos.color = color;
       Vector3 right = Vector3.Cross(normal, forward).normalized;
@@ -1381,13 +1168,13 @@ namespace Leap.Unity {
     }
 
     public static void DrawCone(Vector3 origin,
-                           Vector3 direction,
-                           float angle,
-                           float height,
-                           Color color,
-                           int quality = 4,
-                           float duration = 0,
-                           bool depthTest = true) {
+                                Vector3 direction,
+                                float angle,
+                                float height,
+                                Color color,
+                                int quality = 4,
+                                float duration = 0,
+                                bool depthTest = true) {
 
       float step = height / quality;
       for (float q = step; q <= height; q += step) {
@@ -1658,6 +1445,14 @@ namespace Leap.Unity {
       return new Rect(r.x, (fromTop ? r.y : r.y + r.height - lineHeight), r.width, lineHeight);
     }
 
+    public static void SplitHorizontallyWithLeft(this Rect rect, out Rect left, out Rect right, float leftWidth) {
+      left = rect;
+      left.width = leftWidth;
+      right = rect;
+      right.x += left.width;
+      right.width = rect.width - leftWidth;
+    }
+
     #region Enumerators
 
     /// <summary>
@@ -1714,40 +1509,428 @@ namespace Leap.Unity {
 
     #endregion
 
-    #region List Utils
+    #endregion
 
-    public static void EnsureListExists<T>(ref List<T> list) {
-      if (list == null) {
-        list = new List<T>();
-      }
+    #region Leap Utilities
+    
+    #region Pose Utils
+
+    /// <summary>
+    /// Returns a pose such that fromPose.Then(thisPose) will have this position
+    /// and the fromPose's rotation.
+    /// </summary>
+    public static Pose From(this Vector3 position, Pose fromPose) {
+      return new Pose(position, fromPose.rotation).From(fromPose);
     }
 
-    public static void EnsureListCount<T>(this List<T> list, int count) {
-      if (list.Count == count) return;
-
-      while (list.Count < count) {
-        list.Add(default(T));
-      }
-
-      while (list.Count > count) {
-        list.RemoveAt(list.Count - 1);
-      }
+    public static Pose GetPose(this Rigidbody rigidbody) {
+      return new Pose(rigidbody.position, rigidbody.rotation);
     }
 
-    public static void EnsureListCount<T>(this List<T> list, int count, Func<T> createT, Action<T> deleteT = null) {
-      while (list.Count < count) {
-        list.Add(createT());
-      }
-
-      while (list.Count > count) {
-        T tempT = list[list.Count - 1];
-        list.RemoveAt(list.Count - 1);
-
-        if (deleteT != null) {
-          deleteT(tempT);
-        }
-      }
+    /// <summary>
+    /// Returns a Pose that has its position and rotation mirrored on the X axis.
+    /// </summary>
+    public static Pose MirroredX(this Pose pose) {
+      var v = pose.position;
+      var q = pose.rotation;
+      return new Pose(new Vector3(-v.x, v.y, v.z),
+                      new Quaternion(-q.x, q.y, q.z, -q.w).Flipped());
     }
+
+    /// <summary>
+    /// Returns a Pose that has its position and rotation flipped.
+    /// </summary>
+    public static Pose Negated(this Pose pose) {
+      var v = pose.position;
+      var q = pose.rotation;
+      return new Pose(new Vector3(-v.x, -v.y, -v.z),
+                      new Quaternion(-q.z, -q.y, -q.z, q.w));
+    }
+
+    #endregion
+
+    #endregion
+
+    #region Value Mapping Utils ("Map")
+
+    /// <summary>
+    /// Maps the value between valueMin and valueMax to its linearly proportional equivalent between resultMin and resultMax.
+    /// The input value is clamped between valueMin and valueMax; if this is not desired, see MapUnclamped.
+    /// </summary>
+    public static float Map(this float value, float valueMin, float valueMax, float resultMin, float resultMax) {
+      if (valueMin == valueMax) return resultMin;
+      return Mathf.Lerp(resultMin, resultMax, ((value - valueMin) / (valueMax - valueMin)));
+    }
+
+    /// <summary>
+    /// Maps the value between valueMin and valueMax to its linearly proportional equivalent between resultMin and resultMax,
+    /// without clamping the result value between resultMin and resultMax.
+    /// </summary>
+    public static float MapUnclamped(this float value, float valueMin, float valueMax, float resultMin, float resultMax) {
+      if (valueMin == valueMax) return resultMin;
+      return Mathf.LerpUnclamped(resultMin, resultMax, ((value - valueMin) / (valueMax - valueMin)));
+    }
+
+    /// <summary>
+    /// Maps each Vector2 component between valueMin and valueMax to its linearly proportional equivalent between resultMin and resultMax.
+    /// The input values are clamped between valueMin and valueMax; if this is not desired, see MapUnclamped.
+    /// </summary>
+    public static Vector2 Map(this Vector2 value, float valueMin, float valueMax, float resultMin, float resultMax) {
+      return new Vector2(value.x.Map(valueMin, valueMax, resultMin, resultMax),
+                        value.y.Map(valueMin, valueMax, resultMin, resultMax));
+    }
+
+    /// <summary>
+    /// Maps each Vector2 component between valueMin and valueMax to its linearly proportional equivalent between resultMin and resultMax,
+    /// without clamping the result value between resultMin and resultMax.
+    /// </summary>
+    public static Vector2 MapUnclamped(this Vector2 value, float valueMin, float valueMax, float resultMin, float resultMax) {
+      return new Vector2(value.x.MapUnclamped(valueMin, valueMax, resultMin, resultMax),
+                        value.y.MapUnclamped(valueMin, valueMax, resultMin, resultMax));
+    }
+
+    /// <summary>
+    /// Maps each Vector3 component between valueMin and valueMax to its linearly proportional equivalent between resultMin and resultMax.
+    /// The input values are clamped between valueMin and valueMax; if this is not desired, see MapUnclamped.
+    /// </summary>
+    public static Vector3 Map(this Vector3 value, float valueMin, float valueMax, float resultMin, float resultMax) {
+      return new Vector3(value.x.Map(valueMin, valueMax, resultMin, resultMax),
+                        value.y.Map(valueMin, valueMax, resultMin, resultMax),
+                        value.z.Map(valueMin, valueMax, resultMin, resultMax));
+    }
+
+    /// <summary>
+    /// Maps each Vector3 component between valueMin and valueMax to its linearly proportional equivalent between resultMin and resultMax,
+    /// without clamping the result value between resultMin and resultMax.
+    /// </summary>
+    public static Vector3 MapUnclamped(this Vector3 value, float valueMin, float valueMax, float resultMin, float resultMax) {
+      return new Vector3(value.x.MapUnclamped(valueMin, valueMax, resultMin, resultMax),
+                        value.y.MapUnclamped(valueMin, valueMax, resultMin, resultMax),
+                        value.z.MapUnclamped(valueMin, valueMax, resultMin, resultMax));
+    }
+
+    /// <summary>
+    /// Maps each Vector4 component between valueMin and valueMax to its linearly proportional equivalent between resultMin and resultMax.
+    /// The input values are clamped between valueMin and valueMax; if this is not desired, see MapUnclamped.
+    /// </summary>
+    public static Vector4 Map(this Vector4 value, float valueMin, float valueMax, float resultMin, float resultMax) {
+      return new Vector4(value.x.Map(valueMin, valueMax, resultMin, resultMax),
+                        value.y.Map(valueMin, valueMax, resultMin, resultMax),
+                        value.z.Map(valueMin, valueMax, resultMin, resultMax),
+                        value.w.Map(valueMin, valueMax, resultMin, resultMax));
+    }
+
+    /// <summary>
+    /// Maps each Vector4 component between valueMin and valueMax to its linearly proportional equivalent between resultMin and resultMax,
+    /// without clamping the result value between resultMin and resultMax.
+    /// </summary>
+    public static Vector4 MapUnclamped(this Vector4 value, float valueMin, float valueMax, float resultMin, float resultMax) {
+      return new Vector4(value.x.MapUnclamped(valueMin, valueMax, resultMin, resultMax),
+                        value.y.MapUnclamped(valueMin, valueMax, resultMin, resultMax),
+                        value.z.MapUnclamped(valueMin, valueMax, resultMin, resultMax),
+                        value.w.MapUnclamped(valueMin, valueMax, resultMin, resultMax));
+    }
+
+    /// <summary>
+    /// Returns a vector between resultMin and resultMax based on the input value's position
+    /// between valueMin and valueMax.
+    /// The input value is clamped between valueMin and valueMax.
+    /// </summary>
+    public static Vector2 Map(float input, float valueMin, float valueMax, Vector2 resultMin, Vector2 resultMax) {
+      return Vector2.Lerp(resultMin, resultMax, Mathf.InverseLerp(valueMin, valueMax, input));
+    }
+
+    /// <summary>
+    /// Returns a vector between resultMin and resultMax based on the input value's position
+    /// between valueMin and valueMax.
+    /// The input value is clamped between valueMin and valueMax.
+    /// </summary>
+    public static Vector3 Map(float input, float valueMin, float valueMax, Vector3 resultMin, Vector3 resultMax) {
+      return Vector3.Lerp(resultMin, resultMax, Mathf.InverseLerp(valueMin, valueMax, input));
+    }
+
+    /// <summary>
+    /// Returns a vector between resultMin and resultMax based on the input value's position
+    /// between valueMin and valueMax.
+    /// The input value is clamped between valueMin and valueMax.
+    /// </summary>
+    public static Vector4 Map(float input, float valueMin, float valueMax, Vector4 resultMin, Vector4 resultMax) {
+      return Vector4.Lerp(resultMin, resultMax, Mathf.InverseLerp(valueMin, valueMax, input));
+    }
+
+    /// <summary>
+    /// Returns a new Vector2 via component-wise multiplication.
+    /// This operation is equivalent to Vector3.Scale(A, B).
+    /// </summary>
+    public static Vector2 CompMul(this Vector2 A, Vector2 B) {
+      return new Vector2(A.x * B.x, A.y * B.y);
+    }
+
+    /// <summary>
+    /// Returns a new Vector3 via component-wise multiplication.
+    /// This operation is equivalent to Vector3.Scale(A, B).
+    /// </summary>
+    public static Vector3 CompMul(this Vector3 A, Vector3 B) {
+      return new Vector3(A.x * B.x, A.y * B.y, A.z * B.z);
+    }
+
+    /// <summary>
+    /// Returns a new Vector4 via component-wise multiplication.
+    /// This operation is equivalent to Vector3.Scale(A, B).
+    /// </summary>
+    public static Vector4 CompMul(this Vector4 A, Vector4 B) {
+      return new Vector4(A.x * B.x, A.y * B.y, A.z * B.z, A.w * B.w);
+    }
+
+    /// <summary>
+    /// Returns a new Vector3 via component-wise division.
+    /// This operation is the inverse of A.CompMul(B).
+    /// </summary>
+    public static Vector2 CompDiv(this Vector2 A, Vector2 B) {
+      return new Vector2(A.x / B.x, A.y / B.y);
+    }
+
+    /// <summary>
+    /// Returns a new Vector3 via component-wise division.
+    /// This operation is the inverse of A.CompMul(B).
+    /// </summary>
+    public static Vector3 CompDiv(this Vector3 A, Vector3 B) {
+      return new Vector3(A.x / B.x, A.y / B.y, A.z / B.z);
+    }
+
+    /// <summary>
+    /// Returns a new Vector4 via component-wise division.
+    /// This operation is the inverse of A.CompMul(B).
+    /// </summary>
+    public static Vector4 CompDiv(this Vector4 A, Vector4 B) {
+      return new Vector4(A.x / B.x, A.y / B.y, A.z / B.z, A.w / B.w);
+    }
+
+    /// <summary>
+    /// Returns the sum of the components of the input vector.
+    /// </summary>
+    public static float CompSum(this Vector2 v) {
+      return v.x + v.y;
+    }
+
+    /// <summary>
+    /// Returns the sum of the components of the input vector.
+    /// </summary>
+    public static float CompSum(this Vector3 v) {
+      return v.x + v.y + v.z;
+    }
+
+    /// <summary>
+    /// Returns the sum of the components of the input vector.
+    /// </summary>
+    public static float CompSum(this Vector4 v) {
+      return v.x + v.y + v.z + v.w;
+    }
+
+    /// <summary>
+    /// Returns the largest component of the input vector.
+    /// </summary>
+    public static float CompMax(this Vector2 v) {
+      return Mathf.Max(v.x, v.y);
+    }
+
+    /// <summary>
+    /// Returns the largest component of the input vector.
+    /// </summary>
+    public static float CompMax(this Vector3 v) {
+      return Mathf.Max(Mathf.Max(v.x, v.y), v.z);
+    }
+
+    /// <summary>
+    /// Returns the largest component of the input vector.
+    /// </summary>
+    public static float CompMax(this Vector4 v) {
+      return Mathf.Max(Mathf.Max(Mathf.Max(v.x, v.y), v.z), v.w);
+    }
+
+    /// <summary>
+    /// Returns the smallest component of the input vector.
+    /// </summary>
+    public static float CompMin(this Vector2 v) {
+      return Mathf.Min(v.x, v.y);
+    }
+
+    /// <summary>
+    /// Returns the smallest component of the input vector.
+    /// </summary>
+    public static float CompMin(this Vector3 v) {
+      return Mathf.Min(Mathf.Min(v.x, v.y), v.z);
+    }
+
+    /// <summary>
+    /// Returns the smallest component of the input vector.
+    /// </summary>
+    public static float CompMin(this Vector4 v) {
+      return Mathf.Min(Mathf.Min(Mathf.Min(v.x, v.y), v.z), v.w);
+    }
+
+    #endregion
+
+    #region From/Then Utilities
+
+    #region Float
+
+    /// <summary>
+    /// Additive From syntax for floats. Evaluated as this float plus the additive
+    /// inverse of the other float, usually expressed as thisFloat - otherFloat.
+    /// 
+    /// For less trivial uses of From/Then syntax, refer to their implementations for
+    /// Quaternions and Matrix4x4s.
+    /// </summary>
+    public static float From(this float thisFloat, float otherFloat) {
+      return thisFloat - otherFloat;
+    }
+
+    /// <summary>
+    /// Additive To syntax for floats. Evaluated as this float plus the additive
+    /// inverse of the other float, usually expressed as otherFloat - thisFloat.
+    /// 
+    /// For less trivial uses of From/Then syntax, refer to their implementations for
+    /// Quaternions and Matrix4x4s.
+    /// </summary>
+    public static float To(this float thisFloat, float otherFloat) {
+      return otherFloat - thisFloat;
+    }
+
+    /// <summary>
+    /// Additive Then syntax for floats. Literally, thisFloat + otherFloat.
+    /// </summary>
+    public static float Then(this float thisFloat, float otherFloat) {
+      return thisFloat + otherFloat;
+    }
+
+    #endregion
+
+    #region Vector3
+
+    /// <summary>
+    /// Additive From syntax for Vector3. Literally thisVector - otherVector.
+    /// </summary>
+    public static Vector3 From(this Vector3 thisVector, Vector3 otherVector) {
+      return thisVector - otherVector;
+    }
+
+    /// <summary>
+    /// Additive To syntax for Vector3. Literally otherVector - thisVector.
+    /// </summary>
+    public static Vector3 To(this Vector3 thisVector, Vector3 otherVector) {
+      return otherVector - thisVector;
+    }
+
+    /// <summary>
+    /// Additive Then syntax for Vector3. Literally thisVector + otherVector.
+    /// For example: A.Then(B.From(A)) == B.
+    /// </summary>
+    public static Vector3 Then(this Vector3 thisVector, Vector3 otherVector) {
+      return thisVector + otherVector;
+    }
+
+    #endregion
+
+    #region Quaternion
+
+    /// <summary>
+    /// A.From(B) produces the quaternion that rotates from B to A.
+    /// Combines with Then() to produce readable, predictable results:
+    /// B.Then(A.From(B)) == A.
+    /// </summary>
+    public static Quaternion From(this Quaternion thisQuaternion, Quaternion otherQuaternion) {
+      return Quaternion.Inverse(otherQuaternion) * thisQuaternion;
+    }
+
+    /// <summary>
+    /// A.To(B) produces the quaternion that rotates from A to B.
+    /// Combines with Then() to produce readable, predictable results:
+    /// B.Then(B.To(A)) == A.
+    /// </summary>
+    public static Quaternion To(this Quaternion thisQuaternion, Quaternion otherQuaternion) {
+      return Quaternion.Inverse(thisQuaternion) * otherQuaternion;
+    }
+
+    /// <summary>
+    /// Rotates this quaternion by the other quaternion. This is a rightward syntax for
+    /// Quaternion multiplication, which normally obeys left-multiply ordering.
+    /// </summary>
+    public static Quaternion Then(this Quaternion thisQuaternion, Quaternion otherQuaternion) {
+      return thisQuaternion * otherQuaternion;
+    }
+
+    #endregion
+
+    #region Pose
+
+    /// <summary>
+    /// From syntax for Pose structs; A.From(B) returns the Pose that transforms to
+    /// Pose A from Pose B. Also see To() and Then().
+    /// 
+    /// For example, A.Then(B.From(A)) == B.
+    /// </summary>
+    public static Pose From(this Pose thisPose, Pose otherPose) {
+      return otherPose.inverse * thisPose;
+    }
+
+    /// <summary>
+    /// To syntax for Pose structs; A.To(B) returns the Pose that transforms from Pose A
+    /// to Pose B. Also see From() and Then().
+    /// 
+    /// For example, A.Then(A.To(B)) == B.
+    /// </summary>
+    public static Pose To(this Pose thisPose, Pose otherPose) {
+      return thisPose.inverse * otherPose;
+    }
+
+    /// <summary>
+    /// Returns the other pose transformed by this pose. This pose could be understood as
+    /// the parent pose, and the other pose transformed from local this-pose space to
+    /// world space.
+    /// 
+    /// This is similar to matrix multiplication: A * B == A.Then(B). However, order of
+    /// operations is more explicit with this syntax.
+    /// </summary>
+    public static Pose Then(this Pose thisPose, Pose otherPose) {
+      return thisPose * otherPose;
+    }
+
+    #endregion
+
+    #region Matrix4x4
+
+    /// <summary>
+    /// A.From(B) produces the matrix that transforms from B to A.
+    /// Combines with Then() to produce readable, predictable results:
+    /// B.Then(A.From(B)) == A.
+    /// 
+    /// Warning: Scale factors of zero will invalidate this behavior.
+    /// </summary>
+    public static Matrix4x4 From(this Matrix4x4 thisMatrix, Matrix4x4 otherMatrix) {
+      return thisMatrix * otherMatrix.inverse;
+    }
+
+    /// <summary>
+    /// A.To(B) produces the matrix that transforms from A to B.
+    /// Combines with Then() to produce readable, predictable results:
+    /// B.Then(B.To(A)) == A.
+    /// 
+    /// Warning: Scale factors of zero will invalidate this behavior.
+    /// </summary>
+    public static Matrix4x4 To(this Matrix4x4 thisMatrix, Matrix4x4 otherMatrix) {
+      return otherMatrix * thisMatrix.inverse;
+    }
+
+    /// <summary>
+    /// Transforms this matrix by the other matrix. This is a rightward syntax for
+    /// matrix multiplication, which normally obeys left-multiply ordering.
+    /// </summary>
+    public static Matrix4x4 Then(this Matrix4x4 thisMatrix, Matrix4x4 otherMatrix) {
+      return otherMatrix * thisMatrix;
+    }
+
+    #endregion
 
     #endregion
 
