@@ -5,8 +5,9 @@ namespace Leap.Unity {
 
   /// <summary>
   /// This is a definition-friendly interface that new "indexable" struct definitions can
-  /// implement to inherit a pooling strategy via extension methods that allow the
-  /// structs to be 'passed' to IIndexable interfaces without allocation.
+  /// implement to make it a little easier to implement foreach and Query() operations
+  /// for their struct. (You can use the IndexableStructEnumerator for this purpose, you
+  /// just have to pass it type arguments that correspond to your struct type.)
   /// 
   /// Unlike IIndexable, IIndexableStruct cannot utilize extension methods to
   /// automatically give consumers of the interface access to foreach and Query
@@ -28,11 +29,14 @@ namespace Leap.Unity {
   }
 
   /// <summary>
-  /// Wrapper class for using pooled boxes around IIndexableStructs, useful when you
-  /// need to pass an IIndexableStruct into a context that requires an IIndexable and
-  /// you also need to avoid allocating any garbage.
+  /// Explicit boxing class for IIndexableStructs that implements IIndexable.
+  /// 
+  /// This is useful when you need to pass an IIndexableStruct into a context that
+  /// requires an IIndexable and you also need to avoid allocating any garbage. To avoid
+  /// allocation, you can use the generic Pool to pool instances of this class and pass
+  /// it around as an IIndexable.
   /// </summary>
-  public class PooledIndexableStructWrapper<Element, IndexableStruct>
+  public class BoxedIndexableStruct<Element, IndexableStruct>
                  : IIndexable<Element>,
                    IPoolable
                  where IndexableStruct : struct,
@@ -69,46 +73,12 @@ namespace Leap.Unity {
     }
   }
 
-  public static class IndexableStructWrapperExtensions {
+  public static class BoxedIndexableStructExtensions {
 
     /// <summary>
-    /// If you want to send an IIndexableStruct into a context that expects an
-    /// IIndexable, you can use a pooled wrapper around the struct. This method allocates
-    /// by explicitly boxing the struct. If you want to avoid allocation, use the pooling
-    /// strategy afforded by SpawnPooledWrapper() and RecyclePooledWrapper().
-    /// </summary>
-    public static PooledIndexableStructWrapper<Element, IndexableStruct>
-                    AllocateIndexableWrapper<Element,
-                      IndexableStruct>(this IndexableStruct indexableStruct)
-                        where IndexableStruct : struct,
-                          IIndexableStruct<Element, IndexableStruct> {
-      var pooledWrapper = new PooledIndexableStructWrapper<Element, IndexableStruct>();
-      pooledWrapper.maybeIndexableStruct = indexableStruct;
-      return pooledWrapper;
-    }
-
-    /// <summary>
-    /// If you want to send an IIndexableStruct into a context that expects an
-    /// IIndexable without boxing, you can "convert" it to an IIndexable without
-    /// allocating by pooling the wrapper objects instead.
+    /// If you spawned this BoxedIndexableStruct from a Pool, you can call this method
+    /// to recycle it back into the pool.
     /// 
-    /// This extension method is short-hand for spawning a pooled wrapper around the
-    /// struct; pass the wrapper as the IIndexable for your operation within a
-    /// <code>try</code> block, and don't forget to call RecyclePooledWrapper() in a
-    /// <code>finally</code> block afterward.
-    /// </summary>
-    public static PooledIndexableStructWrapper<Element, IndexableStruct>
-                    SpawnPooledWrapper<Element,
-                      IndexableStruct>(this IndexableStruct indexableStruct)
-                        where IndexableStruct : struct,
-                          IIndexableStruct<Element, IndexableStruct> {
-      var pooledWrapper = Pool<PooledIndexableStructWrapper<Element,
-                                                            IndexableStruct>>.Spawn();
-      pooledWrapper.maybeIndexableStruct = indexableStruct;
-      return pooledWrapper;
-    }
-
-    /// <summary>
     /// If you want to send an IIndexableStruct into a context that expects an
     /// IIndexable without boxing, you can "convert" it to an IIndexable without
     /// allocating by pooling the wrapper objects instead.
@@ -116,15 +86,14 @@ namespace Leap.Unity {
     /// This extension method is short-hand for recycling a pooled wrapper around a
     /// struct. It should be called in the <code>finally</code> block after a
     /// <code>try</code> block uses the wrapper as an IIndexable. Be sure to use
-    /// SpawnPooledWrapper() to spawn the wrapper from the Pool in the first place.
+    /// the Pool for the BoxedIndexableStruct to spawn the wrapper in the first place.
     /// </summary>
-    public static void RecyclePooledWrapper<Element,
-                         IndexableStruct>(this PooledIndexableStructWrapper<
-                           Element, IndexableStruct> pooledWrapper)
+    public static void Recycle<Element,
+                         IndexableStruct>(this BoxedIndexableStruct<Element,
+                           IndexableStruct> pooledWrapper)
                              where IndexableStruct : struct,
                                IIndexableStruct<Element, IndexableStruct> {
-      Pool<PooledIndexableStructWrapper<Element,
-                                        IndexableStruct>>.Recycle(pooledWrapper);
+      Pool<BoxedIndexableStruct<Element, IndexableStruct>>.Recycle(pooledWrapper);
     }
 
   }
