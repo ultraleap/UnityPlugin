@@ -64,7 +64,7 @@ namespace Leap.Unity {
     [Header("Runtime Height Adjustment")]
 
     [Tooltip("If enabled, then you can use the chosen keys to step the player's height "
-           + "up and down at runtime. This method ")]
+           + "up and down at runtime.")]
     public bool enableRuntimeAdjustment = true;
 
     [DisableIf("enableRuntimeAdjustment", isEqualTo: false)]
