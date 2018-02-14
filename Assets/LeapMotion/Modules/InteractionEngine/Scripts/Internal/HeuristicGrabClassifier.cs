@@ -28,6 +28,7 @@ namespace Leap.Unity.Interaction.Internal {
     private Collider[][] _collidingCandidates = new Collider[6][];
     private int[] _numberOfColliders = new int[6];
     private Vector3[] _fingerTipPositions = new Vector3[5];
+    private Vector3[] _fingerKnucklePositions = new Vector3[5];
 
     public HeuristicGrabClassifier(InteractionHand intHand,
                                    float fingerStickiness = 0F,
@@ -74,12 +75,13 @@ namespace Leap.Unity.Interaction.Internal {
 
           // Ensure layer mask is up-to-date.
           _scaledGrabParams.LAYER_MASK = interactionHand.manager.GetInteractionLayerMask();
-      
+          
           for (int i = 0; i < hand.Fingers.Count; i++) {
             _fingerTipPositions[i] = hand.Fingers[i].TipPosition.ToVector3();
+            _fingerKnucklePositions[i] = hand.Fingers[i].Bone(Bone.BoneType.TYPE_METACARPAL).NextJoint.ToVector3();
           }
 
-          GrabClassifierHeuristics.UpdateAllProbeColliders(_fingerTipPositions, ref _collidingCandidates, ref _numberOfColliders, _scaledGrabParams);
+          GrabClassifierHeuristics.UpdateAllProbeColliders(_fingerTipPositions, _fingerKnucklePositions, ref _collidingCandidates, ref _numberOfColliders, _scaledGrabParams);
         }
       }
     }
