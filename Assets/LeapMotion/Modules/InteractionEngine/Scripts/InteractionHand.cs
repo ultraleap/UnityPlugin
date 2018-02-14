@@ -721,7 +721,7 @@ namespace Leap.Unity.Interaction {
     }
 
     protected override void onGraspedObjectForciblyReleased(IInteractionBehaviour objectToBeReleased) {
-      grabClassifier.NotifyGraspReleased(objectToBeReleased);
+      grabClassifier.NotifyGraspForciblyReleased(objectToBeReleased);
     }
 
     protected override bool checkShouldRelease(out IInteractionBehaviour objectToRelease) {

@@ -171,15 +171,15 @@ namespace Leap.Unity.Interaction.Internal {
       _classifiers.Remove(behaviour);
     }
 
-    public void NotifyGraspReleased(IInteractionBehaviour behaviour) {
+    public void NotifyGraspForciblyReleased(IInteractionBehaviour behaviour) {
       GrabClassifierHeuristics.GrabClassifier classifier;
       if (_classifiers.TryGetValue(behaviour, out classifier)) {
         classifier.prevGrabbing = false;
         classifier.isGrabbing = false;
         classifier.coolDownProgress = 0F;
-        //for (int i = 0; i < classifier.probes.Length; i++) {
-        //  classifier.probes[i].isInside = false;
-        //}
+        for (int i = 0; i < classifier.probes.Length; i++) {
+          classifier.probes[i].isInside = false;
+        }
       }
     }
 
