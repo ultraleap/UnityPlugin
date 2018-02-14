@@ -19,7 +19,7 @@ namespace Leap.Unity.Generation {
 
     [MenuItem("Assets/Run All Generators")]
     public static void TriggerGeneration() {
-      foreach (var gen in Resources.FindObjectsOfTypeAll<GeneratorBase>()) {
+      foreach (var gen in EditorResources.FindAllAssetsOfType<GeneratorBase>()) {
         try {
           gen.Generate();
         } catch (Exception e) {

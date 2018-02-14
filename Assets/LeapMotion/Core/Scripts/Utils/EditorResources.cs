@@ -8,6 +8,7 @@
  ******************************************************************************/
 
 using System.IO;
+using System.Linq;
 using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
@@ -17,6 +18,17 @@ namespace Leap.Unity {
 
 #if UNITY_EDITOR
   public static class EditorResources {
+
+    /// <summary>
+    /// Finds all assets of a given type.  A simple utility wrapper around some
+    /// AssetDatabase calls.
+    /// </summary>
+    public static T[] FindAllAssetsOfType<T>() where T : Object {
+      return AssetDatabase.FindAssets("t:" + typeof(T).Name).
+                           Select(guid => AssetDatabase.GUIDToAssetPath(guid)).
+                           Select(path => AssetDatabase.LoadAssetAtPath<T>(path)).
+                           ToArray();
+    }
 
     /// <summary>
     /// Use like Resources.Load, but searches folders named EditorResources instead
