@@ -78,7 +78,11 @@ namespace Leap.Unity {
         Hand hand = null;
         //If we found a provider, pull the hand from that
         if (provider != null) {
-          hand = provider.CurrentFrame.Get(Handedness);
+          var frame = provider.CurrentFrame;
+
+          if (frame != null) {
+            hand = frame.Get(Handedness);
+          }
         }
 
         //If we still have a null hand, construct one manually
