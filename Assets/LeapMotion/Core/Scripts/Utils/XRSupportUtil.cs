@@ -33,7 +33,7 @@ namespace Leap.Unity {
 
     public static bool IsXRDevicePresent() {
       #if UNITY_2017_2_OR_NEWER
-      return VRDevice.isPresent;
+      return XRDevice.isPresent;
       #else
       return VRDevice.isPresent;
       #endif
