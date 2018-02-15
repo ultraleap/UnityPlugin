@@ -9,10 +9,10 @@
 
 using UnityEngine;
 
-#if UNITY_5
-using UnityEngine.VR;
-#else
+#if UNITY_2017_2_OR_NEWER
 using UnityEngine.XR;
+#else
+using UnityEngine.VR;
 #endif
 
 namespace Leap.Unity {
@@ -24,50 +24,50 @@ namespace Leap.Unity {
   public static class XRSupportUtil {
 
     public static bool IsXREnabled() {
-      #if UNITY_5
-      return VRSettings.enabled;
-      #else
+      #if UNITY_2017_2_OR_NEWER
       return XRSettings.enabled;
+      #else
+      return VRSettings.enabled;
       #endif
     }
 
     public static bool IsXRDevicePresent() {
-      #if UNITY_5
+      #if UNITY_2017_2_OR_NEWER
       return VRDevice.isPresent;
       #else
-      return XRDevice.isPresent;
+      return VRDevice.isPresent;
       #endif
     }
 
     public static Vector3 GetXRNodeCenterEyeLocalPosition() {
-      #if UNITY_5
-      return InputTracking.GetLocalPosition(UnityEngine.VR.VRNode.CenterEye);
-      #else
+      #if UNITY_2017_2_OR_NEWER
       return InputTracking.GetLocalPosition(XRNode.CenterEye);
+      #else
+      return InputTracking.GetLocalPosition(VRNode.CenterEye);
       #endif
     }
 
     public static Quaternion GetXRNodeCenterEyeLocalRotation() {
-      #if UNITY_5
-      return InputTracking.GetLocalRotation(VRNode.CenterEye);
-      #else
+      #if UNITY_2017_2_OR_NEWER
       return InputTracking.GetLocalRotation(XRNode.CenterEye);
+      #else
+      return InputTracking.GetLocalRotation(VRNode.CenterEye);
       #endif
     }
 
     public static Vector3 GetXRNodeHeadLocalPosition() {
-      #if UNITY_5
-      return InputTracking.GetLocalPosition(VRNode.Head);
-      #else
+      #if UNITY_2017_2_OR_NEWER
       return InputTracking.GetLocalPosition(XRNode.Head);
+      #else
+      return InputTracking.GetLocalPosition(VRNode.Head);
       #endif
     }
 
     public static Quaternion GetXRNodeHeadLocalRotation() {
-      #if UNITY_5
-      return InputTracking.GetLocalRotation(VRNode.Head);
-      #else
+      #if UNITY_2017_2_OR_NEWER
       return InputTracking.GetLocalRotation(XRNode.Head);
+      #else
+      return InputTracking.GetLocalRotation(VRNode.Head);
       #endif
     }
 
@@ -76,10 +76,10 @@ namespace Leap.Unity {
     }
 
     public static string GetLoadedDeviceName() {
-      #if UNITY_5
-      return VRSettings.loadedDeviceName;
-      #else
+      #if UNITY_2017_2_OR_NEWER
       return XRSettings.loadedDeviceName;
+      #else
+      return VRSettings.loadedDeviceName;
       #endif
     }
 
