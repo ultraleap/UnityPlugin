@@ -46,7 +46,7 @@ namespace Leap.Unity {
     }
 
     #region Auto Recenter
-
+#if UNITY_2017_2_OR_NEWER
     [Header("Auto Recenter")]
 
     [SerializeField]
@@ -55,7 +55,6 @@ namespace Leap.Unity {
          + "and call InputTracking.Recenter.")]
     private bool autoRecenterOnUserPresence = true;
 
-#if UNITY_2017_2_OR_NEWER
     private UnityEngine.XR.UserPresenceState _lastUserPresence;
 #endif
 
@@ -104,13 +103,12 @@ namespace Leap.Unity {
           autoRecenterOnUserPresence = false;
         }
       }
+      autoRecenterOnUserPresence = false;
 #else
       var trackingSpaceType = UnityEngine.VR.VRDevice.GetTrackingSpaceType();
       if (trackingSpaceType == UnityEngine.VR.TrackingSpaceType.RoomScale) {
         this.transform.position -= this.transform.up * _roomScaleHeightOffset;
       }
-
-      autoRecenterOnUserPresence = false;
 #endif
     }
 

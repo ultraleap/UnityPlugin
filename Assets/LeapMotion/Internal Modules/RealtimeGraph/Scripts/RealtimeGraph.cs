@@ -300,7 +300,7 @@ namespace Leap.Unity.Graphing {
         AddSample("Render Delta", GraphUnits.Miliseconds, _renderTicks);
 
         float gpuTime;
-#if UNITY_2017_1_OR_NEWER
+#if UNITY_5_6_OR_NEWER
 #if UNITY_2017_2_OR_NEWER
         UnityEngine.XR.XRStats.TryGetGPUTimeLastFrame(out gpuTime);
 #else

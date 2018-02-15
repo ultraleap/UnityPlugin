@@ -896,10 +896,16 @@ namespace Leap.Unity {
     #region Matrix4x4 Utils
 
     public static Matrix4x4 CompMul(Matrix4x4 m, float f) {
+#if UNITY_2017_1_OR_NEWER
       return new Matrix4x4(m.GetColumn(0) * f,
                            m.GetColumn(1) * f,
                            m.GetColumn(2) * f,
                            m.GetColumn(3) * f);
+#else
+      Debug.LogError("CompMul not supported in Unity versions before 2017.1");
+      return Matrix4x4.identity;
+#endif
+
     }
 
     #endregion

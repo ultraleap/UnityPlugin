@@ -360,7 +360,7 @@ namespace Leap.Unity.Interaction {
 
       }
       finally {
-        #if UNITY_2017_1_OR_NEWER
+        #if UNITY_2017_2_OR_NEWER
         // Restore the autoSyncTransforms setting to whatever the user had it as before
         // the Manager FixedUpdate.
         Physics.autoSyncTransforms = preUpdateAutoSyncTransforms;

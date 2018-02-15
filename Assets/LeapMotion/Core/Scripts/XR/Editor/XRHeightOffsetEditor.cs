@@ -11,6 +11,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
+#if UNITY_2017_2_OR_NEWER
+using UnityEngine.XR;
+#else
+using UnityEngine.VR;
+#endif
 
 namespace Leap.Unity {
 
@@ -43,8 +48,12 @@ namespace Leap.Unity {
     //}
 
     private bool isRoomScaleTrackingDetected() {
+#if UNITY_2017_2_OR_NEWER
       var trackingSpaceType = UnityEngine.XR.XRDevice.GetTrackingSpaceType();
-      if (trackingSpaceType == UnityEngine.XR.TrackingSpaceType.RoomScale) {
+#else
+      var trackingSpaceType = VRDevice.GetTrackingSpaceType();
+#endif
+      if (trackingSpaceType == TrackingSpaceType.RoomScale) {
         return true;
       }
       return false;
