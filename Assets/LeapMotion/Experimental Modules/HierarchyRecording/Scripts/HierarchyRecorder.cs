@@ -11,7 +11,11 @@ using System;
 using System.IO;
 using System.Collections.Generic;
 using UnityEngine;
+#if UNITY_2017_2_OR_NEWER
 using UnityEngine.XR;
+#else
+using UnityEngine.VR;
+#endif
 using UnityEngine.SceneManagement;
 #if UNITY_EDITOR
 using UnityEditor;
@@ -90,7 +94,11 @@ namespace Leap.Unity.Recording {
     }
 
     protected void LateUpdate() {
-      if (XRDevice.isPresent && XRDevice.userPresence == UserPresenceState.Present && !_isRecording && (recordWhen & RecordOn.HMDPresence) != 0) {
+      if (!_isRecording && (recordWhen & RecordOn.HMDPresence) != 0 
+#if UNITY_2017_2_OR_NEWER
+    && XRDevice.isPresent && XRDevice.userPresence == UserPresenceState.Present
+#endif
+    ) {
         BeginRecording();
       }
 

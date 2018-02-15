@@ -55,7 +55,9 @@ namespace Leap.Unity {
          + "and call InputTracking.Recenter.")]
     private bool autoRecenterOnUserPresence = true;
 
+#if UNITY_2017_2_OR_NEWER
     private UnityEngine.XR.UserPresenceState _lastUserPresence;
+#endif
 
     #endregion
 
@@ -86,6 +88,7 @@ namespace Leap.Unity {
 
     private void Start() {
       _lastKnownHeightOffset = _roomScaleHeightOffset;
+#if UNITY_2017_2_OR_NEWER
       var trackingSpaceType = UnityEngine.XR.XRDevice.GetTrackingSpaceType();
       if (trackingSpaceType == UnityEngine.XR.TrackingSpaceType.RoomScale) {
         this.transform.position -= this.transform.up * _roomScaleHeightOffset;
@@ -101,11 +104,23 @@ namespace Leap.Unity {
           autoRecenterOnUserPresence = false;
         }
       }
+#else
+      var trackingSpaceType = UnityEngine.VR.VRDevice.GetTrackingSpaceType();
+      if (trackingSpaceType == UnityEngine.VR.TrackingSpaceType.RoomScale) {
+        this.transform.position -= this.transform.up * _roomScaleHeightOffset;
+      }
+
+      autoRecenterOnUserPresence = false;
+#endif
     }
 
     private void Update() {
       if (Application.isPlaying) {
+#if UNITY_2017_2_OR_NEWER
         var deviceIsPresent = UnityEngine.XR.XRDevice.isPresent;
+#else
+        var deviceIsPresent = UnityEngine.VR.VRDevice.isPresent;
+#endif
         if (deviceIsPresent) {
 
           if (enableRuntimeAdjustment) {
@@ -118,6 +133,7 @@ namespace Leap.Unity {
             }
           }
 
+#if UNITY_2017_2_OR_NEWER
           var trackingSpaceType = UnityEngine.XR.XRDevice.GetTrackingSpaceType();
           if (trackingSpaceType == UnityEngine.XR.TrackingSpaceType.Stationary
               && autoRecenterOnUserPresence) {
@@ -131,6 +147,7 @@ namespace Leap.Unity {
               _lastUserPresence = userPresence;
             }
           }
+#endif
         }
       }
     }
@@ -150,8 +167,14 @@ namespace Leap.Unity {
       var down = this.transform.rotation * Vector3.down;
       
       if (Application.isPlaying
+#if UNITY_2017_2_OR_NEWER
           && UnityEngine.XR.XRDevice.GetTrackingSpaceType()
              == UnityEngine.XR.TrackingSpaceType.RoomScale) {
+#else
+          && UnityEngine.VR.VRDevice.GetTrackingSpaceType()
+             == UnityEngine.VR.TrackingSpaceType.RoomScale) {
+#endif
+
         var roomScaleGizmoOffset = Vector3.up * totalHeight;
 
         rigPos += roomScaleGizmoOffset;
