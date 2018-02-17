@@ -345,6 +345,14 @@ namespace Leap.Unity.Interaction {
           // (This will clear softContacts and originalVelocities as well.)
           using (new ProfilerSample("Apply Soft Contacts")) {
             if (_softContacts.Count > 0) {
+              RuntimeGizmoDrawer drawer;
+              if (_drawControllerRuntimeGizmos && RuntimeGizmoManager.TryGetGizmoDrawer(out drawer)) {
+                foreach (PhysicsUtility.SoftContact contact in _softContacts) {
+                  drawer.DrawSphere(contact.position, 0.01f);
+                  drawer.DrawLine(contact.position, contact.position + (contact.normal * 0.02f));
+                }
+              }
+
               PhysicsUtility.applySoftContacts(_softContacts, _softContactOriginalVelocities);
             }
           }

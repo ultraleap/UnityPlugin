@@ -103,7 +103,6 @@ namespace Leap.Unity {
           autoRecenterOnUserPresence = false;
         }
       }
-      autoRecenterOnUserPresence = false;
 #else
       var trackingSpaceType = UnityEngine.VR.VRDevice.GetTrackingSpaceType();
       if (trackingSpaceType == UnityEngine.VR.TrackingSpaceType.RoomScale) {
