@@ -902,8 +902,11 @@ namespace Leap.Unity {
                            m.GetColumn(2) * f,
                            m.GetColumn(3) * f);
 #else
-      Debug.LogError("CompMul not supported in Unity versions before 2017.1");
-      return Matrix4x4.identity;
+      Matrix4x4 toReturn = m;
+      for (int i = 0; i < 4; i++) {
+        toReturn.setColumn(toReturn.GetColumn(i) * f);
+      }
+      return toReturn;
 #endif
 
     }

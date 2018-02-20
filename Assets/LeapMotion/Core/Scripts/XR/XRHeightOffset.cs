@@ -113,11 +113,7 @@ namespace Leap.Unity {
 
     private void Update() {
       if (Application.isPlaying) {
-#if UNITY_2017_2_OR_NEWER
-        var deviceIsPresent = UnityEngine.XR.XRDevice.isPresent;
-#else
-        var deviceIsPresent = UnityEngine.VR.VRDevice.isPresent;
-#endif
+        var deviceIsPresent = XRSupportUtil.IsXRDevicePresent();
         if (deviceIsPresent) {
 
           if (enableRuntimeAdjustment) {
@@ -163,14 +159,7 @@ namespace Leap.Unity {
       var rigPos = this.transform.position;
       var down = this.transform.rotation * Vector3.down;
       
-      if (Application.isPlaying
-#if UNITY_2017_2_OR_NEWER
-          && UnityEngine.XR.XRDevice.GetTrackingSpaceType()
-             == UnityEngine.XR.TrackingSpaceType.RoomScale) {
-#else
-          && UnityEngine.VR.VRDevice.GetTrackingSpaceType()
-             == UnityEngine.VR.TrackingSpaceType.RoomScale) {
-#endif
+      if (Application.isPlaying && XRSupportUtil.IsRoomScale()) {
 
         var roomScaleGizmoOffset = Vector3.up * totalHeight;
 

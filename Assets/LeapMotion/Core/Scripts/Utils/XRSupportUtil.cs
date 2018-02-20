@@ -83,6 +83,14 @@ namespace Leap.Unity {
       #endif
     }
 
+    public static bool IsRoomScale() {
+      #if UNITY_2017_2_OR_NEWER
+      return XRDevice.GetTrackingSpaceType() == TrackingSpaceType.RoomScale;
+      #else
+      return VRDevice.GetTrackingSpaceType() == TrackingSpaceType.RoomScale;
+      #endif
+    }
+
   }
 
 }
