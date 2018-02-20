@@ -8,11 +8,6 @@
  ******************************************************************************/
 
 using UnityEngine;
-#if UNITY_2017_2_OR_NEWER
-using UnityEngine.XR;
-#else
-using UnityEngine.VR;
-#endif
 using System;
 using Leap.Unity.Attributes;
 
@@ -243,11 +238,7 @@ namespace Leap.Unity {
                                        out pastPosition, out pastRotation);
 
       // Use _tweenImageWarping
-#if UNITY_2017_2_OR_NEWER
-      var currCenterRotation = InputTracking.GetLocalRotation(XRNode.CenterEye);
-#else
-      var currCenterRotation = InputTracking.GetLocalRotation(VRNode.CenterEye);
-#endif
+      var currCenterRotation = XRSupportUtil.GetXRNodeCenterEyeLocalRotation();
 
       var imageReferenceRotation = _temporalWarpingMode != TemporalWarpingMode.Off 
                                                         ? pastRotation
@@ -272,13 +263,8 @@ namespace Leap.Unity {
 #endif
 
       // Get most recent tracked pose.
-#if UNITY_2017_2_OR_NEWER
-      var trackedPose = new Pose(InputTracking.GetLocalPosition(XRNode.CenterEye),
-                                 InputTracking.GetLocalRotation(XRNode.CenterEye));
-#else
-      var trackedPose = new Pose(InputTracking.GetLocalPosition(VRNode.CenterEye),
-                                 InputTracking.GetLocalRotation(VRNode.CenterEye));
-#endif
+      var trackedPose = new Pose(XRSupportUtil.GetXRNodeCenterEyeLocalPosition(),
+                                 XRSupportUtil.GetXRNodeCenterEyeLocalRotation());
 
       // If we don't know of any pose offset yet, account for it by finding the pose
       // delta from the "local" tracked pose to the actual camera pose.

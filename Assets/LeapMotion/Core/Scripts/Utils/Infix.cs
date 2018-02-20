@@ -73,12 +73,8 @@ namespace Leap.Unity.Infix {
     /// Infix sugar for Vector3.SignedAngle(a, b).
     /// </summary>
     public static float SignedAngle(this Vector3 a, Vector3 b, Vector3 axis) {
-#if UNITY_2017_1_OR_NEWER
-      return Vector3.SignedAngle(a, b, axis);
-#else
-      Debug.LogError("SignedAngle not supported in Unity versions before 2017.1");
-      return a.Angle(b);
-#endif
+      float sign = Vector3.Dot(Vector3.Cross(a,b), axis) < 0f ? -1f : 1f;
+      return sign * Vector3.Angle(a, b);
     }
 
     #endregion
