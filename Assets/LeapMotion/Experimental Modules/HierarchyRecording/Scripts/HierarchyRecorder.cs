@@ -94,11 +94,7 @@ namespace Leap.Unity.Recording {
     }
 
     protected void LateUpdate() {
-      if (!_isRecording && (recordWhen & RecordOn.HMDPresence) != 0 
-#if UNITY_2017_2_OR_NEWER
-    && XRDevice.isPresent && XRDevice.userPresence == UserPresenceState.Present
-#endif
-    ) {
+      if (!_isRecording && (recordWhen & RecordOn.HMDPresence) != 0 && XRSupportUtil.IsUserPresent()) {
         BeginRecording();
       }
 

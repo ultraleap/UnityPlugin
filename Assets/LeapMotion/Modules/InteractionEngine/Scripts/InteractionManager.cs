@@ -344,15 +344,10 @@ namespace Leap.Unity.Interaction {
           // Apply soft contacts from all controllers in a unified solve.
           // (This will clear softContacts and originalVelocities as well.)
           using (new ProfilerSample("Apply Soft Contacts")) {
+            if (_drawControllerRuntimeGizmos) {
+              _softContactsToDraw = new List<PhysicsUtility.SoftContact>(_softContacts);
+            }
             if (_softContacts.Count > 0) {
-              RuntimeGizmoDrawer drawer;
-              if (_drawControllerRuntimeGizmos && RuntimeGizmoManager.TryGetGizmoDrawer(out drawer)) {
-                foreach (PhysicsUtility.SoftContact contact in _softContacts) {
-                  drawer.DrawSphere(contact.position, 0.01f);
-                  drawer.DrawLine(contact.position, contact.position + (contact.normal * 0.02f));
-                }
-              }
-
               PhysicsUtility.applySoftContacts(_softContacts, _softContactOriginalVelocities);
             }
           }
@@ -850,6 +845,11 @@ namespace Leap.Unity.Interaction {
     [NonSerialized]
     public Dictionary<Rigidbody, PhysicsUtility.Velocities> _softContactOriginalVelocities = new Dictionary<Rigidbody, PhysicsUtility.Velocities>(5);
 
+    /// <summary>
+    /// Stores data for drawing Soft Contacts for interaction controllers.
+    /// </summary>
+    private List<PhysicsUtility.SoftContact> _softContactsToDraw;
+
 #endregion
 
 #region Interaction Controllers
@@ -1051,6 +1051,10 @@ namespace Leap.Unity.Interaction {
           if (controller != null) {
             controller.OnDrawRuntimeGizmos(drawer);
           }
+        }
+        foreach (PhysicsUtility.SoftContact contact in _softContactsToDraw) {
+          drawer.DrawSphere(contact.position, 0.01f);
+          drawer.DrawLine(contact.position, contact.position + (contact.normal * 0.02f));
         }
       }
     }
