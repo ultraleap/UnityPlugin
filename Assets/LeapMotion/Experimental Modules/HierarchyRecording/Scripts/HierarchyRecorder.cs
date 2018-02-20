@@ -11,17 +11,10 @@ using System;
 using System.IO;
 using System.Collections.Generic;
 using UnityEngine;
-#if UNITY_2017_2_OR_NEWER
-using UnityEngine.XR;
-#else
-using UnityEngine.VR;
-#endif
-using UnityEngine.SceneManagement;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
 using Leap.Unity.Query;
-using Leap.Unity.GraphicalRenderer;
 
 namespace Leap.Unity.Recording {
   using Attributes;

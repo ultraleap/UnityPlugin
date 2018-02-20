@@ -8,8 +8,6 @@
  ******************************************************************************/
 
 using UnityEngine;
-using System;
-using System.Linq;
 using Leap.Unity.Attributes;
 
 namespace Leap.Unity {
