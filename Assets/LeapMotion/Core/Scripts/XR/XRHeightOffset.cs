@@ -46,17 +46,15 @@ namespace Leap.Unity {
     }
 
     #region Auto Recenter
-#if UNITY_2017_2_OR_NEWER
     [Header("Auto Recenter")]
 
     [SerializeField]
     [Tooltip("If the detected XR device is present and supports userPresence, "
          + "checking this option will detect when the user puts on the device headset "
-         + "and call InputTracking.Recenter.")]
+         + "and call InputTracking.Recenter. Supported in 2017.2 and newer.")]
     private bool autoRecenterOnUserPresence = true;
 
-    private UnityEngine.XR.UserPresenceState _lastUserPresence;
-#endif
+    private bool _lastUserPresence;
 
     #endregion
 
@@ -87,28 +85,10 @@ namespace Leap.Unity {
 
     private void Start() {
       _lastKnownHeightOffset = _roomScaleHeightOffset;
-#if UNITY_2017_2_OR_NEWER
-      var trackingSpaceType = UnityEngine.XR.XRDevice.GetTrackingSpaceType();
-      if (trackingSpaceType == UnityEngine.XR.TrackingSpaceType.RoomScale) {
+
+      if (XRSupportUtil.IsRoomScale()) {
         this.transform.position -= this.transform.up * _roomScaleHeightOffset;
       }
-
-      // Auto recenter
-      if (Application.isPlaying) {
-        var userPresence = UnityEngine.XR.XRDevice.userPresence;
-
-        if (userPresence == UnityEngine.XR.UserPresenceState.Unsupported) {
-          Debug.Log("[XRAutoRecenter] XR UserPresenceState unsupported; "
-                  + "disabling autoRecenterOnUserPresence. (XR support is probably disabled.)");
-          autoRecenterOnUserPresence = false;
-        }
-      }
-#else
-      var trackingSpaceType = UnityEngine.VR.VRDevice.GetTrackingSpaceType();
-      if (trackingSpaceType == UnityEngine.VR.TrackingSpaceType.RoomScale) {
-        this.transform.position -= this.transform.up * _roomScaleHeightOffset;
-      }
-#endif
     }
 
     private void Update() {
@@ -126,21 +106,17 @@ namespace Leap.Unity {
             }
           }
 
-#if UNITY_2017_2_OR_NEWER
-          var trackingSpaceType = UnityEngine.XR.XRDevice.GetTrackingSpaceType();
-          if (trackingSpaceType == UnityEngine.XR.TrackingSpaceType.Stationary
-              && autoRecenterOnUserPresence) {
-            var userPresence = UnityEngine.XR.XRDevice.userPresence;
+          if (autoRecenterOnUserPresence && !XRSupportUtil.IsRoomScale()) {
+            var userPresence = XRSupportUtil.IsUserPresent();
 
             if (_lastUserPresence != userPresence) {
-              if (userPresence == UnityEngine.XR.UserPresenceState.Present) {
-                UnityEngine.XR.InputTracking.Recenter();
+              if (userPresence) {
+                XRSupportUtil.Recenter();
               }
 
               _lastUserPresence = userPresence;
             }
           }
-#endif
         }
       }
     }

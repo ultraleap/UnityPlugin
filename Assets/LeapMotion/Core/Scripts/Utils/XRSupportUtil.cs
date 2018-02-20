@@ -39,6 +39,25 @@ namespace Leap.Unity {
       #endif
     }
 
+    static bool outputPresenceWarning = false;
+    public static bool IsUserPresent() {
+      #if UNITY_2017_2_OR_NEWER
+      var userPresence = XRDevice.userPresence;
+      if (userPresence == UserPresenceState.Present) {
+        return true;
+      } else if (!outputPresenceWarning && userPresence == UserPresenceState.Unsupported) {
+        Debug.LogWarning("XR UserPresenceState unsupported (XR support is probably disabled).");
+        outputPresenceWarning = true;
+      }
+      #else
+      if (!outputPresenceWarning){
+        Debug.LogWarning("XR UserPresenceState is only supported in in 2017.2 and newer.");
+        outputPresenceWarning = true;
+      }
+      #endif
+      return false;
+    }
+
     public static Vector3 GetXRNodeCenterEyeLocalPosition() {
       #if UNITY_2017_2_OR_NEWER
       return InputTracking.GetLocalPosition(XRNode.CenterEye);
