@@ -103,6 +103,10 @@ namespace Leap.Unity {
       return _dictionary.GetEnumerator();
     }
 
+    public static implicit operator Dictionary<TKey, TValue>(SerializableDictionary<TKey, TValue> serializableDictionary) {
+      return serializableDictionary._dictionary;
+    }
+
     #endregion
 
     /// <summary>
