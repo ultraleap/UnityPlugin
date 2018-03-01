@@ -121,7 +121,7 @@ namespace Leap.Unity.Query {
     bool TryGetNext(out T t);
 
     /// <summary>
-    /// Resets the internal state of this query operation to the begining of
+    /// Resets the internal state of this query operation to the beginning of
     /// the sequence.
     /// </summary>
     void Reset();
