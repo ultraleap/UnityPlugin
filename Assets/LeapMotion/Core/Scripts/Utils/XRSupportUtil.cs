@@ -40,7 +40,7 @@ namespace Leap.Unity {
     }
 
     static bool outputPresenceWarning = false;
-    public static bool IsUserPresent() {
+    public static bool IsUserPresent(bool defaultPresence = true) {
       #if UNITY_2017_2_OR_NEWER
       var userPresence = XRDevice.userPresence;
       if (userPresence == UserPresenceState.Present) {
@@ -55,7 +55,7 @@ namespace Leap.Unity {
         outputPresenceWarning = true;
       }
       #endif
-      return false;
+      return defaultPresence;
     }
 
     public static Vector3 GetXRNodeCenterEyeLocalPosition() {
