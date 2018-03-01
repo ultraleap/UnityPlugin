@@ -41,5 +41,9 @@ namespace Leap.Unity {
     public static implicit operator ReadonlyHashSet<T>(HashSet<T> set) {
       return new ReadonlyHashSet<T>(set);
     }
+
+    public static implicit operator ReadonlyHashSet<T>(SerializableHashSet<T> set) {
+      return (HashSet<T>)set;
+    }
   }
 }
