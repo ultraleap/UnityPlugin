@@ -51,7 +51,8 @@ namespace Leap.Unity.Attributes {
           MethodInfo method = type.GetMethod(methodName, BindingFlags.Public |
                                                          BindingFlags.NonPublic |
                                                          BindingFlags.Static |
-                                                         BindingFlags.Instance);
+                                                         BindingFlags.Instance |
+                                                         BindingFlags.FlattenHierarchy);
 
           if (method == null) {
             Debug.LogWarning("Could not find a property or method of the name " + methodName + " " +
