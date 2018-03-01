@@ -26,7 +26,7 @@ namespace Leap.Unity {
                                         IEnumerable<T> {
 
     [SerializeField]
-    private List<T> _values;
+    private List<T> _values = new List<T>();
 
     [NonSerialized]
     private HashSet<T> _set = new HashSet<T>();

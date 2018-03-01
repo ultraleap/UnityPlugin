@@ -44,13 +44,13 @@ namespace Leap.Unity {
                                                       ISerializableDictionary {
 
     [SerializeField]
-    private List<TKey> _keys;
+    private List<TKey> _keys = new List<TKey>();
 
     [SerializeField]
-    private List<TValue> _values;
+    private List<TValue> _values = new List<TValue>();
 
     [NonSerialized]
-    private Dictionary<TKey, TValue> _dictionary;
+    private Dictionary<TKey, TValue> _dictionary = new Dictionary<TKey, TValue>();
 
     #region DICTIONARY API
 
