@@ -9,6 +9,7 @@
 
 using UnityEngine;
 using System.Collections.Generic;
+using System.Collections;
 
 namespace Leap.Unity {
 
@@ -17,11 +18,17 @@ namespace Leap.Unity {
   /// Useful when you want to return a list to someone but you want
   /// to make sure they don't muck it up!
   /// </summary>
-  public struct ReadonlyList<T> {
+  public struct ReadonlyList<T> : IEnumerable<T> {
     private readonly List<T> _list;
 
     public ReadonlyList(List<T> list) {
       _list = list;
+    }
+
+    public bool isValid {
+      get {
+        return _list != null;
+      }
     }
 
     public int Count {
@@ -40,8 +47,20 @@ namespace Leap.Unity {
       return _list.GetEnumerator();
     }
 
+    IEnumerator<T> IEnumerable<T>.GetEnumerator() {
+      return ((IEnumerable<T>)_list).GetEnumerator();
+    }
+
+    IEnumerator IEnumerable.GetEnumerator() {
+      return ((IEnumerable<T>)_list).GetEnumerator();
+    }
+
     public static implicit operator ReadonlyList<T>(List<T> list) {
       return new ReadonlyList<T>(list);
+    }
+
+    public int IndexOf(T item) {
+      return _list.IndexOf(item);
     }
   }
 }
