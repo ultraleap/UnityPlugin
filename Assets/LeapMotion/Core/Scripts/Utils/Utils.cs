@@ -891,6 +891,135 @@ namespace Leap.Unity {
       return new Quaternion(-q.x, -q.y, -q.z, -q.w);
     }
 
+    #region Compression
+
+    /// <summary>
+    /// Fills the provided bytes buffer starting at the offset with a compressed form
+    /// of the argument quaternion. The offset is also shifted by 4 bytes.
+    /// 
+    /// Use Utils.DecompressBytesToQuat to decode this representation. This encoding ONLY
+    /// works with normalized Quaternions, taking advantage of the fact that their
+    /// components sum to 1 to only encode three of Quaternion components. As a result,
+    /// this method encodes a Quaternion as a single unsigned integer (4 bytes).
+    /// 
+    /// Sources:
+    /// https://bitbucket.org/Unity-Technologies/networking/pull-requests/9/quaternion-compression-for-sending/diff
+    /// and
+    /// http://stackoverflow.com/questions/3393717/c-sharp-converting-uint-to-byte
+    /// </summary>
+    public static void CompressQuatToBytes(Quaternion quat,
+                                             byte[] buffer,
+                                             ref int offset) {
+      int largest = 0;
+      float a, b, c;
+
+      float abs_w = Mathf.Abs(quat.w);
+      float abs_x = Mathf.Abs(quat.x);
+      float abs_y = Mathf.Abs(quat.y);
+      float abs_z = Mathf.Abs(quat.z);
+
+      float largest_value = abs_x;
+
+      if (abs_y > largest_value) {
+        largest = 1;
+        largest_value = abs_y;
+      }
+      if (abs_z > largest_value) {
+        largest = 2;
+        largest_value = abs_z;
+      }
+      if (abs_w > largest_value) {
+        largest = 3;
+        largest_value = abs_w;
+      }
+      if (quat[largest] >= 0f) {
+        a = quat[(largest + 1) % 4];
+        b = quat[(largest + 2) % 4];
+        c = quat[(largest + 3) % 4];
+      }
+      else {
+        a = -quat[(largest + 1) % 4];
+        b = -quat[(largest + 2) % 4];
+        c = -quat[(largest + 3) % 4];
+      }
+
+      // serialize
+      const float minimum = -1.0f / 1.414214f;        // note: 1.0f / sqrt(2)
+      const float maximum = +1.0f / 1.414214f;
+      const float delta = maximum - minimum;
+      const uint maxIntegerValue = (1 << 10) - 1; // 10 bits
+      const float maxIntegerValueF = (float)maxIntegerValue;
+      float normalizedValue;
+      uint integerValue;
+
+      uint sentData = ((uint)largest) << 30;
+      // a
+      normalizedValue = Mathf.Clamp01((a - minimum) / delta);
+      integerValue = (uint)Mathf.Floor(normalizedValue * maxIntegerValueF + 0.5f);
+      sentData = sentData | ((integerValue & maxIntegerValue) << 20);
+      // b
+      normalizedValue = Mathf.Clamp01((b - minimum) / delta);
+      integerValue = (uint)Mathf.Floor(normalizedValue * maxIntegerValueF + 0.5f);
+      sentData = sentData | ((integerValue & maxIntegerValue) << 10);
+      // c
+      normalizedValue = Mathf.Clamp01((c - minimum) / delta);
+      integerValue = (uint)Mathf.Floor(normalizedValue * maxIntegerValueF + 0.5f);
+      sentData = sentData | (integerValue & maxIntegerValue);
+
+      BitConverterNonAlloc.GetBytes(sentData, buffer, ref offset);
+    }
+
+    /// <summary>
+    /// Reads 4 bytes from the argument bytes array (starting at the provided offset) and
+    /// returns a Quaternion as encoded by the Utils.CompressedQuatToBytes function. Also
+    /// increments the provided offset by 4.
+    /// 
+    /// See the Utils.CompressedQuatToBytes documentation for more details on the
+    /// byte representation this method expects.
+    /// 
+    /// Sources:
+    /// https://bitbucket.org/Unity-Technologies/networking/pull-requests/9/quaternion-compression-for-sending/diff
+    /// and
+    /// http://stackoverflow.com/questions/3393717/c-sharp-converting-uint-to-byte
+    /// </summary>
+    public static Quaternion DecompressBytesToQuat(byte[] bytes, ref int offset) {
+      uint readData = BitConverterNonAlloc.ToUInt32(bytes, ref offset);
+
+      int largest = (int)(readData >> 30);
+      float a, b, c;
+
+      const float minimum = -1.0f / 1.414214f;        // note: 1.0f / sqrt(2)
+      const float maximum = +1.0f / 1.414214f;
+      const float delta = maximum - minimum;
+      const uint maxIntegerValue = (1 << 10) - 1; // 10 bits
+      const float maxIntegerValueF = (float)maxIntegerValue;
+      uint integerValue;
+      float normalizedValue;
+      // a
+      integerValue = (readData >> 20) & maxIntegerValue;
+      normalizedValue = (float)integerValue / maxIntegerValueF;
+      a = (normalizedValue * delta) + minimum;
+      // b
+      integerValue = (readData >> 10) & maxIntegerValue;
+      normalizedValue = (float)integerValue / maxIntegerValueF;
+      b = (normalizedValue * delta) + minimum;
+      // c
+      integerValue = readData & maxIntegerValue;
+      normalizedValue = (float)integerValue / maxIntegerValueF;
+      c = (normalizedValue * delta) + minimum;
+
+      Quaternion value = Quaternion.identity;
+      float d = Mathf.Sqrt(1f - a * a - b * b - c * c);
+      value[largest] = d;
+      value[(largest + 1) % 4] = a;
+      value[(largest + 2) % 4] = b;
+      value[(largest + 3) % 4] = c;
+
+      return value;
+    }
+
+    #endregion
+
     #endregion
 
     #region Matrix4x4 Utils
