@@ -11,6 +11,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using System;
 using System.Collections.Generic;
+using Leap.Unity.Infix;
 
 namespace Leap.Unity.RuntimeGizmos {
 
@@ -531,8 +532,65 @@ namespace Leap.Unity.RuntimeGizmos {
     /// <summary>
     /// Draws a wire gizmo sphere at the given position with the given radius.
     /// </summary>
-    public void DrawWireSphere(Vector3 center, float radius) {
-      DrawWireMesh(wireSphereMesh, center, Quaternion.identity, Vector3.one * radius * 2);
+    public void DrawWireSphere(Vector3 center, float radius, int numSegments = 32) {
+      //DrawWireMesh(wireSphereMesh, center, Quaternion.identity, Vector3.one * radius * 2);
+      DrawWireCircle(center, radius);
+
+      PushMatrix();
+
+      matrix = Matrix4x4.TRS(center, Quaternion.identity, Vector3.one)
+               * matrix;
+
+      var x = Vector3.right;
+      var y = Vector3.up;
+      var z = Vector3.forward;
+
+      DrawCameraAwareWireCircle(radius, y, x);
+      DrawCameraAwareWireCircle(radius, z, y);
+      DrawCameraAwareWireCircle(radius, x, z);
+
+      PopMatrix();
+    }
+
+    public void DrawCameraAwareWireCircle(float radius,
+                                          Vector3 normal, Vector3 radialStartDir,
+                                          int numSegments = 32) {
+
+      var origColor = this.color;
+
+      var camPos = matrix.inverse.GetPose().Then(Camera.main.transform.ToPose()).position;
+      Vector3 dirToCamera = camPos.normalized;
+      var v = dirToCamera;
+
+      var frontAlpha = 1f * origColor.a;
+      var backAlpha = 0.1f * origColor.a;
+
+      var xCam = v.Cross(normal);
+      var Q = Quaternion.AngleAxis(360f / numSegments, normal);
+      var r = radialStartDir * radius;
+      for (int i = 0; i < numSegments + 1; i++) {
+        var nextR = Q * r;
+        var xCamAngle = Vector3.SignedAngle(r, xCam, normal);
+        var nextXCamAngle = Vector3.SignedAngle(nextR, xCam, normal);
+        var front = xCamAngle < 0;
+        var nextFront = nextXCamAngle < 0;
+
+        if (front != nextFront) {
+          this.color = origColor.WithAlpha((frontAlpha + backAlpha) / 2f);
+        }
+        else if (front) {
+          this.color = origColor.WithAlpha(frontAlpha);
+        }
+        else {
+          this.color = origColor.WithAlpha(backAlpha);
+        }
+
+        DrawLine(r, nextR);
+
+        r = nextR;
+      }
+
+      this.color = origColor;
     }
 
     /// <summary>
@@ -544,6 +602,21 @@ namespace Leap.Unity.RuntimeGizmos {
                matrix *
                Matrix4x4.TRS(Vector3.zero, Quaternion.identity, new Vector3(1, 1, 0));
       DrawWireSphere(Vector3.zero, radius);
+      PopMatrix();
+    }
+
+    /// <summary>
+    /// Draws a wire gizmo circle at the given position, with the given radius;
+    /// the normal is assumed to be towards Camera.main.
+    /// </summary>
+    public void DrawWireCircle(Vector3 center, float radius) {
+      PushMatrix();
+
+      var camPos = matrix.inverse.GetPose().Then(Camera.main.transform.ToPose()).position;
+      Vector3 dirToCamera = (camPos - center).normalized;
+
+      DrawWireArc(center, dirToCamera, dirToCamera.Perpendicular(), radius, 1, 32);
+
       PopMatrix();
     }
 
@@ -656,38 +729,115 @@ namespace Leap.Unity.RuntimeGizmos {
       PopMatrix();
     }
 
+    public void DrawCollider(Collider collider, bool useWireframe = true) {
+      PushMatrix();
+      RelativeTo(collider.transform);
+
+      if (collider is BoxCollider) {
+        BoxCollider box = collider as BoxCollider;
+        if (useWireframe) {
+          DrawWireCube(box.center, box.size);
+        }
+        else {
+          DrawCube(box.center, box.size);
+        }
+      }
+      else if (collider is SphereCollider) {
+        SphereCollider sphere = collider as SphereCollider;
+        if (useWireframe) {
+          DrawWireSphere(sphere.center, sphere.radius);
+        }
+        else {
+          DrawSphere(sphere.center, sphere.radius);
+        }
+      }
+      else if (collider is CapsuleCollider) {
+        CapsuleCollider capsule = collider as CapsuleCollider;
+        if (useWireframe) {
+          Vector3 capsuleDir;
+          switch (capsule.direction) {
+            case 0: capsuleDir = Vector3.right; break;
+            case 1: capsuleDir = Vector3.up; break;
+            case 2: default: capsuleDir = Vector3.forward; break;
+          }
+          DrawWireCapsule(capsule.center + capsuleDir * (capsule.height / 2F - capsule.radius),
+                          capsule.center - capsuleDir * (capsule.height / 2F - capsule.radius), capsule.radius);
+        }
+        else {
+          Vector3 size = Vector3.zero;
+          size += Vector3.one * capsule.radius * 2;
+          size += new Vector3(capsule.direction == 0 ? 1 : 0,
+                              capsule.direction == 1 ? 1 : 0,
+                              capsule.direction == 2 ? 1 : 0) * (capsule.height - capsule.radius * 2);
+          DrawCube(capsule.center, size);
+        }
+      }
+      else if (collider is MeshCollider) {
+        MeshCollider mesh = collider as MeshCollider;
+        if (mesh.sharedMesh != null) {
+          if (useWireframe) {
+            DrawWireMesh(mesh.sharedMesh, Matrix4x4.identity);
+          }
+          else {
+            DrawMesh(mesh.sharedMesh, Matrix4x4.identity);
+          }
+        }
+      }
+
+      PopMatrix();
+    }
+
     /// <summary>
     /// Draws a simple XYZ-cross position gizmo at the target position, whose size is
     /// scaled relative to the main camera's distance to the target position (for reliable
     /// visibility).
     /// 
+    /// Or, if you provide an override scale, you can enforce a radius size for the gizmo.
+    /// 
     /// You can also provide a color argument and lerp coefficient towards that color from
     /// the axes' default colors (red, green, blue). Colors are lerped in HSV space.
     /// </summary>
-    public void DrawPosition(Vector3 pos, Color lerpColor, float lerpCoeff) {
-      float targetScale = 0.06f; // 6 cm at 1m away.
+    public void DrawPosition(Vector3 pos, Color lerpColor, float lerpCoeff, float? overrideScale = null) {
+      float targetScale;
+      if (overrideScale.HasValue) {
+        targetScale = overrideScale.Value;
+      }
+      else {
+        targetScale = 0.06f; // 6 cm at 1m away.
 
-      var mainCam = Camera.main;
-      var posWorldSpace = matrix * pos;
-      if (mainCam != null) {
-        float camDistance = Vector3.Distance(posWorldSpace, mainCam.transform.position);
+        var mainCam = Camera.main;
+        var posWorldSpace = matrix * pos;
+        if (mainCam != null) {
+          float camDistance = Vector3.Distance(posWorldSpace, mainCam.transform.position);
 
-        targetScale *= camDistance;
+          targetScale *= camDistance;
+        }
       }
 
       float extent = (targetScale / 2f);
 
+      float negativeAlpha = 0.6f;
+
       color = Color.red;
       if (lerpCoeff != 0f) { color = color.LerpHSV(lerpColor, lerpCoeff); }
-      DrawLine(pos - Vector3.right * extent, pos + Vector3.right * extent);
+      DrawLine(pos, pos + Vector3.right * extent);
+      color = Color.black.WithAlpha(negativeAlpha);
+      if (lerpCoeff != 0f) { color = color.LerpHSV(lerpColor, lerpCoeff); }
+      DrawLine(pos, pos - Vector3.right * extent);
 
       color = Color.green;
       if (lerpCoeff != 0f) { color = color.LerpHSV(lerpColor, lerpCoeff); }
-      DrawLine(pos - Vector3.up * extent, pos + Vector3.up * extent);
+      DrawLine(pos, pos + Vector3.up * extent);
+      color = Color.black.WithAlpha(negativeAlpha);
+      if (lerpCoeff != 0f) { color = color.LerpHSV(lerpColor, lerpCoeff); }
+      DrawLine(pos, pos - Vector3.up * extent);
 
       color = Color.blue;
       if (lerpCoeff != 0f) { color = color.LerpHSV(lerpColor, lerpCoeff); }
-      DrawLine(pos - Vector3.forward * extent, pos + Vector3.forward * extent);
+      DrawLine(pos, pos + Vector3.forward * extent);
+      color = Color.black.WithAlpha(negativeAlpha);
+      if (lerpCoeff != 0f) { color = color.LerpHSV(lerpColor, lerpCoeff); }
+      DrawLine(pos, pos - Vector3.forward * extent);
     }
 
     /// <summary>
@@ -697,6 +847,22 @@ namespace Leap.Unity.RuntimeGizmos {
     /// </summary>
     public void DrawPosition(Vector3 pos) {
       DrawPosition(pos, Color.white, 0f);
+    }
+
+    public void DrawPosition(Vector3 pos, float overrideScale) {
+      DrawPosition(pos, Color.white, 0f, overrideScale);
+    }
+
+    public void DrawRect(Transform frame, Rect rect) {
+      PushMatrix();
+
+      this.matrix = frame.localToWorldMatrix;
+      DrawLine(rect.Corner00(), rect.Corner01());
+      DrawLine(rect.Corner01(), rect.Corner11());
+      DrawLine(rect.Corner11(), rect.Corner10());
+      DrawLine(rect.Corner10(), rect.Corner00());
+
+      PopMatrix();
     }
 
     public void ClearAllGizmos() {
