@@ -23,8 +23,14 @@ namespace Leap.Unity.Attributes {
 
     private List<CombinablePropertyAttribute> attributes = new List<CombinablePropertyAttribute>();
     private void getAttributes(SerializedProperty property) {
-      if (!_cachedAttributes.TryGetValue(fieldInfo, out attributes)) {
-        attributes = new List<CombinablePropertyAttribute>();
+      GetAttributes(property, fieldInfo, ref attributes);
+    }
+
+    public static void GetAttributes(SerializedProperty property,
+                                     FieldInfo fieldInfo,
+                                     ref List<CombinablePropertyAttribute> outAttributes) {
+      if (!_cachedAttributes.TryGetValue(fieldInfo, out outAttributes)) {
+        outAttributes = new List<CombinablePropertyAttribute>();
 
         foreach (object o in fieldInfo.GetCustomAttributes(typeof(CombinablePropertyAttribute), true)) {
           CombinablePropertyAttribute combinableProperty = o as CombinablePropertyAttribute;
@@ -36,24 +42,35 @@ namespace Leap.Unity.Attributes {
                              property.propertyType + ".");
               continue;
             }
-            attributes.Add(combinableProperty);
+            outAttributes.Add(combinableProperty);
           }
         }
 
-        _cachedAttributes[fieldInfo] = attributes;
+        _cachedAttributes[fieldInfo] = outAttributes;
       }
     }
 
-    public override void OnGUI(Rect position, SerializedProperty property, GUIContent label) {
+    public override void OnGUI(Rect position, SerializedProperty property,
+                               GUIContent label) {
       getAttributes(property);
 
+      CombinablePropertyDrawer.OnGUI(this.attributes, this.fieldInfo,
+                                     position, property, label);
+    }
+
+    public static void OnGUI(List<CombinablePropertyAttribute> attributes,
+                             FieldInfo fieldInfo,
+                             Rect position, SerializedProperty property, GUIContent label) {
       float defaultLabelWidth = EditorGUIUtility.labelWidth;
       float fieldWidth = position.width - EditorGUIUtility.labelWidth;
 
       bool canUseDefaultDrawer = true;
       bool shouldDisable = false;
 
-      RangeAttribute rangeAttribute = fieldInfo.GetCustomAttributes(typeof(RangeAttribute), true).FirstOrDefault() as RangeAttribute;
+      RangeAttribute rangeAttribute = null;
+      if (fieldInfo != null) {
+        rangeAttribute = fieldInfo.GetCustomAttributes(typeof(RangeAttribute), true).FirstOrDefault() as RangeAttribute;
+      }
 
       ISupportDragAndDrop dragAndDropSupport = null;
 
@@ -103,7 +120,6 @@ namespace Leap.Unity.Attributes {
       }
 
       Rect r = position;
-
       if (dragAndDropSupport != null) {
         processDragAndDrop(dragAndDropSupport, ref r, property);
       }
@@ -111,41 +127,46 @@ namespace Leap.Unity.Attributes {
       EditorGUI.BeginChangeCheck();
       EditorGUI.BeginDisabledGroup(shouldDisable);
 
-      drawAdditive<IBeforeLabelAdditiveDrawer>(ref r, property);
+      drawAdditive<IBeforeLabelAdditiveDrawer>(attributes, ref r, property);
 
       if (canUseDefaultDrawer) {
         r.width = EditorGUIUtility.labelWidth + fieldWidth;
 
         if (fullPropertyDrawer != null) {
           fullPropertyDrawer.DrawProperty(r, property, label);
-        } else {
+        }
+        else {
           if (rangeAttribute != null) {
             if (property.propertyType == SerializedPropertyType.Integer) {
               property.intValue = EditorGUI.IntSlider(r, label, property.intValue, (int)rangeAttribute.min, (int)rangeAttribute.max);
-            } else if (property.propertyType == SerializedPropertyType.Float) {
+            }
+            else if (property.propertyType == SerializedPropertyType.Float) {
               property.floatValue = EditorGUI.Slider(r, label, property.floatValue, rangeAttribute.min, rangeAttribute.max);
-            } else {
+            }
+            else {
               EditorGUI.PropertyField(r, property, label);
             }
-          } else {
+          }
+          else {
             EditorGUI.PropertyField(r, property, label);
           }
         }
 
         r.x += r.width;
-      } else {
+      }
+      else {
         r.width = EditorGUIUtility.labelWidth;
         r = EditorGUI.PrefixLabel(r, label);
 
-        drawAdditive<IAfterLabelAdditiveDrawer>(ref r, property);
-        drawAdditive<IBeforeFieldAdditiveDrawer>(ref r, property);
+        drawAdditive<IAfterLabelAdditiveDrawer>(attributes, ref r, property);
+        drawAdditive<IBeforeFieldAdditiveDrawer>(attributes, ref r, property);
 
         r.width = fieldWidth;
         EditorGUI.PropertyField(r, property, GUIContent.none);
         r.x += r.width;
       }
 
-      drawAdditive<IAfterFieldAdditiveDrawer>(ref r, property);
+      drawAdditive<IAfterFieldAdditiveDrawer>(attributes, ref r, property);
 
       EditorGUI.EndDisabledGroup();
 
@@ -168,7 +189,9 @@ namespace Leap.Unity.Attributes {
       EditorGUIUtility.labelWidth = defaultLabelWidth;
     }
 
-    private void drawAdditive<T>(ref Rect r, SerializedProperty property) where T : class, IAdditiveDrawer {
+    private static void drawAdditive<T>(List<CombinablePropertyAttribute> attributes,
+                                        ref Rect r, SerializedProperty property)
+                          where T : class, IAdditiveDrawer {
       foreach (var a in attributes) {
         if (a is T) {
           T t = a as T;
@@ -179,8 +202,8 @@ namespace Leap.Unity.Attributes {
       }
     }
 
-    private void processDragAndDrop(ISupportDragAndDrop dragAndDropSupport,
-                                    ref Rect r, SerializedProperty property) {
+    private static void processDragAndDrop(ISupportDragAndDrop dragAndDropSupport,
+                                           ref Rect r, SerializedProperty property) {
       Event curEvent = Event.current;
       Rect dropArea = dragAndDropSupport.GetDropArea(r, property);
 

@@ -40,7 +40,8 @@ namespace Leap.Unity.Attributes {
     public void ConstrainValue(SerializedProperty property) {
       if (property.objectReferenceValue != null) {
 
-        UnityObject implementingObject = FindImplementer(property.objectReferenceValue);
+        UnityObject implementingObject = FindImplementer(property,
+                                                         property.objectReferenceValue);
 
         if (implementingObject == null) {
           Debug.LogError(property.objectReferenceValue.GetType().Name + " does not implement " + type.Name);
@@ -55,16 +56,22 @@ namespace Leap.Unity.Attributes {
     /// the interface that this attribute constrains objects to, and returns the object
     /// that implements that interface, or null if none was found.
     /// </summary>
-    public UnityObject FindImplementer(UnityObject obj) {
+    public UnityObject FindImplementer(SerializedProperty property, UnityObject obj) {
 
-      if (!fieldInfo.FieldType.IsAssignableFrom(obj.GetType())
-          && !(typeof(Component).IsAssignableFrom(fieldInfo.FieldType)
-               && obj.GetType() == typeof(GameObject))) {
+      // Don't use fieldInfo here because it is very convenient for it to be left null
+      // on the CombinablePropertyAttribute when dealing with generic-type situations
+      // where the ImplementsInterface class has to be constructed manually in a custom
+      // editor. (Specific case: StreamConnectorEditor.cs)
+
+      if (!this.type.IsAssignableFrom(obj.GetType())
+          && obj.GetType() != typeof(GameObject)
+          && !typeof(Component).IsAssignableFrom(obj.GetType())) {
         // Even if the object implements the correct interface, the field isn't
         // compatible with this object. E.g. A ScriptableObject can't be assigned to a
         // MonoBehaviour field.
         // We have to make an exception when a GameObject is dragged into a field whose
         // type is a Component; we use GetComponent to satisfy that case.
+
         return null;
       }
 
@@ -112,13 +119,14 @@ namespace Leap.Unity.Attributes {
     }
 
     public bool IsDropValid(UnityObject[] draggedObjects, SerializedProperty property) {
-      return draggedObjects.Query().Any(o => FindImplementer(o) != null);
+      return draggedObjects.Query().Any(o => FindImplementer(property, o) != null);
     }
 
     public void ProcessDroppedObjects(UnityObject[] droppedObjects,
                                       SerializedProperty property) {
+
       var implementer = droppedObjects.Query()
-                                      .FirstOrDefault(o => FindImplementer(o));
+                                      .FirstOrDefault(o => FindImplementer(property, o));
 
       if (implementer == null) {
         Debug.LogError(property.objectReferenceValue.GetType().Name
