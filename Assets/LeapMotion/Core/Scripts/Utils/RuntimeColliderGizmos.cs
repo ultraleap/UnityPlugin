@@ -16,10 +16,16 @@ namespace Leap.Unity.RuntimeGizmos {
     public Color color = Color.white;
     public bool useWireframe = true;
     public bool traverseHierarchy = true;
+    public bool drawTriggers = false;
+
+    void Start() { }
 
     public void OnDrawRuntimeGizmos(RuntimeGizmoDrawer drawer) {
+      if (!this.gameObject.activeInHierarchy
+          || !this.enabled) return;
+
       drawer.color = color;
-      drawer.DrawColliders(gameObject, useWireframe, traverseHierarchy);
+      drawer.DrawColliders(gameObject, useWireframe, traverseHierarchy, drawTriggers);
     }
   }
 }
