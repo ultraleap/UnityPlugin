@@ -30,9 +30,14 @@ namespace Leap.Unity.GraphicalRenderer {
 
       var sprite = spriteData.sprite;
 
-      mesh = new Mesh();
+      if (mesh == null) {
+        mesh = new Mesh();
+      }
+
       mesh.name = "Sprite Mesh";
       mesh.hideFlags = HideFlags.HideAndDontSave;
+
+      mesh.Clear(keepVertexLayout: false);
       mesh.vertices = sprite.vertices.Query().Select(v => (Vector3)v).ToArray();
       mesh.triangles = sprite.triangles.Query().Select(i => (int)i).ToArray();
 

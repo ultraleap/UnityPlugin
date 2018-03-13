@@ -249,9 +249,14 @@ namespace Leap.Unity.GraphicalRenderer {
         addQuad(tris, frontVertIdx + vx + 1, backVertIdx + vx + 1, backVertIdx + vx, frontVertIdx + vx);
       }
 
-      mesh = new Mesh();
+      if (mesh == null) {
+        mesh = new Mesh();
+      }
+
       mesh.name = "Box Mesh";
       mesh.hideFlags = HideFlags.HideAndDontSave;
+
+      mesh.Clear(keepVertexLayout: false);
       mesh.SetVertices(verts);
       mesh.SetNormals(normals);
       mesh.SetTriangles(tris, 0);
