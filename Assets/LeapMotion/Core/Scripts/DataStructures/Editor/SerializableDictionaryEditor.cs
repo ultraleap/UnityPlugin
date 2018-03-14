@@ -14,7 +14,7 @@ using System.Collections.Generic;
 
 namespace Leap.Unity {
 
-  [CustomPropertyDrawer(typeof(SDictionaryAttribute))]
+  [CustomPropertyDrawer(typeof(SerializableDictionaryBase), useForChildren: true)]
   public class SerializableDictionaryEditor : PropertyDrawer {
 
     private ReorderableList _list;
