@@ -139,6 +139,11 @@ namespace Leap.Unity.Packaging {
         item.Build();
       }
     }
+
+    [MenuItem("Build/All Apps", priority = 1, validate = true)]
+    public static bool ValidateBuildAll() {
+      return EditorResources.FindAllAssetsOfType<BuildDefinition>().Length > 0;
+    }
 #endif
   }
 }
