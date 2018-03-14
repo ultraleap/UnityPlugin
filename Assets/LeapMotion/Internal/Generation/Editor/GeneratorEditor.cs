@@ -19,13 +19,30 @@ namespace Leap.Unity.Generation {
 
     [MenuItem("Assets/Run All Generators")]
     public static void TriggerGeneration() {
+      int successfulGenerators = 0;
+      int failedGenerators = 0;
       foreach (var gen in EditorResources.FindAllAssetsOfType<GeneratorBase>()) {
         try {
           gen.Generate();
+          successfulGenerators++;
         } catch (Exception e) {
           Debug.LogException(e);
+          failedGenerators++;
         }
       }
+
+      if (successfulGenerators == 1) {
+        Debug.Log("Successfully ran 1 generator.");
+      } else if (successfulGenerators > 1) {
+        Debug.Log("Successfully ran " + successfulGenerators + " generators.");
+      }
+
+      if (failedGenerators == 1) {
+        Debug.LogError("1 generator failed to run.");
+      } else if (failedGenerators > 1) {
+        Debug.LogError(failedGenerators + " generators failed to run.");
+      }
+
       AssetDatabase.Refresh();
       AssetDatabase.SaveAssets();
     }
