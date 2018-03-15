@@ -39,7 +39,7 @@ namespace Leap.Unity.Interaction.Internal {
                                    float thumbRadius = 0.017F,
                                    float grabCooldown = 0.2F,
                                    float maxCurlVel = 0.0F,
-                                   float grabbedMaxCurlVel = -0.05F,
+                                   float grabbedMaxCurlVel = -0.025F,
                                    float maxGrabDistance = 0.05F,
                                    int layerMask = 0,
                                    QueryTriggerInteraction queryTriggers = QueryTriggerInteraction.UseGlobal) {
