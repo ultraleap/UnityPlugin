@@ -896,10 +896,19 @@ namespace Leap.Unity {
     #region Matrix4x4 Utils
 
     public static Matrix4x4 CompMul(Matrix4x4 m, float f) {
+#if UNITY_2017_1_OR_NEWER
       return new Matrix4x4(m.GetColumn(0) * f,
                            m.GetColumn(1) * f,
                            m.GetColumn(2) * f,
                            m.GetColumn(3) * f);
+#else
+      Matrix4x4 toReturn = m;
+      for (int i = 0; i < 4; i++) {
+        toReturn.setColumn(i, toReturn.GetColumn(i) * f);
+      }
+      return toReturn;
+#endif
+
     }
 
     #endregion
