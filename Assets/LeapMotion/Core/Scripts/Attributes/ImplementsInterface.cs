@@ -11,6 +11,7 @@ using UnityEngine;
 using System;
 using System.Collections.Generic;
 using Leap.Unity.Query;
+using System.Text.RegularExpressions;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -40,7 +41,8 @@ namespace Leap.Unity.Attributes {
     public void ConstrainValue(SerializedProperty property) {
       if (property.objectReferenceValue != null) {
 
-        UnityObject implementingObject = FindImplementer(property.objectReferenceValue);
+        UnityObject implementingObject = FindImplementer(property,
+                                                         property.objectReferenceValue);
 
         if (implementingObject == null) {
           Debug.LogError(property.objectReferenceValue.GetType().Name + " does not implement " + type.Name);
@@ -55,41 +57,78 @@ namespace Leap.Unity.Attributes {
     /// the interface that this attribute constrains objects to, and returns the object
     /// that implements that interface, or null if none was found.
     /// </summary>
-    public UnityObject FindImplementer(UnityObject obj) {
+    public UnityObject FindImplementer(SerializedProperty property, UnityObject fromObj) {
 
       // Don't use fieldInfo here because it is very convenient for it to be left null
       // on the CombinablePropertyAttribute when dealing with generic-type situations
       // where the ImplementsInterface class has to be constructed manually in a custom
       // editor. (Specific case: StreamConnectorEditor.cs)
 
-      if (!this.type.IsAssignableFrom(obj.GetType())
-          && obj.GetType() != typeof(GameObject)
-          && !typeof(Component).IsAssignableFrom(obj.GetType())) {
-        // Even if the object implements the correct interface, the field isn't
-        // compatible with this object. E.g. A ScriptableObject can't be assigned to a
-        // MonoBehaviour field.
-        // We have to make an exception when a GameObject is dragged into a field whose
-        // type is a Component; we use GetComponent to satisfy that case.
+      bool isTypeDefinitelyIncompatible;
+      {
+        isTypeDefinitelyIncompatible = !this.type.IsAssignableFrom(fromObj.GetType());
 
+        // We have to make an exception when a GameObject is dragged into a field whose
+        // type is a Component, because it's expected that we can use GetComponent in
+        // that case. (We might still fail later if the component isn't found.)
+        var objIsGameObject = fromObj.GetType() == typeof(GameObject);
+        if (objIsGameObject) {
+          isTypeDefinitelyIncompatible = false;
+        }
+
+        // We also make an exception when a Component is dragged into a field that
+        // doesn't directly satisfy the interface because it might have other Components
+        // on its GameObject that _do_ satisfy the field, again via GetComponent.
+        var objIsComponent = typeof(Component).IsAssignableFrom(fromObj.GetType());
+        if (objIsComponent) {
+          isTypeDefinitelyIncompatible = false;
+        }
+
+        // However, you can't assign a ScriptableObject to a field expecting a Component,
+        // or vice-versa, no matter what.
+
+        // Matches the "Foo" in "PPtr<$Foo>" (as an inner group)
+        var fieldTypeMatch = Regex.Match(property.type, "PPtr<\\$(.+)>");
+        if (fieldTypeMatch.Groups.Count == 0) {
+          // No captured groups means we have no idea what the enclosing field type is.
+          isTypeDefinitelyIncompatible = true;
+        }
+        else {
+          // First group is the whole match, second is the inner group, the class name.
+          var fieldTypeName = fieldTypeMatch.Groups[1].Value;
+
+          var fieldIsScriptableObject = fieldTypeName.Equals("ScriptableObject");
+          if (fieldIsScriptableObject && (objIsComponent || objIsGameObject)) {
+            isTypeDefinitelyIncompatible = true;
+          }
+
+          var fieldTakesComponent = fieldTypeName.Equals("MonoBehaviour")
+                                    || fieldTypeName.Equals("Component");
+          if (fieldTakesComponent && !(objIsComponent || objIsGameObject)) {
+            isTypeDefinitelyIncompatible = true;
+          }
+        }
+      }
+      if (isTypeDefinitelyIncompatible) {
         return null;
       }
 
-      if (obj.GetType().ImplementsInterface(type)) {
+      if (fromObj.GetType().ImplementsInterface(type)) {
         // All good! This object reference implements the interface.
-        return obj;
+        return fromObj;
       }
       else {
         UnityObject implementingObject;
 
-        if (obj is GameObject) {
-          obj = (obj as GameObject).transform;
+        if (fromObj is GameObject) {
+          fromObj = (fromObj as GameObject).transform;
         }
 
-        if (obj is Component) {
+        if (fromObj is Component) {
           // If the object is a Component, first search the rest of the GameObject 
           // for a component that implements the interface. If found, assign it instead,
           // otherwise null out the property.
-          implementingObject = (obj as Component)
+          implementingObject = (fromObj as Component)
                                .GetComponents<Component>()
                                .Query()
                                .Where(c => c.GetType().ImplementsInterface(type))
@@ -118,14 +157,14 @@ namespace Leap.Unity.Attributes {
     }
 
     public bool IsDropValid(UnityObject[] draggedObjects, SerializedProperty property) {
-      return draggedObjects.Query().Any(o => FindImplementer(o) != null);
+      return draggedObjects.Query().Any(o => FindImplementer(property, o) != null);
     }
 
     public void ProcessDroppedObjects(UnityObject[] droppedObjects,
                                       SerializedProperty property) {
 
       var implementer = droppedObjects.Query()
-                                      .FirstOrDefault(o => FindImplementer(o));
+                                      .FirstOrDefault(o => FindImplementer(property, o));
 
       if (implementer == null) {
         Debug.LogError(property.objectReferenceValue.GetType().Name
