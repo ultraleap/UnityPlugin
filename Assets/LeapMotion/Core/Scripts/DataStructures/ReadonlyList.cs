@@ -18,7 +18,7 @@ namespace Leap.Unity {
   /// Useful when you want to return a list to someone but you want
   /// to make sure they don't muck it up!
   /// </summary>
-  public struct ReadonlyList<T> : IEnumerable<T> {
+  public struct ReadonlyList<T> {
     private readonly List<T> _list;
 
     public ReadonlyList(List<T> list) {
@@ -45,14 +45,6 @@ namespace Leap.Unity {
 
     public List<T>.Enumerator GetEnumerator() {
       return _list.GetEnumerator();
-    }
-
-    IEnumerator<T> IEnumerable<T>.GetEnumerator() {
-      return ((IEnumerable<T>)_list).GetEnumerator();
-    }
-
-    IEnumerator IEnumerable.GetEnumerator() {
-      return ((IEnumerable<T>)_list).GetEnumerator();
     }
 
     public static implicit operator ReadonlyList<T>(List<T> list) {
