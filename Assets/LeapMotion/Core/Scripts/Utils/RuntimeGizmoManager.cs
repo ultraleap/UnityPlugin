@@ -52,7 +52,7 @@ namespace Leap.Unity.RuntimeGizmos {
 
     /// <summary>
     /// Subscribe to this event if you want to draw gizmos after rendering is complete.  Doing gizmo
-    /// rendering inside of the normal Camera.onPoseRender event will cause rendering artifacts.
+    /// rendering inside of the normal Camera.onPostRender event will cause rendering artifacts.
     /// </summary>
     public static event Action<RuntimeGizmoDrawer> OnPostRenderGizmos;
 
@@ -351,6 +351,7 @@ namespace Leap.Unity.RuntimeGizmos {
     private List<Matrix4x4> _matrices = new List<Matrix4x4>();
     private List<Color> _colors = new List<Color>();
     private List<Line> _lines = new List<Line>();
+    private List<WireSphere> _wireSpheres = new List<WireSphere>();
     private List<Mesh> _meshes = new List<Mesh>();
 
     private Color _currColor = Color.white;
@@ -529,95 +530,20 @@ namespace Leap.Unity.RuntimeGizmos {
       DrawMesh(sphereMesh, center, Quaternion.identity, Vector3.one * radius * 2);
     }
 
+    public void DrawWireSphere(Pose pose, float radius, int numSegments = 32) {
+      _operations.Add(OperationType.DrawWireSphere);
+      _wireSpheres.Add(new WireSphere() {
+        pose = pose,
+        radius = radius,
+        numSegments = numSegments
+      });
+    }
+
     /// <summary>
     /// Draws a wire gizmo sphere at the given position with the given radius.
     /// </summary>
     public void DrawWireSphere(Vector3 center, float radius, int numSegments = 32) {
-      //DrawWireMesh(wireSphereMesh, center, Quaternion.identity, Vector3.one * radius * 2);
-      DrawWireCircle(center, radius);
-
-      PushMatrix();
-
-      matrix = Matrix4x4.TRS(center, Quaternion.identity, Vector3.one)
-               * matrix;
-
-      var x = Vector3.right;
-      var y = Vector3.up;
-      var z = Vector3.forward;
-
-      DrawCameraAwareWireCircle(radius, y, x);
-      DrawCameraAwareWireCircle(radius, z, y);
-      DrawCameraAwareWireCircle(radius, x, z);
-
-      PopMatrix();
-    }
-
-    public void DrawCameraAwareWireCircle(float radius,
-                                          Vector3 normal, Vector3 radialStartDir,
-                                          int numSegments = 32) {
-
-      var origColor = this.color;
-
-      var camPos = matrix.inverse.GetPose().Then(Camera.main.transform.ToPose()).position;
-      Vector3 dirToCamera = camPos.normalized;
-      var v = dirToCamera;
-
-      var frontAlpha = 1f * origColor.a;
-      var backAlpha = 0.1f * origColor.a;
-
-      var xCam = v.Cross(normal);
-      var Q = Quaternion.AngleAxis(360f / numSegments, normal);
-      var r = radialStartDir * radius;
-      for (int i = 0; i < numSegments + 1; i++) {
-        var nextR = Q * r;
-        var xCamAngle = Vector3.SignedAngle(r, xCam, normal);
-        var nextXCamAngle = Vector3.SignedAngle(nextR, xCam, normal);
-        var front = xCamAngle < 0;
-        var nextFront = nextXCamAngle < 0;
-
-        if (front != nextFront) {
-          this.color = origColor.WithAlpha((frontAlpha + backAlpha) / 2f);
-        }
-        else if (front) {
-          this.color = origColor.WithAlpha(frontAlpha);
-        }
-        else {
-          this.color = origColor.WithAlpha(backAlpha);
-        }
-
-        DrawLine(r, nextR);
-
-        r = nextR;
-      }
-
-      this.color = origColor;
-    }
-
-    /// <summary>
-    /// Draws a wire gizmo circle at the given position, with the given normal and radius.
-    /// </summary>
-    public void DrawWireCircle(Vector3 center, Vector3 direction, float radius) {
-      PushMatrix();
-      matrix = Matrix4x4.TRS(center, Quaternion.LookRotation(direction), Vector3.one) *
-               matrix *
-               Matrix4x4.TRS(Vector3.zero, Quaternion.identity, new Vector3(1, 1, 0));
-      DrawWireSphere(Vector3.zero, radius);
-      PopMatrix();
-    }
-
-    /// <summary>
-    /// Draws a wire gizmo circle at the given position, with the given radius;
-    /// the normal is assumed to be towards Camera.main.
-    /// </summary>
-    public void DrawWireCircle(Vector3 center, float radius) {
-      PushMatrix();
-
-      var camPos = matrix.inverse.GetPose().Then(Camera.main.transform.ToPose()).position;
-      Vector3 dirToCamera = (camPos - center).normalized;
-
-      DrawWireArc(center, dirToCamera, dirToCamera.Perpendicular(), radius, 1, 32);
-
-      PopMatrix();
+      DrawWireSphere(new Pose(center, Quaternion.identity), radius, numSegments);
     }
 
     /// <summary>
@@ -651,13 +577,15 @@ namespace Leap.Unity.RuntimeGizmos {
       DrawWireArc(center, normal, Vector3.Slerp(normal, -normal, 0.5F), radius, 1.0F, numCircleSegments);
     }
 
-    public void DrawWireArc(Vector3 center, Vector3 normal, Vector3 radialStartDirection, float radius, float fractionOfCircleToDraw, int numCircleSegments = 16) {
+    public void DrawWireArc(Vector3 center, Vector3 normal, Vector3 radialStartDirection,
+                            float radius, float fractionOfCircleToDraw, int numCircleSegments = 16) {
       normal = normal.normalized;
       Vector3 radiusVector = radialStartDirection.normalized * radius;
       Vector3 nextVector;
       int numSegmentsToDraw = (int)(numCircleSegments * fractionOfCircleToDraw);
+      Quaternion rotator = Quaternion.AngleAxis(360f / numCircleSegments, normal);
       for (int i = 0; i < numSegmentsToDraw; i++) {
-        nextVector = Quaternion.AngleAxis(360F / numCircleSegments, normal) * radiusVector;
+        nextVector = rotator * radiusVector;
         DrawLine(center + radiusVector, center + nextVector);
         radiusVector = nextVector;
       }
@@ -805,10 +733,10 @@ namespace Leap.Unity.RuntimeGizmos {
       else {
         targetScale = 0.06f; // 6 cm at 1m away.
 
-        var mainCam = Camera.main;
+        var curCam = Camera.current;
         var posWorldSpace = matrix * pos;
-        if (mainCam != null) {
-          float camDistance = Vector3.Distance(posWorldSpace, mainCam.transform.position);
+        if (curCam != null) {
+          float camDistance = Vector3.Distance(posWorldSpace, curCam.transform.position);
 
           targetScale *= camDistance;
         }
@@ -870,6 +798,7 @@ namespace Leap.Unity.RuntimeGizmos {
       _matrices.Clear();
       _colors.Clear();
       _lines.Clear();
+      _wireSpheres.Clear();
       _meshes.Clear();
       _isInWireMode = false;
       _currMatrix = Matrix4x4.identity;
@@ -881,6 +810,7 @@ namespace Leap.Unity.RuntimeGizmos {
         int matrixIndex = 0;
         int colorIndex = 0;
         int lineIndex = 0;
+        int wireSphereIndex = 0;
         int meshIndex = 0;
 
         int currPass = -1;
@@ -895,13 +825,16 @@ namespace Leap.Unity.RuntimeGizmos {
             case OperationType.SetMatrix:
               _currMatrix = _matrices[matrixIndex++];
               break;
+
             case OperationType.SetColor:
               _currColor = _colors[colorIndex++];
               currPass = -1; //force pass to be set the next time we need to draw
               break;
+
             case OperationType.ToggleWireframe:
               GL.wireframe = !GL.wireframe;
               break;
+
             case OperationType.DrawLine:
               setPass(ref currPass, isUnlit: true);
 
@@ -911,6 +844,16 @@ namespace Leap.Unity.RuntimeGizmos {
               GL.Vertex(_currMatrix.MultiplyPoint(line.b));
               GL.End();
               break;
+
+            case OperationType.DrawWireSphere:
+              setPass(ref currPass, isUnlit: true);
+
+              GL.Begin(GL.LINES);
+              WireSphere wireSphere = _wireSpheres[wireSphereIndex++];
+              drawWireSphereNow(wireSphere, ref currPass);
+              GL.End();
+              break;
+
             case OperationType.DrawMesh:
               if (GL.wireframe) {
                 setPass(ref currPass, isUnlit: true);
@@ -918,8 +861,10 @@ namespace Leap.Unity.RuntimeGizmos {
                 setPass(ref currPass, isUnlit: false);
               }
 
-              Graphics.DrawMeshNow(_meshes[meshIndex++], _currMatrix * _matrices[matrixIndex++]);
+              Graphics.DrawMeshNow(_meshes[meshIndex++],
+                                   _currMatrix * _matrices[matrixIndex++]);
               break;
+              
             default:
               throw new InvalidOperationException("Unexpected operation type " + type);
           }
@@ -929,7 +874,135 @@ namespace Leap.Unity.RuntimeGizmos {
       }
     }
 
-    private void setPass(ref int currPass, bool isUnlit) {
+    private void drawLineNow(Vector3 a, Vector3 b) {
+      GL.Vertex(_currMatrix.MultiplyPoint(a));
+      GL.Vertex(_currMatrix.MultiplyPoint(b));
+    }
+
+    private void drawWireArcNow(Vector3 center, Vector3 normal,
+                                Vector3 radialStartDirection, float radius,
+                                float fractionOfCircleToDraw, int numCircleSegments = 16) {
+      normal = normal.normalized;
+      Vector3 radiusVector = radialStartDirection.normalized * radius;
+      Vector3 nextVector;
+      int numSegmentsToDraw = (int)(numCircleSegments * fractionOfCircleToDraw);
+      Quaternion rotator = Quaternion.AngleAxis(360f / numCircleSegments, normal);
+      for (int i = 0; i < numSegmentsToDraw; i++) {
+        nextVector = rotator * radiusVector;
+
+        drawLineNow(center + radiusVector, center + nextVector);
+
+        radiusVector = nextVector;
+      }
+    }
+
+    private void setCurrentPassColorIfNew(Color desiredColor, ref int curPass) {
+      if (_currColor != desiredColor) {
+        _currColor = desiredColor;
+        setPass(ref curPass, isUnlit: true);
+      }
+    }
+
+    private void drawPlaneSoftenedWireArcNow(Vector3 position,
+                                             Vector3 circleNormal,
+                                             Vector3 radialStartDirection,
+                                             float radius,
+                                             Color inFrontOfPlaneColor,
+                                             Color behindPlaneColor,
+                                             Vector3 planeNormal,
+                                             ref int curPass,
+                                             float fractionOfCircleToDraw = 1.0f,
+                                             int numCircleSegments = 16) {
+      var origCurrColor = _currColor;
+
+      var onPlaneDir = planeNormal.Cross(circleNormal);
+      var Q = Quaternion.AngleAxis(360f / numCircleSegments, circleNormal);
+      var r = radialStartDirection * radius;
+      for (int i = 0; i < numCircleSegments + 1; i++) {
+        var nextR = Q * r;
+        var onPlaneAngle = Vector3.SignedAngle(r, onPlaneDir, circleNormal);
+        var nextOnPlaneAngle = Vector3.SignedAngle(nextR, onPlaneDir, circleNormal);
+        var front = onPlaneAngle < 0;
+        var nextFront = nextOnPlaneAngle < 0;
+
+        if (front != nextFront) {
+          var targetColor = Color.Lerp(inFrontOfPlaneColor, behindPlaneColor, 0.5f);
+          GL.End();
+          setPass(ref curPass, isUnlit: true, desiredCurrColor: targetColor);
+          GL.Begin(GL.LINES);
+        }
+        else if (front) {
+          var targetColor = inFrontOfPlaneColor;
+          GL.End();
+          setPass(ref curPass, isUnlit: true, desiredCurrColor: targetColor);
+          GL.Begin(GL.LINES);
+        }
+        else {
+          var targetColor = behindPlaneColor;
+          GL.End();
+          setPass(ref curPass, isUnlit: true, desiredCurrColor: targetColor);
+          GL.Begin(GL.LINES);
+        }
+
+        drawLineNow(r, nextR);
+
+        r = nextR;
+      }
+
+      _currColor = origCurrColor;
+    }
+
+    private void drawWireSphereNow(WireSphere wireSphere,
+                                   ref int curPass) {
+      var position = wireSphere.pose.position;
+      var rotation = wireSphere.pose.rotation;
+
+      var worldPosition = _currMatrix.MultiplyPoint3x4(position);
+
+      var dirToCamera = (Camera.current.transform.position - worldPosition).normalized;
+      var dirToCameraInMatrix = _currMatrix.inverse.MultiplyVector(dirToCamera);
+
+      // Wire sphere outline. This is just a wire sphere that faces the camera.
+      drawWireArcNow(position, dirToCameraInMatrix, dirToCameraInMatrix.Perpendicular(),
+                     wireSphere.radius, 1.0f,
+                     numCircleSegments: wireSphere.numSegments);
+
+
+      var x = rotation * Vector3.right;
+      var y = rotation * Vector3.up;
+      var z = rotation * Vector3.forward;
+
+      drawPlaneSoftenedWireArcNow(position, y, x, wireSphere.radius,
+                                  inFrontOfPlaneColor: _currColor,
+                                  behindPlaneColor: _currColor.WithAlpha(_currColor.a * 0.1f),
+                                  planeNormal: dirToCameraInMatrix,
+                                  curPass: ref curPass,
+                                  fractionOfCircleToDraw: 1.0f,
+                                  numCircleSegments: wireSphere.numSegments);
+      drawPlaneSoftenedWireArcNow(position, z, y, wireSphere.radius,
+                                  inFrontOfPlaneColor: _currColor,
+                                  behindPlaneColor: _currColor.WithAlpha(_currColor.a * 0.1f),
+                                  planeNormal: dirToCameraInMatrix,
+                                  curPass: ref curPass,
+                                  fractionOfCircleToDraw: 1.0f,
+                                  numCircleSegments: wireSphere.numSegments);
+      drawPlaneSoftenedWireArcNow(position, x, z, wireSphere.radius,
+                                  inFrontOfPlaneColor: _currColor,
+                                  behindPlaneColor: _currColor.WithAlpha(_currColor.a * 0.1f),
+                                  planeNormal: dirToCameraInMatrix,
+                                  curPass: ref curPass,
+                                  fractionOfCircleToDraw: 1.0f,
+                                  numCircleSegments: wireSphere.numSegments);
+    }
+
+    private void setPass(ref int currPass, bool isUnlit, Color? desiredCurrColor = null) {
+
+      bool needToUpdateColor = false;
+      if (desiredCurrColor.HasValue) {
+        needToUpdateColor = _currColor != desiredCurrColor.Value;
+        _currColor = desiredCurrColor.Value;
+      }
+
       int newPass;
       if (isUnlit) {
         if (_currColor.a < 1) {
@@ -945,7 +1018,7 @@ namespace Leap.Unity.RuntimeGizmos {
         }
       }
 
-      if (currPass != newPass) {
+      if (currPass != newPass || needToUpdateColor) {
         currPass = newPass;
         _gizmoMaterial.color = _currColor;
         _gizmoMaterial.SetPass(currPass);
@@ -973,6 +1046,7 @@ namespace Leap.Unity.RuntimeGizmos {
       ToggleWireframe,
       SetColor,
       DrawLine,
+      DrawWireSphere,
       DrawMesh
     }
 
@@ -983,6 +1057,12 @@ namespace Leap.Unity.RuntimeGizmos {
         this.a = a;
         this.b = b;
       }
+    }
+
+    private struct WireSphere {
+      public Pose  pose;
+      public float radius;
+      public int numSegments;
     }
   }
 }
