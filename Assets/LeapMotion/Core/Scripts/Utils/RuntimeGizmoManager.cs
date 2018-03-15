@@ -609,57 +609,18 @@ namespace Leap.Unity.RuntimeGizmos {
 
         if (collider.isTrigger && !drawTriggers) { continue; }
 
-        if (collider is BoxCollider) {
-          BoxCollider box = collider as BoxCollider;
-          if (useWireframe) {
-            DrawWireCube(box.center, box.size);
-          } else {
-            DrawCube(box.center, box.size);
-          }
-        } else if (collider is SphereCollider) {
-          SphereCollider sphere = collider as SphereCollider;
-          if (useWireframe) {
-            DrawWireSphere(sphere.center, sphere.radius);
-          } else {
-            DrawSphere(sphere.center, sphere.radius);
-          }
-        } else if (collider is CapsuleCollider) {
-          CapsuleCollider capsule = collider as CapsuleCollider;
-          if (useWireframe) {
-            Vector3 capsuleDir;
-            switch (capsule.direction) {
-              case 0: capsuleDir = Vector3.right; break;
-              case 1: capsuleDir = Vector3.up; break;
-              case 2: default: capsuleDir = Vector3.forward; break;
-            }
-            DrawWireCapsule(capsule.center + capsuleDir * (capsule.height / 2F - capsule.radius),
-                            capsule.center - capsuleDir * (capsule.height / 2F - capsule.radius), capsule.radius);
-          } else {
-            Vector3 size = Vector3.zero;
-            size += Vector3.one * capsule.radius * 2;
-            size += new Vector3(capsule.direction == 0 ? 1 : 0,
-                                capsule.direction == 1 ? 1 : 0,
-                                capsule.direction == 2 ? 1 : 0) * (capsule.height - capsule.radius * 2);
-            DrawCube(capsule.center, size);
-          }
-        } else if (collider is MeshCollider) {
-          MeshCollider mesh = collider as MeshCollider;
-          if (mesh.sharedMesh != null) {
-            if (useWireframe) {
-              DrawWireMesh(mesh.sharedMesh, Matrix4x4.identity);
-            } else {
-              DrawMesh(mesh.sharedMesh, Matrix4x4.identity);
-            }
-          }
-        }
+        DrawCollider(collider, skipMatrixSetup: true);
       }
 
       PopMatrix();
     }
 
-    public void DrawCollider(Collider collider, bool useWireframe = true) {
-      PushMatrix();
-      RelativeTo(collider.transform);
+    public void DrawCollider(Collider collider, bool useWireframe = true,
+                                                bool skipMatrixSetup = false) {
+      if (!skipMatrixSetup) {
+        PushMatrix();
+        RelativeTo(collider.transform);
+      }
 
       if (collider is BoxCollider) {
         BoxCollider box = collider as BoxCollider;
@@ -712,7 +673,9 @@ namespace Leap.Unity.RuntimeGizmos {
         }
       }
 
-      PopMatrix();
+      if (!skipMatrixSetup) {
+        PopMatrix();
+      }
     }
 
     /// <summary>
