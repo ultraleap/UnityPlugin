@@ -1702,6 +1702,7 @@ namespace Leap.Unity.Interaction {
       _releasingControllersBuffer.Clear();
       _releasingControllersBuffer.Add(this);
       _graspedObject.EndGrasp(_releasingControllersBuffer);
+      OnGraspEnd();
 
       //Switch to the replacement object
       _graspedObject = replacement;
@@ -1711,6 +1712,7 @@ namespace Leap.Unity.Interaction {
         //Let the replacement object know that it is being grasped
         tempControllers.Add(this);
         replacement.BeginGrasp(tempControllers);
+        OnGraspBegin();
       } 
       finally {
         tempControllers.Clear();
