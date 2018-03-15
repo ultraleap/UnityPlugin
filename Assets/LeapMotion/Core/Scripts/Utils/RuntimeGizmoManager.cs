@@ -547,7 +547,26 @@ namespace Leap.Unity.RuntimeGizmos {
     }
 
     /// <summary>
-    /// Draws a wire gizmo capsule at the given position, with the given start and end points and radius.
+    /// Draws a wire ellipsoid gizmo with two specified foci and a specified minor axis
+    /// length.
+    /// </summary>
+    public void DrawEllipsoid(Vector3 foci1, Vector3 foci2, float minorAxis) {
+      PushMatrix();
+      Vector3 ellipseCenter = (foci1 + foci2) / 2f;
+      Quaternion ellipseRotation = Quaternion.LookRotation(foci1 - foci2);
+      var majorAxis = Mathf.Sqrt(Mathf.Pow(Vector3.Distance(foci1, foci2) / 2f, 2f)
+                                 + Mathf.Pow(minorAxis / 2f, 2f)) * 2f;
+      Vector3 ellipseScale = new Vector3(minorAxis, minorAxis, majorAxis);
+
+      matrix = Matrix4x4.TRS(ellipseCenter, ellipseRotation, ellipseScale);
+
+      DrawWireSphere(Vector3.zero, 0.5f);
+      PopMatrix();
+    }
+
+    /// <summary>
+    /// Draws a wire gizmo capsule at the given position, with the given start and end
+    /// points and radius.
     /// </summary>
     public void DrawWireCapsule(Vector3 start, Vector3 end, float radius) {
       Vector3 up = (end - start).normalized * radius;
