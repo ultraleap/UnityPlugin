@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Leap Motion, Inc. 2011-2017.                                 *
+ * Copyright (C) Leap Motion, Inc. 2011-2018.                                 *
  * Leap Motion proprietary and  confidential.                                 *
  *                                                                            *
  * Use subject to the terms of the Leap Motion SDK Agreement available at     *
@@ -57,7 +57,8 @@ namespace Leap.Unity{
 
       LeapDeviceInfo deviceInfo;
       deviceInfo.isEmbedded = false;
-      deviceInfo.baseline = 0.04f;
+      //deviceInfo.baseline = 0.064f;
+      deviceInfo.baseline = 0.04f; // Peripheral
       deviceInfo.forwardOffset = 0.12F;
       deviceInfo.horizontalViewAngle = 2.303835f * Mathf.Rad2Deg;
       deviceInfo.verticalViewAngle = 2.007129f * Mathf.Rad2Deg;

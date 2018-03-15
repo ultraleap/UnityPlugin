@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Leap Motion, Inc. 2011-2017.                                 *
+ * Copyright (C) Leap Motion, Inc. 2011-2018.                                 *
  * Leap Motion proprietary and  confidential.                                 *
  *                                                                            *
  * Use subject to the terms of the Leap Motion SDK Agreement available at     *
@@ -22,78 +22,78 @@ namespace Leap.Unity.Query {
 
     public static QueryType Min<QueryType, QueryOp>(this QueryWrapper<QueryType, QueryOp> wrapper)
       where QueryType : IComparable<QueryType>
-      where QueryOp : IQueryOp<QueryType> {
+      where QueryOp : struct, IQueryOp<QueryType> {
       return wrapper.Fold((a, b) => a.CompareTo(b) < 0 ? a : b);
     }
 
     public static T Min<QueryType, QueryOp, T>(this QueryWrapper<QueryType, QueryOp> wrapper, Func<QueryType, T> selector)
       where T : IComparable<T>
-      where QueryOp : IQueryOp<QueryType> {
+      where QueryOp : struct, IQueryOp<QueryType> {
       return wrapper.Select(selector).Fold((a, b) => a.CompareTo(b) < 0 ? a : b);
     }
 
     public static QueryType Max<QueryType, QueryOp>(this QueryWrapper<QueryType, QueryOp> wrapper)
       where QueryType : IComparable<QueryType>
-      where QueryOp : IQueryOp<QueryType> {
+      where QueryOp : struct, IQueryOp<QueryType> {
       return wrapper.Fold((a, b) => a.CompareTo(b) > 0 ? a : b);
     }
 
     public static T Max<QueryType, QueryOp, T>(this QueryWrapper<QueryType, QueryOp> wrapper, Func<QueryType, T> selector)
       where T : IComparable<T>
-      where QueryOp : IQueryOp<QueryType> {
+      where QueryOp : struct, IQueryOp<QueryType> {
       return wrapper.Select(selector).Fold((a, b) => a.CompareTo(b) > 0 ? a : b);
     }
 
     public static QueryWrapper<byte, SelectOp<QueryType, byte, QueryOp>> ToBytes<QueryType, QueryOp>(this QueryWrapper<QueryType, QueryOp> wrapper)
-      where QueryOp : IQueryOp<QueryType>
+      where QueryOp : struct, IQueryOp<QueryType>
       where QueryType : IConvertible {
       return wrapper.Select(FormatHelper<QueryType>.toByte);
     }
 
     public static QueryWrapper<ushort, SelectOp<QueryType, ushort, QueryOp>> ToUShorts<QueryType, QueryOp>(this QueryWrapper<QueryType, QueryOp> wrapper)
-      where QueryOp : IQueryOp<QueryType>
+      where QueryOp : struct, IQueryOp<QueryType>
       where QueryType : IConvertible {
       return wrapper.Select(FormatHelper<QueryType>.toUShort);
     }
 
     public static QueryWrapper<short, SelectOp<QueryType, short, QueryOp>> ToShorts<QueryType, QueryOp>(this QueryWrapper<QueryType, QueryOp> wrapper)
-      where QueryOp : IQueryOp<QueryType>
+      where QueryOp : struct, IQueryOp<QueryType>
       where QueryType : IConvertible {
       return wrapper.Select(FormatHelper<QueryType>.toShort);
     }
 
     public static QueryWrapper<uint, SelectOp<QueryType, uint, QueryOp>> ToUInts<QueryType, QueryOp>(this QueryWrapper<QueryType, QueryOp> wrapper)
-      where QueryOp : IQueryOp<QueryType>
+      where QueryOp : struct, IQueryOp<QueryType>
       where QueryType : IConvertible {
       return wrapper.Select(FormatHelper<QueryType>.toUInt);
     }
 
     public static QueryWrapper<int, SelectOp<QueryType, int, QueryOp>> ToInts<QueryType, QueryOp>(this QueryWrapper<QueryType, QueryOp> wrapper)
-      where QueryOp : IQueryOp<QueryType>
+      where QueryOp : struct, IQueryOp<QueryType>
       where QueryType : IConvertible {
       return wrapper.Select(FormatHelper<QueryType>.toInt);
     }
 
     public static QueryWrapper<ulong, SelectOp<QueryType, ulong, QueryOp>> ToULong<QueryType, QueryOp>(this QueryWrapper<QueryType, QueryOp> wrapper)
-      where QueryOp : IQueryOp<QueryType>
+      where QueryOp : struct, IQueryOp<QueryType>
       where QueryType : IConvertible {
       return wrapper.Select(FormatHelper<QueryType>.toULong);
     }
 
     public static QueryWrapper<long, SelectOp<QueryType, long, QueryOp>> ToLongs<QueryType, QueryOp>(this QueryWrapper<QueryType, QueryOp> wrapper)
-      where QueryOp : IQueryOp<QueryType>
+      where QueryOp : struct, IQueryOp<QueryType>
       where QueryType : IConvertible {
       return wrapper.Select(FormatHelper<QueryType>.toLong);
     }
 
     public static QueryWrapper<float, SelectOp<QueryType, float, QueryOp>> ToFloats<QueryType, QueryOp>(this QueryWrapper<QueryType, QueryOp> wrapper)
-      where QueryOp : IQueryOp<QueryType>
+      where QueryOp : struct, IQueryOp<QueryType>
       where QueryType : IConvertible {
       return wrapper.Select(FormatHelper<QueryType>.toFloat);
     }
 
     public static QueryWrapper<double, SelectOp<QueryType, double, QueryOp>> ToDoubles<QueryType, QueryOp>(this QueryWrapper<QueryType, QueryOp> wrapper)
-      where QueryOp : IQueryOp<QueryType>
+      where QueryOp : struct, IQueryOp<QueryType>
       where QueryType : IConvertible {
       return wrapper.Select(FormatHelper<QueryType>.toDouble);
     }

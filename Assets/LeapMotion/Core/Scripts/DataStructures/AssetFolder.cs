@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Leap Motion, Inc. 2011-2017.                                 *
+ * Copyright (C) Leap Motion, Inc. 2011-2018.                                 *
  * Leap Motion proprietary and  confidential.                                 *
  *                                                                            *
  * Use subject to the terms of the Leap Motion SDK Agreement available at     *
@@ -28,6 +28,12 @@ namespace Leap.Unity {
 
     [SerializeField]
     protected UnityObject _assetFolder;
+
+    public AssetFolder() { }
+
+    public AssetFolder(string path) {
+      Path = path;
+    }
 
     /// <summary>
     /// Gets or sets the folder path.  This path will always be a path

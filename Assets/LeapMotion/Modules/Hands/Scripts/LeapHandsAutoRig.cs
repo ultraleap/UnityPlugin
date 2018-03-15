@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Leap Motion, Inc. 2011-2017.                                 *
+ * Copyright (C) Leap Motion, Inc. 2011-2018.                                 *
  * Leap Motion proprietary and  confidential.                                 *
  *                                                                            *
  * Use subject to the terms of the Leap Motion SDK Agreement available at     *
@@ -16,7 +16,7 @@ namespace Leap.Unity {
   /**LeapHandAutoRig automates setting up the scripts that drive 3D skinned mesh hands. */
   [AddComponentMenu("Leap/Auto Rig Hands")]
   public class LeapHandsAutoRig : MonoBehaviour {
-    private HandPool HandPoolToPopulate;
+    private HandModelManager HandPoolToPopulate;
     public Animator AnimatorForMapping;
 
     public string ModelGroupName = null;
@@ -56,7 +56,7 @@ namespace Leap.Unity {
      * Then it immediately RiggedHand.StoreJointStartPose() to store the rigged asset's original state.*/
     [ContextMenu("AutoRig")]
     public void AutoRig() {
-      HandPoolToPopulate = GameObject.FindObjectOfType<HandPool>();
+      HandPoolToPopulate = GameObject.FindObjectOfType<HandModelManager>();
       AnimatorForMapping = gameObject.GetComponent<Animator>();
       if (AnimatorForMapping != null) {
         if (AnimatorForMapping.isHuman == true) {
@@ -88,7 +88,7 @@ namespace Leap.Unity {
       List<string> RightHandStrings = new List<string> { "right" };
 
       //Assigning these here since this component gets added and used at editor time
-      HandPoolToPopulate = GameObject.FindObjectOfType<HandPool>();
+      HandPoolToPopulate = GameObject.FindObjectOfType<HandModelManager>();
       Reset();
 
       //Find hands and assigns RiggedHands
@@ -159,7 +159,7 @@ namespace Leap.Unity {
     void AutoRigMecanim() {
       //Assigning these here since this component gets added and used at editor time
       AnimatorForMapping = gameObject.GetComponent<Animator>();
-      HandPoolToPopulate = GameObject.FindObjectOfType<HandPool>();
+      HandPoolToPopulate = GameObject.FindObjectOfType<HandModelManager>();
       Reset();
 
       //Find hands and assign RiggedHands

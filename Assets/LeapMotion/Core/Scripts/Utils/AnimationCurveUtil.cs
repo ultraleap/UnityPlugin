@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Leap Motion, Inc. 2011-2017.                                 *
+ * Copyright (C) Leap Motion, Inc. 2011-2018.                                 *
  * Leap Motion proprietary and  confidential.                                 *
  *                                                                            *
  * Use subject to the terms of the Leap Motion SDK Agreement available at     *
@@ -94,6 +94,55 @@ namespace Leap.Unity {
         }
       }
       return true;
+    }
+
+    public static bool ContainsKeyAtTime(this AnimationCurve curve, float time, float tolerance = 0.0000001f) {
+      return curve.keys.Query().Any(k => Mathf.Abs(k.time - time) < tolerance);
+    }
+
+    public static AnimationCurve GetCropped(this AnimationCurve curve, float start, float end, bool slideToStart = true) {
+      AnimationCurve newCurve = new AnimationCurve();
+
+      //Get a copy of the latest key before start
+      Keyframe? latestBeforeStart = null;
+      var keys = curve.keys;
+      for (int i = 0; i < keys.Length; i++) {
+        var key = keys[i];
+        if (key.time >= start) break;
+
+        latestBeforeStart = key;
+      }
+
+      //Remove all keys before start or after end
+      for (int i = keys.Length; i-- != 0;) {
+        if (keys[i].time < start || keys[i].time > end) {
+          curve.RemoveKey(i);
+        }
+      }
+
+      bool alreadyHasZero = false;
+      for (int i = 0; i < keys.Length; i++) {
+        var key = keys[i];
+        if (key.time >= start && key.time <= end) {
+          if (slideToStart) {
+            key.time -= start;
+          }
+
+          if (Mathf.Approximately(key.time, 0)) {
+            alreadyHasZero = true;
+          }
+
+          newCurve.AddKey(key);
+        }
+      }
+
+      if (latestBeforeStart.HasValue && !alreadyHasZero) {
+        var toInsert = latestBeforeStart.Value;
+        toInsert.time = 0;
+        newCurve.AddKey(toInsert);
+      }
+
+      return newCurve;
     }
 
 #if UNITY_EDITOR

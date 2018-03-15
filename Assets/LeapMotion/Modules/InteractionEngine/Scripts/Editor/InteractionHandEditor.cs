@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Leap Motion, Inc. 2011-2017.                                 *
+ * Copyright (C) Leap Motion, Inc. 2011-2018.                                 *
  * Leap Motion proprietary and  confidential.                                 *
  *                                                                            *
  * Use subject to the terms of the Leap Motion SDK Agreement available at     *
@@ -27,7 +27,14 @@ namespace Leap.Unity.Interaction {
       
       _handTex = EditorResources.Load<Texture2D>("HandTex");
 
+      hideField("_leapProvider");
+      specifyCustomDecorator("manager", drawProvider);
+
       specifyCustomDrawer("enabledPrimaryHoverFingertips", drawPrimaryHoverFingertipsEditor);
+    }
+
+    private void drawProvider(SerializedProperty p) {
+      EditorGUILayout.PropertyField(serializedObject.FindProperty("_leapProvider"));
     }
 
     private void drawPrimaryHoverFingertipsEditor(SerializedProperty property) {

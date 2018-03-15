@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Leap Motion, Inc. 2011-2017.                                 *
+ * Copyright (C) Leap Motion, Inc. 2011-2018.                                 *
  * Leap Motion proprietary and  confidential.                                 *
  *                                                                            *
  * Use subject to the terms of the Leap Motion SDK Agreement available at     *
@@ -19,7 +19,7 @@ namespace Leap.Unity.Interaction {
 
   public class AnchorGroup : MonoBehaviour {
 
-    [SerializeField, SHashSet]
+    [SerializeField]
     [Tooltip("The anchors that are within this AnchorGroup. Anchorable objects associated "
            + "this AnchorGroup can only be placed in anchors within this group.")]
     private AnchorSet _anchors;
