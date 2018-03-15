@@ -40,8 +40,7 @@ namespace Leap.Unity.Attributes {
     public void ConstrainValue(SerializedProperty property) {
       if (property.objectReferenceValue != null) {
 
-        UnityObject implementingObject = FindImplementer(property,
-                                                         property.objectReferenceValue);
+        UnityObject implementingObject = FindImplementer(property.objectReferenceValue);
 
         if (implementingObject == null) {
           Debug.LogError(property.objectReferenceValue.GetType().Name + " does not implement " + type.Name);
@@ -56,7 +55,7 @@ namespace Leap.Unity.Attributes {
     /// the interface that this attribute constrains objects to, and returns the object
     /// that implements that interface, or null if none was found.
     /// </summary>
-    public UnityObject FindImplementer(SerializedProperty property, UnityObject obj) {
+    public UnityObject FindImplementer(UnityObject obj) {
 
       // Don't use fieldInfo here because it is very convenient for it to be left null
       // on the CombinablePropertyAttribute when dealing with generic-type situations
@@ -119,14 +118,14 @@ namespace Leap.Unity.Attributes {
     }
 
     public bool IsDropValid(UnityObject[] draggedObjects, SerializedProperty property) {
-      return draggedObjects.Query().Any(o => FindImplementer(property, o) != null);
+      return draggedObjects.Query().Any(o => FindImplementer(o) != null);
     }
 
     public void ProcessDroppedObjects(UnityObject[] droppedObjects,
                                       SerializedProperty property) {
 
       var implementer = droppedObjects.Query()
-                                      .FirstOrDefault(o => FindImplementer(property, o));
+                                      .FirstOrDefault(o => FindImplementer(o));
 
       if (implementer == null) {
         Debug.LogError(property.objectReferenceValue.GetType().Name
