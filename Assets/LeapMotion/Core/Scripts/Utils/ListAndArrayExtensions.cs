@@ -10,7 +10,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Leap.Unity.Query {
+namespace Leap.Unity {
 
   public static class ListAndArrayExtensions {
 

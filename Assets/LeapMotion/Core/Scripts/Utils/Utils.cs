@@ -396,6 +396,16 @@ namespace Leap.Unity {
       return r < 0 ? r + m : r;
     }
 
+    public static int Sign(int value) {
+      if (value == 0) {
+        return 0;
+      } else if (value > 0) {
+        return 1;
+      } else {
+        return -1;
+      }
+    }
+
     /// <summary>
     /// Returns a vector that is perpendicular to this vector.
     /// The returned vector will have the same length as the
