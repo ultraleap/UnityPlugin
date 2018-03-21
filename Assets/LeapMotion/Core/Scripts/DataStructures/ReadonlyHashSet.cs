@@ -7,18 +7,17 @@
  * between Leap Motion and you, your company or other organization.           *
  ******************************************************************************/
 
-using UnityEngine;
 using System.Collections.Generic;
-using System.Collections;
 
 namespace Leap.Unity {
+  using Query;
 
   /// <summary>
   /// A simple wrapper around HashSet to provide readonly access.
   /// Useful when you want to return a HashSet to someone but you want
   /// to make sure they don't muck it up!
   /// </summary>
-  public struct ReadonlyHashSet<T> : ICollection<T> {
+  public struct ReadonlyHashSet<T> {
     private readonly HashSet<T> _set;
 
     public ReadonlyHashSet(HashSet<T> set) {
@@ -31,12 +30,6 @@ namespace Leap.Unity {
       }
     }
 
-    public bool IsReadOnly {
-      get {
-        return true;
-      }
-    }
-
     public HashSet<T>.Enumerator GetEnumerator() {
       return _set.GetEnumerator();
     }
@@ -45,28 +38,8 @@ namespace Leap.Unity {
       return _set.Contains(obj);
     }
 
-    public void Add(T item) {
-      throw new System.NotImplementedException();
-    }
-
-    public void Clear() {
-      throw new System.NotImplementedException();
-    }
-
-    public void CopyTo(T[] array, int arrayIndex) {
-      throw new System.NotImplementedException();
-    }
-
-    public bool Remove(T item) {
-      throw new System.NotImplementedException();
-    }
-
-    IEnumerator<T> IEnumerable<T>.GetEnumerator() {
-      throw new System.NotImplementedException();
-    }
-
-    IEnumerator IEnumerable.GetEnumerator() {
-      throw new System.NotImplementedException();
+    public Query<T> Query() {
+      return _set.Query();
     }
 
     public static implicit operator ReadonlyHashSet<T>(HashSet<T> set) {
