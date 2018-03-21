@@ -1494,48 +1494,51 @@ namespace Leap.Unity {
     /// The height of each line is the height of the Rect divided by the number of lines
     /// requested.
     /// </summary>
-    //public static HorizontalLineRectEnumerator TakeAllLines(this Rect r, int numLines) {
-    //  return new HorizontalLineRectEnumerator(r, numLines);
-    //}
+    public static HorizontalLineRectEnumerator TakeAllLines(this Rect r, int numLines) {
+      return new HorizontalLineRectEnumerator(r, numLines);
+    }
 
-    //public struct HorizontalLineRectEnumerator : IQueryOp<Rect> {
-    //  Rect rect;
-    //  int numLines;
-    //  int index;
+    public struct HorizontalLineRectEnumerator {
+      Rect rect;
+      int numLines;
+      int index;
 
-    //  public HorizontalLineRectEnumerator(Rect rect, int numLines) {
-    //    this.rect = rect;
-    //    this.numLines = numLines;
-    //    this.index = -1;
-    //  }
+      public HorizontalLineRectEnumerator(Rect rect, int numLines) {
+        this.rect = rect;
+        this.numLines = numLines;
+        this.index = -1;
+      }
 
-    //  public float eachHeight { get { return this.rect.height / numLines; } }
+      public float eachHeight { get { return this.rect.height / numLines; } }
 
-    //  public Rect Current {
-    //    get { return new Rect(rect.x, rect.y + eachHeight * index, rect.width, eachHeight); }
-    //  }
-    //  public bool MoveNext() {
-    //    index += 1;
-    //    return index < numLines;
-    //  }
-    //  public HorizontalLineRectEnumerator GetEnumerator() { return this; }
+      public Rect Current {
+        get { return new Rect(rect.x, rect.y + eachHeight * index, rect.width, eachHeight); }
+      }
+      public bool MoveNext() {
+        index += 1;
+        return index < numLines;
+      }
+      public HorizontalLineRectEnumerator GetEnumerator() { return this; }
 
-    //  public bool TryGetNext(out Rect t) {
-    //    if (MoveNext()) {
-    //      t = Current; return true;
-    //    } else {
-    //      t = default(Rect); return false;
-    //    }
-    //  }
+      public void Reset() {
+        index = -1;
+      }
 
-    //  public void Reset() {
-    //    index = -1;
-    //  }
+      public Query<Rect> Query() {
+        List<Rect> rects = Pool<List<Rect>>.Spawn();
+        try {
 
-    //  public QueryWrapper<Rect, HorizontalLineRectEnumerator> Query() {
-    //    return new QueryWrapper<Rect, HorizontalLineRectEnumerator>(this);
-    //  }
-    //}
+          foreach (var rect in this) {
+            rects.Add(rect);
+          }
+          return new Query<Rect>(rects);
+
+        } finally {
+          rects.Clear();
+          Pool<List<Rect>>.Recycle(rects);
+        }
+      }
+    }
 
     #endregion
 
@@ -1544,7 +1547,7 @@ namespace Leap.Unity {
     #endregion
 
     #region Leap Utilities
-    
+
     #region Pose Utils
 
     /// <summary>
