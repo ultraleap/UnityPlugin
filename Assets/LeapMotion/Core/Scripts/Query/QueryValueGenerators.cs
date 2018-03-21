@@ -35,9 +35,11 @@ namespace Leap.Unity.Query {
         int value = from;
         int sign = Utils.Sign(to - from);
 
-        while (Utils.Sign(value - from) == sign) {
-          values.Add(value);
-          value += step * sign;
+        if (sign != 0) {
+          while (Utils.Sign(to - value) == sign) {
+            values.Add(value);
+            value += step * sign;
+          }
         }
 
         if (!endIsExclusive && value == to) {
@@ -46,6 +48,7 @@ namespace Leap.Unity.Query {
 
         return new Query<int>(values);
       } finally {
+        values.Clear();
         Pool<List<int>>.Recycle(values);
       }
     }

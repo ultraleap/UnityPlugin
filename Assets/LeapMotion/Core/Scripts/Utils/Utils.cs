@@ -62,6 +62,19 @@ namespace Leap.Unity {
     }
 
     /// <summary>
+    /// System.Array.Reverse is actually suprisingly complex / slow.  This
+    /// is a basic generic implementation of the reverse algorithm.
+    /// </summary>
+    public static void Reverse<T>(this T[] array, int start, int length) {
+      int mid = start + length / 2;
+      int i = start;
+      int j = start + length;
+      while (i < mid) {
+        array.Swap(i++, --j);
+      }
+    }
+
+    /// <summary>
     /// Shuffle the given list into a different permutation.
     /// </summary>
     public static void Shuffle<T>(this IList<T> list) {

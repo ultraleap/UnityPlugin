@@ -119,7 +119,14 @@ namespace Leap.Unity.Query {
       int count;
       query.Deconstruct(out array, out count);
 
-      Array.Sort(array, (a, b) => selector(a).CompareTo(selector(b)));
+      K[] keys = ArrayPool<K>.Spawn(count);
+      for (int i = 0; i < count; i++) {
+        keys[i] = selector(array[i]);
+      }
+
+      Array.Sort(keys, array, 0, count);
+
+      ArrayPool<K>.Recycle(keys);
 
       return new Query<T>(array, count);
     }
@@ -129,13 +136,7 @@ namespace Leap.Unity.Query {
     /// to select the values to order by.
     /// </summary>
     public static Query<T> OrderByDescending<T, K>(this Query<T> query, Func<T, K> selector) where K : IComparable<K> {
-      T[] array;
-      int count;
-      query.Deconstruct(out array, out count);
-
-      Array.Sort(array, (a, b) => selector(b).CompareTo(selector(a)));
-
-      return new Query<T>(array, count);
+      return query.OrderBy(selector).Reverse();
     }
 
     /// <summary>
@@ -161,6 +162,24 @@ namespace Leap.Unity.Query {
 
         return new Query<T>(dstArray, slice.Count * times);
       }
+    }
+
+    /// <summary>
+    /// Returns a new Query representing the original elements but in reverse order.
+    /// 
+    /// For example:
+    ///  (1, 2, 3).Query().Reverse()
+    /// Would result in:
+    ///  (3, 2, 1)
+    /// </summary>
+    public static Query<T> Reverse<T>(this Query<T> query) {
+      T[] array;
+      int count;
+      query.Deconstruct(out array, out count);
+
+      Utils.Reverse(array, 0, count);
+
+      return new Query<T>(array, count);
     }
 
     /// <summary>
@@ -310,7 +329,7 @@ namespace Leap.Unity.Query {
       int count;
       query.Deconstruct(out array, out count);
 
-      Array.Sort(array);
+      Array.Sort(array, 0, count);
 
       return new Query<T>(array, count);
     }
@@ -323,7 +342,8 @@ namespace Leap.Unity.Query {
       int count;
       query.Deconstruct(out array, out count);
 
-      Array.Sort(array, (a, b) => b.CompareTo(a));
+      Array.Sort(array, 0, count);
+      Utils.Reverse(array, 0, count);
 
       return new Query<T>(array, count);
     }

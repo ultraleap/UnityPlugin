@@ -16,8 +16,8 @@ using NUnit.Framework;
 namespace Leap.Unity.Query.Test {
 
   public class QueryTests {
-    public int[] LIST_0 = { 1, 2, 3, 4, 5 };
-    public int[] LIST_1 = { 6, 7, 8, 9, 10 };
+    public int[] LIST_0 = { 1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 9, 1, 900, int.MinValue, int.MaxValue };
+    public int[] LIST_1 = { 6, 7, 8, 9, 10, 1, 1, 9, 300, 6, 900, int.MaxValue };
 
     [Test]
     public void AllTest() {
@@ -85,6 +85,11 @@ namespace Leap.Unity.Query.Test {
                       LIST_0.Query().Count(i => i % 2 == 0));
     }
 
+    [Test]
+    public void DistinctTest() {
+      Assert.That(LIST_0.Query().Distinct().OrderBy(t => t).ToList(), Is.EquivalentTo(
+                  LIST_0.Distinct().OrderBy(t => t).ToList()));
+    }
 
     [Test]
     public void ElemenAtTest() {
@@ -193,50 +198,40 @@ namespace Leap.Unity.Query.Test {
     }
 
     [Test]
-    public void RangeFrom([Values(0, 1, 2, 100, -1, -2, -100)] int startValue) {
-      //int index = startValue;
-      //int itterations = 0;
-      //foreach (var value in Values.From(startValue)) {
-      //  Assert.That(value, Is.EqualTo(index));
-      //  index++;
-      //  itterations++;
+    public void OrderByTest() {
+      Assert.That(LIST_0.Query().OrderBy(i => i).ToList(), Is.EquivalentTo(
+                  LIST_0.OrderBy(i => i).ToList()));
+    }
 
-      //  if (itterations > 1000) {
-      //    Assert.Pass();
-      //    return;
-      //  }
-      //}
-      Assert.Fail();
+    [Test]
+    public void OrderByDescendingTest() {
+      Assert.That(LIST_0.Query().OrderByDescending(i => i).ToList(), Is.EquivalentTo(
+                  LIST_0.OrderByDescending(i => i).ToList()));
     }
 
     [Test]
     [Pairwise]
     public void RangeFromTo([Values(0, 1, 100, -1, -100)] int startValue,
                             [Values(0, 1, 100, -1, -100)] int endValue,
-                            [Values(1, 2, -1, -2, 0)] int step) {
-      //List<int> items = new List<int>();
-      //if (step != 0) {
-      //  int i = startValue;
-      //  while (true) {
-      //    if (i == endValue) {
-      //      break;
-      //    }
+                            [Values(1, 2, 10)] int step,
+                            [Values(true, false)] bool endIsExclusive) {
+      List<int> expected = new List<int>();
+      int value = startValue;
+      int signStep = endValue > startValue ? step : -step;
+      for (int i = 0; i < Mathf.Abs(startValue - endValue) + 1; i++) {
+        expected.Add(value);
+        value += signStep;
+      }
 
-      //    if ((i > endValue) == (endValue > startValue)) {
-      //      break;
-      //    }
+      if (endIsExclusive) {
+        expected.Remove(endValue);
+      }
 
-      //    items.Add(i);
-      //    if (endValue > startValue) {
-      //      i += Mathf.Abs(step);
-      //    } else {
-      //      i -= Mathf.Abs(step);
-      //    }
-      //  }
-      //}
+      expected = expected.Where(i => i >= Mathf.Min(startValue, endValue)).
+                          Where(i => i <= Mathf.Max(startValue, endValue)).
+                          ToList();
 
-      //Assert.That(Values.From(startValue).To(endValue).By(step).ToList(), Is.EquivalentTo(items));
-      Assert.Fail();
+      Assert.That(Values.Range(startValue, endValue, step, endIsExclusive).ToList(), Is.EquivalentTo(expected));
     }
 
     [Test]
@@ -248,6 +243,12 @@ namespace Leap.Unity.Query.Test {
 
       Assert.That(list, Is.EquivalentTo(
                   LIST_0.Query().Repeat(repetitions).ToList()));
+    }
+
+    [Test]
+    public void ReverseTest() {
+      Assert.That(LIST_0.Query().Reverse().ToList(), Is.EquivalentTo(
+                  LIST_0.Select(i => i).Reverse().ToList()));
     }
 
     [Test]
@@ -294,6 +295,25 @@ namespace Leap.Unity.Query.Test {
     }
 
     [Test]
+    public void SortTest() {
+      var expected = new List<int>(LIST_0);
+      expected.Sort();
+
+      Assert.That(LIST_0.Query().Sort().ToList(), Is.EquivalentTo(
+                  expected));
+    }
+
+    [Test]
+    public void SortDescendingTests() {
+      var expected = new List<int>(LIST_0);
+      expected.Sort();
+      expected.Reverse();
+
+      Assert.That(LIST_0.Query().SortDescending().ToList(), Is.EquivalentTo(
+                  expected));
+    }
+
+    [Test]
     public void TakeTest() {
       Assert.That(LIST_0.Take(4).ToList(), Is.EquivalentTo(
                   LIST_0.Query().Take(4).ToList()));
@@ -311,22 +331,24 @@ namespace Leap.Unity.Query.Test {
       Assert.That(LIST_0.Query().WithPrevious(includeStart: true).Count(p => !p.hasPrev), Is.EqualTo(1));
       Assert.That(LIST_0.Query().WithPrevious(includeStart: true).Count(p => p.hasPrev), Is.EqualTo(LIST_0.Length - 1));
 
+      int index = 0;
       foreach (var pair in LIST_0.Query().WithPrevious()) {
-        Assert.That(pair.value, Is.EqualTo(pair.prev + 1));
+        Assert.That(pair.prev, Is.EqualTo(LIST_0[index]));
+        index++;
       }
     }
 
     [Test]
     public void WithPreviousOffsetTest() {
-      Assert.That(LIST_0.Query().WithPrevious(offset: 4).Count(), Is.EqualTo(1));
-      Assert.That(LIST_0.Query().WithPrevious(offset: 5).Count(), Is.EqualTo(0));
+      Assert.That(LIST_0.Query().WithPrevious(offset: 4).Count(), Is.EqualTo(LIST_0.Length - 4));
+      Assert.That(LIST_0.Query().WithPrevious(offset: LIST_0.Length + 1).Count(), Is.EqualTo(0));
       Assert.That(LIST_0.Query().WithPrevious(offset: int.MaxValue).Count(), Is.EqualTo(0));
 
       var item = LIST_0.Query().WithPrevious(offset: 4).First();
       Assert.That(item.value, Is.EqualTo(5));
       Assert.That(item.prev, Is.EqualTo(1));
 
-      Assert.That(LIST_0.Query().WithPrevious(offset: 2).All(i => i.value - i.prev == 2));
+      Assert.That(Values.Range(0, 10).WithPrevious(offset: 2).All(i => i.value - i.prev == 2));
     }
 
     [Test]
@@ -337,8 +359,13 @@ namespace Leap.Unity.Query.Test {
 
     [Test]
     public void ZipTest() {
+      List<string> expected = new List<string>();
+      for (int i = 0; i < Mathf.Min(LIST_0.Length, LIST_1.Length); i++) {
+        expected.Add(LIST_0[i].ToString() + LIST_1[i].ToString());
+      }
+
       Assert.That(LIST_0.Query().Zip(LIST_1.Query(), (a, b) => a.ToString() + b.ToString()).ToList(), Is.EquivalentTo(
-                  new string[] { "16", "27", "38", "49", "510" }));
+                  expected));
     }
 
     public class TestEnumerator : IEnumerator<int> {

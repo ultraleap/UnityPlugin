@@ -38,6 +38,7 @@ namespace Leap.Unity.Query {
         }
         return new Query<T>(list);
       } finally {
+        list.Clear();
         Pool<List<T>>.Recycle(list);
       }
     }
@@ -98,8 +99,8 @@ namespace Leap.Unity.Query {
         throw new ArgumentException("Count must be non-negative, but was " + count);
       }
 
-      if (count < array.Length) {
-        throw new ArgumentException("Count was " + count + " but the provided array had a length of " + array.Length);
+      if (count > array.Length) {
+        throw new ArgumentException("Count was " + count + " but the provided array only had a length of " + array.Length);
       }
 
       _array = array;
