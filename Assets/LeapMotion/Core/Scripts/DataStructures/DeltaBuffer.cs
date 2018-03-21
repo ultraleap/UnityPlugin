@@ -89,12 +89,12 @@ namespace Leap.Unity {
     /// If the buffer is empty, you should return the identity for your derivative type.
     /// </summary>
     public abstract DerivativeType Delta();
-    
+
     #region foreach Support
-    
-    //public IndexableEnumerator<SampleType> GetEnumerator() {
-    //  return new IndexableEnumerator<SampleType>(this);
-    //}
+
+    public IndexableEnumerator<SampleType> GetEnumerator() {
+      return new IndexableEnumerator<SampleType>(this);
+    }
 
     #endregion
 

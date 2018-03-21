@@ -102,46 +102,30 @@ namespace Leap.Unity {
   /// A two-generic-argument variant of an enumerator that allows an IIndexableStruct
   /// to quickly define an Enumerator that avoids allocation.
   /// </summary>
-  //public struct IndexableStructEnumerator<Element, IndexableStruct>
-  //                : IQueryOp<Element>
-  //                where IndexableStruct : struct,
-  //                                        IIndexableStruct<Element, IndexableStruct> {
+  public struct IndexableStructEnumerator<Element, IndexableStruct>
+    where IndexableStruct : struct, IIndexableStruct<Element, IndexableStruct> {
 
-  //  IndexableStruct? maybeIndexable;
-  //  int index;
+    IndexableStruct? maybeIndexable;
+    int index;
 
-  //  public IndexableStructEnumerator(IndexableStruct indexable) {
-  //    this.maybeIndexable = indexable;
-  //    index = -1;
-  //  }
+    public IndexableStructEnumerator(IndexableStruct indexable) {
+      this.maybeIndexable = indexable;
+      index = -1;
+    }
 
-  //  public IndexableStructEnumerator<Element, IndexableStruct> GetEnumerator() {
-  //    return this;
-  //  }
+    public IndexableStructEnumerator<Element, IndexableStruct> GetEnumerator() {
+      return this;
+    }
 
-  //  public bool MoveNext() {
-  //    if (!maybeIndexable.HasValue) return false;
-  //    index++; return index < maybeIndexable.Value.Count;
-  //  }
+    public bool MoveNext() {
+      if (!maybeIndexable.HasValue) return false;
+      index++; return index < maybeIndexable.Value.Count;
+    }
 
-  //  public bool TryGetNext(out Element t) {
-  //    var hasNext = MoveNext();
-  //    if (!hasNext) {
-  //      t = default(Element);
-  //      return false;
-  //    }
-  //    else {
-  //      t = Current;
-  //      return true;
-  //    }
-  //  }
+    public void Reset() {
+      index = -1;
+    }
 
-  //  public void Reset() {
-  //    index = -1;
-  //  }
-
-  //  public Element Current { get { return maybeIndexable.Value[index]; } }
-
-  //}
-
+    public Element Current { get { return maybeIndexable.Value[index]; } }
+  }
 }

@@ -4,7 +4,6 @@ using UnityEngine;
 using System.Linq;
 using Leap.Unity;
 using Leap.Unity.Query;
-using Leap.Unity.Query;
 
 
 public class Debgaasd : MonoBehaviour {
