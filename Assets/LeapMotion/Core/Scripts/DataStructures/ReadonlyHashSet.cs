@@ -9,6 +9,7 @@
 
 using UnityEngine;
 using System.Collections.Generic;
+using System.Collections;
 
 namespace Leap.Unity {
 
@@ -17,7 +18,7 @@ namespace Leap.Unity {
   /// Useful when you want to return a HashSet to someone but you want
   /// to make sure they don't muck it up!
   /// </summary>
-  public struct ReadonlyHashSet<T> {
+  public struct ReadonlyHashSet<T> : ICollection<T> {
     private readonly HashSet<T> _set;
 
     public ReadonlyHashSet(HashSet<T> set) {
@@ -30,12 +31,42 @@ namespace Leap.Unity {
       }
     }
 
+    public bool IsReadOnly {
+      get {
+        return true;
+      }
+    }
+
     public HashSet<T>.Enumerator GetEnumerator() {
       return _set.GetEnumerator();
     }
 
     public bool Contains(T obj) {
       return _set.Contains(obj);
+    }
+
+    public void Add(T item) {
+      throw new System.NotImplementedException();
+    }
+
+    public void Clear() {
+      throw new System.NotImplementedException();
+    }
+
+    public void CopyTo(T[] array, int arrayIndex) {
+      throw new System.NotImplementedException();
+    }
+
+    public bool Remove(T item) {
+      throw new System.NotImplementedException();
+    }
+
+    IEnumerator<T> IEnumerable<T>.GetEnumerator() {
+      throw new System.NotImplementedException();
+    }
+
+    IEnumerator IEnumerable.GetEnumerator() {
+      throw new System.NotImplementedException();
     }
 
     public static implicit operator ReadonlyHashSet<T>(HashSet<T> set) {

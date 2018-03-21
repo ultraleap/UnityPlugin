@@ -63,7 +63,7 @@ namespace Leap.Unity.Query.Test {
 
     [Test]
     public void ConcatTest() {
-      Assert.That(LIST_0.Concat(LIST_1).SequenceEqual(
+      Assert.That(LIST_0.Concat(LIST_1).ToList(), Is.EquivalentTo(
                   LIST_0.Query().Concat(LIST_1.Query()).ToList()));
     }
 
@@ -133,7 +133,7 @@ namespace Leap.Unity.Query.Test {
       foreach (var item in LIST_0.Query().Concat(LIST_1.Query())) {
         found.Add(item);
       }
-      Assert.That(LIST_0.Concat(LIST_1).SequenceEqual(found));
+      Assert.That(LIST_0.Concat(LIST_1).ToList(), Is.EquivalentTo(found));
     }
 
     [Test]
@@ -158,11 +158,10 @@ namespace Leap.Unity.Query.Test {
     [Test]
     public void MultiFirstTest() {
       var q = LIST_0.Query();
-      var a = q.First();
-      var b = q.First();
 
-      Assert.That(a, Is.EqualTo(LIST_0[0]));
-      Assert.That(b, Is.EqualTo(LIST_0[0]));
+      q.First();
+
+      Assert.That(() => q.First(), Throws.InvalidOperationException);
     }
 
     [Test]
@@ -175,39 +174,39 @@ namespace Leap.Unity.Query.Test {
         a.Add(item);
       }
 
-      foreach (var item in q) {
-        b.Add(item);
-      }
-
-      Assert.That(a, Is.EquivalentTo(LIST_0));
-      Assert.That(b, Is.EquivalentTo(LIST_0));
+      Assert.That(() => {
+        foreach (var item in q) {
+          b.Add(item);
+        }
+      }, Throws.InvalidOperationException);
     }
 
     [Test]
     public void OfTypeTest() {
       object[] objs = new object[] { 0, 0.4f, "Hello", 7u, 0.4, "World", null };
 
-      Assert.That(objs.OfType<string>().SequenceEqual(
+      Assert.That(objs.OfType<string>().ToList(), Is.EquivalentTo(
                   objs.Query().OfType<string>().ToList()));
 
-      Assert.That(objs.OfType<string>().SequenceEqual(
+      Assert.That(objs.OfType<string>(), Is.EquivalentTo(
                   objs.Query().OfType(typeof(string)).Cast<string>().ToList()));
     }
 
     [Test]
     public void RangeFrom([Values(0, 1, 2, 100, -1, -2, -100)] int startValue) {
-      int index = startValue;
-      int itterations = 0;
-      foreach (var value in Values.From(startValue)) {
-        Assert.That(value, Is.EqualTo(index));
-        index++;
-        itterations++;
+      //int index = startValue;
+      //int itterations = 0;
+      //foreach (var value in Values.From(startValue)) {
+      //  Assert.That(value, Is.EqualTo(index));
+      //  index++;
+      //  itterations++;
 
-        if (itterations > 1000) {
-          Assert.Pass();
-          return;
-        }
-      }
+      //  if (itterations > 1000) {
+      //    Assert.Pass();
+      //    return;
+      //  }
+      //}
+      Assert.Fail();
     }
 
     [Test]
@@ -215,28 +214,29 @@ namespace Leap.Unity.Query.Test {
     public void RangeFromTo([Values(0, 1, 100, -1, -100)] int startValue,
                             [Values(0, 1, 100, -1, -100)] int endValue,
                             [Values(1, 2, -1, -2, 0)] int step) {
-      List<int> items = new List<int>();
-      if (step != 0) {
-        int i = startValue;
-        while (true) {
-          if (i == endValue) {
-            break;
-          }
+      //List<int> items = new List<int>();
+      //if (step != 0) {
+      //  int i = startValue;
+      //  while (true) {
+      //    if (i == endValue) {
+      //      break;
+      //    }
 
-          if ((i > endValue) == (endValue > startValue)) {
-            break;
-          }
+      //    if ((i > endValue) == (endValue > startValue)) {
+      //      break;
+      //    }
 
-          items.Add(i);
-          if (endValue > startValue) {
-            i += Mathf.Abs(step);
-          } else {
-            i -= Mathf.Abs(step);
-          }
-        }
-      }
+      //    items.Add(i);
+      //    if (endValue > startValue) {
+      //      i += Mathf.Abs(step);
+      //    } else {
+      //      i -= Mathf.Abs(step);
+      //    }
+      //  }
+      //}
 
-      Assert.That(Values.From(startValue).To(endValue).By(step).ToList(), Is.EquivalentTo(items));
+      //Assert.That(Values.From(startValue).To(endValue).By(step).ToList(), Is.EquivalentTo(items));
+      Assert.Fail();
     }
 
     [Test]
@@ -246,31 +246,19 @@ namespace Leap.Unity.Query.Test {
         list.AddRange(LIST_0);
       }
 
-      Assert.That(list.SequenceEqual(
+      Assert.That(list, Is.EquivalentTo(
                   LIST_0.Query().Repeat(repetitions).ToList()));
     }
 
     [Test]
-    public void RepeatForever() {
-      int count = 0;
-      foreach (var value in LIST_0.Query().Repeat()) {
-        count++;
-        if (count >= 10000) {
-          Assert.Pass();
-          return;
-        }
-      }
-    }
-
-    [Test]
     public void SelectTest() {
-      Assert.That(LIST_0.Select(i => i * 23).SequenceEqual(
+      Assert.That(LIST_0.Select(i => i * 23).ToList(), Is.EquivalentTo(
                   LIST_0.Query().Select(i => i * 23).ToList()));
     }
 
     [Test]
     public void SelectManyTest() {
-      Assert.That(LIST_0.SelectMany(i => LIST_1.Select(j => j * i)).SequenceEqual(
+      Assert.That(LIST_0.SelectMany(i => LIST_1.Select(j => j * i)).ToList(), Is.EquivalentTo(
                   LIST_0.Query().SelectMany(i => LIST_1.Query().Select(j => j * i)).ToList()));
     }
 
@@ -295,25 +283,25 @@ namespace Leap.Unity.Query.Test {
 
     [Test]
     public void SkipTest() {
-      Assert.That(LIST_0.Skip(3).SequenceEqual(
+      Assert.That(LIST_0.Skip(3).ToList(), Is.EquivalentTo(
                   LIST_0.Query().Skip(3).ToList()));
     }
 
     [Test]
     public void SkipWhileTest() {
-      Assert.That(LIST_0.SkipWhile(i => i < 4).SequenceEqual(
+      Assert.That(LIST_0.SkipWhile(i => i < 4).ToList(), Is.EquivalentTo(
                   LIST_0.Query().SkipWhile(i => i < 4).ToList()));
     }
 
     [Test]
     public void TakeTest() {
-      Assert.That(LIST_0.Take(4).SequenceEqual(
+      Assert.That(LIST_0.Take(4).ToList(), Is.EquivalentTo(
                   LIST_0.Query().Take(4).ToList()));
     }
 
     [Test]
     public void TakeWhileTest() {
-      Assert.That(LIST_0.TakeWhile(i => i < 4).SequenceEqual(
+      Assert.That(LIST_0.TakeWhile(i => i < 4).ToList(), Is.EquivalentTo(
                   LIST_0.Query().TakeWhile(i => i < 4).ToList()));
     }
 
@@ -343,13 +331,13 @@ namespace Leap.Unity.Query.Test {
 
     [Test]
     public void WhereTest() {
-      Assert.That(LIST_0.Where(i => i % 2 == 0).SequenceEqual(
+      Assert.That(LIST_0.Where(i => i % 2 == 0).ToList(), Is.EquivalentTo(
                   LIST_0.Query().Where(i => i % 2 == 0).ToList()));
     }
 
     [Test]
     public void ZipTest() {
-      Assert.That(LIST_0.Query().Zip(LIST_1.Query(), (a, b) => a.ToString() + b.ToString()).ToList().SequenceEqual(
+      Assert.That(LIST_0.Query().Zip(LIST_1.Query(), (a, b) => a.ToString() + b.ToString()).ToList(), Is.EquivalentTo(
                   new string[] { "16", "27", "38", "49", "510" }));
     }
 

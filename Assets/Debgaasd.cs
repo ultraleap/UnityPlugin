@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 using Leap.Unity;
-using Leap.Unity.Query2;
+using Leap.Unity.Query;
 using Leap.Unity.Query;
 
 
@@ -21,7 +21,7 @@ public class Debgaasd : MonoBehaviour {
   }
 
   private void Update() {
-    using (new ProfilerSample("Query2")) {
+    using (new ProfilerSample("Query")) {
       result.Clear();
       foreach (var item in _data.SelectMany(i => Enumerable.Repeat(i, i))) {
         result.Add(item);

@@ -92,9 +92,9 @@ namespace Leap.Unity {
     
     #region foreach Support
     
-    public IndexableEnumerator<SampleType> GetEnumerator() {
-      return new IndexableEnumerator<SampleType>(this);
-    }
+    //public IndexableEnumerator<SampleType> GetEnumerator() {
+    //  return new IndexableEnumerator<SampleType>(this);
+    //}
 
     #endregion
 
@@ -190,11 +190,6 @@ namespace Leap.Unity {
         var deltaTime = t1.From(t0);
 
         deltaSum += delta / deltaTime;
-      }
-
-      Slice<float> floats = new Slice<float>(new float[] { 0f, 1f });
-      foreach (var f in floats.Query()) {
-
       }
 
       return deltaSum / (Count - 1);

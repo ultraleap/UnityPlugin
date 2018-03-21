@@ -85,13 +85,13 @@ namespace Leap.Unity {
 
     #region foreach and Query()
 
-    public IndexableStructEnumerator<T, Slice<T>> GetEnumerator() {
-      return new IndexableStructEnumerator<T, Slice<T>>(this);
-    }
+    //public IndexableStructEnumerator<T, Slice<T>> GetEnumerator() {
+    //  return new IndexableStructEnumerator<T, Slice<T>>(this);
+    //}
 
-    public QueryWrapper<T, IndexableStructEnumerator<T, Slice<T>>> Query() {
-      return new QueryWrapper<T, IndexableStructEnumerator<T, Slice<T>>>(GetEnumerator());
-    }
+    //public QueryWrapper<T, IndexableStructEnumerator<T, Slice<T>>> Query() {
+    //  return new QueryWrapper<T, IndexableStructEnumerator<T, Slice<T>>>(GetEnumerator());
+    //}
 
     #endregion
 

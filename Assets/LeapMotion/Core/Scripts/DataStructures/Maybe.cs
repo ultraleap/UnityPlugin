@@ -158,9 +158,9 @@ namespace Leap.Unity {
       }
     }
 
-    public QueryWrapper<T, Maybe<T>.MaybeOp> Query() {
-      return new QueryWrapper<T, MaybeOp>(new MaybeOp(this));
-    }
+    //public QueryWrapper<T, Maybe<T>.MaybeOp> Query() {
+    //  return new QueryWrapper<T, MaybeOp>(new MaybeOp(this));
+    //}
 
     public override int GetHashCode() {
       return hasValue ? _t.GetHashCode() : 0;
@@ -244,35 +244,35 @@ namespace Leap.Unity {
       return Maybe<T>.None;
     }
 
-    public struct MaybeOp : IQueryOp<T> {
-      public Maybe<T> _value;
-      public bool _hasReturned;
+    //public struct MaybeOp : IQueryOp<T> {
+    //  public Maybe<T> _value;
+    //  public bool _hasReturned;
 
-      public MaybeOp(Maybe<T> value) {
-        _value = value;
-        _hasReturned = false;
-      }
+    //  public MaybeOp(Maybe<T> value) {
+    //    _value = value;
+    //    _hasReturned = false;
+    //  }
 
-      public bool TryGetNext(out T t) {
-        if (_hasReturned) {
-          t = default(T);
-          return false;
-        } else {
-          if (_value.hasValue) {
-            t = _value._t;
-            _hasReturned = true;
-            return true;
-          } else {
-            t = default(T);
-            _hasReturned = true;
-            return false;
-          }
-        }
-      }
+    //  public bool TryGetNext(out T t) {
+    //    if (_hasReturned) {
+    //      t = default(T);
+    //      return false;
+    //    } else {
+    //      if (_value.hasValue) {
+    //        t = _value._t;
+    //        _hasReturned = true;
+    //        return true;
+    //      } else {
+    //        t = default(T);
+    //        _hasReturned = true;
+    //        return false;
+    //      }
+    //    }
+    //  }
 
-      public void Reset() {
-        _hasReturned = false;
-      }
-    }
+    //  public void Reset() {
+    //    _hasReturned = false;
+    //  }
+    //}
   }
 }

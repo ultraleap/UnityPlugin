@@ -20,9 +20,9 @@ namespace Leap.Unity {
 
   public static class IIndexableExtensions {
 
-    public static IndexableEnumerator<T> GetEnumerator<T>(this IIndexable<T> indexable) {
-      return new IndexableEnumerator<T>(indexable);
-    }
+    //public static IndexableEnumerator<T> GetEnumerator<T>(this IIndexable<T> indexable) {
+    //  return new IndexableEnumerator<T>(indexable);
+    //}
 
     /// <summary>
     /// Returns a QueryWrapper suitable for Query operations around this IIndexable.
@@ -34,50 +34,50 @@ namespace Leap.Unity {
     /// which provides easy access to pooling methods to avoid allocation while still
     /// allowing a struct to be wrapped as an IIndexable.
     /// </summary>
-    public static QueryWrapper<T, IndexableEnumerator<T>>
-                    Query<T>(this IIndexable<T> indexable) {
-      return new QueryWrapper<T, IndexableEnumerator<T>>(GetEnumerator(indexable));
-    }
+    //public static QueryWrapper<T, IndexableEnumerator<T>>
+    //                Query<T>(this IIndexable<T> indexable) {
+    //  return new QueryWrapper<T, IndexableEnumerator<T>>(GetEnumerator(indexable));
+    //}
 
   }
 
-  public struct IndexableEnumerator<Element> : IQueryOp<Element> {
+  //public struct IndexableEnumerator<Element> : IQueryOp<Element> {
 
-    IIndexable<Element> indexable;
-    int index;
+  //  IIndexable<Element> indexable;
+  //  int index;
 
-    public IndexableEnumerator(IIndexable<Element> indexable) {
-      this.indexable = indexable;
-      index = -1;
-    }
+  //  public IndexableEnumerator(IIndexable<Element> indexable) {
+  //    this.indexable = indexable;
+  //    index = -1;
+  //  }
 
-    public IndexableEnumerator<Element> GetEnumerator() {
-      return this;
-    }
+  //  public IndexableEnumerator<Element> GetEnumerator() {
+  //    return this;
+  //  }
 
-    public bool MoveNext() {
-      if (indexable == null) return false;
-      index++; return index < indexable.Count;
-    }
+  //  public bool MoveNext() {
+  //    if (indexable == null) return false;
+  //    index++; return index < indexable.Count;
+  //  }
 
-    public bool TryGetNext(out Element t) {
-      var hasNext = MoveNext();
-      if (!hasNext) {
-        t = default(Element);
-        return false;
-      }
-      else {
-        t = Current;
-        return true;
-      }
-    }
+  //  public bool TryGetNext(out Element t) {
+  //    var hasNext = MoveNext();
+  //    if (!hasNext) {
+  //      t = default(Element);
+  //      return false;
+  //    }
+  //    else {
+  //      t = Current;
+  //      return true;
+  //    }
+  //  }
 
-    public void Reset() {
-      index = -1;
-    }
+  //  public void Reset() {
+  //    index = -1;
+  //  }
 
-    public Element Current { get { return indexable[index]; } }
+  //  public Element Current { get { return indexable[index]; } }
 
-  }
+  //}
 
 }
