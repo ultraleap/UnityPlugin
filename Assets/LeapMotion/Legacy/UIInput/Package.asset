@@ -14,7 +14,7 @@ MonoBehaviour:
   _definitionName: UIInput
   _showInBuildMenu: 1
   _dependantFolders:
-  - Assets\LeapMotion\Legacy Modules\UIInput
+  - Assets\LeapMotion\Legacy\UIInput
   _ignoredFolders: []
   _dependantFiles: []
   _ignoredFiles: []
