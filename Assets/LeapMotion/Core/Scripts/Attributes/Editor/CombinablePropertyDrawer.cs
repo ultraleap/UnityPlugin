@@ -23,12 +23,12 @@ namespace Leap.Unity.Attributes {
 
     private List<CombinablePropertyAttribute> attributes = new List<CombinablePropertyAttribute>();
     private void getAttributes(SerializedProperty property) {
-      GetAttributes(property, fieldInfo, ref attributes);
+      GetAttributes(property, fieldInfo, out attributes);
     }
 
     public static void GetAttributes(SerializedProperty property,
                                      FieldInfo fieldInfo,
-                                     ref List<CombinablePropertyAttribute> outAttributes) {
+                                     out List<CombinablePropertyAttribute> outAttributes) {
       if (!_cachedAttributes.TryGetValue(fieldInfo, out outAttributes)) {
         outAttributes = new List<CombinablePropertyAttribute>();
 
