@@ -16,8 +16,16 @@ namespace Leap.Unity {
       }
     }
 
-    public static T[] Spawn(int minCount) {
-      int count = Mathf.NextPowerOfTwo(minCount);
+    /// <summary>
+    /// Spawns an array from the ArrayPool given the minimum length.
+    /// The actual length of the array may be larger than what is
+    /// requested.
+    /// 
+    /// Arrays can be returned to the array pool with the Recycle
+    /// method.
+    /// </summary>
+    public static T[] Spawn(int minLength) {
+      int count = Mathf.NextPowerOfTwo(minLength);
       var bin = _bins[count];
 
       if (bin.Count > 0) {
@@ -27,6 +35,10 @@ namespace Leap.Unity {
       }
     }
 
+    /// <summary>
+    /// Recycles an array into the ArrayPool.  The array does not
+    /// need to be an array that was created with Spawn.
+    /// </summary>
     public static void Recycle(T[] array) {
       Array.Clear(array, 0, array.Length);
       int binKey = Mathf.NextPowerOfTwo(array.Length + 1) / 2;
