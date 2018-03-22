@@ -39,10 +39,11 @@ namespace Leap.Unity.Interaction.Tests {
       yield return wait(beginningTestWait);
 
       InitTest(PRESS_BUTTON_RIG, DEFAULT_STAGE);
+      recording.Stop(); // Don't play the recording until we're ready!
 
       // Wait before starting the test.
       yield return wait(aWhile);
-      
+
       // Play the button-pressing animation.
       recording.Play();
 
