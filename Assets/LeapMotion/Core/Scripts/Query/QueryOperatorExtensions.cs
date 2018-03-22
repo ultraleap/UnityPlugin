@@ -282,7 +282,6 @@ namespace Leap.Unity.Query {
       int count;
       query.Deconstruct(out array, out count);
 
-      //TODO: write unit tests for all operations to make sure excess array is cleared
       int resultCount = Mathf.Max(count - toSkip, 0);
       Array.Copy(array, toSkip, array, 0, resultCount);
       Array.Clear(array, resultCount, array.Length - resultCount);
