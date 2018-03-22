@@ -49,7 +49,7 @@ namespace Leap.Unity {
     }
 
     /// <summary>
-    /// System.Array.Reverse is actually suprisingly complex / slow.  This
+    /// System.Array.Reverse is actually surprisingly complex / slow.  This
     /// is a basic generic implementation of the reverse algorithm.
     /// </summary>
     public static void Reverse<T>(this T[] array) {
@@ -62,7 +62,7 @@ namespace Leap.Unity {
     }
 
     /// <summary>
-    /// System.Array.Reverse is actually suprisingly complex / slow.  This
+    /// System.Array.Reverse is actually surprisingly complex / slow.  This
     /// is a basic generic implementation of the reverse algorithm.
     /// </summary>
     public static void Reverse<T>(this T[] array, int start, int length) {
@@ -239,7 +239,7 @@ namespace Leap.Unity {
     }
 
     /// <summary>
-    /// Trims a specific number of characters off of the begining of
+    /// Trims a specific number of characters off of the beginning of
     /// the provided string.  When the number of trimmed characters is
     /// equal to or greater than the length of the string, the empty
     /// string is always returned.
