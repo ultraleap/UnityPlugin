@@ -58,9 +58,14 @@ namespace Leap.Unity.GraphicalRenderer {
         }
       }
 
-      mesh = new Mesh();
+      if (mesh == null) {
+        mesh = new Mesh();
+      }
+
       mesh.name = "Panel Mesh";
       mesh.hideFlags = HideFlags.HideAndDontSave;
+
+      mesh.Clear(keepVertexLayout: false);
       mesh.SetVertices(verts);
       mesh.SetTriangles(tris, 0);
       mesh.SetUVs(uvChannel.Index(), uvs);
