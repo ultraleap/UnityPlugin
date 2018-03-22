@@ -13,7 +13,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using NUnit.Framework;
 
-namespace Leap.Unity.Query.Test {
+namespace Leap.Unity.Tests {
+  using Query;
 
   public class QueryTests {
     public int[] LIST_0 = { 1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 9, 1, 900, int.MinValue, int.MaxValue };

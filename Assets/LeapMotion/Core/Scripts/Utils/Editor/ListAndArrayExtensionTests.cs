@@ -11,7 +11,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using NUnit.Framework;
 
-namespace Leap.Unity.Query.Test {
+namespace Leap.Unity.Tests {
 
   public class ListAndArrayExtensionTests {
 
