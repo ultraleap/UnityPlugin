@@ -227,7 +227,7 @@ namespace Leap.Unity.Interaction {
     }
 
     void Awake() {
-#if UNITY_EDITOR
+      #if UNITY_EDITOR
       if (InteractionPreferences.shouldPrompForGravity && Application.isPlaying) {
         float magnitude = Physics.gravity.y;
         if (Mathf.Abs(magnitude) > InteractionPreferences.MAX_GRAVITY_MAGNITUDE) {
@@ -261,7 +261,7 @@ namespace Leap.Unity.Interaction {
           return;
         }
       }
-#endif
+      #endif
 
       refreshInteractionControllers();
 
@@ -277,7 +277,7 @@ namespace Leap.Unity.Interaction {
       _prevPosition = this.transform.position;
       _prevRotation = this.transform.rotation;
 
-#if UNITY_EDITOR
+      #if UNITY_EDITOR
       if (_drawControllerRuntimeGizmos == true) {
         if (FindObjectOfType<RuntimeGizmoManager>() == null) {
           Debug.LogWarning("'_drawControllerRuntimeGizmos' is enabled, but there is no "
@@ -285,13 +285,13 @@ namespace Leap.Unity.Interaction {
                          + "like to render gizmos in the editor and in your headset.");
         }
       }
-#endif
+      #endif
     }
 
     void OnDisable() {
-#if UNITY_EDITOR
+      #if UNITY_EDITOR
       if (!Application.isPlaying) return;
-#endif
+      #endif
 
       foreach (var intController in _interactionControllers) {
         // Disables the colliders in the interaction controller;
@@ -305,9 +305,9 @@ namespace Leap.Unity.Interaction {
     }
 
     void Update() {
-#if UNITY_EDITOR
+      #if UNITY_EDITOR
       refreshInteractionControllers();
-#endif
+      #endif
     }
 
     void FixedUpdate() {
@@ -315,7 +315,7 @@ namespace Leap.Unity.Interaction {
 
       // Physics should only be synced once at the beginning of the physics simulation.
       // (Will be re-set to its original value at the end of the update.)
-      #if UNITY_2017_1_OR_NEWER
+      #if UNITY_2017_2_OR_NEWER
       var preUpdateAutoSyncTransforms = Physics.autoSyncTransforms;
       Physics.autoSyncTransforms = false;
       #endif
@@ -323,9 +323,9 @@ namespace Leap.Unity.Interaction {
 
         refreshInteractionControllers();
 
-#if UNITY_EDITOR
+        #if UNITY_EDITOR
         if (!Application.isPlaying) return;
-#endif
+        #endif
 
         using (new ProfilerSample("Interaction Manager FixedUpdate", this.gameObject)) {
           // Ensure scale information is up-to-date.
@@ -344,6 +344,9 @@ namespace Leap.Unity.Interaction {
           // Apply soft contacts from all controllers in a unified solve.
           // (This will clear softContacts and originalVelocities as well.)
           using (new ProfilerSample("Apply Soft Contacts")) {
+            if (_drawControllerRuntimeGizmos) {
+              _softContactsToDraw = new List<PhysicsUtility.SoftContact>(_softContacts);
+            }
             if (_softContacts.Count > 0) {
               PhysicsUtility.applySoftContacts(_softContacts, _softContactOriginalVelocities);
             }
@@ -360,7 +363,7 @@ namespace Leap.Unity.Interaction {
 
       }
       finally {
-        #if UNITY_2017_1_OR_NEWER
+        #if UNITY_2017_2_OR_NEWER
         // Restore the autoSyncTransforms setting to whatever the user had it as before
         // the Manager FixedUpdate.
         Physics.autoSyncTransforms = preUpdateAutoSyncTransforms;
@@ -376,96 +379,96 @@ namespace Leap.Unity.Interaction {
 
     #region Controller Interaction State & Callbacks Update
 
-        private HashSet<InteractionController> _activeControllersBuffer = new HashSet<InteractionController>();
-        private HashSet<InteractionController> _hoverControllersBuffer = new HashSet<InteractionController>();
-        private HashSet<InteractionController> _contactControllersBuffer = new HashSet<InteractionController>();
-        private HashSet<InteractionController> _graspingControllersBuffer = new HashSet<InteractionController>();
+    private HashSet<InteractionController> _activeControllersBuffer = new HashSet<InteractionController>();
+    private HashSet<InteractionController> _hoverControllersBuffer = new HashSet<InteractionController>();
+    private HashSet<InteractionController> _contactControllersBuffer = new HashSet<InteractionController>();
+    private HashSet<InteractionController> _graspingControllersBuffer = new HashSet<InteractionController>();
 
-        private void fixedUpdateInteractionControllers() {
+    private void fixedUpdateInteractionControllers() {
 
-          _hoverControllersBuffer.Clear();
-          _contactControllersBuffer.Clear();
-          _graspingControllersBuffer.Clear();
-          _activeControllersBuffer.Clear();
-          foreach (var controller in interactionControllers) {
-            if (!controller.isActiveAndEnabled) continue;
+      _hoverControllersBuffer.Clear();
+      _contactControllersBuffer.Clear();
+      _graspingControllersBuffer.Clear();
+      _activeControllersBuffer.Clear();
+      foreach (var controller in interactionControllers) {
+        if (!controller.isActiveAndEnabled) continue;
 
-            _activeControllersBuffer.Add(controller);
+        _activeControllersBuffer.Add(controller);
 
-            if (controller.hoverEnabled) _hoverControllersBuffer.Add(controller);
-            if (controller.contactEnabled) _contactControllersBuffer.Add(controller);
-            if (controller.graspingEnabled) _graspingControllersBuffer.Add(controller);
-          }
+        if (controller.hoverEnabled) _hoverControllersBuffer.Add(controller);
+        if (controller.contactEnabled) _contactControllersBuffer.Add(controller);
+        if (controller.graspingEnabled) _graspingControllersBuffer.Add(controller);
+      }
 
-          using (new ProfilerSample("Fixed Update Controllers (General Update)")) {
-            // Perform general controller update, for controller collider and point
-            // representations.
-            foreach (var controller in _activeControllersBuffer) {
-              if (!controller.isActiveAndEnabled) continue;
-              (controller as IInternalInteractionController).FixedUpdateController();
-            }
-          }
+      using (new ProfilerSample("Fixed Update Controllers (General Update)")) {
+        // Perform general controller update, for controller collider and point
+        // representations.
+        foreach (var controller in _activeControllersBuffer) {
+          if (!controller.isActiveAndEnabled) continue;
+          (controller as IInternalInteractionController).FixedUpdateController();
+        }
+      }
 
-          using (new ProfilerSample("Fixed Update Controllers (Interaction State and Callbacks)")) {
+      using (new ProfilerSample("Fixed Update Controllers (Interaction State and Callbacks)")) {
 
-            /*
-             * Interactions are checked here in a very specific manner so that interaction
-             * callbacks always occur in a strict order and interaction object state is
-             * always updated directly before the relevant callbacks occur.
-             *
-             * Interaction callbacks will only occur outside this order if a script
-             * manually forces interaction state-changes; for example, calling
-             * interactionController.ReleaseGrasp() will immediately call
-             * interactionObject.OnPerControllerGraspEnd() on the formerly grasped object.
-             *
-             * Callback order:
-             * - Suspension (when a grasped object's grasping controller loses tracking)
-             * - Just-Ended Interactions (Grasps, then Contacts, then Hovers)
-             * - Just-Begun Interactions (Hovers, then Contacts, then Grasps)
-             * - Sustained Interactions (Hovers, then Contacts, then Grasps)
-             */
+        /*
+          * Interactions are checked here in a very specific manner so that interaction
+          * callbacks always occur in a strict order and interaction object state is
+          * always updated directly before the relevant callbacks occur.
+          *
+          * Interaction callbacks will only occur outside this order if a script
+          * manually forces interaction state-changes; for example, calling
+          * interactionController.ReleaseGrasp() will immediately call
+          * interactionObject.OnPerControllerGraspEnd() on the formerly grasped object.
+          *
+          * Callback order:
+          * - Suspension (when a grasped object's grasping controller loses tracking)
+          * - Just-Ended Interactions (Grasps, then Contacts, then Hovers)
+          * - Just-Begun Interactions (Hovers, then Contacts, then Grasps)
+          * - Sustained Interactions (Hovers, then Contacts, then Grasps)
+          */
 
-            // Suspension //
+        // Suspension //
 
-            // Check controllers beginning object suspension.
-            foreach (var controller in _graspingControllersBuffer) {
-              IInteractionBehaviour suspendedObj;
-              if ((controller as IInternalInteractionController).CheckSuspensionBegin(out suspendedObj)) {
-                suspendedObj.BeginSuspension(controller);
-              }
-            }
-
-            // Check controllers ending object suspension.
-            foreach (var controller in _graspingControllersBuffer) {
-              IInteractionBehaviour resumedObj;
-              if ((controller as IInternalInteractionController).CheckSuspensionEnd(out resumedObj)) {
-                resumedObj.EndSuspension(controller);
-              }
-            }
-
-            // Ending Interactions //
-
-            checkEndingGrasps(_graspingControllersBuffer);
-            checkEndingContacts(_contactControllersBuffer);
-            checkEndingPrimaryHovers(_hoverControllersBuffer);
-            checkEndingHovers(_hoverControllersBuffer);
-
-            // Beginning Interactions //
-
-            checkBeginningHovers(_hoverControllersBuffer);
-            checkBeginningPrimaryHovers(_hoverControllersBuffer);
-            checkBeginningContacts(_contactControllersBuffer);
-            checkBeginningGrasps(_graspingControllersBuffer);
-
-            // Sustained Interactions //
-
-            checkSustainingHovers(_hoverControllersBuffer);
-            checkSustainingPrimaryHovers(_hoverControllersBuffer);
-            checkSustainingContacts(_contactControllersBuffer);
-            checkSustainingGrasps(_graspingControllersBuffer);
-
+        // Check controllers beginning object suspension.
+        foreach (var controller in _graspingControllersBuffer) {
+          IInteractionBehaviour suspendedObj;
+          if ((controller as IInternalInteractionController).CheckSuspensionBegin(out suspendedObj)) {
+            suspendedObj.BeginSuspension(controller);
           }
         }
+
+        // Check controllers ending object suspension.
+        foreach (var controller in _graspingControllersBuffer) {
+          IInteractionBehaviour resumedObj;
+          if ((controller as IInternalInteractionController).CheckSuspensionEnd(out resumedObj)) {
+            resumedObj.EndSuspension(controller);
+          }
+        }
+
+        // Ending Interactions //
+
+        checkEndingGrasps(_graspingControllersBuffer);
+        checkEndingContacts(_contactControllersBuffer);
+        checkEndingPrimaryHovers(_hoverControllersBuffer);
+        checkEndingHovers(_hoverControllersBuffer);
+
+        // Beginning Interactions //
+
+        checkBeginningHovers(_hoverControllersBuffer);
+        checkBeginningPrimaryHovers(_hoverControllersBuffer);
+        checkBeginningContacts(_contactControllersBuffer);
+        checkBeginningGrasps(_graspingControllersBuffer);
+
+        // Sustained Interactions //
+
+        checkSustainingHovers(_hoverControllersBuffer);
+        checkSustainingPrimaryHovers(_hoverControllersBuffer);
+        checkSustainingContacts(_contactControllersBuffer);
+        checkSustainingGrasps(_graspingControllersBuffer);
+
+      }
+    }
 
     #region State-Check Remapping Functions
 
@@ -753,114 +756,119 @@ namespace Leap.Unity.Interaction {
 
     #region Object Registration
 
-        public void RegisterInteractionBehaviour(IInteractionBehaviour interactionObj) {
-          _interactionObjects.Add(interactionObj);
-          interactionObjectBodies[interactionObj.rigidbody] = interactionObj;
-        }
+    public void RegisterInteractionBehaviour(IInteractionBehaviour interactionObj) {
+      _interactionObjects.Add(interactionObj);
+      interactionObjectBodies[interactionObj.rigidbody] = interactionObj;
+    }
 
-        /// <summary>
-        /// Returns true if the Interaction Behaviour was registered with this manager;
-        /// otherwise returns false. The manager is guaranteed not to have the Interaction
-        /// Behaviour registered after calling this method.
-        /// </summary>
-        public bool UnregisterInteractionBehaviour(IInteractionBehaviour interactionObj) {
-          bool wasRemovalSuccessful = _interactionObjects.Remove(interactionObj);
-          if (wasRemovalSuccessful) {
-            foreach (var intController in _interactionControllers) {
-              intController.ReleaseObject(interactionObj);
+    /// <summary>
+    /// Returns true if the Interaction Behaviour was registered with this manager;
+    /// otherwise returns false. The manager is guaranteed not to have the Interaction
+    /// Behaviour registered after calling this method.
+    /// </summary>
+    public bool UnregisterInteractionBehaviour(IInteractionBehaviour interactionObj) {
+      bool wasRemovalSuccessful = _interactionObjects.Remove(interactionObj);
+      if (wasRemovalSuccessful) {
+        foreach (var intController in _interactionControllers) {
+          intController.ReleaseObject(interactionObj);
 
-              intController.NotifyObjectUnregistered(interactionObj);
-            }
-            interactionObjectBodies.Remove(interactionObj.rigidbody);
-          }
-          return wasRemovalSuccessful;
+          intController.NotifyObjectUnregistered(interactionObj);
         }
+        interactionObjectBodies.Remove(interactionObj.rigidbody);
+      }
+      return wasRemovalSuccessful;
+    }
 
-        public bool IsBehaviourRegistered(IInteractionBehaviour interactionObj) {
-          return _interactionObjects.Contains(interactionObj);
-        }
+    public bool IsBehaviourRegistered(IInteractionBehaviour interactionObj) {
+      return _interactionObjects.Contains(interactionObj);
+    }
 
     #endregion
 
     #region Moving Frame of Reference Support
 
-        public bool hasMovingFrameOfReference {
-          get {
-            return (this.transform.position - _prevPosition).magnitude > 0.0001F
-                || Quaternion.Angle(transform.rotation * Quaternion.Inverse(_prevRotation),
-                                    Quaternion.identity) > 0.01F;
-          }
-        }
+    public bool hasMovingFrameOfReference {
+      get {
+        return (this.transform.position - _prevPosition).magnitude > 0.0001F
+            || Quaternion.Angle(transform.rotation * Quaternion.Inverse(_prevRotation),
+                                Quaternion.identity) > 0.01F;
+      }
+    }
 
-        // Support for a moving frame of reference.
-        private Vector3 _prevPosition = Vector3.zero;
-        private Quaternion _prevRotation = Quaternion.identity;
+    // Support for a moving frame of reference.
+    private Vector3 _prevPosition = Vector3.zero;
+    private Quaternion _prevRotation = Quaternion.identity;
 
-        private void updateMovingFrameOfReferenceSupport() {
-          _prevPosition = this.transform.position;
-          _prevRotation = this.transform.rotation;
-        }
+    private void updateMovingFrameOfReferenceSupport() {
+      _prevPosition = this.transform.position;
+      _prevRotation = this.transform.rotation;
+    }
 
-        /// <summary>
-        /// Transforms a position and rotation ahead by one FixedUpdate based on the prior
-        /// motion of the InteractionManager.
-        ///
-        /// This method is used to support having the player in a moving frame of reference.
-        /// </summary>
-        public void TransformAheadByFixedUpdate(Vector3 position, Quaternion rotation, out Vector3 newPosition, out Quaternion newRotation) {
-          Vector3 worldDisplacement = this.transform.position - _prevPosition;
-          Quaternion worldRotation = this.transform.rotation * Quaternion.Inverse(_prevRotation);
-          newPosition = ((worldRotation * (position - this.transform.position + worldDisplacement))) + this.transform.position;
-          newRotation = worldRotation * rotation;
-        }
+    /// <summary>
+    /// Transforms a position and rotation ahead by one FixedUpdate based on the prior
+    /// motion of the InteractionManager.
+    ///
+    /// This method is used to support having the player in a moving frame of reference.
+    /// </summary>
+    public void TransformAheadByFixedUpdate(Vector3 position, Quaternion rotation, out Vector3 newPosition, out Quaternion newRotation) {
+      Vector3 worldDisplacement = this.transform.position - _prevPosition;
+      Quaternion worldRotation = this.transform.rotation * Quaternion.Inverse(_prevRotation);
+      newPosition = ((worldRotation * (position - this.transform.position + worldDisplacement))) + this.transform.position;
+      newRotation = worldRotation * rotation;
+    }
 
-        /// <summary>
-        /// Transforms a position ahead by one FixedUpdate based on the prior motion (position
-        /// AND rotation) of the InteractionManager.
-        ///
-        /// This method is used to support having the player in a moving frame of reference.
-        /// </summary>
-        public void TransformAheadByFixedUpdate(Vector3 position, out Vector3 newPosition) {
-          Vector3 worldDisplacement = this.transform.position - _prevPosition;
-          Quaternion worldRotation = this.transform.rotation * Quaternion.Inverse(_prevRotation);
-          newPosition = ((worldRotation * (position - this.transform.position + worldDisplacement))) + this.transform.position;
-        }
+    /// <summary>
+    /// Transforms a position ahead by one FixedUpdate based on the prior motion (position
+    /// AND rotation) of the InteractionManager.
+    ///
+    /// This method is used to support having the player in a moving frame of reference.
+    /// </summary>
+    public void TransformAheadByFixedUpdate(Vector3 position, out Vector3 newPosition) {
+      Vector3 worldDisplacement = this.transform.position - _prevPosition;
+      Quaternion worldRotation = this.transform.rotation * Quaternion.Inverse(_prevRotation);
+      newPosition = ((worldRotation * (position - this.transform.position + worldDisplacement))) + this.transform.position;
+    }
 
     #endregion
 
     #region Soft Contact Support
 
-        /// <summary>
-        /// Stores data for implementing Soft Contact for interaction controllers.
-        /// </summary>
-        [NonSerialized]
-        public List<PhysicsUtility.SoftContact> _softContacts = new List<PhysicsUtility.SoftContact>(80);
+    /// <summary>
+    /// Stores data for implementing Soft Contact for interaction controllers.
+    /// </summary>
+    [NonSerialized]
+    public List<PhysicsUtility.SoftContact> _softContacts = new List<PhysicsUtility.SoftContact>(80);
 
-        /// <summary>
-        /// Stores data for implementing Soft Contact for interaction controllers.
-        /// </summary>
-        [NonSerialized]
-        public Dictionary<Rigidbody, PhysicsUtility.Velocities> _softContactOriginalVelocities = new Dictionary<Rigidbody, PhysicsUtility.Velocities>(5);
+    /// <summary>
+    /// Stores data for implementing Soft Contact for interaction controllers.
+    /// </summary>
+    [NonSerialized]
+    public Dictionary<Rigidbody, PhysicsUtility.Velocities> _softContactOriginalVelocities = new Dictionary<Rigidbody, PhysicsUtility.Velocities>(5);
+
+    /// <summary>
+    /// Stores data for drawing Soft Contacts for interaction controllers.
+    /// </summary>
+    private List<PhysicsUtility.SoftContact> _softContactsToDraw;
 
     #endregion
 
     #region Interaction Controllers
 
-        private void refreshInteractionControllers() {
-          _interactionControllers.Clear();
+    private void refreshInteractionControllers() {
+      _interactionControllers.Clear();
 
-          var tempControllers = Pool<List<InteractionController>>.Spawn();
-          try {
-            this.transform.GetComponentsInChildren<InteractionController>(false, tempControllers);
-            foreach (var controller in tempControllers) {
-              _interactionControllers.Add(controller);
-            }
-          }
-          finally {
-            tempControllers.Clear();
-            Pool<List<InteractionController>>.Recycle(tempControllers);
-          }
+      var tempControllers = Pool<List<InteractionController>>.Spawn();
+      try {
+        this.transform.GetComponentsInChildren<InteractionController>(false, tempControllers);
+        foreach (var controller in tempControllers) {
+          _interactionControllers.Add(controller);
         }
+      }
+      finally {
+        tempControllers.Clear();
+        Pool<List<InteractionController>>.Recycle(tempControllers);
+      }
+    }
 
     #endregion
 
@@ -868,168 +876,168 @@ namespace Leap.Unity.Interaction {
 
     #region Automatic Layers
 
-        protected void generateAutomaticLayers() {
-          _interactionLayer = -1;
-          _interactionNoContactLayer = -1;
-          _contactBoneLayer = -1;
-          for (int i = 8; i < 32; i++) {
-            string layerName = LayerMask.LayerToName(i);
-            if (string.IsNullOrEmpty(layerName)) {
-              if (_interactionLayer == -1) {
-                _interactionLayer = i;
-              }
-              else if (_interactionNoContactLayer == -1) {
-                _interactionNoContactLayer = i;
-              }
-              else if (_contactBoneLayer == -1) {
-                _contactBoneLayer = i;
-                break;
-              }
-            }
+    protected void generateAutomaticLayers() {
+      _interactionLayer = -1;
+      _interactionNoContactLayer = -1;
+      _contactBoneLayer = -1;
+      for (int i = 8; i < 32; i++) {
+        string layerName = LayerMask.LayerToName(i);
+        if (string.IsNullOrEmpty(layerName)) {
+          if (_interactionLayer == -1) {
+            _interactionLayer = i;
           }
-
-          if (_interactionLayer == -1 || _interactionNoContactLayer == -1 || _contactBoneLayer == -1) {
-            if (Application.isPlaying) {
-              enabled = false;
-            }
-            Debug.LogError("InteractionManager Could not find enough free layers for "
-                         + "auto-setup; manual setup is required.", this.gameObject);
-            _autoGenerateLayers = false;
-            return;
+          else if (_interactionNoContactLayer == -1) {
+            _interactionNoContactLayer = i;
+          }
+          else if (_contactBoneLayer == -1) {
+            _contactBoneLayer = i;
+            break;
           }
         }
+      }
 
-        private void setupAutomaticCollisionLayers() {
-          for (int i = 0; i < 32; i++) {
-            // Copy ignore settings from template layer
-            bool shouldIgnore = Physics.GetIgnoreLayerCollision(_templateLayer, i);
-            Physics.IgnoreLayerCollision(_interactionLayer, i, shouldIgnore);
-            Physics.IgnoreLayerCollision(_interactionNoContactLayer, i, shouldIgnore);
-
-            // Contact bones, generally, shouldn't collide with anything except interaction
-            // layers.
-            Physics.IgnoreLayerCollision(_contactBoneLayer, i, true);
-          }
-
-          // Enable interactions between the contact bones and the interaction layer.
-          Physics.IgnoreLayerCollision(_contactBoneLayer, _interactionLayer, false);
-
-          // Disable interactions between the contact bones and the no-contact layer.
-          Physics.IgnoreLayerCollision(_contactBoneLayer, _interactionNoContactLayer, true);
+      if (_interactionLayer == -1 || _interactionNoContactLayer == -1 || _contactBoneLayer == -1) {
+        if (Application.isPlaying) {
+          enabled = false;
         }
+        Debug.LogError("InteractionManager Could not find enough free layers for "
+                      + "auto-setup; manual setup is required.", this.gameObject);
+        _autoGenerateLayers = false;
+        return;
+      }
+    }
+
+    private void setupAutomaticCollisionLayers() {
+      for (int i = 0; i < 32; i++) {
+        // Copy ignore settings from template layer
+        bool shouldIgnore = Physics.GetIgnoreLayerCollision(_templateLayer, i);
+        Physics.IgnoreLayerCollision(_interactionLayer, i, shouldIgnore);
+        Physics.IgnoreLayerCollision(_interactionNoContactLayer, i, shouldIgnore);
+
+        // Contact bones, generally, shouldn't collide with anything except interaction
+        // layers.
+        Physics.IgnoreLayerCollision(_contactBoneLayer, i, true);
+      }
+
+      // Enable interactions between the contact bones and the interaction layer.
+      Physics.IgnoreLayerCollision(_contactBoneLayer, _interactionLayer, false);
+
+      // Disable interactions between the contact bones and the no-contact layer.
+      Physics.IgnoreLayerCollision(_contactBoneLayer, _interactionNoContactLayer, true);
+    }
 
     #endregion
 
     #region Interaction Object Layer Tracking
 
-        private Dictionary<SingleLayer, HashSet<IInteractionBehaviour>> _intObjInteractionLayers = new Dictionary<SingleLayer, HashSet<IInteractionBehaviour>>();
-        private Dictionary<SingleLayer, HashSet<IInteractionBehaviour>> _intObjNoContactLayers   = new Dictionary<SingleLayer, HashSet<IInteractionBehaviour>>();
+    private Dictionary<SingleLayer, HashSet<IInteractionBehaviour>> _intObjInteractionLayers = new Dictionary<SingleLayer, HashSet<IInteractionBehaviour>>();
+    private Dictionary<SingleLayer, HashSet<IInteractionBehaviour>> _intObjNoContactLayers   = new Dictionary<SingleLayer, HashSet<IInteractionBehaviour>>();
 
-        private int _interactionLayerMask = 0;
-        /// <summary>
-        /// Returns a layer mask containing all layers that might contain interaction objects.
-        /// </summary>
-        public int GetInteractionLayerMask() {
-          return _interactionLayerMask;
+    private int _interactionLayerMask = 0;
+    /// <summary>
+    /// Returns a layer mask containing all layers that might contain interaction objects.
+    /// </summary>
+    public int GetInteractionLayerMask() {
+      return _interactionLayerMask;
+    }
+
+    private void refreshInteractionLayerMask() {
+      _interactionLayerMask = 0;
+
+      // Accumulate single-layer layer masks into the combined interaction layer mask.
+      foreach (var layerObjSetPair in _intObjInteractionLayers) {
+        // Skip any layers that may no longer have interaction objects.
+        if (layerObjSetPair.Value.Count == 0) continue;
+
+        _interactionLayerMask = layerObjSetPair.Key.layerMask | _interactionLayerMask;
+      }
+      foreach (var layerObjSetPair in _intObjNoContactLayers) {
+        // Skip any layers that may no longer have interaction objects.
+        if (layerObjSetPair.Value.Count == 0) continue;
+
+        _interactionLayerMask = layerObjSetPair.Key.layerMask | _interactionLayerMask;
+      }
+    }
+
+    private bool[] _contactBoneIgnoreCollisionLayers = new bool[32];
+    /// <summary>
+    /// Updates the contact bone layer to collide against any layers that may contain
+    /// interaction objects and ignore any layers that don't.
+    ///
+    /// (Obviously, this ignores NoContact layers.)
+    /// </summary>
+    private void autoUpdateContactBoneLayerCollision() {
+      // Make sure we ignore all layers by default!
+      for (int i = 0; i < 32; i++) {
+        _contactBoneIgnoreCollisionLayers[i] = true;
+      }
+
+      // Ignore everything except those layers that we know are at least one
+      // interaction object's interaction layer.
+      foreach (var layerObjSetPair in _intObjInteractionLayers) {
+        bool ignoreLayerCollision;
+
+        if (layerObjSetPair.Value.Count == 0) {
+          ignoreLayerCollision = true;
+        }
+        else {
+          ignoreLayerCollision = false;
         }
 
-        private void refreshInteractionLayerMask() {
-          _interactionLayerMask = 0;
-
-          // Accumulate single-layer layer masks into the combined interaction layer mask.
-          foreach (var layerObjSetPair in _intObjInteractionLayers) {
-            // Skip any layers that may no longer have interaction objects.
-            if (layerObjSetPair.Value.Count == 0) continue;
-
-            _interactionLayerMask = layerObjSetPair.Key.layerMask | _interactionLayerMask;
-          }
-          foreach (var layerObjSetPair in _intObjNoContactLayers) {
-            // Skip any layers that may no longer have interaction objects.
-            if (layerObjSetPair.Value.Count == 0) continue;
-
-            _interactionLayerMask = layerObjSetPair.Key.layerMask | _interactionLayerMask;
-          }
+        if (layerObjSetPair.Key.layerIndex < _contactBoneIgnoreCollisionLayers.Length) {
+          _contactBoneIgnoreCollisionLayers[layerObjSetPair.Key.layerIndex] = ignoreLayerCollision;
         }
+      }
 
-        private bool[] _contactBoneIgnoreCollisionLayers = new bool[32];
-        /// <summary>
-        /// Updates the contact bone layer to collide against any layers that may contain
-        /// interaction objects and ignore any layers that don't.
-        ///
-        /// (Obviously, this ignores NoContact layers.)
-        /// </summary>
-        private void autoUpdateContactBoneLayerCollision() {
-          // Make sure we ignore all layers by default!
-          for (int i = 0; i < 32; i++) {
-            _contactBoneIgnoreCollisionLayers[i] = true;
-          }
+      for (int i = 0; i < 32; i++) {
+        Physics.IgnoreLayerCollision(contactBoneLayer.layerIndex, i,
+                                      _contactBoneIgnoreCollisionLayers[i]);
+      }
+    }
 
-          // Ignore everything except those layers that we know are at least one
-          // interaction object's interaction layer.
-          foreach (var layerObjSetPair in _intObjInteractionLayers) {
-            bool ignoreLayerCollision;
+    void IInternalInteractionManager.RefreshLayersNow() {
+      refreshInteractionLayerMask();
+    }
 
-            if (layerObjSetPair.Value.Count == 0) {
-              ignoreLayerCollision = true;
-            }
-            else {
-              ignoreLayerCollision = false;
-            }
+    void IInternalInteractionManager.NotifyIntObjAddedInteractionLayer(IInteractionBehaviour intObj, int layer, bool refreshImmediately) {
+      if (!_intObjInteractionLayers.ContainsKey(layer)) {
+        _intObjInteractionLayers[layer] = new HashSet<IInteractionBehaviour>();
+      }
 
-            if (layerObjSetPair.Key.layerIndex < _contactBoneIgnoreCollisionLayers.Length) {
-              _contactBoneIgnoreCollisionLayers[layerObjSetPair.Key.layerIndex] = ignoreLayerCollision;
-            }
-          }
+      _intObjInteractionLayers[layer].Add(intObj);
 
-          for (int i = 0; i < 32; i++) {
-            Physics.IgnoreLayerCollision(contactBoneLayer.layerIndex, i,
-                                         _contactBoneIgnoreCollisionLayers[i]);
-          }
-        }
+      if (refreshImmediately) {
+        refreshInteractionLayerMask();
+      }
+    }
 
-        void IInternalInteractionManager.RefreshLayersNow() {
-          refreshInteractionLayerMask();
-        }
+    void IInternalInteractionManager.NotifyIntObjRemovedInteractionLayer(IInteractionBehaviour intObj, int layer, bool refreshImmediately) {
+      _intObjInteractionLayers[layer].Remove(intObj);
 
-        void IInternalInteractionManager.NotifyIntObjAddedInteractionLayer(IInteractionBehaviour intObj, int layer, bool refreshImmediately) {
-          if (!_intObjInteractionLayers.ContainsKey(layer)) {
-            _intObjInteractionLayers[layer] = new HashSet<IInteractionBehaviour>();
-          }
+      if (refreshImmediately) {
+        refreshInteractionLayerMask();
+      }
+    }
 
-          _intObjInteractionLayers[layer].Add(intObj);
+    void IInternalInteractionManager.NotifyIntObjAddedNoContactLayer(IInteractionBehaviour intObj, int layer, bool refreshImmediately) {
+      if (!_intObjNoContactLayers.ContainsKey(layer)) {
+        _intObjNoContactLayers[layer] = new HashSet<IInteractionBehaviour>();
+      }
 
-          if (refreshImmediately) {
-            refreshInteractionLayerMask();
-          }
-        }
+      _intObjNoContactLayers[layer].Add(intObj);
 
-        void IInternalInteractionManager.NotifyIntObjRemovedInteractionLayer(IInteractionBehaviour intObj, int layer, bool refreshImmediately) {
-          _intObjInteractionLayers[layer].Remove(intObj);
+      if (refreshImmediately) {
+        refreshInteractionLayerMask();
+      }
+    }
 
-          if (refreshImmediately) {
-            refreshInteractionLayerMask();
-          }
-        }
+    void IInternalInteractionManager.NotifyIntObjRemovedNoContactLayer(IInteractionBehaviour intObj, int layer, bool refreshImmediately) {
+      _intObjNoContactLayers[layer].Remove(intObj);
 
-        void IInternalInteractionManager.NotifyIntObjAddedNoContactLayer(IInteractionBehaviour intObj, int layer, bool refreshImmediately) {
-          if (!_intObjNoContactLayers.ContainsKey(layer)) {
-            _intObjNoContactLayers[layer] = new HashSet<IInteractionBehaviour>();
-          }
-
-          _intObjNoContactLayers[layer].Add(intObj);
-
-          if (refreshImmediately) {
-            refreshInteractionLayerMask();
-          }
-        }
-
-        void IInternalInteractionManager.NotifyIntObjRemovedNoContactLayer(IInteractionBehaviour intObj, int layer, bool refreshImmediately) {
-          _intObjNoContactLayers[layer].Remove(intObj);
-
-          if (refreshImmediately) {
-            refreshInteractionLayerMask();
-          }
-        }
+      if (refreshImmediately) {
+        refreshInteractionLayerMask();
+      }
+    }
 
     #endregion
 
@@ -1037,15 +1045,20 @@ namespace Leap.Unity.Interaction {
 
     #region Runtime Gizmos
 
-        public void OnDrawRuntimeGizmos(RuntimeGizmoDrawer drawer) {
-          if (_drawControllerRuntimeGizmos) {
-            foreach (var controller in _interactionControllers) {
-              if (controller != null) {
-                controller.OnDrawRuntimeGizmos(drawer);
-              }
-            }
+    public void OnDrawRuntimeGizmos(RuntimeGizmoDrawer drawer) {
+      if (_drawControllerRuntimeGizmos) {
+        foreach (var controller in _interactionControllers) {
+          if (controller != null) {
+            controller.OnDrawRuntimeGizmos(drawer);
           }
         }
+        
+        foreach (PhysicsUtility.SoftContact contact in _softContactsToDraw) {
+          drawer.DrawSphere(contact.position, 0.01f);
+          drawer.DrawLine(contact.position, contact.position + (contact.normal * 0.02f));
+        }
+      }
+    }
 
     #endregion
 

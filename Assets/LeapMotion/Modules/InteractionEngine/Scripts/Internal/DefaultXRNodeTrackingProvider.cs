@@ -12,10 +12,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-#if UNITY_5
-using UnityEngine.VR;
-#else
+#if UNITY_2017_2_OR_NEWER
 using UnityEngine.XR;
+#else
+using UnityEngine.VR;
 #endif
 
 namespace Leap.Unity.Interaction {
@@ -32,15 +32,15 @@ namespace Leap.Unity.Interaction {
     public bool isTracked { get { return _isTrackingController; } }
 
     private bool _isXRNodeSet = false;
-    #if UNITY_5
-    private VRNode _backingXRNode;
-    public VRNode xrNode {
+    #if UNITY_2017_2_OR_NEWER
+    private XRNode _backingXRNode;
+    public XRNode xrNode {
       get { return _backingXRNode; }
       set { _backingXRNode = value; _isXRNodeSet = true; }
     }
     #else
-    private XRNode _backingXRNode;
-    public XRNode xrNode {
+    private VRNode _backingXRNode;
+    public VRNode xrNode {
       get { return _backingXRNode; }
       set { _backingXRNode = value; _isXRNodeSet = true; }
     }

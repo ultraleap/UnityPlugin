@@ -9,10 +9,10 @@
 
 using Leap.Unity.Attributes;
 
-#if UNITY_5
-using UnityEngine.VR;
-#else
+#if UNITY_2017_2_OR_NEWER
 using UnityEngine.XR;
+#else
+using UnityEngine.VR;
 #endif
 
 using System;
@@ -282,20 +282,21 @@ namespace Leap.Unity.Interaction {
     /// for this controller is specified as ControllerTrackingMode.Custom, this value
     /// may be ignored.
     /// </summary>
-#if UNITY_5
-    public VRNode xrNode {
-      get { return chirality == Chirality.Left ? VRNode.LeftHand : VRNode.RightHand; }
-    }
-#else
+    /// 
+#if UNITY_2017_2_OR_NEWER
     public XRNode xrNode {
       get { return chirality == Chirality.Left ? XRNode.LeftHand : XRNode.RightHand; }
     }
+#else
+    public VRNode xrNode {
+      get { return chirality == Chirality.Left ? VRNode.LeftHand : VRNode.RightHand; }
+    }
 #endif
 
-    /// <summary>
-    /// Gets whether the controller is a left-hand controller.
-    /// </summary>
-    public override bool isLeft {
+  /// <summary>
+  /// Gets whether the controller is a left-hand controller.
+  /// </summary>
+  public override bool isLeft {
       get { return chirality == Chirality.Left; }
     }
 

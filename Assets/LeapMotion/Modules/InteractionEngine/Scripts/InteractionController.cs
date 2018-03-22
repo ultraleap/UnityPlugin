@@ -1270,6 +1270,9 @@ namespace Leap.Unity.Interaction {
 
         if (_softContactCollisions.Count > 0) {
           _disableSoftContactEnqueued = false;
+          if (_delayedDisableSoftContactCoroutine != null) {
+            manager.StopCoroutine(_delayedDisableSoftContactCoroutine);
+          }
         }
         else {
           // If there are no detected Contacts, exit soft contact mode.
@@ -1289,7 +1292,7 @@ namespace Leap.Unity.Interaction {
     protected virtual void onPreEnableSoftContact() { }
 
     /// <summary>
-    /// Optioanlly override this method to perform logic just after soft contact
+    /// Optionally override this method to perform logic just after soft contact
     /// is disabled for this controller.
     ///
     /// The InteractionHand implementation takes the opportunity to reset its contact
@@ -1330,7 +1333,6 @@ namespace Leap.Unity.Interaction {
     }
 
     private IEnumerator DelayedDisableSoftContact() {
-      if (_disableSoftContactEnqueued) { yield break; }
       yield return new WaitForSecondsRealtime(0.3f);
       if (_disableSoftContactEnqueued) {
         using (new ProfilerSample("Disable Soft Contact")) {

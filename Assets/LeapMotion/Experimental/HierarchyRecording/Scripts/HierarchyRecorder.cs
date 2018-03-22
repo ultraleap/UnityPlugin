@@ -11,13 +11,10 @@ using System;
 using System.IO;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.XR;
-using UnityEngine.SceneManagement;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
 using Leap.Unity.Query;
-using Leap.Unity.GraphicalRenderer;
 
 namespace Leap.Unity.Recording {
   using Attributes;
@@ -90,7 +87,7 @@ namespace Leap.Unity.Recording {
     }
 
     protected void LateUpdate() {
-      if (XRDevice.isPresent && XRDevice.userPresence == UserPresenceState.Present && !_isRecording && (recordWhen & RecordOn.HMDPresence) != 0) {
+      if (!_isRecording && (recordWhen & RecordOn.HMDPresence) != 0 && XRSupportUtil.IsUserPresent()) {
         BeginRecording();
       }
 
