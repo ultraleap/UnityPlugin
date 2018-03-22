@@ -234,7 +234,7 @@ namespace Leap.Unity.Query {
 
     /// <summary>
     /// Returns a new Query representing the current Query where each element has been
-    /// mapped onto a new Query, and then all Qyeries are concatenated into a 
+    /// mapped onto a new Query, and then all Queries are concatenated into a 
     /// single long sequence.
     /// 
     /// For example:

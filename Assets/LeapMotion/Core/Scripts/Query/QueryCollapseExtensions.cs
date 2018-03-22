@@ -578,7 +578,7 @@ namespace Leap.Unity.Query {
     }
 
     /// <summary>
-    /// Converst the Query into a Dictionary using the query elements as keys, and using a value selector
+    /// Converts the Query into a Dictionary using the query elements as keys, and using a value selector
     /// to select the value tied to the key.
     /// </summary>
     public static Dictionary<T, V> ToDictionary<T, V>(this Query<T> query, Func<T, V> valueSelector) {

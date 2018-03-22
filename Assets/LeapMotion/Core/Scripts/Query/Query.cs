@@ -61,7 +61,7 @@ namespace Leap.Unity.Query {
 
   /// <summary>
   /// A Query object is a type of immutable ordered collection of elements that can be 
-  /// used to perform useful queries.  Thesse queries are very similar to LINQ style
+  /// used to perform useful queries.  These queries are very similar to LINQ style
   /// queries, providing useful methods such as Where, Select, Concat, etc....
   /// 
   /// The Query struct and its interfaces use a pooling strategy backed by ArrayPool
@@ -72,7 +72,7 @@ namespace Leap.Unity.Query {
   ///  - The simplest way is to call an operator method such as Where or Select.  These
   ///    methods CONSUME the query to produce a new query.  Trying to use the original
   ///    query after it has been consumed will cause a runtime error.
-  ///  - The next way os to call a collapsing operator, which will consume the query
+  ///  - The next way is to call a collapsing operator, which will consume the query
   ///    and produce a non-query value or other side-effect.  Examples of collapsing 
   ///    operators are First, Last, or ElementAt.
   ///  - The last way to use a query is to Deconstruct it, by calling a Deconstruct
@@ -86,7 +86,7 @@ namespace Leap.Unity.Query {
     private Validator _validator;
 
     /// <summary>
-    /// Consutructs a new query given a source array and a count.  The query assumes
+    /// Constructs a new query given a source array and a count.  The query assumes
     /// ownership of the array, so you should not use it or store it 
     /// after the query is constructed.
     /// </summary>
@@ -203,7 +203,7 @@ namespace Leap.Unity.Query {
     /// <summary>
     /// Deconstructs this Query into a simple QuerySlice construct.  This is
     /// simply a utility overload of the regular Deconstruct method.  The
-    /// user is stil responsible for managing the memory lifecycle of the returned
+    /// user is still responsible for managing the memory lifecycle of the returned
     /// slice.  The Query cannot be used after this method is called.
     /// </summary>
     public QuerySlice Deconstruct() {
