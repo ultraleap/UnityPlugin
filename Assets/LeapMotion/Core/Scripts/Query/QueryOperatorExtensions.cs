@@ -432,6 +432,31 @@ namespace Leap.Unity.Query {
     }
 
     /// <summary>
+    /// Returns a new Query representing all of the elements paired with their index that
+    /// they are located within the query.  This can be useful if you want to retrieve 
+    /// the original index later.
+    /// 
+    /// For example:
+    ///   (A, B, C).Query().WithIndices()
+    /// Would result in:
+    ///   ((0, A), (1, B), (2, C))
+    /// </summary>
+    public static Query<IndexedValue<T>> WithIndices<T>(this Query<T> query) {
+      using (var slice = query.Deconstruct()) {
+        var dstArray = ArrayPool<IndexedValue<T>>.Spawn(slice.Count);
+
+        for (int i = 0; i < slice.Count; i++) {
+          dstArray[i] = new IndexedValue<T>() {
+            index = i,
+            value = slice[i]
+          };
+        }
+
+        return new Query<IndexedValue<T>>(dstArray, slice.Count);
+      }
+    }
+
+    /// <summary>
     /// Returns a new Query where each new element in the sequence is an instance of the PrevPair struct.
     /// The value field of the pair will point to an element in the current sequence, and the prev field will
     /// point to an element that comes 'offset' elements before the current element. If 'includeStart' is true, 
@@ -543,6 +568,11 @@ namespace Leap.Unity.Query {
       /// prev will take the default value of T.
       /// </summary>
       public bool hasPrev;
+    }
+
+    public struct IndexedValue<T> {
+      public int index;
+      public T value;
     }
   }
 }
