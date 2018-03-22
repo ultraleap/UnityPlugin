@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Leap Motion, Inc. 2011-2017.                                 *
+ * Copyright (C) Leap Motion, Inc. 2011-2018.                                 *
  * Leap Motion proprietary and  confidential.                                 *
  *                                                                            *
  * Use subject to the terms of the Leap Motion SDK Agreement available at     *
@@ -315,7 +315,7 @@ namespace Leap.Unity.Interaction {
 
       // Physics should only be synced once at the beginning of the physics simulation.
       // (Will be re-set to its original value at the end of the update.)
-      #if UNITY_2017_1_OR_NEWER
+      #if UNITY_2017_2_OR_NEWER
       var preUpdateAutoSyncTransforms = Physics.autoSyncTransforms;
       Physics.autoSyncTransforms = false;
       #endif
@@ -344,6 +344,9 @@ namespace Leap.Unity.Interaction {
           // Apply soft contacts from all controllers in a unified solve.
           // (This will clear softContacts and originalVelocities as well.)
           using (new ProfilerSample("Apply Soft Contacts")) {
+            if (_drawControllerRuntimeGizmos) {
+              _softContactsToDraw = new List<PhysicsUtility.SoftContact>(_softContacts);
+            }
             if (_softContacts.Count > 0) {
               PhysicsUtility.applySoftContacts(_softContacts, _softContactOriginalVelocities);
             }
@@ -360,7 +363,7 @@ namespace Leap.Unity.Interaction {
 
       }
       finally {
-        #if UNITY_2017_1_OR_NEWER
+        #if UNITY_2017_2_OR_NEWER
         // Restore the autoSyncTransforms setting to whatever the user had it as before
         // the Manager FixedUpdate.
         Physics.autoSyncTransforms = preUpdateAutoSyncTransforms;
@@ -842,6 +845,11 @@ namespace Leap.Unity.Interaction {
     [NonSerialized]
     public Dictionary<Rigidbody, PhysicsUtility.Velocities> _softContactOriginalVelocities = new Dictionary<Rigidbody, PhysicsUtility.Velocities>(5);
 
+    /// <summary>
+    /// Stores data for drawing Soft Contacts for interaction controllers.
+    /// </summary>
+    private List<PhysicsUtility.SoftContact> _softContactsToDraw;
+
 #endregion
 
 #region Interaction Controllers
@@ -1043,6 +1051,10 @@ namespace Leap.Unity.Interaction {
           if (controller != null) {
             controller.OnDrawRuntimeGizmos(drawer);
           }
+        }
+        foreach (PhysicsUtility.SoftContact contact in _softContactsToDraw) {
+          drawer.DrawSphere(contact.position, 0.01f);
+          drawer.DrawLine(contact.position, contact.position + (contact.normal * 0.02f));
         }
       }
     }

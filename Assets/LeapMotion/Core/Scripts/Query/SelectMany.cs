@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Leap Motion, Inc. 2011-2017.                                 *
+ * Copyright (C) Leap Motion, Inc. 2011-2018.                                 *
  * Leap Motion proprietary and  confidential.                                 *
  *                                                                            *
  * Use subject to the terms of the Leap Motion SDK Agreement available at     *
@@ -13,7 +13,7 @@ namespace Leap.Unity.Query {
 
   public struct SelectManyOp<SourceType, ResultType, SourceOp, ResultOp> : IQueryOp<ResultType>
     where SourceOp : IQueryOp<SourceType>
-    where ResultOp : IQueryOp<ResultType> {
+    where ResultOp : struct, IQueryOp<ResultType> {
 
     private SourceOp _source;
     private Func<SourceType, QueryWrapper<ResultType, ResultOp>> _selector;
@@ -66,7 +66,7 @@ namespace Leap.Unity.Query {
     }
   }
 
-  public partial struct QueryWrapper<QueryType, QueryOp> where QueryOp : IQueryOp<QueryType> {
+  public partial struct QueryWrapper<QueryType, QueryOp> {
 
     /// <summary>
     /// Returns a new query operation representing the current query sequence where each element has been
@@ -80,7 +80,7 @@ namespace Leap.Unity.Query {
     ///   ("1", "2", "2", "3", "3", "3", "4", "4", "4", "4")
     /// </summary>
     public QueryWrapper<NewType, SelectManyOp<QueryType, NewType, QueryOp, NewOp>> SelectMany<NewType, NewOp>(Func<QueryType, QueryWrapper<NewType, NewOp>> selector)
-      where NewOp : IQueryOp<NewType> {
+      where NewOp : struct, IQueryOp<NewType> {
       return new QueryWrapper<NewType, SelectManyOp<QueryType, NewType, QueryOp, NewOp>>(new SelectManyOp<QueryType, NewType, QueryOp, NewOp>(_op, selector));
     }
   }

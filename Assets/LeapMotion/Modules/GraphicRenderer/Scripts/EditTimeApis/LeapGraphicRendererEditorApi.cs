@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Leap Motion, Inc. 2011-2017.                                 *
+ * Copyright (C) Leap Motion, Inc. 2011-2018.                                 *
  * Leap Motion proprietary and  confidential.                                 *
  *                                                                            *
  * Use subject to the terms of the Leap Motion SDK Agreement available at     *
@@ -57,7 +57,7 @@ namespace Leap.Unity.GraphicalRenderer {
           }
         }
 
-        validateSpaceComponent();
+        _renderer.validateSpaceComponent();
 
         foreach (var group in _renderer._groups) {
           group.editor.OnValidate();
@@ -188,7 +188,7 @@ namespace Leap.Unity.GraphicalRenderer {
         Undo.RecordObject(_renderer, "Update graphic renderer.");
         Assert.IsFalse(InternalUtility.IsPrefab(_renderer), "Should never do editor updates for prefabs");
 
-        validateSpaceComponent();
+        _renderer.validateSpaceComponent();
 
         bool needsRebuild = false;
 
@@ -236,7 +236,7 @@ namespace Leap.Unity.GraphicalRenderer {
         Assert.IsFalse(InternalUtility.IsPrefab(_renderer), "Should never do editor updates for prefabs");
 
         using (new ProfilerSample("Validate Space Component")) {
-          validateSpaceComponent();
+          _renderer.validateSpaceComponent();
         }
 
         if (fullRebuild) {
@@ -286,19 +286,6 @@ namespace Leap.Unity.GraphicalRenderer {
         }
 
         DoEditorUpdateLogic(fullRebuild: true);
-      }
-
-      private void validateSpaceComponent() {
-        if (_renderer._space != null && !_renderer._space.enabled) {
-          _renderer._space = null;
-        }
-
-        if (_renderer._space == null) {
-          var potentialSpace = _renderer.GetComponent<LeapSpace>();
-          if (potentialSpace != null && potentialSpace.enabled) {
-            _renderer._space = potentialSpace;
-          }
-        }
       }
 
       [NonSerialized]

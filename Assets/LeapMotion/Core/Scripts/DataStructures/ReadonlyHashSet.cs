@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Leap Motion, Inc. 2011-2017.                                 *
+ * Copyright (C) Leap Motion, Inc. 2011-2018.                                 *
  * Leap Motion proprietary and  confidential.                                 *
  *                                                                            *
  * Use subject to the terms of the Leap Motion SDK Agreement available at     *
@@ -40,6 +40,10 @@ namespace Leap.Unity {
 
     public static implicit operator ReadonlyHashSet<T>(HashSet<T> set) {
       return new ReadonlyHashSet<T>(set);
+    }
+
+    public static implicit operator ReadonlyHashSet<T>(SerializableHashSet<T> set) {
+      return (HashSet<T>)set;
     }
   }
 }

@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Leap Motion, Inc. 2011-2017.                                 *
+ * Copyright (C) Leap Motion, Inc. 2011-2018.                                 *
  * Leap Motion proprietary and  confidential.                                 *
  *                                                                            *
  * Use subject to the terms of the Leap Motion SDK Agreement available at     *
@@ -26,6 +26,9 @@ namespace Leap.Unity.Interaction {
   public class InteractionHand : InteractionController {
 
     #region Inspector
+
+    [SerializeField]
+    private LeapProvider _leapProvider;
 
     [Header("Hand Configuration")]
 
@@ -54,8 +57,6 @@ namespace Leap.Unity.Interaction {
     #endregion
 
     #region Hand Data
-
-    private LeapProvider _leapProvider;
     /// <summary>
     /// If the hand data mode for this InteractionHand is set to Custom, you must also
     /// manually specify the provider from which to retrieve Leap frames containing
@@ -176,6 +177,12 @@ namespace Leap.Unity.Interaction {
         fingertipTransform.parent = this.transform;
         _backingFingertipTransforms.Add(fingertipTransform);
         _fingertipTransforms.Add(null);
+      }
+    }
+
+    private void OnDestroy() {
+      if (_leapProvider != null) {
+        _leapProvider.OnFixedFrame -= onProviderFixedFrame;
       }
     }
 
@@ -714,7 +721,7 @@ namespace Leap.Unity.Interaction {
     }
 
     protected override void onGraspedObjectForciblyReleased(IInteractionBehaviour objectToBeReleased) {
-      grabClassifier.NotifyGraspReleased(objectToBeReleased);
+      grabClassifier.NotifyGraspForciblyReleased(objectToBeReleased);
     }
 
     protected override bool checkShouldRelease(out IInteractionBehaviour objectToRelease) {
@@ -744,8 +751,7 @@ namespace Leap.Unity.Interaction {
         }
 
         if (_testHand == null && provider != null) {
-          _testHand = TestHandFactory.MakeTestHand(0, 0, this.isLeft)
-                                     .TransformedCopy(UnityMatrixExtension.GetLeapMatrix(provider.transform));
+          _testHand = provider.MakeTestHand(this.isLeft);
         }
 
         // Hover Point

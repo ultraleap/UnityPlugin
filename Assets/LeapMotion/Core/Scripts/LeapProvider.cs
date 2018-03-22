@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Leap Motion, Inc. 2011-2017.                                 *
+ * Copyright (C) Leap Motion, Inc. 2011-2018.                                 *
  * Leap Motion proprietary and  confidential.                                 *
  *                                                                            *
  * Use subject to the terms of the Leap Motion SDK Agreement available at     *
@@ -20,7 +20,7 @@ namespace Leap.Unity {
   /// </summary>
   public abstract class LeapProvider : MonoBehaviour {
 
-    public TestHandFactory.TestHandPose editTimePose = TestHandFactory.TestHandPose.PoseA;
+    public TestHandFactory.TestHandPose editTimePose = TestHandFactory.TestHandPose.HeadMountedA;
 
     public event Action<Frame> OnUpdateFrame;
     public event Action<Frame> OnFixedFrame;

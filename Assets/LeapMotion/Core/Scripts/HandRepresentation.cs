@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Leap Motion, Inc. 2011-2017.                                 *
+ * Copyright (C) Leap Motion, Inc. 2011-2018.                                 *
  * Leap Motion proprietary and  confidential.                                 *
  *                                                                            *
  * Use subject to the terms of the Leap Motion SDK Agreement available at     *
@@ -17,7 +17,7 @@ namespace Leap.Unity {
    * @param hand The Leap Hand data to paired with a HandModelBase
    */
   public class HandRepresentation {
-    HandPool parent;
+    HandModelManager parent;
     public int HandID { get; private set; }
     public int LastUpdatedTime { get; set; }
     public bool IsMarked { get; set; }
@@ -27,7 +27,7 @@ namespace Leap.Unity {
     public Hand PostProcessHand { get; set; }
     public List<HandModelBase> handModels;
 
-    public HandRepresentation(HandPool parent, Hand hand, Chirality repChirality, ModelType repType) {
+    public HandRepresentation(HandModelManager parent, Hand hand, Chirality repChirality, ModelType repType) {
       this.parent = parent;
       HandID = hand.Id;
       this.RepChirality = repChirality;

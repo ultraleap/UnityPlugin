@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Leap Motion, Inc. 2011-2017.                                 *
+ * Copyright (C) Leap Motion, Inc. 2011-2018.                                 *
  * Leap Motion proprietary and  confidential.                                 *
  *                                                                            *
  * Use subject to the terms of the Leap Motion SDK Agreement available at     *
@@ -31,9 +31,16 @@ namespace Leap.Unity {
     private static void InitStaticOnNewScene(Scene unused, Scene unused2) {
       InitStatic();
     }
+
     private static void InitStatic() {
-      s_provider = GameObject.FindObjectOfType<LeapProvider>();
-      if (s_provider == null) return;
+      s_provider = Object.FindObjectOfType<LeapServiceProvider>();
+      if (s_provider == null) {
+        s_provider = Object.FindObjectOfType<LeapProvider>();
+        if (s_provider == null) {
+          return;
+        }
+      }
+
       Camera providerCamera = s_provider.GetComponentInParent<Camera>();
       if (providerCamera == null) return;
       if (providerCamera.transform.parent == null) return;
@@ -325,7 +332,7 @@ namespace Leap.Unity {
     /// Transforms a hand to a position and rotation.
     /// </summary>
     public static void SetTransform(this Hand hand, Vector3 position, Quaternion rotation) {
-      hand.Transform(Vector3.zero, (rotation * Quaternion.Inverse(hand.Rotation.ToQuaternion())));
+      hand.Transform(Vector3.zero, Quaternion.Slerp((rotation * Quaternion.Inverse(hand.Rotation.ToQuaternion())), Quaternion.identity, 0f));
       hand.Transform(position - hand.PalmPosition.ToVector3(), Quaternion.identity);
     }
 
@@ -475,6 +482,30 @@ namespace Leap.Unity {
                                          / deltaTime;
       }
     }
+    
+    #region Frame Utils
+
+    public static Hand Get(this Frame frame, Chirality whichHand) {
+      return frame.Hands.Query().FirstOrDefault(h => h.IsLeft == (whichHand == Chirality.Left));
+    }
+
+    #endregion
+
+    #region Provider Utils
+
+    public static Hand Get(this LeapProvider provider, Chirality whichHand) {
+      Frame frame;
+      if (Time.inFixedTimeStep) {
+        frame = provider.CurrentFixedFrame;
+      }
+      else {
+        frame = provider.CurrentFrame;
+      }
+
+      return frame.Get(whichHand);
+    }
+
+    #endregion
 
   }
 
