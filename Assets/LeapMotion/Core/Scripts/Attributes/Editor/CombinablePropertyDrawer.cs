@@ -44,6 +44,10 @@ namespace Leap.Unity.Attributes {
       }
     }
 
+    public override float GetPropertyHeight(SerializedProperty property, GUIContent label) {
+      return EditorGUI.GetPropertyHeight(property);
+    }
+
     public override void OnGUI(Rect position, SerializedProperty property, GUIContent label) {
       getAttributes(property);
 
