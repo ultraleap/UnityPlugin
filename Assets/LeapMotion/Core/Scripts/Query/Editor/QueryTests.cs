@@ -359,6 +359,16 @@ namespace Leap.Unity.Tests {
     }
 
     [Test]
+    public void WithIndicesTest() {
+      int index = 0;
+      foreach (var item in LIST_0.Query().WithIndices()) {
+        Assert.That(item.index, Is.EqualTo(index));
+        Assert.That(item.value, Is.EqualTo(LIST_0[index]));
+        index++;
+      }
+    }
+
+    [Test]
     public void ZipTest() {
       List<string> expected = new List<string>();
       for (int i = 0; i < Mathf.Min(LIST_0.Length, LIST_1.Length); i++) {
