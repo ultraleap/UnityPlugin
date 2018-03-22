@@ -147,6 +147,8 @@ namespace Leap.Unity.Query {
     ///   ("A", "hello")
     /// </summary>
     public Query<K> OfType<K>() where K : T {
+      _validator.Validate();
+
       var dstArray = ArrayPool<K>.Spawn(_count);
 
       int dstCount = 0;
