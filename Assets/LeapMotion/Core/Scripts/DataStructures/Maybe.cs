@@ -179,7 +179,7 @@ namespace Leap.Unity {
     /// </summary>
     public Maybe<T> ValueOr(Maybe<T> maybeCustomDefault) {
       if (hasValue) {
-        return Some(_t);
+        return this;
       }
       else {
         return maybeCustomDefault;
