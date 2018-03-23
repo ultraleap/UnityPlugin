@@ -84,9 +84,12 @@ namespace Leap.Unity {
       return new IndexableStructEnumerator<T, ReadonlySlice<T>>(this);
     }
 
-    public QueryWrapper<T, IndexableStructEnumerator<T, ReadonlySlice<T>>> Query() {
-      return new QueryWrapper<T, IndexableStructEnumerator<T,
-                                   ReadonlySlice<T>>>(GetEnumerator());
+    public Query<T> Query() {
+      T[] array = ArrayPool<T>.Spawn(Count);
+      for (int i = 0; i < Count; i++) {
+        array[i] = this[i];
+      }
+      return new Query<T>(array, Count);
     }
 
     #endregion

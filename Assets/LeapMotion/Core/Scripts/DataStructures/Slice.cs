@@ -1,8 +1,6 @@
 ﻿using Leap.Unity.Query;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace Leap.Unity {
 
@@ -89,8 +87,12 @@ namespace Leap.Unity {
       return new IndexableStructEnumerator<T, Slice<T>>(this);
     }
 
-    public QueryWrapper<T, IndexableStructEnumerator<T, Slice<T>>> Query() {
-      return new QueryWrapper<T, IndexableStructEnumerator<T, Slice<T>>>(GetEnumerator());
+    public Query<T> Query() {
+      T[] array = ArrayPool<T>.Spawn(Count);
+      for (int i = 0; i < Count; i++) {
+        array[i] = this[i];
+      }
+      return new Query<T>(array, Count);
     }
 
     #endregion

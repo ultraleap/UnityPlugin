@@ -49,13 +49,26 @@ namespace Leap.Unity {
     }
 
     /// <summary>
-    /// System.Array.Reverse is actually suprisingly complex / slow.  This
+    /// System.Array.Reverse is actually surprisingly complex / slow.  This
     /// is a basic generic implementation of the reverse algorithm.
     /// </summary>
     public static void Reverse<T>(this T[] array) {
       int mid = array.Length / 2;
       int i = 0;
       int j = array.Length;
+      while (i < mid) {
+        array.Swap(i++, --j);
+      }
+    }
+
+    /// <summary>
+    /// System.Array.Reverse is actually surprisingly complex / slow.  This
+    /// is a basic generic implementation of the reverse algorithm.
+    /// </summary>
+    public static void Reverse<T>(this T[] array, int start, int length) {
+      int mid = start + length / 2;
+      int i = start;
+      int j = start + length;
       while (i < mid) {
         array.Swap(i++, --j);
       }
@@ -226,7 +239,7 @@ namespace Leap.Unity {
     }
 
     /// <summary>
-    /// Trims a specific number of characters off of the begining of
+    /// Trims a specific number of characters off of the beginning of
     /// the provided string.  When the number of trimmed characters is
     /// equal to or greater than the length of the string, the empty
     /// string is always returned.
@@ -394,6 +407,16 @@ namespace Leap.Unity {
     public static int Repeat(int x, int m) {
       int r = x % m;
       return r < 0 ? r + m : r;
+    }
+
+    public static int Sign(int value) {
+      if (value == 0) {
+        return 0;
+      } else if (value > 0) {
+        return 1;
+      } else {
+        return -1;
+      }
     }
 
     /// <summary>
@@ -1475,7 +1498,7 @@ namespace Leap.Unity {
       return new HorizontalLineRectEnumerator(r, numLines);
     }
 
-    public struct HorizontalLineRectEnumerator : IQueryOp<Rect> {
+    public struct HorizontalLineRectEnumerator {
       Rect rect;
       int numLines;
       int index;
@@ -1497,20 +1520,23 @@ namespace Leap.Unity {
       }
       public HorizontalLineRectEnumerator GetEnumerator() { return this; }
 
-      public bool TryGetNext(out Rect t) {
-        if (MoveNext()) {
-          t = Current; return true;
-        } else {
-          t = default(Rect); return false;
-        }
-      }
-
       public void Reset() {
         index = -1;
       }
 
-      public QueryWrapper<Rect, HorizontalLineRectEnumerator> Query() {
-        return new QueryWrapper<Rect, HorizontalLineRectEnumerator>(this);
+      public Query<Rect> Query() {
+        List<Rect> rects = Pool<List<Rect>>.Spawn();
+        try {
+
+          foreach (var rect in this) {
+            rects.Add(rect);
+          }
+          return new Query<Rect>(rects);
+
+        } finally {
+          rects.Clear();
+          Pool<List<Rect>>.Recycle(rects);
+        }
       }
     }
 
@@ -1521,7 +1547,7 @@ namespace Leap.Unity {
     #endregion
 
     #region Leap Utilities
-    
+
     #region Pose Utils
 
     /// <summary>
