@@ -87,26 +87,25 @@ namespace Leap.Unity.Attributes {
         // However, you can't assign a ScriptableObject to a field expecting a Component,
         // or vice-versa, no matter what.
 
-        // Matches the "Foo" in "PPtr<$Foo>" (as an inner group)
-        var fieldTypeMatch = Regex.Match(property.type, "PPtr<\\$(.+)>");
-        if (fieldTypeMatch.Groups.Count == 0) {
-          // No captured groups means we have no idea what the enclosing field type is.
+        var propertyName = property.name;
+        var serializedObject = property.serializedObject;
+        var targetObjectType = serializedObject.targetObject.GetType();
+        var fieldInfo = targetObjectType.GetField(propertyName,
+            System.Reflection.BindingFlags.NonPublic
+            | System.Reflection.BindingFlags.Public
+            | System.Reflection.BindingFlags.Instance
+            | System.Reflection.BindingFlags.FlattenHierarchy);
+
+        var fieldIsScriptableObject
+            = fieldInfo.FieldType.IsAssignableFrom(typeof(ScriptableObject));
+        if (fieldIsScriptableObject && (objIsComponent || objIsGameObject)) {
           isTypeDefinitelyIncompatible = true;
         }
-        else {
-          // First group is the whole match, second is the inner group, the class name.
-          var fieldTypeName = fieldTypeMatch.Groups[1].Value;
 
-          var fieldIsScriptableObject = fieldTypeName.Equals("ScriptableObject");
-          if (fieldIsScriptableObject && (objIsComponent || objIsGameObject)) {
-            isTypeDefinitelyIncompatible = true;
-          }
-
-          var fieldTakesComponent = fieldTypeName.Equals("MonoBehaviour")
-                                    || fieldTypeName.Equals("Component");
-          if (fieldTakesComponent && !(objIsComponent || objIsGameObject)) {
-            isTypeDefinitelyIncompatible = true;
-          }
+        var fieldTakesComponent
+            = typeof(Component).IsAssignableFrom(fieldInfo.FieldType);
+        if (fieldTakesComponent && (!objIsComponent && !objIsGameObject)) {
+          isTypeDefinitelyIncompatible = true;
         }
       }
       if (isTypeDefinitelyIncompatible) {
