@@ -87,15 +87,6 @@ namespace Leap.Unity.Attributes {
         // However, you can't assign a ScriptableObject to a field expecting a Component,
         // or vice-versa, no matter what.
 
-        var propertyName = property.name;
-        var serializedObject = property.serializedObject;
-        var targetObjectType = serializedObject.targetObject.GetType();
-        var fieldInfo = targetObjectType.GetField(propertyName,
-            System.Reflection.BindingFlags.NonPublic
-            | System.Reflection.BindingFlags.Public
-            | System.Reflection.BindingFlags.Instance
-            | System.Reflection.BindingFlags.FlattenHierarchy);
-
         var fieldIsScriptableObject
             = fieldInfo.FieldType.IsAssignableFrom(typeof(ScriptableObject));
         if (fieldIsScriptableObject && (objIsComponent || objIsGameObject)) {

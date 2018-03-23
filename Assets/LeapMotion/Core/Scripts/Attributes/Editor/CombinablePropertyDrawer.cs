@@ -79,8 +79,7 @@ namespace Leap.Unity.Attributes {
 
       IFullPropertyDrawer fullPropertyDrawer = null;
       foreach (var a in attributes) {
-        a.fieldInfo = fieldInfo;
-        a.targets = property.serializedObject.targetObjects;
+        a.Init(fieldInfo, property.serializedObject.targetObjects);
 
         if (a is IBeforeLabelAdditiveDrawer) {
           EditorGUIUtility.labelWidth -= (a as IBeforeLabelAdditiveDrawer).GetWidth();
