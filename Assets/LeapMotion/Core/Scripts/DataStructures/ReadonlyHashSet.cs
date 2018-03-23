@@ -7,10 +7,10 @@
  * between Leap Motion and you, your company or other organization.           *
  ******************************************************************************/
 
-using UnityEngine;
 using System.Collections.Generic;
 
 namespace Leap.Unity {
+  using Query;
 
   /// <summary>
   /// A simple wrapper around HashSet to provide readonly access.
@@ -36,6 +36,10 @@ namespace Leap.Unity {
 
     public bool Contains(T obj) {
       return _set.Contains(obj);
+    }
+
+    public Query<T> Query() {
+      return _set.Query();
     }
 
     public static implicit operator ReadonlyHashSet<T>(HashSet<T> set) {

@@ -14,7 +14,7 @@ MonoBehaviour:
   _definitionName: RealtimeGraph
   _showInBuildMenu: 1
   _dependantFolders:
-  - Assets\LeapMotion\Internal Modules\RealtimeGraph
+  - Assets\LeapMotion\Internal\RealtimeGraph
   _ignoredFolders: []
   _dependantFiles: []
   _ignoredFiles: []

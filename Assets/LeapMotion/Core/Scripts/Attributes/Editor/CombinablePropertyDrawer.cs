@@ -50,8 +50,11 @@ namespace Leap.Unity.Attributes {
       }
     }
 
-    public override void OnGUI(Rect position, SerializedProperty property,
-                               GUIContent label) {
+    public override float GetPropertyHeight(SerializedProperty property, GUIContent label) {
+      return EditorGUI.GetPropertyHeight(property);
+    }
+
+    public override void OnGUI(Rect position, SerializedProperty property, GUIContent label) {
       getAttributes(property);
 
       CombinablePropertyDrawer.OnGUI(this.attributes, this.fieldInfo,
@@ -134,27 +137,22 @@ namespace Leap.Unity.Attributes {
 
         if (fullPropertyDrawer != null) {
           fullPropertyDrawer.DrawProperty(r, property, label);
-        }
-        else {
+        } else {
           if (rangeAttribute != null) {
             if (property.propertyType == SerializedPropertyType.Integer) {
               property.intValue = EditorGUI.IntSlider(r, label, property.intValue, (int)rangeAttribute.min, (int)rangeAttribute.max);
-            }
-            else if (property.propertyType == SerializedPropertyType.Float) {
+            } else if (property.propertyType == SerializedPropertyType.Float) {
               property.floatValue = EditorGUI.Slider(r, label, property.floatValue, rangeAttribute.min, rangeAttribute.max);
-            }
-            else {
+            } else {
               EditorGUI.PropertyField(r, property, label);
             }
-          }
-          else {
+          } else {
             EditorGUI.PropertyField(r, property, label);
           }
         }
 
         r.x += r.width;
-      }
-      else {
+      } else {
         r.width = EditorGUIUtility.labelWidth;
         r = EditorGUI.PrefixLabel(r, label);
 
@@ -220,8 +218,7 @@ namespace Leap.Unity.Attributes {
 
           if (isValidDrop) {
             DragAndDrop.visualMode = DragAndDropVisualMode.Link;
-          }
-          else {
+          } else {
             DragAndDrop.visualMode = DragAndDropVisualMode.Rejected;
           }
 

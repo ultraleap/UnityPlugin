@@ -92,8 +92,7 @@ namespace Leap.Unity {
     public Maybe(T t) {
       if (Type<T>.isValueType) {
         hasValue = true;
-      }
-      else {
+      } else {
         hasValue = t != null;
       }
       _t = t;
@@ -164,8 +163,7 @@ namespace Leap.Unity {
     public T ValueOr(T customDefault) {
       if (hasValue) {
         return _t;
-      }
-      else {
+      } else {
         return customDefault;
       }
     }
@@ -180,14 +178,17 @@ namespace Leap.Unity {
     public Maybe<T> ValueOr(Maybe<T> maybeCustomDefault) {
       if (hasValue) {
         return this;
-      }
-      else {
+      } else {
         return maybeCustomDefault;
       }
     }
 
-    public QueryWrapper<T, Maybe<T>.MaybeOp> Query() {
-      return new QueryWrapper<T, MaybeOp>(new MaybeOp(this));
+    public Query<T> Query() {
+      if (hasValue) {
+        return Values.Single(_t);
+      } else {
+        return Values.Empty<T>();
+      }
     }
 
     public override int GetHashCode() {
@@ -269,38 +270,7 @@ namespace Leap.Unity {
     }
 
     public static implicit operator Maybe<T>(Maybe.NoneType none) {
-      return Maybe<T>.None;
-    }
-
-    public struct MaybeOp : IQueryOp<T> {
-      public Maybe<T> _value;
-      public bool _hasReturned;
-
-      public MaybeOp(Maybe<T> value) {
-        _value = value;
-        _hasReturned = false;
-      }
-
-      public bool TryGetNext(out T t) {
-        if (_hasReturned) {
-          t = default(T);
-          return false;
-        } else {
-          if (_value.hasValue) {
-            t = _value._t;
-            _hasReturned = true;
-            return true;
-          } else {
-            t = default(T);
-            _hasReturned = true;
-            return false;
-          }
-        }
-      }
-
-      public void Reset() {
-        _hasReturned = false;
-      }
+      return None;
     }
   }
 }
