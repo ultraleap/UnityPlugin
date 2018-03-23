@@ -209,6 +209,11 @@ namespace Leap.Unity.Packaging {
     private static void buildAllPackages() {
       buildPackages(FindAll());
     }
+
+    [MenuItem("Build/All Packages", priority = 0, validate = true)]
+    private static bool validateBuildAllPackages() {
+      return FindAll().Length > 0;
+    }
 #endif
   }
 }

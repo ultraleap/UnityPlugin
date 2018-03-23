@@ -14,7 +14,7 @@ MonoBehaviour:
   _definitionName: Attachments
   _showInBuildMenu: 1
   _dependantFolders:
-  - Assets\LeapMotion\Legacy Modules\Attachments
+  - Assets\LeapMotion\Legacy\Attachments
   _ignoredFolders: []
   _dependantFiles: []
   _ignoredFiles: []

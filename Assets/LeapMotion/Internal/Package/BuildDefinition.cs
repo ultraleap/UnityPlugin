@@ -135,9 +135,14 @@ namespace Leap.Unity.Packaging {
 
     [MenuItem("Build/All Apps", priority = 1)]
     public static void BuildAll() {
-      foreach (var item in Resources.FindObjectsOfTypeAll<BuildDefinition>()) {
+      foreach (var item in EditorResources.FindAllAssetsOfType<BuildDefinition>()) {
         item.Build();
       }
+    }
+
+    [MenuItem("Build/All Apps", priority = 1, validate = true)]
+    public static bool ValidateBuildAll() {
+      return EditorResources.FindAllAssetsOfType<BuildDefinition>().Length > 0;
     }
 #endif
   }
