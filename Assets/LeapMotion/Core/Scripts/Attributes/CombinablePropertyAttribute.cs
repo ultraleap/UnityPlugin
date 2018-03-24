@@ -88,6 +88,7 @@ namespace Leap.Unity.Attributes {
       }
     }
 
+#if UNITY_EDITOR
     /// <summary>
     /// Initializes the FieldInfo and target information for this
     /// CombinablePropertyAttribute using a SerializedProperty reference.
@@ -119,7 +120,6 @@ namespace Leap.Unity.Attributes {
       _isInitialized = true;
     }
 
-#if UNITY_EDITOR
     public virtual IEnumerable<SerializedPropertyType> SupportedTypes {
       get {
         yield break;
