@@ -18,6 +18,9 @@ namespace Leap.Unity.RuntimeGizmos {
     public bool traverseHierarchy = true;
     public bool drawTriggers = false;
 
+    /// <summary>
+    /// An empty Start() method; gives the MonoBehaviour an enable/disable checkbox.
+    /// </summary>
     void Start() { }
 
     public void OnDrawRuntimeGizmos(RuntimeGizmoDrawer drawer) {
