@@ -131,5 +131,20 @@ namespace Leap.Unity.Interaction {
     private void OnPressed() {
       isToggled = !isToggled;
     }
+
+    /// <summary>
+    /// Sets this InteractionToggle to the "toggled" state. Calling this function won't
+    /// oscillate the state of the toggle; to 'untoggle' the control, call Untoggle().
+    /// </summary>
+    public void Toggle() {
+      isToggled = true;
+    }
+
+    /// <summary>
+    /// Sets this InteractionToggle to the "untoggled" state.
+    /// </summary>
+    public void Untoggle() {
+      isToggled = false;
+    }
   }
 }

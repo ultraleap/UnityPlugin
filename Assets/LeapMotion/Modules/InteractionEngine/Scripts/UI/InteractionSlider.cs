@@ -228,7 +228,10 @@ namespace Leap.Unity.Interaction {
       base.Start();
 
       HorizontalSlideEvent += _horizontalSlideEvent.Invoke;
-      VerticalSlideEvent += _verticalSlideEvent.Invoke;
+      VerticalSlideEvent   += _verticalSlideEvent.Invoke;
+
+      HorizontalSlideEvent += (f) => { _wasSlid = true; };
+      VerticalSlideEvent   += (f) => { _wasSlid = true; };
 
       HorizontalSliderValue = defaultHorizontalValue;
       VerticalSliderValue = defaultVerticalValue;
@@ -286,6 +289,13 @@ namespace Leap.Unity.Interaction {
       }
     }
 
+    private bool _sawWasSlid = false;
+    private bool _wasSlid = false;
+
+    public bool wasSlid {
+      get { return _wasSlid && _sawWasSlid; }
+    }
+
     protected override void Update() {
       base.Update();
 
@@ -293,6 +303,19 @@ namespace Leap.Unity.Interaction {
 
       if (isDepressed || isGrasped) {
         calculateSliderValues();
+      }
+
+
+      // Whenever "_wasSlid" is set to true (however many times between Update() cycles),
+      // this logic produces a single Update() cycle through which slider.wasSlid
+      // will return true. (This allows observing MonoBehaviours to simply check
+      // "wasSlid" during their Update() cycle to perform updating logic.)
+      if (_wasSlid && !_sawWasSlid) {
+        _sawWasSlid = true;
+      }
+      else if (_sawWasSlid) {
+        _wasSlid = false;
+        _sawWasSlid = false;
       }
     }
 
@@ -325,11 +348,25 @@ namespace Leap.Unity.Interaction {
       get {
         return _horizontalSliderPercent;
       }
+      set {
+        var newValue = Mathf.Clamp01(value);
+        if (newValue != _horizontalSliderPercent) {
+          _horizontalSliderPercent = newValue;
+          HorizontalSlideEvent(HorizontalSliderValue);
+        }
+      }
     }
 
     public float normalizedVerticalValue {
       get {
         return _verticalSliderPercent;
+      }
+      set {
+        var newValue = Mathf.Clamp01(value);
+        if (newValue != _verticalSliderPercent) {
+          _verticalSliderPercent = newValue;
+          VerticalSlideEvent(VerticalSliderValue);
+        }
       }
     }
 
