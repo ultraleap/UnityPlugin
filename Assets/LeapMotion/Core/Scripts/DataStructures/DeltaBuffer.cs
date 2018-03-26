@@ -89,9 +89,9 @@ namespace Leap.Unity {
     /// If the buffer is empty, you should return the identity for your derivative type.
     /// </summary>
     public abstract DerivativeType Delta();
-    
+
     #region foreach Support
-    
+
     public IndexableEnumerator<SampleType> GetEnumerator() {
       return new IndexableEnumerator<SampleType>(this);
     }
@@ -190,11 +190,6 @@ namespace Leap.Unity {
         var deltaTime = t1.From(t0);
 
         deltaSum += delta / deltaTime;
-      }
-
-      Slice<float> floats = new Slice<float>(new float[] { 0f, 1f });
-      foreach (var f in floats.Query()) {
-
       }
 
       return deltaSum / (Count - 1);

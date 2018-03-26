@@ -9,11 +9,9 @@
 
 using System;
 using System.Linq;
-using System.Collections.Generic;
-using UnityEngine;
 using NUnit.Framework;
 
-namespace Leap.Unity {
+namespace Leap.Unity.Tests {
 
   public class BitConverterTests {
 

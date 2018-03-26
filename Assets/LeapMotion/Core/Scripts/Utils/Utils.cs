@@ -49,13 +49,26 @@ namespace Leap.Unity {
     }
 
     /// <summary>
-    /// System.Array.Reverse is actually suprisingly complex / slow.  This
+    /// System.Array.Reverse is actually surprisingly complex / slow.  This
     /// is a basic generic implementation of the reverse algorithm.
     /// </summary>
     public static void Reverse<T>(this T[] array) {
       int mid = array.Length / 2;
       int i = 0;
       int j = array.Length;
+      while (i < mid) {
+        array.Swap(i++, --j);
+      }
+    }
+
+    /// <summary>
+    /// System.Array.Reverse is actually surprisingly complex / slow.  This
+    /// is a basic generic implementation of the reverse algorithm.
+    /// </summary>
+    public static void Reverse<T>(this T[] array, int start, int length) {
+      int mid = start + length / 2;
+      int i = start;
+      int j = start + length;
       while (i < mid) {
         array.Swap(i++, --j);
       }
@@ -226,7 +239,7 @@ namespace Leap.Unity {
     }
 
     /// <summary>
-    /// Trims a specific number of characters off of the begining of
+    /// Trims a specific number of characters off of the beginning of
     /// the provided string.  When the number of trimmed characters is
     /// equal to or greater than the length of the string, the empty
     /// string is always returned.
@@ -394,6 +407,16 @@ namespace Leap.Unity {
     public static int Repeat(int x, int m) {
       int r = x % m;
       return r < 0 ? r + m : r;
+    }
+
+    public static int Sign(int value) {
+      if (value == 0) {
+        return 0;
+      } else if (value > 0) {
+        return 1;
+      } else {
+        return -1;
+      }
     }
 
     /// <summary>
@@ -891,15 +914,153 @@ namespace Leap.Unity {
       return new Quaternion(-q.x, -q.y, -q.z, -q.w);
     }
 
+    #region Compression
+
+    /// <summary>
+    /// Fills the provided bytes buffer starting at the offset with a compressed form
+    /// of the argument quaternion. The offset is also shifted by 4 bytes.
+    /// 
+    /// Use Utils.DecompressBytesToQuat to decode this representation. This encoding ONLY
+    /// works with normalized Quaternions, taking advantage of the fact that their
+    /// components sum to 1 to only encode three of Quaternion components. As a result,
+    /// this method encodes a Quaternion as a single unsigned integer (4 bytes).
+    /// 
+    /// Sources:
+    /// https://bitbucket.org/Unity-Technologies/networking/pull-requests/9/quaternion-compression-for-sending/diff
+    /// and
+    /// http://stackoverflow.com/questions/3393717/c-sharp-converting-uint-to-byte
+    /// </summary>
+    public static void CompressQuatToBytes(Quaternion quat,
+                                             byte[] buffer,
+                                             ref int offset) {
+      int largest = 0;
+      float a, b, c;
+
+      float abs_w = Mathf.Abs(quat.w);
+      float abs_x = Mathf.Abs(quat.x);
+      float abs_y = Mathf.Abs(quat.y);
+      float abs_z = Mathf.Abs(quat.z);
+
+      float largest_value = abs_x;
+
+      if (abs_y > largest_value) {
+        largest = 1;
+        largest_value = abs_y;
+      }
+      if (abs_z > largest_value) {
+        largest = 2;
+        largest_value = abs_z;
+      }
+      if (abs_w > largest_value) {
+        largest = 3;
+        largest_value = abs_w;
+      }
+      if (quat[largest] >= 0f) {
+        a = quat[(largest + 1) % 4];
+        b = quat[(largest + 2) % 4];
+        c = quat[(largest + 3) % 4];
+      }
+      else {
+        a = -quat[(largest + 1) % 4];
+        b = -quat[(largest + 2) % 4];
+        c = -quat[(largest + 3) % 4];
+      }
+
+      // serialize
+      const float minimum = -1.0f / 1.414214f;        // note: 1.0f / sqrt(2)
+      const float maximum = +1.0f / 1.414214f;
+      const float delta = maximum - minimum;
+      const uint maxIntegerValue = (1 << 10) - 1; // 10 bits
+      const float maxIntegerValueF = (float)maxIntegerValue;
+      float normalizedValue;
+      uint integerValue;
+
+      uint sentData = ((uint)largest) << 30;
+      // a
+      normalizedValue = Mathf.Clamp01((a - minimum) / delta);
+      integerValue = (uint)Mathf.Floor(normalizedValue * maxIntegerValueF + 0.5f);
+      sentData = sentData | ((integerValue & maxIntegerValue) << 20);
+      // b
+      normalizedValue = Mathf.Clamp01((b - minimum) / delta);
+      integerValue = (uint)Mathf.Floor(normalizedValue * maxIntegerValueF + 0.5f);
+      sentData = sentData | ((integerValue & maxIntegerValue) << 10);
+      // c
+      normalizedValue = Mathf.Clamp01((c - minimum) / delta);
+      integerValue = (uint)Mathf.Floor(normalizedValue * maxIntegerValueF + 0.5f);
+      sentData = sentData | (integerValue & maxIntegerValue);
+
+      BitConverterNonAlloc.GetBytes(sentData, buffer, ref offset);
+    }
+
+    /// <summary>
+    /// Reads 4 bytes from the argument bytes array (starting at the provided offset) and
+    /// returns a Quaternion as encoded by the Utils.CompressedQuatToBytes function. Also
+    /// increments the provided offset by 4.
+    /// 
+    /// See the Utils.CompressedQuatToBytes documentation for more details on the
+    /// byte representation this method expects.
+    /// 
+    /// Sources:
+    /// https://bitbucket.org/Unity-Technologies/networking/pull-requests/9/quaternion-compression-for-sending/diff
+    /// and
+    /// http://stackoverflow.com/questions/3393717/c-sharp-converting-uint-to-byte
+    /// </summary>
+    public static Quaternion DecompressBytesToQuat(byte[] bytes, ref int offset) {
+      uint readData = BitConverterNonAlloc.ToUInt32(bytes, ref offset);
+
+      int largest = (int)(readData >> 30);
+      float a, b, c;
+
+      const float minimum = -1.0f / 1.414214f;        // note: 1.0f / sqrt(2)
+      const float maximum = +1.0f / 1.414214f;
+      const float delta = maximum - minimum;
+      const uint maxIntegerValue = (1 << 10) - 1; // 10 bits
+      const float maxIntegerValueF = (float)maxIntegerValue;
+      uint integerValue;
+      float normalizedValue;
+      // a
+      integerValue = (readData >> 20) & maxIntegerValue;
+      normalizedValue = (float)integerValue / maxIntegerValueF;
+      a = (normalizedValue * delta) + minimum;
+      // b
+      integerValue = (readData >> 10) & maxIntegerValue;
+      normalizedValue = (float)integerValue / maxIntegerValueF;
+      b = (normalizedValue * delta) + minimum;
+      // c
+      integerValue = readData & maxIntegerValue;
+      normalizedValue = (float)integerValue / maxIntegerValueF;
+      c = (normalizedValue * delta) + minimum;
+
+      Quaternion value = Quaternion.identity;
+      float d = Mathf.Sqrt(1f - a * a - b * b - c * c);
+      value[largest] = d;
+      value[(largest + 1) % 4] = a;
+      value[(largest + 2) % 4] = b;
+      value[(largest + 3) % 4] = c;
+
+      return value;
+    }
+
+    #endregion
+
     #endregion
 
     #region Matrix4x4 Utils
 
     public static Matrix4x4 CompMul(Matrix4x4 m, float f) {
+#if UNITY_2017_1_OR_NEWER
       return new Matrix4x4(m.GetColumn(0) * f,
                            m.GetColumn(1) * f,
                            m.GetColumn(2) * f,
                            m.GetColumn(3) * f);
+#else
+      Matrix4x4 toReturn = m;
+      for (int i = 0; i < 4; i++) {
+        toReturn.setColumn(i, toReturn.GetColumn(i) * f);
+      }
+      return toReturn;
+#endif
+
     }
 
     #endregion
@@ -1466,7 +1627,7 @@ namespace Leap.Unity {
       return new HorizontalLineRectEnumerator(r, numLines);
     }
 
-    public struct HorizontalLineRectEnumerator : IQueryOp<Rect> {
+    public struct HorizontalLineRectEnumerator {
       Rect rect;
       int numLines;
       int index;
@@ -1488,20 +1649,23 @@ namespace Leap.Unity {
       }
       public HorizontalLineRectEnumerator GetEnumerator() { return this; }
 
-      public bool TryGetNext(out Rect t) {
-        if (MoveNext()) {
-          t = Current; return true;
-        } else {
-          t = default(Rect); return false;
-        }
-      }
-
       public void Reset() {
         index = -1;
       }
 
-      public QueryWrapper<Rect, HorizontalLineRectEnumerator> Query() {
-        return new QueryWrapper<Rect, HorizontalLineRectEnumerator>(this);
+      public Query<Rect> Query() {
+        List<Rect> rects = Pool<List<Rect>>.Spawn();
+        try {
+
+          foreach (var rect in this) {
+            rects.Add(rect);
+          }
+          return new Query<Rect>(rects);
+
+        } finally {
+          rects.Clear();
+          Pool<List<Rect>>.Recycle(rects);
+        }
       }
     }
 
@@ -1512,7 +1676,7 @@ namespace Leap.Unity {
     #endregion
 
     #region Leap Utilities
-    
+
     #region Pose Utils
 
     /// <summary>

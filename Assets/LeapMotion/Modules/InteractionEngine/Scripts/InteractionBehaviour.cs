@@ -1323,12 +1323,9 @@ namespace Leap.Unity.Interaction {
 
         graspedPoseHandler.GetGraspedPosition(out newPosition, out newRotation);
 
-        IGraspedMovementHandler graspedMovementHandler = rigidbody.isKinematic ?
-                                                       (IGraspedMovementHandler)_kinematicGraspedMovement
-                                                     : (IGraspedMovementHandler)_nonKinematicGraspedMovement;
-        graspedMovementHandler.MoveTo(newPosition, newRotation, this, _justGrasped);
-
-        OnGraspedMovement(origPosition, origRotation, newPosition, newRotation, controllers);
+        fixedUpdateGraspedMovement(new Pose(origPosition, origRotation),
+                                   new Pose(newPosition, newRotation),
+                                   controllers);
 
         throwHandler.OnHold(this, controllers);
       }
@@ -1336,6 +1333,20 @@ namespace Leap.Unity.Interaction {
       OnGraspStay();
 
       _justGrasped = false;
+    }
+
+    protected virtual void fixedUpdateGraspedMovement(Pose origPose, Pose newPose,
+                                              List<InteractionController> controllers) {
+      IGraspedMovementHandler graspedMovementHandler
+          = rigidbody.isKinematic ?
+              (IGraspedMovementHandler)_kinematicGraspedMovement
+            : (IGraspedMovementHandler)_nonKinematicGraspedMovement;
+      graspedMovementHandler.MoveTo(newPose.position, newPose.rotation,
+                                    this, _justGrasped);
+
+      OnGraspedMovement(origPose.position, origPose.rotation,
+                        newPose.position, newPose.rotation,
+                        controllers);
     }
 
     protected InteractionController _suspendingController = null;

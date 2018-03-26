@@ -11,6 +11,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
+using Leap.Unity;
 
 namespace Leap.Unity {
 
@@ -26,7 +27,7 @@ namespace Leap.Unity {
     }
 
     //private void drawHeightOffset(SerializedProperty property) {
-    //  var isRoomScale = isRoomScaleTrackingDetected();
+    //  var isRoomScale = XRSupportUtils.IsRoomScale();
     //  EditorGUI.BeginDisabledGroup(isRoomScale && Application.isPlaying);
     //  EditorGUILayout.PropertyField(property);
     //  EditorGUI.EndDisabledGroup();
@@ -41,14 +42,6 @@ namespace Leap.Unity {
     //    EditorGUILayout.HelpBox(message, MessageType.Info);
     //  }
     //}
-
-    private bool isRoomScaleTrackingDetected() {
-      var trackingSpaceType = UnityEngine.XR.XRDevice.GetTrackingSpaceType();
-      if (trackingSpaceType == UnityEngine.XR.TrackingSpaceType.RoomScale) {
-        return true;
-      }
-      return false;
-    }
 
   }
 

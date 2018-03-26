@@ -62,7 +62,30 @@ namespace Leap.Unity {
 #if UNITY_EDITOR
     void Update() {
       if (!EditorApplication.isPlaying && SupportsEditorPersistence()) {
-        Hand hand = Handedness == Chirality.Left ? Hands.Left : Hands.Right;
+        LeapProvider provider = null;
+
+        //First try to get the provider from a parent HandModelManager
+        if (transform.parent != null) {
+          var manager = transform.parent.GetComponent<HandModelManager>();
+          provider = manager.leapProvider;
+        }
+
+        //If not found, use any old provider from the Hands.Provider getter
+        if (provider == null) {
+          provider = Hands.Provider;
+        }
+
+        Hand hand = null;
+        //If we found a provider, pull the hand from that
+        if (provider != null) {
+          var frame = provider.CurrentFrame;
+
+          if (frame != null) {
+            hand = frame.Get(Handedness);
+          }
+        }
+
+        //If we still have a null hand, construct one manually
         if (hand == null) {
           hand = TestHandFactory.MakeTestHand(Handedness == Chirality.Left, unitType: TestHandFactory.UnitType.LeapUnits);
           hand.Transform(transform.GetLeapMatrix());

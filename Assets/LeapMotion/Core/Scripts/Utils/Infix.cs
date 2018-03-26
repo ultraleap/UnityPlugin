@@ -73,13 +73,14 @@ namespace Leap.Unity.Infix {
     /// Infix sugar for Vector3.SignedAngle(a, b).
     /// </summary>
     public static float SignedAngle(this Vector3 a, Vector3 b, Vector3 axis) {
-      return Vector3.SignedAngle(a, b, axis);
+      float sign = Vector3.Dot(Vector3.Cross(a,b), axis) < 0f ? -1f : 1f;
+      return sign * Vector3.Angle(a, b);
     }
 
     #endregion
 
     #region Quaternion
-    
+
     /// <summary>
     /// Returns (this * Vector3.right), the x-axis of the rotated frame of this
     /// quaternion.
