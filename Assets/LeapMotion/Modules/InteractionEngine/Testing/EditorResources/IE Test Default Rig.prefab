@@ -3749,7 +3749,7 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1697832784374974}
-  m_LocalRotation: {x: -0.19850883, y: -0.5493819, z: -0.81014264, w: 0.0494221}
+  m_LocalRotation: {x: -0.19850886, y: -0.549382, z: -0.81014276, w: 0.049422108}
   m_LocalPosition: {x: 0.17769694, y: 0.21144885, z: 0.2667734}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -5626,7 +5626,7 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1817928305888120}
-  m_LocalRotation: {x: -0.19850883, y: 0.5493819, z: 0.81014264, w: 0.0494221}
+  m_LocalRotation: {x: -0.19850886, y: 0.549382, z: 0.81014276, w: 0.049422108}
   m_LocalPosition: {x: -0.31456825, y: 0.21144885, z: 0.2667734}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -11872,7 +11872,7 @@ MonoBehaviour:
   _hoverEnabled: 1
   _contactEnabled: 1
   _graspingEnabled: 1
-  _leapProvider: {fileID: 0}
+  _leapProvider: {fileID: 114154093724648416}
   _handDataMode: 0
   enabledPrimaryHoverFingertips: 0101010000
 --- !u!114 &114154093724648416
@@ -12143,7 +12143,7 @@ MonoBehaviour:
   _hoverEnabled: 1
   _contactEnabled: 1
   _graspingEnabled: 1
-  _leapProvider: {fileID: 0}
+  _leapProvider: {fileID: 114154093724648416}
   _handDataMode: 1
   enabledPrimaryHoverFingertips: 0101010000
 --- !u!114 &114522313338173604

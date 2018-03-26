@@ -310,7 +310,6 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4777421224093258}
-  - component: {fileID: 114191940833971324}
   - component: {fileID: 114601890650251000}
   - component: {fileID: 114631939688201826}
   m_Layer: 0
@@ -12422,17 +12421,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   attachmentHand: {fileID: 114153799165672642}
   attachmentPoint: 32
---- !u!114 &114191940833971324
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1126265957181116}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 215a4d49fc705b74a9d3c5cbfa2c9601, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &114299259667760126
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -12707,7 +12695,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c592f16851a620743868a31232613370, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _leapProvider: {fileID: 0}
+  _leapProvider: {fileID: 114631939688201826}
   ModelPool: []
 --- !u!114 &114631939688201826
 MonoBehaviour:
