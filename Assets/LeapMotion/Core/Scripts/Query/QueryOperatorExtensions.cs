@@ -24,7 +24,7 @@ namespace Leap.Unity.Query {
       using (var slice = query.Deconstruct()) {
         var dstArray = ArrayPool<T>.Spawn(slice.Count + collection.Count);
 
-        slice.BackingArray.CopyTo(dstArray, 0);
+        Array.Copy(slice.BackingArray, dstArray, slice.Count);
         collection.CopyTo(dstArray, slice.Count);
 
         return new Query<T>(dstArray, slice.Count + collection.Count);
@@ -45,8 +45,8 @@ namespace Leap.Unity.Query {
       using (var otherSlice = other.Deconstruct()) {
         var dstArray = ArrayPool<T>.Spawn(slice.Count + otherSlice.Count);
 
-        slice.BackingArray.CopyTo(dstArray, 0);
-        otherSlice.BackingArray.CopyTo(dstArray, slice.Count);
+        Array.Copy(slice.BackingArray, dstArray, slice.Count);
+        Array.Copy(otherSlice.BackingArray, 0, dstArray, slice.Count, otherSlice.Count);
 
         return new Query<T>(dstArray, slice.Count + otherSlice.Count);
       }
@@ -255,7 +255,7 @@ namespace Leap.Unity.Query {
 
         int targetIndex = 0;
         for (int i = 0; i < slice.Count; i++) {
-          slices[i].BackingArray.CopyTo(dstArray, targetIndex);
+          Array.Copy(slices[i].BackingArray, 0, dstArray, targetIndex, slices[i].Count);
           targetIndex += slices[i].Count;
           slices[i].Dispose();
         }
@@ -283,6 +283,7 @@ namespace Leap.Unity.Query {
       query.Deconstruct(out array, out count);
 
       int resultCount = Mathf.Max(count - toSkip, 0);
+      toSkip = count - resultCount;
       Array.Copy(array, toSkip, array, 0, resultCount);
       Array.Clear(array, resultCount, array.Length - resultCount);
 
