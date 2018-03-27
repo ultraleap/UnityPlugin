@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 using NUnit.Framework;
 using LeapInternal;
 
-namespace Leap.Tests {
+namespace Leap.LeapCSharp.Tests {
 
   [StructLayout(LayoutKind.Sequential)]
   struct TestMarshaledStruct {
@@ -47,7 +47,8 @@ namespace Leap.Tests {
     public void PtrToStructTest() {
       Marshal.StructureToPtr(_testStruct, _ptr, false);
 
-      var output = StructMarshal<TestMarshaledStruct>.PtrToStruct(_ptr);
+      TestMarshaledStruct output;
+      StructMarshal<TestMarshaledStruct>.PtrToStruct(_ptr, out output);
       Assert.That(_testStruct.id, Is.EqualTo(output.id), "Input must match output.");
     }
 
@@ -55,13 +56,14 @@ namespace Leap.Tests {
     public void ArrayElementToStructTest() {
       Marshal.StructureToPtr(_testStruct, (IntPtr)((long)_ptr + _size * ARRAY_TEST_INDEX), false);
 
-      var output = StructMarshal<TestMarshaledStruct>.ArrayElementToStruct(_ptr, ARRAY_TEST_INDEX);
+      TestMarshaledStruct output;
+      StructMarshal<TestMarshaledStruct>.ArrayElementToStruct(_ptr, ARRAY_TEST_INDEX, out output);
       Assert.That(_testStruct.id, Is.EqualTo(output.id), "Input must match output.");
     }
 
     [Test]
     public void CopyIntoDestination() {
-      StructMarshal<TestMarshaledStruct>.CopyIntoDestination(_ptr, _testStruct);
+      StructMarshal<TestMarshaledStruct>.CopyIntoDestination(_ptr, ref _testStruct);
 
       var output = (TestMarshaledStruct)Marshal.PtrToStructure(_ptr, typeof(TestMarshaledStruct));
       Assert.That(_testStruct.id, Is.EqualTo(output.id), "Input must match output.");
@@ -69,7 +71,7 @@ namespace Leap.Tests {
 
     [Test]
     public void CopyIntoArray() {
-      StructMarshal<TestMarshaledStruct>.CopyIntoArray(_ptr, _testStruct, ARRAY_TEST_INDEX);
+      StructMarshal<TestMarshaledStruct>.CopyIntoArray(_ptr, ref _testStruct, ARRAY_TEST_INDEX);
 
       var output = (TestMarshaledStruct)Marshal.PtrToStructure((IntPtr)((long)_ptr + _size * ARRAY_TEST_INDEX), typeof(TestMarshaledStruct));
       Assert.That(_testStruct.id, Is.EqualTo(output.id), "Input must match output.");

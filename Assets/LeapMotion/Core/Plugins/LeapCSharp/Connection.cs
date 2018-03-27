@@ -542,7 +542,7 @@ namespace LeapInternal
       if (LeapConfigChange != null)
       {
         LeapConfigChange.DispatchOnContext<ConfigChangeEventArgs>(this, EventContext,
-          new ConfigChangeEventArgs(config_key, configEvent.status != 0, configEvent.requestId));
+          new ConfigChangeEventArgs(config_key, configEvent.status != false, configEvent.requestId));
       }
     }
 

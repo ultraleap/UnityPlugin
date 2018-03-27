@@ -2,7 +2,7 @@
 using NUnit.Framework;
 using LeapInternal;
 
-namespace Leap.Tests {
+namespace Leap.LeapCSharp.Tests {
     class TestObjectType {
         public int id = 0;
         public TestObjectType(){id = -1;}

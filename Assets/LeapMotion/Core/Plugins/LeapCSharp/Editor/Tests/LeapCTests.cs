@@ -6,7 +6,7 @@ using NUnit.Framework;
 using LeapInternal;
 using Leap;
 
-namespace LeapCSharpWrapperTests
+namespace Leap.LeapCSharp.Tests
 {
     [TestFixture()]
     public class LeapCTests
@@ -570,7 +570,7 @@ namespace LeapCSharpWrapperTests
             }
 
             UInt32 requestId = 1;
-            result = LeapC.SaveConfigValue(connHandle, "tracking_tool_enabled", false, out requestId);
+            result = LeapC.SaveConfigValue(connHandle, "image_processing_auto_flip", false, out requestId);
             Assert.AreEqual(eLeapRS.eLeapRS_Success, result, "Config save requested");
             LEAP_CONNECTION_MESSAGE configMsg = new LEAP_CONNECTION_MESSAGE();
 
@@ -586,11 +586,12 @@ namespace LeapCSharpWrapperTests
             StructMarshal<LEAP_CONFIG_CHANGE_EVENT>.PtrToStruct(configMsg.eventStructPtr, out response);
             UInt32 ReturnedRequestID = response.requestId;
             Assert.AreEqual(requestId, ReturnedRequestID, "Request ID is the same");
-            Assert.True(response.status == 1, "Save successful");
+            UnityEngine.Debug.Log("Response status: " + response.status);
+            Assert.True(response.status == true, "Save successful");
 
             //read the value back
             UInt32 requestID = 1;
-            result = LeapC.RequestConfigValue(connHandle, "tracking_tool_enabled", out requestID);
+            result = LeapC.RequestConfigValue(connHandle, "image_processing_auto_flip", out requestID);
             Assert.AreEqual(eLeapRS.eLeapRS_Success, result, "Config value requested");
             configMsg = new LEAP_CONNECTION_MESSAGE();
 
@@ -611,14 +612,14 @@ namespace LeapCSharpWrapperTests
             ReturnedRequestID = set_response.requestId;
             Assert.AreEqual(requestID, ReturnedRequestID, "Request ID is the same");
             Assert.AreEqual(eLeapValueType.eLeapValueType_Boolean, set_response.value.type, "Got a Boolean value");
-            Assert.False(set_response.value.boolValue == 0, "Tools are disabled");
+            Assert.False(set_response.value.boolValue == 0, "Auto-flip is disabled");
 
             //Set to opposite boolean
-            result = LeapC.SaveConfigValue(connHandle, "tracking_tool_enabled", (set_response.value.boolValue == 0 ? true : false), out requestId);
+            result = LeapC.SaveConfigValue(connHandle, "image_processing_auto_flip", (set_response.value.boolValue == 0 ? true : false), out requestId);
 
             //read the value back again
             requestID = 2;
-            result = LeapC.RequestConfigValue(connHandle, "tracking_tool_enabled", out requestID);
+            result = LeapC.RequestConfigValue(connHandle, "image_processing_auto_flip", out requestID);
             Assert.AreEqual(eLeapRS.eLeapRS_Success, result, "Config value requested");
             configMsg = new LEAP_CONNECTION_MESSAGE();
 
@@ -637,7 +638,7 @@ namespace LeapCSharpWrapperTests
             ReturnedRequestID = set_response.requestId;
             Assert.AreEqual(requestID, ReturnedRequestID, "Request ID is the same");
             Assert.AreEqual(eLeapValueType.eLeapValueType_Boolean, set_response.value.type, "Got a Boolean value");
-            Assert.True(set_response.value.boolValue == 1, "Tools are enabled again");
+            Assert.True(set_response.value.boolValue == 1, "Auto-flip is enabled again");
         }
 
         [Test()]
@@ -680,7 +681,8 @@ namespace LeapCSharpWrapperTests
             Assert.True(response.value.floatValue != float.NaN, "Is a float");
             Assert.AreEqual(1000, response.value.floatValue, "Swipe min velocity is 3mm, the default value");
         }
-
+    
+        [Ignore("LeapC does not document any float config settings to test this with.")]
         [Test()]
         public void TestFloatConfigReadWrite ()
         {
@@ -719,7 +721,7 @@ namespace LeapCSharpWrapperTests
             LEAP_CONFIG_CHANGE_EVENT change;
             StructMarshal<LEAP_CONFIG_CHANGE_EVENT>.PtrToStruct(configMsg.eventStructPtr, out change);
             Assert.AreEqual(requestID, change.requestId, "Request ID is the same");
-            Assert.True(change.status == 1, "Save successful");
+            Assert.True(change.status == true, "Save successful");
 
             //Read first
              requestID = 1;
@@ -759,7 +761,7 @@ namespace LeapCSharpWrapperTests
             Assert.AreEqual(eLeapEventType.eLeapEventType_ConfigChange, configMsg.type);
             StructMarshal<LEAP_CONFIG_CHANGE_EVENT>.PtrToStruct(configMsg.eventStructPtr, out change);
             Assert.AreEqual(requestID, change.requestId, "Request ID is the same");
-            Assert.True(change.status == 1, "Save successful");
+            Assert.True(change.status == true, "Save successful");
 
             //Read again to verify write
             requestID = 2;
@@ -822,7 +824,7 @@ namespace LeapCSharpWrapperTests
             LEAP_CONFIG_CHANGE_EVENT change;
             StructMarshal<LEAP_CONFIG_CHANGE_EVENT>.PtrToStruct(configMsg.eventStructPtr, out change);
             Assert.AreEqual(requestID, change.requestId, "Request ID is the same");
-            Assert.True(change.status == 1, "Save successful");
+            Assert.True(change.status == true, "Save successful");
 
             //Read first
              requestID = 1;
@@ -861,7 +863,7 @@ namespace LeapCSharpWrapperTests
             Assert.AreEqual(eLeapEventType.eLeapEventType_ConfigChange, configMsg.type);
             StructMarshal<LEAP_CONFIG_CHANGE_EVENT>.PtrToStruct(configMsg.eventStructPtr, out change);
             Assert.AreEqual(requestID, change.requestId, "Request ID is the same");
-            Assert.True(change.status == 1, "Save successful");
+            Assert.True(change.status == true, "Save successful");
 
             //Read again to verify write
             requestID = 2;
@@ -964,7 +966,7 @@ namespace LeapCSharpWrapperTests
             LEAP_CONFIG_CHANGE_EVENT change;
             StructMarshal<LEAP_CONFIG_CHANGE_EVENT>.PtrToStruct(configMsg.eventStructPtr, out change);
             Assert.AreEqual(requestID, change.requestId, "Request ID is the same");
-            Assert.True(change.status == 1, "Save successful");
+            Assert.True(change.status == true, "Save successful");
 
             //Read first
             requestID = 1;
@@ -1003,7 +1005,7 @@ namespace LeapCSharpWrapperTests
             Assert.AreEqual(eLeapEventType.eLeapEventType_ConfigChange, configMsg.type);
             StructMarshal<LEAP_CONFIG_CHANGE_EVENT>.PtrToStruct(configMsg.eventStructPtr, out change);
             Assert.AreEqual(requestID, change.requestId, "Request ID is the same");
-            Assert.True(change.status == 1, "Save successful");
+            Assert.True(change.status == true, "Save successful");
 
             //Read again to verify write
             requestID = 2;

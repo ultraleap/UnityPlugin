@@ -1,7 +1,7 @@
 
 using NUnit.Framework;
 
-namespace Leap.Tests
+namespace Leap.LeapCSharp.Tests
 {
     [TestFixture()]
     public class ObjectEquality

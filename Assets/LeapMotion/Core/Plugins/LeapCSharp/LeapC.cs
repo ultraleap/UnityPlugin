@@ -549,7 +549,7 @@ namespace LeapInternal
   public struct LEAP_CONFIG_CHANGE_EVENT
   {
     public UInt32 requestId;
-    public Int32 status;
+    public bool status;
   }
 
   [StructLayout(LayoutKind.Sequential, Pack=1, CharSet = CharSet.Ansi)]

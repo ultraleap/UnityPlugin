@@ -6,7 +6,7 @@ using NUnit.Framework;
 using LeapInternal;
 using Leap;
 
-namespace Leap.Tests {
+namespace Leap.LeapCSharp.Tests {
     [TestFixture()]
     public class LeapCStressTests
     {

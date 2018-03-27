@@ -2,19 +2,16 @@
 using System;
 using Leap;
 
-namespace Leap.Tests {
+namespace Leap.LeapCSharp.Tests {
     [TestFixture ()]
     public class VectorTests
     {
         Vector thisVector = Vector.Up;
         Vector thatVector = Vector.Forward;
-        Vector otherVector = Vector.Left;
+        //Vector otherVector = Vector.Left;
 
-        [TestFixtureSetUp]
-        public void Init ()
-        {
-        }
-
+        [OneTimeSetUp]
+        public void Init () { }
 
         [Test ()]
         public void Vector_Up ()
@@ -432,6 +429,7 @@ namespace Leap.Tests {
             // !!!Vector_NotEqual
             bool vectorsNotEqual = thisVector != thatVector;
             // !!!END
+            Assert.IsTrue(vectorsNotEqual);
         }
 
         [Test ()]
@@ -442,6 +440,7 @@ namespace Leap.Tests {
           Vector yInvalid = new Vector(32.1f, float.NaN, 45f);
           Assert.IsFalse(yInvalid.IsValid());
           Vector zInvalid = new Vector(-345.32f, -78.67f, float.NaN);
+          Assert.IsFalse(zInvalid.IsValid());
           Vector xInfinite = new Vector(float.PositiveInfinity, 3f, 45f);
           Assert.IsFalse(xInfinite.IsValid());
           Vector yInfinite = new Vector(-23.7f, float.NegativeInfinity, 3f);
