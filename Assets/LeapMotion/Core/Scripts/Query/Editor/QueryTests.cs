@@ -95,7 +95,7 @@ namespace Leap.Unity.Tests {
     }
 
     [Test]
-    public void ElemenAtTest([ValueSource("list0")] QueryArg arg, [Values(0, 3, 100)] int index) {
+    public void ElementAtTest([ValueSource("list0")] QueryArg arg, [Values(0, 3, 100)] int index) {
       var list = arg.ToList();
 
       if (index >= list.Count) {
