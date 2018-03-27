@@ -10,18 +10,17 @@ namespace Leap.LeapCSharp.Tests
         Device device = new Device();
 
         [OneTimeSetUp]
-        public void Init ()
-        {
+        public void Init() {
             controller = new Controller ();
             System.Threading.Thread.Sleep (500);
             if(!controller.Devices.IsEmpty)
                 device = controller.Devices[0];
         }
 
-        [Test ()]
-        public void TestCase ()
-        {
-            Assert.True (controller.IsConnected);
+        [Test]
+        public void DeviceIsConnected() {
+            Assert.True(controller.IsConnected,
+              "A Leap device must be connected to successfully test LeapCSharp.");
         }
 
         // ಠ_ಠ
