@@ -103,6 +103,7 @@ namespace LeapInternal
     public EventHandler<DroppedFrameEventArgs> LeapDroppedFrame;
     public EventHandler<ImageEventArgs> LeapImage;
     public EventHandler<PointMappingChangeEventArgs> LeapPointMappingChange;
+    public EventHandler<HeadPoseEventArgs> LeapHeadPoseChange;
 
     public Action<BeginProfilingForThreadArgs> LeapBeginProfilingForThread;
     public Action<EndProfilingForThreadArgs> LeapEndProfilingForThread;
@@ -303,6 +304,11 @@ namespace LeapInternal
               StructMarshal<LEAP_POINT_MAPPING_CHANGE_EVENT>.PtrToStruct(_msg.eventStructPtr, out point_mapping_change_evt);
               handlePointMappingChange(ref point_mapping_change_evt);
               break;
+            case eLeapEventType.eLeapEventType_HeadPose:
+              LEAP_HEAD_POSE_EVENT head_pose_event;
+              StructMarshal<LEAP_HEAD_POSE_EVENT>.PtrToStruct(_msg.eventStructPtr, out head_pose_event);
+              handleHeadPoseChange(ref head_pose_event);
+              break;
             //default:
             //  // Discard unknown message types.
             //  Logger.Log("Unhandled message type " + Enum.GetName(typeof(eLeapEventType), _msg.type));
@@ -382,6 +388,19 @@ namespace LeapInternal
       Frame frame = new Frame();
       GetInterpolatedFrame(frame, time);
       return frame;
+    }
+
+    public void GetInterpolatedHeadPose(ref LEAP_HEAD_POSE_EVENT toFill, Int64 time)
+    {
+      eLeapRS result = LeapC.InterpolateHeadPose(_leapConnection, time, ref toFill);
+      reportAbnormalResults("LeapC get interpolated head pose call was ", result);
+    }
+
+    public LEAP_HEAD_POSE_EVENT GetInterpolatedHeadPose(Int64 time)
+    {
+      LEAP_HEAD_POSE_EVENT headPoseEvent = new LEAP_HEAD_POSE_EVENT();
+      GetInterpolatedHeadPose(ref headPoseEvent, time);
+      return headPoseEvent;
     }
 
     public void GetInterpolatedLeftRightTransform(Int64 time,
@@ -642,6 +661,14 @@ namespace LeapInternal
       if (LeapDroppedFrame != null)
       {
         LeapDroppedFrame.DispatchOnContext<DroppedFrameEventArgs>(this, EventContext, new DroppedFrameEventArgs(droppedFrame.frame_id, droppedFrame.reason));
+      }
+    }
+
+    private void handleHeadPoseChange(ref LEAP_HEAD_POSE_EVENT headPose)
+    {
+      if (LeapHeadPoseChange != null)
+      {
+        LeapHeadPoseChange.DispatchOnContext<HeadPoseEventArgs>(this, EventContext, new HeadPoseEventArgs(headPose.head_position, headPose.head_orientation));
       }
     }
 

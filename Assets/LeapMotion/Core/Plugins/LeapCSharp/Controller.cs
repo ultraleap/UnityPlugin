@@ -371,6 +371,18 @@ namespace Leap
       }
     }
 
+    public event EventHandler<HeadPoseEventArgs> headPoseChange
+    {
+      add
+      {
+        _connection.LeapHeadPoseChange += value;
+      }
+      remove
+      {
+        _connection.LeapHeadPoseChange -= value;
+      }
+    }
+
     //TODO revisit dispose code
     public void Dispose()
     {
@@ -637,6 +649,20 @@ namespace Leap
     public void GetInterpolatedFrame(Frame toFill, Int64 time)
     {
       _connection.GetInterpolatedFrame(toFill, time);
+    }
+
+    /**
+    * Returns the Head pose at the specified time, interpolating the data between existing frames, if necessary.
+     *
+    */
+    public LEAP_HEAD_POSE_EVENT GetInterpolatedHeadPose(Int64 time)
+    {
+      return _connection.GetInterpolatedHeadPose(time);
+    }
+
+    public void GetInterpolatedHeadPose(ref LEAP_HEAD_POSE_EVENT toFill, Int64 time)
+    {
+      _connection.GetInterpolatedHeadPose(ref toFill, time);
     }
 
     public void TelemetryProfiling(ref LEAP_TELEMETRY_DATA telemetryData) {

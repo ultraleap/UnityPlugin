@@ -24,8 +24,6 @@ namespace LeapInternal
       frame.CurrentFramesPerSecond = trackingMsg.framerate;
       frame.InteractionBox = new InteractionBox(trackingMsg.interaction_box_center.ToLeapVector(),
                                                 trackingMsg.interaction_box_size.ToLeapVector());
-      frame.HeadPosition = trackingMsg.head_position.ToLeapVector();
-      frame.HeadOrientation = trackingMsg.head_orientation.ToLeapQuaternion();
 
       frame.ResizeHandList((int)trackingMsg.nHands);
 

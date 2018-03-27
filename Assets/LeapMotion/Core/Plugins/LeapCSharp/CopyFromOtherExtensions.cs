@@ -21,8 +21,6 @@ namespace Leap {
       frame.Timestamp = source.Timestamp;
       frame.CurrentFramesPerSecond = source.CurrentFramesPerSecond;
       frame.InteractionBox = source.InteractionBox;
-      frame.HeadPosition = source.HeadPosition;
-      frame.HeadOrientation = source.HeadOrientation;
 
       frame.ResizeHandList(source.Hands.Count);
 

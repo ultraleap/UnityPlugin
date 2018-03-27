@@ -35,6 +35,7 @@ namespace Leap
     EVENT_DROPPED_FRAME,
     EVENT_IMAGE,             //!< An unrequested image is available
     EVENT_POINT_MAPPING_CHANGE,
+    EVENT_HEAD_POSE
   };
   /**
    * A generic object with no arguments beyond the event type.
@@ -272,6 +273,18 @@ namespace Leap
     public Int64 frameID { get; set; }
     public Int64 timestamp { get; set; }
     public UInt32 nPoints { get; set; }
+  }
+
+  public class HeadPoseEventArgs : LeapEventArgs
+  {
+    public HeadPoseEventArgs(LEAP_VECTOR head_position, LEAP_QUATERNION head_orientation) : base(LeapEvent.EVENT_POINT_MAPPING_CHANGE)
+    {
+      this.headPosition = head_position;
+      this.headOrientation = head_orientation;
+    }
+
+    public LEAP_VECTOR headPosition { get; set; }
+    public LEAP_QUATERNION headOrientation { get; set; }
   }
 
   public struct BeginProfilingForThreadArgs

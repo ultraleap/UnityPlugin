@@ -242,13 +242,6 @@ namespace Leap
      */
     public InteractionBox InteractionBox;
 
-    /**
-    * The position and orientation of the user's head. Positional tracking must be enabled.
-    * @since 3.2.1
-    */
-    public Vector HeadPosition;
-    public LeapQuaternion HeadOrientation;
-
     public int SerializeLength
     {
       get { return 0; }

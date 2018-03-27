@@ -40,5 +40,6 @@ namespace Leap
     event EventHandler<DistortionEventArgs> DistortionChange;
     event EventHandler<ImageEventArgs> ImageReady;
     event EventHandler<PointMappingChangeEventArgs> PointMappingChange;
+    event EventHandler<HeadPoseEventArgs> headPoseChange;
   }
 }

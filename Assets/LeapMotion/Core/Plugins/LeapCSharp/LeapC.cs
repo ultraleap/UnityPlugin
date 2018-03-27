@@ -273,8 +273,6 @@ namespace LeapInternal
     public Int64 tracking_id;
     public LEAP_VECTOR interaction_box_size;
     public LEAP_VECTOR interaction_box_center;
-    public LEAP_VECTOR head_position;
-    public LEAP_QUATERNION head_orientation;
     public UInt32 nHands;
     public IntPtr pHands; //LEAP_HAND*
     public float framerate;
@@ -303,6 +301,14 @@ namespace LeapInternal
     public UInt32 nPoints;
     public LEAP_VECTOR[] points;
     public UInt32[] ids;
+  }
+
+  [StructLayout(LayoutKind.Sequential, Pack = 1)]
+  public struct LEAP_HEAD_POSE_EVENT
+  {
+    public Int64 timestamp;
+    public LEAP_VECTOR head_position;
+    public LEAP_QUATERNION head_orientation;
   }
 
   [StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -423,6 +429,14 @@ namespace LeapInternal
       z = q.z;
       w = q.w;
     }
+  }
+
+  [StructLayout(LayoutKind.Sequential, Pack = 1)]
+  public struct LEAP_MATRIX_3x3
+  {
+    public LEAP_VECTOR m1;
+    public LEAP_VECTOR m2;
+    public LEAP_VECTOR m3;
   }
 
   [StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -630,6 +644,9 @@ namespace LeapInternal
 
     [DllImport("LeapC", EntryPoint = "LeapInterpolateFrameFromTime")]
     public static extern eLeapRS InterpolateFrameFromTime(IntPtr hConnection, Int64 timestamp, Int64 sourceTimestamp, IntPtr pEvent, UInt64 ncbEvent);
+
+    [DllImport("LeapC", EntryPoint = "LeapInterpolateHeadPose")]
+    public static extern eLeapRS InterpolateHeadPose(IntPtr hConnection, Int64 timestamp, ref LEAP_HEAD_POSE_EVENT headPose);
 
     [DllImport("LeapC", EntryPoint = "LeapPixelToRectilinear")]
     public static extern LEAP_VECTOR  LeapPixelToRectilinear(IntPtr hConnection, eLeapPerspectiveType camera, LEAP_VECTOR pixel);
