@@ -151,40 +151,32 @@ namespace LeapInternal
     eLeapRS_CannotOpenDevice = 0xE7010005, //!< The specified device could not be opened. Invalid device identifier or the device has been disconnected since being enumerated.
   };
 
-  public enum eLeapEventType
-  {
-    eLeapEventType_None = 0, //!< No event occurred in the specified timeout period
-    eLeapEventType_Connection, //!< A connection event has occurred
-    eLeapEventType_ConnectionLost, //!< The connection with the service has been lost
-    eLeapEventType_Device, //!<  A device event has occurred
-    eLeapEventType_DeviceFailure, //!< A device failure event has occurred
-    eLeapEventType_PolicyChange, //!< A change in policy occurred
-    eLeapEventType_Tracking = 0x100, //!< A tracking frame has been received
-                                     /**
-                                      * The user must invoke LeapReceiveImage(evt->Image, ...) if image data is desired.  If this call
-                                      * is not made, the image will be discarded from the stream.
-                                      *
-                                      * Depending on the image types the user has requested, this event may be asserted more than once
-                                      * per frame.
-                                      */
-    eLeapEventType_LogEvent = 0x103, //!< A diagnostic event has occured
+  public enum eLeapEventType {
+    eLeapEventType_None = 0,
+    eLeapEventType_Connection,
+    eLeapEventType_ConnectionLost,
+    eLeapEventType_Device,
 
-    /**
-     * The eLeapEventType_DeviceLost event type will always be asserted regardless of the user flags assignment.
-     * Users are required to correctly handle this event when it is received.
-     *
-     * This event is generally asserted when the device has been detached from the system, when the
-     * connection to the service has been lost, or if the device is closed while streaming.  Generally,
-     * any event where the system can conclude no further frames will be received will cause this
-     * method to be invoked.
-     */
-    eLeapEventType_DeviceLost, //!< Event asserted when the underlying device object has been lost
-    eLeapEventType_ConfigResponse, //!< Response to a Config value request
-    eLeapEventType_ConfigChange, //!< Success response to a Config value change
+    /// <summary>
+    /// Note that unplugging a device generates an eLeapEventType_DeviceLost event
+    /// message, not a failure message.
+    /// </summary>
+    eLeapEventType_DeviceFailure,
+
+    eLeapEventType_Policy,
+    eLeapEventType_Tracking = 0x100,
+    eLeapEventType_ImageRequestError,
+    eLeapEventType_ImageComplete,
+    eLeapEventType_LogEvent,
+    eLeapEventType_DeviceLost,
+    eLeapEventType_ConfigResponse,
+    eLeapEventType_ConfigChange,
     eLeapEventType_DeviceStatusChange,
     eLeapEventType_DroppedFrame,
     eLeapEventType_Image,
     eLeapEventType_PointMappingChange,
+    eLeapEventType_LogEvents,
+    eLeapEventType_HeadPose
   };
 
   public enum eLeapDeviceFlag : uint

@@ -231,6 +231,9 @@ namespace LeapInternal
 
           switch (_msg.type)
           {
+            case eLeapEventType.eLeapEventType_None:
+              break;
+
             case eLeapEventType.eLeapEventType_Connection:
               LEAP_CONNECTION_EVENT connection_evt;
               StructMarshal<LEAP_CONNECTION_EVENT>.PtrToStruct(_msg.eventStructPtr, out connection_evt);
@@ -241,21 +244,27 @@ namespace LeapInternal
               StructMarshal<LEAP_CONNECTION_LOST_EVENT>.PtrToStruct(_msg.eventStructPtr, out connection_lost_evt);
               handleConnectionLost(ref connection_lost_evt);
               break;
+
             case eLeapEventType.eLeapEventType_Device:
               LEAP_DEVICE_EVENT device_evt;
               StructMarshal<LEAP_DEVICE_EVENT>.PtrToStruct(_msg.eventStructPtr, out device_evt);
               handleDevice(ref device_evt);
               break;
-            case eLeapEventType.eLeapEventType_DeviceLost:
-              LEAP_DEVICE_EVENT device_lost_evt;
-              StructMarshal<LEAP_DEVICE_EVENT>.PtrToStruct(_msg.eventStructPtr, out device_lost_evt);
-              handleLostDevice(ref device_lost_evt);
-              break;
+
+            // Note that unplugging a device generates an eLeapEventType_DeviceLost event
+            // message, not a failure message. DeviceLost is further down.
             case eLeapEventType.eLeapEventType_DeviceFailure:
               LEAP_DEVICE_FAILURE_EVENT device_failure_evt;
               StructMarshal<LEAP_DEVICE_FAILURE_EVENT>.PtrToStruct(_msg.eventStructPtr, out device_failure_evt);
               handleFailedDevice(ref device_failure_evt);
               break;
+
+            case eLeapEventType.eLeapEventType_Policy:
+              LEAP_POLICY_EVENT policy_evt;
+              StructMarshal<LEAP_POLICY_EVENT>.PtrToStruct(_msg.eventStructPtr, out policy_evt);
+              handlePolicyChange(ref policy_evt);
+              break;
+
             case eLeapEventType.eLeapEventType_Tracking:
               LEAP_TRACKING_EVENT tracking_evt;
               StructMarshal<LEAP_TRACKING_EVENT>.PtrToStruct(_msg.eventStructPtr, out tracking_evt);
@@ -266,10 +275,10 @@ namespace LeapInternal
               StructMarshal<LEAP_LOG_EVENT>.PtrToStruct(_msg.eventStructPtr, out log_evt);
               reportLogMessage(ref log_evt);
               break;
-            case eLeapEventType.eLeapEventType_PolicyChange:
-              LEAP_POLICY_EVENT policy_evt;
-              StructMarshal<LEAP_POLICY_EVENT>.PtrToStruct(_msg.eventStructPtr, out policy_evt);
-              handlePolicyChange(ref policy_evt);
+            case eLeapEventType.eLeapEventType_DeviceLost:
+              LEAP_DEVICE_EVENT device_lost_evt;
+              StructMarshal<LEAP_DEVICE_EVENT>.PtrToStruct(_msg.eventStructPtr, out device_lost_evt);
+              handleLostDevice(ref device_lost_evt);
               break;
             case eLeapEventType.eLeapEventType_ConfigChange:
               LEAP_CONFIG_CHANGE_EVENT config_change_evt;
@@ -294,10 +303,10 @@ namespace LeapInternal
               StructMarshal<LEAP_POINT_MAPPING_CHANGE_EVENT>.PtrToStruct(_msg.eventStructPtr, out point_mapping_change_evt);
               handlePointMappingChange(ref point_mapping_change_evt);
               break;
-            default:
-              //discard unknown message types
-              Logger.Log("Unhandled message type " + Enum.GetName(typeof(eLeapEventType), _msg.type));
-              break;
+            //default:
+            //  // Discard unknown message types.
+            //  Logger.Log("Unhandled message type " + Enum.GetName(typeof(eLeapEventType), _msg.type));
+            //  break;
           } //switch on _msg.type
 
           if (LeapEndProfilingBlock != null && hasBegunProfilingForThread) 
