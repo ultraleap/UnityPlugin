@@ -62,7 +62,7 @@ namespace Leap.Unity {
     [SerializeField]
     protected PhysicsExtrapolationMode _physicsExtrapolation = PhysicsExtrapolationMode.Auto;
 
-    [Tooltip("The amount of time (in seconds) to extrapolate the phyiscs data by.")]
+    [Tooltip("The amount of time (in seconds) to extrapolate the physics data by.")]
     [SerializeField]
     protected float _physicsExtrapolationTime = 1.0f / 90.0f;
 

@@ -51,7 +51,7 @@ namespace Leap.Unity {
       }
       #else
       if (!outputPresenceWarning){
-        Debug.LogWarning("XR UserPresenceState is only supported in in 2017.2 and newer.");
+        Debug.LogWarning("XR UserPresenceState is only supported in 2017.2 and newer.");
         outputPresenceWarning = true;
       }
       #endif

@@ -15,8 +15,6 @@ namespace Leap.Unity {
   /// <summary>
   /// Moves the camera to each eye position on pre-render. Only necessary for image
   /// pass-through (IR viewer) scenarios.
-  /// 
-  /// Note: This script will be removed in a future version of UnityModules.
   /// </summary>
   [RequireComponent(typeof(LeapXRServiceProvider))]
   public class LeapEyeDislocator : MonoBehaviour {
