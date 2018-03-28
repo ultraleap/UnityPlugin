@@ -414,43 +414,6 @@ namespace Leap.LeapCSharp.Tests {
       Assert.AreEqual(eLeapRS.eLeapRS_Success, result, "SetDevicePolicyFlags Call");
     }
 
-    //        [Test]
-    //        public void TestSetImagePolicyFlag ()
-    //        {
-    //            IntPtr connHandle = IntPtr.Zero;
-    //            eLeapRS result = LeapC.CreateConnection(out connHandle);
-    //            Assert.AreEqual(eLeapRS.eLeapRS_Success, result);
-    //
-    //            result = LeapC.OpenConnection(connHandle);
-    //            Assert.AreEqual(eLeapRS.eLeapRS_Success, result);
-    //
-    //            //Wait for device event
-    //            LEAP_CONNECTION_MESSAGE msg = new LEAP_CONNECTION_MESSAGE();
-    //            uint timeout = 100;
-    //            int attempts = 100;
-    //            for(int t = 0; t < attempts; t++){
-    //                result = LeapC.PollConnection(connHandle, timeout, ref msg);
-    //                if(msg.type == eLeapEventType.eLeapEventType_Device)
-    //                    break;
-    //            }
-    //
-    //            eLeapPolicyFlag policyToCheck = eLeapPolicyFlag.eLeapPolicyFlag_Images;
-    //            UInt64 setFlags = (UInt64)policyToCheck;
-    //            UInt64 clearFlags = 0;
-    //            result = LeapC.SetPolicyFlags(connHandle, setFlags, clearFlags);
-    //            Assert.AreEqual(eLeapRS.eLeapRS_Success, result, "SetDevicePolicyFlags Call successful");
-    //
-    //            int tries = 100;
-    //            for(int t = 0; t < tries; t++){
-    //                result = LeapC.PollConnection(connHandle, timeout, ref msg);
-    //                if (msg.type == eLeapEventType.eLeapEventType_PolicyChange) {
-    //                    LEAP_POLICY_EVENT policyEvent = LeapC.PtrToStruct<LEAP_POLICY_EVENT>(msg.eventStructPtr);
-    //                    Assert.IsTrue ((policyEvent.current_policy & setFlags) == setFlags);
-    //                    break;
-    //                }
-    //            }
-    //        }
-
     //public  static extern eLeapRS  LeapSetDeviceFlags (LEAP_DEVICE hDevice, UInt64 set, UInt64 clear, out UInt64* prior);
     [Test]
     public void TestSetDeviceFlags() {
@@ -493,13 +456,6 @@ namespace Leap.LeapCSharp.Tests {
         UInt64 priorFlags = 0;
         result = LeapC.SetDeviceFlags(device, setFlags, clearFlags, out priorFlags);
         Assert.AreEqual(eLeapRS.eLeapRS_Success, result, "SetDeviceFlags Call successful");
-
-        // TODO: This assert assumes that an open device is necessarily streaming (that is,
-        // it has its stream flag set). It's not clear why this must be the case.
-        //Assert.AreEqual(
-        //  (uint)eLeapDeviceFlag.eLeapDeviceFlag_Stream,
-        //  (uint)eLeapDeviceFlag.eLeapDeviceFlag_Stream & priorFlags,
-        //  "Device must be streaming after setting the Stream device flag.");
       }
     }
 

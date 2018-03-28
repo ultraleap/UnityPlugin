@@ -30,55 +30,6 @@ namespace Leap.LeapCSharp.Tests {
         "A Leap device must be connected to successfully test LeapCSharp.");
     }
 
-    // ಠ_ಠ
-    //[Test ()]
-    //public void Device_horizontalViewAngle ()
-    //{
-    //    // !!!Device_horizontalViewAngle
-    //    float angleOnLongDimension = device.HorizontalViewAngle;
-    //    // !!!END
-    //    Assert.AreEqual(132f, angleOnLongDimension * 180f/(float)Math.PI);
-    //}
-
-    // ಠ_ಠ ಠ_ಠ
-    //[Test ()]
-    //public void Device_range ()
-    //{
-    //    // !!!Device_range
-    //    float range = device.Range;
-    //    // !!!END
-    //    Assert.AreEqual(470f, range);
-    //}
-
-    //[Test ()]
-    //public void Device_verticalViewAngle ()
-    //{
-    //    // !!!Device_verticalViewAngle
-    //    float angleOnShortDimension = device.VerticalViewAngle;
-    //    // !!!END
-    //    Assert.AreEqual(115f, angleOnShortDimension * 180f/(float)Math.PI);
-    //}
-
-    [Test()]
-    public void Device_isSmudged() {
-      // !!!Device_isSmudged
-      if (device.IsSmudged) {
-        //Display message to user
-      }
-      // !!!END
-      Assert.False(device.IsSmudged);
-    }
-
-    [Test()]
-    public void Device_isLightingBad() {
-      // !!!Device_isLightingBad
-      if (device.IsLightingBad) {
-        //Display message to user
-      }
-      // !!!END
-      Assert.False(device.IsLightingBad);
-    }
-
     [Test()]
     public void Device_operator_equals() {
       Device thisDevice = new Device();
