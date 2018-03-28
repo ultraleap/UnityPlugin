@@ -14,14 +14,11 @@ namespace Leap.LeapCSharp.Tests {
   [TestFixture()]
   public class DeviceTests {
     Controller controller;
-    Device device = new Device();
 
     [OneTimeSetUp]
     public void Init() {
       controller = new Controller();
       System.Threading.Thread.Sleep(500);
-      if (!controller.Devices.IsEmpty)
-        device = controller.Devices[0];
     }
 
     [Test]
