@@ -7,11 +7,9 @@
 \******************************************************************************/
 using System;
 
-namespace Leap
-{
+namespace Leap {
   public interface IController :
-    IDisposable
-  {
+    IDisposable {
     Frame Frame(int history = 0);
     Frame GetTransformedFrame(LeapTransform trs, int history = 0);
     Frame GetInterpolatedFrame(Int64 time);

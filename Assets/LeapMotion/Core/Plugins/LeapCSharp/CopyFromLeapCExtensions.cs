@@ -5,20 +5,18 @@
 * https://developer.leapmotion.com/sdk_agreement, or another agreement         *
 * between Leap Motion and you, your company or other organization.             *
 \******************************************************************************/
-namespace LeapInternal
-{
+
+namespace LeapInternal {
   using Leap;
 
-  public static class CopyFromLeapCExtensions
-  {
+  public static class CopyFromLeapCExtensions {
 
     /**
      * Copies the data from an internal tracking message into a frame.
      *
      * @param trackingMsg The internal tracking message with the data to be copied into this frame.
      */
-    public static Frame CopyFrom(this Frame frame, ref LEAP_TRACKING_EVENT trackingMsg)
-    {
+    public static Frame CopyFrom(this Frame frame, ref LEAP_TRACKING_EVENT trackingMsg) {
       frame.Id = (long)trackingMsg.info.frame_id;
       frame.Timestamp = (long)trackingMsg.info.timestamp;
       frame.CurrentFramesPerSecond = trackingMsg.framerate;
@@ -27,8 +25,7 @@ namespace LeapInternal
 
       frame.ResizeHandList((int)trackingMsg.nHands);
 
-      for (int i = frame.Hands.Count; i-- != 0; )
-      {
+      for (int i = frame.Hands.Count; i-- != 0;) {
         LEAP_HAND hand;
         StructMarshal<LEAP_HAND>.ArrayElementToStruct(trackingMsg.pHands, i, out hand);
         frame.Hands[i].CopyFrom(ref hand, frame.Id);
@@ -43,8 +40,7 @@ namespace LeapInternal
      * @param leapHand The internal hand definition to be copied into this hand.
      * @param frameId The frame id of the frame this hand belongs to.
      */
-    public static Hand CopyFrom(this Hand hand, ref LEAP_HAND leapHand, long frameId)
-    {
+    public static Hand CopyFrom(this Hand hand, ref LEAP_HAND leapHand, long frameId) {
       hand.FrameId = frameId;
       hand.Id = (int)leapHand.id;
 
@@ -84,8 +80,7 @@ namespace LeapInternal
      * @param handId The hand id of the hand this finger belongs to.
      * @param timeVisible The time in seconds that this finger has been visible.
      */
-    public static Finger CopyFrom(this Finger finger, LEAP_DIGIT leapBone, Finger.FingerType type, int handId, float timeVisible)
-    {
+    public static Finger CopyFrom(this Finger finger, LEAP_DIGIT leapBone, Finger.FingerType type, int handId, float timeVisible) {
       finger.Id = (handId * 10) + leapBone.finger_id;
       finger.HandId = handId;
       finger.TimeVisible = timeVisible;
@@ -105,7 +100,7 @@ namespace LeapInternal
       finger.Direction = intermediate.Direction;
       finger.StabilizedTipPosition = leapBone.stabilized_tip_position.ToLeapVector();
       finger.Width = intermediate.Width;
-      finger.Length = (leapBone.finger_id == 0 ? 0.0f : 0.5f*proximal.Length) + intermediate.Length + 0.77f*distal.Length; //The values 0.5 for proximal and 0.77 for distal are used in platform code for this calculation
+      finger.Length = (leapBone.finger_id == 0 ? 0.0f : 0.5f * proximal.Length) + intermediate.Length + 0.77f * distal.Length; //The values 0.5 for proximal and 0.77 for distal are used in platform code for this calculation
       finger.IsExtended = leapBone.is_extended != 0;
       finger.Type = type;
 
@@ -118,16 +113,14 @@ namespace LeapInternal
      * @param leapBone The internal bone definition to be copied into this bone.
      * @param type The bone type of this bone.
      */
-    public static Bone CopyFrom(this Bone bone, LEAP_BONE leapBone, Bone.BoneType type)
-    {
+    public static Bone CopyFrom(this Bone bone, LEAP_BONE leapBone, Bone.BoneType type) {
       bone.Type = type;
       bone.PrevJoint = leapBone.prev_joint.ToLeapVector();
       bone.NextJoint = leapBone.next_joint.ToLeapVector();
       bone.Direction = (bone.NextJoint - bone.PrevJoint);
       bone.Length = bone.Direction.Magnitude;
 
-      if (bone.Length < float.Epsilon)
-      {
+      if (bone.Length < float.Epsilon) {
         bone.Direction = Vector.Zero;
       } else {
         bone.Direction /= bone.Length;

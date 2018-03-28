@@ -5,11 +5,9 @@
 * https://developer.leapmotion.com/sdk_agreement, or another agreement         *
 * between Leap Motion and you, your company or other organization.             *
 \******************************************************************************/
-namespace Leap
-{
+
+namespace Leap {
   using System;
-  using System.Collections.Generic;
-  using System.Runtime.InteropServices;
 
   /**
    * The Bone class represents a tracked bone.
@@ -27,15 +25,13 @@ namespace Leap
    * @since 2.0
    */
   [Serializable]
-  public class Bone
-  {
+  public class Bone {
     /**
      * Constructs a default Bone object.
      *
      * @since 2.0
      */
-    public Bone()
-    {
+    public Bone() {
       Type = BoneType.TYPE_INVALID;
     }
 
@@ -59,8 +55,7 @@ namespace Leap
                 float length,
                 float width,
                 Bone.BoneType type,
-                LeapQuaternion rotation)
-    {
+                LeapQuaternion rotation) {
       PrevJoint = prevJoint;
       NextJoint = nextJoint;
       Center = center;
@@ -78,8 +73,7 @@ namespace Leap
      * exact same physical bone in the same frame and both Bone objects are valid.
      * @since 2.0
      */
-    public bool Equals(Bone other)
-    {
+    public bool Equals(Bone other) {
       return Center == other.Center && Direction == other.Direction && Length == other.Length;
     }
 
@@ -91,8 +85,7 @@ namespace Leap
      * @returns A description of the Bone object as a string.
      * @since 2.0
      */
-    public override string ToString()
-    {
+    public override string ToString() {
       return Enum.GetName(typeof(BoneType), this.Type) + " bone";
     }
 
@@ -222,8 +215,7 @@ namespace Leap
      * Bone object.
      * @since 2.0
      */
-    public enum BoneType
-    {
+    public enum BoneType {
       TYPE_INVALID = -1,
       TYPE_METACARPAL = 0,
       TYPE_PROXIMAL = 1,

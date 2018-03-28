@@ -6,8 +6,7 @@
 * between Leap Motion and you, your company or other organization.             *
 \******************************************************************************/
 
-namespace Leap
-{
+namespace Leap {
   using System;
 
   /**
@@ -16,8 +15,7 @@ namespace Leap
   * Note that the LeapTransform class replaces the Leap.Matrix class.
   * @since 3.1.2
   */
-  public struct LeapTransform
-  {
+  public struct LeapTransform {
     /**
     * Constructs a new transform from the specified translation and rotation.
     * @param translation the translation vector.
@@ -25,8 +23,7 @@ namespace Leap
     * @since 3.1.2
     */
     public LeapTransform(Vector translation, LeapQuaternion rotation) :
-      this(translation, rotation, Vector.Ones)
-    {
+      this(translation, rotation, Vector.Ones) {
     }
 
     /**
@@ -37,8 +34,7 @@ namespace Leap
     * @since 3.1.2
     */
     public LeapTransform(Vector translation, LeapQuaternion rotation, Vector scale) :
-      this()
-    {
+      this() {
       _scale = scale;
       // these are non-trival setters.
       this.translation = translation;
@@ -51,8 +47,7 @@ namespace Leap
     * @returns the new position vector.
     * @since 3.1.2
     */
-    public Vector TransformPoint(Vector point)
-    {
+    public Vector TransformPoint(Vector point) {
       return _xBasisScaled * point.x + _yBasisScaled * point.y + _zBasisScaled * point.z + translation;
     }
 
@@ -62,8 +57,7 @@ namespace Leap
     * @returns the new direction vector.
     * @since 3.1.2
     */
-    public Vector TransformDirection(Vector direction)
-    {
+    public Vector TransformDirection(Vector direction) {
       return _xBasis * direction.x + _yBasis * direction.y + _zBasis * direction.z;
     }
 
@@ -73,8 +67,7 @@ namespace Leap
     * @returns the new velocity vector.
     * @since 3.1.2
     */
-    public Vector TransformVelocity(Vector velocity)
-    {
+    public Vector TransformVelocity(Vector velocity) {
       return _xBasisScaled * velocity.x + _yBasisScaled * velocity.y + _zBasisScaled * velocity.z;
     }
 
@@ -91,14 +84,12 @@ namespace Leap
     * @returns the new quaternion.
     * @since 3.1.2
     */
-    public LeapQuaternion TransformQuaternion(LeapQuaternion rhs)
-    {
+    public LeapQuaternion TransformQuaternion(LeapQuaternion rhs) {
       if (_quaternionDirty)
         throw new InvalidOperationException("Calling TransformQuaternion after Basis vectors have been modified.");
 
-      if (_flip)
-      {
-        // Mirror the axis of rotation accross the flip axis.
+      if (_flip) {
+        // Mirror the axis of rotation across the flip axis.
         rhs.x *= _flipAxes.x;
         rhs.y *= _flipAxes.y;
         rhs.z *= _flipAxes.z;
@@ -112,8 +103,7 @@ namespace Leap
     * Mirrors this transform's rotation and scale across the x-axis. Translation is not affected.
     * @since 3.1.2
     */
-    public void MirrorX()
-    {
+    public void MirrorX() {
       _xBasis = -_xBasis;
       _xBasisScaled = -_xBasisScaled;
 
@@ -126,8 +116,7 @@ namespace Leap
     * Mirrors this transform's rotation and scale across the z-axis. Translation is not affected.
     * @since 3.1.2
     */
-    public void MirrorZ()
-    {
+    public void MirrorZ() {
       _zBasis = -_zBasis;
       _zBasisScaled = -_zBasisScaled;
 
@@ -163,11 +152,9 @@ namespace Leap
     *
     * @since 3.1.2
     */
-    public Vector yBasis
-    {
+    public Vector yBasis {
       get { return _yBasis; }
-      set
-      {
+      set {
         _yBasis = value;
         _yBasisScaled = value * scale.y;
         _quaternionDirty = true;
@@ -183,11 +170,9 @@ namespace Leap
     *
     * @since 3.1.2
     */
-    public Vector zBasis
-    {
+    public Vector zBasis {
       get { return _zBasis; }
-      set
-      {
+      set {
         _zBasis = value;
         _zBasisScaled = value * scale.z;
         _quaternionDirty = true;
@@ -198,7 +183,8 @@ namespace Leap
     * The translation component of the transform.
     * @since 3.1.2
     */
-    public Vector translation { get { return _translation; }
+    public Vector translation {
+      get { return _translation; }
       set {
         _translation = value;
       }
@@ -239,10 +225,10 @@ namespace Leap
 
         float d = value.MagnitudeSquared;
         float s = 2.0f / d;
-        float xs = value.x * s,   ys = value.y * s,   zs = value.z * s;
-        float wx = value.w * xs,  wy = value.w * ys,  wz = value.w * zs;
-        float xx = value.x * xs,  xy = value.x * ys,  xz = value.x * zs;
-        float yy = value.y * ys,  yz = value.y * zs,  zz = value.z * zs;
+        float xs = value.x * s, ys = value.y * s, zs = value.z * s;
+        float wx = value.w * xs, wy = value.w * ys, wz = value.w * zs;
+        float xx = value.x * xs, xy = value.x * ys, xz = value.x * zs;
+        float yy = value.y * ys, yz = value.y * zs, zz = value.z * zs;
 
         _xBasis = new Vector(1.0f - (yy + zz), xy + wz, xz - wy);
         _yBasis = new Vector(xy - wz, 1.0f - (xx + zz), yz + wx);

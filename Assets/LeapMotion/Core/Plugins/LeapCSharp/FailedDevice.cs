@@ -5,8 +5,8 @@
 * https://developer.leapmotion.com/sdk_agreement, or another agreement         *
 * between Leap Motion and you, your company or other organization.             *
 \******************************************************************************/
-namespace Leap
-{
+
+namespace Leap {
 
   using System;
   using System.Runtime.InteropServices;
@@ -27,9 +27,8 @@ namespace Leap
    */
 
   //TODO Implement FailedDevices
-  public class FailedDevice:
-    IEquatable<FailedDevice>
-  {
+  public class FailedDevice :
+    IEquatable<FailedDevice> {
     public FailedDevice() {
       Failure = FailureType.FAIL_UNKNOWN;
       PnpId = "0";
@@ -40,8 +39,7 @@ namespace Leap
      * True if the devices are the same.
      * @since 3.0
      */
-    public bool Equals(FailedDevice other)
-    {
+    public bool Equals(FailedDevice other) {
       return this.PnpId == other.PnpId;
     }
 
@@ -77,8 +75,7 @@ namespace Leap
      *
      * @since 3.0
      */
-    public enum FailureType
-    {
+    public enum FailureType {
       /** The cause of the error is unknown.
        * @since 3.0
        */

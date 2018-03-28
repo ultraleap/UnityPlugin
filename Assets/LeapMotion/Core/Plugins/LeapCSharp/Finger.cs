@@ -5,10 +5,9 @@
 * https://developer.leapmotion.com/sdk_agreement, or another agreement         *
 * between Leap Motion and you, your company or other organization.             *
 \******************************************************************************/
-namespace Leap
-{
+
+namespace Leap {
   using System;
-  using System.Runtime.InteropServices;
 
   /**
    * The Finger class represents a tracked finger.
@@ -25,8 +24,7 @@ namespace Leap
    * @since 1.0
    */
   [Serializable]
-  public class Finger
-  {
+  public class Finger {
     public Bone[] bones = new Bone[4];
 
     /**
@@ -37,8 +35,7 @@ namespace Leap
      *
      * @since 3.0
      */
-    public Finger()
-    {
+    public Finger() {
       bones[0] = new Bone();
       bones[1] = new Bone();
       bones[2] = new Bone();
@@ -85,8 +82,7 @@ namespace Leap
                  Bone metacarpal,
                  Bone proximal,
                  Bone intermediate,
-                 Bone distal)
-    {
+                 Bone distal) {
       Type = type;
       bones[0] = metacarpal;
       bones[1] = proximal;
@@ -114,8 +110,7 @@ namespace Leap
      * @returns The Bone that has the specified bone type.
      * @since 2.0
      */
-    public Bone Bone(Bone.BoneType boneIx)
-    {
+    public Bone Bone(Bone.BoneType boneIx) {
       return bones[(int)boneIx];
     }
 
@@ -127,8 +122,7 @@ namespace Leap
      * @returns A description of the Finger object as a string.
      * @since 1.0
      */
-    public override string ToString()
-    {
+    public override string ToString() {
       return Enum.GetName(typeof(FingerType), Type) + " id:" + Id;
     }
 
@@ -280,8 +274,7 @@ namespace Leap
      * Finger object.
      * @since 2.0
      */
-    public enum FingerType
-    {
+    public enum FingerType {
       TYPE_THUMB = 0,
       TYPE_INDEX = 1,
       TYPE_MIDDLE = 2,

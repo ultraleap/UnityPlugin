@@ -5,8 +5,7 @@
 * https://developer.leapmotion.com/sdk_agreement, or another agreement         *
 * between Leap Motion and you, your company or other organization.             *
 \******************************************************************************/
-namespace Leap
-{
+namespace Leap {
   using System;
   using System.Runtime.InteropServices;
 
@@ -15,8 +14,7 @@ namespace Leap
    *
    */
   [Serializable]
-  public class Arm : Bone
-  {
+  public class Arm : Bone {
 
     /**
      * Constructs a default Arm object.
@@ -67,8 +65,7 @@ namespace Leap
      * exact same physical arm in the same frame and both Arm objects are valid.
      * @since 2.0.3
      */
-    public bool Equals(Arm other)
-    {
+    public bool Equals(Arm other) {
       return base.Equals(other as Bone);
     }
 
@@ -80,8 +77,7 @@ namespace Leap
      * @returns A description of the Arm object as a string.
      * @since 2.0.3
      */
-    public override string ToString()
-    {
+    public override string ToString() {
       return "Arm";
     }
 
@@ -95,10 +91,8 @@ namespace Leap
      *
      * @since 2.0.3
      */
-    public Vector ElbowPosition
-    {
-      get
-      {
+    public Vector ElbowPosition {
+      get {
         return base.PrevJoint;
       }
     }
@@ -114,10 +108,8 @@ namespace Leap
      *
      * @since 2.0.3
      */
-    public Vector WristPosition
-    {
-      get
-      {
+    public Vector WristPosition {
+      get {
         return base.NextJoint;
       }
     }

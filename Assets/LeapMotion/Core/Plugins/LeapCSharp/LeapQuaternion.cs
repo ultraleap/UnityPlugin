@@ -6,8 +6,8 @@
      * https://developer.leapmotion.com/sdk_agreement, or another agreement         *
      * between Leap Motion and you, your company or other organization.             *
 \******************************************************************************/
-namespace Leap
-{
+
+namespace Leap {
   using System;
   using System.Collections.Generic;
   using System.Runtime.InteropServices;
@@ -18,8 +18,7 @@ namespace Leap
    */
   [Serializable]
   public struct LeapQuaternion :
-    IEquatable<LeapQuaternion>
-  {
+    IEquatable<LeapQuaternion> {
     /**
      * Creates a new LeapQuaternion with the specified component values.
      * @param x the i-basis component
@@ -29,8 +28,7 @@ namespace Leap
      * @since 3.1.2
      */
     public LeapQuaternion(float x, float y, float z, float w) :
-      this()
-    {
+      this() {
       this.x = x;
       this.y = y;
       this.z = z;
@@ -43,8 +41,7 @@ namespace Leap
      * @since 3.1.2
      */
     public LeapQuaternion(LeapQuaternion quaternion) :
-      this()
-    {
+      this() {
       x = quaternion.x;
       y = quaternion.y;
       z = quaternion.z;
@@ -57,8 +54,7 @@ namespace Leap
      * @since 3.1.2
      */
     public LeapQuaternion(LeapInternal.LEAP_QUATERNION quaternion) :
-      this()
-    {
+      this() {
       x = quaternion.x;
       y = quaternion.y;
       z = quaternion.z;
@@ -69,8 +65,7 @@ namespace Leap
      * Returns a string containing this quaternion in a human readable format: (x, y, z).
      * @since 3.1.2
      */
-    public override string ToString()
-    {
+    public override string ToString() {
       return "(" + x + ", " + y + ", " + z + ", " + w + ")";
     }
 
@@ -78,12 +73,10 @@ namespace Leap
      * Compare LeapQuaternion equality component-wise.
      * @since 3.1.2
      */
-    public bool Equals(LeapQuaternion v)
-    {
+    public bool Equals(LeapQuaternion v) {
       return x.NearlyEquals(v.x) && y.NearlyEquals(v.y) && z.NearlyEquals(v.z) && w.NearlyEquals(v.w);
     }
-    public override bool Equals(Object obj)
-    {
+    public override bool Equals(Object obj) {
       return obj is LeapQuaternion && Equals((LeapQuaternion)obj);
     }
 
@@ -92,8 +85,7 @@ namespace Leap
      * component is NaN or infinite, then this returns false.
      * @since 3.1.2
      */
-    public bool IsValid()
-    {
+    public bool IsValid() {
       return !(float.IsNaN(x) || float.IsInfinity(x) ||
                float.IsNaN(y) || float.IsInfinity(y) ||
                float.IsNaN(z) || float.IsInfinity(z) ||
@@ -129,8 +121,7 @@ namespace Leap
      * @returns The length of this quaternion.
      * @since 3.1.2
      */
-    public float Magnitude
-    {
+    public float Magnitude {
       get { return (float)Math.Sqrt(x * x + y * y + z * z + w * w); }
     }
 
@@ -140,8 +131,7 @@ namespace Leap
      * @returns The square of the length of this quaternion.
      * @since 3.1.2
      */
-    public float MagnitudeSquared
-    {
+    public float MagnitudeSquared {
       get { return x * x + y * y + z * z + w * w; }
     }
 
@@ -151,13 +141,10 @@ namespace Leap
      * @returns A LeapQuaternion object with a length of one.
      * @since 3.1.2
      */
-    public LeapQuaternion Normalized
-    {
-      get
-      {
+    public LeapQuaternion Normalized {
+      get {
         float denom = this.MagnitudeSquared;
-        if (denom <= Leap.Constants.EPSILON)
-        {
+        if (denom <= Leap.Constants.EPSILON) {
           return LeapQuaternion.Identity;
         }
         denom = 1.0f / (float)Math.Sqrt(denom);
@@ -172,8 +159,7 @@ namespace Leap
      * @returns A LeapQuaternion containing the product.
      * @since 3.1.2
      */
-    public LeapQuaternion Multiply(LeapQuaternion rhs)
-    {
+    public LeapQuaternion Multiply(LeapQuaternion rhs) {
       return new LeapQuaternion(
         w * rhs.x + x * rhs.w + y * rhs.z - z * rhs.y,
         w * rhs.y + y * rhs.w + z * rhs.x - x * rhs.z,
@@ -187,8 +173,7 @@ namespace Leap
     */
     public static readonly LeapQuaternion Identity = new LeapQuaternion(0, 0, 0, 1);
 
-    public override int GetHashCode()
-    {
+    public override int GetHashCode() {
       unchecked // Overflow is fine, just wrap
       {
         int hash = 17;

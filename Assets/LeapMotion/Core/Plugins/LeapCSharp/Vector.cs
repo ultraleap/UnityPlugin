@@ -5,17 +5,14 @@
      * https://developer.leapmotion.com/sdk_agreement, or another agreement         *
      * between Leap Motion and you, your company or other organization.             *
 \******************************************************************************/
-namespace Leap
-{
+
+namespace Leap {
   using System;
-  using System.Collections.Generic;
-  using System.Runtime.InteropServices;
 
   /**
    * Constants used in Leap Motion math functions.
    */
-  public static class Constants
-  {
+  public static class Constants {
     /**
      * The constant pi as a single precision floating point number.
      * @since 1.0
@@ -60,54 +57,44 @@ namespace Leap
    * @since 1.0
    */
   [Serializable]
-  public struct Vector:
-    IEquatable<Vector>
-  {
+  public struct Vector :
+    IEquatable<Vector> {
     /** Add vectors component-wise. */
-    public static Vector operator +(Vector v1, Vector v2)
-    {
+    public static Vector operator +(Vector v1, Vector v2) {
       return v1._operator_add(v2);
     }
     /** Subtract vectors component-wise. */
-    public static Vector operator -(Vector v1, Vector v2)
-    {
+    public static Vector operator -(Vector v1, Vector v2) {
       return v1._operator_sub(v2);
     }
     /** Multiply vector by a scalar. */
-    public static Vector operator *(Vector v1, float scalar)
-    {
+    public static Vector operator *(Vector v1, float scalar) {
       return v1._operator_mul(scalar);
     }
     /** Multiply vector by a scalar on the left-hand side. */
-    public static Vector operator *(float scalar, Vector v1)
-    {
+    public static Vector operator *(float scalar, Vector v1) {
       return v1._operator_mul(scalar);
     }
     /** Divide vector by a scalar. */
-    public static Vector operator /(Vector v1, float scalar)
-    {
+    public static Vector operator /(Vector v1, float scalar) {
       return v1._operator_div(scalar);
     }
     /** Negate a vector. */
-    public static Vector operator -(Vector v1)
-    {
+    public static Vector operator -(Vector v1) {
       return v1._operator_sub();
     }
     /** Compare two vectors for equality. */
-    public static bool operator ==(Vector v1, Vector v2)
-    {
+    public static bool operator ==(Vector v1, Vector v2) {
       return v1.Equals(v2);
     }
 
     /** Compare two vectors for equality. */
-    public static bool operator !=(Vector v1, Vector v2)
-    {
+    public static bool operator !=(Vector v1, Vector v2) {
       return !v1.Equals(v2);
     }
 
     /** Convert this vector to an array of three float values: [x,y,z]. */
-    public float[] ToFloatArray()
-    {
+    public float[] ToFloatArray() {
       return new float[] { x, y, z };
     }
 
@@ -118,9 +105,8 @@ namespace Leap
      * \include Vector_Constructor_1.txt
      * @since 1.0
      */
-    public Vector(float x, float y, float z):
-      this()
-    {
+    public Vector(float x, float y, float z) :
+      this() {
       this.x = x;
       this.y = y;
       this.z = z;
@@ -132,9 +118,8 @@ namespace Leap
      * \include Vector_Constructor_2.txt
      * @since 1.0
      */
-    public Vector(Vector vector):
-      this()
-    {
+    public Vector(Vector vector) :
+      this() {
       x = vector.x;
       y = vector.y;
       z = vector.z;
@@ -150,8 +135,7 @@ namespace Leap
      * @returns The distance from this point to the specified point.
      * @since 1.0
      */
-    public float DistanceTo(Vector other)
-    {
+    public float DistanceTo(Vector other) {
       return (float)Math.Sqrt((x - other.x) * (x - other.x) +
           (y - other.y) * (y - other.y) +
           (z - other.z) * (z - other.z));
@@ -176,20 +160,15 @@ namespace Leap
      * @returns The angle between this vector and the specified vector in radians.
      * @since 1.0
      */
-    public float AngleTo(Vector other)
-    {
+    public float AngleTo(Vector other) {
       float denom = this.MagnitudeSquared * other.MagnitudeSquared;
-      if (denom <= Constants.EPSILON)
-      {
+      if (denom <= Constants.EPSILON) {
         return 0.0f;
       }
       float val = this.Dot(other) / (float)Math.Sqrt(denom);
-      if (val >= 1.0f)
-      {
+      if (val >= 1.0f) {
         return 0.0f;
-      }
-      else if (val <= -1.0f)
-      {
+      } else if (val <= -1.0f) {
         return Constants.PI;
       }
       return (float)Math.Acos(val);
@@ -209,8 +188,7 @@ namespace Leap
      * @returns The dot product of this vector and the specified vector.
      * @since 1.0
      */
-    public float Dot(Vector other)
-    {
+    public float Dot(Vector other) {
       return (x * other.x) + (y * other.y) + (z * other.z);
     }
 
@@ -230,8 +208,7 @@ namespace Leap
      * @returns The cross product of this vector and the specified vector.
      * @since 1.0
      */
-    public Vector Cross(Vector other)
-    {
+    public Vector Cross(Vector other) {
       return new Vector((y * other.z) - (z * other.y),
                     (z * other.x) - (x * other.z),
                     (x * other.y) - (y * other.x));
@@ -245,8 +222,7 @@ namespace Leap
      * @returns A Vector object with all components negated.
      * @since 1.0
      */
-    private Vector _operator_sub()
-    {
+    private Vector _operator_sub() {
       return new Vector(-x, -y, -z);
     }
 
@@ -256,8 +232,7 @@ namespace Leap
      * \include Vector_Plus.txt
      * @since 1.0
      */
-    private Vector _operator_add(Vector other)
-    {
+    private Vector _operator_add(Vector other) {
       return new Vector(x + other.x, y + other.y, z + other.z);
     }
 
@@ -267,8 +242,7 @@ namespace Leap
      * \include Vector_Minus.txt
      * @since 1.0
      */
-    private Vector _operator_sub(Vector other)
-    {
+    private Vector _operator_sub(Vector other) {
       return new Vector(x - other.x, y - other.y, z - other.z);
     }
 
@@ -278,8 +252,7 @@ namespace Leap
      * \include Vector_Times.txt
      * @since 1.0
      */
-    private Vector _operator_mul(float scalar)
-    {
+    private Vector _operator_mul(float scalar) {
       return new Vector(x * scalar, y * scalar, z * scalar);
     }
 
@@ -289,8 +262,7 @@ namespace Leap
      * \include Vector_Divide.txt
      * @since 1.0
      */
-    private Vector _operator_div(float scalar)
-    {
+    private Vector _operator_div(float scalar) {
       return new Vector(x / scalar, y / scalar, z / scalar);
     }
 
@@ -298,8 +270,7 @@ namespace Leap
      * Returns a string containing this vector in a human readable format: (x, y, z).
      * @since 1.0
      */
-    public override string ToString()
-    {
+    public override string ToString() {
       return "(" + x + ", " + y + ", " + z + ")";
     }
 
@@ -309,12 +280,10 @@ namespace Leap
      * \include Vector_Equals.txt
      * @since 1.0
      */
-    public bool Equals(Vector v)
-    {
+    public bool Equals(Vector v) {
       return x.NearlyEquals(v.x) && y.NearlyEquals(v.y) && z.NearlyEquals(v.z);
     }
-    public override bool Equals(Object obj)
-    {
+    public override bool Equals(Object obj) {
       return obj is Vector && Equals((Vector)obj);
     }
 
@@ -325,8 +294,7 @@ namespace Leap
      * \include Vector_IsValid.txt
      * @since 1.0
      */
-    public bool IsValid()
-    {
+    public bool IsValid() {
       return !(float.IsNaN(x) || float.IsInfinity(x) ||
                float.IsNaN(y) || float.IsInfinity(y) ||
                float.IsNaN(z) || float.IsInfinity(z));
@@ -341,8 +309,7 @@ namespace Leap
      * \include Vector_Index.txt
      * @since 1.0
      */
-    private float _operator_get(uint index)
-    {
+    private float _operator_get(uint index) {
       if (index == 0)
         return x;
       if (index == 1)
@@ -351,10 +318,8 @@ namespace Leap
         return z;
       return 0.0f;
     }
-    public float this[uint index]
-    {
-      get
-      {
+    public float this[uint index] {
+      get {
         if (index == 0)
           return x;
         if (index == 1)
@@ -363,8 +328,7 @@ namespace Leap
           return z;
         return 0.0f;
       }
-      set
-      {
+      set {
         if (index == 0)
           x = value;
         if (index == 1)
@@ -402,8 +366,7 @@ namespace Leap
      * @returns The length of this vector.
      * @since 1.0
      */
-    public float Magnitude
-    {
+    public float Magnitude {
       get { return (float)Math.Sqrt(x * x + y * y + z * z); }
     }
 
@@ -415,8 +378,7 @@ namespace Leap
      * @returns The square of the length of this vector.
      * @since 1.0
      */
-    public float MagnitudeSquared
-    {
+    public float MagnitudeSquared {
       get { return x * x + y * y + z * z; }
     }
 
@@ -436,8 +398,7 @@ namespace Leap
      * @returns The angle of this vector above or below the horizon (x-z plane).
      * @since 1.0
      */
-    public float Pitch
-    {
+    public float Pitch {
       get { return (float)Math.Atan2(y, -z); }
     }
 
@@ -462,8 +423,7 @@ namespace Leap
      * @returns The angle of this vector to the right or left of the y-axis.
      * @since 1.0
      */
-    public float Roll
-    {
+    public float Roll {
       get { return (float)Math.Atan2(x, -y); }
     }
 
@@ -483,8 +443,7 @@ namespace Leap
      * @returns The angle of this vector to the right or left of the negative z-axis.
      * @since 1.0
      */
-    public float Yaw
-    {
+    public float Yaw {
       get { return (float)Math.Atan2(x, -z); }
     }
 
@@ -500,13 +459,10 @@ namespace Leap
      * direction as this Vector object.
      * @since 1.0
      */
-    public Vector Normalized
-    {
-      get
-      {
+    public Vector Normalized {
+      get {
         float denom = this.MagnitudeSquared;
-        if (denom <= Constants.EPSILON)
-        {
+        if (denom <= Constants.EPSILON) {
           return Vector.Zero;
         }
         denom = 1.0f / (float)Math.Sqrt(denom);
@@ -600,8 +556,7 @@ namespace Leap
     public static readonly Vector Down = new Vector(0, -1, 0);
 
 
-    public static Vector Lerp(Vector a, Vector b, float t)
-    {
+    public static Vector Lerp(Vector a, Vector b, float t) {
       return new Vector(
               a.x + t * (b.x - a.x),
               a.y + t * (b.y - a.y),
@@ -609,8 +564,7 @@ namespace Leap
           );
     }
 
-    public override int GetHashCode()
-    {
+    public override int GetHashCode() {
       unchecked // Overflow is fine, just wrap
       {
         int hash = 17;

@@ -15,8 +15,7 @@ namespace Leap {
      *
      * @param source The source frame that is copied into a frame.
      */
-    public static Frame CopyFrom(this Frame frame, Frame source)
-    {
+    public static Frame CopyFrom(this Frame frame, Frame source) {
       frame.Id = source.Id;
       frame.Timestamp = source.Timestamp;
       frame.CurrentFramesPerSecond = source.CurrentFramesPerSecond;
@@ -24,8 +23,7 @@ namespace Leap {
 
       frame.ResizeHandList(source.Hands.Count);
 
-      for (int i = frame.Hands.Count; i-- != 0; )
-      {
+      for (int i = frame.Hands.Count; i-- != 0;) {
         frame.Hands[i].CopyFrom(source.Hands[i]);
       }
 
@@ -38,8 +36,7 @@ namespace Leap {
      *
      * @param source The source hand that is copied into a hand.
      */
-    public static Hand CopyFrom(this Hand hand, Hand source)
-    {
+    public static Hand CopyFrom(this Hand hand, Hand source) {
       hand.Id = source.Id;
       hand.Confidence = source.Confidence;
       hand.GrabStrength = source.GrabStrength;
@@ -59,8 +56,7 @@ namespace Leap {
 
       hand.Arm.CopyFrom(source.Arm);
 
-      for (int i = 5; i-- != 0; )
-      {
+      for (int i = 5; i-- != 0;) {
         hand.Fingers[i].CopyFrom(source.Fingers[i]);
       }
 
@@ -73,10 +69,8 @@ namespace Leap {
      *
      * @param source The source finger that is copied into a finger.
      */
-    public static Finger CopyFrom(this Finger finger, Finger source)
-    {
-      for (int i = 4; i-- != 0; )
-      {
+    public static Finger CopyFrom(this Finger finger, Finger source) {
+      for (int i = 4; i-- != 0;) {
         finger.bones[i].CopyFrom(source.bones[i]);
       }
 

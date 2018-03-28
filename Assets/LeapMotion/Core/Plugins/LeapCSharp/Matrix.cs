@@ -5,8 +5,7 @@
 * https://developer.leapmotion.com/sdk_agreement, or another agreement         *
 * between Leap Motion and you, your company or other organization.             *
 \******************************************************************************/
-namespace Leap
-{
+namespace Leap {
   using System;
 
   /**
@@ -20,17 +19,14 @@ namespace Leap
    * the * operator.
    * @since 1.0
    */
-  public struct Matrix
-  {
+  public struct Matrix {
     /** Multiply two matrices. */
-    public static Matrix operator *(Matrix m1, Matrix m2)
-    {
+    public static Matrix operator *(Matrix m1, Matrix m2) {
       return m1._operator_mul(m2);
     }
 
     /** Copy this matrix to the specified array of 9 float values in row-major order. */
-    public float[] ToArray3x3(float[] output)
-    {
+    public float[] ToArray3x3(float[] output) {
       output[0] = xBasis.x;
       output[1] = xBasis.y;
       output[2] = xBasis.z;
@@ -43,8 +39,7 @@ namespace Leap
       return output;
     }
     /** Copy this matrix to the specified array containing 9 double values in row-major order. */
-    public double[] ToArray3x3(double[] output)
-    {
+    public double[] ToArray3x3(double[] output) {
       output[0] = xBasis.x;
       output[1] = xBasis.y;
       output[2] = xBasis.z;
@@ -57,13 +52,11 @@ namespace Leap
       return output;
     }
     /** Convert this matrix to an array containing 9 float values in row-major order. */
-    public float[] ToArray3x3()
-    {
+    public float[] ToArray3x3() {
       return ToArray3x3(new float[9]);
     }
     /** Copy this matrix to the specified array of 16 float values in row-major order. */
-    public float[] ToArray4x4(float[] output)
-    {
+    public float[] ToArray4x4(float[] output) {
       output[0] = xBasis.x;
       output[1] = xBasis.y;
       output[2] = xBasis.z;
@@ -83,8 +76,7 @@ namespace Leap
       return output;
     }
     /** Copy this matrix to the specified array of 16 double values in row-major order. */
-    public double[] ToArray4x4(double[] output)
-    {
+    public double[] ToArray4x4(double[] output) {
       output[0] = xBasis.x;
       output[1] = xBasis.y;
       output[2] = xBasis.z;
@@ -104,8 +96,7 @@ namespace Leap
       return output;
     }
     /** Convert this matrix to an array containing 16 float values in row-major order. */
-    public float[] ToArray4x4()
-    {
+    public float[] ToArray4x4() {
       return ToArray4x4(new float[16]);
     }
 
@@ -116,9 +107,8 @@ namespace Leap
      *
      * @since 1.0
      */
-    public Matrix(Matrix other):
-      this()
-    {
+    public Matrix(Matrix other) :
+      this() {
       xBasis = other.xBasis;
       yBasis = other.yBasis;
       zBasis = other.zBasis;
@@ -136,8 +126,7 @@ namespace Leap
      * @since 1.0
      */
     public Matrix(Vector xBasis, Vector yBasis, Vector zBasis) :
-      this()
-    {
+      this() {
       this.xBasis = xBasis;
       this.yBasis = yBasis;
       this.zBasis = zBasis;
@@ -156,8 +145,7 @@ namespace Leap
      * @since 1.0
      */
     public Matrix(Vector xBasis, Vector yBasis, Vector zBasis, Vector origin) :
-      this()
-    {
+      this() {
       this.xBasis = xBasis;
       this.yBasis = yBasis;
       this.zBasis = zBasis;
@@ -174,8 +162,7 @@ namespace Leap
      * @since 1.0
      */
     public Matrix(Vector axis, float angleRadians) :
-      this()
-    {
+      this() {
       xBasis = Vector.XAxis;
       yBasis = Vector.YAxis;
       zBasis = Vector.ZAxis;
@@ -195,8 +182,7 @@ namespace Leap
      * @since 1.0
      */
     public Matrix(Vector axis, float angleRadians, Vector translation) :
-      this()
-    {
+      this() {
       xBasis = Vector.XAxis;
       yBasis = Vector.YAxis;
       zBasis = Vector.ZAxis;
@@ -213,8 +199,7 @@ namespace Leap
                   float m20,
                   float m21,
                   float m22) :
-      this()
-    {
+      this() {
       xBasis = new Vector(m00, m01, m02);
       yBasis = new Vector(m10, m11, m12);
       zBasis = new Vector(m20, m21, m22);
@@ -233,8 +218,7 @@ namespace Leap
                   float m30,
                   float m31,
                   float m32) :
-      this()
-    {
+      this() {
       xBasis = new Vector(m00, m01, m02);
       yBasis = new Vector(m10, m11, m12);
       zBasis = new Vector(m20, m21, m22);
@@ -253,8 +237,7 @@ namespace Leap
      * @param angleRadians The amount of rotation in radians.
      * @since 1.0
      */
-    public void SetRotation(Vector axis, float angleRadians)
-    {
+    public void SetRotation(Vector axis, float angleRadians) {
       Vector n = axis.Normalized;
       float s = (float)Math.Sin(angleRadians);
       float c = (float)Math.Cos(angleRadians);
@@ -279,8 +262,7 @@ namespace Leap
      * @returns A new Vector representing the transformed original.
      * @since 1.0
      */
-    public Vector TransformPoint(Vector point)
-    {
+    public Vector TransformPoint(Vector point) {
       return xBasis * point.x + yBasis * point.y + zBasis * point.z + origin;
     }
 
@@ -294,8 +276,7 @@ namespace Leap
      * @returns A new Vector representing the transformed original.
      * @since 1.0
      */
-    public Vector TransformDirection(Vector direction)
-    {
+    public Vector TransformDirection(Vector direction) {
       return xBasis * direction.x + yBasis * direction.y + zBasis * direction.z;
     }
 
@@ -311,8 +292,7 @@ namespace Leap
      * @returns The rigid inverse of the matrix.
      * @since 1.0
      */
-    public Matrix RigidInverse()
-    {
+    public Matrix RigidInverse() {
       Matrix rotInverse = new Matrix(new Vector(xBasis[0], yBasis[0], zBasis[0]),
                                      new Vector(xBasis[1], yBasis[1], zBasis[1]),
                                      new Vector(xBasis[2], yBasis[2], zBasis[2]));
@@ -332,8 +312,7 @@ namespace Leap
      * applying the other transformation followed by this transformation.
      * @since 1.0
      */
-    private Matrix _operator_mul(Matrix other)
-    {
+    private Matrix _operator_mul(Matrix other) {
       return new Matrix(TransformDirection(other.xBasis),
                         TransformDirection(other.yBasis),
                         TransformDirection(other.zBasis),
@@ -347,8 +326,7 @@ namespace Leap
      *
      * @since 1.0
      */
-    public bool Equals(Matrix other)
-    {
+    public bool Equals(Matrix other) {
       return xBasis == other.xBasis &&
              yBasis == other.yBasis &&
              zBasis == other.zBasis &&
@@ -359,8 +337,7 @@ namespace Leap
      * Write the matrix to a string in a human readable format.
      * @since 1.0
      */
-    public override string ToString()
-    {
+    public override string ToString() {
       return string.Format("xBasis: {0} yBasis: {1} zBasis: {2} origin: {3}", xBasis, yBasis, zBasis, origin);
     }
 

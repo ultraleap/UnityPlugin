@@ -6,8 +6,7 @@
 * between Leap Motion and you, your company or other organization.             *
 \******************************************************************************/
 
-namespace Leap
-{
+namespace Leap {
   using System;
   using System.Collections.Generic;
   using System.Text;
@@ -38,9 +37,8 @@ namespace Leap
    *
    * @since 1.0
    */
-  public class Controller:
-    IController
-  {
+  public class Controller :
+    IController {
     Connection _connection;
     bool _disposed = false;
     Config _config;
@@ -51,14 +49,11 @@ namespace Leap
      * By default the synchronization context of the thread creating the controller
      * instance is used. You can change the context if desired.
      */
-    public SynchronizationContext EventContext
-    {
-      get
-      {
+    public SynchronizationContext EventContext {
+      get {
         return _connection.EventContext;
       }
-      set
-      {
+      set {
         _connection.EventContext = value;
       }
     }
@@ -68,15 +63,13 @@ namespace Leap
      * Can be dispatched more than once, if connection is restarted.
      * @since 3.0
      */
-    public event EventHandler<LeapEventArgs> Init
-    {
-      add
-      {
-        if(_hasInitialized)
+    public event EventHandler<LeapEventArgs> Init {
+      add {
+        if (_hasInitialized)
           value(this, new LeapEventArgs(LeapEvent.EVENT_INIT));
         _init += value;
       }
-      remove{ _init -= value; }
+      remove { _init -= value; }
     }
     private bool _hasInitialized = false;
     private EventHandler<LeapEventArgs> _init;
@@ -84,15 +77,13 @@ namespace Leap
      * Dispatched when the connection to the service is established.
      * @since 3.0
      */
-    public event EventHandler<ConnectionEventArgs> Connect
-    {
-      add
-      {
-        if(_hasConnected)
+    public event EventHandler<ConnectionEventArgs> Connect {
+      add {
+        if (_hasConnected)
           value(this, new ConnectionEventArgs());
         _connect += value;
       }
-      remove{ _connect -= value; }
+      remove { _connect -= value; }
     }
     private bool _hasConnected = false;
     private EventHandler<ConnectionEventArgs> _connect;
@@ -100,14 +91,11 @@ namespace Leap
      * Dispatched if the connection to the service is lost.
      * @since 3.0
      */
-    public event EventHandler<ConnectionLostEventArgs> Disconnect
-    {
-      add
-      {
+    public event EventHandler<ConnectionLostEventArgs> Disconnect {
+      add {
         _connection.LeapConnectionLost += value;
       }
-      remove
-      {
+      remove {
         _connection.LeapConnectionLost -= value;
       }
     }
@@ -115,14 +103,11 @@ namespace Leap
      * Dispatched when a tracking frame is ready.
      * @since 3.0
      */
-    public event EventHandler<FrameEventArgs> FrameReady
-    {
-      add
-      {
+    public event EventHandler<FrameEventArgs> FrameReady {
+      add {
         _connection.LeapFrame += value;
       }
-      remove
-      {
+      remove {
         _connection.LeapFrame -= value;
       }
     }
@@ -130,14 +115,11 @@ namespace Leap
      * Dispatched when an internal tracking frame is ready.
      * @since 3.0
      */
-    public event EventHandler<InternalFrameEventArgs> InternalFrameReady
-    {
-      add
-      {
+    public event EventHandler<InternalFrameEventArgs> InternalFrameReady {
+      add {
         _connection.LeapInternalFrame += value;
       }
-      remove
-      {
+      remove {
         _connection.LeapInternalFrame -= value;
       }
     }
@@ -145,29 +127,23 @@ namespace Leap
      * Dispatched when a Leap Motion device is connected.
      * @since 3.0
      */
-    public event EventHandler<DeviceEventArgs> Device
-    {
-      add
-      {
+    public event EventHandler<DeviceEventArgs> Device {
+      add {
         _connection.LeapDevice += value;
       }
-      remove
-      {
+      remove {
         _connection.LeapDevice -= value;
       }
     }
     /**
-     * Dispatched when when a Leap Motion device is disconnected.
+     * Dispatched when a Leap Motion device is disconnected.
      * @since 3.0
      */
-    public event EventHandler<DeviceEventArgs> DeviceLost
-    {
-      add
-      {
+    public event EventHandler<DeviceEventArgs> DeviceLost {
+      add {
         _connection.LeapDeviceLost += value;
       }
-      remove
-      {
+      remove {
         _connection.LeapDeviceLost -= value;
       }
     }
@@ -175,14 +151,11 @@ namespace Leap
      * Dispatched when a Leap device fails to initialize.
      * @since 3.0
      */
-    public event EventHandler<DeviceFailureEventArgs> DeviceFailure
-    {
-      add
-      {
+    public event EventHandler<DeviceFailureEventArgs> DeviceFailure {
+      add {
         _connection.LeapDeviceFailure += value;
       }
-      remove
-      {
+      remove {
         _connection.LeapDeviceFailure -= value;
       }
     }
@@ -190,14 +163,11 @@ namespace Leap
      * Dispatched when the system generates a loggable event.
      * @since 3.0
      */
-    public event EventHandler<LogEventArgs> LogMessage
-    {
-      add
-      {
+    public event EventHandler<LogEventArgs> LogMessage {
+      add {
         _connection.LeapLogEvent += value;
       }
-      remove
-      {
+      remove {
         _connection.LeapLogEvent -= value;
       }
     }
@@ -205,29 +175,23 @@ namespace Leap
      * Dispatched when a policy changes.
      * @since 3.0
      */
-    public event EventHandler<PolicyEventArgs> PolicyChange
-    {
-      add
-      {
+    public event EventHandler<PolicyEventArgs> PolicyChange {
+      add {
         _connection.LeapPolicyChange += value;
       }
-      remove
-      {
+      remove {
         _connection.LeapPolicyChange -= value;
       }
     }
     /**
-     * Dispatched when a configuration seting changes.
+     * Dispatched when a configuration setting changes.
      * @since 3.0
      */
-    public event EventHandler<ConfigChangeEventArgs> ConfigChange
-    {
-      add
-      {
+    public event EventHandler<ConfigChangeEventArgs> ConfigChange {
+      add {
         _connection.LeapConfigChange += value;
       }
-      remove
-      {
+      remove {
         _connection.LeapConfigChange -= value;
       }
     }
@@ -237,26 +201,20 @@ namespace Leap
      * or a new device becomes active.
      * @since 3.0
      */
-    public event EventHandler<DistortionEventArgs> DistortionChange
-    {
-      add
-      {
+    public event EventHandler<DistortionEventArgs> DistortionChange {
+      add {
         _connection.LeapDistortionChange += value;
       }
-      remove
-      {
+      remove {
         _connection.LeapDistortionChange -= value;
       }
     }
 
-    public event EventHandler<DroppedFrameEventArgs> DroppedFrame
-    {
-      add
-      {
+    public event EventHandler<DroppedFrameEventArgs> DroppedFrame {
+      add {
         _connection.LeapDroppedFrame += value;
       }
-      remove
-      {
+      remove {
         _connection.LeapDroppedFrame -= value;
       }
     }
@@ -264,14 +222,11 @@ namespace Leap
      * Dispatched when an unrequested image is ready.
      * @since 4.0
      */
-    public event EventHandler<ImageEventArgs> ImageReady
-    {
-      add
-      {
+    public event EventHandler<ImageEventArgs> ImageReady {
+      add {
         _connection.LeapImage += value;
       }
-      remove
-      {
+      remove {
         _connection.LeapImage -= value;
       }
     }
@@ -285,14 +240,11 @@ namespace Leap
      * 
      * @since 4.0
      */
-    public event Action<BeginProfilingForThreadArgs> BeginProfilingForThread 
-    {
-      add 
-      {
+    public event Action<BeginProfilingForThreadArgs> BeginProfilingForThread {
+      add {
         _connection.LeapBeginProfilingForThread += value;
       }
-      remove 
-      {
+      remove {
         _connection.LeapBeginProfilingForThread -= value;
       }
     }
@@ -303,14 +255,11 @@ namespace Leap
      * 
      * @since 4.0
      */
-    public event Action<EndProfilingForThreadArgs> EndProfilingForThread 
-    {
-      add 
-      {
+    public event Action<EndProfilingForThreadArgs> EndProfilingForThread {
+      add {
         _connection.LeapEndProfilingForThread += value;
       }
-      remove 
-      {
+      remove {
         _connection.LeapEndProfilingForThread -= value;
       }
     }
@@ -323,14 +272,11 @@ namespace Leap
      * 
      * @since 4.0
      */
-    public event Action<BeginProfilingBlockArgs> BeginProfilingBlock 
-    {
-      add 
-      {
+    public event Action<BeginProfilingBlockArgs> BeginProfilingBlock {
+      add {
         _connection.LeapBeginProfilingBlock += value;
       }
-      remove 
-      {
+      remove {
         _connection.LeapBeginProfilingBlock -= value;
       }
     }
@@ -343,14 +289,11 @@ namespace Leap
      * 
      * @since 4.0
      */
-    public event Action<EndProfilingBlockArgs> EndProfilingBlock 
-    {
-      add 
-      {
+    public event Action<EndProfilingBlockArgs> EndProfilingBlock {
+      add {
         _connection.LeapEndProfilingBlock += value;
       }
-      remove 
-      {
+      remove {
         _connection.LeapEndProfilingBlock -= value;
       }
     }
@@ -359,45 +302,36 @@ namespace Leap
      * Dispatched when point mapping change events are generated by the service.
      * @since 4.0
      */
-    public event EventHandler<PointMappingChangeEventArgs> PointMappingChange
-    {
-      add
-      {
+    public event EventHandler<PointMappingChangeEventArgs> PointMappingChange {
+      add {
         _connection.LeapPointMappingChange += value;
       }
-      remove
-      {
+      remove {
         _connection.LeapPointMappingChange -= value;
       }
     }
 
-    public event EventHandler<HeadPoseEventArgs> headPoseChange
-    {
-      add
-      {
+    public event EventHandler<HeadPoseEventArgs> headPoseChange {
+      add {
         _connection.LeapHeadPoseChange += value;
       }
-      remove
-      {
+      remove {
         _connection.LeapHeadPoseChange -= value;
       }
     }
 
     //TODO revisit dispose code
-    public void Dispose()
-    {
+    public void Dispose() {
       Dispose(true);
       GC.SuppressFinalize(this);
     }
 
     // Protected implementation of Dispose pattern.
-    protected virtual void Dispose(bool disposing)
-    {
+    protected virtual void Dispose(bool disposing) {
       if (_disposed)
         return;
 
-      if (disposing)
-      {
+      if (disposing) {
         // Free any other managed objects here.
       }
 
@@ -413,15 +347,14 @@ namespace Leap
      *
      * @since 1.0
      */
-    public Controller() : this(0)
-    {
+    public Controller() : this(0) {
     }
 
     /**
      * Constructs a Controller object using the specified connection key.
      *
      * All controller instances using the same key will use the same connection
-     * to the serivce. In general, an application should not use more than one connection
+     * to the service. In general, an application should not use more than one connection
      * for all its controllers. Each connection keeps its own cache of frames and images.
      *
      * @param connectionKey An identifier specifying the connection to use. If a
@@ -429,8 +362,7 @@ namespace Leap
      * Otherwise, a new connection is created.
      * @since 3.0
      */
-    public Controller(int connectionKey)
-    {
+    public Controller(int connectionKey) {
       _connection = Connection.GetConnection(connectionKey);
       _connection.EventContext = SynchronizationContext.Current;
 
@@ -449,8 +381,7 @@ namespace Leap
      *
      * @since 3.0
      */
-    public void StartConnection()
-    {
+    public void StartConnection() {
       _connection.Start();
     }
 
@@ -462,8 +393,7 @@ namespace Leap
      *
      * @since 3.0
      */
-    public void StopConnection()
-    {
+    public void StopConnection() {
       _connection.Stop();
     }
 
@@ -472,10 +402,8 @@ namespace Leap
      * daemon/service. Can be true even if the Leap Motion hardware is not available.
      * @since 1.2
      */
-    public bool IsServiceConnected
-    {
-      get
-      {
+    public bool IsServiceConnected {
+      get {
         return _connection.IsServiceConnected;
       }
     }
@@ -497,8 +425,7 @@ namespace Leap
      * @param policy A PolicyFlag value indicating the policy to request.
      * @since 2.1.6
      */
-    public void SetPolicy(Controller.PolicyFlag policy)
-    {
+    public void SetPolicy(Controller.PolicyFlag policy) {
       _connection.SetPolicy(policy);
     }
 
@@ -515,8 +442,7 @@ namespace Leap
      * @param flags A PolicyFlag value indicating the policy to request.
      * @since 2.1.6
      */
-    public void ClearPolicy(Controller.PolicyFlag policy)
-    {
+    public void ClearPolicy(Controller.PolicyFlag policy) {
       _connection.ClearPolicy(policy);
     }
 
@@ -538,8 +464,7 @@ namespace Leap
      * @returns A boolean indicating whether the specified policy has been set.
      * @since 2.1.6
      */
-    public bool IsPolicySet(Controller.PolicyFlag policy)
-    {
+    public bool IsPolicySet(Controller.PolicyFlag policy) {
       return _connection.IsPolicySet(policy);
     }
 
@@ -566,8 +491,7 @@ namespace Leap
      * position, an invalid Frame is returned.
      * @since 1.0
      */
-    public Frame Frame(int history)
-    {
+    public Frame Frame(int history) {
       Frame frame = new Frame();
       LEAP_TRACKING_EVENT trackingEvent;
       _connection.Frames.Get(out trackingEvent, history);
@@ -582,8 +506,7 @@ namespace Leap
      * @param toFill The frame object to fill with tracking data.
      * @param history The age of the frame to return.
      */
-    public void Frame(Frame toFill, int history)
-    {
+    public void Frame(Frame toFill, int history) {
       LEAP_TRACKING_EVENT trackingEvent;
       _connection.Frames.Get(out trackingEvent, history);
       toFill.CopyFrom(ref trackingEvent);
@@ -594,8 +517,7 @@ namespace Leap
      *
      * @since 1.0
      */
-    public Frame Frame()
-    {
+    public Frame Frame() {
       return Frame(0);
     }
 
@@ -604,8 +526,7 @@ namespace Leap
      *
      * @param toFill The frame object to fill with tracking data.
      */
-    public void Frame(Frame toFill)
-    {
+    public void Frame(Frame toFill) {
       Frame(toFill, 0);
     }
 
@@ -618,8 +539,7 @@ namespace Leap
      *
      * @param history the age of the timestamp to return,
      */
-    public long FrameTimestamp(int history = 0)
-    {
+    public long FrameTimestamp(int history = 0) {
       LEAP_TRACKING_EVENT trackingEvent;
       _connection.Frames.Get(out trackingEvent, history);
       return trackingEvent.info.timestamp;
@@ -632,8 +552,7 @@ namespace Leap
      * @param history The age of the frame to return, counting backwards from
      * the most recent frame (0) into the past and up to the maximum age (59).
      */
-    public Frame GetTransformedFrame(LeapTransform trs, int history = 0)
-    {
+    public Frame GetTransformedFrame(LeapTransform trs, int history = 0) {
       return new Frame().CopyFrom(Frame(history)).Transform(trs);
     }
 
@@ -641,13 +560,11 @@ namespace Leap
     * Returns the Frame at the specified time, interpolating the data between existing frames, if necessary.
      *
     */
-    public Frame GetInterpolatedFrame(Int64 time)
-    {
+    public Frame GetInterpolatedFrame(Int64 time) {
       return _connection.GetInterpolatedFrame(time);
     }
 
-    public void GetInterpolatedFrame(Frame toFill, Int64 time)
-    {
+    public void GetInterpolatedFrame(Frame toFill, Int64 time) {
       _connection.GetInterpolatedFrame(toFill, time);
     }
 
@@ -655,13 +572,11 @@ namespace Leap
     * Returns the Head pose at the specified time, interpolating the data between existing frames, if necessary.
      *
     */
-    public LEAP_HEAD_POSE_EVENT GetInterpolatedHeadPose(Int64 time)
-    {
+    public LEAP_HEAD_POSE_EVENT GetInterpolatedHeadPose(Int64 time) {
       return _connection.GetInterpolatedHeadPose(time);
     }
 
-    public void GetInterpolatedHeadPose(ref LEAP_HEAD_POSE_EVENT toFill, Int64 time)
-    {
+    public void GetInterpolatedHeadPose(ref LEAP_HEAD_POSE_EVENT toFill, Int64 time) {
       _connection.GetInterpolatedHeadPose(ref toFill, time);
     }
 
@@ -669,8 +584,7 @@ namespace Leap
       _connection.TelemetryProfiling(ref telemetryData);
     }
 
-    public UInt64 TelemetryGetNow()
-    {
+    public UInt64 TelemetryGetNow() {
       return LeapC.TelemetryGetNow();
     }
 
@@ -692,13 +606,11 @@ namespace Leap
                                                   int leftId,
                                                   int rightId,
                                               out LeapTransform leftTransform,
-                                              out LeapTransform rightTransform)
-    {
+                                              out LeapTransform rightTransform) {
       _connection.GetInterpolatedLeftRightTransform(time, sourceTime, leftId, rightId, out leftTransform, out rightTransform);
     }
 
-    public void GetInterpolatedFrameFromTime(Frame toFill, Int64 time, Int64 sourceTime)
-    {
+    public void GetInterpolatedFrameFromTime(Frame toFill, Int64 time, Int64 sourceTime) {
       _connection.GetInterpolatedFrameFromTime(toFill, time, sourceTime);
     }
 
@@ -709,8 +621,7 @@ namespace Leap
      * @since 2.2.7
      *
      */
-    public long Now()
-    {
+    public long Now() {
       return LeapC.GetNow();
     }
 
@@ -731,10 +642,8 @@ namespace Leap
      * @returns True, if connected; false otherwise.
      * @since 1.0
      */
-    public bool IsConnected
-    {
-      get
-      {
+    public bool IsConnected {
+      get {
         return IsServiceConnected && Devices.Count > 0;
       }
     }
@@ -746,10 +655,8 @@ namespace Leap
      * @returns The Controller's Config object.
      * @since 1.0
      */
-    public Config Config
-    {
-      get
-      {
+    public Config Config {
+      get {
         if (_config == null)
           _config = new Config(this._connection.ConnectionKey);
         return _config;
@@ -771,10 +678,8 @@ namespace Leap
      * @returns The list of Leap Motion controllers.
      * @since 1.0
      */
-    public DeviceList Devices
-    {
-      get
-      {
+    public DeviceList Devices {
+      get {
         return _connection.Devices;
       }
     }
@@ -789,8 +694,7 @@ namespace Leap
      *
      * @since 3.0
      */
-    public FailedDeviceList FailedDevices()
-    {
+    public FailedDeviceList FailedDevices() {
       return _connection.FailedDevices;
     }
 
@@ -822,8 +726,7 @@ namespace Leap
      *
      * @since 1.0
      */
-    public enum PolicyFlag
-    {
+    public enum PolicyFlag {
       /**
        * The default policy.
        * @since 1.0
@@ -856,18 +759,15 @@ namespace Leap
       POLICY_MAP_POINTS = (1 << 7),
     }
 
-    protected virtual void OnInit(object sender, LeapEventArgs eventArgs)
-    {
+    protected virtual void OnInit(object sender, LeapEventArgs eventArgs) {
       _hasInitialized = true;
     }
 
-    protected virtual void OnConnect(object sender, ConnectionEventArgs eventArgs)
-    {
+    protected virtual void OnConnect(object sender, ConnectionEventArgs eventArgs) {
       _hasConnected = true;
     }
 
-    protected virtual void OnDisconnect(object sender, ConnectionLostEventArgs eventArgs)
-    {
+    protected virtual void OnDisconnect(object sender, ConnectionLostEventArgs eventArgs) {
       _hasInitialized = false;
       _hasConnected = false;
     }

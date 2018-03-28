@@ -6,8 +6,7 @@
 * between Leap Motion and you, your company or other organization.             *
 \******************************************************************************/
 
-namespace Leap
-{
+namespace Leap {
 
   using System;
   using System.Runtime.InteropServices;
@@ -19,20 +18,17 @@ namespace Leap
    * Get a DeviceList object by calling Controller::devices().
    * @since 1.0
    */
-  public class DeviceList:
-    List<Device>
-  {
+  public class DeviceList :
+    List<Device> {
     /**
      * Constructs an empty list of devices.
      * @since 1.0
      */
-    public DeviceList() {}
+    public DeviceList() { }
 
     /* For internal use. */
-    public Device FindDeviceByHandle(IntPtr deviceHandle)
-    {
-      for (int d = 0; d < this.Count; d++)
-      {
+    public Device FindDeviceByHandle(IntPtr deviceHandle) {
+      for (int d = 0; d < this.Count; d++) {
         if (this[d].Handle == deviceHandle)
           return this[d];
       }
@@ -44,15 +40,12 @@ namespace Leap
     * If no streaming devices are found, returns a default object.
     * @since 3.0
     */
-    public Device ActiveDevice
-    {
-      get
-      {
+    public Device ActiveDevice {
+      get {
         if (Count == 1)
           return this[0];
 
-        for (int d = 0; d < this.Count; d++)
-        {
+        for (int d = 0; d < this.Count; d++) {
           if (this[d].IsStreaming)
             return this[d];
         }
@@ -61,14 +54,11 @@ namespace Leap
     }
 
     /* For internal use. */
-    public void AddOrUpdate(Device device)
-    {
+    public void AddOrUpdate(Device device) {
       Device existingDevice = FindDeviceByHandle(device.Handle);
-      if (existingDevice != null)
-      {
+      if (existingDevice != null) {
         existingDevice.Update(device);
-      }
-      else {
+      } else {
         this.Add(device);
       }
     }
@@ -81,8 +71,7 @@ namespace Leap
      * @returns True, if the list has no members.
      * @since 1.0
      */
-    public bool IsEmpty
-    {
+    public bool IsEmpty {
       get { return this.Count == 0; }
     }
   }

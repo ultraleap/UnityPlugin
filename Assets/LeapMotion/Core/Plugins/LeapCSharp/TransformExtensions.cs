@@ -5,11 +5,11 @@
 * https://developer.leapmotion.com/sdk_agreement, or another agreement         *
 * between Leap Motion and you, your company or other organization.             *
 \******************************************************************************/
+
 namespace Leap {
   using System;
 
-  public static class TransformExtensions
-  {
+  public static class TransformExtensions {
 
     /**
      * Does an in-place rigid transformation of a Frame.
@@ -17,10 +17,8 @@ namespace Leap {
      * @param transform A LeapTransform containing the desired translation, rotation, and scale
      * to be applied to the Frame.
      */
-    public static Frame Transform(this Frame frame, LeapTransform transform)
-    {
-      for (int i = frame.Hands.Count; i-- != 0; )
-      {
+    public static Frame Transform(this Frame frame, LeapTransform transform) {
+      for (int i = frame.Hands.Count; i-- != 0;) {
         frame.Hands[i].Transform(transform);
       }
 
@@ -33,8 +31,7 @@ namespace Leap {
      *
      * @param transform The transformation to be applied to the copied frame.
      */
-    public static Frame TransformedCopy(this Frame frame, LeapTransform transform)
-    {
+    public static Frame TransformedCopy(this Frame frame, LeapTransform transform) {
       return new Frame().CopyFrom(frame).Transform(transform);
     }
 
@@ -44,8 +41,7 @@ namespace Leap {
      * @param transform A LeapTransform containing the desired translation, rotation, and scale
      * to be applied to the Hand.
      */
-    public static Hand Transform(this Hand hand, LeapTransform transform)
-    {
+    public static Hand Transform(this Hand hand, LeapTransform transform) {
       hand.PalmPosition = transform.TransformPoint(hand.PalmPosition);
       hand.StabilizedPalmPosition = transform.TransformPoint(hand.StabilizedPalmPosition);
       hand.PalmVelocity = transform.TransformVelocity(hand.PalmVelocity);
@@ -57,8 +53,7 @@ namespace Leap {
 
       hand.Arm.Transform(transform);
 
-      for (int i = 5; i-- != 0; )
-      {
+      for (int i = 5; i-- != 0;) {
         hand.Fingers[i].Transform(transform);
       }
 
@@ -71,8 +66,7 @@ namespace Leap {
      *
      * @param transform The transformation to be applied to the copied hand.
      */
-    public static Hand TransformedCopy(this Hand hand, LeapTransform transform)
-    {
+    public static Hand TransformedCopy(this Hand hand, LeapTransform transform) {
       return new Hand().CopyFrom(hand).Transform(transform);
     }
 
@@ -82,15 +76,13 @@ namespace Leap {
      * @param transform A LeapTransform containing the desired translation, rotation, and scale
      * to be applied to the Finger.
      */
-    public static Finger Transform(this Finger finger, LeapTransform transform)
-    {
+    public static Finger Transform(this Finger finger, LeapTransform transform) {
       Bone nextBone = finger.bones[3];
       nextBone.NextJoint = transform.TransformPoint(nextBone.NextJoint);
 
       finger.TipPosition = nextBone.NextJoint;
 
-      for (int i = 3; i-- != 0; )
-      {
+      for (int i = 3; i-- != 0;) {
         Bone bone = finger.bones[i];
 
         bone.NextJoint = nextBone.PrevJoint = transform.TransformPoint(bone.NextJoint);
@@ -117,8 +109,7 @@ namespace Leap {
      *
      * @param transform The transformation to be applied to the copied finger.
      */
-    public static Finger TransformedCopy(this Finger finger, LeapTransform transform)
-    {
+    public static Finger TransformedCopy(this Finger finger, LeapTransform transform) {
       return new Finger().CopyFrom(finger).Transform(transform);
     }
 
@@ -128,8 +119,7 @@ namespace Leap {
      * @param transform A LeapTransform containing the desired translation, rotation, and scale
 -    *  to be applied to the bone.
      */
-    public static Bone Transform(this Bone bone, LeapTransform transform)
-    {
+    public static Bone Transform(this Bone bone, LeapTransform transform) {
       bone.PrevJoint = transform.TransformPoint(bone.PrevJoint);
       bone.NextJoint = transform.TransformPoint(bone.NextJoint);
 
@@ -148,8 +138,7 @@ namespace Leap {
       bone.Length *= Math.Abs(transform.scale.z);
       bone.Center = (bone.PrevJoint + bone.NextJoint) / 2.0f;
 
-      if (bone.Length < float.Epsilon)
-      {
+      if (bone.Length < float.Epsilon) {
         bone.Direction = Vector.Zero;
       } else {
         bone.Direction = (bone.NextJoint - bone.PrevJoint) / bone.Length;
@@ -165,8 +154,7 @@ namespace Leap {
      *
      * @param transform The transformation to be applied to the copied bone.
      */
-    public static Bone TransformedCopy(this Bone bone, LeapTransform transform)
-    {
+    public static Bone TransformedCopy(this Bone bone, LeapTransform transform) {
       return new Bone().CopyFrom(bone).Transform(transform);
     }
   }

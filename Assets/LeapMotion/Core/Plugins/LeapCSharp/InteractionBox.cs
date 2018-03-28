@@ -5,10 +5,9 @@
 * https://developer.leapmotion.com/sdk_agreement, or another agreement         *
 * between Leap Motion and you, your company or other organization.             *
 \******************************************************************************/
-namespace Leap
-{
+
+namespace Leap {
   using System;
-  using System.Runtime.InteropServices;
 
   /**
    * The InteractionBox class represents a box-shaped region completely
@@ -28,17 +27,15 @@ namespace Leap
    * @since 1.0
    */
   [Serializable]
-  public struct InteractionBox
-  {
+  public struct InteractionBox {
 
     /**
-     * Create an interaction box with a specxific size and center position.
+     * Create an interaction box with a specific size and center position.
      *
      * @param center The midpoint of the box.
      * @param size The dimensions of the box along each axis.
      */
-    public InteractionBox(Vector center, Vector size)
-    {
+    public InteractionBox(Vector center, Vector size) {
       Size = size;
       Center = center;
     }
@@ -58,17 +55,14 @@ namespace Leap
      * @returns The normalized position.
      * @since 1.0
      */
-    public Vector NormalizePoint(Vector position, bool clamp = true)
-    {
-      if (!this.IsValid)
-      {
+    public Vector NormalizePoint(Vector position, bool clamp = true) {
+      if (!this.IsValid) {
         return Vector.Zero;
       }
       float x = (position.x - Center.x + Size.x / 2.0f) / Size.x;
       float y = (position.y - Center.y + Size.y / 2.0f) / Size.y;
       float z = (position.z - Center.z + Size.z / 2.0f) / Size.z;
-      if (clamp)
-      {
+      if (clamp) {
         x = Math.Min(1.0f, Math.Max(0.0f, x));
         y = Math.Min(1.0f, Math.Max(0.0f, y));
         z = Math.Min(1.0f, Math.Max(0.0f, z));
@@ -88,10 +82,8 @@ namespace Leap
      * @returns The corresponding denormalized position in device coordinates.
      * @since 1.0
      */
-    public Vector DenormalizePoint(Vector normalizedPosition)
-    {
-      if (!IsValid)
-      {
+    public Vector DenormalizePoint(Vector normalizedPosition) {
+      if (!IsValid) {
         return Vector.Zero;
       }
       float x = normalizedPosition.x * Size.x + (Center.x - Size.x / 2.0f);
@@ -109,8 +101,7 @@ namespace Leap
      * are the same size, in the same position and both InteractionBoxes are valid.
      * @since 1.0
      */
-    public bool Equals(InteractionBox other)
-    {
+    public bool Equals(InteractionBox other) {
       return this.IsValid && other.IsValid && (this.Center == other.Center) && (this.Size == other.Size);
     }
 
@@ -120,8 +111,7 @@ namespace Leap
      * @returns A description of the InteractionBox as a string.
      * @since 1.0
      */
-    public override string ToString()
-    {
+    public override string ToString() {
       return "InteractionBox Center: " + Center + ", Size: " + Size;
     }
 
@@ -149,8 +139,7 @@ namespace Leap
      * @returns The InteractionBox width in millimeters.
      * @since 1.0
      */
-    public float Width
-    {
+    public float Width {
       get { return Size.x; }
     }
 
@@ -162,8 +151,7 @@ namespace Leap
      * @returns The InteractionBox height in millimeters.
      * @since 1.0
      */
-    public float Height
-    {
+    public float Height {
       get { return Size.y; }
     }
 
@@ -175,8 +163,7 @@ namespace Leap
      * @returns The InteractionBox depth in millimeters.
      * @since 1.0
      */
-    public float Depth
-    {
+    public float Depth {
       get { return Size.z; }
     }
 
@@ -188,10 +175,8 @@ namespace Leap
      * @returns True, if this InteractionBox object contains valid data.
      * @since 1.0
      */
-    public bool IsValid
-    {
-      get
-      {
+    public bool IsValid {
+      get {
         return Size != Vector.Zero
             && !float.IsNaN(Size.x)
             && !float.IsNaN(Size.y)

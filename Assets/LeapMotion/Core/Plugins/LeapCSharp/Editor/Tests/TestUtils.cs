@@ -85,7 +85,7 @@
 //            palm.direction = setVector(-0.112943358719f, 0.282659977674f, -0.952547729015f);
 //            palm.normal = setVector(-0.0303287450224f, -0.959215939045f, -0.281042635441f);
 //            //palm.basis = setBasis(0.993138492107f, 0.00285232067108f, -0.116909787059f, 0.0303287450224f, 0.959215939045f, 0.281042635441f, 0.112943358719f, -0.282659977674f, 0.952547729015f);
-            
+
 //            return palm;
 //        }
 
@@ -152,7 +152,7 @@
 //        }
 //        public static LEAP_DIGIT makeMiddleStruct(){
 //            LEAP_DIGIT middle = new LEAP_DIGIT();
-            
+
 //            middle.tip_velocity  = setVector(-4.81796693802f, -3.54747653008f, -4.46720075607f);
 //            middle.stabilized_tip_position  = setVector(-5.33823776245f, 437.299865723f, -48.0671043396f);
 //            middle.metacarpal = new LEAP_BONE();
@@ -255,7 +255,7 @@
 //            basis.y_basis = setVector(yx, yy, yz);
 //            basis.z_basis = setVector(zx, zy, zz);
 //            return basis;
-            
+
 //        }
 //        private static LEAP_MATRIX identityBasis(){
 //            LEAP_MATRIX identity = new LEAP_MATRIX();

@@ -6,8 +6,7 @@
 * between Leap Motion and you, your company or other organization.             *
 \******************************************************************************/
 
-namespace Leap
-{
+namespace Leap {
   using System;
   using System.Runtime.InteropServices;
   using System.Collections.Generic;
@@ -22,20 +21,18 @@ namespace Leap
    * @since 3.0
    */
 
-  public class FailedDeviceList : List<FailedDevice>
-  {
+  public class FailedDeviceList : List<FailedDevice> {
     /**
      * Constructs an empty list.
      * @since 3.0
      */
-    public FailedDeviceList() {}
+    public FailedDeviceList() { }
 
     /**
      * Appends the contents of another FailedDeviceList to this one.
      * @since 3.0
      */
-    public FailedDeviceList Append(FailedDeviceList other)
-    {
+    public FailedDeviceList Append(FailedDeviceList other) {
       this.AddRange(other);
       return this;
     }
@@ -44,8 +41,7 @@ namespace Leap
      * Reports whether the list is empty.
      * @since 3.0
      */
-    public bool IsEmpty
-    {
+    public bool IsEmpty {
       get { return this.Count == 0; }
     }
   }

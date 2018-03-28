@@ -7,11 +7,9 @@
 * between Leap Motion and you, your company or other organization.             *
 \******************************************************************************/
 
-namespace Leap
-{
+namespace Leap {
   using System;
   using System.Collections.Generic;
-  using System.Runtime.InteropServices;
 
   /**
    * The Frame class represents a set of hand and finger tracking data detected
@@ -28,8 +26,7 @@ namespace Leap
    * @since 1.0
    */
   [Serializable]
-  public class Frame: IEquatable<Frame>
-  {
+  public class Frame : IEquatable<Frame> {
     [ThreadStatic]
     private static Queue<Hand> _handPool;
 
@@ -48,7 +45,7 @@ namespace Leap
      * @since 1.0
      */
     public Frame() {
-      Hands = new List<Hand> ();
+      Hands = new List<Hand>();
     }
 
     /**
@@ -60,8 +57,7 @@ namespace Leap
      * @param interactionBox The InteractionBox object for this frame.
      * @since 3.0
      */
-    public Frame(long id, long timestamp, float fps, InteractionBox interactionBox, List<Hand> hands)
-    {
+    public Frame(long id, long timestamp, float fps, InteractionBox interactionBox, List<Hand> hands) {
       Id = id;
       Timestamp = timestamp;
       CurrentFramesPerSecond = fps;
@@ -69,52 +65,16 @@ namespace Leap
       Hands = hands;
     }
 
-    /**
-     * Encodes this Frame object as a byte string.
-     *
-     * \include Frame_serialize.txt
-     *
-     * @since 2.1.0
-     */
-    public byte[] Serialize
-    {
-      get
-      {
-        byte[] ptr = new byte[1];
-        ptr[1] = 0;
-        return ptr;
+    [Obsolete]
+    public byte[] Serialize {
+      get {
+        throw new NotImplementedException();
       }
     }
 
-    /**
-     * Decodes a byte string to replace the properties of this Frame.
-     *
-     * A Controller object must be instantiated for this function to succeed, but
-     * it does not need to be connected. To extract gestures from the deserialized
-     * frame, you must enable the appropriate gestures first.
-     *
-     * Any existing data in the frame is
-     * destroyed. If you have references to
-     * child objects (hands, fingers, etc.), these are preserved as long as the
-     * references remain in scope.
-     *
-     * \include Frame_deserialize.txt
-     *
-     * **Note:** The behavior when calling functions which take
-     * another Frame object as a parameter is undefined when either frame has
-     * been deserialized. For example, calling ``Gestures(sinceFrame)`` on a
-     * deserialized frame or with a deserialized frame as parameter (or both)
-     * does not necessarily return all gestures that occurred between the two
-     * frames. Motion functions, like ``ScaleFactor(startFrame)``, are more
-     * likely to return reasonable results, but could return anomalous values
-     * in some cases.
-     *
-     * @param arg A byte array containing the bytes of a serialized frame.
-     * @since 2.1.0
-     */
-    public void Deserialize(byte[] arg)
-    {
-
+    [Obsolete]
+    public void Deserialize(byte[] arg) {
+      throw new NotImplementedException();
     }
 
     /**
@@ -137,12 +97,9 @@ namespace Leap
      * otherwise, an invalid Hand object is returned.
      * @since 1.0
      */
-    public Hand Hand(int id)
-    {
-      for (int i = Hands.Count; i-- != 0; )
-      {
-        if (Hands[i].Id == id)
-        {
+    public Hand Hand(int id) {
+      for (int i = Hands.Count; i-- != 0;) {
+        if (Hands[i].Id == id) {
           return Hands[i];
         }
       }
@@ -158,8 +115,7 @@ namespace Leap
      * the exact same frame of tracking data and both Frame objects are valid.
      * @since 1.0
      */
-    public bool Equals(Frame other)
-    {
+    public bool Equals(Frame other) {
       return this.Id == other.Id && this.Timestamp == other.Timestamp;
     }
 
@@ -169,8 +125,7 @@ namespace Leap
      * @returns A description of the Frame as a string.
      * @since 1.0
      */
-    public override string ToString()
-    {
+    public override string ToString() {
       return "Frame id: " + this.Id + " timestamp: " + this.Timestamp;
     }
 
@@ -242,8 +197,7 @@ namespace Leap
      */
     public InteractionBox InteractionBox;
 
-    public int SerializeLength
-    {
+    public int SerializeLength {
       get { return 0; }
     }
 
@@ -253,18 +207,14 @@ namespace Leap
      * new spaces are filled with hands taken from the hand pool.  If the pool is
      * empty, new hands are constructed instead.
      */
-    internal void ResizeHandList(int count)
-    {
-      if (_handPool == null)
-      {
+    internal void ResizeHandList(int count) {
+      if (_handPool == null) {
         _handPool = new Queue<Hand>();
       }
 
-      while (Hands.Count < count)
-      {
+      while (Hands.Count < count) {
         Hand newHand;
-        if (_handPool.Count > 0)
-        {
+        if (_handPool.Count > 0) {
           newHand = _handPool.Dequeue();
         } else {
           newHand = new Hand();
@@ -272,8 +222,7 @@ namespace Leap
         Hands.Add(newHand);
       }
 
-      while (Hands.Count > count)
-      {
+      while (Hands.Count > count) {
         Hand lastHand = Hands[Hands.Count - 1];
         Hands.RemoveAt(Hands.Count - 1);
         _handPool.Enqueue(lastHand);

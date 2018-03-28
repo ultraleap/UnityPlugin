@@ -5,10 +5,9 @@
 * https://developer.leapmotion.com/sdk_agreement, or another agreement         *
 * between Leap Motion and you, your company or other organization.             *
 \******************************************************************************/
-namespace Leap
-{
+
+namespace Leap {
   using System;
-  using System.Runtime.InteropServices;
   using LeapInternal;
 
   /**
@@ -27,9 +26,8 @@ namespace Leap
    * Test for validity with the Device::isValid() function.
    * @since 1.0
    */
-  public class Device:
-    IEquatable<Device>
-  {
+  public class Device :
+    IEquatable<Device> {
     /**
      * Constructs a default Device object.
      *
@@ -40,7 +38,7 @@ namespace Leap
      *
      * @since 1.0
      */
-    public Device() {}
+    public Device() { }
 
     public Device(IntPtr deviceHandle,
                    float horizontalViewAngle,
@@ -48,8 +46,7 @@ namespace Leap
                    float range,
                    float baseline,
                    bool isStreaming,
-                   string serialNumber)
-    {
+                   string serialNumber) {
       Handle = deviceHandle;
       HorizontalViewAngle = horizontalViewAngle;
       VerticalViewAngle = verticalViewAngle;
@@ -66,8 +63,7 @@ namespace Leap
         float range,
         float baseline,
         bool isStreaming,
-        string serialNumber)
-    {
+        string serialNumber) {
       HorizontalViewAngle = horizontalViewAngle;
       VerticalViewAngle = verticalViewAngle;
       Range = range;
@@ -77,8 +73,7 @@ namespace Leap
     }
 
     /* For internal use. */
-    public void Update(Device updatedDevice)
-    {
+    public void Update(Device updatedDevice) {
       HorizontalViewAngle = updatedDevice.HorizontalViewAngle;
       VerticalViewAngle = updatedDevice.VerticalViewAngle;
       Range = updatedDevice.Range;
@@ -90,8 +85,7 @@ namespace Leap
     /* For internal use. */
     public IntPtr Handle { get; private set; }
 
-    public bool SetPaused(bool pause)
-    {
+    public bool SetPaused(bool pause) {
       ulong prior_state = 0;
       ulong set_flags = 0;
       ulong clear_flags = 0;
@@ -116,8 +110,7 @@ namespace Leap
      * exact same Device and both Devices are valid.
      * @since 1.0
      */
-    public bool Equals(Device other)
-    {
+    public bool Equals(Device other) {
       return this.SerialNumber == other.SerialNumber;
     }
 
@@ -127,8 +120,7 @@ namespace Leap
      * @returns A description of the Device as a string.
      * @since 1.0
      */
-    public override string ToString()
-    {
+    public override string ToString() {
       return "Device serial# " + this.SerialNumber;
     }
 
@@ -209,10 +201,8 @@ namespace Leap
      * @returns The physical device type as a member of the DeviceType enumeration.
      * @since 1.2
      */
-    public Device.DeviceType Type
-    {
-      get
-      {
+    public Device.DeviceType Type {
+      get {
         return DeviceType.TYPE_INVALID;
       }
     }
@@ -238,10 +228,8 @@ namespace Leap
      *
      * @since 3.0
      */
-    public bool IsSmudged
-    {
-      get
-      {
+    public bool IsSmudged {
+      get {
         return false; //TODO implement or remove Is Smudged
       }
     }
@@ -257,10 +245,8 @@ namespace Leap
      *
      * @since 3.0
      */
-    public bool IsLightingBad
-    {
-      get
-      {
+    public bool IsLightingBad {
+      get {
         return false; //TODO Implement or remove IsLightingBad
       }
     }
@@ -269,8 +255,7 @@ namespace Leap
      * The available types of Leap Motion controllers.
      * @since 1.2
      */
-    public enum DeviceType
-    {
+    public enum DeviceType {
       TYPE_INVALID = -1,
 
       /**

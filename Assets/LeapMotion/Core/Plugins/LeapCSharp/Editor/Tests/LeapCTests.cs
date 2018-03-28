@@ -491,8 +491,8 @@ namespace Leap.LeapCSharp.Tests {
         //  (uint)eLeapDeviceFlag.eLeapDeviceFlag_Stream,
         //  (uint)eLeapDeviceFlag.eLeapDeviceFlag_Stream & priorFlags,
         //  "Device must be streaming after setting the Stream device flag.");
-        }
       }
+    }
 
     //public static extern void LeapCloseDevice (LEAP_DEVICE pDevice);
     [Test]

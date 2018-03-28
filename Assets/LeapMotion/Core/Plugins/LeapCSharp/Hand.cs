@@ -5,11 +5,10 @@
 * https://developer.leapmotion.com/sdk_agreement, or another agreement         *
 * between Leap Motion and you, your company or other organization.             *
 \******************************************************************************/
-namespace Leap
-{
+
+namespace Leap {
   using System;
   using System.Collections.Generic;
-  using System.Runtime.InteropServices;
 
   /**
    * The Hand class reports the physical characteristics of a detected hand.
@@ -31,8 +30,7 @@ namespace Leap
    * @since 1.0
    */
   [Serializable]
-  public class Hand
-  {
+  public class Hand {
     /**
      * Constructs a Hand object.
      *
@@ -43,8 +41,7 @@ namespace Leap
      *
      * @since 1.0
      */
-    public Hand()
-    {
+    public Hand() {
       Arm = new Arm();
       Fingers = new List<Finger>(5);
       Fingers.Add(new Finger());
@@ -99,8 +96,7 @@ namespace Leap
                 Vector palmNormal,
                 LeapQuaternion palmOrientation,
                 Vector direction,
-                Vector wristPosition)
-    {
+                Vector wristPosition) {
       FrameId = frameID;
       Id = id;
       Confidence = confidence;
@@ -142,12 +138,9 @@ namespace Leap
      * hand in this frame; otherwise, an invalid Finger object is returned.
      * @since 1.0
      */
-    public Finger Finger(int id)
-    {
-      for (int i = Fingers.Count; i-- != 0; )
-      {
-        if (Fingers[i].Id == id)
-        {
+    public Finger Finger(int id) {
+      for (int i = Fingers.Count; i-- != 0;) {
+        if (Fingers[i].Id == id) {
           return Fingers[i];
         }
       }
@@ -163,8 +156,7 @@ namespace Leap
      * exact same physical hand in the same frame and both Hand objects are valid.
      * @since 1.0
      */
-    public bool Equals(Hand other)
-    {
+    public bool Equals(Hand other) {
       return Id == other.Id && FrameId == other.FrameId;
     }
 
@@ -174,8 +166,7 @@ namespace Leap
      * @returns A description of the Hand as a string.
      * @since 1.0
      */
-    public override string ToString()
-    {
+    public override string ToString() {
       return string.Format(
         "Hand {0} {1}.",
         this.Id,
@@ -271,12 +262,12 @@ namespace Leap
      */
     public Vector Direction;
 
-     /**
-     * The transform of the hand.
-     *
-     * Note, in version prior to 3.1, the Basis was a Matrix object.
-     * @since 3.1
-     */
+    /**
+    * The transform of the hand.
+    *
+    * Note, in version prior to 3.1, the Basis was a Matrix object.
+    * @since 3.1
+    */
     public LeapTransform Basis { get { return new LeapTransform(PalmPosition, Rotation); } }
 
     /**

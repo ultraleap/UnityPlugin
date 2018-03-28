@@ -5,8 +5,7 @@
 * https://developer.leapmotion.com/sdk_agreement, or another agreement         *
 * between Leap Motion and you, your company or other organization.             *
 \******************************************************************************/
-namespace Leap
-{
+namespace Leap {
 
   using System;
   using System.Collections.Generic;
@@ -19,8 +18,7 @@ namespace Leap
    * @since 1.0
    */
 
-  public class Config
-  {
+  public class Config {
     private Connection _connection;
     private Dictionary<UInt32, object> _transactions = new Dictionary<UInt32, object>();
 
@@ -29,35 +27,29 @@ namespace Leap
      *
      * Note that the Controller.Config provides a properly initialized Config object already.
      *
-     * @param connectionKey The id of the connnection. This id must match the key used to create
+     * @param connectionKey The id of the connection. This id must match the key used to create
      * the Controller.
      * @since 3.0
      */
-    public Config(int connectionKey)
-    {
+    public Config(int connectionKey) {
       _connection = Connection.GetConnection(connectionKey);
       _connection.LeapConfigChange += handleConfigChange;
       _connection.LeapConfigResponse += handleConfigResponse;
     }
 
-    private void handleConfigChange(object sender, ConfigChangeEventArgs eventArgs)
-    {
+    private void handleConfigChange(object sender, ConfigChangeEventArgs eventArgs) {
       object actionDelegate;
-      if (_transactions.TryGetValue(eventArgs.RequestId, out actionDelegate))
-      {
+      if (_transactions.TryGetValue(eventArgs.RequestId, out actionDelegate)) {
         Action<bool> changeAction = actionDelegate as Action<bool>;
         changeAction(eventArgs.Succeeded);
         _transactions.Remove(eventArgs.RequestId);
       }
     }
 
-    private void handleConfigResponse(object sender, SetConfigResponseEventArgs eventArgs)
-    {
+    private void handleConfigResponse(object sender, SetConfigResponseEventArgs eventArgs) {
       object actionDelegate = new object();
-      if (_transactions.TryGetValue(eventArgs.RequestId, out actionDelegate))
-      {
-        switch (eventArgs.DataType)
-        {
+      if (_transactions.TryGetValue(eventArgs.RequestId, out actionDelegate)) {
+        switch (eventArgs.DataType) {
           case Config.ValueType.TYPE_BOOLEAN:
             Action<bool> boolAction = actionDelegate as Action<bool>;
             boolAction((int)eventArgs.Value != 0);
@@ -91,12 +83,10 @@ namespace Leap
      *
      * @since 3.0
      */
-    public bool Get<T>(string key, Action<T> onResult)
-    {
+    public bool Get<T>(string key, Action<T> onResult) {
 
       uint requestId = _connection.GetConfigValue(key);
-      if (requestId > 0)
-      {
+      if (requestId > 0) {
         _transactions.Add(requestId, onResult);
         return true;
       }
@@ -113,12 +103,10 @@ namespace Leap
      *
      * @since 3.0
      */
-    public bool Set<T>(string key, T value, Action<bool> onResult) where T : IConvertible
-    {
+    public bool Set<T>(string key, T value, Action<bool> onResult) where T : IConvertible {
       uint requestId = _connection.SetConfigValue<T>(key, value);
 
-      if (requestId > 0)
-      {
+      if (requestId > 0) {
         _transactions.Add(requestId, onResult);
         return true;
       }
@@ -129,8 +117,7 @@ namespace Leap
      * The data type for a configuration parameter.
      * @ deprecated Always returns Config.ValueType.TYPE_UNKNOWN
      */
-    public Config.ValueType Type(string key)
-    {
+    public Config.ValueType Type(string key) {
       return Config.ValueType.TYPE_UNKNOWN;
     }
 
@@ -141,10 +128,8 @@ namespace Leap
      *
      * @since 1.0
      */
-    public bool GetBool(string key)
-    {
-      return Get<bool>(key, delegate (bool value)
-      {
+    public bool GetBool(string key) {
+      return Get<bool>(key, delegate (bool value) {
       });
     }
 
@@ -155,8 +140,7 @@ namespace Leap
      * @returns true on success, false on failure.
      * @since 1.0
      */
-    public bool SetBool(string key, bool value)
-    {
+    public bool SetBool(string key, bool value) {
       return Set<bool>(key, value, delegate (bool success) { });
     }
 
@@ -165,10 +149,8 @@ namespace Leap
      * @ deprecated use Get<Int32>(key, delegate)
      * @since 1.0
      */
-    public bool GetInt32(string key)
-    {
-      return Get<Int32>(key, delegate (Int32 value)
-      {
+    public bool GetInt32(string key) {
+      return Get<Int32>(key, delegate (Int32 value) {
       });
     }
 
@@ -179,8 +161,7 @@ namespace Leap
      * @returns true on success, false on failure.
      * @since 1.0
      */
-    public bool SetInt32(string key, int value)
-    {
+    public bool SetInt32(string key, int value) {
       return Set<Int32>(key, value, delegate (bool success) { });
     }
 
@@ -189,10 +170,8 @@ namespace Leap
      * @ deprecated use Get<float>(key, delegate)
      * @since 1.0
      */
-    public bool GetFloat(string key)
-    {
-      return Get<float>(key, delegate (float value)
-      {
+    public bool GetFloat(string key) {
+      return Get<float>(key, delegate (float value) {
       });
     }
     /** Sets the floating point representation for the specified key.
@@ -202,8 +181,7 @@ namespace Leap
      * @returns true on success, false on failure.
      * @since 1.0
      */
-    public bool SetFloat(string key, float value)
-    {
+    public bool SetFloat(string key, float value) {
       return Set<float>(key, value, delegate (bool success) { });
     }
 
@@ -212,10 +190,8 @@ namespace Leap
      * @ deprecated use Get<string>(key, delegate)
      * @since 1.0
      */
-    public bool GetString(string key)
-    {
-      return Get<string>(key, delegate (string value)
-      {
+    public bool GetString(string key) {
+      return Get<string>(key, delegate (string value) {
       });
     }
     /** Sets the string representation for the specified key.
@@ -225,8 +201,7 @@ namespace Leap
      * @returns true on success, false on failure.
      * @since 1.0
      */
-    public bool SetString(string key, string value)
-    {
+    public bool SetString(string key, string value) {
       return Set<string>(key, value, delegate (bool success) { });
     }
 
@@ -237,8 +212,7 @@ namespace Leap
      * @returns always returns false.
      * @since 1.0
      */
-    public bool Save()
-    {
+    public bool Save() {
       return false;
     }
 
@@ -248,8 +222,7 @@ namespace Leap
      * The Config::type() function returns an item from the ValueType enumeration.
      * @since 1.0
      */
-    public enum ValueType
-    {
+    public enum ValueType {
       /**
        * The data type is unknown.
        * @since 1.0

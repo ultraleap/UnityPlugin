@@ -41,7 +41,7 @@ namespace LeapInternal {
 
     /**
      * Copies a struct of type T into the array pointed to by arrayPtr at the
-     * offset index specified by indexx.  This is an unsafe operation that assumes
+     * offset index specified by index.  This is an unsafe operation that assumes
      * there is enough space allocated in the array to accommodate the struct.
      */
     public static void CopyIntoArray(IntPtr arrayPtr, ref T t, int index) {

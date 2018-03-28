@@ -6,18 +6,15 @@
 * between Leap Motion and you, your company or other organization.             *
 \******************************************************************************/
 
-namespace LeapInternal
-{
+namespace LeapInternal {
   using System;
   using System.Collections.Generic;
   using System.Runtime.InteropServices;
-  using System.Text;
   using System.Threading;
 
   using Leap;
 
-  public class Connection
-  {
+  public class Connection {
     private static Dictionary<int, Connection> connectionDictionary = new Dictionary<int, Connection>();
     private static LeapInternal.MemoryManager _memoryManager = new LeapInternal.MemoryManager();
 
@@ -26,8 +23,7 @@ namespace LeapInternal
     private static long _handPositionOffset;
     private static long _handOrientationOffset;
 
-    static Connection()
-    {
+    static Connection() {
       _handIdOffset = Marshal.OffsetOf(typeof(LEAP_HAND), "id").ToInt64();
 
       long palmOffset = Marshal.OffsetOf(typeof(LEAP_HAND), "palm").ToInt64();
@@ -35,11 +31,9 @@ namespace LeapInternal
       _handOrientationOffset = Marshal.OffsetOf(typeof(LEAP_PALM), "orientation").ToInt64() + palmOffset;
     }
 
-    public static Connection GetConnection(int connectionKey = 0)
-    {
+    public static Connection GetConnection(int connectionKey = 0) {
       Connection conn;
-      if (!Connection.connectionDictionary.TryGetValue(connectionKey, out conn))
-      {
+      if (!Connection.connectionDictionary.TryGetValue(connectionKey, out conn)) {
         conn = new Connection(connectionKey);
         connectionDictionary.Add(connectionKey, conn);
       }
@@ -71,23 +65,23 @@ namespace LeapInternal
     public SynchronizationContext EventContext { get; set; }
 
     private EventHandler<LeapEventArgs> _leapInit;
-    public event EventHandler <LeapEventArgs> LeapInit{
-      add{
+    public event EventHandler<LeapEventArgs> LeapInit {
+      add {
         _leapInit += value;
-        if(_leapConnection != IntPtr.Zero)
+        if (_leapConnection != IntPtr.Zero)
           value(this, new LeapEventArgs(LeapEvent.EVENT_INIT));
       }
-      remove{_leapInit -= value;}
+      remove { _leapInit -= value; }
     }
 
     private EventHandler<ConnectionEventArgs> _leapConnectionEvent;
-    public event EventHandler<ConnectionEventArgs> LeapConnection{
-      add{
+    public event EventHandler<ConnectionEventArgs> LeapConnection {
+      add {
         _leapConnectionEvent += value;
-        if(IsServiceConnected)
+        if (IsServiceConnected)
           value(this, new ConnectionEventArgs());
-        }
-      remove{_leapConnectionEvent -= value;}
+      }
+      remove { _leapConnectionEvent -= value; }
     }
     public EventHandler<ConnectionLostEventArgs> LeapConnectionLost;
     public EventHandler<DeviceEventArgs> LeapDevice;
@@ -112,20 +106,17 @@ namespace LeapInternal
 
     private bool _disposed = false;
 
-    public void Dispose()
-    {
+    public void Dispose() {
       Dispose(true);
       GC.SuppressFinalize(this);
     }
 
     // Protected implementation of Dispose pattern.
-    protected virtual void Dispose(bool disposing)
-    {
+    protected virtual void Dispose(bool disposing) {
       if (_disposed)
         return;
 
-      if (disposing)
-      {
+      if (disposing) {
       }
 
       Stop();
@@ -135,13 +126,11 @@ namespace LeapInternal
       _disposed = true;
     }
 
-    ~Connection()
-    {
+    ~Connection() {
       Dispose(false);
     }
 
-    private Connection(int connectionKey)
-    {
+    private Connection(int connectionKey) {
       ConnectionKey = connectionKey;
       _leapConnection = IntPtr.Zero;
 
@@ -150,8 +139,7 @@ namespace LeapInternal
 
     private LEAP_ALLOCATOR _pLeapAllocator = new LEAP_ALLOCATOR();
 
-    public void Start()
-    {
+    public void Start() {
       if (_isRunning)
         return;
 
@@ -186,8 +174,7 @@ namespace LeapInternal
       _polster.Start();
     }
 
-    public void Stop()
-    {
+    public void Stop() {
       if (!_isRunning)
         return;
 
@@ -197,21 +184,17 @@ namespace LeapInternal
     }
 
     //Run in Polster thread, fills in object queues
-    private void processMessages()
-    {
+    private void processMessages() {
       //Only profiling block currently is the Handle Event block
       const string HANDLE_EVENT_PROFILER_BLOCK = "Handle Event";
       bool hasBegunProfilingForThread = false;
 
-      try
-      {
+      try {
         eLeapRS result;
         _leapInit.DispatchOnContext<LeapEventArgs>(this, EventContext, new LeapEventArgs(LeapEvent.EVENT_INIT));
-        while (_isRunning)
-        {
-          if (LeapBeginProfilingForThread != null && !hasBegunProfilingForThread) 
-          {
-            LeapBeginProfilingForThread(new BeginProfilingForThreadArgs("Worker Thread", 
+        while (_isRunning) {
+          if (LeapBeginProfilingForThread != null && !hasBegunProfilingForThread) {
+            LeapBeginProfilingForThread(new BeginProfilingForThreadArgs("Worker Thread",
                                                                         HANDLE_EVENT_PROFILER_BLOCK));
             hasBegunProfilingForThread = true;
           }
@@ -225,13 +208,11 @@ namespace LeapInternal
             continue;
           }
 
-          if (LeapBeginProfilingBlock != null && hasBegunProfilingForThread) 
-          {
+          if (LeapBeginProfilingBlock != null && hasBegunProfilingForThread) {
             LeapBeginProfilingBlock(new BeginProfilingBlockArgs(HANDLE_EVENT_PROFILER_BLOCK));
           }
 
-          switch (_msg.type)
-          {
+          switch (_msg.type) {
             case eLeapEventType.eLeapEventType_None:
               break;
 
@@ -309,58 +290,47 @@ namespace LeapInternal
               StructMarshal<LEAP_HEAD_POSE_EVENT>.PtrToStruct(_msg.eventStructPtr, out head_pose_event);
               handleHeadPoseChange(ref head_pose_event);
               break;
-            //default:
-            //  // Discard unknown message types.
-            //  Logger.Log("Unhandled message type " + Enum.GetName(typeof(eLeapEventType), _msg.type));
-            //  break;
+              //default:
+              //  // Discard unknown message types.
+              //  Logger.Log("Unhandled message type " + Enum.GetName(typeof(eLeapEventType), _msg.type));
+              //  break;
           } //switch on _msg.type
 
-          if (LeapEndProfilingBlock != null && hasBegunProfilingForThread) 
-          {
+          if (LeapEndProfilingBlock != null && hasBegunProfilingForThread) {
             LeapEndProfilingBlock(new EndProfilingBlockArgs(HANDLE_EVENT_PROFILER_BLOCK));
           }
         } //while running
-      }
-      catch (Exception e)
-      {
+      } catch (Exception e) {
         Logger.Log("Exception: " + e);
         _isRunning = false;
-      } 
-      finally 
-      {
-        if (LeapEndProfilingForThread != null && hasBegunProfilingForThread) 
-        {
+      } finally {
+        if (LeapEndProfilingForThread != null && hasBegunProfilingForThread) {
           LeapEndProfilingForThread(new EndProfilingForThreadArgs());
         }
       }
     }
 
-    private void handleTrackingMessage(ref LEAP_TRACKING_EVENT trackingMsg)
-    {
+    private void handleTrackingMessage(ref LEAP_TRACKING_EVENT trackingMsg) {
       Frames.Put(ref trackingMsg);
 
-      if (LeapFrame != null)
-      {
+      if (LeapFrame != null) {
         LeapFrame.DispatchOnContext<FrameEventArgs>(this, EventContext, new FrameEventArgs(new Frame().CopyFrom(ref trackingMsg)));
       }
     }
 
-    public UInt64 GetInterpolatedFrameSize(Int64 time)
-    {
+    public UInt64 GetInterpolatedFrameSize(Int64 time) {
       UInt64 size = 0;
       eLeapRS result = LeapC.GetFrameSize(_leapConnection, time, out size);
       reportAbnormalResults("LeapC get interpolated frame call was ", result);
       return size;
     }
 
-    public void GetInterpolatedFrame(Frame toFill, Int64 time)
-    {
+    public void GetInterpolatedFrame(Frame toFill, Int64 time) {
       UInt64 size = GetInterpolatedFrameSize(time);
       IntPtr trackingBuffer = Marshal.AllocHGlobal((Int32)size);
       eLeapRS result = LeapC.InterpolateFrame(_leapConnection, time, trackingBuffer, size);
       reportAbnormalResults("LeapC get interpolated frame call was ", result);
-      if (result == eLeapRS.eLeapRS_Success)
-      {
+      if (result == eLeapRS.eLeapRS_Success) {
         LEAP_TRACKING_EVENT tracking_evt;
         StructMarshal<LEAP_TRACKING_EVENT>.PtrToStruct(trackingBuffer, out tracking_evt);
         toFill.CopyFrom(ref tracking_evt);
@@ -368,14 +338,12 @@ namespace LeapInternal
       Marshal.FreeHGlobal(trackingBuffer);
     }
 
-    public void GetInterpolatedFrameFromTime(Frame toFill, Int64 time, Int64 sourceTime)
-    {
+    public void GetInterpolatedFrameFromTime(Frame toFill, Int64 time, Int64 sourceTime) {
       UInt64 size = GetInterpolatedFrameSize(time);
       IntPtr trackingBuffer = Marshal.AllocHGlobal((Int32)size);
       eLeapRS result = LeapC.InterpolateFrameFromTime(_leapConnection, time, sourceTime, trackingBuffer, size);
       reportAbnormalResults("LeapC get interpolated frame from time call was ", result);
-      if (result == eLeapRS.eLeapRS_Success)
-      {
+      if (result == eLeapRS.eLeapRS_Success) {
         LEAP_TRACKING_EVENT tracking_evt;
         StructMarshal<LEAP_TRACKING_EVENT>.PtrToStruct(trackingBuffer, out tracking_evt);
         toFill.CopyFrom(ref tracking_evt);
@@ -383,21 +351,18 @@ namespace LeapInternal
       Marshal.FreeHGlobal(trackingBuffer);
     }
 
-    public Frame GetInterpolatedFrame(Int64 time)
-    {
+    public Frame GetInterpolatedFrame(Int64 time) {
       Frame frame = new Frame();
       GetInterpolatedFrame(frame, time);
       return frame;
     }
 
-    public void GetInterpolatedHeadPose(ref LEAP_HEAD_POSE_EVENT toFill, Int64 time)
-    {
+    public void GetInterpolatedHeadPose(ref LEAP_HEAD_POSE_EVENT toFill, Int64 time) {
       eLeapRS result = LeapC.InterpolateHeadPose(_leapConnection, time, ref toFill);
       reportAbnormalResults("LeapC get interpolated head pose call was ", result);
     }
 
-    public LEAP_HEAD_POSE_EVENT GetInterpolatedHeadPose(Int64 time)
-    {
+    public LEAP_HEAD_POSE_EVENT GetInterpolatedHeadPose(Int64 time) {
       LEAP_HEAD_POSE_EVENT headPoseEvent = new LEAP_HEAD_POSE_EVENT();
       GetInterpolatedHeadPose(ref headPoseEvent, time);
       return headPoseEvent;
@@ -408,8 +373,7 @@ namespace LeapInternal
                                                   Int64 leftId,
                                                   Int64 rightId,
                                               out LeapTransform leftTransform,
-                                              out LeapTransform rightTransform)
-    {
+                                              out LeapTransform rightTransform) {
       leftTransform = LeapTransform.Identity;
       rightTransform = LeapTransform.Identity;
 
@@ -418,8 +382,7 @@ namespace LeapInternal
       eLeapRS result = LeapC.InterpolateFrameFromTime(_leapConnection, time, sourceTime, trackingBuffer, size);
       reportAbnormalResults("LeapC get interpolated frame from time call was ", result);
 
-      if (result == eLeapRS.eLeapRS_Success)
-      {
+      if (result == eLeapRS.eLeapRS_Success) {
         LEAP_TRACKING_EVENT tracking_evt;
         StructMarshal<LEAP_TRACKING_EVENT>.PtrToStruct(trackingBuffer, out tracking_evt);
 
@@ -433,19 +396,15 @@ namespace LeapInternal
         long rotPtr = handPtr + _handOrientationOffset;
         int stride = StructMarshal<LEAP_HAND>.Size;
 
-        for (uint i = tracking_evt.nHands; i-- != 0; idPtr += stride, posPtr += stride, rotPtr += stride)
-        {
+        for (uint i = tracking_evt.nHands; i-- != 0; idPtr += stride, posPtr += stride, rotPtr += stride) {
           id = Marshal.ReadInt32(new IntPtr(idPtr));
           StructMarshal<LEAP_VECTOR>.PtrToStruct(new IntPtr(posPtr), out position);
           StructMarshal<LEAP_QUATERNION>.PtrToStruct(new IntPtr(rotPtr), out orientation);
 
           LeapTransform transform = new LeapTransform(position.ToLeapVector(), orientation.ToLeapQuaternion());
-          if (id == leftId)
-          {
+          if (id == leftId) {
             leftTransform = transform;
-          }
-          else if(id == rightId)
-          {
+          } else if (id == rightId) {
             rightTransform = transform;
           }
         }
@@ -454,24 +413,19 @@ namespace LeapInternal
       Marshal.FreeHGlobal(trackingBuffer);
     }
 
-    private void handleConnection(ref LEAP_CONNECTION_EVENT connectionMsg)
-    {
-      if (_leapConnectionEvent != null)
-      {
+    private void handleConnection(ref LEAP_CONNECTION_EVENT connectionMsg) {
+      if (_leapConnectionEvent != null) {
         _leapConnectionEvent.DispatchOnContext<ConnectionEventArgs>(this, EventContext, new ConnectionEventArgs());
       }
     }
 
-    private void handleConnectionLost(ref LEAP_CONNECTION_LOST_EVENT connectionMsg)
-    {
-      if (LeapConnectionLost != null)
-      {
+    private void handleConnectionLost(ref LEAP_CONNECTION_LOST_EVENT connectionMsg) {
+      if (LeapConnectionLost != null) {
         LeapConnectionLost.DispatchOnContext<ConnectionLostEventArgs>(this, EventContext, new ConnectionLostEventArgs());
       }
     }
 
-    private void handleDevice(ref LEAP_DEVICE_EVENT deviceMsg)
-    {
+    private void handleDevice(ref LEAP_DEVICE_EVENT deviceMsg) {
       IntPtr deviceHandle = deviceMsg.device.handle;
       if (deviceHandle == IntPtr.Zero)
         return;
@@ -493,8 +447,7 @@ namespace LeapInternal
       deviceInfo.serial = Marshal.AllocCoTaskMem((int)deviceInfo.serial_length);
       result = LeapC.GetDeviceInfo(device, ref deviceInfo); //Query the serial
 
-      if (result == eLeapRS.eLeapRS_Success)
-      {
+      if (result == eLeapRS.eLeapRS_Success) {
         Device apiDevice = new Device(deviceHandle,
                                deviceInfo.h_fov, //radians
                                deviceInfo.v_fov, //radians
@@ -505,33 +458,27 @@ namespace LeapInternal
         Marshal.FreeCoTaskMem(deviceInfo.serial);
         _devices.AddOrUpdate(apiDevice);
 
-        if (LeapDevice != null)
-        {
+        if (LeapDevice != null) {
           LeapDevice.DispatchOnContext(this, EventContext, new DeviceEventArgs(apiDevice));
         }
       }
     }
 
-    private void handleLostDevice(ref LEAP_DEVICE_EVENT deviceMsg)
-    {
+    private void handleLostDevice(ref LEAP_DEVICE_EVENT deviceMsg) {
       Device lost = _devices.FindDeviceByHandle(deviceMsg.device.handle);
-      if (lost != null)
-      {
+      if (lost != null) {
         _devices.Remove(lost);
 
-        if (LeapDeviceLost != null)
-        {
+        if (LeapDeviceLost != null) {
           LeapDeviceLost.DispatchOnContext(this, EventContext, new DeviceEventArgs(lost));
         }
       }
     }
 
-    private void handleFailedDevice(ref LEAP_DEVICE_FAILURE_EVENT deviceMsg)
-    {
+    private void handleFailedDevice(ref LEAP_DEVICE_FAILURE_EVENT deviceMsg) {
       string failureMessage;
       string failedSerialNumber = "Unavailable";
-      switch (deviceMsg.status)
-      {
+      switch (deviceMsg.status) {
         case eLeapDeviceStatus.eLeapDeviceStatus_BadCalibration:
           failureMessage = "Bad Calibration. Device failed because of a bad calibration record.";
           break;
@@ -549,48 +496,41 @@ namespace LeapInternal
           break;
       }
       Device failed = _devices.FindDeviceByHandle(deviceMsg.hDevice);
-      if (failed != null)
-      {
+      if (failed != null) {
         _devices.Remove(failed);
       }
 
-      if (LeapDeviceFailure != null)
-      {
+      if (LeapDeviceFailure != null) {
         LeapDeviceFailure.DispatchOnContext<DeviceFailureEventArgs>(this, EventContext,
           new DeviceFailureEventArgs((uint)deviceMsg.status, failureMessage, failedSerialNumber));
       }
     }
 
-    private void handleConfigChange(ref LEAP_CONFIG_CHANGE_EVENT configEvent)
-    {
+    private void handleConfigChange(ref LEAP_CONFIG_CHANGE_EVENT configEvent) {
       string config_key = "";
       _configRequests.TryGetValue(configEvent.requestId, out config_key);
       if (config_key != null)
         _configRequests.Remove(configEvent.requestId);
-      if (LeapConfigChange != null)
-      {
+      if (LeapConfigChange != null) {
         LeapConfigChange.DispatchOnContext<ConfigChangeEventArgs>(this, EventContext,
           new ConfigChangeEventArgs(config_key, configEvent.status != false, configEvent.requestId));
       }
     }
 
-    private void handleConfigResponse(ref LEAP_CONNECTION_MESSAGE configMsg)
-    {
+    private void handleConfigResponse(ref LEAP_CONNECTION_MESSAGE configMsg) {
       LEAP_CONFIG_RESPONSE_EVENT config_response_evt;
       StructMarshal<LEAP_CONFIG_RESPONSE_EVENT>.PtrToStruct(configMsg.eventStructPtr, out config_response_evt);
       string config_key = "";
       _configRequests.TryGetValue(config_response_evt.requestId, out config_key);
       if (config_key != null)
-        _configRequests.Remove (config_response_evt.requestId);
+        _configRequests.Remove(config_response_evt.requestId);
 
       Config.ValueType dataType;
       object value;
       uint requestId = config_response_evt.requestId;
-      if (config_response_evt.value.type != eLeapValueType.eLeapValueType_String)
-      {
+      if (config_response_evt.value.type != eLeapValueType.eLeapValueType_String) {
 
-        switch (config_response_evt.value.type)
-        {
+        switch (config_response_evt.value.type) {
           case eLeapValueType.eLeapValueType_Boolean:
             dataType = Config.ValueType.TYPE_BOOLEAN;
             value = config_response_evt.value.boolValue;
@@ -608,8 +548,7 @@ namespace LeapInternal
             value = new object();
             break;
         }
-      }
-      else {
+      } else {
         LEAP_CONFIG_RESPONSE_EVENT_WITH_REF_TYPE config_ref_value;
         StructMarshal<LEAP_CONFIG_RESPONSE_EVENT_WITH_REF_TYPE>.PtrToStruct(configMsg.eventStructPtr, out config_ref_value);
         dataType = Config.ValueType.TYPE_STRING;
@@ -617,24 +556,19 @@ namespace LeapInternal
       }
       SetConfigResponseEventArgs args = new SetConfigResponseEventArgs(config_key, dataType, value, requestId);
 
-      if (LeapConfigResponse != null)
-      {
+      if (LeapConfigResponse != null) {
         LeapConfigResponse.DispatchOnContext<SetConfigResponseEventArgs>(this, EventContext, args);
       }
     }
 
-    private void reportLogMessage(ref LEAP_LOG_EVENT logMsg)
-    {
-      if (LeapLogEvent != null)
-      {
+    private void reportLogMessage(ref LEAP_LOG_EVENT logMsg) {
+      if (LeapLogEvent != null) {
         LeapLogEvent.DispatchOnContext<LogEventArgs>(this, EventContext, new LogEventArgs(publicSeverity(logMsg.severity), logMsg.timestamp, logMsg.message));
       }
     }
 
-    private MessageSeverity publicSeverity(eLeapLogSeverity leapCSeverity)
-    {
-      switch (leapCSeverity)
-      {
+    private MessageSeverity publicSeverity(eLeapLogSeverity leapCSeverity) {
+      switch (leapCSeverity) {
         case eLeapLogSeverity.eLeapLogSeverity_Unknown:
           return MessageSeverity.MESSAGE_UNKNOWN;
         case eLeapLogSeverity.eLeapLogSeverity_Information:
@@ -648,26 +582,20 @@ namespace LeapInternal
       }
     }
 
-    private void handlePointMappingChange(ref LEAP_POINT_MAPPING_CHANGE_EVENT pointMapping)
-    {
-      if (LeapPointMappingChange != null)
-      {
+    private void handlePointMappingChange(ref LEAP_POINT_MAPPING_CHANGE_EVENT pointMapping) {
+      if (LeapPointMappingChange != null) {
         LeapPointMappingChange.DispatchOnContext<PointMappingChangeEventArgs>(this, EventContext, new PointMappingChangeEventArgs(pointMapping.frame_id, pointMapping.timestamp, pointMapping.nPoints));
       }
     }
 
-    private void handleDroppedFrame(ref LEAP_DROPPED_FRAME_EVENT droppedFrame)
-    {
-      if (LeapDroppedFrame != null)
-      {
+    private void handleDroppedFrame(ref LEAP_DROPPED_FRAME_EVENT droppedFrame) {
+      if (LeapDroppedFrame != null) {
         LeapDroppedFrame.DispatchOnContext<DroppedFrameEventArgs>(this, EventContext, new DroppedFrameEventArgs(droppedFrame.frame_id, droppedFrame.reason));
       }
     }
 
-    private void handleHeadPoseChange(ref LEAP_HEAD_POSE_EVENT headPose)
-    {
-      if (LeapHeadPoseChange != null)
-      {
+    private void handleHeadPoseChange(ref LEAP_HEAD_POSE_EVENT headPose) {
+      if (LeapHeadPoseChange != null) {
         LeapHeadPoseChange.DispatchOnContext<HeadPoseEventArgs>(this, EventContext, new HeadPoseEventArgs(headPose.head_position, headPose.head_orientation));
       }
     }
@@ -682,17 +610,14 @@ namespace LeapInternal
       StructMarshal<LEAP_DISTORTION_MATRIX>.PtrToStruct(image.distortionMatrix, out matrix);
       Array.Copy(matrix.matrix_data, distortionData.Data, matrix.matrix_data.Length);
 
-      if (LeapDistortionChange != null)
-      {
+      if (LeapDistortionChange != null) {
         LeapDistortionChange.DispatchOnContext<DistortionEventArgs>(this, EventContext, new DistortionEventArgs(distortionData, camera));
       }
       return distortionData;
     }
 
-    private void handleImage(ref LEAP_IMAGE_EVENT imageMsg)
-    {
-      if (LeapImage != null)
-      {
+    private void handleImage(ref LEAP_IMAGE_EVENT imageMsg) {
+      if (LeapImage != null) {
         //Update distortion data, if changed
         if ((_currentLeftDistortionData.Version != imageMsg.leftImage.matrix_version) || !_currentLeftDistortionData.IsValid) {
           _currentLeftDistortionData = createDistortionData(imageMsg.leftImage, Image.CameraType.LEFT);
@@ -707,25 +632,21 @@ namespace LeapInternal
       }
     }
 
-    private void handlePolicyChange(ref LEAP_POLICY_EVENT policyMsg)
-    {
-      if (LeapPolicyChange != null)
-      {
+    private void handlePolicyChange(ref LEAP_POLICY_EVENT policyMsg) {
+      if (LeapPolicyChange != null) {
         LeapPolicyChange.DispatchOnContext<PolicyEventArgs>(this, EventContext, new PolicyEventArgs(policyMsg.current_policy, _activePolicies));
       }
 
       _activePolicies = policyMsg.current_policy;
 
-      if (_activePolicies != _requestedPolicies)
-      {
+      if (_activePolicies != _requestedPolicies) {
         // This could happen when config is turned off, or
         // this is the policy change event from the last SetPolicy, after that, the user called SetPolicy again
         //TODO handle failure to set desired policy -- maybe a PolicyDenied event
       }
     }
 
-    public void SetPolicy(Controller.PolicyFlag policy)
-    {
+    public void SetPolicy(Controller.PolicyFlag policy) {
       UInt64 setFlags = (ulong)flagForPolicy(policy);
       _requestedPolicies = _requestedPolicies | setFlags;
       setFlags = _requestedPolicies;
@@ -736,8 +657,7 @@ namespace LeapInternal
       reportAbnormalResults("LeapC SetPolicyFlags call was ", result);
     }
 
-    public void ClearPolicy(Controller.PolicyFlag policy)
-    {
+    public void ClearPolicy(Controller.PolicyFlag policy) {
       UInt64 clearFlags = (ulong)flagForPolicy(policy);
       _requestedPolicies = _requestedPolicies & ~clearFlags;
       eLeapRS result = eLeapRS.eLeapRS_UnknownError;
@@ -745,10 +665,8 @@ namespace LeapInternal
       reportAbnormalResults("LeapC SetPolicyFlags call was ", result);
     }
 
-    private eLeapPolicyFlag flagForPolicy(Controller.PolicyFlag singlePolicy)
-    {
-      switch (singlePolicy)
-      {
+    private eLeapPolicyFlag flagForPolicy(Controller.PolicyFlag singlePolicy) {
+      switch (singlePolicy) {
         case Controller.PolicyFlag.POLICY_BACKGROUND_FRAMES:
           return eLeapPolicyFlag.eLeapPolicyFlag_BackgroundFrames;
         case Controller.PolicyFlag.POLICY_IMAGES:
@@ -784,39 +702,36 @@ namespace LeapInternal
      * @returns A boolean indicating whether the specified policy has been set.
      * @since 2.1.6
      */
-    public bool IsPolicySet(Controller.PolicyFlag policy)
-    {
+    public bool IsPolicySet(Controller.PolicyFlag policy) {
       UInt64 policyToCheck = (ulong)flagForPolicy(policy);
       return (_activePolicies & policyToCheck) == policyToCheck;
     }
 
-    public uint GetConfigValue(string config_key)
-    {
+    public uint GetConfigValue(string config_key) {
       uint requestId = 0;
-      eLeapRS result = LeapC.RequestConfigValue (_leapConnection, config_key, out requestId);
-      reportAbnormalResults ("LeapC RequestConfigValue call was ", result);
-      _configRequests [requestId] = config_key;
+      eLeapRS result = LeapC.RequestConfigValue(_leapConnection, config_key, out requestId);
+      reportAbnormalResults("LeapC RequestConfigValue call was ", result);
+      _configRequests[requestId] = config_key;
       return requestId;
     }
 
-    public uint SetConfigValue<T> (string config_key, T value) where T : IConvertible
-    {
+    public uint SetConfigValue<T>(string config_key, T value) where T : IConvertible {
       uint requestId = 0;
       eLeapRS result;
-      Type dataType = value.GetType ();
+      Type dataType = value.GetType();
       if (dataType == typeof(bool)) {
-        result = LeapC.SaveConfigValue (_leapConnection, config_key, Convert.ToBoolean (value), out requestId);
+        result = LeapC.SaveConfigValue(_leapConnection, config_key, Convert.ToBoolean(value), out requestId);
       } else if (dataType == typeof(Int32)) {
-        result = LeapC.SaveConfigValue (_leapConnection, config_key, Convert.ToInt32 (value), out requestId);
+        result = LeapC.SaveConfigValue(_leapConnection, config_key, Convert.ToInt32(value), out requestId);
       } else if (dataType == typeof(float)) {
-        result = LeapC.SaveConfigValue (_leapConnection, config_key, Convert.ToSingle (value), out requestId);
+        result = LeapC.SaveConfigValue(_leapConnection, config_key, Convert.ToSingle(value), out requestId);
       } else if (dataType == typeof(string)) {
-        result = LeapC.SaveConfigValue (_leapConnection, config_key, Convert.ToString (value), out requestId);
+        result = LeapC.SaveConfigValue(_leapConnection, config_key, Convert.ToString(value), out requestId);
       } else {
-        throw new ArgumentException ("Only boolean, Int32, float, and string types are supported.");
+        throw new ArgumentException("Only boolean, Int32, float, and string types are supported.");
       }
-      reportAbnormalResults ("LeapC SaveConfigValue call was ", result);
-      _configRequests [requestId] = config_key;
+      reportAbnormalResults("LeapC SaveConfigValue call was ", result);
+      _configRequests[requestId] = config_key;
       return requestId;
     }
 
@@ -825,15 +740,13 @@ namespace LeapInternal
      * daemon/service. Can be true even if the Leap Motion hardware is not available.
      * @since 1.2
      */
-    public bool IsServiceConnected
-    {
-      get
-      {
+    public bool IsServiceConnected {
+      get {
         if (_leapConnection == IntPtr.Zero)
           return false;
 
         LEAP_CONNECTION_INFO pInfo = new LEAP_CONNECTION_INFO();
-        pInfo.size = (uint)Marshal.SizeOf (pInfo);
+        pInfo.size = (uint)Marshal.SizeOf(pInfo);
         eLeapRS result = LeapC.GetConnectionInfo(_leapConnection, ref pInfo);
         reportAbnormalResults("LeapC GetConnectionInfo call was ", result);
 
@@ -859,12 +772,9 @@ namespace LeapInternal
      * @returns The list of Leap Motion controllers.
      * @since 1.0
      */
-    public DeviceList Devices
-    {
-      get
-      {
-        if (_devices == null)
-        {
+    public DeviceList Devices {
+      get {
+        if (_devices == null) {
           _devices = new DeviceList();
         }
 
@@ -872,12 +782,9 @@ namespace LeapInternal
       }
     }
 
-    public FailedDeviceList FailedDevices
-    {
-      get
-      {
-        if (_failedDevices == null)
-        {
+    public FailedDeviceList FailedDevices {
+      get {
+        if (_failedDevices == null) {
           _failedDevices = new FailedDeviceList();
         }
 
@@ -885,7 +792,7 @@ namespace LeapInternal
       }
     }
 
-    public Vector PixelToRectilinear(Image.CameraType camera, Vector pixel){
+    public Vector PixelToRectilinear(Image.CameraType camera, Vector pixel) {
       LEAP_VECTOR pixelStruct = new LEAP_VECTOR(pixel);
       LEAP_VECTOR ray = LeapC.LeapPixelToRectilinear(_leapConnection,
              (camera == Image.CameraType.LEFT ?
@@ -895,7 +802,7 @@ namespace LeapInternal
       return new Vector(ray.x, ray.y, ray.z);
     }
 
-    public Vector RectilinearToPixel(Image.CameraType camera, Vector ray){
+    public Vector RectilinearToPixel(Image.CameraType camera, Vector ray) {
       LEAP_VECTOR rayStruct = new LEAP_VECTOR(ray);
       LEAP_VECTOR pixel = LeapC.LeapRectilinearToPixel(_leapConnection,
              (camera == Image.CameraType.LEFT ?
@@ -911,8 +818,7 @@ namespace LeapInternal
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    private struct LEAP_POINT_MAPPING_INTERNAL
-    {
+    private struct LEAP_POINT_MAPPING_INTERNAL {
       public Int64 frame_id;
       public Int64 timestamp;
       public UInt32 nPoints;
@@ -920,8 +826,7 @@ namespace LeapInternal
       public IntPtr ids;
     }
 
-    public void GetPointMapping(ref LEAP_POINT_MAPPING pm)
-    {
+    public void GetPointMapping(ref LEAP_POINT_MAPPING pm) {
       UInt64 size = 0;
       IntPtr buffer = IntPtr.Zero;
       while (true) {
@@ -951,9 +856,9 @@ namespace LeapInternal
       pm.points = new LEAP_VECTOR[nPoints];
       pm.ids = new UInt32[nPoints];
 
-      float[] points = new float[3*nPoints];
+      float[] points = new float[3 * nPoints];
       Int32[] ids = new Int32[nPoints];
-      Marshal.Copy(pmi.points, points, 0, 3*nPoints);
+      Marshal.Copy(pmi.points, points, 0, 3 * nPoints);
       Marshal.Copy(pmi.ids, ids, 0, nPoints);
 
       int j = 0;
@@ -961,20 +866,17 @@ namespace LeapInternal
         pm.points[i].x = points[j++];
         pm.points[i].y = points[j++];
         pm.points[i].z = points[j++];
-        pm.ids[i] = unchecked ((UInt32)ids[i]);
+        pm.ids[i] = unchecked((UInt32)ids[i]);
       }
       Marshal.FreeHGlobal(buffer);
     }
 
     private eLeapRS _lastResult; //Used to avoid repeating the same log message, ie. for events like time out
-    private void reportAbnormalResults(string context, eLeapRS result)
-    {
+    private void reportAbnormalResults(string context, eLeapRS result) {
       if (result != eLeapRS.eLeapRS_Success &&
-         result != _lastResult)
-      {
+         result != _lastResult) {
         string msg = context + " " + result;
-        if (LeapLogEvent != null)
-        {
+        if (LeapLogEvent != null) {
           LeapLogEvent.DispatchOnContext<LogEventArgs>(this, EventContext,
             new LogEventArgs(MessageSeverity.MESSAGE_CRITICAL,
                 LeapC.GetNow(),

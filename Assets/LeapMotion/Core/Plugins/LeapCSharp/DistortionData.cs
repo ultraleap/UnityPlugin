@@ -5,11 +5,10 @@
 * https://developer.leapmotion.com/sdk_agreement, or another agreement         *
 * between Leap Motion and you, your company or other organization.             *
 \******************************************************************************/
-using System;
-using System.Collections.Generic;
 
-namespace Leap
-{
+using System;
+
+namespace Leap {
   /**
    * The DistortionData class contains the distortion map for correcting the
    * lens distortion of an image.
@@ -20,8 +19,7 @@ namespace Leap
    *
    * @since 3.0
    */
-  public class DistortionData
-  {
+  public class DistortionData {
     /**
      * Constructs an uninitialized distortion object.
      * @since 3.0
@@ -31,8 +29,7 @@ namespace Leap
     /**
      * @since 3.0
      */
-    public DistortionData(UInt64 version, float width, float height, float[] data)
-    {
+    public DistortionData(UInt64 version, float width, float height, float[] data) {
       Version = version;
       Width = width;
       Height = height;
@@ -76,10 +73,8 @@ namespace Leap
      * Reports whether the distortion data is internally consistent.
      * @since 3.0
      */
-    public bool IsValid
-    {
-      get
-      {
+    public bool IsValid {
+      get {
         if (Data != null &&
             Width == LeapInternal.LeapC.DistortionSize &&
             Height == LeapInternal.LeapC.DistortionSize &&
