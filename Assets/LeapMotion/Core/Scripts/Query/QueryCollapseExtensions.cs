@@ -75,6 +75,32 @@ namespace Leap.Unity.Query {
     }
 
     /// <summary>
+    /// Returns the average of a Query of floats.
+    /// </summary>
+    public static float Average(this Query<float> query) {
+      using (var slice = query.Deconstruct()) {
+        float sum = 0;
+        for (int i = 0; i < slice.Count; i++) {
+          sum += slice[i];
+        }
+        return sum / slice.Count;
+      }
+    }
+
+    /// <summary>
+    /// Returns the average of a Query of doubles.
+    /// </summary>
+    public static double Average(this Query<double> query) {
+      using (var slice = query.Deconstruct()) {
+        double sum = 0;
+        for (int i = 0; i < slice.Count; i++) {
+          sum += slice[i];
+        }
+        return sum / slice.Count;
+      }
+    }
+
+    /// <summary>
     /// Returns true if any element in the Query is equal to a specific value.
     /// </summary>
     public static bool Contains<T>(this Query<T> query, T item) {
@@ -354,7 +380,7 @@ namespace Leap.Unity.Query {
     /// Returns the largest element in the Query.
     /// </summary>
     public static T Max<T>(this Query<T> query) where T : IComparable<T> {
-      return query.Fold((a, b) => a.CompareTo(b) > 0 ? a : b);
+      return query.Fold(FoldDelegate<T>.max);
     }
 
     /// <summary>
@@ -368,7 +394,7 @@ namespace Leap.Unity.Query {
     /// Returns the smallest element in the Query.
     /// </summary>
     public static T Min<T>(this Query<T> query) where T : IComparable<T> {
-      return query.Fold((a, b) => a.CompareTo(b) < 0 ? a : b);
+      return query.Fold(FoldDelegate<T>.min);
     }
 
     /// <summary>
@@ -442,6 +468,27 @@ namespace Leap.Unity.Query {
     /// </summary>
     public static Maybe<T> SingleOrNone<T>(this Query<T> query, Func<T, bool> predicate) {
       return query.Where(predicate).SingleOrNone();
+    }
+
+    /// <summary>
+    /// Returns the sum of a Query of ints.
+    /// </summary>
+    public static int Sum(this Query<int> query) {
+      return query.Fold((a, b) => a + b);
+    }
+
+    /// <summary>
+    /// Returns the sum of a Query of floats.
+    /// </summary>
+    public static float Sum(this Query<float> query) {
+      return query.Fold((a, b) => a + b);
+    }
+
+    /// <summary>
+    /// Returns the sum of a Query of doubles.
+    /// </summary>
+    public static double Sum(this Query<double> query) {
+      return query.Fold((a, b) => a + b);
     }
 
     /// <summary>
@@ -583,6 +630,11 @@ namespace Leap.Unity.Query {
     /// </summary>
     public static Dictionary<T, V> ToDictionary<T, V>(this Query<T> query, Func<T, V> valueSelector) {
       return query.ToDictionary(t => t, valueSelector);
+    }
+
+    private static class FoldDelegate<T> where T : IComparable<T> {
+      public readonly static Func<T, T, T> max = (a, b) => a.CompareTo(b) > 0 ? a : b;
+      public readonly static Func<T, T, T> min = (a, b) => a.CompareTo(b) < 0 ? a : b;
     }
   }
 }
