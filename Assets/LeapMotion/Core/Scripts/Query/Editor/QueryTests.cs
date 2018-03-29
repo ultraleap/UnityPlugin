@@ -200,6 +200,28 @@ namespace Leap.Unity.Tests {
     }
 
     [Test]
+    public void MaxTest([ValueSource("list0")] QueryArg arg) {
+      if (arg.ToList().Count == 0) {
+        Assert.Ignore("Ignore empty queries for max tests.");
+        return;
+      }
+
+      Assert.That(arg.ToQuery().Max(), Is.EqualTo(
+                  arg.ToList().Max()));
+    }
+
+    [Test]
+    public void MinTest([ValueSource("list0")] QueryArg arg) {
+      if (arg.ToList().Count == 0) {
+        Assert.Ignore("Ignore empty queries for min tests.");
+        return;
+      }
+
+      Assert.That(arg.ToQuery().Min(), Is.EqualTo(
+                  arg.ToList().Min()));
+    }
+
+    [Test]
     public void MultiFirstTest([ValueSource("list0")] QueryArg arg) {
       var q = arg.ToQuery();
 
