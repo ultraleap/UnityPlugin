@@ -601,6 +601,7 @@ namespace Leap.Unity.Query {
           _single = new FunctorComparer<T, K>();
         }
         _single._functor = functor;
+        _single._sign = sign;
         return _single;
       }
 
