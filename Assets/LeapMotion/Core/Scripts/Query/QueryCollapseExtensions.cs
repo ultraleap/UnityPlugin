@@ -31,19 +31,11 @@ namespace Leap.Unity.Query {
           return true;
         }
 
-        var a = slice[0];
+        var comparer = EqualityComparer<T>.Default;
+
+        var first = slice[0];
         for (int i = 1; i < slice.Count; i++) {
-          var b = slice[i];
-
-          if ((a == null) != (b == null)) {
-            return false;
-          }
-
-          if ((a == null) && (b == null)) {
-            continue;
-          }
-
-          if (!a.Equals(b)) {
+          if (!comparer.Equals(first, slice[i])) {
             return false;
           }
         }
@@ -108,8 +100,9 @@ namespace Leap.Unity.Query {
       int count;
       query.Deconstruct(out array, out count);
 
+      var comparer = EqualityComparer<T>.Default;
       for (int i = 0; i < count; i++) {
-        if (array[i].Equals(item)) {
+        if (comparer.Equals(item, array[i])) {
           ArrayPool<T>.Recycle(array);
           return true;
         }
@@ -283,12 +276,9 @@ namespace Leap.Unity.Query {
     /// </summary>
     public static int IndexOf<T>(this Query<T> query, T t) {
       using (var slice = query.Deconstruct()) {
+        var comparer = EqualityComparer<T>.Default;
         for (int i = 0; i < slice.Count; i++) {
-          if (t == null) {
-            if (slice[i] == null) {
-              return i;
-            }
-          } else if (t.Equals(slice[i])) {
+          if (comparer.Equals(t, slice[i])) {
             return i;
           }
         }
@@ -514,12 +504,9 @@ namespace Leap.Unity.Query {
         var array = slice;
         T reference = array[0];
 
+        var comparer = EqualityComparer<T>.Default;
         for (int i = 1; i < slice.Count; i++) {
-          if (reference == null) {
-            if (array[i] != null) {
-              return Maybe.None;
-            }
-          } else if (!reference.Equals(array[i])) {
+          if (!comparer.Equals(reference, slice[i])) {
             return Maybe.None;
           }
         }
