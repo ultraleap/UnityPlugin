@@ -54,6 +54,17 @@ namespace Leap.Unity.Tests {
     }
 
     [Test]
+    public void AverageTest([ValueSource("list0")] QueryArg arg0) {
+      if (arg0.ToList().Count == 0) {
+        Assert.Ignore("Ignore empty queries for average test.");
+        return;
+      }
+
+      Assert.That(arg0.ToQuery().Select(t => (double)t).Average(), Is.EqualTo(
+                  arg0.ToList().Average()).Within(0.001).Percent);
+    }
+
+    [Test]
     public void CastTest() {
       object[] objs = new object[] { "Hello", "World", "These", "Are", "All", "Strings" };
 
@@ -186,6 +197,28 @@ namespace Leap.Unity.Tests {
 
       Assert.That(arg.ToQuery().LastOrDefault(), Is.EqualTo(
                   arg.ToList().LastOrDefault()));
+    }
+
+    [Test]
+    public void MaxTest([ValueSource("list0")] QueryArg arg) {
+      if (arg.ToList().Count == 0) {
+        Assert.Ignore("Ignore empty queries for max tests.");
+        return;
+      }
+
+      Assert.That(arg.ToQuery().Max(), Is.EqualTo(
+                  arg.ToList().Max()));
+    }
+
+    [Test]
+    public void MinTest([ValueSource("list0")] QueryArg arg) {
+      if (arg.ToList().Count == 0) {
+        Assert.Ignore("Ignore empty queries for min tests.");
+        return;
+      }
+
+      Assert.That(arg.ToQuery().Min(), Is.EqualTo(
+                  arg.ToList().Min()));
     }
 
     [Test]
@@ -345,6 +378,17 @@ namespace Leap.Unity.Tests {
 
       Assert.That(arg.ToQuery().SortDescending().ToList(), Is.EquivalentTo(
                   expected));
+    }
+
+    [Test]
+    public void SumTests([ValueSource("list0")] QueryArg arg) {
+      if (arg.ToList().Count == 0) {
+        Assert.Ignore("Ignore empty queries for sum tests.");
+        return;
+      }
+
+      Assert.That(arg.ToQuery().Sum(), Is.EqualTo(
+                  arg.ToList().Sum()));
     }
 
     [Test]

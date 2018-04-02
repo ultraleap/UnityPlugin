@@ -31,19 +31,11 @@ namespace Leap.Unity.Query {
           return true;
         }
 
-        var a = slice[0];
+        var comparer = EqualityComparer<T>.Default;
+
+        var first = slice[0];
         for (int i = 1; i < slice.Count; i++) {
-          var b = slice[i];
-
-          if ((a == null) != (b == null)) {
-            return false;
-          }
-
-          if ((a == null) && (b == null)) {
-            continue;
-          }
-
-          if (!a.Equals(b)) {
+          if (!comparer.Equals(first, slice[i])) {
             return false;
           }
         }
@@ -75,6 +67,32 @@ namespace Leap.Unity.Query {
     }
 
     /// <summary>
+    /// Returns the average of a Query of floats.
+    /// </summary>
+    public static float Average(this Query<float> query) {
+      using (var slice = query.Deconstruct()) {
+        float sum = 0;
+        for (int i = 0; i < slice.Count; i++) {
+          sum += slice[i];
+        }
+        return sum / slice.Count;
+      }
+    }
+
+    /// <summary>
+    /// Returns the average of a Query of doubles.
+    /// </summary>
+    public static double Average(this Query<double> query) {
+      using (var slice = query.Deconstruct()) {
+        double sum = 0;
+        for (int i = 0; i < slice.Count; i++) {
+          sum += slice[i];
+        }
+        return sum / slice.Count;
+      }
+    }
+
+    /// <summary>
     /// Returns true if any element in the Query is equal to a specific value.
     /// </summary>
     public static bool Contains<T>(this Query<T> query, T item) {
@@ -82,8 +100,9 @@ namespace Leap.Unity.Query {
       int count;
       query.Deconstruct(out array, out count);
 
+      var comparer = EqualityComparer<T>.Default;
       for (int i = 0; i < count; i++) {
-        if (array[i].Equals(item)) {
+        if (comparer.Equals(item, array[i])) {
           ArrayPool<T>.Recycle(array);
           return true;
         }
@@ -257,12 +276,9 @@ namespace Leap.Unity.Query {
     /// </summary>
     public static int IndexOf<T>(this Query<T> query, T t) {
       using (var slice = query.Deconstruct()) {
+        var comparer = EqualityComparer<T>.Default;
         for (int i = 0; i < slice.Count; i++) {
-          if (t == null) {
-            if (slice[i] == null) {
-              return i;
-            }
-          } else if (t.Equals(slice[i])) {
+          if (comparer.Equals(t, slice[i])) {
             return i;
           }
         }
@@ -354,7 +370,7 @@ namespace Leap.Unity.Query {
     /// Returns the largest element in the Query.
     /// </summary>
     public static T Max<T>(this Query<T> query) where T : IComparable<T> {
-      return query.Fold((a, b) => a.CompareTo(b) > 0 ? a : b);
+      return query.Fold(FoldDelegate<T>.max);
     }
 
     /// <summary>
@@ -368,7 +384,7 @@ namespace Leap.Unity.Query {
     /// Returns the smallest element in the Query.
     /// </summary>
     public static T Min<T>(this Query<T> query) where T : IComparable<T> {
-      return query.Fold((a, b) => a.CompareTo(b) < 0 ? a : b);
+      return query.Fold(FoldDelegate<T>.min);
     }
 
     /// <summary>
@@ -445,6 +461,27 @@ namespace Leap.Unity.Query {
     }
 
     /// <summary>
+    /// Returns the sum of a Query of ints.
+    /// </summary>
+    public static int Sum(this Query<int> query) {
+      return query.Fold((a, b) => a + b);
+    }
+
+    /// <summary>
+    /// Returns the sum of a Query of floats.
+    /// </summary>
+    public static float Sum(this Query<float> query) {
+      return query.Fold((a, b) => a + b);
+    }
+
+    /// <summary>
+    /// Returns the sum of a Query of doubles.
+    /// </summary>
+    public static double Sum(this Query<double> query) {
+      return query.Fold((a, b) => a + b);
+    }
+
+    /// <summary>
     /// Returns the single value that is present in the entire Query.  If there is more
     /// than one value in the Query or there are no values at all, this method will return
     /// the default value.
@@ -467,12 +504,9 @@ namespace Leap.Unity.Query {
         var array = slice;
         T reference = array[0];
 
+        var comparer = EqualityComparer<T>.Default;
         for (int i = 1; i < slice.Count; i++) {
-          if (reference == null) {
-            if (array[i] != null) {
-              return Maybe.None;
-            }
-          } else if (!reference.Equals(array[i])) {
+          if (!comparer.Equals(reference, slice[i])) {
             return Maybe.None;
           }
         }
@@ -583,6 +617,11 @@ namespace Leap.Unity.Query {
     /// </summary>
     public static Dictionary<T, V> ToDictionary<T, V>(this Query<T> query, Func<T, V> valueSelector) {
       return query.ToDictionary(t => t, valueSelector);
+    }
+
+    private static class FoldDelegate<T> where T : IComparable<T> {
+      public readonly static Func<T, T, T> max = (a, b) => a.CompareTo(b) > 0 ? a : b;
+      public readonly static Func<T, T, T> min = (a, b) => a.CompareTo(b) < 0 ? a : b;
     }
   }
 }
