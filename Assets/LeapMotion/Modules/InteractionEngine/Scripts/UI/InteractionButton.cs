@@ -16,8 +16,8 @@ using UnityEngine.Serialization;
 namespace Leap.Unity.Interaction {
 
   ///<summary>
-  /// A physics-enabled button. Activation is triggered by physically pushing the button
-  /// back to its compressed position.
+  /// A physics-enabled button. Activated by physically pressing the button, with events
+  /// for press and unpress.
   ///</summary>
   public class InteractionButton : InteractionBehaviour {
 
@@ -89,7 +89,6 @@ namespace Leap.Unity.Interaction {
     #endregion
 
     #region State
-
 
     protected bool _isPressed = false;
     /// <summary> Gets whether the button is currently held down. </summary>
