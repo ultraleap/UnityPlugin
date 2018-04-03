@@ -397,7 +397,7 @@ GameObject:
   - component: {fileID: 879694408}
   - component: {fileID: 879694407}
   m_Layer: 0
-  m_Name: Extendo Hand Models
+  m_Name: Projected Hand Models
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
