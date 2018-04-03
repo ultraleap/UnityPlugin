@@ -698,22 +698,6 @@ namespace Leap.Unity.Interaction {
     [DisableIf("_moveObjectWhenGrasped", isEqualTo: false)]
     public GraspedMovementType graspedMovementType;
 
-    /// <summary>s
-    /// The RigidbodyWarper manipulates the graphical (but not physical) position ofs
-    /// grasped objects based on the movement of the Leap hand so they appear move with
-    /// less latency.
-    /// </summary>
-    /// TODO: This is not actually implemented.
-    [HideInInspector]
-    public RigidbodyWarper rigidbodyWarper;
-
-    [Header("Advanced Settings")]
-
-    [Tooltip("Warping manipulates the graphical (but not physical) position of grasped "
-           + "objects based on the movement of the grasping interaction controller so "
-           + "the objects appear to move with less latency.")]
-    public bool graspHoldWarpingEnabled__curIgnored = true; // TODO: Warping not yet implemented.
-
     [Header("Layer Overrides")]
 
     [SerializeField]
@@ -782,7 +766,6 @@ namespace Leap.Unity.Interaction {
 
       rigidbody = GetComponent<Rigidbody>();
       rigidbody.maxAngularVelocity = MAX_ANGULAR_VELOCITY;
-      rigidbodyWarper = new RigidbodyWarper(manager, this.transform, rigidbody, 0.25F);
     }
 
     protected virtual void OnEnable() {
