@@ -301,7 +301,7 @@ namespace Leap.Unity.Interaction {
 
       if (!Application.isPlaying) { return; }
 
-      if (isDepressed || isGrasped) {
+      if (isPressed || isGrasped) {
         calculateSliderValues();
       }
 
