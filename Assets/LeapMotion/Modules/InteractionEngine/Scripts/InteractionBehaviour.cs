@@ -1400,6 +1400,9 @@ namespace Leap.Unity.Interaction {
       Utils.FindColliders<Collider>(this.gameObject, _interactionColliders,
                                     includeInactiveObjects: false);
 
+      _interactionColliders.RemoveAll(
+        c => c.GetComponent<IgnoreColliderForInteraction>() != null);
+
       // Since the interaction colliders might have changed, or appeared for the first
       // time, set their layers appropriately.
       refreshInteractionColliderLayers();
