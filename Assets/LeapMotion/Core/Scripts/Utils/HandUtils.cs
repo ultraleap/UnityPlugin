@@ -79,9 +79,6 @@ namespace Leap.Unity {
       }
     }
 
-    [System.Serializable]
-    public class HandEvent : UnityEvent<Hand> { }
-
     /// <summary>
     /// Returns the first hand of the argument Chirality in the current frame,
     /// otherwise returns null if no such hand is found.

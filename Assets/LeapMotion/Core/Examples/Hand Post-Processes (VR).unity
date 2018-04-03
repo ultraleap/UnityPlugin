@@ -229,11 +229,6 @@ MonoBehaviour:
     IsRightToBeSpawned: 0
     IsEnabled: 1
     CanDuplicate: 0
-    HandPostProcesses:
-      m_PersistentCalls:
-        m_Calls: []
-      m_TypeName: Leap.Unity.Hands+HandEvent, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
-        PublicKeyToken=null
 --- !u!1001 &475644817
 Prefab:
   m_ObjectHideFlags: 0
@@ -446,11 +441,6 @@ MonoBehaviour:
     IsRightToBeSpawned: 0
     IsEnabled: 1
     CanDuplicate: 0
-    HandPostProcesses:
-      m_PersistentCalls:
-        m_Calls: []
-      m_TypeName: Leap.Unity.Hands+HandEvent, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
-        PublicKeyToken=null
 --- !u!114 &879694408
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -464,7 +454,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   editTimePose: 0
   _leapProvider: {fileID: 1267071315}
-  extensionAmount: 3.5
+  _extensionAmount: 3.5
+  _handMergeDistance: 0.65
 --- !u!1 &1040383591
 GameObject:
   m_ObjectHideFlags: 0
@@ -582,11 +573,6 @@ MonoBehaviour:
     IsRightToBeSpawned: 0
     IsEnabled: 1
     CanDuplicate: 0
-    HandPostProcesses:
-      m_PersistentCalls:
-        m_Calls: []
-      m_TypeName: Leap.Unity.Hands+HandEvent, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
-        PublicKeyToken=null
 --- !u!114 &1247070420
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -600,6 +586,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   editTimePose: 0
   _leapProvider: {fileID: 1267071315}
+  _stiffness: 0.01
+  _damping: 0.05
 --- !u!1 &1267071314
 GameObject:
   m_ObjectHideFlags: 0
