@@ -453,7 +453,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   editTimePose: 0
-  _leapProvider: {fileID: 1267071315}
+  _inputLeapProvider: {fileID: 1267071315}
   _extensionAmount: 3.5
   _handMergeDistance: 0.65
 --- !u!1 &1040383591
@@ -585,7 +585,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   editTimePose: 0
-  _leapProvider: {fileID: 1267071315}
+  _inputLeapProvider: {fileID: 1267071315}
   _stiffness: 0.01
   _damping: 0.05
 --- !u!1 &1267071314

@@ -11,45 +11,74 @@ using UnityEngine;
 using Leap.Unity.Attributes;
 namespace Leap.Unity {
   public abstract class PostProcessProvider : LeapProvider {
-    [Tooltip("The LeapProvider to use to drive hand representations in the defined "
-           + "model pool groups.")]
+    [Tooltip("Whether this step should apply its post-process or " +
+      "pass the frames through un-modified.")]
+    public bool postProcessingEnabled = true;
+
+    [Tooltip("The LeapProvider to augment with this post-process.")]
     [SerializeField]
     [OnEditorChange("inputLeapProvider")]
-    private LeapProvider _leapProvider;
+    protected LeapProvider _inputLeapProvider;
     public LeapProvider inputLeapProvider {
-      get { return _leapProvider; }
+      get { return _inputLeapProvider; }
       set {
-        if (_leapProvider != null) {
-          _leapProvider.OnFixedFrame -= ProcessFixedFrame;
-          _leapProvider.OnUpdateFrame -= ProcessUpdateFrame;
+        OnValidate();
+
+        if (_inputLeapProvider != null) {
+          _inputLeapProvider.OnFixedFrame -= ProcessFixedFrame;
+          _inputLeapProvider.OnUpdateFrame -= ProcessUpdateFrame;
         }
 
-        _leapProvider = value;
+        _inputLeapProvider = value;
 
-        if (_leapProvider != null) {
-          _leapProvider.OnFixedFrame += ProcessFixedFrame;
-          _leapProvider.OnUpdateFrame += ProcessUpdateFrame;
+        if (_inputLeapProvider != null) {
+          _inputLeapProvider.OnFixedFrame += ProcessFixedFrame;
+          _inputLeapProvider.OnUpdateFrame += ProcessUpdateFrame;
         }
       }
     }
 
     protected virtual void OnEnable() {
-      if (_leapProvider == null) {
-        _leapProvider = Hands.Provider;
+      if (_inputLeapProvider == null && Hands.Provider != this) {
+        _inputLeapProvider = Hands.Provider;
       }
 
-      _leapProvider.OnUpdateFrame -= ProcessUpdateFrame;
-      _leapProvider.OnUpdateFrame += ProcessUpdateFrame;
+      _inputLeapProvider.OnUpdateFrame -= ProcessUpdateFrame;
+      _inputLeapProvider.OnUpdateFrame += ProcessUpdateFrame;
 
-      _leapProvider.OnFixedFrame -= ProcessFixedFrame;
-      _leapProvider.OnFixedFrame += ProcessFixedFrame;
+      _inputLeapProvider.OnFixedFrame -= ProcessFixedFrame;
+      _inputLeapProvider.OnFixedFrame += ProcessFixedFrame;
+    }
+
+    protected virtual void OnValidate() {
+#if UNITY_EDITOR
+      if (!Application.isPlaying) {
+        if (checkForCycles()) {
+          _inputLeapProvider = null;
+          Debug.LogError("Post-Process Cycle Detected!  " +
+            "Nulling "+gameObject.name+"'s InputProvider...", this);
+        }
+      }
+#endif
+    }
+
+    bool checkForCycles() {
+      LeapProvider providerA = _inputLeapProvider, providerB = _inputLeapProvider;
+      while (providerA is PostProcessProvider) {
+        providerB = (providerB as PostProcessProvider).inputLeapProvider;
+        if (providerA == providerB) { return true; }
+           else if(!(providerB is PostProcessProvider)) { return false; }
+        providerA = (providerA as PostProcessProvider).inputLeapProvider;
+        providerB = (providerB as PostProcessProvider).inputLeapProvider;
+      }
+      return false;
     }
 
     public override Frame CurrentFrame {
       get {
         #if UNITY_EDITOR
-        if (!Application.isPlaying) {
-          ProcessUpdateFrame(_leapProvider.CurrentFrame);
+        if (!Application.isPlaying && _inputLeapProvider != null) {
+          ProcessUpdateFrame(_inputLeapProvider.CurrentFrame);
         }
         #endif
         return _cachedUpdateFrame;
@@ -58,8 +87,8 @@ namespace Leap.Unity {
     public override Frame CurrentFixedFrame {
       get {
         #if UNITY_EDITOR
-        if (!Application.isPlaying) {
-          ProcessUpdateFrame(_leapProvider.CurrentFixedFrame);
+        if (!Application.isPlaying && _inputLeapProvider != null) {
+          ProcessUpdateFrame(_inputLeapProvider.CurrentFixedFrame);
         }
         #endif
         return _cachedFixedFrame;
@@ -71,12 +100,12 @@ namespace Leap.Unity {
 
     private void ProcessUpdateFrame(Frame inputFrame) {
       _cachedUpdateFrame.CopyFrom(inputFrame);
-      ProcessFrame(ref _cachedUpdateFrame);
+      if (postProcessingEnabled) { ProcessFrame(ref _cachedUpdateFrame); }
       DispatchUpdateFrameEvent(_cachedUpdateFrame);
     }
     private void ProcessFixedFrame(Frame inputFrame) {
       _cachedFixedFrame.CopyFrom(inputFrame);
-      ProcessFrame(ref _cachedFixedFrame);
+      if (postProcessingEnabled) { ProcessFrame(ref _cachedFixedFrame); }
       DispatchFixedFrameEvent(_cachedFixedFrame);
     }
 
