@@ -698,22 +698,6 @@ namespace Leap.Unity.Interaction {
     [DisableIf("_moveObjectWhenGrasped", isEqualTo: false)]
     public GraspedMovementType graspedMovementType;
 
-    /// <summary>s
-    /// The RigidbodyWarper manipulates the graphical (but not physical) position ofs
-    /// grasped objects based on the movement of the Leap hand so they appear move with
-    /// less latency.
-    /// </summary>
-    /// TODO: This is not actually implemented.
-    [HideInInspector]
-    public RigidbodyWarper rigidbodyWarper;
-
-    [Header("Advanced Settings")]
-
-    [Tooltip("Warping manipulates the graphical (but not physical) position of grasped "
-           + "objects based on the movement of the grasping interaction controller so "
-           + "the objects appear to move with less latency.")]
-    public bool graspHoldWarpingEnabled__curIgnored = true; // TODO: Warping not yet implemented.
-
     [Header("Layer Overrides")]
 
     [SerializeField]
@@ -782,7 +766,6 @@ namespace Leap.Unity.Interaction {
 
       rigidbody = GetComponent<Rigidbody>();
       rigidbody.maxAngularVelocity = MAX_ANGULAR_VELOCITY;
-      rigidbodyWarper = new RigidbodyWarper(manager, this.transform, rigidbody, 0.25F);
     }
 
     protected virtual void OnEnable() {
@@ -803,10 +786,18 @@ namespace Leap.Unity.Interaction {
       // Make sure we have a list of all of this object's colliders.
       RefreshInteractionColliders();
 
+      // Refresh curved space. Currently a maximum of one (1) LeapSpace is supported per
+      // InteractionBehaviour.
+      foreach (var collider in _interactionColliders) {
+        var leapSpace = collider.transform.GetComponentInParent<ISpaceComponent>();
+        if (leapSpace != null) {
+          space = leapSpace;
+          break;
+        }
+      }
+
       // Ensure physics layers are set up properly.
       initLayers();
-
-      space = GetComponentInChildren<ISpaceComponent>();
     }
 
     protected virtual void OnDisable() {
@@ -1408,6 +1399,9 @@ namespace Leap.Unity.Interaction {
     public void RefreshInteractionColliders() {
       Utils.FindColliders<Collider>(this.gameObject, _interactionColliders,
                                     includeInactiveObjects: false);
+
+      _interactionColliders.RemoveAll(
+        c => c.GetComponent<IgnoreColliderForInteraction>() != null);
 
       // Since the interaction colliders might have changed, or appeared for the first
       // time, set their layers appropriately.

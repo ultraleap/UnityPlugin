@@ -71,6 +71,16 @@ namespace Leap.Unity {
         return curve;
       }
     }
+
+    public static AnimationCurve SigmoidUpDown {
+      get {
+        AnimationCurve curve = new AnimationCurve();
+        curve.AddKey(new Keyframe(0,    0, 0, 0));
+        curve.AddKey(new Keyframe(0.5f, 1, 0, 0));
+        curve.AddKey(new Keyframe(1,    0, 0, 0));
+        return curve;
+      }
+    }
   }
 
   public static class AnimationCurveUtil {
