@@ -9,7 +9,7 @@
 
 using UnityEngine;
 namespace Leap.Unity.Examples {
-  public class InertiaProvider : PostProcessProvider {
+  public class InertiaPostProcessingProvider : PostProcessProvider {
     [Range(0f, 1f)]
     public float _stiffness = 0.01f;
     [Range(0f, 1f)]

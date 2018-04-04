@@ -9,7 +9,7 @@
 
 using UnityEngine;
 namespace Leap.Unity.Examples {
-  public class ProjectionProvider : PostProcessProvider {
+  public class ProjectionPostProcessingProvider : PostProcessProvider {
     [Range(0f, 5f)]
     public float _extensionAmount = 3.5f;
     [Range(0f, 1f)]

@@ -11,10 +11,6 @@ using UnityEngine;
 using Leap.Unity.Attributes;
 namespace Leap.Unity {
   public abstract class PostProcessProvider : LeapProvider {
-    [Tooltip("Whether this step should apply its post-process or " +
-      "pass the frames through un-modified.")]
-    public bool postProcessingEnabled = true;
-
     [Tooltip("The LeapProvider to augment with this post-process.")]
     [SerializeField]
     [OnEditorChange("inputLeapProvider")]
@@ -37,6 +33,10 @@ namespace Leap.Unity {
         }
       }
     }
+
+    [Tooltip("Whether this step should apply its post-process or " +
+  "pass the frames through un-modified.")]
+    public bool postProcessingEnabled = true;
 
     protected virtual void OnEnable() {
       if (_inputLeapProvider == null && Hands.Provider != this) {
