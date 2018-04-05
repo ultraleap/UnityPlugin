@@ -70,8 +70,8 @@ namespace Leap.Unity.Interaction.Tests {
     
     protected InteractionHand leftHand;
     protected InteractionHand rightHand;
-    protected InteractionVRController leftVRController;
-    protected InteractionVRController rightVRController;
+    protected InteractionXRController leftVRController;
+    protected InteractionXRController rightVRController;
 
     #endregion
 
@@ -125,7 +125,7 @@ namespace Leap.Unity.Interaction.Tests {
           continue;
         }
 
-        var vrController = controller as InteractionVRController;
+        var vrController = controller as InteractionXRController;
         if (vrController != null && vrController.isLeft) {
           leftVRController = vrController;
           continue;

@@ -33,7 +33,7 @@ namespace Leap.Unity.Query {
       using (var slice = query.Deconstruct()) {
         var dstArray = ArrayPool<T>.Spawn(slice.Count + collection.Count);
 
-        slice.BackingArray.CopyTo(dstArray, 0);
+        Array.Copy(slice.BackingArray, dstArray, slice.Count);
         collection.CopyTo(dstArray, slice.Count);
 
         return new Query<T>(dstArray, slice.Count + collection.Count);
@@ -54,8 +54,8 @@ namespace Leap.Unity.Query {
       using (var otherSlice = other.Deconstruct()) {
         var dstArray = ArrayPool<T>.Spawn(slice.Count + otherSlice.Count);
 
-        slice.BackingArray.CopyTo(dstArray, 0);
-        otherSlice.BackingArray.CopyTo(dstArray, slice.Count);
+        Array.Copy(slice.BackingArray, dstArray, slice.Count);
+        Array.Copy(otherSlice.BackingArray, 0, dstArray, slice.Count, otherSlice.Count);
 
         return new Query<T>(dstArray, slice.Count + otherSlice.Count);
       }
@@ -128,14 +128,9 @@ namespace Leap.Unity.Query {
       int count;
       query.Deconstruct(out array, out count);
 
-      K[] keys = ArrayPool<K>.Spawn(count);
-      for (int i = 0; i < count; i++) {
-        keys[i] = selector(array[i]);
-      }
-
-      Array.Sort(keys, array, 0, count);
-
-      ArrayPool<K>.Recycle(keys);
+      var comparer = FunctorComparer<T, K>.Ascending(selector);
+      Array.Sort(array, 0, count, comparer);
+      comparer.Clear();
 
       return new Query<T>(array, count);
     }
@@ -145,7 +140,15 @@ namespace Leap.Unity.Query {
     /// to select the values to order by.
     /// </summary>
     public static Query<T> OrderByDescending<T, K>(this Query<T> query, Func<T, K> selector) where K : IComparable<K> {
-      return query.OrderBy(selector).Reverse();
+      T[] array;
+      int count;
+      query.Deconstruct(out array, out count);
+
+      var comparer = FunctorComparer<T, K>.Descending(selector);
+      Array.Sort(array, 0, count, comparer);
+      comparer.Clear();
+
+      return new Query<T>(array, count);
     }
 
     /// <summary>
@@ -264,7 +267,7 @@ namespace Leap.Unity.Query {
 
         int targetIndex = 0;
         for (int i = 0; i < slice.Count; i++) {
-          slices[i].BackingArray.CopyTo(dstArray, targetIndex);
+          Array.Copy(slices[i].BackingArray, 0, dstArray, targetIndex, slices[i].Count);
           targetIndex += slices[i].Count;
           slices[i].Dispose();
         }
@@ -292,6 +295,7 @@ namespace Leap.Unity.Query {
       query.Deconstruct(out array, out count);
 
       int resultCount = Mathf.Max(count - toSkip, 0);
+      toSkip = count - resultCount;
       Array.Copy(array, toSkip, array, 0, resultCount);
       Array.Clear(array, resultCount, array.Length - resultCount);
 
@@ -582,6 +586,41 @@ namespace Leap.Unity.Query {
     public struct IndexedValue<T> {
       public int index;
       public T value;
+    }
+
+    private class FunctorComparer<T, K> : IComparer<T> where K : IComparable<K> {
+      [ThreadStatic]
+      private static FunctorComparer<T, K> _single;
+
+      private Func<T, K> _functor;
+      private int _sign;
+
+      private FunctorComparer() { }
+
+      public static FunctorComparer<T, K> Ascending(Func<T, K> functor) {
+        return single(functor, 1);
+      }
+
+      public static FunctorComparer<T, K> Descending(Func<T, K> functor) {
+        return single(functor, -1);
+      }
+
+      private static FunctorComparer<T, K> single(Func<T, K> functor, int sign) {
+        if (_single == null) {
+          _single = new FunctorComparer<T, K>();
+        }
+        _single._functor = functor;
+        _single._sign = sign;
+        return _single;
+      }
+
+      public void Clear() {
+        _functor = null;
+      }
+
+      public int Compare(T x, T y) {
+        return _sign * _functor(x).CompareTo(_functor(y));
+      }
     }
   }
 }
