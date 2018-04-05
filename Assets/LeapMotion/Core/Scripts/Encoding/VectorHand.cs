@@ -23,9 +23,7 @@ namespace Leap.Unity.Encoding {
   /// TODO: CurlHand not yet brought in from Networking module!
   /// </summary>
   [Serializable]
-  public class VectorHand : IEncoding<Leap.Hand>,
-                            IByteEncoding,
-                            IByteCodec<Leap.Hand> {
+  public class VectorHand {
 
     #region Data
 
