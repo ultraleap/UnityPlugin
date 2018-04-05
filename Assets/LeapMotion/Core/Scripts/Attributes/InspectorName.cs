@@ -6,8 +6,7 @@
  * https://developer.leapmotion.com/sdk_agreement, or another agreement       *
  * between Leap Motion and you, your company or other organization.           *
  ******************************************************************************/
-
-using UnityEditor;
+ 
 using UnityEngine;
 
 namespace Leap.Unity.Attributes {
@@ -21,9 +20,10 @@ namespace Leap.Unity.Attributes {
     }
 
 #if UNITY_EDITOR
-    public void DrawProperty(Rect rect, SerializedProperty property, GUIContent label) {
+    public void DrawProperty(Rect rect, UnityEditor.SerializedProperty property,
+                             GUIContent label) {
       label.text = name;
-      EditorGUI.PropertyField(rect, property, label, includeChildren: true);
+      UnityEditor.EditorGUI.PropertyField(rect, property, label, includeChildren: true);
     }
 #endif
   }
