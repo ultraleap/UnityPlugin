@@ -259,7 +259,7 @@ namespace Leap.Unity.Interaction {
     }
 
     private const float FRICTION_COEFFICIENT = 30F;
-    private const float DRAG_COEFFICIENT = 50F;
+    private const float DRAG_COEFFICIENT = 60F;
     protected virtual void Update() {
 
       // Reset our convenience state variables.
@@ -279,12 +279,21 @@ namespace Leap.Unity.Interaction {
         _physicsOccurred = false;
 
         // Record and enforce the sliding state from the previous frame.
-        if (isPrimaryHovered || isGrasped) {
-          localPhysicsPosition = getDepressedConstrainedLocalPosition(transform.parent.InverseTransformPoint(rigidbody.position) - localPhysicsPosition);
+        if (this.primaryHoverDistance < 0.005f || isGrasped) {
+          localPhysicsPosition
+            = constrainDepressedLocalPosition(
+                transform.parent.InverseTransformPoint(rigidbody.position)
+                - localPhysicsPosition);
         } else {
-          Vector2 localSlidePosition = new Vector2(localPhysicsPosition.x, localPhysicsPosition.y);
-          localPhysicsPosition = transform.parent.InverseTransformPoint(rigidbody.position);
-          localPhysicsPosition = new Vector3(localSlidePosition.x, localSlidePosition.y, localPhysicsPosition.z);
+          Vector2 localSlidePosition = new Vector2(localPhysicsPosition.x,
+                                                   localPhysicsPosition.y);
+
+          localPhysicsPosition
+            = transform.parent.InverseTransformPoint(this.transform.position);
+
+          localPhysicsPosition = new Vector3(localSlidePosition.x,
+                                             localSlidePosition.y,
+                                             localPhysicsPosition.z);
         }
 
         // Calculate the physical kinematics of the button in local space
@@ -293,7 +302,7 @@ namespace Leap.Unity.Interaction {
           Vector3 curLocalDepressorPos = transform.parent.InverseTransformPoint(_lastDepressor.position);
           Vector3 origLocalDepressorPos = transform.parent.InverseTransformPoint(transform.TransformPoint(_localDepressorPosition));
           localPhysicsVelocity = Vector3.back * 0.05f;
-          localPhysicsPosition = getDepressedConstrainedLocalPosition(curLocalDepressorPos - origLocalDepressorPos);
+          localPhysicsPosition = constrainDepressedLocalPosition(curLocalDepressorPos - origLocalDepressorPos);
         }
         else if (isGrasped) {
           // Do nothing!
@@ -302,24 +311,38 @@ namespace Leap.Unity.Interaction {
           Vector3 originalLocalVelocity = localPhysicsVelocity;
 
           // Spring force
-          localPhysicsVelocity += Mathf.Clamp(_springForce * 10000F * (initialLocalPosition.z - Mathf.Lerp(minMaxHeight.x, minMaxHeight.y, restingHeight) - localPhysicsPosition.z), -100f / transform.parent.lossyScale.x, 100f / transform.parent.lossyScale.x)
-                                              * Time.fixedDeltaTime
-                                              * Vector3.forward;
+          localPhysicsVelocity +=
+            Mathf.Clamp(_springForce * 10000F
+                        * (initialLocalPosition.z
+                           - Mathf.Lerp(minMaxHeight.x, minMaxHeight.y, restingHeight)
+                           - localPhysicsPosition.z),
+                       -100f / transform.parent.lossyScale.x,
+                        100f / transform.parent.lossyScale.x)
+            * Time.fixedDeltaTime * Vector3.forward;
 
           // Friction & Drag
           float velMag = originalLocalVelocity.magnitude;
+          var frictionDragVelocityChangeAmt = 0f;
           if (velMag > 0F) {
             Vector3 resistanceDir = -originalLocalVelocity / velMag;
 
             // Friction force
-            Vector3 frictionForce = resistanceDir * velMag * FRICTION_COEFFICIENT;
-            localPhysicsVelocity += (frictionForce /* assume unit mass */ * Time.fixedDeltaTime * transform.parent.lossyScale.x);
+            var frictionForceAmt = velMag * FRICTION_COEFFICIENT;
+            frictionDragVelocityChangeAmt
+              += Time.fixedDeltaTime * transform.parent.lossyScale.x * frictionForceAmt;
 
             // Drag force
             float velSqrMag = velMag * velMag;
-            Vector3 dragForce = resistanceDir * velSqrMag * DRAG_COEFFICIENT;
-            localPhysicsVelocity += (dragForce /* assume unit mass */ * Time.fixedDeltaTime * transform.parent.lossyScale.x);
+            var dragForceAmt = velSqrMag * DRAG_COEFFICIENT;
+            frictionDragVelocityChangeAmt
+              += Time.fixedDeltaTime * transform.parent.lossyScale.x * dragForceAmt;
+
+            // Apply velocity change, but don't let friction or drag let velocity
+            // magnitude cross zero.
+            var newVelMag = Mathf.Max(0, velMag - frictionDragVelocityChangeAmt);
+            localPhysicsVelocity = localPhysicsVelocity / velMag * newVelMag;
           }
+          
         }
 
         // Transform the local physics back into world space
@@ -388,9 +411,17 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    // How the button should behave when it is depressed
-    protected virtual Vector3 getDepressedConstrainedLocalPosition(Vector3 desiredOffset) {
-      return new Vector3(initialLocalPosition.x, initialLocalPosition.y, localPhysicsPosition.z + desiredOffset.z);
+    /// <summary>
+    /// Clamps the input local-space position to the bounds allowed by this UI element,
+    /// without clamping along the button depression axis. For buttons, this is locks the
+    /// element in local-XY space, but not along the pressing axis (Z axis).
+    /// </summary>
+    protected virtual Vector3 constrainDepressedLocalPosition(Vector3 localPosition) {
+      // Buttons are only allowed to move along their Z axis.
+      return new Vector3(
+        initialLocalPosition.x,
+        initialLocalPosition.y,
+        localPhysicsPosition.z + localPosition.z);
     }
 
     protected virtual void onGraspBegin() {

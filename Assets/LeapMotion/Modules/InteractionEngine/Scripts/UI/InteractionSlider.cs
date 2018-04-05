@@ -21,6 +21,8 @@ namespace Leap.Unity.Interaction {
   ///</summary>
   public class InteractionSlider : InteractionButton {
 
+    #region Inspector & Properties
+
     public enum SliderType {
       Vertical,
       Horizontal,
@@ -191,146 +193,6 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    //Internal Slider Values
-    protected float _horizontalSliderPercent;
-    protected float _verticalSliderPercent;
-    protected RectTransform parent;
-
-    private bool _started = false;
-
-    protected override void OnValidate() {
-      base.OnValidate();
-
-      if (this.transform.parent != null && this.transform.parent.GetComponent<RectTransform>() != null) {
-        _parentHasRectTransform = true;
-      }
-      else {
-        _parentHasRectTransform = false;
-      }
-    }
-
-    protected override void Start() {
-      if (_started) return;
-
-      _started = true;
-
-      calculateSliderLimits();
-
-      switch (sliderType) {
-        case SliderType.Horizontal:
-          verticalSlideLimits = new Vector2(0, 0);
-          break;
-        case SliderType.Vertical:
-          horizontalSlideLimits = new Vector2(0, 0);
-          break;
-      }
-
-      base.Start();
-
-      HorizontalSlideEvent += _horizontalSlideEvent.Invoke;
-      VerticalSlideEvent   += _verticalSlideEvent.Invoke;
-
-      HorizontalSlideEvent += (f) => { _wasSlid = true; };
-      VerticalSlideEvent   += (f) => { _wasSlid = true; };
-
-      HorizontalSliderValue = defaultHorizontalValue;
-      VerticalSliderValue = defaultVerticalValue;
-
-      if (dispatchSlideValueOnStart) {
-        HorizontalSlideEvent(HorizontalSliderValue);
-        VerticalSlideEvent(VerticalSliderValue);
-      }
-    }
-
-    public void RecalculateSliderLimits() {
-      calculateSliderLimits();
-    }
-
-    private void calculateSliderLimits() {
-      if (transform.parent != null) {
-        parent = transform.parent.GetComponent<RectTransform>();
-
-        if (overrideRectLimits) return;
-
-        if (parent != null) {
-          if (parent.rect.width < 0f || parent.rect.height < 0f) {
-            Debug.LogError("Parent Rectangle dimensions negative; can't set slider boundaries!", parent.gameObject);
-            enabled = false;
-          } else {
-            var self = transform.GetComponent<RectTransform>();
-            if (self != null) {
-              horizontalSlideLimits = new Vector2(parent.rect.xMin - transform.localPosition.x + self.rect.width / 2F, parent.rect.xMax - transform.localPosition.x - self.rect.width / 2F);
-              if (horizontalSlideLimits.x > horizontalSlideLimits.y) {
-                horizontalSlideLimits = new Vector2(0F, 0F);
-              }
-              if (Mathf.Abs(horizontalSlideLimits.x) < 0.0001F) {
-                horizontalSlideLimits.x = 0F;
-              }
-              if (Mathf.Abs(horizontalSlideLimits.y) < 0.0001F) {
-                horizontalSlideLimits.y = 0F;
-              }
-
-              verticalSlideLimits = new Vector2(parent.rect.yMin - transform.localPosition.y + self.rect.height / 2F, parent.rect.yMax - transform.localPosition.y - self.rect.height / 2F);
-              if (verticalSlideLimits.x > verticalSlideLimits.y) {
-                verticalSlideLimits = new Vector2(0F, 0F);
-              }
-              if (Mathf.Abs(verticalSlideLimits.x) < 0.0001F) {
-                verticalSlideLimits.x = 0F;
-              }
-              if (Mathf.Abs(verticalSlideLimits.y) < 0.0001F) {
-                verticalSlideLimits.y = 0F;
-              }
-            } else {
-              horizontalSlideLimits = new Vector2(parent.rect.xMin - transform.localPosition.x, parent.rect.xMax - transform.localPosition.x);
-              verticalSlideLimits = new Vector2(parent.rect.yMin - transform.localPosition.y, parent.rect.yMax - transform.localPosition.y);
-            }
-          }
-        }
-      }
-    }
-
-    private bool _sawWasSlid = false;
-    private bool _wasSlid = false;
-
-    public bool wasSlid {
-      get { return _wasSlid && _sawWasSlid; }
-    }
-
-    protected override void Update() {
-      base.Update();
-
-      if (!Application.isPlaying) { return; }
-
-      if (isPressed || isGrasped) {
-        calculateSliderValues();
-      }
-
-
-      // Whenever "_wasSlid" is set to true (however many times between Update() cycles),
-      // this logic produces a single Update() cycle through which slider.wasSlid
-      // will return true. (This allows observing MonoBehaviours to simply check
-      // "wasSlid" during their Update() cycle to perform updating logic.)
-      if (_wasSlid && !_sawWasSlid) {
-        _sawWasSlid = true;
-      }
-      else if (_sawWasSlid) {
-        _wasSlid = false;
-        _sawWasSlid = false;
-      }
-    }
-
-    protected override void OnEnable() {
-      base.OnEnable();
-
-      OnContactStay += calculateSliderValues;
-    }
-
-    protected override void OnDisable() {
-      OnContactStay -= calculateSliderValues;
-
-      base.OnDisable();
-    }
-
     private void calculateSliderValues() {
       // Calculate renormalized slider values.
       if (horizontalSlideLimits.x != horizontalSlideLimits.y) {
@@ -386,7 +248,164 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    protected override Vector3 getDepressedConstrainedLocalPosition(Vector3 desiredOffset) {
+    /// <summary>
+    /// Gets whether the slider was slide in the latest Update().
+    /// </summary>
+    public bool wasSlid {
+      get { return _wasSlid && _sawWasSlid; }
+    }
+
+    #endregion
+
+    #region Internal State
+
+    protected float _horizontalSliderPercent;
+    protected float _verticalSliderPercent;
+    protected RectTransform parent;
+
+    private bool _started = false;
+
+    private bool _sawWasSlid = false;
+    private bool _wasSlid = false;
+
+    #endregion
+
+    #region Unity Events
+
+    protected override void OnValidate() {
+      base.OnValidate();
+
+      if (this.transform.parent != null && this.transform.parent.GetComponent<RectTransform>() != null) {
+        _parentHasRectTransform = true;
+      }
+      else {
+        _parentHasRectTransform = false;
+      }
+    }
+
+    protected override void OnEnable() {
+      base.OnEnable();
+
+      OnContactStay += calculateSliderValues;
+    }
+
+    protected override void OnDisable() {
+      OnContactStay -= calculateSliderValues;
+
+      base.OnDisable();
+    }
+
+    protected override void Start() {
+      if (_started) return;
+
+      _started = true;
+
+      calculateSliderLimits();
+
+      switch (sliderType) {
+        case SliderType.Horizontal:
+          verticalSlideLimits = new Vector2(0, 0);
+          break;
+        case SliderType.Vertical:
+          horizontalSlideLimits = new Vector2(0, 0);
+          break;
+      }
+
+      base.Start();
+
+      HorizontalSlideEvent += _horizontalSlideEvent.Invoke;
+      VerticalSlideEvent   += _verticalSlideEvent.Invoke;
+
+      HorizontalSlideEvent += (f) => { _wasSlid = true; };
+      VerticalSlideEvent   += (f) => { _wasSlid = true; };
+
+      HorizontalSliderValue = defaultHorizontalValue;
+      VerticalSliderValue = defaultVerticalValue;
+
+      if (dispatchSlideValueOnStart) {
+        HorizontalSlideEvent(HorizontalSliderValue);
+        VerticalSlideEvent(VerticalSliderValue);
+      }
+    }
+
+    protected override void Update() {
+      base.Update();
+
+      if (!Application.isPlaying) { return; }
+
+      if (isPressed || isGrasped) {
+        calculateSliderValues();
+      }
+
+      // Whenever "_wasSlid" is set to true (however many times between Update() cycles),
+      // this logic produces a single Update() cycle through which slider.wasSlid
+      // will return true. (This allows observing MonoBehaviours to simply check
+      // "wasSlid" during their Update() cycle to perform updating logic.)
+      if (_wasSlid && !_sawWasSlid) {
+        _sawWasSlid = true;
+      }
+      else if (_sawWasSlid) {
+        _wasSlid = false;
+        _sawWasSlid = false;
+      }
+    }
+
+    #endregion
+
+    #region Public API
+
+    public void RecalculateSliderLimits() {
+      calculateSliderLimits();
+    }
+
+    #endregion
+
+    #region Internal Methods
+
+    private void calculateSliderLimits() {
+      if (transform.parent != null) {
+        parent = transform.parent.GetComponent<RectTransform>();
+
+        if (overrideRectLimits) return;
+
+        if (parent != null) {
+          if (parent.rect.width < 0f || parent.rect.height < 0f) {
+            Debug.LogError("Parent Rectangle dimensions negative; can't set slider boundaries!", parent.gameObject);
+            enabled = false;
+          } else {
+            var self = transform.GetComponent<RectTransform>();
+            if (self != null) {
+              horizontalSlideLimits = new Vector2(parent.rect.xMin - transform.localPosition.x + self.rect.width / 2F, parent.rect.xMax - transform.localPosition.x - self.rect.width / 2F);
+              if (horizontalSlideLimits.x > horizontalSlideLimits.y) {
+                horizontalSlideLimits = new Vector2(0F, 0F);
+              }
+              if (Mathf.Abs(horizontalSlideLimits.x) < 0.0001F) {
+                horizontalSlideLimits.x = 0F;
+              }
+              if (Mathf.Abs(horizontalSlideLimits.y) < 0.0001F) {
+                horizontalSlideLimits.y = 0F;
+              }
+
+              verticalSlideLimits = new Vector2(parent.rect.yMin - transform.localPosition.y + self.rect.height / 2F, parent.rect.yMax - transform.localPosition.y - self.rect.height / 2F);
+              if (verticalSlideLimits.x > verticalSlideLimits.y) {
+                verticalSlideLimits = new Vector2(0F, 0F);
+              }
+              if (Mathf.Abs(verticalSlideLimits.x) < 0.0001F) {
+                verticalSlideLimits.x = 0F;
+              }
+              if (Mathf.Abs(verticalSlideLimits.y) < 0.0001F) {
+                verticalSlideLimits.y = 0F;
+              }
+            } else {
+              horizontalSlideLimits = new Vector2(parent.rect.xMin - transform.localPosition.x, parent.rect.xMax - transform.localPosition.x);
+              verticalSlideLimits = new Vector2(parent.rect.yMin - transform.localPosition.y, parent.rect.yMax - transform.localPosition.y);
+            }
+          }
+        }
+      }
+    }
+
+    protected override Vector3 constrainDepressedLocalPosition(Vector3 desiredOffset) {
       Vector3 unSnappedPosition =
         new Vector3(Mathf.Clamp((localPhysicsPosition.x + desiredOffset.x), initialLocalPosition.x + horizontalSlideLimits.x, initialLocalPosition.x + horizontalSlideLimits.y),
                     Mathf.Clamp((localPhysicsPosition.y + desiredOffset.y), initialLocalPosition.y + verticalSlideLimits.x, initialLocalPosition.y + verticalSlideLimits.y),
@@ -406,6 +425,10 @@ namespace Leap.Unity.Interaction {
                          Mathf.Lerp(initialLocalPosition.y + verticalSlideLimits.x, initialLocalPosition.y + verticalSlideLimits.y, vSliderPercent),
                                    (localPhysicsPosition.z + desiredOffset.z));
     }
+
+    #endregion
+
+    #region Gizmos
 
     protected override void OnDrawGizmosSelected() {
       base.OnDrawGizmosSelected();
@@ -451,5 +474,7 @@ namespace Leap.Unity.Interaction {
         }
       }
     }
+
+    #endregion
   }
 }
