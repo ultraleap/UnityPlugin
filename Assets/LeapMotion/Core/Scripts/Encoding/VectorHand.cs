@@ -192,14 +192,18 @@ namespace Leap.Unity.Encoding {
           + numBytesRequired + " bytes from the offset position.");
       }
 
+      // Chirality.
+      isLeft = bytes[offset++] == 0x00;
+
+      // Palm position and rotation.
       for (int i = 0; i < 3; i++) {
         palmPos[i] = Convert.ToSingle(
-                       BitConverterNonAlloc.ToUInt16(bytes, ref offset))
+                       BitConverterNonAlloc.ToInt16(bytes, ref offset))
                      / 4096f;
       }
-
       palmRot = Utils.DecompressBytesToQuat(bytes, ref offset);
 
+      // Palm-local bone joint positions.
       for (int i = 0; i < NUM_JOINT_POSITIONS; i++) {
         for (int j = 0; j < 3; j++) {
           jointPositions[i][j] = VectorHandExtensions.ByteToFloat(bytes[offset++]);
