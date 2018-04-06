@@ -6,7 +6,7 @@ using NUnit.Framework;
 namespace Leap.Unity.Tests {
   using Encoding;
 
-  public class VectorHandTests : MonoBehaviour {
+  public class VectorHandTests {
 
     [Test]
     public void EncodeDecodeTest() {
