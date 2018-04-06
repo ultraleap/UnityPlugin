@@ -30,16 +30,17 @@ namespace Leap {
     public static Frame MakeTestFrame(int frameId,
                                       bool includeLeftHand = true,
                                       bool includeRightHand = true,
-                                      TestHandPose handPose = TestHandPose.HeadMountedA) {
+                                      TestHandPose handPose = TestHandPose.HeadMountedA,
+                                      UnitType unitType = UnitType.LeapUnits) {
 
       var testFrame = new Frame(frameId, 0, 120.0f,
                                 new InteractionBox(),
                                 new List<Hand>());
 
       if (includeLeftHand)
-        testFrame.Hands.Add(MakeTestHand(true, handPose, frameId, 10));
+        testFrame.Hands.Add(MakeTestHand(true, handPose, frameId, 10, unitType));
       if (includeRightHand)
-        testFrame.Hands.Add(MakeTestHand(false, handPose, frameId, 20));
+        testFrame.Hands.Add(MakeTestHand(false, handPose, frameId, 20, unitType));
 
       return testFrame;
     }

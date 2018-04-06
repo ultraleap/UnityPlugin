@@ -264,7 +264,7 @@ namespace Leap.Unity.Encoding {
 
     /// <summary>
     /// Shortcut for reading a VectorHand-encoded byte representation of a Leap hand and
-    /// decoding it immdiately into a Hand object.
+    /// decoding it immediately into a Hand object.
     /// </summary>
     public void ReadBytes(byte[] bytes, ref int offset, Hand intoHand) {
       ReadBytes(bytes, ref offset);
