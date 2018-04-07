@@ -12,6 +12,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Leap;
+using Leap.Unity.Attributes;
 
 namespace Leap.Unity {
   /** This version of HandModelBase supports a hand respresentation based on a skinned and jointed 3D model asset.*/
@@ -43,14 +44,33 @@ namespace Leap.Unity {
     [SerializeField]
     [HideInInspector]
     private bool deformPositionsState = false;
-
-
+    
     [Tooltip("Hands are typically rigged in 3D packages with the palm transform near the wrist. Uncheck this is your model's palm transform is at the center of the palm similar to Leap's API drives")]
     public bool ModelPalmAtLeapWrist = true;
+
     [Tooltip("Set to True if each finger has an extra trasform between palm and base of the finger.")]
     public bool UseMetaCarpals;
+
+    [Tooltip("Because bones only exist at their roots in model rigs, the length of the "
+           + "last fingertip bone is lost when placing bones at positions in the tracked "
+           + "hand. This option scales the last bone along its X axis (length axis) to "
+           + "match its bone length to the tracked bone length. This option only has "
+           + "an effect if Deform Positions In Fingers is enabled.")]
+    [DisableIf("DeformPositionsInFingers", isEqualTo: false)]
+    [SerializeField]
+    [OnEditorChange("scaleLastFingerBones")]
+    private bool _scaleLastFingerBones = true;
+    public bool scaleLastFingerBones {
+      get { return _scaleLastFingerBones; }
+      set {
+        _scaleLastFingerBones = value;
+        setScaleLastFingerBoneInFingers(_scaleLastFingerBones);
+      }
+    }
+
     public Vector3 modelFingerPointing = new Vector3(0, 0, 0);
     public Vector3 modelPalmFacing = new Vector3(0, 0, 0);
+
     [Header("Values for Stored Start Pose")]
     [SerializeField]
     private List<Transform> jointList = new List<Transform>();
@@ -62,6 +82,7 @@ namespace Leap.Unity {
     public override void InitHand() {
       UpdateHand();
       setDeformPositionsInFingers(deformPositionsState);
+      setScaleLastFingerBoneInFingers(scaleLastFingerBones);
     }
 
     public Quaternion Reorientation() {
@@ -274,12 +295,21 @@ namespace Leap.Unity {
         jointTrans.localPosition = localPositions[i];
       }
     }
+
     private void setDeformPositionsInFingers(bool onOff) {
-      RiggedFinger[] riggedFingers = GetComponentsInChildren<RiggedFinger>();
-      foreach(RiggedFinger finger in riggedFingers){
+      var riggedFingers = GetComponentsInChildren<RiggedFinger>();
+      foreach (var finger in riggedFingers){
         finger.deformPosition = onOff;
       }
     }
+
+    private void setScaleLastFingerBoneInFingers(bool shouldScale) {
+      var riggedFingers = GetComponentsInChildren<RiggedFinger>();
+      foreach (var finger in riggedFingers) {
+        finger.scaleLastFingerBone = shouldScale;
+      }
+    }
+
     public void OnValidate() {
       if (DeformPositionsInFingers != deformPositionsState) {
         RestoreJointsStartPose();
