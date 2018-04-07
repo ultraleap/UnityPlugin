@@ -34,8 +34,7 @@ namespace Leap.Unity.Interaction {
       specifyConditionalDrawing(() => !targets.Query().All(intObj => intObj.ignoreGrasping),
                                 "_allowMultiGrasp",
                                 "_moveObjectWhenGrasped",
-                                "graspedMovementType",
-                                "graspHoldWarpingEnabled__curIgnored");
+                                "graspedMovementType");
 
       // Layer Overrides
       specifyConditionalDrawing(() => targets.Query().Any(intObj => intObj.overrideInteractionLayer),
