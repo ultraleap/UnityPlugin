@@ -39,7 +39,7 @@ namespace Leap.Unity {
                                 (int)LeapServiceProvider.PhysicsExtrapolationMode.Manual,
                                 "_physicsExtrapolationTime");
 
-      deferProperty("_enableDllProfiling");
+      deferProperty("_workerThreadProfiling");
     }
 
     private void frameOptimizationWarning(SerializedProperty property) {
