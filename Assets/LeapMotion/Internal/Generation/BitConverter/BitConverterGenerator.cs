@@ -41,7 +41,11 @@ namespace Leap.Unity.Generation {
     }
 
     private void generateCode() {
-      List<string> lines = new List<string>();
+      List<string> lines = getLines(codeTemplate);
+      lines = lines.Select(l => l.Replace("Leap.Unity.Generation", "Leap.Unity").
+                                  Replace("BitConverterNonAlloc_Template_", "BitConverterNonAlloc")).
+                    ToList();
+
       using (var writer = File.CreateText(Path.Combine(targetFolder.Path, "BitConverterNonAlloc.cs"))) {
         for (int i = 0; i < lines.Count; i++) {
           string line = lines[i];
@@ -59,9 +63,9 @@ namespace Leap.Unity.Generation {
 
             Func<int, string> byteExpr;
             if (line.Contains(TO_KEY)) {
-              byteExpr = b => "_c.byte" + b + " = bytes[offset++];";
+              byteExpr = b => "_c.Byte" + b + " = bytes[offset++];";
             } else if (line.Contains(GET_KEY)) {
-              byteExpr = b => "bytes[offset++] = _c.byte" + i + ";";
+              byteExpr = b => "bytes[offset++] = _c.Byte" + b + ";";
             } else {
               throw new InvalidOperationException("Invalid template type [" + line + "]");
             }
@@ -76,13 +80,25 @@ namespace Leap.Unity.Generation {
 
     private void expandMethodTemplate(List<string> methodTemplate, StreamWriter writer, Func<int, string> byteExpr) {
       foreach (string primitiveType in primitiveTypes) {
-        Type type = Assembly.GetAssembly(typeof(int)).GetType(primitiveType);
+        Debug.Log(typeof(UInt16).Assembly);
+        Debug.Log(typeof(ushort).Assembly);
+        Debug.Log(typeof(UInt16).FullName);
+
+        Type type = Assembly.GetAssembly(typeof(int)).GetTypes().First(t => t.Name == primitiveType);
+
+        Debug.Log(primitiveType + " : " + type);
+
         int bytes = Marshal.SizeOf(type);
 
-        foreach (var line in methodTemplate) {
+        for (int i = 0; i < methodTemplate.Count; i++) {
+          string line = methodTemplate[i];
+          line = line.Replace("Single", primitiveType);
+
           if (line.Contains(FILL_BYTES_KEY)) {
-            for (int i = 0; i < bytes; i++) {
-              writer.WriteLine(byteExpr(i));
+            string indent = new string(line.TakeWhile(c => char.IsWhiteSpace(c)).ToArray());
+            for (int j = 0; j < bytes; j++) {
+              writer.Write(indent);
+              writer.WriteLine(byteExpr(j));
             }
           } else {
             writer.WriteLine(line);
@@ -92,19 +108,12 @@ namespace Leap.Unity.Generation {
     }
 
     private void generateUnitTests() {
-      List<string> lines = new List<string>();
-      using (var reader = new StringReader(testTemplate.text)) {
-        while (true) {
-          string line = reader.ReadLine();
-          if (line == null) {
-            break;
-          }
+      List<string> lines = getLines(testTemplate);
 
-          lines.Add(line.Replace("Leap.Unity.Generation", "Leap.Unity.Tests").
-                         Replace("_Template_", "").
-                         Replace("_BitConverterTestMock_", "BitConverterNonAlloc"));
-        }
-      }
+      lines = lines.Select(l => l.Replace("Leap.Unity.Generation", "Leap.Unity.Tests").
+                                  Replace("_Template_", "").
+                                  Replace("_BitConverterTestMock_", "BitConverterNonAlloc")).
+                    ToList();
 
       string codeTemplate = lines.Query().
                                   SkipWhile(l => !l.Contains(BEGIN_KEY)).
@@ -136,6 +145,20 @@ namespace Leap.Unity.Generation {
 
         writer.Write(afterCode);
       }
+    }
+
+    private List<string> getLines(TextAsset asset) {
+      List<string> lines = new List<string>();
+      using (var reader = new StringReader(asset.text)) {
+        while (true) {
+          string line = reader.ReadLine();
+          if (line == null) {
+            break;
+          }
+          lines.Add(line);
+        }
+      }
+      return lines;
     }
   }
 

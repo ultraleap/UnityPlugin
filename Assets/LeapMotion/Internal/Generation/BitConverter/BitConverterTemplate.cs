@@ -31,15 +31,15 @@ namespace Leap.Unity.Generation {
     //END
     //BEGIN GET
 
-    public static void GetBytes(Single single, byte[] bytes, int offset = 0) {
-      _c.Single = single;
+    public static void GetBytes(Single value, byte[] bytes, int offset = 0) {
+      _c.Single = value;
       //FILL BYTES
     }
     //END
     //BEGIN GET
 
-    public static void GetBytes(Single single, byte[] bytes, ref int offset) {
-      _c.Single = single;
+    public static void GetBytes(Single value, byte[] bytes, ref int offset) {
+      _c.Single = value;
       //FILL BYTES
     }
     //END
