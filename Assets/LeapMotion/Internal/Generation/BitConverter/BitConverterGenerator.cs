@@ -7,8 +7,11 @@
  * between Leap Motion and you, your company or other organization.           *
  ******************************************************************************/
 
+using System;
 using System.IO;
 using System.Linq;
+using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -20,9 +23,9 @@ namespace Leap.Unity.Generation {
 
     public const string BEGIN_KEY = "//BEGIN";
     public const string END_KEY = "//END";
-    public const string TEMPLATE_NAMESPACE = "Leap.Unity.Generation";
-    public const string TARGET_NAMESPACE = "Leap.Unity";
-    public const string TEST_NAMESPACE = "Leap.Unity.Tests";
+    public const string TO_KEY = "TO";
+    public const string GET_KEY = "GET";
+    public const string FILL_BYTES_KEY = "//FILL BYTES";
 
     public TextAsset codeTemplate;
     public TextAsset testTemplate;
@@ -33,20 +36,71 @@ namespace Leap.Unity.Generation {
     public string[] primitiveTypes;
 
     public override void Generate() {
-      replaceCenterCode(codeTemplate, targetFolder, "_Primitive_", "BitConverterNonAlloc.cs", TARGET_NAMESPACE);
-      replaceCenterCode(testTemplate, testFolder, "Single", "BitConverterNonAllocTests.cs", TEST_NAMESPACE);
+      generateCode();
+      generateUnitTests();
     }
 
-    private void replaceCenterCode(TextAsset template, AssetFolder folder, string toReplace, string filename, string targetNamespace) {
+    private void generateCode() {
       List<string> lines = new List<string>();
-      using (var reader = new StringReader(template.text)) {
+      using (var writer = File.CreateText(Path.Combine(targetFolder.Path, "BitConverterNonAlloc.cs"))) {
+        for (int i = 0; i < lines.Count; i++) {
+          string line = lines[i];
+
+          if (line.Contains(BEGIN_KEY)) {
+            List<string> methodTemplate = new List<string>();
+            while (true) {
+              i++;
+              string methodLine = lines[i];
+              if (methodLine.Contains(END_KEY)) {
+                break;
+              }
+              methodTemplate.Add(methodLine);
+            }
+
+            Func<int, string> byteExpr;
+            if (line.Contains(TO_KEY)) {
+              byteExpr = b => "_c.byte" + b + " = bytes[offset++];";
+            } else if (line.Contains(GET_KEY)) {
+              byteExpr = b => "bytes[offset++] = _c.byte" + i + ";";
+            } else {
+              throw new InvalidOperationException("Invalid template type [" + line + "]");
+            }
+
+            expandMethodTemplate(methodTemplate, writer, byteExpr);
+          } else {
+            writer.WriteLine(line);
+          }
+        }
+      }
+    }
+
+    private void expandMethodTemplate(List<string> methodTemplate, StreamWriter writer, Func<int, string> byteExpr) {
+      foreach (string primitiveType in primitiveTypes) {
+        Type type = Assembly.GetAssembly(typeof(int)).GetType(primitiveType);
+        int bytes = Marshal.SizeOf(type);
+
+        foreach (var line in methodTemplate) {
+          if (line.Contains(FILL_BYTES_KEY)) {
+            for (int i = 0; i < bytes; i++) {
+              writer.WriteLine(byteExpr(i));
+            }
+          } else {
+            writer.WriteLine(line);
+          }
+        }
+      }
+    }
+
+    private void generateUnitTests() {
+      List<string> lines = new List<string>();
+      using (var reader = new StringReader(testTemplate.text)) {
         while (true) {
           string line = reader.ReadLine();
           if (line == null) {
             break;
           }
 
-          lines.Add(line.Replace(TEMPLATE_NAMESPACE, targetNamespace).
+          lines.Add(line.Replace("Leap.Unity.Generation", "Leap.Unity.Tests").
                          Replace("_Template_", "").
                          Replace("_BitConverterTestMock_", "BitConverterNonAlloc"));
         }
@@ -70,13 +124,13 @@ namespace Leap.Unity.Generation {
                                Select(s => s + "\n").
                                Fold((a, b) => a + b);
 
-      using (var writer = File.CreateText(Path.Combine(folder.Path, filename))) {
+      using (var writer = File.CreateText(Path.Combine(testFolder.Path, "BitConverterNonAllocTests.cs"))) {
         writer.Write(beforeCode);
 
         foreach (var primitiveType in primitiveTypes) {
           //Replace Single with the actual primitive
           //Also uncomment the Test attribute
-          writer.Write(codeTemplate.Replace(toReplace, primitiveType).
+          writer.Write(codeTemplate.Replace("Single", primitiveType).
                                     Replace("//[Test]", "[Test]"));
         }
 
@@ -84,8 +138,6 @@ namespace Leap.Unity.Generation {
       }
     }
   }
-
-  public struct _Primitive_ { }
 
   public static class _BitConverterTestMock_ {
     public static System.Single ToSingle(byte[] bytes, int offset) { return 0; }
