@@ -87,6 +87,9 @@ namespace Leap.Unity.Examples {
             var prevPose = maybePrevPose.Value;
             integratePose(ref curPose, ref prevPose,
                           targetPose: framePose, deltaTime: deltaTime);
+            hand.SetPalmPose(curPose);
+            maybeCurPose = curPose;
+            maybePrevPose = prevPose;
           }
         }
       }
