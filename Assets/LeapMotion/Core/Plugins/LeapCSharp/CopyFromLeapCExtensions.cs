@@ -54,7 +54,7 @@ namespace LeapInternal {
       hand.PinchDistance = leapHand.pinch_distance;
       hand.PalmWidth = leapHand.palm.width;
       hand.IsLeft = leapHand.type == eLeapHandType.eLeapHandType_Left;
-      hand.TimeVisible = leapHand.visible_time;
+      hand.TimeVisible = (float)(leapHand.visible_time * 1e-6);
       hand.PalmPosition = leapHand.palm.position.ToLeapVector();
       hand.StabilizedPalmPosition = leapHand.palm.stabilized_position.ToLeapVector();
       hand.PalmVelocity = leapHand.palm.velocity.ToLeapVector();
