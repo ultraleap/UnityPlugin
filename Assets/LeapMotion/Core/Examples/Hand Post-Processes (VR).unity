@@ -319,8 +319,8 @@ Transform:
   m_Children:
   - {fileID: 1267071318}
   - {fileID: 197891095}
-  - {fileID: 879694406}
   - {fileID: 1247070418}
+  - {fileID: 879694406}
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -417,7 +417,7 @@ Transform:
   - {fileID: 172343939}
   - {fileID: 589164865}
   m_Father: {fileID: 542902865}
-  m_RootOrder: 2
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &879694407
 MonoBehaviour:
@@ -453,7 +453,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   editTimePose: 0
-  _inputLeapProvider: {fileID: 1267071315}
+  _inputLeapProvider: {fileID: 1247070420}
   postProcessingEnabled: 1
   _extensionAmount: 3.5
   _handMergeDistance: 0.65
@@ -550,7 +550,7 @@ Transform:
   - {fileID: 1790608859}
   - {fileID: 1040383592}
   m_Father: {fileID: 542902865}
-  m_RootOrder: 3
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1247070419
 MonoBehaviour:
@@ -588,8 +588,6 @@ MonoBehaviour:
   editTimePose: 0
   _inputLeapProvider: {fileID: 1267071315}
   postProcessingEnabled: 1
-  stiffness: 0.01
-  damping: 0.05
 --- !u!1 &1267071314
 GameObject:
   m_ObjectHideFlags: 0
