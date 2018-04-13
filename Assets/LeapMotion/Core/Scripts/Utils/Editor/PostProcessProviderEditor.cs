@@ -30,6 +30,13 @@ namespace Leap.Unity {
           type: MessageType.Info
         );
       }
+      else if (provider.passthroughOnly) {
+        EditorGUILayout.HelpBox(
+          message: "This post-process provider is set to pass-through only, so it will "
+                 + "pass its input unmodified to its output.",
+          type: MessageType.Info
+        );
+      }
     }
 
   }
