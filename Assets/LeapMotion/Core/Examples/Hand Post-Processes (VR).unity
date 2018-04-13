@@ -402,7 +402,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &879694406
 Transform:
   m_ObjectHideFlags: 0
@@ -591,7 +591,7 @@ MonoBehaviour:
   dataUpdateMode: 0
   passthroughOnly: 0
   stiffness: 2
-  damping: 2
+  damping: 3
 --- !u!1 &1267071314
 GameObject:
   m_ObjectHideFlags: 0
