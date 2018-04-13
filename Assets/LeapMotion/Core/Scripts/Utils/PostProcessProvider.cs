@@ -22,7 +22,7 @@ namespace Leap.Unity {
     public LeapProvider inputLeapProvider {
       get { return _inputLeapProvider; }
       set {
-        OnValidate();
+        validateInput();
 
         if (_inputLeapProvider != null) {
           _inputLeapProvider.OnFixedFrame -= processFixedFrame;
@@ -50,6 +50,31 @@ namespace Leap.Unity {
            + "input directly to its output without performing any post-processing.")]
     public bool passthroughOnly = false;
 
+    private Frame _cachedUpdateFrame = new Frame();
+    private Frame _cachedFixedFrame = new Frame();
+
+    public override Frame CurrentFrame {
+      get {
+        #if UNITY_EDITOR
+        if (!Application.isPlaying && _inputLeapProvider != null) {
+          processUpdateFrame(_inputLeapProvider.CurrentFrame);
+        }
+        #endif
+        return _cachedUpdateFrame;
+      }
+    }
+
+    public override Frame CurrentFixedFrame {
+      get {
+        #if UNITY_EDITOR
+        if (!Application.isPlaying && _inputLeapProvider != null) {
+          processUpdateFrame(_inputLeapProvider.CurrentFixedFrame);
+        }
+        #endif
+        return _cachedFixedFrame;
+      }
+    }
+
     protected virtual void OnEnable() {
       if (_inputLeapProvider == null && Hands.Provider != this) {
         _inputLeapProvider = Hands.Provider;
@@ -63,17 +88,19 @@ namespace Leap.Unity {
     }
 
     protected virtual void OnValidate() {
-      #if UNITY_EDITOR
-      if (!Application.isPlaying) {
-        if (detectCycle()) {
-          _inputLeapProvider = null;
-          Debug.LogError("The input to the post-process provider on " + gameObject.name
-                       + " causes an infinite cycle, so its input has been set to null.");
-        }
-      }
-      #endif
+      validateInput();
     }
-    
+
+    public abstract void ProcessFrame(ref Frame inputFrame);
+
+    private void validateInput() {
+      if (detectCycle()) {
+        _inputLeapProvider = null;
+        Debug.LogError("The input to the post-process provider on " + gameObject.name
+                     + " causes an infinite cycle, so its input has been set to null.");
+      }
+    }
+
     private bool detectCycle() {
       LeapProvider providerA = _inputLeapProvider, providerB = _inputLeapProvider;
       while (providerA is PostProcessProvider) {
@@ -86,30 +113,6 @@ namespace Leap.Unity {
       }
       return false;
     }
-
-    public override Frame CurrentFrame {
-      get {
-        #if UNITY_EDITOR
-        if (!Application.isPlaying && _inputLeapProvider != null) {
-          processUpdateFrame(_inputLeapProvider.CurrentFrame);
-        }
-        #endif
-        return _cachedUpdateFrame;
-      }
-    }
-    public override Frame CurrentFixedFrame {
-      get {
-        #if UNITY_EDITOR
-        if (!Application.isPlaying && _inputLeapProvider != null) {
-          processUpdateFrame(_inputLeapProvider.CurrentFixedFrame);
-        }
-        #endif
-        return _cachedFixedFrame;
-      }
-    }
-
-    private Frame _cachedUpdateFrame = new Frame();
-    private Frame _cachedFixedFrame = new Frame();
 
     private void processUpdateFrame(Frame inputFrame) {
       if (dataUpdateMode == DataUpdateMode.FixedUpdateOnly) {
@@ -131,6 +134,5 @@ namespace Leap.Unity {
       DispatchFixedFrameEvent(_cachedFixedFrame);
     }
 
-    public abstract void ProcessFrame(ref Frame inputFrame);
   }
 }
