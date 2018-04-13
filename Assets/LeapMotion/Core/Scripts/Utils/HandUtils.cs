@@ -191,6 +191,13 @@ namespace Leap.Unity {
     }
 
     /// <summary>
+    /// As Hand.SetTransform(), but takes a Pose as input for convenience.
+    /// </summary>
+    public static void SetPalmPose(this Hand hand, Pose newPalmPose) {
+      hand.SetTransform(newPalmPose.position, newPalmPose.rotation);
+    }
+
+    /// <summary>
     /// Returns the direction the Hand's palm is facing. For the  other two palm-basis
     /// directions, see RadialAxis and DistalAxis.
     /// 

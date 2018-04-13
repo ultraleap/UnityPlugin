@@ -453,8 +453,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   editTimePose: 0
-  postProcessingEnabled: 1
   _inputLeapProvider: {fileID: 1267071315}
+  postProcessingEnabled: 1
   _extensionAmount: 3.5
   _handMergeDistance: 0.65
 --- !u!1 &1040383591
@@ -586,10 +586,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   editTimePose: 0
-  postProcessingEnabled: 1
   _inputLeapProvider: {fileID: 1267071315}
-  _stiffness: 0.01
-  _damping: 0.05
+  postProcessingEnabled: 1
+  stiffness: 0.01
+  damping: 0.05
 --- !u!1 &1267071314
 GameObject:
   m_ObjectHideFlags: 0
