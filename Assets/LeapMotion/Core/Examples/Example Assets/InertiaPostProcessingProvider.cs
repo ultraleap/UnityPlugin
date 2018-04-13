@@ -14,7 +14,7 @@ namespace Leap.Unity.Examples {
 
   public class InertiaPostProcessingProvider : PostProcessProvider {
 
-    [Header("Inertia Settings")]
+    [Header("Inertia")]
     
     [Tooltip("Higher stiffness will keep the bouncy hand closer to the tracked hand data.")]
     [Range(0f, 10f)]
