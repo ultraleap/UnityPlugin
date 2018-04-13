@@ -1,6 +1,6 @@
 /******************************************************************************
  * Copyright (C) Leap Motion, Inc. 2011-2018.                                 *
- * Leap Motion proprietary and  confidential.                                 *
+ * Leap Motion proprietary and confidential.                                  *
  *                                                                            *
  * Use subject to the terms of the Leap Motion SDK Agreement available at     *
  * https://developer.leapmotion.com/sdk_agreement, or another agreement       *
@@ -29,7 +29,7 @@ public static class AutoCopywriteHeader {
   /// </summary>
   private static string[] copywriteNotice = {"/******************************************************************************",
                                              " * Copyright (C) Leap Motion, Inc. 2011-2018.                                 *",
-                                             " * Leap Motion proprietary and  confidential.                                 *",
+                                             " * Leap Motion proprietary and confidential.                                  *",
                                              " *                                                                            *",
                                              " * Use subject to the terms of the Leap Motion SDK Agreement available at     *",
                                              " * https://developer.leapmotion.com/sdk_agreement, or another agreement       *",

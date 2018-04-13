@@ -1,6 +1,6 @@
 /******************************************************************************
  * Copyright (C) Leap Motion, Inc. 2011-2018.                                 *
- * Leap Motion proprietary and  confidential.                                 *
+ * Leap Motion proprietary and confidential.                                  *
  *                                                                            *
  * Use subject to the terms of the Leap Motion SDK Agreement available at     *
  * https://developer.leapmotion.com/sdk_agreement, or another agreement       *
@@ -56,24 +56,27 @@ namespace Leap.Unity {
       get {
         if (s_leapRig == null) {
           InitStatic();
-          if (s_leapRig == null) {
-            Debug.LogWarning("Camera has no parent; Rig will return null.");
-          }
         }
         return s_leapRig;
       }
     }
 
     /// <summary>
-    /// Static convenience accessor for the LeapProvider.
+    /// Static convenience accessor for a LeapProvider in the scene. Preference is given
+    /// to a LeapServiceProvider if there is one.
+    /// 
+    /// If static memory currently has no reference for the provider (or if it was
+    /// destroyed), this call will search the scene for a LeapProvider and cache it to be
+    /// returned next time.
+    /// 
+    /// If there is no LeapProvider in your scene, this getter
+    /// will return null. Be warned that calling this regularly can be expensive if
+    /// LeapProviders often don't exist in your scene or are frequently destroyed.
     /// </summary>
     public static LeapProvider Provider {
       get {
         if (s_provider == null) {
           InitStatic();
-          if (s_provider == null) {
-            Debug.LogWarning("No LeapProvider found in the scene.");
-          }
         }
         return s_provider;
       }

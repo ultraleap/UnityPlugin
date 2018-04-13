@@ -1,6 +1,6 @@
 /******************************************************************************
  * Copyright (C) Leap Motion, Inc. 2011-2018.                                 *
- * Leap Motion proprietary and  confidential.                                 *
+ * Leap Motion proprietary and confidential.                                  *
  *                                                                            *
  * Use subject to the terms of the Leap Motion SDK Agreement available at     *
  * https://developer.leapmotion.com/sdk_agreement, or another agreement       *
@@ -8,26 +8,30 @@
  ******************************************************************************/
 
 using UnityEngine;
-using UnityEngine.Rendering;
-using System;
 
 namespace Leap.Unity {
+  using Attributes;
 
   /// <summary>
   /// Moves the camera to each eye position on pre-render. Only necessary for image
   /// pass-through (IR viewer) scenarios.
-  /// 
-  /// Note: This script will be removed in a future version of UnityModules.
   /// </summary>
+  [RequireComponent(typeof(LeapXRServiceProvider))]
   public class LeapEyeDislocator : MonoBehaviour {
 
-    private Matrix4x4 _finalCenterMatrix;
+    [SerializeField]
+    private bool _useCustomBaseline = false;
 
-    private LeapDeviceInfo _deviceInfo;
+    [MinValue(0), Units("MM"), InspectorName("Baseline")]
+    [SerializeField]
+    private float _customBaselineValue = 64;
 
-    void Start() {
-      _deviceInfo = LeapDeviceInfo.GetLeapDeviceInfo();
-    }
+    [SerializeField]
+    private bool _showEyePositions = false;
+
+    private LeapXRServiceProvider _provider;
+    private Maybe<float> _deviceBaseline = Maybe.None;
+    private bool _hasVisitedPreCull = false;
 
     private Camera _cachedCamera;
     private Camera _camera {
@@ -39,34 +43,91 @@ namespace Leap.Unity {
       }
     }
 
-    [SerializeField]
-    private EyeType _eyeType = new EyeType(EyeType.OrderType.CENTER);
-
-    void OnPreCull() {
-      #if UNITY_EDITOR
-      if (!Application.isPlaying) return;
-      #endif
-
-      _camera.ResetWorldToCameraMatrix();
-      _finalCenterMatrix = _camera.worldToCameraMatrix;
+    private void onDevice(Device device) {
+      _deviceBaseline = Maybe.Some(device.Baseline);
     }
 
-    void OnPreRender() {
-      #if UNITY_EDITOR
-      if (!Application.isPlaying) return;
-      #endif
+    private void OnEnable() {
+      _provider = GetComponent<LeapXRServiceProvider>();
+      if (_provider == null) {
+        enabled = false;
+        return;
+      }
 
-      _eyeType.BeginCamera(); // swaps eye
+      _provider.OnDeviceSafe += onDevice;
+    }
 
-      Matrix4x4 offsetMatrix;
-      
-      offsetMatrix = _finalCenterMatrix;
-      Vector3 ipdOffset = (_eyeType.IsLeftEye ? 1 : -1) * transform.right * _deviceInfo.baseline * 0.5f;
-      Vector3 forwardOffset = -transform.forward * _deviceInfo.forwardOffset;
-      offsetMatrix *= Matrix4x4.TRS(ipdOffset + forwardOffset, Quaternion.identity, Vector3.one);
+    private void OnDisable() {
+      _camera.ResetStereoViewMatrices();
 
-      _camera.worldToCameraMatrix = offsetMatrix;
+      _provider.OnDeviceSafe -= onDevice;
+    }
+
+    private void Update() {
+      _camera.ResetStereoViewMatrices();
+      _hasVisitedPreCull = false;
+    }
+
+    private void OnPreCull() {
+      if (_hasVisitedPreCull) {
+        return;
+      }
+      _hasVisitedPreCull = true;
+
+      Maybe<float> baselineToUse = Maybe.None;
+      if (_useCustomBaseline) {
+        baselineToUse = Maybe.Some(_customBaselineValue);
+      } else {
+        baselineToUse = _deviceBaseline;
+      }
+
+      float baselineValue;
+      if (baselineToUse.TryGetValue(out baselineValue)) {
+        baselineValue *= 1e-3f;
+
+        Matrix4x4 leftMat = _camera.GetStereoViewMatrix(Camera.StereoscopicEye.Left);
+        Matrix4x4 rightMat = _camera.GetStereoViewMatrix(Camera.StereoscopicEye.Right);
+
+        Vector3 leftPos = leftMat.inverse.MultiplyPoint3x4(Vector3.zero);
+        Vector3 rightPos = rightMat.inverse.MultiplyPoint3x4(Vector3.zero);
+        float existingBaseline = Vector3.Distance(leftPos, rightPos);
+
+        float baselineAdjust = baselineValue - existingBaseline;
+
+        adjustViewMatrix(Camera.StereoscopicEye.Left, baselineAdjust);
+        adjustViewMatrix(Camera.StereoscopicEye.Right, baselineAdjust);
+      }
+    }
+
+    private void adjustViewMatrix(Camera.StereoscopicEye eye, float baselineAdjust) {
+      float eyeOffset = eye == Camera.StereoscopicEye.Left ? 1 : -1;
+      Vector3 ipdOffset = eyeOffset * Vector3.right * baselineAdjust * 0.5f;
+      Vector3 providerForwardOffset = Vector3.forward * _provider.deviceOffsetZAxis;
+      Vector3 providerVerticalOffset = -Vector3.up * _provider.deviceOffsetYAxis;
+      Quaternion providerRotation = Quaternion.AngleAxis(_provider.deviceTiltXAxis, Vector3.right);
+
+      var existingMatrix = _camera.GetStereoViewMatrix(eye);
+      _camera.SetStereoViewMatrix(eye, Matrix4x4.Rotate(providerRotation) *
+                                       Matrix4x4.Translate(providerForwardOffset + ipdOffset) *
+                                       Matrix4x4.Translate(providerVerticalOffset) *
+                                       existingMatrix);
+    }
+
+    private void OnDrawGizmos() {
+      if (_showEyePositions && Application.isPlaying) {
+        Matrix4x4 leftMat = _camera.GetStereoViewMatrix(Camera.StereoscopicEye.Left);
+        Matrix4x4 rightMat = _camera.GetStereoViewMatrix(Camera.StereoscopicEye.Right);
+
+        Vector3 leftPos = leftMat.inverse.MultiplyPoint3x4(Vector3.zero);
+        Vector3 rightPos = rightMat.inverse.MultiplyPoint3x4(Vector3.zero);
+
+        Gizmos.color = Color.white;
+        Gizmos.DrawSphere(leftPos, 0.02f);
+        Gizmos.DrawSphere(rightPos, 0.02f);
+
+        Gizmos.color = Color.blue;
+        Gizmos.DrawLine(leftPos, rightPos);
+      }
     }
   }
-
 }

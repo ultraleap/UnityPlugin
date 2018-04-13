@@ -1,6 +1,6 @@
 /******************************************************************************
  * Copyright (C) Leap Motion, Inc. 2011-2018.                                 *
- * Leap Motion proprietary and  confidential.                                 *
+ * Leap Motion proprietary and confidential.                                  *
  *                                                                            *
  * Use subject to the terms of the Leap Motion SDK Agreement available at     *
  * https://developer.leapmotion.com/sdk_agreement, or another agreement       *
@@ -68,6 +68,16 @@ namespace Leap.Unity {
         AnimationCurve curve = new AnimationCurve();
         curve.AddKey(new Keyframe(0, 1, 0, 0));
         curve.AddKey(new Keyframe(1, 0, 0, 0));
+        return curve;
+      }
+    }
+
+    public static AnimationCurve SigmoidUpDown {
+      get {
+        AnimationCurve curve = new AnimationCurve();
+        curve.AddKey(new Keyframe(0,    0, 0, 0));
+        curve.AddKey(new Keyframe(0.5f, 1, 0, 0));
+        curve.AddKey(new Keyframe(1,    0, 0, 0));
         return curve;
       }
     }

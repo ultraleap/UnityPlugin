@@ -1,16 +1,18 @@
 /******************************************************************************
  * Copyright (C) Leap Motion, Inc. 2011-2018.                                 *
- * Leap Motion proprietary and  confidential.                                 *
+ * Leap Motion proprietary and confidential.                                  *
  *                                                                            *
  * Use subject to the terms of the Leap Motion SDK Agreement available at     *
  * https://developer.leapmotion.com/sdk_agreement, or another agreement       *
  * between Leap Motion and you, your company or other organization.           *
  ******************************************************************************/
 
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace Leap.Unity {
+  using Attributes;
 
   /// <summary>
   /// The LeapServiceProvider provides tracked Leap Hand data and images from the device
@@ -60,14 +62,18 @@ namespace Leap.Unity {
     [SerializeField]
     protected PhysicsExtrapolationMode _physicsExtrapolation = PhysicsExtrapolationMode.Auto;
 
-    [Tooltip("The amount of time (in seconds) to extrapolate the phyiscs data by.")]
+    [Tooltip("The amount of time (in seconds) to extrapolate the physics data by.")]
     [SerializeField]
     protected float _physicsExtrapolationTime = 1.0f / 90.0f;
+
+    [Tooltip("When checked, profiling data from the LeapCSharp worker thread will be used to populate the UnityProfiler.")]
+    [EditTimeOnly]
+    [SerializeField]
+    protected bool _workerThreadProfiling = false;
 
     #endregion
 
     #region Internal Settings & Memory
-
     protected bool _useInterpolation = true;
 
     // Extrapolate on Android to compensate for the latency introduced by its graphics
@@ -94,9 +100,30 @@ namespace Leap.Unity {
     #endregion
 
     #region Edit-time Frame Data
+    
+    private Action<Device> _onDeviceSafe;
+    /// <summary>
+    /// A utility event to get a callback whenever a new device is connected to the service.
+    /// This callback will ALSO trigger a callback upon subscription if a device is already
+    /// connected.
+    /// 
+    /// For situations with multiple devices OnDeviceSafe will be dispatched once for each device.
+    /// </summary>
+    public event Action<Device> OnDeviceSafe {
+      add {
+        if (_leapController != null && _leapController.IsConnected) {
+          foreach (var device in _leapController.Devices) {
+            value(device);
+          }
+        }
+        _onDeviceSafe += value;
+      }
+      remove {
+        _onDeviceSafe -= value;
+      }
+    }
 
     #if UNITY_EDITOR
-
     private Frame _backingUntransformedEditTimeFrame = null;
     private Frame _untransformedEditTimeFrame {
       get {
@@ -216,6 +243,10 @@ namespace Leap.Unity {
     }
 
     protected virtual void Update() {
+      if (_workerThreadProfiling) {
+        LeapProfiling.Update();
+      }
+
 #if UNITY_EDITOR
       if (UnityEditor.EditorApplication.isCompiling) {
         UnityEditor.EditorApplication.isPlaying = false;
@@ -352,13 +383,6 @@ namespace Leap.Unity {
     }
 
     /// <summary>
-    /// Returns information describing the device hardware.
-    /// </summary>
-    public LeapDeviceInfo GetDeviceInfo() {
-      return LeapDeviceInfo.GetLeapDeviceInfo();
-    }
-
-    /// <summary>
     /// Retransforms hand data from Leap space to the space of the Unity transform.
     /// This is only necessary if you're moving the LeapServiceProvider around in a
     /// custom script and trying to access Hand data from it directly afterward.
@@ -394,21 +418,37 @@ namespace Leap.Unity {
 
       _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_DEFAULT);
     }
-    
+
     /// <summary>
     /// Creates an instance of a Controller, initializing its policy flags and
     /// subscribing to its connection event.
     /// </summary>
     protected void createController() {
       if (_leapController != null) {
-        destroyController();
+        return;
       }
 
       _leapController = new Controller();
+      _leapController.Device += (s, e) => {
+        if (_onDeviceSafe != null) {
+          _onDeviceSafe(e.Device);
+        }
+      };
+
       if (_leapController.IsConnected) {
         initializeFlags();
       } else {
         _leapController.Device += onHandControllerConnect;
+      }
+
+      if (_workerThreadProfiling) {
+        //A controller will report profiling statistics for the duration of it's lifetime
+        //so these events will never be unsubscribed from.
+        _leapController.EndProfilingBlock += LeapProfiling.EndProfilingBlock;
+        _leapController.BeginProfilingBlock += LeapProfiling.BeginProfilingBlock;
+
+        _leapController.EndProfilingForThread += LeapProfiling.EndProfilingForThread;
+        _leapController.BeginProfilingForThread += LeapProfiling.BeginProfilingForThread;
       }
     }
     
@@ -428,7 +468,10 @@ namespace Leap.Unity {
 
     protected void onHandControllerConnect(object sender, LeapEventArgs args) {
       initializeFlags();
-      _leapController.Device -= onHandControllerConnect;
+
+      if (_leapController != null) {
+        _leapController.Device -= onHandControllerConnect;
+      }
     }
 
     protected virtual void transformFrame(Frame source, Frame dest) {
