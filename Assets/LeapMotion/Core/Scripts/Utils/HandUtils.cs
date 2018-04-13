@@ -184,6 +184,13 @@ namespace Leap.Unity {
     }
 
     /// <summary>
+    /// Returns a Pose consisting of the tracked hand's palm position and rotation.
+    /// </summary>
+    public static Pose GetPalmPose(this Hand hand) {
+      return new Pose(hand.PalmPosition.ToVector3(), hand.Rotation.ToQuaternion());
+    }
+
+    /// <summary>
     /// Returns the direction the Hand's palm is facing. For the  other two palm-basis
     /// directions, see RadialAxis and DistalAxis.
     /// 

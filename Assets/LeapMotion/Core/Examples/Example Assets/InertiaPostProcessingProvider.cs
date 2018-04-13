@@ -7,63 +7,74 @@
  * between Leap Motion and you, your company or other organization.           *
  ******************************************************************************/
 
+using Leap.Unity.Query;
 using UnityEngine;
+
 namespace Leap.Unity.Examples {
+
   public class InertiaPostProcessingProvider : PostProcessProvider {
-    [Range(0f, 1f)]
-    public float _stiffness = 0.01f;
-    [Range(0f, 1f)]
-    public float _damping = 0.05f;
 
-    private Pose leftHand = Pose.identity,
-                 rightHand = Pose.identity,
-                 previousLeftHand = Pose.identity,
-                 previousRightHand = Pose.identity;
+    [Header("Inertia Settings")]
+    
+    [Range(0f, 1f)]
+    public float stiffness = 0.01f;
 
+    [Range(0f, 1f)]
+    public float damping = 0.05f;
+
+    private Pose _leftPose = Pose.identity;
+    private Pose _rightPose = Pose.identity;
+    private Pose _previousLeftPose = Pose.identity;
+    private Pose _previousRightPose = Pose.identity;
+
+    /// <summary>
+    /// Post-processes the input frame in place to give hands bouncy-feeling physics.
+    /// </summary>
     public override void ProcessFrame(ref Frame inputFrame) {
-      //Record the current pose states of the left and right hands
-      int leftHandId = -1, rightHandId = -1;
-      Pose currentLeftHand = Pose.identity,
-           currentRightHand = Pose.identity;
-      foreach (Hand hand in inputFrame.Hands) {
-        if (hand.IsLeft) {
-          leftHandId = hand.Id;
-          currentLeftHand = new Pose(hand.PalmPosition.ToVector3(),
-                                     hand.Rotation.ToQuaternion());
-          if (hand.TimeVisible == 0f) {
-            leftHand = currentLeftHand;
-            previousLeftHand = currentLeftHand;
-          }
-        } else {
-          rightHandId = hand.Id;
-          currentRightHand = new Pose(hand.PalmPosition.ToVector3(),
-                                      hand.Rotation.ToQuaternion());
-          if (hand.TimeVisible == 0f) {
-            rightHand = currentRightHand;
-            previousRightHand = currentRightHand;
-          }
-        }
-      }
 
-      //Integrate the hands forward in time and apply their transforms to the frame
-      if (leftHandId != -1) {
-        integrateHand(ref leftHand, ref previousLeftHand, currentLeftHand);
-        inputFrame.Hand(leftHandId).SetTransform(leftHand.position, leftHand.rotation);
+      var leftHand = inputFrame.Hands.Query().FirstOrDefault();
+      var rightHand = inputFrame.Hands.Query().FirstOrDefault();
+
+      if (leftHand != null) {
+        var frameLeftPose = leftHand.GetPalmPose();
+
+        if (leftHand.TimeVisible == 0) {
+          // Initialize with no momentum.
+          _leftPose = frameLeftPose;
+          _previousLeftPose = frameLeftPose;
+        }
+        
+        // Integrate hand pose with momentum, targeting the current frame pose.
+        integratePose(ref _leftPose, ref _previousLeftPose,
+                      targetPose: frameLeftPose);
       }
-      if (rightHandId != -1) {
-        integrateHand(ref rightHand, ref previousRightHand, currentRightHand);
-        inputFrame.Hand(rightHandId).SetTransform(rightHand.position, rightHand.rotation);
+      if (rightHand != null) {
+        var frameRightPose = rightHand.GetPalmPose();
+
+        if (rightHand.TimeVisible == 0) {
+          // Initialize with no momentum.
+          _rightPose = frameRightPose;
+          _previousRightPose = frameRightPose;
+        }
+
+        // Integrate hand pose with momentum, targeting the current frame pose.
+        integratePose(ref _rightPose, ref _previousRightPose,
+                      targetPose: frameRightPose);
       }
     }
 
-    //Integrate's the hand's inertia to give it bouncy feeling physics
-    void integrateHand(ref Pose hand, ref Pose previousHand, Pose currentHand) {
-      //Verlet Integration
-      Pose tempHand = hand;
-      hand *= Pose.Lerp(previousHand.inverse * hand, Pose.identity, _damping); //5% damping/frame
-      previousHand = tempHand;
-      //Pull the integrated hand toward the original one a little bit every frame
-      hand = Pose.Lerp(hand, currentHand, _stiffness);
+    /// <summary>
+    /// Integrates curPose's inertia from prevPose to give it bouncy-feeling physics
+    /// while gradually shifting it towards the target pose.
+    /// </summary>
+    private void integratePose(ref Pose curPose, ref Pose prevPose, Pose targetPose) {
+      // Verlet integration onto curPose based on the delta from prevPose.
+      Pose tempPose = curPose;
+      curPose *= Pose.Lerp(prevPose.inverse * curPose, Pose.identity, damping);
+      prevPose = tempPose;
+
+      // Pull the integrated hand toward the original one a little bit every frame.
+      curPose = Pose.Lerp(curPose, targetPose, stiffness);
     }
   }
 }
