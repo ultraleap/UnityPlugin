@@ -67,9 +67,10 @@ namespace Leap.Unity {
       while (providerA is PostProcessProvider) {
         providerB = (providerB as PostProcessProvider).inputLeapProvider;
         if (providerA == providerB) { return true; }
-           else if(!(providerB is PostProcessProvider)) { return false; }
+        else if (!(providerB is PostProcessProvider)) { return false; }
         providerA = (providerA as PostProcessProvider).inputLeapProvider;
         providerB = (providerB as PostProcessProvider).inputLeapProvider;
+        if (!(providerB is PostProcessProvider)) { return false; }
       }
       return false;
     }
