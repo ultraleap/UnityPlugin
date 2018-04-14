@@ -82,11 +82,6 @@ namespace Leap.Unity {
               var newScale = bones[i].transform.localScale;
               newScale.x = boneLen / standardLen;
               bones[i].transform.localScale = newScale;
-              if (this.fingerType == Finger.FingerType.TYPE_INDEX
-                  && this.hand_ != null && this.hand_.IsLeft
-                  && Application.isPlaying) {
-                Debug.Log("Set left index tip bone scale to: " + newScale);
-              }
             }
           }
         }
