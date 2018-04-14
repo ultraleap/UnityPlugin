@@ -21,7 +21,7 @@ namespace Leap.Unity {
   /// the Leap Motion hand model are in the same order in the bones array.
   /// </summary>
   public class RiggedFinger : FingerModel {
-    
+
     /// <summary>
     /// Allows the mesh to be stretched to align with finger joint positions.
     /// Only set to true when mesh is not visible.
@@ -38,24 +38,24 @@ namespace Leap.Unity {
     public Quaternion Reorientation() {
       return Quaternion.Inverse(Quaternion.LookRotation(modelFingerPointing, -modelPalmFacing));
     }
-    
+
     /// <summary> Backing store for s_standardFingertipLengths, don't touch. </summary>
     private static float[] s_backingStandardFingertipLengths = null;
+    static RiggedFinger() {
+      // Calculate standard fingertip lengths.
+      s_backingStandardFingertipLengths = new float[5];
+      var testHand = TestHandFactory.MakeTestHand(isLeft: true,
+                           unitType: TestHandFactory.UnitType.UnityUnits);
+      for (int i = 0; i < 5; i++) {
+        var fingertipBone = testHand.Fingers[i].bones[3];
+        s_backingStandardFingertipLengths[i] = fingertipBone.Length;
+      }
+    }
     /// <summary>
-    /// Lazily-calculated fingertip lengths for the standard edit-time hand.
+    /// Fingertip lengths for the standard edit-time hand.
     /// </summary>
     private static float[] s_standardFingertipLengths {
       get {
-        if (s_backingStandardFingertipLengths == null) {
-          // Calculate standard fingertip lengths.
-          s_backingStandardFingertipLengths = new float[5];
-          var testHand = TestHandFactory.MakeTestHand(isLeft: true,
-                           unitType: TestHandFactory.UnitType.UnityUnits);
-          for (int i = 0; i < 5; i++) {
-            var fingertipBone = testHand.Fingers[i].bones[3];
-            s_backingStandardFingertipLengths[i] = fingertipBone.Length;
-          }
-        }
         return s_backingStandardFingertipLengths;
       }
     }
