@@ -80,12 +80,25 @@ namespace Leap.Unity {
               var boneLen = boneVec.magnitude;
               var standardLen = s_standardFingertipLengths[(int)this.fingerType];
               var newScale = bones[i].transform.localScale;
-              newScale.x = boneLen / standardLen;
+              var lengthComponentIdx = getLargestComponentIndex(modelFingerPointing);
+              newScale[lengthComponentIdx] = boneLen / standardLen;
               bones[i].transform.localScale = newScale;
             }
           }
         }
       }
+    }
+
+    private int getLargestComponentIndex(Vector3 pointingVector) {
+      var largestValue = 0f;
+      var largestIdx = 0;
+      for (int i = 0; i < 3; i++) {
+        var testValue = pointingVector[i];
+        if (testValue > largestValue) {
+          largestIdx = i;
+        }
+      }
+      return largestIdx;
     }
 
     public void SetupRiggedFinger (bool useMetaCarpals) {
