@@ -93,10 +93,7 @@ namespace Leap.Unity.Interaction {
     protected bool _isPressed = false;
     /// <summary> Gets whether the button is currently held down. </summary>
     public bool isPressed { get { return _isPressed; } }
-    /// <summary>
-    /// Deprecated. Use isPressed.
-    /// Gets whether the button is currently held down, even if it's in a good mood.
-    /// </summary>
+    [Obsolete("Deprecated. Use isPressed instead.", false)]
     public bool isDepressed { get { return _isPressed; } }
 
     protected bool _pressedThisFrame = false;
@@ -104,9 +101,7 @@ namespace Leap.Unity.Interaction {
     /// Gets whether the button was pressed during this Update frame.
     /// </summary>
     public bool pressedThisFrame { get { return _pressedThisFrame; } }
-    /// <summary>
-    /// Deprecated. Use pressedThisFrame instead.
-    /// </summary>
+    [Obsolete("Deprecated. Use pressedThisFrame instead.", false)]
     public bool depressedThisFrame { get { return _pressedThisFrame; } }
 
     protected bool _unpressedThisFrame = false;
@@ -114,9 +109,7 @@ namespace Leap.Unity.Interaction {
     /// Gets whether the button was unpressed this frame.
     /// </summary>
     public bool unpressedThisFrame { get { return _unpressedThisFrame; } }
-    /// <summary>
-    /// Deprecated. Use unpressedThisFrame instead.
-    /// </summary>
+    [Obsolete("Deprecated. Use unpressedThisFrame instead.", false)]
     public bool unDepressedThisFrame { get { return _unpressedThisFrame; } }
 
     private float _pressedAmount = 0F;
@@ -127,9 +120,7 @@ namespace Leap.Unity.Interaction {
     /// button.
     /// </summary>
     public float pressedAmount { get { return _pressedAmount; } }
-    /// <summary>
-    /// Deprecated. Same as "pressedAmount", but more sorrowful.
-    /// </summary>
+    [Obsolete("Deprecated. Use pressedAmount instead.", false)]
     public float depressedAmount { get { return _pressedAmount; } }
 
 
@@ -490,7 +481,7 @@ namespace Leap.Unity.Interaction {
     public void SetMinHeight(float minHeight) {
       minMaxHeight = new Vector2(Mathf.Min(minMaxHeight.y, minHeight), minMaxHeight.y);
     }
-    /// <summary> Deprecated. Use SetMinHeight instead. </summary>
+    [Obsolete("Deprecated. Use SetMinHeight instead.", false)]
     public void setMinHeight(float minHeight) {
       SetMinHeight(minHeight);
     }
@@ -503,7 +494,7 @@ namespace Leap.Unity.Interaction {
     public void SetMaxHeight(float maxHeight) {
       minMaxHeight = new Vector2(minMaxHeight.x, Mathf.Max(minMaxHeight.x, maxHeight));
     }
-    /// <summary> Deprecated. Use SetMaxHeight instead. </summary>
+    [Obsolete("Deprecated. Use SetMaxHeight instead.", false)]
     public void setMaxHeight(float maxHeight) {
       SetMaxHeight(maxHeight);
     }
