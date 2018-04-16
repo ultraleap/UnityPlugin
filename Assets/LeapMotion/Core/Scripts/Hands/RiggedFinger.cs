@@ -91,6 +91,7 @@ namespace Leap.Unity {
         var testValue = pointingVector[i];
         if (Mathf.Abs(testValue) > largestValue) {
           largestIdx = i;
+          largestValue = Mathf.Abs(testValue);
         }
       }
       return largestIdx;
