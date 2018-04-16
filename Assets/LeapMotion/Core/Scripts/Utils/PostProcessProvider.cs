@@ -22,7 +22,7 @@ namespace Leap.Unity {
     public LeapProvider inputLeapProvider {
       get { return _inputLeapProvider; }
       set {
-        if (_inputLeapProvider != null) {
+        if (Application.isPlaying && _inputLeapProvider != null) {
           _inputLeapProvider.OnFixedFrame -= processFixedFrame;
           _inputLeapProvider.OnUpdateFrame -= processUpdateFrame;
         }
@@ -30,7 +30,7 @@ namespace Leap.Unity {
         _inputLeapProvider = value;
         validateInput();
 
-        if (_inputLeapProvider != null) {
+        if (Application.isPlaying && _inputLeapProvider != null) {
           _inputLeapProvider.OnFixedFrame -= processFixedFrame; // safeguard double-subscription
           _inputLeapProvider.OnFixedFrame += processFixedFrame;
           _inputLeapProvider.OnUpdateFrame -= processUpdateFrame; // safeguard double-subscription
@@ -75,18 +75,8 @@ namespace Leap.Unity {
     }
 
     protected virtual void OnEnable() {
-      if (_inputLeapProvider == null) {
-        var staticProvider = Hands.Provider;
-        if (staticProvider != this) {
-          _inputLeapProvider = staticProvider;
-        }
-      }
-
-      _inputLeapProvider.OnUpdateFrame -= processUpdateFrame;
-      _inputLeapProvider.OnUpdateFrame += processUpdateFrame;
-
-      _inputLeapProvider.OnFixedFrame -= processFixedFrame;
-      _inputLeapProvider.OnFixedFrame += processFixedFrame;
+      // Bootstrap event subscription, handled in the input property setter.
+      inputLeapProvider = _inputLeapProvider;
     }
 
     protected virtual void OnValidate() {
