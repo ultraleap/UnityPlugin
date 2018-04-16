@@ -837,18 +837,21 @@ namespace Leap.Unity.Interaction {
     /// Stores data for implementing Soft Contact for interaction controllers.
     /// </summary>
     [NonSerialized]
-    public List<PhysicsUtility.SoftContact> _softContacts = new List<PhysicsUtility.SoftContact>(80);
+    public List<PhysicsUtility.SoftContact> _softContacts
+      = new List<PhysicsUtility.SoftContact>(80);
 
     /// <summary>
     /// Stores data for implementing Soft Contact for interaction controllers.
     /// </summary>
     [NonSerialized]
-    public Dictionary<Rigidbody, PhysicsUtility.Velocities> _softContactOriginalVelocities = new Dictionary<Rigidbody, PhysicsUtility.Velocities>(5);
+    public Dictionary<Rigidbody, PhysicsUtility.Velocities> _softContactOriginalVelocities
+      = new Dictionary<Rigidbody, PhysicsUtility.Velocities>(5);
 
     /// <summary>
     /// Stores data for drawing Soft Contacts for interaction controllers.
     /// </summary>
-    private List<PhysicsUtility.SoftContact> _softContactsToDraw;
+    private List<PhysicsUtility.SoftContact> _softContactsToDraw
+      = new List<PhysicsUtility.SoftContact>();
 
     #endregion
 
