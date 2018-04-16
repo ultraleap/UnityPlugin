@@ -75,8 +75,11 @@ namespace Leap.Unity {
     }
 
     protected virtual void OnEnable() {
-      if (_inputLeapProvider == null && Hands.Provider != this) {
-        _inputLeapProvider = Hands.Provider;
+      if (_inputLeapProvider == null) {
+        var staticProvider = Hands.Provider;
+        if (staticProvider != this) {
+          _inputLeapProvider = staticProvider;
+        }
       }
 
       _inputLeapProvider.OnUpdateFrame -= processUpdateFrame;
