@@ -86,8 +86,12 @@ namespace Leap.Unity {
     }
 
     public Quaternion Reorientation() {
+      if (modelFingerPointing == Vector3.zero || modelPalmFacing == Vector3.zero) {
+        return Quaternion.identity;
+      }
       return Quaternion.Inverse(Quaternion.LookRotation(modelFingerPointing, -modelPalmFacing));
     }
+
     public override void UpdateHand() {
       if (palm != null) {
         if (ModelPalmAtLeapWrist) {
