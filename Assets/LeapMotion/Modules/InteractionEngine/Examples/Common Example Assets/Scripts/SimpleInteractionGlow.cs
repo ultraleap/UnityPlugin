@@ -87,7 +87,7 @@ public class SimpleInteractionGlow : MonoBehaviour {
 
       // We can also check the depressed-or-not-depressed state of InteractionButton objects
       // and assign them a unique color in that case.
-      if (_intObj is InteractionButton && (_intObj as InteractionButton).isDepressed) {
+      if (_intObj is InteractionButton && (_intObj as InteractionButton).isPressed) {
         targetColor = pressedColor;
       }
 
