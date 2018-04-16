@@ -22,14 +22,13 @@ namespace Leap.Unity {
     public LeapProvider inputLeapProvider {
       get { return _inputLeapProvider; }
       set {
-        validateInput();
-
         if (_inputLeapProvider != null) {
           _inputLeapProvider.OnFixedFrame -= processFixedFrame;
           _inputLeapProvider.OnUpdateFrame -= processUpdateFrame;
         }
 
         _inputLeapProvider = value;
+        validateInput();
 
         if (_inputLeapProvider != null) {
           _inputLeapProvider.OnFixedFrame -= processFixedFrame; // safeguard double-subscription
