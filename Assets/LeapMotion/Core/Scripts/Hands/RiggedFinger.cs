@@ -39,24 +39,19 @@ namespace Leap.Unity {
       return Quaternion.Inverse(Quaternion.LookRotation(modelFingerPointing, -modelPalmFacing));
     }
 
-    /// <summary> Backing store for s_standardFingertipLengths, don't touch. </summary>
-    private static float[] s_backingStandardFingertipLengths = null;
+
+    /// <summary>
+    /// Fingertip lengths for the standard edit-time hand.
+    /// </summary>
+    private static float[] s_standardFingertipLengths = null;
     static RiggedFinger() {
       // Calculate standard fingertip lengths.
-      s_backingStandardFingertipLengths = new float[5];
+      s_standardFingertipLengths = new float[5];
       var testHand = TestHandFactory.MakeTestHand(isLeft: true,
                            unitType: TestHandFactory.UnitType.UnityUnits);
       for (int i = 0; i < 5; i++) {
         var fingertipBone = testHand.Fingers[i].bones[3];
-        s_backingStandardFingertipLengths[i] = fingertipBone.Length;
-      }
-    }
-    /// <summary>
-    /// Fingertip lengths for the standard edit-time hand.
-    /// </summary>
-    private static float[] s_standardFingertipLengths {
-      get {
-        return s_backingStandardFingertipLengths;
+        s_standardFingertipLengths[i] = fingertipBone.Length;
       }
     }
 
