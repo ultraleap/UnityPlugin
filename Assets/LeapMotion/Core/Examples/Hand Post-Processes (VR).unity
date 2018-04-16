@@ -588,7 +588,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   editTimePose: 0
   _inputLeapProvider: {fileID: 1267071315}
-  dataUpdateMode: 0
+  dataUpdateMode: 2
   passthroughOnly: 0
   stiffness: 2
   damping: 3

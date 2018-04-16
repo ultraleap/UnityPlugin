@@ -24,13 +24,21 @@ namespace Leap.Unity.Examples {
     [Range(0f, 10f)]
     public float damping = 2f;
     
+    // Update-time Hand Data
     private Pose? _leftPose = null;
     private Pose? _previousLeftPose = null;
     private float _leftAge = 0f;
-
     private Pose? _rightPose = null;
     private Pose? _previousRightPose = null;
     private float _rightAge = 0f;
+
+    // FixedUpdate-time Hand Data
+    private Pose? _fixedLeftPose = null;
+    private Pose? _fixedPreviousLeftPose = null;
+    private float _fixedLeftAge = 0f;
+    private Pose? _fixedRightPose = null;
+    private Pose? _fixedPreviousRightPose = null;
+    private float _fixedRightAge = 0f;
 
     /// <summary>
     /// Post-processes the input frame in place to give hands bouncy-feeling physics.
@@ -39,8 +47,29 @@ namespace Leap.Unity.Examples {
       var leftHand = inputFrame.Hands.Query().FirstOrDefault(h => h.IsLeft);
       var rightHand = inputFrame.Hands.Query().FirstOrDefault(h => !h.IsLeft);
 
-      processHand(leftHand, ref _leftPose, ref _previousLeftPose, ref _leftAge);
-      processHand(rightHand, ref _rightPose, ref _previousRightPose, ref _rightAge);
+      // Frames can potentially come from two time-interwoven sources: Update frames
+      // and FixedUpdate frames. Time is not monotonically increasing frame-to-frame
+      // because FixedUpdates and Updates interweave and occasionally FixedUpdate plays
+      // catch-up, and we interpolate hand data accordingly further up the hand pipeline,
+      // which affects the hand.TimeVisible property we use to simulate our effect
+      // statefully over time.
+      //
+      // To support both Update-time hand data and FixedUpdate-time hand data with a
+      // single stateful post-process, we maintain two independent states for each stream,
+      // which, independently, _are_ going to be monotonically forward-moving in time.
+      if (Time.inFixedTimeStep) {
+        // FixedUpdate hand data.
+        processHand(leftHand,
+          ref _fixedLeftPose, ref _fixedPreviousLeftPose, ref _fixedLeftAge);
+        processHand(rightHand,
+          ref _fixedRightPose, ref _fixedPreviousRightPose, ref _fixedRightAge);
+      }
+      else {
+        // Update hand data.
+        processHand(leftHand, ref _leftPose, ref _previousLeftPose, ref _leftAge);
+        processHand(rightHand, ref _rightPose, ref _previousRightPose, ref _rightAge);
+      }
+
     }
     
     private void processHand(Hand hand,
@@ -71,14 +100,10 @@ namespace Leap.Unity.Examples {
 
           // Calculate how much time has passed since we last received hand data.
           // 
-          // We can't actually assume leftHand.TimeVisible is monotonically increasing,
-          // because there are independent hand data streams to account for the timing
-          // differences of Update() and FixedUpdate()!
-          // 
-          // This is addressed by using the data mode setting so that one stream or the
-          // other is selected, but some stateless post-processes may want to always
-          // run every frame no matter what, so as a safety measure, we ensure deltaTime
-          // is positive before running our stateful filter to give the hand momentum.
+          // As a safety measure, we ensure deltaTime is positive before running our
+          // stateful filter to give the hand momentum. Any post-process could mess with
+          // the TimeVisible property, so we do this to minimize the chance of total
+          // havok.
           var deltaTime = hand.TimeVisible - handAge;
           if (deltaTime > 0) {
             handAge = hand.TimeVisible;
