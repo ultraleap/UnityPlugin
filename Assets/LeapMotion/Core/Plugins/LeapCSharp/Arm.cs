@@ -9,38 +9,25 @@
 
 namespace Leap {
   using System;
-  using System.Runtime.InteropServices;
 
-  /**
-   * The Arm class represents the forearm.
-   *
-   */
+  /// <summary>
+  /// The Arm class represents the forearm.
+  /// </summary>
   [Serializable]
-  public class Arm : Bone {
+  public class Arm : Bone, IEquatable<Arm> {
 
-    /**
-     * Constructs a default Arm object.
-     *
-     * Get valid Arm objects from a Hand object.
-     *
-     * \include Arm_get.txt
-     *
-     * @since 2.0.3
-     */
+    /// <summary>
+    /// Constructs a default Arm object.
+    /// Get valid Arm objects from a Hand object.
+    /// 
+    /// @since 2.0.3
+    /// </summary>
     public Arm() : base() { }
 
-    /**
-     * Constructs a new Arm object.
-     *
-     * @param elbow The position of the elbow.
-     * @param wrist The position of the wrist.
-     * @param center The position of the midpoint between the elbow and wrist.
-     * @param direction The unit direction vector from elbow to wrist.
-     * @param length The distance between elbow and wrist in millimeters.
-     * @param width The estimated average width of the arm.
-     * @param basis The basis matrix representing the orientation of the arm.
-     * @since 3.0
-     */
+    /// <summary>
+    /// Constructs a new Arm object. 
+    /// @since 3.0 
+    /// </summary>
     public Arm(Vector elbow,
                Vector wrist,
                Vector center,
@@ -57,59 +44,46 @@ namespace Leap {
              BoneType.TYPE_METACARPAL, //ignored for arms
              rotation) { }
 
-    /**
-     * Compare Arm object equality.
-     *
-     * \include Arm_operator_equals.txt
-     *
-     * Two Arm objects are equal if and only if both Arm objects represent the
-     *
-     * exact same physical arm in the same frame and both Arm objects are valid.
-     * @since 2.0.3
-     */
+    /// <summary>
+    /// Compare Arm object equality.
+    /// Two Arm objects are equal if and only if both Arm objects represent the
+    /// exact same physical arm in the same frame and both Arm objects are valid.
+    /// @since 2.0.3
+    /// </summary>
     public bool Equals(Arm other) {
-      return base.Equals(other as Bone);
+      return Equals(other as Bone);
     }
 
-    /**
-     * A string containing a brief, human readable description of the Arm object.
-     *
-     * \include Arm_toString.txt
-     *
-     * @returns A description of the Arm object as a string.
-     * @since 2.0.3
-     */
+    /// <summary>
+    /// A string containing a brief, human readable description of the Arm object.
+    /// @since 2.0.3
+    /// </summary>
     public override string ToString() {
       return "Arm";
     }
 
-    /**
-     * The position of the elbow.
-     *
-     * \include Arm_elbowPosition.txt
-     *
-     * If not in view, the elbow position is estimated based on typical human
-     * anatomical proportions.
-     *
-     * @since 2.0.3
-     */
+    /// <summary>
+    /// The position of the elbow.
+    /// If not in view, the elbow position is estimated based on typical human
+    /// anatomical proportions.
+    /// 
+    /// @since 2.0.3
+    /// </summary>
     public Vector ElbowPosition {
       get {
         return base.PrevJoint;
       }
     }
 
-    /**
-     * The position of the wrist.
-     *
-     * \include Arm_wristPosition.txt
-     *
-     * Note that the wrist position is not collocated with the end of any bone in
-     * the hand. There is a gap of a few centimeters since the carpal bones are
-     * not included in the skeleton model.
-     *
-     * @since 2.0.3
-     */
+    /// <summary>
+    /// The position of the wrist.
+    /// 
+    /// Note that the wrist position is not collocated with the end of any bone in
+    /// the hand. There is a gap of a few centimeters since the carpal bones are
+    /// not included in the skeleton model.
+    /// 
+    /// @since 2.0.3
+    /// </summary>
     public Vector WristPosition {
       get {
         return base.NextJoint;
