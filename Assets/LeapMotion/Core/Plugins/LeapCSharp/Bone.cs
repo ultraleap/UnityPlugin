@@ -10,45 +10,35 @@
 namespace Leap {
   using System;
 
-  /**
-   * The Bone class represents a tracked bone.
-   *
-   * All fingers contain 4 bones that make up the anatomy of the finger.
-   * Get valid Bone objects from a Finger object.
-   *
-   * Bones are ordered from base to tip, indexed from 0 to 3.  Additionally, the
-   * bone's Type enum may be used to index a specific bone anatomically.
-   *
-   * \include Bone_iteration.txt
-   *
-   * The thumb does not have a base metacarpal bone and therefore contains a valid,
-   * zero length bone at that location.
-   * @since 2.0
-   */
+  /// <summary>
+  /// The Bone class represents a tracked bone.
+  /// 
+  /// All fingers contain 4 bones that make up the anatomy of the finger.
+  /// Get valid Bone objects from a Finger object.
+  /// 
+  /// Bones are ordered from base to tip, indexed from 0 to 3.  Additionally, the
+  /// bone's Type enum may be used to index a specific bone anatomically.
+  /// 
+  /// The thumb does not have a base metacarpal bone and therefore contains a valid,
+  /// zero length bone at that location.
+  /// @since 2.0
+  /// </summary>
   [Serializable]
-  public class Bone {
-    /**
-     * Constructs a default Bone object.
-     *
-     * @since 2.0
-     */
+  public class Bone : IEquatable<Bone> {
+
+    /// <summary>
+    /// Constructs a default invalid Bone object.
+    /// 
+    /// @since 2.0
+    /// </summary>
     public Bone() {
       Type = BoneType.TYPE_INVALID;
     }
 
-    /**
-     * Constructs a new Bone object.
-     *
-     * @param prevJoint The proximal end of the bone (closest to the body)
-     * @param nextJoint The distal end of the bone (furthest from the body)
-     * @param center The midpoint of the bone
-     * @param direction The unit direction vector pointing from prevJoint to nextJoint.
-     * @param length The estimated length of the bone.
-     * @param width The estimated average width of the bone.
-     * @param type The type of finger bone.
-     * @param basis The matrix representing the orientation of the bone.
-     * @since 3.0
-     */
+    /// <summary>
+    /// Constructs a new Bone object.
+    /// @since 3.0
+    /// </summary>
     public Bone(Vector prevJoint,
                 Vector nextJoint,
                 Vector center,
@@ -67,155 +57,115 @@ namespace Leap {
       Type = type;
     }
 
-    /**
-     * Compare Bone object equality.
-     *
-     * Two Bone objects are equal if and only if both Bone objects represent the
-     * exact same physical bone in the same frame and both Bone objects are valid.
-     * @since 2.0
-     */
+    /// <summary>
+    /// Compare Bone object equality.
+    /// 
+    /// Two Bone objects are equal if and only if both Bone objects represent the
+    /// exact same physical bone in the same frame and both Bone objects are valid.
+    /// @since 2.0
+    /// </summary>
     public bool Equals(Bone other) {
       return Center == other.Center && Direction == other.Direction && Length == other.Length;
     }
 
-    /**
-     * A string containing a brief, human readable description of the Bone object.
-     *
-     * \include Bone_toString.txt
-     *
-     * @returns A description of the Bone object as a string.
-     * @since 2.0
-     */
+    /// <summary>
+    /// A string containing a brief, human readable description of the Bone object.
+    /// @since 2.0
+    /// </summary>
     public override string ToString() {
       return Enum.GetName(typeof(BoneType), this.Type) + " bone";
     }
 
-    /**
-     * The base of the bone, closest to the wrist.
-     *
-     * In anatomical terms, this is the proximal end of the bone.
-     * \include Bone_prevJoint.txt
-     *
-     * @returns The Vector containing the coordinates of the previous joint position.
-     * @since 2.0
-     */
+    /// <summary>
+    /// The base of the bone, closest to the wrist.
+    /// In anatomical terms, this is the proximal end of the bone.
+    /// @since 2.0
+    /// </summary>
     public Vector PrevJoint;
 
-    /**
-     * The end of the bone, closest to the finger tip.
-     *
-     * In anatomical terms, this is the distal end of the bone.
-     *
-     * \include Bone_nextJoint.txt
-     *
-     * @returns The Vector containing the coordinates of the next joint position.
-     * @since 2.0
-     */
+    /// <summary>
+    /// The end of the bone, closest to the finger tip.
+    /// In anatomical terms, this is the distal end of the bone.
+    /// @since 2.0
+    /// </summary>
     public Vector NextJoint;
 
-    /**
-     * The midpoint of the bone.
-     *
-     * \include Bone_center.txt
-     *
-     * @returns The midpoint in the center of the bone.
-     * @since 2.0
-     */
+    /// <summary>
+    /// The midpoint of the bone. 
+    /// @since 2.0 
+    /// </summary>
     public Vector Center;
 
-    /**
-     * The normalized direction of the bone from base to tip.
-     *
-     * \include Bone_direction.txt
-     *
-     * @returns The normalized direction of the bone from base to tip.
-     * @since 2.0
-     */
+    /// <summary>
+    /// The normalized direction of the bone from base to tip.
+    /// @since 2.0
+    /// </summary>
     public Vector Direction;
 
-    /**
-     * The estimated length of the bone in millimeters.
-     *
-     * \include Bone_length.txt
-     *
-     * @returns The length of the bone in millimeters.
-     * @since 2.0
-     */
+    /// <summary>
+    /// The estimated length of the bone.
+    /// @since 2.0
+    /// </summary>
     public float Length;
 
-    /**
-     * The average width of the flesh around the bone in millimeters.
-     *
-     * \include Bone_width.txt
-     *
-     * @returns The width of the flesh around the bone in millimeters.
-     * @since 2.0
-     */
+    /// <summary>
+    /// The average width of the flesh around the bone.
+    /// @since 2.0
+    /// </summary>
     public float Width;
 
-    /**
-     * The name of this bone.
-     *
-     * \include Bone_type.txt
-     *
-     * @returns The anatomical type of this bone as a member of the Bone::Type
-     * enumeration.
-     * @since 2.0
-     */
-    public Bone.BoneType Type;
+    /// <summary>
+    /// The type of this bone.
+    /// @since 2.0
+    /// </summary>
+    public BoneType Type;
 
-    /**
-     * The orientation of this Bone as a Quaternion.
-     *
-     * @returns The Quaternion.
-     * @since 2.0
-     */
+    /// <summary>
+    /// The orientation of this Bone as a Quaternion.
+    /// @since 2.0
+    /// </summary>
     public LeapQuaternion Rotation;
 
-    /**
-     * The orthonormal basis vectors for this Bone as a Matrix.
-     * The orientation of this Bone as a Quaternion.
-     *
-     * Basis vectors specify the orientation of a bone.
-     *
-     * **xBasis** Perpendicular to the longitudinal axis of the
-     *   bone; exits the sides of the finger.
-     *
-     * **yBasis or up vector** Perpendicular to the longitudinal
-     *   axis of the bone; exits the top and bottom of the finger. More positive
-     *   in the upward direction.
-     *
-     * **zBasis** Aligned with the longitudinal axis of the bone.
-     *   More positive toward the base of the finger.
-     *
-     * The bases provided for the right hand use the right-hand rule; those for
-     * the left hand use the left-hand rule. Thus, the positive direction of the
-     * x-basis is to the right for the right hand and to the left for the left
-     * hand. You can change from right-hand to left-hand rule by multiplying the
-     * z basis vector by -1.
-     *
-     * You can use the basis vectors for such purposes as measuring complex
-     * finger poses and skeletal animation.
-     *
-     * Note that converting the basis vectors directly into a quaternion
-     * representation is not mathematically valid. If you use quaternions,
-     * create them from the derived rotation matrix not directly from the bases.
-     *
-     * \include Bone_basis.txt
-     *
-     * @returns The basis of the bone as a matrix.
-     * @returns The Quaternion.
-     * @since 2.0
-     */
+    /// <summary>
+    /// The orthonormal basis vectors for this Bone as a Matrix.
+    /// The orientation of this Bone as a Quaternion.
+    /// 
+    /// Basis vectors specify the orientation of a bone.
+    /// 
+    /// **xBasis** Perpendicular to the longitudinal axis of the
+    ///   bone; exits the sides of the finger.
+    /// 
+    /// **yBasis or up vector** Perpendicular to the longitudinal
+    ///   axis of the bone; exits the top and bottom of the finger. More positive
+    ///   in the upward direction.
+    /// 
+    /// **zBasis** Aligned with the longitudinal axis of the bone.
+    ///   More positive toward the base of the finger.
+    /// 
+    /// The bases provided for the right hand use the right-hand rule; those for
+    /// the left hand use the left-hand rule. Thus, the positive direction of the
+    /// x-basis is to the right for the right hand and to the left for the left
+    /// hand. You can change from right-hand to left-hand rule by multiplying the
+    /// z basis vector by -1.
+    /// 
+    /// You can use the basis vectors for such purposes as measuring complex
+    /// finger poses and skeletal animation.
+    /// 
+    /// Note that converting the basis vectors directly into a quaternion
+    /// representation is not mathematically valid. If you use quaternions,
+    /// create them from the derived rotation matrix not directly from the bases.
+    /// 
+    /// @since 2.0
+    /// </summary>
     public LeapTransform Basis { get { return new LeapTransform(PrevJoint, Rotation); } }
 
-    /**
-     * Enumerates the names of the bones.
-     *
-     * Members of this enumeration are returned by Bone::type() to identify a
-     * Bone object.
-     * @since 2.0
-     */
+    /// <summary>
+    /// Enumerates the type of bones.
+    /// 
+    /// Members of this enumeration are returned by Bone.Type() to identify a
+    /// Bone object.
+    /// @since 2.0
+    /// </summary>
     public enum BoneType {
       TYPE_INVALID = -1,
       TYPE_METACARPAL = 0,
