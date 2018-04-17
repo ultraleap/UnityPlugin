@@ -45,8 +45,8 @@ namespace Leap.Unity.Interaction {
           }
           restingHeight = isToggled ? toggledRestingHeight : _originalRestingHeight;
           rigidbody.WakeUp();
-          depressedThisFrame = value;
-          unDepressedThisFrame = !value;
+          _pressedThisFrame = value;
+          _unpressedThisFrame = !value;
         }
       }
     }

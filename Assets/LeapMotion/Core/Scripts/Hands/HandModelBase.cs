@@ -67,7 +67,9 @@ namespace Leap.Unity {
         //First try to get the provider from a parent HandModelManager
         if (transform.parent != null) {
           var manager = transform.parent.GetComponent<HandModelManager>();
-          provider = manager.leapProvider;
+          if (manager != null) {
+            provider = manager.leapProvider;
+          }
         }
 
         //If not found, use any old provider from the Hands.Provider getter
