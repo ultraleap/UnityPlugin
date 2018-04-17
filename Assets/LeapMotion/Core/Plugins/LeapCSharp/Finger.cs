@@ -10,32 +10,25 @@
 namespace Leap {
   using System;
 
-  /**
-   * The Finger class represents a tracked finger.
-   *
-   * Fingers are objects that the Leap Motion software has classified as a finger.
-   * Get valid Finger objects from a Frame or a Hand object.
-   *
-   * Fingers may be permanently associated to a hand. In this case the angular order of the finger IDs
-   * will be invariant. As fingers move in and out of view it is possible for the guessed ID
-   * of a finger to be incorrect. Consequently, it may be necessary for finger IDs to be
-   * exchanged. All tracked properties, such as velocity, will remain continuous in the API.
-   * However, quantities that are derived from the API output (such as a history of positions)
-   * will be discontinuous unless they have a corresponding ID exchange.
-   * @since 1.0
-   */
+  /// <summary>
+  /// The Finger class represents a tracked finger.
+  /// 
+  /// Fingers are objects that the Leap Motion software has classified as a finger.
+  /// Get valid Finger objects from a Frame or a Hand object.
+  /// @since 1.0
+  /// </summary>
   [Serializable]
   public class Finger {
     public Bone[] bones = new Bone[4];
 
-    /**
-     * Constructs a finger.
-     *
-     * An uninitialized finger is considered invalid.
-     * Get valid Finger objects from a Hand object.
-     *
-     * @since 3.0
-     */
+    /// <summary>
+    /// Constructs a finger.
+    /// 
+    /// An uninitialized finger is considered invalid.
+    /// Get valid Finger objects from a Hand object.
+    /// 
+    /// @since 3.0
+    /// </summary>
     public Finger() {
       bones[0] = new Bone();
       bones[1] = new Bone();
@@ -43,31 +36,14 @@ namespace Leap {
       bones[3] = new Bone();
     }
 
-    /**
-     * Constructs a finger.
-     *
-     * Generally, you should not create your own finger objects. Such objects will not
-     * have valid tracking data. Get valid finger objects from a hand in a frame
-     * received from the service.
-     *
-     * @param frameId The id of the frame this finger appears in.
-     * @param handId The id of the hand this finger belongs to.
-     * @param fingerId The id of this finger (handId + 0-4 for finger position).
-     * @param timeVisible How long this instance of the finger has been visible.
-     * @param tipPosition The position of the finger tip.
-     * @param tipVelocity The velocity of the finger tip.
-     * @param direction The pointing direction of the finger.
-     * @param stabilizedTipPosition The stabilized tip position.
-     * @param width The average width of the finger.
-     * @param length The length of the finger.
-     * @param isExtended Whether the finger is more-or-less straight.
-     * @param type The finger name.
-     * @param metacarpal The first bone of the finger (inside the hand).
-     * @param proximal The second bone of the finger
-     * @param intermediate The third bone of the finger.
-     * @param distal The end bone.
-     * @since 3.0
-     */
+    /// <summary>
+    /// Constructs a finger.
+    /// 
+    /// Generally, you should not create your own finger objects. Such objects will not
+    /// have valid tracking data. Get valid finger objects from a hand in a frame
+    /// received from the service.
+    /// @since 3.0
+    /// </summary>
     public Finger(long frameId,
                  int handId,
                  int fingerId,
@@ -101,186 +77,121 @@ namespace Leap {
       TimeVisible = timeVisible;
     }
 
-    /**
-     * The bone at a given bone index on this finger.
-     *
-     * \include Bone_iteration.txt
-     *
-     * @param boneIx An index value from the Bone::Type enumeration identifying the
-     * bone of interest.
-     * @returns The Bone that has the specified bone type.
-     * @since 2.0
-     */
+    /// <summary>
+    /// The bone at a given bone index on this finger.
+    /// @since 2.0
+    /// </summary>
     public Bone Bone(Bone.BoneType boneIx) {
       return bones[(int)boneIx];
     }
 
-    /**
-     * A string containing a brief, human readable description of the Finger object.
-     *
-     * \include Finger_toString.txt
-     *
-     * @returns A description of the Finger object as a string.
-     * @since 1.0
-     */
+    /// <summary>
+    /// A string containing a brief, human readable description of the Finger object.
+    /// @since 1.0
+    /// </summary>
     public override string ToString() {
       return Enum.GetName(typeof(FingerType), Type) + " id:" + Id;
     }
 
-    /**
-     * The name of this finger.
-     *
-     * \include Finger_type.txt
-     *
-     * @returns The anatomical type of this finger as a member of the Finger::Type
-     * enumeration.
-     * @since 2.0
-     */
+    /// <summary>
+    /// The type of this finger.
+    /// @since 2.0
+    /// </summary>
     public Finger.FingerType Type;
 
-    /**
-     * A unique ID assigned to this Finger object, whose value remains the
-     * same across consecutive frames while the tracked finger or tool remains
-     * visible. If tracking is lost (for example, when a finger is occluded by
-     * another finger or when it is withdrawn from the Leap Motion Controller field of view), the
-     * Leap Motion software may assign a new ID when it detects the entity in a future frame.
-     *
-     * \include Finger_id.txt
-     *
-     * Use the ID value with the Frame::pointable() function to find this
-     * Finger object in future frames.
-     *
-     * IDs should be from 1 to 100 (inclusive). If more than 100 objects are tracked
-     * an IDs of -1 will be used until an ID in the defined range is available.
-     *
-     * @returns The ID assigned to this Finger object.
-     * @since 1.0
-     */
+    /// <summary>
+    /// A unique ID assigned to this Finger object, whose value remains the
+    /// same across consecutive frames while the tracked hand remains visible. 
+    /// If tracking of the hand is lost, the Leap Motion software may assign a 
+    /// new ID when it detects the hand in a future frame.
+    /// 
+    /// Use the ID value to find this Finger object in future frames.
+    /// 
+    /// IDs should be from 1 to 100 (inclusive). If more than 100 objects are tracked
+    /// an IDs of -1 will be used until an ID in the defined range is available.
+    /// 
+    /// @since 1.0
+    /// </summary>
     public int Id;
 
-    /**
-     * The Hand associated with a finger.
-     *
-     * \include Finger_hand.txt
-     *
-     * Not that in version 2+, tools are not associated with hands. For
-     * tools, this function always returns an invalid Hand object.
-     *
-     * @returns The associated Hand object, if available; otherwise,
-     * an invalid Hand object is returned.
-     * @since 1.0
-     */
+    /// <summary>
+    /// The Hand associated with a finger.
+    /// @since 1.0
+    /// </summary>
     public int HandId;
 
-    /**
-     * The tip position in millimeters from the Leap Motion origin.
-     *
-     * \include Finger_tipPosition.txt
-     *
-     * @returns The Vector containing the coordinates of the tip position.
-     * @since 1.0
-     */
+    /// <summary>
+    /// The tip position of this Finger.
+    /// @since 1.0
+    /// </summary>
     public Vector TipPosition;
 
-    /**
-     * The rate of change of the tip position in millimeters/second.
-     *
-     * \include Finger_tipVelocity.txt
-     *
-     * @returns The Vector containing the coordinates of the tip velocity.
-     * @since 1.0
-     */
+    /// <summary>
+    /// The rate of change of the tip position of this finger.
+    /// @since 1.0
+    /// </summary>
     public Vector TipVelocity;
 
-    /**
-     * The direction in which this finger or tool is pointing.
-     *
-     * \include Finger_direction.txt
-     *
-     * The direction is expressed as a unit vector pointing in the same
-     * direction as the tip.
-     *
-     * \image html images/Leap_Finger_Model.png
-     *
-     * @returns The Vector pointing in the same direction as the tip of this
-     * Finger object.
-     * @since 1.0
-     */
+    /// <summary>
+    /// The direction in which this finger or tool is pointing. The direction is expressed 
+    /// as a unit vector pointing in the same direction as the tip.
+    /// @since 1.0
+    /// </summary>
     public Vector Direction;
 
-    /**
-     * The estimated width of the finger or tool in millimeters.
-     *
-     * \include Finger_width.txt
-     *
-     * @returns The estimated width of this Finger object.
-     * @since 1.0
-     */
+    /// <summary>
+    /// The estimated width of the finger.
+    /// @since 1.0
+    /// </summary>
     public float Width;
 
-    /**
-     * The estimated length of the finger or tool in millimeters.
-     *
-     * \include Finger_length.txt
-     *
-     * @returns The estimated length of this Finger object.
-     * @since 1.0
-     */
+    /// <summary>
+    /// The estimated length of the finger.
+    /// @since 1.0
+    /// </summary>
     public float Length;
 
-    /**
-     * Whether or not this Finger is in an extended posture.
-     *
-     * A finger is considered extended if it is extended straight from the hand as if
-     * pointing. A finger is not extended when it is bent down and curled towards the
-     * palm.  Tools are always extended.
-     *
-     * \include Finger_isExtended.txt
-     *
-     * @returns True, if the pointable is extended.
-     * @since 2.0
-     */
+    /// <summary>
+    /// Whether or not this Finger is in an extended posture.
+    /// 
+    /// A finger is considered extended if it is extended straight from the hand as if
+    /// pointing. A finger is not extended when it is bent down and curled towards the
+    /// palm.
+    /// 
+    /// @since 2.0
+    /// </summary>
     public bool IsExtended;
 
-    /**
-     * The stabilized tip position of this Finger.
-     *
-     * Smoothing and stabilization is performed in order to make
-     * this value more suitable for interaction with 2D content. The stabilized
-     * position lags behind the tip position by a variable amount, depending
-     * primarily on the speed of movement.
-     *
-     * \include Finger_stabilizedTipPosition.txt
-     *
-     * @returns A modified tip position of this Finger object
-     * with some additional smoothing and stabilization applied.
-     * @since 1.0
-     */
+    /// <summary>
+    /// The stabilized tip position of this Finger.
+    /// 
+    /// Smoothing and stabilization is performed in order to make
+    /// this value more suitable for interaction with 2D content. The stabilized
+    /// position lags behind the tip position by a variable amount, depending
+    /// primarily on the speed of movement.
+    /// 
+    /// @since 1.0
+    /// </summary>
     public Vector StabilizedTipPosition;
 
-    /**
-     * The duration of time this Finger has been visible to the Leap Motion Controller.
-     *
-     * \include Finger_timeVisible.txt
-     *
-     * @returns The duration (in seconds) that this Finger has been tracked.
-     * @since 1.0
-     */
+    /// <summary>
+    /// The duration of time this Finger has been visible to the Leap Motion Controller.
+    /// @since 1.0
+    /// </summary>
     public float TimeVisible;
 
-    /**
-     * Enumerates the names of the fingers.
-     *
-     * Members of this enumeration are returned by Finger::type() to identify a
-     * Finger object.
-     * @since 2.0
-     */
+    /// <summary>
+    /// Enumerates the names of the fingers.
+    /// 
+    /// Members of this enumeration are returned by Finger.Type() to identify a
+    /// Finger object.
+    /// @since 2.0
+    /// </summary>
     public enum FingerType {
       TYPE_THUMB = 0,
       TYPE_INDEX = 1,
       TYPE_MIDDLE = 2,
       TYPE_RING = 3,
-      /** The pinky or little finger  */
       TYPE_PINKY = 4,
       TYPE_UNKNOWN = -1
     }
