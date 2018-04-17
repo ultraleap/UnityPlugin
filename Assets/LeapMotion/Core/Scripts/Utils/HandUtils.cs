@@ -82,9 +82,6 @@ namespace Leap.Unity {
       }
     }
 
-    [System.Serializable]
-    public class HandEvent : UnityEvent<Hand> { }
-
     /// <summary>
     /// Returns the first hand of the argument Chirality in the current frame,
     /// otherwise returns null if no such hand is found.
@@ -187,6 +184,20 @@ namespace Leap.Unity {
     /// </summary>
     public static Finger GetPinky(this Hand hand) {
       return hand.Fingers[(int)Leap.Finger.FingerType.TYPE_PINKY];
+    }
+
+    /// <summary>
+    /// Returns a Pose consisting of the tracked hand's palm position and rotation.
+    /// </summary>
+    public static Pose GetPalmPose(this Hand hand) {
+      return new Pose(hand.PalmPosition.ToVector3(), hand.Rotation.ToQuaternion());
+    }
+
+    /// <summary>
+    /// As Hand.SetTransform(), but takes a Pose as input for convenience.
+    /// </summary>
+    public static void SetPalmPose(this Hand hand, Pose newPalmPose) {
+      hand.SetTransform(newPalmPose.position, newPalmPose.rotation);
     }
 
     /// <summary>

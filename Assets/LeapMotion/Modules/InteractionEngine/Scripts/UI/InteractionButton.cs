@@ -315,8 +315,6 @@ namespace Leap.Unity.Interaction {
           float velMag = originalLocalVelocity.magnitude;
           var frictionDragVelocityChangeAmt = 0f;
           if (velMag > 0F) {
-            Vector3 resistanceDir = -originalLocalVelocity / velMag;
-
             // Friction force
             var frictionForceAmt = velMag * FRICTION_COEFFICIENT;
             frictionDragVelocityChangeAmt
