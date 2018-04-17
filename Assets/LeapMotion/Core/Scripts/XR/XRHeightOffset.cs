@@ -9,6 +9,7 @@
 
 using UnityEngine;
 using Leap.Unity.Attributes;
+using UnityEngine.Serialization;
 
 namespace Leap.Unity {
 
@@ -45,12 +46,22 @@ namespace Leap.Unity {
 
     #region Auto Recenter
     [Header("Auto Recenter")]
-
-    [SerializeField]
+    
+    [FormerlySerializedAs("autoRecenterOnUserPresence")]
     [Tooltip("If the detected XR device is present and supports userPresence, "
-         + "checking this option will detect when the user puts on the device headset "
-         + "and call InputTracking.Recenter. Supported in 2017.2 and newer.")]
-    private bool autoRecenterOnUserPresence = true;
+           + "checking this option will detect when userPresence changes from false to "
+           + "true and call InputTracking.Recenter. Supported in 2017.2 and newer.")]
+    public bool recenterOnUserPresence = true;
+
+    [Tooltip("Calls InputTracking.Recenter on Start().")]
+    public bool recenterOnStart = true;
+
+    [Tooltip("If enabled, InputTracking.Recenter will be called when the assigned key is "
+           + "pressed.")]
+    public bool recenterOnKey = true;
+
+    [Tooltip("When this key is pressed, InputTracking.Recenter will be called.")]
+    public KeyCode recenterKey = KeyCode.R;
 
     private bool _lastUserPresence;
 
@@ -87,6 +98,10 @@ namespace Leap.Unity {
       if (XRSupportUtil.IsRoomScale()) {
         this.transform.position -= this.transform.up * _roomScaleHeightOffset;
       }
+
+      if (recenterOnStart) {
+        XRSupportUtil.Recenter();
+      }
     }
 
     private void Update() {
@@ -104,7 +119,7 @@ namespace Leap.Unity {
             }
           }
 
-          if (autoRecenterOnUserPresence && !XRSupportUtil.IsRoomScale()) {
+          if (recenterOnUserPresence && !XRSupportUtil.IsRoomScale()) {
             var userPresence = XRSupportUtil.IsUserPresent();
 
             if (_lastUserPresence != userPresence) {
@@ -114,6 +129,10 @@ namespace Leap.Unity {
 
               _lastUserPresence = userPresence;
             }
+          }
+
+          if (recenterOnKey && Input.GetKeyDown(recenterKey)) {
+            XRSupportUtil.Recenter();
           }
         }
       }

@@ -22,26 +22,9 @@ namespace Leap.Unity {
     protected override void OnEnable() {
       base.OnEnable();
 
-      //specifyCustomDrawer("_roomScaleHeightOffset", drawHeightOffset);
-      //specifyCustomDecorator("_roomScaleHeightOffset", decorateHeightOffset);
+      specifyConditionalDrawing(conditionalName: "recenterOnKey",
+                                dependantProperties: "recenterKey");
     }
-
-    //private void drawHeightOffset(SerializedProperty property) {
-    //  var isRoomScale = XRSupportUtils.IsRoomScale();
-    //  EditorGUI.BeginDisabledGroup(isRoomScale && Application.isPlaying);
-    //  EditorGUILayout.PropertyField(property);
-    //  EditorGUI.EndDisabledGroup();
-    //}
-
-    //private void decorateHeightOffset(SerializedProperty property) {
-    //  if (isRoomScaleTrackingDetected()) {
-    //    var message = "RoomScale XR space tracking detected. The Height Offset field "
-    //                + "is unnecessary because the rig root is interpreted as the floor "
-    //                + "rather than the root for the head. The offset will be set to zero "
-    //                + "during play mode.";
-    //    EditorGUILayout.HelpBox(message, MessageType.Info);
-    //  }
-    //}
 
   }
 
