@@ -452,9 +452,9 @@ namespace LeapInternal {
         Device apiDevice = new Device(deviceHandle,
                                deviceInfo.h_fov, //radians
                                deviceInfo.v_fov, //radians
-                               deviceInfo.range / 1000, //to mm
-                               deviceInfo.baseline / 1000, //to mm
-                               (deviceInfo.status == (UInt32)eLeapDeviceStatus.eLeapDeviceStatus_Streaming),
+                               deviceInfo.range / 1000.0f, //to mm
+                               deviceInfo.baseline / 1000.0f, //to mm
+                               (deviceInfo.status == eLeapDeviceStatus.eLeapDeviceStatus_Streaming),
                                Marshal.PtrToStringAnsi(deviceInfo.serial));
         Marshal.FreeCoTaskMem(deviceInfo.serial);
         _devices.AddOrUpdate(apiDevice);

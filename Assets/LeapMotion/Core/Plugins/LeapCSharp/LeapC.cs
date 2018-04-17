@@ -13,86 +13,212 @@ namespace LeapInternal {
   using System.Runtime.InteropServices;
 
   public enum eLeapConnectionStatus : uint {
-    eLeapConnectionStatus_NotConnected = 0, //!< // A connection has been established
-    eLeapConnectionStatus_Connected, //!< The connection has not been completed. Call OpenConnection.
-    eLeapConnectionStatus_HandshakeIncomplete, //!< The connection handshake has not completed
-    eLeapConnectionStatus_NotRunning = 0xE7030004 //!< A connection could not be established because the server does not appear to be running
+    /// <summary>
+    /// A connection has been established.
+    /// </summary>
+    eLeapConnectionStatus_NotConnected = 0,
+    /// <summary>
+    /// The connection has not been completed. Call OpenConnection.
+    /// </summary>
+    eLeapConnectionStatus_Connected,
+    /// <summary>
+    /// The connection handshake has not completed.
+    /// </summary>
+    eLeapConnectionStatus_HandshakeIncomplete,
+    /// <summary>
+    /// A connection could not be established because the server does not appear to be running.
+    /// </summary>
+    eLeapConnectionStatus_NotRunning = 0xE7030004
   };
 
   public enum eLeapDeviceCaps : uint {
-    eLeapDeviceCaps_Color = 0x00000001, //!< The device can send color images
+    /// <summary>
+    /// The device can send color images.
+    /// </summary>
+    eLeapDeviceCaps_Color = 0x00000001,
   };
 
   public enum eLeapDeviceType : uint {
-    eLeapDeviceType_Peripheral = 0x0003, //!< The Leap Motion consumer peripheral
-    eLeapDeviceType_Dragonfly = 0x1102, //!< Internal research product codename "Dragonfly"
-    eLeapDeviceType_Nightcrawler = 0x1201 //!< Internal research product codename "Nightcrawler"
+    /// <summary>
+    /// The Leap Motion consumer peripheral
+    /// </summary>
+    eLeapDeviceType_Peripheral = 0x0003,
+    /// <summary>
+    /// Internal research product codename "Dragonfly".
+    /// </summary>
+    eLeapDeviceType_Dragonfly = 0x1102,
+    /// <summary>
+    /// Internal research product codename "Nightcrawler".
+    /// </summary>
+    eLeapDeviceType_Nightcrawler = 0x1201,
+    /// <summary>
+    /// Research product codename "Rigel".
+    /// </summary>
+    eLeapDevicePID_Rigel = 0x1202
+  };
+
+  public enum eLeapServiceDisposition : uint {
+    /// <summary>
+    /// The service cannot receive frames fast enough from the underlying hardware.
+    /// @since 3.1.3
+    /// </summary>
+    eLeapServiceState_LowFpsDetected = 0x00000001,
+
+    /// <summary>
+    /// The service has paused itself due to an insufficient frame rate from the hardware.
+    /// @since 3.1.3
+    /// </summary>
+    eLeapServiceState_PoorPerformancePause = 0x00000002,
   };
 
   public enum eDistortionMatrixType {
-    eDistortionMatrixType_64x64 //!< A 64x64 matrix of pairs of points.
+    /// <summary>
+    /// A 64x64 matrix of pairs of points.
+    /// </summary>
+    eDistortionMatrixType_64x64
   };
 
   public enum eLeapPolicyFlag : uint {
-    eLeapPolicyFlag_BackgroundFrames = 0x00000001, //!< Allows frame receipt even when this application is not the foreground application
-    eLeapPolicyFlag_Images = 0x00000002, //!< Allow streaming images
-    eLeapPolicyFlag_OptimizeHMD = 0x00000004, //!< Optimize HMD Policy Flag
-    eLeapPolicyFlag_AllowPauseResume = 0x00000008, //!< Modifies the security token to allow calls to LeapPauseDevice to succeed
-    eLeapPolicyFlag_MapPoints = 0x00000080, //!< Allows streaming map points
-    eLeapPolicyFlag_IncludeAllFrames = 0x00008000, //!< Include native-app frames when receiving background frames.
-    eLeapPolicyFlag_NonExclusive = 0x00800000  //!< Allow background apps to also receive frames.
+    /// <summary>
+    /// Allows frame receipt even when this application is not the foreground application.
+    /// </summary>
+    eLeapPolicyFlag_BackgroundFrames = 0x00000001,
+    /// <summary>
+    /// Allow streaming images
+    /// </summary>
+    eLeapPolicyFlag_Images = 0x00000002,
+    /// <summary>
+    /// Optimize HMD Policy Flag.
+    /// </summary>
+    eLeapPolicyFlag_OptimizeHMD = 0x00000004,
+    /// <summary>
+    /// Modifies the security token to allow calls to LeapPauseDevice to succeed
+    /// </summary>
+    eLeapPolicyFlag_AllowPauseResume = 0x00000008,
+    /// <summary>
+    /// Allows streaming map points.
+    /// </summary>
+    eLeapPolicyFlag_MapPoints = 0x00000080,
   };
 
-
   public enum eLeapDeviceStatus : uint {
-    eLeapDeviceStatus_Streaming = 0x00000001, //!< Presently sending frames to all clients that have requested them
-    eLeapDeviceStatus_Paused = 0x00000002, //!< Device streaming has been paused
-    eLeapDeviceStatus_UnknownFailure = 0xE8010000, //!< The device has failed, but the failure reason is not known
-    eLeapDeviceStatus_BadCalibration = 0xE8010001, //!< Bad calibration, cannot send frames
-    eLeapDeviceStatus_BadFirmware = 0xE8010002, //!< Corrupt firmware and/or cannot receive a required firmware update
-    eLeapDeviceStatus_BadTransport = 0xE8010003, //!< Exhibiting USB communications issues
-    eLeapDeviceStatus_BadControl = 0xE8010004, //!< Missing critical control interfaces needed for communication
+    /// <summary>
+    /// Presently sending frames to all clients that have requested them.
+    /// </summary>
+    eLeapDeviceStatus_Streaming = 0x00000001,
+    /// <summary>
+    /// Device streaming has been paused.
+    /// </summary>
+    eLeapDeviceStatus_Paused = 0x00000002,
+    /// <summary>
+    /// There are known sources of infrared interference. Device has transitioned to
+    /// robust mode in order to compensate.
+    /// </summary>
+    eLeapDeviceStatus_Robust = 0x00000004,
+    /// <summary>
+    /// The device's window is smudged, tracking may be degraded.
+    /// </summary>
+    eLeapDeviceStatus_Smudged = 0x00000008,
+    /// <summary>
+    /// The device has entered low-resource mode.
+    /// </summary>
+    eLeapDeviceStatus_LowResource = 0x00000010,
+    /// <summary>
+    /// The device has failed, but the failure reason is not known.
+    /// </summary>
+    eLeapDeviceStatus_UnknownFailure = 0xE8010000,
+    /// <summary>
+    /// Bad calibration, cannot send frames.
+    /// </summary>
+    eLeapDeviceStatus_BadCalibration = 0xE8010001,
+    /// <summary>
+    /// Corrupt firmware and/or cannot receive a required firmware update.
+    /// </summary>
+    eLeapDeviceStatus_BadFirmware = 0xE8010002,
+    /// <summary>
+    /// Exhibiting USB communications issues.
+    /// </summary>
+    eLeapDeviceStatus_BadTransport = 0xE8010003,
+    /// <summary>
+    /// Missing critical control interfaces needed for communication.
+    /// </summary>
+    eLeapDeviceStatus_BadControl = 0xE8010004,
   };
 
   public enum eLeapImageType {
     eLeapImageType_Unknown = 0,
-    eLeapImageType_Default, //!< Default processed IR image
-    eLeapImageType_Raw //!< Image from raw sensor values
+    /// <summary>
+    /// Default processed IR image
+    /// </summary>
+    eLeapImageType_Default,
+    /// <summary>
+    /// Image from raw sensor values
+    /// </summary>
+    eLeapImageType_Raw
   };
 
   public enum eLeapImageFormat : uint {
-    eLeapImageFormat_UNKNOWN = 0, //!< Unknown format (shouldn't happen)
-    eLeapImageType_IR = 0x317249, //!< An infrared image
-    eLeapImageType_RGBIr_Bayer = 0x49425247, //!< A Bayer RGBIr image with uncorrected RGB channels
+    /// <summary>
+    /// An invalid or unknown format.
+    /// </summary>
+    eLeapImageFormat_UNKNOWN = 0,
+    /// <summary>
+    /// An infrared image.
+    /// </summary>
+    eLeapImageType_IR = 0x317249,
+    /// <summary>
+    /// A Bayer RGBIr image with uncorrected RGB channels
+    /// </summary>
+    eLeapImageType_RGBIr_Bayer = 0x49425247,
   };
 
   public enum eLeapPerspectiveType {
-    eLeapPerspectiveType_invalid = 0, //!< Reserved, invalid
-    eLeapPerspectiveType_stereo_left = 1, //!< A canonically left image
-    eLeapPerspectiveType_stereo_right = 2, //!< A canonically right image
-    eLeapPerspectiveType_mono = 3, //!< Reserved for future use
+    /// <summary>
+    /// An unknown or invalid type.
+    /// </summary>
+    eLeapPerspectiveType_invalid = 0,
+    /// <summary>
+    /// A canonically left image.
+    /// </summary>
+    eLeapPerspectiveType_stereo_left = 1,
+    /// <summary>
+    /// A canonically right image.
+    /// </summary>
+    eLeapPerspectiveType_stereo_right = 2,
+    /// <summary>
+    /// Reserved for future use.
+    /// </summary>
+    eLeapPerspectiveType_mono = 3,
   };
 
-  public enum eLeapImageRequestError {
-    eLeapImageRequestError_Unknown, //!< The reason for the failure is unknown
-    eLeapImageRequestError_ImagesDisabled, //!< Images are turned off in the user's configuration
-    eLeapImageRequestError_Unavailable, //!< The requested images are not available
-    eLeapImageRequestError_InsufficientBuffer, //!< The provided buffer is not large enough for the requested images
-  }
-
   public enum eLeapHandType {
-    eLeapHandType_Left, //!< Left hand
-    eLeapHandType_Right //!< Right hand
+    eLeapHandType_Left,
+    eLeapHandType_Right
   };
 
   public enum eLeapLogSeverity {
+    /// <summary>
+    /// The message severity is not known or was not specified.
+    /// </summary>
     eLeapLogSeverity_Unknown = 0,
+    /// <summary>
+    /// A message about a fault that could render the software or device non-functional.
+    /// </summary>
     eLeapLogSeverity_Critical,
+    /// <summary>
+    /// A message warning about a condition that could degrade device capabilities.
+    /// </summary>
     eLeapLogSeverity_Warning,
+    /// <summary>
+    /// A system status message.
+    /// </summary>
     eLeapLogSeverity_Information
   };
 
   public enum eLeapValueType : int {
+    /// <summary>
+    /// The type is unknown (which is an abnormal condition).
+    /// </summary>
     eLeapValueType_Unknown,
     eLeapValueType_Boolean,
     eLeapValueType_Int32,
@@ -114,66 +240,212 @@ namespace LeapInternal {
   };
 
   public enum eLeapRS : uint {
-    eLeapRS_Success = 0x00000000, //!< The operation completed successfully
-    eLeapRS_UnknownError = 0xE2010000, //!< An unknown error has occurred
-    eLeapRS_InvalidArgument = 0xE2010001, //!< An invalid argument was specified
-    eLeapRS_InsufficientResources = 0xE2010002, //!< Insufficient resources existed to complete the request
-    eLeapRS_InsufficientBuffer = 0xE2010003, //!< The specified buffer was not large enough to complete the request
-    eLeapRS_Timeout = 0xE2010004, //!< The requested operation has timed out
-    eLeapRS_NotConnected = 0xE2010005, //!< The connection is not open
-    eLeapRS_HandshakeIncomplete = 0xE2010006, //!< The request did not succeed because the client has not finished connecting to the server
-    eLeapRS_BufferSizeOverflow = 0xE2010007, //!< The specified buffer size is too large
-    eLeapRS_ProtocolError = 0xE2010008, //!< A communications protocol error has occurred
-    eLeapRS_InvalidClientID = 0xE2010009, //!< The server incorrectly specified zero as a client ID
-    eLeapRS_UnexpectedClosed = 0xE201000A, //!< The connection to the service was unexpectedly closed while reading a message
-    eLeapRS_CannotCancelImageFrameRequest = 0xE201000B, //!< An attempt to cancel an image request failed (either too late, or the image token was invalid)
-    eLeapRS_NotAvailable = 0xE7010002, //!< A connection could not be established to the Leap Motion service
-    eLeapRS_NotStreaming = 0xE7010004, //!< The requested operation can only be performed while the device is streaming
-                                       /**
-                                       * It is possible that the device identifier
-                                       * is invalid, or that the device has been disconnected since being enumerated.
-                                       */
-    eLeapRS_CannotOpenDevice = 0xE7010005, //!< The specified device could not be opened. Invalid device identifier or the device has been disconnected since being enumerated.
+    /// <summary>
+    /// The operation completed successfully.
+    /// </summary>
+    eLeapRS_Success = 0x00000000,
+    /// <summary>
+    /// An undetermined error has occurred.
+    /// This is usually the result of an abnormal operating condition in LeapC,
+    /// the Leap Motion service, or the host computer itself.
+    /// </summary>
+    eLeapRS_UnknownError = 0xE2010000,
+    /// <summary>
+    /// An invalid argument was specified.
+    /// </summary>
+    eLeapRS_InvalidArgument = 0xE2010001,
+    /// <summary>
+    /// Insufficient resources existed to complete the request.
+    /// </summary>
+    eLeapRS_InsufficientResources = 0xE2010002,
+    /// <summary>
+    /// The specified buffer was not large enough to complete the request.
+    /// </summary>
+    eLeapRS_InsufficientBuffer = 0xE2010003,
+    /// <summary>
+    /// The requested operation has timed out.
+    /// </summary>
+    eLeapRS_Timeout = 0xE2010004,
+    /// <summary>
+    /// The operation is invalid because there is no current connection.
+    /// </summary>
+    eLeapRS_NotConnected = 0xE2010005,
+    /// <summary>
+    /// The operation is invalid because the connection is not complete.
+    /// </summary>
+    eLeapRS_HandshakeIncomplete = 0xE2010006,
+    /// <summary>
+    /// The specified buffer size is too large.
+    /// </summary>
+    eLeapRS_BufferSizeOverflow = 0xE2010007,
+    /// <summary>
+    /// A communications protocol error occurred.
+    /// </summary>
+    eLeapRS_ProtocolError = 0xE2010008,
+    /// <summary>
+    /// The server incorrectly specified zero as a client ID.
+    /// </summary>
+    eLeapRS_InvalidClientID = 0xE2010009,
+    /// <summary>
+    /// The connection to the service was unexpectedly closed while reading or writing a message.
+    /// The server may have terminated.
+    /// </summary>
+    eLeapRS_UnexpectedClosed = 0xE201000A,
+    /// <summary>
+    /// The specified request token does not appear to be valid
+    /// 
+    /// Provided that the token value which identifies the request itself was, at one point, valid, this
+    /// error condition occurs when the request to which the token refers has already been satisfied or
+    /// is currently being satisfied.
+    /// </summary>
+    eLeapRS_UnknownImageFrameRequest = 0xE201000B,
+    /// <summary>
+    /// The specified frame ID is not valid or is no longer valid
+    /// 
+    /// Provided that frame ID was, at one point, valid, this error condition occurs when the identifier
+    /// refers to a frame that occurred further in the past than is currently recorded in the rolling
+    /// frame window.
+    /// </summary>
+    eLeapRS_UnknownTrackingFrameID = 0xE201000C,
+    /// <summary>
+    /// The specified timestamp references a future point in time
+    /// 
+    /// The related routine can only operate on time points having occurred in the past, and the
+    /// provided timestamp occurs in the future.
+    /// </summary>
+    eLeapRS_RoutineIsNotSeer = 0xE201000D,
+    /// <summary>
+    /// The specified timestamp references a point too far in the past
+    /// 
+    /// The related routine can only operate on time points occurring within its immediate record of
+    /// the past.
+    /// </summary>
+    eLeapRS_TimestampTooEarly = 0xE201000E,
+    /// <summary>
+    /// LeapPollConnection is called concurrently.
+    /// </summary>
+    eLeapRS_ConcurrentPoll = 0xE201000F,
+    /// <summary>
+    /// A connection to the Leap Motion service could not be established.
+    /// </summary>
+    eLeapRS_NotAvailable = 0xE7010002,
+    /// <summary>
+    /// The requested operation can only be performed while the device is sending data.
+    /// </summary>
+    eLeapRS_NotStreaming = 0xE7010004,
+    /// <summary>
+    /// The specified device could not be opened. It is possible that the device identifier
+    /// is invalid, or that the device has been disconnected since being enumerated.
+    /// </summary>
+    eLeapRS_CannotOpenDevice = 0xE7010005,
   };
 
   public enum eLeapEventType {
+    /// <summary>
+    /// No event has occurred within the timeout period specified when calling LeapPollConnection().
+    /// </summary>
     eLeapEventType_None = 0,
+    /// <summary>
+    /// A connection to the Leap Motion service has been established.
+    /// </summary>
     eLeapEventType_Connection,
+    /// <summary>
+    /// The connection to the Leap Motion service has been lost.
+    /// </summary>
     eLeapEventType_ConnectionLost,
+    /// <summary>
+    /// A device has been detected or plugged-in.
+    /// A device event is dispatched after a connection is established for any
+    /// devices already plugged in. (The system currently only supports one
+    /// streaming device at a time.)
+    /// </summary>
     eLeapEventType_Device,
-
     /// <summary>
     /// Note that unplugging a device generates an eLeapEventType_DeviceLost event
     /// message, not a failure message.
     /// </summary>
     eLeapEventType_DeviceFailure,
-
+    /// <summary>
+    /// A policy change has occurred.
+    /// This can be due to setting a policy with LeapSetPolicyFlags() or due to changing
+    /// or policy-related config settings, including images_mode.
+    /// (A user can also change these policies using the Leap Motion Control Panel.)
+    /// </summary>
     eLeapEventType_Policy,
+    /// <summary>
+    /// A tracking frame. The message contains the tracking data for the frame.
+    /// </summary>
     eLeapEventType_Tracking = 0x100,
+    /// <summary>
+    /// The request for an image has failed.
+    /// The message contains information about the failure. The client application
+    /// will not receive the requested image set.
+    /// </summary>
     eLeapEventType_ImageRequestError,
+    /// <summary>
+    /// The request for an image is complete.
+    /// The image data has been completely written to the application-provided
+    /// buffer.
+    /// </summary>
     eLeapEventType_ImageComplete,
+    /// <summary>
+    /// A system message.
+    /// </summary>
     eLeapEventType_LogEvent,
+    /// <summary>
+    ///  The device connection has been lost.
+    /// 
+    /// This event is generally asserted when the device has been detached from the system, when the
+    /// connection to the service has been lost, or if the device is closed while streaming. Generally,
+    /// any event where the system can conclude no further frames will be received will result in this
+    /// message. The DeviceEvent field will be filled with the id of the formerly attached device.
+    /// </summary>
     eLeapEventType_DeviceLost,
+    /// <summary>
+    /// The asynchronous response to a call to LeapRequestConfigValue().
+    /// Contains the value of requested configuration item.
+    /// </summary>
     eLeapEventType_ConfigResponse,
+    /// <summary>
+    /// The asynchronous response to a call to LeapSaveConfigValue().
+    /// Reports whether the change succeeded or failed.
+    /// </summary>
     eLeapEventType_ConfigChange,
+    /// <summary>
+    /// Notification that a status change has been detected on an attached device.
+    /// </summary>
     eLeapEventType_DeviceStatusChange,
+    /// <summary>
+    /// A tracking frame has been dropped by the service.
+    /// </summary>
     eLeapEventType_DroppedFrame,
+    /// <summary>
+    /// Notification that an unrequested stereo image pair is available.
+    /// </summary>
     eLeapEventType_Image,
+    /// <summary>
+    /// Notification that point mapping has changed.
+    /// </summary>
     eLeapEventType_PointMappingChange,
+    /// <summary>
+    /// An array of system messages.
+    /// </summary>
     eLeapEventType_LogEvents,
+    /// <summary>
+    /// A new head pose is available.
+    /// </summary>
     eLeapEventType_HeadPose
   };
 
   public enum eLeapDeviceFlag : uint {
-    /**
-    * This flag is updated when the user pauses or resumes tracking on the device from the Leap control
-    * panel.  Modification of this flag will fail if the AllowPauseResume policy is not set on this device
-    * object.
-    */
-    eLeapDeviceFlag_Stream = 0x00000001 //!< Flag set if the device is presently streaming frames
-  };
-  public enum eLeapConnectionFlags : uint {
-    eLeapConnectionFlags_Default = 0x00000000, //!< Currently there is only a default state flag.
+    /// <summary>
+    /// Flag set if the device is presently streaming frames
+    /// 
+    /// This flag is updated when the user pauses or resumes tracking on the device from the Leap control
+    /// panel. Modification of this flag will fail if the AllowPauseResume policy is not set on this device
+    /// object.
+    /// </summary>
+    eLeapDeviceFlag_Stream = 0x00000001
   };
 
   public enum eLeapDroppedFrameType {
@@ -202,17 +474,13 @@ namespace LeapInternal {
 
   [StructLayout(LayoutKind.Sequential, Pack = 1)]
   public struct LEAP_CONNECTION_EVENT {
-    public UInt32 flags;
+    public eLeapServiceDisposition flags;
   }
 
   [StructLayout(LayoutKind.Sequential, Pack = 1)]
   public struct LEAP_DEVICE_REF {
     public IntPtr handle; //void *
     public UInt32 id;
-    public LEAP_DEVICE_REF(IntPtr handle, UInt32 id) {
-      this.handle = handle;
-      this.id = id;
-    }
   }
 
   [StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -222,15 +490,16 @@ namespace LeapInternal {
 
   [StructLayout(LayoutKind.Sequential, Pack = 1)]
   public struct LEAP_ALLOCATOR {
-    public LeapInternal.Allocate allocate;
-    public LeapInternal.Deallocate deallocate;
-    public UInt32 number;
+    public Allocate allocate;
+    public Deallocate deallocate;
+    public IntPtr state;
   }
 
   [StructLayout(LayoutKind.Sequential, Pack = 1)]
   public struct LEAP_DEVICE_EVENT {
     public UInt32 flags;
     public LEAP_DEVICE_REF device;
+    public eLeapDeviceStatus status;
   }
 
   [StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -295,8 +564,8 @@ namespace LeapInternal {
   [StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Ansi)]
   public struct LEAP_DEVICE_INFO {
     public UInt32 size;
-    public UInt32 status;
-    public UInt32 caps;
+    public eLeapDeviceStatus status;
+    public eLeapDeviceCaps caps;
     public eLeapDeviceType type;
     public UInt32 baseline;
     public UInt32 serial_length;
