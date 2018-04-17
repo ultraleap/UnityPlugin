@@ -311,7 +311,7 @@ namespace LeapInternal {
       Frames.Put(ref trackingMsg);
 
       if (LeapFrame != null) {
-        LeapFrame.DispatchOnContext<FrameEventArgs>(this, EventContext, new FrameEventArgs(new Frame().CopyFrom(ref trackingMsg)));
+        LeapFrame.DispatchOnContext(this, EventContext, new FrameEventArgs(new Frame().CopyFrom(ref trackingMsg)));
       }
     }
 
