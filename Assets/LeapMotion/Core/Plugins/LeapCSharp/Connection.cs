@@ -682,24 +682,21 @@ namespace LeapInternal {
       }
     }
 
-    /**
-     * Gets the active setting for a specific policy.
-     *
-     * Keep in mind that setting a policy flag is asynchronous, so changes are
-     * not effective immediately after calling setPolicyFlag(). In addition, a
-     * policy request can be declined by the user. You should always set the
-     * policy flags required by your application at startup and check that the
-     * policy change request was successful after an appropriate interval.
-     *
-     * If the controller object is not connected to the Leap Motion software, then the default
-     * state for the selected policy is returned.
-     *
-     * \include Controller_isPolicySet.txt
-     *
-     * @param flags A PolicyFlag value indicating the policy to query.
-     * @returns A boolean indicating whether the specified policy has been set.
-     * @since 2.1.6
-     */
+    /// <summary>
+    /// Gets the active setting for a specific policy.
+    ///
+    /// Keep in mind that setting a policy flag is asynchronous, so changes are
+    /// not effective immediately after calling setPolicyFlag(). In addition, a
+    /// policy request can be declined by the user. You should always set the
+    /// policy flags required by your application at startup and check that the
+    /// policy change request was successful after an appropriate interval.
+    ///
+    /// If the controller object is not connected to the Leap Motion software, then the default
+    /// state for the selected policy is returned.
+    ///
+    ///
+    /// @since 2.1.6
+    /// </summary>
     public bool IsPolicySet(Controller.PolicyFlag policy) {
       UInt64 policyToCheck = (ulong)flagForPolicy(policy);
       return (_activePolicies & policyToCheck) == policyToCheck;
@@ -733,11 +730,11 @@ namespace LeapInternal {
       return requestId;
     }
 
-    /**
-     * Reports whether your application has a connection to the Leap Motion
-     * daemon/service. Can be true even if the Leap Motion hardware is not available.
-     * @since 1.2
-     */
+    /// <summary>
+    /// Reports whether your application has a connection to the Leap Motion
+    /// daemon/service. Can be true even if the Leap Motion hardware is not available.
+    /// @since 1.2
+    /// </summary>
     public bool IsServiceConnected {
       get {
         if (_leapConnection == IntPtr.Zero)
@@ -755,21 +752,19 @@ namespace LeapInternal {
       }
     }
 
-    /**
-     * The list of currently attached and recognized Leap Motion controller devices.
-     *
-     * The Device objects in the list describe information such as the range and
-     * tracking volume.
-     *
-     * \include Controller_devices.txt
-     *
-     * Currently, the Leap Motion Controller only allows a single active device at a time,
-     * however there may be multiple devices physically attached and listed here.  Any active
-     * device(s) are guaranteed to be listed first, however order is not determined beyond that.
-     *
-     * @returns The list of Leap Motion controllers.
-     * @since 1.0
-     */
+    /// <summary>
+    /// The list of currently attached and recognized Leap Motion controller devices.
+    ///
+    /// The Device objects in the list describe information such as the range and
+    /// tracking volume.
+    ///
+    ///
+    /// Currently, the Leap Motion Controller only allows a single active device at a time,
+    /// however there may be multiple devices physically attached and listed here.  Any active
+    /// device(s) are guaranteed to be listed first, however order is not determined beyond that.
+    ///
+    /// @since 1.0
+    /// </summary>
     public DeviceList Devices {
       get {
         if (_devices == null) {
