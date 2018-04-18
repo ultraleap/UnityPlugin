@@ -17,7 +17,6 @@ namespace LeapInternal {
 
   public class Connection {
     private static Dictionary<int, Connection> connectionDictionary = new Dictionary<int, Connection>();
-    private static MemoryManager _memoryManager = new LeapInternal.MemoryManager();
 
     //Left-right precalculated offsets
     private static long _handIdOffset;
@@ -159,10 +158,10 @@ namespace LeapInternal {
       }
       // The Allocator must persist the lifetime of the connection
       if (_pLeapAllocator.allocate == null) {
-        _pLeapAllocator.allocate = _memoryManager.Pin;
+        _pLeapAllocator.allocate = MemoryManager.Pin;
       }
       if (_pLeapAllocator.deallocate == null) {
-        _pLeapAllocator.deallocate = _memoryManager.Unpin;
+        _pLeapAllocator.deallocate = MemoryManager.Unpin;
       }
       LeapC.SetAllocator(_leapConnection, ref _pLeapAllocator);
 
@@ -623,8 +622,8 @@ namespace LeapInternal {
         if ((_currentLeftDistortionData.Version != imageMsg.leftImage.matrix_version) || !_currentRightDistortionData.IsValid) {
           _currentRightDistortionData = createDistortionData(imageMsg.rightImage, Image.CameraType.RIGHT);
         }
-        ImageData leftImage = new ImageData(Image.CameraType.LEFT, imageMsg.leftImage, _currentLeftDistortionData, _memoryManager);
-        ImageData rightImage = new ImageData(Image.CameraType.RIGHT, imageMsg.rightImage, _currentRightDistortionData, _memoryManager);
+        ImageData leftImage = new ImageData(Image.CameraType.LEFT, imageMsg.leftImage, _currentLeftDistortionData);
+        ImageData rightImage = new ImageData(Image.CameraType.RIGHT, imageMsg.rightImage, _currentRightDistortionData);
         Image stereoImage = new Image(imageMsg.info.frame_id, imageMsg.info.timestamp, leftImage, rightImage);
         LeapImage.DispatchOnContext(this, EventContext, new ImageEventArgs(stereoImage));
       }

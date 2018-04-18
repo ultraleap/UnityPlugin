@@ -49,13 +49,11 @@ namespace Leap {
                  int fingerId,
                  float timeVisible,
                  Vector tipPosition,
-                 Vector tipVelocity,
                  Vector direction,
-                 Vector stabilizedTipPosition,
                  float width,
                  float length,
                  bool isExtended,
-                 Finger.FingerType type,
+                 FingerType type,
                  Bone metacarpal,
                  Bone proximal,
                  Bone intermediate,
@@ -68,12 +66,10 @@ namespace Leap {
       Id = (handId * 10) + fingerId;
       HandId = handId;
       TipPosition = tipPosition;
-      TipVelocity = tipVelocity;
       Direction = direction;
       Width = width;
       Length = length;
       IsExtended = isExtended;
-      StabilizedTipPosition = stabilizedTipPosition;
       TimeVisible = timeVisible;
     }
 
@@ -127,12 +123,6 @@ namespace Leap {
     public Vector TipPosition;
 
     /// <summary>
-    /// The rate of change of the tip position of this finger.
-    /// @since 1.0
-    /// </summary>
-    public Vector TipVelocity;
-
-    /// <summary>
     /// The direction in which this finger or tool is pointing. The direction is expressed 
     /// as a unit vector pointing in the same direction as the tip.
     /// @since 1.0
@@ -161,18 +151,6 @@ namespace Leap {
     /// @since 2.0
     /// </summary>
     public bool IsExtended;
-
-    /// <summary>
-    /// The stabilized tip position of this Finger.
-    /// 
-    /// Smoothing and stabilization is performed in order to make
-    /// this value more suitable for interaction with 2D content. The stabilized
-    /// position lags behind the tip position by a variable amount, depending
-    /// primarily on the speed of movement.
-    /// 
-    /// @since 1.0
-    /// </summary>
-    public Vector StabilizedTipPosition;
 
     /// <summary>
     /// The duration of time this Finger has been visible to the Leap Motion Controller.

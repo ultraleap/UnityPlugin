@@ -46,11 +46,10 @@ namespace Leap {
     /// Constructs a new Frame.
     /// @since 3.0
     /// </summary>
-    public Frame(long id, long timestamp, float fps, InteractionBox interactionBox, List<Hand> hands) {
+    public Frame(long id, long timestamp, float fps, List<Hand> hands) {
       Id = id;
       Timestamp = timestamp;
       CurrentFramesPerSecond = fps;
-      InteractionBox = interactionBox;
       Hands = hands;
     }
 
@@ -156,8 +155,6 @@ namespace Leap {
     /// @since 1.0
     /// </summary>
     public List<Hand> Hands;
-
-    public InteractionBox InteractionBox;
 
     /// <summary>
     /// Resizes the Hand list to have a specific size.  If the size is decreased,

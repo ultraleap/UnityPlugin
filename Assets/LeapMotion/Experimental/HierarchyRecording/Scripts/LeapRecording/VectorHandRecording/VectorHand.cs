@@ -20,7 +20,7 @@ namespace Leap.Unity.Recording {
     public bool       isLeft;
     public Vector3    palmPos;
     public Quaternion palmRot;
-    
+
     private Vector3[]  _backingJointPositions;
     public Vector3[] jointPositions {
       get {
@@ -96,10 +96,10 @@ namespace Leap.Unity.Recording {
             boneRot = Quaternion.LookRotation((nextJoint - prevJoint).normalized,
                                               Vector3.Cross((nextJoint - prevJoint).normalized,
                                                 (fingerIdx == 0 ?
-                                                  (isLeft ? -Vector3.up : Vector3.up) 
+                                                  (isLeft ? -Vector3.up : Vector3.up)
                                                  : Vector3.right)));
           }
-        
+
           // Convert to world space from palm space.
           nextJoint = ToWorld(nextJoint, palmPos, palmRot);
           prevJoint = ToWorld(prevJoint, palmPos, palmRot);
@@ -119,9 +119,7 @@ namespace Leap.Unity.Recording {
                                        fingerId:               fingerIdx,
                                        timeVisible:            Time.time,
                                        tipPosition:            nextJoint.ToVector(),
-                                       tipVelocity:            Vector.Zero,
                                        direction:              (boneRot * Vector3.forward).ToVector(),
-                                       stabilizedTipPosition:  nextJoint.ToVector(),
                                        width:                  1f,
                                        length:                 1f,
                                        isExtended:             true,

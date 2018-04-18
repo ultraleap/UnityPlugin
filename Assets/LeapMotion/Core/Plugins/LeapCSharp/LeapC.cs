@@ -98,7 +98,7 @@ namespace LeapInternal {
     /// <summary>
     /// Allows streaming map points.
     /// </summary>
-    eLeapPolicyFlag_MapPoints = 0x00000080,
+    eLeapPolicyFlag_MapPoints = 0x00000080
   };
 
   public enum eLeapDeviceStatus : uint {
@@ -512,8 +512,6 @@ namespace LeapInternal {
   public struct LEAP_TRACKING_EVENT {
     public LEAP_FRAME_HEADER info;
     public Int64 tracking_id;
-    public LEAP_VECTOR interaction_box_size;
-    public LEAP_VECTOR interaction_box_center;
     public UInt32 nHands;
     public IntPtr pHands; //LEAP_HAND*
     public float framerate;
@@ -676,8 +674,6 @@ namespace LeapInternal {
     public LEAP_BONE proximal;
     public LEAP_BONE intermediate;
     public LEAP_BONE distal;
-    public LEAP_VECTOR tip_velocity;
-    public LEAP_VECTOR stabilized_tip_position;
     public Int32 is_extended;
   }
 
