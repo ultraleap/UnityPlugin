@@ -16,7 +16,7 @@ namespace LeapInternal {
   public delegate IntPtr Allocate(UInt32 size, eLeapAllocatorType typeHint);
   public delegate void Deallocate(IntPtr buffer);
 
-  public class MemoryManager {
+  public static class MemoryManager {
 
     /// <summary>
     /// Specifies whether or not a pooling strategy should be used for the
@@ -39,24 +39,10 @@ namespace LeapInternal {
     /// </summary>
     public static uint MinPoolSize = 8;
 
-    private Dictionary<IntPtr, ActiveMemoryInfo> _activeMemory = new Dictionary<IntPtr, ActiveMemoryInfo>();
-    private Dictionary<PoolKey, Queue<object>> _pooledMemory = new Dictionary<PoolKey, Queue<object>>();
+    private static Dictionary<IntPtr, ActiveMemoryInfo> _activeMemory = new Dictionary<IntPtr, ActiveMemoryInfo>();
+    private static Dictionary<PoolKey, Queue<object>> _pooledMemory = new Dictionary<PoolKey, Queue<object>>();
 
-    ~MemoryManager() {
-      foreach (var info in _activeMemory.Values) {
-        info.handle.Free();
-      }
-      _activeMemory.Clear();
-      _activeMemory = null;
-
-      foreach (var pool in _pooledMemory.Values) {
-        pool.Clear();
-      }
-      _pooledMemory.Clear();
-      _pooledMemory = null;
-    }
-
-    public IntPtr Pin(UInt32 size, eLeapAllocatorType typeHint) {
+    public static IntPtr Pin(UInt32 size, eLeapAllocatorType typeHint) {
       try {
         //Construct a key to identify the desired allocation
         PoolKey key = new PoolKey() {
@@ -106,7 +92,7 @@ namespace LeapInternal {
       return IntPtr.Zero;
     }
 
-    public void Unpin(IntPtr ptr) {
+    public static void Unpin(IntPtr ptr) {
       try {
         //Grab the info for the given pointer
         ActiveMemoryInfo info = _activeMemory[ptr];
@@ -122,7 +108,7 @@ namespace LeapInternal {
       } catch (Exception) { }
     }
 
-    public object GetPinnedObject(IntPtr ptr) {
+    public static object GetPinnedObject(IntPtr ptr) {
       try {
         return _activeMemory[ptr].handle.Target;
       } catch (Exception) { }
