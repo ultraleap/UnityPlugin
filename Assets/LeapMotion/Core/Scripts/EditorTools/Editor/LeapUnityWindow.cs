@@ -4,12 +4,32 @@ using Leap.Unity;
 
 namespace Leap.Unity {
 
+  [InitializeOnLoad]
   public class LeapUnityWindow : EditorWindow {
 
     #region Settings & Init
 
     private const string WINDOW_TITLE = "Leap Motion Unity Modules";
     private static readonly Vector2 WINDOW_MIN_SIZE = new Vector2(600f, 600f);
+
+    /// <summary>
+    /// This editor preference marks the Leap Unity SDK as having been launched. When
+    /// this is not detected, we can assume this is the first time the SDK has been
+    /// imported into an editor, so we open the window for discoverability.
+    /// </summary>
+    private const string LEAP_UNITY_WINDOW_LAUNCHED_PREF = "Leap Unity Window Launched";
+    /// <summary>
+    /// This static constructor is called as the editor launches due to the
+    /// InitializeOnLoad attribute on LeapUnityWindow.
+    /// </summary>
+    static LeapUnityWindow() {
+      EditorApplication.delayCall += () => {
+        if (!EditorPrefs.GetBool(LEAP_UNITY_WINDOW_LAUNCHED_PREF)) {
+          EditorPrefs.SetBool(LEAP_UNITY_WINDOW_LAUNCHED_PREF, true);
+          Init();
+        }
+      };
+    }
 
     [MenuItem("Window/Leap Motion")]
     private static void Init() {
@@ -40,13 +60,13 @@ namespace Leap.Unity {
       }
     }
 
-    private GUISkin _backingWindowSkin;
-    private GUISkin _windowSkin {
+    private static GUISkin s_backingWindowSkin;
+    public static GUISkin windowSkin {
       get {
-        if (_backingWindowSkin == null) {
-          _backingWindowSkin = EditorGUIUtility.GetBuiltinSkin(EditorSkin.Scene);
+        if (s_backingWindowSkin == null) {
+          s_backingWindowSkin = EditorGUIUtility.GetBuiltinSkin(EditorSkin.Scene);
         }
-        return _backingWindowSkin;
+        return s_backingWindowSkin;
       }
     }
 
@@ -64,7 +84,7 @@ namespace Leap.Unity {
     private void OnGUI() {
       var origSkin = GUI.skin;
       try {
-        GUI.skin = _windowSkin;
+        GUI.skin = windowSkin;
 
         drawGUI();
       }
@@ -74,11 +94,11 @@ namespace Leap.Unity {
     }
 
     private void drawGUI() {
-      var boxStyle = _windowSkin.box;
+      var boxStyle = windowSkin.box;
       GUILayout.BeginVertical();
 
       // Logo.
-      var logoStyle = _windowSkin.box;
+      var logoStyle = windowSkin.box;
       logoStyle.fixedHeight = 150;
       logoStyle.stretchWidth = true;
       logoStyle.alignment = TextAnchor.MiddleCenter;
@@ -86,7 +106,7 @@ namespace Leap.Unity {
       GUILayout.Box(new GUIContent(leapTex), logoStyle, GUILayout.ExpandWidth(true),
         GUILayout.MaxHeight(150f));
 
-      // Title.
+      // Current Core version.
       //var titleStyle = new GUIStyle(_windowSkin.label);
       //titleStyle.fontSize = 20;
       //titleStyle.margin = new RectOffset(0, 0, 0, 10);
