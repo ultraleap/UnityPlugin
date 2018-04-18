@@ -18,7 +18,7 @@ namespace Leap {
   /// 
   /// Create an instance of this Controller class to access frames of tracking
   /// data and configuration information.Frame data can be polled at any time
-  /// using the Controller::frame() function.Call frame() or frame(0) to get the
+  /// using the Controller.Frame() function.Call frame() or frame(0) to get the
   /// most recent frame.Set the history parameter to a positive integer to access
   /// previous frames.A controller stores up to 60 frames in its frame history.
   /// 
@@ -430,7 +430,7 @@ namespace Leap {
     ///  
     /// Policy changes are completed asynchronously and, because they are subject 
     /// to user approval or system compatibility checks, may not complete successfully. Call 
-    /// Controller::isPolicySet() after a suitable interval to test whether 
+    /// Controller.IsPolicySet() after a suitable interval to test whether 
     /// the change was accepted. 
     /// @since 2.1.6 
     /// </summary>
@@ -443,7 +443,7 @@ namespace Leap {
     /// 
     /// Policy changes are completed asynchronously and, because they are subject
     /// to user approval or system compatibility checks, may not complete successfully. Call
-    /// Controller::isPolicySet() after a suitable interval to test whether
+    /// Controller.IsPolicySet() after a suitable interval to test whether
     /// the change was accepted.
     /// @since 2.1.6
     /// </summary>

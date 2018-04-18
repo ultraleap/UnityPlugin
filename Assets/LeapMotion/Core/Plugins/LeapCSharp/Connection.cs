@@ -450,6 +450,7 @@ namespace LeapInternal {
                                deviceInfo.v_fov, //radians
                                deviceInfo.range / 1000.0f, //to mm
                                deviceInfo.baseline / 1000.0f, //to mm
+                               (Device.DeviceType)deviceInfo.type,
                                (deviceInfo.status == eLeapDeviceStatus.eLeapDeviceStatus_Streaming),
                                Marshal.PtrToStringAnsi(deviceInfo.serial));
         Marshal.FreeCoTaskMem(deviceInfo.serial);
