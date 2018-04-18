@@ -10,12 +10,12 @@
 namespace Leap {
   using System;
 
-  /**
-  * The LeapTransform class represents a transform in three dimensional space.
-  *
-  * Note that the LeapTransform class replaces the Leap.Matrix class.
-  * @since 3.1.2
-  */
+  /// <summary>
+  /// The LeapTransform class represents a transform in three dimensional space.
+  /// 
+  /// Note that the LeapTransform class replaces the Leap.Matrix class.
+  /// @since 3.1.2
+  /// </summary>
   public struct LeapTransform {
     /**
     * Constructs a new transform from the specified translation and rotation.
