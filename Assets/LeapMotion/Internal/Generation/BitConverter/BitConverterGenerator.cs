@@ -7,8 +7,11 @@
  * between Leap Motion and you, your company or other organization.           *
  ******************************************************************************/
 
+using System;
 using System.IO;
 using System.Linq;
+using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -20,9 +23,9 @@ namespace Leap.Unity.Generation {
 
     public const string BEGIN_KEY = "//BEGIN";
     public const string END_KEY = "//END";
-    public const string TEMPLATE_NAMESPACE = "Leap.Unity.Generation";
-    public const string TARGET_NAMESPACE = "Leap.Unity";
-    public const string TEST_NAMESPACE = "Leap.Unity.Tests";
+    public const string TO_KEY = "TO";
+    public const string GET_KEY = "GET";
+    public const string FILL_BYTES_KEY = "//FILL BYTES";
 
     public TextAsset codeTemplate;
     public TextAsset testTemplate;
@@ -33,24 +36,84 @@ namespace Leap.Unity.Generation {
     public string[] primitiveTypes;
 
     public override void Generate() {
-      replaceCenterCode(codeTemplate, targetFolder, "_Primitive_", "BitConverterNonAlloc.cs", TARGET_NAMESPACE);
-      replaceCenterCode(testTemplate, testFolder, "Single", "BitConverterNonAllocTests.cs", TEST_NAMESPACE);
+      generateCode();
+      generateUnitTests();
     }
 
-    private void replaceCenterCode(TextAsset template, AssetFolder folder, string toReplace, string filename, string targetNamespace) {
-      List<string> lines = new List<string>();
-      using (var reader = new StringReader(template.text)) {
-        while (true) {
-          string line = reader.ReadLine();
-          if (line == null) {
-            break;
-          }
+    private void generateCode() {
+      List<string> lines = getLines(codeTemplate);
+      lines = lines.Select(l => l.Replace("Leap.Unity.Generation", "Leap.Unity").
+                                  Replace("BitConverterNonAlloc_Template_", "BitConverterNonAlloc")).
+                    ToList();
 
-          lines.Add(line.Replace(TEMPLATE_NAMESPACE, targetNamespace).
-                         Replace("_Template_", "").
-                         Replace("_BitConverterTestMock_", "BitConverterNonAlloc"));
+      using (var writer = File.CreateText(Path.Combine(targetFolder.Path, "BitConverterNonAlloc.cs"))) {
+        for (int i = 0; i < lines.Count; i++) {
+          string line = lines[i];
+
+          if (line.Contains(BEGIN_KEY)) {
+            List<string> methodTemplate = new List<string>();
+            while (true) {
+              i++;
+              string methodLine = lines[i];
+              if (methodLine.Contains(END_KEY)) {
+                break;
+              }
+              methodTemplate.Add(methodLine);
+            }
+
+            Func<int, string> byteExpr;
+            if (line.Contains(TO_KEY)) {
+              byteExpr = b => "_c.Byte" + b + " = bytes[offset++];";
+            } else if (line.Contains(GET_KEY)) {
+              byteExpr = b => "bytes[offset++] = _c.Byte" + b + ";";
+            } else {
+              throw new InvalidOperationException("Invalid template type [" + line + "]");
+            }
+
+            expandMethodTemplate(methodTemplate, writer, byteExpr);
+          } else {
+            writer.WriteLine(line);
+          }
         }
       }
+    }
+
+    private void expandMethodTemplate(List<string> methodTemplate, StreamWriter writer, Func<int, string> byteExpr) {
+      foreach (string primitiveType in primitiveTypes) {
+        Debug.Log(typeof(UInt16).Assembly);
+        Debug.Log(typeof(ushort).Assembly);
+        Debug.Log(typeof(UInt16).FullName);
+
+        Type type = Assembly.GetAssembly(typeof(int)).GetTypes().First(t => t.Name == primitiveType);
+
+        Debug.Log(primitiveType + " : " + type);
+
+        int bytes = Marshal.SizeOf(type);
+
+        for (int i = 0; i < methodTemplate.Count; i++) {
+          string line = methodTemplate[i];
+          line = line.Replace("Single", primitiveType);
+
+          if (line.Contains(FILL_BYTES_KEY)) {
+            string indent = new string(line.TakeWhile(c => char.IsWhiteSpace(c)).ToArray());
+            for (int j = 0; j < bytes; j++) {
+              writer.Write(indent);
+              writer.WriteLine(byteExpr(j));
+            }
+          } else {
+            writer.WriteLine(line);
+          }
+        }
+      }
+    }
+
+    private void generateUnitTests() {
+      List<string> lines = getLines(testTemplate);
+
+      lines = lines.Select(l => l.Replace("Leap.Unity.Generation", "Leap.Unity.Tests").
+                                  Replace("_Template_", "").
+                                  Replace("_BitConverterTestMock_", "BitConverterNonAlloc")).
+                    ToList();
 
       string codeTemplate = lines.Query().
                                   SkipWhile(l => !l.Contains(BEGIN_KEY)).
@@ -70,22 +133,34 @@ namespace Leap.Unity.Generation {
                                Select(s => s + "\n").
                                Fold((a, b) => a + b);
 
-      using (var writer = File.CreateText(Path.Combine(folder.Path, filename))) {
+      using (var writer = File.CreateText(Path.Combine(testFolder.Path, "BitConverterNonAllocTests.cs"))) {
         writer.Write(beforeCode);
 
         foreach (var primitiveType in primitiveTypes) {
           //Replace Single with the actual primitive
           //Also uncomment the Test attribute
-          writer.Write(codeTemplate.Replace(toReplace, primitiveType).
+          writer.Write(codeTemplate.Replace("Single", primitiveType).
                                     Replace("//[Test]", "[Test]"));
         }
 
         writer.Write(afterCode);
       }
     }
-  }
 
-  public struct _Primitive_ { }
+    private List<string> getLines(TextAsset asset) {
+      List<string> lines = new List<string>();
+      using (var reader = new StringReader(asset.text)) {
+        while (true) {
+          string line = reader.ReadLine();
+          if (line == null) {
+            break;
+          }
+          lines.Add(line);
+        }
+      }
+      return lines;
+    }
+  }
 
   public static class _BitConverterTestMock_ {
     public static System.Single ToSingle(byte[] bytes, int offset) { return 0; }

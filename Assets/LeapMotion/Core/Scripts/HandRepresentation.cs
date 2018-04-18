@@ -24,7 +24,6 @@ namespace Leap.Unity {
     public Chirality RepChirality { get; protected set; }
     public ModelType RepType { get; protected set; }
     public Hand MostRecentHand { get; protected set; }
-    public Hand PostProcessHand { get; set; }
     public List<HandModelBase> handModels;
 
     public HandRepresentation(HandModelManager parent, Hand hand, Chirality repChirality, ModelType repType) {
@@ -33,7 +32,6 @@ namespace Leap.Unity {
       this.RepChirality = repChirality;
       this.RepType = repType;
       this.MostRecentHand = hand;
-      this.PostProcessHand = new Hand();
     }
 
     /** To be called if the HandRepresentation no longer has a Leap Hand. */
@@ -77,13 +75,7 @@ namespace Leap.Unity {
       MostRecentHand = hand;
       if (handModels != null) {
         for (int i = 0; i < handModels.Count; i++) {
-          if (handModels[i].group != null && handModels[i].group.HandPostProcesses.GetPersistentEventCount() > 0) {
-            PostProcessHand.CopyFrom(hand);
-            handModels[i].group.HandPostProcesses.Invoke(PostProcessHand);
-            handModels[i].SetLeapHand(PostProcessHand);
-          } else {
-            handModels[i].SetLeapHand(hand);
-          }
+          handModels[i].SetLeapHand(hand);
           handModels[i].UpdateHand();
         }
       }

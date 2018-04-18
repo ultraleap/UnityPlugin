@@ -82,7 +82,7 @@ namespace Leap.Unity {
       if (t >= 1f) return b;
       if (t <= 0f) return a;
       return new Pose(Vector3.Lerp(a.position, b.position, t),
-                      Quaternion.Slerp(a.rotation, b.rotation, t));
+                      Quaternion.Lerp(Quaternion.Slerp(a.rotation, b.rotation, t), Quaternion.identity, 0f));
     }
 
     /// <summary>

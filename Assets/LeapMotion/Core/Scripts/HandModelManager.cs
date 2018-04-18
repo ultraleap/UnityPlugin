@@ -190,8 +190,6 @@ namespace Leap.Unity {
       public bool IsEnabled = true;
       public bool CanDuplicate;
 
-      public Hands.HandEvent HandPostProcesses;
-
       /*Looks for suitable HandModelBase is the ModelGroup's modelList, if found, it is added to modelsCheckedOut.
        * If not, one can be cloned*/
       public HandModelBase TryGetModel(Chirality chirality, ModelType modelType) {
