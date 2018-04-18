@@ -10,102 +10,73 @@
 namespace Leap {
   using System;
 
-  /**
-   * Constants used in Leap Motion math functions.
-   */
+  /// <summary>
+  /// Constants used in Leap Motion math functions.
+  /// </summary>
   public static class Constants {
-    /**
-     * The constant pi as a single precision floating point number.
-     * @since 1.0
-     */
     public const float PI = 3.1415926536f;
-
-    /**
-     * The constant ratio to convert an angle measure from degrees to radians.
-     * Multiply a value in degrees by this constant to convert to radians.
-     * @since 1.0
-     */
     public const float DEG_TO_RAD = 0.0174532925f;
-
-    /**
-     * The constant ratio to convert an angle measure from radians to degrees.
-     * Multiply a value in radians by this constant to convert to degrees.
-     * @since 1.0
-     */
     public const float RAD_TO_DEG = 57.295779513f;
-
-    /**
-     * The difference between 1 and the least value greater than 1 that is
-     * representable as a float.
-     * @since 2.0
-     */
     public const float EPSILON = 1.192092896e-07f;
   }
 
-  /**
-   * The Vector struct represents a three-component mathematical vector or point
-   * such as a direction or position in three-dimensional space.
-   *
-   * The Leap Motion software employs a right-handed Cartesian coordinate system.
-   * Values given are in units of real-world millimeters. The origin is centered
-   * at the center of the Leap Motion Controller. The x- and z-axes lie in the horizontal
-   * plane, with the x-axis running parallel to the long edge of the device.
-   * The y-axis is vertical, with positive values increasing upwards (in contrast
-   * to the downward orientation of most computer graphics coordinate systems).
-   * The z-axis has positive values increasing away from the computer screen.
-   *
-   * \image html images/Leap_Axes.png
-   * @since 1.0
-   */
+  /// <summary>
+  /// The Vector struct represents a three-component mathematical vector or point
+  /// such as a direction or position in three-dimensional space.
+  /// 
+  /// The Leap Motion software employs a right-handed Cartesian coordinate system.
+  /// Values given are in units of real-world millimeters. The origin is centered
+  /// at the center of the Leap Motion Controller. The x- and z-axes lie in the horizontal
+  /// plane, with the x-axis running parallel to the long edge of the device.
+  /// The y-axis is vertical, with positive values increasing upwards (in contrast
+  /// to the downward orientation of most computer graphics coordinate systems).
+  /// The z-axis has positive values increasing away from the computer screen.
+  /// @since 1.0
+  /// </summary>
   [Serializable]
   public struct Vector :
     IEquatable<Vector> {
-    /** Add vectors component-wise. */
+
     public static Vector operator +(Vector v1, Vector v2) {
-      return v1._operator_add(v2);
+      return new Vector(v1.x + v2.x, v1.y + v2.y, v1.z + v2.z);
     }
-    /** Subtract vectors component-wise. */
+
     public static Vector operator -(Vector v1, Vector v2) {
-      return v1._operator_sub(v2);
+      return new Vector(v1.x - v2.x, v1.y - v2.y, v1.z - v2.z);
     }
-    /** Multiply vector by a scalar. */
+
     public static Vector operator *(Vector v1, float scalar) {
-      return v1._operator_mul(scalar);
+      return new Vector(v1.x * scalar, v1.y * scalar, v1.z * scalar);
     }
-    /** Multiply vector by a scalar on the left-hand side. */
+
     public static Vector operator *(float scalar, Vector v1) {
-      return v1._operator_mul(scalar);
+      return new Vector(v1.x * scalar, v1.y * scalar, v1.z * scalar);
     }
-    /** Divide vector by a scalar. */
+
     public static Vector operator /(Vector v1, float scalar) {
-      return v1._operator_div(scalar);
+      return new Vector(v1.x / scalar, v1.y / scalar, v1.z / scalar);
     }
-    /** Negate a vector. */
+
     public static Vector operator -(Vector v1) {
-      return v1._operator_sub();
+      return new Vector(-v1.x, -v1.y, -v1.z);
     }
-    /** Compare two vectors for equality. */
+
     public static bool operator ==(Vector v1, Vector v2) {
       return v1.Equals(v2);
     }
-
-    /** Compare two vectors for equality. */
+    
     public static bool operator !=(Vector v1, Vector v2) {
       return !v1.Equals(v2);
     }
-
-    /** Convert this vector to an array of three float values: [x,y,z]. */
+    
     public float[] ToFloatArray() {
       return new float[] { x, y, z };
     }
 
-
-    /**
-     * Creates a new Vector with the specified component values.
-     *
-     * \include Vector_Constructor_1.txt
-     * @since 1.0
-     */
+    /// <summary>
+    /// Creates a new Vector with the specified component values.
+    /// @since 1.0
+    /// </summary>
     public Vector(float x, float y, float z) :
       this() {
       this.x = x;
@@ -113,12 +84,10 @@ namespace Leap {
       this.z = z;
     }
 
-    /**
-     * Copies the specified Vector.
-     *
-     * \include Vector_Constructor_2.txt
-     * @since 1.0
-     */
+    /// <summary>
+    /// Copies the specified Vector.
+    /// @since 1.0
+    /// </summary>
     public Vector(Vector vector) :
       this() {
       x = vector.x;
@@ -126,16 +95,12 @@ namespace Leap {
       z = vector.z;
     }
 
-    /**
-     * The distance between the point represented by this Vector
-     * object and a point represented by the specified Vector object.
-     *
-     * \include Vector_DistanceTo.txt
-     *
-     * @param other A Vector object.
-     * @returns The distance from this point to the specified point.
-     * @since 1.0
-     */
+    /// <summary>
+    /// The distance between the point represented by this Vector
+    /// object and a point represented by the specified Vector object.
+    /// 
+    /// @since 1.0
+    /// </summary>
     public float DistanceTo(Vector other) {
       return (float)Math.Sqrt((x - other.x) * (x - other.x) +
           (y - other.y) * (y - other.y) +
@@ -143,24 +108,17 @@ namespace Leap {
 
     }
 
-    /**
-     * The angle between this vector and the specified vector in radians.
-     *
-     * The angle is measured in the plane formed by the two vectors. The
-     * angle returned is always the smaller of the two conjugate angles.
-     * Thus <tt>A.angleTo(B) == B.angleTo(A)</tt> and is always a positive
-     * value less than or equal to pi radians (180 degrees).
-     *
-     * If either vector has zero length, then this function returns zero.
-     *
-     * \image html images/Math_AngleTo.png
-     *
-     * \include Vector_AngleTo.txt
-     *
-     * @param other A Vector object.
-     * @returns The angle between this vector and the specified vector in radians.
-     * @since 1.0
-     */
+    /// <summary>
+    /// The angle between this vector and the specified vector in radians.
+    /// 
+    /// The angle is measured in the plane formed by the two vectors. The
+    /// angle returned is always the smaller of the two conjugate angles.
+    /// Thus A.angleTo(B) == B.angleTo(A) and is always a positive
+    /// value less than or equal to pi radians (180 degrees).
+    /// 
+    /// If either vector has zero length, then this function returns zero.
+    /// @since 1.0
+    /// </summary>
     public float AngleTo(Vector other) {
       float denom = this.MagnitudeSquared * other.MagnitudeSquared;
       if (denom <= Constants.EPSILON) {
@@ -175,102 +133,37 @@ namespace Leap {
       return (float)Math.Acos(val);
     }
 
-    /**
-     * The dot product of this vector with another vector.
-     *
-     * The dot product is the magnitude of the projection of this vector
-     * onto the specified vector.
-     *
-     * \image html images/Math_Dot.png
-     *
-     * \include Vector_Dot.txt
-     *
-     * @param other A Vector object.
-     * @returns The dot product of this vector and the specified vector.
-     * @since 1.0
-     */
+    /// <summary>
+    /// The dot product of this vector with another vector.
+    /// 
+    /// The dot product is the magnitude of the projection of this vector
+    /// onto the specified vector.
+    /// @since 1.0
+    /// </summary>
     public float Dot(Vector other) {
       return (x * other.x) + (y * other.y) + (z * other.z);
     }
 
-    /**
-     * The cross product of this vector and the specified vector.
-     *
-     * The cross product is a vector orthogonal to both original vectors.
-     * It has a magnitude equal to the area of a parallelogram having the
-     * two vectors as sides. The direction of the returned vector is
-     * determined by the right-hand rule. Thus <tt>A.cross(B) == -B.cross(A).</tt>
-     *
-     * \image html images/Math_Cross.png
-     *
-     * \include Vector_Cross.txt
-     *
-     * @param other A Vector object.
-     * @returns The cross product of this vector and the specified vector.
-     * @since 1.0
-     */
+    /// <summary>
+    /// The cross product of this vector and the specified vector.
+    /// 
+    /// The cross product is a vector orthogonal to both original vectors.
+    /// It has a magnitude equal to the area of a parallelogram having the
+    /// two vectors as sides. The direction of the returned vector is
+    /// determined by the right-hand rule. Thus A.cross(B) == -B.cross(A).
+    /// 
+    /// @since 1.0
+    /// </summary>
     public Vector Cross(Vector other) {
       return new Vector((y * other.z) - (z * other.y),
                     (z * other.x) - (x * other.z),
                     (x * other.y) - (y * other.x));
     }
 
-    /**
-     * A copy of this vector pointing in the opposite direction.
-     *
-     * \include Vector_Negate.txt
-     *
-     * @returns A Vector object with all components negated.
-     * @since 1.0
-     */
-    private Vector _operator_sub() {
-      return new Vector(-x, -y, -z);
-    }
-
-    /**
-     * Add vectors component-wise.
-     *
-     * \include Vector_Plus.txt
-     * @since 1.0
-     */
-    private Vector _operator_add(Vector other) {
-      return new Vector(x + other.x, y + other.y, z + other.z);
-    }
-
-    /**
-     * Subtract vectors component-wise.
-     *
-     * \include Vector_Minus.txt
-     * @since 1.0
-     */
-    private Vector _operator_sub(Vector other) {
-      return new Vector(x - other.x, y - other.y, z - other.z);
-    }
-
-    /**
-     * Multiply vector by a scalar.
-     *
-     * \include Vector_Times.txt
-     * @since 1.0
-     */
-    private Vector _operator_mul(float scalar) {
-      return new Vector(x * scalar, y * scalar, z * scalar);
-    }
-
-    /**
-     * Divide vector by a scalar.
-     *
-     * \include Vector_Divide.txt
-     * @since 1.0
-     */
-    private Vector _operator_div(float scalar) {
-      return new Vector(x / scalar, y / scalar, z / scalar);
-    }
-
-    /**
-     * Returns a string containing this vector in a human readable format: (x, y, z).
-     * @since 1.0
-     */
+    /// <summary>
+    /// Returns a string containing this vector in a human readable format: (x, y, z).
+    /// @since 1.0
+    /// </summary>
     public override string ToString() {
       return "(" + x + ", " + y + ", " + z + ")";
     }
