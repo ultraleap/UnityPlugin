@@ -49,7 +49,6 @@ namespace Leap.Unity.GraphicalRenderer {
               _graphic.OnDetachedFromGroup();
               group.TryAddGraphic(_graphic);
             }
-            group = _graphic.attachedGroup;
           }
         }
       }

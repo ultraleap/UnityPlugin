@@ -623,7 +623,7 @@ namespace LeapInternal {
         if ((_currentLeftDistortionData.Version != imageMsg.leftImage.matrix_version) || !_currentLeftDistortionData.IsValid) {
           _currentLeftDistortionData = createDistortionData(imageMsg.leftImage, Image.CameraType.LEFT);
         }
-        if ((_currentLeftDistortionData.Version != imageMsg.leftImage.matrix_version) || !_currentRightDistortionData.IsValid) {
+        if ((_currentRightDistortionData.Version != imageMsg.rightImage.matrix_version) || !_currentRightDistortionData.IsValid) {
           _currentRightDistortionData = createDistortionData(imageMsg.rightImage, Image.CameraType.RIGHT);
         }
         ImageData leftImage = new ImageData(Image.CameraType.LEFT, imageMsg.leftImage, _currentLeftDistortionData, _memoryManager);
@@ -653,16 +653,14 @@ namespace LeapInternal {
       setFlags = _requestedPolicies;
       UInt64 clearFlags = ~_requestedPolicies; //inverse of desired policies
 
-      eLeapRS result = eLeapRS.eLeapRS_UnknownError;
-      result = LeapC.SetPolicyFlags(_leapConnection, setFlags, clearFlags);
+      eLeapRS result = LeapC.SetPolicyFlags(_leapConnection, setFlags, clearFlags);
       reportAbnormalResults("LeapC SetPolicyFlags call was ", result);
     }
 
     public void ClearPolicy(Controller.PolicyFlag policy) {
       UInt64 clearFlags = (ulong)flagForPolicy(policy);
       _requestedPolicies = _requestedPolicies & ~clearFlags;
-      eLeapRS result = eLeapRS.eLeapRS_UnknownError;
-      result = LeapC.SetPolicyFlags(_leapConnection, 0, clearFlags);
+      eLeapRS result = LeapC.SetPolicyFlags(_leapConnection, 0, clearFlags);
       reportAbnormalResults("LeapC SetPolicyFlags call was ", result);
     }
 

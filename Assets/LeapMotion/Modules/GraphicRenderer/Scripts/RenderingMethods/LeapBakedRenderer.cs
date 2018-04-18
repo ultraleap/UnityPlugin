@@ -296,6 +296,7 @@ namespace Leap.Unity.GraphicalRenderer {
 
       public MeshRendererContainer(Transform root) {
         obj = new GameObject("Graphic Renderer");
+        obj.transform.SetParent(root);
 #if UNITY_EDITOR
         Undo.RegisterCreatedObjectUndo(obj, "Created graphic renderer");
 #endif

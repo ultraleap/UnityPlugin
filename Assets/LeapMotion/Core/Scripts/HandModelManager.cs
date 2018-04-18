@@ -87,9 +87,7 @@ namespace Leap.Unity {
         HandRepresentation rep;
         if (!all_hand_reps.TryGetValue(curHand.Id, out rep)) {
           rep = MakeHandRepresentation(curHand, modelType);
-          if (rep != null) {
-            all_hand_reps.Add(curHand.Id, rep);
-          }
+          all_hand_reps.Add(curHand.Id, rep);
         }
         if (rep != null) {
           rep.IsMarked = true;
