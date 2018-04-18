@@ -7,9 +7,9 @@ using Leap.Unity.Attributes;
 
 public class DocUpgrader : MonoBehaviour {
 
-  [QuickButton("Convert", "convert")]
   public AssetFolder folder;
 
+  [ContextMenu("Conbvert")]
   private void convert() {
     string[] files = Directory.GetFiles(folder.Path, "*.cs", SearchOption.AllDirectories);
     foreach (var path in files) {
@@ -68,7 +68,7 @@ public class DocUpgrader : MonoBehaviour {
         continue;
       }
 
-      yield return indent + "/// " + line.Substring(2);
+      yield return indent + line.Replace("* ", "/// ");
     }
     yield return indent + "/// </summary>";
   }
