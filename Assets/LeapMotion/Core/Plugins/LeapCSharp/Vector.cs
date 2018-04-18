@@ -34,8 +34,7 @@ namespace Leap {
   /// @since 1.0
   /// </summary>
   [Serializable]
-  public struct Vector :
-    IEquatable<Vector> {
+  public struct Vector : IEquatable<Vector> {
 
     public static Vector operator +(Vector v1, Vector v2) {
       return new Vector(v1.x + v2.x, v1.y + v2.y, v1.z + v2.z);
@@ -64,11 +63,11 @@ namespace Leap {
     public static bool operator ==(Vector v1, Vector v2) {
       return v1.Equals(v2);
     }
-    
+
     public static bool operator !=(Vector v1, Vector v2) {
       return !v1.Equals(v2);
     }
-    
+
     public float[] ToFloatArray() {
       return new float[] { x, y, z };
     }
@@ -120,11 +119,11 @@ namespace Leap {
     /// @since 1.0
     /// </summary>
     public float AngleTo(Vector other) {
-      float denom = this.MagnitudeSquared * other.MagnitudeSquared;
+      float denom = MagnitudeSquared * other.MagnitudeSquared;
       if (denom <= Constants.EPSILON) {
         return 0.0f;
       }
-      float val = this.Dot(other) / (float)Math.Sqrt(denom);
+      float val = Dot(other) / (float)Math.Sqrt(denom);
       if (val >= 1.0f) {
         return 0.0f;
       } else if (val <= -1.0f) {
@@ -168,50 +167,34 @@ namespace Leap {
       return "(" + x + ", " + y + ", " + z + ")";
     }
 
-    /**
-     * Compare Vector equality component-wise.
-     *
-     * \include Vector_Equals.txt
-     * @since 1.0
-     */
+    /// <summary>
+    /// Compare Vector equality component-wise.
+    /// @since 1.0
+    /// </summary>
     public bool Equals(Vector v) {
       return x.NearlyEquals(v.x) && y.NearlyEquals(v.y) && z.NearlyEquals(v.z);
     }
+
     public override bool Equals(Object obj) {
       return obj is Vector && Equals((Vector)obj);
     }
 
-    /**
-     * Returns true if all of the vector's components are finite.  If any
-     * component is NaN or infinite, then this returns false.
-     *
-     * \include Vector_IsValid.txt
-     * @since 1.0
-     */
+    /// <summary>
+    /// Returns true if all of the vector's components are finite.  If any
+    /// component is NaN or infinite, then this returns false.
+    /// @since 1.0
+    /// </summary>
     public bool IsValid() {
       return !(float.IsNaN(x) || float.IsInfinity(x) ||
                float.IsNaN(y) || float.IsInfinity(y) ||
                float.IsNaN(z) || float.IsInfinity(z));
     }
 
-    /**
-     * Index vector components numerically.
-     * Index 0 is x, index 1 is y, and index 2 is z.
-     * @returns The x, y, or z component of this Vector, if the specified index
-     * value is at least 0 and at most 2; otherwise, returns zero.
-     *
-     * \include Vector_Index.txt
-     * @since 1.0
-     */
-    private float _operator_get(uint index) {
-      if (index == 0)
-        return x;
-      if (index == 1)
-        return y;
-      if (index == 2)
-        return z;
-      return 0.0f;
-    }
+    /// <summary>
+    /// Index vector components numerically.
+    /// Index 0 is x, index 1 is y, and index 2 is z.
+    /// @since 1.0
+    /// </summary>
     public float this[uint index] {
       get {
         if (index == 0)
@@ -220,7 +203,7 @@ namespace Leap {
           return y;
         if (index == 2)
           return z;
-        return 0.0f;
+        throw new IndexOutOfRangeException();
       }
       set {
         if (index == 0)
@@ -229,224 +212,155 @@ namespace Leap {
           y = value;
         if (index == 2)
           z = value;
+        throw new IndexOutOfRangeException();
       }
     }
-    /**
-     * The horizontal component.
-     * @since 1.0
-     */
+
     public float x;
-
-    /**
-     * The vertical component.
-     * @since 1.0
-     */
     public float y;
-
-    /**
-     * The depth component.
-     * @since 1.0
-     */
     public float z;
 
-    /**
-     * The magnitude, or length, of this vector.
-     *
-     * The magnitude is the L2 norm, or Euclidean distance between the origin and
-     * the point represented by the (x, y, z) components of this Vector object.
-     *
-     * \include Vector_Magnitude.txt
-     *
-     * @returns The length of this vector.
-     * @since 1.0
-     */
+    /// <summary>
+    /// The magnitude, or length, of this vector.
+    /// 
+    /// The magnitude is the L2 norm, or Euclidean distance between the origin and
+    /// the point represented by the (x, y, z) components of this Vector object.
+    /// @since 1.0
+    /// </summary>
     public float Magnitude {
       get { return (float)Math.Sqrt(x * x + y * y + z * z); }
     }
 
-    /**
-     * The square of the magnitude, or length, of this vector.
-     *
-     * \include Vector_Magnitude_Squared.txt
-     *
-     * @returns The square of the length of this vector.
-     * @since 1.0
-     */
+    /// <summary>
+    /// The square of the magnitude, or length, of this vector.
+    /// @since 1.0
+    /// </summary>
     public float MagnitudeSquared {
       get { return x * x + y * y + z * z; }
     }
 
-    /**
-     * The pitch angle in radians.
-     *
-     * Pitch is the angle between the negative z-axis and the projection of
-     * the vector onto the y-z plane. In other words, pitch represents rotation
-     * around the x-axis.
-     * If the vector points upward, the returned angle is between 0 and pi radians
-     * (180 degrees); if it points downward, the angle is between 0 and -pi radians.
-     *
-     * \image html images/Math_Pitch_Angle.png
-     *
-     * \include Vector_Pitch.txt
-     *
-     * @returns The angle of this vector above or below the horizon (x-z plane).
-     * @since 1.0
-     */
+    /// <summary>
+    /// The pitch angle in radians.
+    /// 
+    /// Pitch is the angle between the negative z-axis and the projection of
+    /// the vector onto the y-z plane. In other words, pitch represents rotation
+    /// around the x-axis.
+    /// If the vector points upward, the returned angle is between 0 and pi radians
+    /// (180 degrees); if it points downward, the angle is between 0 and -pi radians.
+    /// 
+    /// @since 1.0
+    /// </summary>
     public float Pitch {
       get { return (float)Math.Atan2(y, -z); }
     }
 
-    /**
-     * The roll angle in radians.
-     *
-     * Roll is the angle between the y-axis and the projection of
-     * the vector onto the x-y plane. In other words, roll represents rotation
-     * around the z-axis. If the vector points to the left of the y-axis,
-     * then the returned angle is between 0 and pi radians (180 degrees);
-     * if it points to the right, the angle is between 0 and -pi radians.
-     *
-     * \image html images/Math_Roll_Angle.png
-     *
-     * Use this function to get roll angle of the plane to which this vector is a
-     * normal. For example, if this vector represents the normal to the palm,
-     * then this function returns the tilt or roll of the palm plane compared
-     * to the horizontal (x-z) plane.
-     *
-     * \include Vector_Roll.txt
-     *
-     * @returns The angle of this vector to the right or left of the y-axis.
-     * @since 1.0
-     */
+    /// <summary>
+    /// The roll angle in radians.
+    /// 
+    /// Roll is the angle between the y-axis and the projection of
+    /// the vector onto the x-y plane. In other words, roll represents rotation
+    /// around the z-axis. If the vector points to the left of the y-axis,
+    /// then the returned angle is between 0 and pi radians (180 degrees);
+    /// if it points to the right, the angle is between 0 and -pi radians.
+    /// 
+    /// Use this function to get roll angle of the plane to which this vector is a
+    /// normal. For example, if this vector represents the normal to the palm,
+    /// then this function returns the tilt or roll of the palm plane compared
+    /// to the horizontal (x-z) plane.
+    /// 
+    /// @since 1.0
+    /// </summary>
     public float Roll {
       get { return (float)Math.Atan2(x, -y); }
     }
 
-    /**
-     * The yaw angle in radians.
-     *
-     * Yaw is the angle between the negative z-axis and the projection of
-     * the vector onto the x-z plane. In other words, yaw represents rotation
-     * around the y-axis. If the vector points to the right of the negative z-axis,
-     * then the returned angle is between 0 and pi radians (180 degrees);
-     * if it points to the left, the angle is between 0 and -pi radians.
-     *
-     * \image html images/Math_Yaw_Angle.png
-     *
-     * \include Vector_Yaw.txt
-     *
-     * @returns The angle of this vector to the right or left of the negative z-axis.
-     * @since 1.0
-     */
+    /// <summary>
+    /// The yaw angle in radians.
+    /// 
+    /// Yaw is the angle between the negative z-axis and the projection of
+    /// the vector onto the x-z plane. In other words, yaw represents rotation
+    /// around the y-axis. If the vector points to the right of the negative z-axis,
+    /// then the returned angle is between 0 and pi radians (180 degrees);
+    /// if it points to the left, the angle is between 0 and -pi radians.
+    /// 
+    /// @since 1.0
+    /// </summary>
     public float Yaw {
       get { return (float)Math.Atan2(x, -z); }
     }
 
-    /**
-     * A normalized copy of this vector.
-     *
-     * A normalized vector has the same direction as the original vector,
-     * but with a length of one.
-     *
-     * \include Vector_Normalized.txt
-     *
-     * @returns A Vector object with a length of one, pointing in the same
-     * direction as this Vector object.
-     * @since 1.0
-     */
+    /// <summary>
+    /// A normalized copy of this vector.
+    /// 
+    /// A normalized vector has the same direction as the original vector,
+    /// but with a length of one.
+    /// 
+    /// @since 1.0
+    /// </summary>
     public Vector Normalized {
       get {
-        float denom = this.MagnitudeSquared;
+        float denom = MagnitudeSquared;
         if (denom <= Constants.EPSILON) {
-          return Vector.Zero;
+          return Zero;
         }
         denom = 1.0f / (float)Math.Sqrt(denom);
         return new Vector(x * denom, y * denom, z * denom);
       }
     }
 
-    /**
-     * The zero vector: (0, 0, 0)
-     *
-     * \include Vector_Zero.txt
-     * @since 1.0
-     */
+    /// <summary>
+    /// The zero vector: (0, 0, 0)
+    /// </summary>
     public static readonly Vector Zero = new Vector(0, 0, 0);
 
-    /**
-     * The ones vector: (1, 1, 1)
-     */
+    /// <summary>
+    /// The ones vector: (1, 1, 1)
+    /// </summary>
     public static readonly Vector Ones = new Vector(1, 1, 1);
 
-    /**
-     * The x-axis unit vector: (1, 0, 0)
-     *
-     * \include Vector_XAxis.txt
-     * @since 1.0
-     */
+    /// <summary>
+    /// The x-axis unit vector: (1, 0, 0)
+    /// </summary>
     public static readonly Vector XAxis = new Vector(1, 0, 0);
 
-    /**
-     * The y-axis unit vector: (0, 1, 0)
-     *
-     * \include Vector_YAxis.txt
-     * @since 1.0
-     */
+    /// <summary>
+    /// The y-axis unit vector: (0, 1, 0)
+    /// </summary>
     public static readonly Vector YAxis = new Vector(0, 1, 0);
 
-    /**
-     * The z-axis unit vector: (0, 0, 1)
-     *
-     * \include Vector_ZAxis.txt
-     * @since 1.0
-     */
+    /// <summary>
+    /// The z-axis unit vector: (0, 0, 1)
+    /// </summary>
     public static readonly Vector ZAxis = new Vector(0, 0, 1);
 
-    /**
-     * The unit vector pointing forward along the negative z-axis: (0, 0, -1)
-     *
-     * \include Vector_Forward.txt
-     * @since 1.0
-     */
+    /// <summary>
+    /// The unit vector pointing forward along the negative z-axis: (0, 0, -1)
+    /// </summary>
     public static readonly Vector Forward = new Vector(0, 0, -1);
 
-    /**
-     * The unit vector pointing backward along the positive z-axis: (0, 0, 1)
-     *
-     * \include Vector_Backward.txt
-     * @since 1.0
-     */
+    /// <summary>
+    /// The unit vector pointing backward along the positive z-axis: (0, 0, 1)
+    /// </summary>
     public static readonly Vector Backward = new Vector(0, 0, 1);
 
-    /**
-     * The unit vector pointing left along the negative x-axis: (-1, 0, 0)
-     *
-     * \include Vector_Left.txt
-     * @since 1.0
-     */
+    /// <summary>
+    /// The unit vector pointing left along the negative x-axis: (-1, 0, 0)
+    /// </summary>
     public static readonly Vector Left = new Vector(-1, 0, 0);
 
-    /**
-     * The unit vector pointing right along the positive x-axis: (1, 0, 0)
-     *
-     * \include Vector_Right.txt
-     * @since 1.0
-     */
+    /// <summary>
+    /// The unit vector pointing right along the positive x-axis: (1, 0, 0)
+    /// </summary>
     public static readonly Vector Right = new Vector(1, 0, 0);
 
-    /**
-     * The unit vector pointing up along the positive y-axis: (0, 1, 0)
-     *
-     * \include Vector_Up.txt
-     * @since 1.0
-     */
+    /// <summary>
+    /// The unit vector pointing up along the positive y-axis: (0, 1, 0)
+    /// </summary>
     public static readonly Vector Up = new Vector(0, 1, 0);
 
-    /**
-     * The unit vector pointing down along the negative y-axis: (0, -1, 0)
-     *
-     * \include Vector_Down.txt
-     * @since 1.0
-     */
+    /// <summary>
+    /// The unit vector pointing down along the negative y-axis: (0, -1, 0)
+    /// </summary>
     public static readonly Vector Down = new Vector(0, -1, 0);
 
 
@@ -469,5 +383,5 @@ namespace Leap {
         return hash;
       }
     }
-  }// end of Vector class
-} //end namespace
+  }
+}
