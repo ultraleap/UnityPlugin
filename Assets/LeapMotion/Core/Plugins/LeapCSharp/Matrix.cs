@@ -10,24 +10,29 @@
 namespace Leap {
   using System;
 
-  /**
-   * The Matrix struct represents a transformation matrix.
-   *
-   * To use this struct to transform a Vector, construct a matrix containing the
-   * desired transformation and then use the Matrix::transformPoint() or
-   * Matrix::transformDirection() functions to apply the transform.
-   *
-   * Transforms can be combined by multiplying two or more transform matrices using
-   * the * operator.
-   * @since 1.0
-   */
+  /// <summary>
+  /// The Matrix struct represents a transformation matrix.
+  /// 
+  /// To use this struct to transform a Vector, construct a matrix containing the
+  /// desired transformation and then use the Matrix::transformPoint() or
+  /// Matrix.TransformDirection() functions to apply the transform.
+  /// 
+  /// Transforms can be combined by multiplying two or more transform matrices using
+  /// the * operator.
+  /// @since 1.0
+  /// </summary>
   public struct Matrix {
-    /** Multiply two matrices. */
+
+    /// <summary>
+    /// Multiply two matrices.
+    /// </summary>
     public static Matrix operator *(Matrix m1, Matrix m2) {
       return m1._operator_mul(m2);
     }
-
-    /** Copy this matrix to the specified array of 9 float values in row-major order. */
+    
+    /// <summary>
+    /// Copy this matrix to the specified array of 9 float values in row-major order.
+    /// </summary>
     public float[] ToArray3x3(float[] output) {
       output[0] = xBasis.x;
       output[1] = xBasis.y;
@@ -40,7 +45,10 @@ namespace Leap {
       output[8] = zBasis.z;
       return output;
     }
-    /** Copy this matrix to the specified array containing 9 double values in row-major order. */
+
+    /// <summary>
+    /// Copy this matrix to the specified array containing 9 double values in row-major order.
+    /// </summary>
     public double[] ToArray3x3(double[] output) {
       output[0] = xBasis.x;
       output[1] = xBasis.y;
@@ -53,11 +61,17 @@ namespace Leap {
       output[8] = zBasis.z;
       return output;
     }
-    /** Convert this matrix to an array containing 9 float values in row-major order. */
+    
+    /// <summary>
+    /// Convert this matrix to an array containing 9 float values in row-major order.
+    /// </summary>
     public float[] ToArray3x3() {
       return ToArray3x3(new float[9]);
     }
-    /** Copy this matrix to the specified array of 16 float values in row-major order. */
+
+    /// <summary>
+    /// Copy this matrix to the specified array of 16 float values in row-major order.
+    /// </summary>
     public float[] ToArray4x4(float[] output) {
       output[0] = xBasis.x;
       output[1] = xBasis.y;
@@ -77,7 +91,10 @@ namespace Leap {
       output[15] = 1.0f;
       return output;
     }
-    /** Copy this matrix to the specified array of 16 double values in row-major order. */
+
+    /// <summary>
+    /// Copy this matrix to the specified array of 16 double values in row-major order.
+    /// </summary>
     public double[] ToArray4x4(double[] output) {
       output[0] = xBasis.x;
       output[1] = xBasis.y;
@@ -97,18 +114,18 @@ namespace Leap {
       output[15] = 1.0f;
       return output;
     }
-    /** Convert this matrix to an array containing 16 float values in row-major order. */
+    
+    /// <summary>
+    /// Convert this matrix to an array containing 16 float values in row-major order.
+    /// </summary>
     public float[] ToArray4x4() {
       return ToArray4x4(new float[16]);
     }
 
-    /**
-     * Constructs a copy of the specified Matrix object.
-     *
-     * \include Matrix_Matrix_copy.txt
-     *
-     * @since 1.0
-     */
+    /// <summary>
+    /// Constructs a copy of the specified Matrix object.
+    /// @since 1.0
+    /// </summary>
     public Matrix(Matrix other) :
       this() {
       xBasis = other.xBasis;
@@ -117,16 +134,10 @@ namespace Leap {
       origin = other.origin;
     }
 
-    /**
-     * Constructs a transformation matrix from the specified basis vectors.
-     *
-     * \include Matrix_Matrix_basis.txt
-     *
-     * @param xBasis A Vector specifying rotation and scale factors for the x-axis.
-     * @param yBasis A Vector specifying rotation and scale factors for the y-axis.
-     * @param zBasis A Vector specifying rotation and scale factors for the z-axis.
-     * @since 1.0
-     */
+    /// <summary>
+    /// Constructs a transformation matrix from the specified basis vectors.
+    /// @since 1.0
+    /// </summary>
     public Matrix(Vector xBasis, Vector yBasis, Vector zBasis) :
       this() {
       this.xBasis = xBasis;
@@ -135,17 +146,10 @@ namespace Leap {
       this.origin = Vector.Zero;
     }
 
-    /**
-     * Constructs a transformation matrix from the specified basis and translation vectors.
-     *
-     * \include Matrix_Matrix_basis_origin.txt
-     *
-     * @param xBasis A Vector specifying rotation and scale factors for the x-axis.
-     * @param yBasis A Vector specifying rotation and scale factors for the y-axis.
-     * @param zBasis A Vector specifying rotation and scale factors for the z-axis.
-     * @param origin A Vector specifying translation factors on all three axes.
-     * @since 1.0
-     */
+    /// <summary>
+    /// Constructs a transformation matrix from the specified basis and translation vectors.
+    /// @since 1.0
+    /// </summary>
     public Matrix(Vector xBasis, Vector yBasis, Vector zBasis, Vector origin) :
       this() {
       this.xBasis = xBasis;
@@ -154,35 +158,24 @@ namespace Leap {
       this.origin = origin;
     }
 
-    /**
-     * Constructs a transformation matrix specifying a rotation around the specified vector.
-     *
-     * \include Matrix_Matrix_rotation.txt
-     *
-     * @param axis A Vector specifying the axis of rotation.
-     * @param angleRadians The amount of rotation in radians.
-     * @since 1.0
-     */
+    /// <summary>
+    /// Constructs a transformation matrix specifying a rotation around the specified vector.
+    /// @since 1.0
+    /// </summary>
     public Matrix(Vector axis, float angleRadians) :
       this() {
       xBasis = Vector.XAxis;
       yBasis = Vector.YAxis;
       zBasis = Vector.ZAxis;
       origin = Vector.Zero;
-      this.SetRotation(axis, angleRadians);
+      SetRotation(axis, angleRadians);
     }
 
-    /**
-     * Constructs a transformation matrix specifying a rotation around the specified vector
-     * and a translation by the specified vector.
-     *
-     * \include Matrix_Matrix_rotation_translation.txt
-     *
-     * @param axis A Vector specifying the axis of rotation.
-     * @param angleRadians The angle of rotation in radians.
-     * @param translation A Vector representing the translation part of the transform.
-     * @since 1.0
-     */
+    /// <summary>
+    /// Constructs a transformation matrix specifying a rotation around the specified vector
+    /// and a translation by the specified vector.
+    /// @since 1.0
+    /// </summary>
     public Matrix(Vector axis, float angleRadians, Vector translation) :
       this() {
       xBasis = Vector.XAxis;
@@ -227,18 +220,14 @@ namespace Leap {
       origin = new Vector(m30, m31, m32);
     }
 
-    /**
-     * Sets this transformation matrix to represent a rotation around the specified vector.
-     *
-     * \include Matrix_setRotation.txt
-     *
-     * This function erases any previous rotation and scale transforms applied
-     * to this matrix, but does not affect translation.
-     *
-     * @param axis A Vector specifying the axis of rotation.
-     * @param angleRadians The amount of rotation in radians.
-     * @since 1.0
-     */
+    /// <summary>
+    /// Sets this transformation matrix to represent a rotation around the specified vector.
+    /// 
+    /// This function erases any previous rotation and scale transforms applied
+    /// to this matrix, but does not affect translation.
+    /// 
+    /// @since 1.0
+    /// </summary>
     public void SetRotation(Vector axis, float angleRadians) {
       Vector n = axis.Normalized;
       float s = (float)Math.Sin(angleRadians);
@@ -250,50 +239,36 @@ namespace Leap {
       zBasis = new Vector(n[2] * n[0] * C - n[1] * s, n[2] * n[1] * C + n[0] * s, n[2] * n[2] * C + c);
     }
 
-    //TODO functions for getting Axis and Angle from matrix
-
-    /**
-     * Transforms a vector with this matrix by transforming its rotation,
-     * scale, and translation.
-     *
-     * \include Matrix_transformPoint.txt
-     *
-     * Translation is applied after rotation and scale.
-     *
-     * @param point The Vector to transform.
-     * @returns A new Vector representing the transformed original.
-     * @since 1.0
-     */
+    /// <summary>
+    /// Transforms a vector with this matrix by transforming its rotation,
+    /// scale, and translation.
+    /// 
+    /// Translation is applied after rotation and scale.
+    /// 
+    /// @since 1.0
+    /// </summary>
     public Vector TransformPoint(Vector point) {
       return xBasis * point.x + yBasis * point.y + zBasis * point.z + origin;
     }
 
-    /**
-     * Transforms a vector with this matrix by transforming its rotation and
-     * scale only.
-     *
-     * \include Matrix_transformDirection.txt
-     *
-     * @param in The Vector to transform.
-     * @returns A new Vector representing the transformed original.
-     * @since 1.0
-     */
+    /// <summary>
+    /// Transforms a vector with this matrix by transforming its rotation and
+    /// scale only.
+    /// @since 1.0
+    /// </summary>
     public Vector TransformDirection(Vector direction) {
       return xBasis * direction.x + yBasis * direction.y + zBasis * direction.z;
     }
 
-    /**
-     * Performs a matrix inverse if the matrix consists entirely of rigid
-     * transformations (translations and rotations).  If the matrix is not rigid,
-     * this operation will not represent an inverse.
-     *
-     * \include Matrix_rigidInverse.txt
-     *
-     * Note that all matrices that are directly returned by the API are rigid.
-     *
-     * @returns The rigid inverse of the matrix.
-     * @since 1.0
-     */
+    /// <summary>
+    /// Performs a matrix inverse if the matrix consists entirely of rigid
+    /// transformations (translations and rotations).  If the matrix is not rigid,
+    /// this operation will not represent an inverse.
+    /// 
+    /// Note that all matrices that are directly returned by the API are rigid.
+    /// 
+    /// @since 1.0
+    /// </summary>
     public Matrix RigidInverse() {
       Matrix rotInverse = new Matrix(new Vector(xBasis[0], yBasis[0], zBasis[0]),
                                      new Vector(xBasis[1], yBasis[1], zBasis[1]),
@@ -302,18 +277,11 @@ namespace Leap {
       return rotInverse;
     }
 
-    /**
-     * Multiply transform matrices.
-     *
-     * Combines two transformations into a single equivalent transformation.
-     *
-     * \include Matrix_operator_times.txt
-     *
-     * @param other A Matrix to multiply on the right hand side.
-     * @returns A new Matrix representing the transformation equivalent to
-     * applying the other transformation followed by this transformation.
-     * @since 1.0
-     */
+    /// <summary>
+    /// Multiply transform matrices.
+    /// Combines two transformations into a single equivalent transformation.
+    /// @since 1.0
+    /// </summary>
     private Matrix _operator_mul(Matrix other) {
       return new Matrix(TransformDirection(other.xBasis),
                         TransformDirection(other.yBasis),
@@ -321,13 +289,10 @@ namespace Leap {
                         TransformPoint(other.origin));
     }
 
-    /**
-     * Compare Matrix equality component-wise.
-     *
-     * \include Matrix_operator_equals.txt
-     *
-     * @since 1.0
-     */
+    /// <summary>
+    /// Compare Matrix equality component-wise.
+    /// @since 1.0
+    /// </summary>
     public bool Equals(Matrix other) {
       return xBasis == other.xBasis &&
              yBasis == other.yBasis &&
@@ -335,58 +300,41 @@ namespace Leap {
              origin == other.origin;
     }
 
-    /**
-     * Write the matrix to a string in a human readable format.
-     * @since 1.0
-     */
+    /// <summary>
+    /// Write the matrix to a string in a human readable format.
+    /// </summary>
     public override string ToString() {
       return string.Format("xBasis: {0} yBasis: {1} zBasis: {2} origin: {3}", xBasis, yBasis, zBasis, origin);
     }
 
-    /**
-     * The basis vector for the x-axis.
-     *
-     * \include Matrix_xBasis.txt
-     *
-     * @since 1.0
-     */
+    /// <summary>
+    /// The basis vector for the x-axis.
+    /// @since 1.0
+    /// </summary>
     public Vector xBasis { get; set; }
 
-    /**
-     * The basis vector for the y-axis.
-     *
-     * \include Matrix_yBasis.txt
-     *
-     * @since 1.0
-     */
+    /// <summary>
+    /// The basis vector for the y-axis.
+    /// @since 1.0
+    /// </summary>
     public Vector yBasis { get; set; }
 
-    /**
-     * The basis vector for the z-axis.
-     *
-     * \include Matrix_zBasis.txt
-     *
-     * @since 1.0
-     */
+    /// <summary>
+    /// The basis vector for the z-axis.
+    /// @since 1.0
+    /// </summary>
     public Vector zBasis { get; set; }
 
-    /**
-     * The translation factors for all three axes.
-     *
-     * \include Matrix_origin.txt
-     *
-     * @since 1.0
-     */
+    /// <summary>
+    /// The translation factors for all three axes.
+    /// @since 1.0
+    /// </summary>
     public Vector origin { get; set; }
 
-    /**
-     * Returns the identity matrix specifying no translation, rotation, and scale.
-     *
-     * \include Matrix_identity.txt
-     *
-     * @returns The identity matrix.
-     * @since 1.0
-     */
+    /// <summary>
+    /// Returns the identity matrix specifying no translation, rotation, and scale.
+    /// @since 1.0
+    /// </summary>
     public static readonly Matrix Identity = new Matrix(Vector.XAxis, Vector.YAxis, Vector.ZAxis, Vector.Zero);
   }
 }

@@ -230,7 +230,7 @@ namespace Leap {
     /// <summary>
     /// The number of bytes per pixel.
     /// 
-    /// Use this value along with Image::width() and Image:::height()
+    /// Use this value along with Image.Width() and Image.Height()
     /// to calculate the size of the data buffer.
     /// 
     /// @since 2.2.0
