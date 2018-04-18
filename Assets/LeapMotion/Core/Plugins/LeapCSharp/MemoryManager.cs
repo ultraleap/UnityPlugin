@@ -7,6 +7,7 @@
  * between Leap Motion and you, your company or other organization.           *
  ******************************************************************************/
 
+using AOT;
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
@@ -42,6 +43,7 @@ namespace LeapInternal {
     private static Dictionary<IntPtr, ActiveMemoryInfo> _activeMemory = new Dictionary<IntPtr, ActiveMemoryInfo>();
     private static Dictionary<PoolKey, Queue<object>> _pooledMemory = new Dictionary<PoolKey, Queue<object>>();
 
+    [MonoPInvokeCallback(typeof(Allocate))]
     public static IntPtr Pin(UInt32 size, eLeapAllocatorType typeHint) {
       try {
         //Construct a key to identify the desired allocation
@@ -92,6 +94,7 @@ namespace LeapInternal {
       return IntPtr.Zero;
     }
 
+    [MonoPInvokeCallback(typeof(Deallocate))]
     public static void Unpin(IntPtr ptr) {
       try {
         //Grab the info for the given pointer
