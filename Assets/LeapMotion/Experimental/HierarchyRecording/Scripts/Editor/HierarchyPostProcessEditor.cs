@@ -38,7 +38,9 @@ namespace Leap.Unity.Recording {
                                                    + "before converting its raw recording "
                                                    + "data into AnimationClip data."
                                                    : ""))) {
-        target.BuildPlaybackPrefab(new ProgressBar());
+        EditorApplication.delayCall += () => {
+          target.BuildPlaybackPrefab(new ProgressBar());
+        };
       }
 
       EditorGUI.EndDisabledGroup();
