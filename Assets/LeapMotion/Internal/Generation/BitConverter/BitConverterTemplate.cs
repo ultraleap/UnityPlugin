@@ -13,37 +13,92 @@ using System.Runtime.InteropServices;
 namespace Leap.Unity.Generation {
 
   public static class BitConverterNonAlloc_Template_ {
-    private static ConversionStruct _c = new ConversionStruct();
+
+#if !IL2CPP_ENABLED
+    [ThreadStatic]
+    private static ConversionStruct _c;
+#endif
 
     //BEGIN TO
 
     public static Single ToSingle(byte[] bytes, int offset = 0) {
+#if IL2CPP_ENABLED
+#if UNITY_2018_1_OR_NEWER
+      unsafe {
+        fixed (void* ptr = &bytes[offset]) {
+          return *(Single*)ptr;
+        }
+      }
+#else
+#error BitConverterNoAlloc only supports IL2CPP on versions of Unity 2018.1 or greater.
+#endif
+#else
       //FILL BYTES
       return _c.Single;
+#endif
     }
     //END
     //BEGIN TO
 
     public static Single ToSingle(byte[] bytes, ref int offset) {
+#if IL2CPP_ENABLED
+#if UNITY_2018_1_OR_NEWER
+      unsafe {
+        fixed (void* ptr = &bytes[offset]) {
+          offset += sizeof(Single);
+          return *(Single*)ptr;
+        }
+      }
+#else
+#error BitConverterNoAlloc only supports IL2CPP on versions of Unity 2018.1 or greater.
+#endif
+#else
       //FILL BYTES
       return _c.Single;
+#endif
     }
     //END
     //BEGIN GET
 
     public static void GetBytes(Single value, byte[] bytes, int offset = 0) {
+#if IL2CPP_ENABLED
+#if UNITY_2018_1_OR_NEWER
+      unsafe {
+        fixed (void* ptr = &bytes[offset]) {
+          *(Single*)ptr = value;
+        }
+      }
+#else
+#error BitConverterNoAlloc only supports IL2CPP on versions of Unity 2018.1 or greater.
+#endif
+#else
       _c.Single = value;
       //FILL BYTES
+#endif
     }
     //END
     //BEGIN GET
 
     public static void GetBytes(Single value, byte[] bytes, ref int offset) {
+#if IL2CPP_ENABLED
+#if UNITY_2018_1_OR_NEWER
+      unsafe {
+        fixed (void* ptr = &bytes[offset]) {
+          offset += sizeof(Single);
+          *(Single*)ptr = value;
+        }
+      }
+#else
+#error BitConverterNoAlloc only supports IL2CPP on versions of Unity 2018.1 or greater.
+#endif
+#else
       _c.Single = value;
       //FILL BYTES
+#endif
     }
     //END
 
+#if !IL2CPP_ENABLED
     [StructLayout(LayoutKind.Explicit)]
     private struct ConversionStruct {
       [FieldOffset(0)]
@@ -80,5 +135,6 @@ namespace Leap.Unity.Generation {
       [FieldOffset(0)]
       public Double Double;
     }
+#endif
   }
 }

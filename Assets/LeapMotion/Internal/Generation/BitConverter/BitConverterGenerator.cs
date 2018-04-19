@@ -86,8 +86,6 @@ namespace Leap.Unity.Generation {
 
         Type type = Assembly.GetAssembly(typeof(int)).GetTypes().First(t => t.Name == primitiveType);
 
-        Debug.Log(primitiveType + " : " + type);
-
         int bytes = Marshal.SizeOf(type);
 
         for (int i = 0; i < methodTemplate.Count; i++) {
