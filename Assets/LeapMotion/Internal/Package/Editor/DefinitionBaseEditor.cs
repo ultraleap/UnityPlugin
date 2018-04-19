@@ -111,7 +111,7 @@ namespace Leap.Unity.Packaging {
       builder.AppendLine("}");
       builder.AppendLine();
 
-      File.WriteAllText("Assets/LeapMotion/Modules/Package/Editor/" + typeName + "BuildMenuItems.cs", builder.ToString());
+      File.WriteAllText("Assets/LeapMotion/Internal/Package/Editor/" + typeName + "BuildMenuItems.cs", builder.ToString());
       AssetDatabase.Refresh();
     }
 

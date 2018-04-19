@@ -15,10 +15,7 @@ MonoBehaviour:
   _showInBuildMenu: 1
   _dependantFolders:
   - Assets\LeapMotion\Core
-  - Assets\LeapMotion\Core\Plugins\Android
-  _ignoredFolders:
-  - Assets\LeapMotion\Core\Plugins\Android
+  _ignoredFolders: []
   _dependantFiles: []
-  _ignoredFiles:
-  - Assets\LeapMotion\Core\Plugins\libLeapC.so
+  _ignoredFiles: []
   _dependantPackages: []

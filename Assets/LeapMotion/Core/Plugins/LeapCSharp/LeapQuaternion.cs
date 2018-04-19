@@ -9,24 +9,19 @@
 
 namespace Leap {
   using System;
-  using System.Collections.Generic;
-  using System.Runtime.InteropServices;
 
-  /**
-   * The LeapQuaternion struct represents a rotation in three-dimensional space.
-   * @since 3.1.2
-   */
+  /// <summary>
+  /// The LeapQuaternion struct represents a rotation in three-dimensional space.
+  /// @since 3.1.2
+  /// </summary>
   [Serializable]
   public struct LeapQuaternion :
     IEquatable<LeapQuaternion> {
-    /**
-     * Creates a new LeapQuaternion with the specified component values.
-     * @param x the i-basis component
-     * @param y the j-basis component
-     * @param z the k-basis component
-     * @param w the scalar component
-     * @since 3.1.2
-     */
+
+    /// <summary>
+    /// Creates a new LeapQuaternion with the specified component values.
+    /// @since 3.1.2
+    /// </summary>
     public LeapQuaternion(float x, float y, float z, float w) :
       this() {
       this.x = x;
@@ -35,11 +30,10 @@ namespace Leap {
       this.w = w;
     }
 
-    /**
-     * Copies the specified LeapQuaternion.
-     * @param quaternion the LeapQuaternion to copy.
-     * @since 3.1.2
-     */
+    /// <summary>
+    /// Copies the specified LeapQuaternion.
+    /// @since 3.1.2
+    /// </summary>
     public LeapQuaternion(LeapQuaternion quaternion) :
       this() {
       x = quaternion.x;
@@ -48,11 +42,10 @@ namespace Leap {
       w = quaternion.w;
     }
 
-    /**
-     * Copies the specified LEAP_QUATERNION.
-     * @param quaternion the LEAP_QUATERNION struct to copy.
-     * @since 3.1.2
-     */
+    /// <summary>
+    /// Copies the specified LEAP_QUATERNION.
+    /// @since 3.1.2
+    /// </summary>
     public LeapQuaternion(LeapInternal.LEAP_QUATERNION quaternion) :
       this() {
       x = quaternion.x;
@@ -61,18 +54,18 @@ namespace Leap {
       w = quaternion.w;
     }
 
-    /**
-     * Returns a string containing this quaternion in a human readable format: (x, y, z).
-     * @since 3.1.2
-     */
+    /// <summary>
+    /// Returns a string containing this quaternion in a human readable format: (x, y, z).
+    /// @since 3.1.2
+    /// </summary>
     public override string ToString() {
       return "(" + x + ", " + y + ", " + z + ", " + w + ")";
     }
 
-    /**
-     * Compare LeapQuaternion equality component-wise.
-     * @since 3.1.2
-     */
+    /// <summary>
+    /// Compare LeapQuaternion equality component-wise.
+    /// @since 3.1.2
+    /// </summary>
     public bool Equals(LeapQuaternion v) {
       return x.NearlyEquals(v.x) && y.NearlyEquals(v.y) && z.NearlyEquals(v.z) && w.NearlyEquals(v.w);
     }
@@ -80,11 +73,11 @@ namespace Leap {
       return obj is LeapQuaternion && Equals((LeapQuaternion)obj);
     }
 
-    /**
-     * Returns true if all of the quaternion's components are finite.  If any
-     * component is NaN or infinite, then this returns false.
-     * @since 3.1.2
-     */
+    /// <summary>
+    /// Returns true if all of the quaternion's components are finite.  If any
+    /// component is NaN or infinite, then this returns false.
+    /// @since 3.1.2
+    /// </summary>
     public bool IsValid() {
       return !(float.IsNaN(x) || float.IsInfinity(x) ||
                float.IsNaN(y) || float.IsInfinity(y) ||
@@ -92,73 +85,47 @@ namespace Leap {
                float.IsNaN(w) || float.IsInfinity(w));
     }
 
-    /**
-     * The x component.
-     * @since 3.1.2
-     */
     public float x;
-
-    /**
-     * The y component.
-     * @since 3.1.2
-     */
     public float y;
-
-    /**
-     * The z component.
-     * @since 3.1.2
-     */
     public float z;
-
-    /**
-     * The w component.
-     * @since 3.1.2
-     */
     public float w;
 
-    /**
-     * The magnitude, or length, of this quaternion.
-     * @returns The length of this quaternion.
-     * @since 3.1.2
-     */
+    /// <summary>
+    /// The magnitude, or length, of this quaternion.
+    /// @since 3.1.2
+    /// </summary>
     public float Magnitude {
       get { return (float)Math.Sqrt(x * x + y * y + z * z + w * w); }
     }
 
-    /**
-     * The square of the magnitude, or length, of this quaternion.
-     *
-     * @returns The square of the length of this quaternion.
-     * @since 3.1.2
-     */
+    /// <summary>
+    /// The square of the magnitude, or length, of this quaternion.
+    /// @since 3.1.2
+    /// </summary>
     public float MagnitudeSquared {
       get { return x * x + y * y + z * z + w * w; }
     }
 
-    /**
-     * A normalized copy of this quaternion.
-     *
-     * @returns A LeapQuaternion object with a length of one.
-     * @since 3.1.2
-     */
+    /// <summary>
+    /// A normalized copy of this quaternion.
+    /// @since 3.1.2
+    /// </summary>
     public LeapQuaternion Normalized {
       get {
-        float denom = this.MagnitudeSquared;
-        if (denom <= Leap.Constants.EPSILON) {
-          return LeapQuaternion.Identity;
+        float denom = MagnitudeSquared;
+        if (denom <= Constants.EPSILON) {
+          return Identity;
         }
         denom = 1.0f / (float)Math.Sqrt(denom);
         return new LeapQuaternion(x * denom, y * denom, z * denom, w * denom);
       }
     }
 
-    /**
-     * Concatenates the rotation described by this quaternion with the one provided
-     * and returns the result.
-     *
-     * @returns A LeapQuaternion containing the product.
-     * @since 3.1.2
-     */
+    /// <summary>
+    /// Concatenates the rotation described by this quaternion with the one provided
+    /// and returns the result.
+    /// @since 3.1.2
+    /// </summary>
     public LeapQuaternion Multiply(LeapQuaternion rhs) {
       return new LeapQuaternion(
         w * rhs.x + x * rhs.w + y * rhs.z - z * rhs.y,
@@ -167,10 +134,10 @@ namespace Leap {
         w * rhs.w - x * rhs.x - y * rhs.y - z * rhs.z);
     }
 
-    /**
-    * The identity quaternion.
-     * @since 3.1.2
-    */
+    /// <summary>
+    /// The identity quaternion.
+    /// @since 3.1.2 
+    /// </summary>
     public static readonly LeapQuaternion Identity = new LeapQuaternion(0, 0, 0, 1);
 
     public override int GetHashCode() {
@@ -185,5 +152,5 @@ namespace Leap {
         return hash;
       }
     }
-  }// end of LeapQuaternion class
-} //end namespace
+  }
+}

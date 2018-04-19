@@ -55,7 +55,7 @@ namespace Leap.LeapCSharp.Tests {
     public void TestCreateConnection() {
       eLeapRS result;
       LEAP_CONNECTION_CONFIG config = new LEAP_CONNECTION_CONFIG();
-      config.server_namespace = "Leap Service";
+      config.server_namespace = Marshal.StringToHGlobalAnsi("Leap Service");
       config.flags = 0;
       config.size = (uint)Marshal.SizeOf(config);
       IntPtr connHandle = IntPtr.Zero;
@@ -67,6 +67,7 @@ namespace Leap.LeapCSharp.Tests {
       result = LeapC.CreateConnection(out defConn);
       Assert.False(defConn == IntPtr.Zero, "Default config connection failed.");
       Assert.AreEqual(eLeapRS.eLeapRS_Success, result);
+      Marshal.FreeHGlobal(config.server_namespace);
     }
 
     [Ignore("info.status is not returning true even though the result was returned "

@@ -433,9 +433,7 @@ namespace Leap.Unity {
                             int fingerId,
                             float timeVisible,
                             Vector tipPosition,
-                            Vector tipVelocity,
                             Vector direction,
-                            Vector stabilizedTipPosition,
                             float width,
                             float length,
                             bool isExtended,
@@ -448,8 +446,6 @@ namespace Leap.Unity {
       toFill.HandId                 = handId;
       toFill.TimeVisible            = timeVisible;
       toFill.TipPosition            = tipPosition;
-      toFill.TipVelocity            = tipVelocity;
-      toFill.StabilizedTipPosition  = stabilizedTipPosition;
       toFill.Direction              = direction;
       toFill.Width                  = width;
       toFill.Length                 = length;
@@ -483,18 +479,13 @@ namespace Leap.Unity {
     }
 
     /// <summary>
-    /// Fills the hand's PalmVelocity and each finger's TipVelocity data based on the
+    /// Fills the hand's PalmVelocity data based on the
     /// previous hand object and the provided delta time between the two hands.
     /// </summary>
     public static void FillTemporalData(this Hand toFill,
                                         Hand previousHand, float deltaTime) {
       toFill.PalmVelocity = (toFill.PalmPosition - previousHand.PalmPosition)
                              / deltaTime;
-      for (int i = 0; i < toFill.Fingers.Count; i++) {
-        toFill.Fingers[i].TipVelocity = (toFill.Fingers[i].TipPosition
-                                           - previousHand.Fingers[i].TipPosition)
-                                         / deltaTime;
-      }
     }
     
     #region Frame Utils

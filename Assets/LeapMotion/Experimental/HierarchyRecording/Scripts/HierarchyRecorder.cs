@@ -60,6 +60,7 @@ namespace Leap.Unity.Recording {
       get { return Time.time - _startTime; }
     }
 
+    [Flags]
     public enum RecordOn {
       Start = 0x01,
       HMDPresence = 0x02,

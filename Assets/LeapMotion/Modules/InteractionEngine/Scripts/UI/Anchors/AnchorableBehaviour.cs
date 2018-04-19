@@ -630,22 +630,17 @@ namespace Leap.Unity.Interaction {
 
       float reachTargetAmount = 0F;
       Vector3 towardsHand = Vector3.zero;
-      if (interactionBehaviour != null) {
-        if (isAttractedByHand) {
-          if (interactionBehaviour.isHovered) {
-            Hand hoveringHand = interactionBehaviour.closestHoveringHand;
+      if (interactionBehaviour.isHovered) {
+        Hand hoveringHand = interactionBehaviour.closestHoveringHand;
 
-            reachTargetAmount = Mathf.Clamp01(attractionReachByDistance.Evaluate(
-                                  Vector3.Distance(hoveringHand.PalmPosition.ToVector3(), anchor.transform.position)
-                                ));
-            towardsHand = hoveringHand.PalmPosition.ToVector3() - anchor.transform.position;
-          }
-
-          Vector3 targetOffsetTowardsHand = towardsHand * maxAttractionReach * reachTargetAmount;
-
-          _offsetTowardsHand = Vector3.Lerp(_offsetTowardsHand, targetOffsetTowardsHand, 5 * Time.deltaTime);
-        }
+        reachTargetAmount = Mathf.Clamp01(attractionReachByDistance.Evaluate(
+                              Vector3.Distance(hoveringHand.PalmPosition.ToVector3(), anchor.transform.position)
+                            ));
+        towardsHand = hoveringHand.PalmPosition.ToVector3() - anchor.transform.position;
       }
+
+      Vector3 targetOffsetTowardsHand = towardsHand * maxAttractionReach * reachTargetAmount;
+      _offsetTowardsHand = Vector3.Lerp(_offsetTowardsHand, targetOffsetTowardsHand, 5 * Time.deltaTime);
     }
 
     private void updateAnchorAttachment() {

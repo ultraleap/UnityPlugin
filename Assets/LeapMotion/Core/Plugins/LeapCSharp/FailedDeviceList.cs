@@ -8,42 +8,37 @@
  ******************************************************************************/
 
 namespace Leap {
-  using System;
-  using System.Runtime.InteropServices;
   using System.Collections.Generic;
 
-  /**
-   * The list of FailedDevice objects contains an entry for every failed Leap Motion
-   * hardware device connected to the client computer. FailedDevice objects report
-   * the device pnpID string and reason for failure.
-   *
-   * Get the list of FailedDevice objects from Controller::failedDevices().
-   *
-   * @since 3.0
-   */
-
+  /// <summary>
+  /// The list of FailedDevice objects contains an entry for every failed Leap Motion
+  /// hardware device connected to the client computer. FailedDevice objects report
+  /// the device pnpID string and reason for failure.
+  /// 
+  /// Get the list of FailedDevice objects from Controller.FailedDevices().
+  /// 
+  /// @since 3.0
+  /// </summary>
   public class FailedDeviceList : List<FailedDevice> {
-    /**
-     * Constructs an empty list.
-     * @since 3.0
-     */
+
+    /// <summary>
+    /// Constructs an empty list.
+    /// </summary>
     public FailedDeviceList() { }
 
-    /**
-     * Appends the contents of another FailedDeviceList to this one.
-     * @since 3.0
-     */
+    /// <summary>
+    /// Appends the contents of another FailedDeviceList to this one.
+    /// </summary>
     public FailedDeviceList Append(FailedDeviceList other) {
-      this.AddRange(other);
+      AddRange(other);
       return this;
     }
 
-    /**
-     * Reports whether the list is empty.
-     * @since 3.0
-     */
+    /// <summary>
+    /// Reports whether the list is empty.
+    /// </summary>
     public bool IsEmpty {
-      get { return this.Count == 0; }
+      get { return Count == 0; }
     }
   }
 }

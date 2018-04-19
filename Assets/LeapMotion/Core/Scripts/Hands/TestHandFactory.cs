@@ -34,7 +34,6 @@ namespace Leap {
                                       UnitType unitType = UnitType.LeapUnits) {
 
       var testFrame = new Frame(frameId, 0, 120.0f,
-                                new InteractionBox(),
                                 new List<Hand>());
 
       if (includeLeftHand)
@@ -265,9 +264,7 @@ namespace Leap {
       fingerId,
       0.0f,
       distal.NextJoint,
-      new Vector(0, 0, 0),
       forward,
-      position,
       8f,
       jointLengths[1] + jointLengths[2] + jointLengths[3],
       true,
