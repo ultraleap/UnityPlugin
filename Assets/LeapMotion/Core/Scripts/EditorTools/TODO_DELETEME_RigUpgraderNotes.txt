@@ -1,0 +1,104 @@
+This is conceptually what we're matching.
+I'm uncertain yet if we want to match transform names, or what amount of
+deviation from this pattern we want to still support upgraders for.
+
+Standard VR rig (old)
+"LMHeadMountedRig" - soft-contain VR Height Offset -> auto-change
+  |
+  |- "CenterEyeAnchor" - soft-contain Leap VR Camera Control,
+  |    |                 soft-contain Camera,
+  |    |                 soft-contain Enable Depth Buffer -> Missing Script
+  |    |
+  |    `- "LeapSpace" - soft-contain TempWarp -> Missing Script
+  |         |
+  |         `- "LeapHandController" - soft-contain LHC -> Missing Script,
+  |                                   contain Leap Service Provider
+  |                                     OR XR provider,
+  |                                   soft-contain Hand Model Manager
+  `- "HandModels"
+       |
+       `- X handModelTransforms, unmodified.
+
+
+
+Show all matches in the scene. For each match, display:
+Rig transform ("LMHeadMountedRig") (note 1)
+Camera transform ("CenterEyeAnchor") (note 1)
+LeapSpace transform ("LeapSpace") (note 2)
+LeapHandController transform ("LeapHandController") (note 3)
+HandModelManager transform ("HandModels") (note 4)
+
+(note 1) This transform contributed to the check for an old rig, but will not
+         be modified for the upgrade.
+
+(note 2) The LeapSpace transform will be removed.
+         if (leapSpace_missingScriptDetected) A Missing Script will be removed.
+         if (leapSpace_componentsDetected) Components on this transform will be 
+                                           removed.
+
+(note 3) The LeapHandController transform will be removed.
+         The Leap(XR)ServiceProvider will be moved to the Camera transform.
+         if (handModelManagerTransform != null /* see (note 4)*/) {
+           The Hand Model Manager will be moved to the HandModelManager transform.
+         }
+         else {
+           The Hand Model Manager will be moved to a new sibling Transform of the
+           Camera.
+         }
+
+(note 4) The HandModelManager transform will first be matched by the Transform
+          reference in the HandModelManager script marked as the hand model 
+          parent.
+          If there is no reference, we will try to find a sibling transform named
+          "HandModels".
+          If there is no such transform, we will give up and this transform will 
+          be null.
+
+if (transformsInLeapSpaceOrLHC.Count > 0) {
+  Transforms that are beneath the LeapSpace or the LeapHandController
+  components will be moved to be children of the Camera transform.
+  [ ] Delete these transforms instead.
+  [ ] Move these transforms to a different parent: (object field)
+}
+
+
+Standard Pass-through ("AR") Rig
+================================
+
+Standard pass-through rig (old)
+"LMHeadMountedRig" - soft-contain VR Height Offset -> auto-change
+  |
+  |- "LeftEyeAnchor" - soft-contain Leap VR Camera Control,
+  |    |               soft-contain Camera,
+  |    |               soft-contain Enable Depth Buffer -> Missing Script,
+  |    |               contain Leap Image Retriever -> SUGGESTS Image Rig
+  |    |
+  |    `- "LeapSpace" - soft-contain TempWarp -> Missing Script
+  |         |
+  |         |- "LeapHandController" - soft-contain LHC -> Missing Script,
+  |         |                         contain Leap Service Provider
+  |         |                           OR XR provider,
+  |         |                         soft-contain Hand Pool
+  |         `- "QuadBackground" -> as 'extra' Transform, moved to child of Camera.
+  |
+  |- "RightEyeAnchor" - soft-contain Leap VR Camera Control,
+  |                     soft-contain Camera,
+  |                     soft-contain Enable Depth Buffer -> Missing Script
+  |                     ^- these on a sibling of the Leap Image Retriever
+  |                        indicates extremely high certainty of Image Rig.
+  |
+  `- "HandModels"
+       |
+       `- X handModelTransforms, unmodified.
+
+
+isImageRig
+if (leapEyeDislocatorComponent != null && !isImageRig) {
+  The leapEyeDislocatorComponent, formerly referred to as LeapVRCameraControl, will be removed because the detected rig is not set up for device image pass-through.
+}
+
+rightCameraTransform
+if (rightCameraTransform != null) {
+  The following transform was detected as a "right-eye". This is no longer necessary for image pass-through, so this transform and its components will be deleted.
+  [ ] Don't delete this transform.
+}
