@@ -54,14 +54,12 @@ namespace Leap {
      * @param id The id of this frame.
      * @param timestamp The creation time of this frame in microseconds.
      * @param fps The current data frame rate of the service when this frame was created.
-     * @param interactionBox The InteractionBox object for this frame.
      * @since 3.0
      */
-    public Frame(long id, long timestamp, float fps, InteractionBox interactionBox, List<Hand> hands) {
+    public Frame(long id, long timestamp, float fps, List<Hand> hands) {
       Id = id;
       Timestamp = timestamp;
       CurrentFramesPerSecond = fps;
-      InteractionBox = interactionBox;
       Hands = hands;
     }
 
@@ -185,17 +183,6 @@ namespace Leap {
      * @since 1.0
      */
     public List<Hand> Hands;
-
-    /**
-     * The current InteractionBox for the frame. See the InteractionBox class
-     * documentation for more details on how this class should be used.
-     *
-     * \include Frame_interactionBox.txt
-     *
-     * @returns The current InteractionBox object.
-     * @since 1.0
-     */
-    public InteractionBox InteractionBox;
 
     public int SerializeLength {
       get { return 0; }

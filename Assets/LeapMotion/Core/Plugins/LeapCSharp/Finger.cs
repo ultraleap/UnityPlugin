@@ -55,9 +55,7 @@ namespace Leap {
      * @param fingerId The id of this finger (handId + 0-4 for finger position).
      * @param timeVisible How long this instance of the finger has been visible.
      * @param tipPosition The position of the finger tip.
-     * @param tipVelocity The velocity of the finger tip.
      * @param direction The pointing direction of the finger.
-     * @param stabilizedTipPosition The stabilized tip position.
      * @param width The average width of the finger.
      * @param length The length of the finger.
      * @param isExtended Whether the finger is more-or-less straight.
@@ -73,9 +71,7 @@ namespace Leap {
                  int fingerId,
                  float timeVisible,
                  Vector tipPosition,
-                 Vector tipVelocity,
                  Vector direction,
-                 Vector stabilizedTipPosition,
                  float width,
                  float length,
                  bool isExtended,
@@ -92,12 +88,10 @@ namespace Leap {
       Id = (handId * 10) + fingerId;
       HandId = handId;
       TipPosition = tipPosition;
-      TipVelocity = tipVelocity;
       Direction = direction;
       Width = width;
       Length = length;
       IsExtended = isExtended;
-      StabilizedTipPosition = stabilizedTipPosition;
       TimeVisible = timeVisible;
     }
 
@@ -183,16 +177,6 @@ namespace Leap {
     public Vector TipPosition;
 
     /**
-     * The rate of change of the tip position in millimeters/second.
-     *
-     * \include Finger_tipVelocity.txt
-     *
-     * @returns The Vector containing the coordinates of the tip velocity.
-     * @since 1.0
-     */
-    public Vector TipVelocity;
-
-    /**
      * The direction in which this finger or tool is pointing.
      *
      * \include Finger_direction.txt
@@ -241,22 +225,6 @@ namespace Leap {
      * @since 2.0
      */
     public bool IsExtended;
-
-    /**
-     * The stabilized tip position of this Finger.
-     *
-     * Smoothing and stabilization is performed in order to make
-     * this value more suitable for interaction with 2D content. The stabilized
-     * position lags behind the tip position by a variable amount, depending
-     * primarily on the speed of movement.
-     *
-     * \include Finger_stabilizedTipPosition.txt
-     *
-     * @returns A modified tip position of this Finger object
-     * with some additional smoothing and stabilization applied.
-     * @since 1.0
-     */
-    public Vector StabilizedTipPosition;
 
     /**
      * The duration of time this Finger has been visible to the Leap Motion Controller.

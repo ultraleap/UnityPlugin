@@ -26,7 +26,8 @@ namespace LeapInternal {
   public enum eLeapDeviceType : uint {
     eLeapDeviceType_Peripheral = 0x0003, //!< The Leap Motion consumer peripheral
     eLeapDeviceType_Dragonfly = 0x1102, //!< Internal research product codename "Dragonfly"
-    eLeapDeviceType_Nightcrawler = 0x1201 //!< Internal research product codename "Nightcrawler"
+    eLeapDeviceType_Nightcrawler = 0x1201, //!< Internal research product codename "Nightcrawler"
+    eLeapDeviceType_Rigel = 0x1202 //!< Internal product codename "Rigel"
   };
 
   public enum eDistortionMatrixType {
@@ -39,8 +40,6 @@ namespace LeapInternal {
     eLeapPolicyFlag_OptimizeHMD = 0x00000004, //!< Optimize HMD Policy Flag
     eLeapPolicyFlag_AllowPauseResume = 0x00000008, //!< Modifies the security token to allow calls to LeapPauseDevice to succeed
     eLeapPolicyFlag_MapPoints = 0x00000080, //!< Allows streaming map points
-    eLeapPolicyFlag_IncludeAllFrames = 0x00008000, //!< Include native-app frames when receiving background frames.
-    eLeapPolicyFlag_NonExclusive = 0x00800000  //!< Allow background apps to also receive frames.
   };
 
 
@@ -243,8 +242,6 @@ namespace LeapInternal {
   public struct LEAP_TRACKING_EVENT {
     public LEAP_FRAME_HEADER info;
     public Int64 tracking_id;
-    public LEAP_VECTOR interaction_box_size;
-    public LEAP_VECTOR interaction_box_center;
     public UInt32 nHands;
     public IntPtr pHands; //LEAP_HAND*
     public float framerate;
@@ -407,8 +404,6 @@ namespace LeapInternal {
     public LEAP_BONE proximal;
     public LEAP_BONE intermediate;
     public LEAP_BONE distal;
-    public LEAP_VECTOR tip_velocity;
-    public LEAP_VECTOR stabilized_tip_position;
     public Int32 is_extended;
   }
 
