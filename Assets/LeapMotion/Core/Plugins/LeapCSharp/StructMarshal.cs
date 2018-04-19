@@ -63,7 +63,7 @@ namespace LeapInternal {
         Marshal.PtrToStructure(ptr, _container);
         t = _container.value;
       } catch (Exception e) {
-        Logger.Log("Problem converting structure " + typeof(T) + " from ptr " + ptr + " : " + e.Message);
+        UnityEngine.Debug.LogException(e);
         t = default(T);
       }
 #endif
