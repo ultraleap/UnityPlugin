@@ -26,15 +26,11 @@ namespace Leap.Unity {
     /// </summary>
     public static UInt16 ToUInt16(byte[] bytes, int offset = 0) {
 #if ENABLE_IL2CPP
-#if UNITY_2018_1_OR_NEWER
       unsafe {
         fixed (void* ptr = &bytes[offset]) {
           return *(UInt16*)ptr;
         }
       }
-#else
-#error BitConverterNoAlloc only supports IL2CPP on versions of Unity 2018.1 or greater.
-#endif
 #else
       _c.Byte0 = bytes[offset++];
       _c.Byte1 = bytes[offset++];
@@ -48,15 +44,11 @@ namespace Leap.Unity {
     /// </summary>
     public static Int16 ToInt16(byte[] bytes, int offset = 0) {
 #if ENABLE_IL2CPP
-#if UNITY_2018_1_OR_NEWER
       unsafe {
         fixed (void* ptr = &bytes[offset]) {
           return *(Int16*)ptr;
         }
       }
-#else
-#error BitConverterNoAlloc only supports IL2CPP on versions of Unity 2018.1 or greater.
-#endif
 #else
       _c.Byte0 = bytes[offset++];
       _c.Byte1 = bytes[offset++];
@@ -70,15 +62,11 @@ namespace Leap.Unity {
     /// </summary>
     public static UInt32 ToUInt32(byte[] bytes, int offset = 0) {
 #if ENABLE_IL2CPP
-#if UNITY_2018_1_OR_NEWER
       unsafe {
         fixed (void* ptr = &bytes[offset]) {
           return *(UInt32*)ptr;
         }
       }
-#else
-#error BitConverterNoAlloc only supports IL2CPP on versions of Unity 2018.1 or greater.
-#endif
 #else
       _c.Byte0 = bytes[offset++];
       _c.Byte1 = bytes[offset++];
@@ -94,15 +82,11 @@ namespace Leap.Unity {
     /// </summary>
     public static Int32 ToInt32(byte[] bytes, int offset = 0) {
 #if ENABLE_IL2CPP
-#if UNITY_2018_1_OR_NEWER
       unsafe {
         fixed (void* ptr = &bytes[offset]) {
           return *(Int32*)ptr;
         }
       }
-#else
-#error BitConverterNoAlloc only supports IL2CPP on versions of Unity 2018.1 or greater.
-#endif
 #else
       _c.Byte0 = bytes[offset++];
       _c.Byte1 = bytes[offset++];
@@ -118,15 +102,11 @@ namespace Leap.Unity {
     /// </summary>
     public static UInt64 ToUInt64(byte[] bytes, int offset = 0) {
 #if ENABLE_IL2CPP
-#if UNITY_2018_1_OR_NEWER
       unsafe {
         fixed (void* ptr = &bytes[offset]) {
           return *(UInt64*)ptr;
         }
       }
-#else
-#error BitConverterNoAlloc only supports IL2CPP on versions of Unity 2018.1 or greater.
-#endif
 #else
       _c.Byte0 = bytes[offset++];
       _c.Byte1 = bytes[offset++];
@@ -146,15 +126,11 @@ namespace Leap.Unity {
     /// </summary>
     public static Int64 ToInt64(byte[] bytes, int offset = 0) {
 #if ENABLE_IL2CPP
-#if UNITY_2018_1_OR_NEWER
       unsafe {
         fixed (void* ptr = &bytes[offset]) {
           return *(Int64*)ptr;
         }
       }
-#else
-#error BitConverterNoAlloc only supports IL2CPP on versions of Unity 2018.1 or greater.
-#endif
 #else
       _c.Byte0 = bytes[offset++];
       _c.Byte1 = bytes[offset++];
@@ -174,15 +150,11 @@ namespace Leap.Unity {
     /// </summary>
     public static Single ToSingle(byte[] bytes, int offset = 0) {
 #if ENABLE_IL2CPP
-#if UNITY_2018_1_OR_NEWER
       unsafe {
         fixed (void* ptr = &bytes[offset]) {
           return *(Single*)ptr;
         }
       }
-#else
-#error BitConverterNoAlloc only supports IL2CPP on versions of Unity 2018.1 or greater.
-#endif
 #else
       _c.Byte0 = bytes[offset++];
       _c.Byte1 = bytes[offset++];
@@ -198,15 +170,11 @@ namespace Leap.Unity {
     /// </summary>
     public static Double ToDouble(byte[] bytes, int offset = 0) {
 #if ENABLE_IL2CPP
-#if UNITY_2018_1_OR_NEWER
       unsafe {
         fixed (void* ptr = &bytes[offset]) {
           return *(Double*)ptr;
         }
       }
-#else
-#error BitConverterNoAlloc only supports IL2CPP on versions of Unity 2018.1 or greater.
-#endif
 #else
       _c.Byte0 = bytes[offset++];
       _c.Byte1 = bytes[offset++];
@@ -230,16 +198,12 @@ namespace Leap.Unity {
     /// </summary>
     public static UInt16 ToUInt16(byte[] bytes, ref int offset) {
 #if ENABLE_IL2CPP
-#if UNITY_2018_1_OR_NEWER
       unsafe {
         fixed (void* ptr = &bytes[offset]) {
           offset += sizeof(UInt16);
           return *(UInt16*)ptr;
         }
       }
-#else
-#error BitConverterNoAlloc only supports IL2CPP on versions of Unity 2018.1 or greater.
-#endif
 #else
       _c.Byte0 = bytes[offset++];
       _c.Byte1 = bytes[offset++];
@@ -257,16 +221,12 @@ namespace Leap.Unity {
     /// </summary>
     public static Int16 ToInt16(byte[] bytes, ref int offset) {
 #if ENABLE_IL2CPP
-#if UNITY_2018_1_OR_NEWER
       unsafe {
         fixed (void* ptr = &bytes[offset]) {
           offset += sizeof(Int16);
           return *(Int16*)ptr;
         }
       }
-#else
-#error BitConverterNoAlloc only supports IL2CPP on versions of Unity 2018.1 or greater.
-#endif
 #else
       _c.Byte0 = bytes[offset++];
       _c.Byte1 = bytes[offset++];
@@ -284,16 +244,12 @@ namespace Leap.Unity {
     /// </summary>
     public static UInt32 ToUInt32(byte[] bytes, ref int offset) {
 #if ENABLE_IL2CPP
-#if UNITY_2018_1_OR_NEWER
       unsafe {
         fixed (void* ptr = &bytes[offset]) {
           offset += sizeof(UInt32);
           return *(UInt32*)ptr;
         }
       }
-#else
-#error BitConverterNoAlloc only supports IL2CPP on versions of Unity 2018.1 or greater.
-#endif
 #else
       _c.Byte0 = bytes[offset++];
       _c.Byte1 = bytes[offset++];
@@ -313,16 +269,12 @@ namespace Leap.Unity {
     /// </summary>
     public static Int32 ToInt32(byte[] bytes, ref int offset) {
 #if ENABLE_IL2CPP
-#if UNITY_2018_1_OR_NEWER
       unsafe {
         fixed (void* ptr = &bytes[offset]) {
           offset += sizeof(Int32);
           return *(Int32*)ptr;
         }
       }
-#else
-#error BitConverterNoAlloc only supports IL2CPP on versions of Unity 2018.1 or greater.
-#endif
 #else
       _c.Byte0 = bytes[offset++];
       _c.Byte1 = bytes[offset++];
@@ -342,16 +294,12 @@ namespace Leap.Unity {
     /// </summary>
     public static UInt64 ToUInt64(byte[] bytes, ref int offset) {
 #if ENABLE_IL2CPP
-#if UNITY_2018_1_OR_NEWER
       unsafe {
         fixed (void* ptr = &bytes[offset]) {
           offset += sizeof(UInt64);
           return *(UInt64*)ptr;
         }
       }
-#else
-#error BitConverterNoAlloc only supports IL2CPP on versions of Unity 2018.1 or greater.
-#endif
 #else
       _c.Byte0 = bytes[offset++];
       _c.Byte1 = bytes[offset++];
@@ -375,16 +323,12 @@ namespace Leap.Unity {
     /// </summary>
     public static Int64 ToInt64(byte[] bytes, ref int offset) {
 #if ENABLE_IL2CPP
-#if UNITY_2018_1_OR_NEWER
       unsafe {
         fixed (void* ptr = &bytes[offset]) {
           offset += sizeof(Int64);
           return *(Int64*)ptr;
         }
       }
-#else
-#error BitConverterNoAlloc only supports IL2CPP on versions of Unity 2018.1 or greater.
-#endif
 #else
       _c.Byte0 = bytes[offset++];
       _c.Byte1 = bytes[offset++];
@@ -408,16 +352,12 @@ namespace Leap.Unity {
     /// </summary>
     public static Single ToSingle(byte[] bytes, ref int offset) {
 #if ENABLE_IL2CPP
-#if UNITY_2018_1_OR_NEWER
       unsafe {
         fixed (void* ptr = &bytes[offset]) {
           offset += sizeof(Single);
           return *(Single*)ptr;
         }
       }
-#else
-#error BitConverterNoAlloc only supports IL2CPP on versions of Unity 2018.1 or greater.
-#endif
 #else
       _c.Byte0 = bytes[offset++];
       _c.Byte1 = bytes[offset++];
@@ -437,16 +377,12 @@ namespace Leap.Unity {
     /// </summary>
     public static Double ToDouble(byte[] bytes, ref int offset) {
 #if ENABLE_IL2CPP
-#if UNITY_2018_1_OR_NEWER
       unsafe {
         fixed (void* ptr = &bytes[offset]) {
           offset += sizeof(Double);
           return *(Double*)ptr;
         }
       }
-#else
-#error BitConverterNoAlloc only supports IL2CPP on versions of Unity 2018.1 or greater.
-#endif
 #else
       _c.Byte0 = bytes[offset++];
       _c.Byte1 = bytes[offset++];
@@ -467,15 +403,11 @@ namespace Leap.Unity {
     /// </summary>
     public static void GetBytes(UInt16 value, byte[] bytes, int offset = 0) {
 #if ENABLE_IL2CPP
-#if UNITY_2018_1_OR_NEWER
       unsafe {
         fixed (void* ptr = &bytes[offset]) {
           *(UInt16*)ptr = value;
         }
       }
-#else
-#error BitConverterNoAlloc only supports IL2CPP on versions of Unity 2018.1 or greater.
-#endif
 #else
       _c.UInt16 = value;
       bytes[offset++] = _c.Byte0;
@@ -490,15 +422,11 @@ namespace Leap.Unity {
     /// </summary>
     public static void GetBytes(Int16 value, byte[] bytes, int offset = 0) {
 #if ENABLE_IL2CPP
-#if UNITY_2018_1_OR_NEWER
       unsafe {
         fixed (void* ptr = &bytes[offset]) {
           *(Int16*)ptr = value;
         }
       }
-#else
-#error BitConverterNoAlloc only supports IL2CPP on versions of Unity 2018.1 or greater.
-#endif
 #else
       _c.Int16 = value;
       bytes[offset++] = _c.Byte0;
@@ -513,15 +441,11 @@ namespace Leap.Unity {
     /// </summary>
     public static void GetBytes(UInt32 value, byte[] bytes, int offset = 0) {
 #if ENABLE_IL2CPP
-#if UNITY_2018_1_OR_NEWER
       unsafe {
         fixed (void* ptr = &bytes[offset]) {
           *(UInt32*)ptr = value;
         }
       }
-#else
-#error BitConverterNoAlloc only supports IL2CPP on versions of Unity 2018.1 or greater.
-#endif
 #else
       _c.UInt32 = value;
       bytes[offset++] = _c.Byte0;
@@ -538,15 +462,11 @@ namespace Leap.Unity {
     /// </summary>
     public static void GetBytes(Int32 value, byte[] bytes, int offset = 0) {
 #if ENABLE_IL2CPP
-#if UNITY_2018_1_OR_NEWER
       unsafe {
         fixed (void* ptr = &bytes[offset]) {
           *(Int32*)ptr = value;
         }
       }
-#else
-#error BitConverterNoAlloc only supports IL2CPP on versions of Unity 2018.1 or greater.
-#endif
 #else
       _c.Int32 = value;
       bytes[offset++] = _c.Byte0;
@@ -563,15 +483,11 @@ namespace Leap.Unity {
     /// </summary>
     public static void GetBytes(UInt64 value, byte[] bytes, int offset = 0) {
 #if ENABLE_IL2CPP
-#if UNITY_2018_1_OR_NEWER
       unsafe {
         fixed (void* ptr = &bytes[offset]) {
           *(UInt64*)ptr = value;
         }
       }
-#else
-#error BitConverterNoAlloc only supports IL2CPP on versions of Unity 2018.1 or greater.
-#endif
 #else
       _c.UInt64 = value;
       bytes[offset++] = _c.Byte0;
@@ -592,15 +508,11 @@ namespace Leap.Unity {
     /// </summary>
     public static void GetBytes(Int64 value, byte[] bytes, int offset = 0) {
 #if ENABLE_IL2CPP
-#if UNITY_2018_1_OR_NEWER
       unsafe {
         fixed (void* ptr = &bytes[offset]) {
           *(Int64*)ptr = value;
         }
       }
-#else
-#error BitConverterNoAlloc only supports IL2CPP on versions of Unity 2018.1 or greater.
-#endif
 #else
       _c.Int64 = value;
       bytes[offset++] = _c.Byte0;
@@ -621,15 +533,11 @@ namespace Leap.Unity {
     /// </summary>
     public static void GetBytes(Single value, byte[] bytes, int offset = 0) {
 #if ENABLE_IL2CPP
-#if UNITY_2018_1_OR_NEWER
       unsafe {
         fixed (void* ptr = &bytes[offset]) {
           *(Single*)ptr = value;
         }
       }
-#else
-#error BitConverterNoAlloc only supports IL2CPP on versions of Unity 2018.1 or greater.
-#endif
 #else
       _c.Single = value;
       bytes[offset++] = _c.Byte0;
@@ -646,15 +554,11 @@ namespace Leap.Unity {
     /// </summary>
     public static void GetBytes(Double value, byte[] bytes, int offset = 0) {
 #if ENABLE_IL2CPP
-#if UNITY_2018_1_OR_NEWER
       unsafe {
         fixed (void* ptr = &bytes[offset]) {
           *(Double*)ptr = value;
         }
       }
-#else
-#error BitConverterNoAlloc only supports IL2CPP on versions of Unity 2018.1 or greater.
-#endif
 #else
       _c.Double = value;
       bytes[offset++] = _c.Byte0;
@@ -678,16 +582,12 @@ namespace Leap.Unity {
     /// </summary>
     public static void GetBytes(UInt16 value, byte[] bytes, ref int offset) {
 #if ENABLE_IL2CPP
-#if UNITY_2018_1_OR_NEWER
       unsafe {
         fixed (void* ptr = &bytes[offset]) {
           offset += sizeof(UInt16);
           *(UInt16*)ptr = value;
         }
       }
-#else
-#error BitConverterNoAlloc only supports IL2CPP on versions of Unity 2018.1 or greater.
-#endif
 #else
       _c.UInt16 = value;
       bytes[offset++] = _c.Byte0;
@@ -705,16 +605,12 @@ namespace Leap.Unity {
     /// </summary>
     public static void GetBytes(Int16 value, byte[] bytes, ref int offset) {
 #if ENABLE_IL2CPP
-#if UNITY_2018_1_OR_NEWER
       unsafe {
         fixed (void* ptr = &bytes[offset]) {
           offset += sizeof(Int16);
           *(Int16*)ptr = value;
         }
       }
-#else
-#error BitConverterNoAlloc only supports IL2CPP on versions of Unity 2018.1 or greater.
-#endif
 #else
       _c.Int16 = value;
       bytes[offset++] = _c.Byte0;
@@ -732,16 +628,12 @@ namespace Leap.Unity {
     /// </summary>
     public static void GetBytes(UInt32 value, byte[] bytes, ref int offset) {
 #if ENABLE_IL2CPP
-#if UNITY_2018_1_OR_NEWER
       unsafe {
         fixed (void* ptr = &bytes[offset]) {
           offset += sizeof(UInt32);
           *(UInt32*)ptr = value;
         }
       }
-#else
-#error BitConverterNoAlloc only supports IL2CPP on versions of Unity 2018.1 or greater.
-#endif
 #else
       _c.UInt32 = value;
       bytes[offset++] = _c.Byte0;
@@ -761,16 +653,12 @@ namespace Leap.Unity {
     /// </summary>
     public static void GetBytes(Int32 value, byte[] bytes, ref int offset) {
 #if ENABLE_IL2CPP
-#if UNITY_2018_1_OR_NEWER
       unsafe {
         fixed (void* ptr = &bytes[offset]) {
           offset += sizeof(Int32);
           *(Int32*)ptr = value;
         }
       }
-#else
-#error BitConverterNoAlloc only supports IL2CPP on versions of Unity 2018.1 or greater.
-#endif
 #else
       _c.Int32 = value;
       bytes[offset++] = _c.Byte0;
@@ -790,16 +678,12 @@ namespace Leap.Unity {
     /// </summary>
     public static void GetBytes(UInt64 value, byte[] bytes, ref int offset) {
 #if ENABLE_IL2CPP
-#if UNITY_2018_1_OR_NEWER
       unsafe {
         fixed (void* ptr = &bytes[offset]) {
           offset += sizeof(UInt64);
           *(UInt64*)ptr = value;
         }
       }
-#else
-#error BitConverterNoAlloc only supports IL2CPP on versions of Unity 2018.1 or greater.
-#endif
 #else
       _c.UInt64 = value;
       bytes[offset++] = _c.Byte0;
@@ -823,16 +707,12 @@ namespace Leap.Unity {
     /// </summary>
     public static void GetBytes(Int64 value, byte[] bytes, ref int offset) {
 #if ENABLE_IL2CPP
-#if UNITY_2018_1_OR_NEWER
       unsafe {
         fixed (void* ptr = &bytes[offset]) {
           offset += sizeof(Int64);
           *(Int64*)ptr = value;
         }
       }
-#else
-#error BitConverterNoAlloc only supports IL2CPP on versions of Unity 2018.1 or greater.
-#endif
 #else
       _c.Int64 = value;
       bytes[offset++] = _c.Byte0;
@@ -856,16 +736,12 @@ namespace Leap.Unity {
     /// </summary>
     public static void GetBytes(Single value, byte[] bytes, ref int offset) {
 #if ENABLE_IL2CPP
-#if UNITY_2018_1_OR_NEWER
       unsafe {
         fixed (void* ptr = &bytes[offset]) {
           offset += sizeof(Single);
           *(Single*)ptr = value;
         }
       }
-#else
-#error BitConverterNoAlloc only supports IL2CPP on versions of Unity 2018.1 or greater.
-#endif
 #else
       _c.Single = value;
       bytes[offset++] = _c.Byte0;
@@ -885,16 +761,12 @@ namespace Leap.Unity {
     /// </summary>
     public static void GetBytes(Double value, byte[] bytes, ref int offset) {
 #if ENABLE_IL2CPP
-#if UNITY_2018_1_OR_NEWER
       unsafe {
         fixed (void* ptr = &bytes[offset]) {
           offset += sizeof(Double);
           *(Double*)ptr = value;
         }
       }
-#else
-#error BitConverterNoAlloc only supports IL2CPP on versions of Unity 2018.1 or greater.
-#endif
 #else
       _c.Double = value;
       bytes[offset++] = _c.Byte0;
