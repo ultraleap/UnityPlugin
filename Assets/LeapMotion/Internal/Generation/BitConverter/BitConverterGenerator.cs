@@ -80,10 +80,6 @@ namespace Leap.Unity.Generation {
 
     private void expandMethodTemplate(List<string> methodTemplate, StreamWriter writer, Func<int, string> byteExpr) {
       foreach (string primitiveType in primitiveTypes) {
-        Debug.Log(typeof(UInt16).Assembly);
-        Debug.Log(typeof(ushort).Assembly);
-        Debug.Log(typeof(UInt16).FullName);
-
         Type type = Assembly.GetAssembly(typeof(int)).GetTypes().First(t => t.Name == primitiveType);
 
         int bytes = Marshal.SizeOf(type);
