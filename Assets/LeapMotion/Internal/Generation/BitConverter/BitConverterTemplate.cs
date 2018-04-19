@@ -20,7 +20,11 @@ namespace Leap.Unity.Generation {
 #endif
 
     //BEGIN TO
-
+    /// <summary>
+    /// Given an array of bytes, and an offset to start reading from, return
+    /// the Single value that is represented by that byte pattern.  Undefined
+    /// results if there are not enough bytes in the array.
+    /// </summary>
     public static Single ToSingle(byte[] bytes, int offset = 0) {
 #if IL2CPP_ENABLED
 #if UNITY_2018_1_OR_NEWER
@@ -40,6 +44,14 @@ namespace Leap.Unity.Generation {
     //END
     //BEGIN TO
 
+    /// <summary>
+    /// Given an array of bytes, and an offset to start reading from, return
+    /// the Single value that is represented by that byte pattern.  Undefined
+    /// results if there are not enough bytes in the array.
+    /// 
+    /// The offset variable is incremented by the size of the Single in bytes
+    /// after this method is complete.
+    /// </summary>
     public static Single ToSingle(byte[] bytes, ref int offset) {
 #if IL2CPP_ENABLED
 #if UNITY_2018_1_OR_NEWER
@@ -60,6 +72,11 @@ namespace Leap.Unity.Generation {
     //END
     //BEGIN GET
 
+    /// <summary>
+    /// Given a Single value, copy its binary representation into the given array
+    /// of bytes, at the given offset.  Undefined results if there are not enough
+    /// bytes in the array to accept the value.
+    /// </summary>
     public static void GetBytes(Single value, byte[] bytes, int offset = 0) {
 #if IL2CPP_ENABLED
 #if UNITY_2018_1_OR_NEWER
@@ -79,6 +96,14 @@ namespace Leap.Unity.Generation {
     //END
     //BEGIN GET
 
+    /// <summary>
+    /// Given a Single value, copy its binary representation into the given array
+    /// of bytes, at the given offset.  Undefined results if there are not enough
+    /// bytes in the array to accept the value.
+    /// 
+    /// The offset variable is incremented by the size of the Single in bytes
+    /// after this method is complete.
+    /// </summary>
     public static void GetBytes(Single value, byte[] bytes, ref int offset) {
 #if IL2CPP_ENABLED
 #if UNITY_2018_1_OR_NEWER
