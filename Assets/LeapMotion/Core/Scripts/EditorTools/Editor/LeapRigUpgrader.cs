@@ -64,7 +64,7 @@ namespace Leap.Unity {
             }
             else {
               _currentSceneScanStatus = SceneScanStatus.NoOldRigs;
-              _upgraderWindow.Close();
+              //_upgraderWindow.Close();
             }
           }
         }
@@ -161,27 +161,32 @@ namespace Leap.Unity {
       public Transform handModelParentTransform; // -> HandModelManager
 
       /// <summary>
+      /// Detects if the argument Transform is the _rig root_ of an old Leap rig,
+      /// modifying the passed-in old rig hierarchy description. Returns true if the
+      /// rig was detected as an old rig, false otherwise.
+      /// </summary>
+      public static bool DetectFor(Transform transform, OldRigHierarchy toFill) {
+        var didDetectOldRig = false;
+        var scannedRig = toFill;
+
+        // Try to find the camera below this rig object.
+        // TODO
+
+        return didDetectOldRig;
+      }
+
+      /// <summary>
       /// Detects if the argument Transform is the _rig root_ of an old Leap rig, in
       /// which case an OldRigHierarchy description is returned, otherwise this method
       /// returns null.
       /// </summary>
       public static OldRigHierarchy DetectFor(Transform transform) {
-        var didDetectOldRig = false;
         var scannedRig = new OldRigHierarchy();
-
-        var name = transform.name;
-        if (name.Equals(OLD_RIG_ROOT_NAME)) {
-          scannedRig.rigTransform = transform;
-          didDetectOldRig = true;
-        }
-
-        if (didDetectOldRig) {
-          return scannedRig;
-        }
-        else {
-          return null;
-        }
+        var didDetectOldRig = DetectFor(transform, scannedRig);
+        if (!didDetectOldRig) return null;
+        return scannedRig;
       }
+
     }
 
     private void OnGUI() {
