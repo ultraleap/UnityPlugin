@@ -14,7 +14,7 @@ namespace Leap.Unity {
 
   public static class BitConverterNonAlloc {
 
-#if !IL2CPP_ENABLED
+#if !ENABLE_IL2CPP
     [ThreadStatic]
     private static ConversionStruct _c;
 #endif
@@ -25,7 +25,7 @@ namespace Leap.Unity {
     /// results if there are not enough bytes in the array.
     /// </summary>
     public static UInt16 ToUInt16(byte[] bytes, int offset = 0) {
-#if IL2CPP_ENABLED
+#if ENABLE_IL2CPP
 #if UNITY_2018_1_OR_NEWER
       unsafe {
         fixed (void* ptr = &bytes[offset]) {
@@ -47,7 +47,7 @@ namespace Leap.Unity {
     /// results if there are not enough bytes in the array.
     /// </summary>
     public static Int16 ToInt16(byte[] bytes, int offset = 0) {
-#if IL2CPP_ENABLED
+#if ENABLE_IL2CPP
 #if UNITY_2018_1_OR_NEWER
       unsafe {
         fixed (void* ptr = &bytes[offset]) {
@@ -69,7 +69,7 @@ namespace Leap.Unity {
     /// results if there are not enough bytes in the array.
     /// </summary>
     public static UInt32 ToUInt32(byte[] bytes, int offset = 0) {
-#if IL2CPP_ENABLED
+#if ENABLE_IL2CPP
 #if UNITY_2018_1_OR_NEWER
       unsafe {
         fixed (void* ptr = &bytes[offset]) {
@@ -93,7 +93,7 @@ namespace Leap.Unity {
     /// results if there are not enough bytes in the array.
     /// </summary>
     public static Int32 ToInt32(byte[] bytes, int offset = 0) {
-#if IL2CPP_ENABLED
+#if ENABLE_IL2CPP
 #if UNITY_2018_1_OR_NEWER
       unsafe {
         fixed (void* ptr = &bytes[offset]) {
@@ -117,7 +117,7 @@ namespace Leap.Unity {
     /// results if there are not enough bytes in the array.
     /// </summary>
     public static UInt64 ToUInt64(byte[] bytes, int offset = 0) {
-#if IL2CPP_ENABLED
+#if ENABLE_IL2CPP
 #if UNITY_2018_1_OR_NEWER
       unsafe {
         fixed (void* ptr = &bytes[offset]) {
@@ -145,7 +145,7 @@ namespace Leap.Unity {
     /// results if there are not enough bytes in the array.
     /// </summary>
     public static Int64 ToInt64(byte[] bytes, int offset = 0) {
-#if IL2CPP_ENABLED
+#if ENABLE_IL2CPP
 #if UNITY_2018_1_OR_NEWER
       unsafe {
         fixed (void* ptr = &bytes[offset]) {
@@ -173,7 +173,7 @@ namespace Leap.Unity {
     /// results if there are not enough bytes in the array.
     /// </summary>
     public static Single ToSingle(byte[] bytes, int offset = 0) {
-#if IL2CPP_ENABLED
+#if ENABLE_IL2CPP
 #if UNITY_2018_1_OR_NEWER
       unsafe {
         fixed (void* ptr = &bytes[offset]) {
@@ -197,7 +197,7 @@ namespace Leap.Unity {
     /// results if there are not enough bytes in the array.
     /// </summary>
     public static Double ToDouble(byte[] bytes, int offset = 0) {
-#if IL2CPP_ENABLED
+#if ENABLE_IL2CPP
 #if UNITY_2018_1_OR_NEWER
       unsafe {
         fixed (void* ptr = &bytes[offset]) {
@@ -229,7 +229,7 @@ namespace Leap.Unity {
     /// after this method is complete.
     /// </summary>
     public static UInt16 ToUInt16(byte[] bytes, ref int offset) {
-#if IL2CPP_ENABLED
+#if ENABLE_IL2CPP
 #if UNITY_2018_1_OR_NEWER
       unsafe {
         fixed (void* ptr = &bytes[offset]) {
@@ -256,7 +256,7 @@ namespace Leap.Unity {
     /// after this method is complete.
     /// </summary>
     public static Int16 ToInt16(byte[] bytes, ref int offset) {
-#if IL2CPP_ENABLED
+#if ENABLE_IL2CPP
 #if UNITY_2018_1_OR_NEWER
       unsafe {
         fixed (void* ptr = &bytes[offset]) {
@@ -283,7 +283,7 @@ namespace Leap.Unity {
     /// after this method is complete.
     /// </summary>
     public static UInt32 ToUInt32(byte[] bytes, ref int offset) {
-#if IL2CPP_ENABLED
+#if ENABLE_IL2CPP
 #if UNITY_2018_1_OR_NEWER
       unsafe {
         fixed (void* ptr = &bytes[offset]) {
@@ -312,7 +312,7 @@ namespace Leap.Unity {
     /// after this method is complete.
     /// </summary>
     public static Int32 ToInt32(byte[] bytes, ref int offset) {
-#if IL2CPP_ENABLED
+#if ENABLE_IL2CPP
 #if UNITY_2018_1_OR_NEWER
       unsafe {
         fixed (void* ptr = &bytes[offset]) {
@@ -341,7 +341,7 @@ namespace Leap.Unity {
     /// after this method is complete.
     /// </summary>
     public static UInt64 ToUInt64(byte[] bytes, ref int offset) {
-#if IL2CPP_ENABLED
+#if ENABLE_IL2CPP
 #if UNITY_2018_1_OR_NEWER
       unsafe {
         fixed (void* ptr = &bytes[offset]) {
@@ -374,7 +374,7 @@ namespace Leap.Unity {
     /// after this method is complete.
     /// </summary>
     public static Int64 ToInt64(byte[] bytes, ref int offset) {
-#if IL2CPP_ENABLED
+#if ENABLE_IL2CPP
 #if UNITY_2018_1_OR_NEWER
       unsafe {
         fixed (void* ptr = &bytes[offset]) {
@@ -407,7 +407,7 @@ namespace Leap.Unity {
     /// after this method is complete.
     /// </summary>
     public static Single ToSingle(byte[] bytes, ref int offset) {
-#if IL2CPP_ENABLED
+#if ENABLE_IL2CPP
 #if UNITY_2018_1_OR_NEWER
       unsafe {
         fixed (void* ptr = &bytes[offset]) {
@@ -436,7 +436,7 @@ namespace Leap.Unity {
     /// after this method is complete.
     /// </summary>
     public static Double ToDouble(byte[] bytes, ref int offset) {
-#if IL2CPP_ENABLED
+#if ENABLE_IL2CPP
 #if UNITY_2018_1_OR_NEWER
       unsafe {
         fixed (void* ptr = &bytes[offset]) {
@@ -466,7 +466,7 @@ namespace Leap.Unity {
     /// bytes in the array to accept the value.
     /// </summary>
     public static void GetBytes(UInt16 value, byte[] bytes, int offset = 0) {
-#if IL2CPP_ENABLED
+#if ENABLE_IL2CPP
 #if UNITY_2018_1_OR_NEWER
       unsafe {
         fixed (void* ptr = &bytes[offset]) {
@@ -489,7 +489,7 @@ namespace Leap.Unity {
     /// bytes in the array to accept the value.
     /// </summary>
     public static void GetBytes(Int16 value, byte[] bytes, int offset = 0) {
-#if IL2CPP_ENABLED
+#if ENABLE_IL2CPP
 #if UNITY_2018_1_OR_NEWER
       unsafe {
         fixed (void* ptr = &bytes[offset]) {
@@ -512,7 +512,7 @@ namespace Leap.Unity {
     /// bytes in the array to accept the value.
     /// </summary>
     public static void GetBytes(UInt32 value, byte[] bytes, int offset = 0) {
-#if IL2CPP_ENABLED
+#if ENABLE_IL2CPP
 #if UNITY_2018_1_OR_NEWER
       unsafe {
         fixed (void* ptr = &bytes[offset]) {
@@ -537,7 +537,7 @@ namespace Leap.Unity {
     /// bytes in the array to accept the value.
     /// </summary>
     public static void GetBytes(Int32 value, byte[] bytes, int offset = 0) {
-#if IL2CPP_ENABLED
+#if ENABLE_IL2CPP
 #if UNITY_2018_1_OR_NEWER
       unsafe {
         fixed (void* ptr = &bytes[offset]) {
@@ -562,7 +562,7 @@ namespace Leap.Unity {
     /// bytes in the array to accept the value.
     /// </summary>
     public static void GetBytes(UInt64 value, byte[] bytes, int offset = 0) {
-#if IL2CPP_ENABLED
+#if ENABLE_IL2CPP
 #if UNITY_2018_1_OR_NEWER
       unsafe {
         fixed (void* ptr = &bytes[offset]) {
@@ -591,7 +591,7 @@ namespace Leap.Unity {
     /// bytes in the array to accept the value.
     /// </summary>
     public static void GetBytes(Int64 value, byte[] bytes, int offset = 0) {
-#if IL2CPP_ENABLED
+#if ENABLE_IL2CPP
 #if UNITY_2018_1_OR_NEWER
       unsafe {
         fixed (void* ptr = &bytes[offset]) {
@@ -620,7 +620,7 @@ namespace Leap.Unity {
     /// bytes in the array to accept the value.
     /// </summary>
     public static void GetBytes(Single value, byte[] bytes, int offset = 0) {
-#if IL2CPP_ENABLED
+#if ENABLE_IL2CPP
 #if UNITY_2018_1_OR_NEWER
       unsafe {
         fixed (void* ptr = &bytes[offset]) {
@@ -645,7 +645,7 @@ namespace Leap.Unity {
     /// bytes in the array to accept the value.
     /// </summary>
     public static void GetBytes(Double value, byte[] bytes, int offset = 0) {
-#if IL2CPP_ENABLED
+#if ENABLE_IL2CPP
 #if UNITY_2018_1_OR_NEWER
       unsafe {
         fixed (void* ptr = &bytes[offset]) {
@@ -677,7 +677,7 @@ namespace Leap.Unity {
     /// after this method is complete.
     /// </summary>
     public static void GetBytes(UInt16 value, byte[] bytes, ref int offset) {
-#if IL2CPP_ENABLED
+#if ENABLE_IL2CPP
 #if UNITY_2018_1_OR_NEWER
       unsafe {
         fixed (void* ptr = &bytes[offset]) {
@@ -704,7 +704,7 @@ namespace Leap.Unity {
     /// after this method is complete.
     /// </summary>
     public static void GetBytes(Int16 value, byte[] bytes, ref int offset) {
-#if IL2CPP_ENABLED
+#if ENABLE_IL2CPP
 #if UNITY_2018_1_OR_NEWER
       unsafe {
         fixed (void* ptr = &bytes[offset]) {
@@ -731,7 +731,7 @@ namespace Leap.Unity {
     /// after this method is complete.
     /// </summary>
     public static void GetBytes(UInt32 value, byte[] bytes, ref int offset) {
-#if IL2CPP_ENABLED
+#if ENABLE_IL2CPP
 #if UNITY_2018_1_OR_NEWER
       unsafe {
         fixed (void* ptr = &bytes[offset]) {
@@ -760,7 +760,7 @@ namespace Leap.Unity {
     /// after this method is complete.
     /// </summary>
     public static void GetBytes(Int32 value, byte[] bytes, ref int offset) {
-#if IL2CPP_ENABLED
+#if ENABLE_IL2CPP
 #if UNITY_2018_1_OR_NEWER
       unsafe {
         fixed (void* ptr = &bytes[offset]) {
@@ -789,7 +789,7 @@ namespace Leap.Unity {
     /// after this method is complete.
     /// </summary>
     public static void GetBytes(UInt64 value, byte[] bytes, ref int offset) {
-#if IL2CPP_ENABLED
+#if ENABLE_IL2CPP
 #if UNITY_2018_1_OR_NEWER
       unsafe {
         fixed (void* ptr = &bytes[offset]) {
@@ -822,7 +822,7 @@ namespace Leap.Unity {
     /// after this method is complete.
     /// </summary>
     public static void GetBytes(Int64 value, byte[] bytes, ref int offset) {
-#if IL2CPP_ENABLED
+#if ENABLE_IL2CPP
 #if UNITY_2018_1_OR_NEWER
       unsafe {
         fixed (void* ptr = &bytes[offset]) {
@@ -855,7 +855,7 @@ namespace Leap.Unity {
     /// after this method is complete.
     /// </summary>
     public static void GetBytes(Single value, byte[] bytes, ref int offset) {
-#if IL2CPP_ENABLED
+#if ENABLE_IL2CPP
 #if UNITY_2018_1_OR_NEWER
       unsafe {
         fixed (void* ptr = &bytes[offset]) {
@@ -884,7 +884,7 @@ namespace Leap.Unity {
     /// after this method is complete.
     /// </summary>
     public static void GetBytes(Double value, byte[] bytes, ref int offset) {
-#if IL2CPP_ENABLED
+#if ENABLE_IL2CPP
 #if UNITY_2018_1_OR_NEWER
       unsafe {
         fixed (void* ptr = &bytes[offset]) {
@@ -908,7 +908,7 @@ namespace Leap.Unity {
 #endif
     }
 
-#if !IL2CPP_ENABLED
+#if !ENABLE_IL2CPP
     [StructLayout(LayoutKind.Explicit)]
     private struct ConversionStruct {
       [FieldOffset(0)]

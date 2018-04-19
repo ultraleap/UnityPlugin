@@ -14,7 +14,7 @@ namespace Leap.Unity.Generation {
 
   public static class BitConverterNonAlloc_Template_ {
 
-#if !IL2CPP_ENABLED
+#if !ENABLE_IL2CPP
     [ThreadStatic]
     private static ConversionStruct _c;
 #endif
@@ -26,7 +26,7 @@ namespace Leap.Unity.Generation {
     /// results if there are not enough bytes in the array.
     /// </summary>
     public static Single ToSingle(byte[] bytes, int offset = 0) {
-#if IL2CPP_ENABLED
+#if ENABLE_IL2CPP
 #if UNITY_2018_1_OR_NEWER
       unsafe {
         fixed (void* ptr = &bytes[offset]) {
@@ -53,7 +53,7 @@ namespace Leap.Unity.Generation {
     /// after this method is complete.
     /// </summary>
     public static Single ToSingle(byte[] bytes, ref int offset) {
-#if IL2CPP_ENABLED
+#if ENABLE_IL2CPP
 #if UNITY_2018_1_OR_NEWER
       unsafe {
         fixed (void* ptr = &bytes[offset]) {
@@ -78,7 +78,7 @@ namespace Leap.Unity.Generation {
     /// bytes in the array to accept the value.
     /// </summary>
     public static void GetBytes(Single value, byte[] bytes, int offset = 0) {
-#if IL2CPP_ENABLED
+#if ENABLE_IL2CPP
 #if UNITY_2018_1_OR_NEWER
       unsafe {
         fixed (void* ptr = &bytes[offset]) {
@@ -105,7 +105,7 @@ namespace Leap.Unity.Generation {
     /// after this method is complete.
     /// </summary>
     public static void GetBytes(Single value, byte[] bytes, ref int offset) {
-#if IL2CPP_ENABLED
+#if ENABLE_IL2CPP
 #if UNITY_2018_1_OR_NEWER
       unsafe {
         fixed (void* ptr = &bytes[offset]) {
@@ -123,7 +123,7 @@ namespace Leap.Unity.Generation {
     }
     //END
 
-#if !IL2CPP_ENABLED
+#if !ENABLE_IL2CPP
     [StructLayout(LayoutKind.Explicit)]
     private struct ConversionStruct {
       [FieldOffset(0)]
