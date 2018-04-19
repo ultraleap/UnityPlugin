@@ -463,7 +463,7 @@ namespace LeapInternal {
   public struct LEAP_CONNECTION_CONFIG {
     public UInt32 size;
     public UInt32 flags;
-    public string server_namespace;
+    public IntPtr server_namespace; //char*
   }
 
   [StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -535,8 +535,8 @@ namespace LeapInternal {
     public Int64 frame_id;
     public Int64 timestamp;
     public UInt32 nPoints;
-    public LEAP_VECTOR[] points;
-    public UInt32[] ids;
+    public IntPtr points;  //LEAP_VECTOR*
+    public IntPtr ids;     //uint32*
   }
 
   [StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -552,7 +552,6 @@ namespace LeapInternal {
     public eLeapEventType type;
     public IntPtr eventStructPtr;
   }
-
 
   [StructLayout(LayoutKind.Sequential, Pack = 1)]
   public struct LEAP_DISCONNECTION_EVENT {
@@ -571,12 +570,6 @@ namespace LeapInternal {
     public float h_fov;
     public float v_fov;
     public UInt32 range;
-  }
-
-  [StructLayout(LayoutKind.Sequential, Pack = 1)]
-  public struct LEAP_DISTORTION_MATRIX {
-    [MarshalAs(UnmanagedType.ByValArray, SizeConst = 2 * 64 * 64)]//2floats * 64 width * 64 height
-    public float[] matrix_data;
   }
 
   [StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -603,7 +596,13 @@ namespace LeapInternal {
   public struct LEAP_IMAGE {
     public LEAP_IMAGE_PROPERTIES properties;
     public UInt64 matrix_version;
-    public IntPtr distortionMatrix; //LEAP_DISTORTION_MATRIX* distortion_matrix[2]
+
+    //LEAP_DISTORTION_MATRIX* 
+    //The struct LEAP_DISTORTION_MATRIX cannot exist in c# without using unsafe code
+    //This is ok though, since it is just an array of floats
+    //so you need to manually marshal this pointer to the correct size and type
+    //See LeapC.h for details
+    public IntPtr distortionMatrix;
     public IntPtr data; // void* of an allocator-supplied buffer
     public UInt32 offset; // Offset, in bytes, from beginning of buffer to start of image data
   }
@@ -719,7 +718,7 @@ namespace LeapInternal {
   public struct LEAP_LOG_EVENT {
     public eLeapLogSeverity severity;
     public Int64 timestamp;
-    public string message;
+    public IntPtr message; //char*
   }
 
   [StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Ansi)]
@@ -875,25 +874,25 @@ namespace LeapInternal {
       LEAP_VARIANT_VALUE_TYPE valueStruct = new LEAP_VARIANT_VALUE_TYPE(); //This is a C# approximation of a C union
       valueStruct.type = eLeapValueType.eLeapValueType_Boolean;
       valueStruct.boolValue = value ? 1 : 0;
-      return LeapC.SaveConfigWithValueType(hConnection, key, valueStruct, out requestId);
+      return SaveConfigWithValueType(hConnection, key, valueStruct, out requestId);
     }
     public static eLeapRS SaveConfigValue(IntPtr hConnection, string key, Int32 value, out UInt32 requestId) {
       LEAP_VARIANT_VALUE_TYPE valueStruct = new LEAP_VARIANT_VALUE_TYPE();
       valueStruct.type = eLeapValueType.eLeapValueType_Int32;
       valueStruct.intValue = value;
-      return LeapC.SaveConfigWithValueType(hConnection, key, valueStruct, out requestId);
+      return SaveConfigWithValueType(hConnection, key, valueStruct, out requestId);
     }
     public static eLeapRS SaveConfigValue(IntPtr hConnection, string key, float value, out UInt32 requestId) {
       LEAP_VARIANT_VALUE_TYPE valueStruct = new LEAP_VARIANT_VALUE_TYPE();
       valueStruct.type = eLeapValueType.eLeapValueType_Float;
       valueStruct.floatValue = value;
-      return LeapC.SaveConfigWithValueType(hConnection, key, valueStruct, out requestId);
+      return SaveConfigWithValueType(hConnection, key, valueStruct, out requestId);
     }
     public static eLeapRS SaveConfigValue(IntPtr hConnection, string key, string value, out UInt32 requestId) {
       LEAP_VARIANT_REF_TYPE valueStruct;
       valueStruct.type = eLeapValueType.eLeapValueType_String;
       valueStruct.stringValue = value;
-      return LeapC.SaveConfigWithRefType(hConnection, key, valueStruct, out requestId);
+      return SaveConfigWithRefType(hConnection, key, valueStruct, out requestId);
     }
     private static eLeapRS SaveConfigWithValueType(IntPtr hConnection, string key, LEAP_VARIANT_VALUE_TYPE valueStruct, out UInt32 requestId) {
       IntPtr configValue = Marshal.AllocHGlobal(Marshal.SizeOf(valueStruct));
@@ -956,5 +955,5 @@ namespace LeapInternal {
 
     [DllImport("LeapC", EntryPoint = "LeapTelemetryGetNow")]
     public static extern UInt64 TelemetryGetNow();
-  }//end LeapC
-} //end LeapInternal namespace
+  }
+}

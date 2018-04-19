@@ -526,7 +526,6 @@ namespace LeapInternal {
       object value;
       uint requestId = config_response_evt.requestId;
       if (config_response_evt.value.type != eLeapValueType.eLeapValueType_String) {
-
         switch (config_response_evt.value.type) {
           case eLeapValueType.eLeapValueType_Boolean:
             dataType = Config.ValueType.TYPE_BOOLEAN;
@@ -560,7 +559,7 @@ namespace LeapInternal {
 
     private void reportLogMessage(ref LEAP_LOG_EVENT logMsg) {
       if (LeapLogEvent != null) {
-        LeapLogEvent.DispatchOnContext(this, EventContext, new LogEventArgs(publicSeverity(logMsg.severity), logMsg.timestamp, logMsg.message));
+        LeapLogEvent.DispatchOnContext(this, EventContext, new LogEventArgs(publicSeverity(logMsg.severity), logMsg.timestamp, Marshal.PtrToStringAnsi(logMsg.message)));
       }
     }
 
@@ -602,10 +601,11 @@ namespace LeapInternal {
       distortionData.Version = image.matrix_version;
       distortionData.Width = LeapC.DistortionSize; //fixed value for now
       distortionData.Height = LeapC.DistortionSize; //fixed value for now
+
+      //Visit LeapC.h for more details.  We need to marshal the float data manually
+      //since the distortion struct cannot be represented safely in c#
       distortionData.Data = new float[(int)(distortionData.Width * distortionData.Height * 2)]; //2 float values per map point
-      LEAP_DISTORTION_MATRIX matrix;
-      StructMarshal<LEAP_DISTORTION_MATRIX>.PtrToStruct(image.distortionMatrix, out matrix);
-      Array.Copy(matrix.matrix_data, distortionData.Data, matrix.matrix_data.Length);
+      Marshal.Copy(image.distortionMatrix, distortionData.Data, 0, distortionData.Data.Length);
 
       if (LeapDistortionChange != null) {
         LeapDistortionChange.DispatchOnContext(this, EventContext, new DistortionEventArgs(distortionData, camera));
@@ -807,16 +807,7 @@ namespace LeapInternal {
       reportAbnormalResults("LeapC TelemetryProfiling call was ", result);
     }
 
-    [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    private struct LEAP_POINT_MAPPING_INTERNAL {
-      public Int64 frame_id;
-      public Int64 timestamp;
-      public UInt32 nPoints;
-      public IntPtr points;
-      public IntPtr ids;
-    }
-
-    public void GetPointMapping(ref LEAP_POINT_MAPPING pm) {
+    public void GetPointMapping(ref PointMapping pm) {
       UInt64 size = 0;
       IntPtr buffer = IntPtr.Zero;
       while (true) {
@@ -829,21 +820,19 @@ namespace LeapInternal {
         }
         reportAbnormalResults("LeapC get point mapping call was ", result);
         if (result != eLeapRS.eLeapRS_Success) {
-          pm.nPoints = 0;
           pm.points = null;
           pm.ids = null;
           return;
         }
         break;
       }
-      LEAP_POINT_MAPPING_INTERNAL pmi;
-      StructMarshal<LEAP_POINT_MAPPING_INTERNAL>.PtrToStruct(buffer, out pmi);
+      LEAP_POINT_MAPPING pmi;
+      StructMarshal<LEAP_POINT_MAPPING>.PtrToStruct(buffer, out pmi);
       Int32 nPoints = (Int32)pmi.nPoints;
 
-      pm.frame_id = pmi.frame_id;
+      pm.frameId = pmi.frame_id;
       pm.timestamp = pmi.timestamp;
-      pm.nPoints = pmi.nPoints;
-      pm.points = new LEAP_VECTOR[nPoints];
+      pm.points = new Vector[nPoints];
       pm.ids = new UInt32[nPoints];
 
       float[] points = new float[3 * nPoints];

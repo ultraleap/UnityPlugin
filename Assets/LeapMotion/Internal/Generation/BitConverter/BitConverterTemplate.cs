@@ -13,37 +13,101 @@ using System.Runtime.InteropServices;
 namespace Leap.Unity.Generation {
 
   public static class BitConverterNonAlloc_Template_ {
-    private static ConversionStruct _c = new ConversionStruct();
+
+#if !ENABLE_IL2CPP
+    [ThreadStatic]
+    private static ConversionStruct _c;
+#endif
 
     //BEGIN TO
-
+    /// <summary>
+    /// Given an array of bytes, and an offset to start reading from, return
+    /// the Single value that is represented by that byte pattern.  Undefined
+    /// results if there are not enough bytes in the array.
+    /// </summary>
     public static Single ToSingle(byte[] bytes, int offset = 0) {
+#if ENABLE_IL2CPP
+      unsafe {
+        fixed (void* ptr = &bytes[offset]) {
+          return *(Single*)ptr;
+        }
+      }
+#else
       //FILL BYTES
       return _c.Single;
+#endif
     }
     //END
     //BEGIN TO
 
+    /// <summary>
+    /// Given an array of bytes, and an offset to start reading from, return
+    /// the Single value that is represented by that byte pattern.  Undefined
+    /// results if there are not enough bytes in the array.
+    /// 
+    /// The offset variable is incremented by the size of the Single in bytes
+    /// after this method is complete.
+    /// </summary>
     public static Single ToSingle(byte[] bytes, ref int offset) {
+#if ENABLE_IL2CPP
+      unsafe {
+        fixed (void* ptr = &bytes[offset]) {
+          offset += sizeof(Single);
+          return *(Single*)ptr;
+        }
+      }
+#else
       //FILL BYTES
       return _c.Single;
+#endif
     }
     //END
     //BEGIN GET
 
+    /// <summary>
+    /// Given a Single value, copy its binary representation into the given array
+    /// of bytes, at the given offset.  Undefined results if there are not enough
+    /// bytes in the array to accept the value.
+    /// </summary>
     public static void GetBytes(Single value, byte[] bytes, int offset = 0) {
+#if ENABLE_IL2CPP
+      unsafe {
+        fixed (void* ptr = &bytes[offset]) {
+          *(Single*)ptr = value;
+        }
+      }
+#else
       _c.Single = value;
       //FILL BYTES
+#endif
     }
     //END
     //BEGIN GET
 
+    /// <summary>
+    /// Given a Single value, copy its binary representation into the given array
+    /// of bytes, at the given offset.  Undefined results if there are not enough
+    /// bytes in the array to accept the value.
+    /// 
+    /// The offset variable is incremented by the size of the Single in bytes
+    /// after this method is complete.
+    /// </summary>
     public static void GetBytes(Single value, byte[] bytes, ref int offset) {
+#if ENABLE_IL2CPP
+      unsafe {
+        fixed (void* ptr = &bytes[offset]) {
+          offset += sizeof(Single);
+          *(Single*)ptr = value;
+        }
+      }
+#else
       _c.Single = value;
       //FILL BYTES
+#endif
     }
     //END
 
+#if !ENABLE_IL2CPP
     [StructLayout(LayoutKind.Explicit)]
     private struct ConversionStruct {
       [FieldOffset(0)]
@@ -80,5 +144,6 @@ namespace Leap.Unity.Generation {
       [FieldOffset(0)]
       public Double Double;
     }
+#endif
   }
 }
