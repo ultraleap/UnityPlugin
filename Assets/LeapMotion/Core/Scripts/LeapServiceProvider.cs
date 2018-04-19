@@ -87,6 +87,7 @@ namespace Leap.Unity {
 #endif
 
     protected Controller _leapController;
+    protected bool _isDestroyed;
 
     protected SmoothedFloat _fixedOffset = new SmoothedFloat();
     protected SmoothedFloat _smoothedTrackingLatency = new SmoothedFloat();
@@ -326,6 +327,7 @@ namespace Leap.Unity {
 
     protected virtual void OnDestroy() {
       destroyController();
+      _isDestroyed = true;
     }
 
     protected virtual void OnApplicationPause(bool isPaused) {
@@ -341,6 +343,7 @@ namespace Leap.Unity {
 
     protected virtual void OnApplicationQuit() {
       destroyController();
+      _isDestroyed = true;
     }
 
     public float CalculatePhysicsExtrapolation() {
@@ -367,7 +370,7 @@ namespace Leap.Unity {
     public Controller GetLeapController() {
       #if UNITY_EDITOR
       // Null check to deal with hot reloading.
-      if (_leapController == null) {
+      if (!_isDestroyed && _leapController == null) {
         createController();
       }
       #endif

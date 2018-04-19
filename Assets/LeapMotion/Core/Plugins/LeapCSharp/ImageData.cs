@@ -33,12 +33,12 @@ namespace LeapInternal {
     public UInt64 DistortionMatrixKey { get; protected set; }
     public DistortionData DistortionData { get; protected set; }
 
-    public ImageData(Image.CameraType camera, LEAP_IMAGE image, DistortionData distortionData, MemoryManager memoryManager) {
+    public ImageData(Image.CameraType camera, LEAP_IMAGE image, DistortionData distortionData) {
       this.camera = camera;
       this._properties = image.properties;
       this.DistortionMatrixKey = image.matrix_version;
       this.DistortionData = distortionData;
-      this._object = memoryManager.GetPinnedObject(image.data);
+      this._object = MemoryManager.GetPinnedObject(image.data);
       this.byteOffset = image.offset;
     }
   }

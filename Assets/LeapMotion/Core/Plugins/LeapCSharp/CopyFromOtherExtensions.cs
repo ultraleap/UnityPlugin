@@ -21,7 +21,6 @@ namespace Leap {
       frame.Id = source.Id;
       frame.Timestamp = source.Timestamp;
       frame.CurrentFramesPerSecond = source.CurrentFramesPerSecond;
-      frame.InteractionBox = source.InteractionBox;
 
       frame.ResizeHandList(source.Hands.Count);
 
@@ -81,9 +80,7 @@ namespace Leap {
       finger.TimeVisible = source.TimeVisible;
 
       finger.TipPosition = source.TipPosition;
-      finger.TipVelocity = source.TipVelocity;
       finger.Direction = source.Direction;
-      finger.StabilizedTipPosition = source.StabilizedTipPosition;
       finger.Width = source.Width;
       finger.Length = source.Length;
       finger.IsExtended = source.IsExtended;

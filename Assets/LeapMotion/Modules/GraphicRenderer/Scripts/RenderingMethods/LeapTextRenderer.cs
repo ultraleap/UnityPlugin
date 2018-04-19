@@ -295,15 +295,14 @@ namespace Leap.Unity.GraphicalRenderer {
             }
           }
         }
-
-        var textGraphic = graphic as LeapTextGraphic;
-        var text = textGraphic.text;
+        
+        var text = graphic.text;
 
         float _charScale = this._scale * SCALE_CONSTANT / _dynamicPixelsPerUnit;
         float _scale = _charScale * graphic.fontSize / _font.fontSize;
-        float lineHeight = _scale * textGraphic.lineSpacing * _font.lineHeight * _dynamicPixelsPerUnit;
+        float lineHeight = _scale * graphic.lineSpacing * _font.lineHeight * _dynamicPixelsPerUnit;
 
-        RectTransform rectTransform = textGraphic.transform as RectTransform;
+        RectTransform rectTransform = graphic.transform as RectTransform;
         float maxWidth;
         if (rectTransform != null) {
           maxWidth = rectTransform.rect.width;
@@ -315,7 +314,7 @@ namespace Leap.Unity.GraphicalRenderer {
         _widthCalculator.charScale = _charScale;
         _widthCalculator.fontStyle = graphic.fontStyle;
         _widthCalculator.scaledFontSize = scaledFontSize;
-        TextWrapper.Wrap(text, textGraphic.tokens, _tempLines, _widthCalculator.func, maxWidth);
+        TextWrapper.Wrap(text, graphic.tokens, _tempLines, _widthCalculator.func, maxWidth);
 
         float textHeight = _tempLines.Count * lineHeight;
 
@@ -325,7 +324,7 @@ namespace Leap.Unity.GraphicalRenderer {
         if (rectTransform != null) {
           origin.y -= rectTransform.rect.y;
 
-          switch (textGraphic.verticalAlignment) {
+          switch (graphic.verticalAlignment) {
             case LeapTextGraphic.VerticalAlignment.Center:
               origin.y -= (rectTransform.rect.height - textHeight) / 2;
               break;
@@ -339,7 +338,7 @@ namespace Leap.Unity.GraphicalRenderer {
 
           if (rectTransform != null) {
             origin.x = rectTransform.rect.x;
-            switch (textGraphic.horizontalAlignment) {
+            switch (graphic.horizontalAlignment) {
               case LeapTextGraphic.HorizontalAlignment.Center:
                 origin.x += (rectTransform.rect.width - line.width) / 2;
                 break;
@@ -348,7 +347,7 @@ namespace Leap.Unity.GraphicalRenderer {
                 break;
             }
           } else {
-            switch (textGraphic.horizontalAlignment) {
+            switch (graphic.horizontalAlignment) {
               case LeapTextGraphic.HorizontalAlignment.Left:
                 origin.x = 0;
                 break;

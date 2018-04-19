@@ -8,26 +8,27 @@
  ******************************************************************************/
 
 namespace Leap {
-
   using System;
-  using System.Runtime.InteropServices;
   using System.Collections.Generic;
 
-  /**
-   * The DeviceList class represents a list of Device objects.
-   *
-   * Get a DeviceList object by calling Controller::devices().
-   * @since 1.0
-   */
+  /// <summary>
+  /// The DeviceList class represents a list of Device objects.
+  /// 
+  /// Get a DeviceList object by calling Controller.Devices().
+  /// @since 1.0
+  /// </summary>
   public class DeviceList :
     List<Device> {
-    /**
-     * Constructs an empty list of devices.
-     * @since 1.0
-     */
+
+    /// <summary>
+    /// Constructs an empty list of devices.
+    /// @since 1.0
+    /// </summary>
     public DeviceList() { }
 
-    /* For internal use. */
+    /// <summary>
+    /// For internal use only.
+    /// </summary>
     public Device FindDeviceByHandle(IntPtr deviceHandle) {
       for (int d = 0; d < this.Count; d++) {
         if (this[d].Handle == deviceHandle)
@@ -36,44 +37,44 @@ namespace Leap {
       return null;
     }
 
-    /**
-    * The device that is currently streaming tracking data.
-    * If no streaming devices are found, returns a default object.
-    * @since 3.0
-    */
+    /// <summary>
+    /// The device that is currently streaming tracking data.
+    /// If no streaming devices are found, returns null
+    /// </summary>
     public Device ActiveDevice {
       get {
-        if (Count == 1)
+        if (Count == 1) {
           return this[0];
-
-        for (int d = 0; d < this.Count; d++) {
-          if (this[d].IsStreaming)
-            return this[d];
         }
-        return new Device();
+
+        for (int d = 0; d < Count; d++) {
+          if (this[d].IsStreaming) {
+            return this[d];
+          }
+        }
+
+        return null;
       }
     }
 
-    /* For internal use. */
+    /// <summary>
+    /// For internal use only.
+    /// </summary>
     public void AddOrUpdate(Device device) {
       Device existingDevice = FindDeviceByHandle(device.Handle);
       if (existingDevice != null) {
         existingDevice.Update(device);
       } else {
-        this.Add(device);
+        Add(device);
       }
     }
 
-    /**
-     * Reports whether the list is empty.
-     *
-     * \include DeviceList_isEmpty.txt
-     *
-     * @returns True, if the list has no members.
-     * @since 1.0
-     */
+    /// <summary>
+    /// Reports whether the list is empty.
+    /// @since 1.0
+    /// </summary>
     public bool IsEmpty {
-      get { return this.Count == 0; }
+      get { return Count == 0; }
     }
   }
 }

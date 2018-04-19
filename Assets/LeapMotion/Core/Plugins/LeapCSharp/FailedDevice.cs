@@ -8,99 +8,77 @@
  ******************************************************************************/
 
 namespace Leap {
-
   using System;
-  using System.Runtime.InteropServices;
 
-  /**
-   * The FailedDevice class provides information about Leap Motion hardware that
-   * has been physically connected to the client computer, but is not operating
-   * correctly.
-   *
-   * Failed devices do not provide any tracking data and do not show up in the
-   * Controller:devices() list.
-   *
-   * Get the list of failed devices using Controller::failedDevices().
-   *
-   * \include FailedDevice_class.txt
-   *
-   * @since 3.0
-   */
-
-  //TODO Implement FailedDevices
+  /// <summary>
+  /// The FailedDevice class provides information about Leap Motion hardware that
+  /// has been physically connected to the client computer, but is not operating
+  /// correctly.
+  /// 
+  /// Failed devices do not provide any tracking data and do not show up in the
+  /// Controller.Devices() list.
+  /// 
+  /// Get the list of failed devices using Controller.FailedDevices().
+  /// 
+  /// @since 3.0
+  /// </summary>
   public class FailedDevice :
     IEquatable<FailedDevice> {
+
     public FailedDevice() {
       Failure = FailureType.FAIL_UNKNOWN;
       PnpId = "0";
     }
 
-    /**
-     * Test FailedDevice equality.
-     * True if the devices are the same.
-     * @since 3.0
-     */
+    /// <summary>
+    /// Test FailedDevice equality.
+    /// True if the devices are the same.
+    /// @since 3.0
+    /// </summary>
     public bool Equals(FailedDevice other) {
-      return this.PnpId == other.PnpId;
+      return PnpId == other.PnpId;
     }
 
-    /**
-        * The device plug-and-play id string.
-        * @since 3.0
-        */
+    /// <summary>
+    /// The device plug-and-play id string.
+    /// @since 3.0
+    /// </summary>
     public string PnpId { get; private set; }
 
-    /**
-     * The reason for device failure.
-     *
-     * The failure reasons are defined as members of the FailureType enumeration:
-     *
-     * **FailureType::FAIL_UNKNOWN**  The cause of the error is unknown.
-     *
-     * **FailureType::FAIL_CALIBRATION** The device has a bad calibration record.
-     *
-     * **FailureType::FAIL_FIRMWARE** The device firmware is corrupt or failed to update.
-     *
-     * **FailureType::FAIL_TRANSPORT** The device is unresponsive.
-     *
-     * **FailureType::FAIL_CONTROL** The service cannot establish the required USB control interfaces.
-     *
-     * **FailureType::FAIL_COUNT** Not currently used.
-     *
-     * @since 3.0
-     */
-    public FailedDevice.FailureType Failure { get; private set; }
+    /// <summary>
+    /// The reason for device failure.
+    /// The failure reasons are defined as members of the FailureType enumeration.
+    /// 
+    /// @since 3.0
+    /// </summary>
+    public FailureType Failure { get; private set; }
 
-    /**
-     * The errors that can cause a device to fail to properly connect to the service.
-     *
-     * @since 3.0
-     */
+    /// <summary>
+    /// The errors that can cause a device to fail to properly connect to the service.
+    /// 
+    /// @since 3.0
+    /// </summary>
     public enum FailureType {
-      /** The cause of the error is unknown.
-       * @since 3.0
-       */
+      /// <summary>
+      /// The cause of the error is unknown.
+      /// </summary>
       FAIL_UNKNOWN,
-      /** The device has a bad calibration record.
-       * @since 3.0
-       */
+      /// <summary>
+      /// The device has a bad calibration record.
+      /// </summary>
       FAIL_CALIBRATION,
-      /** The device firmware is corrupt or failed to update.
-       * @since 3.0
-       */
+      /// <summary>
+      /// The device firmware is corrupt or failed to update.
+      /// </summary>
       FAIL_FIRMWARE,
-      /** The device is unresponsive.
-       * @since 3.0
-       */
+      /// <summary>
+      /// The device is unresponsive.
+      /// </summary>
       FAIL_TRANSPORT,
-      /** The service cannot establish the required USB control interfaces.
-       * @since 3.0
-       */
-      FAIL_CONTROL,
-      /** Not currently used.
-       * @since 3.0
-       */
-      FAIL_COUNT
+      /// <summary>
+      /// The service cannot establish the required USB control interfaces.
+      /// </summary>
+      FAIL_CONTROl
     }
   }
 }

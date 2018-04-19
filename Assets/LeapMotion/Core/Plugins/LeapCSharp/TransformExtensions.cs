@@ -95,9 +95,7 @@ namespace Leap {
       nextBone.PrevJoint = transform.TransformPoint(nextBone.PrevJoint);
       nextBone.TransformGivenJoints(transform);
 
-      finger.TipVelocity = transform.TransformVelocity(finger.TipVelocity);
       finger.Direction = finger.bones[2].Direction;
-      finger.StabilizedTipPosition = transform.TransformPoint(finger.StabilizedTipPosition);
       finger.Width *= Math.Abs(transform.scale.x);
       finger.Length *= Math.Abs(transform.scale.z);
 

@@ -69,21 +69,5 @@ namespace Leap.LeapCSharp.Tests {
       StructMarshal<TestMarshaledStruct>.ArrayElementToStruct(_ptr, ARRAY_TEST_INDEX, out output);
       Assert.That(_testStruct.id, Is.EqualTo(output.id), "Input must match output.");
     }
-
-    [Test]
-    public void CopyIntoDestination() {
-      StructMarshal<TestMarshaledStruct>.CopyIntoDestination(_ptr, ref _testStruct);
-
-      var output = (TestMarshaledStruct)Marshal.PtrToStructure(_ptr, typeof(TestMarshaledStruct));
-      Assert.That(_testStruct.id, Is.EqualTo(output.id), "Input must match output.");
-    }
-
-    [Test]
-    public void CopyIntoArray() {
-      StructMarshal<TestMarshaledStruct>.CopyIntoArray(_ptr, ref _testStruct, ARRAY_TEST_INDEX);
-
-      var output = (TestMarshaledStruct)Marshal.PtrToStructure((IntPtr)((long)_ptr + _size * ARRAY_TEST_INDEX), typeof(TestMarshaledStruct));
-      Assert.That(_testStruct.id, Is.EqualTo(output.id), "Input must match output.");
-    }
   }
 }

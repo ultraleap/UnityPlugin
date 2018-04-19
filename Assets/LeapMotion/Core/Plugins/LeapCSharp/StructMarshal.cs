@@ -16,6 +16,7 @@ namespace LeapInternal {
    * A helper class to marshal between unmanaged memory and structs without creating garbage.
    */
   public static class StructMarshal<T> where T : struct {
+#if !ENABLE_IL2CPP
     [StructLayout(LayoutKind.Sequential)]
     private class StructContainer {
       public T value;
@@ -23,6 +24,8 @@ namespace LeapInternal {
 
     [ThreadStatic]
     private static StructContainer _container;
+#endif
+
     private static int _sizeofT;
 
     static StructMarshal() {
@@ -40,32 +43,18 @@ namespace LeapInternal {
     }
 
     /**
-     * Copies a struct of type T into the memory pointed to by dstPtr.  This is an
-     * unsafe operation that assumes there is enough space allocated at the pointer
-     * to accommodate the struct.
-     */
-    public static void CopyIntoDestination(IntPtr dstPtr, ref T t) {
-      CopyIntoArray(dstPtr, ref t, 0);
-    }
-
-    /**
-     * Copies a struct of type T into the array pointed to by arrayPtr at the
-     * offset index specified by index.  This is an unsafe operation that assumes
-     * there is enough space allocated in the array to accommodate the struct.
-     */
-    public static void CopyIntoArray(IntPtr arrayPtr, ref T t, int index) {
-      if (_container == null) {
-        _container = new StructContainer();
-      }
-
-      _container.value = t;
-      Marshal.StructureToPtr(_container, new IntPtr(arrayPtr.ToInt64() + _sizeofT * index), false);
-    }
-
-    /**
      * Converts an IntPtr to a struct of type T.
      */
     public static void PtrToStruct(IntPtr ptr, out T t) {
+#if ENABLE_IL2CPP
+#if UNITY_2018_1_OR_NEWER
+      unsafe {
+        Unity.Collections.LowLevel.Unsafe.UnsafeUtility.CopyPtrToStructure((void*)ptr, out t);
+      }
+#else
+#error UnityModules Only supports IL2CPP on versions of Unity 2018.1 or greater.
+#endif
+#else
       if (_container == null) {
         _container = new StructContainer();
       }
@@ -74,9 +63,10 @@ namespace LeapInternal {
         Marshal.PtrToStructure(ptr, _container);
         t = _container.value;
       } catch (Exception e) {
-        Logger.Log("Problem converting structure " + typeof(T) + " from ptr " + ptr + " : " + e.Message);
+        UnityEngine.Debug.LogException(e);
         t = default(T);
       }
+#endif
     }
 
     /**

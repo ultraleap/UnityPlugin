@@ -1463,16 +1463,16 @@ namespace Leap.Unity.Interaction {
 
         // Update the manager if necessary.
 
-      if (interactionLayer != _lastInteractionLayer) {
-        (manager as IInternalInteractionManager).NotifyIntObjHasNewInteractionLayer(this, oldInteractionLayer: _lastInteractionLayer,
-                                                                                          newInteractionLayer: interactionLayer);
-        _lastInteractionLayer = interactionLayer;
-      }
+        if (interactionLayer != _lastInteractionLayer) {
+          (manager as IInternalInteractionManager).NotifyIntObjHasNewInteractionLayer(this, oldInteractionLayer: _lastInteractionLayer,
+                                                                                            newInteractionLayer: interactionLayer);
+          _lastInteractionLayer = interactionLayer;
+        }
 
         if (noContactLayer != _lastNoContactLayer) {
           (manager as IInternalInteractionManager).NotifyIntObjHasNewNoContactLayer(this, oldNoContactLayer: _lastNoContactLayer,
                                                                                           newNoContactLayer: noContactLayer);
-          _lastInteractionLayer = noContactLayer;
+          _lastNoContactLayer = noContactLayer;
         }
       }
     }
