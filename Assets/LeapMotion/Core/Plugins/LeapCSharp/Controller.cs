@@ -558,7 +558,7 @@ namespace Leap {
       return LeapC.TelemetryGetNow();
     }
 
-    public void GetPointMapping(ref LEAP_POINT_MAPPING pointMapping) {
+    public void GetPointMapping(ref PointMapping pointMapping) {
       _connection.GetPointMapping(ref pointMapping);
     }
 
