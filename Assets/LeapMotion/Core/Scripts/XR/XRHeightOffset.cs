@@ -58,7 +58,7 @@ namespace Leap.Unity {
 
     [Tooltip("If enabled, InputTracking.Recenter will be called when the assigned key is "
            + "pressed.")]
-    public bool recenterOnKey = true;
+    public bool recenterOnKey = false;
 
     [Tooltip("When this key is pressed, InputTracking.Recenter will be called.")]
     public KeyCode recenterKey = KeyCode.R;
