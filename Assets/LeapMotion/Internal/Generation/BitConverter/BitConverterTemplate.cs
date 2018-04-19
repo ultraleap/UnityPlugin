@@ -27,15 +27,11 @@ namespace Leap.Unity.Generation {
     /// </summary>
     public static Single ToSingle(byte[] bytes, int offset = 0) {
 #if ENABLE_IL2CPP
-#if UNITY_2018_1_OR_NEWER
       unsafe {
         fixed (void* ptr = &bytes[offset]) {
           return *(Single*)ptr;
         }
       }
-#else
-#error BitConverterNoAlloc only supports IL2CPP on versions of Unity 2018.1 or greater.
-#endif
 #else
       //FILL BYTES
       return _c.Single;
@@ -54,16 +50,12 @@ namespace Leap.Unity.Generation {
     /// </summary>
     public static Single ToSingle(byte[] bytes, ref int offset) {
 #if ENABLE_IL2CPP
-#if UNITY_2018_1_OR_NEWER
       unsafe {
         fixed (void* ptr = &bytes[offset]) {
           offset += sizeof(Single);
           return *(Single*)ptr;
         }
       }
-#else
-#error BitConverterNoAlloc only supports IL2CPP on versions of Unity 2018.1 or greater.
-#endif
 #else
       //FILL BYTES
       return _c.Single;
@@ -79,15 +71,11 @@ namespace Leap.Unity.Generation {
     /// </summary>
     public static void GetBytes(Single value, byte[] bytes, int offset = 0) {
 #if ENABLE_IL2CPP
-#if UNITY_2018_1_OR_NEWER
       unsafe {
         fixed (void* ptr = &bytes[offset]) {
           *(Single*)ptr = value;
         }
       }
-#else
-#error BitConverterNoAlloc only supports IL2CPP on versions of Unity 2018.1 or greater.
-#endif
 #else
       _c.Single = value;
       //FILL BYTES
@@ -106,16 +94,12 @@ namespace Leap.Unity.Generation {
     /// </summary>
     public static void GetBytes(Single value, byte[] bytes, ref int offset) {
 #if ENABLE_IL2CPP
-#if UNITY_2018_1_OR_NEWER
       unsafe {
         fixed (void* ptr = &bytes[offset]) {
           offset += sizeof(Single);
           *(Single*)ptr = value;
         }
       }
-#else
-#error BitConverterNoAlloc only supports IL2CPP on versions of Unity 2018.1 or greater.
-#endif
 #else
       _c.Single = value;
       //FILL BYTES
