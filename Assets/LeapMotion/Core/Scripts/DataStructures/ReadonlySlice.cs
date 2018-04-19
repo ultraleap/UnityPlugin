@@ -31,7 +31,7 @@ namespace Leap.Unity {
     /// used in a <code>foreach</code> statement.
     /// </summary>
     public static ReadonlySlice<T> ReadonlySlice<T>(this ReadonlyList<T> list, int beginIdx = -1, int endIdx = -1) {
-      if (beginIdx == -1 && endIdx != -1) {
+      if (beginIdx == -1 && endIdx == -1) {
         return new ReadonlySlice<T>(list, 0, list.Count);
       }
       else if (beginIdx == -1 && endIdx != -1) {

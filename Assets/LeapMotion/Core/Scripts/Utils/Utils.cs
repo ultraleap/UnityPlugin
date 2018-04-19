@@ -336,31 +336,25 @@ namespace Leap.Unity {
         currIndex--;
         char c = value[currIndex];
 
-        if (currFunc != null) {
-          if (currFunc(c)) {
-            continue;
-          } else {
-            currFunc = null;
-          }
+        if (currFunc != null && currFunc(c)) {
+          continue;
         }
 
-        if (currFunc == null) {
-          if (curr != "") {
-            result = " " + curr.Capitalize() + result;
-            curr = "";
-          }
+        if (curr != "") {
+          result = " " + curr.Capitalize() + result;
+          curr = "";
+        }
 
-          if (acronymFunc(c)) {
-            currFunc = acronymFunc;
-          } else if (wordFunc(c)) {
-            currFunc = wordFunc;
-          } else if (numberFunc(c)) {
-            currFunc = numberFunc;
-          } else if (fluffFunc(c)) {
-            currFunc = fluffFunc;
-          } else {
-            throw new Exception("Unexpected state, no function matched character " + c);
-          }
+        if (acronymFunc(c)) {
+          currFunc = acronymFunc;
+        } else if (wordFunc(c)) {
+          currFunc = wordFunc;
+        } else if (numberFunc(c)) {
+          currFunc = numberFunc;
+        } else if (fluffFunc(c)) {
+          currFunc = fluffFunc;
+        } else {
+          throw new Exception("Unexpected state, no function matched character " + c);
         }
       }
 
