@@ -447,7 +447,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _roomScaleHeightOffset: 1.6
-  autoRecenterOnUserPresence: 1
+  recenterOnUserPresence: 1
+  recenterOnStart: 1
+  recenterOnKey: 1
+  recenterKey: 114
   enableRuntimeAdjustment: 1
   stepUpKey: 273
   stepDownKey: 274
@@ -528,8 +531,8 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 420189611}
-  m_LocalRotation: {x: -0.8627298, y: 0.07547905, z: -0.12940954, w: -0.48296326}
-  m_LocalPosition: {x: -0.2732525, y: -0.06377416, z: 0.26097336}
+  m_LocalRotation: {x: -0.8627298, y: 0.075478986, z: -0.12940952, w: -0.48296323}
+  m_LocalPosition: {x: -0.27325246, y: -0.06331757, z: 0.25051472}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 795012431}
@@ -800,7 +803,7 @@ Prefab:
     - target: {fileID: 224000011045273006, guid: ed811e274f5753b478b84e8424f730ef,
         type: 2}
       propertyPath: m_AnchorMin.x
-      value: 0
+      value: 0.00000003196227
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: ed811e274f5753b478b84e8424f730ef, type: 2}
@@ -1197,8 +1200,8 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1188448098}
-  m_LocalRotation: {x: -0.8627298, y: -0.07547908, z: 0.1294096, w: -0.48296323}
-  m_LocalPosition: {x: 0.27325255, y: -0.06377416, z: 0.2609733}
+  m_LocalRotation: {x: -0.8627298, y: -0.07547914, z: 0.12940961, w: -0.4829632}
+  m_LocalPosition: {x: 0.27325258, y: -0.06331751, z: 0.2505146}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 422496982}
@@ -1319,11 +1322,6 @@ MonoBehaviour:
     IsRightToBeSpawned: 0
     IsEnabled: 1
     CanDuplicate: 1
-    HandPostProcesses:
-      m_PersistentCalls:
-        m_Calls: []
-      m_TypeName: Leap.Unity.Hands+HandEvent, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
-        PublicKeyToken=null
 --- !u!1 &2098797246
 GameObject:
   m_ObjectHideFlags: 0
@@ -1370,6 +1368,7 @@ MonoBehaviour:
   _frameOptimization: 0
   _physicsExtrapolation: 1
   _physicsExtrapolationTime: 0.011111111
+  _workerThreadProfiling: 0
   _allowManualDeviceOffset: 0
   _deviceOffsetYAxis: 0
   _deviceOffsetZAxis: 0.12

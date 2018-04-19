@@ -155,7 +155,6 @@ MonoBehaviour:
   _allowMultiGrasp: 0
   _moveObjectWhenGrasped: 1
   graspedMovementType: 0
-  graspHoldWarpingEnabled__curIgnored: 1
   _overrideInteractionLayer: 0
   _interactionLayer:
     layerIndex: 0
@@ -1361,6 +1360,26 @@ Prefab:
     - target: {fileID: 4389870053191570, guid: 2276723046d707c4f94d431ceb80ab92, type: 2}
       propertyPath: m_LocalRotation.z
       value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4222071105232520, guid: 2276723046d707c4f94d431ceb80ab92, type: 2}
+      propertyPath: m_LocalScale.x
+      value: 0.9999971
+      objectReference: {fileID: 0}
+    - target: {fileID: 4409171998759784, guid: 2276723046d707c4f94d431ceb80ab92, type: 2}
+      propertyPath: m_LocalScale.x
+      value: 1.0000038
+      objectReference: {fileID: 0}
+    - target: {fileID: 4958922228817942, guid: 2276723046d707c4f94d431ceb80ab92, type: 2}
+      propertyPath: m_LocalScale.x
+      value: 0.99999934
+      objectReference: {fileID: 0}
+    - target: {fileID: 4149354895858466, guid: 2276723046d707c4f94d431ceb80ab92, type: 2}
+      propertyPath: m_LocalScale.x
+      value: 0.9999972
+      objectReference: {fileID: 0}
+    - target: {fileID: 4845852643395992, guid: 2276723046d707c4f94d431ceb80ab92, type: 2}
+      propertyPath: m_LocalScale.x
+      value: 1.0000049
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 2276723046d707c4f94d431ceb80ab92, type: 2}
@@ -3213,6 +3232,26 @@ Prefab:
       propertyPath: m_LocalRotation.x
       value: -0
       objectReference: {fileID: 0}
+    - target: {fileID: 4411577448127944, guid: 2aa010a1e75292e49a24f3f71bb9cddb, type: 2}
+      propertyPath: m_LocalScale.x
+      value: 0.9999987
+      objectReference: {fileID: 0}
+    - target: {fileID: 4143700205523432, guid: 2aa010a1e75292e49a24f3f71bb9cddb, type: 2}
+      propertyPath: m_LocalScale.x
+      value: 0.99999917
+      objectReference: {fileID: 0}
+    - target: {fileID: 4883225918227628, guid: 2aa010a1e75292e49a24f3f71bb9cddb, type: 2}
+      propertyPath: m_LocalScale.x
+      value: 1.0000039
+      objectReference: {fileID: 0}
+    - target: {fileID: 4113658506791758, guid: 2aa010a1e75292e49a24f3f71bb9cddb, type: 2}
+      propertyPath: m_LocalScale.x
+      value: 0.9999972
+      objectReference: {fileID: 0}
+    - target: {fileID: 4859271042775292, guid: 2aa010a1e75292e49a24f3f71bb9cddb, type: 2}
+      propertyPath: m_LocalScale.x
+      value: 0.9999986
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 2aa010a1e75292e49a24f3f71bb9cddb, type: 2}
   m_IsPrefabParent: 0
@@ -3340,11 +3379,6 @@ MonoBehaviour:
     IsRightToBeSpawned: 0
     IsEnabled: 1
     CanDuplicate: 0
-    HandPostProcesses:
-      m_PersistentCalls:
-        m_Calls: []
-      m_TypeName: Leap.Unity.Hands+HandEvent, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
-        PublicKeyToken=null
 --- !u!114 &1036247346 stripped
 MonoBehaviour:
   m_PrefabParentObject: {fileID: 114446365300099102, guid: 72368278d054cda4bb18e5aa08ce971d,
@@ -3504,7 +3538,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _roomScaleHeightOffset: 1.6
-  autoRecenterOnUserPresence: 1
+  recenterOnUserPresence: 1
+  recenterOnStart: 1
+  recenterOnKey: 1
+  recenterKey: 114
   enableRuntimeAdjustment: 1
   stepUpKey: 273
   stepDownKey: 274
@@ -4242,7 +4279,6 @@ MonoBehaviour:
   _allowMultiGrasp: 0
   _moveObjectWhenGrasped: 1
   graspedMovementType: 0
-  graspHoldWarpingEnabled__curIgnored: 1
   _overrideInteractionLayer: 0
   _interactionLayer:
     layerIndex: 0
@@ -4368,6 +4404,7 @@ MonoBehaviour:
   _frameOptimization: 0
   _physicsExtrapolation: 1
   _physicsExtrapolationTime: 0.011111111
+  _workerThreadProfiling: 0
   _allowManualDeviceOffset: 0
   _deviceOffsetYAxis: 0
   _deviceOffsetZAxis: 0.12
@@ -4825,7 +4862,6 @@ MonoBehaviour:
   _allowMultiGrasp: 0
   _moveObjectWhenGrasped: 1
   graspedMovementType: 0
-  graspHoldWarpingEnabled__curIgnored: 1
   _overrideInteractionLayer: 0
   _interactionLayer:
     layerIndex: 0
