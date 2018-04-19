@@ -8,11 +8,11 @@
  ******************************************************************************/
 
 namespace Leap {
-  /**
-   * Reports whether the message is for
-   * a severe failure, a recoverable warning, or a status change.
-   * @since 3.0
-   */
+  /// <summary>
+  /// Reports whether the message is for
+  /// a severe failure, a recoverable warning, or a status change.
+  /// @since 3.0
+  /// </summary>
   public enum MessageSeverity {
     MESSAGE_UNKNOWN = 0,
     MESSAGE_CRITICAL = 1,

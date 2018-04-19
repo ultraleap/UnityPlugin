@@ -12,26 +12,21 @@ using System.Reflection;
 
 namespace LeapInternal {
   public static class Logger {
-    //
-    // Summary:
-    //     Logs message to the a Console.
+
+    /// <summary>
+    /// Logs message to the a Console.
+    /// </summary>
     public static void Log(object message) {
-#if DEBUG
-#if UNITY_EDITOR
       UnityEngine.Debug.Log(message);
-#else
-                    Console.WriteLine(message);
-#endif
-#endif
     }
 
     public static void LogStruct(object thisObject, string title = "") {
       try {
         if (!thisObject.GetType().IsValueType) {
-          Logger.Log(title + " ---- Trying to log non-struct with struct logger");
+          Log(title + " ---- Trying to log non-struct with struct logger");
           return;
         }
-        Logger.Log(title + " ---- " + thisObject.GetType().ToString());
+        Log(title + " ---- " + thisObject.GetType().ToString());
         FieldInfo[] fieldInfos;
         fieldInfos = thisObject.GetType().GetFields(
             BindingFlags.Public | BindingFlags.NonPublic // Get public and non-public
@@ -40,11 +35,12 @@ namespace LeapInternal {
 
         // write member names
         foreach (FieldInfo fieldInfo in fieldInfos) {
-          string value = fieldInfo.GetValue(thisObject).ToString();
-          Logger.Log(" -------- Name: " + fieldInfo.Name + ", Value = " + value);
+          object obj = fieldInfo.GetValue(thisObject);
+          string value = obj == null ? "null" : obj.ToString();
+          Log(" -------- Name: " + fieldInfo.Name + ", Value = " + value);
         }
       } catch (Exception exception) {
-        Logger.Log(exception.Message);
+        Log(exception.Message);
       }
     }
   }
