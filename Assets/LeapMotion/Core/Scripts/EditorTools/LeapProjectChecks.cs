@@ -42,8 +42,6 @@ namespace Leap.Unity {
       public LeapProjectCheckAttribute attribute;
     }
 
-    private static bool _wereScriptsRecompiled = false;
-
     private static List<ProjectCheck> _projectChecks = null;
 
     private static void ensureChecksLoaded() {
