@@ -90,7 +90,16 @@ namespace Leap.Unity {
 
       EditorGUILayout.Space();
 
+      drawScanCurrentSceneButtonAndStatus();
+
+      EditorGUILayout.Space();
+
+      return true;
+    }
+
+    private static void drawScanCurrentSceneButtonAndStatus() {
       using (new EditorGUILayout.HorizontalScope()) {
+
         if (GUILayout.Button(new GUIContent("Scan Current Scene",
               "Scan the currently open scene for old Leap rigs."),
               GUILayout.MaxWidth(200f))) {
@@ -112,16 +121,13 @@ namespace Leap.Unity {
           case SceneScanStatus.NoOldRigsFound:
             scanText = "Scene contained no old Leap rigs as of the last scan.";
             break;
-          case SceneScanStatus.NotScanned: default:
+          case SceneScanStatus.NotScanned:
+          default:
             scanText = "Scene not yet scanned.";
             break;
         }
         EditorGUILayout.LabelField(scanText);
       }
-
-      EditorGUILayout.Space();
-
-      return true;
     }
 
     #endregion
@@ -138,13 +144,10 @@ namespace Leap.Unity {
       var origIndent = EditorGUI.indentLevel;
       EditorGUI.indentLevel = 0;
 
-      EditorGUILayout.Space();
+      drawRigUpgraderCheckGUI();
 
-      if (currentSceneScanStatus == SceneScanStatus.NotScanned) {
-        EditorGUILayout.LabelField("Scene has not yet been scanned. Visit the Leap "
-          + "Motion SDK window from Window->Leap Motion to begin a scan.",
-          wrapLabel);
-      }
+      EditorGUILayout.Space();
+      EditorGUILayout.Space();
 
       EditorGUILayout.LabelField(
         "To be safe, you should make sure you've backed up your scene or you're at least "
