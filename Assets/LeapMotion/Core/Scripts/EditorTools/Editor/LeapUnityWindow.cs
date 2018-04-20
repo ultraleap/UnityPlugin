@@ -123,7 +123,10 @@ namespace Leap.Unity {
           LeapProjectChecks.DrawProjectChecksGUI();
           break;
         case 1:
+          float prevLabelWidth = EditorGUIUtility.labelWidth;
+          EditorGUIUtility.labelWidth = 200;
           LeapPreferences.DrawPreferencesGUI();
+          EditorGUIUtility.labelWidth = prevLabelWidth;
           break;
         default:
           _tab = 0;
