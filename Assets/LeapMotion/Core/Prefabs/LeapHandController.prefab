@@ -59,6 +59,7 @@ MonoBehaviour:
   _frameOptimization: 0
   _physicsExtrapolation: 1
   _physicsExtrapolationTime: 0.011111111
+  _workerThreadProfiling: 0
 --- !u!114 &11471522
 MonoBehaviour:
   m_ObjectHideFlags: 1

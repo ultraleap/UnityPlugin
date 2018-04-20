@@ -935,17 +935,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1d1554d7e1f527445affc9fc6d835819, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  recordOnStart: 0
-  recordOnHDMPresence: 0
+  recordWhen: 0
   recordingName: LeapFramesExampleRecording
   targetFolder:
     _assetFolder: {fileID: 102900000, guid: 36fc374c29b5e7e4b8f8935604b5a247, type: 3}
-  transformMode: 2
-  specificTransforms:
-  - {fileID: 0}
-  - {fileID: 0}
-  audioSourceMode: 0
-  specificAudioSources: []
   provider: {fileID: 0}
   recordLeapData: 1
   beginRecordingKey: 286

@@ -7,26 +7,26 @@
  * between Leap Motion and you, your company or other organization.           *
  ******************************************************************************/
 
-using UnityEditor;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
-namespace Leap.Unity.Interaction {
+namespace Leap.Unity.Recording {
 
-  [CustomEditor(typeof(IgnoreColliderForInteraction))]
-  public class IgnoreColliderForInteractionEditor
-    : CustomEditorBase<IgnoreColliderForInteraction> {
+  public class TransitionOnMarker : TransitionBehaviour {
 
+    public MarkerController controller;
+    public string markerName;
+    public MarkerController.MarkerTest condition = MarkerController.MarkerTest.AfterMarkerStarts;
 
-    public override void OnInspectorGUI() {
-      base.OnInspectorGUI();
-
-      EditorGUILayout.HelpBox(
-        "Causes any Colliders located on the same GameObject to be ignored by the "
-      + "Interaction Engine. Does not affect parents or children. It is recommended that "
-      + "you use this component only with trigger colliders.",
-        MessageType.None);
+    private void OnEnable() {
+      controller.updateMarkersIfNeeded();
     }
 
+    private void Update() {
+      if (controller.TestMarker(markerName, condition)) {
+        Transition();
+      }
+    }
   }
-
 }

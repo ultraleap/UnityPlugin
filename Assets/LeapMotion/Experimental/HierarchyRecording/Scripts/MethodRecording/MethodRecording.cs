@@ -8,27 +8,34 @@
  ******************************************************************************/
 
 using System;
+using System.IO;
 using System.Collections.Generic;
 using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace Leap.Unity.Recording {
 
   public abstract class MethodRecording : MonoBehaviour {
-
     public Mode mode { get; private set; }
 
     protected virtual void Awake() {
-      HierarchyRecorder.OnBeginRecording += EnterRecordingMode;
-    }
-
-    protected virtual void OnDestroy() {
-      HierarchyRecorder.OnBeginRecording -= EnterRecordingMode;
+      HierarchyRecorder.OnBeginRecording += () => {
+        if (gameObject != null) {
+          EnterRecordingMode();
+        }
+      };
     }
 
     public abstract float GetDuration();
 
     public virtual void EnterRecordingMode() {
       mode = Mode.Recording;
+    }
+
+    public virtual void ExitRecordingMode(string savePath) {
+      mode = Mode.None;
     }
 
     public virtual void EnterPlaybackMode() {
@@ -44,25 +51,38 @@ namespace Leap.Unity.Recording {
     }
   }
 
-  public abstract class BasicMethodRecording<T> : MethodRecording {
+  public abstract class BasicMethodData<T> : ScriptableObject {
+    public List<float> times;
+    public List<T> args;
+  }
 
-    [SerializeField]
-    protected List<float> _times;
+  public abstract class BasicMethodRecording<T, K> : MethodRecording where T : BasicMethodData<K> {
 
-    [SerializeField]
-    protected List<T> _args;
+    public T data;
+
+    public override void EnterRecordingMode() {
+      base.EnterRecordingMode();
+      data = ScriptableObject.CreateInstance<T>();
+    }
+
+    public override void ExitRecordingMode(string savePath) {
+      base.ExitRecordingMode(savePath);
+#if UNITY_EDITOR
+      AssetDatabase.CreateAsset(data, savePath);
+#endif
+    }
 
     public override sealed float GetDuration() {
-      if (_times.Count == 0) {
+      if (data.times.Count == 0) {
         return 0;
       } else {
-        return _times[_times.Count - 1];
+        return data.times[data.times.Count - 1];
       }
     }
 
     public override sealed void SweepTime(float from, float to) {
-      int startIndex = _times.BinarySearch(from);
-      int endIndex = _times.BinarySearch(to);
+      int startIndex = data.times.BinarySearch(from);
+      int endIndex = data.times.BinarySearch(to);
 
       if (startIndex < 0) {
         startIndex = ~startIndex;
@@ -72,27 +92,19 @@ namespace Leap.Unity.Recording {
         endIndex = ~endIndex;
       }
 
-      Debug.Log("Sweep from " + from + " (" + startIndex + ") to " + to + " (" + endIndex + ")");
-
       for (int i = startIndex; i < endIndex; i++) {
-        InvokeArgs(_args[i]);
+        InvokeArgs(data.args[i]);
       }
     }
 
-    protected void SaveArgs(T state) {
-      if (_times == null) _times = new List<float>();
-      if (_args == null) _args = new List<T>();
+    protected void SaveArgs(K state) {
+      if (data.times == null) data.times = new List<float>();
+      if (data.args == null) data.args = new List<K>();
 
-      _times.Add(HierarchyRecorder.instance.recordingTime);
-      _args.Add(state);
+      data.times.Add(HierarchyRecorder.instance.recordingTime);
+      data.args.Add(state);
     }
 
-    protected abstract void InvokeArgs(T state);
-
-    [Serializable]
-    private struct TimedArgs {
-      public float time;
-      public T state;
-    }
+    protected abstract void InvokeArgs(K state);
   }
 }

@@ -7,26 +7,27 @@
  * between Leap Motion and you, your company or other organization.           *
  ******************************************************************************/
 
-using UnityEditor;
+using System;
 using UnityEngine;
+using UnityEngine.Playables;
+using UnityEngine.Timeline;
 
-namespace Leap.Unity.Interaction {
+namespace Leap.Unity.Recording {
 
-  [CustomEditor(typeof(IgnoreColliderForInteraction))]
-  public class IgnoreColliderForInteractionEditor
-    : CustomEditorBase<IgnoreColliderForInteraction> {
+  public class MarkerClip : PlayableAsset, ITimelineClipAsset {
 
+    public string markerName;
 
-    public override void OnInspectorGUI() {
-      base.OnInspectorGUI();
-
-      EditorGUILayout.HelpBox(
-        "Causes any Colliders located on the same GameObject to be ignored by the "
-      + "Interaction Engine. Does not affect parents or children. It is recommended that "
-      + "you use this component only with trigger colliders.",
-        MessageType.None);
+    public ClipCaps clipCaps {
+      get {
+        return ClipCaps.None;
+      }
     }
 
+    public override Playable CreatePlayable(PlayableGraph graph, GameObject owner) {
+      return ScriptPlayable<MarkerPlayable>.Create(graph);
+    }
   }
 
+  public class MarkerPlayable : PlayableBehaviour { }
 }

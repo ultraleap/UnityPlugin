@@ -29,9 +29,7 @@ namespace Leap.Unity.Recording {
     public string recordingName;
     public AssetFolder assetFolder;
 
-    public string curveDataFilename;
-
-    public string leapDataFilename;
+    public AssetFolder dataFolder;
 
     [SerializeField, ImplementsTypeNameDropdown(typeof(LeapRecording))]
     private string _leapRecordingType;
@@ -88,12 +86,29 @@ namespace Leap.Unity.Recording {
       //Try to generate a leap recording if we have leap data
       RecordingTrack recordingTrack = null;
       LeapRecording leapRecording = null;
-      if (!string.IsNullOrEmpty(leapDataFilename)) {
-        var leapData = JsonUtility.FromJson<RecordedLeapData>(File.ReadAllText(Path.Combine(assetFolder.Path, leapDataFilename)));
+
+      string framesPath = Path.Combine(dataFolder.Path, "Frames.data");
+      if (File.Exists(framesPath)) {
+        List<Frame> frames = new List<Frame>();
+
+        progress.Begin(1, "Loading Leap Data", "", () => {
+          progress.Step();
+          using (var reader = File.OpenText(framesPath)) {
+            while (true) {
+              string line = reader.ReadLine();
+              if (string.IsNullOrEmpty(line)) {
+                break;
+              }
+
+              frames.Add(JsonUtility.FromJson<Frame>(line));
+            }
+          }
+        });
+
         leapRecording = ScriptableObject.CreateInstance(_leapRecordingType) as LeapRecording;
         if (leapRecording != null) {
           leapRecording.name = "Recorded Leap Data";
-          leapRecording.LoadFrames(leapData.frames);
+          leapRecording.LoadFrames(frames);
         } else {
           Debug.LogError("Unable to create Leap recording: Invalid type specification for "
                        + "LeapRecording implementation.", this);
@@ -164,11 +179,17 @@ namespace Leap.Unity.Recording {
           foreach (var recording in recordings) {
             progress.Step(recording.gameObject.name);
 
-            var track = timeline.CreateTrack<MethodRecordingTrack>(null, recording.gameObject.name);
-            director.SetGenericBinding(track.outputs.Query().First().sourceObject, recording);
+            try {
+              var track = timeline.CreateTrack<MethodRecordingTrack>(null, recording.gameObject.name);
+              director.SetGenericBinding(track.outputs.Query().First().sourceObject, recording);
 
-            var clip = track.CreateClip<MethodRecordingClip>();
-            clip.duration = recording.GetDuration();
+              var clip = track.CreateClip<MethodRecordingClip>();
+
+
+              clip.duration = recording.GetDuration();
+            } catch (Exception e) {
+              Debug.LogException(e);
+            }
           }
         });
       }
@@ -201,10 +222,19 @@ namespace Leap.Unity.Recording {
       var clip = new AnimationClip();
       clip.name = "Recorded Animation";
 
-      RecordedDataAsset curves = null;
-      progress.Begin(1, "Opening Curve File...", "", () => {
+      List<EditorCurveBindingData> curveData = new List<EditorCurveBindingData>();
+      progress.Begin(1, "Opening Curve Files...", "", () => {
         progress.Step();
-        curves = JsonUtility.FromJson<RecordedDataAsset>(File.ReadAllText(Path.Combine(assetFolder.Path, curveDataFilename)));
+        using (var reader = File.OpenText(Path.Combine(dataFolder.Path, "Curves.data"))) {
+          while (true) {
+            string line = reader.ReadLine();
+            if (string.IsNullOrEmpty(line)) {
+              break;
+            }
+
+            curveData.Add(JsonUtility.FromJson<EditorCurveBindingData>(line));
+          }
+        }
       });
 
       progress.Begin(2, "", "", () => {
@@ -219,7 +249,7 @@ namespace Leap.Unity.Recording {
         var toCompress = new Dictionary<EditorCurveBinding, AnimationCurve>();
         var targetObjects = new HashSet<UnityEngine.Object>();
 
-        foreach (var data in curves.data) {
+        foreach (var data in curveData) {
           Type type;
           if (!nameToType.TryGetValue(data.typeName, out type)) {
             continue;
