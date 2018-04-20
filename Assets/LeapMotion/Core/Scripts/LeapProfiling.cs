@@ -72,7 +72,7 @@ namespace Leap.Unity {
         Interlocked.Add(ref _samplersToCreateCount, eventData.blockNames.Length);
       }
 #else
-      Debug.LogError("Thread Profiling is unavailable below in Unity versions below 2017.3");
+      Debug.LogWarning("Thread Profiling is unavailable in versions of Unity below 2017.3");
 #endif
     }
 
@@ -80,7 +80,7 @@ namespace Leap.Unity {
 #if UNITY_2017_3_OR_NEWER
       Profiler.EndThreadProfiling();
 #else
-      Debug.LogError("Thread Profiling is unavailable below in Unity versions below 2017.3");
+      Debug.LogWarning("Thread Profiling is unavailable in versions of Unity below 2017.3");
 #endif
     }
 
