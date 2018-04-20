@@ -33,12 +33,18 @@ namespace Leap.Unity {
       EditorSceneManager.sceneOpened -= onSceneOpened;
       EditorSceneManager.sceneOpened += onSceneOpened;
 
+      EditorApplication.hierarchyWindowChanged -= onHierarchyWindowChanged;
+      EditorApplication.hierarchyWindowChanged += onHierarchyWindowChanged;
+
       _currentSceneScanStatus = SceneScanStatus.NotScanned;
     }
 
-    private static void onSceneOpened(Scene scene, OpenSceneMode openSceneMOde) {
+    private static void onSceneOpened(Scene scene, OpenSceneMode openSceneMode) {
       _currentSceneScanStatus = SceneScanStatus.NotScanned;
-
+      ClearScanData();
+    }
+    private static void onHierarchyWindowChanged() {
+      _currentSceneScanStatus = SceneScanStatus.NotScanned;
       ClearScanData();
     }
 
@@ -125,13 +131,8 @@ namespace Leap.Unity {
     private static Vector2 _scrollPosition = Vector2.zero;
     private static Dictionary<OldRigHierarchy, bool> _rigFoldoutStates
       = new Dictionary<OldRigHierarchy, bool>();
-    private static bool _camera_removeEnableDepthBufferScript = true;
-    private static bool _camera_removeRightEyeCamera = true;
-    private static bool _camera_removeLeapEyeDislocator = true;
-    private static bool _leapSpace_removeMissingScripts = true;
-    private static bool _leapSpace_mergeExtraChildrenUpward = true;
-    private static bool _lhc_removeMissingScripts = true;
-    private static bool _lhc_mergeExtraChildrenUpward = true;
+    private static OldRigHierarchy.UpgradeOptions _upgradeOptions
+      = new OldRigHierarchy.UpgradeOptions();
 
     public static void DrawUpgraderGUI() {
       var origIndent = EditorGUI.indentLevel;
@@ -188,31 +189,18 @@ namespace Leap.Unity {
           foldoutName, toggleOnLabelClick: true);
         if (_rigFoldoutStates[oldRig]) {
           EditorGUILayout.Space();
-
-          // Rig Transform.
+          
           drawOldRigTransformGUI(oldRig);
-          //using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox)) {
-          //}
-
-          // Rig Camera.
+          
           drawOldRigCameraGUI(oldRig);
-          //using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox)) {
-          //}
-
-          // Leap Space.
+          
           drawOldRigLeapSpaceGUI(oldRig);
-          //using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox)) {
-          //}
-
-          // LeapHandController.
+          
           drawOldRigLHCGUI(oldRig);
-          //using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox)) {
-          //}
-
         }
 
         if (GUILayout.Button("Update Rig")) {
-          Debug.Log("Update rig requested.");
+          oldRig.Upgrade(_upgradeOptions);
         }
       }
     }
@@ -259,7 +247,7 @@ namespace Leap.Unity {
           yesOption: "Remove the EnableDepthBuffer script from the camera.",
           noOption: "Don't remove the EnableDepthBuffer script, I'm using it for "
                   + "something.",
-          yesOptionFlag: ref _camera_removeEnableDepthBufferScript
+          yesOptionFlag: ref _upgradeOptions.camera_removeEnableDepthBufferScript
         );
       }
 
@@ -277,7 +265,7 @@ namespace Leap.Unity {
           drawYesNoToggle(
             yesOption: "Remove this camera object.",
             noOption: "Don't remove this camera, I'm using it for something else.",
-            yesOptionFlag: ref _camera_removeRightEyeCamera
+            yesOptionFlag: ref _upgradeOptions.camera_removeRightEyeCamera
           );
         }
       }
@@ -294,7 +282,7 @@ namespace Leap.Unity {
           drawYesNoToggle(
             yesOption: "Remove LeapEyeDislocator.",
             noOption: "Don't remove LeapEyeDislocator.",
-            yesOptionFlag: ref _camera_removeLeapEyeDislocator
+            yesOptionFlag: ref _upgradeOptions.camera_removeLeapEyeDislocator
           );
         }
       }
@@ -316,7 +304,7 @@ namespace Leap.Unity {
       if (leapSpace_missingScripts.Count > 0) {
         EditorGUILayout.Separator();
         drawRemoveMissingScriptsSetting(leapSpace_missingScripts.Count,
-          ref _leapSpace_removeMissingScripts);
+          ref _upgradeOptions.leapSpace_removeMissingScripts);
       }
 
       var leapSpace_nonLHCChildren
@@ -326,7 +314,8 @@ namespace Leap.Unity {
         drawMergeUpwardsSetting(
           originalTransformName: "LeapSpace",
           numExtraChildren: leapSpace_nonLHCChildren.Count,
-          mergeExtraChildrenUpwardFlag: ref _leapSpace_mergeExtraChildrenUpward
+          mergeExtraChildrenUpwardFlag:
+            ref _upgradeOptions.leapSpace_mergeExtraChildrenUpward
         );
       }
     }
@@ -375,7 +364,7 @@ namespace Leap.Unity {
       if (lhc_missingScripts.Count > 0) {
         EditorGUILayout.Separator();
         drawRemoveMissingScriptsSetting(lhc_missingScripts.Count,
-          ref _lhc_removeMissingScripts
+          ref _upgradeOptions.lhc_removeMissingScripts
         );
       }
 
@@ -385,7 +374,7 @@ namespace Leap.Unity {
         drawMergeUpwardsSetting(
           originalTransformName: "LeapHandController",
           numExtraChildren: lhc_extraChildren.Count,
-          mergeExtraChildrenUpwardFlag: ref _lhc_mergeExtraChildrenUpward
+          mergeExtraChildrenUpwardFlag: ref _upgradeOptions.lhc_mergeExtraChildrenUpward
         );
       }
     }
@@ -581,6 +570,8 @@ namespace Leap.Unity {
   /// </remarks>
   public class OldRigHierarchy {
 
+    #region Status State
+
     /// <summary>
     /// Whether this rig can be upgraded. Set after a DetectFor(transform) call.
     /// </summary>
@@ -600,6 +591,10 @@ namespace Leap.Unity {
         = "Rig data has not been collected. Call OldRigHierarchy.DetectFor(transform) to "
         + "scan.";
 
+    #endregion
+
+    #region Scanned Rig Data
+
     /// <summary> The root transform of the old rig hierarchy. </summary>
     public Transform rigTransform;
 
@@ -608,10 +603,7 @@ namespace Leap.Unity {
     /// </summary>
     public Transform handModelParentTransform;
 
-    #region Rig Camera Data & Detection
-
-    [ThreadStatic]
-    private static List<OldCameraData> s_cameraDataBuffer = new List<OldCameraData>();
+    #region Rig Camera Data
 
     /// <summary>
     /// Old camera objects that weren't modified at all would have had a 
@@ -631,41 +623,6 @@ namespace Leap.Unity {
     /// the LEFT eye if this rig was an IR viewer rig specifically.
     /// </summary>
     public OldCameraData cameraData;
-
-    /// <summary>
-    /// Detects **potential** old rig cameras among rigTransform's direct children and
-    /// fills the detectedCameras list with data for each possible rig camera detected.
-    /// </summary>
-    private static void detectPotentialOldRigCameras(Transform rigTransform,
-                                                     List<OldCameraData> detectedCameras) {
-      foreach (var child in rigTransform.GetChildren()) {
-        var eyeDislocator = child.GetComponent<LeapEyeDislocator>();
-        var camera = child.GetComponent<Camera>();
-        var leapXRProvider = child.GetComponent<LeapXRServiceProvider>();
-        var enableDepthBuffer = child.GetComponent<EnableDepthBuffer>();
-
-        if (camera == null) {
-          // Definitely no camera detected for this child.
-          continue;
-        }
-        else if (leapXRProvider != null) {
-          // A camera with a LeapXRServiceProvider on it is definitely not an old rig!
-          // This is probably an up-to-date rig.
-          continue;
-        }
-        else {
-          // OK, this could be an old rig camera. Get as much data as possible about it.
-          var oldCamData = new OldCameraData();
-          oldCamData.cameraTransform = child;
-          oldCamData.cameraComponent = camera;
-          oldCamData.leapEyeDislocator = eyeDislocator;
-          oldCamData.enableDepthBuffer = enableDepthBuffer;
-
-          // Add it to the detected cameras list. We'll process it more later.
-          detectedCameras.Add(oldCamData);
-        }
-      }
-    }
 
     #endregion
 
@@ -701,6 +658,10 @@ namespace Leap.Unity {
 
     #endregion
 
+    #endregion
+
+    #region Scanning
+
     /// <summary>
     /// Detects if the argument Transform is the _rig root_ of an old Leap rig,
     /// modifying the passed-in old rig hierarchy description. Returns true if the
@@ -714,10 +675,11 @@ namespace Leap.Unity {
       scannedRig.rigTransform = transform;
 
       // Scan for the camera transform in immediate children.
-      s_cameraDataBuffer.Clear();
-      detectPotentialOldRigCameras(transform, s_cameraDataBuffer);
+      var camDataBuffer = new List<OldCameraData>();
+      camDataBuffer.Clear();
+      detectPotentialOldRigCameras(transform, camDataBuffer);
 
-      if (s_cameraDataBuffer.Count == 0) {
+      if (camDataBuffer.Count == 0) {
         // No cameras found; this is not an upgradeable old rig.
         return false;
       }
@@ -779,8 +741,8 @@ namespace Leap.Unity {
         // right -eye camera in the image rig case.
         var secondaryCamDatas = new List<OldCameraData>();
 
-        for (int i = 0; i < s_cameraDataBuffer.Count; i++) {
-          var camData = s_cameraDataBuffer[i];
+        for (int i = 0; i < camDataBuffer.Count; i++) {
+          var camData = camDataBuffer[i];
           var expectingFirstLeapSpaceData = firstLeapSpaceData == null;
 
           var camTransform = camData.cameraTransform;
@@ -907,6 +869,41 @@ namespace Leap.Unity {
     }
 
     /// <summary>
+    /// Detects **potential** old rig cameras among rigTransform's direct children and
+    /// fills the detectedCameras list with data for each possible rig camera detected.
+    /// </summary>
+    private static void detectPotentialOldRigCameras(Transform rigTransform,
+                                                     List<OldCameraData> detectedCameras) {
+      foreach (var child in rigTransform.GetChildren()) {
+        var eyeDislocator = child.GetComponent<LeapEyeDislocator>();
+        var camera = child.GetComponent<Camera>();
+        var leapXRProvider = child.GetComponent<LeapXRServiceProvider>();
+        var enableDepthBuffer = child.GetComponent<EnableDepthBuffer>();
+
+        if (camera == null) {
+          // Definitely no camera detected for this child.
+          continue;
+        }
+        else if (leapXRProvider != null) {
+          // A camera with a LeapXRServiceProvider on it is definitely not an old rig!
+          // This is probably an up-to-date rig.
+          continue;
+        }
+        else {
+          // OK, this could be an old rig camera. Get as much data as possible about it.
+          var oldCamData = new OldCameraData();
+          oldCamData.cameraTransform = child;
+          oldCamData.cameraComponent = camera;
+          oldCamData.leapEyeDislocator = eyeDislocator;
+          oldCamData.enableDepthBuffer = enableDepthBuffer;
+
+          // Add it to the detected cameras list. We'll process it more later.
+          detectedCameras.Add(oldCamData);
+        }
+      }
+    }
+
+    /// <summary>
     /// Detects if the argument Transform is the _rig root_ of an old Leap rig, in
     /// which case an OldRigHierarchy description is returned, otherwise this method
     /// returns null.
@@ -929,6 +926,148 @@ namespace Leap.Unity {
         }
       }
     }
+
+    #endregion
+
+    #region Upgrading
+
+    public class UpgradeOptions {
+      public bool camera_removeEnableDepthBufferScript = true;
+      public bool camera_removeRightEyeCamera = true;
+      public bool camera_removeLeapEyeDislocator = true;
+      public bool leapSpace_removeMissingScripts = true;
+      public bool leapSpace_mergeExtraChildrenUpward = true;
+      public bool lhc_removeMissingScripts = true;
+      public bool lhc_mergeExtraChildrenUpward = true;
+    }
+
+    public void Upgrade(UpgradeOptions options) {
+      if (options == null) { options = new UpgradeOptions(); }
+
+      if (!this.isUpgradeableOldRig) {
+        throw new InvalidOperationException(
+          "Aborting upgrade attempt: This rig is not upgradeable.");
+      }
+
+      // Rig transform: unmodified.
+
+      // Camera transform, then LeapSpace transform, then LHC transform.
+      if (cameraData == null) {
+        Debug.LogError("No camera data available for this rig during upgrade attempt.");
+      }
+      else {
+        var enableDepthBufferScript = this.cameraData.enableDepthBuffer;
+        if (options.camera_removeEnableDepthBufferScript) {
+          Undo.DestroyObjectImmediate(enableDepthBufferScript);
+        }
+
+        var eyeDislocator = this.cameraData.leapEyeDislocator;
+        if (options.camera_removeLeapEyeDislocator) {
+          Undo.DestroyObjectImmediate(eyeDislocator);
+        }
+        
+        if (this.isImageRig) {
+          var rightEyeCamData = this.imageRigData.rightEyeCamData;
+          if (rightEyeCamData != null) {
+            var rightEyeTransform = rightEyeCamData.cameraTransform;
+            if (options.camera_removeRightEyeCamera) {
+              Undo.DestroyObjectImmediate(rightEyeTransform);
+            }
+          }
+        }
+
+        var cameraTransform = cameraData.cameraTransform;
+
+        if (leapSpaceData == null) {
+          Debug.LogError("No LeapSpace data available for this rig during upgrade "
+            + "attempt.");
+        }
+        else {
+          var leapSpaceExtraChildren = leapSpaceData.nonLHCChildTransforms;
+          if (options.leapSpace_mergeExtraChildrenUpward) {
+            foreach (var extraChild in leapSpaceExtraChildren) {
+              Undo.SetTransformParent(extraChild, cameraTransform,
+                "Move LeapSpace child to Camera");
+            }
+          }
+
+          var leapSpaceTransform = leapSpaceData.leapSpaceTransform;
+          var leapSpace_missingScripts = leapSpaceData.missingComponentIndices;
+          if (options.leapSpace_removeMissingScripts) {
+            removeMissingScriptsWithUndo(leapSpaceTransform, leapSpace_missingScripts);
+          }
+
+          if (lhcData == null) {
+            Debug.LogError("No LeapHandController data available for this rig during "
+            + "upgrade attempt.");
+          }
+          else {
+            var lhcExtraChildren = lhcData.extraChildTransforms;
+            if (options.lhc_mergeExtraChildrenUpward) {
+              foreach (var extraChild in lhcExtraChildren) {
+                Undo.SetTransformParent(extraChild, cameraTransform,
+                  "Move LHC child to Camera");
+              }
+            }
+
+            var lhcTransform = lhcData.lhcTransform;
+            var lhc_missingScripts = lhcData.missingComponentIndices;
+            if (options.lhc_removeMissingScripts) {
+              removeMissingScriptsWithUndo(lhcTransform, lhc_missingScripts);
+            }
+
+            // Migrate the HandPool (now HandModelManager) to the hand model parent 
+            // transform if we could find one.
+            var handModelManager = lhcData.handModelManager;
+            if (handModelManager != null && this.handModelParentTransform != null) {
+              var newHandModelManager
+                = Undo.AddComponent<HandModelManager>(handModelParentTransform.gameObject);
+              EditorUtility.CopySerialized(handModelManager, newHandModelManager);
+
+              EditorUtils.ReplaceSceneReferences(handModelManager, newHandModelManager);
+            }
+
+            // Migrate the LeapServiceProvider on the LHC to a LeapXRServiceProvider on
+            // the primary camera, and swap references over to it.
+            var leapServiceProvider = lhcData.leapServiceProvider;
+            if (leapServiceProvider != null) {
+              var leapXRServiceProvider = Undo.AddComponent<LeapXRServiceProvider>(
+                cameraData.cameraTransform.gameObject);
+              EditorUtility.CopySerialized(leapServiceProvider, leapXRServiceProvider);
+
+              EditorUtils.ReplaceSceneReferences(leapServiceProvider,
+                leapXRServiceProvider);
+            }
+          }
+
+          // Remove the LeapSpace transform, also destroying the LeapHandController
+          // object.
+          Undo.DestroyObjectImmediate(leapSpaceTransform);
+        }
+      }
+    }
+
+    private void removeMissingScriptsWithUndo(Transform fromObj,
+                                              List<int> missingScriptIndices) {
+      if (missingScriptIndices == null || missingScriptIndices.Count == 0) {
+        return;
+      }
+
+      var components = fromObj.GetComponents<Component>();
+      var r = 0;
+      for (var i = 0; i < components.Length; i++) {
+        if (components[i] != null) continue;
+
+        var serializedObject = new SerializedObject(fromObj.gameObject);
+        var prop = serializedObject.FindProperty("m_Component");
+        prop.DeleteArrayElementAtIndex(i - r);
+        r++;
+
+        serializedObject.ApplyModifiedProperties();
+      }
+    }
+
+    #endregion
 
   }
 
