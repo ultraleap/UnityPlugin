@@ -12033,16 +12033,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1d1554d7e1f527445affc9fc6d835819, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  recordOnStart: 0
+  recordWhen: 0
   recordingName: Hierarchy Recorder
   targetFolder:
     _assetFolder: {fileID: 102900000, guid: f450c9f6d2ceff24d831e03a6155fb51, type: 3}
-  transformMode: 2
-  specificTransforms:
-  - {fileID: 4555189170981434}
-  - {fileID: 4862958490166676}
-  audioSourceMode: 1
-  specificAudioSources: []
   provider: {fileID: 114468029769000348}
   recordLeapData: 1
   beginRecordingKey: 286
@@ -12357,6 +12351,7 @@ MonoBehaviour:
   _frameOptimization: 0
   _physicsExtrapolation: 1
   _physicsExtrapolationTime: 0.011111111
+  _workerThreadProfiling: 0
 --- !u!114 &114470273802699020
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -12473,8 +12468,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cfb12777e12bf9941b23356a343f5016, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _eyeType:
-    _orderType: 3
+  _useCustomBaseline: 0
+  _customBaselineValue: 64
+  _showEyePositions: 0
 --- !u!114 &114618301826625184
 MonoBehaviour:
   m_ObjectHideFlags: 1

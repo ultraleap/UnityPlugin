@@ -13004,8 +13004,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cfb12777e12bf9941b23356a343f5016, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _eyeType:
-    _orderType: 3
+  _useCustomBaseline: 0
+  _customBaselineValue: 64
+  _showEyePositions: 0
 --- !u!114 &114960047069036262
 MonoBehaviour:
   m_ObjectHideFlags: 1
