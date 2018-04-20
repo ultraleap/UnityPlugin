@@ -186,6 +186,7 @@ namespace Leap.Unity {
           
           drawRigItem("Rig Transform: ",
             oldRig.rigTransform, typeof(Transform));
+
           drawRigItem("Rig Camera: ",
             oldRig.cameraData.cameraComponent, typeof(Camera));
           drawRigItem("(old) LeapSpace: ",
@@ -255,10 +256,10 @@ namespace Leap.Unity {
   ///   |         `- "QuadBackground" -> as 'extra' Transform, moved to child of Camera.
   ///   |
   ///   |- "RightEyeAnchor" - contain LeapVRCameraControl -> LeapEyeDislocator
+  ///   |                     ^- this on a sibling of the Leap Image Retriever
+  ///   |                        indicates extremely high certainty of Image Rig.
   ///   |                     soft-contain Camera,
   ///   |                     soft-contain Enable Depth Buffer -> Missing Script
-  ///   |                     ^- these on a sibling of the Leap Image Retriever
-  ///   |                        indicates extremely high certainty of Image Rig.
   ///   |
   ///   `- "HandModels"
   ///        |
@@ -420,6 +421,7 @@ namespace Leap.Unity {
       public List<int> missingComponentIndices;
       public LeapServiceProvider leapServiceProvider;
       public HandModelManager handModelManager;
+      public List<Transform> extraChildTransforms;
     }
     public OldLeapHandControllerData lhcData;
 
@@ -532,6 +534,11 @@ namespace Leap.Unity {
                 firstLHCData.missingComponentIndices = new List<int>();
                 fillMissingComponentIndices(firstLHCData.lhcTransform,
                   firstLHCData.missingComponentIndices);
+
+                firstLHCData.extraChildTransforms = new List<Transform>();
+                foreach (var greatGrandchild in grandchild.GetChildren()) {
+                  firstLHCData.extraChildTransforms.Add(greatGrandchild);
+                }
 
                 firstLHCData.handModelManager
                   = grandchild.GetComponent<HandModelManager>();
