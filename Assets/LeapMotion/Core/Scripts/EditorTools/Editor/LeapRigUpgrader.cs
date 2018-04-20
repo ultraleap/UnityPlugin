@@ -1035,20 +1035,20 @@ namespace Leap.Unity {
             // Migrate the LeapServiceProvider on the LHC to a LeapXRServiceProvider on
             // the primary camera, and swap references over to it.
             var leapServiceProvider = lhcData.leapServiceProvider;
-            var leapXrServiceProvider = (LeapXRServiceProvider)null;
+            var leapXRServiceProvider = (LeapXRServiceProvider)null;
             if (leapServiceProvider != null) {
-              leapXrServiceProvider = Undo.AddComponent<LeapXRServiceProvider>(
+              leapXRServiceProvider = Undo.AddComponent<LeapXRServiceProvider>(
                 cameraData.cameraTransform.gameObject);
 
-              // TODO: Copy applicable settings from LSP to LXRSP
-              //EditorUtility.CopySerialized(leapServiceProvider, leapXRServiceProvider);
+              leapServiceProvider
+                .CopySettingsToLeapXRServiceProvider(leapXRServiceProvider);
 
               EditorUtils.ReplaceSceneReferences(leapServiceProvider,
-                leapXrServiceProvider);
+                leapXRServiceProvider);
             }
 
-            if (newHandModelManager != null && leapXrServiceProvider != null) {
-              newHandModelManager.leapProvider = leapXrServiceProvider;
+            if (newHandModelManager != null && leapXRServiceProvider != null) {
+              newHandModelManager.leapProvider = leapXRServiceProvider;
             }
           }
 
