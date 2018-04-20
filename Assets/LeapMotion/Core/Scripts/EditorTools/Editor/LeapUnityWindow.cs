@@ -106,16 +106,9 @@ namespace Leap.Unity {
       GUILayout.Box(new GUIContent(leapTex), logoStyle, GUILayout.ExpandWidth(true),
         GUILayout.MaxHeight(150f));
 
-      // Current Core version.
-      //var titleStyle = new GUIStyle(_windowSkin.label);
-      //titleStyle.fontSize = 20;
-      //titleStyle.margin = new RectOffset(0, 0, 0, 10);
-      ////titleStyle.stretchHeight = false;
-      //var titleContent = new GUIContent("Leap Motion Unity Modules");
-      //GUILayout.Label(titleContent, titleStyle);
-
       // Window tabs.
-      _tab = GUILayout.Toolbar(_tab, new string[] { "Project Checks", "Preferences" });
+      _tab = GUILayout.Toolbar(_tab,
+        new string[] { "Project Checks", "Rig Upgrader", "Preferences" });
       _scrollPosition = GUILayout.BeginScrollView(_scrollPosition,
         GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
       switch (_tab) {
@@ -123,6 +116,9 @@ namespace Leap.Unity {
           LeapProjectChecks.DrawProjectChecksGUI();
           break;
         case 1:
+          LeapRigUpgrader.DrawUpgraderGUI();
+          break;
+        case 2:
           float prevLabelWidth = EditorGUIUtility.labelWidth;
           EditorGUIUtility.labelWidth = 200;
           LeapPreferences.DrawPreferencesGUI();

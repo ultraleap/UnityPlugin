@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEditor;
+using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -9,10 +10,16 @@ namespace Leap.Unity {
 
   using UnityObject = UnityEngine.Object;
 
+  /// <summary>
+  /// Can scan the currently open scene and detect instances of an old Leap Rig
+  /// hierarchy, render a GUI describing the old rig, and provides functionality for
+  /// automatically upgrading the rig.
+  /// </summary>
   [InitializeOnLoad]
   public static class LeapRigUpgrader {
 
-    private static LeapRigUpgraderWindow _upgraderWindow = null;
+    #region Events
+
     public enum SceneScanStatus { NotScanned, ContainsOldRigs, NoOldRigsFound }
     private static SceneScanStatus _currentSceneScanStatus = SceneScanStatus.NotScanned;
     public static SceneScanStatus currentSceneScanStatus {
@@ -21,15 +28,23 @@ namespace Leap.Unity {
       }
     }
 
-    static LeapRigUpgrader() {
-      SceneManager.activeSceneChanged += onActiveSceneChanged;
+    [InitializeOnLoadMethod]
+    private static void Init() {
+      EditorSceneManager.sceneOpened -= onSceneOpened;
+      EditorSceneManager.sceneOpened += onSceneOpened;
 
       _currentSceneScanStatus = SceneScanStatus.NotScanned;
     }
 
-    private static void onActiveSceneChanged(Scene current, Scene next) {
+    private static void onSceneOpened(Scene scene, OpenSceneMode openSceneMOde) {
       _currentSceneScanStatus = SceneScanStatus.NotScanned;
+
+      ClearScanData();
     }
+
+    #endregion
+
+    #region GUI
 
     public static GUIStyle boldLabel {
       get { return EditorStyles.boldLabel; }
@@ -61,20 +76,15 @@ namespace Leap.Unity {
 
       using (new EditorGUILayout.HorizontalScope()) {
         if (GUILayout.Button(new GUIContent("Scan Current Scene",
-          "Scan the currently open scene for old Leap rigs."), GUILayout.MaxWidth(200f))) {
-          if (_upgraderWindow == null) {
-            _upgraderWindow = LeapRigUpgraderWindow.OpenRigUpgraderWindow();
+              "Scan the currently open scene for old Leap rigs."),
+              GUILayout.MaxWidth(200f))) {
+          var oldRigsDetected = ScanCurrentSceneForOldLeapRigs();
+          if (oldRigsDetected) {
+            _currentSceneScanStatus = SceneScanStatus.ContainsOldRigs;
+            // TODO: Move to scan tab
           }
-          if (_upgraderWindow != null) {
-            var oldRigsDetected = _upgraderWindow.ScanCurrentSceneForOldLeapRigs();
-            if (oldRigsDetected) {
-              _currentSceneScanStatus = SceneScanStatus.ContainsOldRigs;
-              _upgraderWindow.Focus();
-            }
-            else {
-              _currentSceneScanStatus = SceneScanStatus.NoOldRigsFound;
-              //_upgraderWindow.Close();
-            }
+          else {
+            _currentSceneScanStatus = SceneScanStatus.NoOldRigsFound;
           }
         }
 
@@ -98,85 +108,21 @@ namespace Leap.Unity {
       return true;
     }
 
-  }
+    private static Vector2 _scrollPosition = Vector2.zero;
 
-  public class LeapRigUpgraderWindow : EditorWindow {
-
-    private const string WINDOW_TITLE = "Leap Rig Upgrader";
-    private static readonly Vector2 WINDOW_MIN_SIZE = new Vector2(500f, 500f);
-
-    public static LeapRigUpgraderWindow OpenRigUpgraderWindow() {
-      var window = (LeapRigUpgraderWindow)GetWindow(typeof(LeapRigUpgraderWindow),
-        utility: true, title: WINDOW_TITLE, focus: true);
-      window.name = "Leap Motion Unity Modules Window";
-      window.minSize = WINDOW_MIN_SIZE;
-      return window;
-    }
-
-    #region Memory
-
-    private List<Transform> _backingTransformsBuffer = null;
-    private List<Transform> _transformsBuffer {
-    get {
-        if (_backingTransformsBuffer == null)
-          _backingTransformsBuffer = new List<Transform>();
-        return _backingTransformsBuffer;
-      }
-    }
-
-    private List<OldRigHierarchy> _backingOldRigs = null;
-    private List<OldRigHierarchy> _oldRigs {
-      get {
-        if (_backingOldRigs == null) {
-          _backingOldRigs = new List<OldRigHierarchy>();
-        }
-        return _backingOldRigs;
-      }
-    }
-
-    #endregion
-
-    /// <summary>
-    /// Returns true if old rigs were (potentially) found. Returns false if none were
-    /// found. If this method returns true, you can Show() the window instance to display
-    /// scanned details and auto-upgrade options to the user.
-    /// </summary>
-    public bool ScanCurrentSceneForOldLeapRigs() {
-      _oldRigs.Clear();
-
-      var currentScene = SceneManager.GetActiveScene();
-      var rootObjs = currentScene.GetRootGameObjects();
-      foreach (var rootObj in rootObjs) {
-        rootObj.transform.GetComponentsInChildren(_transformsBuffer);
-        foreach (var transform in _transformsBuffer) {
-          var oldRig = OldRigHierarchy.DetectFor(transform);
-          if (oldRig != null) {
-            _oldRigs.Add(oldRig);
-          }
-        }
-        _transformsBuffer.Clear();
-      }
-
-      return _oldRigs.Count > 0;
-    }
-
-    public static GUIStyle wrapLabel { get { return LeapRigUpgrader.wrapLabel; } }
-
-    private Vector2 _scrollPosition = Vector2.zero;
-
-    private Dictionary<OldRigHierarchy, bool> _rigFoldoutStates
+    private static Dictionary<OldRigHierarchy, bool> _rigFoldoutStates
       = new Dictionary<OldRigHierarchy, bool>();
 
     //private bool _camera_removeMissingScripts = true; // removed option
-    private bool _camera_removeEnableDepthBufferScript = true;
-    private bool _camera_removeRightEyeCamera = true;
-    private bool _camera_removeLeapEyeDislocator = true;
-    private bool _leapSpace_removeMissingScripts = true;
-    private bool _leapSpace_mergeExtraChildrenUpward = true;
-    private bool _lhc_removeMissingScripts = true;
-    private bool _lhc_mergeExtraChildrenUpward = true;
+    private static bool _camera_removeEnableDepthBufferScript = true;
+    private static bool _camera_removeRightEyeCamera = true;
+    private static bool _camera_removeLeapEyeDislocator = true;
+    private static bool _leapSpace_removeMissingScripts = true;
+    private static bool _leapSpace_mergeExtraChildrenUpward = true;
+    private static bool _lhc_removeMissingScripts = true;
+    private static bool _lhc_mergeExtraChildrenUpward = true;
 
-    private void OnGUI() {
+    public static void DrawUpgraderGUI() {
       var origIndent = EditorGUI.indentLevel;
       EditorGUI.indentLevel = 0;
 
@@ -206,7 +152,7 @@ namespace Leap.Unity {
 
       _scrollPosition = EditorGUILayout.BeginScrollView(_scrollPosition,
         GUILayout.ExpandWidth(true));
-      
+
       foreach (var oldRig in _oldRigs) {
         using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox)) {
 
@@ -225,7 +171,7 @@ namespace Leap.Unity {
             foldoutName, toggleOnLabelClick: true);
           if (_rigFoldoutStates[oldRig]) {
             EditorGUILayout.Space();
-            
+
             // Rig Transform.
             using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox)) {
               EditorGUI.indentLevel = 0;
@@ -241,7 +187,8 @@ namespace Leap.Unity {
             // Rig Camera.
             using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox)) {
               EditorGUI.indentLevel = 0;
-              drawRigItem("Rig Camera", oldRig.cameraData.cameraComponent, typeof(Camera));
+              drawRigItem("Rig Camera", oldRig.cameraData.cameraComponent,
+                typeof(Camera));
               EditorGUI.indentLevel = 1;
               EditorGUILayout.Separator();
 
@@ -251,7 +198,7 @@ namespace Leap.Unity {
               //   drawMissingScriptsSetting(camera_missingScripts.Count,
               //     ref _camera_removeMissingScripts);
               // }
-              
+
               var camera_enableDepthBuffer = oldRig.cameraData.enableDepthBuffer;
               if (camera_enableDepthBuffer != null) {
                 EditorGUI.BeginDisabledGroup(true);
@@ -259,13 +206,13 @@ namespace Leap.Unity {
                   typeof(EnableDepthBuffer), true);
                 EditorGUI.EndDisabledGroup();
                 EditorGUILayout.LabelField(
-                  "The EnableDepthBuffer script used to be a part of Leap camera rigs by default "
-                + "but can cause shader issues in certain situations. If you're not sure you need "
-                + "this component, you should remove it.",
+                  "The EnableDepthBuffer script used to be a part of Leap camera rigs by "
+                + "default but can cause shader issues in certain situations. If you're "
+                + "not sure you need this component, you should remove it.",
                   wrapLabel);
                 drawYesNoToggle(
                   yesOption: "Remove the EnableDepthBuffer script from the camera.",
-                  noOption:  "Don't remove the EnableDepthBuffer script, I'm using it for "
+                  noOption: "Don't remove the EnableDepthBuffer script, I'm using it for "
                           + "something.",
                   yesOptionFlag: ref _camera_removeEnableDepthBufferScript
                 );
@@ -278,8 +225,8 @@ namespace Leap.Unity {
                 if (rightEyeCamera != null) {
                   drawObjField(rightEyeCamera, typeof(Camera));
                   EditorGUILayout.LabelField(
-                    "Separate cameras for the left and right eyes are no longer necessary for "
-                  + "image pass-through rigs.",
+                    "Separate cameras for the left and right eyes are no longer necessary "
+                  + "for IR viewer rigs.",
                     wrapLabel
                   );
                   drawYesNoToggle(
@@ -294,9 +241,9 @@ namespace Leap.Unity {
                 if (primaryLeapEyeDislocator != null) {
                   drawObjField(primaryLeapEyeDislocator, typeof(LeapEyeDislocator));
                   EditorGUILayout.LabelField(
-                    "LeapEyeDislocator was found on this object, but it was not detected to be "
-                  + "an image pass-through rig. LeapEyeDislocator is not necessary on "
-                  + "non-IR viewer rigs.",
+                    "LeapEyeDislocator was found on this object, but it was not detected "
+                  + "to be an IR viewer rig. LeapEyeDislocator is not necessary "
+                  + "on non-IR viewer rigs.",
                     wrapLabel
                   );
                   drawYesNoToggle(
@@ -331,16 +278,10 @@ namespace Leap.Unity {
                 = oldRig.leapSpaceData.nonLHCChildTransforms;
               if (leapSpace_nonLHCChildren.Count > 0) {
                 EditorGUILayout.Separator();
-                var isPlural = leapSpace_nonLHCChildren.Count == 1;
-                EditorGUILayout.LabelField(
-                  leapSpace_nonLHCChildren.Count + (isPlural ?
-                  " transforms are attached as children " : " transform is attached as a child")
-                + " to the LeapSpace transform, which is deprecated and will be removed.",
-                  wrapLabel);
-                drawYesNoToggle(
-                  yesOption: "Move these scripts to be children of the camera.",
-                  noOption: "Remove these scripts.",
-                  yesOptionFlag: ref _leapSpace_mergeExtraChildrenUpward
+                drawMergeUpwardsSetting(
+                  originalTransformName: "LeapSpace",
+                  numExtraChildren: leapSpace_nonLHCChildren.Count,
+                  mergeExtraChildrenUpwardFlag: ref _leapSpace_mergeExtraChildrenUpward
                 );
               }
             }
@@ -361,15 +302,15 @@ namespace Leap.Unity {
                 "The LeapServiceProvider will be removed. In its place, a "
               + "LeapXRServiceProvider will be added directly to the Camera. The "
               + "LeapXRServiceProvider handles temporal warping (latency correction) "
-              + "automatically for XR rigs. Applicable settings will be transferred to the "
-              + "LeapXRServiceProvider.", wrapLabel);
+              + "automatically for XR rigs. Applicable settings will be transferred to "
+              + "the LeapXRServiceProvider.", wrapLabel);
 
               EditorGUILayout.Separator();
               EditorGUILayout.LabelField(
                 "The HandPool and HandController objects have been combined into a single "
-              + "HandModelManager script, which has been moved to rest on the parent of hand "
-              + "models. This clarifies its separation from the hand data pipeline as one of "
-              + "(potentially many) consumers of hand data from a device.",
+              + "HandModelManager script, which has been moved to rest on the parent of "
+              + "hand models. This clarifies its separation from the hand data pipeline "
+              + "as one of (potentially many) consumers of hand data from a device.",
               wrapLabel);
 
               var handModelParent = oldRig.handModelParentTransform;
@@ -392,21 +333,14 @@ namespace Leap.Unity {
                   ref _lhc_removeMissingScripts
                 );
               }
-              
+
               var lhc_extraChildren = oldRig.lhcData.extraChildTransforms;
               if (lhc_extraChildren.Count > 0) {
                 EditorGUILayout.Separator();
-                var isPlural = lhc_extraChildren.Count == 1;
-                EditorGUILayout.LabelField(
-                  lhc_extraChildren.Count + (isPlural ?
-                  " transforms are attached as children " : " transform is attached as a child")
-                + " to the LeapHandController transform, which is deprecated and will be "
-                + "removed.",
-                  wrapLabel);
-                drawYesNoToggle(
-                  yesOption: "Move these scripts to be children of the camera.",
-                  noOption: "Remove these scripts.",
-                  yesOptionFlag: ref _lhc_mergeExtraChildrenUpward
+                drawMergeUpwardsSetting(
+                  originalTransformName: "LeapHandController",
+                  numExtraChildren: lhc_extraChildren.Count,
+                  mergeExtraChildrenUpwardFlag: ref _lhc_mergeExtraChildrenUpward
                 );
               }
             }
@@ -421,7 +355,7 @@ namespace Leap.Unity {
       }
 
       EditorGUILayout.EndScrollView();
-      
+
       EditorGUI.indentLevel = origIndent;
     }
 
@@ -452,6 +386,24 @@ namespace Leap.Unity {
       removeMissingScriptsFlag = !temp;
     }
 
+    private static void drawMergeUpwardsSetting(string originalTransformName,
+                                                int numExtraChildren,
+                                                ref bool mergeExtraChildrenUpwardFlag) {
+      var isPlural = numExtraChildren == 1;
+      EditorGUILayout.LabelField(
+        numExtraChildren
+      + (isPlural ? " transforms are attached as children "
+                  : " transform is attached as a child")
+      + " to the " + originalTransformName + " transform, which is deprecated and will be "
+      + "removed.",
+        wrapLabel);
+      drawYesNoToggle(
+        yesOption: "Move these scripts to be children of the camera.",
+        noOption: "Remove these scripts.",
+        yesOptionFlag: ref mergeExtraChildrenUpwardFlag
+      );
+    }
+
     private static void drawYesNoToggle(string yesOption, string noOption,
                                         ref bool yesOptionFlag) {
       yesOptionFlag = EditorGUILayout.ToggleLeft(yesOption, yesOptionFlag);
@@ -471,10 +423,74 @@ namespace Leap.Unity {
       return t.name;
     }
 
+    #endregion
+
+    #region Upgrader Memory
+
+    private static List<Transform> _backingTransformsBuffer = null;
+    private static List<Transform> _transformsBuffer {
+      get {
+        if (_backingTransformsBuffer == null)
+          _backingTransformsBuffer = new List<Transform>();
+        return _backingTransformsBuffer;
+      }
+    }
+
+    private static List<OldRigHierarchy> _backingOldRigs = null;
+    private static List<OldRigHierarchy> _oldRigs {
+      get {
+        if (_backingOldRigs == null) {
+          _backingOldRigs = new List<OldRigHierarchy>();
+        }
+        return _backingOldRigs;
+      }
+    }
+
+    #endregion
+
+    #region Scan Methods
+
+    /// <summary>
+    /// Clears any data from the most recent scan.
+    /// </summary>
+    public static void ClearScanData() {
+      _oldRigs.Clear();
+    }
+
+    /// <summary>
+    /// Returns true if old rigs were (potentially) found. Returns false if none were
+    /// found. If this method returns true, you can Show() the window instance to display
+    /// scanned details and auto-upgrade options to the user.
+    /// </summary>
+    public static bool ScanCurrentSceneForOldLeapRigs() {
+      ClearScanData();
+
+      var currentScene = SceneManager.GetActiveScene();
+      var rootObjs = currentScene.GetRootGameObjects();
+      foreach (var rootObj in rootObjs) {
+        rootObj.transform.GetComponentsInChildren(_transformsBuffer);
+        foreach (var transform in _transformsBuffer) {
+          var oldRig = OldRigHierarchy.DetectFor(transform);
+          if (oldRig != null) {
+            _oldRigs.Add(oldRig);
+          }
+        }
+        _transformsBuffer.Clear();
+      }
+
+      return _oldRigs.Count > 0;
+    }
+
+    #endregion
+
   }
 
   /// <summary>
-  /// Description of an old Leap VR rig.
+  /// Description of an old Leap VR rig from before Core version 4.4.
+  /// 
+  /// Use DetectFor(transform) to attempt to detect an
+  /// instance of an old Leap rig with its root at that Transform. If the rig is detected
+  /// and upgradeable, also provides a call to upgrade the rig in an Undo-able way.
   /// </summary>
   /// <remarks>
   /// This is essentially the hierarchy that we're matching to build this object:
@@ -573,7 +589,7 @@ namespace Leap.Unity {
     }
     /// <summary>
     /// The driven camera transform and component info of the rig hierarchy, or that of
-    /// the LEFT eye if this rig was an image pass-through rig specifically.
+    /// the LEFT eye if this rig was an IR viewer rig specifically.
     /// </summary>
     public OldCameraData cameraData;
 
