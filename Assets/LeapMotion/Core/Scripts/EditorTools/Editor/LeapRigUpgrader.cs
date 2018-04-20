@@ -974,6 +974,10 @@ namespace Leap.Unity {
               Undo.DestroyObjectImmediate(rightEyeTransform.gameObject);
             }
           }
+          if (cameraData.cameraComponent != null
+              && cameraData.cameraComponent.stereoTargetEye == StereoTargetEyeMask.Left) {
+            cameraData.cameraComponent.stereoTargetEye = StereoTargetEyeMask.Both;
+          }
         }
 
         var cameraTransform = cameraData.cameraTransform;
