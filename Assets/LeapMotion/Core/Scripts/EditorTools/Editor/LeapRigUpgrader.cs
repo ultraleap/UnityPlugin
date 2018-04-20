@@ -422,8 +422,8 @@ namespace Leap.Unity {
       + "removed.",
         wrapLabel);
       drawYesNoToggle(
-        yesOption: "Move these scripts to be children of the camera.",
-        noOption: "Remove these scripts.",
+        yesOption: "Move these objects to be children of the camera.",
+        noOption: "Remove these objects.",
         yesOptionFlag: ref mergeExtraChildrenUpwardFlag
       );
     }
