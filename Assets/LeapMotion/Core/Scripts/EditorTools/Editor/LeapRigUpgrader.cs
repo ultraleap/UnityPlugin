@@ -971,7 +971,7 @@ namespace Leap.Unity {
           if (rightEyeCamData != null) {
             var rightEyeTransform = rightEyeCamData.cameraTransform;
             if (options.camera_removeRightEyeCamera) {
-              Undo.DestroyObjectImmediate(rightEyeTransform);
+              Undo.DestroyObjectImmediate(rightEyeTransform.gameObject);
             }
           }
         }
@@ -1019,8 +1019,9 @@ namespace Leap.Unity {
             // Migrate the HandPool (now HandModelManager) to the hand model parent 
             // transform if we could find one.
             var handModelManager = lhcData.handModelManager;
+            var newHandModelManager = (HandModelManager)null;
             if (handModelManager != null && this.handModelParentTransform != null) {
-              var newHandModelManager
+              newHandModelManager
                 = Undo.AddComponent<HandModelManager>(handModelParentTransform.gameObject);
               EditorUtility.CopySerialized(handModelManager, newHandModelManager);
 
@@ -1030,41 +1031,48 @@ namespace Leap.Unity {
             // Migrate the LeapServiceProvider on the LHC to a LeapXRServiceProvider on
             // the primary camera, and swap references over to it.
             var leapServiceProvider = lhcData.leapServiceProvider;
+            var leapXrServiceProvider = (LeapXRServiceProvider)null;
             if (leapServiceProvider != null) {
-              var leapXRServiceProvider = Undo.AddComponent<LeapXRServiceProvider>(
+              leapXrServiceProvider = Undo.AddComponent<LeapXRServiceProvider>(
                 cameraData.cameraTransform.gameObject);
-              EditorUtility.CopySerialized(leapServiceProvider, leapXRServiceProvider);
+
+              // TODO: Copy applicable settings from LSP to LXRSP
+              //EditorUtility.CopySerialized(leapServiceProvider, leapXRServiceProvider);
 
               EditorUtils.ReplaceSceneReferences(leapServiceProvider,
-                leapXRServiceProvider);
+                leapXrServiceProvider);
+            }
+
+            if (newHandModelManager != null && leapXrServiceProvider != null) {
+              newHandModelManager.leapProvider = leapXrServiceProvider;
             }
           }
 
           // Remove the LeapSpace transform, also destroying the LeapHandController
           // object.
-          Undo.DestroyObjectImmediate(leapSpaceTransform);
+          Undo.DestroyObjectImmediate(leapSpaceTransform.gameObject);
         }
       }
     }
 
     private void removeMissingScriptsWithUndo(Transform fromObj,
                                               List<int> missingScriptIndices) {
-      if (missingScriptIndices == null || missingScriptIndices.Count == 0) {
-        return;
-      }
+      //if (missingScriptIndices == null || missingScriptIndices.Count == 0) {
+      //  return;
+      //}
 
-      var components = fromObj.GetComponents<Component>();
-      var r = 0;
-      for (var i = 0; i < components.Length; i++) {
-        if (components[i] != null) continue;
+      //var components = fromObj.GetComponents<Component>();
+      //var r = 0;
+      //for (var i = 0; i < components.Length; i++) {
+      //  if (components[i] != null) continue;
 
-        var serializedObject = new SerializedObject(fromObj.gameObject);
-        var prop = serializedObject.FindProperty("m_Component");
-        prop.DeleteArrayElementAtIndex(i - r);
-        r++;
+      //  var serializedObject = new SerializedObject(fromObj.gameObject);
+      //  var prop = serializedObject.FindProperty("m_Component");
+      //  prop.DeleteArrayElementAtIndex(i - r);
+      //  r++;
 
-        serializedObject.ApplyModifiedProperties();
-      }
+      //  serializedObject.ApplyModifiedProperties();
+      //}
     }
 
     #endregion
