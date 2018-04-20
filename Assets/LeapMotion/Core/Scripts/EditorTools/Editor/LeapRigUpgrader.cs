@@ -183,9 +183,15 @@ namespace Leap.Unity {
         using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox)) {
           EditorGUILayout.LabelField(getName(oldRig.rigTransform), boldLabel,
             GUILayout.ExpandWidth(false));
+          EditorGUILayout.Space();
           
-          drawRigItem("Rig Transform: ",
+          // Rig Transform.
+          drawRigItem("Rig Transform",
             oldRig.rigTransform, typeof(Transform));
+          EditorGUILayout.LabelField(
+            "This transform is the root of the detected rig and does not need to be "
+          + "modified.", wrapLabel);
+          EditorGUILayout.Space();
 
           drawRigItem("Rig Camera: ",
             oldRig.cameraData.cameraComponent, typeof(Camera));
