@@ -106,7 +106,9 @@ namespace Leap.Unity {
           var oldRigsDetected = ScanCurrentSceneForOldLeapRigs();
           if (oldRigsDetected) {
             _currentSceneScanStatus = SceneScanStatus.ContainsOldRigs;
-            // TODO: Move to scan tab
+            if (LeapUnityWindow.isWindowOpen) {
+              LeapUnityWindow.ShowTab(1);
+            }
           }
           else {
             _currentSceneScanStatus = SceneScanStatus.NoOldRigsFound;

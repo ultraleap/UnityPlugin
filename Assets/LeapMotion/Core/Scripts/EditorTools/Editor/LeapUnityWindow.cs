@@ -11,6 +11,7 @@ namespace Leap.Unity {
 
     private const string WINDOW_TITLE = "Leap Motion Unity Modules";
     private static readonly Vector2 WINDOW_MIN_SIZE = new Vector2(600f, 600f);
+    private static LeapUnityWindow _currentWindow = null;
 
     /// <summary>
     /// This editor preference marks the Leap Unity SDK as having been launched. When
@@ -37,6 +38,7 @@ namespace Leap.Unity {
         utility: true, title: WINDOW_TITLE, focus: true);
       window.name = "Leap Motion Unity Modules Window";
       window.minSize = WINDOW_MIN_SIZE;
+      _currentWindow = window;
     }
 
     #endregion
@@ -74,7 +76,23 @@ namespace Leap.Unity {
 
     #region Window State
 
-    private int _tab = 0;
+    public static bool isWindowOpen {
+      get {
+        return _currentWindow != null;
+      }
+    }
+
+    private int _tabIndex = 0;
+    private static string[] _tabs = new string[] {
+      "Project Checks", "Rig Upgrader", "Preferences"
+    };
+    public static void ShowTab(int tabIndex) {
+      if (_currentWindow != null) {
+        _currentWindow._tabIndex = tabIndex;
+      }
+    }
+    public static int GetTabCount() { return _tabs.Length; }
+
     private Vector2 _scrollPosition = Vector2.zero;
 
     #endregion
@@ -107,11 +125,10 @@ namespace Leap.Unity {
         GUILayout.MaxHeight(150f));
 
       // Window tabs.
-      _tab = GUILayout.Toolbar(_tab,
-        new string[] { "Project Checks", "Rig Upgrader", "Preferences" });
+      _tabIndex = GUILayout.Toolbar(_tabIndex, _tabs);
       _scrollPosition = GUILayout.BeginScrollView(_scrollPosition,
         GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
-      switch (_tab) {
+      switch (_tabIndex) {
         case 0:
           LeapProjectChecks.DrawProjectChecksGUI();
           break;
@@ -125,7 +142,7 @@ namespace Leap.Unity {
           EditorGUIUtility.labelWidth = prevLabelWidth;
           break;
         default:
-          _tab = 0;
+          _tabIndex = 0;
           break;
       }
       GUILayout.EndScrollView();
