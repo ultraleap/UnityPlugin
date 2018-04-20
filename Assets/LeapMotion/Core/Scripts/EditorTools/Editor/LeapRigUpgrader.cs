@@ -225,13 +225,6 @@ namespace Leap.Unity {
       EditorGUI.indentLevel = 1;
       EditorGUILayout.Separator();
 
-      // removed camera "missing components" check.
-      // var camera_missingScripts = oldRig.cameraData.missingComponentIndices;
-      // if (camera_missingScripts.Count > 0) {
-      //   drawMissingScriptsSetting(camera_missingScripts.Count,
-      //     ref _camera_removeMissingScripts);
-      // }
-
       var camera_enableDepthBuffer = oldRig.cameraData.enableDepthBuffer;
       if (camera_enableDepthBuffer != null) {
         EditorGUI.BeginDisabledGroup(true);
@@ -299,14 +292,6 @@ namespace Leap.Unity {
       + "migrated into the LeapXRServiceProvider for XR rigs.",
         wrapLabel);
 
-      var leapSpace_missingScripts
-                = oldRig.leapSpaceData.missingComponentIndices;
-      if (leapSpace_missingScripts.Count > 0) {
-        EditorGUILayout.Separator();
-        drawRemoveMissingScriptsSetting(leapSpace_missingScripts.Count,
-          ref _upgradeOptions.leapSpace_removeMissingScripts);
-      }
-
       var leapSpace_nonLHCChildren
                 = oldRig.leapSpaceData.nonLHCChildTransforms;
       if (leapSpace_nonLHCChildren.Count > 0) {
@@ -360,14 +345,6 @@ namespace Leap.Unity {
         // decided against adding a HandModelManager if none already exists.
       }
 
-      var lhc_missingScripts = oldRig.lhcData.missingComponentIndices;
-      if (lhc_missingScripts.Count > 0) {
-        EditorGUILayout.Separator();
-        drawRemoveMissingScriptsSetting(lhc_missingScripts.Count,
-          ref _upgradeOptions.lhc_removeMissingScripts
-        );
-      }
-
       var lhc_extraChildren = oldRig.lhcData.extraChildTransforms;
       if (lhc_extraChildren.Count > 0) {
         EditorGUILayout.Separator();
@@ -390,24 +367,6 @@ namespace Leap.Unity {
         EditorGUILayout.ObjectField(obj, objType, true, GUILayout.ExpandWidth(true));
         EditorGUI.EndDisabledGroup();
       }
-    }
-
-    private static void drawRemoveMissingScriptsSetting(int numMissing,
-                                                        ref bool removeMissingScriptsFlag) {
-      var isPlural = numMissing != 1;
-      EditorGUILayout.LabelField(
-        numMissing + (isPlural ? " missing scripts were found on this object. Some of them "
-                               : " missing script was found on this object. It "
-        + "may correspond to " + (isPlural ? "scripts that have " : "a script that has ")
-        + "been deprecated as of Core 4.4."),
-        wrapLabel);
-
-      removeMissingScriptsFlag = EditorGUILayout.ToggleLeft(
-        "Remove missing scripts on this object.", removeMissingScriptsFlag);
-
-      bool temp = EditorGUILayout.ToggleLeft(
-        "Don't remove missing scripts on this object.", !removeMissingScriptsFlag);
-      removeMissingScriptsFlag = !temp;
     }
 
     private static void drawMergeUpwardsSetting(string originalTransformName,
@@ -607,8 +566,8 @@ namespace Leap.Unity {
 
     /// <summary>
     /// Old camera objects that weren't modified at all would have had a 
-    /// LeapEyeDislocator (formerly LeapVRCameraControl), a Camera component, and at
-    /// least one missing component for the now-removed EnableDepthBuffer script.
+    /// LeapEyeDislocator (formerly LeapVRCameraControl), a Camera component, and an
+    /// EnableDepthBuffer component.
     /// </summary>
     public class OldCameraData {
       public Transform cameraTransform;
@@ -630,7 +589,6 @@ namespace Leap.Unity {
 
     public class OldLeapSpaceData {
       public Transform leapSpaceTransform;
-      public List<int> missingComponentIndices;
 
       /// <summary>
       /// Some rigs, like the old image rig or modifications to the old standard rig,
@@ -643,7 +601,6 @@ namespace Leap.Unity {
 
     public class OldLeapHandControllerData {
       public Transform lhcTransform;
-      public List<int> missingComponentIndices;
       public LeapServiceProvider leapServiceProvider;
       public HandModelManager handModelManager;
       public List<Transform> extraChildTransforms;
@@ -761,9 +718,6 @@ namespace Leap.Unity {
                 firstLHCData = new OldLeapHandControllerData();
                 firstLHCData.lhcTransform = grandchild;
                 firstLHCData.leapServiceProvider = leapServiceProvider;
-                firstLHCData.missingComponentIndices = new List<int>();
-                fillMissingComponentIndices(firstLHCData.lhcTransform,
-                  firstLHCData.missingComponentIndices);
 
                 firstLHCData.extraChildTransforms = new List<Transform>();
                 foreach (var greatGrandchild in grandchild.GetChildren()) {
@@ -784,9 +738,6 @@ namespace Leap.Unity {
                 if (leapSpaceChild == firstLHCData.lhcTransform) continue;
                 firstLeapSpaceData.nonLHCChildTransforms.Add(leapSpaceChild);
               }
-              firstLeapSpaceData.missingComponentIndices = new List<int>();
-              fillMissingComponentIndices(child,
-                firstLeapSpaceData.missingComponentIndices);
               break;
             }
           }
@@ -996,10 +947,6 @@ namespace Leap.Unity {
           }
 
           var leapSpaceTransform = leapSpaceData.leapSpaceTransform;
-          var leapSpace_missingScripts = leapSpaceData.missingComponentIndices;
-          if (options.leapSpace_removeMissingScripts) {
-            removeMissingScriptsWithUndo(leapSpaceTransform, leapSpace_missingScripts);
-          }
 
           if (lhcData == null) {
             Debug.LogError("No LeapHandController data available for this rig during "
@@ -1012,12 +959,6 @@ namespace Leap.Unity {
                 Undo.SetTransformParent(extraChild, cameraTransform,
                   "Move LHC child to Camera");
               }
-            }
-
-            var lhcTransform = lhcData.lhcTransform;
-            var lhc_missingScripts = lhcData.missingComponentIndices;
-            if (options.lhc_removeMissingScripts) {
-              removeMissingScriptsWithUndo(lhcTransform, lhc_missingScripts);
             }
 
             // Migrate the HandPool (now HandModelManager) to the hand model parent 
@@ -1054,29 +995,11 @@ namespace Leap.Unity {
 
           // Remove the LeapSpace transform, also destroying the LeapHandController
           // object.
-          Undo.DestroyObjectImmediate(leapSpaceTransform.gameObject);
+          if (leapSpaceTransform != null) {
+            Undo.DestroyObjectImmediate(leapSpaceTransform.gameObject);
+          }
         }
       }
-    }
-
-    private void removeMissingScriptsWithUndo(Transform fromObj,
-                                              List<int> missingScriptIndices) {
-      //if (missingScriptIndices == null || missingScriptIndices.Count == 0) {
-      //  return;
-      //}
-
-      //var components = fromObj.GetComponents<Component>();
-      //var r = 0;
-      //for (var i = 0; i < components.Length; i++) {
-      //  if (components[i] != null) continue;
-
-      //  var serializedObject = new SerializedObject(fromObj.gameObject);
-      //  var prop = serializedObject.FindProperty("m_Component");
-      //  prop.DeleteArrayElementAtIndex(i - r);
-      //  r++;
-
-      //  serializedObject.ApplyModifiedProperties();
-      //}
     }
 
     #endregion
