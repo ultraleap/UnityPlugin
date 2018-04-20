@@ -12,6 +12,7 @@ namespace Leap.Unity.Interaction.Examples {
     }
 
     private void Start() {
+#if UNITY_2017_2_OR_NEWER
       if (Physics.autoSyncTransforms) {
         Debug.LogWarning(
           "Physics.autoSyncTransforms is enabled. This will cause Interaction "
@@ -19,6 +20,7 @@ namespace Leap.Unity.Interaction.Examples {
         + "move a parent transform. You can modify this setting in "
         + "Edit->Project Settings->Physics.");
       }
+#endif
     }
 
     private void Update() {

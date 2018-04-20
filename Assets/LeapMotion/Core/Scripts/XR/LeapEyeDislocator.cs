@@ -107,7 +107,7 @@ namespace Leap.Unity {
       Quaternion providerRotation = Quaternion.AngleAxis(_provider.deviceTiltXAxis, Vector3.right);
 
       var existingMatrix = _camera.GetStereoViewMatrix(eye);
-      _camera.SetStereoViewMatrix(eye, Matrix4x4.Rotate(providerRotation) *
+      _camera.SetStereoViewMatrix(eye, Matrix4x4.TRS(Vector3.zero, providerRotation, Vector3.one) *
                                        Matrix4x4.Translate(providerForwardOffset + ipdOffset) *
                                        Matrix4x4.Translate(providerVerticalOffset) *
                                        existingMatrix);

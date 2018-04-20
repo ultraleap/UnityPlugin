@@ -902,8 +902,8 @@ namespace Leap.Unity.RuntimeGizmos {
       var r = radialStartDirection * radius;
       for (int i = 0; i < numCircleSegments + 1; i++) {
         var nextR = Q * r;
-        var onPlaneAngle = Vector3.SignedAngle(r, onPlaneDir, circleNormal);
-        var nextOnPlaneAngle = Vector3.SignedAngle(nextR, onPlaneDir, circleNormal);
+        var onPlaneAngle = Infix.Infix.SignedAngle(r, onPlaneDir, circleNormal);
+        var nextOnPlaneAngle = Infix.Infix.SignedAngle(nextR, onPlaneDir, circleNormal);
         var front = onPlaneAngle < 0;
         var nextFront = nextOnPlaneAngle < 0;
 
