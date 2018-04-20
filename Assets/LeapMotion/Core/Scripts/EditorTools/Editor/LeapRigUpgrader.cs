@@ -206,6 +206,10 @@ namespace Leap.Unity {
 
         if (GUILayout.Button("Update Rig")) {
           oldRig.Upgrade(_upgradeOptions);
+
+          EditorApplication.delayCall += () => {
+            ScanCurrentSceneForOldLeapRigs();
+          };
         }
       }
     }
