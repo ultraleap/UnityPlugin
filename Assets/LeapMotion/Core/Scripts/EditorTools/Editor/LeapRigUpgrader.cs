@@ -160,6 +160,10 @@ namespace Leap.Unity {
       return _oldRigs.Count > 0;
     }
 
+    public static GUIStyle wrapLabel { get { return LeapRigUpgrader.wrapLabel; } }
+
+    private bool _camera_removeMissingScripts = true;
+
     private void OnGUI() {
       var boldLabel = LeapRigUpgrader.boldLabel;
       var wrapLabel = LeapRigUpgrader.wrapLabel;
@@ -186,15 +190,26 @@ namespace Leap.Unity {
           EditorGUILayout.Space();
           
           // Rig Transform.
-          drawRigItem("Rig Transform",
-            oldRig.rigTransform, typeof(Transform));
+          drawRigItem("Rig Transform", oldRig.rigTransform, typeof(Transform));
           EditorGUILayout.LabelField(
             "This transform is the root of the detected rig and does not need to be "
           + "modified.", wrapLabel);
           EditorGUILayout.Space();
 
-          drawRigItem("Rig Camera: ",
-            oldRig.cameraData.cameraComponent, typeof(Camera));
+          // Rig Camera.
+          /* TODO:
+           *    if (camera_enableDepthBuffer != null) {
+                  The EnableDepthBuffer script used to be a part of Leap cameras by default but can cause shader issues in certain situations. If you're not sure you need this component, you should remove it.
+                  [x] Remove the EnableDepthBuffer script from the camera.
+                  [ ] Don't remove the EnableDepthBuffer script, I'm using it for something.
+                } */
+          drawRigItem("Rig Camera", oldRig.cameraData.cameraComponent, typeof(Camera));
+          var camera_missingScripts = oldRig.cameraData.missingComponentIndices;
+          if (camera_missingScripts.Count > 0) {
+            drawMissingScriptsSetting(camera_missingScripts.Count,
+              ref _camera_removeMissingScripts);
+          }
+
           drawRigItem("(old) LeapSpace: ",
             oldRig.leapSpaceData.leapSpaceTransform, typeof(Transform));
           drawRigItem("(old) LeapHandController",
@@ -211,6 +226,28 @@ namespace Leap.Unity {
         EditorGUI.BeginDisabledGroup(true);
         EditorGUILayout.ObjectField(obj, objType, true, GUILayout.ExpandWidth(true));
         EditorGUI.EndDisabledGroup();
+      }
+    }
+
+    private static void drawMissingScriptsSetting(int numMissing,
+                                                  ref bool removeMissingScriptsFlag) {
+      var isPlural = numMissing != 1;
+      EditorGUILayout.LabelField(
+        numMissing + (isPlural ? " missing scripts were found on this rig. Some of them "
+                               : " missing script was found on this rig. It "
+        + "may correspond to " + (isPlural ? " scripts that have " : " a script that has ")
+        + "been deprecated since Core 4.4."),
+        wrapLabel);
+      using (new EditorGUILayout.HorizontalScope()) {
+        removeMissingScriptsFlag = EditorGUILayout.Toggle(removeMissingScriptsFlag);
+        EditorGUILayout.LabelField("Remove missing scripts on this object.",
+          wrapLabel);
+      }
+      using (new EditorGUILayout.HorizontalScope()) {
+        bool temp = EditorGUILayout.Toggle(!removeMissingScriptsFlag);
+        removeMissingScriptsFlag = !temp;
+        EditorGUILayout.LabelField("Don't remove missing scripts on this object.",
+          wrapLabel);
       }
     }
 
@@ -655,15 +692,13 @@ namespace Leap.Unity {
       if (!didDetectOldRig) return null;
       return scannedRig;
     }
-
-    [ThreadStatic]
-    private static List<Component> s_componentsBuffer = new List<Component>();
+    
     private static void fillMissingComponentIndices(Transform transform, List<int> toFill) {
       toFill.Clear();
-      s_componentsBuffer.Clear();
-      transform.GetComponents(s_componentsBuffer);
-      for (int i = 0; i < s_componentsBuffer.Count; i++) {
-        var component = s_componentsBuffer[i];
+      var tempList = new List<Component>();
+      transform.GetComponents(tempList);
+      for (int i = 0; i < tempList.Count; i++) {
+        var component = tempList[i];
         if (component == null) {
           toFill.Add(i);
         }
@@ -673,3 +708,4 @@ namespace Leap.Unity {
   }
 
 }
+ 
