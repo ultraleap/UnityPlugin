@@ -9,6 +9,7 @@
 
 using System.Threading;
 using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.Profiling;
 
 namespace Leap.Unity {
@@ -56,6 +57,7 @@ namespace Leap.Unity {
     }
 
     public static void BeginProfilingForThread(BeginProfilingForThreadArgs eventData) {
+#if UNITY_2017_3_OR_NEWER
       //Enable unity profiling for this thread
       Profiler.BeginThreadProfiling("LeapCSharp", eventData.threadName);
 
@@ -69,10 +71,17 @@ namespace Leap.Unity {
 
         Interlocked.Add(ref _samplersToCreateCount, eventData.blockNames.Length);
       }
+#else
+      Debug.LogWarning("Thread Profiling is unavailable in versions of Unity below 2017.3");
+#endif
     }
 
     public static void EndProfilingForThread(EndProfilingForThreadArgs eventData) {
+#if UNITY_2017_3_OR_NEWER
       Profiler.EndThreadProfiling();
+#else
+      Debug.LogWarning("Thread Profiling is unavailable in versions of Unity below 2017.3");
+#endif
     }
 
     public static void BeginProfilingBlock(BeginProfilingBlockArgs eventData) {

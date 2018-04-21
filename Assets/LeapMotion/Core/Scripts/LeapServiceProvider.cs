@@ -66,8 +66,13 @@ namespace Leap.Unity {
     [SerializeField]
     protected float _physicsExtrapolationTime = 1.0f / 90.0f;
 
+#if UNITY_2017_3_OR_NEWER
     [Tooltip("When checked, profiling data from the LeapCSharp worker thread will be used to populate the UnityProfiler.")]
     [EditTimeOnly]
+#else
+    [Tooltip("Worker thread profiling requires a Unity version of 2017.3 or greater.")]
+    [Disable]
+#endif
     [SerializeField]
     protected bool _workerThreadProfiling = false;
 
