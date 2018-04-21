@@ -98,10 +98,9 @@ namespace Leap.Unity {
     }
 
     private static void drawScanCurrentSceneButtonAndStatus() {
-      using (new EditorGUILayout.HorizontalScope()) {
 
-        if (GUILayout.Button(new GUIContent("Scan Current Scene",
-              "Scan the currently open scene for old Leap rigs."),
+      using (new EditorGUILayout.HorizontalScope()) {
+        if (GUILayout.Button(new GUIContent("Scan Current Scene"),
               GUILayout.MaxWidth(200f))) {
           var oldRigsDetected = ScanCurrentSceneForOldLeapRigs();
           if (oldRigsDetected) {
@@ -146,22 +145,20 @@ namespace Leap.Unity {
       var origIndent = EditorGUI.indentLevel;
       EditorGUI.indentLevel = 0;
 
-      drawRigUpgraderCheckGUI();
+      using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox)) {
+        drawRigUpgraderCheckGUI();
+      }
 
       EditorGUILayout.Space();
       EditorGUILayout.Space();
 
-      EditorGUILayout.LabelField(
-        "To be safe, you should make sure you've backed up your scene or you're at least "
-      + "running version control!",
-        wrapLabel
-      );
+      drawRigScanResultsGUI();
 
-      EditorGUILayout.Space();
-
-      var singleRig = _oldRigs.Count == 1;
-      EditorGUILayout.LabelField("Detected " + _oldRigs.Count + " old rig"
-        + (singleRig ? "" : "s") + ".", wrapLabel);
+      var splitterStyle = new GUIStyle(LeapUnityWindow.windowSkin.box);
+      splitterStyle.fixedHeight = 1f;
+      splitterStyle.stretchWidth = true;
+      splitterStyle.margin = new RectOffset(0, 0, 0, 0);
+      GUILayout.Box("", splitterStyle);
 
       _scrollPosition = EditorGUILayout.BeginScrollView(_scrollPosition,
         GUILayout.ExpandWidth(true));
@@ -174,6 +171,18 @@ namespace Leap.Unity {
       EditorGUILayout.EndScrollView();
 
       EditorGUI.indentLevel = origIndent;
+    }
+
+    private static void drawRigScanResultsGUI() {
+      var safetyWarning = "To be safe, you should make sure you've backed up your scene "
+        + "before upgrading.";
+      EditorGUILayout.LabelField(safetyWarning, wrapLabel);
+      
+      var singleRig = _oldRigs.Count == 1;
+      EditorGUILayout.LabelField(
+        "Detected " + _oldRigs.Count + " old rig"
+        + (singleRig ? "" : "s") + ". "
+        , wrapLabel);
     }
 
     private static void drawOldRigUpgradeGUI(OldRigHierarchy oldRig) {
@@ -190,12 +199,18 @@ namespace Leap.Unity {
         else {
           foldoutName += " (click to hide upgrade details)";
         }
-        _rigFoldoutStates[oldRig] = EditorGUILayout.Foldout(_rigFoldoutStates[oldRig],
-          foldoutName, toggleOnLabelClick: true);
+        using (new EditorGUILayout.HorizontalScope()) {
+          _rigFoldoutStates[oldRig] = EditorGUILayout.Foldout(_rigFoldoutStates[oldRig],
+            foldoutName, toggleOnLabelClick: true);
+
+          EditorGUI.BeginDisabledGroup(true);
+          EditorGUILayout.ObjectField(oldRig.rigTransform, typeof(Transform), true,
+            GUILayout.ExpandWidth(false));
+          EditorGUI.EndDisabledGroup();
+        }
+
         if (_rigFoldoutStates[oldRig]) {
           EditorGUILayout.Space();
-          
-          drawOldRigTransformGUI(oldRig);
           
           drawOldRigCameraGUI(oldRig);
           
@@ -216,30 +231,17 @@ namespace Leap.Unity {
 
     #region Old Rig Component Drawing
 
-    private static void drawOldRigTransformGUI(OldRigHierarchy oldRig) {
-      EditorGUI.indentLevel = 0;
-      drawRigItem("Rig Transform", oldRig.rigTransform, typeof(Transform));
-      EditorGUI.indentLevel = 1;
-      EditorGUILayout.Separator();
-
-      EditorGUILayout.LabelField(
-        "This transform is the root of the detected rig and does not need to be "
-      + "modified.", wrapLabel);
-    }
-
     private static void drawOldRigCameraGUI(OldRigHierarchy oldRig) {
-      EditorGUI.indentLevel = 0;
+      EditorGUI.indentLevel = 1;
       drawRigItem("Rig Camera", oldRig.cameraData.cameraComponent,
         typeof(Camera));
-      EditorGUI.indentLevel = 1;
-      EditorGUILayout.Separator();
+      EditorGUI.indentLevel = 2;
 
       var camera_enableDepthBuffer = oldRig.cameraData.enableDepthBuffer;
       if (camera_enableDepthBuffer != null) {
-        EditorGUI.BeginDisabledGroup(true);
-        EditorGUILayout.ObjectField(camera_enableDepthBuffer,
-          typeof(EnableDepthBuffer), true);
-        EditorGUI.EndDisabledGroup();
+        EditorGUILayout.Space();
+        drawRigItem("Remove Enable Depth Buffer", camera_enableDepthBuffer,
+          typeof(EnableDepthBuffer));
         EditorGUILayout.LabelField(
           "The EnableDepthBuffer script used to be a part of Leap camera rigs by "
         + "default but can cause shader issues in certain situations. If you're "
@@ -253,12 +255,12 @@ namespace Leap.Unity {
         );
       }
 
-      EditorGUILayout.Separator();
 
       if (oldRig.isImageRig) {
+        EditorGUILayout.Space();
         var rightEyeCamera = oldRig.imageRigData.rightEyeCamData.cameraComponent;
         if (rightEyeCamera != null) {
-          drawObjField(rightEyeCamera, typeof(Camera));
+          drawRigItem("Remove Right Eye Camera", rightEyeCamera, typeof(Camera));
           EditorGUILayout.LabelField(
             "Separate cameras for the left and right eyes are no longer necessary "
           + "for IR viewer rigs.",
@@ -272,9 +274,11 @@ namespace Leap.Unity {
         }
       }
       else {
+        EditorGUILayout.Space();
         var primaryLeapEyeDislocator = oldRig.cameraData.leapEyeDislocator;
         if (primaryLeapEyeDislocator != null) {
-          drawObjField(primaryLeapEyeDislocator, typeof(LeapEyeDislocator));
+          drawRigItem("Remove Leap Eye Dislocator", primaryLeapEyeDislocator,
+            typeof(LeapEyeDislocator));
           EditorGUILayout.LabelField(
             "LeapEyeDislocator was found on this object, but it was not detected "
           + "to be an IR viewer rig. LeapEyeDislocator is not necessary "
@@ -282,29 +286,32 @@ namespace Leap.Unity {
             wrapLabel
           );
           drawYesNoToggle(
-            yesOption: "Remove LeapEyeDislocator.",
+            yesOption: "Remove the LeapEyeDislocator script from the camera.",
             noOption: "Don't remove LeapEyeDislocator.",
             yesOptionFlag: ref _upgradeOptions.camera_removeLeapEyeDislocator
           );
         }
       }
+
+      EditorGUILayout.Space();
     }
 
     private static void drawOldRigLeapSpaceGUI(OldRigHierarchy oldRig) {
-
-      EditorGUI.indentLevel = 0;
-      drawRigItem("(old) LeapSpace: ",
-        oldRig.leapSpaceData.leapSpaceTransform, typeof(Transform));
+      EditorGUILayout.Space();
       EditorGUI.indentLevel = 1;
+      drawRigItem("LeapSpace Transform (to be deleted.)",
+        oldRig.leapSpaceData.leapSpaceTransform, typeof(Transform));
+      EditorGUI.indentLevel = 2;
       EditorGUILayout.LabelField(
         "The LeapSpace transform and its temporal warping functionality have been "
-      + "migrated into the LeapXRServiceProvider for XR rigs.",
+      + "migrated into the LeapXRServiceProvider for XR rigs. As a part of this upgrade, "
+      + "this transform (including any components on it) will be deleted.",
         wrapLabel);
 
       var leapSpace_nonLHCChildren
                 = oldRig.leapSpaceData.nonLHCChildTransforms;
       if (leapSpace_nonLHCChildren.Count > 0) {
-        EditorGUILayout.Separator();
+        EditorGUILayout.Space();
         drawMergeUpwardsSetting(
           originalTransformName: "LeapSpace",
           numExtraChildren: leapSpace_nonLHCChildren.Count,
@@ -312,42 +319,44 @@ namespace Leap.Unity {
             ref _upgradeOptions.leapSpace_mergeExtraChildrenUpward
         );
       }
+
+      EditorGUILayout.Space();
     }
 
     private static void drawOldRigLHCGUI(OldRigHierarchy oldRig) {
-
-      EditorGUI.indentLevel = 0;
-      drawRigItem("(old) LeapHandController",
-        oldRig.lhcData.leapServiceProvider, typeof(Transform));
+      EditorGUILayout.Space();
       EditorGUI.indentLevel = 1;
+      drawRigItem("LeapHandController Transform (to be deleted.)",
+        oldRig.lhcData.leapServiceProvider, typeof(Transform));
+      EditorGUI.indentLevel = 2;
       EditorGUILayout.LabelField(
         "The LeapHandController transform and its LeapHandController, "
       + "LeapServiceProvider, and HandPool components have been simplified.",
         wrapLabel);
-
-      EditorGUILayout.Separator();
+      
       EditorGUILayout.LabelField(
         "The LeapServiceProvider will be removed. In its place, a "
       + "LeapXRServiceProvider will be added directly to the Camera. The "
       + "LeapXRServiceProvider handles temporal warping (latency correction) "
       + "automatically for XR rigs. Applicable settings will be transferred to "
       + "the LeapXRServiceProvider.", wrapLabel);
-
-      EditorGUILayout.Separator();
+      
       EditorGUILayout.LabelField(
         "The HandPool and HandController objects have been combined into a single "
-      + "HandModelManager script, which has been moved to rest on the parent of "
+      + "HandModelManager script, which should be moved to the parent transform of the "
       + "hand models. This clarifies its separation from the hand data pipeline "
       + "as one of (potentially many) consumers of hand data from a device.",
       wrapLabel);
 
       var handModelParent = oldRig.handModelParentTransform;
-      if (handModelParent != null) {
-        EditorGUILayout.Separator();
-        drawObjField(handModelParent, typeof(Transform));
+      var handModelManager = oldRig.lhcData.handModelManager;
+      if (handModelParent != null && handModelManager != null) {
+        EditorGUILayout.Space();
+        drawRigItem("Move the HandModelManager...", handModelManager, typeof(HandModelManager));
+        drawRigItem("...to the hand model parent transform", handModelParent, typeof(Transform));
         EditorGUILayout.LabelField(
           "The HandModelManager will be moved to the " + handModelParent.name
-        + "transform because it is the parent transform of the hand models.",
+        + " transform because it is the parent transform of the hand models.",
           wrapLabel);
       }
       else {
@@ -356,7 +365,7 @@ namespace Leap.Unity {
 
       var lhc_extraChildren = oldRig.lhcData.extraChildTransforms;
       if (lhc_extraChildren.Count > 0) {
-        EditorGUILayout.Separator();
+        EditorGUILayout.Space();
         drawMergeUpwardsSetting(
           originalTransformName: "LeapHandController",
           numExtraChildren: lhc_extraChildren.Count,
@@ -368,12 +377,12 @@ namespace Leap.Unity {
     #endregion
 
     #region Drawing Helper Methods
-
+    
     private static void drawRigItem(string label, UnityObject obj, Type objType) {
       using (new EditorGUILayout.HorizontalScope()) {
-        EditorGUILayout.LabelField(label, GUILayout.ExpandWidth(false));
+        EditorGUILayout.LabelField(label, GUILayout.ExpandWidth(true));
         EditorGUI.BeginDisabledGroup(true);
-        EditorGUILayout.ObjectField(obj, objType, true, GUILayout.ExpandWidth(true));
+        EditorGUILayout.ObjectField(obj, objType, true, GUILayout.ExpandWidth(false));
         EditorGUI.EndDisabledGroup();
       }
     }
