@@ -1050,7 +1050,7 @@ namespace Leap.Unity {
 #else
       Matrix4x4 toReturn = m;
       for (int i = 0; i < 4; i++) {
-        toReturn.setColumn(i, toReturn.GetColumn(i) * f);
+        toReturn.SetColumn(i, toReturn.GetColumn(i) * f);
       }
       return toReturn;
 #endif
