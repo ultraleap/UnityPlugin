@@ -7,6 +7,14 @@ namespace Leap.Unity.Interaction.Internal {
   using Query;
 
   public static class InteractionChecks {
+    public const float MAX_GRAVITY_MAGNITUDE = 4.905f;
+
+#if UNITY_ANDROID
+    public const float MAX_TIMESTEP = 1.0f / 60.0f;
+#else
+    public const float MAX_TIMESTEP = 1.0f / 90.0f;
+#endif
+
     private const string CHECK_KEY = "LeapInteractionEngineCheckKey";
     private const string SHOULD_LAUNCH_FOR_IE = "LeapWindowPanelShouldLaunchForIE";
 
@@ -40,8 +48,8 @@ namespace Leap.Unity.Interaction.Internal {
     }
 
     private static bool checkForTimeStep() {
-      if (Time.fixedDeltaTime > InteractionPreferences.MAX_TIMESTEP + Mathf.Epsilon) {
-        float roundedTimestep = (float)Math.Round(InteractionPreferences.MAX_TIMESTEP, 4);
+      if (Time.fixedDeltaTime > MAX_TIMESTEP + Mathf.Epsilon) {
+        float roundedTimestep = (float)Math.Round(MAX_TIMESTEP, 4);
         EditorGUILayout.HelpBox("Your fixed timestep is " + Time.fixedDeltaTime +
                                 ", which is slower than the recommended value " +
                                 "of " + roundedTimestep + ".\n\nGo to Edit/Project Settings/Time " +
@@ -54,7 +62,7 @@ namespace Leap.Unity.Interaction.Internal {
 
     private static bool checkForGravity() {
       float magnitude = Physics.gravity.y;
-      if (Mathf.Abs(magnitude) > InteractionPreferences.MAX_GRAVITY_MAGNITUDE) {
+      if (Mathf.Abs(magnitude) > MAX_GRAVITY_MAGNITUDE) {
         EditorGUILayout.HelpBox("Your gravity magnitude is " + magnitude
                               + " which is stronger than the recommended value "
                               + "of -4.905!\n\nGo to Edit/Project Settings/Physics "
