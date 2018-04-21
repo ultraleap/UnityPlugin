@@ -33,7 +33,7 @@ namespace Leap.Unity {
     }
 
     [MenuItem("Window/Leap Motion")]
-    private static void Init() {
+    public static void Init() {
       var window = (LeapUnityWindow)GetWindow(typeof(LeapUnityWindow),
         utility: true, title: WINDOW_TITLE, focus: true);
       window.name = "Leap Motion Unity Modules Window";

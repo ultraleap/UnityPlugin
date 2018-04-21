@@ -1,8 +1,6 @@
 ﻿using System;
 using UnityEngine;
-#if UNITY_EDITOR
 using UnityEditor;
-#endif
 
 namespace Leap.Unity.Interaction.Internal {
   using UnityObject = UnityEngine.Object;
@@ -10,8 +8,18 @@ namespace Leap.Unity.Interaction.Internal {
 
   public static class InteractionChecks {
     private const string CHECK_KEY = "LeapInteractionEngineCheckKey";
+    private const string SHOULD_LAUNCH_FOR_IE = "LeapWindowPanelShouldLaunchForIE";
 
-#if UNITY_EDITOR
+    [InitializeOnLoadMethod]
+    private static void init() {
+      EditorApplication.delayCall += () => {
+        if (EditorPrefs.GetBool(SHOULD_LAUNCH_FOR_IE, defaultValue: true)) {
+          EditorPrefs.SetBool(SHOULD_LAUNCH_FOR_IE, false);
+          LeapUnityWindow.Init();
+        }
+      };
+    }
+
     [LeapProjectCheck("Interaction Engine", 10)]
     public static bool CheckInteractionSettings() {
       EditorGUILayout.LabelField("Interaction Engine", EditorStyles.boldLabel);
@@ -76,6 +84,5 @@ namespace Leap.Unity.Interaction.Internal {
         return true;
       }
     }
-#endif
   }
 }
