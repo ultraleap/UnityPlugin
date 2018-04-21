@@ -1,6 +1,7 @@
 ﻿using Leap.Unity.Query;
 using System;
 using System.Collections.Generic;
+using System.Text;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -363,6 +364,34 @@ namespace Leap.Unity {
         // decided against adding a HandModelManager if none already exists.
       }
 
+      var lhc_extraComponents = oldRig.lhcData.extraComponents;
+      if (lhc_extraComponents != null && lhc_extraComponents.Count > 0) {
+        EditorGUILayout.Space();
+        drawRigItem("Extra Components Detected", null, null);
+
+        var sb = new StringBuilder();
+        sb.Append("The ");
+        for (int i = 0; i < lhc_extraComponents.Count; i++) {
+          var component = lhc_extraComponents[i];
+          sb.Append(component.GetType().Name);
+          if (i != lhc_extraComponents.Count - 1) sb.Append(", ");
+          if (i == lhc_extraComponents.Count - 2) sb.Append("and ");
+        }
+        var isPlural = lhc_extraComponents.Count != 1;
+        if (isPlural) {
+          sb.Append(" components (and references to them) will be migrated to the camera "
+            + "transform.");
+        }
+        else {
+          sb.Append(" component (and references to it) will be migrated to the camera "
+            + "transform.");
+        }
+
+        EditorGUILayout.LabelField(
+          sb.ToString(),
+          wrapLabel);
+      }
+
       var lhc_extraChildren = oldRig.lhcData.extraChildTransforms;
       if (lhc_extraChildren.Count > 0) {
         EditorGUILayout.Space();
@@ -381,9 +410,11 @@ namespace Leap.Unity {
     private static void drawRigItem(string label, UnityObject obj, Type objType) {
       using (new EditorGUILayout.HorizontalScope()) {
         EditorGUILayout.LabelField(label, GUILayout.ExpandWidth(true));
-        EditorGUI.BeginDisabledGroup(true);
-        EditorGUILayout.ObjectField(obj, objType, true, GUILayout.ExpandWidth(false));
-        EditorGUI.EndDisabledGroup();
+        if (obj != null) {
+          EditorGUI.BeginDisabledGroup(true);
+          EditorGUILayout.ObjectField(obj, objType, true, GUILayout.ExpandWidth(false));
+          EditorGUI.EndDisabledGroup();
+        }
       }
     }
 
@@ -622,6 +653,7 @@ namespace Leap.Unity {
       public LeapServiceProvider leapServiceProvider;
       public HandModelManager handModelManager;
       public List<Transform> extraChildTransforms;
+      public List<Component> extraComponents;
     }
     public OldLeapHandControllerData lhcData;
 
@@ -744,6 +776,20 @@ namespace Leap.Unity {
 
                 firstLHCData.handModelManager
                   = grandchild.GetComponent<HandModelManager>();
+
+                var components = grandchild.GetComponents<Component>();
+                foreach (var component in components) {
+                  if (component == null) continue; // ignore "Missing Script"
+                  if (component == firstLHCData.lhcTransform) continue;
+                  if (component == firstLHCData.leapServiceProvider) continue;
+                  if (component == firstLHCData.handModelManager) continue;
+
+                  if (firstLHCData.extraComponents == null) {
+                    firstLHCData.extraComponents = new List<Component>();
+                  }
+                  firstLHCData.extraComponents.Add(component);
+                }
+
                 break;
               }
             }
@@ -1008,6 +1054,19 @@ namespace Leap.Unity {
 
             if (newHandModelManager != null && leapXRServiceProvider != null) {
               newHandModelManager.leapProvider = leapXRServiceProvider;
+            }
+
+            // Migrate any extra components on the LHC to the camera.
+            var extraComponents = lhcData.extraComponents;
+            if (extraComponents != null && extraComponents.Count > 0) {
+              foreach (var component in extraComponents) {
+                var newComponent
+                  = cameraTransform.gameObject.AddComponent(component.GetType());
+
+                EditorUtility.CopySerialized(component, newComponent);
+
+                EditorUtils.ReplaceSceneReferences(component, newComponent);
+              }
             }
           }
 
