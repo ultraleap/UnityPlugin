@@ -400,6 +400,19 @@ namespace Leap.Unity {
       transformFrame(_untransformedFixedFrame, _transformedFixedFrame);
     }
 
+    /// <summary>
+    /// Copies property settings from this LeapServiceProvider to the target
+    /// LeapXRServiceProvider where applicable. Does not modify any XR-specific settings
+    /// that only exist on the LeapXRServiceProvider.
+    /// </summary>
+    public void CopySettingsToLeapXRServiceProvider(
+        LeapXRServiceProvider leapXRServiceProvider) {
+      leapXRServiceProvider._frameOptimization = _frameOptimization;
+      leapXRServiceProvider._physicsExtrapolation = _physicsExtrapolation;
+      leapXRServiceProvider._physicsExtrapolationTime = _physicsExtrapolationTime;
+      leapXRServiceProvider._workerThreadProfiling = _workerThreadProfiling;
+    }
+
     #endregion
 
     #region Internal Methods

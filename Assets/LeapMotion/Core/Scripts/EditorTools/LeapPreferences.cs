@@ -82,13 +82,13 @@ namespace Leap.Unity {
     }
 
     [PreferenceItem("Leap Motion")]
-    private static void preferenceMenu() {
+    public static void DrawPreferencesGUI() {
       ensurePreferenceItemsLoaded();
 
       foreach (var item in _leapPreferenceItems) {
         item.drawPreferenceGui();
       }
     }
-#endif
+    #endif
   }
 }
