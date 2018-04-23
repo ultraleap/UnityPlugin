@@ -30,6 +30,14 @@ namespace Leap.Unity {
     public static IndexableEnumerator<T> GetEnumerator<T>(this IIndexable<T> indexable) {
       return new IndexableEnumerator<T>(indexable);
     }
+
+    public static Query<T> Query<T>(this IIndexable<T> indexable) {
+      var arr = ArrayPool<T>.Spawn(indexable.Count);
+      for (int i = 0; i < indexable.Count; i++) {
+        arr[i] = indexable[i];
+      }
+      return new Query<T>(arr, indexable.Count);
+    }
   }
 
   public struct IndexableEnumerator<Element> {
