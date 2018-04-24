@@ -24,9 +24,17 @@ namespace Leap.Unity {
                                                    .enumValueIndex == 1; },
                                 "_customWarpAdjustment");
 
-      specifyConditionalDrawing("_allowManualDeviceOffset",
-                                  "_deviceOffsetYAxis", "_deviceOffsetZAxis",
-                                  "_deviceTiltXAxis");
+      specifyConditionalDrawing(() => { return serializedObject
+                                                 .FindProperty("_deviceOffsetMode")
+                                                   .enumValueIndex == 1; },
+                                "_deviceOffsetYAxis", 
+                                "_deviceOffsetZAxis",
+                                "_deviceTiltXAxis");
+
+      specifyConditionalDrawing(() => { return serializedObject
+                                                 .FindProperty("_deviceOffsetMode")
+                                                   .enumValueIndex == 2; },
+                                "_deviceOrigin");
     }
 
     private void decorateAllowManualTimeAlignment(SerializedProperty property) {
