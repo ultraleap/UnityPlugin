@@ -35,6 +35,10 @@ namespace Leap.Unity {
     }
   }
 
+  /// <summary>
+  /// Utility class for working with project checks. Note, most features are only
+  /// available in the Editor.
+  /// </summary>
   public static class LeapProjectChecks {
 
     private struct ProjectCheck {
@@ -101,8 +105,6 @@ namespace Leap.Unity {
         }
         
       }
-
-
       #endif
     }
 
@@ -110,23 +112,34 @@ namespace Leap.Unity {
 
     private const string IGNORED_KEYS_PREF = "LeapUnityWindow_IgnoredKeys";
 
+    #if UNITY_EDITOR
     private static HashSet<string> _backingIgnoredKeys = null;
+    #endif
     /// <summary> Lazily filled via EditorPrefs. </summary>
     private static HashSet<string> _ignoredKeys {
       get {
+        #if UNITY_EDITOR
         if (_backingIgnoredKeys == null) {
           _backingIgnoredKeys
             = splitBySemicolonToSet(EditorPrefs.GetString(IGNORED_KEYS_PREF));
         }
         return _backingIgnoredKeys;
+        #else
+        return null;
+        #endif
       }
     }
 
     public static bool CheckIgnoredKey(string editorPrefKey) {
+      #if UNITY_EDITOR
       return _ignoredKeys.Contains(editorPrefKey);
+      #else
+      return false;
+      #endif
     }
 
     public static void SetIgnoredKey(string editorPrefKey, bool ignore) {
+      #if UNITY_EDITOR
       if (ignore) {
         _ignoredKeys.Add(editorPrefKey);
       }
@@ -135,12 +148,15 @@ namespace Leap.Unity {
       }
 
       uploadignoredKeyChangesToEditorPrefs();
+      #endif
     }
 
     public static void ClearAllIgnoredKeys() {
+      #if UNITY_EDITOR
       _ignoredKeys.Clear();
 
       uploadignoredKeyChangesToEditorPrefs();
+      #endif
     }
 
     /// <summary>
@@ -162,10 +178,12 @@ namespace Leap.Unity {
     }
 
     private static void uploadignoredKeyChangesToEditorPrefs() {
+      #if UNITY_EDITOR
       EditorPrefs.SetString(IGNORED_KEYS_PREF, joinBySemicolon(_ignoredKeys));
+      #endif
     }
 
-    #endregion
+#endregion
 
   }
 
