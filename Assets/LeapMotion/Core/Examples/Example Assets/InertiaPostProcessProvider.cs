@@ -12,7 +12,7 @@ using UnityEngine;
 
 namespace Leap.Unity.Examples {
 
-  public class InertiaPostProcessingProvider : PostProcessProvider {
+  public class InertiaPostProcessProvider : PostProcessProvider {
 
     [Header("Inertia")]
     
