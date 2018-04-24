@@ -11,7 +11,7 @@ using UnityEngine;
 
 namespace Leap.Unity.Examples {
 
-  public class ProjectionPostProcessingProvider : PostProcessProvider {
+  public class ProjectionPostProcessProvider : PostProcessProvider {
     
     [Header("Projection")]
 
