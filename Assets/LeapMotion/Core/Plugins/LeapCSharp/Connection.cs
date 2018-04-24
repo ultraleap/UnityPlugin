@@ -179,8 +179,18 @@ namespace LeapInternal {
         return;
 
       _isRunning = false;
-      _polster.Join();
+
+      //Very important to close the connection before we try to join the
+      //worker thread!  The call to PollConnection can sometimes block,
+      //despite the timeout, causing an attempt to join the thread waiting
+      //forever and preventing the connection from stopping.
+      //
+      //It seems that closing the connection causes PollConnection to 
+      //unblock in these cases, so just make sure to close the connection
+      //before trying to join the worker thread.
       LeapC.CloseConnection(_leapConnection);
+
+      _polster.Join();
     }
 
     //Run in Polster thread, fills in object queues
