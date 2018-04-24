@@ -344,6 +344,7 @@ namespace Leap.Unity {
                                                     bool updateTemporalCompensation = true) {
       LeapTransform leapTransform;
 
+      //Calculate a Temporally Warped Pose
       if (Application.isPlaying
           && updateTemporalCompensation
           && transformHistory.history.IsFull
@@ -356,6 +357,7 @@ namespace Leap.Unity {
                                          out warpedPosition, out warpedRotation);
       }
 
+      //Calculate the Current Pose
       Pose currentPose = Pose.identity;
       if (_deviceOffsetMode == DeviceOffsetMode.Transform && deviceOrigin != null) {
         currentPose.position = deviceOrigin.position;
@@ -370,13 +372,14 @@ namespace Leap.Unity {
                                                     out currentPose.rotation);
       }
 
+      //Choose between Warped and Current Pose
       bool useCurrentPosition = (_temporalWarpingMode == TemporalWarpingMode.Off) || !Application.isPlaying;
       warpedPosition = useCurrentPosition ? currentPose.position : warpedPosition;
       warpedRotation = useCurrentPosition ? currentPose.rotation : warpedRotation;
 
+      //Apply offsets (when applicable)
       if (Application.isPlaying) {
         if (_deviceOffsetMode != DeviceOffsetMode.Transform) {
-          // Yes, up corresponds to Z and forward corresponds to Y post-rotation.
           warpedPosition += warpedRotation * Vector3.up * deviceOffsetYAxis
                           + warpedRotation * Vector3.forward * deviceOffsetZAxis;
           warpedRotation *= Quaternion.Euler(deviceTiltXAxis, 0f, 0f);
