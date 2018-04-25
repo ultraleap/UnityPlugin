@@ -15,7 +15,6 @@ namespace Leap.Unity {
   [CustomEditor(typeof(LeapServiceProvider))]
   public class LeapServiceProviderEditor : CustomEditorBase<LeapServiceProvider> {
 
-    protected Vector3 arcDirection = -Vector3.forward;
     protected Quaternion deviceRotation = Quaternion.identity;
     protected bool isVRProvider = false;
 
@@ -95,9 +94,9 @@ namespace Leap.Unity {
       drawControllerEdge(origin, local_bottom_right, local_top_right);
 
       drawControllerArc(origin, local_top_left, local_bottom_left, local_top_right,
-                        local_bottom_right, arcDirection);
+                        local_bottom_right);
       drawControllerArc(origin, local_top_left, local_top_right, local_bottom_left,
-                        local_bottom_right, -Vector3.right);
+                        local_bottom_right);
     }
 
     private void getLocalGlobalPoint(int x, int y, int z,
@@ -119,16 +118,19 @@ namespace Leap.Unity {
 
     private void drawControllerArc(Vector3 origin,
                                    Vector3 edgeA0, Vector3 edgeA1,
-                                   Vector3 edgeB0, Vector3 edgeB1,
-                                   Vector3 direction) {
-      Vector3 faceA = Vector3.Lerp(edgeA0, edgeA1, 0.5f);
-      Vector3 faceB = Vector3.Lerp(edgeB0, edgeB1, 0.5f);
+                                   Vector3 edgeB0, Vector3 edgeB1) {
+      Vector3 faceA = target.transform.rotation * Vector3.Lerp(edgeA0, edgeA1, 0.5f);
+      Vector3 faceB = target.transform.rotation * Vector3.Lerp(edgeB0, edgeB1, 0.5f);
 
-      Vector3 depth_normal = target.transform.TransformDirection(direction);
-      float angle = Vector3.Angle(faceA, faceB);
+      float resolutionIncrement = 1f / 50f;
+      for (float i = 0f; i < 1f; i += resolutionIncrement) {
+        Vector3 begin = Vector3.Lerp(faceA, faceB, i).normalized
+                        * target.transform.lossyScale.x * BOX_RADIUS;
+        Vector3 end = Vector3.Lerp(faceA, faceB, i + resolutionIncrement).normalized 
+                      * target.transform.lossyScale.x * BOX_RADIUS;
 
-      Handles.DrawWireArc(origin, depth_normal, target.transform.TransformDirection(faceA),
-                          angle, target.transform.lossyScale.x * BOX_RADIUS);
+        Handles.DrawLine(origin + begin, origin + end);
+      }
     }
   }
 }

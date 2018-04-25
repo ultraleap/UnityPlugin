@@ -24,9 +24,17 @@ namespace Leap.Unity {
                                                    .enumValueIndex == 1; },
                                 "_customWarpAdjustment");
 
-      specifyConditionalDrawing("_allowManualDeviceOffset",
-                                  "_deviceOffsetYAxis", "_deviceOffsetZAxis",
-                                  "_deviceTiltXAxis");
+      specifyConditionalDrawing(() => { return serializedObject
+                                                 .FindProperty("_deviceOffsetMode")
+                                                   .enumValueIndex == 1; },
+                                "_deviceOffsetYAxis", 
+                                "_deviceOffsetZAxis",
+                                "_deviceTiltXAxis");
+
+      specifyConditionalDrawing(() => { return serializedObject
+                                                 .FindProperty("_deviceOffsetMode")
+                                                   .enumValueIndex == 2; },
+                                "_deviceOrigin");
     }
 
     private void decorateAllowManualTimeAlignment(SerializedProperty property) {
@@ -48,16 +56,23 @@ namespace Leap.Unity {
     }
 
     public override void OnSceneGUI() {
-      arcDirection = Vector3.up;
-      deviceRotation = Quaternion.Euler(90f, 0f, 0f);
+      LeapXRServiceProvider xrProvider = target as LeapXRServiceProvider;
+      if (serializedObject.FindProperty("_deviceOffsetMode").enumValueIndex == 2 &&
+          xrProvider.deviceOrigin != null) {
+        controllerOffset = xrProvider.transform.InverseTransformPoint(xrProvider.deviceOrigin.position);
+        deviceRotation = Quaternion.Inverse(xrProvider.transform.rotation) * 
+                         xrProvider.deviceOrigin.rotation * 
+                         Quaternion.Euler(90f, 0f, 0f);
+      } else {
+        var vrProvider = target as LeapXRServiceProvider;
 
-      var vrProvider = target as LeapXRServiceProvider;
+        deviceRotation = Quaternion.Euler(90f, 0f, 0f) * 
+                         Quaternion.Euler(vrProvider.deviceTiltXAxis, 0f, 0f);
 
-      deviceRotation *= Quaternion.Euler(vrProvider.deviceTiltXAxis, 0f, 0f);
-
-      controllerOffset = new Vector3(0f,
-                                     vrProvider.deviceOffsetYAxis,
-                                     vrProvider.deviceOffsetZAxis);
+        controllerOffset = new Vector3(0f,
+                                       vrProvider.deviceOffsetYAxis,
+                                       vrProvider.deviceOffsetZAxis);
+      }
 
       base.OnSceneGUI();
     }
