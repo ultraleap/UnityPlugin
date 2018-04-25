@@ -844,7 +844,7 @@ MonoBehaviour:
   _deviceOffsetZAxis: 0.12
   _deviceTiltXAxis: 5
   _deviceOrigin: {fileID: 0}
-  _temporalWarpingMode: 3
+  _temporalWarpingMode: 0
   _customWarpAdjustment: 17
   _updateHandInPrecull: 0
 --- !u!20 &1440997457
