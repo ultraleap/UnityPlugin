@@ -53,7 +53,8 @@ namespace Leap.Unity {
           deviceOffsetZAxis = DEFAULT_DEVICE_OFFSET_Z_AXIS;
           deviceTiltXAxis = DEFAULT_DEVICE_TILT_X_AXIS;
         }
-        if (_deviceOffsetMode == DeviceOffsetMode.Transform) {
+        if (_deviceOffsetMode == DeviceOffsetMode.Transform &&
+            _temporalWarpingMode != TemporalWarpingMode.Off) {
           _temporalWarpingMode = TemporalWarpingMode.Off;
         }
       }
@@ -196,7 +197,13 @@ namespace Leap.Unity {
     }
 
     protected virtual void OnValidate() {
-      if (_deviceOffsetMode == DeviceOffsetMode.Transform) {
+      if (_deviceOffsetMode == DeviceOffsetMode.Transform &&
+          _temporalWarpingMode != TemporalWarpingMode.Off) {
+#if UNITY_EDITOR
+        UnityEditor.Undo.RecordObject(this, "Disabled Temporal Warping");
+        Debug.LogWarning("Temporal Warping Disabled!  Cannot use Temporal " +
+                         "Warping with the Transform Device Offset Mode.", this);
+#endif
         _temporalWarpingMode = TemporalWarpingMode.Off;
       }
     }
@@ -212,6 +219,11 @@ namespace Leap.Unity {
     protected override void Start() {
       base.Start();
       _cachedCamera = GetComponent<Camera>();
+      if (_deviceOffsetMode == DeviceOffsetMode.Transform && _deviceOrigin == null) {
+        Debug.LogError("Cannot use the Transform DeviceOffsetMode without " +
+                       "specifying a Transform to use as the Device Origin.", this);
+        _deviceOffsetMode = DeviceOffsetMode.Default;
+      }
     }
 
     protected override void Update() {
