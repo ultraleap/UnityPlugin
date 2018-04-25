@@ -56,7 +56,6 @@ namespace Leap.Unity {
     }
 
     public override void OnSceneGUI() {
-      arcDirection = Vector3.up;
       LeapXRServiceProvider xrProvider = target as LeapXRServiceProvider;
       if (serializedObject.FindProperty("_deviceOffsetMode").enumValueIndex == 2 &&
           xrProvider.deviceOrigin != null) {
