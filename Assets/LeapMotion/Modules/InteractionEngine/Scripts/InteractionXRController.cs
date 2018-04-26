@@ -563,6 +563,8 @@ namespace Leap.Unity.Interaction {
         includeInactiveObjects: true);
 
       foreach (var collider in _colliderBuffer) {
+        if (collider.isTrigger) continue; // Contact Bones are for "contacting" colliders.
+
         ContactBone contactBone = collider.gameObject.AddComponent<ContactBone>();
         Rigidbody body = collider.gameObject.GetComponent<Rigidbody>();
         if (body == null) {
