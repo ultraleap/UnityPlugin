@@ -548,6 +548,10 @@ namespace Leap.Unity.Interaction {
 
     /// <summary> Reconnects and resets all the joints in the hand. </summary>
     private void resetContactBoneJoints() {
+      // If contact bones array is null, there's nothing to reset. This can happen if
+      // the controller is disabled before it had a chance to initialize contact.
+      if (_contactBones == null) return;
+
       // If the palm contact bone is null, we can't reset bone joints.
       if (_contactBones[NUM_FINGERS * BONES_PER_FINGER] == null) return;
 

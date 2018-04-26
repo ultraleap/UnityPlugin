@@ -166,8 +166,8 @@ namespace Leap.Unity.Interaction {
     public abstract InteractionHand intHand { get; }
 
     /// <summary>
-    /// Contact requires knowledge of the controller's scale.
-    /// TODO: Warn if the controller is scaled non-uniformly.
+    /// Contact requires knowledge of the controller's scale. Non-uniformly scaled
+    /// controllers are NOT supported.
     /// </summary>
     public float scale { get { return this.transform.lossyScale.x; } }
 
@@ -1313,10 +1313,13 @@ namespace Leap.Unity.Interaction {
           if (_delayedDisableSoftContactCoroutine != null) {
             manager.StopCoroutine(_delayedDisableSoftContactCoroutine);
           }
-          for (int i = 0; i < contactBones.Length; i++) {
-            if (contactBones[i].collider == null) continue;
 
-            disableContactBoneCollision();
+          if (contactBones != null) {
+            for (int i = 0; i < contactBones.Length; i++) {
+              if (contactBones[i].collider == null) continue;
+
+              disableContactBoneCollision();
+            }
           }
         }
       }

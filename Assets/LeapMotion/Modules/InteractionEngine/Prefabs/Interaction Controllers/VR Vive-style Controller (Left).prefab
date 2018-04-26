@@ -262,7 +262,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1393620680427892}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.0801, y: 0, z: 0}
+  m_LocalPosition: {x: -1.2390416, y: -1.1210103e-17, z: 0.50485814}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4296772287723422}
@@ -438,6 +438,8 @@ MonoBehaviour:
   _trackingProviderType: Leap.Unity.Interaction.DefaultXRNodeTrackingProvider
   _deviceJoystickTokens: openvr controller left
   _chirality: 0
+  _pollConnection: 1
+  pollConnectionInterval: 2
   _hoverPoint: {fileID: 4815831099454246}
   primaryHoverPoints:
   - {fileID: 4198793855848632}
@@ -446,6 +448,9 @@ MonoBehaviour:
   maxGraspDistance: 0.06
   graspButtonAxis: LeftVRTriggerAxis
   graspTimingSlop: 0.1
+  _enableObjectsOnlyWhenTracked:
+  - {fileID: 1397249577376870}
+  - {fileID: 1545272327151176}
 --- !u!114 &114439833622174436
 MonoBehaviour:
   m_ObjectHideFlags: 1
