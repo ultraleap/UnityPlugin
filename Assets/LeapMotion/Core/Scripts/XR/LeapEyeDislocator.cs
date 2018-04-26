@@ -29,7 +29,7 @@ namespace Leap.Unity {
     [SerializeField]
     private bool _showEyePositions = false;
 
-    private LeapXRServiceProvider _provider;
+    private LeapServiceProvider _provider;
     private Maybe<float> _deviceBaseline = Maybe.None;
     private bool _hasVisitedPreCull = false;
 
@@ -48,10 +48,13 @@ namespace Leap.Unity {
     }
 
     private void OnEnable() {
-      _provider = GetComponent<LeapXRServiceProvider>();
+      _provider = GetComponent<LeapServiceProvider>();
       if (_provider == null) {
-        enabled = false;
-        return;
+        _provider = GetComponentInChildren<LeapServiceProvider>();
+        if (_provider == null) {
+          enabled = false;
+          return;
+        }
       }
 
       _provider.OnDeviceSafe += onDevice;
@@ -102,9 +105,20 @@ namespace Leap.Unity {
     private void adjustViewMatrix(Camera.StereoscopicEye eye, float baselineAdjust) {
       float eyeOffset = eye == Camera.StereoscopicEye.Left ? 1 : -1;
       Vector3 ipdOffset = eyeOffset * Vector3.right * baselineAdjust * 0.5f;
-      Vector3 providerForwardOffset = Vector3.forward * _provider.deviceOffsetZAxis;
-      Vector3 providerVerticalOffset = -Vector3.up * _provider.deviceOffsetYAxis;
-      Quaternion providerRotation = Quaternion.AngleAxis(_provider.deviceTiltXAxis, Vector3.right);
+      Vector3 providerForwardOffset = Vector3.zero, 
+              providerVerticalOffset = Vector3.zero;
+      Quaternion providerRotation = Quaternion.Euler(0f, 180f, 0f);
+      if (_provider is LeapXRServiceProvider) {
+        LeapXRServiceProvider _xrProvider = _provider as LeapXRServiceProvider;
+        providerForwardOffset = Vector3.forward * _xrProvider.deviceOffsetZAxis;
+        providerVerticalOffset = -Vector3.up * _xrProvider.deviceOffsetYAxis;
+        providerRotation = Quaternion.AngleAxis(_xrProvider.deviceTiltXAxis, Vector3.right);
+      } else {
+        Matrix4x4 imageMatWarp = _camera.projectionMatrix
+                                   * Matrix4x4.TRS(Vector3.zero, providerRotation, Vector3.one)
+                                   * _camera.projectionMatrix.inverse;
+        Shader.SetGlobalMatrix("_LeapGlobalWarpedOffset", imageMatWarp);
+      }
 
       var existingMatrix = _camera.GetStereoViewMatrix(eye);
       _camera.SetStereoViewMatrix(eye, Matrix4x4.TRS(Vector3.zero, providerRotation, Vector3.one) *

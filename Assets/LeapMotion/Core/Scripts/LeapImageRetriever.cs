@@ -244,6 +244,9 @@ namespace Leap.Unity {
 
     private void Awake() {
       _provider = GetComponent<LeapServiceProvider>();
+      if (_provider == null) {
+        _provider = GetComponentInChildren<LeapServiceProvider>();
+      }
 
       //Enable pooling to reduce overhead of images
       LeapInternal.MemoryManager.EnablePooling = true;
