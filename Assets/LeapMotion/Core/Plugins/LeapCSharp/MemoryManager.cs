@@ -14,8 +14,11 @@ using System.Runtime.InteropServices;
 
 namespace LeapInternal {
 
-  public delegate IntPtr Allocate(UInt32 size, eLeapAllocatorType typeHint);
-  public delegate void Deallocate(IntPtr buffer);
+  [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+  public delegate IntPtr Allocate(UInt32 size, eLeapAllocatorType typeHint, IntPtr state);
+
+  [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+  public delegate void Deallocate(IntPtr buffer, IntPtr state);
 
   public static class MemoryManager {
 
@@ -44,7 +47,7 @@ namespace LeapInternal {
     private static Dictionary<PoolKey, Queue<object>> _pooledMemory = new Dictionary<PoolKey, Queue<object>>();
 
     [MonoPInvokeCallback(typeof(Allocate))]
-    public static IntPtr Pin(UInt32 size, eLeapAllocatorType typeHint) {
+    public static IntPtr Pin(UInt32 size, eLeapAllocatorType typeHint, IntPtr state) {
       try {
         //Construct a key to identify the desired allocation
         PoolKey key = new PoolKey() {
@@ -89,13 +92,15 @@ namespace LeapInternal {
         });
 
         return ptr;
-      } catch (Exception) { }
+      } catch (Exception e) {
+        UnityEngine.Debug.LogException(e);
+      }
 
       return IntPtr.Zero;
     }
 
     [MonoPInvokeCallback(typeof(Deallocate))]
-    public static void Unpin(IntPtr ptr) {
+    public static void Unpin(IntPtr ptr, IntPtr state) {
       try {
         //Grab the info for the given pointer
         ActiveMemoryInfo info = _activeMemory[ptr];
@@ -108,7 +113,9 @@ namespace LeapInternal {
 
         //Finally we unpin the memory
         info.handle.Free();
-      } catch (Exception) { }
+      } catch (Exception e) {
+        UnityEngine.Debug.LogException(e);
+      }
     }
 
     public static object GetPinnedObject(IntPtr ptr) {
