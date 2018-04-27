@@ -238,12 +238,7 @@ namespace Leap.Unity.Interaction {
                                  .Any(joystick => controllerSupportTokens.Query()
                                                  .All(token => joystick.Contains(token)));
 
-        if (matchesController) {
-          _isJoystickDetected = true;
-        }
-        else {
-          _isJoystickDetected = false;
-        }
+        _isJoystickDetected = matchesController;
       }
     }
 
