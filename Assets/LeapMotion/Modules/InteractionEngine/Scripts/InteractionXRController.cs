@@ -342,7 +342,9 @@ namespace Leap.Unity.Interaction {
     #region General InteractionController Implementation
 
     /// <summary>
-    /// Gets whether or not the underlying controller is currently tracked.
+    /// Gets whether or not the underlying controller is currently tracked and any
+    /// joystick token filtering has confirmed that this controller has been detected as
+    /// a connected joystick.
     /// </summary>
     public override bool isTracked {
       get {

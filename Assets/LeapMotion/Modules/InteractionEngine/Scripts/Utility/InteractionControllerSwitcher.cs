@@ -48,8 +48,8 @@ namespace Leap.Unity.Interaction {
     }
 
     void FixedUpdate() {
-      setControllersActive(rightHandControllers, false);
-      setControllersActive(leftHandControllers, true);
+      updateControllersActiveState(rightHandControllers, false);
+      updateControllersActiveState(leftHandControllers, true);
     }
 
     private void refreshControllers() {
@@ -117,23 +117,22 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    private void setControllersActive(List<InteractionController> controllers, bool isLeft) {
-      bool foundATrackedController = false;
+    private void updateControllersActiveState(List<InteractionController> controllers,
+                                              bool isLeft) {
+      bool foundFirstActive = false;
       for (int i = 0; i < controllers.Count; i++) {
-        bool isActive = false;
-        if (controllers[i] is InteractionXRController) {
-          isActive = (controllers[i] as InteractionXRController).trackingProvider.isTracked && controllers[i].isBeingMoved;
-        }
-        else if (controllers[i] is InteractionHand) {
-          isActive = (isLeft ? Hands.Left : Hands.Right) != null && controllers[i].isBeingMoved;
-        }
+        var controller = controllers[i];
 
-        if (!foundATrackedController && isActive) {
-          foundATrackedController = true;
-          if (!controllers[i].enabled) {
-            controllers[i].enabled = true;
+        bool shouldBeActive = !foundFirstActive && (controller.isLeft == isLeft)
+          && controller.isTracked && controller.isBeingMoved;
 
-            if (controllers[i] is InteractionHand) {
+        if (shouldBeActive) {
+          foundFirstActive = true;
+
+          if (!controller.enabled) {
+            controller.enabled = true;
+
+            if (controller is InteractionHand) {
               if (isLeft) {
                 OnLeftHandActive.Invoke();
               }
@@ -143,17 +142,15 @@ namespace Leap.Unity.Interaction {
             }
           }
         }
-        else {
-          if (controllers[i].enabled) {
-            controllers[i].enabled = false;
+        else if (controller.enabled) {
+          controller.enabled = false;
 
-            if (controllers[i] is InteractionHand) {
-              if (isLeft) {
-                OnLeftHandInactive.Invoke();
-              }
-              else {
-                OnRightHandInactive.Invoke();
-              }
+          if (controller is InteractionHand) {
+            if (isLeft) {
+              OnLeftHandInactive.Invoke();
+            }
+            else {
+              OnRightHandInactive.Invoke();
             }
           }
         }
