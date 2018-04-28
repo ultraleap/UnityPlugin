@@ -21,8 +21,8 @@ namespace Leap.Unity.Interaction.Examples {
     public UnityEvent OnInteractionHandEnabled;
     public UnityEvent OnInteractionHandDisabled;
     
-    private float _handSeparationDistance = 0.15f;
-    private float _handHoldingDistance = 0.12f;
+    private float _handSeparationDistance = 0.23f;
+    private float _handHoldingDistance = 0.18f;
 
     private void Reset() {
       if (intCtrl == null) {
@@ -37,7 +37,7 @@ namespace Leap.Unity.Interaction.Examples {
     }
 
     private void Update() {
-      if (intCtrl != null && intHand != null) {
+      if (intCtrl != null && intCtrl.isActiveAndEnabled && intHand != null) {
         var shouldIntHandBeEnabled = !intCtrl.isBeingMoved;
 
         if (intCtrl.isTracked) {
