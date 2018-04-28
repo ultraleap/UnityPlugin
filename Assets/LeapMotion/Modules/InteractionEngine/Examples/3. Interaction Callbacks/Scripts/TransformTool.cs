@@ -38,6 +38,10 @@ namespace Leap.Unity.Examples {
     private HashSet<TranslationAxis> _activeTranslationAxes = new HashSet<TranslationAxis>();
 
     void Start() {
+      if (interactionManager == null) {
+        interactionManager = InteractionManager.instance;
+      }
+
       foreach (var handle in GetComponentsInChildren<TransformHandle>()) {
         _transformHandles.Add(handle);
       }

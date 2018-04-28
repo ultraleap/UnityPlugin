@@ -8,6 +8,10 @@ namespace Leap.Unity.Interaction.Examples {
   /// This simple example script disables the InteractionHand script and has event
   /// outputs to drive hiding Leap hand renderers when it detects that an
   /// InteractionXRController is tracked and moving (e.g. it has been picked up).
+  /// 
+  /// It also does some basic checks with hand distance so that you can see your hands
+  /// when you put the controller down and you hide the hands when they're obviously
+  /// holding the controller (e.g. tracked as very close to the controller).
   /// </summary>
   public class HideInteractionHandWhenControllerMoving : MonoBehaviour {
 
@@ -16,6 +20,9 @@ namespace Leap.Unity.Interaction.Examples {
 
     public UnityEvent OnInteractionHandEnabled;
     public UnityEvent OnInteractionHandDisabled;
+    
+    private float _handSeparationDistance = 0.15f;
+    private float _handHoldingDistance = 0.12f;
 
     private void Reset() {
       if (intCtrl == null) {
@@ -31,16 +38,34 @@ namespace Leap.Unity.Interaction.Examples {
 
     private void Update() {
       if (intCtrl != null && intHand != null) {
-        if (intCtrl.isBeingMoved && intHand.enabled) {
-          intHand.enabled = false;
+        var shouldIntHandBeEnabled = !intCtrl.isBeingMoved;
 
-          OnInteractionHandDisabled.Invoke();
+        if (intCtrl.isTracked) {
+          var handPos = intHand.position;
+          var ctrlPos = intCtrl.position;
+          var handControllerDistanceSqr = (handPos - ctrlPos).sqrMagnitude;
+
+          // Also allow the hand to be active if it's far enough away from the controller.
+          if (handControllerDistanceSqr > _handSeparationDistance * _handSeparationDistance) {
+            shouldIntHandBeEnabled = true;
+          }
+
+          // Prevent the hand from being active if it's very close to the controller.
+          if (handControllerDistanceSqr < _handHoldingDistance * _handHoldingDistance) {
+            shouldIntHandBeEnabled = false;
+          }
         }
 
-        if (!intCtrl.isBeingMoved && !intHand.enabled) {
+        if (shouldIntHandBeEnabled && !intHand.enabled) {
           intHand.enabled = true;
 
           OnInteractionHandEnabled.Invoke();
+        }
+
+        if (!shouldIntHandBeEnabled && intHand.enabled) {
+          intHand.enabled = false;
+
+          OnInteractionHandDisabled.Invoke();
         }
       }
     }

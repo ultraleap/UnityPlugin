@@ -320,21 +320,46 @@ namespace Leap.Unity.Interaction {
     #region Movement Detection
 
     private const float RIG_LOCAL_MOVEMENT_SPEED_THRESHOLD = 00.07F;
+    private const float RIG_LOCAL_MOVEMENT_SPEED_THRESHOLD_SQR
+      = RIG_LOCAL_MOVEMENT_SPEED_THRESHOLD * RIG_LOCAL_MOVEMENT_SPEED_THRESHOLD;
     private const float RIG_LOCAL_ROTATION_SPEED_THRESHOLD = 10.00F;
     private const float BEING_MOVED_TIMEOUT = 0.5F;
 
     private float _lastTimeMoved = 0F;
     private bool  _isBeingMoved = false;
     private void refreshIsBeingMoved(Vector3 position, Quaternion rotation) {
-      Transform baseTransform = Camera.main.transform.parent;
-      if (((baseTransform.InverseTransformPoint(position)
-            - baseTransform.InverseTransformPoint(_trackedPositionLastFrame)) / Time.fixedDeltaTime).magnitude > RIG_LOCAL_MOVEMENT_SPEED_THRESHOLD
-           || Quaternion.Angle(baseTransform.InverseTransformRotation(rotation),
-                               baseTransform.InverseTransformRotation(_trackedRotationLastFrame)) / Time.fixedDeltaTime > RIG_LOCAL_ROTATION_SPEED_THRESHOLD) {
+      var isMoving = false;
+      var baseTransform = this.manager.transform;
+
+      // Check translation speed, relative to the Interaction Manager.
+      var baseLocalPos = baseTransform.InverseTransformPoint(position);
+      var baseLocalPosLastFrame =baseTransform.InverseTransformPoint(
+        _trackedPositionLastFrame);
+      var baseLocalSqrSpeed = ((baseLocalPos - baseLocalPosLastFrame)
+        / Time.fixedDeltaTime).sqrMagnitude;
+      if (baseLocalSqrSpeed > RIG_LOCAL_MOVEMENT_SPEED_THRESHOLD_SQR) {
+        isMoving = true;
+      }
+
+      // Check rotation speed, relative to the Interaction Manager.
+      var baseLocalRot = baseTransform.InverseTransformRotation(rotation);
+      var baseLocalRotLastFrame = baseTransform.InverseTransformRotation(
+        _trackedRotationLastFrame);
+      var baseLocalAngularSpeed = Quaternion.Angle(baseLocalRot, baseLocalRotLastFrame)
+        / Time.fixedDeltaTime;
+      if (baseLocalAngularSpeed > RIG_LOCAL_ROTATION_SPEED_THRESHOLD) {
+        isMoving = true;
+      }
+
+      if (isMoving) {
         _lastTimeMoved = Time.fixedTime;
       }
 
-      _isBeingMoved = trackingProvider != null && trackingProvider.isTracked && Time.fixedTime - _lastTimeMoved < BEING_MOVED_TIMEOUT;
+      // "isMoving" lasts for a bit after the controller stops moving, to avoid
+      // rapid oscillation of the value.
+      var timeSinceLastMoving = Time.fixedTime - _lastTimeMoved;
+      _isBeingMoved = trackingProvider != null && trackingProvider.isTracked
+        && timeSinceLastMoving < BEING_MOVED_TIMEOUT;
     }
 
     #endregion
@@ -353,7 +378,11 @@ namespace Leap.Unity.Interaction {
     }
 
     /// <summary>
-    /// Gets whether or not the underlying controller is currently being moved in worldspace.
+    /// Gets whether or not the underlying controller is currently being moved in world
+    /// space, but relative to the Interaction Manager's transform. The Interaction
+    /// Manager is usually a sibling of the main camera beneath the camera rig transform,
+    /// so that if your application is only translating the player rig in space, this
+    /// method won't incorrectly return true.
     /// </summary>
     public override bool isBeingMoved {
       get {
