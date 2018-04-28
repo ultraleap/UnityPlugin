@@ -219,7 +219,7 @@ namespace Leap.Unity.Interaction {
         _pollTimer += Time.fixedDeltaTime;
       }
 
-      if (_pollTimer >= pollConnectionInterval) {
+      if (_pollConnection && _pollTimer >= pollConnectionInterval) {
         _pollTimer = 0f;
 
         RefreshControllerConnection();
