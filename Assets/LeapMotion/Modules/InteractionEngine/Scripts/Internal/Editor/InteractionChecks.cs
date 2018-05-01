@@ -93,6 +93,14 @@ namespace Leap.Unity.Interaction.Internal {
 
       allChecksPassed &= checkRigidHandsAndDrawGUI();
 
+      if (!allChecksPassed && Application.isPlaying) {
+        EditorGUILayout.Space();
+
+        EditorGUILayout.HelpBox("Editor is currently in play-mode, so any project setting "
+          + "changes will be reverted upon returning to edit-mode. You should return to "
+          + "edit-mode if you want auto-fixes to stick.", MessageType.Warning);
+      }
+
       return allChecksPassed;
     }
 
