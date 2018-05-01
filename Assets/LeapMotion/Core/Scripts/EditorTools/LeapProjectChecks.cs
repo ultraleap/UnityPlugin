@@ -112,7 +112,26 @@ namespace Leap.Unity {
         using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox)) {
           allChecksPassed &= projectCheck.checkFunc();
         }
-        
+
+      }
+
+      if (_ignoredKeys != null && _ignoredKeys.Count > 0) {
+        EditorGUILayout.Space();
+        using (new EditorGUILayout.HorizontalScope()) {
+          GUILayout.FlexibleSpace();
+
+          using (new EditorGUILayout.VerticalScope()) {
+            GUILayout.Space(4f);
+            GUILayout.Label("Some project checks have been ignored.");
+          }
+
+          if (GUILayout.Button(new GUIContent("Reset Ignore Flags",
+                "Un-ignore any project checks that have been ignored."))) {
+            ClearAllIgnoredKeys();
+          }
+
+          EditorGUILayout.Space();
+        }
       }
       #endif
     }
