@@ -43,8 +43,13 @@ namespace Leap.Unity {
       EditorSceneManager.sceneOpened -= onSceneOpened;
       EditorSceneManager.sceneOpened += onSceneOpened;
 
-      EditorApplication.hierarchyWindowChanged -= onHierarchyWindowChanged;
-      EditorApplication.hierarchyWindowChanged += onHierarchyWindowChanged;
+      #if UNITY_2018_1_OR_NEWER
+      EditorApplication.hierarchyChanged -= onHierarchyChanged;
+      EditorApplication.hierarchyChanged += onHierarchyChanged;
+      #else
+      EditorApplication.hierarchyWindowChanged -= onHierarchyChanged;
+      EditorApplication.hierarchyWindowChanged += onHierarchyChanged;
+      #endif
 
       _currentSceneScanStatus = SceneScanStatus.NotScanned;
     }
@@ -53,7 +58,7 @@ namespace Leap.Unity {
       _currentSceneScanStatus = SceneScanStatus.NotScanned;
       ClearScanData();
     }
-    private static void onHierarchyWindowChanged() {
+    private static void onHierarchyChanged() {
       _currentSceneScanStatus = SceneScanStatus.NotScanned;
       ClearScanData();
     }
