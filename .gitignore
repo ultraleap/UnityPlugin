@@ -23,7 +23,10 @@
 /Temp
 ExportedObj/
 Temp/
-Build/
+Build/*
+build/*
+Builds/*
+builds/*
 
 .vs/
 .vscode/
