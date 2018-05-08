@@ -20,9 +20,9 @@ namespace Leap.Unity {
     private const int THUMB_BASE_INDEX = (int)Finger.FingerType.TYPE_THUMB * 4;
     private const int PINKY_BASE_INDEX = (int)Finger.FingerType.TYPE_PINKY * 4;
 
-    private const float SPHERE_RADIUS = 0.008f;
-    private const float CYLINDER_RADIUS = 0.006f;
-    private const float PALM_RADIUS = 0.015f;
+    private const float SPHERE_RADIUS = 0.0065f;
+    private const float CYLINDER_RADIUS = 0.0045f;
+    private const float PALM_RADIUS = 0.012f;
 
     private static int _leftColorIndex = 0;
     private static int _rightColorIndex = 0;
@@ -135,6 +135,7 @@ namespace Leap.Unity {
       //If we want to show the arm, do the calculations and display the meshes
       if (_showArm) {
         var arm = _hand.Arm;
+
         Vector3 right = arm.Basis.xBasis.ToVector3() * arm.Width * 0.7f * 0.5f;
         Vector3 wrist = arm.WristPosition.ToVector3();
         Vector3 elbow = arm.ElbowPosition.ToVector3();
