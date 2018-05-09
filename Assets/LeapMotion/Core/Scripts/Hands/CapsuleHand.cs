@@ -133,9 +133,6 @@ namespace Leap.Unity {
       Vector3 palmPosition = _hand.PalmPosition.ToVector3();
       drawSphere(palmPosition, _palmRadius);
 
-      Vector3 wristPos = _hand.PalmPosition.ToVector3();
-      drawSphere(wristPos);
-
       Vector3 thumbBaseToPalm = _spherePositions[THUMB_BASE_INDEX] - _hand.PalmPosition.ToVector3();
       Vector3 mockThumbJointPos = _hand.PalmPosition.ToVector3() + Vector3.Reflect(thumbBaseToPalm, _hand.Basis.xBasis.ToVector3());
       drawSphere(mockThumbJointPos);
