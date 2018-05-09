@@ -20,9 +20,9 @@ namespace Leap.Unity {
     private const int THUMB_BASE_INDEX = (int)Finger.FingerType.TYPE_THUMB * 4;
     private const int PINKY_BASE_INDEX = (int)Finger.FingerType.TYPE_PINKY * 4;
 
-    private const float SPHERE_RADIUS = 0.0065f;
-    private const float CYLINDER_RADIUS = 0.0045f;
-    private const float PALM_RADIUS = 0.012f;
+    //private const float _jointRadius = 0.0065f;
+    //private const float _cylinderRadius = 0.0045f;
+    //private const float _palmRadius = 0.012f;
 
     private static int _leftColorIndex = 0;
     private static int _rightColorIndex = 0;
@@ -44,6 +44,18 @@ namespace Leap.Unity {
     [MinValue(3)]
     [SerializeField]
     private int _cylinderResolution = 12;
+
+    [MinValue(0)]
+    [SerializeField]
+    private float _jointRadius = 0.008f;
+
+    [MinValue(0)]
+    [SerializeField]
+    private float _cylinderRadius = 0.006f;
+
+    [MinValue(0)]
+    [SerializeField]
+    private float _palmRadius = 0.015f;
 
     private Material _sphereMat;
     private Hand _hand;
@@ -123,7 +135,7 @@ namespace Leap.Unity {
       //PalmPos, WristPos, and mockThumbJointPos, which is derived and not taken from the frame obj
 
       Vector3 palmPosition = _hand.PalmPosition.ToVector3();
-      drawSphere(palmPosition, PALM_RADIUS);
+      drawSphere(palmPosition, _palmRadius);
 
       Vector3 wristPos = _hand.PalmPosition.ToVector3();
       drawSphere(wristPos);
@@ -188,7 +200,11 @@ namespace Leap.Unity {
       drawCylinder(mockThumbJointPos, PINKY_BASE_INDEX);
     }
 
-    private void drawSphere(Vector3 position, float radius = SPHERE_RADIUS) {
+    private void drawSphere(Vector3 position) {
+      drawSphere(position, _jointRadius);
+    }
+
+    private void drawSphere(Vector3 position, float radius) {
       //multiply radius by 2 because the default unity sphere has a radius of 0.5 meters at scale 1.
       Graphics.DrawMesh(_sphereMesh, Matrix4x4.TRS(position, Quaternion.identity, Vector3.one * radius * 2.0f * transform.lossyScale.x), _sphereMat, 0);
     }
@@ -235,8 +251,8 @@ namespace Leap.Unity {
       Vector3 p1 = Vector3.forward * length;
       for (int i = 0; i < _cylinderResolution; i++) {
         float angle = (Mathf.PI * 2.0f * i) / _cylinderResolution;
-        float dx = CYLINDER_RADIUS * Mathf.Cos(angle);
-        float dy = CYLINDER_RADIUS * Mathf.Sin(angle);
+        float dx = _cylinderRadius * Mathf.Cos(angle);
+        float dy = _cylinderRadius * Mathf.Sin(angle);
 
         Vector3 spoke = new Vector3(dx, dy, 0);
 
