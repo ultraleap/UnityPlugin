@@ -20,10 +20,6 @@ namespace Leap.Unity {
     private const int THUMB_BASE_INDEX = (int)Finger.FingerType.TYPE_THUMB * 4;
     private const int PINKY_BASE_INDEX = (int)Finger.FingerType.TYPE_PINKY * 4;
 
-    //private const float _jointRadius = 0.0065f;
-    //private const float _cylinderRadius = 0.0045f;
-    //private const float _palmRadius = 0.012f;
-
     private static int _leftColorIndex = 0;
     private static int _rightColorIndex = 0;
     private static Color[] _leftColorList = { new Color(0.0f, 0.0f, 1.0f), new Color(0.2f, 0.0f, 0.4f), new Color(0.0f, 0.2f, 0.2f) };
