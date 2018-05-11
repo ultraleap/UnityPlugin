@@ -364,8 +364,7 @@ namespace Leap.Unity {
         transformHistory.SampleTransform(timestamp
                                          - (long)(warpingAdjustment * 1000f)
                                          - (_temporalWarpingMode ==
-                                         TemporalWarpingMode.Images ? -20000 :
-                                         (long)(_smoothedTrackingLatency.value)),
+                                         TemporalWarpingMode.Images ? -20000 : 0),
                                          out warpedPosition, out warpedRotation);
       }
 
