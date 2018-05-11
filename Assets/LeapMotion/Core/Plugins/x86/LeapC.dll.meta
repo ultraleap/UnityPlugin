@@ -11,11 +11,24 @@ PluginImporter:
   isOverridable: 0
   platformData:
   - first:
+      '': Any
+    second:
+      enabled: 0
+      settings:
+        Exclude Android: 1
+        Exclude Editor: 0
+        Exclude Linux: 0
+        Exclude Linux64: 1
+        Exclude LinuxUniversal: 1
+        Exclude OSXUniversal: 1
+        Exclude Win: 0
+        Exclude Win64: 1
+  - first:
       Android: Android
     second:
       enabled: 0
       settings:
-        CPU: AnyCPU
+        CPU: ARMv7
   - first:
       Any: 
     second:
@@ -28,7 +41,7 @@ PluginImporter:
       settings:
         CPU: x86
         DefaultValueInitialized: true
-        OS: AnyOS
+        OS: Windows
   - first:
       Facebook: Win
     second:
