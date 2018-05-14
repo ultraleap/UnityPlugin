@@ -41,7 +41,13 @@ namespace Leap.Unity {
     /// The maximum number of times the provider will 
     /// attempt to reconnect to the service before giving up.
     /// </summary>
-    protected const int MAX_RECONNECTION_ATTEMPTS = 3;
+    protected const int MAX_RECONNECTION_ATTEMPTS = 10;
+
+    /// <summary>
+    /// The number of seconds to wait between each
+    /// reconnection attempt.
+    /// </summary>
+    protected const float RECONNECTION_INTERVAL = 3f;
 
     #endregion
 
@@ -505,18 +511,21 @@ namespace Leap.Unity {
     protected bool checkConnectionIntegrity() {
       if (_leapController.IsServiceConnected) {
         _timeSinceServiceConnectionChecked = 0f;
+        _numberOfReconnectionAttempts = 0;
         return true;
       } else if (_numberOfReconnectionAttempts < MAX_RECONNECTION_ATTEMPTS) {
         _timeSinceServiceConnectionChecked += Time.unscaledDeltaTime;
 
-        if (_timeSinceServiceConnectionChecked > 2f) {
+        if (_timeSinceServiceConnectionChecked > RECONNECTION_INTERVAL) {
           _timeSinceServiceConnectionChecked = 0f;
           _numberOfReconnectionAttempts++;
 
-          Debug.LogWarning("Leap Service not connected; attempting to reconnect for try " +
-                            _numberOfReconnectionAttempts+"/"+MAX_RECONNECTION_ATTEMPTS+"...", this);
-          destroyController();
-          createController();
+          Debug.LogError("Leap Service not connected; attempting to reconnect for try " +
+                          _numberOfReconnectionAttempts+"/"+MAX_RECONNECTION_ATTEMPTS + "...", this);
+          using (new ProfilerSample("Reconnection Attempt")) {
+            destroyController();
+            createController();
+          }
         }
       }
       return false;
