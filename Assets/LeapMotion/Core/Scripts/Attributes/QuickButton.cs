@@ -7,9 +7,8 @@
  * between Leap Motion and you, your company or other organization.           *
  ******************************************************************************/
 
-using System;
-using System.Collections;
-using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using UnityEngine;
 using Leap.Unity.Query;
 
@@ -19,13 +18,13 @@ using UnityEditor;
 
 namespace Leap.Unity.Attributes {
 
-  public class QuickButtonAttribute : CombinablePropertyAttribute, IBeforeFieldAdditiveDrawer {
+  public class QuickButtonAttribute : CombinablePropertyAttribute, IAfterFieldAdditiveDrawer {
 
     public const float PADDING_RIGHT = 12f;
 
-    public string label = "Quick Button";
-    public string methodOnPress = null;
-    public string tooltip = "";
+    public readonly string label = "Quick Button";
+    public readonly string methodOnPress = null;
+    public readonly string tooltip = "";
 
     public QuickButtonAttribute(string buttonLabel, string methodOnPress, string tooltip = "") {
       this.label = buttonLabel;
@@ -33,6 +32,7 @@ namespace Leap.Unity.Attributes {
       this.tooltip = tooltip;
     }
 
+#if UNITY_EDITOR
     /// <summary>
     /// IBeforeFieldAdditiveDrawer uses this to determine the width of the rect to pass
     /// to the Draw method.
@@ -41,53 +41,62 @@ namespace Leap.Unity.Attributes {
       return GUI.skin.label.CalcSize(new GUIContent(label)).x + 12f + PADDING_RIGHT;
     }
 
-#if UNITY_EDITOR
     public void Draw(Rect rect, SerializedProperty property) {
-      
+
       var type = targets.Query().FirstOrDefault().GetType();
-      System.Reflection.MethodInfo method;
-      try {
-        method = type.GetMethod(methodOnPress, System.Reflection.BindingFlags.Instance
-                                             | System.Reflection.BindingFlags.Public
-                                             | System.Reflection.BindingFlags.NonPublic);
-      }
-      catch (System.Reflection.AmbiguousMatchException e) {
-        Debug.LogError("QuickButton tried to prepare " + methodOnPress + " for calling, "
-                     + "but received an AmbiguousMatchException:\n" + e.ToString());
-        return;
+      var namedMethods = type.GetMethods(BindingFlags.Instance |
+                                         BindingFlags.Public |
+                                         BindingFlags.NonPublic).
+                              Where(m => m.Name == methodOnPress);
+
+      MethodInfo method = null;
+      string errorMessage = null;
+      string buttonTooltip = tooltip;
+
+      if (namedMethods.Count() == 0) {
+        errorMessage = "QuickButton tried to prepare " + methodOnPress + " for calling, " +
+                       "but the type " + type.Name + " has no such method.";
+      } else {
+        var validMethods = namedMethods.Where(m => m.GetParameters().
+                                                     All(p => p.IsOptional));
+
+        if (validMethods.Count() == 0) {
+          errorMessage = "QuickButton tried to prepare " + methodOnPress + " for calling, " +
+                         "but the type " + type.Name + " had no valid methods.";
+        } else if (validMethods.Count() > 1) {
+          errorMessage = "QuickButton tried to prepare " + methodOnPress + " for calling, " +
+                         "but the type " + type.Name + " had more than one valid method.";
+        } else {
+          method = validMethods.Single();
+        }
       }
 
+      Color prevColor = GUI.color;
       if (method == null) {
-        Debug.LogError("QuickButton tried to prepare " + methodOnPress + " for calling, "
-                     + "but the type " + type.Name + " has no such method.");
-        return;
+        Debug.LogError(errorMessage);
+        buttonTooltip = errorMessage;
+        GUI.color = Color.red;
       }
 
-      if (method.GetParameters().Query().Any(p => !p.IsOptional)) {
-        Debug.LogError("QuickButton can't call " + method.Name + " because it requires "
-                     + "non-optional parameters.");
-        return;
-      }
-
-      if (GUI.Button(rect.PadInner(0, 0, 0, PADDING_RIGHT), new GUIContent(label, tooltip))) {
-        foreach (var target in targets) {
-          Undo.RegisterFullObjectHierarchyUndo(target, "Perform QuickButton Action");
-        }
-        foreach (var target in targets) {
-          try {
-            method.Invoke(target, new object[] { });
+      using (new EditorGUI.DisabledScope(method == null)) {
+        if (GUI.Button(rect.PadInner(0, 0, 0, PADDING_RIGHT), new GUIContent(label, buttonTooltip))) {
+          foreach (var target in targets) {
+            Undo.RegisterFullObjectHierarchyUndo(target, "Perform QuickButton Action");
           }
-          catch (Exception e) {
-            Debug.LogError(e.GetType().Name + " thrown trying to call method "
-              + method.Name + " on target " + target.name + ":\n"
-              + e.ToString());
+          foreach (var target in targets) {
+            try {
+              method.Invoke(target,
+                            method.GetParameters().Select(p => p.DefaultValue).ToArray());
+            } catch (TargetInvocationException e) {
+              Debug.LogError("Quick button received an error while trying to invoke " + methodOnPress + " on " + type.Name);
+              Debug.LogException(e.InnerException);
+            }
           }
         }
       }
 
+      GUI.color = prevColor;
     }
 #endif
-
   }
-
 }
