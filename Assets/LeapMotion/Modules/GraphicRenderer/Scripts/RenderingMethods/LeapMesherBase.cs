@@ -603,11 +603,22 @@ namespace Leap.Unity.GraphicalRenderer {
 
     protected virtual void buildColors() {
       using (new ProfilerSample("Build Colors")) {
-        Color totalTint = _bakedTint * _generation.graphic.vertexColor;
+        Color totalTint;
+        if (QualitySettings.activeColorSpace == ColorSpace.Linear) {
+          totalTint = _bakedTint.linear * _generation.graphic.vertexColor.linear;
+        } else {
+          totalTint = _bakedTint * _generation.graphic.vertexColor;
+        }
 
         var colors = MeshCache.GetColors(_generation.graphic.mesh);
-        for (int i = 0; i < colors.Length; i++) {
-          _generation.colors.Add(colors[i] * totalTint);
+        if (QualitySettings.activeColorSpace == ColorSpace.Linear) {
+          for (int i = 0; i < colors.Length; i++) {
+            _generation.colors.Add(colors[i].linear * totalTint);
+          }
+        } else {
+          for (int i = 0; i < colors.Length; i++) {
+            _generation.colors.Add(colors[i] * totalTint);
+          }
         }
       }
     }
