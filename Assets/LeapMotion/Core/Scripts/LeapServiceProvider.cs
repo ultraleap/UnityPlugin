@@ -41,7 +41,7 @@ namespace Leap.Unity {
     /// The maximum number of times the provider will 
     /// attempt to reconnect to the service before giving up.
     /// </summary>
-    protected const int MAX_RECONNECTION_ATTEMPTS = 10;
+    protected const int MAX_RECONNECTION_ATTEMPTS = 5;
 
     /// <summary>
     /// The number of frames to wait between each
@@ -520,8 +520,9 @@ namespace Leap.Unity {
           _framesSinceServiceConnectionChecked = 0;
           _numberOfReconnectionAttempts++;
 
-          Debug.Log("Leap Service not connected; attempting to reconnect for try " +
-                    _numberOfReconnectionAttempts+"/"+MAX_RECONNECTION_ATTEMPTS + "...", this);
+          Debug.LogWarning("Leap Service not connected; attempting to reconnect for try " +
+                           _numberOfReconnectionAttempts + "/" + MAX_RECONNECTION_ATTEMPTS +
+                           "...", this);
           using (new ProfilerSample("Reconnection Attempt")) {
             destroyController();
             createController();
