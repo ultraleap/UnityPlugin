@@ -520,8 +520,8 @@ namespace Leap.Unity {
           _framesSinceServiceConnectionChecked = 0;
           _numberOfReconnectionAttempts++;
 
-          Debug.LogError("Leap Service not connected; attempting to reconnect for try " +
-                          _numberOfReconnectionAttempts+"/"+MAX_RECONNECTION_ATTEMPTS + "...", this);
+          Debug.Log("Leap Service not connected; attempting to reconnect for try " +
+                    _numberOfReconnectionAttempts+"/"+MAX_RECONNECTION_ATTEMPTS + "...", this);
           using (new ProfilerSample("Reconnection Attempt")) {
             destroyController();
             createController();
