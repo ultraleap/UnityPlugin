@@ -309,7 +309,11 @@ namespace Leap.Unity.GraphicalRenderer {
         if (!tintFeature.isDirtyOrEditTime) continue;
 
         using (new ProfilerSample("Update Tinting")) {
-          tintFeature.featureData.Query().Select(d => (Vector4)d.color).FillList(_tintColors);
+          if (QualitySettings.activeColorSpace == ColorSpace.Linear) {
+            tintFeature.featureData.Query().Select(d => (Vector4)d.color.linear).FillList(_tintColors);
+          } else {
+            tintFeature.featureData.Query().Select(d => (Vector4)d.color).FillList(_tintColors);
+          }
           _material.SetVectorArraySafe(TINTS_PROPERTY, _tintColors);
         }
       }
