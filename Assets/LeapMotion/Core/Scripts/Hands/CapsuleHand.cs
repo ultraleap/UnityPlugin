@@ -32,6 +32,9 @@ namespace Leap.Unity {
     private bool _showArm = true;
 
     [SerializeField]
+    private bool _castShadows = true;
+
+    [SerializeField]
     private Material _material;
 
     [SerializeField]
@@ -199,16 +202,24 @@ namespace Leap.Unity {
 
     private void drawSphere(Vector3 position, float radius) {
       //multiply radius by 2 because the default unity sphere has a radius of 0.5 meters at scale 1.
-      Graphics.DrawMesh(_sphereMesh, Matrix4x4.TRS(position, Quaternion.identity, Vector3.one * radius * 2.0f * transform.lossyScale.x), _sphereMat, 0);
+      Graphics.DrawMesh(_sphereMesh, 
+                        Matrix4x4.TRS(position, 
+                                      Quaternion.identity, 
+                                      Vector3.one * radius * 2.0f * transform.lossyScale.x), 
+                        _sphereMat, 0, 
+                        null, 0, null, _castShadows);
     }
 
     private void drawCylinder(Vector3 a, Vector3 b) {
       float length = (a - b).magnitude;
 
       Graphics.DrawMesh(getCylinderMesh(length),
-                        Matrix4x4.TRS(a, Quaternion.LookRotation(b - a), new Vector3(transform.lossyScale.x, transform.lossyScale.x, 1)),
+                        Matrix4x4.TRS(a, 
+                                      Quaternion.LookRotation(b - a), 
+                                      new Vector3(transform.lossyScale.x, transform.lossyScale.x, 1)),
                         _material,
-                        gameObject.layer);
+                        gameObject.layer, 
+                        null, 0, null, _castShadows);
     }
 
     private void drawCylinder(int a, int b) {
