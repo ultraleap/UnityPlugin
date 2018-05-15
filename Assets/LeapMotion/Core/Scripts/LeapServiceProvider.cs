@@ -41,13 +41,13 @@ namespace Leap.Unity {
     /// The maximum number of times the provider will 
     /// attempt to reconnect to the service before giving up.
     /// </summary>
-    protected const int MAX_RECONNECTION_ATTEMPTS = 10;
+    protected const int MAX_RECONNECTION_ATTEMPTS = 5;
 
     /// <summary>
-    /// The number of seconds to wait between each
+    /// The number of frames to wait between each
     /// reconnection attempt.
     /// </summary>
-    protected const float RECONNECTION_INTERVAL = 3f;
+    protected const int RECONNECTION_INTERVAL = 180;
 
     #endregion
 
@@ -501,7 +501,7 @@ namespace Leap.Unity {
       }
     }
 
-    private float _timeSinceServiceConnectionChecked = 0f;
+    private int _framesSinceServiceConnectionChecked = 0;
     private int _numberOfReconnectionAttempts = 0;
     /// <summary>
     /// Checks whether this provider is connected to a service;
@@ -510,18 +510,19 @@ namespace Leap.Unity {
     /// </summary>
     protected bool checkConnectionIntegrity() {
       if (_leapController.IsServiceConnected) {
-        _timeSinceServiceConnectionChecked = 0f;
+        _framesSinceServiceConnectionChecked = 0;
         _numberOfReconnectionAttempts = 0;
         return true;
       } else if (_numberOfReconnectionAttempts < MAX_RECONNECTION_ATTEMPTS) {
-        _timeSinceServiceConnectionChecked += Time.unscaledDeltaTime;
+        _framesSinceServiceConnectionChecked ++;
 
-        if (_timeSinceServiceConnectionChecked > RECONNECTION_INTERVAL) {
-          _timeSinceServiceConnectionChecked = 0f;
+        if (_framesSinceServiceConnectionChecked > RECONNECTION_INTERVAL) {
+          _framesSinceServiceConnectionChecked = 0;
           _numberOfReconnectionAttempts++;
 
-          Debug.LogError("Leap Service not connected; attempting to reconnect for try " +
-                          _numberOfReconnectionAttempts+"/"+MAX_RECONNECTION_ATTEMPTS + "...", this);
+          Debug.LogWarning("Leap Service not connected; attempting to reconnect for try " +
+                           _numberOfReconnectionAttempts + "/" + MAX_RECONNECTION_ATTEMPTS +
+                           "...", this);
           using (new ProfilerSample("Reconnection Attempt")) {
             destroyController();
             createController();
