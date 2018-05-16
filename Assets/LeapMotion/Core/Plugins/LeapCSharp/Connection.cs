@@ -666,7 +666,7 @@ namespace LeapInternal {
     public void ClearPolicy(Controller.PolicyFlag policy) {
       UInt64 clearFlags = (ulong)flagForPolicy(policy);
       _requestedPolicies = _requestedPolicies & ~clearFlags;
-      eLeapRS result = LeapC.SetPolicyFlags(_leapConnection, 0, clearFlags);
+      eLeapRS result = LeapC.SetPolicyFlags(_leapConnection, _requestedPolicies, ~_requestedPolicies);
       reportAbnormalResults("LeapC SetPolicyFlags call was ", result);
     }
 
