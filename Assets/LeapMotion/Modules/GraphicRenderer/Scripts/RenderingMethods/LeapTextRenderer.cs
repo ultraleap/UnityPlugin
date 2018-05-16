@@ -14,7 +14,6 @@ using UnityEngine;
 using UnityEditor;
 #endif
 using Leap.Unity.Space;
-using Leap.Unity.Query;
 using Leap.Unity.Attributes;
 
 namespace Leap.Unity.GraphicalRenderer {
@@ -269,6 +268,16 @@ namespace Leap.Unity.GraphicalRenderer {
     private List<int> _tris = new List<int>();
     private void generateTextMesh(int index, LeapTextGraphic graphic, Mesh mesh) {
       using (new ProfilerSample("Generate Text Mesh")) {
+        Color globalTintConverted;
+        Color graphicColorConverted;
+        if (QualitySettings.activeColorSpace == ColorSpace.Linear) {
+          globalTintConverted = _globalTint.linear;
+          graphicColorConverted = graphic.color.linear;
+        } else {
+          globalTintConverted = _globalTint;
+          graphicColorConverted = graphic.color;
+        }
+        
         mesh.Clear(keepVertexLayout: false);
 
         graphic.isRepresentationDirty = false;
@@ -388,7 +397,7 @@ namespace Leap.Unity.GraphicalRenderer {
             _uvs.Add(info.uvBottomLeft);
 
             if (_useColor) {
-              _colors.Append(4, _globalTint * graphic.color);
+              _colors.Append(4, globalTintConverted * graphicColorConverted);
             }
 
             origin.x += info.advance * _charScale;
