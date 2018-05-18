@@ -41,8 +41,11 @@ namespace Leap.Unity {
     private EyeTextureData _eyeTextureData = new EyeTextureData();
 
     //Image that we have requested from the service.  Are requested in Update and retrieved in OnPreRender
-    protected ProduceConsumeBuffer<Image> _imageQueue = new ProduceConsumeBuffer<Image>(32);
+    protected ProduceConsumeBuffer<Image> _imageQueue = new ProduceConsumeBuffer<Image>(128);
     protected Image _currentImage = null;
+
+    private long _prevSequenceId;
+    private bool _needQueueReset;
 
     public EyeTextureData TextureData {
       get {
@@ -244,6 +247,9 @@ namespace Leap.Unity {
 
     private void Awake() {
       _provider = GetComponent<LeapServiceProvider>();
+      if (_provider == null) {
+        _provider = GetComponentInChildren<LeapServiceProvider>();
+      }
 
       //Enable pooling to reduce overhead of images
       LeapInternal.MemoryManager.EnablePooling = true;
@@ -271,6 +277,11 @@ namespace Leap.Unity {
       Frame imageFrame = _provider.CurrentFrame;
 
       _currentImage = null;
+
+      if (_needQueueReset) {
+        while (_imageQueue.TryDequeue()) { }
+        _needQueueReset = false;
+      }
 
       /* Use the most recent image that is not newer than the current frame
        * This means that the shown image might be slightly older than the current
@@ -337,7 +348,21 @@ namespace Leap.Unity {
 
     private void onImageReady(object sender, ImageEventArgs args) {
       Image image = args.image;
-      _imageQueue.TryEnqueue(image);
+
+      if (!_imageQueue.TryEnqueue(image)) {
+        Debug.LogWarning("Image buffer filled up.  This is unexpected means images are being provided faster than " +
+                         "LeapImageRetriever can consume them.  This might happen if the application has stalled " +
+                         "or we recieved a very high volume of images suddenly.");
+        _needQueueReset = true;
+      }
+
+      if (image.SequenceId < _prevSequenceId) {
+        //We moved back in time, so we should reset the queue so it doesn't get stuck
+        //on the previous image, which will be very old.
+        //this typically happens when the service is restarted while the application is running.
+        _needQueueReset = true;
+      }
+      _prevSequenceId = image.SequenceId;
     }
 
     public void ApplyGammaCorrectionValues() {
