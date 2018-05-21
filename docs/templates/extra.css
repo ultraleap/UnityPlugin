@@ -1,0 +1,38 @@
+#nav-tree{ overflow-x: hidden!important;}
+.tabs, .tabs2, .tabs3 {background-color:#222!important;background-image:none!important;}
+.tablist a {text-shadow: none!important;background-color: #222!important;color: #fff!important;background-image:none!important}
+.tablist li.current a {background-image: none!important;text-shadow: none!important;background-color: #5daa00!important;}
+#nav-path{display:none!important;}
+.ui-resizable-e{background: none!important;background-color: #ddd!important;}
+a {color: #5daa00!important;}
+#nav-tree .selected {background-image: none!important;color: #fff!important;background-color: #5daa00!important;text-shadow: none!important;}
+#nav-tree a {color:#222!important;}
+#nav-tree .selected a {color:#fff!important}
+.tablist a:hover{background-image:none!important;background-color:#333!important}
+#titlearea{height:100px}
+#sidenav{top:130px}#titlearea table {padding: 14px;}
+#projectlogo {padding-right: 12px;}
+#projectalign {padding-bottom: 4px;}
+#projectname {font: 200% Tahoma, Arial,sans-serif!important;}
+pre code {border:none!important}
+
+div#navrow2 {background-color: #2B2B2B!important;}
+div#navrow2 .tablist a {background-color: #2B2B2B!important;}
+div#navrow2 .tablist a:hover {background-color:#333!important;}
+div#navrow2 .tablist li.current a {background-color: #5daa00!important;}
+div#navrow3 {background-color: #333!important;}
+div#navrow3 .tablist a {background-color: #333!important;}
+div#navrow3 .tablist a:hover {background-color:#2B2B2B!important;}
+div#navrow3 .tablist li.current a {background-color: #5daa00!important;}
+div#navrow4 {background-color: #3C3C3C!important;}
+div#navrow4 .tablist a {background-color: #3C3C3C!important;}
+div#navrow4 .tablist a:hover {background-color:#333!important;}
+div#navrow4 .tablist li.current a {background-color: #5daa00!important;}
+
+h1.glow, h2.glow, h3.glow, h4.glow, h5.glow, h6.glow {text-shadow: none!important}
+
+.memproto, .fieldtable th { border-top: #b7b7b7; border-right: #b7b7b7; border-left: #b7b7b7; color: #000; background-color: #e6e5e5; background-image: none!important; box-shadow: none!important;}
+.memdoc { box-shadow: none!important; background-image: none!important;}
+.memitem.glow { box-shadow: none!important;}
+table.fieldtable { box-shadow: none!important; }
+span.lineno { border-right: none!important;}
