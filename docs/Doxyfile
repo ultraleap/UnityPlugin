@@ -44,7 +44,7 @@ PROJECT_NUMBER         = 4.4.0
 # for a project that appears at the top of each page and should give viewer a
 # quick idea about the purpose of the project. Keep the description short.
 
-PROJECT_BRIEF          = "Leap Motion's Unity SDK"
+PROJECT_BRIEF          = "Leap Motion's Unity SDK."
 
 # With the PROJECT_LOGO tag one can specify a logo or an icon that is included
 # in the documentation. The maximum height of the logo should not exceed 55
@@ -229,15 +229,7 @@ TAB_SIZE               = 2
 # newlines (in the resulting output). You can put ^^ in the value part of an
 # alias to insert a newline as if a physical newline was in the original file.
 
-ALIASES                = "cref{1}=\link \1 \endlink" \
-                         "cref{2}=\link \1#\2 \1\SEP\2 \endlink" \
-                         SEP=. \
-                         "hhref{2}=\link \1 \2 \endlink" \
-                         "liveexample{1}=\verbatim embed:rst:leading-asterisk\n   .. raw:: html\n      :file: codeexamples/includes/javascript/\1\n\endverbatim" \
-                         "example=\include" \
-                         "table=\verbatim embed:rst:leading-asterisk" \
-                         "endtable=\endverbatim" \
-                         "available=\par"
+ALIASES                = 
 
 # This tag can be used to specify a number of word-keyword mappings (TCL only).
 # A mapping has the form "name=value". For example adding "class=itcl::class"
@@ -739,7 +731,7 @@ WARNINGS               = YES
 # will automatically be disabled.
 # The default value is: YES.
 
-WARN_IF_UNDOCUMENTED   = YES
+WARN_IF_UNDOCUMENTED   = NO
 
 # If the WARN_IF_DOC_ERROR tag is set to YES, doxygen will generate warnings for
 # potential errors in the documentation, such as not documenting some parameters
@@ -747,7 +739,7 @@ WARN_IF_UNDOCUMENTED   = YES
 # markup commands wrongly.
 # The default value is: YES.
 
-WARN_IF_DOC_ERROR      = YES
+WARN_IF_DOC_ERROR      = NO
 
 # This WARN_NO_PARAMDOC option can be enabled to get warnings for functions that
 # are documented, but have no documentation for their parameters or return
@@ -755,7 +747,7 @@ WARN_IF_DOC_ERROR      = YES
 # parameter documentation, but not about the absence of documentation.
 # The default value is: NO.
 
-WARN_NO_PARAMDOC       = YES
+WARN_NO_PARAMDOC       = NO
 
 # If the WARN_AS_ERROR tag is set to YES then doxygen will immediately stop when
 # a warning is encountered.
@@ -791,8 +783,7 @@ WARN_LOGFILE           =
 
 INPUT                  = ../Assets/LeapMotion/Core \
                          ../Assets/LeapMotion/Modules \
-                         placeholder1.md \
-                         placeholder2.md
+                         ./content
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding. Doxygen uses
@@ -865,7 +856,7 @@ EXCLUDE_SYMBOLS        =
 # that contain example code fragments that are included (see the \include
 # command).
 
-EXAMPLE_PATH           = 
+EXAMPLE_PATH           = ./
 
 # If the value of the EXAMPLE_PATH tag contains directories, you can use the
 # EXAMPLE_PATTERNS tag to specify one or more wildcard pattern (like *.cpp and
@@ -885,7 +876,7 @@ EXAMPLE_RECURSIVE      = NO
 # that contain images that are to be included in the documentation (see the
 # \image command).
 
-IMAGE_PATH             = 
+IMAGE_PATH             = images
 
 # The INPUT_FILTER tag can be used to specify a program that doxygen should
 # invoke to filter for each input file. Doxygen will invoke the filter program
@@ -1097,7 +1088,7 @@ HTML_FILE_EXTENSION    = .html
 # of the possible markers and block names see the documentation.
 # This tag requires that the tag GENERATE_HTML is set to YES.
 
-HTML_HEADER            = templates/header.html
+HTML_HEADER            = 
 
 # The HTML_FOOTER tag can be used to specify a user-defined HTML footer for each
 # generated HTML page. If the tag is left blank doxygen will generate a standard
@@ -1107,7 +1098,7 @@ HTML_HEADER            = templates/header.html
 # that doxygen normally uses.
 # This tag requires that the tag GENERATE_HTML is set to YES.
 
-HTML_FOOTER            = templates/footer.html
+HTML_FOOTER            = 
 
 # The HTML_STYLESHEET tag can be used to specify a user-defined cascading style
 # sheet that is used by each HTML page. It can be used to fine-tune the look of
@@ -1132,7 +1123,7 @@ HTML_STYLESHEET        =
 # list). For an example see the documentation.
 # This tag requires that the tag GENERATE_HTML is set to YES.
 
-HTML_EXTRA_STYLESHEET  = templates/extra.css
+HTML_EXTRA_STYLESHEET  = ./templates/extra.css
 
 # The HTML_EXTRA_FILES tag can be used to specify one or more extra images or
 # other source files which should be copied to the HTML output directory. Note
