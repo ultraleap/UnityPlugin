@@ -5,11 +5,11 @@
     <tab type="mainpage" visible="yes" title="Unity Modules"/>
     <tab type="modules" visible="no" title="LAYOUT_MODULES" intro=""/>
     <tab type="pages" visible="no" title="LAYOUT_PAGES" intro="LAYOUT_PAGES_INTRO"/>
-    <tab type="namespaces" visible="yes" title="LAYOUT_NAMESPACES">
+    <tab type="namespaces" visible="no" title="LAYOUT_NAMESPACES">
       <tab type="namespacelist" visible="yes" title="LAYOUT_NAMESPACE_LIST" intro="LAYOUT_NAMESPACE_LIST_INTRO"/>
       <tab type="namespacemembers" visible="no" title="LAYOUT_NAMESPACE_MEMBERS" intro="LAYOUT_NAMESPACE_MEMBERS_INTRO"/>
     </tab>
-    <tab type="classes" visible="yes" title="UnityModules + LeapCSharp API Reference">
+    <tab type="classes" visible="yes" title="API Reference">
       <tab type="classlist" visible="yes" title="Class List"
         intro="LeapCSharp was recently merged as-source into UnityModules, so namespaces are not completely tidy. LeapCSharp classes are listed flatly in the 'Leap' namespace, while UnityModules classes can be found in the Leap.Unity namespace."/>
       <!-- <tab type="classindex" visible="$ALPHABETICAL_INDEX" title=""/> -->
