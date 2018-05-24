@@ -1,29 +1,67 @@
-#nav-tree{ overflow-x: hidden!important;}
-.tabs, .tabs2, .tabs3, #main-nav, .sm-dox {background-color:#222!important;background-image:none!important;}
+#nav-tree { overflow-x: hidden!important; }
+.tabs, .tabs2, .tabs3, #main-nav, .sm-dox {
+  background-color:#222!important; background-image:none!important;
+}
 
-.tablist a, .sm-dox a {text-shadow: none!important;background-color: #222!important;color: #fff!important;background-image:none!important}
+.tablist a, .sm-dox a {
+  text-shadow: none!important; background-color: #222!important; color: #fff!important;
+  background-image:none!important
+}
 
 .tablist li.current a,
-.sm-dox li.current a {background-image: none!important;text-shadow: none!important;background-color: #5daa00!important;}
+.sm-dox li.current a {
+  background-image: none!important; text-shadow: none!important; background-color: #5daa00!important;
+}
 
+#titlearea { background: none; background-color: #222; height: 100px; }
+#projectalign { padding-left: 16px !important; }
+#projectname, #projectbrief { color: #fff; }
+#projectnumber { color: #5daa00; }
 
-#nav-path{display:none!important;}
-.ui-resizable-e{background: none!important;background-color: #ddd!important;}
-a {color: #5daa00!important;}
-#nav-tree .selected {background-image: none!important;color: #fff!important;background-color: #5daa00!important;text-shadow: none!important;}
-#nav-tree a {color:#222!important;}
-#nav-tree .selected a {color:#fff!important}
+#searchboxrect {
+  z-index: 2; position: absolute; left: 0px; right: 0px; height: 30px;
+  background-color: #5daa00;
+  border-bottom-width: 1px; border-bottom-style: solid; border-color: #def8c0;
+}
+#MSearchBox {
+  right: initial; position: absolute; left: 47px; top: 106px; width: 250px;
+  zindex: 4;
+}
+#MSearchField { width: 185px; }
+#MSearchResultsWindow {left: 5px!important; z-index: 5; }
+#nav-sync { display:none!important; }
+#nav-tree-contents { margin-top: 30px;  }
+#nav-path{ display:none!important; }
+
+#doc-content {
+  z-index: 5; position: absolute; background-color: white;
+  left: 0px; right: 0px;
+}
+
+.ui-resizable-e { background: none!important; background-color: #ddd!important; }
+a { color: #5daa00!important; }
+#nav-tree .selected {
+  background-image: none!important; background-color: #5daa00!important;
+  color: #fff!important; text-shadow: none!important;
+}
+#nav-tree a { color:#000!important; }
+#nav-tree .selected a { color:#fff!important }
+#side-nav { background-color: #5daa00; width: 240; z-index: -1; }
+#nav-tree { background-color: #f2f2f2; background-image: none!important;}
+#nav-tree-contents { background-color: #f2f2f2; }
+#nav-tree .label { font: inherit; }
+#nav-tree .label a { font-family: 'Roboto', sans-serif; }
+
+#nav-tree div.item { padding-left: 10px; }
 
 .tablist a:hover, 
-.sm-dox a:hover {background-image:none!important;background-color:#333!important}
+.sm-dox a:hover { background-image:none!important; background-color:#333!important }
 
-#titlearea{height:100px}
-#sidenav{top:130px}#titlearea table {padding: 14px;}
-#projectlogo {padding-right: 12px;}
-#projectalign {padding-bottom: 4px;}
+#sidenav { top:130px }
+#projectlogo { padding-left: 48px; padding-right: 68px; }
+#projectalign { padding-bottom: 4px; }
 #projectname {font: 200% Tahoma, Arial,sans-serif!important;}
 pre code {border:none!important}
-
 
 div#navrow2 {background-color: #2B2B2B!important;}
 div#navrow2 .tablist a {background-color: #2B2B2B!important;}
@@ -37,13 +75,6 @@ div#navrow4 {background-color: #3C3C3C!important;}
 div#navrow4 .tablist a {background-color: #3C3C3C!important;}
 div#navrow4 .tablist a:hover {background-color:#333!important;}
 div#navrow4 .tablist li.current a {background-color: #5daa00!important;}
-
-ul#main-menu {background-color: #2B2B2B!important;}
-ul#main-menu .sm-dox a {background-color: #2B2B2B!important;}
-ul#main-menu .sm-dox a:hover {background-color:#333!important;}
-ul#main-menu .sm-dox li.current a {background-color: #5daa00!important;}
-
-
 
 h1.glow, h2.glow, h3.glow, h4.glow, h5.glow, h6.glow {text-shadow: none!important}
 

@@ -1,3 +1,3 @@
-# Placeholder 1 {#placeholder1}
+# Placeholder 1
 
 This is a placeholder.

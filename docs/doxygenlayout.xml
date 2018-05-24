@@ -3,25 +3,23 @@
   <!-- Navigation index tabs for HTML output -->
   <navindex>
     <tab type="mainpage" visible="yes" title="Unity Modules"/>
-    <tab type="modules" visible="no" title="LAYOUT_MODULES" intro=""/>
-    <tab type="pages" visible="no" title="LAYOUT_PAGES" intro="LAYOUT_PAGES_INTRO"/>
+    <tab type="modules" visible="no" title="" intro=""/>
+    <tab type="pages" visible="yes" title="" intro=""/>
     <tab type="namespaces" visible="no" title="LAYOUT_NAMESPACES">
-      <tab type="namespacelist" visible="yes" title="LAYOUT_NAMESPACE_LIST" intro="LAYOUT_NAMESPACE_LIST_INTRO"/>
+      <tab type="namespacelist" visible="yes" title="Namespaces" intro=""/>
       <tab type="namespacemembers" visible="no" title="LAYOUT_NAMESPACE_MEMBERS" intro="LAYOUT_NAMESPACE_MEMBERS_INTRO"/>
     </tab>
-    <tab type="classes" visible="yes" title="API Reference">
-      <tab type="classlist" visible="yes" title="Class List"
-        intro="LeapCSharp was recently merged as-source into UnityModules, so namespaces are not completely tidy. LeapCSharp classes are listed flatly in the 'Leap' namespace, while UnityModules classes can be found in the Leap.Unity namespace."/>
-      <!-- <tab type="classindex" visible="$ALPHABETICAL_INDEX" title=""/> -->
-      <tab type="classindex" visible="$ALPHABETICAL_INDEX" title="Class Index"/>  
-      <tab type="hierarchy" visible="yes" title="Class Hierarchy" intro=""/>
+    <tab type="classes" visible="yes" title="Classes">
+      <tab type="classlist" visible="yes" title="Class List" intro="LeapCSharp was recently merged as-source into UnityModules, so namespace organization is not entirely obvious. LeapCSharp classes can be found directly inside the 'Leap' namespace, while UnityModules classes can be found in the Leap.Unity namespace."/>
       <tab type="classmembers" visible="no" title="LAYOUT_CLASS_MEMBERS" intro="LAYOUT_CLASS_MEMBERS_INTRO"/>
+      <tab type="classindex" visible="$ALPHABETICAL_INDEX" title="Class Index"/>  
+      <tab type="hierarchy" visible="no" title="Class Hierarchy" intro=""/>
     </tab>
-    <tab type="files" visible="yes" title="LAYOUT_FILES">
-      <tab type="filelist" visible="yes" title="LAYOUT_FILE_LIST" intro="LAYOUT_FILE_LIST_INTRO"/>
-      <tab type="globals" visible="yes" title="LAYOUT_GLOBALS" intro="LAYOUT_GLOBALS_INTRO"/>
+    <tab type="files" visible="no" title="Files">
+      <tab type="filelist" visible="no" title="File List" intro=""/>
+      <tab type="globals" visible="no" title="LAYOUT_GLOBALS" intro="LAYOUT_GLOBALS_INTRO"/>
     </tab>
-    <tab type="examples" visible="yes" title="LAYOUT_EXAMPLES" intro="LAYOUT_EXAMPLES_INTRO"/>  
+    <tab type="examples" visible="no" title="LAYOUT_EXAMPLES" intro="LAYOUT_EXAMPLES_INTRO"/>  
   </navindex>
 
   <!-- Layout definition for a class page -->
