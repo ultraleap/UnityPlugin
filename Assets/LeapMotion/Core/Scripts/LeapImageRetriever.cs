@@ -350,7 +350,7 @@ namespace Leap.Unity {
       Image image = args.image;
 
       if (!_imageQueue.TryEnqueue(image)) {
-        Debug.LogWarning("Image buffer filled up.  This is unexpected means images are being provided faster than " +
+        Debug.LogWarning("Image buffer filled up. This is unexpected and means images are being provided faster than " +
                          "LeapImageRetriever can consume them.  This might happen if the application has stalled " +
                          "or we recieved a very high volume of images suddenly.");
         _needQueueReset = true;
