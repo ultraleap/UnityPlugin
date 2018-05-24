@@ -3,6 +3,11 @@
   background-color:#222!important; background-image:none!important;
 }
 
+#sidenav { top:130px }
+#projectlogo { padding-left: 20px; padding-right: 14px; padding-top: 13px; }
+#projectalign { padding-bottom: 4px; padding-top: 6px; }
+#projectname {font: 200% Tahoma, Arial,sans-serif!important;}
+
 .tablist a, .sm-dox a {
   text-shadow: none!important; background-color: #222!important; color: #fff!important;
   background-image:none!important
@@ -14,7 +19,6 @@
 }
 
 #titlearea { background: none; background-color: #222; height: 100px; }
-#projectalign { padding-left: 16px !important; }
 #projectname, #projectbrief { color: #fff; }
 #projectnumber { color: #5daa00; }
 
@@ -24,8 +28,8 @@
   border-bottom-width: 1px; border-bottom-style: solid; border-color: #def8c0;
 }
 #MSearchBox {
-  right: initial; position: absolute; left: 47px; top: 106px; width: 250px;
-  zindex: 4;
+  right: initial; position: absolute; left: 0px; top: 106px; width: 250px;
+  z-index: 4;
 }
 #MSearchField { width: 185px; }
 #MSearchResultsWindow {left: 5px!important; z-index: 5; }
@@ -56,11 +60,6 @@ a { color: #5daa00!important; }
 
 .tablist a:hover, 
 .sm-dox a:hover { background-image:none!important; background-color:#333!important }
-
-#sidenav { top:130px }
-#projectlogo { padding-left: 48px; padding-right: 68px; }
-#projectalign { padding-bottom: 4px; }
-#projectname {font: 200% Tahoma, Arial,sans-serif!important;}
 pre code {border:none!important}
 
 div#navrow2 {background-color: #2B2B2B!important;}

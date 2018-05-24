@@ -87,6 +87,16 @@ Now that you know how to get Leap hands rendering in your scene, you may want to
 
 - Our **[[Modules | https://github.com/leapmotion/UnityModules/wiki#which-modules-are-right-for-you]]** may help if your application requires physical interactions, mobile-friendly rendering, and more!
 
+# FAQ {#core-faq}
+
+**Q: I'm working on a custom experience/headset integration and hand alignment needs to be _totally perfect._ I have control over the head rig that will be used for my experience. How can I make sure the hand aligns with the user's real hands perfectly?**
+
+A: Check your LeapSpace object in the LMHeadMountedRig prefab. We've included an `Allow Manual Device Offset` checkbox in the Advanced section that will allow you to adjust where your application expects the Leap Motion Controller to be relative to the tracked headset. (If you don't see this checkbox, make sure you've upgraded to the latest version of the Core module.)
+
+Because most Leap Motion VR rigs utilize a custom VR developer mount attachment, not all Leap Motion Controllers are mounted in the same place relative to the tracked positions of VR headsets. In order for hands in VR space to align perfectly with hands in the real world, your application needs to know _exactly_ where the Leap Motion Controller is mounted relative to your tracked headset position and orientation. While the default values will usually produce an acceptable experience for VR, in passthrough or mixed-reality situations, a mismatch between the real world Leap position and the VR world Leap position -- even of just a few degrees of tilt, or a centimeter of displacement -- can shift hands too much to produce a plausible tracking experience.
+
+Naturally, this solution isn't viable if you intend for your application to be run on a wide variety of headsets with a Leap Motion Controller attached. Under these circumstances, we recommend you keep the device offsets to their default values (uncheck the checkbox to revert them).
+
 [devsdk]: https://developer.leapmotion.com/get-started/ "Get Started with the Leap Motion SDK"
 [BasicVRRig]: http://blog.leapmotion.com/wp-content/uploads/2017/06/BasicVRRig.png
 
