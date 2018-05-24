@@ -1,6 +1,6 @@
 # UnityModules Documentation
 
-To build, install Doxygen 1.8.11. **Later versions of Doxygen will not work correctly.** Then:
+To build, install Doxygen 1.8.11. **Later versions of Doxygen will not work correctly.**
 
 Then run `doxygen` in this folder (`docs`).
 
