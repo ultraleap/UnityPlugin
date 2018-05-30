@@ -21,6 +21,9 @@ var NAVTREE =
     [ "Graphic Renderer", "graphic-renderer.html", [
       [ "FAQ", "graphic-renderer.html#graphic-renderer-faq", null ]
     ] ],
+    [ "Hands Module", "hands-module.html", [
+      [ "Auto-rigging Tool", "hands-module.html#hands-auto-rigging-tool", null ]
+    ] ],
     [ "Namespaces", "namespaces.html", "namespaces" ],
     [ "Classes", "annotated.html", [
       [ "Class List", "annotated.html", "annotated_dup" ],
@@ -55,9 +58,9 @@ var NAVTREEINDEX =
 "class_leap_1_1_unity_1_1_skeletal_hand.html#ab5c5634050c278b877480f1821c66444",
 "class_leap_1_1_unity_1_1_tests_1_1_hand_factory_right.html#a0cab5466a9d9c96403931eead74305a3",
 "class_leap_internal_1_1_connection.html#a2faca2fee18184d9f5d52aead8137582",
-"interface_leap_1_1_unity_1_1_interaction_1_1_i_x_r_controller_tracking_provider.html",
-"struct_leap_1_1_unity_1_1_animation_1_1_tween.html#a17a237457e57625296e6b24feb19c60a",
-"struct_leap_internal_1_1_l_e_a_p___d_e_v_i_c_e___f_a_i_l_u_r_e___e_v_e_n_t.html#a43bd33d0cf11750550b4b34ed5dd1b90"
+"interface_leap_1_1_unity_1_1_interaction_1_1_i_throw_handler.html#a27e8917319ddc3a4467d29b07d156b5b",
+"struct_leap_1_1_unity_1_1_animation_1_1_tween.html#a0944aaace84dc23cf616c48ec4730d62",
+"struct_leap_internal_1_1_l_e_a_p___d_e_v_i_c_e___e_v_e_n_t.html#ae28bb82b65d9eb2276bcf39b693d53fe"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';
