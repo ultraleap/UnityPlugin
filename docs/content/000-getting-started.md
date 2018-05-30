@@ -26,9 +26,9 @@ For more details on upgrading modules, or if your project already contains older
 
   Designed to address the needs of mobile rendering platforms and the ergonomics of personal VR/AR interfaces, the Graphic Renderer allows you to **render an entire curved, 3D, dynamic interface in 1-3 draw calls**. The Graphic Renderer can be used in tandem with the Interaction Engine; see [[this FAQ answer | FAQ-(Graphic-Renderer)#q-can-i-use-the-graphic-renderer-with-the-interaction-engine-if-i-curve-the-graphics-of-interactionbehaviours-like-buttons-and-sliders-will-i-still-be-able-to-interact-with-them]] for a link to our integration example project.
 
-- **[[Hands Module | Hands-Module]]**
+- @ref hands-module
     
-  The tools you need to rig your 3D hand assets to work with Leap hands, including the powerful [[auto-rigging tool | Hands-Module#autorigging ]].
+  The tools you need to rig your 3D hand assets to work with Leap hands, including the powerful @ref #hands-auto-rigging-tool.
 
 # Looking for the API docs? TODO: DELETEME MAYBE? {#deleteme}
 

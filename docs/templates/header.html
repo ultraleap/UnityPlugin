@@ -1,4 +1,4 @@
-<!-- HTML header for doxygen 1.8.14-->
+<!--HTML header for doxygen 1.8.14-->
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -10,11 +10,16 @@
 <link href="$relpath^tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="$relpath^jquery.js"></script>
 <script type="text/javascript" src="$relpath^dynsections.js"></script>
+<link href="https://fonts.googleapis.com/css?family=Lato:300,400,700" rel="stylesheet">
 $treeview
 $search
 $mathjax
 <link href="$relpath^$stylesheet" rel="stylesheet" type="text/css" />
 $extrastylesheet
+
+<!-- Custom resize overrides -->
+<script type="text/javascript" src="$relpath^resizeoverrides.js"></script>
+
 </head>
 <body>
 <div id="top"><!-- do not remove this div, it is closed by doxygen! -->
@@ -30,9 +35,9 @@ $extrastylesheet
   <!--BEGIN PROJECT_NAME-->
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">$projectname
-   <!--BEGIN PROJECT_NUMBER-->&#160;<span id="projectnumber">$projectnumber</span><!--END PROJECT_NUMBER-->
    </div>
    <!--BEGIN PROJECT_BRIEF--><div id="projectbrief">$projectbrief</div><!--END PROJECT_BRIEF-->
+   <!--BEGIN PROJECT_NUMBER--><div id="projectnumber">$projectnumber</div><!--END PROJECT_NUMBER-->
   </td>
   <!--END PROJECT_NAME-->
   <!--BEGIN !PROJECT_NAME-->
@@ -44,7 +49,7 @@ $extrastylesheet
   <!--END !PROJECT_NAME-->
   <!--BEGIN DISABLE_INDEX-->
    <!--BEGIN SEARCHENGINE-->
-   <td>$searchbox</td>
+   <td id="searchbar">$searchbox</td>
    <!--END SEARCHENGINE-->
   <!--END DISABLE_INDEX-->
  </tr>
@@ -53,4 +58,4 @@ $extrastylesheet
 </div>
 <div id="searchboxrect"></div>
 <!--END TITLEAREA-->
-<!-- end header part -->
+<!-- end header part
