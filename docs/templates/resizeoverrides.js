@@ -1,11 +1,11 @@
 // resize_overrides.js
 
-var searchbarDiv;
-var searchbarInput;
+// var searchbarDiv;
+// var searchbarInput;
 
 function initOverrides() {
-  searchbarInput = $("#MSearchField");
-  searchbarDiv = $("#searchbar");
+  // searchbarInput = $("#MSearchField");
+  // searchbarDiv = $("#searchbar");
 
   var width = readCookie('width');
   if (width) { restoreWidth(width); } else { resizeWidth(); }
@@ -35,8 +35,13 @@ function restoreWidth(navWidth)
   content.css({marginLeft:parseInt(navWidth)+"px"});
   sidenav.css({width:navWidth + "px"});
 
-  if (searchbarInput !== undefined) {
-    searchbarInput.css({width:navWidth - 32 + "px"});
-    searchbarDiv.css({width:navWidth + "px"})
-  }
+  // if (searchbarInput !== undefined) {
+  //   searchbarInput.css({width:navWidth - 32 + "px"});
+  //   searchbarDiv.css({width:navWidth + "px"})
+  // }
 }
+
+// function readyInit() {
+//   makeNavBarLinks()
+// }
+// $(document).ready(readyInit)

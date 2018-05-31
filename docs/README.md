@@ -11,3 +11,13 @@ You can delete the `html` folder if it already exists, as doxygen will regenerat
 Run `doxygen` in this folder (`/docs`).
 
 Documentation will be generated into a folder called `html`. The `index.html` file will redirect to the `html/index.html` file, which is the *actual* landing page.
+
+## Optional: Dot adds cool diagrams
+
+On macOS,
+```
+brew install graphviz
+```
+will get you the `dot` command in your path, which allows Doxygen to generate
+much, much more interesting visual diagrams depicting the inter-relation of
+classes.

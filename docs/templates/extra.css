@@ -7,10 +7,13 @@
 :root {
   /* Color palette. */
   --dark:         #141414;
+  --header-bg:    #272b32;
   --leap-green:   #5da800;
   --dark-green:   #4e850f;
   --less-light:   #bfbfbf;
   --light:        #e8e8e8;
+  --content-bg:   #f8f8f8;
+  --navtree-bg:   #dddddd;
 
   /* Text. */ 
   --main-font-family: 'Lato';
@@ -34,7 +37,7 @@ body, table, div, p, dl {
  */
 
 #top {
-  background-color: var(--dark);
+  background-color: var(--header-bg);
   color: var(--light);
   /*font-family: var(--main-font-family);*/
 
@@ -46,6 +49,11 @@ body, table, div, p, dl {
 /* Make the header "table" stack each table entry vertically. */
 #titlearea table tbody tr td {
   display: block;
+}
+
+/* Make the header "table" fill the whole titlearea div in width. */
+#titlearea table {
+  width: 100%
 }
 
 /* Give the Leap Motion logo vertically-centering margins. */
@@ -91,24 +99,24 @@ body, table, div, p, dl {
 
 /* Override style for searchbar section. */
 #searchbar {
-  padding-bottom: 5px;
+  
 }
 #MSearchBox { /* Override doxygen defaults. */
   position: inherit !important;
-  float: none !important;
+  /* float: none !important;
   margin-top: 0px !important;
   right: inherit !important;
   width: inherit !important;
   background-color: inherit !important;
   padding-top: inherit !important;
-  padding-bottom: inherit !important;
+  padding-bottom: inherit !important; */
 }
 #MSearchBox .left {
   /* The "left" span of the search box actually contains the search input,
    * so we can't just hide it. */
   display: block;
-  position: inherit;
-  width: inherit !important;
+  position: initial;
+  width: 100%;
   height: inherit !important;
   background-image: none;
 }
@@ -122,13 +130,14 @@ body, table, div, p, dl {
   display: block;
   position: inherit;
   height: inherit;
+  padding: 0em 1em 0em 1em;
+  margin: 1em auto 1em auto;
+  width: 80%;
+
   background: var(--light);
-  padding-left: 12px;
   font: inherit;
   font-family: var(--main-font-family);
-  margin-left: auto;
-  margin-right: auto;
-  padding-right: 10px;
+
   border-radius: 13px;
 
   /* Allow the default "input" element border. */
@@ -157,6 +166,7 @@ body, table, div, p, dl {
 /* Prevent horizontal scrollbars on the sidebar. */
 #nav-tree {
   overflow-x: hidden!important;
+  background: var(--navtree-bg);
 }
 
 /* Hide the resizable handle for the sidebar. */
@@ -169,6 +179,20 @@ body, table, div, p, dl {
   display: none !important;
 }
 
+/* Enforce text styling on nav-tree items. */
+#nav-tree .item {
+  font: inherit;
+  font-family: var(--main-font-family) !important;
+}
+
+/* Make the selected nav-tree item have a flat-color background. */
+#nav-tree .selected {
+  background-image: none;
+  text-shadow: none;
+  background-color: var(--leap-green);
+}
+
+
 
 /* ============
  * Page Content
@@ -176,6 +200,57 @@ body, table, div, p, dl {
  *
  * Markdown-generated guide content and auto-generated API documentation HTML.
  */
+
+ body {
+   background-color: var(--content-bg);
+ }
+ #doc-content {
+   max-width: 60em;
+   margin-left: auto !important;
+   margin-right: auto;
+   background-color: var(--content-bg);
+ }
+
+
+/* div.title, div.dynheader, div.dyncontent, table.memberdecls, {
+	max-width: 60em;
+	margin-left: auto;
+	margin-right: auto;
+} */
+
+ /* Remove gradients and various default effects on info boxes in generated
+  * docs. */
+.memdoc {
+  background-color: var(--content-bg);
+}
+.memproto, .fieldtable th {
+  border-top: #b7b7b7;
+  border-right: #b7b7b7;
+  border-left: #b7b7b7;
+  color: #000;
+  background-color: var(--content-bg);
+  background-image: none!important;
+  box-shadow: none!important;
+}
+.memdoc {
+  box-shadow: none!important;
+  background-image: none!important;
+}
+.memitem.glow { box-shadow: none!important; }
+table.fieldtable { box-shadow: none!important; }
+span.lineno {
+  border-right: none!important;
+}
+div.header {
+	background-image: none;
+	background-color: var(--content-bg);
+	margin: 0px;
+	border-bottom: 1px solid #D6E5C4;
+}
+div.contents table tbody tr,
+div.contents table tbody tr td {
+	background-color: var(--content-bg);
+}
 
 /* ======
  * Footer
@@ -266,9 +341,5 @@ div#navrow4 .tablist li.current a {background-color: #5daa00!important;}
 
 h1.glow, h2.glow, h3.glow, h4.glow, h5.glow, h6.glow {text-shadow: none!important}
 
-.memproto, .fieldtable th { border-top: #b7b7b7; border-right: #b7b7b7; border-left: #b7b7b7; color: #000; background-color: #e6e5e5; background-image: none!important; box-shadow: none!important;}
-.memdoc { box-shadow: none!important; background-image: none!important;}
-.memitem.glow { box-shadow: none!important;}
-table.fieldtable { box-shadow: none!important; }
-span.lineno { border-right: none!important;}
+
 */
