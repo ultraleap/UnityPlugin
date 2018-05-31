@@ -1,0 +1,274 @@
+
+/* =========
+ * Top Level
+ * =========
+ */
+
+:root {
+  /* Color palette. */
+  --dark:         #141414;
+  --leap-green:   #5ca800;
+  --dark-green:   #4e850f;
+  --less-light:   #bfbfbf;
+  --light:        #e8e8e8;
+
+  /* Text. */ 
+  --main-font-family: 'Lato';
+  --backup-font-family: sans-serif;
+
+  /* Basic layout parameters. */
+  --sidebar-width: 300px;
+}
+
+body, table, div, p, dl {
+  font-family: var(--main-font-family), var(--backup-font-family) !important;
+  color: var(--dark);
+}
+
+
+/* ======
+ * Header
+ * ======
+ *
+ * Logo, project name, version number, search bar.
+ */
+
+#top {
+  background-color: var(--dark);
+  color: var(--light);
+  /*font-family: var(--main-font-family);*/
+
+  /* Make the header flush with the sidebar so it takes up less space. */
+  float: left;
+  width: var(--sidebar-width);
+}
+
+/* Make the header "table" stack each table entry vertically. */
+#titlearea table tbody tr td {
+  display: block;
+}
+
+/* Give the Leap Motion logo vertically-centering margins. */
+#projectlogo img {
+  margin-top: 20px;
+  margin-bottom: 10px;
+}
+
+/* Remove doxygen 0.5em padding-left on project summary */
+#projectalign {
+  padding-left: 0em !important;
+}
+
+/* Override style for the project name. */
+#projectname {
+  font: inherit !important;
+  font-family: var(--main-font-family) !important;
+  font-size: 24pt !important;
+  text-align: center;
+  color: var(--light);
+}
+
+/* Override style for the project brief. */
+#projectbrief {
+  font: inherit !important;
+  font-family: var(--main-font-family) !important;
+  font-size: 12pt !important;
+  text-align: center;
+  margin-top: 0.25em;
+  color: var(--less-light);
+}
+
+/* Override style for the project version. */
+#projectnumber {
+  font: inherit !important;
+  font-family: var(--main-font-family) !important;
+  font-size: 16pt !important;
+  text-align: center;
+  margin-top: 0.25em;
+  color: var(--leap-green);
+  margin-bottom: 0.5em;
+}
+
+/* Override style for searchbar section. */
+#searchbar {
+  padding-bottom: 5px;
+}
+#MSearchBox { /* Override doxygen defaults. */
+  position: inherit !important;
+  float: none !important;
+  margin-top: 0px !important;
+  right: inherit !important;
+  width: inherit !important;
+  background-color: inherit !important;
+  padding-top: inherit !important;
+  padding-bottom: inherit !important;
+}
+#MSearchBox .left {
+  /* The "left" span of the search box actually contains the search input,
+   * so we can't just hide it. */
+  display: block;
+  position: inherit;
+  width: inherit !important;
+  height: inherit !important;
+  background-image: none;
+}
+#MSearchBox .right { /* Hide the "right-side" doxygen search bar image. */
+  display: none;
+}
+#MSearchSelect { /* Hide the search filtering option. */
+  display: none;
+}
+#MSearchField { /* Override doxygen defaults. */
+  display: block;
+  position: inherit;
+  height: inherit;
+  background: var(--light);
+  padding-left: 12px;
+  font: inherit;
+  font-family: var(--main-font-family);
+  margin-left: auto;
+  margin-right: auto;
+  padding-right: 10px;
+  border-radius: 13px;
+
+  /* Allow the default "input" element border. */
+  border: inherit !important;
+}
+/* Adjust the search results window to reflect the new search bar position. */
+#MSearchResultsWindow {
+  left: 0px !important;
+  margin-top: 20px !important;
+  margin-left: 20px !important;
+}
+
+/* ==========
+ * Navigation
+ * ==========
+ *
+ * Sidebar: Table of contents, navigation, content links, and external links.
+ */
+
+/* Align the top of the side-nav bar JUST RIGHT so that it touches the bottom of
+ * the page and the project header. */
+#side-nav {
+  padding: 0px 0px 0px 0px;
+ }
+
+#nav-tree {
+  /* Prevent horizontal scrollbars on the sidebar. */
+  overflow-x: hidden!important;
+}
+
+/* Hide the resizable handle for the sidebar. */
+.ui-resizable-handle.ui-resizable-e {
+  display: none !important;
+}
+
+/* Hide the "nav-sync" widget in the sidebar. */
+#nav-sync {
+  display: none !important;
+}
+
+
+/* ============
+ * Page Content
+ * ============
+ *
+ * Markdown-generated guide content and auto-generated API documentation HTML.
+ */
+
+/* ======
+ * Footer
+ * ======
+ */
+
+ #nav-path {
+   /* Hide the footer. */
+   display: none;
+ }
+
+/*#nav-tree { overflow-x: hidden!important; }
+.tabs, .tabs2, .tabs3, #main-nav, .sm-dox {
+  background-color:#222!important; background-image:none!important;
+}
+
+#sidenav { top:130px }
+#projectlogo { padding-left: 20px; padding-right: 14px; padding-top: 13px; }
+#projectalign { padding-bottom: 4px; padding-top: 6px; }
+#projectname {font: 200% Tahoma, Arial,sans-serif!important;}
+
+.tablist a, .sm-dox a {
+  text-shadow: none!important; background-color: #222!important; color: #fff!important;
+  background-image:none!important
+}
+
+.tablist li.current a,
+.sm-dox li.current a {
+  background-image: none!important; text-shadow: none!important; background-color: #5daa00!important;
+}
+
+#titlearea { background: none; background-color: #222; height: 100px; }
+#projectname, #projectbrief { color: #fff; }
+#projectnumber { color: #5daa00; }
+
+#searchboxrect {
+  z-index: 2; position: absolute; left: 0px; right: 0px; height: 30px;
+  background-color: #5daa00;
+  border-bottom-width: 1px; border-bottom-style: solid; border-color: #def8c0;
+}
+#MSearchBox {
+  right: initial; position: absolute; left: 0px; top: 106px; width: 250px;
+  z-index: 4;
+}
+#MSearchField { width: 185px; }
+#MSearchResultsWindow {left: 5px!important; z-index: 5; }
+#nav-sync { display:none!important; }
+#nav-tree-contents { margin-top: 30px;  }
+#nav-path{ display:none!important; }
+
+#doc-content {
+  z-index: 5; position: absolute; background-color: white;
+  left: 0px; right: 0px;
+}
+
+.ui-resizable-e { background: none!important; background-color: #ddd!important; }
+a { color: #5daa00!important; }
+#nav-tree .selected {
+  background-image: none!important; background-color: #5daa00!important;
+  color: #fff!important; text-shadow: none!important;
+}
+#nav-tree a { color:#000!important; }
+#nav-tree .selected a { color:#fff!important }
+#side-nav { background-color: #5daa00; width: 240; z-index: -1; }
+#nav-tree { background-color: #f2f2f2; background-image: none!important;}
+#nav-tree-contents { background-color: #f2f2f2; }
+#nav-tree .label { font: inherit; }
+#nav-tree .label a { font-family: 'Roboto', sans-serif; }
+
+#nav-tree div.item { padding-left: 10px; }
+
+.tablist a:hover, 
+.sm-dox a:hover { background-image:none!important; background-color:#333!important }
+pre code {border:none!important}
+
+div#navrow2 {background-color: #2B2B2B!important;}
+div#navrow2 .tablist a {background-color: #2B2B2B!important;}
+div#navrow2 .tablist a:hover {background-color:#333!important;}
+div#navrow2 .tablist li.current a {background-color: #5daa00!important;}
+div#navrow3 {background-color: #333!important;}
+div#navrow3 .tablist a {background-color: #333!important;}
+div#navrow3 .tablist a:hover {background-color:#2B2B2B!important;}
+div#navrow3 .tablist li.current a {background-color: #5daa00!important;}
+div#navrow4 {background-color: #3C3C3C!important;}
+div#navrow4 .tablist a {background-color: #3C3C3C!important;}
+div#navrow4 .tablist a:hover {background-color:#333!important;}
+div#navrow4 .tablist li.current a {background-color: #5daa00!important;}
+
+h1.glow, h2.glow, h3.glow, h4.glow, h5.glow, h6.glow {text-shadow: none!important}
+
+.memproto, .fieldtable th { border-top: #b7b7b7; border-right: #b7b7b7; border-left: #b7b7b7; color: #000; background-color: #e6e5e5; background-image: none!important; box-shadow: none!important;}
+.memdoc { box-shadow: none!important; background-image: none!important;}
+.memitem.glow { box-shadow: none!important;}
+table.fieldtable { box-shadow: none!important; }
+span.lineno { border-right: none!important;}
+*/
