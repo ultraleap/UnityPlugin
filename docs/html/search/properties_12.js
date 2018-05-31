@@ -1,0 +1,23 @@
+var searchData=
+[
+  ['scale',['scale',['../struct_leap_1_1_leap_transform.html#a0eecf7009c7852bed8e56a61ad5269ee',1,'Leap.LeapTransform.scale()'],['../class_leap_1_1_unity_1_1_interaction_1_1_interaction_controller.html#a1d28dec57cce925ad92342891bd71e7c',1,'Leap.Unity.Interaction.InteractionController.scale()']]],
+  ['scalelastfingerbones',['scaleLastFingerBones',['../class_leap_1_1_unity_1_1_rigged_hand.html#a1d53d6b57fd3e92f6236479aec87afbb',1,'Leap::Unity::RiggedHand']]],
+  ['sequenceid',['SequenceId',['../class_leap_1_1_image.html#a0d3c10d15ca863c01384d130bf769c04',1,'Leap::Image']]],
+  ['serialize',['Serialize',['../class_leap_1_1_frame.html#a155704ecc1834a1c1123941cf088c3ac',1,'Leap::Frame']]],
+  ['serializelength',['SerializeLength',['../class_leap_1_1_frame.html#a8b032295b24a55f230692a0845405dc8',1,'Leap::Frame']]],
+  ['serialnumber',['SerialNumber',['../class_leap_1_1_device.html#abf3fb18efc323201b7cbc3617cbb4703',1,'Leap::Device']]],
+  ['seteditorleappose',['SetEditorLeapPose',['../class_leap_1_1_unity_1_1_rigged_hand.html#ab05160db762278c3d7e2d5e6bb337c1d',1,'Leap::Unity::RiggedHand']]],
+  ['severity',['severity',['../class_leap_1_1_log_event_args.html#a794e81b08eeb69bf14c69947234e21ef',1,'Leap::LogEventArgs']]],
+  ['shipalignedangularvelocity',['shipAlignedAngularVelocity',['../class_leap_1_1_unity_1_1_examples_1_1_spaceship.html#a8ed3ef8801bcdfc359e4161a4b0f2ad9',1,'Leap::Unity::Examples::Spaceship']]],
+  ['shipalignedvelocity',['shipAlignedVelocity',['../class_leap_1_1_unity_1_1_examples_1_1_spaceship.html#a4d098889ee2c71d2d8664186fd262ab1',1,'Leap::Unity::Examples::Spaceship']]],
+  ['simulationscale',['SimulationScale',['../class_leap_1_1_unity_1_1_interaction_1_1_interaction_manager.html#a13cf11e3acbafac9cba2f1cc35926637',1,'Leap::Unity::Interaction::InteractionManager']]],
+  ['size',['size',['../class_leap_1_1_unity_1_1_graphical_renderer_1_1_leap_box_graphic.html#ab7850768e324b209434f0c7e84ee294d',1,'Leap::Unity::GraphicalRenderer::LeapBoxGraphic']]],
+  ['softcontactdislocationdistance',['softContactDislocationDistance',['../class_leap_1_1_unity_1_1_interaction_1_1_interaction_controller.html#a6a9d8b6925c345f98269f95dbe730482',1,'Leap::Unity::Interaction::InteractionController']]],
+  ['softcontactenabled',['softContactEnabled',['../class_leap_1_1_unity_1_1_interaction_1_1_interaction_controller.html#aaaca33be6e897074c5d16c99bede84ad',1,'Leap::Unity::Interaction::InteractionController']]],
+  ['sourcedata',['sourceData',['../class_leap_1_1_unity_1_1_graphical_renderer_1_1_leap_sliced_graphic.html#a933543b047e6b2caa5538fb0976d1286',1,'Leap::Unity::GraphicalRenderer::LeapSlicedGraphic']]],
+  ['space',['space',['../class_leap_1_1_unity_1_1_space_1_1_leap_cylindrical_space_1_1_transformer.html#af36e6b03d9abc55fac50e5a35745d0a9',1,'Leap.Unity.Space.LeapCylindricalSpace.Transformer.space()'],['../class_leap_1_1_unity_1_1_space_1_1_leap_spherical_space_1_1_transformer.html#acb721b43b35652d7e2451f3d059f9302',1,'Leap.Unity.Space.LeapSphericalSpace.Transformer.space()'],['../class_leap_1_1_unity_1_1_graphical_renderer_1_1_leap_graphic_renderer.html#aa2775b97ff5f8e366a6e0ad9d4d89c4c',1,'Leap.Unity.GraphicalRenderer.LeapGraphicRenderer.space()'],['../class_leap_1_1_unity_1_1_interaction_1_1_interaction_behaviour.html#afa6f25e6db232ceb3accd756b96c7b33',1,'Leap.Unity.Interaction.InteractionBehaviour.space()'],['../interface_leap_1_1_unity_1_1_interaction_1_1_i_interaction_behaviour.html#afa6f25e6db232ceb3accd756b96c7b33',1,'Leap.Unity.Interaction.IInteractionBehaviour.space()']]],
+  ['springforce',['springForce',['../class_leap_1_1_unity_1_1_interaction_1_1_interaction_button.html#a15003c55d4611abbeb8e16f70a2b7fb9',1,'Leap::Unity::Interaction::InteractionButton']]],
+  ['sprite',['sprite',['../class_leap_1_1_unity_1_1_graphical_renderer_1_1_leap_sprite_data.html#a3b07e45db440aac51fcedd79931bb691',1,'Leap::Unity::GraphicalRenderer::LeapSpriteData']]],
+  ['succeeded',['Succeeded',['../class_leap_1_1_config_change_event_args.html#a5e941e13889494ff5524fe02f0310523',1,'Leap::ConfigChangeEventArgs']]],
+  ['supportinfo',['supportInfo',['../class_leap_1_1_unity_1_1_graphical_renderer_1_1_leap_graphic_group.html#aa4403d2cbf6faf747ca39cd08077a4fd',1,'Leap::Unity::GraphicalRenderer::LeapGraphicGroup']]]
+];
