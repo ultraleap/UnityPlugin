@@ -35,7 +35,7 @@ If you've gone through the setup process but you aren't seeing hands in your app
 
 [LeapProvider][ref_LeapProvider] defines the basic interface our modules expect to use to retrieve [Frame][ref_Frame] data. This abstraction allows you to create your own LeapProviders, which is useful when testing or developing in a context where Leap Controller hardware isn't immediately.
 
-[LeapServiceProvider][ref_LeapServiceProvider] is the class that communicates with the Leap service running on your platform and provides Frame objects containing Leap hands to your application. Generally, any class that needs Hand data from the sensor will need a LeapServiceProvider to get that data.
+[LeapServiceProvider][ref_LeapServiceProvider] is the class that communicates with the Leap service running on your platform and provides Frame objects containing Leap hands to your application. Generally, any class that needs Hand data from the sensor will need a reference to a LeapServiceProvider to get that data.
 
 [LeapXRServiceProvider][ref_LeapXRServiceProvider] is the specialized component you should use for XR applications. Place this component directly on your XR camera, so that it can correctly account for differences in tracking timing between the sensor and your headset's pose tracking.
 
