@@ -9,7 +9,7 @@
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
-<link href="https://fonts.googleapis.com/css?family=Lato:300,400,700" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab" rel="stylesheet"> 
 <link href="navtree.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="resize.js"></script>
 <script type="text/javascript" src="navtreedata.js"></script>
@@ -108,6 +108,10 @@ $(document).ready(function(){initNavTree('graphic-renderer.html','');});
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p>foo</p>
+<h1><a class="anchor" id="gr-plus-ie"></a>
+Graphic Renderer + Interaction Engine</h1>
+<p><b>Q: Can I use the Graphic Renderer with the Interaction Engine? If I curve the graphics of InteractionBehaviours like buttons and sliders, will I still be able to interact with them?</b></p>
+<p>A: Yes, and yes! Every feature of the Graphic Renderer &ndash; particularly curved spaces &ndash; is compatible with the Interaction Engine. Check out the <a href="https://github.com/leapmotion/Button-Builder">Button Builder</a>, an example project we put together that demonstrates how the two systems can work in parallel.</p>
 <h1><a class="anchor" id="graphic-renderer-faq"></a>
 FAQ</h1>
 <p><b>Q: My objects are not moving/rotating/scaling in play mode, even though I can translate/rotate/scale them in edit mode!</b></p>
@@ -124,9 +128,7 @@ FAQ</h1>
 <p>The layer of the graphic is not taken into account by the graphic renderer, since <em>all graphics for a group are always rendered on the same layer</em>. This layer is configured on the <em>rendering method</em> and not on the graphic itself.</p>
 <p><b>Q: My sprites are not showing up correctly?</b></p>
 <p>Make sure that <em>all</em> of your sprites are packed into the same sprite atlas. They will need to have the same packing tag, and the same settings. In addition, the current version of unity has a bug involving sprites and atlases, so you might need to enter/exit playmode a few times before they become visible.</p>
-<p><b>Q: Can I use the Graphic Renderer with the Interaction Engine? If I curve the graphics of InteractionBehaviours like buttons and sliders, will I still be able to interact with them?</b></p>
-<p>A: Yes, and yes! Every feature of the Graphic Renderer &ndash; particularly curved spaces &ndash; is compatible with the Interaction Engine. Check out the <a href="https://github.com/leapmotion/Button-Builder">Button Builder</a>, an example project we put together that demonstrates how the two systems can work in parallel.</p>
-<h2>Got a question not answered here? #{need-more-help}</h2>
+<h1>Got a question not answered here?</h1>
 <p>Head over to <a href="https://community.leapmotion.com/c/development" title="Leap Motion Developer Forums">the developer forum</a> and post your question! We'll see how we can help. </p>
 </div></div><!-- contents -->
 </div><!-- doc-content -->
@@ -134,7 +136,7 @@ FAQ</h1>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer">Generated on Thu May 31 2018 00:31:05 for Unity Modules by
+    <li class="footer">Generated on Thu May 31 2018 17:27:33 for Unity Modules by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.11 </li>
   </ul>

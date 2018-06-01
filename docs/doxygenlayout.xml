@@ -6,7 +6,7 @@
     <tab type="modules" visible="no" title="" intro=""/>
     <tab type="pages" visible="yes" title="" intro=""/>
     <tab type="namespaces" visible="no" title="LAYOUT_NAMESPACES">
-      <tab type="namespacelist" visible="yes" title="Namespaces" intro=""/>
+      <tab type="namespacelist" visible="yes" title="Namespaces" intro="LeapCSharp was recently merged as-source into UnityModules, so namespace organization is not entirely obvious. LeapCSharp classes can be found directly inside the 'Leap' namespace, while UnityModules classes can be found in the Leap.Unity namespace."/>
       <tab type="namespacemembers" visible="no" title="LAYOUT_NAMESPACE_MEMBERS" intro="LAYOUT_NAMESPACE_MEMBERS_INTRO"/>
     </tab>
     <tab type="classes" visible="yes" title="Classes">

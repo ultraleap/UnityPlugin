@@ -41,7 +41,14 @@ function restoreWidth(navWidth)
   // }
 }
 
-// function readyInit() {
-//   makeNavBarLinks()
-// }
-// $(document).ready(readyInit)
+function readyInit() {
+  var docContent = document.getElementById(`doc-content`);
+  var contentContainer = document.createElement('div');
+  contentContainer.id = 'doc-content-container'
+
+  docContent.parentNode.insertBefore(contentContainer, docContent);
+  $(docContent).detach().appendTo(contentContainer);
+
+  content = $('#doc-content-container')
+}
+$(document).ready(readyInit);

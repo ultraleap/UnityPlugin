@@ -4,26 +4,38 @@ var NAVTREE =
     [ "Getting Started", "index.html", [
       [ "Installing the modules", "index.html#installing-unity-modules", null ],
       [ "Which modules are right for you?", "index.html#choosing-modules", null ],
-      [ "Looking for the API docs? TODO: DELETEME MAYBE?", "index.html#deleteme", null ],
       [ "Troubleshooting", "index.html#troubleshooting", null ]
     ] ],
     [ "Core", "core.html", [
+      [ "The core Leap components", "core.html#core-leap-components", null ],
+      [ "Leap Motion XR rigs", "core.html#xr-rig-setup", null ],
+      [ "A basic set of Leap hands", "core.html#a-basic-set-of-leap-hands", null ],
+      [ "Attaching objects to hand joints", "core.html#attaching-objects-to-hand-joints", null ],
       [ "FAQ", "core.html#core-faq", null ]
     ] ],
     [ "Interaction Engine", "interaction-engine.html", [
       [ "The basic components of interaction", "interaction-engine.html#ie-basic-components", null ],
+      [ "Just add InteractionBehaviour!", "interaction-engine.html#ie-just-add-interactionbehaviour", null ],
+      [ "First steps with the Interaction Engine", "interaction-engine.html#ie-first-steps", null ],
+      [ "Check out the examples", "interaction-engine.html#ie-examples", null ],
       [ "Working with PhysX objects in Unity", "interaction-engine.html#ie-working-with-physx", null ],
       [ "Custom layers for interaction objects", "interaction-engine.html#ie-custom-layers", null ],
-      [ "Writing custom behaviors for interaction objects", "interaction-engine.html#ie-custom-interaction-behaviors", null ],
-      [ "Interaction Types In-Depth", "interaction-engine.html#ie-in-depth", null ],
+      [ "Custom behaviors for interaction objects", "interaction-engine.html#ie-custom-interaction-behaviors", null ],
+      [ "Interaction types in-depth", "interaction-engine.html#ie-in-depth", null ],
       [ "FAQ", "interaction-engine.html#interaction-engine-faq", null ]
     ] ],
     [ "Graphic Renderer", "graphic-renderer.html", [
+      [ "Graphic Renderer + Interaction Engine", "graphic-renderer.html#gr-plus-ie", null ],
       [ "FAQ", "graphic-renderer.html#graphic-renderer-faq", null ]
     ] ],
     [ "Hands Module", "hands-module.html", [
       [ "Auto-rigging Tool", "hands-module.html#hands-auto-rigging-tool", null ]
     ] ],
+    [ "Upgrading Unity Modules", "upgrading-unity-modules.html", [
+      [ "Special upgrade: Old XR Rigs (before Core 4.4.0)", "upgrading-unity-modules.html#upgrades-prior-to-4-4-0", null ],
+      [ "Special upgrade: Files (before June 1st, 2017)", "upgrading-unity-modules.html#upgrades-prior-to-2017-06-01", null ]
+    ] ],
+    [ "Deprecated Modules", "deprecated-modules.html", null ],
     [ "Namespaces", "namespaces.html", "namespaces" ],
     [ "Classes", "annotated.html", [
       [ "Class List", "annotated.html", "annotated_dup" ],
@@ -58,9 +70,9 @@ var NAVTREEINDEX =
 "class_leap_1_1_unity_1_1_skeletal_hand.html#ab5c5634050c278b877480f1821c66444",
 "class_leap_1_1_unity_1_1_tests_1_1_hand_factory_right.html#a0cab5466a9d9c96403931eead74305a3",
 "class_leap_internal_1_1_connection.html#a2faca2fee18184d9f5d52aead8137582",
-"interface_leap_1_1_unity_1_1_interaction_1_1_i_throw_handler.html#a27e8917319ddc3a4467d29b07d156b5b",
-"struct_leap_1_1_unity_1_1_animation_1_1_tween.html#a0944aaace84dc23cf616c48ec4730d62",
-"struct_leap_internal_1_1_l_e_a_p___d_e_v_i_c_e___e_v_e_n_t.html#ae28bb82b65d9eb2276bcf39b693d53fe"
+"interface_leap_1_1_unity_1_1_interaction_1_1_i_internal_interaction_controller.html#af26e0dd34fe46c2dae8b2539bfaf493c",
+"struct_leap_1_1_unity_1_1_animation_1_1_internal_1_1_transform_selector.html#ad6a93a6aeb5e096d0bbe57f1dd7075a3",
+"struct_leap_internal_1_1_l_e_a_p___c_o_n_n_e_c_t_i_o_n___l_o_s_t___e_v_e_n_t.html#a50f795625b67f33371f62722b0fe0063"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

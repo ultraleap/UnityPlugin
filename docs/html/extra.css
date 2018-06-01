@@ -7,20 +7,27 @@
 :root {
   /* Color palette. */
   --dark:         #141414;
-  --header-bg:    #272b32;
   --leap-green:   #5da800;
   --dark-green:   #4e850f;
   --less-light:   #bfbfbf;
+  --medium-gray:  #dddddd;
   --light:        #e8e8e8;
+
+  --header-bg:    #272b32;
+  --navtree-bg:   var(--medium-gray);
+  --body-bg:      var(--medium-gray);
   --content-bg:   #f8f8f8;
-  --navtree-bg:   #dddddd;
+
+  --link-color:   var(--leap-green);
+  --border-color: #cecece;
+  --member-header-bg: var(--body-bg);
 
   /* Text. */ 
   --main-font-family: 'Lato';
   --backup-font-family: sans-serif;
 
   /* Basic layout parameters. */
-  --sidebar-width: 300px;
+  --sidebar-width: 330px;
 }
 
 body, table, div, p, dl {
@@ -28,6 +35,63 @@ body, table, div, p, dl {
   color: var(--dark);
 }
 
+a, a.el {
+  color: var(--link-color) !important;
+}
+
+.title {
+	font-family: 'Roboto Slab', serif !important;
+	font-size: 22px;
+	color: #2c2c2c;
+}
+
+h1 {
+	font-size: 22px;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Roboto Slab', serif;
+  margin-top: 2em;
+  margin-bottom: 1em;
+	color: #404040;
+}
+
+ul {
+	padding-left: 2em;
+}
+
+p, li {
+	font-size: 16px;
+	font-weight: normal;
+	color: #404040;
+	line-height: 24px;
+}
+
+/* ====
+ * Code
+ * ====
+ *
+ * Inline code and code fragments.
+ */
+
+code {
+  font-family: monospace;
+	display: inline;
+	background-color: #e7e7e7;
+	border-radius: 0.2em;
+	margin-left: 0.2em;
+	margin-right: 0.2em;
+	padding-left: 0.3em;
+	padding-right: 0.3em;
+	color: #333;
+}
+a.code, a.code:visited, a.line, a.line:visited {
+	color: #4665A2;
+}
+div.line {
+  font-family: monospace, fixed !important;
+  font-size: 14px;
+}
 
 /* ======
  * Header
@@ -44,6 +108,11 @@ body, table, div, p, dl {
   /* Make the header flush with the sidebar so it takes up less space. */
   float: left;
   width: var(--sidebar-width);
+}
+
+/* Remove the bottom-border line on the header section. */
+#titlearea {
+  border-bottom: none;
 }
 
 /* Make the header "table" stack each table entry vertically. */
@@ -161,12 +230,18 @@ body, table, div, p, dl {
  * the page and the project header. */
 #side-nav {
   padding: 0px 0px 0px 0px;
+
+  width: var(--sidebar-width);
  }
 
 /* Prevent horizontal scrollbars on the sidebar. */
 #nav-tree {
   overflow-x: hidden!important;
   background: var(--navtree-bg);
+
+  /* Make the nav-tree stick out beneath the content page, to hide the vertical
+   * scrollbar. */
+  width: calc(100% + 30px);
 }
 
 /* Hide the resizable handle for the sidebar. */
@@ -192,43 +267,119 @@ body, table, div, p, dl {
   background-color: var(--leap-green);
 }
 
+/* Override navbar items' font and color. */
+.label a {
+	font-size: 14px;
+  font-family: var(--main-font-family);
+  color: var(--dark) !important;
+}
+
+/* Also ensure the currently-selected navbar link is white. */ 
+#nav-tree .selected a {
+	color: #fff !important;
+}
 
 
-/* ============
- * Page Content
- * ============
- *
- * Markdown-generated guide content and auto-generated API documentation HTML.
- */
+ /* ============
+  * Page Content
+  * ============
+  *
+  * Markdown-generated guide content and auto-generated API documentation HTML.
+  */
 
  body {
-   background-color: var(--content-bg);
+   background-color: var(--body-bg);
  }
  #doc-content {
-   max-width: 60em;
-   margin-left: auto !important;
-   margin-right: auto;
-   background-color: var(--content-bg);
+   background-color: var(--body-bg);
  }
 
+ /* resizeoverrides.js initializes an alternative documentation-content
+  * container: #doc-content-container, a div that wraps around #doc-content.
+  * Resize events are shifted to target the container instead, so we clear flow-
+  * related style from #doc-content and apply it to #doc-content-container
+  * instead. */
+#doc-content {
+  height: auto !important;
+  margin-left: 0px !important;
+  overflow: inherit;
+}
+#doc-content-container {
+  overflow: auto;
+  position: relative;
+}
 
-/* div.title, div.dynheader, div.dyncontent, table.memberdecls, {
-	max-width: 60em;
-	margin-left: auto;
-	margin-right: auto;
-} */
+ /* With the doc-content now nested inside a container that can span the 
+  * page and keep the scroll-bar on the right, we can cap the width of 
+  * doc-content itself to make it stick to about a single page's width. */
+#doc-content {
+  max-width: 52em;
+  margin-right: auto;
+  padding: 3em 4em 3em 4em;
+}
 
- /* Remove gradients and various default effects on info boxes in generated
-  * docs. */
+ /* We also want to align the headers and paragraphs along a single line in the
+  * main content of the page. */
+div.headertitle {
+  padding-left: 0px;
+}
+div.contents {
+  margin-left: 0px;
+  margin-right: 0px;
+}
+
+/* Finally, adjust background colors for the content elements. */
+#doc-content-container {
+  background-color: var(--body-bg);
+}
+#doc-content {
+  background-color: var(--content-bg);
+}
+div.header {
+  background-color: inherit;
+  background-image: none;
+}
+
+
+/* Remove gradients and various default effects on info boxes in generated
+ * docs. */
+.memproto, dl.reflist dt {
+  background-color: var(--member-header-bg);
+  border-top: 1px solid var(--border-color);
+  border-left: 1px solid var(--border-color);
+  border-right: 1px solid var(--border-color);
+ }
+.memdoc, dl.reflist dd {
+  border-bottom: 1px solid var(--border-color);
+  border-left: 1px solid var(--border-color);
+  border-right: 1px solid var(--border-color);
+ }
+.fieldtable th {
+  background-color: var(--member-header-bg);
+  border-bottom: 1px solid var(--border-color);
+}
+.fieldtable {
+  border: 1px solid var(--border-color) !important;
+}
+.fieldtable td.fieldtype, .fieldtable td.fieldname {
+	white-space: nowrap;
+	border-right: 1px solid var(--border-color);
+	border-bottom: 1px solid var(--border-color);
+	vertical-align: top;
+}
+.fieldtable td.fielddoc {
+	border-bottom: 1px solid var(--border-color);
+}
 .memdoc {
   background-color: var(--content-bg);
+}
+.memproto {
+	border-bottom: var(--border-color);
+	border-bottom-style: solid;
+	border-bottom-width: thin;
 }
 .memproto, .fieldtable th {
-  border-top: #b7b7b7;
-  border-right: #b7b7b7;
-  border-left: #b7b7b7;
   color: #000;
-  background-color: var(--content-bg);
   background-image: none!important;
   box-shadow: none!important;
 }
@@ -236,20 +387,26 @@ body, table, div, p, dl {
   box-shadow: none!important;
   background-image: none!important;
 }
+.memproto, dl.reflist dt { text-shadow: none; }
 .memitem.glow { box-shadow: none!important; }
 table.fieldtable { box-shadow: none!important; }
 span.lineno {
   border-right: none!important;
 }
-div.header {
-	background-image: none;
-	background-color: var(--content-bg);
-	margin: 0px;
-	border-bottom: 1px solid #D6E5C4;
+h1.glow, h2.glow, h3.glow, h4.glow, h5.glow, h6.glow {
+  text-shadow: none!important;
 }
-div.contents table tbody tr,
-div.contents table tbody tr td {
-	background-color: var(--content-bg);
+.mdescLeft, .mdescRight, .memItemLeft, .memItemRight, .memTemplItemLeft,
+.memTemplItemRight, .memTemplParams {
+	background-color: inherit;
+}
+span.mlabel {
+  background-color: var(--leap-green);
+  border: none;
+}
+.memItemRight code {
+	padding: 0px;
+	padding-right: 0.7em;
 }
 
 /* ======

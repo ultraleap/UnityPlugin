@@ -2,6 +2,12 @@
 
 foo
 
+# Graphic Renderer + Interaction Engine {#gr-plus-ie}
+
+**Q: Can I use the Graphic Renderer with the Interaction Engine? If I curve the graphics of InteractionBehaviours like buttons and sliders, will I still be able to interact with them?**
+
+A: Yes, and yes! Every feature of the Graphic Renderer -- particularly curved spaces -- is compatible with the Interaction Engine. Check out the [Button Builder][buttonbuilder], an example project we put together that demonstrates how the two systems can work in parallel.
+
 # FAQ {#graphic-renderer-faq}
 
 **Q: My objects are not moving/rotating/scaling in play mode, even though I can translate/rotate/scale them in edit mode!**
@@ -32,11 +38,7 @@ The layer of the graphic is not taken into account by the graphic renderer, sinc
 
 Make sure that *all* of your sprites are packed into the same sprite atlas.  They will need to have the same packing tag, and the same settings.  In addition, the current version of unity has a bug involving sprites and atlases, so you might need to enter/exit playmode a few times before they become visible.
 
-**Q: Can I use the Graphic Renderer with the Interaction Engine? If I curve the graphics of InteractionBehaviours like buttons and sliders, will I still be able to interact with them?**
-
-A: Yes, and yes! Every feature of the Graphic Renderer -- particularly curved spaces -- is compatible with the Interaction Engine. Check out the [Button Builder][buttonbuilder], an example project we put together that demonstrates how the two systems can work in parallel.
-
-## Got a question not answered here? #{need-more-help}
+# Got a question not answered here?
 
 Head over to [the developer forum][devforum] and post your question! We'll see how we can help.
 
