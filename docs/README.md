@@ -12,6 +12,10 @@ Run `doxygen` in this folder (`/docs`).
 
 Documentation will be generated into a folder called `html`. The `index.html` file will redirect to the `html/index.html` file, which is the *actual* landing page.
 
+## Publishing the docs
+
+Replace the contents of the branch `gh-pages` with the contents of the doxygen output, which is configured to dump its output into an `html` folder in this directory. (GitHub Pages is configured to statically serve the contents of the root directory in the `gh-pages` branch.)
+
 ## Optional: Dot adds cool diagrams
 
 On macOS,

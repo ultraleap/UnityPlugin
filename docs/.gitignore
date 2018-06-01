@@ -1,0 +1,4 @@
+// Ignore html output from doxygen.
+// (To publish the output, copy it and replace the contents in the root of the
+// Github Pages branch, `gh-pages`.)
+./html/*
