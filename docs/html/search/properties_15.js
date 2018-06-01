@@ -1,0 +1,13 @@
+var searchData=
+[
+  ['value',['Value',['../class_leap_1_1_set_config_response_event_args.html#a2d7e8cd2081ad3db5aa8e597557123e9',1,'Leap.SetConfigResponseEventArgs.Value()'],['../class_leap_1_1_unity_1_1_multi_typed_reference.html#afe3b23c25bde34a38670cefdf387ac60',1,'Leap.Unity.MultiTypedReference.Value()'],['../class_leap_1_1_unity_1_1_multi_typed_reference.html#a5c85b4421012bd10c63fac1162244327',1,'Leap.Unity.MultiTypedReference.Value()'],['../class_leap_1_1_unity_1_1_graphical_renderer_1_1_custom_channel_data_base.html#a4fc7f59e3113e19697159919a5aad095',1,'Leap.Unity.GraphicalRenderer.CustomChannelDataBase.value()']]],
+  ['valueordefault',['valueOrDefault',['../struct_leap_1_1_unity_1_1_maybe.html#a94e921f48bc991390157a2f99720a567',1,'Leap::Unity::Maybe']]],
+  ['values',['Values',['../class_leap_1_1_unity_1_1_serializable_dictionary.html#aadbe924e77b18574adee6b1356aebc1b',1,'Leap::Unity::SerializableDictionary']]],
+  ['velocity',['velocity',['../class_leap_1_1_unity_1_1_examples_1_1_spaceship.html#a657f2be2faad1298aeefc486884ce193',1,'Leap.Unity.Examples.Spaceship.velocity()'],['../class_leap_1_1_unity_1_1_interaction_1_1_interaction_controller.html#a83c89a07dd158f3b07c5ae7c0b1c4757',1,'Leap.Unity.Interaction.InteractionController.velocity()'],['../class_leap_1_1_unity_1_1_interaction_1_1_interaction_hand.html#a6a71cb0a137dd5e08f2717b17fd6b62b',1,'Leap.Unity.Interaction.InteractionHand.velocity()'],['../class_leap_1_1_unity_1_1_interaction_1_1_interaction_x_r_controller.html#a6a71cb0a137dd5e08f2717b17fd6b62b',1,'Leap.Unity.Interaction.InteractionXRController.velocity()']]],
+  ['version',['Version',['../class_leap_1_1_distortion_data.html#a93dfd96d731c8f1e791c7c2004ebbeb3',1,'Leap::DistortionData']]],
+  ['verticalalignment',['verticalAlignment',['../class_leap_1_1_unity_1_1_graphical_renderer_1_1_leap_text_graphic.html#ac93ec47dd3daea0f6ff1ab308ab5c10f',1,'Leap::Unity::GraphicalRenderer::LeapTextGraphic']]],
+  ['verticalsliderpercent',['VerticalSliderPercent',['../class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider.html#aeee6b9c39e9ab5106ac0c72bd17bf3cb',1,'Leap::Unity::Interaction::InteractionSlider']]],
+  ['verticalslidervalue',['VerticalSliderValue',['../class_leap_1_1_unity_1_1_interaction_1_1_interaction_slider.html#a6c140d134a9abb4b034a638cc2c97f32',1,'Leap::Unity::Interaction::InteractionSlider']]],
+  ['verticalviewangle',['VerticalViewAngle',['../class_leap_1_1_device.html#af913be3da04db2be4bc91d3c0218ae45',1,'Leap::Device']]],
+  ['visualizebasis',['VisualizeBasis',['../class_leap_1_1_unity_1_1_debug_hand.html#a7e6bb5a949822325c3aca68af4348eea',1,'Leap::Unity::DebugHand']]]
+];
