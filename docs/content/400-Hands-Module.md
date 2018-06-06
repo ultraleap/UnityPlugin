@@ -1,6 +1,6 @@
 # Hands Module {#hands-module}
 
-**Editor's Note:** This article is re-printed from a [blog post][hands-module-blog-post] documenting the Hands Module shortly after its release. It is still up-to-date, as the Hands Module's workflow has not changed significantly since its publication.
+_**Editor's Note:** This article is re-printed from a [blog post][hands-module-blog-post] documenting the Hands Module shortly after its release. It is still up-to-date, as the Hands Module's workflow has not changed significantly since its publication._
 
 [hands-module-blog-post]: http://blog.leapmotion.com/hands-module-2-0-bring-your-hand-designs-to-life-in-two-minutes-or-less/ 
 
