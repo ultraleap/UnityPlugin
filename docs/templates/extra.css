@@ -303,6 +303,11 @@ div.line {
   height: auto !important;
   margin-left: 0px !important;
   overflow: inherit;
+
+  /* In cases where there isn't much page content, we still want the white
+   * area of the page to extend to the bottom of the browser window.
+   * (There probably is a better way to do this...) */
+  min-height: calc(100% - 84px);
 }
 #doc-content-container {
   overflow: auto;
