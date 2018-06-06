@@ -1,4 +1,6 @@
-// Ignore html output from doxygen.
+// Ignore html output from doxygen, and any .tmp files from generation.
 // (To publish the output, copy it and replace the contents in the root of the
 // Github Pages branch, `gh-pages`.)
-./html/*
+
+html/*
+*.tmp
