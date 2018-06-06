@@ -39,9 +39,8 @@ If you're not seeing hands in your Unity application, check the following first:
 
 - If you're using a custom camera or controller rig, check your application's scene hierarchy while your hand is in front of the sensor. Make sure the hand isn't simply being rendered in the wrong place relative to your camera. Additionally, double-check you have your rig is set up correct: @ref xr-rig-setup.
 
-- Check the Leap Motion icon in your task bar, which you'll have if you've installed the service from the [developer SDK][devsdk] for your platform. . If it's dark, the Leap service isn't sending any data. Double-check your Leap Motion hardware is plugged in, and check that the Leap Motion service is running.
+- Check the Leap Motion icon in your task bar, which you'll have if you've installed the service from the [developer SDK][devsdk] for your platform. If it's dark, the Leap service isn't sending any data. Double-check your Leap Motion hardware is plugged in, and check that the Leap Motion service is running.
 
 - Open the Leap Motion Visualizer from the right-click menu of the Leap Motion icon in your task bar. If you see hands in the Visualizer, the problem is mostly likely somewhere in Unity; otherwise, the problem is outside Unity.
 
 [devsdk]: https://developer.leapmotion.com/get-started/ "Leap Motion Developer SDK"
-[devforum]: https://community.leapmotion.com/c/development "Leap Motion Developer Forums"
