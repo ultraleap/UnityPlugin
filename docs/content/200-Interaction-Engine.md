@@ -1,22 +1,26 @@
 # Interaction Engine {#interaction-engine}
 
-The Interaction Engine allows users to work with your VR application by interacting with *physical* or *pseudo-physical* objects. Whether a baseball, a [block][blocks], a virtual trackball, a button on an interface panel, or a hologram with more complex affordances, if there are objects in your application you need your user to be able to **hover near**, **touch**, or **grasp** in some way, the Interaction Engine can do some or all of that work for you.
+The Interaction Engine allows users to work with your VR application by interacting with *physical* or *pseudo-physical* objects. Whether a baseball, a [block][blocks], a virtual trackball, a button on an interface panel, or a hologram with more complex affordances, if there are objects in your application you need your user to be able to **hover** near, **touch**, or **grasp** in some way, the Interaction Engine can do some or all of that work for you.
 
 You can find latest stable Interaction Engine package [on our developer site][devsite].
 
-**The Interaction Engine requires Unity 5.6 or later.**
-
-If you take a look at the examples that come with the package, you'll notice some common patterns that are good to follow when building things with the Interaction Engine.
+For a quick look at what the Interaction Engine can do, we recommend importing the package into your Unity project (don't forget Core as well!) and checking out the included example scenes, documented further down below. For an in-depth review of features in the Interaction Engine, keep reading!
 
 # The basic components of interaction {#ie-basic-components}
 
-- "Interaction objects" are GameObjects with an attached @ref InteractionBehaviour. They require a Rigidbody and at least one Collider.
-- The @ref InteractionManager receives FixedUpdate from Unity and handles all the internal logic that makes interactions possible, including updating hand/controller data and interaction object data. **You need one of these in your scene for interaction objects to function!** A good place for it is right underneath your player's top-level camera rig object (not the camera itself, but its parent).
-- Each @ref InteractionController does all the actual _interacting_ with interaction objects, whether by picking them up, touching them, hitting them, or just being near them. This object could be the user's hand by way of the @ref InteractionHand component, or a VR Controller (e.g. Oculus Touch or Vive controller) if it uses the @ref InteractionXRController component. Interaction controllers **should sit beneath the Interaction Manager in the hierarchy** -- see the diagram below.
+- "Interaction objects" are GameObjects with an attached [InteractionBehaviour][ref_InteractionBehaviour]. They require a Rigidbody and at least one Collider.
+- The [InteractionManager][ref_InteractionManager] receives FixedUpdate from Unity and handles all the internal logic that makes interactions possible, including updating hand/controller data and interaction object data. **You need one of these in your scene for interaction objects to function!** A good place for the manager is right underneath your player's top-level camera rig transform (that is, not the player's camera itself, but its parent).
+- Each [InteractionController][ref_InteractionController] does all the actual _interacting_ with interaction objects, whether by picking them up, touching them, hitting them, or just being near them. This object could be the user's hand by way of the [InteractionHand][ref_InteractionHand] component, or a VR Controller (e.g. Oculus Touch or Vive controller) if it uses the [InteractionXRController][ref_InteractionXRController] component. Interaction controllers **must sit beneath the Interaction Manager in the hierarchy** to function -- see the diagram below.
+
+[ref_InteractionBehaviour]: @ref Leap.Unity.Interaction.InteractionBehaviour
+[ref_InteractionManager]: @ref Leap.Unity.Interaction.InteractionManager
+[ref_InteractionController]: @ref Leap.Unity.Interaction.InteractionController
+[ref_InteractionHand]: @ref Leap.Unity.Interaction.InteractionHand
+[ref_InteractionXRController]: @ref Leap.Unity.Interaction.InteractionXRController
 
 ![](http://blog.leapmotion.com/wp-content/uploads/2017/07/IESetupDiagram.png)
 
-Interaction objects may or may not live inside the player's camera rig depending on whether or not they should move with the player. Interaction controllers, _including_ Interaction Hands, always live underneath the Interaction Manager, and the Interaction Manager should be a sibling of the camera object.
+Interaction objects can live anywhere in your scene, as long as you have an InteractionManager active. Interaction controllers, on the other hand, always need to live underneath the Interaction Manager in order to function, and the Interaction Manager should always be a sibling of the camera object, so that controllers don't inherit strange velocities if the player's rig is moved around.
 
 # Just add InteractionBehaviour! {#ie-just-add-interactionbehaviour}
 
@@ -24,8 +28,6 @@ When you add an [InteractionBehaviour][ref_InteractionBehaviour] component to an
 
 - If it didn't have one before, the object will gain a [Rigidbody][rigidbody] component with gravity enabled, making it a physically-simulated object governed by Unity's PhysX engine. If your object doesn't have a [Collider][collider], it will fall through the floor!
 - Assuming you have an Interaction Manager with one or more interaction controllers beneath it, you'll be able to pick up, poke, and smack the object with your hands or VR controller.
-
-[ref_InteractionBehaviour]: @ref Leap.Unity.Interaction.InteractionBehaviour
 
 The first example in the Interaction Engine package showcases the default behavior of a handful of different objects when they first become interaction objects.
 
