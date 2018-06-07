@@ -10,7 +10,7 @@ For a quick look at what the Interaction Engine can do, we recommend importing t
 
 - "Interaction objects" are GameObjects with an attached [InteractionBehaviour][ref_InteractionBehaviour]. They require a Rigidbody and at least one Collider.
 - The [InteractionManager][ref_InteractionManager] receives FixedUpdate from Unity and handles all the internal logic that makes interactions possible, including updating hand/controller data and interaction object data. **You need one of these in your scene for interaction objects to function!** A good place for the manager is right underneath your player's top-level camera rig transform (that is, not the player's camera itself, but its parent).
-- Each [InteractionController][ref_InteractionController] does all the actual _interacting_ with interaction objects, whether by picking them up, touching them, hitting them, or just being near them. This object could be the user's hand by way of the [InteractionHand][ref_InteractionHand] component, or a VR Controller (e.g. Oculus Touch or Vive controller) if it uses the [InteractionXRController][ref_InteractionXRController] component. Interaction controllers **must sit beneath the Interaction Manager in the hierarchy** to function -- see the diagram below.
+- Each [InteractionController][ref_InteractionController] does all the actual _interacting_ with interaction objects, whether by picking them up, touching them, hitting them, or just being near them. This object could be the user's hand by way of the [InteractionHand][ref_InteractionHand] component, or an XR Controller (e.g. Oculus Touch or Vive controller) if it uses the [InteractionXRController][ref_InteractionXRController] component. Interaction controllers **must sit beneath the Interaction Manager in the hierarchy** to function.
 
 [ref_InteractionBehaviour]: @ref Leap.Unity.Interaction.InteractionBehaviour
 [ref_InteractionManager]: @ref Leap.Unity.Interaction.InteractionManager
@@ -18,7 +18,7 @@ For a quick look at what the Interaction Engine can do, we recommend importing t
 [ref_InteractionHand]: @ref Leap.Unity.Interaction.InteractionHand
 [ref_InteractionXRController]: @ref Leap.Unity.Interaction.InteractionXRController
 
-![](http://blog.leapmotion.com/wp-content/uploads/2017/07/IESetupDiagram.png)
+![A basic XR rig with the Interaction Engine.](@ref images/Basic_Components_of_Interaction.png)
 
 Interaction objects can live anywhere in your scene, as long as you have an InteractionManager active. Interaction controllers, on the other hand, always need to live underneath the Interaction Manager in order to function, and the Interaction Manager should always be a sibling of the camera object, so that controllers don't inherit strange velocities if the player's rig is moved around.
 
@@ -27,7 +27,7 @@ Interaction objects can live anywhere in your scene, as long as you have an Inte
 When you add an [InteractionBehaviour][ref_InteractionBehaviour] component to an object, a couple of things happen automatically:
 
 - If it didn't have one before, the object will gain a [Rigidbody][rigidbody] component with gravity enabled, making it a physically-simulated object governed by Unity's PhysX engine. If your object doesn't have a [Collider][collider], it will fall through the floor!
-- Assuming you have an Interaction Manager with one or more interaction controllers beneath it, you'll be able to pick up, poke, and smack the object with your hands or VR controller.
+- Assuming you have an Interaction Manager with one or more interaction controllers beneath it, you'll be able to pick up, poke, and smack the object with your hands or XR controller.
 
 The first example in the Interaction Engine package showcases the default behavior of a handful of different objects when they first become interaction objects.
 
@@ -47,7 +47,7 @@ If you haven't already, import @ref core and the Interaction Engine into your Un
 
 ## Update the Physics timestep and gravity!
 
-Unity's physics engine has a "fixed timestep," and that timestep is not always in sync with the graphics frame rate. It is very important that you set the physics timestep to be the same as the rendering frame rate. If you are building for an Oculus or Vive, this means that your physics timestep should be `0.0111111` (corresponding to 90 frames per second). This is configured via `Edit -> Project Settings -> Time`. For more details on this process, visit [[Scripting Interaction Objects | Scripting Interaction Objects]]
+Unity's physics engine has a "fixed timestep," and that timestep is not always in sync with the graphics frame rate. It is very important that you set the physics timestep to be the same as the rendering frame rate. If you are building for an Oculus or Vive, this means that your physics timestep should be `0.0111111` (corresponding to 90 frames per second). This is configured via `Edit -> Project Settings -> Time`.
 
 Additionally, we've found that setting your gravity to half its real-world scale (-4.905 on the Y axis instead of -9.81) produces a better feeling when working with physical objects. We strongly recommend setting your gravity in this way; you can change it in `Edit -> Project Settings -> Physics`.
 
@@ -56,13 +56,13 @@ Additionally, we've found that setting your gravity to half its real-world scale
 If you don't already have a Leap-enabled XR camera rig to your scene, you can follow these steps:
 - Open a new scene and delete the `Main Camera` object. (We'll set up our own.)
 - Drag the **Leap Rig** prefab into your scene: `LeapMotion/Core/Prefabs`.
-- Drag the **Interaction Manager** prefab into your camera rig: `LeapMotion/Modules/Interaction/Prefabs`.
+- Drag the **Interaction Manager** prefab into your camera rig: `LeapMotion/Modules/InteractionEngine/Prefabs`.
 
 If you aren't familiar with Leap-enabled XR rigs, check out @ref xr-rig-setup.
 
 It is possible to use a custom camera rig in combination with Leap Motion. If you'd like to use something other than the **Leap Rig** prefab, you should make sure you have a camera tagged MainCamera in your scene, and that it has children with the same components and linkages that you can find beneath the Camera object in the **Leap Rig** prefab. Note that the Interaction Engine on its own does not render hands, it only instantiates physical representations of hands.
 
-Generally, it's a good idea to keep your scene organized. At Leap, we tend to put player-centric scripts in GameObjects as siblings of the Main Camera object. For example, the AttachmentHands script offers a convenient way to attach arbitrary objects to any of the joints in a Leap hand representation, and it belongs in such a sibling GameObject. To create AttachmentHands for use in your scene, you would:
+At Leap, we tend to put player-centric scripts in dedicated GameObjects that are siblings of the Main Camera object. For example, the AttachmentHands script offers a convenient way to attach arbitrary objects to any of the joints in a Leap hand representation, and it belongs in such a sibling GameObject. To create AttachmentHands for use in your scene, you would:
 - Create a new GameObject in your scene
 - Rename it `Attachment Hands`
 - Drag it into the Rig object so that it sits beneath your Rig object
@@ -72,7 +72,7 @@ Generally, it's a good idea to keep your scene organized. At Leap, we tend to pu
 
 If you intend to use the Interaction Engine with Oculus Touch or Vive controllers, you'll need to configure your project's input settings before you'll be able to use the controllers to grasp objects. Input settings are project settings that cannot be changed by imported packages, which is why we can't configure these input settings for you. You can skip this section if you are only interested in using Leap hands with the Interaction Engine.
 
-Go to your Input Manager (`Edit->Project Settings->Input`) and set up the joystick axes you'd like to use for left-hand and right-hand grasps. (Controller triggers are still referred to as 'joysticks' in Unity's parlance.) Then make sure each InteractionVRController has its grasping axis set to the corresponding axis you set up. The default prefabs for left and right InteractionVRControllers will look for axes named `LeftVRTriggerAxis` and `RightVRTriggerAxis`, respectively.
+Go to your Input Manager (`Edit->Project Settings->Input`) and set up the joystick axes you'd like to use for left-hand and right-hand grasps. (Controller triggers are still referred to as 'joysticks' in Unity's parlance.) Then make sure each InteractionXRController has its grasping axis set to the corresponding axis you set up. The default prefabs for left and right InteractionXRControllers will look for axes named `LeftXRTriggerAxis` and `RightXRTriggerAxis`, respectively.
 
 Helpful diagrams and axis labels can be found in [Unity's documentation][unity-docs-openvr-controllers].
 
@@ -80,9 +80,9 @@ Helpful diagrams and axis labels can be found in [Unity's documentation][unity-d
 
 # Check out the examples {#ie-examples}
 
-The examples folder (`LeapMotion/Modules/Interaction/Examples`) contains a series of example scenes that demonstrate the features of the Interaction Engine.
+The examples folder (`LeapMotion/Modules/InteractionEngine/Examples`) contains a series of example scenes that demonstrate the features of the Interaction Engine.
 
-Most of the examples can be played using Leap hands via the Leap Motion Controller *or* using any VR controller that Unity provides built-in support for, such as Oculus Touch controllers or Vive controllers.
+Many of the examples can be used with Leap hands via the Leap Motion Controller *or* with any XR controller that Unity provides built-in support for, such as Oculus Touch controllers or Vive controllers.
 
 ## Example 1: Interaction Objects 101
 
@@ -92,9 +92,9 @@ Most of the examples can be played using Leap hands via the Leap Motion Controll
 
 The Interaction Objects example shows the default behavior of interaction objects when they first receive their InteractionBehaviour component.
 
-Reach out with your hands or your VR controller and play around with the objects in front of you to get a sense of how the default physics of interaction objects feels. In particular, you should notice that objects don't jitter or explode, even if you attempt to crush them or pull on the constrained objects in various directions.
+Reach out with your hands or your XR controller and play around with the objects in front of you to get a sense of how the default physics of interaction objects feels. In particular, you should see that objects don't jitter or explode, even if you attempt to crush them or pull on the constrained objects in various directions.
 
-On the right side of this scene are floating objects that have been marked **kinematic** and that have `ignoreGrasping` and `ignoreContact` set to `true` on their InteractionBehaviours. These objects have a simple script attached to them that causes them to glow when hands are nearby -- but due to their interaction settings, they will only receive hover information, and cannot be grasped. Note that Rigidbodies collide against these objects even though they have `ignoreContact` set to true -- this setting applies only against interaction controllers, not for arbitrary Rigidbodies.
+On the right side of this scene are floating objects that have been marked **kinematic** and that have `ignoreGrasping` and `ignoreContact` set to `true` on their InteractionBehaviours. These objects have a simple script attached to them that causes them to glow when hands are nearby -- but due to their interaction settings, they will only receive hover information, and cannot be grasped. Note that Rigidbodies collide against these objects even though they have `ignoreContact` set to true -- this setting applies only against interaction controllers, not for arbitrary Rigidbodies. In general, we use **Contact** to refer specifically to the contact-handling subsystem in the Interaction Engine between interaction controllers (e.g. hands) and interaction objects (e.g. cubes).
 
 ## Example 2: Basic UI in the Interaction Engine
 
@@ -102,9 +102,12 @@ On the right side of this scene are floating objects that have been marked **kin
 
 [BasicUIExample]: http://blog.leapmotion.com/wp-content/uploads/2017/06/BasicUIExample.gif
 
-Interacting with interface elements is a very particular _kind_ of interaction, but in VR, we find these interactions to make the most sense to users when they are provided physical metaphors and familiar mechanisms. Thus, we've built a small set of fine-tuned InteractionBehaviours (that will continue to grow!) that deal with this extremely common use-case: The InteractionButton, and the InteractionSlider.
+Interacting with interface elements is a very particular _kind_ of interaction, but in VR, we find these interactions to make the most sense to users when they are provided physical metaphors and familiar mechanisms. Thus, we've built a small set of fine-tuned InteractionBehaviours (that will continue to grow!) that deal with this extremely common use-case: The [Interaction Button][ref_InteractionButton], and the [Interaction Slider][ref_InteractionSlider].
 
-Try manipulating this interface in various ways, including ways that it doesn't expect to be used. You should find that even clumsy users will be able to push only one button at a time: Fundamentally, **user interfaces in the Interaction Engine only allow the 'primary hovered' interaction object to be manipulated or triggered at any one time**. This is a soft constraint; primary hover data is exposed through the InteractionBehaviour API for any and all interaction objects for which **hovering** is enabled, and the InteractionButton script enforces the constraint by disabling contact when it is not 'the primary hover' of an interaction controller.
+[ref_InteractionButton]: @ref Leap.Unity.Interaction.InteractionButton
+[ref_InteractionSlider]: @ref Leap.Unity.Interaction.InteractionSlider
+
+Try manipulating this interface in various ways, including ways that it doesn't expect to be used. You should find that even clumsy users will be able to push only one button at a time: Fundamentally, _user interfaces in the Interaction Engine only allow the 'primary hovered' interaction object to be manipulated or triggered at any one time_. This is a soft constraint; primary hover data is exposed through the [InteractionBehaviour's API][ref_InteractionBehaviour] for any and all interaction objects for which **hovering** is enabled, and the InteractionButton enforces the constraint by disabling contact when it is not 'the primary hover' of an interaction controller.
 
 ## Example 3: Interaction Callbacks for Handle-type Interfaces
 
@@ -112,7 +115,7 @@ Try manipulating this interface in various ways, including ways that it doesn't 
 
 [InteractionCallbacksExample]: http://blog.leapmotion.com/wp-content/uploads/2017/06/InteractionCallbacksExample.gif
 
-The Interaction Callbacks example features a set of interaction objects that collectively form a basic Transform Tool the user may use at runtime to manipulate the position and rotation of an object. These interaction objects ignore contact, reacting only to grasping controllers and controller proximity through hovering. Instead of allowing themselves to be moved directly by grasping hands, these objects report information to their managing TransformTool object, which orchestrates the overall motion of the target object and each handle at the end of every frame.
+The Interaction Callbacks example features a set of interaction objects that collectively form a basic Transform Tool the user may use at runtime to manipulate the position and rotation of an object. These interaction objects ignore contact, reacting only to grasping controllers and controller proximity through hovering. Instead of allowing themselves to be moved directly by grasping hands, these objects cancel out and report the grasped movement from controllers to their managing TransformTool object, which orchestrates the overall motion of the target object and each handle at the end of every frame.
 
 ## Example 4: Attaching Interfaces to the User's Hand
 
@@ -120,7 +123,7 @@ The Interaction Callbacks example features a set of interaction objects that col
 
 [HandUIExample]: http://blog.leapmotion.com/wp-content/uploads/2017/06/HandUIExample.gif
 
-Simple applications may want to place an interface directly attached to the user's hands so core functionalities are always within arm's reach. This example demonstrates that concept by animating one such interface into view when the user looks at their own palm (or the belly of their VR controller; this may be better mapped to a VR controller button!).
+Simple applications may want to attach an interface directly to a user's hand so that certain important functionalities are always within arm's reach. This example demonstrates this concept by animating one such interface into view when the user looks at their left palm (or the belly of their XR controller; in the controller case, it may be better to map such a menu to an XR controller button!).
 
 ## Example 5: Building on Interaction Objects with Anchors
 
@@ -136,11 +139,15 @@ The AnchorableBehaviour, Anchor, and AnchorGroup components constitute an option
 
 [DynamicUIExample]: http://blog.leapmotion.com/wp-content/uploads/2017/06/DynamicUIExample.gif
 
-InteractionButtons and InteractionSliders are useful on their own, but they become truly powerful tools in your UI toolkit when combined with Anchors, and Core utilities like the AttachmentHands and the Tween library to allow the user to carry around entire physical interfaces on their person in VR. This example combines all of these components to demonstrate using the Interaction Engine to build a set of portable VR interfaces.
+InteractionButtons and InteractionSliders are useful on their own, but they become truly powerful tools in your UI toolkit when combined with Anchors, and Core utilities like the AttachmentHands and the Tween library to allow the user to carry around entire physical interfaces on their person in XR spaces. This example combines all of these components to demonstrate using the Interaction Engine to build a set of portable XR interfaces.
 
 ## Example 7: Moving Reference Frames
 
-The Interaction Engine keeps your interfaces working even while the player is being translated and rotated. Make sure your player moves during FixedUpdate, before the Interaction Engine performs its own FixedUpdate. Also make sure the Interaction Manager object moves with the player -- this is most easily accomplished by placing it beneath your player object in the hierarchy. This example demonstrates a working configuration you can reference for your own application.
+The Interaction Engine keeps your interfaces working even while the player is being translated and rotated. Make sure your player moves during FixedUpdate, before the Interaction Engine performs its own FixedUpdate. You'll also need to make sure the Interaction Manager object moves with the player -- this is most easily accomplished by placing it beneath the player's rig Transform, as depicted in our [standard rig diagram][ie-basic-components] above.
+
+If you're not sure that your application is set up correctly for moving reference frame support, this example demonstrates a working configuration that you can reference.
+
+[ie-basic-components]: @ref ie-basic-components
 
 ## Example 8: Swap Grasp
 
