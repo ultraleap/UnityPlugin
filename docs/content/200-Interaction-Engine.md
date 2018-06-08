@@ -72,7 +72,7 @@ At Leap, we tend to put player-centric scripts in dedicated GameObjects that are
 
 If you intend to use the Interaction Engine with Oculus Touch or Vive controllers, you'll need to configure your project's input settings before you'll be able to use the controllers to grasp objects. Input settings are project settings that cannot be changed by imported packages, which is why we can't configure these input settings for you. You can skip this section if you are only interested in using Leap hands with the Interaction Engine.
 
-Go to your Input Manager (`Edit->Project Settings->Input`) and set up the joystick axes you'd like to use for left-hand and right-hand grasps. (Controller triggers are still referred to as 'joysticks' in Unity's parlance.) Then make sure each InteractionXRController has its grasping axis set to the corresponding axis you set up. The default prefabs for left and right InteractionXRControllers will look for axes named `LeftXRTriggerAxis` and `RightXRTriggerAxis`, respectively.
+Go to your Input Manager (`Edit -> Project Settings -> Input`) and set up the joystick axes you'd like to use for left-hand and right-hand grasps. (Controller triggers are still referred to as 'joysticks' in Unity's parlance.) Then make sure each InteractionXRController has its grasping axis set to the corresponding axis you set up. The default prefabs for left and right InteractionXRControllers will look for axes named `LeftXRTriggerAxis` and `RightXRTriggerAxis`, respectively.
 
 Helpful diagrams and axis labels can be found in [Unity's documentation][unity-docs-openvr-controllers].
 
@@ -86,9 +86,9 @@ Many of the examples can be used with Leap hands via the Leap Motion Controller 
 
 ## Example 1: Interaction Objects 101
 
-![][InteractionObjectsExample]
-
-[InteractionObjectsExample]: http://blog.leapmotion.com/wp-content/uploads/2017/06/InteractionObjectsExample.gif
+\htmlonly
+<video class="ie-example-video" src="Example_1_-_Interaction_Objects.webm" autoplay loop></video>
+\endhtmlonly
 
 The Interaction Objects example shows the default behavior of interaction objects when they first receive their InteractionBehaviour component.
 
@@ -98,9 +98,9 @@ On the right side of this scene are floating objects that have been marked **kin
 
 ## Example 2: Basic UI in the Interaction Engine
 
-![][BasicUIExample]
-
-[BasicUIExample]: http://blog.leapmotion.com/wp-content/uploads/2017/06/BasicUIExample.gif
+\htmlonly
+<video class="ie-example-video" src="Example_2_-_Basic_UI.webm" autoplay loop></video>
+\endhtmlonly
 
 Interacting with interface elements is a very particular _kind_ of interaction, but in VR, we find these interactions to make the most sense to users when they are provided physical metaphors and familiar mechanisms. Thus, we've built a small set of fine-tuned InteractionBehaviours (that will continue to grow!) that deal with this extremely common use-case: The [Interaction Button][ref_InteractionButton], and the [Interaction Slider][ref_InteractionSlider].
 
@@ -111,37 +111,41 @@ Try manipulating this interface in various ways, including ways that it doesn't 
 
 ## Example 3: Interaction Callbacks for Handle-type Interfaces
 
-![][InteractionCallbacksExample]
-
-[InteractionCallbacksExample]: http://blog.leapmotion.com/wp-content/uploads/2017/06/InteractionCallbacksExample.gif
+\htmlonly
+<video class="ie-example-video" src="Example_3_-_Interaction_Callbacks.webm" autoplay loop></video>
+\endhtmlonly
 
 The Interaction Callbacks example features a set of interaction objects that collectively form a basic Transform Tool the user may use at runtime to manipulate the position and rotation of an object. These interaction objects ignore contact, reacting only to grasping controllers and controller proximity through hovering. Instead of allowing themselves to be moved directly by grasping hands, these objects cancel out and report the grasped movement from controllers to their managing TransformTool object, which orchestrates the overall motion of the target object and each handle at the end of every frame.
 
 ## Example 4: Attaching Interfaces to the User's Hand
 
-![][HandUIExample]
-
-[HandUIExample]: http://blog.leapmotion.com/wp-content/uploads/2017/06/HandUIExample.gif
+\htmlonly
+<video class="ie-example-video" src="Example_4_-_Hand_UI.webm" autoplay loop></video>
+\endhtmlonly
 
 Simple applications may want to attach an interface directly to a user's hand so that certain important functionalities are always within arm's reach. This example demonstrates this concept by animating one such interface into view when the user looks at their left palm (or the belly of their XR controller; in the controller case, it may be better to map such a menu to an XR controller button!).
 
 ## Example 5: Building on Interaction Objects with Anchors
 
-![][AnchorsExample]
-
-[AnchorsExample]: http://blog.leapmotion.com/wp-content/uploads/2017/06/AnchorsExample.gif
+\htmlonly
+<video class="ie-example-video" src="Example_5_-_Anchors.webm" autoplay loop></video>
+\endhtmlonly
 
 The AnchorableBehaviour, Anchor, and AnchorGroup components constitute an optional set of scripts that are included with the Interaction Engine that build on the basic interactivity afforded by interaction objects. This example demonstrates all three of these components. AnchorableBehaviours integrate well with InteractionBehaviour components (they are designed to sit on the same GameObject) and allow an interaction object to be placed in Anchor points that can be defined anywhere in your scene.
 
 ## Example 6: Dynamic Interfaces: Interaction Objects, AttachmentHands, and Anchors
 
-![][DynamicUIExample]
-
-[DynamicUIExample]: http://blog.leapmotion.com/wp-content/uploads/2017/06/DynamicUIExample.gif
+\htmlonly
+<video class="ie-example-video" src="Example_6_-_Dynamic_UI.webm" autoplay loop></video>
+\endhtmlonly
 
 InteractionButtons and InteractionSliders are useful on their own, but they become truly powerful tools in your UI toolkit when combined with Anchors, and Core utilities like the AttachmentHands and the Tween library to allow the user to carry around entire physical interfaces on their person in XR spaces. This example combines all of these components to demonstrate using the Interaction Engine to build a set of portable XR interfaces.
 
 ## Example 7: Moving Reference Frames
+
+\htmlonly
+<video class="ie-example-video" src="Example_7_-_Moving_Reference_Frames.webm" autoplay loop></video>
+\endhtmlonly
 
 The Interaction Engine keeps your interfaces working even while the player is being translated and rotated. Make sure your player moves during FixedUpdate, before the Interaction Engine performs its own FixedUpdate. You'll also need to make sure the Interaction Manager object moves with the player -- this is most easily accomplished by placing it beneath the player's rig Transform, as depicted in our [standard rig diagram][ie-basic-components] above.
 
@@ -150,6 +154,10 @@ If you're not sure that your application is set up correctly for moving referenc
 [ie-basic-components]: @ref ie-basic-components
 
 ## Example 8: Swap Grasp
+
+\htmlonly
+<video class="ie-example-video" src="Example_8_-_Swap_Grasp.webm" autoplay loop></video>
+\endhtmlonly
 
 This example scene demonstrates the use of the [InteractionController][ref_InteractionController]'s SwapGrasp() method, which allows you to instantly swap an object that the user is holding for another. This is especially useful if you need objects to morph while the user is holding them.
 
@@ -167,7 +175,7 @@ Source: [this helpful chart from Unity][unity script callback order], via [the e
 
 **FixedUpdate** happens just before the physics engine "PhysX" updates and is where user physics logic goes! This is where you should modify the positions, rotations, velocities, and angular velocities of your Rigidbodies to your liking before the physics engine *does physics to them*.
 
-**FixedUpdate may happen 0 or more times per Update.** VR applications usually run at 90 frames per second to avoid sickening the user. Update runs once before the Camera in your scene renders what it sees to the screen or your VR headset. Unity's physics engine has a "fixed timestep" that is configured via Edit->Project Settings->Time. Here at Leap, we build applications with a fixed timestep of `0.0111111` to try and get a FixedUpdate to run once a frame, and this is the setting we recommend. But do note that FixedUpdate **is not** guaranteed to fire before every rendered frame, if your time-per-frame is less that your fixed timestep. Additionally, FixedUpdate may happen two or more times before a rendered frame: this will happen if you spend more than two fixed timesteps' worth of time on any one render frame (i.e. if you "drop a frame" because you tried to do too much work during one Update or FixedUpdate).
+**FixedUpdate may happen 0 or more times per Update.** VR applications usually run at 90 frames per second to avoid sickening the user. Update runs once before the Camera in your scene renders what it sees to the screen or your VR headset. Unity's physics engine has a "fixed timestep" that is configured via `Edit -> Project Settings -> Time`. At Leap, we build applications with a fixed timestep of `0.0111111` to try and get a FixedUpdate to run once a frame, and this is the setting we recommend. But do note that FixedUpdate is **not** guaranteed to fire before every rendered frame, if your time-per-frame is less that your fixed timestep. Additionally, FixedUpdate may happen two or more times before a rendered frame. This will happen if you spend more than two fixed timesteps' worth of time on any one render frame (i.e. if you "drop a frame" because you tried to do too much work during one Update or FixedUpdate).
 
 Naturally, because the Interaction Engine deals entirely in physics objects, **all interaction object callbacks occur during FixedUpdate**. While we're on the subject of potential gotchas, here are a few more gotchas when working with physics:
 
@@ -176,15 +184,17 @@ Naturally, because the Interaction Engine deals entirely in physics objects, **a
 
 # Custom layers for interaction objects {#ie-custom-layers}
 
-Have a custom object layer setup? No problem. Interaction objects need to switch between two layers at runtime: One to exist on when the object **can** collide with your hands (think "contact enabled"), and one to exist on when the object **can't** collide with your hands (When "contact disabled", and also when **grasping** the object).
+Have a custom object layer setup? No problem. Interaction objects need to switch between two layers at runtime:
+- The "Interaction" layer, used when the object **can** collide with your hands.
+- The "No Contact" layer, used when the object **can't** collide with your hands. This is the case when the object is **grasped**, or when`ignoreContact` is set to `true`.
 
 On a specific Interaction Behaviour under its **Layer Overrides** header, check `Override Interaction Layer` and `Override No Contact Layer` in its inspector to specify custom layers to use for the object when contact is enabled or disabled (e.g. due to being grasped). These layers must follow collision rules with respect to the **contact bone layer**, which is the layer that contains the Colliders that make up the bones in Interaction Hands or Interaction Controllers. (The contact bone layer is usually automatically generated, but you can specify a custom layer to use for Interaction Controllers in the Interaction Manager's inspector.) The rules are as follows:
 
 - The Interaction Layer should have collision enabled with the contact bone layer.
-- The No Contact layer should **NOT** have collision enabled with the contact bone layer.
-- (Any collision configuration is allowed for these layers with respect to any non-contact-bone layers.)
+- The No Contact layer should **not** have collision enabled with the contact bone layer.
+- (Any collision configuration is allowed for these layers with respect to any other, non-contact-bone layers.)
 
-You can override both or only one of the layers for interaction objects as long as these rules are followed.
+You can override both or only one of the layers for interaction objects as long as these rules are followed. You can also name these layers anything you want, although we usually put "Interaction" and "No Contact" in the layer names to make their purposes clear.
 
 # Custom behaviors for interaction objects {#ie-custom-interaction-behaviors}
 

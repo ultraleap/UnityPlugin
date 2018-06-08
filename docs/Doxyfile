@@ -774,7 +774,8 @@ WARN_LOGFILE           =
 
 INPUT                  = ../Assets/LeapMotion/Core \
                          ../Assets/LeapMotion/Modules \
-                         ./content
+                         ./content \
+                         ./videos
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding. Doxygen uses
@@ -1124,7 +1125,15 @@ HTML_EXTRA_STYLESHEET  = ./templates/extra.css
 # files will be copied as-is; there are no commands or markers available.
 # This tag requires that the tag GENERATE_HTML is set to YES.
 
-HTML_EXTRA_FILES       = ./templates/resizeoverrides.js
+HTML_EXTRA_FILES       = ./templates/resizeoverrides.js \
+                         ./videos/Example_1_-_Interaction_Objects.webm \
+                         ./videos/Example_2_-_Basic_UI.webm \
+                         ./videos/Example_3_-_Interaction_Callbacks.webm \
+                         ./videos/Example_4_-_Hand_UI.webm \
+                         ./videos/Example_5_-_Anchors.webm \
+                         ./videos/Example_6_-_Dynamic_UI.webm \
+                         ./videos/Example_7_-_Moving_Reference_Frames.webm \
+                         ./videos/Example_8_-_Swap_Grasp.webm \
 
 # The HTML_COLORSTYLE_HUE tag controls the color of the HTML output. Doxygen
 # will adjust the colors in the style sheet and background images according to

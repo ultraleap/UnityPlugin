@@ -345,6 +345,14 @@ div.header {
   background-image: none;
 }
 
+/* Align .webm video tags for the IE page example scenes. */
+.ie-example-video {
+	margin: 0 auto;
+  width: 400px;
+  height: 280px;
+	display: block;
+}
+
 
 /* Remove gradients and various default effects on info boxes in generated
  * docs. */
