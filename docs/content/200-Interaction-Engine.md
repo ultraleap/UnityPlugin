@@ -421,9 +421,9 @@ However, you don't want a grasping-only trigger collider to be _too_ much larger
 
 **Q: Can I add colliders to my interaction object that are ignored by the Interaction Engine, so that I can, for example, detect ray-casts against the object when it is far away from the player?**
 
-A: You can use the [IgnoreCollidersForInteraction][ref_IgnoreCollidersForInteraction] component on any Colliders on an InteractionBehaviour that you'd like the Interaction Engine to ignore. Any such colliders should also be [trigger][triggers] colliders to prevent strange behavior if interaction controllers collide with those ignored colliders.
+A: You can use the [IgnoreColliderForInteraction][ref_IgnoreColliderForInteraction] component on any Colliders on an InteractionBehaviour that you'd like the Interaction Engine to ignore. Any such colliders should also be [trigger][triggers] colliders to prevent strange behavior if interaction controllers collide with those ignored colliders.
 
-[ref_IgnoreCollidersForInteraction]: @ref IgnoreCollidersForInteraction
+[ref_IgnoreColliderForInteraction]: @ref IgnoreCollidersForInteraction
 
 **Q: Can I hold an interaction object with both hands?**
 
