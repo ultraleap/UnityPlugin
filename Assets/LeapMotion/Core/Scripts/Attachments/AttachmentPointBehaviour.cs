@@ -1,6 +1,6 @@
 /******************************************************************************
- * Copyright (C) Leap Motion, Inc. 2011-2017.                                 *
- * Leap Motion proprietary and  confidential.                                 *
+ * Copyright (C) Leap Motion, Inc. 2011-2018.                                 *
+ * Leap Motion proprietary and confidential.                                  *
  *                                                                            *
  * Use subject to the terms of the Leap Motion SDK Agreement available at     *
  * https://developer.leapmotion.com/sdk_agreement, or another agreement       *
@@ -74,14 +74,13 @@ namespace Leap.Unity.Attachments {
       position = Vector3.zero;
       rotation = Quaternion.identity;
 
-      if (!singlePoint.IsSinglePoint()) {
+      if (singlePoint != AttachmentPointFlags.None && !singlePoint.IsSinglePoint()) {
         Debug.LogError("Cannot get attachment point data for an AttachmentPointFlags argument consisting of more than one set flag.");
         return;
       }
 
       switch (singlePoint) {
         case AttachmentPointFlags.None:
-          Debug.LogError("Unable to set transform; this AttachmentPointBehaviour does not have its attachment point flag set.");
           return;
 
         case AttachmentPointFlags.Wrist:

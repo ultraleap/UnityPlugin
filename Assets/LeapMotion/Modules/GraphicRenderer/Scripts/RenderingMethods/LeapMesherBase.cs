@@ -1,6 +1,6 @@
 /******************************************************************************
- * Copyright (C) Leap Motion, Inc. 2011-2017.                                 *
- * Leap Motion proprietary and  confidential.                                 *
+ * Copyright (C) Leap Motion, Inc. 2011-2018.                                 *
+ * Leap Motion proprietary and confidential.                                  *
  *                                                                            *
  * Use subject to the terms of the Leap Motion SDK Agreement available at     *
  * https://developer.leapmotion.com/sdk_agreement, or another agreement       *
@@ -309,7 +309,11 @@ namespace Leap.Unity.GraphicalRenderer {
         if (!tintFeature.isDirtyOrEditTime) continue;
 
         using (new ProfilerSample("Update Tinting")) {
-          tintFeature.featureData.Query().Select(d => (Vector4)d.color).FillList(_tintColors);
+          if (QualitySettings.activeColorSpace == ColorSpace.Linear) {
+            tintFeature.featureData.Query().Select(d => (Vector4)d.color.linear).FillList(_tintColors);
+          } else {
+            tintFeature.featureData.Query().Select(d => (Vector4)d.color).FillList(_tintColors);
+          }
           _material.SetVectorArraySafe(TINTS_PROPERTY, _tintColors);
         }
       }
@@ -599,11 +603,22 @@ namespace Leap.Unity.GraphicalRenderer {
 
     protected virtual void buildColors() {
       using (new ProfilerSample("Build Colors")) {
-        Color totalTint = _bakedTint * _generation.graphic.vertexColor;
+        Color totalTint;
+        if (QualitySettings.activeColorSpace == ColorSpace.Linear) {
+          totalTint = _bakedTint.linear * _generation.graphic.vertexColor.linear;
+        } else {
+          totalTint = _bakedTint * _generation.graphic.vertexColor;
+        }
 
         var colors = MeshCache.GetColors(_generation.graphic.mesh);
-        for (int i = 0; i < colors.Length; i++) {
-          _generation.colors.Add(colors[i] * totalTint);
+        if (QualitySettings.activeColorSpace == ColorSpace.Linear) {
+          for (int i = 0; i < colors.Length; i++) {
+            _generation.colors.Add(colors[i].linear * totalTint);
+          }
+        } else {
+          for (int i = 0; i < colors.Length; i++) {
+            _generation.colors.Add(colors[i] * totalTint);
+          }
         }
       }
     }

@@ -1,6 +1,6 @@
 /******************************************************************************
- * Copyright (C) Leap Motion, Inc. 2011-2017.                                 *
- * Leap Motion proprietary and  confidential.                                 *
+ * Copyright (C) Leap Motion, Inc. 2011-2018.                                 *
+ * Leap Motion proprietary and confidential.                                  *
  *                                                                            *
  * Use subject to the terms of the Leap Motion SDK Agreement available at     *
  * https://developer.leapmotion.com/sdk_agreement, or another agreement       *
@@ -54,6 +54,12 @@ namespace Leap.Unity {
       }
     }
 
+    private float GetPinchDistance(Hand hand) {
+      var indexTipPosition = hand.GetIndex().TipPosition.ToVector3();
+      var thumbTipPosition = hand.GetThumb().TipPosition.ToVector3();
+      return Vector3.Distance(indexTipPosition, thumbTipPosition);
+    }
+
     protected override void ensureUpToDate() {
       if (Time.frameCount == _lastUpdateFrame) {
         return;
@@ -69,7 +75,7 @@ namespace Leap.Unity {
         return;
       }
 
-      _distance = hand.PinchDistance * MM_TO_M;
+      _distance = GetPinchDistance(hand);
       _rotation = hand.Basis.CalculateRotation();
       _position = ((hand.Fingers[0].TipPosition + hand.Fingers[1].TipPosition) * .5f).ToVector3();
 

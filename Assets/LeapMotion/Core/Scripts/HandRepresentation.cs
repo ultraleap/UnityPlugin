@@ -1,6 +1,6 @@
 /******************************************************************************
- * Copyright (C) Leap Motion, Inc. 2011-2017.                                 *
- * Leap Motion proprietary and  confidential.                                 *
+ * Copyright (C) Leap Motion, Inc. 2011-2018.                                 *
+ * Leap Motion proprietary and confidential.                                  *
  *                                                                            *
  * Use subject to the terms of the Leap Motion SDK Agreement available at     *
  * https://developer.leapmotion.com/sdk_agreement, or another agreement       *
@@ -17,23 +17,21 @@ namespace Leap.Unity {
    * @param hand The Leap Hand data to paired with a HandModelBase
    */
   public class HandRepresentation {
-    HandPool parent;
+    HandModelManager parent;
     public int HandID { get; private set; }
     public int LastUpdatedTime { get; set; }
     public bool IsMarked { get; set; }
     public Chirality RepChirality { get; protected set; }
     public ModelType RepType { get; protected set; }
     public Hand MostRecentHand { get; protected set; }
-    public Hand PostProcessHand { get; set; }
     public List<HandModelBase> handModels;
 
-    public HandRepresentation(HandPool parent, Hand hand, Chirality repChirality, ModelType repType) {
+    public HandRepresentation(HandModelManager parent, Hand hand, Chirality repChirality, ModelType repType) {
       this.parent = parent;
       HandID = hand.Id;
       this.RepChirality = repChirality;
       this.RepType = repType;
       this.MostRecentHand = hand;
-      this.PostProcessHand = new Hand();
     }
 
     /** To be called if the HandRepresentation no longer has a Leap Hand. */
@@ -77,13 +75,7 @@ namespace Leap.Unity {
       MostRecentHand = hand;
       if (handModels != null) {
         for (int i = 0; i < handModels.Count; i++) {
-          if (handModels[i].group != null && handModels[i].group.HandPostProcesses.GetPersistentEventCount() > 0) {
-            PostProcessHand.CopyFrom(hand);
-            handModels[i].group.HandPostProcesses.Invoke(PostProcessHand);
-            handModels[i].SetLeapHand(PostProcessHand);
-          } else {
-            handModels[i].SetLeapHand(hand);
-          }
+          handModels[i].SetLeapHand(hand);
           handModels[i].UpdateHand();
         }
       }

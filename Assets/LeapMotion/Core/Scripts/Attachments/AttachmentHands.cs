@@ -1,6 +1,6 @@
 /******************************************************************************
- * Copyright (C) Leap Motion, Inc. 2011-2017.                                 *
- * Leap Motion proprietary and  confidential.                                 *
+ * Copyright (C) Leap Motion, Inc. 2011-2018.                                 *
+ * Leap Motion proprietary and confidential.                                  *
  *                                                                            *
  * Use subject to the terms of the Leap Motion SDK Agreement available at     *
  * https://developer.leapmotion.com/sdk_agreement, or another agreement       *
@@ -121,14 +121,6 @@ namespace Leap.Unity.Attachments {
 
           var leapHand = handAccessors[i]();
           attachmentHand.isTracked = leapHand != null;
-
-          #if UNITY_EDITOR
-          if (Hands.Provider != null) {
-            if (leapHand == null && !Application.isPlaying) {
-              leapHand = Hands.Provider.MakeTestHand(attachmentHand.chirality == Chirality.Left);
-            }
-          }
-          #endif
 
           using (new ProfilerSample(attachmentHand.gameObject.name + " Update Points")) {
             foreach (var point in attachmentHand.points) {

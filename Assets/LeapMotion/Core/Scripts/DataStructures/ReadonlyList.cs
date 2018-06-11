@@ -1,6 +1,6 @@
 /******************************************************************************
- * Copyright (C) Leap Motion, Inc. 2011-2017.                                 *
- * Leap Motion proprietary and  confidential.                                 *
+ * Copyright (C) Leap Motion, Inc. 2011-2018.                                 *
+ * Leap Motion proprietary and confidential.                                  *
  *                                                                            *
  * Use subject to the terms of the Leap Motion SDK Agreement available at     *
  * https://developer.leapmotion.com/sdk_agreement, or another agreement       *
@@ -9,6 +9,7 @@
 
 using UnityEngine;
 using System.Collections.Generic;
+using System.Collections;
 
 namespace Leap.Unity {
 
@@ -22,6 +23,12 @@ namespace Leap.Unity {
 
     public ReadonlyList(List<T> list) {
       _list = list;
+    }
+
+    public bool isValid {
+      get {
+        return _list != null;
+      }
     }
 
     public int Count {
@@ -42,6 +49,10 @@ namespace Leap.Unity {
 
     public static implicit operator ReadonlyList<T>(List<T> list) {
       return new ReadonlyList<T>(list);
+    }
+
+    public int IndexOf(T item) {
+      return _list.IndexOf(item);
     }
   }
 }

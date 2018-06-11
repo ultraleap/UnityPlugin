@@ -1,6 +1,6 @@
 /******************************************************************************
- * Copyright (C) Leap Motion, Inc. 2011-2017.                                 *
- * Leap Motion proprietary and  confidential.                                 *
+ * Copyright (C) Leap Motion, Inc. 2011-2018.                                 *
+ * Leap Motion proprietary and confidential.                                  *
  *                                                                            *
  * Use subject to the terms of the Leap Motion SDK Agreement available at     *
  * https://developer.leapmotion.com/sdk_agreement, or another agreement       *
@@ -14,15 +14,13 @@ namespace Leap.Unity{
   [CustomEditor(typeof(LeapImageRetriever))]
   public class LeapImageRetrieverEditor : CustomEditorBase<LeapImageRetriever> {
 
-    private GUIContent _brightTextureGUIContent;
-    private GUIContent _rawTextureGUIContent;
+    private GUIContent _textureGUIContent;
     private GUIContent _distortionTextureGUIContent;
 
     protected override void OnEnable() {
       base.OnEnable();
 
-      _brightTextureGUIContent = new GUIContent("Bright Texture");
-      _rawTextureGUIContent = new GUIContent("Raw Texture");
+      _textureGUIContent = new GUIContent("Sensor Texture");
       _distortionTextureGUIContent = new GUIContent("Distortion Texture");
     }
 
@@ -34,8 +32,7 @@ namespace Leap.Unity{
         var dataType = typeof(Object);
 
         EditorGUI.BeginDisabledGroup(true);
-        EditorGUILayout.ObjectField(_brightTextureGUIContent, data.BrightTexture.CombinedTexture, dataType, true);
-        EditorGUILayout.ObjectField(_rawTextureGUIContent, data.RawTexture.CombinedTexture, dataType, true);
+        EditorGUILayout.ObjectField(_textureGUIContent, data.TextureData.CombinedTexture, dataType, true);
         EditorGUILayout.ObjectField(_distortionTextureGUIContent, data.Distortion.CombinedTexture, dataType, true);
         EditorGUI.EndDisabledGroup();
       }

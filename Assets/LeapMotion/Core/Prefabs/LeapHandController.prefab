@@ -42,7 +42,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c592f16851a620743868a31232613370, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _modelsParent: {fileID: 0}
+  _leapProvider: {fileID: 0}
   ModelPool: []
 --- !u!114 &11435192
 MonoBehaviour:
@@ -56,12 +56,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   editTimePose: 0
-  _isHeadMounted: 0
-  _temporalWarping: {fileID: 0}
   _frameOptimization: 0
   _physicsExtrapolation: 1
   _physicsExtrapolationTime: 0.011111111
-  _updateHandInPrecull: 0
+  _workerThreadProfiling: 0
 --- !u!114 &11471522
 MonoBehaviour:
   m_ObjectHideFlags: 1

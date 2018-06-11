@@ -1,6 +1,6 @@
 /******************************************************************************
- * Copyright (C) Leap Motion, Inc. 2011-2017.                                 *
- * Leap Motion proprietary and  confidential.                                 *
+ * Copyright (C) Leap Motion, Inc. 2011-2018.                                 *
+ * Leap Motion proprietary and confidential.                                  *
  *                                                                            *
  * Use subject to the terms of the Leap Motion SDK Agreement available at     *
  * https://developer.leapmotion.com/sdk_agreement, or another agreement       *
@@ -22,6 +22,10 @@ namespace Leap.Unity {
     public Vector3    position;
     public Quaternion rotation;
 
+    public Pose(Vector3 position)
+      : this(position, Quaternion.identity) { }
+    public Pose(Quaternion rotation)
+      : this(Vector3.zero, rotation) { }
     public Pose(Vector3 position, Quaternion rotation) {
       this.position = position;
       this.rotation = rotation;
@@ -32,7 +36,7 @@ namespace Leap.Unity {
     public Pose inverse {
       get {
         var invQ = Quaternion.Inverse(this.rotation);
-        return new Pose(-(invQ * this.position), invQ);
+        return new Pose(invQ * -this.position, invQ);
       }
     }
 
@@ -43,6 +47,26 @@ namespace Leap.Unity {
     public static Pose operator *(Pose A, Pose B) {
       return new Pose(A.position + (A.rotation * B.position),
                       A.rotation * B.rotation);
+    }
+
+    /// <summary>
+    /// Returns the accumulation of the two poses: The positions summed, and with
+    /// rotation A.rotation * B.rotation. Note that this accumulates the poses without
+    /// interpreting either pose as a parent space of the other; but also beware that
+    /// rotations are noncommutative, so this operation is also noncommutative.
+    /// </summary>
+    public static Pose operator +(Pose A, Pose B) {
+      return new Pose(A.position + B.position,
+                      A.rotation * B.rotation);
+    }
+
+    /// <summary>
+    /// Transforms the right-hand-side Vector3 as a local-space position into world space
+    /// as if this Pose were its reference frame.
+    /// </summary>
+    public static Pose operator *(Pose pose, Vector3 localPosition) {
+      return new Pose(pose.position + pose.rotation * localPosition,
+                      pose.rotation);
     }
 
     public bool ApproxEquals(Pose other) {
@@ -58,7 +82,7 @@ namespace Leap.Unity {
       if (t >= 1f) return b;
       if (t <= 0f) return a;
       return new Pose(Vector3.Lerp(a.position, b.position, t),
-                      Quaternion.Slerp(a.rotation, b.rotation, t));
+                      Quaternion.Lerp(Quaternion.Slerp(a.rotation, b.rotation, t), Quaternion.identity, 0f));
     }
 
     /// <summary>
@@ -127,8 +151,15 @@ namespace Leap.Unity {
     /// <summary>
     /// Creates a Pose using the transform's position and rotation.
     /// </summary>
-    public static Pose ToWorldPose(this Transform t) {
+    public static Pose ToPose(this Transform t) {
       return new Pose(t.position, t.rotation);
+    }
+
+    /// <summary>
+    /// Creates a Pose using the transform's position and rotation.
+    /// </summary>
+    public static Pose ToWorldPose(this Transform t) {
+      return t.ToPose();
     }
 
     /// <summary>
@@ -139,14 +170,21 @@ namespace Leap.Unity {
       t.localPosition = localPose.position;
       t.localRotation = localPose.rotation;
     }
+    /// <summary>
+    /// Sets the position and rotation of this transform to the argument pose's
+    /// position and rotation. Identical to SetWorldPose.
+    /// </summary>
+    public static void SetPose(this Transform t, Pose worldPose) {
+      t.position = worldPose.position;
+      t.rotation = worldPose.rotation;
+    }
 
     /// <summary>
     /// Sets the position and rotation of this transform to the argument pose's
-    /// position and rotation.
+    /// position and rotation. Identical to SetPose.
     /// </summary>
     public static void SetWorldPose(this Transform t, Pose worldPose) {
-      t.position = worldPose.position;
-      t.rotation = worldPose.rotation;
+      t.SetPose(worldPose);
     }
 
     /// <summary>
@@ -158,6 +196,22 @@ namespace Leap.Unity {
                                                        : Quaternion.LookRotation(
                                                            m.GetColumn(2),
                                                            m.GetColumn(1)));
+    }
+
+    /// <summary>
+    /// Returns a new Pose with the argument rotation instead of the Pose's current
+    /// rotation.
+    /// </summary>
+    public static Pose WithRotation(this Pose pose, Quaternion newRotation) {
+      return new Pose(pose.position, newRotation);
+    }
+
+    /// <summary>
+    /// Returns a new Pose with the argument position instead of the Pose's current
+    /// position.
+    /// </summary>
+    public static Pose WithPosition(this Pose pose, Vector3 newPosition) {
+      return new Pose(newPosition, pose.rotation);
     }
 
     public static Vector3 GetVector3(this Matrix4x4 m) { return m.GetColumn(3); }

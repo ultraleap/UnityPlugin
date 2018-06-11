@@ -1,6 +1,6 @@
 /******************************************************************************
- * Copyright (C) Leap Motion, Inc. 2011-2017.                                 *
- * Leap Motion proprietary and  confidential.                                 *
+ * Copyright (C) Leap Motion, Inc. 2011-2018.                                 *
+ * Leap Motion proprietary and confidential.                                  *
  *                                                                            *
  * Use subject to the terms of the Leap Motion SDK Agreement available at     *
  * https://developer.leapmotion.com/sdk_agreement, or another agreement       *
@@ -87,7 +87,7 @@ public class SimpleInteractionGlow : MonoBehaviour {
 
       // We can also check the depressed-or-not-depressed state of InteractionButton objects
       // and assign them a unique color in that case.
-      if (_intObj is InteractionButton && (_intObj as InteractionButton).isDepressed) {
+      if (_intObj is InteractionButton && (_intObj as InteractionButton).isPressed) {
         targetColor = pressedColor;
       }
 

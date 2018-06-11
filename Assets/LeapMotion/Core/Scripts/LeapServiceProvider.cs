@@ -1,54 +1,72 @@
 /******************************************************************************
- * Copyright (C) Leap Motion, Inc. 2011-2017.                                 *
- * Leap Motion proprietary and  confidential.                                 *
+ * Copyright (C) Leap Motion, Inc. 2011-2018.                                 *
+ * Leap Motion proprietary and confidential.                                  *
  *                                                                            *
  * Use subject to the terms of the Leap Motion SDK Agreement available at     *
  * https://developer.leapmotion.com/sdk_agreement, or another agreement       *
  * between Leap Motion and you, your company or other organization.           *
  ******************************************************************************/
 
-using UnityEngine;
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
 using System;
-using System.Collections;
-using Leap.Unity.Attributes;
-//using Leap.Unity.Graphing;
+using System.Collections.Generic;
+using UnityEngine;
 
 namespace Leap.Unity {
-  /**LeapServiceProvider creates a Controller and supplies Leap Hands and images */
+  using Attributes;
+
+  /// <summary>
+  /// The LeapServiceProvider provides tracked Leap Hand data and images from the device
+  /// via the Leap service running on the client machine.
+  /// </summary>
   public class LeapServiceProvider : LeapProvider {
-    /** Conversion factor for nanoseconds to seconds. */
+
+    #region Constants
+
+    /// <summary>
+    /// Converts nanoseconds to seconds.
+    /// </summary>
     protected const double NS_TO_S = 1e-6;
-    /** Conversion factor for seconds to nanoseconds. */
+
+    /// <summary>
+    /// Converts seconds to nanoseconds.
+    /// </summary>
     protected const double S_TO_NS = 1e6;
-    /** Transform Array for Precull Latching **/
-    protected const string HAND_ARRAY = "_LeapHandTransforms";
+
+    /// <summary>
+    /// The transform array used for late-latching.
+    /// </summary>
+    protected const string HAND_ARRAY_GLOBAL_NAME = "_LeapHandTransforms";
+
+    /// <summary>
+    /// The maximum number of times the provider will 
+    /// attempt to reconnect to the service before giving up.
+    /// </summary>
+    protected const int MAX_RECONNECTION_ATTEMPTS = 5;
+
+    /// <summary>
+    /// The number of frames to wait between each
+    /// reconnection attempt.
+    /// </summary>
+    protected const int RECONNECTION_INTERVAL = 180;
+
+    #endregion
+
+    #region Inspector
 
     public enum FrameOptimizationMode {
       None,
       ReuseUpdateForPhysics,
       ReusePhysicsForUpdate,
     }
+    [Tooltip("When enabled, the provider will only calculate one leap frame instead of two.")]
+    [SerializeField]
+    protected FrameOptimizationMode _frameOptimization = FrameOptimizationMode.None;
 
     public enum PhysicsExtrapolationMode {
       None,
       Auto,
       Manual
     }
-
-    [Tooltip("Set true if the Leap Motion hardware is mounted on an HMD; otherwise, leave false.")]
-    [SerializeField]
-    protected bool _isHeadMounted = false;
-
-    [SerializeField]
-    protected LeapVRTemporalWarping _temporalWarping;
-
-    [Tooltip("When enabled, the provider will only calculate one leap frame instead of two.")]
-    [SerializeField]
-    protected FrameOptimizationMode _frameOptimization = FrameOptimizationMode.None;
-
     [Tooltip("The mode to use when extrapolating physics.\n" +
              " None - No extrapolation is used at all.\n" +
              " Auto - Extrapolation is chosen based on the fixed timestep.\n" +
@@ -56,18 +74,27 @@ namespace Leap.Unity {
     [SerializeField]
     protected PhysicsExtrapolationMode _physicsExtrapolation = PhysicsExtrapolationMode.Auto;
 
-    [Tooltip("The amount of time (in seconds) to extrapolate the phyiscs data by.")]
+    [Tooltip("The amount of time (in seconds) to extrapolate the physics data by.")]
     [SerializeField]
     protected float _physicsExtrapolationTime = 1.0f / 90.0f;
 
-    [Header("[Experimental]")]
-    [Tooltip("Pass updated transform matrices to objects with materials using the VertexOffsetShader.")]
+#if UNITY_2017_3_OR_NEWER
+    [Tooltip("When checked, profiling data from the LeapCSharp worker thread will be used to populate the UnityProfiler.")]
+    [EditTimeOnly]
+#else
+    [Tooltip("Worker thread profiling requires a Unity version of 2017.3 or greater.")]
+    [Disable]
+#endif
     [SerializeField]
-    protected bool _updateHandInPrecull = false;
+    protected bool _workerThreadProfiling = false;
 
+    #endregion
+
+    #region Internal Settings & Memory
     protected bool _useInterpolation = true;
 
-    //Extrapolate on Android to compensate for the latency introduced by its graphics pipeline
+    // Extrapolate on Android to compensate for the latency introduced by its graphics
+    // pipeline.
 #if UNITY_ANDROID && !UNITY_EDITOR
     protected int ExtrapolationAmount = 15;
     protected int BounceAmount = 70;
@@ -76,28 +103,114 @@ namespace Leap.Unity {
     protected int BounceAmount = 0;
 #endif
 
-    protected Controller leap_controller_;
+    protected Controller _leapController;
+    protected bool _isDestroyed;
 
-    protected bool manualUpdateHasBeenCalledSinceUpdate;
-    protected Vector3 warpedPosition;
-    protected Quaternion warpedRotation;
     protected SmoothedFloat _fixedOffset = new SmoothedFloat();
     protected SmoothedFloat _smoothedTrackingLatency = new SmoothedFloat();
     protected long _unityToLeapOffset;
 
     protected Frame _untransformedUpdateFrame;
     protected Frame _transformedUpdateFrame;
-
     protected Frame _untransformedFixedFrame;
     protected Frame _transformedFixedFrame;
 
-    protected Matrix4x4[] _transformArray = new Matrix4x4[2];
+    #endregion
 
-    [NonSerialized]
-    public long imageTimeStamp = 0;
+    #region Edit-time Frame Data
+    
+    private Action<Device> _onDeviceSafe;
+    /// <summary>
+    /// A utility event to get a callback whenever a new device is connected to the service.
+    /// This callback will ALSO trigger a callback upon subscription if a device is already
+    /// connected.
+    /// 
+    /// For situations with multiple devices OnDeviceSafe will be dispatched once for each device.
+    /// </summary>
+    public event Action<Device> OnDeviceSafe {
+      add {
+        if (_leapController != null && _leapController.IsConnected) {
+          foreach (var device in _leapController.Devices) {
+            value(device);
+          }
+        }
+        _onDeviceSafe += value;
+      }
+      remove {
+        _onDeviceSafe -= value;
+      }
+    }
+
+    #if UNITY_EDITOR
+    private Frame _backingUntransformedEditTimeFrame = null;
+    private Frame _untransformedEditTimeFrame {
+      get {
+        if (_backingUntransformedEditTimeFrame == null) {
+          _backingUntransformedEditTimeFrame = new Frame();
+        }
+        return _backingUntransformedEditTimeFrame;
+      }
+    }
+    private Frame _backingEditTimeFrame = null;
+    private Frame _editTimeFrame {
+      get {
+        if (_backingEditTimeFrame == null) {
+          _backingEditTimeFrame = new Frame();
+        }
+        return _backingEditTimeFrame;
+      }
+    }
+
+    private Dictionary<TestHandFactory.TestHandPose, Hand> _cachedLeftHands
+      = new Dictionary<TestHandFactory.TestHandPose, Hand>();
+    private Hand _editTimeLeftHand {
+      get {
+        Hand cachedHand;
+        if (_cachedLeftHands.TryGetValue(editTimePose, out cachedHand)) {
+          return cachedHand;
+        }
+        else {
+          cachedHand = TestHandFactory.MakeTestHand(isLeft: true, pose: editTimePose);
+          _cachedLeftHands[editTimePose] = cachedHand;
+          return cachedHand;
+        }
+      }
+    }
+
+    private Dictionary<TestHandFactory.TestHandPose, Hand> _cachedRightHands
+      = new Dictionary<TestHandFactory.TestHandPose, Hand>();
+    private Hand _editTimeRightHand {
+      get {
+        Hand cachedHand;
+        if (_cachedRightHands.TryGetValue(editTimePose, out cachedHand)) {
+          return cachedHand;
+        }
+        else {
+          cachedHand = TestHandFactory.MakeTestHand(isLeft: false, pose: editTimePose);
+          _cachedRightHands[editTimePose] = cachedHand;
+          return cachedHand;
+        }
+      }
+    }
+
+    #endif
+
+    #endregion
+
+    #region LeapProvider Implementation
 
     public override Frame CurrentFrame {
       get {
+        #if UNITY_EDITOR
+        if (!Application.isPlaying) {
+          _editTimeFrame.Hands.Clear();
+          _untransformedEditTimeFrame.Hands.Clear();
+          _untransformedEditTimeFrame.Hands.Add(_editTimeLeftHand);
+          _untransformedEditTimeFrame.Hands.Add(_editTimeRightHand);
+          transformFrame(_untransformedEditTimeFrame, _editTimeFrame);
+          return _editTimeFrame;
+        }
+        #endif
         if (_frameOptimization == FrameOptimizationMode.ReusePhysicsForUpdate) {
           return _transformedFixedFrame;
         } else {
@@ -108,6 +221,16 @@ namespace Leap.Unity {
 
     public override Frame CurrentFixedFrame {
       get {
+        #if UNITY_EDITOR
+        if (!Application.isPlaying) {
+          _editTimeFrame.Hands.Clear();
+          _untransformedEditTimeFrame.Hands.Clear();
+          _untransformedEditTimeFrame.Hands.Add(_editTimeLeftHand);
+          _untransformedEditTimeFrame.Hands.Add(_editTimeRightHand);
+          transformFrame(_untransformedEditTimeFrame, _editTimeFrame);
+          return _editTimeFrame;
+        }
+        #endif
         if (_frameOptimization == FrameOptimizationMode.ReuseUpdateForPhysics) {
           return _transformedUpdateFrame;
         } else {
@@ -116,72 +239,12 @@ namespace Leap.Unity {
       }
     }
 
-    protected bool UseInterpolation {
-      get {
-        return _useInterpolation;
-      }
-      set {
-        _useInterpolation = value;
-      }
-    }
+    #endregion
 
-    public bool UpdateHandInPrecull {
-      get {
-        return _updateHandInPrecull;
-      }
-      set {
-        resetTransforms();
-        _updateHandInPrecull = value;
-      }
-    }
-
-    public float CalculatePhysicsExtrapolation() {
-      switch (_physicsExtrapolation) {
-        case PhysicsExtrapolationMode.None:
-          return 0;
-        case PhysicsExtrapolationMode.Auto:
-          return Time.fixedDeltaTime;
-        case PhysicsExtrapolationMode.Manual:
-          return _physicsExtrapolationTime;
-        default:
-          throw new InvalidOperationException("Unexpected physics extrapolation mode: " + _physicsExtrapolation);
-      }
-    }
-
-    /** Returns the Leap Controller instance. */
-    public Controller GetLeapController() {
-#if UNITY_EDITOR
-      //Null check to deal with hot reloading
-      if (leap_controller_ == null) {
-        createController();
-      }
-#endif
-      return leap_controller_;
-    }
-
-    /** True, if the Leap Motion hardware is plugged in and this application is connected to the Leap Motion service. */
-    public bool IsConnected() {
-      return GetLeapController().IsConnected;
-    }
-
-    /** Returns information describing the device hardware. */
-    public LeapDeviceInfo GetDeviceInfo() {
-      return LeapDeviceInfo.GetLeapDeviceInfo();
-    }
-
-    public void ReTransformFrames() {
-      transformFrame(_untransformedUpdateFrame, _transformedUpdateFrame);
-      transformFrame(_untransformedFixedFrame, _transformedFixedFrame);
-    }
+    #region Unity Events
 
     protected virtual void Reset() {
-      if (checkShouldEnableHeadMounted()) {
-        _isHeadMounted = true;
-      }
-
-      _temporalWarping = GetComponentInParent<LeapVRTemporalWarping>();
-      _frameOptimization = FrameOptimizationMode.None;
-      _updateHandInPrecull = false;
+      editTimePose = TestHandFactory.TestHandPose.DesktopModeA;
     }
 
     protected virtual void Awake() {
@@ -190,8 +253,6 @@ namespace Leap.Unity {
     }
 
     protected virtual void Start() {
-      checkShouldEnableHeadMounted();
-
       createController();
       _transformedUpdateFrame = new Frame();
       _transformedFixedFrame = new Frame();
@@ -200,14 +261,19 @@ namespace Leap.Unity {
     }
 
     protected virtual void Update() {
+      if (_workerThreadProfiling) {
+        LeapProfiling.Update();
+      }
+
+      if (!checkConnectionIntegrity()) { return; }
+
 #if UNITY_EDITOR
-      if (EditorApplication.isCompiling) {
-        EditorApplication.isPlaying = false;
+      if (UnityEditor.EditorApplication.isCompiling) {
+        UnityEditor.EditorApplication.isPlaying = false;
         Debug.LogWarning("Unity hot reloading not currently supported. Stopping Editor Playback.");
         return;
       }
 #endif
-      manualUpdateHasBeenCalledSinceUpdate = false;
 
       _fixedOffset.Update(Time.time - Time.fixedTime, Time.deltaTime);
 
@@ -219,17 +285,16 @@ namespace Leap.Unity {
       if (_useInterpolation) {
 #if !UNITY_ANDROID || UNITY_EDITOR
         _smoothedTrackingLatency.value = Mathf.Min(_smoothedTrackingLatency.value, 30000f);
-        _smoothedTrackingLatency.Update((float)(leap_controller_.Now() - leap_controller_.FrameTimestamp()), Time.deltaTime);
+        _smoothedTrackingLatency.Update((float)(_leapController.Now() - _leapController.FrameTimestamp()), Time.deltaTime);
 #endif
         long timestamp = CalculateInterpolationTime() + (ExtrapolationAmount * 1000);
         _unityToLeapOffset = timestamp - (long)(Time.time * S_TO_NS);
 
-        leap_controller_.GetInterpolatedFrameFromTime(_untransformedUpdateFrame, timestamp, CalculateInterpolationTime() - (BounceAmount * 1000));
-      } else {
-        leap_controller_.Frame(_untransformedUpdateFrame);
+        _leapController.GetInterpolatedFrameFromTime(_untransformedUpdateFrame, timestamp, CalculateInterpolationTime() - (BounceAmount * 1000));
       }
-
-      imageTimeStamp = leap_controller_.FrameTimestamp();
+      else {
+        _leapController.Frame(_untransformedUpdateFrame);
+      }
 
       if (_untransformedUpdateFrame != null) {
         transformFrame(_untransformedUpdateFrame, _transformedUpdateFrame);
@@ -249,24 +314,27 @@ namespace Leap.Unity {
         long timestamp;
         switch (_frameOptimization) {
           case FrameOptimizationMode.None:
-            //By default we use Time.fixedTime to ensure that our hands are on the same timeline
-            //as Update.  We add an extrapolation value to help compensate for latency.
+            // By default we use Time.fixedTime to ensure that our hands are on the same
+            // timeline as Update.  We add an extrapolation value to help compensate
+            // for latency.
             float extrapolatedTime = Time.fixedTime + CalculatePhysicsExtrapolation();
             timestamp = (long)(extrapolatedTime * S_TO_NS) + _unityToLeapOffset;
             break;
           case FrameOptimizationMode.ReusePhysicsForUpdate:
-            //If we are re-using physics frames for update, we don't even want to care about
-            //Time.fixedTime, just grab the most recent interpolated timestamp like we are
-            //in Update
+            // If we are re-using physics frames for update, we don't even want to care
+            // about Time.fixedTime, just grab the most recent interpolated timestamp
+            // like we are in Update.
             timestamp = CalculateInterpolationTime() + (ExtrapolationAmount * 1000);
             break;
           default:
-            throw new InvalidOperationException("Unexpected frame optimization mode: " + _frameOptimization);
+            throw new System.InvalidOperationException(
+              "Unexpected frame optimization mode: " + _frameOptimization);
         }
-        leap_controller_.GetInterpolatedFrame(_untransformedFixedFrame, timestamp);
+        _leapController.GetInterpolatedFrame(_untransformedFixedFrame, timestamp);
 
-      } else {
-        leap_controller_.Frame(_untransformedFixedFrame);
+      }
+      else {
+        _leapController.Frame(_untransformedFixedFrame);
       }
 
       if (_untransformedFixedFrame != null) {
@@ -276,202 +344,208 @@ namespace Leap.Unity {
       }
     }
 
-    long CalculateInterpolationTime(bool endOfFrame = false) {
-#if UNITY_ANDROID && !UNITY_EDITOR
-      return leap_controller_.Now() - 16000;
-#else
-      if (leap_controller_ != null) {
-        return leap_controller_.Now() - (long)_smoothedTrackingLatency.value + (_updateHandInPrecull && !endOfFrame ? (long)(Time.smoothDeltaTime * S_TO_NS / Time.timeScale) : 0);
-      } else {
-        return 0;
-      }
-#endif
-    }
-
     protected virtual void OnDestroy() {
       destroyController();
+      _isDestroyed = true;
     }
 
     protected virtual void OnApplicationPause(bool isPaused) {
-      if (leap_controller_ != null) {
+      if (_leapController != null) {
         if (isPaused) {
-          leap_controller_.StopConnection();
-        } else {
-          leap_controller_.StartConnection();
+          _leapController.StopConnection();
+        }
+        else {
+          _leapController.StartConnection();
         }
       }
     }
 
     protected virtual void OnApplicationQuit() {
       destroyController();
+      _isDestroyed = true;
     }
 
-    protected virtual void OnEnable() {
-      Camera.onPreCull -= LateUpdateHandTransforms;
-      Camera.onPreCull += LateUpdateHandTransforms;
-      resetTransforms();
+    public float CalculatePhysicsExtrapolation() {
+      switch (_physicsExtrapolation) {
+        case PhysicsExtrapolationMode.None:
+          return 0;
+        case PhysicsExtrapolationMode.Auto:
+          return Time.fixedDeltaTime;
+        case PhysicsExtrapolationMode.Manual:
+          return _physicsExtrapolationTime;
+        default:
+          throw new System.InvalidOperationException(
+            "Unexpected physics extrapolation mode: " + _physicsExtrapolation);
+      }
     }
 
-    protected virtual void OnDisable() {
-      Camera.onPreCull -= LateUpdateHandTransforms;
-      resetTransforms();
+    #endregion
+
+    #region Public API
+
+    /// <summary>
+    /// Returns the Leap Controller instance.
+    /// </summary>
+    public Controller GetLeapController() {
+      #if UNITY_EDITOR
+      // Null check to deal with hot reloading.
+      if (!_isDestroyed && _leapController == null) {
+        createController();
+      }
+      #endif
+      return _leapController;
     }
 
-    private bool checkShouldEnableHeadMounted() {
-      if (XRSupportUtil.IsXREnabled()) {
-        var parentCamera = GetComponentInParent<Camera>();
-        if (parentCamera != null && parentCamera.stereoTargetEye != StereoTargetEyeMask.None) {
+    /// <summary>
+    /// Returns true if the Leap Motion hardware is plugged in and this application is
+    /// connected to the Leap Motion service.
+    /// </summary>
+    public bool IsConnected() {
+      return GetLeapController().IsConnected;
+    }
 
-          if (!_isHeadMounted) {
-            if (Application.isPlaying) {
-              Debug.LogError("VR is enabled and the LeapServiceProvider is the child of a "
-                           + "camera targeting one or both stereo eyes; You should "
-                           + "check the isHeadMounted option on the LeapServiceProvider "
-                           + "if the Leap is mounted or attached to your VR headset!",
-                             this);
-            }
-            return true;
+    /// <summary>
+    /// Retransforms hand data from Leap space to the space of the Unity transform.
+    /// This is only necessary if you're moving the LeapServiceProvider around in a
+    /// custom script and trying to access Hand data from it directly afterward.
+    /// </summary>
+    public void RetransformFrames() {
+      transformFrame(_untransformedUpdateFrame, _transformedUpdateFrame);
+      transformFrame(_untransformedFixedFrame, _transformedFixedFrame);
+    }
+
+    /// <summary>
+    /// Copies property settings from this LeapServiceProvider to the target
+    /// LeapXRServiceProvider where applicable. Does not modify any XR-specific settings
+    /// that only exist on the LeapXRServiceProvider.
+    /// </summary>
+    public void CopySettingsToLeapXRServiceProvider(
+        LeapXRServiceProvider leapXRServiceProvider) {
+      leapXRServiceProvider._frameOptimization = _frameOptimization;
+      leapXRServiceProvider._physicsExtrapolation = _physicsExtrapolation;
+      leapXRServiceProvider._physicsExtrapolationTime = _physicsExtrapolationTime;
+      leapXRServiceProvider._workerThreadProfiling = _workerThreadProfiling;
+    }
+
+    #endregion
+
+    #region Internal Methods
+
+    protected virtual long CalculateInterpolationTime(bool endOfFrame = false) {
+      #if UNITY_ANDROID && !UNITY_EDITOR
+      return _leapController.Now() - 16000;
+      #else
+      if (_leapController != null) {
+        return _leapController.Now() - (long)_smoothedTrackingLatency.value;
+      } else {
+        return 0;
+      }
+      #endif
+    }
+    
+    /// <summary>
+    /// Initializes Leap Motion policy flags.
+    /// </summary>
+    protected virtual void initializeFlags() {
+      if (_leapController == null) {
+        return;
+      }
+
+      _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_DEFAULT);
+    }
+
+    /// <summary>
+    /// Creates an instance of a Controller, initializing its policy flags and
+    /// subscribing to its connection event.
+    /// </summary>
+    protected void createController() {
+      if (_leapController != null) {
+        return;
+      }
+
+      _leapController = new Controller();
+      _leapController.Device += (s, e) => {
+        if (_onDeviceSafe != null) {
+          _onDeviceSafe(e.Device);
+        }
+      };
+
+      if (_leapController.IsConnected) {
+        initializeFlags();
+      } else {
+        _leapController.Device += onHandControllerConnect;
+      }
+
+      if (_workerThreadProfiling) {
+        //A controller will report profiling statistics for the duration of it's lifetime
+        //so these events will never be unsubscribed from.
+        _leapController.EndProfilingBlock += LeapProfiling.EndProfilingBlock;
+        _leapController.BeginProfilingBlock += LeapProfiling.BeginProfilingBlock;
+
+        _leapController.EndProfilingForThread += LeapProfiling.EndProfilingForThread;
+        _leapController.BeginProfilingForThread += LeapProfiling.BeginProfilingForThread;
+      }
+    }
+    
+    /// <summary>
+    /// Stops the connection for the existing instance of a Controller, clearing old
+    /// policy flags and resetting the Controller to null.
+    /// </summary>
+    protected void destroyController() {
+      if (_leapController != null) {
+        if (_leapController.IsConnected) {
+          _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
+        }
+        _leapController.StopConnection();
+        _leapController = null;
+      }
+    }
+
+    private int _framesSinceServiceConnectionChecked = 0;
+    private int _numberOfReconnectionAttempts = 0;
+    /// <summary>
+    /// Checks whether this provider is connected to a service;
+    /// If it is not, attempt to reconnect at regular intervals
+    /// for MAX_RECONNECTION_ATTEMPTS
+    /// </summary>
+    protected bool checkConnectionIntegrity() {
+      if (_leapController.IsServiceConnected) {
+        _framesSinceServiceConnectionChecked = 0;
+        _numberOfReconnectionAttempts = 0;
+        return true;
+      } else if (_numberOfReconnectionAttempts < MAX_RECONNECTION_ATTEMPTS) {
+        _framesSinceServiceConnectionChecked ++;
+
+        if (_framesSinceServiceConnectionChecked > RECONNECTION_INTERVAL) {
+          _framesSinceServiceConnectionChecked = 0;
+          _numberOfReconnectionAttempts++;
+
+          Debug.LogWarning("Leap Service not connected; attempting to reconnect for try " +
+                           _numberOfReconnectionAttempts + "/" + MAX_RECONNECTION_ATTEMPTS +
+                           "...", this);
+          using (new ProfilerSample("Reconnection Attempt")) {
+            destroyController();
+            createController();
           }
         }
       }
       return false;
     }
 
-    /*
-     * Resets the Global Hand Transform Shader Matrices
-     */
-    protected void resetTransforms() {
-      _transformArray[0] = Matrix4x4.identity;
-      _transformArray[1] = Matrix4x4.identity;
-      Shader.SetGlobalMatrixArray(HAND_ARRAY, _transformArray);
-    }
-
-    /*
-     * Initializes the Leap Motion policy flags.
-     * The POLICY_OPTIMIZE_HMD flag improves tracking for head-mounted devices.
-     */
-    protected void initializeFlags() {
-      if (leap_controller_ == null) {
-        return;
-      }
-      //Optimize for top-down tracking if on head mounted display.
-      if (_isHeadMounted) {
-        leap_controller_.SetPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
-      } else {
-        leap_controller_.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
-      }
-    }
-    /** Create an instance of a Controller, initialize its policy flags
-     * and subscribe to connection event */
-    protected void createController() {
-      if (leap_controller_ != null) {
-        destroyController();
-      }
-
-      leap_controller_ = new Controller();
-      if (leap_controller_.IsConnected) {
-        initializeFlags();
-      } else {
-        leap_controller_.Device += onHandControllerConnect;
-      }
-    }
-
-    /** Calling this method stop the connection for the existing instance of a Controller, 
-     * clears old policy flags and resets to null */
-    protected void destroyController() {
-      if (leap_controller_ != null) {
-        if (leap_controller_.IsConnected) {
-          leap_controller_.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
-        }
-        leap_controller_.StopConnection();
-        leap_controller_ = null;
-      }
-    }
-
     protected void onHandControllerConnect(object sender, LeapEventArgs args) {
       initializeFlags();
-      leap_controller_.Device -= onHandControllerConnect;
-    }
 
-    protected void transformFrame(Frame source, Frame dest, bool resampleTemporalWarping = true) {
-      LeapTransform leapTransform;
-      if (_temporalWarping != null) {
-        if (resampleTemporalWarping) {
-          _temporalWarping.TryGetWarpedTransform(LeapVRTemporalWarping.WarpedAnchor.CENTER, out warpedPosition, out warpedRotation, source.Timestamp);
-          warpedRotation = warpedRotation * transform.localRotation;
-        }
-
-        leapTransform = new LeapTransform(warpedPosition.ToVector(), warpedRotation.ToLeapQuaternion(), transform.lossyScale.ToVector() * 1e-3f);
-        leapTransform.MirrorZ();
-      } else {
-        leapTransform = transform.GetLeapMatrix();
-      }
-
-      dest.CopyFrom(source).Transform(leapTransform);
-    }
-
-    protected void transformHands(ref LeapTransform LeftHand, ref LeapTransform RightHand) {
-      LeapTransform leapTransform;
-      if (_temporalWarping != null) {
-        leapTransform = new LeapTransform(warpedPosition.ToVector(), warpedRotation.ToLeapQuaternion(), transform.lossyScale.ToVector() * 1e-3f);
-        leapTransform.MirrorZ();
-      } else {
-        leapTransform = transform.GetLeapMatrix();
-      }
-
-      LeftHand = new LeapTransform(leapTransform.TransformPoint(LeftHand.translation), leapTransform.TransformQuaternion(LeftHand.rotation));
-      RightHand = new LeapTransform(leapTransform.TransformPoint(RightHand.translation), leapTransform.TransformQuaternion(RightHand.rotation));
-    }
-
-    public void LateUpdateHandTransforms(Camera camera) {
-      if (_updateHandInPrecull) {
-#if UNITY_EDITOR
-        //Hard-coded name of the camera used to generate the pre-render view
-        if (camera.gameObject.name == "PreRenderCamera") {
-          return;
-        }
-
-        bool isScenePreviewCamera = camera.gameObject.hideFlags == HideFlags.HideAndDontSave;
-        if (isScenePreviewCamera) {
-          return;
-        }
-#endif
-
-        if (Application.isPlaying && !manualUpdateHasBeenCalledSinceUpdate && leap_controller_ != null) {
-          manualUpdateHasBeenCalledSinceUpdate = true;
-          //Find the Left and/or Right Hand(s) to Latch
-          Hand leftHand = null, rightHand = null;
-          LeapTransform PrecullLeftHand = LeapTransform.Identity, PrecullRightHand = LeapTransform.Identity;
-          for (int i = 0; i < CurrentFrame.Hands.Count; i++) {
-            Hand updateHand = CurrentFrame.Hands[i];
-            if (updateHand.IsLeft && leftHand == null) {
-              leftHand = updateHand;
-            } else if (updateHand.IsRight && rightHand == null) {
-              rightHand = updateHand;
-            }
-          }
-
-          //Determine their new Transforms
-          leap_controller_.GetInterpolatedLeftRightTransform(CalculateInterpolationTime() + (ExtrapolationAmount * 1000), CalculateInterpolationTime() - (BounceAmount * 1000), (leftHand != null ? leftHand.Id : 0), (rightHand != null ? rightHand.Id : 0), out PrecullLeftHand, out PrecullRightHand);
-          bool LeftValid = PrecullLeftHand.translation != Vector.Zero; bool RightValid = PrecullRightHand.translation != Vector.Zero;
-          transformHands(ref PrecullLeftHand, ref PrecullRightHand);
-
-          //Calculate the Delta Transforms
-          if (rightHand != null && RightValid) {
-            _transformArray[0] =
-                               Matrix4x4.TRS(PrecullRightHand.translation.ToVector3(), PrecullRightHand.rotation.ToQuaternion(), Vector3.one) *
-             Matrix4x4.Inverse(Matrix4x4.TRS(rightHand.PalmPosition.ToVector3(), rightHand.Rotation.ToQuaternion(), Vector3.one));
-          }
-          if (leftHand != null && LeftValid) {
-            _transformArray[1] =
-                               Matrix4x4.TRS(PrecullLeftHand.translation.ToVector3(), PrecullLeftHand.rotation.ToQuaternion(), Vector3.one) *
-             Matrix4x4.Inverse(Matrix4x4.TRS(leftHand.PalmPosition.ToVector3(), leftHand.Rotation.ToQuaternion(), Vector3.one));
-          }
-
-          //Apply inside of the vertex shader
-          Shader.SetGlobalMatrixArray(HAND_ARRAY, _transformArray);
-        }
+      if (_leapController != null) {
+        _leapController.Device -= onHandControllerConnect;
       }
     }
+
+    protected virtual void transformFrame(Frame source, Frame dest) {
+      dest.CopyFrom(source).Transform(transform.GetLeapMatrix());
+    }
+
+    #endregion
+
   }
+
 }

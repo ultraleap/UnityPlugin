@@ -1,6 +1,6 @@
 /******************************************************************************
- * Copyright (C) Leap Motion, Inc. 2011-2017.                                 *
- * Leap Motion proprietary and  confidential.                                 *
+ * Copyright (C) Leap Motion, Inc. 2011-2018.                                 *
+ * Leap Motion proprietary and confidential.                                  *
  *                                                                            *
  * Use subject to the terms of the Leap Motion SDK Agreement available at     *
  * https://developer.leapmotion.com/sdk_agreement, or another agreement       *
@@ -227,42 +227,6 @@ namespace Leap.Unity.Interaction {
     }
 
     void Awake() {
-#if UNITY_EDITOR
-      if (InteractionPreferences.shouldPrompForGravity && Application.isPlaying) {
-        float magnitude = Physics.gravity.y;
-        if (Mathf.Abs(magnitude) > InteractionPreferences.MAX_GRAVITY_MAGNITUDE) {
-          if (EditorUtility.DisplayDialog("Gravity magnitude too strong!",
-                                          "Your gravity magnitude is " + magnitude
-                                        + " which is stronger than the recommended value "
-                                        + "of -4.905!\n\nGo to Edit/Project Settings/Physics "
-                                        + "to change the magnitude.",
-                                          "I understand, don't show this again",
-                                          "OK, I'll go fix it")) {
-            InteractionPreferences.shouldPrompForGravity = false;
-          }
-          EditorApplication.isPlaying = false;
-          return;
-        }
-      }
-
-      if (InteractionPreferences.shouldPrompForPhysicsTimestep && Application.isPlaying) {
-        if (Time.fixedDeltaTime > InteractionPreferences.MAX_TIMESTEP + Mathf.Epsilon) {
-          float roundedTimestep = (float)Math.Round(InteractionPreferences.MAX_TIMESTEP, 4);
-          if (EditorUtility.DisplayDialog("Timestep too slow!",
-                                           "Your fixed timestep is " + Time.fixedDeltaTime
-                                         + ", which is slower than the recommended value "
-                                         + "of " + roundedTimestep + ".\n\nGo to Edit/Project Settings/Time "
-                                         + "to change the fixed timestep.",
-                                           "I understand, don't show this again",
-                                           "OK, I'll go fix it")) {
-            InteractionPreferences.shouldPrompForPhysicsTimestep = false;
-          }
-          EditorApplication.isPlaying = false;
-          return;
-        }
-      }
-#endif
-
       refreshInteractionControllers();
 
       if (!Application.isPlaying) return;
@@ -277,7 +241,7 @@ namespace Leap.Unity.Interaction {
       _prevPosition = this.transform.position;
       _prevRotation = this.transform.rotation;
 
-#if UNITY_EDITOR
+      #if UNITY_EDITOR
       if (_drawControllerRuntimeGizmos == true) {
         if (FindObjectOfType<RuntimeGizmoManager>() == null) {
           Debug.LogWarning("'_drawControllerRuntimeGizmos' is enabled, but there is no "
@@ -285,13 +249,13 @@ namespace Leap.Unity.Interaction {
                          + "like to render gizmos in the editor and in your headset.");
         }
       }
-#endif
+      #endif
     }
 
     void OnDisable() {
-#if UNITY_EDITOR
+      #if UNITY_EDITOR
       if (!Application.isPlaying) return;
-#endif
+      #endif
 
       foreach (var intController in _interactionControllers) {
         // Disables the colliders in the interaction controller;
@@ -305,9 +269,9 @@ namespace Leap.Unity.Interaction {
     }
 
     void Update() {
-#if UNITY_EDITOR
+      #if UNITY_EDITOR
       refreshInteractionControllers();
-#endif
+      #endif
     }
 
     void FixedUpdate() {
@@ -315,7 +279,7 @@ namespace Leap.Unity.Interaction {
 
       // Physics should only be synced once at the beginning of the physics simulation.
       // (Will be re-set to its original value at the end of the update.)
-      #if UNITY_2017_1_OR_NEWER
+      #if UNITY_2017_2_OR_NEWER
       var preUpdateAutoSyncTransforms = Physics.autoSyncTransforms;
       Physics.autoSyncTransforms = false;
       #endif
@@ -323,9 +287,9 @@ namespace Leap.Unity.Interaction {
 
         refreshInteractionControllers();
 
-#if UNITY_EDITOR
+        #if UNITY_EDITOR
         if (!Application.isPlaying) return;
-#endif
+        #endif
 
         using (new ProfilerSample("Interaction Manager FixedUpdate", this.gameObject)) {
           // Ensure scale information is up-to-date.
@@ -344,6 +308,9 @@ namespace Leap.Unity.Interaction {
           // Apply soft contacts from all controllers in a unified solve.
           // (This will clear softContacts and originalVelocities as well.)
           using (new ProfilerSample("Apply Soft Contacts")) {
+            if (_drawControllerRuntimeGizmos) {
+              _softContactsToDraw = new List<PhysicsUtility.SoftContact>(_softContacts);
+            }
             if (_softContacts.Count > 0) {
               PhysicsUtility.applySoftContacts(_softContacts, _softContactOriginalVelocities);
             }
@@ -360,7 +327,7 @@ namespace Leap.Unity.Interaction {
 
       }
       finally {
-        #if UNITY_2017_1_OR_NEWER
+        #if UNITY_2017_2_OR_NEWER
         // Restore the autoSyncTransforms setting to whatever the user had it as before
         // the Manager FixedUpdate.
         Physics.autoSyncTransforms = preUpdateAutoSyncTransforms;
@@ -374,7 +341,7 @@ namespace Leap.Unity.Interaction {
 
 #endregion
 
-#region Controller Interaction State & Callbacks Update
+    #region Controller Interaction State & Callbacks Update
 
     private HashSet<InteractionController> _activeControllersBuffer = new HashSet<InteractionController>();
     private HashSet<InteractionController> _hoverControllersBuffer = new HashSet<InteractionController>();
@@ -409,21 +376,21 @@ namespace Leap.Unity.Interaction {
       using (new ProfilerSample("Fixed Update Controllers (Interaction State and Callbacks)")) {
 
         /*
-         * Interactions are checked here in a very specific manner so that interaction
-         * callbacks always occur in a strict order and interaction object state is
-         * always updated directly before the relevant callbacks occur.
-         *
-         * Interaction callbacks will only occur outside this order if a script
-         * manually forces interaction state-changes; for example, calling
-         * interactionController.ReleaseGrasp() will immediately call
-         * interactionObject.OnPerControllerGraspEnd() on the formerly grasped object.
-         *
-         * Callback order:
-         * - Suspension (when a grasped object's grasping controller loses tracking)
-         * - Just-Ended Interactions (Grasps, then Contacts, then Hovers)
-         * - Just-Begun Interactions (Hovers, then Contacts, then Grasps)
-         * - Sustained Interactions (Hovers, then Contacts, then Grasps)
-         */
+          * Interactions are checked here in a very specific manner so that interaction
+          * callbacks always occur in a strict order and interaction object state is
+          * always updated directly before the relevant callbacks occur.
+          *
+          * Interaction callbacks will only occur outside this order if a script
+          * manually forces interaction state-changes; for example, calling
+          * interactionController.ReleaseGrasp() will immediately call
+          * interactionObject.OnPerControllerGraspEnd() on the formerly grasped object.
+          *
+          * Callback order:
+          * - Suspension (when a grasped object's grasping controller loses tracking)
+          * - Just-Ended Interactions (Grasps, then Contacts, then Hovers)
+          * - Just-Begun Interactions (Hovers, then Contacts, then Grasps)
+          * - Sustained Interactions (Hovers, then Contacts, then Grasps)
+          */
 
         // Suspension //
 
@@ -467,291 +434,291 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-#region State-Check Remapping Functions
+    #region State-Check Remapping Functions
 
-    private void checkEndingGrasps(ReadonlyHashSet<InteractionController> interactionControllers) {
-      remapInteractionObjectStateChecks(
-        controllers: interactionControllers,
-        stateCheckFunc: (InteractionController maybeReleasingController, out IInteractionBehaviour maybeReleasedObject) => {
-          return (maybeReleasingController as IInternalInteractionController).CheckGraspEnd(out maybeReleasedObject);
-        },
-        actionPerInteractionObject: (releasedObject, releasingIntControllers) => {
-          releasedObject.EndGrasp(releasingIntControllers);
-        });
-    }
-
-    private void checkEndingContacts(ReadonlyHashSet<InteractionController> interactionControllers) {
-      remapMultiInteractionObjectStateChecks(
-        controllers: interactionControllers,
-        multiObjectStateCheckFunc: (InteractionController maybeEndedContactingController, out HashSet<IInteractionBehaviour> endContactedObjects) => {
-          return (maybeEndedContactingController as IInternalInteractionController).CheckContactEnd(out endContactedObjects);
-        },
-        actionPerInteractionObject: (endContactedObject, endContactedIntControllers) => {
-          endContactedObject.EndContact(endContactedIntControllers);
-        });
-    }
-
-    private void checkEndingPrimaryHovers(ReadonlyHashSet<InteractionController> interactionControllers) {
-      remapInteractionObjectStateChecks(
-        controllers: interactionControllers,
-        stateCheckFunc: (InteractionController maybeEndedPrimaryHoveringController, out IInteractionBehaviour endPrimaryHoveredObject) => {
-          return (maybeEndedPrimaryHoveringController as IInternalInteractionController).CheckPrimaryHoverEnd(out endPrimaryHoveredObject);
-        },
-        actionPerInteractionObject: (endPrimaryHoveredObject, noLongerPrimaryHoveringControllers) => {
-          endPrimaryHoveredObject.EndPrimaryHover(noLongerPrimaryHoveringControllers);
-        });
-    }
-
-    private void checkEndingHovers(ReadonlyHashSet<InteractionController> interactionControllers) {
-      remapMultiInteractionObjectStateChecks(
-        controllers: interactionControllers,
-        multiObjectStateCheckFunc: (InteractionController maybeEndedHoveringController, out HashSet<IInteractionBehaviour> endHoveredObjects) => {
-          return (maybeEndedHoveringController as IInternalInteractionController).CheckHoverEnd(out endHoveredObjects);
-        },
-        actionPerInteractionObject: (endHoveredObject, endHoveringIntControllers) => {
-          endHoveredObject.EndHover(endHoveringIntControllers);
-        });
-    }
-
-    private void checkBeginningHovers(ReadonlyHashSet<InteractionController> interactionControllers) {
-      remapMultiInteractionObjectStateChecks(
-        controllers: interactionControllers,
-        multiObjectStateCheckFunc: (InteractionController maybeBeganHoveringController, out HashSet<IInteractionBehaviour> beganHoveredObjects) => {
-          return (maybeBeganHoveringController as IInternalInteractionController).CheckHoverBegin(out beganHoveredObjects);
-        },
-        actionPerInteractionObject: (beganHoveredObject, beganHoveringIntControllers) => {
-          beganHoveredObject.BeginHover(beganHoveringIntControllers);
-        });
-    }
-
-    private void checkBeginningPrimaryHovers(ReadonlyHashSet<InteractionController> interactionControllers) {
-      remapInteractionObjectStateChecks(
-        controllers: interactionControllers,
-        stateCheckFunc: (InteractionController maybeBeganPrimaryHoveringController, out IInteractionBehaviour primaryHoveredObject) => {
-          return (maybeBeganPrimaryHoveringController as IInternalInteractionController).CheckPrimaryHoverBegin(out primaryHoveredObject);
-        },
-        actionPerInteractionObject: (newlyPrimaryHoveredObject, beganPrimaryHoveringControllers) => {
-          newlyPrimaryHoveredObject.BeginPrimaryHover(beganPrimaryHoveringControllers);
-        });
-    }
-
-    private void checkBeginningContacts(ReadonlyHashSet<InteractionController> interactionControllers) {
-      remapMultiInteractionObjectStateChecks(
-        controllers: interactionControllers,
-        multiObjectStateCheckFunc: (InteractionController maybeBeganContactingController, out HashSet<IInteractionBehaviour> beganContactedObjects) => {
-          return (maybeBeganContactingController as IInternalInteractionController).CheckContactBegin(out beganContactedObjects);
-        },
-        actionPerInteractionObject: (beganContactedObject, beganContactingIntControllers) => {
-          beganContactedObject.BeginContact(beganContactingIntControllers);
-        });
-    }
-
-    private void checkBeginningGrasps(ReadonlyHashSet<InteractionController> interactionControllers) {
-      remapInteractionObjectStateChecks(
-        controllers: interactionControllers,
-        stateCheckFunc: (InteractionController maybeBeganGraspingController, out IInteractionBehaviour graspedObject) => {
-          return (maybeBeganGraspingController as IInternalInteractionController).CheckGraspBegin(out graspedObject);
-        },
-        actionPerInteractionObject: (newlyGraspedObject, beganGraspingIntControllers) => {
-          newlyGraspedObject.BeginGrasp(beganGraspingIntControllers);
-        });
-    }
-
-    private void checkSustainingHovers(ReadonlyHashSet<InteractionController> interactionControllers) {
-      remapMultiInteractionObjectStateChecks(
-        controllers: interactionControllers,
-        multiObjectStateCheckFunc: (InteractionController maybeSustainedHoveringController, out HashSet<IInteractionBehaviour> hoveredObjects) => {
-          return (maybeSustainedHoveringController as IInternalInteractionController).CheckHoverStay(out hoveredObjects);
-        },
-        actionPerInteractionObject: (hoveredObject, hoveringIntControllers) => {
-          hoveredObject.StayHovered(hoveringIntControllers);
-        });
-    }
-
-    private void checkSustainingPrimaryHovers(ReadonlyHashSet<InteractionController> interactionControllers) {
-      remapInteractionObjectStateChecks(
-        controllers: interactionControllers,
-        stateCheckFunc: (InteractionController maybeSustainedPrimaryHoveringController, out IInteractionBehaviour primaryHoveredObject) => {
-          return (maybeSustainedPrimaryHoveringController as IInternalInteractionController).CheckPrimaryHoverStay(out primaryHoveredObject);
-        },
-        actionPerInteractionObject: (primaryHoveredObject, primaryHoveringControllers) => {
-          primaryHoveredObject.StayPrimaryHovered(primaryHoveringControllers);
-        });
-    }
-
-    private void checkSustainingContacts(ReadonlyHashSet<InteractionController> interactionControllers) {
-      remapMultiInteractionObjectStateChecks(
-        controllers: interactionControllers,
-        multiObjectStateCheckFunc: (InteractionController maybeSustainedContactingController, out HashSet<IInteractionBehaviour> contactedObjects) => {
-          return (maybeSustainedContactingController as IInternalInteractionController).CheckContactStay(out contactedObjects);
-        },
-        actionPerInteractionObject: (contactedObject, contactingIntControllers) => {
-          contactedObject.StayContacted(contactingIntControllers);
-        });
-    }
-
-    private void checkSustainingGrasps(ReadonlyHashSet<InteractionController> interactionControllers) {
-      remapInteractionObjectStateChecks(
-        controllers: interactionControllers,
-        stateCheckFunc: (InteractionController maybeSustainedGraspingController, out IInteractionBehaviour graspedObject) => {
-          return (maybeSustainedGraspingController as IInternalInteractionController).CheckGraspHold(out graspedObject);
-        },
-        actionPerInteractionObject: (contactedObject, contactingIntControllers) => {
-          contactedObject.StayGrasped(contactingIntControllers);
-        });
-    }
-
-    private delegate bool StateChangeCheckFunc(InteractionController controller, out IInteractionBehaviour obj);
-    private delegate bool MultiStateChangeCheckFunc(InteractionController controller, out HashSet<IInteractionBehaviour> objs);
-
-    [ThreadStatic]
-    private static Dictionary<IInteractionBehaviour, List<InteractionController>> s_objControllersMap = new Dictionary<IInteractionBehaviour, List<InteractionController>>();
-
-    /// <summary>
-    /// Checks object state per-controller, then calls an action per-object with all controller checks that reported back an object.
-    /// </summary>
-    private void remapInteractionObjectStateChecks(ReadonlyHashSet<InteractionController> controllers,
-                                                   StateChangeCheckFunc stateCheckFunc,
-                                                   Action<IInteractionBehaviour, List<InteractionController>> actionPerInteractionObject) {
-
-      // Ensure the object->controllers buffer is non-null (ThreadStatic quirk) and clean.
-      if (s_objControllersMap == null) s_objControllersMap = new Dictionary<IInteractionBehaviour, List<InteractionController>>();
-      s_objControllersMap.Clear();
-
-      // In a nutshell, this remaps methods per-controller that output an interaction object if the controller changed that object's state
-      // to methods per-object with all of the controllers for which the check produced a state-change.
-      foreach (var controller in controllers) {
-        IInteractionBehaviour objectWhoseStateChanged;
-        if (stateCheckFunc(controller, out objectWhoseStateChanged)) {
-          if (!s_objControllersMap.ContainsKey(objectWhoseStateChanged)) {
-            s_objControllersMap[objectWhoseStateChanged] = Pool<List<InteractionController>>.Spawn();
-          }
-          s_objControllersMap[objectWhoseStateChanged].Add(controller);
+        private void checkEndingGrasps(ReadonlyHashSet<InteractionController> interactionControllers) {
+          remapInteractionObjectStateChecks(
+            controllers: interactionControllers,
+            stateCheckFunc: (InteractionController maybeReleasingController, out IInteractionBehaviour maybeReleasedObject) => {
+              return (maybeReleasingController as IInternalInteractionController).CheckGraspEnd(out maybeReleasedObject);
+            },
+            actionPerInteractionObject: (releasedObject, releasingIntControllers) => {
+              releasedObject.EndGrasp(releasingIntControllers);
+            });
         }
-      }
-      // Finally, iterate through each (object, controllers) pair and call the action for each pair
-      foreach (var objControllesPair in s_objControllersMap) {
-        actionPerInteractionObject(objControllesPair.Key, objControllesPair.Value);
 
-        // Clear each controllers list and return it to the list pool.
-        objControllesPair.Value.Clear();
-        Pool<List<InteractionController>>.Recycle(objControllesPair.Value);
-      }
-    }
+        private void checkEndingContacts(ReadonlyHashSet<InteractionController> interactionControllers) {
+          remapMultiInteractionObjectStateChecks(
+            controllers: interactionControllers,
+            multiObjectStateCheckFunc: (InteractionController maybeEndedContactingController, out HashSet<IInteractionBehaviour> endContactedObjects) => {
+              return (maybeEndedContactingController as IInternalInteractionController).CheckContactEnd(out endContactedObjects);
+            },
+            actionPerInteractionObject: (endContactedObject, endContactedIntControllers) => {
+              endContactedObject.EndContact(endContactedIntControllers);
+            });
+        }
 
-    /// <summary>
-    /// Checks object state per-controller, then calls an action per-object with all controller checks that reported back objects.
-    /// </summary>
-    private void remapMultiInteractionObjectStateChecks(ReadonlyHashSet<InteractionController> controllers,
-                                                        MultiStateChangeCheckFunc multiObjectStateCheckFunc,
-                                                        Action<IInteractionBehaviour, List<InteractionController>> actionPerInteractionObject) {
-      // Ensure object<->controllers buffer is non-null (ThreadStatic quirk) and clean.
-      if (s_objControllersMap == null) s_objControllersMap = new Dictionary<IInteractionBehaviour, List<InteractionController>>();
-      s_objControllersMap.Clear();
+        private void checkEndingPrimaryHovers(ReadonlyHashSet<InteractionController> interactionControllers) {
+          remapInteractionObjectStateChecks(
+            controllers: interactionControllers,
+            stateCheckFunc: (InteractionController maybeEndedPrimaryHoveringController, out IInteractionBehaviour endPrimaryHoveredObject) => {
+              return (maybeEndedPrimaryHoveringController as IInternalInteractionController).CheckPrimaryHoverEnd(out endPrimaryHoveredObject);
+            },
+            actionPerInteractionObject: (endPrimaryHoveredObject, noLongerPrimaryHoveringControllers) => {
+              endPrimaryHoveredObject.EndPrimaryHover(noLongerPrimaryHoveringControllers);
+            });
+        }
 
-      // In a nutshell, this remaps methods per-controller that output multiple interaction objects if the controller changed those objects' states
-      // to methods per-object with all of the controllers for which the check produced a state-change.
-      foreach (var controller in controllers) {
-        HashSet<IInteractionBehaviour> stateChangedObjects;
-        if (multiObjectStateCheckFunc(controller, out stateChangedObjects)) {
-          foreach (var stateChangedObject in stateChangedObjects) {
-            if (!s_objControllersMap.ContainsKey(stateChangedObject)) {
-              s_objControllersMap[stateChangedObject] = Pool<List<InteractionController>>.Spawn();
+        private void checkEndingHovers(ReadonlyHashSet<InteractionController> interactionControllers) {
+          remapMultiInteractionObjectStateChecks(
+            controllers: interactionControllers,
+            multiObjectStateCheckFunc: (InteractionController maybeEndedHoveringController, out HashSet<IInteractionBehaviour> endHoveredObjects) => {
+              return (maybeEndedHoveringController as IInternalInteractionController).CheckHoverEnd(out endHoveredObjects);
+            },
+            actionPerInteractionObject: (endHoveredObject, endHoveringIntControllers) => {
+              endHoveredObject.EndHover(endHoveringIntControllers);
+            });
+        }
+
+        private void checkBeginningHovers(ReadonlyHashSet<InteractionController> interactionControllers) {
+          remapMultiInteractionObjectStateChecks(
+            controllers: interactionControllers,
+            multiObjectStateCheckFunc: (InteractionController maybeBeganHoveringController, out HashSet<IInteractionBehaviour> beganHoveredObjects) => {
+              return (maybeBeganHoveringController as IInternalInteractionController).CheckHoverBegin(out beganHoveredObjects);
+            },
+            actionPerInteractionObject: (beganHoveredObject, beganHoveringIntControllers) => {
+              beganHoveredObject.BeginHover(beganHoveringIntControllers);
+            });
+        }
+
+        private void checkBeginningPrimaryHovers(ReadonlyHashSet<InteractionController> interactionControllers) {
+          remapInteractionObjectStateChecks(
+            controllers: interactionControllers,
+            stateCheckFunc: (InteractionController maybeBeganPrimaryHoveringController, out IInteractionBehaviour primaryHoveredObject) => {
+              return (maybeBeganPrimaryHoveringController as IInternalInteractionController).CheckPrimaryHoverBegin(out primaryHoveredObject);
+            },
+            actionPerInteractionObject: (newlyPrimaryHoveredObject, beganPrimaryHoveringControllers) => {
+              newlyPrimaryHoveredObject.BeginPrimaryHover(beganPrimaryHoveringControllers);
+            });
+        }
+
+        private void checkBeginningContacts(ReadonlyHashSet<InteractionController> interactionControllers) {
+          remapMultiInteractionObjectStateChecks(
+            controllers: interactionControllers,
+            multiObjectStateCheckFunc: (InteractionController maybeBeganContactingController, out HashSet<IInteractionBehaviour> beganContactedObjects) => {
+              return (maybeBeganContactingController as IInternalInteractionController).CheckContactBegin(out beganContactedObjects);
+            },
+            actionPerInteractionObject: (beganContactedObject, beganContactingIntControllers) => {
+              beganContactedObject.BeginContact(beganContactingIntControllers);
+            });
+        }
+
+        private void checkBeginningGrasps(ReadonlyHashSet<InteractionController> interactionControllers) {
+          remapInteractionObjectStateChecks(
+            controllers: interactionControllers,
+            stateCheckFunc: (InteractionController maybeBeganGraspingController, out IInteractionBehaviour graspedObject) => {
+              return (maybeBeganGraspingController as IInternalInteractionController).CheckGraspBegin(out graspedObject);
+            },
+            actionPerInteractionObject: (newlyGraspedObject, beganGraspingIntControllers) => {
+              newlyGraspedObject.BeginGrasp(beganGraspingIntControllers);
+            });
+        }
+
+        private void checkSustainingHovers(ReadonlyHashSet<InteractionController> interactionControllers) {
+          remapMultiInteractionObjectStateChecks(
+            controllers: interactionControllers,
+            multiObjectStateCheckFunc: (InteractionController maybeSustainedHoveringController, out HashSet<IInteractionBehaviour> hoveredObjects) => {
+              return (maybeSustainedHoveringController as IInternalInteractionController).CheckHoverStay(out hoveredObjects);
+            },
+            actionPerInteractionObject: (hoveredObject, hoveringIntControllers) => {
+              hoveredObject.StayHovered(hoveringIntControllers);
+            });
+        }
+
+        private void checkSustainingPrimaryHovers(ReadonlyHashSet<InteractionController> interactionControllers) {
+          remapInteractionObjectStateChecks(
+            controllers: interactionControllers,
+            stateCheckFunc: (InteractionController maybeSustainedPrimaryHoveringController, out IInteractionBehaviour primaryHoveredObject) => {
+              return (maybeSustainedPrimaryHoveringController as IInternalInteractionController).CheckPrimaryHoverStay(out primaryHoveredObject);
+            },
+            actionPerInteractionObject: (primaryHoveredObject, primaryHoveringControllers) => {
+              primaryHoveredObject.StayPrimaryHovered(primaryHoveringControllers);
+            });
+        }
+
+        private void checkSustainingContacts(ReadonlyHashSet<InteractionController> interactionControllers) {
+          remapMultiInteractionObjectStateChecks(
+            controllers: interactionControllers,
+            multiObjectStateCheckFunc: (InteractionController maybeSustainedContactingController, out HashSet<IInteractionBehaviour> contactedObjects) => {
+              return (maybeSustainedContactingController as IInternalInteractionController).CheckContactStay(out contactedObjects);
+            },
+            actionPerInteractionObject: (contactedObject, contactingIntControllers) => {
+              contactedObject.StayContacted(contactingIntControllers);
+            });
+        }
+
+        private void checkSustainingGrasps(ReadonlyHashSet<InteractionController> interactionControllers) {
+          remapInteractionObjectStateChecks(
+            controllers: interactionControllers,
+            stateCheckFunc: (InteractionController maybeSustainedGraspingController, out IInteractionBehaviour graspedObject) => {
+              return (maybeSustainedGraspingController as IInternalInteractionController).CheckGraspHold(out graspedObject);
+            },
+            actionPerInteractionObject: (contactedObject, contactingIntControllers) => {
+              contactedObject.StayGrasped(contactingIntControllers);
+            });
+        }
+
+        private delegate bool StateChangeCheckFunc(InteractionController controller, out IInteractionBehaviour obj);
+        private delegate bool MultiStateChangeCheckFunc(InteractionController controller, out HashSet<IInteractionBehaviour> objs);
+
+        [ThreadStatic]
+        private static Dictionary<IInteractionBehaviour, List<InteractionController>> s_objControllersMap = new Dictionary<IInteractionBehaviour, List<InteractionController>>();
+
+        /// <summary>
+        /// Checks object state per-controller, then calls an action per-object with all controller checks that reported back an object.
+        /// </summary>
+        private void remapInteractionObjectStateChecks(ReadonlyHashSet<InteractionController> controllers,
+                                                       StateChangeCheckFunc stateCheckFunc,
+                                                       Action<IInteractionBehaviour, List<InteractionController>> actionPerInteractionObject) {
+
+          // Ensure the object->controllers buffer is non-null (ThreadStatic quirk) and clean.
+          if (s_objControllersMap == null) s_objControllersMap = new Dictionary<IInteractionBehaviour, List<InteractionController>>();
+          s_objControllersMap.Clear();
+
+          // In a nutshell, this remaps methods per-controller that output an interaction object if the controller changed that object's state
+          // to methods per-object with all of the controllers for which the check produced a state-change.
+          foreach (var controller in controllers) {
+            IInteractionBehaviour objectWhoseStateChanged;
+            if (stateCheckFunc(controller, out objectWhoseStateChanged)) {
+              if (!s_objControllersMap.ContainsKey(objectWhoseStateChanged)) {
+                s_objControllersMap[objectWhoseStateChanged] = Pool<List<InteractionController>>.Spawn();
+              }
+              s_objControllersMap[objectWhoseStateChanged].Add(controller);
             }
-            s_objControllersMap[stateChangedObject].Add(controller);
+          }
+          // Finally, iterate through each (object, controllers) pair and call the action for each pair
+          foreach (var objControllesPair in s_objControllersMap) {
+            actionPerInteractionObject(objControllesPair.Key, objControllesPair.Value);
+
+            // Clear each controllers list and return it to the list pool.
+            objControllesPair.Value.Clear();
+            Pool<List<InteractionController>>.Recycle(objControllesPair.Value);
           }
         }
-      }
-      // Finally, iterate through each (object, controllers) pair and call the action for each pair
-      foreach (var objControllersPair in s_objControllersMap) {
-        actionPerInteractionObject(objControllersPair.Key, objControllersPair.Value);
 
-        // Clear each controllers list and return it to the list pool.
-        objControllersPair.Value.Clear();
-        Pool<List<InteractionController>>.Recycle(objControllersPair.Value);
-      }
-    }
+        /// <summary>
+        /// Checks object state per-controller, then calls an action per-object with all controller checks that reported back objects.
+        /// </summary>
+        private void remapMultiInteractionObjectStateChecks(ReadonlyHashSet<InteractionController> controllers,
+                                                            MultiStateChangeCheckFunc multiObjectStateCheckFunc,
+                                                            Action<IInteractionBehaviour, List<InteractionController>> actionPerInteractionObject) {
+          // Ensure object<->controllers buffer is non-null (ThreadStatic quirk) and clean.
+          if (s_objControllersMap == null) s_objControllersMap = new Dictionary<IInteractionBehaviour, List<InteractionController>>();
+          s_objControllersMap.Clear();
 
-#endregion
+          // In a nutshell, this remaps methods per-controller that output multiple interaction objects if the controller changed those objects' states
+          // to methods per-object with all of the controllers for which the check produced a state-change.
+          foreach (var controller in controllers) {
+            HashSet<IInteractionBehaviour> stateChangedObjects;
+            if (multiObjectStateCheckFunc(controller, out stateChangedObjects)) {
+              foreach (var stateChangedObject in stateChangedObjects) {
+                if (!s_objControllersMap.ContainsKey(stateChangedObject)) {
+                  s_objControllersMap[stateChangedObject] = Pool<List<InteractionController>>.Spawn();
+                }
+                s_objControllersMap[stateChangedObject].Add(controller);
+              }
+            }
+          }
+          // Finally, iterate through each (object, controllers) pair and call the action for each pair
+          foreach (var objControllersPair in s_objControllersMap) {
+            actionPerInteractionObject(objControllersPair.Key, objControllersPair.Value);
 
-#region State Notifications
+            // Clear each controllers list and return it to the list pool.
+            objControllersPair.Value.Clear();
+            Pool<List<InteractionController>>.Recycle(objControllersPair.Value);
+          }
+        }
 
-    // TODO: Delete this whole sction
+    #endregion
 
-    //private HashSet<InteractionController> controllerSetBuffer = new HashSet<InteractionController>();
+    #region State Notifications
 
-    //void IInternalInteractionManager.NotifyControllerDisabled(InteractionController controller) {
-    //  controllerSetBuffer.Clear();
-    //  controllerSetBuffer.Add(controller);
+        // TODO: Delete this whole sction
 
-    //  checkEndingGrasps(controllerSetBuffer);
-    //  checkEndingContacts(controllerSetBuffer);
-    //  checkEndingPrimaryHovers(controllerSetBuffer);
-    //  checkEndingHovers(controllerSetBuffer);
-    //}
+        //private HashSet<InteractionController> controllerSetBuffer = new HashSet<InteractionController>();
 
-    //void IInternalInteractionManager.NotifyHoverDisabled(InteractionController controller) {
-    //  controllerSetBuffer.Clear();
-    //  controllerSetBuffer.Add(controller);
+        //void IInternalInteractionManager.NotifyControllerDisabled(InteractionController controller) {
+        //  controllerSetBuffer.Clear();
+        //  controllerSetBuffer.Add(controller);
 
-    //  checkEndingPrimaryHovers(controllerSetBuffer);
-    //  checkEndingHovers(controllerSetBuffer);
-    //}
+        //  checkEndingGrasps(controllerSetBuffer);
+        //  checkEndingContacts(controllerSetBuffer);
+        //  checkEndingPrimaryHovers(controllerSetBuffer);
+        //  checkEndingHovers(controllerSetBuffer);
+        //}
 
-    //void IInternalInteractionManager.NotifyContactDisabled(InteractionController controller) {
-    //  controllerSetBuffer.Clear();
-    //  controllerSetBuffer.Add(controller);
+        //void IInternalInteractionManager.NotifyHoverDisabled(InteractionController controller) {
+        //  controllerSetBuffer.Clear();
+        //  controllerSetBuffer.Add(controller);
 
-    //  checkEndingContacts(controllerSetBuffer);
-    //}
+        //  checkEndingPrimaryHovers(controllerSetBuffer);
+        //  checkEndingHovers(controllerSetBuffer);
+        //}
 
-    //void IInternalInteractionManager.NotifyObjectHoverIgnored(IInteractionBehaviour intObj) {
-    //  controllerSetBuffer.Clear();
+        //void IInternalInteractionManager.NotifyContactDisabled(InteractionController controller) {
+        //  controllerSetBuffer.Clear();
+        //  controllerSetBuffer.Add(controller);
 
-    //  foreach (var controller in interactionControllers) {
-    //    if (controller.hoveredObjects.Contains(intObj)) {
-    //      (controller as IInternalInteractionController).ClearHoverTrackingForObject(intObj);
+        //  checkEndingContacts(controllerSetBuffer);
+        //}
 
-    //      controllerSetBuffer.Add(controller);
-    //    }
-    //  }
+        //void IInternalInteractionManager.NotifyObjectHoverIgnored(IInteractionBehaviour intObj) {
+        //  controllerSetBuffer.Clear();
 
-    //  checkEndingHovers(controllerSetBuffer);
-    //}
+        //  foreach (var controller in interactionControllers) {
+        //    if (controller.hoveredObjects.Contains(intObj)) {
+        //      (controller as IInternalInteractionController).ClearHoverTrackingForObject(intObj);
 
-    //void IInternalInteractionManager.NotifyObjectPrimaryHoverIgnored(IInteractionBehaviour intObj) {
-    //  controllerSetBuffer.Clear();
+        //      controllerSetBuffer.Add(controller);
+        //    }
+        //  }
 
-    //  foreach (var controller in interactionControllers) {
-    //    if (controller.primaryHoveredObject == intObj) {
-    //      (controller as IInternalInteractionController).ClearPrimaryHoverTrackingForObject(intObj);
+        //  checkEndingHovers(controllerSetBuffer);
+        //}
 
-    //      controllerSetBuffer.Add(controller);
-    //    }
-    //  }
+        //void IInternalInteractionManager.NotifyObjectPrimaryHoverIgnored(IInteractionBehaviour intObj) {
+        //  controllerSetBuffer.Clear();
 
-    //  checkEndingPrimaryHovers(controllerSetBuffer);
-    //}
+        //  foreach (var controller in interactionControllers) {
+        //    if (controller.primaryHoveredObject == intObj) {
+        //      (controller as IInternalInteractionController).ClearPrimaryHoverTrackingForObject(intObj);
 
-    //void IInternalInteractionManager.NotifyObjectContactIgnored(IInteractionBehaviour intObj) {
-    //  controllerSetBuffer.Clear();
+        //      controllerSetBuffer.Add(controller);
+        //    }
+        //  }
 
-    //  foreach (var controller in interactionControllers) {
-    //    if (controller.contactingObjects.Contains(intObj)) {
-    //      (controller as IInternalInteractionController).ClearContactTrackingForObject(intObj);
+        //  checkEndingPrimaryHovers(controllerSetBuffer);
+        //}
 
-    //      controllerSetBuffer.Add(controller);
-    //    }
-    //  }
+        //void IInternalInteractionManager.NotifyObjectContactIgnored(IInteractionBehaviour intObj) {
+        //  controllerSetBuffer.Clear();
 
-    //  checkEndingContacts(controllerSetBuffer);
-    //}
+        //  foreach (var controller in interactionControllers) {
+        //    if (controller.contactingObjects.Contains(intObj)) {
+        //      (controller as IInternalInteractionController).ClearContactTrackingForObject(intObj);
 
-#endregion
+        //      controllerSetBuffer.Add(controller);
+        //    }
+        //  }
 
-#endregion
+        //  checkEndingContacts(controllerSetBuffer);
+        //}
 
-#region Object Registration
+    #endregion
+
+    #endregion
+
+    #region Object Registration
 
     public void RegisterInteractionBehaviour(IInteractionBehaviour interactionObj) {
       _interactionObjects.Add(interactionObj);
@@ -780,9 +747,9 @@ namespace Leap.Unity.Interaction {
       return _interactionObjects.Contains(interactionObj);
     }
 
-#endregion
+    #endregion
 
-#region Moving Frame of Reference Support
+    #region Moving Frame of Reference Support
 
     public bool hasMovingFrameOfReference {
       get {
@@ -826,25 +793,33 @@ namespace Leap.Unity.Interaction {
       newPosition = ((worldRotation * (position - this.transform.position + worldDisplacement))) + this.transform.position;
     }
 
-#endregion
+    #endregion
 
-#region Soft Contact Support
-
-    /// <summary>
-    /// Stores data for implementing Soft Contact for interaction controllers.
-    /// </summary>
-    [NonSerialized]
-    public List<PhysicsUtility.SoftContact> _softContacts = new List<PhysicsUtility.SoftContact>(80);
+    #region Soft Contact Support
 
     /// <summary>
     /// Stores data for implementing Soft Contact for interaction controllers.
     /// </summary>
     [NonSerialized]
-    public Dictionary<Rigidbody, PhysicsUtility.Velocities> _softContactOriginalVelocities = new Dictionary<Rigidbody, PhysicsUtility.Velocities>(5);
+    public List<PhysicsUtility.SoftContact> _softContacts
+      = new List<PhysicsUtility.SoftContact>(80);
 
-#endregion
+    /// <summary>
+    /// Stores data for implementing Soft Contact for interaction controllers.
+    /// </summary>
+    [NonSerialized]
+    public Dictionary<Rigidbody, PhysicsUtility.Velocities> _softContactOriginalVelocities
+      = new Dictionary<Rigidbody, PhysicsUtility.Velocities>(5);
 
-#region Interaction Controllers
+    /// <summary>
+    /// Stores data for drawing Soft Contacts for interaction controllers.
+    /// </summary>
+    private List<PhysicsUtility.SoftContact> _softContactsToDraw
+      = new List<PhysicsUtility.SoftContact>();
+
+    #endregion
+
+    #region Interaction Controllers
 
     private void refreshInteractionControllers() {
       _interactionControllers.Clear();
@@ -862,11 +837,11 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-#endregion
+    #endregion
 
-#region Layers
+    #region Layers
 
-#region Automatic Layers
+    #region Automatic Layers
 
     protected void generateAutomaticLayers() {
       _interactionLayer = -1;
@@ -893,7 +868,7 @@ namespace Leap.Unity.Interaction {
           enabled = false;
         }
         Debug.LogError("InteractionManager Could not find enough free layers for "
-                     + "auto-setup; manual setup is required.", this.gameObject);
+                      + "auto-setup; manual setup is required.", this.gameObject);
         _autoGenerateLayers = false;
         return;
       }
@@ -918,9 +893,9 @@ namespace Leap.Unity.Interaction {
       Physics.IgnoreLayerCollision(_contactBoneLayer, _interactionNoContactLayer, true);
     }
 
-#endregion
+    #endregion
 
-#region Interaction Object Layer Tracking
+    #region Interaction Object Layer Tracking
 
     private Dictionary<SingleLayer, HashSet<IInteractionBehaviour>> _intObjInteractionLayers = new Dictionary<SingleLayer, HashSet<IInteractionBehaviour>>();
     private Dictionary<SingleLayer, HashSet<IInteractionBehaviour>> _intObjNoContactLayers   = new Dictionary<SingleLayer, HashSet<IInteractionBehaviour>>();
@@ -983,7 +958,7 @@ namespace Leap.Unity.Interaction {
 
       for (int i = 0; i < 32; i++) {
         Physics.IgnoreLayerCollision(contactBoneLayer.layerIndex, i,
-                                     _contactBoneIgnoreCollisionLayers[i]);
+                                      _contactBoneIgnoreCollisionLayers[i]);
       }
     }
 
@@ -1031,11 +1006,11 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-#endregion
+    #endregion
 
-#endregion
+    #endregion
 
-#region Runtime Gizmos
+    #region Runtime Gizmos
 
     public void OnDrawRuntimeGizmos(RuntimeGizmoDrawer drawer) {
       if (_drawControllerRuntimeGizmos) {
@@ -1044,10 +1019,15 @@ namespace Leap.Unity.Interaction {
             controller.OnDrawRuntimeGizmos(drawer);
           }
         }
+        
+        foreach (PhysicsUtility.SoftContact contact in _softContactsToDraw) {
+          drawer.DrawSphere(contact.position, 0.01f);
+          drawer.DrawLine(contact.position, contact.position + (contact.normal * 0.02f));
+        }
       }
     }
 
-#endregion
+    #endregion
 
   }
 

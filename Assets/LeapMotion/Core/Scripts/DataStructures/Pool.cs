@@ -1,6 +1,6 @@
 /******************************************************************************
- * Copyright (C) Leap Motion, Inc. 2011-2017.                                 *
- * Leap Motion proprietary and  confidential.                                 *
+ * Copyright (C) Leap Motion, Inc. 2011-2018.                                 *
+ * Leap Motion proprietary and confidential.                                  *
  *                                                                            *
  * Use subject to the terms of the Leap Motion SDK Agreement available at     *
  * https://developer.leapmotion.com/sdk_agreement, or another agreement       *
@@ -15,9 +15,7 @@ namespace Leap.Unity {
 
   /// <summary>
   /// Implement this interface to recieve a callback whenever your object is
-  /// spawned from a pool.  You do not recieve a callback during recycle because
-  /// the recommended workflow is to have the object implement IDisposable and
-  /// recycle itself within the Dispose method.
+  /// spawned from a pool.
   /// </summary>
   public interface IPoolable {
     void OnSpawn();

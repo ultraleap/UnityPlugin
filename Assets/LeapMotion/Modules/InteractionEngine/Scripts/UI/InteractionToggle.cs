@@ -1,6 +1,6 @@
 /******************************************************************************
- * Copyright (C) Leap Motion, Inc. 2011-2017.                                 *
- * Leap Motion proprietary and  confidential.                                 *
+ * Copyright (C) Leap Motion, Inc. 2011-2018.                                 *
+ * Leap Motion proprietary and confidential.                                  *
  *                                                                            *
  * Use subject to the terms of the Leap Motion SDK Agreement available at     *
  * https://developer.leapmotion.com/sdk_agreement, or another agreement       *
@@ -45,8 +45,8 @@ namespace Leap.Unity.Interaction {
           }
           restingHeight = isToggled ? toggledRestingHeight : _originalRestingHeight;
           rigidbody.WakeUp();
-          depressedThisFrame = value;
-          unDepressedThisFrame = !value;
+          _pressedThisFrame = value;
+          _unpressedThisFrame = !value;
         }
       }
     }
@@ -130,6 +130,21 @@ namespace Leap.Unity.Interaction {
 
     private void OnPressed() {
       isToggled = !isToggled;
+    }
+
+    /// <summary>
+    /// Sets this InteractionToggle to the "toggled" state. Calling this function won't
+    /// oscillate the state of the toggle; to 'untoggle' the control, call Untoggle().
+    /// </summary>
+    public void Toggle() {
+      isToggled = true;
+    }
+
+    /// <summary>
+    /// Sets this InteractionToggle to the "untoggled" state.
+    /// </summary>
+    public void Untoggle() {
+      isToggled = false;
     }
   }
 }

@@ -1,6 +1,6 @@
 /******************************************************************************
- * Copyright (C) Leap Motion, Inc. 2011-2017.                                 *
- * Leap Motion proprietary and  confidential.                                 *
+ * Copyright (C) Leap Motion, Inc. 2011-2018.                                 *
+ * Leap Motion proprietary and confidential.                                  *
  *                                                                            *
  * Use subject to the terms of the Leap Motion SDK Agreement available at     *
  * https://developer.leapmotion.com/sdk_agreement, or another agreement       *
@@ -291,6 +291,13 @@ namespace Leap.Unity.GraphicalRenderer {
     }
 
     /// <summary>
+    /// Called by graphic groups when a renderer's attached space changes.
+    /// </summary>
+    public void OnUpdateAnchor(LeapSpaceAnchor anchor) {
+      _anchor = anchor;
+    }
+
+    /// <summary>
     /// Called by the system when this graphic is detached from a group.  This method
     /// is invoked both at runtime and at edit time.
     /// </summary>
@@ -357,6 +364,12 @@ namespace Leap.Unity.GraphicalRenderer {
 
     protected virtual void OnEnable() {
       patchReferences();
+    }
+
+    protected virtual void OnDestroy() {
+      if (Application.isPlaying && isAttachedToGroup) {
+        TryDetach();
+      }
     }
 
     protected virtual void OnDrawGizmos() {

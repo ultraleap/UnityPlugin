@@ -1,6 +1,6 @@
 /******************************************************************************
- * Copyright (C) Leap Motion, Inc. 2011-2017.                                 *
- * Leap Motion proprietary and  confidential.                                 *
+ * Copyright (C) Leap Motion, Inc. 2011-2018.                                 *
+ * Leap Motion proprietary and confidential.                                  *
  *                                                                            *
  * Use subject to the terms of the Leap Motion SDK Agreement available at     *
  * https://developer.leapmotion.com/sdk_agreement, or another agreement       *
@@ -14,29 +14,50 @@ namespace Leap {
   using Leap.Unity;
   using UnityEngine;
 
-  public class TestHandFactory {
+  public static class TestHandFactory {
 
-    public static Frame MakeTestFrame(int frameId, bool leftHandIncluded, bool rightHandIncluded) {
-      Frame testFrame = new Frame(frameId, 0, 120.0f, new InteractionBox(), new List<Hand>());
-      if (leftHandIncluded)
-        testFrame.Hands.Add(MakeTestHand(frameId, 10, true));
-      if (rightHandIncluded)
-        testFrame.Hands.Add(MakeTestHand(frameId, 20, false));
-      return testFrame;
-    }
+    #region Test Frame / Hand API
 
-    public static Hand MakeTestHand(bool isLeft, int frameId = 0, int handId = 0) {
-      return MakeTestHand(frameId, handId, isLeft);
+    public enum UnitType {
+      LeapUnits,
+      UnityUnits
     }
 
     /// <summary>
-    /// Returns a test Leap Hand object transformed by the leftHandTransform argument. If the Leap hand is
-    /// a right hand, the position and rotation of the Hand will be mirrored along the X axis (so you can provide
-    /// LeapTransform to construct both left and right hands.
+    /// Creates a test Frame that contains two Hands (by default). You can also
+    /// optionally specify a TestHandPose to produce a frame with a different test pose.
     /// </summary>
-    public static Hand MakeTestHand(bool isLeft, LeapTransform leftHandTransform, int frameId = 0, int handId = 0) {
+    public static Frame MakeTestFrame(int frameId,
+                                      bool includeLeftHand = true,
+                                      bool includeRightHand = true,
+                                      TestHandPose handPose = TestHandPose.HeadMountedA,
+                                      UnitType unitType = UnitType.LeapUnits) {
+
+      var testFrame = new Frame(frameId, 0, 120.0f,
+                                new List<Hand>());
+
+      if (includeLeftHand)
+        testFrame.Hands.Add(MakeTestHand(true, handPose, frameId, 10, unitType));
+      if (includeRightHand)
+        testFrame.Hands.Add(MakeTestHand(false, handPose, frameId, 20, unitType));
+
+      return testFrame;
+    }
+
+    /// <summary>
+    /// Returns a test Leap Hand object transformed by the leftHandTransform argument.
+    /// If the Leap hand is a right hand, the position and rotation of the Hand will be
+    /// mirrored along the X axis (so you can provide LeapTransform to construct both
+    /// left and right hands.
+    /// </summary>
+    public static Hand MakeTestHand(bool isLeft, LeapTransform leftHandTransform,
+                                    int frameId = 0, int handId = 0,
+                                    UnitType unitType = UnitType.LeapUnits) {
+
+      // Apply the appropriate mirroring if this is a right hand.
       if (!isLeft) {
-        leftHandTransform.translation = new Vector(-leftHandTransform.translation.x, leftHandTransform.translation.y, leftHandTransform.translation.z);
+        leftHandTransform.translation = new Vector(-leftHandTransform.translation.x,
+          leftHandTransform.translation.y, leftHandTransform.translation.z);
 
         leftHandTransform.rotation = new LeapQuaternion(-leftHandTransform.rotation.x,
                                                          leftHandTransform.rotation.y,
@@ -45,43 +66,88 @@ namespace Leap {
 
         leftHandTransform.MirrorX();
       }
-      return MakeTestHand(frameId, handId, isLeft).Transform(leftHandTransform);
+
+      // Leap space is oriented differently than Unity space, so correct for this here.
+      var hand = makeLeapSpaceTestHand(frameId, handId, isLeft)
+                   .Transform(leftHandTransform);
+      var correctingQuaternion = Quaternion.Euler(90f, 0f, 180f);
+      var correctingLeapQuaternion = new LeapQuaternion(correctingQuaternion.x,
+                                                        correctingQuaternion.y,
+                                                        correctingQuaternion.z,
+                                                        correctingQuaternion.w);
+
+      var transformedHand = hand.Transform(new LeapTransform(Vector.Zero,
+                                                             correctingLeapQuaternion));
+
+      if (unitType == UnitType.UnityUnits) {
+        transformedHand.TransformToUnityUnits();
+      }
+
+      return transformedHand;
     }
 
     /// <summary>
-    /// Returns a test Leap Hand object in the argument pose position and rotation from the hand controller.
+    /// Returns a test Hand object.
     /// </summary>
-    public static Hand MakeTestHand(bool isLeft, TestHandPose pose, int frameId = 0, int handId = 0) {
-      return MakeTestHand(isLeft, GetTestPoseLeftHandTransform(pose), frameId, handId);
+    public static Hand MakeTestHand(bool isLeft,
+                                    int frameId = 0, int handId = 0,
+                                    UnitType unitType = UnitType.LeapUnits) {
+      return MakeTestHand(isLeft, LeapTransform.Identity, frameId, handId, unitType);
     }
 
+    /// <summary>
+    /// Returns a test Leap Hand object in the argument TestHandPose.
+    /// </summary>
+    public static Hand MakeTestHand(bool isLeft, TestHandPose pose,
+                                    int frameId = 0, int handId = 0,
+                                    UnitType unitType = UnitType.LeapUnits) {
+      return MakeTestHand(isLeft, GetTestPoseLeftHandTransform(pose),
+                          frameId, handId,
+                          unitType);
+    }
+
+    #endregion
+
+    #region Test Hand Poses
+
     public enum TestHandPose {
-      PoseA,
-      PoseB
+      HeadMountedA,
+      HeadMountedB,
+      DesktopModeA
     }
 
     public static LeapTransform GetTestPoseLeftHandTransform(TestHandPose pose) {
       LeapTransform transform = LeapTransform.Identity;
       switch (pose) {
-        case TestHandPose.PoseA:
-          transform.rotation = AngleAxis(180 * Constants.DEG_TO_RAD, Vector.Forward);
+        case TestHandPose.HeadMountedA:
+          transform.rotation = angleAxis(180 * Constants.DEG_TO_RAD, Vector.Forward);
           transform.translation = new Vector(80f, 120f, 0f);
           break;
-        case TestHandPose.PoseB:
+        case TestHandPose.HeadMountedB:
           transform.rotation = Quaternion.Euler(30F, -10F, -20F).ToLeapQuaternion();
           transform.translation = new Vector(220f, 270f, 130f);
+          break;
+        case TestHandPose.DesktopModeA:
+          transform.rotation = angleAxis(0f * Constants.DEG_TO_RAD, Vector.Forward)
+                                .Multiply(angleAxis(-90f * Constants.DEG_TO_RAD, Vector.Right))
+                                .Multiply(angleAxis(180f * Constants.DEG_TO_RAD, Vector.Up));
+          transform.translation = new Vector(120f, 0f, -170f);
           break;
       }
       return transform;
     }
 
-    public static Hand MakeTestHand(int frameId, int handId, bool isLeft) {
+    #endregion
+
+    #region Leap Space Hand Generation
+
+    private static Hand makeLeapSpaceTestHand(int frameId, int handId, bool isLeft) {
       List<Finger> fingers = new List<Finger>(5);
-      fingers.Add(MakeThumb(frameId, handId, isLeft));
-      fingers.Add(MakeIndexFinger(frameId, handId, isLeft));
-      fingers.Add(MakeMiddleFinger(frameId, handId, isLeft));
-      fingers.Add(MakeRingFinger(frameId, handId, isLeft));
-      fingers.Add(MakePinky(frameId, handId, isLeft));
+      fingers.Add(makeThumb(frameId, handId, isLeft));
+      fingers.Add(makeIndexFinger(frameId, handId, isLeft));
+      fingers.Add(makeMiddleFinger(frameId, handId, isLeft));
+      fingers.Add(makeRingFinger(frameId, handId, isLeft));
+      fingers.Add(makePinky(frameId, handId, isLeft));
 
       Vector armWrist = new Vector(-7.05809944059f, 4.0f, 50.0f);
       Vector elbow = armWrist + 250f * Vector.Backward;
@@ -111,7 +177,7 @@ namespace Leap {
       return testHand;
     }
 
-    static LeapQuaternion AngleAxis(float angle, Vector axis) {
+    private static LeapQuaternion angleAxis(float angle, Vector axis) {
       if (!axis.MagnitudeSquared.NearlyEquals(1.0f)) {
         throw new ArgumentException("Axis must be a unit vector.");
       }
@@ -123,59 +189,54 @@ namespace Leap {
       return q.Normalized;
     }
 
-    static LeapQuaternion RotationBetween(Vector fromDirection, Vector toDirection) {
+    private static LeapQuaternion rotationBetween(Vector fromDirection, Vector toDirection) {
       float m = Mathf.Sqrt(2.0f + 2.0f * fromDirection.Dot(toDirection));
       Vector w = (1.0f / m) * fromDirection.Cross(toDirection);
       return new LeapQuaternion(w.x, w.y, w.z, 0.5f * m);
     }
 
-    static Finger MakeThumb(int frameId, int handId, bool isLeft) {
-      //Thumb
+    private static Finger makeThumb(int frameId, int handId, bool isLeft) {
       Vector position = new Vector(19.3382610281f, -6.0f, 53.168484654f);
       Vector forward = new Vector(0.636329113772f, -0.5f, -0.899787143982f);
       Vector up = new Vector(0.804793943718f, 0.447213915513f, 0.390264553767f);
       float[] jointLengths = {0.0f, 46.22f, 31.57f, 21.67f};
-      return MakeFinger(Finger.FingerType.TYPE_THUMB, position, forward, up, jointLengths, frameId, handId, handId + 0, isLeft);
+      return makeFinger(Finger.FingerType.TYPE_THUMB, position, forward, up, jointLengths, frameId, handId, handId + 0, isLeft);
     }
 
-    static Finger MakeIndexFinger(int frameId, int handId, bool isLeft) {
-      //Index Finger
+    private static Finger makeIndexFinger(int frameId, int handId, bool isLeft) {
       Vector position = new Vector(23.1812851873f, 2.0f, -23.1493459317f);
       Vector forward = new Vector(0.166044313785f, -0.14834045293f, -0.974897120667f);
       Vector up = new Vector(0.0249066470677f, 0.988936352868f, -0.1462345681f);
       float[]  jointLengths = {68.12f, 39.78f, 22.38f, 15.82f};
-      return MakeFinger(Finger.FingerType.TYPE_INDEX, position, forward, up, jointLengths, frameId, handId, handId + 1, isLeft);
+      return makeFinger(Finger.FingerType.TYPE_INDEX, position, forward, up, jointLengths, frameId, handId, handId + 1, isLeft);
     }
 
-    static Finger MakeMiddleFinger(int frameId, int handId, bool isLeft) {
-      //Middle Finger
+    private static Finger makeMiddleFinger(int frameId, int handId, bool isLeft) {
       Vector position = new Vector(2.78877821918f, 4.0f, -23.252105626f);
       Vector forward = new Vector(0.0295207858556f, -0.148340452932f, -0.988495641481f);
       Vector up = new Vector(-0.145765270107f, 0.977715980076f, -0.151075968756f);
       float[]  jointLengths = {64.60f, 44.63f, 26.33f, 17.40f};
-      return MakeFinger(Finger.FingerType.TYPE_MIDDLE, position, forward, up, jointLengths, frameId, handId, handId + 2, isLeft);
+      return makeFinger(Finger.FingerType.TYPE_MIDDLE, position, forward, up, jointLengths, frameId, handId, handId + 2, isLeft);
     }
 
-    static Finger MakeRingFinger(int frameId, int handId, bool isLeft) {
-      //Ring Finger
+    private static Finger makeRingFinger(int frameId, int handId, bool isLeft) {
       Vector position = new Vector(-17.447168266f, 4.0f, -17.2791440615f);
       Vector forward = new Vector(-0.121317937368f, -0.148340347175f, -0.981466810174f);
       Vector up = new Vector(-0.216910468316f, 0.968834928679f, -0.119619102602f);
       float[]  jointLengths = {58.00f, 41.37f, 25.65f, 17.30f};
-      return MakeFinger(Finger.FingerType.TYPE_RING, position, forward, up, jointLengths, frameId, handId, handId + 3, isLeft);
+      return makeFinger(Finger.FingerType.TYPE_RING, position, forward, up, jointLengths, frameId, handId, handId + 3, isLeft);
     }
 
-    static Finger MakePinky(int frameId, int handId, bool isLeft) {
-      //Pinky Finger
+    private static Finger makePinky(int frameId, int handId, bool isLeft) {
       Vector position = new Vector(-35.3374394559f, 0.0f, -9.72871382551f);
       Vector forward = new Vector(-0.259328923438f, -0.105851224797f, -0.959970847306f);
       Vector up = new Vector(-0.353350220937f, 0.935459475557f, -0.00769356576168f);
       float[]  jointLengths = {53.69f, 32.74f, 18.11f, 15.96f};
-      return MakeFinger(Finger.FingerType.TYPE_PINKY, position, forward, up, jointLengths, frameId, handId, handId + 4, isLeft);
+      return makeFinger(Finger.FingerType.TYPE_PINKY, position, forward, up, jointLengths, frameId, handId, handId + 4, isLeft);
     }
 
 
-    static Finger MakeFinger(Finger.FingerType name, Vector position, Vector forward, Vector up, float[] jointLengths,
+    private static Finger makeFinger(Finger.FingerType name, Vector position, Vector forward, Vector up, float[] jointLengths,
        int frameId, int handId, int fingerId, bool isLeft) {
 
       forward = forward.Normalized;
@@ -183,19 +244,19 @@ namespace Leap {
 
       Bone[] bones = new Bone[5];
       float proximalDistance = -jointLengths[0];
-      Bone metacarpal = MakeBone (Bone.BoneType.TYPE_METACARPAL, position + forward * proximalDistance, jointLengths[0], 8f, forward, up, isLeft);
+      Bone metacarpal = makeBone (Bone.BoneType.TYPE_METACARPAL, position + forward * proximalDistance, jointLengths[0], 8f, forward, up, isLeft);
       proximalDistance += jointLengths[0];
       bones[0] = metacarpal;
 
-      Bone proximal = MakeBone (Bone.BoneType.TYPE_PROXIMAL,  position + forward * proximalDistance, jointLengths[1], 8f, forward, up, isLeft);
+      Bone proximal = makeBone (Bone.BoneType.TYPE_PROXIMAL,  position + forward * proximalDistance, jointLengths[1], 8f, forward, up, isLeft);
       proximalDistance += jointLengths[1];
       bones[1] = proximal;
 
-      Bone intermediate = MakeBone (Bone.BoneType.TYPE_INTERMEDIATE,  position + forward * proximalDistance, jointLengths[2], 8f, forward, up, isLeft);
+      Bone intermediate = makeBone (Bone.BoneType.TYPE_INTERMEDIATE,  position + forward * proximalDistance, jointLengths[2], 8f, forward, up, isLeft);
       proximalDistance += jointLengths[2];
       bones[2] = intermediate;
 
-      Bone distal = MakeBone (Bone.BoneType.TYPE_DISTAL,  position + forward * proximalDistance, jointLengths[3], 8f, forward, up, isLeft);
+      Bone distal = makeBone (Bone.BoneType.TYPE_DISTAL,  position + forward * proximalDistance, jointLengths[3], 8f, forward, up, isLeft);
       bones[3] = distal;
 
       return new Finger(frameId,
@@ -203,9 +264,7 @@ namespace Leap {
       fingerId,
       0.0f,
       distal.NextJoint,
-      new Vector(0, 0, 0),
       forward,
-      position,
       8f,
       jointLengths[1] + jointLengths[2] + jointLengths[3],
       true,
@@ -216,7 +275,7 @@ namespace Leap {
       bones[3]);
     }
 
-    static Bone MakeBone(Bone.BoneType name, Vector proximalPosition, float length, float width, Vector direction, Vector up, bool isLeft) {
+    private static Bone makeBone(Bone.BoneType name, Vector proximalPosition, float length, float width, Vector direction, Vector up, bool isLeft) {
 
       LeapQuaternion rotation = UnityEngine.Quaternion.LookRotation(-direction.ToVector3(), up.ToVector3()).ToLeapQuaternion();
 
@@ -230,5 +289,29 @@ namespace Leap {
            name,
            rotation);
     }
+
+    #endregion
+
   }
+
+  // Note: The fact that this class needs to exist is ridiculous
+  // TODO: Look into automatically returning things in Unity units? Would require changes
+  // for everything that uses the TestHandFactory.
+  public static class LeapTestProviderExtensions {
+
+    public static readonly float MM_TO_M = 1e-3f;
+
+    public static LeapTransform GetLeapTransform(Vector3 position, Quaternion rotation) {
+      Vector scale = new Vector(MM_TO_M, MM_TO_M, MM_TO_M); // Leap units -> Unity units.
+      LeapTransform transform = new LeapTransform(position.ToVector(), rotation.ToLeapQuaternion(), scale);
+      transform.MirrorZ(); // Unity is left handed.
+      return transform;
+    }
+
+    public static void TransformToUnityUnits(this Hand hand) {
+      hand.Transform(GetLeapTransform(Vector3.zero, Quaternion.identity));
+    }
+
+  }
+
 }

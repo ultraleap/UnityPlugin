@@ -1,6 +1,6 @@
 /******************************************************************************
- * Copyright (C) Leap Motion, Inc. 2011-2017.                                 *
- * Leap Motion proprietary and  confidential.                                 *
+ * Copyright (C) Leap Motion, Inc. 2011-2018.                                 *
+ * Leap Motion proprietary and confidential.                                  *
  *                                                                            *
  * Use subject to the terms of the Leap Motion SDK Agreement available at     *
  * https://developer.leapmotion.com/sdk_agreement, or another agreement       *
@@ -14,7 +14,6 @@ using UnityEngine;
 using UnityEditor;
 #endif
 using Leap.Unity.Space;
-using Leap.Unity.Query;
 using Leap.Unity.Attributes;
 
 namespace Leap.Unity.GraphicalRenderer {
@@ -269,6 +268,16 @@ namespace Leap.Unity.GraphicalRenderer {
     private List<int> _tris = new List<int>();
     private void generateTextMesh(int index, LeapTextGraphic graphic, Mesh mesh) {
       using (new ProfilerSample("Generate Text Mesh")) {
+        Color globalTintConverted;
+        Color graphicColorConverted;
+        if (QualitySettings.activeColorSpace == ColorSpace.Linear) {
+          globalTintConverted = _globalTint.linear;
+          graphicColorConverted = graphic.color.linear;
+        } else {
+          globalTintConverted = _globalTint;
+          graphicColorConverted = graphic.color;
+        }
+        
         mesh.Clear(keepVertexLayout: false);
 
         graphic.isRepresentationDirty = false;
@@ -295,15 +304,14 @@ namespace Leap.Unity.GraphicalRenderer {
             }
           }
         }
-
-        var textGraphic = graphic as LeapTextGraphic;
-        var text = textGraphic.text;
+        
+        var text = graphic.text;
 
         float _charScale = this._scale * SCALE_CONSTANT / _dynamicPixelsPerUnit;
         float _scale = _charScale * graphic.fontSize / _font.fontSize;
-        float lineHeight = _scale * textGraphic.lineSpacing * _font.lineHeight * _dynamicPixelsPerUnit;
+        float lineHeight = _scale * graphic.lineSpacing * _font.lineHeight * _dynamicPixelsPerUnit;
 
-        RectTransform rectTransform = textGraphic.transform as RectTransform;
+        RectTransform rectTransform = graphic.transform as RectTransform;
         float maxWidth;
         if (rectTransform != null) {
           maxWidth = rectTransform.rect.width;
@@ -315,7 +323,7 @@ namespace Leap.Unity.GraphicalRenderer {
         _widthCalculator.charScale = _charScale;
         _widthCalculator.fontStyle = graphic.fontStyle;
         _widthCalculator.scaledFontSize = scaledFontSize;
-        TextWrapper.Wrap(text, textGraphic.tokens, _tempLines, _widthCalculator.func, maxWidth);
+        TextWrapper.Wrap(text, graphic.tokens, _tempLines, _widthCalculator.func, maxWidth);
 
         float textHeight = _tempLines.Count * lineHeight;
 
@@ -325,7 +333,7 @@ namespace Leap.Unity.GraphicalRenderer {
         if (rectTransform != null) {
           origin.y -= rectTransform.rect.y;
 
-          switch (textGraphic.verticalAlignment) {
+          switch (graphic.verticalAlignment) {
             case LeapTextGraphic.VerticalAlignment.Center:
               origin.y -= (rectTransform.rect.height - textHeight) / 2;
               break;
@@ -339,7 +347,7 @@ namespace Leap.Unity.GraphicalRenderer {
 
           if (rectTransform != null) {
             origin.x = rectTransform.rect.x;
-            switch (textGraphic.horizontalAlignment) {
+            switch (graphic.horizontalAlignment) {
               case LeapTextGraphic.HorizontalAlignment.Center:
                 origin.x += (rectTransform.rect.width - line.width) / 2;
                 break;
@@ -348,7 +356,7 @@ namespace Leap.Unity.GraphicalRenderer {
                 break;
             }
           } else {
-            switch (textGraphic.horizontalAlignment) {
+            switch (graphic.horizontalAlignment) {
               case LeapTextGraphic.HorizontalAlignment.Left:
                 origin.x = 0;
                 break;
@@ -389,7 +397,7 @@ namespace Leap.Unity.GraphicalRenderer {
             _uvs.Add(info.uvBottomLeft);
 
             if (_useColor) {
-              _colors.Append(4, _globalTint * graphic.color);
+              _colors.Append(4, globalTintConverted * graphicColorConverted);
             }
 
             origin.x += info.advance * _charScale;

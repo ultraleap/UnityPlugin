@@ -1,6 +1,6 @@
 /******************************************************************************
- * Copyright (C) Leap Motion, Inc. 2011-2017.                                 *
- * Leap Motion proprietary and  confidential.                                 *
+ * Copyright (C) Leap Motion, Inc. 2011-2018.                                 *
+ * Leap Motion proprietary and confidential.                                  *
  *                                                                            *
  * Use subject to the terms of the Leap Motion SDK Agreement available at     *
  * https://developer.leapmotion.com/sdk_agreement, or another agreement       *
@@ -12,7 +12,7 @@ using System.Collections;
 using Leap.Unity;
 
 public class CycleHandPairs : MonoBehaviour {
-  public HandPool HandPool;
+  public HandModelManager HandPool;
   public string[] GroupNames;
   private int currentGroup;
   public int CurrentGroup {
@@ -34,7 +34,7 @@ public class CycleHandPairs : MonoBehaviour {
 
   // Use this for initialization
   void Start () {
-    HandPool = GetComponent<HandPool>();
+    HandPool = GetComponent<HandModelManager>();
     disableAllGroups();
     CurrentGroup = 0;
   }

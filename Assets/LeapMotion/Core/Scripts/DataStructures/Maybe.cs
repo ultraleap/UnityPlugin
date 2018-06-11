@@ -1,6 +1,6 @@
 /******************************************************************************
- * Copyright (C) Leap Motion, Inc. 2011-2017.                                 *
- * Leap Motion proprietary and  confidential.                                 *
+ * Copyright (C) Leap Motion, Inc. 2011-2018.                                 *
+ * Leap Motion proprietary and confidential.                                  *
  *                                                                            *
  * Use subject to the terms of the Leap Motion SDK Agreement available at     *
  * https://developer.leapmotion.com/sdk_agreement, or another agreement       *
@@ -92,11 +92,9 @@ namespace Leap.Unity {
     public Maybe(T t) {
       if (Type<T>.isValueType) {
         hasValue = true;
-      }
-      else {
+      } else {
         hasValue = t != null;
       }
-
       _t = t;
     }
 
@@ -158,8 +156,39 @@ namespace Leap.Unity {
       }
     }
 
-    public QueryWrapper<T, Maybe<T>.MaybeOp> Query() {
-      return new QueryWrapper<T, MaybeOp>(new MaybeOp(this));
+    /// <summary>
+    /// If this Maybe has a value, returns the value, otherwise returns the argument
+    /// custom default value.
+    /// </summary>
+    public T ValueOr(T customDefault) {
+      if (hasValue) {
+        return _t;
+      } else {
+        return customDefault;
+      }
+    }
+
+    /// <summary>
+    /// Returns this Maybe if it has a value, otherwise returns the argument Maybe value.
+    /// Useful for overlaying multiple Maybe values.
+    /// For example, if I want to overlay a "maybe override font" variable with
+    /// another "maybe override font" variable, I can call:
+    /// this.font = other.font.ValueOr(this.font);
+    /// </summary>
+    public Maybe<T> ValueOr(Maybe<T> maybeCustomDefault) {
+      if (hasValue) {
+        return this;
+      } else {
+        return maybeCustomDefault;
+      }
+    }
+
+    public Query<T> Query() {
+      if (hasValue) {
+        return Values.Single(_t);
+      } else {
+        return Values.Empty<T>();
+      }
     }
 
     public override int GetHashCode() {
@@ -241,38 +270,7 @@ namespace Leap.Unity {
     }
 
     public static implicit operator Maybe<T>(Maybe.NoneType none) {
-      return Maybe<T>.None;
-    }
-
-    public struct MaybeOp : IQueryOp<T> {
-      public Maybe<T> _value;
-      public bool _hasReturned;
-
-      public MaybeOp(Maybe<T> value) {
-        _value = value;
-        _hasReturned = false;
-      }
-
-      public bool TryGetNext(out T t) {
-        if (_hasReturned) {
-          t = default(T);
-          return false;
-        } else {
-          if (_value.hasValue) {
-            t = _value._t;
-            _hasReturned = true;
-            return true;
-          } else {
-            t = default(T);
-            _hasReturned = true;
-            return false;
-          }
-        }
-      }
-
-      public void Reset() {
-        _hasReturned = false;
-      }
+      return None;
     }
   }
 }

@@ -23,8 +23,10 @@
 /Temp
 ExportedObj/
 Temp/
-Build/
+[Bb]uild/
+[Bb]uilds/
 
+.vs/
 .vscode/
 
 *~
@@ -38,3 +40,4 @@ Thumbs.db
 .DS_Store?
 
 *_ElementData*
+UnityPlayer.dll

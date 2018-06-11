@@ -1,6 +1,6 @@
 /******************************************************************************
- * Copyright (C) Leap Motion, Inc. 2011-2017.                                 *
- * Leap Motion proprietary and  confidential.                                 *
+ * Copyright (C) Leap Motion, Inc. 2011-2018.                                 *
+ * Leap Motion proprietary and confidential.                                  *
  *                                                                            *
  * Use subject to the terms of the Leap Motion SDK Agreement available at     *
  * https://developer.leapmotion.com/sdk_agreement, or another agreement       *
@@ -38,6 +38,10 @@ namespace Leap.Unity.Examples {
     private HashSet<TranslationAxis> _activeTranslationAxes = new HashSet<TranslationAxis>();
 
     void Start() {
+      if (interactionManager == null) {
+        interactionManager = InteractionManager.instance;
+      }
+
       foreach (var handle in GetComponentsInChildren<TransformHandle>()) {
         _transformHandles.Add(handle);
       }

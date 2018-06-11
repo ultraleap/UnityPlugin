@@ -1,6 +1,6 @@
 /******************************************************************************
- * Copyright (C) Leap Motion, Inc. 2011-2017.                                 *
- * Leap Motion proprietary and  confidential.                                 *
+ * Copyright (C) Leap Motion, Inc. 2011-2018.                                 *
+ * Leap Motion proprietary and confidential.                                  *
  *                                                                            *
  * Use subject to the terms of the Leap Motion SDK Agreement available at     *
  * https://developer.leapmotion.com/sdk_agreement, or another agreement       *
@@ -166,8 +166,8 @@ namespace Leap.Unity.Interaction {
     public abstract InteractionHand intHand { get; }
 
     /// <summary>
-    /// Contact requires knowledge of the controller's scale.
-    /// TODO: Warn if the controller is scaled non-uniformly.
+    /// Contact requires knowledge of the controller's scale. Non-uniformly scaled
+    /// controllers are NOT supported.
     /// </summary>
     public float scale { get { return this.transform.lossyScale.x; } }
 
@@ -195,6 +195,21 @@ namespace Leap.Unity.Interaction {
     /// Called every (fixed) frame this InteractionController is primarily hovering over an InteractionBehaviour.
     /// </summary>
     public Action<InteractionBehaviour> OnStayPrimaryHoveringObject = (intObj) => { };
+
+    /// <summary>
+    /// Called when the InteractionController begins grasping an object.
+    /// </summary>
+    public Action OnGraspBegin = () => { };
+
+    /// <summary>
+    /// Called while the InteractionController is grasping an object.
+    /// </summary>
+    public Action OnGraspStay = () => { };
+
+    /// <summary>
+    /// Called when the InteractionController releases an object.
+    /// </summary>
+    public Action OnGraspEnd = () => { };
 
     #endregion
 
@@ -1255,6 +1270,9 @@ namespace Leap.Unity.Interaction {
 
         if (_softContactCollisions.Count > 0) {
           _disableSoftContactEnqueued = false;
+          if (_delayedDisableSoftContactCoroutine != null) {
+            manager.StopCoroutine(_delayedDisableSoftContactCoroutine);
+          }
         }
         else {
           // If there are no detected Contacts, exit soft contact mode.
@@ -1274,7 +1292,7 @@ namespace Leap.Unity.Interaction {
     protected virtual void onPreEnableSoftContact() { }
 
     /// <summary>
-    /// Optioanlly override this method to perform logic just after soft contact
+    /// Optionally override this method to perform logic just after soft contact
     /// is disabled for this controller.
     ///
     /// The InteractionHand implementation takes the opportunity to reset its contact
@@ -1295,10 +1313,13 @@ namespace Leap.Unity.Interaction {
           if (_delayedDisableSoftContactCoroutine != null) {
             manager.StopCoroutine(_delayedDisableSoftContactCoroutine);
           }
-          for (int i = 0; i < contactBones.Length; i++) {
-            if (contactBones[i].collider == null) continue;
 
-            disableContactBoneCollision();
+          if (contactBones != null) {
+            for (int i = 0; i < contactBones.Length; i++) {
+              if (contactBones[i].collider == null) continue;
+
+              disableContactBoneCollision();
+            }
           }
         }
       }
@@ -1315,7 +1336,6 @@ namespace Leap.Unity.Interaction {
     }
 
     private IEnumerator DelayedDisableSoftContact() {
-      if (_disableSoftContactEnqueued) { yield break; }
       yield return new WaitForSecondsRealtime(0.3f);
       if (_disableSoftContactEnqueued) {
         using (new ProfilerSample("Disable Soft Contact")) {
@@ -1654,6 +1674,8 @@ namespace Leap.Unity.Interaction {
     public bool TryGrasp(IInteractionBehaviour intObj) {
       if (checkShouldGraspAtemporal(intObj)) {
         _graspedObject = intObj;
+        OnGraspBegin();
+
         return true;
       }
 
@@ -1685,6 +1707,7 @@ namespace Leap.Unity.Interaction {
       _releasingControllersBuffer.Clear();
       _releasingControllersBuffer.Add(this);
       _graspedObject.EndGrasp(_releasingControllersBuffer);
+      OnGraspEnd();
 
       //Switch to the replacement object
       _graspedObject = replacement;
@@ -1694,6 +1717,7 @@ namespace Leap.Unity.Interaction {
         //Let the replacement object know that it is being grasped
         tempControllers.Add(this);
         replacement.BeginGrasp(tempControllers);
+        OnGraspBegin();
       } 
       finally {
         tempControllers.Clear();
@@ -1810,8 +1834,9 @@ namespace Leap.Unity.Interaction {
         var tempGraspedObject = _graspedObject;
 
         // Clear controller grasped object, and enable soft contact.
-        EnableSoftContact();
+        OnGraspEnd();
         _graspedObject = null;
+        EnableSoftContact();
 
         // Fire object's grasp-end callback.
         tempGraspedObject.EndGrasp(_releasingControllersBuffer);
@@ -1854,12 +1879,15 @@ namespace Leap.Unity.Interaction {
         // Note: controllersBuffer is iterated twice to preserve state modification order.
         // For reference order, see InteractionController.ReleaseGrasp() above.
         foreach (var controller in controllersBuffer) {
-          // Avoid "popping" of released objects by enabling soft contact on releasing
-          // controllers.
-          controller.EnableSoftContact();
+          // Fire grasp end callback for the controller.
+          controller.OnGraspEnd();
 
           // Clear grasped object state.
           controller._graspedObject = null;
+
+          // Avoid "popping" of released objects by enabling soft contact on releasing
+          // controllers.
+          controller.EnableSoftContact();
         }
 
         // Evaluate object logic for being released by each controller.
@@ -1934,6 +1962,7 @@ namespace Leap.Unity.Interaction {
       if (!shouldReleaseObject) shouldReleaseObject = checkShouldRelease(out releasedObject);
 
       if (shouldReleaseObject) {
+        OnGraspEnd();
         _graspedObject = null;
         EnableSoftContact(); // prevent objects popping out of the hand on release
         return true;
@@ -1960,6 +1989,7 @@ namespace Leap.Unity.Interaction {
       bool shouldGraspObject = checkShouldGrasp(out newlyGraspedObject);
       if (shouldGraspObject) {
         _graspedObject = newlyGraspedObject;
+        OnGraspBegin();
 
         return true;
       }
@@ -1974,6 +2004,7 @@ namespace Leap.Unity.Interaction {
     /// </summary>
     bool IInternalInteractionController.CheckGraspHold(out IInteractionBehaviour graspedObject) {
       graspedObject = _graspedObject;
+      OnGraspStay();
       return graspedObject != null;
     }
 

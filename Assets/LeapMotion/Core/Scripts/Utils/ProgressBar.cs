@@ -1,6 +1,6 @@
 /******************************************************************************
- * Copyright (C) Leap Motion, Inc. 2011-2017.                                 *
- * Leap Motion proprietary and  confidential.                                 *
+ * Copyright (C) Leap Motion, Inc. 2011-2018.                                 *
+ * Leap Motion proprietary and confidential.                                  *
  *                                                                            *
  * Use subject to the terms of the Leap Motion SDK Agreement available at     *
  * https://developer.leapmotion.com/sdk_agreement, or another agreement       *
@@ -71,6 +71,8 @@ namespace Leap.Unity {
     private List<string> infoStrings = new List<string>();
     private Stopwatch stopwatch = new Stopwatch();
 
+    private bool _forceUpdate;
+
     private IProgressView _view;
 
 #if UNITY_EDITOR
@@ -117,6 +119,7 @@ namespace Leap.Unity {
       infoStrings.Add(info);
 
       try {
+        _forceUpdate = true;
         action();
       } finally {
         int lastIndex = chunks.Count - 1;
@@ -144,7 +147,7 @@ namespace Leap.Unity {
     /// </summary>
     public void Step(string infoString = "") {
       progress[progress.Count - 1]++;
-      if (stopwatch.ElapsedMilliseconds > 17) {
+      if (stopwatch.ElapsedMilliseconds > 17 || _forceUpdate) {
         displayBar(infoString);
         stopwatch.Reset();
         stopwatch.Start();
@@ -152,6 +155,8 @@ namespace Leap.Unity {
     }
 
     private void displayBar(string info = "") {
+      _forceUpdate = false;
+
       float percent = 0.0f;
       float fraction = 1.0f;
       string titleString = "";

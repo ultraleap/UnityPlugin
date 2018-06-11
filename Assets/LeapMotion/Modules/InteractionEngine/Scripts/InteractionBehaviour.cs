@@ -1,6 +1,6 @@
 /******************************************************************************
- * Copyright (C) Leap Motion, Inc. 2011-2017.                                 *
- * Leap Motion proprietary and  confidential.                                 *
+ * Copyright (C) Leap Motion, Inc. 2011-2018.                                 *
+ * Leap Motion proprietary and confidential.                                  *
  *                                                                            *
  * Use subject to the terms of the Leap Motion SDK Agreement available at     *
  * https://developer.leapmotion.com/sdk_agreement, or another agreement       *
@@ -698,22 +698,6 @@ namespace Leap.Unity.Interaction {
     [DisableIf("_moveObjectWhenGrasped", isEqualTo: false)]
     public GraspedMovementType graspedMovementType;
 
-    /// <summary>s
-    /// The RigidbodyWarper manipulates the graphical (but not physical) position ofs
-    /// grasped objects based on the movement of the Leap hand so they appear move with
-    /// less latency.
-    /// </summary>
-    /// TODO: This is not actually implemented.
-    [HideInInspector]
-    public RigidbodyWarper rigidbodyWarper;
-
-    [Header("Advanced Settings")]
-
-    [Tooltip("Warping manipulates the graphical (but not physical) position of grasped "
-           + "objects based on the movement of the grasping interaction controller so "
-           + "the objects appear to move with less latency.")]
-    public bool graspHoldWarpingEnabled__curIgnored = true; // TODO: Warping not yet implemented.
-
     [Header("Layer Overrides")]
 
     [SerializeField]
@@ -782,7 +766,6 @@ namespace Leap.Unity.Interaction {
 
       rigidbody = GetComponent<Rigidbody>();
       rigidbody.maxAngularVelocity = MAX_ANGULAR_VELOCITY;
-      rigidbodyWarper = new RigidbodyWarper(manager, this.transform, rigidbody, 0.25F);
     }
 
     protected virtual void OnEnable() {
@@ -803,10 +786,18 @@ namespace Leap.Unity.Interaction {
       // Make sure we have a list of all of this object's colliders.
       RefreshInteractionColliders();
 
+      // Refresh curved space. Currently a maximum of one (1) LeapSpace is supported per
+      // InteractionBehaviour.
+      foreach (var collider in _interactionColliders) {
+        var leapSpace = collider.transform.GetComponentInParent<ISpaceComponent>();
+        if (leapSpace != null) {
+          space = leapSpace;
+          break;
+        }
+      }
+
       // Ensure physics layers are set up properly.
       initLayers();
-
-      space = GetComponentInChildren<ISpaceComponent>();
     }
 
     protected virtual void OnDisable() {
@@ -1323,12 +1314,9 @@ namespace Leap.Unity.Interaction {
 
         graspedPoseHandler.GetGraspedPosition(out newPosition, out newRotation);
 
-        IGraspedMovementHandler graspedMovementHandler = rigidbody.isKinematic ?
-                                                       (IGraspedMovementHandler)_kinematicGraspedMovement
-                                                     : (IGraspedMovementHandler)_nonKinematicGraspedMovement;
-        graspedMovementHandler.MoveTo(newPosition, newRotation, this, _justGrasped);
-
-        OnGraspedMovement(origPosition, origRotation, newPosition, newRotation, controllers);
+        fixedUpdateGraspedMovement(new Pose(origPosition, origRotation),
+                                   new Pose(newPosition, newRotation),
+                                   controllers);
 
         throwHandler.OnHold(this, controllers);
       }
@@ -1336,6 +1324,20 @@ namespace Leap.Unity.Interaction {
       OnGraspStay();
 
       _justGrasped = false;
+    }
+
+    protected virtual void fixedUpdateGraspedMovement(Pose origPose, Pose newPose,
+                                              List<InteractionController> controllers) {
+      IGraspedMovementHandler graspedMovementHandler
+          = rigidbody.isKinematic ?
+              (IGraspedMovementHandler)_kinematicGraspedMovement
+            : (IGraspedMovementHandler)_nonKinematicGraspedMovement;
+      graspedMovementHandler.MoveTo(newPose.position, newPose.rotation,
+                                    this, _justGrasped);
+
+      OnGraspedMovement(origPose.position, origPose.rotation,
+                        newPose.position, newPose.rotation,
+                        controllers);
     }
 
     protected InteractionController _suspendingController = null;
@@ -1398,6 +1400,9 @@ namespace Leap.Unity.Interaction {
       Utils.FindColliders<Collider>(this.gameObject, _interactionColliders,
                                     includeInactiveObjects: false);
 
+      _interactionColliders.RemoveAll(
+        c => c.GetComponent<IgnoreColliderForInteraction>() != null);
+
       // Since the interaction colliders might have changed, or appeared for the first
       // time, set their layers appropriately.
       refreshInteractionColliderLayers();
@@ -1458,16 +1463,16 @@ namespace Leap.Unity.Interaction {
 
         // Update the manager if necessary.
 
-      if (interactionLayer != _lastInteractionLayer) {
-        (manager as IInternalInteractionManager).NotifyIntObjHasNewInteractionLayer(this, oldInteractionLayer: _lastInteractionLayer,
-                                                                                          newInteractionLayer: interactionLayer);
-        _lastInteractionLayer = interactionLayer;
-      }
+        if (interactionLayer != _lastInteractionLayer) {
+          (manager as IInternalInteractionManager).NotifyIntObjHasNewInteractionLayer(this, oldInteractionLayer: _lastInteractionLayer,
+                                                                                            newInteractionLayer: interactionLayer);
+          _lastInteractionLayer = interactionLayer;
+        }
 
         if (noContactLayer != _lastNoContactLayer) {
           (manager as IInternalInteractionManager).NotifyIntObjHasNewNoContactLayer(this, oldNoContactLayer: _lastNoContactLayer,
                                                                                           newNoContactLayer: noContactLayer);
-          _lastInteractionLayer = noContactLayer;
+          _lastNoContactLayer = noContactLayer;
         }
       }
     }

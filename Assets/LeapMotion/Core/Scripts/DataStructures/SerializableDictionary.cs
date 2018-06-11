@@ -1,6 +1,6 @@
 /******************************************************************************
- * Copyright (C) Leap Motion, Inc. 2011-2017.                                 *
- * Leap Motion proprietary and  confidential.                                 *
+ * Copyright (C) Leap Motion, Inc. 2011-2018.                                 *
+ * Leap Motion proprietary and confidential.                                  *
  *                                                                            *
  * Use subject to the terms of the Leap Motion SDK Agreement available at     *
  * https://developer.leapmotion.com/sdk_agreement, or another agreement       *
@@ -8,17 +8,18 @@
  ******************************************************************************/
 
 using UnityEngine;
+using System;
 using System.Text;
 using System.Collections.Generic;
 using System.Linq;
+using System.Collections;
 
 namespace Leap.Unity {
 
-  /// <summary>
-  /// You must mark a serializable dictionary with this attribute in order to 
-  /// use the custom inspector editor.
-  /// </summary>
+  [Obsolete("It is no longer required to annotate SerializableDictionary with an SDictionary attribute")]
   public class SDictionaryAttribute : PropertyAttribute { }
+
+  public abstract class SerializableDictionaryBase { }
 
   public interface ICanReportDuplicateInformation {
 #if UNITY_EDITOR
@@ -36,16 +37,77 @@ namespace Leap.Unity {
   /// non-generic version specific to your needs.  This is the same workflow that exists
   /// for using the UnityEvent class as well. 
   /// </summary>
-  public class SerializableDictionary<TKey, TValue> : Dictionary<TKey, TValue>,
-    ICanReportDuplicateInformation,
-    ISerializationCallbackReceiver,
-    ISerializableDictionary {
+  public class SerializableDictionary<TKey, TValue> : SerializableDictionaryBase,
+                                                      IEnumerable<KeyValuePair<TKey, TValue>>,
+                                                      ICanReportDuplicateInformation,
+                                                      ISerializationCallbackReceiver,
+                                                      ISerializableDictionary {
 
     [SerializeField]
-    private List<TKey> _keys;
+    private List<TKey> _keys = new List<TKey>();
 
     [SerializeField]
-    private List<TValue> _values;
+    private List<TValue> _values = new List<TValue>();
+
+    [NonSerialized]
+    private Dictionary<TKey, TValue> _dictionary = new Dictionary<TKey, TValue>();
+
+    #region DICTIONARY API
+
+    public TValue this[TKey key] {
+      get { return _dictionary[key]; }
+      set { _dictionary[key] = value; }
+    }
+
+    public Dictionary<TKey, TValue>.KeyCollection Keys {
+      get { return _dictionary.Keys; }
+    }
+
+    public Dictionary<TKey, TValue>.ValueCollection Values {
+      get { return _dictionary.Values; }
+    }
+
+    public int Count {
+      get { return _dictionary.Count; }
+    }
+
+    public void Add(TKey key, TValue value) {
+      _dictionary.Add(key, value);
+    }
+
+    public void Clear() {
+      _dictionary.Clear();
+    }
+
+    public bool ContainsKey(TKey key) {
+      return _dictionary.ContainsKey(key);
+    }
+
+    public bool ContainsValue(TValue value) {
+      return _dictionary.ContainsValue(value);
+    }
+
+    public bool Remove(TKey key) {
+      return _dictionary.Remove(key);
+    }
+
+    public bool TryGetValue(TKey key, out TValue value) {
+      return _dictionary.TryGetValue(key, out value);
+    }
+
+    public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator() {
+      return _dictionary.GetEnumerator();
+    }
+
+    IEnumerator IEnumerable.GetEnumerator() {
+      return _dictionary.GetEnumerator();
+    }
+
+    public static implicit operator Dictionary<TKey, TValue>(SerializableDictionary<TKey, TValue> serializableDictionary) {
+      return serializableDictionary._dictionary;
+    }
+
+    #endregion
 
     /// <summary>
     /// Returns how much of the display space should be allocated to the key.
@@ -57,8 +119,8 @@ namespace Leap.Unity {
 
     public override string ToString() {
       StringBuilder toReturn = new StringBuilder();
-      List<TKey> keys = Keys.ToList<TKey>();
-      List<TValue> values = Values.ToList<TValue>();
+      List<TKey> keys = _dictionary.Keys.ToList<TKey>();
+      List<TValue> values = _dictionary.Values.ToList<TValue>();
       toReturn.Append("[");
       for (int i = 0; i < keys.Count; i++) {
         toReturn.Append("{");
@@ -73,7 +135,7 @@ namespace Leap.Unity {
     }
 
     public void OnAfterDeserialize() {
-      Clear();
+      _dictionary.Clear();
 
       if (_keys != null && _values != null) {
         int count = Mathf.Min(_keys.Count, _values.Count);
@@ -85,7 +147,7 @@ namespace Leap.Unity {
             continue;
           }
 
-          this[key] = value;
+          _dictionary[key] = value;
         }
       }
 
@@ -154,14 +216,14 @@ namespace Leap.Unity {
         TKey key = _keys[i];
         if (key == null) continue;
 
-        if (!ContainsKey(key)) {
+        if (!_dictionary.ContainsKey(key)) {
           _keys.RemoveAt(i);
           _values.RemoveAt(i);
         }
       }
 #endif
 
-      Enumerator enumerator = GetEnumerator();
+      Dictionary<TKey, TValue>.Enumerator enumerator = _dictionary.GetEnumerator();
       while (enumerator.MoveNext()) {
         var pair = enumerator.Current;
 

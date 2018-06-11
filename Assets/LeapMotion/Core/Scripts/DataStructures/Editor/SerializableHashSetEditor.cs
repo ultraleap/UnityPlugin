@@ -1,6 +1,6 @@
 /******************************************************************************
- * Copyright (C) Leap Motion, Inc. 2011-2017.                                 *
- * Leap Motion proprietary and  confidential.                                 *
+ * Copyright (C) Leap Motion, Inc. 2011-2018.                                 *
+ * Leap Motion proprietary and confidential.                                  *
  *                                                                            *
  * Use subject to the terms of the Leap Motion SDK Agreement available at     *
  * https://developer.leapmotion.com/sdk_agreement, or another agreement       *
@@ -15,7 +15,7 @@ using UnityEditorInternal;
 
 namespace Leap.Unity {
 
-  [CustomPropertyDrawer(typeof(SHashSetAttribute))]
+  [CustomPropertyDrawer(typeof(SerializableHashSetBase), useForChildren: true)]
   public class SerializableHashSetEditor : PropertyDrawer {
 
     private ReorderableList _list;
@@ -131,7 +131,7 @@ namespace Leap.Unity {
 
     private void onAddCallback(ReorderableList list) {
       SerializedProperty values = _currProperty.FindPropertyRelative("_values");
-      
+
       values.arraySize++;
 
       updatePairsFromProperty(_currProperty);
@@ -139,7 +139,7 @@ namespace Leap.Unity {
 
     private void onRemoveCallback(ReorderableList list) {
       SerializedProperty values = _currProperty.FindPropertyRelative("_values");
-      
+
       actuallyDeleteAt(values, list.index);
 
       updatePairsFromProperty(_currProperty);

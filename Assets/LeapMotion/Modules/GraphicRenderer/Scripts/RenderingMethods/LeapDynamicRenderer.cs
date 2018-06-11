@@ -1,6 +1,6 @@
 /******************************************************************************
- * Copyright (C) Leap Motion, Inc. 2011-2017.                                 *
- * Leap Motion proprietary and  confidential.                                 *
+ * Copyright (C) Leap Motion, Inc. 2011-2018.                                 *
+ * Leap Motion proprietary and confidential.                                  *
  *                                                                            *
  * Use subject to the terms of the Leap Motion SDK Agreement available at     *
  * https://developer.leapmotion.com/sdk_agreement, or another agreement       *
@@ -75,6 +75,8 @@ namespace Leap.Unity.GraphicalRenderer {
           for (int i = 0; i < group.graphics.Count; i++) {
             var graphic = group.graphics[i];
             if (graphic.isRepresentationDirty || _meshes[i] == null) {
+              MeshCache.Clear();
+
               beginMesh(_meshes[i]);
               _generation.graphic = graphic as LeapMeshGraphicBase;
               _generation.graphicIndex = i;

@@ -1,6 +1,6 @@
 /******************************************************************************
- * Copyright (C) Leap Motion, Inc. 2011-2017.                                 *
- * Leap Motion proprietary and  confidential.                                 *
+ * Copyright (C) Leap Motion, Inc. 2011-2018.                                 *
+ * Leap Motion proprietary and confidential.                                  *
  *                                                                            *
  * Use subject to the terms of the Leap Motion SDK Agreement available at     *
  * https://developer.leapmotion.com/sdk_agreement, or another agreement       *
@@ -13,25 +13,25 @@ using System.Collections.Generic;
 using UnityEngine;
 using NUnit.Framework;
 
-namespace Leap.Unity.Query.Test {
+namespace Leap.Unity.Tests {
+  using Query;
+  using System;
 
   public class QueryTests {
-    public int[] LIST_0 = { 1, 2, 3, 4, 5 };
-    public int[] LIST_1 = { 6, 7, 8, 9, 10 };
 
     [Test]
-    public void AllTest() {
-      Assert.AreEqual(LIST_0.All(i => i < 5),
-                      LIST_0.Query().All(i => i < 5));
+    public void AllTest([ValueSource("list0")] QueryArg arg) {
+      Assert.That(arg.ToQuery().All(i => i < 5), Is.EqualTo(
+                  arg.ToList().All(i => i < 5)));
 
-      Assert.AreEqual(LIST_0.All(i => i != 8),
-                      LIST_0.Query().All(i => i != 8));
+      Assert.That(arg.ToQuery().All(i => i != 8), Is.EqualTo(
+                  arg.ToList().All(i => i != 8)));
     }
 
     [Test]
-    public void AnyTest() {
-      Assert.AreEqual(LIST_0.Any(i => i == 4),
-                      LIST_0.Query().Any(i => i == 4));
+    public void AnyTest([ValueSource("list0")] QueryArg arg) {
+      Assert.That(arg.ToQuery().Any(i => i == 4), Is.EqualTo(
+                  arg.ToList().Query().Any(i => i == 4)));
     }
 
     [Test]
@@ -54,6 +54,17 @@ namespace Leap.Unity.Query.Test {
     }
 
     [Test]
+    public void AverageTest([ValueSource("list0")] QueryArg arg0) {
+      if (arg0.ToList().Count == 0) {
+        Assert.Ignore("Ignore empty queries for average test.");
+        return;
+      }
+
+      Assert.That(arg0.ToQuery().Select(t => (double)t).Average(), Is.EqualTo(
+                  arg0.ToList().Average()).Within(0.001).Percent);
+    }
+
+    [Test]
     public void CastTest() {
       object[] objs = new object[] { "Hello", "World", "These", "Are", "All", "Strings" };
 
@@ -62,37 +73,48 @@ namespace Leap.Unity.Query.Test {
     }
 
     [Test]
-    public void ConcatTest() {
-      Assert.That(LIST_0.Concat(LIST_1).SequenceEqual(
-                  LIST_0.Query().Concat(LIST_1.Query()).ToList()));
+    public void ConcatTest([ValueSource("list0")] QueryArg arg0, [ValueSource("list0")] QueryArg arg1) {
+      Assert.That(arg0.ToQuery().Concat(arg1.ToList()).ToList(), Is.EquivalentTo(
+                  arg0.ToList().Concat(arg1.ToList()).ToList()));
+
+      Assert.That(arg0.ToQuery().Concat(arg1.ToQuery()).ToList(), Is.EquivalentTo(
+                  arg0.ToList().Concat(arg1.ToList()).ToList()));
     }
 
     [Test]
-    public void ContainsTest() {
-      Assert.AreEqual(LIST_0.Contains(3),
-                      LIST_0.Query().Contains(3));
+    public void ContainsTest([ValueSource("list0")] QueryArg arg) {
+      Assert.That(arg.ToQuery().Contains(3), Is.EqualTo(
+                  arg.ToList().Contains(3)));
 
-      Assert.AreEqual(LIST_0.Contains(9),
-                      LIST_0.Query().Contains(9));
+      Assert.That(arg.ToQuery().Contains(9), Is.EqualTo(
+                  arg.ToList().Contains(9)));
     }
 
     [Test]
-    public void CountTests() {
-      Assert.AreEqual(LIST_0.Count(),
-                      LIST_0.Query().Count());
+    public void CountTests([ValueSource("list0")] QueryArg arg) {
+      Assert.That(arg.ToQuery().Count(), Is.EqualTo(
+                  arg.ToList().Count()));
 
-      Assert.AreEqual(LIST_0.Count(i => i % 2 == 0),
-                      LIST_0.Query().Count(i => i % 2 == 0));
+      Assert.That(arg.ToQuery().Count(i => i % 2 == 0), Is.EqualTo(
+                  arg.ToList().Count(i => i % 2 == 0)));
     }
 
+    [Test]
+    public void DistinctTest([ValueSource("list0")] QueryArg arg) {
+      Assert.That(arg.ToQuery().Distinct().OrderBy(t => t).ToList(), Is.EquivalentTo(
+                  arg.ToList().Distinct().OrderBy(t => t).ToList()));
+    }
 
     [Test]
-    public void ElemenAtTest() {
-      Assert.AreEqual(LIST_0.ElementAt(3),
-                      LIST_0.Query().ElementAt(3));
+    public void ElementAtTest([ValueSource("list0")] QueryArg arg, [Values(0, 3, 100)] int index) {
+      var list = arg.ToList();
 
-      Assert.AreEqual(LIST_0.ElementAtOrDefault(100),
-                      LIST_0.Query().ElementAtOrDefault(100));
+      if (index >= list.Count) {
+        Assert.That(() => arg.ToQuery().ElementAt(index), Throws.InstanceOf<IndexOutOfRangeException>());
+      } else {
+        Assert.That(arg.ToQuery().ElementAt(index), Is.EqualTo(
+                    arg.ToList().ElementAt(index)));
+      }
     }
 
     [Test]
@@ -101,177 +123,211 @@ namespace Leap.Unity.Query.Test {
     }
 
     [Test]
-    public void FirstTests() {
-      Assert.AreEqual(LIST_0.First(),
-                      LIST_0.Query().First());
+    public void FirstTests([ValueSource("list0")] QueryArg arg) {
+      var list = arg.ToList();
 
-      Assert.AreEqual(LIST_0.First(i => i % 2 == 0),
-                      LIST_0.Query().First(i => i % 2 == 0));
-    }
-
-    [Test]
-    public void FirstOrDefaultTests() {
-      Assert.AreEqual(LIST_0.FirstOrDefault(),
-                      LIST_0.Query().FirstOrDefault());
-
-      Assert.AreEqual(LIST_0.FirstOrDefault(i => i % 2 == 0),
-                      LIST_0.Query().FirstOrDefault(i => i % 2 == 0));
-
-      Assert.AreEqual(LIST_0.FirstOrDefault(i => i > 10),
-                      LIST_0.Query().FirstOrDefault(i => i > 10));
-    }
-
-    [Test]
-    public void FoldTest() {
-      Assert.AreEqual(LIST_0.Query().Fold((a, b) => a + b),
-                      LIST_0.Sum());
-    }
-
-    [Test]
-    public void ForeachTest() {
-      List<int> found = new List<int>();
-      foreach (var item in LIST_0.Query().Concat(LIST_1.Query())) {
-        found.Add(item);
+      if (list.Count == 0) {
+        Assert.That(() => arg.ToQuery().First(), Throws.InvalidOperationException);
+      } else {
+        Assert.That(arg.ToQuery().First(), Is.EqualTo(
+                    arg.ToList().First()));
       }
-      Assert.That(LIST_0.Concat(LIST_1).SequenceEqual(found));
+
+      if (list.Where(i => i % 2 == 0).Count() == 0) {
+        Assert.That(() => arg.ToQuery().Where(i => i % 2 == 0).First(), Throws.InvalidOperationException);
+      } else {
+        Assert.That(arg.ToQuery().First(i => i % 2 == 0), Is.EqualTo(
+                    arg.ToList().First(i => i % 2 == 0)));
+      }
     }
 
     [Test]
-    public void IndexOfTests() {
-      Assert.AreEqual(LIST_0.Query().IndexOf(3), 2);
-      Assert.AreEqual(LIST_0.Query().IndexOf(100), -1);
+    public void FirstOrDefaultTests([ValueSource("list0")] QueryArg arg) {
+      Assert.That(arg.ToQuery().FirstOrDefault(), Is.EqualTo(
+                  arg.ToList().FirstOrDefault()));
+
+      Assert.That(arg.ToQuery().FirstOrDefault(i => i % 2 == 0), Is.EqualTo(
+                  arg.ToList().FirstOrDefault(i => i % 2 == 0)));
+
+      Assert.That(arg.ToQuery().FirstOrDefault(i => i > 10), Is.EqualTo(
+                  arg.ToList().FirstOrDefault(i => i > 10)));
     }
 
     [Test]
-    public void LastTests() {
-      Assert.That(LIST_0.Query().Last(), Is.EqualTo(LIST_0.Last()));
+    public void FoldTest([ValueSource("list0")] QueryArg arg) {
+      var list = arg.ToList();
 
-      var empty = new int[] { };
-
-      Assert.That(() => {
-        empty.Query().Last();
-      }, Throws.InvalidOperationException);
-
-      Assert.That(empty.Query().LastOrDefault(), Is.EqualTo(empty.LastOrDefault()));
+      if (list.Count == 0) {
+        Assert.That(() => arg.ToQuery().Fold((a, b) => a + b), Throws.InvalidOperationException);
+      } else {
+        Assert.That(arg.ToQuery().Fold((a, b) => a + b), Is.EqualTo(
+                    arg.ToList().Sum()));
+      }
     }
 
     [Test]
-    public void MultiFirstTest() {
-      var q = LIST_0.Query();
-      var a = q.First();
-      var b = q.First();
-
-      Assert.That(a, Is.EqualTo(LIST_0[0]));
-      Assert.That(b, Is.EqualTo(LIST_0[0]));
+    public void ForeachTest([ValueSource("list0")] QueryArg arg0, [ValueSource("list1")] QueryArg arg1) {
+      List<int> actual = new List<int>();
+      foreach (var item in arg0.ToQuery().Concat(arg1.ToQuery())) {
+        actual.Add(item);
+      }
+      Assert.That(actual, Is.EquivalentTo(
+                  arg0.ToList().Concat(arg1.ToList()).ToList()));
     }
 
     [Test]
-    public void MultiForeachTest() {
+    public void IndexOfTests([ValueSource("list0")] QueryArg arg) {
+      Assert.That(arg.ToQuery().IndexOf(3), Is.EqualTo(
+                  arg.ToList().IndexOf(3)));
+
+      Assert.That(arg.ToQuery().IndexOf(100), Is.EqualTo(
+                  arg.ToList().IndexOf(100)));
+    }
+
+    [Test]
+    public void LastTests([ValueSource("list0")] QueryArg arg) {
+      var list = arg.ToList();
+
+      if (list.Count == 0) {
+        Assert.That(() => arg.ToQuery().Last(), Throws.InvalidOperationException);
+      } else {
+        Assert.That(arg.ToQuery().Last(), Is.EqualTo(
+                    arg.ToList().Last()));
+      }
+
+      Assert.That(arg.ToQuery().LastOrDefault(), Is.EqualTo(
+                  arg.ToList().LastOrDefault()));
+    }
+
+    [Test]
+    public void MaxTest([ValueSource("list0")] QueryArg arg) {
+      if (arg.ToList().Count == 0) {
+        Assert.Ignore("Ignore empty queries for max tests.");
+        return;
+      }
+
+      Assert.That(arg.ToQuery().Max(), Is.EqualTo(
+                  arg.ToList().Max()));
+    }
+
+    [Test]
+    public void MinTest([ValueSource("list0")] QueryArg arg) {
+      if (arg.ToList().Count == 0) {
+        Assert.Ignore("Ignore empty queries for min tests.");
+        return;
+      }
+
+      Assert.That(arg.ToQuery().Min(), Is.EqualTo(
+                  arg.ToList().Min()));
+    }
+
+    [Test]
+    public void MultiFirstTest([ValueSource("list0")] QueryArg arg) {
+      var q = arg.ToQuery();
+
+      q.FirstOrDefault();
+
+      Assert.That(() => q.FirstOrDefault(), Throws.InvalidOperationException);
+    }
+
+    [Test]
+    public void MultiForeachTest([ValueSource("list0")] QueryArg arg) {
       List<int> a = new List<int>();
       List<int> b = new List<int>();
 
-      var q = LIST_0.Query();
+      var q = arg.ToQuery();
       foreach (var item in q) {
         a.Add(item);
       }
 
-      foreach (var item in q) {
-        b.Add(item);
-      }
-
-      Assert.That(a, Is.EquivalentTo(LIST_0));
-      Assert.That(b, Is.EquivalentTo(LIST_0));
+      Assert.That(() => {
+        foreach (var item in q) {
+          b.Add(item);
+        }
+      }, Throws.InvalidOperationException);
     }
 
     [Test]
     public void OfTypeTest() {
       object[] objs = new object[] { 0, 0.4f, "Hello", 7u, 0.4, "World", null };
 
-      Assert.That(objs.OfType<string>().SequenceEqual(
+      Assert.That(objs.OfType<string>().ToList(), Is.EquivalentTo(
                   objs.Query().OfType<string>().ToList()));
 
-      Assert.That(objs.OfType<string>().SequenceEqual(
+      Assert.That(objs.OfType<string>(), Is.EquivalentTo(
                   objs.Query().OfType(typeof(string)).Cast<string>().ToList()));
     }
 
     [Test]
-    public void RangeFrom([Values(0, 1, 2, 100, -1, -2, -100)] int startValue) {
-      int index = startValue;
-      int itterations = 0;
-      foreach (var value in Values.From(startValue)) {
-        Assert.That(value, Is.EqualTo(index));
-        index++;
-        itterations++;
+    public void OrderByTest([ValueSource("list0")] QueryArg arg) {
+      Assert.That(arg.ToQuery().OrderBy(i => i).ToList(), Is.EquivalentTo(
+                  arg.ToList().OrderBy(i => i).ToList()));
+    }
 
-        if (itterations > 1000) {
-          Assert.Pass();
-          return;
-        }
-      }
+    [Test]
+    public void OrderByDescendingTest([ValueSource("list0")] QueryArg arg) {
+      Assert.That(arg.ToQuery().OrderByDescending(i => i).ToList(), Is.EquivalentTo(
+                  arg.ToList().OrderByDescending(i => i).ToList()));
     }
 
     [Test]
     [Pairwise]
     public void RangeFromTo([Values(0, 1, 100, -1, -100)] int startValue,
                             [Values(0, 1, 100, -1, -100)] int endValue,
-                            [Values(1, 2, -1, -2, 0)] int step) {
-      List<int> items = new List<int>();
-      if (step != 0) {
-        int i = startValue;
-        while (true) {
-          if (i == endValue) {
-            break;
-          }
-
-          if ((i > endValue) == (endValue > startValue)) {
-            break;
-          }
-
-          items.Add(i);
-          if (endValue > startValue) {
-            i += Mathf.Abs(step);
-          } else {
-            i -= Mathf.Abs(step);
-          }
-        }
+                            [Values(1, 2, 10)] int step,
+                            [Values(true, false)] bool endIsExclusive) {
+      List<int> expected = new List<int>();
+      int value = startValue;
+      int signStep = endValue > startValue ? step : -step;
+      for (int i = 0; i < Mathf.Abs(startValue - endValue) + 1; i++) {
+        expected.Add(value);
+        value += signStep;
       }
 
-      Assert.That(Values.From(startValue).To(endValue).By(step).ToList(), Is.EquivalentTo(items));
+      if (endIsExclusive) {
+        expected.Remove(endValue);
+      }
+
+      expected = expected.Where(i => i >= Mathf.Min(startValue, endValue)).
+                          Where(i => i <= Mathf.Max(startValue, endValue)).
+                          ToList();
+
+      Assert.That(Values.Range(startValue, endValue, step, endIsExclusive).ToList(), Is.EquivalentTo(expected));
     }
 
     [Test]
-    public void Repeat([Values(0, 1, 2, 3, 100)] int repetitions) {
+    public void Repeat([ValueSource("list0")] QueryArg arg, [Values(0, 1, 2, 3, 100)] int repetitions) {
       List<int> list = new List<int>();
       for (int i = 0; i < repetitions; i++) {
-        list.AddRange(LIST_0);
+        list.AddRange(arg.ToList());
       }
 
-      Assert.That(list.SequenceEqual(
-                  LIST_0.Query().Repeat(repetitions).ToList()));
+      Assert.That(arg.ToQuery().Repeat(repetitions).ToList(), Is.EquivalentTo(
+                  list));
     }
 
     [Test]
-    public void RepeatForever() {
-      int count = 0;
-      foreach (var value in LIST_0.Query().Repeat()) {
-        count++;
-        if (count >= 10000) {
-          Assert.Pass();
-          return;
-        }
-      }
+    public void ReverseTest([ValueSource("list0")] QueryArg arg) {
+      var expected = arg.ToList();
+      expected.Reverse();
+
+      Assert.That(arg.ToQuery().Reverse().ToList(), Is.EquivalentTo(
+                  expected));
     }
 
     [Test]
-    public void SelectTest() {
-      Assert.That(LIST_0.Select(i => i * 23).SequenceEqual(
-                  LIST_0.Query().Select(i => i * 23).ToList()));
+    public void SelectTest([ValueSource("list0")] QueryArg arg) {
+      Assert.That(arg.ToQuery().Select(i => i * 23).ToList(), Is.EquivalentTo(
+                  arg.ToList().Select(i => i * 23).ToList()));
     }
 
     [Test]
-    public void SelectManyTest() {
-      Assert.That(LIST_0.SelectMany(i => LIST_1.Select(j => j * i)).SequenceEqual(
-                  LIST_0.Query().SelectMany(i => LIST_1.Query().Select(j => j * i)).ToList()));
+    public void SelectManyTest([ValueSource("list0")] QueryArg arg0, [ValueSource("list0")] QueryArg arg1) {
+      Assert.That(arg0.ToQuery().SelectMany(i => arg1.ToQuery().Select(j => j * i)).ToList(), Is.EquivalentTo(
+                  arg0.ToList().SelectMany(i => arg1.ToList().Select(j => j * i)).ToList()));
+
+      Assert.That(arg0.ToQuery().SelectMany(i => arg1.ToList().Select(j => j * i).ToList()).ToList(), Is.EquivalentTo(
+                  arg0.ToList().SelectMany(i => arg1.ToList().Select(j => j * i)).ToList()));
     }
 
     [Test]
@@ -294,64 +350,193 @@ namespace Leap.Unity.Query.Test {
     }
 
     [Test]
-    public void SkipTest() {
-      Assert.That(LIST_0.Skip(3).SequenceEqual(
-                  LIST_0.Query().Skip(3).ToList()));
+    public void SkipTest([ValueSource("list0")] QueryArg arg) {
+      Assert.That(arg.ToQuery().Skip(3).ToList(), Is.EquivalentTo(
+                  arg.ToList().Skip(3).ToList()));
     }
 
     [Test]
-    public void SkipWhileTest() {
-      Assert.That(LIST_0.SkipWhile(i => i < 4).SequenceEqual(
-                  LIST_0.Query().SkipWhile(i => i < 4).ToList()));
+    public void SkipWhileTest([ValueSource("list0")] QueryArg arg) {
+      Assert.That(arg.ToQuery().SkipWhile(i => i < 4).ToList(), Is.EquivalentTo(
+                  arg.ToList().SkipWhile(i => i < 4).ToList()));
     }
 
     [Test]
-    public void TakeTest() {
-      Assert.That(LIST_0.Take(4).SequenceEqual(
-                  LIST_0.Query().Take(4).ToList()));
+    public void SortTest([ValueSource("list0")] QueryArg arg) {
+      var expected = arg.ToList();
+      expected.Sort();
+
+      Assert.That(arg.ToQuery().Sort().ToList(), Is.EquivalentTo(
+                  expected));
     }
 
     [Test]
-    public void TakeWhileTest() {
-      Assert.That(LIST_0.TakeWhile(i => i < 4).SequenceEqual(
-                  LIST_0.Query().TakeWhile(i => i < 4).ToList()));
+    public void SortDescendingTests([ValueSource("list0")] QueryArg arg) {
+      var expected = arg.ToList();
+      expected.Sort();
+      expected.Reverse();
+
+      Assert.That(arg.ToQuery().SortDescending().ToList(), Is.EquivalentTo(
+                  expected));
     }
 
     [Test]
-    public void WithPreviousTest() {
-      Assert.That(LIST_0.Query().WithPrevious().Count(p => p.hasPrev), Is.EqualTo(LIST_0.Length - 1));
-      Assert.That(LIST_0.Query().WithPrevious(includeStart: true).Count(p => !p.hasPrev), Is.EqualTo(1));
-      Assert.That(LIST_0.Query().WithPrevious(includeStart: true).Count(p => p.hasPrev), Is.EqualTo(LIST_0.Length - 1));
+    public void SumTests([ValueSource("list0")] QueryArg arg) {
+      if (arg.ToList().Count == 0) {
+        Assert.Ignore("Ignore empty queries for sum tests.");
+        return;
+      }
 
-      foreach (var pair in LIST_0.Query().WithPrevious()) {
-        Assert.That(pair.value, Is.EqualTo(pair.prev + 1));
+      Assert.That(arg.ToQuery().Sum(), Is.EqualTo(
+                  arg.ToList().Sum()));
+    }
+
+    [Test]
+    public void TakeTest([ValueSource("list0")] QueryArg arg) {
+      Assert.That(arg.ToQuery().Take(4).ToList(), Is.EquivalentTo(
+                  arg.ToList().Take(4).ToList()));
+    }
+
+    [Test]
+    public void TakeWhileTest([ValueSource("list0")] QueryArg arg) {
+      Assert.That(arg.ToQuery().TakeWhile(i => i < 4).ToList(), Is.EquivalentTo(
+                  arg.ToList().TakeWhile(i => i < 4).ToList()));
+    }
+
+    [Test]
+    public void WithPreviousTest([ValueSource("list0")] QueryArg arg) {
+      var list = arg.ToList();
+      if (list.Count == 0) {
+        Assert.That(arg.ToQuery().WithPrevious().Count(), Is.EqualTo(0));
+        Assert.That(arg.ToQuery().WithPrevious(includeStart: true).Count(), Is.EqualTo(0));
+      } else if (list.Count == 1) {
+        Assert.That(arg.ToQuery().WithPrevious().Count(), Is.EqualTo(0));
+        Assert.That(arg.ToQuery().WithPrevious(includeStart: true).Count(), Is.EqualTo(1));
+      } else {
+        Assert.That(arg.ToQuery().WithPrevious().Count(p => p.hasPrev), Is.EqualTo(list.Count - 1));
+        Assert.That(arg.ToQuery().WithPrevious(includeStart: true).Count(p => !p.hasPrev), Is.EqualTo(1));
+        Assert.That(arg.ToQuery().WithPrevious(includeStart: true).Count(p => p.hasPrev), Is.EqualTo(list.Count - 1));
+      }
+
+      int index = 0;
+      foreach (var pair in arg.ToQuery().WithPrevious()) {
+        Assert.That(pair.prev, Is.EqualTo(list[index]));
+        index++;
       }
     }
 
     [Test]
-    public void WithPreviousOffsetTest() {
-      Assert.That(LIST_0.Query().WithPrevious(offset: 4).Count(), Is.EqualTo(1));
-      Assert.That(LIST_0.Query().WithPrevious(offset: 5).Count(), Is.EqualTo(0));
-      Assert.That(LIST_0.Query().WithPrevious(offset: int.MaxValue).Count(), Is.EqualTo(0));
+    public void WithPreviousOffsetTest([ValueSource("list0")] QueryArg arg) {
+      var list = arg.ToList();
+      if (list.Count == 0) {
+        Assert.That(arg.ToQuery().WithPrevious(offset: 4).Count(), Is.EqualTo(0));
+        Assert.That(arg.ToQuery().WithPrevious(offset: 4, includeStart: true).Count(), Is.EqualTo(0));
+      } else if (list.Count == 1) {
+        Assert.That(arg.ToQuery().WithPrevious(offset: 4).Count(), Is.EqualTo(0));
+        Assert.That(arg.ToQuery().WithPrevious(offset: 4, includeStart: true).Count(), Is.EqualTo(1));
+      } else {
+        Assert.That(arg.ToQuery().WithPrevious(offset: 4).Count(), Is.EqualTo(Mathf.Max(0, list.Count - 4)));
+        Assert.That(arg.ToQuery().WithPrevious(offset: list.Count + 1).Count(), Is.EqualTo(0));
+        Assert.That(arg.ToQuery().WithPrevious(offset: int.MaxValue).Count(), Is.EqualTo(0));
+      }
 
-      var item = LIST_0.Query().WithPrevious(offset: 4).First();
-      Assert.That(item.value, Is.EqualTo(5));
-      Assert.That(item.prev, Is.EqualTo(1));
-
-      Assert.That(LIST_0.Query().WithPrevious(offset: 2).All(i => i.value - i.prev == 2));
+      Assert.That(Values.Range(0, 10).WithPrevious(offset: 2).All(i => i.value - i.prev == 2));
     }
 
     [Test]
-    public void WhereTest() {
-      Assert.That(LIST_0.Where(i => i % 2 == 0).SequenceEqual(
-                  LIST_0.Query().Where(i => i % 2 == 0).ToList()));
+    public void WhereTest([ValueSource("list0")] QueryArg arg) {
+      Assert.That(arg.ToQuery().Where(i => i % 2 == 0).ToList(), Is.EquivalentTo(
+                  arg.ToList().Where(i => i % 2 == 0).ToList()));
     }
 
     [Test]
-    public void ZipTest() {
-      Assert.That(LIST_0.Query().Zip(LIST_1.Query(), (a, b) => a.ToString() + b.ToString()).ToList().SequenceEqual(
-                  new string[] { "16", "27", "38", "49", "510" }));
+    public void WithIndicesTest([ValueSource("list0")] QueryArg arg) {
+      int index = 0;
+      foreach (var item in arg.ToQuery().WithIndices()) {
+        Assert.That(item.index, Is.EqualTo(index));
+        Assert.That(item.value, Is.EqualTo(arg.ToList()[index]));
+        index++;
+      }
     }
+
+    [Test]
+    public void ZipTest([ValueSource("list0")] QueryArg arg0, [ValueSource("list1")] QueryArg arg1) {
+      var list0 = arg0.ToList();
+      var list1 = arg1.ToList();
+
+      List<string> expected = new List<string>();
+      for (int i = 0; i < Mathf.Min(list0.Count, list1.Count); i++) {
+        expected.Add(list0[i].ToString() + list1[i].ToString());
+      }
+
+      Assert.That(arg0.ToQuery().Zip(arg1.ToQuery(), (a, b) => a.ToString() + b.ToString()).ToList(), Is.EquivalentTo(
+                  expected));
+
+      Assert.That(arg0.ToQuery().Zip(arg1.ToList(), (a, b) => a.ToString() + b.ToString()).ToList(), Is.EquivalentTo(
+                  expected));
+    }
+
+    private static IEnumerable<QueryArg> list0 {
+      get {
+        List<int> values = new List<int>() { 1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 9, 1, 900, int.MinValue, int.MaxValue };
+        List<int> lengths = new List<int>() {
+          0,
+          1,
+          2,
+          int.MaxValue
+        };
+
+        foreach (var length in lengths) {
+          var list = values.Take(length).ToList();
+          yield return new QueryArg(list, list.Count);
+          yield return new QueryArg(list, list.Count * 10 + 10);
+        }
+      }
+    }
+
+    private static IEnumerable<QueryArg> list1 {
+      get {
+        List<int> values = new List<int>() { 6, 7, 8, 9, 10, 1, 1, 9, 300, 6, 900, int.MaxValue };
+        List<int> lengths = new List<int>() {
+          0,
+          1,
+          2,
+          int.MaxValue
+        };
+
+        foreach (var length in lengths) {
+          var list = values.Take(length).ToList();
+          yield return new QueryArg(list, list.Count);
+          yield return new QueryArg(list, list.Count * 10 + 10);
+        }
+      }
+    }
+
+    public class QueryArg {
+      private int[] _array;
+      private int _count;
+
+      public QueryArg(List<int> values, int capacity) {
+        _array = new int[capacity];
+        values.CopyTo(_array);
+        _count = values.Count;
+      }
+
+      public Query<int> ToQuery() {
+        int[] copy = new int[_array.Length];
+        _array.CopyTo(copy, 0);
+        return new Query<int>(copy, _count);
+      }
+
+      public List<int> ToList() {
+        return new List<int>(_array.Take(_count));
+      }
+
+      public override string ToString() {
+        return _array.Length + " : " + Utils.ToArrayString(_array.Take(_count));
+      }
+    }
+
 
     public class TestEnumerator : IEnumerator<int> {
       private int _curr = -1;
