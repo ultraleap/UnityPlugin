@@ -40,10 +40,16 @@ namespace Leap.Unity.Interaction.Internal {
         }
       };
 
+      #if UNITY_2017_OR_NEWER
       EditorApplication.playModeStateChanged -= onPlayModeStateChanged;
       EditorApplication.playModeStateChanged += onPlayModeStateChanged;
+      #else
+      EditorApplication.playmodeStateChanged -= onPlayModeStateChanged;
+      EditorApplication.playmodeStateChanged += onPlayModeStateChanged;
+      #endif
     }
 
+    #if UNITY_2017_OR_NEWER
     private static void onPlayModeStateChanged(PlayModeStateChange stateChange) {
       if (stateChange == PlayModeStateChange.EnteredPlayMode) {
         bool allChecksPassed = runAllChecks_NoGUI();
@@ -53,6 +59,20 @@ namespace Leap.Unity.Interaction.Internal {
         }
       }
     }
+    #else
+    private static void onPlayModeStateChanged() {
+      var didEnterPlayMode = EditorApplication.isPlayingOrWillChangePlaymode
+                             && EditorApplication.isPlaying;
+
+      if (didEnterPlayMode) {
+        bool allChecksPassed = runAllChecks_NoGUI();
+
+        if (!allChecksPassed) {
+          EditorApplication.delayCall += LeapUnityWindow.Init;
+        }
+      }
+    }
+    #endif
 
     [LeapProjectCheck("Interaction Engine", 10)]
     public static bool CheckInteractionSettings() {
@@ -70,7 +90,7 @@ namespace Leap.Unity.Interaction.Internal {
       return true;
     }
 
-    #region Run All Checks
+#region Run All Checks
 
     private static bool runAllChecks_NoGUI() {
       bool allChecksPassed = true;
@@ -104,9 +124,9 @@ namespace Leap.Unity.Interaction.Internal {
       return allChecksPassed;
     }
 
-    #endregion
+#endregion
 
-    #region Check Gravity
+#region Check Gravity
 
     private static bool checkGravity() {
       if (LeapProjectChecks.CheckIgnoredKey(IGNORE_GRAVITY_CHECK_KEY)) {
@@ -147,9 +167,9 @@ namespace Leap.Unity.Interaction.Internal {
       return gravityOK;
     }
 
-    #endregion
+#endregion
 
-    #region Check Timestep
+#region Check Timestep
 
     private static bool checkTimeStep() {
       if (LeapProjectChecks.CheckIgnoredKey(IGNORE_TIMESTEP_CHECK_KEY)) {
@@ -192,9 +212,9 @@ namespace Leap.Unity.Interaction.Internal {
       return timeStepOK;
     }
 
-    #endregion
+#endregion
 
-    #region Check Rigid Hands
+#region Check Rigid Hands
 
     private static bool checkRigidHands() {
       var unusedRigidHandObjects = (GameObject[])null;
@@ -248,7 +268,7 @@ namespace Leap.Unity.Interaction.Internal {
       return rigidHandsOK;
     }
 
-    #endregion
+#endregion
 
   }
 }
