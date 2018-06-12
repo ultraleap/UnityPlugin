@@ -37,6 +37,18 @@ namespace Leap.Unity {
     /// </summary>
     protected const string HAND_ARRAY_GLOBAL_NAME = "_LeapHandTransforms";
 
+    /// <summary>
+    /// The maximum number of times the provider will 
+    /// attempt to reconnect to the service before giving up.
+    /// </summary>
+    protected const int MAX_RECONNECTION_ATTEMPTS = 5;
+
+    /// <summary>
+    /// The number of frames to wait between each
+    /// reconnection attempt.
+    /// </summary>
+    protected const int RECONNECTION_INTERVAL = 180;
+
     #endregion
 
     #region Inspector
@@ -66,8 +78,13 @@ namespace Leap.Unity {
     [SerializeField]
     protected float _physicsExtrapolationTime = 1.0f / 90.0f;
 
+#if UNITY_2017_3_OR_NEWER
     [Tooltip("When checked, profiling data from the LeapCSharp worker thread will be used to populate the UnityProfiler.")]
     [EditTimeOnly]
+#else
+    [Tooltip("Worker thread profiling requires a Unity version of 2017.3 or greater.")]
+    [Disable]
+#endif
     [SerializeField]
     protected bool _workerThreadProfiling = false;
 
@@ -248,6 +265,8 @@ namespace Leap.Unity {
         LeapProfiling.Update();
       }
 
+      if (!checkConnectionIntegrity()) { return; }
+
 #if UNITY_EDITOR
       if (UnityEditor.EditorApplication.isCompiling) {
         UnityEditor.EditorApplication.isPlaying = false;
@@ -395,6 +414,19 @@ namespace Leap.Unity {
       transformFrame(_untransformedFixedFrame, _transformedFixedFrame);
     }
 
+    /// <summary>
+    /// Copies property settings from this LeapServiceProvider to the target
+    /// LeapXRServiceProvider where applicable. Does not modify any XR-specific settings
+    /// that only exist on the LeapXRServiceProvider.
+    /// </summary>
+    public void CopySettingsToLeapXRServiceProvider(
+        LeapXRServiceProvider leapXRServiceProvider) {
+      leapXRServiceProvider._frameOptimization = _frameOptimization;
+      leapXRServiceProvider._physicsExtrapolation = _physicsExtrapolation;
+      leapXRServiceProvider._physicsExtrapolationTime = _physicsExtrapolationTime;
+      leapXRServiceProvider._workerThreadProfiling = _workerThreadProfiling;
+    }
+
     #endregion
 
     #region Internal Methods
@@ -467,6 +499,37 @@ namespace Leap.Unity {
         _leapController.StopConnection();
         _leapController = null;
       }
+    }
+
+    private int _framesSinceServiceConnectionChecked = 0;
+    private int _numberOfReconnectionAttempts = 0;
+    /// <summary>
+    /// Checks whether this provider is connected to a service;
+    /// If it is not, attempt to reconnect at regular intervals
+    /// for MAX_RECONNECTION_ATTEMPTS
+    /// </summary>
+    protected bool checkConnectionIntegrity() {
+      if (_leapController.IsServiceConnected) {
+        _framesSinceServiceConnectionChecked = 0;
+        _numberOfReconnectionAttempts = 0;
+        return true;
+      } else if (_numberOfReconnectionAttempts < MAX_RECONNECTION_ATTEMPTS) {
+        _framesSinceServiceConnectionChecked ++;
+
+        if (_framesSinceServiceConnectionChecked > RECONNECTION_INTERVAL) {
+          _framesSinceServiceConnectionChecked = 0;
+          _numberOfReconnectionAttempts++;
+
+          Debug.LogWarning("Leap Service not connected; attempting to reconnect for try " +
+                           _numberOfReconnectionAttempts + "/" + MAX_RECONNECTION_ATTEMPTS +
+                           "...", this);
+          using (new ProfilerSample("Reconnection Attempt")) {
+            destroyController();
+            createController();
+          }
+        }
+      }
+      return false;
     }
 
     protected void onHandControllerConnect(object sender, LeapEventArgs args) {

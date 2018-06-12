@@ -871,6 +871,7 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   deformPosition: 1
+  scaleLastFingerBone: 0
   modelFingerPointing: {x: 1, y: 0, z: 0}
   modelPalmFacing: {x: 0, y: -1, z: 0}
 --- !u!114 &114245269363414434
@@ -901,6 +902,7 @@ MonoBehaviour:
   deformPositionsState: 1
   ModelPalmAtLeapWrist: 1
   UseMetaCarpals: 1
+  _scaleLastFingerBones: 1
   modelFingerPointing: {x: 1, y: -0, z: -0}
   modelPalmFacing: {x: 0, y: -1, z: 0}
   jointList:
@@ -1017,6 +1019,7 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   deformPosition: 1
+  scaleLastFingerBone: 0
   modelFingerPointing: {x: 1, y: 0, z: 0}
   modelPalmFacing: {x: 0, y: -1, z: 0}
 --- !u!114 &114565555105106300
@@ -1041,6 +1044,7 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   deformPosition: 1
+  scaleLastFingerBone: 0
   modelFingerPointing: {x: 1, y: 0, z: 0}
   modelPalmFacing: {x: 0, y: -1, z: 0}
 --- !u!114 &114599956679201074
@@ -1065,6 +1069,7 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   deformPosition: 1
+  scaleLastFingerBone: 0
   modelFingerPointing: {x: 1, y: 0, z: 0}
   modelPalmFacing: {x: 0, y: -1, z: 0}
 --- !u!114 &114793224122224908
@@ -1089,6 +1094,7 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   deformPosition: 1
+  scaleLastFingerBone: 0
   modelFingerPointing: {x: 1, y: 0, z: 0}
   modelPalmFacing: {x: 0, y: -1, z: 0}
 --- !u!137 &137723638835135990

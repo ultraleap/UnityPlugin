@@ -366,6 +366,12 @@ namespace Leap.Unity.GraphicalRenderer {
       patchReferences();
     }
 
+    protected virtual void OnDestroy() {
+      if (Application.isPlaying && isAttachedToGroup) {
+        TryDetach();
+      }
+    }
+
     protected virtual void OnDrawGizmos() {
 #if UNITY_EDITOR
       editor.OnDrawGizmos();

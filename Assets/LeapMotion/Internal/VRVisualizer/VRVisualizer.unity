@@ -166,11 +166,6 @@ MonoBehaviour:
     IsRightToBeSpawned: 0
     IsEnabled: 1
     CanDuplicate: 1
-    HandPostProcesses:
-      m_PersistentCalls:
-        m_Calls: []
-      m_TypeName: Leap.Unity.Hands+HandEvent, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
-        PublicKeyToken=null
 --- !u!1 &228550818
 GameObject:
   m_ObjectHideFlags: 0
@@ -203,19 +198,20 @@ MonoBehaviour:
   _frameOptimization: 0
   _physicsExtrapolation: 1
   _physicsExtrapolationTime: 0.011111111
+  _workerThreadProfiling: 0
 --- !u!4 &228550822
 Transform:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 411750, guid: 18d6bf9063dcb1842be63f411fd9fc26, type: 2}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 228550818}
-  m_LocalRotation: {x: -0.00000011520229, y: -0.70710695, z: -0.7071066, w: 0.00000011520235}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalRotation: {x: -0, y: -0.7071068, z: -0.7071068, w: 0}
+  m_LocalPosition: {x: 0.02, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1659293092}
   m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: -89.980194, y: -180, z: 0}
+  m_LocalEulerAnglesHint: {x: -90, y: -180, z: 0}
 --- !u!1001 &343781140
 Prefab:
   m_ObjectHideFlags: 0
@@ -270,6 +266,30 @@ Prefab:
     - target: {fileID: 464466, guid: 869d20cdda15af24aab9e72b5f2eec78, type: 2}
       propertyPath: m_LocalEulerAnglesHint.y
       value: 360
+      objectReference: {fileID: 0}
+    - target: {fileID: 11407378, guid: 869d20cdda15af24aab9e72b5f2eec78, type: 2}
+      propertyPath: _material
+      value: 
+      objectReference: {fileID: 2100000, guid: 2177dcab57f0bf94f8974dbcf7edc036, type: 2}
+    - target: {fileID: 11407378, guid: 869d20cdda15af24aab9e72b5f2eec78, type: 2}
+      propertyPath: _sphereMesh
+      value: 
+      objectReference: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
+    - target: {fileID: 11407378, guid: 869d20cdda15af24aab9e72b5f2eec78, type: 2}
+      propertyPath: _jointRadius
+      value: 0.0065
+      objectReference: {fileID: 0}
+    - target: {fileID: 11407378, guid: 869d20cdda15af24aab9e72b5f2eec78, type: 2}
+      propertyPath: _cylinderRadius
+      value: 0.0045
+      objectReference: {fileID: 0}
+    - target: {fileID: 11407378, guid: 869d20cdda15af24aab9e72b5f2eec78, type: 2}
+      propertyPath: _palmRadius
+      value: 0.012
+      objectReference: {fileID: 0}
+    - target: {fileID: 11407378, guid: 869d20cdda15af24aab9e72b5f2eec78, type: 2}
+      propertyPath: _castShadows
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 869d20cdda15af24aab9e72b5f2eec78, type: 2}
@@ -410,11 +430,6 @@ MonoBehaviour:
     IsRightToBeSpawned: 0
     IsEnabled: 1
     CanDuplicate: 1
-    HandPostProcesses:
-      m_PersistentCalls:
-        m_Calls: []
-      m_TypeName: Leap.Unity.Hands+HandEvent, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
-        PublicKeyToken=null
 --- !u!1 &713154453
 GameObject:
   m_ObjectHideFlags: 0
@@ -524,10 +539,12 @@ MonoBehaviour:
   _frameOptimization: 0
   _physicsExtrapolation: 1
   _physicsExtrapolationTime: 0.011111111
-  _allowManualDeviceOffset: 1
+  _workerThreadProfiling: 0
+  _deviceOffsetMode: 0
   _deviceOffsetYAxis: 0
   _deviceOffsetZAxis: 0.12
   _deviceTiltXAxis: 1
+  _deviceOrigin: {fileID: 0}
   _temporalWarpingMode: 2
   _customWarpAdjustment: 17
   _updateHandInPrecull: 0
@@ -542,9 +559,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fd815635398474cbbba564563a209f82, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _provider: {fileID: 896654703}
   _gammaCorrection: 1
-  ImageTimeout: 9000
 --- !u!114 &896654705
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -556,8 +571,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cfb12777e12bf9941b23356a343f5016, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _eyeType:
-    _orderType: 3
+  _useCustomBaseline: 0
+  _customBaselineValue: 64
+  _showEyePositions: 0
 --- !u!114 &896654706
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1042,6 +1058,30 @@ Prefab:
       propertyPath: m_LocalEulerAnglesHint.y
       value: 360
       objectReference: {fileID: 0}
+    - target: {fileID: 11407378, guid: 869d20cdda15af24aab9e72b5f2eec78, type: 2}
+      propertyPath: _material
+      value: 
+      objectReference: {fileID: 2100000, guid: 2177dcab57f0bf94f8974dbcf7edc036, type: 2}
+    - target: {fileID: 11407378, guid: 869d20cdda15af24aab9e72b5f2eec78, type: 2}
+      propertyPath: _sphereMesh
+      value: 
+      objectReference: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
+    - target: {fileID: 11407378, guid: 869d20cdda15af24aab9e72b5f2eec78, type: 2}
+      propertyPath: _jointRadius
+      value: 0.0065
+      objectReference: {fileID: 0}
+    - target: {fileID: 11407378, guid: 869d20cdda15af24aab9e72b5f2eec78, type: 2}
+      propertyPath: _cylinderRadius
+      value: 0.0045
+      objectReference: {fileID: 0}
+    - target: {fileID: 11407378, guid: 869d20cdda15af24aab9e72b5f2eec78, type: 2}
+      propertyPath: _palmRadius
+      value: 0.012
+      objectReference: {fileID: 0}
+    - target: {fileID: 11407378, guid: 869d20cdda15af24aab9e72b5f2eec78, type: 2}
+      propertyPath: _castShadows
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 869d20cdda15af24aab9e72b5f2eec78, type: 2}
   m_IsPrefabParent: 0
@@ -1172,7 +1212,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _roomScaleHeightOffset: 1.6
-  autoRecenterOnUserPresence: 1
+  recenterOnUserPresence: 1
+  recenterOnStart: 1
+  recenterOnKey: 0
+  recenterKey: 114
   enableRuntimeAdjustment: 1
   stepUpKey: 273
   stepDownKey: 274
@@ -1231,6 +1274,30 @@ Prefab:
     - target: {fileID: 464466, guid: 39d18871c11b53c4082d8202e3db68a3, type: 2}
       propertyPath: m_LocalEulerAnglesHint.y
       value: 360
+      objectReference: {fileID: 0}
+    - target: {fileID: 11407378, guid: 39d18871c11b53c4082d8202e3db68a3, type: 2}
+      propertyPath: _material
+      value: 
+      objectReference: {fileID: 2100000, guid: 2177dcab57f0bf94f8974dbcf7edc036, type: 2}
+    - target: {fileID: 11407378, guid: 39d18871c11b53c4082d8202e3db68a3, type: 2}
+      propertyPath: _sphereMesh
+      value: 
+      objectReference: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
+    - target: {fileID: 11407378, guid: 39d18871c11b53c4082d8202e3db68a3, type: 2}
+      propertyPath: _jointRadius
+      value: 0.0065
+      objectReference: {fileID: 0}
+    - target: {fileID: 11407378, guid: 39d18871c11b53c4082d8202e3db68a3, type: 2}
+      propertyPath: _cylinderRadius
+      value: 0.0045
+      objectReference: {fileID: 0}
+    - target: {fileID: 11407378, guid: 39d18871c11b53c4082d8202e3db68a3, type: 2}
+      propertyPath: _palmRadius
+      value: 0.012
+      objectReference: {fileID: 0}
+    - target: {fileID: 11407378, guid: 39d18871c11b53c4082d8202e3db68a3, type: 2}
+      propertyPath: _castShadows
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 39d18871c11b53c4082d8202e3db68a3, type: 2}
@@ -1299,6 +1366,30 @@ Prefab:
     - target: {fileID: 464466, guid: 39d18871c11b53c4082d8202e3db68a3, type: 2}
       propertyPath: m_LocalEulerAnglesHint.y
       value: 360
+      objectReference: {fileID: 0}
+    - target: {fileID: 11407378, guid: 39d18871c11b53c4082d8202e3db68a3, type: 2}
+      propertyPath: _material
+      value: 
+      objectReference: {fileID: 2100000, guid: 2177dcab57f0bf94f8974dbcf7edc036, type: 2}
+    - target: {fileID: 11407378, guid: 39d18871c11b53c4082d8202e3db68a3, type: 2}
+      propertyPath: _sphereMesh
+      value: 
+      objectReference: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
+    - target: {fileID: 11407378, guid: 39d18871c11b53c4082d8202e3db68a3, type: 2}
+      propertyPath: _jointRadius
+      value: 0.0065
+      objectReference: {fileID: 0}
+    - target: {fileID: 11407378, guid: 39d18871c11b53c4082d8202e3db68a3, type: 2}
+      propertyPath: _cylinderRadius
+      value: 0.0045
+      objectReference: {fileID: 0}
+    - target: {fileID: 11407378, guid: 39d18871c11b53c4082d8202e3db68a3, type: 2}
+      propertyPath: _palmRadius
+      value: 0.012
+      objectReference: {fileID: 0}
+    - target: {fileID: 11407378, guid: 39d18871c11b53c4082d8202e3db68a3, type: 2}
+      propertyPath: _castShadows
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 39d18871c11b53c4082d8202e3db68a3, type: 2}
@@ -1374,8 +1465,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cfb12777e12bf9941b23356a343f5016, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _eyeType:
-    _orderType: 1
+  _useCustomBaseline: 0
+  _customBaselineValue: 64
+  _showEyePositions: 0
 --- !u!114 &1659293088
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1388,9 +1480,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fd815635398474cbbba564563a209f82, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _provider: {fileID: 228550819}
   _gammaCorrection: 1
-  ImageTimeout: 9000
 --- !u!114 &1659293089
 MonoBehaviour:
   m_ObjectHideFlags: 0

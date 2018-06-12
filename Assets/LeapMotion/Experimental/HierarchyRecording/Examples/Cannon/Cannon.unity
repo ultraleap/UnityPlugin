@@ -441,14 +441,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1d1554d7e1f527445affc9fc6d835819, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  recordOnStart: 1
+  recordWhen: 0
   recordingName: Cannon
   targetFolder:
     _assetFolder: {fileID: 0}
-  transformMode: 0
-  specificTransforms: []
-  audioSourceMode: 0
-  specificAudioSources: []
   provider: {fileID: 0}
   recordLeapData: 0
   beginRecordingKey: 286
