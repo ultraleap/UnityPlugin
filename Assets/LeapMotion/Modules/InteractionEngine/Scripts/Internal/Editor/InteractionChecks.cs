@@ -40,7 +40,7 @@ namespace Leap.Unity.Interaction.Internal {
         }
       };
 
-      #if UNITY_2017_OR_NEWER
+      #if UNITY_2017_1_OR_NEWER
       EditorApplication.playModeStateChanged -= onPlayModeStateChanged;
       EditorApplication.playModeStateChanged += onPlayModeStateChanged;
       #else
@@ -49,7 +49,7 @@ namespace Leap.Unity.Interaction.Internal {
       #endif
     }
 
-    #if UNITY_2017_OR_NEWER
+    #if UNITY_2017_1_OR_NEWER
     private static void onPlayModeStateChanged(PlayModeStateChange stateChange) {
       if (stateChange == PlayModeStateChange.EnteredPlayMode) {
         bool allChecksPassed = runAllChecks_NoGUI();
