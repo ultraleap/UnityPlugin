@@ -12,6 +12,8 @@ using System;
 using System.Collections.Generic;
 using Leap.Unity.Query;
 using System.Text.RegularExpressions;
+using System.Reflection;
+using System.Linq;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -27,14 +29,40 @@ namespace Leap.Unity.Attributes {
                                               ISupportDragAndDrop {
 
 #pragma warning disable 0414
-    private Type type;
+    /// <summary>
+    /// The interface Type, or null if the attribute was initialized to call a
+    /// Type getter method instead.
+    /// </summary>
+    private Type _type;
+    /// <summary>
+    /// The name of a method to call on the component containing the decorated
+    /// object field to dynamically retrieve the Type of the interface, or null
+    /// if the Type was specified statically in the Attribute constructor (in
+    /// which case the Type is in _type).
+    /// </summary>
+    private string _typeGetterMethodName;
 #pragma warning restore 0414
 
+    /// <summary>
+    /// Specifies that the object field input must implement an interface
+    /// defined by the provided Type argument. Objects that are dragged into
+    /// the field are checked to ensure they implement the interface.
+    /// </summary>
     public ImplementsInterfaceAttribute(Type type) {
       if (!type.IsInterface) {
         throw new System.Exception(type.Name + " is not an interface.");
       }
-      this.type = type;
+      this._type = type;
+    }
+
+    /// <summary>
+    /// Specifies that the object field input must implement an interface
+    /// defined by the type returned when the argument method is called on the
+    /// component object. Objects that are dragged into the field are checked
+    /// to ensure they implement the interface.
+    /// </summary>
+    public ImplementsInterfaceAttribute(string typeGetterMethodName) {
+      this._typeGetterMethodName = typeGetterMethodName;
     }
 
 #if UNITY_EDITOR
@@ -45,10 +73,33 @@ namespace Leap.Unity.Attributes {
                                                          property.objectReferenceValue);
 
         if (implementingObject == null) {
-          Debug.LogError(property.objectReferenceValue.GetType().Name + " does not implement " + type.Name);
+          Debug.LogError(property.objectReferenceValue.GetType().Name + " does not implement " + _type.Name);
         }
 
         property.objectReferenceValue = implementingObject;
+      }
+    }
+
+    /// <summary>
+    /// Returns the interface type that this attribute uses to constrain
+    /// object fields that it decorates.
+    /// </summary>
+    public Type GetInterfaceType() {
+      if (this._type != null) {
+        return _type;
+      }
+      else { // use _typeGetterMethodName.
+        var target = targets.Query().FirstOrDefault();
+        var objectType = target.GetType();
+
+        var method = objectType.FindMethodByName(_typeGetterMethodName);
+
+        var interfaceType = method.Invoke(
+          target,
+          method.GetParameters().Select(p => p.DefaultValue).ToArray()
+        );
+
+        return interfaceType as Type;
       }
     }
 
@@ -59,14 +110,11 @@ namespace Leap.Unity.Attributes {
     /// </summary>
     public UnityObject FindImplementer(SerializedProperty property, UnityObject fromObj) {
 
-      // Don't use fieldInfo here because it is very convenient for it to be left null
-      // on the CombinablePropertyAttribute when dealing with generic-type situations
-      // where the ImplementsInterface class has to be constructed manually in a custom
-      // editor. (Specific case: StreamConnectorEditor.cs)
+      var type = this.GetInterfaceType();
 
       bool isTypeDefinitelyIncompatible;
       {
-        isTypeDefinitelyIncompatible = !this.type.IsAssignableFrom(fromObj.GetType());
+        isTypeDefinitelyIncompatible = !type.IsAssignableFrom(fromObj.GetType());
 
         // We have to make an exception when a GameObject is dragged into a field whose
         // type is a Component, because it's expected that we can use GetComponent in
@@ -134,6 +182,8 @@ namespace Leap.Unity.Attributes {
     }
 
     public void DrawProperty(Rect rect, SerializedProperty property, GUIContent label) {
+      var type = GetInterfaceType();
+
       if (property.objectReferenceValue != null) {
         EditorGUI.ObjectField(rect, property, type, label);
       }
@@ -152,6 +202,7 @@ namespace Leap.Unity.Attributes {
 
     public void ProcessDroppedObjects(UnityObject[] droppedObjects,
                                       SerializedProperty property) {
+      var type = GetInterfaceType();
 
       var implementer = droppedObjects.Query()
                                       .FirstOrDefault(o => FindImplementer(property, o));

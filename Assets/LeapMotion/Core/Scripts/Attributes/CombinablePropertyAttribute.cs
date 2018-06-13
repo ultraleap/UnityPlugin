@@ -14,6 +14,7 @@ using UnityEditor;
 using System;
 using System.Reflection;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Leap.Unity.Attributes {
 
@@ -129,4 +130,43 @@ namespace Leap.Unity.Attributes {
     public virtual void OnPropertyChanged(SerializedProperty property) { }
 #endif
   }
+
+  public static class AttributeExtensions {
+
+    public static MethodInfo FindMethodByName(this Type type,
+                                              string methodName) {
+      var namedMethods = type.GetMethods(BindingFlags.Instance |
+                                           BindingFlags.Public |
+                                           BindingFlags.NonPublic).
+                                Where(m => m.Name == methodName);
+      
+      MethodInfo method = null;
+      string errorMessage = "";
+      if (namedMethods.Count() == 0) {
+        errorMessage = "The type " + type.Name + " has no such method.";
+      } else {
+        var validMethods = namedMethods.Where(m => m.GetParameters().
+                                                     All(p => p.IsOptional));
+
+        if (validMethods.Count() == 0) {
+          errorMessage = "The type " + type.Name + " had no valid methods by "
+            + "that name.";
+        } else if (validMethods.Count() > 1) {
+          errorMessage = "The type " + type.Name + " had more than one valid "
+            + "method.";
+        } else {
+          method = validMethods.Single();
+        }
+      }
+
+      if (!string.IsNullOrEmpty(errorMessage)) {
+        Debug.LogError("Couldn't load method " + methodName + ": "
+          + errorMessage);
+      }
+
+      return method;
+    }
+
+  }
+
 }
