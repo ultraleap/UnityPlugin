@@ -8,7 +8,6 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 432918}
-  - component: {fileID: 11471522}
   - component: {fileID: 11435192}
   - component: {fileID: 11406336}
   m_Layer: 0
@@ -60,17 +59,6 @@ MonoBehaviour:
   _physicsExtrapolation: 1
   _physicsExtrapolationTime: 0.011111111
   _workerThreadProfiling: 0
---- !u!114 &11471522
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 166326}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 215a4d49fc705b74a9d3c5cbfa2c9601, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1
