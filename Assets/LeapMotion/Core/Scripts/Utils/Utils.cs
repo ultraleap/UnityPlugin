@@ -683,6 +683,41 @@ namespace Leap.Unity {
     }
 
     /// <summary>
+    /// Scans all the children in order of the argument Transform, appending each transform
+    /// it finds to toFill. Children are added depth-first by default.
+    ///
+    /// Pass breadthFirst: true to fill the list breadth-first instead.
+    /// </summary>
+    public static void GetAllChildren(this Transform t, List<Transform> toFill,
+                                      bool breadthFirst = false) {
+      if (breadthFirst) {
+        var cursor = t; var cursorIdx = toFill.Count; var endIdx = cursorIdx;
+        do {
+          endIdx += addImmediateChildren(cursor, toFill);
+          cursorIdx += 1;
+          if (cursorIdx >= endIdx) break;
+          cursor = toFill[cursorIdx];
+        } while (true);
+      }
+      else {
+        addChildrenRecursive(t, toFill);
+      }
+    }
+    private static void addChildrenRecursive(Transform t, List<Transform> list) {
+      foreach (var child in t.GetChildren()) {
+        list.Add(child);
+        addChildrenRecursive(child, list);
+      }
+    }
+    private static int addImmediateChildren(Transform t, List<Transform> list) {
+      int numChildren = 0;
+      foreach (var child in t.GetChildren()) {
+        list.Add(child); numChildren++;
+      }
+      return numChildren;
+    }
+
+    /// <summary>
     /// Sets the localPosition, localRotation, and localScale to their default values:
     /// Vector3.zero, Quaternion.identity, and Vector3.one.
     /// </summary>
