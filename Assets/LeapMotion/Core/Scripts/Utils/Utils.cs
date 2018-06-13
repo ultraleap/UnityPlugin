@@ -14,9 +14,10 @@ using System.IO;
 using System.Collections.Generic;
 using Leap.Unity.Query;
 
-namespace Leap.Unity {
+using Pose = Leap.Unity.Pose;
+using Leap.Unity.RuntimeGizmos;
 
-  using Pose = Leap.Unity.Pose;
+namespace Leap.Unity {
 
   public static class Utils {
 
@@ -901,7 +902,7 @@ namespace Leap.Unity {
     /// Returns a copy of the input Vector3 as a Vector4 with a new W component.
     /// </summary>
     public static Vector4 WithW(this Vector3 v, float w) {
-      return new Vector3(v.x, v.y, v.z, w);
+      return new Vector4(v.x, v.y, v.z, w);
     }
 
     #endregion
@@ -1872,7 +1873,7 @@ namespace Leap.Unity {
     /// and the fromPose's rotation.
     /// </summary>
     public static Pose From(this Vector3 position, Pose fromPose) {
-      return new Pose(position, fromPose.rotation).From(fromPose);
+      return fromPose.inverse * new Pose(position, fromPose.rotation);
     }
 
     public static Pose GetPose(this Rigidbody rigidbody) {

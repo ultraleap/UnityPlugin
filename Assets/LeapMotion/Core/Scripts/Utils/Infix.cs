@@ -173,6 +173,14 @@ namespace Leap.Unity.Infix {
     #region Quaternion
 
     /// <summary>
+    /// Returns (this * Vector3.forward), the z-axis of the rotated frame of this
+    /// quaternion.
+    /// </summary>
+    public static Vector3 GetForward(this Quaternion q) {
+      return q * Vector3.forward;
+    }
+
+    /// <summary>
     /// Returns (this * Vector3.right), the x-axis of the rotated frame of this
     /// quaternion.
     /// </summary>
@@ -188,11 +196,10 @@ namespace Leap.Unity.Infix {
     }
 
     /// <summary>
-    /// Returns (this * Vector3.forward), the z-axis of the rotated frame of this
-    /// quaternion.
+    /// Returns Quaternion.Inverse(this).
     /// </summary>
-    public static Vector3 GetForward(this Quaternion q) {
-      return q * Vector3.forward;
+    public static Quaternion Inverse(this Quaternion q) {
+      return Quaternion.Inverse(q);
     }
 
     #endregion

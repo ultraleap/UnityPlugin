@@ -7,6 +7,7 @@
  * between Leap Motion and you, your company or other organization.           *
  ******************************************************************************/
 
+using Leap.Unity.Infix;
 using Leap.Unity.Query;
 using UnityEngine;
 
@@ -186,8 +187,8 @@ namespace Leap.Unity {
         var r1 = sample1.value;
         var t1 = sample1.time;
 
-        var delta = (r1.From(r0)).ToAngleAxisVector();
-        var deltaTime = t1.From(t0);
+        var delta = (r0.Inverse() * r1).ToAngleAxisVector();
+        var deltaTime = t1 - t0;
 
         deltaSum += delta / deltaTime;
       }

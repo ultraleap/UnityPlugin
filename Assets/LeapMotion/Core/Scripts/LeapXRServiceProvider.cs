@@ -377,7 +377,7 @@ namespace Leap.Unity {
         currentPose.position = currentPose.rotation * Vector3.up * deviceOffsetYAxis
                                + currentPose.rotation * Vector3.forward * deviceOffsetZAxis;
         currentPose.rotation = Quaternion.Euler(deviceTiltXAxis, 0f, 0f);
-        currentPose = transform.ToLocalPose().Then(currentPose);
+        currentPose = transform.ToLocalPose() * currentPose;
       } else {
         transformHistory.SampleTransform(timestamp, out currentPose.position,
                                                     out currentPose.rotation);
