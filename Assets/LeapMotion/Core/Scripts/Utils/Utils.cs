@@ -16,6 +16,8 @@ using Leap.Unity.Query;
 
 namespace Leap.Unity {
 
+  using Pose = Leap.Unity.Pose;
+
   public static class Utils {
 
     #region C# Utilities
@@ -614,6 +616,17 @@ namespace Leap.Unity {
 
     #endregion
 
+    #region Nullable Utils
+
+    public static T? ValueOr<T>(this T? foo, T? other) where T : struct {
+      if (foo.HasValue) {
+        return foo;
+      }
+      return other;
+    }
+
+    #endregion
+
     #endregion
 
     #region Unity Utilities
@@ -863,7 +876,33 @@ namespace Leap.Unity {
       return t.InverseTransformPoint(v);
     }
 
-    
+    /// <summary>
+    /// Returns a copy of the input Vector3 with a different X component.
+    /// </summary>
+    public static Vector3 WithX(this Vector3 v, float x) {
+      return new Vector3(x, v.y, v.z);
+    }
+
+    /// <summary>
+    /// Returns a copy of the input Vector3 with a different Y component.
+    /// </summary>
+    public static Vector3 WithY(this Vector3 v, float y) {
+      return new Vector3(v.x, y, v.z);
+    }
+
+    /// <summary>
+    /// Returns a copy of the input Vector3 with a different Z component.
+    /// </summary>
+    public static Vector3 WithZ(this Vector3 v, float z) {
+      return new Vector3(v.x, v.y, z);
+    }
+
+    /// <summary>
+    /// Returns a copy of the input Vector3 as a Vector4 with a new W component.
+    /// </summary>
+    public static Vector4 WithW(this Vector3 v, float w) {
+      return new Vector3(v.x, v.y, v.z, w);
+    }
 
     #endregion
 
@@ -1131,6 +1170,26 @@ namespace Leap.Unity {
 
     #endregion
 
+    #region Rigidbody Utils
+
+    /// <summary>
+    /// Sets body.position and body.rotation using the argument Pose.
+    /// </summary>
+    public static void SetPose(this Rigidbody body, Pose pose) {
+      body.position = pose.position;
+      body.rotation = pose.rotation;
+    }
+
+    /// <summary>
+    /// Calls body.MovePosition() and body.MoveRotation() using the argument Pose.
+    /// </summary>
+    public static void MovePose(this Rigidbody body, Pose pose) {
+      body.MovePosition(pose.position);
+      body.MoveRotation(pose.rotation);
+    }
+
+    #endregion
+
     #region Collider Utils
 
     #region Capsule Collider Utils
@@ -1331,7 +1390,8 @@ namespace Leap.Unity {
       DrawArc(360, center, planeA, normal, radius, color, quality);
     }
 
-    /* Adapted from: Zarrax (http://math.stackexchange.com/users/3035/zarrax), Parametric Equation of a Circle in 3D Space?, 
+    /* Adapted from: Zarrax (http://math.stackexchange.com/users/3035/zarrax),
+     * Parametric Equation of a Circle in 3D Space?, 
      * URL (version: 2014-09-09): http://math.stackexchange.com/q/73242 */
     public static void DrawArc(float arc,
                                Vector3 center,
@@ -1372,6 +1432,87 @@ namespace Leap.Unity {
       }
     }
 
+    public static void DrawPose(this RuntimeGizmoDrawer drawer,
+                                Pose pose, float radius = 0.10f,
+                                bool drawCube = false) {
+      drawer.PushMatrix();
+
+      drawer.matrix = Matrix4x4.TRS(pose.position, pose.rotation, Vector3.one);
+
+      var origColor = drawer.color;
+
+      if (drawCube) {
+        drawer.DrawCube(Vector3.zero, Vector3.one * radius * 0.3f);
+      }
+      drawer.DrawPosition(Vector3.zero, radius * 2);
+
+      drawer.color = origColor;
+
+      drawer.PopMatrix();
+    }
+
+    public static void DrawRay(this RuntimeGizmoDrawer drawer,
+                               Vector3 position, Vector3 direction) {
+      drawer.DrawLine(position, position + direction);
+    }
+
+    public static void DrawDashedLine(this RuntimeGizmoDrawer drawer, 
+                                      Vector3 a, Vector3 b,
+                                      float segmentsPerMeter = 32f,
+                                      float normalizedPhaseOffset = 0f) {
+      var distance = (b - a).magnitude;
+      var numSegments = distance * segmentsPerMeter;
+      var segmentLength = distance / numSegments;
+
+      var dir = (b - a) / distance;
+
+      for (float i = normalizedPhaseOffset; i < numSegments; i += 2) {
+        var start = a + dir * segmentLength * i;
+        var end   = a + dir * Mathf.Min(segmentLength * (i + 1), distance);
+
+        drawer.DrawLine(start, end);
+      }
+    }
+    
+    public static void DrawBar(this RuntimeGizmoDrawer drawer, float amount,
+                               Vector3 position, Vector3 direction, Color color,
+                               float scale = 1f) {
+      var thickness = 0.10f;
+
+      drawer.color = color;
+
+      drawer.PushMatrix();
+
+      drawer.matrix = Matrix4x4.TRS(position, Quaternion.LookRotation(direction),
+        Vector3.one * scale);
+
+      var bar = new Vector3(thickness, thickness, amount);
+      drawer.DrawWireCube(amount * 0.5f * Vector3.forward,
+        bar + (Vector3.one * thickness));
+      drawer.DrawCube(amount * 0.5f * Vector3.forward, bar);
+
+      drawer.PopMatrix();
+    }
+
+    public static void DrawBar(this RuntimeGizmoDrawer drawer, float amount,
+                               Vector3 position, Vector3 direction,
+                               float scale = 1f) {
+      DrawBar(drawer, amount, position, direction, Color.white, scale);
+    }
+
+    public static void DrawBar(this RuntimeGizmoDrawer drawer, float amount,
+                               Transform atTransform, Color color,
+                               float scale = 1f) {
+      DrawBar(drawer, amount, atTransform.position, atTransform.forward, color,
+        scale);
+    }
+
+    public static void DrawBar(this RuntimeGizmoDrawer drawer, float amount,
+                              Transform atTransform, float scale = 1f) {
+      DrawBar(drawer, amount, atTransform.position, atTransform.forward,
+        Color.white, scale);
+    }
+
     #endregion
 
     #region Texture Utils
@@ -1395,6 +1536,24 @@ namespace Leap.Unity {
       }
 
       return Array.IndexOf(_incompressibleFormats, format) < 0;
+    }
+
+    #endregion
+
+    #region Gradient Utils
+
+    public static Texture2D ToTexture(this Gradient gradient, int resolution = 256, TextureFormat format = TextureFormat.ARGB32) {
+      Texture2D tex = new Texture2D(resolution, 1, format, mipmap: false, linear: true);
+      tex.filterMode = FilterMode.Bilinear;
+      tex.wrapMode = TextureWrapMode.Clamp;
+      tex.hideFlags = HideFlags.HideAndDontSave;
+
+      for (int i = 0; i < resolution; i++) {
+        float t = i / (resolution - 1.0f);
+        tex.SetPixel(i, 0, gradient.Evaluate(t));
+      }
+      tex.Apply(updateMipmaps: false, makeNoLongerReadable: true);
+      return tex;
     }
 
     #endregion
@@ -1740,6 +1899,19 @@ namespace Leap.Unity {
                       new Quaternion(-q.z, -q.y, -q.z, q.w));
     }
 
+    public static Pose Integrated(this Pose thisPose, Movement movement, float deltaTime) {
+      thisPose.position = movement.velocity * deltaTime + thisPose.position;
+
+      if (movement.angularVelocity.sqrMagnitude > 0.00001f) {
+        var angVelMag = movement.angularVelocity.magnitude;
+        thisPose.rotation = Quaternion.AngleAxis(angVelMag * deltaTime,
+                                                 movement.angularVelocity / angVelMag)
+                            * thisPose.rotation;
+      }
+
+      return thisPose;
+    }
+
     #endregion
 
     #endregion
@@ -1961,169 +2133,6 @@ namespace Leap.Unity {
     public static float CompMin(this Vector4 v) {
       return Mathf.Min(Mathf.Min(Mathf.Min(v.x, v.y), v.z), v.w);
     }
-
-    #endregion
-
-    #region From/Then Utilities
-
-    #region Float
-
-    /// <summary>
-    /// Additive From syntax for floats. Evaluated as this float plus the additive
-    /// inverse of the other float, usually expressed as thisFloat - otherFloat.
-    /// 
-    /// For less trivial uses of From/Then syntax, refer to their implementations for
-    /// Quaternions and Matrix4x4s.
-    /// </summary>
-    public static float From(this float thisFloat, float otherFloat) {
-      return thisFloat - otherFloat;
-    }
-
-    /// <summary>
-    /// Additive To syntax for floats. Evaluated as this float plus the additive
-    /// inverse of the other float, usually expressed as otherFloat - thisFloat.
-    /// 
-    /// For less trivial uses of From/Then syntax, refer to their implementations for
-    /// Quaternions and Matrix4x4s.
-    /// </summary>
-    public static float To(this float thisFloat, float otherFloat) {
-      return otherFloat - thisFloat;
-    }
-
-    /// <summary>
-    /// Additive Then syntax for floats. Literally, thisFloat + otherFloat.
-    /// </summary>
-    public static float Then(this float thisFloat, float otherFloat) {
-      return thisFloat + otherFloat;
-    }
-
-    #endregion
-
-    #region Vector3
-
-    /// <summary>
-    /// Additive From syntax for Vector3. Literally thisVector - otherVector.
-    /// </summary>
-    public static Vector3 From(this Vector3 thisVector, Vector3 otherVector) {
-      return thisVector - otherVector;
-    }
-
-    /// <summary>
-    /// Additive To syntax for Vector3. Literally otherVector - thisVector.
-    /// </summary>
-    public static Vector3 To(this Vector3 thisVector, Vector3 otherVector) {
-      return otherVector - thisVector;
-    }
-
-    /// <summary>
-    /// Additive Then syntax for Vector3. Literally thisVector + otherVector.
-    /// For example: A.Then(B.From(A)) == B.
-    /// </summary>
-    public static Vector3 Then(this Vector3 thisVector, Vector3 otherVector) {
-      return thisVector + otherVector;
-    }
-
-    #endregion
-
-    #region Quaternion
-
-    /// <summary>
-    /// A.From(B) produces the quaternion that rotates from B to A.
-    /// Combines with Then() to produce readable, predictable results:
-    /// B.Then(A.From(B)) == A.
-    /// </summary>
-    public static Quaternion From(this Quaternion thisQuaternion, Quaternion otherQuaternion) {
-      return Quaternion.Inverse(otherQuaternion) * thisQuaternion;
-    }
-
-    /// <summary>
-    /// A.To(B) produces the quaternion that rotates from A to B.
-    /// Combines with Then() to produce readable, predictable results:
-    /// B.Then(B.To(A)) == A.
-    /// </summary>
-    public static Quaternion To(this Quaternion thisQuaternion, Quaternion otherQuaternion) {
-      return Quaternion.Inverse(thisQuaternion) * otherQuaternion;
-    }
-
-    /// <summary>
-    /// Rotates this quaternion by the other quaternion. This is a rightward syntax for
-    /// Quaternion multiplication, which normally obeys left-multiply ordering.
-    /// </summary>
-    public static Quaternion Then(this Quaternion thisQuaternion, Quaternion otherQuaternion) {
-      return thisQuaternion * otherQuaternion;
-    }
-
-    #endregion
-
-    #region Pose
-
-    /// <summary>
-    /// From syntax for Pose structs; A.From(B) returns the Pose that transforms to
-    /// Pose A from Pose B. Also see To() and Then().
-    /// 
-    /// For example, A.Then(B.From(A)) == B.
-    /// </summary>
-    public static Pose From(this Pose thisPose, Pose otherPose) {
-      return otherPose.inverse * thisPose;
-    }
-
-    /// <summary>
-    /// To syntax for Pose structs; A.To(B) returns the Pose that transforms from Pose A
-    /// to Pose B. Also see From() and Then().
-    /// 
-    /// For example, A.Then(A.To(B)) == B.
-    /// </summary>
-    public static Pose To(this Pose thisPose, Pose otherPose) {
-      return thisPose.inverse * otherPose;
-    }
-
-    /// <summary>
-    /// Returns the other pose transformed by this pose. This pose could be understood as
-    /// the parent pose, and the other pose transformed from local this-pose space to
-    /// world space.
-    /// 
-    /// This is similar to matrix multiplication: A * B == A.Then(B). However, order of
-    /// operations is more explicit with this syntax.
-    /// </summary>
-    public static Pose Then(this Pose thisPose, Pose otherPose) {
-      return thisPose * otherPose;
-    }
-
-    #endregion
-
-    #region Matrix4x4
-
-    /// <summary>
-    /// A.From(B) produces the matrix that transforms from B to A.
-    /// Combines with Then() to produce readable, predictable results:
-    /// B.Then(A.From(B)) == A.
-    /// 
-    /// Warning: Scale factors of zero will invalidate this behavior.
-    /// </summary>
-    public static Matrix4x4 From(this Matrix4x4 thisMatrix, Matrix4x4 otherMatrix) {
-      return thisMatrix * otherMatrix.inverse;
-    }
-
-    /// <summary>
-    /// A.To(B) produces the matrix that transforms from A to B.
-    /// Combines with Then() to produce readable, predictable results:
-    /// B.Then(B.To(A)) == A.
-    /// 
-    /// Warning: Scale factors of zero will invalidate this behavior.
-    /// </summary>
-    public static Matrix4x4 To(this Matrix4x4 thisMatrix, Matrix4x4 otherMatrix) {
-      return otherMatrix * thisMatrix.inverse;
-    }
-
-    /// <summary>
-    /// Transforms this matrix by the other matrix. This is a rightward syntax for
-    /// matrix multiplication, which normally obeys left-multiply ordering.
-    /// </summary>
-    public static Matrix4x4 Then(this Matrix4x4 thisMatrix, Matrix4x4 otherMatrix) {
-      return otherMatrix * thisMatrix;
-    }
-
-    #endregion
 
     #endregion
 
