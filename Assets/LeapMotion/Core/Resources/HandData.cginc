@@ -25,7 +25,7 @@ uniform float4 _Leap_RH_FingerSegments[28];
 float4x4 Leap_HandData_Preprocess_Matrix = IDENTITY_MATRIX4x4;
 
 void Leap_ClearPreprocessMatrix() {
-  //Leap_HandData_Preprocess_Matrix = IDENTITY_MATRIX4x4;
+  Leap_HandData_Preprocess_Matrix = IDENTITY_MATRIX4x4;
 }
 
 //----------------------
