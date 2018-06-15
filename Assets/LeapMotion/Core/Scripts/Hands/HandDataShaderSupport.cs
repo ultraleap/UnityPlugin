@@ -11,7 +11,7 @@ namespace Leap.Unity {
   /// (or something like it) somewhere in your scene.
   /// </summary>
   [ExecuteInEditMode]
-  public class HandShaderGlobalSupport : MonoBehaviour {
+  public class HandDataShaderSupport : MonoBehaviour {
 
     public LeapProvider provider;
 

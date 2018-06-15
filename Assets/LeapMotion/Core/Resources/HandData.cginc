@@ -17,15 +17,18 @@ uniform float4 _Leap_RH_FingerSegments[28];
 // Functions
 // =========
 
-#define IDENTITY_MATRIX4x4 { 1.0, 0.0, 0.0, 0.0, \
-                             0.0, 1.0, 0.0, 0.0, \
-                             0.0, 0.0, 1.0, 0.0, \
-                             0.0, 0.0, 0.0, 1.0 }
+#define IDENTITY_MATRIX_4x4 1, 0, 0, 0, \
+                            0, 1, 0, 0, \
+                            0, 0, 1, 0, \
+                            0, 0, 0, 1
 
-float4x4 Leap_HandData_Preprocess_Matrix = IDENTITY_MATRIX4x4;
+// This matrix multiplies hand data from Leap_Distance and Leap_SqrDist
+// functions; you can modify this if you want to transform hand data coming into
+// your shaders before calculating distances.
+float4x4 Leap_HandData_Preprocess_Matrix = { IDENTITY_MATRIX_4x4 };
 
 void Leap_ClearPreprocessMatrix() {
-  Leap_HandData_Preprocess_Matrix = IDENTITY_MATRIX4x4;
+  Leap_HandData_Preprocess_Matrix = float4x4(IDENTITY_MATRIX_4x4);
 }
 
 //----------------------
