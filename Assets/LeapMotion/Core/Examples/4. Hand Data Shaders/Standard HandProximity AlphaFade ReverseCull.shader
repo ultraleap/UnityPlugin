@@ -1,4 +1,4 @@
-﻿Shader "Leap Motion/Examples/Standard ReverseCull AlphaFade HandProximity" {
+﻿Shader "LeapMotion/Examples/Standard HandProximity AlphaFade ReverseCull" {
 	Properties {
     // HandProximity parameters
     [NoScaleOffset]

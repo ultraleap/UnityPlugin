@@ -1,4 +1,4 @@
-﻿Shader "Leap Motion/Examples/Unlit HandProximity"
+﻿Shader "LeapMotion/Examples/Unlit HandProximity"
 {
 	Properties
 	{

@@ -1,4 +1,4 @@
-﻿Shader "Leap Motion/Examples/Standard Emissive HandProximity" {
+﻿Shader "LeapMotion/Examples/Standard HandProximity Emissive" {
 	Properties {
     // HandProximity parameters
     [NoScaleOffset]

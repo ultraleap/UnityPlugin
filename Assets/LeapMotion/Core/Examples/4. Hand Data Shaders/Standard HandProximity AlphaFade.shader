@@ -1,4 +1,4 @@
-﻿Shader "Leap Motion/Examples/Standard AlphaFade HandProximity" {
+﻿Shader "LeapMotion/Examples/Standard HandProximity AlphaFade" {
 	Properties {
     // HandProximity parameters
     [NoScaleOffset]
