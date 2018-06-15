@@ -1,10 +1,9 @@
-﻿Shader "Leap Motion/Examples/Standard Emissive HandProximity" {
+﻿Shader "Leap Motion/Examples/Standard Emissive HandProximity ByVertex" {
 	Properties {
     // HandProximity parameters
     [NoScaleOffset]
-    _ProximityGradient ("Proximity Gradient", 2D) = "black" {}
-    _ProximityMapping ("Map: DistMin, DistMax, GradMin, GradMax", Vector)
-		  = (0, 0.01, 1, 0)
+    _ProximityGradient ("Proximity Gradient", 2D) = "white" {}
+    _ProximityMapping ("Map: DistMin, DistMax, GradMin, GradMax", Vector) = (0, 0.01, 1, 0)
 
     // Standard parameters
 		_MainTex ("Albedo (RGB)", 2D) = "white" {}
@@ -22,7 +21,7 @@
     #include "Assets/LeapMotion/Core/Resources/HandData.cginc"
 
 		// Physically based Standard lighting model
-		#pragma surface surf Standard fullforwardshadows
+		#pragma surface surf Standard fullforwardshadows vertex:vert
 
 		// Use shader model 3.0 target, to get nicer looking lighting
 		#pragma target 3.0
@@ -33,7 +32,7 @@
 
 		struct Input {
 			float2 uv_MainTex;
-      float3 worldPos;
+      float4 proximityColor;
 		};
     
     sampler2D _ProximityGradient;
@@ -41,6 +40,16 @@
 
 		half _Glossiness;
 		half _Metallic;
+    
+    void vert (inout appdata_full v, out Input o) {
+      UNITY_INITIALIZE_OUTPUT(Input, o);
+      o.proximityColor = evalProximityColorLOD(
+				mul(unity_ObjectToWorld, v.vertex).xyz,
+			  _ProximityGradient, 
+				_ProximityMapping,
+				0
+			);
+    }
 
 		// Add instancing support for this shader. You need to check 'Enable Instancing' on materials that use the shader.
 		// See https://docs.unity3d.com/Manual/GPUInstancing.html for more information about instancing.
@@ -51,13 +60,11 @@
 
 		void surf (Input IN, inout SurfaceOutputStandard o) {
 			// Albedo comes from a texture tinted by color
-			fixed4 c = tex2D (_MainTex, IN.uv_MainTex);
-			o.Albedo = c.rgb * _Color;
-
+			fixed4 c = tex2D (_MainTex, IN.uv_MainTex) * _Color;
+			o.Albedo = c.rgb;
+			
       // Proximity emission effect from HandProximity.
-      o.Emission = _BaseEmissionColor
-                    + evalProximityColor(IN.worldPos, _ProximityGradient,
-                                         _ProximityMapping);
+      o.Emission = _BaseEmissionColor + IN.proximityColor.rgb;
 
 			// Metallic and smoothness come from slider variables
 			o.Metallic = _Metallic;
@@ -66,5 +73,5 @@
 		}
 		ENDCG
 	}
-	FallBack "Diffuse"
+	//FallBack "Diffuse"
 }

@@ -5,7 +5,7 @@
     [NoScaleOffset]
     _ProximityGradient ("Proximity Gradient", 2D) = "white" {}
     _ProximityMapping ("Map: DistMin, DistMax, GradMin, GradMax", Vector)
-		  = (0, 0.04, 1, 0)
+		  = (0, 0.01, 1, 0)
 	}
 	SubShader
 	{

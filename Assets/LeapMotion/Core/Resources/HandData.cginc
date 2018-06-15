@@ -285,9 +285,9 @@ float _normalDisplacementMagnitude = 100.0;
 // Virtual Materials
 // =================
 
-// -------------------------------
-// Plath (Color by Hand Proximity)
-// -------------------------------
+// --------------
+// Hand Proximity
+// --------------
 
 float4 Leap_EvalGradientWithMap(float input, sampler2D gradient, float4 inputMapping) {
   float eval = Leap_Map(input,   inputMapping.x,
