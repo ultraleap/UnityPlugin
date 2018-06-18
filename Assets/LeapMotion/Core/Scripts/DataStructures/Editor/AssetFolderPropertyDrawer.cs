@@ -26,11 +26,11 @@ namespace Leap.Unity {
       Object folderAsset = null;
       string folderPath = "";
 
-      SerializedProperty folderProp = property.FindPropertyRelative("_assetFolder");
-      if (folderProp.hasMultipleDifferentValues) {
+      SerializedProperty assetProp = property.FindPropertyRelative("_assetReference");
+      if (assetProp.hasMultipleDifferentValues) {
         EditorGUI.showMixedValue = true;
       } else {
-        folderAsset = folderProp.objectReferenceValue;
+        folderAsset = assetProp.objectReferenceValue;
         if (folderAsset != null) {
           folderPath = AssetDatabase.GetAssetPath(folderAsset);
         }
@@ -50,7 +50,7 @@ namespace Leap.Unity {
           if (!ValidatePath(resultPath, relativePath, out errorMessage)) {
             EditorUtility.DisplayDialog("Invalid selection.", errorMessage, "OK");
           } else {
-            folderProp.objectReferenceValue = asset;
+            assetProp.objectReferenceValue = asset;
           }
         }
       }
@@ -72,7 +72,7 @@ namespace Leap.Unity {
             case EventType.DragPerform:
               if (ValidateObject(draggedObject, out errorMessage)) {
                 DragAndDrop.AcceptDrag();
-                folderProp.objectReferenceValue = draggedObject;
+                assetProp.objectReferenceValue = draggedObject;
               }
               break;
           }
@@ -85,6 +85,9 @@ namespace Leap.Unity {
     }
 
     protected virtual string PromptUserForPath(string currentPath) {
+      if (string.IsNullOrEmpty(currentPath)) {
+        currentPath = "Assets";
+      }
       return EditorUtility.OpenFolderPanel("Select Folder", currentPath, "");
     }
 
