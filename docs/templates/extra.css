@@ -12,17 +12,20 @@
   --less-light:   #bfbfbf;
   --medium-gray:  #dddddd;
   --light:        #e8e8e8;
+  --very-light:   #fefefe;
 
   --header-bg:    #272b32;
   --navtree-bg:   var(--medium-gray);
-  --body-bg:      var(--medium-gray);
-  --content-bg:   #f8f8f8;
+  --body-bg:      var(--very-light);
+  --content-bg:   var(--very-light);
+  --search-bg:    var(--light);
 
   --link-color:   var(--leap-green);
   --border-color: #cecece;
   --member-header-bg: var(--body-bg);
 
-  /* Text. */ 
+  /* Fonts. */ 
+  --title-font-family: 'Roboto Slab';
   --main-font-family: 'Lato';
   --backup-font-family: sans-serif;
 
@@ -40,7 +43,7 @@ a, a.el {
 }
 
 .title {
-	font-family: 'Roboto Slab', serif !important;
+	font-family: var(--title-font-family), serif !important;
 	font-size: 22px;
 	color: #2c2c2c;
 }
@@ -50,7 +53,7 @@ h1 {
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: 'Roboto Slab', serif;
+  font-family: var(--title-font-family), serif;
   margin-top: 2em;
   margin-bottom: 1em;
 	color: #404040;
@@ -65,6 +68,11 @@ p, li {
 	font-weight: normal;
 	color: #404040;
 	line-height: 24px;
+}
+
+/* Prevent big images from falling off the page. */
+.image img {
+	max-width: 60em;
 }
 
 /* ====
@@ -102,7 +110,7 @@ div.line {
 
 #top {
   background-color: var(--header-bg);
-  color: var(--light);
+  color: var(--search-bg);
   /*font-family: var(--main-font-family);*/
 
   /* Make the header flush with the sidebar so it takes up less space. */
@@ -203,7 +211,7 @@ div.line {
   margin: 1em auto 1em auto;
   width: 80%;
 
-  background: var(--light);
+  background: var(--search-bg);
   font: inherit;
   font-family: var(--main-font-family);
 
@@ -214,9 +222,34 @@ div.line {
 }
 /* Adjust the search results window to reflect the new search bar position. */
 #MSearchResultsWindow {
-  left: 0px !important;
-  margin-top: 20px !important;
-  margin-left: 20px !important;
+	position: fixed;
+	left: 300px !important;
+	margin-top: -6px !important;
+	margin-left: 0px !important;
+	border: 0px solid var(--leap-green);
+	border-radius: 0px;
+	background-color: var(--light);
+}
+#MSearchResults {
+  box-shadow: 7px 5px 7px #0000000c;
+}
+/* Adjust search results text. */
+.SRSymbol {
+  color: var(--link-color);
+  font: inherit;
+  font-family: var(--main-font-family), var(--backup-font-family); 
+  font-weight: bold;
+}
+.SRScope {
+	font-family: sans-serif;
+	color: #6e6e6e;
+}
+.SRPage {
+  background-color: var(--search-bg)
+}
+.SRPage .SREntry {
+	font-size: 12px;
+	padding: 2px 5px;
 }
 
 /* ==========
@@ -318,7 +351,7 @@ div.line {
   * page and keep the scroll-bar on the right, we can cap the width of 
   * doc-content itself to make it stick to about a single page's width. */
 #doc-content {
-  max-width: 52em;
+  max-width: 60em;
   margin-right: auto;
   padding: 3em 4em 3em 4em;
 }

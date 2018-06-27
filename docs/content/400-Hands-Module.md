@@ -14,13 +14,13 @@ In this post, we’ll provide a detailed overview on how to use our new autorig 
 
 The new LeapHandAutorig Monobehavior script acts as a quarterback for an array of scripts and methods which comprise the rigged hands setup process. Sitting at the top of a hands hierarchy, the script runs in the editor. The Autorig button in the Inspector sets off a chain of actions that works through the steps outlined in the chart below.
 
-![](http://blog.leapmotion.com/wp-content/uploads/2016/07/hands-module-4.png)
+![](@ref images/hands-module-4.png)
 
 After autorigging, the LeapHands Autorig Inspector console acts as a central control panel to push values to the other Leap Motion rigging scripts. This allows you to test the model quickly and set certain values centrally, instead of digging through the hierarchy to set values in all the scripts manually.
 
 Autorigging can act on a variety of FBX assets, and works in two different ways, depending on whether the asset has a Unity Mecanim Humanoid definition. If so, then LeapHandsAutorig finds and assign joints based on this mapping. If not, then LeapHandsAutorig searches the hierarchy below its Transform by a list of names typical of common character rigging practices.
 
-![](http://blog.leapmotion.com/wp-content/uploads/2016/07/hands-module-6.png)
+![](@ref images/hands-module-6.png)
 
 # Step 1: Setting the Scene {#hands-auto-rig-step-1}
 
@@ -48,19 +48,19 @@ In this alternative example, the LoPoly_Rigged_Hands_Skeleton transform is an FB
 
 Drag the LeapHandsAutorig script to this transform and click the Autorig button. In this case, if you check the SetEditorLeapPose checkbox, you’ll see that the hands’ palms are flipped. So for this model, you can check the FlipPalms checkbox. This reverses the direction of the ModelPalmFacing vectors for each RiggedHand script and all of the RiggedFinger scripts as well.
 
-# Step 3: RiggedHand and RiggedFingers Are Set Up Automatically #{hands-auto-rig-step-3}
+# Step 3: RiggedHand and RiggedFingers Are Set Up Automatically {#hands-auto-rig-step-3}
 
 One of the main tasks of the LeapHandAutorig component is to find hand transforms and assign RiggedHand components, then to find the base transform for each finger and assign RiggedFinger components. After autorigging, you can find them quickly by clicking on their references in the LeapHandAutorig’s Inspector. This expands the hierarchy and highlights their individual transforms for easy selection. These are the script components that receive and translate tracking data from Leap Motion’s Core Assets scripts and actually drive the rigged hand models at runtime.
 
 The RiggedHand script contains references to the palm and forearm (if they exist) as well as reference to the five RiggedFinger components in its hierarchy. The ModelPalmFacing and ModelFingerPointing vectors represent the cardinal direction the the palm and fingers face. These, and the several remaining fields, are identical to those exposed in the LeapHandAutorig script. When those values are changed, those values are pushed here.
 
-![](http://blog.leapmotion.com/wp-content/uploads/2016/07/hands-module-2.png)
+![](@ref images/hands-module-2.png)
 
 Each RiggedFinger script contains references for its three child bone transforms and one of five finger types. They also have fields for the cardinal-direction-facing vectors for the palm and the direction of its children bones.  Again, like those in the RiggedHand script, these vectors are calculated by methods within the RiggedFingers script, but can be changed via the central interface of the LeapHandsAutorig.
 
 Each RiggedFinger component also has a significant checkbox called Deform Position. This causes the joint transforms to not only be rotated by Leap Motion tracking but to be positioned as well. To take advantage of this feature, the FBX model needs to have been built with joints close to human proportions and weighted well enough to allow joints to move without polygon tearing. This field then allows for scaling and proportioning the rigged model to the user’s tracked hand.
 
-![](http://blog.leapmotion.com/wp-content/uploads/2016/07/hands-module-7.png)
+![](@ref images/hands-module-7.png)
 
 # Making New Hand Models or Choosing Hand Assets #{hands-new-hand-models}
 
@@ -70,7 +70,7 @@ That being said, the steps outlined below are equally relevant if you’re choos
 
 Sculpting and topology:  Sculpting something that can bend and deform well is more that simply creating a visually appealing shape. You’ll want to think about and plan how your model will look when it’s stretched to its limits, curled into a fist or other extreme poses. We strongly recommend topology that features edgeloops flowing along the creases of the hand, rather than a uniform distribution of polygons. This is critical for good deformations.
 
-![](http://blog.leapmotion.com/wp-content/uploads/2016/07/hands-module-3.png)
+![](@ref images/hands-module-3.png)
 
 Performance: Since you’re probably creating these hands for a VR application, it’s good to remember that these hands get rendered twice. To keep your framerates high, polygon budgets and draw calls should be managed. (Underscore that several times if you’re creating a mobile application.)
 
@@ -89,7 +89,7 @@ Joint Orientation: Having proper joint orientations is critical for a couple of 
 
 Keep in mind that the end user’s hands will be curling anatomically. Understanding the finer details – like how fingers curl toward the center of the palm, rather just folding straight in – will streamline your development and help you get more convincing poses out of your rigged hands.
 
-![](http://blog.leapmotion.com/wp-content/uploads/2016/07/hands-module-1.png)
+![](@ref images/hands-module-1.png)
 
 Vertex Weighting for Range of Motion and Good Deformation: Since your rigged hands may be driven by many different end users, hand models for Leap Motion tracking need to deform well through a rich range of motions. Joint placement and careful weighting for good deformations is important for quality posing.
 
