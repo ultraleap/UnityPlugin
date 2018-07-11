@@ -381,7 +381,13 @@ namespace Leap.Unity.GraphicalRenderer {
         }
       }
 
-      packedTexture = new Texture2D(1, 1, TextureFormat.ARGB32, mipmap: false, linear: true);
+      #if UNITY_2018_2_OR_NEWER
+      packedTexture = new Texture2D(1, 1, TextureFormat.ARGB32, mipChain: false,
+        linear: true);
+      #else
+      packedTexture = new Texture2D(1, 1, TextureFormat.ARGB32, mipmap: false,
+        linear: true);
+      #endif
       packedTexture.filterMode = _filterMode;
     }
 
@@ -442,7 +448,13 @@ namespace Leap.Unity.GraphicalRenderer {
     private Texture2D getDefaultTexture(Color color) {
       Texture2D texture;
       if (!_cachedDefaultTextures.TryGetValue(color, out texture)) {
+        
+        #if UNITY_2018_2_OR_NEWER
+        texture = new Texture2D(3, 3, TextureFormat.ARGB32, mipChain: false);
+        #else
         texture = new Texture2D(3, 3, TextureFormat.ARGB32, mipmap: false);
+        #endif
+
         texture.SetPixels(new Color[3 * 3].Fill(color));
         _cachedDefaultTextures[color] = texture;
       }
