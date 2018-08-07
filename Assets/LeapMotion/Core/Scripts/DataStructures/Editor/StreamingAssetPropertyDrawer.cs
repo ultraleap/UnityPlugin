@@ -16,6 +16,9 @@ namespace Leap.Unity {
   public class StreamingAssetPropertyDrawer : StreamingFolderPropertyDrawer {
 
     protected override string PromptUserForPath(string currentPath) {
+      if (string.IsNullOrEmpty(currentPath)) {
+        currentPath = "Assets";
+      }
       return EditorUtility.OpenFilePanel("Select File", currentPath, "");
     }
 

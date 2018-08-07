@@ -207,7 +207,7 @@ You can override both or only one of the layers for interaction objects as long 
 Be sure to take a look at examples 2 through 6 to see how interaction objects can have their behavior fine-tuned to meet the specific needs of your application. The standard workflow for writing custom scripts for interaction objects goes something like this:
 
 - Be sure your object has an [InteractionBehaviour][ref_InteractionBehaviour] component (or an [InteractionButton][ref_InteractionButton] or [InteractionSlider][ref_InteractionSlider] component, each of which inherit from @ref InteractionBehaviour).
-- Add your custom script to the interaction object and initialize a reference to the InteracrionBehaviour component.
+- Add your custom script to the interaction object and initialize a reference to the InteractionBehaviour component.
 ```{.cs}
 using Leap.Unity.Interaction;
 using UnityEngine;
