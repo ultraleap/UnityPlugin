@@ -1,10 +1,8 @@
 # Leap Motion Unity Modules
 
-To download Leap Motion's latest stable modules as .unitypackages, visit [our Unity developer site][devsite].
+To download Leap Motion's latest stable modules as .unitypackages, visit [our Unity developer site][devsite]. Be sure to also check out our [documentation and API reference][um-docs]!
 
-Be sure to also check out our [documentation and API reference][um-docs]!
-
-**UnityModules packages from our developer website support Unity 5.6.2, 2017.1-4, and 2018.1.**
+**UnityModules packages from our developer website support Unity 5.6.2, 2017.1-4, and 2018.1.** Newer versions of Unity are usually perfectly safe to use. If you encounter errors or warnings with newer Unity versions, please report them as an Issue.
 
 **The UnityModules *repository* expects Unity 2017.3 and up.** If you are sourcing UnityModules directly from this repository, your mileage may vary with earlier versions of Unity.
 
