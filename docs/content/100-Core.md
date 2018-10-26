@@ -112,3 +112,10 @@ A: Check your LeapXRServiceProvider object in the Leap Rig prefab. We've include
 Because most Leap Motion VR rigs utilize a custom VR developer mount attachment, not all Leap Motion Controllers are mounted in the same place relative to the tracked positions of VR headsets. In order for hands in VR space to align perfectly with hands in the real world, your application needs to know _exactly_ where the Leap Motion Controller is mounted relative to your tracked headset position and orientation. While the default values will usually produce an acceptable experience for VR, in passthrough or mixed-reality situations, a mismatch between the real world Leap position and the VR world Leap position -- even of just a few degrees of tilt, or a centimeter of displacement -- can shift hands too much to produce a plausible tracking experience.
 
 Naturally, this solution isn't viable if you intend for your application to be run on a wide variety of headsets with a Leap Motion Controller attached. Under these circumstances, we recommend you keep the device offsets to their default values (uncheck the checkbox to revert them).
+
+**Q: How do I convert a VR example into a desktop example?
+
+First, add your own camera to the scene so you can film from whatever perspective makes sense for your user.
+
+The basic setup of a VR-less system is to use a LeapServiceProvider component (not a LeapXRServiceProvider) and a linked Hand Model Manager (with hands underneath it in the hierarchy and registered to it, much like how you see implemented in the VR prefabs).
+Also remember to disable VR mode from your player settings (if you’re using a cloned version of UnityModules). Upon pressing play and holding your hands over the device, you should see the hands in the proper orientation.
