@@ -38,8 +38,9 @@ namespace Leap {
     /// 
     /// @since 1.0
     /// </summary>
-    public Frame() {
+    public Frame(UInt32 DeviceID = 1) {
       Hands = new List<Hand>();
+      this.DeviceID = DeviceID;
     }
 
     /// <summary>
@@ -51,6 +52,7 @@ namespace Leap {
       Timestamp = timestamp;
       CurrentFramesPerSecond = fps;
       Hands = hands;
+      DeviceID = 1;
     }
 
     [Obsolete]
@@ -157,12 +159,14 @@ namespace Leap {
     public List<Hand> Hands;
 
     /// <summary>
-    /// Resizes the Hand list to have a specific size.  If the size is decreased,
-    /// the removed hands are placed into the hand pool.  If the size is increased, the
-    /// new spaces are filled with hands taken from the hand pool.  If the pool is
-    /// empty, new hands are constructed instead.
+    /// Only used when constructing new frames manually.
+    ///
+    /// Resizes the Hand list to have a specific size. If the size is decreased,
+    /// the removed hands are placed into the hand pool. If the size is
+    /// increased, the new spaces are filled with hands taken from the hand pool.
+    /// If the pool is empty, new hands are constructed instead.
     /// </summary>
-    internal void ResizeHandList(int count) {
+    public void ResizeHandList(int count) {
       if (_handPool == null) {
         _handPool = new Queue<Hand>();
       }
@@ -183,5 +187,16 @@ namespace Leap {
         _handPool.Enqueue(lastHand);
       }
     }
+
+    /// <summary>
+    /// The Device ID that this frame was seen from.
+    /// 
+    /// 1-Indexed; Non-Deterministic order
+    ///
+    /// Only valid when `supportsMultipleDevices` is true on the LeapProvider.
+    /// 
+    /// @since 4.1
+    /// </summary>
+    public UInt32 DeviceID;
   }
 }

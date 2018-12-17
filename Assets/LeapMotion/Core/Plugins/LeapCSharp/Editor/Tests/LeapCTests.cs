@@ -94,7 +94,7 @@ namespace Leap.LeapCSharp.Tests {
       IntPtr connHandle = IntPtr.Zero;
       eLeapRS result;
       LEAP_CONNECTION_INFO info = new LEAP_CONNECTION_INFO();
-      info.status = eLeapConnectionStatus.eLeapConnectionStatus_HandshakeIncomplete;
+      info.status = eLeapConnectionStatus.HandshakeIncomplete;
       info.size = (uint)Marshal.SizeOf(typeof(LEAP_CONNECTION_INFO));
       result = LeapC.GetConnectionInfo(connHandle, ref info);
       Assert.AreEqual(eLeapRS.eLeapRS_InvalidArgument, result);
@@ -105,7 +105,7 @@ namespace Leap.LeapCSharp.Tests {
 
       result = LeapC.GetConnectionInfo(connHandle, ref info);
       Assert.AreEqual(eLeapRS.eLeapRS_Success, result);
-      Assert.AreEqual(eLeapConnectionStatus.eLeapConnectionStatus_NotConnected, info.status, "Not connected before OpenConnection");
+      Assert.AreEqual(eLeapConnectionStatus.NotConnected, info.status, "Not connected before OpenConnection");
 
       result = LeapC.OpenConnection(connHandle);
       Assert.AreEqual(eLeapRS.eLeapRS_Success, result);
@@ -119,7 +119,7 @@ namespace Leap.LeapCSharp.Tests {
 
       result = LeapC.GetConnectionInfo(connHandle, ref info);
       Assert.AreEqual(eLeapRS.eLeapRS_Success, result);
-      Assert.AreEqual(eLeapConnectionStatus.eLeapConnectionStatus_Connected, info.status, "Connection info says we are connected");
+      Assert.AreEqual(eLeapConnectionStatus.Connected, info.status, "Connection info says we are connected");
 
     }
 

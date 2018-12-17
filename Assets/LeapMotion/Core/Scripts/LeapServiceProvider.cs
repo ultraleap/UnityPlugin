@@ -78,6 +78,23 @@ namespace Leap.Unity {
     [SerializeField]
     protected float _physicsExtrapolationTime = 1.0f / 90.0f;
 
+    public enum MultipleDeviceMode {
+      Disabled,
+      All,
+      Specific
+    }
+
+    [Tooltip("When set to `All`, provider will receive data from all connected devices.")]
+    [EditTimeOnly]
+    [SerializeField]
+    protected MultipleDeviceMode _multipleDeviceMode = MultipleDeviceMode.Disabled;
+
+    [Tooltip("When Multiple Device Mode is set to `Specific`, the provider will " +
+      "receive data from only the devices that contain this in their serial number.")]
+    [EditTimeOnly]
+    [SerializeField]
+    protected string _specificSerialNumber;
+
 #if UNITY_2017_3_OR_NEWER
     [Tooltip("When checked, profiling data from the LeapCSharp worker thread will be used to populate the UnityProfiler.")]
     [EditTimeOnly]
@@ -463,12 +480,24 @@ namespace Leap.Unity {
         return;
       }
 
-      _leapController = new Controller();
+      _leapController = new Controller(_multipleDeviceMode != MultipleDeviceMode.Disabled);
       _leapController.Device += (s, e) => {
         if (_onDeviceSafe != null) {
           _onDeviceSafe(e.Device);
         }
       };
+
+      if (_multipleDeviceMode == MultipleDeviceMode.All) {
+        _onDeviceSafe += (d) => {
+          _leapController.SubscribeToDeviceEvents(d);
+        };
+      } else if (_multipleDeviceMode == MultipleDeviceMode.Specific) {
+        _onDeviceSafe += (d) => {
+          if (d.SerialNumber.Contains(_specificSerialNumber)) {
+            _leapController.SubscribeToDeviceEvents(d);
+          }
+        };
+      }
 
       if (_leapController.IsConnected) {
         initializeFlags();
@@ -496,6 +525,7 @@ namespace Leap.Unity {
         if (_leapController.IsConnected) {
           _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
         }
+        _leapController.UnsubscribeFromAllDevices();
         _leapController.StopConnection();
         _leapController = null;
       }

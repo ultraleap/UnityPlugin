@@ -13,23 +13,27 @@ using System;
 namespace Leap.Unity {
 
   public class ProduceConsumeBuffer<T> {
+    
     private T[] _buffer;
     private uint _bufferMask;
     private uint _head, _tail;
 
     /// <summary>
-    /// Constructs a new produce consumer buffer of at least a certain capacity.  Once the
-    /// buffer is created, the capacity cannot be modified.
+    /// Constructs a new produce consumer buffer of at least a certain capacity.
+    /// Once the buffer is created, the capacity cannot be modified.
     /// 
-    /// If the minimum capacity is a power of two, it will be used as the actual capacity.
-    /// If the minimum capacity is not a power of two, the next highest power of two will
-    /// be used as the capacity.  This behavior is an optimization, Internally this class 
-    /// uses a bitwise AND operation instead of a slower modulus operation for indexing, 
-    /// which only is possible if the array length is a power of two.
+    /// If the minimum capacity is a power of two, it will be used as the actual
+    /// capacity. If the minimum capacity is not a power of two, the next
+    /// highest power of two will be used as the capacity.  This behavior is an
+    /// optimization, Internally this class uses a bitwise AND operation instead
+    /// of a slower modulus operation for indexing, which only is possible if
+    /// the array length is a power of two.
     /// </summary>
     public ProduceConsumeBuffer(int minCapacity) {
       if (minCapacity <= 0) {
-        throw new ArgumentOutOfRangeException("The capacity of the ProduceConsumeBuffer must be positive and non-zero.");
+        throw new ArgumentOutOfRangeException(
+          "The capacity of the ProduceConsumeBuffer must be positive and " +
+          "non-zero.");
       }
 
       int capacity;
@@ -76,9 +80,9 @@ namespace Leap.Unity {
     }
 
     /// <summary>
-    /// Tries to enqueue a value into the buffer.  If the buffer is already full, this
-    /// method will perform no action and return false.  This method is only safe to
-    /// be called from a single producer thread.
+    /// Tries to enqueue a value into the buffer. If the buffer is already full,
+    /// this method will perform no action and return false. This method is only
+    /// safe to be called from a single producer thread.
     /// </summary>
     public bool TryEnqueue(ref T t) {
       uint nextTail = (_tail + 1) & _bufferMask;
@@ -90,19 +94,19 @@ namespace Leap.Unity {
     }
 
     /// <summary>
-    /// Tries to enqueue a value into the buffer.  If the buffer is already full, this
-    /// method will perform no action and return false.  This method is only safe to
-    /// be called from a single producer thread.
+    /// Tries to enqueue a value into the buffer. If the buffer is already full,
+    /// this method will perform no action and return false. This method is only
+    /// safe to be called from a single producer thread.
     /// </summary>
     public bool TryEnqueue(T t) {
       return TryEnqueue(ref t);
     }
 
     /// <summary>
-    /// Tries to get the next element that would be dequeued from this
-    /// buffer.  If there is no element yet, this method will return false.
-    /// If there is an element ready to be dequeued, it will be copied to
-    /// the out param and this method will return true.
+    /// Tries to get the next element that would be dequeued from this buffer.
+    /// If there is no element yet, this method will return false. If there is
+    /// an element ready to be dequeued, it will be copied to the out param and
+    /// this method will return true.
     /// 
     /// This method is only safe to be called from a single consumer thread.
     /// </summary>
@@ -111,18 +115,18 @@ namespace Leap.Unity {
         t = default(T);
         return false;
       } else {
-        //No risk of an enqueue corrupting this element 
-        //since we don't modify head or tail, an enqueue targeting this element
-        //would fail.
+        // No risk of an enqueue corrupting this element 
+        // since we don't modify head or tail, an enqueue targeting this element
+        // would fail.
         t = _buffer[_head];
         return true;
       }
     }
 
     /// <summary>
-    /// Tries to dequeue a value off of the buffer.  If the buffer is empty this method
-    /// will perform no action and return false.  This method is only safe to be
-    /// called from a single consumer thread.
+    /// Tries to dequeue a value off of the buffer. If the buffer is empty this
+    /// method will perform no action and return false. This method is only safe
+    /// to be called from a single consumer thread.
     /// </summary>
     public bool TryDequeue(out T t) {
       if (_tail == _head) {
@@ -136,9 +140,9 @@ namespace Leap.Unity {
     }
 
     /// <summary>
-    /// Tries to dequeue a value off of the buffer.  If the buffer is empty this method
-    /// will perform no action and return false.  This method is only safe to be
-    /// called from a single consumer thread.
+    /// Tries to dequeue a value off of the buffer. If the buffer is empty this
+    /// method will perform no action and return false. This method is only safe
+    /// to be called from a single consumer thread.
     /// </summary>
     public bool TryDequeue() {
       if (_tail == _head) {
@@ -150,9 +154,9 @@ namespace Leap.Unity {
     }
 
     /// <summary>
-    /// Tries to dequeue all values off of the buffer, returning the most recently
-    /// added element.  If there was an element found, this method will return true,
-    /// else it will return false.
+    /// Tries to dequeue all values off of the buffer, returning the most
+    /// recently added element. If there was an element found, this method will
+    /// return true, else it will return false.
     /// </summary>
     public bool TryDequeueAll(out T mostRecent) {
       if (!TryDequeue(out mostRecent)) {

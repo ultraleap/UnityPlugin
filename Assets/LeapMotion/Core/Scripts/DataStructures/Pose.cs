@@ -9,6 +9,8 @@
 
 using System;
 using UnityEngine;
+using Leap.Unity.Encoding;
+using Leap.Unity.Splines;
 
 namespace Leap.Unity {
 
@@ -17,7 +19,7 @@ namespace Leap.Unity {
   /// multiplication, but Poses always have unit scale.
   /// </summary>
   [System.Serializable]
-  public struct Pose : IEquatable<Pose> {
+  public struct Pose : IEquatable<Pose>, IInterpolable<Pose> {
 
     public Vector3    position;
     public Quaternion rotation;
@@ -37,6 +39,16 @@ namespace Leap.Unity {
       get {
         var invQ = Quaternion.Inverse(this.rotation);
         return new Pose(invQ * -this.position, invQ);
+      }
+    }
+
+    /// <summary>
+    /// Returns a Matrix4x4 corresponding to this pose's translation and
+    /// rotation, with unit scale.
+    /// </summary>
+    public Matrix4x4 matrix {
+      get {
+        return Matrix4x4.TRS(this.position, this.rotation, Vector3.one);
       }
     }
 
@@ -119,7 +131,8 @@ namespace Leap.Unity {
       else return this.Equals((Pose)obj);
     }
     public bool Equals(Pose other) {
-      return other.position == this.position && other.rotation == this.rotation;
+      return other.position == this.position && 
+             other.rotation == this.rotation;
     }
 
     public override int GetHashCode() {
@@ -135,6 +148,24 @@ namespace Leap.Unity {
 
     public static bool operator !=(Pose a, Pose b) {
       return !(a.Equals(b));
+    }
+
+
+    // IInterpolable Implementation
+    public Pose CopyFrom(Pose h) {
+      position = h.position;
+      rotation = h.rotation;
+      return this;
+    }
+    public bool FillLerped(Pose a, Pose b, float t) {
+      this = LerpUnclamped(a, b, t);
+      return true;
+    }
+    public bool FillSplined(Pose a, Pose b, Pose c, Pose d, float t) {
+      position = CatmullRom.ToCHS(a.position, b.position, c.position, d.position,
+        centripetal: false).PositionAt(t);
+      rotation = Quaternion.SlerpUnclamped(b.rotation, c.rotation, t);
+      return true;
     }
 
   }

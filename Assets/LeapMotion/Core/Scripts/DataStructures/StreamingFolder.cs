@@ -20,7 +20,7 @@ namespace Leap.Unity {
   public class StreamingFolder : AssetFolder, ISerializationCallbackReceiver {
 
     [SerializeField]
-    protected string _relativePath;
+    private string _relativePath;
 
     /// <summary>
     /// Gets the full path to the streaming folder.  This operation is safe to be
@@ -41,18 +41,7 @@ namespace Leap.Unity {
 
     public void OnBeforeSerialize() {
 #if UNITY_EDITOR
-      if (_assetReference == null && !string.IsNullOrEmpty(_relativePath)) {
-        //If the asset folder is null, we first see if the current relative path points to a valid
-        //folder.  This can happen during deserialization of a unitypackage.
-
-        //We hardcode Assets/StreamingAssets since this can only occur within the editor
-        //and unity doesn't let us call Application.streamingAssetsPath from within the
-        //OnBeforeSerialize callback
-        string path = System.IO.Path.Combine("Assets/StreamingAssets", _relativePath);
-        _assetReference = AssetDatabase.LoadAssetAtPath<DefaultAsset>(path);
-      }
-
-      string assetPath = AssetDatabase.GetAssetPath(_assetReference);
+      string assetPath = AssetDatabase.GetAssetPath(_assetFolder);
       if (string.IsNullOrEmpty(assetPath)) {
         _relativePath = null;
       } else {

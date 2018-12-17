@@ -40,6 +40,7 @@ namespace Leap {
     IController {
     Connection _connection;
     bool _disposed = false;
+    bool _supportsMultipleDevices = true;
     Config _config;
 
     /// <summary>
@@ -361,7 +362,7 @@ namespace Leap {
     /// 
     /// @since 1.0
     /// </summary>
-    public Controller() : this(0) { }
+    public Controller(bool supportsMultipleDevices = true) : this(0) { }
 
     /// <summary>
     /// Constructs a Controller object using the specified connection key.
@@ -375,13 +376,15 @@ namespace Leap {
     /// Otherwise, a new connection is created.
     /// @since 3.0
     /// </summary>
-    public Controller(int connectionKey) {
+    public Controller(int connectionKey, bool supportsMultipleDevices = true) {
       _connection = Connection.GetConnection(connectionKey);
       _connection.EventContext = SynchronizationContext.Current;
 
       _connection.LeapInit += OnInit;
       _connection.LeapConnection += OnConnect;
       _connection.LeapConnectionLost += OnDisconnect;
+
+      _supportsMultipleDevices = supportsMultipleDevices;
 
       _connection.Start();
     }
@@ -395,7 +398,7 @@ namespace Leap {
     /// @since 3.0
     /// </summary>
     public void StartConnection() {
-      _connection.Start();
+      _connection.Start(_supportsMultipleDevices);
     }
 
     /// <summary>
@@ -541,13 +544,70 @@ namespace Leap {
 
     /// <summary>
     /// Returns the Head pose at the specified time, interpolating the data between existing frames, if necessary.
+    /// Allocates garbage.
     /// </summary>
     public LEAP_HEAD_POSE_EVENT GetInterpolatedHeadPose(Int64 time) {
       return _connection.GetInterpolatedHeadPose(time);
     }
 
+    /// <summary>
+    /// Returns the Head pose at the specified time, interpolating the data between existing frames, if necessary.
+    /// </summary>
     public void GetInterpolatedHeadPose(ref LEAP_HEAD_POSE_EVENT toFill, Int64 time) {
       _connection.GetInterpolatedHeadPose(ref toFill, time);
+    }
+
+    /// <summary>
+    /// Returns the Eye poses at the specified time, interpolating the data between existing frames, if necessary.
+    /// </summary>
+    public void GetInterpolatedEyePositions(ref LEAP_EYE_EVENT toFill, Int64 time) {
+      _connection.GetInterpolatedEyePositions(ref toFill, time);
+    }
+
+    /// <summary>
+    /// Subscribes to the events coming from an individual device
+    /// 
+    /// If this is not called, only the primary device will be subscribed.
+    /// Will automatically unsubscribe the primary device if this is called 
+    /// on a secondary device, but not a primary one.  
+    /// 
+    /// @since 4.1
+    /// </summary>
+    public void SubscribeToDeviceEvents(Device device) {
+      _connection.SubscribeToDeviceEvents(device);
+    }
+
+    /// <summary>
+    /// Unsubscribes from the events coming from an individual device
+    /// 
+    /// This can be called safely, even if the device has not been subscribed.
+    /// 
+    /// @since 4.1
+    /// </summary>
+    public void UnsubscribeFromDeviceEvents(Device device) {
+      _connection.UnsubscribeFromDeviceEvents(device);
+    }
+
+    /// <summary>
+    /// Subscribes to the events coming from all devices
+    /// 
+    /// @since 4.1
+    /// </summary>
+    public void SubscribeToAllDevices() {
+      for (int i = 1; i < Devices.Count; i++) {
+        _connection.SubscribeToDeviceEvents(Devices[i]);
+      }
+    }
+
+    /// <summary>
+    /// Unsubscribes from the events coming from all devices
+    /// 
+    /// @since 4.1
+    /// </summary>
+    public void UnsubscribeFromAllDevices() {
+      for (int i = 1; i < Devices.Count; i++) {
+        _connection.UnsubscribeFromDeviceEvents(Devices[i]);
+      }
     }
 
     public void TelemetryProfiling(ref LEAP_TELEMETRY_DATA telemetryData) {

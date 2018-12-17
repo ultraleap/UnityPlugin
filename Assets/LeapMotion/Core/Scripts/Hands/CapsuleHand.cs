@@ -201,6 +201,8 @@ namespace Leap.Unity {
     }
 
     private void drawSphere(Vector3 position, float radius) {
+      if (isNaN(position)) { return; }
+
       //multiply radius by 2 because the default unity sphere has a radius of 0.5 meters at scale 1.
       Graphics.DrawMesh(_sphereMesh, 
                         Matrix4x4.TRS(position, 
@@ -211,15 +213,23 @@ namespace Leap.Unity {
     }
 
     private void drawCylinder(Vector3 a, Vector3 b) {
+      if (isNaN(a) || isNaN(b)) { return; }
+
       float length = (a - b).magnitude;
 
-      Graphics.DrawMesh(getCylinderMesh(length),
-                        Matrix4x4.TRS(a, 
-                                      Quaternion.LookRotation(b - a), 
-                                      new Vector3(transform.lossyScale.x, transform.lossyScale.x, 1)),
-                        _material,
-                        gameObject.layer, 
-                        null, 0, null, _castShadows);
+      if ((a - b).magnitude > 0.001f) {
+        Graphics.DrawMesh(getCylinderMesh(length),
+                          Matrix4x4.TRS(a, 
+                                        Quaternion.LookRotation(b - a),
+                                        new Vector3(transform.lossyScale.x, transform.lossyScale.x, 1)),
+                          _material,
+                          gameObject.layer, 
+                          null, 0, null, _castShadows);
+      }
+    }
+
+    private bool isNaN(Vector3 v) {
+      return float.IsNaN(v.x) || float.IsNaN(v.y) || float.IsNaN(v.z);
     }
 
     private void drawCylinder(int a, int b) {

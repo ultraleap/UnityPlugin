@@ -32,7 +32,9 @@ namespace Leap.Unity{
         var dataType = typeof(Object);
 
         EditorGUI.BeginDisabledGroup(true);
-        EditorGUILayout.ObjectField(_textureGUIContent, data.TextureData.CombinedTexture, dataType, true);
+        for (int i = 0; i < data.TextureData.Count; i++) {
+          EditorGUILayout.ObjectField(_textureGUIContent, data.TextureData[i].CombinedTexture, dataType, true);
+        }
         EditorGUILayout.ObjectField(_distortionTextureGUIContent, data.Distortion.CombinedTexture, dataType, true);
         EditorGUI.EndDisabledGroup();
       }

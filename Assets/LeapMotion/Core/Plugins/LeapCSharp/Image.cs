@@ -23,23 +23,27 @@ namespace Leap {
     private ImageData rightImage;
     private Int64 frameId = 0;
     private Int64 timestamp = 0;
+    private UInt32 deviceId = 0;
 
-    public Image(Int64 frameId, Int64 timestamp, ImageData leftImage, ImageData rightImage) {
+    public Image(Int64 frameId, Int64 timestamp,
+                 ImageData leftImage, ImageData rightImage,
+                 UInt32 deviceId) {
       if (leftImage == null || rightImage == null) {
         throw new ArgumentNullException("images");
       }
       if (leftImage.type != rightImage.type ||
-         leftImage.format != rightImage.format ||
-         leftImage.width != rightImage.width ||
-         leftImage.height != rightImage.height ||
-         leftImage.bpp != rightImage.bpp ||
-         leftImage.DistortionSize != rightImage.DistortionSize) {
+          leftImage.format != rightImage.format ||
+          leftImage.width != rightImage.width ||
+          leftImage.height != rightImage.height ||
+          leftImage.bpp != rightImage.bpp ||
+          leftImage.DistortionSize != rightImage.DistortionSize) {
         throw new ArgumentException("image mismatch");
       }
       this.frameId = frameId;
       this.timestamp = timestamp;
       this.leftImage = leftImage;
       this.rightImage = rightImage;
+      this.deviceId = deviceId;
     }
 
     private ImageData imageData(CameraType camera) {
@@ -52,7 +56,7 @@ namespace Leap {
     /// The image data is a set of 8-bit intensity values. The buffer is
     /// image.Width * image.Height * image.BytesPerPixel bytes long.
     /// 
-    /// Use the ByteOffset(` method to find the beginning offset
+    /// Use the ByteOffset method to find the beginning offset
     /// of the data for the specified camera.
     /// 
     /// @since 4.0
@@ -369,6 +373,17 @@ namespace Leap {
     }
 
     /// <summary>
+    /// Returns a convenience device ID based on which attached device sent this
+    /// image.
+    /// @since 4.5.0
+    /// </summary>
+    public UInt32 DeviceID {
+      get {
+        return deviceId;
+      }
+    }
+
+    /// <summary>
     /// Enumerates the possible image formats.
     /// 
     /// The Image.Format() function returns an item from the FormatType enumeration.
@@ -387,6 +402,11 @@ namespace Leap {
     public enum CameraType {
       LEFT = 0,
       RIGHT = 1
+    };
+
+    public enum CalibrationType {
+      INFRARED = 0,
+      VISIBLE = 1
     };
   }
 

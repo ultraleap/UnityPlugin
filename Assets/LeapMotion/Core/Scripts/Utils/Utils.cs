@@ -834,6 +834,13 @@ namespace Leap.Unity {
 
     #region Quaternion Utils
 
+    public static bool ContainsNaN(this Quaternion q) {
+      return float.IsNaN(q.x)
+          || float.IsNaN(q.y)
+          || float.IsNaN(q.z)
+          || float.IsNaN(q.w);
+    }
+
     /// <summary>
     /// Converts the quaternion into an axis and an angle and returns the vector
     /// axis * angle. Angle magnitude is measured in degrees, not radians; this requires
@@ -1925,6 +1932,29 @@ namespace Leap.Unity {
     /// </summary>
     public static float CompMin(this Vector4 v) {
       return Mathf.Min(Mathf.Min(Mathf.Min(v.x, v.y), v.z), v.w);
+    }
+
+    /// <summary>
+    /// Returns a new Vector2 via component-wise Lerp.
+    /// </summary>
+    public static Vector2 CompLerp(this Vector2 A, Vector2 B, Vector2 Ts) {
+      return new Vector2(Mathf.Lerp(A.x, B.x, Ts.x), Mathf.Lerp(A.y, B.y, Ts.y));
+    }
+
+    /// <summary>
+    /// Returns a new Vector3 via component-wise Lerp.
+    /// </summary>
+    public static Vector3 CompLerp(this Vector3 A, Vector3 B, Vector3 Ts) {
+      return new Vector3(Mathf.Lerp(A.x, B.x, Ts.x), Mathf.Lerp(A.y, B.y, Ts.y),
+        Mathf.Lerp(A.z, B.z, Ts.z));
+    }
+
+    /// <summary>
+    /// Returns a new Vector4 via component-wise Lerp.
+    /// </summary>
+    public static Vector4 CompLerp(this Vector4 A, Vector4 B, Vector4 Ts) {
+      return new Vector4(Mathf.Lerp(A.x, B.x, Ts.x), Mathf.Lerp(A.y, B.y, Ts.y),
+        Mathf.Lerp(A.z, B.z, Ts.z), Mathf.Lerp(A.w, B.w, Ts.w));
     }
 
     #endregion

@@ -12,23 +12,30 @@ namespace LeapInternal {
   using System;
   using System.Runtime.InteropServices;
 
+  public enum eLeapConnectionFlag : uint {
+    /// <summary>
+    /// Allows subscription to multiple devices
+    /// </summary>
+    eLeapConnectionFlag_MultipleDevicesAware = 0x00000001,
+  };
+
   public enum eLeapConnectionStatus : uint {
     /// <summary>
     /// A connection has been established.
     /// </summary>
-    eLeapConnectionStatus_NotConnected = 0,
+    NotConnected = 0,
     /// <summary>
     /// The connection has not been completed. Call OpenConnection.
     /// </summary>
-    eLeapConnectionStatus_Connected,
+    Connected,
     /// <summary>
     /// The connection handshake has not completed.
     /// </summary>
-    eLeapConnectionStatus_HandshakeIncomplete,
+    HandshakeIncomplete,
     /// <summary>
     /// A connection could not be established because the server does not appear to be running.
     /// </summary>
-    eLeapConnectionStatus_NotRunning = 0xE7030004
+    NotRunning = 0xE7030004
   };
 
   public enum eLeapDeviceCaps : uint {
@@ -190,6 +197,14 @@ namespace LeapInternal {
     /// </summary>
     eLeapPerspectiveType_mono = 3,
   };
+
+  public enum eLeapCameraCalibrationType {
+    /** Infrared calibration (default). */
+    eLeapCameraCalibrationType_infrared = 0,
+
+    /** Visual calibration. */
+    eLeapCameraCalibrationType_visual = 1
+  }
 
   public enum eLeapHandType {
     eLeapHandType_Left,
@@ -479,7 +494,7 @@ namespace LeapInternal {
 
   [StructLayout(LayoutKind.Sequential, Pack = 1)]
   public struct LEAP_DEVICE_REF {
-    public IntPtr handle; //void *
+    public IntPtr connectionHandle; //void *
     public UInt32 id;
   }
 
@@ -549,10 +564,21 @@ namespace LeapInternal {
   }
 
   [StructLayout(LayoutKind.Sequential, Pack = 1)]
+  public struct LEAP_EYE_EVENT {
+    public Int64 frame_id;
+    public Int64 timestamp;
+    public LEAP_VECTOR left_eye_position;
+    public LEAP_VECTOR right_eye_position;
+    public float left_eye_estimated_error;
+    public float right_eye_estimated_error;
+  }
+
+  [StructLayout(LayoutKind.Sequential, Pack = 1)]
   public struct LEAP_CONNECTION_MESSAGE {
     public UInt32 size;
     public eLeapEventType type;
     public IntPtr eventStructPtr;
+    public UInt32 deviceID;
   }
 
   [StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -827,6 +853,12 @@ namespace LeapInternal {
     [DllImport("LeapC", EntryPoint = "LeapOpenDevice")]
     public static extern eLeapRS OpenDevice(LEAP_DEVICE_REF rDevice, out IntPtr pDevice);
 
+    [DllImport("LeapC", EntryPoint = "LeapSubscribeEvents")]
+    public static extern eLeapRS LeapSubscribeEvents(IntPtr hConnection, IntPtr hDevice);
+
+    [DllImport("LeapC", EntryPoint = "LeapUnsubscribeEvents")]
+    public static extern eLeapRS LeapUnsubscribeEvents(IntPtr hConnection, IntPtr hDevice);
+
     [DllImport("LeapC", EntryPoint = "LeapGetDeviceInfo", CharSet = CharSet.Ansi)]
     public static extern eLeapRS GetDeviceInfo(IntPtr hDevice, ref LEAP_DEVICE_INFO info);
 
@@ -851,11 +883,25 @@ namespace LeapInternal {
     [DllImport("LeapC", EntryPoint = "LeapInterpolateHeadPose")]
     public static extern eLeapRS InterpolateHeadPose(IntPtr hConnection, Int64 timestamp, ref LEAP_HEAD_POSE_EVENT headPose);
 
+    [DllImport("LeapC", EntryPoint = "LeapInterpolateEyePositions")]
+    public static extern eLeapRS InterpolateEyePositions(IntPtr hConnection,
+      Int64 timestamp, ref LEAP_EYE_EVENT eyes);
+
     [DllImport("LeapC", EntryPoint = "LeapPixelToRectilinear")]
-    public static extern LEAP_VECTOR LeapPixelToRectilinear(IntPtr hConnection, eLeapPerspectiveType camera, LEAP_VECTOR pixel);
+    public static extern LEAP_VECTOR LeapPixelToRectilinear(IntPtr hConnection,
+      eLeapPerspectiveType camera, LEAP_VECTOR pixel);
+
+    [DllImport("LeapC", EntryPoint = "LeapPixelToRectilinearEx")]
+    public static extern LEAP_VECTOR LeapPixelToRectilinearEx(IntPtr hConnection,
+      IntPtr hDevice, eLeapPerspectiveType camera, eLeapCameraCalibrationType calibrationType, LEAP_VECTOR pixel);
 
     [DllImport("LeapC", EntryPoint = "LeapRectilinearToPixel")]
-    public static extern LEAP_VECTOR LeapRectilinearToPixel(IntPtr hConnection, eLeapPerspectiveType camera, LEAP_VECTOR rectilinear);
+    public static extern LEAP_VECTOR LeapRectilinearToPixel(IntPtr hConnection,
+      eLeapPerspectiveType camera, LEAP_VECTOR rectilinear);
+
+    [DllImport("LeapC", EntryPoint = "LeapRectilinearToPixelEx")]
+    public static extern LEAP_VECTOR LeapRectilinearToPixelEx(IntPtr hConnection,
+      IntPtr hDevice, eLeapPerspectiveType camera, eLeapCameraCalibrationType calibrationType, LEAP_VECTOR rectilinear);
 
     [DllImport("LeapC", EntryPoint = "LeapCloseDevice")]
     public static extern void CloseDevice(IntPtr pDevice);

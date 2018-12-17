@@ -8,6 +8,7 @@
  ******************************************************************************/
 
 using System;
+using UnityEngine;
 
 namespace Leap.Unity {
 
@@ -71,7 +72,10 @@ namespace Leap.Unity {
     /// Oldest element is at index 0, youngest is at Count - 1.
     /// </summary>
     public T Get(int idx) {
-      if (idx < 0 || idx > Count - 1) { throw new IndexOutOfRangeException(); }
+      if (idx < 0 || idx > Count - 1) {
+        Debug.Log("Tried to access index " + idx + " of RingBuffer with count " + Count);
+        throw new IndexOutOfRangeException();
+      }
 
       return arr[(firstIdx + idx) % arr.Length];
     }

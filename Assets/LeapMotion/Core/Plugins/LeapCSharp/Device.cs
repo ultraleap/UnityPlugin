@@ -40,13 +40,13 @@ namespace Leap {
     public Device() { }
 
     public Device(IntPtr deviceHandle,
-                   float horizontalViewAngle,
-                   float verticalViewAngle,
-                   float range,
-                   float baseline,
-                   DeviceType type,
-                   bool isStreaming,
-                   string serialNumber) {
+                  float horizontalViewAngle,
+                  float verticalViewAngle,
+                  float range,
+                  float baseline,
+                  DeviceType type,
+                  bool isStreaming,
+                  string serialNumber) {
       Handle = deviceHandle;
       HorizontalViewAngle = horizontalViewAngle;
       VerticalViewAngle = verticalViewAngle;
@@ -91,21 +91,6 @@ namespace Leap {
     /// For internal use only.
     /// </summary>
     public IntPtr Handle { get; private set; }
-
-    public bool SetPaused(bool pause) {
-      ulong prior_state = 0;
-      ulong set_flags = 0;
-      ulong clear_flags = 0;
-      if (pause) {
-        set_flags = (ulong)eLeapDeviceFlag.eLeapDeviceFlag_Stream;
-      } else {
-        clear_flags = (ulong)eLeapDeviceFlag.eLeapDeviceFlag_Stream;
-      }
-
-      eLeapRS result = LeapC.SetDeviceFlags(Handle, set_flags, clear_flags, out prior_state);
-
-      return result == eLeapRS.eLeapRS_Success;
-    }
 
     /// <summary>
     /// Compare Device object equality. 

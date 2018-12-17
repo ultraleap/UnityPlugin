@@ -171,6 +171,8 @@ namespace Leap.Unity.RuntimeGizmos {
     }
 
     protected void onPostRender(Camera camera) {
+      if ((camera.cullingMask & gameObject.layer) == 0) { return; }
+
 #if UNITY_EDITOR
       //Always draw scene view
       //Never draw preview or reflection
