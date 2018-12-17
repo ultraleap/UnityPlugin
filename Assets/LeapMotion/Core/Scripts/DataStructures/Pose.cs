@@ -10,7 +10,7 @@
 using System;
 using UnityEngine;
 using Leap.Unity.Encoding;
-using Leap.Unity.Splines;
+using Leap.Unity.Animation;
 
 namespace Leap.Unity {
 

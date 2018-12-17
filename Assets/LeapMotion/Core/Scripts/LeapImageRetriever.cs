@@ -41,8 +41,6 @@ namespace Leap.Unity {
     public const int RIGHT_IMAGE_INDEX = 1;
     public const float IMAGE_SETTING_POLL_RATE = 2.0f;
 
-    public LeapPostProcess postProcessing;
-
     [SerializeField]
     [FormerlySerializedAs("gammaCorrection")]
     private float _gammaCorrection = 1.0f;
@@ -157,7 +155,7 @@ namespace Leap.Unity {
       for(int i = 0; i < latestDeviceImages.Length; i++) {
         if (latestDeviceImages[i] != null) {
           bool applyTexture = updateSpecificDeviceIDTexture == 0 || latestDeviceImages[i].DeviceID == updateSpecificDeviceIDTexture;
-          _eyeTextureData.UpdateTextures(latestDeviceImages[i], postProcessing, applyTexture);
+          _eyeTextureData.UpdateTextures(latestDeviceImages[i], applyTexture);
         }
       }
     }
@@ -165,7 +163,7 @@ namespace Leap.Unity {
     public bool UpdateDeviceIDTexture(int deviceID) {
       if (latestDeviceImages .Length > deviceID - 1 && latestDeviceImages[deviceID - 1] != null) {
         bool applyTexture = latestDeviceImages[deviceID - 1].DeviceID == deviceID;
-        _eyeTextureData.UpdateTextures(latestDeviceImages[deviceID - 1], postProcessing, applyTexture);
+        _eyeTextureData.UpdateTextures(latestDeviceImages[deviceID - 1], applyTexture);
         return true;
       } else {
         return false;
@@ -296,10 +294,8 @@ namespace Leap.Unity {
         }
       }
 
-      public void UpdateTexture(Image image, LeapPostProcess postProcessing, bool applyTexture = true) {
+      public void UpdateTexture(Image image, bool applyTexture = true) {
         byte[] array = image.Data(Image.CameraType.LEFT);
-
-        if(postProcessing != null) postProcessing.OnNewImage(image, array);
 
         if (applyTexture) {
           if (_combinedTexture != null) {
@@ -439,8 +435,8 @@ namespace Leap.Unity {
         _isStale = false;
       }
 
-      public void UpdateTextures(Image image, LeapPostProcess postProcessing, bool applyTexture = true) {
-        TextureData[((int)image.DeviceID) - 1].UpdateTexture(image, postProcessing, applyTexture);
+      public void UpdateTextures(Image image, bool applyTexture = true) {
+        TextureData[((int)image.DeviceID) - 1].UpdateTexture(image, applyTexture);
       }
     }
 
