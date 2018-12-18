@@ -260,14 +260,15 @@ namespace Leap.Unity {
         #endif
       }
       if (useSRPFix) {
+#if UNITY_2018_1_OR_NEWER
         // Experimental support for the Lightweight Rendering Pipeline and any
         // other situation where OnPreCull is not available.
         UnityEngine.Experimental.Rendering.RenderPipeline.beginCameraRendering -=
           onPreCull;
         UnityEngine.Experimental.Rendering.RenderPipeline.beginCameraRendering +=
           onPreCull;
-      }
-      else {
+#endif
+      } else {
         // Default behavior: Use a camera's OnPreCull callback to update data for
         // temporal warping.
         if (preCullCamera == null) {
@@ -289,12 +290,13 @@ namespace Leap.Unity {
         #endif
       }
       if (useSRPFix) {
+#if UNITY_2018_1_OR_NEWER
         // Experimental support for the Lightweight Rendering Pipeline and any
         // other situation where OnPreCull is not available.
         UnityEngine.Experimental.Rendering.RenderPipeline.beginCameraRendering -=
           onPreCull;
-      }
-      else {
+#endif
+      } else {
         // Default behavior: Use a camera's OnPreCull callback to update data for
         // temporal warping.
         Camera.onPreCull -= onPreCull;
