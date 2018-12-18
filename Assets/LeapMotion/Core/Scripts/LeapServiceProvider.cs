@@ -108,7 +108,11 @@ namespace Leap.Unity {
     #endregion
 
     #region Internal Settings & Memory
-    protected bool _useInterpolation = true;
+    /// <summary>
+    /// Determines if the service provider should temporally resample frames for smoothness.
+    /// </summary>
+    [NonSerialized]
+    public bool UseInterpolation = true;
 
     // Extrapolate on Android to compensate for the latency introduced by its graphics
     // pipeline.
@@ -127,10 +131,12 @@ namespace Leap.Unity {
     protected SmoothedFloat _smoothedTrackingLatency = new SmoothedFloat();
     protected long _unityToLeapOffset;
 
-    protected Frame _untransformedUpdateFrame;
-    protected Frame _transformedUpdateFrame;
-    protected Frame _untransformedFixedFrame;
-    protected Frame _transformedFixedFrame;
+    /// <summary>
+    /// Device-space frames prior to transformation into world space.
+    /// </summary>
+    [NonSerialized]
+    public Frame UntransformedUpdateFrame, UntransformedFixedFrame;
+    protected Frame _transformedUpdateFrame, _transformedFixedFrame;
 
     #endregion
 
@@ -267,14 +273,15 @@ namespace Leap.Unity {
     protected virtual void Awake() {
       _fixedOffset.delay = 0.4f;
       _smoothedTrackingLatency.SetBlend(0.99f, 0.0111f);
+      UseInterpolation = _multipleDeviceMode.Equals(MultipleDeviceMode.All) ? false : UseInterpolation;
     }
 
     protected virtual void Start() {
       createController();
       _transformedUpdateFrame = new Frame();
       _transformedFixedFrame = new Frame();
-      _untransformedUpdateFrame = new Frame();
-      _untransformedFixedFrame = new Frame();
+      UntransformedUpdateFrame = new Frame();
+      UntransformedFixedFrame = new Frame();
     }
 
     protected virtual void Update() {
@@ -299,7 +306,7 @@ namespace Leap.Unity {
         return;
       }
 
-      if (_useInterpolation) {
+      if (UseInterpolation) {
 #if !UNITY_ANDROID || UNITY_EDITOR
         _smoothedTrackingLatency.value = Mathf.Min(_smoothedTrackingLatency.value, 30000f);
         _smoothedTrackingLatency.Update((float)(_leapController.Now() - _leapController.FrameTimestamp()), Time.deltaTime);
@@ -307,14 +314,14 @@ namespace Leap.Unity {
         long timestamp = CalculateInterpolationTime() + (ExtrapolationAmount * 1000);
         _unityToLeapOffset = timestamp - (long)(Time.time * S_TO_NS);
 
-        _leapController.GetInterpolatedFrameFromTime(_untransformedUpdateFrame, timestamp, CalculateInterpolationTime() - (BounceAmount * 1000));
+        _leapController.GetInterpolatedFrameFromTime(UntransformedUpdateFrame, timestamp, CalculateInterpolationTime() - (BounceAmount * 1000));
       }
       else {
-        _leapController.Frame(_untransformedUpdateFrame);
+        _leapController.Frame(UntransformedUpdateFrame);
       }
 
-      if (_untransformedUpdateFrame != null) {
-        transformFrame(_untransformedUpdateFrame, _transformedUpdateFrame);
+      if (UntransformedUpdateFrame != null) {
+        transformFrame(UntransformedUpdateFrame, _transformedUpdateFrame);
 
         DispatchUpdateFrameEvent(_transformedUpdateFrame);
       }
@@ -326,7 +333,7 @@ namespace Leap.Unity {
         return;
       }
 
-      if (_useInterpolation) {
+      if (UseInterpolation) {
 
         long timestamp;
         switch (_frameOptimization) {
@@ -347,15 +354,15 @@ namespace Leap.Unity {
             throw new System.InvalidOperationException(
               "Unexpected frame optimization mode: " + _frameOptimization);
         }
-        _leapController.GetInterpolatedFrame(_untransformedFixedFrame, timestamp);
+        _leapController.GetInterpolatedFrame(UntransformedFixedFrame, timestamp);
 
       }
       else {
-        _leapController.Frame(_untransformedFixedFrame);
+        _leapController.Frame(UntransformedFixedFrame);
       }
 
-      if (_untransformedFixedFrame != null) {
-        transformFrame(_untransformedFixedFrame, _transformedFixedFrame);
+      if (UntransformedFixedFrame != null) {
+        transformFrame(UntransformedFixedFrame, _transformedFixedFrame);
 
         DispatchFixedFrameEvent(_transformedFixedFrame);
       }
@@ -427,8 +434,8 @@ namespace Leap.Unity {
     /// custom script and trying to access Hand data from it directly afterward.
     /// </summary>
     public void RetransformFrames() {
-      transformFrame(_untransformedUpdateFrame, _transformedUpdateFrame);
-      transformFrame(_untransformedFixedFrame, _transformedFixedFrame);
+      transformFrame(UntransformedUpdateFrame, _transformedUpdateFrame);
+      transformFrame(UntransformedFixedFrame, _transformedFixedFrame);
     }
 
     /// <summary>

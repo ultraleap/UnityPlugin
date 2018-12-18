@@ -21,6 +21,7 @@ namespace Leap {
       frame.Id = source.Id;
       frame.Timestamp = source.Timestamp;
       frame.CurrentFramesPerSecond = source.CurrentFramesPerSecond;
+      frame.DeviceID = source.DeviceID;
 
       frame.ResizeHandList(source.Hands.Count);
 
