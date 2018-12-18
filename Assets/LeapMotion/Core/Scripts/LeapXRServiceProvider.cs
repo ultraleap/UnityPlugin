@@ -106,6 +106,30 @@ namespace Leap.Unity {
       set { _preCullCamera = value; }
     }
 
+    [Tooltip("Keep this false unless you need support for a custom scriptable " +
+      "rendering pipeline, such as the Lightweight Rendering Pipeline. OnPreCull " +
+      "is not called in such a circumstance, so an experimental " +
+      "beginCameraRendering callback is used instead to update tranform data for " +
+      "temporal warping. You must add the LEAP_FIX_SRP scripting define symbol to " +
+      "your project to enable the use of this toggle. (See Other Settings in " +
+      "your project's Player Settings.)")]
+    [SerializeField, EditTimeOnly]
+    #if !LEAP_FIX_SRP
+    [Disable]
+    #endif
+    private bool _useExperimentalSRPCallback = false;
+    public bool useExperimentalSRPCallback {
+      get { return _useExperimentalSRPCallback; }
+      set {
+        if (this.isActiveAndEnabled) {
+          throw new System.InvalidOperationException(
+            "The LeapServiceProvider must be disabled to modify " +
+            "useExperimentalSRPCallback.");
+        }
+        _useExperimentalSRPCallback = value;
+      }
+    }
+
     // Temporal Warping
 
 #if UNITY_STANDALONE
@@ -229,18 +253,52 @@ namespace Leap.Unity {
     protected virtual void OnEnable() {
       resetShaderTransforms();
 
-      if (preCullCamera == null) {
-        preCullCamera = GetComponent<Camera>();
+      var useSRPFix = false;
+      if (useExperimentalSRPCallback) {
+        #if LEAP_FIX_SRP
+        useSRPFix = true;
+        #endif
       }
+      if (useSRPFix) {
+        // Experimental support for the Lightweight Rendering Pipeline and any
+        // other situation where OnPreCull is not available.
+        UnityEngine.Experimental.Rendering.RenderPipeline.beginCameraRendering -=
+          onPreCull;
+        UnityEngine.Experimental.Rendering.RenderPipeline.beginCameraRendering +=
+          onPreCull;
+      }
+      else {
+        // Default behavior: Use a camera's OnPreCull callback to update data for
+        // temporal warping.
+        if (preCullCamera == null) {
+          preCullCamera = GetComponent<Camera>();
+        }
 
-      Camera.onPreCull -= onPreCull; // No multiple-subscription.
-      Camera.onPreCull += onPreCull;
+        Camera.onPreCull -= onPreCull; // No multiple-subscription.
+        Camera.onPreCull += onPreCull;
+      }
     }
 
     protected virtual void OnDisable() {
       resetShaderTransforms();
 
-      Camera.onPreCull -= onPreCull;
+      var useSRPFix = false;
+      if (useExperimentalSRPCallback) {
+        #if LEAP_FIX_SRP
+        useSRPFix = true;
+        #endif
+      }
+      if (useSRPFix) {
+        // Experimental support for the Lightweight Rendering Pipeline and any
+        // other situation where OnPreCull is not available.
+        UnityEngine.Experimental.Rendering.RenderPipeline.beginCameraRendering -=
+          onPreCull;
+      }
+      else {
+        // Default behavior: Use a camera's OnPreCull callback to update data for
+        // temporal warping.
+        Camera.onPreCull -= onPreCull;
+      }
     }
 
     protected override void Start() {
