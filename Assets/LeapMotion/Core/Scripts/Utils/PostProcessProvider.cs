@@ -49,6 +49,9 @@ namespace Leap.Unity {
            + "input directly to its output without performing any post-processing.")]
     public bool passthroughOnly = false;
 
+    //This allows the post processor to emit a different number of frames than it receives
+    protected bool _dispatchManually = false;
+
     private Frame _cachedUpdateFrame = new Frame();
     private Frame _cachedFixedFrame = new Frame();
 
@@ -113,7 +116,7 @@ namespace Leap.Unity {
 
       _cachedUpdateFrame.CopyFrom(inputFrame);
       if (!passthroughOnly) { ProcessFrame(ref _cachedUpdateFrame); }
-      DispatchUpdateFrameEvent(_cachedUpdateFrame);
+      if(!_dispatchManually) DispatchUpdateFrameEvent(_cachedUpdateFrame);
     }
 
     private void processFixedFrame(Frame inputFrame) {
@@ -123,7 +126,7 @@ namespace Leap.Unity {
 
       _cachedFixedFrame.CopyFrom(inputFrame);
       if (!passthroughOnly) { ProcessFrame(ref _cachedFixedFrame); }
-      DispatchFixedFrameEvent(_cachedFixedFrame);
+      if (!_dispatchManually) DispatchFixedFrameEvent(_cachedFixedFrame);
     }
 
   }
