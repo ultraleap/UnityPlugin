@@ -90,7 +90,9 @@ namespace Leap.Unity {
     protected MultipleDeviceMode _multipleDeviceMode = MultipleDeviceMode.Disabled;
 
     [Tooltip("When Multiple Device Mode is set to `Specific`, the provider will " +
-      "receive data from only the devices that contain this in their serial number.")]
+      "receive data from only the devices that contain this in their serial number.  "+
+      "If the serial number is unknown, simply specify which DeviceID to " +
+      "sample from (0 is invalid, 1 and above are valid).")]
     [EditTimeOnly]
     [SerializeField]
     protected string _specificSerialNumber;
@@ -130,6 +132,11 @@ namespace Leap.Unity {
     protected SmoothedFloat _fixedOffset = new SmoothedFloat();
     protected SmoothedFloat _smoothedTrackingLatency = new SmoothedFloat();
     protected long _unityToLeapOffset;
+
+    // A counter to keep track of how many devices have been seen up through this point
+    // Allows a provider to latch onto a device based on its order of appearance
+    // (which correspond to that device's DeviceID)
+    protected uint _numDevicesSeen = 0;
 
     /// <summary>
     /// Device-space frames prior to transformation into world space.
@@ -487,7 +494,8 @@ namespace Leap.Unity {
         return;
       }
 
-      _leapController = new Controller(_multipleDeviceMode != MultipleDeviceMode.Disabled);
+      _leapController = new Controller(_specificSerialNumber.GetHashCode(),  
+                                       _multipleDeviceMode != MultipleDeviceMode.Disabled);
       _leapController.Device += (s, e) => {
         if (_onDeviceSafe != null) {
           _onDeviceSafe(e.Device);
@@ -500,7 +508,12 @@ namespace Leap.Unity {
         };
       } else if (_multipleDeviceMode == MultipleDeviceMode.Specific) {
         _onDeviceSafe += (d) => {
-          if (d.SerialNumber.Contains(_specificSerialNumber)) {
+          int DeviceID = 0;
+          _numDevicesSeen++;
+          if ((int.TryParse(_specificSerialNumber, out DeviceID) &&
+              _numDevicesSeen == (uint)DeviceID) ||
+             (_specificSerialNumber.Length > 1 &&
+              d.SerialNumber.Contains(_specificSerialNumber))) {
             _leapController.SubscribeToDeviceEvents(d);
           }
         };
