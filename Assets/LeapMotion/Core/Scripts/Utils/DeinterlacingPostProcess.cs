@@ -15,7 +15,9 @@ namespace Leap.Unity.Examples {
   public class DeinterlacingPostProcess : PostProcessProvider {
 
     [Tooltip("This provider will receive data from only the " +
-             "device that contains this in its serial number.")]
+             "device that contains this in its serial number. \n" +
+             "If the serial number is unknown, simply specify " +
+             "which DeviceIndex to grab frames from.")]
     [EditTimeOnly]
     [SerializeField]
     protected string _specificSerialNumber;
@@ -31,6 +33,12 @@ namespace Leap.Unity.Examples {
 
       _provider.GetLeapController().FrameReady -= dispatchFrameEvent;
       _provider.GetLeapController().FrameReady += dispatchFrameEvent;
+
+      // If the given "serial number" is one character, interpret it as the ID
+      int parsedID = 0;
+      if (_specificSerialNumber.Length == 1 && int.TryParse(_specificSerialNumber, out parsedID)) {
+        _thisProvidersID = (uint)parsedID;
+      }
     }
 
     public void Update() {
@@ -57,6 +65,18 @@ namespace Leap.Unity.Examples {
         DispatchUpdateFrameEvent(_retransformedFrame);
       } else {
         DispatchFixedFrameEvent(_retransformedFrame);
+      }
+    }
+
+    public override Frame CurrentFrame {
+      get {
+        return _retransformedFrame;
+      }
+    }
+
+    public override Frame CurrentFixedFrame {
+      get {
+        return _retransformedFrame;
       }
     }
 
