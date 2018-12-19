@@ -21,6 +21,7 @@ namespace Leap.Unity {
 
     [SerializeField]
     private string _relativePath;
+    public string relativePath { get { return _relativePath; } }
 
     /// <summary>
     /// Gets the full path to the streaming folder.  This operation is safe to be

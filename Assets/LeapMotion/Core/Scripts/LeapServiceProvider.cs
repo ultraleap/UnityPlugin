@@ -114,16 +114,16 @@ namespace Leap.Unity {
     /// Determines if the service provider should temporally resample frames for smoothness.
     /// </summary>
     [NonSerialized]
-    public bool UseInterpolation = true;
+    public bool useInterpolation = true;
 
     // Extrapolate on Android to compensate for the latency introduced by its graphics
     // pipeline.
 #if UNITY_ANDROID && !UNITY_EDITOR
-    protected int ExtrapolationAmount = 15;
-    protected int BounceAmount = 70;
+    protected int extrapolationAmount = 15;
+    protected int bounceAmount = 70;
 #else
-    protected int ExtrapolationAmount = 0;
-    protected int BounceAmount = 0;
+    protected int extrapolationAmount = 0;
+    protected int bounceAmount = 0;
 #endif
 
     protected Controller _leapController;
@@ -133,16 +133,17 @@ namespace Leap.Unity {
     protected SmoothedFloat _smoothedTrackingLatency = new SmoothedFloat();
     protected long _unityToLeapOffset;
 
-    // A counter to keep track of how many devices have been seen up through this point
-    // Allows a provider to latch onto a device based on its order of appearance
-    // (which correspond to that device's DeviceID)
+    /// <summary> A counter to keep track of how many devices have been seen up
+    /// through this point. Allows a provider to latch onto a device based on
+    /// its order of appearance, which corresponds to that device's DeviceID.
+    /// </summary>
     protected uint _numDevicesSeen = 0;
 
     /// <summary>
     /// Device-space frames prior to transformation into world space.
     /// </summary>
     [NonSerialized]
-    public Frame UntransformedUpdateFrame, UntransformedFixedFrame;
+    public Frame untransformedUpdateFrame, untransformedFixedFrame;
     protected Frame _transformedUpdateFrame, _transformedFixedFrame;
 
     #endregion
@@ -280,15 +281,16 @@ namespace Leap.Unity {
     protected virtual void Awake() {
       _fixedOffset.delay = 0.4f;
       _smoothedTrackingLatency.SetBlend(0.99f, 0.0111f);
-      UseInterpolation = _multipleDeviceMode.Equals(MultipleDeviceMode.All) ? false : UseInterpolation;
+      useInterpolation = _multipleDeviceMode.Equals(MultipleDeviceMode.All) ?
+        false : useInterpolation;
     }
 
     protected virtual void Start() {
       createController();
       _transformedUpdateFrame = new Frame();
       _transformedFixedFrame = new Frame();
-      UntransformedUpdateFrame = new Frame();
-      UntransformedFixedFrame = new Frame();
+      untransformedUpdateFrame = new Frame();
+      untransformedFixedFrame = new Frame();
     }
 
     protected virtual void Update() {
@@ -313,22 +315,23 @@ namespace Leap.Unity {
         return;
       }
 
-      if (UseInterpolation) {
+      if (useInterpolation) {
 #if !UNITY_ANDROID || UNITY_EDITOR
         _smoothedTrackingLatency.value = Mathf.Min(_smoothedTrackingLatency.value, 30000f);
         _smoothedTrackingLatency.Update((float)(_leapController.Now() - _leapController.FrameTimestamp()), Time.deltaTime);
 #endif
-        long timestamp = CalculateInterpolationTime() + (ExtrapolationAmount * 1000);
+        long timestamp = CalculateInterpolationTime() + (extrapolationAmount * 1000);
         _unityToLeapOffset = timestamp - (long)(Time.time * S_TO_NS);
 
-        _leapController.GetInterpolatedFrameFromTime(UntransformedUpdateFrame, timestamp, CalculateInterpolationTime() - (BounceAmount * 1000));
+        _leapController.GetInterpolatedFrameFromTime(untransformedUpdateFrame,
+          timestamp, CalculateInterpolationTime() - (bounceAmount * 1000));
       }
       else {
-        _leapController.Frame(UntransformedUpdateFrame);
+        _leapController.Frame(untransformedUpdateFrame);
       }
 
-      if (UntransformedUpdateFrame != null) {
-        transformFrame(UntransformedUpdateFrame, _transformedUpdateFrame);
+      if (untransformedUpdateFrame != null) {
+        transformFrame(untransformedUpdateFrame, _transformedUpdateFrame);
 
         DispatchUpdateFrameEvent(_transformedUpdateFrame);
       }
@@ -340,7 +343,7 @@ namespace Leap.Unity {
         return;
       }
 
-      if (UseInterpolation) {
+      if (useInterpolation) {
 
         long timestamp;
         switch (_frameOptimization) {
@@ -355,21 +358,21 @@ namespace Leap.Unity {
             // If we are re-using physics frames for update, we don't even want to care
             // about Time.fixedTime, just grab the most recent interpolated timestamp
             // like we are in Update.
-            timestamp = CalculateInterpolationTime() + (ExtrapolationAmount * 1000);
+            timestamp = CalculateInterpolationTime() + (extrapolationAmount * 1000);
             break;
           default:
             throw new System.InvalidOperationException(
               "Unexpected frame optimization mode: " + _frameOptimization);
         }
-        _leapController.GetInterpolatedFrame(UntransformedFixedFrame, timestamp);
+        _leapController.GetInterpolatedFrame(untransformedFixedFrame, timestamp);
 
       }
       else {
-        _leapController.Frame(UntransformedFixedFrame);
+        _leapController.Frame(untransformedFixedFrame);
       }
 
-      if (UntransformedFixedFrame != null) {
-        transformFrame(UntransformedFixedFrame, _transformedFixedFrame);
+      if (untransformedFixedFrame != null) {
+        transformFrame(untransformedFixedFrame, _transformedFixedFrame);
 
         DispatchFixedFrameEvent(_transformedFixedFrame);
       }
@@ -441,8 +444,8 @@ namespace Leap.Unity {
     /// custom script and trying to access Hand data from it directly afterward.
     /// </summary>
     public void RetransformFrames() {
-      transformFrame(UntransformedUpdateFrame, _transformedUpdateFrame);
-      transformFrame(UntransformedFixedFrame, _transformedFixedFrame);
+      transformFrame(untransformedUpdateFrame, _transformedUpdateFrame);
+      transformFrame(untransformedFixedFrame, _transformedFixedFrame);
     }
 
     /// <summary>
@@ -495,7 +498,7 @@ namespace Leap.Unity {
       }
 
       _leapController = new Controller(_specificSerialNumber.GetHashCode(),  
-                                       _multipleDeviceMode != MultipleDeviceMode.Disabled);
+        _multipleDeviceMode != MultipleDeviceMode.Disabled);
       _leapController.Device += (s, e) => {
         if (_onDeviceSafe != null) {
           _onDeviceSafe(e.Device);

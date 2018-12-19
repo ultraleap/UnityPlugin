@@ -582,8 +582,8 @@ namespace Leap.Unity {
           //Determine their new Transforms
           var interpolationTime = CalculateInterpolationTime();
           _leapController.GetInterpolatedLeftRightTransform(
-                            interpolationTime + (ExtrapolationAmount * 1000),
-                            interpolationTime - (BounceAmount * 1000),
+                            interpolationTime + (extrapolationAmount * 1000),
+                            interpolationTime - (bounceAmount * 1000),
                             (leftHand != null ? leftHand.Id : 0),
                             (rightHand != null ? rightHand.Id : 0),
                             out precullLeftHand,

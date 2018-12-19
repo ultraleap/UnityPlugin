@@ -29,7 +29,7 @@ namespace Leap.Unity.Examples {
     public void Start() {
       this._dispatchManually = true;
       _provider = _inputLeapProvider as LeapServiceProvider;
-      _provider.UseInterpolation = false;
+      _provider.useInterpolation = false;
 
       _provider.GetLeapController().FrameReady -= dispatchFrameEvent;
       _provider.GetLeapController().FrameReady += dispatchFrameEvent;
