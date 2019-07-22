@@ -23,7 +23,7 @@ namespace Leap.Unity.Examples {
                                    || target.workstationModeTween.targetTransform == null
                                    || target.workstationModeTween.startTransform == null
                                    || target.workstationModeTween.endTransform == null
-                                   || PrefabUtility.GetPrefabType(target.gameObject) == PrefabType.Prefab);
+                                   || Utils.IsObjectPartOfPrefabAsset(target.gameObject));
 
       EditorGUILayout.BeginHorizontal();
 

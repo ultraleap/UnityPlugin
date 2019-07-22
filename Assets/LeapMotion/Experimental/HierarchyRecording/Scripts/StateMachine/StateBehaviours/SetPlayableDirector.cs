@@ -17,6 +17,7 @@ namespace Leap.Unity.Recording {
 
   public class SetPlayableDirector : MonoBehaviour {
 
+    #pragma warning disable 0649
     [SerializeField]
     private PlayableDirector _director;
 
@@ -25,6 +26,7 @@ namespace Leap.Unity.Recording {
 
     [SerializeField]
     private DirectorWrapMode _wrapMode = DirectorWrapMode.None;
+    #pragma warning restore 0649
 
     private void OnEnable() {
       _director.time = 0;

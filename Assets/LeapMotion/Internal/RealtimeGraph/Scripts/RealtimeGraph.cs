@@ -344,6 +344,7 @@ namespace Leap.Unity.Graphing {
 
     private void UpdateTexture() {
       float max = _smoothedMax.value * 1.5f;
+      max = (max > 0f) ? Mathf.Max(0.0001f, max) : Mathf.Min(-0.0001f, max);
 
       Deque<float> history;
       switch (_graphMode) {
@@ -372,7 +373,7 @@ namespace Leap.Unity.Graphing {
 
       Vector3 localP = valueMesh.transform.localPosition;
       localP.y = _smoothedValue.value / max - 0.5f;
-      valueMesh.transform.localPosition = localP;
+      if(!float.IsNaN(localP.y) && !float.IsInfinity(localP.y)) valueMesh.transform.localPosition = localP;
     }
 
     protected Graph getGraph(string name, GraphUnits units) {

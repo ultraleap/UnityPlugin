@@ -144,5 +144,16 @@ namespace Leap.Unity {
       transform.MirrorZ(); // Unity is left handed.
       return transform;
     }
+
+    /**
+     * Transforms a Unity Transform object by a Unity Matrix4x4.
+     */
+    public static void Transform(this Transform thisTransform, Matrix4x4 transform) {
+      Matrix4x4 newTransform = transform * thisTransform.localToWorldMatrix;
+      thisTransform.position = newTransform.GetVector3();
+      thisTransform.rotation = newTransform.GetQuaternion();
+      thisTransform.localScale = Vector3.Scale(thisTransform.localScale,
+                                               transform.lossyScale);
+    }
   }
 }

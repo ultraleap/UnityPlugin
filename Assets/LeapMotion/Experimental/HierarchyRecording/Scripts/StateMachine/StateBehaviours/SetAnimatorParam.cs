@@ -11,6 +11,7 @@ using UnityEngine;
 
 public class SetAnimatorParam : MonoBehaviour {
 
+  #pragma warning disable 0649
   [SerializeField]
   private Animator _animator;
 
@@ -31,6 +32,7 @@ public class SetAnimatorParam : MonoBehaviour {
 
   [SerializeField]
   private float _floatValue;
+  #pragma warning restore 0649
 
   private object _defaultValue;
 

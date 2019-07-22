@@ -126,5 +126,15 @@ namespace Leap.Unity {
         obj.transform.localRotation = Quaternion.identity;
       }
     }
+
+    [MenuItem("GameObject/Deselect All %#d")]
+    static void DeselectAll() {
+      if (!CorePreferences.allowClearTransformHotkey) {
+        return;
+      }
+
+      Selection.objects = new Object[0];
+    }
+
   }
 }

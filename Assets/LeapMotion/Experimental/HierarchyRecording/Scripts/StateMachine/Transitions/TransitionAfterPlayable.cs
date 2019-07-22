@@ -14,8 +14,10 @@ namespace Leap.Unity.Recording {
   
   public class TransitionAfterPlayable : TransitionBehaviour {
 
+    #pragma warning disable 0649
     [SerializeField]
     private PlayableDirector _director;
+    #pragma warning restore 0649
 
     private bool _hasStartedPlaying = false;
 

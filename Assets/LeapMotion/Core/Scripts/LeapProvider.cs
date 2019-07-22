@@ -20,11 +20,12 @@ namespace Leap.Unity {
   /// of the Leap Motion Controller.
   /// </summary>
   public abstract class LeapProvider : MonoBehaviour {
-
+    
     public TestHandPose editTimePose = TestHandPose.HeadMountedA;
 
     public event Action<Frame> OnUpdateFrame;
     public event Action<Frame> OnFixedFrame;
+    public event Action<Frame> OnPostUpdateFrame;
 
     /// <summary>
     /// The current frame for this update cycle, in world space. 
@@ -49,6 +50,9 @@ namespace Leap.Unity {
     protected void DispatchUpdateFrameEvent(Frame frame) {
       if (OnUpdateFrame != null) {
         OnUpdateFrame(frame);
+      }
+      if (OnPostUpdateFrame != null) {
+        OnPostUpdateFrame(frame);
       }
     }
 

@@ -22,6 +22,8 @@ namespace Leap.Unity {
     public float delay = 0f; // Mean delay
     public bool reset = true; // Reset on Next Update
 
+    public SmoothedFloat(float blend = 0f, float deltaTime = 1f) { SetBlend(blend); }
+
     public void SetBlend(float blend, float deltaTime = 1f) {
       delay = deltaTime * blend / (1f - blend);
     }

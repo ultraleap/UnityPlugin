@@ -81,7 +81,26 @@ namespace Leap.Unity {
       _leapPreferenceItems.Sort((a, b) => a.attribute.order.CompareTo(b.attribute.order));
     }
 
+  #if UNITY_2018_3_OR_NEWER
+    // Implementations Leap Motion settings using the new SettingsProvider API.
+    private class LeapMotionSettingsProvider : SettingsProvider {
+      public LeapMotionSettingsProvider(string path, SettingsScope scopes = SettingsScope.User)
+      : base(path, scopes)
+      { }
+
+      public override void OnGUI(string searchContext) {
+        DrawPreferencesGUI();
+      }
+    }
+ 
+    [SettingsProvider]
+    static SettingsProvider GetSettingsProvider()
+    {
+        return new LeapMotionSettingsProvider("Preferences/Leap Motion");
+    }
+#else
     [PreferenceItem("Leap Motion")]
+#endif
     public static void DrawPreferencesGUI() {
       ensurePreferenceItemsLoaded();
 

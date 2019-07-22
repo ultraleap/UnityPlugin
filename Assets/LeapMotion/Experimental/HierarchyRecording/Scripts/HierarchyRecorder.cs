@@ -508,7 +508,13 @@ namespace Leap.Unity.Recording {
         postProcessComponent.assetFolder = new AssetFolder(finalSubFolder);
 
         string prefabPath = Path.Combine(finalSubFolder, recordingName + " Raw.prefab");
+        #if UNITY_2018_3_OR_NEWER
+        var path = prefabPath.Replace('\\', '/');
+        PrefabUtility.SaveAsPrefabAsset(myGameObject, path, out bool didSucceed);
+        if (!didSucceed) { Debug.LogError($"Error saving prefab asset to {path}"); }
+        #else
         PrefabUtility.CreatePrefab(prefabPath.Replace('\\', '/'), myGameObject);
+        #endif
 
         AssetDatabase.Refresh();
 

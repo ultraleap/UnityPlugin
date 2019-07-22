@@ -55,7 +55,7 @@ namespace Leap.Unity {
         model.SetLeapHand(MostRecentHand);
         model.InitHand();
         model.BeginHand();
-        model.UpdateHand();
+        model.UpdateHandWithEvent();
       } else {
         model.SetLeapHand(MostRecentHand);
         model.BeginHand();
@@ -76,7 +76,7 @@ namespace Leap.Unity {
       if (handModels != null) {
         for (int i = 0; i < handModels.Count; i++) {
           handModels[i].SetLeapHand(hand);
-          handModels[i].UpdateHand();
+          handModels[i].UpdateHandWithEvent();
         }
       }
     }

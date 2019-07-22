@@ -95,16 +95,21 @@ namespace Leap.Unity.Animation {
     /// The time is clamped within the t0 - t1 range.
     /// </summary>
     public Vector3 PositionAt(float t) {
-      float i = Mathf.Clamp01((t - t0) / (t1 - t0));
-      float i2 = i * i;
-      float i3 = i2 * i;
+      if (t > t1) {
+        float i = ((t - t0) / (t1 - t0)) - 1f;
+        return pos1 + (vel1 * i);
+      } else {
+        float i = Mathf.Clamp01((t - t0) / (t1 - t0));
+        float i2 = i * i;
+        float i3 = i2 * i;
 
-      Vector3 h00 = (2 * i3 - 3 * i2 + 1) * pos0;
-      Vector3 h10 = (i3 - 2 * i2 + i) * (t1 - t0) * vel0;
-      Vector3 h01 = (-2 * i3 + 3 * i2) * pos1;
-      Vector3 h11 = (i3 - i2) * (t1 - t0) * vel1;
+        Vector3 h00 = (2 * i3 - 3 * i2 + 1) * pos0;
+        Vector3 h10 = (i3 - 2 * i2 + i) * (t1 - t0) * vel0;
+        Vector3 h01 = (-2 * i3 + 3 * i2) * pos1;
+        Vector3 h11 = (i3 - i2) * (t1 - t0) * vel1;
 
-      return h00 + h10 + h01 + h11;
+        return h00 + h10 + h01 + h11;
+      }
     }
 
     /// <summary>

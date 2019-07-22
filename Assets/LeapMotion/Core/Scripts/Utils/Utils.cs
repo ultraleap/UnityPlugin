@@ -51,14 +51,16 @@ namespace Leap.Unity {
     /// <summary>
     /// System.Array.Reverse is actually surprisingly complex / slow.  This
     /// is a basic generic implementation of the reverse algorithm.
+    /// Returns the passed-in reference to allow call chaining.
     /// </summary>
-    public static void Reverse<T>(this T[] array) {
+    public static T[] Reverse<T>(this T[] array) {
       int mid = array.Length / 2;
       int i = 0;
       int j = array.Length;
       while (i < mid) {
         array.Swap(i++, --j);
       }
+      return array;
     }
 
     /// <summary>
@@ -225,9 +227,228 @@ namespace Leap.Unity {
       return relativePath;
     }
 
+    /// <summary> Enforces the requirement that the argument-by-ref array is
+    /// non-null. If it's null, a new one of length 0 will be allocated.
+    /// No length requirement is enforced.
+    /// </summary>
+    public static T[] Require<T>(ref T[] arr) {
+      if (arr == null) {
+        var oldArr = arr;
+        arr = new T[0];
+        if (oldArr != null) {
+          for (var i = 0; i < oldArr.Length && i < arr.Length; i++) {
+            arr[i] = oldArr[i];
+          }
+        }
+      }
+      return arr;
+    }
+
+    /// <summary> Enforces the requirement that the argument-by-ref array is
+    /// non-null, and that it is the required length. The passed lambda is called with each index if the array is re-initialized to match the required length. </summary>
+    public static T[] Require<T>(ref T[] arr, int length, Func<int, T> createAtIdx) {
+      if (arr == null || arr.Length != length) {
+        arr = new T[length];
+        for (var i = 0; i < length; i++) {
+          arr[i] = createAtIdx(i);
+        }
+      }
+      return arr;
+    }
+
+    /// <summary> Enforces the requirement that the argument-by-ref array is
+    /// non-null and that its length is the argument requiredLength. If either
+    /// required invariant is not satisfied, a new array is allocated and the
+    /// reference becomes the newly-allocated array. Any values in the original
+    /// array are transferred to the new array when this occurs.
+    ///
+    /// The final array that satisfies the non-null and length invariants is
+    /// returned, whether it's the original array or the newly-allocated one.
+    /// </summary>
+    public static T[] Require<T>(ref T[] arr, int length) {
+      if (arr == null || arr.Length != length) {
+        var oldArr = arr;
+        arr = new T[length];
+        if (oldArr != null) {
+          for (var i = 0; i < oldArr.Length && i < arr.Length; i++) {
+            arr[i] = oldArr[i];
+          }
+        }
+      }
+      return arr;
+    }
+
+    /// <summary> Enforces the requirement that the argument-by-ref array is
+    /// non-null and that it contains the arguments that follow in sequence.
+    /// If the array is null or the wrong length, a new array is allocated and
+    /// the reference becomes the newly-allocated array. Any values in the
+    /// original array are transferred to the new array when this occurs.
+    ///
+    /// The final array that satisfies the non-null length, and contents
+    /// invariants is returned, whether it's the original array or the
+    /// newly-allocated one.
+    /// </summary>
+    public static T[] Require<T>(ref T[] arr, T item0) {
+      Require(ref arr, 1);
+      arr[0] = item0;
+      return arr;
+    }
+
+    /// <summary> Enforces the requirement that the argument-by-ref array is
+    /// non-null and that it contains the arguments that follow in sequence.
+    /// If the array is null or the wrong length, a new array is allocated and
+    /// the reference becomes the newly-allocated array. No re-allocation occurs
+    /// if only the contents need to change.
+    ///
+    /// The final array that satisfies the non-null, length, and content
+    /// invariants is returned, whether it's the original array or the
+    /// newly-allocated one.
+    /// </summary>
+    public static T[] Require<T>(ref T[] arr, T item0, T item1) {
+      Require(ref arr, 2);
+      arr[0] = item0; arr[1] = item1;
+      return arr;
+    }
+
+    /// <summary> Enforces the requirement that the argument-by-ref array is
+    /// non-null and that it contains the arguments that follow in sequence.
+    /// If the array is null or the wrong length, a new array is allocated and
+    /// the reference becomes the newly-allocated array. No re-allocation occurs
+    /// if only the contents need to change.
+    ///
+    /// The final array that satisfies the non-null, length, and content
+    /// invariants is returned, whether it's the original array or the
+    /// newly-allocated one.
+    /// </summary>
+    public static T[] Require<T>(ref T[] arr, T item0, T item1, T item2, T item3) {
+      Require(ref arr, 4);
+      arr[0] = item0; arr[1] = item1; arr[2] = item2; arr[3] = item3;
+      return arr;
+    }
+
+    /// <summary> Enforces the requirement that the argument-by-ref array is
+    /// non-null and that it contains the arguments that follow in sequence.
+    /// If the array is null or the wrong length, a new array is allocated and
+    /// the reference becomes the newly-allocated array. No re-allocation occurs
+    /// if only the contents need to change.
+    ///
+    /// The final array that satisfies the non-null, length, and content
+    /// invariants is returned, whether it's the original array or the
+    /// newly-allocated one.
+    /// </summary>
+    public static T[] Require<T>(ref T[] arr, T item0, T item1, T item2, T item3,
+      T item4)
+    {
+      Require(ref arr, 5);
+      arr[0] = item0; arr[1] = item1; arr[2] = item2; arr[3] = item3;
+      arr[4] = item4;
+      return arr;
+    }
+
+    /// <summary> Enforces the requirement that the argument-by-ref List is
+    /// non-null and that it is exactly as long as `length`.
+    /// </summary>
+    public static List<T> RequireLen<T>(ref List<T> list, int length) {
+      list = Require(ref list);
+      list.Clear();
+      while (list.Count < length) { list.Add(default); }
+      return list;
+    }
+
+    /// <summary> Enforces the requirement that the argument-by-ref List is
+    /// non-null and that it (exactly) contains the arguments that follow it.
+    ///
+    /// The final list that satisfies the non-null and length invariants is
+    /// returned, whether it's the original array or a newly-allocated one.
+    /// </summary>
+    public static List<T> Require<T>(ref List<T> list, T item0) {
+      list = Require(ref list);
+      list.Clear();
+      list[0] = item0;
+      return list;
+    }
+
+    /// <summary> Enforces the requirement that the argument-by-ref List is
+    /// non-null and that it (exactly) contains the arguments that follow it.
+    ///
+    /// The final list that satisfies the non-null and length invariants is
+    /// returned, whether it's the original array or a newly-allocated one.
+    /// </summary>
+    public static List<T> Require<T>(ref List<T> list, T item0, T item1) {
+      list = Require(ref list);
+      list.Clear();
+      list.Add(item0);
+      list.Add(item1);
+      return list;
+    }
+
+    /// <summary> Enforces the requirement that the argument-by-ref List is
+    /// non-null and that it (exactly) contains the arguments that follow it.
+    /// </summary>
+    public static List<T> Require<T>(ref List<T> list, T item, T[] items) {
+      list = Require(ref list);
+      list.Clear();
+      list.Add(item);
+      list.AddRange(items);
+      return list;
+    }
+
+    /// <summary> Enforces the requirement that T is not null.
+    /// If it is, creates a new valid T by calling the passed function.
+    /// If a new T is created in this way, the object reference is switched out
+    /// for the new T.
+    ///
+    /// The created (or original, if already non-default) T is returned for
+    /// convenience.
+    /// </summary>
+    public static T Require<T>(ref T t, Func<T> makeValidT) where T : class {
+      if (t == default(T)) {
+        t = makeValidT();
+      }
+      return t;
+    }
+
+    /// <summary> Enforces the requirement that T is not null.
+    /// If it is, creates a new valid T by calling the passed function.
+    /// If a new T is created in this way, the object reference is switched out
+    /// for the new T.
+    ///
+    /// The created (or original, if already non-default) T is returned for
+    /// convenience.
+    /// </summary>
+    public static T? Require<T>(ref T? t, Func<T> makeValidT) where T : struct {
+      if (t == null) {
+        t = makeValidT();
+      }
+      return t;
+    }
+
+    /// <summary> Enforces the requirement that T is not null.
+    /// If it is, creates a new valid T by calling new T().
+    /// If a new T is created in this way, the object reference is switched out
+    /// for the new T.
+    ///
+    /// The created (or original, if already non-default) T is returned for
+    /// convenience.
+    /// </summary>
+    public static T Require<T>(ref T t) where T : class, new() {
+      if (t == default(T)) {
+        t = new T();
+      }
+      return t;
+    }
+
+    /// <summary> Returns the argument object if this object is null, or this
+    /// object if it is non-null. </summary>
+    public static T OrIfNull<T>(this T t, T otherwise) where T : class {
+      if (t == null) { return otherwise; }
+      return t;
+    }
+
     #endregion
 
     #region String Utils
+
     /// <summary>
     /// Trims a specific number of characters off of the end of the
     /// provided string.  When the number of trimmed characters is
@@ -260,6 +481,11 @@ namespace Leap.Unity {
       } else {
         return str;
       }
+    }
+
+    public static string[] GetNamePieces(string value) {
+      var niceName = GenerateNiceName(value).ToLower();
+      return niceName.Split(new char[] {' '});
     }
 
     /// <summary>
@@ -370,6 +596,15 @@ namespace Leap.Unity {
 
       return result.Trim();
     }
+
+    public static int Count(this string str, char toCount) {
+      int count = 0;
+      foreach (var c in str) {
+        if (c == toCount) { count++; }
+      }
+      return count;
+    }
+
     #endregion
 
     #region Print Utils
@@ -378,14 +613,23 @@ namespace Leap.Unity {
     /// Prints the elements of an array in a bracket-enclosed, comma-delimited list,
     /// prefixed by the elements' type.
     /// </summary>
-    public static string ToArrayString<T>(this IEnumerable<T> enumerable) {
+    public static string ToArrayString<T>(this IEnumerable<T> enumerable,
+      System.Func<T, string> toStringFunc = null)
+    {
       var str = "[" + typeof(T).Name + ": ";
       bool addedFirstElement = false;
       foreach (var t in enumerable) {
         if (addedFirstElement) {
           str += ", ";
         }
-        str += t.ToString();
+        if (toStringFunc != null) {
+          if (t == null) { str += "<null>"; }
+          else { str += toStringFunc(t); }
+        }
+        else {
+          if (t == null) { str += "<null>"; }
+          else { str += t.ToString(); }
+        }
 
         addedFirstElement = true;
       }
@@ -394,9 +638,78 @@ namespace Leap.Unity {
       return str;
     }
 
+    /// <summary> Supported languages: "csharp", "python" </summary>
+    public static string ToCodeArrayString(this IEnumerable<Vector3> vectors, string language = null) {
+      var sb = new System.Text.StringBuilder();
+
+      bool csharp = false, python = false;
+      if (language == null || language.Equals("csharp")) { csharp = true; }
+      if (language.Equals("python")) { python = true; }
+
+      var arrPrefix = "";
+      if (csharp) { arrPrefix = "new Vector3[] { \n"; }
+      else if (python) { arrPrefix = "np.array([ \n"; }
+      sb.Append(arrPrefix);
+      
+      var elPrefix = "";
+      if (csharp) { elPrefix = "  new Vector3("; }
+      else if (python) { elPrefix = "  ["; }
+
+      Func<float, string> f2s = f => f.ToString("R") + "";
+      if (csharp) { f2s = f => f.ToString("R") + "f"; }
+      else if (python) { f2s = f => (f * 1000).ToString("R") + ""; }
+
+      var compSep = ", ";
+      if (csharp) { compSep = ", "; }
+      else if (python) { compSep = ", "; }
+
+      var elPostfix = "";
+      if (csharp) { elPostfix = "),\n"; }
+      else if (python) { elPostfix = "],\n"; }
+
+      foreach (var v in vectors) {
+        sb.Append(elPrefix);
+        sb.Append(f2s(v[0]) + compSep);
+        sb.Append(f2s(v[1]) + compSep);
+        sb.Append(f2s(v[2]));
+        sb.Append(elPostfix);
+      }
+
+      if (csharp) {
+        sb.Length -= 2;
+        sb.Append("\n};");
+      } else if (python) {
+        sb.Length -= 2;
+        sb.Append("\n])");
+      }
+      
+      return sb.ToString();
+    }
+
+    public static string ToCodeArrayString(this IEnumerable<Quaternion> quats) {
+      var sb = new System.Text.StringBuilder();
+      sb.Append("new Quaternion[] { \n");
+      foreach (var q in quats) {
+        sb.Append("  new Quaternion(");
+        sb.Append(q[0].ToString("R") + "f, ");
+        sb.Append(q[1].ToString("R") + "f, ");
+        sb.Append(q[2].ToString("R") + "f, ");
+        sb.Append(q[3].ToString("R") + "f),\n");
+      }
+      sb.Length -= 2;
+      sb.Append("\n};");
+      
+      return sb.ToString();
+    }
+
     #endregion
 
     #region Math Utils
+
+    public static class Math {
+      /// <summary> 1.61803398875f </summary>
+      public const float PHI = 1.61803398875f;
+    }
 
     public static int Repeat(int x, int m) {
       int r = x % m;
@@ -548,6 +861,50 @@ namespace Leap.Unity {
       return arr;
     }
 
+    /// <summary> Executes the delegate for each object in the array that is
+    /// non-null. </summary>
+    public static void ForEach<T>(this T[] arr, Action<T> doFunc) 
+      where T : class
+    {
+      foreach (var t in arr) {
+        if (t != null) { doFunc(t); }
+      }
+    }
+
+    /// <summary> Executes the delegate for each object in the array that can
+    /// be cast to the generic argument type. The delegate is not called if the
+    /// cast results in null. </summary>
+    public static void ForEach<T>(this object[] arr, Action<T> doFunc) 
+      where T : class
+    {
+      foreach (var obj in arr) {
+        var t = obj as T;
+        if (t != null) { doFunc(t); }
+      }
+    }
+
+    /// <summary> Modifies each element of the array in-place using `mapFunc`.
+    /// </summary>
+    public static void Transform<T>(this T[] arr, Func<T, T> mapFunc) {
+      for (var i = 0; i < arr.Length; i++) {
+        arr[i] = mapFunc(arr[i]);
+      }
+    }
+    
+    /// <summary> Search support for arrays of types that implement IEquatable,
+    /// e.g. many standard value types like `int` and `float`. </summary>
+    public static bool ContainsValue<T>(this T[] arr, T value) where T: IEquatable<T> {
+      for (var i = 0; i < arr.Length; i++) {
+        if (arr[i].Equals(value)) { return true; }
+      }
+      return false;
+    }
+
+    /// <summary> Returns whether the array contains the value via Array.IndexOf. </summary>
+    public static bool Contains<T>(this T[] arr, T value) {
+      return System.Array.IndexOf(arr, value) != -1;
+    }
+   
     #endregion
 
     #region List Utils
@@ -612,6 +969,56 @@ namespace Leap.Unity {
       list.Add(t3);
     }
 
+    /// <summary> Applies the function to each item in the list, in-place.
+    /// Also known as a "map" operation. </summary>
+    public static void ForEach<T>(this List<T> list, Func<T, T> applyFunc) {
+      for (var i = 0; i < list.Count; i++) {
+        list[i] = applyFunc(list[i]);
+      }
+    }
+
+    /// <summary> Calls `Clear()` on the list and returns it. Useful for chain
+    /// calls on lists, because the built-in list `Clear()` returns null.
+    /// </summary>
+    public static List<T> Cleared<T>(this List<T> list) {
+      list.Clear(); return list;
+    }
+
+    /// <summary> Copies each element from src by calling the copyElementFunc.
+    /// If the source list is null or empty, the destination list will be
+    /// emptied (unless `dontClear` is passed).
+    /// 
+    /// Returns the destination List for convenience. </summary>
+    public static List<T> CopyFrom<T>(this List<T> dst, List<T> src,
+      System.Action<T, T> copyElementFunc, bool dontClear = false)
+      where T: class, new()
+    {
+      if (!dontClear) { dst.Clear(); }
+      if (src == null) { return dst; }
+      foreach (var srcT in src) {
+        var dstT = new T();
+        copyElementFunc(srcT, dstT);
+        dst.Add(dstT);
+      }
+      return dst;
+    }
+
+    #endregion
+
+    #region Nullable Utils
+
+    /// <summary>
+    /// Returns the value of the nullable if it has one, or returns defaultValue.
+    /// </summary>
+    public static T UnwrapOr<T>(this T? nullable, T defaultValue)
+      where T : struct
+    {
+      if (nullable.HasValue) {
+        return nullable.Value;
+      }
+      return defaultValue;
+    }
+
     #endregion
 
     #endregion
@@ -619,6 +1026,22 @@ namespace Leap.Unity {
     #region Unity Utilities
 
     #region Unity Object Utils
+
+    /// <summary> Gets whether the target object is part of a prefab asset (excluding prefab instances.) Compiles differently pre- and post-2018.3. Also compiles differently in builds, where this method always returns false. </summary>
+    public static bool IsObjectPartOfPrefabAsset(UnityEngine.Object obj) {
+      #if UNITY_EDITOR
+      #if UNITY_2018_3_OR_NEWER
+      // Exclude objects that are not part of any prefab, and exclude prefab _instances_.
+      return UnityEditor.PrefabUtility.IsPartOfAnyPrefab(obj) &&
+        UnityEditor.PrefabUtility.GetPrefabInstanceStatus(obj) == UnityEditor.PrefabInstanceStatus.NotAPrefab;
+      #else
+      // Before 2018.3, use GetPrefabType.
+      return PrefabUtility.GetPrefabType(obj) == PrefabType.Prefab;
+      #endif
+      #else
+      return false;
+      #endif
+    }
 
     /// <summary>
     /// Usage is the same as FindObjectOfType, but this method will also return objects
@@ -631,12 +1054,8 @@ namespace Leap.Unity {
       return Resources.FindObjectsOfTypeAll<T>().Query()
         .Where(o => {
 #if UNITY_EDITOR
-          // Exclude prefabs.
-          var prefabType = UnityEditor.PrefabUtility.GetPrefabType(o);
-          if (prefabType == UnityEditor.PrefabType.ModelPrefab
-          || prefabType == UnityEditor.PrefabType.Prefab) {
-            return false;
-          }
+          // Exclude prefab assets found by the Resources scan.
+          if (IsObjectPartOfPrefabAsset(o)) { return false; }
 #endif
           return true;
         })
@@ -682,6 +1101,79 @@ namespace Leap.Unity {
       public void Dispose() { }
     }
 
+    public static List<Transform> GetSelfAndAllChildren(this Transform t,
+      bool breadthFirst = false)
+    {
+      var transforms = new List<Transform>();
+      transforms.Add(t);
+      GetAllChildren(t, transforms, breadthFirst);
+      return transforms;
+    }
+    
+    /// <summary>
+    /// Scans all the children in order of the argument Transform, appending
+    /// each transform it finds to toFill. Children are added depth-first by default.
+    ///
+    /// Pass breadthFirst: true to fill the list breadth-first instead.
+    /// </summary>
+    public static void GetAllChildren(this Transform t, List<Transform> toFill,
+                                      bool breadthFirst = false) {
+      if (breadthFirst) {
+        var cursor = t; var cursorIdx = toFill.Count; var endIdx = cursorIdx;
+        do {
+          endIdx += addImmediateChildren(cursor, toFill);
+          cursorIdx += 1;
+          if (cursorIdx >= endIdx) break;
+          cursor = toFill[cursorIdx];
+        } while (true);
+      }
+      else {
+        addChildrenRecursive(t, toFill);
+      }
+    }
+    private static void addChildrenRecursive(Transform t, List<Transform> list) {
+      if (t == null) { return; }
+      foreach (var child in t.GetChildren()) {
+        list.Add(child);
+        addChildrenRecursive(child, list);
+      }
+    }
+    private static int addImmediateChildren(Transform t, List<Transform> list) {
+      int numChildren = 0;
+      foreach (var child in t.GetChildren()) {
+        list.Add(child); numChildren++;
+      }
+      return numChildren;
+    }
+
+    /// <summary> As FindChild(string), but tries to find the first string first, then moves onto each next string until a non-null matching child is found. </summary>
+    public static Transform FindChild(this Transform t, string[] possibleNames,
+      bool caseSensitive = true)
+    {
+      foreach (var name in possibleNames) {
+        var found = FindChild(t, name, caseSensitive);
+        if (found != null) { return found; }
+      }
+      return null;
+    }
+
+    /// <summary> Returns the first child whose name includes the 'withName' argument string. Optionally pass caseSensitive: false to ignore case. Children are scanned deeply using Utils.GetAllChildren. If no such child exists, returns null. </summary>
+    public static Transform FindChild(this Transform t, string withName,
+      bool caseSensitive = true)
+    {
+      var children = Utils.Require(ref _b_findChildBuffer);
+      children.Clear();
+      t.GetAllChildren(children);
+      if (!caseSensitive) { withName = withName.ToLower(); }
+      foreach (var child in children) {
+        var name = child.name;
+        if (!caseSensitive) { name = name.ToLower(); }
+        if (child.name.Contains(withName)) { return child; }
+      }
+      return null;
+    }
+    private static List<Transform> _b_findChildBuffer = new List<Transform>();
+
     /// <summary>
     /// Sets the localPosition, localRotation, and localScale to their default values:
     /// Vector3.zero, Quaternion.identity, and Vector3.one.
@@ -699,6 +1191,65 @@ namespace Leap.Unity {
     public static void ResetLocalPose(this Transform t) {
       t.localPosition = Vector3.zero;
       t.localRotation = Quaternion.identity;
+    }
+
+    /// <summary> Determines the cardinal direction in the rotated frame that
+    /// most closely points towards the global-frame argument direction.
+    /// The positive or negative X, Y, or Z axis directions (converted to global
+    /// space via the rotated frame) are the six possible return values.
+    /// </summary>
+    public static Vector3 GetClosestAxisDirection(this Transform t, Vector3 toDir) {
+      return t.rotation.GetClosestAxisDirection(toDir);
+    }
+
+    /// <summary> Attempts to set the `localToWorldMatrix` of this Transform to
+    /// the target matrix by retreiving a pose and lossy scale from the target
+    /// matrix and adjusting the transform data appropriately. This operation
+    /// won't work for projective matrices, and is disabled at edit-time by
+    /// default because it can destroy Transform information (enable edit-time
+    /// by passing `allowAtEditTime` at your own risk). </summary>
+    public static void SetMatrix(this Transform t, Matrix4x4 targetMatrix,
+      bool allowAtEditTime = false)
+    {
+      var pose = targetMatrix.GetPose();
+      var scale = targetMatrix.lossyScale;
+      
+      if (!Application.isPlaying && !allowAtEditTime) {
+        throw new System.Exception("Transform.SetMatrix extension was called " +
+          "at edit-time without `allowAtEditTime` set. Because attempting " +
+          "to set the matrix of a Transform is a non-guaranteed operation and " +
+          "would modify the Transform data at edit-time, you must opt-in to this " +
+          "behavior (at your own risk).");
+      }
+      else {
+        t.SetPose(pose);
+        if (t.parent != null) { scale = scale.CompDiv(t.parent.lossyScale); }
+        t.localScale = scale;
+      }
+    }
+
+    /// <summary> Returns the worldToLocal matrix of the transform. </summary>
+    public static Matrix4x4 LocalFromWorld(this Transform t) {
+      return t.worldToLocalMatrix;
+    }
+
+    /// <summary> Returns the localToWorld matrix of the transform. </summary>
+    public static Matrix4x4 WorldFromLocal(this Transform t) {
+      return t.localToWorldMatrix;
+    }
+
+    /// <summary> Tries to set the lossyScale of the Transform to the argument.
+    /// Will likely fail in various edge cases, use at your own risk. </summary>
+    public static void SetLossyScale(this Transform t, Vector3 lossyScale) {
+      var scale = lossyScale;
+      if (t.parent != null) { scale = scale.CompDiv(t.parent.lossyScale); }
+      t.localScale = scale;
+    }
+
+    /// <summary> Returns the world-space distance between the origins of two
+    /// Transforms. </summary>
+    public static float Distance(Transform t0, Transform t1) {
+      return Vector3.Distance(t0.position, t1.position);
     }
 
     #endregion
@@ -803,8 +1354,56 @@ namespace Leap.Unity {
     /// </summary>
     /// <param name="thisTransform"></param>
     /// <param name="transform"></param>
-    public static void LookAwayFrom(this Transform thisTransform, Transform transform, Vector3 upwards) {
+    public static void LookAwayFrom(this Transform thisTransform,
+      Transform transform, Vector3 upwards)
+    {
       thisTransform.rotation = Quaternion.LookRotation(thisTransform.position - transform.position, upwards);
+    }
+
+    /// <summary> Determines the cardinal direction in the rotated frame that
+    /// most closely points towards the global-frame argument direction.
+    /// The positive or negative X, Y, or Z axis directions (converted to global
+    /// space via the rotated frame) are the six possible return values.
+    /// </summary>
+    public static Vector3 GetClosestAxisDirection(this Quaternion q,
+      Vector3 toDir)
+    {
+      var localDir = (Quaternion.Inverse(q) * toDir).normalized;
+      var closestAxis = Vector3.right;
+      var largestDot = -1f;
+      for (var sign = 1; sign >= -1; sign -= 2) {
+        for (var axis = 0; axis < 3; axis++) {
+          var testAxis = Vector3.zero; testAxis[axis] = 1f * sign;
+          var testDot = Vector3.Dot(localDir, testAxis);
+          if (testDot > largestDot) {
+            largestDot = testDot;
+            closestAxis = testAxis;
+          }
+        }
+      }
+      return (q * closestAxis).normalized;
+    }
+
+    /// <summary> Determines the cardinal direction in the rotated frame that
+    /// most closely points towards the local-frame argument direction.
+    /// The positive or negative X, Y, or Z axis directions are the six possible
+    /// return values.
+    /// </summary>
+    public static Vector3 GetClosestLocalAxisDirection(Vector3 toLocalDir)
+    {
+      var closestAxis = Vector3.right;
+      var largestDot = -1f;
+      for (var sign = 1; sign >= -1; sign -= 2) {
+        for (var axis = 0; axis < 3; axis++) {
+          var testAxis = Vector3.zero; testAxis[axis] = 1f * sign;
+          var testDot = Vector3.Dot(toLocalDir, testAxis);
+          if (testDot > largestDot) {
+            largestDot = testDot;
+            closestAxis = testAxis;
+          }
+        }
+      }
+      return closestAxis.normalized;
     }
 
     #endregion
@@ -828,11 +1427,104 @@ namespace Leap.Unity {
       return t.InverseTransformPoint(v);
     }
 
-    
+    /// <summary>
+    /// Returns a Vector4 with this Vector3's values and the specified w value.
+    /// </summary>
+    public static Vector4 WithW(this Vector3 v, float w) {
+      return new Vector4(v.x, v.y, v.z, w);
+    }
+
+    /// <summary> Returns the point pivoted around the argument pivot point with
+    /// the argument rotation. </summary>
+    public static Vector3 Pivot(this Vector3 point, Vector3 pivot,
+      Quaternion rotation)
+    {
+      var pointFromPivot = point - pivot;
+      var rotatedPointFromPivot = rotation * pointFromPivot;
+      return pivot + rotatedPointFromPivot;
+    }
+
+    /// <summary> Constructs an AngleAxis rotation that aligns this vector to
+    /// the argument `toDir` on a single axis, by projecting it onto the plane
+    /// defined by the axis and rotating v (also on that plane) to align with it.
+    /// 
+    /// Can optionally receive the computed signed angle out to the `angle`
+    /// parameter.
+    /// </summary>
+    public static Quaternion GetAxisFromToRotation(this Vector3 v, Vector3 toDir,
+      Vector3 axis, out float angle, float? minAngle = null,
+      float? maxAngle = null)
+    {
+      v = Vector3.ProjectOnPlane(v, axis);
+      var toDir_axis = Vector3.ProjectOnPlane(toDir, axis);
+      angle = Vector3.SignedAngle(v, toDir_axis, axis);
+      if (minAngle != null) { angle = Mathf.Max(minAngle.Value, angle); }
+      if (maxAngle != null) { angle = Mathf.Min(maxAngle.Value, angle); }
+      var rotation = Quaternion.AngleAxis(angle, axis);
+      return rotation;
+    }
+
+    /// <summary> Constructs an AngleAxis rotation that aligns this vector to
+    /// the argument `toDir` on a single axis, by projecting it onto the plane
+    /// defined by the axis and rotating v (also on that plane) to align with it.
+    /// </summary>
+    public static Quaternion GetAxisFromToRotation(this Vector3 v, Vector3 toDir,
+      Vector3 axis, float? minAngle = null, float? maxAngle = null)
+    {
+      var unusedAngle = 0f;
+      return GetAxisFromToRotation(v, toDir, axis, out unusedAngle, minAngle,
+        maxAngle);
+    }
+
+    public static Vector3 GetCentroid(
+      System.Action<List<Vector3>> fillPoints)
+    {
+      var points = Pool<List<Vector3>>.Spawn().Cleared();
+      fillPoints(points);
+      if (points.Count == 0) { return default(Vector3); }
+
+      var centroid = Vector3.zero;
+      for (var i = 0; i < points.Count; i++) {
+        centroid += points[i];
+      }
+      centroid /= points.Count;
+
+      return centroid;
+    }
+
+    public static Vector3 GetCentroid(Vector3[] points)
+    {
+      var centroid = Vector3.zero;
+      for (var i = 0; i < points.Length; i++) {
+        centroid += points[i];
+      }
+      centroid /= points.Length;
+
+      return centroid;
+    }
+
+    public static Vector3 ConstrainToNormal(this Vector3 direction,
+      Vector3 normalDirection, float maxAngle)
+    {
+      if (maxAngle <= 0f) return normalDirection.normalized * direction.magnitude;
+      if (maxAngle >= 180f) return direction;
+      float angle = Mathf.Acos(Mathf.Clamp(
+        Vector3.Dot(direction.normalized, normalDirection.normalized),
+        -1f, 1f)) * Mathf.Rad2Deg;
+      return Vector3.Slerp(direction.normalized, normalDirection.normalized,
+        (angle - maxAngle) / angle) * direction.magnitude;
+    }
 
     #endregion
 
     #region Quaternion Utils
+
+    public static bool ContainsNaN(this Quaternion q) {
+      return float.IsNaN(q.x)
+          || float.IsNaN(q.y)
+          || float.IsNaN(q.z)
+          || float.IsNaN(q.w);
+    }
 
     /// <summary>
     /// Converts the quaternion into an axis and an angle and returns the vector
@@ -904,8 +1596,24 @@ namespace Leap.Unity {
                                      upwardDirection);
     }
 
+    /// <summary> Returns the quaternion with every component negated. </summary>
     public static Quaternion Flipped(this Quaternion q) {
       return new Quaternion(-q.x, -q.y, -q.z, -q.w);
+    }
+
+    /// <summary> Returns the quaternion with X and W negated. </summary>
+    public static Quaternion MirroredX(this Quaternion q) {
+      return new Quaternion(-q.x, q.y, q.z, -q.w);
+    }
+
+    /// <summary> Returns the quaternion with Y and W negated. </summary>
+    public static Quaternion MirroredY(this Quaternion q) {
+      return new Quaternion(q.x, -q.y, q.z, -q.w);
+    }
+
+    /// <summary> Returns the quaternion with Z and W negated. </summary>
+    public static Quaternion MirroredZ(this Quaternion q) {
+      return new Quaternion(q.x, q.y, -q.z, -q.w);
     }
 
     #region Compression
@@ -1055,6 +1763,245 @@ namespace Leap.Unity {
       return toReturn;
 #endif
 
+    }
+    
+    public static Vector3 GetTranslation(this Matrix4x4 m) {
+      return m.GetColumn(3);
+    }
+
+    public static Vector3 GetVector3(this Matrix4x4 m) {
+      return m.GetColumn(3);
+    }
+
+    public static Quaternion GetQuaternion_LookRot(this Matrix4x4 m) {
+      if (m.GetColumn(2) == m.GetColumn(1)) { return Quaternion.identity; }
+      return Quaternion.LookRotation(m.GetColumn(2), m.GetColumn(1));
+    }
+
+    public static Quaternion GetQuaternion_CopySign(this Matrix4x4 m) {
+      // quaternion.w = sqrt( max( 0, 1 + m00 + m11 + m22 ) ) / 2;
+      // quaternion.x = sqrt( max( 0, 1 + m00 - m11 - m22 ) ) / 2;
+      // quaternion.y = sqrt( max( 0, 1 - m00 + m11 - m22 ) ) / 2;
+      // quaternion.z = sqrt( max( 0, 1 - m00 - m11 + m22 ) ) / 2;
+      // Q.x = _copysign( Q.x, m21 - m12 )
+      // Q.y = _copysign( Q.y, m02 - m20 )
+      // Q.z = _copysign( Q.z, m10 - m01 )
+      var q = new Quaternion();
+
+      q.w = Mathf.Sqrt( Mathf.Max( 0, 1 + m.m00 + m.m11 + m.m22 ) ) / 2;
+
+      q.x = Mathf.Sqrt( Mathf.Max( 0, 1 + m.m00 - m.m11 - m.m22 ) ) / 2;
+      q.y = Mathf.Sqrt( Mathf.Max( 0, 1 - m.m00 + m.m11 - m.m22 ) ) / 2;
+      q.z = Mathf.Sqrt( Mathf.Max( 0, 1 - m.m00 - m.m11 + m.m22 ) ) / 2;
+      q.x = copySign(q.x, m.m21 - m.m12);
+      q.y = copySign(q.y, m.m02 - m.m20);
+      q.z = copySign(q.z, m.m10 - m.m01);
+      // X Y Z //no
+      // X Z Y //no
+      // Y Z X //no
+      // Y X Z //no
+      // Z X Y //no
+      // Z Y X //no
+      //q = Quaternion.Lerp(q, Quaternion.identity, 0f); // Safety normalize.
+      return q;
+    }
+
+    /// <summary> Sets the sign of the first argument to match the sign of the
+    /// second argument. </summary>
+    private static float copySign(float toValue, float signSource) {
+      if (signSource == 0f) { throw new System.InvalidOperationException(
+        "signSource of zero is not supported in copySign."); }
+      return Mathf.Abs(toValue) * Mathf.Sign(signSource);
+    }
+
+    /// http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/
+    ///
+    public static Quaternion GetQuaternion_Manual(this Matrix4x4 m) {
+      // float trace = a[0][0] + a[1][1] + a[2][2]; // I removed + 1.0f; see discussion with Ethan
+      // if( trace > 0 ) {// I changed M_EPSILON to 0
+      //   float s = 0.5f / sqrtf(trace+ 1.0f);
+      //   q.w = 0.25f / s;
+      //   q.x = ( a[2][1] - a[1][2] ) * s;
+      //   q.y = ( a[0][2] - a[2][0] ) * s;
+      //   q.z = ( a[1][0] - a[0][1] ) * s;
+      // } else {
+      //   if ( a[0][0] > a[1][1] && a[0][0] > a[2][2] ) {
+      //     float s = 2.0f * sqrtf( 1.0f + a[0][0] - a[1][1] - a[2][2]);
+      //     q.w = (a[2][1] - a[1][2] ) / s;
+      //     q.x = 0.25f * s;
+      //     q.y = (a[0][1] + a[1][0] ) / s;
+      //     q.z = (a[0][2] + a[2][0] ) / s;
+      //   } else if (a[1][1] > a[2][2]) {
+      //     float s = 2.0f * sqrtf( 1.0f + a[1][1] - a[0][0] - a[2][2]);
+      //     q.w = (a[0][2] - a[2][0] ) / s;
+      //     q.x = (a[0][1] + a[1][0] ) / s;
+      //     q.y = 0.25f * s;
+      //     q.z = (a[1][2] + a[2][1] ) / s;
+      //   } else {
+      //     float s = 2.0f * sqrtf( 1.0f + a[2][2] - a[0][0] - a[1][1] );
+      //     q.w = (a[1][0] - a[0][1] ) / s;
+      //     q.x = (a[0][2] + a[2][0] ) / s;
+      //     q.y = (a[1][2] + a[2][1] ) / s;
+      //     q.z = 0.25f * s;
+      //   }
+      // }
+      var q = new Quaternion();
+      var trace = m.m00 + m.m11 + m.m22;
+      if (trace > 0) {
+        var s = 0.5f / Mathf.Sqrt(trace + 1.0f);
+        q.w = 0.25f / s;
+        q.x = (m.m21 - m.m12) * s;
+        q.y = (m.m02 - m.m20) * s;
+        q.z = (m.m10 - m.m01) * s;
+      }
+      else {
+        if (m.m00 > m.m11 && m.m00 > m.m22) {
+          var s = 2.0f * Mathf.Sqrt(1f + m.m00 - m.m11 - m.m22);
+          q.w = (m.m21 - m.m12) / s;
+          q.x = 0.25f * s;
+          q.y = (m.m01 + m.m10) / s;
+          q.z = (m.m02 + m.m20) / s;
+        }
+        else if (m.m11 > m.m22) {
+          var s = 2.0f * Mathf.Sqrt(1f + m.m11 - m.m00 - m.m22);
+          q.w = (m.m02 - m.m20) / s;
+          q.x = (m.m01 + m.m10) / s;
+          q.y = 0.25f * s;
+          q.z = (m.m12 + m.m21) / s;
+        }
+        else {
+          var s = 2.0f * Mathf.Sqrt(1f + m.m22 - m.m00 - m.m11);
+          q.w = (m.m10 - m.m01) / s;
+          q.x = (m.m02 + m.m20) / s;
+          q.y = (m.m12 + m.m21) / s;
+          q.z = 0.25f * s;
+        }
+      }
+      return q;
+    }
+
+    // Found here: https://github.com/lordofduct/space.../master/SpacepuppyBase/Utils/TransformUtil.cs
+    public static Quaternion GetQuaternion_SpacePuppy(this Matrix4x4 m) {
+      // Adapted from: http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/index.htm
+      Quaternion q = new Quaternion();
+      q.w = Mathf.Sqrt(Mathf.Max(0, 1 + m[0,0] + m[1,1] + m[2,2])) / 2;
+      q.x = Mathf.Sqrt(Mathf.Max(0, 1 + m[0,0] - m[1,1] - m[2,2])) / 2;
+      q.y = Mathf.Sqrt(Mathf.Max(0, 1 - m[0,0] + m[1,1] - m[2,2])) / 2;
+      q.z = Mathf.Sqrt(Mathf.Max(0, 1 - m[0,0] - m[1,1] + m[2,2])) / 2;
+      q.x *= Mathf.Sign(q.x *(m[2,1] - m[1,2]));
+      q.y *= Mathf.Sign(q.y *(m[0,2] - m[2,0]));
+      q.z *= Mathf.Sign(q.z *(m[1,0] - m[0,1]));
+      return q;
+    }
+
+    /// <summary> Returns the quaternion defined by the matrices multiply forward
+    /// and up vectors and passing those vectors into LookRotation.
+    /// If either the forward or up vectors determined from the input matrix
+    /// are Vector3.zero, returns Quaternion.identity to avoid console spam.
+    /// </summary>
+    public static Quaternion GetQuaternion(this Matrix4x4 m) {
+      var forward = m.MultiplyVector(Vector3.forward);
+      var up = m.MultiplyVector(Vector3.up);
+      if (forward == Vector3.zero || up == Vector3.zero) {
+        return Quaternion.identity;
+      }
+      return Quaternion.LookRotation(forward, up);
+    }
+    
+    public static void FillMatrixFromQuaternion(this Quaternion q,
+                                                ref Vector3[] matrix) {
+      matrix[0] = q * Vector3.right;
+      matrix[1] = q * Vector3.up;
+      matrix[2] = q * Vector3.forward;
+    }
+
+
+    /// <summary> Determines the cardinal direction in the matrix's frame that
+    /// most closely points towards the global-frame argument direction.
+    /// The positive or negative X, Y, or Z axis directions (converted to global
+    /// space via the matrix) are the six possible return values.
+    /// </summary>
+    public static Vector3 GetClosestAxisDirection(this Matrix4x4 m, Vector3 toDir) {
+      var localDir = (m.inverse.MultiplyVector(toDir)).normalized;
+      var closestAxis = Vector3.right;
+      var largestDot = -1f;
+      for (var sign = 1; sign >= -1; sign -= 2) {
+        for (var axis = 0; axis < 2; axis++) {
+          var testAxis = Vector3.zero; testAxis[axis] = 1f * sign;
+          var testDot = Vector3.Dot(localDir, testAxis);
+          if (testDot > largestDot) {
+            largestDot = testDot;
+            closestAxis = testAxis;
+          }
+        }
+      }
+      return (m.MultiplyVector(closestAxis)).normalized;
+    }
+
+    /// <summary> Non-projective only (MultiplyPoint3x4(Vector3.zero)). </summary>
+    public static Vector3 GetPosition(this Matrix4x4 m) {
+      return m.MultiplyPoint3x4(Vector3.zero);
+    }
+
+    public static Vector3 GetRight(this Matrix4x4 m) {
+      return m.MultiplyVector(Vector3.right);
+    }
+
+    public static Vector3 GetUp(this Matrix4x4 m) {
+      return m.MultiplyVector(Vector3.up);
+    }
+
+    public static Vector3 GetForward(this Matrix4x4 m) {
+      return m.MultiplyVector(Vector3.forward);
+    }
+
+    public static Vector3 GetAxis(this Matrix4x4 m, int i) {
+      if (i == 0) { return m.GetRight(); }
+      if (i == 1) { return m.GetUp(); }
+      if (i == 2) { return m.GetForward(); }
+      throw new System.InvalidOperationException("Invalid axis index " + i);
+    }
+
+    /// <summary> Given a Matrix4x4 with some possibly non-identity translation,
+    /// this operation rotates the matrix by the quaternion `q` using
+    /// `Matrix4x4.Rotate`, then compensates for any translation the rotation
+    /// might have introduced. (The effective multiply order is Rotate(q) * m.)
+    /// Essentially, this operation "pivots" matrices about their translated
+    /// origin by the argument quaternion. </summary>
+    public static Matrix4x4 Pivot(this Matrix4x4 m, Quaternion q) {
+      var origPos = m.GetPosition();
+      var toTranslateBack = Matrix4x4.Rotate(q) * m;
+      var newPos = toTranslateBack.GetPosition();
+      var translatedBack = Matrix4x4.Translate(origPos - newPos) * toTranslateBack;
+      return translatedBack;
+    }
+
+    /// <summary> As `Pivot()` with no Vector3 argument, but instead of pivoting
+    /// the Matrix4x4 about its own local Vector3.zero position, the matrix is
+    /// pivoting about the argument global position `p`.
+    /// </summary>
+    public static Matrix4x4 Pivot(this Matrix4x4 m, Quaternion q, Vector3 p) {
+      // m is worldFromRoot
+      // preservePos = worldFromRoot * MultiplyPoint3x4(p == wristFromRoot.inverse)
+      var preservePos = p;
+      var preservePos_local = m.inverse.MultiplyPoint3x4(p);
+      var toTranslateBack = Matrix4x4.Rotate(q) * m;
+      var newPos = toTranslateBack.MultiplyPoint3x4(preservePos_local);
+      var translatedBack = Matrix4x4.Translate(preservePos - newPos) *
+        toTranslateBack;
+      return translatedBack;
+    }
+
+    /// <summary> As `Pivot` but the matrix's rotation matches `q` instead
+    /// of being rotated by `q` at the end. </summary>
+    public static Matrix4x4 PivotTo(this Matrix4x4 m, Quaternion q) {
+      var origPos = m.GetPosition();
+      var origRot = m.GetQuaternion();
+      var toTranslateBack = Matrix4x4.Rotate(q * Quaternion.Inverse(origRot)) *
+        m;
+      var newPos = toTranslateBack.GetPosition();
+      var translatedBack = Matrix4x4.Translate(origPos - newPos) * toTranslateBack;
+      return translatedBack;
     }
 
     #endregion
@@ -1281,6 +2228,13 @@ namespace Leap.Unity {
       return Mathf.Lerp(h0, h1, t) % 1f;
     }
 
+    /// <summary> As Color.HSVToRGB but using Vector3 as the storage struct.
+    /// Color components are floats from 0-1. </summary>
+    public static Vector3 HSVToRGB(Vector3 hsv) {
+      var c = Color.HSVToRGB(hsv.x, hsv.y, hsv.z);
+      return new Vector3(c.r, c.g, c.b);
+    }
+
     #endregion
 
     #region Gizmo Utils
@@ -1346,9 +2300,12 @@ namespace Leap.Unity {
       TextureFormat.EAC_R,
       TextureFormat.EAC_R_SIGNED,
       TextureFormat.EAC_RG,
-      TextureFormat.EAC_RG_SIGNED,
+      TextureFormat.EAC_RG_SIGNED
+      #if !UNITY_2019_1_OR_NEWER
+      ,
       TextureFormat.ETC_RGB4_3DS,
       TextureFormat.ETC_RGBA8_3DS
+      #endif
     };
 
     /// <summary>
@@ -1544,7 +2501,7 @@ namespace Leap.Unity {
     /// <summary>
     public static Rect TakeRight(this Rect r, float widthFromRight) {
       widthFromRight = Mathf.Clamp(widthFromRight, 0f, r.width);
-      return new Rect(r.x + r.width - widthFromRight, r.y, r.height, widthFromRight);
+      return new Rect(r.x + r.width - widthFromRight, r.y, widthFromRight, r.height);
     }
 
     #endregion
@@ -1634,9 +2591,10 @@ namespace Leap.Unity {
 
       public float eachHeight { get { return this.rect.height / numLines; } }
 
-      public Rect Current {
-        get { return new Rect(rect.x, rect.y + eachHeight * index, rect.width, eachHeight); }
-      }
+      public Rect Current { get {
+        return new Rect(rect.x, rect.y + eachHeight * index, rect.width,
+          eachHeight);
+      }}
       public bool MoveNext() {
         index += 1;
         return index < numLines;
@@ -1703,6 +2661,36 @@ namespace Leap.Unity {
       var q = pose.rotation;
       return new Pose(new Vector3(-v.x, -v.y, -v.z),
                       new Quaternion(-q.z, -q.y, -q.z, q.w));
+    }
+
+    /// <summary> Given a Pose with some possibly non-identity translation, this operation rotates the pose by the quaternion `q`, then compensates for any translation the rotation might have introduced. Essentially, this operation "pivots" poses about their translated origin by the argument quaternion. </summary>
+    public static Pose Pivot(this Pose p, Quaternion q) {
+      var origPos = p.position;
+      var toTranslateBack = q * p;
+      var newPos = toTranslateBack.position;
+      var translatedBack = new Pose(origPos - newPos) * toTranslateBack;
+      return translatedBack;
+    }
+
+    /// <summary> As `Pivot()` with no Vector3 argument, but instead of pivoting the pose about its own local Vector3.zero position, the pose is pivoted about the argument world position `pivotPoint`. </summary>
+    public static Pose Pivot(this Pose p, Quaternion q, Vector3 pivotPoint) {
+      var preservePos = pivotPoint;
+      var preservePos_local = p.inverse * pivotPoint;
+      var toTranslateBack = q * p;
+      var newPos = (toTranslateBack * preservePos_local).position;
+      var translatedBack = new Pose(preservePos - newPos) * toTranslateBack;
+      return translatedBack;
+    }
+
+    /// <summary> As `Pivot` but the pose's rotation matches `q` instead of being rotated by `q` at the end. </summary>
+    public static Pose PivotTo(this Pose p, Quaternion q) {
+      var origPos = p.position;
+      var origRot = p.rotation;
+      var toTranslateBack = new Pose(q * Quaternion.Inverse(origRot)) *
+        p;
+      var newPos = toTranslateBack.position;
+      var translatedBack = new Pose(origPos - newPos) * toTranslateBack;
+      return translatedBack;
     }
 
     #endregion
@@ -1841,7 +2829,7 @@ namespace Leap.Unity {
     }
 
     /// <summary>
-    /// Returns a new Vector3 via component-wise division.
+    /// Returns a new Vector2 via component-wise division.
     /// This operation is the inverse of A.CompMul(B).
     /// </summary>
     public static Vector2 CompDiv(this Vector2 A, Vector2 B) {
@@ -1862,6 +2850,54 @@ namespace Leap.Unity {
     /// </summary>
     public static Vector4 CompDiv(this Vector4 A, Vector4 B) {
       return new Vector4(A.x / B.x, A.y / B.y, A.z / B.z, A.w / B.w);
+    }
+
+    /// <summary>
+    /// Returns a new Vector2 via component-wise addition.
+    /// This operation is the inverse of A.CompSub(B).
+    /// </summary>
+    public static Vector2 CompAdd(this Vector2 A, Vector2 B) {
+      return new Vector2(A.x + B.x, A.y + B.y);
+    }
+
+    /// <summary>
+    /// Returns a new Vector3 via component-wise addition.
+    /// This operation is the inverse of A.CompSub(B).
+    /// </summary>
+    public static Vector3 CompAdd(this Vector3 A, Vector3 B) {
+      return new Vector3(A.x + B.x, A.y + B.y, A.z + B.z);
+    }
+
+    /// <summary>
+    /// Returns a new Vector4 via component-wise addition.
+    /// This operation is the inverse of A.CompSub(B).
+    /// </summary>
+    public static Vector4 CompAdd(this Vector4 A, Vector4 B) {
+      return new Vector4(A.x + B.x, A.y + B.y, A.z + B.z, A.w + B.w);
+    }
+
+    /// <summary>
+    /// Returns a new Vector2 via component-wise subtraction.
+    /// This operation is the inverse of A.CompAdd(B).
+    /// </summary>
+    public static Vector2 CompSub(this Vector2 A, Vector2 B) {
+      return new Vector2(A.x - B.x, A.y - B.y);
+    }
+
+    /// <summary>
+    /// Returns a new Vector3 via component-wise subtraction.
+    /// This operation is the inverse of A.CompAdd(B).
+    /// </summary>
+    public static Vector3 CompSub(this Vector3 A, Vector3 B) {
+      return new Vector3(A.x - B.x, A.y - B.y, A.z - B.z);
+    }
+
+    /// <summary>
+    /// Returns a new Vector4 via component-wise subtraction.
+    /// This operation is the inverse of A.CompAdd(B).
+    /// </summary>
+    public static Vector4 CompSub(this Vector4 A, Vector4 B) {
+      return new Vector4(A.x - B.x, A.y - B.y, A.z - B.z, A.w - B.w);
     }
 
     /// <summary>
@@ -1927,6 +2963,50 @@ namespace Leap.Unity {
       return Mathf.Min(Mathf.Min(Mathf.Min(v.x, v.y), v.z), v.w);
     }
 
+    /// <summary>
+    /// Returns a new Vector2 via component-wise Lerp.
+    /// </summary>
+    public static Vector2 CompLerp(this Vector2 A, Vector2 B, Vector2 Ts) {
+      return new Vector2(Mathf.Lerp(A.x, B.x, Ts.x), Mathf.Lerp(A.y, B.y, Ts.y));
+    }
+
+    /// <summary>
+    /// Returns a new Vector3 via component-wise Lerp.
+    /// </summary>
+    public static Vector3 CompLerp(this Vector3 A, Vector3 B, Vector3 Ts) {
+      return new Vector3(Mathf.Lerp(A.x, B.x, Ts.x), Mathf.Lerp(A.y, B.y, Ts.y),
+        Mathf.Lerp(A.z, B.z, Ts.z));
+    }
+
+    /// <summary>
+    /// Returns a new Vector4 via component-wise Lerp.
+    /// </summary>
+    public static Vector4 CompLerp(this Vector4 A, Vector4 B, Vector4 Ts) {
+      return new Vector4(Mathf.Lerp(A.x, B.x, Ts.x), Mathf.Lerp(A.y, B.y, Ts.y),
+        Mathf.Lerp(A.z, B.z, Ts.z), Mathf.Lerp(A.w, B.w, Ts.w));
+    }
+
+    /// <summary>
+    /// Returns a new Vector2 via an component-wise float operation.
+    /// </summary>
+    public static Vector2 CompWise(this Vector2 A, Func<float, float> op) {
+      return new Vector2(op(A.x), op(A.y));
+    }
+
+    /// <summary>
+    /// Returns a new Vector3 via an component-wise float operation.
+    /// </summary>
+    public static Vector3 CompWise(this Vector3 A, Func<float, float> op) {
+      return new Vector3(op(A.x), op(A.y), op(A.z));
+    }
+
+    /// <summary>
+    /// Returns a new Vector4 via an component-wise float operation.
+    /// </summary>
+    public static Vector4 CompWise(this Vector4 A, Func<float, float> op) {
+      return new Vector4(op(A.x), op(A.y), op(A.z), op(A.w));
+    }
+
     #endregion
 
     #region From/Then Utilities
@@ -1960,6 +3040,15 @@ namespace Leap.Unity {
     /// </summary>
     public static float Then(this float thisFloat, float otherFloat) {
       return thisFloat + otherFloat;
+    }
+
+    #endregion
+
+    #region Vector2
+
+    /// <summary> Lerps between the Vector2's X and Y by `t`. </summary>
+    public static float Lerp(this Vector2 betweenXAndY, float t) {
+      return Mathf.Lerp(betweenXAndY.x, betweenXAndY.y, t);
     }
 
     #endregion

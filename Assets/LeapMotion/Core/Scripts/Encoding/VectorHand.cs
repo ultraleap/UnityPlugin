@@ -9,8 +9,19 @@
 
 using System;
 using UnityEngine;
+using Leap.Unity.Splines;
 
 namespace Leap.Unity.Encoding {
+
+  /// <summary>
+  /// An interface that signifies this class can interpolate
+  /// via the standard techniques
+  /// </summary>
+  public interface IInterpolable<T> {
+    T CopyFrom(T toCopy);
+    bool FillLerped(T from, T to, float t);
+    bool FillSplined(T a, T b, T c, T d, float t);
+  }
 
   /// <summary>
   /// A Vector-based encoding of a Leap Hand.
@@ -23,7 +34,7 @@ namespace Leap.Unity.Encoding {
   /// TODO: CurlHand not yet brought in from Networking module!
   /// </summary>
   [Serializable]
-  public class VectorHand {
+  public class VectorHand : IInterpolable<VectorHand> {
 
     #region Data
 
@@ -32,12 +43,15 @@ namespace Leap.Unity.Encoding {
     public bool       isLeft;
     public Vector3    palmPos;
     public Quaternion palmRot;
+    public Pose palmPose { get { return new Pose(palmPos, palmRot); }}
     
     [SerializeField]
     private Vector3[]  _backingJointPositions;
     public Vector3[] jointPositions {
       get {
-        if (_backingJointPositions == null) {
+        if (_backingJointPositions == null ||
+          _backingJointPositions.Length != NUM_JOINT_POSITIONS)
+        {
           _backingJointPositions = new Vector3[NUM_JOINT_POSITIONS];
         }
         return _backingJointPositions;
@@ -58,6 +72,18 @@ namespace Leap.Unity.Encoding {
       Encode(hand);
     }
 
+    /// <summary>
+    /// Copies a VectorHand from another VectorHand
+    /// </summary>
+    public VectorHand CopyFrom(VectorHand h) {
+      if (h != null) {
+        isLeft = h.isLeft; palmPos = h.palmPos; palmRot = h.palmRot;
+        for(int i = 0; i < jointPositions.Length; i++)
+          _backingJointPositions[i] = h.jointPositions[i];
+      }
+      return this;
+    }
+
     #region Hand Encoding
 
     public void Encode(Hand fromHand) {
@@ -67,16 +93,19 @@ namespace Leap.Unity.Encoding {
 
       int boneIdx = 0;
       for (int i = 0; i < 5; i++) {
-        Vector3 baseMetacarpal = ToLocal(fromHand.Fingers[i].bones[0].PrevJoint.ToVector3(),
-                                         palmPos, palmRot);
+        Vector3 baseMetacarpal = ToLocal(
+          fromHand.Fingers[i].bones[0].PrevJoint.ToVector3(), palmPos, palmRot);
         jointPositions[boneIdx++] = baseMetacarpal;
         for (int j = 0; j < 4; j++) {
-          Vector3 joint = ToLocal(fromHand.Fingers[i].bones[j].NextJoint.ToVector3(),
-                                  palmPos, palmRot);
+          Vector3 joint = ToLocal(
+            fromHand.Fingers[i].bones[j].NextJoint.ToVector3(), palmPos, palmRot);
           jointPositions[boneIdx++] = joint;
         }
       }
     }
+
+    // TODO: DELETEME
+    public static Vector3 tweakWristPosition = new Vector3(0f, -0.015f, -0.065f);
 
     public void Decode(Hand intoHand) {
       int boneIdx = 0;
@@ -123,7 +152,7 @@ namespace Leap.Unity.Encoding {
           frameId: -1,
           handId: (isLeft ? 0 : 1),
           fingerId: fingerIdx,
-          timeVisible: Time.time,
+          timeVisible: 10f,// Time.time, <- This is unused and main thread only
           tipPosition: nextJoint.ToVector(),
           direction: (boneRot * Vector3.forward).ToVector(),
           width: 1f,
@@ -142,26 +171,41 @@ namespace Leap.Unity.Encoding {
                       (palmRot).ToLeapQuaternion());
 
       // Finally, fill hand data.
-      intoHand.Fill(frameID:                -1,
-                  id:                     (isLeft ? 0 : 1),
-                  confidence:             1f,
-                  grabStrength:           0.5f,
-                  grabAngle:              100f,
-                  pinchStrength:          0.5f,
-                  pinchDistance:          50f,
-                  palmWidth:              0.085f,
-                  isLeft:                 isLeft,
-                  timeVisible:            1f,
-                  fingers:                null /* already uploaded finger data */,
-                  palmPosition:           palmPos.ToVector(),
-                  stabilizedPalmPosition: palmPos.ToVector(),
-                  palmVelocity:           Vector3.zero.ToVector(),
-                  palmNormal:             (palmRot * Vector3.down).ToVector(),
-                  rotation:               (palmRot.ToLeapQuaternion()),
-                  direction:              (palmRot * Vector3.forward).ToVector(),
-                  wristPosition:          ToWorld(new Vector3(0f, 0f, -0.055f),
-                                                  palmPos,
-                                                  palmRot).ToVector());
+      var palmPose = new Pose(palmPos, palmRot);
+      // var wristPos = ToWorld(new Vector3(0f, -0.015f, -0.065f), palmPos, palmRot);
+      var wristPos = (palmPose * tweakWristPosition).position;
+      intoHand.Fill(
+        frameID:                -1,
+        id:                     (isLeft ? 0 : 1),
+        confidence:             1f,
+        grabStrength:           0.5f,
+        grabAngle:              100f,
+        pinchStrength:          0.5f,
+        pinchDistance:          50f,
+        palmWidth:              0.085f,
+        isLeft:                 isLeft,
+        timeVisible:            1f,
+        fingers:                null /* already uploaded finger data */,
+        palmPosition:           palmPos.ToVector(),
+        stabilizedPalmPosition: palmPos.ToVector(),
+        palmVelocity:           Vector3.zero.ToVector(),
+        palmNormal:             (palmRot * Vector3.down).ToVector(),
+        rotation:               (palmRot.ToLeapQuaternion()),
+        direction:              (palmRot * Vector3.forward).ToVector(),
+        wristPosition:          wristPos.ToVector()
+      );
+
+      // TODO: DELETEME
+      // var sphere = new Geometry.Sphere(radius: 0.008f);
+      // var drawer = HyperMegaStuff.HyperMegaLines.drawer;
+      // drawer.color = LeapColor.cerulean;
+      // sphere.WithCenter(wristPos).DrawLines(drawer.DrawLine);
+
+      // sphere.radius = 0.007f;
+      // drawer.color = LeapColor.white;
+      // foreach (var point in jointPositions) {
+      //   sphere.WithCenter((palmPose * point).position).DrawLines(drawer.DrawLine);
+      // }
     }
 
     #endregion
@@ -177,6 +221,15 @@ namespace Leap.Unity.Encoding {
     /// encoded in hand-local space using 3 bytes.
     /// </summary>
     public int numBytesRequired { get { return 86; } }
+    public const int NUM_BYTES = 86;
+    
+    /// <summary>
+    /// Fills this VectorHand with data read from the provided byte array, starting at
+    /// the provided offset.
+    /// </summary>
+    public void ReadBytes(byte[] bytes, int offset = 0) {
+      ReadBytes(bytes, ref offset);
+    }
 
     /// <summary>
     /// Fills this VectorHand with data read from the provided byte array, starting at
@@ -276,10 +329,69 @@ namespace Leap.Unity.Encoding {
     /// <summary>
     /// Shortcut for encoding a Leap hand into a VectorHand representation and
     /// compressing it immediately into a byte representation.
+    /// If the provided Hand is null, the 86 bytes are set to zero.
     /// </summary>
     public void FillBytes(byte[] bytes, ref int offset, Hand fromHand) {
-      Encode(fromHand);
-      FillBytes(bytes, ref offset);
+      if (fromHand == null) {
+        for (int i = offset; i < offset + NUM_BYTES; i++) {
+          bytes[i] = 0;
+        }
+      }
+      else {
+        Encode(fromHand);
+        FillBytes(bytes, ref offset);
+      }
+    }
+
+    [ThreadStatic]
+    private static VectorHand s_backingCachedVectorHand;
+    private static VectorHand s_cachedVectorHand {
+      get {
+        if (s_backingCachedVectorHand == null) {
+          s_backingCachedVectorHand = new VectorHand();
+        }
+        return s_backingCachedVectorHand;
+      }
+    }
+    [ThreadStatic]
+    private static Vector3[] s_backingJointsBuffer =
+      new Vector3[NUM_JOINT_POSITIONS];
+    private static Vector3[] s_jointsBuffer {
+      get {
+        if (s_backingJointsBuffer == null) {
+          s_backingJointsBuffer = new Vector3[NUM_JOINT_POSITIONS];
+        }
+        return s_backingJointsBuffer;
+      }
+    }
+
+    /// <summary>
+    /// Fills bytes using a thread-safe (ThreadStatic) cached VectorHand to
+    /// encode the provided Hand.
+    /// If the provided Hand is null, the 86 bytes are set to zero.
+    /// </summary>
+    public static void StaticFillBytes(byte[] bytes, Hand fromHand) {
+      StaticFillBytes(bytes, 0, fromHand);
+    }
+
+    /// <summary>
+    /// Fills bytes at the argument offset using a thread-safe (ThreadStatic)
+    /// cached VectorHand to encode the provided Hand.
+    /// If the provided Hand is null, the 86 bytes are set to zero.
+    /// </summary>
+    public static void StaticFillBytes(byte[] bytes, int offset, Hand fromHand) {
+      StaticFillBytes(bytes, ref offset, fromHand);
+    }
+
+    /// <summary>
+    /// Fills bytes at the argument offset using a thread-safe (ThreadStatic)
+    /// cached VectorHand to encode the provided Hand.
+    /// If the provided Hand is null, the 86 bytes are set to zero.
+    /// </summary>
+    public static void StaticFillBytes(byte[] bytes, ref int offset,
+                                       Hand fromHand) {
+      s_cachedVectorHand._backingJointPositions = s_jointsBuffer;
+      s_cachedVectorHand.FillBytes(bytes, ref offset, fromHand);
     }
 
     #endregion
@@ -296,12 +408,68 @@ namespace Leap.Unity.Encoding {
     }
 
     /// <summary>
-    /// Converts a world-space point to a local-space point given the local space's
-    /// origin and rotation.
+    /// Converts a world-space point to a local-space point given the local
+    /// space's origin and rotation.
     /// </summary>
     public static Vector3 ToLocal(Vector3 worldPoint,
                                   Vector3 localOrigin, Quaternion localRot) {
       return Quaternion.Inverse(localRot) * (worldPoint - localOrigin);
+    }
+
+    /// <summary> Fills the ref-argument VectorHand with interpolated data
+    /// between the two other VectorHands, by t (unclamped), and return true.
+    /// If either a or b is null, the ref-argument VectorHand is also set to
+    /// null, and the method returns false.
+    /// An exception is thrown if the interpolation arguments a and b don't
+    /// have the same chirality.
+    /// </summary>
+    public bool FillLerped(VectorHand a, VectorHand b, float t) {
+      if (a == null || b == null) return false;
+      if (a.isLeft != b.isLeft) {
+        throw new System.Exception("VectorHands must be interpolated with the " +
+        "same chirality.");
+      }
+      isLeft = a.isLeft;
+      palmPos = Vector3.LerpUnclamped(a.palmPos, b.palmPos, t);
+      palmRot = Quaternion.SlerpUnclamped(a.palmRot, b.palmRot, t);
+      for (int i = 0; i < jointPositions.Length; i++) {
+        jointPositions[i] = Vector3.LerpUnclamped(a.jointPositions[i],
+        b.jointPositions[i], t);
+      }
+      return true;
+    }
+
+    /// <summary> Fills the ref-argument VectorHand with interpolated data
+    /// between the 4 other VectorHands, by t (unclamped), and return true.
+    /// If either a, b, c or d is null, the ref-argument VectorHand is also set to
+    /// null, and the method returns false.
+    /// An exception is thrown if the interpolation arguments a and b don't
+    /// have the same chirality.
+    /// </summary>
+    public bool FillSplined(VectorHand a, VectorHand b, VectorHand c, VectorHand d, float t) {
+      if (a == null || b == null || c == null || d == null) {
+        return false;
+      }
+      if (b.isLeft != c.isLeft) {
+        throw new System.Exception("VectorHands must be interpolated with the " +
+        "same chirality.");
+      }
+      isLeft = a.isLeft;
+      palmPos = CatmullRom.ToCHS(
+                         a.palmPos, b.palmPos, c.palmPos, d.palmPos, false).PositionAt(t);
+      palmRot = Quaternion.SlerpUnclamped(b.palmRot, c.palmRot, t);
+      //Quaternion splines are not as robust
+      //CatmullRom.ToQuaternionCHS(
+      //  a.palmRot, b.palmRot, c.palmRot, d.palmRot, false).RotationAt(t);
+
+      for (int i = 0; i < jointPositions.Length; i++) {
+        jointPositions[i] = CatmullRom.ToCHS(
+                                     a.jointPositions[i], 
+                                     b.jointPositions[i], 
+                                     c.jointPositions[i], 
+                                     d.jointPositions[i], false).PositionAt(t);
+      }
+      return true;
     }
 
     #endregion

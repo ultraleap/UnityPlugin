@@ -16,8 +16,32 @@ namespace Leap.Unity {
   public class LeapTestProvider : LeapProvider {
 
     public Frame frame;
-    public override Frame CurrentFrame { get { return frame; } }
-    public override Frame CurrentFixedFrame { get { return frame; } }
+    public override Frame CurrentFrame {
+      get {
+        #if UNITY_EDITOR
+        if (!Application.isPlaying) {
+          frame = TestHandFactory.MakeTestFrame(frameId: 0,
+            includeLeftHand: true, includeRightHand: true,
+            handPose: editTimePose,
+            unitType: TestHandFactory.UnitType.UnityUnits);
+        }
+        #endif
+        return frame;
+      }
+    }
+    public override Frame CurrentFixedFrame {
+      get {
+        #if UNITY_EDITOR
+        if (!Application.isPlaying) {
+          frame = TestHandFactory.MakeTestFrame(frameId: 0,
+            includeLeftHand: true, includeRightHand: true,
+            handPose: editTimePose,
+            unitType: TestHandFactory.UnitType.UnityUnits);
+        }
+        #endif
+        return frame;
+      }
+    }
 
     [Header("Runtime Basis Transforms")]
 
@@ -38,10 +62,12 @@ namespace Leap.Unity {
     private Hand _cachedRightHand = null;
 
     void Awake() {
-      _cachedLeftHand  = TestHandFactory.MakeTestHand(isLeft: true,
-                                           unitType: TestHandFactory.UnitType.UnityUnits);
+      _cachedLeftHand = TestHandFactory.MakeTestHand(isLeft: true,
+        unitType: TestHandFactory.UnitType.UnityUnits);
+      _cachedLeftHand.Id = 0;
       _cachedRightHand = TestHandFactory.MakeTestHand(isLeft: false,
-                                           unitType: TestHandFactory.UnitType.UnityUnits);
+        unitType: TestHandFactory.UnitType.UnityUnits);
+      _cachedRightHand.Id = 1;
     }
 
     void Update() {

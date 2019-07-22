@@ -491,7 +491,9 @@ namespace Leap.Unity {
     #region Frame Utils
 
     public static Hand Get(this Frame frame, Chirality whichHand) {
-      return frame.Hands.Query().FirstOrDefault(h => h.IsLeft == (whichHand == Chirality.Left));
+      if (frame.Hands == null) { return null; }
+      return frame.Hands.Query().FirstOrDefault(
+        h => h.IsLeft == (whichHand == Chirality.Left));
     }
 
     #endregion

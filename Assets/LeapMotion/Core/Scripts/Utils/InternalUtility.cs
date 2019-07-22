@@ -29,11 +29,11 @@ namespace Leap.Unity {
     private static List<InvokeStruct> _invokeList = new List<InvokeStruct>();
 
     static InternalUtility() {
-      EditorApplication.update += destroyLoop;
+      //EditorApplication.update += destroyLoop;
     }
 
     public static bool IsPrefab(Component component) {
-      return PrefabUtility.GetPrefabType(component.gameObject) == PrefabType.Prefab;
+      return Utils.IsObjectPartOfPrefabAsset(component.gameObject);
     }
 
     /// <summary>

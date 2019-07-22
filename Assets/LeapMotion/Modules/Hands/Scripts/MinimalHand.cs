@@ -18,6 +18,7 @@ namespace Leap.Unity {
       return true;
     }
 
+    #pragma warning disable 0649
     [SerializeField]
     private Chirality _handedness;
 
@@ -38,6 +39,7 @@ namespace Leap.Unity {
 
     [SerializeField]
     private Material _jointMat;
+    #pragma warning restore 0649
 
     private Hand _hand;
     private Transform _palm;

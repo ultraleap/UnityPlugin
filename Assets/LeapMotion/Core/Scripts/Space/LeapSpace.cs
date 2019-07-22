@@ -14,6 +14,7 @@ using Leap.Unity.Query;
 
 namespace Leap.Unity.Space {
 
+  [ExecuteInEditMode]
   public abstract class LeapSpace : LeapSpaceAnchor {
     private static List<LeapSpace> _enabledSpaces = new List<LeapSpace>();
     public static List<LeapSpace> allEnabled {

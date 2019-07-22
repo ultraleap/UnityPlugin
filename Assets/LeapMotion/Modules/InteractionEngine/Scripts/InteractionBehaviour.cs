@@ -537,6 +537,35 @@ namespace Leap.Unity.Interaction {
 
     #endregion
 
+    #region General API
+
+    /// <summary> Use this if you want to modify the isKinematic state of an
+    /// interaction object while it is grasped; otherwise the object's grasp
+    /// settings may return the Rigidbody to the kinematic state of the object
+    /// from right before it was grasped. </summary>
+    public void SetKinematicWithoutGrasp(bool isKinematic) {
+      if (this.isGrasped) {
+        _wasKinematicBeforeGrasp = isKinematic;
+      }
+      else {
+        _rigidbody.isKinematic = isKinematic;
+      }
+    }
+
+    /// <summary> Use this to retrieve the isKinematic state of the interactino
+    /// object ignoring any temporary modification to isKinematic that may be
+    /// due to the object being grasped. </summary>
+    public bool GetKinematicWithoutGrasp() {
+      if (this.isGrasped) {
+        return _wasKinematicBeforeGrasp;
+      }
+      else {
+        return _rigidbody.isKinematic;
+      }
+    }
+
+    #endregion
+
     #endregion
 
     #region Inspector

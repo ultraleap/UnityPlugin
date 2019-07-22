@@ -36,6 +36,14 @@ public static class AutoCopywriteHeader {
                                              " * between Leap Motion and you, your company or other organization.           *",
                                              " ******************************************************************************/"};
 
+  private static string[] northStarCopywriteNotice = {"/******************************************************************************",
+                                                      " * Copyright (C) Leap Motion, Inc. 2011-2018.                                 *",
+                                                      " *                                                                            *",
+                                                      " * Use subject to the terms of the Apache License 2.0 available at            *",
+                                                      " * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *",
+                                                      " * between Leap Motion and you, your company or other organization.           *",
+                                                      " ******************************************************************************/"};
+
   private static string[] searchFolders = { "LeapMotion" };
 
   [MenuItem("Assets/Update Copywrite Headers")]
@@ -111,8 +119,14 @@ public static class AutoCopywriteHeader {
       }
 
       //Append the comment block first
-      foreach (var noticeLine in copywriteNotice) {
-        builder.AppendLine(noticeLine);
+      if (filename.Contains("North Star")) {
+        foreach (var noticeLine in northStarCopywriteNotice) {
+          builder.AppendLine(noticeLine);
+        }
+      } else {
+        foreach (var noticeLine in copywriteNotice) {
+          builder.AppendLine(noticeLine);
+        }
       }
 
       //Then append a single empty line

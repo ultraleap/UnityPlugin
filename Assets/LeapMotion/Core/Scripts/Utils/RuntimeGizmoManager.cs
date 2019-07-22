@@ -171,6 +171,8 @@ namespace Leap.Unity.RuntimeGizmos {
     }
 
     protected void onPostRender(Camera camera) {
+      if ((camera.cullingMask & gameObject.layer) == 0) { return; }
+
 #if UNITY_EDITOR
       //Always draw scene view
       //Never draw preview or reflection
@@ -1047,4 +1049,34 @@ namespace Leap.Unity.RuntimeGizmos {
       public int numSegments;
     }
   }
+
+  public static class RuntimeGizmoExtensions {
+
+    public static void DrawPose(this RuntimeGizmos.RuntimeGizmoDrawer drawer,
+                                Pose pose, float radius = 0.10f,
+                                bool drawCube = false) {
+      drawer.PushMatrix();
+
+      drawer.matrix = Matrix4x4.TRS(pose.position, pose.rotation, Vector3.one);
+
+      var origColor = drawer.color;
+
+      //drawer.DrawWireSphere(Vector3.zero, radius);
+      if (drawCube) {
+        drawer.DrawCube(Vector3.zero, Vector3.one * radius * 0.3f);
+      }
+      drawer.DrawPosition(Vector3.zero, radius * 2);
+
+      drawer.color = origColor;
+
+      drawer.PopMatrix();
+    }
+
+    public static void DrawRay(this RuntimeGizmos.RuntimeGizmoDrawer drawer,
+                               Vector3 position, Vector3 direction) {
+      drawer.DrawLine(position, position + direction);
+    }
+
+  }
+
 }

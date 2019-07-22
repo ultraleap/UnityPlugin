@@ -19,6 +19,7 @@ namespace Leap.Unity.VRVisualizer{
     public UnityEngine.UI.Text m_trackingText;
     public UnityEngine.UI.Text m_frameRateText;
     public UnityEngine.UI.Text m_dataFrameRateText;
+
     public KeyCode keyToToggleHMD = KeyCode.V;
   
     private Controller m_controller = null;
@@ -60,13 +61,14 @@ namespace Leap.Unity.VRVisualizer{
       if (m_controller != null)
         m_leapConnected = m_controller.IsConnected;
 
-      Screen.SetResolution(Screen.currentResolution.width, Screen.currentResolution.height, false);
       if (XRSupportUtil.IsXRDevicePresent())
       {
+        Screen.SetResolution(640, 480, false);
         goVR();    
       }
       else
       {
+        Screen.SetResolution(Screen.currentResolution.width, Screen.currentResolution.height, false);
         goDesktop();
       }
 
