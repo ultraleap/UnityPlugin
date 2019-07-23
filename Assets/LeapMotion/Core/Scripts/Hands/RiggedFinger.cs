@@ -55,6 +55,7 @@ namespace Leap.Unity {
       }
     }
 
+    private RiggedHand _parentRiggedHand = null;
     /// <summary>
     /// Updates model bone positions and rotations based on tracked hand data.
     /// </summary>
@@ -72,7 +73,21 @@ namespace Leap.Unity {
               // the standard "test" edit-time hand model from the TestHandFactory.
               var boneTipPos = GetJointPosition(i + 1);
               var boneVec = boneTipPos - boneRootPos;
+
+              // If the rigged hand is scaled (due to a scaled rig), we'll need to divide
+              // out that scale from the bone length to get its normal length.
+              if (_parentRiggedHand == null) {
+                _parentRiggedHand = GetComponentInParent<RiggedHand>();
+              }
+              if (_parentRiggedHand != null) {
+                var parentRiggedHandScale = _parentRiggedHand.transform.lossyScale.x;
+                if (parentRiggedHandScale != 0f && parentRiggedHandScale != 1f) {
+                  boneVec /= parentRiggedHandScale;
+                }
+              }
+
               var boneLen = boneVec.magnitude;
+
               var standardLen = s_standardFingertipLengths[(int)this.fingerType];
               var newScale = bones[i].transform.localScale;
               var lengthComponentIdx = getLargestComponentIndex(modelFingerPointing);

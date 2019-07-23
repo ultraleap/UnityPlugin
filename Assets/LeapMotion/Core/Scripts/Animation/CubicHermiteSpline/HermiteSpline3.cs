@@ -92,7 +92,8 @@ namespace Leap.Unity.Animation {
 
     /// <summary>
     /// Gets the position at time t along this spline.  
-    /// The time is clamped within the t0 - t1 range.
+    /// The time is clamped to t0, but can extrapolate
+    /// beyond t1.
     /// </summary>
     public Vector3 PositionAt(float t) {
       if (t > t1) {
@@ -114,7 +115,8 @@ namespace Leap.Unity.Animation {
 
     /// <summary>
     /// Gets the first derivative of position at time t.
-    /// The time is clamped within the t0 - t1 range.
+    /// The time is clamped within the t0 - t1 range
+    /// (thus velocity is unaffected by extrapolation).
     /// </summary>
     public Vector3 VelocityAt(float t) {
       float C00 = t1 - t0;
@@ -143,6 +145,7 @@ namespace Leap.Unity.Animation {
     /// <summary>
     /// Gets both the position and the first derivative of position
     /// at time ti.  The time is clamped within the t0 - t1 range.
+    /// If you wish to extrapolate, use PositionAt(t).
     /// </summary>
     public void PositionAndVelAt(float t, out Vector3 position, out Vector3 velocity) {
       float C00 = t1 - t0;
