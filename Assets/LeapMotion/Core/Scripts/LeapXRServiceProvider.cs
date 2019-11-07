@@ -303,7 +303,12 @@ namespace Leap.Unity {
                                        imageQuatWarp.eulerAngles.y,
                                       -imageQuatWarp.eulerAngles.z);
       Matrix4x4 imageMatWarp = projectionMatrix
+                               #if UNITY_2019_2_OR_NEWER
+                               // The camera projection matrices seem to have vertically inverted...
+                               * Matrix4x4.TRS(Vector3.zero, imageQuatWarp, new Vector3(1f, -1f, 1f))
+                               #else
                                * Matrix4x4.TRS(Vector3.zero, imageQuatWarp, Vector3.one)
+                               #endif
                                * projectionMatrix.inverse;
       Shader.SetGlobalMatrix("_LeapGlobalWarpedOffset", imageMatWarp);
     }
