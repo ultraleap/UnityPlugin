@@ -11,6 +11,10 @@ using UnityEngine;
 using System;
 using Leap.Unity.Attributes;
 
+#if UNITY_2018_2_OR_NEWER
+using UnityEngine.Rendering;
+#endif
+
 namespace Leap.Unity {
 
   /// <summary>
@@ -233,14 +237,31 @@ namespace Leap.Unity {
         preCullCamera = GetComponent<Camera>();
       }
 
+      #if UNITY_2018_2_OR_NEWER
+      if (GraphicsSettings.renderPipelineAsset != null) {
+        RenderPipelineManager.beginCameraRendering -= onBeginRendering;
+        RenderPipelineManager.beginCameraRendering += onBeginRendering;
+      } else {
+        Camera.onPreCull -= onPreCull; // No multiple-subscription.
+        Camera.onPreCull += onPreCull;
+      }
+      #else
       Camera.onPreCull -= onPreCull; // No multiple-subscription.
-      Camera.onPreCull += onPreCull;
+      #endif
     }
 
     protected virtual void OnDisable() {
       resetShaderTransforms();
 
-      Camera.onPreCull -= onPreCull;
+      #if UNITY_2018_2_OR_NEWER
+      if (GraphicsSettings.renderPipelineAsset != null) {
+        RenderPipelineManager.beginCameraRendering -= onBeginRendering;
+      } else {
+        Camera.onPreCull -= onPreCull; // No multiple-subscription.
+      }
+      #else
+      Camera.onPreCull -= onPreCull; // No multiple-subscription.
+      #endif
     }
 
     protected override void Start() {
@@ -268,9 +289,9 @@ namespace Leap.Unity {
       var projectionMatrix = _cachedCamera == null ? Matrix4x4.identity
         : _cachedCamera.projectionMatrix;
       switch (SystemInfo.graphicsDeviceType) {
-#if !UNITY_2017_2_OR_NEWER
+        #if !UNITY_2017_2_OR_NEWER
         case UnityEngine.Rendering.GraphicsDeviceType.Direct3D9:
-#endif
+        #endif
         case UnityEngine.Rendering.GraphicsDeviceType.Direct3D11:
         case UnityEngine.Rendering.GraphicsDeviceType.Direct3D12:
           for (int i = 0; i < 4; i++) {
@@ -312,6 +333,8 @@ namespace Leap.Unity {
                                * projectionMatrix.inverse;
       Shader.SetGlobalMatrix("_LeapGlobalWarpedOffset", imageMatWarp);
     }
+
+    protected virtual void onBeginRendering(ScriptableRenderContext context, Camera camera) { onPreCull(camera); }
 
     protected virtual void onPreCull(Camera preCullingCamera) {
       if (preCullingCamera != preCullCamera) {
