@@ -421,12 +421,10 @@ namespace Leap.Unity {
     /// Returns the Leap Controller instance.
     /// </summary>
     public Controller GetLeapController() {
-      #if UNITY_EDITOR
       // Null check to deal with hot reloading.
       if (!_isDestroyed && _leapController == null) {
         createController();
       }
-      #endif
       return _leapController;
     }
 
