@@ -80,6 +80,7 @@ namespace Leap.Unity {
         }
         return s_provider;
       }
+      set { s_provider = value; }
     }
 
     /// <summary>
