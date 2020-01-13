@@ -620,7 +620,7 @@ namespace Leap.Unity.Interaction {
     }
 
     private void updateAttractionToHand() {
-      if (interactionBehaviour == null || !isAttractedByHand) {
+      if (interactionBehaviour == null || anchor == null || !isAttractedByHand) {
         if (_offsetTowardsHand != Vector3.zero) {
           _offsetTowardsHand = Vector3.Lerp(_offsetTowardsHand, Vector3.zero, 5F * Time.deltaTime);
         }
@@ -631,15 +631,21 @@ namespace Leap.Unity.Interaction {
       float reachTargetAmount = 0F;
       Vector3 towardsHand = Vector3.zero;
       if (interactionBehaviour.isHovered) {
-        Hand hoveringHand = interactionBehaviour.closestHoveringHand;
+         Vector3 hoverTarget = Vector3.zero;
 
-        reachTargetAmount = Mathf.Clamp01(attractionReachByDistance.Evaluate(
-                              Vector3.Distance(hoveringHand.PalmPosition.ToVector3(), anchor.transform.position)
-                            ));
-        towardsHand = hoveringHand.PalmPosition.ToVector3() - anchor.transform.position;
-      }
+		 InteractionController hoveringController = interactionBehaviour.closestHoveringController;
+         if (hoveringController is InteractionHand)	{
+		    Hand hoveringHand = interactionBehaviour.closestHoveringHand;
+		    hoverTarget = hoveringHand.PalmPosition.ToVector3();
+		 }
+         else hoverTarget = hoveringController.hoverPoint;
 
-      Vector3 targetOffsetTowardsHand = towardsHand * maxAttractionReach * reachTargetAmount;
+         reachTargetAmount = Mathf.Clamp01(attractionReachByDistance.Evaluate(
+            Vector3.Distance(hoverTarget, anchor.transform.position)));
+            towardsHand = hoverTarget - anchor.transform.position;
+		}
+
+	  Vector3 targetOffsetTowardsHand = towardsHand * maxAttractionReach * reachTargetAmount;
       _offsetTowardsHand = Vector3.Lerp(_offsetTowardsHand, targetOffsetTowardsHand, 5 * Time.deltaTime);
     }
 
