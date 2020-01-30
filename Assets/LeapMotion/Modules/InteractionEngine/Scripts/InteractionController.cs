@@ -2004,7 +2004,7 @@ namespace Leap.Unity.Interaction {
     /// </summary>
     bool IInternalInteractionController.CheckGraspHold(out IInteractionBehaviour graspedObject) {
       graspedObject = _graspedObject;
-      OnGraspStay();
+      if (graspedObject != null) OnGraspStay();
       return graspedObject != null;
     }
 
