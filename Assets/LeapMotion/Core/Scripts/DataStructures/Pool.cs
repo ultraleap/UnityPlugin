@@ -97,5 +97,21 @@ namespace Leap.Unity {
 
       _pool.Push(t);
     }
+
+    /// <summary> Calls Recycle for each argument. </summary>
+    public static void Recycle(T t0, T t1) {
+      Recycle(t0); Recycle(t1);
+    }
+
+    /// <summary> Calls Recycle for each argument. </summary>
+    public static void Recycle(T t0, T t1, T t2) {
+      Recycle(t0); Recycle(t1); Recycle(t2);
+    }
+
+    /// <summary> Calls Recycle for each argument. </summary>
+    public static void Recycle(T t0, T t1, T t2, T t3) {
+      Recycle(t0); Recycle(t1); Recycle(t2); Recycle(t3);
+    }
+    
   }
 }

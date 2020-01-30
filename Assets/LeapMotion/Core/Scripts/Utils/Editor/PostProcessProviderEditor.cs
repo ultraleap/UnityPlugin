@@ -24,11 +24,15 @@ namespace Leap.Unity {
       // Edit-time pose is only relevant for providers that generate hands.
       // Post-process Providers are a special case and don't generate their own hands.
       specifyConditionalDrawing(() => false, "editTimePose");
-
-      specifyCustomDecorator("_inputLeapProvider", decorateInputLeapProvider);
     }
 
-    private void decorateInputLeapProvider(SerializedProperty property) {
+    public override void OnInspectorGUI() {
+      base.OnInspectorGUI();
+
+      drawNotificationsGUI();
+    }
+
+    private void drawNotificationsGUI() {
       var provider = this.target;
 
       if (!provider.enabled) {

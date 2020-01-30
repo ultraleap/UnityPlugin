@@ -51,11 +51,13 @@ namespace Leap.Unity.Interaction {
     private string _deviceJoystickTokens = "oculus touch right"; // or, e.g., "openvr controller right"
     public string deviceJoystickTokens { get { return _deviceJoystickTokens; } }
 
+    #pragma warning disable 0649
     [Tooltip("Which hand will hold this controller? This property cannot be changed "
            + "at runtime.")]
     [SerializeField, EditTimeOnly]
     private Chirality _chirality;
     public Chirality chirality { get { return _chirality; } }
+    #pragma warning restore 0649
 
     [Tooltip("Whether to continuously poll attached joystick data for a joystick that "
            + "matches the device joystick tokens, using Input.GetJoystickNames(). This "

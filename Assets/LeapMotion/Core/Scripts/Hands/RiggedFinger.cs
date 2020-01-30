@@ -85,6 +85,7 @@ namespace Leap.Unity {
                   boneVec /= parentRiggedHandScale;
                 }
               }
+
               var boneLen = boneVec.magnitude;
 
               var standardLen = s_standardFingertipLengths[(int)this.fingerType];

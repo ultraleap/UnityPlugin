@@ -14,6 +14,7 @@ namespace Leap.Unity.DetectionExamples {
 
   public class PinchDraw : MonoBehaviour {
 
+    #pragma warning disable 0649
     [Tooltip("Each pinch detector can draw one line at a time.")]
     [SerializeField]
     private PinchDetector[] _pinchDetectors;
@@ -35,6 +36,7 @@ namespace Leap.Unity.DetectionExamples {
 
     [SerializeField]
     private float _minSegmentLength = 0.005f;
+    #pragma warning restore 0649
 
     private DrawState[] _drawStates;
 

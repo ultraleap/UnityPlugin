@@ -31,8 +31,10 @@ namespace Leap.Unity.Recording {
 
     public AssetFolder dataFolder;
 
+    #pragma warning disable 0649
     [SerializeField, ImplementsTypeNameDropdown(typeof(LeapRecording))]
     private string _leapRecordingType;
+    #pragma warning restore 0649
 
     [Header("Compression Settings")]
     [MinValue(0)]
@@ -168,7 +170,13 @@ namespace Leap.Unity.Recording {
         DestroyImmediate(this);
 
         string prefabPath = Path.Combine(assetFolder.Path, recordingName + ".prefab");
+        #if UNITY_2018_3_OR_NEWER
+        var path = prefabPath.Replace('\\', '/');
+        PrefabUtility.SaveAsPrefabAsset(myGameObject, path, out bool didSucceed);
+        if (!didSucceed) { Debug.LogError($"Error saving prefab asset to {path}"); }
+        #else
         PrefabUtility.CreatePrefab(prefabPath.Replace('\\', '/'), myGameObject);
+        #endif
       });
     }
 

@@ -44,6 +44,13 @@ namespace Leap.Unity.Attributes {
 #endif
   }
 
+  public interface ITopPanelDrawer {
+#if UNITY_EDITOR
+    float GetHeight();
+    void Draw(Rect panelRect, SerializedProperty property);
+#endif
+  }
+
   public interface ISupportDragAndDrop {
 #if UNITY_EDITOR
     Rect GetDropArea(Rect r, SerializedProperty property);

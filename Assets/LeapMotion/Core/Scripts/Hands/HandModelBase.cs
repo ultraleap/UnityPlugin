@@ -20,8 +20,13 @@ namespace Leap.Unity {
 
   [ExecuteInEditMode]
   public abstract class HandModelBase : MonoBehaviour {
+
     public event Action OnBegin;
     public event Action OnFinish;
+    /// <summary> Called directly after the HandModelBase's UpdateHand().
+    /// </summary>
+    public event Action OnUpdate;
+
     private bool isTracked = false;
     public bool IsTracked {
       get { return isTracked; }
@@ -29,8 +34,7 @@ namespace Leap.Unity {
 
     public abstract Chirality Handedness { get; set; }
     public abstract ModelType HandModelType { get; }
-    public virtual void InitHand() {
-    }
+    public virtual void InitHand() { }
 
     public virtual void BeginHand() {
       if (OnBegin != null) {
@@ -39,6 +43,10 @@ namespace Leap.Unity {
       isTracked = true;
     }
     public abstract void UpdateHand();
+    public void UpdateHandWithEvent() {
+      UpdateHand();
+      if (OnUpdate != null) { OnUpdate(); }
+    }
     public virtual void FinishHand() {
       if (OnFinish != null) {
         OnFinish();

@@ -42,21 +42,26 @@ namespace Leap.Unity.Attributes {
       if (_cachedDelegate == null) {
         Type type = targets[0].GetType();
 
-        PropertyInfo propertyInfo = type.GetProperty(methodName, BindingFlags.Public |
-                                                                 BindingFlags.NonPublic |
-                                                                 BindingFlags.Instance);
+        PropertyInfo propertyInfo = type.GetProperty(methodName,
+          BindingFlags.Public |
+          BindingFlags.NonPublic |
+          BindingFlags.Instance
+        );
         if (propertyInfo != null) {
           _cachedDelegate = (obj, arg) => propertyInfo.SetValue(obj, arg, null);
-        } else {
-          MethodInfo method = type.GetMethod(methodName, BindingFlags.Public |
-                                                         BindingFlags.NonPublic |
-                                                         BindingFlags.Static |
-                                                         BindingFlags.Instance |
-                                                         BindingFlags.FlattenHierarchy);
+        }
+        else {
+          MethodInfo method = type.GetMethod(methodName,
+            BindingFlags.Public |
+            BindingFlags.NonPublic |
+            BindingFlags.Static |
+            BindingFlags.Instance |
+            BindingFlags.FlattenHierarchy
+          );
 
           if (method == null) {
-            Debug.LogWarning("Could not find a property or method of the name " + methodName + " " +
-                              "to invoke for the OnChange attribute.");
+            Debug.LogWarning("Could not find a property or method of the name " +
+              methodName + " " + "to invoke for the OnChange attribute.");
             return;
           }
 
@@ -70,8 +75,8 @@ namespace Leap.Unity.Attributes {
               method.Invoke(obj, argArray);
             };
           } else {
-            Debug.LogWarning("Could not invoke the method " + methodName + " from OnChange " +
-                             "because the method had more than 1 argument.");
+            Debug.LogWarning("Could not invoke the method " + methodName +
+              " from OnChange because the method had more than 1 argument.");
           }
         }
       }

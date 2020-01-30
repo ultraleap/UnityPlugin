@@ -480,7 +480,9 @@ namespace Leap.Unity.Query {
     /// is transformed into:
     ///   (A,_) (B,_) (C,A) (D,B) (E,C) (F,D)
     /// </summary>
-    public static Query<PrevPair<T>> WithPrevious<T>(this Query<T> query, int offset = 1, bool includeStart = false) {
+    public static Query<PrevPair<T>> WithPrevious<T>(this Query<T> query,
+      int offset = 1, bool includeStart = false)
+    {
       using (var slice = query.Deconstruct()) {
         int resultCount = includeStart ? slice.Count : Mathf.Max(0, slice.Count - offset);
         var dstArray = ArrayPool<PrevPair<T>>.Spawn(resultCount);
@@ -506,6 +508,50 @@ namespace Leap.Unity.Query {
         }
 
         return new Query<PrevPair<T>>(dstArray, resultCount);
+      }
+    }
+
+    /// <summary>
+    /// Returns a new Query where each new element in the sequence is an instance of the
+    /// PrevPair struct. The value field of the pair will point to an element in the
+    /// current sequence, and the prev field will point to an element that comes
+    /// 'offset' elements before the current element. If 'includeStart' is true, the
+    /// sequence will also include elements that have no previous element.
+    /// 
+    /// For example, with an offset of 2 and with includeEnd as true, the sequence:
+    ///   A, B, C, D, E, F
+    /// is transformed into:
+    ///   (A,C) (B,D) (C,E) (D,F) (E,_) (F,_)
+    /// </summary>
+    public static Query<NextPair<T>> WithNext<T>(this Query<T> query,
+      int offset = 1, bool includeEnd = false)
+    {
+      offset = Math.Abs(offset);
+      using (var slice = query.Deconstruct()) {
+        int resultCount = includeEnd ? slice.Count : Mathf.Max(0, slice.Count - offset);
+        var dstArray = ArrayPool<NextPair<T>>.Spawn(resultCount);
+
+        int dstIndex = 0;
+
+        for (int i = 0; i < slice.Count - offset; i++) {
+          dstArray[dstIndex++] = new NextPair<T>() {
+            value = slice[i],
+            next = slice[i + offset],
+            hasNext = true
+          };
+        }
+
+        if (includeEnd) {
+          for (int i = slice.Count - offset; i < slice.Count; i++) {
+            dstArray[dstIndex++] = new NextPair<T>() {
+              value = slice[i],
+              next = default(T),
+              hasNext = false
+            };
+          }
+        }
+
+        return new Query<NextPair<T>>(dstArray, resultCount);
       }
     }
 
@@ -581,6 +627,24 @@ namespace Leap.Unity.Query {
       /// prev will take the default value of T.
       /// </summary>
       public bool hasPrev;
+    }
+
+    public struct NextPair<T> {
+      /// <summary>
+      /// The current element of the sequence
+      /// </summary>
+      public T value;
+
+      /// <summary>
+      /// If hasNext is true, the element that comes after the value.
+      /// </summary>
+      public T next;
+
+      /// <summary>
+      /// Does the next field represent the next value?  If false,
+      /// prev will take the default value of T.
+      /// </summary>
+      public bool hasNext;
     }
 
     public struct IndexedValue<T> {

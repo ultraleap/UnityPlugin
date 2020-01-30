@@ -27,6 +27,7 @@ namespace Leap.Unity.GraphicalRenderer {
 
     #region INSPECTOR FIELDS
 
+    #pragma warning disable 0649
     [Tooltip("What type of graphic motion should be supported by this renderer?  Currently there are only two modes, None, and Translation.")]
     [EditTimeOnly]
     [SerializeField]
@@ -36,6 +37,8 @@ namespace Leap.Unity.GraphicalRenderer {
     [EditTimeOnly]
     [SerializeField]
     private bool _createMeshRenderers;
+    #pragma warning restore 0649
+    
     #endregion
 
     #region PRIVATE VARIABLES

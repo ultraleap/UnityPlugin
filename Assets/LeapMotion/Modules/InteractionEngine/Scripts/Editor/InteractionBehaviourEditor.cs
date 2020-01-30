@@ -48,7 +48,7 @@ namespace Leap.Unity.Interaction {
     private void drawInteractionManagerDecorator(SerializedProperty property) {
       bool shouldDrawInteractionManagerNotSetWarning = false;
       foreach (var target in targets) {
-        if (PrefabUtility.GetPrefabType(target) == PrefabType.Prefab) continue;
+        if (Utils.IsObjectPartOfPrefabAsset(target)) continue;
 
         if (target.manager == null) {
           shouldDrawInteractionManagerNotSetWarning = true;
@@ -95,7 +95,7 @@ namespace Leap.Unity.Interaction {
         }
         else {
           foreach (var target in targets) {
-            if (PrefabUtility.GetPrefabType(target) == PrefabType.Prefab) continue;
+            if (Utils.IsObjectPartOfPrefabAsset(target)) continue;
 
             Undo.RecordObject(target, "Auto-set Interaction Manager");
             target.manager = manager;

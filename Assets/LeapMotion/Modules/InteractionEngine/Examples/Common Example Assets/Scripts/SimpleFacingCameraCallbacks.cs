@@ -18,6 +18,7 @@ namespace Leap.Unity.Examples {
   public class SimpleFacingCameraCallbacks : MonoBehaviour {
 
     public Transform toFaceCamera;
+    public Camera cameraToFace;
 
     private bool _initialized = false;
     private bool _isFacingCamera = false;
@@ -30,9 +31,10 @@ namespace Leap.Unity.Examples {
     }
 
     private void initialize() {
+      if(cameraToFace == null) { cameraToFace = Camera.main; }
       // Set "_isFacingCamera" to be whatever the current state ISN'T, so that we are
       // guaranteed to fire a UnityEvent on the first initialized Update().
-      _isFacingCamera = !GetIsFacingCamera(toFaceCamera, Camera.main);
+      _isFacingCamera = !GetIsFacingCamera(toFaceCamera, cameraToFace);
       _initialized = true;
     }
 
@@ -42,7 +44,7 @@ namespace Leap.Unity.Examples {
       }
       if (!_initialized) return;
 
-      if (GetIsFacingCamera(toFaceCamera, Camera.main, _isFacingCamera ? 0.77F : 0.82F) != _isFacingCamera) {
+      if (GetIsFacingCamera(toFaceCamera, cameraToFace, _isFacingCamera ? 0.77F : 0.82F) != _isFacingCamera) {
         _isFacingCamera = !_isFacingCamera;
 
         if (_isFacingCamera) {

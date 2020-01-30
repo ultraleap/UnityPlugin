@@ -10,7 +10,6 @@
 using System;
 using UnityEngine;
 using UnityObject = UnityEngine.Object;
-using UnityEngine.Serialization;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -28,8 +27,7 @@ namespace Leap.Unity {
   public class AssetFolder {
 
     [SerializeField]
-    [FormerlySerializedAs("_assetFolder")]
-    protected UnityObject _assetReference;
+    protected UnityObject _assetFolder;
 
     public AssetFolder() { }
 
@@ -46,8 +44,8 @@ namespace Leap.Unity {
     public virtual string Path {
       get {
 #if UNITY_EDITOR
-        if (_assetReference != null) {
-          return AssetDatabase.GetAssetPath(_assetReference);
+        if (_assetFolder != null) {
+          return AssetDatabase.GetAssetPath(_assetFolder);
         } else {
           return null;
         }
@@ -57,7 +55,7 @@ namespace Leap.Unity {
       }
       set {
 #if UNITY_EDITOR
-        _assetReference = AssetDatabase.LoadAssetAtPath<DefaultAsset>(value);
+        _assetFolder = AssetDatabase.LoadAssetAtPath<DefaultAsset>(value);
 #else
         throw new InvalidOperationException("Cannot set the Path of an Asset Folder in a build.");
 #endif

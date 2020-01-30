@@ -41,10 +41,12 @@ namespace LeapInternal {
     /// overwritten with new objects.  Turning this number down can reduce
     /// the total memory footprint used by the memory manager.
     /// </summary>
-    public static uint MinPoolSize = 8;
+    public static uint MinPoolSize = 64;
 
-    private static Dictionary<IntPtr, ActiveMemoryInfo> _activeMemory = new Dictionary<IntPtr, ActiveMemoryInfo>();
-    private static Dictionary<PoolKey, Queue<object>> _pooledMemory = new Dictionary<PoolKey, Queue<object>>();
+    private static Dictionary<IntPtr, ActiveMemoryInfo> _activeMemory =
+      new Dictionary<IntPtr, ActiveMemoryInfo>();
+    private static Dictionary<PoolKey, Queue<object>> _pooledMemory =
+      new Dictionary<PoolKey, Queue<object>>();
 
     [MonoPInvokeCallback(typeof(Allocate))]
     public static IntPtr Pin(UInt32 size, eLeapAllocatorType typeHint, IntPtr state) {

@@ -27,8 +27,8 @@ namespace Leap.Unity.Attributes {
     }
 
     public static void GetAttributes(SerializedProperty property,
-                                     FieldInfo fieldInfo,
-                                     out List<CombinablePropertyAttribute> outAttributes) {
+      FieldInfo fieldInfo, out List<CombinablePropertyAttribute> outAttributes)
+    {
       if (!_cachedAttributes.TryGetValue(fieldInfo, out outAttributes)) {
         outAttributes = new List<CombinablePropertyAttribute>();
 
@@ -50,20 +50,36 @@ namespace Leap.Unity.Attributes {
       }
     }
 
-    public override float GetPropertyHeight(SerializedProperty property, GUIContent label) {
-      return EditorGUI.GetPropertyHeight(property);
+    public override float GetPropertyHeight(SerializedProperty property,
+      GUIContent label) 
+    {
+      getAttributes(property);
+
+      var topPanelDrawer = attributes.Query().Cast<ITopPanelDrawer>()
+        .Where(o => o != null).FirstOrDefault();
+      if (topPanelDrawer != null) {
+        return topPanelDrawer.GetHeight() + EditorGUI.GetPropertyHeight(property,
+          includeChildren: true);
+      }
+
+      return EditorGUI.GetPropertyHeight(property, includeChildren: true);
+    }
+
+    public override bool CanCacheInspectorGUI(SerializedProperty property) {
+      return false;
     }
 
     public override void OnGUI(Rect position, SerializedProperty property, GUIContent label) {
       getAttributes(property);
 
-      CombinablePropertyDrawer.OnGUI(this.attributes, this.fieldInfo,
-                                     position, property, label);
+      CombinablePropertyDrawer.OnGUI(this.attributes, this.fieldInfo, position,
+        property, label);
     }
 
     public static void OnGUI(List<CombinablePropertyAttribute> attributes,
-                             FieldInfo fieldInfo,
-                             Rect position, SerializedProperty property, GUIContent label) {
+      FieldInfo fieldInfo, Rect position, SerializedProperty property,
+      GUIContent label)
+    {
       float defaultLabelWidth = EditorGUIUtility.labelWidth;
       float fieldWidth = position.width - EditorGUIUtility.labelWidth;
 
@@ -78,6 +94,7 @@ namespace Leap.Unity.Attributes {
       ISupportDragAndDrop dragAndDropSupport = null;
 
       IFullPropertyDrawer fullPropertyDrawer = null;
+      ITopPanelDrawer topPanelDrawer = null;
       foreach (var a in attributes) {
         if (fieldInfo != null) {
           a.Init(fieldInfo, property.serializedObject.targetObjects);
@@ -116,6 +133,10 @@ namespace Leap.Unity.Attributes {
         if (a is ISupportDragAndDrop) {
           dragAndDropSupport = (a as ISupportDragAndDrop);
         }
+
+        if (a is ITopPanelDrawer) {
+          topPanelDrawer = (a as ITopPanelDrawer);
+        }
       }
 
       if (fullPropertyDrawer != null && !canUseDefaultDrawer) {
@@ -124,12 +145,22 @@ namespace Leap.Unity.Attributes {
       }
 
       Rect r = position;
+      Rect topPanel = new Rect();
+      if (topPanelDrawer != null) {
+        // Y = 0 is the top, so take the Rect's "bottom" for top panel.
+        topPanel = r.TakeBottom(topPanelDrawer.GetHeight(), out r);
+      }
+
       if (dragAndDropSupport != null) {
         processDragAndDrop(dragAndDropSupport, ref r, property);
       }
 
       EditorGUI.BeginChangeCheck();
       EditorGUI.BeginDisabledGroup(shouldDisable);
+
+      if (topPanelDrawer != null) {
+        topPanelDrawer.Draw(topPanel, property);
+      }
 
       drawAdditive<IBeforeLabelAdditiveDrawer>(attributes, ref r, property);
 
@@ -145,15 +176,16 @@ namespace Leap.Unity.Attributes {
             } else if (property.propertyType == SerializedPropertyType.Float) {
               property.floatValue = EditorGUI.Slider(r, label, property.floatValue, rangeAttribute.min, rangeAttribute.max);
             } else {
-              EditorGUI.PropertyField(r, property, label);
+              EditorGUI.PropertyField(r, property, label, includeChildren: true);
             }
           } else {
-            EditorGUI.PropertyField(r, property, label);
+            EditorGUI.PropertyField(r, property, label, includeChildren: true);
           }
         }
 
         r.x += r.width;
-      } else {
+      }
+      else {
         r.width = EditorGUIUtility.labelWidth;
         r = EditorGUI.PrefixLabel(r, label);
 
@@ -161,7 +193,8 @@ namespace Leap.Unity.Attributes {
         drawAdditive<IBeforeFieldAdditiveDrawer>(attributes, ref r, property);
 
         r.width = fieldWidth;
-        EditorGUI.PropertyField(r, property, GUIContent.none);
+        EditorGUI.PropertyField(r, property, GUIContent.none,
+          includeChildren: true);
         r.x += r.width;
       }
 
@@ -169,7 +202,14 @@ namespace Leap.Unity.Attributes {
 
       EditorGUI.EndDisabledGroup();
 
-      bool didChange = EditorGUI.EndChangeCheck();
+      bool didChange = false;
+      try {
+        didChange = EditorGUI.EndChangeCheck();
+      }
+      catch (System.Exception e) {
+        Debug.LogWarning("CombinablePropertyDrawer exception getting didChange: " +
+          e.ToString());
+      }
 
       if (didChange || !property.hasMultipleDifferentValues) {
         foreach (var a in attributes) {

@@ -9,6 +9,8 @@
 
 using System;
 using UnityEngine;
+using Leap.Unity.Encoding;
+using Leap.Unity.Splines;
 
 namespace Leap.Unity {
 
@@ -17,7 +19,7 @@ namespace Leap.Unity {
   /// multiplication, but Poses always have unit scale.
   /// </summary>
   [System.Serializable]
-  public struct Pose : IEquatable<Pose> {
+  public struct Pose : IEquatable<Pose>, IInterpolable<Pose> {
 
     public Vector3    position;
     public Quaternion rotation;
@@ -36,7 +38,18 @@ namespace Leap.Unity {
     public Pose inverse {
       get {
         var invQ = Quaternion.Inverse(this.rotation);
-        return new Pose(invQ * -this.position, invQ);
+        return new Pose(invQ * -this.position, invQ.normalized);
+      }
+    }
+
+    /// <summary>
+    /// Returns a Matrix4x4 corresponding to this pose's translation and
+    /// rotation, with unit scale.
+    /// </summary>
+    public Matrix4x4 matrix {
+      get {
+        this.rotation = this.rotation.normalized;
+        return Matrix4x4.TRS(this.position, this.rotation, Vector3.one);
       }
     }
 
@@ -61,12 +74,26 @@ namespace Leap.Unity {
     }
 
     /// <summary>
-    /// Transforms the right-hand-side Vector3 as a local-space position into world space
-    /// as if this Pose were its reference frame.
+    /// Transforms the right-hand-side Vector3 as a local-space position into
+    /// world space as if this Pose were its reference frame or parent.
     /// </summary>
     public static Pose operator *(Pose pose, Vector3 localPosition) {
       return new Pose(pose.position + pose.rotation * localPosition,
                       pose.rotation);
+    }
+
+    public static Pose operator *(Pose pose, Quaternion localRotation) {
+      return pose * new Pose(Vector3.zero, localRotation);
+    }
+
+    public static Pose operator *(Quaternion parentRotation, Pose localPose) {
+      return new Pose(Vector3.zero, parentRotation) * localPose;
+    }
+
+    /// <summary> Non-projective matrices only (MultiplyPoint3x4). </summary>
+    public static Pose operator *(Matrix4x4 matrix, Pose localPose) {
+      return new Pose(matrix.MultiplyPoint3x4(localPose.position),
+        matrix.rotation * localPose.rotation);
     }
 
     public bool ApproxEquals(Pose other) {
@@ -119,7 +146,8 @@ namespace Leap.Unity {
       else return this.Equals((Pose)obj);
     }
     public bool Equals(Pose other) {
-      return other.position == this.position && other.rotation == this.rotation;
+      return other.position == this.position && 
+             other.rotation == this.rotation;
     }
 
     public override int GetHashCode() {
@@ -137,6 +165,24 @@ namespace Leap.Unity {
       return !(a.Equals(b));
     }
 
+
+    // IInterpolable Implementation
+    public Pose CopyFrom(Pose h) {
+      position = h.position;
+      rotation = h.rotation;
+      return this;
+    }
+    public bool FillLerped(Pose a, Pose b, float t) {
+      this = LerpUnclamped(a, b, t);
+      return true;
+    }
+    public bool FillSplined(Pose a, Pose b, Pose c, Pose d, float t) {
+      position = CatmullRom.ToCHS(a.position, b.position, c.position, d.position,
+        centripetal: false).PositionAt(t);
+      rotation = Quaternion.SlerpUnclamped(b.rotation, c.rotation, t);
+      return true;
+    }
+
   }
 
   public static class PoseExtensions {
@@ -152,6 +198,13 @@ namespace Leap.Unity {
     /// Creates a Pose using the transform's position and rotation.
     /// </summary>
     public static Pose ToPose(this Transform t) {
+      return new Pose(t.position, t.rotation);
+    }
+
+    /// <summary>
+    /// Creates a Pose using the transform's position and rotation.
+    /// </summary>
+    public static Pose GetPose(this Transform t) {
       return new Pose(t.position, t.rotation);
     }
 
@@ -191,11 +244,13 @@ namespace Leap.Unity {
     /// Returns the pose (position and rotation) described by a Matrix4x4.
     /// </summary>
     public static Pose GetPose(this Matrix4x4 m) {
-      return new Pose(m.GetColumn(3),
-                      m.GetColumn(2) == m.GetColumn(1) ? Quaternion.identity
-                                                       : Quaternion.LookRotation(
-                                                           m.GetColumn(2),
-                                                           m.GetColumn(1)));
+      return new Pose(position: m.MultiplyPoint3x4(Vector3.zero),
+        rotation: m.GetQuaternion());
+      // return new Pose(m.GetColumn(3),
+      //                 m.GetColumn(2) == m.GetColumn(1) ? Quaternion.identity
+      //                                                  : Quaternion.LookRotation(
+      //                                                      m.GetColumn(2),
+      //                                                      m.GetColumn(1)));
     }
 
     /// <summary>
@@ -212,13 +267,6 @@ namespace Leap.Unity {
     /// </summary>
     public static Pose WithPosition(this Pose pose, Vector3 newPosition) {
       return new Pose(newPosition, pose.rotation);
-    }
-
-    public static Vector3 GetVector3(this Matrix4x4 m) { return m.GetColumn(3); }
-
-    public static Quaternion GetQuaternion(this Matrix4x4 m) {
-      if (m.GetColumn(2) == m.GetColumn(1)) { return Quaternion.identity; }
-      return Quaternion.LookRotation(m.GetColumn(2), m.GetColumn(1));
     }
 
     public const float EPSILON = 0.0001f;

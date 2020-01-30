@@ -339,8 +339,9 @@ namespace Leap.Unity.GraphicalRenderer {
             tex = convertToTexture2D(rt, _mipMap);
 
             progress.Step("Compressing Texture");
+
 #if UNITY_EDITOR
-#if UNITY_2018_4_OR_NEWER
+#if UNITY_2018_3_OR_NEWER
 			  UnityEditor.EditorUtility.CompressTexture(tex, _format, UnityEditor.TextureCompressionQuality.Best);
 #else
 			  UnityEditor.EditorUtility.CompressTexture(tex, _format, TextureCompressionQuality.Best);
@@ -452,7 +453,7 @@ namespace Leap.Unity.GraphicalRenderer {
     private Texture2D getDefaultTexture(Color color) {
       Texture2D texture;
       if (!_cachedDefaultTextures.TryGetValue(color, out texture)) {
-        
+
         #if UNITY_2018_2_OR_NEWER
         texture = new Texture2D(3, 3, TextureFormat.ARGB32, mipChain: false);
         #else

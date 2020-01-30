@@ -20,11 +20,13 @@ namespace Leap.Unity {
     [Serializable]
     private class Entry {
 
+      #pragma warning disable 0649
       [SerializeField]
       public int enumValue;
 
       [SerializeField]
       public UnityEvent callback;
+      #pragma warning restore 0649
     }
 
     //The actual serialized list of entries

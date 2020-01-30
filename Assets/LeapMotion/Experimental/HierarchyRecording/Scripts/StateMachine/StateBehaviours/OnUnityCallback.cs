@@ -14,7 +14,7 @@ namespace Leap.Unity.Recording {
   public class OnUnityCallback : MonoBehaviour {
 
     [SerializeField]
-    private EnumEventTable _table;
+    private EnumEventTable _table = null;
 
     private void Awake() {
       _table.Invoke((int)CallbackType.Awake);
