@@ -339,13 +339,15 @@ namespace Leap.Unity.GraphicalRenderer {
             tex = convertToTexture2D(rt, _mipMap);
 
             progress.Step("Compressing Texture");
-#if UNITY_EDITOR && UNITY_2018_3_OR_NEWER
-            UnityEditor.EditorUtility.CompressTexture(tex, _format,
-            (int)TextureCompressionQuality.Best);
-#elif UNITY_EDITOR
-            UnityEditor.EditorUtility.CompressTexture(tex, _format, TextureCompressionQuality.Best);
+
+#if UNITY_EDITOR
+#if UNITY_2018_3_OR_NEWER
+			  UnityEditor.EditorUtility.CompressTexture(tex, _format, UnityEditor.TextureCompressionQuality.Best);
+#else
+			  UnityEditor.EditorUtility.CompressTexture(tex, _format, TextureCompressionQuality.Best);
 #endif
-            tex.filterMode = _filterMode;
+#endif
+			  tex.filterMode = _filterMode;
 
             progress.Step("Updating Texture");
             //keep the texture as readable because the user might want to do things with the texture!
