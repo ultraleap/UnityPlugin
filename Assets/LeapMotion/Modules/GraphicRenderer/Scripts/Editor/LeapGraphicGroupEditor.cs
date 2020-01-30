@@ -222,7 +222,17 @@ namespace Leap.Unity.GraphicalRenderer {
       Rect left, right;
       rect.SplitHorizontallyWithRight(out left, out right, BUTTON_WIDTH * 2);
 
-      if (!EditorApplication.isPlaying && PrefabUtility.GetPrefabType(_renderer) != PrefabType.Prefab) {
+      #if UNITY_2018_3_OR_NEWER
+      if (!EditorApplication.isPlaying &&
+        // Allow normal gameobjects & prefab _instances_ but not prefab assets.
+        !PrefabUtility.IsPartOfAnyPrefab(_renderer) ||
+        PrefabUtility.GetPrefabInstanceStatus(_renderer) != PrefabInstanceStatus.NotAPrefab)
+      {
+      #else
+      if (!EditorApplication.isPlaying &&
+        PrefabUtility.GetPrefabType(_renderer) != PrefabType.Prefab)
+      {
+      #endif
         var mesher = _renderer.editor.GetSelectedRenderingMethod() as LeapMesherBase;
         if (mesher != null) {
 

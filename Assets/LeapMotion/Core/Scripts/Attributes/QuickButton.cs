@@ -18,7 +18,9 @@ using UnityEditor;
 
 namespace Leap.Unity.Attributes {
 
-  public class QuickButtonAttribute : CombinablePropertyAttribute, IAfterFieldAdditiveDrawer {
+  public class QuickButtonAttribute : CombinablePropertyAttribute, 
+    IAfterFieldAdditiveDrawer
+  {
 
     public const float PADDING_RIGHT = 12f;
 
@@ -26,7 +28,9 @@ namespace Leap.Unity.Attributes {
     public readonly string methodOnPress = null;
     public readonly string tooltip = "";
 
-    public QuickButtonAttribute(string buttonLabel, string methodOnPress, string tooltip = "") {
+    public QuickButtonAttribute(string buttonLabel, string methodOnPress,
+      string tooltip = "")
+    {
       this.label = buttonLabel;
       this.methodOnPress = methodOnPress;
       this.tooltip = tooltip;
@@ -38,7 +42,7 @@ namespace Leap.Unity.Attributes {
     /// to the Draw method.
     /// </summary>
     public float GetWidth() {
-      return GUI.skin.label.CalcSize(new GUIContent(label)).x + 12f + PADDING_RIGHT;
+      return GUI.skin.label.CalcSize(new GUIContent(label)).x + PADDING_RIGHT;
     }
 
     public void Draw(Rect rect, SerializedProperty property) {
@@ -79,9 +83,14 @@ namespace Leap.Unity.Attributes {
       }
 
       using (new EditorGUI.DisabledScope(method == null)) {
-        if (GUI.Button(rect.PadInner(0, 0, 0, PADDING_RIGHT), new GUIContent(label, buttonTooltip))) {
+        if (GUI.Button(rect.PadInner(0, 0, 0, 0), new GUIContent(label, buttonTooltip))) {
           foreach (var target in targets) {
-            Undo.RegisterFullObjectHierarchyUndo(target, "Perform QuickButton Action");
+            if (target is MonoBehaviour) {
+              Undo.RegisterFullObjectHierarchyUndo((target as MonoBehaviour).gameObject,
+                "Perform QuickButton Action");
+            } else {
+              Undo.RegisterFullObjectHierarchyUndo(target, "Perform QuickButton Action");
+            }
           }
           foreach (var target in targets) {
             try {

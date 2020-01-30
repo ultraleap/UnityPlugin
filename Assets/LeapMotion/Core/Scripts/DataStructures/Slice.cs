@@ -47,6 +47,16 @@ namespace Leap.Unity {
       return Slice(list, fromIdx);
     }
 
+    /// <summary> Creates a new array and returns it, with the contents of this
+    /// slice. </summary>
+    public static T[] ToArray<T>(this Slice<T> slice) {
+      var array = new T[slice.Count];
+      for (int i = 0; i < slice.Count; i++) {
+        array[i] = slice[i];
+      }
+      return array;
+    }
+
   }
 
   public struct Slice<T> : IIndexableStruct<T, Slice<T>> {

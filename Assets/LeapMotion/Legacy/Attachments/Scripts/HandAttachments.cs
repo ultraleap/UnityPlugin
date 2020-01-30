@@ -70,9 +70,11 @@ namespace Leap.Unity.Attachments {
       }
     }
   
+    #pragma warning disable 0649
     [Tooltip("Whether to use this for right or left hands")]
     [SerializeField]
     private Chirality _handedness;
+    #pragma warning restore 0649
 
     /** 
      * Whether to use this for right or left hands.

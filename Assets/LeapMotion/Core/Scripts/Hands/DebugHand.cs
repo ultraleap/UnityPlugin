@@ -35,6 +35,7 @@ namespace Leap.Unity {
       }
     }
 
+    #pragma warning disable 0649
     [SerializeField]
     private Chirality handedness;
     public override Chirality Handedness {
@@ -43,6 +44,7 @@ namespace Leap.Unity {
       }
       set { }
     }
+    #pragma warning restore 0649
 
     public override Hand GetLeapHand() {
       return hand_;

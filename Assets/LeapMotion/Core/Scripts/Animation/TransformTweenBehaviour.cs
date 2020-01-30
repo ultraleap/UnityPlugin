@@ -194,8 +194,10 @@ namespace Leap.Unity.Animation {
     [System.Serializable]
     public class FloatEvent : UnityEvent<float> { }
 
+    #pragma warning disable 0649
     [SerializeField]
     private EnumEventTable _eventTable;
+    #pragma warning restore 0649
 
     public enum EventType {
       //OnProgress = 100, // Requires float Event data

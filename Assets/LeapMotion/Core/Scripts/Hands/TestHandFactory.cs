@@ -141,6 +141,8 @@ namespace Leap {
 
     #region Leap Space Hand Generation
 
+    public static Vector PepperWristOffset = new Vector(-8.87f, -0.5f, 85.12f);
+
     private static Hand makeLeapSpaceTestHand(int frameId, int handId, bool isLeft) {
       List<Finger> fingers = new List<Finger>(5);
       fingers.Add(makeThumb(frameId, handId, isLeft));
@@ -153,7 +155,8 @@ namespace Leap {
       Vector elbow = armWrist + 250f * Vector.Backward;
 
       // Adrian: The previous "armBasis" used "elbow" as a translation component.
-      Arm arm = new Arm(elbow, armWrist,(elbow + armWrist)/2, Vector.Forward, 250f, 41f, LeapQuaternion.Identity);
+      Arm arm = new Arm(elbow, armWrist,(elbow + armWrist)/2, Vector.Forward,
+        250f, 41f, LeapQuaternion.Identity);
       Hand testHand = new Hand(frameId,
                                handId,
                                1.0f,
@@ -172,7 +175,8 @@ namespace Leap {
                                Vector.Down,
                                LeapQuaternion.Identity,
                                Vector.Forward,
-                               new Vector(-4.36385750984f, 6.5f, 31.0111342526f));
+                               PepperWristOffset);
+                              //  new Vector(-12.36385750984f, -6.5f, 81.0111342526f));
 
       return testHand;
     }

@@ -14,7 +14,8 @@ namespace Leap.Unity {
 
   /// <summary>
   /// A component to be attached to a HandModelBase to handle starting and ending of
-  /// tracking.
+  /// tracking. `HandReset` is called when tracking begins. `HandFinish` is
+  /// called when tracking ends.
   /// </summary>
   public abstract class HandTransitionBehavior : MonoBehaviour {
 

@@ -14,11 +14,13 @@ using Leap.Unity.GraphicalRenderer;
 
 public class ExampleArrayController : MonoBehaviour {
 
+  #pragma warning disable 0649
   [SerializeField]
   private AnimationCurve _motionCurve;
+  #pragma warning restore 0649
 
   [SerializeField]
-  private Gradient _gradient;
+  private Gradient _gradient = null;
 
   private List<LeapGraphic> _graphics = new List<LeapGraphic>();
   private List<Vector3> _originalPositions = new List<Vector3>();

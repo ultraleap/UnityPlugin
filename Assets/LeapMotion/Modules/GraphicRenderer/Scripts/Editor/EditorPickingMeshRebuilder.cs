@@ -16,7 +16,11 @@ namespace Leap.Unity.GraphicalRenderer {
 
     [InitializeOnLoadMethod]
     private static void initManager() {
+      #if UNITY_2019_1_OR_NEWER
+      SceneView.duringSceneGui += onSceneGui;
+      #else
       SceneView.onSceneGUIDelegate += onSceneGui;
+      #endif
     }
 
     private static void onSceneGui(SceneView view) {

@@ -803,8 +803,10 @@ namespace Leap.Unity.Interaction {
 
     #region Unity Events (Internal)
 
+    #pragma warning disable 0649
     [SerializeField]
     private EnumEventTable _eventTable;
+    #pragma warning restore 0649
 
     public enum EventType {
       OnAttachedToAnchor = 100,

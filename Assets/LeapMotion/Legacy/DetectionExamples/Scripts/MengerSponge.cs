@@ -15,6 +15,7 @@ namespace Leap.Unity.DetectionExamples {
   [ExecuteInEditMode]
   public class MengerSponge : MonoBehaviour {
 
+    #pragma warning disable 0649
     [SerializeField]
     private int _rendererLod = 2;
 
@@ -26,6 +27,7 @@ namespace Leap.Unity.DetectionExamples {
 
     [SerializeField]
     private bool _overrideShadowDistance = false;
+    #pragma warning restore 0649
 
     private List<GameObject> _renderers = new List<GameObject>();
     private Mesh _subMesh = null;

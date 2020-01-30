@@ -38,10 +38,12 @@ namespace Leap.Unity.InputModule {
 
     private Quaternion CurrentRotation;
 
+    #pragma warning disable 0649
     [SerializeField]
     private Mesh _sphereMesh;
     [SerializeField]
     private Material _sphereMaterial;
+    #pragma warning restore 0649
 
     private GameObject[] Cursors;
     private SpringJoint[,] SpringJoints;

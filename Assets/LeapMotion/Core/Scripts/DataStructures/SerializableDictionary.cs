@@ -95,7 +95,7 @@ namespace Leap.Unity {
       return _dictionary.TryGetValue(key, out value);
     }
 
-    public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator() {
+    public Dictionary<TKey, TValue>.Enumerator GetEnumerator() {
       return _dictionary.GetEnumerator();
     }
 
@@ -237,6 +237,10 @@ namespace Leap.Unity {
         _values.Add(pair.Value);
 #endif
       }
+    }
+
+    IEnumerator<KeyValuePair<TKey, TValue>> IEnumerable<KeyValuePair<TKey, TValue>>.GetEnumerator() {
+      return ((IEnumerable<KeyValuePair<TKey, TValue>>)_dictionary).GetEnumerator();
     }
   }
 }

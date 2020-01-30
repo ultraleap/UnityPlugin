@@ -22,7 +22,7 @@ namespace Leap.Unity.Interaction {
     [SerializeField]
     [Tooltip("The anchors that are within this AnchorGroup. Anchorable objects associated "
            + "this AnchorGroup can only be placed in anchors within this group.")]
-    private AnchorSet _anchors;
+    private AnchorSet _anchors = null;
     public AnchorSet anchors { get { return _anchors; } }
 
     private HashSet<AnchorableBehaviour> _anchorableObjects = new HashSet<AnchorableBehaviour>();

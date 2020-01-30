@@ -105,6 +105,9 @@ namespace Leap.Unity.Interaction {
     /// </summary>
     private Hand _hand;
 
+
+
+    public Transform headTransform;
     #endregion
 
     #region Unity Events
@@ -721,7 +724,8 @@ namespace Leap.Unity.Interaction {
     }
 
     protected override void fixedUpdateGraspingState() {
-      grabClassifier.FixedUpdateClassifierHandState();
+      //Feed Camera Transform in for Projective Grabbing Hack (details inside)
+      grabClassifier.FixedUpdateClassifierHandState(headTransform);
     }
 
     protected override void onGraspedObjectForciblyReleased(IInteractionBehaviour objectToBeReleased) {

@@ -65,7 +65,7 @@ namespace Leap.Unity.GraphicalRenderer {
 
     [EditTimeOnly]
     [SerializeField]
-    private Transform _transform;
+    private Transform _transform = null;
 
     /// <summary>
     /// Gets or sets the amount of strength for this blend shape.

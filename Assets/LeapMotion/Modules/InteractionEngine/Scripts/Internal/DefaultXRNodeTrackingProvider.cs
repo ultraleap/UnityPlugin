@@ -8,8 +8,6 @@
  ******************************************************************************/
 
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 #if UNITY_2017_2_OR_NEWER
@@ -55,8 +53,8 @@ namespace Leap.Unity.Interaction {
     void updateTrackingData() {
       if (_isXRNodeSet) {
 
-        var position = InputTracking.GetLocalPosition(xrNode);
-        var rotation = InputTracking.GetLocalRotation(xrNode);
+        var position = XRSupportUtil.GetXRNodeLocalPosition((int)xrNode);
+        var rotation = XRSupportUtil.GetXRNodeLocalRotation((int)xrNode);
 
         // Unfortunately, the only alternative to checking the controller's position and
         // rotation for whether or not it is tracked is to request an allocated string

@@ -30,26 +30,42 @@ namespace Leap.Unity.Attributes {
     public readonly object testValue;
     public readonly bool disableResult;
     public readonly bool isAndOperation;
+    public readonly bool nullIsValid;
+    public readonly bool equalToComparison;
 
-    public DisableIfBase(object isEqualTo, object isNotEqualTo, bool isAndOperation, params string[] propertyNames) {
+    public DisableIfBase(object isEqualTo, object isNotEqualTo, bool isAndOperation, 
+                         bool nullIsValid, bool equalToComparison, params string[] propertyNames) {
       this.propertyNames = propertyNames;
       this.isAndOperation = isAndOperation;
+      this.nullIsValid = nullIsValid;
+      this.equalToComparison = equalToComparison;
 
-      if ((isEqualTo != null) == (isNotEqualTo != null)) {
-        throw new ArgumentException("Must specify exactly one of 'equalTo' or 'notEqualTo'.");
+      if (nullIsValid) {
+        if (equalToComparison) {
+          testValue = isEqualTo;
+          disableResult = true;
+        } else {
+          testValue = isNotEqualTo;
+          disableResult = false;
+        }
+      } else {
+        if ((isEqualTo != null) == (isNotEqualTo != null)) {
+          throw new ArgumentException("Must specify exactly one of 'equalTo' or 'notEqualTo'.");
+        }
+
+        if (isEqualTo != null) {
+          testValue = isEqualTo;
+          disableResult = true;
+        } else if (isNotEqualTo != null) {
+          testValue = isNotEqualTo;
+          disableResult = false;
+        }
+
+        if (!(testValue is bool) && !(testValue is Enum)) {
+          throw new ArgumentException("Only values of bool or Enum are allowed in comparisons using DisableIf.");
+        }
       }
 
-      if (isEqualTo != null) {
-        testValue = isEqualTo;
-        disableResult = true;
-      } else if (isNotEqualTo != null) {
-        testValue = isNotEqualTo;
-        disableResult = false;
-      }
-
-      if (!(testValue is bool) && !(testValue is Enum)) {
-        throw new ArgumentException("Only values of bool or Enum are allowed in comparisons using DisableIf.");
-      }
     }
 
 #if UNITY_EDITOR
@@ -77,7 +93,13 @@ namespace Leap.Unity.Attributes {
     }
 
     private bool shouldDisable(SerializedProperty property) {
-      if (property.propertyType == SerializedPropertyType.Boolean) {
+      if (property == null) {
+        throw new System.NullReferenceException(
+          "Property was null. Expected one of " + propertyNames.ToArrayString());
+      }
+      if (nullIsValid && property.propertyType == SerializedPropertyType.ObjectReference) {
+        return (property.objectReferenceValue == (UnityEngine.Object)testValue) == disableResult;
+      } else if (property.propertyType == SerializedPropertyType.Boolean) {
         return (property.boolValue == (bool)testValue) == disableResult;
       } else if (property.propertyType == SerializedPropertyType.Enum) {
         return (property.intValue == (int)testValue) == disableResult;
@@ -91,30 +113,40 @@ namespace Leap.Unity.Attributes {
 
   public class DisableIf : DisableIfBase {
     public DisableIf(string propertyName, object isEqualTo = null, object isNotEqualTo = null) :
-      base(isEqualTo, isNotEqualTo, true, propertyName) { }
+      base(isEqualTo, isNotEqualTo, true, false, false, propertyName) { }
+  }
+
+  public class DisableIfEqual : DisableIfBase {
+    public DisableIfEqual(string propertyName, object To) :
+      base(To, null, true, true, true, propertyName) { }
+  }
+
+  public class DisableIfNotEqual : DisableIfBase {
+    public DisableIfNotEqual(string propertyName, object To) :
+      base(null, To, true, true, false, propertyName) { }
   }
 
   public class DisableIfAny : DisableIfBase {
 
     public DisableIfAny(string propertyName1, string propertyName2, object areEqualTo = null, object areNotEqualTo = null) :
-      base(areEqualTo, areNotEqualTo, false, propertyName1, propertyName2) { }
+      base(areEqualTo, areNotEqualTo, false, false, false, propertyName1, propertyName2) { }
 
     public DisableIfAny(string propertyName1, string propertyName2, string propertyName3, object areEqualTo = null, object areNotEqualTo = null) :
-      base(areEqualTo, areNotEqualTo, false, propertyName1, propertyName2, propertyName3) { }
+      base(areEqualTo, areNotEqualTo, false, false, false, propertyName1, propertyName2, propertyName3) { }
 
     public DisableIfAny(string propertyName1, string propertyName2, string propertyName3, string propertyName4, object areEqualTo = null, object areNotEqualTo = null) :
-      base(areEqualTo, areNotEqualTo, false, propertyName1, propertyName2, propertyName3, propertyName4) { }
+      base(areEqualTo, areNotEqualTo, false, false, false, propertyName1, propertyName2, propertyName3, propertyName4) { }
   }
 
   public class DisableIfAll : DisableIfBase {
 
     public DisableIfAll(string propertyName1, string propertyName2, object areEqualTo = null, object areNotEqualTo = null) :
-      base(areEqualTo, areNotEqualTo, true, propertyName1, propertyName2) { }
+      base(areEqualTo, areNotEqualTo, true, false, false, propertyName1, propertyName2) { }
 
     public DisableIfAll(string propertyName1, string propertyName2, string propertyName3, object areEqualTo = null, object areNotEqualTo = null) :
-      base(areEqualTo, areNotEqualTo, true, propertyName1, propertyName2, propertyName3) { }
+      base(areEqualTo, areNotEqualTo, true, false, false, propertyName1, propertyName2, propertyName3) { }
 
     public DisableIfAll(string propertyName1, string propertyName2, string propertyName3, string propertyName4, object areEqualTo = null, object areNotEqualTo = null) :
-      base(areEqualTo, areNotEqualTo, true, propertyName1, propertyName2, propertyName3, propertyName4) { }
+      base(areEqualTo, areNotEqualTo, true, false, false, propertyName1, propertyName2, propertyName3, propertyName4) { }
   }
 }
