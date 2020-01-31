@@ -112,13 +112,13 @@ namespace Leap.Unity {
 
     // Temporal Warping
 
-#if UNITY_STANDALONE
+    #if UNITY_STANDALONE
     private const int DEFAULT_WARP_ADJUSTMENT = 17;
-#elif UNITY_ANDROID
+    #elif UNITY_ANDROID
     private const int DEFAULT_WARP_ADJUSTMENT = 45;
-#else
+    #else
     private const int DEFAULT_WARP_ADJUSTMENT = 17;
-#endif
+    #endif
 
     public enum TemporalWarpingMode {
       Auto,
@@ -221,11 +221,11 @@ namespace Leap.Unity {
     //     protected virtual void OnValidate() {
     //       if (_deviceOffsetMode == DeviceOffsetMode.Transform &&
     //           _temporalWarpingMode != TemporalWarpingMode.Off) {
-    // #if UNITY_EDITOR
+    //         #if UNITY_EDITOR
     //         UnityEditor.Undo.RecordObject(this, "Disabled Temporal Warping");
     //         Debug.LogWarning("Temporal warping disabled. Temporal warping cannot be used "
     //           + "with the Transform device offset mode.", this);
-    // #endif
+    //         #endif
     //         _temporalWarpingMode = TemporalWarpingMode.Off;
     //       }
     //     }
@@ -236,6 +236,12 @@ namespace Leap.Unity {
       if (preCullCamera == null) {
         preCullCamera = GetComponent<Camera>();
       }
+
+      #if UNITY_2020_1_OR_NEWER
+      if (GetComponent<UnityEngine.SpatialTracking.TrackedPoseDriver>() == null) {
+        gameObject.AddComponent<UnityEngine.SpatialTracking.TrackedPoseDriver>().UseRelativeTransform = true;
+      }
+      #endif
 
       #if UNITY_2018_2_OR_NEWER
       if (GraphicsSettings.renderPipelineAsset != null) {
@@ -325,12 +331,12 @@ namespace Leap.Unity {
                                        imageQuatWarp.eulerAngles.y,
                                       -imageQuatWarp.eulerAngles.z);
       Matrix4x4 imageMatWarp = projectionMatrix
-                               #if UNITY_2019_2_OR_NEWER
+      #if UNITY_2019_2_OR_NEWER
                                // The camera projection matrices seem to have vertically inverted...
                                * Matrix4x4.TRS(Vector3.zero, imageQuatWarp, new Vector3(1f, -1f, 1f))
-                               #else
+      #else
                                * Matrix4x4.TRS(Vector3.zero, imageQuatWarp, Vector3.one)
-                               #endif
+      #endif
                                * projectionMatrix.inverse;
       Shader.SetGlobalMatrix("_LeapGlobalWarpedOffset", imageMatWarp);
     }
@@ -383,9 +389,9 @@ namespace Leap.Unity {
     #region LeapServiceProvider Overrides
 
     protected override long CalculateInterpolationTime(bool endOfFrame = false) {
-#if UNITY_ANDROID
+      #if UNITY_ANDROID
       return _leapController.Now() - 16000;
-#else
+      #else
       if (_leapController != null) {
         return _leapController.Now()
                - (long)_smoothedTrackingLatency.value
@@ -395,7 +401,7 @@ namespace Leap.Unity {
       } else {
         return 0;
       }
-#endif
+      #endif
     }
 
     /// <summary>
@@ -523,9 +529,9 @@ namespace Leap.Unity {
         if (camera == null) camera = preCullCamera;
         switch (camera.cameraType) {
           case CameraType.Preview:
-#if UNITY_2017_1_OR_NEWER
+          #if UNITY_2017_1_OR_NEWER
           case CameraType.Reflection:
-#endif
+          #endif
           case CameraType.SceneView:
             return;
         }

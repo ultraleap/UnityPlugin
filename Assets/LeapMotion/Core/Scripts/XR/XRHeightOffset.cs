@@ -64,6 +64,7 @@ namespace Leap.Unity {
     public KeyCode recenterKey = KeyCode.R;
 
     private bool _lastUserPresence;
+    protected Vector3 _recenterPosition;
 
     #endregion
 
@@ -99,6 +100,8 @@ namespace Leap.Unity {
         this.transform.position -= this.transform.up * _roomScaleHeightOffset;
       }
 
+      _recenterPosition = transform.position;
+
       if (recenterOnStart) {
         XRSupportUtil.Recenter();
       }
@@ -132,10 +135,17 @@ namespace Leap.Unity {
           }
 
           if (recenterOnKey && Input.GetKeyDown(recenterKey)) {
+#if UNITY_2020_1_OR_NEWER
+            OffsetRecenter();
+#endif
             XRSupportUtil.Recenter();
           }
         }
       }
+    }
+
+    void OffsetRecenter() {
+      transform.localPosition -= transform.TransformPoint(XRSupportUtil.GetXRNodeCenterEyeLocalPosition()) - _recenterPosition;
     }
 
     #endregion

@@ -37,7 +37,9 @@ namespace Leap.Unity {
     }
 
     public static bool IsXRDevicePresent() {
-      #if UNITY_2017_2_OR_NEWER
+      #if UNITY_2020_1_OR_NEWER
+      return XRSettings.isDeviceActive;
+      #elif UNITY_2017_2_OR_NEWER
       return XRDevice.isPresent;
       #else
       return VRDevice.isPresent;
@@ -46,7 +48,9 @@ namespace Leap.Unity {
 
     static bool outputPresenceWarning = false;
     public static bool IsUserPresent(bool defaultPresence = true) {
-      #if UNITY_2017_2_OR_NEWER
+      #if UNITY_2020_1_OR_NEWER
+      return XRSettings.isDeviceActive;
+      #elif UNITY_2017_2_OR_NEWER
       var userPresence = XRDevice.userPresence;
       if (userPresence == UserPresenceState.Present) {
         return true;
