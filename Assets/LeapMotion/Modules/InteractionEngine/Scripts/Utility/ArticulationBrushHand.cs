@@ -164,6 +164,9 @@ namespace Leap.Unity {
         }
       } else {
         palmBody.gameObject.SetActive(true);
+        palmBody.immovable = true;
+        palmBody.TeleportRoot(hand_.PalmPosition.ToVector3(), hand_.Rotation.ToQuaternion());
+        _lastFrameTeleport = Time.frameCount;
       }
     }
 
@@ -193,7 +196,7 @@ namespace Leap.Unity {
       // Apply tracking position velocity; force = (velocity * mass) / deltaTime
       float massOfHand = palmBody.mass + (N_FINGERS * N_ACTIVE_BONES * _perBoneMass);
       Vector3 palmDelta = hand_.PalmPosition.ToVector3() - palmBody.centerOfMass;
-      palmBody.AddForce(Vector3.ClampMagnitude(((palmDelta / Time.fixedDeltaTime) * palmBody.mass) / Time.fixedDeltaTime, 1000f));
+      palmBody.AddForce(Vector3.ClampMagnitude(((palmDelta / Time.fixedDeltaTime) * palmBody.mass) / Time.fixedDeltaTime, 2000f));
 
       // Apply tracking rotation velocity TODO: Make this correct...
       Quaternion rotation = hand_.Rotation.ToQuaternion() * Quaternion.Inverse(palmBody.transform.rotation);
@@ -267,6 +270,7 @@ namespace Leap.Unity {
     }
 
     public override void FinishHand() {
+      palmBody.immovable = true;
       //palmBody.gameObject.SetActive(false);
 
       base.FinishHand();
