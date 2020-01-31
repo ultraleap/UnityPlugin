@@ -104,6 +104,10 @@ namespace Leap.Unity {
 
       if (recenterOnStart) {
         XRSupportUtil.Recenter();
+
+#if UNITY_2020_1_OR_NEWER
+        OffsetRecenter();
+#endif
       }
     }
 

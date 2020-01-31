@@ -1100,6 +1100,15 @@ namespace Leap.Unity.Interaction {
         Quaternion deltaRot = targetRotation * Quaternion.Inverse(body.rotation);
         body.angularVelocity = PhysicsUtility.ToAngularVelocity(deltaRot, Time.fixedDeltaTime);
       }
+
+      CapsuleCollider cap = body.GetComponent<CapsuleCollider>();
+      if (cap) {
+        Vector3 a = Vector3.zero, b = Vector3.zero;
+        cap.GetCapsulePoints(out a, out b);
+        StatusDrawer.DrawSphere(a,    cap.radius*2);
+        StatusDrawer.DrawLine  (a, b, cap.radius*2);
+        StatusDrawer.DrawSphere(b,    cap.radius*2);
+      }
     }
 
     #endregion
