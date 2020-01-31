@@ -79,8 +79,8 @@ namespace Leap.Unity {
         }
 
         BoxCollider box = palmGameObject.GetComponent<BoxCollider>();
-        box.center = new Vector3(0f, 0.005f, 0.015f);
-        box.size = new Vector3(0.06f, 0.02f, 0.07f);
+        box.center = new Vector3(0f, 0.005f, -0.015f);
+        box.size   = new Vector3(0.06f, 0.02f, 0.07f);
         box.material = _material;
 
         palmBody = palmGameObject.GetComponent<ArticulationBody>();
@@ -129,16 +129,34 @@ namespace Leap.Unity {
             _capsuleBodies[boneArrayIndex] = capsule;
 
             ArticulationBody body = capsuleGameObject.AddComponent<ArticulationBody>();
-            body.jointType = ArticulationJointType.RevoluteJoint;
-            //body.jointFriction = body.jointFriction * 0.05f;
             body.anchorPosition = new Vector3(0f, 0f, 0f);
             body.anchorRotation = Quaternion.identity;
             body.mass = _perBoneMass;
 
-            ArticulationDrive drive = new ArticulationDrive() {
-              stiffness = 10f, forceLimit = 10000f,
-            };
-            body.xDrive = drive;
+            if (jointIndex == 0) {
+              body.twistLock  = ArticulationDofLock  .FreeMotion;
+              body.swingYLock = fingerIndex == 0 ? ArticulationDofLock.FreeMotion : ArticulationDofLock.LimitedMotion;
+              body.swingZLock = ArticulationDofLock  .FreeMotion;
+              body.jointType  = fingerIndex == 0 ? ArticulationJointType.SphericalJoint : ArticulationJointType.RevoluteJoint; //ArticulationJointType.SphericalJoint;
+              ArticulationDrive xDrive = new ArticulationDrive() {
+                stiffness = 10f, forceLimit = 1000f, damping = 0.25f, lowerLimit = -10f, upperLimit = 89f
+              };
+              body.xDrive = xDrive;
+
+              ArticulationDrive yDrive = new ArticulationDrive() {
+                stiffness = 10f, forceLimit = 1000f, damping = 0.5f, lowerLimit = -20f, upperLimit = 20f
+              };
+              body.yDrive = yDrive;
+              body.zDrive = yDrive;
+            } else {
+              body.jointType = ArticulationJointType.RevoluteJoint;
+              body.twistLock = ArticulationDofLock  .FreeMotion;
+              ArticulationDrive drive = new ArticulationDrive() {
+                stiffness = 10f, forceLimit = 1000f, damping = 0.25f, lowerLimit = -10f, upperLimit = 89f
+              };
+              body.xDrive = drive;
+            }
+
             _articulationBodies[boneArrayIndex] = body;
 
             lastTransform = capsuleGameObject.transform;
@@ -162,10 +180,10 @@ namespace Leap.Unity {
       foreach(ArticulationBody body in _articulationBodies) { body.AddForce(-Physics.gravity * body.mass); }
 
       // Counter Velocity; force = (velocity * mass) / deltaTime
-      palmBody.AddForce(-(((palmBody.centerOfMass - _palmBodyLastPos) / Time.fixedDeltaTime) * palmBody.mass) / Time.fixedDeltaTime);
+      palmBody.AddForce(Vector3.ClampMagnitude(-(((palmBody.centerOfMass - _palmBodyLastPos) / Time.fixedDeltaTime) * palmBody.mass) / Time.fixedDeltaTime, 1500f));
       for (int i = 0; i < _articulationBodies.Length; i++) {
         Vector3 velocity = (_articulationBodies[i].centerOfMass - _bodyLastPositions[i]) / Time.fixedDeltaTime;
-        _articulationBodies[i].AddForce(-(velocity * _articulationBodies[i].mass) / Time.fixedDeltaTime); 
+        _articulationBodies[i].AddForce(Vector3.ClampMagnitude(-(velocity * _articulationBodies[i].mass) / Time.fixedDeltaTime, 10f)); 
       }
 
       // Record positions to calculate velocity
@@ -175,7 +193,7 @@ namespace Leap.Unity {
       // Apply tracking position velocity; force = (velocity * mass) / deltaTime
       float massOfHand = palmBody.mass + (N_FINGERS * N_ACTIVE_BONES * _perBoneMass);
       Vector3 palmDelta = hand_.PalmPosition.ToVector3() - palmBody.centerOfMass;
-      palmBody.AddForce(((palmDelta / Time.fixedDeltaTime) * palmBody.mass) / Time.fixedDeltaTime);
+      palmBody.AddForce(Vector3.ClampMagnitude(((palmDelta / Time.fixedDeltaTime) * palmBody.mass) / Time.fixedDeltaTime, 1000f));
 
       // Apply tracking rotation velocity TODO: Make this correct...
       Quaternion rotation = hand_.Rotation.ToQuaternion() * Quaternion.Inverse(palmBody.transform.rotation);
@@ -186,13 +204,12 @@ namespace Leap.Unity {
       palmBody.AddTorque(angularVelocity);
 
       // Fix the hand if it gets into a bad situation by teleporting and holding in place until its bad velocities disappear
-      if (Vector3.Distance(palmBody.transform.position, hand_.PalmPosition.ToVector3()) > 0.1f) {
+      if (Vector3.Distance(palmBody.transform.position, hand_.PalmPosition.ToVector3()) > 1.0f) {
         palmBody.immovable = true;
         palmBody.TeleportRoot(hand_.PalmPosition.ToVector3(), hand_.Rotation.ToQuaternion());
         _lastFrameTeleport = Time.frameCount;
       }
-      if (Time.frameCount - _lastFrameTeleport == 20) palmBody.immovable = false;
-      
+      if (Time.frameCount - _lastFrameTeleport >= 20) palmBody.immovable = false;
 
       // Iterate through the bones in the hand, applying drive forces
       for (int fingerIndex = 0; fingerIndex < N_FINGERS; fingerIndex++) {
@@ -200,23 +217,43 @@ namespace Leap.Unity {
           Bone prevBone = hand_.Fingers[fingerIndex].Bone((Bone.BoneType)(jointIndex));
           Bone bone     = hand_.Fingers[fingerIndex].Bone((Bone.BoneType)(jointIndex + 1));
 
-          int boneArrayIndex = fingerIndex * N_ACTIVE_BONES + jointIndex;
+          int boneArrayIndex    = fingerIndex * N_ACTIVE_BONES + jointIndex;
           ArticulationBody body = _articulationBodies[boneArrayIndex];
 
-          float targetAngle = Vector3.SignedAngle(
+          float xTargetAngle = Vector3.SignedAngle(
             prevBone.Rotation.ToQuaternion() * ((fingerIndex == 0 && jointIndex == 0) ? -Vector3.up : Vector3.forward),
-            bone.Direction.ToVector3(),
-            prevBone.Rotation.ToQuaternion() * Vector3.right);
-          targetAngle = (fingerIndex == 0 && jointIndex == 0) ? targetAngle + 90f : targetAngle;
+            bone.Direction.ToVector3(), prevBone.Rotation.ToQuaternion() * Vector3.right);
+          xTargetAngle = (fingerIndex == 0 && jointIndex == 0) ? xTargetAngle + 90f : xTargetAngle;
 
-          ArticulationDrive drive = new ArticulationDrive() {
-            stiffness = body.xDrive.stiffness, forceLimit = body.xDrive.forceLimit, target = targetAngle
+          body.xDrive = new ArticulationDrive() {
+            stiffness  = body.xDrive.stiffness, 
+            forceLimit = body.xDrive.forceLimit, 
+            damping    = body.xDrive.damping,
+            lowerLimit = body.xDrive.lowerLimit,
+            upperLimit = body.xDrive.upperLimit,
+            target     = xTargetAngle
           };
-          body.xDrive = drive;
+
+          if (jointIndex == 0) {
+            float yTargetAngle = Vector3.SignedAngle(
+              prevBone.Rotation.ToQuaternion() * Vector3.right,
+              bone    .Rotation.ToQuaternion() * Vector3.right,
+              prevBone.Rotation.ToQuaternion() * Vector3.up);
+
+            body.yDrive = new ArticulationDrive() {
+              stiffness  = body.yDrive.stiffness, 
+              forceLimit = body.yDrive.forceLimit, 
+              damping    = body.yDrive.damping,
+              upperLimit = body.yDrive.upperLimit,
+              lowerLimit = body.yDrive.lowerLimit,
+              target     = yTargetAngle
+            };
+          }
 
           CapsuleCollider CapCollider = _capsuleBodies[boneArrayIndex];
           if (CapCollider) {
-            Vector3 a = bone.PrevJoint.ToVector3(), b = bone.NextJoint.ToVector3();
+            Vector3 a = bone.PrevJoint.ToVector3(), 
+                    b = bone.NextJoint.ToVector3();
             //StatusDrawer.DrawSphere(a,    CapCollider.radius * 2);
             //StatusDrawer.DrawLine  (a, b, CapCollider.radius * 2);
             //StatusDrawer.DrawSphere(b,    CapCollider.radius * 2);
