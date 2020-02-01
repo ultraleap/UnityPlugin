@@ -25,6 +25,8 @@ namespace Leap.Unity {
       get { return ModelType.Physics; }
     }
 
+    public Transform loPolyHandPalm;
+
     [SerializeField]
     [Tooltip("The mass of each finger bone; the palm will be 3x this.")]
     private float _perBoneMass = 3.0f;
@@ -135,11 +137,11 @@ namespace Leap.Unity {
 
             if (jointIndex == 0) {
               body.twistLock  = ArticulationDofLock  .FreeMotion;
-              body.swingYLock = fingerIndex == 0 ? ArticulationDofLock.FreeMotion : ArticulationDofLock.LimitedMotion;
+              body.swingYLock = fingerIndex == 0 ? ArticulationDofLock.FreeMotion : ArticulationDofLock.LockedMotion;
               body.swingZLock = ArticulationDofLock  .FreeMotion;
               body.jointType  = fingerIndex == 0 ? ArticulationJointType.SphericalJoint : ArticulationJointType.RevoluteJoint; //ArticulationJointType.SphericalJoint;
               ArticulationDrive xDrive = new ArticulationDrive() {
-                stiffness = 10f, forceLimit = 1000f, damping = 0.25f, lowerLimit = -10f, upperLimit = 89f
+                stiffness = 10f, forceLimit = 1000f, damping = 0.25f, lowerLimit = -5f, upperLimit = 80f
               };
               body.xDrive = xDrive;
 
@@ -195,7 +197,9 @@ namespace Leap.Unity {
 
       // Apply tracking position velocity; force = (velocity * mass) / deltaTime
       float massOfHand = palmBody.mass + (N_FINGERS * N_ACTIVE_BONES * _perBoneMass);
-      Vector3 palmDelta = hand_.PalmPosition.ToVector3() - palmBody.centerOfMass;
+      Vector3 palmDelta = (hand_.PalmPosition.ToVector3() + 
+        (hand_.Rotation.ToQuaternion() * Vector3.back * 0.0225f) +
+        (hand_.Rotation.ToQuaternion() * Vector3.up * 0.0115f)) - palmBody.centerOfMass;
       palmBody.AddForce(Vector3.ClampMagnitude(((palmDelta / Time.fixedDeltaTime) * palmBody.mass) / Time.fixedDeltaTime, 2000f));
 
       // Apply tracking rotation velocity TODO: Make this correct...
@@ -214,8 +218,18 @@ namespace Leap.Unity {
       }
       if (Time.frameCount - _lastFrameTeleport >= 20) palmBody.immovable = false;
 
+
+      if (loPolyHandPalm != null) {
+        loPolyHandPalm.position = palmBody.transform.position - (palmBody.transform.forward * 0.06f);
+        loPolyHandPalm.rotation = palmBody.transform.rotation * Quaternion.Euler(hand_.IsLeft ? 180f : 0f, hand_.IsLeft ? 90f : -90f, 0f);
+      }
+
+      Transform curJoint = null;
       // Iterate through the bones in the hand, applying drive forces
       for (int fingerIndex = 0; fingerIndex < N_FINGERS; fingerIndex++) {
+        if (loPolyHandPalm != null) {
+          curJoint = fingerIndex == 0 ? loPolyHandPalm.GetChild(fingerIndex) : loPolyHandPalm.GetChild(fingerIndex).GetChild(0);
+        }
         for (int jointIndex = 0; jointIndex < N_ACTIVE_BONES; jointIndex++) {
           Bone prevBone = hand_.Fingers[fingerIndex].Bone((Bone.BoneType)(jointIndex));
           Bone bone     = hand_.Fingers[fingerIndex].Bone((Bone.BoneType)(jointIndex + 1));
@@ -257,13 +271,14 @@ namespace Leap.Unity {
           if (CapCollider) {
             Vector3 a = bone.PrevJoint.ToVector3(), 
                     b = bone.NextJoint.ToVector3();
-            //StatusDrawer.DrawSphere(a,    CapCollider.radius * 2);
-            //StatusDrawer.DrawLine  (a, b, CapCollider.radius * 2);
-            //StatusDrawer.DrawSphere(b,    CapCollider.radius * 2);
-            CapCollider.GetCapsulePoints(out a, out b);
-            StatusDrawer.DrawSphere(a,    CapCollider.radius * 2);
-            StatusDrawer.DrawLine  (a, b, CapCollider.radius * 2);
-            StatusDrawer.DrawSphere(b,    CapCollider.radius * 2);
+          }
+
+          if (loPolyHandPalm != null) {
+            curJoint.transform.position = body.transform.position;
+            curJoint.transform.rotation = body.transform.rotation * Quaternion.Euler(hand_.IsLeft ? 180f : 0f, hand_.IsLeft ? 90f : -90f, 0f);
+            if (curJoint.childCount > 0) {
+              curJoint = curJoint.GetChild(0);
+            }
           }
         }
       }
@@ -271,7 +286,7 @@ namespace Leap.Unity {
 
     public override void FinishHand() {
       palmBody.immovable = true;
-      //palmBody.gameObject.SetActive(false);
+      //palmBody.gameObject.SetActive(false); // This causes the joint references to reset!!!
 
       base.FinishHand();
     }
