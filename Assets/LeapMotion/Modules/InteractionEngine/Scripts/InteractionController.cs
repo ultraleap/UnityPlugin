@@ -214,7 +214,7 @@ namespace Leap.Unity.Interaction {
     /// <summary>
     /// Called when contact data is initialized.
     /// </summary>
-    public Action<InteractionController> OnContactInitialized = (interactionController) => { };
+    public Action<InteractionController> OnContactInitialized = (intCtrl) => { };
 
     #endregion
 
@@ -962,7 +962,7 @@ namespace Leap.Unity.Interaction {
         if (initContact()) {
           finishInitContact();
           _contactInitialized = true;
-          OnContactInitialized?.Invoke(this);
+          if (OnContactInitialized != null) OnContactInitialized(this);
         }
         else {
           return;
