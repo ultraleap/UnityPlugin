@@ -211,6 +211,11 @@ namespace Leap.Unity.Interaction {
     /// </summary>
     public Action OnGraspEnd = () => { };
 
+    /// <summary>
+    /// Called when contact data is initialized.
+    /// </summary>
+    public Action<InteractionController> OnContactInitialized = (intCtrl) => { };
+
     #endregion
 
     #region Unity Events
@@ -957,6 +962,7 @@ namespace Leap.Unity.Interaction {
         if (initContact()) {
           finishInitContact();
           _contactInitialized = true;
+          if (OnContactInitialized != null) OnContactInitialized(this);
         }
         else {
           return;
