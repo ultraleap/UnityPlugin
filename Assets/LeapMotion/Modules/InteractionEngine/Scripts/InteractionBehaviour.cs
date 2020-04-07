@@ -1307,10 +1307,15 @@ namespace Leap.Unity.Interaction {
 
         // Fire interaction callback.
         OnPerControllerGraspEnd(controller);
-      }
 
-      // This re-initializes the graspedPoseHandler for multi-grasp.
-      if (moveObjectWhenGrasped) {
+        if (moveObjectWhenGrasped && manager.multiGraspHoldingMode == InteractionManager.MultiGraspHoldingMode.PreservePosePerController) {
+          // Remove each hand from the pose solver.
+          graspedPoseHandler.RemoveController(controller);
+        }
+      }
+      
+      // Possibly re-initialize the graspedPoseHandler.
+      if (moveObjectWhenGrasped && manager.multiGraspHoldingMode == InteractionManager.MultiGraspHoldingMode.ReinitializeOnAnyRelease) {
         graspedPoseHandler.ClearControllers();
 
         foreach (var item in _graspingControllers) {
