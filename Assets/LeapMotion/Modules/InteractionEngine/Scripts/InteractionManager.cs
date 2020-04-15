@@ -60,6 +60,13 @@ namespace Leap.Unity.Interaction {
            + "you expect your player's hands or controllers to ever have non-unit scale.")]
     public float touchActivationRadius = 0.075F;
 
+    public enum MultiGraspHoldingMode {
+      PreservePosePerController,
+      ReinitializeOnAnyRelease
+    }
+    [Tooltip("If set to PreservePosePerController, when holding a multi-grasp-enabled object and releasing with a single hand or controller, the object's held pose will adjust to reflect only the remaining holding controllers.\n\nIf set to PreservePosePerController, when any hand or controller releases an object, the remaining controllers will reinitialize their holding pose to match the last-held state of the object, allowing the user to rotate and translate the object more loosely.\n\nPreservePosePerController is the default setting.")]
+    public MultiGraspHoldingMode multiGraspHoldingMode = MultiGraspHoldingMode.PreservePosePerController;
+
     [Header("Layer Settings")]
     [Tooltip("Whether or not to create the layers used for interaction when the scene "
            + "runs. Interactions require an interaction layer (for objects), a grasped "
