@@ -2,6 +2,7 @@
   "dependencies": {
     "com.unity.collab-proxy": "1.2.16",
     "com.unity.ext.nunit": "1.0.0",
+    "com.unity.ide.vscode": "1.1.4",
     "com.unity.package-manager-ui": "2.2.0",
     "com.unity.test-framework": "1.0.18",
     "com.unity.textmeshpro": "2.0.1",
