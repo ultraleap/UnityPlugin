@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Leap Motion, Inc. 2011-2018.                                 *
+ * Copyright (C) Leap Motion, Inc. 2011-2020.                                 *
  * Leap Motion proprietary and confidential.                                  *
  *                                                                            *
  * Use subject to the terms of the Leap Motion SDK Agreement available at     *
@@ -28,7 +28,7 @@ public static class AutoCopywriteHeader {
   ///  - the last and ONLY the last line of the notice contains the comment block end token */
   /// </summary>
   private static string[] copywriteNotice = {"/******************************************************************************",
-                                             " * Copyright (C) Leap Motion, Inc. 2011-2018.                                 *",
+                                             " * Copyright (C) Leap Motion, Inc. 2011-2020.                                 *",
                                              " * Leap Motion proprietary and confidential.                                  *",
                                              " *                                                                            *",
                                              " * Use subject to the terms of the Leap Motion SDK Agreement available at     *",
@@ -37,7 +37,7 @@ public static class AutoCopywriteHeader {
                                              " ******************************************************************************/"};
 
   private static string[] northStarCopywriteNotice = {"/******************************************************************************",
-                                                      " * Copyright (C) Leap Motion, Inc. 2011-2018.                                 *",
+                                                      " * Copyright (C) Leap Motion, Inc. 2011-2020.                                 *",
                                                       " *                                                                            *",
                                                       " * Use subject to the terms of the Apache License 2.0 available at            *",
                                                       " * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *",
