@@ -4,6 +4,8 @@ To download Leap Motion's latest stable modules as .unitypackages, visit [our Un
 
 **UnityModules packages from our developer website support Unity 5.6.2, 2017.1-4, and 2018.1.** Newer versions of Unity are usually perfectly safe to use. If you encounter errors or warnings with newer Unity versions, please report them as an Issue.
 
+Since Unity Modules 4.5.0, our [releases page][releases] on this repository is the official source for distribution. This version of UnityModules fixes compilation warnings in Unity 2019 and includes some fixes for newer Unity features like the Scriptable Render Pipeline.
+
 **The UnityModules *repository* expects Unity 2017.3 and up.** If you are sourcing UnityModules directly from this repository, your mileage may vary with earlier versions of Unity.
 
 ## License
@@ -20,3 +22,4 @@ This repository contains code for Leap Motion's Unity Modules, easy-to-use tools
 [devsite]: https://developer.leapmotion.com/unity/ "Leap Motion Unity Developer site"
 [wiki]: https://github.com/leapmotion/UnityModules/wiki "Leap Motion Unity Modules Wiki"
 [sdkagreement]: https://developer.leapmotion.com/sdk_agreement "Leap Motion Developer SDK Agreement"
+[releases]: https://github.com/leapmotion/UnityModules/releases
