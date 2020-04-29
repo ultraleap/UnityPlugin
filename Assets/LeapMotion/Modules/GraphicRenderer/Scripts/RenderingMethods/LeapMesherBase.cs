@@ -136,7 +136,7 @@ namespace Leap.Unity.GraphicalRenderer {
 
     //#### Sprite/Texture Remapping ####
     [SerializeField]
-    private AtlasUvs _atlasUvs;
+    private AtlasUvs _atlasUvs = default;
     [NonSerialized]
     protected MaterialPropertyBlock _spriteTextureBlock;
 
