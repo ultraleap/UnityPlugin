@@ -15,7 +15,7 @@ MonoBehaviour:
   _definitionName: Detection Examples
   _showInBuildMenu: 0
   _dependantFolders:
-  - Assets\LeapMotion\Legacy\DetectionExamples
+  - Assets\Plugins\LeapMotion\Legacy\DetectionExamples
   _ignoredFolders: []
   _dependantFiles: []
   _ignoredFiles: []

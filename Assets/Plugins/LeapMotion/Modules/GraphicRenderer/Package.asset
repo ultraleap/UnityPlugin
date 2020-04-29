@@ -3,8 +3,9 @@
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
@@ -14,9 +15,10 @@ MonoBehaviour:
   _definitionName: Graphic Renderer
   _showInBuildMenu: 1
   _dependantFolders:
-  - Assets\LeapMotion\Modules\GraphicRenderer
-  - Assets\LeapMotion\Modules\GraphicRenderer\Testing
+  - Assets\Plugins\LeapMotion\Modules\GraphicRenderer
+  - Assets\Plugins\LeapMotion\Modules\GraphicRenderer\Testing
   _ignoredFolders:
+  - Assets\Plugins\LeapMotion\Modules\GraphicRenderer\Testing
   - Assets\LeapMotion\Modules\GraphicRenderer\Testing
   _dependantFiles: []
   _ignoredFiles: []
