@@ -1,10 +1,10 @@
 /******************************************************************************
- * Copyright (C) Leap Motion, Inc. 2011-2020.                                 *
- * Leap Motion proprietary and confidential.                                  *
+ * Copyright (C) Ultraleap, Inc. 2011-2020.                                   *
+ * Ultraleap proprietary and confidential.                                    *
  *                                                                            *
  * Use subject to the terms of the Leap Motion SDK Agreement available at     *
  * https://developer.leapmotion.com/sdk_agreement, or another agreement       *
- * between Leap Motion and you, your company or other organization.           *
+ * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
 using System;
@@ -18,7 +18,7 @@ using UnityEditor;
 public static class AutoCopywriteHeader {
 
   private static Regex beginPattern = new Regex(@"^\/\*");
-  private static Regex endPattern = new Regex(@"\*\/");
+  private static Regex endPattern   = new Regex(@"\*\/" );
 
 
   /// <summary>
@@ -28,21 +28,21 @@ public static class AutoCopywriteHeader {
   ///  - the last and ONLY the last line of the notice contains the comment block end token */
   /// </summary>
   private static string[] copywriteNotice = {"/******************************************************************************",
-                                             " * Copyright (C) Leap Motion, Inc. 2011-2020.                                 *",
-                                             " * Leap Motion proprietary and confidential.                                  *",
+                                             " * Copyright (C) Ultraleap, Inc. 2011-2020.                                   *",
+                                             " * Ultraleap proprietary and confidential.                                    *",
                                              " *                                                                            *",
                                              " * Use subject to the terms of the Leap Motion SDK Agreement available at     *",
                                              " * https://developer.leapmotion.com/sdk_agreement, or another agreement       *",
-                                             " * between Leap Motion and you, your company or other organization.           *",
+                                             " * between Ultraleap and you, your company or other organization.             *",
                                              " ******************************************************************************/"};
 
-  private static string[] northStarCopywriteNotice = {"/******************************************************************************",
-                                                      " * Copyright (C) Leap Motion, Inc. 2011-2020.                                 *",
-                                                      " *                                                                            *",
-                                                      " * Use subject to the terms of the Apache License 2.0 available at            *",
-                                                      " * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *",
-                                                      " * between Leap Motion and you, your company or other organization.           *",
-                                                      " ******************************************************************************/"};
+  private static string[] apacheCopywriteNotice = {"/******************************************************************************",
+                                                   " * Copyright (C) Ultraleap, Inc. 2011-2020.                                   *",
+                                                   " *                                                                            *",
+                                                   " * Use subject to the terms of the Apache License 2.0 available at            *",
+                                                   " * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *",
+                                                   " * between Ultraleap and you, your company or other organization.             *",
+                                                   " ******************************************************************************/"};
 
   private static string[] searchFolders = { "LeapMotion" };
 
@@ -120,7 +120,7 @@ public static class AutoCopywriteHeader {
 
       //Append the comment block first
       if (filename.Contains("North Star")) {
-        foreach (var noticeLine in northStarCopywriteNotice) {
+        foreach (var noticeLine in apacheCopywriteNotice) {
           builder.AppendLine(noticeLine);
         }
       } else {
