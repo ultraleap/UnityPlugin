@@ -11,7 +11,7 @@ using UnityEngine;
 using System;
 using Leap.Unity.Attributes;
 
-#if UNITY_2018_2_OR_NEWER
+#if UNITY_2019_1_OR_NEWER
 using UnityEngine.Rendering;
 #endif
 
@@ -237,7 +237,7 @@ namespace Leap.Unity {
         preCullCamera = GetComponent<Camera>();
       }
 
-      #if UNITY_2018_2_OR_NEWER
+      #if UNITY_2019_1_OR_NEWER
       if (GraphicsSettings.renderPipelineAsset != null) {
         RenderPipelineManager.beginCameraRendering -= onBeginRendering;
         RenderPipelineManager.beginCameraRendering += onBeginRendering;
@@ -254,7 +254,7 @@ namespace Leap.Unity {
     protected virtual void OnDisable() {
       resetShaderTransforms();
 
-      #if UNITY_2018_2_OR_NEWER
+      #if UNITY_2019_1_OR_NEWER
       if (GraphicsSettings.renderPipelineAsset != null) {
         RenderPipelineManager.beginCameraRendering -= onBeginRendering;
       } else {
@@ -335,7 +335,9 @@ namespace Leap.Unity {
       Shader.SetGlobalMatrix("_LeapGlobalWarpedOffset", imageMatWarp);
     }
 
+    #if UNITY_2019_1_OR_NEWER
     protected virtual void onBeginRendering(ScriptableRenderContext context, Camera camera) { onPreCull(camera); }
+    #endif
 
     protected virtual void onPreCull(Camera preCullingCamera) {
       if (preCullingCamera != preCullCamera) {

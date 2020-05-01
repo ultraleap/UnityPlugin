@@ -7,6 +7,7 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
+using System.Collections.Generic;
 using UnityEngine;
 
 #if UNITY_2017_2_OR_NEWER
@@ -46,19 +47,32 @@ namespace Leap.Unity {
 
     static bool outputPresenceWarning = false;
     public static bool IsUserPresent(bool defaultPresence = true) {
-      #if UNITY_2017_2_OR_NEWER
-      var userPresence = XRDevice.userPresence;
-      if (userPresence == UserPresenceState.Present) {
-        return true;
-      } else if (!outputPresenceWarning && userPresence == UserPresenceState.Unsupported) {
-        Debug.LogWarning("XR UserPresenceState unsupported (XR support is probably disabled).");
-        outputPresenceWarning = true;
-      }
+      #if UNITY_2019_3_OR_NEWER
+        var devices = new List<InputDevice>();
+        InputDevices.GetDevicesWithCharacteristics(InputDeviceCharacteristics.HeadMounted, devices);
+        if (devices.Count == 0 && !outputPresenceWarning) {
+          Debug.LogWarning("No head-mounted devices found. Possibly no HMD is available to the XR system.");
+          outputPresenceWarning = true;
+        }
+        if (devices.Count != 0) {
+          var device = devices[0];
+          if (device.TryGetFeatureValue(CommonUsages.userPresence, out var userPresent)) {
+            return userPresent;
+          }
+        }
+      #elif UNITY_2017_2_OR_NEWER
+        var userPresence = XRDevice.userPresence;
+        if (userPresence == UserPresenceState.Present) {
+          return true;
+        } else if (!outputPresenceWarning && userPresence == UserPresenceState.Unsupported) {
+          Debug.LogWarning("XR UserPresenceState unsupported (XR support is probably disabled).");
+          outputPresenceWarning = true;
+        }
       #else
-      if (!outputPresenceWarning){
-        Debug.LogWarning("XR UserPresenceState is only supported in 2017.2 and newer.");
-        outputPresenceWarning = true;
-      }
+        if (!outputPresenceWarning){
+          Debug.LogWarning("XR UserPresenceState is only supported in 2017.2 and newer.");
+          outputPresenceWarning = true;
+        }
       #endif
       return defaultPresence;
     }
@@ -166,7 +180,15 @@ namespace Leap.Unity {
     }
 
     public static void Recenter() {
-      InputTracking.Recenter();
+      #if UNITY_2019_3_OR_NEWER
+        var devices = new List<InputDevice>();
+        InputDevices.GetDevicesWithCharacteristics(InputDeviceCharacteristics.HeadMounted, devices);
+        if (devices.Count == 0) return;
+        var hmdDevice = devices[0];
+        hmdDevice.subsystem.TryRecenter();
+      #else
+        InputTracking.Recenter();
+      #endif
     }
 
     public static string GetLoadedDeviceName() {
@@ -177,11 +199,18 @@ namespace Leap.Unity {
       #endif
     }
 
+    /// <summary> Returns whether there's a floor available. </summary>
     public static bool IsRoomScale() {
-      #if UNITY_2017_2_OR_NEWER
-      return XRDevice.GetTrackingSpaceType() == TrackingSpaceType.RoomScale;
+      #if UNITY_2019_3_OR_NEWER
+        var devices = new List<InputDevice>();
+        InputDevices.GetDevicesWithCharacteristics(InputDeviceCharacteristics.HeadMounted, devices);
+        if (devices.Count == 0) return false;
+        var hmdDevice = devices[0];
+        return hmdDevice.subsystem.GetTrackingOriginMode().HasFlag(TrackingOriginModeFlags.Floor);
+      #elif UNITY_2017_2_OR_NEWER
+        return XRDevice.GetTrackingSpaceType() == TrackingSpaceType.RoomScale;
       #else
-      return VRDevice.GetTrackingSpaceType() == TrackingSpaceType.RoomScale;
+        return VRDevice.GetTrackingSpaceType() == TrackingSpaceType.RoomScale;
       #endif
     }
 
