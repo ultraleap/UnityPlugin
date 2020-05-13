@@ -185,21 +185,21 @@ namespace Leap.Unity {
       foreach(ArticulationBody body in _articulationBodies) { body.AddForce(-Physics.gravity * body.mass); }
 
       // Counter Velocity; force = (velocity * mass) / deltaTime
-      palmBody.AddForce(Vector3.ClampMagnitude(-(((palmBody.centerOfMass - _palmBodyLastPos) / Time.fixedDeltaTime) * palmBody.mass) / Time.fixedDeltaTime, 1500f));
+      palmBody.AddForce(Vector3.ClampMagnitude(1.0f * -(((palmBody.worldCenterOfMass - _palmBodyLastPos) / Time.fixedDeltaTime) * palmBody.mass) / Time.fixedDeltaTime, 1500f));
       for (int i = 0; i < _articulationBodies.Length; i++) {
-        Vector3 velocity = (_articulationBodies[i].centerOfMass - _bodyLastPositions[i]) / Time.fixedDeltaTime;
-        _articulationBodies[i].AddForce(Vector3.ClampMagnitude(-(velocity * _articulationBodies[i].mass) / Time.fixedDeltaTime, 10f)); 
+        Vector3 velocity = (_articulationBodies[i].worldCenterOfMass - _bodyLastPositions[i]) / Time.fixedDeltaTime;
+        _articulationBodies[i].AddForce(1.0f * Vector3.ClampMagnitude(-(velocity * _articulationBodies[i].mass) / Time.fixedDeltaTime, 5f)); 
       }
 
       // Record positions to calculate velocity
-      _palmBodyLastPos = palmBody.centerOfMass;
-      for(int i = 0; i < _articulationBodies.Length; i++) { _bodyLastPositions[i] = _articulationBodies[i].centerOfMass; }
+      _palmBodyLastPos = palmBody.worldCenterOfMass;
+      for(int i = 0; i < _articulationBodies.Length; i++) { _bodyLastPositions[i] = _articulationBodies[i].worldCenterOfMass; }
 
       // Apply tracking position velocity; force = (velocity * mass) / deltaTime
       float massOfHand = palmBody.mass + (N_FINGERS * N_ACTIVE_BONES * _perBoneMass);
       Vector3 palmDelta = (hand_.PalmPosition.ToVector3() + 
         (hand_.Rotation.ToQuaternion() * Vector3.back * 0.0225f) +
-        (hand_.Rotation.ToQuaternion() * Vector3.up * 0.0115f)) - palmBody.centerOfMass;
+        (hand_.Rotation.ToQuaternion() * Vector3.up * 0.0115f)) - palmBody.worldCenterOfMass;
       palmBody.AddForce(Vector3.ClampMagnitude(((palmDelta / Time.fixedDeltaTime) * palmBody.mass) / Time.fixedDeltaTime, 2000f));
 
       // Apply tracking rotation velocity TODO: Make this correct...

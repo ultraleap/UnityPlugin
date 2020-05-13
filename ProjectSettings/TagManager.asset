@@ -16,8 +16,8 @@ TagManager:
   - ContactBones
   - Interaction
   - InteractionNoContact
-  - 
-  - 
+  - LeftContactBones
+  - RightContactBones
   - 
   - 
   - 
