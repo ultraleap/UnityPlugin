@@ -46,7 +46,9 @@ namespace Leap.Unity {
       #endif
     }
 
+    #if !UNITY_2020_1_OR_NEWER && UNITY_2017_2_OR_NEWER
     static bool outputPresenceWarning = false;
+    #endif
     public static bool IsUserPresent(bool defaultPresence = true) {
       #if UNITY_2020_1_OR_NEWER
       return XRSettings.isDeviceActive;
@@ -58,13 +60,14 @@ namespace Leap.Unity {
         Debug.LogWarning("XR UserPresenceState unsupported (XR support is probably disabled).");
         outputPresenceWarning = true;
       }
+      return defaultPresence;
       #else
       if (!outputPresenceWarning){
         Debug.LogWarning("XR UserPresenceState is only supported in 2017.2 and newer.");
         outputPresenceWarning = true;
       }
-      #endif
       return defaultPresence;
+      #endif
     }
 
     public static Vector3 GetXRNodeCenterEyeLocalPosition() {

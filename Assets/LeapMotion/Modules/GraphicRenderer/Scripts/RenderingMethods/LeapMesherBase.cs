@@ -223,7 +223,7 @@ namespace Leap.Unity.GraphicalRenderer {
 
 #if UNITY_EDITOR
       if (!Application.isPlaying) {
-        Packer.RebuildAtlasCacheIfNeeded(EditorUserBuildSettings.activeBuildTarget);
+        //Packer.RebuildAtlasCacheIfNeeded(EditorUserBuildSettings.activeBuildTarget);
       }
 
       for (int i = 0; i < features.Count; i++) {
@@ -377,7 +377,7 @@ namespace Leap.Unity.GraphicalRenderer {
 
         if (_spriteFeatures.Count != 0) {
 #if UNITY_EDITOR
-          Packer.RebuildAtlasCacheIfNeeded(EditorUserBuildSettings.activeBuildTarget);
+          //Packer.RebuildAtlasCacheIfNeeded(EditorUserBuildSettings.activeBuildTarget);
 #endif
           extractSpriteRects();
           uploadSpriteTextures();

@@ -57,9 +57,8 @@ namespace Leap.Unity {
     [Tooltip("Sets each fingers' velocity directly every frame.")]
     private bool setFingerVelocity = true;
 
-    [SerializeField]
     [Tooltip("Finds all static and kinematic colliders and puts them on the hand's layer so they do not collide with eachother.")]
-    private bool noCollideWithStaticGeometry = true;
+    public bool noCollideWithStaticGeometry = true;
 
 
     // DELETE ME

@@ -448,7 +448,7 @@ public class SoftbodyJobified : MonoBehaviour {
     JobsUtility.JobDebuggerEnabled = false;
   }
 
-  void FixedUpdate() {
+  void Update() {
     Profiler.BeginSample("Schedule Softbody Work", this);
 
     int batchSize = 8;
@@ -594,16 +594,19 @@ public class SoftbodyJobified : MonoBehaviour {
     //Calculate the impulses on PhysX objects
     float invDT = 1 / Time.deltaTime; float vertexMass = (mass / softbodyData.bodyVerts.Length);
     for (int i = 0; i < softbodyData.raycastHits.Length; i++) {
-      Rigidbody collidingBody; ArticulationBody collidingBody2;
+      Rigidbody collidingBody; //ArticulationBody collidingBody2;
       if ((collidingBody = softbodyData.raycastHits[i].rigidbody) != null && !collidingBody.isKinematic) {
-        Vector3 preCollisionVelocity = (softbodyData.preCollisionVerts[i] - softbodyData.prevBodyVerts[i]) * invDT;
-        Vector3 postCollisionVelocity = (softbodyData.bodyVerts[i] - softbodyData.prevBodyVerts[i]) * invDT;
-        Vector3 deltaMomentum = (postCollisionVelocity - preCollisionVelocity) * vertexMass;
-        Vector3 netForce = -deltaMomentum * invDT;
-        collidingBody.AddForceAtPosition(netForce, softbodyData.bodyVerts[i], ForceMode.Force);
-        if ((collidingBody2 = softbodyData.raycastHits[i].collider.GetComponent<ArticulationBody>()) != null) {
-          //Debug.Log(softbodyData.raycastHits[i].rigidbody.mass);
-          collidingBody2.AddForceAtPosition(netForce, softbodyData.bodyVerts[i]);
+        if (Vector3.Dot(softbodyData.bodyVerts[i] - softbodyData.raycastHits[i].point, softbodyData.raycastHits[i].normal) < 0f) {
+          Vector3 preCollisionVelocity = (softbodyData.preCollisionVerts[i] - softbodyData.prevBodyVerts[i]) * invDT;
+          Vector3 postCollisionVelocity = (softbodyData.bodyVerts[i] - softbodyData.prevBodyVerts[i]) * invDT;
+          Vector3 deltaMomentum = (postCollisionVelocity - preCollisionVelocity) * vertexMass;
+          Vector3 netForce = -deltaMomentum * invDT;
+          collidingBody.AddForceAtPosition(netForce, softbodyData.bodyVerts[i], ForceMode.Force);
+          //if ((collidingBody2 = softbodyData.raycastHits[i].collider.GetComponent<ArticulationBody>()) != null) {
+          //  //Debug.Log(softbodyData.raycastHits[i].rigidbody.mass);
+          //  collidingBody2.AddForceAtPosition(netForce, softbodyData.bodyVerts[i]);
+          //}
+          //Debug.DrawRay(softbodyData.bodyVerts[i], netForce);
         }
       }
     }

@@ -26,8 +26,7 @@ namespace Leap.Unity.Interaction {
       get { return ModelType.Physics; }
     }
 
-    [SerializeField]
-    private InteractionManager _manager;
+    public InteractionManager _manager;
 
     [SerializeField]
     private float _perBoneMass = 1.0f;
