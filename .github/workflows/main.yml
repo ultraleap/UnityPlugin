@@ -1,4 +1,4 @@
-name: UnityModules: Run Unit Tests on develop
+name: UnityModules - Run Unit Tests on develop
 
 on:
   pull_request: {}
