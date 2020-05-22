@@ -1,15 +1,15 @@
-name: UnityModules - Run Unit Tests on develop
+name: UnityModules - Run Unit Tests
 
 on:
-  pull_request: {}
-  push: {}
+  pull_request:
+    types: [opened, synchronize]
 
 env:
   UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
 
 jobs:
   build:
-    name: Run Unit Tests on develop
+    name: Run Unit Tests
     runs-on: ubuntu-latest
     steps:
     
