@@ -17,6 +17,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
         with:
+          ref: feat-gh-actions
           lfs: true
     
       # Cache
