@@ -1,4 +1,4 @@
-name: Test UnityModules 😎
+name: UnityModules: Run Unit Tests on develop
 
 on:
   pull_request: {}
@@ -9,7 +9,7 @@ env:
 
 jobs:
   build:
-    name: Test UnityModules ✨
+    name: Run Unit Tests on develop
     runs-on: ubuntu-latest
     steps:
     
@@ -41,16 +41,3 @@ jobs:
         with:
           name: Test results
           path: artifacts
-
-      # Build
-      #- name: Build project
-      #  uses: webbertakken/unity-builder@v0.10
-      #  with:
-      #    unityVersion: 2019.2.11f1
-      #    targetPlatform: Windows 
-
-      ## Output 
-      #- uses: actions/upload-artifact@v1
-      #  with:
-      #    name: Build
-      #    path: build
