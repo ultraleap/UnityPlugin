@@ -2,7 +2,7 @@ name: Test UnityModules 😎
 
 on:
   pull_request: {}
-  push: { branches: [feat-gh-actions] }
+  push: { branches: [develop] }
 
 env:
   UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
@@ -17,7 +17,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
         with:
-          ref: feat-gh-actions
+          ref: develop
           lfs: true
     
       # Cache
