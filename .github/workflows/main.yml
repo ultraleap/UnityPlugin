@@ -2,7 +2,7 @@ name: UnityModules - Run Unit Tests on develop
 
 on:
   pull_request: {}
-  push: { branches: [develop] }
+  push: {}
 
 env:
   UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
@@ -17,7 +17,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
         with:
-          ref: develop
           lfs: true
     
       # Cache
