@@ -7,6 +7,8 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
+#if !UNITY_EDITOR_LINUX
+
 using System;
 using System.Threading;
 using System.Runtime.InteropServices;
@@ -1006,3 +1008,5 @@ namespace Leap.LeapCSharp.Tests {
 
   }
 }
+
+#endif

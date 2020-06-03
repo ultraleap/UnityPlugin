@@ -7,6 +7,8 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
+#if !UNITY_EDITOR_LINUX
+
 using System;
 using NUnit.Framework;
 using LeapInternal;
@@ -41,3 +43,5 @@ namespace Leap.LeapCSharp.Tests {
     }
   }
 }
+
+#endif

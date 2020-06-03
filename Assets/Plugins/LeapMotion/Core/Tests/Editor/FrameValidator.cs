@@ -36,7 +36,7 @@ namespace Leap.Unity.Tests {
       _frame = createFrame();
     }
 
-    [SetUp]
+    [TearDown]
     public virtual void Teardown() {
       _frame = null;
     }
