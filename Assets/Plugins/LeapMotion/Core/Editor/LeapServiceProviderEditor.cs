@@ -38,6 +38,7 @@ namespace Leap.Unity {
                                 (int)LeapServiceProvider.PhysicsExtrapolationMode.Manual,
                                 "_physicsExtrapolationTime");
 
+      deferProperty("_serverNameSpace");
       deferProperty("_workerThreadProfiling");
     }
 
