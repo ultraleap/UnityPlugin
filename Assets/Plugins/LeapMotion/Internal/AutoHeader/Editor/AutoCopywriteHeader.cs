@@ -119,7 +119,7 @@ public static class AutoCopywriteHeader {
       }
 
       //Append the comment block first
-      if (filename.Contains("North Star")) {
+      if (true/*filename.Contains("North Star")*/) { // Make UnityModules entirely Apache
         foreach (var noticeLine in apacheCopywriteNotice) {
           builder.AppendLine(noticeLine);
         }
