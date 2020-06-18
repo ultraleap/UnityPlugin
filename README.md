@@ -2,7 +2,7 @@
 
 To download Leap Motion's latest stable modules as .unitypackages, visit [our Unity developer site][devsite]. Be sure to also check out our [documentation and API reference][um-docs]!
 
-**UnityModules packages from our developer website support Unity 5.6.2, 2017.1-4, and 2018.1.** Newer versions of Unity are usually perfectly safe to use. If you encounter errors or warnings with newer Unity versions, please report them as an Issue.
+**UnityModules packages from our developer website support Unity 5.6.2, 2017.1-4, 2018.1-3, and 2019.1-2.** Newer versions of Unity are usually perfectly safe to use. If you encounter errors or warnings with newer Unity versions, please report them as an Issue.
 
 Since Unity Modules 4.5.0, our [releases page][releases] on this repository is the official source for distribution. This version of UnityModules fixes compilation warnings in Unity 2019 and includes some fixes for newer Unity features like the Scriptable Render Pipeline (in 2019.1 and beyond).
 
@@ -10,7 +10,7 @@ Since Unity Modules 4.5.0, our [releases page][releases] on this repository is t
 
 ## License
 
-Use of Leap Motion's UnityModules is subject to the [Leap Motion developer SDK agreement][sdkagreement].
+Use of Leap Motion's UnityModules is subject to the [Apache V2 License Agreement][apache].
 
 ## This repository
 
@@ -21,5 +21,5 @@ This repository contains code for Leap Motion's Unity Modules, easy-to-use tools
 [um-docs]: https://leapmotion.github.io/UnityModules/
 [devsite]: https://developer.leapmotion.com/unity/ "Leap Motion Unity Developer site"
 [wiki]: https://github.com/leapmotion/UnityModules/wiki "Leap Motion Unity Modules Wiki"
-[sdkagreement]: https://developer.leapmotion.com/sdk_agreement "Leap Motion Developer SDK Agreement"
+[apache]: http://www.apache.org/licenses/LICENSE-2.0 "Apache V2 License"
 [releases]: https://github.com/leapmotion/UnityModules/releases
