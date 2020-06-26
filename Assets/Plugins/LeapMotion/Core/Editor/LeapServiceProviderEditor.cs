@@ -40,6 +40,9 @@ namespace Leap.Unity {
 
       deferProperty("_serverNameSpace");
       deferProperty("_workerThreadProfiling");
+
+      addPropertyToFoldout("_workerThreadProfiling", "Advanced Options");
+      addPropertyToFoldout("_serverNameSpace"      , "Advanced Options");
     }
 
     private void frameOptimizationWarning(SerializedProperty property) {
