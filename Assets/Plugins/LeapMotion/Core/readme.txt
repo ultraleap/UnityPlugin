@@ -1,20 +1,17 @@
 /******************************************************************************
- * Copyright (C) Leap Motion, Inc. 2011-2017.                                 *
- * Leap Motion proprietary and  confidential.                                 *
+ * Copyright (C) Ultraleap, Inc. 2011-2020.                                   *
  *                                                                            *
- * Use subject to the terms of the Leap Motion SDK Agreement available at     *
- * https://developer.leapmotion.com/sdk_agreement, or another agreement       *
- * between Leap Motion and you, your company or other organization.           *
+ * Use subject to the terms of the Apache License 2.0 available at            *
+ * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
+ * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
 Leap Motion Core Assets
 
-These assets go along with our V3 Orion Beta.
+This module is the core dependency package for Leap Motion's Unity developer SDK.
 
-Before you begin:
-  You first need the Leap Motion V3 Orion Beta installed from:
+You will need to have the Leap Motion service installed, which must be downloaded separately:
   https://developer.leapmotion.com/
 
 Questions/Bugs/Feature Requests?
   Please post on https://community.leapmotion.com/c/development
-
