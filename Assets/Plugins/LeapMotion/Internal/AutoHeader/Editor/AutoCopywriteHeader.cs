@@ -26,15 +26,6 @@ public static class AutoCopywriteHeader {
   ///  - the first line of the notice contains the comment block begin token /*
   ///  - the last and ONLY the last line of the notice contains the comment block end token */
   /// </summary>
-  private static string[] copywriteNotice = {"/******************************************************************************",
-                                             " * Copyright (C) Ultraleap, Inc. 2011-2020.                                   *",
-                                             " * Ultraleap proprietary and confidential.                                    *",
-                                             " *                                                                            *",
-                                             " * Use subject to the terms of the Leap Motion SDK Agreement available at     *",
-                                             " * https://developer.leapmotion.com/sdk_agreement, or another agreement       *",
-                                             " * between Ultraleap and you, your company or other organization.             *",
-                                             " ******************************************************************************/"};
-
   private static string[] apacheCopywriteNotice = {"/******************************************************************************",
                                                    " * Copyright (C) Ultraleap, Inc. 2011-2020.                                   *",
                                                    " *                                                                            *",
@@ -118,15 +109,19 @@ public static class AutoCopywriteHeader {
       }
 
       //Append the comment block first
-      if (true/*filename.Contains("North Star")*/) { // Make UnityModules entirely Apache
-        foreach (var noticeLine in apacheCopywriteNotice) {
-          builder.AppendLine(noticeLine);
-        }
-      } else {
-        foreach (var noticeLine in copywriteNotice) {
-          builder.AppendLine(noticeLine);
-        }
+      //As of June 2020, UnityModules is fully licensed under Apache V2
+      foreach (var noticeLine in apacheCopywriteNotice) {
+        builder.AppendLine(noticeLine);
       }
+      // // if (filename.Contains("North Star")) {
+      // //   foreach (var noticeLine in apacheCopywriteNotice) {
+      // //     builder.AppendLine(noticeLine);
+      // //   }
+      // // } else {
+      // //   foreach (var noticeLine in leapSdkCopywriteNotice) {
+      // //     builder.AppendLine(noticeLine);
+      // //   }
+      // // }
 
       //Then append a single empty line
       builder.AppendLine();
@@ -147,3 +142,17 @@ public static class AutoCopywriteHeader {
     }
   }
 }
+
+#region archive
+
+// Irrelevant as of June 2020, as UnityModules is now fully licensed under Apache V2. The original Leap Motion Developer SDK license header is below.
+  // private static string[] leapSdkCopywriteNotice = {"/******************************************************************************",
+  //                                            " * Copyright (C) Ultraleap, Inc. 2011-2020.                                   *",
+  //                                            " * Ultraleap proprietary and confidential.                                    *",
+  //                                            " *                                                                            *",
+  //                                            " * Use subject to the terms of the Leap Motion SDK Agreement available at     *",
+  //                                            " * https://developer.leapmotion.com/sdk_agreement, or another agreement       *",
+  //                                            " * between Ultraleap and you, your company or other organization.             *",
+  //                                            " ******************************************************************************/"};
+
+#endregion
