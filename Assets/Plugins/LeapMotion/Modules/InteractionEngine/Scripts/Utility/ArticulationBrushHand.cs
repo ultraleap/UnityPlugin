@@ -8,11 +8,6 @@
  ******************************************************************************/
 
 using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
-using Leap;
-using System;
-
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -23,13 +18,13 @@ namespace Leap.Unity {
     private const int N_FINGERS = 5;
     private const int N_ACTIVE_BONES = 3;
 
-    private ArticulationBody palmBody;
+    private ArticulationBody   _palmBody;
     private ArticulationBody[] _articulationBodies;
-    private BoxCollider palmCollider;
-    private CapsuleCollider[] _capsuleColliders;
-    private Vector3 _palmBodyLastPos;
-    private Vector3[] _bodyLastPositions;
-    private int _lastFrameTeleport = 0;
+    private BoxCollider        _palmCollider;
+    private CapsuleCollider [] _capsuleColliders;
+    private int                _lastFrameTeleport = 0;
+    private bool               _ghosted = false;
+    private int                _layerMask;
 
     public override ModelType HandModelType {
       get { return ModelType.Physics; }
@@ -75,8 +70,15 @@ namespace Leap.Unity {
       }
 #endif
 
+      // Get the layers that collide with this hand
+      int myLayer = gameObject.layer;
+      for (int i = 0; i < 32; i++) {
+        if (!Physics.GetIgnoreLayerCollision(myLayer, i)) {
+          _layerMask = _layerMask | 1 << i;
+        }
+      }
 
-      if (palmBody == null || palmBody.gameObject == null) {
+      if (_palmBody == null || _palmBody.gameObject == null) {
         GameObject palmGameObject = new GameObject(gameObject.name + " Palm", typeof(ArticulationBody), typeof(BoxCollider));
         palmGameObject.layer = gameObject.layer;
 
@@ -91,19 +93,18 @@ namespace Leap.Unity {
             1f / palmTransform.parent.lossyScale.z);
         }
 
-        palmCollider = palmGameObject.GetComponent<BoxCollider>();
-        palmCollider.center = new Vector3(0f, 0.005f, -0.015f);
-        palmCollider.size   = new Vector3(0.06f, 0.02f, 0.07f);
-        palmCollider.material = _material;
+        _palmCollider = palmGameObject.GetComponent<BoxCollider>();
+        _palmCollider.center = new Vector3(0f, 0.005f, -0.015f);
+        _palmCollider.size   = new Vector3(0.06f, 0.02f, 0.07f);
+        _palmCollider.material = _material;
 
-        palmBody = palmGameObject.GetComponent<ArticulationBody>();
-        palmBody.immovable = true;
-        palmBody.TeleportRoot(hand_.PalmPosition.ToVector3(), hand_.Rotation.ToQuaternion());
-        palmBody.mass = _perBoneMass * 3f;
+        _palmBody = palmGameObject.GetComponent<ArticulationBody>();
+        _palmBody.immovable = true;
+        _palmBody.TeleportRoot(hand_.PalmPosition.ToVector3(), hand_.Rotation.ToQuaternion());
+        _palmBody.mass = _perBoneMass * 3f;
 
-        _capsuleColliders      = new CapsuleCollider [N_FINGERS * N_ACTIVE_BONES];
+        _capsuleColliders   = new CapsuleCollider [N_FINGERS * N_ACTIVE_BONES];
         _articulationBodies = new ArticulationBody[N_FINGERS * N_ACTIVE_BONES];
-        _bodyLastPositions  = new Vector3         [N_FINGERS * N_ACTIVE_BONES];
 
         for (int fingerIndex = 0; fingerIndex < N_FINGERS; fingerIndex++) {
           Transform lastTransform = palmTransform;
@@ -152,12 +153,12 @@ namespace Leap.Unity {
               body.swingZLock = ArticulationDofLock .LimitedMotion;
               body.jointType  = fingerIndex == 0 ? ArticulationJointType.SphericalJoint : ArticulationJointType.SphericalJoint;
               ArticulationDrive xDrive = new ArticulationDrive() {
-                stiffness = 500f, forceLimit = 2000f, damping = 3f, lowerLimit = -15f, upperLimit = 80f
+                stiffness = 150f, forceLimit = 1000f, damping = 3f, lowerLimit = -15f, upperLimit = 80f
               };
               body.xDrive = xDrive;
 
               ArticulationDrive yDrive = new ArticulationDrive() {
-                stiffness = 500f, forceLimit = 2000f, damping = 6f, lowerLimit = -15f, upperLimit = 15f
+                stiffness = 150f, forceLimit = 1000f, damping = 6f, lowerLimit = -15f, upperLimit = 15f
               };
               body.yDrive = yDrive;
               body.zDrive = yDrive;
@@ -165,7 +166,7 @@ namespace Leap.Unity {
               body.jointType = ArticulationJointType.RevoluteJoint;
               body.twistLock = ArticulationDofLock  .FreeMotion;
               ArticulationDrive drive = new ArticulationDrive() {
-                stiffness = 500f, forceLimit = 2000f, damping = 3f, lowerLimit = -10f, upperLimit = 89f
+                stiffness = 150f, forceLimit = 1000f, damping = 3f, lowerLimit = -10f, upperLimit = 89f
               };
               body.xDrive = drive;
             }
@@ -175,22 +176,24 @@ namespace Leap.Unity {
             lastTransform = capsuleGameObject.transform;
           }
         }
+        _palmBody.solverIterations = 60;
+        _palmBody.solverVelocityIterations = 20;
       } else {
-        palmBody.gameObject.SetActive(true);
+        _palmBody.gameObject.SetActive(true);
         loPolyHandPalm.gameObject.SetActive(true);
-        palmCollider.enabled = true;
-        foreach (CapsuleCollider collider in _capsuleColliders) collider.enabled = true;
-        palmBody.immovable = true;
-        palmBody.TeleportRoot(hand_.PalmPosition.ToVector3(), hand_.Rotation.ToQuaternion());
-        palmBody.velocity = Vector3.zero;
-        palmBody.angularVelocity = Vector3.zero;
+        _palmCollider.enabled = false;
+        foreach (CapsuleCollider collider in _capsuleColliders) collider.enabled = false;
+        _palmBody.immovable = true;
+        _palmBody.TeleportRoot(hand_.PalmPosition.ToVector3(), hand_.Rotation.ToQuaternion());
+        _palmBody.velocity = Vector3.zero;
+        _palmBody.angularVelocity = Vector3.zero;
         _lastFrameTeleport = Time.frameCount;
         for (int i = 0; i < _articulationBodies.Length; i++) {
           //_articulationBodies[i].jointVelocity = new ArticulationReducedSpace(0f, 0f, 0f);
           _articulationBodies[i].velocity = Vector3.zero;
           _articulationBodies[i].angularVelocity = Vector3.zero;
         }
-        loPolyHandRenderer.enabled = true;
+        _ghosted = true;
       }
     }
 
@@ -201,7 +204,7 @@ namespace Leap.Unity {
 #endif
 
       // Counter Gravity; force = mass * acceleration
-      palmBody.AddForce(-Physics.gravity * palmBody.mass);
+      _palmBody.AddForce(-Physics.gravity * _palmBody.mass);
       foreach(ArticulationBody body in _articulationBodies) {
         int dofs = body.jointVelocity.dofCount;
         float velLimit = 1.75f;
@@ -212,46 +215,58 @@ namespace Leap.Unity {
       }
 
       // Apply tracking position velocity; force = (velocity * mass) / deltaTime
-      float massOfHand = palmBody.mass + (N_FINGERS * N_ACTIVE_BONES * _perBoneMass);
+      float massOfHand = _palmBody.mass + (N_FINGERS * N_ACTIVE_BONES * _perBoneMass);
       Vector3 palmDelta = (hand_.PalmPosition.ToVector3() +
         (hand_.Rotation.ToQuaternion() * Vector3.back * 0.0225f) +
-        (hand_.Rotation.ToQuaternion() * Vector3.up * 0.0115f)) - palmBody.worldCenterOfMass;
+        (hand_.Rotation.ToQuaternion() * Vector3.up * 0.0115f)) - _palmBody.worldCenterOfMass;
       // Setting velocity sets it on all the joints, adding a force only adds to root joint
-      palmBody.velocity = Vector3.zero;
-      palmBody.AddForce(Vector3.ClampMagnitude((((palmDelta / Time.fixedDeltaTime) / Time.fixedDeltaTime) * (palmBody.mass + (_perBoneMass * 5))), 1000f));
+      _palmBody.velocity = Vector3.zero;
+      _palmBody.AddForce(Vector3.ClampMagnitude((((palmDelta / Time.fixedDeltaTime) / Time.fixedDeltaTime) * (_palmBody.mass + (_perBoneMass * 5))), 1000f));
 
       // Apply tracking rotation velocity 
       // TODO: Compensate for phantom forces on strongly misrotated appendages
       // AddTorque and AngularVelocity both apply to ALL the joints in the chain
-      Quaternion rotation = hand_.Rotation.ToQuaternion() * Quaternion.Inverse(palmBody.transform.rotation);
+      Quaternion rotation = hand_.Rotation.ToQuaternion() * Quaternion.Inverse(_palmBody.transform.rotation);
       Vector3 angularVelocity = Vector3.ClampMagnitude((new Vector3(
         Mathf.DeltaAngle(0, rotation.eulerAngles.x),
         Mathf.DeltaAngle(0, rotation.eulerAngles.y),
-        Mathf.DeltaAngle(0, rotation.eulerAngles.z)) / Time.fixedDeltaTime) * Mathf.Deg2Rad, 1500f);
+        Mathf.DeltaAngle(0, rotation.eulerAngles.z)) / Time.fixedDeltaTime) * Mathf.Deg2Rad, 50f);
       //palmBody.angularVelocity = Vector3.zero;
       //palmBody.AddTorque(angularVelocity);
-      palmBody.angularVelocity = angularVelocity * 1.1f;
-      //palmBody.angularDamping = 10f;
+      _palmBody.angularVelocity = angularVelocity;
+      _palmBody.angularDamping = 50f;
 
       // Fix the hand if it gets into a bad situation by teleporting and holding in place until its bad velocities disappear
-      if (Vector3.Distance(palmBody.transform.position, hand_.PalmPosition.ToVector3()) > 1.0f) {
-        palmBody.immovable       = true;
-        palmBody.TeleportRoot(hand_.PalmPosition.ToVector3(), hand_.Rotation.ToQuaternion());
-        palmBody.velocity        = Vector3.zero;
-        palmBody.angularVelocity = Vector3.zero;
+      if (Vector3.Distance(_palmBody.transform.position, hand_.PalmPosition.ToVector3()) > 1.0f) {
+        _palmBody.immovable       = true;
+        _palmBody.TeleportRoot(hand_.PalmPosition.ToVector3(), hand_.Rotation.ToQuaternion());
+        _palmBody.velocity        = Vector3.zero;
+        _palmBody.angularVelocity = Vector3.zero;
         _lastFrameTeleport       = Time.frameCount;
-        for(int i = 0; i < _articulationBodies.Length; i++) {
+        _palmCollider.enabled     = false;
+        foreach (CapsuleCollider collider in _capsuleColliders) collider.enabled = false;
+        for (int i = 0; i < _articulationBodies.Length; i++) {
           //_articulationBodies[i].jointVelocity   = new ArticulationReducedSpace(0f, 0f, 0f);
           _articulationBodies[i].velocity        = Vector3.zero;
           _articulationBodies[i].angularVelocity = Vector3.zero;
         }
+        _ghosted = true;
       }
-      if (Time.frameCount - _lastFrameTeleport >= 1) palmBody.immovable = false;
+      if (Time.frameCount - _lastFrameTeleport >= 1) {
+        _palmBody.immovable = false;
+        loPolyHandRenderer.enabled = true;
+      }
+      if (Time.frameCount - _lastFrameTeleport >= 2 && _ghosted &&
+          !Physics.CheckSphere(_palmBody.worldCenterOfMass, 0.1f, _layerMask)) {
+        _palmCollider.enabled = true;
+        foreach (CapsuleCollider collider in _capsuleColliders) collider.enabled = true;
+        _ghosted = false;
+      }
 
 
       if (loPolyHandPalm != null) {
-        loPolyHandPalm.position = palmBody.transform.position - (palmBody.transform.forward * 0.06f);
-        loPolyHandPalm.rotation = palmBody.transform.rotation * Quaternion.Euler(hand_.IsLeft ? 180f : 0f, hand_.IsLeft ? 90f : -90f, 0f);
+        loPolyHandPalm.position = _palmBody.transform.position - (_palmBody.transform.forward * 0.06f);
+        loPolyHandPalm.rotation = _palmBody.transform.rotation * Quaternion.Euler(hand_.IsLeft ? 180f : 0f, hand_.IsLeft ? 90f : -90f, 0f);
       }
 
       Transform curJoint = null;
@@ -310,11 +325,12 @@ namespace Leap.Unity {
     }
 
     public override void FinishHand() {
-      palmBody.immovable = true;
+      _palmBody.immovable = true;
       //palmBody.gameObject.SetActive(false); // This causes the joint references to reset!!!
       loPolyHandRenderer.enabled = false;
-      palmCollider.enabled = false;
+      _palmCollider.enabled = false;
       foreach (CapsuleCollider collider in _capsuleColliders) collider.enabled = false;
+      _ghosted = true;
 
       base.FinishHand();
     }
