@@ -204,56 +204,43 @@ namespace Leap.Unity {
         body.maxAngularVelocity = velLimit;
         body.maxDepenetrationVelocity = 3f;
 
-        if (dofs == 1) {
-          body.jointVelocity = new ArticulationReducedSpace(
-            Mathf.Clamp(body.jointVelocity[0], -velLimit, velLimit));
-        } else if (dofs == 2) {
-          body.jointVelocity = new ArticulationReducedSpace(
-          Mathf.Clamp(body.jointVelocity[0], -velLimit, velLimit),
-          Mathf.Clamp(body.jointVelocity[1], -velLimit, velLimit));
-        } else {
-          body.jointVelocity = new ArticulationReducedSpace(
-          Mathf.Clamp(body.jointVelocity[0], -velLimit, velLimit),
-          Mathf.Clamp(body.jointVelocity[1], -velLimit, velLimit),
-          Mathf.Clamp(body.jointVelocity[2], -velLimit, velLimit));
-        }
-
-        body.AddForce(-Physics.gravity * body.mass); 
+        body.AddForce(-Physics.gravity * body.mass);
       }
-
-      // Counter Velocity; force = (velocity * mass) / deltaTime
-      palmBody.AddForce(Vector3.ClampMagnitude(-(palmBody.velocity * palmBody.mass) / Time.fixedDeltaTime, 1500f));
-      for (int i = 0; i < _articulationBodies.Length; i++) {
-        _articulationBodies[i].AddForce(1.0f * Vector3.ClampMagnitude(-(_articulationBodies[i].velocity * _articulationBodies[i].mass) / Time.fixedDeltaTime, 10f)); 
-      }
-
-      // Record positions to calculate velocity
-      _palmBodyLastPos = palmBody.worldCenterOfMass;
-      for(int i = 0; i < _articulationBodies.Length; i++) { _bodyLastPositions[i] = _articulationBodies[i].worldCenterOfMass; }
 
       // Apply tracking position velocity; force = (velocity * mass) / deltaTime
       float massOfHand = palmBody.mass + (N_FINGERS * N_ACTIVE_BONES * _perBoneMass);
-      Vector3 palmDelta = (hand_.PalmPosition.ToVector3() + 
+      Vector3 palmDelta = (hand_.PalmPosition.ToVector3() +
         (hand_.Rotation.ToQuaternion() * Vector3.back * 0.0225f) +
-        (hand_.Rotation.ToQuaternion() * Vector3.up   * 0.0115f)) - palmBody.worldCenterOfMass;
-      palmBody.AddForce(Vector3.ClampMagnitude(((palmDelta / Time.fixedDeltaTime) * (palmBody.mass)) / Time.fixedDeltaTime, 20000f));
+        (hand_.Rotation.ToQuaternion() * Vector3.up * 0.0115f)) - palmBody.worldCenterOfMass;
+      // Setting velocity sets it on all the joints, adding a force only adds to root joint
+      palmBody.velocity = Vector3.zero;
+      palmBody.AddForce(Vector3.ClampMagnitude((((palmDelta / Time.fixedDeltaTime) / Time.fixedDeltaTime) * (palmBody.mass + (_perBoneMass * 5))), 1000f));
 
-      // Apply tracking rotation velocity TODO: Make this correct...
+      // Apply tracking rotation velocity 
+      // TODO: Compensate for phantom forces on strongly misrotated appendages
+      // AddTorque and AngularVelocity both apply to ALL the joints in the chain
       Quaternion rotation = hand_.Rotation.ToQuaternion() * Quaternion.Inverse(palmBody.transform.rotation);
       Vector3 angularVelocity = Vector3.ClampMagnitude((new Vector3(
         Mathf.DeltaAngle(0, rotation.eulerAngles.x),
         Mathf.DeltaAngle(0, rotation.eulerAngles.y),
-        Mathf.DeltaAngle(0, rotation.eulerAngles.z)) / Time.fixedDeltaTime) / 50f, 1500f);
-      palmBody.AddTorque(angularVelocity);
+        Mathf.DeltaAngle(0, rotation.eulerAngles.z)) / Time.fixedDeltaTime) * Mathf.Deg2Rad, 1500f);
+      //palmBody.angularVelocity = Vector3.zero;
+      //palmBody.AddTorque(angularVelocity);
+      palmBody.angularVelocity = angularVelocity;
+      //palmBody.angularDamping = 10f;
 
       // Fix the hand if it gets into a bad situation by teleporting and holding in place until its bad velocities disappear
       if (Vector3.Distance(palmBody.transform.position, hand_.PalmPosition.ToVector3()) > 1.0f) {
-        palmBody.immovable = true;
+        palmBody.immovable       = true;
         palmBody.TeleportRoot(hand_.PalmPosition.ToVector3(), hand_.Rotation.ToQuaternion());
-        _lastFrameTeleport = Time.frameCount;
-        //for(int i = 0; i < _articulationBodies.Length; i++) {
-        //  _articulationBodies[i].jointVelocity = new ArticulationReducedSpace(0f, 0f, 0f);
-        //}
+        palmBody.velocity        = Vector3.zero;
+        palmBody.angularVelocity = Vector3.zero;
+        _lastFrameTeleport       = Time.frameCount;
+        for(int i = 0; i < _articulationBodies.Length; i++) {
+          //_articulationBodies[i].jointVelocity   = new ArticulationReducedSpace(0f, 0f, 0f);
+          _articulationBodies[i].velocity        = Vector3.zero;
+          _articulationBodies[i].angularVelocity = Vector3.zero;
+        }
       }
       if (Time.frameCount - _lastFrameTeleport >= 1) palmBody.immovable = false;
 
@@ -277,13 +264,10 @@ namespace Leap.Unity {
           ArticulationBody body = _articulationBodies[boneArrayIndex];
 
           float xTargetAngle = Vector3.SignedAngle(
-            prevBone.Rotation.ToQuaternion() * ((fingerIndex == 0 && jointIndex == 0) ? -Vector3.up : Vector3.forward),
-            bone.Direction.ToVector3(), prevBone.Rotation.ToQuaternion() * Vector3.right);
+            prevBone.Rotation .ToQuaternion() * ((fingerIndex == 0 && jointIndex == 0) ? -Vector3.up : Vector3.forward),
+                bone.Direction.ToVector3   (),
+            prevBone.Rotation .ToQuaternion() * Vector3.right);
           xTargetAngle = (fingerIndex == 0 && jointIndex == 0) ? xTargetAngle + 90f : xTargetAngle;
-
-          Vector3 delta = bone.Center.ToVector3() - body.worldCenterOfMass;
-          delta = Vector3.ClampMagnitude(delta, Mathf.Abs(delta.magnitude - 0.002f));
-          body.AddForce(Vector3.ClampMagnitude(((delta / Time.fixedDeltaTime) * (body.mass)) / Time.fixedDeltaTime, 20f));
 
           body.xDrive = new ArticulationDrive() {
             stiffness  = body.xDrive.stiffness, 
@@ -308,12 +292,6 @@ namespace Leap.Unity {
               lowerLimit = body.yDrive.lowerLimit,
               target     = yTargetAngle
             };
-          }
-
-          CapsuleCollider CapCollider = _capsuleColliders[boneArrayIndex];
-          if (CapCollider) {
-            Vector3 a = bone.PrevJoint.ToVector3(), 
-                    b = bone.NextJoint.ToVector3();
           }
 
           if (loPolyHandPalm != null) {
