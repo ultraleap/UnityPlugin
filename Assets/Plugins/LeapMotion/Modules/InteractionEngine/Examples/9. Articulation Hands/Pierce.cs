@@ -50,7 +50,7 @@ public class Pierce : MonoBehaviour {
     if (collidedWithTipIndex < 0) return;
 
     // Filter collisions by the force magnitude applied
-    if (Vector3.Dot(collision.impulse, transform.up) <= 2f) { return; }
+    if (Mathf.Abs(Vector3.Dot(collision.impulse, transform.up)) <= 2f) { return; }
 
     // If a PiercingEvent truly has occurred, create a linear joint to represent it
     ConfigurableJoint linearJoint = gameObject.AddComponent<ConfigurableJoint>();

@@ -147,17 +147,17 @@ namespace Leap.Unity {
             body.mass = _perBoneMass;
 
             if (jointIndex == 0) {
-              body.twistLock  = ArticulationDofLock  .FreeMotion;
-              body.swingYLock = fingerIndex == 0 ? ArticulationDofLock.FreeMotion : ArticulationDofLock.LockedMotion;
-              body.swingZLock = ArticulationDofLock  .FreeMotion;
-              body.jointType  = fingerIndex == 0 ? ArticulationJointType.SphericalJoint : ArticulationJointType.RevoluteJoint; //ArticulationJointType.SphericalJoint; //
+              body.twistLock  = ArticulationDofLock .LimitedMotion;
+              body.swingYLock = fingerIndex == 0 ? ArticulationDofLock.FreeMotion : ArticulationDofLock.LimitedMotion;
+              body.swingZLock = ArticulationDofLock .LimitedMotion;
+              body.jointType  = fingerIndex == 0 ? ArticulationJointType.SphericalJoint : ArticulationJointType.SphericalJoint;
               ArticulationDrive xDrive = new ArticulationDrive() {
-                stiffness = 10f, forceLimit = 1000f, damping = 0.15f, lowerLimit = -5f, upperLimit = 80f
+                stiffness = 500f, forceLimit = 2000f, damping = 3f, lowerLimit = -15f, upperLimit = 80f
               };
               body.xDrive = xDrive;
 
               ArticulationDrive yDrive = new ArticulationDrive() {
-                stiffness = 10f, forceLimit = 1000f, damping = 0.3f, lowerLimit = -20f, upperLimit = 20f
+                stiffness = 500f, forceLimit = 2000f, damping = 6f, lowerLimit = -15f, upperLimit = 15f
               };
               body.yDrive = yDrive;
               body.zDrive = yDrive;
@@ -165,7 +165,7 @@ namespace Leap.Unity {
               body.jointType = ArticulationJointType.RevoluteJoint;
               body.twistLock = ArticulationDofLock  .FreeMotion;
               ArticulationDrive drive = new ArticulationDrive() {
-                stiffness = 10f, forceLimit = 1000f, damping = 0.15f, lowerLimit = -10f, upperLimit = 89f
+                stiffness = 500f, forceLimit = 2000f, damping = 3f, lowerLimit = -10f, upperLimit = 89f
               };
               body.xDrive = drive;
             }
@@ -182,9 +182,13 @@ namespace Leap.Unity {
         foreach (CapsuleCollider collider in _capsuleColliders) collider.enabled = true;
         palmBody.immovable = true;
         palmBody.TeleportRoot(hand_.PalmPosition.ToVector3(), hand_.Rotation.ToQuaternion());
+        palmBody.velocity = Vector3.zero;
+        palmBody.angularVelocity = Vector3.zero;
         _lastFrameTeleport = Time.frameCount;
         for (int i = 0; i < _articulationBodies.Length; i++) {
-          _articulationBodies[i].jointVelocity = new ArticulationReducedSpace(0f, 0f, 0f);
+          //_articulationBodies[i].jointVelocity = new ArticulationReducedSpace(0f, 0f, 0f);
+          _articulationBodies[i].velocity = Vector3.zero;
+          _articulationBodies[i].angularVelocity = Vector3.zero;
         }
         loPolyHandRenderer.enabled = true;
       }
@@ -226,7 +230,7 @@ namespace Leap.Unity {
         Mathf.DeltaAngle(0, rotation.eulerAngles.z)) / Time.fixedDeltaTime) * Mathf.Deg2Rad, 1500f);
       //palmBody.angularVelocity = Vector3.zero;
       //palmBody.AddTorque(angularVelocity);
-      palmBody.angularVelocity = angularVelocity;
+      palmBody.angularVelocity = angularVelocity * 1.1f;
       //palmBody.angularDamping = 10f;
 
       // Fix the hand if it gets into a bad situation by teleporting and holding in place until its bad velocities disappear
