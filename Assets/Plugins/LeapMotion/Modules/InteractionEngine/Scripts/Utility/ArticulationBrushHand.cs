@@ -33,6 +33,9 @@ namespace Leap.Unity {
     public Transform loPolyHandPalm;
     public SkinnedMeshRenderer loPolyHandRenderer;
 
+    [Range(0.1f, 10f)]
+    public float _strength = 1f;
+
     [SerializeField]
     [Tooltip("The mass of each finger bone; the palm will be 3x this.")]
     private float _perBoneMass = 3.0f;
@@ -153,12 +156,12 @@ namespace Leap.Unity {
               body.swingZLock = ArticulationDofLock .LimitedMotion;
               body.jointType  = fingerIndex == 0 ? ArticulationJointType.SphericalJoint : ArticulationJointType.SphericalJoint;
               ArticulationDrive xDrive = new ArticulationDrive() {
-                stiffness = 150f, forceLimit = 1000f, damping = 3f, lowerLimit = -15f, upperLimit = 80f
+                stiffness = 100f * _strength, forceLimit = 1000f * _strength, damping = 3f, lowerLimit = -15f, upperLimit = 80f
               };
               body.xDrive = xDrive;
 
               ArticulationDrive yDrive = new ArticulationDrive() {
-                stiffness = 150f, forceLimit = 1000f, damping = 6f, lowerLimit = -15f, upperLimit = 15f
+                stiffness = 100f * _strength, forceLimit = 1000f * _strength, damping = 6f, lowerLimit = -15f, upperLimit = 15f
               };
               body.yDrive = yDrive;
               body.zDrive = yDrive;
@@ -166,7 +169,7 @@ namespace Leap.Unity {
               body.jointType = ArticulationJointType.RevoluteJoint;
               body.twistLock = ArticulationDofLock  .FreeMotion;
               ArticulationDrive drive = new ArticulationDrive() {
-                stiffness = 150f, forceLimit = 1000f, damping = 3f, lowerLimit = -10f, upperLimit = 89f
+                stiffness = 100f * _strength, forceLimit = 1000f * _strength, damping = 3f, lowerLimit = -10f, upperLimit = 89f
               };
               body.xDrive = drive;
             }
@@ -220,8 +223,10 @@ namespace Leap.Unity {
         (hand_.Rotation.ToQuaternion() * Vector3.back * 0.0225f) +
         (hand_.Rotation.ToQuaternion() * Vector3.up * 0.0115f)) - _palmBody.worldCenterOfMass;
       // Setting velocity sets it on all the joints, adding a force only adds to root joint
-      _palmBody.velocity = Vector3.zero;
-      _palmBody.AddForce(Vector3.ClampMagnitude((((palmDelta / Time.fixedDeltaTime) / Time.fixedDeltaTime) * (_palmBody.mass + (_perBoneMass * 5))), 1000f));
+      //_palmBody.velocity = Vector3.zero;
+      float alpha = 0.05f; // Blend between existing velocity and all new velocity
+      _palmBody.velocity *= alpha;
+      _palmBody.AddForce(Vector3.ClampMagnitude((((palmDelta / Time.fixedDeltaTime) / Time.fixedDeltaTime) * (_palmBody.mass + (_perBoneMass * 5))) * (1f-alpha), 1000f * _strength));
 
       // Apply tracking rotation velocity 
       // TODO: Compensate for phantom forces on strongly misrotated appendages
@@ -230,7 +235,7 @@ namespace Leap.Unity {
       Vector3 angularVelocity = Vector3.ClampMagnitude((new Vector3(
         Mathf.DeltaAngle(0, rotation.eulerAngles.x),
         Mathf.DeltaAngle(0, rotation.eulerAngles.y),
-        Mathf.DeltaAngle(0, rotation.eulerAngles.z)) / Time.fixedDeltaTime) * Mathf.Deg2Rad, 50f);
+        Mathf.DeltaAngle(0, rotation.eulerAngles.z)) / Time.fixedDeltaTime) * Mathf.Deg2Rad, 45f * _strength);
       //palmBody.angularVelocity = Vector3.zero;
       //palmBody.AddTorque(angularVelocity);
       _palmBody.angularVelocity = angularVelocity;
