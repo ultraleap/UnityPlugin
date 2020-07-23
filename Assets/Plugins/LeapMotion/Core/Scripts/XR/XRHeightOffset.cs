@@ -118,7 +118,7 @@ namespace Leap.Unity {
             }
           }
 
-          if (recenterOnUserPresence && !XRSupportUtil.IsRoomScale()) {
+          if (recenterOnUserPresence && !XRSupportUtil.IsLargePlayspace()) {
             var userPresence = XRSupportUtil.IsUserPresent();
 
             if (_lastUserPresence != userPresence) {
