@@ -37,7 +37,9 @@ namespace Leap.Unity {
     }
 
     public static bool IsXRDevicePresent() {
-      #if UNITY_2017_2_OR_NEWER
+      #if UNITY_2020_1_OR_NEWER
+      return XRSettings.isDeviceActive;
+      #elif UNITY_2017_2_OR_NEWER
       return XRDevice.isPresent;
       #else
       return VRDevice.isPresent;
@@ -210,6 +212,23 @@ namespace Leap.Unity {
         return XRDevice.GetTrackingSpaceType() == TrackingSpaceType.RoomScale;
       #else
         return VRDevice.GetTrackingSpaceType() == TrackingSpaceType.RoomScale;
+      #endif
+    }
+
+    static List<Vector3> _boundaryPoints = new List<Vector3>();
+    /// <summary> Returns whether the playspace is larger than 1m on its shortest side. </summary>
+    public static bool IsLargePlayspace() {
+      #if UNITY_2020_1_OR_NEWER // Oculus reports a floor centered space now...
+        var devices = new List<InputDevice>();
+        InputDevices.GetDevicesWithCharacteristics(InputDeviceCharacteristics.HeadMounted, devices);
+        if (devices.Count == 0) return false;
+        var hmdDevice = devices[0];
+        hmdDevice.subsystem.TryGetBoundaryPoints(_boundaryPoints);
+        Bounds playspaceSize = new Bounds();
+        foreach(Vector3 boundaryPoint in _boundaryPoints) { playspaceSize.Encapsulate(boundaryPoint); }
+        return playspaceSize.size.magnitude > 1f; // Playspace is greater than 1m on its shortest axis
+      #else
+        return IsRoomScale();
       #endif
     }
 
