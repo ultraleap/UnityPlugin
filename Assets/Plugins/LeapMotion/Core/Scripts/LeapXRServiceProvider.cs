@@ -236,6 +236,12 @@ namespace Leap.Unity {
         preCullCamera = GetComponent<Camera>();
       }
 
+      #if UNITY_2020_1_OR_NEWER
+      if (GetComponent<UnityEngine.SpatialTracking.TrackedPoseDriver>() == null) {
+        gameObject.AddComponent<UnityEngine.SpatialTracking.TrackedPoseDriver>().UseRelativeTransform = true;
+      }
+      #endif
+
       #if UNITY_2019_1_OR_NEWER
       if (GraphicsSettings.renderPipelineAsset != null) {
         RenderPipelineManager.beginCameraRendering -= onBeginRendering;

@@ -221,9 +221,11 @@ namespace Leap.Unity.GraphicalRenderer {
       SupportUtil.OnlySupportFirstFeature<LeapSpriteFeature>(info);
 
 #if UNITY_EDITOR
+      #if !UNITY_2020_1_OR_NEWER
       if (!Application.isPlaying) {
         Packer.RebuildAtlasCacheIfNeeded(EditorUserBuildSettings.activeBuildTarget);
       }
+      #endif
 
       for (int i = 0; i < features.Count; i++) {
         var feature = features[i];
@@ -375,7 +377,7 @@ namespace Leap.Unity.GraphicalRenderer {
         }
 
         if (_spriteFeatures.Count != 0) {
-#if UNITY_EDITOR
+#if UNITY_EDITOR && !UNITY_2020_1_OR_NEWER
           Packer.RebuildAtlasCacheIfNeeded(EditorUserBuildSettings.activeBuildTarget);
 #endif
           extractSpriteRects();
