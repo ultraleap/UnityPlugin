@@ -36,6 +36,7 @@ namespace Leap.Unity {
     private readonly Color BackfaceEdgeColour = new Color(1, 1, 1, 0.02f);
 
     private LeapServiceProvider _leapServiceProvider;
+    private Controller _leapController;
 
     protected override void OnEnable() {
 
@@ -155,17 +156,39 @@ namespace Leap.Unity {
       }
     }
 
+    private Controller LeapController {
+      get {
+
+        if (this._leapController!= null)
+        {
+          return this._leapController;
+        }
+        else
+        {
+          this._leapController = LeapServiceProvider?.GetLeapController();
+
+          this._leapController.Device += _leapController_DeviceChanged;
+          this._leapController.DeviceLost += _leapController_DeviceChanged;
+
+          return this._leapController;
+        }
+      }
+    }
+
+    private void _leapController_DeviceChanged(object sender, DeviceEventArgs e) {
+      EditorWindow view = EditorWindow.GetWindow<SceneView>();
+      view.Repaint();
+    }
+
     private void DetectConnectedDevice() {
 
-      var leapController = LeapServiceProvider.GetLeapController();
-
-      if (leapController?.Devices?.Count == 1)
+      if (LeapController?.Devices?.Count == 1)
       {
-        if (leapController.Devices.First().Type == Device.DeviceType.TYPE_RIGEL)
+        if (LeapController.Devices.First().Type == Device.DeviceType.TYPE_RIGEL)
         {
           DrawRigelInteractionZoneMesh();
         }
-        else if (leapController.Devices.First().Type == Device.DeviceType.TYPE_PERIPHERAL)
+        else if (LeapController.Devices.First().Type == Device.DeviceType.TYPE_PERIPHERAL)
         {
           DrawPeripheralInteractionZone(LMC_BOX_WIDTH, LMC_BOX_DEPTH, LMC_BOX_RADIUS, Color.white);
         }
