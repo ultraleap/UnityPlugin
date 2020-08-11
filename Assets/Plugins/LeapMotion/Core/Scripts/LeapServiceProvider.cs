@@ -644,7 +644,7 @@ namespace Leap.Unity
 
             if (_leapController != null)
             {
-                _leapController.Device -= onHandControllerConnect;
+               // _leapController.Device -= onHandControllerConnect;
             }
         }
 

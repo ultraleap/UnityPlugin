@@ -15,8 +15,7 @@ using System.Text.RegularExpressions;
 using UnityEditor;
 using UnityEngine;
 
-namespace Leap.Unity
-{
+namespace Leap.Unity {
 
   [CustomEditor(typeof(LeapServiceProvider))]
   public class LeapServiceProviderEditor : CustomEditorBase<LeapServiceProvider> {
@@ -36,7 +35,11 @@ namespace Leap.Unity
     private GenericMesh rigelInteractionZoneMesh;
     private readonly Color BackfaceEdgeColour = new Color(1, 1, 1, 0.02f);
 
+    private LeapServiceProvider _leapServiceProvider;
+
     protected override void OnEnable() {
+
+      
       ParseRigelInteractionMeshData();
 
       base.OnEnable();
@@ -59,7 +62,8 @@ namespace Leap.Unity
       LeapServiceProvider.FrameOptimizationMode mode = (LeapServiceProvider.FrameOptimizationMode)property.intValue;
       string warningText;
 
-      switch (mode) {
+      switch (mode)
+      {
 
         case LeapServiceProvider.FrameOptimizationMode.ReuseUpdateForPhysics:
           warningText = "Reusing update frames for physics introduces a frame of latency "
@@ -95,7 +99,8 @@ namespace Leap.Unity
 
     public virtual void OnSceneGUI() {
 
-      switch (GetSelectedInteractionVolume()) {
+      switch (GetSelectedInteractionVolume())
+      {
         case LeapServiceProvider.InteractionVolumeVisualization.None:
           break;
         case LeapServiceProvider.InteractionVolumeVisualization.Peripheral:
@@ -134,28 +139,42 @@ namespace Leap.Unity
       }
     }
 
+    private LeapServiceProvider LeapServiceProvider {
+      get {
+
+        if (this._leapServiceProvider != null)
+        {
+          return this._leapServiceProvider;
+        }
+        else
+        {
+          this._leapServiceProvider = this.target.GetComponent<LeapServiceProvider>();
+
+          return this._leapServiceProvider;
+        }
+      }
+    }
 
     private void DetectConnectedDevice() {
 
-      LeapServiceProvider lsp = this.target.GetComponent<LeapServiceProvider>();
-      Connection c = Connection.GetConnection(0);
-      if (c.Devices.Count == 1)
+      var leapController = LeapServiceProvider.GetLeapController();
+
+      if (leapController?.Devices?.Count == 1)
       {
-        if (c.Devices.First().Type == Device.DeviceType.TYPE_RIGEL)
+        if (leapController.Devices.First().Type == Device.DeviceType.TYPE_RIGEL)
         {
           DrawRigelInteractionZoneMesh();
         }
-        else if (c.Devices.First().Type == Device.DeviceType.TYPE_PERIPHERAL)
+        else if (leapController.Devices.First().Type == Device.DeviceType.TYPE_PERIPHERAL)
         {
           DrawPeripheralInteractionZone(LMC_BOX_WIDTH, LMC_BOX_DEPTH, LMC_BOX_RADIUS, Color.white);
         }
       }
     }
 
-    private LeapServiceProvider.InteractionVolumeVisualization GetSelectedInteractionVolume() {
-      LeapServiceProvider lsp = this.target.GetComponent<LeapServiceProvider>();
+    private LeapServiceProvider.InteractionVolumeVisualization? GetSelectedInteractionVolume() {
 
-      return lsp.SelectedInteractionVolumeVisualization;
+      return LeapServiceProvider?.SelectedInteractionVolumeVisualization;
     }
 
 
@@ -245,7 +264,7 @@ namespace Leap.Unity
 
     private void drawControllerEdge(Vector3 origin,
                                     Vector3 edge0, Vector3 edge1,
-                                    float box_radius) { 
+                                    float box_radius) {
       Vector3 right_normal = target.transform
                                    .TransformDirection(Vector3.Cross(edge0, edge1));
       float right_angle = Vector3.Angle(edge0, edge1);
@@ -274,8 +293,7 @@ namespace Leap.Unity
       }
     }
 
-    internal enum enumaxis
-    {
+    internal enum enumaxis {
       X,
       Y,
       Z
@@ -286,23 +304,23 @@ namespace Leap.Unity
     /// </summary>
     internal class ObjFileParser {
       private const char delimiter = ' ';
-      private GenericMesh mesh;
+      private GenericMesh _mesh;
 
-      private bool swapYZ;
+      private bool _swapYZ;
       internal const bool SwapYZ = true;
 
       internal float _scaleFactor;
 
       public GenericMesh FromObj(string filePath, bool SwapYZ = false, float scaleFactor = 1) {
 
-        this.swapYZ = SwapYZ;
+        this._swapYZ = SwapYZ;
         this._scaleFactor = scaleFactor;
 
         if (File.Exists(filePath) && Path.GetExtension(filePath) == ".obj")
         {
           using (StreamReader fs = File.OpenText(filePath))
           {
-            mesh = new GenericMesh();
+            _mesh = new GenericMesh();
 
             string line;
             while (fs.EndOfStream == false)
@@ -311,11 +329,11 @@ namespace Leap.Unity
               ParseLine(line);
             }
 
-            mesh.AddEdges();
+            _mesh.AddEdges();
           }
         }
 
-        return mesh;
+        return _mesh;
       }
 
 
@@ -348,7 +366,7 @@ namespace Leap.Unity
         {
           try
           {
-            this.mesh.AddTriangle(ParseVertexFaceElement(elements[1]), ParseVertexFaceElement(elements[2]), ParseVertexFaceElement(elements[3]));
+            this._mesh.AddTriangle(ParseVertexFaceElement(elements[1]), ParseVertexFaceElement(elements[2]), ParseVertexFaceElement(elements[3]));
           }
           catch (Exception e)
           {
@@ -408,10 +426,10 @@ namespace Leap.Unity
         {
           try
           {
-            this.mesh.Vertices.Add(new Vector3() {
+            this._mesh.Vertices.Add(new Vector3() {
               x = float.Parse(elements[1]) * this._scaleFactor,
-              y = swapYZ ? float.Parse(elements[3]) * this._scaleFactor : float.Parse(elements[2]) * this._scaleFactor,
-              z = swapYZ ? float.Parse(elements[2]) * this._scaleFactor : float.Parse(elements[3]) * this._scaleFactor,
+              y = _swapYZ ? float.Parse(elements[3]) * this._scaleFactor : float.Parse(elements[2]) * this._scaleFactor,
+              z = _swapYZ ? float.Parse(elements[2]) * this._scaleFactor : float.Parse(elements[3]) * this._scaleFactor,
             });
           }
           catch (Exception e)
@@ -431,11 +449,11 @@ namespace Leap.Unity
           {
             Vector3 normal = new Vector3() {
               x = float.Parse(elements[1]),
-              y = swapYZ ? float.Parse(elements[3]) : float.Parse(elements[2]),
-              z = swapYZ ? float.Parse(elements[2]) : float.Parse(elements[3])
+              y = _swapYZ ? float.Parse(elements[3]) : float.Parse(elements[2]),
+              z = _swapYZ ? float.Parse(elements[2]) : float.Parse(elements[3])
             };
 
-            this.mesh.Normals.Add(normal);
+            this._mesh.Normals.Add(normal);
           }
           catch (Exception e)
           {
@@ -478,13 +496,13 @@ namespace Leap.Unity
     /// </summary>
     internal class GenericMesh {
 
-      private readonly string meshName;
-      private readonly List<MeshVertex> meshVertices = new List<MeshVertex>();
-      private readonly Dictionary<int, Edge> edges = new Dictionary<int, Edge>();
+      private readonly string _meshName;
+      private readonly List<MeshVertex> _meshVertices = new List<MeshVertex>();
+      private readonly Dictionary<int, Edge> _edges = new Dictionary<int, Edge>();
 
-      private readonly List<Vector3> vertices = new List<Vector3>();
-      private readonly List<Vector2> uv = new List<Vector2>();
-      private readonly List<Vector3> normals = new List<Vector3>();
+      private readonly List<Vector3> _vertices = new List<Vector3>();
+      private readonly List<Vector2> _uv = new List<Vector2>();
+      private readonly List<Vector3> _normals = new List<Vector3>();
 
       public GenericMesh() {
 
@@ -493,17 +511,17 @@ namespace Leap.Unity
       /// <summary>
       /// Mesh vertices
       /// </summary>
-      internal List<Vector3> Vertices => this.vertices;
+      internal List<Vector3> Vertices => this._vertices;
 
       /// <summary>
       /// Mesh normals
       /// </summary>
-      internal List<Vector3> Normals => this.normals;
+      internal List<Vector3> Normals => this._normals;
 
       /// <summary>
       /// Mesh texture coordinates
       /// </summary>
-      internal List<Vector2> UV => this.uv;
+      internal List<Vector2> UV => this._uv;
 
       /// <summary>
       /// Enumerator for triangles in the mesh
@@ -511,9 +529,9 @@ namespace Leap.Unity
       /// <returns>The next triangle as an array of three mesh vertex values</returns>
       internal IEnumerable<MeshVertex[]> Triangles() {
 
-        for (int index = 0; index <= this.meshVertices.Count - 3; index += 3)
+        for (int index = 0; index <= this._meshVertices.Count - 3; index += 3)
         {
-          yield return this.meshVertices
+          yield return this._meshVertices
               .Skip(index)
               .Take(3).ToArray();
         }
@@ -525,7 +543,7 @@ namespace Leap.Unity
       /// <returns>The next edge</returns>
       internal IEnumerable<Edge> Edges() {
 
-        foreach (KeyValuePair<int, Edge> edge in this.edges)
+        foreach (KeyValuePair<int, Edge> edge in this._edges)
         {
           yield return edge.Value;
         }
@@ -542,23 +560,23 @@ namespace Leap.Unity
         min = 0.0f;
         max = 0.0f;
 
-        if (this.vertices.Count > 0)
+        if (this._vertices.Count > 0)
         {
           switch (axis)
           {
             case enumaxis.X:
-              min = this.vertices.Min(v => v.x);
-              max = this.vertices.Max(v => v.x);
+              min = this._vertices.Min(v => v.x);
+              max = this._vertices.Max(v => v.x);
               break;
 
             case enumaxis.Y:
-              min = this.vertices.Min(v => v.y);
-              max = this.vertices.Max(v => v.y);
+              min = this._vertices.Min(v => v.y);
+              max = this._vertices.Max(v => v.y);
               break;
 
             case enumaxis.Z:
-              min = this.vertices.Min(v => v.z);
-              max = this.vertices.Max(v => v.z);
+              min = this._vertices.Min(v => v.z);
+              max = this._vertices.Max(v => v.z);
               break;
 
             default:
@@ -576,9 +594,9 @@ namespace Leap.Unity
       /// <param name="meshVertex3"></param>
       internal void AddTriangle(MeshVertex meshVertex1, MeshVertex meshVertex2, MeshVertex meshVertex3) {
 
-        this.meshVertices.Add(meshVertex1);
-        this.meshVertices.Add(meshVertex2);
-        this.meshVertices.Add(meshVertex3);
+        this._meshVertices.Add(meshVertex1);
+        this._meshVertices.Add(meshVertex2);
+        this._meshVertices.Add(meshVertex3);
       }
 
       /// <summary>
@@ -621,8 +639,7 @@ namespace Leap.Unity
           }
         }
 
-        void AddEdgeIfNotCommon(MeshVertex edgeVertexA, MeshVertex edgeVertexB, IEnumerable<MeshVertex> commonVertices)
-        {
+        void AddEdgeIfNotCommon(MeshVertex edgeVertexA, MeshVertex edgeVertexB, IEnumerable<MeshVertex> commonVertices) {
           if ((commonVertices.First().VertexIndex == edgeVertexA.VertexIndex && commonVertices.Last().VertexIndex == edgeVertexB.VertexIndex) ||
               (commonVertices.First().VertexIndex == edgeVertexB.VertexIndex && commonVertices.Last().VertexIndex == edgeVertexA.VertexIndex))
           {
@@ -644,9 +661,9 @@ namespace Leap.Unity
 
         int edgeKey = Edge.SzudzikID(meshVertex1.VertexIndex, meshVertex2.VertexIndex);
 
-        if (!this.edges.ContainsKey(edgeKey))
+        if (!this._edges.ContainsKey(edgeKey))
         {
-          this.edges.Add(edgeKey, new Edge(
+          this._edges.Add(edgeKey, new Edge(
               new Tuple<int, Vector3>[] { new Tuple<int, Vector3>(meshVertex1.VertexIndex, this.Vertices[meshVertex1.VertexIndex]),
                                                  new Tuple<int, Vector3>(meshVertex2.VertexIndex, this.Vertices[meshVertex2.VertexIndex])},
               new Vector3[] { this.Normals[meshVertex1.NormalIndex.Value], this.Normals[meshVertex2.NormalIndex.Value] }
@@ -663,23 +680,21 @@ namespace Leap.Unity
 
         return Vector3.SqrMagnitude(nA - nB) < 0.00001f;
 
-        Vector3 Normal(MeshVertex[] triangle)
-        {
-          return Vector3.Cross(this.vertices[triangle[1].VertexIndex] - this.vertices[triangle[0].VertexIndex],
-                               this.vertices[triangle[2].VertexIndex] - this.vertices[triangle[1].VertexIndex]);
+        Vector3 Normal(MeshVertex[] triangle) {
+          return Vector3.Cross(this._vertices[triangle[1].VertexIndex] - this._vertices[triangle[0].VertexIndex],
+                               this._vertices[triangle[2].VertexIndex] - this._vertices[triangle[1].VertexIndex]);
         }
       }
 
-      private bool TrianglesShareTwoPoints(IEnumerable<MeshVertex> previousTriangle, 
-                                           IEnumerable<MeshVertex> triangle, 
+      private bool TrianglesShareTwoPoints(IEnumerable<MeshVertex> previousTriangle,
+                                           IEnumerable<MeshVertex> triangle,
                                            out IEnumerable<MeshVertex> commonPoints) {
 
         commonPoints = previousTriangle.Where(vtx => VertexIsInTriangle(vtx.VertexIndex, previousTriangle));
 
         return commonPoints.Count() == 2;
 
-        bool VertexIsInTriangle(int vertexID, IEnumerable<MeshVertex> triangleToCheck)
-        {
+        bool VertexIsInTriangle(int vertexID, IEnumerable<MeshVertex> triangleToCheck) {
           return triangle.Any(v => v.VertexIndex == vertexID);
         }
       }
