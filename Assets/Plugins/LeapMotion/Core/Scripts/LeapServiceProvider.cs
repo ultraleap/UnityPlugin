@@ -57,13 +57,13 @@ namespace Leap.Unity
         public enum InteractionVolumeVisualization
         {
             None,
-            Peripheral,
-            Rigel,
+            LeapMotionController,
+            RigelPlaceholderNotAccurate,
             Automatic
         }
         [Tooltip("Displays a representation of the interaction volume in the scene view")]
         [SerializeField]
-        protected InteractionVolumeVisualization _interactionVolumeVisualization = InteractionVolumeVisualization.Peripheral;
+        protected InteractionVolumeVisualization _interactionVolumeVisualization = InteractionVolumeVisualization.LeapMotionController;
 
         public InteractionVolumeVisualization SelectedInteractionVolumeVisualization
         {

@@ -104,10 +104,10 @@ namespace Leap.Unity {
       {
         case LeapServiceProvider.InteractionVolumeVisualization.None:
           break;
-        case LeapServiceProvider.InteractionVolumeVisualization.Peripheral:
-          DrawPeripheralInteractionZone(LMC_BOX_WIDTH, LMC_BOX_DEPTH, LMC_BOX_RADIUS, Color.white);
+        case LeapServiceProvider.InteractionVolumeVisualization.LeapMotionController:
+          DrawLeapMotionControllerInteractionZone(LMC_BOX_WIDTH, LMC_BOX_DEPTH, LMC_BOX_RADIUS, Color.white);
           break;
-        case LeapServiceProvider.InteractionVolumeVisualization.Rigel:
+        case LeapServiceProvider.InteractionVolumeVisualization.RigelPlaceholderNotAccurate:
           DrawRigelInteractionZoneMesh();
           break;
         case LeapServiceProvider.InteractionVolumeVisualization.Automatic:
@@ -127,7 +127,8 @@ namespace Leap.Unity {
       {
         try
         {
-          rigelInteractionZoneMesh = rigelMeshDataParser.FromObj(Path.Combine(Application.dataPath, "UnityModules", "Assets", "Plugins", "LeapMotion", "Core", "Models", "Rigel-interaction-cone.obj"),
+          // This data is not oriented or scaled correctly yet.
+          rigelInteractionZoneMesh = rigelMeshDataParser.FromObj(Path.Combine(Application.dataPath, "UnityModules", "Assets", "Plugins", "LeapMotion", "Core", "Models", "Rigel-interaction-cone-placeholder.obj"),
               ObjFileParser.SwapYZ,
               INTERACTION_VOLUME_MODEL_IMPORT_SCALE_FACTOR);
 
@@ -167,8 +168,11 @@ namespace Leap.Unity {
         {
           this._leapController = LeapServiceProvider?.GetLeapController();
 
-          this._leapController.Device += _leapController_DeviceChanged;
-          this._leapController.DeviceLost += _leapController_DeviceChanged;
+          if (this._leapController != null)
+          {
+            this._leapController.Device += _leapController_DeviceChanged;
+            this._leapController.DeviceLost += _leapController_DeviceChanged;
+          }
 
           return this._leapController;
         }
@@ -190,7 +194,7 @@ namespace Leap.Unity {
         }
         else if (LeapController.Devices.First().Type == Device.DeviceType.TYPE_PERIPHERAL)
         {
-          DrawPeripheralInteractionZone(LMC_BOX_WIDTH, LMC_BOX_DEPTH, LMC_BOX_RADIUS, Color.white);
+          DrawLeapMotionControllerInteractionZone(LMC_BOX_WIDTH, LMC_BOX_DEPTH, LMC_BOX_RADIUS, Color.white);
         }
       }
     }
@@ -249,7 +253,7 @@ namespace Leap.Unity {
       }
     }
 
-    private void DrawPeripheralInteractionZone(float box_width, float box_depth, float box_radius, Color interactionZoneColor) {
+    private void DrawLeapMotionControllerInteractionZone(float box_width, float box_depth, float box_radius, Color interactionZoneColor) {
 
       Color previousColor = Handles.color;
       Handles.color = interactionZoneColor;
@@ -767,7 +771,6 @@ namespace Leap.Unity {
 
           this.CommonNormal = this.VertexNormals[0] + this.VertexNormals[1];
           this.CommonNormal.Normalize();
-          //this.CommonNormal.Scale(new Vector3(1000f, 1000f, 1000f));
         }
         else
         {
