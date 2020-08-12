@@ -219,8 +219,7 @@ namespace Leap.Unity {
           return _editTimeFrame;
         }
         #endif
-        if (_frameOptimization == FrameOptimizationMode.ReusePhysicsForUpdate)
-        {
+        if (_frameOptimization == FrameOptimizationMode.ReusePhysicsForUpdate) {
           return _transformedFixedFrame;
         } else {
           return _transformedUpdateFrame;
@@ -230,7 +229,7 @@ namespace Leap.Unity {
 
     public override Frame CurrentFixedFrame {
       get {
-#if UNITY_EDITOR
+        #if UNITY_EDITOR
         if (!Application.isPlaying) {
           _editTimeFrame.Hands.Clear();
           _untransformedEditTimeFrame.Hands.Clear();
@@ -239,7 +238,7 @@ namespace Leap.Unity {
           transformFrame(_untransformedEditTimeFrame, _editTimeFrame);
           return _editTimeFrame;
         }
-#endif
+        #endif
         if (_frameOptimization == FrameOptimizationMode.ReuseUpdateForPhysics) {
           return _transformedUpdateFrame;
         } else {
@@ -270,16 +269,14 @@ namespace Leap.Unity {
     }
 
     protected virtual void Update() {
-      if (_workerThreadProfiling)
-      {
+      if (_workerThreadProfiling) {
         LeapProfiling.Update();
       }
 
       if (!checkConnectionIntegrity()) { return; }
 
 #if UNITY_EDITOR
-      if (UnityEditor.EditorApplication.isCompiling)
-      {
+      if (UnityEditor.EditorApplication.isCompiling) {
         UnityEditor.EditorApplication.isPlaying = false;
         Debug.LogWarning("Unity hot reloading not currently supported. Stopping Editor Playback.");
         return;
@@ -444,15 +441,15 @@ namespace Leap.Unity {
     #region Internal Methods
 
     protected virtual long CalculateInterpolationTime(bool endOfFrame = false) {
-#if UNITY_ANDROID && !UNITY_EDITOR
+      #if UNITY_ANDROID && !UNITY_EDITOR
       return _leapController.Now() - 16000;
-#else
+      #else
       if (_leapController != null) {
         return _leapController.Now() - (long)_smoothedTrackingLatency.value;
       } else {
         return 0;
       }
-#endif
+      #endif
     }
 
     /// <summary>
