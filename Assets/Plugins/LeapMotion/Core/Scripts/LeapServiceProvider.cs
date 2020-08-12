@@ -129,7 +129,7 @@ namespace Leap.Unity {
     #endregion
 
     #region Edit-time Frame Data
-
+ 
     private Action<Device> _onDeviceSafe;
     /// <summary>
     /// A utility event to get a callback whenever a new device is connected to the service.
@@ -141,7 +141,7 @@ namespace Leap.Unity {
     public event Action<Device> OnDeviceSafe {
       add {
         if (_leapController != null && _leapController.IsConnected) {
-          foreach (Device device in _leapController.Devices) {
+          foreach (var device in _leapController.Devices) {
             value(device);
           }
         }
@@ -178,7 +178,8 @@ namespace Leap.Unity {
       get {
         if (_cachedLeftHands.TryGetValue(editTimePose, out Hand cachedHand)) {
           return cachedHand;
-        } else {
+        }
+        else {
           cachedHand = TestHandFactory.MakeTestHand(isLeft: true, pose: editTimePose);
           _cachedLeftHands[editTimePose] = cachedHand;
           return cachedHand;
@@ -188,12 +189,12 @@ namespace Leap.Unity {
 
     private Dictionary<TestHandFactory.TestHandPose, Hand> _cachedRightHands
       = new Dictionary<TestHandFactory.TestHandPose, Hand>();
-
     private Hand _editTimeRightHand {
       get {
         if (_cachedRightHands.TryGetValue(editTimePose, out Hand cachedHand)) {
           return cachedHand;
-        } else {
+        }
+        else {
           cachedHand = TestHandFactory.MakeTestHand(isLeft: false, pose: editTimePose);
           _cachedRightHands[editTimePose] = cachedHand;
           return cachedHand;
@@ -293,7 +294,7 @@ namespace Leap.Unity {
       if (_useInterpolation) {
 #if !UNITY_ANDROID || UNITY_EDITOR
         _smoothedTrackingLatency.value = Mathf.Min(_smoothedTrackingLatency.value, 30000f);
-        _smoothedTrackingLatency.Update(_leapController.Now() - _leapController.FrameTimestamp(), Time.deltaTime);
+        _smoothedTrackingLatency.Update((float)(_leapController.Now() - _leapController.FrameTimestamp()), Time.deltaTime);
 #endif
         long timestamp = CalculateInterpolationTime() + (ExtrapolationAmount * 1000);
         _unityToLeapOffset = timestamp - (long)(Time.time * S_TO_NS);
@@ -451,7 +452,7 @@ namespace Leap.Unity {
       }
       #endif
     }
-
+ 
     /// <summary>
     /// Initializes Leap Motion policy flags.
     /// </summary>
@@ -495,7 +496,7 @@ namespace Leap.Unity {
         _leapController.BeginProfilingForThread += LeapProfiling.BeginProfilingForThread;
       }
     }
-
+ 
     /// <summary>
     /// Stops the connection for the existing instance of a Controller, clearing old
     /// policy flags and resetting the Controller to null.
