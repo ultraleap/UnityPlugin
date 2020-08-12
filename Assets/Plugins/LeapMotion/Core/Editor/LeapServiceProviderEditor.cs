@@ -121,18 +121,18 @@ namespace Leap.Unity {
 
     private void ParseRigelInteractionMeshData() {
 
-      ObjFileParser rigelMeshDataParser = new ObjFileParser();
+      
 
       if (rigelInteractionZoneMesh == null)
       {
         try
         {
+          ObjFileParser rigelMeshDataParser = new ObjFileParser();
+
           // This data is not oriented or scaled correctly yet.
           rigelInteractionZoneMesh = rigelMeshDataParser.FromObj(Path.Combine(Application.dataPath, "UnityModules", "Assets", "Plugins", "LeapMotion", "Core", "Models", "Rigel-interaction-cone-placeholder.obj"),
               ObjFileParser.SwapYZ,
               INTERACTION_VOLUME_MODEL_IMPORT_SCALE_FACTOR);
-
-          int edgeCount = rigelInteractionZoneMesh.Edges().Count();
         }
         catch (Exception e)
         {
