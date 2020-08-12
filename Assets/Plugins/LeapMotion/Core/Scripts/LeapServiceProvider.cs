@@ -140,10 +140,8 @@ namespace Leap.Unity {
     /// </summary>
     public event Action<Device> OnDeviceSafe {
       add {
-        if (_leapController != null && _leapController.IsConnected)
-        {
-          foreach (Device device in _leapController.Devices)
-          {
+        if (_leapController != null && _leapController.IsConnected) {
+          foreach (Device device in _leapController.Devices) {
             value(device);
           }
         }
@@ -154,12 +152,11 @@ namespace Leap.Unity {
       }
     }
 
-#if UNITY_EDITOR
+    #if UNITY_EDITOR
     private Frame _backingUntransformedEditTimeFrame = null;
     private Frame _untransformedEditTimeFrame {
       get {
-        if (_backingUntransformedEditTimeFrame == null)
-        {
+        if (_backingUntransformedEditTimeFrame == null) {
           _backingUntransformedEditTimeFrame = new Frame();
         }
         return _backingUntransformedEditTimeFrame;
@@ -168,8 +165,7 @@ namespace Leap.Unity {
     private Frame _backingEditTimeFrame = null;
     private Frame _editTimeFrame {
       get {
-        if (_backingEditTimeFrame == null)
-        {
+        if (_backingEditTimeFrame == null) {
           _backingEditTimeFrame = new Frame();
         }
         return _backingEditTimeFrame;
@@ -180,12 +176,9 @@ namespace Leap.Unity {
       = new Dictionary<TestHandFactory.TestHandPose, Hand>();
     private Hand _editTimeLeftHand {
       get {
-        if (_cachedLeftHands.TryGetValue(editTimePose, out Hand cachedHand))
-        {
+        if (_cachedLeftHands.TryGetValue(editTimePose, out Hand cachedHand)) {
           return cachedHand;
-        }
-        else
-        {
+        } else {
           cachedHand = TestHandFactory.MakeTestHand(isLeft: true, pose: editTimePose);
           _cachedLeftHands[editTimePose] = cachedHand;
           return cachedHand;
@@ -195,14 +188,12 @@ namespace Leap.Unity {
 
     private Dictionary<TestHandFactory.TestHandPose, Hand> _cachedRightHands
       = new Dictionary<TestHandFactory.TestHandPose, Hand>();
+
     private Hand _editTimeRightHand {
       get {
-        if (_cachedRightHands.TryGetValue(editTimePose, out Hand cachedHand))
-        {
+        if (_cachedRightHands.TryGetValue(editTimePose, out Hand cachedHand)) {
           return cachedHand;
-        }
-        else
-        {
+        } else {
           cachedHand = TestHandFactory.MakeTestHand(isLeft: false, pose: editTimePose);
           _cachedRightHands[editTimePose] = cachedHand;
           return cachedHand;
@@ -210,7 +201,7 @@ namespace Leap.Unity {
       }
     }
 
-#endif
+    #endif
 
     #endregion
 
@@ -218,9 +209,8 @@ namespace Leap.Unity {
 
     public override Frame CurrentFrame {
       get {
-#if UNITY_EDITOR
-        if (!Application.isPlaying)
-        {
+        #if UNITY_EDITOR
+        if (!Application.isPlaying) {
           _editTimeFrame.Hands.Clear();
           _untransformedEditTimeFrame.Hands.Clear();
           _untransformedEditTimeFrame.Hands.Add(_editTimeLeftHand);
@@ -228,13 +218,11 @@ namespace Leap.Unity {
           transformFrame(_untransformedEditTimeFrame, _editTimeFrame);
           return _editTimeFrame;
         }
-#endif
+        #endif
         if (_frameOptimization == FrameOptimizationMode.ReusePhysicsForUpdate)
         {
           return _transformedFixedFrame;
-        }
-        else
-        {
+        } else {
           return _transformedUpdateFrame;
         }
       }
@@ -243,8 +231,7 @@ namespace Leap.Unity {
     public override Frame CurrentFixedFrame {
       get {
 #if UNITY_EDITOR
-        if (!Application.isPlaying)
-        {
+        if (!Application.isPlaying) {
           _editTimeFrame.Hands.Clear();
           _untransformedEditTimeFrame.Hands.Clear();
           _untransformedEditTimeFrame.Hands.Add(_editTimeLeftHand);
@@ -253,12 +240,9 @@ namespace Leap.Unity {
           return _editTimeFrame;
         }
 #endif
-        if (_frameOptimization == FrameOptimizationMode.ReuseUpdateForPhysics)
-        {
+        if (_frameOptimization == FrameOptimizationMode.ReuseUpdateForPhysics) {
           return _transformedUpdateFrame;
-        }
-        else
-        {
+        } else {
           return _transformedFixedFrame;
         }
       }
@@ -304,14 +288,12 @@ namespace Leap.Unity {
 
       _fixedOffset.Update(Time.time - Time.fixedTime, Time.deltaTime);
 
-      if (_frameOptimization == FrameOptimizationMode.ReusePhysicsForUpdate)
-      {
+      if (_frameOptimization == FrameOptimizationMode.ReusePhysicsForUpdate) {
         DispatchUpdateFrameEvent(_transformedFixedFrame);
         return;
       }
 
-      if (_useInterpolation)
-      {
+      if (_useInterpolation) {
 #if !UNITY_ANDROID || UNITY_EDITOR
         _smoothedTrackingLatency.value = Mathf.Min(_smoothedTrackingLatency.value, 30000f);
         _smoothedTrackingLatency.Update(_leapController.Now() - _leapController.FrameTimestamp(), Time.deltaTime);
@@ -321,13 +303,11 @@ namespace Leap.Unity {
 
         _leapController.GetInterpolatedFrameFromTime(_untransformedUpdateFrame, timestamp, CalculateInterpolationTime() - (BounceAmount * 1000));
       }
-      else
-      {
+      else {
         _leapController.Frame(_untransformedUpdateFrame);
       }
 
-      if (_untransformedUpdateFrame != null)
-      {
+      if (_untransformedUpdateFrame != null) {
         transformFrame(_untransformedUpdateFrame, _transformedUpdateFrame);
 
         DispatchUpdateFrameEvent(_transformedUpdateFrame);
@@ -335,18 +315,15 @@ namespace Leap.Unity {
     }
 
     protected virtual void FixedUpdate() {
-      if (_frameOptimization == FrameOptimizationMode.ReuseUpdateForPhysics)
-      {
+      if (_frameOptimization == FrameOptimizationMode.ReuseUpdateForPhysics) {
         DispatchFixedFrameEvent(_transformedUpdateFrame);
         return;
       }
 
-      if (_useInterpolation)
-      {
+      if (_useInterpolation) {
 
         long timestamp;
-        switch (_frameOptimization)
-        {
+        switch (_frameOptimization) {
           case FrameOptimizationMode.None:
             // By default we use Time.fixedTime to ensure that our hands are on the same
             // timeline as Update.  We add an extrapolation value to help compensate
@@ -367,13 +344,11 @@ namespace Leap.Unity {
         _leapController.GetInterpolatedFrame(_untransformedFixedFrame, timestamp);
 
       }
-      else
-      {
+      else {
         _leapController.Frame(_untransformedFixedFrame);
       }
 
-      if (_untransformedFixedFrame != null)
-      {
+      if (_untransformedFixedFrame != null) {
         transformFrame(_untransformedFixedFrame, _transformedFixedFrame);
 
         DispatchFixedFrameEvent(_transformedFixedFrame);
@@ -386,14 +361,11 @@ namespace Leap.Unity {
     }
 
     protected virtual void OnApplicationPause(bool isPaused) {
-      if (_leapController != null)
-      {
-        if (isPaused)
-        {
+      if (_leapController != null) {
+        if (isPaused) {
           _leapController.StopConnection();
         }
-        else
-        {
+        else {
           _leapController.StartConnection();
         }
       }
@@ -405,8 +377,7 @@ namespace Leap.Unity {
     }
 
     public float CalculatePhysicsExtrapolation() {
-      switch (_physicsExtrapolation)
-      {
+      switch (_physicsExtrapolation) {
         case PhysicsExtrapolationMode.None:
           return 0;
         case PhysicsExtrapolationMode.Auto:
@@ -427,13 +398,12 @@ namespace Leap.Unity {
     /// Returns the Leap Controller instance.
     /// </summary>
     public Controller GetLeapController() {
-#if UNITY_EDITOR
+      #if UNITY_EDITOR
       // Null check to deal with hot reloading.
-      if (!_isDestroyed && _leapController == null)
-      {
+      if (!_isDestroyed && _leapController == null) {
         createController();
       }
-#endif
+      #endif
       return _leapController;
     }
 
@@ -477,12 +447,9 @@ namespace Leap.Unity {
 #if UNITY_ANDROID && !UNITY_EDITOR
       return _leapController.Now() - 16000;
 #else
-      if (_leapController != null)
-      {
+      if (_leapController != null) {
         return _leapController.Now() - (long)_smoothedTrackingLatency.value;
-      }
-      else
-      {
+      } else {
         return 0;
       }
 #endif
@@ -492,8 +459,7 @@ namespace Leap.Unity {
     /// Initializes Leap Motion policy flags.
     /// </summary>
     protected virtual void initializeFlags() {
-      if (_leapController == null)
-      {
+      if (_leapController == null) {
         return;
       }
 
@@ -505,31 +471,24 @@ namespace Leap.Unity {
     /// subscribing to its connection event.
     /// </summary>
     protected void createController() {
-      if (_leapController != null)
-      {
+      if (_leapController != null) {
         return;
       }
 
       _leapController = new Controller();
-      _leapController.Device += (s, e) =>
-      {
-        if (_onDeviceSafe != null)
-        {
+      _leapController.Device += (s, e) => {
+        if (_onDeviceSafe != null) {
           _onDeviceSafe(e.Device);
         }
       };
 
-      if (_leapController.IsConnected)
-      {
+      if (_leapController.IsConnected) {
         initializeFlags();
-      }
-      else
-      {
+      } else {
         _leapController.Device += onHandControllerConnect;
       }
 
-      if (_workerThreadProfiling)
-      {
+      if (_workerThreadProfiling) {
         //A controller will report profiling statistics for the duration of it's lifetime
         //so these events will never be unsubscribed from.
         _leapController.EndProfilingBlock += LeapProfiling.EndProfilingBlock;
@@ -545,10 +504,8 @@ namespace Leap.Unity {
     /// policy flags and resetting the Controller to null.
     /// </summary>
     protected void destroyController() {
-      if (_leapController != null)
-      {
-        if (_leapController.IsConnected)
-        {
+      if (_leapController != null) {
+        if (_leapController.IsConnected) {
           _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
         }
         _leapController.StopConnection();
@@ -564,26 +521,21 @@ namespace Leap.Unity {
     /// for MAX_RECONNECTION_ATTEMPTS
     /// </summary>
     protected bool checkConnectionIntegrity() {
-      if (_leapController.IsServiceConnected)
-      {
+      if (_leapController.IsServiceConnected) {
         _framesSinceServiceConnectionChecked = 0;
         _numberOfReconnectionAttempts = 0;
         return true;
-      }
-      else if (_numberOfReconnectionAttempts < MAX_RECONNECTION_ATTEMPTS)
-      {
+      } else if (_numberOfReconnectionAttempts < MAX_RECONNECTION_ATTEMPTS) {
         _framesSinceServiceConnectionChecked++;
 
-        if (_framesSinceServiceConnectionChecked > RECONNECTION_INTERVAL)
-        {
+        if (_framesSinceServiceConnectionChecked > RECONNECTION_INTERVAL) {
           _framesSinceServiceConnectionChecked = 0;
           _numberOfReconnectionAttempts++;
 
           Debug.LogWarning("Leap Service not connected; attempting to reconnect for try " +
                            _numberOfReconnectionAttempts + "/" + MAX_RECONNECTION_ATTEMPTS +
                            "...", this);
-          using (new ProfilerSample("Reconnection Attempt"))
-          {
+          using (new ProfilerSample("Reconnection Attempt")) {
             destroyController();
             createController();
           }
@@ -595,8 +547,8 @@ namespace Leap.Unity {
     protected void onHandControllerConnect(object sender, LeapEventArgs args) {
       initializeFlags();
 
-      if (_leapController != null)
-      {
+      // TO REVIEW
+      if (_leapController != null) {
         // _leapController.Device -= onHandControllerConnect;
       }
     }

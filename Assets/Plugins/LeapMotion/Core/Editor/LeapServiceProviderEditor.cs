@@ -60,12 +60,10 @@ namespace Leap.Unity {
     }
 
     private void frameOptimizationWarning(SerializedProperty property) {
-      LeapServiceProvider.FrameOptimizationMode mode = (LeapServiceProvider.FrameOptimizationMode)property.intValue;
+      var mode = (LeapServiceProvider.FrameOptimizationMode)property.intValue;
       string warningText;
 
-      switch (mode)
-      {
-
+      switch (mode) {
         case LeapServiceProvider.FrameOptimizationMode.ReuseUpdateForPhysics:
           warningText = "Reusing update frames for physics introduces a frame of latency "
                       + "for physics interactions.";
@@ -83,9 +81,9 @@ namespace Leap.Unity {
 
     public override void OnInspectorGUI() {
 
-#if UNITY_2019_3_OR_NEWER
+      #if UNITY_2019_3_OR_NEWER
       // Easily tracking VR-enabled-or-not requires an XR package installed, so remove this warning for now.
-#else
+      #else
       if (UnityEditor.PlayerSettings.virtualRealitySupported && !isVRProvider) {
         EditorGUILayout.HelpBox(
           "VR support is enabled. If your Leap is mounted to your headset, you should be "
@@ -93,15 +91,14 @@ namespace Leap.Unity {
           + "is not mounted to your headset, you can safely ignore this warning.)",
           MessageType.Warning);
       }
-#endif
+      #endif
 
       base.OnInspectorGUI();
     }
 
     public virtual void OnSceneGUI() {
 
-      switch (GetSelectedInteractionVolume())
-      {
+      switch (GetSelectedInteractionVolume()) {
         case LeapServiceProvider.InteractionVolumeVisualization.None:
           break;
         case LeapServiceProvider.InteractionVolumeVisualization.LeapMotionController:
@@ -121,10 +118,7 @@ namespace Leap.Unity {
 
     private void ParseRigelInteractionMeshData() {
 
-      
-
-      if (rigelInteractionZoneMesh == null)
-      {
+      if (rigelInteractionZoneMesh == null) {
         try
         {
           ObjFileParser rigelMeshDataParser = new ObjFileParser();
@@ -133,9 +127,7 @@ namespace Leap.Unity {
           rigelInteractionZoneMesh = rigelMeshDataParser.FromObj(Path.Combine(Application.dataPath, "UnityModules", "Assets", "Plugins", "LeapMotion", "Core", "Models", "Rigel-interaction-cone-placeholder.obj"),
               ObjFileParser.SwapYZ,
               INTERACTION_VOLUME_MODEL_IMPORT_SCALE_FACTOR);
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
           Debug.LogException(e);
         }
       }
@@ -144,12 +136,9 @@ namespace Leap.Unity {
     private LeapServiceProvider LeapServiceProvider {
       get {
 
-        if (this._leapServiceProvider != null)
-        {
+        if (this._leapServiceProvider != null) {
           return this._leapServiceProvider;
-        }
-        else
-        {
+        } else {
           this._leapServiceProvider = this.target.GetComponent<LeapServiceProvider>();
 
           return this._leapServiceProvider;
@@ -160,16 +149,12 @@ namespace Leap.Unity {
     private Controller LeapController {
       get {
 
-        if (this._leapController!= null)
-        {
+        if (this._leapController!= null) {
           return this._leapController;
-        }
-        else
-        {
+        } else {
           this._leapController = LeapServiceProvider?.GetLeapController();
 
-          if (this._leapController != null)
-          {
+          if (this._leapController != null) {
             this._leapController.Device += _leapController_DeviceChanged;
             this._leapController.DeviceLost += _leapController_DeviceChanged;
           }
@@ -186,14 +171,10 @@ namespace Leap.Unity {
 
     private void DetectConnectedDevice() {
 
-      if (LeapController?.Devices?.Count == 1)
-      {
-        if (LeapController.Devices.First().Type == Device.DeviceType.TYPE_RIGEL)
-        {
+      if (LeapController?.Devices?.Count == 1) {
+        if (LeapController.Devices.First().Type == Device.DeviceType.TYPE_RIGEL) {
           DrawRigelInteractionZoneMesh();
-        }
-        else if (LeapController.Devices.First().Type == Device.DeviceType.TYPE_PERIPHERAL)
-        {
+        } else if (LeapController.Devices.First().Type == Device.DeviceType.TYPE_PERIPHERAL) {
           DrawLeapMotionControllerInteractionZone(LMC_BOX_WIDTH, LMC_BOX_DEPTH, LMC_BOX_RADIUS, Color.white);
         }
       }
@@ -207,25 +188,20 @@ namespace Leap.Unity {
 
     private void DrawRigelInteractionZoneMesh() {
 
-      if (this.rigelInteractionZoneMesh != null && this.rigelInteractionZoneMesh.Edges() != null)
-      {
-        foreach (Edge edge in this.rigelInteractionZoneMesh.Edges())
-        {
+      if (this.rigelInteractionZoneMesh != null && this.rigelInteractionZoneMesh.Edges() != null) {
+        foreach (Edge edge in this.rigelInteractionZoneMesh.Edges()) {
+          
           // Draw edges
-          if (edge.CommonNormal != null)
-          {
+          if (edge.CommonNormal != null) {
             Vector3 edgeVertex0 = target.transform.TransformPoint(edge.VertexLocations[0].Item2);
             Vector3 edgeVertex1 = target.transform.TransformPoint(edge.VertexLocations[1].Item2);
             Vector3 edgeCommonNormal = target.transform.TransformPoint(edge.CommonNormal);
 
             float angle;
-            if (SceneView.currentDrawingSceneView.camera.orthographic)
-            {
+            if (SceneView.currentDrawingSceneView.camera.orthographic) {
               // Iso Camera
               angle = Vector3.Angle(SceneView.currentDrawingSceneView.camera.transform.forward, edgeCommonNormal);
-            }
-            else
-            {
+            } else {
               // Perspective Camera
               angle = Vector3.Angle(edgeVertex0 - SceneView.currentDrawingSceneView.camera.transform.position, edgeCommonNormal);
             }
@@ -233,8 +209,7 @@ namespace Leap.Unity {
             // Shade the edge line based on it's angle to the camera, making it more intense as it approaches 90 degrees
             // This gives the interaction volume a cell style appearance
             float shadingFactor = Math.Abs(angle / 90.0f);
-            if (shadingFactor > 1)
-            {
+            if (shadingFactor > 1) {
               shadingFactor = 2 - shadingFactor;
             }
 
@@ -242,8 +217,7 @@ namespace Leap.Unity {
             {
               Handles.color = new Color(shadingFactor, shadingFactor, shadingFactor, shadingFactor * PEAK_INTERACTION_VOLUME_OPACITY);
               Handles.DrawAAPolyLine(edgeVertex0, edgeVertex1);
-            }
-            else // Edge is effectively a backface edge
+            } else // Edge is effectively a backface edge
             {
               Handles.color = BackfaceEdgeColour;
               Handles.DrawAAPolyLine(edgeVertex0, edgeVertex1);
@@ -309,8 +283,7 @@ namespace Leap.Unity {
       Vector3 faceB = target.transform.rotation * Vector3.Lerp(edgeB0, edgeB1, 0.5f);
 
       float resolutionIncrement = 1f / 50f;
-      for (float i = 0f; i < 1f; i += resolutionIncrement)
-      {
+      for (float i = 0f; i < 1f; i += resolutionIncrement) {
         Vector3 begin = Vector3.Lerp(faceA, faceB, i).normalized
                         * target.transform.lossyScale.x * box_radius;
         Vector3 end = Vector3.Lerp(faceA, faceB, i + resolutionIncrement).normalized
@@ -343,15 +316,12 @@ namespace Leap.Unity {
         this._swapYZ = SwapYZ;
         this._scaleFactor = scaleFactor;
 
-        if (File.Exists(filePath) && Path.GetExtension(filePath) == ".obj")
-        {
-          using (StreamReader fs = File.OpenText(filePath))
-          {
+        if (File.Exists(filePath) && Path.GetExtension(filePath) == ".obj") {
+          using (StreamReader fs = File.OpenText(filePath)) {
             _mesh = new GenericMesh();
 
             string line;
-            while (fs.EndOfStream == false)
-            {
+            while (fs.EndOfStream == false) {
               line = fs.ReadLine();
               ParseLine(line);
             }
@@ -370,16 +340,11 @@ namespace Leap.Unity {
 
         line = Regex.Replace(line, @"\s+", " "); // Remove unecessary duplicate whitespace
 
-        if (line.StartsWith("vn"))
-        {
+        if (line.StartsWith("vn")) {
           ParseVertexNormal(line);
-        }
-        else if (line.StartsWith("v "))
-        {
+        } else if (line.StartsWith("v ")) {
           ParseVertex(line);
-        }
-        else if (line.StartsWith("f "))
-        {
+        } else if (line.StartsWith("f ")) {
           ParsePolygonalFaceElement(line);
         }
       }
@@ -389,14 +354,10 @@ namespace Leap.Unity {
         // Expect three vertex elements (following the identifier), vertex elements can take 3 different forms a vertex index reference optionally
         // with a normal vertex index reference, optionally with texture coordinate index reference
         string[] elements = line.Split(delimiter);
-        if (elements.Count() == 4)
-        {
-          try
-          {
+        if (elements.Count() == 4) {
+          try {
             this._mesh.AddTriangle(ParseVertexFaceElement(elements[1]), ParseVertexFaceElement(elements[2]), ParseVertexFaceElement(elements[3]));
-          }
-          catch (Exception e)
-          {
+          } catch (Exception e) {
             Debug.LogException(e);
           }
         }
@@ -407,8 +368,7 @@ namespace Leap.Unity {
 
         string[] elements = vertexString.Split('/');
 
-        switch (elements.Count())
-        {
+        switch (elements.Count()) {
           // 1. Vertex indices
           // A valid vertex index matches the corresponding vertex elements of a previously defined vertex list.If an index is positive then it refers to the offset in that vertex list, starting at 1.If an index is negative then it relatively refers to the end of the vertex list, -1 referring to the last element.
           // Each face can contain three or more vertices.
@@ -431,12 +391,9 @@ namespace Leap.Unity {
             // As texture coordinates are optional, one can define geometry without them, but one must put two slashes after the vertex index before putting the normal index.
             // f v1//vn1 v2//vn2 v3//vn3 ...
 
-            if (elements[1].Length == 0)
-            {
+            if (elements[1].Length == 0) {
               return new MeshVertex(int.Parse(elements[0]) - 1, null, int.Parse(elements[2]) - 1);
-            }
-            else
-            {
+            } else {
               return new MeshVertex(int.Parse(elements[0]) - 1, int.Parse(elements[1]) - 1, int.Parse(elements[2]) - 1);
             }
 
@@ -449,18 +406,14 @@ namespace Leap.Unity {
 
         // Expect three floats after the descriptor
         string[] elements = line.Split(delimiter);
-        if (elements.Count() == 4)
-        {
-          try
-          {
+        if (elements.Count() == 4) {
+          try  {
             this._mesh.Vertices.Add(new Vector3() {
               x = float.Parse(elements[1]) * this._scaleFactor,
               y = _swapYZ ? float.Parse(elements[3]) * this._scaleFactor : float.Parse(elements[2]) * this._scaleFactor,
               z = _swapYZ ? float.Parse(elements[2]) * this._scaleFactor : float.Parse(elements[3]) * this._scaleFactor,
             });
-          }
-          catch (Exception e)
-          {
+          } catch (Exception e) {
             Debug.LogException(e);
           }
         }
@@ -470,10 +423,8 @@ namespace Leap.Unity {
 
         // Expect three floats after the descriptor
         string[] elements = line.Split(delimiter);
-        if (elements.Count() == 4)
-        {
-          try
-          {
+        if (elements.Count() == 4) {
+          try {
             Vector3 normal = new Vector3() {
               x = float.Parse(elements[1]),
               y = _swapYZ ? float.Parse(elements[3]) : float.Parse(elements[2]),
@@ -482,8 +433,7 @@ namespace Leap.Unity {
 
             this._mesh.Normals.Add(normal);
           }
-          catch (Exception e)
-          {
+          catch (Exception e) {
             Debug.LogException(e);
           }
         }
@@ -556,8 +506,7 @@ namespace Leap.Unity {
       /// <returns>The next triangle as an array of three mesh vertex values</returns>
       internal IEnumerable<MeshVertex[]> Triangles() {
 
-        for (int index = 0; index <= this._meshVertices.Count - 3; index += 3)
-        {
+        for (int index = 0; index <= this._meshVertices.Count - 3; index += 3) {
           yield return this._meshVertices
               .Skip(index)
               .Take(3).ToArray();
@@ -570,8 +519,7 @@ namespace Leap.Unity {
       /// <returns>The next edge</returns>
       internal IEnumerable<Edge> Edges() {
 
-        foreach (KeyValuePair<int, Edge> edge in this._edges)
-        {
+        foreach (KeyValuePair<int, Edge> edge in this._edges) {
           yield return edge.Value;
         }
       }
@@ -587,10 +535,8 @@ namespace Leap.Unity {
         min = 0.0f;
         max = 0.0f;
 
-        if (this._vertices.Count > 0)
-        {
-          switch (axis)
-          {
+        if (this._vertices.Count > 0) {
+          switch (axis) {
             case enumaxis.X:
               min = this._vertices.Min(v => v.x);
               max = this._vertices.Max(v => v.x);
@@ -631,13 +577,11 @@ namespace Leap.Unity {
       /// </summary>
       internal void AddEdges() {
 
-        foreach (MeshVertex[] triangleA in this.Triangles())
-        {
+        foreach (MeshVertex[] triangleA in this.Triangles()) {
           bool foundQuad = false;
 
           // Check current triangle against all other triangles to see if this triangle forms a quad with another
-          foreach (MeshVertex[] triangleB in this.Triangles())
-          {
+          foreach (MeshVertex[] triangleB in this.Triangles()) {
 
             // Attempt to remove any diagonal edges of triangles that form a quad. 
             // The assumption here is that quads will be formed from adjacent triangles
@@ -657,8 +601,7 @@ namespace Leap.Unity {
             }
           }
 
-          if (!foundQuad)
-          {
+          if (!foundQuad) {
             // Add the triangle's edges 
             AddEdge(triangleA[0], triangleA[1]);
             AddEdge(triangleA[1], triangleA[2]);
@@ -668,12 +611,9 @@ namespace Leap.Unity {
 
         void AddEdgeIfNotCommon(MeshVertex edgeVertexA, MeshVertex edgeVertexB, IEnumerable<MeshVertex> commonVertices) {
           if ((commonVertices.First().VertexIndex == edgeVertexA.VertexIndex && commonVertices.Last().VertexIndex == edgeVertexB.VertexIndex) ||
-              (commonVertices.First().VertexIndex == edgeVertexB.VertexIndex && commonVertices.Last().VertexIndex == edgeVertexA.VertexIndex))
-          {
+              (commonVertices.First().VertexIndex == edgeVertexB.VertexIndex && commonVertices.Last().VertexIndex == edgeVertexA.VertexIndex)) {
             // Skip
-          }
-          else
-          {
+          } else {
             AddEdge(edgeVertexA, edgeVertexB);
           }
         }
@@ -688,8 +628,7 @@ namespace Leap.Unity {
 
         int edgeKey = Edge.SzudzikID(meshVertex1.VertexIndex, meshVertex2.VertexIndex);
 
-        if (!this._edges.ContainsKey(edgeKey))
-        {
+        if (!this._edges.ContainsKey(edgeKey)) {
           this._edges.Add(edgeKey, new Edge(
               new Tuple<int, Vector3>[] { new Tuple<int, Vector3>(meshVertex1.VertexIndex, this.Vertices[meshVertex1.VertexIndex]),
                                                  new Tuple<int, Vector3>(meshVertex2.VertexIndex, this.Vertices[meshVertex2.VertexIndex])},
@@ -745,8 +684,7 @@ namespace Leap.Unity {
 
         if (vertexLocations.Count() != 2 ||
             (uvCoords.Count() != 2 || uvCoords.Count() != 0) ||
-            (vertexNormals.Count() != 2 || vertexNormals.Count() != 0))
-        {
+            (vertexNormals.Count() != 2 || vertexNormals.Count() != 0)) {
           throw (new ArgumentException("Array size is incorrect for edge data"));
         }
 
@@ -764,16 +702,13 @@ namespace Leap.Unity {
       public Edge(Tuple<int, Vector3>[] vertexLocations, Vector3[] vertexNormals) {
 
         if (vertexLocations.Count() == 2 ||
-            (vertexNormals.Count() == 2 || vertexNormals.Count() == 0))
-        {
+            (vertexNormals.Count() == 2 || vertexNormals.Count() == 0)) {
           this.VertexLocations = vertexLocations;
           this.VertexNormals = vertexNormals;
 
           this.CommonNormal = this.VertexNormals[0] + this.VertexNormals[1];
           this.CommonNormal.Normalize();
-        }
-        else
-        {
+        } else {
           throw (new ArgumentException("Array size is incorrect for edge data"));
         }
       }
