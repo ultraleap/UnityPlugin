@@ -39,7 +39,7 @@ namespace Leap.Unity {
     private Controller _leapController;
 
 
-    protected override void OnEnable() { 
+    protected override void OnEnable() {
 
       base.OnEnable();
 
@@ -81,9 +81,9 @@ namespace Leap.Unity {
 
     public override void OnInspectorGUI() {
 
-      #if UNITY_2019_3_OR_NEWER
+#if UNITY_2019_3_OR_NEWER
       // Easily tracking VR-enabled-or-not requires an XR package installed, so remove this warning for now.
-      #else
+#else
       if (UnityEditor.PlayerSettings.virtualRealitySupported && !isVRProvider) {
         EditorGUILayout.HelpBox(
           "VR support is enabled. If your Leap is mounted to your headset, you should be "
@@ -91,7 +91,7 @@ namespace Leap.Unity {
           + "is not mounted to your headset, you can safely ignore this warning.)",
           MessageType.Warning);
       }
-      #endif
+#endif
 
       base.OnInspectorGUI();
     }
@@ -104,7 +104,7 @@ namespace Leap.Unity {
         case LeapServiceProvider.InteractionVolumeVisualization.LeapMotionController:
           DrawLeapMotionControllerInteractionZone(LMC_BOX_WIDTH, LMC_BOX_DEPTH, LMC_BOX_RADIUS, Color.white);
           break;
-        case LeapServiceProvider.InteractionVolumeVisualization.RigelPlaceholderNotAccurate:
+        case LeapServiceProvider.InteractionVolumeVisualization.Rigel:
           DrawRigelInteractionZoneMesh();
           break;
         case LeapServiceProvider.InteractionVolumeVisualization.Automatic:
@@ -125,7 +125,7 @@ namespace Leap.Unity {
         // asset again causes it to retain the flipped normals and will then reflip them. There appears
         // to be no way to clear this cache, so we check the first normal in the mesh to see if we
         // need to flip it.
-        if (_rigelInteractionZoneMesh.normals[0].ApproxEquals(new Vector3(1.0f,-0.1f,0)))
+        if (_rigelInteractionZoneMesh.normals[0].ApproxEquals(new Vector3(-1.0f, 0.1f, 0)))
           ReverseNormals();
       }
 
@@ -145,9 +145,10 @@ namespace Leap.Unity {
     private LeapServiceProvider LeapServiceProvider {
       get {
 
-        if (this._leapServiceProvider != null) {
+        if (this._leapServiceProvider != null) { 
           return this._leapServiceProvider;
-        } else {
+        }
+        else {
           this._leapServiceProvider = this.target.GetComponent<LeapServiceProvider>();
 
           return this._leapServiceProvider;
@@ -158,9 +159,11 @@ namespace Leap.Unity {
     private Controller LeapController {
       get {
 
-        if (this._leapController!= null) {
+        if (this._leapController != null) {
           return this._leapController;
-        } else {
+        }
+        else
+        {
           this._leapController = LeapServiceProvider?.GetLeapController();
 
           if (this._leapController != null) {
@@ -180,10 +183,12 @@ namespace Leap.Unity {
 
     private void DetectConnectedDevice() {
 
-      if (LeapController?.Devices?.Count == 1) {
+      if (LeapController?.Devices?.Count == 1)
+      {
         if (LeapController.Devices.First().Type == Device.DeviceType.TYPE_RIGEL) {
           DrawRigelInteractionZoneMesh();
-        } else if (LeapController.Devices.First().Type == Device.DeviceType.TYPE_PERIPHERAL) {
+        }
+        else if (LeapController.Devices.First().Type == Device.DeviceType.TYPE_PERIPHERAL) {
           DrawLeapMotionControllerInteractionZone(LMC_BOX_WIDTH, LMC_BOX_DEPTH, LMC_BOX_RADIUS, Color.white);
         }
       }
@@ -272,439 +277,6 @@ namespace Leap.Unity {
       X,
       Y,
       Z
-    }
-
-    /// <summary>
-    /// Parses an OBJ file into a generic mesh data structure
-    /// </summary>
-    internal class ObjFileParser {
-      private const char delimiter = ' ';
-      private GenericMesh _mesh;
-
-      private bool _swapYZ;
-      internal const bool SwapYZ = true;
-
-      internal float _scaleFactor;
-
-      public GenericMesh FromObj(string filePath, bool SwapYZ = false, float scaleFactor = 1) {
-
-        this._swapYZ = SwapYZ;
-        this._scaleFactor = scaleFactor;
-
-        if (File.Exists(filePath) && Path.GetExtension(filePath) == ".obj") {
-          using (StreamReader fs = File.OpenText(filePath)) {
-            _mesh = new GenericMesh();
-
-            string line;
-            while (fs.EndOfStream == false) {
-              line = fs.ReadLine();
-              ParseLine(line);
-            }
-
-            _mesh.AddEdges();
-          }
-        }
-
-        return _mesh;
-      }
-
-
-      private void ParseLine(string line) {
-
-        // See https://en.wikipedia.org/wiki/Wavefront_.obj_file for Obj file format
-
-        line = Regex.Replace(line, @"\s+", " "); // Remove unecessary duplicate whitespace
-
-        if (line.StartsWith("vn")) {
-          ParseVertexNormal(line);
-        } else if (line.StartsWith("v ")) {
-          ParseVertex(line);
-        } else if (line.StartsWith("f ")) {
-          ParsePolygonalFaceElement(line);
-        }
-      }
-
-      private void ParsePolygonalFaceElement(string line) {
-
-        // Expect three vertex elements (following the identifier), vertex elements can take 3 different forms a vertex index reference optionally
-        // with a normal vertex index reference, optionally with texture coordinate index reference
-        string[] elements = line.Split(delimiter);
-        if (elements.Count() == 4) {
-          try {
-            this._mesh.AddTriangle(ParseVertexFaceElement(elements[1]), ParseVertexFaceElement(elements[2]), ParseVertexFaceElement(elements[3]));
-          } catch (Exception e) {
-            Debug.LogException(e);
-          }
-        }
-      }
-
-
-      private MeshVertex ParseVertexFaceElement(string vertexString) {
-
-        string[] elements = vertexString.Split('/');
-
-        switch (elements.Count()) {
-          // 1. Vertex indices
-          // A valid vertex index matches the corresponding vertex elements of a previously defined vertex list.If an index is positive then it refers to the offset in that vertex list, starting at 1.If an index is negative then it relatively refers to the end of the vertex list, -1 referring to the last element.
-          // Each face can contain three or more vertices.
-          // f v1 v2 v3 ....
-          case 1:
-            return new MeshVertex(int.Parse(elements[0]) - 1);
-
-          // 2. Vertex texture coordinate indices
-          // Optionally, texture coordinate indices can be used to specify texture coordinates when defining a face. To add a texture coordinate index to a vertex index when defining a face, one must put a slash immediately after the vertex index and then put the texture coordinate index. No spaces are permitted before or after the slash.A valid texture coordinate index starts from 1 and matches the corresponding element in the previously defined list of texture coordinates.Each face can contain three or more elements.
-          // f v1/ vt1 v2 / vt2 v3 / vt3...
-          case 2:
-            return new MeshVertex(int.Parse(elements[0]) - 1, int.Parse(elements[1]) - 1);
-
-          case 3:
-            // 3a. Vertex normal indices
-            // Optionally, normal indices can be used to specify normal vectors for vertices when defining a face.To add a normal index to a vertex index when defining a face, one must put a second slash after the texture coordinate index and then put the normal index.A valid normal index starts from 1 and matches the corresponding element in the previously defined list of normals.Each face can contain three or more elements.
-            // f v1 / vt1 / vn1 v2 / vt2 / vn2 v3 / vt3 / vn3...
-
-            // 3b. Vertex normal indices without texture coordinate indices
-            // As texture coordinates are optional, one can define geometry without them, but one must put two slashes after the vertex index before putting the normal index.
-            // f v1//vn1 v2//vn2 v3//vn3 ...
-
-            if (elements[1].Length == 0) {
-              return new MeshVertex(int.Parse(elements[0]) - 1, null, int.Parse(elements[2]) - 1);
-            } else {
-              return new MeshVertex(int.Parse(elements[0]) - 1, int.Parse(elements[1]) - 1, int.Parse(elements[2]) - 1);
-            }
-
-          default:
-            return null;
-        }
-      }
-
-      private void ParseVertex(string line) {
-
-        // Expect three floats after the descriptor
-        string[] elements = line.Split(delimiter);
-        if (elements.Count() == 4) {
-          try  {
-            this._mesh.Vertices.Add(new Vector3() {
-              x = float.Parse(elements[1]) * this._scaleFactor,
-              y = _swapYZ ? float.Parse(elements[3]) * this._scaleFactor : float.Parse(elements[2]) * this._scaleFactor,
-              z = _swapYZ ? float.Parse(elements[2]) * this._scaleFactor : float.Parse(elements[3]) * this._scaleFactor,
-            });
-          } catch (Exception e) {
-            Debug.LogException(e);
-          }
-        }
-      }
-
-      private void ParseVertexNormal(string line) {
-
-        // Expect three floats after the descriptor
-        string[] elements = line.Split(delimiter);
-        if (elements.Count() == 4) {
-          try {
-            Vector3 normal = new Vector3() {
-              x = float.Parse(elements[1]),
-              y = _swapYZ ? float.Parse(elements[3]) : float.Parse(elements[2]),
-              z = _swapYZ ? float.Parse(elements[2]) : float.Parse(elements[3])
-            };
-
-            this._mesh.Normals.Add(normal);
-          }
-          catch (Exception e) {
-            Debug.LogException(e);
-          }
-        }
-      }
-    }
-
-    /// <summary>
-    /// Holds information about a vertex - location, UV coordinates and normal
-    /// </summary>
-    public class MeshVertex {
-
-      public readonly int VertexIndex;
-      public readonly int? UVIndex;
-      public readonly int? NormalIndex;
-
-      public MeshVertex(int vertexIndex) {
-
-        VertexIndex = vertexIndex;
-      }
-
-      public MeshVertex(int vertexIndex, int uvIndex) {
-
-        VertexIndex = vertexIndex;
-        UVIndex = uvIndex;
-      }
-
-      public MeshVertex(int vertexIndex, int? uvIndex, int? normalIndex) {
-
-        VertexIndex = vertexIndex;
-        UVIndex = uvIndex;
-        NormalIndex = normalIndex;
-      }
-    }
-
-    /// <summary>
-    /// Generic class for holding mesh data
-    /// </summary>
-    internal class GenericMesh {
-
-      private readonly string _meshName;
-      private readonly List<MeshVertex> _meshVertices = new List<MeshVertex>();
-      private readonly Dictionary<int, Edge> _edges = new Dictionary<int, Edge>();
-
-      private readonly List<Vector3> _vertices = new List<Vector3>();
-      private readonly List<Vector2> _uv = new List<Vector2>();
-      private readonly List<Vector3> _normals = new List<Vector3>();
-
-      public GenericMesh() {
-
-      }
-
-      /// <summary>
-      /// Mesh vertices
-      /// </summary>
-      internal List<Vector3> Vertices => this._vertices;
-
-      /// <summary>
-      /// Mesh normals
-      /// </summary>
-      internal List<Vector3> Normals => this._normals;
-
-      /// <summary>
-      /// Mesh texture coordinates
-      /// </summary>
-      internal List<Vector2> UV => this._uv;
-
-      /// <summary>
-      /// Enumerator for triangles in the mesh
-      /// </summary>
-      /// <returns>The next triangle as an array of three mesh vertex values</returns>
-      internal IEnumerable<MeshVertex[]> Triangles() {
-
-        for (int index = 0; index <= this._meshVertices.Count - 3; index += 3) {
-          yield return this._meshVertices
-              .Skip(index)
-              .Take(3).ToArray();
-        }
-      }
-
-      /// <summary>
-      /// Enumarator for the edges in the mesh
-      /// </summary>
-      /// <returns>The next edge</returns>
-      internal IEnumerable<Edge> Edges() {
-
-        foreach (KeyValuePair<int, Edge> edge in this._edges) {
-          yield return edge.Value;
-        }
-      }
-
-      /// <summary>
-      /// Calculates the mesh bounds in a particular axus
-      /// </summary>
-      /// <param name="axis">Target axis</param>
-      /// <param name="min">Min value in the axis</param>
-      /// <param name="max">Max value in the axis</param>
-      internal void Bounds(enumaxis axis, out float min, out float max) {
-
-        min = 0.0f;
-        max = 0.0f;
-
-        if (this._vertices.Count > 0) {
-          switch (axis) {
-            case enumaxis.X:
-              min = this._vertices.Min(v => v.x);
-              max = this._vertices.Max(v => v.x);
-              break;
-
-            case enumaxis.Y:
-              min = this._vertices.Min(v => v.y);
-              max = this._vertices.Max(v => v.y);
-              break;
-
-            case enumaxis.Z:
-              min = this._vertices.Min(v => v.z);
-              max = this._vertices.Max(v => v.z);
-              break;
-
-            default:
-              break;
-          }
-        }
-      }
-
-
-      /// <summary>
-      /// Adds a triangle to the generic mesh
-      /// </summary>
-      /// <param name="meshVertex1"></param>
-      /// <param name="meshVertex2"></param>
-      /// <param name="meshVertex3"></param>
-      internal void AddTriangle(MeshVertex meshVertex1, MeshVertex meshVertex2, MeshVertex meshVertex3) {
-
-        this._meshVertices.Add(meshVertex1);
-        this._meshVertices.Add(meshVertex2);
-        this._meshVertices.Add(meshVertex3);
-      }
-
-      /// <summary>
-      /// Processes the mesh data to add edges for visualisation. Will attempt to regenerate quad edges if it determines triangles form a quad
-      /// </summary>
-      internal void AddEdges() {
-
-        foreach (MeshVertex[] triangleA in this.Triangles()) {
-          bool foundQuad = false;
-
-          // Check current triangle against all other triangles to see if this triangle forms a quad with another
-          foreach (MeshVertex[] triangleB in this.Triangles()) {
-
-            // Attempt to remove any diagonal edges of triangles that form a quad. 
-            // The assumption here is that quads will be formed from adjacent triangles
-            if (NormalsMatch(triangleA, triangleB) && TrianglesShareTwoPoints(triangleA, triangleB, out IEnumerable<MeshVertex> commonPoints))
-            {
-              // Triangles form a quad, we just need to add the boundary of the quad to the edge list
-              AddEdgeIfNotCommon(triangleA[0], triangleA[1], commonPoints);
-              AddEdgeIfNotCommon(triangleA[1], triangleA[2], commonPoints);
-              AddEdgeIfNotCommon(triangleA[2], triangleA[0], commonPoints);
-
-              AddEdgeIfNotCommon(triangleB[0], triangleB[1], commonPoints);
-              AddEdgeIfNotCommon(triangleB[1], triangleB[2], commonPoints);
-              AddEdgeIfNotCommon(triangleB[2], triangleB[0], commonPoints);
-
-              foundQuad = true;
-              break;
-            }
-          }
-
-          if (!foundQuad) {
-            // Add the triangle's edges 
-            AddEdge(triangleA[0], triangleA[1]);
-            AddEdge(triangleA[1], triangleA[2]);
-            AddEdge(triangleA[2], triangleA[0]);
-          }
-        }
-
-        void AddEdgeIfNotCommon(MeshVertex edgeVertexA, MeshVertex edgeVertexB, IEnumerable<MeshVertex> commonVertices) {
-          if ((commonVertices.First().VertexIndex == edgeVertexA.VertexIndex && commonVertices.Last().VertexIndex == edgeVertexB.VertexIndex) ||
-              (commonVertices.First().VertexIndex == edgeVertexB.VertexIndex && commonVertices.Last().VertexIndex == edgeVertexA.VertexIndex)) {
-            // Skip
-          } else {
-            AddEdge(edgeVertexA, edgeVertexB);
-          }
-        }
-      }
-
-      /// <summary>
-      /// Adds an edge to the edge array
-      /// </summary>
-      /// <param name="meshVertex1">First edge vertex</param>
-      /// <param name="meshVertex2">Seconh edge vertex</param>
-      private void AddEdge(MeshVertex meshVertex1, MeshVertex meshVertex2) {
-
-        int edgeKey = Edge.SzudzikID(meshVertex1.VertexIndex, meshVertex2.VertexIndex);
-
-        if (!this._edges.ContainsKey(edgeKey)) {
-          this._edges.Add(edgeKey, new Edge(
-              new Tuple<int, Vector3>[] { new Tuple<int, Vector3>(meshVertex1.VertexIndex, this.Vertices[meshVertex1.VertexIndex]),
-                                                 new Tuple<int, Vector3>(meshVertex2.VertexIndex, this.Vertices[meshVertex2.VertexIndex])},
-              new Vector3[] { this.Normals[meshVertex1.NormalIndex.Value], this.Normals[meshVertex2.NormalIndex.Value] }
-          ));
-        }
-      }
-
-      private bool NormalsMatch(MeshVertex[] triangleA, MeshVertex[] triangleB) {
-
-        Vector3 nA = Normal(triangleA);
-        Vector3 nB = Normal(triangleB);
-        nA.Normalize();
-        nB.Normalize();
-
-        return Vector3.SqrMagnitude(nA - nB) < 0.00001f;
-
-        Vector3 Normal(MeshVertex[] triangle) {
-          return Vector3.Cross(this._vertices[triangle[1].VertexIndex] - this._vertices[triangle[0].VertexIndex],
-                               this._vertices[triangle[2].VertexIndex] - this._vertices[triangle[1].VertexIndex]);
-        }
-      }
-
-      private bool TrianglesShareTwoPoints(IEnumerable<MeshVertex> previousTriangle,
-                                           IEnumerable<MeshVertex> triangle,
-                                           out IEnumerable<MeshVertex> commonPoints) {
-
-        commonPoints = previousTriangle.Where(vtx => VertexIsInTriangle(vtx.VertexIndex, previousTriangle));
-
-        return commonPoints.Count() == 2;
-
-        bool VertexIsInTriangle(int vertexID, IEnumerable<MeshVertex> triangleToCheck) {
-          return triangle.Any(v => v.VertexIndex == vertexID);
-        }
-      }
-    }
-
-    /// <summary>
-    /// Holds information about an edge in a mesh. Derived from the edge of the triangles that make up the mesh
-    /// </summary>
-    internal class Edge {
-
-      public readonly Tuple<int, Vector3>[] VertexLocations;
-      public readonly Vector2[] UVCoords;
-      public readonly Vector3[] VertexNormals;
-
-      /// <summary>
-      /// The normal of the edge, based on the combination of the edge vertex normals
-      /// </summary>
-      public readonly Vector3 CommonNormal;
-
-      public Edge(Tuple<int, Vector3>[] vertexLocations, Vector2[] uvCoords, Vector3[] vertexNormals) {
-
-        if (vertexLocations.Count() != 2 ||
-            (uvCoords.Count() != 2 || uvCoords.Count() != 0) ||
-            (vertexNormals.Count() != 2 || vertexNormals.Count() != 0)) {
-          throw (new ArgumentException("Array size is incorrect for edge data"));
-        }
-
-        this.VertexLocations = vertexLocations;
-        this.UVCoords = uvCoords;
-        this.VertexNormals = vertexNormals;
-        this.CommonNormal = this.VertexNormals[0] + this.VertexNormals[1];
-      }
-
-      /// <summary>
-      /// Creates an Edge based on two vertex locations and the respective normals
-      /// </summary>
-      /// <param name="vertexLocations">Location of the edge start and end point, with index information</param>
-      /// <param name="vertexNormals">Normal associated with the edge start and end point</param>
-      public Edge(Tuple<int, Vector3>[] vertexLocations, Vector3[] vertexNormals) {
-
-        if (vertexLocations.Count() == 2 ||
-            (vertexNormals.Count() == 2 || vertexNormals.Count() == 0)) {
-          this.VertexLocations = vertexLocations;
-          this.VertexNormals = vertexNormals;
-
-          this.CommonNormal = this.VertexNormals[0] + this.VertexNormals[1];
-          this.CommonNormal.Normalize();
-        } else {
-          throw (new ArgumentException("Array size is incorrect for edge data"));
-        }
-      }
-
-      public override string ToString() {
-
-        return $"({VertexLocations[0].Item2.x},{VertexLocations[0].Item2.y},{VertexLocations[0].Item2.z}) -> " +
-               $"({VertexLocations[1].Item2.x},{VertexLocations[1].Item2.y},{VertexLocations[1].Item2.z})";
-      }
-
-      /// <summary>
-      /// Given a pair of integers, that are the vertex IDs of the edge, compute a compact ID for this pair of values
-      /// </summary>
-      /// <param name="a">Vertex Index #1</param>
-      /// <param name="b">Vertex Index #2</param>
-      /// <returns>Unique ID for this vertex index pair</returns>
-      internal static int SzudzikID(int a, int b) {
-
-        // From https://stackoverflow.com/questions/919612/mapping-two-integers-to-one-in-a-unique-and-deterministic-way
-        return a >= b ? a * a + a + b : a + b * b;
-      }
     }
   }
 }

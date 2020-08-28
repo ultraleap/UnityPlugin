@@ -55,7 +55,7 @@ namespace Leap.Unity {
     public enum InteractionVolumeVisualization {
       None,
       LeapMotionController,
-      RigelPlaceholderNotAccurate,
+      Rigel,
       Automatic
     }
     [Tooltip("Displays a representation of the interaction volume in the scene view")]
