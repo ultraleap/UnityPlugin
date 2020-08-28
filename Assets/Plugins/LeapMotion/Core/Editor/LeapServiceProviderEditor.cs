@@ -32,13 +32,16 @@ namespace Leap.Unity {
     private const float LMC_BOX_DEPTH = 0.6671f;
 
     private const float PEAK_INTERACTION_VOLUME_OPACITY = 0.4f;
-    private GenericMesh rigelInteractionZoneMesh;
+    private GenericMesh _rigelInteractionZoneMesh;
     private readonly Color BackfaceEdgeColour = new Color(1, 1, 1, 0.02f);
 
+    private Mesh rigelInteractionZoneMesh;
+    private Material _rigelInteractionMaterial;
+    private readonly Vector3 _rigelInteractionZoneMeshOffset = new Vector3(0.0523f, 0, 0.005f); //new Vector3(-0.0523f, 0, -0.005f);
     private LeapServiceProvider _leapServiceProvider;
     private Controller _leapController;
 
-    protected override void OnEnable() {
+    protected override void OnEnable() { 
 
       
       ParseRigelInteractionMeshData();
@@ -118,19 +121,30 @@ namespace Leap.Unity {
 
     private void ParseRigelInteractionMeshData() {
 
-      if (rigelInteractionZoneMesh == null) {
-        try
-        {
-          ObjFileParser rigelMeshDataParser = new ObjFileParser();
+      rigelInteractionZoneMesh = (Mesh)AssetDatabase.LoadAssetAtPath(Path.Combine("Assets", "UnityModules", "Assets", "Plugins", "LeapMotion", "Core", "Models", "Rigel-interaction-cone-placeholder.obj"), typeof(Mesh));
+      _rigelInteractionMaterial = (Material)AssetDatabase.LoadAssetAtPath(Path.Combine("Assets", "UnityModules", "Assets", "Plugins", "LeapMotion", "Core", "Materials", "RigelInteractionVolume.mat"), typeof(Material));
 
-          // This data is not oriented or scaled correctly yet.
-          rigelInteractionZoneMesh = rigelMeshDataParser.FromObj(Path.Combine(Application.dataPath, "UnityModules", "Assets", "Plugins", "LeapMotion", "Core", "Models", "Rigel-interaction-cone-placeholder.obj"),
-              ObjFileParser.SwapYZ,
-              INTERACTION_VOLUME_MODEL_IMPORT_SCALE_FACTOR);
-        } catch (Exception e) {
-          Debug.LogException(e);
-        }
-      }
+      //Vector3[] normals = rigelInteractionZoneMesh.normals;
+      //for (int i = 0; i < normals.Length; i++)
+      //  normals[i] = -normals[i];
+      //rigelInteractionZoneMesh.normals = normals;
+
+      //if (_rigelInteractionZoneMesh == null) {
+      //  try
+      //  {
+      //    ObjFileParser rigelMeshDataParser = new ObjFileParser();
+
+      //    // This data is not oriented or scaled correctly yet.
+      //    _rigelInteractionZoneMesh = rigelMeshDataParser.FromObj(Path.Combine(Application.dataPath, "UnityModules", "Assets", "Plugins", "LeapMotion", "Core", "Models", "Rigel-interaction-cone-placeholder.obj"),
+      //        ObjFileParser.SwapYZ,
+      //        INTERACTION_VOLUME_MODEL_IMPORT_SCALE_FACTOR);
+          
+
+      //  }
+      //  catch (Exception e) {
+      //    Debug.LogException(e);
+      //  }
+      //}
     }
 
     private LeapServiceProvider LeapServiceProvider {
@@ -188,43 +202,47 @@ namespace Leap.Unity {
 
     private void DrawRigelInteractionZoneMesh() {
 
-      if (this.rigelInteractionZoneMesh != null && this.rigelInteractionZoneMesh.Edges() != null) {
-        foreach (Edge edge in this.rigelInteractionZoneMesh.Edges()) {
+      _rigelInteractionMaterial.SetPass(1);
+      Graphics.DrawMeshNow(rigelInteractionZoneMesh, Matrix4x4.TRS(_rigelInteractionZoneMeshOffset, Quaternion.Euler(-90, 0, 0), Vector3.one * 0.001f));
+
+
+      //if (this._rigelInteractionZoneMesh != null && this._rigelInteractionZoneMesh.Edges() != null) {
+      //  foreach (Edge edge in this._rigelInteractionZoneMesh.Edges()) {
           
-          // Draw edges
-          if (edge.CommonNormal != null) {
-            Vector3 edgeVertex0 = target.transform.TransformPoint(edge.VertexLocations[0].Item2);
-            Vector3 edgeVertex1 = target.transform.TransformPoint(edge.VertexLocations[1].Item2);
-            Vector3 edgeCommonNormal = target.transform.TransformPoint(edge.CommonNormal);
+      //    // Draw edges
+      //    if (edge.CommonNormal != null) {
+      //      Vector3 edgeVertex0 = target.transform.TransformPoint(edge.VertexLocations[0].Item2);
+      //      Vector3 edgeVertex1 = target.transform.TransformPoint(edge.VertexLocations[1].Item2);
+      //      Vector3 edgeCommonNormal = target.transform.TransformPoint(edge.CommonNormal);
 
-            float angle;
-            if (SceneView.currentDrawingSceneView.camera.orthographic) {
-              // Iso Camera
-              angle = Vector3.Angle(SceneView.currentDrawingSceneView.camera.transform.forward, edgeCommonNormal);
-            } else {
-              // Perspective Camera
-              angle = Vector3.Angle(edgeVertex0 - SceneView.currentDrawingSceneView.camera.transform.position, edgeCommonNormal);
-            }
+      //      float angle;
+      //      if (SceneView.currentDrawingSceneView.camera.orthographic) {
+      //        // Iso Camera
+      //        angle = Vector3.Angle(SceneView.currentDrawingSceneView.camera.transform.forward, edgeCommonNormal);
+      //      } else {
+      //        // Perspective Camera
+      //        angle = Vector3.Angle(edgeVertex0 - SceneView.currentDrawingSceneView.camera.transform.position, edgeCommonNormal);
+      //      }
 
-            // Shade the edge line based on it's angle to the camera, making it more intense as it approaches 90 degrees
-            // This gives the interaction volume a cell style appearance
-            float shadingFactor = Math.Abs(angle / 90.0f);
-            if (shadingFactor > 1) {
-              shadingFactor = 2 - shadingFactor;
-            }
+      //      // Shade the edge line based on it's angle to the camera, making it more intense as it approaches 90 degrees
+      //      // This gives the interaction volume a cell style appearance
+      //      float shadingFactor = Math.Abs(angle / 90.0f);
+      //      if (shadingFactor > 1) {
+      //        shadingFactor = 2 - shadingFactor;
+      //      }
 
-            if (angle >= Math.Abs(90)) // Was <= if YZ flipping is not on 
-            {
-              Handles.color = new Color(shadingFactor, shadingFactor, shadingFactor, shadingFactor * PEAK_INTERACTION_VOLUME_OPACITY);
-              Handles.DrawAAPolyLine(edgeVertex0, edgeVertex1);
-            } else // Edge is effectively a backface edge
-            {
-              Handles.color = BackfaceEdgeColour;
-              Handles.DrawAAPolyLine(edgeVertex0, edgeVertex1);
-            }
-          }
-        }
-      }
+      //      if (angle >= Math.Abs(90)) // Was <= if YZ flipping is not on 
+      //      {
+      //        Handles.color = new Color(shadingFactor, shadingFactor, shadingFactor, shadingFactor * PEAK_INTERACTION_VOLUME_OPACITY);
+      //        Handles.DrawAAPolyLine(edgeVertex0, edgeVertex1);
+      //      } else // Edge is effectively a backface edge
+      //      {
+      //        Handles.color = BackfaceEdgeColour;
+      //        Handles.DrawAAPolyLine(edgeVertex0, edgeVertex1);
+      //      }
+      //    }
+      //  }
+      //}
     }
 
     private void DrawLeapMotionControllerInteractionZone(float box_width, float box_depth, float box_radius, Color interactionZoneColor) {
