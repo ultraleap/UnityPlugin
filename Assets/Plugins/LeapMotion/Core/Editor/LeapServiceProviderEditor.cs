@@ -31,22 +31,19 @@ namespace Leap.Unity {
     private const float LMC_BOX_WIDTH = 0.965f;
     private const float LMC_BOX_DEPTH = 0.6671f;
 
-    private const float PEAK_INTERACTION_VOLUME_OPACITY = 0.4f;
-    private GenericMesh _rigelInteractionZoneMesh;
-    private readonly Color BackfaceEdgeColour = new Color(1, 1, 1, 0.02f);
-
-    private Mesh rigelInteractionZoneMesh;
+    private Mesh _rigelInteractionZoneMesh;
     private Material _rigelInteractionMaterial;
-    private readonly Vector3 _rigelInteractionZoneMeshOffset = new Vector3(0.0523f, 0, 0.005f); //new Vector3(-0.0523f, 0, -0.005f);
+    private readonly Vector3 _rigelInteractionZoneMeshOffset = new Vector3(0.0523f, 0, 0.005f);
+
     private LeapServiceProvider _leapServiceProvider;
     private Controller _leapController;
 
+
     protected override void OnEnable() { 
 
-      
-      ParseRigelInteractionMeshData();
-
       base.OnEnable();
+
+      ParseRigelInteractionMeshData();
 
       specifyCustomDecorator("_frameOptimization", frameOptimizationWarning);
 
@@ -121,30 +118,28 @@ namespace Leap.Unity {
 
     private void ParseRigelInteractionMeshData() {
 
-      rigelInteractionZoneMesh = (Mesh)AssetDatabase.LoadAssetAtPath(Path.Combine("Assets", "UnityModules", "Assets", "Plugins", "LeapMotion", "Core", "Models", "Rigel-interaction-cone-placeholder.obj"), typeof(Mesh));
-      _rigelInteractionMaterial = (Material)AssetDatabase.LoadAssetAtPath(Path.Combine("Assets", "UnityModules", "Assets", "Plugins", "LeapMotion", "Core", "Materials", "RigelInteractionVolume.mat"), typeof(Material));
+      if (_rigelInteractionZoneMesh == null) {
+        _rigelInteractionZoneMesh = (Mesh)AssetDatabase.LoadAssetAtPath(Path.Combine("Assets", "UnityModules", "Assets", "Plugins", "LeapMotion", "Core", "Models", "Rigel-interaction-cone-placeholder.obj"), typeof(Mesh));
 
-      //Vector3[] normals = rigelInteractionZoneMesh.normals;
-      //for (int i = 0; i < normals.Length; i++)
-      //  normals[i] = -normals[i];
-      //rigelInteractionZoneMesh.normals = normals;
+        // There is a be where the asset database appears to cache changes to assets, so loading an
+        // asset again causes it to retain the flipped normals and will then reflip them. There appears
+        // to be no way to clear this cache, so we check the first normal in the mesh to see if we
+        // need to flip it.
+        if (_rigelInteractionZoneMesh.normals[0].ApproxEquals(new Vector3(1.0f,-0.1f,0)))
+          ReverseNormals();
+      }
 
-      //if (_rigelInteractionZoneMesh == null) {
-      //  try
-      //  {
-      //    ObjFileParser rigelMeshDataParser = new ObjFileParser();
+      if (_rigelInteractionMaterial == null) {
+        _rigelInteractionMaterial = (Material)AssetDatabase.LoadAssetAtPath(Path.Combine("Assets", "UnityModules", "Assets", "Plugins", "LeapMotion", "Core", "Materials", "RigelInteractionVolume.mat"), typeof(Material));
+      }
 
-      //    // This data is not oriented or scaled correctly yet.
-      //    _rigelInteractionZoneMesh = rigelMeshDataParser.FromObj(Path.Combine(Application.dataPath, "UnityModules", "Assets", "Plugins", "LeapMotion", "Core", "Models", "Rigel-interaction-cone-placeholder.obj"),
-      //        ObjFileParser.SwapYZ,
-      //        INTERACTION_VOLUME_MODEL_IMPORT_SCALE_FACTOR);
-          
+    }
 
-      //  }
-      //  catch (Exception e) {
-      //    Debug.LogException(e);
-      //  }
-      //}
+    private void ReverseNormals() {
+      Vector3[] normals = _rigelInteractionZoneMesh.normals;
+      for (int i = 0; i < normals.Length; i++)
+        normals[i] = -normals[i];
+      _rigelInteractionZoneMesh.normals = normals;
     }
 
     private LeapServiceProvider LeapServiceProvider {
@@ -199,50 +194,12 @@ namespace Leap.Unity {
       return LeapServiceProvider?.SelectedInteractionVolumeVisualization;
     }
 
-
     private void DrawRigelInteractionZoneMesh() {
 
-      _rigelInteractionMaterial.SetPass(1);
-      Graphics.DrawMeshNow(rigelInteractionZoneMesh, Matrix4x4.TRS(_rigelInteractionZoneMeshOffset, Quaternion.Euler(-90, 0, 0), Vector3.one * 0.001f));
-
-
-      //if (this._rigelInteractionZoneMesh != null && this._rigelInteractionZoneMesh.Edges() != null) {
-      //  foreach (Edge edge in this._rigelInteractionZoneMesh.Edges()) {
-          
-      //    // Draw edges
-      //    if (edge.CommonNormal != null) {
-      //      Vector3 edgeVertex0 = target.transform.TransformPoint(edge.VertexLocations[0].Item2);
-      //      Vector3 edgeVertex1 = target.transform.TransformPoint(edge.VertexLocations[1].Item2);
-      //      Vector3 edgeCommonNormal = target.transform.TransformPoint(edge.CommonNormal);
-
-      //      float angle;
-      //      if (SceneView.currentDrawingSceneView.camera.orthographic) {
-      //        // Iso Camera
-      //        angle = Vector3.Angle(SceneView.currentDrawingSceneView.camera.transform.forward, edgeCommonNormal);
-      //      } else {
-      //        // Perspective Camera
-      //        angle = Vector3.Angle(edgeVertex0 - SceneView.currentDrawingSceneView.camera.transform.position, edgeCommonNormal);
-      //      }
-
-      //      // Shade the edge line based on it's angle to the camera, making it more intense as it approaches 90 degrees
-      //      // This gives the interaction volume a cell style appearance
-      //      float shadingFactor = Math.Abs(angle / 90.0f);
-      //      if (shadingFactor > 1) {
-      //        shadingFactor = 2 - shadingFactor;
-      //      }
-
-      //      if (angle >= Math.Abs(90)) // Was <= if YZ flipping is not on 
-      //      {
-      //        Handles.color = new Color(shadingFactor, shadingFactor, shadingFactor, shadingFactor * PEAK_INTERACTION_VOLUME_OPACITY);
-      //        Handles.DrawAAPolyLine(edgeVertex0, edgeVertex1);
-      //      } else // Edge is effectively a backface edge
-      //      {
-      //        Handles.color = BackfaceEdgeColour;
-      //        Handles.DrawAAPolyLine(edgeVertex0, edgeVertex1);
-      //      }
-      //    }
-      //  }
-      //}
+      if (_rigelInteractionMaterial != null && _rigelInteractionZoneMesh != null) {
+        _rigelInteractionMaterial.SetPass(0);
+        Graphics.DrawMeshNow(_rigelInteractionZoneMesh, Matrix4x4.TRS(_rigelInteractionZoneMeshOffset, Quaternion.Euler(-90, 0, 0), Vector3.one * 0.001f));
+      }
     }
 
     private void DrawLeapMotionControllerInteractionZone(float box_width, float box_depth, float box_radius, Color interactionZoneColor) {
