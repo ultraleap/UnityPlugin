@@ -125,7 +125,7 @@ namespace Leap.Unity {
         // asset again (when _rigelInteractionZoneMesh is null) causes it to retain the flipped normals 
         // it and will then flip them again. There appears to be no way to clear this cache, so here we
         // check the first normal in the mesh to see if we need to flip it. 
-        if (_rigelInteractionZoneMesh.normals[0].ApproxEquals(new Vector3(-1.0f, 0.1f, 0)))
+       // if (_rigelInteractionZoneMesh.normals[0].ApproxEquals(new Vector3(-1.0f, 0.1f, 0)))
           ReverseNormals();
       }
 
