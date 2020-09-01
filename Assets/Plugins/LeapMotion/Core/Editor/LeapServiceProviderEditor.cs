@@ -31,9 +31,9 @@ namespace Leap.Unity {
     private const float LMC_BOX_WIDTH = 0.965f;
     private const float LMC_BOX_DEPTH = 0.6671f;
 
-    private Mesh _rigelInteractionZoneMesh;
-    private Material _rigelInteractionMaterial;
-    private readonly Vector3 _rigelInteractionZoneMeshOffset = new Vector3(0.0523f, 0, 0.005f);
+    private Mesh _stereoIR170InteractionZoneMesh;
+    private Material _stereoIR170InteractionMaterial;
+    private readonly Vector3 _stereoIR170InteractionZoneMeshOffset = new Vector3(0.0523f, 0, 0.005f);
 
     private LeapServiceProvider _leapServiceProvider;
     private Controller _leapController;
@@ -43,7 +43,7 @@ namespace Leap.Unity {
 
       base.OnEnable();
 
-      ParseRigelInteractionMeshData();
+      ParseStereoIR170InteractionMeshData();
 
       specifyCustomDecorator("_frameOptimization", frameOptimizationWarning);
 
@@ -104,8 +104,8 @@ namespace Leap.Unity {
         case LeapServiceProvider.InteractionVolumeVisualization.LeapMotionController:
           DrawLeapMotionControllerInteractionZone(LMC_BOX_WIDTH, LMC_BOX_DEPTH, LMC_BOX_RADIUS, Color.white);
           break;
-        case LeapServiceProvider.InteractionVolumeVisualization.Rigel:
-          DrawRigelInteractionZoneMesh();
+        case LeapServiceProvider.InteractionVolumeVisualization.StereoIR170:
+          DrawStereoIR170InteractionZoneMesh();
           break;
         case LeapServiceProvider.InteractionVolumeVisualization.Automatic:
           DetectConnectedDevice();
@@ -116,30 +116,16 @@ namespace Leap.Unity {
 
     }
 
-    private void ParseRigelInteractionMeshData() {
+    private void ParseStereoIR170InteractionMeshData() {
 
-      if (_rigelInteractionZoneMesh == null) {
-        _rigelInteractionZoneMesh = (Mesh)AssetDatabase.LoadAssetAtPath(Path.Combine("Assets", "UnityModules", "Assets", "Plugins", "LeapMotion", "Core", "Models", "Rigel-interaction-cone-placeholder.obj"), typeof(Mesh));
-
-        // There is a bug/feature where the asset database appears to cache changes to assets, so loading an
-        // asset again (when _rigelInteractionZoneMesh is null) causes it to retain the flipped normals 
-        // it and will then flip them again. There appears to be no way to clear this cache, so here we
-        // check the first normal in the mesh to see if we need to flip it. 
-       // if (_rigelInteractionZoneMesh.normals[0].ApproxEquals(new Vector3(-1.0f, 0.1f, 0)))
-          ReverseNormals();
+      if (_stereoIR170InteractionZoneMesh == null) {
+        _stereoIR170InteractionZoneMesh = (Mesh)AssetDatabase.LoadAssetAtPath(Path.Combine("Assets", "UnityModules", "Assets", "Plugins", "LeapMotion", "Core", "Models", "StereoIR170-interaction-cone.obj"), typeof(Mesh));
       }
 
-      if (_rigelInteractionMaterial == null) {
-        _rigelInteractionMaterial = (Material)AssetDatabase.LoadAssetAtPath(Path.Combine("Assets", "UnityModules", "Assets", "Plugins", "LeapMotion", "Core", "Materials", "RigelInteractionVolume.mat"), typeof(Material));
+      if (_stereoIR170InteractionMaterial == null) {
+        _stereoIR170InteractionMaterial = (Material)AssetDatabase.LoadAssetAtPath(Path.Combine("Assets", "UnityModules", "Assets", "Plugins", "LeapMotion", "Core", "Materials", "StereoIR170InteractionVolume.mat"), typeof(Material));
       }
 
-    }
-
-    private void ReverseNormals() {
-      Vector3[] normals = _rigelInteractionZoneMesh.normals;
-      for (int i = 0; i < normals.Length; i++)
-        normals[i] = -normals[i];
-      _rigelInteractionZoneMesh.normals = normals;
     }
 
     private LeapServiceProvider LeapServiceProvider {
@@ -186,7 +172,7 @@ namespace Leap.Unity {
       if (LeapController?.Devices?.Count == 1)
       {
         if (LeapController.Devices.First().Type == Device.DeviceType.TYPE_RIGEL) {
-          DrawRigelInteractionZoneMesh();
+          DrawStereoIR170InteractionZoneMesh();
         }
         else if (LeapController.Devices.First().Type == Device.DeviceType.TYPE_PERIPHERAL) {
           DrawLeapMotionControllerInteractionZone(LMC_BOX_WIDTH, LMC_BOX_DEPTH, LMC_BOX_RADIUS, Color.white);
@@ -199,11 +185,13 @@ namespace Leap.Unity {
       return LeapServiceProvider?.SelectedInteractionVolumeVisualization;
     }
 
-    private void DrawRigelInteractionZoneMesh() {
+    private void DrawStereoIR170InteractionZoneMesh() {
 
-      if (_rigelInteractionMaterial != null && _rigelInteractionZoneMesh != null) {
-        _rigelInteractionMaterial.SetPass(0);
-        Graphics.DrawMeshNow(_rigelInteractionZoneMesh, Matrix4x4.TRS(_rigelInteractionZoneMeshOffset, Quaternion.Euler(-90, 0, 0), Vector3.one * 0.001f));
+      if (_stereoIR170InteractionMaterial != null && _stereoIR170InteractionZoneMesh != null) {
+        _stereoIR170InteractionMaterial.SetPass(0);
+
+        Graphics.DrawMeshNow(_stereoIR170InteractionZoneMesh,
+           target.transform.localToWorldMatrix * Matrix4x4.TRS(_stereoIR170InteractionZoneMeshOffset, Quaternion.Euler(-90, 0, 0), Vector3.one * 0.001f));
       }
     }
 
@@ -229,9 +217,9 @@ namespace Leap.Unity {
       drawControllerEdge(origin, local_bottom_right, local_top_right, box_radius);
 
       drawControllerArc(origin, local_top_left, local_bottom_left, local_top_right,
-                          local_bottom_right, box_radius);
+                        local_bottom_right, box_radius);
       drawControllerArc(origin, local_top_left, local_top_right, local_bottom_left,
-                          local_bottom_right, box_radius);
+                        local_bottom_right, box_radius);
 
       Handles.color = previousColor;
     }

@@ -38,7 +38,7 @@
                 float3 worldNorm = UnityObjectToWorldNormal(v.normal);
                 float3 cameraForwardVector = mul((float3x3)unity_CameraToWorld, float3(0, 0, 1));
 
-                o.cameraToSurfaceNormalAngleDegrees = degrees(acos(dot(normalize(worldNorm), normalize(cameraForwardVector))));
+                o.cameraToSurfaceNormalAngleDegrees = degrees(acos(dot(normalize(-worldNorm), normalize(cameraForwardVector))));
                 return o;
             }
 

@@ -55,7 +55,7 @@ namespace Leap.Unity {
     public enum InteractionVolumeVisualization {
       None,
       LeapMotionController,
-      Rigel,
+      StereoIR170,
       Automatic
     }
     [Tooltip("Displays a representation of the interaction volume in the scene view")]
@@ -545,9 +545,8 @@ namespace Leap.Unity {
     protected void onHandControllerConnect(object sender, LeapEventArgs args) {
       initializeFlags();
 
-      // TO REVIEW
       if (_leapController != null) {
-        // _leapController.Device -= onHandControllerConnect;
+        _leapController.Device -= onHandControllerConnect;
       }
     }
 
