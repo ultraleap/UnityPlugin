@@ -260,12 +260,6 @@ namespace Leap.Unity {
         Handles.DrawAAPolyLine(origin + begin, origin + end);
       }
     }
-
-    internal enum enumaxis {
-      X,
-      Y,
-      Z
-    }
   }
 }
 
