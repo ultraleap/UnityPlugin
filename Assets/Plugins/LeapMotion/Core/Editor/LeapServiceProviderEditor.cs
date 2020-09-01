@@ -119,11 +119,11 @@ namespace Leap.Unity {
     private void ParseStereoIR170InteractionMeshData() {
 
       if (_stereoIR170InteractionZoneMesh == null) {
-        _stereoIR170InteractionZoneMesh = (Mesh)AssetDatabase.LoadAssetAtPath(Path.Combine("Assets", "UnityModules", "Assets", "Plugins", "LeapMotion", "Core", "Models", "StereoIR170-interaction-cone.obj"), typeof(Mesh));
+        _stereoIR170InteractionZoneMesh = (Mesh)AssetDatabase.LoadAssetAtPath(Path.Combine("Assets", "Plugins", "LeapMotion", "Core", "Models", "StereoIR170-interaction-cone.obj"), typeof(Mesh));
       }
 
       if (_stereoIR170InteractionMaterial == null) {
-        _stereoIR170InteractionMaterial = (Material)AssetDatabase.LoadAssetAtPath(Path.Combine("Assets", "UnityModules", "Assets", "Plugins", "LeapMotion", "Core", "Materials", "StereoIR170InteractionVolume.mat"), typeof(Material));
+        _stereoIR170InteractionMaterial = (Material)AssetDatabase.LoadAssetAtPath(Path.Combine("Assets", "Plugins", "LeapMotion", "Core", "Materials", "StereoIR170InteractionVolume.mat"), typeof(Material));
       }
 
     }

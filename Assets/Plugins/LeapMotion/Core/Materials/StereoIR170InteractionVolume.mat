@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: RigelInteractionVolume
+  m_Name: StereoIR170InteractionVolume
   m_Shader: {fileID: 4800000, guid: d184816898f36e742a667d8c0f9efe59, type: 3}
   m_ShaderKeywords: _REMOVEDIAG_ON
   m_LightmapFlags: 4
