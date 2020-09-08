@@ -453,7 +453,7 @@ namespace LeapInternal {
       result = LeapC.GetDeviceInfo(device, ref deviceInfo); //Query the serial
 
       if (result == eLeapRS.eLeapRS_Success) {
-        Device apiDevice = new Device(deviceHandle,
+        Device apiDevice = new Device(device,
                                deviceInfo.h_fov, //radians
                                deviceInfo.v_fov, //radians
                                deviceInfo.range / 1000.0f, //to mm
