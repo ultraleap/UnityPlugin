@@ -191,7 +191,8 @@ namespace Leap.Unity {
         _stereoIR170InteractionMaterial.SetPass(0);
 
         Graphics.DrawMeshNow(_stereoIR170InteractionZoneMesh,
-           target.transform.localToWorldMatrix * Matrix4x4.TRS(_stereoIR170InteractionZoneMeshOffset, Quaternion.Euler(-90, 0, 0), Vector3.one * 0.001f));
+           target.transform.localToWorldMatrix * 
+           Matrix4x4.TRS(controllerOffset + _stereoIR170InteractionZoneMeshOffset, deviceRotation * Quaternion.Euler(-90, 0, 0), Vector3.one * 0.001f));
       }
     }
 
