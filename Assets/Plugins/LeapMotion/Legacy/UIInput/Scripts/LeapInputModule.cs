@@ -8,13 +8,9 @@
 
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.VR;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
-using UnityEngine.Serialization;
 using System.Collections.Generic;
-using Leap.Unity;
-using Leap;
 
 namespace Leap.Unity.InputModule {
   /** An InputModule that supports the use of Leap Motion tracking data for manipulating Unity UI controls. */
