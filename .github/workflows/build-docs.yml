@@ -1,14 +1,9 @@
 name: UnityModules - Build Docs
 
 on:
-  pull_request:
-    types: [opened, synchronize]
-  # Switch to this when ready to merge into master
-  # push:
-  #   branches:
-  #     - main
-  #   paths:
-  #     - docs/**
+  push:
+    branches:
+      - main
 
 jobs:
   build:
@@ -62,6 +57,6 @@ jobs:
         uses: JamesIves/github-pages-deploy-action@3.6.1
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This is set by github, do not change.
-          BRANCH: gh-pages-temp # The branch the action should deploy to.
+          BRANCH: gh-pages # The branch the action should deploy to.
           FOLDER: docs/html # The folder the action should deploy.
           CLEAN: true # Automatically remove deleted files from the deploy branch
