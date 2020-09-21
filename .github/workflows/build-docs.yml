@@ -31,8 +31,8 @@ jobs:
       # Install Doxygen and Graphvis from Brew
       - name: Install doxygen and graphviz
         run: |
-          apt-get install doxygen=1.8.11
-          apt-get install graphviz
+          sudo apt-get install doxygen=1.8.11
+          sudo apt-get install graphviz
         working-directory: ./docs
 
       # Build the Doxygen Documentation
