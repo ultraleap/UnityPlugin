@@ -15,40 +15,42 @@ jobs:
     name: Build Docs
     runs-on: ubuntu-latest
     steps:
-    
-      # Checkout
-      - name: Checkout repository
+      - name: Checkout UnityModules
         uses: actions/checkout@v2
         with:
           lfs: true
 
-      # Debug
       - name: Debug Print Current Directory
         run: |
-          ls -l
+          ls
         working-directory: .
 
-      # Install Doxygen and Graphvis from Brew
-      - name: Install doxygen and graphviz
+      - name: Checkout Doxygen 1.8.11
         run: |
-          sudo apt-get install doxygen=1.8.13-10
+          git clone https://github.com/nickjbenson/doxygen-clone-1-8-11 --branch doxygen-1.8.11 doxygen
+        working-directory: .
+
+      - name: Build Doxygen 1.8.11
+        run: |
+          cmake .
+          make
+        working-directory: ./doxygen
+
+      - name: Install graphviz
+        run: |
           sudo apt-get install graphviz
+
+      - name: Run Doxygen 1.8.11 in docs folder
+        run: |
+          ../doxygen/bin/doxygen
         working-directory: ./docs
 
-      # Build the Doxygen Documentation
-      - name: Build Documentation
+      - name: (Debug) Print html build artifacts
         run: |
-          doxygen
-        working-directory: ./docs
-
-      # Debug view the files in the html directory
-      - name: Debug Print Built Files
-        run: |
-          ls -lR
+          ls -R
         working-directory: ./docs/html
 
-      # Upload the files in the html directory
-      - name: Debug Upload Documentation Artifacts
+      - name: (Debug) Upload html build artifacts
         uses: actions/upload-artifact@v2
         if: ${{ always() }} # Even if the build exits with a failure code
         with:
