@@ -6,7 +6,7 @@ on:
 # Switch to this when ready to merge into master
 #  push:
 #    branches:
-#      - master
+#      - main
 #    paths:
 #      - docs/**
 
@@ -25,14 +25,14 @@ jobs:
       # Debug
       - name: Debug Print Current Directory
         run: |
-          ls
+          ls -l
         working-directory: .
 
       # Install Doxygen and Graphvis from Brew
       - name: Install doxygen and graphviz
         run: |
-          brew install doxygen
-          brew install graphviz
+          apt-get install doxygen=1.8.11
+          apt-get install graphviz
         working-directory: ./docs
 
       # Build the Doxygen Documentation
@@ -44,7 +44,7 @@ jobs:
       # Debug view the files in the html directory
       - name: Debug Print Built Files
         run: |
-          ls -R
+          ls -lR
         working-directory: ./docs/html
 
       # Upload the files in the html directory
