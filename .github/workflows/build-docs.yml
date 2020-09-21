@@ -61,5 +61,5 @@ jobs:
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This is set by github, do not change.
           BRANCH: gh-pages-temp # The branch the action should deploy to.
-          FOLDER: .docs/html # The folder the action should deploy.
+          FOLDER: ./docs/html # The folder the action should deploy.
           CLEAN: true # Automatically remove deleted files from the deploy branch
