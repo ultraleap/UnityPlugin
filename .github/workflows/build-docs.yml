@@ -53,7 +53,7 @@ jobs:
           path: ./docs/html
 
       # Push the contents of the html directory to the gh-pages branch 
-      - name: Deploy 🚀 - TEMP BRANCH
+      - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@3.6.1
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This is set by github, do not change.
