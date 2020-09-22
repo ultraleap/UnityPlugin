@@ -562,7 +562,7 @@ namespace LeapInternal {
   [StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Ansi)]
   public struct LEAP_DEVICE_INFO {
     public UInt32 size;
-    public eLeapDeviceStatus status;
+    public UInt32 status;
     public eLeapDeviceCaps caps;
     public eLeapDeviceType type;
     public UInt32 baseline;
