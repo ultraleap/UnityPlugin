@@ -453,13 +453,14 @@ namespace LeapInternal {
       result = LeapC.GetDeviceInfo(device, ref deviceInfo); //Query the serial
 
       if (result == eLeapRS.eLeapRS_Success) {
-        Device apiDevice = new Device(device,
+        Device apiDevice = new Device(deviceHandle,
+                               device,
                                deviceInfo.h_fov, //radians
                                deviceInfo.v_fov, //radians
                                deviceInfo.range / 1000.0f, //to mm
                                deviceInfo.baseline / 1000.0f, //to mm
                                (Device.DeviceType)deviceInfo.type,
-                               (deviceInfo.status == eLeapDeviceStatus.eLeapDeviceStatus_Streaming),
+                               (deviceInfo.status == (uint)eLeapDeviceStatus.eLeapDeviceStatus_Streaming),
                                Marshal.PtrToStringAnsi(deviceInfo.serial));
         Marshal.FreeCoTaskMem(deviceInfo.serial);
         _devices.AddOrUpdate(apiDevice);

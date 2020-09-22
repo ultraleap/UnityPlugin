@@ -39,6 +39,7 @@ namespace Leap {
     public Device() { }
 
     public Device(IntPtr deviceHandle,
+                   IntPtr internalHandle,
                    float horizontalViewAngle,
                    float verticalViewAngle,
                    float range,
@@ -47,12 +48,13 @@ namespace Leap {
                    bool isStreaming,
                    string serialNumber) {
       Handle = deviceHandle;
+      InternalHandle = internalHandle;
       HorizontalViewAngle = horizontalViewAngle;
       VerticalViewAngle = verticalViewAngle;
       Range = range;
       Baseline = baseline;
       Type = type;
-      IsStreaming = isStreaming;
+      //IsStreaming = isStreaming;
       SerialNumber = serialNumber;
     }
 
@@ -70,7 +72,7 @@ namespace Leap {
       VerticalViewAngle = verticalViewAngle;
       Range = range;
       Baseline = baseline;
-      IsStreaming = isStreaming;
+      //IsStreaming = isStreaming;
       SerialNumber = serialNumber;
     }
 
@@ -82,7 +84,7 @@ namespace Leap {
       VerticalViewAngle = updatedDevice.VerticalViewAngle;
       Range = updatedDevice.Range;
       Baseline = updatedDevice.Baseline;
-      IsStreaming = updatedDevice.IsStreaming;
+      //IsStreaming = updatedDevice.IsStreaming;
       SerialNumber = updatedDevice.SerialNumber;
     }
 
@@ -90,6 +92,8 @@ namespace Leap {
     /// For internal use only.
     /// </summary>
     public IntPtr Handle { get; private set; }
+
+    private IntPtr InternalHandle;
 
     public bool SetPaused(bool pause) {
       ulong prior_state = 0;
@@ -176,7 +180,25 @@ namespace Leap {
     /// Currently only one controller can provide data at a time.
     /// @since 1.2
     /// </summary>
-    public bool IsStreaming { get; private set; }
+    public bool IsStreaming
+    {
+        get
+        {
+            eLeapRS result;
+
+            LEAP_DEVICE_INFO deviceInfo = new LEAP_DEVICE_INFO();
+            deviceInfo.serial = IntPtr.Zero;
+            deviceInfo.size = (uint)System.Runtime.InteropServices.Marshal.SizeOf(deviceInfo);
+            deviceInfo.status = (uint)System.Runtime.InteropServices.Marshal.SizeOf(deviceInfo);
+            result = LeapC.GetDeviceInfo(InternalHandle, ref deviceInfo);
+
+            if (result != eLeapRS.eLeapRS_Success)
+                return true;
+            var status = ((deviceInfo.status & (uint)eLeapDeviceStatus.eLeapDeviceStatus_Streaming) == (uint)eLeapDeviceStatus.eLeapDeviceStatus_Streaming);
+            System.Runtime.InteropServices.Marshal.FreeCoTaskMem(deviceInfo.serial);
+            return status;
+        }
+    }
 
     /// <summary>
     /// The device type.
@@ -204,13 +226,45 @@ namespace Leap {
     /// <summary>
     /// The software has detected a possible smudge on the translucent cover
     /// over the Leap Motion cameras.
-    /// 
-    /// Not implemented yet.
     /// @since 3.0
     /// </summary>
     public bool IsSmudged {
       get {
-        throw new NotImplementedException();
+        eLeapRS result;
+
+        LEAP_DEVICE_INFO deviceInfo = new LEAP_DEVICE_INFO();
+        deviceInfo.serial = IntPtr.Zero;
+        deviceInfo.size = (uint)System.Runtime.InteropServices.Marshal.SizeOf(deviceInfo);
+        deviceInfo.status = (uint)System.Runtime.InteropServices.Marshal.SizeOf(deviceInfo);
+        result = LeapC.GetDeviceInfo(InternalHandle, ref deviceInfo);
+
+        if (result != eLeapRS.eLeapRS_Success)
+            return true;
+        var status = ((deviceInfo.status & (uint)eLeapDeviceStatus.eLeapDeviceStatus_Smudged) == (uint)eLeapDeviceStatus.eLeapDeviceStatus_Smudged);
+        System.Runtime.InteropServices.Marshal.FreeCoTaskMem(deviceInfo.serial);
+        return status;
+      }
+    }
+
+    /// <summary>
+    /// The software has entered low-resource mode
+    /// @since 3.0
+    /// </summary>
+    public bool IsLowResource {
+      get {
+        eLeapRS result;
+
+        LEAP_DEVICE_INFO deviceInfo = new LEAP_DEVICE_INFO();
+        deviceInfo.serial = IntPtr.Zero;
+        deviceInfo.size = (uint)System.Runtime.InteropServices.Marshal.SizeOf(deviceInfo);
+        deviceInfo.status = (uint)System.Runtime.InteropServices.Marshal.SizeOf(deviceInfo);
+        result = LeapC.GetDeviceInfo(InternalHandle, ref deviceInfo);
+
+        if (result != eLeapRS.eLeapRS_Success)
+            return true;
+        var status = ((deviceInfo.status & (uint)eLeapDeviceStatus.eLeapDeviceStatus_LowResource) == (uint)eLeapDeviceStatus.eLeapDeviceStatus_LowResource);
+        System.Runtime.InteropServices.Marshal.FreeCoTaskMem(deviceInfo.serial);
+        return status;
       }
     }
 
@@ -218,14 +272,24 @@ namespace Leap {
     /// The software has detected excessive IR illumination, which may interfere 
     /// with tracking. If robust mode is enabled, the system will enter robust mode when 
     /// isLightingBad() is true. 
-    /// 
-    /// Not implemented yet. 
     /// @since 3.0 
     /// </summary>
     public bool IsLightingBad {
       get {
-        throw new NotImplementedException();
-      }
+            eLeapRS result;
+
+            LEAP_DEVICE_INFO deviceInfo = new LEAP_DEVICE_INFO();
+            deviceInfo.serial = IntPtr.Zero;
+            deviceInfo.size = (uint)System.Runtime.InteropServices.Marshal.SizeOf(deviceInfo);
+            deviceInfo.status = (uint)System.Runtime.InteropServices.Marshal.SizeOf(deviceInfo);
+            result = LeapC.GetDeviceInfo(InternalHandle, ref deviceInfo);
+
+            if (result != eLeapRS.eLeapRS_Success)
+                return true;
+            var status = ((deviceInfo.status & (uint)eLeapDeviceStatus.eLeapDeviceStatus_Robust) == (uint)eLeapDeviceStatus.eLeapDeviceStatus_Robust);
+            System.Runtime.InteropServices.Marshal.FreeCoTaskMem(deviceInfo.serial);
+            return status;
+        }
     }
 
     /// <summary>
