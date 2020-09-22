@@ -184,19 +184,7 @@ namespace Leap {
     {
         get
         {
-            eLeapRS result;
-
-            LEAP_DEVICE_INFO deviceInfo = new LEAP_DEVICE_INFO();
-            deviceInfo.serial = IntPtr.Zero;
-            deviceInfo.size = (uint)System.Runtime.InteropServices.Marshal.SizeOf(deviceInfo);
-            deviceInfo.status = (uint)System.Runtime.InteropServices.Marshal.SizeOf(deviceInfo);
-            result = LeapC.GetDeviceInfo(InternalHandle, ref deviceInfo);
-
-            if (result != eLeapRS.eLeapRS_Success)
-                return true;
-            var status = ((deviceInfo.status & (uint)eLeapDeviceStatus.eLeapDeviceStatus_Streaming) == (uint)eLeapDeviceStatus.eLeapDeviceStatus_Streaming);
-            System.Runtime.InteropServices.Marshal.FreeCoTaskMem(deviceInfo.serial);
-            return status;
+            return ((GetDeviceStatus() & (uint)eLeapDeviceStatus.eLeapDeviceStatus_Streaming) == (uint)eLeapDeviceStatus.eLeapDeviceStatus_Streaming);
         }
     }
 
@@ -224,12 +212,10 @@ namespace Leap {
     public string SerialNumber { get; private set; }
 
     /// <summary>
-    /// The software has detected a possible smudge on the translucent cover
-    /// over the Leap Motion cameras.
-    /// @since 3.0
+    /// Returns the internal status field of the current device
     /// </summary>
-    public bool IsSmudged {
-      get {
+    protected uint GetDeviceStatus()
+    {
         eLeapRS result;
 
         LEAP_DEVICE_INFO deviceInfo = new LEAP_DEVICE_INFO();
@@ -239,10 +225,21 @@ namespace Leap {
         result = LeapC.GetDeviceInfo(InternalHandle, ref deviceInfo);
 
         if (result != eLeapRS.eLeapRS_Success)
-            return true;
-        var status = ((deviceInfo.status & (uint)eLeapDeviceStatus.eLeapDeviceStatus_Smudged) == (uint)eLeapDeviceStatus.eLeapDeviceStatus_Smudged);
+            return 0;
+        uint status = deviceInfo.status;
         System.Runtime.InteropServices.Marshal.FreeCoTaskMem(deviceInfo.serial);
         return status;
+    }
+
+
+    /// <summary>
+    /// The software has detected a possible smudge on the translucent cover
+    /// over the Leap Motion cameras.
+    /// @since 3.0
+    /// </summary>
+    public bool IsSmudged {
+      get {
+            return ((GetDeviceStatus() & (uint)eLeapDeviceStatus.eLeapDeviceStatus_Smudged) == (uint)eLeapDeviceStatus.eLeapDeviceStatus_Smudged);
       }
     }
 
@@ -252,19 +249,7 @@ namespace Leap {
     /// </summary>
     public bool IsLowResource {
       get {
-        eLeapRS result;
-
-        LEAP_DEVICE_INFO deviceInfo = new LEAP_DEVICE_INFO();
-        deviceInfo.serial = IntPtr.Zero;
-        deviceInfo.size = (uint)System.Runtime.InteropServices.Marshal.SizeOf(deviceInfo);
-        deviceInfo.status = (uint)System.Runtime.InteropServices.Marshal.SizeOf(deviceInfo);
-        result = LeapC.GetDeviceInfo(InternalHandle, ref deviceInfo);
-
-        if (result != eLeapRS.eLeapRS_Success)
-            return true;
-        var status = ((deviceInfo.status & (uint)eLeapDeviceStatus.eLeapDeviceStatus_LowResource) == (uint)eLeapDeviceStatus.eLeapDeviceStatus_LowResource);
-        System.Runtime.InteropServices.Marshal.FreeCoTaskMem(deviceInfo.serial);
-        return status;
+            return ((GetDeviceStatus() & (uint)eLeapDeviceStatus.eLeapDeviceStatus_LowResource) == (uint)eLeapDeviceStatus.eLeapDeviceStatus_LowResource);
       }
     }
 
@@ -276,19 +261,7 @@ namespace Leap {
     /// </summary>
     public bool IsLightingBad {
       get {
-            eLeapRS result;
-
-            LEAP_DEVICE_INFO deviceInfo = new LEAP_DEVICE_INFO();
-            deviceInfo.serial = IntPtr.Zero;
-            deviceInfo.size = (uint)System.Runtime.InteropServices.Marshal.SizeOf(deviceInfo);
-            deviceInfo.status = (uint)System.Runtime.InteropServices.Marshal.SizeOf(deviceInfo);
-            result = LeapC.GetDeviceInfo(InternalHandle, ref deviceInfo);
-
-            if (result != eLeapRS.eLeapRS_Success)
-                return true;
-            var status = ((deviceInfo.status & (uint)eLeapDeviceStatus.eLeapDeviceStatus_Robust) == (uint)eLeapDeviceStatus.eLeapDeviceStatus_Robust);
-            System.Runtime.InteropServices.Marshal.FreeCoTaskMem(deviceInfo.serial);
-            return status;
+            return ((GetDeviceStatus() & (uint)eLeapDeviceStatus.eLeapDeviceStatus_Robust) == (uint)eLeapDeviceStatus.eLeapDeviceStatus_Robust);
         }
     }
 
