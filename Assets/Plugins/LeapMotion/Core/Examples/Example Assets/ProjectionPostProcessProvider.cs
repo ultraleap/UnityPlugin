@@ -36,8 +36,8 @@ namespace Leap.Unity.Examples {
       foreach (var hand in inputFrame.Hands) {
         // Approximate shoulder position with magic values.
         Vector3 shoulderPos = headPos
-                              + (shoulderBasis * (new Vector3(0f, -0.2f, -0.1f)
-                              + Vector3.left * 0.1f * (hand.IsLeft ? 1f : -1f)));
+                              + (shoulderBasis * (new Vector3(0f, -0.13f, -0.1f)
+                              + Vector3.left * 0.15f * (hand.IsLeft ? 1f : -1f)));
 
         // Calculate the projection of the hand if it extends beyond the
         // handMergeDistance.
