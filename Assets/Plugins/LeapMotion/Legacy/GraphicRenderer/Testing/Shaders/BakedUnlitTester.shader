@@ -23,7 +23,7 @@ Shader "LeapMotion/GraphicRenderer/Testing/Unlit/Baked" {
       #pragma shader_feature _ GRAPHIC_RENDERER_MOVEMENT_TRANSLATION GRAPHIC_RENDERER_MOVEMENT_FULL
       #pragma shader_feature _ GRAPHIC_RENDERER_TINTING
       #pragma shader_feature _ GRAPHIC_RENDERER_BLEND_SHAPES
-      #include "Assets/Plugins/LeapMotion/Modules/GraphicRenderer/Resources/BakedRenderer.cginc"
+      #include "Assets/Plugins/LeapMotion/Legacy/GraphicRenderer/Resources/BakedRenderer.cginc"
       #include "UnityCG.cginc"
 
       sampler2D _MainTex;
