@@ -52,6 +52,18 @@ namespace Leap.Unity {
 
     #region Inspector
 
+    public enum InteractionVolumeVisualization {
+      None,
+      LeapMotionController,
+      StereoIR170,
+      Automatic
+    }
+    [Tooltip("Displays a representation of the interaction volume in the scene view")]
+    [SerializeField]
+    protected InteractionVolumeVisualization _interactionVolumeVisualization = InteractionVolumeVisualization.LeapMotionController;
+
+    public InteractionVolumeVisualization SelectedInteractionVolumeVisualization => _interactionVolumeVisualization;
+
     public enum FrameOptimizationMode {
       None,
       ReuseUpdateForPhysics,
@@ -117,7 +129,7 @@ namespace Leap.Unity {
     #endregion
 
     #region Edit-time Frame Data
-    
+ 
     private Action<Device> _onDeviceSafe;
     /// <summary>
     /// A utility event to get a callback whenever a new device is connected to the service.
@@ -164,8 +176,7 @@ namespace Leap.Unity {
       = new Dictionary<TestHandFactory.TestHandPose, Hand>();
     private Hand _editTimeLeftHand {
       get {
-        Hand cachedHand;
-        if (_cachedLeftHands.TryGetValue(editTimePose, out cachedHand)) {
+        if (_cachedLeftHands.TryGetValue(editTimePose, out Hand cachedHand)) {
           return cachedHand;
         }
         else {
@@ -180,8 +191,7 @@ namespace Leap.Unity {
       = new Dictionary<TestHandFactory.TestHandPose, Hand>();
     private Hand _editTimeRightHand {
       get {
-        Hand cachedHand;
-        if (_cachedRightHands.TryGetValue(editTimePose, out cachedHand)) {
+        if (_cachedRightHands.TryGetValue(editTimePose, out Hand cachedHand)) {
           return cachedHand;
         }
         else {
@@ -420,6 +430,7 @@ namespace Leap.Unity {
     /// </summary>
     public void CopySettingsToLeapXRServiceProvider(
         LeapXRServiceProvider leapXRServiceProvider) {
+      leapXRServiceProvider._interactionVolumeVisualization = _interactionVolumeVisualization;
       leapXRServiceProvider._frameOptimization = _frameOptimization;
       leapXRServiceProvider._physicsExtrapolation = _physicsExtrapolation;
       leapXRServiceProvider._physicsExtrapolationTime = _physicsExtrapolationTime;
@@ -441,7 +452,7 @@ namespace Leap.Unity {
       }
       #endif
     }
-    
+ 
     /// <summary>
     /// Initializes Leap Motion policy flags.
     /// </summary>
@@ -485,7 +496,7 @@ namespace Leap.Unity {
         _leapController.BeginProfilingForThread += LeapProfiling.BeginProfilingForThread;
       }
     }
-    
+ 
     /// <summary>
     /// Stops the connection for the existing instance of a Controller, clearing old
     /// policy flags and resetting the Controller to null.
@@ -513,7 +524,7 @@ namespace Leap.Unity {
         _numberOfReconnectionAttempts = 0;
         return true;
       } else if (_numberOfReconnectionAttempts < MAX_RECONNECTION_ATTEMPTS) {
-        _framesSinceServiceConnectionChecked ++;
+        _framesSinceServiceConnectionChecked++;
 
         if (_framesSinceServiceConnectionChecked > RECONNECTION_INTERVAL) {
           _framesSinceServiceConnectionChecked = 0;

@@ -1,4 +1,4 @@
-#include "Assets/Plugins/LeapMotion/Modules/GraphicRenderer/Resources/GraphicRenderer.cginc"
+#include "Assets/Plugins/LeapMotion/Legacy/GraphicRenderer/Resources/GraphicRenderer.cginc"
 
 #ifdef GRAPHIC_RENDERER_ENABLE_CUSTOM_CHANNELS
 #define GRAPHICS_HAVE_ID
@@ -44,7 +44,7 @@
 #ifdef GRAPHIC_MOVEMENT
 #ifdef GRAPHIC_RENDERER_CYLINDRICAL
 #define GRAPHIC_RENDERER_WARPING
-#include "Assets/Plugins/LeapMotion/Modules/GraphicRenderer/Resources/CylindricalSpace.cginc"
+#include "Assets/Plugins/LeapMotion/Legacy/GraphicRenderer/Resources/CylindricalSpace.cginc"
 
 float4 _GraphicRendererCurved_GraphicParameters[GRAPHIC_MAX];
 
@@ -65,7 +65,7 @@ void ApplyGraphicWarping(inout float4 vert, int graphicId) {
 #ifdef GRAPHIC_MOVEMENT
 #ifdef GRAPHIC_RENDERER_SPHERICAL
 #define GRAPHIC_RENDERER_WARPING
-#include "Assets/Plugins/LeapMotion/Modules/GraphicRenderer/Resources/SphericalSpace.cginc"
+#include "Assets/Plugins/LeapMotion/Legacy/GraphicRenderer/Resources/SphericalSpace.cginc"
 
 float4 _GraphicRendererCurved_GraphicParameters[GRAPHIC_MAX];
 

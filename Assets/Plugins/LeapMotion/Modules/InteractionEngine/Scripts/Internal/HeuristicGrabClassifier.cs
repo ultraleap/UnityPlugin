@@ -6,8 +6,7 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using InteractionEngineUtility;
-using Leap.Unity.RuntimeGizmos;
+using Leap.Interaction.Internal.InteractionEngineUtility;
 using System;
 using System.Collections.Generic;
 #if UNITY_EDITOR
