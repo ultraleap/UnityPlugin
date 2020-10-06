@@ -192,7 +192,9 @@ namespace Leap.Unity {
           hmdDevice.subsystem.TryRecenter();
         #if !UNITY_2020_1_OR_NEWER
         }else{
+          #pragma warning disable 0618
           InputTracking.Recenter();
+          #pragma warning restore 0618
         }
         #endif
       #else
@@ -221,7 +223,9 @@ namespace Leap.Unity {
           return hmdDevice.subsystem.GetTrackingOriginMode().HasFlag(TrackingOriginModeFlags.Floor);
         #if !UNITY_2020_1_OR_NEWER
         }else{
+          #pragma warning disable 0618
           return XRDevice.GetTrackingSpaceType() == TrackingSpaceType.RoomScale;
+          #pragma warning restore 0618
         }
         #endif
       #elif UNITY_2017_2_OR_NEWER
