@@ -186,11 +186,15 @@ namespace Leap.Unity {
         InputDevices.GetDevicesWithCharacteristics(InputDeviceCharacteristics.HeadMounted, devices);
         if (devices.Count == 0) return;
         var hmdDevice = devices[0];
+        #if !UNITY_2020_1_OR_NEWER
         if(hmdDevice.subsystem != null) {
+        #endif
           hmdDevice.subsystem.TryRecenter();
+        #if !UNITY_2020_1_OR_NEWER
         }else{
           InputTracking.Recenter();
         }
+        #endif
       #else
         InputTracking.Recenter();
       #endif
@@ -211,11 +215,15 @@ namespace Leap.Unity {
         InputDevices.GetDevicesWithCharacteristics(InputDeviceCharacteristics.HeadMounted, devices);
         if (devices.Count == 0) return false;
         var hmdDevice = devices[0];
+        #if !UNITY_2020_1_OR_NEWER
         if(hmdDevice.subsystem != null) {
+        #endif
           return hmdDevice.subsystem.GetTrackingOriginMode().HasFlag(TrackingOriginModeFlags.Floor);
+        #if !UNITY_2020_1_OR_NEWER
         }else{
           return XRDevice.GetTrackingSpaceType() == TrackingSpaceType.RoomScale;
         }
+        #endif
       #elif UNITY_2017_2_OR_NEWER
         return XRDevice.GetTrackingSpaceType() == TrackingSpaceType.RoomScale;
       #else
