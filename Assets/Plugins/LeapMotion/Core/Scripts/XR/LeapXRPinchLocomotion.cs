@@ -10,8 +10,12 @@ using UnityEngine;
 
 namespace Leap.Unity {
 
-  public class PinchMover : MonoBehaviour {
+  /// <summary>Ensure this script is on your player object and 
+  /// set to execute before the LeapXRServiceProvider</summary>
+  public class LeapXRPinchLocomotion : MonoBehaviour {
 
+    [Tooltip("Your Leap Hand Provider.  Ensure the Pinch Locomotion script " +
+      "is set to execute before this provider in the 'Script Execution Order'")]
     public LeapXRServiceProvider provider;
     [Range(0.00f, 50f)]
     public float pinchThreshold    = 25f;
