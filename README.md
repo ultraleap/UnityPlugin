@@ -6,6 +6,12 @@ The UnityModules repository is designed to be opened in 2019.2. Our release pack
 
 Since Unity Modules 4.5.0, our [releases page][releases] on this repository is the official source for distribution. This version of UnityModules fixes compilation warnings in Unity 2019 and includes some fixes for newer Unity features like the Scriptable Render Pipeline (in 2019.1 and beyond).
 
+### Notes on SpatialTracking import errors.
+
+* Unity 2019.4 users: If you get errors related to "SpatialTracking" upon importing the Core module, you will need to install [XR Legacy Input Helpers](http://docs.unity3d.com/Packages/com.unity.xr.legacyinputhelpers@2.1/manual/index.html).
+
+* Unity 2020.1 users: If you get errors related to "SpatialTracking" upon importing the Core module, you will need to install the [Oculus XR package](http://docs.unity3d.com/Packages/com.unity.xr.oculus@1.4/manual/index.html).
+
 ## License
 
 Use of Leap Motion's UnityModules is subject to the [Apache V2 License Agreement][apache].
