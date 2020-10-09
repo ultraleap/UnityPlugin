@@ -53,11 +53,14 @@ namespace Leap.Unity {
         // Moves subsidiary devices to be in alignment with the device at the 0 index
         if (Input.GetKeyUp(solveForRelativeTransformKey)) {
           if (devices[0].handPoints.Count > 3) {
+            KabschSolver solver = new KabschSolver();
+
             for (int i = 1; i < devices.Length; i++) {
-              KabschSolver solver = new KabschSolver();
+
+              List<Vector3> referenceValues = new List<Vector3>(devices[0].handPoints);
 
               Matrix4x4 deviceToOriginDeviceMatrix = 
-                solver.SolveKabsch(devices[i].handPoints, devices[0].handPoints, 200);
+                solver.SolveKabsch(devices[i].handPoints, referenceValues, 200);
 
               devices[i].deviceProvider.transform.Transform(deviceToOriginDeviceMatrix);
 
