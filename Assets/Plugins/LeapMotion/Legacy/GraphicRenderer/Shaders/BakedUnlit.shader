@@ -1,14 +1,10 @@
-﻿Shader "LeapMotion/GraphicRenderer/Unlit/Dynamic Transparent" {
+﻿Shader "LeapMotion/GraphicRenderer/Unlit/Baked" {
   Properties {
-    _Color   ("Color", Color) = (1,1,1,1)
+    _Color("Color", Color) = (1,1,1,1)
     _MainTex ("Texture", 2D) = "white" {}
   }
   SubShader {
-    Tags {"Queue"="Transparent" "RenderType"="Transparent" }
-
-    ZWrite Off
-    Blend SrcAlpha OneMinusSrcAlpha
-    Cull Back
+    Tags {"Queue"="Geometry" "RenderType"="Opaque" }
 
     Pass {
       CGPROGRAM
@@ -21,24 +17,26 @@
       #pragma shader_feature _ GRAPHIC_RENDERER_VERTEX_UV_1
       #pragma shader_feature _ GRAPHIC_RENDERER_VERTEX_UV_2
       #pragma shader_feature _ GRAPHIC_RENDERER_VERTEX_COLORS
+      #pragma shader_feature _ GRAPHIC_RENDERER_MOVEMENT_TRANSLATION GRAPHIC_RENDERER_MOVEMENT_FULL
       #pragma shader_feature _ GRAPHIC_RENDERER_TINTING
       #pragma shader_feature _ GRAPHIC_RENDERER_BLEND_SHAPES
       #pragma shader_feature _ GRAPHIC_RENDERER_ENABLE_CUSTOM_CHANNELS
-      #include "Assets/Plugins/LeapMotion/Modules/GraphicRenderer/Resources/DynamicRenderer.cginc"
+      #include "Assets/Plugins/LeapMotion/Legacy/GraphicRenderer/Resources/BakedRenderer.cginc"
       #include "UnityCG.cginc"
 
       sampler2D _MainTex;
+      sampler2D _MainTex2;
       
-      v2f_graphic_dynamic vert (appdata_graphic_dynamic v) {
+      v2f_graphic_baked vert (appdata_graphic_baked v) {
         BEGIN_V2F(v);
 
-        v2f_graphic_dynamic o;
-        APPLY_DYNAMIC_GRAPHICS(v, o);
+        v2f_graphic_baked o;
+        APPLY_BAKED_GRAPHICS(v,o);
 
         return o;
       }
       
-      fixed4 frag (v2f_graphic_dynamic i) : SV_Target {
+      fixed4 frag (v2f_graphic_baked i) : SV_Target {
         fixed4 color = fixed4(1,1,1,1);
 
 #ifdef GRAPHIC_RENDERER_VERTEX_NORMALS

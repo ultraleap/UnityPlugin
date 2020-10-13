@@ -17,7 +17,7 @@ Shader "Hidden/LeapMotion/GraphicRenderer/Examples/Bake 1" {
     #define GRAPHIC_RENDERER_ENABLE_CUSTOM_CHANNELS
 
     #pragma shader_feature _ GRAPHIC_RENDERER_CYLINDRICAL GRAPHIC_RENDERER_SPHERICAL
-    #include "Assets/Plugins/LeapMotion/Modules/GraphicRenderer/Resources/BakedRenderer.cginc"
+    #include "Assets/Plugins/LeapMotion/Legacy/GraphicRenderer/Resources/BakedRenderer.cginc"
     #include "UnityCG.cginc"
 
     struct Input {

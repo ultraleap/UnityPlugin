@@ -1,0 +1,62 @@
+name: UnityModules - Build Docs
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    name: Build Docs
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout UnityModules
+        uses: actions/checkout@v2
+        with:
+          lfs: true
+
+      - name: Debug Print Current Directory
+        run: |
+          ls
+        working-directory: .
+
+      - name: Checkout Doxygen 1.8.11
+        run: |
+          git clone https://github.com/nickjbenson/doxygen-clone-1-8-11 --branch doxygen-1.8.11 doxygen
+        working-directory: .
+
+      - name: Build Doxygen 1.8.11
+        run: |
+          cmake .
+          make
+        working-directory: ./doxygen
+
+      - name: Install graphviz
+        run: |
+          sudo apt-get install graphviz
+
+      - name: Run Doxygen 1.8.11 in docs folder
+        run: |
+          ../doxygen/bin/doxygen
+        working-directory: ./docs
+
+      - name: (Debug) Print html build artifacts
+        run: |
+          ls -R
+        working-directory: ./docs/html
+
+      - name: (Debug) Upload html build artifacts
+        uses: actions/upload-artifact@v2
+        if: ${{ always() }} # Even if the build exits with a failure code
+        with:
+          name: Documentation Build Artifacts
+          path: ./docs/html
+
+      # Push the contents of the html directory to the gh-pages branch 
+      - name: Deploy 🚀
+        uses: JamesIves/github-pages-deploy-action@3.6.1
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This is set by github, do not change.
+          BRANCH: gh-pages # The branch the action should deploy to.
+          FOLDER: docs/html # The folder the action should deploy.
+          CLEAN: true # Automatically remove deleted files from the deploy branch

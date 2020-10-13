@@ -15,8 +15,8 @@ MonoBehaviour:
   _definitionName: Graphic Renderer
   _showInBuildMenu: 1
   _dependantFolders:
-  - Assets\Plugins\LeapMotion\Modules\GraphicRenderer
-  - Assets\Plugins\LeapMotion\Modules\GraphicRenderer\Testing
+  - Assets\Plugins\LeapMotion\Legacy\GraphicRenderer
+  - Assets\Plugins\LeapMotion\Legacy\GraphicRenderer\Testing
   _ignoredFolders:
   - Assets\Plugins\LeapMotion\Modules\GraphicRenderer\Testing
   - Assets\LeapMotion\Modules\GraphicRenderer\Testing
