@@ -299,7 +299,12 @@ namespace LeapInternal {
               StructMarshal<LEAP_HEAD_POSE_EVENT>.PtrToStruct(_msg.eventStructPtr, out head_pose_event);
               handleHeadPoseChange(ref head_pose_event);
               break;
-          } //switch on _msg.type
+            case eLeapEventType.eLeapEventType_DeviceStatusChange:
+              LEAP_DEVICE_STATUS_CHANGE_EVENT status_evt;
+              StructMarshal<LEAP_DEVICE_STATUS_CHANGE_EVENT>.PtrToStruct(_msg.eventStructPtr, out status_evt);
+              handleDeviceStatusEvent(ref status_evt);
+              break;
+        } //switch on _msg.type
 
           if (LeapEndProfilingBlock != null && hasBegunProfilingForThread) {
             LeapEndProfilingBlock(new EndProfilingBlockArgs(HANDLE_EVENT_PROFILER_BLOCK));
@@ -429,6 +434,14 @@ namespace LeapInternal {
         LeapConnectionLost.DispatchOnContext(this, EventContext, new ConnectionLostEventArgs());
       }
     }
+    private void handleDeviceStatusEvent(ref LEAP_DEVICE_STATUS_CHANGE_EVENT statusEvent)
+    {
+        var device = _devices.FindDeviceByHandle(statusEvent.device.handle);
+        if (device == null)
+            return;
+        device.UpdateStatus(statusEvent.status);
+    }
+
 
     private void handleDevice(ref LEAP_DEVICE_EVENT deviceMsg) {
       IntPtr deviceHandle = deviceMsg.device.handle;
@@ -460,7 +473,7 @@ namespace LeapInternal {
                                deviceInfo.range / 1000.0f, //to mm
                                deviceInfo.baseline / 1000.0f, //to mm
                                (Device.DeviceType)deviceInfo.type,
-                               (deviceInfo.status == (uint)eLeapDeviceStatus.eLeapDeviceStatus_Streaming),
+                               deviceInfo.status,
                                Marshal.PtrToStringAnsi(deviceInfo.serial));
         Marshal.FreeCoTaskMem(deviceInfo.serial);
         _devices.AddOrUpdate(apiDevice);
