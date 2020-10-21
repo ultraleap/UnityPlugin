@@ -8,7 +8,8 @@
 
 namespace Leap {
   using System;
-  using LeapInternal;
+    using System.Data;
+    using LeapInternal;
 
   /// <summary>
   /// The Device class represents a physically connected device.
@@ -45,7 +46,7 @@ namespace Leap {
                    float range,
                    float baseline,
                    DeviceType type,
-                   bool isStreaming,
+                   uint status,
                    string serialNumber) {
       Handle = deviceHandle;
       InternalHandle = internalHandle;
@@ -54,8 +55,8 @@ namespace Leap {
       Range = range;
       Baseline = baseline;
       Type = type;
-      //IsStreaming = isStreaming;
       SerialNumber = serialNumber;
+      UpdateStatus((eLeapDeviceStatus)status);
     }
 
     /// <summary>
@@ -66,26 +67,49 @@ namespace Leap {
         float verticalViewAngle,
         float range,
         float baseline,
-        bool isStreaming,
+        uint status,
         string serialNumber) {
       HorizontalViewAngle = horizontalViewAngle;
       VerticalViewAngle = verticalViewAngle;
       Range = range;
       Baseline = baseline;
-      //IsStreaming = isStreaming;
       SerialNumber = serialNumber;
+      UpdateStatus((eLeapDeviceStatus)status);
     }
 
-    /// <summary>
-    /// For internal use only.
-    /// </summary>
+        /// <summary>
+        /// For internal use only.
+        /// </summary>
     public void Update(Device updatedDevice) {
       HorizontalViewAngle = updatedDevice.HorizontalViewAngle;
       VerticalViewAngle = updatedDevice.VerticalViewAngle;
       Range = updatedDevice.Range;
       Baseline = updatedDevice.Baseline;
-      //IsStreaming = updatedDevice.IsStreaming;
+      IsStreaming = updatedDevice.IsStreaming;
       SerialNumber = updatedDevice.SerialNumber;
+    }
+
+    /// <summary>
+    /// Updates the status fields by parsing the uint given by the event
+    /// </summary>
+    internal void UpdateStatus(eLeapDeviceStatus status)
+    {
+        if ((status & eLeapDeviceStatus.eLeapDeviceStatus_Streaming) == eLeapDeviceStatus.eLeapDeviceStatus_Streaming)
+            IsStreaming = true;
+        else
+            IsStreaming = false;
+        if ((status & eLeapDeviceStatus.eLeapDeviceStatus_Smudged) == eLeapDeviceStatus.eLeapDeviceStatus_Smudged)
+            IsSmudged = true;
+        else
+            IsSmudged = false;
+        if ((status & eLeapDeviceStatus.eLeapDeviceStatus_Robust) == eLeapDeviceStatus.eLeapDeviceStatus_Robust)
+            IsLightingBad = true;
+        else
+            IsLightingBad = false;
+        if ((status & eLeapDeviceStatus.eLeapDeviceStatus_LowResource) == eLeapDeviceStatus.eLeapDeviceStatus_LowResource)
+            IsLowResource = true;
+        else
+            IsLowResource = false;
     }
 
     /// <summary>
@@ -96,17 +120,7 @@ namespace Leap {
     private IntPtr InternalHandle;
 
     public bool SetPaused(bool pause) {
-      ulong prior_state = 0;
-      ulong set_flags = 0;
-      ulong clear_flags = 0;
-      if (pause) {
-        set_flags = (ulong)eLeapDeviceFlag.eLeapDeviceFlag_Stream;
-      } else {
-        clear_flags = (ulong)eLeapDeviceFlag.eLeapDeviceFlag_Stream;
-      }
-
-      eLeapRS result = LeapC.SetDeviceFlags(Handle, set_flags, clear_flags, out prior_state);
-
+      eLeapRS result = LeapC.LeapSetPause(Handle, pause);
       return result == eLeapRS.eLeapRS_Success;
     }
 
@@ -180,13 +194,7 @@ namespace Leap {
     /// Currently only one controller can provide data at a time.
     /// @since 1.2
     /// </summary>
-    public bool IsStreaming
-    {
-        get
-        {
-            return ((GetDeviceStatus() & (uint)eLeapDeviceStatus.eLeapDeviceStatus_Streaming) == (uint)eLeapDeviceStatus.eLeapDeviceStatus_Streaming);
-        }
-    }
+    public bool IsStreaming { get; internal set; }
 
     /// <summary>
     /// The device type.
@@ -221,7 +229,6 @@ namespace Leap {
         LEAP_DEVICE_INFO deviceInfo = new LEAP_DEVICE_INFO();
         deviceInfo.serial = IntPtr.Zero;
         deviceInfo.size = (uint)System.Runtime.InteropServices.Marshal.SizeOf(deviceInfo);
-        deviceInfo.status = (uint)System.Runtime.InteropServices.Marshal.SizeOf(deviceInfo);
         result = LeapC.GetDeviceInfo(InternalHandle, ref deviceInfo);
 
         if (result != eLeapRS.eLeapRS_Success)
@@ -237,37 +244,25 @@ namespace Leap {
     /// over the Leap Motion cameras.
     /// @since 3.0
     /// </summary>
-    public bool IsSmudged {
-      get {
-            return ((GetDeviceStatus() & (uint)eLeapDeviceStatus.eLeapDeviceStatus_Smudged) == (uint)eLeapDeviceStatus.eLeapDeviceStatus_Smudged);
-      }
-    }
+    public bool IsSmudged { get; internal set; }
 
-    /// <summary>
-    /// The software has entered low-resource mode
-    /// @since 3.0
-    /// </summary>
-    public bool IsLowResource {
-      get {
-            return ((GetDeviceStatus() & (uint)eLeapDeviceStatus.eLeapDeviceStatus_LowResource) == (uint)eLeapDeviceStatus.eLeapDeviceStatus_LowResource);
-      }
-    }
+        /// <summary>
+        /// The software has entered low-resource mode
+        /// @since 3.0
+        /// </summary>
+    public bool IsLowResource { get; internal set; }
 
-    /// <summary>
-    /// The software has detected excessive IR illumination, which may interfere 
-    /// with tracking. If robust mode is enabled, the system will enter robust mode when 
-    /// isLightingBad() is true. 
-    /// @since 3.0 
-    /// </summary>
-    public bool IsLightingBad {
-      get {
-            return ((GetDeviceStatus() & (uint)eLeapDeviceStatus.eLeapDeviceStatus_Robust) == (uint)eLeapDeviceStatus.eLeapDeviceStatus_Robust);
-        }
-    }
+        /// <summary>
+        /// The software has detected excessive IR illumination, which may interfere 
+        /// with tracking. If robust mode is enabled, the system will enter robust mode when 
+        /// isLightingBad() is true. 
+        /// @since 3.0 
+        /// </summary>
+    public bool IsLightingBad { get; internal set; }
 
-    /// <summary>
-    /// The available types of Leap Motion controllers.
-    /// </summary>
+        /// <summary>
+        /// The available types of Leap Motion controllers.
+        /// </summary>
     public enum DeviceType {
       TYPE_INVALID = -1,
 
