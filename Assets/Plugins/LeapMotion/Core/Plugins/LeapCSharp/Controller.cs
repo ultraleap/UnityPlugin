@@ -349,7 +349,7 @@ namespace Leap {
       if (_disposed) {
         return;
       }
-
+      _connection.Dispose();
       _disposed = true;
     }
 

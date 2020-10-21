@@ -507,6 +507,7 @@ namespace Leap.Unity {
           _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
         }
         _leapController.StopConnection();
+        _leapController.Dispose();
         _leapController = null;
       }
     }
