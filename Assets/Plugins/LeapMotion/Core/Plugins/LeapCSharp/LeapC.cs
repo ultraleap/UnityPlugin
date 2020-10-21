@@ -503,7 +503,14 @@ namespace LeapInternal {
     public eLeapDeviceStatus status;
   }
 
-  [StructLayout(LayoutKind.Sequential, Pack = 1)]
+ [StructLayout(LayoutKind.Sequential, Pack = 1)]
+ public struct LEAP_DEVICE_STATUS_CHANGE_EVENT {
+    public LEAP_DEVICE_REF device;
+    public eLeapDeviceStatus last_status;
+    public eLeapDeviceStatus status;
+ }
+
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
   public struct LEAP_DEVICE_FAILURE_EVENT {
     public eLeapDeviceStatus status;
     public IntPtr hDevice;
@@ -562,7 +569,7 @@ namespace LeapInternal {
   [StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Ansi)]
   public struct LEAP_DEVICE_INFO {
     public UInt32 size;
-    public eLeapDeviceStatus status;
+    public UInt32 status;
     public eLeapDeviceCaps caps;
     public eLeapDeviceType type;
     public UInt32 baseline;
@@ -832,8 +839,8 @@ namespace LeapInternal {
     [DllImport("LeapC", EntryPoint = "LeapSetPolicyFlags")]
     public static extern eLeapRS SetPolicyFlags(IntPtr hConnection, UInt64 set, UInt64 clear);
 
-    [DllImport("LeapC", EntryPoint = "LeapSetDeviceFlags")]
-    public static extern eLeapRS SetDeviceFlags(IntPtr hDevice, UInt64 set, UInt64 clear, out UInt64 prior);
+    [DllImport("LeapC", EntryPoint = "LeapSetPause")]
+    public static extern eLeapRS LeapSetPause(IntPtr hConnection, bool pause);
 
     [DllImport("LeapC", EntryPoint = "LeapPollConnection")]
     public static extern eLeapRS PollConnection(IntPtr hConnection, UInt32 timeout, ref LEAP_CONNECTION_MESSAGE msg);

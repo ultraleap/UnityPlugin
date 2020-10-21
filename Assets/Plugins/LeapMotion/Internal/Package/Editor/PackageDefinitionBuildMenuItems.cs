@@ -18,12 +18,6 @@ namespace Leap.Unity.Packaging {
       PackageDefinition.BuildPackage("828092ac76618d349a96555173177a8f");
     }
 
-    // Graphic Renderer
-    [MenuItem("Build/Graphic Renderer", priority = 50)]
-    public static void Build_467ca7c53d8bceb4191d08a77cb1848b() {
-      PackageDefinition.BuildPackage("467ca7c53d8bceb4191d08a77cb1848b");
-    }
-
     // Hands
     [MenuItem("Build/Hands", priority = 50)]
     public static void Build_0270504144afc6248ba5d4114c5feddf() {

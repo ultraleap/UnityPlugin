@@ -22,7 +22,7 @@
       #pragma shader_feature _ GRAPHIC_RENDERER_VERTEX_COLORS
       #pragma shader_feature _ GRAPHIC_RENDERER_TINTING
       #pragma shader_feature _ GRAPHIC_RENDERER_BLEND_SHAPES
-      #include "Assets/Plugins/LeapMotion/Modules/GraphicRenderer/Resources/DynamicRenderer.cginc"
+      #include "Assets/Plugins/LeapMotion/Legacy/GraphicRenderer/Resources/DynamicRenderer.cginc"
       #include "UnityCG.cginc"
 
       sampler2D _MainTex;
