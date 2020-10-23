@@ -18,7 +18,7 @@ namespace Leap.Unity {
     private const int N_FINGERS = 5;
     private const int N_ACTIVE_BONES = 3;
 
-    private ArticulationBody   _palmBody; 
+    private ArticulationBody   _palmBody;
     private ArticulationBody[] _articulationBodies;
     private BoxCollider        _palmCollider;
     private CapsuleCollider [] _capsuleColliders;
