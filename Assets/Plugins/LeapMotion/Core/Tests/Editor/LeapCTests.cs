@@ -1,11 +1,12 @@
 /******************************************************************************
  * Copyright (C) Ultraleap, Inc. 2011-2020.                                   *
- * Ultraleap proprietary and confidential.                                    *
  *                                                                            *
- * Use subject to the terms of the Leap Motion SDK Agreement available at     *
- * https://developer.leapmotion.com/sdk_agreement, or another agreement       *
+ * Use subject to the terms of the Apache License 2.0 available at            *
+ * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
+
+#if !UNITY_EDITOR_LINUX
 
 using System;
 using System.Threading;
@@ -455,7 +456,7 @@ namespace Leap.LeapCSharp.Tests {
         UInt64 setFlags = 0;
         UInt64 clearFlags = 0;
         UInt64 priorFlags = 0;
-        result = LeapC.SetDeviceFlags(device, setFlags, clearFlags, out priorFlags);
+        //result = LeapC.SetDeviceFlags(device, setFlags, clearFlags, out priorFlags);
         Assert.AreEqual(eLeapRS.eLeapRS_Success, result, "SetDeviceFlags Call successful");
       }
     }
@@ -1006,3 +1007,5 @@ namespace Leap.LeapCSharp.Tests {
 
   }
 }
+
+#endif

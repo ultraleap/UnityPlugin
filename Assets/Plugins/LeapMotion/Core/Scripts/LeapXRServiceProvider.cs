@@ -1,9 +1,8 @@
 /******************************************************************************
  * Copyright (C) Ultraleap, Inc. 2011-2020.                                   *
- * Ultraleap proprietary and confidential.                                    *
  *                                                                            *
- * Use subject to the terms of the Leap Motion SDK Agreement available at     *
- * https://developer.leapmotion.com/sdk_agreement, or another agreement       *
+ * Use subject to the terms of the Apache License 2.0 available at            *
+ * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
@@ -237,7 +236,7 @@ namespace Leap.Unity {
         preCullCamera = GetComponent<Camera>();
       }
 
-      #if UNITY_2020_1_OR_NEWER
+      #if UNITY_2019_4_OR_NEWER
       if (GetComponent<UnityEngine.SpatialTracking.TrackedPoseDriver>() == null) {
         gameObject.AddComponent<UnityEngine.SpatialTracking.TrackedPoseDriver>().UseRelativeTransform = true;
       }

@@ -1,9 +1,8 @@
 /******************************************************************************
  * Copyright (C) Ultraleap, Inc. 2011-2020.                                   *
- * Ultraleap proprietary and confidential.                                    *
  *                                                                            *
- * Use subject to the terms of the Leap Motion SDK Agreement available at     *
- * https://developer.leapmotion.com/sdk_agreement, or another agreement       *
+ * Use subject to the terms of the Apache License 2.0 available at            *
+ * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
@@ -17,12 +16,6 @@ namespace Leap.Unity.Packaging {
     [MenuItem("Build/Core", priority = 50)]
     public static void Build_828092ac76618d349a96555173177a8f() {
       PackageDefinition.BuildPackage("828092ac76618d349a96555173177a8f");
-    }
-
-    // Graphic Renderer
-    [MenuItem("Build/Graphic Renderer", priority = 50)]
-    public static void Build_467ca7c53d8bceb4191d08a77cb1848b() {
-      PackageDefinition.BuildPackage("467ca7c53d8bceb4191d08a77cb1848b");
     }
 
     // Hands

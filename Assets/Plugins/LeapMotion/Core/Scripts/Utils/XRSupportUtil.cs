@@ -1,9 +1,8 @@
 /******************************************************************************
  * Copyright (C) Ultraleap, Inc. 2011-2020.                                   *
- * Ultraleap proprietary and confidential.                                    *
  *                                                                            *
- * Use subject to the terms of the Leap Motion SDK Agreement available at     *
- * https://developer.leapmotion.com/sdk_agreement, or another agreement       *
+ * Use subject to the terms of the Apache License 2.0 available at            *
+ * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
@@ -41,7 +40,7 @@ namespace Leap.Unity {
       #if UNITY_2020_1_OR_NEWER
       return XRSettings.isDeviceActive;
       #elif UNITY_2017_2_OR_NEWER
-            return XRDevice.isPresent;
+      return XRDevice.isPresent;
       #else
       return VRDevice.isPresent;
       #endif
@@ -187,7 +186,17 @@ namespace Leap.Unity {
         InputDevices.GetDevicesWithCharacteristics(InputDeviceCharacteristics.HeadMounted, devices);
         if (devices.Count == 0) return;
         var hmdDevice = devices[0];
-        hmdDevice.subsystem.TryRecenter();
+        #if !UNITY_2020_1_OR_NEWER
+        if(hmdDevice.subsystem != null) {
+        #endif
+          hmdDevice.subsystem.TryRecenter();
+        #if !UNITY_2020_1_OR_NEWER
+        }else{
+          #pragma warning disable 0618
+          InputTracking.Recenter();
+          #pragma warning restore 0618
+        }
+        #endif
       #else
         InputTracking.Recenter();
       #endif
@@ -208,11 +217,38 @@ namespace Leap.Unity {
         InputDevices.GetDevicesWithCharacteristics(InputDeviceCharacteristics.HeadMounted, devices);
         if (devices.Count == 0) return false;
         var hmdDevice = devices[0];
-        return hmdDevice.subsystem.GetTrackingOriginMode().HasFlag(TrackingOriginModeFlags.Floor);
+        #if !UNITY_2020_1_OR_NEWER
+        if(hmdDevice.subsystem != null) {
+        #endif
+          return hmdDevice.subsystem.GetTrackingOriginMode().HasFlag(TrackingOriginModeFlags.Floor);
+        #if !UNITY_2020_1_OR_NEWER
+        }else{
+          #pragma warning disable 0618
+          return XRDevice.GetTrackingSpaceType() == TrackingSpaceType.RoomScale;
+          #pragma warning restore 0618
+        }
+        #endif
       #elif UNITY_2017_2_OR_NEWER
         return XRDevice.GetTrackingSpaceType() == TrackingSpaceType.RoomScale;
       #else
         return VRDevice.GetTrackingSpaceType() == TrackingSpaceType.RoomScale;
+      #endif
+    }
+
+    static List<Vector3> _boundaryPoints = new List<Vector3>();
+    /// <summary> Returns whether the playspace is larger than 1m on its shortest side. </summary>
+    public static bool IsLargePlayspace() {
+      #if UNITY_2020_1_OR_NEWER // Oculus reports a floor centered space now...
+        var devices = new List<InputDevice>();
+        InputDevices.GetDevicesWithCharacteristics(InputDeviceCharacteristics.HeadMounted, devices);
+        if (devices.Count == 0) return false;
+        var hmdDevice = devices[0];
+        hmdDevice.subsystem.TryGetBoundaryPoints(_boundaryPoints);
+        Bounds playspaceSize = new Bounds();
+        foreach(Vector3 boundaryPoint in _boundaryPoints) { playspaceSize.Encapsulate(boundaryPoint); }
+        return playspaceSize.size.magnitude > 1f; // Playspace is greater than 1m on its shortest axis
+      #else
+        return IsRoomScale();
       #endif
     }
 

@@ -1,9 +1,8 @@
 /******************************************************************************
  * Copyright (C) Ultraleap, Inc. 2011-2020.                                   *
- * Ultraleap proprietary and confidential.                                    *
  *                                                                            *
- * Use subject to the terms of the Leap Motion SDK Agreement available at     *
- * https://developer.leapmotion.com/sdk_agreement, or another agreement       *
+ * Use subject to the terms of the Apache License 2.0 available at            *
+ * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
@@ -300,7 +299,12 @@ namespace LeapInternal {
               StructMarshal<LEAP_HEAD_POSE_EVENT>.PtrToStruct(_msg.eventStructPtr, out head_pose_event);
               handleHeadPoseChange(ref head_pose_event);
               break;
-          } //switch on _msg.type
+            case eLeapEventType.eLeapEventType_DeviceStatusChange:
+              LEAP_DEVICE_STATUS_CHANGE_EVENT status_evt;
+              StructMarshal<LEAP_DEVICE_STATUS_CHANGE_EVENT>.PtrToStruct(_msg.eventStructPtr, out status_evt);
+              handleDeviceStatusEvent(ref status_evt);
+              break;
+        } //switch on _msg.type
 
           if (LeapEndProfilingBlock != null && hasBegunProfilingForThread) {
             LeapEndProfilingBlock(new EndProfilingBlockArgs(HANDLE_EVENT_PROFILER_BLOCK));
@@ -430,6 +434,14 @@ namespace LeapInternal {
         LeapConnectionLost.DispatchOnContext(this, EventContext, new ConnectionLostEventArgs());
       }
     }
+    private void handleDeviceStatusEvent(ref LEAP_DEVICE_STATUS_CHANGE_EVENT statusEvent)
+    {
+        var device = _devices.FindDeviceByHandle(statusEvent.device.handle);
+        if (device == null)
+            return;
+        device.UpdateStatus(statusEvent.status);
+    }
+
 
     private void handleDevice(ref LEAP_DEVICE_EVENT deviceMsg) {
       IntPtr deviceHandle = deviceMsg.device.handle;
@@ -455,12 +467,13 @@ namespace LeapInternal {
 
       if (result == eLeapRS.eLeapRS_Success) {
         Device apiDevice = new Device(deviceHandle,
+                               device,
                                deviceInfo.h_fov, //radians
                                deviceInfo.v_fov, //radians
                                deviceInfo.range / 1000.0f, //to mm
                                deviceInfo.baseline / 1000.0f, //to mm
                                (Device.DeviceType)deviceInfo.type,
-                               (deviceInfo.status == eLeapDeviceStatus.eLeapDeviceStatus_Streaming),
+                               deviceInfo.status,
                                Marshal.PtrToStringAnsi(deviceInfo.serial));
         Marshal.FreeCoTaskMem(deviceInfo.serial);
         _devices.AddOrUpdate(apiDevice);

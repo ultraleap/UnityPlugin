@@ -2,15 +2,19 @@
 
 To download Leap Motion's latest stable modules as .unitypackages, visit [our Unity developer site][devsite]. Be sure to also check out our [documentation and API reference][um-docs]!
 
-**UnityModules packages from our developer website support Unity 5.6.2, 2017.1-4, and 2018.1.** Newer versions of Unity are usually perfectly safe to use. If you encounter errors or warnings with newer Unity versions, please report them as an Issue.
+The UnityModules repository is designed to be opened in 2019.2. Our release packages should support 5.6.2 and up, for stable Unity releases. If you hit an issue with version support, please submit a ticket with any details!
 
 Since Unity Modules 4.5.0, our [releases page][releases] on this repository is the official source for distribution. This version of UnityModules fixes compilation warnings in Unity 2019 and includes some fixes for newer Unity features like the Scriptable Render Pipeline (in 2019.1 and beyond).
 
-**The UnityModules *repository* expects Unity 2017.3 and up.** If you are sourcing UnityModules directly from this repository, your mileage may vary with earlier versions of Unity.
+### Notes on SpatialTracking import errors.
+
+* Unity 2019.4 users: If you get errors related to "SpatialTracking" upon importing the Core module, you will need to install [XR Legacy Input Helpers](http://docs.unity3d.com/Packages/com.unity.xr.legacyinputhelpers@2.1/manual/index.html).
+
+* Unity 2020.1 users: If you get errors related to "SpatialTracking" upon importing the Core module, you will need to install the [Oculus XR package](http://docs.unity3d.com/Packages/com.unity.xr.oculus@1.4/manual/index.html).
 
 ## License
 
-Use of Leap Motion's UnityModules is subject to the [Leap Motion developer SDK agreement][sdkagreement].
+Use of Leap Motion's UnityModules is subject to the [Apache V2 License Agreement][apache].
 
 ## This repository
 
@@ -21,5 +25,5 @@ This repository contains code for Leap Motion's Unity Modules, easy-to-use tools
 [um-docs]: https://leapmotion.github.io/UnityModules/
 [devsite]: https://developer.leapmotion.com/unity/ "Leap Motion Unity Developer site"
 [wiki]: https://github.com/leapmotion/UnityModules/wiki "Leap Motion Unity Modules Wiki"
-[sdkagreement]: https://developer.leapmotion.com/sdk_agreement "Leap Motion Developer SDK Agreement"
+[apache]: http://www.apache.org/licenses/LICENSE-2.0 "Apache V2 License"
 [releases]: https://github.com/leapmotion/UnityModules/releases

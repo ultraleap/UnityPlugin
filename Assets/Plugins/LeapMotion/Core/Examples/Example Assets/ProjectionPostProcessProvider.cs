@@ -1,9 +1,8 @@
 /******************************************************************************
  * Copyright (C) Ultraleap, Inc. 2011-2020.                                   *
- * Ultraleap proprietary and confidential.                                    *
  *                                                                            *
- * Use subject to the terms of the Leap Motion SDK Agreement available at     *
- * https://developer.leapmotion.com/sdk_agreement, or another agreement       *
+ * Use subject to the terms of the Apache License 2.0 available at            *
+ * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
@@ -16,15 +15,15 @@ namespace Leap.Unity.Examples {
     [Header("Projection")]
     public Transform headTransform;
 
-    [Tooltip("The exponent of the projection of any hand distance from the approximated "
+    [Tooltip("The scale of the projection of any hand distance from the approximated "
            + "shoulder beyond the handMergeDistance.")]
-    [Range(0f, 5f)]
-    public float projectionExponent = 3.50f;
+    [Range(0f, 15f)]
+    public float projectionScale = 10f;
 
     [Tooltip("The distance from the approximated shoulder beyond which any additional "
            + "distance is exponentiated by the projectionExponent.")]
     [Range(0f, 1f)]
-    public float handMergeDistance = 0.30f;
+    public float handMergeDistance = 0.35f;
 
     public override void ProcessFrame(ref Frame inputFrame) {
       // Calculate the position of the head and the basis to calculate shoulder position.
@@ -36,16 +35,16 @@ namespace Leap.Unity.Examples {
 
       foreach (var hand in inputFrame.Hands) {
         // Approximate shoulder position with magic values.
-        var shoulderPos = headPos
-                          + (shoulderBasis * (new Vector3(0f, -0.2f, -0.1f)
-                          + Vector3.left * 0.1f * (hand.IsLeft ? 1f : -1f)));
+        Vector3 shoulderPos = headPos
+                              + (shoulderBasis * (new Vector3(0f, -0.13f, -0.1f)
+                              + Vector3.left * 0.15f * (hand.IsLeft ? 1f : -1f)));
 
         // Calculate the projection of the hand if it extends beyond the
         // handMergeDistance.
-        var shoulderToHand = hand.PalmPosition.ToVector3() - shoulderPos;
-        var handShoulderDist = shoulderToHand.magnitude;
-        var projectionDistance = Mathf.Max(0f, handShoulderDist - handMergeDistance);
-        var projectionAmount = Mathf.Pow(1 + projectionDistance, projectionExponent);
+        Vector3 shoulderToHand     = hand.PalmPosition.ToVector3() - shoulderPos;
+        float   handShoulderDist   = shoulderToHand.magnitude;
+        float   projectionDistance = Mathf.Max(0f, handShoulderDist - handMergeDistance);
+        float   projectionAmount   = 1f + (projectionDistance * projectionScale);
         hand.SetTransform(shoulderPos + shoulderToHand * projectionAmount,
                           hand.Rotation.ToQuaternion());
       }

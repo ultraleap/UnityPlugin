@@ -38,13 +38,13 @@ PROJECT_NAME           = "Unity Modules"
 # could be handy for archiving the generated documentation or if some version
 # control system is used.
 
-PROJECT_NUMBER         = 4.4.0
+PROJECT_NUMBER         = 4.6.0
 
 # Using the PROJECT_BRIEF tag one can provide an optional one line description
 # for a project that appears at the top of each page and should give viewer a
 # quick idea about the purpose of the project. Keep the description short.
 
-PROJECT_BRIEF          = "Leap Motion's Unity SDK"
+PROJECT_BRIEF          = "Ultraleap's Hand Tracking Unity SDK"
 
 # With the PROJECT_LOGO tag one can specify a logo or an icon that is included
 # in the documentation. The maximum height of the logo should not exceed 55
@@ -1237,7 +1237,7 @@ DOCSET_PUBLISHER_ID    = com.leapmotion
 # The default value is: Publisher.
 # This tag requires that the tag GENERATE_DOCSET is set to YES.
 
-DOCSET_PUBLISHER_NAME  = "Leap Motion"
+DOCSET_PUBLISHER_NAME  = "Ultraleap"
 
 # If the GENERATE_HTMLHELP tag is set to YES then doxygen generates three
 # additional HTML index files: index.hhp, index.hhc, and index.hhk. The
