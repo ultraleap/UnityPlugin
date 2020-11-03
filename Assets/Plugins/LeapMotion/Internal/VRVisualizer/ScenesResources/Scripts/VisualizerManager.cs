@@ -9,7 +9,6 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Leap;
-using LeapInternal;
 using System;
 
 namespace Leap.Unity.VRVisualizer{
@@ -62,7 +61,7 @@ namespace Leap.Unity.VRVisualizer{
         m_PCVisualizer.gameObject.SetActive(true);
         m_VRVisualizer.gameObject.SetActive(false);
         m_warningText.text = "ScreenTop tracking mode activated";
-        m_controller.SetTrackingMode(eLeapTrackingMode.eLeapTrackingMode_ScreenTop);
+        m_controller.SetPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP);
     }
 
     void Start()
@@ -107,32 +106,38 @@ namespace Leap.Unity.VRVisualizer{
         return;
       }
 
-      switch (m_controller.GetTrackingMode())
+      if (m_controller.IsPolicySet(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP))
       {
-        case eLeapTrackingMode.eLeapTrackingMode_Desktop:
-          m_trackingText.text = String.Format(
-            "Tracking Mode: Desktop (Press '{0}' to switch to head-mounted mode)",
-            keyToSwitchViewMode);
-          if (Input.GetKeyDown(keyToSwitchViewMode))
-            m_controller.SetTrackingMode(eLeapTrackingMode.eLeapTrackingMode_HMD);
-          break;
-        case eLeapTrackingMode.eLeapTrackingMode_HMD:
-          m_trackingText.text = String.Format(
-            "Tracking Mode: Head-Mounted (Press '{0}' to switch to screen-top mode)",
-            keyToSwitchViewMode);
-          if (Input.GetKeyDown(keyToSwitchViewMode))
-            m_controller.SetTrackingMode(eLeapTrackingMode.eLeapTrackingMode_ScreenTop);
-          break;
-        case eLeapTrackingMode.eLeapTrackingMode_ScreenTop:
-          m_trackingText.text = String.Format(
-            "Tracking Mode: Screen-Top (Press '{0}' to switch to desktop mode)",
-            keyToSwitchViewMode);
-          if (Input.GetKeyDown(keyToSwitchViewMode))
-            m_controller.SetTrackingMode(eLeapTrackingMode.eLeapTrackingMode_Desktop);
-          break;
-        default:
-          m_trackingText.text = "The Tracking Mode is not recognized!";
-          break;
+        m_trackingText.text = String.Format(
+          "Tracking Mode: Screen-Top (Press '{0}' to switch to desktop mode)",
+          keyToSwitchViewMode);
+        if (Input.GetKeyDown(keyToSwitchViewMode))
+        {
+          m_controller.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP);
+          m_controller.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
+        }
+      }
+      else if (m_controller.IsPolicySet(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD))
+      {
+        m_trackingText.text = String.Format(
+          "Tracking Mode: Head-Mounted (Press '{0}' to switch to screen-top mode)",
+          keyToSwitchViewMode);
+        if (Input.GetKeyDown(keyToSwitchViewMode))
+        {
+          m_controller.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
+          m_controller.SetPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP);
+        }
+      }
+      else
+      {
+        m_trackingText.text = String.Format(
+          "Tracking Mode: Desktop (Press '{0}' to switch to head-mounted mode)",
+          keyToSwitchViewMode);
+        if (Input.GetKeyDown(keyToSwitchViewMode))
+        {
+          m_controller.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP);
+          m_controller.SetPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
+        }
       }
 
         //update render frame display

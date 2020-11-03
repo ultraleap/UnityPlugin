@@ -6,7 +6,6 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using LeapInternal;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -505,7 +504,8 @@ namespace Leap.Unity {
     protected void destroyController() {
       if (_leapController != null) {
         if (_leapController.IsConnected) {
-          _leapController.SetTrackingMode(eLeapTrackingMode.eLeapTrackingMode_Desktop);
+          _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP);
+          _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
         }
         _leapController.StopConnection();
         _leapController.Dispose();

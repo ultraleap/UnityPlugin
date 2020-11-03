@@ -593,14 +593,6 @@ namespace Leap {
       return LeapC.GetNow();
     }
 
-    public UInt64 SetTrackingMode(eLeapTrackingMode mode) {
-      return _connection.SetTrackingMode(mode);
-    }
-
-    public eLeapTrackingMode GetTrackingMode() {
-      return _connection.GetTrackingMode();
-    }
-
     /// <summary>
     /// Reports whether this Controller is connected to the Leap Motion service and
     /// the Leap Motion hardware is plugged in.
