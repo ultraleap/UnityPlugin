@@ -70,6 +70,29 @@ namespace LeapInternal {
     eLeapServiceState_PoorPerformancePause = 0x00000002,
   };
 
+  /// <summary>
+  ///Enumerates values for the tracking mode.
+  /// </summary>
+  public enum eLeapTrackingMode : uint {
+    /// <summary>
+    /// The tracking mode optimised for desktop devices
+    /// @since 5.0.0
+    /// </summary>
+    eLeapTrackingMode_Desktop = 0,
+
+    /// <summary>
+    /// The tracking mode optimised for head-mounted devices
+    /// @since 5.0.0 */
+    /// </summary>
+    eLeapTrackingMode_HMD = 1,
+
+    /// <summary>
+    /// The tracking mode optimised for screen top-mounted devices
+    /// @since 5.0.0 */
+    /// </summary>
+    eLeapTrackingMode_ScreenTop = 2
+  };
+
   public enum eDistortionMatrixType {
     /// <summary>
     /// A 64x64 matrix of pairs of points.
@@ -97,7 +120,12 @@ namespace LeapInternal {
     /// <summary>
     /// Allows streaming map points.
     /// </summary>
-    eLeapPolicyFlag_MapPoints = 0x00000080
+    eLeapPolicyFlag_MapPoints = 0x00000080,
+    /// <summary>
+    /// The policy specifying whether to optimize tracking for screen-top device.
+    /// @since 5.0.0
+    /// </summary>
+    eLeapPolicyFlag_ScreenTop = 0x00000100,
   };
 
   public enum eLeapDeviceStatus : uint {
@@ -427,6 +455,13 @@ namespace LeapInternal {
     /// </summary>
     eLeapEventType_PointMappingChange,
     /// <summary>
+    /// A tracking mode change has occurred.
+    /// This can be due to changing the hmd or screentop policy with LeapSetPolicyFlags().
+    /// or setting the tracking mode using LeapSetTrackingMode().
+    /// @since 5.0.0
+    /// </summary>
+    eLeapEventType_TrackingMode,
+    /// <summary>
     /// An array of system messages.
     /// </summary>
     eLeapEventType_LogEvents,
@@ -564,6 +599,17 @@ namespace LeapInternal {
   [StructLayout(LayoutKind.Sequential, Pack = 1)]
   public struct LEAP_DISCONNECTION_EVENT {
     public UInt32 reserved;
+  }
+
+  [StructLayout(LayoutKind.Sequential, Pack = 1)]
+  public struct LEAP_TRACKING_MODE_EVENT {
+    public UInt32 reserved;
+    /// <summary>
+    /// An enum specifying the tracking mode effective at the
+    /// time the tracking mode event was processed.
+    /// @since 5.0.0
+    /// </summary>
+    public eLeapTrackingMode current_tracking_mode;
   }
 
   [StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Ansi)]
@@ -963,5 +1009,8 @@ namespace LeapInternal {
 
     [DllImport("LeapC", EntryPoint = "LeapTelemetryGetNow")]
     public static extern UInt64 TelemetryGetNow();
+
+    [DllImport("LeapC", EntryPoint = "LeapSetTrackingMode")]
+    public static extern UInt64 SetTrackingMode(IntPtr hConnection, eLeapTrackingMode mode);
   }
 }
