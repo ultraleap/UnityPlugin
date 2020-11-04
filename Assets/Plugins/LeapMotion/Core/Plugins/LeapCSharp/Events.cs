@@ -33,7 +33,6 @@ namespace Leap {
     EVENT_DROPPED_FRAME,
     EVENT_IMAGE,             //!< An unrequested image is available
     EVENT_POINT_MAPPING_CHANGE,
-    EVENT_TRACKING_MODE_CHANGE,
     EVENT_HEAD_POSE
   };
   /// <summary>
@@ -254,14 +253,6 @@ namespace Leap {
 
     public LEAP_VECTOR headPosition { get; set; }
     public LEAP_QUATERNION headOrientation { get; set; }
-  }
-
-  public class TrackingModeEventArgs : LeapEventArgs {
-    public TrackingModeEventArgs(eLeapTrackingMode current_tracking_mode) : base(LeapEvent.EVENT_TRACKING_MODE_CHANGE) {
-      this.currentTrackingMode = current_tracking_mode;
-    }
-
-    public eLeapTrackingMode currentTrackingMode { get; set; }
   }
 
   public struct BeginProfilingForThreadArgs {

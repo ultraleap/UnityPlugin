@@ -13,7 +13,6 @@ namespace LeapInternal {
   using System.Threading;
 
   using Leap;
-  using LeapInternal;
 
   public class Connection {
     private static Dictionary<int, Connection> connectionDictionary = new Dictionary<int, Connection>();
@@ -57,7 +56,6 @@ namespace LeapInternal {
     //Policy and enabled features
     private UInt64 _requestedPolicies = 0;
     private UInt64 _activePolicies = 0;
-    private eLeapTrackingMode _activeTrackingMode = eLeapTrackingMode.eLeapTrackingMode_Desktop;
 
     //Config change status
     private Dictionary<uint, string> _configRequests = new Dictionary<uint, string>();
@@ -99,7 +97,6 @@ namespace LeapInternal {
     public EventHandler<ImageEventArgs> LeapImage;
     public EventHandler<PointMappingChangeEventArgs> LeapPointMappingChange;
     public EventHandler<HeadPoseEventArgs> LeapHeadPoseChange;
-    public EventHandler<TrackingModeEventArgs> LeapTrackingModeChange;
 
     public Action<BeginProfilingForThreadArgs> LeapBeginProfilingForThread;
     public Action<EndProfilingForThreadArgs> LeapEndProfilingForThread;
@@ -296,11 +293,6 @@ namespace LeapInternal {
               LEAP_POINT_MAPPING_CHANGE_EVENT point_mapping_change_evt;
               StructMarshal<LEAP_POINT_MAPPING_CHANGE_EVENT>.PtrToStruct(_msg.eventStructPtr, out point_mapping_change_evt);
               handlePointMappingChange(ref point_mapping_change_evt);
-              break;
-            case eLeapEventType.eLeapEventType_TrackingMode:
-              LEAP_TRACKING_MODE_EVENT tracking_mode_event;
-              StructMarshal<LEAP_TRACKING_MODE_EVENT>.PtrToStruct(_msg.eventStructPtr, out tracking_mode_event);
-              handleTrackingModeChange(ref tracking_mode_event);
               break;
             case eLeapEventType.eLeapEventType_HeadPose:
               LEAP_HEAD_POSE_EVENT head_pose_event;
@@ -660,14 +652,6 @@ namespace LeapInternal {
       }
     }
 
-    private void handleTrackingModeChange(ref LEAP_TRACKING_MODE_EVENT tracking_mode_event) {
-      if (LeapTrackingModeChange != null) {
-        LeapTrackingModeChange.DispatchOnContext(this, EventContext, new TrackingModeEventArgs(tracking_mode_event.current_tracking_mode));
-      }
-
-      _activeTrackingMode = tracking_mode_event.current_tracking_mode;
-    }
-
     private void handlePolicyChange(ref LEAP_POLICY_EVENT policyMsg) {
       if (LeapPolicyChange != null) {
         LeapPolicyChange.DispatchOnContext(this, EventContext, new PolicyEventArgs(policyMsg.current_policy, _activePolicies));
@@ -711,8 +695,6 @@ namespace LeapInternal {
           return eLeapPolicyFlag.eLeapPolicyFlag_AllowPauseResume;
         case Controller.PolicyFlag.POLICY_MAP_POINTS:
           return eLeapPolicyFlag.eLeapPolicyFlag_MapPoints;
-        case Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP:
-          return eLeapPolicyFlag.eLeapPolicyFlag_ScreenTop;
         case Controller.PolicyFlag.POLICY_DEFAULT:
           return 0;
         default:
@@ -904,14 +886,6 @@ namespace LeapInternal {
         }
       }
       _lastResult = result;
-    }
-
-    public UInt64 SetTrackingMode(eLeapTrackingMode mode) {
-      return LeapC.SetTrackingMode(_leapConnection, mode);
-    }
-
-    public eLeapTrackingMode GetTrackingMode() {
-      return _activeTrackingMode;
     }
   }
 }
