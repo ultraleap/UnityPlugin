@@ -593,14 +593,6 @@ namespace Leap {
       return LeapC.GetNow();
     }
 
-    public UInt64 SetTrackingMode(eLeapTrackingMode mode) {
-      return _connection.SetTrackingMode(mode);
-    }
-
-    public eLeapTrackingMode GetTrackingMode() {
-      return _connection.GetTrackingMode();
-    }
-
     /// <summary>
     /// Reports whether this Controller is connected to the Leap Motion service and
     /// the Leap Motion hardware is plugged in.
@@ -719,11 +711,6 @@ namespace Leap {
       /// Allow streaming map point
       /// </summary>
       POLICY_MAP_POINTS = (1 << 7),
-      /// <summary>
-      /// Optimize the tracking for screen-top device.
-      /// @since 5.0.0
-      /// </summary>
-      POLICY_OPTIMIZE_SCREENTOP = (1 << 8),
     }
 
     protected virtual void OnInit(object sender, LeapEventArgs eventArgs) {

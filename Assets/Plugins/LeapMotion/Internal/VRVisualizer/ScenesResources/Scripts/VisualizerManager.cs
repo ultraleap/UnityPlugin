@@ -9,8 +9,6 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Leap;
-using LeapInternal;
-using System;
 
 namespace Leap.Unity.VRVisualizer{
   public class VisualizerManager : MonoBehaviour {
@@ -21,7 +19,7 @@ namespace Leap.Unity.VRVisualizer{
     public UnityEngine.UI.Text m_frameRateText;
     public UnityEngine.UI.Text m_dataFrameRateText;
 
-    public KeyCode keyToSwitchViewMode = KeyCode.V;
+    public KeyCode keyToToggleHMD = KeyCode.V;
   
     private Controller m_controller = null;
     private bool m_leapConnected = false;
@@ -29,8 +27,6 @@ namespace Leap.Unity.VRVisualizer{
     private SmoothedFloat m_deltaTime;
     private int m_framrateUpdateCount = 0;
     private int m_framerateUpdateInterval = 30;
-
-    private const bool m_startInScreenTopViewMode = false;
 
     private void FindController() {
       LeapServiceProvider provider = FindObjectOfType<LeapServiceProvider>();
@@ -57,14 +53,6 @@ namespace Leap.Unity.VRVisualizer{
       m_warningText.text = "No head-mounted display detected. Orion performs best in a head-mounted display";      
     }
 
-    private void goScreenTop()
-    {
-        m_PCVisualizer.gameObject.SetActive(true);
-        m_VRVisualizer.gameObject.SetActive(false);
-        m_warningText.text = "ScreenTop tracking mode activated";
-        m_controller.SetTrackingMode(eLeapTrackingMode.eLeapTrackingMode_ScreenTop);
-    }
-
     void Start()
     {
       m_trackingText.text = "";
@@ -72,12 +60,7 @@ namespace Leap.Unity.VRVisualizer{
       if (m_controller != null)
         m_leapConnected = m_controller.IsConnected;
 
-      if (m_startInScreenTopViewMode)
-      {
-        Screen.SetResolution(Screen.currentResolution.width, Screen.currentResolution.height, false);
-        goScreenTop();
-      }
-      else if (XRSupportUtil.IsXRDevicePresent())
+      if (XRSupportUtil.IsXRDevicePresent())
       {
         Screen.SetResolution(640, 480, false);
         goVR();    
@@ -106,34 +89,28 @@ namespace Leap.Unity.VRVisualizer{
         m_trackingText.text = "";
         return;
       }
+  
+      m_trackingText.text = "Tracking Mode: ";
+      m_trackingText.text += (m_controller.IsPolicySet(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD)) ? "Head-Mounted" : "Desktop";
 
-      switch (m_controller.GetTrackingMode())
+
+      // In Desktop Mode
+      if (m_PCVisualizer.activeInHierarchy)
       {
-        case eLeapTrackingMode.eLeapTrackingMode_Desktop:
-          m_trackingText.text = String.Format(
-            "Tracking Mode: Desktop (Press '{0}' to switch to head-mounted mode)",
-            keyToSwitchViewMode);
-          if (Input.GetKeyDown(keyToSwitchViewMode))
-            m_controller.SetTrackingMode(eLeapTrackingMode.eLeapTrackingMode_HMD);
-          break;
-        case eLeapTrackingMode.eLeapTrackingMode_HMD:
-          m_trackingText.text = String.Format(
-            "Tracking Mode: Head-Mounted (Press '{0}' to switch to screen-top mode)",
-            keyToSwitchViewMode);
-          if (Input.GetKeyDown(keyToSwitchViewMode))
-            m_controller.SetTrackingMode(eLeapTrackingMode.eLeapTrackingMode_ScreenTop);
-          break;
-        case eLeapTrackingMode.eLeapTrackingMode_ScreenTop:
-          m_trackingText.text = String.Format(
-            "Tracking Mode: Screen-Top (Press '{0}' to switch to desktop mode)",
-            keyToSwitchViewMode);
-          if (Input.GetKeyDown(keyToSwitchViewMode))
-            m_controller.SetTrackingMode(eLeapTrackingMode.eLeapTrackingMode_Desktop);
-          break;
-        default:
-          m_trackingText.text = "The Tracking Mode is not recognized!";
-          break;
-      }
+        if (m_controller.IsPolicySet(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD))
+        {
+          m_trackingText.text += " (Press '" + keyToToggleHMD + "' to switch to desktop mode)";
+          if (Input.GetKeyDown(keyToToggleHMD))
+            m_controller.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
+        }
+        else
+        {
+          m_trackingText.text += " (Press '" + keyToToggleHMD + "' to switch to head-mounted mode)";
+          if (Input.GetKeyDown(keyToToggleHMD)) {
+              m_controller.SetPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
+          }
+        }
+      } 
 
         //update render frame display
       m_deltaTime.Update(Time.deltaTime, Time.deltaTime);

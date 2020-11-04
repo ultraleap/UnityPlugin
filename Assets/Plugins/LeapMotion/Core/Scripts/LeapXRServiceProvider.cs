@@ -9,7 +9,6 @@
 using UnityEngine;
 using System;
 using Leap.Unity.Attributes;
-using LeapInternal;
 
 #if UNITY_2019_1_OR_NEWER
 using UnityEngine.Rendering;
@@ -416,7 +415,7 @@ namespace Leap.Unity {
       }
 
       // Optimize for head-mounted tracking if on head-mounted display.
-      _leapController.SetTrackingMode(eLeapTrackingMode.eLeapTrackingMode_HMD);
+      _leapController.SetPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
     }
 
     protected override void transformFrame(Frame source, Frame dest) {
