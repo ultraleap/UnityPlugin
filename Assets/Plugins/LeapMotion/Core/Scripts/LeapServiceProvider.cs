@@ -99,6 +99,11 @@ namespace Leap.Unity {
     [SerializeField]
     protected bool _workerThreadProfiling = false;
 
+    [Tooltip("Which Leap Service API Endpoint to connect to.  This is configured on the service with the 'api_namespace' argument.")]
+    [SerializeField]
+    [EditTimeOnly]
+    protected string _serverNameSpace = "Leap Service";
+
     #endregion
 
     #region Internal Settings & Memory
@@ -473,7 +478,7 @@ namespace Leap.Unity {
         return;
       }
 
-      _leapController = new Controller();
+      _leapController = new Controller(0, _serverNameSpace);
       _leapController.Device += (s, e) => {
         if (_onDeviceSafe != null) {
           _onDeviceSafe(e.Device);
