@@ -89,6 +89,16 @@ namespace Leap.Unity {
     [SerializeField]
     protected float _physicsExtrapolationTime = 1.0f / 90.0f;
 
+    public enum TrackingOptimizationMode {
+      Desktop,
+      ScreenTop,
+      HMD
+    }
+    [Tooltip("Which tracking mode to request that the service optimize for; use the LeapXRServiceProvider for proper HMD Mode!")]
+    [SerializeField]
+    [EditTimeOnly]
+    protected TrackingOptimizationMode _trackingOptimization = TrackingOptimizationMode.Desktop;
+
 #if UNITY_2017_3_OR_NEWER
     [Tooltip("When checked, profiling data from the LeapCSharp worker thread will be used to populate the UnityProfiler.")]
     [EditTimeOnly]
@@ -466,7 +476,19 @@ namespace Leap.Unity {
         return;
       }
 
-      _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_DEFAULT);
+      if (_trackingOptimization == TrackingOptimizationMode.Desktop) {
+        _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_DEFAULT);
+        _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP);
+        _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
+      } else if (_trackingOptimization == TrackingOptimizationMode.ScreenTop) {
+        _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_DEFAULT);
+        _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
+        _leapController.SetPolicy  (Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP);
+      } else if (_trackingOptimization == TrackingOptimizationMode.HMD) {
+        _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_DEFAULT);
+        _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP);
+        _leapController.SetPolicy  (Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
+      }
     }
 
     /// <summary>
