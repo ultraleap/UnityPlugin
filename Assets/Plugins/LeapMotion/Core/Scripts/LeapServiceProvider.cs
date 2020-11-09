@@ -94,7 +94,8 @@ namespace Leap.Unity {
       ScreenTop,
       HMD
     }
-    [Tooltip("Which tracking mode to request that the service optimize for; use the LeapXRServiceProvider for proper HMD Mode!")]
+    [Tooltip("Which tracking mode to request that the service optimize for; " +
+             "use the LeapXRServiceProvider for properly integrated HMD Mode!")]
     [SerializeField]
     [EditTimeOnly]
     protected TrackingOptimizationMode _trackingOptimization = TrackingOptimizationMode.Desktop;
