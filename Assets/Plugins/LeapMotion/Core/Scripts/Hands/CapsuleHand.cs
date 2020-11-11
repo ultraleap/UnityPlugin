@@ -36,6 +36,7 @@ namespace Leap.Unity {
 
     [SerializeField]
     private Material _material;
+    private Material _backing_material;
 
     [SerializeField]
     private Mesh _sphereMesh;
@@ -92,11 +93,11 @@ namespace Leap.Unity {
     }
 
     public override void InitHand() {
-      if (_material != null || !_material.enableInstancing) {
-        _material = new Material(_material);
-        _material.hideFlags = HideFlags.DontSaveInEditor;
-        _material.enableInstancing = true;
-        _sphereMat = new Material(_material);
+      if (_material != null && (_backing_material == null || !_backing_material.enableInstancing)) {
+        _backing_material = new Material(_material);
+        _backing_material.hideFlags = HideFlags.DontSaveInEditor;
+        _backing_material.enableInstancing = true;
+        _sphereMat = new Material(_backing_material);
         _sphereMat.hideFlags = HideFlags.DontSaveInEditor;
       }
     }
@@ -125,11 +126,11 @@ namespace Leap.Unity {
         _spherePositions = new Vector3[TOTAL_JOINT_COUNT];
       }
 
-      if (_sphereMat == null || !_material.enableInstancing) {
-        _material = new Material(_material);
-        _material.hideFlags = HideFlags.DontSaveInEditor;
-        _material.enableInstancing = true;
-        _sphereMat = new Material(_material);
+      if (_material != null && (_backing_material == null || !_backing_material.enableInstancing)) {
+        _backing_material = new Material(_material);
+        _backing_material.hideFlags = HideFlags.DontSaveInEditor;
+        _backing_material.enableInstancing = true;
+        _sphereMat = new Material(_backing_material);
         _sphereMat.hideFlags = HideFlags.DontSaveInEditor;
       }
 
@@ -216,7 +217,7 @@ namespace Leap.Unity {
 
       // Draw Cylinders
       if(_cylinderMesh == null) { _cylinderMesh = getCylinderMesh(1f); }
-      Graphics.DrawMeshInstanced(_cylinderMesh, 0, _material, _cylinderMatrices, _curCylinderIndex, null,
+      Graphics.DrawMeshInstanced(_cylinderMesh, 0, _backing_material, _cylinderMatrices, _curCylinderIndex, null,
         _castShadows ? UnityEngine.Rendering.ShadowCastingMode.On : UnityEngine.Rendering.ShadowCastingMode.Off, true, gameObject.layer);
     }
 
