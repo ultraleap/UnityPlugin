@@ -22,7 +22,7 @@
     "versionDefines": [
         {
             "name": "com.unity.xr.legacyinputhelpers",
-            "expression": "2.0",
+            "expression": "1.0",
             "define": "XR_LEGACY_INPUT_AVAILABLE"
         }
     ],
