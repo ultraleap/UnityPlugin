@@ -97,12 +97,7 @@ namespace LeapInternal {
     /// <summary>
     /// Allows streaming map points.
     /// </summary>
-    eLeapPolicyFlag_MapPoints = 0x00000080,
-    /// <summary>
-    /// The policy specifying whether to optimize tracking for screen-top device.
-    /// @since 5.0.0
-    /// </summary>
-    eLeapPolicyFlag_ScreenTop = 0x00000100,
+    eLeapPolicyFlag_MapPoints = 0x00000080
   };
 
   public enum eLeapDeviceStatus : uint {
