@@ -20,7 +20,7 @@ namespace Leap.Unity.VRVisualizer{
     public UnityEngine.UI.Text m_frameRateText;
     public UnityEngine.UI.Text m_dataFrameRateText;
 
-    public KeyCode keyToToggleHMD = KeyCode.V;
+    public KeyCode keyToSwitchViewMode = KeyCode.V;
   
     private Controller m_controller = null;
     private bool m_leapConnected = false;
@@ -28,6 +28,8 @@ namespace Leap.Unity.VRVisualizer{
     private SmoothedFloat m_deltaTime;
     private int m_framrateUpdateCount = 0;
     private int m_framerateUpdateInterval = 30;
+
+    private const bool m_startInScreenTopViewMode = false;
 
     private void FindController() {
       LeapServiceProvider provider = FindObjectOfType<LeapServiceProvider>();
@@ -54,7 +56,8 @@ namespace Leap.Unity.VRVisualizer{
       m_warningText.text = "No head-mounted display detected. Orion performs best in a head-mounted display";      
     }
 
-    private void goScreenTop() {
+    private void goScreenTop()
+    {
         m_PCVisualizer.gameObject.SetActive(true);
         m_VRVisualizer.gameObject.SetActive(false);
         m_warningText.text = "ScreenTop tracking mode activated";
@@ -68,7 +71,12 @@ namespace Leap.Unity.VRVisualizer{
       if (m_controller != null)
         m_leapConnected = m_controller.IsConnected;
 
-      if (XRSupportUtil.IsXRDevicePresent())
+      if (m_startInScreenTopViewMode)
+      {
+        Screen.SetResolution(Screen.currentResolution.width, Screen.currentResolution.height, false);
+        goScreenTop();
+      }
+      else if (XRSupportUtil.IsXRDevicePresent())
       {
         Screen.SetResolution(640, 480, false);
         goVR();    
@@ -97,9 +105,6 @@ namespace Leap.Unity.VRVisualizer{
         m_trackingText.text = "";
         return;
       }
-  
-      m_trackingText.text = "Tracking Mode: ";
-      m_trackingText.text += (m_controller.IsPolicySet(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD)) ? "Head-Mounted" : "Desktop";
 
       if (m_controller.IsPolicySet(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP))
       {
