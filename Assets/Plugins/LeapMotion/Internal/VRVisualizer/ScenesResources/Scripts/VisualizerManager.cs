@@ -50,7 +50,7 @@ namespace Leap.Unity.VRVisualizer{
     private void goDesktop() {
       m_PCVisualizer.gameObject.SetActive(true);
       m_VRVisualizer.gameObject.SetActive(false);
-      m_warningText.text = "No head-mounted display detected. Orion performs best in a head-mounted display";      
+      m_warningText.text = "No head-mounted display detected.";      
     }
 
     void Start()
