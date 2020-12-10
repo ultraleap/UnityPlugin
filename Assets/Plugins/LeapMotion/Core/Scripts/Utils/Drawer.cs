@@ -122,7 +122,8 @@ namespace Leap.Unity {
         #if UNITY_EDITOR
         var origM = UnityEditor.Handles.matrix;
         var origColor = UnityEditor.Handles.color;
-        Color.RGBToHSV(origColor, out float h, out float s, out float v);
+        float h, s, v;
+        Color.RGBToHSV(origColor, out h, out s, out v);
         UnityEditor.Handles.color = origColor.WithHSV(h, s * 1f, v * 3f);
         UnityEditor.Handles.matrix = m;
         // UnityEditor.Handles.SphereHandleCap
