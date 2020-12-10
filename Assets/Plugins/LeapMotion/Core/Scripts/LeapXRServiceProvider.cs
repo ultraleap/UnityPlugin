@@ -236,7 +236,7 @@ namespace Leap.Unity {
         preCullCamera = GetComponent<Camera>();
       }
 
-      #if UNITY_2019_4_OR_NEWER
+      #if XR_LEGACY_INPUT_AVAILABLE
       if (GetComponent<UnityEngine.SpatialTracking.TrackedPoseDriver>() == null) {
         gameObject.AddComponent<UnityEngine.SpatialTracking.TrackedPoseDriver>().UseRelativeTransform = true;
       }
