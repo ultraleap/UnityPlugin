@@ -36,9 +36,12 @@ namespace Leap.Unity {
 
     [SerializeField]
     private Material _material;
+    private Material _backing_material;
 
     [SerializeField]
     private Mesh _sphereMesh;
+
+    private Mesh _cylinderMesh;
 
     [MinValue(3)]
     [SerializeField]
@@ -60,6 +63,9 @@ namespace Leap.Unity {
     private Material _sphereMat;
     private Hand _hand;
     private Vector3[] _spherePositions;
+    private Matrix4x4[] _sphereMatrices   = new Matrix4x4[32], 
+                        _cylinderMatrices = new Matrix4x4[32];
+    private int _curSphereIndex = 0, _curCylinderIndex = 0;
 
     public override ModelType HandModelType {
       get {
@@ -87,8 +93,11 @@ namespace Leap.Unity {
     }
 
     public override void InitHand() {
-      if (_material != null) {
-        _sphereMat = new Material(_material);
+      if (_material != null && (_backing_material == null || !_backing_material.enableInstancing)) {
+        _backing_material = new Material(_material);
+        _backing_material.hideFlags = HideFlags.DontSaveInEditor;
+        _backing_material.enableInstancing = true;
+        _sphereMat = new Material(_backing_material);
         _sphereMat.hideFlags = HideFlags.DontSaveInEditor;
       }
     }
@@ -110,12 +119,18 @@ namespace Leap.Unity {
     }
 
     public override void UpdateHand() {
+      _curSphereIndex   = 0;
+      _curCylinderIndex = 0;
+
       if (_spherePositions == null || _spherePositions.Length != TOTAL_JOINT_COUNT) {
         _spherePositions = new Vector3[TOTAL_JOINT_COUNT];
       }
 
-      if (_sphereMat == null) {
-        _sphereMat = new Material(_material);
+      if (_material != null && (_backing_material == null || !_backing_material.enableInstancing)) {
+        _backing_material = new Material(_material);
+        _backing_material.hideFlags = HideFlags.DontSaveInEditor;
+        _backing_material.enableInstancing = true;
+        _sphereMat = new Material(_backing_material);
         _sphereMat.hideFlags = HideFlags.DontSaveInEditor;
       }
 
@@ -195,6 +210,15 @@ namespace Leap.Unity {
       //Draw the rest of the hand
       drawCylinder(mockThumbJointPos, THUMB_BASE_INDEX);
       drawCylinder(mockThumbJointPos, PINKY_BASE_INDEX);
+
+      // Draw Spheres
+      Graphics.DrawMeshInstanced(_sphereMesh, 0, _sphereMat, _sphereMatrices, _curSphereIndex, null, 
+        _castShadows?UnityEngine.Rendering.ShadowCastingMode.On: UnityEngine.Rendering.ShadowCastingMode.Off, true, gameObject.layer);
+
+      // Draw Cylinders
+      if(_cylinderMesh == null) { _cylinderMesh = getCylinderMesh(1f); }
+      Graphics.DrawMeshInstanced(_cylinderMesh, 0, _backing_material, _cylinderMatrices, _curCylinderIndex, null,
+        _castShadows ? UnityEngine.Rendering.ShadowCastingMode.On : UnityEngine.Rendering.ShadowCastingMode.Off, true, gameObject.layer);
     }
 
     private void drawSphere(Vector3 position) {
@@ -205,12 +229,8 @@ namespace Leap.Unity {
       if (isNaN(position)) { return; }
 
       //multiply radius by 2 because the default unity sphere has a radius of 0.5 meters at scale 1.
-      Graphics.DrawMesh(_sphereMesh, 
-                        Matrix4x4.TRS(position, 
-                                      Quaternion.identity, 
-                                      Vector3.one * radius * 2.0f * transform.lossyScale.x), 
-                        _sphereMat, 0, 
-                        null, 0, null, _castShadows);
+      _sphereMatrices[_curSphereIndex++] = Matrix4x4.TRS(position, 
+        Quaternion.identity, Vector3.one * radius * 2.0f * transform.lossyScale.x);
     }
 
     private void drawCylinder(Vector3 a, Vector3 b) {
@@ -219,13 +239,8 @@ namespace Leap.Unity {
       float length = (a - b).magnitude;
 
       if ((a - b).magnitude > 0.001f) {
-        Graphics.DrawMesh(getCylinderMesh(length),
-                          Matrix4x4.TRS(a, 
-                                        Quaternion.LookRotation(b - a),
-                                        new Vector3(transform.lossyScale.x, transform.lossyScale.x, 1)),
-                          _material,
-                          gameObject.layer, 
-                          null, 0, null, _castShadows);
+        _cylinderMatrices[_curCylinderIndex++] = Matrix4x4.TRS(a,
+          Quaternion.LookRotation(b - a), new Vector3(transform.lossyScale.x, transform.lossyScale.x, length));
       }
     }
 
