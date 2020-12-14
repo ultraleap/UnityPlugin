@@ -21,7 +21,7 @@ namespace Leap.Unity {
 
     private static int _leftColorIndex = 0;
     private static int _rightColorIndex = 0;
-    private static Color[] _leftColorList = { new Color(0.0f, 0.0f, 1.0f), new Color(0.2f, 0.0f, 0.4f), new Color(0.0f, 0.2f, 0.2f) };
+    private static Color[] _leftColorList  = { new Color(0.0f, 0.0f, 1.0f), new Color(0.2f, 0.0f, 0.4f), new Color(0.0f, 0.2f, 0.2f) };
     private static Color[] _rightColorList = { new Color(1.0f, 0.0f, 0.0f), new Color(1.0f, 1.0f, 0.0f), new Color(1.0f, 0.5f, 0.0f) };
 
     #pragma warning disable 0649
@@ -96,15 +96,28 @@ namespace Leap.Unity {
       if (_material != null && (_backing_material == null || !_backing_material.enableInstancing)) {
         _backing_material = new Material(_material);
         _backing_material.hideFlags = HideFlags.DontSaveInEditor;
+        if(!Application.isEditor && !_backing_material.enableInstancing) {
+          Debug.LogError("Capsule Hand Material needs Instancing Enabled to render in builds!", this);
+        }
         _backing_material.enableInstancing = true;
         _sphereMat = new Material(_backing_material);
         _sphereMat.hideFlags = HideFlags.DontSaveInEditor;
       }
     }
 
+    #if UNITY_EDITOR
     private void OnValidate() {
       _meshMap.Clear();
+      if (_material == null || !_material.enableInstancing) {
+        Debug.LogWarning("CapsuleHand's Material must have " +
+          "instancing enabled in order to work in builds! Replacing " +
+          "Material with a Default Material now...", this);
+        _material = (Material)UnityEditor.AssetDatabase.LoadAssetAtPath(
+          System.IO.Path.Combine("Assets", "Plugins", "LeapMotion",
+          "Core", "Materials", "InstancedCapsuleHand.mat"), typeof(Material));
+      }
     }
+    #endif
 
     public override void BeginHand() {
       base.BeginHand();

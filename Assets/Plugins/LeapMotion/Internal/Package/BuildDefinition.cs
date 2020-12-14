@@ -122,7 +122,6 @@ namespace Leap.Unity.Packaging {
         if (!Directory.Exists(exportFolder)) {
           try {
             // Simplify any ".." relative-ness.
-            var info = Directory.CreateDirectory(exportFolder);
             exportFolder = new DirectoryInfo(exportFolder).FullName;
           } catch (Exception) {
             UnityEngine.Debug.Log("Could not build " + DefinitionName + " because " +

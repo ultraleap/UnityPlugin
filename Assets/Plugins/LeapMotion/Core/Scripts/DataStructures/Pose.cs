@@ -37,7 +37,7 @@ namespace Leap.Unity {
     public Pose inverse {
       get {
         var invQ = Quaternion.Inverse(this.rotation);
-        return new Pose(invQ * -this.position, invQ.normalized);
+        return new Pose(invQ * -this.position, Quaternion.Lerp(invQ, invQ, 0f)); // Normalize
       }
     }
 
@@ -47,7 +47,7 @@ namespace Leap.Unity {
     /// </summary>
     public Matrix4x4 matrix {
       get {
-        this.rotation = this.rotation.normalized;
+        this.rotation = Quaternion.Lerp(this.rotation, this.rotation, 0f); // Normalize
         return Matrix4x4.TRS(this.position, this.rotation, Vector3.one);
       }
     }

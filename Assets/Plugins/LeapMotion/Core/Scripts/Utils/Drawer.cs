@@ -25,7 +25,6 @@ namespace Leap.Unity {
     /// <summary> Calls the `setColor` delegate. </summary>
     public Color color { set { implSetColor(value); }}
 
-    private Matrix4x4 _matrix = Matrix4x4.identity;
     public Stack<Matrix4x4> _matrices;
     public Matrix4x4 _currMatrix = Matrix4x4.identity;
     public bool MaybePushMatrix(Matrix4x4? m) {
