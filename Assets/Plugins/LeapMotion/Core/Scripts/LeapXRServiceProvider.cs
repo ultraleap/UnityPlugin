@@ -453,7 +453,7 @@ namespace Leap.Unity {
       }
 
       // Normalize the rotation Quaternion.
-      warpedRotation = Quaternion.Lerp(warpedRotation, Quaternion.identity, 0f);
+      warpedRotation = warpedRotation.ToNormalized();
 
       //Calculate the Current Pose
       Pose currentPose = Pose.identity;
