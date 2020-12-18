@@ -135,9 +135,9 @@ namespace Leap {
           break;
         case TestHandPose.ScreenTop:
           transform.rotation = angleAxis(0 * Constants.DEG_TO_RAD, Vector.Forward)
-                                .Multiply(angleAxis(160 * Constants.DEG_TO_RAD, Vector.Right))
+                                .Multiply(angleAxis(140 * Constants.DEG_TO_RAD, Vector.Right))
                                 .Multiply(angleAxis(0 * Constants.DEG_TO_RAD, Vector.Up));
-          transform.translation = new Vector(-120f, 40f, -400f);
+          transform.translation = new Vector(-120f, 20f, -380f);
           transform.scale = new Vector(1, 1, 1);
           break;
 
