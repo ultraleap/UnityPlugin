@@ -5,7 +5,7 @@ using UnityEngine;
 namespace Leap.Unity
 {
     [CreateAssetMenu(fileName = "AutoRigger_Definitions", menuName = "Ultraleap/Autorigger_Definitions", order = 1)]
-    public class HandBinder_BoneDefinitions : ScriptableObject
+    public class HandBinderBoneDefinitions : ScriptableObject
     {
         public BoneDefinitions boneDefinitions = new BoneDefinitions();
     }

@@ -1,40 +1,34 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEditor;
+﻿using System.Collections.Generic;
 using System.Linq;
+using UnityEditor;
+using UnityEngine;
 
-namespace Leap.Unity
-{
+namespace Leap.Unity {
+
     [InitializeOnLoad]
-    public class HandBinder_DocumentationWindow : EditorWindow
-    {
-        //Store the current page
-        int currentPage = 0;
-        //Store which pages the user has already gone too
-        List<int> previousPages = new List<int>();
-        //The scroll position of the window
-        Vector2 scrollPosition;
-        //Store the color of the gui before changes where made
-        static Color beforeColor;
-        //Styles to be used for the content
-        public static GUIStyle headerStyle, contentStyle, textureStyle, buttonStyle, autoRigButton;
-        Texture2D labelImageBG;
+    public class HandBinderDocumentationWindow : EditorWindow {
 
-        static UnityEngine.Object leapController;
+        private int currentPage = 0;
+        private List<int> previousPages = new List<int>();
+        //Styles to be used for the content
+        public static GUIStyle headerStyle;
+        public static GUIStyle contentStyle;
+        public static GUIStyle textureStyle;
+        public static GUIStyle buttonStyle;
+        public static GUIStyle autoRigButton;
+
+        private static UnityEngine.Object leapController;
 
         /// <summary>
         /// The documentation window will pop up the first time the user imports this module
         /// </summary>
-        static HandBinder_DocumentationWindow()
-        {
+        static HandBinderDocumentationWindow() {
             EditorApplication.update += Open;
         }
-        static void Open()
-        {
+
+        private static void Open() {
             //Allow it to pop up when the user first installs the module
-            if (PlayerPrefs.GetInt("Rigging_Documentation_PopUp") == 0)
-            {
+            if(PlayerPrefs.GetInt("Rigging_Documentation_PopUp") == 0) {
                 //Stop it popping up when the project is loaded again
                 PlayerPrefs.SetInt("Rigging_Documentation_PopUp", 1);
                 Init();
@@ -45,17 +39,15 @@ namespace Leap.Unity
         /// Makes the documentation window appear in its own menu at the top
         /// </summary>
         [MenuItem("Ultraleap/Hand Rigging Documentation")]
-        static void Init()
-        {
+        private static void Init() {
             leapController = AssetDatabase.LoadAssetAtPath("Assets/Plugins/LeapMotion/Core/Prefabs/LeapHandController.prefab", typeof(Leap.Unity.HandModelManager));
             // Get existing open window or if none, make a new one:
-            var window = (HandBinder_DocumentationWindow)EditorWindow.GetWindow(typeof(HandBinder_DocumentationWindow));
+            var window = (HandBinderDocumentationWindow)EditorWindow.GetWindow(typeof(HandBinderDocumentationWindow));
             window.Show();
             window.minSize = new Vector2(650, 700);
         }
 
-        void OnGUI()
-        {
+        private void OnGUI() {
             SetUp();
             DrawPages();
         }
@@ -63,99 +55,81 @@ namespace Leap.Unity
         /// <summary>
         /// Set up the GUIStyle for the varius elements that will be rendered
         /// </summary>
-        void SetUp()
-        {
+        private void SetUp() {
             //Set up the GUI Styles
-            headerStyle = new GUIStyle()
-            {
+            headerStyle = new GUIStyle() {
                 alignment = TextAnchor.MiddleCenter,
                 fontStyle = FontStyle.Bold,
                 fontSize = 30,
-                normal = new GUIStyleState()
-                {
+                normal = new GUIStyleState() {
                     textColor = Color.white,
                 }
             };
 
-            contentStyle = new GUIStyle()
-            {
+            contentStyle = new GUIStyle() {
                 alignment = TextAnchor.MiddleCenter,
                 margin = new RectOffset(10, 0, 0, 10),
                 wordWrap = true,
                 fontStyle = FontStyle.Normal,
                 fontSize = 13,
-                normal = new GUIStyleState()
-                {
+                normal = new GUIStyleState() {
                     textColor = Color.white,
                 }
             };
 
-            buttonStyle = new GUIStyle(GUI.skin.button)
-            {
+            buttonStyle = new GUIStyle(GUI.skin.button) {
                 alignment = TextAnchor.MiddleCenter,
                 wordWrap = true,
                 fontStyle = FontStyle.Bold,
                 fontSize = 20,
-                normal = new GUIStyleState()
-                {
+                normal = new GUIStyleState() {
                     textColor = Color.black,
                     background = (Texture2D)Resources.Load<Texture>("Editor_Documentation_Green_Upstate")
                 },
             };
 
-            autoRigButton = new GUIStyle(GUI.skin.button)
-            {
+            autoRigButton = new GUIStyle(GUI.skin.button) {
                 alignment = TextAnchor.MiddleCenter,
                 wordWrap = true,
                 fontStyle = FontStyle.Bold,
                 fontSize = 20,
-                normal = new GUIStyleState()
-                {
+                normal = new GUIStyleState() {
                     textColor = Color.black,
                     background = (Texture2D)Resources.Load<Texture>("Editor_Documentation_Yellow_Upstate")
                 },
             };
 
-            textureStyle = new GUIStyle()
-            {
+            textureStyle = new GUIStyle() {
                 alignment = TextAnchor.MiddleCenter,
                 imagePosition = ImagePosition.ImageOnly,
             };
-
-            beforeColor = GUI.color;
-
         }
 
-        void Header(string header)
-        {
+        private void Header(string header) {
             GUILayout.Space(20);
             GUILayout.Label(header, headerStyle);
             GUILayout.Space(20);
         }
-        void DrawTexture(Texture texture)
-        {
+
+        private void DrawTexture(Texture texture) {
             GUILayout.Space(20);
             GUILayout.Label(texture, textureStyle);
 
             GUILayout.Space(20);
         }
 
-        void PageButtons(int index, bool includePrevious = true, string buttonOverride = "Next Step")
-        {
+        private void PageButtons(int index, bool includePrevious = true, string buttonOverride = "Next Step") {
             GUILayout.Space(20);
             GUILayout.BeginHorizontal();
             GUILayout.Space(20);
 
-            if (includePrevious)
-            {
-                if (GUILayout.Button("Previous Step", buttonStyle))
-                {
+            if(includePrevious) {
+                if(GUILayout.Button("Previous Step", buttonStyle)) {
                     PreviousPage();
                 }
             }
 
-            if (GUILayout.Button(buttonOverride, buttonStyle))
-            {
+            if(GUILayout.Button(buttonOverride, buttonStyle)) {
                 MovePage(index);
             }
             GUILayout.Space(20);
@@ -166,57 +140,52 @@ namespace Leap.Unity
         /// <summary>
         /// Depending on which page the user has selected, draw that page
         /// </summary>
-        void DrawPages()
-        {
-            beforeColor = GUI.color;
-
-            switch (currentPage)
-            {
+        private void DrawPages() {
+            switch(currentPage) {
                 case 0:
                     previousPages.Clear();
                     StartPage();
                     break;
+
                 case 1:
                     Page1();
                     break;
+
                 case 2:
                     Page2();
                     break;
+
                 case 3:
                     Page3();
                     break;
+
                 case 4:
                     Page4();
                     break;
+
                 case 5:
                     Page5();
                     break;
             }
         }
 
-        void MovePage(int specific)
-        {
+        private void MovePage(int specific) {
             //Store the last page
             previousPages.Add(currentPage);
-            if (specific == -1)
+            if(specific == -1)
                 currentPage = (currentPage + 1) % 6;
-            else
-            {
+            else {
                 currentPage = specific;
             }
-
-            scrollPosition = Vector2.zero;
         }
-        void PreviousPage()
-        {
+
+        private void PreviousPage() {
             var last = previousPages.LastOrDefault();
             previousPages.RemoveAt(previousPages.Count - 1);
             currentPage = last;
         }
 
-
-        void StartPage()
-        {
+        private void StartPage() {
             DrawTexture((Texture)Resources.Load("Editor_Ultraleap_logo"));
             GUILayout.Space(-50);
             Header("Hand Rigging Module");
@@ -227,16 +196,14 @@ namespace Leap.Unity
 
             GUILayout.BeginHorizontal();
             GUILayout.Space(50);
-            if (GUILayout.Button("Next Step", buttonStyle))
-            {
+            if(GUILayout.Button("Next Step", buttonStyle)) {
                 MovePage(-1);
             }
             GUILayout.Space(50);
             GUILayout.EndHorizontal();
         }
 
-        void Page1()
-        {
+        private void Page1() {
             Header("Step 1");
 
             GUILayout.BeginHorizontal();
@@ -249,8 +216,7 @@ namespace Leap.Unity
 
             GUILayout.Space(20);
             GUILayout.Label("Locate the Leap Hand Controller prefab in the 'Core Modules Prefabs' folder then place this into the scene", contentStyle);
-            if (leapController != null)
-            {
+            if(leapController != null) {
                 leapController = (Leap.Unity.HandModelManager)EditorGUILayout.ObjectField(leapController, typeof(Leap.Unity.HandModelManager), false);
                 GUILayout.Space(20);
             }
@@ -265,11 +231,9 @@ namespace Leap.Unity
 
             GUILayout.EndHorizontal();
             PageButtons(-1);
-
         }
 
-        void Page2()
-        {
+        private void Page2() {
             Header("Step 2");
 
             GUILayout.BeginHorizontal();
@@ -288,12 +252,10 @@ namespace Leap.Unity
 
             GUILayout.EndHorizontal();
 
-
             PageButtons(-1);
         }
 
-        void Page3()
-        {
+        private void Page3() {
             Header("Step 3");
             GUILayout.BeginHorizontal();
             GUILayout.BeginVertical();
@@ -310,14 +272,12 @@ namespace Leap.Unity
 
             PageButtons(5);
             EditorGUILayout.Space();
-            if (GUILayout.Button("If auto rig failed - Click here!", autoRigButton))
-            {
+            if(GUILayout.Button("If auto rig failed - Click here!", autoRigButton)) {
                 MovePage(4);
             }
         }
 
-        void Page4()
-        {
+        private void Page4() {
             Header("Step 3 - Auto Rig Failed");
 
             GUILayout.BeginHorizontal();
@@ -331,8 +291,7 @@ namespace Leap.Unity
             PageButtons(-1);
         }
 
-        void Page5()
-        {
+        private void Page5() {
             Header("Step 4");
             GUILayout.BeginHorizontal();
             GUILayout.BeginVertical();
@@ -353,4 +312,3 @@ namespace Leap.Unity
         }
     }
 }
-

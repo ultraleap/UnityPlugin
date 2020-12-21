@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Leap.Unity
 {
-    public static class HandBinder_AutoRigger
+    public static class HandBinderAutoRigger
     {
         /// <summary>
         /// This function is used to search the HandBinder scipts children transforms to auto assign them for the user
