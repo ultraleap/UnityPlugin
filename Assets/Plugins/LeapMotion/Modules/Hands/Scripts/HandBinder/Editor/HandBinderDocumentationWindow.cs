@@ -11,11 +11,11 @@ namespace Leap.Unity.HandsModule {
         private int currentPage = 0;
         private List<int> previousPages = new List<int>();
         //Styles to be used for the content
-        public static GUIStyle headerStyle;
-        public static GUIStyle contentStyle;
-        public static GUIStyle textureStyle;
-        public static GUIStyle buttonStyle;
-        public static GUIStyle autoRigButton;
+        private static GUIStyle headerStyle;
+        private static GUIStyle contentStyle;
+        private static GUIStyle textureStyle;
+        private static GUIStyle buttonStyle;
+        private static GUIStyle autoRigButton;
 
         private static UnityEngine.Object leapController;
 

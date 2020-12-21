@@ -4,7 +4,7 @@ namespace Leap.Unity.HandsModule {
 
     [CreateAssetMenu(fileName = "AutoRigger_Definitions", menuName = "Ultraleap/Autorigger_Definitions", order = 1)]
     public class HandBinderBoneDefinitions : ScriptableObject {
-        public BoneDefinitions boneDefinitions = new BoneDefinitions();
+        public BoneDefinitions BoneDefinitions = new BoneDefinitions();
     }
 
     /// <summary>
@@ -12,12 +12,12 @@ namespace Leap.Unity.HandsModule {
     /// </summary>
     [System.Serializable]
     public class BoneDefinitions {
-        public string[] _definition_Thumb = { "thumb" };
-        public string[] _definition_Index = { "index" };
-        public string[] _definition_Middle = { "middle" };
-        public string[] _definition_Ring = { "ring" };
-        public string[] _definition_Pinky = { "pinky", "little" };
-        public string[] _definition_Wrist = { "wrist", "hand", "palm" };
-        public string[] _definition_Elbow = { "elbow", "upperArm" };
+        public string[] DefinitionThumb = { "thumb" };
+        public string[] DefinitionIndex = { "index" };
+        public string[] DefinitionMiddle = { "middle" };
+        public string[] DefinitionRing = { "ring" };
+        public string[] DefinitionPinky = { "pinky", "little" };
+        public string[] DefinitionWrist = { "wrist", "hand", "palm" };
+        public string[] DefinitionElbow = { "elbow", "upperArm" };
     }
 }

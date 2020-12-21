@@ -14,23 +14,23 @@ namespace Leap.Unity.HandsModule {
             BoneDefinitions boneDefinitions = null;
 
             //Check to see if we have an autorigger Definitions scriptable object
-            if(handBinder.customBoneDefinitions == null) {
+            if(handBinder.CustomBoneDefinitions == null) {
                 boneDefinitions = new BoneDefinitions();
             }
             else {
-                boneDefinitions = handBinder.customBoneDefinitions.boneDefinitions;
+                boneDefinitions = handBinder.CustomBoneDefinitions.BoneDefinitions;
             }
 
             //Get all children of the hand
             var children = GetAllChildren(handBinder.transform);
 
             var foundBones = new List<Transform>();
-            foundBones.AddRange(SelectBones(children, boneDefinitions._definition_Thumb, true));
-            foundBones.AddRange(SelectBones(children, boneDefinitions._definition_Index));
-            foundBones.AddRange(SelectBones(children, boneDefinitions._definition_Middle));
-            foundBones.AddRange(SelectBones(children, boneDefinitions._definition_Ring));
-            foundBones.AddRange(SelectBones(children, boneDefinitions._definition_Pinky));
-            foundBones.Add(SelectBones(children, boneDefinitions._definition_Wrist).FirstOrDefault());
+            foundBones.AddRange(SelectBones(children, boneDefinitions.DefinitionThumb, true));
+            foundBones.AddRange(SelectBones(children, boneDefinitions.DefinitionIndex));
+            foundBones.AddRange(SelectBones(children, boneDefinitions.DefinitionMiddle));
+            foundBones.AddRange(SelectBones(children, boneDefinitions.DefinitionRing));
+            foundBones.AddRange(SelectBones(children, boneDefinitions.DefinitionPinky));
+            foundBones.Add(SelectBones(children, boneDefinitions.DefinitionWrist).FirstOrDefault());
 
             for(int i = 0; i < foundBones.Count; i++) {
                 AssignUnityBone(foundBones[i], i, ref handBinder);
@@ -139,7 +139,7 @@ namespace Leap.Unity.HandsModule {
             Bone.BoneType boneType;
             IndexToType(index, out fingerType, out boneType);
 
-            var startTransform = handBinder.startTransforms[index];
+            var startTransform = handBinder.StartTransforms[index];
             startTransform.fingerType = fingerType;
             startTransform.boneType = boneType;
 
@@ -147,7 +147,7 @@ namespace Leap.Unity.HandsModule {
                 startTransform.position = boneTransform.localPosition;
                 startTransform.rotation = boneTransform.localRotation.eulerAngles;
 
-                handBinder.boundGameobjects[index] = boneTransform;
+                handBinder.BoundGameobjects[index] = boneTransform;
             }
         }
 
@@ -161,14 +161,14 @@ namespace Leap.Unity.HandsModule {
             //handBinder.boundGameobjects[17] = Pinky Proximal
             //handBinder.boundGameobjects[20] = Wrist
 
-            if(handBinder.boundGameobjects[9] != null && handBinder.boundGameobjects[5] != null && handBinder.boundGameobjects[17] != null && handBinder.boundGameobjects[20] != null) {
+            if(handBinder.BoundGameobjects[9] != null && handBinder.BoundGameobjects[5] != null && handBinder.BoundGameobjects[17] != null && handBinder.BoundGameobjects[20] != null) {
                 //Get the Direction from the middle finger to the wrist
-                var wristForward = handBinder.boundGameobjects[9].transform.position - handBinder.boundGameobjects[20].transform.position;
+                var wristForward = handBinder.BoundGameobjects[9].transform.position - handBinder.BoundGameobjects[20].transform.position;
                 //Get the Direction from the Proximal pinky finger to the Proximal Index finger
-                var wristRight = handBinder.boundGameobjects[5].transform.position - handBinder.boundGameobjects[17].transform.position;
+                var wristRight = handBinder.BoundGameobjects[5].transform.position - handBinder.BoundGameobjects[17].transform.position;
 
                 //Swap the direction based on left and right hands
-                if(handBinder.handedness == Chirality.Right)
+                if(handBinder.Handedness == Chirality.Right)
                     wristRight = -wristRight;
 
                 //Get the direciton that goes outwards from the back of the hand
@@ -187,7 +187,7 @@ namespace Leap.Unity.HandsModule {
 
                 //Now calculate the difference between the models rotation and the leaps rotation
                 var wristRotationDifference = Quaternion.Inverse(modelRotation) * leapRotation;
-                var wristRelativeDifference = Quaternion.Inverse(handBinder.boundGameobjects[20].transform.rotation) * wristRotationDifference;
+                var wristRelativeDifference = Quaternion.Inverse(handBinder.BoundGameobjects[20].transform.rotation) * wristRotationDifference;
 
                 //We are using Euler angles to make it easier to understand in the inspector
                 var roundedWristRotationOffset = wristRelativeDifference.eulerAngles;
@@ -198,7 +198,7 @@ namespace Leap.Unity.HandsModule {
 
                 //Assign these values to the hand binder
                 handBinder.GlobalFingerRotationOffset = roundedWristRotationOffset;
-                handBinder.wristRotationOffset = roundedWristRotationOffset;
+                handBinder.WristRotationOffset = roundedWristRotationOffset;
             }
         }
 

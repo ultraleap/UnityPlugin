@@ -28,13 +28,13 @@ namespace Leap.Unity.HandsModule {
 
         private SerializedProperty handedness;
         private SerializedProperty debugLeapHand;
-        private SerializedProperty debugHand_Size;
+        private SerializedProperty gizmoSize;
         private SerializedProperty debugModelTransforms;
         private SerializedProperty setPositions;
         private SerializedProperty useMetaBones;
         private SerializedProperty setEditorPose;
         private SerializedProperty customBoneDefinitions;
-        private SerializedProperty GlobalFingerRotationOffset;
+        private SerializedProperty globalFingerRotationOffset;
         private SerializedProperty wristRotationOffset;
         private SerializedProperty boundGameobjects;
         private SerializedProperty startTransforms;
@@ -53,12 +53,12 @@ namespace Leap.Unity.HandsModule {
         private void SerializedProperties() {
             handedness = serializedObject.FindProperty("handedness");
             debugLeapHand = serializedObject.FindProperty("debugLeapHand");
-            debugHand_Size = serializedObject.FindProperty("debugHand_Size");
+            gizmoSize = serializedObject.FindProperty("GizmoSize");
             debugModelTransforms = serializedObject.FindProperty("debugModelTransforms");
             setPositions = serializedObject.FindProperty("setPositions");
             useMetaBones = serializedObject.FindProperty("useMetaBones");
             setEditorPose = serializedObject.FindProperty("setEditorPose");
-            GlobalFingerRotationOffset = serializedObject.FindProperty("GlobalFingerRotationOffset");
+            globalFingerRotationOffset = serializedObject.FindProperty("GlobalFingerRotationOffset");
             wristRotationOffset = serializedObject.FindProperty("wristRotationOffset");
             boundGameobjects = serializedObject.FindProperty("boundGameobjects");
             startTransforms = serializedObject.FindProperty("startTransforms");
@@ -193,8 +193,8 @@ namespace Leap.Unity.HandsModule {
                 Undo.RegisterCompleteObjectUndo(myTarget, "Autorig");
                 HandBinderAutoRigger.AutoRig(myTarget);
 
-                myTarget.setEditorPose = true;
-                myTarget.debugModelTransforms = true;
+                myTarget.SetEditorPose = true;
+                myTarget.DebugModelTransforms = true;
             }
 
             EditorGUILayout.Space();
@@ -234,11 +234,11 @@ namespace Leap.Unity.HandsModule {
                 GUILayout.EndHorizontal();
 
                 GUI.color = previousCol;
-                EditorGUILayout.PropertyField(debugHand_Size);
+                EditorGUILayout.PropertyField(gizmoSize);
                 EditorGUILayout.PropertyField(setEditorPose);
             }
 
-            if(setEditorPose.boolValue != myTarget.setEditorPose) {
+            if(setEditorPose.boolValue != myTarget.SetEditorPose) {
                 myTarget.ResetHand();
             }
 
@@ -248,7 +248,7 @@ namespace Leap.Unity.HandsModule {
 
             if(fineTuning) {
                 EditorGUILayout.Space();
-                EditorGUILayout.PropertyField(GlobalFingerRotationOffset);
+                EditorGUILayout.PropertyField(globalFingerRotationOffset);
                 EditorGUILayout.Space();
                 EditorGUILayout.PropertyField(wristRotationOffset);
                 EditorGUILayout.Space();
@@ -414,7 +414,7 @@ namespace Leap.Unity.HandsModule {
             if(myTarget != null && myTarget.enabled) {
                 MakeLeapHand(myTarget);
 
-                if(myTarget.setEditorPose) {
+                if(myTarget.SetEditorPose) {
                     if(myTarget.GetLeapHand() == null) {
                         myTarget.InitHand();
                         myTarget.BeginHand();
@@ -466,7 +466,7 @@ namespace Leap.Unity.HandsModule {
                 hand.Transform(binder.transform.GetLeapMatrix());
             }
 
-            binder._leapHand = hand;
+            binder.LeapHand = hand;
         }
 
         /// <summary>
@@ -476,50 +476,50 @@ namespace Leap.Unity.HandsModule {
             myTarget = (HandBinder)target;
 
             //Draw the leap hand
-            if(myTarget.debugLeapHand) {
+            if(myTarget.DebugLeapHand) {
                 Handles.color = leapHandDebugCol;
 
-                foreach(var finger in myTarget._leapHand.Fingers) {
+                foreach(var finger in myTarget.LeapHand.Fingers) {
                     var index = 0;
 
                     foreach(var bone in finger.bones) {
-                        Handles.SphereHandleCap(-1, bone.PrevJoint.ToVector3(), Quaternion.identity, myTarget.debugHand_Size, EventType.Repaint);
+                        Handles.SphereHandleCap(-1, bone.PrevJoint.ToVector3(), Quaternion.identity, myTarget.GizmoSize, EventType.Repaint);
                         if((index + 1) <= finger.bones.Length - 1)
                             Handles.DrawLine(finger.bones[index].PrevJoint.ToVector3(), finger.bones[index + 1].PrevJoint.ToVector3());
                         index++;
                     }
                 }
-                Handles.SphereHandleCap(-1, myTarget._leapHand.WristPosition.ToVector3(), Quaternion.identity, myTarget.debugHand_Size, EventType.Repaint);
+                Handles.SphereHandleCap(-1, myTarget.LeapHand.WristPosition.ToVector3(), Quaternion.identity, myTarget.GizmoSize, EventType.Repaint);
             }
 
             //Draw the bound Gameobjects
-            if(myTarget.debugModelTransforms) {
+            if(myTarget.DebugModelTransforms) {
                 Handles.color = handModelDebugCol;
 
-                for(int i = 0; i < myTarget.boundGameobjects.Length; i++) {
-                    if(i % 4 == 0 && !myTarget.useMetaBones)
+                for(int i = 0; i < myTarget.BoundGameobjects.Length; i++) {
+                    if(i % 4 == 0 && !myTarget.UseMetaBones)
                         continue;
 
-                    if(myTarget.boundGameobjects[i] != null) {
+                    if(myTarget.BoundGameobjects[i] != null) {
                         //Handles.SphereHandleCap(-1, myTarget.boundGameobjects[i].transform.position, myTarget.boundGameobjects[i].transform.rotation , myTarget.debugHand_Size, EventType.Repaint);
-                        Handles.DrawWireDisc(myTarget.boundGameobjects[i].transform.position, myTarget.boundGameobjects[i].transform.right, myTarget.debugHand_Size);
-                        Handles.DrawWireDisc(myTarget.boundGameobjects[i].transform.position, myTarget.boundGameobjects[i].transform.up, myTarget.debugHand_Size);
-                        Handles.DrawWireDisc(myTarget.boundGameobjects[i].transform.position, myTarget.boundGameobjects[i].transform.forward, myTarget.debugHand_Size);
+                        Handles.DrawWireDisc(myTarget.BoundGameobjects[i].transform.position, myTarget.BoundGameobjects[i].transform.right, myTarget.GizmoSize);
+                        Handles.DrawWireDisc(myTarget.BoundGameobjects[i].transform.position, myTarget.BoundGameobjects[i].transform.up, myTarget.GizmoSize);
+                        Handles.DrawWireDisc(myTarget.BoundGameobjects[i].transform.position, myTarget.BoundGameobjects[i].transform.forward, myTarget.GizmoSize);
                     }
                 }
             }
 
             //Draw helpful gizmos to show how much the hand has been offset from its original position
             Handles.color = new Color(43, 43, 43);
-            for(int i = 0; i < myTarget.offsets.Count; i++) {
-                var offset = myTarget.offsets[i];
+            for(int i = 0; i < myTarget.Offsets.Count; i++) {
+                var offset = myTarget.Offsets[i];
                 var id = HandBinderAutoRigger.TypeToIndex(offset.fingerType, offset.boneType);
-                var boundObject = myTarget.boundGameobjects[id];
-                var startTransform = myTarget.startTransforms[id];
+                var boundObject = myTarget.BoundGameobjects[id];
+                var startTransform = myTarget.StartTransforms[id];
 
                 if(boundObject != null) {
                     var originPosition = boundObject.transform.TransformPoint(startTransform.position - boundObject.localPosition);
-                    Handles.SphereHandleCap(-1, originPosition, Quaternion.identity, myTarget.debugHand_Size, EventType.Repaint);
+                    Handles.SphereHandleCap(-1, originPosition, Quaternion.identity, myTarget.GizmoSize, EventType.Repaint);
 
                     Handles.DrawDottedLine(originPosition, boundObject.position, 6f);
                 }
