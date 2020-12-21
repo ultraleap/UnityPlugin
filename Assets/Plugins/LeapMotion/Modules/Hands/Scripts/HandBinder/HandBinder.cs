@@ -32,7 +32,7 @@ namespace Leap.Unity.HandsModule {
         public Transform[] BoundGameobjects = new Transform[21];
         public Offset[] StartTransforms = new Offset[21];
 
-        public override Chirality Handedness { get { return Handedness; } set { } }
+        public override Chirality Handedness { get { return handedness; } set { } }
         public Chirality handedness;
         public override ModelType HandModelType { get { return ModelType.Graphics; } }
         public override Hand GetLeapHand() { return LeapHand;}

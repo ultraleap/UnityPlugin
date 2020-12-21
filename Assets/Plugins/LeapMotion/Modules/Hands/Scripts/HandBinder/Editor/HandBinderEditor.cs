@@ -52,16 +52,16 @@ namespace Leap.Unity.HandsModule {
         /// </summary>
         private void SerializedProperties() {
             handedness = serializedObject.FindProperty("handedness");
-            debugLeapHand = serializedObject.FindProperty("debugLeapHand");
+            debugLeapHand = serializedObject.FindProperty("DebugLeapHand");
             gizmoSize = serializedObject.FindProperty("GizmoSize");
-            debugModelTransforms = serializedObject.FindProperty("debugModelTransforms");
-            setPositions = serializedObject.FindProperty("setPositions");
-            useMetaBones = serializedObject.FindProperty("useMetaBones");
-            setEditorPose = serializedObject.FindProperty("setEditorPose");
+            debugModelTransforms = serializedObject.FindProperty("DebugModelTransforms");
+            setPositions = serializedObject.FindProperty("SetPositions");
+            useMetaBones = serializedObject.FindProperty("UseMetaBones");
+            setEditorPose = serializedObject.FindProperty("SetEditorPose");
             globalFingerRotationOffset = serializedObject.FindProperty("GlobalFingerRotationOffset");
-            wristRotationOffset = serializedObject.FindProperty("wristRotationOffset");
-            boundGameobjects = serializedObject.FindProperty("boundGameobjects");
-            startTransforms = serializedObject.FindProperty("startTransforms");
+            wristRotationOffset = serializedObject.FindProperty("WristRotationOffset");
+            boundGameobjects = serializedObject.FindProperty("BoundGameobjects");
+            startTransforms = serializedObject.FindProperty("StartTransforms");
 
             customBoneDefinitions = serializedObject.FindProperty("customBoneDefinitions");
             handTexture = Resources.Load<Texture>("Editor_hand");
