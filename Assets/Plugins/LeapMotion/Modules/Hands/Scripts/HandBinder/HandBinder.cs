@@ -35,15 +35,28 @@ namespace Leap.Unity.HandsModule {
         public override Chirality Handedness { get { return handedness; } set { } }
         public Chirality handedness;
         public override ModelType HandModelType { get { return ModelType.Graphics; } }
-        public override Hand GetLeapHand() { return LeapHand;}
-        public override void SetLeapHand(Hand hand) { LeapHand = hand;}
-        public override bool SupportsEditorPersistence() { return false;}
+
+        public override Hand GetLeapHand() {
+            return LeapHand;
+        }
+
+        public override void SetLeapHand(Hand hand) {
+            LeapHand = hand;
+        }
+
+        public override bool SupportsEditorPersistence() {
+            return false;
+        }
 
         private void OnDestroy() {
             ResetHand();
         }
 
         private void OnDisable() {
+            ResetHand();
+        }
+
+        private void Reset() {
             ResetHand();
         }
 
