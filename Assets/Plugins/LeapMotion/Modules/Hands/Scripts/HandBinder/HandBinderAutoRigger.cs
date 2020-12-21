@@ -191,10 +191,10 @@ namespace Leap.Unity.HandsModule {
 
                 //We are using Euler angles to make it easier to understand in the inspector
                 var roundedWristRotationOffset = wristRelativeDifference.eulerAngles;
-                //Round these values to the nearest 45 degrees
-                roundedWristRotationOffset.x = Mathf.Round(roundedWristRotationOffset.x / 45) * 45;
-                roundedWristRotationOffset.y = Mathf.Round(roundedWristRotationOffset.y / 45) * 45;
-                roundedWristRotationOffset.z = Mathf.Round(roundedWristRotationOffset.z / 45) * 45;
+                //Round these values to the nearest 90 degrees
+                roundedWristRotationOffset.x = Mathf.Round(roundedWristRotationOffset.x / 90) * 90;
+                roundedWristRotationOffset.y = Mathf.Round(roundedWristRotationOffset.y / 90) * 90;
+                roundedWristRotationOffset.z = Mathf.Round(roundedWristRotationOffset.z / 90) * 90;
 
                 //Assign these values to the hand binder
                 handBinder.GlobalFingerRotationOffset = roundedWristRotationOffset;

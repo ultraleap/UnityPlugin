@@ -37,7 +37,8 @@ namespace Leap.Unity.HandsModule {
         private SerializedProperty globalFingerRotationOffset;
         private SerializedProperty wristRotationOffset;
         private SerializedProperty boundGameobjects;
-        private SerializedProperty startTransforms;
+        private SerializedProperty startTransforms; 
+        private SerializedProperty offsets;
 
         private GUIStyle buttonStyle;
         private GUIStyle statusStyle;
@@ -62,8 +63,9 @@ namespace Leap.Unity.HandsModule {
             wristRotationOffset = serializedObject.FindProperty("WristRotationOffset");
             boundGameobjects = serializedObject.FindProperty("BoundGameobjects");
             startTransforms = serializedObject.FindProperty("StartTransforms");
+            customBoneDefinitions = serializedObject.FindProperty("CustomBoneDefinitions");
+            offsets = serializedObject.FindProperty("Offsets");
 
-            customBoneDefinitions = serializedObject.FindProperty("customBoneDefinitions");
             handTexture = Resources.Load<Texture>("Editor_hand");
             buttonTexture = Resources.Load<Texture>("Editor_Documentation_Green_Upstate");
             downstate = Resources.Load<Texture>("Editor_Documentation_Green_Downstate");
@@ -262,10 +264,9 @@ namespace Leap.Unity.HandsModule {
                 GUILayout.Label(dividerLine);
                 EditorGUILayout.Space();
 
-                var array = serializedObject.FindProperty("offsets");
 
-                for(int i = 0; i < array.arraySize; i++) {
-                    var element = array.GetArrayElementAtIndex(i);
+                for(int i = 0; i < offsets.arraySize; i++) {
+                    var element = offsets.GetArrayElementAtIndex(i);
                     var fingerType = element.FindPropertyRelative("fingerType");
                     var boneType = element.FindPropertyRelative("boneType");
                     var rotation = element.FindPropertyRelative("rotation");
@@ -281,7 +282,7 @@ namespace Leap.Unity.HandsModule {
                     EditorGUILayout.PropertyField(fingerType, GUIContent.none);
                     EditorGUILayout.PropertyField(boneType, GUIContent.none);
                     if(GUILayout.Button(EditorGUIUtility.IconContent("Toolbar Minus"))) {
-                        array.DeleteArrayElementAtIndex(i);
+                        offsets.DeleteArrayElementAtIndex(i);
                         continue;
                     }
                     EditorGUILayout.EndHorizontal();
@@ -305,7 +306,7 @@ namespace Leap.Unity.HandsModule {
                 }
 
                 if(GUILayout.Button("Add Finger Offset + ", subButtonStyle)) {
-                    array.InsertArrayElementAtIndex(array.arraySize);
+                    offsets.InsertArrayElementAtIndex(offsets.arraySize);
                 }
             }
 
@@ -365,10 +366,10 @@ namespace Leap.Unity.HandsModule {
         /// <param name="index">The index of the boundGameobject between 0 - 20</param>
         private void CreateObjectField(Vector2 offset, Event e, int index) {
             var boundObject = boundGameobjects.GetArrayElementAtIndex(index);
-            var boundTransform = boundObject.objectReferenceValue as Transform;
+            var beforeTransform = boundObject.objectReferenceValue as Transform;
 
             //Check to see if this bone is valid
-            bool isAssignedTo = boundTransform != null;
+            bool isAssignedTo = beforeTransform != null;
             bonesValid.Add(isAssignedTo);
 
             //The size of the field
@@ -388,23 +389,37 @@ namespace Leap.Unity.HandsModule {
 
             //Draw the object field
             EditorGUI.ObjectField(newRect, boundObject, GUIContent.none);
-            boundTransform = boundObject.objectReferenceValue as Transform;
+            var afterTransform = boundObject.objectReferenceValue as Transform;
 
             GUI.color = previousCol;
 
             //Do an extra check to see if the bone has now been assigned to, if it has call then make sure we update the start transforms with this new reference
-            if(!isAssignedTo && boundTransform != null) {
-                var startT = startTransforms.GetArrayElementAtIndex(index);
-
-                Finger.FingerType fingerType;
-                Bone.BoneType boneType;
-                HandBinderAutoRigger.IndexToType(index, out fingerType, out boneType);
-
-                startT.FindPropertyRelative("fingerType").intValue = (int)fingerType;
-                startT.FindPropertyRelative("boneType").intValue = (int)boneType;
-                startT.FindPropertyRelative("position").vector3Value = boundTransform.localPosition;
-                startT.FindPropertyRelative("rotation").vector3Value = boundTransform.localRotation.eulerAngles;
+            if(!isAssignedTo && beforeTransform != null) {
+                AssignTransform(index, afterTransform);
             }
+
+            else if(isAssignedTo && beforeTransform != afterTransform) {
+                //The user has removed a reference to a bone, make sure that is applied
+                AssignTransform(index, afterTransform);
+            }
+        }
+
+        void AssignTransform(int index, Transform boundTransform) {
+            if(setEditorPose.boolValue == true) {
+                setEditorPose.boolValue = false;
+                //Setting a new bone has to be done when the hand is not an in editor pose, so doing this will reset the hand
+                return;
+            }
+            var startT = startTransforms.GetArrayElementAtIndex(index);
+
+            Finger.FingerType fingerType;
+            Bone.BoneType boneType;
+            HandBinderAutoRigger.IndexToType(index, out fingerType, out boneType);
+
+            startT.FindPropertyRelative("fingerType").intValue = (int)fingerType;
+            startT.FindPropertyRelative("boneType").intValue = (int)boneType;
+            startT.FindPropertyRelative("position").vector3Value = boundTransform.localPosition;
+            startT.FindPropertyRelative("rotation").vector3Value = boundTransform.localRotation.eulerAngles;
         }
 
         /// <summary>
@@ -497,7 +512,7 @@ namespace Leap.Unity.HandsModule {
                 Handles.color = handModelDebugCol;
 
                 for(int i = 0; i < myTarget.BoundGameobjects.Length; i++) {
-                    if(i % 4 == 0 && !myTarget.UseMetaBones)
+                    if(i % 4 == 0 && !myTarget.UseMetaBones && i != myTarget.BoundGameobjects.Length -1)
                         continue;
 
                     if(myTarget.BoundGameobjects[i] != null) {
