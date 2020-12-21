@@ -3,7 +3,7 @@ using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
-namespace Leap.Unity {
+namespace Leap.Unity.HandsModule {
 
     [CanEditMultipleObjects]
     [CustomEditor(typeof(HandBinder))]
@@ -191,7 +191,7 @@ namespace Leap.Unity {
                 statusTimer = 5;
                 //Allow the user to undo the auto rig
                 Undo.RegisterCompleteObjectUndo(myTarget, "Autorig");
-                HandBinderAutoRigger.AutoRig(ref myTarget);
+                HandBinderAutoRigger.AutoRig(myTarget);
 
                 myTarget.setEditorPose = true;
                 myTarget.debugModelTransforms = true;

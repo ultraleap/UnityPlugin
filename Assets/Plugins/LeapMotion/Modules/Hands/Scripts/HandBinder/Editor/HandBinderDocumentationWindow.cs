@@ -3,7 +3,7 @@ using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
-namespace Leap.Unity {
+namespace Leap.Unity.HandsModule {
 
     [InitializeOnLoad]
     public class HandBinderDocumentationWindow : EditorWindow {

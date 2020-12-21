@@ -2,7 +2,7 @@
 using System.Linq;
 using UnityEngine;
 
-namespace Leap.Unity {
+namespace Leap.Unity.HandsModule {
 
     public class HandBinder : HandModelBase {
         public Hand _leapHand;
