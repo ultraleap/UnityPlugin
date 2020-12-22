@@ -37,7 +37,7 @@ namespace Leap.Unity.HandsModule {
         private SerializedProperty globalFingerRotationOffset;
         private SerializedProperty wristRotationOffset;
         private SerializedProperty boundGameobjects;
-        private SerializedProperty startTransforms; 
+        private SerializedProperty startTransforms;
         private SerializedProperty offsets;
 
         private GUIStyle buttonStyle;
@@ -81,23 +81,17 @@ namespace Leap.Unity.HandsModule {
 
             SerializedProperties();
 
-            if(myTarget.gameObject.name.ToUpper().Contains("Left".ToUpper())) {
-                handedness.enumValueIndex = (int)Chirality.Left;
-            }
-            else if(myTarget.gameObject.name.ToUpper().Contains("Right".ToUpper())) {
-                handedness.enumValueIndex = (int)Chirality.Right;
+            //Only do this if no bones have been assigned
+            if(myTarget.BoundGameobjects.All(x => x == null)) {
+                if(myTarget.gameObject.name.ToUpper().Contains("Left".ToUpper())) {
+                    handedness.enumValueIndex = (int)Chirality.Left;
+                }
+                else if(myTarget.gameObject.name.ToUpper().Contains("Right".ToUpper())) {
+                    handedness.enumValueIndex = (int)Chirality.Right;
+                }
             }
 
-            debugModelTransforms.boolValue = true;
-
-            //Update the editor pose
-            if(!Application.isPlaying)
-                EditorApplication.update += EditorHandPose;
             serializedObject.ApplyModifiedProperties();
-        }
-
-        private void OnDestroy() {
-            EditorApplication.update -= EditorHandPose;
         }
 
         /// <summary>
@@ -182,7 +176,6 @@ namespace Leap.Unity.HandsModule {
                 GUI.color = valid ? Color.green : Color.red;
                 var status = (valid ? "Status : Completed Successfully" : "Status : Completed With Errors");
                 EditorGUILayout.LabelField(status, statusStyle);
-                debugModelTransforms.boolValue = valid;
                 GUI.color = previousCol;
                 statusTimer -= Time.deltaTime;
             }
@@ -194,9 +187,6 @@ namespace Leap.Unity.HandsModule {
                 //Allow the user to undo the auto rig
                 Undo.RegisterCompleteObjectUndo(myTarget, "Autorig");
                 HandBinderAutoRigger.AutoRig(myTarget);
-
-                myTarget.SetEditorPose = true;
-                myTarget.DebugModelTransforms = true;
             }
 
             EditorGUILayout.Space();
@@ -238,10 +228,18 @@ namespace Leap.Unity.HandsModule {
                 GUI.color = previousCol;
                 EditorGUILayout.PropertyField(gizmoSize);
                 EditorGUILayout.PropertyField(setEditorPose);
-            }
+                if(setEditorPose.boolValue != myTarget.SetEditorPose) {
+                    if(setEditorPose.boolValue == false) {
+                        myTarget.ResetHand();
+                    }
+                    else {
+                    }
+                }
 
-            if(setEditorPose.boolValue != myTarget.SetEditorPose) {
-                myTarget.ResetHand();
+                if(GUILayout.Button("Reset Hand")) {
+                    myTarget.ResetHand();
+                    setEditorPose.boolValue = false;
+                }
             }
 
             if(GUILayout.Button(!fineTuning ? "Show Fine Tuning Options" : "Hide Fine Tuning Options")) {
@@ -263,7 +261,6 @@ namespace Leap.Unity.HandsModule {
                 EditorGUILayout.Space();
                 GUILayout.Label(dividerLine);
                 EditorGUILayout.Space();
-
 
                 for(int i = 0; i < offsets.arraySize; i++) {
                     var element = offsets.GetArrayElementAtIndex(i);
@@ -393,23 +390,27 @@ namespace Leap.Unity.HandsModule {
 
             GUI.color = previousCol;
 
-            //Do an extra check to see if the bone has now been assigned to, if it has call then make sure we update the start transforms with this new reference
-            if(!isAssignedTo && beforeTransform != null) {
-                AssignTransform(index, afterTransform);
+            //Check to see if there is a bone assigned
+            if(isAssignedTo) {
+                //If there is a bone assigned but it is not the same as the bone that we have
+                if(beforeTransform != afterTransform && afterTransform != null) {
+                    AssignTransform(index, afterTransform);
+                }
             }
-
-            else if(isAssignedTo && beforeTransform != afterTransform) {
-                //The user has removed a reference to a bone, make sure that is applied
-                AssignTransform(index, afterTransform);
+            else {
+                if(afterTransform != null) {
+                    AssignTransform(index, afterTransform);
+                }
             }
         }
 
-        void AssignTransform(int index, Transform boundTransform) {
+        private void AssignTransform(int index, Transform boundTransform) {
+            //Setting a new bone has to be done when the hand is not an in editor pose, so doing this will reset the hand
             if(setEditorPose.boolValue == true) {
+                myTarget.ResetHand();
                 setEditorPose.boolValue = false;
-                //Setting a new bone has to be done when the hand is not an in editor pose, so doing this will reset the hand
-                return;
             }
+
             var startT = startTransforms.GetArrayElementAtIndex(index);
 
             Finger.FingerType fingerType;
@@ -438,9 +439,6 @@ namespace Leap.Unity.HandsModule {
                     else {
                         myTarget.UpdateHand();
                     }
-                }
-                else {
-                    myTarget.ResetHand();
                 }
             }
         }
@@ -490,6 +488,11 @@ namespace Leap.Unity.HandsModule {
         private void OnSceneGUI() {
             myTarget = (HandBinder)target;
 
+            //Update the editor pose, this will only get called when the object is selected.
+            if(!Application.isPlaying) {
+                EditorHandPose();
+            }
+
             //Draw the leap hand
             if(myTarget.DebugLeapHand) {
                 Handles.color = leapHandDebugCol;
@@ -512,11 +515,10 @@ namespace Leap.Unity.HandsModule {
                 Handles.color = handModelDebugCol;
 
                 for(int i = 0; i < myTarget.BoundGameobjects.Length; i++) {
-                    if(i % 4 == 0 && !myTarget.UseMetaBones && i != myTarget.BoundGameobjects.Length -1)
-                        continue;
+                    //if(i % 4 == 0 && !myTarget.UseMetaBones && i != myTarget.BoundGameobjects.Length -1)
+                    //    continue;
 
                     if(myTarget.BoundGameobjects[i] != null) {
-                        //Handles.SphereHandleCap(-1, myTarget.boundGameobjects[i].transform.position, myTarget.boundGameobjects[i].transform.rotation , myTarget.debugHand_Size, EventType.Repaint);
                         Handles.DrawWireDisc(myTarget.BoundGameobjects[i].transform.position, myTarget.BoundGameobjects[i].transform.right, myTarget.GizmoSize);
                         Handles.DrawWireDisc(myTarget.BoundGameobjects[i].transform.position, myTarget.BoundGameobjects[i].transform.up, myTarget.GizmoSize);
                         Handles.DrawWireDisc(myTarget.BoundGameobjects[i].transform.position, myTarget.BoundGameobjects[i].transform.forward, myTarget.GizmoSize);

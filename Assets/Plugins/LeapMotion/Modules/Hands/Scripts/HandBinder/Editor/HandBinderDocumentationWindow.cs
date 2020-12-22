@@ -7,11 +7,12 @@ namespace Leap.Unity.HandsModule {
 
     [InitializeOnLoad]
     public class HandBinderDocumentationWindow : EditorWindow {
-
         private int currentPage = 0;
         private List<int> previousPages = new List<int>();
+
         //Styles to be used for the content
         private static GUIStyle headerStyle;
+
         private static GUIStyle contentStyle;
         private static GUIStyle textureStyle;
         private static GUIStyle buttonStyle;

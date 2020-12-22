@@ -33,10 +33,13 @@ namespace Leap.Unity.HandsModule {
             foundBones.Add(SelectBones(children, boneDefinitions.DefinitionWrist).FirstOrDefault());
 
             for(int i = 0; i < foundBones.Count; i++) {
-                AssignUnityBone(foundBones[i], i, ref handBinder);
+                AssignUnityBone(foundBones[i], i, handBinder);
             }
 
             CalculateWristRotationOffset(handBinder);
+
+            handBinder.DebugModelTransforms = true;
+            handBinder.SetEditorPose = true;
         }
 
         /// <summary>
@@ -78,7 +81,6 @@ namespace Leap.Unity.HandsModule {
                     }
                 }
             }
-
             return SortBones(bones, isThumb);
         }
 
@@ -94,33 +96,26 @@ namespace Leap.Unity.HandsModule {
             Transform middle = null;
             Transform distal = null;
 
+            if(isThumb || bones.Length == 3) {
+                meta = null;
+                proximal = bones[0];
+                middle = bones[1];
+                distal = bones[2];
+            }
             //We assume the 4th child is the distal bone
-            if(bones.Length >= 4 && !isThumb) {
+            else if(bones.Length >= 4) {
                 meta = bones[0];
                 proximal = bones[1];
                 middle = bones[2];
                 distal = bones[3];
             }
 
-            //We assume that a meta is not included
-            else if(bones.Length == 3) {
-                meta = null;
-                proximal = bones[0];
-                middle = bones[1];
-                distal = bones[2];
-            }
-            //We assume the thumb starts at the proximal finger
-            else if(isThumb) {
-                proximal = bones[0];
-                middle = bones[1];
-                distal = bones[2];
-            }
             var boundObjects = new Transform[]
             {
-            meta,
-            proximal,
-            middle,
-            distal
+                meta,
+                proximal,
+                middle,
+                distal
             };
 
             return boundObjects;
@@ -134,7 +129,7 @@ namespace Leap.Unity.HandsModule {
         /// <param name="boneIndex">The index of the bone you want to assign</param>
         /// <param name="handBinder">The Hand Binder this information will be added to</param>
         /// <returns></returns>
-        public static void AssignUnityBone(Transform boneTransform, int index, ref HandBinder handBinder) {
+        public static void AssignUnityBone(Transform boneTransform, int index, HandBinder handBinder) {
             Finger.FingerType fingerType;
             Bone.BoneType boneType;
             IndexToType(index, out fingerType, out boneType);
@@ -148,6 +143,10 @@ namespace Leap.Unity.HandsModule {
                 startTransform.rotation = boneTransform.localRotation.eulerAngles;
 
                 handBinder.BoundGameobjects[index] = boneTransform;
+
+                //If we found meta bones then we can turn on this option for the user
+                if(boneType == Bone.BoneType.TYPE_METACARPAL)
+                    handBinder.UseMetaBones = true;
             }
         }
 
