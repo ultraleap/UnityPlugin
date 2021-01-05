@@ -37,7 +37,7 @@ If you've gone through the setup process but you aren't seeing hands in your app
 
 [LeapServiceProvider][ref_LeapServiceProvider] is the class that communicates with the Leap service running on your platform and provides Frame objects containing Leap hands to your application. Generally, any class that needs Hand data from the sensor will need a reference to a LeapServiceProvider to get that data. 
 
-Release 4.7.0. introduces a new tracking model for tracking devices mounted above a screen and facing down towards the user (angled at 30 degress from the vertical), which is currently in **preview only**. Known as screen top mode, this can be selected in the Leap Service Provider 'Advanced Options' section, under 'Tracking Optimization'.  NB There is a corresponding screen top option for viewing the hands in the editor when this tracking mode is selected (Edit Time Pose). 
+Release 4.7.0. introduces a new tracking model for tracking devices mounted above a screen and facing down towards the user (angled at 30 degress from the vertical), which is currently in **preview only**. Known as Screentop, this can be selected in the LeapServiceProvider's 'Advanced Options' section, under 'Tracking Optimization'.  There is a corresponding Screentop option for viewing the hands in the editor when this tracking mode is selected (Edit Time Pose). 
 
 [LeapXRServiceProvider][ref_LeapXRServiceProvider] is the specialized component you should use for XR applications. Place this component directly on your XR camera, so that it can correctly account for differences in tracking timing between the sensor and your headset's pose tracking.
 
