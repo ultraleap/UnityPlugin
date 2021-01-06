@@ -20,6 +20,8 @@ namespace Leap.Unity.HandsModule {
 
         private static UnityEngine.Object leapController;
 
+        static Vector2 scrollPosition;
+
         /// <summary>
         /// The documentation window will pop up the first time the user imports this module
         /// </summary>
@@ -45,7 +47,6 @@ namespace Leap.Unity.HandsModule {
             // Get existing open window or if none, make a new one:
             var window = (HandBinderDocumentationWindow)EditorWindow.GetWindow(typeof(HandBinderDocumentationWindow));
             window.Show();
-            window.minSize = new Vector2(650, 700);
         }
 
         private void OnGUI() {
@@ -61,7 +62,7 @@ namespace Leap.Unity.HandsModule {
             headerStyle = new GUIStyle() {
                 alignment = TextAnchor.MiddleCenter,
                 fontStyle = FontStyle.Bold,
-                fontSize = 30,
+                fontSize = Screen.width / 25,
                 normal = new GUIStyleState() {
                     textColor = Color.white,
                 }
@@ -72,7 +73,7 @@ namespace Leap.Unity.HandsModule {
                 margin = new RectOffset(10, 0, 0, 10),
                 wordWrap = true,
                 fontStyle = FontStyle.Normal,
-                fontSize = 13,
+                fontSize = Screen.width / 40,
                 normal = new GUIStyleState() {
                     textColor = Color.white,
                 }
@@ -82,7 +83,7 @@ namespace Leap.Unity.HandsModule {
                 alignment = TextAnchor.MiddleCenter,
                 wordWrap = true,
                 fontStyle = FontStyle.Bold,
-                fontSize = 20,
+                fontSize = Screen.width / 30,
                 normal = new GUIStyleState() {
                     textColor = Color.black,
                     background = (Texture2D)Resources.Load<Texture>("Editor_Documentation_Green_Upstate")
@@ -93,7 +94,7 @@ namespace Leap.Unity.HandsModule {
                 alignment = TextAnchor.MiddleCenter,
                 wordWrap = true,
                 fontStyle = FontStyle.Bold,
-                fontSize = 20,
+                fontSize = Screen.width / 30,
                 normal = new GUIStyleState() {
                     textColor = Color.black,
                     background = (Texture2D)Resources.Load<Texture>("Editor_Documentation_Yellow_Upstate")
@@ -142,6 +143,8 @@ namespace Leap.Unity.HandsModule {
         /// Depending on which page the user has selected, draw that page
         /// </summary>
         private void DrawPages() {
+
+            scrollPosition = GUILayout.BeginScrollView(scrollPosition);
             switch(currentPage) {
                 case 0:
                     previousPages.Clear();
@@ -168,6 +171,7 @@ namespace Leap.Unity.HandsModule {
                     Page5();
                     break;
             }
+            GUILayout.EndScrollView();
         }
 
         private void MovePage(int specific) {
@@ -191,8 +195,8 @@ namespace Leap.Unity.HandsModule {
             GUILayout.Space(-50);
             Header("Hand Rigging Module");
             GUILayout.Space(100);
-            GUILayout.Label("<size=20>Set up your own rigged hands with the Rigging Module</size>", contentStyle);
-            GUILayout.Label("<size=20> Press Next Step to follow the step by step guide</size>", contentStyle);
+            GUILayout.Label("Set up your own rigged hands with the Rigging Module", contentStyle);
+            GUILayout.Label("Press Next Step to follow the step by step guide", contentStyle);
             GUILayout.Space(100);
 
             GUILayout.BeginHorizontal();

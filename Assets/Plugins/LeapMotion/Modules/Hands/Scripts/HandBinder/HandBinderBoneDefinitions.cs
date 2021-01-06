@@ -2,7 +2,7 @@
 
 namespace Leap.Unity.HandsModule {
 
-    [CreateAssetMenu(fileName = "AutoRigger_Definitions", menuName = "Ultraleap/Autorigger_Definitions", order = 1)]
+    [CreateAssetMenu(fileName = "HandBinderBoneDefinitions", menuName = "Ultraleap/HandBinderBoneDefinitions", order = 1)]
     public class HandBinderBoneDefinitions : ScriptableObject {
         public BoneDefinitions BoneDefinitions = new BoneDefinitions();
     }
