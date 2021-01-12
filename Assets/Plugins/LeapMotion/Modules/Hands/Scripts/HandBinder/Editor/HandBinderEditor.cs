@@ -25,6 +25,7 @@ namespace Leap.Unity.HandsModule {
         private bool fineTuning;
         private bool debugOptions;
         private bool riggingOptions;
+        private bool armRigging;
 
         private SerializedProperty handedness;
         private SerializedProperty debugLeapHand;
@@ -39,6 +40,14 @@ namespace Leap.Unity.HandsModule {
         private SerializedProperty boundGameobjects;
         private SerializedProperty startTransforms;
         private SerializedProperty offsets;
+
+        private SerializedProperty elbow;
+        private SerializedProperty shoulder;
+        private SerializedProperty elbowRotationOffset;
+        private SerializedProperty elbowPositionOffset;
+        private SerializedProperty shoulderRotationOffset;
+        private SerializedProperty elbowOffset;
+        private SerializedProperty shoulderOffset;
 
         private GUIStyle buttonStyle;
         private GUIStyle statusStyle;
@@ -65,6 +74,14 @@ namespace Leap.Unity.HandsModule {
             startTransforms = serializedObject.FindProperty("StartTransforms");
             customBoneDefinitions = serializedObject.FindProperty("CustomBoneDefinitions");
             offsets = serializedObject.FindProperty("Offsets");
+
+            elbow = serializedObject.FindProperty("elbow");
+            shoulder = serializedObject.FindProperty("shoulder");
+            elbowRotationOffset = serializedObject.FindProperty("elbowRotationOffset");
+            elbowPositionOffset = serializedObject.FindProperty("elbowPositionOffset");
+            shoulderRotationOffset = serializedObject.FindProperty("shoulderRotationOffset");
+            elbowOffset = serializedObject.FindProperty("elbowOffset");
+            shoulderOffset = serializedObject.FindProperty("shoulderOffset");
 
             handTexture = Resources.Load<Texture>("Editor_hand");
             buttonTexture = Resources.Load<Texture>("Editor_Documentation_Green_Upstate");
@@ -154,7 +171,7 @@ namespace Leap.Unity.HandsModule {
             var middleOfImage = middleOfInspector - (handedness.intValue == 0 ? handTexture.width : -handTexture.width) / 2;
 
             //Create the rect that the texture will use
-            imageRect = new Rect(middleOfImage, 20, handedness.intValue == 0 ? handTexture.width : -handTexture.width, handTexture.height);
+            imageRect = new Rect(middleOfImage, 30, handedness.intValue == 0 ? handTexture.width : -handTexture.width, handTexture.height);
 
             ////Begin drawing an area to display the hand
             GUILayout.BeginVertical(GUILayout.MinWidth(imageRect.width), GUILayout.MinHeight(imageRect.height));
@@ -192,9 +209,12 @@ namespace Leap.Unity.HandsModule {
             EditorGUILayout.Space();
             //Choose if this hand is the left or right hand
 
+            GUI.color = riggingOptions ? Color.green : Color.white;
             if(GUILayout.Button(!riggingOptions ? "Show Rigging Options" : "Hide Rigging Options")) {
                 riggingOptions = !riggingOptions;
             }
+
+            GUI.color = Color.white;
 
             if(riggingOptions) {
                 EditorGUILayout.Space();
@@ -202,11 +222,61 @@ namespace Leap.Unity.HandsModule {
                 useMetaBones.boolValue = GUILayout.Toggle(useMetaBones.boolValue, "Use Metacarpal  Bones");
                 setPositions.boolValue = GUILayout.Toggle(setPositions.boolValue, "Set the positions of the fingers");
                 EditorGUILayout.PropertyField(customBoneDefinitions);
+                EditorGUILayout.Space();
+
+                GUI.color = armRigging ? Color.green : Color.white;
+                if(GUILayout.Button("Arm Rigging")) {
+                    armRigging = !armRigging;
+                }
+                GUI.color = Color.white;
+                GUILayout.Space(armRigging ? 0 : 10);
+
+                if(armRigging) {
+                    EditorGUI.BeginChangeCheck();
+                    EditorGUILayout.PropertyField(elbow);
+                    if(EditorGUI.EndChangeCheck()) {
+
+                        if(elbow.objectReferenceValue != null) {
+                            var t = (elbow.objectReferenceValue) as GameObject;
+                            if(t != null) {
+                                elbowOffset.FindPropertyRelative("position").vector3Value = t.transform.localPosition;
+                                elbowOffset.FindPropertyRelative("rotation").vector3Value = t.transform.localRotation.eulerAngles;
+                            }
+                        }
+                    }
+
+                    EditorGUILayout.PropertyField(elbowPositionOffset);
+                    EditorGUILayout.PropertyField(elbowRotationOffset);
+
+                    EditorGUI.BeginChangeCheck();
+                    EditorGUILayout.PropertyField(shoulder);
+                    if(EditorGUI.EndChangeCheck()) {
+                        if(((shoulder.objectReferenceValue) as Transform) != null) {
+                            var shoulderOffset = new HandBinder.Offset();
+                            shoulderOffset.position = ((shoulder.objectReferenceValue) as Transform).transform.localPosition;
+                            shoulderOffset.rotation = ((shoulder.objectReferenceValue) as Transform).localRotation.eulerAngles;
+                            myTarget.shoulderOffset = shoulderOffset;
+                        }
+
+                        if(shoulder.objectReferenceValue != null) {
+                            var t = (shoulder.objectReferenceValue) as GameObject;
+                            if(t != null) {
+                                shoulderOffset.FindPropertyRelative("position").vector3Value = t.transform.localPosition;
+                                shoulderOffset.FindPropertyRelative("rotation").vector3Value = t.transform.localRotation.eulerAngles;
+                            }
+                        }
+                    }
+
+                    EditorGUILayout.PropertyField(shoulderRotationOffset);
+                    EditorGUILayout.Space();
+                }
             }
 
+            GUI.color = debugOptions ? Color.green : Color.white;
             if(GUILayout.Button(!debugOptions ? "Show Debug Options" : "Hide Debug Options")) {
                 debugOptions = !debugOptions;
             }
+            GUI.color = Color.white;
 
             if(debugOptions) {
                 EditorGUILayout.Space();
@@ -228,6 +298,7 @@ namespace Leap.Unity.HandsModule {
                 GUI.color = previousCol;
                 EditorGUILayout.PropertyField(gizmoSize);
                 EditorGUILayout.PropertyField(setEditorPose);
+
                 if(setEditorPose.boolValue != myTarget.SetEditorPose) {
                     if(setEditorPose.boolValue == false) {
                         myTarget.ResetHand();
@@ -242,15 +313,18 @@ namespace Leap.Unity.HandsModule {
                 }
             }
 
+            GUI.color = fineTuning ? Color.green : Color.white;
             if(GUILayout.Button(!fineTuning ? "Show Fine Tuning Options" : "Hide Fine Tuning Options")) {
                 fineTuning = !fineTuning;
             }
+            GUI.color = Color.white;
 
             if(fineTuning) {
                 EditorGUILayout.Space();
-                EditorGUILayout.PropertyField(globalFingerRotationOffset);
-                EditorGUILayout.Space();
                 EditorGUILayout.PropertyField(wristRotationOffset);
+                EditorGUILayout.Space();
+                EditorGUILayout.PropertyField(globalFingerRotationOffset);
+
                 EditorGUILayout.Space();
 
                 if(GUILayout.Button("Recalculate Offsets")) {
@@ -301,11 +375,20 @@ namespace Leap.Unity.HandsModule {
                     GUILayout.Label(dividerLine);
                     EditorGUILayout.Space();
                 }
-
                 if(GUILayout.Button("Add Finger Offset + ", subButtonStyle)) {
                     offsets.InsertArrayElementAtIndex(offsets.arraySize);
                 }
             }
+
+            GUILayout.Space(10);
+            GUILayout.BeginHorizontal();
+            GUILayout.Space(20);
+            if(GUILayout.Button("Setup Guide")) {
+                var window = (HandBinderDocumentationWindow)EditorWindow.GetWindow(typeof(HandBinderDocumentationWindow));
+                window.Show();
+            }
+            GUILayout.Space(20);
+            GUILayout.EndHorizontal();
 
             serializedObject.ApplyModifiedProperties();
         }
@@ -519,9 +602,13 @@ namespace Leap.Unity.HandsModule {
                     //    continue;
 
                     if(myTarget.BoundGameobjects[i] != null) {
-                        Handles.DrawWireDisc(myTarget.BoundGameobjects[i].transform.position, myTarget.BoundGameobjects[i].transform.right, myTarget.GizmoSize);
-                        Handles.DrawWireDisc(myTarget.BoundGameobjects[i].transform.position, myTarget.BoundGameobjects[i].transform.up, myTarget.GizmoSize);
-                        Handles.DrawWireDisc(myTarget.BoundGameobjects[i].transform.position, myTarget.BoundGameobjects[i].transform.forward, myTarget.GizmoSize);
+                        var target = myTarget.BoundGameobjects[i].transform;
+
+                        if(myTarget.DebugModelTransforms) {
+                            Handles.DrawWireDisc(target.position, target.right, gizmoSize.floatValue);
+                            Handles.DrawWireDisc(target.position, target.up, gizmoSize.floatValue);
+                            Handles.DrawWireDisc(target.position, target.forward, gizmoSize.floatValue);
+                        }
                     }
                 }
             }

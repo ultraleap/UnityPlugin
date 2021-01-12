@@ -176,28 +176,21 @@ namespace Leap.Unity.HandsModule {
                 //Make the vectors orthoginal to eacother, this is the basis for the model hand
                 Vector3.OrthoNormalize(ref wristRight, ref wristUp, ref wristForward);
 
-                //Get the rotation of the calculated hand Basis
-                var modelRotation = Quaternion.LookRotation(wristForward, wristUp);
-
                 //Create a new leap hand based off the Desktop hand pose
                 var hand = TestHandFactory.MakeTestHand(handBinder.Handedness == Chirality.Left, unitType: TestHandFactory.UnitType.LeapUnits);
                 hand.Transform(TestHandFactory.GetTestPoseLeftHandTransform(TestHandFactory.TestHandPose.DesktopModeA));
                 var leapRotation = hand.Rotation.ToQuaternion();
 
+                //Get the rotation of the calculated hand Basis
+                var modelRotation = Quaternion.LookRotation(wristForward, wristUp);
+
                 //Now calculate the difference between the models rotation and the leaps rotation
                 var wristRotationDifference = Quaternion.Inverse(modelRotation) * leapRotation;
-                var wristRelativeDifference = Quaternion.Inverse(handBinder.BoundGameobjects[20].transform.rotation) * wristRotationDifference;
-
-                //We are using Euler angles to make it easier to understand in the inspector
-                var roundedWristRotationOffset = wristRelativeDifference.eulerAngles;
-                //Round these values to the nearest 90 degrees
-                roundedWristRotationOffset.x = Mathf.Round(roundedWristRotationOffset.x / 90) * 90;
-                roundedWristRotationOffset.y = Mathf.Round(roundedWristRotationOffset.y / 90) * 90;
-                roundedWristRotationOffset.z = Mathf.Round(roundedWristRotationOffset.z / 90) * 90;
+                var wristRelativeDifference = (Quaternion.Inverse(handBinder.BoundGameobjects[20].transform.rotation) * wristRotationDifference).eulerAngles;
 
                 //Assign these values to the hand binder
-                handBinder.GlobalFingerRotationOffset = roundedWristRotationOffset;
-                handBinder.WristRotationOffset = roundedWristRotationOffset;
+                handBinder.GlobalFingerRotationOffset = wristRelativeDifference;
+                handBinder.WristRotationOffset = wristRelativeDifference;
             }
         }
 

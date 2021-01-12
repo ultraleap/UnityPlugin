@@ -5,7 +5,6 @@ using UnityEngine;
 
 namespace Leap.Unity.HandsModule {
 
-    [InitializeOnLoad]
     public class HandBinderDocumentationWindow : EditorWindow {
         private int currentPage = 0;
         private List<int> previousPages = new List<int>();
@@ -21,22 +20,6 @@ namespace Leap.Unity.HandsModule {
         private static UnityEngine.Object leapController;
 
         static Vector2 scrollPosition;
-
-        /// <summary>
-        /// The documentation window will pop up the first time the user imports this module
-        /// </summary>
-        static HandBinderDocumentationWindow() {
-            EditorApplication.update += Open;
-        }
-
-        private static void Open() {
-            //Allow it to pop up when the user first installs the module
-            if(PlayerPrefs.GetInt("Rigging_Documentation_PopUp") == 0) {
-                //Stop it popping up when the project is loaded again
-                PlayerPrefs.SetInt("Rigging_Documentation_PopUp", 1);
-                Init();
-            }
-        }
 
         /// <summary>
         /// Makes the documentation window appear in its own menu at the top
