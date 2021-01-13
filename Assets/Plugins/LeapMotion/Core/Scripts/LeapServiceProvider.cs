@@ -176,7 +176,8 @@ namespace Leap.Unity {
       = new Dictionary<TestHandFactory.TestHandPose, Hand>();
     private Hand _editTimeLeftHand {
       get {
-        if (_cachedLeftHands.TryGetValue(editTimePose, out Hand cachedHand)) {
+        Hand cachedHand = null;
+        if (_cachedLeftHands.TryGetValue(editTimePose, out cachedHand)) {
           return cachedHand;
         }
         else {
@@ -191,7 +192,8 @@ namespace Leap.Unity {
       = new Dictionary<TestHandFactory.TestHandPose, Hand>();
     private Hand _editTimeRightHand {
       get {
-        if (_cachedRightHands.TryGetValue(editTimePose, out Hand cachedHand)) {
+        Hand cachedHand = null;
+        if (_cachedRightHands.TryGetValue(editTimePose, out cachedHand)) {
           return cachedHand;
         }
         else {
