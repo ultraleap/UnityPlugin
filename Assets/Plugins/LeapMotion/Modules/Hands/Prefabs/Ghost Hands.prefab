@@ -706,6 +706,7 @@ MonoBehaviour:
     boneType: 0
     position: {x: 0, y: 0, z: 0}
     rotation: {x: 0, y: 0, z: 0}
+  handRotationLimiter: {fileID: 0}
   Offsets: []
   BoundGameobjects:
   - {fileID: 0}
@@ -1477,6 +1478,7 @@ MonoBehaviour:
     boneType: 0
     position: {x: 0, y: 0, z: 0}
     rotation: {x: 0, y: 0, z: 0}
+  handRotationLimiter: {fileID: 0}
   Offsets: []
   BoundGameobjects:
   - {fileID: 0}
@@ -2335,6 +2337,11 @@ PrefabInstance:
       propertyPath: m_LocalRotation.w
       value: 0.6497586
       objectReference: {fileID: 0}
+    - target: {fileID: 4376116880951145041, guid: 4577231256ebec149ac8882d93c98cda,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 4c1d8de22955e4a4c8dda3f54365517d, type: 2}
     - target: {fileID: 4458883916249789313, guid: 4577231256ebec149ac8882d93c98cda,
         type: 3}
       propertyPath: m_LocalRotation.y
@@ -3381,6 +3388,11 @@ PrefabInstance:
       propertyPath: m_LocalRotation.w
       value: 0.6497586
       objectReference: {fileID: 0}
+    - target: {fileID: 4376116880951145041, guid: 4577231256ebec149ac8882d93c98cda,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 4c1d8de22955e4a4c8dda3f54365517d, type: 2}
     - target: {fileID: 4458883916249789313, guid: 4577231256ebec149ac8882d93c98cda,
         type: 3}
       propertyPath: m_LocalRotation.y
