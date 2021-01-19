@@ -696,6 +696,7 @@ namespace Leap.Unity.Interaction {
     private bool _graspButtonDown = false;
     private bool _graspButtonUp = false;
     private float _graspButtonDownSlopTimer = 0F;
+    private bool _inputWarningDisplayed = false;
 
     public override Vector3 GetGraspPoint() {
       return graspPoint.transform.position;
@@ -731,7 +732,12 @@ namespace Leap.Unity.Interaction {
           try {
             graspButton = Input.GetAxis(graspButtonAxis) > graspDepressedValue;
           } catch {
-            Debug.LogError("INPUT AXIS NOT SET UP.  Go to your Input Manager and add a definition for " + graspButtonAxis + " on the " + (isLeft ? "9" : "10") + "th Joystick Axis.");
+            if (!_inputWarningDisplayed) {
+              Debug.LogWarning("VR CONTROLLER INPUT AXES ARE NOT SET UP.  Go to your Input Manager " +
+                "and add a definition for " + graspButtonAxis + " on the " + (isLeft ? "9" : "10") + "th " +
+                "Joystick Axis or disable this controller.", this);
+              _inputWarningDisplayed = true;
+            }
             graspButton = Input.GetKey(isLeft ? KeyCode.JoystickButton14: KeyCode.JoystickButton15);
           }
         }
@@ -756,7 +762,12 @@ namespace Leap.Unity.Interaction {
           try {
             graspButton = Input.GetAxis(graspButtonAxis) > graspDepressedValue;
           } catch {
-            Debug.LogError("INPUT AXIS NOT SET UP.  Go to your Input Manager and add a definition for " + graspButtonAxis + " on the " + (isLeft ? "9" : "10") + "th Joystick Axis.");
+            if (!_inputWarningDisplayed) {
+              Debug.LogWarning("VR CONTROLLER INPUT AXES ARE NOT SET UP.  Go to your Input Manager " +
+                "and add a definition for " + graspButtonAxis + " on the " + (isLeft ? "9" : "10") + "th " +
+                "Joystick Axis or disable this controller.", this);
+              _inputWarningDisplayed = true;
+            }
             graspButton = Input.GetKey(isLeft ? KeyCode.JoystickButton14 : KeyCode.JoystickButton15);
           }
         }
