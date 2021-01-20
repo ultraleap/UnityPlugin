@@ -40,3 +40,5 @@ Note: Tested with V0.1.2 of the Package
 
 * Not all features of the Leap.Hand are populated by the provider. All joint transforms for the hand are updated, but additional features such as pinch strength are not.
 
+* The OpenXR data in the Microsoft plugin is designed around an eye level experience, whereas Unity by default uses a floor level. Ensure there is an  `EyeLevelOverride` component applied to an object in your scene to ensure hands appear in the correct location for your head.
+
