@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 
+#if LEAP_TESTS
 using Leap.Unity.Testing;
 
 
@@ -38,4 +39,5 @@ namespace Leap.Unity.GraphicalRenderer.Tests {
     }
   }
 }
+#endif
 #endif

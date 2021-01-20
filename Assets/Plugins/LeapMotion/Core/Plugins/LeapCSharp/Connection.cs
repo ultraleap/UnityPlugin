@@ -15,7 +15,30 @@ namespace LeapInternal {
   using Leap;
 
   public class Connection {
-    private static Dictionary<int, Connection> connectionDictionary = new Dictionary<int, Connection>();
+    public struct Key {
+      public readonly int connectionId;
+      public readonly string serverNamespace;
+
+      public Key(int connectionId, string serverNamespace = null) {
+        this.connectionId = connectionId;
+        this.serverNamespace = serverNamespace;
+      }
+    }
+
+    private static Dictionary<Key, Connection> connectionDictionary = new Dictionary<Key, Connection>();
+
+    public static Connection GetConnection(int connectionId = 0) {
+      return GetConnection(new Key(connectionId));
+    }
+
+    public static Connection GetConnection(Key connectionKey) {
+      Connection conn;
+      if (!Connection.connectionDictionary.TryGetValue(connectionKey, out conn)) {
+        conn = new Connection(connectionKey);
+        connectionDictionary.Add(connectionKey, conn);
+      }
+      return conn;
+    }
 
     //Left-right precalculated offsets
     private static long _handIdOffset;
@@ -30,16 +53,7 @@ namespace LeapInternal {
       _handOrientationOffset = Marshal.OffsetOf(typeof(LEAP_PALM), "orientation").ToInt64() + palmOffset;
     }
 
-    public static Connection GetConnection(int connectionKey = 0) {
-      Connection conn;
-      if (!connectionDictionary.TryGetValue(connectionKey, out conn)) {
-        conn = new Connection(connectionKey);
-        connectionDictionary.Add(connectionKey, conn);
-      }
-      return conn;
-    }
-
-    public int ConnectionKey { get; private set; }
+    public Key ConnectionKey { get; private set; }
     public CircularObjectBuffer<LEAP_TRACKING_EVENT> Frames { get; set; }
 
     private DeviceList _devices = new DeviceList();
@@ -129,7 +143,7 @@ namespace LeapInternal {
       Dispose(false);
     }
 
-    private Connection(int connectionKey) {
+    private Connection(Key connectionKey) {
       ConnectionKey = connectionKey;
       _leapConnection = IntPtr.Zero;
 
@@ -144,7 +158,17 @@ namespace LeapInternal {
 
       eLeapRS result;
       if (_leapConnection == IntPtr.Zero) {
-        result = LeapC.CreateConnection(out _leapConnection);
+        if (ConnectionKey.serverNamespace == null) {
+          result = LeapC.CreateConnection(out _leapConnection);
+        } else {
+          LEAP_CONNECTION_CONFIG config = new LEAP_CONNECTION_CONFIG();
+          config.size = (uint)Marshal.SizeOf(config);
+          config.flags = 0;
+          config.server_namespace = Marshal.StringToHGlobalAnsi(ConnectionKey.serverNamespace);
+          result = LeapC.CreateConnection(ref config, out _leapConnection);
+          Marshal.FreeHGlobal(config.server_namespace);
+        }
+
         if (result != eLeapRS.eLeapRS_Success || _leapConnection == IntPtr.Zero) {
           reportAbnormalResults("LeapC CreateConnection call was ", result);
           return;
@@ -695,6 +719,8 @@ namespace LeapInternal {
           return eLeapPolicyFlag.eLeapPolicyFlag_AllowPauseResume;
         case Controller.PolicyFlag.POLICY_MAP_POINTS:
           return eLeapPolicyFlag.eLeapPolicyFlag_MapPoints;
+        case Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP:
+          return eLeapPolicyFlag.eLeapPolicyFlag_ScreenTop;
         case Controller.PolicyFlag.POLICY_DEFAULT:
           return 0;
         default:

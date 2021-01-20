@@ -30,14 +30,17 @@ namespace Leap.Unity {
   }
 
   public class CustomEditorBase : Editor {
-    protected Dictionary<string, Action<SerializedProperty>> _specifiedDrawers;
+    protected Dictionary<string,      Action<SerializedProperty >> _specifiedDrawers;
     protected Dictionary<string, List<Action<SerializedProperty>>> _specifiedDecorators;
     protected Dictionary<string, List<Action<SerializedProperty>>> _specifiedPostDecorators;
-    protected Dictionary<string, List<Func<bool>>> _conditionalProperties;
-    protected List<string> _deferredProperties;
+    protected Dictionary<string,                 List<Func<bool>>> _conditionalProperties;
+    protected Dictionary<string,                     List<string>> _foldoutProperties;
+    protected Dictionary<string,                             bool> _foldoutStates;
+    protected List      <string                                  > _deferredProperties;
     protected bool _showScriptField = true;
 
     private bool _canCallSpecifyFunctions = false;
+    private GUIStyle _boldFoldoutStyle;
 
     protected List<SerializedProperty> _modifiedProperties = new List<SerializedProperty>();
 
@@ -180,6 +183,37 @@ namespace Leap.Unity {
       _deferredProperties.Insert(0, propertyName);
     }
 
+    /// <summary>
+    /// Condition the drawing of a property based on the status of a foldout drop-down.
+    /// </summary>
+    protected void addPropertyToFoldout(string propertyName, string foldoutName, bool foldoutStartOpen = false) {
+      throwIfNotInOnEnable("addPropertyToFoldout");
+
+      if (!validateProperty(propertyName)) { return; }
+
+      List<string> list;
+      if (!_foldoutProperties.TryGetValue(foldoutName, out list)) {
+        list = new List<string>();
+        _foldoutProperties[foldoutName] = list;
+      }
+      _foldoutProperties[foldoutName].Add(propertyName);
+      _foldoutStates    [foldoutName] = foldoutStartOpen;
+    }
+
+    /// <summary>
+    /// Check whether a property is inside of a foldout drop-down.
+    /// </summary>
+    protected bool isInFoldout(string propertyName) {
+      bool isInFoldout = false;
+      foreach (var foldout in _foldoutProperties) {
+        foreach (string property in foldout.Value) {
+          if (property.Equals(propertyName)) { isInFoldout = true; break; }
+        }
+        if (isInFoldout) { break; }
+      }
+      return isInFoldout;
+    }
+
     protected void drawScriptField(bool disable = true) {
       var scriptProp = serializedObject.FindProperty("m_Script");
       EditorGUI.BeginDisabledGroup(disable);
@@ -195,11 +229,13 @@ namespace Leap.Unity {
         throw new Exception("Cleaning up an editor of type " + GetType() + ".  Make sure to always destroy your editors when you are done with them!");
       }
 
-      _specifiedDrawers = new Dictionary<string, Action<SerializedProperty>>();
-      _specifiedDecorators = new Dictionary<string, List<Action<SerializedProperty>>>();
+      _specifiedDrawers        = new Dictionary<string, Action<SerializedProperty>>();
+      _specifiedDecorators     = new Dictionary<string, List<Action<SerializedProperty>>>();
       _specifiedPostDecorators = new Dictionary<string, List<Action<SerializedProperty>>>();
-      _conditionalProperties = new Dictionary<string, List<Func<bool>>>();
-      _deferredProperties = new List<string>();
+      _conditionalProperties   = new Dictionary<string, List<Func<bool>>>();
+      _foldoutProperties       = new Dictionary<string, List<string>>();
+      _foldoutStates           = new Dictionary<string, bool>();
+      _deferredProperties      = new List<string>();
       _canCallSpecifyFunctions = true;
     }
 
@@ -216,6 +252,12 @@ namespace Leap.Unity {
      * Individual properties can be specified to have custom drawers.
      */
     public override void OnInspectorGUI() {
+      // OnInspectorGUI is the first time "EditorStyles" can be accessed
+      if (_boldFoldoutStyle == null) {
+        _boldFoldoutStyle = new GUIStyle(EditorStyles.foldout);
+        _boldFoldoutStyle.fontStyle = FontStyle.Bold;
+      }
+
       _canCallSpecifyFunctions = false;
 
       _modifiedProperties.Clear();
@@ -228,7 +270,8 @@ namespace Leap.Unity {
           continue;
         }
 
-        if (_deferredProperties.Contains(iterator.name)) {
+        if (_deferredProperties.Contains(iterator.name) || 
+            isInFoldout(iterator.name)) {
           continue;
         }
 
@@ -240,7 +283,28 @@ namespace Leap.Unity {
       }
 
       foreach (var deferredProperty in _deferredProperties) {
-        drawProperty(serializedObject.FindProperty(deferredProperty));
+        if (!isInFoldout(deferredProperty)) {
+          drawProperty(serializedObject.FindProperty(deferredProperty));
+        }
+      }
+
+      foreach (var foldout in _foldoutProperties) {
+        _foldoutStates[foldout.Key] = 
+          EditorGUILayout.Foldout(_foldoutStates[foldout.Key], foldout.Key, _boldFoldoutStyle);
+        if (_foldoutStates[foldout.Key]) {
+          // Draw normal priority properties first
+          foreach (var property in foldout.Value) {
+            if (!_deferredProperties.Contains(property)) {
+              drawProperty(serializedObject.FindProperty(property));
+            }
+          }
+          // Draw deferred properties second
+          foreach (var property in foldout.Value) {
+            if (_deferredProperties.Contains(property)) {
+              drawProperty(serializedObject.FindProperty(property));
+            }
+          }
+        }
       }
 
       serializedObject.ApplyModifiedProperties();

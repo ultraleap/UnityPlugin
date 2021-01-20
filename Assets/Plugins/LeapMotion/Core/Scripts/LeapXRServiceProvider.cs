@@ -38,8 +38,6 @@ namespace Leap.Unity {
       Transform
     }
 
-    [Header("Advanced")]
-
     [Tooltip("Allow manual adjustment of the Leap device's virtual offset and tilt. These "
            + "settings can be used to match the physical position and orientation of the "
            + "Leap Motion sensor on a tracked device it is mounted on (such as a VR "
@@ -415,6 +413,7 @@ namespace Leap.Unity {
       }
 
       // Optimize for head-mounted tracking if on head-mounted display.
+      _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP);
       _leapController.SetPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
     }
 

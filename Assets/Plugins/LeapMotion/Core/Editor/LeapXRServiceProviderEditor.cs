@@ -34,6 +34,16 @@ namespace Leap.Unity {
                                                  .FindProperty("_deviceOffsetMode")
                                                    .enumValueIndex == 2; },
                                 "_deviceOrigin");
+
+      addPropertyToFoldout("_deviceOffsetMode"    , "Advanced Options");
+      addPropertyToFoldout("_temporalWarpingMode" , "Advanced Options");
+      addPropertyToFoldout("_customWarpAdjustment", "Advanced Options");
+      addPropertyToFoldout("_deviceOffsetYAxis"   , "Advanced Options");
+      addPropertyToFoldout("_deviceOffsetZAxis"   , "Advanced Options");
+      addPropertyToFoldout("_deviceTiltXAxis"     , "Advanced Options");
+      addPropertyToFoldout("_deviceOrigin"        , "Advanced Options");
+      addPropertyToFoldout("_preCullCamera"       , "Advanced Options");
+      addPropertyToFoldout("_updateHandInPrecull" , "Advanced Options");
     }
 
     private void decorateAllowManualTimeAlignment(SerializedProperty property) {
