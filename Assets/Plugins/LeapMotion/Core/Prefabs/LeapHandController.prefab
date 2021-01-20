@@ -10,7 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 432918}
   - component: {fileID: 11435192}
-  - component: {fileID: 11406336}
   m_Layer: 0
   m_Name: LeapHandController
   m_TagString: Untagged
@@ -50,17 +49,4 @@ MonoBehaviour:
   _physicsExtrapolation: 1
   _physicsExtrapolationTime: 0.011111111
   _workerThreadProfiling: 0
---- !u!114 &11406336
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 166326}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c592f16851a620743868a31232613370, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _leapProvider: {fileID: 0}
-  ModelPool: []
+  _serverNameSpace: Leap Service
