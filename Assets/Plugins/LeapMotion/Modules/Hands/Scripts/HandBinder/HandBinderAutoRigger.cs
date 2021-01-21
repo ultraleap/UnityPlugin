@@ -38,6 +38,19 @@ namespace Leap.Unity.HandsModule {
 
             CalculateWristRotationOffset(handBinder);
 
+            foreach(var def in boneDefinitions.DefinitionElbow) {
+                foreach(var child in children) {
+                    if(child.name.ToUpper().Contains(def.ToUpper())) {
+                        handBinder.elbow = child.gameObject;
+                        break;
+                    }
+                }
+
+                if(handBinder.elbow != null) {
+                    break;
+                }
+            }
+
             handBinder.DebugModelTransforms = true;
             handBinder.SetEditorPose = true;
         }

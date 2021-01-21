@@ -19,5 +19,6 @@ namespace Leap.Unity.HandsModule {
         public string[] DefinitionPinky = { "pinky", "little" };
         public string[] DefinitionWrist = { "wrist", "hand", "palm" };
         public string[] DefinitionElbow = { "elbow", "upperArm" };
+        //public string[] DefinitionShoulder = { "shoulder", ""};
     }
 }

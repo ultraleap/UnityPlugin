@@ -680,20 +680,18 @@ MonoBehaviour:
   WristRotationOffset: {x: 1.1733366, y: 83.780685, z: 173.32983}
   GlobalFingerRotationOffset: {x: 1.1733366, y: 83.780685, z: 173.32983}
   elbow: {fileID: 0}
-  shoulder: {fileID: 0}
   elbowRotationOffset: {x: 0, y: 0, z: 0}
   elbowPositionOffset: {x: 0, y: 0, z: 0}
-  shoulderRotationOffset: {x: 0, y: 0, z: 0}
   elbowOffset:
     fingerType: 0
     boneType: 0
     position: {x: 0, y: 0, z: 0}
     rotation: {x: 0, y: 0, z: 0}
-  shoulderOffset:
-    fingerType: 0
-    boneType: 0
-    position: {x: 0, y: 0, z: 0}
-    rotation: {x: 0, y: 0, z: 0}
+  fineTuning: 0
+  debugOptions: 0
+  riggingOptions: 0
+  armRigging: 0
+  needsResetUpdating: 1
   Offsets: []
   BoundGameobjects:
   - {fileID: 0}
@@ -1463,20 +1461,18 @@ MonoBehaviour:
   WristRotationOffset: {x: 1.1733366, y: 276.2193, z: 186.67017}
   GlobalFingerRotationOffset: {x: 1.1733366, y: 276.2193, z: 186.67017}
   elbow: {fileID: 0}
-  shoulder: {fileID: 0}
   elbowRotationOffset: {x: 0, y: 0, z: 0}
   elbowPositionOffset: {x: 0, y: 0, z: 0}
-  shoulderRotationOffset: {x: 0, y: 0, z: 0}
   elbowOffset:
     fingerType: 0
     boneType: 0
     position: {x: 0, y: 0, z: 0}
     rotation: {x: 0, y: 0, z: 0}
-  shoulderOffset:
-    fingerType: 0
-    boneType: 0
-    position: {x: 0, y: 0, z: 0}
-    rotation: {x: 0, y: 0, z: 0}
+  fineTuning: 0
+  debugOptions: 0
+  riggingOptions: 0
+  armRigging: 0
+  needsResetUpdating: 1
   Offsets: []
   BoundGameobjects:
   - {fileID: 0}
@@ -2128,7 +2124,7 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 4577231256ebec149ac8882d93c98cda,
         type: 3}
       propertyPath: m_Name
-      value: Generic Hand_Left
+      value: Outline Hand_Left
       objectReference: {fileID: 0}
     - target: {fileID: 1272306230068891847, guid: 4577231256ebec149ac8882d93c98cda,
         type: 3}
@@ -3189,7 +3185,7 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 4577231256ebec149ac8882d93c98cda,
         type: 3}
       propertyPath: m_Name
-      value: Generic Hand_Right
+      value: Outline Hand_Right
       objectReference: {fileID: 0}
     - target: {fileID: 1272306230068891847, guid: 4577231256ebec149ac8882d93c98cda,
         type: 3}

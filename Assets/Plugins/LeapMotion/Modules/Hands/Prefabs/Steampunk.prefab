@@ -679,20 +679,18 @@ MonoBehaviour:
   WristRotationOffset: {x: 5.1985364, y: 358.95816, z: 186.23482}
   GlobalFingerRotationOffset: {x: 5.1985364, y: 358.95816, z: 186.23482}
   elbow: {fileID: 0}
-  shoulder: {fileID: 0}
   elbowRotationOffset: {x: 0, y: 0, z: 0}
   elbowPositionOffset: {x: 0, y: 0, z: 0}
-  shoulderRotationOffset: {x: 0, y: 0, z: 0}
   elbowOffset:
     fingerType: 0
     boneType: 0
     position: {x: 0, y: 0, z: 0}
     rotation: {x: 0, y: 0, z: 0}
-  shoulderOffset:
-    fingerType: 0
-    boneType: 0
-    position: {x: 0, y: 0, z: 0}
-    rotation: {x: 0, y: 0, z: 0}
+  fineTuning: 0
+  debugOptions: 0
+  riggingOptions: 1
+  armRigging: 0
+  needsResetUpdating: 0
   Offsets: []
   BoundGameobjects:
   - {fileID: 0}
@@ -1469,20 +1467,18 @@ MonoBehaviour:
   WristRotationOffset: {x: 5.1985364, y: 1.0418534, z: 173.76518}
   GlobalFingerRotationOffset: {x: 5.1985364, y: 1.0418534, z: 173.76518}
   elbow: {fileID: 0}
-  shoulder: {fileID: 0}
   elbowRotationOffset: {x: 0, y: 0, z: 0}
   elbowPositionOffset: {x: 0, y: 0, z: 0}
-  shoulderRotationOffset: {x: 0, y: 0, z: 0}
   elbowOffset:
     fingerType: 0
     boneType: 0
     position: {x: 0, y: 0, z: 0}
     rotation: {x: 0, y: 0, z: 0}
-  shoulderOffset:
-    fingerType: 0
-    boneType: 0
-    position: {x: 0, y: 0, z: 0}
-    rotation: {x: 0, y: 0, z: 0}
+  fineTuning: 0
+  debugOptions: 0
+  riggingOptions: 1
+  armRigging: 0
+  needsResetUpdating: 0
   Offsets: []
   BoundGameobjects:
   - {fileID: 0}
