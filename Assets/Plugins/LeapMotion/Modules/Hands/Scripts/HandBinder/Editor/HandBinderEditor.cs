@@ -38,12 +38,9 @@ namespace Leap.Unity.HandsModule {
         private SerializedProperty offsets;
 
         private SerializedProperty elbow;
-        private SerializedProperty shoulder;
         private SerializedProperty elbowRotationOffset;
         private SerializedProperty elbowPositionOffset;
-        private SerializedProperty shoulderRotationOffset;
-        private SerializedProperty elbowOffset;
-        private SerializedProperty shoulderOffset;
+        private SerializedProperty elbowStartPosition;
 
         private SerializedProperty fineTuning;
         private SerializedProperty debugOptions;
@@ -55,6 +52,11 @@ namespace Leap.Unity.HandsModule {
         private GUIStyle subButtonStyle;
 
         private Rect imageRect;
+        bool showStatus = false;
+
+        Color warningColor = new Color(1f, 0.5529412f, 0f);
+        Color green = new Color32(140, 234, 40, 255);
+
 
         /// <summary>
         /// Assign the serialized properties
@@ -75,12 +77,9 @@ namespace Leap.Unity.HandsModule {
             offsets = serializedObject.FindProperty("Offsets");
             handedness = serializedObject.FindProperty("handedness");
             elbow = serializedObject.FindProperty("elbow");
-            shoulder = serializedObject.FindProperty("shoulder");
             elbowRotationOffset = serializedObject.FindProperty("elbowRotationOffset");
             elbowPositionOffset = serializedObject.FindProperty("elbowPositionOffset");
-            shoulderRotationOffset = serializedObject.FindProperty("shoulderRotationOffset");
-            elbowOffset = serializedObject.FindProperty("elbowOffset");
-            shoulderOffset = serializedObject.FindProperty("shoulderOffset");
+            elbowStartPosition = serializedObject.FindProperty("elbowStartPosition");
             fineTuning = serializedObject.FindProperty("fineTuning");
             debugOptions = serializedObject.FindProperty("debugOptions");
             riggingOptions = serializedObject.FindProperty("riggingOptions");
@@ -126,6 +125,7 @@ namespace Leap.Unity.HandsModule {
                     textColor = Color.white,
                 },
                 fontSize = 15,
+                wordWrap = true
             };
 
             buttonStyle = new GUIStyle(GUI.skin.button) {
@@ -164,8 +164,6 @@ namespace Leap.Unity.HandsModule {
             serializedObject.Update();
             StyleSetUp();
 
-            setEditorPose.boolValue = GUILayout.Toggle(setEditorPose.boolValue, "Set Edit Time Pose", "Button");
-
             //Figure out the middle of the inspector
             var middleOfInspector = EditorGUIUtility.currentViewWidth / 2;
 
@@ -191,9 +189,12 @@ namespace Leap.Unity.HandsModule {
             GUILayout.Space(40);
 
             var valid = bonesValid.All(x => x == false);
-            GUI.color = valid ? Color.green : Color.yellow;
+            GUI.color = valid ? green : warningColor;
             var status = (valid ? "Status : Completed Successfully" : "Status : Completed With Warnings");
-            EditorGUILayout.LabelField(status, statusStyle);
+            showStatus = GUILayout.Toggle(showStatus, status, statusStyle);
+            if(showStatus) {
+                GUILayout.Label(myTarget.warnings);
+            }
             GUI.color = previousCol;
 
             GUILayout.Space(20);
@@ -201,7 +202,7 @@ namespace Leap.Unity.HandsModule {
             if(GUILayout.Button("Auto Rig", buttonStyle)) {
                 Undo.RegisterCompleteObjectUndo(myTarget, "AutoRig");
                 Undo.undoRedoPerformed += delegate { UndoAutoRig(myTarget); };
-                HandBinderAutoRigger.AutoRig(myTarget);
+                HandBinderAutoRigger.AutoRig(myTarget, ref myTarget.warnings);
             }
 
             EditorGUILayout.Space();
@@ -221,10 +222,7 @@ namespace Leap.Unity.HandsModule {
                 EditorGUILayout.PropertyField(customBoneDefinitions);
                 EditorGUILayout.Space();
 
-                if(GUILayout.Button("Arm Rigging")) {
-                    armRigging.boolValue = !armRigging.boolValue;
-                }
-                GUILayout.Space(armRigging.boolValue ? 0 : 10);
+                armRigging.boolValue = GUILayout.Toggle(armRigging.boolValue, "Arm Rigging", "Button");
 
                 if(armRigging.boolValue) {
                     EditorGUI.BeginChangeCheck();
@@ -234,8 +232,8 @@ namespace Leap.Unity.HandsModule {
                         if(elbow.objectReferenceValue != null) {
                             var t = (elbow.objectReferenceValue) as GameObject;
                             if(t != null) {
-                                elbowOffset.FindPropertyRelative("position").vector3Value = t.transform.localPosition;
-                                elbowOffset.FindPropertyRelative("rotation").vector3Value = t.transform.localRotation.eulerAngles;
+                                elbowStartPosition.FindPropertyRelative("position").vector3Value = t.transform.localPosition;
+                                elbowStartPosition.FindPropertyRelative("rotation").vector3Value = t.transform.localRotation.eulerAngles;
                             }
                         }
                     }
@@ -257,14 +255,14 @@ namespace Leap.Unity.HandsModule {
             if(debugOptions.boolValue) {
                 EditorGUILayout.Space();
 
-                GUI.color = debugLeapHand.boolValue ? Color.green : previousCol;
+                GUI.color = debugLeapHand.boolValue ? green : previousCol;
                 GUILayout.BeginHorizontal();
                 EditorGUILayout.PropertyField(debugLeapHand);
                 if(debugLeapHand.boolValue)
                     leapHandDebugCol = EditorGUILayout.ColorField(GUIContent.none, leapHandDebugCol, false, false, false);
                 GUILayout.EndHorizontal();
 
-                GUI.color = debugModelTransforms.boolValue ? Color.green : previousCol;
+                GUI.color = debugModelTransforms.boolValue ? green : previousCol;
                 GUILayout.BeginHorizontal();
                 EditorGUILayout.PropertyField(debugModelTransforms);
                 if(debugModelTransforms.boolValue)
@@ -274,6 +272,7 @@ namespace Leap.Unity.HandsModule {
                 GUI.color = previousCol;
                 EditorGUILayout.PropertyField(gizmoSize);
 
+                setEditorPose.boolValue = GUILayout.Toggle(setEditorPose.boolValue, setEditorPose.boolValue ? "Reset Hand" : "Align with Leap Pose", "Button");
 
                 EditorGUILayout.Space();
                 GUILayout.Label(dividerLine);
@@ -345,10 +344,9 @@ namespace Leap.Unity.HandsModule {
                 }
             }
 
-            GUILayout.Space(10);
             GUILayout.BeginHorizontal();
             GUILayout.Space(20);
-            if(GUILayout.Button("Setup Guide")) {
+            if(GUILayout.Button("Setup Guide", subButtonStyle)) {
                 var window = (HandBinderDocumentationWindow)EditorWindow.GetWindow(typeof(HandBinderDocumentationWindow));
                 window.Show();
             }
@@ -432,7 +430,7 @@ namespace Leap.Unity.HandsModule {
             newRect = overContent ? maxSize : newRect;
 
             //Choose a color based on validity
-            var color = isAssignedTo ? Color.green : Color.yellow;
+            var color = isAssignedTo ? green : warningColor;
             //Change the color that the gui is stuled based on the validity
             GUI.color = color;
 
@@ -551,18 +549,25 @@ namespace Leap.Unity.HandsModule {
             //Draw the leap hand
             if(myTarget.DebugLeapHand) {
                 Handles.color = leapHandDebugCol;
-
                 foreach(var finger in myTarget.LeapHand.Fingers) {
                     var index = 0;
 
                     foreach(var bone in finger.bones) {
                         Handles.SphereHandleCap(-1, bone.PrevJoint.ToVector3(), Quaternion.identity, myTarget.GizmoSize, EventType.Repaint);
-                        if((index + 1) <= finger.bones.Length - 1)
+                        if((index + 1) <= finger.bones.Length - 1) {
                             Handles.DrawLine(finger.bones[index].PrevJoint.ToVector3(), finger.bones[index + 1].PrevJoint.ToVector3());
+                        }
+                        DrawLeapBasis(bone, gizmoSize.floatValue * 4);
                         index++;
                     }
                 }
+
                 Handles.SphereHandleCap(-1, myTarget.LeapHand.WristPosition.ToVector3(), Quaternion.identity, myTarget.GizmoSize, EventType.Repaint);
+
+                var elbowPosition = myTarget.LeapHand.WristPosition.ToVector3() - (myTarget.LeapHand.Arm.Basis.zBasis.ToVector3().normalized * myTarget.elbowLength);
+                Handles.SphereHandleCap(-1, elbowPosition, Quaternion.identity, myTarget.GizmoSize, EventType.Repaint);
+                Handles.DrawLine(elbowPosition, myTarget.LeapHand.WristPosition.ToVector3());
+
             }
 
             //Draw the bound Gameobjects
@@ -607,6 +612,42 @@ namespace Leap.Unity.HandsModule {
             myTarget.SetEditorPose = false;
             myTarget = binder;
             SceneView.lastActiveSceneView.Repaint();
+        }
+
+        void DrawLeapBasis(Leap.Bone bone, float size) {
+
+            Vector3 middle, y, x, z;
+
+            middle = bone.PrevJoint.ToVector3();
+            y = bone.Basis.xBasis.ToVector3();
+            x = bone.Basis.yBasis.ToVector3();
+            z = bone.Basis.zBasis.ToVector3();
+
+            Handles.color = Color.green;
+            Handles.DrawLine(middle, middle + y.normalized * size);
+            Handles.color = Color.red;
+            Handles.DrawLine(middle, middle + x.normalized * size);
+            Handles.color = Color.blue;
+            Handles.DrawLine(middle, middle + z.normalized * size);
+            Handles.color = leapHandDebugCol;
+
+        }
+
+        void DrawTransformBasis(Transform bone, float size) {
+
+            Vector3 middle, y, x, z;
+
+            middle = bone.position;
+            y = bone.up;
+            x = bone.right;
+            z = bone.forward;
+
+            Handles.color = green;
+            Handles.DrawLine(middle, middle + y.normalized * size);
+            Handles.color = Color.red;
+            Handles.DrawLine(middle, middle + x.normalized * size);
+            Handles.color = Color.blue;
+            Handles.DrawLine(middle, middle + z.normalized * size);
         }
     }
 }

@@ -32,29 +32,32 @@ namespace Leap.Unity.HandsModule {
         public Vector3 elbowRotationOffset;
         [Tooltip("The Position offset that will get applied to the assigned elbow bone")]
         public Vector3 elbowPositionOffset;
-        public Offset elbowOffset;
+        public TransformStore elbowStartPosition;
+        public float elbowLength;
 
         //Used in the editor scripts
         public bool fineTuning;
         public bool debugOptions;
         public bool riggingOptions;
         public bool armRigging;
-        public bool needsResetUpdating = false;
+
+        public string warnings;
+
 
         /// <summary>
         /// Being used to store position and rotations
         /// </summary>
         [System.Serializable]
-        public class Offset {
+        public class TransformStore {
             public Finger.FingerType fingerType;
             public Bone.BoneType boneType;
             public Vector3 position = Vector3.zero;
             public Vector3 rotation = Vector3.zero;
         }
 
-        public List<Offset> Offsets = new List<Offset>();
+        public List<TransformStore> Offsets = new List<TransformStore>();
         public Transform[] BoundGameobjects = new Transform[21];
-        public Offset[] StartTransforms = new Offset[21];
+        public TransformStore[] StartTransforms = new TransformStore[21];
 
         public override Chirality Handedness { get { return handedness; } set { } }
         public Chirality handedness;
@@ -87,7 +90,6 @@ namespace Leap.Unity.HandsModule {
         /// Update the BoundGameobjects so that the positions and rotations match that of the leap hand
         /// </summary>
         public override void UpdateHand() {
-            needsResetUpdating = true;
             Vector3 position;
             Quaternion rotation;
             Transform boundObject = null;
@@ -95,7 +97,8 @@ namespace Leap.Unity.HandsModule {
             var index = 0;
 
             if(elbow != null) {
-                elbow.transform.position = LeapHand.Arm.ElbowPosition.ToVector3() + elbowPositionOffset;
+                var elbowPosition = LeapHand.WristPosition.ToVector3() - ((LeapHand.Arm.Basis.zBasis.ToVector3() * elbowLength) + elbowPositionOffset);
+                elbow.transform.position = elbowPosition;
                 elbow.transform.rotation = LeapHand.Arm.Rotation.ToQuaternion() * Quaternion.Euler(elbowRotationOffset);
             }
 
@@ -117,7 +120,7 @@ namespace Leap.Unity.HandsModule {
                             var bone = LeapHand.Fingers[fingerType].bones[boneType];
 
                             //Find an offset that works with this bone
-                            Offset offset = Offsets.FirstOrDefault(x => x.fingerType == currentFinger.Type && x.boneType == bone.Type);
+                            TransformStore offset = Offsets.FirstOrDefault(x => x.fingerType == currentFinger.Type && x.boneType == bone.Type);
 
                             if(SetPositions) {
                                 position = bone.PrevJoint.ToVector3();
@@ -158,21 +161,17 @@ namespace Leap.Unity.HandsModule {
         /// Reset the boundGameobjects back to the default pose
         /// </summary>
         public void ResetHand() {
-
-            if(needsResetUpdating) {
-                for(int i = 0; i < BoundGameobjects.Length; i++) {
-                    var boundObject = BoundGameobjects[i];
-                    if(boundObject != null) {
-                        boundObject.transform.localPosition = StartTransforms[i].position;
-                        boundObject.transform.localRotation = Quaternion.Euler(StartTransforms[i].rotation);
-                    }
+            for(int i = 0; i < BoundGameobjects.Length; i++) {
+                var boundObject = BoundGameobjects[i];
+                if(boundObject != null) {
+                    boundObject.transform.localPosition = StartTransforms[i].position;
+                    boundObject.transform.localRotation = Quaternion.Euler(StartTransforms[i].rotation);
                 }
+            }
 
-                if(elbow != null) {
-                    elbow.transform.localPosition = elbowOffset.position;
-                    elbow.transform.localRotation = Quaternion.Euler(elbowOffset.rotation);
-                }
-                needsResetUpdating = false;
+            if(elbow != null) {
+                elbow.transform.localPosition = elbowStartPosition.position;
+                elbow.transform.localRotation = Quaternion.Euler(elbowStartPosition.rotation);
             }
         }
     }

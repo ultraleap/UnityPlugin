@@ -10,7 +10,10 @@ namespace Leap.Unity.HandsModule {
         /// This function is used to search the HandBinder scipts children transforms to auto assign them for the user
         /// </summary>
         /// <param name="handBinder">The binder that the found transforms will get assigned too</param>
-        public static void AutoRig(HandBinder handBinder) {
+        public static void AutoRig(HandBinder handBinder, ref string warnings) {
+            handBinder.SetEditorPose = false;
+            handBinder.ResetHand();
+            warnings = "";
             BoneDefinitions boneDefinitions = null;
 
             //Check to see if we have an autorigger Definitions scriptable object
@@ -30,24 +33,39 @@ namespace Leap.Unity.HandsModule {
             foundBones.AddRange(SelectBones(children, boneDefinitions.DefinitionMiddle));
             foundBones.AddRange(SelectBones(children, boneDefinitions.DefinitionRing));
             foundBones.AddRange(SelectBones(children, boneDefinitions.DefinitionPinky));
-            foundBones.Add(SelectBones(children, boneDefinitions.DefinitionWrist).FirstOrDefault());
+            var wrist = SelectBones(children, boneDefinitions.DefinitionWrist).FirstOrDefault();
+            foundBones.Add(wrist);
 
             for(int i = 0; i < foundBones.Count; i++) {
-                AssignUnityBone(foundBones[i], i, handBinder);
+                AssignUnityBone(foundBones[i], i, handBinder, ref warnings);
             }
 
             CalculateWristRotationOffset(handBinder);
 
-            foreach(var def in boneDefinitions.DefinitionElbow) {
-                foreach(var child in children) {
-                    if(child.name.ToUpper().Contains(def.ToUpper())) {
-                        handBinder.elbow = child.gameObject;
+            if(wrist != null) {
+
+                foreach(var def in boneDefinitions.DefinitionElbow) {
+                    foreach(var child in children) {
+                        if(child.name.ToUpper().Contains(def.ToUpper())) {
+
+                            var elbow = child.gameObject;
+
+                            handBinder.elbowLength = (wrist.position - elbow.transform.position).magnitude;
+
+                            var startTransform = new HandBinder.TransformStore();
+                            startTransform.position = elbow.transform.localPosition;
+                            startTransform.rotation = elbow.transform.localRotation.eulerAngles;
+
+                            handBinder.elbowStartPosition = startTransform;
+
+                            handBinder.elbow = elbow.gameObject;
+                            break;
+                        }
+                    }
+
+                    if(handBinder.elbow != null) {
                         break;
                     }
-                }
-
-                if(handBinder.elbow != null) {
-                    break;
                 }
             }
 
@@ -142,7 +160,7 @@ namespace Leap.Unity.HandsModule {
         /// <param name="boneIndex">The index of the bone you want to assign</param>
         /// <param name="handBinder">The Hand Binder this information will be added to</param>
         /// <returns></returns>
-        public static void AssignUnityBone(Transform boneTransform, int index, HandBinder handBinder) {
+        public static void AssignUnityBone(Transform boneTransform, int index, HandBinder handBinder, ref string warning) {
             Finger.FingerType fingerType;
             Bone.BoneType boneType;
             IndexToType(index, out fingerType, out boneType);
@@ -158,8 +176,13 @@ namespace Leap.Unity.HandsModule {
                 handBinder.BoundGameobjects[index] = boneTransform;
 
                 //If we found meta bones then we can turn on this option for the user
-                if(boneType == Bone.BoneType.TYPE_METACARPAL)
+                if(boneType == Bone.BoneType.TYPE_METACARPAL) {
                     handBinder.UseMetaBones = true;
+                }
+            }
+
+            else {
+                warning += "\n" + fingerType.ToString() + " " + boneType.ToString() + " : Not Assigned";
             }
         }
 
