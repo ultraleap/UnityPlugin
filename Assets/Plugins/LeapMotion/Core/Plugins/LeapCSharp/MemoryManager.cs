@@ -107,7 +107,9 @@ namespace LeapInternal {
         ActiveMemoryInfo info = _activeMemory[ptr];
 
         //First we return the object back to its pool
-        _pooledMemory[info.key].Enqueue(info.handle.Target);
+        if (EnablePooling) {
+          _pooledMemory[info.key].Enqueue(info.handle.Target);
+        }
 
         //Then we remove the pointer from the active memory map
         _activeMemory.Remove(ptr);
