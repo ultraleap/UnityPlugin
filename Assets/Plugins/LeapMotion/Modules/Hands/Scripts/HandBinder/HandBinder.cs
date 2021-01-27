@@ -1,63 +1,52 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 namespace Leap.Unity.HandsModule {
 
     public class HandBinder : HandModelBase {
-
         public Hand LeapHand;
+
         [Tooltip("Custom Bone Name definitions")]
         public HandBinderBoneDefinitions CustomBoneDefinitions;
+
         [Tooltip("The size of the debug gizmos")]
         public float GizmoSize = 0.004f;
-        [Tooltip("Show the Leap Hand in the scene")]
-        public bool DebugLeapHand = true;
-        [Tooltip("Show the assigned gameobjects as gizmos in the scene")]
-        public bool DebugModelTransforms = true;
+        [Tooltip("The length of the elbow to maintain the correct offset from the wrist")]
+        public float elbowLength;
+
         [Tooltip("Set the assigned transforms to the leap hand during editor")]
         public bool SetEditorPose;
         [Tooltip("Set the assigned transforms to the same position as the Leap Hand")]
         public bool SetPositions;
         [Tooltip("Use metacarpal bones")]
         public bool UseMetaBones;
-
-        [Tooltip("The Rotation offset that will be assigned to the assigned wrist bone")]
-        public Vector3 WristRotationOffset;
         [Tooltip("The Rotation offset that will be assigned to all the Fingers")]
         public Vector3 GlobalFingerRotationOffset;
-        [Tooltip("The elbow that will get assigned to the leap elbow position")]
-        public GameObject elbow;
-        [Tooltip("The Rotation offset that will get applied to the assigned elbow bone")]
-        public Vector3 elbowRotationOffset;
-        [Tooltip("The Position offset that will get applied to the assigned elbow bone")]
-        public Vector3 elbowPositionOffset;
-        public TransformStore elbowStartPosition;
-        public float elbowLength;
 
-        //Used in the editor scripts
+        //Used by Editor Script
         public bool fineTuning;
+
         public bool debugOptions;
         public bool riggingOptions;
         public bool armRigging;
 
-        public string warnings;
+        [Tooltip("Show the Leap Hand in the scene")]
+        public bool DebugLeapHand = true;
 
+        [Tooltip("Show the Leaps rotation axis in the scene")]
+        public bool DebugLeapRotationAxis = false;
 
-        /// <summary>
-        /// Being used to store position and rotations
-        /// </summary>
-        [System.Serializable]
-        public class TransformStore {
-            public Finger.FingerType fingerType;
-            public Bone.BoneType boneType;
-            public Vector3 position = Vector3.zero;
-            public Vector3 rotation = Vector3.zero;
-        }
+        [Tooltip("Show the assigned gameobjects as gizmos in the scene")]
+        public bool DebugModelTransforms = true;
 
-        public List<TransformStore> Offsets = new List<TransformStore>();
-        public Transform[] BoundGameobjects = new Transform[21];
-        public TransformStore[] StartTransforms = new TransformStore[21];
+        [Tooltip("Show the assigned gameobjects rotation axis in the scene")]
+        public bool DebugModelRotationAxis;
+
+        //The data structure that contains transforms that get bound to the leap data
+        public BoundHand boundHand = new BoundHand();
+
+        //User defines offsets in editor script
+        public List<BoundTypes> offsets = new List<BoundTypes>();
 
         public override Chirality Handedness { get { return handedness; } set { } }
         public Chirality handedness;
@@ -84,75 +73,60 @@ namespace Leap.Unity.HandsModule {
             ResetHand();
         }
 
-        private void Start() {
-        }
         /// <summary>
         /// Update the BoundGameobjects so that the positions and rotations match that of the leap hand
         /// </summary>
         public override void UpdateHand() {
-            Vector3 position;
-            Quaternion rotation;
-            Transform boundObject = null;
+            if(boundHand.elbow.boundTransfrom != null) {
+                var elbowPosition = LeapHand.WristPosition.ToVector3() -
+                                        ((LeapHand.Arm.Basis.zBasis.ToVector3() * elbowLength) + boundHand.elbow.offset.position);
+                boundHand.elbow.boundTransfrom.transform.position = elbowPosition;
+                boundHand.elbow.boundTransfrom.transform.rotation = LeapHand.Arm.Rotation.ToQuaternion() * Quaternion.Euler(boundHand.elbow.offset.rotation);
+            }
 
-            var index = 0;
+            if(boundHand.wrist.boundTransfrom != null) {
+                //Now set the wrist position
+                var position = LeapHand.WristPosition.ToVector3() + boundHand.wrist.offset.position;
+                var rotation = LeapHand.Rotation.ToQuaternion() * Quaternion.Euler(boundHand.wrist.offset.rotation);
 
-            if(elbow != null) {
-                var elbowPosition = LeapHand.WristPosition.ToVector3() - ((LeapHand.Arm.Basis.zBasis.ToVector3() * elbowLength) + elbowPositionOffset);
-                elbow.transform.position = elbowPosition;
-                elbow.transform.rotation = LeapHand.Arm.Rotation.ToQuaternion() * Quaternion.Euler(elbowRotationOffset);
+                boundHand.wrist.boundTransfrom.transform.position = position;
+                boundHand.wrist.boundTransfrom.transform.rotation = rotation;
             }
 
             if(LeapHand != null) {
-                for(int fingerType = 0; fingerType < LeapHand.Fingers.Count; fingerType++) {
-                    var currentFinger = LeapHand.Fingers[fingerType];
-                    for(int boneType = 0; boneType < currentFinger.bones.Length; boneType++) {
-                        boundObject = BoundGameobjects.Length > index ? BoundGameobjects[index] : null;
+                for(int fingerIndex = 0; fingerIndex < LeapHand.Fingers.Count; fingerIndex++) {
+                    for(int boneIndex = 0; boneIndex < LeapHand.Fingers[fingerIndex].bones.Length; boneIndex++) {
+                        var boundTransform = boundHand.fingers[fingerIndex].boundBones[boneIndex].boundTransfrom;
 
-                        if(boundObject != null) {
-                            if(boneType == 0 && !UseMetaBones) {
-                                boundObject.transform.localRotation = Quaternion.Euler(StartTransforms[index].rotation);
-                                boundObject.transform.localPosition = StartTransforms[index].position;
+                        if(boundTransform == null) {
+                            continue;
+                        }
+                        var startTransform = boundHand.fingers[fingerIndex].boundBones[boneIndex].startTransform;
 
-                                index++;
-                                continue;
-                            }
-
-                            var bone = LeapHand.Fingers[fingerType].bones[boneType];
-
-                            //Find an offset that works with this bone
-                            TransformStore offset = Offsets.FirstOrDefault(x => x.fingerType == currentFinger.Type && x.boneType == bone.Type);
-
-                            if(SetPositions) {
-                                position = bone.PrevJoint.ToVector3();
-                                if(offset != null)
-                                    position += offset.position;
-                                boundObject.transform.position = position;
-                            }
-                            else {
-                                position = StartTransforms[index].position;
-                                if(offset != null)
-                                    position += offset.position;
-                                boundObject.transform.localPosition = position;
-                            }
-
-                            rotation = bone.Rotation.ToQuaternion() * Quaternion.Euler(GlobalFingerRotationOffset);
-                            if(offset != null)
-                                rotation *= Quaternion.Euler(offset.rotation);
-                            boundObject.transform.rotation = rotation;
+                        if(boneIndex == 0 && !UseMetaBones) {
+                            boundTransform.transform.localRotation = Quaternion.Euler(startTransform.rotation);
+                            boundTransform.transform.localPosition = startTransform.position;
+                            continue;
                         }
 
-                        index++;
+                        var bone = LeapHand.Fingers[fingerIndex].bones[boneIndex];
+                        var offset = boundHand.fingers[fingerIndex].boundBones[boneIndex].offset;
+
+                        Vector3 position = Vector3.zero;
+                        Quaternion rotation = Quaternion.identity;
+
+                        if(SetPositions) {
+                            position = bone.PrevJoint.ToVector3() + offset.position;
+                            boundTransform.transform.position = position;
+                        }
+                        else {
+                            position = startTransform.position + offset.position;
+                            boundTransform.transform.localPosition = position;
+                        }
+
+                        rotation = bone.Rotation.ToQuaternion() * Quaternion.Euler(GlobalFingerRotationOffset) * Quaternion.Euler(offset.rotation);
+                        boundTransform.transform.rotation = rotation;
                     }
-                }
-
-                boundObject = BoundGameobjects[index];
-                if(boundObject != null) {
-                    //Now set the wrist position
-                    position = LeapHand.WristPosition.ToVector3();
-                    rotation = LeapHand.Rotation.ToQuaternion() * Quaternion.Euler(WristRotationOffset);
-
-                    boundObject.transform.position = position;
-                    boundObject.transform.rotation = rotation;
                 }
             }
         }
@@ -161,17 +135,30 @@ namespace Leap.Unity.HandsModule {
         /// Reset the boundGameobjects back to the default pose
         /// </summary>
         public void ResetHand() {
-            for(int i = 0; i < BoundGameobjects.Length; i++) {
-                var boundObject = BoundGameobjects[i];
-                if(boundObject != null) {
-                    boundObject.transform.localPosition = StartTransforms[i].position;
-                    boundObject.transform.localRotation = Quaternion.Euler(StartTransforms[i].rotation);
+            SetEditorPose = false;
+            foreach(var finger in boundHand.fingers) {
+                if(finger == null) {
+                    continue;
+                }
+
+                foreach(var bone in finger.boundBones) {
+                    if(bone.boundTransfrom == null) {
+                        continue;
+                    }
+
+                    bone.boundTransfrom.localPosition = bone.startTransform.position;
+                    bone.boundTransfrom.localRotation = Quaternion.Euler(bone.startTransform.rotation);
                 }
             }
 
-            if(elbow != null) {
-                elbow.transform.localPosition = elbowStartPosition.position;
-                elbow.transform.localRotation = Quaternion.Euler(elbowStartPosition.rotation);
+            if(boundHand.elbow.boundTransfrom != null) {
+                boundHand.elbow.boundTransfrom.localPosition = boundHand.elbow.startTransform.position;
+                boundHand.elbow.boundTransfrom.localRotation = Quaternion.Euler(boundHand.elbow.startTransform.rotation);
+            }
+
+            if(boundHand.wrist.boundTransfrom != null) {
+                boundHand.wrist.boundTransfrom.localPosition = boundHand.wrist.startTransform.position;
+                boundHand.wrist.boundTransfrom.localRotation = Quaternion.Euler(boundHand.wrist.startTransform.rotation);
             }
         }
     }

@@ -10,10 +10,9 @@ namespace Leap.Unity.HandsModule {
         /// This function is used to search the HandBinder scipts children transforms to auto assign them for the user
         /// </summary>
         /// <param name="handBinder">The binder that the found transforms will get assigned too</param>
-        public static void AutoRig(HandBinder handBinder, ref string warnings) {
+        public static void AutoRig(HandBinder handBinder) {
             handBinder.SetEditorPose = false;
             handBinder.ResetHand();
-            warnings = "";
             BoneDefinitions boneDefinitions = null;
 
             //Check to see if we have an autorigger Definitions scriptable object
@@ -28,46 +27,26 @@ namespace Leap.Unity.HandsModule {
             var children = GetAllChildren(handBinder.transform);
 
             var foundBones = new List<Transform>();
-            foundBones.AddRange(SelectBones(children, boneDefinitions.DefinitionThumb, true));
-            foundBones.AddRange(SelectBones(children, boneDefinitions.DefinitionIndex));
-            foundBones.AddRange(SelectBones(children, boneDefinitions.DefinitionMiddle));
-            foundBones.AddRange(SelectBones(children, boneDefinitions.DefinitionRing));
-            foundBones.AddRange(SelectBones(children, boneDefinitions.DefinitionPinky));
+            var thumbBones = SelectBones(children, boneDefinitions.DefinitionThumb, true);
+            var indexBones = SelectBones(children, boneDefinitions.DefinitionIndex);
+            var middleBones = SelectBones(children, boneDefinitions.DefinitionMiddle);
+            var ringBones = SelectBones(children, boneDefinitions.DefinitionRing);
+            var pinkyBones = SelectBones(children, boneDefinitions.DefinitionPinky);
             var wrist = SelectBones(children, boneDefinitions.DefinitionWrist).FirstOrDefault();
-            foundBones.Add(wrist);
+            var Elbow = SelectBones(children, boneDefinitions.DefinitionElbow).FirstOrDefault();
 
-            for(int i = 0; i < foundBones.Count; i++) {
-                AssignUnityBone(foundBones[i], i, handBinder, ref warnings);
+            handBinder.boundHand.fingers[0].boundBones = AssignUnityBone(thumbBones);
+            handBinder.boundHand.fingers[1].boundBones = AssignUnityBone(indexBones);
+            handBinder.boundHand.fingers[2].boundBones = AssignUnityBone(middleBones);
+            handBinder.boundHand.fingers[3].boundBones = AssignUnityBone(ringBones);
+            handBinder.boundHand.fingers[4].boundBones = AssignUnityBone(pinkyBones);
+            handBinder.boundHand.wrist = AssignBoundBone(wrist);
+            handBinder.boundHand.elbow = AssignBoundBone(Elbow);
+            if(wrist != null && Elbow != null) {
+                handBinder.elbowLength = (wrist.position - Elbow.position).magnitude;
             }
 
             CalculateWristRotationOffset(handBinder);
-
-            if(wrist != null) {
-
-                foreach(var def in boneDefinitions.DefinitionElbow) {
-                    foreach(var child in children) {
-                        if(child.name.ToUpper().Contains(def.ToUpper())) {
-
-                            var elbow = child.gameObject;
-
-                            handBinder.elbowLength = (wrist.position - elbow.transform.position).magnitude;
-
-                            var startTransform = new HandBinder.TransformStore();
-                            startTransform.position = elbow.transform.localPosition;
-                            startTransform.rotation = elbow.transform.localRotation.eulerAngles;
-
-                            handBinder.elbowStartPosition = startTransform;
-
-                            handBinder.elbow = elbow.gameObject;
-                            break;
-                        }
-                    }
-
-                    if(handBinder.elbow != null) {
-                        break;
-                    }
-                }
-            }
 
             handBinder.DebugModelTransforms = true;
             handBinder.SetEditorPose = true;
@@ -160,47 +139,43 @@ namespace Leap.Unity.HandsModule {
         /// <param name="boneIndex">The index of the bone you want to assign</param>
         /// <param name="handBinder">The Hand Binder this information will be added to</param>
         /// <returns></returns>
-        public static void AssignUnityBone(Transform boneTransform, int index, HandBinder handBinder, ref string warning) {
-            Finger.FingerType fingerType;
-            Bone.BoneType boneType;
-            IndexToType(index, out fingerType, out boneType);
+        public static BoundBone[] AssignUnityBone(Transform[] boneTransform) {
+            var boundFingers = new BoundBone[]
+                {
+                    AssignBoundBone(boneTransform[0]),
+                    AssignBoundBone(boneTransform[1]),
+                    AssignBoundBone(boneTransform[2]),
+                    AssignBoundBone(boneTransform[3]),
+                };
 
-            var startTransform = handBinder.StartTransforms[index];
-            startTransform.fingerType = fingerType;
-            startTransform.boneType = boneType;
+            return boundFingers;
+        }
 
-            if(boneTransform != null) {
-                startTransform.position = boneTransform.localPosition;
-                startTransform.rotation = boneTransform.localRotation.eulerAngles;
-
-                handBinder.BoundGameobjects[index] = boneTransform;
-
-                //If we found meta bones then we can turn on this option for the user
-                if(boneType == Bone.BoneType.TYPE_METACARPAL) {
-                    handBinder.UseMetaBones = true;
-                }
+        public static BoundBone AssignBoundBone(Transform transform) {
+            var newBone = new BoundBone();
+            if(transform != null) {
+                newBone.boundTransfrom = transform;
+                newBone.startTransform = new TransformStore();
+                newBone.startTransform.position = transform.localPosition;
+                newBone.startTransform.rotation = transform.localRotation.eulerAngles;
             }
-
-            else {
-                warning += "\n" + fingerType.ToString() + " " + boneType.ToString() + " : Not Assigned";
-            }
+            return newBone;
         }
 
         /// <summary>
         /// Calculate the rotation offset needed to get the rigged hand into the same orientation as the leap hand
         /// </summary>
         public static void CalculateWristRotationOffset(HandBinder handBinder) {
-            //This function needs the following information
-            //handBinder.boundGameobjects[9] = Middle Proximal
-            //handBinder.boundGameobjects[5] = Index Proximal
-            //handBinder.boundGameobjects[17] = Pinky Proximal
-            //handBinder.boundGameobjects[20] = Wrist
+            var middleProximal = handBinder.boundHand.fingers[2].boundBones[1].boundTransfrom;
+            var indexProximal = handBinder.boundHand.fingers[1].boundBones[1].boundTransfrom;
+            var pinkyProximal = handBinder.boundHand.fingers[4].boundBones[1].boundTransfrom;
+            var wrist = handBinder.boundHand.wrist.boundTransfrom;
 
-            if(handBinder.BoundGameobjects[9] != null && handBinder.BoundGameobjects[5] != null && handBinder.BoundGameobjects[17] != null && handBinder.BoundGameobjects[20] != null) {
+            if(middleProximal != null && indexProximal != null && pinkyProximal != null && wrist != null) {
                 //Get the Direction from the middle finger to the wrist
-                var wristForward = handBinder.BoundGameobjects[9].transform.position - handBinder.BoundGameobjects[20].transform.position;
+                var wristForward = middleProximal.position - wrist.position;
                 //Get the Direction from the Proximal pinky finger to the Proximal Index finger
-                var wristRight = handBinder.BoundGameobjects[5].transform.position - handBinder.BoundGameobjects[17].transform.position;
+                var wristRight = indexProximal.position - pinkyProximal.position;
 
                 //Swap the direction based on left and right hands
                 if(handBinder.Handedness == Chirality.Right)
@@ -222,49 +197,12 @@ namespace Leap.Unity.HandsModule {
 
                 //Now calculate the difference between the models rotation and the leaps rotation
                 var wristRotationDifference = Quaternion.Inverse(modelRotation) * leapRotation;
-                var wristRelativeDifference = (Quaternion.Inverse(handBinder.BoundGameobjects[20].transform.rotation) * wristRotationDifference).eulerAngles;
+                var wristRelativeDifference = (Quaternion.Inverse(wrist.rotation) * wristRotationDifference).eulerAngles;
 
                 //Assign these values to the hand binder
                 handBinder.GlobalFingerRotationOffset = wristRelativeDifference;
-                handBinder.WristRotationOffset = wristRelativeDifference;
+                handBinder.boundHand.wrist.offset.rotation = wristRelativeDifference;
             }
-        }
-
-        /// <summary>
-        /// This is being used to return a specific index between 0 - 20 from a FingerType and a BoneType
-        /// </summary>
-        /// <param name="finger">The FingerType we use to find the index</param>
-        /// <param name="bone">The BoneType we use to find the index</param>
-        /// <returns></returns>
-        public static int TypeToIndex(Finger.FingerType finger, Bone.BoneType bone) {
-            var boneValue = (int)bone;
-            var fingerValue = (int)finger * 4;
-
-            return fingerValue + boneValue;
-        }
-
-        /// <summary>
-        /// This is being used to return a specific FingerType and BoneType from an index between 0 - 20
-        /// </summary>
-        /// <param name="index">The index between 0 - 20</param>
-        /// <param name="fingerType">The FingerType associated with this Index</param>
-        /// <param name="boneType">The BoneType associated with this Index</param>
-        /// <returns></returns>
-        public static void IndexToType(int index, out Finger.FingerType fingerType, out Bone.BoneType boneType) {
-            //The FingerType is the whole value and the BoneType we calculate from the decimal value
-            //Example:
-            //combinedIndexWithDecimal = 19 / 4 = 4.75
-            //fingerIndex = 4
-            //decimalValue = 4.75 - 4 = 0.75
-            //boneIndex = 0.75 * 4 = 3
-
-            var combinedIndexWithDecimal = (index / 4.0f);
-            var fingerIndex = Mathf.FloorToInt(combinedIndexWithDecimal);
-            var decimalValue = combinedIndexWithDecimal - fingerIndex;
-            var boneIndex = (int)(decimalValue * 4.0f);
-
-            fingerType = (Finger.FingerType)fingerIndex;
-            boneType = (Bone.BoneType)boneIndex;
         }
     }
 }
