@@ -154,7 +154,7 @@ namespace Leap.Unity.HandsModule {
         public static BoundBone AssignBoundBone(Transform transform) {
             var newBone = new BoundBone();
             if(transform != null) {
-                newBone.boundTransfrom = transform;
+                newBone.boundTransform = transform;
                 newBone.startTransform = new TransformStore();
                 newBone.startTransform.position = transform.localPosition;
                 newBone.startTransform.rotation = transform.localRotation.eulerAngles;
@@ -166,10 +166,10 @@ namespace Leap.Unity.HandsModule {
         /// Calculate the rotation offset needed to get the rigged hand into the same orientation as the leap hand
         /// </summary>
         public static void CalculateWristRotationOffset(HandBinder handBinder) {
-            var middleProximal = handBinder.boundHand.fingers[2].boundBones[1].boundTransfrom;
-            var indexProximal = handBinder.boundHand.fingers[1].boundBones[1].boundTransfrom;
-            var pinkyProximal = handBinder.boundHand.fingers[4].boundBones[1].boundTransfrom;
-            var wrist = handBinder.boundHand.wrist.boundTransfrom;
+            var middleProximal = handBinder.boundHand.fingers[2].boundBones[1].boundTransform;
+            var indexProximal = handBinder.boundHand.fingers[1].boundBones[1].boundTransform;
+            var pinkyProximal = handBinder.boundHand.fingers[4].boundBones[1].boundTransform;
+            var wrist = handBinder.boundHand.wrist.boundTransform;
 
             if(middleProximal != null && indexProximal != null && pinkyProximal != null && wrist != null) {
                 //Get the Direction from the middle finger to the wrist

@@ -77,26 +77,26 @@ namespace Leap.Unity.HandsModule {
         /// Update the BoundGameobjects so that the positions and rotations match that of the leap hand
         /// </summary>
         public override void UpdateHand() {
-            if(boundHand.elbow.boundTransfrom != null) {
+            if(boundHand.elbow.boundTransform != null) {
                 var elbowPosition = LeapHand.WristPosition.ToVector3() -
                                         ((LeapHand.Arm.Basis.zBasis.ToVector3() * elbowLength) + boundHand.elbow.offset.position);
-                boundHand.elbow.boundTransfrom.transform.position = elbowPosition;
-                boundHand.elbow.boundTransfrom.transform.rotation = LeapHand.Arm.Rotation.ToQuaternion() * Quaternion.Euler(boundHand.elbow.offset.rotation);
+                boundHand.elbow.boundTransform.transform.position = elbowPosition;
+                boundHand.elbow.boundTransform.transform.rotation = LeapHand.Arm.Rotation.ToQuaternion() * Quaternion.Euler(boundHand.elbow.offset.rotation);
             }
 
-            if(boundHand.wrist.boundTransfrom != null) {
+            if(boundHand.wrist.boundTransform != null) {
                 //Now set the wrist position
                 var position = LeapHand.WristPosition.ToVector3() + boundHand.wrist.offset.position;
                 var rotation = LeapHand.Rotation.ToQuaternion() * Quaternion.Euler(boundHand.wrist.offset.rotation);
 
-                boundHand.wrist.boundTransfrom.transform.position = position;
-                boundHand.wrist.boundTransfrom.transform.rotation = rotation;
+                boundHand.wrist.boundTransform.transform.position = position;
+                boundHand.wrist.boundTransform.transform.rotation = rotation;
             }
 
             if(LeapHand != null) {
                 for(int fingerIndex = 0; fingerIndex < LeapHand.Fingers.Count; fingerIndex++) {
                     for(int boneIndex = 0; boneIndex < LeapHand.Fingers[fingerIndex].bones.Length; boneIndex++) {
-                        var boundTransform = boundHand.fingers[fingerIndex].boundBones[boneIndex].boundTransfrom;
+                        var boundTransform = boundHand.fingers[fingerIndex].boundBones[boneIndex].boundTransform;
 
                         if(boundTransform == null) {
                             continue;
@@ -142,23 +142,23 @@ namespace Leap.Unity.HandsModule {
                 }
 
                 foreach(var bone in finger.boundBones) {
-                    if(bone.boundTransfrom == null) {
+                    if(bone.boundTransform == null) {
                         continue;
                     }
 
-                    bone.boundTransfrom.localPosition = bone.startTransform.position;
-                    bone.boundTransfrom.localRotation = Quaternion.Euler(bone.startTransform.rotation);
+                    bone.boundTransform.localPosition = bone.startTransform.position;
+                    bone.boundTransform.localRotation = Quaternion.Euler(bone.startTransform.rotation);
                 }
             }
 
-            if(boundHand.elbow.boundTransfrom != null) {
-                boundHand.elbow.boundTransfrom.localPosition = boundHand.elbow.startTransform.position;
-                boundHand.elbow.boundTransfrom.localRotation = Quaternion.Euler(boundHand.elbow.startTransform.rotation);
+            if(boundHand.elbow.boundTransform != null) {
+                boundHand.elbow.boundTransform.localPosition = boundHand.elbow.startTransform.position;
+                boundHand.elbow.boundTransform.localRotation = Quaternion.Euler(boundHand.elbow.startTransform.rotation);
             }
 
-            if(boundHand.wrist.boundTransfrom != null) {
-                boundHand.wrist.boundTransfrom.localPosition = boundHand.wrist.startTransform.position;
-                boundHand.wrist.boundTransfrom.localRotation = Quaternion.Euler(boundHand.wrist.startTransform.rotation);
+            if(boundHand.wrist.boundTransform != null) {
+                boundHand.wrist.boundTransform.localPosition = boundHand.wrist.startTransform.position;
+                boundHand.wrist.boundTransform.localRotation = Quaternion.Euler(boundHand.wrist.startTransform.rotation);
             }
         }
     }

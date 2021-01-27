@@ -16,7 +16,7 @@ namespace Leap.Unity.HandsModule {
 
     [System.Serializable]
     public class BoundBone {
-        public Transform boundTransfrom;
+        public Transform boundTransform;
         public TransformStore startTransform = new TransformStore();
         public TransformStore offset = new TransformStore();
     }

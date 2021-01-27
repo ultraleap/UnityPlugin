@@ -196,7 +196,7 @@ namespace Leap.Unity.HandsModule {
 
                 if(armRigging.boolValue) {
                     EditorGUI.BeginChangeCheck();
-                    EditorGUILayout.PropertyField(boundHand.FindPropertyRelative("elbow").FindPropertyRelative("boundTransfrom"));
+                    EditorGUILayout.PropertyField(boundHand.FindPropertyRelative("elbow").FindPropertyRelative("boundTransform"), new GUIContent("Elbow Transform"));
                     if(EditorGUI.EndChangeCheck()) {
                         if(boundHand.FindPropertyRelative("elbow").objectReferenceValue != null) {
                             var t = boundHand.FindPropertyRelative("elbow").objectReferenceValue as Transform;
@@ -205,14 +205,14 @@ namespace Leap.Unity.HandsModule {
                                 boundHand.FindPropertyRelative("elbow").FindPropertyRelative("startTransform").FindPropertyRelative("rotation").vector3Value = t.localRotation.eulerAngles;
 
                                 //Calculate the elbow length when the elbow gets assigned
-                                if(myTarget.boundHand.wrist.boundTransfrom != null) {
-                                    myTarget.elbowLength = (myTarget.boundHand.wrist.boundTransfrom.position - t.position).magnitude;
+                                if(myTarget.boundHand.wrist.boundTransform != null) {
+                                    myTarget.elbowLength = (myTarget.boundHand.wrist.boundTransform.position - t.position).magnitude;
                                 }
                             }
                         }
                     }
-                    EditorGUILayout.PropertyField(boundHand.FindPropertyRelative("elbow").FindPropertyRelative("offset").FindPropertyRelative("position"));
-                    EditorGUILayout.PropertyField(boundHand.FindPropertyRelative("elbow").FindPropertyRelative("offset").FindPropertyRelative("rotation"));
+                    EditorGUILayout.PropertyField(boundHand.FindPropertyRelative("elbow").FindPropertyRelative("offset").FindPropertyRelative("position"), new GUIContent("Elbow Position Offset"));
+                    EditorGUILayout.PropertyField(boundHand.FindPropertyRelative("elbow").FindPropertyRelative("offset").FindPropertyRelative("rotation"), new GUIContent("Elbow Rotation Offset"));
                     EditorGUILayout.PropertyField(serializedObject.FindProperty("elbowLength"));
 
                 }
@@ -386,7 +386,7 @@ namespace Leap.Unity.HandsModule {
         /// <param name="e"></param>
         /// <param name="index">The index of the boundGameobject between 0 - 20</param>
         private void CreateObjectField(Vector2 offset, Event e, SerializedProperty boneProperty) {
-            var objectRef = boneProperty.FindPropertyRelative("boundTransfrom");
+            var objectRef = boneProperty.FindPropertyRelative("boundTransform");
             var beforeTransform = objectRef.objectReferenceValue as Transform;
 
             //Check to see if this bone is valid
@@ -653,7 +653,7 @@ namespace Leap.Unity.HandsModule {
                 Handles.color = handModelDebugCol;
                 for(int finger = 0; finger < myTarget.boundHand.fingers.Length; finger++) {
                     for(int bone = 0; bone < myTarget.boundHand.fingers[finger].boundBones.Length; bone++) {
-                        var target = myTarget.boundHand.fingers[finger].boundBones[bone].boundTransfrom;
+                        var target = myTarget.boundHand.fingers[finger].boundBones[bone].boundTransform;
                         if(target != null) {
                             if(myTarget.DebugModelTransforms) {
                                 Handles.DrawWireDisc(target.position, target.right, gizmoSize.floatValue);
