@@ -377,6 +377,7 @@ namespace Leap.Unity.HandsModule {
                     objectFieldPositionIndex++;
                 }
             }
+            CreateObjectField(objectFieldPositions[20], Event.current, boundHand.FindPropertyRelative("wrist"));
         }
 
         /// <summary>
@@ -417,12 +418,12 @@ namespace Leap.Unity.HandsModule {
             if(isAssignedTo) {
                 //If there is a bone assigned but it is not the same as the bone that we have
                 if(beforeTransform != afterTransform && afterTransform != null) {
-                    AssignTransform(objectRef, afterTransform);
+                    AssignTransform(boneProperty, afterTransform);
                 }
             }
             else {
                 if(afterTransform != null) {
-                    AssignTransform(objectRef, afterTransform);
+                    AssignTransform(boneProperty, afterTransform);
                 }
             }
         }
