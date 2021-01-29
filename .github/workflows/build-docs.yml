@@ -54,7 +54,7 @@ jobs:
 
       # Push the contents of the html directory to the gh-pages branch 
       - name: Deploy 🚀
-        uses: JamesIves/github-pages-deploy-action@3.6.1
+        uses: JamesIves/github-pages-deploy-action@3.7.1
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This is set by github, do not change.
           BRANCH: gh-pages # The branch the action should deploy to.
