@@ -1,4 +1,12 @@
-﻿using System.Collections.Generic;
+﻿/******************************************************************************
+ * Copyright (C) Ultraleap, Inc. 2011-2020.                                   *
+ *                                                                            *
+ * Use subject to the terms of the Apache License 2.0 available at            *
+ * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
+ * between Ultraleap and you, your company or other organization.             *
+ ******************************************************************************/
+
+using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
@@ -6,8 +14,8 @@ using UnityEngine;
 namespace Leap.Unity.HandsModule {
 
     public class HandBinderDocumentationWindow : EditorWindow {
+
         private int currentPage = 0;
-        private List<int> previousPages = new List<int>();
 
         //Styles to be used for the content
         private static GUIStyle headerStyle;
@@ -130,7 +138,6 @@ namespace Leap.Unity.HandsModule {
             scrollPosition = GUILayout.BeginScrollView(scrollPosition);
             switch(currentPage) {
                 case 0:
-                    previousPages.Clear();
                     StartPage();
                     break;
 
@@ -158,8 +165,6 @@ namespace Leap.Unity.HandsModule {
         }
 
         private void MovePage(int specific) {
-            //Store the last page
-            previousPages.Add(currentPage);
             if(specific == -1)
                 currentPage = (currentPage + 1) % 6;
             else {
@@ -168,9 +173,18 @@ namespace Leap.Unity.HandsModule {
         }
 
         private void PreviousPage() {
-            var last = previousPages.LastOrDefault();
-            previousPages.RemoveAt(previousPages.Count - 1);
-            currentPage = last;
+
+            if(currentPage == 5) {
+                currentPage = 3;
+            }
+            else {
+                if(currentPage == 0) {
+                    return;
+                }
+                else {
+                    currentPage -= 1;
+                }
+            }
         }
 
         private void StartPage() {
@@ -235,7 +249,6 @@ namespace Leap.Unity.HandsModule {
             GUILayout.Label("If you wish to use two hand models, repeat this step for the other hand", contentStyle);
             GUILayout.EndVertical();
             DrawTexture((Texture)Resources.Load("Editor_Step_2_Hand_Rig"));
-            //DrawTexture((Texture)Resources.Load("Step_2_Assigned_HandModelManager"));
             GUILayout.Space(20);
 
             GUILayout.EndHorizontal();

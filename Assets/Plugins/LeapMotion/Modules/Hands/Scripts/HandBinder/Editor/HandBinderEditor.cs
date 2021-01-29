@@ -1,4 +1,12 @@
-﻿using System.Collections.Generic;
+﻿/******************************************************************************
+ * Copyright (C) Ultraleap, Inc. 2011-2020.                                   *
+ *                                                                            *
+ * Use subject to the terms of the Apache License 2.0 available at            *
+ * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
+ * between Ultraleap and you, your company or other organization.             *
+ ******************************************************************************/
+
+using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
@@ -228,8 +236,9 @@ namespace Leap.Unity.HandsModule {
                 EditorGUILayout.Space();
                 GUILayout.BeginHorizontal();
                 EditorGUILayout.PropertyField(debugLeapHand);
-                if(debugLeapHand.boolValue)
+                if(debugLeapHand.boolValue) { 
                     leapHandDebugCol = EditorGUILayout.ColorField(GUIContent.none, leapHandDebugCol, false, false, false);
+                }
                 GUILayout.EndHorizontal();
                 EditorGUILayout.PropertyField(DebugLeapRotationAxis);
                 GUILayout.BeginHorizontal();
@@ -267,12 +276,12 @@ namespace Leap.Unity.HandsModule {
                 GUILayout.Label(dividerLine);
                 EditorGUILayout.Space();
 
-                for(int i = 0; i < offsets.arraySize; i++) {
-                    var boundType = offsets.GetArrayElementAtIndex(i);
-                    var before = myTarget.offsets[i];
-                    var offsetProperty = BoundTypeToProperty(boundType.intValue);
-                    var offsetRotation = offsetProperty.FindPropertyRelative("rotation");
-                    var offsetPosition = offsetProperty.FindPropertyRelative("position");
+                for(int offsetIndex = 0; offsetIndex < offsets.arraySize; offsetIndex++) {
+                    SerializedProperty boundType = offsets.GetArrayElementAtIndex(offsetIndex);
+                    BoundTypes previousBoundType = myTarget.offsets[offsetIndex];
+                    SerializedProperty offsetProperty = BoundTypeToProperty(boundType.intValue);
+                    SerializedProperty offsetRotation = offsetProperty.FindPropertyRelative("rotation");
+                    SerializedProperty offsetPosition = offsetProperty.FindPropertyRelative("position");
 
                     GUILayout.BeginVertical("Box");
                     GUILayout.BeginHorizontal("Box");
@@ -285,16 +294,16 @@ namespace Leap.Unity.HandsModule {
                         }
 
                         SceneView.RepaintAll();
-                        offsets.DeleteArrayElementAtIndex(i);
+                        offsets.DeleteArrayElementAtIndex(offsetIndex);
                         break;
                     }
                     GUILayout.EndHorizontal();
 
                     //Check to see if the user has changed the value
-                    if((int)before != boundType.intValue) {
+                    if((int)previousBoundType != boundType.intValue) {
                         //Check to see if any of the offsets are the same as this one
                         if(myTarget.offsets.Any(x => (int)x == boundType.intValue)) {
-                            boundType.intValue = (int)before;
+                            boundType.intValue = (int)previousBoundType;
                         }
                         else {
                             offsetRotation.vector3Value = Vector3.zero;

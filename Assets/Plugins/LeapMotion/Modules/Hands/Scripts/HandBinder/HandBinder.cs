@@ -1,4 +1,12 @@
-﻿using System.Collections.Generic;
+﻿/******************************************************************************
+ * Copyright (C) Ultraleap, Inc. 2011-2020.                                   *
+ *                                                                            *
+ * Use subject to the terms of the Apache License 2.0 available at            *
+ * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
+ * between Ultraleap and you, your company or other organization.             *
+ ******************************************************************************/
+
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Leap.Unity.HandsModule {
@@ -112,20 +120,13 @@ namespace Leap.Unity.HandsModule {
                         var bone = LeapHand.Fingers[fingerIndex].bones[boneIndex];
                         var offset = boundHand.fingers[fingerIndex].boundBones[boneIndex].offset;
 
-                        Vector3 position = Vector3.zero;
-                        Quaternion rotation = Quaternion.identity;
-
                         if(SetPositions) {
-                            position = bone.PrevJoint.ToVector3() + offset.position;
-                            boundTransform.transform.position = position;
+                            boundTransform.transform.position = bone.PrevJoint.ToVector3() + offset.position;
                         }
                         else {
-                            position = startTransform.position + offset.position;
-                            boundTransform.transform.localPosition = position;
+                            boundTransform.transform.localPosition = startTransform.position + offset.position;
                         }
-
-                        rotation = bone.Rotation.ToQuaternion() * Quaternion.Euler(GlobalFingerRotationOffset) * Quaternion.Euler(offset.rotation);
-                        boundTransform.transform.rotation = rotation;
+                        boundTransform.transform.rotation = bone.Rotation.ToQuaternion() * Quaternion.Euler(GlobalFingerRotationOffset) * Quaternion.Euler(offset.rotation);
                     }
                 }
             }
