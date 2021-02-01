@@ -33,7 +33,6 @@ namespace Leap.Unity.HandsModule {
             //Get all children of the hand
             var children = GetAllChildren(handBinder.transform);
 
-            var foundBones = new List<Transform>();
             var thumbBones = SelectBones(children, boneDefinitions.DefinitionThumb, true);
             var indexBones = SelectBones(children, boneDefinitions.DefinitionIndex);
             var middleBones = SelectBones(children, boneDefinitions.DefinitionMiddle);
