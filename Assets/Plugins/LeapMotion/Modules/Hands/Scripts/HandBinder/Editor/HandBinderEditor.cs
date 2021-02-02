@@ -84,33 +84,6 @@ namespace Leap.Unity.HandsModule {
         private Color green = new Color32(140, 234, 40, 255);
 
         /// <summary>
-        /// The mapping that allows a BoundType and Leap FingerType/BoneType to map back to the HandBinders Data structure
-        /// </summary>
-        public static Dictionary<BoundTypes, (Finger.FingerType, Bone.BoneType)> boundTypeMapping = new Dictionary<BoundTypes, (Finger.FingerType, Bone.BoneType)>
-            {
-            {BoundTypes.THUMB_METACARPAL, (Finger.FingerType.TYPE_THUMB, Bone.BoneType.TYPE_METACARPAL)},
-            {BoundTypes.THUMB_PROXIMAL, (Finger.FingerType.TYPE_THUMB, Bone.BoneType.TYPE_PROXIMAL)},
-            {BoundTypes.THUMB_INTERMEDIATE, (Finger.FingerType.TYPE_THUMB, Bone.BoneType.TYPE_INTERMEDIATE)},
-            {BoundTypes.THUMB_DISTAL, (Finger.FingerType.TYPE_THUMB, Bone.BoneType.TYPE_DISTAL)},
-            {BoundTypes.INDEX_METACARPAL, (Finger.FingerType.TYPE_INDEX, Bone.BoneType.TYPE_METACARPAL)},
-            {BoundTypes.INDEX_PROXIMAL, (Finger.FingerType.TYPE_INDEX, Bone.BoneType.TYPE_PROXIMAL)},
-            {BoundTypes.INDEX_INTERMEDIATE, (Finger.FingerType.TYPE_INDEX, Bone.BoneType.TYPE_INTERMEDIATE)},
-            {BoundTypes.INDEX_DISTAL, (Finger.FingerType.TYPE_INDEX, Bone.BoneType.TYPE_DISTAL)},
-            {BoundTypes.MIDDLE_METACARPAL, (Finger.FingerType.TYPE_MIDDLE, Bone.BoneType.TYPE_METACARPAL)},
-            {BoundTypes.MIDDLE_PROXIMAL, (Finger.FingerType.TYPE_MIDDLE, Bone.BoneType.TYPE_PROXIMAL)},
-            {BoundTypes.MIDDLE_INTERMEDIATE, (Finger.FingerType.TYPE_MIDDLE, Bone.BoneType.TYPE_INTERMEDIATE)},
-            {BoundTypes.MIDDLE_DISTAL, (Finger.FingerType.TYPE_MIDDLE, Bone.BoneType.TYPE_DISTAL)},
-            {BoundTypes.RING_METACARPAL, (Finger.FingerType.TYPE_RING, Bone.BoneType.TYPE_METACARPAL)},
-            {BoundTypes.RING_PROXIMAL, (Finger.FingerType.TYPE_RING, Bone.BoneType.TYPE_PROXIMAL)},
-            {BoundTypes.RING_INTERMEDIATE, (Finger.FingerType.TYPE_RING, Bone.BoneType.TYPE_INTERMEDIATE)},
-            {BoundTypes.RING_DISTAL, (Finger.FingerType.TYPE_RING, Bone.BoneType.TYPE_DISTAL)},
-            {BoundTypes.PINKY_METACARPAL, (Finger.FingerType.TYPE_PINKY, Bone.BoneType.TYPE_METACARPAL)},
-            {BoundTypes.PINKY_PROXIMAL, (Finger.FingerType.TYPE_PINKY, Bone.BoneType.TYPE_PROXIMAL)},
-            {BoundTypes.PINKY_INTERMEDIATE, (Finger.FingerType.TYPE_PINKY, Bone.BoneType.TYPE_INTERMEDIATE)},
-            {BoundTypes.PINKY_DISTAL, (Finger.FingerType.TYPE_PINKY, Bone.BoneType.TYPE_DISTAL)},
-        };
-
-        /// <summary>
         /// Assign the serialized properties
         /// </summary>
         private void SerializedProperties() {
@@ -404,7 +377,7 @@ namespace Leap.Unity.HandsModule {
                 EditorGUILayout.Space();
                 if(Selection.gameObjects.Length == 1 && GUILayout.Button("Recalculate Offsets")) {
                     Undo.RegisterFullObjectHierarchyUndo(myTarget.gameObject, "Recalculate Offsets");
-                    HandBinderAutoRigger.CalculateWristRotationOffset(myTarget);
+                    HandBinderAutoRigger.EstimateWristRotationOffset(myTarget);
                 }
                 EditorGUILayout.Space();
                 GUILayout.Label(dividerLine);
@@ -568,12 +541,12 @@ namespace Leap.Unity.HandsModule {
             else if(boundType == BoundTypes.ELBOW) {
                 return boundHand.FindPropertyRelative("elbow").FindPropertyRelative("offset");
             }
-            else if(!boundTypeMapping.ContainsKey(boundType)) {
+            else if(!HandBinderUtilities.boundTypeMapping.ContainsKey(boundType)) {
                 return null;
             }
-
-            var (fingerType, boneType) = boundTypeMapping[boundType];
-            return FingerOffsetPropertyFromLeapTypes(fingerType, boneType);
+            
+            (Finger.FingerType fingerType, Bone.BoneType boneType) fingerBoneType = HandBinderUtilities.boundTypeMapping[boundType];
+            return FingerOffsetPropertyFromLeapTypes(fingerBoneType.fingerType, fingerBoneType.boneType);
         }
 
         private SerializedProperty FingerOffsetPropertyFromLeapTypes(Finger.FingerType fingerType, Bone.BoneType boneType) {
@@ -585,6 +558,10 @@ namespace Leap.Unity.HandsModule {
         /// </summary>
         private void OnSceneGUI() {
             myTarget = (HandBinder)target;
+
+            if(myTarget == null) {
+                return;
+            }
 
             //Update the editor pose, this will only get called when the object is selected.
             if(!Application.isPlaying) {
