@@ -127,6 +127,57 @@ namespace Leap.Unity.HandsModule {
             SerializedProperties();
         }
 
+        void Reset() {
+            myTarget = (HandBinder)target;
+
+            //Return if we already have assigned base transforms
+            if(myTarget.defaultHandPose != null) {
+                return;
+            }
+
+            //Store all children transforms so the user has the ability to reset back to a default pose
+            var allChildren = new List<Transform>();
+            allChildren.Add(myTarget.transform);
+            allChildren.AddRange(HandBinderAutoRigger.GetAllChildren(myTarget.transform));
+
+            var baseTransforms = new List<SerializedTransform>();
+            foreach(var child in allChildren) {
+                var serializedTransform = new SerializedTransform();
+                serializedTransform.reference = child.gameObject;
+                serializedTransform.transform = new TransformStore();
+                serializedTransform.transform.position = child.position;
+                serializedTransform.transform.rotation = child.rotation.eulerAngles;
+                baseTransforms.Add(serializedTransform);
+            }
+            myTarget.defaultHandPose = baseTransforms.ToArray();
+        }
+
+        /// <summary>
+        /// Set the Editor Pose
+        /// </summary>
+        private void EditorHandPose() {
+
+            if(myTarget != null && myTarget.enabled) {
+                MakeLeapHand(myTarget);
+
+                if(myTarget.SetEditorPose) {
+                    if(myTarget.GetLeapHand() == null) {
+                        myTarget.InitHand();
+                        myTarget.BeginHand();
+                        myTarget.UpdateHand();
+                    }
+                    else {
+                        myTarget.UpdateHand();
+                    }
+                }
+                //Only reset the hand when it needs to be
+                else if(myTarget.needsResetting) {
+                    myTarget.ResetHand();
+                    SceneView.RepaintAll();
+                }
+            }
+        }
+
         /// <summary>
         /// Set the GUIStyle of the varius GUI elements we render
         /// </summary>
@@ -164,21 +215,21 @@ namespace Leap.Unity.HandsModule {
         /// Draw the inspector GUI
         /// </summary>
         public override void OnInspectorGUI() {
+
             serializedObject.Update();
             SetUp();
-
-            //Draw the hand graphic with all the object fields
             DrawHandGraphic();
             DrawAutoRigButton();
-            ShowRiggingOptions();
+            ShowBindingOptions();
             ShowDebugOptions();
             ShowFineTuningOptions();
             ShowDocumentationWidow();
 
-            //If the user changed anything in the UI make sure the scene gets updated
-            if(GUI.changed) {
-                SceneView.RepaintAll();
+            if(myTarget.needsResetting && setEditorPose.boolValue == false) {
+
+                myTarget.ResetHand();
             }
+
             serializedObject.ApplyModifiedProperties();
         }
 
@@ -202,12 +253,12 @@ namespace Leap.Unity.HandsModule {
                     }
 
                     var boneProperty = fingerProperty.FindPropertyRelative("boundBones").GetArrayElementAtIndex(boneIndex);
-                    DrawObjectField(objectFieldPositions[objectFieldPositionIndex], Event.current, boneProperty);
+                    DrawObjectField(objectFieldPositions[objectFieldPositionIndex], Event.current, boneProperty, (Finger.FingerType)fingerIndex, (Bone.BoneType)boneIndex);
 
                     objectFieldPositionIndex++;
                 }
             }
-            DrawObjectField(objectFieldPositions[20], Event.current, boundHand.FindPropertyRelative("wrist"));
+            DrawObjectField(objectFieldPositions[20], Event.current, boundHand.FindPropertyRelative("wrist"), Finger.FingerType.TYPE_UNKNOWN, Bone.BoneType.TYPE_INVALID);
 
             EditorGUILayout.Space();
             GUILayout.EndVertical();
@@ -220,7 +271,7 @@ namespace Leap.Unity.HandsModule {
         /// <param name="offset">The offset applied to position this object field on the hand visual</param>
         /// <param name="e"></param>
         /// <param name="index">The index of the boundGameobject between 0 - 20</param>
-        private void DrawObjectField(Vector2 offset, Event e, SerializedProperty boneProperty) {
+        private void DrawObjectField(Vector2 offset, Event e, SerializedProperty boneProperty, Finger.FingerType fingerIndex, Bone.BoneType boneIndex) {
             var objectRef = boneProperty.FindPropertyRelative("boundTransform");
             var beforeTransform = objectRef.objectReferenceValue as Transform;
 
@@ -252,13 +303,45 @@ namespace Leap.Unity.HandsModule {
             if(isAssignedTo) {
                 //If there is a bone assigned but it is not the same as the bone that we have
                 if(beforeTransform != afterTransform && afterTransform != null) {
-                    AssignTransform(boneProperty, afterTransform);
+
+                    if(EditorUtility.DisplayDialog("Bind GameObject",
+                            "Are you sure you want to overwrite this bound GameObject?", "Yes", "No")) {
+                            AssignTransform(boneProperty, afterTransform);
+                        }
                 }
             }
             else {
                 if(afterTransform != null) {
-                    AssignTransform(boneProperty, afterTransform);
+
+                    //Wrist
+                    if(fingerIndex == Finger.FingerType.TYPE_UNKNOWN && boneIndex == Bone.BoneType.TYPE_INVALID) {
+                        AssignTransform(boneProperty, afterTransform, true);
+                    }
+                    //AssignTransform(boneProperty, afterTransform);
+                    AutoAssignChildrenBones(afterTransform, fingerIndex, boneIndex);
                 }
+            }
+        }
+
+        void AutoAssignChildrenBones(Transform child, Finger.FingerType fingerType, Bone.BoneType boneType) {
+
+            if(boneType == Bone.BoneType.TYPE_INVALID) {
+                return;
+            }
+
+            var fingerProperty = boundHand.FindPropertyRelative("fingers").GetArrayElementAtIndex((int)fingerType);
+            var boneProperty = fingerProperty.FindPropertyRelative("boundBones").GetArrayElementAtIndex((int)boneType);
+            var objectRef = boneProperty.FindPropertyRelative("boundTransform");
+            objectRef.objectReferenceValue = child;
+
+            AssignTransform(boneProperty, child);
+
+            if(boneType == Bone.BoneType.TYPE_DISTAL) {
+                return;
+            }
+
+            else if(child.childCount > 0) {
+                AutoAssignChildrenBones(child.GetChild(0), fingerType, (Bone.BoneType)((int)boneType + 1));
             }
         }
 
@@ -267,11 +350,11 @@ namespace Leap.Unity.HandsModule {
         /// </summary>
         /// <param name="boneProperty"></param>
         /// <param name="boundTransform"></param>
-        private void AssignTransform(SerializedProperty boneProperty, Transform boundTransform) {
+        private void AssignTransform(SerializedProperty boneProperty, Transform boundTransform, bool resetOverride = false) {
             //Setting a new bone has to be done when the hand is not an in editor pose, so doing this will reset the hand
-            if(setEditorPose.boolValue == true) {
+            if(setEditorPose.boolValue == true && resetOverride == false) {
                 myTarget.ResetHand();
-                setEditorPose.boolValue = false;
+                //Ensure the scene gets updated after the hand resets
             }
 
             var startTransform = boneProperty.FindPropertyRelative("startTransform");
@@ -282,18 +365,21 @@ namespace Leap.Unity.HandsModule {
 
         private void DrawAutoRigButton() {
             //Draw the Auto Rig Button
-            if(Selection.gameObjects.Length == 1 && GUILayout.Button("AutoRig", buttonStyle)) {
-                Undo.RegisterFullObjectHierarchyUndo(myTarget.gameObject, "AutoRig");
-                HandBinderAutoRigger.AutoRig(myTarget);
-                serializedObject.Update();
-                SceneView.RepaintAll();
+            if(Selection.gameObjects.Length == 1 && GUILayout.Button("Auto Bind", buttonStyle)) {
+
+                if(EditorUtility.DisplayDialog("AutoRig",
+                "Are you sure you want to discard all your changes and run the Auto Bind process?", "Yes", "No")) {
+                    Undo.RegisterFullObjectHierarchyUndo(myTarget.gameObject, "AutoRig");
+                    HandBinderAutoRigger.AutoRig(myTarget);
+                    serializedObject.Update();
+                }
             }
             EditorGUILayout.Space();
         }
 
-        private void ShowRiggingOptions() {
+        private void ShowBindingOptions() {
             //Drop down for rigging options
-            riggingOptions.boolValue = GUILayout.Toggle(riggingOptions.boolValue, !riggingOptions.boolValue ? "Show Rigging Options" : "Hide Rigging Options", subButtonStyle);
+            riggingOptions.boolValue = GUILayout.Toggle(riggingOptions.boolValue, !riggingOptions.boolValue ? "Show Binding Options" : "Hide Binding Options", subButtonStyle);
             EditorGUILayout.Space();
             GUI.color = Color.white;
             if(riggingOptions.boolValue) {
@@ -304,7 +390,7 @@ namespace Leap.Unity.HandsModule {
                 EditorGUILayout.PropertyField(customBoneDefinitions);
                 EditorGUILayout.Space();
 
-                armRigging.boolValue = GUILayout.Toggle(armRigging.boolValue, "Arm Rigging", "Button");
+                armRigging.boolValue = GUILayout.Toggle(armRigging.boolValue, "Arm Binding", "Button");
 
                 if(armRigging.boolValue) {
                     EditorGUI.BeginChangeCheck();
@@ -399,8 +485,6 @@ namespace Leap.Unity.HandsModule {
                             offsetRotation.vector3Value = Vector3.zero;
                             offsetPosition.vector3Value = Vector3.zero;
                         }
-
-                        SceneView.RepaintAll();
                         offsets.DeleteArrayElementAtIndex(offsetIndex);
                         break;
                     }
@@ -418,7 +502,6 @@ namespace Leap.Unity.HandsModule {
                             offsetProperty = BoundTypeToOffsetProperty((BoundTypes)boundType.intValue);
                             offsetRotation = offsetProperty.FindPropertyRelative("rotation");
                             offsetPosition = offsetProperty.FindPropertyRelative("position");
-                            SceneView.RepaintAll();
                         }
                     }
 
@@ -465,29 +548,6 @@ namespace Leap.Unity.HandsModule {
             }
             GUILayout.Space(20);
             GUILayout.EndHorizontal();
-        }
-
-        /// <summary>
-        /// Set the Editor Pose
-        /// </summary>
-        private void EditorHandPose() {
-            if(myTarget != null && myTarget.enabled) {
-                MakeLeapHand(myTarget);
-
-                if(myTarget.SetEditorPose) {
-                    if(myTarget.GetLeapHand() == null) {
-                        myTarget.InitHand();
-                        myTarget.BeginHand();
-                        myTarget.UpdateHand();
-                    }
-                    else {
-                        myTarget.UpdateHand();
-                    }
-                }
-                else {
-                    myTarget.ResetHand();
-                }
-            }
         }
 
         /// <summary>
@@ -544,7 +604,7 @@ namespace Leap.Unity.HandsModule {
             else if(!HandBinderUtilities.boundTypeMapping.ContainsKey(boundType)) {
                 return null;
             }
-            
+
             (Finger.FingerType fingerType, Bone.BoneType boneType) fingerBoneType = HandBinderUtilities.boundTypeMapping[boundType];
             return FingerOffsetPropertyFromLeapTypes(fingerBoneType.fingerType, fingerBoneType.boneType);
         }
@@ -557,15 +617,15 @@ namespace Leap.Unity.HandsModule {
         /// Draw extra gizmos in the scene to help the user while they edit variables
         /// </summary>
         private void OnSceneGUI() {
-            myTarget = (HandBinder)target;
-
-            if(myTarget == null) {
-                return;
-            }
 
             //Update the editor pose, this will only get called when the object is selected.
             if(!Application.isPlaying) {
-                EditorHandPose();
+                //EditorHandPose();
+            }
+
+            myTarget = (HandBinder)target;
+            if(myTarget == null) {
+                return;
             }
 
             //Draw the leap hand
@@ -612,6 +672,14 @@ namespace Leap.Unity.HandsModule {
                             }
                         }
                     }
+                }
+
+                //Draw the wrist Gizmo
+                if(myTarget.boundHand.wrist.boundTransform != null) {
+                    var target = myTarget.boundHand.wrist.boundTransform;
+                    Handles.DrawWireDisc(target.position, target.right, gizmoSize.floatValue);
+                    Handles.DrawWireDisc(target.position, target.up, gizmoSize.floatValue);
+                    Handles.DrawWireDisc(target.position, target.forward, gizmoSize.floatValue);
                 }
             }
         }

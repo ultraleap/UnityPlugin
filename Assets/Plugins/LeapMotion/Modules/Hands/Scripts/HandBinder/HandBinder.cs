@@ -34,7 +34,7 @@ namespace Leap.Unity.HandsModule {
 
         //Used by Editor Script
         public bool fineTuning;
-
+        public bool needsResetting = false;
         public bool debugOptions;
         public bool riggingOptions;
         public bool armRigging;
@@ -61,6 +61,10 @@ namespace Leap.Unity.HandsModule {
         public Chirality handedness;
         public override ModelType HandModelType { get { return ModelType.Graphics; } }
 
+        //Stores all the childrens default pose
+        public SerializedTransform[] defaultHandPose;
+
+
         public override Hand GetLeapHand() {
             return LeapHand;
         }
@@ -70,7 +74,7 @@ namespace Leap.Unity.HandsModule {
         }
 
         public override bool SupportsEditorPersistence() {
-            return false;
+            return true;
         }
 
         private void OnDestroy() {
@@ -86,6 +90,10 @@ namespace Leap.Unity.HandsModule {
         /// Update the BoundGameobjects so that the positions and rotations match that of the leap hand
         /// </summary>
         public override void UpdateHand() {
+
+            if(Application.isEditor && SetEditorPose == false) {
+                return;
+            }
 
             //Calculate the elbows position and rotation making sure to maintatin the models forearm length
             if(boundHand.elbow.boundTransform != null) {
@@ -132,10 +140,11 @@ namespace Leap.Unity.HandsModule {
 
                         //Only update the finger position if the user has defined this behaviour
                         if(SetPositions) {
-                            boundTransform.transform.position = bone.PrevJoint.ToVector3() + offset.position;
+                            boundTransform.transform.position = bone.PrevJoint.ToVector3();
+                            boundTransform.transform.localPosition += offset.position;
                         }
+
                         else {
-                            //User can still add offsets to the start position even if they are not setting leap positional data
                             boundTransform.transform.localPosition = startTransform.position + offset.position;
                         }
 
@@ -144,6 +153,8 @@ namespace Leap.Unity.HandsModule {
                     }
                 }
             }
+
+            needsResetting = true;
         }
 
         /// <summary>
@@ -151,32 +162,16 @@ namespace Leap.Unity.HandsModule {
         /// </summary>
         public void ResetHand() {
 
-            //Reset all of the boundTransforms back to position and rotation they were stored to.
-            SetEditorPose = false;
-            foreach(var finger in boundHand.fingers) {
-                if(finger == null) {
-                    continue;
-                }
+            if(defaultHandPose == null) {
+                return;
+            };
 
-                foreach(var bone in finger.boundBones) {
-                    if(bone.boundTransform == null) {
-                        continue;
-                    }
-
-                    bone.boundTransform.localPosition = bone.startTransform.position;
-                    bone.boundTransform.localRotation = Quaternion.Euler(bone.startTransform.rotation);
-                }
+            for(int i = 0; i < defaultHandPose.Length; i++) {
+                var baseTransform = defaultHandPose[i];
+                baseTransform.reference.transform.position = baseTransform.transform.position;
+                baseTransform.reference.transform.rotation = Quaternion.Euler(baseTransform.transform.rotation);
             }
-
-            if(boundHand.elbow.boundTransform != null) {
-                boundHand.elbow.boundTransform.localPosition = boundHand.elbow.startTransform.position;
-                boundHand.elbow.boundTransform.localRotation = Quaternion.Euler(boundHand.elbow.startTransform.rotation);
-            }
-
-            if(boundHand.wrist.boundTransform != null) {
-                boundHand.wrist.boundTransform.localPosition = boundHand.wrist.startTransform.position;
-                boundHand.wrist.boundTransform.localRotation = Quaternion.Euler(boundHand.wrist.startTransform.rotation);
-            }
+            needsResetting = false;
         }
     }
 }
