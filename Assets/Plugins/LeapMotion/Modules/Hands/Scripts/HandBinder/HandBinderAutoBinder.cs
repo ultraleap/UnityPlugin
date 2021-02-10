@@ -13,13 +13,14 @@ using UnityEngine;
 
 namespace Leap.Unity.HandsModule {
 
-    public static class HandBinderAutoRigger {
+    public static class HandBinderAutoBinder {
 
         /// <summary>
         /// This function is used to search the HandBinder scipts children transforms to auto assign them for the user
         /// </summary>
         /// <param name="handBinder">The binder that the found transforms will get assigned too</param>
         public static void AutoRig(HandBinder handBinder) {
+
             handBinder.ResetHand();
             BoneDefinitions boneDefinitions = null;
 
@@ -36,11 +37,11 @@ namespace Leap.Unity.HandsModule {
             children.Add(handBinder.transform); 
             children.AddRange(GetAllChildren(handBinder.transform));
 
-            var thumbBones = SelectBones(children, boneDefinitions.DefinitionThumb, true);
-            var indexBones = SelectBones(children, boneDefinitions.DefinitionIndex);
-            var middleBones = SelectBones(children, boneDefinitions.DefinitionMiddle);
-            var ringBones = SelectBones(children, boneDefinitions.DefinitionRing);
-            var pinkyBones = SelectBones(children, boneDefinitions.DefinitionPinky);
+            var thumbBones = SortBones(SelectBones(children, boneDefinitions.DefinitionThumb, true));
+            var indexBones = SortBones(SelectBones(children, boneDefinitions.DefinitionIndex), handBinder.UseMetaBones);
+            var middleBones = SortBones(SelectBones(children, boneDefinitions.DefinitionMiddle), handBinder.UseMetaBones);
+            var ringBones = SortBones(SelectBones(children, boneDefinitions.DefinitionRing), handBinder.UseMetaBones);
+            var pinkyBones = SortBones(SelectBones(children, boneDefinitions.DefinitionPinky), handBinder.UseMetaBones);
             var wrist = SelectBones(children, boneDefinitions.DefinitionWrist).FirstOrDefault();
             var Elbow = SelectBones(children, boneDefinitions.DefinitionElbow).FirstOrDefault();
 
@@ -51,6 +52,7 @@ namespace Leap.Unity.HandsModule {
             handBinder.boundHand.fingers[4].boundBones = AssignUnityBone(pinkyBones);
             handBinder.boundHand.wrist = AssignBoundBone(wrist);
             handBinder.boundHand.elbow = AssignBoundBone(Elbow);
+
             if(wrist != null && Elbow != null) {
                 handBinder.elbowLength = (wrist.position - Elbow.position).magnitude;
             }
@@ -86,24 +88,21 @@ namespace Leap.Unity.HandsModule {
         /// <param name="isThumb">is this a thumb?</param>
         /// <returns></returns>
         private static Transform[] SelectBones(List<Transform> children, string[] definitions, bool isThumb = false) {
-            //Can only ever be 4 bones per hand
-            var bones = new Transform[4];
-            int foundBoneIndex = 0;
+            var bones = new List<Transform>();
             for(int definitionIndex = 0; definitionIndex < definitions.Length; definitionIndex++) {
                 foreach(var child in children) {
                     //We have found all the bones we need
-                    if(foundBoneIndex == 4) {
+                    if(bones.Count == 4) {
                         break;
                     }
 
                     var definition = definitions[definitionIndex];
                     if(child.name.ToUpper().Contains(definition.ToUpper())) {
-                        bones[foundBoneIndex] = child;
-                        foundBoneIndex++;
+                        bones.Add(child);
                     }
                 }
             }
-            return SortBones(bones, isThumb);
+            return bones.ToArray();
         }
 
         /// <summary>
@@ -112,19 +111,27 @@ namespace Leap.Unity.HandsModule {
         /// <param name="bones">The bones you want to sort through</param>
         /// <param name="isThumb">Is it a thumb</param>
         /// <returns></returns>
-        private static Transform[] SortBones(Transform[] bones, bool isThumb = false) {
+        private static Transform[] SortBones(Transform[] bones, bool useMeta = false) {
             Transform meta = null;
             Transform proximal = null;
             Transform middle = null;
             Transform distal = null;
 
-            if(isThumb || bones.Length == 3) {
-                meta = null;
-                proximal = bones[0];
-                middle = bones[1];
-                distal = bones[2];
+            if(bones.Length == 3) {
+
+                if(!useMeta) {
+                    meta = null;
+                    proximal = bones[0];
+                    middle = bones[1];
+                    distal = bones[2];
+                }
+                else {
+                    meta = bones[0];
+                    proximal = bones[1];
+                    middle = bones[2];
+                    distal = null;
+                }
             }
-            //We assume the 4th child is the distal bone
             else if(bones.Length >= 4) {
                 meta = bones[0];
                 proximal = bones[1];
@@ -194,10 +201,12 @@ namespace Leap.Unity.HandsModule {
             Transform wrist = handBinder.boundHand.wrist.boundTransform;
 
             if(middleBone != null && indexBone != null && pinkyBone != null && wrist != null) {
+
+                var rootRotation = Quaternion.Inverse(handBinder.gameObject.transform.root.rotation);
                 //Get the Direction from the middle finger to the wrist
-                Vector3 wristForward = middleBone.position - wrist.position;
+                Vector3 wristForward = rootRotation * (middleBone.position - wrist.position);
                 //Get the Direction from the Proximal pinky finger to the Proximal Index finger
-                Vector3 wristRight = indexBone.position - pinkyBone.position;
+                Vector3 wristRight = rootRotation * (indexBone.position - pinkyBone.position);
 
                 //Swap the direction based on left and right hands
                 if(handBinder.Handedness == Chirality.Right) {
@@ -220,7 +229,7 @@ namespace Leap.Unity.HandsModule {
 
                 //Now calculate the difference between the models rotation and the leaps rotation
                 Quaternion wristRotationDifference = Quaternion.Inverse(modelRotation) * leapRotation;
-                Vector3 wristRelativeDifference = (Quaternion.Inverse(wrist.rotation) * wristRotationDifference).eulerAngles;
+                Vector3 wristRelativeDifference = (handBinder.gameObject.transform.root.rotation * (Quaternion.Inverse(wrist.rotation) * wristRotationDifference)).eulerAngles;
 
                 //Round to the nearest 90 degrees
                 wristRelativeDifference.x = Mathf.Round(wristRelativeDifference.x / 90) * 90;

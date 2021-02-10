@@ -64,6 +64,8 @@ namespace Leap.Unity.HandsModule {
         //Stores all the childrens default pose
         public SerializedTransform[] defaultHandPose;
 
+        //Used when resetting the hand back to its default pose
+        Vector3 rootScale;
 
         public override Hand GetLeapHand() {
             return LeapHand;
@@ -83,6 +85,30 @@ namespace Leap.Unity.HandsModule {
 
         //Reset is called when the user hits the Reset button in the Inspector's context menu or when adding the component the first time.
         private void Reset() {
+
+            //Return if we already have assigned base transforms
+            if(defaultHandPose != null) {
+                return;
+            }
+
+            rootScale = transform.localScale;
+
+            //Store all children transforms so the user has the ability to reset back to a default pose
+            var allChildren = new List<Transform>();
+            allChildren.Add(transform);
+            allChildren.AddRange(HandBinderAutoBinder.GetAllChildren(transform));
+
+            var baseTransforms = new List<SerializedTransform>();
+            foreach(var child in allChildren) {
+                var serializedTransform = new SerializedTransform();
+                serializedTransform.reference = child.gameObject;
+                serializedTransform.transform = new TransformStore();
+                serializedTransform.transform.position = child.localPosition;
+                serializedTransform.transform.rotation = child.localRotation.eulerAngles;
+                baseTransforms.Add(serializedTransform);
+            }
+            defaultHandPose = baseTransforms.ToArray();
+
             ResetHand();
         }
 
@@ -168,8 +194,8 @@ namespace Leap.Unity.HandsModule {
 
             for(int i = 0; i < defaultHandPose.Length; i++) {
                 var baseTransform = defaultHandPose[i];
-                baseTransform.reference.transform.position = baseTransform.transform.position;
-                baseTransform.reference.transform.rotation = Quaternion.Euler(baseTransform.transform.rotation);
+                baseTransform.reference.transform.localPosition = baseTransform.transform.position;
+                baseTransform.reference.transform.localRotation = Quaternion.Euler(baseTransform.transform.rotation);
             }
             needsResetting = false;
         }
