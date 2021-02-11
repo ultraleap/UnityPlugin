@@ -37,7 +37,7 @@ namespace Leap.Unity.HandsModule {
             children.Add(handBinder.transform); 
             children.AddRange(GetAllChildren(handBinder.transform));
 
-            var thumbBones = SortBones(SelectBones(children, boneDefinitions.DefinitionThumb, true));
+            var thumbBones = SortBones(SelectBones(children, boneDefinitions.DefinitionThumb), false, true);
             var indexBones = SortBones(SelectBones(children, boneDefinitions.DefinitionIndex), handBinder.UseMetaBones);
             var middleBones = SortBones(SelectBones(children, boneDefinitions.DefinitionMiddle), handBinder.UseMetaBones);
             var ringBones = SortBones(SelectBones(children, boneDefinitions.DefinitionRing), handBinder.UseMetaBones);
@@ -87,7 +87,7 @@ namespace Leap.Unity.HandsModule {
         /// <param name="definitions">The definition to sort through the children</param>
         /// <param name="isThumb">is this a thumb?</param>
         /// <returns></returns>
-        private static Transform[] SelectBones(List<Transform> children, string[] definitions, bool isThumb = false) {
+        private static Transform[] SelectBones(List<Transform> children, string[] definitions) {
             var bones = new List<Transform>();
             for(int definitionIndex = 0; definitionIndex < definitions.Length; definitionIndex++) {
                 foreach(var child in children) {
@@ -111,7 +111,7 @@ namespace Leap.Unity.HandsModule {
         /// <param name="bones">The bones you want to sort through</param>
         /// <param name="isThumb">Is it a thumb</param>
         /// <returns></returns>
-        private static Transform[] SortBones(Transform[] bones, bool useMeta = false) {
+        private static Transform[] SortBones(Transform[] bones, bool useMeta = false, bool isThumb = false) {
             Transform meta = null;
             Transform proximal = null;
             Transform middle = null;
@@ -133,10 +133,18 @@ namespace Leap.Unity.HandsModule {
                 }
             }
             else if(bones.Length >= 4) {
-                meta = bones[0];
-                proximal = bones[1];
-                middle = bones[2];
-                distal = bones[3];
+
+                if(isThumb) {
+                    proximal = bones[0];
+                    middle = bones[1];
+                    distal = bones[2];
+                }
+                else {
+                    meta = bones[0];
+                    proximal = bones[1];
+                    middle = bones[2];
+                    distal = bones[3];
+                }
             }
 
             var boundObjects = new Transform[]

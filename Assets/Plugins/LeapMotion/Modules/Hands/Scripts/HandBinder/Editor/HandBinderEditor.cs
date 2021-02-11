@@ -46,35 +46,35 @@ namespace Leap.Unity.HandsModule {
         private SerializedProperty riggingOptions;
         private SerializedProperty armRigging;
 
-        private Vector2[] objectFieldPositions = new Vector2[]
+        private (Vector2 offset, bool overContent)[] objectFieldData = new (Vector2 offset, bool overContent)[]
         {
             //Thumb
-            new Vector2(-20, -65f),
-            new Vector2(-50, -30),
-            new Vector2(-80, 0),
-            new Vector2(-100, 40),
+            (new Vector2(-20, -65f), false),
+            (new Vector2(-50, -30), false),
+            (new Vector2(-80, 0), false),
+            (new Vector2(-100, 40), false),
             //Index
-            new Vector2(-20, -20f),
-            new Vector2(-10, 50),
-            new Vector2(-10, 80),
-            new Vector2(-10, 110),
+            (new Vector2(-20, -20f), false),
+            (new Vector2(-10, 50), false),
+            (new Vector2(-10, 80), false),
+            (new Vector2(-10, 110), false),
             //Middle
-            new Vector2(10, -20f),
-            new Vector2(25, 50),
-            new Vector2(30, 80),
-            new Vector2(40, 110),
+            (new Vector2(10, -20f), false),
+            (new Vector2(25, 50), false),
+            (new Vector2(30, 80), false),
+            (new Vector2(40, 110), false),
             //Ring
-            new Vector2(30, -30f),
-            new Vector2(55, 30),
-            new Vector2(70, 60),
-            new Vector2(80, 85),
+            (new Vector2(30, -30f), false),
+            (new Vector2(55, 30), false),
+            (new Vector2(70, 60), false),
+            (new Vector2(80, 85), false),
             //Pinky
-            new Vector2(40, -50),
-            new Vector2(80f, 0),
-            new Vector2(100, 18),
-            new Vector2(120, 35),
+            (new Vector2(40, -50), false),
+            (new Vector2(80f, 0), false),
+            (new Vector2(100, 18), false),
+            (new Vector2(120, 35), false),
             //Wrist
-            new Vector2(0, -100)
+            (new Vector2(0, -100), false)
         };
 
         private GUIStyle buttonStyle;
@@ -200,12 +200,12 @@ namespace Leap.Unity.HandsModule {
                     }
 
                     var boneProperty = fingerProperty.FindPropertyRelative("boundBones").GetArrayElementAtIndex(boneIndex);
-                    DrawObjectField(objectFieldPositions[objectFieldPositionIndex], Event.current, boneProperty, (Finger.FingerType)fingerIndex, (Bone.BoneType)boneIndex);
+                    DrawObjectField(ref objectFieldData[objectFieldPositionIndex], Event.current, boneProperty, (Finger.FingerType)fingerIndex, (Bone.BoneType)boneIndex);
 
                     objectFieldPositionIndex++;
                 }
             }
-            DrawObjectField(objectFieldPositions[20], Event.current, boundHand.FindPropertyRelative("wrist"), Finger.FingerType.TYPE_UNKNOWN, Bone.BoneType.TYPE_INVALID);
+            DrawObjectField(ref objectFieldData[20], Event.current, boundHand.FindPropertyRelative("wrist"), Finger.FingerType.TYPE_UNKNOWN, Bone.BoneType.TYPE_INVALID);
 
             EditorGUILayout.Space();
             GUILayout.EndVertical();
@@ -218,7 +218,7 @@ namespace Leap.Unity.HandsModule {
         /// <param name="offset">The offset applied to position this object field on the hand visual</param>
         /// <param name="e"></param>
         /// <param name="index">The index of the boundGameobject between 0 - 20</param>
-        private void DrawObjectField(Vector2 offset, Event e, SerializedProperty boneProperty, Finger.FingerType fingerIndex, Bone.BoneType boneIndex) {
+        private void DrawObjectField(ref (Vector2 offset, bool overContent) objectField, Event e, SerializedProperty boneProperty, Finger.FingerType fingerIndex, Bone.BoneType boneIndex) {
             var objectRef = boneProperty.FindPropertyRelative("boundTransform");
             var beforeTransform = objectRef.objectReferenceValue as Transform;
 
@@ -227,13 +227,32 @@ namespace Leap.Unity.HandsModule {
 
             //The size of the field
             float referencePointSize = 13;
-            offset.x = handedness.intValue == 1 ? -offset.x + 8 : offset.x;
-            var center = imageRect.center - offset;
+            objectField.offset.x = handedness.intValue == 1 ? -objectField.offset.x + 8 : objectField.offset.x;
+            var center = imageRect.center - objectField.offset;
             var newRect = new Rect(center.x, center.y, referencePointSize, referencePointSize);
             var maxSize = new Rect(center.x, center.y, referencePointSize * 6, referencePointSize);
-            //Check if the cursor is inside the rect
-            var overContent = maxSize.Contains(e.mousePosition);
-            newRect = overContent ? maxSize : newRect;
+
+            objectField.overContent = maxSize.Contains(e.mousePosition);
+
+            //To stop the UI from overlapping when the user tries to drag and drop
+            if(objectField.overContent) {
+                bool overOtherContent = false;
+                for(int i = 0; i < objectFieldData.Length; i++) {
+                    if(objectFieldData[i] != objectField) {
+                        if(objectFieldData[i].overContent) {
+                            overOtherContent = true;
+                        }
+                    }
+                }
+
+                //Check if the cursor is inside the rect
+                if(overOtherContent) {
+                    objectField.overContent = false;
+                    Debug.Log("Already over another content field");
+                }
+            }
+
+            newRect = objectField.overContent ? maxSize : newRect;
 
             //Choose a color based on validity
             var color = isAssignedTo ? green : warningColor;

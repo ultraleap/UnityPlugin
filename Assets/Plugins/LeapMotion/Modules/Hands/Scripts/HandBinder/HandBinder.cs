@@ -12,6 +12,7 @@ using UnityEngine;
 
 namespace Leap.Unity.HandsModule {
 
+    [DisallowMultipleComponent]
     public class HandBinder : HandModelBase {
         public Hand LeapHand;
 
