@@ -1,4 +1,4 @@
-# Graphic Renderer {#graphic-renderer}
+# (Deprecated) Graphic Renderer {#graphic-renderer}
 
 Introduction
 -------
