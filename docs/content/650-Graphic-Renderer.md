@@ -2,7 +2,7 @@
 
 Deprecation Notice
 -------
-<ins><b>This module is deprecated as of October 6th, 2020. It should still function with Core version 4.4.0 and Unity 2019 versions but future support may degrade.</b></ins>
+**This module is deprecated as of October 6th, 2020. It should still function with Core version 4.4.0 and Unity 2019 versions but future support may degrade.**
 
 Introduction
 -------
