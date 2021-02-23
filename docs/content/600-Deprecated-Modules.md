@@ -28,6 +28,6 @@ These modules are **still compatible** as of Core 4.3.0, but may become unsuppor
 
 - [Graphic Renderer 0.1.3][graphic-renderer]
 
-  The Graphic Renderer was deprecated in 4.6.0 because its primary function (drawcall batching) is not necessary on desktop-class GPUs (our primary supported platform), and Unity updates since its initial release have incrementally subsumed or broken underlying functionality.
+  The Graphic Renderer was deprecated in 4.6.0 because its primary function (draw-call batching) is not necessary on desktop-class GPUs, which is currently our primary supported platform. Additionally, other tools for mobile UI optimization have matured since its inception, and Unity updates since its initial release have incrementally subsumed or broken its underlying functionality.
 
 [graphic-renderer]: https://developer.leapmotion.com/releases/graphic-renderer-013 "(Deprecated) Graphic Renderer"
