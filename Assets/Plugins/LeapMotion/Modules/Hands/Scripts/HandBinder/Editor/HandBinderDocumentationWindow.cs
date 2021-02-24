@@ -32,11 +32,12 @@ namespace Leap.Unity.HandsModule {
         /// <summary>
         /// Makes the documentation window appear in its own menu at the top
         /// </summary>
-        [MenuItem("Ultraleap/Hand Rigging Documentation")]
+        [MenuItem("Ultraleap/Hand Binding Documentation")]
         private static void Init() {
             leapController = AssetDatabase.LoadAssetAtPath("Assets/Plugins/LeapMotion/Core/Prefabs/LeapHandController.prefab", typeof(Leap.Unity.HandModelManager));
             // Get existing open window or if none, make a new one:
             var window = (HandBinderDocumentationWindow)EditorWindow.GetWindow(typeof(HandBinderDocumentationWindow));
+            window.titleContent = new GUIContent("Hand Binding Guide");
             window.Show();
         }
 
@@ -190,9 +191,9 @@ namespace Leap.Unity.HandsModule {
         private void StartPage() {
             DrawTexture((Texture)Resources.Load("Editor_Ultraleap_logo"));
             GUILayout.Space(-50);
-            Header("Hand Rigging Module");
+            Header("Hands Module");
             GUILayout.Space(100);
-            GUILayout.Label("Set up your own rigged hands with the Rigging Module", contentStyle);
+            GUILayout.Label("Set up your own hands with the Hands Module", contentStyle);
             GUILayout.Label("Press Next Step to follow the step by step guide", contentStyle);
             GUILayout.Space(100);
 
@@ -212,20 +213,9 @@ namespace Leap.Unity.HandsModule {
             GUILayout.Space(20);
 
             GUILayout.BeginVertical();
-            GUILayout.Label("To get the leap motion data into the scene we need two components:", contentStyle);
-            GUILayout.Label("<color=cyan><b>leap Service Provider</b></color>", contentStyle);
-            GUILayout.Label("<color=cyan><b>Hand Model Manager</b></color>", contentStyle);
-
-            GUILayout.Space(20);
-            GUILayout.Label("Locate the Leap Hand Controller prefab in the 'Core Modules Prefabs' folder then place this into the scene", contentStyle);
-            if(leapController != null) {
-                leapController = (Leap.Unity.HandModelManager)EditorGUILayout.ObjectField(leapController, typeof(Leap.Unity.HandModelManager), false);
-                GUILayout.Space(20);
-            }
-
-            GUILayout.Label("Create a new entry in the Hand Model Manager Script and name appropriately", contentStyle);
-            GUILayout.Label("Remember to press 'is Enabled' on the new group you just made", contentStyle);
-            GUILayout.Label("Remember to change the 'Edit Time Pose' to the desired setting", contentStyle);
+            GUILayout.Label("Add the Leap Hand Controller prefab to the scene", contentStyle);
+            GUILayout.Label("Create a new entry in the Hand Model Manager Script", contentStyle);
+            GUILayout.Label("Tick 'is Enabled' on the group you just made", contentStyle);
 
             GUILayout.EndVertical();
             DrawTexture((Texture)Resources.Load("Editor_Step1_Inspector"));
@@ -242,11 +232,10 @@ namespace Leap.Unity.HandsModule {
             GUILayout.Space(20);
 
             GUILayout.BeginVertical();
-            GUILayout.Label("Drag your hand model under the Leap Hand Controller that you dragged into the scene earlier.", contentStyle);
-            GUILayout.Label("Assign the Leap Hand Binder script to the base of the hand model, the Autorigging function will search all children of the gameobject you assign it to.", contentStyle);
-            GUILayout.Label("Set the hand to the desired left or right handedness on each script.", contentStyle);
-            GUILayout.Label("Drag the Hand Rigging Scripts under the left and right slots of the Hand Model Manager.", contentStyle);
-            GUILayout.Label("If you wish to use two hand models, repeat this step for the other hand", contentStyle);
+            GUILayout.Label("Ensure your 3D Hand assets are in the scene, as a child of Leap Hand Controller.", contentStyle);
+            GUILayout.Label("Add a Hand Binder Component to each of your hand GameObjects", contentStyle);
+            GUILayout.Label("Set the desired left or right handedness on the Hand Binder Component.", contentStyle);
+            GUILayout.Label("Reference both Hand Binder Components, on the Hand Model Manager, in the hand group created in Step 1.", contentStyle);
             GUILayout.EndVertical();
             DrawTexture((Texture)Resources.Load("Editor_Step_2_Hand_Rig"));
             GUILayout.Space(20);
@@ -260,8 +249,8 @@ namespace Leap.Unity.HandsModule {
             Header("Step 3");
             GUILayout.BeginHorizontal();
             GUILayout.BeginVertical();
-            GUILayout.Label("Press the Auto Rig Button", contentStyle);
-            GUILayout.Label("The Auto Rig button will try to find and assign transforms of the model hand into the slots of the hand graphic in the inspector for you.", contentStyle);
+            GUILayout.Label("Press the Auto Bind Button", contentStyle);
+            GUILayout.Label("The Auto Bind button will try to find and assign transforms of the model hand into the slots of the hand graphic in the inspector for you.", contentStyle);
             GUILayout.EndVertical();
             DrawTexture((Texture)Resources.Load("Editor_Step_3_Hand_Rig"));
             GUILayout.EndHorizontal();
@@ -273,19 +262,19 @@ namespace Leap.Unity.HandsModule {
 
             PageButtons(5);
             EditorGUILayout.Space();
-            if(GUILayout.Button("If auto rig failed - Click here!", autoRigButton)) {
+            if(GUILayout.Button("If Auto Bind failed - Click here!", autoRigButton)) {
                 MovePage(4);
             }
         }
 
         private void Page4() {
-            Header("Step 3 - Auto Rig Failed");
+            Header("Step 3 - Auto Bind Failed");
 
             GUILayout.BeginHorizontal();
             GUILayout.BeginVertical();
-            GUILayout.Label("If the Autorig failed, slots on the hand will remain <color=red>RED</color>.", contentStyle);
+            GUILayout.Label("If the Auto Bind failed, slots on the hand will remain <color=orange>ORANGE</color>.", contentStyle);
             GUILayout.Label("You are still able to continue if you do not wish to include every finger bone, simply drag and drop the transform you wish to use into the slots on the hand graphic.", contentStyle);
-            GUILayout.Label("Slots that are <color=green>GREEN</color> will be updated using leap data, any in <color=red>RED</color> will be skipped", contentStyle);
+            GUILayout.Label("Slots that are <color=green>GREEN</color> will be updated using leap data, any in <color=orange>ORANGE</color> will be skipped", contentStyle);
             GUILayout.EndVertical();
             DrawTexture((Texture)Resources.Load("Editor_AutoRig_Failed"));
             GUILayout.EndHorizontal();

@@ -12,7 +12,6 @@ using System.Linq;
 using UnityEngine;
 
 namespace Leap.Unity.HandsModule {
-
     public static class HandBinderAutoBinder {
 
         /// <summary>
@@ -22,19 +21,11 @@ namespace Leap.Unity.HandsModule {
         public static void AutoRig(HandBinder handBinder) {
 
             handBinder.ResetHand();
-            BoneDefinitions boneDefinitions = null;
-
-            //Check to see if we have an autorigger Definitions scriptable object
-            if(handBinder.CustomBoneDefinitions == null) {
-                boneDefinitions = new BoneDefinitions();
-            }
-            else {
-                boneDefinitions = handBinder.CustomBoneDefinitions.BoneDefinitions;
-            }
+            BoneDefinitions boneDefinitions = new BoneDefinitions();
 
             //Get all children of the hand
             var children = new List<Transform>();
-            children.Add(handBinder.transform); 
+            children.Add(handBinder.transform);
             children.AddRange(GetAllChildren(handBinder.transform));
 
             var thumbBones = SortBones(SelectBones(children, boneDefinitions.DefinitionThumb), false, true);
@@ -58,7 +49,9 @@ namespace Leap.Unity.HandsModule {
             }
 
             EstimateWristRotationOffset(handBinder);
+            CalculateElbowLength(handBinder);
 
+            handBinder.GetLeapHand();
             handBinder.UpdateHand();
             handBinder.DebugModelTransforms = true;
             handBinder.SetEditorPose = true;
@@ -193,7 +186,6 @@ namespace Leap.Unity.HandsModule {
         /// Estimate the rotation offset needed to get the rigged hand into the same orientation as the leap hand
         /// </summary>
         public static void EstimateWristRotationOffset(HandBinder handBinder) {
-
             //Try to using the meta first
             Transform indexBone = handBinder.boundHand.fingers[(int)Finger.FingerType.TYPE_INDEX].boundBones[(int)Bone.BoneType.TYPE_METACARPAL].boundTransform;
             Transform middleBone = handBinder.boundHand.fingers[(int)Finger.FingerType.TYPE_MIDDLE].boundBones[(int)Bone.BoneType.TYPE_METACARPAL].boundTransform;
@@ -247,6 +239,12 @@ namespace Leap.Unity.HandsModule {
                 //Assign these values to the hand binder
                 handBinder.GlobalFingerRotationOffset = wristRelativeDifference;
                 handBinder.boundHand.wrist.offset.rotation = wristRelativeDifference;
+            }
+        }
+
+        public static void CalculateElbowLength(HandBinder handBinder) {
+            if(handBinder.boundHand.elbow.boundTransform != null && handBinder.boundHand.wrist.boundTransform != null) {
+                handBinder.elbowLength = (handBinder.boundHand.wrist.boundTransform.position - handBinder.boundHand.elbow.boundTransform.position).magnitude;
             }
         }
     }
