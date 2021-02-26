@@ -35,8 +35,8 @@ namespace Leap.Unity.HandsModule {
         private SerializedProperty setPositions;
         private SerializedProperty useMetaBones;
         private SerializedProperty setEditorPose;
-        private SerializedProperty customBoneDefinitions;
         private SerializedProperty globalFingerRotationOffset;
+        private SerializedProperty wristRotationOffset;
         private SerializedProperty boundHand;
         private SerializedProperty offsets;
         private SerializedProperty fineTuning;
@@ -60,7 +60,7 @@ namespace Leap.Unity.HandsModule {
             useMetaBones = serializedObject.FindProperty("UseMetaBones");
             setEditorPose = serializedObject.FindProperty("SetEditorPose");
             globalFingerRotationOffset = serializedObject.FindProperty("GlobalFingerRotationOffset");
-            customBoneDefinitions = serializedObject.FindProperty("CustomBoneDefinitions");
+            wristRotationOffset = serializedObject.FindProperty("wristRotationOffset");
             handedness = serializedObject.FindProperty("handedness");
             fineTuning = serializedObject.FindProperty("fineTuning");
             debugOptions = serializedObject.FindProperty("debugOptions");
@@ -142,8 +142,20 @@ namespace Leap.Unity.HandsModule {
             if(Selection.gameObjects.Length == 1 && GUILayout.Button("Bind Hand", buttonStyle)) {
                 var window = (BindingOptionsWindow)EditorWindow.GetWindow(typeof(BindingOptionsWindow));
                 window.SetUp(ref myTarget);
-                window.titleContent = new GUIContent("Binding Window", Resources.Load<Texture>("Editor_hand"));
+                window.titleContent = new GUIContent("Binding Window");
+                window.autoRepaintOnSceneChange = true;
                 window.Show();
+                HandBinderAutoBinder.CheckForAssignedBones(ref myTarget);
+
+                //Try to auto rig 
+                if(!myTarget.boundToBones)
+                {
+                    Undo.RegisterFullObjectHierarchyUndo(myTarget, "AutoBind");
+                    Undo.undoRedoPerformed += window.AutoRigUndo;
+                    HandBinderAutoBinder.AutoRig(myTarget);
+                    myTarget.UpdateHand();
+                }
+
             }
             EditorGUILayout.Space();
         }
@@ -201,7 +213,7 @@ namespace Leap.Unity.HandsModule {
                 //Draw the Calculated Offsets for the wrist and Fingers
                 GUILayout.BeginVertical("Box");
                 EditorGUILayout.Space();
-                EditorGUILayout.PropertyField(boundHand.FindPropertyRelative("wrist").FindPropertyRelative("offset").FindPropertyRelative("rotation"), new GUIContent("Wrist Rotation Offset"));
+                EditorGUILayout.PropertyField(wristRotationOffset, new GUIContent("Wrist Rotation Offset"));
                 EditorGUILayout.Space();
                 EditorGUILayout.PropertyField(globalFingerRotationOffset, new GUIContent("Fingers Rotation Offset"));
                 GUI.color = previousCol;
@@ -440,6 +452,8 @@ namespace Leap.Unity.HandsModule {
             float spaceSize = 30f;
             Vector2 scrollPosition;
             GUISkin editorSkin;
+            string previousUndoName;
+
             string message1 = "Alternatively, reference the GameObjects you wish to use from the scene into the fields below, once assigned the dots above will appear green to show they are bound to tracking data.";
             string message2 = "Once you have assigned the bones you wish to use, the button below will attempt to calculate the rotational offsets needed to line the 3D Model hand with the leap Data.";
             public void SetUp(ref HandBinder handBinderRef) {
@@ -468,15 +482,18 @@ namespace Leap.Unity.HandsModule {
                 };
             }
 
-            void OnGUI() {
+            //Closes the window if the user selects another gameobject with the Hand Binder on it
+            private void OnSelectionChange() {
 
-                //If the user has selected an object with a hand binder which is not this one, close the window.
                 if(Selection.activeTransform != null) {
                     var selectedHandBinder = Selection.activeTransform.GetComponent<HandBinder>();
                     if(selectedHandBinder != null && selectedHandBinder != handBinder) {
                         Close();
                     }
                 }
+            }
+
+            void OnGUI() {
 
                 HandGraphic.DrawHandGraphic(handBinder);
                 DrawAutoBindButton();
@@ -488,8 +505,11 @@ namespace Leap.Unity.HandsModule {
 
             void DrawAutoBindButton() {
                 if(GUILayout.Button(new GUIContent("Auto Bind", "Automatically try to search and bind the hand"), editorSkin.button, GUILayout.MaxWidth(EditorGUIUtility.currentViewWidth), GUILayout.MinHeight(spaceSize))) {
-                    if(EditorUtility.DisplayDialog("AutoRig",
+                    if(EditorUtility.DisplayDialog("Auto Bind",
                         "Are you sure you want to discard all your changes and run the Auto Bind process?", "Yes", "No")) {
+
+                        Undo.RegisterFullObjectHierarchyUndo(handBinder, "AutoBind");
+                        Undo.undoRedoPerformed += AutoRigUndo;
                         HandBinderAutoBinder.AutoRig(handBinder);
                         handBinder.UpdateHand();
                     }
@@ -497,6 +517,12 @@ namespace Leap.Unity.HandsModule {
 
                 GUILayout.Label(message1, editorSkin.label);
                 GUILayout.Label(dividerLine);
+            }
+
+            public void AutoRigUndo() {
+                Close();
+                handBinder.ResetHand(true);
+                Undo.undoRedoPerformed -= AutoRigUndo;
             }
 
             void DrawObjectFields() {

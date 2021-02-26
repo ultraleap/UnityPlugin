@@ -27,7 +27,7 @@ namespace Leap.Unity.HandsModule {
             var children = new List<Transform>();
             children.Add(handBinder.transform);
             children.AddRange(GetAllChildren(handBinder.transform));
-
+            
             var thumbBones = SortBones(SelectBones(children, boneDefinitions.DefinitionThumb), false, true);
             var indexBones = SortBones(SelectBones(children, boneDefinitions.DefinitionIndex), handBinder.UseMetaBones);
             var middleBones = SortBones(SelectBones(children, boneDefinitions.DefinitionMiddle), handBinder.UseMetaBones);
@@ -50,11 +50,39 @@ namespace Leap.Unity.HandsModule {
 
             EstimateWristRotationOffset(handBinder);
             CalculateElbowLength(handBinder);
+            CheckForAssignedBones(ref handBinder);
 
             handBinder.GetLeapHand();
             handBinder.UpdateHand();
             handBinder.DebugModelTransforms = true;
             handBinder.SetEditorPose = true;
+        }
+
+        public static void CheckForAssignedBones(ref HandBinder handBinder) {
+            var boundToBones = false;
+            if(handBinder.boundHand.fingers[0].boundBones.Any(x => x.boundTransform != null)) {
+                boundToBones = true;
+            }
+            else if(handBinder.boundHand.fingers[1].boundBones.Any(x => x.boundTransform != null)) {
+                boundToBones = true;
+            }
+            else if(handBinder.boundHand.fingers[2].boundBones.Any(x => x.boundTransform != null)) {
+                boundToBones = true;
+            }
+            else if(handBinder.boundHand.fingers[3].boundBones.Any(x => x.boundTransform != null)) {
+                boundToBones = true;
+            }
+            else if(handBinder.boundHand.fingers[4].boundBones.Any(x => x.boundTransform != null)) {
+                boundToBones = true;
+            }
+            else if(handBinder.boundHand.elbow.boundTransform != null) {
+                boundToBones = true;
+            }
+            else if(handBinder.boundHand.wrist.boundTransform != null) {
+                boundToBones = true;
+            }
+
+            handBinder.boundToBones = boundToBones;
         }
 
         /// <summary>
@@ -186,59 +214,39 @@ namespace Leap.Unity.HandsModule {
         /// Estimate the rotation offset needed to get the rigged hand into the same orientation as the leap hand
         /// </summary>
         public static void EstimateWristRotationOffset(HandBinder handBinder) {
-            //Try to using the meta first
-            Transform indexBone = handBinder.boundHand.fingers[(int)Finger.FingerType.TYPE_INDEX].boundBones[(int)Bone.BoneType.TYPE_METACARPAL].boundTransform;
-            Transform middleBone = handBinder.boundHand.fingers[(int)Finger.FingerType.TYPE_MIDDLE].boundBones[(int)Bone.BoneType.TYPE_METACARPAL].boundTransform;
-            Transform pinkyBone = handBinder.boundHand.fingers[(int)Finger.FingerType.TYPE_PINKY].boundBones[(int)Bone.BoneType.TYPE_METACARPAL].boundTransform;
 
-            //If the meta does not exist, use the proximal bones
-            if(indexBone == null || middleBone == null || pinkyBone == null) {
-                indexBone = handBinder.boundHand.fingers[(int)Finger.FingerType.TYPE_INDEX].boundBones[(int)Bone.BoneType.TYPE_PROXIMAL].boundTransform;
-                middleBone = handBinder.boundHand.fingers[(int)Finger.FingerType.TYPE_MIDDLE].boundBones[(int)Bone.BoneType.TYPE_PROXIMAL].boundTransform;
-                pinkyBone = handBinder.boundHand.fingers[(int)Finger.FingerType.TYPE_PINKY].boundBones[(int)Bone.BoneType.TYPE_PROXIMAL].boundTransform;
-            }
+            Transform indexBone = handBinder.boundHand.fingers[(int)Finger.FingerType.TYPE_INDEX].boundBones[(int)Bone.BoneType.TYPE_PROXIMAL].boundTransform;
+            Transform middleBone = handBinder.boundHand.fingers[(int)Finger.FingerType.TYPE_MIDDLE].boundBones[(int)Bone.BoneType.TYPE_PROXIMAL].boundTransform;
+            Transform pinkyBone = handBinder.boundHand.fingers[(int)Finger.FingerType.TYPE_PINKY].boundBones[(int)Bone.BoneType.TYPE_PROXIMAL].boundTransform;
 
             Transform wrist = handBinder.boundHand.wrist.boundTransform;
 
             if(middleBone != null && indexBone != null && pinkyBone != null && wrist != null) {
 
-                var rootRotation = Quaternion.Inverse(handBinder.gameObject.transform.root.rotation);
-                //Get the Direction from the middle finger to the wrist
-                Vector3 wristForward = rootRotation * (middleBone.position - wrist.position);
-                //Get the Direction from the Proximal pinky finger to the Proximal Index finger
-                Vector3 wristRight = rootRotation * (indexBone.position - pinkyBone.position);
+                //Create temporary transform
+                var modelBasis = new GameObject();
 
-                //Swap the direction based on left and right hands
-                if(handBinder.Handedness == Chirality.Right) {
-                    wristRight = -wristRight;
+                //Calculate Models rotation
+                var forward = (middleBone.position - wrist.position);
+                var right = (indexBone.position - pinkyBone.position);
+                if(handBinder.handedness == Chirality.Right) {
+                    right = -right;
                 }
+                var up = Vector3.Cross(forward, right);
+                Vector3.OrthoNormalize(ref up, ref forward, ref right);
+                var modelRotation = Quaternion.LookRotation(forward, up);
 
-                //Get the direciton that goes outwards from the back of the hand
-                Vector3 wristUp = Vector3.Cross(wristForward, wristRight);
+                //Apply rotation to temporary transform
+                modelBasis.transform.rotation = modelRotation;
+                modelBasis.transform.position = wrist.position;
 
-                //Make the vectors orthoginal to eacother, this is the basis for the model hand
-                Vector3.OrthoNormalize(ref wristRight, ref wristUp, ref wristForward);
+                //Calculate the difference between the Calculated hand basis and the wrists rotation
+                handBinder.wristRotationOffset = (Quaternion.Inverse(modelRotation) * wrist.transform.rotation).eulerAngles;
+                //Assuming the fingers have been created using the same rotation axis as the wrist
+                handBinder.GlobalFingerRotationOffset = handBinder.wristRotationOffset;
 
-                //Create a new leap hand based off the Desktop hand pose
-                Hand hand = TestHandFactory.MakeTestHand(handBinder.Handedness == Chirality.Left, unitType: TestHandFactory.UnitType.LeapUnits);
-                hand.Transform(TestHandFactory.GetTestPoseLeftHandTransform(TestHandFactory.TestHandPose.DesktopModeA));
-                Quaternion leapRotation = hand.Rotation.ToQuaternion();
-
-                //Get the rotation of the calculated hand Basis
-                Quaternion modelRotation = Quaternion.LookRotation(wristForward, wristUp);
-
-                //Now calculate the difference between the models rotation and the leaps rotation
-                Quaternion wristRotationDifference = Quaternion.Inverse(modelRotation) * leapRotation;
-                Vector3 wristRelativeDifference = (handBinder.gameObject.transform.root.rotation * (Quaternion.Inverse(wrist.rotation) * wristRotationDifference)).eulerAngles;
-
-                //Round to the nearest 90 degrees
-                wristRelativeDifference.x = Mathf.Round(wristRelativeDifference.x / 90) * 90;
-                wristRelativeDifference.y = Mathf.Round(wristRelativeDifference.y / 90) * 90;
-                wristRelativeDifference.z = Mathf.Round(wristRelativeDifference.z / 90) * 90;
-
-                //Assign these values to the hand binder
-                handBinder.GlobalFingerRotationOffset = wristRelativeDifference;
-                handBinder.boundHand.wrist.offset.rotation = wristRelativeDifference;
+                //Clean up the temporary object 
+                GameObject.DestroyImmediate(modelBasis);
             }
         }
 
