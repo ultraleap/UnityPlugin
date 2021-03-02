@@ -133,7 +133,6 @@ namespace Leap.Unity.HandsModule {
             ShowDebugOptions();
             ShowFineTuningOptions();
             ShowDocumentationWidow();
-
             serializedObject.ApplyModifiedProperties();
         }
 
@@ -167,7 +166,6 @@ namespace Leap.Unity.HandsModule {
             setEditorPose.boolValue = GUILayout.Toggle(setEditorPose.boolValue, new GUIContent("Set Leap Editor Pose", "Should the Leap Editor Pose be used during Edit mode?"));
             useMetaBones.boolValue = GUILayout.Toggle(useMetaBones.boolValue, new GUIContent("Use Metacarpal Bones", "Does this binding require Metacarpal Bones?"));
             setPositions.boolValue = GUILayout.Toggle(setPositions.boolValue, new GUIContent("Set Bone Positions", "Does this binding require the positional leap data to be applied to the 3D model?"));
-
             EditorGUILayout.Space();
 
             EditorGUILayout.Space();
@@ -344,6 +342,10 @@ namespace Leap.Unity.HandsModule {
             //Update the editor pose, this will only get called when the object is selected.
             myTarget = (HandBinder)target;
 
+            if(myTarget.LeapHand == null) {
+                return;
+            }
+
             //Draw the leap hand in the scene
             if(myTarget.DebugLeapHand) {
 
@@ -358,7 +360,7 @@ namespace Leap.Unity.HandsModule {
                         }
 
                         if(DebugLeapRotationAxis.boolValue) {
-                            DrawLeapBasis(bone, gizmoSize.floatValue * 4);
+                            DrawLeapBasis(bone, myTarget.GizmoSize * 4);
                         }
                         index++;
                     }
@@ -381,13 +383,13 @@ namespace Leap.Unity.HandsModule {
                         var target = myTarget.boundHand.fingers[finger].boundBones[bone].boundTransform;
                         if(target != null) {
                             if(myTarget.DebugModelTransforms) {
-                                Handles.DrawWireDisc(target.position, target.right, gizmoSize.floatValue);
-                                Handles.DrawWireDisc(target.position, target.up, gizmoSize.floatValue);
-                                Handles.DrawWireDisc(target.position, target.forward, gizmoSize.floatValue);
+                                Handles.DrawWireDisc(target.position, target.right, myTarget.GizmoSize);
+                                Handles.DrawWireDisc(target.position, target.up, myTarget.GizmoSize);
+                                Handles.DrawWireDisc(target.position, target.forward, myTarget.GizmoSize);
                             }
 
                             if(DebugModelRotationAxis.boolValue) {
-                                DrawTransformBasis(target, gizmoSize.floatValue * 4);
+                                DrawTransformBasis(target, myTarget.GizmoSize * 4);
                             }
                         }
                     }
@@ -396,17 +398,17 @@ namespace Leap.Unity.HandsModule {
                 //Draw the wrist Gizmo
                 if(myTarget.boundHand.wrist.boundTransform != null) {
                     var target = myTarget.boundHand.wrist.boundTransform;
-                    Handles.DrawWireDisc(target.position, target.right, gizmoSize.floatValue);
-                    Handles.DrawWireDisc(target.position, target.up, gizmoSize.floatValue);
-                    Handles.DrawWireDisc(target.position, target.forward, gizmoSize.floatValue);
+                    Handles.DrawWireDisc(target.position, target.right, myTarget.GizmoSize);
+                    Handles.DrawWireDisc(target.position, target.up, myTarget.GizmoSize);
+                    Handles.DrawWireDisc(target.position, target.forward, myTarget.GizmoSize);
                 }
 
                 //Draw the wrist Gizmo
                 if(myTarget.boundHand.elbow.boundTransform != null) {
                     var target = myTarget.boundHand.elbow.boundTransform;
-                    Handles.DrawWireDisc(target.position, target.right, gizmoSize.floatValue);
-                    Handles.DrawWireDisc(target.position, target.up, gizmoSize.floatValue);
-                    Handles.DrawWireDisc(target.position, target.forward, gizmoSize.floatValue);
+                    Handles.DrawWireDisc(target.position, target.right, myTarget.GizmoSize);
+                    Handles.DrawWireDisc(target.position, target.up, myTarget.GizmoSize);
+                    Handles.DrawWireDisc(target.position, target.forward, myTarget.GizmoSize);
                 }
             }
         }
@@ -668,7 +670,7 @@ namespace Leap.Unity.HandsModule {
                 }
 
                 var midPoint = Screen.width / 2;
-                var middleYOffset = 25;
+                var middleYOffset = 50;
 
                 //Draw the hand texture
                 var handTextureRect = new Rect(midPoint, middleYOffset, handTexture.width, handTexture.height);
