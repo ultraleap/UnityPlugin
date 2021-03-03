@@ -132,7 +132,6 @@ namespace Leap.Unity.HandsModule {
             ShowBindingOptions();
             ShowDebugOptions();
             ShowFineTuningOptions();
-            ShowDocumentationWidow();
             serializedObject.ApplyModifiedProperties();
         }
 
@@ -297,18 +296,6 @@ namespace Leap.Unity.HandsModule {
                 GUILayout.Label(dividerLine);
                 EditorGUILayout.Space();
             }
-        }
-
-        private void ShowDocumentationWidow() {
-            //Draw a button for the user to open the set up guide
-            GUILayout.BeginHorizontal();
-            GUILayout.Space(20);
-            if(GUILayout.Button("Setup Guide", subButtonStyle)) {
-                var window = (HandBinderDocumentationWindow)EditorWindow.GetWindow(typeof(HandBinderDocumentationWindow));
-                window.Show();
-            }
-            GUILayout.Space(20);
-            GUILayout.EndHorizontal();
         }
 
         /// <summary>
