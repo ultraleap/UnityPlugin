@@ -246,7 +246,7 @@ namespace Leap.Unity {
 
     private void Awake() {
       _provider = GetComponent<LeapServiceProvider>();
-      if (_provider == null) {
+      if(_provider == null) {
         _provider = GetComponentInChildren<LeapServiceProvider>();
       }
 
@@ -255,14 +255,13 @@ namespace Leap.Unity {
 
       ApplyGammaCorrectionValues();
 #if UNITY_2019_3_OR_NEWER
-            //SRP require subscribing to RenderPipelineManagers
-            if(UnityEngine.Rendering.GraphicsSettings.renderPipelineAsset != null) {
-                UnityEngine.Rendering.RenderPipelineManager.beginCameraRendering -= OnSRPPreRender;
-                UnityEngine.Rendering.RenderPipelineManager.beginCameraRendering += OnSRPPreRender;
-            }
+      //SRP require subscribing to RenderPipelineManagers
+      if(UnityEngine.Rendering.GraphicsSettings.renderPipelineAsset != null) {
+        UnityEngine.Rendering.RenderPipelineManager.beginCameraRendering -= onBeginRendering;
+        UnityEngine.Rendering.RenderPipelineManager.beginCameraRendering += onBeginRendering;
+      }
 #endif
-
-        }
+    }
 
     private void OnEnable() {
       subscribeToService();
@@ -275,19 +274,18 @@ namespace Leap.Unity {
     private void OnDestroy() {
       StopAllCoroutines();
       Controller controller = _provider.GetLeapController();
-      if (controller != null) {
+      if(controller != null) {
         _provider.GetLeapController().DistortionChange -= onDistortionChange;
       }
 #if UNITY_2019_3_OR_NEWER
-            //SRP require subscribing to RenderPipelineManagers
-            if(UnityEngine.Rendering.GraphicsSettings.renderPipelineAsset != null) {
-                UnityEngine.Rendering.RenderPipelineManager.beginCameraRendering -= OnSRPPreRender;
-            }
+      //SRP require subscribing to RenderPipelineManagers
+      if(UnityEngine.Rendering.GraphicsSettings.renderPipelineAsset != null) {
+        UnityEngine.Rendering.RenderPipelineManager.beginCameraRendering -= onBeginRendering;
+      }
 #endif
+    }
 
-        }
-
-        private void LateUpdate() {
+    private void LateUpdate() {
       Frame imageFrame = _provider.CurrentFrame;
 
       _currentImage = null;
@@ -326,12 +324,12 @@ namespace Leap.Unity {
     }
 
 #if UNITY_2019_3_OR_NEWER
-        private void OnSRPPreRender(UnityEngine.Rendering.ScriptableRenderContext scriptableRenderContext, Camera camera) {
-            OnPreRender();
-        }
+    private void onBeginRendering(UnityEngine.Rendering.ScriptableRenderContext scriptableRenderContext, Camera camera) {
+       OnPreRender();
+    }
 #endif
 
-        private void subscribeToService() {
+    private void subscribeToService() {
       if (_serviceCoroutine != null) {
         return;
       }
