@@ -81,7 +81,7 @@ namespace Leap.Unity.HandsModule {
             if(SetEditorPose == false) {
                 ResetHand();
             }
-            
+
             if(DebugLeapHand) {
                 editorPersistance = true;
             }
@@ -121,25 +121,17 @@ namespace Leap.Unity.HandsModule {
             }
         }
 
-        //private void OnEnable() {
-        //    if(Hands.Provider != null) {
-        //        Hands.Provider.OnUpdateFrame += StaticHand;
-        //    }
-        //}
-
-        //void StaticHand(Frame frame) {
-        //    SetLeapHand(Handedness == Chirality.Left ? Hands.Left : Hands.Right);
-        //    UpdateHand();
-        //}
-
         /// <summary>
         /// Update the BoundGameobjects so that the positions and rotations match that of the leap hand
         /// </summary>
         public override void UpdateHand() {
 
-            SetLeapHand(Handedness == Chirality.Left ? Hands.Left : Hands.Right);
-
             if(!SetEditorPose && Application.isEditor) {
+                return;
+            }
+
+            if(LeapHand == null) {
+                ResetHand();
                 return;
             }
 
