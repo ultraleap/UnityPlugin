@@ -8,8 +8,8 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: SkeletonArm
-  m_Shader: {fileID: 46, guid: 0000000000000000f000000000000000, type: 0}
-  m_ShaderKeywords: _METALLICGLOSSMAP _NORMALMAP
+  m_Shader: {fileID: 4800000, guid: c5b35a4c19d643f4f87637cdd8587b98, type: 3}
+  m_ShaderKeywords: _METALLICGLOSSMAP _NORMALMAP _USEFRESNEL_ON _USEOUTLINE_ON
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -78,12 +78,15 @@ Material:
     - _Distortion: -0.01
     - _DstBlend: 0
     - _EnvironmentReflections: 1
+    - _FresnelPower: 0.042
     - _GlossMapScale: 0.3
     - _Glossiness: 0
     - _GlossyReflections: 1
+    - _LightIntensity: 1
     - _Metallic: 0
     - _Mode: 0
     - _OcclusionStrength: 0.5
+    - _Outline: 0.0005
     - _Parallax: 0.02
     - _Power: 27.35
     - _QueueOffset: 0
@@ -98,10 +101,16 @@ Material:
     - _UVSec: 0
     - _WorkflowMode: 1
     - _ZWrite: 1
+    - _useFresnel: 1
+    - _useLighting: 0
+    - _useOutline: 1
     m_Colors:
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
+    - _FresnelColor: {r: 1, g: 1, b: 1, a: 1}
+    - _MainColor: {r: 1, g: 1, b: 1, a: 1}
     - _Outline: {r: 0, g: 0, b: 0, a: 1}
+    - _OutlineColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
     - _SubColor: {r: 1, g: 1, b: 1, a: 1}

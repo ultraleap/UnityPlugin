@@ -216,9 +216,12 @@ namespace Leap.Unity.HandsModule {
             };
 
             for(int i = 0; i < defaultHandPose.Length; i++) {
+
                 var baseTransform = defaultHandPose[i];
-                baseTransform.reference.transform.localPosition = baseTransform.transform.position;
-                baseTransform.reference.transform.localRotation = Quaternion.Euler(baseTransform.transform.rotation);
+                if(baseTransform != null) {
+                    baseTransform.reference.transform.localPosition = baseTransform.transform.position;
+                    baseTransform.reference.transform.localRotation = Quaternion.Euler(baseTransform.transform.rotation);
+                }
             }
             needsResetting = false;
         }

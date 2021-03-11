@@ -128,14 +128,14 @@ namespace Leap.Unity.HandsModule {
             serializedObject.Update();
             SetUp();
             GUIHandGraphic.DrawHandGraphic(myTarget.handedness, GUIHandGraphic.FlattenHandBinderTransforms(myTarget));
-            DrawAutoRigButton();
+            DrawAutoBindButton();
             ShowBindingOptions();
             ShowDebugOptions();
             ShowFineTuningOptions();
             serializedObject.ApplyModifiedProperties();
         }
 
-        private void DrawAutoRigButton() {
+        private void DrawAutoBindButton() {
             //Draw the Auto Rig Button
             if(Selection.gameObjects.Length == 1 && GUILayout.Button("Bind Hand", buttonStyle)) {
                 var window = (BindHandWindow)EditorWindow.GetWindow(typeof(BindHandWindow));
@@ -145,15 +145,6 @@ namespace Leap.Unity.HandsModule {
                 window.Show();
                 window.minSize = new Vector2(600, 900);
                 HandBinderAutoBinder.CheckForAssignedBones(ref myTarget);
-
-                //Try to auto rig 
-                if(!myTarget.boundToBones) {
-                    Undo.RegisterFullObjectHierarchyUndo(myTarget, "AutoBind");
-                    Undo.undoRedoPerformed += window.AutoRigUndo;
-                    HandBinderAutoBinder.AutoRig(myTarget);
-                    myTarget.UpdateHand();
-                }
-
             }
             EditorGUILayout.Space();
         }
