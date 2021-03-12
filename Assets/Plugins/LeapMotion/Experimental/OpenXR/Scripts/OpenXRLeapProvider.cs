@@ -47,12 +47,12 @@ public class OpenXRLeapProvider : LeapProvider
   private void Application_onBeforeRender()
   {
     // Dispatch the frame event just brefore rendering to reduce jitter
-    FillLeapFrame(FrameTime.BeforeRender, ref _beforeRenderFrame);
+    FillLeapFrame(Microsoft.MixedReality.OpenXR.FrameTime.OnBeforeRender, ref _beforeRenderFrame);
     DispatchUpdateFrameEvent(_beforeRenderFrame); 
   }
 
   void FixedUpdate() {
-    FillLeapFrame(FrameTime.OnUpdate, ref _fixedUpdateFrame);
+    FillLeapFrame(Microsoft.MixedReality.OpenXR.FrameTime.OnUpdate, ref _fixedUpdateFrame);
     DispatchFixedFrameEvent(_fixedUpdateFrame); 
   }
 
@@ -61,7 +61,7 @@ public class OpenXRLeapProvider : LeapProvider
   /// <Summary>
   /// Popuates the given Leap Frame with the most recent hand data
   /// </Summary>
-  public void FillLeapFrame(FrameTime frameTime, ref Frame leapFrame)
+  public void FillLeapFrame(Microsoft.MixedReality.OpenXR.FrameTime frameTime, ref Frame leapFrame)
   {   
       _hands.Clear();
       if (FillLeapHandFromExtension(leftHandTracker, true, frameTime, ref _leftVHand))
@@ -81,12 +81,12 @@ public class OpenXRLeapProvider : LeapProvider
   /// <Summary>
   /// Read the most recent hand data from the OpenXR extension and populate a given VectorHand with joint locations
   /// </Summary>
-  private bool FillLeapHandFromExtension(HandTracker handTracker, bool isLeft, FrameTime frameTime, ref VectorHand vHand)
+  private bool FillLeapHandFromExtension(HandTracker handTracker, bool isLeft, Microsoft.MixedReality.OpenXR.FrameTime frameTime, ref VectorHand vHand)
   {
       if (handTracker.TryLocateHandJoints(frameTime, handJointLocations))
       {
           vHand.isLeft = isLeft;
-          
+
           //Fill the vHand with joint data
           vHand.palmPos = handJointLocations[0].Position;
           vHand.palmRot = handJointLocations[0].Rotation;

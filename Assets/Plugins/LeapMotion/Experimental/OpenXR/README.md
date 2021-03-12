@@ -23,7 +23,7 @@ Adds `XR_EXT_hand_tracking` support to an existing OpenXR runtime.
 
 * [Microsoft Mixed Reality OpenXR Plugin] (https://docs.microsoft.com/en-us/windows/mixed-reality/develop/unity/openxr-getting-started)
 
-Note: Tested with V0.1.2 of the Package
+Note: Tested with V0.1.4 of the Package
 
 ### Setup
 
