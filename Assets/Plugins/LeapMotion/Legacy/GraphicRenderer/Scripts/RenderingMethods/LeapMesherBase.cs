@@ -135,7 +135,7 @@ namespace Leap.Unity.GraphicalRenderer {
 
     //#### Sprite/Texture Remapping ####
     [SerializeField]
-    private AtlasUvs _atlasUvs;
+    private AtlasUvs _atlasUvs = default(AtlasUvs);
     [NonSerialized]
     protected MaterialPropertyBlock _spriteTextureBlock;
 
@@ -223,7 +223,7 @@ namespace Leap.Unity.GraphicalRenderer {
 #if UNITY_EDITOR
       #if !UNITY_2020_1_OR_NEWER
       if (!Application.isPlaying) {
-        //Packer.RebuildAtlasCacheIfNeeded(EditorUserBuildSettings.activeBuildTarget);
+        Packer.RebuildAtlasCacheIfNeeded(EditorUserBuildSettings.activeBuildTarget);
       }
       #endif
 

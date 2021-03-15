@@ -89,6 +89,18 @@ namespace Leap.Unity {
     [SerializeField]
     protected float _physicsExtrapolationTime = 1.0f / 90.0f;
 
+    public enum TrackingOptimizationMode {
+      Desktop,
+      ScreenTop,
+      HMD
+    }
+    [Tooltip("[Service must be >= 4.9.2!] " +
+      "Which tracking mode to request that the service optimize for. " +
+      "(Use the LeapXRServiceProvider for HMD Mode instead of this option!)")]
+    [SerializeField]
+    [EditTimeOnly]
+    protected TrackingOptimizationMode _trackingOptimization = TrackingOptimizationMode.Desktop;
+
 #if UNITY_2017_3_OR_NEWER
     [Tooltip("When checked, profiling data from the LeapCSharp worker thread will be used to populate the UnityProfiler.")]
     [EditTimeOnly]
@@ -98,6 +110,11 @@ namespace Leap.Unity {
 #endif
     [SerializeField]
     protected bool _workerThreadProfiling = false;
+
+    [Tooltip("Which Leap Service API Endpoint to connect to.  This is configured on the service with the 'api_namespace' argument.")]
+    [SerializeField]
+    [EditTimeOnly]
+    protected string _serverNameSpace = "Leap Service";
 
     #endregion
 
@@ -176,7 +193,8 @@ namespace Leap.Unity {
       = new Dictionary<TestHandFactory.TestHandPose, Hand>();
     private Hand _editTimeLeftHand {
       get {
-        if (_cachedLeftHands.TryGetValue(editTimePose, out Hand cachedHand)) {
+        Hand cachedHand = null;
+        if (_cachedLeftHands.TryGetValue(editTimePose, out cachedHand)) {
           return cachedHand;
         }
         else {
@@ -191,7 +209,8 @@ namespace Leap.Unity {
       = new Dictionary<TestHandFactory.TestHandPose, Hand>();
     private Hand _editTimeRightHand {
       get {
-        if (_cachedRightHands.TryGetValue(editTimePose, out Hand cachedHand)) {
+        Hand cachedHand = null;
+        if (_cachedRightHands.TryGetValue(editTimePose, out cachedHand)) {
           return cachedHand;
         }
         else {
@@ -461,7 +480,19 @@ namespace Leap.Unity {
         return;
       }
 
-      _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_DEFAULT);
+      if (_trackingOptimization == TrackingOptimizationMode.Desktop) {
+        _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_DEFAULT);
+        _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP);
+        _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
+      } else if (_trackingOptimization == TrackingOptimizationMode.ScreenTop) {
+        _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_DEFAULT);
+        _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
+        _leapController.SetPolicy  (Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP);
+      } else if (_trackingOptimization == TrackingOptimizationMode.HMD) {
+        _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_DEFAULT);
+        _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP);
+        _leapController.SetPolicy  (Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
+      }
     }
 
     /// <summary>
@@ -473,7 +504,7 @@ namespace Leap.Unity {
         return;
       }
 
-      _leapController = new Controller();
+      _leapController = new Controller(0, _serverNameSpace);
       _leapController.Device += (s, e) => {
         if (_onDeviceSafe != null) {
           _onDeviceSafe(e.Device);
@@ -504,6 +535,7 @@ namespace Leap.Unity {
     protected void destroyController() {
       if (_leapController != null) {
         if (_leapController.IsConnected) {
+          _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP);
           _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
         }
         _leapController.StopConnection();
