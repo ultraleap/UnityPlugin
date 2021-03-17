@@ -67,10 +67,10 @@ namespace Leap.Unity.HandsModule {
             boundHand = serializedObject.FindProperty("boundHand");
             offsets = serializedObject.FindProperty("offsets");
 
-            buttonTexture = Resources.Load<Texture>("Editor_Documentation_Green_Upstate");
-            downstate = Resources.Load<Texture>("Editor_Documentation_Green_Downstate");
-            dividerLine = Resources.Load<Texture>("Editor_Divider_line");
-            subButton = Resources.Load<Texture>("secondary_button");
+            buttonTexture = Resources.Load<Texture>("EditorDocumentationGreenUpstate");
+            downstate = Resources.Load<Texture>("EditorDocumentationGreenDownstate");
+            dividerLine = Resources.Load<Texture>("EditorDividerLine");
+            subButton = Resources.Load<Texture>("SecondaryButton");
         }
 
         private void OnEnable() {
@@ -136,7 +136,7 @@ namespace Leap.Unity.HandsModule {
         }
 
         private void DrawAutoBindButton() {
-            //Draw the Auto Rig Button
+            //Draw the Auto Bind Button
             if(Selection.gameObjects.Length == 1 && GUILayout.Button("Bind Hand", buttonStyle)) {
                 var window = (BindHandWindow)EditorWindow.GetWindow(typeof(BindHandWindow));
                 window.SetUp(ref myTarget);
@@ -144,7 +144,6 @@ namespace Leap.Unity.HandsModule {
                 window.autoRepaintOnSceneChange = true;
                 window.Show();
                 window.minSize = new Vector2(600, 900);
-                HandBinderAutoBinder.CheckForAssignedBones(ref myTarget);
             }
             EditorGUILayout.Space();
         }
@@ -435,11 +434,11 @@ namespace Leap.Unity.HandsModule {
             string previousUndoName;
 
             string message1 = "Reference the GameObjects you wish to use from the scene into the fields below, once assigned the dots above will appear green to show they are bound to tracking data.";
-            string message2 = "Once you have assigned the bones you wish to use, the button below will attempt to calculate the rotational offsets needed to line the 3D Model hand with the leap Data.";
+            string message2 = "Once you have assigned the bones you wish to use, the button below will attempt to calculate the rotational offsets needed to line the 3D Model hand with the tracking data.";
             public void SetUp(ref HandBinder handBinderRef) {
                 handBinder = handBinderRef;
-                mainButtonTexture = Resources.Load<Texture>("Editor_Documentation_Green_Upstate");
-                dividerLine = Resources.Load<Texture>("Editor_Divider_line");
+                mainButtonTexture = Resources.Load<Texture>("EditorDocumentationGreenUpstate");
+                dividerLine = Resources.Load<Texture>("EditorDividerline");
 
                 editorSkin = new GUISkin() {
                     label = new GUIStyle() {
@@ -491,7 +490,7 @@ namespace Leap.Unity.HandsModule {
 
                         Undo.RegisterFullObjectHierarchyUndo(handBinder, "AutoBind");
                         Undo.undoRedoPerformed += AutoRigUndo;
-                        HandBinderAutoBinder.AutoRig(handBinder);
+                        HandBinderAutoBinder.AutoBind(handBinder);
                         handBinder.UpdateHand();
                     }
                 }
@@ -655,7 +654,7 @@ namespace Leap.Unity.HandsModule {
 
             }
             static public void SetUp() {
-                handTexture = Resources.Load<Texture>("Editor_hand");
+                handTexture = Resources.Load<Texture>("EditorHand");
                 dotTexture = EditorGUIUtility.IconContent("sv_icon_dot0_pix16_gizmo").image;
             }
 

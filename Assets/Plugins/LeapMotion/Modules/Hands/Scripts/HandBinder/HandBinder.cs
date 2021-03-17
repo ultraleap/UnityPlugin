@@ -1,5 +1,4 @@
-﻿using System.Runtime.InteropServices.ComTypes;
-/******************************************************************************
+﻿/******************************************************************************
  * Copyright (C) Ultraleap, Inc. 2011-2020.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
@@ -22,36 +21,30 @@ namespace Leap.Unity.HandsModule {
         [Tooltip("The length of the elbow to maintain the correct offset from the wrist")]
         public float elbowLength;
 
+        [Tooltip("The Rotation offset that will be assigned to all the Fingers")]
+        public Vector3 GlobalFingerRotationOffset;
+        [Tooltip("The Rotation offset that will be assigned to the wrist")]
+        public Vector3 wristRotationOffset;
+
         [Tooltip("Set the assigned transforms to the leap hand during editor")]
         public bool SetEditorPose;
         [Tooltip("Set the assigned transforms to the same position as the Leap Hand")]
         public bool SetPositions;
         [Tooltip("Use metacarpal bones")]
         public bool UseMetaBones;
-        [Tooltip("The Rotation offset that will be assigned to all the Fingers")]
-        public Vector3 GlobalFingerRotationOffset;
-        public Vector3 wristRotationOffset;
+        [Tooltip("Show the Leap Hand in the scene")]
+        public bool DebugLeapHand = true;
+        [Tooltip("Show the Leaps rotation axis in the scene")]
+        public bool DebugLeapRotationAxis = false;
+        [Tooltip("Show the assigned gameobjects as gizmos in the scene")]
+        public bool DebugModelTransforms = true;
+        [Tooltip("Show the assigned gameobjects rotation axis in the scene")]
+        public bool DebugModelRotationAxis;
 
         //Used by Editor Script
         public bool fineTuning;
-        public bool needsResetting = false;
         public bool debugOptions;
-        public bool riggingOptions;
-        public bool armRigging;
-        public bool boundToBones = false;
-
-
-        [Tooltip("Show the Leap Hand in the scene")]
-        public bool DebugLeapHand = true;
-
-        [Tooltip("Show the Leaps rotation axis in the scene")]
-        public bool DebugLeapRotationAxis = false;
-
-        [Tooltip("Show the assigned gameobjects as gizmos in the scene")]
-        public bool DebugModelTransforms = true;
-
-        [Tooltip("Show the assigned gameobjects rotation axis in the scene")]
-        public bool DebugModelRotationAxis;
+        public bool needsResetting = false;
 
         //The data structure that contains transforms that get bound to the leap data
         public BoundHand boundHand = new BoundHand();
@@ -218,7 +211,7 @@ namespace Leap.Unity.HandsModule {
             for(int i = 0; i < defaultHandPose.Length; i++) {
 
                 var baseTransform = defaultHandPose[i];
-                if(baseTransform != null) {
+                if(baseTransform != null && baseTransform.reference != null) {
                     baseTransform.reference.transform.localPosition = baseTransform.transform.position;
                     baseTransform.reference.transform.localRotation = Quaternion.Euler(baseTransform.transform.rotation);
                 }

@@ -18,7 +18,7 @@ namespace Leap.Unity.HandsModule {
         /// This function is used to search the HandBinder scipts children transforms to auto assign them for the user
         /// </summary>
         /// <param name="handBinder">The binder that the found transforms will get assigned too</param>
-        public static void AutoRig(HandBinder handBinder) {
+        public static void AutoBind(HandBinder handBinder) {
 
             handBinder.ResetHand();
             BoneDefinitions boneDefinitions = new BoneDefinitions();
@@ -50,39 +50,11 @@ namespace Leap.Unity.HandsModule {
 
             EstimateWristRotationOffset(handBinder);
             CalculateElbowLength(handBinder);
-            CheckForAssignedBones(ref handBinder);
 
             handBinder.GetLeapHand();
             handBinder.UpdateHand();
             handBinder.DebugModelTransforms = true;
             handBinder.SetEditorPose = true;
-        }
-
-        public static void CheckForAssignedBones(ref HandBinder handBinder) {
-            var boundToBones = false;
-            if(handBinder.boundHand.fingers[0].boundBones.Any(x => x.boundTransform != null)) {
-                boundToBones = true;
-            }
-            else if(handBinder.boundHand.fingers[1].boundBones.Any(x => x.boundTransform != null)) {
-                boundToBones = true;
-            }
-            else if(handBinder.boundHand.fingers[2].boundBones.Any(x => x.boundTransform != null)) {
-                boundToBones = true;
-            }
-            else if(handBinder.boundHand.fingers[3].boundBones.Any(x => x.boundTransform != null)) {
-                boundToBones = true;
-            }
-            else if(handBinder.boundHand.fingers[4].boundBones.Any(x => x.boundTransform != null)) {
-                boundToBones = true;
-            }
-            else if(handBinder.boundHand.elbow.boundTransform != null) {
-                boundToBones = true;
-            }
-            else if(handBinder.boundHand.wrist.boundTransform != null) {
-                boundToBones = true;
-            }
-
-            handBinder.boundToBones = boundToBones;
         }
 
         /// <summary>
@@ -102,7 +74,7 @@ namespace Leap.Unity.HandsModule {
         }
 
         /// <summary>
-        /// The Autorigger uses this to select the children that match the finger definitions
+        /// The Autobinder uses this to select the children that match the finger definitions
         /// </summary>
         /// <param name="children">The found Children</param>
         /// <param name="definitions">The definition to sort through the children</param>
@@ -223,9 +195,6 @@ namespace Leap.Unity.HandsModule {
 
             if(middleBone != null && indexBone != null && pinkyBone != null && wrist != null) {
 
-                //Create temporary transform
-                var modelBasis = new GameObject();
-
                 //Calculate Models rotation
                 var forward = (middleBone.position - wrist.position);
                 var right = (indexBone.position - pinkyBone.position);
@@ -236,17 +205,10 @@ namespace Leap.Unity.HandsModule {
                 Vector3.OrthoNormalize(ref up, ref forward, ref right);
                 var modelRotation = Quaternion.LookRotation(forward, up);
 
-                //Apply rotation to temporary transform
-                modelBasis.transform.rotation = modelRotation;
-                modelBasis.transform.position = wrist.position;
-
                 //Calculate the difference between the Calculated hand basis and the wrists rotation
                 handBinder.wristRotationOffset = (Quaternion.Inverse(modelRotation) * wrist.transform.rotation).eulerAngles;
                 //Assuming the fingers have been created using the same rotation axis as the wrist
                 handBinder.GlobalFingerRotationOffset = handBinder.wristRotationOffset;
-
-                //Clean up the temporary object 
-                GameObject.DestroyImmediate(modelBasis);
             }
         }
 

@@ -1595,6 +1595,11 @@ PrefabInstance:
       propertyPath: needsResetting
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 5978719801942663016, guid: 1d338fed0ed7df84a86c220153fbcc35,
+        type: 3}
+      propertyPath: debugOptions
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1d338fed0ed7df84a86c220153fbcc35, type: 3}
 --- !u!1001 &8430408771703383279
