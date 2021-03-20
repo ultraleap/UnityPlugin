@@ -1,6 +1,6 @@
 Using pre-set license
 Built from '2020.3/staging' branch; Version is '2020.3.0f1 (c7b5465681fb) revision 13088070'; Using compiler version '192528614'; Build Type 'Release'
-OS: 'Windows 10 Pro; OS build 19041.804; Version 2004; 64bit' Language: 'en' Physical Memory: 32651 MB
+OS: 'Windows 10 Pro; OS build 19041.867; Version 2004; 64bit' Language: 'en' Physical Memory: 32651 MB
 BatchMode: 1, IsHumanControllingUs: 0, StartBugReporterOnCrash: 0, Is64bit: 1, IsPro: 0
 
  COMMAND LINE ARGUMENTS:
@@ -15,12 +15,12 @@ D:/Work/Ultraleap/UnityProjects/UnityModulesFork
 -logFile
 Logs/AssetImportWorker0.log
 -srvPort
-51971
+50111
 Successfully changed project path to: D:/Work/Ultraleap/UnityProjects/UnityModulesFork
 D:/Work/Ultraleap/UnityProjects/UnityModulesFork
 Using Asset Import Pipeline V2.
-Refreshing native plugins compatible for Editor in 62.26 ms, found 4 plugins.
-Preloading 1 native plugins for Editor in 0.94 ms.
+Refreshing native plugins compatible for Editor in 459.38 ms, found 4 plugins.
+Preloading 1 native plugins for Editor in 0.93 ms.
 Initialize engine version: 2020.3.0f1 (c7b5465681fb)
 [Subsystems] Discovering subsystems at path C:/Program Files/Unity/Hub/Editor/2020.3.0f1/Editor/Data/Resources/UnitySubsystems
 [Subsystems] Discovering subsystems at path D:/Work/Ultraleap/UnityProjects/UnityModulesFork/Assets
@@ -30,31 +30,31 @@ Direct3D:
     Renderer: NVIDIA GeForce GTX 1660 (ID=0x2184)
     Vendor:   
     VRAM:     5991 MB
-    Driver:   27.21.14.6172
+    Driver:   27.21.14.6192
 Initialize mono
 Mono path[0] = 'C:/Program Files/Unity/Hub/Editor/2020.3.0f1/Editor/Data/Managed'
 Mono path[1] = 'C:/Program Files/Unity/Hub/Editor/2020.3.0f1/Editor/Data/MonoBleedingEdge/lib/mono/unityjit'
 Mono config path = 'C:/Program Files/Unity/Hub/Editor/2020.3.0f1/Editor/Data/MonoBleedingEdge/etc'
-Using monoOptions --debugger-agent=transport=dt_socket,embedding=1,server=y,suspend=n,address=127.0.0.1:56684
+Using monoOptions --debugger-agent=transport=dt_socket,embedding=1,server=y,suspend=n,address=127.0.0.1:56016
 Begin MonoManager ReloadAssembly
 Registering precompiled unity dll's ...
 Register platform support module: C:/Program Files/Unity/Hub/Editor/2020.3.0f1/Editor/Data/PlaybackEngines/WindowsStandaloneSupport/UnityEditor.WindowsStandalone.Extensions.dll
-Registered in 0.002941 seconds.
+Registered in 0.001500 seconds.
 Native extension for WindowsStandalone target not found
-Refreshing native plugins compatible for Editor in 55.15 ms, found 4 plugins.
-Preloading 1 native plugins for Editor in 0.08 ms.
+Refreshing native plugins compatible for Editor in 56.79 ms, found 4 plugins.
+Preloading 1 native plugins for Editor in 0.11 ms.
 Invoked RoslynAnalysisRunner static constructor.
 RoslynAnalysisRunner will not be running.
 RoslynAnalysisRunner has terminated.
 Mono: successfully reloaded assembly
-- Completed reload, in  1.226 seconds
+- Completed reload, in  1.239 seconds
 Platform modules already initialized, skipping
 Registering precompiled user dll's ...
-Registered in 0.002199 seconds.
+Registered in 0.001722 seconds.
 Begin MonoManager ReloadAssembly
 Native extension for WindowsStandalone target not found
-Refreshing native plugins compatible for Editor in 0.54 ms, found 4 plugins.
-Preloading 1 native plugins for Editor in 0.08 ms.
+Refreshing native plugins compatible for Editor in 0.51 ms, found 4 plugins.
+Preloading 1 native plugins for Editor in 0.06 ms.
 Invoked RoslynAnalysisRunner static constructor.
 RoslynAnalysisRunner will not be running.
 RoslynAnalysisRunner has terminated.
@@ -69,42 +69,684 @@ NullReferenceException: Object reference not set to an instance of an object
 (Filename: Library/PackageCache/com.unity.xr.oculus@1.8.1/Runtime/OculusLoader.cs Line: 243)
 
 Mono: successfully reloaded assembly
-- Completed reload, in  1.462 seconds
+- Completed reload, in  1.522 seconds
 Platform modules already initialized, skipping
 ========================================================================
 Worker process is ready to serve import requests
-Launched and connected shader compiler UnityShaderCompiler.exe after 0.04 seconds
-Refreshing native plugins compatible for Editor in 1.00 ms, found 4 plugins.
-Preloading 1 native plugins for Editor in 0.08 ms.
-Unloading 1993 Unused Serialized files (Serialized files now loaded: 0)
-System memory in use before: 95.6 MB.
-System memory in use after: 95.7 MB.
+Launched and connected shader compiler UnityShaderCompiler.exe after 0.07 seconds
+Refreshing native plugins compatible for Editor in 0.52 ms, found 4 plugins.
+Preloading 1 native plugins for Editor in 0.06 ms.
+Unloading 1994 Unused Serialized files (Serialized files now loaded: 0)
+System memory in use before: 95.7 MB.
+System memory in use after: 95.8 MB.
 
-Unloading 12 unused Assets to reduce memory usage. Loaded Objects now: 2436.
-Total: 5.045000 ms (FindLiveObjects: 0.890800 ms CreateObjectMapping: 0.249700 ms MarkObjects: 3.815700 ms  DeleteObjects: 0.086200 ms)
-
-========================================================================
-Received Import Request.
-  path: Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/Common Example Assets/PhysicMaterials/Bounceless.physicMaterial
-  artifactKey: Guid(7589b04e96bd3c04bb25a021d4b91fc2) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/Common Example Assets/PhysicMaterials/Bounceless.physicMaterial using Guid(7589b04e96bd3c04bb25a021d4b91fc2) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '17fb15584d4ac5a50d841046c3e0f523') in 0.046489 seconds
-  Import took 0.051038 seconds .
+Unloading 12 unused Assets to reduce memory usage. Loaded Objects now: 2437.
+Total: 3.519300 ms (FindLiveObjects: 0.821900 ms CreateObjectMapping: 0.224600 ms MarkObjects: 2.385600 ms  DeleteObjects: 0.085800 ms)
 
 ========================================================================
 Received Import Request.
-  Time since last request: 12.524493 seconds.
-  path: Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/Common Example Assets/PhysicMaterials/Bounceless.physicMaterial
-  artifactKey: Guid(7589b04e96bd3c04bb25a021d4b91fc2) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/Common Example Assets/PhysicMaterials/Bounceless.physicMaterial using Guid(7589b04e96bd3c04bb25a021d4b91fc2) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'ee610b6a017a57932314af1962633220') in 0.005951 seconds
-  Import took 0.031630 seconds .
+  path: Assets/Plugins/LeapMotion/Core/Materials/Passthrough/ThresholdOverlay.mat
+  artifactKey: Guid(d13beceec606bdd4c84a60e313ea18ed) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Plugins/LeapMotion/Core/Materials/Passthrough/ThresholdOverlay.mat using Guid(d13beceec606bdd4c84a60e313ea18ed) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '1be3627fa66d2418d34953a79f0ba8a1') in 0.153521 seconds
+  Import took 0.160091 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000153 seconds.
+  path: Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/Common Example Assets/Materials/IE Example Prism Blue.mat
+  artifactKey: Guid(c72f96eddcce18e40b75a40fd5b472f8) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/Common Example Assets/Materials/IE Example Prism Blue.mat using Guid(c72f96eddcce18e40b75a40fd5b472f8) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'fad4460496411fa7b73ad65c73dff842') in 0.083122 seconds
+  Import took 0.090075 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000066 seconds.
+  path: Assets/Plugins/LeapMotion/Internal/RealtimeGraph/Material/RealtimeGraphMaterial.mat
+  artifactKey: Guid(3e57083e98a417b48bf9834eba6d7ba3) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Plugins/LeapMotion/Internal/RealtimeGraph/Material/RealtimeGraphMaterial.mat using Guid(3e57083e98a417b48bf9834eba6d7ba3) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '04993cd95d5340f3eb5cb4a95f10ed98') in 0.103833 seconds
+  Import took 0.112188 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000681 seconds.
+  path: Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/3. Interaction Callbacks/Materials/Red Standard.mat
+  artifactKey: Guid(51ee002e89aeabf45adc1f83587093ab) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/3. Interaction Callbacks/Materials/Red Standard.mat using Guid(51ee002e89aeabf45adc1f83587093ab) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '8e65277b3537f8e4580268e27198cc51') in 0.055568 seconds
+  Import took 0.068073 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000061 seconds.
+  path: Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/Common Example Assets/Materials/IE Example Black Matte.mat
+  artifactKey: Guid(95c889baf756fd84ba2f1ab36adf3687) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/Common Example Assets/Materials/IE Example Black Matte.mat using Guid(95c889baf756fd84ba2f1ab36adf3687) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '7c897d576b4220e2075e41f9f6f056af') in 0.044045 seconds
+  Import took 0.056006 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000458 seconds.
+  path: Assets/Plugins/LeapMotion/Core/Examples/Example Assets/Attachment Hands Example Red.mat
+  artifactKey: Guid(113742fcb5ec3254e96c40315b70f248) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Plugins/LeapMotion/Core/Examples/Example Assets/Attachment Hands Example Red.mat using Guid(113742fcb5ec3254e96c40315b70f248) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'd444e711a21ff381be70ae3564b5a5a3') in 0.052511 seconds
+  Import took 0.062041 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.001242 seconds.
+  path: Assets/Plugins/LeapMotion/Legacy/DetectionExamples/Materials/BlueShiny.mat
+  artifactKey: Guid(65c16a52c657e63478e181ef0a136e20) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Plugins/LeapMotion/Legacy/DetectionExamples/Materials/BlueShiny.mat using Guid(65c16a52c657e63478e181ef0a136e20) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'a46551eceda5beb21f54ebd7e7ef915f') in 0.046569 seconds
+  Import took 0.056368 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000276 seconds.
+  path: Assets/Plugins/LeapMotion/Legacy/DetectionExamples/Materials/GreenShiny.mat
+  artifactKey: Guid(75ac83db1cec6459382f15d263a76c5f) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Plugins/LeapMotion/Legacy/DetectionExamples/Materials/GreenShiny.mat using Guid(75ac83db1cec6459382f15d263a76c5f) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '2cf8956206032c3191328f3d4711f75b') in 0.035798 seconds
+  Import took 0.040279 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000046 seconds.
+  path: Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/Common Example Assets/Materials/IE Example Anchor Magenta.mat
+  artifactKey: Guid(b9d3f1e940eda314f8637d959a3a516c) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/Common Example Assets/Materials/IE Example Anchor Magenta.mat using Guid(b9d3f1e940eda314f8637d959a3a516c) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'ee9ee1eb7e00b9ae71401bef1479626b') in 0.024010 seconds
+  Import took 0.029688 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000275 seconds.
+  path: Assets/Plugins/LeapMotion/Core/Models/Materials/RightHand.mat
+  artifactKey: Guid(6abeee8e66f6d66499ebfabe3071781b) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Plugins/LeapMotion/Core/Models/Materials/RightHand.mat using Guid(6abeee8e66f6d66499ebfabe3071781b) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'a266f2b24ecb6fa574c395d78390f90e') in 0.065495 seconds
+  Import took 0.070722 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000204 seconds.
+  path: Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/3. Interaction Callbacks/Materials/Red Dark Standard.mat
+  artifactKey: Guid(da67de850ecf2ee4ca13ab3720fed439) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/3. Interaction Callbacks/Materials/Red Dark Standard.mat using Guid(da67de850ecf2ee4ca13ab3720fed439) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'b74564dc7e438a35d18f5a934f14aebf') in 0.113516 seconds
+  Import took 0.121862 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000096 seconds.
+  path: Assets/Plugins/LeapMotion/Core/Models/Materials/LeftHand.mat
+  artifactKey: Guid(83278e7188ea55a498165e1b85cde644) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Plugins/LeapMotion/Core/Models/Materials/LeftHand.mat using Guid(83278e7188ea55a498165e1b85cde644) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '11e3c81d888a3b3ef8d1b0d2de9de8b0') in 0.051090 seconds
+  Import took 0.061133 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000264 seconds.
+  path: Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/Common Example Assets/Materials/IE Example Dark Matte.mat
+  artifactKey: Guid(cb707237b19198f4bbc0381c5c11da15) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/Common Example Assets/Materials/IE Example Dark Matte.mat using Guid(cb707237b19198f4bbc0381c5c11da15) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'daa18a507a77c754d0a961d581f1e23b') in 0.028520 seconds
+  Import took 0.033138 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000185 seconds.
+  path: Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/Common Example Assets/Materials/IE Example Prism Reflection Transparent.mat
+  artifactKey: Guid(c12aa740729ba6647b92aafc5837f7f1) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/Common Example Assets/Materials/IE Example Prism Reflection Transparent.mat using Guid(c12aa740729ba6647b92aafc5837f7f1) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '3f49c415107320cc6b8740fcb802a55b') in 0.033112 seconds
+  Import took 0.039387 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000353 seconds.
+  path: Assets/Plugins/LeapMotion/Modules/InteractionEngine/Scripts/Utility/Softbody/Softbody/Icospheres/suzanne_singleMesh.obj
+  artifactKey: Guid(3c52798c8ce10824799891515744e0df) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Plugins/LeapMotion/Modules/InteractionEngine/Scripts/Utility/Softbody/Softbody/Icospheres/suzanne_singleMesh.obj using Guid(3c52798c8ce10824799891515744e0df) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '9bcac700aa127fd22c3abc9003f8a756') in 0.122022 seconds
+  Import took 0.127451 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000548 seconds.
+  path: Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/Common Example Assets/Materials/IE Example Anchor Red.mat
+  artifactKey: Guid(7b8e8fb53123e87458def40ee25598ae) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/Common Example Assets/Materials/IE Example Anchor Red.mat using Guid(7b8e8fb53123e87458def40ee25598ae) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '3f3e2f8f2798ab0266d9dbe921c38865') in 0.025945 seconds
+  Import took 0.032708 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000296 seconds.
+  path: Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/7. Moving Reference Frames/Materials/IE Example 7 Ship Light.mat
+  artifactKey: Guid(86a6445786a72a541aadfe4b33ace47a) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/7. Moving Reference Frames/Materials/IE Example 7 Ship Light.mat using Guid(86a6445786a72a541aadfe4b33ace47a) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '4a062d9c3d443d57f4b46249ea59e5fa') in 0.027766 seconds
+  Import took 0.033763 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000316 seconds.
+  path: Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/6. Dynamic UI/Materials/IE Example Button Top Magenta.mat
+  artifactKey: Guid(c3668e6cfed1245449b1c77a171b328a) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/6. Dynamic UI/Materials/IE Example Button Top Magenta.mat using Guid(c3668e6cfed1245449b1c77a171b328a) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '177d33c004d681d1eed902c9517a8d43') in 0.029643 seconds
+  Import took 0.038659 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000201 seconds.
+  path: Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/3. Interaction Callbacks/Materials/Blue Dark Standard.mat
+  artifactKey: Guid(ba8a2058b03e6714ca9d242b51bb0580) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/3. Interaction Callbacks/Materials/Blue Dark Standard.mat using Guid(ba8a2058b03e6714ca9d242b51bb0580) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'fb5267b16dc530713f4c8ae4ded6f61d') in 0.036700 seconds
+  Import took 0.043302 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000272 seconds.
+  path: Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/Common Example Assets/Materials/IE Example Metallic.mat
+  artifactKey: Guid(bdfd2de707005aa4288a25d4ee9c3b63) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/Common Example Assets/Materials/IE Example Metallic.mat using Guid(bdfd2de707005aa4288a25d4ee9c3b63) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'db1380cf0d21206a69dd1f798dcbf0b5') in 0.041468 seconds
+  Import took 0.048127 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000058 seconds.
+  path: Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/3. Interaction Callbacks/Models/Materials/No Name.mat
+  artifactKey: Guid(0e06bc9005c025b4aa939d31f6e78e20) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/3. Interaction Callbacks/Models/Materials/No Name.mat using Guid(0e06bc9005c025b4aa939d31f6e78e20) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'e3e2c4f165fe54e687a308763945236d') in 0.035699 seconds
+  Import took 0.044987 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000216 seconds.
+  path: Assets/Plugins/LeapMotion/Experimental/HierarchyRecording/Examples/Events/Events Example Cube Material.mat
+  artifactKey: Guid(c83ad3ea0202a8c4390ec6e0fb6083a9) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Plugins/LeapMotion/Experimental/HierarchyRecording/Examples/Events/Events Example Cube Material.mat using Guid(c83ad3ea0202a8c4390ec6e0fb6083a9) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '9da624c87d7ec67e7c30c068ea083a9e') in 0.025375 seconds
+  Import took 0.036853 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000918 seconds.
+  path: Assets/Plugins/LeapMotion/Core/Materials/Passthrough/Background.mat
+  artifactKey: Guid(5542e7d1f79ac814389a3f5fe0c55630) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Plugins/LeapMotion/Core/Materials/Passthrough/Background.mat using Guid(5542e7d1f79ac814389a3f5fe0c55630) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '0c51bb3870244693f2183ccf5a00eda6') in 0.030110 seconds
+  Import took 0.035019 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000203 seconds.
+  path: Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/Common Example Assets/Materials/IE Example Gray Matte.mat
+  artifactKey: Guid(8eca0b31e096dbb4e9ec168e385043a9) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/Common Example Assets/Materials/IE Example Gray Matte.mat using Guid(8eca0b31e096dbb4e9ec168e385043a9) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'aba3af77a39a2de2ca7d85c9df0af61c') in 0.024792 seconds
+  Import took 0.029607 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000229 seconds.
+  path: Assets/Plugins/LeapMotion/Core/Examples/Example Assets/Attachment Hands Example Blue.mat
+  artifactKey: Guid(67b66d4eb50ed684d94eb00bc04709d2) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Plugins/LeapMotion/Core/Examples/Example Assets/Attachment Hands Example Blue.mat using Guid(67b66d4eb50ed684d94eb00bc04709d2) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '464209aae5518dad3638e6f161d298e2') in 0.023976 seconds
+  Import took 0.027955 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000229 seconds.
+  path: Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/Common Example Assets/Materials/IE Example Unlit Text BG Dark.mat
+  artifactKey: Guid(5bfb48adea98f2b4eb8c987cde2c6173) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/Common Example Assets/Materials/IE Example Unlit Text BG Dark.mat using Guid(5bfb48adea98f2b4eb8c987cde2c6173) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '11c53695ee2961b91370f0b5715ed3a4') in 0.041944 seconds
+  Import took 0.046225 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000060 seconds.
+  path: Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/6. Dynamic UI/Materials/IE Example Button Blue.mat
+  artifactKey: Guid(2b0b0f5d22d773a439b6e3f7f0f0db48) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/6. Dynamic UI/Materials/IE Example Button Blue.mat using Guid(2b0b0f5d22d773a439b6e3f7f0f0db48) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'e79f8c02d252810e22d461065884b71f') in 0.024930 seconds
+  Import took 0.030170 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000197 seconds.
+  path: Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/Common Example Assets/Materials/IE Example Light Matte.mat
+  artifactKey: Guid(e3e996b13676a484ebc0a80bbb24be05) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/Common Example Assets/Materials/IE Example Light Matte.mat using Guid(e3e996b13676a484ebc0a80bbb24be05) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'af79247778a0eb85028650b1d0f24060') in 0.031324 seconds
+  Import took 0.035758 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000234 seconds.
+  path: Assets/Plugins/LeapMotion/Internal/VRVisualizer/ScenesResources/CapsuleHandMat.mat
+  artifactKey: Guid(2177dcab57f0bf94f8974dbcf7edc036) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Plugins/LeapMotion/Internal/VRVisualizer/ScenesResources/CapsuleHandMat.mat using Guid(2177dcab57f0bf94f8974dbcf7edc036) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'bda7183e6599fe86424aac6438fa941c') in 0.033842 seconds
+  Import took 0.039551 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000185 seconds.
+  path: Assets/Plugins/LeapMotion/Modules/InteractionEngine/Testing/EditorResources/Static Geometry.mat
+  artifactKey: Guid(7d691cfd14be7b5499c4abcbc9120bb2) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Plugins/LeapMotion/Modules/InteractionEngine/Testing/EditorResources/Static Geometry.mat using Guid(7d691cfd14be7b5499c4abcbc9120bb2) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '582f1fa28999c94eb3ecc6e119ece015') in 0.031330 seconds
+  Import took 0.034854 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000180 seconds.
+  path: Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/6. Dynamic UI/Materials/IE Example Button Magenta.mat
+  artifactKey: Guid(69b1643ce1326a54eb20c5022c2482ad) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/6. Dynamic UI/Materials/IE Example Button Magenta.mat using Guid(69b1643ce1326a54eb20c5022c2482ad) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'cc2d58ca1bd37ab7731a9df117e8955f') in 0.030203 seconds
+  Import took 0.034134 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000192 seconds.
+  path: Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/6. Dynamic UI/Materials/IE Example Panel Blue.mat
+  artifactKey: Guid(f5a3b806279e74b44b5bf9c4080225be) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/6. Dynamic UI/Materials/IE Example Panel Blue.mat using Guid(f5a3b806279e74b44b5bf9c4080225be) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'fe09f85ea918e13fc220bd050fa7fa04') in 0.029632 seconds
+  Import took 0.035697 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000226 seconds.
+  path: Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/6. Dynamic UI/Materials/IE Example Button Top Red.mat
+  artifactKey: Guid(dc45d6090197f2d439bcbcc7422683b5) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/6. Dynamic UI/Materials/IE Example Button Top Red.mat using Guid(dc45d6090197f2d439bcbcc7422683b5) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'a1cb0d91ecc2c69afd295257892f2c49') in 0.024003 seconds
+  Import took 0.028448 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000177 seconds.
+  path: Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/6. Dynamic UI/Materials/IE Example Panel Magenta.mat
+  artifactKey: Guid(2c27ee87798951a46863d8e0330c6969) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/6. Dynamic UI/Materials/IE Example Panel Magenta.mat using Guid(2c27ee87798951a46863d8e0330c6969) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'e5d5cee8b30bb61feb17e9f601e5ced9') in 0.036515 seconds
+  Import took 0.041308 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000178 seconds.
+  path: Assets/Plugins/LeapMotion/Modules/Hands/Hand Assets/Generic Hand/Ghost Hand.mat
+  artifactKey: Guid(4c1d8de22955e4a4c8dda3f54365517d) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Plugins/LeapMotion/Modules/Hands/Hand Assets/Generic Hand/Ghost Hand.mat using Guid(4c1d8de22955e4a4c8dda3f54365517d) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '1c5a684adc26c20951cf11743d13ebb3') in 0.067080 seconds
+  Import took 0.071253 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000172 seconds.
+  path: Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/Common Example Assets/Materials/IE Example Prism Red Inner.mat
+  artifactKey: Guid(fe8d338c2c6190046ab9cde3a05d52d8) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/Common Example Assets/Materials/IE Example Prism Red Inner.mat using Guid(fe8d338c2c6190046ab9cde3a05d52d8) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'fab53c97ddfaa2961d5fb01ce9e47f62') in 0.041037 seconds
+  Import took 0.045267 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000189 seconds.
+  path: Assets/Plugins/LeapMotion/Modules/Hands/Hand Assets/Skeleton/SkeletonArm.mat
+  artifactKey: Guid(fc295eba5abda994e8e9dd730218fa31) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Plugins/LeapMotion/Modules/Hands/Hand Assets/Skeleton/SkeletonArm.mat using Guid(fc295eba5abda994e8e9dd730218fa31) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'b647f04e2d59eff8f3c5cd3aee1b35ac') in 0.128834 seconds
+  Import took 0.133116 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000228 seconds.
+  path: Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/3. Interaction Callbacks/Materials/Blue Standard.mat
+  artifactKey: Guid(64c9f49445bfa804299126cc11bfd4e7) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/3. Interaction Callbacks/Materials/Blue Standard.mat using Guid(64c9f49445bfa804299126cc11bfd4e7) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'cf771b94dd42a99a5f2b973fbe9ae802') in 0.054864 seconds
+  Import took 0.059692 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000188 seconds.
+  path: Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/6. Dynamic UI/Materials/IE Example Panel Red.mat
+  artifactKey: Guid(6d23fd159c2675a449dee1b04c5f8286) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/6. Dynamic UI/Materials/IE Example Panel Red.mat using Guid(6d23fd159c2675a449dee1b04c5f8286) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'c049ca1c3d2a4cca85dbcceb937b3921') in 0.030950 seconds
+  Import took 0.035144 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000187 seconds.
+  path: Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/Common Example Assets/Materials/IE Example Prism Magenta Inner.mat
+  artifactKey: Guid(854b52ee442177745ac03e1917e527a6) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/Common Example Assets/Materials/IE Example Prism Magenta Inner.mat using Guid(854b52ee442177745ac03e1917e527a6) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'd142904d5f93d6b20d170ba75fce2578') in 0.030490 seconds
+  Import took 0.035716 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000210 seconds.
+  path: Assets/Plugins/LeapMotion/Core/Materials/AlphaToWhite.mat
+  artifactKey: Guid(72e5fb030c388e14f8988b632aea539a) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Plugins/LeapMotion/Core/Materials/AlphaToWhite.mat using Guid(72e5fb030c388e14f8988b632aea539a) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'd1c8c9854155a0ef9dfb8e91edef26a8') in 0.018544 seconds
+  Import took 0.023137 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000185 seconds.
+  path: Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/7. Moving Reference Frames/Materials/IE Example 7 Skybox.mat
+  artifactKey: Guid(4dcebe2eae3130a4c85a843e7323395e) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/7. Moving Reference Frames/Materials/IE Example 7 Skybox.mat using Guid(4dcebe2eae3130a4c85a843e7323395e) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '84611d8aae37c32e82dfa804b56a6ed4') in 0.020346 seconds
+  Import took 0.027285 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000190 seconds.
+  path: Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/Common Example Assets/Materials/IE Example Prism Magenta.mat
+  artifactKey: Guid(1c47cc1942430364aa9648991bb85e71) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/Common Example Assets/Materials/IE Example Prism Magenta.mat using Guid(1c47cc1942430364aa9648991bb85e71) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '1c25968fbcc51ddbb98bd96c72360408') in 0.031028 seconds
+  Import took 0.034702 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000164 seconds.
+  path: Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/6. Dynamic UI/Materials/IE Example Button Red.mat
+  artifactKey: Guid(ff7c634b1ca200843b1908e1995a13b1) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/6. Dynamic UI/Materials/IE Example Button Red.mat using Guid(ff7c634b1ca200843b1908e1995a13b1) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '419688afe14383ba70284a29521be68c') in 0.035603 seconds
+  Import took 0.042265 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000180 seconds.
+  path: Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/Common Example Assets/Materials/IE Example Anchor Blue.mat
+  artifactKey: Guid(668490d1e2537624c99ab58447146100) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/Common Example Assets/Materials/IE Example Anchor Blue.mat using Guid(668490d1e2537624c99ab58447146100) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '1f93fd60ba4d9df53d66ae9c93f76a89') in 0.030152 seconds
+  Import took 0.035873 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000197 seconds.
+  path: Assets/Plugins/LeapMotion/Core/Models/StereoIR170-interaction-cone.obj
+  artifactKey: Guid(39d0d2580bd1f6c43882f03f38e7e946) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Plugins/LeapMotion/Core/Models/StereoIR170-interaction-cone.obj using Guid(39d0d2580bd1f6c43882f03f38e7e946) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'ae5132086a115badfa25a706b47bd086') in 0.047804 seconds
+  Import took 0.053218 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000256 seconds.
+  path: Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/6. Dynamic UI/Materials/IE Example Button Panel.mat
+  artifactKey: Guid(a3927224a38b4c74eb9e223111df6924) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/6. Dynamic UI/Materials/IE Example Button Panel.mat using Guid(a3927224a38b4c74eb9e223111df6924) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '44033e870e4bbebd2d90c3948ba4fbe1') in 0.031754 seconds
+  Import took 0.036452 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000269 seconds.
+  path: Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/6. Dynamic UI/Materials/IE Example Button Top Blue.mat
+  artifactKey: Guid(cc811fdfe128d1645a49b0bed5b1cf28) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/6. Dynamic UI/Materials/IE Example Button Top Blue.mat using Guid(cc811fdfe128d1645a49b0bed5b1cf28) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '4d850cdd861135e9c2c6aa3d1bd4d332') in 0.027595 seconds
+  Import took 0.032717 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000268 seconds.
+  path: Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/Common Example Assets/Materials/IE Example Slippery Floor.mat
+  artifactKey: Guid(4f57ce981e8d73e4bad6f876b171592f) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/Common Example Assets/Materials/IE Example Slippery Floor.mat using Guid(4f57ce981e8d73e4bad6f876b171592f) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '1ea952dda19830d63019a48a694edd34') in 0.029750 seconds
+  Import took 0.034692 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000262 seconds.
+  path: Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/9. Articulation Hands/VoxelBinnedParticles/Example/Materials/Particle.mat
+  artifactKey: Guid(5829ec0716fe0ca4fb04d300d58ca3c7) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/9. Articulation Hands/VoxelBinnedParticles/Example/Materials/Particle.mat using Guid(5829ec0716fe0ca4fb04d300d58ca3c7) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'f6442fcfc6eb805da8807f9b9bf013f0') in 0.035144 seconds
+  Import took 0.039864 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000192 seconds.
+  path: Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/Common Example Assets/Materials/IE Example Prism Red.mat
+  artifactKey: Guid(715d23d2330038e4997eaf7979f4d64f) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/Common Example Assets/Materials/IE Example Prism Red.mat using Guid(715d23d2330038e4997eaf7979f4d64f) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '3e2834531a7d6dcaaacb02a89e239c22') in 0.033475 seconds
+  Import took 0.037754 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000215 seconds.
+  path: Assets/Plugins/LeapMotion/Core/Materials/StereoIR170InteractionVolume.mat
+  artifactKey: Guid(095eb2a35819f824e989239e78fa4de7) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Plugins/LeapMotion/Core/Materials/StereoIR170InteractionVolume.mat using Guid(095eb2a35819f824e989239e78fa4de7) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '5a0d8b7873a58c2ebdc29e991983bbb8') in 0.029508 seconds
+  Import took 0.037124 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000532 seconds.
+  path: Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/9. Articulation Hands/VoxelBinnedParticles/Example/Materials/Cylinder.mat
+  artifactKey: Guid(0569b830459b33541b3c5079cc7c217a) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/9. Articulation Hands/VoxelBinnedParticles/Example/Materials/Cylinder.mat using Guid(0569b830459b33541b3c5079cc7c217a) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '4c510df05eb3973a8c28c10d21ccac27') in 0.033392 seconds
+  Import took 0.038006 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000211 seconds.
+  path: Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/Common Example Assets/Materials/IE Example Light Gray Matte.mat
+  artifactKey: Guid(ae962c51f2146e4439603b2865982593) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/Common Example Assets/Materials/IE Example Light Gray Matte.mat using Guid(ae962c51f2146e4439603b2865982593) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '33f29e8f34ef560b20680f2a352e48cb') in 0.037807 seconds
+  Import took 0.045321 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000142 seconds.
+  path: Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/3. Interaction Callbacks/Materials/Green Dark Standard.mat
+  artifactKey: Guid(4842b2f4fd9791d41975d9dc8a13d707) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/3. Interaction Callbacks/Materials/Green Dark Standard.mat using Guid(4842b2f4fd9791d41975d9dc8a13d707) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'd383e4a616e13d470d646fbe5d7910c8') in 0.025754 seconds
+  Import took 0.031667 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000201 seconds.
+  path: Assets/Plugins/LeapMotion/Legacy/DetectionExamples/Materials/PinchLineMaterial.mat
+  artifactKey: Guid(fb63cfc93595449b8b8a6d75e0cada95) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Plugins/LeapMotion/Legacy/DetectionExamples/Materials/PinchLineMaterial.mat using Guid(fb63cfc93595449b8b8a6d75e0cada95) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '727c6aa54ac4c1d98fad0457fb899b77') in 0.067386 seconds
+  Import took 0.072654 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000289 seconds.
+  path: Assets/Plugins/LeapMotion/Modules/Hands/Examples/Scenes/LightMat.mat
+  artifactKey: Guid(f0e68fe5a30b3fb47aa040fedf8c06a0) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Plugins/LeapMotion/Modules/Hands/Examples/Scenes/LightMat.mat using Guid(f0e68fe5a30b3fb47aa040fedf8c06a0) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '45dabe40d43fbb81d45b71d09d136a20') in 0.119495 seconds
+  Import took 0.151889 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000519 seconds.
+  path: Assets/Plugins/LeapMotion/Legacy/DetectionExamples/Materials/RedShiny.mat
+  artifactKey: Guid(66e97fbc349a749c6be1f12a1f6283b1) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Plugins/LeapMotion/Legacy/DetectionExamples/Materials/RedShiny.mat using Guid(66e97fbc349a749c6be1f12a1f6283b1) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '5f5cc765aebcff9a54dcfd38feb9b5d1') in 0.045456 seconds
+  Import took 0.050829 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000231 seconds.
+  path: Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/7. Moving Reference Frames/Materials/IE Example 7 Linear Reference.mat
+  artifactKey: Guid(d4fa32da6d5945d40af0324afdd7d83f) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/7. Moving Reference Frames/Materials/IE Example 7 Linear Reference.mat using Guid(d4fa32da6d5945d40af0324afdd7d83f) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'dd5ed042e436faa79321f575a3118f24') in 0.031282 seconds
+  Import took 0.036859 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000263 seconds.
+  path: Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/3. Interaction Callbacks/Materials/Green Standard.mat
+  artifactKey: Guid(1c98be40e6a99764cb9e35b111f81340) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/3. Interaction Callbacks/Materials/Green Standard.mat using Guid(1c98be40e6a99764cb9e35b111f81340) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '766d0a8b6280bba5fde0d3122a9323e3') in 0.033521 seconds
+  Import took 0.039209 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000216 seconds.
+  path: Assets/Plugins/LeapMotion/Core/Materials/Passthrough/Foreground.mat
+  artifactKey: Guid(5c4d27217d0496548bc3a3896886cf70) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Plugins/LeapMotion/Core/Materials/Passthrough/Foreground.mat using Guid(5c4d27217d0496548bc3a3896886cf70) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '356db172664d4e7ca8bb7069311963c9') in 0.023879 seconds
+  Import took 0.032119 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000174 seconds.
+  path: Assets/Plugins/LeapMotion/Modules/Hands/Hand Assets/Generic Hand/Outline.mat
+  artifactKey: Guid(205eb13c26243634c9e71c8adc6440b7) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Plugins/LeapMotion/Modules/Hands/Hand Assets/Generic Hand/Outline.mat using Guid(205eb13c26243634c9e71c8adc6440b7) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '1e74b9995512b0de41417805121107b4') in 0.033664 seconds
+  Import took 0.037659 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000205 seconds.
+  path: Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/Common Example Assets/Materials/IE Example Prism Blue Inner.mat
+  artifactKey: Guid(f99be3eba6be7de469f615e931e32b0f) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/Common Example Assets/Materials/IE Example Prism Blue Inner.mat using Guid(f99be3eba6be7de469f615e931e32b0f) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '3460a1600769d65d991551df8a6491bd') in 0.029726 seconds
+  Import took 0.034396 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000348 seconds.
+  path: Assets/Plugins/LeapMotion/Core/Models/Materials/Lamb_LoPolyHand.mat
+  artifactKey: Guid(c5b9e8be6efc5c74aad1024a1e60cc0b) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Plugins/LeapMotion/Core/Models/Materials/Lamb_LoPolyHand.mat using Guid(c5b9e8be6efc5c74aad1024a1e60cc0b) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'fc8ccb5dda876902270e52aa1507de09') in 0.033558 seconds
+  Import took 0.037442 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000171 seconds.
+  path: Assets/Plugins/LeapMotion/Core/Examples/Example Assets/Attachment Hands Example Green.mat
+  artifactKey: Guid(81f6d387b9d5c994d9e291af97c84648) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Plugins/LeapMotion/Core/Examples/Example Assets/Attachment Hands Example Green.mat using Guid(81f6d387b9d5c994d9e291af97c84648) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '2a346dcb176e3f1b84d7fd5b208bec13') in 0.035475 seconds
+  Import took 0.039715 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000225 seconds.
+  path: Assets/Plugins/LeapMotion/Core/Materials/InstancedCapsuleHand.mat
+  artifactKey: Guid(50db6ec9473cfa746a5882bd2a16ced8) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Plugins/LeapMotion/Core/Materials/InstancedCapsuleHand.mat using Guid(50db6ec9473cfa746a5882bd2a16ced8) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '039058e3cee4cf45230e38947505255b') in 0.023465 seconds
+  Import took 0.027243 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000181 seconds.
+  path: Assets/Plugins/LeapMotion/Core/Examples/Example Assets/Example Ground Material.mat
+  artifactKey: Guid(c49b4153c4032784bbc659f359b10954) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Plugins/LeapMotion/Core/Examples/Example Assets/Example Ground Material.mat using Guid(c49b4153c4032784bbc659f359b10954) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '3d2c632d64f3cdf98845408e96e9ad99') in 0.026159 seconds
+  Import took 0.031237 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000172 seconds.
+  path: Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/Common Example Assets/Materials/IE Example SphereY.mat
+  artifactKey: Guid(d4042b3053c957348b6879e3aa751969) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/Common Example Assets/Materials/IE Example SphereY.mat using Guid(d4042b3053c957348b6879e3aa751969) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'f5f7842d1b535d3ada93226524a61406') in 0.031129 seconds
+  Import took 0.034554 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000170 seconds.
+  path: Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/9. Articulation Hands/VoxelBinnedParticles/Example/Materials/Floor.mat
+  artifactKey: Guid(8ea2d271eadd00a4eb84de1df60a79aa) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/9. Articulation Hands/VoxelBinnedParticles/Example/Materials/Floor.mat using Guid(8ea2d271eadd00a4eb84de1df60a79aa) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '00f15adf1a5062adcd96e76b73a4c006') in 0.027819 seconds
+  Import took 0.031842 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000185 seconds.
+  path: Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/Common Example Assets/Materials/IE Example SphereZ.mat
+  artifactKey: Guid(896523dcb08797746b7118238fe354db) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/Common Example Assets/Materials/IE Example SphereZ.mat using Guid(896523dcb08797746b7118238fe354db) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'c7ed6b3f118bff26eed63b04f40f0188') in 0.037961 seconds
+  Import took 0.042343 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000192 seconds.
+  path: Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/7. Moving Reference Frames/Materials/IE Example 7 Ship Hull.mat
+  artifactKey: Guid(65931aeabdda990478006d61615bed18) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/7. Moving Reference Frames/Materials/IE Example 7 Ship Hull.mat using Guid(65931aeabdda990478006d61615bed18) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '8ecf417e585588113ff97cb4822127d0') in 0.027360 seconds
+  Import took 0.034836 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000225 seconds.
+  path: Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/Common Example Assets/Materials/IE Example Unlit Text BG Light.mat
+  artifactKey: Guid(13c8d12cf9f998048a24a2f7adc62041) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/Common Example Assets/Materials/IE Example Unlit Text BG Light.mat using Guid(13c8d12cf9f998048a24a2f7adc62041) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '569848586a77e66329caa943fb8ebd78') in 0.037705 seconds
+  Import took 0.043900 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000309 seconds.
+  path: Assets/Plugins/LeapMotion/Legacy/DetectionExamples/Materials/Surface.mat
+  artifactKey: Guid(0584718ba366d46a994848f1796a90ea) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Plugins/LeapMotion/Legacy/DetectionExamples/Materials/Surface.mat using Guid(0584718ba366d46a994848f1796a90ea) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '4b8de541ded27d501dd1900bc06dc0d3') in 0.046067 seconds
+  Import took 0.051960 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000264 seconds.
+  path: Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/Common Example Assets/Materials/IE Example SphereX.mat
+  artifactKey: Guid(86566622ce0c16442bec9518e6c48937) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/Common Example Assets/Materials/IE Example SphereX.mat using Guid(86566622ce0c16442bec9518e6c48937) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '7e5bf5dee524e0da09c4416e7ead98ac') in 0.033487 seconds
+  Import took 0.038112 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000187 seconds.
+  path: Assets/Plugins/LeapMotion/Legacy/UIInput/Textures/Roboto-Medium.ttf
+  artifactKey: Guid(5b964491dc225bb489190e46b82093ca) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Plugins/LeapMotion/Legacy/UIInput/Textures/Roboto-Medium.ttf using Guid(5b964491dc225bb489190e46b82093ca) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '0e104645f7ea464d32f58f95d4981a36') in 0.069019 seconds
+  Import took 0.077070 seconds .
 
 ========================================================================
 Received Prepare
 Registering precompiled user dll's ...
-Registered in 0.002972 seconds.
+Registered in 0.002692 seconds.
 Begin MonoManager ReloadAssembly
 Native extension for WindowsStandalone target not found
-Refreshing native plugins compatible for Editor in 0.93 ms, found 4 plugins.
+Refreshing native plugins compatible for Editor in 0.95 ms, found 4 plugins.
+Preloading 1 native plugins for Editor in 0.08 ms.
+Invoked RoslynAnalysisRunner static constructor.
+RoslynAnalysisRunner will not be running.
+RoslynAnalysisRunner has terminated.
+NullReferenceException: Object reference not set to an instance of an object
+  at Unity.XR.Oculus.OculusLoader.AssetPathToAbsolutePath (System.String assetPath) [0x00048] in D:\Work\Ultraleap\UnityProjects\UnityModulesFork\Library\PackageCache\com.unity.xr.oculus@1.8.1\Runtime\OculusLoader.cs:243 
+  at Unity.XR.Oculus.OculusLoader.EditorLoadOVRPlugin () [0x0007b] in D:\Work\Ultraleap\UnityProjects\UnityModulesFork\Library\PackageCache\com.unity.xr.oculus@1.8.1\Runtime\OculusLoader.cs:228 
+
+(Filename: Library/PackageCache/com.unity.xr.oculus@1.8.1/Runtime/OculusLoader.cs Line: 243)
+
+Mono: successfully reloaded assembly
+- Completed reload, in  1.651 seconds
+Platform modules already initialized, skipping
+Refreshing native plugins compatible for Editor in 0.89 ms, found 4 plugins.
+Preloading 1 native plugins for Editor in 0.08 ms.
+Unloading 1953 Unused Serialized files (Serialized files now loaded: 0)
+System memory in use before: 97.1 MB.
+System memory in use after: 97.2 MB.
+
+Unloading 9 unused Assets to reduce memory usage. Loaded Objects now: 2489.
+Total: 4.756800 ms (FindLiveObjects: 0.408800 ms CreateObjectMapping: 0.088900 ms MarkObjects: 4.191600 ms  DeleteObjects: 0.066000 ms)
+
+========================================================================
+Received Prepare
+Registering precompiled user dll's ...
+Registered in 0.002099 seconds.
+Begin MonoManager ReloadAssembly
+Native extension for WindowsStandalone target not found
+Refreshing native plugins compatible for Editor in 0.53 ms, found 4 plugins.
+Preloading 1 native plugins for Editor in 0.07 ms.
+Invoked RoslynAnalysisRunner static constructor.
+RoslynAnalysisRunner will not be running.
+RoslynAnalysisRunner has terminated.
+NullReferenceException: Object reference not set to an instance of an object
+  at Unity.XR.Oculus.OculusLoader.AssetPathToAbsolutePath (System.String assetPath) [0x00048] in D:\Work\Ultraleap\UnityProjects\UnityModulesFork\Library\PackageCache\com.unity.xr.oculus@1.8.1\Runtime\OculusLoader.cs:243 
+  at Unity.XR.Oculus.OculusLoader.EditorLoadOVRPlugin () [0x0007b] in D:\Work\Ultraleap\UnityProjects\UnityModulesFork\Library\PackageCache\com.unity.xr.oculus@1.8.1\Runtime\OculusLoader.cs:228 
+
+(Filename: Library/PackageCache/com.unity.xr.oculus@1.8.1/Runtime/OculusLoader.cs Line: 243)
+
+Mono: successfully reloaded assembly
+- Completed reload, in  1.453 seconds
+Platform modules already initialized, skipping
+Refreshing native plugins compatible for Editor in 0.63 ms, found 4 plugins.
+Preloading 1 native plugins for Editor in 0.07 ms.
+Unloading 1953 Unused Serialized files (Serialized files now loaded: 0)
+System memory in use before: 97.1 MB.
+System memory in use after: 97.3 MB.
+
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2493.
+Total: 2.657500 ms (FindLiveObjects: 0.216500 ms CreateObjectMapping: 0.109300 ms MarkObjects: 2.309100 ms  DeleteObjects: 0.021000 ms)
+
+========================================================================
+Received Prepare
+Registering precompiled user dll's ...
+Registered in 0.001900 seconds.
+Begin MonoManager ReloadAssembly
+Native extension for WindowsStandalone target not found
+Refreshing native plugins compatible for Editor in 0.59 ms, found 4 plugins.
 Preloading 1 native plugins for Editor in 0.09 ms.
 Invoked RoslynAnalysisRunner static constructor.
 RoslynAnalysisRunner will not be running.
@@ -116,14 +758,497 @@ NullReferenceException: Object reference not set to an instance of an object
 (Filename: Library/PackageCache/com.unity.xr.oculus@1.8.1/Runtime/OculusLoader.cs Line: 243)
 
 Mono: successfully reloaded assembly
-- Completed reload, in  1.209 seconds
+- Completed reload, in  1.154 seconds
+Platform modules already initialized, skipping
+Refreshing native plugins compatible for Editor in 1.26 ms, found 4 plugins.
+Preloading 1 native plugins for Editor in 0.06 ms.
+Unloading 1953 Unused Serialized files (Serialized files now loaded: 0)
+System memory in use before: 97.2 MB.
+System memory in use after: 97.3 MB.
+
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2497.
+Total: 5.788000 ms (FindLiveObjects: 0.334700 ms CreateObjectMapping: 0.277700 ms MarkObjects: 5.152600 ms  DeleteObjects: 0.021000 ms)
+
+========================================================================
+Received Prepare
+Registering precompiled user dll's ...
+Registered in 0.002773 seconds.
+Begin MonoManager ReloadAssembly
+Native extension for WindowsStandalone target not found
+Refreshing native plugins compatible for Editor in 3.11 ms, found 4 plugins.
+Preloading 1 native plugins for Editor in 0.08 ms.
+Invoked RoslynAnalysisRunner static constructor.
+RoslynAnalysisRunner will not be running.
+RoslynAnalysisRunner has terminated.
+NullReferenceException: Object reference not set to an instance of an object
+  at Unity.XR.Oculus.OculusLoader.AssetPathToAbsolutePath (System.String assetPath) [0x00048] in D:\Work\Ultraleap\UnityProjects\UnityModulesFork\Library\PackageCache\com.unity.xr.oculus@1.8.1\Runtime\OculusLoader.cs:243 
+  at Unity.XR.Oculus.OculusLoader.EditorLoadOVRPlugin () [0x0007b] in D:\Work\Ultraleap\UnityProjects\UnityModulesFork\Library\PackageCache\com.unity.xr.oculus@1.8.1\Runtime\OculusLoader.cs:228 
+
+(Filename: Library/PackageCache/com.unity.xr.oculus@1.8.1/Runtime/OculusLoader.cs Line: 243)
+
+Mono: successfully reloaded assembly
+- Completed reload, in  1.720 seconds
+Platform modules already initialized, skipping
+Refreshing native plugins compatible for Editor in 0.50 ms, found 4 plugins.
+Preloading 1 native plugins for Editor in 0.06 ms.
+Unloading 1953 Unused Serialized files (Serialized files now loaded: 0)
+System memory in use before: 97.2 MB.
+System memory in use after: 97.3 MB.
+
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2501.
+Total: 2.959700 ms (FindLiveObjects: 0.213400 ms CreateObjectMapping: 0.116100 ms MarkObjects: 2.610500 ms  DeleteObjects: 0.018200 ms)
+
+========================================================================
+Received Import Request.
+  Time since last request: 301.730792 seconds.
+  path: Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/Common Example Assets/PhysicMaterials/Slippery.physicMaterial
+  artifactKey: Guid(21499581201963b4fba59af488b4b08c) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/Common Example Assets/PhysicMaterials/Slippery.physicMaterial using Guid(21499581201963b4fba59af488b4b08c) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'c2e40bcff96326eec244ff4efbaaaaac') in 0.057548 seconds
+  Import took 0.069956 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 3.025648 seconds.
+  path: Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/Common Example Assets/PhysicMaterials
+  artifactKey: Guid(8bbb4f754e22aa142bef60ff1a1b325d) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/Common Example Assets/PhysicMaterials using Guid(8bbb4f754e22aa142bef60ff1a1b325d) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '88a83430cfa6ceb5e6a25c0bb76d30e4') in 0.010343 seconds
+  Import took 0.029128 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 5.745965 seconds.
+  path: Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/Common Example Assets/PhysicMaterials/New Physic Material.physicMaterial
+  artifactKey: Guid(34d7eaa68e74f8c41b6ad61e19b3e31e) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/Common Example Assets/PhysicMaterials/New Physic Material.physicMaterial using Guid(34d7eaa68e74f8c41b6ad61e19b3e31e) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '25e7392b7216a783642839a2ee2aa85c') in 0.019264 seconds
+  Import took 0.026887 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 7.510353 seconds.
+  path: Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/Common Example Assets/PhysicMaterials/jeng.physicMaterial
+  artifactKey: Guid(34d7eaa68e74f8c41b6ad61e19b3e31e) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/Common Example Assets/PhysicMaterials/jeng.physicMaterial using Guid(34d7eaa68e74f8c41b6ad61e19b3e31e) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '6d3be2c75899b8ed4cf6d32264c1af64') in 0.021286 seconds
+  Import took 0.032359 seconds .
+
+========================================================================
+Received Prepare
+Registering precompiled user dll's ...
+Registered in 0.002312 seconds.
+Begin MonoManager ReloadAssembly
+Native extension for WindowsStandalone target not found
+Refreshing native plugins compatible for Editor in 0.52 ms, found 4 plugins.
+Preloading 1 native plugins for Editor in 0.08 ms.
+Invoked RoslynAnalysisRunner static constructor.
+RoslynAnalysisRunner will not be running.
+RoslynAnalysisRunner has terminated.
+NullReferenceException: Object reference not set to an instance of an object
+  at Unity.XR.Oculus.OculusLoader.AssetPathToAbsolutePath (System.String assetPath) [0x00048] in D:\Work\Ultraleap\UnityProjects\UnityModulesFork\Library\PackageCache\com.unity.xr.oculus@1.8.1\Runtime\OculusLoader.cs:243 
+  at Unity.XR.Oculus.OculusLoader.EditorLoadOVRPlugin () [0x0007b] in D:\Work\Ultraleap\UnityProjects\UnityModulesFork\Library\PackageCache\com.unity.xr.oculus@1.8.1\Runtime\OculusLoader.cs:228 
+
+(Filename: Library/PackageCache/com.unity.xr.oculus@1.8.1/Runtime/OculusLoader.cs Line: 243)
+
+Mono: successfully reloaded assembly
+- Completed reload, in  1.612 seconds
 Platform modules already initialized, skipping
 Refreshing native plugins compatible for Editor in 0.63 ms, found 4 plugins.
-Preloading 1 native plugins for Editor in 0.06 ms.
-Unloading 1952 Unused Serialized files (Serialized files now loaded: 0)
-System memory in use before: 93.1 MB.
-System memory in use after: 93.2 MB.
+Preloading 1 native plugins for Editor in 0.14 ms.
+Unloading 1953 Unused Serialized files (Serialized files now loaded: 0)
+System memory in use before: 97.2 MB.
+System memory in use after: 97.3 MB.
 
-Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2440.
-Total: 3.791400 ms (FindLiveObjects: 0.288800 ms CreateObjectMapping: 0.193200 ms MarkObjects: 3.285000 ms  DeleteObjects: 0.022600 ms)
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2505.
+Total: 2.171000 ms (FindLiveObjects: 0.221800 ms CreateObjectMapping: 0.075700 ms MarkObjects: 1.853000 ms  DeleteObjects: 0.018900 ms)
+
+========================================================================
+Received Prepare
+Registering precompiled user dll's ...
+Registered in 0.001991 seconds.
+Begin MonoManager ReloadAssembly
+Native extension for WindowsStandalone target not found
+Refreshing native plugins compatible for Editor in 0.75 ms, found 4 plugins.
+Preloading 1 native plugins for Editor in 0.08 ms.
+Invoked RoslynAnalysisRunner static constructor.
+RoslynAnalysisRunner will not be running.
+RoslynAnalysisRunner has terminated.
+NullReferenceException: Object reference not set to an instance of an object
+  at Unity.XR.Oculus.OculusLoader.AssetPathToAbsolutePath (System.String assetPath) [0x00048] in D:\Work\Ultraleap\UnityProjects\UnityModulesFork\Library\PackageCache\com.unity.xr.oculus@1.8.1\Runtime\OculusLoader.cs:243 
+  at Unity.XR.Oculus.OculusLoader.EditorLoadOVRPlugin () [0x0007b] in D:\Work\Ultraleap\UnityProjects\UnityModulesFork\Library\PackageCache\com.unity.xr.oculus@1.8.1\Runtime\OculusLoader.cs:228 
+
+(Filename: Library/PackageCache/com.unity.xr.oculus@1.8.1/Runtime/OculusLoader.cs Line: 243)
+
+Mono: successfully reloaded assembly
+- Completed reload, in  1.188 seconds
+Platform modules already initialized, skipping
+Refreshing native plugins compatible for Editor in 1.88 ms, found 4 plugins.
+Preloading 1 native plugins for Editor in 0.08 ms.
+Unloading 1953 Unused Serialized files (Serialized files now loaded: 0)
+System memory in use before: 97.2 MB.
+System memory in use after: 97.3 MB.
+
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2509.
+Total: 2.781100 ms (FindLiveObjects: 0.364600 ms CreateObjectMapping: 0.213100 ms MarkObjects: 2.184400 ms  DeleteObjects: 0.017500 ms)
+
+========================================================================
+Received Prepare
+Registering precompiled user dll's ...
+Registered in 0.003612 seconds.
+Begin MonoManager ReloadAssembly
+Native extension for WindowsStandalone target not found
+Refreshing native plugins compatible for Editor in 0.59 ms, found 4 plugins.
+Preloading 1 native plugins for Editor in 0.08 ms.
+Invoked RoslynAnalysisRunner static constructor.
+RoslynAnalysisRunner will not be running.
+RoslynAnalysisRunner has terminated.
+NullReferenceException: Object reference not set to an instance of an object
+  at Unity.XR.Oculus.OculusLoader.AssetPathToAbsolutePath (System.String assetPath) [0x00048] in D:\Work\Ultraleap\UnityProjects\UnityModulesFork\Library\PackageCache\com.unity.xr.oculus@1.8.1\Runtime\OculusLoader.cs:243 
+  at Unity.XR.Oculus.OculusLoader.EditorLoadOVRPlugin () [0x0007b] in D:\Work\Ultraleap\UnityProjects\UnityModulesFork\Library\PackageCache\com.unity.xr.oculus@1.8.1\Runtime\OculusLoader.cs:228 
+
+(Filename: Library/PackageCache/com.unity.xr.oculus@1.8.1/Runtime/OculusLoader.cs Line: 243)
+
+Mono: successfully reloaded assembly
+- Completed reload, in  1.378 seconds
+Platform modules already initialized, skipping
+Refreshing native plugins compatible for Editor in 0.77 ms, found 4 plugins.
+Preloading 1 native plugins for Editor in 0.07 ms.
+Unloading 1953 Unused Serialized files (Serialized files now loaded: 0)
+System memory in use before: 97.2 MB.
+System memory in use after: 97.3 MB.
+
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2513.
+Total: 3.761900 ms (FindLiveObjects: 0.527800 ms CreateObjectMapping: 0.100400 ms MarkObjects: 3.110700 ms  DeleteObjects: 0.021300 ms)
+
+========================================================================
+Received Prepare
+Registering precompiled user dll's ...
+Registered in 0.002176 seconds.
+Begin MonoManager ReloadAssembly
+Native extension for WindowsStandalone target not found
+Refreshing native plugins compatible for Editor in 0.51 ms, found 4 plugins.
+Preloading 1 native plugins for Editor in 0.07 ms.
+Invoked RoslynAnalysisRunner static constructor.
+RoslynAnalysisRunner will not be running.
+RoslynAnalysisRunner has terminated.
+NullReferenceException: Object reference not set to an instance of an object
+  at Unity.XR.Oculus.OculusLoader.AssetPathToAbsolutePath (System.String assetPath) [0x00048] in D:\Work\Ultraleap\UnityProjects\UnityModulesFork\Library\PackageCache\com.unity.xr.oculus@1.8.1\Runtime\OculusLoader.cs:243 
+  at Unity.XR.Oculus.OculusLoader.EditorLoadOVRPlugin () [0x0007b] in D:\Work\Ultraleap\UnityProjects\UnityModulesFork\Library\PackageCache\com.unity.xr.oculus@1.8.1\Runtime\OculusLoader.cs:228 
+
+(Filename: Library/PackageCache/com.unity.xr.oculus@1.8.1/Runtime/OculusLoader.cs Line: 243)
+
+Mono: successfully reloaded assembly
+- Completed reload, in  1.637 seconds
+Platform modules already initialized, skipping
+Refreshing native plugins compatible for Editor in 1.41 ms, found 4 plugins.
+Preloading 1 native plugins for Editor in 0.08 ms.
+Unloading 1953 Unused Serialized files (Serialized files now loaded: 0)
+System memory in use before: 97.2 MB.
+System memory in use after: 97.3 MB.
+
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2517.
+Total: 3.880400 ms (FindLiveObjects: 0.265100 ms CreateObjectMapping: 0.079300 ms MarkObjects: 3.512900 ms  DeleteObjects: 0.021500 ms)
+
+========================================================================
+Received Prepare
+Registering precompiled user dll's ...
+Registered in 0.001819 seconds.
+Begin MonoManager ReloadAssembly
+Native extension for WindowsStandalone target not found
+Refreshing native plugins compatible for Editor in 0.64 ms, found 4 plugins.
+Preloading 1 native plugins for Editor in 0.07 ms.
+Invoked RoslynAnalysisRunner static constructor.
+RoslynAnalysisRunner will not be running.
+RoslynAnalysisRunner has terminated.
+NullReferenceException: Object reference not set to an instance of an object
+  at Unity.XR.Oculus.OculusLoader.AssetPathToAbsolutePath (System.String assetPath) [0x00048] in D:\Work\Ultraleap\UnityProjects\UnityModulesFork\Library\PackageCache\com.unity.xr.oculus@1.8.1\Runtime\OculusLoader.cs:243 
+  at Unity.XR.Oculus.OculusLoader.EditorLoadOVRPlugin () [0x0007b] in D:\Work\Ultraleap\UnityProjects\UnityModulesFork\Library\PackageCache\com.unity.xr.oculus@1.8.1\Runtime\OculusLoader.cs:228 
+
+(Filename: Library/PackageCache/com.unity.xr.oculus@1.8.1/Runtime/OculusLoader.cs Line: 243)
+
+Mono: successfully reloaded assembly
+- Completed reload, in  1.048 seconds
+Platform modules already initialized, skipping
+Refreshing native plugins compatible for Editor in 0.53 ms, found 4 plugins.
+Preloading 1 native plugins for Editor in 0.06 ms.
+Unloading 1953 Unused Serialized files (Serialized files now loaded: 0)
+System memory in use before: 97.2 MB.
+System memory in use after: 97.3 MB.
+
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2521.
+Total: 2.976900 ms (FindLiveObjects: 0.407300 ms CreateObjectMapping: 0.201400 ms MarkObjects: 2.338400 ms  DeleteObjects: 0.028400 ms)
+
+========================================================================
+Received Prepare
+Registering precompiled user dll's ...
+Registered in 0.001877 seconds.
+Begin MonoManager ReloadAssembly
+Native extension for WindowsStandalone target not found
+Refreshing native plugins compatible for Editor in 2.91 ms, found 4 plugins.
+Preloading 1 native plugins for Editor in 0.08 ms.
+Invoked RoslynAnalysisRunner static constructor.
+RoslynAnalysisRunner will not be running.
+RoslynAnalysisRunner has terminated.
+NullReferenceException: Object reference not set to an instance of an object
+  at Unity.XR.Oculus.OculusLoader.AssetPathToAbsolutePath (System.String assetPath) [0x00048] in D:\Work\Ultraleap\UnityProjects\UnityModulesFork\Library\PackageCache\com.unity.xr.oculus@1.8.1\Runtime\OculusLoader.cs:243 
+  at Unity.XR.Oculus.OculusLoader.EditorLoadOVRPlugin () [0x0007b] in D:\Work\Ultraleap\UnityProjects\UnityModulesFork\Library\PackageCache\com.unity.xr.oculus@1.8.1\Runtime\OculusLoader.cs:228 
+
+(Filename: Library/PackageCache/com.unity.xr.oculus@1.8.1/Runtime/OculusLoader.cs Line: 243)
+
+Mono: successfully reloaded assembly
+- Completed reload, in  1.400 seconds
+Platform modules already initialized, skipping
+Refreshing native plugins compatible for Editor in 0.72 ms, found 4 plugins.
+Preloading 1 native plugins for Editor in 0.07 ms.
+Unloading 1953 Unused Serialized files (Serialized files now loaded: 0)
+System memory in use before: 97.2 MB.
+System memory in use after: 97.3 MB.
+
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2525.
+Total: 2.220300 ms (FindLiveObjects: 0.240800 ms CreateObjectMapping: 0.100800 ms MarkObjects: 1.852200 ms  DeleteObjects: 0.024700 ms)
+
+========================================================================
+Received Prepare
+Registering precompiled user dll's ...
+Registered in 0.003257 seconds.
+Begin MonoManager ReloadAssembly
+Native extension for WindowsStandalone target not found
+Refreshing native plugins compatible for Editor in 0.51 ms, found 4 plugins.
+Preloading 1 native plugins for Editor in 0.06 ms.
+Invoked RoslynAnalysisRunner static constructor.
+RoslynAnalysisRunner will not be running.
+RoslynAnalysisRunner has terminated.
+NullReferenceException: Object reference not set to an instance of an object
+  at Unity.XR.Oculus.OculusLoader.AssetPathToAbsolutePath (System.String assetPath) [0x00048] in D:\Work\Ultraleap\UnityProjects\UnityModulesFork\Library\PackageCache\com.unity.xr.oculus@1.8.1\Runtime\OculusLoader.cs:243 
+  at Unity.XR.Oculus.OculusLoader.EditorLoadOVRPlugin () [0x0007b] in D:\Work\Ultraleap\UnityProjects\UnityModulesFork\Library\PackageCache\com.unity.xr.oculus@1.8.1\Runtime\OculusLoader.cs:228 
+
+(Filename: Library/PackageCache/com.unity.xr.oculus@1.8.1/Runtime/OculusLoader.cs Line: 243)
+
+Mono: successfully reloaded assembly
+- Completed reload, in  1.177 seconds
+Platform modules already initialized, skipping
+Refreshing native plugins compatible for Editor in 0.65 ms, found 4 plugins.
+Preloading 1 native plugins for Editor in 0.08 ms.
+Unloading 1953 Unused Serialized files (Serialized files now loaded: 0)
+System memory in use before: 97.2 MB.
+System memory in use after: 97.4 MB.
+
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2529.
+Total: 2.290100 ms (FindLiveObjects: 0.233500 ms CreateObjectMapping: 0.073600 ms MarkObjects: 1.962600 ms  DeleteObjects: 0.019000 ms)
+
+========================================================================
+Received Prepare
+Registering precompiled user dll's ...
+Registered in 0.001784 seconds.
+Begin MonoManager ReloadAssembly
+Native extension for WindowsStandalone target not found
+Refreshing native plugins compatible for Editor in 0.60 ms, found 4 plugins.
+Preloading 1 native plugins for Editor in 0.61 ms.
+Invoked RoslynAnalysisRunner static constructor.
+RoslynAnalysisRunner will not be running.
+RoslynAnalysisRunner has terminated.
+NullReferenceException: Object reference not set to an instance of an object
+  at Unity.XR.Oculus.OculusLoader.AssetPathToAbsolutePath (System.String assetPath) [0x00048] in D:\Work\Ultraleap\UnityProjects\UnityModulesFork\Library\PackageCache\com.unity.xr.oculus@1.8.1\Runtime\OculusLoader.cs:243 
+  at Unity.XR.Oculus.OculusLoader.EditorLoadOVRPlugin () [0x0007b] in D:\Work\Ultraleap\UnityProjects\UnityModulesFork\Library\PackageCache\com.unity.xr.oculus@1.8.1\Runtime\OculusLoader.cs:228 
+
+(Filename: Library/PackageCache/com.unity.xr.oculus@1.8.1/Runtime/OculusLoader.cs Line: 243)
+
+Mono: successfully reloaded assembly
+- Completed reload, in  1.273 seconds
+Platform modules already initialized, skipping
+Refreshing native plugins compatible for Editor in 0.79 ms, found 4 plugins.
+Preloading 1 native plugins for Editor in 0.09 ms.
+Unloading 1953 Unused Serialized files (Serialized files now loaded: 0)
+System memory in use before: 97.2 MB.
+System memory in use after: 97.4 MB.
+
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2533.
+Total: 3.422100 ms (FindLiveObjects: 0.480200 ms CreateObjectMapping: 0.158200 ms MarkObjects: 2.761000 ms  DeleteObjects: 0.020500 ms)
+
+========================================================================
+Received Prepare
+Registering precompiled user dll's ...
+Registered in 0.002053 seconds.
+Begin MonoManager ReloadAssembly
+Native extension for WindowsStandalone target not found
+Refreshing native plugins compatible for Editor in 0.63 ms, found 4 plugins.
+Preloading 1 native plugins for Editor in 0.07 ms.
+Invoked RoslynAnalysisRunner static constructor.
+RoslynAnalysisRunner will not be running.
+RoslynAnalysisRunner has terminated.
+NullReferenceException: Object reference not set to an instance of an object
+  at Unity.XR.Oculus.OculusLoader.AssetPathToAbsolutePath (System.String assetPath) [0x00048] in D:\Work\Ultraleap\UnityProjects\UnityModulesFork\Library\PackageCache\com.unity.xr.oculus@1.8.1\Runtime\OculusLoader.cs:243 
+  at Unity.XR.Oculus.OculusLoader.EditorLoadOVRPlugin () [0x0007b] in D:\Work\Ultraleap\UnityProjects\UnityModulesFork\Library\PackageCache\com.unity.xr.oculus@1.8.1\Runtime\OculusLoader.cs:228 
+
+(Filename: Library/PackageCache/com.unity.xr.oculus@1.8.1/Runtime/OculusLoader.cs Line: 243)
+
+Mono: successfully reloaded assembly
+- Completed reload, in  1.253 seconds
+Platform modules already initialized, skipping
+Refreshing native plugins compatible for Editor in 9.78 ms, found 4 plugins.
+Preloading 1 native plugins for Editor in 0.07 ms.
+Unloading 1953 Unused Serialized files (Serialized files now loaded: 0)
+System memory in use before: 97.3 MB.
+System memory in use after: 97.4 MB.
+
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2537.
+Total: 11.771900 ms (FindLiveObjects: 0.238800 ms CreateObjectMapping: 0.082900 ms MarkObjects: 11.425300 ms  DeleteObjects: 0.023800 ms)
+
+========================================================================
+Received Prepare
+Registering precompiled user dll's ...
+Registered in 0.002436 seconds.
+Begin MonoManager ReloadAssembly
+Native extension for WindowsStandalone target not found
+Refreshing native plugins compatible for Editor in 0.54 ms, found 4 plugins.
+Preloading 1 native plugins for Editor in 0.21 ms.
+Invoked RoslynAnalysisRunner static constructor.
+RoslynAnalysisRunner will not be running.
+RoslynAnalysisRunner has terminated.
+NullReferenceException: Object reference not set to an instance of an object
+  at Unity.XR.Oculus.OculusLoader.AssetPathToAbsolutePath (System.String assetPath) [0x00048] in D:\Work\Ultraleap\UnityProjects\UnityModulesFork\Library\PackageCache\com.unity.xr.oculus@1.8.1\Runtime\OculusLoader.cs:243 
+  at Unity.XR.Oculus.OculusLoader.EditorLoadOVRPlugin () [0x0007b] in D:\Work\Ultraleap\UnityProjects\UnityModulesFork\Library\PackageCache\com.unity.xr.oculus@1.8.1\Runtime\OculusLoader.cs:228 
+
+(Filename: Library/PackageCache/com.unity.xr.oculus@1.8.1/Runtime/OculusLoader.cs Line: 243)
+
+Mono: successfully reloaded assembly
+- Completed reload, in  1.723 seconds
+Platform modules already initialized, skipping
+Refreshing native plugins compatible for Editor in 0.77 ms, found 4 plugins.
+Preloading 1 native plugins for Editor in 0.07 ms.
+Unloading 1953 Unused Serialized files (Serialized files now loaded: 0)
+System memory in use before: 97.3 MB.
+System memory in use after: 97.4 MB.
+
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2541.
+Total: 3.166000 ms (FindLiveObjects: 0.220500 ms CreateObjectMapping: 0.080000 ms MarkObjects: 2.840200 ms  DeleteObjects: 0.023400 ms)
+
+========================================================================
+Received Prepare
+Registering precompiled user dll's ...
+Registered in 0.002249 seconds.
+Begin MonoManager ReloadAssembly
+Native extension for WindowsStandalone target not found
+Refreshing native plugins compatible for Editor in 0.55 ms, found 4 plugins.
+Preloading 1 native plugins for Editor in 0.08 ms.
+Invoked RoslynAnalysisRunner static constructor.
+RoslynAnalysisRunner will not be running.
+RoslynAnalysisRunner has terminated.
+NullReferenceException: Object reference not set to an instance of an object
+  at Unity.XR.Oculus.OculusLoader.AssetPathToAbsolutePath (System.String assetPath) [0x00048] in D:\Work\Ultraleap\UnityProjects\UnityModulesFork\Library\PackageCache\com.unity.xr.oculus@1.8.1\Runtime\OculusLoader.cs:243 
+  at Unity.XR.Oculus.OculusLoader.EditorLoadOVRPlugin () [0x0007b] in D:\Work\Ultraleap\UnityProjects\UnityModulesFork\Library\PackageCache\com.unity.xr.oculus@1.8.1\Runtime\OculusLoader.cs:228 
+
+(Filename: Library/PackageCache/com.unity.xr.oculus@1.8.1/Runtime/OculusLoader.cs Line: 243)
+
+Mono: successfully reloaded assembly
+- Completed reload, in  1.654 seconds
+Platform modules already initialized, skipping
+Refreshing native plugins compatible for Editor in 0.90 ms, found 4 plugins.
+Preloading 1 native plugins for Editor in 0.09 ms.
+Unloading 1953 Unused Serialized files (Serialized files now loaded: 0)
+System memory in use before: 97.3 MB.
+System memory in use after: 97.4 MB.
+
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2545.
+Total: 2.237000 ms (FindLiveObjects: 0.220500 ms CreateObjectMapping: 0.074000 ms MarkObjects: 1.908600 ms  DeleteObjects: 0.032000 ms)
+
+========================================================================
+Received Prepare
+Registering precompiled user dll's ...
+Registered in 0.002149 seconds.
+Begin MonoManager ReloadAssembly
+Native extension for WindowsStandalone target not found
+Refreshing native plugins compatible for Editor in 0.53 ms, found 4 plugins.
+Preloading 1 native plugins for Editor in 0.09 ms.
+Invoked RoslynAnalysisRunner static constructor.
+RoslynAnalysisRunner will not be running.
+RoslynAnalysisRunner has terminated.
+NullReferenceException: Object reference not set to an instance of an object
+  at Unity.XR.Oculus.OculusLoader.AssetPathToAbsolutePath (System.String assetPath) [0x00048] in D:\Work\Ultraleap\UnityProjects\UnityModulesFork\Library\PackageCache\com.unity.xr.oculus@1.8.1\Runtime\OculusLoader.cs:243 
+  at Unity.XR.Oculus.OculusLoader.EditorLoadOVRPlugin () [0x0007b] in D:\Work\Ultraleap\UnityProjects\UnityModulesFork\Library\PackageCache\com.unity.xr.oculus@1.8.1\Runtime\OculusLoader.cs:228 
+
+(Filename: Library/PackageCache/com.unity.xr.oculus@1.8.1/Runtime/OculusLoader.cs Line: 243)
+
+Mono: successfully reloaded assembly
+- Completed reload, in  1.218 seconds
+Platform modules already initialized, skipping
+Refreshing native plugins compatible for Editor in 5.34 ms, found 4 plugins.
+Preloading 1 native plugins for Editor in 0.11 ms.
+Unloading 1953 Unused Serialized files (Serialized files now loaded: 0)
+System memory in use before: 97.3 MB.
+System memory in use after: 97.4 MB.
+
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2549.
+Total: 2.271900 ms (FindLiveObjects: 0.278800 ms CreateObjectMapping: 0.073700 ms MarkObjects: 1.900300 ms  DeleteObjects: 0.017900 ms)
+
+========================================================================
+Received Import Request.
+  Time since last request: 737.333513 seconds.
+  path: Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/Common Example Assets/PhysicMaterials/New Physic Material.physicMaterial
+  artifactKey: Guid(1d4375bde050a664e8f3305cb589072e) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/Common Example Assets/PhysicMaterials/New Physic Material.physicMaterial using Guid(1d4375bde050a664e8f3305cb589072e) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '53ac276c250c6b3cd021c30d2bbcc124') in 0.020587 seconds
+  Import took 0.029787 seconds .
+
+========================================================================
+Received Prepare
+Registering precompiled user dll's ...
+Registered in 0.002065 seconds.
+Begin MonoManager ReloadAssembly
+Native extension for WindowsStandalone target not found
+Refreshing native plugins compatible for Editor in 0.57 ms, found 4 plugins.
+Preloading 1 native plugins for Editor in 0.07 ms.
+Invoked RoslynAnalysisRunner static constructor.
+RoslynAnalysisRunner will not be running.
+RoslynAnalysisRunner has terminated.
+NullReferenceException: Object reference not set to an instance of an object
+  at Unity.XR.Oculus.OculusLoader.AssetPathToAbsolutePath (System.String assetPath) [0x00048] in D:\Work\Ultraleap\UnityProjects\UnityModulesFork\Library\PackageCache\com.unity.xr.oculus@1.8.1\Runtime\OculusLoader.cs:243 
+  at Unity.XR.Oculus.OculusLoader.EditorLoadOVRPlugin () [0x0007b] in D:\Work\Ultraleap\UnityProjects\UnityModulesFork\Library\PackageCache\com.unity.xr.oculus@1.8.1\Runtime\OculusLoader.cs:228 
+
+(Filename: Library/PackageCache/com.unity.xr.oculus@1.8.1/Runtime/OculusLoader.cs Line: 243)
+
+Mono: successfully reloaded assembly
+- Completed reload, in  1.073 seconds
+Platform modules already initialized, skipping
+Refreshing native plugins compatible for Editor in 0.95 ms, found 4 plugins.
+Preloading 1 native plugins for Editor in 0.12 ms.
+Unloading 1953 Unused Serialized files (Serialized files now loaded: 0)
+System memory in use before: 97.3 MB.
+System memory in use after: 97.4 MB.
+
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2553.
+Total: 2.284400 ms (FindLiveObjects: 0.210400 ms CreateObjectMapping: 0.071100 ms MarkObjects: 1.982600 ms  DeleteObjects: 0.018600 ms)
+
+========================================================================
+Received Import Request.
+  Time since last request: 315.591924 seconds.
+  path: Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/Common Example Assets/PhysicMaterials/Jenga.physicMaterial
+  artifactKey: Guid(1d4375bde050a664e8f3305cb589072e) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Plugins/LeapMotion/Modules/InteractionEngine/Examples/Common Example Assets/PhysicMaterials/Jenga.physicMaterial using Guid(1d4375bde050a664e8f3305cb589072e) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '97d0833b8322e759d83b08ebb808c010') in 0.023314 seconds
+  Import took 0.027022 seconds .
+
+========================================================================
+Received Prepare
+Registering precompiled user dll's ...
+Registered in 0.001943 seconds.
+Begin MonoManager ReloadAssembly
+Native extension for WindowsStandalone target not found
+Refreshing native plugins compatible for Editor in 1.49 ms, found 4 plugins.
+Preloading 1 native plugins for Editor in 0.08 ms.
+Invoked RoslynAnalysisRunner static constructor.
+RoslynAnalysisRunner will not be running.
+RoslynAnalysisRunner has terminated.
+NullReferenceException: Object reference not set to an instance of an object
+  at Unity.XR.Oculus.OculusLoader.AssetPathToAbsolutePath (System.String assetPath) [0x00048] in D:\Work\Ultraleap\UnityProjects\UnityModulesFork\Library\PackageCache\com.unity.xr.oculus@1.8.1\Runtime\OculusLoader.cs:243 
+  at Unity.XR.Oculus.OculusLoader.EditorLoadOVRPlugin () [0x0007b] in D:\Work\Ultraleap\UnityProjects\UnityModulesFork\Library\PackageCache\com.unity.xr.oculus@1.8.1\Runtime\OculusLoader.cs:228 
+
+(Filename: Library/PackageCache/com.unity.xr.oculus@1.8.1/Runtime/OculusLoader.cs Line: 243)
+
+Mono: successfully reloaded assembly
+- Completed reload, in  1.334 seconds
+Platform modules already initialized, skipping
+Refreshing native plugins compatible for Editor in 0.53 ms, found 4 plugins.
+Preloading 1 native plugins for Editor in 0.06 ms.
+Unloading 1953 Unused Serialized files (Serialized files now loaded: 0)
+System memory in use before: 97.3 MB.
+System memory in use after: 97.4 MB.
+
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2557.
+Total: 4.085700 ms (FindLiveObjects: 0.478900 ms CreateObjectMapping: 0.147900 ms MarkObjects: 3.413700 ms  DeleteObjects: 0.042900 ms)
 
