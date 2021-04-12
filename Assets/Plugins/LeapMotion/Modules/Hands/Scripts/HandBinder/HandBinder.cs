@@ -119,7 +119,7 @@ namespace Leap.Unity.HandsModule {
         /// </summary>
         public override void UpdateHand() {
 
-            if(!SetEditorPose && Application.isEditor) {
+            if(!SetEditorPose && !Application.isPlaying) {
                 return;
             }
 
