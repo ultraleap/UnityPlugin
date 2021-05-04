@@ -364,11 +364,11 @@ namespace Leap.Unity {
         // the pose delta from the "local" tracked pose to the actual camera
         // pose.
         if (!_trackingBaseDeltaPose.HasValue) {
-          _trackingBaseDeltaPose = _cachedCamera.transform.ToLocalPose()
-                                    * trackedPose.inverse;
+          _trackingBaseDeltaPose = PoseExtensions.mul(_cachedCamera.transform.ToLocalPose(),
+                                    trackedPose.inverse());
         }
         // This way, we always track a scene-space tracked pose.
-        trackedPose = _trackingBaseDeltaPose.Value * trackedPose;
+        trackedPose = PoseExtensions.mul(_trackingBaseDeltaPose.Value, trackedPose);
       }
       else if (_deviceOffsetMode == DeviceOffsetMode.Transform) {
         trackedPose = deviceOrigin.ToPose();
