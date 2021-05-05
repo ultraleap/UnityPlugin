@@ -613,28 +613,28 @@ namespace Leap.Unity {
     /// prefixed by the elements' type.
     /// </summary>
     public static string ToArrayString<T>(this IEnumerable<T> enumerable,
-      System.Func<T, string> toStringFunc = null)
-    {
-      var str = "[" + typeof(T).Name + ": ";
+      System.Func<T, string> toStringFunc = null, int? limit = null) {
+      var sb = new System.Text.StringBuilder();
+      sb.Append("[" + typeof(T).Name + ": ");
       bool addedFirstElement = false;
+      var count = 0;
       foreach (var t in enumerable) {
+        count += 1; if (limit.HasValue && count == limit.Value) break;
+
         if (addedFirstElement) {
-          str += ", ";
+          sb.Append(", ");
         }
         if (toStringFunc != null) {
-          if (t == null) { str += "<null>"; }
-          else { str += toStringFunc(t); }
-        }
-        else {
-          if (t == null) { str += "<null>"; }
-          else { str += t.ToString(); }
+          if (t == null) { sb.Append("<null>"); } else { sb.Append(toStringFunc(t)); }
+        } else {
+          if (t == null) { sb.Append("<null>"); } else { sb.Append(t.ToString()); }
         }
 
         addedFirstElement = true;
       }
-      str += "]";
+      sb.Append("]");
 
-      return str;
+      return sb.ToString();
     }
 
     /// <summary> Supported languages: "csharp", "python" </summary>
@@ -884,6 +884,14 @@ namespace Leap.Unity {
 
     /// <summary> Modifies each element of the array in-place using `mapFunc`.
     /// </summary>
+    public static void Transform<T, Aux>(this T[] arr, Aux aux, Func<T, Aux, T> mapFunc) {
+      for (var i = 0; i < arr.Length; i++) {
+        arr[i] = mapFunc(arr[i], aux);
+      }
+    }
+
+    /// <summary> Modifies each element of the array in-place using `mapFunc`.
+    /// </summary>
     public static void Transform<T>(this T[] arr, Func<T, T> mapFunc) {
       for (var i = 0; i < arr.Length; i++) {
         arr[i] = mapFunc(arr[i]);
@@ -903,7 +911,59 @@ namespace Leap.Unity {
     public static bool Contains<T>(this T[] arr, T value) {
       return System.Array.IndexOf(arr, value) != -1;
     }
-   
+
+    /// <summary> Copy with range arguments. sO = sourceOffset, dO = dstOffset, num = number of elements to copy. </summary>
+    public static T[] CopyFrom<T>(this T[] dst, T[] src, int sO, int dO, int num) {
+      if (sO < 0) throw new IndexOutOfRangeException();
+      if (sO + num - 1 >= src.Length) throw new IndexOutOfRangeException();
+      if (dO < 0) throw new IndexOutOfRangeException();
+      if (dO + num - 1 >= dst.Length) throw new IndexOutOfRangeException();
+      for (var i = 0; i < num; i++) {
+        var srcIdx = sO + i;
+        var dstIdx = dO + i;
+        dst[dstIdx] = src[srcIdx];
+      }
+      return dst;
+    }
+
+    /// <summary> Calls CopyTo from the argument src to dst. Expects the arrays to have the same length. </summary>
+    public static T[] CopyFrom<T>(this T[] dst, T[] src) {
+      if (dst.Length != src.Length) { throw new Exception("CopyFrom expects the dst and src arrays to have the same length."); }
+      src.CopyTo(dst, 0);
+      return dst;
+    }
+
+    #endregion
+
+    #region Dictionary Utils
+
+    /// <summary> Removes all entries where check returns true. </summary>
+    public static void RemoveAll<K, V>(this Dictionary<K, V> d, Func<K, V, bool> check) {
+      var removeBuffer = Pool<List<K>>.Spawn().Cleared();
+      try {
+        foreach (var kv in d) {
+          var k = kv.Key; var v = kv.Value;
+          if (check(k, v)) { removeBuffer.Add(k); }
+        }
+        foreach (var k in removeBuffer) {
+          d.Remove(k);
+        }
+      } finally {
+        Pool<List<K>>.Recycle(removeBuffer);
+      }
+    }
+
+    #endregion
+
+
+    #region Camera Utils
+
+    public static void RequireDepthTexture(Camera c) {
+      if (c.depthTextureMode != DepthTextureMode.Depth || c.depthTextureMode != DepthTextureMode.DepthNormals) {
+        c.depthTextureMode = DepthTextureMode.Depth;
+      }
+    }
+
     #endregion
 
     #region List Utils
@@ -973,6 +1033,14 @@ namespace Leap.Unity {
     public static void ForEach<T>(this List<T> list, Func<T, T> applyFunc) {
       for (var i = 0; i < list.Count; i++) {
         list[i] = applyFunc(list[i]);
+      }
+    }
+
+    /// <summary> Applies the function to each item in the list, in-place.
+    /// Also known as a "map" operation. Supports an auxiliary argument to avoid allocation in lambdas. </summary>
+    public static void ForEach<T, Aux>(this List<T> list, Aux aux, Func<T, Aux, T> applyFunc) {
+      for (var i = 0; i < list.Count; i++) {
+        list[i] = applyFunc(list[i], aux);
       }
     }
 
