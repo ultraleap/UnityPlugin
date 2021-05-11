@@ -23,18 +23,16 @@ Note: The hand binder is a complete overhaul of the previous Hand Rigging soluti
 # Video Guide {#video-guide}
 
 \htmlonly
-<video class="ie-example-video" src="HandsModule_Guide.webm" autoplay loop></video>
+<video class="ie-hands-video" src="HandsModuleGuide.webm" autoplay loop></video>
 \endhtmlonly
 
-2021-03-11 10-14-45.mp4
-
 # Assigning Bones Manually:
-If the hand model you have doesn't have a clear naming convention, you can still use the Hand Binder to connect leap data to the hand model. Simply drag and drop the GameObject you wish to bind from the scene into the slots in the Bind Hand pop up window.
+If the hand model you have doesn't have a clear naming convention, you can still use the **Hand Binder** to connect leap data to the hand model. Simply drag and drop the GameObject you wish to bind from the scene into the slots in the Bind Hand pop up window.
 
-Note: You DO NOT have to assign every bone, the hand binder script is able to push data to one or all the bones of the hand.
+**Note:** You **DO NOT** have to assign every bone, the hand binder script is able to push data to one or all the bones of the hand.
 
 \htmlonly
-<video class="ie-example-video" src="HandsModule_HandBinder.webm" autoplay loop></video>
+<video class="ie-hands-video" src="HandsModule_HandBinder_manualAssigning.webm" autoplay loop></video>
 \endhtmlonly
 
 # Understanding the Hand Binder Inspector
@@ -47,7 +45,8 @@ Note: You DO NOT have to assign every bone, the hand binder script is able to pu
 
 **Set bone positions** – should each assigned Gameobjects position be set to match the position of the leap data?
 
-**Show Debug Options**
+*Show Debug Options*
+
 **Debug Leap Hand** – shows a gizmo for each joint of the leap hand. In editor this will be set to the edit time pose set in the leap service provider.
 
 **Debug Leap Rotation Axis** – shows the rotation axis for each joint of the leap hand.
@@ -60,8 +59,9 @@ Note: You DO NOT have to assign every bone, the hand binder script is able to pu
 
 **Reset Hand/Align with leap pose** - do you want the assigned hand to be set to the default leap pose during edit mode? This is a useful option that can reset the bones back to their default pose.
 
-**Fine Tuning Options**
-Global Finger Rotation Offset – the rotation offset that is applied to rotate the model's fingers to the rotation of the leap finger data.
+*Fine Tuning Options*
+
+**Global Finger Rotation Offset** – the rotation offset that is applied to rotate the model's fingers to the rotation of the leap finger data.
 
 **Wrist Rotation Offset** – the rotation offset that is applied to rotate the models wrist to the rotation of the leap wrist data.
 
