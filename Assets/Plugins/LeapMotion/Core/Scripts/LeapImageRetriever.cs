@@ -246,7 +246,7 @@ namespace Leap.Unity {
 
     private void Awake() {
       _provider = GetComponent<LeapServiceProvider>();
-      if (_provider == null) {
+      if(_provider == null) {
         _provider = GetComponentInChildren<LeapServiceProvider>();
       }
 
@@ -254,6 +254,13 @@ namespace Leap.Unity {
       LeapInternal.MemoryManager.EnablePooling = true;
 
       ApplyGammaCorrectionValues();
+#if UNITY_2019_3_OR_NEWER
+      //SRP require subscribing to RenderPipelineManagers
+      if(UnityEngine.Rendering.GraphicsSettings.renderPipelineAsset != null) {
+        UnityEngine.Rendering.RenderPipelineManager.beginCameraRendering -= onBeginRendering;
+        UnityEngine.Rendering.RenderPipelineManager.beginCameraRendering += onBeginRendering;
+      }
+#endif
     }
 
     private void OnEnable() {
@@ -267,9 +274,15 @@ namespace Leap.Unity {
     private void OnDestroy() {
       StopAllCoroutines();
       Controller controller = _provider.GetLeapController();
-      if (controller != null) {
+      if(controller != null) {
         _provider.GetLeapController().DistortionChange -= onDistortionChange;
       }
+#if UNITY_2019_3_OR_NEWER
+      //SRP require subscribing to RenderPipelineManagers
+      if(UnityEngine.Rendering.GraphicsSettings.renderPipelineAsset != null) {
+        UnityEngine.Rendering.RenderPipelineManager.beginCameraRendering -= onBeginRendering;
+      }
+#endif
     }
 
     private void LateUpdate() {
@@ -309,6 +322,12 @@ namespace Leap.Unity {
         _eyeTextureData.UpdateTextures(_currentImage);
       }
     }
+
+#if UNITY_2019_3_OR_NEWER
+    private void onBeginRendering(UnityEngine.Rendering.ScriptableRenderContext scriptableRenderContext, Camera camera) {
+       OnPreRender();
+    }
+#endif
 
     private void subscribeToService() {
       if (_serviceCoroutine != null) {
