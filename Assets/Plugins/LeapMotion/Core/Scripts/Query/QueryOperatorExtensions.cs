@@ -19,6 +19,35 @@ namespace Leap.Unity.Query {
   /// </summary>
   public static class QueryOperatorExtensions {
 
+    /// <summary> Don't put big r values into this! </summary>
+    private static int getCombinationLength(int n, int r) {
+      if (r > 8) throw new System.NotSupportedException();
+      var result = 1;
+      var rFac = Factorial(r);
+      for (var i = 0; i < r; i++) result *= n - i;
+      result /= rFac;
+      return result;
+    }
+    /// <summary> Int32s, careful with overflow. </summary>
+    private static int Factorial(int N) {
+      int f = 1; for (var n = N; n > 1; n--) f *= n; return f;
+    }
+
+    /// <summary> 
+    /// Prints a Debug.LogError if the query results contains more than a single element, but otherwise preserves the Query as-is. 
+    /// </summary>
+    public static Query<T> ComplainIfMany<T>(this Query<T> query, string message = null) {
+      T[] array;
+      int count;
+      query.Deconstruct(out array, out count);
+
+      if (count > 1) {
+        Debug.LogError($"Query contained more than one element.");
+      }
+
+      return new Query<T>(array, count);
+    }
+
     /// <summary>
     /// Returns a new Query operation representing the concatenation of the current Query to
     /// the argument ICollection.
@@ -188,7 +217,7 @@ namespace Leap.Unity.Query {
       int count;
       query.Deconstruct(out array, out count);
 
-      Utils.Reverse(array, 0, count);
+      array.Reverse(0, count);
 
       return new Query<T>(array, count);
     }
@@ -207,6 +236,86 @@ namespace Leap.Unity.Query {
         var dstArray = ArrayPool<K>.Spawn(slice.Count);
         for (int i = 0; i < slice.Count; i++) {
           dstArray[i] = selector(slice[i]);
+        }
+
+        return new Query<K>(dstArray, slice.Count);
+      }
+    }
+
+    /// <summary>
+    /// Returns a new Query representing the current Query mapped element-by-element
+    /// into a new Query by a mapping operation. This variant accepts an auxiliary argument slot for the selector function, to prevent allocation.
+    /// 
+    /// For example:
+    ///   (1, 2, 3, 4).Query().Select(10, (num, offset) => (num * 2 + offset).ToString())
+    /// Would result in:
+    ///   ("12", "14", "16", "18")
+    /// </summary>
+    public static Query<K> Select<T, Arg, K>(this Query<T> query, Arg arg, Func<T, Arg, K> selectorWithArg) {
+      using (var slice = query.Deconstruct()) {
+        var dstArray = ArrayPool<K>.Spawn(slice.Count);
+        for (int i = 0; i < slice.Count; i++) {
+          dstArray[i] = selectorWithArg(slice[i], arg);
+        }
+
+        return new Query<K>(dstArray, slice.Count);
+      }
+    }
+
+    /// <summary>
+    /// Returns a new Query representing the current Query mapped element-by-element
+    /// into a new Query by a mapping operation. This variant accepts two auxiliary argument slots for the selector function, to prevent allocation.
+    /// 
+    /// For example:
+    ///   (1, 2, 3, 4).Query().Select(10, (num, offset) => (num * 2 + offset).ToString())
+    /// Would result in:
+    ///   ("12", "14", "16", "18")
+    /// </summary>
+    public static Query<K> Select<T, Aux1, Aux2, K>(this Query<T> query, Aux1 aux1, Aux2 aux2, Func<T, Aux1, Aux2, K> selectorWithArg) {
+      using (var slice = query.Deconstruct()) {
+        var dstArray = ArrayPool<K>.Spawn(slice.Count);
+        for (int i = 0; i < slice.Count; i++) {
+          dstArray[i] = selectorWithArg(slice[i], aux1, aux2);
+        }
+
+        return new Query<K>(dstArray, slice.Count);
+      }
+    }
+
+    /// <summary>
+    /// Returns a new Query representing the current Query mapped element-by-element
+    /// into a new Query by a mapping operation. This variant accepts three auxiliary argument slots for the selector function, to prevent allocation.
+    /// 
+    /// For example:
+    ///   (1, 2, 3, 4).Query().Select(10, (num, offset) => (num * 2 + offset).ToString())
+    /// Would result in:
+    ///   ("12", "14", "16", "18")
+    /// </summary>
+    public static Query<K> Select<T, Aux1, Aux2, Aux3, K>(this Query<T> query, Aux1 aux1, Aux2 aux2, Aux3 aux3, Func<T, Aux1, Aux2, Aux3, K> selectorWithArg) {
+      using (var slice = query.Deconstruct()) {
+        var dstArray = ArrayPool<K>.Spawn(slice.Count);
+        for (int i = 0; i < slice.Count; i++) {
+          dstArray[i] = selectorWithArg(slice[i], aux1, aux2, aux3);
+        }
+
+        return new Query<K>(dstArray, slice.Count);
+      }
+    }
+
+    /// <summary>
+    /// Returns a new Query representing the current Query mapped element-by-element
+    /// into a new Query by a mapping operation. This variant accepts four auxiliary argument slots for the selector function, to prevent allocation.
+    /// 
+    /// For example:
+    ///   (1, 2, 3, 4).Query().Select(10, (num, offset) => (num * 2 + offset).ToString())
+    /// Would result in:
+    ///   ("12", "14", "16", "18")
+    /// </summary>
+    public static Query<K> Select<T, Aux1, Aux2, Aux3, Aux4, K>(this Query<T> query, Aux1 aux1, Aux2 aux2, Aux3 aux3, Aux4 aux4, Func<T, Aux1, Aux2, Aux3, Aux4, K> selectorWithArg) {
+      using (var slice = query.Deconstruct()) {
+        var dstArray = ArrayPool<K>.Spawn(slice.Count);
+        for (int i = 0; i < slice.Count; i++) {
+          dstArray[i] = selectorWithArg(slice[i], aux1, aux2, aux3, aux4);
         }
 
         return new Query<K>(dstArray, slice.Count);
@@ -354,9 +463,119 @@ namespace Leap.Unity.Query {
       query.Deconstruct(out array, out count);
 
       Array.Sort(array, 0, count);
-      Utils.Reverse(array, 0, count);
+      array.Reverse(0, count);
 
       return new Query<T>(array, count);
+    }
+
+    // Cached storage support for supporting SortValues<T> (for IndexedValue queries).
+    public class CachedIndexableComparer<T> : IComparer<T> {
+      public System.Func<T, T, int> comparison;
+      public void SetComparison(System.Func<T, T, int> comparison) {
+        this.comparison = comparison;
+      }
+      public int Compare(T x, T y) { return comparison(x, y); }
+    }
+
+    /// <summary> WARNING: This function allocates.
+    ///
+    /// Returns a nested Query where each inner sequence is split from the original query by evaluating the "when" function with sequence prev, next (a, b) pair along the original query.
+    ///
+    /// For example:
+    ///   seqA = (A, B, C, D, E, F, G, H)
+    ///   seqA.Query().Split((a, b) => a == C || b == G)
+    /// Would result in:
+    ///   ((A, B, C), (D, E, F), (G, H))
+    ///
+    /// If you pass a "keepB" function, for each (a, b) pair along the sequence, "b" values for which keepB(b) returns false will be discarded from the returned subsequence list. This is useful, for example, if you want to split a sequence of valid and invalid values into a list of subsequences of only continuous valid values.
+    ///
+    /// For example:
+    ///   seqA = (A, B, null, null, E, null, G, H)
+    ///   seqA.Query().Split((a, b) => (a == null) != (b == null), keepB: b => b != null)
+    /// Would result in:
+    ///   ((A, B), (E), (G, H))
+    ///
+    /// TODO: Should be possible to make this method non-allocating by using something like struct Slices all over the original backing Collection instead of allocating new Lists. -Nick 2019-12-03
+    /// </summary>
+    public static Query<List<T>> Split<T>(this Query<T> query, Func<T, T, bool> when, Func<T, bool> keepB = null) {
+      using (var slice = query.Deconstruct()) {
+        var outerArr = new List<List<T>>();
+        var pendingArr = new List<T>();
+
+        if (slice.Count == 0) {
+          outerArr.Add(pendingArr);
+        } else if (slice.Count == 1) {
+          pendingArr.Add(slice[0]);
+          outerArr.Add(pendingArr);
+        } else {
+          // General case.
+          var A = slice[0];
+          pendingArr.Add(A);
+          for (var b = 1; b < slice.Count; b++) {
+            var B = slice[b];
+
+            if (when(A, B)) {
+              // Split.
+              outerArr.Add(pendingArr);
+              pendingArr = new List<T>();
+            }
+
+            if (keepB == null || keepB(B)) {
+              // Add B to pending, make it new A.
+              pendingArr.Add(B);
+              A = B;
+            }
+          }
+
+          // Don't forget the last sequence. 
+          if (pendingArr.Count > 0) {
+            outerArr.Add(pendingArr);
+          }
+        }
+
+        return outerArr.Query();
+      }
+    }
+
+    /// <summary> As Split, but simpler: Each inner sequence's length is determined by the innerCount argument. Requires an exact split, innerCount must evenly divide the total number of elements in the original Query. </summary>
+    public static Query<List<T>> SplitTake<T>(this Query<T> query, int innerCount) {
+      using (var slice = query.Deconstruct()) {
+        var outerArr = new List<List<T>>();
+        var pendingArr = new List<T>();
+
+        if (slice.Count % innerCount != 0) throw new System.ArgumentException($"Query.SplitTake() over {slice.Count} elements must be divisible by innerCount {innerCount}.");
+
+        if (slice.Count == 0) {
+          outerArr.Add(pendingArr);
+        } else if (slice.Count == 1) {
+          pendingArr.Add(slice[0]);
+          outerArr.Add(pendingArr);
+        } else {
+          // General case.
+          var A = slice[0];
+          pendingArr.Add(A);
+          for (var b = 1; b < slice.Count; b++) {
+            var B = slice[b];
+
+            if (pendingArr.Count == innerCount) {
+              // Split.
+              outerArr.Add(pendingArr);
+              pendingArr = new List<T>();
+            }
+
+            // Add B to pending, make it new A.
+            pendingArr.Add(B);
+            A = B;
+          }
+
+          // Don't forget the last sequence. 
+          if (pendingArr.Count > 0) {
+            outerArr.Add(pendingArr);
+          }
+        }
+
+        return outerArr.Query();
+      }
     }
 
     /// <summary>
@@ -480,8 +699,7 @@ namespace Leap.Unity.Query {
     ///   (A,_) (B,_) (C,A) (D,B) (E,C) (F,D)
     /// </summary>
     public static Query<PrevPair<T>> WithPrevious<T>(this Query<T> query,
-      int offset = 1, bool includeStart = false)
-    {
+      int offset = 1, bool includeStart = false) {
       using (var slice = query.Deconstruct()) {
         int resultCount = includeStart ? slice.Count : Mathf.Max(0, slice.Count - offset);
         var dstArray = ArrayPool<PrevPair<T>>.Spawn(resultCount);
@@ -523,8 +741,7 @@ namespace Leap.Unity.Query {
     ///   (A,C) (B,D) (C,E) (D,F) (E,_) (F,_)
     /// </summary>
     public static Query<NextPair<T>> WithNext<T>(this Query<T> query,
-      int offset = 1, bool includeEnd = false)
-    {
+      int offset = 1, bool includeEnd = false) {
       offset = Math.Abs(offset);
       using (var slice = query.Deconstruct()) {
         int resultCount = includeEnd ? slice.Count : Mathf.Max(0, slice.Count - offset);
@@ -649,6 +866,13 @@ namespace Leap.Unity.Query {
     public struct IndexedValue<T> {
       public int index;
       public T value;
+
+      public IndexedValue(int index, T value) { this.index = index; this.value = value; }
+
+      public void Deconstruct(out int index, out T value) {
+        index = this.index;
+        value = this.value;
+      }
     }
 
     private class FunctorComparer<T, K> : IComparer<T> where K : IComparable<K> {

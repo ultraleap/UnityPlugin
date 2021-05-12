@@ -172,7 +172,7 @@ namespace Leap.Unity.Encoding {
       // Finally, fill hand data.
       var palmPose = new Pose(palmPos, palmRot);
       // var wristPos = ToWorld(new Vector3(0f, -0.015f, -0.065f), palmPos, palmRot);
-      var wristPos = (palmPose * tweakWristPosition).position;
+      var wristPos = palmPose.mul(tweakWristPosition).position;
       intoHand.Fill(
         frameID:                -1,
         id:                     (isLeft ? 0 : 1),
