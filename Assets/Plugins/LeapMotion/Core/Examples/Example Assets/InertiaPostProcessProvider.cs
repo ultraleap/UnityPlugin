@@ -126,17 +126,17 @@ namespace Leap.Unity.Examples {
     private void integratePose(ref Pose curPose, ref Pose prevPose,
                                Pose targetPose, float deltaTime) {
       // Calculate motion from prevPose to curPose.
-      var deltaPose = PoseExtensions.mul(curPose.inverse(), prevPose); // prevPose in curPose's local space.
+      var deltaPose = curPose.inverse().mul(prevPose); // prevPose in curPose's local space.
       deltaPose = new Pose(-deltaPose.position, Quaternion.Inverse(deltaPose.rotation));
-      deltaPose = PoseExtensions.Lerp(deltaPose, Pose.identity, damping * deltaTime); // Dampen.
+      deltaPose = deltaPose.Lerp(Pose.identity, damping * deltaTime); // Dampen.
 
       // Verlet-integrate curPose based on the delta from prevPose.
       Pose tempPose = curPose;
-      curPose = PoseExtensions.mul(curPose, deltaPose);
+      curPose = curPose.mul(deltaPose);
       prevPose = tempPose;
 
       // Pull the integrated hand toward the target a little bit based on stiffness.
-      curPose = PoseExtensions.Lerp(curPose, targetPose, stiffness * deltaTime);
+      curPose = curPose.Lerp(targetPose, stiffness * deltaTime);
     }
   }
 }

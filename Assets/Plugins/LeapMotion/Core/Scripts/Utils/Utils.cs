@@ -2733,19 +2733,19 @@ namespace Leap.Unity {
     /// <summary> Given a Pose with some possibly non-identity translation, this operation rotates the pose by the quaternion `q`, then compensates for any translation the rotation might have introduced. Essentially, this operation "pivots" poses about their translated origin by the argument quaternion. </summary>
     public static Pose Pivot(this Pose p, Quaternion q) {
       var origPos = p.position;
-      var toTranslateBack = PoseExtensions.mul(q, p);
+      var toTranslateBack = q.mul(p);
       var newPos = toTranslateBack.position;
-      var translatedBack = PoseExtensions.mul(new Pose(origPos - newPos, Quaternion.identity), toTranslateBack);
+      var translatedBack = new Pose(origPos - newPos, Quaternion.identity).mul(toTranslateBack);
       return translatedBack;
     }
 
     /// <summary> As `Pivot()` with no Vector3 argument, but instead of pivoting the pose about its own local Vector3.zero position, the pose is pivoted about the argument world position `pivotPoint`. </summary>
     public static Pose Pivot(this Pose p, Quaternion q, Vector3 pivotPoint) {
       var preservePos = pivotPoint;
-      var preservePos_local = PoseExtensions.mul(p.inverse(), pivotPoint);
-      var toTranslateBack = PoseExtensions.mul(q, p);
-      var newPos = PoseExtensions.mul(toTranslateBack, preservePos_local).position;
-      var translatedBack = PoseExtensions.mul(new Pose(preservePos - newPos, Quaternion.identity), toTranslateBack);
+      var preservePos_local = p.inverse().mul(pivotPoint);
+      var toTranslateBack = q.mul(p);
+      var newPos = toTranslateBack.mul(preservePos_local).position;
+      var translatedBack = new Pose(preservePos - newPos, Quaternion.identity).mul(toTranslateBack);
       return translatedBack;
     }
 
@@ -2753,9 +2753,9 @@ namespace Leap.Unity {
     public static Pose PivotTo(this Pose p, Quaternion q) {
       var origPos = p.position;
       var origRot = p.rotation;
-      var toTranslateBack = PoseExtensions.mul(new Pose(Vector3.zero, q * Quaternion.Inverse(origRot)), p);
+      var toTranslateBack = new Pose(Vector3.zero, q * Quaternion.Inverse(origRot)).mul(p);
       var newPos = toTranslateBack.position;
-      var translatedBack = PoseExtensions.mul(new Pose(origPos - newPos, Quaternion.identity), toTranslateBack);
+      var translatedBack = new Pose(origPos - newPos, Quaternion.identity).mul(toTranslateBack);
       return translatedBack;
     }
 
@@ -3184,7 +3184,7 @@ namespace Leap.Unity {
     /// For example, A.Then(B.From(A)) == B.
     /// </summary>
     public static Pose From(this Pose thisPose, Pose otherPose) {
-      return PoseExtensions.mul(otherPose.inverse(), thisPose);
+      return otherPose.inverse().mul(thisPose);
     }
 
     /// <summary>
@@ -3194,7 +3194,7 @@ namespace Leap.Unity {
     /// For example, A.Then(A.To(B)) == B.
     /// </summary>
     public static Pose To(this Pose thisPose, Pose otherPose) {
-      return PoseExtensions.mul(thisPose.inverse(), otherPose);
+      return thisPose.inverse().mul(otherPose);
     }
 
     /// <summary>
@@ -3206,7 +3206,7 @@ namespace Leap.Unity {
     /// operations is more explicit with this syntax.
     /// </summary>
     public static Pose Then(this Pose thisPose, Pose otherPose) {
-      return PoseExtensions.mul(thisPose, otherPose);
+      return thisPose.mul(otherPose);
     }
 
     #endregion

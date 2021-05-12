@@ -73,7 +73,7 @@ namespace Leap.Unity.Geometry {
       }
       else {
         _cachedMatrix = transform.localToWorldMatrix * _cachedMatrix;
-        _cachedPose = PoseExtensions.mul(transform.localToWorldMatrix.GetPose(), _cachedPose.Value);
+        _cachedPose = transform.localToWorldMatrix.GetPose().mul(_cachedPose.Value);
         _cachedTransformMatrix = transform.localToWorldMatrix;
       }
 
@@ -135,13 +135,13 @@ namespace Leap.Unity.Geometry {
 
       var colliderCenter = getUnityColliderWorldCenter(unityCollider);
       var colliderCenter_plane =
-        PoseExtensions.mul(planePoseInverse, colliderCenter).position;
+        planePoseInverse.mul(colliderCenter).position;
       var colliderCenterOnPlane_plane = colliderCenter_plane.WithZ(0f);
       var colliderCenterOnPlane =
-        PoseExtensions.mul(planePose, colliderCenterOnPlane_plane).position;
+        planePose.mul(colliderCenterOnPlane_plane).position;
 
       var closestPoint = unityCollider.ClosestPoint(colliderCenterOnPlane);
-      var closestPoint_plane = PoseExtensions.mul(planePoseInverse, closestPoint).position;
+      var closestPoint_plane = planePoseInverse.mul(closestPoint).position;
 
       // Concave shapes will break here; projection from their center is not
       // valid. To support concavity, you'd want to project to the plane from

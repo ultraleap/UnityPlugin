@@ -35,7 +35,7 @@ namespace Leap.Unity {
     /// Returns Pose B transformed by Pose A, like a transform hierarchy with A as the
     /// parent of B.
     /// </summary>
-    public static Pose mul(Pose A, Pose B) {
+    public static Pose mul(this Pose A, Pose B) {
       return new Pose(A.position + (A.rotation * B.position),
                       A.rotation * B.rotation);
     }
@@ -46,7 +46,7 @@ namespace Leap.Unity {
     /// interpreting either Pose as a parent space of the other; but also beware that
     /// rotations are noncommutative, so this operation is also noncommutative.
     /// </summary>
-    public static Pose add(Pose A, Pose B) {
+    public static Pose add(this Pose A, Pose B) {
       return new Pose(A.position + B.position,
                       A.rotation * B.rotation);
     }
@@ -55,26 +55,26 @@ namespace Leap.Unity {
     /// Transforms the right-hand-side Vector3 as a local-space position into
     /// world space as if this Pose were its reference frame or parent.
     /// </summary>
-    public static Pose mul(Pose pose, Vector3 localPosition) {
+    public static Pose mul(this Pose pose, Vector3 localPosition) {
       return new Pose(pose.position + pose.rotation * localPosition,
                       pose.rotation);
     }
 
-    public static Pose mul(Pose pose, Quaternion localRotation) {
-      return mul(pose, new Pose(Vector3.zero, localRotation));
+    public static Pose mul(this Pose pose, Quaternion localRotation) {
+      return pose.mul(new Pose(Vector3.zero, localRotation));
     }
 
-    public static Pose mul(Quaternion parentRotation, Pose localPose) {
-      return mul(new Pose(Vector3.zero, parentRotation), localPose);
+    public static Pose mul(this Quaternion parentRotation, Pose localPose) {
+      return new Pose(Vector3.zero, parentRotation).mul(localPose);
     }
 
     /// <summary> Non-projective matrices only (MultiplyPoint3x4). </summary>
-    public static Pose mul(Matrix4x4 matrix, Pose localPose) {
+    public static Pose mul(this Matrix4x4 matrix, Pose localPose) {
       return new Pose(matrix.MultiplyPoint3x4(localPose.position),
         matrix.rotation * localPose.rotation);
     }
 
-    public static bool ApproxEquals(Pose pose, Pose other) {
+    public static bool ApproxEquals(this Pose pose, Pose other) {
       return pose.position.ApproxEquals(other.position) && pose.rotation.ApproxEquals(other.rotation);
     }
 
@@ -83,7 +83,7 @@ namespace Leap.Unity {
     /// between a and b by t from 0 to 1. This method clamps t between 0 and 1; if
     /// extrapolation is desired, see Extrapolate.
     /// </summary>
-    public static Pose Lerp(Pose a, Pose b, float t) {
+    public static Pose Lerp(this Pose a, Pose b, float t) {
       if (t >= 1f) return b;
       if (t <= 0f) return a;
       return new Pose(Vector3.Lerp(a.position, b.position, t),
@@ -94,7 +94,7 @@ namespace Leap.Unity {
     /// As Lerp, but doesn't clamp t between 0 and 1. Values above one extrapolate
     /// forwards beyond b, while values less than zero extrapolate backwards past a.
     /// </summary>
-    public static Pose LerpUnclamped(Pose a, Pose b, float t) {
+    public static Pose LerpUnclamped(this Pose a, Pose b, float t) {
       return new Pose(Vector3.LerpUnclamped(a.position, b.position, t),
                       Quaternion.SlerpUnclamped(a.rotation, b.rotation, t));
     }
@@ -103,7 +103,7 @@ namespace Leap.Unity {
     /// As LerpUnclamped, but extrapolates using time values for a and b, and a target
     /// time at which to determine the extrapolated Pose.
     /// </summary>
-    public static Pose LerpUnclampedTimed(Pose a, float aTime,
+    public static Pose LerpUnclampedTimed(this Pose a, float aTime,
                                           Pose b, float bTime,
                                           float extrapolateTime) {
       return LerpUnclamped(a, b, extrapolateTime.MapUnclamped(aTime, bTime, 0f, 1f));

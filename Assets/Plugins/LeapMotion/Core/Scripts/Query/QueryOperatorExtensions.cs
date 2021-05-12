@@ -33,8 +33,9 @@ namespace Leap.Unity.Query {
       int f = 1; for (var n = N; n > 1; n--) f *= n; return f;
     }
 
-    /// <summary>
-    /// Prints a Debug.LogError if the query results contains more than a single element, but otherwise preserves the Query as-is.</summary>
+    /// <summary> 
+    /// Prints a Debug.LogError if the query results contains more than a single element, but otherwise preserves the Query as-is. 
+    /// </summary>
     public static Query<T> ComplainIfMany<T>(this Query<T> query, string message = null) {
       T[] array;
       int count;
