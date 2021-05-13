@@ -6,6 +6,7 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 using Leap.Unity.Query;
@@ -59,6 +60,11 @@ namespace Leap.Unity.Infix {
     /// infinity. </summary>
     public static bool IsInfinity(this float f) {
       return float.IsPositiveInfinity(f) || float.IsNegativeInfinity(f);
+    }
+
+    /// <summary> Infix for Mathf.Sign(f). </summary>
+    public static float Sign(this float f) {
+      return Mathf.Sign(f);
     }
 
     #endregion
@@ -384,6 +390,36 @@ namespace Leap.Unity.Infix {
     /// Note that this method can be used to move up one level in the file hierarchy every time it is called. </summary>
     public static string GetDirectoryName(this string path) {
       return Path.GetDirectoryName(path);
+    }
+
+    #endregion
+
+    #region Array
+
+    /// <summary> Infix for array.Clone() that returns T[] instead of object. </summary>
+    public static T[] Cloned<T>(this T[] arr) {
+      return (T[])arr.Clone();
+    }
+
+    /// <summary> Infix for Array.IndexOf(arr, t). </summary>
+    public static int IndexOf<T>(this T[] arr, T t) {
+      return System.Array.IndexOf(arr, t);
+    }
+
+    /// <summary> Calls map for each element in src to write to the corresponding index in this array. Returns this array for chaining. </summary>
+    public static T[] CopyFromMap<T, U>(this T[] dst, U[] src, Func<U, T> map) {
+      for (var i = 0; i < dst.Length && i < src.Length; i++) {
+        dst[i] = map(src[i]);
+      }
+      return dst;
+    }
+
+    #endregion
+
+    #region Matrix
+
+    public static Vector3 GetPos(this Matrix4x4 m) {
+      return m.GetPosition();
     }
 
     #endregion
