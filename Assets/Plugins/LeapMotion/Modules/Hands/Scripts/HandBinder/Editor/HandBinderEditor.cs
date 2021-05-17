@@ -60,12 +60,11 @@ namespace Leap.Unity.HandsModule {
             useMetaBones = serializedObject.FindProperty("UseMetaBones");
             setEditorPose = serializedObject.FindProperty("SetEditorPose");
             globalFingerRotationOffset = serializedObject.FindProperty("GlobalFingerRotationOffset");
-            wristRotationOffset = serializedObject.FindProperty("wristRotationOffset");
-            handedness = serializedObject.FindProperty("handedness");
-            fineTuning = serializedObject.FindProperty("fineTuning");
-            debugOptions = serializedObject.FindProperty("debugOptions");
-            boundHand = serializedObject.FindProperty("boundHand");
-            offsets = serializedObject.FindProperty("offsets");
+            wristRotationOffset = serializedObject.FindProperty("WristRotationOffset");
+            fineTuning = serializedObject.FindProperty("FineTuning");
+            debugOptions = serializedObject.FindProperty("DebugOptions");
+            boundHand = serializedObject.FindProperty("BoundHand");
+            offsets = serializedObject.FindProperty("Offsets");
 
             buttonTexture = Resources.Load<Texture>("EditorDocumentationGreenUpstate");
             downstate = Resources.Load<Texture>("EditorDocumentationGreenDownstate");
@@ -221,7 +220,7 @@ namespace Leap.Unity.HandsModule {
 
                 for(int offsetIndex = 0; offsetIndex < offsets.arraySize; offsetIndex++) {
                     SerializedProperty boundType = offsets.GetArrayElementAtIndex(offsetIndex);
-                    BoundTypes previousBoundType = myTarget.offsets[offsetIndex];
+                    BoundTypes previousBoundType = myTarget.Offsets[offsetIndex];
                     SerializedProperty offsetProperty = BoundTypeToOffsetProperty((BoundTypes)boundType.intValue);
                     SerializedProperty offsetRotation = offsetProperty.FindPropertyRelative("rotation");
                     SerializedProperty offsetPosition = offsetProperty.FindPropertyRelative("position");
@@ -243,7 +242,7 @@ namespace Leap.Unity.HandsModule {
                     //Check to see if the user has changed the value
                     if((int)previousBoundType != boundType.intValue) {
                         //Check to see if any of the offsets are the same as this one
-                        if(myTarget.offsets.Any(x => (int)x == boundType.intValue)) {
+                        if(myTarget.Offsets.Any(x => (int)x == boundType.intValue)) {
                             boundType.intValue = (int)previousBoundType;
                         }
                         else {
@@ -276,7 +275,7 @@ namespace Leap.Unity.HandsModule {
                             enumList.Add(i);
                         }
 
-                        var result = enumList.Where(typeA => myTarget.offsets.All(typeB => (int)typeB != typeA)).FirstOrDefault();
+                        var result = enumList.Where(typeA => myTarget.Offsets.All(typeB => (int)typeB != typeA)).FirstOrDefault();
 
                         offset.intValue = result;
                     }
@@ -355,9 +354,9 @@ namespace Leap.Unity.HandsModule {
             //Draw the bound Gameobjects
             if(myTarget.DebugModelTransforms) {
                 Handles.color = handModelDebugCol;
-                for(int finger = 0; finger < myTarget.boundHand.fingers.Length; finger++) {
-                    for(int bone = 0; bone < myTarget.boundHand.fingers[finger].boundBones.Length; bone++) {
-                        var target = myTarget.boundHand.fingers[finger].boundBones[bone].boundTransform;
+                for(int finger = 0; finger < myTarget.BoundHand.fingers.Length; finger++) {
+                    for(int bone = 0; bone < myTarget.BoundHand.fingers[finger].boundBones.Length; bone++) {
+                        var target = myTarget.BoundHand.fingers[finger].boundBones[bone].boundTransform;
                         if(target != null) {
                             if(myTarget.DebugModelTransforms) {
                                 Handles.DrawWireDisc(target.position, target.right, myTarget.GizmoSize);
@@ -373,16 +372,16 @@ namespace Leap.Unity.HandsModule {
                 }
 
                 //Draw the wrist Gizmo
-                if(myTarget.boundHand.wrist.boundTransform != null) {
-                    var target = myTarget.boundHand.wrist.boundTransform;
+                if(myTarget.BoundHand.wrist.boundTransform != null) {
+                    var target = myTarget.BoundHand.wrist.boundTransform;
                     Handles.DrawWireDisc(target.position, target.right, myTarget.GizmoSize);
                     Handles.DrawWireDisc(target.position, target.up, myTarget.GizmoSize);
                     Handles.DrawWireDisc(target.position, target.forward, myTarget.GizmoSize);
                 }
 
                 //Draw the wrist Gizmo
-                if(myTarget.boundHand.elbow.boundTransform != null) {
-                    var target = myTarget.boundHand.elbow.boundTransform;
+                if(myTarget.BoundHand.elbow.boundTransform != null) {
+                    var target = myTarget.BoundHand.elbow.boundTransform;
                     Handles.DrawWireDisc(target.position, target.right, myTarget.GizmoSize);
                     Handles.DrawWireDisc(target.position, target.up, myTarget.GizmoSize);
                     Handles.DrawWireDisc(target.position, target.forward, myTarget.GizmoSize);
@@ -513,11 +512,11 @@ namespace Leap.Unity.HandsModule {
                 GUILayout.BeginVertical();
 
                 //Draw the wrist bone object field
-                DrawObjectField("WRIST : ", ref handBinder.boundHand.wrist);
+                DrawObjectField("WRIST : ", ref handBinder.BoundHand.wrist);
                 GUILayout.Space(spaceSize);
 
-                for(int fingerID = 0; fingerID < handBinder.boundHand.fingers.Length; fingerID++) {
-                    for(int boneID = 0; boneID < handBinder.boundHand.fingers[fingerID].boundBones.Length; boneID++) {
+                for(int fingerID = 0; fingerID < handBinder.BoundHand.fingers.Length; fingerID++) {
+                    for(int boneID = 0; boneID < handBinder.BoundHand.fingers[fingerID].boundBones.Length; boneID++) {
                         if((Finger.FingerType)fingerID == Finger.FingerType.TYPE_THUMB && (Bone.BoneType)boneID == Bone.BoneType.TYPE_METACARPAL) {
                             continue;
                         }
@@ -526,14 +525,14 @@ namespace Leap.Unity.HandsModule {
                         //var boneType = (fingerID == 0 ? boneID - 1: boneID).ToString();
 
                         var objectFieldName = ((fingerType + " " + boneType + " :").ToString());
-                        DrawObjectField(objectFieldName, ref handBinder.boundHand.fingers[fingerID].boundBones[boneID], true, fingerID, boneID);
+                        DrawObjectField(objectFieldName, ref handBinder.BoundHand.fingers[fingerID].boundBones[boneID], true, fingerID, boneID);
 
                     }
                     GUILayout.Space(spaceSize);
                 }
 
                 //Draw the Elbow bone object field
-                DrawObjectField("Elbow : ", ref handBinder.boundHand.elbow);
+                DrawObjectField("Elbow : ", ref handBinder.BoundHand.elbow);
                 GUILayout.Space(spaceSize);
 
                 GUILayout.EndVertical();
@@ -566,7 +565,7 @@ namespace Leap.Unity.HandsModule {
                 firstChildList = GetFirstChildren(newT, ref firstChildList);
                 for(int i = 0; i < firstChildList.Count; i++) {
                     if(boneID + i <= 3) {
-                        handBinder.boundHand.fingers[fingerID].boundBones[boneID + i] = HandBinderAutoBinder.AssignBoundBone(firstChildList[i]);
+                        handBinder.BoundHand.fingers[fingerID].boundBones[boneID + i] = HandBinderAutoBinder.AssignBoundBone(firstChildList[i]);
                     }
                 }
             }
@@ -641,15 +640,15 @@ namespace Leap.Unity.HandsModule {
             static public Transform[] FlattenHandBinderTransforms(HandBinder handBinder) {
                 var bones = new List<Transform>();
                 int index = 0;
-                for(int FINGERID = 0; FINGERID < handBinder.boundHand.fingers.Length; FINGERID++) {
-                    for(int BONEID = 0; BONEID < handBinder.boundHand.fingers[FINGERID].boundBones.Length; BONEID++) {
-                        var BONE = handBinder.boundHand.fingers[FINGERID].boundBones[BONEID];
+                for(int FINGERID = 0; FINGERID < handBinder.BoundHand.fingers.Length; FINGERID++) {
+                    for(int BONEID = 0; BONEID < handBinder.BoundHand.fingers[FINGERID].boundBones.Length; BONEID++) {
+                        var BONE = handBinder.BoundHand.fingers[FINGERID].boundBones[BONEID];
                         bones.Add(BONE.boundTransform);
                         index++;
                     }
                     index++;
                 }
-                bones.Add(handBinder.boundHand.wrist.boundTransform);
+                bones.Add(handBinder.BoundHand.wrist.boundTransform);
                 return bones.ToArray();
 
             }
