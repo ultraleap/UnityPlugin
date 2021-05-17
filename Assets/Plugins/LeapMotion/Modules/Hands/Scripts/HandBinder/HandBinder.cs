@@ -21,7 +21,7 @@ namespace Leap.Unity.HandsModule {
         [Tooltip("The length of the elbow to maintain the correct offset from the wrist")]
         public float elbowLength;
 
-        [Tooltip("The Rotation offset that will be assigned to all the Fingers")]
+        [Tooltip("The Rotation offset that will be assigned to all the fingers")]
         public Vector3 GlobalFingerRotationOffset;
         [Tooltip("The Rotation offset that will be assigned to the wrist")]
         public Vector3 wristRotationOffset;
