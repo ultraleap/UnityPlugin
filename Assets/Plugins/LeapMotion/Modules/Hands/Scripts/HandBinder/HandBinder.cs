@@ -43,6 +43,7 @@ namespace Leap.Unity.HandsModule {
         public bool FineTuning;
         public bool DebugOptions;
         public bool EditPoseNeedsResetting = false;
+        public Chirality Chirality;
 
         //The data structure that contains transforms that get bound to the leap data
         public BoundHand BoundHand = new BoundHand();
@@ -51,17 +52,10 @@ namespace Leap.Unity.HandsModule {
         //Stores all the childrens default pose
         public SerializedTransform[] DefaultHandPose;
 
-        public override Chirality Handedness { get { return handedness; } set { } }
-        public Chirality handedness;
+        public override Chirality Handedness { get { return Chirality; } set { } }
         public override ModelType HandModelType { get { return ModelType.Graphics; } }
-
-        public override Hand GetLeapHand() {
-            return LeapHand;
-        }
-
-        public override void SetLeapHand(Hand hand) {
-            LeapHand = hand;
-        }
+        public override Hand GetLeapHand() { return LeapHand;}
+        public override void SetLeapHand(Hand hand) { LeapHand = hand; }
 
         public override bool SupportsEditorPersistence() {
 

@@ -14,7 +14,7 @@ namespace Leap.Unity.HandsModule {
     /// Used to define what bones names are valid for each finger
     /// </summary>
     [System.Serializable]
-    public class BoneDefinitions {
+    public class BoneNameDefinitions {
         public string[] DefinitionThumb = { "thumb" };
         public string[] DefinitionIndex = { "index" };
         public string[] DefinitionMiddle = { "middle" };

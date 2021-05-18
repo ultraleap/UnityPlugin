@@ -26,7 +26,7 @@ namespace Leap.Unity.HandsModule {
         private Texture dividerLine;
         private Texture subButton;
 
-        private SerializedProperty handedness;
+        private SerializedProperty chirality;
         private SerializedProperty debugLeapHand;
         private SerializedProperty DebugLeapRotationAxis;
         private SerializedProperty gizmoSize;
@@ -50,7 +50,7 @@ namespace Leap.Unity.HandsModule {
         /// Assign the serialized properties
         /// </summary>
         private void SerializedProperties() {
-            handedness = serializedObject.FindProperty("handedness");
+            chirality = serializedObject.FindProperty("Chirality");
             debugLeapHand = serializedObject.FindProperty("DebugLeapHand");
             DebugLeapRotationAxis = serializedObject.FindProperty("DebugLeapRotationAxis");
             gizmoSize = serializedObject.FindProperty("GizmoSize");
@@ -77,10 +77,10 @@ namespace Leap.Unity.HandsModule {
             myTarget = (HandBinder)target;
 
             if(myTarget.gameObject.name.ToUpper().Contains("Left".ToUpper())) {
-                myTarget.handedness = Chirality.Left;
+                myTarget.Handedness = Unity.Chirality.Left;
             }
             if(myTarget.gameObject.name.ToUpper().Contains("Right".ToUpper())) {
-                myTarget.handedness = Chirality.Right;
+                myTarget.Handedness = Unity.Chirality.Right;
             }
 
             SerializedProperties();
@@ -126,7 +126,7 @@ namespace Leap.Unity.HandsModule {
         public override void OnInspectorGUI() {
             serializedObject.Update();
             SetUp();
-            GUIHandGraphic.DrawHandGraphic(myTarget.handedness, GUIHandGraphic.FlattenHandBinderTransforms(myTarget));
+            GUIHandGraphic.DrawHandGraphic(myTarget.Handedness, GUIHandGraphic.FlattenHandBinderTransforms(myTarget));
             DrawAutoBindButton();
             ShowBindingOptions();
             ShowDebugOptions();
@@ -149,7 +149,7 @@ namespace Leap.Unity.HandsModule {
 
         private void ShowBindingOptions() {
             EditorGUILayout.Space();
-            EditorGUILayout.PropertyField(handedness, new GUIContent("Hand Type", "Which hand does this binder target?"));
+            EditorGUILayout.PropertyField(chirality, new GUIContent("Hand Type", "Which hand does this binder target?"));
             EditorGUILayout.Space();
             setEditorPose.boolValue = GUILayout.Toggle(setEditorPose.boolValue, new GUIContent("Set Leap Editor Pose", "Should the Leap Editor Pose be used during Edit mode?"));
             useMetaBones.boolValue = GUILayout.Toggle(useMetaBones.boolValue, new GUIContent("Use Metacarpal Bones", "Does this binding require Metacarpal Bones?"));
@@ -474,7 +474,7 @@ namespace Leap.Unity.HandsModule {
             }
 
             void OnGUI() {
-                GUIHandGraphic.DrawHandGraphic(handBinder.handedness, GUIHandGraphic.FlattenHandBinderTransforms(handBinder));
+                GUIHandGraphic.DrawHandGraphic(handBinder.Handedness, GUIHandGraphic.FlattenHandBinderTransforms(handBinder));
                 DrawAutoBindButton();
                 scrollPosition = GUILayout.BeginScrollView(scrollPosition);
                 DrawObjectFields();
@@ -667,7 +667,7 @@ namespace Leap.Unity.HandsModule {
 
                 //Draw the hand texture
                 var handTextureRect = new Rect(midPoint, middleYOffset, handTexture.width, handTexture.height);
-                if(handedness == Chirality.Left) {
+                if(handedness == Unity.Chirality.Left) {
                     handTextureRect.x -= handTexture.width / 2;
                 }
                 else {
@@ -688,7 +688,7 @@ namespace Leap.Unity.HandsModule {
                         GUI.color = Color.green;
                         var pointRect = new Rect(midPoint, middleYOffset, handTexture.width, handTexture.height);
 
-                        if(handedness == Chirality.Left) {
+                        if(handedness == Unity.Chirality.Left) {
                             pointRect.center -= handPoints[index];
                         }
                         else {
@@ -706,7 +706,7 @@ namespace Leap.Unity.HandsModule {
                 GUI.color = Color.green;
                 var pRect = new Rect(midPoint, middleYOffset, handTexture.width, handTexture.height);
                 ;
-                if(handedness == Chirality.Left) {
+                if(handedness == Unity.Chirality.Left) {
                     pRect.center -= handPoints[index];
                 }
                 else {
@@ -730,7 +730,7 @@ namespace Leap.Unity.HandsModule {
 
                 //Draw the hand texture
                 var handTextureRect = new Rect(midPoint, middleYOffset, handTexture.width, handTexture.height);
-                if(handedness == Chirality.Left) {
+                if(handedness == Unity.Chirality.Left) {
                     handTextureRect.x -= handTexture.width / 2;
                 }
                 else {
@@ -750,7 +750,7 @@ namespace Leap.Unity.HandsModule {
 
                     var pointRect = new Rect(midPoint, middleYOffset, handTexture.width, handTexture.height);
 
-                    if(handedness == Chirality.Left) {
+                    if(handedness == Unity.Chirality.Left) {
                         pointRect.center -= handPoints[boneID];
                     }
                     else {
