@@ -24,7 +24,7 @@ namespace Leap.Unity.HandsModule {
         public static void AutoBind(HandBinder handBinder) {
 
             handBinder.ResetHand();
-            BoneDefinitions boneDefinitions = new BoneDefinitions();
+            BoneNameDefinitions boneDefinitions = new BoneNameDefinitions();
 
             //Get all children of the hand
             var children = new List<Transform>();
@@ -39,11 +39,11 @@ namespace Leap.Unity.HandsModule {
             var wrist = SelectBones(children, boneDefinitions.DefinitionWrist).FirstOrDefault();
             var elbow = SelectBones(children, boneDefinitions.DefinitionElbow).FirstOrDefault();
 
-            handBinder.BoundHand.fingers[0].boundBones = AssignUnityBone(thumbBones);
-            handBinder.BoundHand.fingers[1].boundBones = AssignUnityBone(indexBones);
-            handBinder.BoundHand.fingers[2].boundBones = AssignUnityBone(middleBones);
-            handBinder.BoundHand.fingers[3].boundBones = AssignUnityBone(ringBones);
-            handBinder.BoundHand.fingers[4].boundBones = AssignUnityBone(pinkyBones);
+            handBinder.BoundHand.fingers[0].boundBones = AssignTransformToBoundBone(thumbBones);
+            handBinder.BoundHand.fingers[1].boundBones = AssignTransformToBoundBone(indexBones);
+            handBinder.BoundHand.fingers[2].boundBones = AssignTransformToBoundBone(middleBones);
+            handBinder.BoundHand.fingers[3].boundBones = AssignTransformToBoundBone(ringBones);
+            handBinder.BoundHand.fingers[4].boundBones = AssignTransformToBoundBone(pinkyBones);
             handBinder.BoundHand.wrist = AssignBoundBone(wrist);
             handBinder.BoundHand.elbow = AssignBoundBone(elbow);
 
@@ -162,7 +162,7 @@ namespace Leap.Unity.HandsModule {
         /// <param name="boneIndex">The index of the bone you want to assign</param>
         /// <param name="handBinder">The Hand Binder this information will be added to</param>
         /// <returns></returns>
-        public static BoundBone[] AssignUnityBone(Transform[] boneTransform) {
+        public static BoundBone[] AssignTransformToBoundBone(Transform[] boneTransform) {
             var boundFingers = new BoundBone[]
                 {
                     AssignBoundBone(boneTransform[0]),
@@ -201,7 +201,7 @@ namespace Leap.Unity.HandsModule {
                 //Calculate model's rotation
                 var forward = (middleBone.position - wrist.position);
                 var right = (indexBone.position - pinkyBone.position);
-                if(handBinder.handedness == Chirality.Right) {
+                if(handBinder.Handedness == Chirality.Right) {
                     right = -right;
                 }
                 var up = Vector3.Cross(forward, right);

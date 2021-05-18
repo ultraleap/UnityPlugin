@@ -16,7 +16,7 @@ This page provides a detailed overview of how to use our new Hand Binder pipelin
 
 # Hand Binder {#hand-binder}
 
-The new Hand Binder Monobehavior script is the connection between leap motion data and the game objects you want to attach to finger bone.
+The new Hand Binder Monobehavior script is the connection between leap motion data and the game objects you want to attach to finger bones.
 
 Note: The hand binder is a complete overhaul of the previous Hand Rigging solution and is intended to replace it.
 
@@ -43,7 +43,7 @@ If the hand model you have doesn't have a clear naming convention, you can still
 
 **Use Metacarpal Bones** – does this hand have joints for metacarpal bones? If so, would you like to use them?
 
-**Set Bone Positions** – should each assigned Gameobjects position be set to match the position of the leap data?
+**Set Bone Positions** – should each assigned Gameobject's position be set to match the position of the leap data?
 
 <br />
 *Show Debug Options*
@@ -65,8 +65,8 @@ If the hand model you have doesn't have a clear naming convention, you can still
 
 **Global Finger Rotation Offset** – the rotation offset that is applied to rotate the model's fingers to the rotation of the leap finger data.
 
-**Wrist Rotation Offset** – the rotation offset that is applied to rotate the models wrist to the rotation of the leap wrist data.
+**Wrist Rotation Offset** – the rotation offset that is applied to rotate the model's wrist to the rotation of the leap wrist data.
 
 **Recalculate Offsets** – click this to have the script automatically calculate the rotation difference for you. This may require a couple of clicks for the rotation to be calculated and slight user adjustment to correctly calculate this.
 
-**Add Finger Offset** – ever wondered what your hand would look like with extra long fingers? Well now you can find out! Simply add a new finger offset, change the finger type and bone type to the bone you wish to adjust. Then fiddle with the position and rotation values until you get the desired effect.
+**Add Finger Offset** – ever wondered what your hand would look like with extra long fingers? Well now you can find out! Simply add a finger offset, change the finger type and bone type to the bone you wish to adjust. Then fiddle with the position and rotation values until you get the desired effect.
