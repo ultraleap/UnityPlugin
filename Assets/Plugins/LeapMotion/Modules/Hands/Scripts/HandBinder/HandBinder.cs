@@ -52,6 +52,7 @@ namespace Leap.Unity.HandsModule {
         //Stores all the childrens default pose
         public SerializedTransform[] DefaultHandPose;
 
+        //Custom editor requires Chirality in a non overridden property, Public Chirality exists for the editor.
         public override Chirality Handedness { get { return Chirality; } set { } }
         public override ModelType HandModelType { get { return ModelType.Graphics; } }
         public override Hand GetLeapHand() { return LeapHand;}
