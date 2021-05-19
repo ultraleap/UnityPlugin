@@ -25,9 +25,3 @@ These modules are **still compatible** as of Core 4.3.0, but may become unsuppor
   The examples in this module demonstrate scripts in Core that have been deprecated and removed in a future Core release, since most of their functionalities have been superseded by more recent Modules or Core features.
 
 [detection-utilities]: https://developer.leapmotion.com/releases/detection-examples-104 "(Deprecated) Detection Utilities"
-
-- [Graphic Renderer 0.1.3][graphic-renderer]
-
-  The Graphic Renderer was deprecated in 4.6.0 because its primary function (draw-call batching) is not necessary on desktop-class GPUs, which is currently our primary supported platform. Additionally, other tools for mobile UI optimization have matured since its inception, and Unity updates since its initial release have incrementally subsumed or broken its underlying functionality.
-
-[graphic-renderer]: https://developer.leapmotion.com/releases/graphic-renderer-013 "(Deprecated) Graphic Renderer"

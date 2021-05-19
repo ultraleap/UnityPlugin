@@ -27,6 +27,8 @@ For more details on upgrading modules, or if your project already contains older
   
 [Blocks]: https://www.youtube.com/watch?v=oZ_53T2jBGg "Leap Motion Blocks Demo"
 
+- With the @ref graphic-renderer, you can **render an entire curved, 3D, dynamic interface in 1-3 draw calls**. The Graphic Renderer can be used in tandem with the Interaction Engine; see @ref gr-plus-ie for details and a link to an example project.
+
 - The @ref hands-module provides the tools you need to rig your 3D hand assets to work with Leap hands, including the powerful @ref #hands-auto-rigging-tool.
 
 # Troubleshooting {#troubleshooting}
