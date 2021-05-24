@@ -33,7 +33,7 @@ If the hand model you have doesn't have a clear naming convention, you can still
 **Note:** You **DO NOT** have to assign every bone, the hand binder script is able to push data to one or all the bones of the hand.
 
 \htmlonly
-<video class="ie-hands-video" src="HandsModule_HandBinder_manualAssigning.webm" autoplay loop></video>
+<video class="ie-hands-video" src="HandsModule_HandBinder_Manual.webm" autoplay loop></video>
 \endhtmlonly
 
 # Understanding the Hand Binder Inspector {#understanding-the-hand-binder-inspector}
