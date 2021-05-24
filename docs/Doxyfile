@@ -1134,8 +1134,8 @@ HTML_EXTRA_FILES       = ./templates/resizeoverrides.js \
                          ./videos/Example_6_-_Dynamic_UI.webm \
                          ./videos/Example_7_-_Moving_Reference_Frames.webm \
                          ./videos/Example_8_-_Swap_Grasp.webm \
-			 ./videos/HandsModule_HandBinder_ManualAssigning.webm \
-			 ./videos/HandsModuleGuide.webm \
+                         ./videos/HandsModule_HandBinder_ManualAssigning.webm \
+                         ./videos/HandsModuleGuide.webm \
 
 # The HTML_COLORSTYLE_HUE tag controls the color of the HTML output. Doxygen
 # will adjust the colors in the style sheet and background images according to
