@@ -282,7 +282,7 @@ namespace Leap.Unity {
 
     private AndroidJavaObject _serviceBinder;
 
-    private void OnEnable()
+    protected void OnEnable()
     {
       AndroidJavaClass unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
       AndroidJavaObject activity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
@@ -301,7 +301,7 @@ namespace Leap.Unity {
       }
     }
 
-    void OnDisable()
+    protected void OnDisable()
     {
       Debug.Log("ServiceBinder.unbind...");
       _serviceBinder.Call("unbind");

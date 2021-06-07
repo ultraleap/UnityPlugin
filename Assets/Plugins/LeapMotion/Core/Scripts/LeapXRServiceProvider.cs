@@ -252,6 +252,10 @@ namespace Leap.Unity {
       Camera.onPreCull -= onPreCull; // No multiple-subscription.
       Camera.onPreCull += onPreCull;
       #endif
+
+      #if UNITY_ANDROID
+      base.OnEnable();
+      #endif
     }
 
     protected virtual void OnDisable() {
@@ -265,6 +269,10 @@ namespace Leap.Unity {
       }
       #else
       Camera.onPreCull -= onPreCull; // No multiple-subscription.
+      #endif
+
+      #if UNITY_ANDROID
+      base.OnDisable();
       #endif
     }
 
