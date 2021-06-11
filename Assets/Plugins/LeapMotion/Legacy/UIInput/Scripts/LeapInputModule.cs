@@ -223,6 +223,7 @@ namespace Leap.Unity.InputModule {
       }
 
       canvases = Resources.FindObjectsOfTypeAll<Canvas>();
+      for (int i = 0; i < canvases.Length; i++) if (canvases[i].worldCamera == null) canvases[i].worldCamera = Camera.main;
 
       //Set Projective/Tactile Modes
       if (InteractionMode == InteractionCapability.Projective) {
