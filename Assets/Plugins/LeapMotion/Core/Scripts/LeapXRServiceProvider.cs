@@ -115,20 +115,13 @@ namespace Leap.Unity {
     private Camera _mainCamera; // Redundant backing field, used to present value in editor at parent level
 
     public Camera mainCamera {
-      get {
-        if (_mainCameraProvider == null || MainCameraProvider.Instance != null || MainCameraProvider.Instance.mainCamera == null) {
-           return Camera.main;
-        } else {
-           return MainCameraProvider.Instance.mainCamera;
-        }
-      }
-
+      get { return MainCameraProvider.Instance.mainCamera; }
       set { MainCameraProvider.Instance.mainCamera = value; }
     }
 
-    [SerializeField]
-    [HideInInspector]
-    private MainCameraProvider _mainCameraProvider;
+//  [SerializeField]
+//  [HideInInspector]
+//  private MainCameraProvider _mainCameraProvider;
  
     // Temporal Warping
 #if UNITY_STANDALONE
