@@ -11,7 +11,7 @@ using UnityEngine.UI;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using System.Collections.Generic;
-using Assets.Plugins.UnityModules.Assets.Plugins.LeapMotion.Core.Scripts.XR;
+using Assets.Plugins.LeapMotion.Core.Scripts.XR;
 
 namespace Leap.Unity.InputModule {
   /** An InputModule that supports the use of Leap Motion tracking data for manipulating Unity UI controls. */

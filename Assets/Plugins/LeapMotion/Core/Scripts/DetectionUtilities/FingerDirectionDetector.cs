@@ -9,7 +9,7 @@
 using UnityEngine;
 using System.Collections;
 using Leap.Unity.Attributes;
-using Assets.Plugins.UnityModules.Assets.Plugins.LeapMotion.Core.Scripts.XR;
+using Assets.Plugins.LeapMotion.Core.Scripts.XR;
 
 namespace Leap.Unity {
   /**

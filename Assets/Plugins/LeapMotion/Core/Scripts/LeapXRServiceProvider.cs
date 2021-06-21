@@ -9,7 +9,7 @@
 using UnityEngine;
 using System;
 using Leap.Unity.Attributes;
-using Assets.Plugins.UnityModules.Assets.Plugins.LeapMotion.Core.Scripts.XR;
+using Assets.Plugins.LeapMotion.Core.Scripts.XR;
 using System.Runtime.Serialization;
 
 #if UNITY_2019_1_OR_NEWER

@@ -6,7 +6,7 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Assets.Plugins.UnityModules.Assets.Plugins.LeapMotion.Core.Scripts.XR;
+using Assets.Plugins.LeapMotion.Core.Scripts.XR;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;

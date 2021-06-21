@@ -12,7 +12,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using System;
 using System.Collections.Generic;
-using Assets.Plugins.UnityModules.Assets.Plugins.LeapMotion.Core.Scripts.XR;
+using Assets.Plugins.LeapMotion.Core.Scripts.XR;
 
 namespace Leap.Unity.InputModule {
   /** A physics-enabled button. Activation is triggered by physically pushing the button back to its unsprung position. 
