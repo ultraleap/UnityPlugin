@@ -27,7 +27,6 @@ namespace Assets.Plugins.LeapMotion.Core.Scripts.XR
                 isTemporaryInstance = true;
                 m_Instance = new GameObject("Temporary Instance of MainCameraProvider").GetComponent<MainCameraProvider>();
 
-                // Problem during the creation, this should not happen
                 if (m_Instance == null) {
                   Debug.LogError("Problem creating MainCameraProvider Instance");
                 }
@@ -54,7 +53,7 @@ namespace Assets.Plugins.LeapMotion.Core.Scripts.XR
             m_Instance = this as MainCameraProvider;
         }
         else if (m_Instance != this) {
-          Debug.LogError("Another instance of MainCameraProvider already exists!=. Destroying self...");
+          Debug.LogError("Another instance of MainCameraProvider already exists. Destroying self.");
           DestroyImmediate(this);
           return;
         }
@@ -72,7 +71,6 @@ namespace Assets.Plugins.LeapMotion.Core.Scripts.XR
     /// </summary>
     public virtual void Init() { }
 
-    /// Make sure the instance isn't referenced anymore when the user quits, just in case.
     private void OnApplicationQuit() {
       m_Instance = null;
     }
