@@ -6,6 +6,7 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
+using Assets.Plugins.UnityModules.Assets.Plugins.LeapMotion.Core.Scripts.XR;
 using UnityEngine;
 
 namespace Leap.Unity.Examples {
@@ -27,7 +28,7 @@ namespace Leap.Unity.Examples {
 
     public override void ProcessFrame(ref Frame inputFrame) {
       // Calculate the position of the head and the basis to calculate shoulder position.
-      if (headTransform == null) { headTransform = Camera.main.transform; }
+      if (headTransform == null) { headTransform = MainCameraProvider.Instance.mainCamera.transform; }
       Vector3 headPos = headTransform.position;
       var shoulderBasis = Quaternion.LookRotation(
         Vector3.ProjectOnPlane(headTransform.forward, Vector3.up),

@@ -6,6 +6,7 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
+using Assets.Plugins.UnityModules.Assets.Plugins.LeapMotion.Core.Scripts.XR;
 using Leap.Unity.Animation;
 using Leap.Unity.Interaction;
 using System.Collections;
@@ -300,13 +301,13 @@ namespace Leap.Unity.Examples {
     }
 
     private Vector3 determineWorkstationPosition() {
-      return workstationPositionFunc(Camera.main.transform.position, Camera.main.transform.rotation,
+      return workstationPositionFunc(MainCameraProvider.Instance.mainCamera.transform.position, MainCameraProvider.Instance.mainCamera.transform.rotation,
                                      _intObj.rigidbody.position, _intObj.rigidbody.velocity, 0.30F,
                                      _otherStationObjPositions, _otherStationObjRadii);
     }
 
     private Quaternion determineWorkstationRotation(Vector3 workstationPosition) {
-      return workstationRotationFunc(Camera.main.transform.position, workstationPosition);
+      return workstationRotationFunc(MainCameraProvider.Instance.mainCamera.transform.position, workstationPosition);
     }
 
     public static Vector3 DefaultDetermineWorkstationPosition(Vector3 userEyePosition, Quaternion userEyeRotation,

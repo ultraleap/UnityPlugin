@@ -9,6 +9,7 @@
 using UnityEngine;
 using System.Collections;
 using Leap.Unity.Attributes;
+using Assets.Plugins.UnityModules.Assets.Plugins.LeapMotion.Core.Scripts.XR;
 
 namespace Leap.Unity {
   /**
@@ -158,12 +159,12 @@ namespace Leap.Unity {
     private Vector3 selectedDirection(Vector3 tipPosition){
       switch(PointingType){
         case PointingType.RelativeToHorizon:
-          Quaternion cameraRot = Camera.main.transform.rotation;
+          Quaternion cameraRot = MainCameraProvider.Instance.mainCamera.transform.rotation;
           float cameraYaw = cameraRot.eulerAngles.y;
           Quaternion rotator = Quaternion.AngleAxis(cameraYaw, Vector3.up);
           return rotator * PointingDirection;
         case PointingType.RelativeToCamera:
-          return Camera.main.transform.TransformDirection(PointingDirection);
+          return MainCameraProvider.Instance.mainCamera.transform.TransformDirection(PointingDirection);
         case PointingType.RelativeToWorld:
           return PointingDirection;
         case PointingType.AtTarget:

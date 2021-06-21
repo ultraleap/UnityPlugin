@@ -9,6 +9,8 @@
 using UnityEngine;
 using System;
 using Leap.Unity.Attributes;
+using Assets.Plugins.UnityModules.Assets.Plugins.LeapMotion.Core.Scripts.XR;
+using System.Runtime.Serialization;
 
 #if UNITY_2019_1_OR_NEWER
 using UnityEngine.Rendering;
@@ -107,8 +109,28 @@ namespace Leap.Unity {
       set { _preCullCamera = value; }
     }
 
-    // Temporal Warping
+    [Tooltip("Specifies the main camera. Required for XR2 based platforms. "
+           + "Falls back to Camera.main if not set")]
+    [SerializeField, OnEditorChange("mainCamera")]
+    private Camera _mainCamera; // Redundant backing field, used to present value in editor at parent level
 
+    public Camera mainCamera {
+      get {
+        if (_mainCameraProvider == null || MainCameraProvider.Instance != null || MainCameraProvider.Instance.mainCamera == null) {
+           return Camera.main;
+        } else {
+           return MainCameraProvider.Instance.mainCamera;
+        }
+      }
+
+      set { MainCameraProvider.Instance.mainCamera = value; }
+    }
+
+    [SerializeField]
+    [HideInInspector]
+    private MainCameraProvider _mainCameraProvider;
+ 
+    // Temporal Warping
 #if UNITY_STANDALONE
     private const int DEFAULT_WARP_ADJUSTMENT = 17;
 #elif UNITY_ANDROID

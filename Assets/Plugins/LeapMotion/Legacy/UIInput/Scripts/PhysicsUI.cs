@@ -12,6 +12,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using System;
 using System.Collections.Generic;
+using Assets.Plugins.UnityModules.Assets.Plugins.LeapMotion.Core.Scripts.XR;
 
 namespace Leap.Unity.InputModule {
   /** A physics-enabled button. Activation is triggered by physically pushing the button back to its unsprung position. 
@@ -72,7 +73,7 @@ namespace Leap.Unity.InputModule {
     }
 
     void Update() {
-      pointerEvent.position = Camera.main.WorldToScreenPoint(ButtonFace.transform.position);
+      pointerEvent.position = MainCameraProvider.Instance.mainCamera.WorldToScreenPoint(ButtonFace.transform.position);
       if (physicsOccurred) {
         physicsOccurred = false;
 

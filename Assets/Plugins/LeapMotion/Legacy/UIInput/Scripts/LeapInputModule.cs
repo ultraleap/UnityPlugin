@@ -11,6 +11,7 @@ using UnityEngine.UI;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using System.Collections.Generic;
+using Assets.Plugins.UnityModules.Assets.Plugins.LeapMotion.Core.Scripts.XR;
 
 namespace Leap.Unity.InputModule {
   /** An InputModule that supports the use of Leap Motion tracking data for manipulating Unity UI controls. */
@@ -223,7 +224,7 @@ namespace Leap.Unity.InputModule {
       }
 
       canvases = Resources.FindObjectsOfTypeAll<Canvas>();
-      for (int i = 0; i < canvases.Length; i++) if (canvases[i].worldCamera == null) canvases[i].worldCamera = Camera.main;
+      for (int i = 0; i < canvases.Length; i++) if (canvases[i].worldCamera == null) canvases[i].worldCamera = MainCameraProvider.Instance.mainCamera;
 
       //Set Projective/Tactile Modes
       if (InteractionMode == InteractionCapability.Projective) {
@@ -310,8 +311,8 @@ namespace Leap.Unity.InputModule {
       timeEnteredCanvas = new float[NumberOfPointers];
 
       //Used for calculating the origin of the Projective Interactions
-      if (Camera.main != null) {
-        CurrentRotation = Camera.main.transform.rotation;
+      if (MainCameraProvider.Instance.mainCamera != null) {
+        CurrentRotation = MainCameraProvider.Instance.mainCamera.transform.rotation;
       } else {
         Debug.LogAssertion("Tag your Main Camera with 'MainCamera' for the UI Module");
       }
@@ -324,7 +325,7 @@ namespace Leap.Unity.InputModule {
 
     //Update the Head Yaw for Calculating "Shoulder Positions"
     void Update() {
-      if (Camera.main != null) {
+      if (MainCameraProvider.Instance.mainCamera != null) {
         Quaternion HeadYaw = Quaternion.Euler(0f, OldCameraRot.eulerAngles.y, 0f);
         CurrentRotation = Quaternion.Slerp(CurrentRotation, HeadYaw, 0.1f);
       }
@@ -336,9 +337,9 @@ namespace Leap.Unity.InputModule {
         (LeapDataProvider as LeapServiceProvider).RetransformFrames();
       }
 
-      OldCameraPos = Camera.main.transform.position;
-      OldCameraRot = Camera.main.transform.rotation;
-      //OldCameraFoV = Camera.main.fieldOfView;
+      OldCameraPos = MainCameraProvider.Instance.mainCamera.transform.position;
+      OldCameraRot = MainCameraProvider.Instance.mainCamera.transform.rotation;
+      //OldCameraFoV = MainCameraProvider.Instance.mainCamera.fieldOfView;
 
       //Send update events if there is a selected object
       //This is important for InputField to receive keyboard events
@@ -378,7 +379,7 @@ namespace Leap.Unity.InputModule {
 
         //Calculate Shoulder Positions (for Projection)
         Vector3 ProjectionOrigin = Vector3.zero;
-        if (Camera.main != null) {
+        if (MainCameraProvider.Instance.mainCamera != null) {
           switch (LeapDataProvider.CurrentFrame.Hands[whichHand].IsRight) {
             case true:
               ProjectionOrigin = OldCameraPos + CurrentRotation * new Vector3(0.15f, -0.2f, 0f);
@@ -438,7 +439,7 @@ namespace Leap.Unity.InputModule {
         PrevScreenPosition[whichPointer] = PointEvents[whichPointer].position;
 
         if (DrawDebug) {
-          PointerLines[whichPointer].SetPosition(0, Camera.main.transform.position);
+          PointerLines[whichPointer].SetPosition(0, MainCameraProvider.Instance.mainCamera.transform.position);
           PointerLines[whichPointer].SetPosition(1, Pointers[whichPointer].position);
         }
 
@@ -618,9 +619,9 @@ namespace Leap.Unity.InputModule {
 
       }
 
-      Camera.main.transform.position = OldCameraPos;
-      Camera.main.transform.rotation = OldCameraRot;
-      //Camera.main.fieldOfView = OldCameraFoV;
+      MainCameraProvider.Instance.mainCamera.transform.position = OldCameraPos;
+      MainCameraProvider.Instance.mainCamera.transform.rotation = OldCameraRot;
+      //MainCameraProvider.Instance.mainCamera.fieldOfView = OldCameraFoV;
     }
 
     //Raycast from the EventCamera into UI Space
@@ -663,7 +664,7 @@ namespace Leap.Unity.InputModule {
           float farthest = 0f;
           IndexFingerPosition = LeapDataProvider.CurrentFrame.Hands[whichHand].Fingers[1].TipPosition.ToVector3();
           for (int i = 1; i < 3; i++) {
-            float fingerDistance = Vector3.Distance(Camera.main.transform.position, LeapDataProvider.CurrentFrame.Hands[whichHand].Fingers[i].TipPosition.ToVector3());
+            float fingerDistance = Vector3.Distance(MainCameraProvider.Instance.mainCamera.transform.position, LeapDataProvider.CurrentFrame.Hands[whichHand].Fingers[i].TipPosition.ToVector3());
             float fingerExtension = Mathf.Clamp01(Vector3.Dot(LeapDataProvider.CurrentFrame.Hands[whichHand].Fingers[i].Direction.ToVector3(), LeapDataProvider.CurrentFrame.Hands[whichPointer].Direction.ToVector3())) / 1.5f;
             if (fingerDistance > farthest && fingerExtension > 0.5f) {
               farthest = fingerDistance;
@@ -676,19 +677,19 @@ namespace Leap.Unity.InputModule {
 
         //Else Raycast through the knuckle of the Index Finger
       } else {
-        Camera.main.transform.position = Origin;
+        MainCameraProvider.Instance.mainCamera.transform.position = Origin;
         IndexFingerPosition = LeapDataProvider.CurrentFrame.Hands[whichHand].Fingers[whichFinger].Bone(Bone.BoneType.TYPE_METACARPAL).Center.ToVector3();
       }
 
       //Draw Camera Origin
       if (DrawDebug)
-        DebugSphereQueue.Enqueue(Camera.main.transform.position);
+        DebugSphereQueue.Enqueue(MainCameraProvider.Instance.mainCamera.transform.position);
 
       //Set EventCamera's FoV
-      //Camera.main.fieldOfView = 179f;
+      //MainCameraProvider.Instance.mainCamera.fieldOfView = 179f;
 
       //Set the Raycast Direction and Delta
-      PointEvents[whichPointer].position = Vector2.Lerp(PrevScreenPosition[whichPointer], Camera.main.WorldToScreenPoint(IndexFingerPosition), 1.0f);//new Vector2(Screen.width / 2, Screen.height / 2);
+      PointEvents[whichPointer].position = Vector2.Lerp(PrevScreenPosition[whichPointer], MainCameraProvider.Instance.mainCamera.WorldToScreenPoint(IndexFingerPosition), 1.0f);//new Vector2(Screen.width / 2, Screen.height / 2);
       PointEvents[whichPointer].delta = (PointEvents[whichPointer].position - PrevScreenPosition[whichPointer]) * -10f;
       PointEvents[whichPointer].scrollDelta = Vector2.zero;
 
@@ -869,8 +870,8 @@ namespace Leap.Unity.InputModule {
     void evaluatePointerSize(int whichPointer) {
       //Use the Scale AnimCurve to Evaluate the Size of the Pointer
       float PointDistance = 1f;
-      if (Camera.main != null) {
-        PointDistance = (Pointers[whichPointer].position - Camera.main.transform.position).magnitude;
+      if (MainCameraProvider.Instance.mainCamera != null) {
+        PointDistance = (Pointers[whichPointer].position - MainCameraProvider.Instance.mainCamera.transform.position).magnitude;
       }
 
       float Pointerscale = PointerDistanceScale.Evaluate(PointDistance);

@@ -9,6 +9,7 @@
 using UnityEngine;
 using System.Collections;
 using Leap.Unity.Attributes;
+using Assets.Plugins.UnityModules.Assets.Plugins.LeapMotion.Core.Scripts.XR;
 
 namespace Leap.Unity {
   /** 
@@ -59,7 +60,7 @@ namespace Leap.Unity {
 
     void Update() {
       if (fadedIn > 0) {
-        Camera cam = Camera.main;
+        Camera cam = MainCameraProvider.Instance.mainCamera;
         Vector3 pos = cam.transform.position + cam.transform.forward * distanceToCamera;
         transform.position = pos;
         transform.LookAt(cam.transform);
