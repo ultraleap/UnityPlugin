@@ -1,0 +1,12 @@
+stages:
+  - build
+
+# Trigger build of core.unitypackage
+build::build-unity-packages:
+  stage: build
+  rules:
+    - if: $CI_COMMIT_BRANCH == "android-integration"
+      when: manual
+  trigger:
+    project: creative/ci/libtrack
+    branch: main
