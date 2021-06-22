@@ -10,3 +10,4 @@ build::build-unity-packages:
   trigger:
     project: creative/ci/libtrack
     branch: main
+    
