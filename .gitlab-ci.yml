@@ -1,7 +1,6 @@
 stages:
   - build
 
-# Trigger build of core.unitypackage
 build::build-unity-packages:
   stage: build
   rules:
