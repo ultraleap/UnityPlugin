@@ -4,7 +4,7 @@ stages:
 build::build-unity-packages:
   stage: build
   rules:
-    - if: $CI_COMMIT_BRANCH == "android-integration"
+    - if: $CI_COMMIT_BRANCH == "feature/android-integration"
       when: manual
   trigger:
     project: creative/ci/libtrack
