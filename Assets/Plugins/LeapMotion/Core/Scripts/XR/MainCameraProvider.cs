@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace Assets.Plugins.LeapMotion.Core.Scripts.XR
+namespace Leap.Unity
 {
     /// <summary>
     /// Singleton class to provide access to the main camera. Based on public singleton implementations
