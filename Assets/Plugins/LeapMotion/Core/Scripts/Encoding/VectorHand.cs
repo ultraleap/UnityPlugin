@@ -185,7 +185,7 @@ namespace Leap.Unity.Encoding {
         grabStrength:           0.5f,
         grabAngle:              100f,
         pinchStrength:          0.5f,
-        pinchDistance:          50f,
+        pinchDistance:          (jointPositions[4] - jointPositions[9]).magnitude * 1000,
         palmWidth:              0.085f,
         isLeft:                 isLeft,
         timeVisible:            1f,
