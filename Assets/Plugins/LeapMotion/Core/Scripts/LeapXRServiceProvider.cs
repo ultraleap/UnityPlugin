@@ -117,10 +117,6 @@ namespace Leap.Unity {
       get { return MainCameraProvider.Instance.mainCamera; }
       set { MainCameraProvider.Instance.mainCamera = value; }
     }
-
-//  [SerializeField]
-//  [HideInInspector]
-//  private MainCameraProvider _mainCameraProvider;
  
     // Temporal Warping
 #if UNITY_STANDALONE
