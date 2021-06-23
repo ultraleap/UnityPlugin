@@ -219,7 +219,7 @@ namespace Leap.Unity.Encoding {
     /// the camera-local hand rotation uses 4 bytes, and each joint position component is
     /// encoded in hand-local space using 3 bytes.
     /// </summary>
-    public int numBytesRequired { get { return 86; } }
+    public int numBytesRequired { get { return 92; } }
     public const int NUM_BYTES = 86;
     
     /// <summary>
@@ -248,7 +248,7 @@ namespace Leap.Unity.Encoding {
       // Palm position and rotation.
       for (int i = 0; i < 3; i++) {
         palmPos[i] = Convert.ToSingle(
-                       BitConverterNonAlloc.ToInt16(bytes, ref offset))
+                       BitConverterNonAlloc.ToInt32(bytes, ref offset))
                      / 4096f;
       }
       palmRot = Utils.DecompressBytesToQuat(bytes, ref offset);
@@ -287,7 +287,7 @@ namespace Leap.Unity.Encoding {
       
       // Palm position, each component compressed 
       for (int i = 0; i < 3; i++) {
-        BitConverterNonAlloc.GetBytes(Convert.ToInt16(palmPos[i] * 4096f),
+        BitConverterNonAlloc.GetBytes(Convert.ToInt32(palmPos[i] * 4096f),
                                       bytesToFill,
                                       ref offset);
       }
