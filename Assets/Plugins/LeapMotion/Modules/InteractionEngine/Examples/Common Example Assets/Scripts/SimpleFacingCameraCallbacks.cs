@@ -30,7 +30,7 @@ namespace Leap.Unity.Examples {
     }
 
     private void initialize() {
-      if(cameraToFace == null) { cameraToFace = Camera.main; }
+      if(cameraToFace == null) { cameraToFace = MainCameraProvider.Instance.mainCamera; }
       // Set "_isFacingCamera" to be whatever the current state ISN'T, so that we are
       // guaranteed to fire a UnityEvent on the first initialized Update().
       _isFacingCamera = !GetIsFacingCamera(toFaceCamera, cameraToFace);
