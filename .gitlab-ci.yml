@@ -14,5 +14,5 @@ trigger::trigger-downstream:
       allow_failure: false
 
   trigger:
-    project: creative/ci/uhi/unity
+    project: xr/integrations/ci/unitymodules
     branch: main
