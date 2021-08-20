@@ -1,0 +1,35 @@
+{
+  "name": "com.ultraleap.tracking",
+  "displayName": "Ultraleap Tracking",
+  "version": "4.9.0",
+  "unity": "2019.4",
+  "type": "library",
+  "description": "Ultraleap Tracking",
+  "keywords": [
+    "haptics",
+    "ultraleap"
+  ],
+  "readme": "Ultraleap",
+  "author": {
+    "name": "Ultraleap",
+    "email": "contact@ultraleap.com",
+    "url": "https://www.ultraleap.com"
+  },
+  "samples": [
+    {
+      "displayName": "Core Examples",
+      "description": "",
+      "path": "Examples~/Core Examples"
+    },
+    {
+      "displayName": "Hands Examples",
+      "description": "",
+      "path": "Examples~/Hands Examples"
+    },
+    {
+      "displayName": "InteractionEngine Examples",
+      "description": "",
+      "path": "Examples~/Interaction Engine Examples"
+    }
+  ]
+}
