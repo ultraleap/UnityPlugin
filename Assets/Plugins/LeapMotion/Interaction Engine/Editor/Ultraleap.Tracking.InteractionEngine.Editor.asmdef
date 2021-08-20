@@ -1,0 +1,21 @@
+{
+    "name": "Ultraleap.Tracking.InteractionEngine.Editor",
+    "rootNamespace": "",
+    "references": [
+        "GUID:2ee0542102ac1084e8d9a910885c1e81",
+        "GUID:cec9848704c49724192ff47f9b3e9156",
+        "GUID:db4e617c04f44c144bc19216a63dd19b",
+        "GUID:3a12b97a7afaf6b47bfe53cf1f942886"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
