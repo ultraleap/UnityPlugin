@@ -1,7 +1,8 @@
 {
     "name": "Ultraleap.Tracking.Core",
     "references": [
-        "GUID:2ee0542102ac1084e8d9a910885c1e81"
+        "GUID:2ee0542102ac1084e8d9a910885c1e81",
+        "GUID:ba171b3dd2a51234ab864770f99741a5"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
@@ -16,5 +17,6 @@
             "expression": "1.0",
             "define": "XR_LEGACY_INPUT_AVAILABLE"
         }
-    ]
+    ],
+    "noEngineReferences": false
 }
