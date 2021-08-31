@@ -7,7 +7,7 @@
  ******************************************************************************/
 
 using System;
-using Leap.Unity.Infix;
+using Leap.Unity.Drawing;
 using Leap.Unity.RuntimeGizmos;
 using UnityEngine;
 

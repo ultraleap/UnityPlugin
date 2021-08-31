@@ -6,11 +6,9 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
+using Leap.Unity.Drawing;
 using Leap.Unity.Infix;
-using Leap.Unity.RuntimeGizmos;
 using UnityEngine;
-
-// using Drawer = Leap.Unity.RuntimeGizmos.RuntimeGizmoDrawer;
 
 namespace Leap.Unity.Geometry {
 

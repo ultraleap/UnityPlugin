@@ -11,7 +11,7 @@ using System.Collections.Generic;
 using Leap.Unity.Infix;
 using UnityEngine;
 
-namespace Leap.Unity {
+namespace Leap.Unity.Drawing {
 
   /// <summary> Simple drawing interface abstraction (intended for debug drawing,
   /// not production!) with statically-accessible backend implementations via 

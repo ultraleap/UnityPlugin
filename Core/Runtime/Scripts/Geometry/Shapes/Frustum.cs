@@ -6,8 +6,7 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Leap.Unity.Attributes;
-using Leap.Unity.Infix;
+using Leap.Unity.Drawing;
 using UnityEngine;
 
 namespace Leap.Unity.Geometry {
