@@ -1,4 +1,5 @@
 stages:
+  - headers
   - trigger
 
 trigger::trigger-downstream:
@@ -12,6 +13,8 @@ trigger::trigger-downstream:
     - if: $CI_COMMIT_BRANCH != "main"
       when: manual
       allow_failure: false
+  variables:
+    UPSTREAM_COMMIT_BRANCH: $CI_COMMIT_BRANCH
 
   trigger:
     project: xr/integrations/ci/unitymodules
