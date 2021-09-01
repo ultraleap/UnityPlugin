@@ -20,4 +20,3 @@ trigger::trigger-downstream:
   trigger:
     project: xr/integrations/ci/unityplugin
     branch: main
-    
