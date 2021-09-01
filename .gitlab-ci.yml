@@ -6,15 +6,16 @@ trigger::trigger-downstream:
   stage: trigger
   inherit:
     variables: false
+ 
   rules:
-    - if: $CI_COMMIT_BRANCH == "main"
+    - if: $CI_COMMIT_REF_NAME == "main"
       when: always
       allow_failure: false
-    - if: $CI_COMMIT_BRANCH != "main"
+    - if: $CI_COMMIT_REF_NAME != "main"
       when: manual
       allow_failure: false
   variables:
-    UPSTREAM_COMMIT_BRANCH: $CI_COMMIT_BRANCH
+    UPSTREAM_COMMIT_BRANCH: $CI_COMMIT_REF_NAME 
 
   trigger:
     project: xr/integrations/ci/unitymodules
