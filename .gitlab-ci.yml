@@ -18,6 +18,6 @@ trigger::trigger-downstream:
     UPSTREAM_COMMIT_BRANCH: $CI_COMMIT_BRANCH 
 
   trigger:
-    project: xr/integrations/ci/unitymodules
+    project: xr/integrations/ci/unityplugin
     branch: main
     
