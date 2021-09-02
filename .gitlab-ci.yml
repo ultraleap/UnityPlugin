@@ -13,6 +13,7 @@ trigger::trigger-downstream:
       allow_failure: false
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
       when: always
+      strategy: depend
       allow_failure: false
     - if: $CI_COMMIT_BRANCH != "main"
       when: manual
