@@ -1,0 +1,46 @@
+stages:
+  - trigger
+
+trigger::trigger-downstream:
+  stage: trigger
+  inherit:
+    variables: false
+    
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      when: never
+
+    - if: $UPSTREAM_COMMIT_BRANCH == "windows/legacy" && $CI_PIPELINE_SOURCE == "pipeline"
+      when: always
+      allow_failure: false
+
+    - if: $CI_COMMIT_BRANCH == "windows/legacy"
+      when: manual
+      allow_failure: false
+
+  variables:
+    UPSTREAM_COMMIT_BRANCH: $CI_COMMIT_BRANCH 
+
+  trigger:
+    project: xr/integrations/ci/unityplugin
+    branch: windows/legacy
+
+
+trigger::trigger-downstream-merge-request:
+  stage: trigger
+  inherit:
+    variables: false
+ 
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      when: always
+      allow_failure: false
+
+  variables:
+    UPSTREAM_COMMIT_BRANCH: $CI_COMMIT_BRANCH 
+
+  trigger:
+    project: xr/integrations/ci/unityplugin
+    branch: windows/legacy
+    strategy: depend
+    

@@ -1,0 +1,74 @@
+# -----------------------------------------------------------------------------
+# Create output for skylight
+# ----------------------------------------------------------------------------
+
+build-skylight::unitypackage:
+  stage: build-skylight
+  tags:
+    - unity
+    - win10
+  timeout: 2h
+  rules:
+    - if: $CI_COMMIT_REF_NAME == "skylight/legacy"
+      when: always
+      allow_failure: false
+
+  variables:
+    LIBTRACK_ROOT_URL: "https://gitlab.ultrahaptics.com/api/v4/projects/leap-v5-platform%2Flibtrack"
+    WINDOWS_JOB: "WinRelDebProdLTS"
+    UPSTREAM_PLUGINS_ROOT: "Assets/Plugins/LeapMotion/Core/Plugins"
+    UNITY_LOG_FILE: "./Unity_build.log"
+
+  before_script:
+    - if (Test-Path -Path $ARTIFACTS_PATH/core.unitypackage) { Remove-Item $ARTIFACTS_PATH/core.unitypackage }
+
+    - !reference [.initialise-repository, script]
+
+  script:
+    - if (Test-Path -Path "$ARTIFACTS_PATH") { ls $ARTIFACTS_PATH } else { echo "creating... $ARTIFACTS_PATH"; mkdir "$ARTIFACTS_PATH" }
+
+    ## Initial setup
+    - $env:PATH += ';C:\Program Files\7-Zip'
+    - if (Test-Path "C:/build_machine_info.txt") { Get-Content "C:/build_machine_info.txt" }
+
+    ## Get Unity version and changeset from the project.
+    - $line = Get-Content $PROJECT_PATH/ProjectSettings/ProjectVersion.txt | Select -Index 1
+    - $UNITY_VERSION = $line -Split " " | Select -Index 1
+    - $UNITY_PATH = "C:/Unity/$UNITY_VERSION/Editor/Unity.exe"
+
+    ## Work out where to pull Libtrack assets from
+    - | 
+      if($UPSTREAM_BRANCH_REF)
+      { $LIBTRACK_URL = "$LIBTRACK_ROOT_URL/jobs/artifacts/$UPSTREAM_BRANCH_REF/raw" }
+      else
+      { $LIBTRACK_URL = "$LIBTRACK_ROOT_URL/jobs/artifacts/$LIBTRACK_BRANCH/raw" }
+      
+      if($UPSTREAM_WINDOWS_RELEASE_JOB_NAME)
+      { $LIBTRACK_WINDOWS_JOB = $UPSTREAM_WINDOWS_RELEASE_JOB_NAME }
+      else
+      { $LIBTRACK_WINDOWS_JOB = $WINDOWS_JOB }
+
+    # Download LeapC DLL
+    - echo "$LIBTRACK_URL/VisualizerDependencies.zip?job=$LIBTRACK_WINDOWS_JOB"
+    - if (-not (Test-Path -Path "temp/")) { echo "creating... temp"; New-Item "temp/" -Type Directory }
+    - Invoke-RestMethod -Headers @{"PRIVATE-TOKEN"="$LIBTRACK_ACCESS_TOKEN"} -Uri "$LIBTRACK_URL/VisualizerDependencies.zip?job=$LIBTRACK_WINDOWS_JOB" -OutFile "temp.zip"
+    - if (Test-Path "temp.zip") { } else { echo "Error downloading full artifact archive"; exit 1; }
+    - Expand-Archive -Path "temp.zip" -DestinationPath "temp/"
+    - Copy-Item "temp/VisualizerDependencies/LeapC.dll" -Destination "$PROJECT_PATH/$UPSTREAM_PLUGINS_ROOT/x86_64/LeapC.dll" -Force
+    - Remove-Item -path "$PROJECT_PATH/$UPSTREAM_PLUGINS_ROOT/x86/*" -Recurse -Force #32-bit no longer supported
+    
+    # Tidy up
+    - Remove-Item -path "temp/*" -Recurse -Force
+   
+    # Build the project, output package requires absolute path
+    - $process = Start-Process -Wait -PassThru -FilePath "$UNITY_PATH" -ArgumentList "-batchmode -quit -logFile $CI_PROJECT_DIR/$ARTIFACTS_PATH/skylight.log -projectPath `"$UPSTREAM_MODULES_PATH`" -exportPackage `"Assets/Plugins/LeapMotion/Core`" `"$CI_PROJECT_DIR/$ARTIFACTS_PATH/core.unitypackage`""
+    - echo $process.ExitCode
+    - if (-not ($process.ExitCode -eq 0)) { exit $process.ExitCode }
+
+  artifacts:
+    name: "Unity"
+    paths:
+      - "$ARTIFACTS_PATH/core.unitypackage"
+      - "$ARTIFACTS_PATH/skylight.log"
+    when: always
+    expire_in: never
