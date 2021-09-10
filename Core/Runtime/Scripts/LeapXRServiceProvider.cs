@@ -245,7 +245,7 @@ namespace Leap.Unity {
     //       }
     //     }
 
-    protected virtual void OnEnable() {
+    protected override void OnEnable() {
       resetShaderTransforms();
 
       if (preCullCamera == null) {
@@ -276,7 +276,7 @@ namespace Leap.Unity {
       #endif
     }
 
-    protected virtual void OnDisable() {
+    protected override void OnDisable() {
       resetShaderTransforms();
 
       #if UNITY_2019_1_OR_NEWER

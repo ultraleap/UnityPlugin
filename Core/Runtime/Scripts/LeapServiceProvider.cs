@@ -286,7 +286,7 @@ namespace Leap.Unity {
         AndroidJavaObject context;
         ServiceCallbacks serviceCallbacks;
 
-        protected void OnEnable()
+        protected virtual void OnEnable()
         {
             CreateAndroidBinding();
         }
@@ -335,7 +335,7 @@ namespace Leap.Unity {
             return false;
         }
 
-        protected void OnDisable()
+        protected virtual void OnDisable()
         {
             if (_serviceBinder != null)
             {
