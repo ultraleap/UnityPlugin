@@ -312,7 +312,8 @@ namespace Leap.Unity {
     protected override void Update() {
       manualUpdateHasBeenCalledSinceUpdate = false;
       base.Update();
-      imageTimeStamp = _leapController.FrameTimestamp();
+      if(_leapController != null)
+          imageTimeStamp = _leapController.FrameTimestamp();
     }
 
     void LateUpdate() {
@@ -378,6 +379,11 @@ namespace Leap.Unity {
         return;
       }
       #endif
+
+      if(_cachedCamera == null || _leapController == null)
+      {
+        return;
+      }
 
       Pose trackedPose;
       if (_deviceOffsetMode == DeviceOffsetMode.Default
