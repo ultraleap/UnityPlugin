@@ -9,7 +9,6 @@
 using Leap.Unity;
 using Leap.Unity.Query;
 using UnityEngine;
-using Pose = Leap.Unity.Pose;
 
 namespace Leap.Examples
 {
@@ -141,17 +140,17 @@ namespace Leap.Examples
                                    Pose targetPose, float deltaTime)
         {
             // Calculate motion from prevPose to curPose.
-            var deltaPose = curPose.inverse * prevPose; // prevPose in curPose's local space.
+            var deltaPose = curPose.inverse().mul(prevPose); // prevPose in curPose's local space.
             deltaPose = new Pose(-deltaPose.position, Quaternion.Inverse(deltaPose.rotation));
-            deltaPose = Pose.Lerp(deltaPose, Pose.identity, damping * deltaTime); // Dampen.
+            deltaPose = deltaPose.Lerp(Pose.identity, damping * deltaTime); // Dampen.
 
             // Verlet-integrate curPose based on the delta from prevPose.
             Pose tempPose = curPose;
-            curPose = curPose * deltaPose;
+            curPose = curPose.mul(deltaPose);
             prevPose = tempPose;
 
             // Pull the integrated hand toward the target a little bit based on stiffness.
-            curPose = Pose.Lerp(curPose, targetPose, stiffness * deltaTime);
+            curPose = curPose.Lerp(targetPose, stiffness * deltaTime);
         }
     }
 }

@@ -8,7 +8,6 @@
 
 using Leap.Unity;
 using UnityEngine;
-using Pose = Leap.Unity.Pose;
 
 namespace Leap.InteractionEngine.Examples
 {
@@ -21,7 +20,7 @@ namespace Leap.InteractionEngine.Examples
 
         private void OnEnable()
         {
-            _selfToTargetPose = this.transform.ToPose().inverse * target.transform.ToPose();
+            _selfToTargetPose = this.transform.ToPose().inverse().mul(target.transform.ToPose());
         }
 
         private void Start()
@@ -39,7 +38,7 @@ namespace Leap.InteractionEngine.Examples
 
         private void Update()
         {
-            target.transform.SetPose(this.transform.ToPose() * _selfToTargetPose);
+            target.transform.SetPose(this.transform.ToPose().mul(_selfToTargetPose));
         }
 
     }
