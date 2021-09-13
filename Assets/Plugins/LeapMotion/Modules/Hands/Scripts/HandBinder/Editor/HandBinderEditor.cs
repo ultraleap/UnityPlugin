@@ -142,6 +142,7 @@ namespace Leap.Unity.HandsModule {
                 window.titleContent = new GUIContent("Binding Window");
                 window.autoRepaintOnSceneChange = true;
                 window.Show();
+                window.minSize = new Vector2(600, 900);
             }
             EditorGUILayout.Space();
         }
@@ -386,9 +387,6 @@ namespace Leap.Unity.HandsModule {
                     Handles.DrawWireDisc(target.position, target.forward, myTarget.GizmoSize);
                 }
             }
-
-            //Updates the scene so that it gets refreshed independently of the inspector
-            SceneView.RepaintAll();
         }
 
         private void DrawLeapBasis(Leap.Bone bone, float size) {

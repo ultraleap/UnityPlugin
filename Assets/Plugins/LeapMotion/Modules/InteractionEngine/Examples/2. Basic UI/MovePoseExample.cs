@@ -16,7 +16,7 @@ namespace Leap.Unity.Interaction.Examples {
     private Pose _selfToTargetPose = Pose.identity;
 
     private void OnEnable() {
-      _selfToTargetPose = this.transform.ToPose().inverse * target.transform.ToPose();
+      _selfToTargetPose = this.transform.ToPose().inverse().mul(target.transform.ToPose());
     }
 
     private void Start() {
@@ -32,7 +32,7 @@ namespace Leap.Unity.Interaction.Examples {
     }
 
     private void Update() {
-      target.transform.SetPose(this.transform.ToPose() * _selfToTargetPose);
+      target.transform.SetPose(this.transform.ToPose().mul(_selfToTargetPose));
     }
 
   }

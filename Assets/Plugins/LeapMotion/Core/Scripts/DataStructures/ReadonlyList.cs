@@ -53,5 +53,8 @@ namespace Leap.Unity {
     public int IndexOf(T item) {
       return _list.IndexOf(item);
     }
+
+    /// <summary> Converts the ReadonlyList{T} reference back to a List{T}. Useful to use extension methods that accept Lists but not ReadonlyLists, but be careful, this makes the underlying data writeable again and could go against the grain of another author's API. Intended to allow calling Query() ops on APIs that expose ReadonlyLists instead of Lists. </summary>
+    public List<T> asList { get { return _list; } }
   }
 }

@@ -276,7 +276,7 @@ namespace Leap.Unity {
       _basisColors[2] = zColor;
 
       var bipyramid = new Geometry.Bipyramid(a: Vector3.zero, b: Vector3.zero,
-        polySegments: 16, lengthFraction: 0.5f, overrideMatrix: pose.matrix);
+        polySegments: 16, lengthFraction: 0.5f, overrideMatrix: pose.matrix());
       for (var bIdx = 0; bIdx < 3; bIdx++) {
         var b = Vector3.zero; b[bIdx] = length;
         bipyramid.b = b;

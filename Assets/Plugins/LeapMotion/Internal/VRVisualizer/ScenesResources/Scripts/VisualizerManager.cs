@@ -21,15 +21,15 @@ namespace Leap.Unity.VRVisualizer{
     public UnityEngine.UI.Text m_dataFrameRateText;
 
     public KeyCode keyToSwitchViewMode = KeyCode.V;
-  
-    private Controller m_controller = null;
-    private bool m_leapConnected = false;
 
-    private SmoothedFloat m_deltaTime;
-    private int m_framrateUpdateCount = 0;
-    private int m_framerateUpdateInterval = 30;
+    protected Controller m_controller = null;
+    protected bool m_leapConnected = false;
 
-    private const bool m_startInScreenTopViewMode = false;
+    protected SmoothedFloat m_deltaTime;
+    protected int m_framrateUpdateCount = 0;
+    protected int m_framerateUpdateInterval = 30;
+
+    protected bool m_startInScreenTopViewMode = false;
 
     private void FindController() {
       LeapServiceProvider provider = FindObjectOfType<LeapServiceProvider>();

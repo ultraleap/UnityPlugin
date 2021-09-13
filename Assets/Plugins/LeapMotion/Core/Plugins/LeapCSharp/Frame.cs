@@ -161,7 +161,7 @@ namespace Leap {
     /// new spaces are filled with hands taken from the hand pool.  If the pool is
     /// empty, new hands are constructed instead.
     /// </summary>
-    internal void ResizeHandList(int count) {
+    public void ResizeHandList(int count) {
       if (_handPool == null) {
         _handPool = new Queue<Hand>();
       }
