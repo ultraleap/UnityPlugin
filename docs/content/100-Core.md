@@ -15,7 +15,7 @@ Utilizing non-allocating libraries is crucial for VR development, where garbage 
 
 # Setting up your development environment
 
-Our [developer SDK][devsdk] includes the installer that can get an Ultraleap tracking service running on your platform. You'll need a Ultraleap tracking service to handle the communication between your tracking hardware, your development machine, and your application.
+Our [developer SDK][devsdk] includes the installer that can get an Ultraleap tracking service running on your platform. You'll need an Ultraleap tracking service to handle the communication between your tracking hardware, your development machine, and your application.
 
 [devsdk]: https://developer.leapmotion.com/get-started/ "Get Started with Hand Tracking"
 
