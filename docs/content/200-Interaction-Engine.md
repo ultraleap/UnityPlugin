@@ -34,7 +34,7 @@ When you add an [InteractionBehaviour][ref_InteractionBehaviour] component to an
 
 The first example in the Interaction Engine package showcases the default behavior of a handful of different objects when they first become interaction objects.
 
-[devsite]: https://developer.leapmotion.com/unity "Ultraleap Plugin for Unity on the Ultraleap for Developes site"
+[devsite]: https://developer.leapmotion.com/unity "Ultraleap Plugin for Unity on the Ultraleap for Developers site"
 [blocks]: https://www.youtube.com/watch?v=oZ_53T2jBGg&t=1m11s "Ultraleap / Leap Motion Blocks demo"
 [rigidbody]: https://docs.unity3d.com/ScriptReference/Rigidbody.html
 [collider]: https://docs.unity3d.com/ScriptReference/Collider.html
