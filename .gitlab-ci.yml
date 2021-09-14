@@ -12,11 +12,11 @@ trigger::trigger-downstream:
       when: always
       allow_failure: false
 
-    - if: $CI_COMMIT_BRANCH == "main"
+    - if: $UPSTREAM_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == "pipeline"
       when: always
       allow_failure: false
 
-    - if: $CI_COMMIT_BRANCH != "main"
+    - if: $CI_COMMIT_BRANCH == "main"
       when: manual
       allow_failure: false
 
