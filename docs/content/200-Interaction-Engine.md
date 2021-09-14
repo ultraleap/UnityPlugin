@@ -34,8 +34,8 @@ When you add an [InteractionBehaviour][ref_InteractionBehaviour] component to an
 
 The first example in the Interaction Engine package showcases the default behavior of a handful of different objects when they first become interaction objects.
 
-[devsite]: https://developer.leapmotion.com/unity "Leap Motion Unity Developer site"
-[blocks]: https://www.youtube.com/watch?v=oZ_53T2jBGg&t=1m11s "Leap Motion Blocks demo"
+[devsite]: https://developer.leapmotion.com/unity "Ultraleap Plugin for Unity on the Ultraleap for Developers site"
+[blocks]: https://www.youtube.com/watch?v=oZ_53T2jBGg&t=1m11s "Ultraleap / Leap Motion Blocks demo"
 [rigidbody]: https://docs.unity3d.com/ScriptReference/Rigidbody.html
 [collider]: https://docs.unity3d.com/ScriptReference/Collider.html
 
@@ -46,7 +46,7 @@ If you haven't already, import @ref core and the Interaction Engine into your Un
 - Download the latest Core package from [our developer site][devsite].
 - Download the latest Interaction Engine package from [our developer site][devsite].
 - Import both packages. To import a `.unitypackage` file, double-click on it while your project is open, or go to `Assets -> Import Package...` and choose the package.
-- If you see errors, make sure your project has the latest version of Core (one section up), and that your project was opened using Unity 5.6 or later.
+- If you see errors, make sure your project has the latest version of Core (one section up), and that your project was opened using Unity 2019.4 or later.
 
 ## Update the Physics timestep and gravity!
 
@@ -63,9 +63,9 @@ If you don't already have a Leap-enabled XR camera rig to your scene, you can fo
 
 If you aren't familiar with Leap-enabled XR rigs, check out @ref xr-rig-setup.
 
-It is possible to use a custom camera rig in combination with Leap Motion. If you'd like to use something other than the **Leap Rig** prefab, you should make sure you have a camera tagged MainCamera in your scene, and that it has children with the same components and linkages that you can find beneath the Camera object in the **Leap Rig** prefab. Note that the Interaction Engine on its own does not render hands, it only instantiates physical representations of hands.
+It is possible to use a custom camera rig in combination with Ultraleap tracking. If you'd like to use something other than the **Leap Rig** prefab, you should make sure you have a camera tagged MainCamera in your scene, and that it has children with the same components and linkages that you can find beneath the Camera object in the **Leap Rig** prefab. Note that the Interaction Engine on its own does not render hands, it only instantiates physical representations of hands.
 
-At Leap, we tend to put player-centric scripts in dedicated GameObjects that are siblings of the Main Camera object. For example, the AttachmentHands script offers a convenient way to attach arbitrary objects to any of the joints in a Leap hand representation, and it belongs in such a sibling GameObject. To create AttachmentHands for use in your scene, you would:
+At Ultraleap, we tend to put player-centric scripts in dedicated GameObjects that are siblings of the Main Camera object. For example, the AttachmentHands script offers a convenient way to attach arbitrary objects to any of the joints in a Leap hand representation, and it belongs in such a sibling GameObject. To create AttachmentHands for use in your scene, you would:
 - Create a new GameObject in your scene
 - Rename it `Attachment Hands`
 - Drag it into the Rig object so that it sits beneath your Rig object
@@ -85,7 +85,7 @@ Helpful diagrams and axis labels can be found in [Unity's documentation][unity-d
 
 The examples folder (`LeapMotion/Modules/InteractionEngine/Examples`) contains a series of example scenes that demonstrate the features of the Interaction Engine.
 
-Many of the examples can be used with Leap hands via the Leap Motion Controller *or* with any XR controller that Unity provides built-in support for, such as Oculus Touch controllers or Vive controllers.
+Many of the examples can be used with Leap hands via Ultraleap tracking cameras *or* with any XR controller that Unity provides built-in support for, such as Oculus Touch controllers or Vive controllers.
 
 ## Example 1: Interaction Objects 101
 
@@ -435,4 +435,4 @@ Two-hand-grasping interactions are not fully realistic yet with out-of-the-box I
 
 Head over to [the developer forum][devforum] and post your question! We'll see how we can help.
 
-[devforum]: https://community.leapmotion.com/c/development "Leap Motion Developer Forums"
+[devforum]: https://community.leapmotion.com/c/development "Ultraleap / Leap Motion Developer Forums"
