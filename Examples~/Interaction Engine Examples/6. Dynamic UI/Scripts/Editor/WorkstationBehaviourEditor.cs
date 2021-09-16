@@ -7,6 +7,7 @@
  ******************************************************************************/
 
 using Leap.Unity;
+using Leap.Unity.Examples;
 using UnityEditor;
 using UnityEngine;
 

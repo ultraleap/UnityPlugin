@@ -40,13 +40,21 @@ namespace Leap.Unity {
     /// The maximum number of times the provider will 
     /// attempt to reconnect to the service before giving up.
     /// </summary>
+    #if UNITY_ANDROID
+    protected const int MAX_RECONNECTION_ATTEMPTS = 10;
+    #else
     protected const int MAX_RECONNECTION_ATTEMPTS = 5;
+    #endif
 
     /// <summary>
     /// The number of frames to wait between each
     /// reconnection attempt.
     /// </summary>
+    #if UNITY_ANDROID
+    protected const int RECONNECTION_INTERVAL = 360;
+    #else
     protected const int RECONNECTION_INTERVAL = 180;
+    #endif
 
     #endregion
 
@@ -267,6 +275,39 @@ namespace Leap.Unity {
       }
     }
 
+    #endregion
+
+    #region Android Support
+    #if UNITY_ANDROID
+
+    private AndroidJavaObject _serviceBinder;
+
+    protected void OnEnable()
+    {
+      AndroidJavaClass unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
+      AndroidJavaObject activity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
+      AndroidJavaObject context = activity.Call<AndroidJavaObject>("getApplicationContext");
+      ServiceCallbacks serviceCallbacks = new ServiceCallbacks();
+      _serviceBinder = new AndroidJavaObject("com.ultraleap.tracking.service_binder.ServiceBinder", context, serviceCallbacks);
+
+      bool bindStatus = _serviceBinder.Call<bool>("bind");
+      if (bindStatus)
+      {
+        Debug.Log("ServiceBinder.bind : succeeded.");
+      }
+      else
+      {
+        Debug.LogWarning("ServiceBinder.bind : failed!");
+      }
+    }
+
+    protected void OnDisable()
+    {
+      Debug.Log("ServiceBinder.unbind...");
+      _serviceBinder.Call("unbind");
+    }
+
+    #endif
     #endregion
 
     #region Unity Events
@@ -532,7 +573,7 @@ namespace Leap.Unity {
     /// Stops the connection for the existing instance of a Controller, clearing old
     /// policy flags and resetting the Controller to null.
     /// </summary>
-    protected void destroyController() {
+    public void destroyController() {
       if (_leapController != null) {
         if (_leapController.IsConnected) {
           _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP);
