@@ -1,5 +1,9 @@
 fileFormatVersion: 2
+<<<<<<< HEAD:Core/Editor/Utils/StringPathUtils.cs.meta
 guid: f0ffe27de8e9040bd8951b44e7388d45
+=======
+guid: 838854aa7ccad33498e3dc1bf367bbfe
+>>>>>>> 87b7f922 (Updated to use UPM structure):Core/Runtime/Scripts/Utils/ServiceCallbacks.cs.meta
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
