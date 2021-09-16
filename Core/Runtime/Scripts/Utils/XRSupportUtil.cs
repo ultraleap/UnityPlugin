@@ -15,13 +15,87 @@ using UnityEngine.XR;
 using UnityEngine.VR;
 #endif
 
-namespace Leap.Unity {
+namespace Leap.Unity
+{
 
   /// <summary>
   /// Wraps various (but not all) "XR" calls with Unity 5.6-supporting "VR" calls
-  /// via #ifdefs.
-  /// </summary>
+  // via #ifdefs.
+  // </summary>
   public static class XRSupportUtil {
+
+     // There is no support planned for Unity's XR plugin system on XR2 devices using the Unity SnapDragon XR SDK
+     // The XR2 implementation therefore calls into the SVR plugin directly
+
+     if UNITY_ANDROID // In future we should target XR2 devices only with this. However, at the moment Android support is limited to XR2 devices only
+
+     public static bool IsXREnabled() {
+         return SvrManager.Instance.status.running && SvrManager.Instance.status.pose == 3;
+     }
+
+     public static bool IsXRDevicePresent() {
+         return SvrManager.Instance.status.running;
+     }
+
+     public static bool IsUserPresent(bool defaultPresence = true) {
+         return true; // TODO user presence can be queried with recent versions of the SVR SDK (>= v4.0.4) - a proximity detector is fitted to some devices.
+     }
+
+     public static Vector3 GetXRNodeCenterEyeLocalPosition() {
+         if (XRSupportUtil.IsXREnabled()) {
+             return SvrManager.Instance.head.transform.localPosition;
+         } else {
+             Debug.LogWarning("Cannot read XRNodeCenterEyeLocalPosition as XR is not enabled");
+             return Vector3.zero;
+         }
+     }
+
+     public static Quaternion GetXRNodeCenterEyeLocalRotation() {
+         if (XRSupportUtil.IsXREnabled()) {
+             return SvrManager.Instance.head.transform.localRotation;
+         } else {
+             Debug.LogWarning("Cannot read XRNodeCenterEyeLocalRotation as XR is not enabled");
+             return Quaternion.identity;
+         }
+     }
+
+     // The following methods / fields are part of the XRSupportUtil 'interface' but are not currently used. They have not been implemented for the XR2/Android
+
+     //public static Vector3 GetXRNodeHeadLocalPosition() {
+     //}
+
+     //public static Quaternion GetXRNodeHeadLocalRotation() {
+     //}
+
+     //public static Vector3 GetXRNodeLocalPosition(int node) {
+     //}
+
+     //public static Quaternion GetXRNodeLocalRotation(int node) {
+     //}
+
+     public static void Recenter() {
+         SvrInput.Instance.HandleRecenter();
+     }
+
+     public static string GetLoadedDeviceName() {
+         return "XR2_Device";
+     }
+
+     public static bool IsRoomScale() {
+         return true;
+     }
+
+     public static bool IsLargePlayspace() {
+         // The current SVR support for reading the playspace dimensions is crude. Likely to be improved on by 3rd parties
+         // By default, we should consider the current playspace as 'large'
+         return true;
+     }
+
+     // The following methods / fields are part of the XRSupportUtil 'interface' but are not currently used. They have not been implemented for the XR2/Android
+     // public static float GetGPUTime() {
+     // }
+
+    #else
 
     #if UNITY_2019_2_OR_NEWER
     private static System.Collections.Generic.List<XRNodeState> nodeStates = 
@@ -268,6 +342,6 @@ namespace Leap.Unity {
       return gpuTime;
     }
 
-  }
-
+    #endif
+    }
 }

@@ -122,7 +122,7 @@ namespace Leap.Unity {
 #if UNITY_STANDALONE
     private const int DEFAULT_WARP_ADJUSTMENT = 17;
 #elif UNITY_ANDROID
-    private const int DEFAULT_WARP_ADJUSTMENT = 45;
+    private const int DEFAULT_WARP_ADJUSTMENT = 35; // Tuned for XR2 on a Morpheus SKU3
 #else
     private const int DEFAULT_WARP_ADJUSTMENT = 17;
 #endif
@@ -196,13 +196,21 @@ namespace Leap.Unity {
     protected Vector3 warpedPosition = Vector3.zero;
     protected Quaternion warpedRotation = Quaternion.identity;
     protected Matrix4x4[] _transformArray = new Matrix4x4[2];
+
+    #if !UNITY_ANDROID
     private Pose? _trackingBaseDeltaPose = null;
+    #endif
 
     private Camera _cachedCamera;
     private Camera cachedCamera {
       get {
         if (_cachedCamera == null) {
-          _cachedCamera = GetComponent<Camera>();
+
+            #if UNITY_ANDROID
+           _cachedCamera = mainCamera;
+            #else
+           _cachedCamera = GetComponent<Camera>();
+            #endif
         }
         return _cachedCamera;
       }
@@ -378,6 +386,10 @@ namespace Leap.Unity {
         trackedPose = new Pose(XRSupportUtil.GetXRNodeCenterEyeLocalPosition(),
                                XRSupportUtil.GetXRNodeCenterEyeLocalRotation());
 
+        #if UNITY_ANDROID
+        // There is no camera in the SVR prefab that is effectively at the centre position - only
+        // eye left and eye right. In this case, don't calculate a delta
+        #else
         // If we don't know of any pose offset yet, account for it by finding
         // the pose delta from the "local" tracked pose to the actual camera
         // pose.
@@ -385,6 +397,7 @@ namespace Leap.Unity {
           _trackingBaseDeltaPose = _cachedCamera.transform.ToLocalPose().mul(
                                       trackedPose.inverse());
         }
+
         // This way, we always track a scene-space tracked pose.
         trackedPose = _trackingBaseDeltaPose.Value.mul(trackedPose);
       }
@@ -462,6 +475,7 @@ namespace Leap.Unity {
           && updateTemporalCompensation
           && transformHistory.history.IsFull
           && _temporalWarpingMode != TemporalWarpingMode.Off) {
+
         transformHistory.SampleTransform(timestamp
                                          - (long)(warpingAdjustment * 1000f)
                                          - (_temporalWarpingMode ==
