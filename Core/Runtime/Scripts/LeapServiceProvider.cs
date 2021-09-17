@@ -109,13 +109,13 @@ namespace Leap.Unity {
     [EditTimeOnly]
     protected TrackingOptimizationMode _trackingOptimization = TrackingOptimizationMode.Desktop;
 
-    #if UNITY_2017_3_OR_NEWER
+#if UNITY_2017_3_OR_NEWER
     [Tooltip("When checked, profiling data from the LeapCSharp worker thread will be used to populate the UnityProfiler.")]
     [EditTimeOnly]
-    #else
+#else
     [Tooltip("Worker thread profiling requires a Unity version of 2017.3 or greater.")]
     [Disable]
-    #endif
+#endif
     [SerializeField]
     protected bool _workerThreadProfiling = false;
 
@@ -131,13 +131,13 @@ namespace Leap.Unity {
 
     // Extrapolate on Android to compensate for the latency introduced by its graphics
     // pipeline.
-    #if UNITY_ANDROID && !UNITY_EDITOR
+#if UNITY_ANDROID && !UNITY_EDITOR
     protected int ExtrapolationAmount = 15;
     protected int BounceAmount = 70;
-    #else
+#else
     protected int ExtrapolationAmount = 0;
     protected int BounceAmount = 0;
-    #endif
+#endif
 
     protected Controller _leapController;
     protected bool _isDestroyed;
@@ -237,7 +237,7 @@ namespace Leap.Unity {
 
     public override Frame CurrentFrame {
       get {
-    #if UNITY_EDITOR
+        #if UNITY_EDITOR
         if (!Application.isPlaying) {
           _editTimeFrame.Hands.Clear();
           _untransformedEditTimeFrame.Hands.Clear();
@@ -246,11 +246,10 @@ namespace Leap.Unity {
           transformFrame(_untransformedEditTimeFrame, _editTimeFrame);
           return _editTimeFrame;
         }
-    #endif
+        #endif
         if (_frameOptimization == FrameOptimizationMode.ReusePhysicsForUpdate) {
           return _transformedFixedFrame;
-        }
-        else {
+        } else {
           return _transformedUpdateFrame;
         }
       }
@@ -258,7 +257,7 @@ namespace Leap.Unity {
 
     public override Frame CurrentFixedFrame {
       get {
-    #if UNITY_EDITOR
+        #if UNITY_EDITOR
         if (!Application.isPlaying) {
           _editTimeFrame.Hands.Clear();
           _untransformedEditTimeFrame.Hands.Clear();
@@ -267,7 +266,7 @@ namespace Leap.Unity {
           transformFrame(_untransformedEditTimeFrame, _editTimeFrame);
           return _editTimeFrame;
         }
-    #endif
+        #endif
         if (_frameOptimization == FrameOptimizationMode.ReuseUpdateForPhysics) {
           return _transformedUpdateFrame;
         }
@@ -363,13 +362,13 @@ namespace Leap.Unity {
 
       if (!checkConnectionIntegrity()) { return; }
 
-    #if UNITY_EDITOR
+#if UNITY_EDITOR
       if (UnityEditor.EditorApplication.isCompiling) {
         UnityEditor.EditorApplication.isPlaying = false;
         Debug.LogWarning("Unity hot reloading not currently supported. Stopping Editor Playback.");
         return;
       }
-    #endif
+#endif
 
       _fixedOffset.Update(Time.time - Time.fixedTime, Time.deltaTime);
 
@@ -379,10 +378,10 @@ namespace Leap.Unity {
       }
 
       if (_useInterpolation) {
-    #if !UNITY_ANDROID || UNITY_EDITOR
+#if !UNITY_ANDROID || UNITY_EDITOR
         _smoothedTrackingLatency.value = Mathf.Min(_smoothedTrackingLatency.value, 30000f);
         _smoothedTrackingLatency.Update((float)(_leapController.Now() - _leapController.FrameTimestamp()), Time.deltaTime);
-    #endif
+#endif
         long timestamp = CalculateInterpolationTime() + (ExtrapolationAmount * 1000);
         _unityToLeapOffset = timestamp - (long)(Time.time * S_TO_NS);
 
@@ -496,12 +495,12 @@ namespace Leap.Unity {
     /// Returns the Leap Controller instance.
     /// </summary>
     public Controller GetLeapController() {
-    #if UNITY_EDITOR
+      #if UNITY_EDITOR
       // Null check to deal with hot reloading.
       if (!_isDestroyed && _leapController == null) {
         createController();
       }
-    #endif
+      #endif
       return _leapController;
     }
 
@@ -529,7 +528,7 @@ namespace Leap.Unity {
     /// that only exist on the LeapXRServiceProvider.
     /// </summary>
     public void CopySettingsToLeapXRServiceProvider(
-    LeapXRServiceProvider leapXRServiceProvider) {
+      LeapXRServiceProvider leapXRServiceProvider) {
       leapXRServiceProvider._interactionVolumeVisualization = _interactionVolumeVisualization;
       leapXRServiceProvider._frameOptimization = _frameOptimization;
       leapXRServiceProvider._physicsExtrapolation = _physicsExtrapolation;
@@ -542,16 +541,16 @@ namespace Leap.Unity {
     #region Internal Methods
 
     protected virtual long CalculateInterpolationTime(bool endOfFrame = false) {
-    #if UNITY_ANDROID && !UNITY_EDITOR
+      #if UNITY_ANDROID && !UNITY_EDITOR
       return _leapController.Now() - 16000;
-    #else
+      #else
       if (_leapController != null) {
         return _leapController.Now() - (long)_smoothedTrackingLatency.value;
       }
       else {
         return 0;
       }
-    #endif
+      #endif
     }
 
     /// <summary>
@@ -566,13 +565,11 @@ namespace Leap.Unity {
         _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_DEFAULT);
         _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP);
         _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
-      }
-      else if (_trackingOptimization == TrackingOptimizationMode.ScreenTop) {
+      } else if (_trackingOptimization == TrackingOptimizationMode.ScreenTop) {
         _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_DEFAULT);
         _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
         _leapController.SetPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP);
-      }
-      else if (_trackingOptimization == TrackingOptimizationMode.HMD) {
+      } else if (_trackingOptimization == TrackingOptimizationMode.HMD) {
         _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_DEFAULT);
         _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP);
         _leapController.SetPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
@@ -603,8 +600,7 @@ namespace Leap.Unity {
 
       if (_leapController.IsConnected) {
         initializeFlags();
-      }
-      else {
+      } else {
         _leapController.Device += onHandControllerConnect;
       }
 
@@ -647,8 +643,7 @@ namespace Leap.Unity {
         _framesSinceServiceConnectionChecked = 0;
         _numberOfReconnectionAttempts = 0;
         return true;
-      }
-      else if (_numberOfReconnectionAttempts < MAX_RECONNECTION_ATTEMPTS) {
+      } else if (_numberOfReconnectionAttempts < MAX_RECONNECTION_ATTEMPTS) {
         _framesSinceServiceConnectionChecked++;
 
         if (_framesSinceServiceConnectionChecked > RECONNECTION_INTERVAL) {
