@@ -41,7 +41,7 @@ namespace Leap.Unity {
     /// attempt to reconnect to the service before giving up.
     /// </summary>
 #if UNITY_ANDROID
-        protected const int MAX_RECONNECTION_ATTEMPTS = 10;
+    protected const int MAX_RECONNECTION_ATTEMPTS = 10;
 #else
     protected const int MAX_RECONNECTION_ATTEMPTS = 5;
 #endif
@@ -51,7 +51,7 @@ namespace Leap.Unity {
     /// reconnection attempt.
     /// </summary>
 #if UNITY_ANDROID
-        protected const int RECONNECTION_INTERVAL = 360;
+    protected const int RECONNECTION_INTERVAL = 360;
 #else
     protected const int RECONNECTION_INTERVAL = 180;
 #endif
@@ -110,8 +110,8 @@ namespace Leap.Unity {
     protected TrackingOptimizationMode _trackingOptimization = TrackingOptimizationMode.Desktop;
 
 #if UNITY_2017_3_OR_NEWER
-        [Tooltip("When checked, profiling data from the LeapCSharp worker thread will be used to populate the UnityProfiler.")]
-        [EditTimeOnly]
+    [Tooltip("When checked, profiling data from the LeapCSharp worker thread will be used to populate the UnityProfiler.")]
+    [EditTimeOnly]
 #else
     [Tooltip("Worker thread profiling requires a Unity version of 2017.3 or greater.")]
     [Disable]
@@ -165,69 +165,67 @@ namespace Leap.Unity {
     /// </summary>
     public event Action<Device> OnDeviceSafe {
       add {
-        if (_leapController != null && _leapController.IsConnected) {
-          foreach (var device in _leapController.Devices) {
-            value(device);
-          }
-        }
-        _onDeviceSafe += value;
+      if (_leapController != null && _leapController.IsConnected) {
+      foreach (var device in _leapController.Devices) {
+      value(device);
+      }
+      }
+      _onDeviceSafe += value;
       }
       remove {
-        _onDeviceSafe -= value;
+      _onDeviceSafe -= value;
       }
     }
 
 #if UNITY_EDITOR
-        private Frame _backingUntransformedEditTimeFrame = null;
+    private Frame _backingUntransformedEditTimeFrame = null;
     private Frame _untransformedEditTimeFrame {
       get {
-        if (_backingUntransformedEditTimeFrame == null) {
-                    _backingUntransformedEditTimeFrame = new Frame();
-                }
-                return _backingUntransformedEditTimeFrame;
-            }
-        }
-        private Frame _backingEditTimeFrame = null;
+      if (_backingUntransformedEditTimeFrame == null) {
+      _backingUntransformedEditTimeFrame = new Frame();
+      }
+      return _backingUntransformedEditTimeFrame;
+      }
+    }
+    private Frame _backingEditTimeFrame = null;
     private Frame _editTimeFrame {
       get {
-        if (_backingEditTimeFrame == null) {
-                    _backingEditTimeFrame = new Frame();
-                }
-                return _backingEditTimeFrame;
-            }
-        }
+      if (_backingEditTimeFrame == null) {
+      _backingEditTimeFrame = new Frame();
+      }
+      return _backingEditTimeFrame;
+      }
+    }
 
-        private Dictionary<TestHandFactory.TestHandPose, Hand> _cachedLeftHands
-          = new Dictionary<TestHandFactory.TestHandPose, Hand>();
+    private Dictionary<TestHandFactory.TestHandPose, Hand> _cachedLeftHands
+      = new Dictionary<TestHandFactory.TestHandPose, Hand>();
     private Hand _editTimeLeftHand {
       get {
-                Hand cachedHand = null;
-        if (_cachedLeftHands.TryGetValue(editTimePose, out cachedHand)) {
-                    return cachedHand;
-                }
-        else {
-                    cachedHand = TestHandFactory.MakeTestHand(isLeft: true, pose: editTimePose);
-                    _cachedLeftHands[editTimePose] = cachedHand;
-                    return cachedHand;
-                }
-            }
-        }
+      Hand cachedHand = null;
+      if (_cachedLeftHands.TryGetValue(editTimePose, out cachedHand)) {
+      return cachedHand;
+      } else {
+      cachedHand = TestHandFactory.MakeTestHand(isLeft: true, pose: editTimePose);
+      _cachedLeftHands[editTimePose] = cachedHand;
+      return cachedHand;
+      }
+      }
+    }
 
-        private Dictionary<TestHandFactory.TestHandPose, Hand> _cachedRightHands
-          = new Dictionary<TestHandFactory.TestHandPose, Hand>();
+    private Dictionary<TestHandFactory.TestHandPose, Hand> _cachedRightHands
+      = new Dictionary<TestHandFactory.TestHandPose, Hand>();
     private Hand _editTimeRightHand {
       get {
-                Hand cachedHand = null;
-        if (_cachedRightHands.TryGetValue(editTimePose, out cachedHand)) {
-                    return cachedHand;
-                }
-        else {
-                    cachedHand = TestHandFactory.MakeTestHand(isLeft: false, pose: editTimePose);
-                    _cachedRightHands[editTimePose] = cachedHand;
-                    return cachedHand;
-                }
-            }
-        }
+      Hand cachedHand = null;
+      if (_cachedRightHands.TryGetValue(editTimePose, out cachedHand)) {
+      return cachedHand;
+      } else {
+      cachedHand = TestHandFactory.MakeTestHand(isLeft: false, pose: editTimePose);
+      _cachedRightHands[editTimePose] = cachedHand;
+      return cachedHand;
+      }
+      }
+    }
 
 #endif
 
@@ -238,40 +236,40 @@ namespace Leap.Unity {
     public override Frame CurrentFrame {
       get {
 #if UNITY_EDITOR
-        if (!Application.isPlaying) {
-                    _editTimeFrame.Hands.Clear();
-                    _untransformedEditTimeFrame.Hands.Clear();
-                    _untransformedEditTimeFrame.Hands.Add(_editTimeLeftHand);
-                    _untransformedEditTimeFrame.Hands.Add(_editTimeRightHand);
-                    transformFrame(_untransformedEditTimeFrame, _editTimeFrame);
-                    return _editTimeFrame;
-                }
+      if (!Application.isPlaying) {
+      _editTimeFrame.Hands.Clear();
+      _untransformedEditTimeFrame.Hands.Clear();
+      _untransformedEditTimeFrame.Hands.Add(_editTimeLeftHand);
+      _untransformedEditTimeFrame.Hands.Add(_editTimeRightHand);
+      transformFrame(_untransformedEditTimeFrame, _editTimeFrame);
+      return _editTimeFrame;
+      }
 #endif
-        if (_frameOptimization == FrameOptimizationMode.ReusePhysicsForUpdate) {
-          return _transformedFixedFrame;
-        } else {
-          return _transformedUpdateFrame;
-        }
+      if (_frameOptimization == FrameOptimizationMode.ReusePhysicsForUpdate) {
+      return _transformedFixedFrame;
+      } else {
+      return _transformedUpdateFrame;
+      }
       }
     }
 
     public override Frame CurrentFixedFrame {
       get {
 #if UNITY_EDITOR
-        if (!Application.isPlaying) {
-                    _editTimeFrame.Hands.Clear();
-                    _untransformedEditTimeFrame.Hands.Clear();
-                    _untransformedEditTimeFrame.Hands.Add(_editTimeLeftHand);
-                    _untransformedEditTimeFrame.Hands.Add(_editTimeRightHand);
-                    transformFrame(_untransformedEditTimeFrame, _editTimeFrame);
-                    return _editTimeFrame;
-                }
+      if (!Application.isPlaying) {
+      _editTimeFrame.Hands.Clear();
+      _untransformedEditTimeFrame.Hands.Clear();
+      _untransformedEditTimeFrame.Hands.Add(_editTimeLeftHand);
+      _untransformedEditTimeFrame.Hands.Add(_editTimeRightHand);
+      transformFrame(_untransformedEditTimeFrame, _editTimeFrame);
+      return _editTimeFrame;
+      }
 #endif
-        if (_frameOptimization == FrameOptimizationMode.ReuseUpdateForPhysics) {
-          return _transformedUpdateFrame;
-        } else {
-          return _transformedFixedFrame;
-        }
+      if (_frameOptimization == FrameOptimizationMode.ReuseUpdateForPhysics) {
+      return _transformedUpdateFrame;
+      } else {
+      return _transformedFixedFrame;
+      }
       }
     }
 
@@ -280,220 +278,207 @@ namespace Leap.Unity {
     #region Android Support
 #if UNITY_ANDROID
 
-        private AndroidJavaObject _serviceBinder;
-        AndroidJavaClass unityPlayer;
-        AndroidJavaObject activity;
-        AndroidJavaObject context;
-        ServiceCallbacks serviceCallbacks;
+    private AndroidJavaObject _serviceBinder;
+    AndroidJavaClass unityPlayer;
+    AndroidJavaObject activity;
+    AndroidJavaObject context;
+    ServiceCallbacks serviceCallbacks;
 
-        protected virtual void OnEnable()
-        {
-            CreateAndroidBinding();
-        }
+    protected virtual void OnEnable() {
+    CreateAndroidBinding();
+    }
 
-        public bool CreateAndroidBinding()
-        {
-            try
-            {
-                if (_serviceBinder != null)
-                {
-                    //Check binding status before calling rebind
-                    bool bindStatus = _serviceBinder.Call<bool>("isBound");
-                    Debug.Log("CreateAndroidBinding - Current service binder status " + bindStatus);
-                    if (bindStatus)
-                        return true;
-                    else
-                        _serviceBinder = null;
-                }
-                if (_serviceBinder == null)
-                {
-                    //Get activity and context
-                    if (unityPlayer == null)
-                    {
-                        Debug.Log("CreateAndroidBinding - Getting activity and context");
-                        unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
-                        activity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
-                        context = activity.Call<AndroidJavaObject>("getApplicationContext");
-                        serviceCallbacks = new ServiceCallbacks();
-                    }
-                    //Create a new service binding
-                    Debug.Log("CreateAndroidBinding - Creating a new service binder");
-                    _serviceBinder = new AndroidJavaObject("com.ultraleap.tracking.service_binder.ServiceBinder", context, serviceCallbacks);
-                    bool success = _serviceBinder.Call<bool>("bind");
-                    if (success)
-                    {
-                        Debug.Log("CreateAndroidBinding - Binding of service binder complete");
-                    }
-                    return true;
-                }
-            }
-            catch (Exception e)
-            {
-                Debug.LogWarning("CreateAndroidBinding - Failed to bind service: " + e.Message);
-                _serviceBinder = null;
-            }
-            return false;
-        }
+    public bool CreateAndroidBinding() {
+    try {
+    if (_serviceBinder != null) {
+    //Check binding status before calling rebind
+    bool bindStatus = _serviceBinder.Call<bool>("isBound");
+    Debug.Log("CreateAndroidBinding - Current service binder status " + bindStatus);
+    if (bindStatus)
+      return true;
+    else
+      _serviceBinder = null;
+    }
+    if (_serviceBinder == null) {
+    //Get activity and context
+    if (unityPlayer == null) {
+    Debug.Log("CreateAndroidBinding - Getting activity and context");
+    unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
+    activity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
+    context = activity.Call<AndroidJavaObject>("getApplicationContext");
+    serviceCallbacks = new ServiceCallbacks();
+    }
+    //Create a new service binding
+    Debug.Log("CreateAndroidBinding - Creating a new service binder");
+    _serviceBinder = new AndroidJavaObject("com.ultraleap.tracking.service_binder.ServiceBinder", context, serviceCallbacks);
+    bool success = _serviceBinder.Call<bool>("bind");
+    if (success) {
+    Debug.Log("CreateAndroidBinding - Binding of service binder complete");
+    }
+    return true;
+    }
+    } catch (Exception e) {
+    Debug.LogWarning("CreateAndroidBinding - Failed to bind service: " + e.Message);
+    _serviceBinder = null;
+    }
+    return false;
+    }
 
-        protected virtual void OnDisable()
-        {
-            if (_serviceBinder != null)
-            {
-                Debug.Log("ServiceBinder.unbind...");
-                _serviceBinder.Call("unbind");
-            }
-        }
+    protected virtual void OnDisable() {
+    if (_serviceBinder != null) {
+    Debug.Log("ServiceBinder.unbind...");
+    _serviceBinder.Call("unbind");
+    }
+    }
 #endif
     #endregion
 
     #region Unity Events
 
     protected virtual void Reset() {
-      editTimePose = TestHandFactory.TestHandPose.DesktopModeA;
+    editTimePose = TestHandFactory.TestHandPose.DesktopModeA;
     }
 
     protected virtual void Awake() {
-      _fixedOffset.delay = 0.4f;
-      _smoothedTrackingLatency.SetBlend(0.99f, 0.0111f);
+    _fixedOffset.delay = 0.4f;
+    _smoothedTrackingLatency.SetBlend(0.99f, 0.0111f);
     }
 
     protected virtual void Start() {
-      createController();
-      _transformedUpdateFrame = new Frame();
-      _transformedFixedFrame = new Frame();
-      _untransformedUpdateFrame = new Frame();
-      _untransformedFixedFrame = new Frame();
+    createController();
+    _transformedUpdateFrame = new Frame();
+    _transformedFixedFrame = new Frame();
+    _untransformedUpdateFrame = new Frame();
+    _untransformedFixedFrame = new Frame();
     }
 
     protected virtual void Update() {
-      if (_workerThreadProfiling) {
-        LeapProfiling.Update();
-      }
+    if (_workerThreadProfiling) {
+    LeapProfiling.Update();
+    }
 
-      if (!checkConnectionIntegrity()) { return; }
+    if (!checkConnectionIntegrity()) { return; }
 
 #if UNITY_EDITOR
-      if (UnityEditor.EditorApplication.isCompiling) {
-                UnityEditor.EditorApplication.isPlaying = false;
-                Debug.LogWarning("Unity hot reloading not currently supported. Stopping Editor Playback.");
-                return;
-            }
+    if (UnityEditor.EditorApplication.isCompiling) {
+    UnityEditor.EditorApplication.isPlaying = false;
+    Debug.LogWarning("Unity hot reloading not currently supported. Stopping Editor Playback.");
+    return;
+    }
 #endif
 
-      _fixedOffset.Update(Time.time - Time.fixedTime, Time.deltaTime);
+    _fixedOffset.Update(Time.time - Time.fixedTime, Time.deltaTime);
 
-      if (_frameOptimization == FrameOptimizationMode.ReusePhysicsForUpdate) {
-        DispatchUpdateFrameEvent(_transformedFixedFrame);
-        return;
-      }
+    if (_frameOptimization == FrameOptimizationMode.ReusePhysicsForUpdate) {
+    DispatchUpdateFrameEvent(_transformedFixedFrame);
+    return;
+    }
 
-      if (_useInterpolation) {
+    if (_useInterpolation) {
 #if !UNITY_ANDROID || UNITY_EDITOR
-        _smoothedTrackingLatency.value = Mathf.Min(_smoothedTrackingLatency.value, 30000f);
-        _smoothedTrackingLatency.Update((float)(_leapController.Now() - _leapController.FrameTimestamp()), Time.deltaTime);
+    _smoothedTrackingLatency.value = Mathf.Min(_smoothedTrackingLatency.value, 30000f);
+    _smoothedTrackingLatency.Update((float)(_leapController.Now() - _leapController.FrameTimestamp()), Time.deltaTime);
 #endif
-        long timestamp = CalculateInterpolationTime() + (ExtrapolationAmount * 1000);
-        _unityToLeapOffset = timestamp - (long)(Time.time * S_TO_NS);
+    long timestamp = CalculateInterpolationTime() + (ExtrapolationAmount * 1000);
+    _unityToLeapOffset = timestamp - (long)(Time.time * S_TO_NS);
 
-        _leapController.GetInterpolatedFrameFromTime(_untransformedUpdateFrame, timestamp, CalculateInterpolationTime() - (BounceAmount * 1000));
-      } else {
-        _leapController.Frame(_untransformedUpdateFrame);
-      }
+    _leapController.GetInterpolatedFrameFromTime(_untransformedUpdateFrame, timestamp, CalculateInterpolationTime() - (BounceAmount * 1000));
+    } else {
+    _leapController.Frame(_untransformedUpdateFrame);
+    }
 
-      if (_untransformedUpdateFrame != null) {
-        transformFrame(_untransformedUpdateFrame, _transformedUpdateFrame);
+    if (_untransformedUpdateFrame != null) {
+    transformFrame(_untransformedUpdateFrame, _transformedUpdateFrame);
 
-        DispatchUpdateFrameEvent(_transformedUpdateFrame);
-      }
+    DispatchUpdateFrameEvent(_transformedUpdateFrame);
+    }
     }
 
     protected virtual void FixedUpdate() {
-      if (_frameOptimization == FrameOptimizationMode.ReuseUpdateForPhysics) {
-        DispatchFixedFrameEvent(_transformedUpdateFrame);
-        return;
-      }
+    if (_frameOptimization == FrameOptimizationMode.ReuseUpdateForPhysics) {
+    DispatchFixedFrameEvent(_transformedUpdateFrame);
+    return;
+    }
 
-      if (_useInterpolation) {
+    if (_useInterpolation) {
 
-        long timestamp;
-        switch (_frameOptimization) {
-          case FrameOptimizationMode.None:
-            // By default we use Time.fixedTime to ensure that our hands are on the same
-            // timeline as Update.  We add an extrapolation value to help compensate
-            // for latency.
-            float extrapolatedTime = Time.fixedTime + CalculatePhysicsExtrapolation();
-            timestamp = (long)(extrapolatedTime * S_TO_NS) + _unityToLeapOffset;
-            break;
-          case FrameOptimizationMode.ReusePhysicsForUpdate:
-            // If we are re-using physics frames for update, we don't even want to care
-            // about Time.fixedTime, just grab the most recent interpolated timestamp
-            // like we are in Update.
-            timestamp = CalculateInterpolationTime() + (ExtrapolationAmount * 1000);
-            break;
-          default:
-            throw new System.InvalidOperationException(
-              "Unexpected frame optimization mode: " + _frameOptimization);
-        }
-        _leapController.GetInterpolatedFrame(_untransformedFixedFrame, timestamp);
+    long timestamp;
+    switch (_frameOptimization) {
+      case FrameOptimizationMode.None:
+        // By default we use Time.fixedTime to ensure that our hands are on the same
+        // timeline as Update.  We add an extrapolation value to help compensate
+        // for latency.
+        float extrapolatedTime = Time.fixedTime + CalculatePhysicsExtrapolation();
+        timestamp = (long)(extrapolatedTime * S_TO_NS) + _unityToLeapOffset;
+        break;
+      case FrameOptimizationMode.ReusePhysicsForUpdate:
+        // If we are re-using physics frames for update, we don't even want to care
+        // about Time.fixedTime, just grab the most recent interpolated timestamp
+        // like we are in Update.
+        timestamp = CalculateInterpolationTime() + (ExtrapolationAmount * 1000);
+        break;
+      default:
+        throw new System.InvalidOperationException(
+          "Unexpected frame optimization mode: " + _frameOptimization);
+    }
+    _leapController.GetInterpolatedFrame(_untransformedFixedFrame, timestamp);
 
-      } else {
-        _leapController.Frame(_untransformedFixedFrame);
-      }
+    } else {
+    _leapController.Frame(_untransformedFixedFrame);
+    }
 
-      if (_untransformedFixedFrame != null) {
-        transformFrame(_untransformedFixedFrame, _transformedFixedFrame);
+    if (_untransformedFixedFrame != null) {
+    transformFrame(_untransformedFixedFrame, _transformedFixedFrame);
 
-        DispatchFixedFrameEvent(_transformedFixedFrame);
-      }
+    DispatchFixedFrameEvent(_transformedFixedFrame);
+    }
     }
 
     protected virtual void OnDestroy() {
-      destroyController();
-      _isDestroyed = true;
+    destroyController();
+    _isDestroyed = true;
     }
 
     protected virtual void OnApplicationFocus(bool hasFocus) {
 #if UNITY_ANDROID
-            if (hasFocus)
-            {
-                CreateAndroidBinding();
-            }
+    if (hasFocus) {
+    CreateAndroidBinding();
+    }
 #endif
     }
 
     protected virtual void OnApplicationPause(bool isPaused) {
 #if UNITY_ANDROID
-            if (isPaused)
-                {
-                    _serviceBinder.Call("unbind");
-                }
+    if (isPaused) {
+    _serviceBinder.Call("unbind");
+    }
 #endif
-      if (_leapController != null) {
-        if (isPaused) {
-          _leapController.StopConnection();
-        } else {
-          _leapController.StartConnection();
-        }
-      }
+    if (_leapController != null) {
+    if (isPaused) {
+    _leapController.StopConnection();
+    } else {
+    _leapController.StartConnection();
+    }
+    }
     }
 
     protected virtual void OnApplicationQuit() {
-      destroyController();
-      _isDestroyed = true;
+    destroyController();
+    _isDestroyed = true;
     }
 
     public float CalculatePhysicsExtrapolation() {
-      switch (_physicsExtrapolation) {
-        case PhysicsExtrapolationMode.None:
-          return 0;
-        case PhysicsExtrapolationMode.Auto:
-          return Time.fixedDeltaTime;
-        case PhysicsExtrapolationMode.Manual:
-          return _physicsExtrapolationTime;
-        default:
-          throw new System.InvalidOperationException(
-            "Unexpected physics extrapolation mode: " + _physicsExtrapolation);
-      }
+    switch (_physicsExtrapolation) {
+      case PhysicsExtrapolationMode.None:
+        return 0;
+      case PhysicsExtrapolationMode.Auto:
+        return Time.fixedDeltaTime;
+      case PhysicsExtrapolationMode.Manual:
+        return _physicsExtrapolationTime;
+      default:
+        throw new System.InvalidOperationException(
+          "Unexpected physics extrapolation mode: " + _physicsExtrapolation);
+    }
     }
 
     #endregion
@@ -505,12 +490,12 @@ namespace Leap.Unity {
     /// </summary>
     public Controller GetLeapController() {
 #if UNITY_EDITOR
-            // Null check to deal with hot reloading.
-      if (!_isDestroyed && _leapController == null) {
-                createController();
-            }
+    // Null check to deal with hot reloading.
+    if (!_isDestroyed && _leapController == null) {
+    createController();
+    }
 #endif
-      return _leapController;
+    return _leapController;
     }
 
     /// <summary>
@@ -518,7 +503,7 @@ namespace Leap.Unity {
     /// connected to the Leap Motion service.
     /// </summary>
     public bool IsConnected() {
-      return GetLeapController().IsConnected;
+    return GetLeapController().IsConnected;
     }
 
     /// <summary>
@@ -527,8 +512,8 @@ namespace Leap.Unity {
     /// custom script and trying to access Hand data from it directly afterward.
     /// </summary>
     public void RetransformFrames() {
-      transformFrame(_untransformedUpdateFrame, _transformedUpdateFrame);
-      transformFrame(_untransformedFixedFrame, _transformedFixedFrame);
+    transformFrame(_untransformedUpdateFrame, _transformedUpdateFrame);
+    transformFrame(_untransformedFixedFrame, _transformedFixedFrame);
     }
 
     /// <summary>
@@ -538,11 +523,11 @@ namespace Leap.Unity {
     /// </summary>
     public void CopySettingsToLeapXRServiceProvider(
     LeapXRServiceProvider leapXRServiceProvider) {
-      leapXRServiceProvider._interactionVolumeVisualization = _interactionVolumeVisualization;
-      leapXRServiceProvider._frameOptimization = _frameOptimization;
-      leapXRServiceProvider._physicsExtrapolation = _physicsExtrapolation;
-      leapXRServiceProvider._physicsExtrapolationTime = _physicsExtrapolationTime;
-      leapXRServiceProvider._workerThreadProfiling = _workerThreadProfiling;
+    leapXRServiceProvider._interactionVolumeVisualization = _interactionVolumeVisualization;
+    leapXRServiceProvider._frameOptimization = _frameOptimization;
+    leapXRServiceProvider._physicsExtrapolation = _physicsExtrapolation;
+    leapXRServiceProvider._physicsExtrapolationTime = _physicsExtrapolationTime;
+    leapXRServiceProvider._workerThreadProfiling = _workerThreadProfiling;
     }
 
     #endregion
@@ -553,11 +538,11 @@ namespace Leap.Unity {
 #if UNITY_ANDROID && !UNITY_EDITOR
       return _leapController.Now() - 16000;
 #else
-      if (_leapController != null) {
-        return _leapController.Now() - (long)_smoothedTrackingLatency.value;
-      } else {
-        return 0;
-      }
+    if (_leapController != null) {
+    return _leapController.Now() - (long)_smoothedTrackingLatency.value;
+    } else {
+    return 0;
+    }
 #endif
     }
 
@@ -565,23 +550,23 @@ namespace Leap.Unity {
     /// Initializes Leap Motion policy flags.
     /// </summary>
     protected virtual void initializeFlags() {
-      if (_leapController == null) {
-        return;
-      }
+    if (_leapController == null) {
+    return;
+    }
 
-      if (_trackingOptimization == TrackingOptimizationMode.Desktop) {
-        _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_DEFAULT);
-        _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP);
-        _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
-      } else if (_trackingOptimization == TrackingOptimizationMode.ScreenTop) {
-        _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_DEFAULT);
-        _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
-        _leapController.SetPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP);
-      } else if (_trackingOptimization == TrackingOptimizationMode.HMD) {
-        _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_DEFAULT);
-        _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP);
-        _leapController.SetPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
-      }
+    if (_trackingOptimization == TrackingOptimizationMode.Desktop) {
+    _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_DEFAULT);
+    _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP);
+    _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
+    } else if (_trackingOptimization == TrackingOptimizationMode.ScreenTop) {
+    _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_DEFAULT);
+    _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
+    _leapController.SetPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP);
+    } else if (_trackingOptimization == TrackingOptimizationMode.HMD) {
+    _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_DEFAULT);
+    _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP);
+    _leapController.SetPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
+    }
     }
 
     /// <summary>
@@ -590,37 +575,37 @@ namespace Leap.Unity {
     /// </summary>
     protected void createController() {
 #if UNITY_ANDROID
-            var bindStatus = CreateAndroidBinding();
-            if (!bindStatus)
-                return;
+    var bindStatus = CreateAndroidBinding();
+    if (!bindStatus)
+      return;
 #endif
 
-      if (_leapController != null) {
-        return;
-      }
+    if (_leapController != null) {
+    return;
+    }
 
-      _leapController = new Controller(0, _serverNameSpace);
-      _leapController.Device += (s, e) => {
-        if (_onDeviceSafe != null) {
-          _onDeviceSafe(e.Device);
-        }
-      };
+    _leapController = new Controller(0, _serverNameSpace);
+    _leapController.Device += (s, e) => {
+    if (_onDeviceSafe != null) {
+    _onDeviceSafe(e.Device);
+    }
+    };
 
-      if (_leapController.IsConnected) {
-        initializeFlags();
-      } else {
-        _leapController.Device += onHandControllerConnect;
-      }
+    if (_leapController.IsConnected) {
+    initializeFlags();
+    } else {
+    _leapController.Device += onHandControllerConnect;
+    }
 
-      if (_workerThreadProfiling) {
-        //A controller will report profiling statistics for the duration of it's lifetime
-        //so these events will never be unsubscribed from.
-        _leapController.EndProfilingBlock += LeapProfiling.EndProfilingBlock;
-        _leapController.BeginProfilingBlock += LeapProfiling.BeginProfilingBlock;
+    if (_workerThreadProfiling) {
+    //A controller will report profiling statistics for the duration of it's lifetime
+    //so these events will never be unsubscribed from.
+    _leapController.EndProfilingBlock += LeapProfiling.EndProfilingBlock;
+    _leapController.BeginProfilingBlock += LeapProfiling.BeginProfilingBlock;
 
-        _leapController.EndProfilingForThread += LeapProfiling.EndProfilingForThread;
-        _leapController.BeginProfilingForThread += LeapProfiling.BeginProfilingForThread;
-      }
+    _leapController.EndProfilingForThread += LeapProfiling.EndProfilingForThread;
+    _leapController.BeginProfilingForThread += LeapProfiling.BeginProfilingForThread;
+    }
     }
 
     /// <summary>
@@ -628,15 +613,15 @@ namespace Leap.Unity {
     /// policy flags and resetting the Controller to null.
     /// </summary>
     public void destroyController() {
-      if (_leapController != null) {
-        if (_leapController.IsConnected) {
-          _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP);
-          _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
-        }
-        _leapController.StopConnection();
-        _leapController.Dispose();
-        _leapController = null;
-      }
+    if (_leapController != null) {
+    if (_leapController.IsConnected) {
+    _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP);
+    _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
+    }
+    _leapController.StopConnection();
+    _leapController.Dispose();
+    _leapController = null;
+    }
     }
 
     private int _framesSinceServiceConnectionChecked = 0;
@@ -647,39 +632,39 @@ namespace Leap.Unity {
     /// for MAX_RECONNECTION_ATTEMPTS
     /// </summary>
     protected bool checkConnectionIntegrity() {
-      if (_leapController != null && _leapController.IsServiceConnected) {
-        _framesSinceServiceConnectionChecked = 0;
-        _numberOfReconnectionAttempts = 0;
-        return true;
-      } else if (_numberOfReconnectionAttempts < MAX_RECONNECTION_ATTEMPTS) {
-        _framesSinceServiceConnectionChecked++;
+    if (_leapController != null && _leapController.IsServiceConnected) {
+    _framesSinceServiceConnectionChecked = 0;
+    _numberOfReconnectionAttempts = 0;
+    return true;
+    } else if (_numberOfReconnectionAttempts < MAX_RECONNECTION_ATTEMPTS) {
+    _framesSinceServiceConnectionChecked++;
 
-        if (_framesSinceServiceConnectionChecked > RECONNECTION_INTERVAL) {
-          _framesSinceServiceConnectionChecked = 0;
-          _numberOfReconnectionAttempts++;
+    if (_framesSinceServiceConnectionChecked > RECONNECTION_INTERVAL) {
+    _framesSinceServiceConnectionChecked = 0;
+    _numberOfReconnectionAttempts++;
 
-          Debug.LogWarning("Leap Service not connected; attempting to reconnect for try " +
-                           _numberOfReconnectionAttempts + "/" + MAX_RECONNECTION_ATTEMPTS +
-                           "...", this);
-          using (new ProfilerSample("Reconnection Attempt")) {
-            destroyController();
-            createController();
-          }
-        }
-      }
-      return false;
+    Debug.LogWarning("Leap Service not connected; attempting to reconnect for try " +
+                     _numberOfReconnectionAttempts + "/" + MAX_RECONNECTION_ATTEMPTS +
+                     "...", this);
+    using (new ProfilerSample("Reconnection Attempt")) {
+    destroyController();
+    createController();
+    }
+    }
+    }
+    return false;
     }
 
     protected void onHandControllerConnect(object sender, LeapEventArgs args) {
-      initializeFlags();
+    initializeFlags();
 
-      if (_leapController != null) {
-        _leapController.Device -= onHandControllerConnect;
-      }
+    if (_leapController != null) {
+    _leapController.Device -= onHandControllerConnect;
+    }
     }
 
     protected virtual void transformFrame(Frame source, Frame dest) {
-      dest.CopyFrom(source).Transform(transform.GetLeapMatrix());
+    dest.CopyFrom(source).Transform(transform.GetLeapMatrix());
     }
 
     #endregion
