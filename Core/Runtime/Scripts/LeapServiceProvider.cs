@@ -10,16 +10,14 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Leap.Unity
-{
+namespace Leap.Unity {
   using Attributes;
 
   /// <summary>
   /// The LeapServiceProvider provides tracked Leap Hand data and images from the device
   /// via the Leap service running on the client machine.
   /// </summary>
-  public class LeapServiceProvider : LeapProvider
-  {
+  public class LeapServiceProvider : LeapProvider {
 
     #region Constants
 
@@ -62,8 +60,7 @@ namespace Leap.Unity
 
     #region Inspector
 
-    public enum InteractionVolumeVisualization
-    {
+    public enum InteractionVolumeVisualization {
       None,
       LeapMotionController,
       StereoIR170,
@@ -75,8 +72,7 @@ namespace Leap.Unity
 
     public InteractionVolumeVisualization SelectedInteractionVolumeVisualization => _interactionVolumeVisualization;
 
-    public enum FrameOptimizationMode
-    {
+    public enum FrameOptimizationMode {
       None,
       ReuseUpdateForPhysics,
       ReusePhysicsForUpdate,
@@ -85,8 +81,7 @@ namespace Leap.Unity
     [SerializeField]
     protected FrameOptimizationMode _frameOptimization = FrameOptimizationMode.None;
 
-    public enum PhysicsExtrapolationMode
-    {
+    public enum PhysicsExtrapolationMode {
       None,
       Auto,
       Manual
@@ -102,8 +97,7 @@ namespace Leap.Unity
     [SerializeField]
     protected float _physicsExtrapolationTime = 1.0f / 90.0f;
 
-    public enum TrackingOptimizationMode
-    {
+    public enum TrackingOptimizationMode {
       Desktop,
       ScreenTop,
       HMD
@@ -169,21 +163,16 @@ namespace Leap.Unity
     /// 
     /// For situations with multiple devices OnDeviceSafe will be dispatched once for each device.
     /// </summary>
-    public event Action<Device> OnDeviceSafe
-    {
-      add
-      {
-        if (_leapController != null && _leapController.IsConnected)
-        {
-          foreach (var device in _leapController.Devices)
-          {
+    public event Action<Device> OnDeviceSafe {
+      add {
+        if (_leapController != null && _leapController.IsConnected) {
+          foreach (var device in _leapController.Devices) {
             value(device);
           }
         }
         _onDeviceSafe += value;
       }
-      remove
-      {
+      remove {
         _onDeviceSafe -= value;
       }
     }
@@ -246,10 +235,8 @@ namespace Leap.Unity
 
     #region LeapProvider Implementation
 
-    public override Frame CurrentFrame
-    {
-      get
-      {
+    public override Frame CurrentFrame {
+      get {
 #if UNITY_EDITOR
         if (!Application.isPlaying) {
                     _editTimeFrame.Hands.Clear();
@@ -260,21 +247,16 @@ namespace Leap.Unity
                     return _editTimeFrame;
                 }
 #endif
-        if (_frameOptimization == FrameOptimizationMode.ReusePhysicsForUpdate)
-        {
+        if (_frameOptimization == FrameOptimizationMode.ReusePhysicsForUpdate) {
           return _transformedFixedFrame;
-        }
-        else
-        {
+        } else {
           return _transformedUpdateFrame;
         }
       }
     }
 
-    public override Frame CurrentFixedFrame
-    {
-      get
-      {
+    public override Frame CurrentFixedFrame {
+      get {
 #if UNITY_EDITOR
         if (!Application.isPlaying) {
                     _editTimeFrame.Hands.Clear();
@@ -285,12 +267,9 @@ namespace Leap.Unity
                     return _editTimeFrame;
                 }
 #endif
-        if (_frameOptimization == FrameOptimizationMode.ReuseUpdateForPhysics)
-        {
+        if (_frameOptimization == FrameOptimizationMode.ReuseUpdateForPhysics) {
           return _transformedUpdateFrame;
-        }
-        else
-        {
+        } else {
           return _transformedFixedFrame;
         }
       }
@@ -369,19 +348,16 @@ namespace Leap.Unity
 
     #region Unity Events
 
-    protected virtual void Reset()
-    {
+    protected virtual void Reset() {
       editTimePose = TestHandFactory.TestHandPose.DesktopModeA;
     }
 
-    protected virtual void Awake()
-    {
+    protected virtual void Awake() {
       _fixedOffset.delay = 0.4f;
       _smoothedTrackingLatency.SetBlend(0.99f, 0.0111f);
     }
 
-    protected virtual void Start()
-    {
+    protected virtual void Start() {
       createController();
       _transformedUpdateFrame = new Frame();
       _transformedFixedFrame = new Frame();
@@ -389,10 +365,8 @@ namespace Leap.Unity
       _untransformedFixedFrame = new Frame();
     }
 
-    protected virtual void Update()
-    {
-      if (_workerThreadProfiling)
-      {
+    protected virtual void Update() {
+      if (_workerThreadProfiling) {
         LeapProfiling.Update();
       }
 
@@ -408,14 +382,12 @@ namespace Leap.Unity
 
       _fixedOffset.Update(Time.time - Time.fixedTime, Time.deltaTime);
 
-      if (_frameOptimization == FrameOptimizationMode.ReusePhysicsForUpdate)
-      {
+      if (_frameOptimization == FrameOptimizationMode.ReusePhysicsForUpdate) {
         DispatchUpdateFrameEvent(_transformedFixedFrame);
         return;
       }
 
-      if (_useInterpolation)
-      {
+      if (_useInterpolation) {
 #if !UNITY_ANDROID || UNITY_EDITOR
         _smoothedTrackingLatency.value = Mathf.Min(_smoothedTrackingLatency.value, 30000f);
         _smoothedTrackingLatency.Update((float)(_leapController.Now() - _leapController.FrameTimestamp()), Time.deltaTime);
@@ -424,34 +396,27 @@ namespace Leap.Unity
         _unityToLeapOffset = timestamp - (long)(Time.time * S_TO_NS);
 
         _leapController.GetInterpolatedFrameFromTime(_untransformedUpdateFrame, timestamp, CalculateInterpolationTime() - (BounceAmount * 1000));
-      }
-      else
-      {
+      } else {
         _leapController.Frame(_untransformedUpdateFrame);
       }
 
-      if (_untransformedUpdateFrame != null)
-      {
+      if (_untransformedUpdateFrame != null) {
         transformFrame(_untransformedUpdateFrame, _transformedUpdateFrame);
 
         DispatchUpdateFrameEvent(_transformedUpdateFrame);
       }
     }
 
-    protected virtual void FixedUpdate()
-    {
-      if (_frameOptimization == FrameOptimizationMode.ReuseUpdateForPhysics)
-      {
+    protected virtual void FixedUpdate() {
+      if (_frameOptimization == FrameOptimizationMode.ReuseUpdateForPhysics) {
         DispatchFixedFrameEvent(_transformedUpdateFrame);
         return;
       }
 
-      if (_useInterpolation)
-      {
+      if (_useInterpolation) {
 
         long timestamp;
-        switch (_frameOptimization)
-        {
+        switch (_frameOptimization) {
           case FrameOptimizationMode.None:
             // By default we use Time.fixedTime to ensure that our hands are on the same
             // timeline as Update.  We add an extrapolation value to help compensate
@@ -471,28 +436,23 @@ namespace Leap.Unity
         }
         _leapController.GetInterpolatedFrame(_untransformedFixedFrame, timestamp);
 
-      }
-      else
-      {
+      } else {
         _leapController.Frame(_untransformedFixedFrame);
       }
 
-      if (_untransformedFixedFrame != null)
-      {
+      if (_untransformedFixedFrame != null) {
         transformFrame(_untransformedFixedFrame, _transformedFixedFrame);
 
         DispatchFixedFrameEvent(_transformedFixedFrame);
       }
     }
 
-    protected virtual void OnDestroy()
-    {
+    protected virtual void OnDestroy() {
       destroyController();
       _isDestroyed = true;
     }
 
-    protected virtual void OnApplicationFocus(bool hasFocus)
-    {
+    protected virtual void OnApplicationFocus(bool hasFocus) {
 #if UNITY_ANDROID
             if (hasFocus)
             {
@@ -501,37 +461,29 @@ namespace Leap.Unity
 #endif
     }
 
-    protected virtual void OnApplicationPause(bool isPaused)
-    {
+    protected virtual void OnApplicationPause(bool isPaused) {
 #if UNITY_ANDROID
             if (isPaused)
                 {
                     _serviceBinder.Call("unbind");
                 }
 #endif
-      if (_leapController != null)
-      {
-        if (isPaused)
-        {
+      if (_leapController != null) {
+        if (isPaused) {
           _leapController.StopConnection();
-        }
-        else
-        {
+        } else {
           _leapController.StartConnection();
         }
       }
     }
 
-    protected virtual void OnApplicationQuit()
-    {
+    protected virtual void OnApplicationQuit() {
       destroyController();
       _isDestroyed = true;
     }
 
-    public float CalculatePhysicsExtrapolation()
-    {
-      switch (_physicsExtrapolation)
-      {
+    public float CalculatePhysicsExtrapolation() {
+      switch (_physicsExtrapolation) {
         case PhysicsExtrapolationMode.None:
           return 0;
         case PhysicsExtrapolationMode.Auto:
@@ -551,8 +503,7 @@ namespace Leap.Unity
     /// <summary>
     /// Returns the Leap Controller instance.
     /// </summary>
-    public Controller GetLeapController()
-    {
+    public Controller GetLeapController() {
 #if UNITY_EDITOR
             // Null check to deal with hot reloading.
       if (!_isDestroyed && _leapController == null) {
@@ -566,8 +517,7 @@ namespace Leap.Unity
     /// Returns true if the Leap Motion hardware is plugged in and this application is
     /// connected to the Leap Motion service.
     /// </summary>
-    public bool IsConnected()
-    {
+    public bool IsConnected() {
       return GetLeapController().IsConnected;
     }
 
@@ -576,8 +526,7 @@ namespace Leap.Unity
     /// This is only necessary if you're moving the LeapServiceProvider around in a
     /// custom script and trying to access Hand data from it directly afterward.
     /// </summary>
-    public void RetransformFrames()
-    {
+    public void RetransformFrames() {
       transformFrame(_untransformedUpdateFrame, _transformedUpdateFrame);
       transformFrame(_untransformedFixedFrame, _transformedFixedFrame);
     }
@@ -588,8 +537,7 @@ namespace Leap.Unity
     /// that only exist on the LeapXRServiceProvider.
     /// </summary>
     public void CopySettingsToLeapXRServiceProvider(
-    LeapXRServiceProvider leapXRServiceProvider)
-    {
+    LeapXRServiceProvider leapXRServiceProvider) {
       leapXRServiceProvider._interactionVolumeVisualization = _interactionVolumeVisualization;
       leapXRServiceProvider._frameOptimization = _frameOptimization;
       leapXRServiceProvider._physicsExtrapolation = _physicsExtrapolation;
@@ -601,17 +549,13 @@ namespace Leap.Unity
 
     #region Internal Methods
 
-    protected virtual long CalculateInterpolationTime(bool endOfFrame = false)
-    {
+    protected virtual long CalculateInterpolationTime(bool endOfFrame = false) {
 #if UNITY_ANDROID && !UNITY_EDITOR
       return _leapController.Now() - 16000;
 #else
-      if (_leapController != null)
-      {
+      if (_leapController != null) {
         return _leapController.Now() - (long)_smoothedTrackingLatency.value;
-      }
-      else
-      {
+      } else {
         return 0;
       }
 #endif
@@ -620,27 +564,20 @@ namespace Leap.Unity
     /// <summary>
     /// Initializes Leap Motion policy flags.
     /// </summary>
-    protected virtual void initializeFlags()
-    {
-      if (_leapController == null)
-      {
+    protected virtual void initializeFlags() {
+      if (_leapController == null) {
         return;
       }
 
-      if (_trackingOptimization == TrackingOptimizationMode.Desktop)
-      {
+      if (_trackingOptimization == TrackingOptimizationMode.Desktop) {
         _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_DEFAULT);
         _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP);
         _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
-      }
-      else if (_trackingOptimization == TrackingOptimizationMode.ScreenTop)
-      {
+      } else if (_trackingOptimization == TrackingOptimizationMode.ScreenTop) {
         _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_DEFAULT);
         _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
         _leapController.SetPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP);
-      }
-      else if (_trackingOptimization == TrackingOptimizationMode.HMD)
-      {
+      } else if (_trackingOptimization == TrackingOptimizationMode.HMD) {
         _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_DEFAULT);
         _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP);
         _leapController.SetPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
@@ -651,39 +588,31 @@ namespace Leap.Unity
     /// Creates an instance of a Controller, initializing its policy flags and
     /// subscribing to its connection event.
     /// </summary>
-    protected void createController()
-    {
+    protected void createController() {
 #if UNITY_ANDROID
             var bindStatus = CreateAndroidBinding();
             if (!bindStatus)
                 return;
 #endif
 
-      if (_leapController != null)
-      {
+      if (_leapController != null) {
         return;
       }
 
       _leapController = new Controller(0, _serverNameSpace);
-      _leapController.Device += (s, e) =>
-      {
-        if (_onDeviceSafe != null)
-        {
+      _leapController.Device += (s, e) => {
+        if (_onDeviceSafe != null) {
           _onDeviceSafe(e.Device);
         }
       };
 
-      if (_leapController.IsConnected)
-      {
+      if (_leapController.IsConnected) {
         initializeFlags();
-      }
-      else
-      {
+      } else {
         _leapController.Device += onHandControllerConnect;
       }
 
-      if (_workerThreadProfiling)
-      {
+      if (_workerThreadProfiling) {
         //A controller will report profiling statistics for the duration of it's lifetime
         //so these events will never be unsubscribed from.
         _leapController.EndProfilingBlock += LeapProfiling.EndProfilingBlock;
@@ -698,12 +627,9 @@ namespace Leap.Unity
     /// Stops the connection for the existing instance of a Controller, clearing old
     /// policy flags and resetting the Controller to null.
     /// </summary>
-    public void destroyController()
-    {
-      if (_leapController != null)
-      {
-        if (_leapController.IsConnected)
-        {
+    public void destroyController() {
+      if (_leapController != null) {
+        if (_leapController.IsConnected) {
           _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP);
           _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
         }
@@ -720,28 +646,22 @@ namespace Leap.Unity
     /// If it is not, attempt to reconnect at regular intervals
     /// for MAX_RECONNECTION_ATTEMPTS
     /// </summary>
-    protected bool checkConnectionIntegrity()
-    {
-      if (_leapController != null && _leapController.IsServiceConnected)
-      {
+    protected bool checkConnectionIntegrity() {
+      if (_leapController != null && _leapController.IsServiceConnected) {
         _framesSinceServiceConnectionChecked = 0;
         _numberOfReconnectionAttempts = 0;
         return true;
-      }
-      else if (_numberOfReconnectionAttempts < MAX_RECONNECTION_ATTEMPTS)
-      {
+      } else if (_numberOfReconnectionAttempts < MAX_RECONNECTION_ATTEMPTS) {
         _framesSinceServiceConnectionChecked++;
 
-        if (_framesSinceServiceConnectionChecked > RECONNECTION_INTERVAL)
-        {
+        if (_framesSinceServiceConnectionChecked > RECONNECTION_INTERVAL) {
           _framesSinceServiceConnectionChecked = 0;
           _numberOfReconnectionAttempts++;
 
           Debug.LogWarning("Leap Service not connected; attempting to reconnect for try " +
                            _numberOfReconnectionAttempts + "/" + MAX_RECONNECTION_ATTEMPTS +
                            "...", this);
-          using (new ProfilerSample("Reconnection Attempt"))
-          {
+          using (new ProfilerSample("Reconnection Attempt")) {
             destroyController();
             createController();
           }
@@ -750,18 +670,15 @@ namespace Leap.Unity
       return false;
     }
 
-    protected void onHandControllerConnect(object sender, LeapEventArgs args)
-    {
+    protected void onHandControllerConnect(object sender, LeapEventArgs args) {
       initializeFlags();
 
-      if (_leapController != null)
-      {
+      if (_leapController != null) {
         _leapController.Device -= onHandControllerConnect;
       }
     }
 
-    protected virtual void transformFrame(Frame source, Frame dest)
-    {
+    protected virtual void transformFrame(Frame source, Frame dest) {
       dest.CopyFrom(source).Transform(transform.GetLeapMatrix());
     }
 
