@@ -59,8 +59,6 @@ namespace Leap.Unity
          }
      }
 
-     // The following methods / fields are part of the XRSupportUtil 'interface' but are not currently used. They have not been implemented for the XR2/Android
-
      public static Vector3 GetXRNodeHeadLocalPosition() {
          if (XRSupportUtil.IsXREnabled())
          {
@@ -84,6 +82,8 @@ namespace Leap.Unity
              return Quaternion.identity;
          }
      }
+
+    // The following methods / fields are part of the XRSupportUtil 'interface' but are not currently used. They have not been implemented for the XR2/Android
 
      //public static Vector3 GetXRNodeLocalPosition(int node) {
      //}
