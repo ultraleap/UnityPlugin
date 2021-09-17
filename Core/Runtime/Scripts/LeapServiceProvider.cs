@@ -269,8 +269,7 @@ namespace Leap.Unity {
         #endif
         if (_frameOptimization == FrameOptimizationMode.ReuseUpdateForPhysics) {
           return _transformedUpdateFrame;
-        }
-        else {
+        } else {
           return _transformedFixedFrame;
         }
       }
