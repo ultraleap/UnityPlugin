@@ -204,7 +204,8 @@ namespace Leap.Unity {
         Hand cachedHand = null;
         if (_cachedLeftHands.TryGetValue(editTimePose, out cachedHand)) {
           return cachedHand;
-        } else {
+        }
+        else {
           cachedHand = TestHandFactory.MakeTestHand(isLeft: true, pose: editTimePose);
           _cachedLeftHands[editTimePose] = cachedHand;
           return cachedHand;
@@ -219,7 +220,8 @@ namespace Leap.Unity {
         Hand cachedHand = null;
         if (_cachedRightHands.TryGetValue(editTimePose, out cachedHand)) {
           return cachedHand;
-        } else {
+        }
+        else {
           cachedHand = TestHandFactory.MakeTestHand(isLeft: false, pose: editTimePose);
           _cachedRightHands[editTimePose] = cachedHand;
           return cachedHand;
@@ -247,7 +249,8 @@ namespace Leap.Unity {
 #endif
         if (_frameOptimization == FrameOptimizationMode.ReusePhysicsForUpdate) {
           return _transformedFixedFrame;
-        } else {
+        }
+        else {
           return _transformedUpdateFrame;
         }
       }
@@ -267,7 +270,8 @@ namespace Leap.Unity {
 #endif
         if (_frameOptimization == FrameOptimizationMode.ReuseUpdateForPhysics) {
           return _transformedUpdateFrame;
-        } else {
+        }
+        else {
           return _transformedFixedFrame;
         }
       }
@@ -383,7 +387,8 @@ namespace Leap.Unity {
         _unityToLeapOffset = timestamp - (long)(Time.time * S_TO_NS);
 
         _leapController.GetInterpolatedFrameFromTime(_untransformedUpdateFrame, timestamp, CalculateInterpolationTime() - (BounceAmount * 1000));
-      } else {
+      }
+      else {
         _leapController.Frame(_untransformedUpdateFrame);
       }
 
@@ -423,7 +428,8 @@ namespace Leap.Unity {
         }
         _leapController.GetInterpolatedFrame(_untransformedFixedFrame, timestamp);
 
-      } else {
+      }
+      else {
         _leapController.Frame(_untransformedFixedFrame);
       }
 
@@ -456,7 +462,8 @@ namespace Leap.Unity {
       if (_leapController != null) {
         if (isPaused) {
           _leapController.StopConnection();
-        } else {
+        }
+        else {
           _leapController.StartConnection();
         }
       }
@@ -540,7 +547,8 @@ namespace Leap.Unity {
 #else
       if (_leapController != null) {
         return _leapController.Now() - (long)_smoothedTrackingLatency.value;
-      } else {
+      }
+      else {
         return 0;
       }
 #endif
@@ -558,11 +566,13 @@ namespace Leap.Unity {
         _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_DEFAULT);
         _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP);
         _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
-      } else if (_trackingOptimization == TrackingOptimizationMode.ScreenTop) {
+      }
+      else if (_trackingOptimization == TrackingOptimizationMode.ScreenTop) {
         _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_DEFAULT);
         _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
         _leapController.SetPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP);
-      } else if (_trackingOptimization == TrackingOptimizationMode.HMD) {
+      }
+      else if (_trackingOptimization == TrackingOptimizationMode.HMD) {
         _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_DEFAULT);
         _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP);
         _leapController.SetPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
@@ -593,7 +603,8 @@ namespace Leap.Unity {
 
       if (_leapController.IsConnected) {
         initializeFlags();
-      } else {
+      }
+      else {
         _leapController.Device += onHandControllerConnect;
       }
 
@@ -636,7 +647,8 @@ namespace Leap.Unity {
         _framesSinceServiceConnectionChecked = 0;
         _numberOfReconnectionAttempts = 0;
         return true;
-      } else if (_numberOfReconnectionAttempts < MAX_RECONNECTION_ATTEMPTS) {
+      }
+      else if (_numberOfReconnectionAttempts < MAX_RECONNECTION_ATTEMPTS) {
         _framesSinceServiceConnectionChecked++;
 
         if (_framesSinceServiceConnectionChecked > RECONNECTION_INTERVAL) {
