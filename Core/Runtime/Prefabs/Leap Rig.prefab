@@ -214,7 +214,7 @@ MonoBehaviour:
   handedness: 0
   _showArm: 1
   _castShadows: 1
-  _material: {fileID: 0}
+  _material: {fileID: 2100000, guid: 50db6ec9473cfa746a5882bd2a16ced8, type: 2}
   _sphereMesh: {fileID: 4300002, guid: 2f496b1b1bec86743b418551f859020c, type: 3}
   _cylinderResolution: 12
   _jointRadius: 0.008
@@ -334,7 +334,7 @@ MonoBehaviour:
   handedness: 1
   _showArm: 1
   _castShadows: 1
-  _material: {fileID: 0}
+  _material: {fileID: 2100000, guid: 50db6ec9473cfa746a5882bd2a16ced8, type: 2}
   _sphereMesh: {fileID: 4300002, guid: 2f496b1b1bec86743b418551f859020c, type: 3}
   _cylinderResolution: 12
   _jointRadius: 0.008

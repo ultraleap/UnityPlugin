@@ -6,10 +6,10 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Leap.Unity;
+using UHI.Tracking;
 using UnityEngine;
 
-namespace Leap.Hands.Examples
+namespace Leap.Unity.Hands.Examples
 {
     public class CycleHandPairs : MonoBehaviour
     {
