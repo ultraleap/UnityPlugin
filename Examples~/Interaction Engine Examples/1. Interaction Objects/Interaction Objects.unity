@@ -645,6 +645,38 @@ PrefabInstance:
       propertyPath: m_Material
       value: 
       objectReference: {fileID: 0}
+    - target: {fileID: 8988524118100135441, guid: 5a1fb53528997fe478560ab3120da9cb, type: 3}
+      propertyPath: hoverColor.b
+      value: 0.93725497
+      objectReference: {fileID: 0}
+    - target: {fileID: 8988524118100135441, guid: 5a1fb53528997fe478560ab3120da9cb, type: 3}
+      propertyPath: hoverColor.g
+      value: 0.18431373
+      objectReference: {fileID: 0}
+    - target: {fileID: 8988524118100135441, guid: 5a1fb53528997fe478560ab3120da9cb, type: 3}
+      propertyPath: hoverColor.r
+      value: 0.65882355
+      objectReference: {fileID: 0}
+    - target: {fileID: 8988524118100135441, guid: 5a1fb53528997fe478560ab3120da9cb, type: 3}
+      propertyPath: defaultColor.b
+      value: 0.5215686
+      objectReference: {fileID: 0}
+    - target: {fileID: 8988524118100135441, guid: 5a1fb53528997fe478560ab3120da9cb, type: 3}
+      propertyPath: defaultColor.g
+      value: 0.9215687
+      objectReference: {fileID: 0}
+    - target: {fileID: 8988524118100135441, guid: 5a1fb53528997fe478560ab3120da9cb, type: 3}
+      propertyPath: defaultColor.r
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8988524118100135441, guid: 5a1fb53528997fe478560ab3120da9cb, type: 3}
+      propertyPath: pressedColor.b
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8988524118100135441, guid: 5a1fb53528997fe478560ab3120da9cb, type: 3}
+      propertyPath: pressedColor.g
+      value: 0.5529412
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5a1fb53528997fe478560ab3120da9cb, type: 3}
 --- !u!4 &146948170 stripped
@@ -697,13 +729,13 @@ TextMesh:
     smacked,
     picked up, and thrown by interaction controllers.
 
-    
 
-    Hands tracked
-    by Leap Motion and standard VR controllers are
 
-    supported equally well by
-    the Interaction Engine.'
+    Hands tracked by Leap
+    Motion and standard VR controllers are
+
+    supported equally well by the Interaction
+    Engine.'
   m_OffsetZ: 0
   m_CharacterSize: 1
   m_LineSpacing: 1
@@ -1506,11 +1538,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   useHover: 1
   usePrimaryHover: 0
-  defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
+  defaultColor: {r: 0, g: 0.9215687, b: 0.5215686, a: 1}
   suspendedColor: {r: 1, g: 0, b: 0, a: 1}
-  hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
+  hoverColor: {r: 0.65882355, g: 0.18431373, b: 0.93725497, a: 1}
   primaryHoverColor: {r: 0.8, g: 0.8, b: 0.8, a: 1}
-  pressedColor: {r: 1, g: 1, b: 1, a: 1}
+  pressedColor: {r: 1, g: 0.5529412, b: 0, a: 1}
+  rends:
+  - materialID: 0
+    renderer: {fileID: 255649385}
 --- !u!1 &259010354
 GameObject:
   m_ObjectHideFlags: 0
@@ -1776,8 +1811,8 @@ TextMesh:
     floating objects below ignore
     contact and grasping: they
 
-    only receive hover information, even though
-    other objects
+    only receive hover information, even though other
+    objects
 
     can still collide with them.'
   m_OffsetZ: 0
@@ -1925,6 +1960,38 @@ PrefabInstance:
       propertyPath: _allowMultiGrasp
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8241989165609557697, guid: 8998b2da307be7f419e285784a8495a6, type: 3}
+      propertyPath: hoverColor.b
+      value: 0.93725497
+      objectReference: {fileID: 0}
+    - target: {fileID: 8241989165609557697, guid: 8998b2da307be7f419e285784a8495a6, type: 3}
+      propertyPath: hoverColor.g
+      value: 0.18431373
+      objectReference: {fileID: 0}
+    - target: {fileID: 8241989165609557697, guid: 8998b2da307be7f419e285784a8495a6, type: 3}
+      propertyPath: hoverColor.r
+      value: 0.65882355
+      objectReference: {fileID: 0}
+    - target: {fileID: 8241989165609557697, guid: 8998b2da307be7f419e285784a8495a6, type: 3}
+      propertyPath: defaultColor.b
+      value: 0.5215686
+      objectReference: {fileID: 0}
+    - target: {fileID: 8241989165609557697, guid: 8998b2da307be7f419e285784a8495a6, type: 3}
+      propertyPath: defaultColor.g
+      value: 0.9215687
+      objectReference: {fileID: 0}
+    - target: {fileID: 8241989165609557697, guid: 8998b2da307be7f419e285784a8495a6, type: 3}
+      propertyPath: defaultColor.r
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8241989165609557697, guid: 8998b2da307be7f419e285784a8495a6, type: 3}
+      propertyPath: pressedColor.b
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8241989165609557697, guid: 8998b2da307be7f419e285784a8495a6, type: 3}
+      propertyPath: pressedColor.g
+      value: 0.5529412
+      objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 0}
     - {fileID: 114726310233506268, guid: 8998b2da307be7f419e285784a8495a6, type: 3}
@@ -2051,6 +2118,38 @@ PrefabInstance:
       propertyPath: _allowMultiGrasp
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8241989165609557697, guid: 8998b2da307be7f419e285784a8495a6, type: 3}
+      propertyPath: hoverColor.b
+      value: 0.93725497
+      objectReference: {fileID: 0}
+    - target: {fileID: 8241989165609557697, guid: 8998b2da307be7f419e285784a8495a6, type: 3}
+      propertyPath: hoverColor.g
+      value: 0.18431373
+      objectReference: {fileID: 0}
+    - target: {fileID: 8241989165609557697, guid: 8998b2da307be7f419e285784a8495a6, type: 3}
+      propertyPath: hoverColor.r
+      value: 0.65882355
+      objectReference: {fileID: 0}
+    - target: {fileID: 8241989165609557697, guid: 8998b2da307be7f419e285784a8495a6, type: 3}
+      propertyPath: defaultColor.b
+      value: 0.5215686
+      objectReference: {fileID: 0}
+    - target: {fileID: 8241989165609557697, guid: 8998b2da307be7f419e285784a8495a6, type: 3}
+      propertyPath: defaultColor.g
+      value: 0.9215687
+      objectReference: {fileID: 0}
+    - target: {fileID: 8241989165609557697, guid: 8998b2da307be7f419e285784a8495a6, type: 3}
+      propertyPath: defaultColor.r
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8241989165609557697, guid: 8998b2da307be7f419e285784a8495a6, type: 3}
+      propertyPath: pressedColor.b
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8241989165609557697, guid: 8998b2da307be7f419e285784a8495a6, type: 3}
+      propertyPath: pressedColor.g
+      value: 0.5529412
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8998b2da307be7f419e285784a8495a6, type: 3}
 --- !u!4 &355568955 stripped
@@ -2058,30 +2157,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4299111203110852, guid: 8998b2da307be7f419e285784a8495a6, type: 3}
   m_PrefabInstance: {fileID: 355568954}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &355568956 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1580682090112394, guid: 8998b2da307be7f419e285784a8495a6, type: 3}
-  m_PrefabInstance: {fileID: 355568954}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &355568957
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 355568956}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4b02e2f8ae628ac4f9faca951fe12db4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  useHover: 1
-  usePrimaryHover: 0
-  defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
-  suspendedColor: {r: 1, g: 0, b: 0, a: 1}
-  hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
-  primaryHoverColor: {r: 1, g: 1, b: 1, a: 1}
-  pressedColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &356717452
 GameObject:
   m_ObjectHideFlags: 0
@@ -2350,8 +2425,16 @@ PrefabInstance:
       value: 1.3462
       objectReference: {fileID: 0}
     - target: {fileID: 4433721948416446, guid: 9b0d46ef9e6296640baaf7bac58ac47b, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.044678
+      objectReference: {fileID: 0}
+    - target: {fileID: 4433721948416446, guid: 9b0d46ef9e6296640baaf7bac58ac47b, type: 3}
       propertyPath: m_LocalScale.z
       value: 0.762
+      objectReference: {fileID: 0}
+    - target: {fileID: 4433721948416446, guid: 9b0d46ef9e6296640baaf7bac58ac47b, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.28
       objectReference: {fileID: 0}
     - target: {fileID: 4433721948416446, guid: 9b0d46ef9e6296640baaf7bac58ac47b, type: 3}
       propertyPath: m_LocalPosition.z
@@ -2540,6 +2623,38 @@ PrefabInstance:
       propertyPath: m_RootOrder
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 8241989165609557697, guid: 8998b2da307be7f419e285784a8495a6, type: 3}
+      propertyPath: hoverColor.b
+      value: 0.93725497
+      objectReference: {fileID: 0}
+    - target: {fileID: 8241989165609557697, guid: 8998b2da307be7f419e285784a8495a6, type: 3}
+      propertyPath: hoverColor.g
+      value: 0.18431373
+      objectReference: {fileID: 0}
+    - target: {fileID: 8241989165609557697, guid: 8998b2da307be7f419e285784a8495a6, type: 3}
+      propertyPath: hoverColor.r
+      value: 0.65882355
+      objectReference: {fileID: 0}
+    - target: {fileID: 8241989165609557697, guid: 8998b2da307be7f419e285784a8495a6, type: 3}
+      propertyPath: defaultColor.b
+      value: 0.5215686
+      objectReference: {fileID: 0}
+    - target: {fileID: 8241989165609557697, guid: 8998b2da307be7f419e285784a8495a6, type: 3}
+      propertyPath: defaultColor.g
+      value: 0.9215687
+      objectReference: {fileID: 0}
+    - target: {fileID: 8241989165609557697, guid: 8998b2da307be7f419e285784a8495a6, type: 3}
+      propertyPath: defaultColor.r
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8241989165609557697, guid: 8998b2da307be7f419e285784a8495a6, type: 3}
+      propertyPath: pressedColor.b
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8241989165609557697, guid: 8998b2da307be7f419e285784a8495a6, type: 3}
+      propertyPath: pressedColor.g
+      value: 0.5529412
+      objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 0}
   m_SourcePrefab: {fileID: 100100000, guid: 8998b2da307be7f419e285784a8495a6, type: 3}
@@ -2548,30 +2663,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4299111203110852, guid: 8998b2da307be7f419e285784a8495a6, type: 3}
   m_PrefabInstance: {fileID: 435065600}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &435065602 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1580682090112394, guid: 8998b2da307be7f419e285784a8495a6, type: 3}
-  m_PrefabInstance: {fileID: 435065600}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &435065603
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 435065602}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4b02e2f8ae628ac4f9faca951fe12db4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  useHover: 1
-  usePrimaryHover: 0
-  defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
-  suspendedColor: {r: 1, g: 0, b: 0, a: 1}
-  hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
-  primaryHoverColor: {r: 1, g: 1, b: 1, a: 1}
-  pressedColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &455833684
 GameObject:
   m_ObjectHideFlags: 0
@@ -2671,11 +2762,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   useHover: 0
   usePrimaryHover: 1
-  defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
+  defaultColor: {r: 0, g: 0.9215687, b: 0.5215686, a: 1}
   suspendedColor: {r: 1, g: 0, b: 0, a: 1}
-  hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
+  hoverColor: {r: 0.65882355, g: 0.18431373, b: 0.93725497, a: 1}
   primaryHoverColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
-  pressedColor: {r: 1, g: 1, b: 1, a: 1}
+  pressedColor: {r: 1, g: 0.5529412, b: 0, a: 1}
+  rends: []
 --- !u!114 &458776555
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3042,6 +3134,38 @@ PrefabInstance:
       propertyPath: m_Material
       value: 
       objectReference: {fileID: 0}
+    - target: {fileID: 8988524118100135441, guid: 5a1fb53528997fe478560ab3120da9cb, type: 3}
+      propertyPath: hoverColor.b
+      value: 0.93725497
+      objectReference: {fileID: 0}
+    - target: {fileID: 8988524118100135441, guid: 5a1fb53528997fe478560ab3120da9cb, type: 3}
+      propertyPath: hoverColor.g
+      value: 0.18431373
+      objectReference: {fileID: 0}
+    - target: {fileID: 8988524118100135441, guid: 5a1fb53528997fe478560ab3120da9cb, type: 3}
+      propertyPath: hoverColor.r
+      value: 0.65882355
+      objectReference: {fileID: 0}
+    - target: {fileID: 8988524118100135441, guid: 5a1fb53528997fe478560ab3120da9cb, type: 3}
+      propertyPath: defaultColor.b
+      value: 0.5215686
+      objectReference: {fileID: 0}
+    - target: {fileID: 8988524118100135441, guid: 5a1fb53528997fe478560ab3120da9cb, type: 3}
+      propertyPath: defaultColor.g
+      value: 0.9215687
+      objectReference: {fileID: 0}
+    - target: {fileID: 8988524118100135441, guid: 5a1fb53528997fe478560ab3120da9cb, type: 3}
+      propertyPath: defaultColor.r
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8988524118100135441, guid: 5a1fb53528997fe478560ab3120da9cb, type: 3}
+      propertyPath: pressedColor.b
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8988524118100135441, guid: 5a1fb53528997fe478560ab3120da9cb, type: 3}
+      propertyPath: pressedColor.g
+      value: 0.5529412
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5a1fb53528997fe478560ab3120da9cb, type: 3}
 --- !u!4 &614767084 stripped
@@ -3246,6 +3370,38 @@ PrefabInstance:
       value: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
         PublicKeyToken=null
       objectReference: {fileID: 0}
+    - target: {fileID: 8241989165609557697, guid: 8998b2da307be7f419e285784a8495a6, type: 3}
+      propertyPath: hoverColor.b
+      value: 0.93725497
+      objectReference: {fileID: 0}
+    - target: {fileID: 8241989165609557697, guid: 8998b2da307be7f419e285784a8495a6, type: 3}
+      propertyPath: hoverColor.g
+      value: 0.18431373
+      objectReference: {fileID: 0}
+    - target: {fileID: 8241989165609557697, guid: 8998b2da307be7f419e285784a8495a6, type: 3}
+      propertyPath: hoverColor.r
+      value: 0.65882355
+      objectReference: {fileID: 0}
+    - target: {fileID: 8241989165609557697, guid: 8998b2da307be7f419e285784a8495a6, type: 3}
+      propertyPath: defaultColor.b
+      value: 0.5215686
+      objectReference: {fileID: 0}
+    - target: {fileID: 8241989165609557697, guid: 8998b2da307be7f419e285784a8495a6, type: 3}
+      propertyPath: defaultColor.g
+      value: 0.9215687
+      objectReference: {fileID: 0}
+    - target: {fileID: 8241989165609557697, guid: 8998b2da307be7f419e285784a8495a6, type: 3}
+      propertyPath: defaultColor.r
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8241989165609557697, guid: 8998b2da307be7f419e285784a8495a6, type: 3}
+      propertyPath: pressedColor.b
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8241989165609557697, guid: 8998b2da307be7f419e285784a8495a6, type: 3}
+      propertyPath: pressedColor.g
+      value: 0.5529412
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8998b2da307be7f419e285784a8495a6, type: 3}
 --- !u!4 &759419767 stripped
@@ -3253,30 +3409,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4299111203110852, guid: 8998b2da307be7f419e285784a8495a6, type: 3}
   m_PrefabInstance: {fileID: 759419766}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &759419768 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1580682090112394, guid: 8998b2da307be7f419e285784a8495a6, type: 3}
-  m_PrefabInstance: {fileID: 759419766}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &759419769
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 759419768}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4b02e2f8ae628ac4f9faca951fe12db4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  useHover: 1
-  usePrimaryHover: 0
-  defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
-  suspendedColor: {r: 1, g: 0, b: 0, a: 1}
-  hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
-  primaryHoverColor: {r: 1, g: 1, b: 1, a: 1}
-  pressedColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &815133632
 GameObject:
   m_ObjectHideFlags: 0
@@ -3599,11 +3731,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   useHover: 0
   usePrimaryHover: 1
-  defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
+  defaultColor: {r: 0, g: 0.9215687, b: 0.5215686, a: 1}
   suspendedColor: {r: 1, g: 0, b: 0, a: 1}
-  hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
+  hoverColor: {r: 0.65882355, g: 0.18431373, b: 0.93725497, a: 1}
   primaryHoverColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
-  pressedColor: {r: 1, g: 1, b: 1, a: 1}
+  pressedColor: {r: 1, g: 0.5529412, b: 0, a: 1}
+  rends: []
 --- !u!114 &826168931
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3727,11 +3860,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   useHover: 0
   usePrimaryHover: 1
-  defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
+  defaultColor: {r: 0, g: 0.9215687, b: 0.5215686, a: 1}
   suspendedColor: {r: 1, g: 0, b: 0, a: 1}
-  hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
+  hoverColor: {r: 0.65882355, g: 0.18431373, b: 0.93725497, a: 1}
   primaryHoverColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
-  pressedColor: {r: 1, g: 1, b: 1, a: 1}
+  pressedColor: {r: 1, g: 0.5529412, b: 0, a: 1}
+  rends: []
 --- !u!114 &868492578
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4593,6 +4727,38 @@ PrefabInstance:
       propertyPath: m_Material
       value: 
       objectReference: {fileID: 0}
+    - target: {fileID: 6565953506581530402, guid: 88a926f39f5ae5c40976d0ff02c7fd2f, type: 3}
+      propertyPath: hoverColor.b
+      value: 0.93725497
+      objectReference: {fileID: 0}
+    - target: {fileID: 6565953506581530402, guid: 88a926f39f5ae5c40976d0ff02c7fd2f, type: 3}
+      propertyPath: hoverColor.g
+      value: 0.18431373
+      objectReference: {fileID: 0}
+    - target: {fileID: 6565953506581530402, guid: 88a926f39f5ae5c40976d0ff02c7fd2f, type: 3}
+      propertyPath: hoverColor.r
+      value: 0.65882355
+      objectReference: {fileID: 0}
+    - target: {fileID: 6565953506581530402, guid: 88a926f39f5ae5c40976d0ff02c7fd2f, type: 3}
+      propertyPath: defaultColor.b
+      value: 0.5215686
+      objectReference: {fileID: 0}
+    - target: {fileID: 6565953506581530402, guid: 88a926f39f5ae5c40976d0ff02c7fd2f, type: 3}
+      propertyPath: defaultColor.g
+      value: 0.9215687
+      objectReference: {fileID: 0}
+    - target: {fileID: 6565953506581530402, guid: 88a926f39f5ae5c40976d0ff02c7fd2f, type: 3}
+      propertyPath: defaultColor.r
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6565953506581530402, guid: 88a926f39f5ae5c40976d0ff02c7fd2f, type: 3}
+      propertyPath: pressedColor.b
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6565953506581530402, guid: 88a926f39f5ae5c40976d0ff02c7fd2f, type: 3}
+      propertyPath: pressedColor.g
+      value: 0.5529412
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 88a926f39f5ae5c40976d0ff02c7fd2f, type: 3}
 --- !u!4 &1225568924 stripped
@@ -4600,30 +4766,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4481971903717870, guid: 88a926f39f5ae5c40976d0ff02c7fd2f, type: 3}
   m_PrefabInstance: {fileID: 1225568923}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &1225568925 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1156390824112410, guid: 88a926f39f5ae5c40976d0ff02c7fd2f, type: 3}
-  m_PrefabInstance: {fileID: 1225568923}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &1225568926
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1225568925}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4b02e2f8ae628ac4f9faca951fe12db4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  useHover: 1
-  usePrimaryHover: 0
-  defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
-  suspendedColor: {r: 1, g: 0, b: 0, a: 1}
-  hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
-  primaryHoverColor: {r: 0.8, g: 0.8, b: 0.8, a: 1}
-  pressedColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &1226439653
 GameObject:
   m_ObjectHideFlags: 0
@@ -4859,6 +5001,38 @@ PrefabInstance:
       propertyPath: m_Material
       value: 
       objectReference: {fileID: 0}
+    - target: {fileID: 8988524118100135441, guid: 5a1fb53528997fe478560ab3120da9cb, type: 3}
+      propertyPath: hoverColor.b
+      value: 0.93725497
+      objectReference: {fileID: 0}
+    - target: {fileID: 8988524118100135441, guid: 5a1fb53528997fe478560ab3120da9cb, type: 3}
+      propertyPath: hoverColor.g
+      value: 0.18431373
+      objectReference: {fileID: 0}
+    - target: {fileID: 8988524118100135441, guid: 5a1fb53528997fe478560ab3120da9cb, type: 3}
+      propertyPath: hoverColor.r
+      value: 0.65882355
+      objectReference: {fileID: 0}
+    - target: {fileID: 8988524118100135441, guid: 5a1fb53528997fe478560ab3120da9cb, type: 3}
+      propertyPath: defaultColor.b
+      value: 0.5215686
+      objectReference: {fileID: 0}
+    - target: {fileID: 8988524118100135441, guid: 5a1fb53528997fe478560ab3120da9cb, type: 3}
+      propertyPath: defaultColor.g
+      value: 0.9215687
+      objectReference: {fileID: 0}
+    - target: {fileID: 8988524118100135441, guid: 5a1fb53528997fe478560ab3120da9cb, type: 3}
+      propertyPath: defaultColor.r
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8988524118100135441, guid: 5a1fb53528997fe478560ab3120da9cb, type: 3}
+      propertyPath: pressedColor.b
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8988524118100135441, guid: 5a1fb53528997fe478560ab3120da9cb, type: 3}
+      propertyPath: pressedColor.g
+      value: 0.5529412
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5a1fb53528997fe478560ab3120da9cb, type: 3}
 --- !u!4 &1259090014 stripped
@@ -4965,11 +5139,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   useHover: 0
   usePrimaryHover: 1
-  defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
+  defaultColor: {r: 0, g: 0.9215687, b: 0.5215686, a: 1}
   suspendedColor: {r: 1, g: 0, b: 0, a: 1}
-  hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
+  hoverColor: {r: 0.65882355, g: 0.18431373, b: 0.93725497, a: 1}
   primaryHoverColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
-  pressedColor: {r: 1, g: 1, b: 1, a: 1}
+  pressedColor: {r: 1, g: 0.5529412, b: 0, a: 1}
+  rends: []
 --- !u!114 &1346347930
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5700,18 +5875,6 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4299111203110852, guid: 8998b2da307be7f419e285784a8495a6, type: 3}
-      propertyPath: m_LocalScale.x
-      value: 0.082679994
-      objectReference: {fileID: 0}
-    - target: {fileID: 4299111203110852, guid: 8998b2da307be7f419e285784a8495a6, type: 3}
-      propertyPath: m_LocalScale.y
-      value: 0.082679994
-      objectReference: {fileID: 0}
-    - target: {fileID: 4299111203110852, guid: 8998b2da307be7f419e285784a8495a6, type: 3}
-      propertyPath: m_LocalScale.z
-      value: 0.082679994
-      objectReference: {fileID: 0}
-    - target: {fileID: 4299111203110852, guid: 8998b2da307be7f419e285784a8495a6, type: 3}
       propertyPath: m_LocalPosition.x
       value: -0.31683812
       objectReference: {fileID: 0}
@@ -5739,41 +5902,37 @@ PrefabInstance:
       propertyPath: m_LocalRotation.z
       value: -0
       objectReference: {fileID: 0}
-    - target: {fileID: 23829386691053380, guid: 8998b2da307be7f419e285784a8495a6, type: 3}
-      propertyPath: m_Materials.Array.data[0]
-      value: 
-      objectReference: {fileID: 2100000, guid: 95c889baf756fd84ba2f1ab36adf3687, type: 2}
-    - target: {fileID: 54989536721116318, guid: 8998b2da307be7f419e285784a8495a6, type: 3}
-      propertyPath: m_UseGravity
-      value: 1
+    - target: {fileID: 8241989165609557697, guid: 8998b2da307be7f419e285784a8495a6, type: 3}
+      propertyPath: hoverColor.b
+      value: 0.93725497
       objectReference: {fileID: 0}
-    - target: {fileID: 54989536721116318, guid: 8998b2da307be7f419e285784a8495a6, type: 3}
-      propertyPath: m_Interpolate
+    - target: {fileID: 8241989165609557697, guid: 8998b2da307be7f419e285784a8495a6, type: 3}
+      propertyPath: hoverColor.g
+      value: 0.18431373
+      objectReference: {fileID: 0}
+    - target: {fileID: 8241989165609557697, guid: 8998b2da307be7f419e285784a8495a6, type: 3}
+      propertyPath: hoverColor.r
+      value: 0.65882355
+      objectReference: {fileID: 0}
+    - target: {fileID: 8241989165609557697, guid: 8998b2da307be7f419e285784a8495a6, type: 3}
+      propertyPath: defaultColor.b
+      value: 0.5215686
+      objectReference: {fileID: 0}
+    - target: {fileID: 8241989165609557697, guid: 8998b2da307be7f419e285784a8495a6, type: 3}
+      propertyPath: defaultColor.g
+      value: 0.9215687
+      objectReference: {fileID: 0}
+    - target: {fileID: 8241989165609557697, guid: 8998b2da307be7f419e285784a8495a6, type: 3}
+      propertyPath: defaultColor.r
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 54989536721116318, guid: 8998b2da307be7f419e285784a8495a6, type: 3}
-      propertyPath: m_IsKinematic
+    - target: {fileID: 8241989165609557697, guid: 8998b2da307be7f419e285784a8495a6, type: 3}
+      propertyPath: pressedColor.b
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 65521548597448220, guid: 8998b2da307be7f419e285784a8495a6, type: 3}
-      propertyPath: m_Material
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 114726310233506268, guid: 8998b2da307be7f419e285784a8495a6, type: 3}
-      propertyPath: _manager
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 114726310233506268, guid: 8998b2da307be7f419e285784a8495a6, type: 3}
-      propertyPath: _ignoreContact
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 114726310233506268, guid: 8998b2da307be7f419e285784a8495a6, type: 3}
-      propertyPath: _ignoreGrasping
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 114726310233506268, guid: 8998b2da307be7f419e285784a8495a6, type: 3}
-      propertyPath: _allowMultiGrasp
-      value: 0
+    - target: {fileID: 8241989165609557697, guid: 8998b2da307be7f419e285784a8495a6, type: 3}
+      propertyPath: pressedColor.g
+      value: 0.5529412
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8998b2da307be7f419e285784a8495a6, type: 3}
@@ -5782,30 +5941,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4299111203110852, guid: 8998b2da307be7f419e285784a8495a6, type: 3}
   m_PrefabInstance: {fileID: 1585374984}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &1585374986 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1580682090112394, guid: 8998b2da307be7f419e285784a8495a6, type: 3}
-  m_PrefabInstance: {fileID: 1585374984}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &1585374987
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1585374986}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4b02e2f8ae628ac4f9faca951fe12db4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  useHover: 1
-  usePrimaryHover: 0
-  defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
-  suspendedColor: {r: 1, g: 0, b: 0, a: 1}
-  hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
-  primaryHoverColor: {r: 1, g: 1, b: 1, a: 1}
-  pressedColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &1602369146
 GameObject:
   m_ObjectHideFlags: 0
@@ -8651,6 +8786,38 @@ PrefabInstance:
       propertyPath: m_Material
       value: 
       objectReference: {fileID: 0}
+    - target: {fileID: 8988524118100135441, guid: 5a1fb53528997fe478560ab3120da9cb, type: 3}
+      propertyPath: hoverColor.b
+      value: 0.93725497
+      objectReference: {fileID: 0}
+    - target: {fileID: 8988524118100135441, guid: 5a1fb53528997fe478560ab3120da9cb, type: 3}
+      propertyPath: hoverColor.g
+      value: 0.18431373
+      objectReference: {fileID: 0}
+    - target: {fileID: 8988524118100135441, guid: 5a1fb53528997fe478560ab3120da9cb, type: 3}
+      propertyPath: hoverColor.r
+      value: 0.65882355
+      objectReference: {fileID: 0}
+    - target: {fileID: 8988524118100135441, guid: 5a1fb53528997fe478560ab3120da9cb, type: 3}
+      propertyPath: defaultColor.b
+      value: 0.5215686
+      objectReference: {fileID: 0}
+    - target: {fileID: 8988524118100135441, guid: 5a1fb53528997fe478560ab3120da9cb, type: 3}
+      propertyPath: defaultColor.g
+      value: 0.9215687
+      objectReference: {fileID: 0}
+    - target: {fileID: 8988524118100135441, guid: 5a1fb53528997fe478560ab3120da9cb, type: 3}
+      propertyPath: defaultColor.r
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8988524118100135441, guid: 5a1fb53528997fe478560ab3120da9cb, type: 3}
+      propertyPath: pressedColor.b
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8988524118100135441, guid: 5a1fb53528997fe478560ab3120da9cb, type: 3}
+      propertyPath: pressedColor.g
+      value: 0.5529412
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5a1fb53528997fe478560ab3120da9cb, type: 3}
 --- !u!4 &2021243793 stripped
@@ -8904,11 +9071,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   useHover: 0
   usePrimaryHover: 1
-  defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
+  defaultColor: {r: 0, g: 0.9215687, b: 0.5215686, a: 1}
   suspendedColor: {r: 1, g: 0, b: 0, a: 1}
-  hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
+  hoverColor: {r: 0.65882355, g: 0.18431373, b: 0.93725497, a: 1}
   primaryHoverColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
-  pressedColor: {r: 1, g: 1, b: 1, a: 1}
+  pressedColor: {r: 1, g: 0.5529412, b: 0, a: 1}
+  rends: []
 --- !u!114 &2069913280
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9090,11 +9258,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   useHover: 0
   usePrimaryHover: 1
-  defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
+  defaultColor: {r: 0, g: 0.9215687, b: 0.5215686, a: 1}
   suspendedColor: {r: 1, g: 0, b: 0, a: 1}
-  hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
+  hoverColor: {r: 0.65882355, g: 0.18431373, b: 0.93725497, a: 1}
   primaryHoverColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
-  pressedColor: {r: 1, g: 1, b: 1, a: 1}
+  pressedColor: {r: 1, g: 0.5529412, b: 0, a: 1}
+  rends: []
 --- !u!114 &2123307579
 MonoBehaviour:
   m_ObjectHideFlags: 0
