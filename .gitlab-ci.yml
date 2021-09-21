@@ -24,6 +24,6 @@ trigger::trigger-downstream:
     UPSTREAM_COMMIT_BRANCH: $CI_COMMIT_BRANCH 
 
   trigger:
-    project: xr/integrations/ci/unityplugin
+    project: xr/integrations/unity/ci/unityplugin
     branch: main
     strategy: depend
