@@ -400,6 +400,7 @@ namespace Leap.Unity {
 
         // This way, we always track a scene-space tracked pose.
         trackedPose = _trackingBaseDeltaPose.Value.mul(trackedPose);
+        #endif
       }
       else if (_deviceOffsetMode == DeviceOffsetMode.Transform) {
         trackedPose = deviceOrigin.ToPose();

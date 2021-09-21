@@ -27,7 +27,7 @@ namespace Leap.Unity
      // There is no support planned for Unity's XR plugin system on XR2 devices using the Unity SnapDragon XR SDK
      // The XR2 implementation therefore calls into the SVR plugin directly
 
-     if UNITY_ANDROID // In future we should target XR2 devices only with this. However, at the moment Android support is limited to XR2 devices only
+     #if UNITY_ANDROID // In future we should target XR2 devices only with this. However, at the moment Android support is limited to XR2 devices only
 
      public static bool IsXREnabled() {
          return SvrManager.Instance.status.running && SvrManager.Instance.status.pose == 3;
