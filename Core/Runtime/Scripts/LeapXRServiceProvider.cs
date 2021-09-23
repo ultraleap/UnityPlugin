@@ -208,6 +208,9 @@ namespace Leap.Unity {
         #region Unity Events
 
         protected override void Reset() {
+
+            if(!Application.isPlaying) { return; }
+
             base.Reset();
             editTimePose = TestHandFactory.TestHandPose.HeadMountedB;
 
@@ -233,6 +236,9 @@ namespace Leap.Unity {
         //     }
 
         protected virtual void OnEnable() {
+
+            if(!Application.isPlaying) { return; }
+
             resetShaderTransforms();
 
             if(preCullCamera == null) {
@@ -265,6 +271,9 @@ namespace Leap.Unity {
         }
 
         protected virtual void OnDisable() {
+
+            if(!Application.isPlaying) { return; }
+
             resetShaderTransforms();
 
 #if UNITY_2019_1_OR_NEWER
@@ -281,6 +290,9 @@ namespace Leap.Unity {
         }
 
         protected override void Start() {
+
+            if(!Application.isPlaying) { return; }
+
             base.Start();
             //_cachedCamera = GetComponent<Camera>();
             if(_deviceOffsetMode == DeviceOffsetMode.Transform && _deviceOrigin == null) {
@@ -310,6 +322,9 @@ namespace Leap.Unity {
         }
 
         void LateUpdate() {
+
+            if(!Application.isPlaying) { return; }
+
             var projectionMatrix = _cachedCamera == null ? Matrix4x4.identity
               : _cachedCamera.projectionMatrix;
             switch(SystemInfo.graphicsDeviceType) {
@@ -404,9 +419,9 @@ namespace Leap.Unity {
             OnPreCullHandTransforms(_cachedCamera);
         }
 
-#endregion
+        #endregion
 
-#region LeapServiceProvider Overrides
+        #region LeapServiceProvider Overrides
 
         protected override long CalculateInterpolationTime(bool endOfFrame = false) {
 #if UNITY_ANDROID
@@ -444,9 +459,9 @@ namespace Leap.Unity {
             dest.CopyFrom(source).Transform(leapTransform);
         }
 
-#endregion
+        #endregion
 
-#region Internal Methods
+        #region Internal Methods
 
         /// <summary>
         /// Resets shader globals for the Hand transforms.
@@ -621,7 +636,7 @@ namespace Leap.Unity {
             }
         }
 
-#endregion
+        #endregion
     }
 
 }
