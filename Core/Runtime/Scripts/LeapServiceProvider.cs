@@ -332,6 +332,15 @@ namespace Leap.Unity {
         _serviceBinder.Call("unbind");
       }
     }
+
+    #else
+
+    protected virtual void OnEnable() {
+    }
+    
+    protected virtual void OnDisable() {
+    }
+
     #endif
     #endregion
 
