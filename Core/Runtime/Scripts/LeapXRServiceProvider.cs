@@ -22,7 +22,6 @@ namespace Leap.Unity {
     /// warp tracked hand positions based on the motion of the headset to account for the
     /// differing latencies of the two tracking systems.
     /// </summary>
-    [ExecuteInEditMode]
     public class LeapXRServiceProvider : LeapServiceProvider {
 
         #region Inspector
@@ -291,8 +290,6 @@ namespace Leap.Unity {
 
         protected override void Start() {
 
-            if(!Application.isPlaying) { return; }
-
             base.Start();
             //_cachedCamera = GetComponent<Camera>();
             if(_deviceOffsetMode == DeviceOffsetMode.Transform && _deviceOrigin == null) {
@@ -309,21 +306,13 @@ namespace Leap.Unity {
 
         protected override void Update() {
 
-            if(Application.isPlaying) {
-                manualUpdateHasBeenCalledSinceUpdate = false;
-                base.Update();
-                imageTimeStamp = _leapController.FrameTimestamp();
-            }
+            manualUpdateHasBeenCalledSinceUpdate = false;
+            base.Update();
+            imageTimeStamp = _leapController.FrameTimestamp();
 
-            if(cachedCamera != null) {
-                this.transform.position = cachedCamera.transform.position;
-                this.transform.rotation = cachedCamera.transform.rotation;
-            }
         }
 
         void LateUpdate() {
-
-            if(!Application.isPlaying) { return; }
 
             var projectionMatrix = _cachedCamera == null ? Matrix4x4.identity
               : _cachedCamera.projectionMatrix;
@@ -382,12 +371,6 @@ namespace Leap.Unity {
             if(preCullingCamera != preCullCamera) {
                 return;
             }
-
-#if UNITY_EDITOR
-            if(!Application.isPlaying) {
-                return;
-            }
-#endif
 
             Pose trackedPose;
             if(_deviceOffsetMode == DeviceOffsetMode.Default
