@@ -14,103 +14,136 @@ using UnityEditor;
 
 /** HandModelBase defines abstract methods as a template for building Leap hand models*/
 namespace Leap.Unity {
-  public enum Chirality { Left, Right };
-  public enum ModelType { Graphics, Physics };
+    public enum Chirality { Left, Right };
+    public enum ModelType { Graphics, Physics };
 
-  [ExecuteInEditMode]
-  public abstract class HandModelBase : MonoBehaviour {
+    [ExecuteInEditMode]
+    public abstract class HandModelBase : MonoBehaviour {
 
-    public event Action OnBegin;
-    public event Action OnFinish;
-    /// <summary> Called directly after the HandModelBase's UpdateHand().
-    /// </summary>
-    public event Action OnUpdate;
+        public event Action OnBegin;
+        public event Action OnFinish;
+        /// <summary> Called directly after the HandModelBase's UpdateHand().
+        /// </summary>
+        public event Action OnUpdate;
 
-    private bool isTracked = false;
-    public bool IsTracked {
-      get { return isTracked; }
-    }
+        private bool isTracked = false;
+        public bool IsTracked {
+            get { return isTracked; }
+        }
 
-    public abstract Chirality Handedness { get; set; }
-    public abstract ModelType HandModelType { get; }
-    public virtual void InitHand() { }
+        public abstract Chirality Handedness { get; set; }
+        public abstract ModelType HandModelType { get; }
+        public virtual void InitHand() { }
 
-    public virtual void BeginHand() {
-      if (OnBegin != null) {
-        OnBegin();
-      }
-      isTracked = true;
-    }
-    public abstract void UpdateHand();
-    public void UpdateHandWithEvent() {
-      UpdateHand();
-      if (OnUpdate != null) { OnUpdate(); }
-    }
-    public virtual void FinishHand() {
-      if (OnFinish != null) {
-        OnFinish();
-      }
-      isTracked = false;
-    }
-    public abstract Hand GetLeapHand();
-    public abstract void SetLeapHand(Hand hand);
+        public virtual void BeginHand() {
+            if(OnBegin != null) {
+                OnBegin();
+            }
+            isTracked = true;
+        }
+        public abstract void UpdateHand();
+        public void UpdateHandWithEvent() {
+            UpdateHand();
+            if(OnUpdate != null) { OnUpdate(); }
+        }
+        public virtual void FinishHand() {
+            if(OnFinish != null) {
+                OnFinish();
+            }
+            isTracked = false;
+        }
+        public abstract Hand GetLeapHand();
+        public abstract void SetLeapHand(Hand hand);
 
-    /// <summary>
-    /// Returns whether or not this hand model supports editor persistence.  This is false by default and must be
-    /// opt-in by a developer making their own hand model script if they want editor persistence.
-    /// </summary>
-    public virtual bool SupportsEditorPersistence() {
-      return false;
-    }
+        /// <summary>
+        /// Returns whether or not this hand model supports editor persistence.  This is false by default and must be
+        /// opt-in by a developer making their own hand model script if they want editor persistence.
+        /// </summary>
+        public virtual bool SupportsEditorPersistence() {
+            return false;
+        }
 
-    [NonSerialized]
-    public HandModelManager.ModelGroup group;
+        [NonSerialized]
+        public HandModelManager.ModelGroup group;
+
+        LeapProvider leapProvider;
+
+        private void OnEnable() {
+            if(leapProvider == null) {
+
+                //Try to set the provider for the user
+                leapProvider = Hands.Provider;
+
+                if(leapProvider == null) {
+                    Debug.Log("No leap provider found");
+                    return;
+                }
+            }
+
+            leapProvider.OnUpdateFrame -= UpdateFrame;
+            leapProvider.OnFixedFrame -= FixedUpdateFrame;
+            leapProvider.OnUpdateFrame += UpdateFrame;
+            leapProvider.OnFixedFrame += FixedUpdateFrame;
+        }
+
+        private void OnDisable() {
+
+            leapProvider.OnUpdateFrame -= UpdateFrame;
+            leapProvider.OnFixedFrame -= FixedUpdateFrame;
+        }
+
+        void UpdateFrame(Frame frame) {
+            var hand = frame.Get(Handedness);
+            UpdateBase(hand);
+        }
+
+        void FixedUpdateFrame(Frame frame) {
+            var hand = frame.Get(Handedness);
+            UpdateBase(hand);
+        }
 
 #if UNITY_EDITOR
-    void Update() {
-      if (!EditorApplication.isPlaying && SupportsEditorPersistence()) {
-        LeapProvider provider = null;
 
-        //First try to get the provider from a parent HandModelManager
-        if (transform.parent != null) {
-          var manager = transform.parent.GetComponent<HandModelManager>();
-          if (manager != null) {
-            provider = manager.leapProvider;
-          }
+        //Only Runs in editor
+        private void Update() {
+            if(!Application.isPlaying && SupportsEditorPersistence()) {
+
+
+                //Try to set the provider for the user
+                var Provider = Hands.Provider;
+                Hand hand = null;
+                if(Provider == null) {
+                    if(!Application.isPlaying && SupportsEditorPersistence()) {
+                        //If we still have a null hand, construct one manually
+                        if(hand == null) {
+                            hand = TestHandFactory.MakeTestHand(Handedness == Chirality.Left, unitType: TestHandFactory.UnitType.LeapUnits);
+                            hand.Transform(transform.GetLeapMatrix());
+                        }
+                    }
+                }
+                else {
+                    hand = Provider.CurrentFrame.Get(Handedness);
+                }
+
+                UpdateBase(hand);
+            }
         }
-
-        //If not found, use any old provider from the Hands.Provider getter
-        if (provider == null) {
-          provider = Hands.Provider;
-        }
-
-        Hand hand = null;
-        //If we found a provider, pull the hand from that
-        if (provider != null) {
-          var frame = provider.CurrentFrame;
-
-          if (frame != null) {
-            hand = frame.Get(Handedness);
-          }
-        }
-
-        //If we still have a null hand, construct one manually
-        if (hand == null) {
-          hand = TestHandFactory.MakeTestHand(Handedness == Chirality.Left, unitType: TestHandFactory.UnitType.LeapUnits);
-          hand.Transform(transform.GetLeapMatrix());
-        }
-
-        if (GetLeapHand() == null) {
-          SetLeapHand(hand);
-          InitHand();
-          BeginHand();
-          UpdateHand();
-        } else {
-          SetLeapHand(hand);
-          UpdateHand();
-        }
-      }
-    }
 #endif
-  }
+
+        void UpdateBase(Hand hand) {
+
+
+            if(GetLeapHand() == null) {
+                SetLeapHand(hand);
+                InitHand();
+                BeginHand();
+                UpdateHand();
+            }
+            else {
+                SetLeapHand(hand);
+                UpdateHand();
+            }
+
+        }
+    }
 }
