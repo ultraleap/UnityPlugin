@@ -1,13 +1,15 @@
 {
   "name": "com.ultraleap.tracking",
   "displayName": "Ultraleap Tracking",
-  "version": "4.9.0",
+  "description": "Ultraleap Unity Plugin for Tracking",
+  "version": "5.0.0",
   "unity": "2019.4",
   "type": "library",
-  "description": "Ultraleap Tracking",
   "keywords": [
-    "haptics",
-    "ultraleap"
+    "ultraleap",
+    "leap motion",
+    "hand tracking",
+    "tracking"
   ],
   "readme": "Ultraleap",
   "author": {
