@@ -154,7 +154,7 @@ namespace Leap.Unity {
     #endregion
 
     #region Edit-time Frame Data
- 
+
     private Action<Device> _onDeviceSafe;
     /// <summary>
     /// A utility event to get a callback whenever a new device is connected to the service.
@@ -281,30 +281,64 @@ namespace Leap.Unity {
     #if UNITY_ANDROID
 
     private AndroidJavaObject _serviceBinder;
+    AndroidJavaClass unityPlayer;
+    AndroidJavaObject activity;
+    AndroidJavaObject context;
+    ServiceCallbacks serviceCallbacks;
 
-    protected void OnEnable()
-    {
-      AndroidJavaClass unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
-      AndroidJavaObject activity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
-      AndroidJavaObject context = activity.Call<AndroidJavaObject>("getApplicationContext");
-      ServiceCallbacks serviceCallbacks = new ServiceCallbacks();
-      _serviceBinder = new AndroidJavaObject("com.ultraleap.tracking.service_binder.ServiceBinder", context, serviceCallbacks);
+    protected virtual void OnEnable() {
+      CreateAndroidBinding();
+    }
 
-      bool bindStatus = _serviceBinder.Call<bool>("bind");
-      if (bindStatus)
-      {
-        Debug.Log("ServiceBinder.bind : succeeded.");
+    public bool CreateAndroidBinding() {
+      try {
+        if (_serviceBinder != null) {
+          //Check binding status before calling rebind
+          bool bindStatus = _serviceBinder.Call<bool>("isBound");
+          Debug.Log("CreateAndroidBinding - Current service binder status " + bindStatus);
+          if (bindStatus)
+            return true;
+          else
+            _serviceBinder = null;
+        }
+        if (_serviceBinder == null) {
+          //Get activity and context
+          if (unityPlayer == null) {
+            Debug.Log("CreateAndroidBinding - Getting activity and context");
+            unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
+            activity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
+            context = activity.Call<AndroidJavaObject>("getApplicationContext");
+            serviceCallbacks = new ServiceCallbacks();
+          }
+          //Create a new service binding
+          Debug.Log("CreateAndroidBinding - Creating a new service binder");
+          _serviceBinder = new AndroidJavaObject("com.ultraleap.tracking.service_binder.ServiceBinder", context, serviceCallbacks);
+          bool success = _serviceBinder.Call<bool>("bind");
+          if (success) {
+            Debug.Log("CreateAndroidBinding - Binding of service binder complete");
+          }
+          return true;
+        }
+      } catch (Exception e) {
+        Debug.LogWarning("CreateAndroidBinding - Failed to bind service: " + e.Message);
+        _serviceBinder = null;
       }
-      else
-      {
-        Debug.LogWarning("ServiceBinder.bind : failed!");
+      return false;
+    }
+
+    protected virtual void OnDisable() {
+      if (_serviceBinder != null) {
+        Debug.Log("ServiceBinder.unbind...");
+        _serviceBinder.Call("unbind");
       }
     }
 
-    protected void OnDisable()
-    {
-      Debug.Log("ServiceBinder.unbind...");
-      _serviceBinder.Call("unbind");
+    #else
+
+    protected virtual void OnEnable() {
+    }
+    
+    protected virtual void OnDisable() {
     }
 
     #endif
@@ -418,7 +452,20 @@ namespace Leap.Unity {
       _isDestroyed = true;
     }
 
+    protected virtual void OnApplicationFocus(bool hasFocus) {
+    #if UNITY_ANDROID
+      if (hasFocus) {
+        CreateAndroidBinding();
+      }
+    #endif
+    }
+
     protected virtual void OnApplicationPause(bool isPaused) {
+    #if UNITY_ANDROID
+      if (isPaused) {
+        _serviceBinder.Call("unbind");
+      }
+    #endif
       if (_leapController != null) {
         if (isPaused) {
           _leapController.StopConnection();
@@ -489,7 +536,7 @@ namespace Leap.Unity {
     /// that only exist on the LeapXRServiceProvider.
     /// </summary>
     public void CopySettingsToLeapXRServiceProvider(
-        LeapXRServiceProvider leapXRServiceProvider) {
+      LeapXRServiceProvider leapXRServiceProvider) {
       leapXRServiceProvider._interactionVolumeVisualization = _interactionVolumeVisualization;
       leapXRServiceProvider._frameOptimization = _frameOptimization;
       leapXRServiceProvider._physicsExtrapolation = _physicsExtrapolation;
@@ -507,12 +554,13 @@ namespace Leap.Unity {
       #else
       if (_leapController != null) {
         return _leapController.Now() - (long)_smoothedTrackingLatency.value;
-      } else {
+      }
+      else {
         return 0;
       }
       #endif
     }
- 
+
     /// <summary>
     /// Initializes Leap Motion policy flags.
     /// </summary>
@@ -528,11 +576,11 @@ namespace Leap.Unity {
       } else if (_trackingOptimization == TrackingOptimizationMode.ScreenTop) {
         _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_DEFAULT);
         _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
-        _leapController.SetPolicy  (Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP);
+        _leapController.SetPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP);
       } else if (_trackingOptimization == TrackingOptimizationMode.HMD) {
         _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_DEFAULT);
         _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP);
-        _leapController.SetPolicy  (Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
+        _leapController.SetPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
       }
     }
 
@@ -541,6 +589,12 @@ namespace Leap.Unity {
     /// subscribing to its connection event.
     /// </summary>
     protected void createController() {
+    #if UNITY_ANDROID
+      var bindStatus = CreateAndroidBinding();
+      if (!bindStatus)
+        return;
+    #endif
+
       if (_leapController != null) {
         return;
       }
@@ -568,7 +622,7 @@ namespace Leap.Unity {
         _leapController.BeginProfilingForThread += LeapProfiling.BeginProfilingForThread;
       }
     }
- 
+
     /// <summary>
     /// Stops the connection for the existing instance of a Controller, clearing old
     /// policy flags and resetting the Controller to null.
@@ -593,7 +647,7 @@ namespace Leap.Unity {
     /// for MAX_RECONNECTION_ATTEMPTS
     /// </summary>
     protected bool checkConnectionIntegrity() {
-      if (_leapController.IsServiceConnected) {
+      if (_leapController != null && _leapController.IsServiceConnected) {
         _framesSinceServiceConnectionChecked = 0;
         _numberOfReconnectionAttempts = 0;
         return true;

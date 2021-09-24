@@ -245,7 +245,7 @@ namespace Leap.Unity {
     //       }
     //     }
 
-    protected virtual void OnEnable() {
+    protected override void OnEnable() {
       resetShaderTransforms();
 
       if (preCullCamera == null) {
@@ -276,7 +276,7 @@ namespace Leap.Unity {
       #endif
     }
 
-    protected virtual void OnDisable() {
+    protected override void OnDisable() {
       resetShaderTransforms();
 
       #if UNITY_2019_1_OR_NEWER
@@ -312,7 +312,8 @@ namespace Leap.Unity {
     protected override void Update() {
       manualUpdateHasBeenCalledSinceUpdate = false;
       base.Update();
-      imageTimeStamp = _leapController.FrameTimestamp();
+      if(_leapController != null)
+          imageTimeStamp = _leapController.FrameTimestamp();
     }
 
     void LateUpdate() {
@@ -378,6 +379,11 @@ namespace Leap.Unity {
         return;
       }
       #endif
+
+      if(_cachedCamera == null || _leapController == null)
+      {
+        return;
+      }
 
       Pose trackedPose;
       if (_deviceOffsetMode == DeviceOffsetMode.Default
