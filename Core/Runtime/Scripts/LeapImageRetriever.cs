@@ -267,7 +267,7 @@ namespace Leap.Unity {
       ApplyGammaCorrectionValues();
 #if UNITY_2019_3_OR_NEWER
       //SRP require subscribing to RenderPipelineManagers
-      if (UnityEngine.Rendering.GraphicsSettings.renderPipelineAsset != null) {
+      if(UnityEngine.Rendering.GraphicsSettings.renderPipelineAsset != null) {
         UnityEngine.Rendering.RenderPipelineManager.beginCameraRendering -= onBeginRendering;
         UnityEngine.Rendering.RenderPipelineManager.beginCameraRendering += onBeginRendering;
       }

@@ -9,7 +9,7 @@
 using UnityEngine;
 using System.Collections;
 
-namespace Leap.Unity {
+namespace Leap.Unity{
   [ExecuteInEditMode]
   public class EnableDepthBuffer : MonoBehaviour {
 
