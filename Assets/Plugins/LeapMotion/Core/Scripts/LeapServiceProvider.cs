@@ -7,6 +7,7 @@
  ******************************************************************************/
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -51,6 +52,16 @@ namespace Leap.Unity {
     #endregion
 
     #region Inspector
+    
+    public enum Mode
+    {
+      None,
+      Desktop,
+      ScreenTop,
+      HeadMounted
+    }
+    
+    [SerializeField] private Mode _mode = Mode.None;
 
     public enum InteractionVolumeVisualization {
       None,
@@ -471,28 +482,139 @@ namespace Leap.Unity {
       }
       #endif
     }
- 
+    
+    private Coroutine _changeModeCoroutine;
+
+    protected virtual void InitialiseMode()
+    {
+      ChangeMode(_mode);
+    }
+
     /// <summary>
-    /// Initializes Leap Motion policy flags.
+    /// Triggers a coroutine that sets appropriate policy flags and wait for them to be set to ensure we've changed mode
     /// </summary>
-    protected virtual void initializeFlags() {
-      if (_leapController == null) {
-        return;
+    /// <param name="mode">Mode to set</param>
+    /// <returns>True if coroutine is triggered, false if coroutine is already running</returns>
+    public void ChangeMode(Mode mode)
+    {
+      if (_changeModeCoroutine != null)
+      {
+        StopCoroutine(_changeModeCoroutine);
+      }
+      
+      switch (mode)
+      {
+        case Mode.None:
+          break;        
+        case Mode.Desktop:
+          _changeModeCoroutine = StartCoroutine(SetDesktopMode());
+          break;
+        case Mode.ScreenTop:
+          _changeModeCoroutine = StartCoroutine(SetScreenTopMode());
+          break;
+        case Mode.HeadMounted:
+          _changeModeCoroutine = StartCoroutine(SetHeadMountedMode());
+          break;
+      }
+    }
+
+    public Mode GetMode()
+    {
+      var screenTopPolicySet = _leapController.IsPolicySet(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP);
+      var headMountedPolicySet = _leapController.IsPolicySet(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
+      
+      var desktopMode = !screenTopPolicySet && !headMountedPolicySet;
+      if (desktopMode)
+      {
+        return Mode.Desktop;
+      }
+      
+      var headMountedMode = !screenTopPolicySet && headMountedPolicySet;
+      if (headMountedMode)
+      {
+        return Mode.HeadMounted;
+      }
+      
+      var screenTopMode = screenTopPolicySet && !headMountedPolicySet;
+      if (screenTopMode)
+      {
+        return Mode.ScreenTop;
       }
 
-      if (_trackingOptimization == TrackingOptimizationMode.Desktop) {
-        _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_DEFAULT);
-        _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP);
-        _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
-      } else if (_trackingOptimization == TrackingOptimizationMode.ScreenTop) {
-        _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_DEFAULT);
-        _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
-        _leapController.SetPolicy  (Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP);
-      } else if (_trackingOptimization == TrackingOptimizationMode.HMD) {
-        _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_DEFAULT);
-        _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP);
-        _leapController.SetPolicy  (Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
+      return Mode.None;
+    }
+    
+
+    /// <summary>
+    /// Sets desktop mode properties and information
+    /// </summary>
+    private IEnumerator SetDesktopMode()
+    {  
+      _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP);
+      _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
+
+      var screenTopPolicySet = _leapController.IsPolicySet(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP);
+      var headMountedPolicySet = _leapController.IsPolicySet(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
+       
+      var desktopMode = !screenTopPolicySet && !headMountedPolicySet;
+
+      while (!desktopMode)
+      {
+        screenTopPolicySet = _leapController.IsPolicySet(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP);
+        headMountedPolicySet = _leapController.IsPolicySet(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
+        desktopMode = !screenTopPolicySet && !headMountedPolicySet;
+        yield return null;
       }
+
+      _changeModeCoroutine = null;
+    }
+
+    /// <summary>
+    /// Sets head mounted mode properties and information
+    /// </summary>
+    private IEnumerator SetHeadMountedMode()
+    {
+      _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP);
+      _leapController.SetPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
+
+      var screenTopPolicySet = _leapController.IsPolicySet(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP);
+      var headMountedPolicySet = _leapController.IsPolicySet(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
+       
+      var headMountedMode = !screenTopPolicySet && headMountedPolicySet;
+
+      while (!headMountedMode)
+      {
+        screenTopPolicySet = _leapController.IsPolicySet(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP);
+        headMountedPolicySet = _leapController.IsPolicySet(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
+        headMountedMode = headMountedMode = !screenTopPolicySet && headMountedPolicySet;
+        yield return null;
+      }
+      
+      _changeModeCoroutine = null;
+    }
+
+    /// <summary>
+    /// Sets screen top mode properties and information
+    /// </summary>
+    private IEnumerator SetScreenTopMode()
+    {
+      _leapController.SetPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP);
+      _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
+      
+      var screenTopPolicySet = _leapController.IsPolicySet(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP);
+      var headMountedPolicySet = _leapController.IsPolicySet(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
+
+      var screenTopMode = screenTopPolicySet && !headMountedPolicySet;
+
+      while (!screenTopMode)
+      {
+        screenTopPolicySet = _leapController.IsPolicySet(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP);
+        headMountedPolicySet = _leapController.IsPolicySet(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
+        screenTopMode = screenTopMode = screenTopPolicySet && !headMountedPolicySet;
+        yield return null;
+      }   
+      
+      _changeModeCoroutine = null;
     }
 
     /// <summary>
@@ -512,7 +634,7 @@ namespace Leap.Unity {
       };
 
       if (_leapController.IsConnected) {
-        initializeFlags();
+        InitialiseMode();
       } else {
         _leapController.Device += onHandControllerConnect;
       }
@@ -534,10 +656,6 @@ namespace Leap.Unity {
     /// </summary>
     protected void destroyController() {
       if (_leapController != null) {
-        if (_leapController.IsConnected) {
-          _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP);
-          _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
-        }
         _leapController.StopConnection();
         _leapController.Dispose();
         _leapController = null;
@@ -576,7 +694,7 @@ namespace Leap.Unity {
     }
 
     protected void onHandControllerConnect(object sender, LeapEventArgs args) {
-      initializeFlags();
+      InitialiseMode();
 
       if (_leapController != null) {
         _leapController.Device -= onHandControllerConnect;
