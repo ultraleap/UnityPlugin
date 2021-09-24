@@ -62,15 +62,15 @@ namespace Leap.Unity {
       }
 
       public bool CheckStale(Image image) {
-        if(_combinedTexture == null || _intermediateArray == null) {
+        if (_combinedTexture == null || _intermediateArray == null) {
           return true;
         }
 
-        if(image.Width != _combinedTexture.width || image.Height * 2 != _combinedTexture.height) {
+        if (image.Width != _combinedTexture.width || image.Height * 2 != _combinedTexture.height) {
           return true;
         }
 
-        if(_combinedTexture.format != getTextureFormat(image)) {
+        if (_combinedTexture.format != getTextureFormat(image)) {
           return true;
         }
 
@@ -83,7 +83,7 @@ namespace Leap.Unity {
 
         TextureFormat format = getTextureFormat(image);
 
-        if(_combinedTexture != null) {
+        if (_combinedTexture != null) {
           DestroyImmediate(_combinedTexture);
         }
 
@@ -105,7 +105,7 @@ namespace Leap.Unity {
       }
 
       private TextureFormat getTextureFormat(Image image) {
-        switch(image.Format) {
+        switch (image.Format) {
           case Image.FormatType.INFRARED:
             return TextureFormat.Alpha8;
           default:
@@ -114,7 +114,7 @@ namespace Leap.Unity {
       }
 
       private int bytesPerPixel(TextureFormat format) {
-        switch(format) {
+        switch (format) {
           case TextureFormat.Alpha8:
             return 1;
           default:
@@ -140,7 +140,7 @@ namespace Leap.Unity {
         int combinedWidth = image.DistortionWidth / 2;
         int combinedHeight = image.DistortionHeight * 2;
 
-        if(_combinedTexture != null) {
+        if (_combinedTexture != null) {
           DestroyImmediate(_combinedTexture);
         }
 
@@ -164,7 +164,7 @@ namespace Leap.Unity {
                                        Concat(image.Distortion(Image.CameraType.RIGHT)).
                                        ToArray();
 
-        for(int i = 0; i < distortionData.Length; i += 2) {
+        for (int i = 0; i < distortionData.Length; i += 2) {
           byte b0, b1, b2, b3;
           encodeFloat(distortionData[i], out b0, out b1);
           encodeFloat(distortionData[i + 1], out b2, out b3);
@@ -235,10 +235,9 @@ namespace Leap.Unity {
 
 #if UNITY_EDITOR
     void OnValidate() {
-      if(Application.isPlaying) {
+      if (Application.isPlaying) {
         ApplyGammaCorrectionValues();
-      }
-      else {
+      } else {
         EyeTextureData.ResetGlobalShaderValues();
       }
     }
@@ -251,7 +250,7 @@ namespace Leap.Unity {
       //  _provider = GetComponentInChildren<LeapServiceProvider>();
       //}
 
-      if(_provider == null) {
+      if (_provider == null) {
         Debug.Log("Provider not assigned");
         this.enabled = false;
         return;
@@ -268,7 +267,7 @@ namespace Leap.Unity {
       ApplyGammaCorrectionValues();
 #if UNITY_2019_3_OR_NEWER
       //SRP require subscribing to RenderPipelineManagers
-      if(UnityEngine.Rendering.GraphicsSettings.renderPipelineAsset != null) {
+      if (UnityEngine.Rendering.GraphicsSettings.renderPipelineAsset != null) {
         UnityEngine.Rendering.RenderPipelineManager.beginCameraRendering -= onBeginRendering;
         UnityEngine.Rendering.RenderPipelineManager.beginCameraRendering += onBeginRendering;
       }
@@ -286,12 +285,12 @@ namespace Leap.Unity {
     private void OnDestroy() {
       StopAllCoroutines();
       Controller controller = _provider.GetLeapController();
-      if(controller != null) {
+      if (controller != null) {
         _provider.GetLeapController().DistortionChange -= onDistortionChange;
       }
 #if UNITY_2019_3_OR_NEWER
       //SRP require subscribing to RenderPipelineManagers
-      if(UnityEngine.Rendering.GraphicsSettings.renderPipelineAsset != null) {
+      if (UnityEngine.Rendering.GraphicsSettings.renderPipelineAsset != null) {
         UnityEngine.Rendering.RenderPipelineManager.beginCameraRendering -= onBeginRendering;
       }
 #endif
@@ -302,8 +301,8 @@ namespace Leap.Unity {
 
       _currentImage = null;
 
-      if(_needQueueReset) {
-        while(_imageQueue.TryDequeue()) { }
+      if (_needQueueReset) {
+        while (_imageQueue.TryDequeue()) { }
         _needQueueReset = false;
       }
 
@@ -315,8 +314,8 @@ namespace Leap.Unity {
        * At that time, image ids never line up with tracking ids.
        */
       Image potentialImage;
-      while(_imageQueue.TryPeek(out potentialImage)) {
-        if(potentialImage.SequenceId > imageFrame.Id) {
+      while (_imageQueue.TryPeek(out potentialImage)) {
+        if (potentialImage.SequenceId > imageFrame.Id) {
           break;
         }
 
@@ -326,8 +325,8 @@ namespace Leap.Unity {
     }
 
     private void OnPreRender(Camera cam) {
-      if(_currentImage != null) {
-        if(_eyeTextureData.CheckStale(_currentImage)) {
+      if (_currentImage != null) {
+        if (_eyeTextureData.CheckStale(_currentImage)) {
           _eyeTextureData.Reconstruct(_currentImage);
         }
 
@@ -342,7 +341,7 @@ namespace Leap.Unity {
 #endif
 
     private void subscribeToService() {
-      if(_serviceCoroutine != null) {
+      if (_serviceCoroutine != null) {
         return;
       }
 
@@ -350,13 +349,13 @@ namespace Leap.Unity {
     }
 
     private void unsubscribeFromService() {
-      if(_serviceCoroutine != null) {
+      if (_serviceCoroutine != null) {
         StopCoroutine(_serviceCoroutine);
         _serviceCoroutine = null;
       }
 
       var controller = _provider.GetLeapController();
-      if(controller != null) {
+      if (controller != null) {
         controller.ClearPolicy(Controller.PolicyFlag.POLICY_IMAGES);
         controller.ImageReady -= onImageReady;
         controller.DistortionChange -= onDistortionChange;
@@ -369,7 +368,7 @@ namespace Leap.Unity {
       do {
         controller = _provider.GetLeapController();
         yield return null;
-      } while(controller == null);
+      } while (controller == null);
 
       controller.SetPolicy(Controller.PolicyFlag.POLICY_IMAGES);
       controller.ImageReady += onImageReady;
@@ -379,14 +378,14 @@ namespace Leap.Unity {
     private void onImageReady(object sender, ImageEventArgs args) {
       Image image = args.image;
 
-      if(!_imageQueue.TryEnqueue(image)) {
+      if (!_imageQueue.TryEnqueue(image)) {
         Debug.LogWarning("Image buffer filled up. This is unexpected and means images are being provided faster than " +
                          "LeapImageRetriever can consume them.  This might happen if the application has stalled " +
                          "or we recieved a very high volume of images suddenly.");
         _needQueueReset = true;
       }
 
-      if(image.SequenceId < _prevSequenceId) {
+      if (image.SequenceId < _prevSequenceId) {
         //We moved back in time, so we should reset the queue so it doesn't get stuck
         //on the previous image, which will be very old.
         //this typically happens when the service is restarted while the application is running.
@@ -397,7 +396,7 @@ namespace Leap.Unity {
 
     public void ApplyGammaCorrectionValues() {
       float gamma = 1f;
-      if(QualitySettings.activeColorSpace != ColorSpace.Linear) {
+      if (QualitySettings.activeColorSpace != ColorSpace.Linear) {
         gamma = -Mathf.Log10(Mathf.GammaToLinearSpace(0.1f));
       }
       Shader.SetGlobalFloat(GLOBAL_COLOR_SPACE_GAMMA_NAME, gamma);

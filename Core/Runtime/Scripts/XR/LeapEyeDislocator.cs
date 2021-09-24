@@ -35,7 +35,7 @@ namespace Leap.Unity {
     [SerializeField] private Camera _cachedCamera;
     private Camera _camera {
       get {
-        if(_cachedCamera == null) {
+        if (_cachedCamera == null) {
           //_cachedCamera = GetComponent<Camera>();
         }
         return _cachedCamera;
@@ -83,21 +83,20 @@ namespace Leap.Unity {
     }
 
     private void OnPreCull(Camera cam) {
-      if(_hasVisitedPreCull) {
+      if (_hasVisitedPreCull) {
         return;
       }
       _hasVisitedPreCull = true;
 
       Maybe<float> baselineToUse = Maybe.None;
-      if(_useCustomBaseline) {
+      if (_useCustomBaseline) {
         baselineToUse = Maybe.Some(_customBaselineValue);
-      }
-      else {
+      } else {
         baselineToUse = _deviceBaseline;
       }
 
       float baselineValue;
-      if(baselineToUse.TryGetValue(out baselineValue)) {
+      if (baselineToUse.TryGetValue(out baselineValue)) {
         baselineValue *= 1e-3f;
 
         Matrix4x4 leftMat = _camera.GetStereoViewMatrix(Camera.StereoscopicEye.Left);
@@ -120,13 +119,12 @@ namespace Leap.Unity {
       Vector3 providerForwardOffset = Vector3.zero,
               providerVerticalOffset = Vector3.zero;
       Quaternion providerRotation = Quaternion.Euler(0f, 180f, 0f);
-      if(_provider is LeapXRServiceProvider) {
+      if (_provider is LeapXRServiceProvider) {
         LeapXRServiceProvider _xrProvider = _provider as LeapXRServiceProvider;
         providerForwardOffset = Vector3.forward * _xrProvider.deviceOffsetZAxis;
         providerVerticalOffset = -Vector3.up * _xrProvider.deviceOffsetYAxis;
         providerRotation = Quaternion.AngleAxis(_xrProvider.deviceTiltXAxis, Vector3.right);
-      }
-      else {
+      } else {
         Matrix4x4 imageMatWarp = _camera.projectionMatrix
                                    * Matrix4x4.TRS(Vector3.zero, providerRotation, Vector3.one)
                                    * _camera.projectionMatrix.inverse;
@@ -141,7 +139,7 @@ namespace Leap.Unity {
     }
 
     private void OnDrawGizmos() {
-      if(_showEyePositions && Application.isPlaying) {
+      if (_showEyePositions && Application.isPlaying) {
         Matrix4x4 leftMat = _camera.GetStereoViewMatrix(Camera.StereoscopicEye.Left);
         Matrix4x4 rightMat = _camera.GetStereoViewMatrix(Camera.StereoscopicEye.Right);
 
