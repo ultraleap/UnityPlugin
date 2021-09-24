@@ -474,8 +474,6 @@ namespace Leap.Unity {
       #endif
     }
     
-    private Coroutine _changeModeCoroutine;
-
     /// <summary>
     /// Sets the initial mode if it is anything other than None, None leave the tracking system in its last state
     /// </summary>
@@ -490,28 +488,20 @@ namespace Leap.Unity {
     /// <param name="trackingMode">Tracking mode to set</param>
     public void changeTrackingMode(TrackingMode trackingMode)
     {
-      if (_changeModeCoroutine != null)
-      {
-        StopCoroutine(_changeModeCoroutine);
-      }
-      
       switch (trackingMode)
       {
         case TrackingMode.None:
           break;        
         case TrackingMode.Desktop:
-          _changeModeCoroutine = StartCoroutine(setTrackingMode(setDesktopModeFlags, trackingMode, Time.time));
+          setDesktopModeFlags();
           break;
         case TrackingMode.ScreenTop:
-          _changeModeCoroutine = StartCoroutine(setTrackingMode(setScreenTopModeFlags, trackingMode, Time.time));
+          setScreenTopModeFlags();
           break;
         case TrackingMode.HeadMounted:
-          _changeModeCoroutine = StartCoroutine(setTrackingMode(setHeadMountedModeFlags, trackingMode, Time.time));
+          setHeadMountedModeFlags();
           break;
       }
-
-      //variable to be captured by set
-      var initialTime = Time.time;
 
       //local functions since these methods should not be callable outside of this function
       
@@ -529,31 +519,9 @@ namespace Leap.Unity {
       }
 
       void setHeadMountedModeFlags()
-      {  
+      {
         _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP);
         _leapController.SetPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
-      }
-
-      const float timeoutThreshold = 1f;
-
-      //set mode coroutine
-      IEnumerator setTrackingMode(Action modeCallback, TrackingMode targetTrackingMode, float time)
-      {  
-        //call function to set initial flags
-        modeCallback();
-
-        //check current tracking mode based on flags currently set
-        var isModeSet = getTrackingMode() == targetTrackingMode;
-
-        //if mode is not set yet and has not timed out
-        while (!isModeSet && Time.time - time < timeoutThreshold)
-        {
-          isModeSet = getTrackingMode() == targetTrackingMode;
-          yield return null;
-        }
-
-        //set cached coroutine to null so that another async (Leap-side) mode set operation can run
-        _changeModeCoroutine = null;
       }
     }
 
