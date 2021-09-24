@@ -485,9 +485,9 @@ namespace Leap.Unity {
     
     private Coroutine _changeModeCoroutine;
 
-    protected virtual void InitialiseMode()
+    protected virtual void initialiseMode()
     {
-      ChangeMode(_mode);
+      changeMode(_mode);
     }
 
     /// <summary>
@@ -495,7 +495,7 @@ namespace Leap.Unity {
     /// </summary>
     /// <param name="mode">Mode to set</param>
     /// <returns>True if coroutine is triggered, false if coroutine is already running</returns>
-    public void ChangeMode(Mode mode)
+    public void changeMode(Mode mode)
     {
       if (_changeModeCoroutine != null)
       {
@@ -507,18 +507,58 @@ namespace Leap.Unity {
         case Mode.None:
           break;        
         case Mode.Desktop:
-          _changeModeCoroutine = StartCoroutine(SetDesktopMode());
+          _changeModeCoroutine = StartCoroutine(setMode(setDesktopModeFlags, mode));
           break;
         case Mode.ScreenTop:
-          _changeModeCoroutine = StartCoroutine(SetScreenTopMode());
+          _changeModeCoroutine = StartCoroutine(setMode(setScreenTopModeFlags, mode));
           break;
         case Mode.HeadMounted:
-          _changeModeCoroutine = StartCoroutine(SetHeadMountedMode());
+          _changeModeCoroutine = StartCoroutine(setMode(setHeadMountedModeFlags, mode));
           break;
+      }
+
+      //local functions since these methods should not be callable outside of this function
+      
+      //set mode flags
+      void setDesktopModeFlags()
+      {  
+        _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP);
+        _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
+      }
+
+      void setScreenTopModeFlags()
+      {  
+        _leapController.SetPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP);
+        _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
+      }
+
+      void setHeadMountedModeFlags()
+      {  
+        _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP);
+        _leapController.SetPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
+      }
+
+      //set mode coroutine
+      IEnumerator setMode(Action modeCallback, Mode targetMode)
+      {  
+        modeCallback();
+
+        var isModeSet = getMode() == targetMode;
+
+        while (!isModeSet)
+        {
+          isModeSet = getMode() == targetMode;
+          yield return null;
+        }
+
+        _changeModeCoroutine = null;
       }
     }
 
-    public Mode GetMode()
+    /// <summary>
+    /// Gets the current mode by polling policy flags
+    /// </summary>
+    public Mode getMode()
     {
       var screenTopPolicySet = _leapController.IsPolicySet(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP);
       var headMountedPolicySet = _leapController.IsPolicySet(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
@@ -543,79 +583,6 @@ namespace Leap.Unity {
 
       return Mode.None;
     }
-    
-
-    /// <summary>
-    /// Sets desktop mode properties and information
-    /// </summary>
-    private IEnumerator SetDesktopMode()
-    {  
-      _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP);
-      _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
-
-      var screenTopPolicySet = _leapController.IsPolicySet(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP);
-      var headMountedPolicySet = _leapController.IsPolicySet(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
-       
-      var desktopMode = !screenTopPolicySet && !headMountedPolicySet;
-
-      while (!desktopMode)
-      {
-        screenTopPolicySet = _leapController.IsPolicySet(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP);
-        headMountedPolicySet = _leapController.IsPolicySet(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
-        desktopMode = !screenTopPolicySet && !headMountedPolicySet;
-        yield return null;
-      }
-
-      _changeModeCoroutine = null;
-    }
-
-    /// <summary>
-    /// Sets head mounted mode properties and information
-    /// </summary>
-    private IEnumerator SetHeadMountedMode()
-    {
-      _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP);
-      _leapController.SetPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
-
-      var screenTopPolicySet = _leapController.IsPolicySet(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP);
-      var headMountedPolicySet = _leapController.IsPolicySet(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
-       
-      var headMountedMode = !screenTopPolicySet && headMountedPolicySet;
-
-      while (!headMountedMode)
-      {
-        screenTopPolicySet = _leapController.IsPolicySet(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP);
-        headMountedPolicySet = _leapController.IsPolicySet(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
-        headMountedMode = headMountedMode = !screenTopPolicySet && headMountedPolicySet;
-        yield return null;
-      }
-      
-      _changeModeCoroutine = null;
-    }
-
-    /// <summary>
-    /// Sets screen top mode properties and information
-    /// </summary>
-    private IEnumerator SetScreenTopMode()
-    {
-      _leapController.SetPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP);
-      _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
-      
-      var screenTopPolicySet = _leapController.IsPolicySet(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP);
-      var headMountedPolicySet = _leapController.IsPolicySet(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
-
-      var screenTopMode = screenTopPolicySet && !headMountedPolicySet;
-
-      while (!screenTopMode)
-      {
-        screenTopPolicySet = _leapController.IsPolicySet(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP);
-        headMountedPolicySet = _leapController.IsPolicySet(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
-        screenTopMode = screenTopMode = screenTopPolicySet && !headMountedPolicySet;
-        yield return null;
-      }   
-      
-      _changeModeCoroutine = null;
-    }
 
     /// <summary>
     /// Creates an instance of a Controller, initializing its policy flags and
@@ -634,7 +601,7 @@ namespace Leap.Unity {
       };
 
       if (_leapController.IsConnected) {
-        InitialiseMode();
+        initialiseMode();
       } else {
         _leapController.Device += onHandControllerConnect;
       }
@@ -694,7 +661,7 @@ namespace Leap.Unity {
     }
 
     protected void onHandControllerConnect(object sender, LeapEventArgs args) {
-      InitialiseMode();
+      initialiseMode();
 
       if (_leapController != null) {
         _leapController.Device -= onHandControllerConnect;
