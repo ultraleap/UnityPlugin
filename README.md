@@ -28,7 +28,6 @@
 
 ## Update Links
 - [ ] Update [documentation] link
-- [ ] Update [api-reference] link
 - [ ] Update [devsite] link
 - [ ] Update [devsite-unity] link
 - [x] Update [releases] link
@@ -70,7 +69,7 @@ If you are using any of the scriptable render pipelines (SRP) then you will need
 
 This plugin has been configured to be used with the [Unity Package Manager (UPM)][package-manager], but we also provide a \*.unitypackage for those who wish to follow the legacy approach which can be obtained from [our developer site][developer-site-unity] or from the [release section][releases].
 
-Be sure to also check out our [documentation][documentation] and [API reference][api-reference].
+Be sure to also check out our [documentation][documentation].
 
 ## Installation
 
