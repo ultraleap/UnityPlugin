@@ -500,15 +500,18 @@ namespace Leap.Unity {
         case TrackingMode.None:
           break;        
         case TrackingMode.Desktop:
-          _changeModeCoroutine = StartCoroutine(setTrackingMode(setDesktopModeFlags, trackingMode));
+          _changeModeCoroutine = StartCoroutine(setTrackingMode(setDesktopModeFlags, trackingMode, Time.time));
           break;
         case TrackingMode.ScreenTop:
-          _changeModeCoroutine = StartCoroutine(setTrackingMode(setScreenTopModeFlags, trackingMode));
+          _changeModeCoroutine = StartCoroutine(setTrackingMode(setScreenTopModeFlags, trackingMode, Time.time));
           break;
         case TrackingMode.HeadMounted:
-          _changeModeCoroutine = StartCoroutine(setTrackingMode(setHeadMountedModeFlags, trackingMode));
+          _changeModeCoroutine = StartCoroutine(setTrackingMode(setHeadMountedModeFlags, trackingMode, Time.time));
           break;
       }
+
+      //variable to be captured by set
+      var initialTime = Time.time;
 
       //local functions since these methods should not be callable outside of this function
       
@@ -531,19 +534,25 @@ namespace Leap.Unity {
         _leapController.SetPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
       }
 
+      const float timeoutThreshold = 1f;
+
       //set mode coroutine
-      IEnumerator setTrackingMode(Action modeCallback, TrackingMode targetTrackingMode)
+      IEnumerator setTrackingMode(Action modeCallback, TrackingMode targetTrackingMode, float time)
       {  
+        //call function to set initial flags
         modeCallback();
 
+        //check current tracking mode based on flags currently set
         var isModeSet = getTrackingMode() == targetTrackingMode;
 
-        while (!isModeSet)
+        //if mode is not set yet and has not timed out
+        while (!isModeSet && Time.time - time < timeoutThreshold)
         {
           isModeSet = getTrackingMode() == targetTrackingMode;
           yield return null;
         }
 
+        //set cached coroutine to null so that another async (Leap-side) mode set operation can run
         _changeModeCoroutine = null;
       }
     }
