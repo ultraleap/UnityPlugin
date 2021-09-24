@@ -60,7 +60,10 @@ namespace Leap.Unity {
       ScreenTop,
       HeadMounted
     }
-    
+
+    [Tooltip("Sets the mode with which to initialise the tracking system. " +
+      "The default value for this parameter is None, which implies that the tracking system " +
+      "will remain in it's last known state. Change this to force a specific tracking mode on startup.")]
     [SerializeField] private Mode _mode = Mode.None;
 
     public enum InteractionVolumeVisualization {
