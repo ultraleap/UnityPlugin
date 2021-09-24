@@ -36,7 +36,7 @@ namespace Leap.Unity {
     public virtual void InitHand() { }
 
     public virtual void BeginHand() {
-      if (OnBegin != null) {
+      if(OnBegin != null) {
         OnBegin();
       }
       isTracked = true;
@@ -44,10 +44,10 @@ namespace Leap.Unity {
     public abstract void UpdateHand();
     public void UpdateHandWithEvent() {
       UpdateHand();
-      if (OnUpdate != null) { OnUpdate(); }
+      if(OnUpdate != null) { OnUpdate(); }
     }
     public virtual void FinishHand() {
-      if (OnFinish != null) {
+      if(OnFinish != null) {
         OnFinish();
       }
       isTracked = false;
@@ -68,7 +68,7 @@ namespace Leap.Unity {
 
 #if UNITY_EDITOR
     void Update() {
-      if (!EditorApplication.isPlaying && SupportsEditorPersistence()) {
+      if(!EditorApplication.isPlaying && SupportsEditorPersistence()) {
         LeapProvider provider = null;
 
 
@@ -82,32 +82,33 @@ namespace Leap.Unity {
         //}
 
         //If not found, use any old provider from the Hands.Provider getter
-        if (provider == null) {
+        if(provider == null) {
           provider = Hands.Provider;
         }
 
         Hand hand = null;
         //If we found a provider, pull the hand from that
-        if (provider != null) {
+        if(provider != null) {
           var frame = provider.CurrentFrame;
 
-          if (frame != null) {
+          if(frame != null) {
             hand = frame.Get(Handedness);
           }
         }
 
         //If we still have a null hand, construct one manually
-        if (hand == null) {
+        if(hand == null) {
           hand = TestHandFactory.MakeTestHand(Handedness == Chirality.Left, unitType: TestHandFactory.UnitType.LeapUnits);
           hand.Transform(transform.GetLeapMatrix());
         }
 
-        if (GetLeapHand() == null) {
+        if(GetLeapHand() == null) {
           SetLeapHand(hand);
           InitHand();
           BeginHand();
           UpdateHand();
-        } else {
+        }
+        else {
           SetLeapHand(hand);
           UpdateHand();
         }
