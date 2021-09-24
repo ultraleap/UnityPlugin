@@ -22,7 +22,7 @@ namespace Leap.Unity {
 
     void Awake() {
 
-      if(_camera == null) {
+      if (_camera == null) {
         Debug.Log("Camera not assigned");
         this.enabled = false;
         return;
@@ -30,11 +30,10 @@ namespace Leap.Unity {
 
       _camera.depthTextureMode = _depthTextureMode;
 
-      if(SystemInfo.SupportsRenderTextureFormat(RenderTextureFormat.Depth) &&
+      if (SystemInfo.SupportsRenderTextureFormat(RenderTextureFormat.Depth) &&
           _depthTextureMode != DepthTextureMode.None) {
         Shader.EnableKeyword(DEPTH_TEXTURE_VARIANT_NAME);
-      }
-      else {
+      } else {
         Shader.DisableKeyword(DEPTH_TEXTURE_VARIANT_NAME);
       }
     }

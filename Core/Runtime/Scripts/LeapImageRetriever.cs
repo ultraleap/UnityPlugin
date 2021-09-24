@@ -285,12 +285,12 @@ namespace Leap.Unity {
     private void OnDestroy() {
       StopAllCoroutines();
       Controller controller = _provider.GetLeapController();
-      if (controller != null) {
+      if(controller != null) {
         _provider.GetLeapController().DistortionChange -= onDistortionChange;
       }
 #if UNITY_2019_3_OR_NEWER
       //SRP require subscribing to RenderPipelineManagers
-      if (UnityEngine.Rendering.GraphicsSettings.renderPipelineAsset != null) {
+      if(UnityEngine.Rendering.GraphicsSettings.renderPipelineAsset != null) {
         UnityEngine.Rendering.RenderPipelineManager.beginCameraRendering -= onBeginRendering;
       }
 #endif
@@ -336,7 +336,7 @@ namespace Leap.Unity {
 
 #if UNITY_2019_3_OR_NEWER
     private void onBeginRendering(UnityEngine.Rendering.ScriptableRenderContext scriptableRenderContext, Camera camera) {
-      OnPreRender(camera);
+       OnPreRender(camera);
     }
 #endif
 
