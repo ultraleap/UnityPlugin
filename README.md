@@ -7,10 +7,11 @@
 
 [documentation]: https://docs.ultraleap.com/ "Ultraleap UnityPlugin Documentation"
 [api-reference]: https://docs.ultraleap.com/ "Ultraleap UnityPlugin API Reference"
-[devsite]: https://developer.leapmotion.com/ "Ultraleap Developer Site"
-[devsite-unity]: https://developer.leapmotion.com/unity/ "Ultraleap Developer site - Unity"
-[releases]: https://github.com/leapmotion/UnityModules/releases "UnityPlugin releases"
-
+[developer-site]: https://developer.leapmotion.com/ "Ultraleap Developer Site"
+[developer-site-unity]: https://developer.leapmotion.com/unity/ "Ultraleap Developer site - Unity"
+[releases]: https://github.com/ultraleap/UnityPlugin/releases "UnityPlugin releases"
+[developer-forum]: https://forums.leapmotion.com/ "Developer Forum"
+[repository-clone-url]: https://github.com/ultraleap/UnityPlugin.git "Clone with HTTPS"
 
 
 
@@ -30,7 +31,7 @@
 - [ ] Update [api-reference] link
 - [ ] Update [devsite] link
 - [ ] Update [devsite-unity] link
-- [ ] Update [releases] link
+- [x] Update [releases] link
 
 
 
@@ -44,7 +45,12 @@ This repository hosts the complete Ultraleap Unity Plugin and developer SDK. Exa
 
 ## Requirements
 
-You will need a Leap Motion compatible device to use this plugin. In addition you will need to have the Leap Motion service installed, which must be [downloaded separately][devsite]:
+The UnityPlugin repository is designed to work with Unity 2019.4 LTS or newer. However, due to the ever changing landscape of package dependencies in Unity we cannot guarantee compatibility with every plugin or variant of Unity, but aim to provide support for all LTS versions that are under continuous support from Unity. If you are sourcing UnityPlugin directly from this repository, your mileage may vary with earlier versions of Unity.
+
+You will need an Ultraleap compatible tracking device to use this plugin. In addition you will need to have the Ultraleap Gemini tracking service installed, which must be [downloaded separately][developer-site].
+
+Our content uses the standard shader throughout the majority of our examples. However, it is possible to view these example scenes according to whichever pipeline you choose by using the upgrading functionality for render pipelines, supplied by Unity.
+To ensure you can continue using our hand models and custom shaders, we also supply an extra URP & HDRP compatible example scene. __(Note these will only work with the correct SRP installed)__
 
 Use of Ultraleap's UnityPlugin is subject to the [Apache V2 License Agreement][apache].
 
@@ -62,14 +68,14 @@ If you are using any of the scriptable render pipelines (SRP) then you will need
 
 # Getting Started
 
-This plugin has been configured to be used with the [Unity Package Manager (UPM)][package-manager], but we also provide a \*.unitypackage for those who wish to follow the old approach which can be obtained from [our developer site][devsite] or from the [release section][releases].
+This plugin has been configured to be used with the [Unity Package Manager (UPM)][package-manager], but we also provide a \*.unitypackage for those who wish to follow the legacy approach which can be obtained from [our developer site][developer-site-unity] or from the [release section][releases].
 
 Be sure to also check out our [documentation][documentation] and [API reference][api-reference].
 
 ## Installation
 
 1. __UPM via GitHub__  
-  To add a (read-only) UPM package remotely via a GitHub URL select the option "Add package from git URL…" in the Unity package manager and paste in the textbox that appears. The package will then be added to your project and you should be good to go! 
+  To add a (read-only) UPM package remotely via a GitHub URL select the option "Add package from git URL…" in the Unity package manager. Paste the link to [clone the repository][repository-clone-url] into the input field that appears and press enter. The package will then be added to your project and you should be good to go! 
     * *Requires Unity 2019.4 (LTS) or newer.*
 
 2. __UPM Local Package__  
@@ -81,7 +87,7 @@ Be sure to also check out our [documentation][documentation] and [API reference]
     * *This is perhaps the easiest way to work if you want o submit a pull request against the Ultraleap Unity Plugin.*
 
 4. __Unity Package__  
-  Import the package (e.g. Assets -> Import Package -> Custom Package...) which can be downloaded from [our Unity developer site][devsite] or the [releases section][releases] of this repository.     
+  Import the package (e.g. Assets -> Import Package -> Custom Package...) which can be downloaded from [our Unity developer site][developer-site-unity] or the [releases section][releases] of this repository.     
     * *\*.unitypackage(s) are a deprecated solution in Unity. Do not move the location of the installed plugin as this may break certain features.*
 
 5. __Submodule__  
@@ -99,3 +105,8 @@ Add the following scoped registry to Unity (Edit -> Project Settings... -> Packa
 ## Upgrading Existing Installation
 
 ## Quick-Start Guide
+
+## Feedback
+
+For any further questions or feedback please visit our [developer forums][developer-forum].
+For any issues encountered when using the plugin, please raise an issue on GitHub. ALternatively, if you have a fix, please submit a merge request for us to review.
