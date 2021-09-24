@@ -116,7 +116,7 @@ namespace Leap.Unity {
     private void adjustViewMatrix(Camera.StereoscopicEye eye, float baselineAdjust) {
       float eyeOffset = eye == Camera.StereoscopicEye.Left ? 1 : -1;
       Vector3 ipdOffset = eyeOffset * Vector3.right * baselineAdjust * 0.5f;
-      Vector3 providerForwardOffset = Vector3.zero,
+      Vector3 providerForwardOffset = Vector3.zero, 
               providerVerticalOffset = Vector3.zero;
       Quaternion providerRotation = Quaternion.Euler(0f, 180f, 0f);
       if (_provider is LeapXRServiceProvider) {

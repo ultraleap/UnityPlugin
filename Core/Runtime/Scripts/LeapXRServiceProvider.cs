@@ -206,7 +206,6 @@ namespace Leap.Unity {
     #region Unity Events
 
     protected override void Reset() {
-
       base.Reset();
       editTimePose = TestHandFactory.TestHandPose.HeadMountedB;
 
@@ -232,7 +231,6 @@ namespace Leap.Unity {
     //     }
 
     protected virtual void OnEnable() {
-
       resetShaderTransforms();
 
       if (preCullCamera == null) {
@@ -260,11 +258,9 @@ namespace Leap.Unity {
       Camera.onPreCull -= onPreCull; // No multiple-subscription.
       Camera.onPreCull += onPreCull;
       #endif
-
     }
 
     protected virtual void OnDisable() {
-
       resetShaderTransforms();
 
       #if UNITY_2019_1_OR_NEWER
@@ -280,7 +276,6 @@ namespace Leap.Unity {
     }
 
     protected override void Start() {
-
       base.Start();
       //_cachedCamera = GetComponent<Camera>();
       if (_deviceOffsetMode == DeviceOffsetMode.Transform && _deviceOrigin == null) {
@@ -378,7 +373,7 @@ namespace Leap.Unity {
       }
       else if (_deviceOffsetMode == DeviceOffsetMode.Transform) {
         trackedPose = deviceOrigin.ToPose();
-      } 
+      }
       else {
         Debug.LogError("Unsupported DeviceOffsetMode: " + _deviceOffsetMode);
         return;
