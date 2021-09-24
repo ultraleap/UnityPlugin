@@ -103,18 +103,6 @@ namespace Leap.Unity {
     [SerializeField]
     protected float _physicsExtrapolationTime = 1.0f / 90.0f;
 
-    public enum TrackingOptimizationMode {
-      Desktop,
-      ScreenTop,
-      HMD
-    }
-    [Tooltip("[Service must be >= 4.9.2!] " +
-      "Which tracking mode to request that the service optimize for. " +
-      "(Use the LeapXRServiceProvider for HMD Mode instead of this option!)")]
-    [SerializeField]
-    [EditTimeOnly]
-    protected TrackingOptimizationMode _trackingOptimization = TrackingOptimizationMode.Desktop;
-
 #if UNITY_2017_3_OR_NEWER
     [Tooltip("When checked, profiling data from the LeapCSharp worker thread will be used to populate the UnityProfiler.")]
     [EditTimeOnly]
@@ -488,6 +476,9 @@ namespace Leap.Unity {
     
     private Coroutine _changeModeCoroutine;
 
+    /// <summary>
+    /// Sets the initial mode if it is anything other than None, None leave the tracking system in its last state
+    /// </summary>
     protected virtual void initialiseMode()
     {
       changeMode(_mode);
@@ -497,7 +488,6 @@ namespace Leap.Unity {
     /// Triggers a coroutine that sets appropriate policy flags and wait for them to be set to ensure we've changed mode
     /// </summary>
     /// <param name="mode">Mode to set</param>
-    /// <returns>True if coroutine is triggered, false if coroutine is already running</returns>
     public void changeMode(Mode mode)
     {
       if (_changeModeCoroutine != null)
