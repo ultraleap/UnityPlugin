@@ -112,10 +112,8 @@ namespace Leap.Unity {
         Debug.LogWarning("CapsuleHand's Material must have " +
           "instancing enabled in order to work in builds! Replacing " +
           "Material with a Default Material now...", this);
-        _material = (Material)UnityEditor.AssetDatabase.LoadAssetAtPath(
-          System.IO.Path.Combine("Assets", "Plugins", "LeapMotion",
-          "Core", "Materials", "InstancedCapsuleHand.mat"), typeof(Material));
-      }
+        _material = (Material)Resources.Load("InstancedCapsuleHand", typeof(Material));
+            }
     }
     #endif
 
