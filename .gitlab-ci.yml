@@ -21,10 +21,9 @@ trigger::trigger-downstream:
 
   variables:
     UPSTREAM_COMMIT_BRANCH: $CI_COMMIT_BRANCH 
-    UPSTREAM_COMMIT_REPOSITORY: $CI_REPOSITORY_URL 
+    UPSTREAM_COMMIT_REPOSITORY: $CI_PROJECT_DIR 
 
   trigger:
     project: xr/integrations/unity/ci/unityplugin-ci
     branch: windows/rc
     strategy: depend
-    
