@@ -133,7 +133,6 @@ namespace Leap.Unity {
                 if(gameObject.activeInHierarchy)
                 {
                     UpdateHand();
-                    Debug.Log("Updating");
                 }
             }
         }
