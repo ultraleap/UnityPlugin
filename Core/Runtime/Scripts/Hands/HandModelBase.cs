@@ -86,8 +86,8 @@ namespace Leap.Unity {
             leapProvider.OnFixedFrame += FixedUpdateFrame;
         }
 
-        private void OnDisable() {
-
+        private void OnDestroy()
+        {
             leapProvider.OnUpdateFrame -= UpdateFrame;
             leapProvider.OnFixedFrame -= FixedUpdateFrame;
         }
@@ -102,26 +102,46 @@ namespace Leap.Unity {
             UpdateBase(hand);
         }
 
+        void UpdateBase(Hand hand) {
+
+            SetLeapHand(hand);
+
+            if (hand == null) {
+                FinishHand();
+            }
+            else {
+
+                if (!IsTracked)
+                {
+                    InitHand();
+                    BeginHand();
+                }
+
+                UpdateHand();
+            }
+        }
+
 #if UNITY_EDITOR
 
         //Only Runs in editor
-        private void Update() {
-            if(!Application.isPlaying && SupportsEditorPersistence()) {
-
-
+        private void Update()
+        {
+            if (!Application.isPlaying && SupportsEditorPersistence())
+            {
                 //Try to set the provider for the user
                 var Provider = Hands.Provider;
                 Hand hand = null;
-                if(Provider == null) {
-                    if(!Application.isPlaying && SupportsEditorPersistence()) {
-                        //If we still have a null hand, construct one manually
-                        if(hand == null) {
-                            hand = TestHandFactory.MakeTestHand(Handedness == Chirality.Left, unitType: TestHandFactory.UnitType.LeapUnits);
-                            hand.Transform(transform.GetLeapMatrix());
-                        }
-                    }
+                if (Provider == null)
+                {
+                    //If we still have a null hand, construct one manually
+                    if (hand == null)
+                    {
+                        hand = TestHandFactory.MakeTestHand(Handedness == Chirality.Left, unitType: TestHandFactory.UnitType.LeapUnits);
+                        hand.Transform(transform.GetLeapMatrix());
+                    }   
                 }
-                else {
+                else
+                {
                     hand = Provider.CurrentFrame.Get(Handedness);
                 }
 
@@ -129,21 +149,5 @@ namespace Leap.Unity {
             }
         }
 #endif
-
-        void UpdateBase(Hand hand) {
-
-
-            if(GetLeapHand() == null) {
-                SetLeapHand(hand);
-                InitHand();
-                BeginHand();
-                UpdateHand();
-            }
-            else {
-                SetLeapHand(hand);
-                UpdateHand();
-            }
-
-        }
     }
 }
