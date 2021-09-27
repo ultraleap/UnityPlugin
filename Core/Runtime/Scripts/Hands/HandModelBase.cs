@@ -80,10 +80,17 @@ namespace Leap.Unity {
                 }
             }
 
-            leapProvider.OnUpdateFrame -= UpdateFrame;
-            leapProvider.OnFixedFrame -= FixedUpdateFrame;
-            leapProvider.OnUpdateFrame += UpdateFrame;
-            leapProvider.OnFixedFrame += FixedUpdateFrame;
+            if(HandModelType == ModelType.Graphics)
+            {
+                leapProvider.OnUpdateFrame -= UpdateFrame;
+                leapProvider.OnUpdateFrame += UpdateFrame;
+            }
+
+            else
+            {
+                leapProvider.OnFixedFrame -= FixedUpdateFrame;
+                leapProvider.OnFixedFrame += FixedUpdateFrame;
+            }
         }
 
         private void OnDestroy()
@@ -107,7 +114,10 @@ namespace Leap.Unity {
             SetLeapHand(hand);
 
             if (hand == null) {
-                FinishHand();
+                if(IsTracked)
+                {
+                    FinishHand();
+                }
             }
             else {
 
