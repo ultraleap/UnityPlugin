@@ -11,11 +11,11 @@ trigger::trigger-downstream:
       when: always
       allow_failure: false
 
-    - if: $UPSTREAM_COMMIT_BRANCH == "windows/legacy" && $CI_PIPELINE_SOURCE == "pipeline"
+    - if: $CI_PIPELINE_SOURCE == "pipeline"
       when: always
       allow_failure: false
 
-    - if: $CI_COMMIT_BRANCH == "windows/legacy"
+    - if: $CI_COMMIT_BRANCH == "4.9.0-rc2"
       when: manual
       allow_failure: false
 
@@ -23,6 +23,6 @@ trigger::trigger-downstream:
     UPSTREAM_COMMIT_BRANCH: $CI_COMMIT_BRANCH 
 
   trigger:
-    project: xr/integrations/ci/unityplugin
-    branch: windows/legacy
+    project: xr/integrations/unity/ci/unityplugin-ci
+    branch: windows/rc
     strategy: depend
