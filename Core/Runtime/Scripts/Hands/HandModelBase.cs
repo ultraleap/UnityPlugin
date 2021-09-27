@@ -44,7 +44,9 @@ namespace Leap.Unity {
         public abstract void UpdateHand();
         public void UpdateHandWithEvent() {
             UpdateHand();
-            if(OnUpdate != null) { OnUpdate(); }
+            if(OnUpdate != null) { 
+                OnUpdate(); 
+            }
         }
         public virtual void FinishHand() {
             if(OnFinish != null) {
@@ -114,6 +116,7 @@ namespace Leap.Unity {
             SetLeapHand(hand);
 
             if (hand == null) {
+
                 if(IsTracked)
                 {
                     FinishHand();
@@ -127,7 +130,11 @@ namespace Leap.Unity {
                     BeginHand();
                 }
 
-                UpdateHand();
+                if(gameObject.activeInHierarchy)
+                {
+                    UpdateHand();
+                    Debug.Log("Updating");
+                }
             }
         }
 

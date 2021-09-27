@@ -133,8 +133,6 @@ namespace Leap.Unity {
 
     public override void UpdateHand() {
 
-            if (!gameObject.activeInHierarchy) return;
-
       _curSphereIndex   = 0;
       _curCylinderIndex = 0;
 
