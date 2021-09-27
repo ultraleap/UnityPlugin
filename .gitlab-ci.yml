@@ -1,17 +1,5 @@
 stages:
-  - output
   - trigger
-
-output::output:
-  stage: output
-  tags:
-    - unity
-    - win10
-
-  script:
-    - echo $CI_COMMIT_BRANCH 
-    - echo $CI_REPOSITORY_URL 
-
 
 trigger::trigger-downstream:
   stage: trigger
