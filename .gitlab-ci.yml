@@ -21,6 +21,7 @@ trigger::trigger-downstream:
 
   variables:
     UPSTREAM_COMMIT_BRANCH: $CI_COMMIT_BRANCH 
+    UPSTREAM_COMMIT_REPOSITORY: $CI_REPOSITORY_URL 
 
   trigger:
     project: xr/integrations/unity/ci/unityplugin-ci
