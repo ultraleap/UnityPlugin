@@ -5,7 +5,7 @@ trigger::trigger-downstream:
   stage: trigger
 
   rules:
-    - if: $CI_COMMIT_BRANCH == "4.9.0-rc2"
+    - if: $CI_COMMIT_BRANCH == "4.9.1-rc1"
       when: manual
       allow_failure: false
 
