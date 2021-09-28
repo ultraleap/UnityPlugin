@@ -11,7 +11,6 @@ using UnityEngine.Serialization;
 using System;
 using System.Collections;
 using Leap.Unity.Query;
-using UnityEngine.Assertions;
 
 namespace Leap.Unity {
 
@@ -244,22 +243,14 @@ namespace Leap.Unity {
 #endif
 
     private void Awake() {
-
-      //_provider = GetComponent<LeapServiceProvider>();
-      //if(_provider == null) {
-      //  _provider = GetComponentInChildren<LeapServiceProvider>();
-      //}
-
       if (_provider == null) {
         Debug.Log("Provider not assigned");
         this.enabled = false;
         return;
       }
 
-      Camera.onPreRender -= OnPreRender;
-      Camera.onPreRender += OnPreRender;
-
-      Assert.IsNotNull(_provider);
+      Camera.onPreRender -= OnCameraPreRender;
+      Camera.onPreRender += OnCameraPreRender;
 
       //Enable pooling to reduce overhead of images
       LeapInternal.MemoryManager.EnablePooling = true;
@@ -288,12 +279,11 @@ namespace Leap.Unity {
       if(controller != null) {
         _provider.GetLeapController().DistortionChange -= onDistortionChange;
       }
-#if UNITY_2019_3_OR_NEWER
+
       //SRP require subscribing to RenderPipelineManagers
       if(UnityEngine.Rendering.GraphicsSettings.renderPipelineAsset != null) {
         UnityEngine.Rendering.RenderPipelineManager.beginCameraRendering -= onBeginRendering;
       }
-#endif
     }
 
     private void LateUpdate() {
@@ -324,7 +314,7 @@ namespace Leap.Unity {
       }
     }
 
-    private void OnPreRender(Camera cam) {
+    private void OnCameraPreRender(Camera cam) {
       if (_currentImage != null) {
         if (_eyeTextureData.CheckStale(_currentImage)) {
           _eyeTextureData.Reconstruct(_currentImage);
@@ -334,11 +324,9 @@ namespace Leap.Unity {
       }
     }
 
-#if UNITY_2019_3_OR_NEWER
     private void onBeginRendering(UnityEngine.Rendering.ScriptableRenderContext scriptableRenderContext, Camera camera) {
-       OnPreRender(camera);
+       OnCameraPreRender(camera);
     }
-#endif
 
     private void subscribeToService() {
       if (_serviceCoroutine != null) {

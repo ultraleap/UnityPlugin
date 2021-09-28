@@ -10,7 +10,6 @@ using UnityEngine;
 
 namespace Leap.Unity {
   using Attributes;
-  using UnityEngine.Assertions;
 
   /// <summary>
   /// Moves the camera to each eye position on pre-render. Only necessary for image
@@ -32,41 +31,24 @@ namespace Leap.Unity {
     private Maybe<float> _deviceBaseline = Maybe.None;
     private bool _hasVisitedPreCull = false;
 
-    [SerializeField] private Camera _cachedCamera;
-    private Camera _camera {
-      get {
-        if (_cachedCamera == null) {
-          //_cachedCamera = GetComponent<Camera>();
-        }
-        return _cachedCamera;
-      }
-    }
+    [SerializeField] private Camera _camera;
 
     private void onDevice(Device device) {
       _deviceBaseline = Maybe.Some(device.Baseline);
     }
 
     private void OnDestroy() {
-      Camera.onPreCull -= OnPreCull;
+      Camera.onPreCull -= OnCameraPreCull;
     }
 
     private void OnEnable() {
-      //_provider = GetComponent<LeapServiceProvider>();
-      //if (_provider == null) {
-      //  _provider = GetComponentInChildren<LeapServiceProvider>();
-      //  if (_provider == null) {
-      //    enabled = false;
-      //    return;
-      //  }
-      //}
-
       if(_provider == null) {
         enabled = false;
         return;
       }
 
-      Camera.onPreCull -= OnPreCull;
-      Camera.onPreCull += OnPreCull;
+      Camera.onPreCull -= OnCameraPreCull;
+      Camera.onPreCull += OnCameraPreCull;
 
       _provider.OnDeviceSafe += onDevice;
     }
@@ -82,7 +64,7 @@ namespace Leap.Unity {
       _hasVisitedPreCull = false;
     }
 
-    private void OnPreCull(Camera cam) {
+    private void OnCameraPreCull(Camera cam) {
       if (_hasVisitedPreCull) {
         return;
       }

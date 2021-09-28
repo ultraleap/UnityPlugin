@@ -42,7 +42,6 @@ namespace Leap.Unity {
       addPropertyToFoldout("_deviceOffsetZAxis"   , "Advanced Options");
       addPropertyToFoldout("_deviceTiltXAxis"     , "Advanced Options");
       addPropertyToFoldout("_deviceOrigin"        , "Advanced Options");
-      addPropertyToFoldout("_preCullCamera"       , "Advanced Options");
       addPropertyToFoldout("_updateHandInPrecull" , "Advanced Options");
     }
 

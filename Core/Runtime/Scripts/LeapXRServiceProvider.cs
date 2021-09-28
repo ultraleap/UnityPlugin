@@ -97,16 +97,6 @@ namespace Leap.Unity {
       set { _deviceOrigin = value; }
     }
 
-    [Tooltip("This camera's PreCull time triggers pose data collection for "
-           + "temporal warping. This needs to be set if the provider is not "
-           + "on the same GameObject as the main Camera component.")]
-    //[SerializeField]
-    private Camera _preCullCamera;
-    public Camera preCullCamera {
-      get { return _preCullCamera; }
-      set { _preCullCamera = value; }
-    }
-
     // Temporal Warping
 
 #if UNITY_STANDALONE
@@ -188,15 +178,7 @@ namespace Leap.Unity {
     protected Matrix4x4[] _transformArray = new Matrix4x4[2];
     private Pose? _trackingBaseDeltaPose = null;
 
-    public Camera _cachedCamera;
-    private Camera cachedCamera {
-      get {
-        if (_cachedCamera == null) {
-          //_cachedCamera = GetComponent<Camera>();
-        }
-        return _cachedCamera;
-      }
-    }
+    public Camera camera;
 
     [NonSerialized]
     public long imageTimeStamp = 0;
@@ -208,37 +190,10 @@ namespace Leap.Unity {
     protected override void Reset() {
       base.Reset();
       editTimePose = TestHandFactory.TestHandPose.HeadMountedB;
-
-      if (preCullCamera == null) {
-        if (_cachedCamera != null) {
-          preCullCamera = cachedCamera;
-        }
-        //preCullCamera = GetComponent<Camera>();
-      }
     }
-
-    // TODO: DELETEME
-    //     protected virtual void OnValidate() {
-    //       if (_deviceOffsetMode == DeviceOffsetMode.Transform &&
-    //           _temporalWarpingMode != TemporalWarpingMode.Off) {
-    // #if UNITY_EDITOR
-    //         UnityEditor.Undo.RecordObject(this, "Disabled Temporal Warping");
-    //         Debug.LogWarning("Temporal warping disabled. Temporal warping cannot be used "
-    //           + "with the Transform device offset mode.", this);
-    // #endif
-    //         _temporalWarpingMode = TemporalWarpingMode.Off;
-    //       }
-    //     }
 
     protected virtual void OnEnable() {
       resetShaderTransforms();
-
-      if (preCullCamera == null) {
-        if (cachedCamera != null) {
-          preCullCamera = cachedCamera;
-        }
-        //preCullCamera = GetComponent<Camera>();
-      }
 
       #if XR_LEGACY_INPUT_AVAILABLE
       if (GetComponent<UnityEngine.SpatialTracking.TrackedPoseDriver>() == null) {
@@ -277,14 +232,13 @@ namespace Leap.Unity {
 
     protected override void Start() {
       base.Start();
-      //_cachedCamera = GetComponent<Camera>();
       if (_deviceOffsetMode == DeviceOffsetMode.Transform && _deviceOrigin == null) {
         Debug.LogError("Cannot use the Transform device offset mode without " +
                        "specifying a Transform to use as the device origin.", this);
         _deviceOffsetMode = DeviceOffsetMode.Default;
       }
 
-      if (Application.isPlaying && preCullCamera == null &&
+      if (Application.isPlaying && camera == null &&
           _temporalWarpingMode != TemporalWarpingMode.Off) {
         Debug.LogError("Cannot perform temporal warping with no pre-cull camera.");
       }
@@ -297,8 +251,8 @@ namespace Leap.Unity {
     }
 
     void LateUpdate() {
-      var projectionMatrix = _cachedCamera == null ? Matrix4x4.identity
-        : _cachedCamera.projectionMatrix;
+      var projectionMatrix = camera == null ? Matrix4x4.identity
+        : camera.projectionMatrix;
       switch (SystemInfo.graphicsDeviceType) {
         #if !UNITY_2017_2_OR_NEWER
         case UnityEngine.Rendering.GraphicsDeviceType.Direct3D9:
@@ -350,9 +304,16 @@ namespace Leap.Unity {
     #endif
 
     protected virtual void onPreCull(Camera preCullingCamera) {
-      if (preCullingCamera != preCullCamera) {
+      if (preCullingCamera != camera) {
         return;
       }
+
+      #if UNITY_EDITOR
+      if (!Application.isPlaying)
+      {
+        return;
+      }
+      #endif
 
       Pose trackedPose;
       if (_deviceOffsetMode == DeviceOffsetMode.Default
@@ -365,7 +326,7 @@ namespace Leap.Unity {
         // the pose delta from the tracked pose to the actual camera
         // pose.
         if (!_trackingBaseDeltaPose.HasValue) {
-          _trackingBaseDeltaPose = _cachedCamera.transform.GetPose().mul(
+          _trackingBaseDeltaPose = camera.transform.GetPose().mul(
                                       trackedPose.inverse());
         }
         // This way, we always track a scene-space tracked pose.
@@ -381,7 +342,7 @@ namespace Leap.Unity {
 
       transformHistory.UpdateDelay(trackedPose, _leapController.Now());
 
-      OnPreCullHandTransforms(_cachedCamera);
+      OnPreCullHandTransforms(camera);
     }
 
     #endregion
@@ -527,13 +488,11 @@ namespace Leap.Unity {
     protected void OnPreCullHandTransforms(Camera camera) {
       if (updateHandInPrecull) {
         //Don't update pre cull for preview, reflection, or scene view cameras
-        if (camera == null) camera = preCullCamera;
-        switch (camera.cameraType) {
-          case CameraType.Preview:
-#if UNITY_2017_1_OR_NEWER
-          case CameraType.Reflection:
-#endif
-          case CameraType.SceneView:
+        if (camera == null) { 
+            return; 
+        }
+
+        if(camera.cameraType == CameraType.SceneView) {
             return;
         }
 
