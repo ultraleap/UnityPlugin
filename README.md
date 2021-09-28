@@ -22,7 +22,9 @@
 - [x] Initial documentation pass
 - [ ] Update introduction
 - [ ] Update upgrade existing modules
+- [ ] Add pull request process guide
 - [ ] Add quick start guide
+- [ ] Add API reference
 - [ ] Determine if there is any missing content
 - [ ] Add any missing content
 
@@ -40,7 +42,9 @@
 
 ## Introduction
 
-This repository hosts the complete Ultraleap Unity Plugin and developer SDK. Examples are included to quickly get you up and running with Ultraleap's hand tracking technology.
+Ultraleap's Unity Plugin enables the data produced by Ultraleap tracking hardware to be used by developers inside their Unity projects. It includes various utilities, examples and prefabs that make it as easy as possible to design and use hand tracking in XR projects
+
+This repository hosts the complete Ultraleap Unity Plugin and Ultraleap Tracking SDK. Examples are included to quickly get you up and running with Ultraleap's hand tracking technology.
 
 ## Requirements
 
