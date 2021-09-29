@@ -15,27 +15,6 @@
 
 
 
-<!--TODO-->
-# Prior to release
-## Update Content
-
-- [x] Initial documentation pass
-- [ ] Update introduction
-- [ ] Update upgrade existing modules
-- [ ] Add pull request process guide
-- [ ] Add quick start guide
-- [ ] Add API reference
-- [ ] Determine if there is any missing content
-- [ ] Add any missing content
-
-## Update Links
-- [ ] Update [documentation] link
-- [ ] Update [devsite] link
-- [ ] Update [devsite-unity] link
-- [x] Update [releases] link
-
-
-
 
 <!--content-->
 # Ultraleap Unity Plugin
