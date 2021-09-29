@@ -380,10 +380,14 @@ namespace Leap.Unity {
 
     protected virtual LeapTransform GetWarpedMatrix(long timestamp,
                                                     bool updateTemporalCompensation = true) {
-      LeapTransform leapTransform;
 
-      //Calculate a Temporally Warped Pose
-      if (Application.isPlaying
+
+            LeapTransform leapTransform = new LeapTransform();
+
+            if (Camera == null) return leapTransform;
+
+            //Calculate a Temporally Warped Pose
+            if (Application.isPlaying
           && updateTemporalCompensation
           && transformHistory.history.IsFull
           && _temporalWarpingMode != TemporalWarpingMode.Off) {
@@ -408,7 +412,7 @@ namespace Leap.Unity {
           currentPose.rotation * Vector3.up * deviceOffsetYAxis
           + currentPose.rotation * Vector3.forward * deviceOffsetZAxis;
         currentPose.rotation = Quaternion.Euler(deviceTiltXAxis, 0f, 0f);
-        currentPose = transform.ToLocalPose().Then(currentPose);
+        currentPose = _camera.transform.ToPose().Then(currentPose);
       } else {
         transformHistory.SampleTransform(timestamp, out currentPose.position,
                                                     out currentPose.rotation);
@@ -438,20 +442,13 @@ namespace Leap.Unity {
         // We are being destroyed, get outta here.
         return LeapTransform.Identity;
       }
-      if (transform.parent != null
-          && _deviceOffsetMode != DeviceOffsetMode.Transform) {
-        leapTransform = new LeapTransform(
-          transform.parent.TransformPoint(warpedPosition).ToVector(),
-          (transform.parent.rotation * warpedRotation).ToLeapQuaternion(),
-          transform.lossyScale.ToVector() * 1e-3f
-        );
-      } else {
+
         leapTransform = new LeapTransform(
           warpedPosition.ToVector(),
           warpedRotation.ToLeapQuaternion(),
           transform.lossyScale.ToVector() * 1e-3f
         );
-      }
+
 
       leapTransform.MirrorZ();
 

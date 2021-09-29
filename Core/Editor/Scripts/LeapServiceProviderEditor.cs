@@ -194,23 +194,48 @@ namespace Leap.Unity {
       return LeapServiceProvider?.SelectedInteractionVolumeVisualization;
     }
 
-    private void DrawStereoIR170InteractionZoneMesh() {
+        private void DrawStereoIR170InteractionZoneMesh()
+        {
+            Transform targetTransform = target.transform;
+            LeapXRServiceProvider xrProvider = target as LeapXRServiceProvider;
+            if (xrProvider != null)
+            {
+                targetTransform = xrProvider.Camera.transform;
 
-      if (_stereoIR170InteractionMaterial != null && _stereoIR170InteractionZoneMesh != null) {
-        _stereoIR170InteractionMaterial.SetPass(0);
+                if (xrProvider.deviceOrigin != null)
+                {
+                    targetTransform.InverseTransformPoint(xrProvider.deviceOrigin.position);
+                }
+            }
 
-        Graphics.DrawMeshNow(_stereoIR170InteractionZoneMesh,
-           target.transform.localToWorldMatrix * 
-           Matrix4x4.TRS(controllerOffset + _stereoIR170InteractionZoneMeshOffset, deviceRotation * Quaternion.Euler(-90, 0, 0), Vector3.one * 0.001f));
-      }
-    }
+            if (_stereoIR170InteractionMaterial != null && _stereoIR170InteractionZoneMesh != null)
+            {
+                _stereoIR170InteractionMaterial.SetPass(0);
 
-    private void DrawLeapMotionControllerInteractionZone(float box_width, float box_depth, float box_radius, Color interactionZoneColor) {
+                Graphics.DrawMeshNow(_stereoIR170InteractionZoneMesh,
+                   targetTransform.localToWorldMatrix *
+                   Matrix4x4.TRS(controllerOffset + _stereoIR170InteractionZoneMeshOffset, deviceRotation * Quaternion.Euler(-90, 0, 0), Vector3.one * 0.001f));
+            }
+        }
 
-      Color previousColor = Handles.color;
+        private void DrawLeapMotionControllerInteractionZone(float box_width, float box_depth, float box_radius, Color interactionZoneColor) {
+
+            Transform targetTransform = target.transform;
+            LeapXRServiceProvider xrProvider = target as LeapXRServiceProvider;
+            if (xrProvider != null)
+            {
+                targetTransform = xrProvider.Camera.transform;
+
+                if (xrProvider.deviceOrigin != null)
+                {
+                    targetTransform.InverseTransformPoint(xrProvider.deviceOrigin.position);
+                }
+            }
+
+            Color previousColor = Handles.color;
       Handles.color = interactionZoneColor;
 
-      Vector3 origin = target.transform.TransformPoint(controllerOffset);
+      Vector3 origin = targetTransform.TransformPoint(controllerOffset);
       Vector3 local_top_left, top_left, local_top_right, top_right, local_bottom_left, bottom_left, local_bottom_right, bottom_right;
       getLocalGlobalPoint(-1, 1,  1, box_width, box_depth, box_radius, out local_top_left    , out top_left);
       getLocalGlobalPoint( 1, 1,  1, box_width, box_depth, box_radius, out local_top_right   , out top_right);
@@ -237,20 +262,45 @@ namespace Leap.Unity {
 
     private void getLocalGlobalPoint(int x, int y, int z, float box_width, float box_depth, float box_radius, out Vector3 local, out Vector3 global) {
 
-      local = deviceRotation * new Vector3(x * box_width, y * box_radius, z * box_depth);
-      global = target.transform.TransformPoint(controllerOffset
+
+            Transform targetTransform = target.transform;
+            LeapXRServiceProvider xrProvider = target as LeapXRServiceProvider;
+            if (xrProvider != null)
+            {
+                targetTransform = xrProvider.Camera.transform;
+
+                if (xrProvider.deviceOrigin != null)
+                {
+                    targetTransform.InverseTransformPoint(xrProvider.deviceOrigin.position);
+                }
+            }
+
+            local = deviceRotation * new Vector3(x * box_width, y * box_radius, z * box_depth);
+      global = targetTransform.TransformPoint(controllerOffset
                                                + box_radius * local.normalized);
     }
 
     private void drawControllerEdge(Vector3 origin,
                                     Vector3 edge0, Vector3 edge1,
                                     float box_radius) {
-      Vector3 right_normal = target.transform
+            Transform targetTransform = target.transform;
+            LeapXRServiceProvider xrProvider = target as LeapXRServiceProvider;
+            if (xrProvider != null)
+            {
+                targetTransform = xrProvider.Camera.transform;
+
+                if (xrProvider.deviceOrigin != null)
+                {
+                    targetTransform.InverseTransformPoint(xrProvider.deviceOrigin.position);
+                }
+            }
+
+            Vector3 right_normal = targetTransform
                                    .TransformDirection(Vector3.Cross(edge0, edge1));
       float right_angle = Vector3.Angle(edge0, edge1);
 
-      Handles.DrawWireArc(origin, right_normal, target.transform.TransformDirection(edge0),
-                          right_angle, target.transform.lossyScale.x * box_radius);
+      Handles.DrawWireArc(origin, right_normal, targetTransform.TransformDirection(edge0),
+                          right_angle, targetTransform.lossyScale.x * box_radius);
     }
 
     private void drawControllerArc(Vector3 origin,
@@ -258,15 +308,27 @@ namespace Leap.Unity {
                                    Vector3 edgeB0, Vector3 edgeB1,
                                    float box_radius) {
 
-      Vector3 faceA = target.transform.rotation * Vector3.Lerp(edgeA0, edgeA1, 0.5f);
-      Vector3 faceB = target.transform.rotation * Vector3.Lerp(edgeB0, edgeB1, 0.5f);
+            Transform targetTransform = target.transform;
+            LeapXRServiceProvider xrProvider = target as LeapXRServiceProvider;
+            if (xrProvider != null)
+            {
+                targetTransform = xrProvider.Camera.transform;
+
+                if (xrProvider.deviceOrigin != null)
+                {
+                    targetTransform.InverseTransformPoint(xrProvider.deviceOrigin.position);
+                }
+            }
+
+            Vector3 faceA = targetTransform.rotation * Vector3.Lerp(edgeA0, edgeA1, 0.5f);
+      Vector3 faceB = targetTransform.rotation * Vector3.Lerp(edgeB0, edgeB1, 0.5f);
 
       float resolutionIncrement = 1f / 50f;
       for (float i = 0f; i < 1f; i += resolutionIncrement) {
         Vector3 begin = Vector3.Lerp(faceA, faceB, i).normalized
-                        * target.transform.lossyScale.x * box_radius;
+                        * targetTransform.lossyScale.x * box_radius;
         Vector3 end = Vector3.Lerp(faceA, faceB, i + resolutionIncrement).normalized
-                      * target.transform.lossyScale.x * box_radius;
+                      * targetTransform.lossyScale.x * box_radius;
 
         Handles.DrawAAPolyLine(origin + begin, origin + end);
       }
