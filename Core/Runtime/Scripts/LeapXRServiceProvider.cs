@@ -178,9 +178,10 @@ namespace Leap.Unity {
     protected Matrix4x4[] _transformArray = new Matrix4x4[2];
     private Pose? _trackingBaseDeltaPose = null;
 
-    public Camera camera;
+    [SerializeField] private Camera _camera;
+    public Camera Camera => _camera;
 
-    [NonSerialized]
+        [NonSerialized]
     public long imageTimeStamp = 0;
 
     #endregion
@@ -238,7 +239,7 @@ namespace Leap.Unity {
         _deviceOffsetMode = DeviceOffsetMode.Default;
       }
 
-      if (Application.isPlaying && camera == null &&
+      if (Application.isPlaying && _camera == null &&
           _temporalWarpingMode != TemporalWarpingMode.Off) {
         Debug.LogError("Cannot perform temporal warping with no pre-cull camera.");
       }
@@ -251,8 +252,8 @@ namespace Leap.Unity {
     }
 
     void LateUpdate() {
-      var projectionMatrix = camera == null ? Matrix4x4.identity
-        : camera.projectionMatrix;
+      var projectionMatrix = _camera == null ? Matrix4x4.identity
+        : _camera.projectionMatrix;
       switch (SystemInfo.graphicsDeviceType) {
         #if !UNITY_2017_2_OR_NEWER
         case UnityEngine.Rendering.GraphicsDeviceType.Direct3D9:
@@ -304,7 +305,7 @@ namespace Leap.Unity {
     #endif
 
     protected virtual void onPreCull(Camera preCullingCamera) {
-      if (preCullingCamera != camera) {
+      if (preCullingCamera != _camera) {
         return;
       }
 
@@ -326,7 +327,7 @@ namespace Leap.Unity {
         // the pose delta from the tracked pose to the actual camera
         // pose.
         if (!_trackingBaseDeltaPose.HasValue) {
-          _trackingBaseDeltaPose = camera.transform.GetPose().mul(
+          _trackingBaseDeltaPose = _camera.transform.GetPose().mul(
                                       trackedPose.inverse());
         }
         // This way, we always track a scene-space tracked pose.
@@ -342,7 +343,7 @@ namespace Leap.Unity {
 
       transformHistory.UpdateDelay(trackedPose, _leapController.Now());
 
-      OnPreCullHandTransforms(camera);
+      OnPreCullHandTransforms(_camera);
     }
 
     #endregion
@@ -488,11 +489,10 @@ namespace Leap.Unity {
     protected void OnPreCullHandTransforms(Camera camera) {
       if (updateHandInPrecull) {
         //Don't update pre cull for preview, reflection, or scene view cameras
-        if (camera == null) { 
-            return; 
-        }
-
-        if(camera.cameraType == CameraType.SceneView) {
+        switch (camera.cameraType) {
+          case CameraType.Preview:
+          case CameraType.Reflection:
+          case CameraType.SceneView:
             return;
         }
 
