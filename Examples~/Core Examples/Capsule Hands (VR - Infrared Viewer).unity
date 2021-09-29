@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.18028378, g: 0.22571412, b: 0.30692285, a: 1}
+  m_IndirectSpecularColor: {r: 0.18028377, g: 0.22571409, b: 0.30692285, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -96,7 +96,6 @@ LightmapSettings:
     m_PVRFilteringAtrousPositionSigmaAO: 1
     m_ExportTrainingData: 0
     m_TrainingDataDestination: TrainingData
-    m_LightProbeSampleCountMultiplier: 4
   m_LightingDataAsset: {fileID: 0}
   m_UseShadowmask: 0
 --- !u!196 &4
@@ -373,9 +372,8 @@ Light:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1966885502}
   m_Enabled: 1
-  serializedVersion: 10
+  serializedVersion: 9
   m_Type: 1
-  m_Shape: 0
   m_Color: {r: 1, g: 0.95686275, b: 0.8392157, a: 1}
   m_Intensity: 1
   m_Range: 10
@@ -529,6 +527,11 @@ PrefabInstance:
       propertyPath: _cachedCamera
       value: 
       objectReference: {fileID: 20862103360611550}
+    - target: {fileID: 1624307276489095890, guid: a3493d19a55aa734daa24f35421a14d2,
+        type: 3}
+      propertyPath: _camera
+      value: 
+      objectReference: {fileID: 20862103360611550}
     - target: {fileID: 1624307276489095891, guid: a3493d19a55aa734daa24f35421a14d2,
         type: 3}
       propertyPath: _camera
@@ -553,6 +556,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 619520992775503171, guid: 61295638423e5054896ff2f27dd0dfe5,
+        type: 3}
+      propertyPath: m_Sources.Array.data[0].sourceTransform
+      value: 
+      objectReference: {fileID: 4057967694525232}
     - target: {fileID: 4932522712503475008, guid: 61295638423e5054896ff2f27dd0dfe5,
         type: 3}
       propertyPath: ModelPool.Array.data[0].IsLeftToBeSpawned
@@ -566,6 +574,11 @@ PrefabInstance:
     - target: {fileID: 5036544205602592339, guid: 61295638423e5054896ff2f27dd0dfe5,
         type: 3}
       propertyPath: _cachedCamera
+      value: 
+      objectReference: {fileID: 20862103360611550}
+    - target: {fileID: 5036544205602592339, guid: 61295638423e5054896ff2f27dd0dfe5,
+        type: 3}
+      propertyPath: _camera
       value: 
       objectReference: {fileID: 20862103360611550}
     - target: {fileID: 5658783167411007876, guid: 61295638423e5054896ff2f27dd0dfe5,
