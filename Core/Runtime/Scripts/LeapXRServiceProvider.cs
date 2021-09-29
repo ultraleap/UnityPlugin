@@ -202,7 +202,6 @@ namespace Leap.Unity {
       }
       #endif
 
-      #if UNITY_2019_1_OR_NEWER
       if (GraphicsSettings.renderPipelineAsset != null) {
         RenderPipelineManager.beginCameraRendering -= onBeginRendering;
         RenderPipelineManager.beginCameraRendering += onBeginRendering;
@@ -210,10 +209,6 @@ namespace Leap.Unity {
         Camera.onPreCull -= onPreCull; // No multiple-subscription.
         Camera.onPreCull += onPreCull;
       }
-      #else
-      Camera.onPreCull -= onPreCull; // No multiple-subscription.
-      Camera.onPreCull += onPreCull;
-      #endif
     }
 
     protected virtual void OnDisable() {
