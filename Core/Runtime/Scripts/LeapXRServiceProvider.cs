@@ -10,8 +10,9 @@ using UnityEngine;
 using System;
 using Leap.Unity.Attributes;
 
+#if UNITY_2019_1_OR_NEWER
 using UnityEngine.Rendering;
-using UnityEngine.Assertions;
+#endif
 
 namespace Leap.Unity {
 
@@ -192,12 +193,6 @@ namespace Leap.Unity {
       editTimePose = TestHandFactory.TestHandPose.HeadMountedB;
     }
 
-
-    private void Awake()
-    {
-        Assert.IsNotNull(Camera);
-    }
-
     protected virtual void OnEnable() {
       resetShaderTransforms();
 
@@ -216,15 +211,18 @@ namespace Leap.Unity {
       }
     }
 
-
     protected virtual void OnDisable() {
       resetShaderTransforms();
 
+      #if UNITY_2019_1_OR_NEWER
       if (GraphicsSettings.renderPipelineAsset != null) {
-         RenderPipelineManager.beginCameraRendering -= onBeginRendering;
+        RenderPipelineManager.beginCameraRendering -= onBeginRendering;
       } else {
-         Camera.onPreCull -= onPreCull; // No multiple-subscription.
+        Camera.onPreCull -= onPreCull; // No multiple-subscription.
       }
+      #else
+      Camera.onPreCull -= onPreCull; // No multiple-subscription.
+      #endif
 
     }
 
@@ -252,6 +250,9 @@ namespace Leap.Unity {
       var projectionMatrix = _camera == null ? Matrix4x4.identity
         : _camera.projectionMatrix;
       switch (SystemInfo.graphicsDeviceType) {
+        #if !UNITY_2017_2_OR_NEWER
+        case UnityEngine.Rendering.GraphicsDeviceType.Direct3D9:
+        #endif
         case UnityEngine.Rendering.GraphicsDeviceType.Direct3D11:
         case UnityEngine.Rendering.GraphicsDeviceType.Direct3D12:
           for (int i = 0; i < 4; i++) {
@@ -284,13 +285,19 @@ namespace Leap.Unity {
                                        imageQuatWarp.eulerAngles.y,
                                       -imageQuatWarp.eulerAngles.z);
       Matrix4x4 imageMatWarp = projectionMatrix
+                               #if UNITY_2019_2_OR_NEWER
                                // The camera projection matrices seem to have vertically inverted...
                                * Matrix4x4.TRS(Vector3.zero, imageQuatWarp, new Vector3(1f, -1f, 1f))
+                               #else
+                               * Matrix4x4.TRS(Vector3.zero, imageQuatWarp, Vector3.one)
+                               #endif
                                * projectionMatrix.inverse;
       Shader.SetGlobalMatrix("_LeapGlobalWarpedOffset", imageMatWarp);
     }
 
+    #if UNITY_2019_1_OR_NEWER
     protected virtual void onBeginRendering(ScriptableRenderContext context, Camera camera) { onPreCull(camera); }
+    #endif
 
     protected virtual void onPreCull(Camera preCullingCamera) {
       if (preCullingCamera != _camera) {
@@ -388,14 +395,10 @@ namespace Leap.Unity {
 
     protected virtual LeapTransform GetWarpedMatrix(long timestamp,
                                                     bool updateTemporalCompensation = true) {
+      LeapTransform leapTransform;
 
-
-            LeapTransform leapTransform = new LeapTransform();
-
-            if (Camera == null) return leapTransform;
-
-            //Calculate a Temporally Warped Pose
-            if (Application.isPlaying
+      //Calculate a Temporally Warped Pose
+      if (Application.isPlaying
           && updateTemporalCompensation
           && transformHistory.history.IsFull
           && _temporalWarpingMode != TemporalWarpingMode.Off) {
@@ -420,7 +423,7 @@ namespace Leap.Unity {
           currentPose.rotation * Vector3.up * deviceOffsetYAxis
           + currentPose.rotation * Vector3.forward * deviceOffsetZAxis;
         currentPose.rotation = Quaternion.Euler(deviceTiltXAxis, 0f, 0f);
-        currentPose = _camera.transform.ToPose().Then(currentPose);
+        currentPose = transform.ToLocalPose().Then(currentPose);
       } else {
         transformHistory.SampleTransform(timestamp, out currentPose.position,
                                                     out currentPose.rotation);
@@ -450,13 +453,20 @@ namespace Leap.Unity {
         // We are being destroyed, get outta here.
         return LeapTransform.Identity;
       }
-
+      if (transform.parent != null
+          && _deviceOffsetMode != DeviceOffsetMode.Transform) {
+        leapTransform = new LeapTransform(
+          transform.parent.TransformPoint(warpedPosition).ToVector(),
+          (transform.parent.rotation * warpedRotation).ToLeapQuaternion(),
+          transform.lossyScale.ToVector() * 1e-3f
+        );
+      } else {
         leapTransform = new LeapTransform(
           warpedPosition.ToVector(),
           warpedRotation.ToLeapQuaternion(),
           transform.lossyScale.ToVector() * 1e-3f
         );
-
+      }
 
       leapTransform.MirrorZ();
 
