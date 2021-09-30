@@ -211,18 +211,23 @@ namespace Leap.Unity
         }
 
 #if UNITY_EDITOR
-    void OnDrawGizmos() {
-      if (ShowGizmos) {
-        if (IsActive) {
-          Gizmos.color = Color.green;
-        } else {
-          Gizmos.color = Color.red;
+        void OnDrawGizmos()
+        {
+            if (ShowGizmos)
+            {
+                if (IsActive)
+                {
+                    Gizmos.color = Color.green;
+                }
+                else
+                {
+                    Gizmos.color = Color.red;
+                }
+                Gizmos.DrawWireSphere(transform.position, OnDistance);
+                Gizmos.color = Color.blue;
+                Gizmos.DrawWireSphere(transform.position, OffDistance);
+            }
         }
-        Gizmos.DrawWireSphere(transform.position, OnDistance);
-        Gizmos.color = Color.blue;
-        Gizmos.DrawWireSphere(transform.position, OffDistance);
-      }
-    }
 #endif
     }
 

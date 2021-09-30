@@ -26,14 +26,14 @@ namespace Leap.Unity
     {
 
 #if UNITY_2019_2_OR_NEWER
-    private static System.Collections.Generic.List<XRNodeState> nodeStates = 
-      new System.Collections.Generic.List<XRNodeState>();
+        private static System.Collections.Generic.List<XRNodeState> nodeStates =
+          new System.Collections.Generic.List<XRNodeState>();
 #endif
 
         public static bool IsXREnabled()
         {
 #if UNITY_2017_2_OR_NEWER
-      return XRSettings.enabled;
+            return XRSettings.enabled;
 #else
             return VRSettings.enabled;
 #endif
@@ -44,7 +44,7 @@ namespace Leap.Unity
 #if UNITY_2020_1_OR_NEWER
       return XRSettings.isDeviceActive;
 #elif UNITY_2017_2_OR_NEWER
-      return XRDevice.isPresent;
+            return XRDevice.isPresent;
 #else
             return VRDevice.isPresent;
 #endif
@@ -67,13 +67,16 @@ namespace Leap.Unity
           }
         }
 #elif UNITY_2017_2_OR_NEWER
-        var userPresence = XRDevice.userPresence;
-        if (userPresence == UserPresenceState.Present) {
-          return true;
-        } else if (!outputPresenceWarning && userPresence == UserPresenceState.Unsupported) {
-          Debug.LogWarning("XR UserPresenceState unsupported (XR support is probably disabled).");
-          outputPresenceWarning = true;
-        }
+            var userPresence = XRDevice.userPresence;
+            if (userPresence == UserPresenceState.Present)
+            {
+                return true;
+            }
+            else if (!outputPresenceWarning && userPresence == UserPresenceState.Unsupported)
+            {
+                Debug.LogWarning("XR UserPresenceState unsupported (XR support is probably disabled).");
+                outputPresenceWarning = true;
+            }
 #else
             if (!outputPresenceWarning)
             {
@@ -87,14 +90,15 @@ namespace Leap.Unity
         public static Vector3 GetXRNodeCenterEyeLocalPosition()
         {
 #if UNITY_2019_2_OR_NEWER
-      InputTracking.GetNodeStates(nodeStates);
-      Vector3 position;
-      foreach(XRNodeState state in nodeStates) {
-        if(state.nodeType == XRNode.CenterEye &&
-           state.TryGetPosition(out position))
-        { return position; }
-      }
-      return Vector3.zero;
+            InputTracking.GetNodeStates(nodeStates);
+            Vector3 position;
+            foreach (XRNodeState state in nodeStates)
+            {
+                if (state.nodeType == XRNode.CenterEye &&
+                   state.TryGetPosition(out position))
+                { return position; }
+            }
+            return Vector3.zero;
 #elif UNITY_2017_2_OR_NEWER
       return InputTracking.GetLocalPosition(XRNode.CenterEye);
 #else
@@ -105,14 +109,15 @@ namespace Leap.Unity
         public static Quaternion GetXRNodeCenterEyeLocalRotation()
         {
 #if UNITY_2019_2_OR_NEWER
-      InputTracking.GetNodeStates(nodeStates);
-      Quaternion rotation;
-      foreach (XRNodeState state in nodeStates) {
-        if (state.nodeType == XRNode.CenterEye &&
-            state.TryGetRotation(out rotation))
-        { return rotation; }
-      }
-      return Quaternion.identity;
+            InputTracking.GetNodeStates(nodeStates);
+            Quaternion rotation;
+            foreach (XRNodeState state in nodeStates)
+            {
+                if (state.nodeType == XRNode.CenterEye &&
+                    state.TryGetRotation(out rotation))
+                { return rotation; }
+            }
+            return Quaternion.identity;
 #elif UNITY_2017_2_OR_NEWER
       return InputTracking.GetLocalRotation(XRNode.CenterEye);
 #else
@@ -123,14 +128,15 @@ namespace Leap.Unity
         public static Vector3 GetXRNodeHeadLocalPosition()
         {
 #if UNITY_2019_2_OR_NEWER
-      InputTracking.GetNodeStates(nodeStates);
-      Vector3 position;
-      foreach(XRNodeState state in nodeStates) {
-        if(state.nodeType == XRNode.Head &&
-           state.TryGetPosition(out position))
-        { return position; }
-      }
-      return Vector3.zero;
+            InputTracking.GetNodeStates(nodeStates);
+            Vector3 position;
+            foreach (XRNodeState state in nodeStates)
+            {
+                if (state.nodeType == XRNode.Head &&
+                   state.TryGetPosition(out position))
+                { return position; }
+            }
+            return Vector3.zero;
 #elif UNITY_2017_2_OR_NEWER
       return InputTracking.GetLocalPosition(XRNode.Head);
 #else
@@ -141,14 +147,15 @@ namespace Leap.Unity
         public static Quaternion GetXRNodeHeadLocalRotation()
         {
 #if UNITY_2019_2_OR_NEWER
-      InputTracking.GetNodeStates(nodeStates);
-      Quaternion rotation;
-      foreach (XRNodeState state in nodeStates) {
-        if (state.nodeType == XRNode.Head &&
-            state.TryGetRotation(out rotation))
-        { return rotation; }
-      }
-      return Quaternion.identity;
+            InputTracking.GetNodeStates(nodeStates);
+            Quaternion rotation;
+            foreach (XRNodeState state in nodeStates)
+            {
+                if (state.nodeType == XRNode.Head &&
+                    state.TryGetRotation(out rotation))
+                { return rotation; }
+            }
+            return Quaternion.identity;
 #elif UNITY_2017_2_OR_NEWER
       return InputTracking.GetLocalRotation(XRNode.Head);
 #else
@@ -159,14 +166,15 @@ namespace Leap.Unity
         public static Vector3 GetXRNodeLocalPosition(int node)
         {
 #if UNITY_2019_2_OR_NEWER
-      InputTracking.GetNodeStates(nodeStates);
-      Vector3 position;
-      foreach(XRNodeState state in nodeStates) {
-        if(state.nodeType == (XRNode)node &&
-           state.TryGetPosition(out position))
-        { return position; }
-      }
-      return Vector3.zero;
+            InputTracking.GetNodeStates(nodeStates);
+            Vector3 position;
+            foreach (XRNodeState state in nodeStates)
+            {
+                if (state.nodeType == (XRNode)node &&
+                   state.TryGetPosition(out position))
+                { return position; }
+            }
+            return Vector3.zero;
 #elif UNITY_2017_2_OR_NEWER
       return InputTracking.GetLocalPosition((XRNode)node);
 #else
@@ -177,14 +185,15 @@ namespace Leap.Unity
         public static Quaternion GetXRNodeLocalRotation(int node)
         {
 #if UNITY_2019_2_OR_NEWER
-      InputTracking.GetNodeStates(nodeStates);
-      Quaternion rotation;
-      foreach (XRNodeState state in nodeStates) {
-        if (state.nodeType == (XRNode)node &&
-            state.TryGetRotation(out rotation))
-        { return rotation; }
-      }
-      return Quaternion.identity;
+            InputTracking.GetNodeStates(nodeStates);
+            Quaternion rotation;
+            foreach (XRNodeState state in nodeStates)
+            {
+                if (state.nodeType == (XRNode)node &&
+                    state.TryGetRotation(out rotation))
+                { return rotation; }
+            }
+            return Quaternion.identity;
 #elif UNITY_2017_2_OR_NEWER
       return InputTracking.GetLocalRotation((XRNode)node);
 #else
@@ -218,7 +227,7 @@ namespace Leap.Unity
         public static string GetLoadedDeviceName()
         {
 #if UNITY_2017_2_OR_NEWER
-      return XRSettings.loadedDeviceName;
+            return XRSettings.loadedDeviceName;
 #else
             return VRSettings.loadedDeviceName;
 #endif
@@ -244,7 +253,7 @@ namespace Leap.Unity
         }
 #endif
 #elif UNITY_2017_2_OR_NEWER
-        return XRDevice.GetTrackingSpaceType() == TrackingSpaceType.RoomScale;
+            return XRDevice.GetTrackingSpaceType() == TrackingSpaceType.RoomScale;
 #else
             return VRDevice.GetTrackingSpaceType() == TrackingSpaceType.RoomScale;
 #endif
@@ -275,7 +284,7 @@ namespace Leap.Unity
             float gpuTime = 0f;
 #if UNITY_5_6_OR_NEWER
 #if UNITY_2017_2_OR_NEWER
-      UnityEngine.XR.XRStats.TryGetGPUTimeLastFrame(out gpuTime);
+            UnityEngine.XR.XRStats.TryGetGPUTimeLastFrame(out gpuTime);
 #else
       UnityEngine.VR.VRStats.TryGetGPUTimeLastFrame(out gpuTime);
 #endif

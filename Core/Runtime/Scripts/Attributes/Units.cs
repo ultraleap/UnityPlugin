@@ -24,13 +24,15 @@ namespace Leap.Unity.Attributes
         }
 
 #if UNITY_EDITOR
-    public float GetWidth() {
-      return EditorStyles.label.CalcSize(new GUIContent(unitsName)).x;
-    }
+        public float GetWidth()
+        {
+            return EditorStyles.label.CalcSize(new GUIContent(unitsName)).x;
+        }
 
-    public void Draw(Rect rect, SerializedProperty property) {
-      GUI.Label(rect, unitsName);
-    }
+        public void Draw(Rect rect, SerializedProperty property)
+        {
+            GUI.Label(rect, unitsName);
+        }
 #endif
     }
 }

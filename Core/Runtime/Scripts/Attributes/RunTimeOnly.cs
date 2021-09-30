@@ -17,9 +17,10 @@ namespace Leap.Unity.Attributes
     {
 
 #if UNITY_EDITOR
-    public bool ShouldDisable(SerializedProperty property) {
-      return !EditorApplication.isPlaying;
-    }
+        public bool ShouldDisable(SerializedProperty property)
+        {
+            return !EditorApplication.isPlaying;
+        }
 #endif
     }
 }

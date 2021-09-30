@@ -37,49 +37,59 @@ namespace Leap.Unity.Attributes
             _baseType = type;
 
 #if UNITY_EDITOR
-      refreshImplementingTypes();
-      refreshTypeOptions();
+            refreshImplementingTypes();
+            refreshTypeOptions();
 #endif
         }
 
 #if UNITY_EDITOR
-    public void DrawProperty(Rect rect, SerializedProperty property, GUIContent label) {
-      int curSelectedIdx = getCurSelectedIdx(property);
+        public void DrawProperty(Rect rect, SerializedProperty property, GUIContent label)
+        {
+            int curSelectedIdx = getCurSelectedIdx(property);
 
-      int selectedIdx = EditorGUI.Popup(rect, label, curSelectedIdx, _typeOptions);
-      if (selectedIdx != curSelectedIdx) {
-        property.stringValue = _implementingTypes[selectedIdx].FullName;
-      }
+            int selectedIdx = EditorGUI.Popup(rect, label, curSelectedIdx, _typeOptions);
+            if (selectedIdx != curSelectedIdx)
+            {
+                property.stringValue = _implementingTypes[selectedIdx].FullName;
+            }
 
-      if (curSelectedIdx == -1 && _implementingTypes.Count > 0) {
-        curSelectedIdx = 0;
-        property.stringValue = _implementingTypes[curSelectedIdx].FullName;
-      }
-    }
-
-    private void refreshImplementingTypes() {
-      _implementingTypes.Clear();
-
-      foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies()) {
-        foreach (var type in assembly.GetTypes()) {
-          if (_baseType.IsAssignableFrom(type) && !type.IsAbstract && !type.IsInterface) {
-            _implementingTypes.Add(type);
-          }
+            if (curSelectedIdx == -1 && _implementingTypes.Count > 0)
+            {
+                curSelectedIdx = 0;
+                property.stringValue = _implementingTypes[curSelectedIdx].FullName;
+            }
         }
-      }
-    }
 
-    private void refreshTypeOptions() {
-      _typeOptions = new GUIContent[_implementingTypes.Count];
+        private void refreshImplementingTypes()
+        {
+            _implementingTypes.Clear();
 
-      for (int i = 0; i < _typeOptions.Length; i++) {
-        _typeOptions[i] = new GUIContent(_implementingTypes[i].Name);
-      }
-    }
+            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                foreach (var type in assembly.GetTypes())
+                {
+                    if (_baseType.IsAssignableFrom(type) && !type.IsAbstract && !type.IsInterface)
+                    {
+                        _implementingTypes.Add(type);
+                    }
+                }
+            }
+        }
 
-    private int getCurSelectedIdx(SerializedProperty property) {
-      return _implementingTypes.FindIndex((t => property.stringValue.Equals(t.FullName)));
-    }
+        private void refreshTypeOptions()
+        {
+            _typeOptions = new GUIContent[_implementingTypes.Count];
+
+            for (int i = 0; i < _typeOptions.Length; i++)
+            {
+                _typeOptions[i] = new GUIContent(_implementingTypes[i].Name);
+            }
+        }
+
+        private int getCurSelectedIdx(SerializedProperty property)
+        {
+            return _implementingTypes.FindIndex((t => property.stringValue.Equals(t.FullName)));
+        }
 #endif
     }
 

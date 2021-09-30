@@ -156,30 +156,39 @@ namespace Leap.Unity
             }
 
 #if UNITY_EDITOR
-      //Delete any values not present
-      for (int i = _values.Count; i-- != 0;) {
-        T value = _values[i];
-        if (value == null) {
-          continue;
-        }
+            //Delete any values not present
+            for (int i = _values.Count; i-- != 0;)
+            {
+                T value = _values[i];
+                if (value == null)
+                {
+                    continue;
+                }
 
-        if (!_set.Contains(value)) {
-          _values.RemoveAt(i);
-        }
-      }
+                if (!_set.Contains(value))
+                {
+                    _values.RemoveAt(i);
+                }
+            }
 
-      //Add any values not accounted for
-      foreach (var value in _set) {
-        if (isNull(value)) {
-          if (!_values.Query().Any(obj => isNull(obj))) {
-            _values.Add(value);
-          }
-        } else {
-          if (!_values.Contains(value)) {
-            _values.Add(value);
-          }
-        }
-      }
+            //Add any values not accounted for
+            foreach (var value in _set)
+            {
+                if (isNull(value))
+                {
+                    if (!_values.Query().Any(obj => isNull(obj)))
+                    {
+                        _values.Add(value);
+                    }
+                }
+                else
+                {
+                    if (!_values.Contains(value))
+                    {
+                        _values.Add(value);
+                    }
+                }
+            }
 #else
             //At runtime we just recreate the list
             _values.Clear();

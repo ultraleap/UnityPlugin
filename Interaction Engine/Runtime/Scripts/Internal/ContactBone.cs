@@ -46,7 +46,7 @@ namespace Leap.Unity.Interaction
         /// to work correctly.
         /// </summary>
 #if UNITY_EDITOR
-    new
+        new
 #endif
         public Collider collider;
 
@@ -129,13 +129,13 @@ namespace Leap.Unity.Interaction
         void OnCollisionEnter(Collision collision)
         {
 #if UNITY_EDITOR
-      bool hitNonInteractionObject = false;
+            bool hitNonInteractionObject = false;
 #endif
 
             if (collision.rigidbody == null)
             {
 #if UNITY_EDITOR
-        hitNonInteractionObject = true;
+                hitNonInteractionObject = true;
 #endif
             }
             else
@@ -177,21 +177,22 @@ namespace Leap.Unity.Interaction
                 else
                 {
 #if UNITY_EDITOR
-          hitNonInteractionObject = true;
+                    hitNonInteractionObject = true;
 #endif
                 }
             }
 
 #if UNITY_EDITOR
-      if (hitNonInteractionObject) {
-        // If we hit something that isn't an Interaction Behaviour, there's probably an issue.
-        Debug.LogError("Contact bone collided with something that's not an Interaction"
-                     + "Behaviour! This is liable to cause contact bones to build unstable "
-                     + "velocities and produce bad behavior. Please check your layer "
-                     + "settings in the Interaction Manager, and avoid placing any non-"
-                     + "Interaction objects in layers that contain Interaction objects.",
-                     this);
-      }
+            if (hitNonInteractionObject)
+            {
+                // If we hit something that isn't an Interaction Behaviour, there's probably an issue.
+                Debug.LogError("Contact bone collided with something that's not an Interaction"
+                             + "Behaviour! This is liable to cause contact bones to build unstable "
+                             + "velocities and produce bad behavior. Please check your layer "
+                             + "settings in the Interaction Manager, and avoid placing any non-"
+                             + "Interaction objects in layers that contain Interaction objects.",
+                             this);
+            }
 #endif
         }
 

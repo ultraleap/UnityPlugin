@@ -48,8 +48,8 @@ namespace Leap.Unity
             EditorSceneManager.sceneOpened += onSceneOpened;
 
 #if UNITY_2018_1_OR_NEWER
-      EditorApplication.hierarchyChanged -= onHierarchyChanged;
-      EditorApplication.hierarchyChanged += onHierarchyChanged;
+            EditorApplication.hierarchyChanged -= onHierarchyChanged;
+            EditorApplication.hierarchyChanged += onHierarchyChanged;
 #else
             EditorApplication.hierarchyWindowChanged -= onHierarchyChanged;
             EditorApplication.hierarchyWindowChanged += onHierarchyChanged;

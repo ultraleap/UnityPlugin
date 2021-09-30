@@ -1290,9 +1290,9 @@ namespace Leap.Unity
         {
 #if UNITY_EDITOR
 #if UNITY_2018_3_OR_NEWER
-      // Exclude objects that are not part of any prefab, and exclude prefab _instances_.
-      return UnityEditor.PrefabUtility.IsPartOfAnyPrefab(obj) &&
-        UnityEditor.PrefabUtility.GetPrefabInstanceStatus(obj) == UnityEditor.PrefabInstanceStatus.NotAPrefab;
+            // Exclude objects that are not part of any prefab, and exclude prefab _instances_.
+            return UnityEditor.PrefabUtility.IsPartOfAnyPrefab(obj) &&
+              UnityEditor.PrefabUtility.GetPrefabInstanceStatus(obj) == UnityEditor.PrefabInstanceStatus.NotAPrefab;
 #else
       // Before 2018.3, use GetPrefabType.
       return UnityEditor.PrefabUtility.GetPrefabType(obj) == UnityEditor.PrefabType.Prefab;
@@ -1315,10 +1315,10 @@ namespace Leap.Unity
               .Where(o =>
               {
 #if UNITY_EDITOR
-          // Exclude prefab assets found by the Resources scan.
-          if (IsObjectPartOfPrefabAsset(o)) { return false; }
+                  // Exclude prefab assets found by the Resources scan.
+                  if (IsObjectPartOfPrefabAsset(o)) { return false; }
 #endif
-            return true;
+                  return true;
               })
               .FirstOrDefault();
         }
@@ -2076,10 +2076,10 @@ namespace Leap.Unity
         public static Matrix4x4 CompMul(Matrix4x4 m, float f)
         {
 #if UNITY_2017_1_OR_NEWER
-      return new Matrix4x4(m.GetColumn(0) * f,
-                           m.GetColumn(1) * f,
-                           m.GetColumn(2) * f,
-                           m.GetColumn(3) * f);
+            return new Matrix4x4(m.GetColumn(0) * f,
+                                 m.GetColumn(1) * f,
+                                 m.GetColumn(2) * f,
+                                 m.GetColumn(3) * f);
 #else
             Matrix4x4 toReturn = m;
             for (int i = 0; i < 4; i++)

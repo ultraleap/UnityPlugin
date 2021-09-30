@@ -48,11 +48,14 @@ namespace Leap.Unity
             get
             {
 #if UNITY_EDITOR
-        if (_assetFolder != null) {
-          return AssetDatabase.GetAssetPath(_assetFolder);
-        } else {
-          return null;
-        }
+                if (_assetFolder != null)
+                {
+                    return AssetDatabase.GetAssetPath(_assetFolder);
+                }
+                else
+                {
+                    return null;
+                }
 #else
                 throw new InvalidOperationException("Cannot access the Path of an Asset Folder in a build.");
 #endif
@@ -60,7 +63,7 @@ namespace Leap.Unity
             set
             {
 #if UNITY_EDITOR
-        _assetFolder = AssetDatabase.LoadAssetAtPath<DefaultAsset>(value);
+                _assetFolder = AssetDatabase.LoadAssetAtPath<DefaultAsset>(value);
 #else
                 throw new InvalidOperationException("Cannot set the Path of an Asset Folder in a build.");
 #endif

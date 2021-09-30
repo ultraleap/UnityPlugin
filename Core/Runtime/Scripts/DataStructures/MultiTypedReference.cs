@@ -35,19 +35,21 @@ namespace Leap.Unity
     {
 
 #if UNITY_EDITOR
-    public const string ID_NAME_TABLE = "abcdefghijklmnopqrstuvwxyz";
+        public const string ID_NAME_TABLE = "abcdefghijklmnopqrstuvwxyz";
 
-    public static SerializedProperty GetReferenceProperty(SerializedProperty property) {
-      var indexProp = property.FindPropertyRelative("_index");
-      int indexValue = indexProp.intValue;
-      if (indexValue == -1) {
-        return null;
-      }
+        public static SerializedProperty GetReferenceProperty(SerializedProperty property)
+        {
+            var indexProp = property.FindPropertyRelative("_index");
+            int indexValue = indexProp.intValue;
+            if (indexValue == -1)
+            {
+                return null;
+            }
 
-      string listPropName = "_" + ID_NAME_TABLE[indexValue];
-      var listProp = property.FindPropertyRelative(listPropName);
-      return listProp.GetArrayElementAtIndex(0);
-    }
+            string listPropName = "_" + ID_NAME_TABLE[indexValue];
+            var listProp = property.FindPropertyRelative(listPropName);
+            return listProp.GetArrayElementAtIndex(0);
+        }
 #endif
     }
 

@@ -42,74 +42,87 @@ namespace Leap.Unity
         }
 
 #if UNITY_EDITOR
-    private static List<LeapPreferenceItem> _leapPreferenceItems = null;
+        private static List<LeapPreferenceItem> _leapPreferenceItems = null;
 
-    private struct LeapPreferenceItem {
-      public Action drawPreferenceGui;
-      public LeapPreferences attribute;
-    }
-
-    private static void ensurePreferenceItemsLoaded() {
-      if (_leapPreferenceItems != null) {
-        return;
-      }
-
-      _leapPreferenceItems = new List<LeapPreferenceItem>();
-
-      var assemblies = AppDomain.CurrentDomain.GetAssemblies();
-      foreach (var type in assemblies.SelectMany(a => a.GetTypes())) {
-        foreach (var method in type.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static)) {
-          var attributes = method.GetCustomAttributes(typeof(LeapPreferences), inherit: true);
-          if (attributes.Length == 0) {
-            continue;
-          }
-
-          var attribute = attributes[0] as LeapPreferences;
-          _leapPreferenceItems.Add(new LeapPreferenceItem() {
-            drawPreferenceGui = () => {
-              EditorGUILayout.LabelField(attribute.header, EditorStyles.boldLabel);
-              using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox)) {
-                method.Invoke(null, null);
-              }
-              EditorGUILayout.Space();
-              EditorGUILayout.Space();
-              EditorGUILayout.Space();
-            },
-            attribute = attribute
-          });
+        private struct LeapPreferenceItem
+        {
+            public Action drawPreferenceGui;
+            public LeapPreferences attribute;
         }
-      }
 
-      _leapPreferenceItems.Sort((a, b) => a.attribute.order.CompareTo(b.attribute.order));
-    }
+        private static void ensurePreferenceItemsLoaded()
+        {
+            if (_leapPreferenceItems != null)
+            {
+                return;
+            }
+
+            _leapPreferenceItems = new List<LeapPreferenceItem>();
+
+            var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+            foreach (var type in assemblies.SelectMany(a => a.GetTypes()))
+            {
+                foreach (var method in type.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static))
+                {
+                    var attributes = method.GetCustomAttributes(typeof(LeapPreferences), inherit: true);
+                    if (attributes.Length == 0)
+                    {
+                        continue;
+                    }
+
+                    var attribute = attributes[0] as LeapPreferences;
+                    _leapPreferenceItems.Add(new LeapPreferenceItem()
+                    {
+                        drawPreferenceGui = () =>
+                        {
+                            EditorGUILayout.LabelField(attribute.header, EditorStyles.boldLabel);
+                            using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
+                            {
+                                method.Invoke(null, null);
+                            }
+                            EditorGUILayout.Space();
+                            EditorGUILayout.Space();
+                            EditorGUILayout.Space();
+                        },
+                        attribute = attribute
+                    });
+                }
+            }
+
+            _leapPreferenceItems.Sort((a, b) => a.attribute.order.CompareTo(b.attribute.order));
+        }
 
 #if UNITY_2018_3_OR_NEWER
-    // Implementations Leap Motion settings using the new SettingsProvider API.
-    private class LeapMotionSettingsProvider : SettingsProvider {
-      public LeapMotionSettingsProvider(string path, SettingsScope scopes = SettingsScope.User)
-      : base(path, scopes)
-      { }
+        // Implementations Leap Motion settings using the new SettingsProvider API.
+        private class LeapMotionSettingsProvider : SettingsProvider
+        {
+            public LeapMotionSettingsProvider(string path, SettingsScope scopes = SettingsScope.User)
+            : base(path, scopes)
+            { }
 
-      public override void OnGUI(string searchContext) {
-        DrawPreferencesGUI();
-      }
-    }
- 
-    [SettingsProvider]
-    static SettingsProvider GetSettingsProvider()
-    {
-        return new LeapMotionSettingsProvider("Preferences/Leap Motion");
-    }
+            public override void OnGUI(string searchContext)
+            {
+                DrawPreferencesGUI();
+            }
+        }
+
+        [SettingsProvider]
+        static SettingsProvider GetSettingsProvider()
+        {
+            return new LeapMotionSettingsProvider("Preferences/Leap Motion");
+        }
 #else
     [PreferenceItem("Leap Motion")]
 #endif
-    public static void DrawPreferencesGUI() {
-      ensurePreferenceItemsLoaded();
+        public static void DrawPreferencesGUI()
+        {
+            ensurePreferenceItemsLoaded();
 
-      foreach (var item in _leapPreferenceItems) {
-        item.drawPreferenceGui();
-      }
-    }
+            foreach (var item in _leapPreferenceItems)
+            {
+                item.drawPreferenceGui();
+            }
+        }
 #endif
     }
 }

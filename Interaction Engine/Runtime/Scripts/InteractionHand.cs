@@ -846,34 +846,41 @@ namespace Leap.Unity.Interaction
 
 #if UNITY_EDITOR
 
-    private Leap.Hand _testHand = null;
+        private Leap.Hand _testHand = null;
 
-    public override void OnDrawRuntimeGizmos(RuntimeGizmoDrawer drawer) {
-      if (Application.isPlaying) {
-        base.OnDrawRuntimeGizmos(drawer);
-      }
-      else {
-        var provider = leapProvider;
-        if (provider == null) {
-          provider = Hands.Provider;
+        public override void OnDrawRuntimeGizmos(RuntimeGizmoDrawer drawer)
+        {
+            if (Application.isPlaying)
+            {
+                base.OnDrawRuntimeGizmos(drawer);
+            }
+            else
+            {
+                var provider = leapProvider;
+                if (provider == null)
+                {
+                    provider = Hands.Provider;
+                }
+
+                if (_testHand == null && provider != null)
+                {
+                    _testHand = provider.MakeTestHand(this.isLeft);
+                }
+
+                // Hover Point
+                _unwarpedHandData = _testHand; // hoverPoint is driven by this backing variable
+                drawHoverPoint(drawer, hoverPoint);
+
+                // Primary Hover Points
+                for (int i = 0; i < NUM_FINGERS; i++)
+                {
+                    if (enabledPrimaryHoverFingertips[i])
+                    {
+                        drawPrimaryHoverPoint(drawer, _testHand.Fingers[i].TipPosition.ToVector3());
+                    }
+                }
+            }
         }
-
-        if (_testHand == null && provider != null) {
-          _testHand = provider.MakeTestHand(this.isLeft);
-        }
-
-        // Hover Point
-        _unwarpedHandData = _testHand; // hoverPoint is driven by this backing variable
-        drawHoverPoint(drawer, hoverPoint);
-
-        // Primary Hover Points
-        for (int i = 0; i < NUM_FINGERS; i++) {
-          if (enabledPrimaryHoverFingertips[i]) {
-            drawPrimaryHoverPoint(drawer, _testHand.Fingers[i].TipPosition.ToVector3());
-          }
-        }
-      }
-    }
 
 #endif
 

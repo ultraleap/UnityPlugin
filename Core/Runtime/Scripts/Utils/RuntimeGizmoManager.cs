@@ -201,21 +201,23 @@ namespace Leap.Unity.RuntimeGizmos
             if ((camera.cullingMask & gameObject.layer) == 0) { return; }
 
 #if UNITY_EDITOR
-      //Always draw scene view
-      //Never draw preview or reflection
-      switch (camera.cameraType) {
-        case CameraType.Preview:
+            //Always draw scene view
+            //Never draw preview or reflection
+            switch (camera.cameraType)
+            {
+                case CameraType.Preview:
 #if UNITY_2017_1_OR_NEWER
-        case CameraType.Reflection:
+                case CameraType.Reflection:
 #endif
-          return;
-        case CameraType.Game:
-        case CameraType.VR:
-          if (!_displayInGameView) {
-            return;
-          }
-          break;
-      }
+                    return;
+                case CameraType.Game:
+                case CameraType.VR:
+                    if (!_displayInGameView)
+                    {
+                        return;
+                    }
+                    break;
+            }
 #endif
 
             if (_readyForSwap)

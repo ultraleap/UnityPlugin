@@ -22,12 +22,13 @@ namespace Leap.Unity
             get
             {
 #if UNITY_EDITOR
-        if (!Application.isPlaying) {
-          frame = TestHandFactory.MakeTestFrame(frameId: 0,
-            includeLeftHand: true, includeRightHand: true,
-            handPose: editTimePose,
-            unitType: TestHandFactory.UnitType.UnityUnits);
-        }
+                if (!Application.isPlaying)
+                {
+                    frame = TestHandFactory.MakeTestFrame(frameId: 0,
+                      includeLeftHand: true, includeRightHand: true,
+                      handPose: editTimePose,
+                      unitType: TestHandFactory.UnitType.UnityUnits);
+                }
 #endif
                 return frame;
             }
@@ -37,12 +38,13 @@ namespace Leap.Unity
             get
             {
 #if UNITY_EDITOR
-        if (!Application.isPlaying) {
-          frame = TestHandFactory.MakeTestFrame(frameId: 0,
-            includeLeftHand: true, includeRightHand: true,
-            handPose: editTimePose,
-            unitType: TestHandFactory.UnitType.UnityUnits);
-        }
+                if (!Application.isPlaying)
+                {
+                    frame = TestHandFactory.MakeTestFrame(frameId: 0,
+                      includeLeftHand: true, includeRightHand: true,
+                      handPose: editTimePose,
+                      unitType: TestHandFactory.UnitType.UnityUnits);
+                }
 #endif
                 return frame;
             }

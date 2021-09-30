@@ -214,27 +214,32 @@ namespace Leap.Unity
         }
 
 #if UNITY_EDITOR
-    protected virtual void OnDrawGizmos () {
-      if (ShowGizmos) {
-        ensureUpToDate();
-        Color centerColor;
-        Vector3 centerPosition = _position;
-        Quaternion circleRotation = _rotation;
-        if (IsHolding) {
-          centerColor = OnColor;
-        } else {
-          centerColor = OffColor;
+        protected virtual void OnDrawGizmos()
+        {
+            if (ShowGizmos)
+            {
+                ensureUpToDate();
+                Color centerColor;
+                Vector3 centerPosition = _position;
+                Quaternion circleRotation = _rotation;
+                if (IsHolding)
+                {
+                    centerColor = OnColor;
+                }
+                else
+                {
+                    centerColor = OffColor;
+                }
+                Vector3 axis;
+                float angle;
+                circleRotation.ToAngleAxis(out angle, out axis);
+                Utils.DrawCircle(centerPosition, Normal, Distance / 2, centerColor);
+                Gizmos.color = NormalColor;
+                Gizmos.DrawLine(centerPosition, centerPosition + Direction * Distance / 2);
+                Gizmos.color = DirectionColor;
+                Gizmos.DrawLine(centerPosition, centerPosition + Normal * Distance / 2);
+            }
         }
-        Vector3 axis;
-        float angle;
-        circleRotation.ToAngleAxis(out angle, out axis);
-        Utils.DrawCircle(centerPosition, Normal, Distance / 2, centerColor);
-        Gizmos.color = NormalColor;
-        Gizmos.DrawLine(centerPosition, centerPosition + Direction * Distance / 2);
-        Gizmos.color = DirectionColor;
-        Gizmos.DrawLine(centerPosition, centerPosition + Normal * Distance / 2);
-      }
-    }
 #endif
 
     }

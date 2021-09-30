@@ -82,45 +82,64 @@ namespace Leap.Unity.Attributes
         }
 
 #if UNITY_EDITOR
-    public bool ShouldDisable(SerializedProperty property) {
-      foreach (var name in propertyNames) {
-        var prop = property.serializedObject.FindProperty(name);
+        public bool ShouldDisable(SerializedProperty property)
+        {
+            foreach (var name in propertyNames)
+            {
+                var prop = property.serializedObject.FindProperty(name);
 
-        bool result = shouldDisable(prop);
-        if (isAndOperation) {
-          if (!result) {
-            return false;
-          }
-        } else {
-          if (result) {
-            return true;
-          }
+                bool result = shouldDisable(prop);
+                if (isAndOperation)
+                {
+                    if (!result)
+                    {
+                        return false;
+                    }
+                }
+                else
+                {
+                    if (result)
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            if (isAndOperation)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
-      }
 
-      if (isAndOperation) {
-        return true;
-      } else {
-        return false;
-      }
-    }
-
-    private bool shouldDisable(SerializedProperty property) {
-      if (property == null) {
-        throw new System.NullReferenceException(
-          "Property was null. Expected one of " + propertyNames.ToArrayString());
-      }
-      if (nullIsValid && property.propertyType == SerializedPropertyType.ObjectReference) {
-        return (property.objectReferenceValue == (UnityEngine.Object)testValue) == disableResult;
-      } else if (property.propertyType == SerializedPropertyType.Boolean) {
-        return (property.boolValue == (bool)testValue) == disableResult;
-      } else if (property.propertyType == SerializedPropertyType.Enum) {
-        return (property.intValue == (int)testValue) == disableResult;
-      } else {
-        Debug.LogError("Can only conditionally disable based on boolean or enum types.");
-        return false;
-      }
-    }
+        private bool shouldDisable(SerializedProperty property)
+        {
+            if (property == null)
+            {
+                throw new System.NullReferenceException(
+                  "Property was null. Expected one of " + propertyNames.ToArrayString());
+            }
+            if (nullIsValid && property.propertyType == SerializedPropertyType.ObjectReference)
+            {
+                return (property.objectReferenceValue == (UnityEngine.Object)testValue) == disableResult;
+            }
+            else if (property.propertyType == SerializedPropertyType.Boolean)
+            {
+                return (property.boolValue == (bool)testValue) == disableResult;
+            }
+            else if (property.propertyType == SerializedPropertyType.Enum)
+            {
+                return (property.intValue == (int)testValue) == disableResult;
+            }
+            else
+            {
+                Debug.LogError("Can only conditionally disable based on boolean or enum types.");
+                return false;
+            }
+        }
 #endif
     }
 

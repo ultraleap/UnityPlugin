@@ -67,10 +67,11 @@ namespace Leap.Unity.Attachments
         public static bool ContainsPoint(this AttachmentPointFlags points, AttachmentPointFlags singlePoint)
         {
 #if UNITY_EDITOR
-      // Validation for ensuring singlePoint is really a single point.
-      if (!singlePoint.IsSinglePoint()) {
-        Debug.LogWarning("'ContainsPoint' called with an argument that contains more than one attachment point flag set.");
-      }
+            // Validation for ensuring singlePoint is really a single point.
+            if (!singlePoint.IsSinglePoint())
+            {
+                Debug.LogWarning("'ContainsPoint' called with an argument that contains more than one attachment point flag set.");
+            }
 #endif
             return points.Contains(singlePoint);
         }

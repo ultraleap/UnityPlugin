@@ -18,40 +18,44 @@ namespace Leap.Unity
 {
 
 #if UNITY_EDITOR
-  [InitializeOnLoad]
+    [InitializeOnLoad]
 #endif
     public static class InternalUtility
     {
 
 #if UNITY_EDITOR
-    public static Action OnAnySave;
+        public static Action OnAnySave;
 
-    private static List<UnityEngine.Object> toDestroy = new List<UnityEngine.Object>();
-    private static List<InvokeStruct> _invokeList = new List<InvokeStruct>();
+        private static List<UnityEngine.Object> toDestroy = new List<UnityEngine.Object>();
+        private static List<InvokeStruct> _invokeList = new List<InvokeStruct>();
 
-    static InternalUtility() {
-      //EditorApplication.update += destroyLoop;
-    }
+        static InternalUtility()
+        {
+            //EditorApplication.update += destroyLoop;
+        }
 
-    public static bool IsPrefab(Component component) {
-      return Utils.IsObjectPartOfPrefabAsset(component.gameObject);
-    }
+        public static bool IsPrefab(Component component)
+        {
+            return Utils.IsObjectPartOfPrefabAsset(component.gameObject);
+        }
 
-    /// <summary>
-    /// Call this method from within OnDestroy.  The action will only be invoked if
-    /// the object was deleted during EDIT MODE, and that destruction was not caused
-    /// by a scene change, playmode change, or application quit.
-    /// </summary>
-    /// <param name="action"></param>
-    public static void InvokeIfUserDestroyed(Action action) {
-      if (EditorApplication.isPlayingOrWillChangePlaymode ||
-          EditorApplication.isPlaying ||
-          EditorApplication.isPaused) {
-        return;
-      }
+        /// <summary>
+        /// Call this method from within OnDestroy.  The action will only be invoked if
+        /// the object was deleted during EDIT MODE, and that destruction was not caused
+        /// by a scene change, playmode change, or application quit.
+        /// </summary>
+        /// <param name="action"></param>
+        public static void InvokeIfUserDestroyed(Action action)
+        {
+            if (EditorApplication.isPlayingOrWillChangePlaymode ||
+                EditorApplication.isPlaying ||
+                EditorApplication.isPaused)
+            {
+                return;
+            }
 
-      _invokeList.Add(new InvokeStruct(action));
-    }
+            _invokeList.Add(new InvokeStruct(action));
+        }
 #endif
 
         /// <summary>
@@ -61,9 +65,11 @@ namespace Leap.Unity
         public static T AddComponent<T>(GameObject obj) where T : Component
         {
 #if UNITY_EDITOR
-      if (!Application.isPlaying) {
-        return Undo.AddComponent<T>(obj);
-      } else
+            if (!Application.isPlaying)
+            {
+                return Undo.AddComponent<T>(obj);
+            }
+            else
 #endif
             {
                 return obj.AddComponent<T>();
@@ -77,9 +83,11 @@ namespace Leap.Unity
         public static Component AddComponent(GameObject obj, Type type)
         {
 #if UNITY_EDITOR
-      if (!Application.isPlaying) {
-        return Undo.AddComponent(obj, type);
-      } else
+            if (!Application.isPlaying)
+            {
+                return Undo.AddComponent(obj, type);
+            }
+            else
 #endif
             {
                 return obj.AddComponent(type);
@@ -97,65 +105,84 @@ namespace Leap.Unity
         public static void Destroy(UnityEngine.Object obj)
         {
 #if UNITY_EDITOR
-      if (Application.isPlaying) {
-        UnityEngine.Object.Destroy(obj);
-      } else {
-        toDestroy.Add(obj);
-      }
+            if (Application.isPlaying)
+            {
+                UnityEngine.Object.Destroy(obj);
+            }
+            else
+            {
+                toDestroy.Add(obj);
+            }
 #else
             UnityEngine.Object.Destroy(obj);
 #endif
         }
 
 #if UNITY_EDITOR
-    private static void destroyLoop() {
-      if (_invokeList.Count != 0) {
-        var scene = SceneManager.GetActiveScene();
-        foreach (var action in _invokeList) {
-          if (action.scene == scene) {
-            try {
-              action.action();
-            } catch (Exception e) {
-              Debug.LogException(e);
+        private static void destroyLoop()
+        {
+            if (_invokeList.Count != 0)
+            {
+                var scene = SceneManager.GetActiveScene();
+                foreach (var action in _invokeList)
+                {
+                    if (action.scene == scene)
+                    {
+                        try
+                        {
+                            action.action();
+                        }
+                        catch (Exception e)
+                        {
+                            Debug.LogException(e);
+                        }
+                    }
+                }
+                _invokeList.Clear();
             }
-          }
+
+            if (toDestroy.Count != 0)
+            {
+                for (int i = 0; i < toDestroy.Count; i++)
+                {
+                    var obj = toDestroy[i];
+                    if (obj != null)
+                    {
+                        Undo.DestroyObjectImmediate(obj);
+                    }
+                }
+                toDestroy.Clear();
+            }
         }
-        _invokeList.Clear();
-      }
 
-      if (toDestroy.Count != 0) {
-        for (int i = 0; i < toDestroy.Count; i++) {
-          var obj = toDestroy[i];
-          if (obj != null) {
-            Undo.DestroyObjectImmediate(obj);
-          }
+        private static void dispatchOnAnySave()
+        {
+            if (OnAnySave != null)
+            {
+                OnAnySave();
+            }
         }
-        toDestroy.Clear();
-      }
-    }
 
-    private static void dispatchOnAnySave() {
-      if (OnAnySave != null) {
-        OnAnySave();
-      }
-    }
+        private struct InvokeStruct
+        {
+            public Scene scene;
+            public Action action;
 
-    private struct InvokeStruct {
-      public Scene scene;
-      public Action action;
+            public InvokeStruct(Action action)
+            {
+                this.action = action;
+                scene = SceneManager.GetActiveScene();
+            }
+        }
 
-      public InvokeStruct(Action action) {
-        this.action = action;
-        scene = SceneManager.GetActiveScene();
-      }
-    }
-
-    public class SaveWatcher : UnityEditor.AssetModificationProcessor {
-      static string[] OnWillSaveAssets(string[] paths) {
-        EditorApplication.delayCall += dispatchOnAnySave;
-        return paths;
-      }
-    }
+        public class SaveWatcher : UnityEditor.AssetModificationProcessor
+        {
+            static string[] OnWillSaveAssets(string[] paths)
+            {
+                EditorApplication.delayCall += dispatchOnAnySave;
+                return paths;
+            }
+        }
 #endif
     }
 }

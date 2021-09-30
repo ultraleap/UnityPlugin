@@ -185,21 +185,26 @@ namespace Leap.Unity
         }
 
 #if UNITY_EDITOR
-    private void OnDrawGizmos(){
-      if(ShowGizmos && HandModel != null && HandModel.IsTracked){
-        Color centerColor;
-        if (IsActive) {
-          centerColor = OnColor;
-        } else {
-          centerColor = OffColor;
+        private void OnDrawGizmos()
+        {
+            if (ShowGizmos && HandModel != null && HandModel.IsTracked)
+            {
+                Color centerColor;
+                if (IsActive)
+                {
+                    centerColor = OnColor;
+                }
+                else
+                {
+                    centerColor = OffColor;
+                }
+                Hand hand = HandModel.GetLeapHand();
+                Utils.DrawCone(hand.PalmPosition.ToVector3(), hand.PalmNormal.ToVector3(), OnAngle, hand.PalmWidth, centerColor, 8);
+                Utils.DrawCone(hand.PalmPosition.ToVector3(), hand.PalmNormal.ToVector3(), OffAngle, hand.PalmWidth, LimitColor, 8);
+                Gizmos.color = DirectionColor;
+                Gizmos.DrawRay(hand.PalmPosition.ToVector3(), selectedDirection(hand.PalmPosition.ToVector3()));
+            }
         }
-        Hand hand = HandModel.GetLeapHand();
-        Utils.DrawCone(hand.PalmPosition.ToVector3(), hand.PalmNormal.ToVector3(), OnAngle, hand.PalmWidth, centerColor, 8);
-        Utils.DrawCone(hand.PalmPosition.ToVector3(), hand.PalmNormal.ToVector3(), OffAngle, hand.PalmWidth, LimitColor, 8);
-        Gizmos.color = DirectionColor;
-        Gizmos.DrawRay(hand.PalmPosition.ToVector3(), selectedDirection(hand.PalmPosition.ToVector3()));
-      }
-    }
 #endif
     }
 

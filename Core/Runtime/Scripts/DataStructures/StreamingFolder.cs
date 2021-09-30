@@ -47,15 +47,18 @@ namespace Leap.Unity
         public void OnBeforeSerialize()
         {
 #if UNITY_EDITOR
-      string assetPath = AssetDatabase.GetAssetPath(_assetFolder);
-      if (string.IsNullOrEmpty(assetPath)) {
-        _relativePath = null;
-      } else {
-        string fullFolder = System.IO.Path.GetFullPath(assetPath);
-        _relativePath = Utils.MakeRelativePath(Application.streamingAssetsPath, fullFolder);
-        _relativePath = string.Join(System.IO.Path.DirectorySeparatorChar.ToString(),
-                                    _relativePath.Split(System.IO.Path.DirectorySeparatorChar).Skip(1).ToArray());
-      }
+            string assetPath = AssetDatabase.GetAssetPath(_assetFolder);
+            if (string.IsNullOrEmpty(assetPath))
+            {
+                _relativePath = null;
+            }
+            else
+            {
+                string fullFolder = System.IO.Path.GetFullPath(assetPath);
+                _relativePath = Utils.MakeRelativePath(Application.streamingAssetsPath, fullFolder);
+                _relativePath = string.Join(System.IO.Path.DirectorySeparatorChar.ToString(),
+                                            _relativePath.Split(System.IO.Path.DirectorySeparatorChar).Skip(1).ToArray());
+            }
 #endif
         }
     }

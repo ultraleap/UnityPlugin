@@ -22,11 +22,12 @@ namespace Leap.Unity.Attributes
         }
 
 #if UNITY_EDITOR
-    public void DrawProperty(Rect rect, UnityEditor.SerializedProperty property,
-                             GUIContent label) {
-      label.text = name;
-      UnityEditor.EditorGUI.PropertyField(rect, property, label, includeChildren: true);
-    }
+        public void DrawProperty(Rect rect, UnityEditor.SerializedProperty property,
+                                 GUIContent label)
+        {
+            label.text = name;
+            UnityEditor.EditorGUI.PropertyField(rect, property, label, includeChildren: true);
+        }
 #endif
     }
 }

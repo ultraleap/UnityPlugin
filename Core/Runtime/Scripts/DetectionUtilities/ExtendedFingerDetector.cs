@@ -176,27 +176,33 @@ namespace Leap.Unity
         }
 
 #if UNITY_EDITOR
-    void OnDrawGizmos () {
-      if (ShowGizmos && HandModel != null && HandModel.IsTracked) {
-        PointingState[] state = { Thumb, Index, Middle, Ring, Pinky };
-        Hand hand = HandModel.GetLeapHand();
-        int extendedCount = 0;
-        int notExtendedCount = 0;
-        for (int f = 0; f < 5; f++) {
-          Finger finger = hand.Fingers[f];
-          if (finger.IsExtended) extendedCount++;
-          else notExtendedCount++;
-          if (matchFingerState(finger, state[f]) && 
-             (extendedCount <= MaximumExtendedCount) && 
-             (extendedCount >= MinimumExtendedCount)) {
-            Gizmos.color = OnColor;
-          } else {
-            Gizmos.color = OffColor;
-          }
-          Gizmos.DrawWireSphere(finger.TipPosition.ToVector3(), finger.Width);
+        void OnDrawGizmos()
+        {
+            if (ShowGizmos && HandModel != null && HandModel.IsTracked)
+            {
+                PointingState[] state = { Thumb, Index, Middle, Ring, Pinky };
+                Hand hand = HandModel.GetLeapHand();
+                int extendedCount = 0;
+                int notExtendedCount = 0;
+                for (int f = 0; f < 5; f++)
+                {
+                    Finger finger = hand.Fingers[f];
+                    if (finger.IsExtended) extendedCount++;
+                    else notExtendedCount++;
+                    if (matchFingerState(finger, state[f]) &&
+                       (extendedCount <= MaximumExtendedCount) &&
+                       (extendedCount >= MinimumExtendedCount))
+                    {
+                        Gizmos.color = OnColor;
+                    }
+                    else
+                    {
+                        Gizmos.color = OffColor;
+                    }
+                    Gizmos.DrawWireSphere(finger.TipPosition.ToVector3(), finger.Width);
+                }
+            }
         }
-      }
-    }
 #endif
     }
 

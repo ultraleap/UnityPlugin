@@ -76,50 +76,61 @@ namespace Leap.Unity
         public HandModelManager.ModelGroup group;
 
 #if UNITY_EDITOR
-    void Update() {
-      if (!EditorApplication.isPlaying && SupportsEditorPersistence()) {
-        LeapProvider provider = null;
+        void Update()
+        {
+            if (!EditorApplication.isPlaying && SupportsEditorPersistence())
+            {
+                LeapProvider provider = null;
 
-        //First try to get the provider from a parent HandModelManager
-        if (transform.parent != null) {
-          var manager = transform.parent.GetComponent<HandModelManager>();
-          if (manager != null) {
-            provider = manager.leapProvider;
-          }
+                //First try to get the provider from a parent HandModelManager
+                if (transform.parent != null)
+                {
+                    var manager = transform.parent.GetComponent<HandModelManager>();
+                    if (manager != null)
+                    {
+                        provider = manager.leapProvider;
+                    }
+                }
+
+                //If not found, use any old provider from the Hands.Provider getter
+                if (provider == null)
+                {
+                    provider = Hands.Provider;
+                }
+
+                Hand hand = null;
+                //If we found a provider, pull the hand from that
+                if (provider != null)
+                {
+                    var frame = provider.CurrentFrame;
+
+                    if (frame != null)
+                    {
+                        hand = frame.Get(Handedness);
+                    }
+                }
+
+                //If we still have a null hand, construct one manually
+                if (hand == null)
+                {
+                    hand = TestHandFactory.MakeTestHand(Handedness == Chirality.Left, unitType: TestHandFactory.UnitType.LeapUnits);
+                    hand.Transform(transform.GetLeapMatrix());
+                }
+
+                if (GetLeapHand() == null)
+                {
+                    SetLeapHand(hand);
+                    InitHand();
+                    BeginHand();
+                    UpdateHand();
+                }
+                else
+                {
+                    SetLeapHand(hand);
+                    UpdateHand();
+                }
+            }
         }
-
-        //If not found, use any old provider from the Hands.Provider getter
-        if (provider == null) {
-          provider = Hands.Provider;
-        }
-
-        Hand hand = null;
-        //If we found a provider, pull the hand from that
-        if (provider != null) {
-          var frame = provider.CurrentFrame;
-
-          if (frame != null) {
-            hand = frame.Get(Handedness);
-          }
-        }
-
-        //If we still have a null hand, construct one manually
-        if (hand == null) {
-          hand = TestHandFactory.MakeTestHand(Handedness == Chirality.Left, unitType: TestHandFactory.UnitType.LeapUnits);
-          hand.Transform(transform.GetLeapMatrix());
-        }
-
-        if (GetLeapHand() == null) {
-          SetLeapHand(hand);
-          InitHand();
-          BeginHand();
-          UpdateHand();
-        } else {
-          SetLeapHand(hand);
-          UpdateHand();
-        }
-      }
-    }
 #endif
     }
 }

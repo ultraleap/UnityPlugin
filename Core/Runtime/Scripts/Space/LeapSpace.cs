@@ -23,11 +23,12 @@ namespace Leap.Unity.Space
             get
             {
 #if UNITY_EDITOR
-        //if we are in the editor, don't bother with enable/disable lifecycle
-        //just use FindObjectsOfType!
-        if (!Application.isPlaying) {
-          FindObjectsOfType<LeapSpace>().Query().Where(c => c.enabled).FillList(_enabledSpaces);
-        }
+                //if we are in the editor, don't bother with enable/disable lifecycle
+                //just use FindObjectsOfType!
+                if (!Application.isPlaying)
+                {
+                    FindObjectsOfType<LeapSpace>().Query().Where(c => c.enabled).FillList(_enabledSpaces);
+                }
 #endif
                 return _enabledSpaces;
             }

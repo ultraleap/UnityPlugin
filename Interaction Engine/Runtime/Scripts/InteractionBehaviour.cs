@@ -638,7 +638,7 @@ namespace Leap.Unity.Interaction
 
         private Rigidbody _rigidbody;
 #if UNITY_EDITOR
-    new 
+        new
 #endif
         /// <summary> The Rigidbody associated with this interaction object. </summary>
         public Rigidbody rigidbody

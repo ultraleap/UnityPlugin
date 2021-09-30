@@ -245,15 +245,16 @@ namespace Leap.Unity.Attachments
         public void notifyPointBehaviourDeleted(AttachmentPointBehaviour point)
         {
 #if UNITY_EDITOR
-      // Only valid if the AttachmentHand itself is also not being destroyed.
-      if (_isBeingDestroyed) return;
+            // Only valid if the AttachmentHand itself is also not being destroyed.
+            if (_isBeingDestroyed) return;
 
-      // Refresh this hand's attachment transforms on a slight delay.
-      // Only AttachmentHands can _truly_ remove attachment points!
-      AttachmentHands attachHands = GetComponentInParent<AttachmentHands>();
-      if (attachHands != null) {
-        EditorApplication.delayCall += () => { refreshAttachmentTransforms(attachHands.attachmentPoints); };
-      }
+            // Refresh this hand's attachment transforms on a slight delay.
+            // Only AttachmentHands can _truly_ remove attachment points!
+            AttachmentHands attachHands = GetComponentInParent<AttachmentHands>();
+            if (attachHands != null)
+            {
+                EditorApplication.delayCall += () => { refreshAttachmentTransforms(attachHands.attachmentPoints); };
+            }
 #endif
         }
 
@@ -309,7 +310,7 @@ namespace Leap.Unity.Attachments
             }
 
 #if UNITY_EDITOR
-      EditorUtility.SetDirty(this);
+            EditorUtility.SetDirty(this);
 #endif
         }
 
@@ -335,8 +336,8 @@ namespace Leap.Unity.Attachments
                 {
                     GameObject obj = new GameObject(Enum.GetName(typeof(AttachmentPointFlags), singlePoint));
 #if UNITY_EDITOR
-          Undo.RegisterCreatedObjectUndo(obj, "Created Object");
-          pointBehaviour = Undo.AddComponent<AttachmentPointBehaviour>(obj);
+                    Undo.RegisterCreatedObjectUndo(obj, "Created Object");
+                    pointBehaviour = Undo.AddComponent<AttachmentPointBehaviour>(obj);
 #else
                     pointBehaviour = obj.AddComponent<AttachmentPointBehaviour>();
 #endif
@@ -347,7 +348,7 @@ namespace Leap.Unity.Attachments
                 }
 
 #if UNITY_EDITOR
-        Undo.RecordObject(pointBehaviour, "Set Attachment Point");
+                Undo.RecordObject(pointBehaviour, "Set Attachment Point");
 #endif
                 pointBehaviour.attachmentPoint = singlePoint;
                 pointBehaviour.attachmentHand = this;
@@ -358,7 +359,7 @@ namespace Leap.Unity.Attachments
                 _attachmentPointsDirty = true;
 
 #if UNITY_EDITOR
-        EditorUtility.SetDirty(this);
+                EditorUtility.SetDirty(this);
 #endif
             }
         }
@@ -366,7 +367,7 @@ namespace Leap.Unity.Attachments
         private static void SetTransformParent(Transform t, Transform parent)
         {
 #if UNITY_EDITOR
-      Undo.SetTransformParent(t, parent, "Set Transform Parent");
+            Undo.SetTransformParent(t, parent, "Set Transform Parent");
 #else
             t.parent = parent;
 #endif
@@ -391,7 +392,7 @@ namespace Leap.Unity.Attachments
                 _attachmentPointsDirty = true;
 
 #if UNITY_EDITOR
-        EditorUtility.SetDirty(this);
+                EditorUtility.SetDirty(this);
 #endif
             }
         }

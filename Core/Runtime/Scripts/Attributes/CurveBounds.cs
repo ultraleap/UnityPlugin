@@ -35,15 +35,18 @@ namespace Leap.Unity.Attributes
         }
 
 #if UNITY_EDITOR
-    public void DrawProperty(Rect rect, SerializedProperty property, GUIContent label) {
-      EditorGUI.CurveField(rect, property, Color.green, bounds);
-    }
+        public void DrawProperty(Rect rect, SerializedProperty property, GUIContent label)
+        {
+            EditorGUI.CurveField(rect, property, Color.green, bounds);
+        }
 
-    public override IEnumerable<SerializedPropertyType> SupportedTypes {
-      get {
-        yield return SerializedPropertyType.AnimationCurve;
-      }
-    }
+        public override IEnumerable<SerializedPropertyType> SupportedTypes
+        {
+            get
+            {
+                yield return SerializedPropertyType.AnimationCurve;
+            }
+        }
 #endif
     }
 

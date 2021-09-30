@@ -36,25 +36,28 @@ namespace Leap.Unity
     }
 
 #if UNITY_EDITOR
-  /// <summary>
-  /// An example progress view that uses the simple EditorUtility methods to 
-  /// provide a developer with progress of an editor action.
-  /// </summary>
-  public class EditorProgressView : IProgressView {
     /// <summary>
-    /// Gets a reference to a singleton instance of the EditorProgressView.
-    /// This is safe because EditorProgressView is stateless.
+    /// An example progress view that uses the simple EditorUtility methods to 
+    /// provide a developer with progress of an editor action.
     /// </summary>
-    public static readonly EditorProgressView Single = new EditorProgressView();
+    public class EditorProgressView : IProgressView
+    {
+        /// <summary>
+        /// Gets a reference to a singleton instance of the EditorProgressView.
+        /// This is safe because EditorProgressView is stateless.
+        /// </summary>
+        public static readonly EditorProgressView Single = new EditorProgressView();
 
-    public void Clear() {
-      EditorUtility.ClearProgressBar();
-    }
+        public void Clear()
+        {
+            EditorUtility.ClearProgressBar();
+        }
 
-    public void DisplayProgress(string title, string info, float progress) {
-      EditorUtility.DisplayProgressBar(title, info, progress);
+        public void DisplayProgress(string title, string info, float progress)
+        {
+            EditorUtility.DisplayProgressBar(title, info, progress);
+        }
     }
-  }
 #endif
 
     /// <summary>
@@ -78,13 +81,13 @@ namespace Leap.Unity
         private IProgressView _view;
 
 #if UNITY_EDITOR
-    /// <summary>
-    /// Constructs a new progress bar given a default EditorProgressView.
-    /// You can use this constructor whenever you want to give progress 
-    /// feedback to a Unity developer about an editor action that might
-    /// take some time to complete.
-    /// </summary>
-    public ProgressBar() : this(EditorProgressView.Single) { }
+        /// <summary>
+        /// Constructs a new progress bar given a default EditorProgressView.
+        /// You can use this constructor whenever you want to give progress 
+        /// feedback to a Unity developer about an editor action that might
+        /// take some time to complete.
+        /// </summary>
+        public ProgressBar() : this(EditorProgressView.Single) { }
 #endif
 
         /// <summary>

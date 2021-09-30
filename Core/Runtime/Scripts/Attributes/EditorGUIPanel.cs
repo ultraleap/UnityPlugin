@@ -55,69 +55,81 @@ namespace Leap.Unity.Attributes
         }
 
 #if UNITY_EDITOR
-    private Action<Rect, UnityEngine.Object[]> _cachedDelegate;
-    
-    public float GetHeight() {
-      return LINE_HEIGHT * heightInLines;
-    }
+        private Action<Rect, UnityEngine.Object[]> _cachedDelegate;
 
-    public void Draw(Rect panelRect, SerializedProperty property) {
-      if (_cachedDelegate == null) {
-        Type type = targets[0].GetType();
-
-        MethodInfo method = type.GetMethod(editorMethodName,
-          BindingFlags.Public |
-          BindingFlags.NonPublic |
-          BindingFlags.Static |
-          BindingFlags.Instance |
-          BindingFlags.FlattenHierarchy
-        );
-
-        if (method == null) {
-          Debug.LogWarning("Could not find method of the name " +
-            editorMethodName + " " + "to invoke for the TopButtonPanel " +
-            "attribute.");
-          return;
+        public float GetHeight()
+        {
+            return LINE_HEIGHT * heightInLines;
         }
 
-        int paramCount = method.GetParameters().Length;
-        if (paramCount == 0) {
-          Debug.LogWarning("Method " + editorMethodName + "needs to accept a " +
-            "Rect arg and Object[] arg to know the size of the panel to draw and " +
-            "which components are currently selected.");
-        }
-        // else if (paramCount == 1) {
-        //   Debug.LogWarning("Method " + editorMethodName + "needs to accept a " +
-        //     "Rect arg and Object[] arg to know the size of the panel to draw and " +
-        //     "which components are currently selected.");
-        // }
-        else if (paramCount == 1 || paramCount == 2) {
-          _cachedDelegate = (rect, targets) => {
-            if (!method.IsStatic) {
-              // Non-static drawing is only valid for single-object selection.
-              if (targets.Length == 1) {
-                object[] argArray = new object[1];
-                argArray[0] = rect;
-                method.Invoke(targets[0], argArray);
-              }
+        public void Draw(Rect panelRect, SerializedProperty property)
+        {
+            if (_cachedDelegate == null)
+            {
+                Type type = targets[0].GetType();
+
+                MethodInfo method = type.GetMethod(editorMethodName,
+                  BindingFlags.Public |
+                  BindingFlags.NonPublic |
+                  BindingFlags.Static |
+                  BindingFlags.Instance |
+                  BindingFlags.FlattenHierarchy
+                );
+
+                if (method == null)
+                {
+                    Debug.LogWarning("Could not find method of the name " +
+                      editorMethodName + " " + "to invoke for the TopButtonPanel " +
+                      "attribute.");
+                    return;
+                }
+
+                int paramCount = method.GetParameters().Length;
+                if (paramCount == 0)
+                {
+                    Debug.LogWarning("Method " + editorMethodName + "needs to accept a " +
+                      "Rect arg and Object[] arg to know the size of the panel to draw and " +
+                      "which components are currently selected.");
+                }
+                // else if (paramCount == 1) {
+                //   Debug.LogWarning("Method " + editorMethodName + "needs to accept a " +
+                //     "Rect arg and Object[] arg to know the size of the panel to draw and " +
+                //     "which components are currently selected.");
+                // }
+                else if (paramCount == 1 || paramCount == 2)
+                {
+                    _cachedDelegate = (rect, targets) =>
+                    {
+                        if (!method.IsStatic)
+                        {
+                            // Non-static drawing is only valid for single-object selection.
+                            if (targets.Length == 1)
+                            {
+                                object[] argArray = new object[1];
+                                argArray[0] = rect;
+                                method.Invoke(targets[0], argArray);
+                            }
+                        }
+                        else
+                        { // method.IsStatic
+                            object[] argArray = new object[2];
+                            argArray[0] = rect;
+                            argArray[1] = targets;
+                            method.Invoke(null, argArray);
+                        }
+                    };
+                }
+                else
+                {
+                    Debug.LogWarning("Could not invoke the method " + editorMethodName +
+                      " from TopButtonPanel because the method had more than 1 argument.");
+                }
             }
-            else { // method.IsStatic
-              object[] argArray = new object[2];
-              argArray[0] = rect;
-              argArray[1] = targets;
-              method.Invoke(null, argArray);
-            }
-          };
-        } else {
-          Debug.LogWarning("Could not invoke the method " + editorMethodName +
-            " from TopButtonPanel because the method had more than 1 argument.");
+
+            _cachedDelegate.Invoke(panelRect, targets);
+
+            return;
         }
-      }
-
-      _cachedDelegate.Invoke(panelRect, targets);
-
-      return;
-    }
 
 #endif
     }

@@ -20,29 +20,35 @@ namespace Leap.Unity.Attributes
         public const float BUTTON_WIDTH = 20;
 
 #if UNITY_EDITOR
-    public void Draw(Rect rect, SerializedProperty property) {
-      rect.width = BUTTON_WIDTH;
+        public void Draw(Rect rect, SerializedProperty property)
+        {
+            rect.width = BUTTON_WIDTH;
 
-      if (GUI.Button(rect, "-")) {
-        property.intValue--;
-      }
+            if (GUI.Button(rect, "-"))
+            {
+                property.intValue--;
+            }
 
-      rect.x += rect.width;
+            rect.x += rect.width;
 
-      if (GUI.Button(rect, "+")) {
-        property.intValue++;
-      }
-    }
+            if (GUI.Button(rect, "+"))
+            {
+                property.intValue++;
+            }
+        }
 
-    public float GetWidth() {
-      return BUTTON_WIDTH * 2;
-    }
+        public float GetWidth()
+        {
+            return BUTTON_WIDTH * 2;
+        }
 
-    public override IEnumerable<SerializedPropertyType> SupportedTypes {
-      get {
-        yield return SerializedPropertyType.Integer;
-      }
-    }
+        public override IEnumerable<SerializedPropertyType> SupportedTypes
+        {
+            get
+            {
+                yield return SerializedPropertyType.Integer;
+            }
+        }
 #endif
     }
 }

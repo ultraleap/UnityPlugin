@@ -570,23 +570,29 @@ namespace Leap.Unity
         #region Editor-only Methods
 
 #if UNITY_EDITOR
-    /**In the Unity Editor, Validate that the HandModelBase is an instance of a prefab from the scene vs. a prefab from the project. */
-    void OnValidate() {
-      if (ModelPool != null) {
-        for (int i = 0; i < ModelPool.Count; i++) {
-          if (ModelPool[i] != null) {
-            if (ModelPool[i].LeftModel) {
-              ModelPool[i].IsLeftToBeSpawned = Utils.IsObjectPartOfPrefabAsset(
-                ModelPool[i].LeftModel);
+        /**In the Unity Editor, Validate that the HandModelBase is an instance of a prefab from the scene vs. a prefab from the project. */
+        void OnValidate()
+        {
+            if (ModelPool != null)
+            {
+                for (int i = 0; i < ModelPool.Count; i++)
+                {
+                    if (ModelPool[i] != null)
+                    {
+                        if (ModelPool[i].LeftModel)
+                        {
+                            ModelPool[i].IsLeftToBeSpawned = Utils.IsObjectPartOfPrefabAsset(
+                              ModelPool[i].LeftModel);
+                        }
+                        if (ModelPool[i].RightModel)
+                        {
+                            ModelPool[i].IsRightToBeSpawned = Utils.IsObjectPartOfPrefabAsset(
+                              ModelPool[i].RightModel);
+                        }
+                    }
+                }
             }
-            if (ModelPool[i].RightModel) {
-              ModelPool[i].IsRightToBeSpawned = Utils.IsObjectPartOfPrefabAsset(
-                ModelPool[i].RightModel);
-            }
-          }
         }
-      }
-    }
 
 #endif
 

@@ -24,8 +24,8 @@ namespace Leap.Unity
     public interface ICanReportDuplicateInformation
     {
 #if UNITY_EDITOR
-    List<int> GetDuplicationInformation();
-    void ClearDuplicates();
+        List<int> GetDuplicationInformation();
+        void ClearDuplicates();
 #endif
     }
 
@@ -181,48 +181,61 @@ namespace Leap.Unity
         }
 
 #if UNITY_EDITOR
-    public List<int> GetDuplicationInformation() {
-      Dictionary<TKey, int> info = new Dictionary<TKey, int>();
+        public List<int> GetDuplicationInformation()
+        {
+            Dictionary<TKey, int> info = new Dictionary<TKey, int>();
 
-      for (int i = 0; i < _keys.Count; i++) {
-        TKey key = _keys[i];
-        if (key == null) {
-          continue;
+            for (int i = 0; i < _keys.Count; i++)
+            {
+                TKey key = _keys[i];
+                if (key == null)
+                {
+                    continue;
+                }
+
+                if (info.ContainsKey(key))
+                {
+                    info[key]++;
+                }
+                else
+                {
+                    info[key] = 1;
+                }
+            }
+
+            List<int> dups = new List<int>();
+            for (int i = 0; i < _keys.Count; i++)
+            {
+                TKey key = _keys[i];
+                if (key == null)
+                {
+                    continue;
+                }
+
+                dups.Add(info[key]);
+            }
+
+            return dups;
         }
 
-        if (info.ContainsKey(key)) {
-          info[key]++;
-        } else {
-          info[key] = 1;
+        public void ClearDuplicates()
+        {
+            HashSet<TKey> takenKeys = new HashSet<TKey>();
+            for (int i = 0; i < _keys.Count; i++)
+            {
+                TKey key = _keys[i];
+                if (takenKeys.Contains(key))
+                {
+                    _keys.RemoveAt(i);
+                    _values.RemoveAt(i);
+                    i--;
+                }
+                else
+                {
+                    takenKeys.Add(key);
+                }
+            }
         }
-      }
-
-      List<int> dups = new List<int>();
-      for (int i = 0; i < _keys.Count; i++) {
-        TKey key = _keys[i];
-        if (key == null) {
-          continue;
-        }
-
-        dups.Add(info[key]);
-      }
-
-      return dups;
-    }
-
-    public void ClearDuplicates() {
-      HashSet<TKey> takenKeys = new HashSet<TKey>();
-      for (int i = 0; i < _keys.Count; i++) {
-        TKey key = _keys[i];
-        if (takenKeys.Contains(key)) {
-          _keys.RemoveAt(i);
-          _values.RemoveAt(i);
-          i--;
-        } else {
-          takenKeys.Add(key);
-        }
-      }
-    }
 #endif
 
         public void OnBeforeSerialize()
@@ -238,15 +251,17 @@ namespace Leap.Unity
             }
 
 #if UNITY_EDITOR
-      for (int i = _keys.Count; i-- != 0;) {
-        TKey key = _keys[i];
-        if (key == null) continue;
+            for (int i = _keys.Count; i-- != 0;)
+            {
+                TKey key = _keys[i];
+                if (key == null) continue;
 
-        if (!_dictionary.ContainsKey(key)) {
-          _keys.RemoveAt(i);
-          _values.RemoveAt(i);
-        }
-      }
+                if (!_dictionary.ContainsKey(key))
+                {
+                    _keys.RemoveAt(i);
+                    _values.RemoveAt(i);
+                }
+            }
 #endif
 
             Dictionary<TKey, TValue>.Enumerator enumerator = _dictionary.GetEnumerator();
@@ -255,10 +270,11 @@ namespace Leap.Unity
                 var pair = enumerator.Current;
 
 #if UNITY_EDITOR
-        if (!_keys.Contains(pair.Key)) {
-          _keys.Add(pair.Key);
-          _values.Add(pair.Value);
-        }
+                if (!_keys.Contains(pair.Key))
+                {
+                    _keys.Add(pair.Key);
+                    _values.Add(pair.Value);
+                }
 #else
                 _keys.Add(pair.Key);
                 _values.Add(pair.Value);

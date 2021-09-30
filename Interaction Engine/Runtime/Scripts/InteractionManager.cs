@@ -263,20 +263,22 @@ namespace Leap.Unity.Interaction
             _prevRotation = this.transform.rotation;
 
 #if UNITY_EDITOR
-      if (_drawControllerRuntimeGizmos == true) {
-        if (FindObjectOfType<RuntimeGizmoManager>() == null) {
-          Debug.LogWarning("'_drawControllerRuntimeGizmos' is enabled, but there is no "
-                         + "RuntimeGizmoManager in your scene. Please add one if you'd "
-                         + "like to render gizmos in the editor and in your headset.");
-        }
-      }
+            if (_drawControllerRuntimeGizmos == true)
+            {
+                if (FindObjectOfType<RuntimeGizmoManager>() == null)
+                {
+                    Debug.LogWarning("'_drawControllerRuntimeGizmos' is enabled, but there is no "
+                                   + "RuntimeGizmoManager in your scene. Please add one if you'd "
+                                   + "like to render gizmos in the editor and in your headset.");
+                }
+            }
 #endif
         }
 
         void OnDisable()
         {
 #if UNITY_EDITOR
-      if (!Application.isPlaying) return;
+            if (!Application.isPlaying) return;
 #endif
 
             foreach (var intController in _interactionControllers)
@@ -295,7 +297,7 @@ namespace Leap.Unity.Interaction
         void Update()
         {
 #if UNITY_EDITOR
-      refreshInteractionControllers();
+            refreshInteractionControllers();
 #endif
         }
 
@@ -306,8 +308,8 @@ namespace Leap.Unity.Interaction
             // Physics should only be synced once at the beginning of the physics simulation.
             // (Will be re-set to its original value at the end of the update.)
 #if UNITY_2017_2_OR_NEWER
-      var preUpdateAutoSyncTransforms = Physics.autoSyncTransforms;
-      Physics.autoSyncTransforms = false;
+            var preUpdateAutoSyncTransforms = Physics.autoSyncTransforms;
+            Physics.autoSyncTransforms = false;
 #endif
             try
             {
@@ -315,7 +317,7 @@ namespace Leap.Unity.Interaction
                 refreshInteractionControllers();
 
 #if UNITY_EDITOR
-        if (!Application.isPlaying) return;
+                if (!Application.isPlaying) return;
 #endif
 
                 using (new ProfilerSample("Interaction Manager FixedUpdate", this.gameObject))
@@ -363,9 +365,9 @@ namespace Leap.Unity.Interaction
             finally
             {
 #if UNITY_2017_2_OR_NEWER
-        // Restore the autoSyncTransforms setting to whatever the user had it as before
-        // the Manager FixedUpdate.
-        Physics.autoSyncTransforms = preUpdateAutoSyncTransforms;
+                // Restore the autoSyncTransforms setting to whatever the user had it as before
+                // the Manager FixedUpdate.
+                Physics.autoSyncTransforms = preUpdateAutoSyncTransforms;
 #endif
             }
         }

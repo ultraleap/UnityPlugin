@@ -64,19 +64,21 @@ namespace Leap.Unity
         public static void BeginProfilingForThread(BeginProfilingForThreadArgs eventData)
         {
 #if UNITY_2017_3_OR_NEWER
-      //Enable unity profiling for this thread
-      Profiler.BeginThreadProfiling("LeapCSharp", eventData.threadName);
+            //Enable unity profiling for this thread
+            Profiler.BeginThreadProfiling("LeapCSharp", eventData.threadName);
 
-      //Assume that threads are not stopping and starting frequently
-      //so we can get away with less-than-optimal strategies when starting a thread.
-      //in this case we use a naive queue with a lock.
-      lock (_samplersToCreate) {
-        foreach (var blockName in eventData.blockNames) {
-          _samplersToCreate.Enqueue(blockName);
-        }
+            //Assume that threads are not stopping and starting frequently
+            //so we can get away with less-than-optimal strategies when starting a thread.
+            //in this case we use a naive queue with a lock.
+            lock (_samplersToCreate)
+            {
+                foreach (var blockName in eventData.blockNames)
+                {
+                    _samplersToCreate.Enqueue(blockName);
+                }
 
-        Interlocked.Add(ref _samplersToCreateCount, eventData.blockNames.Length);
-      }
+                Interlocked.Add(ref _samplersToCreateCount, eventData.blockNames.Length);
+            }
 #else
             Debug.LogWarning("Thread Profiling is unavailable in versions of Unity below 2017.3");
 #endif
@@ -85,7 +87,7 @@ namespace Leap.Unity
         public static void EndProfilingForThread(EndProfilingForThreadArgs eventData)
         {
 #if UNITY_2017_3_OR_NEWER
-      Profiler.EndThreadProfiling();
+            Profiler.EndThreadProfiling();
 #else
             Debug.LogWarning("Thread Profiling is unavailable in versions of Unity below 2017.3");
 #endif

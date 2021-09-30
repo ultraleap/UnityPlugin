@@ -30,12 +30,13 @@ namespace Leap.Unity
         protected bool _isEditing = true;
 
 #if UNITY_EDITOR
-    [ContextMenu("Edit")]
-    private void beginEditing() {
-      Undo.RecordObject(this, "Enabled editing");
-      EditorUtility.SetDirty(this);
-      _isEditing = true;
-    }
+        [ContextMenu("Edit")]
+        private void beginEditing()
+        {
+            Undo.RecordObject(this, "Enabled editing");
+            EditorUtility.SetDirty(this);
+            _isEditing = true;
+        }
 #endif
 
     }

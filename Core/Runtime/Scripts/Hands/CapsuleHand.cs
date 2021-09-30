@@ -118,15 +118,17 @@ namespace Leap.Unity
         }
 
 #if UNITY_EDITOR
-    private void OnValidate() {
-      _meshMap.Clear();
-      if (_material == null || !_material.enableInstancing) {
-        Debug.LogWarning("CapsuleHand's Material must have " +
-          "instancing enabled in order to work in builds! Replacing " +
-          "Material with a Default Material now...", this);
-        _material = (Material)Resources.Load("InstancedCapsuleHand", typeof(Material));
+        private void OnValidate()
+        {
+            _meshMap.Clear();
+            if (_material == null || !_material.enableInstancing)
+            {
+                Debug.LogWarning("CapsuleHand's Material must have " +
+                  "instancing enabled in order to work in builds! Replacing " +
+                  "Material with a Default Material now...", this);
+                _material = (Material)Resources.Load("InstancedCapsuleHand", typeof(Material));
             }
-    }
+        }
 #endif
 
         public override void BeginHand()

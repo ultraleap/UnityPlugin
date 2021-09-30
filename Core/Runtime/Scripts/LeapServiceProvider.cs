@@ -108,8 +108,8 @@ namespace Leap.Unity
         protected TrackingOptimizationMode _trackingOptimization = TrackingOptimizationMode.Desktop;
 
 #if UNITY_2017_3_OR_NEWER
-    [Tooltip("When checked, profiling data from the LeapCSharp worker thread will be used to populate the UnityProfiler.")]
-    [EditTimeOnly]
+        [Tooltip("When checked, profiling data from the LeapCSharp worker thread will be used to populate the UnityProfiler.")]
+        [EditTimeOnly]
 #else
         [Tooltip("Worker thread profiling requires a Unity version of 2017.3 or greater.")]
         [Disable]
@@ -181,56 +181,70 @@ namespace Leap.Unity
         }
 
 #if UNITY_EDITOR
-    private Frame _backingUntransformedEditTimeFrame = null;
-    private Frame _untransformedEditTimeFrame {
-      get {
-        if (_backingUntransformedEditTimeFrame == null) {
-          _backingUntransformedEditTimeFrame = new Frame();
+        private Frame _backingUntransformedEditTimeFrame = null;
+        private Frame _untransformedEditTimeFrame
+        {
+            get
+            {
+                if (_backingUntransformedEditTimeFrame == null)
+                {
+                    _backingUntransformedEditTimeFrame = new Frame();
+                }
+                return _backingUntransformedEditTimeFrame;
+            }
         }
-        return _backingUntransformedEditTimeFrame;
-      }
-    }
-    private Frame _backingEditTimeFrame = null;
-    private Frame _editTimeFrame {
-      get {
-        if (_backingEditTimeFrame == null) {
-          _backingEditTimeFrame = new Frame();
+        private Frame _backingEditTimeFrame = null;
+        private Frame _editTimeFrame
+        {
+            get
+            {
+                if (_backingEditTimeFrame == null)
+                {
+                    _backingEditTimeFrame = new Frame();
+                }
+                return _backingEditTimeFrame;
+            }
         }
-        return _backingEditTimeFrame;
-      }
-    }
 
-    private Dictionary<TestHandFactory.TestHandPose, Hand> _cachedLeftHands
-      = new Dictionary<TestHandFactory.TestHandPose, Hand>();
-    private Hand _editTimeLeftHand {
-      get {
-        Hand cachedHand = null;
-        if (_cachedLeftHands.TryGetValue(editTimePose, out cachedHand)) {
-          return cachedHand;
+        private Dictionary<TestHandFactory.TestHandPose, Hand> _cachedLeftHands
+          = new Dictionary<TestHandFactory.TestHandPose, Hand>();
+        private Hand _editTimeLeftHand
+        {
+            get
+            {
+                Hand cachedHand = null;
+                if (_cachedLeftHands.TryGetValue(editTimePose, out cachedHand))
+                {
+                    return cachedHand;
+                }
+                else
+                {
+                    cachedHand = TestHandFactory.MakeTestHand(isLeft: true, pose: editTimePose);
+                    _cachedLeftHands[editTimePose] = cachedHand;
+                    return cachedHand;
+                }
+            }
         }
-        else {
-          cachedHand = TestHandFactory.MakeTestHand(isLeft: true, pose: editTimePose);
-          _cachedLeftHands[editTimePose] = cachedHand;
-          return cachedHand;
-        }
-      }
-    }
 
-    private Dictionary<TestHandFactory.TestHandPose, Hand> _cachedRightHands
-      = new Dictionary<TestHandFactory.TestHandPose, Hand>();
-    private Hand _editTimeRightHand {
-      get {
-        Hand cachedHand = null;
-        if (_cachedRightHands.TryGetValue(editTimePose, out cachedHand)) {
-          return cachedHand;
+        private Dictionary<TestHandFactory.TestHandPose, Hand> _cachedRightHands
+          = new Dictionary<TestHandFactory.TestHandPose, Hand>();
+        private Hand _editTimeRightHand
+        {
+            get
+            {
+                Hand cachedHand = null;
+                if (_cachedRightHands.TryGetValue(editTimePose, out cachedHand))
+                {
+                    return cachedHand;
+                }
+                else
+                {
+                    cachedHand = TestHandFactory.MakeTestHand(isLeft: false, pose: editTimePose);
+                    _cachedRightHands[editTimePose] = cachedHand;
+                    return cachedHand;
+                }
+            }
         }
-        else {
-          cachedHand = TestHandFactory.MakeTestHand(isLeft: false, pose: editTimePose);
-          _cachedRightHands[editTimePose] = cachedHand;
-          return cachedHand;
-        }
-      }
-    }
 
 #endif
 
@@ -243,14 +257,15 @@ namespace Leap.Unity
             get
             {
 #if UNITY_EDITOR
-        if (!Application.isPlaying) {
-          _editTimeFrame.Hands.Clear();
-          _untransformedEditTimeFrame.Hands.Clear();
-          _untransformedEditTimeFrame.Hands.Add(_editTimeLeftHand);
-          _untransformedEditTimeFrame.Hands.Add(_editTimeRightHand);
-          transformFrame(_untransformedEditTimeFrame, _editTimeFrame);
-          return _editTimeFrame;
-        }
+                if (!Application.isPlaying)
+                {
+                    _editTimeFrame.Hands.Clear();
+                    _untransformedEditTimeFrame.Hands.Clear();
+                    _untransformedEditTimeFrame.Hands.Add(_editTimeLeftHand);
+                    _untransformedEditTimeFrame.Hands.Add(_editTimeRightHand);
+                    transformFrame(_untransformedEditTimeFrame, _editTimeFrame);
+                    return _editTimeFrame;
+                }
 #endif
                 if (_frameOptimization == FrameOptimizationMode.ReusePhysicsForUpdate)
                 {
@@ -268,14 +283,15 @@ namespace Leap.Unity
             get
             {
 #if UNITY_EDITOR
-        if (!Application.isPlaying) {
-          _editTimeFrame.Hands.Clear();
-          _untransformedEditTimeFrame.Hands.Clear();
-          _untransformedEditTimeFrame.Hands.Add(_editTimeLeftHand);
-          _untransformedEditTimeFrame.Hands.Add(_editTimeRightHand);
-          transformFrame(_untransformedEditTimeFrame, _editTimeFrame);
-          return _editTimeFrame;
-        }
+                if (!Application.isPlaying)
+                {
+                    _editTimeFrame.Hands.Clear();
+                    _untransformedEditTimeFrame.Hands.Clear();
+                    _untransformedEditTimeFrame.Hands.Add(_editTimeLeftHand);
+                    _untransformedEditTimeFrame.Hands.Add(_editTimeRightHand);
+                    transformFrame(_untransformedEditTimeFrame, _editTimeFrame);
+                    return _editTimeFrame;
+                }
 #endif
                 if (_frameOptimization == FrameOptimizationMode.ReuseUpdateForPhysics)
                 {
@@ -322,11 +338,12 @@ namespace Leap.Unity
             if (!checkConnectionIntegrity()) { return; }
 
 #if UNITY_EDITOR
-      if (UnityEditor.EditorApplication.isCompiling) {
-        UnityEditor.EditorApplication.isPlaying = false;
-        Debug.LogWarning("Unity hot reloading not currently supported. Stopping Editor Playback.");
-        return;
-      }
+            if (UnityEditor.EditorApplication.isCompiling)
+            {
+                UnityEditor.EditorApplication.isPlaying = false;
+                Debug.LogWarning("Unity hot reloading not currently supported. Stopping Editor Playback.");
+                return;
+            }
 #endif
 
             _fixedOffset.Update(Time.time - Time.fixedTime, Time.deltaTime);
@@ -461,10 +478,11 @@ namespace Leap.Unity
         public Controller GetLeapController()
         {
 #if UNITY_EDITOR
-      // Null check to deal with hot reloading.
-      if (!_isDestroyed && _leapController == null) {
-        createController();
-      }
+            // Null check to deal with hot reloading.
+            if (!_isDestroyed && _leapController == null)
+            {
+                createController();
+            }
 #endif
             return _leapController;
         }

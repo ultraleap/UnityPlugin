@@ -442,9 +442,10 @@ namespace Leap.Unity.Interaction
         /// </summary>
         /// 
 #if UNITY_2017_2_OR_NEWER
-    public XRNode xrNode {
-      get { return chirality == Chirality.Left ? XRNode.LeftHand : XRNode.RightHand; }
-    }
+        public XRNode xrNode
+        {
+            get { return chirality == Chirality.Left ? XRNode.LeftHand : XRNode.RightHand; }
+        }
 #else
         public VRNode xrNode
         {

@@ -38,42 +38,45 @@ namespace Leap.Unity.Attributes
         }
 
 #if UNITY_EDITOR
-    public void DrawProperty(Rect rect, SerializedProperty property, GUIContent label) {
-      EditorGUI.BeginProperty(rect, label, property);
+        public void DrawProperty(Rect rect, SerializedProperty property, GUIContent label)
+        {
+            EditorGUI.BeginProperty(rect, label, property);
 
-      Vector2 value = property.vector2Value;
+            Vector2 value = property.vector2Value;
 
-      rect = EditorGUI.PrefixLabel(rect, GUIUtility.GetControlID(FocusType.Passive), label);
+            rect = EditorGUI.PrefixLabel(rect, GUIUtility.GetControlID(FocusType.Passive), label);
 
-      int prevIndent = EditorGUI.indentLevel;
-      EditorGUI.indentLevel = 0;
+            int prevIndent = EditorGUI.indentLevel;
+            EditorGUI.indentLevel = 0;
 
-      float w = rect.width * PERCENT_NUM;
+            float w = rect.width * PERCENT_NUM;
 
-      Rect leftNum = new Rect(rect.x, rect.y, w, rect.height);
-      Rect slider = new Rect(rect.x + w + SPACING, rect.y, rect.width - 2 * w - SPACING * 2, rect.height);
-      Rect rightNum = new Rect(rect.x + rect.width - w, rect.y, w, rect.height);
+            Rect leftNum = new Rect(rect.x, rect.y, w, rect.height);
+            Rect slider = new Rect(rect.x + w + SPACING, rect.y, rect.width - 2 * w - SPACING * 2, rect.height);
+            Rect rightNum = new Rect(rect.x + rect.width - w, rect.y, w, rect.height);
 
-      float newMin = EditorGUI.FloatField(leftNum, value.x);
-      float newMax = EditorGUI.FloatField(rightNum, value.y);
+            float newMin = EditorGUI.FloatField(leftNum, value.x);
+            float newMax = EditorGUI.FloatField(rightNum, value.y);
 
-      value.x = Mathf.Clamp(newMin, min, value.y);
-      value.y = Mathf.Clamp(newMax, value.x, max);
+            value.x = Mathf.Clamp(newMin, min, value.y);
+            value.y = Mathf.Clamp(newMax, value.x, max);
 
-      EditorGUI.MinMaxSlider(slider, ref value.x, ref value.y, min, max);
+            EditorGUI.MinMaxSlider(slider, ref value.x, ref value.y, min, max);
 
-      property.vector2Value = value;
+            property.vector2Value = value;
 
-      EditorGUI.EndProperty();
+            EditorGUI.EndProperty();
 
-      EditorGUI.indentLevel = prevIndent;
-    }
+            EditorGUI.indentLevel = prevIndent;
+        }
 
-    public override IEnumerable<SerializedPropertyType> SupportedTypes {
-      get {
-        yield return SerializedPropertyType.Vector2;
-      }
-    }
+        public override IEnumerable<SerializedPropertyType> SupportedTypes
+        {
+            get
+            {
+                yield return SerializedPropertyType.Vector2;
+            }
+        }
 #endif
     }
 }

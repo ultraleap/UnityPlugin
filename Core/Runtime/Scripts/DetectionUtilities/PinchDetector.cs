@@ -118,32 +118,38 @@ namespace Leap.Unity
         }
 
 #if UNITY_EDITOR
-    protected override void OnDrawGizmos () {
-      if (ShowGizmos && _handModel != null && _handModel.IsTracked) {
-        Color centerColor = Color.clear;
-        Vector3 centerPosition = Vector3.zero;
-        Quaternion circleRotation = Quaternion.identity;
-        if (IsHolding) {
-          centerColor = Color.green;
-          centerPosition = Position;
-          circleRotation = Rotation;
-        } else {
-          Hand hand = _handModel.GetLeapHand();
-          if (hand != null) {
-            Finger thumb = hand.Fingers[0];
-            Finger index = hand.Fingers[1];
-            centerColor = Color.red;
-            centerPosition = ((thumb.Bone(Bone.BoneType.TYPE_DISTAL).NextJoint + index.Bone(Bone.BoneType.TYPE_DISTAL).NextJoint) / 2).ToVector3();
-            circleRotation = hand.Basis.CalculateRotation();
-          }
+        protected override void OnDrawGizmos()
+        {
+            if (ShowGizmos && _handModel != null && _handModel.IsTracked)
+            {
+                Color centerColor = Color.clear;
+                Vector3 centerPosition = Vector3.zero;
+                Quaternion circleRotation = Quaternion.identity;
+                if (IsHolding)
+                {
+                    centerColor = Color.green;
+                    centerPosition = Position;
+                    circleRotation = Rotation;
+                }
+                else
+                {
+                    Hand hand = _handModel.GetLeapHand();
+                    if (hand != null)
+                    {
+                        Finger thumb = hand.Fingers[0];
+                        Finger index = hand.Fingers[1];
+                        centerColor = Color.red;
+                        centerPosition = ((thumb.Bone(Bone.BoneType.TYPE_DISTAL).NextJoint + index.Bone(Bone.BoneType.TYPE_DISTAL).NextJoint) / 2).ToVector3();
+                        circleRotation = hand.Basis.CalculateRotation();
+                    }
+                }
+                Vector3 axis;
+                float angle;
+                circleRotation.ToAngleAxis(out angle, out axis);
+                Utils.DrawCircle(centerPosition, axis, ActivateDistance / 2, centerColor);
+                Utils.DrawCircle(centerPosition, axis, DeactivateDistance / 2, Color.blue);
+            }
         }
-        Vector3 axis;
-        float angle;
-        circleRotation.ToAngleAxis(out angle, out axis);
-        Utils.DrawCircle(centerPosition, axis, ActivateDistance / 2, centerColor);
-        Utils.DrawCircle(centerPosition, axis, DeactivateDistance / 2, Color.blue);
-      }
-    }
 #endif
     }
 }

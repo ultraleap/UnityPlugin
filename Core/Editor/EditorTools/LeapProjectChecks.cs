@@ -119,35 +119,41 @@ namespace Leap.Unity
         public static void DrawProjectChecksGUI()
         {
 #if UNITY_EDITOR
-      ensureChecksLoaded();
-      
-      bool allChecksPassed = true;
-      foreach (var projectCheck in _projectChecks) {
-        
-        using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox)) {
-          allChecksPassed &= projectCheck.checkFunc();
-        }
+            ensureChecksLoaded();
 
-      }
+            bool allChecksPassed = true;
+            foreach (var projectCheck in _projectChecks)
+            {
 
-      if (_ignoredKeys != null && _ignoredKeys.Count > 0) {
-        EditorGUILayout.Space();
-        using (new EditorGUILayout.HorizontalScope()) {
-          GUILayout.FlexibleSpace();
+                using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
+                {
+                    allChecksPassed &= projectCheck.checkFunc();
+                }
 
-          using (new EditorGUILayout.VerticalScope()) {
-            GUILayout.Space(4f);
-            GUILayout.Label("Some project checks have been ignored.");
-          }
+            }
 
-          if (GUILayout.Button(new GUIContent("Reset Ignore Flags",
-                "Un-ignore any project checks that have been ignored."))) {
-            ClearAllIgnoredKeys();
-          }
+            if (_ignoredKeys != null && _ignoredKeys.Count > 0)
+            {
+                EditorGUILayout.Space();
+                using (new EditorGUILayout.HorizontalScope())
+                {
+                    GUILayout.FlexibleSpace();
 
-          EditorGUILayout.Space();
-        }
-      }
+                    using (new EditorGUILayout.VerticalScope())
+                    {
+                        GUILayout.Space(4f);
+                        GUILayout.Label("Some project checks have been ignored.");
+                    }
+
+                    if (GUILayout.Button(new GUIContent("Reset Ignore Flags",
+                          "Un-ignore any project checks that have been ignored.")))
+                    {
+                        ClearAllIgnoredKeys();
+                    }
+
+                    EditorGUILayout.Space();
+                }
+            }
 #endif
         }
 
@@ -156,7 +162,7 @@ namespace Leap.Unity
         private const string IGNORED_KEYS_PREF = "LeapUnityWindow_IgnoredKeys";
 
 #if UNITY_EDITOR
-    private static HashSet<string> _backingIgnoredKeys = null;
+        private static HashSet<string> _backingIgnoredKeys = null;
 #endif
         /// <summary> Lazily filled via EditorPrefs. </summary>
         private static HashSet<string> _ignoredKeys
@@ -164,11 +170,12 @@ namespace Leap.Unity
             get
             {
 #if UNITY_EDITOR
-        if (_backingIgnoredKeys == null) {
-          _backingIgnoredKeys
-            = splitBySemicolonToSet(EditorPrefs.GetString(IGNORED_KEYS_PREF));
-        }
-        return _backingIgnoredKeys;
+                if (_backingIgnoredKeys == null)
+                {
+                    _backingIgnoredKeys
+                      = splitBySemicolonToSet(EditorPrefs.GetString(IGNORED_KEYS_PREF));
+                }
+                return _backingIgnoredKeys;
 #else
                 return null;
 #endif
@@ -178,7 +185,7 @@ namespace Leap.Unity
         public static bool CheckIgnoredKey(string editorPrefKey)
         {
 #if UNITY_EDITOR
-      return _ignoredKeys.Contains(editorPrefKey);
+            return _ignoredKeys.Contains(editorPrefKey);
 #else
             return false;
 #endif
@@ -187,23 +194,25 @@ namespace Leap.Unity
         public static void SetIgnoredKey(string editorPrefKey, bool ignore)
         {
 #if UNITY_EDITOR
-      if (ignore) {
-        _ignoredKeys.Add(editorPrefKey);
-      }
-      else {
-        _ignoredKeys.Remove(editorPrefKey);
-      }
+            if (ignore)
+            {
+                _ignoredKeys.Add(editorPrefKey);
+            }
+            else
+            {
+                _ignoredKeys.Remove(editorPrefKey);
+            }
 
-      uploadignoredKeyChangesToEditorPrefs();
+            uploadignoredKeyChangesToEditorPrefs();
 #endif
         }
 
         public static void ClearAllIgnoredKeys()
         {
 #if UNITY_EDITOR
-      _ignoredKeys.Clear();
+            _ignoredKeys.Clear();
 
-      uploadignoredKeyChangesToEditorPrefs();
+            uploadignoredKeyChangesToEditorPrefs();
 #endif
         }
 
@@ -231,7 +240,7 @@ namespace Leap.Unity
         private static void uploadignoredKeyChangesToEditorPrefs()
         {
 #if UNITY_EDITOR
-      EditorPrefs.SetString(IGNORED_KEYS_PREF, joinBySemicolon(_ignoredKeys));
+            EditorPrefs.SetString(IGNORED_KEYS_PREF, joinBySemicolon(_ignoredKeys));
 #endif
         }
 

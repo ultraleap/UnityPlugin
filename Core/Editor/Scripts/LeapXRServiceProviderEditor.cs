@@ -63,8 +63,8 @@ namespace Leap.Unity
             bool pcOrAndroidPlatformDetected = false;
             string targetPlatform = "";
 #if UNITY_STANDALONE
-      pcOrAndroidPlatformDetected = true;
-      targetPlatform = "Standalone (Desktop)";
+            pcOrAndroidPlatformDetected = true;
+            targetPlatform = "Standalone (Desktop)";
 #elif UNITY_ANDROID
       pcOrAndroidPlatformDetected = true;
       targetPlatform = "Android";

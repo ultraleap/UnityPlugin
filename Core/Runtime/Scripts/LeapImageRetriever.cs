@@ -269,13 +269,17 @@ namespace Leap.Unity
         }
 
 #if UNITY_EDITOR
-    void OnValidate() {
-      if (Application.isPlaying) {
-        ApplyGammaCorrectionValues();
-      } else {
-        EyeTextureData.ResetGlobalShaderValues();
-      }
-    }
+        void OnValidate()
+        {
+            if (Application.isPlaying)
+            {
+                ApplyGammaCorrectionValues();
+            }
+            else
+            {
+                EyeTextureData.ResetGlobalShaderValues();
+            }
+        }
 #endif
 
         private void Awake()

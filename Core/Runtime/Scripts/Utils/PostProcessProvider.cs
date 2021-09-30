@@ -67,9 +67,10 @@ namespace Leap.Unity
             get
             {
 #if UNITY_EDITOR
-        if (!Application.isPlaying && _inputLeapProvider != null) {
-          processUpdateFrame(_inputLeapProvider.CurrentFrame);
-        }
+                if (!Application.isPlaying && _inputLeapProvider != null)
+                {
+                    processUpdateFrame(_inputLeapProvider.CurrentFrame);
+                }
 #endif
                 return _cachedUpdateFrame;
             }
@@ -80,9 +81,10 @@ namespace Leap.Unity
             get
             {
 #if UNITY_EDITOR
-        if (!Application.isPlaying && _inputLeapProvider != null) {
-          processUpdateFrame(_inputLeapProvider.CurrentFixedFrame);
-        }
+                if (!Application.isPlaying && _inputLeapProvider != null)
+                {
+                    processUpdateFrame(_inputLeapProvider.CurrentFixedFrame);
+                }
 #endif
                 return _cachedFixedFrame;
             }

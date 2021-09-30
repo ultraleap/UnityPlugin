@@ -132,27 +132,27 @@ namespace Leap.Unity.Drawing
                 drawer.implDrawLine = (a, b) =>
                 {
 #if UNITY_EDITOR
-        UnityEditor.Handles.DrawLine(a, b);
+                    UnityEditor.Handles.DrawLine(a, b);
 #endif
                 };
                 drawer.implSetColor = (c) =>
                 {
 #if UNITY_EDITOR
-        UnityEditor.Handles.color = c;
+                    UnityEditor.Handles.color = c;
 #endif
                 };
                 drawer.implDrawUnitSphere = (m) =>
                 {
 #if UNITY_EDITOR
-        var origM = UnityEditor.Handles.matrix;
-        var origColor = UnityEditor.Handles.color;
-        float h, s, v;
-        Color.RGBToHSV(origColor, out h, out s, out v);
-        UnityEditor.Handles.color = origColor.WithHSV(h, s * 1f, v * 3f);
-        UnityEditor.Handles.matrix = m;
-        // UnityEditor.Handles.SphereHandleCap
-        UnityEditor.Handles.SphereHandleCap(0, Vector3.zero, Quaternion.identity, 1f, EventType.Repaint);
-        UnityEditor.Handles.matrix = origM;
+                    var origM = UnityEditor.Handles.matrix;
+                    var origColor = UnityEditor.Handles.color;
+                    float h, s, v;
+                    Color.RGBToHSV(origColor, out h, out s, out v);
+                    UnityEditor.Handles.color = origColor.WithHSV(h, s * 1f, v * 3f);
+                    UnityEditor.Handles.matrix = m;
+                    // UnityEditor.Handles.SphereHandleCap
+                    UnityEditor.Handles.SphereHandleCap(0, Vector3.zero, Quaternion.identity, 1f, EventType.Repaint);
+                    UnityEditor.Handles.matrix = origM;
 #endif
                 };
                 return drawer;

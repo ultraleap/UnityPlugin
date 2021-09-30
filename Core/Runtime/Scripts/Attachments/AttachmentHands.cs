@@ -43,10 +43,10 @@ namespace Leap.Unity.Attachments
                 if (_attachmentPoints != value)
                 {
 #if UNITY_EDITOR
-          Undo.IncrementCurrentGroup();
-          Undo.SetCurrentGroupName("Modify Attachment Points");
+                    Undo.IncrementCurrentGroup();
+                    Undo.SetCurrentGroupName("Modify Attachment Points");
 
-          Undo.RecordObject(this, "Modify AttachmentHands Points");
+                    Undo.RecordObject(this, "Modify AttachmentHands Points");
 #endif
 
                     _attachmentPoints = value;
@@ -79,17 +79,18 @@ namespace Leap.Unity.Attachments
         public AttachmentHand[] attachmentHands { get { return _attachmentHands; } set { _attachmentHands = value; } }
 
 #if UNITY_EDITOR
-    void OnValidate() {
-      if (getIsPrefab()) return;
+        void OnValidate()
+        {
+            if (getIsPrefab()) return;
 
-      reinitialize();
-    }
+            reinitialize();
+        }
 #endif
 
         void Awake()
         {
 #if UNITY_EDITOR
-      if (getIsPrefab()) return;
+            if (getIsPrefab()) return;
 #endif
 
             reinitialize();
@@ -101,7 +102,7 @@ namespace Leap.Unity.Attachments
             refreshAttachmentHands();
 
 #if UNITY_EDITOR
-      EditorApplication.delayCall += refreshAttachmentHandTransforms;
+            EditorApplication.delayCall += refreshAttachmentHandTransforms;
 #else
             refreshAttachmentHandTransforms();
 #endif
@@ -110,9 +111,10 @@ namespace Leap.Unity.Attachments
         void Update()
         {
 #if UNITY_EDITOR
-      if (Utils.IsObjectPartOfPrefabAsset(this.gameObject)) {
-        return;
-      }
+            if (Utils.IsObjectPartOfPrefabAsset(this.gameObject))
+            {
+                return;
+            }
 #endif
 
             bool requiresReinitialization = false;
@@ -165,7 +167,7 @@ namespace Leap.Unity.Attachments
             // If we're a prefab, we'll be unable to set parent transforms, so we shouldn't create new objects in general.
             bool isPrefab = false;
 #if UNITY_EDITOR
-      isPrefab = getIsPrefab();
+            isPrefab = getIsPrefab();
 #endif
 
             // If necessary, generate a left and right AttachmentHand.
@@ -197,7 +199,7 @@ namespace Leap.Unity.Attachments
                 {
                     GameObject obj = new GameObject();
 #if UNITY_EDITOR
-          Undo.RegisterCreatedObjectUndo(obj, "Created GameObject");
+                    Undo.RegisterCreatedObjectUndo(obj, "Created GameObject");
 #endif
                     _attachmentHands[0] = obj.AddComponent<AttachmentHand>();
                     _attachmentHands[0].chirality = Chirality.Left;
@@ -209,7 +211,7 @@ namespace Leap.Unity.Attachments
                 {
                     GameObject obj = new GameObject();
 #if UNITY_EDITOR
-          Undo.RegisterCreatedObjectUndo(obj, "Created GameObject");
+                    Undo.RegisterCreatedObjectUndo(obj, "Created GameObject");
 #endif
                     _attachmentHands[1] = obj.AddComponent<AttachmentHand>();
                     _attachmentHands[1].chirality = Chirality.Right;
@@ -228,7 +230,7 @@ namespace Leap.Unity.Attachments
             if (this == null) return;
 
 #if UNITY_EDITOR
-      if (getIsPrefab()) return;
+            if (getIsPrefab()) return;
 #endif
 
             bool requiresReinitialization = false;
@@ -252,7 +254,7 @@ namespace Leap.Unity.Attachments
                 }
 
 #if UNITY_EDITOR
-        EditorUtility.SetDirty(this);
+                EditorUtility.SetDirty(this);
 #endif
             }
 
@@ -263,9 +265,10 @@ namespace Leap.Unity.Attachments
         }
 
 #if UNITY_EDITOR
-    private bool getIsPrefab() {
-      return Utils.IsObjectPartOfPrefabAsset(this.gameObject);
-    }
+        private bool getIsPrefab()
+        {
+            return Utils.IsObjectPartOfPrefabAsset(this.gameObject);
+        }
 #endif
 
     }

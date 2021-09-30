@@ -93,16 +93,18 @@ namespace Leap.Unity
         }
 
 #if UNITY_EDITOR
-    public static Rect SingleLine(this Rect rect) {
-      rect.height = EditorGUIUtility.singleLineHeight;
-      return rect;
-    }
+        public static Rect SingleLine(this Rect rect)
+        {
+            rect.height = EditorGUIUtility.singleLineHeight;
+            return rect;
+        }
 
-    public static Rect Indent(this Rect rect) {
-      rect.x += EditorGUIUtility.singleLineHeight;
-      rect.width -= EditorGUIUtility.singleLineHeight;
-      return rect;
-    }
+        public static Rect Indent(this Rect rect)
+        {
+            rect.x += EditorGUIUtility.singleLineHeight;
+            rect.width -= EditorGUIUtility.singleLineHeight;
+            return rect;
+        }
 #endif
     }
 }

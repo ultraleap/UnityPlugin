@@ -59,42 +59,51 @@ namespace Leap.Unity.Attributes
 
 #if UNITY_EDITOR
 
-    public void Draw(Rect rect, SerializedProperty property) {
-      var existingValue = property.stringValue;
-      var pipeSyntaxPath = PipeFileSyntax.Parse(property.stringValue);
-      existingValue = pipeSyntaxPath.path;
+        public void Draw(Rect rect, SerializedProperty property)
+        {
+            var existingValue = property.stringValue;
+            var pipeSyntaxPath = PipeFileSyntax.Parse(property.stringValue);
+            existingValue = pipeSyntaxPath.path;
 
-      string currentDir = null;
-      if (!string.IsNullOrEmpty(existingValue)) {
-        currentDir = Path.GetDirectoryName(existingValue);
-      }
-
-      string chosenFile = null;
-      if (GUI.Button(rect, "...")) {
-        if (dialogType == FileDialogType.Folder) {
-          chosenFile = EditorUtility.OpenFolderPanel("Choose Folder", currentDir, null);
-          if (!string.IsNullOrEmpty(chosenFile)) {
-            chosenFile += Path.DirectorySeparatorChar;
-            if (!string.IsNullOrEmpty(existingValue) && preserveExistingFileName) {
-              var existingName = Path.GetFileName(existingValue);
-              chosenFile = Path.Combine(chosenFile, existingName);
+            string currentDir = null;
+            if (!string.IsNullOrEmpty(existingValue))
+            {
+                currentDir = Path.GetDirectoryName(existingValue);
             }
-          }
-        }
-        else if (dialogType == FileDialogType.Open) {
-          chosenFile = EditorUtility.OpenFilePanel("Choose File", currentDir,
-            null);
-        }
-        else { // dialogType == FileDialogType.Save
-          chosenFile = EditorUtility.SaveFilePanel("Output File", currentDir,
-            "", null);
-        }
-      }
 
-      if (!string.IsNullOrEmpty(chosenFile)) {
-        property.stringValue = pipeSyntaxPath.ChangePath(chosenFile).ToString();
-      }
-    }
+            string chosenFile = null;
+            if (GUI.Button(rect, "..."))
+            {
+                if (dialogType == FileDialogType.Folder)
+                {
+                    chosenFile = EditorUtility.OpenFolderPanel("Choose Folder", currentDir, null);
+                    if (!string.IsNullOrEmpty(chosenFile))
+                    {
+                        chosenFile += Path.DirectorySeparatorChar;
+                        if (!string.IsNullOrEmpty(existingValue) && preserveExistingFileName)
+                        {
+                            var existingName = Path.GetFileName(existingValue);
+                            chosenFile = Path.Combine(chosenFile, existingName);
+                        }
+                    }
+                }
+                else if (dialogType == FileDialogType.Open)
+                {
+                    chosenFile = EditorUtility.OpenFilePanel("Choose File", currentDir,
+                      null);
+                }
+                else
+                { // dialogType == FileDialogType.Save
+                    chosenFile = EditorUtility.SaveFilePanel("Output File", currentDir,
+                      "", null);
+                }
+            }
+
+            if (!string.IsNullOrEmpty(chosenFile))
+            {
+                property.stringValue = pipeSyntaxPath.ChangePath(chosenFile).ToString();
+            }
+        }
 
 #endif
 

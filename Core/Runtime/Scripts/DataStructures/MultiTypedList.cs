@@ -179,36 +179,41 @@ namespace Leap.Unity
     {
 
 #if UNITY_EDITOR
-    public const string ID_NAME_TABLE = "abcdefghijklmnopqrstuvwxyz";
-    public static Dictionary<int, string> _nameCache = new Dictionary<int, string>();
-    private static string getName(int id) {
-      string name;
-      if (!_nameCache.TryGetValue(id, out name)) {
-        name = "_" + ID_NAME_TABLE[id];
-        _nameCache[id] = name;
-      }
-      return name;
-    }
+        public const string ID_NAME_TABLE = "abcdefghijklmnopqrstuvwxyz";
+        public static Dictionary<int, string> _nameCache = new Dictionary<int, string>();
+        private static string getName(int id)
+        {
+            string name;
+            if (!_nameCache.TryGetValue(id, out name))
+            {
+                name = "_" + ID_NAME_TABLE[id];
+                _nameCache[id] = name;
+            }
+            return name;
+        }
 
-    public static SerializedProperty GetTableProperty(SerializedProperty list) {
-      return list.FindPropertyRelative("_table");
-    }
+        public static SerializedProperty GetTableProperty(SerializedProperty list)
+        {
+            return list.FindPropertyRelative("_table");
+        }
 
-    public static SerializedProperty GetArrayElementAtIndex(SerializedProperty list, int index) {
-      var tableProp = GetTableProperty(list);
-      var idIndexProp = tableProp.GetArrayElementAtIndex(index);
+        public static SerializedProperty GetArrayElementAtIndex(SerializedProperty list, int index)
+        {
+            var tableProp = GetTableProperty(list);
+            var idIndexProp = tableProp.GetArrayElementAtIndex(index);
 
-      return GetReferenceProperty(list, idIndexProp);
-    }
+            return GetReferenceProperty(list, idIndexProp);
+        }
 
-    public static SerializedProperty GetReferenceProperty(SerializedProperty list, SerializedProperty idIndexProp) {
-      var idProp = idIndexProp.FindPropertyRelative("id");
-      var indexProp = idIndexProp.FindPropertyRelative("index");
+        public static SerializedProperty GetReferenceProperty(SerializedProperty list, SerializedProperty idIndexProp)
+        {
+            var idProp = idIndexProp.FindPropertyRelative("id");
+            var indexProp = idIndexProp.FindPropertyRelative("index");
 
-      string listPropName = getName(idProp.intValue);
-      var listProp = list.FindPropertyRelative(listPropName);
-      return listProp.GetArrayElementAtIndex(indexProp.intValue);
-    }
+            string listPropName = getName(idProp.intValue);
+            var listProp = list.FindPropertyRelative(listPropName);
+            return listProp.GetArrayElementAtIndex(indexProp.intValue);
+        }
 #endif
     }
 

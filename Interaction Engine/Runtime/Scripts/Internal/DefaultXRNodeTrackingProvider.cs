@@ -32,11 +32,12 @@ namespace Leap.Unity.Interaction
 
         private bool _isXRNodeSet = false;
 #if UNITY_2017_2_OR_NEWER
-    private XRNode _backingXRNode;
-    public XRNode xrNode {
-      get { return _backingXRNode; }
-      set { _backingXRNode = value; _isXRNodeSet = true; }
-    }
+        private XRNode _backingXRNode;
+        public XRNode xrNode
+        {
+            get { return _backingXRNode; }
+            set { _backingXRNode = value; _isXRNodeSet = true; }
+        }
 #else
         private VRNode _backingXRNode;
         public VRNode xrNode
