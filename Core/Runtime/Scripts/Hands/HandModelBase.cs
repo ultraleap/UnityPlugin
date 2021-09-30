@@ -68,21 +68,25 @@ namespace Leap.Unity {
         [NonSerialized]
         public HandModelManager.ModelGroup group;
 
-        LeapProvider leapProvider;
+        public LeapProvider leapProvider;
 
-        private void OnEnable() {
-            if(leapProvider == null) {
+        private void Awake()
+        {
+            this.gameObject.SetActive(false);
+            if (leapProvider == null)
+            {
 
                 //Try to set the provider for the user
                 leapProvider = Hands.Provider;
 
-                if(leapProvider == null) {
+                if (leapProvider == null)
+                {
                     Debug.Log("No leap provider found");
                     return;
                 }
             }
 
-            if(HandModelType == ModelType.Graphics)
+            if (HandModelType == ModelType.Graphics)
             {
                 leapProvider.OnUpdateFrame -= UpdateFrame;
                 leapProvider.OnUpdateFrame += UpdateFrame;
@@ -93,10 +97,13 @@ namespace Leap.Unity {
                 leapProvider.OnFixedFrame -= FixedUpdateFrame;
                 leapProvider.OnFixedFrame += FixedUpdateFrame;
             }
+
         }
 
         private void OnDestroy()
         {
+            if (leapProvider == null) { return; }
+
             leapProvider.OnUpdateFrame -= UpdateFrame;
             leapProvider.OnFixedFrame -= FixedUpdateFrame;
         }
