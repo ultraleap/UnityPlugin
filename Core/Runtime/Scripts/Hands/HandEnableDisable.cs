@@ -26,7 +26,6 @@ namespace Leap.Unity{
       #endif
 
       base.Awake();
-      //gameObject.SetActive(false);
     }
 
   	protected override void HandReset() {
