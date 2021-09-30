@@ -121,7 +121,7 @@ namespace Leap.Unity
         // Temporal Warping
 
 #if UNITY_STANDALONE
-    private const int DEFAULT_WARP_ADJUSTMENT = 17;
+        private const int DEFAULT_WARP_ADJUSTMENT = 17;
 #elif UNITY_ANDROID
     private const int DEFAULT_WARP_ADJUSTMENT = 45;
 #else
@@ -269,13 +269,16 @@ namespace Leap.Unity
 #endif
 
 #if UNITY_2019_1_OR_NEWER
-      if (GraphicsSettings.renderPipelineAsset != null) {
-        RenderPipelineManager.beginCameraRendering -= onBeginRendering;
-        RenderPipelineManager.beginCameraRendering += onBeginRendering;
-      } else {
-        Camera.onPreCull -= onPreCull; // No multiple-subscription.
-        Camera.onPreCull += onPreCull;
-      }
+            if (GraphicsSettings.renderPipelineAsset != null)
+            {
+                RenderPipelineManager.beginCameraRendering -= onBeginRendering;
+                RenderPipelineManager.beginCameraRendering += onBeginRendering;
+            }
+            else
+            {
+                Camera.onPreCull -= onPreCull; // No multiple-subscription.
+                Camera.onPreCull += onPreCull;
+            }
 #else
             Camera.onPreCull -= onPreCull; // No multiple-subscription.
             Camera.onPreCull += onPreCull;
@@ -287,11 +290,14 @@ namespace Leap.Unity
             resetShaderTransforms();
 
 #if UNITY_2019_1_OR_NEWER
-      if (GraphicsSettings.renderPipelineAsset != null) {
-        RenderPipelineManager.beginCameraRendering -= onBeginRendering;
-      } else {
-        Camera.onPreCull -= onPreCull; // No multiple-subscription.
-      }
+            if (GraphicsSettings.renderPipelineAsset != null)
+            {
+                RenderPipelineManager.beginCameraRendering -= onBeginRendering;
+            }
+            else
+            {
+                Camera.onPreCull -= onPreCull; // No multiple-subscription.
+            }
 #else
             Camera.onPreCull -= onPreCull; // No multiple-subscription.
 #endif
@@ -376,7 +382,7 @@ namespace Leap.Unity
         }
 
 #if UNITY_2019_1_OR_NEWER
-    protected virtual void onBeginRendering(ScriptableRenderContext context, Camera camera) { onPreCull(camera); }
+        protected virtual void onBeginRendering(ScriptableRenderContext context, Camera camera) { onPreCull(camera); }
 #endif
 
         protected virtual void onPreCull(Camera preCullingCamera)
@@ -387,9 +393,10 @@ namespace Leap.Unity
             }
 
 #if UNITY_EDITOR
-      if (!Application.isPlaying) {
-        return;
-      }
+            if (!Application.isPlaying)
+            {
+                return;
+            }
 #endif
 
             Pose trackedPose;
@@ -600,7 +607,7 @@ namespace Leap.Unity
                 {
                     case CameraType.Preview:
 #if UNITY_2017_1_OR_NEWER
-          case CameraType.Reflection:
+                    case CameraType.Reflection:
 #endif
                     case CameraType.SceneView:
                         return;
