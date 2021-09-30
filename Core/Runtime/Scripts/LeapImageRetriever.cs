@@ -287,6 +287,12 @@ namespace Leap.Unity {
     }
 
     private void LateUpdate() {
+
+      var xrProvider = _provider as LeapXRServiceProvider;
+      if (xrProvider != null) {
+          if (xrProvider.Camera == null) { return; }
+      }
+
       Frame imageFrame = _provider.CurrentFrame;
 
       _currentImage = null;

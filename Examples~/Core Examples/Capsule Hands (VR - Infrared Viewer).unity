@@ -291,7 +291,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: abb0e8dd6c809854f8fea5e0976884f8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  editTimePose: 1
+  editTimePose: 0
   _interactionVolumeVisualization: 3
   _frameOptimization: 0
   _physicsExtrapolation: 1
@@ -901,6 +901,6 @@ PrefabInstance:
         type: 3}
       propertyPath: _leapProvider
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 428738287}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: df1d1bdbe09f66f4eaeb313fb5ead59e, type: 3}

@@ -11,6 +11,7 @@ using System;
 using Leap.Unity.Attributes;
 
 using UnityEngine.Rendering;
+using UnityEngine.Assertions;
 
 namespace Leap.Unity {
 
@@ -191,6 +192,12 @@ namespace Leap.Unity {
       editTimePose = TestHandFactory.TestHandPose.HeadMountedB;
     }
 
+
+    private void Awake()
+    {
+        Assert.IsNotNull(Camera);
+    }
+
     protected virtual void OnEnable() {
       resetShaderTransforms();
 
@@ -209,13 +216,14 @@ namespace Leap.Unity {
       }
     }
 
+
     protected virtual void OnDisable() {
       resetShaderTransforms();
 
       if (GraphicsSettings.renderPipelineAsset != null) {
-        RenderPipelineManager.beginCameraRendering -= onBeginRendering;
+         RenderPipelineManager.beginCameraRendering -= onBeginRendering;
       } else {
-        Camera.onPreCull -= onPreCull; // No multiple-subscription.
+         Camera.onPreCull -= onPreCull; // No multiple-subscription.
       }
 
     }
