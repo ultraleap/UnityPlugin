@@ -14,8 +14,13 @@ namespace Leap.Unity {
   [CustomEditor(typeof(LeapXRServiceProvider))]
   public class LeapXRServiceProviderEditor : LeapServiceProviderEditor {
 
+        SerializedProperty _camera;
+
     protected override void OnEnable() {
-      base.OnEnable();
+
+            _camera = serializedObject.FindProperty("_camera");
+
+            base.OnEnable();
       isVRProvider = true;
 
       specifyConditionalDrawing(() => { return serializedObject
@@ -63,7 +68,19 @@ namespace Leap.Unity {
       }
     }
 
-    public override void OnSceneGUI() {
+        public override void OnInspectorGUI()
+        {
+            if (_camera.objectReferenceValue == null)
+            {
+                EditorGUILayout.PropertyField(_camera);
+                serializedObject.ApplyModifiedProperties();
+                return;
+            }
+
+            base.OnInspectorGUI();
+        }
+
+        public override void OnSceneGUI() {
       LeapXRServiceProvider xrProvider = target as LeapXRServiceProvider;
 
       if(xrProvider.Camera == null){ return; }
