@@ -12,14 +12,17 @@ using UnityEditor;
 #endif
 using System.Collections.Generic;
 
-namespace Leap.Unity.Attributes {
+namespace Leap.Unity.Attributes
+{
 
-  public class MinValue : CombinablePropertyAttribute, IPropertyConstrainer {
-    public float minValue;
+    public class MinValue : CombinablePropertyAttribute, IPropertyConstrainer
+    {
+        public float minValue;
 
-    public MinValue(float minValue) {
-      this.minValue = minValue;
-    }
+        public MinValue(float minValue)
+        {
+            this.minValue = minValue;
+        }
 
 #if UNITY_EDITOR
     public void ConstrainValue(SerializedProperty property) {
@@ -46,5 +49,5 @@ namespace Leap.Unity.Attributes {
       }
     }
 #endif
-  }
+    }
 }

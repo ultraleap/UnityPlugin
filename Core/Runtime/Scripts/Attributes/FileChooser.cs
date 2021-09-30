@@ -10,47 +10,54 @@ using System.IO;
 using UnityEditor;
 using UnityEngine;
 
-namespace Leap.Unity.Attributes {
+namespace Leap.Unity.Attributes
+{
 
-  public enum FileDialogType { Open, Save, Folder };
+    public enum FileDialogType { Open, Save, Folder };
 
-  public class ReadFileChooserAttribute : FileChooserAttribute {
-    public ReadFileChooserAttribute(bool preserveExistingFileName = false,
-      string extension = null) : base(FileDialogType.Open,
-        preserveExistingFileName, extension) { }
-  }
-
-  public class WriteFileChooserAttribute : FileChooserAttribute {
-    public WriteFileChooserAttribute(bool preserveExistingFileName = false,
-      string extension = null) : base(FileDialogType.Save,
-        preserveExistingFileName, extension) { }
-  }
-
-  public class FolderChooserAttribute : FileChooserAttribute {
-    public FolderChooserAttribute(bool preserveExistingFileName = false,
-      string extension = null) : base(FileDialogType.Folder,
-        preserveExistingFileName, extension) { }
-  }
-
-  public class FileChooserAttribute : CombinablePropertyAttribute,
-    IAfterFieldAdditiveDrawer
-  {
-
-    public FileDialogType dialogType;
-    public bool preserveExistingFileName = false;
-    /// <summary> Expected file extension .</summary>
-    public string extension = null;
-
-    public FileChooserAttribute(FileDialogType dialogType,
-      bool preserveExistingFileName = false,
-      string extension = null)
+    public class ReadFileChooserAttribute : FileChooserAttribute
     {
-      this.dialogType = dialogType;
-      this.preserveExistingFileName = preserveExistingFileName;
-      this.extension = extension;
+        public ReadFileChooserAttribute(bool preserveExistingFileName = false,
+          string extension = null) : base(FileDialogType.Open,
+            preserveExistingFileName, extension)
+        { }
     }
 
-    #if UNITY_EDITOR
+    public class WriteFileChooserAttribute : FileChooserAttribute
+    {
+        public WriteFileChooserAttribute(bool preserveExistingFileName = false,
+          string extension = null) : base(FileDialogType.Save,
+            preserveExistingFileName, extension)
+        { }
+    }
+
+    public class FolderChooserAttribute : FileChooserAttribute
+    {
+        public FolderChooserAttribute(bool preserveExistingFileName = false,
+          string extension = null) : base(FileDialogType.Folder,
+            preserveExistingFileName, extension)
+        { }
+    }
+
+    public class FileChooserAttribute : CombinablePropertyAttribute,
+      IAfterFieldAdditiveDrawer
+    {
+
+        public FileDialogType dialogType;
+        public bool preserveExistingFileName = false;
+        /// <summary> Expected file extension .</summary>
+        public string extension = null;
+
+        public FileChooserAttribute(FileDialogType dialogType,
+          bool preserveExistingFileName = false,
+          string extension = null)
+        {
+            this.dialogType = dialogType;
+            this.preserveExistingFileName = preserveExistingFileName;
+            this.extension = extension;
+        }
+
+#if UNITY_EDITOR
 
     public void Draw(Rect rect, SerializedProperty property) {
       var existingValue = property.stringValue;
@@ -89,11 +96,12 @@ namespace Leap.Unity.Attributes {
       }
     }
 
-    #endif
+#endif
 
-    public float GetWidth() {
-      return 24;
+        public float GetWidth()
+        {
+            return 24;
+        }
     }
-  }
 
 }

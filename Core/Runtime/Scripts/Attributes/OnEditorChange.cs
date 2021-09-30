@@ -14,23 +14,26 @@ using UnityEditor;
 using UnityEngine;
 using UnityObject = UnityEngine.Object;
 
-namespace Leap.Unity.Attributes {
+namespace Leap.Unity.Attributes
+{
 
-  /// <summary>
-  /// Use the OnChange attribute to recieve a callback whenever a field
-  /// is changed.  The callback can be in the form of:
-  ///  - A method accepting zero arguments
-  ///  - A method accepting a single argument matching the field type 
-  ///      (new value is passed in as the argument)
-  ///  - A property matching the type of the field 
-  ///      (the setter is called with the new value)
-  /// </summary>
-  public class OnEditorChangeAttribute : CombinablePropertyAttribute {
-    public readonly string methodName;
+    /// <summary>
+    /// Use the OnChange attribute to recieve a callback whenever a field
+    /// is changed.  The callback can be in the form of:
+    ///  - A method accepting zero arguments
+    ///  - A method accepting a single argument matching the field type 
+    ///      (new value is passed in as the argument)
+    ///  - A property matching the type of the field 
+    ///      (the setter is called with the new value)
+    /// </summary>
+    public class OnEditorChangeAttribute : CombinablePropertyAttribute
+    {
+        public readonly string methodName;
 
-    public OnEditorChangeAttribute(string methodName) {
-      this.methodName = methodName;
-    }
+        public OnEditorChangeAttribute(string methodName)
+        {
+            this.methodName = methodName;
+        }
 
 #if UNITY_EDITOR
     private Action<UnityObject, object> _cachedDelegate;
@@ -88,5 +91,5 @@ namespace Leap.Unity.Attributes {
       }
     }
 #endif
-  }
+    }
 }

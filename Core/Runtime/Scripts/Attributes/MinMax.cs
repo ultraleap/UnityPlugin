@@ -12,26 +12,30 @@ using UnityEditor;
 #endif
 using System.Collections.Generic;
 
-namespace Leap.Unity.Attributes {
+namespace Leap.Unity.Attributes
+{
 
-  public class MinMax : CombinablePropertyAttribute, IFullPropertyDrawer {
-    public const float PERCENT_NUM = 0.2f;
-    public const float SPACING = 3;
+    public class MinMax : CombinablePropertyAttribute, IFullPropertyDrawer
+    {
+        public const float PERCENT_NUM = 0.2f;
+        public const float SPACING = 3;
 
-    public readonly float min, max;
-    public readonly bool isInt;
+        public readonly float min, max;
+        public readonly bool isInt;
 
-    public MinMax(float min, float max) {
-      this.min = min;
-      this.max = max;
-      isInt = false;
-    }
+        public MinMax(float min, float max)
+        {
+            this.min = min;
+            this.max = max;
+            isInt = false;
+        }
 
-    public MinMax(int min, int max) {
-      this.min = min;
-      this.max = max;
-      isInt = true;
-    }
+        public MinMax(int min, int max)
+        {
+            this.min = min;
+            this.max = max;
+            isInt = true;
+        }
 
 #if UNITY_EDITOR
     public void DrawProperty(Rect rect, SerializedProperty property, GUIContent label) {
@@ -71,5 +75,5 @@ namespace Leap.Unity.Attributes {
       }
     }
 #endif
-  }
+    }
 }

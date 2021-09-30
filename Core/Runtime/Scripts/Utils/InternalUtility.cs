@@ -14,12 +14,14 @@ using UnityEngine.SceneManagement;
 using UnityEditor;
 #endif
 
-namespace Leap.Unity {
+namespace Leap.Unity
+{
 
 #if UNITY_EDITOR
   [InitializeOnLoad]
 #endif
-  public static class InternalUtility {
+    public static class InternalUtility
+    {
 
 #if UNITY_EDITOR
     public static Action OnAnySave;
@@ -52,45 +54,48 @@ namespace Leap.Unity {
     }
 #endif
 
-    /// <summary>
-    /// This method functions in the same was as gameObject.AddComponent, except it
-    /// includes Undo functionality by default when running in the editor.
-    /// </summary>
-    public static T AddComponent<T>(GameObject obj) where T : Component {
+        /// <summary>
+        /// This method functions in the same was as gameObject.AddComponent, except it
+        /// includes Undo functionality by default when running in the editor.
+        /// </summary>
+        public static T AddComponent<T>(GameObject obj) where T : Component
+        {
 #if UNITY_EDITOR
       if (!Application.isPlaying) {
         return Undo.AddComponent<T>(obj);
       } else
 #endif
-      {
-        return obj.AddComponent<T>();
-      }
-    }
+            {
+                return obj.AddComponent<T>();
+            }
+        }
 
-    /// <summary>
-    /// This method functions in the same was as gameObject.AddComponent, except it
-    /// includes Undo functionality by default when running in the editor.
-    /// </summary>
-    public static Component AddComponent(GameObject obj, Type type) {
+        /// <summary>
+        /// This method functions in the same was as gameObject.AddComponent, except it
+        /// includes Undo functionality by default when running in the editor.
+        /// </summary>
+        public static Component AddComponent(GameObject obj, Type type)
+        {
 #if UNITY_EDITOR
       if (!Application.isPlaying) {
         return Undo.AddComponent(obj, type);
       } else
 #endif
-      {
-        return obj.AddComponent(type);
-      }
-    }
+            {
+                return obj.AddComponent(type);
+            }
+        }
 
-    /// <summary>
-    /// This method functions in the same way as Object.Destroy(), except it
-    /// includes Undo functionality by default when running in the editor, and
-    /// is safe to call from within 'forbidden' callbacks like OnValidate.  
-    /// 
-    /// Like Object.Destroy this method doesn't actually destroy the object 
-    /// right away, but instead destroys it at a slightly later point in time.
-    /// </summary>
-    public static void Destroy(UnityEngine.Object obj) {
+        /// <summary>
+        /// This method functions in the same way as Object.Destroy(), except it
+        /// includes Undo functionality by default when running in the editor, and
+        /// is safe to call from within 'forbidden' callbacks like OnValidate.  
+        /// 
+        /// Like Object.Destroy this method doesn't actually destroy the object 
+        /// right away, but instead destroys it at a slightly later point in time.
+        /// </summary>
+        public static void Destroy(UnityEngine.Object obj)
+        {
 #if UNITY_EDITOR
       if (Application.isPlaying) {
         UnityEngine.Object.Destroy(obj);
@@ -98,9 +103,9 @@ namespace Leap.Unity {
         toDestroy.Add(obj);
       }
 #else
-    UnityEngine.Object.Destroy(obj);
+            UnityEngine.Object.Destroy(obj);
 #endif
-    }
+        }
 
 #if UNITY_EDITOR
     private static void destroyLoop() {
@@ -152,5 +157,5 @@ namespace Leap.Unity {
       }
     }
 #endif
-  }
+    }
 }

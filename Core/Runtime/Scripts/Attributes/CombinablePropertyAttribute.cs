@@ -14,85 +14,101 @@ using System;
 using System.Reflection;
 using System.Collections.Generic;
 
-namespace Leap.Unity.Attributes {
+namespace Leap.Unity.Attributes
+{
 
-  using UnityObject = UnityEngine.Object;
+    using UnityObject = UnityEngine.Object;
 
-  public interface IPropertyConstrainer {
+    public interface IPropertyConstrainer
+    {
 #if UNITY_EDITOR
     void ConstrainValue(SerializedProperty property);
 #endif
-  }
+    }
 
-  public interface IPropertyDisabler {
+    public interface IPropertyDisabler
+    {
 #if UNITY_EDITOR
     bool ShouldDisable(SerializedProperty property);
 #endif
-  }
+    }
 
-  public interface IFullPropertyDrawer {
+    public interface IFullPropertyDrawer
+    {
 #if UNITY_EDITOR
     void DrawProperty(Rect rect, SerializedProperty property, GUIContent label);
 #endif
-  }
+    }
 
-  public interface IAdditiveDrawer {
+    public interface IAdditiveDrawer
+    {
 #if UNITY_EDITOR
     float GetWidth();
     void Draw(Rect rect, SerializedProperty property);
 #endif
-  }
+    }
 
-  public interface ITopPanelDrawer {
+    public interface ITopPanelDrawer
+    {
 #if UNITY_EDITOR
     float GetHeight();
     void Draw(Rect panelRect, SerializedProperty property);
 #endif
-  }
+    }
 
-  public interface ISupportDragAndDrop {
+    public interface ISupportDragAndDrop
+    {
 #if UNITY_EDITOR
     Rect GetDropArea(Rect r, SerializedProperty property);
     bool IsDropValid(UnityObject[] draggedObjects, SerializedProperty property);
     void ProcessDroppedObjects(UnityObject[] droppedObjects, SerializedProperty property);
 #endif
-  }
-
-  public interface IBeforeLabelAdditiveDrawer : IAdditiveDrawer { }
-  public interface IAfterLabelAdditiveDrawer : IAdditiveDrawer { }
-  public interface IBeforeFieldAdditiveDrawer : IAdditiveDrawer { }
-  public interface IAfterFieldAdditiveDrawer : IAdditiveDrawer { }
-
-  public abstract class CombinablePropertyAttribute : PropertyAttribute {
-    private bool _isInitialized = false;
-
-    private FieldInfo _fieldInfo;
-    public FieldInfo fieldInfo {
-      get {
-        if (!_isInitialized) {
-          Debug.LogError("CombinablePropertyAttribute needed fieldInfo but was not "
-                       + "initialized. Did you call Init()?");
-        }
-        return _fieldInfo;
-      }
-      protected set {
-        _fieldInfo = value;
-      }
     }
 
-    private UnityObject[] _targets;
-    public UnityObject[] targets {
-      get {
-        if (!_isInitialized) {
-          Debug.LogError("CombinablePropertyAttribute needed fieldInfo but was not "
-                       + "initialized. Did you call Init()?");
+    public interface IBeforeLabelAdditiveDrawer : IAdditiveDrawer { }
+    public interface IAfterLabelAdditiveDrawer : IAdditiveDrawer { }
+    public interface IBeforeFieldAdditiveDrawer : IAdditiveDrawer { }
+    public interface IAfterFieldAdditiveDrawer : IAdditiveDrawer { }
+
+    public abstract class CombinablePropertyAttribute : PropertyAttribute
+    {
+        private bool _isInitialized = false;
+
+        private FieldInfo _fieldInfo;
+        public FieldInfo fieldInfo
+        {
+            get
+            {
+                if (!_isInitialized)
+                {
+                    Debug.LogError("CombinablePropertyAttribute needed fieldInfo but was not "
+                                 + "initialized. Did you call Init()?");
+                }
+                return _fieldInfo;
+            }
+            protected set
+            {
+                _fieldInfo = value;
+            }
         }
-        return _targets;
-      }
-      protected set {
-        _targets = value;
-      }
-    }
+
+        private UnityObject[] _targets;
+        public UnityObject[] targets
+        {
+            get
+            {
+                if (!_isInitialized)
+                {
+                    Debug.LogError("CombinablePropertyAttribute needed fieldInfo but was not "
+                                 + "initialized. Did you call Init()?");
+                }
+                return _targets;
+            }
+            protected set
+            {
+                _targets = value;
+            }
+        }
 
 #if UNITY_EDITOR
     /// <summary>
@@ -134,5 +150,5 @@ namespace Leap.Unity.Attributes {
 
     public virtual void OnPropertyChanged(SerializedProperty property) { }
 #endif
-  }
+    }
 }

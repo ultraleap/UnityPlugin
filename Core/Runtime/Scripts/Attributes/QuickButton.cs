@@ -6,34 +6,35 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
+using Leap.Unity.Query;
 using System.Linq;
 using System.Reflection;
 using UnityEngine;
-using Leap.Unity.Query;
 
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
 
-namespace Leap.Unity.Attributes {
+namespace Leap.Unity.Attributes
+{
 
-  public class QuickButtonAttribute : CombinablePropertyAttribute, 
-    IAfterFieldAdditiveDrawer
-  {
-
-    public const float PADDING_RIGHT = 12f;
-
-    public readonly string label = "Quick Button";
-    public readonly string methodOnPress = null;
-    public readonly string tooltip = "";
-
-    public QuickButtonAttribute(string buttonLabel, string methodOnPress,
-      string tooltip = "")
+    public class QuickButtonAttribute : CombinablePropertyAttribute,
+      IAfterFieldAdditiveDrawer
     {
-      this.label = buttonLabel;
-      this.methodOnPress = methodOnPress;
-      this.tooltip = tooltip;
-    }
+
+        public const float PADDING_RIGHT = 12f;
+
+        public readonly string label = "Quick Button";
+        public readonly string methodOnPress = null;
+        public readonly string tooltip = "";
+
+        public QuickButtonAttribute(string buttonLabel, string methodOnPress,
+          string tooltip = "")
+        {
+            this.label = buttonLabel;
+            this.methodOnPress = methodOnPress;
+            this.tooltip = tooltip;
+        }
 
 #if UNITY_EDITOR
     /// <summary>
@@ -106,5 +107,5 @@ namespace Leap.Unity.Attributes {
       GUI.color = prevColor;
     }
 #endif
-  }
+    }
 }

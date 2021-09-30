@@ -13,146 +13,178 @@ using UnityEditor;
 #endif
 using Leap.Unity.Query;
 
-namespace Leap.Unity {
+namespace Leap.Unity
+{
 
-  public static class DefaultCurve {
+    public static class DefaultCurve
+    {
 
-    public static AnimationCurve Zero {
-      get {
-        AnimationCurve curve = new AnimationCurve();
-        curve.AddKey(0, 0);
-        curve.AddKey(1, 0);
-        return curve;
-      }
-    }
-
-    public static AnimationCurve One {
-      get {
-        AnimationCurve curve = new AnimationCurve();
-        curve.AddKey(0, 1);
-        curve.AddKey(1, 1);
-        return curve;
-      }
-    }
-
-    public static AnimationCurve LinearUp {
-      get {
-        AnimationCurve curve = new AnimationCurve();
-        curve.AddKey(new Keyframe(0, 0, 1, 1));
-        curve.AddKey(new Keyframe(1, 1, 1, 1));
-        return curve;
-      }
-    }
-
-    public static AnimationCurve LinearDown {
-      get {
-        AnimationCurve curve = new AnimationCurve();
-        curve.AddKey(new Keyframe(0, 1, -1, -1));
-        curve.AddKey(new Keyframe(1, 0, -1, -1));
-        return curve;
-      }
-    }
-
-    public static AnimationCurve SigmoidUp {
-      get {
-        AnimationCurve curve = new AnimationCurve();
-        curve.AddKey(new Keyframe(0, 0, 0, 0));
-        curve.AddKey(new Keyframe(1, 1, 0, 0));
-        return curve;
-      }
-    }
-
-    public static AnimationCurve SigmoidDown {
-      get {
-        AnimationCurve curve = new AnimationCurve();
-        curve.AddKey(new Keyframe(0, 1, 0, 0));
-        curve.AddKey(new Keyframe(1, 0, 0, 0));
-        return curve;
-      }
-    }
-
-    public static AnimationCurve SigmoidUpDown {
-      get {
-        AnimationCurve curve = new AnimationCurve();
-        curve.AddKey(new Keyframe(0,    0, 0, 0));
-        curve.AddKey(new Keyframe(0.5f, 1, 0, 0));
-        curve.AddKey(new Keyframe(1,    0, 0, 0));
-        return curve;
-      }
-    }
-  }
-
-  public static class AnimationCurveUtil {
-
-    public static bool IsConstant(this AnimationCurve curve) {
-      var keys = curve.keys;
-      var first = keys[0];
-      for (int i = 0; i < keys.Length; i++) {
-        var key = keys[i];
-
-        if (!Mathf.Approximately(first.value, key.value)) {
-          return false;
+        public static AnimationCurve Zero
+        {
+            get
+            {
+                AnimationCurve curve = new AnimationCurve();
+                curve.AddKey(0, 0);
+                curve.AddKey(1, 0);
+                return curve;
+            }
         }
 
-        if (!Mathf.Approximately(key.inTangent, 0) && !float.IsInfinity(key.inTangent)) {
-          return false;
+        public static AnimationCurve One
+        {
+            get
+            {
+                AnimationCurve curve = new AnimationCurve();
+                curve.AddKey(0, 1);
+                curve.AddKey(1, 1);
+                return curve;
+            }
         }
 
-        if (!Mathf.Approximately(key.outTangent, 0) && !float.IsInfinity(key.outTangent)) {
-          return false;
+        public static AnimationCurve LinearUp
+        {
+            get
+            {
+                AnimationCurve curve = new AnimationCurve();
+                curve.AddKey(new Keyframe(0, 0, 1, 1));
+                curve.AddKey(new Keyframe(1, 1, 1, 1));
+                return curve;
+            }
         }
-      }
-      return true;
+
+        public static AnimationCurve LinearDown
+        {
+            get
+            {
+                AnimationCurve curve = new AnimationCurve();
+                curve.AddKey(new Keyframe(0, 1, -1, -1));
+                curve.AddKey(new Keyframe(1, 0, -1, -1));
+                return curve;
+            }
+        }
+
+        public static AnimationCurve SigmoidUp
+        {
+            get
+            {
+                AnimationCurve curve = new AnimationCurve();
+                curve.AddKey(new Keyframe(0, 0, 0, 0));
+                curve.AddKey(new Keyframe(1, 1, 0, 0));
+                return curve;
+            }
+        }
+
+        public static AnimationCurve SigmoidDown
+        {
+            get
+            {
+                AnimationCurve curve = new AnimationCurve();
+                curve.AddKey(new Keyframe(0, 1, 0, 0));
+                curve.AddKey(new Keyframe(1, 0, 0, 0));
+                return curve;
+            }
+        }
+
+        public static AnimationCurve SigmoidUpDown
+        {
+            get
+            {
+                AnimationCurve curve = new AnimationCurve();
+                curve.AddKey(new Keyframe(0, 0, 0, 0));
+                curve.AddKey(new Keyframe(0.5f, 1, 0, 0));
+                curve.AddKey(new Keyframe(1, 0, 0, 0));
+                return curve;
+            }
+        }
     }
 
-    public static bool ContainsKeyAtTime(this AnimationCurve curve, float time, float tolerance = 0.0000001f) {
-      return curve.keys.Query().Any(k => Mathf.Abs(k.time - time) < tolerance);
-    }
+    public static class AnimationCurveUtil
+    {
 
-    public static AnimationCurve GetCropped(this AnimationCurve curve, float start, float end, bool slideToStart = true) {
-      AnimationCurve newCurve = new AnimationCurve();
+        public static bool IsConstant(this AnimationCurve curve)
+        {
+            var keys = curve.keys;
+            var first = keys[0];
+            for (int i = 0; i < keys.Length; i++)
+            {
+                var key = keys[i];
 
-      //Get a copy of the latest key before start
-      Keyframe? latestBeforeStart = null;
-      var keys = curve.keys;
-      for (int i = 0; i < keys.Length; i++) {
-        var key = keys[i];
-        if (key.time >= start) break;
+                if (!Mathf.Approximately(first.value, key.value))
+                {
+                    return false;
+                }
 
-        latestBeforeStart = key;
-      }
+                if (!Mathf.Approximately(key.inTangent, 0) && !float.IsInfinity(key.inTangent))
+                {
+                    return false;
+                }
 
-      //Remove all keys before start or after end
-      for (int i = keys.Length; i-- != 0;) {
-        if (keys[i].time < start || keys[i].time > end) {
-          curve.RemoveKey(i);
+                if (!Mathf.Approximately(key.outTangent, 0) && !float.IsInfinity(key.outTangent))
+                {
+                    return false;
+                }
+            }
+            return true;
         }
-      }
 
-      bool alreadyHasZero = false;
-      for (int i = 0; i < keys.Length; i++) {
-        var key = keys[i];
-        if (key.time >= start && key.time <= end) {
-          if (slideToStart) {
-            key.time -= start;
-          }
-
-          if (Mathf.Approximately(key.time, 0)) {
-            alreadyHasZero = true;
-          }
-
-          newCurve.AddKey(key);
+        public static bool ContainsKeyAtTime(this AnimationCurve curve, float time, float tolerance = 0.0000001f)
+        {
+            return curve.keys.Query().Any(k => Mathf.Abs(k.time - time) < tolerance);
         }
-      }
 
-      if (latestBeforeStart.HasValue && !alreadyHasZero) {
-        var toInsert = latestBeforeStart.Value;
-        toInsert.time = 0;
-        newCurve.AddKey(toInsert);
-      }
+        public static AnimationCurve GetCropped(this AnimationCurve curve, float start, float end, bool slideToStart = true)
+        {
+            AnimationCurve newCurve = new AnimationCurve();
 
-      return newCurve;
-    }
+            //Get a copy of the latest key before start
+            Keyframe? latestBeforeStart = null;
+            var keys = curve.keys;
+            for (int i = 0; i < keys.Length; i++)
+            {
+                var key = keys[i];
+                if (key.time >= start) break;
+
+                latestBeforeStart = key;
+            }
+
+            //Remove all keys before start or after end
+            for (int i = keys.Length; i-- != 0;)
+            {
+                if (keys[i].time < start || keys[i].time > end)
+                {
+                    curve.RemoveKey(i);
+                }
+            }
+
+            bool alreadyHasZero = false;
+            for (int i = 0; i < keys.Length; i++)
+            {
+                var key = keys[i];
+                if (key.time >= start && key.time <= end)
+                {
+                    if (slideToStart)
+                    {
+                        key.time -= start;
+                    }
+
+                    if (Mathf.Approximately(key.time, 0))
+                    {
+                        alreadyHasZero = true;
+                    }
+
+                    newCurve.AddKey(key);
+                }
+            }
+
+            if (latestBeforeStart.HasValue && !alreadyHasZero)
+            {
+                var toInsert = latestBeforeStart.Value;
+                toInsert.time = 0;
+                newCurve.AddKey(toInsert);
+            }
+
+            return newCurve;
+        }
 
 #if UNITY_EDITOR
     public static AnimationCurve Compress(AnimationCurve curve, float maxDelta = 0.005f, int checkSteps = 8) {
@@ -385,8 +417,9 @@ namespace Leap.Unity {
     }
 #endif
 
-    public static void AddBooleanKey(this AnimationCurve curve, float time, bool value) {
-      var keyframe = new Keyframe() { time = time, value = value ? 1 : 0 };
+        public static void AddBooleanKey(this AnimationCurve curve, float time, bool value)
+        {
+            var keyframe = new Keyframe() { time = time, value = value ? 1 : 0 };
 
 #if UNITY_EDITOR
       int keyframeIdx = curve.AddKey(keyframe);
@@ -396,10 +429,10 @@ namespace Leap.Unity {
       AnimationUtility.SetKeyRightTangentMode(curve, keyframeIdx,
                                              AnimationUtility.TangentMode.Constant);
 #else
-      curve.AddKey(keyframe);
+            curve.AddKey(keyframe);
 #endif
+        }
     }
-  }
 
 
 }

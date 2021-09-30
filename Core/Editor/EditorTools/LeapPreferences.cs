@@ -7,36 +7,39 @@
  ******************************************************************************/
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Collections.Generic;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
 
-namespace Leap.Unity {
+namespace Leap.Unity
+{
 
-  /// <summary>
-  /// This attribute is used to add items to the Leap Motion preferences window.
-  /// This allows each module to define their own preferences and still have them
-  /// all show up under the same window.  
-  /// 
-  /// The usage is very similar to the built-in PreferenceItem attribute.  You
-  /// add the attribute onto a static method that should be run whenever the 
-  /// preference window is visited.  This method is a gui method and should use
-  /// GuiLayout and EditorGuiLayout in order to draw the preferences.  You can
-  /// specify the name of the preferences as well as an order value to specify
-  /// how the preferences are ordered relative to other preferences.
-  /// </summary>
-  [AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
-  public class LeapPreferences : Attribute {
-    public readonly string header;
-    public readonly int order;
+    /// <summary>
+    /// This attribute is used to add items to the Leap Motion preferences window.
+    /// This allows each module to define their own preferences and still have them
+    /// all show up under the same window.  
+    /// 
+    /// The usage is very similar to the built-in PreferenceItem attribute.  You
+    /// add the attribute onto a static method that should be run whenever the 
+    /// preference window is visited.  This method is a gui method and should use
+    /// GuiLayout and EditorGuiLayout in order to draw the preferences.  You can
+    /// specify the name of the preferences as well as an order value to specify
+    /// how the preferences are ordered relative to other preferences.
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
+    public class LeapPreferences : Attribute
+    {
+        public readonly string header;
+        public readonly int order;
 
-    public LeapPreferences(string header, int order) {
-      this.header = header;
-      this.order = order;
-    }
+        public LeapPreferences(string header, int order)
+        {
+            this.header = header;
+            this.order = order;
+        }
 
 #if UNITY_EDITOR
     private static List<LeapPreferenceItem> _leapPreferenceItems = null;
@@ -80,7 +83,7 @@ namespace Leap.Unity {
       _leapPreferenceItems.Sort((a, b) => a.attribute.order.CompareTo(b.attribute.order));
     }
 
-  #if UNITY_2018_3_OR_NEWER
+#if UNITY_2018_3_OR_NEWER
     // Implementations Leap Motion settings using the new SettingsProvider API.
     private class LeapMotionSettingsProvider : SettingsProvider {
       public LeapMotionSettingsProvider(string path, SettingsScope scopes = SettingsScope.User)
@@ -107,6 +110,6 @@ namespace Leap.Unity {
         item.drawPreferenceGui();
       }
     }
-    #endif
-  }
+#endif
+    }
 }

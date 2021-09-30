@@ -6,19 +6,21 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using UnityEngine;
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
 
-namespace Leap.Unity.Attributes {
-  using Query;
+namespace Leap.Unity.Attributes
+{
+    using Query;
 
-  public class EnumFlags : CombinablePropertyAttribute, IFullPropertyDrawer {
+    public class EnumFlags : CombinablePropertyAttribute, IFullPropertyDrawer
+    {
 
-    public EnumFlags() { }
+        public EnumFlags() { }
 
 #if UNITY_EDITOR
     private string[] _enumNames;
@@ -74,5 +76,5 @@ namespace Leap.Unity.Attributes {
       }
     }
 #endif
-  }
+    }
 }

@@ -18,23 +18,27 @@ using UnityEditor;
 
 using UnityObject = UnityEngine.Object;
 
-namespace Leap.Unity.Attributes {
+namespace Leap.Unity.Attributes
+{
 
-  public class ImplementsInterfaceAttribute : CombinablePropertyAttribute,
-                                              IPropertyConstrainer,
-                                              IFullPropertyDrawer,
-                                              ISupportDragAndDrop {
+    public class ImplementsInterfaceAttribute : CombinablePropertyAttribute,
+                                                IPropertyConstrainer,
+                                                IFullPropertyDrawer,
+                                                ISupportDragAndDrop
+    {
 
 #pragma warning disable 0414
-    private Type type;
+        private Type type;
 #pragma warning restore 0414
 
-    public ImplementsInterfaceAttribute(Type type) {
-      if (!type.IsInterface) {
-        throw new System.Exception(type.Name + " is not an interface.");
-      }
-      this.type = type;
-    }
+        public ImplementsInterfaceAttribute(Type type)
+        {
+            if (!type.IsInterface)
+            {
+                throw new System.Exception(type.Name + " is not an interface.");
+            }
+            this.type = type;
+        }
 
 #if UNITY_EDITOR
     public void ConstrainValue(SerializedProperty property) {
@@ -170,5 +174,5 @@ namespace Leap.Unity.Attributes {
       }
     }
 #endif
-  }
+    }
 }

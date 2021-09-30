@@ -6,65 +6,74 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using UnityEngine;
 using System;
+using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
 
 /** HandModelBase defines abstract methods as a template for building Leap hand models*/
-namespace Leap.Unity {
-  public enum Chirality { Left, Right };
-  public enum ModelType { Graphics, Physics };
+namespace Leap.Unity
+{
+    public enum Chirality { Left, Right };
+    public enum ModelType { Graphics, Physics };
 
-  [ExecuteInEditMode]
-  public abstract class HandModelBase : MonoBehaviour {
+    [ExecuteInEditMode]
+    public abstract class HandModelBase : MonoBehaviour
+    {
 
-    public event Action OnBegin;
-    public event Action OnFinish;
-    /// <summary> Called directly after the HandModelBase's UpdateHand().
-    /// </summary>
-    public event Action OnUpdate;
+        public event Action OnBegin;
+        public event Action OnFinish;
+        /// <summary> Called directly after the HandModelBase's UpdateHand().
+        /// </summary>
+        public event Action OnUpdate;
 
-    private bool isTracked = false;
-    public bool IsTracked {
-      get { return isTracked; }
-    }
+        private bool isTracked = false;
+        public bool IsTracked
+        {
+            get { return isTracked; }
+        }
 
-    public abstract Chirality Handedness { get; set; }
-    public abstract ModelType HandModelType { get; }
-    public virtual void InitHand() { }
+        public abstract Chirality Handedness { get; set; }
+        public abstract ModelType HandModelType { get; }
+        public virtual void InitHand() { }
 
-    public virtual void BeginHand() {
-      if (OnBegin != null) {
-        OnBegin();
-      }
-      isTracked = true;
-    }
-    public abstract void UpdateHand();
-    public void UpdateHandWithEvent() {
-      UpdateHand();
-      if (OnUpdate != null) { OnUpdate(); }
-    }
-    public virtual void FinishHand() {
-      if (OnFinish != null) {
-        OnFinish();
-      }
-      isTracked = false;
-    }
-    public abstract Hand GetLeapHand();
-    public abstract void SetLeapHand(Hand hand);
+        public virtual void BeginHand()
+        {
+            if (OnBegin != null)
+            {
+                OnBegin();
+            }
+            isTracked = true;
+        }
+        public abstract void UpdateHand();
+        public void UpdateHandWithEvent()
+        {
+            UpdateHand();
+            if (OnUpdate != null) { OnUpdate(); }
+        }
+        public virtual void FinishHand()
+        {
+            if (OnFinish != null)
+            {
+                OnFinish();
+            }
+            isTracked = false;
+        }
+        public abstract Hand GetLeapHand();
+        public abstract void SetLeapHand(Hand hand);
 
-    /// <summary>
-    /// Returns whether or not this hand model supports editor persistence.  This is false by default and must be
-    /// opt-in by a developer making their own hand model script if they want editor persistence.
-    /// </summary>
-    public virtual bool SupportsEditorPersistence() {
-      return false;
-    }
+        /// <summary>
+        /// Returns whether or not this hand model supports editor persistence.  This is false by default and must be
+        /// opt-in by a developer making their own hand model script if they want editor persistence.
+        /// </summary>
+        public virtual bool SupportsEditorPersistence()
+        {
+            return false;
+        }
 
-    [NonSerialized]
-    public HandModelManager.ModelGroup group;
+        [NonSerialized]
+        public HandModelManager.ModelGroup group;
 
 #if UNITY_EDITOR
     void Update() {
@@ -112,5 +121,5 @@ namespace Leap.Unity {
       }
     }
 #endif
-  }
+    }
 }

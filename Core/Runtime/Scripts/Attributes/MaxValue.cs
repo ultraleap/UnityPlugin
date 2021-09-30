@@ -6,20 +6,23 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
 
-namespace Leap.Unity.Attributes {
+namespace Leap.Unity.Attributes
+{
 
-  public class MaxValue : CombinablePropertyAttribute, IPropertyConstrainer {
-    public float maxValue;
+    public class MaxValue : CombinablePropertyAttribute, IPropertyConstrainer
+    {
+        public float maxValue;
 
-    public MaxValue(float maxValue) {
-      this.maxValue = maxValue;
-    }
+        public MaxValue(float maxValue)
+        {
+            this.maxValue = maxValue;
+        }
 
 #if UNITY_EDITOR
     public void ConstrainValue(SerializedProperty property) {
@@ -46,5 +49,5 @@ namespace Leap.Unity.Attributes {
       }
     }
 #endif
-  }
+    }
 }

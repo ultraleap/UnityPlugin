@@ -11,14 +11,17 @@ using UnityEngine;
 using UnityEditor;
 #endif
 
-namespace Leap.Unity.Attributes {
+namespace Leap.Unity.Attributes
+{
 
-  public class UnitsAttribute : CombinablePropertyAttribute, IAfterFieldAdditiveDrawer {
-    public readonly string unitsName;
+    public class UnitsAttribute : CombinablePropertyAttribute, IAfterFieldAdditiveDrawer
+    {
+        public readonly string unitsName;
 
-    public UnitsAttribute(string unitsName) {
-      this.unitsName = unitsName;
-    }
+        public UnitsAttribute(string unitsName)
+        {
+            this.unitsName = unitsName;
+        }
 
 #if UNITY_EDITOR
     public float GetWidth() {
@@ -29,5 +32,5 @@ namespace Leap.Unity.Attributes {
       GUI.Label(rect, unitsName);
     }
 #endif
-  }
+    }
 }

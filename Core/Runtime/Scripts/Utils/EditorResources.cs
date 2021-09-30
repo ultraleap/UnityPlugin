@@ -13,7 +13,8 @@ using UnityEngine;
 using UnityEditor;
 #endif
 
-namespace Leap.Unity {
+namespace Leap.Unity
+{
 
 #if UNITY_EDITOR
   public static class EditorResources {

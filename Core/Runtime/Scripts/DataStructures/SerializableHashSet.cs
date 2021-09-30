@@ -6,125 +6,154 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
+using Leap.Unity.Query;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Leap.Unity.Query;
-using System.Collections;
 
-namespace Leap.Unity {
+namespace Leap.Unity
+{
 
-  [Obsolete("It is no longer required to annotate SerializableHashSets with the SHashSet attribute.")]
-  public class SHashSetAttribute : PropertyAttribute { }
+    [Obsolete("It is no longer required to annotate SerializableHashSets with the SHashSet attribute.")]
+    public class SHashSetAttribute : PropertyAttribute { }
 
-  public abstract class SerializableHashSetBase { }
+    public abstract class SerializableHashSetBase { }
 
-  public class SerializableHashSet<T> : SerializableHashSetBase,
-                                        ICanReportDuplicateInformation,
-                                        ISerializationCallbackReceiver,
-                                        IEnumerable<T> {
+    public class SerializableHashSet<T> : SerializableHashSetBase,
+                                          ICanReportDuplicateInformation,
+                                          ISerializationCallbackReceiver,
+                                          IEnumerable<T>
+    {
 
-    [SerializeField]
-    private List<T> _values = new List<T>();
+        [SerializeField]
+        private List<T> _values = new List<T>();
 
-    [NonSerialized]
-    private HashSet<T> _set = new HashSet<T>();
+        [NonSerialized]
+        private HashSet<T> _set = new HashSet<T>();
 
-    #region HASH SET API
+        #region HASH SET API
 
-    public int Count {
-      get { return _set.Count; }
-    }
-
-    public bool Add(T item) {
-      return _set.Add(item);
-    }
-
-    public void Clear() {
-      _set.Clear();
-    }
-
-    public bool Contains(T item) {
-      return _set.Contains(item);
-    }
-
-    public bool Remove(T item) {
-      return _set.Remove(item);
-    }
-
-    public static implicit operator HashSet<T>(SerializableHashSet<T> serializableHashSet) {
-      return serializableHashSet._set;
-    }
-
-    public IEnumerator<T> GetEnumerator() {
-      return _set.GetEnumerator();
-    }
-
-    IEnumerator IEnumerable.GetEnumerator() {
-      return _set.GetEnumerator();
-    }
-
-    #endregion
-
-    public void ClearDuplicates() {
-      HashSet<T> takenValues = new HashSet<T>();
-      for (int i = _values.Count; i-- != 0;) {
-        var value = _values[i];
-        if (takenValues.Contains(value)) {
-          _values.RemoveAt(i);
-        } else {
-          takenValues.Add(value);
-        }
-      }
-    }
-
-    public List<int> GetDuplicationInformation() {
-      Dictionary<T, int> info = new Dictionary<T, int>();
-
-      foreach (var value in _values) {
-        if (value == null) {
-          continue;
+        public int Count
+        {
+            get { return _set.Count; }
         }
 
-        if (info.ContainsKey(value)) {
-          info[value]++;
-        } else {
-          info[value] = 1;
-        }
-      }
-
-      List<int> dups = new List<int>();
-      foreach (var value in _values) {
-        if (value == null) {
-          continue;
+        public bool Add(T item)
+        {
+            return _set.Add(item);
         }
 
-        dups.Add(info[value]);
-      }
-
-      return dups;
-    }
-
-    public void OnAfterDeserialize() {
-      _set.Clear();
-
-      if (_values != null) {
-        foreach (var value in _values) {
-          if (value != null) {
-            _set.Add(value);
-          }
+        public void Clear()
+        {
+            _set.Clear();
         }
-      }
+
+        public bool Contains(T item)
+        {
+            return _set.Contains(item);
+        }
+
+        public bool Remove(T item)
+        {
+            return _set.Remove(item);
+        }
+
+        public static implicit operator HashSet<T>(SerializableHashSet<T> serializableHashSet)
+        {
+            return serializableHashSet._set;
+        }
+
+        public IEnumerator<T> GetEnumerator()
+        {
+            return _set.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return _set.GetEnumerator();
+        }
+
+        #endregion
+
+        public void ClearDuplicates()
+        {
+            HashSet<T> takenValues = new HashSet<T>();
+            for (int i = _values.Count; i-- != 0;)
+            {
+                var value = _values[i];
+                if (takenValues.Contains(value))
+                {
+                    _values.RemoveAt(i);
+                }
+                else
+                {
+                    takenValues.Add(value);
+                }
+            }
+        }
+
+        public List<int> GetDuplicationInformation()
+        {
+            Dictionary<T, int> info = new Dictionary<T, int>();
+
+            foreach (var value in _values)
+            {
+                if (value == null)
+                {
+                    continue;
+                }
+
+                if (info.ContainsKey(value))
+                {
+                    info[value]++;
+                }
+                else
+                {
+                    info[value] = 1;
+                }
+            }
+
+            List<int> dups = new List<int>();
+            foreach (var value in _values)
+            {
+                if (value == null)
+                {
+                    continue;
+                }
+
+                dups.Add(info[value]);
+            }
+
+            return dups;
+        }
+
+        public void OnAfterDeserialize()
+        {
+            _set.Clear();
+
+            if (_values != null)
+            {
+                foreach (var value in _values)
+                {
+                    if (value != null)
+                    {
+                        _set.Add(value);
+                    }
+                }
+            }
 
 #if !UNITY_EDITOR
-      _values.Clear();
+            _values.Clear();
 #endif
-    }
+        }
 
-    public void OnBeforeSerialize() {
-      if (_values == null) {
-        _values = new List<T>();
-      }
+        public void OnBeforeSerialize()
+        {
+            if (_values == null)
+            {
+                _values = new List<T>();
+            }
 
 #if UNITY_EDITOR
       //Delete any values not present
@@ -152,22 +181,25 @@ namespace Leap.Unity {
         }
       }
 #else
-      //At runtime we just recreate the list
-      _values.Clear();
-      _values.AddRange(this);
+            //At runtime we just recreate the list
+            _values.Clear();
+            _values.AddRange(this);
 #endif
+        }
+
+        private bool isNull(object obj)
+        {
+            if (obj == null)
+            {
+                return true;
+            }
+
+            if (obj is UnityEngine.Object)
+            {
+                return (obj as UnityEngine.Object) == null;
+            }
+
+            return false;
+        }
     }
-
-    private bool isNull(object obj) {
-      if (obj == null) {
-        return true;
-      }
-
-      if (obj is UnityEngine.Object) {
-        return (obj as UnityEngine.Object) == null;
-      }
-
-      return false;
-    }
-  }
 }

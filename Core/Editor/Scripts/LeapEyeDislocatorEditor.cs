@@ -8,18 +8,21 @@
 
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using UnityEditor;
+using UnityEngine;
 
-namespace Leap.Unity {
+namespace Leap.Unity
+{
 
-  [CustomEditor(typeof(LeapEyeDislocator))]
-  public class LeapEyeDislocatorEditor : CustomEditorBase<LeapEyeDislocator> {
+    [CustomEditor(typeof(LeapEyeDislocator))]
+    public class LeapEyeDislocatorEditor : CustomEditorBase<LeapEyeDislocator>
+    {
 
-    protected override void OnEnable() {
-      base.OnEnable();
+        protected override void OnEnable()
+        {
+            base.OnEnable();
 
-      specifyConditionalDrawing("_useCustomBaseline", "_customBaselineValue");
+            specifyConditionalDrawing("_useCustomBaseline", "_customBaselineValue");
+        }
     }
-  }
 }

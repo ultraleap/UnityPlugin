@@ -6,52 +6,53 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
+using Leap.Unity.Query;
+using System;
 using System.Linq;
 using System.Reflection;
 using UnityEngine;
-using Leap.Unity.Query;
-using System;
 
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
 
-namespace Leap.Unity.Attributes {
+namespace Leap.Unity.Attributes
+{
 
-  public class EditorGUIPanelAttribute : CombinablePropertyAttribute, 
-    ITopPanelDrawer
-  {
-
-    public const float LINE_HEIGHT = 20f;
-
-    public int heightInLines;
-    public readonly string editorMethodName;
-
-    /// <summary> Pass the name of a **static** method in your MonoBehaviour
-    /// that accepts a Rect and Object[] targets, which reflects the current
-    /// editor selection (might be multiple of your MonoBehaviours in a
-    /// multi-select case). The method is called in an OnGUI inspector context,
-    /// so you can make EditorGUI or GUI calls. See the example below for 
-    /// example usage. </summary>
-    /// <example>
-    /// ```
-    /// [EditorGUIPanel("DrawPanel")]
-    /// public SomeType inspectorObj;
-    /// private static void DrawPanel(Rect panel, Object[] targets) {
-    ///   #if UNITY_EDITOR
-    ///   if (GUI.Button(panel, "Do Thing")) { 
-    ///     targets.ForEach≤MyBehaviour≥(r => r.DoThing());
-    ///   }
-    ///   #endif
-    /// }
-    /// ```
-    /// </example>
-    public EditorGUIPanelAttribute(string editorMethodName,
-      int heightInLines = 1)
+    public class EditorGUIPanelAttribute : CombinablePropertyAttribute,
+      ITopPanelDrawer
     {
-      this.heightInLines = heightInLines;
-      this.editorMethodName = editorMethodName;
-    }
+
+        public const float LINE_HEIGHT = 20f;
+
+        public int heightInLines;
+        public readonly string editorMethodName;
+
+        /// <summary> Pass the name of a **static** method in your MonoBehaviour
+        /// that accepts a Rect and Object[] targets, which reflects the current
+        /// editor selection (might be multiple of your MonoBehaviours in a
+        /// multi-select case). The method is called in an OnGUI inspector context,
+        /// so you can make EditorGUI or GUI calls. See the example below for 
+        /// example usage. </summary>
+        /// <example>
+        /// ```
+        /// [EditorGUIPanel("DrawPanel")]
+        /// public SomeType inspectorObj;
+        /// private static void DrawPanel(Rect panel, Object[] targets) {
+        ///   #if UNITY_EDITOR
+        ///   if (GUI.Button(panel, "Do Thing")) { 
+        ///     targets.ForEach≤MyBehaviour≥(r => r.DoThing());
+        ///   }
+        ///   #endif
+        /// }
+        /// ```
+        /// </example>
+        public EditorGUIPanelAttribute(string editorMethodName,
+          int heightInLines = 1)
+        {
+            this.heightInLines = heightInLines;
+            this.editorMethodName = editorMethodName;
+        }
 
 #if UNITY_EDITOR
     private Action<Rect, UnityEngine.Object[]> _cachedDelegate;
@@ -119,6 +120,6 @@ namespace Leap.Unity.Attributes {
     }
 
 #endif
-  }
+    }
 
 }

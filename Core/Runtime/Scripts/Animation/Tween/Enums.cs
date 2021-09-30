@@ -6,17 +6,20 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-namespace Leap.Unity.Animation {
+namespace Leap.Unity.Animation
+{
 
-  public enum Direction {
-    Forward = 1,
-    Backward = -1
-  }
+    public enum Direction
+    {
+        Forward = 1,
+        Backward = -1
+    }
 
-  public enum SmoothType {
-    Linear = 1,
-    Smooth = 2,
-    SmoothEnd = 3,
-    SmoothStart = 4
-  }
+    public enum SmoothType
+    {
+        Linear = 1,
+        Smooth = 2,
+        SmoothEnd = 3,
+        SmoothStart = 4
+    }
 }

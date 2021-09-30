@@ -14,30 +14,33 @@ using UnityEditor;
 #endif
 using UnityEngine;
 
-namespace Leap.Unity.Attributes {
+namespace Leap.Unity.Attributes
+{
 
-  /// <summary>
-  /// Place this attribute on a serialized string field to have it render as a dropdown
-  /// menu that is automatically populated with implementing types of the type provided
-  /// to the attribute. The string field will contain the type name selected by the user.
-  /// This can be converted into a Type reference via reflection and used to construct
-  /// objects by their type, for example, or to construct ScriptableObjects by their type.
-  /// </summary>
-  public class ImplementsTypeNameDropdownAttribute : CombinablePropertyAttribute,
-                                                     IFullPropertyDrawer {
-    
-    protected Type _baseType;
-    protected List<Type> _implementingTypes = new List<Type>();
-    protected GUIContent[] _typeOptions;
+    /// <summary>
+    /// Place this attribute on a serialized string field to have it render as a dropdown
+    /// menu that is automatically populated with implementing types of the type provided
+    /// to the attribute. The string field will contain the type name selected by the user.
+    /// This can be converted into a Type reference via reflection and used to construct
+    /// objects by their type, for example, or to construct ScriptableObjects by their type.
+    /// </summary>
+    public class ImplementsTypeNameDropdownAttribute : CombinablePropertyAttribute,
+                                                       IFullPropertyDrawer
+    {
 
-    public ImplementsTypeNameDropdownAttribute(Type type) {
-      _baseType = type;
+        protected Type _baseType;
+        protected List<Type> _implementingTypes = new List<Type>();
+        protected GUIContent[] _typeOptions;
+
+        public ImplementsTypeNameDropdownAttribute(Type type)
+        {
+            _baseType = type;
 
 #if UNITY_EDITOR
       refreshImplementingTypes();
       refreshTypeOptions();
 #endif
-    }
+        }
 
 #if UNITY_EDITOR
     public void DrawProperty(Rect rect, SerializedProperty property, GUIContent label) {
@@ -78,7 +81,7 @@ namespace Leap.Unity.Attributes {
       return _implementingTypes.FindIndex((t => property.stringValue.Equals(t.FullName)));
     }
 #endif
-  }
+    }
 
 
 }
