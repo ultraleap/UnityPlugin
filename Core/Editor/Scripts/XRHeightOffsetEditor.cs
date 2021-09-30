@@ -6,25 +6,28 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
+using Leap.Unity;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
-using Leap.Unity;
 
-namespace Leap.Unity {
+namespace Leap.Unity
+{
 
-  [CanEditMultipleObjects]
-  [CustomEditor(typeof(XRHeightOffset))]
-  public class XRHeightOffsetEditor : CustomEditorBase<XRHeightOffset> {
+    [CanEditMultipleObjects]
+    [CustomEditor(typeof(XRHeightOffset))]
+    public class XRHeightOffsetEditor : CustomEditorBase<XRHeightOffset>
+    {
 
-    protected override void OnEnable() {
-      base.OnEnable();
+        protected override void OnEnable()
+        {
+            base.OnEnable();
 
-      specifyConditionalDrawing(conditionalName: "recenterOnKey",
-                                dependantProperties: "recenterKey");
+            specifyConditionalDrawing(conditionalName: "recenterOnKey",
+                                      dependantProperties: "recenterKey");
+        }
+
     }
-
-  }
 
 }

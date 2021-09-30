@@ -11,8 +11,10 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace Leap.Unity.HandsModule {
-    public static class HandBinderAutoBinder {
+namespace Leap.Unity.HandsModule
+{
+    public static class HandBinderAutoBinder
+    {
 
         //The minimum amount of Transforms required to be able to match Transforms back to a Leap data point
         const int MINIMUM_TRANSFORMS = 3;
@@ -21,7 +23,8 @@ namespace Leap.Unity.HandsModule {
         /// This function is used to search the child Transforms of the HandBinder script to automatically try and assign them for the user
         /// </summary>
         /// <param name="handBinder">The HandBinder that the found Transform target will get assigned to</param>
-        public static void AutoBind(HandBinder handBinder) {
+        public static void AutoBind(HandBinder handBinder)
+        {
 
             handBinder.ResetHand();
             BoneNameDefinitions boneDefinitions = new BoneNameDefinitions();
@@ -30,7 +33,7 @@ namespace Leap.Unity.HandsModule {
             var children = new List<Transform>();
             children.Add(handBinder.transform);
             children.AddRange(GetAllChildren(handBinder.transform));
-            
+
             var thumbBones = SortBones(SelectBones(children, boneDefinitions.DefinitionThumb), false, true);
             var indexBones = SortBones(SelectBones(children, boneDefinitions.DefinitionIndex), handBinder.UseMetaBones);
             var middleBones = SortBones(SelectBones(children, boneDefinitions.DefinitionMiddle), handBinder.UseMetaBones);
@@ -47,7 +50,8 @@ namespace Leap.Unity.HandsModule {
             handBinder.BoundHand.wrist = AssignBoundBone(wrist);
             handBinder.BoundHand.elbow = AssignBoundBone(elbow);
 
-            if(wrist != null && elbow != null) {
+            if (wrist != null && elbow != null)
+            {
                 handBinder.ElbowLength = (wrist.position - elbow.position).magnitude;
             }
 
@@ -65,11 +69,14 @@ namespace Leap.Unity.HandsModule {
         /// </summary>
         /// <param name="_t"></param>
         /// <returns></returns>
-        public static List<Transform> GetAllChildren(Transform _t) {
+        public static List<Transform> GetAllChildren(Transform _t)
+        {
             List<Transform> ts = new List<Transform>();
-            foreach(Transform t in _t) {
+            foreach (Transform t in _t)
+            {
                 ts.Add(t);
-                if(t.childCount > 0) {
+                if (t.childCount > 0)
+                {
                     ts.AddRange(GetAllChildren(t));
                 }
             }
@@ -82,18 +89,23 @@ namespace Leap.Unity.HandsModule {
         /// <param name="children">The found children</param>
         /// <param name="definitions">The criteria to match to the children</param>
         /// <returns></returns>
-        private static Transform[] SelectBones(List<Transform> children, string[] definitions) {
+        private static Transform[] SelectBones(List<Transform> children, string[] definitions)
+        {
             var bones = new List<Transform>();
-            for(int definitionIndex = 0; definitionIndex < definitions.Length; definitionIndex++) {
-                foreach(var child in children) {
+            for (int definitionIndex = 0; definitionIndex < definitions.Length; definitionIndex++)
+            {
+                foreach (var child in children)
+                {
                     //We have found all the bones we need
-                    if(bones.Count == 4) {
+                    if (bones.Count == 4)
+                    {
                         break;
                     }
 
                     var definition = definitions[definitionIndex].ToUpper();
 
-                    if(child.name.ToUpper().Contains(definition)) {
+                    if (child.name.ToUpper().Contains(definition))
+                    {
                         bones.Add(child);
                     }
                 }
@@ -107,35 +119,42 @@ namespace Leap.Unity.HandsModule {
         /// <param name="bones">The bones to sort</param>
         /// <param name="isThumb">Is it a thumb</param>
         /// <returns></returns>
-        private static Transform[] SortBones(Transform[] bones, bool useMeta = false, bool isThumb = false) {
+        private static Transform[] SortBones(Transform[] bones, bool useMeta = false, bool isThumb = false)
+        {
             Transform meta = null;
             Transform proximal = null;
             Transform middle = null;
             Transform distal = null;
 
-            if(bones.Length == MINIMUM_TRANSFORMS) {
+            if (bones.Length == MINIMUM_TRANSFORMS)
+            {
 
-                if(useMeta == false) {
+                if (useMeta == false)
+                {
                     meta = null;
                     proximal = bones[0];
                     middle = bones[1];
                     distal = bones[2];
                 }
-                else {
+                else
+                {
                     meta = bones[0];
                     proximal = bones[1];
                     middle = bones[2];
                     distal = null;
                 }
             }
-            else if(bones.Length > MINIMUM_TRANSFORMS) {
+            else if (bones.Length > MINIMUM_TRANSFORMS)
+            {
 
-                if(isThumb == true) {
+                if (isThumb == true)
+                {
                     proximal = bones[0];
                     middle = bones[1];
                     distal = bones[2];
                 }
-                else {
+                else
+                {
                     meta = bones[0];
                     proximal = bones[1];
                     middle = bones[2];
@@ -162,7 +181,8 @@ namespace Leap.Unity.HandsModule {
         /// <param name="boneIndex">The index of the bone you want to assign</param>
         /// <param name="handBinder">The Hand Binder this information will be added to</param>
         /// <returns></returns>
-        public static BoundBone[] AssignTransformToBoundBone(Transform[] boneTransform) {
+        public static BoundBone[] AssignTransformToBoundBone(Transform[] boneTransform)
+        {
             var boundFingers = new BoundBone[]
                 {
                     AssignBoundBone(boneTransform[0]),
@@ -174,9 +194,11 @@ namespace Leap.Unity.HandsModule {
             return boundFingers;
         }
 
-        public static BoundBone AssignBoundBone(Transform transform) {
+        public static BoundBone AssignBoundBone(Transform transform)
+        {
             var newBone = new BoundBone();
-            if(transform != null) {
+            if (transform != null)
+            {
                 newBone.boundTransform = transform;
                 newBone.startTransform = new TransformStore();
                 newBone.startTransform.position = transform.localPosition;
@@ -188,7 +210,8 @@ namespace Leap.Unity.HandsModule {
         /// <summary>
         /// Estimate the rotation offset needed to get the rigged hand into the same orientation as the leap hand
         /// </summary>
-        public static void EstimateWristRotationOffset(HandBinder handBinder) {
+        public static void EstimateWristRotationOffset(HandBinder handBinder)
+        {
 
             Transform indexBone = handBinder.BoundHand.fingers[(int)Finger.FingerType.TYPE_INDEX].boundBones[(int)Bone.BoneType.TYPE_PROXIMAL].boundTransform;
             Transform middleBone = handBinder.BoundHand.fingers[(int)Finger.FingerType.TYPE_MIDDLE].boundBones[(int)Bone.BoneType.TYPE_PROXIMAL].boundTransform;
@@ -196,12 +219,14 @@ namespace Leap.Unity.HandsModule {
 
             Transform wrist = handBinder.BoundHand.wrist.boundTransform;
 
-            if(middleBone != null && indexBone != null && pinkyBone != null && wrist != null) {
+            if (middleBone != null && indexBone != null && pinkyBone != null && wrist != null)
+            {
 
                 //Calculate model's rotation
                 var forward = (middleBone.position - wrist.position);
                 var right = (indexBone.position - pinkyBone.position);
-                if(handBinder.Handedness == Chirality.Right) {
+                if (handBinder.Handedness == Chirality.Right)
+                {
                     right = -right;
                 }
                 var up = Vector3.Cross(forward, right);
@@ -215,8 +240,10 @@ namespace Leap.Unity.HandsModule {
             }
         }
 
-        public static void CalculateElbowLength(HandBinder handBinder) {
-            if(handBinder.BoundHand.elbow.boundTransform != null && handBinder.BoundHand.wrist.boundTransform != null) {
+        public static void CalculateElbowLength(HandBinder handBinder)
+        {
+            if (handBinder.BoundHand.elbow.boundTransform != null && handBinder.BoundHand.wrist.boundTransform != null)
+            {
                 handBinder.ElbowLength = (handBinder.BoundHand.wrist.boundTransform.position - handBinder.BoundHand.elbow.boundTransform.position).magnitude;
             }
         }

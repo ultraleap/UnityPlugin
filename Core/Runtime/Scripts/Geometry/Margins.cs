@@ -8,64 +8,78 @@
 
 using UnityEngine;
 
-namespace Leap.Unity.Geometry {
+namespace Leap.Unity.Geometry
+{
 
-  public struct Margins {
+    public struct Margins
+    {
 
-    public float left;
-    public float right;
-    public float top;
-    public float bottom;
+        public float left;
+        public float right;
+        public float top;
+        public float bottom;
 
-    public static readonly Margins zero = Margins.All(0f);
-    public static readonly Margins one = Margins.All(1f);
+        public static readonly Margins zero = Margins.All(0f);
+        public static readonly Margins one = Margins.All(1f);
 
-    public Margins(float left, float right, float top, float bottom) {
-      this.left = left; this.right = right; this.top = top; this.bottom = bottom;
+        public Margins(float left, float right, float top, float bottom)
+        {
+            this.left = left; this.right = right; this.top = top; this.bottom = bottom;
+        }
+
+        public static Margins All(float margin)
+        {
+            return new Margins()
+            {
+                left = margin,
+                right = margin,
+                top = margin,
+                bottom = margin
+            };
+        }
+
+        public static Margins operator *(Margins m, float factor)
+        {
+            return new Margins(m.left * factor, m.right * factor, m.top * factor,
+              m.bottom * factor);
+        }
+
+        public static Margins operator *(float factor, Margins m)
+        {
+            return new Margins(m.left * factor, m.right * factor, m.top * factor,
+              m.bottom * factor);
+        }
+
+        public static Margins operator -(Margins m)
+        {
+            return m * -1f;
+        }
+
     }
 
-    public static Margins All(float margin) {
-      return new Margins() {
-        left = margin, right = margin, top = margin, bottom = margin
-      };
+    public static class MarginExtensions
+    {
+
+        public static LocalRect PadOuter(this LocalRect r, Margins margins)
+        {
+            return new LocalRect(
+              center: r.center + new Vector3(
+                (margins.right - margins.left) / 2f,
+                (margins.top - margins.bottom) / 2f,
+                0f
+              ),
+              radii: new Vector2(
+                r.radii.x + (margins.right + margins.left) / 2f,
+                r.radii.y + (margins.top + margins.bottom) / 2f
+              )
+            );
+        }
+
+        public static LocalRect PadInner(this LocalRect r, Margins margins)
+        {
+            return r.PadOuter(-margins);
+        }
+
     }
-
-    public static Margins operator *(Margins m, float factor) {
-      return new Margins(m.left * factor, m.right * factor, m.top * factor,
-        m.bottom * factor);
-    }
-
-    public static Margins operator *(float factor, Margins m) {
-      return new Margins(m.left * factor, m.right * factor, m.top * factor,
-        m.bottom * factor);
-    }
-
-    public static Margins operator -(Margins m) {
-      return m * -1f;
-    }
-
-  }
-
-  public static class MarginExtensions {
-
-    public static LocalRect PadOuter(this LocalRect r, Margins margins) {
-      return new LocalRect(
-        center: r.center + new Vector3(
-          (margins.right - margins.left) / 2f,
-          (margins.top - margins.bottom) / 2f,
-          0f
-        ),
-        radii: new Vector2(
-          r.radii.x + (margins.right + margins.left) / 2f,
-          r.radii.y + (margins.top + margins.bottom) / 2f
-        )
-      );
-    }
-
-    public static LocalRect PadInner(this LocalRect r, Margins margins) {
-      return r.PadOuter(-margins);
-    }
-
-  }
 
 }

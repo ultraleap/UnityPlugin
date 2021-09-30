@@ -16,7 +16,7 @@ trigger::trigger-downstream:
       when: always
       allow_failure: false
 
-    - if: $CI_COMMIT_BRANCH == "main"
+    - if: $CI_COMMIT_BRANCH
       when: manual
       allow_failure: false
 
@@ -25,5 +25,5 @@ trigger::trigger-downstream:
 
   trigger:
     project: xr/integrations/unity/ci/unityplugin-ci
-    branch: main
+    branch: feature/main-formatted
     strategy: depend
