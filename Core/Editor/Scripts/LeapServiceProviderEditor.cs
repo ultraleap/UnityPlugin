@@ -268,21 +268,15 @@ namespace Leap.Unity
             Handles.DrawAAPolyLine(origin, bottom_left);
             Handles.DrawAAPolyLine(origin, bottom_right);
 
-            drawControllerEdge(origin, local_top_left, local_top_right, box_radius,
-                                         targetTransform);
-            drawControllerEdge(origin, local_bottom_left, local_top_left, box_radius,
-                                         targetTransform);
-            drawControllerEdge(origin, local_bottom_left, local_bottom_right, box_radius,
-                                         targetTransform);
-            drawControllerEdge(origin, local_bottom_right, local_top_right, box_radius,
-                                         targetTransform);
+            drawControllerEdge(origin, local_top_left, local_top_right, box_radius, targetTransform);
+            drawControllerEdge(origin, local_bottom_left, local_top_left, box_radius, targetTransform);
+            drawControllerEdge(origin, local_bottom_left, local_bottom_right, box_radius, targetTransform);
+            drawControllerEdge(origin, local_bottom_right, local_top_right, box_radius, targetTransform);
 
             drawControllerArc(origin, local_top_left, local_bottom_left, local_top_right,
-                              local_bottom_right, box_radius,
-                                         targetTransform);
+                              local_bottom_right, box_radius, targetTransform);
             drawControllerArc(origin, local_top_left, local_top_right, local_bottom_left,
-                              local_bottom_right, box_radius,
-                                         targetTransform);
+                              local_bottom_right, box_radius, targetTransform);
 
             Handles.color = previousColor;
         }
@@ -302,8 +296,7 @@ namespace Leap.Unity
                                         Transform targetTransform)
         {
 
-            Vector3 right_normal = targetTransform
-                                   .TransformDirection(Vector3.Cross(edge0, edge1));
+            Vector3 right_normal = targetTransform.TransformDirection(Vector3.Cross(edge0, edge1));
             float right_angle = Vector3.Angle(edge0, edge1);
 
             Handles.DrawWireArc(origin, right_normal, targetTransform.TransformDirection(edge0),
