@@ -25,7 +25,7 @@ namespace Leap.Unity
               // Object not found, we create a temporary one
               if (m_Instance == null) {
                 isTemporaryInstance = true;
-                m_Instance = new GameObject("MainCameraProvider").GetComponent<MainCameraProvider>();
+                m_Instance = new GameObject("MainCameraProvider").AddComponent<MainCameraProvider>();
 
                 if (m_Instance == null) {
                   Debug.LogError("Problem creating MainCameraProvider Instance");
