@@ -6,35 +6,40 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using UnityEngine;
 using UnityEditor;
+using UnityEngine;
 
-namespace Leap.Unity{
-  [CustomEditor(typeof(LeapImageRetriever))]
-  public class LeapImageRetrieverEditor : CustomEditorBase<LeapImageRetriever> {
+namespace Leap.Unity
+{
+    [CustomEditor(typeof(LeapImageRetriever))]
+    public class LeapImageRetrieverEditor : CustomEditorBase<LeapImageRetriever>
+    {
 
-    private GUIContent _textureGUIContent;
-    private GUIContent _distortionTextureGUIContent;
+        private GUIContent _textureGUIContent;
+        private GUIContent _distortionTextureGUIContent;
 
-    protected override void OnEnable() {
-      base.OnEnable();
+        protected override void OnEnable()
+        {
+            base.OnEnable();
 
-      _textureGUIContent = new GUIContent("Sensor Texture");
-      _distortionTextureGUIContent = new GUIContent("Distortion Texture");
+            _textureGUIContent = new GUIContent("Sensor Texture");
+            _distortionTextureGUIContent = new GUIContent("Distortion Texture");
+        }
+
+        public override void OnInspectorGUI()
+        {
+            base.OnInspectorGUI();
+
+            if (Application.isPlaying)
+            {
+                var data = target.TextureData;
+                var dataType = typeof(Object);
+
+                EditorGUI.BeginDisabledGroup(true);
+                EditorGUILayout.ObjectField(_textureGUIContent, data.TextureData.CombinedTexture, dataType, true);
+                EditorGUILayout.ObjectField(_distortionTextureGUIContent, data.Distortion.CombinedTexture, dataType, true);
+                EditorGUI.EndDisabledGroup();
+            }
+        }
     }
-
-    public override void OnInspectorGUI() {
-      base.OnInspectorGUI();
-
-      if (Application.isPlaying) {
-        var data = target.TextureData;
-        var dataType = typeof(Object);
-
-        EditorGUI.BeginDisabledGroup(true);
-        EditorGUILayout.ObjectField(_textureGUIContent, data.TextureData.CombinedTexture, dataType, true);
-        EditorGUILayout.ObjectField(_distortionTextureGUIContent, data.Distortion.CombinedTexture, dataType, true);
-        EditorGUI.EndDisabledGroup();
-      }
-    }
-  }
 }

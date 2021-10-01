@@ -8,28 +8,31 @@
 
 using System;
 
-namespace Leap.Unity {
+namespace Leap.Unity
+{
 
-  [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
-  [Obsolete]
-  public class ExecuteBeforeAttribute : Attribute {
-    public Type beforeType;
-    public ExecuteBeforeAttribute(Type beforeType) { }
-  }
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
+    [Obsolete]
+    public class ExecuteBeforeAttribute : Attribute
+    {
+        public Type beforeType;
+        public ExecuteBeforeAttribute(Type beforeType) { }
+    }
 
-  [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
-  [Obsolete]
-  public class ExecuteAfterAttribute : Attribute {
-    public Type afterType;
-    public ExecuteAfterAttribute(Type afterType) { }
-  }
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
+    [Obsolete]
+    public class ExecuteAfterAttribute : Attribute
+    {
+        public Type afterType;
+        public ExecuteAfterAttribute(Type afterType) { }
+    }
 
-  [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
-  [Obsolete]
-  public class ExecuteBeforeDefault : Attribute { }
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
+    [Obsolete]
+    public class ExecuteBeforeDefault : Attribute { }
 
-  [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
-  [Obsolete]
-  public class ExecuteAfterDefault : Attribute { }
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
+    [Obsolete]
+    public class ExecuteAfterDefault : Attribute { }
 
 }

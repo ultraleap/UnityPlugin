@@ -10,10 +10,12 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Leap.Unity.HandsModule {
+namespace Leap.Unity.HandsModule
+{
 
     [DisallowMultipleComponent]
-    public class HandBinder : HandModelBase {
+    public class HandBinder : HandModelBase
+    {
         public Hand LeapHand;
 
         [Tooltip("The size of the debug gizmos")]
@@ -55,45 +57,53 @@ namespace Leap.Unity.HandsModule {
         //Custom editor requires Chirality in a non overridden property, Public Chirality exists for the editor.
         public override Chirality Handedness { get { return Chirality; } set { } }
         public override ModelType HandModelType { get { return ModelType.Graphics; } }
-        public override Hand GetLeapHand() { return LeapHand;}
+        public override Hand GetLeapHand() { return LeapHand; }
         public override void SetLeapHand(Hand hand) { LeapHand = hand; }
 
-        public override bool SupportsEditorPersistence() {
+        public override bool SupportsEditorPersistence()
+        {
 
             bool editorPersistance = SetEditorPose;
 
-            if(SetEditorPose == false) {
+            if (SetEditorPose == false)
+            {
                 ResetHand();
             }
 
-            if(DebugLeapHand) {
+            if (DebugLeapHand)
+            {
                 editorPersistance = true;
             }
 
             return editorPersistance;
         }
 
-        private void OnDestroy() {
+        private void OnDestroy()
+        {
             ResetHand();
         }
 
         //Reset is called when the user hits the Reset button in the Inspector's context menu or when adding the component the first time.
-        private void Reset() {
+        private void Reset()
+        {
 
             //Return if we already have assigned base transforms
-            if(DefaultHandPose != null) {
+            if (DefaultHandPose != null)
+            {
                 ResetHand();
                 return;
             }
 
-            else {
+            else
+            {
                 //Store all children transforms so the user has the ability to reset back to a default pose
                 var allChildren = new List<Transform>();
                 allChildren.Add(transform);
                 allChildren.AddRange(HandBinderAutoBinder.GetAllChildren(transform));
 
                 var baseTransforms = new List<SerializedTransform>();
-                foreach(var child in allChildren) {
+                foreach (var child in allChildren)
+                {
                     var serializedTransform = new SerializedTransform();
                     serializedTransform.reference = child.gameObject;
                     serializedTransform.transform = new TransformStore();
@@ -108,30 +118,36 @@ namespace Leap.Unity.HandsModule {
         /// <summary>
         /// Update the BoundGameobjects so that the positions and rotations match that of the leap hand
         /// </summary>
-        public override void UpdateHand() {
+        public override void UpdateHand()
+        {
 
-            if(!SetEditorPose && !Application.isPlaying) {
+            if (!SetEditorPose && !Application.isPlaying)
+            {
                 return;
             }
 
-            if(LeapHand == null) {
+            if (LeapHand == null)
+            {
                 ResetHand();
                 return;
             }
 
             //Calculate the elbows position and rotation making sure to maintain the models forearm length
-            if(BoundHand.elbow.boundTransform != null && BoundHand.wrist.boundTransform != null && ElbowLength > 0) {
+            if (BoundHand.elbow.boundTransform != null && BoundHand.wrist.boundTransform != null && ElbowLength > 0)
+            {
                 //Calculate the position of the elbow based on the calcualted elbow length
                 var elbowPosition = LeapHand.WristPosition.ToVector3() -
                                         ((LeapHand.Arm.Basis.zBasis.ToVector3() * ElbowLength) + BoundHand.elbow.offset.position);
-                if(!elbowPosition.ContainsNaN()) {
+                if (!elbowPosition.ContainsNaN())
+                {
                     BoundHand.elbow.boundTransform.transform.position = elbowPosition;
                     BoundHand.elbow.boundTransform.transform.rotation = LeapHand.Arm.Rotation.ToQuaternion() * Quaternion.Euler(BoundHand.elbow.offset.rotation);
                 }
             }
 
             //Update the wrist's position and rotation to leap data
-            if(BoundHand.wrist.boundTransform != null) {
+            if (BoundHand.wrist.boundTransform != null)
+            {
 
                 //Calculate the position of the wrist to the leap position + offset defined by the user
                 var wristPosition = LeapHand.WristPosition.ToVector3() + BoundHand.wrist.offset.position;
@@ -145,22 +161,27 @@ namespace Leap.Unity.HandsModule {
             }
 
             //Loop through all the leap fingers and update the bound fingers to the leap data
-            if(LeapHand != null) {
-                for(int fingerIndex = 0; fingerIndex < LeapHand.Fingers.Count; fingerIndex++) {
-                    for(int boneIndex = 0; boneIndex < LeapHand.Fingers[fingerIndex].bones.Length; boneIndex++) {
+            if (LeapHand != null)
+            {
+                for (int fingerIndex = 0; fingerIndex < LeapHand.Fingers.Count; fingerIndex++)
+                {
+                    for (int boneIndex = 0; boneIndex < LeapHand.Fingers[fingerIndex].bones.Length; boneIndex++)
+                    {
 
                         //The transform that the user has defined
                         var boundTransform = BoundHand.fingers[fingerIndex].boundBones[boneIndex].boundTransform;
 
                         //Continue if the user has not defined a transform for this finger
-                        if(boundTransform == null) {
+                        if (boundTransform == null)
+                        {
                             continue;
                         }
 
                         //Get the start transform that was stored for each assigned transform
                         var startTransform = BoundHand.fingers[fingerIndex].boundBones[boneIndex].startTransform;
 
-                        if(boneIndex == 0 && !UseMetaBones) {
+                        if (boneIndex == 0 && !UseMetaBones)
+                        {
                             boundTransform.transform.localRotation = Quaternion.Euler(startTransform.rotation);
                             boundTransform.transform.localPosition = startTransform.position;
                             continue;
@@ -172,12 +193,14 @@ namespace Leap.Unity.HandsModule {
                         var boneOffset = BoundHand.fingers[fingerIndex].boundBones[boneIndex].offset;
 
                         //Only update the finger position if the user has defined this behaviour
-                        if(SetPositions) {
+                        if (SetPositions)
+                        {
                             boundTransform.transform.position = leapBone.PrevJoint.ToVector3();
                             boundTransform.transform.localPosition += boneOffset.position;
                         }
 
-                        else {
+                        else
+                        {
                             boundTransform.transform.localPosition = startTransform.position + boneOffset.position;
                         }
 
@@ -193,16 +216,20 @@ namespace Leap.Unity.HandsModule {
         /// <summary>
         /// Reset the boundGameobjects back to the default pose
         /// </summary>
-        public void ResetHand(bool forceReset = false) {
+        public void ResetHand(bool forceReset = false)
+        {
 
-            if(DefaultHandPose == null || EditPoseNeedsResetting == false && forceReset == false) {
+            if (DefaultHandPose == null || EditPoseNeedsResetting == false && forceReset == false)
+            {
                 return;
             };
 
-            for(int i = 0; i < DefaultHandPose.Length; i++) {
+            for (int i = 0; i < DefaultHandPose.Length; i++)
+            {
 
                 var baseTransform = DefaultHandPose[i];
-                if(baseTransform != null && baseTransform.reference != null) {
+                if (baseTransform != null && baseTransform.reference != null)
+                {
                     baseTransform.reference.transform.localPosition = baseTransform.transform.position;
                     baseTransform.reference.transform.localRotation = Quaternion.Euler(baseTransform.transform.rotation);
                 }

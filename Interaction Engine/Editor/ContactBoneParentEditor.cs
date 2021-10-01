@@ -11,19 +11,23 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-namespace Leap.Unity.Interaction {
+namespace Leap.Unity.Interaction
+{
 
-  [CustomEditor(typeof(ContactBoneParent))]
-  public class ContactBoneParentEditor : CustomEditorBase<ContactBoneParent> {
+    [CustomEditor(typeof(ContactBoneParent))]
+    public class ContactBoneParentEditor : CustomEditorBase<ContactBoneParent>
+    {
 
-    protected override void OnEnable() {
-      base.OnEnable();
+        protected override void OnEnable()
+        {
+            base.OnEnable();
+        }
+
+        public override void OnInspectorGUI()
+        {
+            base.OnInspectorGUI();
+        }
+
     }
-
-    public override void OnInspectorGUI() {
-      base.OnInspectorGUI();
-    }
-
-  }
 
 }
