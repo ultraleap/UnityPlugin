@@ -38,6 +38,8 @@
 			float3 worldNormal : NORMAL;
 			float3 viewDir : TEXCOORD1;
 			fixed4 diff : COLOR0;
+
+			UNITY_VERTEX_OUTPUT_STEREO
 		};
 
 		ENDCG
@@ -64,6 +66,10 @@
 				v2f vert(appdata_base v)
 				{
 					v2f o;
+					UNITY_SETUP_INSTANCE_ID(v);
+					UNITY_INITIALIZE_OUTPUT(v2f, o);
+					UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
+
 					o.pos = UnityObjectToClipPos(v.vertex);
 					float3 norm = mul((float3x3)UNITY_MATRIX_IT_MV, v.normal);
 					float2 offset = TransformViewToProjection(norm.xy);
@@ -93,6 +99,10 @@
 				v2f vert(appdata_base v)
 				{
 					v2f o;
+					UNITY_SETUP_INSTANCE_ID(v);
+					UNITY_INITIALIZE_OUTPUT(v2f, o);
+					UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
+
 					o.pos = UnityObjectToClipPos(v.vertex);
 					o.uv = v.texcoord;
 					half3 worldNormal = UnityObjectToWorldNormal(v.normal);
