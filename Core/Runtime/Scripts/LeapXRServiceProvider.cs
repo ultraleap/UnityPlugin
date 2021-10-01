@@ -9,8 +9,9 @@
 using UnityEngine;
 using System;
 using Leap.Unity.Attributes;
-
+#if UNITY_2019_1_OR_NEWER
 using UnityEngine.Rendering;
+#endif
 using UnityEngine.Assertions;
 
 namespace Leap.Unity {
@@ -220,13 +221,16 @@ namespace Leap.Unity {
     protected virtual void OnDisable() {
       resetShaderTransforms();
 
-      if (GraphicsSettings.renderPipelineAsset != null) {
+#if UNITY_2019_1_OR_NEWER
+            if (GraphicsSettings.renderPipelineAsset != null) {
          RenderPipelineManager.beginCameraRendering -= onBeginRendering;
       } else {
          Camera.onPreCull -= onPreCull; // No multiple-subscription.
       }
-
-    }
+#else
+            Camera.onPreCull -= onPreCull;
+#endif
+        }
 
     protected override void Start() {
       base.Start();
@@ -252,7 +256,9 @@ namespace Leap.Unity {
       var projectionMatrix = _camera == null ? Matrix4x4.identity
         : _camera.projectionMatrix;
       switch (SystemInfo.graphicsDeviceType) {
-        case UnityEngine.Rendering.GraphicsDeviceType.Direct3D11:
+#if !UNITY_2017_2_OR_NEWER
+                case UnityEngine.Rendering.GraphicsDeviceType.Direct3D11:
+#endif
         case UnityEngine.Rendering.GraphicsDeviceType.Direct3D12:
           for (int i = 0; i < 4; i++) {
             projectionMatrix[1, i] = -projectionMatrix[1, i];
@@ -284,25 +290,31 @@ namespace Leap.Unity {
                                        imageQuatWarp.eulerAngles.y,
                                       -imageQuatWarp.eulerAngles.z);
       Matrix4x4 imageMatWarp = projectionMatrix
+#if UNITY_2019_2_OR_NEWER
                                // The camera projection matrices seem to have vertically inverted...
                                * Matrix4x4.TRS(Vector3.zero, imageQuatWarp, new Vector3(1f, -1f, 1f))
+#else
+                               * Matrix4x4.TRS(Vector3.zero, imageQuatWarp, Vector3.One)
+#endif
                                * projectionMatrix.inverse;
       Shader.SetGlobalMatrix("_LeapGlobalWarpedOffset", imageMatWarp);
     }
 
-    protected virtual void onBeginRendering(ScriptableRenderContext context, Camera camera) { onPreCull(camera); }
+#if UNITY_2019_1_OR_NEWER
+        protected virtual void onBeginRendering(ScriptableRenderContext context, Camera camera) { onPreCull(camera); }
+#endif
 
-    protected virtual void onPreCull(Camera preCullingCamera) {
+        protected virtual void onPreCull(Camera preCullingCamera) {
       if (preCullingCamera != _camera) {
         return;
       }
 
-      #if UNITY_EDITOR
+#if UNITY_EDITOR
       if (!Application.isPlaying)
       {
         return;
       }
-      #endif
+#endif
 
       Pose trackedPose;
       if (_deviceOffsetMode == DeviceOffsetMode.Default
@@ -334,9 +346,9 @@ namespace Leap.Unity {
       OnPreCullHandTransforms(_camera);
     }
 
-    #endregion
+#endregion
 
-    #region LeapServiceProvider Overrides
+#region LeapServiceProvider Overrides
 
     protected override long CalculateInterpolationTime(bool endOfFrame = false) {
 #if UNITY_ANDROID
@@ -373,9 +385,9 @@ namespace Leap.Unity {
       dest.CopyFrom(source).Transform(leapTransform);
     }
 
-    #endregion
+#endregion
 
-    #region Internal Methods
+#region Internal Methods
 
     /// <summary>
     /// Resets shader globals for the Hand transforms.
@@ -538,7 +550,7 @@ namespace Leap.Unity {
       }
     }
 
-    #endregion
+#endregion
 
   }
 
