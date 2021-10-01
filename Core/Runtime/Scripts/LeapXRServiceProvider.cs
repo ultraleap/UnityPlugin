@@ -12,7 +12,6 @@ using Leap.Unity.Attributes;
 #if UNITY_2019_1_OR_NEWER
 using UnityEngine.Rendering;
 #endif
-using UnityEngine.Assertions;
 
 namespace Leap.Unity
 {
@@ -112,9 +111,9 @@ namespace Leap.Unity
 #if UNITY_STANDALONE
         private const int DEFAULT_WARP_ADJUSTMENT = 17;
 #elif UNITY_ANDROID
-    private const int DEFAULT_WARP_ADJUSTMENT = 45;
+        private const int DEFAULT_WARP_ADJUSTMENT = 45;
 #else
-    private const int DEFAULT_WARP_ADJUSTMENT = 17;
+        private const int DEFAULT_WARP_ADJUSTMENT = 17;
 #endif
 
         public enum TemporalWarpingMode
@@ -214,22 +213,17 @@ namespace Leap.Unity
             editTimePose = TestHandFactory.TestHandPose.HeadMountedB;
         }
 
-
-        private void Awake()
-        {
-            Assert.IsNotNull(Camera);
-        }
-
         protected virtual void OnEnable()
         {
             resetShaderTransforms();
 
 #if XR_LEGACY_INPUT_AVAILABLE
-      if (GetComponent<UnityEngine.SpatialTracking.TrackedPoseDriver>() == null) {
-        gameObject.AddComponent<UnityEngine.SpatialTracking.TrackedPoseDriver>().UseRelativeTransform = true;
-      }
+            if (GetComponent<UnityEngine.SpatialTracking.TrackedPoseDriver>() == null) {
+                gameObject.AddComponent<UnityEngine.SpatialTracking.TrackedPoseDriver>().UseRelativeTransform = true;
+            }
 #endif
 
+#if UNITY_2019_1_OR_NEWER
             if (GraphicsSettings.renderPipelineAsset != null)
             {
                 RenderPipelineManager.beginCameraRendering -= onBeginRendering;
@@ -240,8 +234,11 @@ namespace Leap.Unity
                 Camera.onPreCull -= onPreCull; // No multiple-subscription.
                 Camera.onPreCull += onPreCull;
             }
+#else
+            Camera.onPreCull -= onPreCull; // No multiple-subscription.
+            Camera.onPreCull += onPreCull;
+#endif
         }
-
 
         protected virtual void OnDisable()
         {
@@ -257,6 +254,7 @@ namespace Leap.Unity
                 Camera.onPreCull -= onPreCull; // No multiple-subscription.
             }
 #else
+            Camera.onPreCull -= onPreCull; // No multiple-subscription.
             Camera.onPreCull -= onPreCull;
 #endif
         }
@@ -292,8 +290,9 @@ namespace Leap.Unity
             switch (SystemInfo.graphicsDeviceType)
             {
 #if !UNITY_2017_2_OR_NEWER
-                case UnityEngine.Rendering.GraphicsDeviceType.Direct3D11:
+                case UnityEngine.Rendering.GraphicsDeviceType.Direct3D9:
 #endif
+                case UnityEngine.Rendering.GraphicsDeviceType.Direct3D11:
                 case UnityEngine.Rendering.GraphicsDeviceType.Direct3D12:
                     for (int i = 0; i < 4; i++)
                     {
@@ -328,9 +327,12 @@ namespace Leap.Unity
                                             -imageQuatWarp.eulerAngles.z);
             Matrix4x4 imageMatWarp = projectionMatrix
 #if UNITY_2019_2_OR_NEWER
+                               // The camera projection matrices seem to have vertically inverted...
+                               * Matrix4x4.TRS(Vector3.zero, imageQuatWarp, new Vector3(1f, -1f, 1f))
                                      // The camera projection matrices seem to have vertically inverted...
                                      * Matrix4x4.TRS(Vector3.zero, imageQuatWarp, new Vector3(1f, -1f, 1f))
 #else
+                               * Matrix4x4.TRS(Vector3.zero, imageQuatWarp, Vector3.one)
                                * Matrix4x4.TRS(Vector3.zero, imageQuatWarp, Vector3.One)
 #endif
                                * projectionMatrix.inverse;
@@ -452,17 +454,15 @@ namespace Leap.Unity
         protected virtual LeapTransform GetWarpedMatrix(long timestamp,
                                                         bool updateTemporalCompensation = true)
         {
-
-
             LeapTransform leapTransform = new LeapTransform();
 
-            if (Camera == null) return leapTransform;
+            if (Camera == null)
+            {
+                return leapTransform;
+            }
 
             //Calculate a Temporally Warped Pose
-            if (Application.isPlaying
-          && updateTemporalCompensation
-          && transformHistory.history.IsFull
-          && _temporalWarpingMode != TemporalWarpingMode.Off)
+            if (Application.isPlaying && updateTemporalCompensation && transformHistory.history.IsFull && _temporalWarpingMode != TemporalWarpingMode.Off)
             {
                 transformHistory.SampleTransform(timestamp
                                                  - (long)(warpingAdjustment * 1000f)
@@ -552,10 +552,13 @@ namespace Leap.Unity
             if (updateHandInPrecull)
             {
                 //Don't update pre cull for preview, reflection, or scene view cameras
+                if (camera == null) camera = Camera;
                 switch (camera.cameraType)
                 {
                     case CameraType.Preview:
+#if UNITY_2017_1_OR_NEWER
                     case CameraType.Reflection:
+#endif
                     case CameraType.SceneView:
                         return;
                 }
@@ -625,7 +628,4 @@ namespace Leap.Unity
         }
 
         #endregion
-
     }
-
-}
