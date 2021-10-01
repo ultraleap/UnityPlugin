@@ -329,8 +329,8 @@ namespace Leap.Unity
 #if UNITY_2019_2_OR_NEWER
                                // The camera projection matrices seem to have vertically inverted...
                                * Matrix4x4.TRS(Vector3.zero, imageQuatWarp, new Vector3(1f, -1f, 1f))
-                                     // The camera projection matrices seem to have vertically inverted...
-                                     * Matrix4x4.TRS(Vector3.zero, imageQuatWarp, new Vector3(1f, -1f, 1f))
+                                // The camera projection matrices seem to have vertically inverted...
+                                * Matrix4x4.TRS(Vector3.zero, imageQuatWarp, new Vector3(1f, -1f, 1f))
 #else
                                * Matrix4x4.TRS(Vector3.zero, imageQuatWarp, Vector3.one)
                                * Matrix4x4.TRS(Vector3.zero, imageQuatWarp, Vector3.One)
