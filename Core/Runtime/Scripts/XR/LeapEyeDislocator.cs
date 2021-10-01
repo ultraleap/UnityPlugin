@@ -61,6 +61,8 @@ namespace Leap.Unity
 
         private void OnDisable()
         {
+            if (_camera == null) return;
+
             _camera.ResetStereoViewMatrices();
 
             _provider.OnDeviceSafe -= onDevice;
@@ -68,6 +70,8 @@ namespace Leap.Unity
 
         private void Update()
         {
+            if (_camera == null) return;
+
             _camera.ResetStereoViewMatrices();
             _hasVisitedPreCull = false;
         }
