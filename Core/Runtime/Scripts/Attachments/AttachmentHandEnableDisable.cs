@@ -12,24 +12,29 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Leap.Unity.Attachments {
+namespace Leap.Unity.Attachments
+{
 
-  public class AttachmentHandEnableDisable : MonoBehaviour {
+    public class AttachmentHandEnableDisable : MonoBehaviour
+    {
 
-    public AttachmentHand attachmentHand;
+        public AttachmentHand attachmentHand;
 
-    void Update() {
-      // Deactivation trigger
-      if (!attachmentHand.isTracked && attachmentHand.gameObject.activeSelf) {
-        attachmentHand.gameObject.SetActive(false);
-      }
+        void Update()
+        {
+            // Deactivation trigger
+            if (!attachmentHand.isTracked && attachmentHand.gameObject.activeSelf)
+            {
+                attachmentHand.gameObject.SetActive(false);
+            }
 
-      // Reactivation trigger
-      if (attachmentHand.isTracked && !attachmentHand.gameObject.activeSelf) {
-        attachmentHand.gameObject.SetActive(true);
-      }
+            // Reactivation trigger
+            if (attachmentHand.isTracked && !attachmentHand.gameObject.activeSelf)
+            {
+                attachmentHand.gameObject.SetActive(true);
+            }
+        }
+
     }
-
-  }
 
 }

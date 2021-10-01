@@ -8,23 +8,27 @@
 
 using System;
 
-namespace Leap.Unity.Attributes {
+namespace Leap.Unity.Attributes
+{
 
-  [Obsolete]
-  public enum AutoFindLocations {
-    Object = 0x01,
-    Children = 0x02,
-    Parents = 0x04,
-    Scene = 0x08,
-    All = 0xFFFF
-  }
-
-  [Obsolete]
-  public class AutoFindAttribute : Attribute {
-    public readonly AutoFindLocations searchLocations;
-
-    public AutoFindAttribute(AutoFindLocations searchLocations = AutoFindLocations.All) {
-      this.searchLocations = searchLocations;
+    [Obsolete]
+    public enum AutoFindLocations
+    {
+        Object = 0x01,
+        Children = 0x02,
+        Parents = 0x04,
+        Scene = 0x08,
+        All = 0xFFFF
     }
-  }
+
+    [Obsolete]
+    public class AutoFindAttribute : Attribute
+    {
+        public readonly AutoFindLocations searchLocations;
+
+        public AutoFindAttribute(AutoFindLocations searchLocations = AutoFindLocations.All)
+        {
+            this.searchLocations = searchLocations;
+        }
+    }
 }

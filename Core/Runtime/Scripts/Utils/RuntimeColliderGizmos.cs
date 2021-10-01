@@ -8,26 +8,29 @@
 
 using UnityEngine;
 
-namespace Leap.Unity.RuntimeGizmos {
+namespace Leap.Unity.RuntimeGizmos
+{
 
-  public class RuntimeColliderGizmos : MonoBehaviour, IRuntimeGizmoComponent {
+    public class RuntimeColliderGizmos : MonoBehaviour, IRuntimeGizmoComponent
+    {
 
-    public Color color = Color.white;
-    public bool useWireframe = true;
-    public bool traverseHierarchy = true;
-    public bool drawTriggers = false;
+        public Color color = Color.white;
+        public bool useWireframe = true;
+        public bool traverseHierarchy = true;
+        public bool drawTriggers = false;
 
-    /// <summary>
-    /// An empty Start() method; gives the MonoBehaviour an enable/disable checkbox.
-    /// </summary>
-    void Start() { }
+        /// <summary>
+        /// An empty Start() method; gives the MonoBehaviour an enable/disable checkbox.
+        /// </summary>
+        void Start() { }
 
-    public void OnDrawRuntimeGizmos(RuntimeGizmoDrawer drawer) {
-      if (!this.gameObject.activeInHierarchy
-          || !this.enabled) return;
+        public void OnDrawRuntimeGizmos(RuntimeGizmoDrawer drawer)
+        {
+            if (!this.gameObject.activeInHierarchy
+                || !this.enabled) return;
 
-      drawer.color = color;
-      drawer.DrawColliders(gameObject, useWireframe, traverseHierarchy, drawTriggers);
+            drawer.color = color;
+            drawer.DrawColliders(gameObject, useWireframe, traverseHierarchy, drawTriggers);
+        }
     }
-  }
 }
