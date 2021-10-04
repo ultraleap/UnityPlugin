@@ -25,6 +25,10 @@ Ultraleap's Unity Plugin enables the data produced by Ultraleap tracking hardwar
 
 This repository hosts the complete Ultraleap Unity Plugin and Ultraleap Tracking SDK. Examples are included to quickly get you up and running with Ultraleap's hand tracking technology.
 
+## Getting Started
+
+This repository contains code for Ultraleap's Unity Plugin 5.0 which has been designed to be an easy-to-use tool for integrating Ultraleap cameras into new Unity projects. However, there are a couple of things you will need to be able to test the content you have created, and there are also several ways you can go about installing Ultraleap’s Unity Plugin 
+
 ## Requirements
 
 The UnityPlugin repository is designed to work with Unity 2019.4 LTS or newer. However, due to the ever changing landscape of package dependencies in Unity we cannot guarantee compatibility with every plugin or variant of Unity, but aim to provide support for all LTS versions that are under continuous support from Unity. If you are sourcing UnityPlugin directly from this repository, your mileage may vary with earlier versions of Unity.
