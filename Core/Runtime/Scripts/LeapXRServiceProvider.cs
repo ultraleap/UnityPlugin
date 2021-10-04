@@ -255,7 +255,6 @@ namespace Leap.Unity
             }
 #else
             Camera.onPreCull -= onPreCull; // No multiple-subscription.
-            Camera.onPreCull -= onPreCull;
 #endif
         }
 
