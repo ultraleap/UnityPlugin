@@ -42,39 +42,48 @@ The Unity Plugin repository is designed to work with Unity 2019.4 LTS or newer, 
 
 
 #### Option 1: UPM via GitHub
+<details><summary>Click to expand</summary>
 
   - To add a (read-only) UPM package remotely via a GitHub URL select the option "Add package from git URL…" in the Unity package manager. 
   - Paste the link to [clone the repository][repository-clone-url] into the input field that appears and press enter. 
   - The package will then be added to your project and you should be good to go!  
   - *Requires Unity 2019.4 (LTS) or newer.*
-  
+
+</details>
 
 #### Option 2: UPM Local Package
-  
-  
+<details><summary>Click to expand</summary>
+
   - To add a (read-only) UPM package locally from a cloned repository select the option "Add package from disk…" and point it at the root folder of the cloned repository on your file system.  
   - *By default this will use an absolute file path from your machine, so will not be a sharable solution without some modification.*
-  
+
+</details> 
 
 #### Option 3: UPM Embedded Package
+<details><summary>Click to expand</summary>
 
   -  To add a (editable) UPM package locally from a cloned repository place it within the Packages folder of your Unity project.  
   - *This is perhaps the easiest way to work if you want o submit a pull request against the Ultraleap Unity Plugin.*
+
+</details>
   
 #### Option 4: Unity Package
-  
+<details><summary>Click to expand</summary>
+
   - Import the package (e.g. Assets -> Import Package -> Custom Package...) which can be downloaded from [our Unity developer site][developer-site-unity] or the [releases section][releases] of this repository.     
   - *\*.unitypackage(s) are a deprecated solution in Unity. Do not move the location of the installed plugin as this may break certain features.*
-  
 
+</details>
+  
 #### Option 5: Submodule
+<details><summary>Click to expand</summary>
 
   - You can also add this plugin as a submodule in your assets folder. 
   - *Use this method with caution as submodules can introduce their own complexities to a project*
 
+</details>
 
 **Please note:**  
-
 - Due to the ever changing landscape of package dependencies in Unity we cannot guarantee compatibility with every plugin or variant of Unity, but aim to provide support for any LTS versions that are under continuous support from Unity. 
 - If you are sourcing the Unity Plugin directly from this repository, you may find that it does not function well with earlier versions of Unity
 
@@ -134,7 +143,7 @@ Our vision is to make it as easy as possible to design the best user experience 
 5. Open a Pull Request
 
 ## License
-Use of Ultraleap's Unity Plugin is subject to the Apache V2 License Agreement.
+Use of Ultraleap's Unity Plugin is subject to the [Apache V2 License Agreement][apache].
 
 ## Contact
 User Support: support@ultraleap.com 
