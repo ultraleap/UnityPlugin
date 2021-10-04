@@ -40,27 +40,27 @@ To use this Plugin you will need the following:
 
 The Unity Plugin repository is designed to work with Unity 2019.4 LTS or newer, as a result there are several ways you can consume this plugin 
 
-1. __UPM via GitHub__  
-  To add a (read-only) UPM package remotely via a GitHub URL select the option "Add package from git URL…" in the Unity package manager. Paste the link to [clone the repository][repository-clone-url] into the input field that appears and press enter. The package will then be added to your project and you should be good to go! 
-    * *Requires Unity 2019.4 (LTS) or newer.*
-
-2. __UPM Local Package__  
-  To add a (read-only) UPM package locally from a cloned repository select the option "Add package from disk…" and point it at the root folder of the cloned repository on your file system.
-    * *By default this will use an absolute file path from your machine, so will not be a sharable solution without some modification.*
-
-3. __UPM Embedded Package__  
-  To add a (editable) UPM package locally from a cloned repository place it within the Packages folder of your Unity project.
-    * *This is perhaps the easiest way to work if you want o submit a pull request against the Ultraleap Unity Plugin.
-
-4. __Unity Package__  
+1. **UPM via GitHub**
+  To add a (read-only) UPM package remotely via a GitHub URL select the option "Add package from git URL…" in the Unity package manager. Paste the link to [clone the repository][repository-clone-url] into the input field that appears and press enter. The package will then be added to your project and you should be good to go!  
+    - *Requires Unity 2019.4 (LTS) or newer.*
+  
+2. **UPM Local Package**
+  To add a (read-only) UPM package locally from a cloned repository select the option "Add package from disk…" and point it at the root folder of the cloned repository on your file system.  
+    - *By default this will use an absolute file path from your machine, so will not be a sharable solution without some modification.*
+  
+3. **UPM Embedded Package**
+  To add a (editable) UPM package locally from a cloned repository place it within the Packages folder of your Unity project.  
+    - *This is perhaps the easiest way to work if you want o submit a pull request against the Ultraleap Unity Plugin.*
+  
+4. **Unity Package**
   Import the package (e.g. Assets -> Import Package -> Custom Package...) which can be downloaded from [our Unity developer site][developer-site-unity] or the [releases section][releases] of this repository.     
-    * *\*.unitypackage(s) are a deprecated solution in Unity. Do not move the location of the installed plugin as this may break certain features.*
-
-5. __Submodule__  
+    - *\*.unitypackage(s) are a deprecated solution in Unity. Do not move the location of the installed plugin as this may break certain features.*
+  
+5. **Submodule**
   You can also add this plugin as a submodule in your assets folder. 
-    * *Use this method with caution as submodules can introduce their own complexities to a project*
+    - *Use this method with caution as submodules can introduce their own complexities to a project*
 
-**Please note:** 
+**Please note:**  
 
 - Due to the ever changing landscape of package dependencies in Unity we cannot guarantee compatibility with every plugin or variant of Unity, but aim to provide support for any LTS versions that are under continuous support from Unity. 
 
@@ -69,32 +69,33 @@ The Unity Plugin repository is designed to work with Unity 2019.4 LTS or newer, 
 ### Dependencies
 
 If you are using Unity 2020.4 (LTS) or newer with XR then you will need to follow the Unity documentation on how to configure your project.
-  * [Upgrading to XR plugin Management System][upgrade-xr]
+  - [Upgrading to XR plugin Management System][upgrade-xr]
 
 If you are using any of the scriptable render pipelines (SRP) then you will need to follow the appropriate Unity documentation for upgrading shaders:
-* [Upgrading to Universal Render Pipeline (URP)][upgrade-urp] 
-* [Upgrading to High DefinitionRender Pipeline (URP)][upgrade-hdrp]
+- [Upgrading to Universal Render Pipeline (URP)][upgrade-urp] 
+- [Upgrading to High DefinitionRender Pipeline (URP)][upgrade-hdrp]
 
 ## Usage
-- ****Core****: Contains the minimum functionality required for the visualisation of 3D hands. Should help you to understand where to begin with hand tracking
+- **Core**: Contains the minimum functionality required for the visualisation of 3D hands. Should help you to understand where to begin with hand tracking
   - We include objects attached to the hand tracking data to help users understand this relationship
   - We show hand tracking working in a range of tracking orientations
   - We show you that incoming hand tracking data can be manipulated
   - We include an infrared camera feed with a 3D hand model tracking to a real hand
-  - We show how a rigged hand could be built before a user starts this aspect of the workflow so that they can understand how the rig will work once hand tracking data has been applied  
+  - We show how a rigged hand could be built before a user starts this aspect of the workflow so that they can understand how the rig will work once hand tracking data has been applied
+
 
 - ****Interaction Engine****: A collection of functions that allow for a developer to determine physics-driven interactions between hands and other objects. Used to determine the correct velocity of a hand to determine how much / far a 3D object should move
   - We include a scene that shows hand tracking working with complex shapes, allowing the user to pick up and interact with objects in the scene
   - We have an example to show how to interact with UI Elements
   - We include an example showing UI attached to the hand (as opposed to fixed in the scene)
 
-- ****Hands****: Enables developers to use hand tracking data to drive their own 3D Hand assets without writing any code, includes sample hand assets. Used to include any custom hand visuals or bind leap data to things in their scene.
+- **Hands**: Enables developers to use hand tracking data to drive their own 3D Hand assets without writing any code, includes sample hand assets. Used to include any custom hand visuals or bind leap data to things in their scene.
   - We provide different styles of 3D hands that you can use
   - We have in-depth documentation online with an explanation of each feature
   - We have included step by step guides within the Editor which teaches you how to set up hands without the need to open online documentation
-  - No programming knowledge is needed
+  - No programming knowledge is needed  
 
-- ****UI Input****: Enables developers to retrofit their existing 2D UIs so that they can be interacted with using hand tracking. Helps developers to get started with hand tracking without needing to build something from scratch
+- **UI Input**: Enables developers to retrofit their existing 2D UIs so that they can be interacted with using hand tracking. Helps developers to get started with hand tracking without needing to build something from scratch
 
 For more examples, please refer to the Documentation
 
@@ -114,8 +115,8 @@ Use of Ultraleap's Unity Plugin is subject to the Apache V2 License Agreement.
 ## Contact
 User Support: support@ultraleap.com 
 
-## Community Support: 
+## Community Support
 Our [Developer Forum][developer-forum] is a place where you are actively encouraged to share your questions, insights, ideas, feature requests and projects. 
 
-## Project Link: 
+## Links 
 [Ultraleap Unity Plugin][repository-clone-url]
