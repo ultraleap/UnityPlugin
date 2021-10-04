@@ -21,12 +21,13 @@ namespace Leap.Unity
     [ExecuteInEditMode]
     public abstract class HandModelBase : MonoBehaviour
     {
-
         public event Action OnBegin;
         public event Action OnFinish;
         /// <summary> Called directly after the HandModelBase's UpdateHand().
         /// </summary>
         public event Action OnUpdate;
+
+        private bool init = false;
 
         private bool isTracked = false;
         public bool IsTracked
@@ -78,20 +79,35 @@ namespace Leap.Unity
         [NonSerialized]
         public HandModelManager.ModelGroup group;
 
+        [Tooltip("Optionally set a Leap Provider to use for tracking frames  \n" +
+        "If you do not set one, the first provider found in the scene will be used. \n" +
+        "If no provider is found this gameobject will disable itself")]
         public LeapProvider leapProvider;
+
+        [Tooltip("Should this hand GameObject begin disabled? \n" +
+            "You can use a Hand Enable Disable component to turn on and off this gameobject when a hand is detected and lost")]
+        public bool disableOnAwake = true;
 
         private void Awake()
         {
-            this.gameObject.SetActive(false);
+            if(!Application.isPlaying)
+            {
+                return;
+            }
+
+            init = false;
+            this.gameObject.SetActive(disableOnAwake ? false : this.gameObject.activeInHierarchy);
+
             if (leapProvider == null)
             {
-
                 //Try to set the provider for the user
                 leapProvider = Hands.Provider;
 
                 if (leapProvider == null)
                 {
-                    Debug.Log("No leap provider found");
+                    Debug.LogError("No leap provider found in the scene, hand model have been disabled", this.gameObject);
+                    this.enabled = false;
+                    this.gameObject.SetActive(false);
                     return;
                 }
             }
@@ -132,12 +148,10 @@ namespace Leap.Unity
 
         void UpdateBase(Hand hand)
         {
-
             SetLeapHand(hand);
 
             if (hand == null)
             {
-
                 if (IsTracked)
                 {
                     FinishHand();
@@ -145,12 +159,16 @@ namespace Leap.Unity
             }
             else
             {
-
                 if (!IsTracked)
                 {
-                    InitHand();
+                    if (!init)
+                    {
+                        InitHand();
+                        init = true;
+                    }
+
                     BeginHand();
-                }
+                }   
 
                 if (gameObject.activeInHierarchy)
                 {
@@ -183,7 +201,8 @@ namespace Leap.Unity
                     hand = Provider.CurrentFrame.Get(Handedness);
                 }
 
-                UpdateBase(hand);
+                SetLeapHand(hand);
+                UpdateHand();
             }
         }
 #endif
