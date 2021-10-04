@@ -16,7 +16,6 @@ namespace Leap.Unity
     /// Moves the camera to each eye position on pre-render. Only necessary for image
     /// pass-through (IR viewer) scenarios.
     /// </summary>
-    [RequireComponent(typeof(LeapXRServiceProvider))]
     public class LeapEyeDislocator : MonoBehaviour
     {
 
@@ -30,46 +29,40 @@ namespace Leap.Unity
         [SerializeField]
         private bool _showEyePositions = false;
 
-        private LeapServiceProvider _provider;
+        [SerializeField] private LeapServiceProvider _provider;
         private Maybe<float> _deviceBaseline = Maybe.None;
         private bool _hasVisitedPreCull = false;
 
-        private Camera _cachedCamera;
-        private Camera _camera
-        {
-            get
-            {
-                if (_cachedCamera == null)
-                {
-                    _cachedCamera = GetComponent<Camera>();
-                }
-                return _cachedCamera;
-            }
-        }
+        [SerializeField] private Camera _camera;
 
         private void onDevice(Device device)
         {
             _deviceBaseline = Maybe.Some(device.Baseline);
         }
 
+        private void OnDestroy()
+        {
+            Camera.onPreCull -= OnCameraPreCull;
+        }
+
         private void OnEnable()
         {
-            _provider = GetComponent<LeapServiceProvider>();
             if (_provider == null)
             {
-                _provider = GetComponentInChildren<LeapServiceProvider>();
-                if (_provider == null)
-                {
-                    enabled = false;
-                    return;
-                }
+                enabled = false;
+                return;
             }
+
+            Camera.onPreCull -= OnCameraPreCull;
+            Camera.onPreCull += OnCameraPreCull;
 
             _provider.OnDeviceSafe += onDevice;
         }
 
         private void OnDisable()
         {
+            if (_camera == null) return;
+
             _camera.ResetStereoViewMatrices();
 
             _provider.OnDeviceSafe -= onDevice;
@@ -77,11 +70,13 @@ namespace Leap.Unity
 
         private void Update()
         {
+            if (_camera == null) return;
+
             _camera.ResetStereoViewMatrices();
             _hasVisitedPreCull = false;
         }
 
-        private void OnPreCull()
+        private void OnCameraPreCull(Camera cam)
         {
             if (_hasVisitedPreCull)
             {

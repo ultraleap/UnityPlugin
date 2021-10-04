@@ -6,8 +6,8 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using System;
 using UnityEngine;
+using System;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -81,16 +81,6 @@ namespace Leap.Unity
             if (!EditorApplication.isPlaying && SupportsEditorPersistence())
             {
                 LeapProvider provider = null;
-
-                //First try to get the provider from a parent HandModelManager
-                if (transform.parent != null)
-                {
-                    var manager = transform.parent.GetComponent<HandModelManager>();
-                    if (manager != null)
-                    {
-                        provider = manager.leapProvider;
-                    }
-                }
 
                 //If not found, use any old provider from the Hands.Provider getter
                 if (provider == null)
