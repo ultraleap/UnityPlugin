@@ -108,7 +108,7 @@ namespace Leap.Unity
 
         private int _tabIndex = 0;
         private static string[] _tabs = new string[] {
-      "Project Checks", "Rig Upgrader", "Preferences"
+      "Project Checks", "Preferences"
     };
         public static void ShowTab(int tabIndex)
         {
@@ -164,9 +164,6 @@ namespace Leap.Unity
                     LeapProjectChecks.DrawProjectChecksGUI();
                     break;
                 case 1:
-                    LeapRigUpgrader.DrawUpgraderGUI();
-                    break;
-                case 2:
                     float prevLabelWidth = EditorGUIUtility.labelWidth;
                     EditorGUIUtility.labelWidth = 200;
                     LeapPreferences.DrawPreferencesGUI();

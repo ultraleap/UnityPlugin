@@ -76,17 +76,11 @@ namespace Leap.Unity
             return false;
         }
 
-        [NonSerialized]
-        public HandModelManager.ModelGroup group;
-
         [Tooltip("Optionally set a Leap Provider to use for tracking frames  \n" +
         "If you do not set one, the first provider found in the scene will be used. \n" +
         "If no provider is found this gameobject will disable itself")]
         public LeapProvider leapProvider;
 
-        [Tooltip("Should this hand GameObject begin disabled? \n" +
-            "You can use a Hand Enable Disable component to turn on and off this gameobject when a hand is detected and lost")]
-        public bool disableOnAwake = true;
 
         private void Awake()
         {
@@ -96,7 +90,6 @@ namespace Leap.Unity
             }
 
             init = false;
-            this.gameObject.SetActive(disableOnAwake ? false : this.gameObject.activeInHierarchy);
 
             if (leapProvider == null)
             {

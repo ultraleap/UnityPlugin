@@ -23,7 +23,6 @@ namespace Leap.Unity.Interaction
         public override void OnInspectorGUI()
         {
             checkParentedToManager();
-            checkWithinHandModelManager();
             checkPrimaryHoverPoints();
 
             base.OnInspectorGUI();
@@ -100,39 +99,6 @@ namespace Leap.Unity.Interaction
                 EditorGUILayout.HelpBox(message, MessageType.Warning);
             }
         }
-
-        private void checkWithinHandModelManager()
-        {
-            bool plural = targets.Length > 1;
-            bool anyWithinHandPool;
-
-            HandModelManager handModelManager = FindObjectOfType<HandModelManager>();
-            if (handModelManager == null) return;
-
-            anyWithinHandPool = targets.Query()
-                                       .Any(c => c.transform.parent == handModelManager.transform);
-
-            if (anyWithinHandPool)
-            {
-                string message = "";
-                if (plural)
-                {
-                    message += "One or more of the currently selected controllers ";
-                }
-                else
-                {
-                    message += "The currently selected controller ";
-                }
-
-                message += "is inside a HandModelManager. Interaction controllers, such "
-                         + "as InteractionHands, are not HandModels and are not spawned by the "
-                         + "HandModelManager. InteractionHands and all Interaction controllers "
-                         + "should be childed to the Interaction Manager.";
-
-                EditorGUILayout.HelpBox(message, MessageType.Error);
-            }
-        }
-
     }
 
 }

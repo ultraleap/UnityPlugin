@@ -7,33 +7,20 @@
  ******************************************************************************/
 
 using Leap.Unity;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Leap.Hands.Examples
 {
     public class CycleHandPairs : MonoBehaviour
     {
-        public HandModelManager HandPool;
-        public string[] GroupNames;
+        public List<GameObject> hands;
         private int currentGroup;
-
-        public int CurrentGroup
-        {
-            get { return currentGroup; }
-            set
-            {
-                disableAllGroups();
-                currentGroup = value;
-                HandPool.EnableGroup(GroupNames[value]);
-            }
-        }
 
         // Use this for initialization
         void Start()
         {
-            HandPool = GetComponent<HandModelManager>();
-            disableAllGroups();
-            CurrentGroup = 0;
+            currentGroup = 0;
         }
 
         // Update is called once per frame
@@ -41,26 +28,25 @@ namespace Leap.Hands.Examples
         {
             if (Input.GetKeyUp(KeyCode.RightArrow))
             {
-                if (CurrentGroup < GroupNames.Length - 1)
-                {
-                    CurrentGroup++;
-                }
+                currentGroup++;
+                if (currentGroup < 0) currentGroup = hands.Count - 1;
             }
 
             if (Input.GetKeyUp(KeyCode.LeftArrow))
             {
-                if (CurrentGroup > 0)
-                {
-                    CurrentGroup--;
-                }
+                currentGroup--;
+                if (currentGroup > hands.Count - 1) currentGroup = 0;
             }
+
+            SortHands();
         }
 
-        private void disableAllGroups()
+        void SortHands()
         {
-            for (int i = 0; i < GroupNames.Length; i++)
+            for (int i = 0; i < hands.Count; i++)
             {
-                HandPool.DisableGroup(GroupNames[i]);
+                var hand = hands[i];
+                hand.gameObject.SetActive(i == currentGroup ? true : false);
             }
         }
     }
