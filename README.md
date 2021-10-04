@@ -12,7 +12,7 @@
 [releases]: https://github.com/ultraleap/UnityPlugin/releases "UnityPlugin releases"
 [developer-forum]: https://forums.leapmotion.com/ "Developer Forum"
 [repository-clone-url]: https://github.com/ultraleap/UnityPlugin.git "Clone with HTTPS"
-
+[xr-guidelines]: https://docs.ultraleap.com/xr-guidelines/ "XR Guidelines"
 
 
 
@@ -72,8 +72,10 @@ If you are using Unity 2020.4 (LTS) or newer with XR then you will need to follo
   - [Upgrading to XR plugin Management System][upgrade-xr]
 
 If you are using any of the scriptable render pipelines (SRP) then you will need to follow the appropriate Unity documentation for upgrading shaders:
+
 - [Upgrading to Universal Render Pipeline (URP)][upgrade-urp] 
-- [Upgrading to High DefinitionRender Pipeline (URP)][upgrade-hdrp]
+
+- [Upgrading to High Definition Render Pipeline (HDRP)][upgrade-hdrp]
 
 ## Usage
 - **Core**: Contains the minimum functionality required for the visualisation of 3D hands. Should help you to understand where to begin with hand tracking
@@ -97,7 +99,7 @@ If you are using any of the scriptable render pipelines (SRP) then you will need
 
 - **UI Input**: Enables developers to retrofit their existing 2D UIs so that they can be interacted with using hand tracking. Helps developers to get started with hand tracking without needing to build something from scratch
 
-For more examples, please refer to the Documentation
+Discover more about our recommended examples and the applicable use cases in our [XR Design Guidelines][xr-guidelines].
 
 ## Contributing
 
