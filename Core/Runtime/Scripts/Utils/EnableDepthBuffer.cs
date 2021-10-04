@@ -24,11 +24,9 @@ namespace Leap.Unity
 
         void Awake()
         {
-
             if (_camera == null)
             {
-                Debug.Log("Camera not assigned");
-                this.enabled = false;
+                Debug.LogError(_camera.gameObject);
                 return;
             }
 
