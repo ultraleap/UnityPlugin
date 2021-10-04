@@ -360,9 +360,15 @@ namespace Leap.Unity
             if (_deviceOffsetMode == DeviceOffsetMode.Default
                 || _deviceOffsetMode == DeviceOffsetMode.ManualHeadOffset)
             {
-                // Get most recent tracked pose from the XR subsystem.
-                trackedPose = new Pose(XRSupportUtil.GetXRNodeCenterEyeLocalPosition(),
-                                       XRSupportUtil.GetXRNodeCenterEyeLocalRotation());
+                // Some headsets may not report valid data when untracked (e.g. Oculus), fall back to using the camera position
+                if (XRSupportUtil.GetXRNodeCenterEyeLocalPosition() == Vector3.zero || _camera.transform.localPosition == Vector3.zero)
+                {
+                    trackedPose = _camera.transform.ToLocalPose();
+                }
+                else
+                {
+                    trackedPose = new Pose(XRSupportUtil.GetXRNodeCenterEyeLocalPosition(), XRSupportUtil.GetXRNodeCenterEyeLocalRotation());
+                }
 
                 // If we don't know of any pose offset yet, account for it by finding
                 // the pose delta from the tracked pose to the actual camera
