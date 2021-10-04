@@ -8,31 +8,37 @@
 
 using System.IO;
 
-namespace Leap.Unity.StringPathUtils {
+namespace Leap.Unity.StringPathUtils
+{
 
-  public static class StringPathUtilExtensions {
+    public static class StringPathUtilExtensions
+    {
 
-    /// <summary> Returns whether the argument path string actually points to
-    /// a file in the OS filesystem. </summary>
-    public static bool IsValidReadPath(this string pathString) {
-      return File.Exists(pathString);
-    }
-
-    /// <summary> Returns whether the argument path string is a path that can
-    /// be written to. Warning, `true` will be returned even if writing would
-    /// overwrite an existing file at that path. </summary>
-    public static bool IsValidWritePath(this string pathString) {
-      if (File.Exists(pathString)) { return true; }
-      else {
-        try {
-          File.Create(pathString);
-          File.Delete(pathString);
-          return true;
+        /// <summary> Returns whether the argument path string actually points to
+        /// a file in the OS filesystem. </summary>
+        public static bool IsValidReadPath(this string pathString)
+        {
+            return File.Exists(pathString);
         }
-        catch (System.Exception) { return false; }
-      }
-    }
 
-  }
+        /// <summary> Returns whether the argument path string is a path that can
+        /// be written to. Warning, `true` will be returned even if writing would
+        /// overwrite an existing file at that path. </summary>
+        public static bool IsValidWritePath(this string pathString)
+        {
+            if (File.Exists(pathString)) { return true; }
+            else
+            {
+                try
+                {
+                    File.Create(pathString);
+                    File.Delete(pathString);
+                    return true;
+                }
+                catch (System.Exception) { return false; }
+            }
+        }
+
+    }
 
 }

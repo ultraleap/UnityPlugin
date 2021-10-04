@@ -6,12 +6,14 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-namespace Leap {
+namespace Leap
+{
 
-  public struct PointMapping {
-    public long frameId;
-    public long timestamp;
-    public Vector[] points;
-    public uint[] ids;
-  }
+    public struct PointMapping
+    {
+        public long frameId;
+        public long timestamp;
+        public Vector[] points;
+        public uint[] ids;
+    }
 }

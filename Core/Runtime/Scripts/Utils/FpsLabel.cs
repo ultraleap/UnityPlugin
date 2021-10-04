@@ -8,51 +8,61 @@
 
 using UnityEngine;
 
-namespace Leap.Unity {
-  public class FpsLabel : MonoBehaviour {
+namespace Leap.Unity
+{
+    public class FpsLabel : MonoBehaviour
+    {
 
-    [SerializeField]
-    private LeapProvider _provider;
+        [SerializeField]
+        private LeapProvider _provider;
 
-    [SerializeField]
-    private TextMesh _frameRateText;
+        [SerializeField]
+        private TextMesh _frameRateText;
 
-    private SmoothedFloat _smoothedRenderFps = new SmoothedFloat();
+        private SmoothedFloat _smoothedRenderFps = new SmoothedFloat();
 
-    private void OnEnable() {
-      if (_provider == null) {
-        _provider = Hands.Provider;
-      }
+        private void OnEnable()
+        {
+            if (_provider == null)
+            {
+                _provider = Hands.Provider;
+            }
 
-      if (_frameRateText == null) {
-        _frameRateText = GetComponentInChildren<TextMesh>();
-        if (_frameRateText == null) {
-          Debug.LogError("Could not enable FpsLabel because no TextMesh was specified!");
-          enabled = false;
+            if (_frameRateText == null)
+            {
+                _frameRateText = GetComponentInChildren<TextMesh>();
+                if (_frameRateText == null)
+                {
+                    Debug.LogError("Could not enable FpsLabel because no TextMesh was specified!");
+                    enabled = false;
+                }
+            }
+
+            _smoothedRenderFps.delay = 0.3f;
+            _smoothedRenderFps.reset = true;
         }
-      }
 
-      _smoothedRenderFps.delay = 0.3f;
-      _smoothedRenderFps.reset = true;
-    }
+        private void Update()
+        {
+            _frameRateText.text = "";
 
-    private void Update() {
-      _frameRateText.text = "";
+            if (_provider != null)
+            {
+                Frame frame = _provider.CurrentFrame;
 
-      if (_provider != null) {
-        Frame frame = _provider.CurrentFrame;
+                if (frame != null)
+                {
+                    _frameRateText.text += "Data FPS:" + _provider.CurrentFrame.CurrentFramesPerSecond.ToString("f2");
+                    _frameRateText.text += System.Environment.NewLine;
+                }
+            }
 
-        if (frame != null) {
-          _frameRateText.text += "Data FPS:" + _provider.CurrentFrame.CurrentFramesPerSecond.ToString("f2");
-          _frameRateText.text += System.Environment.NewLine;
+            if (Time.smoothDeltaTime > Mathf.Epsilon)
+            {
+                _smoothedRenderFps.Update(1.0f / Time.smoothDeltaTime, Time.deltaTime);
+            }
+
+            _frameRateText.text += "Render FPS:" + Mathf.RoundToInt(_smoothedRenderFps.value).ToString("f2");
         }
-      }
-
-      if (Time.smoothDeltaTime > Mathf.Epsilon) {
-        _smoothedRenderFps.Update(1.0f / Time.smoothDeltaTime, Time.deltaTime);
-      }
-
-      _frameRateText.text += "Render FPS:" + Mathf.RoundToInt(_smoothedRenderFps.value).ToString("f2");
     }
-  }
 }

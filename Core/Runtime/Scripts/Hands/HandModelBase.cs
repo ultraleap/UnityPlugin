@@ -13,12 +13,14 @@ using UnityEditor;
 #endif
 
 /** HandModelBase defines abstract methods as a template for building Leap hand models*/
-namespace Leap.Unity {
+namespace Leap.Unity
+{
     public enum Chirality { Left, Right };
     public enum ModelType { Graphics, Physics };
 
     [ExecuteInEditMode]
-    public abstract class HandModelBase : MonoBehaviour {
+    public abstract class HandModelBase : MonoBehaviour
+    {
 
         public event Action OnBegin;
         public event Action OnFinish;
@@ -27,7 +29,8 @@ namespace Leap.Unity {
         public event Action OnUpdate;
 
         private bool isTracked = false;
-        public bool IsTracked {
+        public bool IsTracked
+        {
             get { return isTracked; }
         }
 
@@ -35,21 +38,27 @@ namespace Leap.Unity {
         public abstract ModelType HandModelType { get; }
         public virtual void InitHand() { }
 
-        public virtual void BeginHand() {
-            if(OnBegin != null) {
+        public virtual void BeginHand()
+        {
+            if (OnBegin != null)
+            {
                 OnBegin();
             }
             isTracked = true;
         }
         public abstract void UpdateHand();
-        public void UpdateHandWithEvent() {
+        public void UpdateHandWithEvent()
+        {
             UpdateHand();
-            if(OnUpdate != null) { 
-                OnUpdate(); 
+            if (OnUpdate != null)
+            {
+                OnUpdate();
             }
         }
-        public virtual void FinishHand() {
-            if(OnFinish != null) {
+        public virtual void FinishHand()
+        {
+            if (OnFinish != null)
+            {
                 OnFinish();
             }
             isTracked = false;
@@ -61,7 +70,8 @@ namespace Leap.Unity {
         /// Returns whether or not this hand model supports editor persistence.  This is false by default and must be
         /// opt-in by a developer making their own hand model script if they want editor persistence.
         /// </summary>
-        public virtual bool SupportsEditorPersistence() {
+        public virtual bool SupportsEditorPersistence()
+        {
             return false;
         }
 
@@ -108,28 +118,33 @@ namespace Leap.Unity {
             leapProvider.OnFixedFrame -= FixedUpdateFrame;
         }
 
-        void UpdateFrame(Frame frame) {
+        void UpdateFrame(Frame frame)
+        {
             var hand = frame.Get(Handedness);
             UpdateBase(hand);
         }
 
-        void FixedUpdateFrame(Frame frame) {
+        void FixedUpdateFrame(Frame frame)
+        {
             var hand = frame.Get(Handedness);
             UpdateBase(hand);
         }
 
-        void UpdateBase(Hand hand) {
+        void UpdateBase(Hand hand)
+        {
 
             SetLeapHand(hand);
 
-            if (hand == null) {
+            if (hand == null)
+            {
 
-                if(IsTracked)
+                if (IsTracked)
                 {
                     FinishHand();
                 }
             }
-            else {
+            else
+            {
 
                 if (!IsTracked)
                 {
@@ -137,7 +152,7 @@ namespace Leap.Unity {
                     BeginHand();
                 }
 
-                if(gameObject.activeInHierarchy)
+                if (gameObject.activeInHierarchy)
                 {
                     UpdateHand();
                 }
@@ -161,7 +176,7 @@ namespace Leap.Unity {
                     {
                         hand = TestHandFactory.MakeTestHand(Handedness == Chirality.Left, unitType: TestHandFactory.UnitType.LeapUnits);
                         hand.Transform(transform.GetLeapMatrix());
-                    }   
+                    }
                 }
                 else
                 {

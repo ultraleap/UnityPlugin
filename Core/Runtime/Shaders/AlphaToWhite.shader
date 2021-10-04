@@ -2,11 +2,11 @@
 {
 	Properties
 	{
-		_MainTex ("Texture", 2D) = "white" {}
+		_MainTex("Texture", 2D) = "white" {}
 	}
-	SubShader
+		SubShader
 	{
-		Tags { "RenderType"="Opaque" }
+		Tags { "RenderType" = "Opaque" }
 		LOD 100
 
 		Pass
@@ -16,7 +16,7 @@
 			#pragma fragment frag
 			// make fog work
 			#pragma multi_compile_fog
-			
+
 			#include "UnityCG.cginc"
 
 			struct appdata
@@ -34,8 +34,8 @@
 
 			sampler2D _MainTex;
 			float4 _MainTex_ST;
-			
-			v2f vert (appdata v)
+
+			v2f vert(appdata v)
 			{
 				v2f o;
 				o.vertex = UnityObjectToClipPos(v.vertex);
@@ -43,11 +43,11 @@
 				UNITY_TRANSFER_FOG(o,o.vertex);
 				return o;
 			}
-			
-			fixed4 frag (v2f i) : SV_Target
+
+			fixed4 frag(v2f i) : SV_Target
 			{
 				// sample the texture
-        fixed alpha = tex2D(_MainTex, i.uv).a;
+		fixed alpha = tex2D(_MainTex, i.uv).a;
 				fixed4 col = fixed4(alpha, alpha, alpha, 1.0);
 				// apply fog
 				UNITY_APPLY_FOG(i.fogCoord, col);

@@ -11,29 +11,33 @@ using UnityEngine;
 using UnityEditor;
 #endif
 
-namespace Leap.Unity {
+namespace Leap.Unity
+{
 
-  public class Comment : MonoBehaviour {
+    public class Comment : MonoBehaviour
+    {
 
-    [TextArea]
-    [SerializeField]
-    protected string _comment;
-    public string text {
-      get { return _comment; }
-      set { _comment = value; }
-    }
+        [TextArea]
+        [SerializeField]
+        protected string _comment;
+        public string text
+        {
+            get { return _comment; }
+            set { _comment = value; }
+        }
 
-    [SerializeField, HideInInspector]
-    protected bool _isEditing = true;
+        [SerializeField, HideInInspector]
+        protected bool _isEditing = true;
 
 #if UNITY_EDITOR
-    [ContextMenu("Edit")]
-    private void beginEditing() {
-      Undo.RecordObject(this, "Enabled editing");
-      EditorUtility.SetDirty(this);
-      _isEditing = true;
-    }
+        [ContextMenu("Edit")]
+        private void beginEditing()
+        {
+            Undo.RecordObject(this, "Enabled editing");
+            EditorUtility.SetDirty(this);
+            _isEditing = true;
+        }
 #endif
 
-  }
+    }
 }

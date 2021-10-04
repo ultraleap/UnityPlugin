@@ -1,104 +1,104 @@
 ﻿Shader "Hidden/Runtime Gizmos" {
-  Properties {
-    _Color ("Color", Color) = (1,1,1,1)
-  }
+	Properties{
+	  _Color("Color", Color) = (1,1,1,1)
+	}
 
-  CGINCLUDE
-    #include "UnityCG.cginc"
+		CGINCLUDE
+#include "UnityCG.cginc"
 
-    struct appdata_unlit {
-      float4 vertex : POSITION;
-      float3 normal : NORMAL;
-    };
+		struct appdata_unlit {
+		float4 vertex : POSITION;
+		float3 normal : NORMAL;
+	};
 
-    struct appdata_shaded {
-      float4 vertex : POSITION;
-      float3 normal : NORMAL;
-    };
+	struct appdata_shaded {
+		float4 vertex : POSITION;
+		float3 normal : NORMAL;
+	};
 
-    struct v2f_unlit {
-      float4 vertex : SV_POSITION;
-    };
+	struct v2f_unlit {
+		float4 vertex : SV_POSITION;
+	};
 
-    struct v2f_shaded {
-      float4 vertex : SV_POSITION;
-      float fresnelValue : TEXCOORD0;
-    };
-      
-    v2f_shaded vert_shaded (appdata_shaded v) {
-      v2f_shaded o;
-      o.vertex = UnityObjectToClipPos(v.vertex);
-      float3 viewDir = normalize(ObjSpaceViewDir(v.vertex));
-      o.fresnelValue = lerp(0.39, 0.66, saturate(dot(v.normal, viewDir)));
-      return o;
-    }
+	struct v2f_shaded {
+		float4 vertex : SV_POSITION;
+		float fresnelValue : TEXCOORD0;
+	};
 
-    v2f_unlit vert_unlit (appdata_unlit v) {
-      v2f_unlit o;
-      o.vertex = UnityObjectToClipPos(v.vertex);
-      return o;
-    }
+	v2f_shaded vert_shaded(appdata_shaded v) {
+		v2f_shaded o;
+		o.vertex = UnityObjectToClipPos(v.vertex);
+		float3 viewDir = normalize(ObjSpaceViewDir(v.vertex));
+		o.fresnelValue = lerp(0.39, 0.66, saturate(dot(v.normal, viewDir)));
+		return o;
+	}
 
-    fixed4 _Color;
-      
-    fixed4 frag_shaded (v2f_shaded i) : SV_Target {
-      return _Color * i.fresnelValue;
-    }
+	v2f_unlit vert_unlit(appdata_unlit v) {
+		v2f_unlit o;
+		o.vertex = UnityObjectToClipPos(v.vertex);
+		return o;
+	}
 
-    fixed4 frag_unlit(v2f_unlit i) : SV_Target{
-      return _Color;
-    }
+	fixed4 _Color;
 
-  ENDCG
+	fixed4 frag_shaded(v2f_shaded i) : SV_Target{
+	  return _Color * i.fresnelValue;
+	}
 
-  SubShader {
+		fixed4 frag_unlit(v2f_unlit i) : SV_Target{
+		  return _Color;
+	}
 
-    //Pass 0 : Unlit solid
-    Pass {
-      Blend One Zero
-      ZWrite On
-      ZTest On
+		ENDCG
 
-      CGPROGRAM
-      #pragma vertex vert_unlit
-      #pragma fragment frag_unlit
-      ENDCG
-    }
+		SubShader {
 
-    //Pass 1 : Unlit transparent
-    Pass {
-      Blend SrcAlpha OneMinusSrcAlpha
-      ZWrite Off
-      ZTest On
+		//Pass 0 : Unlit solid
+		Pass{
+		  Blend One Zero
+		  ZWrite On
+		  ZTest On
 
-      CGPROGRAM
-      #pragma vertex vert_unlit
-      #pragma fragment frag_unlit
-      ENDCG
-    }
+		  CGPROGRAM
+		  #pragma vertex vert_unlit
+		  #pragma fragment frag_unlit
+		  ENDCG
+		}
 
-    //Pass 2 : Shaded solid
-    Pass {
-      Blend One Zero
-      ZWrite On
-      ZTest On
+			//Pass 1 : Unlit transparent
+			Pass{
+			  Blend SrcAlpha OneMinusSrcAlpha
+			  ZWrite Off
+			  ZTest On
 
-      CGPROGRAM
-      #pragma vertex vert_shaded
-      #pragma fragment frag_shaded
-      ENDCG
-    }
+			  CGPROGRAM
+			  #pragma vertex vert_unlit
+			  #pragma fragment frag_unlit
+			  ENDCG
+		}
 
-    //Pass 3 : Shaded transparent
-    Pass {
-      Blend SrcAlpha OneMinusSrcAlpha
-      ZWrite Off
-      ZTest On
+			//Pass 2 : Shaded solid
+			Pass{
+			  Blend One Zero
+			  ZWrite On
+			  ZTest On
 
-      CGPROGRAM
-      #pragma vertex vert_shaded
-      #pragma fragment frag_shaded
-      ENDCG
-    }
-  }
+			  CGPROGRAM
+			  #pragma vertex vert_shaded
+			  #pragma fragment frag_shaded
+			  ENDCG
+		}
+
+			//Pass 3 : Shaded transparent
+			Pass{
+			  Blend SrcAlpha OneMinusSrcAlpha
+			  ZWrite Off
+			  ZTest On
+
+			  CGPROGRAM
+			  #pragma vertex vert_shaded
+			  #pragma fragment frag_shaded
+			  ENDCG
+		}
+	}
 }
