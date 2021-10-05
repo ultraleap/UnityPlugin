@@ -148,7 +148,6 @@ namespace Leap.Unity
 
         public override void UpdateHand()
         {
-
             _curSphereIndex = 0;
             _curCylinderIndex = 0;
 
