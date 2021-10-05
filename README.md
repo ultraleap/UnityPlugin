@@ -117,7 +117,7 @@ If you are using any of the scriptable render pipelines (SRP) then you will need
  
 #### Interaction Engine 
 
-  A collection of functions that allow you to determine physics-driven interactions between hands and other objects. Used to determine the correct velocity of a hand to determine how much / far a 3D object should move
+  The Interaction Engine provides physics representations of hands and VR controllers fine-tuned with interaction heuristics to provide a fully-featured interaction API: grasping, throwing, stable 'soft' collision feedback, and proximity. It also comes with with a suite of examples and prefabs to power reliable, stable 3D user interfaces as well as any physics-critical experiences.
 
   - We include a scene that shows hand tracking working with complex shapes, allowing the user to pick up and interact with objects in the scene
   - We have an example to show how to interact with UI Elements
