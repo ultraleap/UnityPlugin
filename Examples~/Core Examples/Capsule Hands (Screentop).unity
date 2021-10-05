@@ -497,7 +497,7 @@ PrefabInstance:
     - target: {fileID: 5336407799547206893, guid: a4f31c9f6421beb42a81b0031924ff15,
         type: 3}
       propertyPath: m_Name
-      value: HandModels (1)
+      value: HandModels
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a4f31c9f6421beb42a81b0031924ff15, type: 3}
