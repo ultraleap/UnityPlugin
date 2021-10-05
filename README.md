@@ -26,11 +26,11 @@
       - Prerequisites
       - Installation
       - Dependencies
-3. Usage
-4. Contributing
-5. License
-7. Community Support
-8. Links
+3. Usage     
+      - Contributing
+      - License
+4. Community Support
+5. Links
    
 </details>
 
@@ -54,7 +54,6 @@ To use this Plugin you will need the following:
 ### Installation
 
 The Unity Plugin repository is designed to work with Unity 2019.4 LTS or newer, as a result there are several ways you can consume this plugin 
-
 
 #### Option 1: UPM via GitHub
 <details><summary>Click to expand</summary>
@@ -147,7 +146,7 @@ Enables developers to retrofit their existing 2D UIs so that they can be interac
 
 ****Discover more about our recommended examples and the applicable use cases in our [XR Design Guidelines][xr-guidelines]****.
 
-## Contributing
+### Contributing
 
 Our vision is to make it as easy as possible to design the best user experience for hand tracking use cases in VR. We learn and are inspired by the creations from our open source community - any contributions you make are greatly appreciated.
 
@@ -157,7 +156,7 @@ Our vision is to make it as easy as possible to design the best user experience 
 4. Push to the Branch (git push origin feature/AmazingFeature)
 5. Open a Pull Request
 
-## License
+### License
 Use of Ultraleap's Unity Plugin is subject to the [Apache V2 License Agreement][apache].
 
 ## Contact
