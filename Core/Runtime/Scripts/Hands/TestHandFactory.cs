@@ -123,7 +123,7 @@ namespace Leap
             HeadMountedA,
             HeadMountedB,
             DesktopModeA,
-            ScreenTop
+            Screentop
         }
 
         public static LeapTransform GetTestPoseLeftHandTransform(TestHandPose pose)
@@ -145,7 +145,7 @@ namespace Leap
                                           .Multiply(angleAxis(180f * Constants.DEG_TO_RAD, Vector.Up));
                     transform.translation = new Vector(120f, 0f, -170f);
                     break;
-                case TestHandPose.ScreenTop:
+                case TestHandPose.Screentop:
                     transform.rotation = angleAxis(0 * Constants.DEG_TO_RAD, Vector.Forward)
                                           .Multiply(angleAxis(140 * Constants.DEG_TO_RAD, Vector.Right))
                                           .Multiply(angleAxis(0 * Constants.DEG_TO_RAD, Vector.Up));

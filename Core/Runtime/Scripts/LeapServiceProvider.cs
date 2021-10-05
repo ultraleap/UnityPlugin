@@ -97,7 +97,7 @@ namespace Leap.Unity
         public enum TrackingOptimizationMode
         {
             Desktop,
-            ScreenTop,
+            Screentop,
             HMD
         }
         [Tooltip("[Service must be >= 4.9.2!] " +
@@ -558,7 +558,7 @@ namespace Leap.Unity
                 _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP);
                 _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
             }
-            else if (_trackingOptimization == TrackingOptimizationMode.ScreenTop)
+            else if (_trackingOptimization == TrackingOptimizationMode.Screentop)
             {
                 _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_DEFAULT);
                 _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
