@@ -107,7 +107,7 @@ If you are using any of the scriptable render pipelines (SRP) then you will need
 
 #### Core 
 
-  Contains the minimum functionality required for the visualisation of 3D hands. Should help you to understand where to begin with hand tracking
+  Contains the minimum functionality required for the visualisation of 3D hands - it should help you to understand where to begin with hand tracking.
 
   - We include objects attached to the hand tracking data to help users understand this relationship
   - We show hand tracking working in a range of tracking orientations
