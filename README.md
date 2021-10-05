@@ -115,7 +115,6 @@ If you are using any of the scriptable render pipelines (SRP) then you will need
   - We show hand tracking working in a range of tracking orientations
   - We show you that incoming hand tracking data can be manipulated
   - We include an infrared camera feed with a 3D hand model tracking to a real hand
-  - We show how a rigged hand could be built before a user starts this aspect of the workflow so that they can understand how the rig will work once hand tracking data has been applied
 
  
 #### Interaction Engine 
