@@ -19,6 +19,21 @@
 <!--content-->
 # Ultraleap Unity Plugin
 
+<details><summary> Table of Contents </summary>
+
+1. Introduction
+2. Getting Started
+      - Prerequisites
+      - Installation
+      - Dependencies
+3. Usage
+4. Contributing
+5. License
+7. Community Support
+8. Links
+   
+</details>
+
 ## Introduction
 
 Ultraleap's Unity Plugin enables the data produced by Ultraleap tracking hardware to be used by developers inside their Unity projects. It includes various utilities, examples and prefabs that make it as easy as possible to design and use hand tracking in XR projects
