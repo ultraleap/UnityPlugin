@@ -6,9 +6,9 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using UnityEngine;
-using System;
 using Leap.Unity.Attributes;
+using System;
+using UnityEngine;
 #if UNITY_2019_1_OR_NEWER
 using UnityEngine.Rendering;
 #endif

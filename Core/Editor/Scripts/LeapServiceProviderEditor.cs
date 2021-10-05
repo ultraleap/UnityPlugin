@@ -326,5 +326,3 @@ namespace Leap.Unity
         }
     }
 }
-
-

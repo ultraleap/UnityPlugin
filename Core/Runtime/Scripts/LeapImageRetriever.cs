@@ -6,11 +6,11 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using UnityEngine;
-using UnityEngine.Serialization;
+using Leap.Unity.Query;
 using System;
 using System.Collections;
-using Leap.Unity.Query;
+using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Leap.Unity
 {
