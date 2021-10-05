@@ -14,13 +14,13 @@ namespace Leap.Hands.Examples
 {
     public class CycleHandPairs : MonoBehaviour
     {
-        public List<GameObject> hands;
-        private int currentGroup;
+        public List<GameObject> handList;
+        private int currentHandID;
 
         // Use this for initialization
         void Start()
         {
-            currentGroup = 0;
+            currentHandID = 0;
         }
 
         // Update is called once per frame
@@ -28,14 +28,14 @@ namespace Leap.Hands.Examples
         {
             if (Input.GetKeyUp(KeyCode.RightArrow))
             {
-                currentGroup++;
-                if (currentGroup < 0) currentGroup = hands.Count - 1;
+                currentHandID++;
+                if (currentHandID < 0) currentHandID = handList.Count - 1;
             }
 
             if (Input.GetKeyUp(KeyCode.LeftArrow))
             {
-                currentGroup--;
-                if (currentGroup > hands.Count - 1) currentGroup = 0;
+                currentHandID--;
+                if (currentHandID > handList.Count - 1) currentHandID = 0;
             }
 
             SortHands();
@@ -43,10 +43,10 @@ namespace Leap.Hands.Examples
 
         void SortHands()
         {
-            for (int i = 0; i < hands.Count; i++)
+            for (int i = 0; i < handList.Count; i++)
             {
-                var hand = hands[i];
-                hand.gameObject.SetActive(i == currentGroup ? true : false);
+                var hand = handList[i];
+                hand.gameObject.SetActive(i == currentHandID ? true : false);
             }
         }
     }

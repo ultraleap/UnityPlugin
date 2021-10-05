@@ -7,15 +7,11 @@
  ******************************************************************************/
 
 using UnityEngine;
-using System.Collections;
-using System;
-using Leap;
 
 namespace Leap.Unity
 {
     public class HandEnableDisable : HandTransitionBehavior
     {
-
         protected override void Awake()
         {
             // Suppress Warnings Related to Kinematic Rigidbodies not supporting Continuous Collision Detection

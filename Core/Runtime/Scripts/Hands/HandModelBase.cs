@@ -6,11 +6,8 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using UnityEngine;
 using System;
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
+using UnityEngine;
 
 /** HandModelBase defines abstract methods as a template for building Leap hand models*/
 namespace Leap.Unity
@@ -98,7 +95,7 @@ namespace Leap.Unity
 
                 if (leapProvider == null)
                 {
-                    Debug.LogError("No leap provider found in the scene, hand model have been disabled", this.gameObject);
+                    Debug.LogError("No leap provider found in the scene, hand model has been disabled", this.gameObject);
                     this.enabled = false;
                     this.gameObject.SetActive(false);
                     return;
