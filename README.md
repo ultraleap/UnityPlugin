@@ -42,7 +42,7 @@ This repository hosts the complete Ultraleap Unity Plugin and Ultraleap Tracking
 
 ## Getting Started
 
-This repository contains code for Ultraleap's Unity Plugin 5.0 which has been designed to be an easy-to-use tool for integrating Ultraleap cameras into new Unity projects. However, there are a couple of things you will need to be able to test the content you have created, and there are also several ways you can go about installing Ultraleap’s Unity Plugin 
+This repository contains code for Ultraleap's Unity Plugin which has been designed to be an easy-to-use tool for integrating Ultraleap cameras into new Unity projects. However, there are a couple of things you will need to be able to test the content you have created, and there are also several ways you can go about installing Ultraleap’s Unity Plugin 
 
 ### Prerequisites
 
@@ -149,7 +149,7 @@ Enables developers to retrofit their existing 2D UIs so that they can be interac
 
 ## Contributing
 
-Our vision is to make it as easy as possible to design the best user experience for hand tracking use cases in VR. Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are greatly appreciated.
+Our vision is to make it as easy as possible to design the best user experience for hand tracking use cases in VR. We learn and are inspired by the creations from our open source community - any contributions you make are greatly appreciated.
 
 1. Fork the Project
 2. Create your Feature Branch (git checkout -b feature/AmazingFeature)
