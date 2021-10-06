@@ -19,24 +19,6 @@
 <!--content-->
 # Ultraleap Unity Plugin
 
-<!--
-<details>
-<summary> Table of Contents </summary>
-
-1. Introduction
-2. Getting Started
-      - Prerequisites
-      - Installation
-      - Dependencies
-3. Usage     
-      - Contributing
-      - License
-4. Community Support
-5. Links
-   
-</details>
--->
-
 ## Introduction
 
 Ultraleap's Unity Plugin enables the data produced by integrating Ultraleap's hand tracking data to be used by developers inside their Unity projects. It includes various utilities, examples and prefabs that make it as easy as possible to design and use hand tracking in XR projects. Examples are included to quickly get you up and running with Ultraleap's hand tracking technology.
@@ -95,7 +77,6 @@ There are several ways you can consume this plugin.
 
 </details>
 
-  
 <details>
 <summary> Option 5: Submodule </summary>
 
