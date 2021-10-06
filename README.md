@@ -14,6 +14,8 @@
 [repository-clone-url]: https://github.com/ultraleap/UnityPlugin.git "Clone with HTTPS"
 [xr-guidelines]: https://docs.ultraleap.com/xr-guidelines/ "XR Guidelines"
 
+[xr-legacy-input-helpers-documentation]: http://docs.unity3d.com/Packages/com.unity.xr.legacyinputhelpers@2.1/manual/index.html "XR Legacy Input Helpers"
+[oculus-xr-documentation]: http://docs.unity3d.com/Packages/com.unity.xr.oculus@1.4/manual/index.html "Oculus XR package"
 
 
 <!--content-->
@@ -95,8 +97,15 @@ If you are using Unity 2020.4 (LTS) or newer with XR then you will need to follo
   - [Upgrading to XR plugin Management System][upgrade-xr]
   
 If you are using any of the scriptable render pipelines (SRP) then you will need to follow the appropriate Unity documentation for upgrading shaders:
-- [Upgrading to Universal Render Pipeline (URP)][upgrade-urp] 
-- [Upgrading to High Definition Render Pipeline (HDRP)][upgrade-hdrp]
+  - [Upgrading to Universal Render Pipeline (URP)][upgrade-urp] 
+  - [Upgrading to High Definition Render Pipeline (HDRP)][upgrade-hdrp]
+
+If you are using Unity 2019.4 (LTS) and you get errors related to "SpatialTracking" upon importing, you will need to install the following package:
+  - [XR Legacy Input Helpers][xr-legacy-input-helpers-documentation].
+
+If you are using Unity 2020.1 or newer and you get errors related to "SpatialTracking" upon importing, you will need to install the following package:
+  - [Oculus XR package][oculus-xr-documentation].
+
 
 ## Usage
 
