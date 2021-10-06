@@ -126,6 +126,12 @@ namespace Leap.Unity
 
         void UpdateFrame(Frame frame)
         {
+            if (this == null)
+            {
+                leapProvider.OnUpdateFrame -= UpdateFrame;
+                return;
+            }
+
             var hand = frame.Get(Handedness);
             UpdateBase(hand);
         }
