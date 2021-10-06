@@ -52,11 +52,12 @@ To use this Plugin you will need the following:
 1. The latest Ultraleap Tracking Service installed
 2. An Ultraleap compatible device 
 3. Unity 2019.4 LTS or newer
-  - This module has been tested to work in Unity 2019.4 LTS
 
 ### Installation
 
-The Unity Plugin repository is designed to work with Unity 2019.4 LTS or newer, as a result there are several ways you can consume this plugin 
+The Unity Plugin repository is designed and tested to work against 2019.4 LTS and 2020.3 LTS. 
+
+There are several ways you can consume this plugin.
 
 <details>
 <summary> Option 1: UPM via GitHub </summary>
@@ -93,12 +94,13 @@ The Unity Plugin repository is designed to work with Unity 2019.4 LTS or newer, 
   - *\*.unitypackage(s) are a deprecated solution in Unity. Do not move the location of the installed plugin as this may break certain features.*
 
 </details>
+
   
 <details>
 <summary> Option 5: Submodule </summary>
 
   - You can also add this plugin as a submodule in your assets folder. 
-  - *Use this method with caution as submodules can introduce their own complexities to a project*
+  - *We do not recommend this approach. Use this method with caution as submodules can introduce their own complexities to a project*
 
 </details>
 
