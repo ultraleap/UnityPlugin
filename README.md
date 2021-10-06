@@ -19,7 +19,9 @@
 <!--content-->
 # Ultraleap Unity Plugin
 
-<details><summary> Table of Contents </summary>
+<!--
+<details>
+<summary> Table of Contents </summary>
 
 1. Introduction
 2. Getting Started
@@ -33,6 +35,7 @@
 5. Links
    
 </details>
+-->
 
 ## Introduction
 
@@ -48,12 +51,15 @@ To use this Plugin you will need the following:
 
 1. The latest Ultraleap Tracking Service installed
 2. An Ultraleap compatible device 
+3. Unity 2019.4 LTS or newer
+  - This module has been tested to work in Unity 2019.4 LTS
 
 ### Installation
 
 The Unity Plugin repository is designed to work with Unity 2019.4 LTS or newer, as a result there are several ways you can consume this plugin 
 
-<details><summary> Option 1: UPM via GitHub </summary>
+<details>
+<summary> Option 1: UPM via GitHub </summary>
 
   - To add a (read-only) UPM package remotely via a GitHub URL select the option "Add package from git URL…" in the Unity package manager. 
   - Paste the link to [clone the repository][repository-clone-url] into the input field that appears and press enter. 
@@ -62,28 +68,34 @@ The Unity Plugin repository is designed to work with Unity 2019.4 LTS or newer, 
 
 </details>
 
-<details><summary> Option 2: UPM Local Package </summary>
+<details>
+<summary> Option 2: UPM Local Package </summary>
 
-  - To add a (read-only) UPM package locally from a cloned repository select the option "Add package from disk…" and point it at the root folder of the cloned repository on your file system.  
+  - To add a (read-only) UPM package locally from a cloned repository select the option "Add package from disk…" and point it at the root folder of the cloned repository on your file system.
   - *By default this will use an absolute file path from your machine, so will not be a sharable solution without some modification.*
+  - *Requires Unity 2019.4 (LTS) or newer.*
 
 </details> 
 
-<details><summary> Option 3: UPM Embedded Package </summary>
+<details>
+<summary> Option 3: UPM Embedded Package </summary>
 
-  -  To add a (editable) UPM package locally from a cloned repository place it within the Packages folder of your Unity project.  
+  -  To add an (editable) UPM package locally from a cloned repository place it within the Packages folder of your Unity project.  
   - *This is perhaps the easiest way to work if you want o submit a pull request against the Ultraleap Unity Plugin.*
+  - *Requires Unity 2019.4 (LTS) or newer.*
 
 </details>
   
-<details><summary> Option 4: Unity Package </summary>
+<details>
+<summary> Option 4: Unity Package (*.unitypackage) </summary>
 
   - Import the package (e.g. Assets -> Import Package -> Custom Package...) which can be downloaded from [our Unity developer site][developer-site-unity] or the [releases section][releases] of this repository.     
   - *\*.unitypackage(s) are a deprecated solution in Unity. Do not move the location of the installed plugin as this may break certain features.*
 
 </details>
   
-<details><summary> Option 5: Submodule </summary>
+<details>
+<summary> Option 5: Submodule </summary>
 
   - You can also add this plugin as a submodule in your assets folder. 
   - *Use this method with caution as submodules can introduce their own complexities to a project*
@@ -143,9 +155,12 @@ Enables developers to retrofit their existing 2D UIs so that they can be interac
 Our vision is to make it as easy as possible to design the best user experience for hand tracking use cases in VR. We learn and are inspired by the creations from our open source community - any contributions you make are greatly appreciated.
 
 1. Fork the Project
-2. Create your Feature Branch (git checkout -b feature/AmazingFeature)
-3. Commit your Changes (git commit -m 'Add some AmazingFeature')
-4. Push to the Branch (git push origin feature/AmazingFeature)
+2. Create your Feature Branch:  
+```git checkout -b feature/AmazingFeature```
+3. Commit your Changes:  
+```git commit -m "Add some AmazingFeature"```
+4. Push to the Branch:   
+```git push origin feature/AmazingFeature```
 5. Open a Pull Request
 
 ### License
