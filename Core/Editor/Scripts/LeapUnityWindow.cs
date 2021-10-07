@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2020.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2021.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -108,7 +108,7 @@ namespace Leap.Unity
 
         private int _tabIndex = 0;
         private static string[] _tabs = new string[] {
-      "Project Checks", "Rig Upgrader", "Preferences"
+      "Project Checks", "Preferences"
     };
         public static void ShowTab(int tabIndex)
         {
@@ -164,9 +164,6 @@ namespace Leap.Unity
                     LeapProjectChecks.DrawProjectChecksGUI();
                     break;
                 case 1:
-                    LeapRigUpgrader.DrawUpgraderGUI();
-                    break;
-                case 2:
                     float prevLabelWidth = EditorGUIUtility.labelWidth;
                     EditorGUIUtility.labelWidth = 200;
                     LeapPreferences.DrawPreferencesGUI();

@@ -1,3 +1,13 @@
+* text=auto
+*.* text eol=lf
+
+*.dll binary
+*.so binary
+*.aar binary
+*.png binary
+*.exr binary
+*.asset binary
+*.fbx binary
 *.so filter=lfs diff=lfs merge=lfs -text
 *.png filter=lfs diff=lfs merge=lfs -text
 *.dll filter=lfs diff=lfs merge=lfs -text
