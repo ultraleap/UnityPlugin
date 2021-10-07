@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2020.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2021.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -118,18 +118,30 @@ namespace Leap.Unity
         public virtual void OnSceneGUI()
         {
 
+            Transform targetTransform = target.transform;
+            LeapXRServiceProvider xrProvider = target as LeapXRServiceProvider;
+            if (xrProvider != null)
+            {
+                targetTransform = xrProvider.Camera.transform;
+
+                if (xrProvider.deviceOrigin != null)
+                {
+                    targetTransform.InverseTransformPoint(xrProvider.deviceOrigin.position);
+                }
+            }
+
             switch (GetSelectedInteractionVolume())
             {
                 case LeapServiceProvider.InteractionVolumeVisualization.None:
                     break;
                 case LeapServiceProvider.InteractionVolumeVisualization.LeapMotionController:
-                    DrawLeapMotionControllerInteractionZone(LMC_BOX_WIDTH, LMC_BOX_DEPTH, LMC_BOX_RADIUS, Color.white);
+                    DrawLeapMotionControllerInteractionZone(LMC_BOX_WIDTH, LMC_BOX_DEPTH, LMC_BOX_RADIUS, Color.white, targetTransform);
                     break;
                 case LeapServiceProvider.InteractionVolumeVisualization.StereoIR170:
-                    DrawStereoIR170InteractionZoneMesh();
+                    DrawStereoIR170InteractionZoneMesh(targetTransform);
                     break;
                 case LeapServiceProvider.InteractionVolumeVisualization.Automatic:
-                    DetectConnectedDevice();
+                    DetectConnectedDevice(targetTransform);
                     break;
                 default:
                     break;
@@ -142,12 +154,12 @@ namespace Leap.Unity
 
             if (_stereoIR170InteractionZoneMesh == null)
             {
-                _stereoIR170InteractionZoneMesh = (Mesh)AssetDatabase.LoadAssetAtPath(Path.Combine("Assets", "Plugins", "LeapMotion", "Core", "Models", "StereoIR170-interaction-cone.obj"), typeof(Mesh));
+                _stereoIR170InteractionZoneMesh = (Mesh)Resources.Load("StereoIR170-interaction-cone", typeof(Mesh));
             }
 
             if (_stereoIR170InteractionMaterial == null)
             {
-                _stereoIR170InteractionMaterial = (Material)AssetDatabase.LoadAssetAtPath(Path.Combine("Assets", "Plugins", "LeapMotion", "Core", "Materials", "StereoIR170InteractionVolume.mat"), typeof(Material));
+                _stereoIR170InteractionMaterial = (Material)Resources.Load("StereoIR170InteractionVolume", typeof(Material));
             }
 
         }
@@ -200,18 +212,18 @@ namespace Leap.Unity
             view.Repaint();
         }
 
-        private void DetectConnectedDevice()
+        private void DetectConnectedDevice(Transform targetTransform)
         {
 
             if (LeapController?.Devices?.Count == 1)
             {
                 if (LeapController.Devices.First().Type == Device.DeviceType.TYPE_RIGEL)
                 {
-                    DrawStereoIR170InteractionZoneMesh();
+                    DrawStereoIR170InteractionZoneMesh(targetTransform);
                 }
                 else if (LeapController.Devices.First().Type == Device.DeviceType.TYPE_PERIPHERAL)
                 {
-                    DrawLeapMotionControllerInteractionZone(LMC_BOX_WIDTH, LMC_BOX_DEPTH, LMC_BOX_RADIUS, Color.white);
+                    DrawLeapMotionControllerInteractionZone(LMC_BOX_WIDTH, LMC_BOX_DEPTH, LMC_BOX_RADIUS, Color.white, targetTransform);
                 }
             }
         }
@@ -222,86 +234,92 @@ namespace Leap.Unity
             return LeapServiceProvider?.SelectedInteractionVolumeVisualization;
         }
 
-        private void DrawStereoIR170InteractionZoneMesh()
+        private void DrawStereoIR170InteractionZoneMesh(Transform targetTransform)
         {
-
             if (_stereoIR170InteractionMaterial != null && _stereoIR170InteractionZoneMesh != null)
             {
                 _stereoIR170InteractionMaterial.SetPass(0);
 
                 Graphics.DrawMeshNow(_stereoIR170InteractionZoneMesh,
-                   target.transform.localToWorldMatrix *
+                   targetTransform.localToWorldMatrix *
                    Matrix4x4.TRS(controllerOffset + _stereoIR170InteractionZoneMeshOffset, deviceRotation * Quaternion.Euler(-90, 0, 0), Vector3.one * 0.001f));
             }
         }
 
-        private void DrawLeapMotionControllerInteractionZone(float box_width, float box_depth, float box_radius, Color interactionZoneColor)
+        private void DrawLeapMotionControllerInteractionZone(float box_width,
+            float box_depth,
+            float box_radius,
+            Color interactionZoneColor,
+            Transform targetTransform)
         {
 
             Color previousColor = Handles.color;
             Handles.color = interactionZoneColor;
 
-            Vector3 origin = target.transform.TransformPoint(controllerOffset);
+            Vector3 origin = targetTransform.TransformPoint(controllerOffset);
             Vector3 local_top_left, top_left, local_top_right, top_right, local_bottom_left, bottom_left, local_bottom_right, bottom_right;
-            getLocalGlobalPoint(-1, 1, 1, box_width, box_depth, box_radius, out local_top_left, out top_left);
-            getLocalGlobalPoint(1, 1, 1, box_width, box_depth, box_radius, out local_top_right, out top_right);
-            getLocalGlobalPoint(-1, 1, -1, box_width, box_depth, box_radius, out local_bottom_left, out bottom_left);
-            getLocalGlobalPoint(1, 1, -1, box_width, box_depth, box_radius, out local_bottom_right, out bottom_right);
+            getLocalGlobalPoint(-1, 1, 1, box_width, box_depth, box_radius, out local_top_left, out top_left, targetTransform);
+            getLocalGlobalPoint(1, 1, 1, box_width, box_depth, box_radius, out local_top_right, out top_right, targetTransform);
+            getLocalGlobalPoint(-1, 1, -1, box_width, box_depth, box_radius, out local_bottom_left, out bottom_left, targetTransform);
+            getLocalGlobalPoint(1, 1, -1, box_width, box_depth, box_radius, out local_bottom_right, out bottom_right, targetTransform);
 
             Handles.DrawAAPolyLine(origin, top_left);
             Handles.DrawAAPolyLine(origin, top_right);
             Handles.DrawAAPolyLine(origin, bottom_left);
             Handles.DrawAAPolyLine(origin, bottom_right);
 
-            drawControllerEdge(origin, local_top_left, local_top_right, box_radius);
-            drawControllerEdge(origin, local_bottom_left, local_top_left, box_radius);
-            drawControllerEdge(origin, local_bottom_left, local_bottom_right, box_radius);
-            drawControllerEdge(origin, local_bottom_right, local_top_right, box_radius);
+            drawControllerEdge(origin, local_top_left, local_top_right, box_radius, targetTransform);
+            drawControllerEdge(origin, local_bottom_left, local_top_left, box_radius, targetTransform);
+            drawControllerEdge(origin, local_bottom_left, local_bottom_right, box_radius, targetTransform);
+            drawControllerEdge(origin, local_bottom_right, local_top_right, box_radius, targetTransform);
 
             drawControllerArc(origin, local_top_left, local_bottom_left, local_top_right,
-                              local_bottom_right, box_radius);
+                              local_bottom_right, box_radius, targetTransform);
             drawControllerArc(origin, local_top_left, local_top_right, local_bottom_left,
-                              local_bottom_right, box_radius);
+                              local_bottom_right, box_radius, targetTransform);
 
             Handles.color = previousColor;
         }
 
-        private void getLocalGlobalPoint(int x, int y, int z, float box_width, float box_depth, float box_radius, out Vector3 local, out Vector3 global)
+        private void getLocalGlobalPoint(int x, int y, int z, float box_width, float box_depth,
+            float box_radius, out Vector3 local, out Vector3 global, Transform targetTransform)
         {
 
             local = deviceRotation * new Vector3(x * box_width, y * box_radius, z * box_depth);
-            global = target.transform.TransformPoint(controllerOffset
+            global = targetTransform.TransformPoint(controllerOffset
                                                      + box_radius * local.normalized);
         }
 
         private void drawControllerEdge(Vector3 origin,
                                         Vector3 edge0, Vector3 edge1,
-                                        float box_radius)
+                                        float box_radius,
+                                        Transform targetTransform)
         {
-            Vector3 right_normal = target.transform
-                                         .TransformDirection(Vector3.Cross(edge0, edge1));
+
+            Vector3 right_normal = targetTransform.TransformDirection(Vector3.Cross(edge0, edge1));
             float right_angle = Vector3.Angle(edge0, edge1);
 
-            Handles.DrawWireArc(origin, right_normal, target.transform.TransformDirection(edge0),
-                                right_angle, target.transform.lossyScale.x * box_radius);
+            Handles.DrawWireArc(origin, right_normal, targetTransform.TransformDirection(edge0),
+                                right_angle, targetTransform.lossyScale.x * box_radius);
         }
 
         private void drawControllerArc(Vector3 origin,
                                        Vector3 edgeA0, Vector3 edgeA1,
                                        Vector3 edgeB0, Vector3 edgeB1,
-                                       float box_radius)
+                                       float box_radius,
+                                       Transform targetTransform)
         {
 
-            Vector3 faceA = target.transform.rotation * Vector3.Lerp(edgeA0, edgeA1, 0.5f);
-            Vector3 faceB = target.transform.rotation * Vector3.Lerp(edgeB0, edgeB1, 0.5f);
+            Vector3 faceA = targetTransform.rotation * Vector3.Lerp(edgeA0, edgeA1, 0.5f);
+            Vector3 faceB = targetTransform.rotation * Vector3.Lerp(edgeB0, edgeB1, 0.5f);
 
             float resolutionIncrement = 1f / 50f;
             for (float i = 0f; i < 1f; i += resolutionIncrement)
             {
                 Vector3 begin = Vector3.Lerp(faceA, faceB, i).normalized
-                                * target.transform.lossyScale.x * box_radius;
+                                * targetTransform.lossyScale.x * box_radius;
                 Vector3 end = Vector3.Lerp(faceA, faceB, i + resolutionIncrement).normalized
-                              * target.transform.lossyScale.x * box_radius;
+                              * targetTransform.lossyScale.x * box_radius;
 
                 Handles.DrawAAPolyLine(origin + begin, origin + end);
             }

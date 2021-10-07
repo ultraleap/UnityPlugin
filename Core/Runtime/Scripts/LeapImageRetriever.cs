@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2020.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2021.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -22,8 +22,6 @@ namespace Leap.Unity
     /// Note: To use the LeapImageRetriever, you must be on version 2.1 or newer and you
     /// must enable "Allow Images" in your Leap Motion settings.
     /// </summary>
-    [RequireComponent(typeof(Camera))]
-    [RequireComponent(typeof(LeapServiceProvider))]
     public class LeapImageRetriever : MonoBehaviour
     {
         public const string GLOBAL_COLOR_SPACE_GAMMA_NAME = "_LeapGlobalColorSpaceGamma";
@@ -38,7 +36,7 @@ namespace Leap.Unity
         [FormerlySerializedAs("gammaCorrection")]
         private float _gammaCorrection = 1.0f;
 
-        private LeapServiceProvider _provider;
+        [SerializeField] private LeapServiceProvider _provider;
         private EyeTextureData _eyeTextureData = new EyeTextureData();
 
         //Image that we have requested from the service.  Are requested in Update and retrieved in OnPreRender
@@ -284,22 +282,26 @@ namespace Leap.Unity
 
         private void Awake()
         {
-            _provider = GetComponent<LeapServiceProvider>();
             if (_provider == null)
             {
-                _provider = GetComponentInChildren<LeapServiceProvider>();
+                Debug.Log("Provider not assigned");
+                this.enabled = false;
+                return;
             }
+
+            Camera.onPreRender -= OnCameraPreRender;
+            Camera.onPreRender += OnCameraPreRender;
 
             //Enable pooling to reduce overhead of images
             LeapInternal.MemoryManager.EnablePooling = true;
 
             ApplyGammaCorrectionValues();
 #if UNITY_2019_3_OR_NEWER
-      //SRP require subscribing to RenderPipelineManagers
-      if(UnityEngine.Rendering.GraphicsSettings.renderPipelineAsset != null) {
-        UnityEngine.Rendering.RenderPipelineManager.beginCameraRendering -= onBeginRendering;
-        UnityEngine.Rendering.RenderPipelineManager.beginCameraRendering += onBeginRendering;
-      }
+            //SRP require subscribing to RenderPipelineManagers
+            if(UnityEngine.Rendering.GraphicsSettings.renderPipelineAsset != null) {
+                UnityEngine.Rendering.RenderPipelineManager.beginCameraRendering -= onBeginRendering;
+                UnityEngine.Rendering.RenderPipelineManager.beginCameraRendering += onBeginRendering;
+            }
 #endif
         }
 
@@ -322,15 +324,23 @@ namespace Leap.Unity
                 _provider.GetLeapController().DistortionChange -= onDistortionChange;
             }
 #if UNITY_2019_3_OR_NEWER
-      //SRP require subscribing to RenderPipelineManagers
-      if(UnityEngine.Rendering.GraphicsSettings.renderPipelineAsset != null) {
-        UnityEngine.Rendering.RenderPipelineManager.beginCameraRendering -= onBeginRendering;
-      }
+            //SRP require subscribing to RenderPipelineManagers
+            if (UnityEngine.Rendering.GraphicsSettings.renderPipelineAsset != null)
+            {
+                UnityEngine.Rendering.RenderPipelineManager.beginCameraRendering -= onBeginRendering;
+            }
 #endif
         }
 
         private void LateUpdate()
         {
+
+            var xrProvider = _provider as LeapXRServiceProvider;
+            if (xrProvider != null)
+            {
+                if (xrProvider.Camera == null) { return; }
+            }
+
             Frame imageFrame = _provider.CurrentFrame;
 
             _currentImage = null;
@@ -361,7 +371,7 @@ namespace Leap.Unity
             }
         }
 
-        private void OnPreRender()
+        private void OnCameraPreRender(Camera cam)
         {
             if (_currentImage != null)
             {
@@ -375,9 +385,10 @@ namespace Leap.Unity
         }
 
 #if UNITY_2019_3_OR_NEWER
-    private void onBeginRendering(UnityEngine.Rendering.ScriptableRenderContext scriptableRenderContext, Camera camera) {
-       OnPreRender();
-    }
+        private void onBeginRendering(UnityEngine.Rendering.ScriptableRenderContext scriptableRenderContext, Camera camera)
+        {
+            OnCameraPreRender(camera);
+        }
 #endif
 
         private void subscribeToService()

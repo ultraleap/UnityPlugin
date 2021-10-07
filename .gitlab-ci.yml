@@ -12,11 +12,15 @@ trigger::trigger-downstream:
       when: always
       allow_failure: false
 
-    - if: $UPSTREAM_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == "pipeline"
+    - if: $CI_PIPELINE_SOURCE == "pipeline"
       when: always
       allow_failure: false
 
     - if: $CI_COMMIT_BRANCH == "main"
+      when: always
+      allow_failure: false
+
+    - if: $CI_COMMIT_BRANCH
       when: manual
       allow_failure: false
 
@@ -27,3 +31,4 @@ trigger::trigger-downstream:
     project: xr/integrations/unity/ci/unityplugin-ci
     branch: main
     strategy: depend
+    

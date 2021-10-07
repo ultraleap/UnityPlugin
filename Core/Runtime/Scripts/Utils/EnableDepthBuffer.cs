@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2020.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2021.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -14,6 +14,9 @@ namespace Leap.Unity
     [ExecuteInEditMode]
     public class EnableDepthBuffer : MonoBehaviour
     {
+
+        [SerializeField] private Camera _camera;
+
         public const string DEPTH_TEXTURE_VARIANT_NAME = "USE_DEPTH_TEXTURE";
 
         [SerializeField]
@@ -21,7 +24,13 @@ namespace Leap.Unity
 
         void Awake()
         {
-            GetComponent<Camera>().depthTextureMode = _depthTextureMode;
+            if (_camera == null)
+            {
+                Debug.LogError(_camera.gameObject);
+                return;
+            }
+
+            _camera.depthTextureMode = _depthTextureMode;
 
             if (SystemInfo.SupportsRenderTextureFormat(RenderTextureFormat.Depth) &&
                 _depthTextureMode != DepthTextureMode.None)
