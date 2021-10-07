@@ -369,7 +369,7 @@ namespace Leap.Unity
                 // pose.
                 if (!_trackingBaseDeltaPose.HasValue)
                 {
-                    _trackingBaseDeltaPose = _camera.transform.GetPose().mul(
+                    _trackingBaseDeltaPose = _camera.transform.ToLocalPose().mul(
                                                 trackedPose.inverse());
                 }
                 // This way, we always track a scene-space tracked pose.
@@ -487,7 +487,7 @@ namespace Leap.Unity
                   currentPose.rotation * Vector3.up * deviceOffsetYAxis
                   + currentPose.rotation * Vector3.forward * deviceOffsetZAxis;
                 currentPose.rotation = Quaternion.Euler(deviceTiltXAxis, 0f, 0f);
-                currentPose = _camera.transform.ToPose().Then(currentPose);
+                currentPose = _camera.transform.ToLocalPose().Then(currentPose);
             }
             else
             {
@@ -525,12 +525,22 @@ namespace Leap.Unity
                 return LeapTransform.Identity;
             }
 
-            leapTransform = new LeapTransform(
-              warpedPosition.ToVector(),
-              warpedRotation.ToLeapQuaternion(),
-              transform.lossyScale.ToVector() * 1e-3f
-            );
-
+            if (Camera.transform.parent != null && _deviceOffsetMode != DeviceOffsetMode.Transform)
+            {
+                leapTransform = new LeapTransform(
+                  Camera.transform.parent.TransformPoint(warpedPosition).ToVector(),
+                  (Camera.transform.parent.rotation * warpedRotation).ToLeapQuaternion(),
+                  Vector.Ones * 1e-3f
+                );
+            }
+            else
+            {
+                leapTransform = new LeapTransform(
+                  warpedPosition.ToVector(),
+                  warpedRotation.ToLeapQuaternion(),
+                  Vector.Ones * 1e-3f
+                );
+            }
 
             leapTransform.MirrorZ();
 
