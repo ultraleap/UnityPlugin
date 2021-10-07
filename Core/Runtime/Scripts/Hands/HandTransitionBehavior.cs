@@ -6,7 +6,6 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using System.Collections;
 using UnityEngine;
 
 namespace Leap.Unity
@@ -17,8 +16,13 @@ namespace Leap.Unity
     /// tracking. `HandReset` is called when tracking begins. `HandFinish` is
     /// called when tracking ends.
     /// </summary>
+    [RequireComponent(typeof(HandModelBase))]
+    [DefaultExecutionOrder(1)]
     public abstract class HandTransitionBehavior : MonoBehaviour
     {
+        [Tooltip("Should this hand GameObject begin disabled? \n" +
+"You can use a Hand Enable Disable component to turn on and off this gameobject when a hand is detected and lost")]
+        public bool disableOnAwake = true;
 
         protected HandModelBase handModelBase;
 
@@ -28,18 +32,14 @@ namespace Leap.Unity
         protected virtual void Awake()
         {
             handModelBase = GetComponent<HandModelBase>();
-            if (handModelBase == null)
-            {
-                Debug.LogWarning("HandTransitionBehavior components require a HandModelBase "
-                  + "component attached to the same GameObject. (Awake)");
-                return;
-            }
 
             handModelBase.OnBegin -= HandReset;
             handModelBase.OnBegin += HandReset;
 
             handModelBase.OnFinish -= HandFinish;
             handModelBase.OnFinish += HandFinish;
+
+            this.gameObject.SetActive(disableOnAwake ? false : this.gameObject.activeInHierarchy);
         }
 
         protected virtual void OnDestroy()
