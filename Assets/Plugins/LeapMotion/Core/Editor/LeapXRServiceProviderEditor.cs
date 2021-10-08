@@ -45,7 +45,7 @@ namespace Leap.Unity {
       addPropertyToFoldout("_preCullCamera"       , "Advanced Options");
       addPropertyToFoldout("_updateHandInPrecull" , "Advanced Options");
 
-      hideField("_trackingMode");
+      hideField("_trackingOptimization");
     }
 
     private void decorateAllowManualTimeAlignment(SerializedProperty property) {

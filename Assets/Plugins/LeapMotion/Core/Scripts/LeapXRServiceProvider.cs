@@ -407,8 +407,8 @@ namespace Leap.Unity {
     /// Initializes the Leap Motion policy flags.
     /// The POLICY_OPTIMIZE_HMD flag improves tracking for head-mounted devices.
     /// </summary>
-    protected override void initialiseTrackingMode() {
-      changeTrackingMode(TrackingMode.HeadMounted);
+    protected override void initializeFlags() {
+      ChangeTrackingMode(TrackingOptimizationMode.HMD);
     }
 
     protected override void transformFrame(Frame source, Frame dest) {
