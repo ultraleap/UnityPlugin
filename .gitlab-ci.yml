@@ -16,5 +16,5 @@ trigger::trigger-downstream:
   trigger:
     project: xr/integrations/unity/ci/unityplugin-ci
     branch: windows/rc
-    strategy: depend  
+    strategy: depend 
     
