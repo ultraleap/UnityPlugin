@@ -137,6 +137,7 @@ If you are using Unity 2020.1 or newer and you get errors related to "SpatialTra
   - We have in-depth documentation online with an explanation of each feature
   - We have included step by step guides within the Editor which teaches you how to set up hands without the need to open online documentation
   - No programming knowledge is needed  
+  - We provide shaders to support HDRP/URP & the Standard render pipeline.
 
 #### UI Input: 
 
