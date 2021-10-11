@@ -11,7 +11,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1091843472886657483}
   - component: {fileID: 1091843472886657477}
-  - component: {fileID: 1091843472886657482}
   m_Layer: 0
   m_Name: Projected Hand Models
   m_TagString: Untagged
@@ -55,29 +54,6 @@ MonoBehaviour:
   headTransform: {fileID: 0}
   projectionScale: 10
   handMergeDistance: 0.35
---- !u!114 &1091843472886657482
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 114473456793702560, guid: dae2e2be31c98324eac460f702db97e9,
-    type: 3}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1091843472886657480}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c592f16851a620743868a31232613370, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _leapProvider: {fileID: 1091843472886657477}
-  ModelPool:
-  - GroupName: Capsule Hands
-    _handModelManager: {fileID: 0}
-    LeftModel: {fileID: 1091843474608533263}
-    IsLeftToBeSpawned: 1
-    RightModel: {fileID: 1091843473606265077}
-    IsRightToBeSpawned: 1
-    IsEnabled: 1
-    CanDuplicate: 0
 --- !u!1001 &1091843473596700903
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -141,18 +117,6 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 1091843473596700903}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1091843473606265077 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 11407378, guid: 39d18871c11b53c4082d8202e3db68a3,
-    type: 3}
-  m_PrefabInstance: {fileID: 1091843473596700903}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a04122797dd84ca43a07055f12d91e0f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1001 &1091843474618105629
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -216,15 +180,3 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 1091843474618105629}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1091843474608533263 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 11407378, guid: 869d20cdda15af24aab9e72b5f2eec78,
-    type: 3}
-  m_PrefabInstance: {fileID: 1091843474618105629}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a04122797dd84ca43a07055f12d91e0f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 

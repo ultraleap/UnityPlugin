@@ -203,8 +203,43 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    - target: {fileID: 1091843473606265077, guid: 4c7e05219b14fce4e925a1a7d7e6551a,
+        type: 3}
+      propertyPath: leapProvider
+      value: 
+      objectReference: {fileID: 717056555}
+    - target: {fileID: 1091843474608533263, guid: 4c7e05219b14fce4e925a1a7d7e6551a,
+        type: 3}
+      propertyPath: leapProvider
+      value: 
+      objectReference: {fileID: 717056555}
+    m_RemovedComponents:
+    - {fileID: 1091843472886657482, guid: 4c7e05219b14fce4e925a1a7d7e6551a, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 4c7e05219b14fce4e925a1a7d7e6551a, type: 3}
+--- !u!114 &271253207 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5468038821123246086, guid: fff9f8f885bed8f4cadbd1f179efd843,
+    type: 3}
+  m_PrefabInstance: {fileID: 1219763501}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fa7eed364e5769a4c8e4dccbc0ee1847, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &717056555 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1091843472886657477, guid: 4c7e05219b14fce4e925a1a7d7e6551a,
+    type: 3}
+  m_PrefabInstance: {fileID: 215151799}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 27476d622d49bab41a86b9fff05af58e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1219763501
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -287,7 +322,18 @@ PrefabInstance:
       propertyPath: _inputLeapProvider
       value: 
       objectReference: {fileID: 1650845201}
-    m_RemovedComponents: []
+    - target: {fileID: 5468038821146861654, guid: fff9f8f885bed8f4cadbd1f179efd843,
+        type: 3}
+      propertyPath: leapProvider
+      value: 
+      objectReference: {fileID: 271253207}
+    - target: {fileID: 5468038821422412440, guid: fff9f8f885bed8f4cadbd1f179efd843,
+        type: 3}
+      propertyPath: leapProvider
+      value: 
+      objectReference: {fileID: 271253207}
+    m_RemovedComponents:
+    - {fileID: 5468038821123246081, guid: fff9f8f885bed8f4cadbd1f179efd843, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: fff9f8f885bed8f4cadbd1f179efd843, type: 3}
 --- !u!1001 &1650845199
 PrefabInstance:
@@ -349,6 +395,11 @@ PrefabInstance:
     - target: {fileID: 3419734950892140626, guid: 5c68b57d4ea619140ac646846102e865,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3947936638174131456, guid: 5c68b57d4ea619140ac646846102e865,
+        type: 3}
+      propertyPath: editTimePose
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6261897482264709521, guid: 5c68b57d4ea619140ac646846102e865,

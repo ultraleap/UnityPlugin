@@ -48,6 +48,6 @@ MonoBehaviour:
   _frameOptimization: 0
   _physicsExtrapolation: 1
   _physicsExtrapolationTime: 0.011111111
-  _trackingOptimization: 0
+  _trackingOptimization: 1
   _workerThreadProfiling: 0
   _serverNameSpace: Leap Service
