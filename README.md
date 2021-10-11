@@ -31,6 +31,8 @@ This repository contains code for Ultraleap's Unity Plugin which has been design
 
 ### Prerequisites
 
+*N.B. This plugin only supports 64-bit Windows builds*
+
 To use this Plugin you will need the following:
 
 1. The latest Ultraleap Tracking Service installed
