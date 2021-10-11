@@ -83,16 +83,23 @@ namespace Leap.Unity
          }
      }
 
-    // The following methods / fields are part of the XRSupportUtil 'interface' but are not currently used. They have not been implemented for the XR2/Android
+     public static Vector3 GetXRNodeLocalPosition(int node) {
+          Debug.LogWarning("Not implemented yet - waiting on max");
+          return Vector3.zero;
+     }
 
-     //public static Vector3 GetXRNodeLocalPosition(int node) {
-     //}
-
-     //public static Quaternion GetXRNodeLocalRotation(int node) {
-     //}
+     public static Quaternion GetXRNodeLocalRotation(int node) {
+          Debug.LogWarning("Not implemented yet - waiting on max");
+          return Quaternion.identity;
+     }
 
      public static void Recenter() {
          SvrInput.Instance.HandleRecenter();
+     }
+
+     public static float GetGPUTime() {
+          Debug.LogWarning("Not implemented for android");
+          return 0;
      }
 
      public static string GetLoadedDeviceName() {
