@@ -19,19 +19,9 @@
   },
   "samples": [
     {
-      "displayName": "Core Examples",
+      "displayName": "Examples",
       "description": "",
-      "path": "Examples~/Core Examples"
-    },
-    {
-      "displayName": "Hands Examples",
-      "description": "",
-      "path": "Examples~/Hands Examples"
-    },
-    {
-      "displayName": "InteractionEngine Examples",
-      "description": "",
-      "path": "Examples~/Interaction Engine Examples"
+      "path": "Examples~"
     }
   ]
 }

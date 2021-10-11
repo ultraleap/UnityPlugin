@@ -29,13 +29,13 @@ namespace Leap.Hands.Examples
             if (Input.GetKeyUp(KeyCode.RightArrow))
             {
                 currentHandID++;
-                if (currentHandID < 0) currentHandID = handList.Count - 1;
+                if (currentHandID > handList.Count - 1) currentHandID = 0;
             }
 
             if (Input.GetKeyUp(KeyCode.LeftArrow))
             {
                 currentHandID--;
-                if (currentHandID > handList.Count - 1) currentHandID = 0;
+                if (currentHandID < 0) currentHandID = handList.Count - 1;
             }
 
             SortHands();
