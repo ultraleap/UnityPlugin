@@ -219,7 +219,7 @@ namespace Leap.Unity
 
 #if XR_LEGACY_INPUT_AVAILABLE
             if (GetComponent<UnityEngine.SpatialTracking.TrackedPoseDriver>() == null) {
-                gameObject.AddComponent<UnityEngine.SpatialTracking.TrackedPoseDriver>().UseRelativeTransform = true;
+                _camera.gameObject.AddComponent<UnityEngine.SpatialTracking.TrackedPoseDriver>().UseRelativeTransform = true;
             }
 #endif
 
