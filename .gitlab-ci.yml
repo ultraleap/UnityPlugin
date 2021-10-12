@@ -3,9 +3,7 @@ stages:
 
 trigger::trigger-downstream:
   stage: trigger
-  inherit:
-    variables: false
-    
+
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
       when: always
