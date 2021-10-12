@@ -14,12 +14,12 @@ trigger::trigger-downstream:
       when: always
       allow_failure: false
 
-    - if: $CI_COMMIT_BRANCH == "xr2/main"
+    - if: $CI_COMMIT_REF_NAME == "xr2/main"
       when: manual
       allow_failure: false
 
   variables:
-    UPSTREAM_COMMIT_BRANCH: $CI_COMMIT_BRANCH 
+    UPSTREAM_COMMIT_BRANCH: $CI_COMMIT_REF_NAME 
 
   trigger:
     project: xr/integrations/unity/ci/unityplugin-ci
@@ -42,13 +42,14 @@ log::log-commit-branch:
       when: always
       allow_failure: false
 
-    - if: $CI_COMMIT_BRANCH == "xr2/main"
+    - if: $CI_COMMIT_REF_NAME == "xr2/main"
       when: manual
       allow_failure: false
 
   variables:
-    UPSTREAM_COMMIT_BRANCH: $CI_COMMIT_BRANCH   
+    UPSTREAM_COMMIT_BRANCH: $CI_COMMIT_REF_NAME   
 
   script:
     - echo $CI_COMMIT_BRANCH 
+    - echo $CI_COMMIT_REF_NAME 
     - echo $UPSTREAM_COMMIT_BRANCH 
