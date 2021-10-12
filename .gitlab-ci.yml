@@ -29,7 +29,10 @@ trigger::trigger-downstream:
 
 log::log-commit-branch:
   stage: log
-
+  tags:
+    - unity
+    - win10
+    
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
       when: always
