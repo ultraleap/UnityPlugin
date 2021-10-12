@@ -232,19 +232,6 @@ namespace Leap.Unity {
       }
     }
 
-    // TODO: DELETEME
-    //     protected virtual void OnValidate() {
-    //       if (_deviceOffsetMode == DeviceOffsetMode.Transform &&
-    //           _temporalWarpingMode != TemporalWarpingMode.Off) {
-    // #if UNITY_EDITOR
-    //         UnityEditor.Undo.RecordObject(this, "Disabled Temporal Warping");
-    //         Debug.LogWarning("Temporal warping disabled. Temporal warping cannot be used "
-    //           + "with the Transform device offset mode.", this);
-    // #endif
-    //         _temporalWarpingMode = TemporalWarpingMode.Off;
-    //       }
-    //     }
-
     protected override void OnEnable() {
       resetShaderTransforms();
 
@@ -296,7 +283,9 @@ namespace Leap.Unity {
 
     protected override void Start() {
       base.Start();
-      _cachedCamera = GetComponent<Camera>();
+
+      InitialiseCachedCamera();
+      
       if (_deviceOffsetMode == DeviceOffsetMode.Transform && _deviceOrigin == null) {
         Debug.LogError("Cannot use the Transform device offset mode without " +
                        "specifying a Transform to use as the device origin.", this);
@@ -370,18 +359,23 @@ namespace Leap.Unity {
     #endif
 
     protected virtual void onPreCull(Camera preCullingCamera) {
+          
       if (preCullingCamera != preCullCamera) {
         return;
       }
 
       #if UNITY_EDITOR
-      if (!Application.isPlaying) {
-        return;
+      if (!Application.isPlaying) { 
+         return;
       }
+      
       #endif
 
-      if(_cachedCamera == null || _leapController == null)
-      {
+      if (_cachedCamera == null || _leapController == null) {
+        if (_temporalWarpingMode == TemporalWarpingMode.Auto || _temporalWarpingMode == TemporalWarpingMode.Manual) {
+          Debug.LogError("The cached camera or controller need to be set for temporal warping to work");
+        }
+
         return;
       }
 
@@ -412,7 +406,7 @@ namespace Leap.Unity {
         trackedPose = deviceOrigin.ToPose();
       }
       else {
-        Debug.LogError("Unsupported DeviceOffsetMode: " + _deviceOffsetMode);
+        Debug.LogError($"Unsupported DeviceOffsetMode: {_deviceOffsetMode}");
         return;
       }
 
@@ -477,6 +471,8 @@ namespace Leap.Unity {
                                                     bool updateTemporalCompensation = true) {
       LeapTransform leapTransform;
 
+           
+
       //Calculate a Temporally Warped Pose
       if (Application.isPlaying
           && updateTemporalCompensation
@@ -488,6 +484,7 @@ namespace Leap.Unity {
                                          - (_temporalWarpingMode ==
                                          TemporalWarpingMode.Images ? -20000 : 0),
                                          out warpedPosition, out warpedRotation);
+
       }
 
       // Normalize the rotation Quaternion.
@@ -632,8 +629,14 @@ namespace Leap.Unity {
       }
     }
 
+    private void InitialiseCachedCamera() {
+    #if UNITY_ANDROID
+       _cachedCamera = mainCamera;
+    #else
+       _cachedCamera = GetComponent<Camera>();
+    #endif
+    }
+
     #endregion
-
   }
-
 }
