@@ -58,8 +58,9 @@ namespace Leap.Unity.InputModule
                 {(PointerStates.OffCanvas, PointerStates.OffCanvas), (module, pointerElement) => pointerElement.TimeEnteredCanvas = Time.time },
             };
 
-            public PointerElement(Camera mainCamera, EventSystem eventSystem, LeapProvider leapDataProvider, IInputModuleSettings settings, IInputModuleEventHandler inputModuleEventHandler, PinchDetector leftHandDetector, PinchDetector rightHandDetector)
+            public PointerElement(Chirality chirality, Camera mainCamera, EventSystem eventSystem, LeapProvider leapDataProvider, IInputModuleSettings settings, IInputModuleEventHandler inputModuleEventHandler, PinchDetector leftHandDetector, PinchDetector rightHandDetector)
             {
+                Chirality = chirality;
                 _mainCamera = mainCamera;
                 _eventSystem = eventSystem;
                 _leapDataProvider = leapDataProvider;
@@ -96,7 +97,7 @@ namespace Leap.Unity.InputModule
 
                     InnerSpriteRenderer.material = Object.Instantiate(pointerMaterial);
 
-                    InnerPointer.transform.parent = parent;
+                    InnerPointer.transform.parent = Pointer.transform;
                     InnerPointer.SetActive(false);
                 }
             }
@@ -524,7 +525,7 @@ namespace Leap.Unity.InputModule
                         .ToVector3();
                     for (int i = 1; i < 3; i++)
                     {
-                        float fingerDistance = Vector3.Distance(Camera.main.transform.position,
+                        float fingerDistance = Vector3.Distance(_mainCamera.transform.position,
                             hand.Fingers[i].TipPosition.ToVector3());
                         float fingerExtension =
                             Mathf.Clamp01(Vector3.Dot(
@@ -533,16 +534,16 @@ namespace Leap.Unity.InputModule
 
                         if (fingerDistance > farthest && fingerExtension > 0.5f)
                         {
+                            // Hummm, not really the index finger position 0 but the selected furthest finger that is considered extended
                             farthest = fingerDistance;
-                            indexFingerPosition = hand.Fingers[i].TipPosition
-                                .ToVector3(); // Hummm, not really the index finger position 0 but the selected furthest finger that is considered extended
+                            indexFingerPosition = hand.Fingers[i].TipPosition.ToVector3(); 
                         }
                     }
                 }
                 else
                 {
                     //Raycast through the knuckle of the finger
-                    indexFingerPosition = hand.Fingers[(int)Finger.FingerType.TYPE_INDEX].Bone(Bone.BoneType.TYPE_METACARPAL).Center.ToVector3();
+                    indexFingerPosition = _mainCamera.transform.position - origin + hand.Fingers[(int)Finger.FingerType.TYPE_INDEX].Bone(Bone.BoneType.TYPE_METACARPAL).Center.ToVector3();
                 }
 
                 //Set the Raycast Direction and Delta
@@ -703,9 +704,9 @@ namespace Leap.Unity.InputModule
             {
                 //Use the Scale AnimCurve to Evaluate the Size of the Pointer
                 float pointDistance = 1f;
-                if (Camera.main != null)
+                if (_mainCamera != null)
                 {
-                    pointDistance = (Pointer.transform.position - Camera.main.transform.position).magnitude;
+                    pointDistance = (Pointer.transform.position - _mainCamera.transform.position).magnitude;
                 }
 
                 var pointerScale = _settings.PointerDistanceScale.Evaluate(pointDistance);
@@ -714,8 +715,7 @@ namespace Leap.Unity.InputModule
                     pointerScale *= _settings.PointerPinchScale.Evaluate(hand.PinchDistance);
                 }
 
-                //Commented out Velocity Stretching because it looks funny when switching between Tactile and Projective
-                Pointer.transform.localScale = pointerScale * new Vector3(1f, 1f /*+ pointData.delta.magnitude*1f*/, 1f);
+                Pointer.transform.localScale = pointerScale * new Vector3(1f, 1f, 1f);
             }
             
             private void RaiseEventsForStateChanges()

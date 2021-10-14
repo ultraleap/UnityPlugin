@@ -211,10 +211,10 @@ namespace Leap.Unity.InputModule
                 projectiveToTactileTransitionDistance = float.MaxValue;
             }
 
-            _pointerLeft = new PointerElement(mainCamera, eventSystem, leapDataProvider, this, this, leftHandDetector, rightHandDetector);
+            _pointerLeft = new PointerElement(Chirality.Left, mainCamera, eventSystem, leapDataProvider, this, this, leftHandDetector, rightHandDetector);
             _pointerLeft.Initialise(transform, pointerSprite, pointerMaterial, innerPointer);
 
-            _pointerRight = new PointerElement(mainCamera, eventSystem, leapDataProvider, this, this, leftHandDetector, rightHandDetector);
+            _pointerRight = new PointerElement(Chirality.Right, mainCamera, eventSystem, leapDataProvider, this, this, leftHandDetector, rightHandDetector);
             _pointerRight.Initialise(transform, pointerSprite, pointerMaterial, innerPointer);
         }
 
