@@ -6,11 +6,10 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Leap.Unity;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Leap.Hands.Examples
+namespace Leap.Unity.HandsModule.Examples
 {
     public class CycleHandPairs : MonoBehaviour
     {
