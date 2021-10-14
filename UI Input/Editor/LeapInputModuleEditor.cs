@@ -17,7 +17,7 @@ namespace Leap.Unity.InputModule
         {
             base.OnEnable();
 
-            specifyConditionalDrawing(() => target.InteractionMode == LeapInputModule.InteractionCapability.Hybrid || target.InteractionMode == LeapInputModule.InteractionCapability.Projective,
+            specifyConditionalDrawing(() => target.InteractionMode == InteractionCapability.Hybrid || target.InteractionMode == InteractionCapability.Projective,
                                      "pinchingThreshold",
                                      "environmentPointer",
                                      "environmentPinch",
@@ -33,10 +33,10 @@ namespace Leap.Unity.InputModule
                                "triggeringColor",
                                "triggerMissedColor");
 
-            specifyConditionalDrawing(() => target.InteractionMode == LeapInputModule.InteractionCapability.Hybrid || target.InteractionMode == LeapInputModule.InteractionCapability.Tactile,
+            specifyConditionalDrawing(() => target.InteractionMode == InteractionCapability.Hybrid || target.InteractionMode == InteractionCapability.Tactile,
                                      "tactilePadding");
 
-            specifyConditionalDrawing(() => target.InteractionMode == LeapInputModule.InteractionCapability.Hybrid,
+            specifyConditionalDrawing(() => target.InteractionMode == InteractionCapability.Hybrid,
                                      "projectiveToTactileTransitionDistance",
                                      "retractUI");
 
@@ -90,7 +90,7 @@ namespace Leap.Unity.InputModule
                          "environmentPinch",
                          "movingReferenceFrame");
 
-            specifyConditionalDrawing(() => target.EnvironmentPointer,
+            specifyConditionalDrawing(() => target.RenderEnvironmentPointer,
                    "environmentPinch");
         }
     }

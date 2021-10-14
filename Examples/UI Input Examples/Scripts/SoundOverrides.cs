@@ -49,31 +49,42 @@ public class SoundOverrides : MonoBehaviour
     private void OnEndMissed(object sender, Vector3 pos) => onEndMissed?.Invoke(pos);
     private void OnEnvironmentPinch(object sender, Vector3 pos) => onEnvironmentPinch?.Invoke(pos);
     
-    public void OnEnable()
+    private void OnEnable()
     {
-        if (module)
+        if (!module)
         {
-            module.onClickDown += OnClickDown;
-            module.onClickUp += OnClickUp;
-            module.onBeginHover += OnBeginHover;
-            module.onEndHover += OnEndHover;
-            module.onBeginMissed += OnBeginMissed;
-            module.onEndMissed += OnEndMissed;
-            module.onEnvironmentPinch += OnEnvironmentPinch;
+            Debug.Log($"You must set a valid {nameof(LeapInputModule)} on this script for it to function");
+            return;
+        }
+
+        if (module is IInputModuleEventHandler eventHandler)
+        {
+            eventHandler.OnClickDown += OnClickDown;
+            eventHandler.OnClickUp += OnClickUp;
+            eventHandler.OnBeginHover += OnBeginHover;
+            eventHandler.OnEndHover += OnEndHover;
+            eventHandler.OnBeginMissed += OnBeginMissed;
+            eventHandler.OnEndMissed += OnEndMissed;
+            eventHandler.OnEnvironmentPinch += OnEnvironmentPinch;
         }
     }    
     
-    public void OnDisable()
+    private void OnDisable()
     {
-        if (module)
+        if (!module)
         {
-            module.onClickDown -= OnClickDown;
-            module.onClickUp -= OnClickUp;
-            module.onBeginHover -= OnBeginHover;
-            module.onEndHover -= OnEndHover;
-            module.onBeginMissed -= OnBeginMissed;
-            module.onEndMissed -= OnEndMissed; 
-            module.onEnvironmentPinch -= OnEnvironmentPinch;
+            return;
+        }
+        
+        if (module is IInputModuleEventHandler eventHandler)
+        {
+            eventHandler.OnClickDown -= OnClickDown;
+            eventHandler.OnClickUp -= OnClickUp;
+            eventHandler.OnBeginHover -= OnBeginHover;
+            eventHandler.OnEndHover -= OnEndHover;
+            eventHandler.OnBeginMissed -= OnBeginMissed;
+            eventHandler.OnEndMissed -= OnEndMissed;
+            eventHandler.OnEnvironmentPinch -= OnEnvironmentPinch;
         }
     }
 }

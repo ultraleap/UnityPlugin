@@ -447,6 +447,10 @@ PrefabInstance:
       value: 1000
       objectReference: {fileID: 0}
     - target: {fileID: 11484536, guid: 8b10486b9212d9f4badcf6c992af0a47, type: 3}
+      propertyPath: mainCamera
+      value: 
+      objectReference: {fileID: 1185258084}
+    - target: {fileID: 11484536, guid: 8b10486b9212d9f4badcf6c992af0a47, type: 3}
       propertyPath: pointerSprite
       value: 
       objectReference: {fileID: 21300000, guid: e4965e539caa5e547abccae409261181,
@@ -485,7 +489,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 11484536, guid: 8b10486b9212d9f4badcf6c992af0a47, type: 3}
       propertyPath: showAdvancedOptions
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 11484536, guid: 8b10486b9212d9f4badcf6c992af0a47, type: 3}
       propertyPath: ShowExperimentalOptions
@@ -984,6 +988,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 39d18871c11b53c4082d8202e3db68a3, type: 3}
+--- !u!20 &1185258084 stripped
+Camera:
+  m_CorrespondingSourceObject: {fileID: 547020878837072258, guid: 5c68b57d4ea619140ac646846102e865,
+    type: 3}
+  m_PrefabInstance: {fileID: 1261053357}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1188448098
 GameObject:
   m_ObjectHideFlags: 0
