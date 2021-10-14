@@ -20,12 +20,12 @@
   "samples": [
     {
       "displayName": "Examples",
-      "description": "",
+      "description": "Examples",
       "path": "Examples~"
     },
     {
-      "displayName": "Experimental/UI Input",
-      "description": "",
+      "displayName": "UI Input (Experimental)",
+      "description": "UI Input (Experimental)",
       "path": "Experimental~/UI Input"
     }
   ]
