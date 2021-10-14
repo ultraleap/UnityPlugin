@@ -20,6 +20,15 @@ namespace Leap.Unity.InputModule
     {
         #region Properties
 
+        //Events
+        public EventHandler<Vector3> onClickDown;
+        public EventHandler<Vector3> onClickUp;
+        public EventHandler<Vector3> onBeginHover;
+        public EventHandler<Vector3> onEndHover;
+        public EventHandler<Vector3> onBeginMissed;
+        public EventHandler<Vector3> onEndMissed;
+        public EventHandler<Vector3> onEnvironmentPinch;
+        
         //General Interaction Parameters
         [Header(" Interaction Setup")]
 
@@ -81,58 +90,6 @@ namespace Leap.Unity.InputModule
         [Tooltip("The distance from the base of a UI element that tactile interaction is triggered.")]
         [SerializeField] float tactilePadding = 0.005f;
 
-        //The sound that is played when the pointer transitions from canvas to element.
-        [Tooltip("The sound that is played when the pointer transitions from canvas to element.")]
-        [SerializeField] AudioClip beginHoverSound;
-
-        //The sound that is played when the pointer transitions from canvas to element.
-        [Tooltip("The sound that is played when the pointer transitions from canvas to element.")]
-        [SerializeField] AudioClip endHoverSound;
-
-        //The sound that is played when the pointer triggers a UI element.
-        [Tooltip("The sound that is played when the pointer triggers a UI element.")]
-        [SerializeField] AudioClip beginTriggerSound;
-
-        //The sound that is played when the pointer triggers a UI element.
-        [Tooltip("The sound that is played when the pointer triggers a UI element.")]
-        [SerializeField] AudioClip endTriggerSound;
-
-        //The sound that is played when the pointer triggers blank canvas.
-        [Tooltip("The sound that is played when the pointer triggers blank canvas.")]
-        [SerializeField] AudioClip beginMissedSound;
-
-        //The sound that is played when the pointer triggers blank canvas.
-        [Tooltip("The sound that is played when the pointer triggers blank canvas.")]
-        [SerializeField] AudioClip endMissedSound;
-
-        //The sound that is played while the pointer is dragging an object.
-        [Tooltip("The sound that is played while the pointer is dragging an object.")]
-        [SerializeField] AudioClip dragLoopSound;
-
-        // Event delegates triggered by Input
-        [Serializable]
-        public class PositionEvent : UnityEvent<Vector3> { }
-
-
-        [Header(" Event Setup")]
-
-        //The event that is triggered upon clicking on a non-canvas UI element.
-        [Tooltip("The event that is triggered upon clicking on a non-canvas UI element.")]
-        [SerializeField] PositionEvent onClickDown;
-
-        //The event that is triggered upon lifting up from a non-canvas UI element (Not 1:1 with onClickDown!)
-        [Tooltip(
-            "The event that is triggered upon lifting up from a non-canvas UI element (Not 1:1 with onClickDown!)")]
-        [SerializeField] PositionEvent onClickUp;
-
-        //The event that is triggered upon hovering over a non-canvas UI element.
-        [Tooltip("The event that is triggered upon hovering over a non-canvas UI element.")]
-        [SerializeField] PositionEvent onHover;
-
-        //The event that is triggered while holding down a non-canvas UI element.
-        [Tooltip("The event that is triggered while holding down a non-canvas UI element.")]
-        [SerializeField] PositionEvent whileClickHeld;
-
         [Tooltip("Whether or not to show unsupported Experimental Options in the Inspector.")]
         [SerializeField] bool showExperimentalOptions;
         public bool ShowExperimentalOptions => showExperimentalOptions;
@@ -180,10 +137,6 @@ namespace Leap.Unity.InputModule
         [Tooltip("Render the pointer onto the environment.")]
         [SerializeField] bool environmentPointer;
         public bool EnvironmentPointer => environmentPointer;
-
-        //The event that is triggered while pinching to a point in the environment.
-        [Tooltip("The event that is triggered while pinching to a point in the environment.")]
-        public PositionEvent environmentPinch;
 
         //Render a smaller pointer inside of the main pointer.
         [Tooltip("Render a smaller pointer inside of the main pointer.")]
@@ -237,7 +190,6 @@ namespace Leap.Unity.InputModule
         //Misc. Objects
         Canvas[] _canvases;
         Quaternion _currentRotation;
-        AudioSource _soundPlayer;
         GameObject[] _currentGo;
         GameObject[] _currentGoing;
         Vector3 _oldCameraPos = Vector3.zero;
@@ -265,6 +217,8 @@ namespace Leap.Unity.InputModule
             OffCanvas
         };
 
+        #region Unity Methods
+        
         //Initialization
         protected override void Start()
         {
@@ -359,9 +313,6 @@ namespace Leap.Unity.InputModule
                     innerPointer.SetActive(false);
                 }
             }
-
-            //Initialize our Sound Player
-            _soundPlayer = gameObject.AddComponent<AudioSource>();
 
             //Initialize the arrays that store persistent objects per pointer
             _pointEvents = new PointerEventData[_numberOfPointers];
@@ -546,7 +497,7 @@ namespace Leap.Unity.InputModule
 
                     if (IsTriggeringInteraction(whichPointer, whichHand, whichFinger))
                     {
-                        environmentPinch.Invoke(_pointers[whichPointer].position);
+                        onEnvironmentPinch.Invoke(this, _pointers[whichPointer].position);
                     }
                 }
 
@@ -817,6 +768,19 @@ namespace Leap.Unity.InputModule
             Camera.main.transform.rotation = _oldCameraRot;
             //Camera.main.fieldOfView = OldCameraFoV;
         }
+        
+        void OnDrawGizmos()
+        {
+            if (drawDebug)
+            {
+                while (_debugSphereQueue != null && _debugSphereQueue.Count > 0)
+                {
+                    Gizmos.DrawSphere(_debugSphereQueue.Dequeue(), 0.1f);
+                }
+            }
+        }
+        
+        #endregion
 
         //Raycast from the EventCamera into UI Space
         bool GetLookPointerEventData(int whichPointer, int whichHand, int whichFinger, Vector3 origin,
@@ -1008,6 +972,22 @@ namespace Leap.Unity.InputModule
                 _pointerState[whichPointer] = PointerStates.OffCanvas;
             }
         }
+        
+        static readonly Dictionary<(PointerStates from, PointerStates to), Action<LeapInputModule, int>> StateActionMap = new Dictionary<(PointerStates prev, PointerStates pointer), Action<LeapInputModule, int>>()
+        {
+            {(PointerStates.OnCanvas, PointerStates.OnElement), (module, whichPointer) => module.onBeginHover.Invoke(module, module._pointers[whichPointer].transform.position) },
+            {(PointerStates.OnCanvas, PointerStates.PinchingToCanvas), (module, whichPointer) => module.onBeginMissed.Invoke(module, module._pointers[whichPointer].transform.position) },
+            {(PointerStates.PinchingToCanvas, PointerStates.OnCanvas), (module, whichPointer) => module.onEndMissed.Invoke(module, module._pointers[whichPointer].transform.position) },
+            {(PointerStates.OnElement, PointerStates.OnCanvas), (module, whichPointer) => module.onEndHover.Invoke(module, module._pointers[whichPointer].transform.position) },
+            {(PointerStates.OnElement, PointerStates.PinchingToElement), (module, whichPointer) => module.onClickDown.Invoke(module, module._pointers[whichPointer].transform.position) },
+            {(PointerStates.PinchingToElement, PointerStates.OnElement), (module, whichPointer) => module.onClickUp.Invoke(module, module._pointers[whichPointer].transform.position) },
+            {(PointerStates.PinchingToElement, PointerStates.OnCanvas), (module, whichPointer) => module.onClickUp.Invoke(module, module._pointers[whichPointer].transform.position) },
+            {(PointerStates.NearCanvas, PointerStates.TouchingElement), (module, whichPointer) => module.onClickDown.Invoke(module, module._pointers[whichPointer].transform.position) },
+            {(PointerStates.NearCanvas, PointerStates.TouchingCanvas), (module, whichPointer) => module.onBeginMissed.Invoke(module, module._pointers[whichPointer].transform.position) },
+            {(PointerStates.TouchingCanvas, PointerStates.NearCanvas), (module, whichPointer) => module.onEndMissed.Invoke(module, module._pointers[whichPointer].transform.position) },
+            {(PointerStates.TouchingElement, PointerStates.NearCanvas), (module, whichPointer) => module.onClickUp.Invoke(module, module._pointers[whichPointer].transform.position) },
+            {(PointerStates.OffCanvas, PointerStates.OffCanvas), (module, whichPointer) => module._timeEnteredCanvas[whichPointer] = Time.time },
+        };
 
         //Discrete 1-Frame Transition Behaviors like Sounds and Events
         //(color changing is in a different function since it is lerped over multiple frames)
@@ -1021,107 +1001,13 @@ namespace Leap.Unity.InputModule
                     if (_currentOverGo[whichPointer] != _prevOverGo[whichPointer])
                     {
                         //When you begin to hover on an element
-                        _soundPlayer.PlayOneShot(beginHoverSound);
-                        onHover.Invoke(_pointers[whichPointer].transform.position);
+                        onBeginHover.Invoke(this, _pointers[whichPointer].transform.position);
                     }
                 }
             }
-
-            //Warning: Horrible State Machine ahead...
-            if (_prevState[whichPointer] == PointerStates.OnCanvas)
-            {
-                if (_pointerState[whichPointer] == PointerStates.OnElement)
-                {
-                    //When you go from hovering on the Canvas to hovering on an element
-                    if (!triggerHoverOnElementSwitch)
-                    {
-                        _soundPlayer.PlayOneShot(beginHoverSound);
-                        onHover.Invoke(_pointers[whichPointer].transform.position);
-                    }
-                }
-                else if (_pointerState[whichPointer] == PointerStates.PinchingToCanvas)
-                {
-                    //When you try to interact with the Canvas
-                    _soundPlayer.PlayOneShot(beginMissedSound);
-                }
-            }
-            else if (_prevState[whichPointer] == PointerStates.PinchingToCanvas)
-            {
-                if (_pointerState[whichPointer] == PointerStates.OnCanvas)
-                {
-                    //When you unpinch off of Blank Canvas
-                    _soundPlayer.PlayOneShot(endMissedSound);
-                }
-            }
-            else if (_prevState[whichPointer] == PointerStates.OnElement)
-            {
-                if (_pointerState[whichPointer] == PointerStates.OnCanvas)
-                {
-                    //When you begin to hover over the Canvas after hovering over an element
-                    _soundPlayer.PlayOneShot(endHoverSound);
-                }
-                else if (_pointerState[whichPointer] == PointerStates.PinchingToElement)
-                {
-                    //When you click on an element
-                    _soundPlayer.PlayOneShot(beginTriggerSound);
-                    onClickDown.Invoke(_pointers[whichPointer].transform.position);
-                }
-            }
-            else if (_prevState[whichPointer] == PointerStates.PinchingToElement)
-            {
-                if (_pointerState[whichPointer] == PointerStates.PinchingToCanvas)
-                {
-                    //When you slide off of an element while holding it
-                    //SoundPlayer.PlayOneShot(HoverSound);
-                }
-                else if (_pointerState[whichPointer] == PointerStates.OnElement ||
-                         _pointerState[whichPointer] == PointerStates.OnCanvas)
-                {
-                    //When you let go of an element
-                    _soundPlayer.PlayOneShot(endTriggerSound);
-                    onClickUp.Invoke(_pointers[whichPointer].transform.position);
-                }
-            }
-            else if (_prevState[whichPointer] == PointerStates.NearCanvas)
-            {
-                if (_pointerState[whichPointer] == PointerStates.TouchingElement)
-                {
-                    //When you physically touch an element
-                    _soundPlayer.PlayOneShot(beginTriggerSound);
-                    onClickDown.Invoke(_pointers[whichPointer].transform.position);
-                }
-
-                if (_pointerState[whichPointer] == PointerStates.TouchingCanvas)
-                {
-                    //When you physically touch Blank Canvas
-                    _soundPlayer.PlayOneShot(beginMissedSound);
-                }
-            }
-            else if (_prevState[whichPointer] == PointerStates.TouchingCanvas)
-            {
-                if (_pointerState[whichPointer] == PointerStates.NearCanvas)
-                {
-                    //When you physically lift off of Blank Canvas
-                    _soundPlayer.PlayOneShot(endMissedSound);
-                }
-            }
-            else if (_prevState[whichPointer] == PointerStates.TouchingElement)
-            {
-                if (_pointerState[whichPointer] == PointerStates.NearCanvas)
-                {
-                    //When you physically pull out of an element
-                    _soundPlayer.PlayOneShot(endTriggerSound);
-                    onClickUp.Invoke(_pointers[whichPointer].transform.position);
-                }
-            }
-            else if (_prevState[whichPointer] == PointerStates.OffCanvas)
-            {
-                if (_pointerState[whichPointer] != PointerStates.OffCanvas)
-                {
-                    //Record the time the hand entered an interactable state
-                    _timeEnteredCanvas[whichPointer] = Time.time;
-                }
-            }
+            
+            StateActionMap.TryGetValue((_prevState[whichPointer], _pointerState[whichPointer]), out var result);
+            result?.Invoke(this, whichPointer);
         }
 
         //Update the pointer location and whether or not it is enabled
@@ -1408,17 +1294,6 @@ namespace Leap.Unity.InputModule
 
             BaseEventData data = GetBaseEventData();
             ExecuteEvents.Execute(eventSystem.currentSelectedGameObject, data, ExecuteEvents.updateSelectedHandler);
-        }
-
-        void OnDrawGizmos()
-        {
-            if (drawDebug)
-            {
-                while (_debugSphereQueue != null && _debugSphereQueue.Count > 0)
-                {
-                    Gizmos.DrawSphere(_debugSphereQueue.Dequeue(), 0.1f);
-                }
-            }
         }
 
         /** Only activate the InputModule when there are hands in the scene. */
