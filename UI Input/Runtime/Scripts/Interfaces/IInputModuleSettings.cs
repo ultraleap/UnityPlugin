@@ -35,9 +35,6 @@ namespace Leap.Unity.InputModule
         //The size of the pointer in world coordinates with respect to the distance between the cursor and the camera.
         AnimationCurve PointerDistanceScale { get; }
 
-        //Create a pointer for each finger.
-        bool PointerPerFinger { get; }
-
         //The Opacity of the Inner Pointer relative to the Primary Pointer.
         float InnerPointerOpacityScalar { get; }
 

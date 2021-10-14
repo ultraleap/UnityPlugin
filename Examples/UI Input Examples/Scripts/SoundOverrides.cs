@@ -1,4 +1,6 @@
 ﻿using System;
+using Leap;
+using Leap.Unity;
 using Leap.Unity.InputModule;
 using UnityEngine;
 using UnityEngine.Events;
@@ -75,7 +77,7 @@ public class SoundOverrides : MonoBehaviour
         {
             return;
         }
-        
+
         if (module is IInputModuleEventHandler eventHandler)
         {
             eventHandler.OnClickDown -= OnClickDown;
