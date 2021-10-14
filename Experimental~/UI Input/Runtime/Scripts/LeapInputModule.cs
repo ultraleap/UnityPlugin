@@ -37,7 +37,6 @@ namespace Leap.Unity.InputModule
         [SerializeField]
         private Camera mainCamera;
 
-
         //The LeapProvider providing tracking data to the scene.
         [Tooltip("The current Leap Data Provider for the scene.")]
         [SerializeField]
@@ -55,67 +54,19 @@ namespace Leap.Unity.InputModule
         [SerializeField]
         private PinchDetector rightHandDetector;
 
-        //Customizable Pointer Parameters
-        [Header(" Pointer Setup")]
-
-        //The sprite for the cursor.
-        [Tooltip("The sprite used to represent your pointers during projective interaction.")]
-        [SerializeField]
-        private Sprite pointerSprite;
-        public Sprite PointerSprite => pointerSprite;
-
-        //The cursor material.
-        [Tooltip("The material to be instantiated for your pointers during projective interaction.")]
-        [SerializeField]
-        private Material pointerMaterial;
-
-        //The color for the cursor when it is not in a special state.
-        [Tooltip("The color of the pointer when it is hovering over blank canvas.")]
-        [SerializeField]
-        private Color standardColor = Color.white;
-        public Color StandardColor => standardColor;
-
-        //The color for the cursor when it is hovering over a control.
-        [Tooltip("The color of the pointer when it is hovering over any other UI element.")]
-        [SerializeField]
-        private Color hoveringColor = Color.green;
-        public Color HoveringColor => hoveringColor;
-
-        //The color for the cursor when it is actively interacting with a control.
-        [Tooltip("The color of the pointer when it is triggering a UI element.")]
-        [SerializeField]
-        private Color triggeringColor = Color.gray;
-        public Color TriggeringColor => triggeringColor;
-
-        //The color for the cursor when it is touching or triggering a non-active part of the UI (such as the canvas).
-        [Tooltip("The color of the pointer when it is triggering blank canvas.")]
-        [SerializeField]
-        private Color triggerMissedColor = Color.gray;
-        public Color TriggerMissedColor => triggerMissedColor;
-
         //Advanced Options
         [Header(" Advanced Options")]
-
-        [Tooltip("Whether or not to show Advanced Options in the Inspector.")]
-        [SerializeField]
-        private bool showAdvancedOptions;
-        public bool ShowAdvancedOptions => showAdvancedOptions;
 
         //The distance from the base of a UI element that tactile interaction is triggered.
         [Tooltip("The distance from the base of a UI element that tactile interaction is triggered.")]
         [SerializeField]
         private float tactilePadding = 0.005f;
         public float TactilePadding => tactilePadding;
-        
-        [Tooltip("Whether or not to show unsupported Experimental Options in the Inspector.")]
-        [SerializeField]
-        private bool showExperimentalOptions;
-        public bool ShowExperimentalOptions => showExperimentalOptions;
 
         //The mode to use for interaction. The default mode is tactile. The projective mode is considered experimental.
         [Tooltip("The interaction mode that the Input Module will be restricted to.")]
         [SerializeField]
-        private InteractionCapability interactionMode = InteractionCapability.Tactile;
+        private InteractionCapability interactionMode = InteractionCapability.Hybrid;
 
         public InteractionCapability InteractionMode => interactionMode;
 
@@ -167,6 +118,46 @@ namespace Leap.Unity.InputModule
         //Transform the Interaction Pointer to allow the Module to work in a non-stationary reference frame.
         [Tooltip("Transform the Interaction Pointer to allow the Module to work in a non-stationary reference frame.")]
         [SerializeField] private bool movingReferenceFrame;
+
+
+        //Customizable Pointer Parameters
+        [Header(" Pointer Setup")]
+
+        //The sprite for the cursor.
+        [Tooltip("The sprite used to represent your pointers during projective interaction.")]
+        [SerializeField]
+        private Sprite pointerSprite;
+        public Sprite PointerSprite => pointerSprite;
+
+        //The cursor material.
+        [Tooltip("The material to be instantiated for your pointers during projective interaction.")]
+        [SerializeField]
+        private Material pointerMaterial;
+
+        //The color for the cursor when it is not in a special state.
+        [Tooltip("The color of the pointer when it is hovering over blank canvas.")]
+        [SerializeField]
+        private Color standardColor = Color.white;
+        public Color StandardColor => standardColor;
+
+        //The color for the cursor when it is hovering over a control.
+        [Tooltip("The color of the pointer when it is hovering over any other UI element.")]
+        [SerializeField]
+        private Color hoveringColor = Color.green;
+        public Color HoveringColor => hoveringColor;
+
+        //The color for the cursor when it is actively interacting with a control.
+        [Tooltip("The color of the pointer when it is triggering a UI element.")]
+        [SerializeField]
+        private Color triggeringColor = Color.gray;
+        public Color TriggeringColor => triggeringColor;
+
+        //The color for the cursor when it is touching or triggering a non-active part of the UI (such as the canvas).
+        [Tooltip("The color of the pointer when it is triggering blank canvas.")]
+        [SerializeField]
+        private Color triggerMissedColor = Color.gray;
+        public Color TriggerMissedColor => triggerMissedColor;
+
 
         private PointerElement _pointerLeft;
         private PointerElement _pointerRight;
