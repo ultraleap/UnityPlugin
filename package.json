@@ -22,6 +22,11 @@
       "displayName": "Examples",
       "description": "",
       "path": "Examples~"
+    },
+    {
+      "displayName": "Experimental/UI Input",
+      "description": "",
+      "path": "Experimental~/UI Input"
     }
   ]
 }
