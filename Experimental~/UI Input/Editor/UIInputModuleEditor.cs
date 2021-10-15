@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2020.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2021.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -10,8 +10,8 @@ using UnityEditor;
 
 namespace Leap.Unity.InputModule
 {
-    [CustomEditor(typeof(LeapInputModule))]
-    public class LeapInputModuleEditor : CustomEditorBase<LeapInputModule>
+    [CustomEditor(typeof(UIInputModule))]
+    public class UIInputModuleEditor : CustomEditorBase<UIInputModule>
     {
         protected override void OnEnable()
         {

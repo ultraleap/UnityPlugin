@@ -1,6 +1,12 @@
-﻿using System;
-using Leap;
-using Leap.Unity;
+﻿/******************************************************************************
+ * Copyright (C) Ultraleap, Inc. 2011-2021.                                   *
+ *                                                                            *
+ * Use subject to the terms of the Apache License 2.0 available at            *
+ * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
+ * between Ultraleap and you, your company or other organization.             *
+ ******************************************************************************/
+
+using System;
 using Leap.Unity.InputModule;
 using UnityEngine;
 using UnityEngine.Events;
@@ -11,7 +17,7 @@ public class SoundOverrides : MonoBehaviour
     [Serializable]
     public class PositionEvent : UnityEvent<Vector3> { }
     
-    [SerializeField] private LeapInputModule module;
+    [SerializeField] private UIInputModule module;
 
     [Header(" Event Setup")]
 
@@ -50,7 +56,7 @@ public class SoundOverrides : MonoBehaviour
     {
         if (!module)
         {
-            Debug.Log($"You must set a valid {nameof(LeapInputModule)} on this script for it to function");
+            Debug.Log($"You must set a valid {nameof(UIInputModule)} on this script for it to function");
             return;
         }
 

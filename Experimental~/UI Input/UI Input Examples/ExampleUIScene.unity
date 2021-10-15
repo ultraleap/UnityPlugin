@@ -453,7 +453,7 @@ PrefabInstance:
     - target: {fileID: 11484536, guid: 8b10486b9212d9f4badcf6c992af0a47, type: 3}
       propertyPath: mainCamera
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 1261053358}
     - target: {fileID: 11484536, guid: 8b10486b9212d9f4badcf6c992af0a47, type: 3}
       propertyPath: innerPointer
       value: 1
@@ -473,12 +473,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 11484536, guid: 8b10486b9212d9f4badcf6c992af0a47, type: 3}
       propertyPath: interactionMode
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 11484536, guid: 8b10486b9212d9f4badcf6c992af0a47, type: 3}
       propertyPath: pointerMaterial
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 2100000, guid: 281e2e9ba50e425488f6b5402c4f8ec0, type: 2}
     - target: {fileID: 11484536, guid: 8b10486b9212d9f4badcf6c992af0a47, type: 3}
       propertyPath: LeapDataProvider
       value: 
@@ -486,7 +486,7 @@ PrefabInstance:
     - target: {fileID: 11484536, guid: 8b10486b9212d9f4badcf6c992af0a47, type: 3}
       propertyPath: leapDataProvider
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 1261053359}
     - target: {fileID: 11484536, guid: 8b10486b9212d9f4badcf6c992af0a47, type: 3}
       propertyPath: leftHandDetector
       value: 
@@ -1125,6 +1125,24 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5c68b57d4ea619140ac646846102e865, type: 3}
+--- !u!20 &1261053358 stripped
+Camera:
+  m_CorrespondingSourceObject: {fileID: 547020878837072258, guid: 5c68b57d4ea619140ac646846102e865,
+    type: 3}
+  m_PrefabInstance: {fileID: 1261053357}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1261053359 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3947936638174131456, guid: 5c68b57d4ea619140ac646846102e865,
+    type: 3}
+  m_PrefabInstance: {fileID: 1261053357}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: abb0e8dd6c809854f8fea5e0976884f8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1298446519
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1374,7 +1392,7 @@ PrefabInstance:
     - target: {fileID: 2113837065891671374, guid: ed811e274f5753b478b84e8424f730ef,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0.00042452585
+      value: 0.000026119675
       objectReference: {fileID: 0}
     - target: {fileID: 3890417976541618248, guid: ed811e274f5753b478b84e8424f730ef,
         type: 3}
@@ -1804,7 +1822,7 @@ PrefabInstance:
     - target: {fileID: 2113837065891671374, guid: ed811e274f5753b478b84e8424f730ef,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0.00045504264
+      value: 0.000029931578
       objectReference: {fileID: 0}
     - target: {fileID: 3890417976541618248, guid: ed811e274f5753b478b84e8424f730ef,
         type: 3}
