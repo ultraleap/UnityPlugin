@@ -678,7 +678,8 @@ namespace Leap.Unity.InputModule
                     }
                     else
                     {
-                        Pointer.transform.position = globalLookPos;
+                        //Amount the pointer floats above the Canvas
+                        Pointer.transform.position = globalLookPos - Pointer.transform.forward * 0.01f;
                     }
 
                     var pointerAngle = Mathf.Rad2Deg * Mathf.Atan2(pointData.delta.x, pointData.delta.y);
@@ -686,7 +687,8 @@ namespace Leap.Unity.InputModule
 
                     if (InnerPointer)
                     {
-                        InnerPointer.transform.position = globalLookPos; // -transform.forward * 0.01f; //Amount the pointer floats above the Canvas
+                        //Amount the pointer floats above the Canvas
+                        InnerPointer.transform.position = globalLookPos - InnerPointer.transform.forward * 0.01f; 
                         InnerPointer.transform.rotation = draggingPlane.rotation * Quaternion.Euler(0f, 0f, -pointerAngle);
                     }
                 }
