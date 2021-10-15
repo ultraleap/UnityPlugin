@@ -1,4 +1,4 @@
-﻿/******************************************************************************
+/******************************************************************************
  * Copyright (C) Ultraleap, Inc. 2011-2021.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
@@ -440,9 +440,8 @@ namespace Leap.Unity.InputModule
                                 }
                                 else
                                 {
-                                    GameObjectBeingDragged =
-                                        EventData
-                                            .pointerDrag; // Property OnDragTarget for .EventData.pointerDrag
+                                    // Property OnDragTarget for .EventData.pointerDrag
+                                    GameObjectBeingDragged = EventData.pointerDrag; 
                                     DragStartPosition = EventData.position;
 
                                     if (CurrentGameObject && CurrentGameObject == GameObjectBeingDragged)
@@ -548,12 +547,11 @@ namespace Leap.Unity.InputModule
             EventData.button = PointerEventData.InputButton.Left;
 
             //If we're in "Touching Mode", Raycast through the fingers
-            Vector3 pointerPosition; // It's a lie, this is not the index finger - but the selected pointing finger....
-            if (IsTouchingOrNearlyTouchingCanvasOrElement || forceTipRaycast) // WTF is touching mode all about ??? Why is it related to tip raycast??
+            Vector3 pointerPosition;
+            if (IsTouchingOrNearlyTouchingCanvasOrElement || forceTipRaycast)
             {
                 tipRaycast = true;
 
-                //Focus pointer through the average of the extended fingers - comment is out of date, not taking an average any more???
                 var farthest = 0f;
                 pointerPosition = hand.GetIndex().TipPosition.ToVector3();
                 for (var i = 1; i < 3; i++)
@@ -567,7 +565,6 @@ namespace Leap.Unity.InputModule
 
                     if (fingerDistance > farthest && fingerExtension > 0.5f)
                     {
-                        // Hmm, not really the index finger position 0 but the selected furthest finger that is considered extended
                         farthest = fingerDistance;
                         pointerPosition = hand.Fingers[i].TipPosition.ToVector3(); 
                     }
@@ -580,7 +577,6 @@ namespace Leap.Unity.InputModule
             }
 
             //Set the Raycast Direction and Delta
-            
             EventData.position = _mainCamera.WorldToScreenPoint(pointerPosition);
             EventData.delta = EventData.position - PrevScreenPosition;
             EventData.scrollDelta = Vector2.zero;
@@ -741,7 +737,6 @@ namespace Leap.Unity.InputModule
         {
             var transitionAmount = Mathf.Clamp01(Mathf.Abs(DistanceOfTipToPointer(hand) - _settings.ProjectiveToTactileTransitionDistance) / 0.05f);
 
-            //TODO Can we reduce the number of instantiations we do here w.r.t. creating colours?
             switch (PointerState)
             {
                 case PointerStates.OnCanvas:
@@ -788,7 +783,6 @@ namespace Leap.Unity.InputModule
         /// <param name="lerpAlpha">The amount to interpolate by</param>
         private void LerpPointerColor(Color color, float lerpAlpha)
         {
-            // TODO can we avoid the new operation for the colours?
             var pointerSprite = Pointer.GetComponent<SpriteRenderer>();
             var oldColor = pointerSprite.color;
             if (color.r == 0f && color.g == 0f && color.b == 0f)

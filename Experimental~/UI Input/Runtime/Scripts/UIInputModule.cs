@@ -209,7 +209,9 @@ namespace Leap.Unity.InputModule
             _projectionOriginProvider?.Update();
         }
 
-        //Process is called by UI system to process events
+        /// <summary>
+        /// Process is called by UI system to process events
+        /// </summary>
         public override void Process()
         {
             if (movingReferenceFrame)
@@ -232,6 +234,11 @@ namespace Leap.Unity.InputModule
             _pointerRight.Process(GetHand(Chirality.Right), _projectionOriginProvider);
         }
         
+        /// <summary>
+        /// Returns hand that matches specified chirality, if one exists
+        /// </summary>
+        /// <param name="chirality">Chirality of the required hand</param>
+        /// <returns>Matching hand, if one exist else null</returns>
         private Hand GetHand(Chirality chirality)
         {
             foreach (var current in leapDataProvider.CurrentFrame.Hands)
@@ -249,6 +256,7 @@ namespace Leap.Unity.InputModule
 
             return null;
         }
+        
         private void OnDrawGizmos()
         {
             if (_projectionOriginProvider != null)
@@ -262,7 +270,10 @@ namespace Leap.Unity.InputModule
             }
         }
 
-        /** Only activate the InputModule when there are hands in the scene. */
+        /// <summary>
+        /// Only activate the InputModule when there are hands in the scene.
+        /// </summary>
+        /// <returns>True if hands are in the scene, otherwise false</returns>
         public override bool ShouldActivateModule()
         {
             return leapDataProvider.CurrentFrame != null && leapDataProvider.CurrentFrame.Hands.Count > 0 &&
