@@ -563,33 +563,7 @@ namespace Leap.Unity.InputModule
 
             //Perform the Raycast and sort all the things we hit by distance... (where distance is the canvas order, not the Z-depth???)
             _eventSystem.RaycastAll(EventData, _raycastResultCache);
-
-            //Optional hack that subverts ScrollRect hierarchies; to avoid this, disable "RaycastTarget" on the Viewport and Content panes
-            if (_settings.OverrideScrollViewClicks)
-            {
-                EventData.pointerCurrentRaycast = new RaycastResult(); // Suboptimal creation of newed object, not needed each time
-                foreach (var t in _raycastResultCache) // Why do we loop over everything in the cache? Don't we want to find the first result of the valid type?
-                {
-                    if (t.gameObject.GetComponent<Scrollbar>() != null)
-                    {
-                        EventData.pointerCurrentRaycast = t;
-                    }
-                    else if (EventData.pointerCurrentRaycast.gameObject == null &&
-                             t.gameObject.GetComponent<ScrollRect>() != null)
-                    {
-                        EventData.pointerCurrentRaycast = t;
-                    }
-                }
-
-                if (EventData.pointerCurrentRaycast.gameObject == null)
-                {
-                    EventData.pointerCurrentRaycast = _inputModuleEventHandler.FindFirstRaycastProxy(_raycastResultCache);
-                }
-            }
-            else
-            {
-                EventData.pointerCurrentRaycast = _inputModuleEventHandler.FindFirstRaycastProxy(_raycastResultCache);
-            }
+            EventData.pointerCurrentRaycast = _inputModuleEventHandler.FindFirstRaycastProxy(_raycastResultCache);
 
             //Clear the list of things we hit; we don't need it anymore.
             _raycastResultCache.Clear();

@@ -23,9 +23,6 @@ namespace Leap.Unity.InputModule
         //The distance from the canvas at which to switch to projective mode.
         float ProjectiveToTactileTransitionDistance { get; }
 
-        //If the ScrollView still doesn't work even after disabling RaycastTarget on the intermediate layers.
-        bool OverrideScrollViewClicks { get; }
-
         //The size of the pointer in world coordinates with respect to the distance between the thumb and forefinger.
         AnimationCurve PointerPinchScale { get; }
 

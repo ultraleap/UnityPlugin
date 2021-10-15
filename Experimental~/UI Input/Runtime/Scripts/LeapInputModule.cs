@@ -105,11 +105,6 @@ namespace Leap.Unity.InputModule
         [SerializeField] private bool triggerHoverOnElementSwitch;
         public bool TriggerHoverOnElementSwitch => triggerHoverOnElementSwitch;
 
-        //If the ScrollView still doesn't work even after disabling RaycastTarget on the intermediate layers.
-        [Tooltip("If the ScrollView still doesn't work even after disabling RaycastTarget on the intermediate layers.")]
-        [SerializeField] private bool overrideScrollViewClicks;
-        public bool OverrideScrollViewClicks => overrideScrollViewClicks;
-
         //Transform the Interaction Pointer to allow the Module to work in a non-stationary reference frame.
         [Tooltip("Transform the Interaction Pointer to allow the Module to work in a non-stationary reference frame.")]
         [SerializeField] private bool movingReferenceFrame;
