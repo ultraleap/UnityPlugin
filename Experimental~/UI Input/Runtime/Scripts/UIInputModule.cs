@@ -161,7 +161,7 @@ namespace Leap.Unity.InputModule
         /// <summary>
         /// Initialisation
         /// </summary>
-        protected void Start()
+        protected override void Start()
         {            
             if (mainCamera == null)
             {
