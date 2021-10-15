@@ -22,7 +22,7 @@ namespace Leap.Unity.InputModule
         /// </summary>
         /// <param name="isLeftHand">True if this is for a left hand</param>
         /// <returns>The projection origin</returns>
-        Vector3 ProjectionOriginForHand(bool isLeftHand);
+        Vector3 ProjectionOriginForHand(Hand hand);
 
         Quaternion CurrentRotation { get; }
         Vector3 ProjectionOriginLeft { get; }

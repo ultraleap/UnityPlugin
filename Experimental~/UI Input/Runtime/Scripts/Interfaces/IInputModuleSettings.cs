@@ -26,9 +26,6 @@ namespace Leap.Unity.InputModule
         //If the ScrollView still doesn't work even after disabling RaycastTarget on the intermediate layers.
         bool OverrideScrollViewClicks { get; }
 
-        //Render the pointer onto the environment.
-        bool RenderEnvironmentPointer { get; }
-
         //The size of the pointer in world coordinates with respect to the distance between the thumb and forefinger.
         AnimationCurve PointerPinchScale { get; }
 

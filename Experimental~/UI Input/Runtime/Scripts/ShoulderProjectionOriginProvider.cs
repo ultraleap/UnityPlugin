@@ -58,10 +58,10 @@ namespace Leap.Unity.InputModule
             /// <summary>
             /// Returns the projection origin for the specfied hand
             /// </summary>
-            /// <param name="isLeftHand">Whether this is for the left hand, if not assume it's the right hand!</param>
+            /// <param name="hand">Hand used to determine chirality</param>
             /// <returns>The projection origin to use for the specified hand</returns>
-            public Vector3 ProjectionOriginForHand(bool isLeftHand)
-                => isLeftHand
+            public Vector3 ProjectionOriginForHand(Hand hand)
+                => hand.IsLeft
                     ? ProjectionOriginLeft
                     : ProjectionOriginRight;
         }

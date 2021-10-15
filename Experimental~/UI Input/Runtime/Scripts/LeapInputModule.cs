@@ -90,11 +90,6 @@ namespace Leap.Unity.InputModule
         [SerializeField] private float pinchingThreshold = 30f;
         public float PinchingThreshold => pinchingThreshold;
 
-        //Render the pointer onto the environment.
-        [Tooltip("Render the pointer onto the environment.")]
-        [SerializeField] private bool environmentPointer; // Rename to renderPointersOnEnvironment
-        public bool RenderEnvironmentPointer => environmentPointer;
-
         //Render a smaller pointer inside of the main pointer.
         [Tooltip("Render a smaller pointer inside of the main pointer.")]
         [SerializeField] private bool innerPointer = true;
@@ -202,10 +197,10 @@ namespace Leap.Unity.InputModule
                 projectiveToTactileTransitionDistance = float.MaxValue;
             }
 
-            _pointerLeft = new PointerElement(Chirality.Left, mainCamera, eventSystem, leapDataProvider, this, this, leftHandDetector, rightHandDetector);
+            _pointerLeft = new PointerElement(Chirality.Left, mainCamera, eventSystem, leapDataProvider, this, this, leftHandDetector);
             _pointerLeft.Initialise(transform, pointerSprite, pointerMaterial, innerPointer);
 
-            _pointerRight = new PointerElement(Chirality.Right, mainCamera, eventSystem, leapDataProvider, this, this, leftHandDetector, rightHandDetector);
+            _pointerRight = new PointerElement(Chirality.Right, mainCamera, eventSystem, leapDataProvider, this, this, rightHandDetector);
             _pointerRight.Initialise(transform, pointerSprite, pointerMaterial, innerPointer);
         }
 

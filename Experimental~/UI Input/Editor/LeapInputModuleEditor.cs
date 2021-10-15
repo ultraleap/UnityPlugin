@@ -19,7 +19,6 @@ namespace Leap.Unity.InputModule
 
             specifyConditionalDrawing(() => target.InteractionMode == InteractionCapability.Hybrid || target.InteractionMode == InteractionCapability.Projective,
                                      "pinchingThreshold",
-                                     "environmentPointer",
                                      "environmentPinch",
                                      "pointerPinchScale",
                                      "leftHandDetector",
@@ -42,9 +41,6 @@ namespace Leap.Unity.InputModule
 
             specifyConditionalDrawing(() => target.InnerPointer,
                                "innerPointerOpacityScalar");
-
-            specifyConditionalDrawing(() => target.RenderEnvironmentPointer,
-                   "environmentPinch");
         }
     }
 }
