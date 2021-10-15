@@ -140,7 +140,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_FontData:
-    m_Font: {fileID: 12800000, guid: 7397991fd148e8b4481078110744c5d0, type: 3}
+    m_Font: {fileID: 12800000, guid: c7836f353ecea934ea191a519262d190, type: 3}
     m_FontSize: 20
     m_FontStyle: 0
     m_BestFit: 0
@@ -302,8 +302,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Layers:
-  - Label: ToggleBackdrop Layer
-    LayerTransform: {fileID: 2328197965514107395}
+  - LayerTransform: {fileID: 2328197965514107395}
     MaxFloatDistance: 0.02
     MinFloatDistance: 0
     Shadow: {fileID: 2504466503334704549}

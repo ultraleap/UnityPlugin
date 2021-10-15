@@ -31,10 +31,6 @@ namespace Leap.Unity.InputModule
         [System.Serializable]
         public struct Layer
         {
-            [HideInInspector]
-            /** A name for the layer. */
-            public string Label;
-
             [Tooltip("The child UI Element to hover above the canvas")]
             /** The child UI Element to float above the parent element. */
             public RectTransform LayerTransform;
@@ -272,17 +268,6 @@ namespace Leap.Unity.InputModule
                 {
                     Layers[i].MinFloatDistance *= 2f;
                     Layers[i].MaxFloatDistance *= 2f;
-                }
-            }
-        }
-
-        void OnValidate()
-        {
-            for (int i = 0; i < Layers.Length; i++)
-            {
-                if (Layers[i].LayerTransform != null)
-                {
-                    Layers[i].Label = Layers[i].LayerTransform.gameObject.name + " Layer";
                 }
             }
         }
