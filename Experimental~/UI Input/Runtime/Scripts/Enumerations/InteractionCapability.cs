@@ -1,14 +1,15 @@
 ﻿namespace Leap.Unity.InputModule
 {
+    /// <summary>
     /// Defines the interaction modes :
-    ///
-    /// - Hybrid: Both tactile and projective interaction. The active mode depends on the ProjectiveToTactileTransitionDistance value.
-    /// - Tactile: The user must physically touch the controls.
-    /// - Projective: A cursor is projected from the user's knuckle.
+    /// - Both: Both direct and indirect interaction. The active mode depends on the ProjectiveToTactileTransitionDistance value.
+    /// - Direct: The user must physically touch the controls.
+    /// - Indirect: A cursor is projected from the user's knuckle.
+    /// </summary>
     public enum InteractionCapability  // Bitfield might be better here with Hybrid being both bits set ....
     {
-        Hybrid,
-        Tactile,
-        Projective
+        Both,
+        Direct,
+        Indirect
     };
 }

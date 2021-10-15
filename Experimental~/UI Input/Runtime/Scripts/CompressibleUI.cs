@@ -15,11 +15,12 @@ using System.Collections.Generic;
 
 namespace Leap.Unity.InputModule
 {
-    /** Supports layer-based, compressible animations that lend a 3D affordance to otherwise flat UI elements.
-      * The CompressibleUI script lets you separate the components of a UI and individual controls into 
-      * floating layers that depress when the user touches them. The CompressibleUI can make it easier for a 
-      * user to use a control. 
-      */
+    /// <summary>
+    /// Supports layer-based, compressible animations that lend a 3D affordance to otherwise flat UI elements.
+    /// The CompressibleUI script lets you separate the components of a UI and individual controls into 
+    /// floating layers that depress when the user touches them. The CompressibleUI can make it easier for a 
+    /// user to use a control. 
+    /// </summary>
     public class CompressibleUI : MonoBehaviour, ILeapWidget
     {
         [Tooltip("A list of RectTransforms that are floated relative to this GameObject.")]
@@ -285,8 +286,6 @@ namespace Leap.Unity.InputModule
                 }
             }
         }
-
-
     }
 
     public static class ExtensionMethods

@@ -25,7 +25,6 @@ namespace Leap.Unity.InputModule
         EventHandler<Vector3> OnBeginMissed { get; set; }
 
         EventHandler<Vector3> OnEndMissed { get; set; }
-        EventHandler<Vector3> OnEnvironmentPinch { get; set; }
 
         void HandlePointerExitAndEnterProxy(PointerEventData EventData, GameObject CurrentGameObjectUnderPointer);
         RaycastResult FindFirstRaycastProxy(List<RaycastResult> candidates);

@@ -39,17 +39,12 @@ public class SoundOverrides : MonoBehaviour
     [Tooltip("The event that is triggered upon ending missing a non-canvas UI element.")]
     [SerializeField] PositionEvent onEndMissed;
 
-    //The event that is triggered while pinching to a point in the environment.
-    [Tooltip("The event that is triggered while pinching to a point in the environment.")]
-    [SerializeField] PositionEvent onEnvironmentPinch;
-
     private void OnClickDown(object sender, Vector3 pos) => onClickDown?.Invoke(pos);
     private void OnClickUp(object sender, Vector3 pos) => onClickUp?.Invoke(pos);
     private void OnBeginHover(object sender, Vector3 pos) => onBeginHover?.Invoke(pos);
     private void OnEndHover(object sender, Vector3 pos) => onEndHover?.Invoke(pos);
     private void OnBeginMissed(object sender, Vector3 pos) => onBeginMissed?.Invoke(pos);
     private void OnEndMissed(object sender, Vector3 pos) => onEndMissed?.Invoke(pos);
-    private void OnEnvironmentPinch(object sender, Vector3 pos) => onEnvironmentPinch?.Invoke(pos);
     
     private void OnEnable()
     {
@@ -67,7 +62,6 @@ public class SoundOverrides : MonoBehaviour
             eventHandler.OnEndHover += OnEndHover;
             eventHandler.OnBeginMissed += OnBeginMissed;
             eventHandler.OnEndMissed += OnEndMissed;
-            eventHandler.OnEnvironmentPinch += OnEnvironmentPinch;
         }
     }    
     
@@ -86,7 +80,6 @@ public class SoundOverrides : MonoBehaviour
             eventHandler.OnEndHover -= OnEndHover;
             eventHandler.OnBeginMissed -= OnBeginMissed;
             eventHandler.OnEndMissed -= OnEndMissed;
-            eventHandler.OnEnvironmentPinch -= OnEnvironmentPinch;
         }
     }
 }

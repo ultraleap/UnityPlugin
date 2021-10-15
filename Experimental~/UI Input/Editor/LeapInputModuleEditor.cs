@@ -17,30 +17,52 @@ namespace Leap.Unity.InputModule
         {
             base.OnEnable();
 
-            specifyConditionalDrawing(() => target.InteractionMode == InteractionCapability.Hybrid || target.InteractionMode == InteractionCapability.Projective,
-                                     "pinchingThreshold",
-                                     "environmentPinch",
+            specifyConditionalDrawing(() => target.InteractionMode == InteractionCapability.Both || target.InteractionMode == InteractionCapability.Indirect,
+                "pinchingThreshold",
                                      "pointerPinchScale",
                                      "leftHandDetector",
                                      "rightHandDetector",
                                      "hoveringColor");
+            
+            specifyConditionalDrawing(
+                () => target.InteractionMode == InteractionCapability.Both ||
+                      target.InteractionMode == InteractionCapability.Direct,
+                "tactilePadding");
 
+            specifyConditionalDrawing(() => target.InteractionMode == InteractionCapability.Both,
+                "projectiveToTactileTransitionDistance");
+            
+            //Calibration Setup
+            addPropertyToFoldout("pinchingThreshold", "Calibration Setup");
+            addPropertyToFoldout("tactilePadding", "Calibration Setup");
+            addPropertyToFoldout("projectiveToTactileTransitionDistance", "Calibration Setup");
+            addPropertyToFoldout("triggerHoverOnElementSwitch", "Calibration Setup");
+            addPropertyToFoldout("movingReferenceFrame","Calibration Setup");
+            
+            //Pointer Setup
+            addPropertyToFoldout("pointerSprite", "Pointer Setup");
+            addPropertyToFoldout("pointerDistanceScale", "Pointer Setup");
+            addPropertyToFoldout("pointerPinchScale","Pointer Setup");
+            addPropertyToFoldout("pointerMaterial","Pointer Setup");
+            addPropertyToFoldout("standardColor","Pointer Setup");
+            addPropertyToFoldout("hoveringColor","Pointer Setup");
+            addPropertyToFoldout("triggeringColor","Pointer Setup");
+            addPropertyToFoldout("triggerMissedColor","Pointer Setup");
+            addPropertyToFoldout("innerPointer", "Pointer Setup");
+            addPropertyToFoldout("innerPointerOpacityScalar", "Pointer Setup");
+            
             specifyConditionalDrawing(() => target.PointerSprite != null,
-                               "pointerMaterial",
-                               "standardColor",
-                               "hoveringColor",
-                               "triggeringColor",
-                               "triggerMissedColor");
+                "pointerDistanceScale",
+                "pointerPinchScale",
+                "pointerMaterial",
+                "standardColor",
+                "hoveringColor",
+                "triggeringColor",
+                "triggerMissedColor",
+                "innerPointer");
 
-            specifyConditionalDrawing(() => target.InteractionMode == InteractionCapability.Hybrid || target.InteractionMode == InteractionCapability.Tactile,
-                                     "tactilePadding");
-
-            specifyConditionalDrawing(() => target.InteractionMode == InteractionCapability.Hybrid,
-                                     "projectiveToTactileTransitionDistance",
-                                     "retractUI");
-
-            specifyConditionalDrawing(() => target.InnerPointer,
-                               "innerPointerOpacityScalar");
+            specifyConditionalDrawing(() => target.PointerSprite != null && target.InnerPointer,
+                "innerPointerOpacityScalar");
         }
     }
 }

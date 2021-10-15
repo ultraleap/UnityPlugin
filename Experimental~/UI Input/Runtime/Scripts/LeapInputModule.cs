@@ -10,6 +10,7 @@ using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using System.Collections.Generic;
+using UnityEngine.Assertions;
 
 namespace Leap.Unity.InputModule
 {
@@ -25,15 +26,21 @@ namespace Leap.Unity.InputModule
         EventHandler<Vector3> IInputModuleEventHandler.OnEndHover { get; set; }
         EventHandler<Vector3> IInputModuleEventHandler.OnBeginMissed { get; set; }
         EventHandler<Vector3> IInputModuleEventHandler.OnEndMissed { get; set; }
-        EventHandler<Vector3> IInputModuleEventHandler.OnEnvironmentPinch { get; set; }
         
         #region Properties
 
         //General Interaction Parameters
-        [Header(" Interaction Setup")]
+        [Header("Interaction Setup")]
+
+        //The mode to use for interaction. The default mode is tactile. The projective mode is considered experimental.
+        [Tooltip("The interaction mode that the Input Module will be restricted to.")]
+        [SerializeField]
+        private InteractionCapability interactionMode = InteractionCapability.Both;
+
+        public InteractionCapability InteractionMode => interactionMode;
 
         //The LeapProvider providing tracking data to the scene.
-        [Tooltip("The current Leap Data Provider for the scene.")]
+        [Tooltip("The main camera used for calculating interactions.")]
         [SerializeField]
         private Camera mainCamera;
 
@@ -54,8 +61,12 @@ namespace Leap.Unity.InputModule
         [SerializeField]
         private PinchDetector rightHandDetector;
 
-        //Advanced Options
-        [Header(" Advanced Options")]
+        //Calibration Setup
+
+        //When not using a PinchDetector, the distance in mm that the tip of the thumb and forefinger should be to activate selection during projective interaction.
+        [Tooltip("When not using a PinchDetector, the distance in mm that the tip of the thumb and forefinger should be to activate selection during projective interaction.")]
+        [SerializeField] private float pinchingThreshold = 30f;
+        public float PinchingThreshold => pinchingThreshold;
 
         //The distance from the base of a UI element that tactile interaction is triggered.
         [Tooltip("The distance from the base of a UI element that tactile interaction is triggered.")]
@@ -63,43 +74,11 @@ namespace Leap.Unity.InputModule
         private float tactilePadding = 0.005f;
         public float TactilePadding => tactilePadding;
 
-        //The mode to use for interaction. The default mode is tactile. The projective mode is considered experimental.
-        [Tooltip("The interaction mode that the Input Module will be restricted to.")]
-        [SerializeField]
-        private InteractionCapability interactionMode = InteractionCapability.Hybrid;
-
-        public InteractionCapability InteractionMode => interactionMode;
-
         //The distance from the canvas at which to switch to projective mode.
         [Tooltip("The distance from the base of a UI element that interaction switches from Projective-Pointer based to Touch based.")]
         [SerializeField] private float projectiveToTactileTransitionDistance = 0.4f;
         public float ProjectiveToTactileTransitionDistance => projectiveToTactileTransitionDistance;
-
-        //The size of the pointer in world coordinates with respect to the distance between the cursor and the camera.
-        [Tooltip("The size of the pointer in world coordinates with respect to the distance between the cursor and the camera.")]
-        [SerializeField] private AnimationCurve pointerDistanceScale = AnimationCurve.Linear(0f, 0.1f, 6f, 1f);
-        public AnimationCurve PointerDistanceScale => pointerDistanceScale;
-
-        //The size of the pointer in world coordinates with respect to the distance between the thumb and forefinger.
-        [Tooltip("The size of the pointer in world coordinates with respect to the distance between the thumb and forefinger.")]
-        [SerializeField] private AnimationCurve pointerPinchScale = AnimationCurve.Linear(30f, 0.6f, 70f, 1.1f);
-        public AnimationCurve PointerPinchScale => pointerPinchScale;
-
-        //When not using a PinchDetector, the distance in mm that the tip of the thumb and forefinger should be to activate selection during projective interaction.
-        [Tooltip("When not using a PinchDetector, the distance in mm that the tip of the thumb and forefinger should be to activate selection during projective interaction.")]
-        [SerializeField] private float pinchingThreshold = 30f;
-        public float PinchingThreshold => pinchingThreshold;
-
-        //Render a smaller pointer inside of the main pointer.
-        [Tooltip("Render a smaller pointer inside of the main pointer.")]
-        [SerializeField] private bool innerPointer = true;
-        public bool InnerPointer => innerPointer;
-
-        //The Opacity of the Inner Pointer relative to the Primary Pointer.
-        [Tooltip("The Opacity of the Inner Pointer relative to the Primary Pointer.")]
-        [SerializeField] private float innerPointerOpacityScalar = 0.77f;
-        public float InnerPointerOpacityScalar => innerPointerOpacityScalar;
-
+        
         //Trigger a Hover Event when switching between UI elements.
         [Tooltip("Trigger a Hover Event when switching between UI elements.")]
         [SerializeField] private bool triggerHoverOnElementSwitch;
@@ -108,11 +87,9 @@ namespace Leap.Unity.InputModule
         //Transform the Interaction Pointer to allow the Module to work in a non-stationary reference frame.
         [Tooltip("Transform the Interaction Pointer to allow the Module to work in a non-stationary reference frame.")]
         [SerializeField] private bool movingReferenceFrame;
-
-
-        //Customizable Pointer Parameters
-        [Header(" Pointer Setup")]
-
+        
+        //Pointer Setup
+        
         //The sprite for the cursor.
         [Tooltip("The sprite used to represent your pointers during projective interaction.")]
         [SerializeField]
@@ -123,6 +100,16 @@ namespace Leap.Unity.InputModule
         [Tooltip("The material to be instantiated for your pointers during projective interaction.")]
         [SerializeField]
         private Material pointerMaterial;
+        
+        //The size of the pointer in world coordinates with respect to the distance between the cursor and the camera.
+        [Tooltip("The size of the pointer in world coordinates with respect to the distance between the cursor and the camera.")]
+        [SerializeField] private AnimationCurve pointerDistanceScale = AnimationCurve.Linear(0f, 0.1f, 6f, 1f);
+        public AnimationCurve PointerDistanceScale => pointerDistanceScale;
+
+        //The size of the pointer in world coordinates with respect to the distance between the thumb and forefinger.
+        [Tooltip("The size of the pointer in world coordinates with respect to the distance between the thumb and forefinger.")]
+        [SerializeField] private AnimationCurve pointerPinchScale = AnimationCurve.Linear(30f, 0.6f, 70f, 1.1f);
+        public AnimationCurve PointerPinchScale => pointerPinchScale;
 
         //The color for the cursor when it is not in a special state.
         [Tooltip("The color of the pointer when it is hovering over blank canvas.")]
@@ -148,6 +135,16 @@ namespace Leap.Unity.InputModule
         private Color triggerMissedColor = Color.gray;
         public Color TriggerMissedColor => triggerMissedColor;
 
+        //Render a smaller pointer inside of the main pointer.
+        [Tooltip("Render a smaller pointer inside of the main pointer.")]
+        [SerializeField] private bool innerPointer = true;
+        public bool InnerPointer => innerPointer;
+
+        //The Opacity of the Inner Pointer relative to the Primary Pointer.
+        [Tooltip("The Opacity of the Inner Pointer relative to the Primary Pointer.")]
+        [SerializeField] private float innerPointerOpacityScalar = 0.77f;
+        public float InnerPointerOpacityScalar => innerPointerOpacityScalar;
+
 
         private PointerElement _pointerLeft;
         private PointerElement _pointerRight;
@@ -164,9 +161,17 @@ namespace Leap.Unity.InputModule
         /// <summary>
         /// Initialisation
         /// </summary>
-        protected override void Start()
-        {
-            base.Start();
+        protected void Start()
+        {            
+            if (mainCamera == null)
+            {
+                Debug.LogError("Main Camera must be set as it is used in interaction calculations", mainCamera);
+            }
+            
+            if (leapDataProvider == null)
+            {
+                Debug.LogError("Leap Data Provider must be set to get tracking data", leapDataProvider);
+            }
 
             var shoulderProjectionOriginProvider = new ShoulderProjectionOriginProvider(Camera.main);
             _projectionOriginProvider = shoulderProjectionOriginProvider;
@@ -183,11 +188,11 @@ namespace Leap.Unity.InputModule
             }
 
             //Set Projective/Tactile Modes
-            if (interactionMode == InteractionCapability.Projective)
+            if (interactionMode == InteractionCapability.Indirect)
             {
                 projectiveToTactileTransitionDistance = -float.MaxValue;
             }
-            else if (interactionMode == InteractionCapability.Tactile)
+            else if (interactionMode == InteractionCapability.Direct)
             {
                 projectiveToTactileTransitionDistance = float.MaxValue;
             }

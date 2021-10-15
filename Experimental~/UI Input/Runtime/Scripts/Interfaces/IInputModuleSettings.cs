@@ -13,11 +13,6 @@ namespace Leap.Unity.InputModule
         //When not using a PinchDetector, the distance in mm that the tip of the thumb and forefinger should be to activate selection during projective interaction.
         float PinchingThreshold { get; }
 
-        /// Defines the interaction modes :
-        ///
-        /// - Hybrid: Both tactile and projective interaction. The active mode depends on the ProjectiveToTactileTransitionDistance value.
-        /// - Tactile: The user must physically touch the controls.
-        /// - Projective: A cursor is projected from the user's knuckle.
         InteractionCapability InteractionMode { get; }
 
         //The distance from the canvas at which to switch to projective mode.

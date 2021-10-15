@@ -8,6 +8,9 @@
 
 namespace Leap.Unity.InputModule
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public interface ILeapWidget
     {
         void Expand();

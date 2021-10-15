@@ -7,6 +7,9 @@ using Object = UnityEngine.Object;
 
 namespace Leap.Unity.InputModule
 {
+    /// <summary>
+    /// Representation of a pointer that can be controlled by the LeapInputModule
+    /// </summary>
     [Serializable]
     public class PointerElement
     {
@@ -87,7 +90,14 @@ namespace Leap.Unity.InputModule
             // Add your sprite to the Sprite Renderer
             // Make sure to instantiate the material so each pointer can be modified independently
             SpriteRenderer.sprite = pointerSprite;
-            SpriteRenderer.material = Object.Instantiate(pointerMaterial);
+            if (pointerMaterial)
+            {
+                SpriteRenderer.material = Object.Instantiate(pointerMaterial);
+            }
+            else
+            {
+                Debug.LogWarning("Pointer material must be set for pointers to be visible", pointerMaterial);
+            }
 
             Pointer.transform.parent = parent;
             Pointer.SetActive(false);
@@ -101,8 +111,14 @@ namespace Leap.Unity.InputModule
 
                 //Add your sprite to the Canvas
                 InnerSpriteRenderer.sprite = pointerSprite;
-
-                InnerSpriteRenderer.material = Object.Instantiate(pointerMaterial);
+                if (pointerMaterial)
+                {
+                    InnerSpriteRenderer.material = Object.Instantiate(pointerMaterial);
+                }
+                else
+                {
+                    Debug.LogWarning("Pointer material must be set for inner pointers to be visible", pointerMaterial);
+                }
 
                 InnerPointer.transform.parent = Pointer.transform;
                 InnerPointer.SetActive(false);
@@ -141,7 +157,7 @@ namespace Leap.Unity.InputModule
         /// </summary>
         private bool IsTriggeringInteraction(Hand hand)
         {
-            if (_settings.InteractionMode != InteractionCapability.Projective)
+            if (_settings.InteractionMode != InteractionCapability.Indirect)
             {
                 if (IsTouchingOrNearlyTouchingCanvasOrElement)
                 {
@@ -149,7 +165,7 @@ namespace Leap.Unity.InputModule
                 }
             }
 
-            if (_settings.InteractionMode != InteractionCapability.Tactile)
+            if (_settings.InteractionMode != InteractionCapability.Direct)
             {
                 if (_pinchDetector != null && HasMatchingChirality(hand) && _pinchDetector.IsPinching)
                 {
@@ -182,13 +198,13 @@ namespace Leap.Unity.InputModule
         /// Is the current mode limited to tactile interaction
         /// </summary>
         private bool OnlyTactileInteractionEnabled
-            => _settings?.InteractionMode == InteractionCapability.Tactile;
+            => _settings?.InteractionMode == InteractionCapability.Direct;
 
         /// <summary>
         /// Is the current mode limited to projective interaction (far field)
         /// </summary>
         private bool OnlyProjectionInteractionEnabled
-            => _settings?.InteractionMode == InteractionCapability.Projective;
+            => _settings?.InteractionMode == InteractionCapability.Indirect;
 
         /// <summary>
         /// Is tactile interaction allowed and is the pointer tip distance within the tactile interaction distance
@@ -214,13 +230,13 @@ namespace Leap.Unity.InputModule
 
             switch (_settings.InteractionMode)
             {
-                case InteractionCapability.Hybrid:
+                case InteractionCapability.Both:
                     ProcessHybrid(projectionOriginProvider, hand);
                     break;
-                case InteractionCapability.Tactile:
+                case InteractionCapability.Direct:
                     ProcessTactile(projectionOriginProvider, hand);
                     break;
-                case InteractionCapability.Projective:
+                case InteractionCapability.Indirect:
                     ProcessProjective(projectionOriginProvider, hand);
                     break;
                 default:

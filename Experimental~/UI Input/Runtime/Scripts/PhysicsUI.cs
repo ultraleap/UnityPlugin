@@ -11,9 +11,11 @@ using UnityEngine.EventSystems;
 
 namespace Leap.Unity.InputModule
 {
-    /** A physics-enabled button. Activation is triggered by physically pushing the button back to its unsprung position.
-      * Requires a SpringJoint.
-      */
+
+    /// <summary>
+    /// A physics-enabled button. Activation is triggered by physically pushing the button back to its unsprung position.
+    /// Requires a SpringJoint.
+    /// </summary>
     public class PhysicsUI : MonoBehaviour
     {
         [Tooltip("The physically-enabled body of the button")]
