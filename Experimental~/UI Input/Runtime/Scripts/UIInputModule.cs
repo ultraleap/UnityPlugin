@@ -184,14 +184,10 @@ namespace Leap.Unity.InputModule
         
         private void OnDrawGizmos()
         {
-            if (_projectionOriginProvider != null)
+            if(_projectionOriginProvider != null)
             {
-                Debug.DrawRay(_projectionOriginProvider.ProjectionOriginLeft, _projectionOriginProvider.CurrentRotation * Vector3.forward * 5f, Color.green);
-                Debug.DrawRay(_projectionOriginProvider.ProjectionOriginRight, _projectionOriginProvider.CurrentRotation * Vector3.forward * 5f, Color.green);
+                _projectionOriginProvider.DrawGizmos();
 
-                Gizmos.DrawSphere(_projectionOriginProvider.ProjectionOriginLeft, 0.1f);
-                Gizmos.DrawSphere(_projectionOriginProvider.ProjectionOriginRight, 0.1f);
-                Gizmos.DrawSphere(mainCamera.transform.position, 0.1f);
             }
         }
 

@@ -8,6 +8,7 @@
 
 using System;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Leap.Unity.InputModule
 {
@@ -19,6 +20,8 @@ namespace Leap.Unity.InputModule
         
         private SpriteRenderer spriteRenderer;
         private Vector3 initialScale;
+
+        public ColorBlock colorBlock;
 
         private void Awake()
         {
@@ -55,31 +58,31 @@ namespace Leap.Unity.InputModule
 
             switch(element.PointerState) {
                 case PointerStates.OnCanvas:
-                    spriteRenderer.color = Color.white;
+                    spriteRenderer.color = colorBlock.normalColor;
                     break;
                 case PointerStates.OffCanvas:
-                    spriteRenderer.color = Color.clear;
+                    spriteRenderer.color = colorBlock.disabledColor;
                     break;
                 case PointerStates.OnElement:
-                    spriteRenderer.color = Color.green;
+                    spriteRenderer.color = colorBlock.highlightedColor;
                     break;
                 case PointerStates.PinchingToCanvas:
-                    spriteRenderer.color = Color.green;
+                    spriteRenderer.color = colorBlock.pressedColor;
                     break;
                 case PointerStates.PinchingToElement:
-                    spriteRenderer.color = Color.green;
+                    spriteRenderer.color = colorBlock.pressedColor;
                     break;
                 case PointerStates.NearCanvas:
-                    spriteRenderer.color = Color.clear;
+                    spriteRenderer.color = colorBlock.normalColor;
                     break;
                 case PointerStates.TouchingCanvas:
-                    spriteRenderer.color = Color.white;
+                    spriteRenderer.color = colorBlock.normalColor;
                     break;
                 case PointerStates.TouchingElement:
-                    spriteRenderer.color = Color.green;
+                    spriteRenderer.color = colorBlock.pressedColor;
                     break;
                 default:
-                    spriteRenderer.color = Color.white;
+                    spriteRenderer.color = colorBlock.normalColor;
                     break;
             }
         }

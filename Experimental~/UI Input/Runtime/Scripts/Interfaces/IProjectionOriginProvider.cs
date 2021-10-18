@@ -47,5 +47,9 @@ namespace Leap.Unity.InputModule
         /// </summary>
         Vector3 ProjectionOriginRight { get; }
 
+        /// <summary>
+        /// Draw gizmos
+        /// </summary>
+        void DrawGizmos();
     }
 }

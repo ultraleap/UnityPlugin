@@ -144,7 +144,7 @@ namespace Leap.Unity.InputModule
             return false;
         }
         
-        bool HasMatchingChirality(Hand hand)
+        public bool HasMatchingChirality(Hand hand)
         {
             switch (Chirality)
             {
@@ -625,8 +625,7 @@ namespace Leap.Unity.InputModule
                         transform.position = globalLookPos - transform.forward * 0.01f;
                     }
 
-                    var pointerAngle = Mathf.Rad2Deg * Mathf.Atan2(pointData.delta.x, pointData.delta.y);
-                    transform.rotation = draggingPlane.rotation * Quaternion.Euler(0f, 0f, -pointerAngle);
+                    transform.rotation = draggingPlane.rotation;
                 }
             }
         }
