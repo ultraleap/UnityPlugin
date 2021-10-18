@@ -13,7 +13,7 @@ namespace Leap.Unity.InputModule
     /// <summary>
     /// Provides the location of the projection origin for raycasting
     /// </summary>
-    interface IProjectionOriginProvider
+    public interface IProjectionOriginProvider
     {
         /// <summary>
         /// Proxy for the MonoBehaviour Update

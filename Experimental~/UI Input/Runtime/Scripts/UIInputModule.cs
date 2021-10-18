@@ -84,6 +84,7 @@ namespace Leap.Unity.InputModule
         //Misc. Objects
         private bool _prevTouchingMode;
         private IProjectionOriginProvider _projectionOriginProvider;
+        public IProjectionOriginProvider ProjectionOriginProvider => _projectionOriginProvider;
 
         #endregion
 
