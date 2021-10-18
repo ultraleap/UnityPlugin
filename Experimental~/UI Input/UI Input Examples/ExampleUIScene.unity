@@ -706,7 +706,7 @@ PrefabInstance:
     - target: {fileID: 2113837065891671374, guid: ed811e274f5753b478b84e8424f730ef,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0.00077069586
+      value: -0.000017989087
       objectReference: {fileID: 0}
     - target: {fileID: 3890417976541618248, guid: ed811e274f5753b478b84e8424f730ef,
         type: 3}
@@ -971,6 +971,16 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 6066007914061005640, guid: ac7931d8ae3533948a4716d7a19fbf6a,
+        type: 3}
+      propertyPath: m_SortingOrder
+      value: 32767
+      objectReference: {fileID: 0}
+    - target: {fileID: 6227598760179989491, guid: ac7931d8ae3533948a4716d7a19fbf6a,
+        type: 3}
+      propertyPath: m_SortingOrder
+      value: 32767
+      objectReference: {fileID: 0}
     - target: {fileID: 6268321655099366013, guid: ac7931d8ae3533948a4716d7a19fbf6a,
         type: 3}
       propertyPath: mainCamera
@@ -1055,6 +1065,36 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: UIInputEventSystem
+      objectReference: {fileID: 0}
+    - target: {fileID: 6615942278314714293, guid: ac7931d8ae3533948a4716d7a19fbf6a,
+        type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6615942278314714293, guid: ac7931d8ae3533948a4716d7a19fbf6a,
+        type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6842748688854817888, guid: ac7931d8ae3533948a4716d7a19fbf6a,
+        type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6842748688854817888, guid: ac7931d8ae3533948a4716d7a19fbf6a,
+        type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6842748688854817888, guid: ac7931d8ae3533948a4716d7a19fbf6a,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6842748688854817888, guid: ac7931d8ae3533948a4716d7a19fbf6a,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ac7931d8ae3533948a4716d7a19fbf6a, type: 3}
@@ -1283,7 +1323,7 @@ PrefabInstance:
     - target: {fileID: 2113837065891671374, guid: ed811e274f5753b478b84e8424f730ef,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0.0008260306
+      value: 0.000042769978
       objectReference: {fileID: 0}
     - target: {fileID: 3890417976541618248, guid: ed811e274f5753b478b84e8424f730ef,
         type: 3}

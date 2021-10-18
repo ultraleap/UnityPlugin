@@ -32,8 +32,19 @@ namespace Leap.Unity.InputModule
         /// <returns>The projection origin</returns>
         Vector3 ProjectionOriginForHand(Hand hand);
 
+        /// <summary>
+        /// 
+        /// </summary>
         Quaternion CurrentRotation { get; }
+        
+        /// <summary>
+        /// 
+        /// </summary>
         Vector3 ProjectionOriginLeft { get; }
+        
+        /// <summary>
+        /// 
+        /// </summary>
         Vector3 ProjectionOriginRight { get; }
 
     }

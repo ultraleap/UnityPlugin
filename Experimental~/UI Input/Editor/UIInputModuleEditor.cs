@@ -18,11 +18,7 @@ namespace Leap.Unity.InputModule
             base.OnEnable();
 
             specifyConditionalDrawing(() => target.InteractionMode == InteractionCapability.Both || target.InteractionMode == InteractionCapability.Indirect,
-                "pinchingThreshold",
-                                     "pointerPinchScale",
-                                     "leftHandDetector",
-                                     "rightHandDetector",
-                                     "hoveringColor");
+                "pinchingThreshold");
             
             specifyConditionalDrawing(
                 () => target.InteractionMode == InteractionCapability.Both ||
@@ -38,31 +34,6 @@ namespace Leap.Unity.InputModule
             addPropertyToFoldout("projectiveToTactileTransitionDistance", "Calibration Setup");
             addPropertyToFoldout("triggerHoverOnElementSwitch", "Calibration Setup");
             addPropertyToFoldout("movingReferenceFrame","Calibration Setup");
-            
-            //Pointer Setup
-            addPropertyToFoldout("pointerSprite", "Pointer Setup");
-            addPropertyToFoldout("pointerDistanceScale", "Pointer Setup");
-            addPropertyToFoldout("pointerPinchScale","Pointer Setup");
-            addPropertyToFoldout("pointerMaterial","Pointer Setup");
-            addPropertyToFoldout("standardColor","Pointer Setup");
-            addPropertyToFoldout("hoveringColor","Pointer Setup");
-            addPropertyToFoldout("triggeringColor","Pointer Setup");
-            addPropertyToFoldout("triggerMissedColor","Pointer Setup");
-            addPropertyToFoldout("innerPointer", "Pointer Setup");
-            addPropertyToFoldout("innerPointerOpacityScalar", "Pointer Setup");
-            
-            specifyConditionalDrawing(() => target.PointerSprite != null,
-                "pointerDistanceScale",
-                "pointerPinchScale",
-                "pointerMaterial",
-                "standardColor",
-                "hoveringColor",
-                "triggeringColor",
-                "triggerMissedColor",
-                "innerPointer");
-
-            specifyConditionalDrawing(() => target.PointerSprite != null && target.InnerPointer,
-                "innerPointerOpacityScalar");
         }
     }
 }

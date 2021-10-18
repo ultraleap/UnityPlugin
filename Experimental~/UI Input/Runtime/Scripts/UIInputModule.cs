@@ -10,14 +10,13 @@ using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using System.Collections.Generic;
-using UnityEngine.Assertions;
 
 namespace Leap.Unity.InputModule
 {
     /// <summary>
     /// An InputModule that supports the use of Leap Motion tracking data for manipulating Unity UI controls.
     /// </summary>
-    public class UIInputModule : BaseInputModule, IInputModuleSettings, IInputModuleEventHandler
+    public class UIInputModule : BaseInputModule, IInputModuleEventHandler
     {
         // //Events
         EventHandler<Vector3> IInputModuleEventHandler.OnClickDown { get; set; }
@@ -43,23 +42,13 @@ namespace Leap.Unity.InputModule
         [Tooltip("The main camera used for calculating interactions.")]
         [SerializeField]
         private Camera mainCamera;
+        public Camera MainCamera => mainCamera;
 
         //The LeapProvider providing tracking data to the scene.
         [Tooltip("The current Leap Data Provider for the scene.")]
         [SerializeField]
         private LeapProvider leapDataProvider;
-
-        //An optional component that will be used to detect pinch motions if set.
-        //Primarily used for projective or hybrid interaction modes (under experimental features).
-        [Tooltip("An optional alternate detector for pinching on the left hand.")]
-        [SerializeField]
-        private PinchDetector leftHandDetector;
-
-        //An optional component that will be used to detect pinch motions if set.
-        //Primarily used for projective or hybrid interaction modes (under experimental features).
-        [Tooltip("An optional alternate detector for pinching on the right hand.")]
-        [SerializeField]
-        private PinchDetector rightHandDetector;
+        public LeapProvider LeapDataProvider => leapDataProvider;
 
         //Calibration Setup
 
@@ -88,70 +77,12 @@ namespace Leap.Unity.InputModule
         [Tooltip("Transform the Interaction Pointer to allow the Module to work in a non-stationary reference frame.")]
         [SerializeField] private bool movingReferenceFrame;
         
-        //Pointer Setup
-        
-        //The sprite for the cursor.
-        [Tooltip("The sprite used to represent your pointers during projective interaction.")]
-        [SerializeField]
-        private Sprite pointerSprite;
-        public Sprite PointerSprite => pointerSprite;
+        //Event related data
+        [SerializeField] private PointerElement _pointerLeft;
+        [SerializeField] private PointerElement _pointerRight;
 
-        //The cursor material.
-        [Tooltip("The material to be instantiated for your pointers during projective interaction.")]
-        [SerializeField]
-        private Material pointerMaterial;
-        
-        //The size of the pointer in world coordinates with respect to the distance between the cursor and the camera.
-        [Tooltip("The size of the pointer in world coordinates with respect to the distance between the cursor and the camera.")]
-        [SerializeField] private AnimationCurve pointerDistanceScale = AnimationCurve.Linear(0f, 0.1f, 6f, 1f);
-        public AnimationCurve PointerDistanceScale => pointerDistanceScale;
-
-        //The size of the pointer in world coordinates with respect to the distance between the thumb and forefinger.
-        [Tooltip("The size of the pointer in world coordinates with respect to the distance between the thumb and forefinger.")]
-        [SerializeField] private AnimationCurve pointerPinchScale = AnimationCurve.Linear(30f, 0.6f, 70f, 1.1f);
-        public AnimationCurve PointerPinchScale => pointerPinchScale;
-
-        //The color for the cursor when it is not in a special state.
-        [Tooltip("The color of the pointer when it is hovering over blank canvas.")]
-        [SerializeField]
-        private Color standardColor = Color.white;
-        public Color StandardColor => standardColor;
-
-        //The color for the cursor when it is hovering over a control.
-        [Tooltip("The color of the pointer when it is hovering over any other UI element.")]
-        [SerializeField]
-        private Color hoveringColor = Color.green;
-        public Color HoveringColor => hoveringColor;
-
-        //The color for the cursor when it is actively interacting with a control.
-        [Tooltip("The color of the pointer when it is triggering a UI element.")]
-        [SerializeField]
-        private Color triggeringColor = Color.gray;
-        public Color TriggeringColor => triggeringColor;
-
-        //The color for the cursor when it is touching or triggering a non-active part of the UI (such as the canvas).
-        [Tooltip("The color of the pointer when it is triggering blank canvas.")]
-        [SerializeField]
-        private Color triggerMissedColor = Color.gray;
-        public Color TriggerMissedColor => triggerMissedColor;
-
-        //Render a smaller pointer inside of the main pointer.
-        [Tooltip("Render a smaller pointer inside of the main pointer.")]
-        [SerializeField] private bool innerPointer = true;
-        public bool InnerPointer => innerPointer;
-
-        //The Opacity of the Inner Pointer relative to the Primary Pointer.
-        [Tooltip("The Opacity of the Inner Pointer relative to the Primary Pointer.")]
-        [SerializeField] private float innerPointerOpacityScalar = 0.77f;
-        public float InnerPointerOpacityScalar => innerPointerOpacityScalar;
-
-
-        private PointerElement _pointerLeft;
-        private PointerElement _pointerRight;
-
-        //Values from the previous frame
+        //Misc. Objects
         private bool _prevTouchingMode;
-
         private IProjectionOriginProvider _projectionOriginProvider;
 
         #endregion
@@ -196,12 +127,6 @@ namespace Leap.Unity.InputModule
             {
                 projectiveToTactileTransitionDistance = float.MaxValue;
             }
-
-            _pointerLeft = new PointerElement(Chirality.Left, mainCamera, eventSystem, leapDataProvider, this, this, leftHandDetector);
-            _pointerLeft.Initialise(transform, pointerSprite, pointerMaterial, innerPointer);
-
-            _pointerRight = new PointerElement(Chirality.Right, mainCamera, eventSystem, leapDataProvider, this, this, rightHandDetector);
-            _pointerRight.Initialise(transform, pointerSprite, pointerMaterial, innerPointer);
         }
 
         private void Update()
@@ -291,14 +216,15 @@ namespace Leap.Unity.InputModule
         {
             base.HandlePointerExitAndEnter(eventData, newEnterTarget);
         }
-
+        
         /// <summary>
-        /// Delegates through to the base class method. Enables pointer class to call into this
+        /// Exposes protected static method, only for use by PointerElement so that it does not need to be a nested class
         /// </summary>
-        /// <param name="candidates">Raycast candidates</param>
-        public RaycastResult FindFirstRaycastProxy(List<RaycastResult> candidates)
+        /// <param name="candidates">Potential candidates</param>
+        /// <returns></returns>
+        public new static RaycastResult FindFirstRaycast(List<RaycastResult> candidates)
         {
-            return FindFirstRaycast(candidates);
+            return BaseInputModule.FindFirstRaycast(candidates);
         }
 
         #endregion

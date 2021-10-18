@@ -13,8 +13,20 @@ namespace Leap.Unity.InputModule
     /// </summary>
     public interface ILeapWidget
     {
+        /// <summary>
+        /// 
+        /// </summary>
         void Expand();
+        
+        /// <summary>
+        /// 
+        /// </summary>
         void Retract();
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="distance"></param>
         void HoverDistance(float distance);
     }
 }

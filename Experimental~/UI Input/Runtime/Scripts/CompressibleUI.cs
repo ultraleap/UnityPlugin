@@ -8,10 +8,7 @@
 
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.EventSystems;
 using UnityEngine.UI;
-using System;
-using System.Collections.Generic;
 
 namespace Leap.Unity.InputModule
 {
@@ -79,10 +76,10 @@ namespace Leap.Unity.InputModule
 
         private float TimeLastHovered = 0f;
 
-        //Reset the Positions of the UI Elements on both Start and Quit
-        void Start()
+        private void Start()
         {
-            for (int i = 0; i < Layers.Length; i++)
+            //Reset the Positions of the UI Elements on both Start and Quit
+            for (var i = 0; i < Layers.Length; i++)
             {
                 if (Layers[i].LayerTransform != null && Layers[i].LayerTransform != transform)
                 {
@@ -104,7 +101,7 @@ namespace Leap.Unity.InputModule
             //}
         }
 
-        void OnApplicationQuit()
+        private void OnApplicationQuit()
         {
             for (int i = 0; i < Layers.Length; i++)
             {
@@ -115,7 +112,7 @@ namespace Leap.Unity.InputModule
             }
         }
 
-        void Update()
+        private void Update()
         {
             //Reset Hovering Distance when "HoverDistance" isn't being called
             if (Time.time > TimeLastHovered + 0.1f && HoveringDistance != 100f)
@@ -241,6 +238,10 @@ namespace Leap.Unity.InputModule
             //}
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="toggle"></param>
         public void DivideLayerHeightsOnToggle(Toggle toggle)
         {
             if (toggle.isOn)

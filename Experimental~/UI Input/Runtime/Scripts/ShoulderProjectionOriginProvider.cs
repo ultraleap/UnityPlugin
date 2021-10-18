@@ -23,8 +23,7 @@ namespace Leap.Unity.InputModule
             public Quaternion CurrentRotation { get; private set; }
             public Vector3 ProjectionOriginRight { get; private set; } = Vector3.zero;
             public Vector3 ProjectionOriginLeft { get; private set; } = Vector3.zero;
-
-
+            
             public ShoulderProjectionOriginProvider(Camera mainCamera)
             {
                 _mainCamera = mainCamera;
@@ -43,24 +42,28 @@ namespace Leap.Unity.InputModule
             public void Update()
             {
                 // Update the Head Yaw for Calculating "Shoulder Positions"
-                if (_mainCamera != null)
+                if (_mainCamera == null)
                 {
-                    var transform = _mainCamera.transform;
-                    _oldCameraPos = transform.position;
-                    _oldCameraRot = transform.rotation;
-
-                    var headYaw = Quaternion.Euler(0f, _oldCameraRot.eulerAngles.y, 0f);
-                    CurrentRotation = Quaternion.Slerp(CurrentRotation, headYaw, 0.1f);
+                    return;
                 }
+                
+                var transform = _mainCamera.transform;
+                _oldCameraPos = transform.position;
+                _oldCameraRot = transform.rotation;
+
+                var headYaw = Quaternion.Euler(0f, _oldCameraRot.eulerAngles.y, 0f);
+                CurrentRotation = Quaternion.Slerp(CurrentRotation, headYaw, 0.1f);
             }
 
             public void Process()
             {
-                if (_mainCamera != null)
+                if (_mainCamera == null)
                 {
-                    ProjectionOriginLeft = _oldCameraPos + CurrentRotation * new Vector3(-0.15f, -0.2f, 0f);
-                    ProjectionOriginRight = _oldCameraPos + CurrentRotation * new Vector3(0.15f, -0.2f, 0f);
+                    return;
                 }
+                
+                ProjectionOriginLeft = _oldCameraPos + CurrentRotation * new Vector3(-0.15f, -0.2f, 0f);
+                ProjectionOriginRight = _oldCameraPos + CurrentRotation * new Vector3(0.15f, -0.2f, 0f);
             }
 
             /// <summary>
