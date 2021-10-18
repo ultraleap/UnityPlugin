@@ -11,16 +11,18 @@ using UnityEngine;
 
 namespace Leap.Unity.InputModule
 {
+    [RequireComponent(typeof(SpriteRenderer))]
     public class UIInputCursor : MonoBehaviour
     {
-        [SerializeField] private SpriteRenderer spriteRenderer;
         [SerializeField] private PointerElement element;
         [SerializeField] private  float interactionPointerScale = 0.6f;
         
+        private SpriteRenderer spriteRenderer;
         private Vector3 initialScale;
 
         private void Awake()
         {
+            spriteRenderer = GetComponent<SpriteRenderer>();
             initialScale = spriteRenderer.transform.localScale;
         }
 

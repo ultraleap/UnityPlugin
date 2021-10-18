@@ -23,12 +23,15 @@ namespace Leap.Unity.InputModule
         #region Properties
         
         public event Action<PointerElement, Hand> OnPointerStateChanged;
+        public event Action<bool> On;
         
         private Camera mainCamera;
         private LeapProvider leapDataProvider;
         
         [SerializeField] private EventSystem eventSystem;
         [SerializeField] private UIInputModule module;
+        [SerializeField] private UIInputCursor cursor;
+        [SerializeField] private bool forceDisable;
         //[SerializeField] private PinchDetector pinchDetector;
         
         public Chirality Chirality { get; private set; }
@@ -174,15 +177,24 @@ namespace Leap.Unity.InputModule
 
         internal void Process(Hand hand, IProjectionOriginProvider projectionOriginProvider)
         {
+            //Control cursor display
+            cursor.gameObject.SetActive(true);
+            
+            if (forceDisable)
+            {
+                cursor.gameObject.SetActive(false);
+            }
+            
             if (hand == null)
             {
                 if (gameObject.activeInHierarchy)
                 {
-                    gameObject.SetActive(false);
+                    cursor.gameObject.SetActive(false);
+                    return;
                 }
-                return;
             }
 
+            //Select interaction
             switch (module.InteractionMode)
             {
                 case InteractionCapability.Both:
@@ -595,8 +607,6 @@ namespace Leap.Unity.InputModule
             var element = EventData.pointerCurrentRaycast.gameObject;
             if (element != null)
             {
-                gameObject.SetActive(true);
-
                 var draggingPlane = EventData.pointerCurrentRaycast.gameObject.GetComponent<RectTransform>();
 
                 if (RectTransformUtility.ScreenPointToWorldPointInRectangle(draggingPlane, pointData.position,
