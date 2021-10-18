@@ -29,7 +29,7 @@ public class SquishyPointer : MonoBehaviour
         if (hand == null) return;
 
         transform.position = Vector3.Lerp(meshRenderer.transform.position, hand.GetPinchPosition(), Time.deltaTime * lerpSpeed);
-        transform.localScale = Vector3.Lerp(Vector3.one, new Vector3(0.5f, 0.5f, 0.5f), hand.PinchStrength);
+        transform.localScale = Vector3.Lerp(Vector3.one, new Vector3(1, 0.5f, 0.5f), hand.PinchStrength);
         transform.LookAt(pointerElement.transform);
         meshRenderer.material.color = Color.Lerp(Color.white, Color.green, hand.PinchStrength);
     }
