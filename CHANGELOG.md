@@ -8,16 +8,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [5.0.0] - Release date TBC
 ### Added
-- Support for Unity HDRP and URP. Hand 
+- Support for Unity HDRP and URP
+  - Materials and shaders in all examples
+  - Hands module shaders for outline, ghost and skeleton hands
 - `Service Provider` (XR, Desktop and Screentop) prefabs
 - `Image Retriever` prefab
 - `HandModels` prefab
-- `PreventChangingTrackingMode` serialized field on `LeapServiceProvider` which will prevent the service provider from sending any tracking mode messages to the tracking service
 
 ### Changed
 - Reorganized the repository layout to adhere to [UPM Package Structure](https://docs.unity3d.com/Manual/cus-layout.html)
   - Core, Hands and Interaction Engine modules are in their own sub-folders with Editor/Runtime folders
-  - UIInput module has  as an experimental module and is available to import as a sample from the package manager window
+  - UIInput module has is now an experimental module and is available to import as a sample from the package manager window
   - Examples for all modules have moved to the `Examples~` folder and are importable from the package manager window
 - The following scripts are no longer required to be put on a `Camera`. Instead, they require a reference to a `Camera`.
   - LeapXRServiceProvider
