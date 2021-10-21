@@ -694,7 +694,9 @@ namespace Leap.Unity {
     protected void onHandControllerConnect(object sender, LeapEventArgs args) {
       initializeFlags();
 
+#if UNITY_ANDROID
       InitClockRebaser();
+#endif
 
       if (_leapController != null) {
         _leapController.Device -= onHandControllerConnect;

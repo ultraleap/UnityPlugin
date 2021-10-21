@@ -487,9 +487,7 @@ namespace Leap.Unity {
           && updateTemporalCompensation
           && _temporalWarpingMode != TemporalWarpingMode.Off) {
 
-        //if (_xr2TimewarpMode == XR2TimewarpMode.Default && transformHistory.history.IsFull) {
-        if (transformHistory.history.IsFull)
-        {
+        if (_xr2TimewarpMode == XR2TimewarpMode.Default && transformHistory.history.IsFull) {
                         transformHistory.SampleTransform(timestamp
                                         - (long)(warpingAdjustment * 1000f)
                                         - (_temporalWarpingMode ==
@@ -497,24 +495,18 @@ namespace Leap.Unity {
                                         out warpedPosition, out warpedRotation);
         }
 #if UNITY_ANDROID
-                Vector3 predictedWarpedPosition; Quaternion predictedWarpedRotation;
-//        else if (_xr2TimewarpMode == XR2TimewarpMode.Experimental) {
+        else if (_xr2TimewarpMode == XR2TimewarpMode.Experimental) {
           // Get the predicted display time for the current frame in milliseconds, then get the predicted head pose
           float predictedDisplayTime_ms = SxrShim.GetPredictedDisplayTime(SystemInfo.graphicsMultiThreaded);
 
-         
+          Vector3 predictedWarpedPosition; 
+          Quaternion predictedWarpedRotation;
           SxrShim.GetPredictedHeadPose(predictedDisplayTime_ms, out predictedWarpedRotation, out predictedWarpedPosition);
-
-                Debug.Log($"{predictedDisplayTime_ms} WARP: Postion O:{predictedWarpedPosition} N:{warpedPosition}  Rotation O:{predictedWarpedRotation.ToString()} N:{warpedRotation.ToString()}");
-
-                warpedPosition.x = -predictedWarpedPosition.x;
-                warpedPosition.y = -predictedWarpedPosition.y;
-                warpedPosition.z = predictedWarpedPosition.z;
-
-                warpedRotation = predictedWarpedRotation;
-
-                
-//        }
+          warpedPosition.x = -predictedWarpedPosition.x;
+          warpedPosition.y = -predictedWarpedPosition.y;
+          warpedPosition.z = predictedWarpedPosition.z;
+          warpedRotation = predictedWarpedRotation;   
+        }
 #endif
       }
 
