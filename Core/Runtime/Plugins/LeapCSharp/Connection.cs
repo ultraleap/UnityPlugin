@@ -777,35 +777,23 @@ namespace LeapInternal
             }
 
             _activePolicies = policyMsg.current_policy;
-
-            if (_activePolicies != _requestedPolicies)
-            {
-                // This could happen when config is turned off, or
-                // this is the policy change event from the last SetPolicy, after that, the user called SetPolicy again
-                //TODO handle failure to set desired policy -- maybe a PolicyDenied event
-            }
         }
 
         public void SetPolicy(Controller.PolicyFlag policy)
         {
-            UInt64 setFlags = (ulong)flagForPolicy(policy);
-            _requestedPolicies = _requestedPolicies | setFlags;
-            setFlags = _requestedPolicies;
-            UInt64 clearFlags = ~_requestedPolicies; //inverse of desired policies
-
-            eLeapRS result = LeapC.SetPolicyFlags(_leapConnection, setFlags, clearFlags);
+            UInt64 setFlags = (ulong)FlagForPolicy(policy);
+            eLeapRS result = LeapC.SetPolicyFlags(_leapConnection, setFlags, 0);
             reportAbnormalResults("LeapC SetPolicyFlags call was ", result);
         }
 
         public void ClearPolicy(Controller.PolicyFlag policy)
         {
-            UInt64 clearFlags = (ulong)flagForPolicy(policy);
-            _requestedPolicies = _requestedPolicies & ~clearFlags;
-            eLeapRS result = LeapC.SetPolicyFlags(_leapConnection, _requestedPolicies, ~_requestedPolicies);
+            UInt64 clearFlags = (ulong)FlagForPolicy(policy);
+            eLeapRS result = LeapC.SetPolicyFlags(_leapConnection, 0, clearFlags);
             reportAbnormalResults("LeapC SetPolicyFlags call was ", result);
         }
 
-        private eLeapPolicyFlag flagForPolicy(Controller.PolicyFlag singlePolicy)
+        static public eLeapPolicyFlag FlagForPolicy(Controller.PolicyFlag singlePolicy)
         {
             switch (singlePolicy)
             {
@@ -845,7 +833,7 @@ namespace LeapInternal
         /// </summary>
         public bool IsPolicySet(Controller.PolicyFlag policy)
         {
-            UInt64 policyToCheck = (ulong)flagForPolicy(policy);
+            UInt64 policyToCheck = (ulong)FlagForPolicy(policy);
             return (_activePolicies & policyToCheck) == policyToCheck;
         }
 
