@@ -6,6 +6,8 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
+using Leap.Unity.Attributes;
+using LeapInternal;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -128,11 +130,14 @@ namespace Leap.Unity {
 
     #region Internal Settings & Memory
     protected bool _useInterpolation = true;
+    protected IntPtr _clockRebaser;
+    protected System.Diagnostics.Stopwatch _stopwatch = new System.Diagnostics.Stopwatch();
+
 
     // Extrapolate on Android to compensate for the latency introduced by its graphics
     // pipeline.
 #if UNITY_ANDROID && !UNITY_EDITOR
-    protected int ExtrapolationAmount = 15;
+    protected int ExtrapolationAmount = 0; // 15;
     protected int BounceAmount = 70;
 #else
     protected int ExtrapolationAmount = 0;
@@ -385,6 +390,13 @@ namespace Leap.Unity {
         return;
       }
 
+#if UNITY_ANDROID
+      if (_clockRebaser != IntPtr.Zero) {
+        eLeapRS result = LeapC.UpdateRebase(_clockRebaser, _stopwatch.ElapsedMilliseconds, LeapC.GetNow());
+        if (result != eLeapRS.eLeapRS_Success) { Debug.LogWarning("UpdateRebase call failed"); }
+      }
+#endif
+
       if (_useInterpolation) {
 #if !UNITY_ANDROID || UNITY_EDITOR
         _smoothedTrackingLatency.value = Mathf.Min(_smoothedTrackingLatency.value, 30000f);
@@ -453,19 +465,19 @@ namespace Leap.Unity {
     }
 
     protected virtual void OnApplicationFocus(bool hasFocus) {
-    #if UNITY_ANDROID
+#if UNITY_ANDROID
       if (hasFocus) {
         CreateAndroidBinding();
       }
-    #endif
+#endif
     }
 
     protected virtual void OnApplicationPause(bool isPaused) {
-    #if UNITY_ANDROID
+#if UNITY_ANDROID
       if (isPaused) {
         _serviceBinder.Call("unbind");
       }
-    #endif
+#endif
       if (_leapController != null) {
         if (isPaused) {
           _leapController.StopConnection();
@@ -495,20 +507,20 @@ namespace Leap.Unity {
       }
     }
 
-    #endregion
+#endregion
 
-    #region Public API
+#region Public API
 
     /// <summary>
     /// Returns the Leap Controller instance.
     /// </summary>
     public Controller GetLeapController() {
-      #if UNITY_EDITOR
+#if UNITY_EDITOR
       // Null check to deal with hot reloading.
       if (!_isDestroyed && _leapController == null) {
         createController();
       }
-      #endif
+#endif
       return _leapController;
     }
 
@@ -544,21 +556,21 @@ namespace Leap.Unity {
       leapXRServiceProvider._workerThreadProfiling = _workerThreadProfiling;
     }
 
-    #endregion
+#endregion
 
-    #region Internal Methods
+#region Internal Methods
 
     protected virtual long CalculateInterpolationTime(bool endOfFrame = false) {
-      #if UNITY_ANDROID && !UNITY_EDITOR
+#if UNITY_ANDROID && !UNITY_EDITOR
       return _leapController.Now() - 16000;
-      #else
+#else
       if (_leapController != null) {
         return _leapController.Now() - (long)_smoothedTrackingLatency.value;
       }
       else {
         return 0;
       }
-      #endif
+#endif
     }
 
     /// <summary>
@@ -589,11 +601,13 @@ namespace Leap.Unity {
     /// subscribing to its connection event.
     /// </summary>
     protected void createController() {
-    #if UNITY_ANDROID
+#if UNITY_ANDROID
       var bindStatus = CreateAndroidBinding();
       if (!bindStatus)
         return;
-    #endif
+
+      InitClockRebaser();
+#endif
 
       if (_leapController != null) {
         return;
@@ -636,6 +650,13 @@ namespace Leap.Unity {
         _leapController.StopConnection();
         _leapController.Dispose();
         _leapController = null;
+
+#if UNITY_ANDROID
+        if (_clockRebaser != IntPtr.Zero) {
+          LeapC.DestroyClockRebaser(_clockRebaser);
+          _stopwatch.Stop();
+        }
+#endif
       }
     }
 
@@ -673,6 +694,8 @@ namespace Leap.Unity {
     protected void onHandControllerConnect(object sender, LeapEventArgs args) {
       initializeFlags();
 
+      InitClockRebaser();
+
       if (_leapController != null) {
         _leapController.Device -= onHandControllerConnect;
       }
@@ -682,8 +705,17 @@ namespace Leap.Unity {
       dest.CopyFrom(source).Transform(transform.GetLeapMatrix());
     }
 
-    #endregion
+#if UNITY_ANDROID
+    private void InitClockRebaser() {
+      _stopwatch.Start();
+      eLeapRS result = LeapC.CreateClockRebaser(out _clockRebaser);
+      
+      if (result != eLeapRS.eLeapRS_Success) { Debug.LogError("Failed to create clock rebaser"); }
+      if (_clockRebaser == IntPtr.Zero) { Debug.LogError("Clock rebaser is null"); }
+    }
+#endif 
+
+#endregion
 
   }
-
 }

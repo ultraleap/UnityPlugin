@@ -6,10 +6,10 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using UnityEngine;
-using System;
+using LeapInternal;
 using Leap.Unity.Attributes;
-using System.Runtime.Serialization;
+using System;
+using UnityEngine;
 
 #if UNITY_2019_1_OR_NEWER
 using UnityEngine.Rendering;
@@ -33,11 +33,19 @@ namespace Leap.Unity {
     private const float DEFAULT_DEVICE_OFFSET_Z_AXIS = 0.12f;
     private const float DEFAULT_DEVICE_TILT_X_AXIS = 5f;
 
+    private enum XR2TimewarpMode  {
+       Default,
+       Experimental
+    }
+
+    private XR2TimewarpMode _xr2TimewarpMode = XR2TimewarpMode.Experimental;
+
     public enum DeviceOffsetMode {
       Default,
       ManualHeadOffset,
       Transform
     }
+
 
     [Tooltip("Allow manual adjustment of the Leap device's virtual offset and tilt. These "
            + "settings can be used to match the physical position and orientation of the "
@@ -421,7 +429,8 @@ namespace Leap.Unity {
 
     protected override long CalculateInterpolationTime(bool endOfFrame = false) {
 #if UNITY_ANDROID
-      return _leapController.Now() - 16000;
+       return GetPredictedDisplayTime_LeapTime();
+       //return _leapController.Now() - 16000;
 #else
       if (_leapController != null) {
         return _leapController.Now()
@@ -433,13 +442,13 @@ namespace Leap.Unity {
         return 0;
       }
 #endif
-    }
+        }
 
-    /// <summary>
-    /// Initializes the Leap Motion policy flags.
-    /// The POLICY_OPTIMIZE_HMD flag improves tracking for head-mounted devices.
-    /// </summary>
-    protected override void initializeFlags() {
+        /// <summary>
+        /// Initializes the Leap Motion policy flags.
+        /// The POLICY_OPTIMIZE_HMD flag improves tracking for head-mounted devices.
+        /// </summary>
+        protected override void initializeFlags() {
       if (_leapController == null) {
         return;
       }
@@ -476,15 +485,37 @@ namespace Leap.Unity {
       //Calculate a Temporally Warped Pose
       if (Application.isPlaying
           && updateTemporalCompensation
-          && transformHistory.history.IsFull
           && _temporalWarpingMode != TemporalWarpingMode.Off) {
 
-        transformHistory.SampleTransform(timestamp
-                                         - (long)(warpingAdjustment * 1000f)
-                                         - (_temporalWarpingMode ==
-                                         TemporalWarpingMode.Images ? -20000 : 0),
-                                         out warpedPosition, out warpedRotation);
+        //if (_xr2TimewarpMode == XR2TimewarpMode.Default && transformHistory.history.IsFull) {
+        if (transformHistory.history.IsFull)
+        {
+                        transformHistory.SampleTransform(timestamp
+                                        - (long)(warpingAdjustment * 1000f)
+                                        - (_temporalWarpingMode ==
+                                        TemporalWarpingMode.Images ? -20000 : 0),
+                                        out warpedPosition, out warpedRotation);
+        }
+#if UNITY_ANDROID
+                Vector3 predictedWarpedPosition; Quaternion predictedWarpedRotation;
+//        else if (_xr2TimewarpMode == XR2TimewarpMode.Experimental) {
+          // Get the predicted display time for the current frame in milliseconds, then get the predicted head pose
+          float predictedDisplayTime_ms = SxrShim.GetPredictedDisplayTime(SystemInfo.graphicsMultiThreaded);
 
+         
+          SxrShim.GetPredictedHeadPose(predictedDisplayTime_ms, out predictedWarpedRotation, out predictedWarpedPosition);
+
+                Debug.Log($"{predictedDisplayTime_ms} WARP: Postion O:{predictedWarpedPosition} N:{warpedPosition}  Rotation O:{predictedWarpedRotation.ToString()} N:{warpedRotation.ToString()}");
+
+                warpedPosition.x = -predictedWarpedPosition.x;
+                warpedPosition.y = -predictedWarpedPosition.y;
+                warpedPosition.z = predictedWarpedPosition.z;
+
+                warpedRotation = predictedWarpedRotation;
+
+                
+//        }
+#endif
       }
 
       // Normalize the rotation Quaternion.
@@ -637,6 +668,27 @@ namespace Leap.Unity {
     #endif
     }
 
-    #endregion
-  }
+#if UNITY_ANDROID
+    /// <summary>
+    /// Return the predicted display time as a leap time
+    /// </summary>
+    /// <returns></returns>
+    private long GetPredictedDisplayTime_LeapTime()
+    {
+
+        long leapClock = 0;
+
+        // Predicted display time for the current frame in milliseconds
+        float displayTime_ms = SxrShim.GetPredictedDisplayTime(SystemInfo.graphicsMultiThreaded);
+
+        if (_clockRebaser != IntPtr.Zero) {
+            LeapC.RebaseClock(_clockRebaser, (long)displayTime_ms + _stopwatch.ElapsedMilliseconds, out leapClock);
+        }
+
+        return leapClock;
+    }
+#endif
+
+#endregion
+    }
 }
