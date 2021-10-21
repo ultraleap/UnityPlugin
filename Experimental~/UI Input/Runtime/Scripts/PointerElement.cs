@@ -32,7 +32,6 @@ namespace Leap.Unity.InputModule
         [SerializeField] private UIInputModule module;
         [SerializeField] private UIInputCursor cursor;
         [SerializeField] private bool forceDisable;
-        //[SerializeField] private PinchDetector pinchDetector;
         
         public Chirality Chirality { get; private set; }
 
@@ -118,19 +117,6 @@ namespace Leap.Unity.InputModule
                     return DistanceOfTipToPointer(hand) < 0f;
                 }
             }
-
-            // if (module.InteractionMode != InteractionCapability.Direct)
-            // {
-            //     if (pinchDetector != null && HasMatchingChirality(hand) && pinchDetector.IsPinching)
-            //     {
-            //         return true;
-            //     }
-            //
-            //     if (pinchDetector == null && hand.PinchDistance < module.PinchingThreshold)
-            //     {
-            //         return true;
-            //     }
-            // }
             
             // N.B. Without pinch detector
             if (module.InteractionMode != InteractionCapability.Direct)
@@ -328,11 +314,6 @@ namespace Leap.Unity.InputModule
                         else
                         {
                             CurrentGameObject = gameObjectJustPressed;
-
-                            //We want to do "click on button down" at same time, unlike regular mouse processing
-                            //Which does click when mouse goes up over same object it went down on
-                            //This improves the user's ability to select small menu items
-                            //ExecuteEvents.Execute(newPressed, PointEvents[whichPointer], ExecuteEvents.pointerClickHandler);
                         }
 
                         if (gameObjectJustPressed != null)
