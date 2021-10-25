@@ -514,7 +514,7 @@ namespace Leap.Unity.InputModule
             EventData.delta = EventData.position - PrevScreenPosition;
             EventData.scrollDelta = Vector2.zero;
 
-            //Perform the Raycast and sort all the things we hit by distance... (where distance is the canvas order, not the Z-depth???)
+            //Perform the Raycast and sort all the things we hit by distance
             eventSystem.RaycastAll(EventData, _raycastResultCache);
             EventData.pointerCurrentRaycast = UIInputModule.FindFirstRaycast(_raycastResultCache);
 
@@ -532,8 +532,6 @@ namespace Leap.Unity.InputModule
         {
             if (EventData.pointerCurrentRaycast.gameObject != null)
             {
-                // Why are we forcing tactile or projective if there is an enum to set up the mode, when are these states forced????
-                // Should be able to re-express this if statement to make it clearer....
                 if (IsPermittedTactileInteraction(hand))
                 {
                     if (IsTriggeringInteraction(hand))
@@ -544,23 +542,19 @@ namespace Leap.Unity.InputModule
                     }
                     else
                     {
-                        // Are we really near it though. We are over something but not close enough for it to be a tactile interaction????
                         PointerState = PointerStates.NearCanvas; 
                     }
                 }
                 else if (!tipRaycastUsed)
                 { 
-                    // Provide more context here ... what is tipRayCast all about and why is it relevant to this logic?
                     if (ExecuteEvents.GetEventHandler<IPointerClickHandler>(EventData.pointerCurrentRaycast.gameObject)) 
                     {
-                        // if HitElementCanBeClicked
                         PointerState = IsTriggeringInteraction(hand) 
                             ? PointerStates.PinchingToElement 
                             : PointerStates.OnElement;
                     }
                     else
                     {
-                        // Hit a non clickable UI element ...
                         PointerState = IsTriggeringInteraction(hand) 
                             ? PointerStates.PinchingToCanvas 
                             : PointerStates.OnCanvas;
@@ -613,7 +607,6 @@ namespace Leap.Unity.InputModule
         
         private void RaiseEventsForStateChanges()
         {
-            // Extract the Hover stuff as a separate method from the state change events?
             if (module.TriggerHoverOnElementSwitch)
             {
                 if (PrevState != PointerStates.OffCanvas && PointerState != PointerStates.OffCanvas)

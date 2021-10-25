@@ -96,9 +96,8 @@ namespace Leap.Unity.InputModule
                     Debug.LogWarning("Ensure that the layers that you have allotted are children of CompressibleUI object and have UI Elements in them!");
                 }
             }
-            //if (!RetractWhenOutsideofTouchingDistance) {
+
             Expand();
-            //}
         }
 
         private void OnApplicationQuit()
@@ -160,8 +159,8 @@ namespace Leap.Unity.InputModule
                             }
                         }
                     }
-                    //else Just lay them flat so they're not bothering any cursors.
                 }
+                //Lay them flat so they're not bothering any cursors.
                 else
                 {
                     if (Layers[i].LayerTransform != null)
