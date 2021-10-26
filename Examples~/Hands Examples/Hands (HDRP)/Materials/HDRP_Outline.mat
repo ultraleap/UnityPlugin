@@ -8,16 +8,14 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: HDRP_Outline
-  m_Shader: {fileID: -6465566751694194690, guid: 00ef0f522aa09f54aad1343dcc056a99,
-    type: 3}
+  m_Shader: {fileID: 4800000, guid: 5ce2a36449e6e3d4ea1dda8f161bd966, type: 3}
   m_ShaderKeywords: _BLENDMODE_ALPHA _SURFACE_TYPE_TRANSPARENT
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
-  m_CustomRenderQueue: 3000
+  m_CustomRenderQueue: -1
   stringTagMap:
     MotionVector: User
-    RenderType: Transparent
   disabledShaderPasses:
   - MOTIONVECTORS
   - TransparentBackface
@@ -55,7 +53,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 2800000, guid: e911cba1eec0c364681095f165f68321, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MetallicGlossMap:
@@ -110,6 +108,7 @@ Material:
     - _Mode: 0
     - _OcclusionStrength: 1
     - _OpaqueCullMode: 2
+    - _Outline: 0.002
     - _Parallax: 0.02
     - _ReceivesSSR: 0
     - _RenderQueueType: 5
@@ -147,6 +146,7 @@ Material:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _DoubleSidedConstants: {r: 1, g: 1, b: -1, a: 0}
     - _EmissionColor: {r: 1, g: 1, b: 1, a: 1}
+    - _OutlineColor: {r: 0, g: 0, b: 0, a: 1}
 --- !u!114 &4961438190780558890
 MonoBehaviour:
   m_ObjectHideFlags: 11
