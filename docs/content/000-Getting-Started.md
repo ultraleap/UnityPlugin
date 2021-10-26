@@ -2,6 +2,8 @@
 
 The UnityModules repository is designed to be opened in Unity 2019.2. However, the most recent release (4.8.0 or later) has been tested with Unity 2019.4 LTS and Unity 2020.2. If you are sourcing UnityModules directly from this repository, your mileage may vary with earlier versions of Unity.
 
+Version 4.9.1 of the Unity Modules is only intended to be used with Version 5.2 of the tracking service (or more recent releases), it is not backwards compatible with previous service releases. For details about service compatibility with Unity Modules and how to upgrade projects, consult the [Migration Guide](https://developer.leapmotion.com/migration-guide).
+
 # Installing the modules {#installing-unity-modules}
 
 Core is the only dependency for any Module. If you are installing any Unity Modules for a new project, you need only to download the latest stable versions of Core and any modules of interest from [our developer page][devpage]. You can import new modules into your project at any time; to upgrade a module, simply delete its folder from your project to get rid of all of the files in that module, then import the latest module version.
