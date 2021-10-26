@@ -207,10 +207,17 @@ namespace Leap.Unity
 
         #region Unity Events
 
+        //Reset is called when the user hits the Reset button in the Inspector's context menu or when adding the component the first time
         protected override void Reset()
         {
             base.Reset();
             editTimePose = TestHandFactory.TestHandPose.HeadMountedB;
+            _interactionVolumeVisualization = InteractionVolumeVisualization.Automatic;
+            _camera = Camera.main;
+            if(_camera != null)
+            {
+                Debug.Log("Camera.Main automatically assigned");
+            }
         }
 
         protected virtual void OnEnable()

@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 3557434566810426996}
   - component: {fileID: 3197135840066374280}
   m_Layer: 0
-  m_Name: XR Service Provider
+  m_Name: Service Provider (XR)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -44,7 +44,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: abb0e8dd6c809854f8fea5e0976884f8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  editTimePose: 1
+  editTimePose: 0
   _interactionVolumeVisualization: 3
   _frameOptimization: 0
   _physicsExtrapolation: 1

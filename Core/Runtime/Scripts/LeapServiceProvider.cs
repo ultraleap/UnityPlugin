@@ -63,7 +63,7 @@ namespace Leap.Unity
         }
         [Tooltip("Displays a representation of the interaction volume in the scene view")]
         [SerializeField]
-        protected InteractionVolumeVisualization _interactionVolumeVisualization = InteractionVolumeVisualization.LeapMotionController;
+        protected InteractionVolumeVisualization _interactionVolumeVisualization = InteractionVolumeVisualization.Automatic;
 
         public InteractionVolumeVisualization SelectedInteractionVolumeVisualization => _interactionVolumeVisualization;
 

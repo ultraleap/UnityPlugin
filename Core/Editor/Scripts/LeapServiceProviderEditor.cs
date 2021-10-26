@@ -117,6 +117,10 @@ namespace Leap.Unity
 
         public virtual void OnSceneGUI()
         {
+            if(target == null)
+            {
+                return;
+            }
 
             Transform targetTransform = target.transform;
             LeapXRServiceProvider xrProvider = target as LeapXRServiceProvider;

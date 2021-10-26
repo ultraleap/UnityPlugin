@@ -15,19 +15,12 @@ namespace Leap.Unity
     [CustomEditor(typeof(LeapXRServiceProvider))]
     public class LeapXRServiceProviderEditor : LeapServiceProviderEditor
     {
-
         SerializedProperty _camera;
 
-        public enum XRTestHandPose
-        {
-            HeadMountedA,
-            HeadMountedB,
-        }
-        public XRTestHandPose TestHandPose;
+        string [] testHandPoses = new string []{ "HeadMountedA", "HeadMountedB" };
 
         protected override void OnEnable()
         {
-
             _camera = serializedObject.FindProperty("_camera");
 
             base.OnEnable();
@@ -71,21 +64,15 @@ namespace Leap.Unity
             addPropertyToFoldout("_updateHandInPrecull", "Advanced Options");
         }
 
+        /// <summary>
+        /// Create a limited drop down for edit time poses
+        /// </summary>
+        /// <param name="property"></param>
         private void DrawCustomEnum(SerializedProperty property)
         {
-            TestHandPose = (XRTestHandPose)EditorGUILayout.EnumPopup("Edit Time Pose", TestHandPose);
-
-            switch (TestHandPose)
-            {
-                case XRTestHandPose.HeadMountedA:
-                    property.enumValueIndex = (int)TestHandFactory.TestHandPose.HeadMountedA;
-                    break;
-                case XRTestHandPose.HeadMountedB:
-                    property.enumValueIndex = (int)TestHandFactory.TestHandPose.HeadMountedB;
-                    break;
-            }
+            property.enumValueIndex = EditorGUILayout.Popup("Edit Time Pose", property.enumValueIndex, testHandPoses);
+            serializedObject.ApplyModifiedProperties();
         }
-
 
         private void decorateAllowManualTimeAlignment(SerializedProperty property)
         {
@@ -111,6 +98,12 @@ namespace Leap.Unity
         {
             if (_camera.objectReferenceValue == null)
             {
+                if (GUILayout.Button("Set Camera.Main"))
+                {
+                    _camera.objectReferenceValue = Camera.main;
+                    serializedObject.ApplyModifiedProperties();
+                }
+
                 EditorGUILayout.PropertyField(_camera);
                 serializedObject.ApplyModifiedProperties();
                 return;
