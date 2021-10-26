@@ -197,8 +197,7 @@ namespace Leap.Unity
                     hand = Provider.CurrentFrame.Get(Handedness);
                 }
 
-                SetLeapHand(hand);
-                UpdateHand();
+                UpdateBase(hand);
             }
         }
 #endif
