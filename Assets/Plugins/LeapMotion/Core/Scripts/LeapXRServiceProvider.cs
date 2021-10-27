@@ -408,18 +408,12 @@ namespace Leap.Unity {
     /// The POLICY_OPTIMIZE_HMD flag improves tracking for head-mounted devices.
     /// </summary>
     protected override void initializeFlags() {
-      if (_leapController == null) {
-        return;
-      }
-
-      // Optimize for head-mounted tracking if on head-mounted display.
-      _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP);
-      _leapController.SetPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
+      ChangeTrackingMode(TrackingOptimizationMode.HMD);
     }
 
     protected override void transformFrame(Frame source, Frame dest) {
-      LeapTransform leapTransform = GetWarpedMatrix(source.Timestamp);
-      dest.CopyFrom(source).Transform(leapTransform);
+        LeapTransform leapTransform = GetWarpedMatrix(source.Timestamp);
+        dest.CopyFrom(source).Transform(leapTransform);
     }
 
     #endregion

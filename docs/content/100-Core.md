@@ -1,8 +1,8 @@
 # Core {#core}
 
-Core contains the fundamental assets necessary to get Leap hand data into your Unity project. The plugins we package with Core handle all the work of talking to the Leap Motion service that runs on your platform and provides hand data to your application from the sensor.
+Core contains the fundamental assets necessary to get Leap hand data into your Unity project. The plugins we package with Core handle all the work of talking to the Ultraleap tracking service that runs on your platform and provides hand data to your application from the sensor.
 
-Core also contains a small set of prefabs to get you prototyping with a VR rig and Leap hands right away. You can create a new scene and drag in the **Leap Rig** prefab to immediately get an XR camera rig with Leap hand support, or you can drag in the LeapHandController prefab to work with a desktop-mounted Leap Motion Controller.
+Core also contains a small set of prefabs to get you prototyping with a VR rig and Leap hands right away. You can create a new scene and drag in the **Leap Rig** prefab to immediately get an XR camera rig with Leap hand support, or you can drag in the LeapHandController prefab to work with a desktop-mounted Ultraleap tracking camera.
 
 Finally, Core contains some lightweight utilities for a better Unity development experience, XR or otherwise.  These utilities support our Modules and, optionally, your own application: It contains [Query][ref_Query], our garbageless LINQ implementation, some useful data structures, a simple [Tween][ref_Tween]  library, and more!
 
@@ -11,15 +11,15 @@ Finally, Core contains some lightweight utilities for a better Unity development
 
 Utilizing non-allocating libraries is crucial for VR development, where garbage collection means dropping frames and sickening your users; so our libraries generally eschew surprising memory allocation of any form. If you encounter garbage collection during normal Unity Modules use and it bothers you as much as it bothers us, let us know on our [Developer Forum][devforum].
 
-[devforum]: https://community.leapmotion.com/c/development "Leap Motion Developer Forum"
+[devforum]: https://community.leapmotion.com/c/development "Ultraleap / Leap Motion Developer Forum"
 
 # Setting up your development environment
 
-Our [developer SDK][devsdk] includes the installer that can get a Leap service running on your platform. You'll need a Leap service to handle the communication between your Leap Motion Controller, your development machine, and your application.
+Our [developer SDK][devsdk] includes the installer that can get an Ultraleap tracking service running on your platform. You'll need an Ultraleap tracking service to handle the communication between your tracking hardware, your development machine, and your application.
 
-[devsdk]: https://developer.leapmotion.com/get-started/ "Get Started with the Leap Motion SDK"
+[devsdk]: https://developer.leapmotion.com/get-started/ "Get Started with Hand Tracking"
 
-You'll need **Unity 5.5 or later** to use our Core Assets. _However, if you're intending to use the Interaction Engine, it relies on physics features that are only present in **Unity 5.6 or later**._
+You'll need **Unity 2019.2 or later** to use our Core Assets. 
 
 Of course, you'll also need the Core package and any Modules you'd like to use imported into your Unity project! Refer to our @ref mainpage guide if you're not sure how to do this.
 
@@ -33,11 +33,13 @@ If you've gone through the setup process but you aren't seeing hands in your app
 
 ### The Providers
 
-[LeapProvider][ref_LeapProvider] defines the basic interface our modules expect to use to retrieve [Frame][ref_Frame] data. This abstraction allows you to create your own LeapProviders, which is useful when testing or developing in a context where Leap Controller hardware isn't immediately.
+[LeapProvider][ref_LeapProvider] defines the basic interface our modules expect to use to retrieve [Frame][ref_Frame] data. This abstraction allows you to create your own LeapProviders, which is useful when testing or developing in a context where Ultraleap tracking hardware isn't immediately available.
 
-[LeapServiceProvider][ref_LeapServiceProvider] is the class that communicates with the Leap service running on your platform and provides Frame objects containing Leap hands to your application. Generally, any class that needs Hand data from the sensor will need a reference to a LeapServiceProvider to get that data. 
+[LeapServiceProvider][ref_LeapServiceProvider] is the class that communicates with the Ultraleap tracking service running on your platform and provides Frame objects containing Leap hands to your application. Generally, any class that needs Hand data from the sensor will need a reference to a LeapServiceProvider to get that data. 
 
-Release 4.7.0. introduces a new tracking model for tracking devices mounted above a screen and facing down towards the user (angled at 30 degress from the vertical), which is currently in **preview only**. Known as Screentop, this can be selected in the LeapServiceProvider's 'Advanced Options' section, under 'Tracking Optimization'.  There is a corresponding Screentop option for viewing the hands in the editor when this tracking mode is selected (Edit Time Pose). 
+Release 4.7.0 introduces a new tracking model for tracking cameras mounted above a screen and facing down towards the user (angled at 30 degrees from the vertical). Known as Screentop, this can be selected in the LeapServiceProvider's "Advanced Options" section, under "Tracking Optimization".  There is a corresponding "Screen Top" option for viewing the hands in the editor when this tracking mode is selected ("Edit Time Pose"). 
+
+The "Tracking Optimization" field also has options for setting desktop or HMD (head mounted) tracking mode. If the "Prevent Changing Tracking Mode" flag is set, the tracking mode on the hand tracking service is not changed by the Unity application when it starts, so the service remains in whatever mode it was before the application started. **If hand tracking does not work as expected in your application, be sure to set the tracking optimization on the [LeapServiceProvider][ref_LeapServiceProvider] to the mode that matches the orientation of the tracking hardware and ensure "Prevent Changing Tracking Mode" is disabled**. It should be noted that virtual reality / mixed reality application use the [LeapXRServiceProvider][ref_LeapXRServiceProvider] which always sets the tracking optimization on connection to head mounted tracking mode.
 
 [LeapXRServiceProvider][ref_LeapXRServiceProvider] is the specialized component you should use for XR applications. Place this component directly on your XR camera, so that it can correctly account for differences in tracking timing between the sensor and your headset's pose tracking.
 
@@ -67,7 +69,7 @@ Our standard rig prefab places the Hand Model Manager as a direct child of the r
 
 ![A basic XR rig setup with Capsule Hands.](@ref images/Basic_XR_Rig.png)
 
-The **Leap Rig** prefab is a ready-made XR rig to get you started building an XR application with Leap Motion. It consists of the following objects:
+The **Leap Rig** prefab is a ready-made XR rig to get you started building an XR application with Ultraleap tracking. It consists of the following objects:
 
 The **Leap Rig** is the root object. This is the Transform you should manipulate if you want to move your player in the XR space. This object contains the _optional_ XRHeightOffset script by default, which offers a simple way to get your player's head at a consistent height across the different XR platforms built into Unity.
 
@@ -109,15 +111,15 @@ The [Capsule Hands][ref_CapsuleHand] generate a set of spheres and cylinders to 
 
 **Q: I'm working on a custom experience/headset integration and hand alignment needs to be _totally perfect._ I have control over the head rig that will be used for my experience. How can I make sure the hand aligns with the user's real hands perfectly?**
 
-A: Check your LeapXRServiceProvider object in the Leap Rig prefab. We've included an `Allow Manual Device Offset` checkbox in the Advanced section that will allow you to adjust where your application expects the Leap Motion Controller to be relative to the tracked headset. (If you don't see this checkbox, make sure you've upgraded to the latest version of the Core module.)
+A: Check your LeapXRServiceProvider object in the Leap Rig prefab. We've included an `Allow Manual Device Offset` checkbox in the Advanced section that will allow you to adjust where your application expects the Ultraleap camera hardware to be relative to the tracked headset. (If you don't see this checkbox, make sure you've upgraded to the latest version of the Core module.)
 
-Because most Leap Motion VR rigs utilize a custom VR developer mount attachment, not all Leap Motion Controllers are mounted in the same place relative to the tracked positions of VR headsets. In order for hands in VR space to align perfectly with hands in the real world, your application needs to know _exactly_ where the Leap Motion Controller is mounted relative to your tracked headset position and orientation. While the default values will usually produce an acceptable experience for VR, in passthrough or mixed-reality situations, a mismatch between the real world Leap position and the VR world Leap position -- even of just a few degrees of tilt, or a centimeter of displacement -- can shift hands too much to produce a plausible tracking experience.
+Because most Ultraleap VR rigs utilize a custom VR developer mount attachment, not all Ultraleap tracking cameras are mounted in the same place relative to the tracked positions of VR headsets. In order for hands in VR space to align perfectly with hands in the real world, your application needs to know _exactly_ where the Ultraleap tracking camera is mounted relative to your tracked headset position and orientation. While the default values will usually produce an acceptable experience for VR, in passthrough or mixed-reality situations, a mismatch between the real world Leap position and the VR world Leap position -- even of just a few degrees of tilt, or a centimetre of displacement -- can shift hands too much to produce a plausible tracking experience.
 
-Naturally, this solution isn't viable if you intend for your application to be run on a wide variety of headsets with a Leap Motion Controller attached. Under these circumstances, we recommend you keep the device offsets to their default values (uncheck the checkbox to revert them).
+Naturally, this solution isn't viable if you intend for your application to be run on a wide variety of headsets with an Ultraleap camera attached. Under these circumstances, we recommend you keep the device offsets to their default values (uncheck the checkbox to revert them).
 
 **Q: How do I convert a VR example into a desktop example?
 
 First, add your own camera to the scene so you can film from whatever perspective makes sense for your user.
 
 The basic setup of a VR-less system is to use a LeapServiceProvider component (not a LeapXRServiceProvider) and a linked Hand Model Manager (with hands underneath it in the hierarchy and registered to it, much like how you see implemented in the VR prefabs).
-Also remember to disable VR mode from your player settings (if you’re using a cloned version of UnityModules). Upon pressing play and holding your hands over the device, you should see the hands in the proper orientation.
+Also remember to disable VR mode from your player settings (if you’re using a cloned version of UnityModules) and set the "tracking mode" to "desktop". Upon pressing play and holding your hands over the device, you should see the hands in the proper orientation. 
