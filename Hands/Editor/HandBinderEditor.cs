@@ -103,6 +103,7 @@ namespace Leap.Unity.HandsModule
             DrawDebugOptions();
             DrawFineTuningOptions();
             serializedObject.ApplyModifiedProperties();
+            EditorUtility.SetDirty(target);
         }
 
         /// <summary>
@@ -236,6 +237,7 @@ namespace Leap.Unity.HandsModule
                 SerializedProperty offsetPosition = offsetProperty.FindPropertyRelative("position");
 
                 GUILayout.BeginVertical(editorSkin.box);
+
                 GUILayout.BeginHorizontal(editorSkin.box);
                 EditorGUILayout.PropertyField(boundType, GUIContent.none, editorSkin);
 
@@ -611,7 +613,6 @@ namespace Leap.Unity.HandsModule
                 GUIHandGraphic.DrawHandGraphic(handBinder.Handedness, GUIHandGraphic.FlattenHandBinderTransforms(handBinder));
                 DrawAutoBindButton();
                 DrawObjectFields();
-                GUILayout.EndScrollView();
                 DrawRotationOffsets();
             }
 
