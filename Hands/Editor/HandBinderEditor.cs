@@ -40,6 +40,8 @@ namespace Leap.Unity.HandsModule
         private SerializedProperty offsets;
         private SerializedProperty fineTuning;
         private SerializedProperty debugOptions;
+        private SerializedProperty leapProvider;
+
 
         private Color green = new Color32(140, 234, 40, 255);
         private GUISkin editorSkin;
@@ -64,6 +66,8 @@ namespace Leap.Unity.HandsModule
             debugOptions = serializedObject.FindProperty("DebugOptions");
             boundHand = serializedObject.FindProperty("BoundHand");
             offsets = serializedObject.FindProperty("Offsets");
+            leapProvider = serializedObject.FindProperty("leapProvider");
+
 
             dividerLine = Resources.Load<Texture>("EditorDividerLine");
             editorSkin = Resources.Load<GUISkin>("UltraleapEditorStyle");
@@ -128,6 +132,7 @@ namespace Leap.Unity.HandsModule
         private void DrawBindingOptions()
         {
             EditorGUILayout.Space();
+            EditorGUILayout.PropertyField(leapProvider, editorSkin);
             EditorGUILayout.PropertyField(chirality, new GUIContent("Hand Type", "Which hand does this binder target?"), editorSkin);
             EditorGUILayout.Space();
 
