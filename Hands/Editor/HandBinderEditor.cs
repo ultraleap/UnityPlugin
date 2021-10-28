@@ -181,7 +181,7 @@ namespace Leap.Unity.HandsModule
                 toggleProperty.boolValue = GUILayout.Toggle(toggleProperty.boolValue, new GUIContent(toggleProperty.name), editorSkin.toggle);
                 if (toggleProperty.boolValue)
                 {
-                    colorField = EditorGUILayout.ColorField(GUIContent.none, colorField, false, false, false);
+                    colorField = EditorGUILayout.ColorField(new GUIContent("Color"), colorField, true, false, false);
                 }
                 GUILayout.EndVertical();
                 serializedObject.ApplyModifiedProperties();
@@ -578,6 +578,7 @@ namespace Leap.Unity.HandsModule
             private GUISkin editorSkin;
             private string message1 = "Reference the GameObjects you wish to use from the scene into the fields below, once assigned the dots above will appear green to show they are bound to tracking data.";
             private string message2 = "Once you have assigned the bones you wish to use, the button below will attempt to calculate the rotational offsets needed to line the 3D Model hand with the tracking data.";
+            private Vector2 scrollPosition;
 
             /// <summary>
             /// Set up the Editor textures and reference to the hand binder
@@ -614,6 +615,7 @@ namespace Leap.Unity.HandsModule
                 DrawAutoBindButton();
                 DrawObjectFields();
                 DrawRotationOffsets();
+                EditorUtility.SetDirty(this);
             }
 
             /// <summary>
@@ -653,6 +655,7 @@ namespace Leap.Unity.HandsModule
             /// </summary>
             void DrawObjectFields()
             {
+                scrollPosition = GUILayout.BeginScrollView(scrollPosition);
                 //Draw a list of all the points of the hand that can be bound too
                 GUILayout.Space(spaceSize);
                 GUILayout.BeginHorizontal();
@@ -689,6 +692,8 @@ namespace Leap.Unity.HandsModule
                 GUILayout.EndVertical();
                 GUILayout.Space(20);
                 GUILayout.EndHorizontal();
+                GUILayout.EndScrollView();
+
             }
 
             /// <summary>
@@ -870,7 +875,7 @@ namespace Leap.Unity.HandsModule
                     SetUp();
                 }
 
-                var midPoint = Screen.width / 2.6f;
+                var midPoint = Screen.width / 2f;
                 var middleYOffset = 50;
 
                 //Draw the hand texture
