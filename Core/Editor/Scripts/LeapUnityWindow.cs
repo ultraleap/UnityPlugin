@@ -19,7 +19,7 @@ namespace Leap.Unity
 
         #region Settings & Init
 
-        private const string WINDOW_TITLE = "Leap Motion Unity Modules";
+        private const string WINDOW_TITLE = "Ultraleap Unity Modules";
         private static readonly Vector2 WINDOW_MIN_SIZE = new Vector2(600f, 600f);
         private static LeapUnityWindow _currentWindow = null;
 
@@ -45,12 +45,12 @@ namespace Leap.Unity
             };
         }
 
-        [MenuItem("Window/Leap Motion")]
+        [MenuItem("Window/Ultraleap")]
         public static void Init()
         {
             var window = (LeapUnityWindow)GetWindow(typeof(LeapUnityWindow),
               utility: true, title: WINDOW_TITLE, focus: true);
-            window.name = "Leap Motion Unity Modules Window";
+            window.name = "Ultraleap Unity Modules Window";
             window.minSize = WINDOW_MIN_SIZE;
             _currentWindow = window;
         }

@@ -54,7 +54,7 @@ namespace Leap.Unity.Interaction.Internal
             {
                 bool allChecksPassed = runAllChecks_NoGUI();
 
-                if (!allChecksPassed)
+                if (!allChecksPassed && EditorPrefs.GetBool(SHOULD_LAUNCH_FOR_IE))
                 {
                     EditorApplication.delayCall += LeapUnityWindow.Init;
                 }
