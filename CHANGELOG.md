@@ -25,7 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - LeapImageRetriever
   - LeapEyeDislocator
   - EnableDepthBuffer
-- Reworked how adding hands to a scene works - hands can be added easily with any type derived from `HandModelBase` can be added directly into the scene and linked with a `LeapProvider` to begin tracking immediately.
+- Reworked how adding hands to a scene works - hands can be added easily. Any type derived from `HandModelBase` can be added directly into the scene and linked with a `LeapProvider` to begin tracking immediately.
 
 ### Removed
 - `HandModelManager` MonoBehaviour
@@ -34,7 +34,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The following example scenes were removed:
   - Rigged Hands (VR - Infrared Viewer)
   - Rigged Hands (VR)
-- x86 LeapC.dll
 - Experimental modules
   - HierarchyRecording
   - Playback
