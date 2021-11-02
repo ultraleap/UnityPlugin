@@ -26,19 +26,23 @@ namespace Leap.Unity {
   public class LeapXRServiceProvider : LeapServiceProvider {
 
     #region Inspector
-
     // Manual Device Offset
-
+    #if UNITY_ANDROID
+    private const float DEFAULT_DEVICE_OFFSET_Y_AXIS = -0.0114f;
+    private const float DEFAULT_DEVICE_OFFSET_Z_AXIS = 0.0981f;
+    private const float DEFAULT_DEVICE_TILT_X_AXIS = 0f;
+    #else
     private const float DEFAULT_DEVICE_OFFSET_Y_AXIS = 0f;
-    private const float DEFAULT_DEVICE_OFFSET_Z_AXIS = 0.12f;
-    private const float DEFAULT_DEVICE_TILT_X_AXIS = 5f;
+    private const float DEFAULT_DEVICE_OFFSET_Z_AXIS = 0.10f;
+    private const float DEFAULT_DEVICE_TILT_X_AXIS = 0f;
+    #endif
 
-    private enum XR2TimewarpMode  {
+    private enum TimewarpMode  {
        Default,
-       Experimental
+       Experimental_XR2
     }
 
-    private XR2TimewarpMode _xr2TimewarpMode = XR2TimewarpMode.Experimental;
+    private TimewarpMode _xr2TimewarpMode = TimewarpMode.Default;
 
     public enum DeviceOffsetMode {
       Default,
@@ -152,7 +156,7 @@ namespace Leap.Unity {
            + "Use 'Images' for scenarios that overlay Leap device images on tracked "
            + "hand data.")]
     [SerializeField]
-    private TemporalWarpingMode _temporalWarpingMode = TemporalWarpingMode.Auto;
+    public TemporalWarpingMode _temporalWarpingMode = TemporalWarpingMode.Auto;
 
     /// <summary>
     /// The time in milliseconds between the current frame's headset position and the
@@ -429,8 +433,13 @@ namespace Leap.Unity {
 
     protected override long CalculateInterpolationTime(bool endOfFrame = false) {
 #if UNITY_ANDROID
-       return GetPredictedDisplayTime_LeapTime();
-       //return _leapController.Now() - 16000;
+
+      if (_xr2TimewarpMode == TimewarpMode.Experimental_XR2) {
+        return GetPredictedDisplayTime_LeapTime();
+      }
+      else {
+        return _leapController.Now() - 16000;
+      }
 #else
       if (_leapController != null) {
         return _leapController.Now()
@@ -448,7 +457,7 @@ namespace Leap.Unity {
         /// Initializes the Leap Motion policy flags.
         /// The POLICY_OPTIMIZE_HMD flag improves tracking for head-mounted devices.
         /// </summary>
-        protected override void initializeFlags() {
+    protected override void initializeFlags() {
       if (_leapController == null) {
         return;
       }
@@ -487,7 +496,7 @@ namespace Leap.Unity {
           && updateTemporalCompensation
           && _temporalWarpingMode != TemporalWarpingMode.Off) {
 
-        if (_xr2TimewarpMode == XR2TimewarpMode.Default && transformHistory.history.IsFull) {
+        if (_xr2TimewarpMode == TimewarpMode.Default && transformHistory.history.IsFull) {
                         transformHistory.SampleTransform(timestamp
                                         - (long)(warpingAdjustment * 1000f)
                                         - (_temporalWarpingMode ==
@@ -495,7 +504,7 @@ namespace Leap.Unity {
                                         out warpedPosition, out warpedRotation);
         }
 #if UNITY_ANDROID
-        else if (_xr2TimewarpMode == XR2TimewarpMode.Experimental) {
+        else if (_xr2TimewarpMode == TimewarpMode.Experimental_XR2) {
           // Get the predicted display time for the current frame in milliseconds, then get the predicted head pose
           float predictedDisplayTime_ms = SxrShim.GetPredictedDisplayTime(SystemInfo.graphicsMultiThreaded);
 
