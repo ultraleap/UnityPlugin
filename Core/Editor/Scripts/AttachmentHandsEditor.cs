@@ -25,7 +25,7 @@ namespace Leap.Unity.Attachments
         {
             base.OnEnable();
 
-            _handTex = EditorResources.Load<Texture2D>("HandTex");
+            _handTex = Resources.Load<Texture2D>("HandTex");
 
             this.specifyCustomDrawer("_attachmentPoints", drawAttachmentPointsEditor);
         }
