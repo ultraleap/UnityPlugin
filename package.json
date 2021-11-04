@@ -1,13 +1,15 @@
 {
   "name": "com.ultraleap.tracking",
   "displayName": "Ultraleap Tracking",
-  "version": "4.9.0",
+  "description": "Ultraleap's Unity Plugin enables the data produced by Ultraleap tracking hardware to be used by developers inside their Unity projects. It includes various utilities, examples and prefabs that make it as easy as possible to design and use hand tracking in XR projects",
+  "version": "5.0.0",
   "unity": "2019.4",
   "type": "library",
-  "description": "Ultraleap Tracking",
   "keywords": [
-    "haptics",
-    "ultraleap"
+    "ultraleap",
+    "leap motion",
+    "hand tracking",
+    "tracking"
   ],
   "readme": "Ultraleap",
   "author": {
@@ -17,19 +19,14 @@
   },
   "samples": [
     {
-      "displayName": "Core Examples",
-      "description": "",
-      "path": "Examples~/Core Examples"
+      "displayName": "Examples",
+      "description": "Examples",
+      "path": "Examples~"
     },
     {
-      "displayName": "Hands Examples",
-      "description": "",
-      "path": "Examples~/Hands Examples"
-    },
-    {
-      "displayName": "InteractionEngine Examples",
-      "description": "",
-      "path": "Examples~/Interaction Engine Examples"
+      "displayName": "UI Input (Experimental)",
+      "description": "UI Input (Experimental)",
+      "path": "Experimental~/UI Input"
     }
   ]
 }

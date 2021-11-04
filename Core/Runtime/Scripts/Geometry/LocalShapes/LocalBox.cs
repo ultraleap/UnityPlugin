@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2020.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2021.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -10,22 +10,33 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Leap.Unity.Geometry {
+namespace Leap.Unity.Geometry
+{
 
-  [System.Serializable]
-  public struct LocalBox {
+    [System.Serializable]
+    public struct LocalBox
+    {
 
-    public Vector3 center;
-    public Vector3 radii;
+        public Vector3 center;
+        public Vector3 radii;
 
-    public Box With(Transform t) {
-      return new Box(this, t);
+        public Box With(Transform t)
+        {
+            return new Box(this, t);
+        }
+
+        public static LocalBox unit
+        {
+            get
+            {
+                return new LocalBox()
+                {
+                    center = Vector3.zero,
+                    radii = Vector3.one
+                };
+            }
+        }
+
     }
-
-    public static LocalBox unit { get { return new LocalBox() {
-      center = Vector3.zero, radii = Vector3.one
-    };}}
-
-  }
 
 }

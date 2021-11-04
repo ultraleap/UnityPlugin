@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2020.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2021.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -33,7 +33,7 @@ namespace Leap.Unity {
       testObj = LoadObject(objectName);
     }
 
-    #region Spawn Utilities
+#region Spawn Utilities
 
     protected T Spawn<T>(T original, Vector3 position) where T : MonoBehaviour {
       return GameObject.Instantiate<T>(original,
@@ -88,9 +88,9 @@ namespace Leap.Unity {
       return obj;
     }
 
-    #endregion
+#endregion
 
-    #region Frame Utilities
+#region Frame Utilities
 
     protected const bool GO_SLOW = false;
 
@@ -107,7 +107,7 @@ namespace Leap.Unity {
       }
     }
 
-    #endregion
+#endregion
 
   }
 

@@ -1,0 +1,18 @@
+{
+    "name": "Ultraleap.Tracking.UIInput.Editor",
+    "references": [
+        "GUID:db4e617c04f44c144bc19216a63dd19b",
+        "GUID:ec6408da4d3315b4f89ad1600f0d4fdf"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

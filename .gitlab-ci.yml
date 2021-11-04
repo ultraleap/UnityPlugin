@@ -1,26 +1,32 @@
 stages:
   - trigger
 
+
 trigger::trigger-downstream:
   stage: trigger
-
+ 
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
       when: always
       allow_failure: false
 
-    - if: $UPSTREAM_COMMIT_BRANCH == "xr2/main" && $CI_PIPELINE_SOURCE == "pipeline"
+    - if: $CI_PIPELINE_SOURCE == "pipeline"
       when: always
       allow_failure: false
 
-    - if: $CI_COMMIT_REF_NAME == "xr2/main"
+    - if: $CI_COMMIT_BRANCH == "main"
+      when: always
+      allow_failure: false
+
+    - if: $CI_COMMIT_BRANCH
       when: manual
       allow_failure: false
 
   variables:
-    UPSTREAM_COMMIT_BRANCH: $CI_COMMIT_REF_NAME 
+    UPSTREAM_COMMIT_BRANCH: $CI_COMMIT_BRANCH 
 
   trigger:
     project: xr/integrations/unity/ci/unityplugin-ci
-    branch: xr2/main
-    strategy: depend
+    branch: main
+    strategy: depend    
+    

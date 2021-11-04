@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2020.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2021.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -10,14 +10,17 @@
 using UnityEditor;
 #endif
 
-namespace Leap.Unity.Attributes {
+namespace Leap.Unity.Attributes
+{
 
-  public class EditTimeOnly : CombinablePropertyAttribute, IPropertyDisabler {
+    public class EditTimeOnly : CombinablePropertyAttribute, IPropertyDisabler
+    {
 
 #if UNITY_EDITOR
-    public bool ShouldDisable(SerializedProperty property) {
-      return EditorApplication.isPlaying;
-    }
+        public bool ShouldDisable(SerializedProperty property)
+        {
+            return EditorApplication.isPlaying;
+        }
 #endif
-  }
+    }
 }

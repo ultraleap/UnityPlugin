@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2020.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2021.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -21,7 +21,6 @@ namespace UHI.Tracking.InteractionEngine.Examples
     [RequireComponent(typeof(InteractionBehaviour))]
     public class SimpleInteractionGlow : MonoBehaviour
     {
-
         [Tooltip("If enabled, the object will lerp to its hoverColor when a hand is nearby.")]
         public bool useHover = true;
 
@@ -39,29 +38,36 @@ namespace UHI.Tracking.InteractionEngine.Examples
         [Tooltip("This color only applies if the object is an InteractionButton or InteractionSlider.")]
         public Color pressedColor = Color.white;
 
-        private Material _material;
+        private Material [] _materials;
 
         private InteractionBehaviour _intObj;
+
+        [SerializeField]
+        private Rend[] rends;
+
+        [System.Serializable]
+        public class Rend {
+            public int materialID = 0;
+            public Renderer renderer;
+        }
 
         void Start()
         {
             _intObj = GetComponent<InteractionBehaviour>();
 
-            Renderer renderer = GetComponent<Renderer>();
-            if (renderer == null)
+            if(rends.Length > 0)
             {
-                renderer = GetComponentInChildren<Renderer>();
-            }
+                _materials = new Material[rends.Length];
 
-            if (renderer != null)
-            {
-                _material = renderer.material;
+                for(int i = 0; i < rends.Length; i++) {
+                    _materials[i] = rends[i].renderer.materials[rends[i].materialID];
+                }
             }
         }
 
         void Update()
         {
-            if (_material != null)
+            if (_materials != null)
             {
 
                 // The target color for the Interaction object will be determined by various simple state checks.
@@ -104,7 +110,9 @@ namespace UHI.Tracking.InteractionEngine.Examples
                 }
 
                 // Lerp actual material color to the target color.
-                _material.color = Color.Lerp(_material.color, targetColor, 30F * Time.deltaTime);
+                for(int i = 0; i < _materials.Length; i++) {
+                    _materials[i].color = Color.Lerp(_materials[i].color, targetColor, 30F * Time.deltaTime);
+                }
             }
         }
 

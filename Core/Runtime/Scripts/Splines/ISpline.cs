@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2020.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2021.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -8,19 +8,21 @@
 
 using UnityEngine;
 
-namespace Leap.Unity.Animation {
+namespace Leap.Unity.Animation
+{
 
-  public interface ISpline<XType, dXType> {
+    public interface ISpline<XType, dXType>
+    {
 
-    float minT { get; }
-    float maxT { get; }
+        float minT { get; }
+        float maxT { get; }
 
-    XType ValueAt(float t);
+        XType ValueAt(float t);
 
-    dXType DerivativeAt(float t);
+        dXType DerivativeAt(float t);
 
-    void ValueAndDerivativeAt(float t, out XType value, out dXType deltaValuePerT);
+        void ValueAndDerivativeAt(float t, out XType value, out dXType deltaValuePerT);
 
-  }
+    }
 
 }

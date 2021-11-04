@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2020.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2021.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -11,19 +11,23 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-namespace Leap.Unity.Interaction {
+namespace Leap.Unity.Interaction
+{
 
-  [CustomEditor(typeof(ContactBoneParent))]
-  public class ContactBoneParentEditor : CustomEditorBase<ContactBoneParent> {
+    [CustomEditor(typeof(ContactBoneParent))]
+    public class ContactBoneParentEditor : CustomEditorBase<ContactBoneParent>
+    {
 
-    protected override void OnEnable() {
-      base.OnEnable();
+        protected override void OnEnable()
+        {
+            base.OnEnable();
+        }
+
+        public override void OnInspectorGUI()
+        {
+            base.OnInspectorGUI();
+        }
+
     }
-
-    public override void OnInspectorGUI() {
-      base.OnInspectorGUI();
-    }
-
-  }
 
 }

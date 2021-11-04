@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2020.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2021.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -9,8 +9,9 @@
 using System;
 using UnityEngine;
 
-namespace Leap.Unity {
+namespace Leap.Unity
+{
 
-  [Serializable]
-  public class StreamingAsset : StreamingFolder, ISerializationCallbackReceiver { }
+    [Serializable]
+    public class StreamingAsset : StreamingFolder, ISerializationCallbackReceiver { }
 }

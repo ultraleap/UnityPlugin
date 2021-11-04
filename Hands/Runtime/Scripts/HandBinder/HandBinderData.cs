@@ -1,48 +1,55 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2020.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2021.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine;
 
-namespace Leap.Unity.HandsModule {
+namespace Leap.Unity.HandsModule
+{
 
     [System.Serializable]
-    public class BoundHand {
+    public class BoundHand
+    {
         public BoundFinger[] fingers = new BoundFinger[5];
         public BoundBone wrist = new BoundBone();
         public BoundBone elbow = new BoundBone();
     }
 
     [System.Serializable]
-    public class BoundFinger {
+    public class BoundFinger
+    {
         public BoundBone[] boundBones = new BoundBone[4];
     }
 
     [System.Serializable]
-    public class BoundBone {
+    public class BoundBone
+    {
         public Transform boundTransform;
         public TransformStore startTransform = new TransformStore();
         public TransformStore offset = new TransformStore();
     }
 
     [System.Serializable]
-    public class TransformStore {
+    public class TransformStore
+    {
         public Vector3 position = Vector3.zero;
         public Vector3 rotation = Vector3.zero;
     }
 
     [System.Serializable]
-    public class SerializedTransform {
+    public class SerializedTransform
+    {
         public TransformStore transform;
         public GameObject reference;
     }
 
-    public enum BoundTypes {
+    public enum BoundTypes
+    {
         THUMB_METACARPAL,
         THUMB_PROXIMAL,
         THUMB_INTERMEDIATE,
@@ -72,7 +79,8 @@ namespace Leap.Unity.HandsModule {
         ELBOW,
     }
 
-    public class HandBinderUtilities {
+    public class HandBinderUtilities
+    {
 
         /// <summary>
         /// The mapping that allows a BoundType and Leap FingerType/BoneType to map back to the HandBinders Data structure
