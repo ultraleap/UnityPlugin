@@ -16,7 +16,7 @@ namespace Leap.Unity
     public class LeapXRServiceProviderEditor : LeapServiceProviderEditor
     {
 
-        SerializedProperty _camera;
+        SerializedProperty _mainCamera;
 
         public enum XRTestHandPose
         {
@@ -28,7 +28,7 @@ namespace Leap.Unity
         protected override void OnEnable()
         {
 
-            _camera = serializedObject.FindProperty("_camera");
+            _mainCamera = serializedObject.FindProperty("_mainCamera");
 
             base.OnEnable();
             isVRProvider = true;
@@ -109,9 +109,9 @@ namespace Leap.Unity
 
         public override void OnInspectorGUI()
         {
-            if (_camera.objectReferenceValue == null)
+            if (_mainCamera.objectReferenceValue == null)
             {
-                EditorGUILayout.PropertyField(_camera);
+                EditorGUILayout.PropertyField(_mainCamera);
                 serializedObject.ApplyModifiedProperties();
                 return;
             }
@@ -123,13 +123,13 @@ namespace Leap.Unity
         {
             LeapXRServiceProvider xrProvider = target as LeapXRServiceProvider;
 
-            if (xrProvider.Camera == null) { return; }
+            if (xrProvider.mainCamera == null) { return; }
 
             controllerOffset = new Vector3(0f,
                                 xrProvider.deviceOffsetYAxis,
                                 xrProvider.deviceOffsetZAxis);
 
-            deviceRotation = xrProvider.Camera.transform.InverseTransformRotation(xrProvider.Camera.transform.TransformRotation(Quaternion.Euler(xrProvider.deviceTiltXAxis, 0f, 0f))) * Quaternion.Euler(90f, 0f, 0f);
+            deviceRotation = xrProvider.mainCamera.transform.InverseTransformRotation(xrProvider.mainCamera.transform.TransformRotation(Quaternion.Euler(xrProvider.deviceTiltXAxis, 0f, 0f))) * Quaternion.Euler(90f, 0f, 0f);
 
 
             base.OnSceneGUI();

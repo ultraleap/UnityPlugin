@@ -224,9 +224,6 @@ namespace Leap.Unity
         private Pose? _trackingBaseDeltaPose = null;
 #endif
 
-        [SerializeField] private Camera _camera;
-        public Camera Camera => _camera;
-
         [NonSerialized]
         public long imageTimeStamp = 0;
 
@@ -249,7 +246,7 @@ namespace Leap.Unity
 #if XR_LEGACY_INPUT_AVAILABLE
             if (GetComponent<UnityEngine.SpatialTracking.TrackedPoseDriver>() == null) 
 			{
-                _camera.gameObject.AddComponent<UnityEngine.SpatialTracking.TrackedPoseDriver>().UseRelativeTransform = true;
+                _mainCamera.gameObject.AddComponent<UnityEngine.SpatialTracking.TrackedPoseDriver>().UseRelativeTransform = true;
             }
 #endif
 
@@ -308,7 +305,7 @@ namespace Leap.Unity
                 _deviceOffsetMode = DeviceOffsetMode.Default;
             }
 
-            if (Application.isPlaying && _camera == null && _temporalWarpingMode != TemporalWarpingMode.Off)
+            if (Application.isPlaying && _mainCamera == null && _temporalWarpingMode != TemporalWarpingMode.Off)
             {
                 Debug.LogError("Cannot perform temporal warping with no pre-cull camera.");
             }
@@ -326,8 +323,8 @@ namespace Leap.Unity
 
         void LateUpdate()
         {
-            var projectionMatrix = _camera == null ? Matrix4x4.identity
-              : _camera.projectionMatrix;
+            var projectionMatrix = _mainCamera == null ? Matrix4x4.identity
+              : _mainCamera.projectionMatrix;
             switch (SystemInfo.graphicsDeviceType)
             {
 #if !UNITY_2017_2_OR_NEWER
@@ -387,7 +384,7 @@ namespace Leap.Unity
         protected virtual void onPreCull(Camera preCullingCamera)
         {
 
-      		if (preCullingCamera != _camera) 
+      		if (preCullingCamera != _mainCamera) 
             {
                 return;
             }
@@ -400,7 +397,7 @@ namespace Leap.Unity
 
 #endif
 
-            if (_camera == null || _leapController == null)
+            if (_mainCamera == null || _leapController == null)
             {
                 if (_temporalWarpingMode == TemporalWarpingMode.Auto || _temporalWarpingMode == TemporalWarpingMode.Manual)
                 {
@@ -415,9 +412,9 @@ namespace Leap.Unity
                 || _deviceOffsetMode == DeviceOffsetMode.ManualHeadOffset)
             {
                 // Some headsets may not report valid data when untracked (e.g. Oculus), fall back to using the camera position
-                if (XRSupportUtil.GetXRNodeCenterEyeLocalPosition() == Vector3.zero || _camera.transform.localPosition == Vector3.zero)
+                if (XRSupportUtil.GetXRNodeCenterEyeLocalPosition() == Vector3.zero || _mainCamera.transform.localPosition == Vector3.zero)
                 {
-                    trackedPose = _camera.transform.ToLocalPose();
+                    trackedPose = _mainCamera.transform.ToLocalPose();
                 }
                 else
                 {
@@ -433,7 +430,7 @@ namespace Leap.Unity
                 // pose.
                 if (!_trackingBaseDeltaPose.HasValue)
                 {
-                    _trackingBaseDeltaPose = _camera.transform.ToLocalPose().mul(
+                    _trackingBaseDeltaPose = _mainCamera.transform.ToLocalPose().mul(
                                                 trackedPose.inverse());
                 }
 
@@ -453,7 +450,7 @@ namespace Leap.Unity
 
             transformHistory.UpdateDelay(trackedPose, _leapController.Now());
 
-            OnPreCullHandTransforms(_camera);
+            OnPreCullHandTransforms(_mainCamera);
         }
 
         #endregion
@@ -529,7 +526,7 @@ namespace Leap.Unity
         {
             LeapTransform leapTransform = new LeapTransform();
 
-            if (Camera == null)
+            if (_mainCamera == null)
             {
                 return leapTransform;
             }
@@ -583,7 +580,7 @@ namespace Leap.Unity
                   currentPose.rotation * Vector3.up * deviceOffsetYAxis
                   + currentPose.rotation * Vector3.forward * deviceOffsetZAxis;
                 currentPose.rotation = Quaternion.Euler(deviceTiltXAxis, 0f, 0f);
-                currentPose = _camera.transform.ToLocalPose().Then(currentPose); //  TOCHECK was just transform
+                currentPose = _mainCamera.transform.ToLocalPose().Then(currentPose); //  TOCHECK was just transform
             }
             else
             {
@@ -631,11 +628,11 @@ namespace Leap.Unity
                 );
             }
 #else
-            if (_camera.transform.parent != null && _deviceOffsetMode != DeviceOffsetMode.Transform)
+            if (_mainCamera.transform.parent != null && _deviceOffsetMode != DeviceOffsetMode.Transform)
             {
                 leapTransform = new LeapTransform(
-                  _camera.transform.parent.TransformPoint(warpedPosition).ToVector(),
-                  (_camera.transform.parent.rotation * warpedRotation).ToLeapQuaternion(),
+                  _mainCamera.transform.parent.TransformPoint(warpedPosition).ToVector(),
+                  (_mainCamera.transform.parent.rotation * warpedRotation).ToLeapQuaternion(),
                   Vector.Ones * 1e-3f
                 );
             }    
@@ -670,7 +667,7 @@ namespace Leap.Unity
                 //Don't update pre cull for preview, reflection, or scene view cameras
                 if (camera == null) 
 				{
-					camera = Camera;
+					camera = _mainCamera;
 			    }
 					
                 switch (camera.cameraType)

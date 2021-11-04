@@ -122,7 +122,7 @@ namespace Leap.Unity
             LeapXRServiceProvider xrProvider = target as LeapXRServiceProvider;
             if (xrProvider != null)
             {
-                targetTransform = xrProvider.Camera.transform;
+                targetTransform = xrProvider.mainCamera.transform;
 
                 if (xrProvider.deviceOrigin != null)
                 {
