@@ -105,7 +105,7 @@ namespace Leap.Unity.InputModule
                 Debug.LogError("Leap Data Provider must be set to get tracking data", leapDataProvider);
             }
 
-            var shoulderProjectionOriginProvider = new ShoulderProjectionOriginProvider(Camera.main);
+            var shoulderProjectionOriginProvider = new ShoulderProjectionOriginProvider(mainCamera);
             _projectionOriginProvider = shoulderProjectionOriginProvider;
 
             if (leapDataProvider == null)
@@ -118,6 +118,17 @@ namespace Leap.Unity.InputModule
                     return;
                 }
             }
+
+            var canvases = Resources.FindObjectsOfTypeAll<Canvas>();
+            for (int i = 0; i < canvases.Length; i++)
+            {
+                if (canvases[i].worldCamera == null)
+                {
+                    canvases[i].worldCamera = MainCameraProvider.Instance.mainCamera;
+                }
+            }
+
+
 
             //Set Projective/Tactile Modes
             if (interactionMode == InteractionCapability.Indirect)
