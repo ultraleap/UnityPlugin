@@ -45,7 +45,7 @@ namespace Leap.Unity
         /// attempt to reconnect to the service before giving up.
         /// </summary>
 #if UNITY_ANDROID
-    protected const int MAX_RECONNECTION_ATTEMPTS = 10;
+        protected const int MAX_RECONNECTION_ATTEMPTS = 10;
 #else
         protected const int MAX_RECONNECTION_ATTEMPTS = 5;
 #endif
@@ -55,7 +55,7 @@ namespace Leap.Unity
         /// reconnection attempt.
         /// </summary>
 #if UNITY_ANDROID
-    protected const int RECONNECTION_INTERVAL = 360;
+        protected const int RECONNECTION_INTERVAL = 360;
 #else
         protected const int RECONNECTION_INTERVAL = 180;
 #endif
@@ -317,80 +317,80 @@ namespace Leap.Unity
             }
         }
 
-#endregion
+        #endregion
 
-#region Android Support
+        #region Android Support
 
 #if UNITY_ANDROID
-	    private AndroidJavaObject _serviceBinder;
-	    AndroidJavaClass unityPlayer;
-	    AndroidJavaObject activity;
-	    AndroidJavaObject context;
-	    ServiceCallbacks serviceCallbacks;
+        private AndroidJavaObject _serviceBinder;
+        AndroidJavaClass unityPlayer;
+        AndroidJavaObject activity;
+        AndroidJavaObject context;
+        ServiceCallbacks serviceCallbacks;
 
-	    protected virtual void OnEnable() 
-		{
-	      CreateAndroidBinding();
-	    }
+        protected virtual void OnEnable()
+        {
+            CreateAndroidBinding();
+        }
 
-	    public bool CreateAndroidBinding() 
-		{
-	      try 
-		  {
-	        if (_serviceBinder != null) 
-			{
-	          //Check binding status before calling rebind
-	          bool bindStatus = _serviceBinder.Call<bool>("isBound");
-	          Debug.Log("CreateAndroidBinding - Current service binder status " + bindStatus);
-	          if (bindStatus)
-			  {
-	            return true;
-			  }
-	          else
-			  {
-	            _serviceBinder = null;
-			  }
-	        }
-			
-	        if (_serviceBinder == null) 
-			{
-	          //Get activity and context
-	          if (unityPlayer == null) 
-			  {
-	            Debug.Log("CreateAndroidBinding - Getting activity and context");
-	            unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
-	            activity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
-	            context = activity.Call<AndroidJavaObject>("getApplicationContext");
-	            serviceCallbacks = new ServiceCallbacks();
-	          }
-			  
-	          //Create a new service binding
-	          Debug.Log("CreateAndroidBinding - Creating a new service binder");
-	          _serviceBinder = new AndroidJavaObject("com.ultraleap.tracking.service_binder.ServiceBinder", context, serviceCallbacks);
-	          bool success = _serviceBinder.Call<bool>("bind");
-	          if (success) 
-			  {
-	            Debug.Log("CreateAndroidBinding - Binding of service binder complete");
-	          }
-	          return true;
-	        }
-	      } 
-		  catch (Exception e) 
-		  {
-	        Debug.LogWarning("CreateAndroidBinding - Failed to bind service: " + e.Message);
-	        _serviceBinder = null;
-	      }
-	    return false;
-	    }
+        public bool CreateAndroidBinding()
+        {
+            try
+            {
+                if (_serviceBinder != null)
+                {
+                    //Check binding status before calling rebind
+                    bool bindStatus = _serviceBinder.Call<bool>("isBound");
+                    Debug.Log("CreateAndroidBinding - Current service binder status " + bindStatus);
+                    if (bindStatus)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        _serviceBinder = null;
+                    }
+                }
 
-	    protected virtual void OnDisable() 
-		{
-	      if (_serviceBinder != null) 
-		  {
-	        Debug.Log("ServiceBinder.unbind...");
-	        _serviceBinder.Call("unbind");
-	      }
-	    }
+                if (_serviceBinder == null)
+                {
+                    //Get activity and context
+                    if (unityPlayer == null)
+                    {
+                        Debug.Log("CreateAndroidBinding - Getting activity and context");
+                        unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
+                        activity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
+                        context = activity.Call<AndroidJavaObject>("getApplicationContext");
+                        serviceCallbacks = new ServiceCallbacks();
+                    }
+
+                    //Create a new service binding
+                    Debug.Log("CreateAndroidBinding - Creating a new service binder");
+                    _serviceBinder = new AndroidJavaObject("com.ultraleap.tracking.service_binder.ServiceBinder", context, serviceCallbacks);
+                    bool success = _serviceBinder.Call<bool>("bind");
+                    if (success)
+                    {
+                        Debug.Log("CreateAndroidBinding - Binding of service binder complete");
+                    }
+                    return true;
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning("CreateAndroidBinding - Failed to bind service: " + e.Message);
+                _serviceBinder = null;
+            }
+            return false;
+        }
+
+        protected virtual void OnDisable()
+        {
+            if (_serviceBinder != null)
+            {
+                Debug.Log("ServiceBinder.unbind...");
+                _serviceBinder.Call("unbind");
+            }
+        }
 
 #else
         protected virtual void OnEnable()
@@ -402,9 +402,9 @@ namespace Leap.Unity
         }
 
 #endif
-#endregion
+        #endregion
 
-#region Unity Events
+        #region Unity Events
 
         protected virtual void Reset()
         {
@@ -453,13 +453,13 @@ namespace Leap.Unity
             }
 
 #if UNITY_ANDROID
-      		if (_clockRebaser != IntPtr.Zero) 
-			{
-        		eLeapRS result = LeapC.UpdateRebase(_clockRebaser, _stopwatch.ElapsedMilliseconds, LeapC.GetNow());
-        		if (result != eLeapRS.eLeapRS_Success) 
-				{ 
-					Debug.LogWarning("UpdateRebase call failed"); 
-				}
+            if (_clockRebaser != IntPtr.Zero)
+            {
+                eLeapRS result = LeapC.UpdateRebase(_clockRebaser, _stopwatch.ElapsedMilliseconds, LeapC.GetNow());
+                if (result != eLeapRS.eLeapRS_Success)
+                {
+                    Debug.LogWarning("UpdateRebase call failed");
+                }
             }
 #endif
 
@@ -543,23 +543,23 @@ namespace Leap.Unity
         protected virtual void OnApplicationFocus(bool hasFocus)
         {
 #if UNITY_ANDROID
-      		if (hasFocus) 
-			{
-        		CreateAndroidBinding();
-      		}
+            if (hasFocus)
+            {
+                CreateAndroidBinding();
+            }
 #endif
         }
 
         protected virtual void OnApplicationPause(bool isPaused)
         {
 #if UNITY_ANDROID
-      		if (_leapController != null) 
-			{
+            if (_leapController != null)
+            {
                 if (isPaused)
-				{
-        			_serviceBinder.Call("unbind");
-				}
-      		}
+                {
+                    _serviceBinder.Call("unbind");
+                }
+            }
 #endif
             if (_leapController != null)
             {
@@ -685,7 +685,7 @@ namespace Leap.Unity
                 _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP);
                 _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
             }
-      		else if (_trackingOptimization == TrackingOptimizationMode.Screentop) 
+            else if (_trackingOptimization == TrackingOptimizationMode.Screentop)
             {
                 _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_DEFAULT);
                 _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
@@ -706,11 +706,11 @@ namespace Leap.Unity
         protected void createController()
         {
 #if UNITY_ANDROID
-      var bindStatus = CreateAndroidBinding();
-      if (!bindStatus)
-        return;
+            var bindStatus = CreateAndroidBinding();
+            if (!bindStatus)
+                return;
 
-      InitClockRebaser();
+            InitClockRebaser();
 #endif
 
             if (_leapController != null)
@@ -752,7 +752,7 @@ namespace Leap.Unity
         /// Stops the connection for the existing instance of a Controller, clearing old
         /// policy flags and resetting the Controller to null.
         /// </summary>
-    	public void destroyController() 
+    	public void destroyController()
         {
             if (_leapController != null)
             {
@@ -766,13 +766,13 @@ namespace Leap.Unity
                 _leapController = null;
 
 #if UNITY_ANDROID
-        		if (_clockRebaser != IntPtr.Zero) 
-				{
-          			LeapC.DestroyClockRebaser(_clockRebaser);
-          			_stopwatch.Stop();
-      			}
+                if (_clockRebaser != IntPtr.Zero)
+                {
+                    LeapC.DestroyClockRebaser(_clockRebaser);
+                    _stopwatch.Stop();
+                }
 #endif
-			}
+            }
         }
 
         private int _framesSinceServiceConnectionChecked = 0;
@@ -784,7 +784,7 @@ namespace Leap.Unity
         /// </summary>
         protected bool checkConnectionIntegrity()
         {
-      		if (_leapController != null && _leapController.IsServiceConnected) 
+            if (_leapController != null && _leapController.IsServiceConnected)
             {
                 _framesSinceServiceConnectionChecked = 0;
                 _numberOfReconnectionAttempts = 0;
@@ -817,7 +817,7 @@ namespace Leap.Unity
             initializeFlags();
 
 #if UNITY_ANDROID
-      		InitClockRebaser();
+            InitClockRebaser();
 #endif
 
             if (_leapController != null)
@@ -832,20 +832,20 @@ namespace Leap.Unity
         }
 
 #if UNITY_ANDROID
-    	private void InitClockRebaser() 
-		{
-      		_stopwatch.Start();
-      		eLeapRS result = LeapC.CreateClockRebaser(out _clockRebaser);
-      
-      		if (result != eLeapRS.eLeapRS_Success) 
-			{ 
-				Debug.LogError("Failed to create clock rebaser"); 
-			}
-			
-      		if (_clockRebaser == IntPtr.Zero) 
-			{ 
-				Debug.LogError("Clock rebaser is null"); 
-			}
+        private void InitClockRebaser()
+        {
+            _stopwatch.Start();
+            eLeapRS result = LeapC.CreateClockRebaser(out _clockRebaser);
+
+            if (result != eLeapRS.eLeapRS_Success)
+            {
+                Debug.LogError("Failed to create clock rebaser");
+            }
+
+            if (_clockRebaser == IntPtr.Zero)
+            {
+                Debug.LogError("Clock rebaser is null");
+            }
         }
 #endif
 
