@@ -27,145 +27,23 @@ namespace Leap.Unity
     public static class XRSupportUtil
     {
 
-        // There is no support planned for Unity's XR plugin system on XR2 devices using the Unity SnapDragon XR SDK
-        // The XR2 implementation therefore calls into the SVR plugin directly
-
-#if UNITY_ANDROID // In future we should target XR2 devices only with this. However, at the moment Android support is limited to XR2 devices only
-
-        public static bool IsXREnabled()
-        {
-            if (SvrManager.Instance != null)
-            {
-                return SvrManager.Instance.status.running && SvrManager.Instance.status.pose == 3;
-            }
-
-            return false;
-        }
-
-        public static bool IsXRDevicePresent()
-        {
-            if (SvrManager.Instance != null)
-            {
-                return SvrManager.Instance.status.running;
-            }
-
-            return false;
-        }
-
-        public static bool IsUserPresent(bool defaultPresence = true)
-        {
-            return true; // TODO user presence can be queried with recent versions of the SVR SDK (>= v4.0.4) - a proximity detector is fitted to some devices.
-        }
-
-        public static Vector3 GetXRNodeCenterEyeLocalPosition()
-        {
-            if (XRSupportUtil.IsXREnabled())
-            {
-                return SvrManager.Instance.head.transform.localPosition;
-            }
-            else
-            {
-                Debug.LogWarning("Cannot read XRNodeCenterEyeLocalPosition as XR is not enabled");
-                return Vector3.zero;
-            }
-        }
-
-        public static Quaternion GetXRNodeCenterEyeLocalRotation()
-        {
-            if (XRSupportUtil.IsXREnabled())
-            {
-                return SvrManager.Instance.head.transform.localRotation;
-            }
-            else
-            {
-                Debug.LogWarning("Cannot read XRNodeCenterEyeLocalRotation as XR is not enabled");
-                return Quaternion.identity;
-            }
-        }
-
-        public static Vector3 GetXRNodeHeadLocalPosition()
-        {
-            if (XRSupportUtil.IsXREnabled())
-            {
-                return SvrManager.Instance.head.localPosition;
-            }
-            else
-            {
-                Debug.LogWarning("Cannot read XRNodeHeadLocalPosition as XR is not enabled");
-                return Vector3.zero;
-            }
-        }
-
-        public static Quaternion GetXRNodeHeadLocalRotation()
-        {
-            if (XRSupportUtil.IsXREnabled())
-            {
-                return SvrManager.Instance.head.transform.localRotation;
-            }
-            else
-            {
-                Debug.LogWarning("Cannot read XRNodeHeadLocalRotation as XR is not enabled");
-                return Quaternion.identity;
-            }
-        }
-
-        public static Vector3 GetXRNodeLocalPosition(int node)
-        {
-            Debug.LogWarning("Not implemented yet");
-            return Vector3.zero;
-        }
-
-        public static Quaternion GetXRNodeLocalRotation(int node)
-        {
-            Debug.LogWarning("Not implemented yet");
-            return Quaternion.identity;
-        }
-
-        public static void Recenter()
-        {
-            if (SvrInput.Instance != null)
-            {
-                SvrInput.Instance.HandleRecenter();
-            }
-        }
-
-        public static float GetGPUTime()
-        {
-            Debug.LogWarning("Not implemented for android");
-            return 0;
-        }
-
-        public static string GetLoadedDeviceName()
-        {
-            return "XR2_Device";
-        }
-
-        public static bool IsRoomScale()
-        {
-            return true;
-        }
-
-        public static bool IsLargePlayspace()
-        {
-            // The current SVR support for reading the playspace dimensions is crude. Likely to be improved on by 3rd parties
-            // By default, we should consider the current playspace as 'large'
-            return true;
-        }
-
-        // The following methods / fields are part of the XRSupportUtil 'interface' but are not currently used. They have not been implemented for the XR2/Android
-        // public static float GetGPUTime() 
-        // {
-        // }
-
-#else
-
 #if UNITY_2019_2_OR_NEWER
         private static System.Collections.Generic.List<XRNodeState> nodeStates =
           new System.Collections.Generic.List<XRNodeState>();
 #endif
+#if UNITY_2020_1_OR_NEWER
+        static List<Vector3> _boundaryPoints = new List<Vector3>();
+#endif
 
         public static bool IsXREnabled()
         {
+#if UNITY_ANDROID
+            if (SvrManager.Instance != null)
+            {
+                return SvrManager.Instance.status.running && SvrManager.Instance.status.pose == 3;
+            }
+#endif
+
 #if UNITY_2017_2_OR_NEWER
             return XRSettings.enabled;
 #else
@@ -175,6 +53,13 @@ namespace Leap.Unity
 
         public static bool IsXRDevicePresent()
         {
+#if UNITY_ANDROID
+            if (SvrManager.Instance != null)
+            {
+                return SvrManager.Instance.status.running;
+            }
+#endif
+
 #if UNITY_2020_1_OR_NEWER
             return XRSettings.isDeviceActive;
 #elif UNITY_2017_2_OR_NEWER
@@ -187,6 +72,13 @@ namespace Leap.Unity
         static bool outputPresenceWarning = false;
         public static bool IsUserPresent(bool defaultPresence = true)
         {
+#if UNITY_ANDROID
+            if (SvrManager.Instance != null)
+            {
+                return true; // TODO user presence can be queried with recent versions of the SVR SDK (>= v4.0.4) - a proximity detector is fitted to some devices.
+            }
+#endif
+
 #if UNITY_2019_3_OR_NEWER
 
             var devices = new List<InputDevice>();
@@ -228,13 +120,28 @@ namespace Leap.Unity
 
         public static Vector3 GetXRNodeCenterEyeLocalPosition()
         {
+#if UNITY_ANDROID
+            if (SvrManager.Instance != null)
+            {
+                if (XRSupportUtil.IsXREnabled())
+                {
+                    return SvrManager.Instance.head.transform.localPosition;
+                }
+                else
+                {
+                    Debug.LogWarning("Cannot read XRNodeCenterEyeLocalPosition as XR is not enabled");
+                    return Vector3.zero;
+                }
+            }
+#endif
+
 #if UNITY_2019_2_OR_NEWER
             InputTracking.GetNodeStates(nodeStates);
             Vector3 position;
             foreach (XRNodeState state in nodeStates)
             {
                 if (state.nodeType == XRNode.CenterEye &&
-                   state.TryGetPosition(out position))
+                    state.TryGetPosition(out position))
                 {
                     return position;
                 }
@@ -251,6 +158,21 @@ namespace Leap.Unity
 
         public static Quaternion GetXRNodeCenterEyeLocalRotation()
         {
+#if UNITY_ANDROID
+            if (SvrManager.Instance != null)
+            {
+                if (XRSupportUtil.IsXREnabled())
+                {
+                    return SvrManager.Instance.head.transform.localRotation;
+                }
+                else
+                {
+                    Debug.LogWarning("Cannot read XRNodeCenterEyeLocalRotation as XR is not enabled");
+                    return Quaternion.identity;
+                }
+            }
+#endif
+
 #if UNITY_2019_2_OR_NEWER
             InputTracking.GetNodeStates(nodeStates);
             Quaternion rotation;
@@ -273,6 +195,21 @@ namespace Leap.Unity
 
         public static Vector3 GetXRNodeHeadLocalPosition()
         {
+#if UNITY_ANDROID
+            if (SvrManager.Instance != null)
+            {
+                if (XRSupportUtil.IsXREnabled())
+                {
+                    return SvrManager.Instance.head.localPosition;
+                }
+                else
+                {
+                    Debug.LogWarning("Cannot read XRNodeHeadLocalPosition as XR is not enabled");
+                    return Vector3.zero;
+                }
+            }
+#endif
+
 #if UNITY_2019_2_OR_NEWER
             InputTracking.GetNodeStates(nodeStates);
             Vector3 position;
@@ -295,6 +232,21 @@ namespace Leap.Unity
 
         public static Quaternion GetXRNodeHeadLocalRotation()
         {
+#if UNITY_ANDROID
+            if (SvrManager.Instance != null)
+            {
+                if (XRSupportUtil.IsXREnabled())
+                {
+                    return SvrManager.Instance.head.transform.localRotation;
+                }
+                else
+                {
+                    Debug.LogWarning("Cannot read XRNodeHeadLocalRotation as XR is not enabled");
+                    return Quaternion.identity;
+                }
+            }
+#endif
+
 #if UNITY_2019_2_OR_NEWER
             InputTracking.GetNodeStates(nodeStates);
             Quaternion rotation;
@@ -317,6 +269,14 @@ namespace Leap.Unity
 
         public static Vector3 GetXRNodeLocalPosition(int node)
         {
+#if UNITY_ANDROID
+            if (SvrManager.Instance != null)
+            {
+                Debug.LogWarning("Not implemented yet");
+                return Vector3.zero;
+            }
+#endif
+
 #if UNITY_2019_2_OR_NEWER
             InputTracking.GetNodeStates(nodeStates);
             Vector3 position;
@@ -339,6 +299,14 @@ namespace Leap.Unity
 
         public static Quaternion GetXRNodeLocalRotation(int node)
         {
+#if UNITY_ANDROID
+            if (SvrManager.Instance != null)
+            {
+                Debug.LogWarning("Not implemented yet");
+                return Quaternion.identity;
+            }
+#endif
+
 #if UNITY_2019_2_OR_NEWER
             InputTracking.GetNodeStates(nodeStates);
             Quaternion rotation;
@@ -361,6 +329,14 @@ namespace Leap.Unity
 
         public static void Recenter()
         {
+#if UNITY_ANDROID
+            if (SvrInput.Instance != null)
+            {
+                SvrInput.Instance.HandleRecenter();
+                return;
+            }
+#endif
+
 #if UNITY_2019_3_OR_NEWER
             var devices = new List<InputDevice>();
             InputDevices.GetDevicesWithCharacteristics(InputDeviceCharacteristics.HeadMounted, devices);
@@ -372,7 +348,7 @@ namespace Leap.Unity
             if (hmdDevice.subsystem != null)
             {
 #endif
-                hmdDevice.subsystem.TryRecenter();
+            hmdDevice.subsystem.TryRecenter();
 #if !UNITY_2020_1_OR_NEWER
             }
             else
@@ -387,8 +363,38 @@ namespace Leap.Unity
 #endif
         }
 
+        public static float GetGPUTime()
+        {
+#if UNITY_ANDROID
+            if (SvrManager.Instance != null)
+            {
+                Debug.LogWarning("Not implemented for android");
+                return 0;
+            }
+#endif
+
+            float gpuTime = 0f;
+#if UNITY_5_6_OR_NEWER
+#if UNITY_2017_2_OR_NEWER
+            UnityEngine.XR.XRStats.TryGetGPUTimeLastFrame(out gpuTime);
+#else
+      		UnityEngine.VR.VRStats.TryGetGPUTimeLastFrame(out gpuTime);
+#endif
+#else
+            gpuTime = UnityEngine.VR.VRStats.gpuTimeLastFrame;
+#endif
+            return gpuTime;
+        }
+
         public static string GetLoadedDeviceName()
         {
+#if UNITY_ANDROID
+            if (SvrManager.Instance != null)
+            {
+                return "XR2_Device";
+            }
+#endif
+
 #if UNITY_2017_2_OR_NEWER
             return XRSettings.loadedDeviceName;
 #else
@@ -399,6 +405,13 @@ namespace Leap.Unity
         /// <summary> Returns whether there's a floor available. </summary>
         public static bool IsRoomScale()
         {
+#if UNITY_ANDROID
+            if (SvrManager.Instance != null)
+            {
+                return true;
+            }
+#endif
+
 #if UNITY_2019_3_OR_NEWER
             var devices = new List<InputDevice>();
             InputDevices.GetDevicesWithCharacteristics(InputDeviceCharacteristics.HeadMounted, devices);
@@ -414,7 +427,7 @@ namespace Leap.Unity
             if (hmdDevice.subsystem != null)
             {
 #endif
-                return hmdDevice.subsystem.GetTrackingOriginMode().HasFlag(TrackingOriginModeFlags.Floor);
+            return hmdDevice.subsystem.GetTrackingOriginMode().HasFlag(TrackingOriginModeFlags.Floor);
 #if !UNITY_2020_1_OR_NEWER
             }
             else
@@ -431,12 +444,18 @@ namespace Leap.Unity
 #endif
         }
 
-#if UNITY_2020_1_OR_NEWER
-        static List<Vector3> _boundaryPoints = new List<Vector3>();
-#endif
         /// <summary> Returns whether the playspace is larger than 1m on its shortest side. </summary>
         public static bool IsLargePlayspace()
         {
+#if UNITY_ANDROID
+            if (SvrManager.Instance != null)
+            {
+                // The current SVR support for reading the playspace dimensions is crude. Likely to be improved on by 3rd parties
+                // By default, we should consider the current playspace as 'large'
+                return true;
+            }
+#endif
+
 #if UNITY_2020_1_OR_NEWER // Oculus reports a floor centered space now...
             var devices = new List<InputDevice>();
             InputDevices.GetDevicesWithCharacteristics(InputDeviceCharacteristics.HeadMounted, devices);
@@ -459,22 +478,5 @@ namespace Leap.Unity
             return IsRoomScale();
 #endif
         }
-
-        public static float GetGPUTime()
-        {
-            float gpuTime = 0f;
-#if UNITY_5_6_OR_NEWER
-#if UNITY_2017_2_OR_NEWER
-            UnityEngine.XR.XRStats.TryGetGPUTimeLastFrame(out gpuTime);
-#else
-      		UnityEngine.VR.VRStats.TryGetGPUTimeLastFrame(out gpuTime);
-#endif
-#else
-            gpuTime = UnityEngine.VR.VRStats.gpuTimeLastFrame;
-#endif
-            return gpuTime;
-        }
-
-#endif
     }
 }
