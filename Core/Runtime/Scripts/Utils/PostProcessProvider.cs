@@ -151,18 +151,18 @@ namespace Leap.Unity
             }
 
             _cachedFixedFrame.CopyFrom(inputFrame);
-            
-			if (!passthroughOnly) 
-			{ 
-				ProcessFrame(ref _cachedFixedFrame); 
-			}
-			
+
+            if (!passthroughOnly)
+            {
+                ProcessFrame(ref _cachedFixedFrame);
+            }
+
             if (passthroughOnly || !implementerHandlesDispatch)
-			{
-				if(_cachedFixedFrame != null)
-				{
-        			DispatchFixedFrameEvent(_cachedFixedFrame);
-				}
+            {
+                if (_cachedFixedFrame != null)
+                {
+                    DispatchFixedFrameEvent(_cachedFixedFrame);
+                }
             }
         }
 

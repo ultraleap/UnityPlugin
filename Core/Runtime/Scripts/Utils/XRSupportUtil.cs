@@ -15,6 +15,8 @@ using UnityEngine.XR;
 using UnityEngine.VR;
 #endif
 
+
+
 namespace Leap.Unity
 {
 
@@ -174,7 +176,7 @@ namespace Leap.Unity
         public static bool IsXRDevicePresent()
         {
 #if UNITY_2020_1_OR_NEWER
-      		return XRSettings.isDeviceActive;
+            return XRSettings.isDeviceActive;
 #elif UNITY_2017_2_OR_NEWER
             return XRDevice.isPresent;
 #else
@@ -187,22 +189,22 @@ namespace Leap.Unity
         {
 #if UNITY_2019_3_OR_NEWER
 
-	        var devices = new List<InputDevice>();
-	        InputDevices.GetDevicesWithCharacteristics(InputDeviceCharacteristics.HeadMounted, devices);
-	        if (devices.Count == 0 && !outputPresenceWarning) 
-			{
-		          Debug.LogWarning("No head-mounted devices found. Possibly no HMD is available to the XR system.");
-		          outputPresenceWarning = true;
-	        }
-	        if (devices.Count != 0) 
-			{
-		          var device = devices[0];
-		          if (device.TryGetFeatureValue(CommonUsages.userPresence, out var userPresent)) 
-				  {
-		            	return userPresent;
-		          }
-	        }
-		
+            var devices = new List<InputDevice>();
+            InputDevices.GetDevicesWithCharacteristics(InputDeviceCharacteristics.HeadMounted, devices);
+            if (devices.Count == 0 && !outputPresenceWarning)
+            {
+                Debug.LogWarning("No head-mounted devices found. Possibly no HMD is available to the XR system.");
+                outputPresenceWarning = true;
+            }
+            if (devices.Count != 0)
+            {
+                var device = devices[0];
+                if (device.TryGetFeatureValue(CommonUsages.userPresence, out var userPresent))
+                {
+                    return userPresent;
+                }
+            }
+
 #elif UNITY_2017_2_OR_NEWER
             var userPresence = XRDevice.userPresence;
             if (userPresence == UserPresenceState.Present)
@@ -233,15 +235,15 @@ namespace Leap.Unity
             {
                 if (state.nodeType == XRNode.CenterEye &&
                    state.TryGetPosition(out position))
-                { 
-					return position; 
-				}
+                {
+                    return position;
+                }
             }
-			
+
             return Vector3.zero;
-			
+
 #elif UNITY_2017_2_OR_NEWER
-      		return InputTracking.GetLocalPosition(XRNode.CenterEye);
+            return InputTracking.GetLocalPosition(XRNode.CenterEye);
 #else
             return InputTracking.GetLocalPosition(VRNode.CenterEye);
 #endif
@@ -256,11 +258,11 @@ namespace Leap.Unity
             {
                 if (state.nodeType == XRNode.CenterEye &&
                     state.TryGetRotation(out rotation))
-                { 
-					return rotation; 
-				}
+                {
+                    return rotation;
+                }
             }
-			
+
             return Quaternion.identity;
 #elif UNITY_2017_2_OR_NEWER
       		return InputTracking.GetLocalRotation(XRNode.CenterEye);
@@ -278,11 +280,11 @@ namespace Leap.Unity
             {
                 if (state.nodeType == XRNode.Head &&
                    state.TryGetPosition(out position))
-                { 
-					return position; 
-				}
+                {
+                    return position;
+                }
             }
-			
+
             return Vector3.zero;
 #elif UNITY_2017_2_OR_NEWER
       		return InputTracking.GetLocalPosition(XRNode.Head);
@@ -300,11 +302,11 @@ namespace Leap.Unity
             {
                 if (state.nodeType == XRNode.Head &&
                     state.TryGetRotation(out rotation))
-                { 
-					return rotation; 
-				}
+                {
+                    return rotation;
+                }
             }
-			
+
             return Quaternion.identity;
 #elif UNITY_2017_2_OR_NEWER
       		return InputTracking.GetLocalRotation(XRNode.Head);
@@ -322,11 +324,11 @@ namespace Leap.Unity
             {
                 if (state.nodeType == (XRNode)node &&
                    state.TryGetPosition(out position))
-                { 
-					return position; 
-				}
+                {
+                    return position;
+                }
             }
-			
+
             return Vector3.zero;
 #elif UNITY_2017_2_OR_NEWER
       		return InputTracking.GetLocalPosition((XRNode)node);
@@ -344,12 +346,12 @@ namespace Leap.Unity
             {
                 if (state.nodeType == (XRNode)node &&
                     state.TryGetRotation(out rotation))
-                { 
-					return rotation; 
-				}
+                {
+                    return rotation;
+                }
             }
             return Quaternion.identity;
-			
+
 #elif UNITY_2017_2_OR_NEWER
       		return InputTracking.GetLocalRotation((XRNode)node);
 #else
@@ -360,25 +362,25 @@ namespace Leap.Unity
         public static void Recenter()
         {
 #if UNITY_2019_3_OR_NEWER
-	        var devices = new List<InputDevice>();
-	        InputDevices.GetDevicesWithCharacteristics(InputDeviceCharacteristics.HeadMounted, devices);
-	        if (devices.Count == 0) 
-				return;
-			
-	        var hmdDevice = devices[0];
+            var devices = new List<InputDevice>();
+            InputDevices.GetDevicesWithCharacteristics(InputDeviceCharacteristics.HeadMounted, devices);
+            if (devices.Count == 0)
+                return;
+
+            var hmdDevice = devices[0];
 #if !UNITY_2020_1_OR_NEWER
-	        if(hmdDevice.subsystem != null) 
-			{
+            if (hmdDevice.subsystem != null)
+            {
 #endif
-				hmdDevice.subsystem.TryRecenter();
+                hmdDevice.subsystem.TryRecenter();
 #if !UNITY_2020_1_OR_NEWER
-	        }
-			else
-			{
+            }
+            else
+            {
 #pragma warning disable 0618
-				InputTracking.Recenter();
+                InputTracking.Recenter();
 #pragma warning restore 0618
-        	}
+            }
 #endif
 #else
             InputTracking.Recenter();
@@ -398,29 +400,29 @@ namespace Leap.Unity
         public static bool IsRoomScale()
         {
 #if UNITY_2019_3_OR_NEWER
-	        var devices = new List<InputDevice>();
-	        InputDevices.GetDevicesWithCharacteristics(InputDeviceCharacteristics.HeadMounted, devices);
-	        
-			if (devices.Count == 0) 
-			{
-				return false;
-			}
-				
-	        var hmdDevice = devices[0];
+            var devices = new List<InputDevice>();
+            InputDevices.GetDevicesWithCharacteristics(InputDeviceCharacteristics.HeadMounted, devices);
+
+            if (devices.Count == 0)
+            {
+                return false;
+            }
+
+            var hmdDevice = devices[0];
 #if !UNITY_2020_1_OR_NEWER
-        	
-			if (hmdDevice.subsystem != null) 
-			{
+
+            if (hmdDevice.subsystem != null)
+            {
 #endif
-          		return hmdDevice.subsystem.GetTrackingOriginMode().HasFlag(TrackingOriginModeFlags.Floor);
+                return hmdDevice.subsystem.GetTrackingOriginMode().HasFlag(TrackingOriginModeFlags.Floor);
 #if !UNITY_2020_1_OR_NEWER
-        	}
-			else
-			{
+            }
+            else
+            {
 #pragma warning disable 0618
-          		return XRDevice.GetTrackingSpaceType() == TrackingSpaceType.RoomScale;
+                return XRDevice.GetTrackingSpaceType() == TrackingSpaceType.RoomScale;
 #pragma warning restore 0618
-			}
+            }
 #endif
 #elif UNITY_2017_2_OR_NEWER
             return XRDevice.GetTrackingSpaceType() == TrackingSpaceType.RoomScale;
@@ -430,29 +432,29 @@ namespace Leap.Unity
         }
 
 #if UNITY_2020_1_OR_NEWER
-    	static List<Vector3> _boundaryPoints = new List<Vector3>();
+        static List<Vector3> _boundaryPoints = new List<Vector3>();
 #endif
         /// <summary> Returns whether the playspace is larger than 1m on its shortest side. </summary>
         public static bool IsLargePlayspace()
         {
 #if UNITY_2020_1_OR_NEWER // Oculus reports a floor centered space now...
-	        var devices = new List<InputDevice>();
-	        InputDevices.GetDevicesWithCharacteristics(InputDeviceCharacteristics.HeadMounted, devices);
-	        
-			if (devices.Count == 0) 
-			{
-				return false;
-			}
-			
-	        var hmdDevice = devices[0];
-	        hmdDevice.subsystem.TryGetBoundaryPoints(_boundaryPoints);
-	        Bounds playspaceSize = new Bounds();
-	        foreach (Vector3 boundaryPoint in _boundaryPoints) 
-			{ 
-				playspaceSize.Encapsulate(boundaryPoint); 
-			}
-			
-	        return playspaceSize.size.magnitude > 1f; // Playspace is greater than 1m on its shortest axis
+            var devices = new List<InputDevice>();
+            InputDevices.GetDevicesWithCharacteristics(InputDeviceCharacteristics.HeadMounted, devices);
+
+            if (devices.Count == 0)
+            {
+                return false;
+            }
+
+            var hmdDevice = devices[0];
+            hmdDevice.subsystem.TryGetBoundaryPoints(_boundaryPoints);
+            Bounds playspaceSize = new Bounds();
+            foreach (Vector3 boundaryPoint in _boundaryPoints)
+            {
+                playspaceSize.Encapsulate(boundaryPoint);
+            }
+
+            return playspaceSize.size.magnitude > 1f; // Playspace is greater than 1m on its shortest axis
 #else
             return IsRoomScale();
 #endif
