@@ -158,7 +158,7 @@ namespace Leap.Unity
                + "Use 'Images' for scenarios that overlay Leap device images on tracked "
                + "hand data.")]
         [SerializeField]
-        public TemporalWarpingMode _temporalWarpingMode = TemporalWarpingMode.Auto;
+        private TemporalWarpingMode _temporalWarpingMode = TemporalWarpingMode.Auto;
 
         /// <summary>
         /// The time in milliseconds between the current frame's headset position and the
