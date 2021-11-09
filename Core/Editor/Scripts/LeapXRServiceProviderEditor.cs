@@ -15,15 +15,9 @@ namespace Leap.Unity
     [CustomEditor(typeof(LeapXRServiceProvider))]
     public class LeapXRServiceProviderEditor : LeapServiceProviderEditor
     {
-
         SerializedProperty _mainCamera;
 
-        public enum XRTestHandPose
-        {
-            HeadMountedA,
-            HeadMountedB,
-        }
-        public XRTestHandPose TestHandPose;
+        string[] testHandPoses = new string[] { "HeadMountedA", "HeadMountedB" };
 
         protected override void OnEnable()
         {
@@ -73,17 +67,8 @@ namespace Leap.Unity
 
         private void DrawCustomEnum(SerializedProperty property)
         {
-            TestHandPose = (XRTestHandPose)EditorGUILayout.EnumPopup("Edit Time Pose", TestHandPose);
-
-            switch (TestHandPose)
-            {
-                case XRTestHandPose.HeadMountedA:
-                    property.enumValueIndex = (int)TestHandFactory.TestHandPose.HeadMountedA;
-                    break;
-                case XRTestHandPose.HeadMountedB:
-                    property.enumValueIndex = (int)TestHandFactory.TestHandPose.HeadMountedB;
-                    break;
-            }
+            property.enumValueIndex = EditorGUILayout.Popup("Edit Time Pose", property.enumValueIndex, testHandPoses);
+            serializedObject.ApplyModifiedProperties();
         }
 
 
@@ -111,6 +96,12 @@ namespace Leap.Unity
         {
             if (_mainCamera.objectReferenceValue == null)
             {
+                if (GUILayout.Button("Set Camera.Main"))
+                {
+                    _mainCamera.objectReferenceValue = MainCameraProvider.Instance.mainCamera;
+                    serializedObject.ApplyModifiedProperties();
+                }
+
                 EditorGUILayout.PropertyField(_mainCamera);
                 serializedObject.ApplyModifiedProperties();
                 return;
@@ -123,7 +114,10 @@ namespace Leap.Unity
         {
             LeapXRServiceProvider xrProvider = target as LeapXRServiceProvider;
 
-            if (xrProvider.mainCamera == null) { return; }
+            if (xrProvider.mainCamera == null) 
+            { 
+                return;
+            }
 
             controllerOffset = new Vector3(0f,
                                 xrProvider.deviceOffsetYAxis,

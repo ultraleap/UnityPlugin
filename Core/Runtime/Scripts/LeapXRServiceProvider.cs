@@ -236,6 +236,12 @@ namespace Leap.Unity
             base.Reset();
             editTimePose = TestHandFactory.TestHandPose.HeadMountedB;
 
+            _interactionVolumeVisualization = InteractionVolumeVisualization.Automatic;
+            _mainCamera = MainCameraProvider.Instance.mainCamera;
+            if (_mainCamera != null)
+            {
+                Debug.Log("Camera.Main automatically assigned");
+            }
         }
 
 
