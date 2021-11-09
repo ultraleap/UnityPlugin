@@ -27,6 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - LeapEyeDislocator
   - EnableDepthBuffer
 - Reworked how adding hands to a scene works - hands can be added easily. Any type derived from `HandModelBase` can be added directly into the scene and linked with a `LeapProvider` to begin tracking immediately.
+- Frame.Get to Frame.GetHandWithChirality.
 
 ### Removed
 - `HandModelManager` MonoBehaviour
