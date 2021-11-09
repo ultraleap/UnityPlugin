@@ -32,8 +32,8 @@ namespace Leap.Unity
 
         void Update()
         {
-            Hand left = HandUtils.Get(provider.CurrentFrame, Chirality.Left);
-            Hand right = HandUtils.Get(provider.CurrentFrame, Chirality.Right);
+            Hand left = HandUtils.GetHandWithChirality(provider.CurrentFrame, Chirality.Left);
+            Hand right = HandUtils.GetHandWithChirality(provider.CurrentFrame, Chirality.Right);
             bool leftPinching = left != null && left.PinchDistance < pinchThreshold;
             bool rightPinching = right != null && right.PinchDistance < pinchThreshold;
 
