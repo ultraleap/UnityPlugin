@@ -15,13 +15,20 @@ namespace Leap.Unity
     [CustomEditor(typeof(LeapXRServiceProvider))]
     public class LeapXRServiceProviderEditor : LeapServiceProviderEditor
     {
-        SerializedProperty _camera;
 
-        string [] testHandPoses = new string []{ "HeadMountedA", "HeadMountedB" };
+        SerializedProperty _mainCamera;
+
+        public enum XRTestHandPose
+        {
+            HeadMountedA,
+            HeadMountedB,
+        }
+        public XRTestHandPose TestHandPose;
 
         protected override void OnEnable()
         {
-            _camera = serializedObject.FindProperty("_camera");
+
+            _mainCamera = serializedObject.FindProperty("_mainCamera");
 
             base.OnEnable();
             isVRProvider = true;
@@ -64,15 +71,21 @@ namespace Leap.Unity
             addPropertyToFoldout("_updateHandInPrecull", "Advanced Options");
         }
 
-        /// <summary>
-        /// Create a limited drop down for edit time poses
-        /// </summary>
-        /// <param name="property"></param>
         private void DrawCustomEnum(SerializedProperty property)
         {
-            property.enumValueIndex = EditorGUILayout.Popup("Edit Time Pose", property.enumValueIndex, testHandPoses);
-            serializedObject.ApplyModifiedProperties();
+            TestHandPose = (XRTestHandPose)EditorGUILayout.EnumPopup("Edit Time Pose", TestHandPose);
+
+            switch (TestHandPose)
+            {
+                case XRTestHandPose.HeadMountedA:
+                    property.enumValueIndex = (int)TestHandFactory.TestHandPose.HeadMountedA;
+                    break;
+                case XRTestHandPose.HeadMountedB:
+                    property.enumValueIndex = (int)TestHandFactory.TestHandPose.HeadMountedB;
+                    break;
+            }
         }
+
 
         private void decorateAllowManualTimeAlignment(SerializedProperty property)
         {
@@ -96,15 +109,9 @@ namespace Leap.Unity
 
         public override void OnInspectorGUI()
         {
-            if (_camera.objectReferenceValue == null)
+            if (_mainCamera.objectReferenceValue == null)
             {
-                if (GUILayout.Button("Set Camera.Main"))
-                {
-                    _camera.objectReferenceValue = Camera.main;
-                    serializedObject.ApplyModifiedProperties();
-                }
-
-                EditorGUILayout.PropertyField(_camera);
+                EditorGUILayout.PropertyField(_mainCamera);
                 serializedObject.ApplyModifiedProperties();
                 return;
             }
@@ -116,13 +123,13 @@ namespace Leap.Unity
         {
             LeapXRServiceProvider xrProvider = target as LeapXRServiceProvider;
 
-            if (xrProvider.Camera == null) { return; }
+            if (xrProvider.mainCamera == null) { return; }
 
             controllerOffset = new Vector3(0f,
                                 xrProvider.deviceOffsetYAxis,
                                 xrProvider.deviceOffsetZAxis);
 
-            deviceRotation = xrProvider.Camera.transform.InverseTransformRotation(xrProvider.Camera.transform.TransformRotation(Quaternion.Euler(xrProvider.deviceTiltXAxis, 0f, 0f))) * Quaternion.Euler(90f, 0f, 0f);
+            deviceRotation = xrProvider.mainCamera.transform.InverseTransformRotation(xrProvider.mainCamera.transform.TransformRotation(Quaternion.Euler(xrProvider.deviceTiltXAxis, 0f, 0f))) * Quaternion.Euler(90f, 0f, 0f);
 
 
             base.OnSceneGUI();

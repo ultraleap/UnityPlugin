@@ -6,10 +6,12 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace UHI.Tracking.InteractionEngine.Examples
+namespace Leap.Unity.Examples
 {
 
     [AddComponentMenu("")]
@@ -27,14 +29,12 @@ namespace UHI.Tracking.InteractionEngine.Examples
 
         void Start()
         {
-            if (toFaceCamera != null)
-                initialize();
+            if (toFaceCamera != null) initialize();
         }
 
         private void initialize()
         {
-            if (cameraToFace == null)
-            { cameraToFace = Camera.main; }
+            if (cameraToFace == null) { cameraToFace = MainCameraProvider.Instance.mainCamera; }
             // Set "_isFacingCamera" to be whatever the current state ISN'T, so that we are
             // guaranteed to fire a UnityEvent on the first initialized Update().
             _isFacingCamera = !GetIsFacingCamera(toFaceCamera, cameraToFace);
@@ -47,8 +47,7 @@ namespace UHI.Tracking.InteractionEngine.Examples
             {
                 initialize();
             }
-            if (!_initialized)
-                return;
+            if (!_initialized) return;
 
             if (GetIsFacingCamera(toFaceCamera, cameraToFace, _isFacingCamera ? 0.77F : 0.82F) != _isFacingCamera)
             {

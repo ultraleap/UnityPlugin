@@ -6,6 +6,7 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
+using System;
 using Leap.Unity.Attributes;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -14,6 +15,7 @@ namespace Leap.Unity
 {
 
     [ExecuteInEditMode]
+    [Obsolete("Recommended to use Unity CameraOffset which is part of xr.legacyinputhelpers instead. See https://docs.unity3d.com/Manual/configuring-project-for-xr.html")]
     public class XRHeightOffset : MonoBehaviour
     {
 

@@ -75,7 +75,7 @@ namespace Leap.Unity
             {
                 if (_backingLeapTex == null)
                 {
-                    _backingLeapTex = EditorResources.Load<Texture2D>(leapLogoResourceName);
+                    _backingLeapTex = Resources.Load<Texture2D>(leapLogoResourceName);
                 }
                 return _backingLeapTex;
             }
