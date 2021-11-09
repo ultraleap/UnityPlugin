@@ -21,8 +21,14 @@ namespace Leap.Unity
 
         protected override void OnEnable()
         {
-
             _mainCamera = serializedObject.FindProperty("_mainCamera");
+
+            if (_mainCamera.objectReferenceValue == null)
+            {
+                _mainCamera.objectReferenceValue = MainCameraProvider.Instance.mainCamera;
+                serializedObject.ApplyModifiedProperties();
+                Debug.Log("Camera.Main automatically assigned");
+            }
 
             base.OnEnable();
             isVRProvider = true;
@@ -90,24 +96,6 @@ namespace Leap.Unity
                                       + "manual time alignment should not be enabled under most "
                                       + "circumstances.", MessageType.Warning);
             }
-        }
-
-        public override void OnInspectorGUI()
-        {
-            if (_mainCamera.objectReferenceValue == null)
-            {
-                if (GUILayout.Button("Set Camera.Main"))
-                {
-                    _mainCamera.objectReferenceValue = MainCameraProvider.Instance.mainCamera;
-                    serializedObject.ApplyModifiedProperties();
-                }
-
-                EditorGUILayout.PropertyField(_mainCamera);
-                serializedObject.ApplyModifiedProperties();
-                return;
-            }
-
-            base.OnInspectorGUI();
         }
 
         public override void OnSceneGUI()
