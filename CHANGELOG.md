@@ -14,7 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `Service Provider` (XR, Desktop and Screentop) prefabs
 - `Image Retriever` prefab
 - `HandModels` prefab
-- Experimental support for XR2 based headsets
+- Experimental support for Qualcomm Snapdragon XR2 based headsets
 
 ### Changed
 - Reorganized the repository layout to adhere to [UPM Package Structure](https://docs.unity3d.com/Manual/cus-layout.html)
