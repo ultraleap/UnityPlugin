@@ -563,10 +563,10 @@ namespace Leap.Unity
         [System.Obsolete("Method is obsolete, use GetHandWithChirality instead", true)]
         public static Hand Get(this Frame frame, Chirality whichHand)
         {
-            return GetHandWithChirality(frame, whichHand);
+            return GetHand(frame, whichHand);
         }
 
-        public static Hand GetHandWithChirality(this Frame frame, Chirality whichHand)
+        public static Hand GetHand(this Frame frame, Chirality whichHand)
         {
             if (frame.Hands == null) { return null; }
             return frame.Hands.Query().FirstOrDefault(
@@ -589,7 +589,7 @@ namespace Leap.Unity
                 frame = provider.CurrentFrame;
             }
 
-            return frame.GetHandWithChirality(whichHand);
+            return frame.GetHand(whichHand);
         }
 
         #endregion

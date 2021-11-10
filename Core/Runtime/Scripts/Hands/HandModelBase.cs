@@ -132,13 +132,13 @@ namespace Leap.Unity
                 return;
             }
 
-            var hand = frame.GetHandWithChirality(Handedness);
+            var hand = frame.GetHand(Handedness);
             UpdateBase(hand);
         }
 
         void FixedUpdateFrame(Frame frame)
         {
-            var hand = frame.GetHandWithChirality(Handedness);
+            var hand = frame.GetHand(Handedness);
             UpdateBase(hand);
         }
 
@@ -194,7 +194,7 @@ namespace Leap.Unity
                 }
                 else
                 {
-                    hand = Provider.CurrentFrame.GetHandWithChirality(Handedness);
+                    hand = Provider.CurrentFrame.GetHand(Handedness);
                 }
 
                 UpdateBase(hand);
