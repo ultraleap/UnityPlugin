@@ -40,7 +40,7 @@ namespace Leap.Unity
 #if UNITY_ANDROID
             if (SvrManager.Instance != null)
             {
-                return SvrManager.Instance.status.running && SvrManager.Instance.status.pose == 3;
+                return SvrManager.Instance.Initialized;
             }
 #endif
 
