@@ -59,25 +59,24 @@ namespace Leap.Unity
 
         #region Resources
 
-        private string leapLogoResourceName
+        private string ultraleapLogoResourceName
         {
             get
             {
-                if (EditorGUIUtility.isProSkin) return "LM_Logo_White";
-                else return "LM_Logo_Black";
+                return "Ultraleap_Logo";
             }
         }
 
-        private Texture2D _backingLeapTex = null;
-        private Texture2D leapTex
+        private Texture2D _ultraleapTexture = null;
+        private Texture2D UltraleapTexture
         {
             get
             {
-                if (_backingLeapTex == null)
+                if (_ultraleapTexture == null)
                 {
-                    _backingLeapTex = EditorResources.Load<Texture2D>(leapLogoResourceName);
+                    _ultraleapTexture = Resources.Load<Texture2D>(ultraleapLogoResourceName);
                 }
-                return _backingLeapTex;
+                return _ultraleapTexture;
             }
         }
 
@@ -151,7 +150,7 @@ namespace Leap.Unity
             logoStyle.stretchWidth = true;
             logoStyle.alignment = TextAnchor.MiddleCenter;
             logoStyle.margin = new RectOffset(0, 0, top: 20, bottom: 20);
-            GUILayout.Box(new GUIContent(leapTex), logoStyle, GUILayout.ExpandWidth(true),
+            GUILayout.Box(new GUIContent(UltraleapTexture), logoStyle, GUILayout.ExpandWidth(true),
               GUILayout.MaxHeight(150f));
 
             // Window tabs.

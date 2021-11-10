@@ -27,7 +27,7 @@ namespace Leap.Unity.Interaction
         {
             base.OnEnable();
 
-            _handTex = EditorResources.Load<Texture2D>("HandTex");
+            _handTex = Resources.Load<Texture2D>("HandTex");
 
             hideField("_leapProvider");
             specifyCustomDecorator("manager", drawProvider);
