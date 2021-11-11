@@ -1499,11 +1499,7 @@ namespace Leap.Unity.Interaction
                 using (new ProfilerSample("Disable Soft Contact"))
                 {
                     _softContactEnabled = false;
-                    for (int i = 0; i < contactBones.Length; i++)
-                    {
-                        enableContactBoneCollision();
-                    }
-
+                    enableContactBoneCollision();
                     onPostDisableSoftContact();
                 }
             }
