@@ -71,7 +71,7 @@ namespace Leap.Unity.InputModule
         
         #endregion
         
-        private void Awake()
+        private void Start()
         {
             EventData = new PointerEventData(eventSystem);
             

@@ -93,42 +93,53 @@ namespace Leap.Unity.InputModule
         /// <summary>
         /// Initialisation
         /// </summary>
-        protected override void Start()
-        {            
-            if (mainCamera == null)
-            {
-                Debug.LogError("Main Camera must be set as it is used in interaction calculations", mainCamera);
-            }
-            
+        protected override void Awake()
+        {
+#if ENABLE_INPUT_SYSTEM && !ENABLE_LEGACY_INPUT_MANAGER
+            //We must have legacy input enabled, or be using an older Unity version
+            enabled = false;
+            return;
+#endif
+
+            //Find and apply LSP/Camera if not already
             if (leapDataProvider == null)
             {
-                Debug.LogError("Leap Data Provider must be set to get tracking data", leapDataProvider);
-            }
-
-            var shoulderProjectionOriginProvider = new ShoulderProjectionOriginProvider(mainCamera);
-            _projectionOriginProvider = shoulderProjectionOriginProvider;
-
-            if (leapDataProvider == null)
-            {
-                leapDataProvider = FindObjectOfType<LeapProvider>();
+                leapDataProvider = GameObject.FindObjectOfType<LeapProvider>();
                 if (leapDataProvider == null || !leapDataProvider.isActiveAndEnabled)
                 {
-                    Debug.LogError("Cannot use LeapImageRetriever if there is no LeapProvider!");
+                    Debug.LogError("Failed to find active LeapProvider", leapDataProvider);
+                    enabled = false;
+                    return;
+                }
+            }
+            if (mainCamera == null)
+            {
+                if (leapDataProvider != null && leapDataProvider is LeapXRServiceProvider)
+                    mainCamera = ((LeapXRServiceProvider)leapDataProvider).mainCamera;
+                if (mainCamera == null)
+                {
+                    Debug.LogError("Failed to find main camera", mainCamera);
                     enabled = false;
                     return;
                 }
             }
 
+            base.Awake();
+        }
+        protected override void Start()
+        {
+            var shoulderProjectionOriginProvider = new ShoulderProjectionOriginProvider(mainCamera);
+            _projectionOriginProvider = shoulderProjectionOriginProvider;
+
+            //Assign mainCamera to Canvases
             var canvases = Resources.FindObjectsOfTypeAll<Canvas>();
             for (int i = 0; i < canvases.Length; i++)
             {
                 if (canvases[i].worldCamera == null)
                 {
-                    canvases[i].worldCamera = MainCameraProvider.Instance.mainCamera;
+                    canvases[i].worldCamera = mainCamera;
                 }
             }
-
-
 
             //Set Projective/Tactile Modes
             if (interactionMode == InteractionCapability.Indirect)
