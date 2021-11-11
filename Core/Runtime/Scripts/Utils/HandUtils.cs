@@ -560,7 +560,7 @@ namespace Leap.Unity
 
         #region Frame Utils
 
-        [System.Obsolete("Method is obsolete, use GetHandWithChirality instead", true)]
+        [System.Obsolete("Method is obsolete, use GetHand instead", true)]
         public static Hand Get(this Frame frame, Chirality whichHand)
         {
             return GetHand(frame, whichHand);
