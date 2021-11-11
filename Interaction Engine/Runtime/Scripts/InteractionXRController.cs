@@ -684,7 +684,8 @@ namespace Leap.Unity.Interaction
                 _contactBoneBuffer.Add(contactBone);
             }
 
-            int numBones = _colliderBuffer.Count;
+            //The number of bones is equal to the colliders found that are not set to trigger
+            int numBones = _contactBoneBuffer.Count;
             _contactBones = new ContactBone[numBones];
             _contactBoneLocalPositions = new Vector3[numBones];
             _contactBoneLocalRotations = new Quaternion[numBones];
