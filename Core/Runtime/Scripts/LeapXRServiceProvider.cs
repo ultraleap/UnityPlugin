@@ -244,7 +244,7 @@ namespace Leap.Unity
             resetShaderTransforms();
 
 #if XR_LEGACY_INPUT_AVAILABLE
-            if (GetComponent<UnityEngine.SpatialTracking.TrackedPoseDriver>() == null) 
+            if (_mainCamera.GetComponent<UnityEngine.SpatialTracking.TrackedPoseDriver>() == null) 
 			{
                 _mainCamera.gameObject.AddComponent<UnityEngine.SpatialTracking.TrackedPoseDriver>().UseRelativeTransform = true;
             }
