@@ -24,7 +24,7 @@ public class ProjectionPointer : MonoBehaviour
 
     private void Update()
     {
-        hand = leapDataProvider.CurrentFrame.Get(chirality);
+        hand = leapDataProvider.CurrentFrame.GetHand(chirality);
         if (module.InteractionMode == InteractionCapability.Direct)
         {
             return;

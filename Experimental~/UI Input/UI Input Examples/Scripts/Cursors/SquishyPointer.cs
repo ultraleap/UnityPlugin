@@ -24,7 +24,7 @@ public class SquishyPointer : MonoBehaviour
 
     private void Update()
     {
-        var hand = leapDataProvider.CurrentFrame.Get(chirality);
+        var hand = leapDataProvider.CurrentFrame.GetHand(chirality);
 
         if (hand == null) return;
 
