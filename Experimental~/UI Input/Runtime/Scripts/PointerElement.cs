@@ -31,8 +31,9 @@ namespace Leap.Unity.InputModule
         [SerializeField] private EventSystem eventSystem;
         [SerializeField] private UIInputModule module;
         [SerializeField] private UIInputCursor cursor;
-        [SerializeField] private bool forceDisable;
-        
+        [SerializeField] private bool forceDisable = false;
+        [SerializeField] private bool disableWhenOffCanvas = true;
+
         public Chirality Chirality { get; private set; }
 
         private PointerEventData EventData { get; set; }
@@ -171,12 +172,12 @@ namespace Leap.Unity.InputModule
                 cursor.gameObject.SetActive(false);
             }
             
-            if (hand == null)
+            if (hand == null || (disableWhenOffCanvas && PointerState == PointerStates.OffCanvas))
             {
                 if (gameObject.activeInHierarchy)
                 {
                     cursor.gameObject.SetActive(false);
-                    return;
+                    if (hand == null) return;
                 }
             }
 
