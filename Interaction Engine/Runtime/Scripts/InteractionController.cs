@@ -1677,6 +1677,7 @@ namespace Leap.Unity.Interaction
             }
             finally
             {
+                tempObjs.Clear();
                 Pool<HashSet<IInteractionBehaviour>>.Recycle(tempObjs);
             }
         }
