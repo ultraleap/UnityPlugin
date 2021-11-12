@@ -338,7 +338,7 @@ namespace Leap.Unity
             var xrProvider = _provider as LeapXRServiceProvider;
             if (xrProvider != null)
             {
-                if (xrProvider.Camera == null) { return; }
+                if (xrProvider.mainCamera == null) { return; }
             }
 
             Frame imageFrame = _provider.CurrentFrame;

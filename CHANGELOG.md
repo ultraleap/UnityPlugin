@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `Service Provider` (XR, Desktop and Screentop) prefabs
 - `Image Retriever` prefab
 - `HandModels` prefab
+- Experimental support for Qualcomm Snapdragon XR2 based headsets
 
 ### Changed
 - Reorganized the repository layout to adhere to [UPM Package Structure](https://docs.unity3d.com/Manual/cus-layout.html)
@@ -26,6 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - LeapEyeDislocator
   - EnableDepthBuffer
 - Reworked how adding hands to a scene works - hands can be added easily. Any type derived from `HandModelBase` can be added directly into the scene and linked with a `LeapProvider` to begin tracking immediately.
+- Frame.Get to Frame.GetHandWithChirality.
 
 ### Removed
 - `HandModelManager` MonoBehaviour
@@ -50,8 +52,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Hand position jumps when using OVRProvider [[UnityModules#1054]](https://github.com/leapmotion/UnityModules/issues/1054) 
-
-
 
 ## [4.9.1 and older]
 

@@ -1185,7 +1185,10 @@ namespace Leap.Unity.Interaction
                 speed = velocity.magnitude;
                 float massScale = Mathf.Clamp(1.0F - (errorFraction * 2.0F), 0.1F, 1.0F)
                               * Mathf.Clamp(speed * 10F, 1F, 10F);
-                body.mass = massScale * contactBone._lastObjectTouchedAdjustedMass;
+                if (massScale * contactBone._lastObjectTouchedAdjustedMass > 0)
+                {
+                    body.mass = massScale * contactBone._lastObjectTouchedAdjustedMass;
+                }
             }
 
             // Potentially enable Soft Contact if our error is too large.
@@ -1496,11 +1499,7 @@ namespace Leap.Unity.Interaction
                 using (new ProfilerSample("Disable Soft Contact"))
                 {
                     _softContactEnabled = false;
-                    for (int i = 0; i < contactBones.Length; i++)
-                    {
-                        enableContactBoneCollision();
-                    }
-
+                    enableContactBoneCollision();
                     onPostDisableSoftContact();
                 }
             }

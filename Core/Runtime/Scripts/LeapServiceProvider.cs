@@ -6,6 +6,8 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
+using Leap.Unity.Attributes;
+using LeapInternal;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -42,13 +44,21 @@ namespace Leap.Unity
         /// The maximum number of times the provider will 
         /// attempt to reconnect to the service before giving up.
         /// </summary>
+#if UNITY_ANDROID
+        protected const int MAX_RECONNECTION_ATTEMPTS = 10;
+#else
         protected const int MAX_RECONNECTION_ATTEMPTS = 5;
+#endif
 
         /// <summary>
         /// The number of frames to wait between each
         /// reconnection attempt.
         /// </summary>
+#if UNITY_ANDROID
+        protected const int RECONNECTION_INTERVAL = 360;
+#else
         protected const int RECONNECTION_INTERVAL = 180;
+#endif
 
         #endregion
 
@@ -63,7 +73,7 @@ namespace Leap.Unity
         }
         [Tooltip("Displays a representation of the interaction volume in the scene view")]
         [SerializeField]
-        protected InteractionVolumeVisualization _interactionVolumeVisualization = InteractionVolumeVisualization.LeapMotionController;
+        protected InteractionVolumeVisualization _interactionVolumeVisualization = InteractionVolumeVisualization.Automatic;
 
         public InteractionVolumeVisualization SelectedInteractionVolumeVisualization => _interactionVolumeVisualization;
 
@@ -126,11 +136,14 @@ namespace Leap.Unity
 
         #region Internal Settings & Memory
         protected bool _useInterpolation = true;
+        protected IntPtr _clockRebaser;
+        protected System.Diagnostics.Stopwatch _stopwatch = new System.Diagnostics.Stopwatch();
+
 
         // Extrapolate on Android to compensate for the latency introduced by its graphics
         // pipeline.
 #if UNITY_ANDROID && !UNITY_EDITOR
-    protected int ExtrapolationAmount = 15;
+    protected int ExtrapolationAmount = 0; // 15;
     protected int BounceAmount = 70;
 #else
         protected int ExtrapolationAmount = 0;
@@ -306,6 +319,91 @@ namespace Leap.Unity
 
         #endregion
 
+        #region Android Support
+
+#if UNITY_ANDROID
+        private AndroidJavaObject _serviceBinder;
+        AndroidJavaClass unityPlayer;
+        AndroidJavaObject activity;
+        AndroidJavaObject context;
+        ServiceCallbacks serviceCallbacks;
+
+        protected virtual void OnEnable()
+        {
+            CreateAndroidBinding();
+        }
+
+        public bool CreateAndroidBinding()
+        {
+            try
+            {
+                if (_serviceBinder != null)
+                {
+                    //Check binding status before calling rebind
+                    bool bindStatus = _serviceBinder.Call<bool>("isBound");
+                    Debug.Log("CreateAndroidBinding - Current service binder status " + bindStatus);
+                    if (bindStatus)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        _serviceBinder = null;
+                    }
+                }
+
+                if (_serviceBinder == null)
+                {
+                    //Get activity and context
+                    if (unityPlayer == null)
+                    {
+                        Debug.Log("CreateAndroidBinding - Getting activity and context");
+                        unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
+                        activity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
+                        context = activity.Call<AndroidJavaObject>("getApplicationContext");
+                        serviceCallbacks = new ServiceCallbacks();
+                    }
+
+                    //Create a new service binding
+                    Debug.Log("CreateAndroidBinding - Creating a new service binder");
+                    _serviceBinder = new AndroidJavaObject("com.ultraleap.tracking.service_binder.ServiceBinder", context, serviceCallbacks);
+                    bool success = _serviceBinder.Call<bool>("bind");
+                    if (success)
+                    {
+                        Debug.Log("CreateAndroidBinding - Binding of service binder complete");
+                    }
+                    return true;
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning("CreateAndroidBinding - Failed to bind service: " + e.Message);
+                _serviceBinder = null;
+            }
+            return false;
+        }
+
+        protected virtual void OnDisable()
+        {
+            if (_serviceBinder != null)
+            {
+                Debug.Log("ServiceBinder.unbind...");
+                _serviceBinder.Call("unbind");
+            }
+        }
+
+#else
+        protected virtual void OnEnable()
+        {
+        }
+
+        protected virtual void OnDisable()
+        {
+        }
+
+#endif
+        #endregion
+
         #region Unity Events
 
         protected virtual void Reset()
@@ -353,6 +451,17 @@ namespace Leap.Unity
                 DispatchUpdateFrameEvent(_transformedFixedFrame);
                 return;
             }
+
+#if UNITY_ANDROID
+            if (_clockRebaser != IntPtr.Zero)
+            {
+                eLeapRS result = LeapC.UpdateRebase(_clockRebaser, _stopwatch.ElapsedMilliseconds, LeapC.GetNow());
+                if (result != eLeapRS.eLeapRS_Success)
+                {
+                    Debug.LogWarning("UpdateRebase call failed");
+                }
+            }
+#endif
 
             if (_useInterpolation)
             {
@@ -431,8 +540,27 @@ namespace Leap.Unity
             _isDestroyed = true;
         }
 
+        protected virtual void OnApplicationFocus(bool hasFocus)
+        {
+#if UNITY_ANDROID
+            if (hasFocus)
+            {
+                CreateAndroidBinding();
+            }
+#endif
+        }
+
         protected virtual void OnApplicationPause(bool isPaused)
         {
+#if UNITY_ANDROID
+            if (_leapController != null)
+            {
+                if (isPaused)
+                {
+                    _serviceBinder.Call("unbind");
+                }
+            }
+#endif
             if (_leapController != null)
             {
                 if (isPaused)
@@ -512,8 +640,7 @@ namespace Leap.Unity
         /// LeapXRServiceProvider where applicable. Does not modify any XR-specific settings
         /// that only exist on the LeapXRServiceProvider.
         /// </summary>
-        public void CopySettingsToLeapXRServiceProvider(
-            LeapXRServiceProvider leapXRServiceProvider)
+        public void CopySettingsToLeapXRServiceProvider(LeapXRServiceProvider leapXRServiceProvider)
         {
             leapXRServiceProvider._interactionVolumeVisualization = _interactionVolumeVisualization;
             leapXRServiceProvider._frameOptimization = _frameOptimization;
@@ -578,6 +705,14 @@ namespace Leap.Unity
         /// </summary>
         protected void createController()
         {
+#if UNITY_ANDROID
+            var bindStatus = CreateAndroidBinding();
+            if (!bindStatus)
+                return;
+
+            InitClockRebaser();
+#endif
+
             if (_leapController != null)
             {
                 return;
@@ -617,7 +752,7 @@ namespace Leap.Unity
         /// Stops the connection for the existing instance of a Controller, clearing old
         /// policy flags and resetting the Controller to null.
         /// </summary>
-        protected void destroyController()
+    	public void destroyController()
         {
             if (_leapController != null)
             {
@@ -629,6 +764,14 @@ namespace Leap.Unity
                 _leapController.StopConnection();
                 _leapController.Dispose();
                 _leapController = null;
+
+#if UNITY_ANDROID
+                if (_clockRebaser != IntPtr.Zero)
+                {
+                    LeapC.DestroyClockRebaser(_clockRebaser);
+                    _stopwatch.Stop();
+                }
+#endif
             }
         }
 
@@ -641,7 +784,7 @@ namespace Leap.Unity
         /// </summary>
         protected bool checkConnectionIntegrity()
         {
-            if (_leapController.IsServiceConnected)
+            if (_leapController != null && _leapController.IsServiceConnected)
             {
                 _framesSinceServiceConnectionChecked = 0;
                 _numberOfReconnectionAttempts = 0;
@@ -673,6 +816,10 @@ namespace Leap.Unity
         {
             initializeFlags();
 
+#if UNITY_ANDROID
+            InitClockRebaser();
+#endif
+
             if (_leapController != null)
             {
                 _leapController.Device -= onHandControllerConnect;
@@ -684,8 +831,25 @@ namespace Leap.Unity
             dest.CopyFrom(source).Transform(transform.GetLeapMatrix());
         }
 
+#if UNITY_ANDROID
+        private void InitClockRebaser()
+        {
+            _stopwatch.Start();
+            eLeapRS result = LeapC.CreateClockRebaser(out _clockRebaser);
+
+            if (result != eLeapRS.eLeapRS_Success)
+            {
+                Debug.LogError("Failed to create clock rebaser");
+            }
+
+            if (_clockRebaser == IntPtr.Zero)
+            {
+                Debug.LogError("Clock rebaser is null");
+            }
+        }
+#endif
+
         #endregion
 
     }
-
 }
