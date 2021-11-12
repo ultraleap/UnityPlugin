@@ -27,6 +27,11 @@
       "displayName": "UI Input (Experimental)",
       "description": "UI Input (Experimental)",
       "path": "Experimental~/UI Input"
+    },
+    {
+      "displayName": "Android XR2 (Experimental)",
+      "description": "Suppport for Android XR2 based headsets(Experimental)",
+      "path": "Experimental~/Android_XR2"
     }
   ]
 }
