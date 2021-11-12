@@ -421,15 +421,10 @@ namespace Leap.Unity
             if (_deviceOffsetMode == DeviceOffsetMode.Default
                 || _deviceOffsetMode == DeviceOffsetMode.ManualHeadOffset)
             {
-                // Some headsets may not report valid data when untracked (e.g. Oculus), fall back to using the camera position
-                if (XRSupportUtil.GetXRNodeCenterEyeLocalPosition() == Vector3.zero || _mainCamera.transform.localPosition == Vector3.zero)
-                {
-                    trackedPose = _mainCamera.transform.ToLocalPose();
-                }
-                else
-                {
-                    trackedPose = new Pose(XRSupportUtil.GetXRNodeCenterEyeLocalPosition(), XRSupportUtil.GetXRNodeCenterEyeLocalRotation());
-                }
+                //Get the local tracked pose from the XR Headset
+                trackedPose = new Pose(XRSupportUtil.GetXRNodeCenterEyeLocalPosition(), XRSupportUtil.GetXRNodeCenterEyeLocalRotation());
+                //Transform the tracked pose into the space of the camera
+                trackedPose.GetTransformedBy(_mainCamera.transform.ToPose());
 
 #if UNITY_ANDROID
                 // There is no camera in the SVR prefab that is effectively at the centre position - only
@@ -613,15 +608,23 @@ namespace Leap.Unity
                 warpedRotation *= Quaternion.Euler(-90f, 90f, 90f);
             }
 
-            //Transform the warped pose back into the space of the main camera
-            warpedPosition = _mainCamera.transform.TransformPoint(warpedPosition);
-            warpedRotation = _mainCamera.transform.rotation * warpedRotation;
-
-            leapTransform = new LeapTransform(
+            //Use the _mainCamera parent to transfrom the warped positions so the player can move around
+            if(_mainCamera.transform.parent != null)
+            {
+                leapTransform = new LeapTransform(
+                  _mainCamera.transform.parent.TransformPoint(warpedPosition).ToVector(),
+                  _mainCamera.transform.parent.TransformRotation(warpedRotation).ToLeapQuaternion(),
+                  Vector.Ones * 1e-3f
+                );
+            }
+            else
+            {
+                leapTransform = new LeapTransform(
                   warpedPosition.ToVector(),
                   warpedRotation.ToLeapQuaternion(),
                   Vector.Ones * 1e-3f
                 );
+            }
 
             leapTransform.MirrorZ();
 
