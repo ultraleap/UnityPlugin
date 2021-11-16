@@ -108,7 +108,8 @@ namespace Leap.Unity
         {
             Desktop,
             Screentop,
-            HMD
+            HMD,
+            None
         }
         [Tooltip("[Service must be >= 4.9.2!] " +
           "Which tracking mode to request that the service optimize for. " +
@@ -649,6 +650,35 @@ namespace Leap.Unity
             leapXRServiceProvider._workerThreadProfiling = _workerThreadProfiling;
         }
 
+        /// <summary>
+        /// Sets Leap Motion policy flags.
+        /// </summary>
+        public void SetTrackingOptimizationMode(TrackingOptimizationMode mode)
+        {
+            if (_leapController == null || mode == TrackingOptimizationMode.None)
+            {
+                return;
+            }
+
+            _trackingOptimization = mode;
+
+            if (mode == TrackingOptimizationMode.Desktop)
+            {
+                _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP);
+                _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
+            }
+            else if (mode == TrackingOptimizationMode.Screentop)
+            {
+                _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
+                _leapController.SetPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP);
+            }
+            else if (mode == TrackingOptimizationMode.HMD)
+            {
+                _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP);
+                _leapController.SetPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
+            }
+        }
+
         #endregion
 
         #region Internal Methods
@@ -674,29 +704,7 @@ namespace Leap.Unity
         /// </summary>
         protected virtual void initializeFlags()
         {
-            if (_leapController == null)
-            {
-                return;
-            }
-
-            if (_trackingOptimization == TrackingOptimizationMode.Desktop)
-            {
-                _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_DEFAULT);
-                _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP);
-                _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
-            }
-            else if (_trackingOptimization == TrackingOptimizationMode.Screentop)
-            {
-                _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_DEFAULT);
-                _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
-                _leapController.SetPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP);
-            }
-            else if (_trackingOptimization == TrackingOptimizationMode.HMD)
-            {
-                _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_DEFAULT);
-                _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP);
-                _leapController.SetPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
-            }
+            SetTrackingOptimizationMode(_trackingOptimization);
         }
 
         /// <summary>
