@@ -514,6 +514,7 @@ namespace Leap.Unity
             {
                 //By default, use the camera transform matrix to transform the frame into 
                 leapTransform = mainCamera.transform.GetLeapMatrix();
+                leapTransform.scale = Vector.Ones * 1e-3f;
 
                 //If the application is playing then we can try to use temporal warping
                 if (Application.isPlaying)
