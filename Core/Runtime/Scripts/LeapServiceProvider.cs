@@ -9,6 +9,7 @@
 using Leap.Unity.Attributes;
 using LeapInternal;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -117,6 +118,10 @@ namespace Leap.Unity
         [SerializeField]
         [EditTimeOnly]
         protected TrackingOptimizationMode _trackingOptimization = TrackingOptimizationMode.Desktop;
+
+        [Tooltip("Enable to prevent changes to tracking mode during initialization. The mode the service is currently set to will be retained.")]
+        [SerializeField]
+        private bool _preventInitializingTrackingMode;
 
 #if UNITY_2017_3_OR_NEWER
         [Tooltip("When checked, profiling data from the LeapCSharp worker thread will be used to populate the UnityProfiler.")]
@@ -651,32 +656,61 @@ namespace Leap.Unity
         }
 
         /// <summary>
-        /// Sets Leap Motion policy flags.
+        /// Triggers a coroutine that sets appropriate policy flags and wait for them to be set to ensure we've changed mode
         /// </summary>
-        public void SetTrackingOptimizationMode(TrackingOptimizationMode mode)
+        /// <param name="trackingMode">Tracking mode to set</param>
+        public void ChangeTrackingMode(TrackingOptimizationMode trackingMode)
         {
-            if (_leapController == null || mode == TrackingOptimizationMode.None)
+            _trackingOptimization = trackingMode;
+
+            if (_leapController == null) return;
+
+            switch (trackingMode)
             {
-                return;
+                case TrackingOptimizationMode.Desktop:
+                    _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP);
+                    _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
+                    break;
+                case TrackingOptimizationMode.Screentop:
+                    _leapController.SetPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP);
+                    _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
+                    break;
+                case TrackingOptimizationMode.HMD:
+                    _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP);
+                    _leapController.SetPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// Gets the current mode by polling policy flags
+        /// </summary>
+        public TrackingOptimizationMode GetTrackingMode()
+        {
+            if (_leapController == null) return _trackingOptimization;
+
+            var screenTopPolicySet = _leapController.IsPolicySet(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP);
+            var headMountedPolicySet = _leapController.IsPolicySet(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
+
+            var desktopMode = !screenTopPolicySet && !headMountedPolicySet;
+            if (desktopMode)
+            {
+                return TrackingOptimizationMode.Desktop;
             }
 
-            _trackingOptimization = mode;
+            var headMountedMode = !screenTopPolicySet && headMountedPolicySet;
+            if (headMountedMode)
+            {
+                return TrackingOptimizationMode.HMD;
+            }
 
-            if (mode == TrackingOptimizationMode.Desktop)
+            var screenTopMode = screenTopPolicySet && !headMountedPolicySet;
+            if (screenTopMode)
             {
-                _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP);
-                _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
+                return TrackingOptimizationMode.Screentop;
             }
-            else if (mode == TrackingOptimizationMode.Screentop)
-            {
-                _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
-                _leapController.SetPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP);
-            }
-            else if (mode == TrackingOptimizationMode.HMD)
-            {
-                _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP);
-                _leapController.SetPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
-            }
+
+            throw new Exception("Unknown tracking optimization mode");
         }
 
         #endregion
@@ -700,11 +734,13 @@ namespace Leap.Unity
         }
 
         /// <summary>
-        /// Initializes Leap Motion policy flags.
+        /// Initializes the policy flags.
         /// </summary>
         protected virtual void initializeFlags()
         {
-            SetTrackingOptimizationMode(_trackingOptimization);
+            if (_preventInitializingTrackingMode) return;
+
+            ChangeTrackingMode(_trackingOptimization);
         }
 
         /// <summary>
@@ -764,11 +800,6 @@ namespace Leap.Unity
         {
             if (_leapController != null)
             {
-                if (_leapController.IsConnected)
-                {
-                    _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP);
-                    _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
-                }
                 _leapController.StopConnection();
                 _leapController.Dispose();
                 _leapController = null;
