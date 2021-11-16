@@ -61,15 +61,6 @@ namespace Leap.Unity
 
             deferProperty("_serverNameSpace");
             deferProperty("_workerThreadProfiling");
-
-            if (!(LeapServiceProvider is LeapXRServiceProvider))
-            {
-                addPropertyToFoldout("_trackingOptimization", "Advanced Options");
-            }
-            else
-            {
-                hideField("_trackingOptimization");
-            }
             addPropertyToFoldout("_workerThreadProfiling", "Advanced Options");
             addPropertyToFoldout("_serverNameSpace", "Advanced Options");
         }
