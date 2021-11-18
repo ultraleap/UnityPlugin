@@ -141,9 +141,11 @@ namespace Leap.Unity
 
         #region Internal Settings & Memory
         protected bool _useInterpolation = true;
+
+#if SVR
         protected IntPtr _clockRebaser;
         protected System.Diagnostics.Stopwatch _stopwatch = new System.Diagnostics.Stopwatch();
-
+#endif
 
         // Extrapolate on Android to compensate for the latency introduced by its graphics
         // pipeline.
@@ -457,7 +459,7 @@ namespace Leap.Unity
                 return;
             }
 
-#if UNITY_ANDROID
+#if SVR
             if (_clockRebaser != IntPtr.Zero)
             {
                 eLeapRS result = LeapC.UpdateRebase(_clockRebaser, _stopwatch.ElapsedMilliseconds, LeapC.GetNow());
@@ -803,7 +805,7 @@ namespace Leap.Unity
                 _leapController.Dispose();
                 _leapController = null;
 
-#if UNITY_ANDROID
+#if SVR
                 if (_clockRebaser != IntPtr.Zero)
                 {
                     LeapC.DestroyClockRebaser(_clockRebaser);
@@ -869,7 +871,7 @@ namespace Leap.Unity
             dest.CopyFrom(source).Transform(transform.GetLeapMatrix());
         }
 
-#if UNITY_ANDROID
+#if SVR
         private void InitClockRebaser()
         {
             _stopwatch.Start();

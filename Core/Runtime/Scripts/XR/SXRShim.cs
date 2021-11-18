@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-#if UNITY_ANDROID
+#if SVR
 
 namespace Leap.Unity
 {

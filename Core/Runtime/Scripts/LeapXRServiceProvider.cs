@@ -38,6 +38,7 @@ namespace Leap.Unity
         private const float DEFAULT_DEVICE_TILT_X_AXIS = 5f;
 #endif
 
+#if SVR
         private enum TimewarpMode
         {
             Default,
@@ -45,6 +46,7 @@ namespace Leap.Unity
         }
 
         private TimewarpMode _xr2TimewarpMode = TimewarpMode.Default;
+#endif
 
         public enum DeviceOffsetMode
         {
@@ -463,8 +465,12 @@ namespace Leap.Unity
 
         protected override long CalculateInterpolationTime(bool endOfFrame = false)
         {
-#if SVR
+            if (_leapController == null)
+            {
+                return 0;
+            }
 
+#if SVR
             if (_xr2TimewarpMode == TimewarpMode.Experimental_XR2)
             {
                 return GetPredictedDisplayTime_LeapTime();
@@ -473,19 +479,17 @@ namespace Leap.Unity
             {
                 return _leapController.Now() - 16000;
             }
+
+#elif UNITY_ANDROID
+            return _leapController.Now() - 16000;
 #else
-            if (_leapController != null)
-            {
-                return _leapController.Now()
-                       - (long)_smoothedTrackingLatency.value
-                       + ((updateHandInPrecull && !endOfFrame) ?
-                            (long)(Time.smoothDeltaTime * S_TO_NS / Time.timeScale)
-                          : 0);
-            }
-            else
-            {
-                return 0;
-            }
+
+            return _leapController.Now()
+                    - (long)_smoothedTrackingLatency.value
+                    + ((updateHandInPrecull && !endOfFrame) ?
+                        (long)(Time.smoothDeltaTime * S_TO_NS / Time.timeScale)
+                        : 0);
+
 #endif
         }
 
@@ -561,13 +565,13 @@ namespace Leap.Unity
             //Calculate a Temporally Warped Pose
             else if (updateTemporalCompensation && transformHistory.history.IsFull)
             {
+#if SVR
                 if (_xr2TimewarpMode == TimewarpMode.Default && transformHistory.history.IsFull)
                 {
                     var imageAdjustment = _temporalWarpingMode == TemporalWarpingMode.Images ? -20000 : 0;
                     var sampleTimestamp = timestamp - (long)(warpingAdjustment * 1000f) - imageAdjustment;
                     transformHistory.SampleTransform(sampleTimestamp, out warpedPosition, out warpedRotation);
                 }
-#if SVR
                 else if (_xr2TimewarpMode == TimewarpMode.Experimental_XR2)
                 {
                     // Get the predicted display time for the current frame in milliseconds, then get the predicted head pose
@@ -580,6 +584,13 @@ namespace Leap.Unity
                     warpedPosition.y = -predictedWarpedPosition.y;
                     warpedPosition.z = predictedWarpedPosition.z;
                     warpedRotation = predictedWarpedRotation;
+                }
+#else
+                if (transformHistory.history.IsFull)
+                {
+                    var imageAdjustment = _temporalWarpingMode == TemporalWarpingMode.Images ? -20000 : 0;
+                    var sampleTimestamp = timestamp - (long)(warpingAdjustment * 1000f) - imageAdjustment;
+                    transformHistory.SampleTransform(sampleTimestamp, out warpedPosition, out warpedRotation);
                 }
 #endif
             }
@@ -602,7 +613,7 @@ namespace Leap.Unity
             }
 
             //Use the _mainCamera parent to transfrom the warped positions so the player can move around
-            if(_mainCamera.transform.parent != null)
+            if (_mainCamera.transform.parent != null)
             {
                 leapTransform = new LeapTransform(
                   _mainCamera.transform.parent.TransformPoint(warpedPosition).ToVector(),
