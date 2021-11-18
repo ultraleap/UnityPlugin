@@ -134,7 +134,7 @@ namespace Leap.Unity
         // Temporal Warping
 #if UNITY_STANDALONE
         private const int DEFAULT_WARP_ADJUSTMENT = 17;
-#elif UNITY_ANDROID
+#elif SVR
         private const int DEFAULT_WARP_ADJUSTMENT = 35; // Tuned for XR2 on a Morpheus SKU3
 #else
         private const int DEFAULT_WARP_ADJUSTMENT = 17;
@@ -426,10 +426,9 @@ namespace Leap.Unity
                 //Transform the tracked pose into the space of the camera
                 trackedPose.GetTransformedBy(_mainCamera.transform.ToPose());
 
-#if UNITY_ANDROID
+#if SVR
                 // There is no camera in the SVR prefab that is effectively at the centre position - only
                 // eye left and eye right. In this case, don't calculate a delta
-#else
                 // If we don't know of any pose offset yet, account for it by finding
                 // the pose delta from the tracked pose to the actual camera
                 // pose.
@@ -464,7 +463,7 @@ namespace Leap.Unity
 
         protected override long CalculateInterpolationTime(bool endOfFrame = false)
         {
-#if UNITY_ANDROID
+#if SVR
 
             if (_xr2TimewarpMode == TimewarpMode.Experimental_XR2)
             {
@@ -568,7 +567,7 @@ namespace Leap.Unity
                     var sampleTimestamp = timestamp - (long)(warpingAdjustment * 1000f) - imageAdjustment;
                     transformHistory.SampleTransform(sampleTimestamp, out warpedPosition, out warpedRotation);
                 }
-#if UNITY_ANDROID
+#if SVR
                 else if (_xr2TimewarpMode == TimewarpMode.Experimental_XR2)
                 {
                     // Get the predicted display time for the current frame in milliseconds, then get the predicted head pose
@@ -718,7 +717,7 @@ namespace Leap.Unity
         }
 
 
-#if UNITY_ANDROID
+#if SVR
         /// <summary>
         /// Return the predicted display time as a leap time
         /// </summary>

@@ -329,7 +329,7 @@ namespace Leap.Unity
 
         public static void Recenter()
         {
-#if UNITY_ANDROID
+#if SVR
             if (SvrInput.Instance != null)
             {
                 SvrInput.Instance.HandleRecenter();
