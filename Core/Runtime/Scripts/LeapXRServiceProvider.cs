@@ -244,6 +244,10 @@ namespace Leap.Unity
             }
         }
 
+        private void OnValidate()
+        {
+            this.transform.hideFlags = HideFlags.NotEditable;
+        }
 
         protected override void OnEnable()
         {
@@ -417,22 +421,17 @@ namespace Leap.Unity
             if (_deviceOffsetMode == DeviceOffsetMode.Default
                 || _deviceOffsetMode == DeviceOffsetMode.ManualHeadOffset)
             {
-                // Some headsets may not report valid data when untracked (e.g. Oculus), fall back to using the camera position
-                if (XRSupportUtil.GetXRNodeCenterEyeLocalPosition() == Vector3.zero || _mainCamera.transform.localPosition == Vector3.zero)
-                {
-                    trackedPose = _mainCamera.transform.ToLocalPose();
-                }
-                else
-                {
-                    trackedPose = new Pose(XRSupportUtil.GetXRNodeCenterEyeLocalPosition(), XRSupportUtil.GetXRNodeCenterEyeLocalRotation());
-                }
+                //Get the local tracked pose from the XR Headset
+                trackedPose = new Pose(XRSupportUtil.GetXRNodeCenterEyeLocalPosition(), XRSupportUtil.GetXRNodeCenterEyeLocalRotation());
+                //Transform the tracked pose into the space of the camera
+                trackedPose.GetTransformedBy(_mainCamera.transform.ToPose());
 
 #if UNITY_ANDROID
                 // There is no camera in the SVR prefab that is effectively at the centre position - only
                 // eye left and eye right. In this case, don't calculate a delta
 #else
                 // If we don't know of any pose offset yet, account for it by finding
-        		// the pose delta from the tracked pose to the actual camera
+                // the pose delta from the tracked pose to the actual camera
                 // pose.
                 if (!_trackingBaseDeltaPose.HasValue)
                 {
@@ -509,7 +508,21 @@ namespace Leap.Unity
 
         protected override void transformFrame(Frame source, Frame dest)
         {
-            LeapTransform leapTransform = GetWarpedMatrix(source.Timestamp);
+            LeapTransform leapTransform = LeapTransform.Identity;
+
+            if (mainCamera != null)
+            {
+                //By default, use the camera transform matrix to transform the frame into 
+                leapTransform = mainCamera.transform.GetLeapMatrix();
+                leapTransform.scale = Vector.Ones * 1e-3f;
+
+                //If the application is playing then we can try to use temporal warping
+                if (Application.isPlaying)
+                {
+                    leapTransform = GetWarpedMatrix(source.Timestamp);
+                }
+            }
+
             dest.CopyFrom(source).Transform(leapTransform);
         }
 
@@ -527,30 +540,40 @@ namespace Leap.Unity
             Shader.SetGlobalMatrixArray(HAND_ARRAY_GLOBAL_NAME, _transformArray);
         }
 
-        protected virtual LeapTransform GetWarpedMatrix(long timestamp,
-                                                        bool updateTemporalCompensation = true)
+        protected virtual LeapTransform GetWarpedMatrix(long timestamp, bool updateTemporalCompensation = true)
         {
-            LeapTransform leapTransform = new LeapTransform();
-
-            if (_mainCamera == null)
+            if (_mainCamera == null || this == null)
             {
-                return leapTransform;
+                return LeapTransform.Identity;
             }
 
+            LeapTransform leapTransform = new LeapTransform();
 
-
-            //Calculate a Temporally Warped Pose
-            if (Application.isPlaying && updateTemporalCompensation && transformHistory.history.IsFull && _temporalWarpingMode != TemporalWarpingMode.Off)
+            // If temporal warping is turned off
+            if (_temporalWarpingMode == TemporalWarpingMode.Off)
             {
+                //Calculate the Current Pose
+                Pose currentPose = Pose.identity;
+                if (_deviceOffsetMode == DeviceOffsetMode.Transform && deviceOrigin != null)
+                {
+                    currentPose = deviceOrigin.ToPose();
+                }
+                else
+                {
+                    transformHistory.SampleTransform(timestamp, out currentPose.position, out currentPose.rotation);
+                }
 
-
-
+                warpedPosition = currentPose.position;
+                warpedRotation = currentPose.rotation;
+            }
+            //Calculate a Temporally Warped Pose
+            else if (updateTemporalCompensation && transformHistory.history.IsFull)
+            {
                 if (_xr2TimewarpMode == TimewarpMode.Default && transformHistory.history.IsFull)
                 {
-                    transformHistory.SampleTransform(timestamp
-                                                     - (long)(warpingAdjustment * 1000f)
-                                                     - (_temporalWarpingMode == TemporalWarpingMode.Images ? -20000 : 0),
-                                                       out warpedPosition, out warpedRotation);
+                    var imageAdjustment = _temporalWarpingMode == TemporalWarpingMode.Images ? -20000 : 0;
+                    var sampleTimestamp = timestamp - (long)(warpingAdjustment * 1000f) - imageAdjustment;
+                    transformHistory.SampleTransform(sampleTimestamp, out warpedPosition, out warpedRotation);
                 }
 #if UNITY_ANDROID
                 else if (_xr2TimewarpMode == TimewarpMode.Experimental_XR2)
@@ -572,77 +595,29 @@ namespace Leap.Unity
             // Normalize the rotation Quaternion.
             warpedRotation = warpedRotation.ToNormalized();
 
-            //Calculate the Current Pose
-            Pose currentPose = Pose.identity;
-            if (_deviceOffsetMode == DeviceOffsetMode.Transform && deviceOrigin != null
-                && (!Application.isPlaying || _temporalWarpingMode == TemporalWarpingMode.Off))
+            //If we are NOT using a transform to offset the tracking
+            if (_deviceOffsetMode != DeviceOffsetMode.Transform)
             {
-                // Transform mode at edit-time -- just use the transform pose.
-                currentPose = deviceOrigin.ToPose();
-            }
-            else if (!Application.isPlaying)
-            {
-                currentPose.position =
-                  currentPose.rotation * Vector3.up * deviceOffsetYAxis
-                  + currentPose.rotation * Vector3.forward * deviceOffsetZAxis;
-                currentPose.rotation = Quaternion.Euler(deviceTiltXAxis, 0f, 0f);
-                currentPose = _mainCamera.transform.ToLocalPose().Then(currentPose); //  TOCHECK was just transform
+                warpedPosition += warpedRotation * Vector3.up * deviceOffsetYAxis
+                                + warpedRotation * Vector3.forward * deviceOffsetZAxis;
+                warpedRotation *= Quaternion.Euler(deviceTiltXAxis, 0f, 0f);
+
+                warpedRotation *= Quaternion.Euler(-90f, 180f, 0f);
             }
             else
             {
-                transformHistory.SampleTransform(timestamp, out currentPose.position,
-                                                            out currentPose.rotation);
+                warpedRotation *= Quaternion.Euler(-90f, 90f, 90f);
             }
 
-            // Choose between Warped and Current Pose
-            bool useCurrentPosition =
-              _temporalWarpingMode == TemporalWarpingMode.Off ||
-              !Application.isPlaying;
-            warpedPosition = useCurrentPosition ? currentPose.position : warpedPosition;
-            warpedRotation = useCurrentPosition ? currentPose.rotation : warpedRotation;
-
-            // Apply offsets (when applicable)
-            if (Application.isPlaying)
-            {
-                if (_deviceOffsetMode != DeviceOffsetMode.Transform)
-                {
-                    warpedPosition += warpedRotation * Vector3.up * deviceOffsetYAxis
-                                    + warpedRotation * Vector3.forward * deviceOffsetZAxis;
-                    warpedRotation *= Quaternion.Euler(deviceTiltXAxis, 0f, 0f);
-
-                    warpedRotation *= Quaternion.Euler(-90f, 180f, 0f);
-                }
-                else
-                {
-                    warpedRotation *= Quaternion.Euler(-90f, 90f, 90f);
-                }
-            }
-
-            if (this == null)
-            {
-                // We are being destroyed, get outta here.
-                return LeapTransform.Identity;
-            }
-
-#if UNITY_ANDROID
-            if (transform.parent != null && _deviceOffsetMode != DeviceOffsetMode.Transform)
-            {
-                leapTransform = new LeapTransform(
-                  transform.parent.TransformPoint(warpedPosition).ToVector(),
-                  (transform.parent.rotation * warpedRotation).ToLeapQuaternion(),
-                  Vector.Ones * 1e-3f
-                );
-            }
-#else
-            if (_mainCamera.transform.parent != null && _deviceOffsetMode != DeviceOffsetMode.Transform)
+            //Use the _mainCamera parent to transfrom the warped positions so the player can move around
+            if(_mainCamera.transform.parent != null)
             {
                 leapTransform = new LeapTransform(
                   _mainCamera.transform.parent.TransformPoint(warpedPosition).ToVector(),
-                  (_mainCamera.transform.parent.rotation * warpedRotation).ToLeapQuaternion(),
+                  _mainCamera.transform.parent.TransformRotation(warpedRotation).ToLeapQuaternion(),
                   Vector.Ones * 1e-3f
                 );
-            }    
-#endif
+            }
             else
             {
                 leapTransform = new LeapTransform(
@@ -686,10 +661,9 @@ namespace Leap.Unity
                         return;
                 }
 
-                if (Application.isPlaying
-                    && !manualUpdateHasBeenCalledSinceUpdate
-                    && _leapController != null)
+                if (Application.isPlaying && !manualUpdateHasBeenCalledSinceUpdate && _leapController != null)
                 {
+
                     manualUpdateHasBeenCalledSinceUpdate = true;
 
                     //Find the left and/or right hand(s) to latch

@@ -19,12 +19,7 @@ namespace Leap.Unity.Interaction.Internal
     public static class InteractionChecks
     {
         public const float MAX_GRAVITY_MAGNITUDE = 4.905f;
-
-#if UNITY_ANDROID
-    public const float MAX_TIMESTEP = 1.0f / 60.0f;
-#else
         public const float MAX_TIMESTEP = 1.0f / 90.0f;
-#endif
 
         private const string IGNORE_GRAVITY_CHECK_KEY = "LeapIEIgnoreGravityCheck";
         private const string IGNORE_TIMESTEP_CHECK_KEY = "LeapIEIgnoreTimestepCheck";
