@@ -37,7 +37,7 @@ namespace Leap.Unity
 
         public static bool IsXREnabled()
         {
-#if UNITY_ANDROID
+#if SVR
             if (SvrManager.Instance != null)
             {
                 return SvrManager.Instance.Initialized;
@@ -53,7 +53,7 @@ namespace Leap.Unity
 
         public static bool IsXRDevicePresent()
         {
-#if UNITY_ANDROID
+#if SVR
             if (SvrManager.Instance != null)
             {
                 return SvrManager.Instance.status.running;
@@ -72,7 +72,7 @@ namespace Leap.Unity
         static bool outputPresenceWarning = false;
         public static bool IsUserPresent(bool defaultPresence = true)
         {
-#if UNITY_ANDROID
+#if SVR
             if (SvrManager.Instance != null)
             {
                 return true; // TODO user presence can be queried with recent versions of the SVR SDK (>= v4.0.4) - a proximity detector is fitted to some devices.
@@ -120,7 +120,7 @@ namespace Leap.Unity
 
         public static Vector3 GetXRNodeCenterEyeLocalPosition()
         {
-#if UNITY_ANDROID
+#if SVR
             if (SvrManager.Instance != null)
             {
                 if (XRSupportUtil.IsXREnabled())
@@ -158,7 +158,7 @@ namespace Leap.Unity
 
         public static Quaternion GetXRNodeCenterEyeLocalRotation()
         {
-#if UNITY_ANDROID
+#if SVR
             if (SvrManager.Instance != null)
             {
                 if (XRSupportUtil.IsXREnabled())
@@ -195,7 +195,7 @@ namespace Leap.Unity
 
         public static Vector3 GetXRNodeHeadLocalPosition()
         {
-#if UNITY_ANDROID
+#if SVR
             if (SvrManager.Instance != null)
             {
                 if (XRSupportUtil.IsXREnabled())
@@ -232,7 +232,7 @@ namespace Leap.Unity
 
         public static Quaternion GetXRNodeHeadLocalRotation()
         {
-#if UNITY_ANDROID
+#if SVR
             if (SvrManager.Instance != null)
             {
                 if (XRSupportUtil.IsXREnabled())
@@ -269,7 +269,7 @@ namespace Leap.Unity
 
         public static Vector3 GetXRNodeLocalPosition(int node)
         {
-#if UNITY_ANDROID
+#if SVR
             if (SvrManager.Instance != null)
             {
                 Debug.LogWarning("Not implemented yet");
@@ -299,7 +299,7 @@ namespace Leap.Unity
 
         public static Quaternion GetXRNodeLocalRotation(int node)
         {
-#if UNITY_ANDROID
+#if SVR
             if (SvrManager.Instance != null)
             {
                 Debug.LogWarning("Not implemented yet");
@@ -365,7 +365,7 @@ namespace Leap.Unity
 
         public static float GetGPUTime()
         {
-#if UNITY_ANDROID
+#if SVR
             if (SvrManager.Instance != null)
             {
                 Debug.LogWarning("Not implemented for android");
@@ -388,7 +388,7 @@ namespace Leap.Unity
 
         public static string GetLoadedDeviceName()
         {
-#if UNITY_ANDROID
+#if SVR
             if (SvrManager.Instance != null)
             {
                 return "XR2_Device";
@@ -405,7 +405,7 @@ namespace Leap.Unity
         /// <summary> Returns whether there's a floor available. </summary>
         public static bool IsRoomScale()
         {
-#if UNITY_ANDROID
+#if SVR
             if (SvrManager.Instance != null)
             {
                 return true;
@@ -447,7 +447,7 @@ namespace Leap.Unity
         /// <summary> Returns whether the playspace is larger than 1m on its shortest side. </summary>
         public static bool IsLargePlayspace()
         {
-#if UNITY_ANDROID
+#if SVR
             if (SvrManager.Instance != null)
             {
                 // The current SVR support for reading the playspace dimensions is crude. Likely to be improved on by 3rd parties
