@@ -110,7 +110,6 @@ namespace Leap.Unity
             Desktop,
             Screentop,
             HMD,
-            None
         }
         [Tooltip("[Service must be >= 4.9.2!] " +
           "Which tracking mode to request that the service optimize for. " +
