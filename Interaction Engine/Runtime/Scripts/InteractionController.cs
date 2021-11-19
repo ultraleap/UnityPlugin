@@ -1266,26 +1266,6 @@ namespace Leap.Unity.Interaction
             {
                 foreach (var contactBone in contactBones)
                 {
-#if UNITY_ANDROID
-          //for(int i = 0; i < _softContactColliderBuffer.Length; i++) {
-          //  _softContactColliderBuffer[i] = null;
-          //}
-          // HACK: assume only using hands on android
-          // TODO: This probably doesn't take into accoutn ignoreContact settings
-          PhysicsUtility.generateSphereContacts(contactBone.rigidbody.position,
-                                                0.02f * manager.SimulationScale,
-                                                contactBone.rigidbody.velocity,
-                                                manager.interactionLayer.layerMask,
-                                                ref manager._softContacts,
-                                                ref manager._softContactOriginalVelocities,
-                                                ref _softContactColliderBuffer);
-
-          //for (int i = 0; i < _softContactColliderBuffer.Length; i++) {
-          //  if (_softContactColliderBuffer[i] != null) {
-          //    NotifySoftContactOverlap(contactBone, _softContactColliderBuffer[i]);
-          //  }
-          //}
-#else
                     Collider contactBoneCollider = contactBone.collider;
                     if (contactBoneCollider is SphereCollider)
                     {
@@ -1384,7 +1364,6 @@ namespace Leap.Unity.Interaction
                                                               ref manager._softContactOriginalVelocities);
                         }
                     }
-#endif
                 }
 
                 // TODO: Implement me to replace trigger colliders
