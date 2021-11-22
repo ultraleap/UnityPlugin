@@ -47,7 +47,7 @@ float2 LeapGetUndistortedUVWithOffset(float4 screenPos, float2 uvOffset) {
 #if SHADER_API_D3D11 || SHADER_API_D3D9 || SHADER_API_D3D11_9X
   // Flip vertically.
 	projection.y = -projection.y;
-	projection.w = -projection.w;
+	projection.w = -projection.w * _ProjectionParams.x;
 #endif
 
 	float2 tangent = (screenUV + projection.xy) / projection.zw;
