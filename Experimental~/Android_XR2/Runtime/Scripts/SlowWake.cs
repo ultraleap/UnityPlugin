@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
+
+#if SVR
 
 namespace Ultraleap
 {
@@ -49,3 +50,4 @@ namespace Ultraleap
         }
     }
 }
+#endif
