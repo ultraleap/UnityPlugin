@@ -309,7 +309,6 @@ namespace Leap.Unity
         {
             base.Start();
 
-
             if (_deviceOffsetMode == DeviceOffsetMode.Transform && _deviceOrigin == null)
             {
                 Debug.LogError("Cannot use the Transform device offset mode without " +
@@ -320,6 +319,15 @@ namespace Leap.Unity
             if (Application.isPlaying && _mainCamera == null && _temporalWarpingMode != TemporalWarpingMode.Off)
             {
                 Debug.LogError("Cannot perform temporal warping with no pre-cull camera.");
+            }
+
+            //Get the local tracked pose from the XR Headset so we can calculate the _trackingBaseDeltaPose from it 
+            var trackedPose = new Pose(XRSupportUtil.GetXRNodeCenterEyeLocalPosition(), XRSupportUtil.GetXRNodeCenterEyeLocalRotation());
+
+            //Find the pose delta from the "local" tracked pose to the actual camera pose, we will use this later on to maintain offsets
+            if (!_trackingBaseDeltaPose.HasValue)
+            {
+                _trackingBaseDeltaPose = _mainCamera.transform.ToLocalPose().mul(trackedPose.inverse());
             }
         }
 
@@ -425,9 +433,10 @@ namespace Leap.Unity
             {
                 //Get the local tracked pose from the XR Headset
                 trackedPose = new Pose(XRSupportUtil.GetXRNodeCenterEyeLocalPosition(), XRSupportUtil.GetXRNodeCenterEyeLocalRotation());
-                //Transform the tracked pose into the space of the camera
-                trackedPose.GetTransformedBy(_mainCamera.transform.ToPose());
 
+                //Use the _trackingBaseDeltaPose calculated on start to convert the local spaced trackedPose into a world space position
+                trackedPose = _trackingBaseDeltaPose.Value.mul(trackedPose);
+                    
 #if SVR
                 // There is no camera in the SVR prefab that is effectively at the centre position - only
                 // eye left and eye right. In this case, don't calculate a delta
