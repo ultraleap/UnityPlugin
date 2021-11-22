@@ -437,21 +437,6 @@ namespace Leap.Unity
                 //Use the _trackingBaseDeltaPose calculated on start to convert the local spaced trackedPose into a world space position
                 trackedPose = _trackingBaseDeltaPose.Value.mul(trackedPose);
                     
-#if SVR
-                // There is no camera in the SVR prefab that is effectively at the centre position - only
-                // eye left and eye right. In this case, don't calculate a delta
-                // If we don't know of any pose offset yet, account for it by finding
-                // the pose delta from the tracked pose to the actual camera
-                // pose.
-                if (!_trackingBaseDeltaPose.HasValue)
-                {
-                    _trackingBaseDeltaPose = _mainCamera.transform.ToLocalPose().mul(
-                                                trackedPose.inverse());
-                }
-
-                // This way, we always track a scene-space tracked pose.
-                trackedPose = _trackingBaseDeltaPose.Value.mul(trackedPose);
-#endif
             }
             else if (_deviceOffsetMode == DeviceOffsetMode.Transform)
             {
