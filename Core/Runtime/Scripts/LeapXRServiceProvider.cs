@@ -129,8 +129,8 @@ namespace Leap.Unity
 
         public Camera mainCamera
         {
-            get { return MainCameraProvider.Instance.mainCamera; }
-            set { MainCameraProvider.Instance.mainCamera = value; }
+            get { return MainCameraProvider.mainCamera; }
+            set { _mainCamera = value; }
         }
 
         // Temporal Warping
@@ -239,7 +239,7 @@ namespace Leap.Unity
             editTimePose = TestHandFactory.TestHandPose.HeadMountedB;
 
             _interactionVolumeVisualization = InteractionVolumeVisualization.Automatic;
-            _mainCamera = MainCameraProvider.Instance.mainCamera;
+            _mainCamera = MainCameraProvider.mainCamera;
             if (_mainCamera != null)
             {
                 Debug.Log("Camera.Main automatically assigned");

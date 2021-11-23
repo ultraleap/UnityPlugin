@@ -65,7 +65,7 @@ namespace Leap.Unity
         {
             if (fadedIn > 0)
             {
-                Camera cam = MainCameraProvider.Instance.mainCamera;
+                Camera cam = MainCameraProvider.mainCamera;
                 Vector3 pos = cam.transform.position + cam.transform.forward * distanceToCamera;
                 transform.position = pos;
                 transform.LookAt(cam.transform);

@@ -25,9 +25,13 @@ namespace Leap.Unity
 
             if (_mainCamera.objectReferenceValue == null)
             {
-                _mainCamera.objectReferenceValue = MainCameraProvider.Instance.mainCamera;
+                _mainCamera.objectReferenceValue = MainCameraProvider.mainCamera;
                 serializedObject.ApplyModifiedProperties();
-                Debug.Log("Camera.Main automatically assigned");
+
+                if(_mainCamera.objectReferenceValue != null)
+                {
+                    Debug.Log("Camera.Main automatically assigned");
+                }
             }
 
             base.OnEnable();
@@ -104,7 +108,7 @@ namespace Leap.Unity
         {
             LeapXRServiceProvider xrProvider = target as LeapXRServiceProvider;
 
-            if (xrProvider.mainCamera == null) 
+            if (_mainCamera.objectReferenceValue == null) 
             { 
                 return;
             }

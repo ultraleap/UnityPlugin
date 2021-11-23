@@ -174,12 +174,12 @@ namespace Leap.Unity
             switch (PointingType)
             {
                 case PointingType.RelativeToHorizon:
-          Quaternion cameraRot = MainCameraProvider.Instance.mainCamera.transform.rotation;
+          Quaternion cameraRot = MainCameraProvider.mainCamera.transform.rotation;
                     float cameraYaw = cameraRot.eulerAngles.y;
                     Quaternion rotator = Quaternion.AngleAxis(cameraYaw, Vector3.up);
                     return rotator * PointingDirection;
                 case PointingType.RelativeToCamera:
-          return MainCameraProvider.Instance.mainCamera.transform.TransformDirection(PointingDirection);
+          return MainCameraProvider.mainCamera.transform.TransformDirection(PointingDirection);
                 case PointingType.RelativeToWorld:
                     return PointingDirection;
                 case PointingType.AtTarget:

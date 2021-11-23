@@ -68,7 +68,7 @@ namespace Leap.Unity.Interaction
                 // every frame, so it's unusable.
                 _isTrackingController = position != Vector3.zero && rotation != Quaternion.identity;
 
-                Transform rigTransform = MainCameraProvider.Instance.mainCamera.transform.parent;
+                Transform rigTransform = MainCameraProvider.mainCamera.transform.parent;
                 if (rigTransform != null)
                 {
                     position = rigTransform.TransformPoint(position);
