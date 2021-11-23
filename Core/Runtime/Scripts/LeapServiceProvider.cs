@@ -750,7 +750,7 @@ namespace Leap.Unity
         /// </summary>
         protected void createController()
         {
-#if UNITY_ANDROID
+#if SVR
             var bindStatus = CreateAndroidBinding();
             if (!bindStatus)
                 return;
@@ -856,7 +856,7 @@ namespace Leap.Unity
         {
             initializeFlags();
 
-#if UNITY_ANDROID
+#if SVR
             InitClockRebaser();
 #endif
 

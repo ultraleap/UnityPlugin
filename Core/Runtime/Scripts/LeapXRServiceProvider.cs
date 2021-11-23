@@ -221,10 +221,7 @@ namespace Leap.Unity
         protected Vector3 warpedPosition = Vector3.zero;
         protected Quaternion warpedRotation = Quaternion.identity;
         protected Matrix4x4[] _transformArray = new Matrix4x4[2];
-
-#if !UNITY_ANDROID
         private Pose? _trackingBaseDeltaPose = null;
-#endif
 
         [NonSerialized]
         public long imageTimeStamp = 0;
@@ -433,7 +430,6 @@ namespace Leap.Unity
             {
                 //Get the local tracked pose from the XR Headset
                 trackedPose = new Pose(XRSupportUtil.GetXRNodeCenterEyeLocalPosition(), XRSupportUtil.GetXRNodeCenterEyeLocalRotation());
-
                 //Use the _trackingBaseDeltaPose calculated on start to convert the local spaced trackedPose into a world space position
                 trackedPose = _trackingBaseDeltaPose.Value.mul(trackedPose);
                     
