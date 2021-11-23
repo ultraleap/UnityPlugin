@@ -124,7 +124,7 @@ namespace Leap.Unity
 
         [Tooltip("Specifies the main camera. Required for XR2 based platforms. "
                + "Falls back to Camera.main if not set")]
-        [SerializeField, OnEditorChange("mainCamera")]
+        [SerializeField]
         private Camera _mainCamera; // Redundant backing field, used to present value in editor at parent level
 
         public Camera mainCamera
