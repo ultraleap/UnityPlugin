@@ -9,12 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [5.0.0] - Release date TBC
 ### Added
 - Support for Unity HDRP and URP
-  - Materials and shaders in all examples
-  - Hands module shaders for outline, ghost and skeleton hands
+- Materials and shaders in all examples
+- Hands module shaders for outline, ghost and skeleton hands
 - `Service Provider` (XR, Desktop and Screentop) prefabs
 - `Image Retriever` prefab
 - `HandModels` prefab
 - Experimental support for Qualcomm Snapdragon XR2 based headsets
+- MainCameraProvider.cs to get the camera on Android platforms
 
 ### Changed
 - Reorganized the repository layout to adhere to [UPM Package Structure](https://docs.unity3d.com/Manual/cus-layout.html)
@@ -28,6 +29,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - EnableDepthBuffer
 - Reworked how adding hands to a scene works - hands can be added easily. Any type derived from `HandModelBase` can be added directly into the scene and linked with a `LeapProvider` to begin tracking immediately.
 - Frame.Get to Frame.GetHandWithChirality.
+- Leap Motion Unity Modules Window
+
 
 ### Removed
 - `HandModelManager` MonoBehaviour
@@ -52,6 +55,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Hand position jumps when using OVRProvider [[UnityModules#1054]](https://github.com/leapmotion/UnityModules/issues/1054) 
+- Initializing contact bones of XR controller 
+- enableContactBoneCollision() called unnecessarily often 
+- ClearContactTracking() doesn't clear a pooled Hashset before calling Recycle()
+- Remove additional audio listeners in example scenes
+- Clipping plane in example scenes is not set close enough, Hands models are being clipped
+- Images not seen in Core examples - Capsule hands (VR - Infrared Viewer)
+
 
 ## [4.9.1 and older]
 
