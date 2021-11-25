@@ -29,11 +29,11 @@ namespace Leap.Unity
         [SerializeField]
         private bool _showEyePositions = false;
 
-        [SerializeField] private LeapServiceProvider _provider;
+        [SerializeField] private LeapServiceProvider _provider = null;
         private Maybe<float> _deviceBaseline = Maybe.None;
         private bool _hasVisitedPreCull = false;
 
-        [SerializeField] private Camera _camera;
+        [SerializeField] private Camera _camera = null;
 
         private void onDevice(Device device)
         {
@@ -91,6 +91,10 @@ namespace Leap.Unity
             }
             else
             {
+                if(_deviceBaseline == Maybe.None)
+                {
+                    _provider.OnDeviceSafe += onDevice;
+                }
                 baselineToUse = _deviceBaseline;
             }
 
@@ -120,7 +124,7 @@ namespace Leap.Unity
             Vector3 providerForwardOffset = Vector3.zero,
                     providerVerticalOffset = Vector3.zero;
             Quaternion providerRotation = Quaternion.Euler(0f, 180f, 0f);
-            if (_provider is LeapXRServiceProvider)
+            if (_provider is LeapXRServiceProvider || _provider.GetType().BaseType == typeof(LeapXRServiceProvider))
             {
                 LeapXRServiceProvider _xrProvider = _provider as LeapXRServiceProvider;
                 providerForwardOffset = Vector3.forward * _xrProvider.deviceOffsetZAxis;

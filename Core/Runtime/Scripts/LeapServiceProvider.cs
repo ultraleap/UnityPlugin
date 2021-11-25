@@ -185,11 +185,17 @@ namespace Leap.Unity
         {
             add
             {
-                if (_leapController != null && _leapController.IsConnected)
+                if (_leapController != null)
                 {
-                    foreach (var device in _leapController.Devices)
+                    _leapController.Device += (a0, a1) => {
+                        value(a1.Device);
+                    };
+                    if (_leapController.IsConnected)
                     {
-                        value(device);
+                        foreach (var device in _leapController.Devices)
+                        {
+                            value(device);
+                        }
                     }
                 }
                 _onDeviceSafe += value;

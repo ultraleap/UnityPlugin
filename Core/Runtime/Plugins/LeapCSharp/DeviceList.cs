@@ -55,6 +55,7 @@ namespace Leap
 
                 for (int d = 0; d < Count; d++)
                 {
+                    this[d].UpdateStatus(LeapInternal.eLeapDeviceStatus.eLeapDeviceStatus_Streaming);
                     if (this[d].IsStreaming)
                     {
                         return this[d];

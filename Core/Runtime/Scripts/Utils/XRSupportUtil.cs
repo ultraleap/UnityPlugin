@@ -9,6 +9,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+#if XR_MANAGEMENT_AVAILABLE
+using UnityEngine.XR.Management;
+#endif
+
 #if UNITY_2017_2_OR_NEWER
 using UnityEngine.XR;
 #else
@@ -44,7 +48,9 @@ namespace Leap.Unity
             }
 #endif
 
-#if UNITY_2017_2_OR_NEWER
+#if XR_MANAGEMENT_AVAILABLE
+            return XRGeneralSettings.Instance.Manager != null;
+#elif UNITY_2017_2_OR_NEWER
             return XRSettings.enabled;
 #else
             return VRSettings.enabled;
@@ -60,7 +66,9 @@ namespace Leap.Unity
             }
 #endif
 
-#if UNITY_2020_1_OR_NEWER
+#if XR_MANAGEMENT_AVAILABLE
+            return XRGeneralSettings.Instance.Manager.activeLoader != null;
+#elif UNITY_2020_1_OR_NEWER
             return XRSettings.isDeviceActive;
 #elif UNITY_2017_2_OR_NEWER
             return XRDevice.isPresent;

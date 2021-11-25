@@ -46,6 +46,10 @@ namespace Leap.Unity
         private long _prevSequenceId;
         private bool _needQueueReset;
 
+        // If image IDs from the libtrack server do not reset with the Visualiser, it triggers out-of-sequence
+        // checks and we lose images. Detecting this and setting an offset allows us to compensate.
+        private long _frameIDOffset = -1;
+
         public EyeTextureData TextureData
         {
             get
@@ -321,7 +325,10 @@ namespace Leap.Unity
             Controller controller = _provider.GetLeapController();
             if (controller != null)
             {
-                _provider.GetLeapController().DistortionChange -= onDistortionChange;
+                controller.DistortionChange -= onDistortionChange;
+                controller.Disconnect -= onDisconnect;
+                controller.ImageReady -= onImageReady;
+                controller.FrameReady -= onFrameReady;
             }
 #if UNITY_2019_3_OR_NEWER
             //SRP require subscribing to RenderPipelineManagers
@@ -361,6 +368,15 @@ namespace Leap.Unity
             Image potentialImage;
             while (_imageQueue.TryPeek(out potentialImage))
             {
+                if (_frameIDOffset == -1) // Initialise to incoming image ID
+                {
+                    _frameIDOffset = potentialImage.SequenceId + 1;
+
+                    if (_frameIDOffset != 0)
+                    {
+                        Debug.LogWarning("Incoming image ID was " + potentialImage.SequenceId + " but we expected zero. Compensating..");
+                    }
+                }
                 if (potentialImage.SequenceId > imageFrame.Id)
                 {
                     break;
@@ -413,9 +429,12 @@ namespace Leap.Unity
             if (controller != null)
             {
                 controller.ClearPolicy(Controller.PolicyFlag.POLICY_IMAGES);
+                controller.Disconnect -= onDisconnect;
                 controller.ImageReady -= onImageReady;
                 controller.DistortionChange -= onDistortionChange;
+                controller.FrameReady -= onFrameReady;
             }
+            _eyeTextureData.MarkStale();
         }
 
         private Coroutine _serviceCoroutine = null;
@@ -428,7 +447,8 @@ namespace Leap.Unity
                 yield return null;
             } while (controller == null);
 
-            controller.SetPolicy(Controller.PolicyFlag.POLICY_IMAGES);
+            controller.FrameReady += onFrameReady;
+            controller.Disconnect += onDisconnect;
             controller.ImageReady += onImageReady;
             controller.DistortionChange += onDistortionChange;
         }
@@ -453,6 +473,20 @@ namespace Leap.Unity
                 _needQueueReset = true;
             }
             _prevSequenceId = image.SequenceId;
+        }
+
+        private void onFrameReady(object sender, FrameEventArgs args)
+        {
+            var controller = _provider.GetLeapController();
+            controller.FrameReady -= onFrameReady;
+            controller.SetPolicy(Controller.PolicyFlag.POLICY_IMAGES);
+        }
+
+        private void onDisconnect(object sender, ConnectionLostEventArgs args)
+        {
+            var controller = _provider.GetLeapController();
+            controller.FrameReady += onFrameReady;
+            controller.ClearPolicy(Controller.PolicyFlag.POLICY_IMAGES);
         }
 
         public void ApplyGammaCorrectionValues()

@@ -779,6 +779,14 @@ namespace LeapInternal
             _activePolicies = policyMsg.current_policy;
         }
 
+        public void SetAndClearPolicy(Controller.PolicyFlag set, Controller.PolicyFlag clear)
+        {
+            UInt64 setFlags = (ulong)FlagForPolicy(set);
+            UInt64 clearFlags = (ulong)FlagForPolicy(clear);
+            eLeapRS result = LeapC.SetPolicyFlags(_leapConnection, setFlags, clearFlags);
+            reportAbnormalResults("LeapC SetAndClearPolicy call was ", result);
+        }
+
         public void SetPolicy(Controller.PolicyFlag policy)
         {
             UInt64 setFlags = (ulong)FlagForPolicy(policy);

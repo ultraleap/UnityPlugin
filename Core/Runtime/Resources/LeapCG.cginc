@@ -46,6 +46,7 @@ float2 LeapGetUndistortedUVWithOffset(float4 screenPos, float2 uvOffset) {
 	// Fix: OpenGL -> D3D origin
 #if SHADER_API_D3D11 || SHADER_API_D3D9 || SHADER_API_D3D11_9X
   // Flip vertically.
+  // Multiplication by _ProjectionParams.x is here for the case where this is negative
 	projection.y = -projection.y;
 	projection.w = -projection.w * _ProjectionParams.x;
 #endif

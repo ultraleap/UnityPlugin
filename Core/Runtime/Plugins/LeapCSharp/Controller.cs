@@ -88,11 +88,12 @@ namespace Leap
         {
             add
             {
-                if (_hasConnected)
-                    value(this, new ConnectionEventArgs());
-                _connect += value;
+                _connection.LeapConnection += value;
             }
-            remove { _connect -= value; }
+            remove
+            {
+                _connection.LeapConnection -= value;
+            }
         }
 
         private bool _hasConnected = false;
@@ -503,6 +504,10 @@ namespace Leap
         /// the change was accepted. 
         /// @since 2.1.6 
         /// </summary>
+        public void SetAndClearPolicy(PolicyFlag set, PolicyFlag clear)
+        {
+            _connection.SetAndClearPolicy(set, clear);
+        }
         public void SetPolicy(PolicyFlag policy)
         {
             _connection.SetPolicy(policy);
