@@ -322,6 +322,7 @@ namespace Leap.Unity
         private void OnDestroy()
         {
             StopAllCoroutines();
+
             Controller controller = _provider.GetLeapController();
             if (controller != null)
             {
@@ -478,15 +479,21 @@ namespace Leap.Unity
         private void onFrameReady(object sender, FrameEventArgs args)
         {
             var controller = _provider.GetLeapController();
-            controller.FrameReady -= onFrameReady;
-            controller.SetPolicy(Controller.PolicyFlag.POLICY_IMAGES);
+            if (controller != null)
+            {
+                controller.FrameReady -= onFrameReady;
+                controller.SetPolicy(Controller.PolicyFlag.POLICY_IMAGES);
+            }
         }
 
         private void onDisconnect(object sender, ConnectionLostEventArgs args)
         {
             var controller = _provider.GetLeapController();
-            controller.FrameReady += onFrameReady;
-            controller.ClearPolicy(Controller.PolicyFlag.POLICY_IMAGES);
+            if (controller != null)
+            {
+                controller.FrameReady += onFrameReady;
+                controller.ClearPolicy(Controller.PolicyFlag.POLICY_IMAGES);
+            }
         }
 
         public void ApplyGammaCorrectionValues()
