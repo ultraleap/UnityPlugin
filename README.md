@@ -31,25 +31,24 @@
 
 ## Introduction
 
-Ultraleap's Unity Plugin enables the data produced by integrating Ultraleap's hand tracking data to be used by developers inside their Unity projects. It includes various utilities, examples and prefabs that make it as easy as possible to design and use hand tracking in XR projects. Examples are included to quickly get you up and running with Ultraleap's hand tracking technology.
+The Ultraleap Hand Tracking Plugin for Unity enables Ultraleap's hand tracking data to be used by developers inside their Unity projects. It includes various utilities, examples, and prefabs that make it as easy as possible to design and use hand tracking in XR projects. Examples are included to quickly get you up and running with Ultraleap's hand tracking technology.
 
 ## Getting Started
 
-This repository contains code for Ultraleap's Unity Plugin which has been designed to be an easy-to-use tool for integrating Ultraleap cameras into new Unity projects. However, there are a couple of things you will need to be able to test the content you have created, and there are also several ways you can go about installing Ultraleap’s Unity Plugin. 
+This repository contains code for Ultraleap's Unity Plugin – an easy-to-use tool for integrating Ultraleap Hand Tracking Cameras into new Unity projects. There are a couple of things you will need to be able to test the content you have created, and there are also several ways you can go about installing Ultraleap’s Unity Plugin. 
 
-### Prerequisites
-
-*N.B. This plugin only supports 64-bit Windows builds*
+### Requirements
 
 To use this Plugin you will need the following:
 
-1. The latest Ultraleap Tracking Service installed
-2. An Ultraleap compatible device 
+1. The latest Ultraleap Hand Tracking Software
+2. An Ultraleap Hand Tracking Camera
 3. Unity 2019.4 LTS or newer
+4. Windows® 10, 64-bit
 
 ### Installation
 
-The Unity Plugin repository is designed and tested to work against 2019.4 LTS and 2020.3 LTS. 
+The UnityPlugin repository is designed and tested to work against 2019.4 LTS and 2020.3 LTS. 
 
 There are several ways you can consume this plugin. We've listed several recommended workflows for different users below. This list is by no means exhaustive - if you are aware of a workflow not listed that you think others would appreciate, please consider contributing!
 
@@ -60,11 +59,11 @@ There are several ways you can consume this plugin. We've listed several recomme
 Consumer workflows are recommended for UnityPlugin users that don't require the ability to contribute back to the source repository.
 
 <details>
-<summary> UPM Package via OpenUPM (Recommended) </summary>
+<summary> UPM Package via OpenUPM </summary>
 
 ##### OpenUPM Summary
 
-This workflow is the easy to get up and running and makes updating packages simple.
+This workflow is the easiest way to get up and running and makes updating packages simple.
 
 ##### OpenUPM Setup
 
