@@ -374,7 +374,7 @@ dependencies-libtrack:
 
   variables:
     PLUGIN_LIBS_PATH: "$UNITY_PROJECT_UNITYPLUGIN_ASSETS_PATH/Core/Runtime/Plugins"
-    UNITYPACKAGES_OUTPUT_PATH: "$CI_PROJECT_DIR/$ARTIFACTS_PATH_UNITY_PROJECT/UnityPackages"
+    UNITYPACKAGES_OUTPUT_PATH: "$CI_PROJECT_DIR/$ARTIFACTS_PATH_UNITY_PROJECT/Ultraleap.UnityPlugin"
 
     # These are the paths that the corresponding .unitypackage will export within the project
     UNITYPACKAGE_EXPORT_PATH_Tracking:                  "$UNITYPLUGIN_ASSETS_PATH/Tracking"
