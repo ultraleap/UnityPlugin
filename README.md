@@ -29,6 +29,9 @@
 <!--content-->
 # Ultraleap Unity Plugin
 
+[![openupm-tracking](https://img.shields.io/npm/v/com.ultraleap.tracking?label=OpenUPM%20Tracking&registry_uri=https://package.openupm.com)](https://openupm.com/packages/com.ultraleap.tracking/)
+[![openupm-tracking-preview](https://img.shields.io/npm/v/com.ultraleap.tracking.preview?label=OpenUPM%20Tracking%20Preview&registry_uri=https://package.openupm.com)](https://openupm.com/packages/com.ultraleap.tracking.preview/)
+
 ## Introduction
 
 The Ultraleap Hand Tracking Plugin for Unity enables Ultraleap's hand tracking data to be used by developers inside their Unity projects. It includes various utilities, examples, and prefabs that make it as easy as possible to design and use hand tracking in XR projects. Examples are included to quickly get you up and running with Ultraleap's hand tracking technology.
