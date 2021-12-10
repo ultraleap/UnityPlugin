@@ -6,8 +6,6 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Leap.Unity.Attributes;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -55,28 +53,14 @@ namespace Leap.Unity.Interaction
 
         public bool Add(Anchor anchor)
         {
-            if (_anchors.Add(anchor))
-            {
-                anchor.groups.Add(this);
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            anchor.groups.Add(this);
+            return _anchors.Add(anchor);
         }
 
         public bool Remove(Anchor anchor)
         {
-            if (_anchors.Remove(anchor))
-            {
-                anchor.groups.Remove(this);
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            anchor.groups.Remove(this);
+            return _anchors.Remove(anchor);
         }
 
         public void NotifyAnchorableObjectAdded(AnchorableBehaviour anchObj)
@@ -86,7 +70,7 @@ namespace Leap.Unity.Interaction
 
         public void NotifyAnchorableObjectRemoved(AnchorableBehaviour anchObj)
         {
-            anchorableObjects.Add(anchObj);
+            anchorableObjects.Remove(anchObj);
         }
 
     }

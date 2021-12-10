@@ -7,12 +7,9 @@
  ******************************************************************************/
 
 using Leap.Unity.Attributes;
-using Leap.Unity.Interaction;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Events;
 
 namespace Leap.Unity.Interaction
 {
@@ -93,7 +90,7 @@ namespace Leap.Unity.Interaction
                 {
                     if (IsValidAnchor(value))
                     {
-                        if (_anchor != null)
+                        if (_anchor != null && _isAttached)
                         {
                             OnDetachedFromAnchor.Invoke();
                             _anchor.NotifyDetached(this);
@@ -131,16 +128,23 @@ namespace Leap.Unity.Interaction
             get { return _anchorGroup; }
             set
             {
-                if (_anchorGroup != null) _anchorGroup.NotifyAnchorableObjectRemoved(this);
+                if (_anchorGroup != null)
+                {
+                    _anchorGroup.NotifyAnchorableObjectRemoved(this);
+                }
 
                 _anchorGroup = value;
+
                 if (anchor != null && !_anchorGroup.Contains(anchor))
                 {
                     anchor = null;
                     Debug.LogWarning(this.name + "'s anchor is not within its anchorGroup (setting it to null).", this.gameObject);
                 }
 
-                if (_anchorGroup != null) _anchorGroup.NotifyAnchorableObjectAdded(this);
+                if (_anchorGroup != null)
+                {
+                    _anchorGroup.NotifyAnchorableObjectAdded(this);
+                }
             }
         }
 
@@ -329,6 +333,11 @@ namespace Leap.Unity.Interaction
             refreshInteractionBehaviour();
             refreshInspectorConveniences();
 
+            if (anchorGroup != null)
+            {
+                anchorGroup.NotifyAnchorableObjectAdded(this);
+            }
+
             if (interactionBehaviour != null)
             {
                 interactionBehaviour.OnGraspBegin += detachAnchorOnGraspBegin;
@@ -420,7 +429,10 @@ namespace Leap.Unity.Interaction
             _interactionBehaviourIsNull = interactionBehaviour == null;
 
             detachWhenGrasped = !_interactionBehaviourIsNull;
-            if (_interactionBehaviourIsNull) useTrajectory = false;
+            if (_interactionBehaviourIsNull)
+            {
+                useTrajectory = false;
+            }
         }
 
         /// <summary>
@@ -439,6 +451,11 @@ namespace Leap.Unity.Interaction
         /// </summary>
         public bool IsValidAnchor(Anchor anchor)
         {
+            if (anchor == null)
+            {
+                return true;
+            }
+
             if (this.anchorGroup != null)
             {
                 return this.anchorGroup.Contains(anchor);
@@ -488,7 +505,10 @@ namespace Leap.Unity.Interaction
                     testScore = getAnchorScore(anchor);
 
                     // Scores of 0 mark ineligible anchors.
-                    if (testScore == 0F) continue;
+                    if (testScore == 0F)
+                    {
+                        continue;
+                    }
 
                     if (testScore > optimalScore)
                     {
@@ -529,7 +549,10 @@ namespace Leap.Unity.Interaction
             foreach (var anchor in anchorsToCheck)
             {
                 if ((requireAnchorHasSpace && (!anchor.allowMultipleObjects && anchor.anchoredObjects.Count != 0))
-                    || (requireAnchorActiveAndEnabled && !anchor.isActiveAndEnabled)) continue;
+                    || (requireAnchorActiveAndEnabled && !anchor.isActiveAndEnabled))
+                {
+                    continue;
+                }
 
                 if ((anchor.transform.position - this.transform.position).sqrMagnitude <= maxAnchorRange * maxAnchorRange)
                 {
@@ -723,7 +746,10 @@ namespace Leap.Unity.Interaction
                     Hand hoveringHand = interactionBehaviour.closestHoveringHand;
                     hoverTarget = hoveringHand.PalmPosition.ToVector3();
                 }
-                else hoverTarget = hoveringController.hoverPoint;
+                else
+                {
+                    hoverTarget = hoveringController.hoverPoint;
+                }
 
                 reachTargetAmount = Mathf.Clamp01(attractionReachByDistance.Evaluate(
                    Vector3.Distance(hoverTarget, anchor.transform.position)));
@@ -945,6 +971,13 @@ namespace Leap.Unity.Interaction
 
         private void initUnityEvents()
         {
+            // If the interaction component is added at runtime, _eventTable won't have been
+            // constructed yet.
+            if (_eventTable == null)
+            {
+                _eventTable = new EnumEventTable();
+            }
+
             setupCallback(ref OnAttachedToAnchor, EventType.OnAttachedToAnchor);
             setupCallback(ref OnLockedToAnchor, EventType.OnLockedToAnchor);
             setupCallback(ref OnDetachedFromAnchor, EventType.OnDetachedFromAnchor);
@@ -958,6 +991,10 @@ namespace Leap.Unity.Interaction
             if (_eventTable.HasUnityEvent((int)type))
             {
                 action += () => _eventTable.Invoke((int)type);
+            }
+            else
+            {
+                action += () => { };
             }
         }
 

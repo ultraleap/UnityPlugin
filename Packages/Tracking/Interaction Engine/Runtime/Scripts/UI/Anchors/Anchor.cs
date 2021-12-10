@@ -6,13 +6,9 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Leap.Unity.Attributes;
-using Leap.Unity.RuntimeGizmos;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Events;
 
 namespace Leap.Unity.Interaction
 {
@@ -132,10 +128,12 @@ namespace Leap.Unity.Interaction
 
         void OnDestroy()
         {
-            foreach (var group in groups)
+            var tempGroups = new HashSet<AnchorGroup>(groups);
+            foreach (var group in tempGroups)
             {
                 group.Remove(this);
             }
+            groups.Clear();
 
             allAnchors.Remove(this);
         }
@@ -214,7 +212,10 @@ namespace Leap.Unity.Interaction
         {
             foreach (var dir in worldDirs)
             {
-                if (dir == Vector3.forward) continue;
+                if (dir == Vector3.forward)
+                {
+                    continue;
+                }
                 Utils.DrawCircle(pos, dir, radius, AnchorGizmoColor, quality: 24, depthTest: true);
             }
         }
