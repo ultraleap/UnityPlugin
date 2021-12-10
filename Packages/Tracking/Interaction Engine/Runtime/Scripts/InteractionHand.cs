@@ -488,14 +488,23 @@ namespace Leap.Unity.Interaction
 
         private void initContactBoneContainer()
         {
-            if (_contactBoneParent != null) Destroy(_contactBoneParent);
+            if (_contactBoneParent != null)
+            {
+                Destroy(_contactBoneParent);
+            }
             string name = (_unwarpedHandData.IsLeft ? "Left" : "Right") + " Interaction Hand Contact Bones";
             _contactBoneParent = new GameObject(name);
         }
 
         private void initContactBones()
         {
-            if (_contactBones != null) for (int i = 0; i < _contactBones.Length; i++) Destroy(_contactBones[i]);
+            if (_contactBones != null)
+            {
+                for (int i = 0; i < _contactBones.Length; i++)
+                {
+                    Destroy(_contactBones[i]);
+                }
+            }
 
             _contactBones = new ContactBone[NUM_FINGERS * BONES_PER_FINGER + 1];
             _handContactBoneMapFunctions = new BoneMapFunc[NUM_FINGERS * BONES_PER_FINGER + 1];
@@ -533,7 +542,10 @@ namespace Leap.Unity.Interaction
                     capsule.height = bone.Length + bone.Width;
                     capsule.material = defaultContactBoneMaterial;
 
-                    if (OnlyInitialiseIndexFinger) capsule.enabled = (fingerIndex == 1 && (jointIndex == 2 || jointIndex == 1));
+                    if (OnlyInitialiseIndexFinger)
+                    {
+                        capsule.enabled = (fingerIndex == 1 && (jointIndex == 2 || jointIndex == 1));
+                    }
                     ContactBone contactBone = initContactBone(bone, contactBoneObj, boneArrayIndex, capsule);
 
                     contactBone.lastTargetPosition = bone.Center.ToVector3();
@@ -564,7 +576,10 @@ namespace Leap.Unity.Interaction
                 box.size = new Vector3(bone.Length, bone.Width, bone.Length);
                 box.material = defaultContactBoneMaterial;
 
-                if (OnlyInitialiseIndexFinger) box.enabled = false;
+                if (OnlyInitialiseIndexFinger)
+                {
+                    box.enabled = false;
+                }
                 initContactBone(null, contactBoneObj, boneArrayIndex, box);
             }
 
