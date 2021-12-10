@@ -47,6 +47,12 @@ stages:
   before_script:
     - New-Item -Path "$ARTIFACTS_PATH" -ItemType Directory -Force
 
+.optional_on_merge_request_except_to_main:
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME != "main"'
+      when: manual
+      allow_failure: true
+
 # -----------------------------------------------------------------------------
 # Formatting
 # -----------------------------------------------------------------------------
@@ -124,6 +130,10 @@ dependencies-libtrack:
   extends: .base
   stage: build
   needs: []
+
+  rules:
+    - !reference [.optional_on_merge_request_except_to_main, rules]
+    - when: on_success
 
   variables:
     LIBTRACK_ROOT_URL: "https://gitlab.ultrahaptics.com/api/v4/projects/leap-v5-platform%2Flibtrack"
@@ -369,10 +379,8 @@ dependencies-libtrack:
   stage: build
 
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME != "main"'
-      when: manual
-      allow_failure: true
-    - when: always
+    - !reference [.optional_on_merge_request_except_to_main, rules]
+    - when: on_success
 
   needs:
    - job: dependencies-libtrack
