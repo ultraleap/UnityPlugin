@@ -18,7 +18,6 @@ namespace Leap.LeapCSharp.Tests
         public TestObjectType(int t) { id = t; }
     }
 
-    [TestFixture]
     public class CircularObjectBufferTests
     {
         [Test]
