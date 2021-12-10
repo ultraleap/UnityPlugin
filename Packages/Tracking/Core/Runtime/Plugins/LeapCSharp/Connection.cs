@@ -75,7 +75,6 @@ namespace LeapInternal
         private Thread _polster;
 
         //Policy and enabled features
-        private UInt64 _requestedPolicies = 0;
         private UInt64 _activePolicies = 0;
 
         //Config change status

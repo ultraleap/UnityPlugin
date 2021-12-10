@@ -97,6 +97,9 @@ namespace Leap
         }
 
         private bool _hasConnected = false;
+
+        public bool IsConnected => _hasConnected;
+
         private EventHandler<ConnectionEventArgs> _connect;
 
         /// <summary>
