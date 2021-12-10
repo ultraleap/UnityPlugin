@@ -117,7 +117,7 @@ namespace Leap.Unity
 
         public virtual void OnSceneGUI()
         {
-            if(target == null)
+            if (target == null)
             {
                 return;
             }

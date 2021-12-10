@@ -6,8 +6,8 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using System;
 using Leap.Unity.InputModule;
+using System;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -16,7 +16,7 @@ public class SoundOverrides : MonoBehaviour
     // Event delegates triggered by Input
     [Serializable]
     public class PositionEvent : UnityEvent<Vector3> { }
-    
+
     [SerializeField] private UIInputModule module;
 
     [Header(" Event Setup")]
@@ -32,15 +32,15 @@ public class SoundOverrides : MonoBehaviour
     //The event that is triggered upon hovering over a non-canvas UI element.
     [Tooltip("The event that is triggered upon hovering over a non-canvas UI element.")]
     [SerializeField] PositionEvent onBeginHover;
-        
+
     //The event that is triggered upon hovering over a non-canvas UI element.
     [Tooltip("The event that is triggered upon ending hovering over a non-canvas UI element.")]
     [SerializeField] PositionEvent onEndHover;
-    
+
     //The event that is triggered upon hovering over a non-canvas UI element.
     [Tooltip("The event that is triggered upon missing a non-canvas UI element.")]
     [SerializeField] PositionEvent onBeginMissed;
-    
+
     //The event that is triggered upon hovering over a non-canvas UI element.
     [Tooltip("The event that is triggered upon ending missing a non-canvas UI element.")]
     [SerializeField] PositionEvent onEndMissed;
@@ -51,7 +51,7 @@ public class SoundOverrides : MonoBehaviour
     private void OnEndHover(object sender, Vector3 pos) => onEndHover?.Invoke(pos);
     private void OnBeginMissed(object sender, Vector3 pos) => onBeginMissed?.Invoke(pos);
     private void OnEndMissed(object sender, Vector3 pos) => onEndMissed?.Invoke(pos);
-    
+
     private void OnEnable()
     {
         if (!module)
@@ -69,8 +69,8 @@ public class SoundOverrides : MonoBehaviour
             eventHandler.OnBeginMissed += OnBeginMissed;
             eventHandler.OnEndMissed += OnEndMissed;
         }
-    }    
-    
+    }
+
     private void OnDisable()
     {
         if (!module)

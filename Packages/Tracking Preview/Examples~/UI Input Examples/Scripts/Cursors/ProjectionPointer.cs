@@ -14,7 +14,7 @@ public class ProjectionPointer : MonoBehaviour
     LeapProvider leapDataProvider;
 
     private Hand hand;
-    
+
     public float lerpSpeed = 10;
 
     private void Awake()
@@ -29,22 +29,21 @@ public class ProjectionPointer : MonoBehaviour
         {
             return;
         }
-        
+
         if (hand == null)
         {
             return;
         }
-        
+
         var projection = module.ProjectionOriginProvider;
         if (projection == null)
         {
             return;
         }
-        
+
         var source = projection.ProjectionOriginForHand(hand);
         var target = cursor.transform.position;
         line.SetPosition(0, source);
         line.SetPosition(1, target);
     }
 }
-

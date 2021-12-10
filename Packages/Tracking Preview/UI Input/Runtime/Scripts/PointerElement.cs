@@ -21,13 +21,13 @@ namespace Leap.Unity.InputModule
     public class PointerElement : MonoBehaviour
     {
         #region Properties
-        
+
         public event Action<PointerElement, Hand> OnPointerStateChanged;
         public event Action<bool> On;
-        
+
         private Camera mainCamera;
         private LeapProvider leapDataProvider;
-        
+
         [SerializeField] private EventSystem eventSystem;
         [SerializeField] private UIInputModule module;
         [SerializeField] private UIInputCursor cursor;
@@ -53,7 +53,7 @@ namespace Leap.Unity.InputModule
 
         private List<RaycastResult> _raycastResultCache = new List<RaycastResult>();
 
-        private static readonly Dictionary<(PointerStates from, PointerStates to), Action<IInputModuleEventHandler, PointerElement>> StateChangeActionMap 
+        private static readonly Dictionary<(PointerStates from, PointerStates to), Action<IInputModuleEventHandler, PointerElement>> StateChangeActionMap
             = new Dictionary<(PointerStates prev, PointerStates pointer), Action<IInputModuleEventHandler, PointerElement>>()
         {
             {(PointerStates.OnCanvas, PointerStates.OnElement), (module, pointerElement) => module.OnBeginHover.Invoke(module, pointerElement.transform.position) },
@@ -69,13 +69,13 @@ namespace Leap.Unity.InputModule
             {(PointerStates.TouchingElement, PointerStates.NearCanvas), (module, pointerElement) => module.OnClickUp.Invoke(module, pointerElement.transform.position) },
             {(PointerStates.OffCanvas, PointerStates.OffCanvas), (module, pointerElement) => pointerElement.TimeEnteredCanvas = Time.time },
         };
-        
+
         #endregion
-        
+
         private void Start()
         {
             EventData = new PointerEventData(eventSystem);
-            
+
             leapDataProvider = module.LeapDataProvider;
             mainCamera = module.MainCamera;
         }
@@ -118,19 +118,19 @@ namespace Leap.Unity.InputModule
                     return DistanceOfTipToPointer(hand) < 0f;
                 }
             }
-            
+
             // N.B. Without pinch detector
             if (module.InteractionMode != InteractionCapability.Direct)
             {
-                if ( hand.PinchDistance < module.PinchingThreshold)
+                if (hand.PinchDistance < module.PinchingThreshold)
                 {
                     return true;
                 }
             }
-            
+
             return false;
         }
-        
+
         public bool HasMatchingChirality(Hand hand)
         {
             switch (Chirality)
@@ -166,12 +166,12 @@ namespace Leap.Unity.InputModule
         {
             //Control cursor display
             cursor.gameObject.SetActive(true);
-            
+
             if (forceDisable)
             {
                 cursor.gameObject.SetActive(false);
             }
-            
+
             if (hand == null || (disableWhenOffCanvas && PointerState == PointerStates.OffCanvas))
             {
                 if (gameObject.activeInHierarchy)
@@ -196,12 +196,12 @@ namespace Leap.Unity.InputModule
                 default:
                     throw new ArgumentOutOfRangeException();
             }
-            
+
             PrevScreenPosition = EventData.position;
             RaiseEventsForStateChanges();
             ProcessUnityEvents(hand);
         }
-        
+
         private void ProcessHybrid(IProjectionOriginProvider projectionOriginProvider, Hand hand)
         {
             ProcessTactile(projectionOriginProvider, hand);
@@ -236,8 +236,8 @@ namespace Leap.Unity.InputModule
             PrevState = PointerState;
             UpdatePointer(EventData);
             ProcessState(hand, tipRaycastUsed);
-        } 
-        
+        }
+
         #region Raise Unity Events
 
         private void ProcessUnityEvents(Hand hand)
@@ -266,7 +266,7 @@ namespace Leap.Unity.InputModule
             {
                 return;
             }
-            
+
             PreviousGameObjectUnderPointer = CurrentGameObjectUnderPointer;
             CurrentGameObjectUnderPointer = EventData.pointerCurrentRaycast.gameObject;
 
@@ -375,7 +375,7 @@ namespace Leap.Unity.InputModule
                                 else
                                 {
                                     // Property OnDragTarget for .EventData.pointerDrag
-                                    GameObjectBeingDragged = EventData.pointerDrag; 
+                                    GameObjectBeingDragged = EventData.pointerDrag;
                                     DragStartPosition = EventData.position;
 
                                     if (CurrentGameObject && CurrentGameObject == GameObjectBeingDragged)
@@ -421,7 +421,7 @@ namespace Leap.Unity.InputModule
                 }
             }
         }
-        
+
         private void ProcessUnityEvents_HandleNoLongerInteracting(Hand hand)
         {
             //If we WERE interacting last frame, but are not this frame...
@@ -461,9 +461,9 @@ namespace Leap.Unity.InputModule
                 }
             }
         }
-        
-        #endregion 
-        
+
+        #endregion
+
         /// <summary>
         /// Raycast from the EventCamera into UI Space
         /// </summary>
@@ -500,7 +500,7 @@ namespace Leap.Unity.InputModule
                     if (fingerDistance > farthest && fingerExtension > 0.5f)
                     {
                         farthest = fingerDistance;
-                        pointerPosition = hand.Fingers[i].TipPosition.ToVector3(); 
+                        pointerPosition = hand.Fingers[i].TipPosition.ToVector3();
                     }
                 }
             }
@@ -537,27 +537,27 @@ namespace Leap.Unity.InputModule
                 {
                     if (IsTriggeringInteraction(hand))
                     {
-                        PointerState = ExecuteEvents.GetEventHandler<IPointerClickHandler>(EventData.pointerCurrentRaycast.gameObject) 
-                            ? PointerStates.TouchingElement 
+                        PointerState = ExecuteEvents.GetEventHandler<IPointerClickHandler>(EventData.pointerCurrentRaycast.gameObject)
+                            ? PointerStates.TouchingElement
                             : PointerStates.TouchingCanvas;
                     }
                     else
                     {
-                        PointerState = PointerStates.NearCanvas; 
+                        PointerState = PointerStates.NearCanvas;
                     }
                 }
                 else if (!tipRaycastUsed)
-                { 
-                    if (ExecuteEvents.GetEventHandler<IPointerClickHandler>(EventData.pointerCurrentRaycast.gameObject)) 
+                {
+                    if (ExecuteEvents.GetEventHandler<IPointerClickHandler>(EventData.pointerCurrentRaycast.gameObject))
                     {
-                        PointerState = IsTriggeringInteraction(hand) 
-                            ? PointerStates.PinchingToElement 
+                        PointerState = IsTriggeringInteraction(hand)
+                            ? PointerStates.PinchingToElement
                             : PointerStates.OnElement;
                     }
                     else
                     {
-                        PointerState = IsTriggeringInteraction(hand) 
-                            ? PointerStates.PinchingToCanvas 
+                        PointerState = IsTriggeringInteraction(hand)
+                            ? PointerStates.PinchingToCanvas
                             : PointerStates.OnCanvas;
                     }
                 }
@@ -570,7 +570,7 @@ namespace Leap.Unity.InputModule
             {
                 PointerState = PointerStates.OffCanvas;
             }
-            
+
             OnPointerStateChanged?.Invoke(this, hand);
         }
 
@@ -605,7 +605,7 @@ namespace Leap.Unity.InputModule
                 }
             }
         }
-        
+
         private void RaiseEventsForStateChanges()
         {
             if (module.TriggerHoverOnElementSwitch)

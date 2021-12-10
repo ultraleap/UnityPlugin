@@ -16,8 +16,8 @@ namespace Leap.Unity.InputModule
     public class UIInputCursor : MonoBehaviour
     {
         [SerializeField] private PointerElement element;
-        [SerializeField] private  float interactionPointerScale = 0.6f;
-        
+        [SerializeField] private float interactionPointerScale = 0.6f;
+
         private SpriteRenderer spriteRenderer;
         private Vector3 initialScale;
 
@@ -56,7 +56,8 @@ namespace Leap.Unity.InputModule
                 ? Vector3.Lerp(initialScale, initialScale * interactionPointerScale, hand.PinchStrength)
                 : Vector3.one;
 
-            switch(element.PointerState) {
+            switch (element.PointerState)
+            {
                 case PointerStates.OnCanvas:
                     spriteRenderer.color = colorBlock.normalColor;
                     break;

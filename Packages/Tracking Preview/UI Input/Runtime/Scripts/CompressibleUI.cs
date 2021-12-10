@@ -224,7 +224,7 @@ namespace Leap.Unity.InputModule
             currentlyFloating = true;
             curLerpSpeed = ExpandSpeed;
         }
-        
+
         /// <summary>
         /// Restore the layer members to their non-floating positions.
         /// </summary>

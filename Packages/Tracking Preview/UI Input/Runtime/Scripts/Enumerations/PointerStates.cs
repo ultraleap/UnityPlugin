@@ -15,11 +15,11 @@ namespace Leap.Unity.InputModule
     {
         OnCanvas,
         OnElement,
-        PinchingToCanvas, 
+        PinchingToCanvas,
         PinchingToElement,
         NearCanvas,
-        TouchingCanvas,   
-        TouchingElement,  
-        OffCanvas         
+        TouchingCanvas,
+        TouchingElement,
+        OffCanvas
     };
 }

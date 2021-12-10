@@ -34,4 +34,3 @@ public class SquishyPointer : MonoBehaviour
         meshRenderer.material.color = Color.Lerp(Color.white, Color.green, hand.PinchStrength);
     }
 }
-

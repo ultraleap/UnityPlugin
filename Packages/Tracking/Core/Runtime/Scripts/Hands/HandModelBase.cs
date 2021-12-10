@@ -81,7 +81,7 @@ namespace Leap.Unity
 
         private void Awake()
         {
-            if(!Application.isPlaying)
+            if (!Application.isPlaying)
             {
                 return;
             }
@@ -164,7 +164,7 @@ namespace Leap.Unity
                     }
 
                     BeginHand();
-                }   
+                }
 
                 if (gameObject.activeInHierarchy)
                 {

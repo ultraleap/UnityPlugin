@@ -19,7 +19,7 @@ namespace Leap.Unity.InputModule
 
             specifyConditionalDrawing(() => target.InteractionMode == InteractionCapability.Both || target.InteractionMode == InteractionCapability.Indirect,
                 "pinchingThreshold");
-            
+
             specifyConditionalDrawing(
                 () => target.InteractionMode == InteractionCapability.Both ||
                       target.InteractionMode == InteractionCapability.Direct,
@@ -27,13 +27,13 @@ namespace Leap.Unity.InputModule
 
             specifyConditionalDrawing(() => target.InteractionMode == InteractionCapability.Both,
                 "projectiveToTactileTransitionDistance");
-            
+
             //Calibration Setup
             addPropertyToFoldout("pinchingThreshold", "Calibration Setup");
             addPropertyToFoldout("tactilePadding", "Calibration Setup");
             addPropertyToFoldout("projectiveToTactileTransitionDistance", "Calibration Setup");
             addPropertyToFoldout("triggerHoverOnElementSwitch", "Calibration Setup");
-            addPropertyToFoldout("movingReferenceFrame","Calibration Setup");
+            addPropertyToFoldout("movingReferenceFrame", "Calibration Setup");
         }
     }
 }
