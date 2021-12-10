@@ -17,10 +17,11 @@
     "email": "contact@ultraleap.com",
     "url": "https://www.ultraleap.com"
   },
-"samples": [
-  {
-     "displayName": "Examples",
-     "description": "",
-     "path": "Examples~"
-  }]
+  "samples": [
+    {
+      "displayName": "Examples",
+      "description": "",
+      "path": "Examples~"
+    }
+  ]
 }
