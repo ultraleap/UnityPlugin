@@ -120,6 +120,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4157122855007356}
   - component: {fileID: 114589100428820638}
+  - component: {fileID: 8916041555348036645}
   m_Layer: 0
   m_Name: Anchor
   m_TagString: Untagged
@@ -158,3 +159,16 @@ MonoBehaviour:
   matchActiveStateWithAttachedObjects: 0
   _eventTable:
     _entries: []
+--- !u!114 &8916041555348036645
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1991655164827012}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 486446c4204e0334990bf2b162423ba6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  scaleTarget: {fileID: 4579866561592978}

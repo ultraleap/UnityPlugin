@@ -419,7 +419,7 @@ namespace Leap.Unity.HandsModule
 
                 var wrist = myTarget.BoundHand.wrist.boundTransform;
 
-                if(wrist != null)
+                if (wrist != null)
                 {
                     for (int i = 0; i < 5; i++)
                     {
@@ -438,7 +438,7 @@ namespace Leap.Unity.HandsModule
                         {
                             Handles.DrawLine(wrist.position, bone.position);
                         }
-                        
+
                     }
                     Handles.SphereHandleCap(-1, wrist.position, Quaternion.identity, myTarget.GizmoSize, EventType.Repaint);
                     Handles.DrawLine(wrist.position, myTarget.LeapHand.Arm.PrevJoint.ToVector3());

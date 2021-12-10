@@ -7,9 +7,9 @@
  ******************************************************************************/
 
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using System.Collections.Generic;
 
 namespace Leap.Unity.InputModule
 {
@@ -25,7 +25,7 @@ namespace Leap.Unity.InputModule
         EventHandler<Vector3> IInputModuleEventHandler.OnEndHover { get; set; }
         EventHandler<Vector3> IInputModuleEventHandler.OnBeginMissed { get; set; }
         EventHandler<Vector3> IInputModuleEventHandler.OnEndMissed { get; set; }
-        
+
         #region Properties
 
         //General Interaction Parameters
@@ -67,7 +67,7 @@ namespace Leap.Unity.InputModule
         [Tooltip("The distance from the base of a UI element that interaction switches from Projective-Pointer based to Touch based.")]
         [SerializeField] private float projectiveToTactileTransitionDistance = 0.4f;
         public float ProjectiveToTactileTransitionDistance => projectiveToTactileTransitionDistance;
-        
+
         //Trigger a Hover Event when switching between UI elements.
         [Tooltip("Trigger a Hover Event when switching between UI elements.")]
         [SerializeField] private bool triggerHoverOnElementSwitch;
@@ -76,7 +76,7 @@ namespace Leap.Unity.InputModule
         //Transform the Interaction Pointer to allow the Module to work in a non-stationary reference frame.
         [Tooltip("Transform the Interaction Pointer to allow the Module to work in a non-stationary reference frame.")]
         [SerializeField] private bool movingReferenceFrame;
-        
+
         //Event related data
         [SerializeField] private PointerElement _pointerLeft;
         [SerializeField] private PointerElement _pointerRight;
@@ -181,7 +181,7 @@ namespace Leap.Unity.InputModule
             _pointerLeft.Process(GetHand(Chirality.Left), _projectionOriginProvider);
             _pointerRight.Process(GetHand(Chirality.Right), _projectionOriginProvider);
         }
-        
+
         /// <summary>
         /// Returns hand that matches specified chirality, if one exists
         /// </summary>
@@ -204,10 +204,10 @@ namespace Leap.Unity.InputModule
 
             return null;
         }
-        
+
         private void OnDrawGizmos()
         {
-            if(_projectionOriginProvider != null)
+            if (_projectionOriginProvider != null)
             {
                 _projectionOriginProvider.DrawGizmos();
 
@@ -235,7 +235,7 @@ namespace Leap.Unity.InputModule
         {
             base.HandlePointerExitAndEnter(eventData, newEnterTarget);
         }
-        
+
         /// <summary>
         /// Exposes protected static method, only for use by PointerElement so that it does not need to be a nested class
         /// </summary>

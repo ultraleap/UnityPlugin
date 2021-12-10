@@ -17,12 +17,12 @@ namespace Leap.Unity.InputModule
         /// 
         /// </summary>
         void Expand();
-        
+
         /// <summary>
         /// 
         /// </summary>
         void Retract();
-        
+
         /// <summary>
         /// 
         /// </summary>

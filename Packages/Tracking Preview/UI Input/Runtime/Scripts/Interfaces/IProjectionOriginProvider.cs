@@ -36,12 +36,12 @@ namespace Leap.Unity.InputModule
         /// 
         /// </summary>
         Quaternion CurrentRotation { get; }
-        
+
         /// <summary>
         /// 
         /// </summary>
         Vector3 ProjectionOriginLeft { get; }
-        
+
         /// <summary>
         /// 
         /// </summary>

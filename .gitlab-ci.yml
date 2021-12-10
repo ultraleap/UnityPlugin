@@ -47,6 +47,13 @@ stages:
   before_script:
     - New-Item -Path "$ARTIFACTS_PATH" -ItemType Directory -Force
 
+.optional_job:
+  rules:
+    - if: '($CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME != "main")
+            || ($CI_COMMIT_BRANCH && $CI_COMMIT_BRANCH != $CI_DEFAULT_BRANCH && $CI_COMMIT_BRANCH != "main")'
+      when: manual
+      allow_failure: true
+
 # -----------------------------------------------------------------------------
 # Formatting
 # -----------------------------------------------------------------------------
@@ -124,6 +131,10 @@ dependencies-libtrack:
   extends: .base
   stage: build
   needs: []
+
+  rules:
+    - !reference [.optional_job, rules]
+    - when: on_success
 
   variables:
     LIBTRACK_ROOT_URL: "https://gitlab.ultrahaptics.com/api/v4/projects/leap-v5-platform%2Flibtrack"
@@ -367,6 +378,10 @@ dependencies-libtrack:
 .export-unitypackage:
   extends: .unity-template
   stage: build
+
+  rules:
+    - !reference [.optional_job, rules]
+    - when: on_success
 
   needs:
    - job: dependencies-libtrack

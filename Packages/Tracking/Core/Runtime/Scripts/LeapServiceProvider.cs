@@ -187,7 +187,8 @@ namespace Leap.Unity
             {
                 if (_leapController != null)
                 {
-                    _leapController.Device += (a0, a1) => {
+                    _leapController.Device += (a0, a1) =>
+                    {
                         value(a1.Device);
                     };
                     if (_leapController.IsConnected)

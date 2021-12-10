@@ -6,8 +6,8 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using LeapInternal;
 using Leap.Unity.Attributes;
+using LeapInternal;
 using System;
 using UnityEngine;
 #if UNITY_2019_1_OR_NEWER
@@ -386,7 +386,7 @@ namespace Leap.Unity
                                      * Matrix4x4.TRS(Vector3.zero, imageQuatWarp, new Vector3(1f, -1f, 1f))
 
 #else
-                               		* Matrix4x4.TRS(Vector3.zero, imageQuatWarp, Vector3.one)
+                                    * Matrix4x4.TRS(Vector3.zero, imageQuatWarp, Vector3.one)
 
 #endif
                                     * projectionMatrix.inverse;
@@ -432,7 +432,7 @@ namespace Leap.Unity
                 trackedPose = new Pose(XRSupportUtil.GetXRNodeCenterEyeLocalPosition(), XRSupportUtil.GetXRNodeCenterEyeLocalRotation());
                 //Use the _trackingBaseDeltaPose calculated on start to convert the local spaced trackedPose into a world space position
                 trackedPose = _trackingBaseDeltaPose.Value.mul(trackedPose);
-                    
+
             }
             else if (_deviceOffsetMode == DeviceOffsetMode.Transform)
             {
@@ -743,6 +743,6 @@ namespace Leap.Unity
         }
 #endif
 
-#endregion
+        #endregion
     }
 }

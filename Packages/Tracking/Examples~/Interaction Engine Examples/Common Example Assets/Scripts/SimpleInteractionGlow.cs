@@ -38,7 +38,7 @@ namespace UHI.Tracking.InteractionEngine.Examples
         [Tooltip("This color only applies if the object is an InteractionButton or InteractionSlider.")]
         public Color pressedColor = Color.white;
 
-        private Material [] _materials;
+        private Material[] _materials;
 
         private InteractionBehaviour _intObj;
 
@@ -46,7 +46,8 @@ namespace UHI.Tracking.InteractionEngine.Examples
         private Rend[] rends;
 
         [System.Serializable]
-        public class Rend {
+        public class Rend
+        {
             public int materialID = 0;
             public Renderer renderer;
         }
@@ -55,11 +56,12 @@ namespace UHI.Tracking.InteractionEngine.Examples
         {
             _intObj = GetComponent<InteractionBehaviour>();
 
-            if(rends.Length > 0)
+            if (rends.Length > 0)
             {
                 _materials = new Material[rends.Length];
 
-                for(int i = 0; i < rends.Length; i++) {
+                for (int i = 0; i < rends.Length; i++)
+                {
                     _materials[i] = rends[i].renderer.materials[rends[i].materialID];
                 }
             }
@@ -110,7 +112,8 @@ namespace UHI.Tracking.InteractionEngine.Examples
                 }
 
                 // Lerp actual material color to the target color.
-                for(int i = 0; i < _materials.Length; i++) {
+                for (int i = 0; i < _materials.Length; i++)
+                {
                     _materials[i].color = Color.Lerp(_materials[i].color, targetColor, 30F * Time.deltaTime);
                 }
             }

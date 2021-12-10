@@ -20,7 +20,7 @@ namespace Leap.Unity
                     _mainCamera = camera;
                 }
 
-                if(_mainCamera == null)
+                if (_mainCamera == null)
                 {
                     Debug.LogError("Please ensure a camera exists in the scene to use the MainCameraProvider");
                 }
