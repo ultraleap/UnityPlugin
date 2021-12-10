@@ -14,10 +14,9 @@ using System;
 
 namespace Leap.LeapCSharp.Tests
 {
-    [TestFixture()]
     public class LeapCStressTests
     {
-        [Test()]
+        [Test]
         public void TestCreateDestroy()
         {
             IntPtr connHandle = IntPtr.Zero;
@@ -31,7 +30,7 @@ namespace Leap.LeapCSharp.Tests
             }
         }
 
-        [Test()]
+        [Test]
         public void TestCreateDestroyWithConfigRequest()
         {
             IntPtr connHandle = IntPtr.Zero;

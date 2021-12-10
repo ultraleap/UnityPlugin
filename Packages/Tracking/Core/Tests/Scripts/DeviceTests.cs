@@ -13,7 +13,6 @@ using System;
 
 namespace Leap.LeapCSharp.Tests
 {
-    [TestFixture()]
     public class DeviceTests
     {
         Controller controller;

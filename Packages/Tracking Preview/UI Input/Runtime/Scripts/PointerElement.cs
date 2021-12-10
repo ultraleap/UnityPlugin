@@ -23,7 +23,7 @@ namespace Leap.Unity.InputModule
         #region Properties
         
         public event Action<PointerElement, Hand> OnPointerStateChanged;
-        public event Action<bool> On;
+        //public event Action<bool> On;
         
         private Camera mainCamera;
         private LeapProvider leapDataProvider;

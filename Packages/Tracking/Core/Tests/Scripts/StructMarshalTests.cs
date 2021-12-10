@@ -21,7 +21,6 @@ namespace Leap.LeapCSharp.Tests
         public TestMarshaledStruct(int t) { id = t; }
     }
 
-    [TestFixture()]
     public class StructMarshalTests
     {
         public const int ARRAY_SIZE = 5;
