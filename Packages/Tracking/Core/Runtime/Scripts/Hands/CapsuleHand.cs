@@ -146,7 +146,10 @@ namespace Leap.Unity
                 {
                     _sphereMat.color = _sphereColor;
                     _backing_material.color = _cylinderColor;
-                    UpdateHand();
+                    if (!Application.isPlaying)
+                    {
+                        UpdateHand();
+                    }
                 }
                 else if (!_useCustomColors
                     && (_sphereMat.color != (_hand.IsLeft ? _leftColorList[_leftColorIndex] : _rightColorList[_rightColorIndex])
@@ -154,7 +157,10 @@ namespace Leap.Unity
                 {
                     _sphereMat.color = _hand.IsLeft ? _leftColorList[_leftColorIndex] : _rightColorList[_rightColorIndex];
                     _backing_material.color = _backingDefault;
-                    UpdateHand();
+                    if (!Application.isPlaying)
+                    {
+                        UpdateHand();
+                    }
                 }
             }
         }
