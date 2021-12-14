@@ -59,6 +59,12 @@ namespace Leap.Unity
         [MinValue(0)]
         [SerializeField]
         private float _palmRadius = 0.015f;
+
+        [SerializeField]
+        private bool _useCustomColors = false;
+
+        [SerializeField]
+        private Color _sphereColor = Color.green, _cylinderColor = Color.white;
 #pragma warning restore 0649
 
         private Material _sphereMat;
@@ -67,6 +73,7 @@ namespace Leap.Unity
         private Matrix4x4[] _sphereMatrices = new Matrix4x4[32],
                             _cylinderMatrices = new Matrix4x4[32];
         private int _curSphereIndex = 0, _curCylinderIndex = 0;
+        private Color _backingDefault = Color.white;
 
         public override ModelType HandModelType
         {
@@ -106,6 +113,7 @@ namespace Leap.Unity
             {
                 _backing_material = new Material(_material);
                 _backing_material.hideFlags = HideFlags.DontSaveInEditor;
+                _backingDefault = _backing_material.color;
                 if (!Application.isEditor && !_backing_material.enableInstancing)
                 {
                     Debug.LogError("Capsule Hand Material needs Instancing Enabled to render in builds!", this);
@@ -113,6 +121,11 @@ namespace Leap.Unity
                 _backing_material.enableInstancing = true;
                 _sphereMat = new Material(_backing_material);
                 _sphereMat.hideFlags = HideFlags.DontSaveInEditor;
+                if (_useCustomColors)
+                {
+                    _sphereMat.color = _sphereColor;
+                    _backing_material.color = _cylinderColor;
+                }
             }
         }
 
@@ -127,6 +140,23 @@ namespace Leap.Unity
                   "Material with a Default Material now...", this);
                 _material = (Material)Resources.Load("InstancedCapsuleHand", typeof(Material));
             }
+            if (_material != null && _backing_material != null && _sphereMat != null)
+            {
+                if(_useCustomColors && (_sphereMat.color != _sphereColor || _backing_material.color != _cylinderColor))
+                {
+                    _sphereMat.color = _sphereColor;
+                    _backing_material.color = _cylinderColor;
+                    UpdateHand();
+                }
+                else if (!_useCustomColors
+                    && (_sphereMat.color != (_hand.IsLeft ? _leftColorList[_leftColorIndex] : _rightColorList[_rightColorIndex])
+                    || _backing_material.color != _backingDefault))
+                {
+                    _sphereMat.color = _hand.IsLeft ? _leftColorList[_leftColorIndex] : _rightColorList[_rightColorIndex];
+                    _backing_material.color = _backingDefault;
+                    UpdateHand();
+                }
+            }
         }
 #endif
 
@@ -134,16 +164,25 @@ namespace Leap.Unity
         {
             base.BeginHand();
 
-            if (_hand.IsLeft)
+            if (_useCustomColors)
             {
-                _sphereMat.color = _leftColorList[_leftColorIndex];
-                _leftColorIndex = (_leftColorIndex + 1) % _leftColorList.Length;
+                _sphereMat.color = _sphereColor;
+                _backing_material.color = _cylinderColor;
             }
             else
             {
-                _sphereMat.color = _rightColorList[_rightColorIndex];
-                _rightColorIndex = (_rightColorIndex + 1) % _rightColorList.Length;
+                if (_hand.IsLeft)
+                {
+                    _sphereMat.color = _leftColorList[_leftColorIndex];
+                    _leftColorIndex = (_leftColorIndex + 1) % _leftColorList.Length;
+                }
+                else
+                {
+                    _sphereMat.color = _rightColorList[_rightColorIndex];
+                    _rightColorIndex = (_rightColorIndex + 1) % _rightColorList.Length;
+                }
             }
+            
         }
 
         public override void UpdateHand()
