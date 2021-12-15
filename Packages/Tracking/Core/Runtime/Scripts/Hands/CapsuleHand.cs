@@ -64,6 +64,7 @@ namespace Leap.Unity
         private bool _useCustomColors = false;
 
         [SerializeField]
+        [DisableIf("_useCustomColors", isEqualTo: false)]
         private Color _sphereColor = Color.green, _cylinderColor = Color.white;
 #pragma warning restore 0649
 
