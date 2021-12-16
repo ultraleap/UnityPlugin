@@ -189,7 +189,7 @@ namespace Leap.Unity
                     _rightColorIndex = (_rightColorIndex + 1) % _rightColorList.Length;
                 }
             }
-            
+
         }
 
         public override void UpdateHand()
