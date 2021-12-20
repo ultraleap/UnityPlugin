@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Adding coloring options to the capsule hands
 
 ### Changed
+- Size of the Skeleton hand assets has been significantly reduced
 
 ### Removed
 
