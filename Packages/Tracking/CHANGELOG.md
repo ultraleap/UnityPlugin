@@ -18,7 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Generic Hand Model rendering issue with transparency
-- 
+- Updated XR2 preview documentation ('How to Build a Unity Application that Shows Tracked Hands on an XR2') to account for asset path changes, name changes to preview packages in V5.0.0 (from expermimental) and in response to internal user testing
 
 ### Known issues
 -	Scenes containing the infrared viewer render incorrectly on systems using single pass stereo with the XR plugin system - e.g. Windows Mixed Reality headsets. SteamVR headsets may also default to single pass stereo, showing the same issue. However in this case, the OpenVR settings can be changed to multipass which resolves the problem.
