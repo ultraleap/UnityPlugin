@@ -295,6 +295,11 @@ namespace Leap
             /// </summary>
             TYPE_RIGEL = (int)eLeapDeviceType.eLeapDevicePID_Rigel,
 
+            /// <summary>
+            /// The Ultraleap Stereo IR 170 (SIR170) hand tracking module.
+            /// </summary>
+            TYPE_SIR170 = (int)eLeapDeviceType.eLeapDevicePID_SIR170,
+
             [Obsolete]
             TYPE_LAPTOP,
             [Obsolete]
