@@ -651,7 +651,7 @@ namespace Leap.Unity.Interaction
 
         [Header("Interaction Overrides")]
 
-        [Tooltip("This object will not receive callbacks from left controllers, right "
+        [Tooltip("This object will not receive hover callbacks from left controllers, right "
                + "controllers, or either hand if this mode is set to anything other than "
                + "None.")]
         [SerializeField]
@@ -710,6 +710,28 @@ namespace Leap.Unity.Interaction
             }
         }
 
+        [Tooltip("This object will not receive grasping callbacks from left controllers, right "
+               + "controllers, or either hand if this mode is set to anything other than "
+               + "None.")]
+        [SerializeField]
+        private IgnoreHoverMode _ignoreGraspingMode = IgnoreHoverMode.None;
+        public IgnoreHoverMode ignoreGraspingMode
+        {
+            get { return _ignoreGraspingMode; }
+            set
+            {
+                _ignoreGraspingMode = value;
+
+                if (isGrasped && _ignoreGraspingMode != IgnoreHoverMode.None)
+                {
+                    if((_ignoreGraspingMode == IgnoreHoverMode.Left && graspingControllers.Query().FirstOrNone(x => x.isLeft) != null) ||
+                        (_ignoreGraspingMode == IgnoreHoverMode.Right && graspingControllers.Query().FirstOrNone(x => x.isRight) != null))
+                    {
+                        graspingController.ReleaseGrasp();
+                    }
+                }
+            }
+        }
         [Tooltip("Interaction controllers will not be able to grasp this object if this "
                + "property is checked.")]
         [SerializeField]

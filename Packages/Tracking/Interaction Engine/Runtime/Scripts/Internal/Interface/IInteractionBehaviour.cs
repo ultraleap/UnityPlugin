@@ -38,6 +38,7 @@ namespace Leap.Unity.Interaction
         IgnoreHoverMode ignoreHoverMode { get; }
         bool ignorePrimaryHover { get; }
         bool ignoreContact { get; }
+        IgnoreHoverMode ignoreGraspingMode { get; }
         bool ignoreGrasping { get; }
 
         // Interaction settings.
