@@ -6,6 +6,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [docs-website]: https://docs.ultraleap.com/ "Ultraleap Docs"
 
+## [6.0.0]
+
+### Added
+
+### Changed
+
+- Moved SimpleFacingCameraCallbacks.cs to Interaction Engine\Runtime\Scripts\Utility & updated its namespace
+
+### Removed
+
 ## [5.1.0] - 2021-12-22
 
 ### Added

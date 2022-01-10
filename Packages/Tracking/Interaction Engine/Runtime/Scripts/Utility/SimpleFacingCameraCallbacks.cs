@@ -11,10 +11,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace Leap.Unity.Examples
+namespace Leap.Unity.Interaction
 {
 
-    [AddComponentMenu("")]
     public class SimpleFacingCameraCallbacks : MonoBehaviour
     {
 
