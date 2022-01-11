@@ -7,7 +7,7 @@
   "license": "Apache-2.0",
   "dependencies" : 
   {
-     "com.ultraleap.tracking" : "5.0.0"
+     "com.ultraleap.tracking" : "5.1.0"
   },
   "keywords": [
     "ultraleap",
