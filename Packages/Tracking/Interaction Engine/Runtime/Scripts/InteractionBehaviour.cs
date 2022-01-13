@@ -724,7 +724,7 @@ namespace Leap.Unity.Interaction
 
                 if (isGrasped && _ignoreGraspingMode != IgnoreHoverMode.None)
                 {
-                    if((_ignoreGraspingMode == IgnoreHoverMode.Left && graspingControllers.Query().FirstOrNone(x => x.isLeft) != null) ||
+                    if ((_ignoreGraspingMode == IgnoreHoverMode.Left && graspingControllers.Query().FirstOrNone(x => x.isLeft) != null) ||
                         (_ignoreGraspingMode == IgnoreHoverMode.Right && graspingControllers.Query().FirstOrNone(x => x.isRight) != null))
                     {
                         graspingController.ReleaseGrasp();
