@@ -103,7 +103,6 @@ namespace Leap.Unity.HandsModule
             DrawDebugOptions();
             DrawFineTuningOptions();
             serializedObject.ApplyModifiedProperties();
-            EditorUtility.SetDirty(target);
         }
 
         /// <summary>
