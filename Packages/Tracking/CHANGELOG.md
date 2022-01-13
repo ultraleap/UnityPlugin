@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [docs-website]: https://docs.ultraleap.com/ "Ultraleap Docs"
 
-## [5.1.0] - 2021-12-22
+## [5.1.0] - 2022-1-11
 
 ### Added
 - Adding coloring options to the capsule hands
