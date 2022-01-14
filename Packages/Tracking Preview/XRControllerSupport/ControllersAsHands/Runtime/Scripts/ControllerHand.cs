@@ -121,7 +121,6 @@ namespace Leap.Unity.Controllers
         [HideInInspector]
         public XRController controller;
         public Vector3 offsetPosition;
-        public Vector3 offsetRotationEuler;
 
         public Vector3 controllerPosition
         {
@@ -157,6 +156,7 @@ namespace Leap.Unity.Controllers
         private Vector3 _currentPosition;
         private Quaternion _currentRotation;
 
+        public Vector3 offsetRotationEuler;
         public ControllerLimb[] limbs = new ControllerLimb[5];
 
         private Chirality chirality = Chirality.Left;
@@ -272,7 +272,7 @@ namespace Leap.Unity.Controllers
             _currentRotation = this.controllerRotation;
 #else
         _currentPosition = this.transform.position;
-        _currentRotation = this.transform.rotation;
+        _currentRotation = this.transform.rotation * Quaternion.Euler(offsetRotationEuler);
 #endif
         }
 
@@ -326,14 +326,13 @@ namespace Leap.Unity.Controllers
             this.pinkyFinger.distalRotation = new Vector3(-45, -20, 20);
             this.pinkyFinger.name = chirality.ToString() + " Pinky";
 
-#if ENABLE_INPUT_SYSTEM
             this.offsetRotationEuler = new Vector3(-10, 260, 235);
             if (chirality == Chirality.Right)
             {
                 this.offsetRotationEuler.y *= -1;
                 this.offsetRotationEuler.z *= -1;
             }
-#endif
+
 
             switch (chirality)
             {

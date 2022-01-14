@@ -166,9 +166,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5410597111759705603, guid: 8163655ae6e81f149b112acc9972a9d3,
         type: 3}
+      propertyPath: _showArm
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5410597111759705603, guid: 8163655ae6e81f149b112acc9972a9d3,
+        type: 3}
       propertyPath: leapProvider
       value: 
       objectReference: {fileID: 1391388410}
+    - target: {fileID: 8522039520641505686, guid: 8163655ae6e81f149b112acc9972a9d3,
+        type: 3}
+      propertyPath: _showArm
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8522039520641505686, guid: 8163655ae6e81f149b112acc9972a9d3,
         type: 3}
       propertyPath: leapProvider
@@ -342,7 +352,7 @@ Transform:
   - {fileID: 1271021919}
   - {fileID: 648610712}
   m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &846275013
 GameObject:
@@ -528,7 +538,7 @@ Transform:
   m_Children:
   - {fileID: 2000368867}
   m_Father: {fileID: 0}
-  m_RootOrder: 4
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1261392063
 GameObject:
@@ -800,6 +810,7 @@ MonoBehaviour:
   passthroughOnly: 0
   leftHandInputs:
     transform: {fileID: 1271021919}
+    offsetRotationEuler: {x: -10, y: 260, z: 235}
     limbs:
     - name: Left Thumb
       analog: 0
@@ -866,6 +877,7 @@ MonoBehaviour:
     timeVisible: 0
   rightHandInputs:
     transform: {fileID: 648610712}
+    offsetRotationEuler: {x: -10, y: -260, z: -235}
     limbs:
     - name: Right Thumb
       analog: 0
@@ -940,11 +952,11 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1391388409}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 1770004245}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &1495581908 stripped
@@ -1140,8 +1152,9 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1495581908}
+  - {fileID: 1391388411}
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1770004246
 MonoBehaviour:
