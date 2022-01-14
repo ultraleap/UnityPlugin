@@ -129,8 +129,16 @@ namespace Leap.Unity
 
         public Camera mainCamera
         {
-            get { return MainCameraProvider.mainCamera; }
-            set { _mainCamera = value; }
+            get 
+            { 
+                return MainCameraProvider.mainCamera; 
+            }
+            set
+            {
+                // Not everything accesses the main camera via the property, so to be safe we also set the backing field
+                _mainCamera = value;
+                MainCameraProvider.mainCamera = value;
+            }
         }
 
         // Temporal Warping
@@ -251,6 +259,13 @@ namespace Leap.Unity
         protected override void OnEnable()
         {
             resetShaderTransforms();
+
+            // Assign the main camera if it looks like one is available and it's not yet been set on the backing field
+            // NB this may be the case if the provider is created via AddComponent, as in MRTK
+            if (_mainCamera == null && MainCameraProvider.mainCamera != null)
+            {
+                _mainCamera = MainCameraProvider.mainCamera;
+            }
 
 #if XR_LEGACY_INPUT_AVAILABLE
             if (_mainCamera.GetComponent<UnityEngine.SpatialTracking.TrackedPoseDriver>() == null) 
