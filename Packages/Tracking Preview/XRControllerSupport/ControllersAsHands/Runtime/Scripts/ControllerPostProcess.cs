@@ -1,16 +1,7 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using System.Linq;
-using Leap.Unity;
-using Leap;
-using Hand = Leap.Hand;
-using Bone = Leap.Bone;
-using Unity.Collections;
+﻿using UnityEngine;
 using System;
 
 #if ENABLE_INPUT_SYSTEM
-using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.XR;
 #endif
 
@@ -99,18 +90,10 @@ namespace Leap.Unity.Controllers
             {
                 OnControllerActiveFrame?.Invoke(Chirality.Left);
             }
-            else
-            {
-                currentInputTypes[(int)Chirality.Left] = InputMethodType.LeapHand;
-            }
 
             if (rightHandInputs.controller.IsControllerActive())
             {
                 OnControllerActiveFrame?.Invoke(Chirality.Right);
-            }
-            else
-            {
-                currentInputTypes[(int)Chirality.Right] = InputMethodType.LeapHand;
             }
 #else
             OnControllerActiveFrame?.Invoke(Chirality.Left);
@@ -174,13 +157,21 @@ namespace Leap.Unity.Controllers
             switch (chirality)
             {
                 case Chirality.Left:
-                    if (!leftHandInputs.controller.IsControllerActive())
+                    if (leftHandInputs.controller.IsControllerActive())
+                    {
+                        currentInputTypes[(int)chirality] = InputMethodType.XRController;
+                    }
+                    else
                     {
                         currentInputTypes[(int)chirality] = InputMethodType.LeapHand;
                     }
                     break;
                 case Chirality.Right:
-                    if (!rightHandInputs.controller.IsControllerActive())
+                    if (rightHandInputs.controller.IsControllerActive())
+                    {
+                        currentInputTypes[(int)chirality] = InputMethodType.XRController;
+                    }
+                    else
                     {
                         currentInputTypes[(int)chirality] = InputMethodType.LeapHand;
                     }
@@ -196,7 +187,6 @@ namespace Leap.Unity.Controllers
                     {
                         case Chirality.Left:
                             inputFrame.Hands.Add(leftHandInputs.hand);
-                            leftPos = leftHandInputs.hand.PalmPosition.ToVector3();
                             break;
                         case Chirality.Right:
                             inputFrame.Hands.Add(rightHandInputs.hand);
@@ -216,6 +206,5 @@ namespace Leap.Unity.Controllers
                     break;
             }
         }
-        public Vector3 leftPos;
     }
 }

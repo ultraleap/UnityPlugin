@@ -150,7 +150,15 @@ namespace Leap.Unity.Controllers
         public Transform transform = null;
 #endif
         private Hand _hand;
-        public Hand hand { get { Hand h = new Hand(); h.CopyFrom(_hand); return h; } }
+        public Hand hand { 
+            get 
+            { 
+                Hand h = new Hand();
+                if(_hand == null)
+                {
+                    _hand = GenerateControllerHand();
+                }
+                h.CopyFrom(_hand); return h; } }
 
         private Vector3 _oldPosition = Vector3.zero;
         private Vector3 _currentPosition;
