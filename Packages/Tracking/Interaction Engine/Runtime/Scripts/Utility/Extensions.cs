@@ -31,6 +31,17 @@ namespace Leap.Unity.Interaction
             }
         }
 
+        public static bool ShouldIgnoreGrasping(this IInteractionBehaviour intObj, InteractionController controller)
+        {
+            switch (intObj.ignoreGraspingMode)
+            {
+                case IgnoreHoverMode.None: return false;
+                case IgnoreHoverMode.Left: return !controller.isTracked || controller.isLeft;
+                case IgnoreHoverMode.Right: return !controller.isTracked || controller.isRight;
+                case IgnoreHoverMode.Both: default: return true;
+            }
+        }
+
     }
 
     #endregion

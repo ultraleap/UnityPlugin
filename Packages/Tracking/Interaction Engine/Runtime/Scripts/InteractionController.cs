@@ -1566,6 +1566,7 @@ namespace Leap.Unity.Interaction
         #region Contact Callbacks
 
         private HashSet<IInteractionBehaviour> _contactBehavioursSet = new HashSet<IInteractionBehaviour>();
+        private List<InteractionBehaviour> _contactingBehavious = new List<InteractionBehaviour>();
 
         private Dictionary<IInteractionBehaviour, int> _contactBehaviours = new Dictionary<IInteractionBehaviour, int>();
         private HashSet<IInteractionBehaviour> _contactBehavioursLastFrame = new HashSet<IInteractionBehaviour>();
@@ -1937,6 +1938,7 @@ namespace Leap.Unity.Interaction
 
             bool validForGrasping = body != null
                                  && manager.interactionObjectBodies.TryGetValue(body, out intObj)
+                                 && !intObj.ShouldIgnoreGrasping(this)
                                  && !intObj.ignoreGrasping;
 
             if (validForGrasping) return intObj;
