@@ -55,11 +55,17 @@ namespace Leap.Unity.Controllers
 
         private void Awake()
         {
-#if !ENABLE_INPUT_SYSTEM
+#if ENABLE_INPUT_SYSTEM && ENABLE_LEGACY_INPUT_MANAGER
+        Debug.LogWarning("Both the Input System & Legacy Input system are enabled at the same time. This may result in undesired behaviour."
+        +"ControllerPostProcess will default to using the Input System.");
+#endif
 
+#if !ENABLE_INPUT_SYSTEM
         if (leftHandInputs.transform == null) Debug.LogError("Please assign a left controller.", this);
         if (rightHandInputs.transform == null) Debug.LogError("Please assign a right controller.", this);
 #endif
+
+
 
             leftHandInputs.Setup(Chirality.Left);
             rightHandInputs.Setup(Chirality.Right);
