@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6612547581167370261}
   - component: {fileID: 6612547581167370260}
+  - component: {fileID: 1891710994397277429}
   m_Layer: 0
   m_Name: ControllerPostProcessProvider
   m_TagString: Untagged
@@ -187,6 +188,22 @@ MonoBehaviour:
       distalRotation: {x: -45, y: 20, z: -20}
     timeVisible: 0
   currentInputTypes: 
+--- !u!114 &1891710994397277429
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6612547581167370263}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e933f13d48c681d48b14750922ac906d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _comment: 'Controller Post Process Setup Guide - To generate sensible values, use
+    the context menu option "Generate Default Axis".  If using the Legacy Input Module,
+    you must install the XR Legacy Input Helpers package and Generate seed bindings. '
+  _isEditing: 0
 --- !u!1 &6612547581540578897
 GameObject:
   m_ObjectHideFlags: 0
