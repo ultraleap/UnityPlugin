@@ -1,4 +1,11 @@
-﻿using UnityEngine;
+﻿/******************************************************************************
+ * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
+ *                                                                            *
+ * Use subject to the terms of the Apache License 2.0 available at            *
+ * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
+ * between Ultraleap and you, your company or other organization.             *
+ ******************************************************************************/
+using UnityEngine;
 using System;
 
 #if ENABLE_INPUT_SYSTEM
@@ -13,13 +20,14 @@ namespace Leap.Unity.Controllers
         XRController,
     }
 
+    /// <summary>
+    /// Controller Post Process takes in XR Controller data and transforms it into 
+    /// Leap Hand data, represented by ControllerHand.
+    /// </summary>
     public class ControllerPostProcess : PostProcessProvider
     {
         public ControllerHand leftHandInputs;
         public ControllerHand rightHandInputs;
-
-        [Tooltip("If enabled, input will default to controllers")]
-        public bool DefaultToControllers = false;
 
         public InputMethodType[] currentInputTypes;
         private InputMethodType[] _oldInputTypes;
@@ -27,6 +35,10 @@ namespace Leap.Unity.Controllers
         public Action<Chirality, InputMethodType> OnHandInputTypeChange;
         public Action<Chirality> OnControllerActiveFrame;
 
+        /// <summary>
+        /// Generates default axis for controllers. 
+        /// This fills the Left & Right Hand Inputs with sensible default data. 
+        /// </summary>
         [ContextMenu("Generate Default Axis")]
         private void GenerateInputDefaultAxis()
         {
@@ -48,8 +60,8 @@ namespace Leap.Unity.Controllers
         rightHandInputs = new ControllerHand(Chirality.Right);
         if (rc != null) rightHandInputs.transform = rc;
 #endif
-            leftHandInputs.GenerateLimbs();
-            rightHandInputs.GenerateLimbs();
+            leftHandInputs.GenerateFingers();
+            rightHandInputs.GenerateFingers();
 
         }
 
@@ -65,19 +77,10 @@ namespace Leap.Unity.Controllers
         if (rightHandInputs.transform == null) Debug.LogError("Please assign a right controller.", this);
 #endif
 
-
-
             leftHandInputs.Setup(Chirality.Left);
             rightHandInputs.Setup(Chirality.Right);
 
-            if (DefaultToControllers)
-            {
-                currentInputTypes = new InputMethodType[] { InputMethodType.XRController, InputMethodType.XRController };
-            }
-            else
-            {
-                currentInputTypes = new InputMethodType[] { InputMethodType.LeapHand, InputMethodType.LeapHand };
-            }
+            currentInputTypes = new InputMethodType[] { InputMethodType.XRController, InputMethodType.XRController };
 
             _oldInputTypes = new InputMethodType[currentInputTypes.Length];
             currentInputTypes.CopyTo(_oldInputTypes, 0);
@@ -89,8 +92,38 @@ namespace Leap.Unity.Controllers
             UpdateControllers();
         }
 
+        /// <summary>
+        /// Updates input types based on whether a controller is active or not.
+        /// If the project is using the Legacy Input System, this does not check for an active controller.
+        /// </summary>
         private void UpdateInputTypes()
         {
+#if ENABLE_INPUT_SYSTEM
+            switch (chirality)
+            {
+                case Chirality.Left:
+                    if (leftHandInputs.controller.IsControllerActive())
+                    {
+                        currentInputTypes[(int)chirality] = InputMethodType.XRController;
+                    }
+                    else
+                    {
+                        currentInputTypes[(int)chirality] = InputMethodType.LeapHand;
+                    }
+                    break;
+                case Chirality.Right:
+                    if (rightHandInputs.controller.IsControllerActive())
+                    {
+                        currentInputTypes[(int)chirality] = InputMethodType.XRController;
+                    }
+                    else
+                    {
+                        currentInputTypes[(int)chirality] = InputMethodType.LeapHand;
+                    }
+                    break;
+            }
+#endif
+
 #if ENABLE_INPUT_SYSTEM
             if (leftHandInputs.controller.IsControllerActive())
             {
@@ -124,7 +157,9 @@ namespace Leap.Unity.Controllers
             currentInputTypes[(int)chirality] = inputMethodType;
         }
 
-
+        /// <summary>
+        /// Updates controller hands to match the controller inputs
+        /// </summary>
         private void UpdateControllers()
         {
 #if ENABLE_INPUT_SYSTEM
@@ -134,18 +169,23 @@ namespace Leap.Unity.Controllers
             }
 
             if (leftHandInputs.controller != null && leftHandInputs.controller.wasUpdatedThisFrame)
-#endif
+            {
                 leftHandInputs.Update();
+            }
 
-#if ENABLE_INPUT_SYSTEM
             if (rightHandInputs.controller == null)
             {
                 rightHandInputs.controller = XRController.rightHand;
             }
 
             if (rightHandInputs.controller != null && rightHandInputs.controller.wasUpdatedThisFrame)
-#endif
+            {
                 rightHandInputs.Update();
+            }
+#else
+            leftHandInputs.Update();
+            rightHandInputs.Update();
+#endif
         }
 
         public override void ProcessFrame(ref Frame inputFrame)
@@ -156,35 +196,13 @@ namespace Leap.Unity.Controllers
             ProcessHandData(Chirality.Right, ref inputFrame);
         }
 
+        /// <summary>
+        /// Adds controller hand data to the leap frame, if the InputMethodType is set to XRController
+        /// </summary>
+        /// <param name="chirality"></param>
+        /// <param name="inputFrame"></param>
         private void ProcessHandData(Chirality chirality, ref Frame inputFrame)
         {
-
-#if ENABLE_INPUT_SYSTEM
-            switch (chirality)
-            {
-                case Chirality.Left:
-                    if (leftHandInputs.controller.IsControllerActive())
-                    {
-                        currentInputTypes[(int)chirality] = InputMethodType.XRController;
-                    }
-                    else
-                    {
-                        currentInputTypes[(int)chirality] = InputMethodType.LeapHand;
-                    }
-                    break;
-                case Chirality.Right:
-                    if (rightHandInputs.controller.IsControllerActive())
-                    {
-                        currentInputTypes[(int)chirality] = InputMethodType.XRController;
-                    }
-                    else
-                    {
-                        currentInputTypes[(int)chirality] = InputMethodType.LeapHand;
-                    }
-                    break;
-            }
-#endif
-
             switch (currentInputTypes[(int)chirality])
             {
                 case InputMethodType.XRController:

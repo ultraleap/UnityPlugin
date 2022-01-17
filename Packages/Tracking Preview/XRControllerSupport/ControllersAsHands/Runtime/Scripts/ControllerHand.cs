@@ -1,3 +1,10 @@
+/******************************************************************************
+ * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
+ *                                                                            *
+ * Use subject to the terms of the Apache License 2.0 available at            *
+ * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
+ * between Ultraleap and you, your company or other organization.             *
+ ******************************************************************************/
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -13,13 +20,17 @@ using UnityEngine.InputSystem;
 
 namespace Leap.Unity.Controllers
 {
-
+    /// <summary>
+    /// Takes in XR Controller data and converts it to Leap Hand Data
+    /// </summary>
     [System.Serializable]
     public class ControllerHand
     {
-
+        /// <summary>
+        /// Represents a controller axis as a finger (e.g. translates trigger to index finger)
+        /// </summary>
         [System.Serializable]
-        public class ControllerLimb
+        public class ControllerFinger
         {
             [HideInInspector]
             public string name = "";
@@ -77,34 +88,34 @@ namespace Leap.Unity.Controllers
 
 #else
             float temp = 0;
-            for (int i = 0; i < this.axes.Count; i++)
-            {
-                if (this.analog)
+                for (int i = 0; i < this.axes.Count; i++)
                 {
-                    temp = Mathf.Abs(Input.GetAxis(this.axes[i]));
-                    if (temp > result)
+                    try
                     {
-                        result = temp;
+                        if (this.analog)
+                        {
+                            temp = Mathf.Abs(Input.GetAxis(this.axes[i]));
+                            if (temp > result)
+                            {
+                                result = temp;
+                            }
+                        }
+                        else
+                        {
+                            if (Input.GetButton(this.axes[i]))
+                            {
+                                result = 1;
+                                break;
+                            }
+                        }
+                    }
+                    catch (System.ArgumentException e)
+                    {
+                        Debug.LogWarning(e.Message + "\n The controller post processor is reliant on the" +
+                            " XR Legacy Input Helpers package when using the Legacy Input Module. Please add this package to your project" +
+                            "and Seed XR Input Bindings.");
                     }
                 }
-                else
-                {
-                        try
-                        {
-
-                    if (Input.GetButton(this.axes[i]))
-                    {
-                        result = 1;
-                        break;
-                    }
-                        }
-                        catch (System.ArgumentException e)
-                        {
-                            Debug.LogWarning(e.Message + "\n The controller post processor is reliant on the" +
-                                " XR Legacy Input Helpers package when using the Legacy Input Module. Please add this package to your project.");
-                        }
-                }
-            }
 #endif
                 if (interpolate)
                 {
@@ -165,7 +176,7 @@ namespace Leap.Unity.Controllers
         private Quaternion _currentRotation;
 
         public Vector3 offsetRotationEuler;
-        public ControllerLimb[] limbs = new ControllerLimb[5];
+        public ControllerFinger[] fingers = new ControllerFinger[5];
 
         private Chirality chirality = Chirality.Left;
 
@@ -179,61 +190,63 @@ namespace Leap.Unity.Controllers
         }
 
         #region Properties
-        public ControllerLimb thumb
+        public ControllerFinger thumb
         {
             get
             {
-                return limbs[0];
+                return fingers[0];
             }
             set
             {
-                limbs[0] = value;
-            }
-        }
-        public ControllerLimb indexFinger
-        {
-            get
-            {
-                return limbs[1];
-            }
-            set
-            {
-                limbs[1] = value;
-            }
-        }
-        public ControllerLimb middleFinger
-        {
-            get
-            {
-                return limbs[2];
-            }
-            set
-            {
-                limbs[2] = value;
+                fingers[0] = value;
             }
         }
 
-        public ControllerLimb ringFinger
+        public ControllerFinger indexFinger
         {
             get
             {
-                return limbs[3];
+                return fingers[1];
             }
             set
             {
-                limbs[3] = value;
+                fingers[1] = value;
             }
         }
 
-        public ControllerLimb pinkyFinger
+        public ControllerFinger middleFinger
         {
             get
             {
-                return limbs[4];
+                return fingers[2];
             }
             set
             {
-                limbs[4] = value;
+                fingers[2] = value;
+            }
+        }
+
+        public ControllerFinger ringFinger
+        {
+            get
+            {
+                return fingers[3];
+            }
+            set
+            {
+                fingers[3] = value;
+            }
+        }
+
+        public ControllerFinger pinkyFinger
+        {
+            get
+            {
+                return fingers[4];
+            }
+            set
+            {
+                fingers[4] = value;
             }
         }
         #endregion
@@ -252,9 +265,9 @@ namespace Leap.Unity.Controllers
                     controller = XRController.rightHand;
                     break;
             }
-            for (int i = 0; i < limbs.Length; i++)
+            for (int i = 0; i < fingers.Length; i++)
             {
-                limbs[i].CreateAction();
+                fingers[i].CreateAction();
             }
             if (controller != null) { _oldPosition = controllerPosition; }
 #else
@@ -265,14 +278,17 @@ namespace Leap.Unity.Controllers
         public void Update()
         {
             this.timeVisible += Time.deltaTime;
-            for (int i = 0; i < this.limbs.Length; i++)
+            for (int i = 0; i < this.fingers.Length; i++)
             {
-                this.limbs[i].Update();
+                this.fingers[i].Update();
             }
             UpdateControllerVariables();
             this._hand = GenerateControllerHand();
         }
 
+        /// <summary>
+        /// Updates position and rotation based on controller position and rotation
+        /// </summary>
         private void UpdateControllerVariables()
         {
 #if ENABLE_INPUT_SYSTEM
@@ -284,22 +300,29 @@ namespace Leap.Unity.Controllers
 #endif
         }
 
-        #region Generate Limbs
+        #region Generate Fingers
 
-        public void GenerateLimbs()
+        /// <summary>
+        /// Generates fingers, axes & Hand Poses
+        /// </summary>
+        public void GenerateFingers()
         {
-            for (int i = 0; i < this.limbs.Length; i++)
+            for (int i = 0; i < this.fingers.Length; i++)
             {
-                this.limbs[i] = new ControllerLimb();
+                this.fingers[i] = new ControllerFinger();
             }
 #if ENABLE_INPUT_SYSTEM
             GenerateInputAxes(this.chirality);
 #else
-        GenerateLegacyAxes(this.chirality);
+            GenerateLegacyAxes(this.chirality);
 #endif
             GenerateHandPoses(this.chirality);
         }
 
+        /// <summary>
+        /// Generates sensible default rotations for fingers
+        /// </summary>
+        /// <param name="chirality"></param>
         private void GenerateHandPoses(Chirality chirality)
         {
             this.thumb.analog = false;
@@ -341,26 +364,29 @@ namespace Leap.Unity.Controllers
                 this.offsetRotationEuler.z *= -1;
             }
 
-
             switch (chirality)
             {
                 case Chirality.Right:
-                    for (int i = 0; i < this.limbs.Length; i++)
+                    for (int i = 0; i < this.fingers.Length; i++)
                     {
-                        this.limbs[i].metacarpalRotation.y *= -1;
-                        this.limbs[i].proximalRotation.y *= -1;
-                        this.limbs[i].intermediateRotation.y *= -1;
-                        this.limbs[i].distalRotation.y *= -1;
-                        this.limbs[i].metacarpalRotation.z *= -1;
-                        this.limbs[i].proximalRotation.z *= -1;
-                        this.limbs[i].intermediateRotation.z *= -1;
-                        this.limbs[i].distalRotation.z *= -1;
+                        this.fingers[i].metacarpalRotation.y *= -1;
+                        this.fingers[i].proximalRotation.y *= -1;
+                        this.fingers[i].intermediateRotation.y *= -1;
+                        this.fingers[i].distalRotation.y *= -1;
+                        this.fingers[i].metacarpalRotation.z *= -1;
+                        this.fingers[i].proximalRotation.z *= -1;
+                        this.fingers[i].intermediateRotation.z *= -1;
+                        this.fingers[i].distalRotation.z *= -1;
                     }
                     break;
             }
         }
 #if ENABLE_INPUT_SYSTEM
 
+        /// <summary>
+        /// Links controller axes to fingers
+        /// </summary>
+        /// <param name="chirality"></param>
         private void GenerateInputAxes(Chirality chirality)
         {
             string hand = chirality.ToString();
@@ -378,7 +404,10 @@ namespace Leap.Unity.Controllers
             this.pinkyFinger.axes = new List<string>() { "<XRController>{" + hand + "Hand}/grip" };
         }
 #else
-
+        /// <summary>
+        /// Links legacy controller axes to fingers
+        /// </summary>
+        /// <param name="chirality"></param>
         private void GenerateLegacyAxes(Chirality chirality)
         {
             string hand = chirality.ToString();
@@ -400,9 +429,13 @@ namespace Leap.Unity.Controllers
 
         #region Generate Hands
 
+        /// <summary>
+        /// Uses ControllerFingers to generate a LeapHand
+        /// </summary>
+        /// <returns></returns>
         private Hand GenerateControllerHand()
         {
-            // this could do with being changed so it doesn't generate each time.
+            //TODO: this could do with being changed so it doesn't generate each time.
             // annoying to do because finger positions are in world space, meaning transforms are hard to carry between frames.
             Hand h = TestHandFactory.MakeTestHand(chirality == Chirality.Left, unitType: TestHandFactory.UnitType.UnityUnits);
             SetFingerSizes(ref h, 0.013f);
@@ -439,21 +472,25 @@ namespace Leap.Unity.Controllers
                 }
             }
         }
-
-        private void RotateFinger(Finger f, ControllerLimb limb)
+        /// <summary>
+        /// Generates a Leap Finger from ControllerFinger
+        /// </summary>
+        /// <param name="f"></param>
+        /// <param name="finger"></param>
+        private void RotateFinger(Finger f, ControllerFinger finger)
         {
-            RotateJoint(ref f.bones[0], ref f.bones[1], Vector3.Slerp(Vector3.zero, limb.metacarpalRotation, limb.value));
-            if (limb.compoundRotations)
+            RotateJoint(ref f.bones[0], ref f.bones[1], Vector3.Slerp(Vector3.zero, finger.metacarpalRotation, finger.value));
+            if (finger.compoundRotations)
             {
-                RotateJoint(ref f.bones[1], ref f.bones[2], Vector3.Slerp(Vector3.zero, limb.metacarpalRotation + limb.proximalRotation, limb.value));
-                RotateJoint(ref f.bones[2], ref f.bones[3], Vector3.Slerp(Vector3.zero, limb.metacarpalRotation + limb.proximalRotation + limb.intermediateRotation, limb.value));
-                RotateJoint(ref f.bones[3], ref f.bones[3], Vector3.Slerp(Vector3.zero, limb.metacarpalRotation + limb.proximalRotation + limb.intermediateRotation + limb.distalRotation, limb.value));
+                RotateJoint(ref f.bones[1], ref f.bones[2], Vector3.Slerp(Vector3.zero, finger.metacarpalRotation + finger.proximalRotation, finger.value));
+                RotateJoint(ref f.bones[2], ref f.bones[3], Vector3.Slerp(Vector3.zero, finger.metacarpalRotation + finger.proximalRotation + finger.intermediateRotation, finger.value));
+                RotateJoint(ref f.bones[3], ref f.bones[3], Vector3.Slerp(Vector3.zero, finger.metacarpalRotation + finger.proximalRotation + finger.intermediateRotation + finger.distalRotation, finger.value));
             }
             else
             {
-                RotateJoint(ref f.bones[1], ref f.bones[2], Vector3.Slerp(Vector3.zero, limb.proximalRotation, limb.value));
-                RotateJoint(ref f.bones[2], ref f.bones[3], Vector3.Slerp(Vector3.zero, limb.intermediateRotation, limb.value));
-                RotateJoint(ref f.bones[3], ref f.bones[3], Vector3.Slerp(Vector3.zero, limb.distalRotation, limb.value));
+                RotateJoint(ref f.bones[1], ref f.bones[2], Vector3.Slerp(Vector3.zero, finger.proximalRotation, finger.value));
+                RotateJoint(ref f.bones[2], ref f.bones[3], Vector3.Slerp(Vector3.zero, finger.intermediateRotation, finger.value));
+                RotateJoint(ref f.bones[3], ref f.bones[3], Vector3.Slerp(Vector3.zero, finger.distalRotation, finger.value));
             }
         }
 
