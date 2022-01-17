@@ -129,9 +129,9 @@ namespace Leap.Unity
 
         public Camera mainCamera
         {
-            get 
-            { 
-                return MainCameraProvider.mainCamera; 
+            get
+            {
+                return MainCameraProvider.mainCamera;
             }
             set
             {
