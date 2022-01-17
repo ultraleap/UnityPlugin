@@ -92,6 +92,11 @@ namespace Leap.Unity.Controllers
             UpdateControllers();
         }
 
+        private void Reset()
+        {
+            GenerateInputDefaultAxis();
+        }
+
         /// <summary>
         /// Updates input types based on whether a controller is active or not.
         /// If the project is using the Legacy Input System, this does not check for an active controller.
