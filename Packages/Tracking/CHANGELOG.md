@@ -9,14 +9,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [5.2.0]
 
 ### Added
+- Adding SIR170 leapc/device.
+- Adding 3DI leapc/device
+- Adding option to grasp interaction objects with a specific hand
+
 
 ### Changed
 
 - Moved SimpleFacingCameraCallbacks.cs to Interaction Engine\Runtime\Scripts\Utility & updated its namespace
+- Update main camera provider to enable work on supporting MRTK
 
 ### Removed
 
-## [5.1.0] - 2022-1-11
+### Fixed
+- https://github.com/ultraleap/UnityPlugin/issues/1177
+
+### Known issues
+-	Scenes containing the infrared viewer render incorrectly on systems using single pass stereo with the XR plugin system - e.g. Windows Mixed Reality headsets. SteamVR headsets may also default to single pass stereo, showing the same issue. However in this case, the OpenVR settings can be changed to multipass which resolves the problem.
+-	Demo scenes do not start at the correct height for a seated user. The XR Plugin Management System adjusts the camera height. This means the user has to adjust components in the scene to the correct height - e.g. camera height. Currently our position is to support the legacy XR system height settings.
+-	Capsule hands appear small compared to size of 'IR hands' of user using HDRP / URP and do not line up. Using standard rendering on Unity 2019.4 LTS  hands are usually not visible (but are being tracked). When they appear they do not line up with the hands in the image.
+- Outline/Ghost hands sometimes show a shader issue when upgrading to SRP (TOON shader)
+- Issues with slider button movements not being possible or registering false presses in moving reference frames scene when frame is moving (inconsistent). Only affects slider buttons - normal buttons work fine.
+- Possible hand offset issues on XR2 headsets using SVR plugin
+
+## [5.1.0]
 
 ### Added
 - Adding coloring options to the capsule hands
@@ -41,7 +57,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Possible hand offset issues on XR2 headsets using SVR plugin
 
 
-## [5.0.0] - 2021-12-8
+## [5.0.0]
 ### Added
 - Support for Unity HDRP and URP including materials and shaders in all examples
 - Hands module shaders for outline, ghost and skeleton hands
