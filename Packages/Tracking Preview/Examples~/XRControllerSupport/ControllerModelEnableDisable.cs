@@ -5,6 +5,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// ControllerModelEnableDisable checks to see whether to enable itself if LeapHands are the current 
+/// input type being used by a ControllerPostProcess. This is to show controller models when hands are active
+/// so that a user can easily find them again.
+/// </summary>
 public class ControllerModelEnableDisable : MonoBehaviour
 {
     public ControllerPostProcess controllerPostProcess;
