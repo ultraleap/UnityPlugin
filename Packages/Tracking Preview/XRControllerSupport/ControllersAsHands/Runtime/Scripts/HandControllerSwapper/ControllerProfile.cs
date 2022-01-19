@@ -10,6 +10,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Leap.Unity;
+using System.Linq;
 
 namespace Leap.Unity.Controllers
 {
@@ -18,7 +19,7 @@ namespace Leap.Unity.Controllers
     /// ControllerProfile sets up and stores the various InputChecks and is primarily used
     /// as a data object
     /// </summary>
-    public class ControllerProfile 
+    public class ControllerProfile
     {
         public List<InputCheckStage> leftHandChecks = new List<InputCheckStage>();
         public List<InputCheckStage> rightHandChecks = new List<InputCheckStage>();
@@ -28,13 +29,22 @@ namespace Leap.Unity.Controllers
 
         public ControllerProfile()
         {
-            PopulateInputCheckStages();
+            PopulateHandToControllerInputCheckStagesList(ref leftHandChecks, Chirality.Left);
+            PopulateHandToControllerInputCheckStagesList(ref rightHandChecks, Chirality.Right);
+
+            PopulateControllerToHandInputCheckStagesList(ref leftControllerChecks, Chirality.Left);
+            PopulateControllerToHandInputCheckStagesList(ref rightControllerChecks, Chirality.Right);
         }
 
         public class InputCheckStage
         {
             public List<InputCheckBase> checks = new List<InputCheckBase>();
-            
+
+            public InputCheckStage()
+            {
+                checks = new List<InputCheckBase>();
+            }
+
             public InputCheckStage(List<InputCheckBase> checks)
             {
                 this.checks = checks;
@@ -66,7 +76,7 @@ namespace Leap.Unity.Controllers
             }
         }
 
-        private void PopulateInputCheckStages()
+        private void PopulateHandToControllerInputCheckStagesList(ref List<InputCheckStage> inputCheckStages, Chirality chirality)
         {
             List<InputCheckBase> handToControllerChecksStage0 = new List<InputCheckBase>()
             {
@@ -108,6 +118,16 @@ namespace Leap.Unity.Controllers
                }
             };
 
+            inputCheckStages = new List<InputCheckStage>()
+            {
+                new InputCheckStage(handToControllerChecksStage0),
+                new InputCheckStage(handToControllerChecksStage1),
+            };
+            inputCheckStages.ForEach(inputCheckStage => inputCheckStage.SetInputCheckChirality(chirality));
+        }
+
+        private void PopulateControllerToHandInputCheckStagesList(ref List<InputCheckStage> inputCheckStages, Chirality chirality)
+        {
             List<InputCheckBase> controllerToHandChecksStage0 = new List<InputCheckBase>()
             {
                 new DistanceFromHead()
@@ -165,26 +185,14 @@ namespace Leap.Unity.Controllers
                 }
             };
 
-            leftHandChecks = new List<InputCheckStage>()
-            {
-                new InputCheckStage(handToControllerChecksStage0),
-                new InputCheckStage(handToControllerChecksStage1),
-            };
-            leftHandChecks.ForEach(inputCheckStage => inputCheckStage.SetInputCheckChirality(Chirality.Left));
-
-            leftControllerChecks = new List<InputCheckStage>()
+            inputCheckStages = new List<InputCheckStage>()
             {
                 new InputCheckStage(controllerToHandChecksStage0),
                 new InputCheckStage(controllerToHandChecksStage1),
                 new InputCheckStage(controllerToHandChecksStage2),
             };
-            leftControllerChecks.ForEach(inputCheckStage => inputCheckStage.SetInputCheckChirality(Chirality.Left));
 
-            rightHandChecks = new List<InputCheckStage>(leftHandChecks);
-            rightHandChecks.ForEach(inputCheckStage => inputCheckStage.SetInputCheckChirality(Chirality.Right));
-
-            rightControllerChecks = new List<InputCheckStage>(leftControllerChecks);
-            rightControllerChecks.ForEach(inputCheckStage => inputCheckStage.SetInputCheckChirality(Chirality.Right));
+            inputCheckStages.ForEach(inputCheckStage => inputCheckStage.SetInputCheckChirality(chirality));
         }
     }
 }
