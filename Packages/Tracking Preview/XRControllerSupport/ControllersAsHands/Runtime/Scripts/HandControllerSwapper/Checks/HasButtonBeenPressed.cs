@@ -14,6 +14,10 @@ using UnityEngine.InputSystem;
 
 namespace Leap.Unity.Controllers
 {
+    /// <summary>
+    /// HasButtonBeenPressed checks to see if a button has been pressed on a controller, if the inputMethodType
+    /// is XRController. If it is a LeapHand, this InputCheckBase returns false
+    /// </summary>
     public class HasButtonBeenPressed : InputCheckBase
     {
 

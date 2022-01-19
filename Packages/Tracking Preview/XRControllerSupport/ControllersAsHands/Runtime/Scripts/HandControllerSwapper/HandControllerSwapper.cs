@@ -16,11 +16,13 @@ using System.Reflection;
 
 namespace Leap.Unity.Controllers
 {
+    /// <summary>
+    /// HandControllerSwapper is used to swap between controller input and hand input.
+    /// </summary>
     public class HandControllerSwapper : MonoBehaviour
     {
         public ControllerPostProcess controllerPostProcess;
         public ControllerProfile ControllerProfile = new ControllerProfile();
-        private ControllerProfile _oldProfile;
         private InputMethodType[] _inputType;
 
         private LeapProvider _originalProvider;
@@ -45,7 +47,12 @@ namespace Leap.Unity.Controllers
             ControllerProfile.SetupProfiles(_originalProvider);
         }
 
-        public void SetCurrentInputType(Chirality chirality)
+        /// <summary>
+        /// This is the heart of the HandControllerSwapper. It takes in a chirality and checks both the Leap Hand 
+        /// and the XR Controller inputs of that chirality, working out which is most appropriate to use at the given time.
+        /// </summary>
+        /// <param name="chirality"></param>
+        private void SetCurrentInputType(Chirality chirality)
         {
             if (ControllerProfile == null)
             {
@@ -89,7 +96,14 @@ namespace Leap.Unity.Controllers
             controllerPostProcess.SetInputMethodType(chirality, _inputType[(int)chirality]);
         }
 
-        public bool IsInputGroupValid(List<ControllerProfile.HandChecks> inputs)
+        /// <summary>
+        /// This checks that an InputGroup is valid.
+        /// It does this by looping through all the InputCheckStages passed in through inputs.
+        /// If all stages are valid, then the InputGroup is valid, and we return true.
+        /// </summary>
+        /// <param name="inputs"></param>
+        /// <returns></returns>
+        public bool IsInputGroupValid(List<ControllerProfile.InputCheckStage> inputs)
         {
             for (int i = 0; i < inputs.Count; i++)
             {
@@ -105,7 +119,16 @@ namespace Leap.Unity.Controllers
             return true;
         }
 
-        public bool IsStageValid(ControllerProfile.HandChecks stage)
+        /// <summary>
+        /// This loops through all InputChecks in an InputCheckStage
+        /// InputCheckStages are a group of InputChecks.
+        /// If one InputCheck in an InputCheckStage is true, the stage is classed as valid.
+        /// Some InputChecks can be classed as mandatory - if this is the case, 
+        /// these must be true for the stage to pass.
+        /// </summary>
+        /// <param name="stage"></param>
+        /// <returns></returns>
+        public bool IsStageValid(ControllerProfile.InputCheckStage stage)
         {
             List<InputCheckBase> mandatoryElements = stage.checks.FindAll(x => x.mandatory);
             bool mandatory = true;
@@ -128,15 +151,6 @@ namespace Leap.Unity.Controllers
             }
             notMandatory = count > 0;
             return mandatory && notMandatory;
-        }
-
-        private void OnValidate()
-        {
-            if (Application.isPlaying && ControllerProfile != _oldProfile)
-            {
-                ControllerProfile.SetupProfiles(_originalProvider);
-                _oldProfile = ControllerProfile;
-            }
         }
     }
 }

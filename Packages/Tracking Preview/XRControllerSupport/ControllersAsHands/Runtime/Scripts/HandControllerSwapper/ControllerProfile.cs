@@ -13,25 +13,29 @@ using Leap.Unity;
 
 namespace Leap.Unity.Controllers
 {
+
+    /// <summary>
+    /// ControllerProfile sets up and stores the various InputChecks and is primarily used
+    /// as a data object
+    /// </summary>
     public class ControllerProfile 
     {
-        public List<HandChecks> leftHandChecks = new List<HandChecks>();
-        public List<HandChecks> rightHandChecks = new List<HandChecks>();
+        public List<InputCheckStage> leftHandChecks = new List<InputCheckStage>();
+        public List<InputCheckStage> rightHandChecks = new List<InputCheckStage>();
 
-        public List<HandChecks> leftControllerChecks = new List<HandChecks>();
-        public List<HandChecks> rightControllerChecks = new List<HandChecks>();
+        public List<InputCheckStage> leftControllerChecks = new List<InputCheckStage>();
+        public List<InputCheckStage> rightControllerChecks = new List<InputCheckStage>();
 
         public ControllerProfile()
         {
-            PopulateLeftHandChecks();
-            PopulateRightHandChecks();
+            PopulateInputCheckStages();
         }
 
-        public class HandChecks
+        public class InputCheckStage
         {
             public List<InputCheckBase> checks = new List<InputCheckBase>();
             
-            public HandChecks(List<InputCheckBase> checks)
+            public InputCheckStage(List<InputCheckBase> checks)
             {
                 this.checks = checks;
             }
@@ -51,7 +55,7 @@ namespace Leap.Unity.Controllers
             SetupProfiles(rightControllerChecks, originalProvider);
         }
 
-        private void SetupProfiles(List<HandChecks> checks, LeapProvider provider)
+        private void SetupProfiles(List<InputCheckStage> checks, LeapProvider provider)
         {
             for (int i = 0; i < checks.Count; i++)
             {
@@ -62,7 +66,7 @@ namespace Leap.Unity.Controllers
             }
         }
 
-        private void PopulateLeftHandChecks()
+        private void PopulateInputCheckStages()
         {
             List<InputCheckBase> handToControllerChecksStage0 = new List<InputCheckBase>()
             {
@@ -161,136 +165,26 @@ namespace Leap.Unity.Controllers
                 }
             };
 
-            leftHandChecks = new List<HandChecks>()
+            leftHandChecks = new List<InputCheckStage>()
             {
-                new HandChecks(handToControllerChecksStage0),
-                new HandChecks(handToControllerChecksStage1),
+                new InputCheckStage(handToControllerChecksStage0),
+                new InputCheckStage(handToControllerChecksStage1),
             };
-            leftHandChecks.ForEach(handCheck => handCheck.SetInputCheckChirality(Chirality.Left));
+            leftHandChecks.ForEach(inputCheckStage => inputCheckStage.SetInputCheckChirality(Chirality.Left));
 
-            leftControllerChecks = new List<HandChecks>()
+            leftControllerChecks = new List<InputCheckStage>()
             {
-                new HandChecks(controllerToHandChecksStage0),
-                new HandChecks(controllerToHandChecksStage1),
-                new HandChecks(controllerToHandChecksStage2),
+                new InputCheckStage(controllerToHandChecksStage0),
+                new InputCheckStage(controllerToHandChecksStage1),
+                new InputCheckStage(controllerToHandChecksStage2),
             };
-            leftControllerChecks.ForEach(handCheck => handCheck.SetInputCheckChirality(Chirality.Left));
-        }
-        
-        private void PopulateRightHandChecks()
-        {
-            List<InputCheckBase> handToControllerChecksStage0 = new List<InputCheckBase>()
-            {
-                new DistanceBetweenInputs()
-                {
-                    inputMethodType = InputMethodType.LeapHand,
-                    actionThreshold = 0.12f
-                },
-                new HasButtonBeenPressed()
-                {
-                    inputMethodType = InputMethodType.XRController,
-                },
-                new InputIsInactive()
-                {
-                    inputMethodType = InputMethodType.LeapHand,
-                },
-            };
+            leftControllerChecks.ForEach(inputCheckStage => inputCheckStage.SetInputCheckChirality(Chirality.Left));
 
-            List<InputCheckBase> handToControllerChecksStage1 = new List<InputCheckBase>()
-            {
-               new DistanceBetweenInputs()
-               {
-                    inputMethodType = InputMethodType.LeapHand,
-                    actionThreshold = 0.12f,
-                    useTime = true,
-                    timeThreshold = 2,
-               },
-               new HasButtonBeenPressed()
-               {
-                    inputMethodType = InputMethodType.XRController,
-               },
-               new InputVelocity()
-               {
-                    inputMethodType = InputMethodType.XRController,
-                    velocityIsLower = false,
-                    actionThreshold = 0.015f,
-                    useTime = true,
-                    timeThreshold = 0.2f
-               }
-            };
+            rightHandChecks = new List<InputCheckStage>(leftHandChecks);
+            rightHandChecks.ForEach(inputCheckStage => inputCheckStage.SetInputCheckChirality(Chirality.Right));
 
-            List<InputCheckBase> controllerToHandChecksStage0 = new List<InputCheckBase>()
-            {
-                new DistanceFromHead()
-                {
-                    inputMethodType = InputMethodType.XRController,
-                    lessThan = false,
-                    actionThreshold = 1.1f,
-                    useTime = true,
-                    timeThreshold = 0.1f
-                },
-                new InputVelocity()
-                {
-                    inputMethodType = InputMethodType.XRController,
-                    velocityIsLower = true,
-                    actionThreshold = 0.01f,
-                    useTime = true,
-                    timeThreshold = 0.2f,
-                },
-                new IsFacingDown()
-                {
-                    inputMethodType = InputMethodType.XRController,
-                    useTime = true,
-                    actionThreshold = 30,
-                    timeThreshold = 0.2f
-                }
-            };
-
-            List<InputCheckBase> controllerToHandChecksStage1 = new List<InputCheckBase>()
-            {
-                new DistanceBetweenInputs()
-                {
-                    inputMethodType = InputMethodType.XRController,
-                    actionThreshold = 0.2f
-                },
-            };
-
-            List<InputCheckBase> controllerToHandChecksStage2 = new List<InputCheckBase>()
-            {
-                new DistanceBetweenInputs()
-                {
-                    inputMethodType= InputMethodType.XRController,
-                    actionThreshold = 0.2f
-                },
-                new PinchGrasp()
-                {
-                    inputMethodType = InputMethodType.LeapHand
-                },
-                new InputVelocity()
-                {
-                    inputMethodType = InputMethodType.XRController,
-                    velocityIsLower = true,
-                    actionThreshold = 0.01f,
-                    useTime = true,
-                    timeThreshold = 0.1f
-                }
-            };
-
-            rightHandChecks = new List<HandChecks>()
-            {
-                new HandChecks(handToControllerChecksStage0),
-                new HandChecks(handToControllerChecksStage1),
-            };
-            rightHandChecks.ForEach(handCheck => handCheck.SetInputCheckChirality(Chirality.Right));
-
-
-            rightControllerChecks = new List<HandChecks>()
-            {
-                new HandChecks(controllerToHandChecksStage0),
-                new HandChecks(controllerToHandChecksStage1),
-                new HandChecks(controllerToHandChecksStage2),
-            };
-            rightControllerChecks.ForEach(handCheck => handCheck.SetInputCheckChirality(Chirality.Right));
+            rightControllerChecks = new List<InputCheckStage>(leftControllerChecks);
+            rightControllerChecks.ForEach(inputCheckStage => inputCheckStage.SetInputCheckChirality(Chirality.Right));
         }
     }
 }

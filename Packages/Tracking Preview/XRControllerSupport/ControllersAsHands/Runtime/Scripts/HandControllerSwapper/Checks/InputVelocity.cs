@@ -14,6 +14,10 @@ using UnityEngine.InputSystem;
 
 namespace Leap.Unity.Controllers
 {
+    /// <summary>
+    /// InputVelocity checks to see if the velocity of the InputMethodType is less than the actionThreshold
+    /// if velocityIsLower is true, or greater than the actionThreshold if velocityIsLower is false
+    /// </summary>
     public class InputVelocity : InputCheckBase
     {
         InputAction _controllerAction;

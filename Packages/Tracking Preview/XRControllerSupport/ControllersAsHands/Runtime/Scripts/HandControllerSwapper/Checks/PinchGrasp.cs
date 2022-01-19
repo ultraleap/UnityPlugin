@@ -11,6 +11,9 @@ using Leap.Unity;
 
 namespace Leap.Unity.Controllers
 {
+    /// <summary>
+    /// PinchGrasp checks to see if a Hand is pinching or grabbing
+    /// </summary>
     public class PinchGrasp : InputCheckBase
     {
         protected override bool IsTrueLogic()

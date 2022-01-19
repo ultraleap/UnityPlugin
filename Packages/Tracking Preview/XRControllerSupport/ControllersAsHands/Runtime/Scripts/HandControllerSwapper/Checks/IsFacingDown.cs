@@ -11,6 +11,11 @@ using UnityEngine;
 
 namespace Leap.Unity.Controllers
 {
+    /// <summary>
+    /// IsFacingDown checks to see if the angle between the InputMethodType and the floor 
+    /// is less than the action threshold. This is useful for checking if XRControllers
+    /// are dangling from a user's wrists.
+    /// </summary>
     public class IsFacingDown : InputCheckBase
     {
         protected override bool IsTrueLogic()

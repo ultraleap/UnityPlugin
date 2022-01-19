@@ -13,6 +13,11 @@ using Leap.Unity;
 
 namespace Leap.Unity.Controllers
 {
+    /// <summary>
+    /// DistanceBetweenInputs checks to see if the distance between inputs (i.e. distance between hands and controllers)
+    /// is less than or equal to the actionThreshold if the InputMethodType is LeapHand, or greater than or 
+    /// equal to the actionThreshold if the InputMethodType is XRController
+    /// </summary>
     public class DistanceBetweenInputs : InputCheckBase
     {
 

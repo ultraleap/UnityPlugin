@@ -12,6 +12,11 @@ using UnityEngine;
 
 namespace Leap.Unity.Controllers
 {
+    /// <summary>
+    /// InputCheckBase is the base class for all InputChecks.
+    /// This is used as a base class to compare Leap Hand Input and XRController Input.
+    /// It also allows you to add a time threshold to your check.
+    /// </summary>
     [System.Serializable]
     public class InputCheckBase
     {
@@ -85,7 +90,6 @@ namespace Leap.Unity.Controllers
                 return false;
 
             return _xrController.IsControllerActive();
-
         }
 
         public virtual void Reset()

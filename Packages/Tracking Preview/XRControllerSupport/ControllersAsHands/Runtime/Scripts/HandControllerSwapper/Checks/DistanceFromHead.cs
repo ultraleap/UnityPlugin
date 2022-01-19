@@ -13,6 +13,10 @@ using UnityEngine;
 
 namespace Leap.Unity.Controllers
 {
+    /// <summary>
+    /// DistanceFromHead checks to see if the distance of the InputMethodType is less than or equal to the actionThreshold
+    /// if lessThan is true, or greater than or equal to the actionThreshold if lessThan is false
+    /// </summary>
     public class DistanceFromHead : InputCheckBase
     {
         public bool lessThan = false;
@@ -22,14 +26,15 @@ namespace Leap.Unity.Controllers
             Vector3 inputPosition;
             if (GetPosition(out inputPosition))
             {
-                distance = Vector3.Distance(inputPosition, Camera.main.transform.position);
+                distance = Vector3.Distance(inputPosition, MainCameraProvider.mainCamera.transform.position);
+
                 if (lessThan)
                 {
-                    return Vector3.Distance(inputPosition, Camera.main.transform.position) <= actionThreshold;
+                    return distance <= actionThreshold;
                 }
                 else
                 {
-                    return Vector3.Distance(inputPosition, Camera.main.transform.position) >= actionThreshold;
+                    return distance >= actionThreshold;
                 }
             }
             return false;

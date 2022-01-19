@@ -13,6 +13,9 @@ using UnityEngine;
 
 namespace Leap.Unity.Controllers
 {
+    /// <summary>
+    /// InputIsInactive checks to see if the assigned InputMethodType is inactive
+    /// </summary>
     public class InputIsInactive : InputCheckBase
     {
         protected override bool IsTrueLogic()
