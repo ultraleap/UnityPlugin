@@ -51,7 +51,7 @@ MonoBehaviour:
   dataUpdateMode: 2
   passthroughOnly: 0
   leftHandInputs:
-    offsetPosition: {x: 0, y: 0, z: 0}
+    transform: {fileID: 6612547581555058609}
     offsetRotationEuler: {x: -10, y: 260, z: 235}
     fingers:
     - name: Left Thumb
@@ -120,7 +120,7 @@ MonoBehaviour:
       distalRotation: {x: -45, y: -20, z: 20}
     timeVisible: 0
   rightHandInputs:
-    offsetPosition: {x: 0, y: 0, z: 0}
+    transform: {fileID: 6612547583109653878}
     offsetRotationEuler: {x: -10, y: -260, z: -235}
     fingers:
     - name: Right Thumb
@@ -202,9 +202,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e933f13d48c681d48b14750922ac906d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _comment: 'Controller Post Process Setup Guide - To generate sensible values, use
-    the context menu option "Generate Default Axis".  If using the Legacy Input Module,
-    you must install the XR Legacy Input Helpers package and Generate seed bindings. '
+  _comment: Controller Post Process Setup Guide - Sensible values should already
+    be pre-populated for the Input System. If this is not the case, use the context
+    menu option "Generate Default Axis".  If you are using the Legacy Input Module,
+    you must install the XR Legacy Input Helpers package and use the option "Generate
+    Seed Bindings" in the assets menu.
   _isEditing: 0
 --- !u!114 &7919004661373399488
 MonoBehaviour:
@@ -275,7 +277,6 @@ MeshRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
-  m_RayTraceProcedural: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -300,7 +301,6 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_AdditionalVertexStreams: {fileID: 0}
 --- !u!65 &6612547581540578863
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -451,7 +451,6 @@ MeshRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
-  m_RayTraceProcedural: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -476,7 +475,6 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_AdditionalVertexStreams: {fileID: 0}
 --- !u!65 &6612547582121251027
 BoxCollider:
   m_ObjectHideFlags: 0
