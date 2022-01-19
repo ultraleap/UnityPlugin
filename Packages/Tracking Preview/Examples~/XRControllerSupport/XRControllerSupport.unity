@@ -729,7 +729,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6612547581167370263, guid: c3578bd76f7b2784faf4bf41b77663e2, type: 3}
       propertyPath: m_Name
-      value: erPostProcessProviderProvider
+      value: ControllerPostProcessProvider
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c3578bd76f7b2784faf4bf41b77663e2, type: 3}
