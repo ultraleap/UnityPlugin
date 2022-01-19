@@ -7,8 +7,10 @@
  ******************************************************************************/
 
 using Leap.Unity;
-using UnityEngine.InputSystem.XR;
 using UnityEngine;
+#if ENABLE_INPUT_SYSTEM
+using UnityEngine.InputSystem.XR;
+#endif
 
 namespace Leap.Unity.Controllers
 {
@@ -43,7 +45,9 @@ namespace Leap.Unity.Controllers
 
         protected LeapProvider _provider;
 
+#if ENABLE_INPUT_SYSTEM
         protected XRController _xrController;
+#endif
 
         public virtual void Setup(LeapProvider originalProvider)
         {
@@ -74,6 +78,8 @@ namespace Leap.Unity.Controllers
 
         protected bool GetController()
         {
+#if ENABLE_INPUT_SYSTEM
+
             if (_xrController == null)
             {
                 switch (hand)
@@ -90,6 +96,9 @@ namespace Leap.Unity.Controllers
                 return false;
 
             return _xrController.IsControllerActive();
+#else
+            return true;
+#endif
         }
 
         public virtual void Reset()

@@ -27,11 +27,29 @@ namespace Leap.Unity.Controllers
 
         private LeapProvider _originalProvider;
 
+        private Vector3 leftControllerVelocity, rightControllerVelocity;
+        private Vector3 prevLeftControllerPosition, prevRightControllerPosition;
+
         private void Start()
         {
             Setup(controllerPostProcess.inputLeapProvider, controllerPostProcess.currentInputTypes);
             controllerPostProcess.OnControllerActiveFrame += SetCurrentInputType;
             controllerPostProcess.AlwaysEnableControllersIfActive = false;
+            leftControllerVelocity = Vector3.zero;
+            rightControllerVelocity = Vector3.zero;
+            prevLeftControllerPosition = Vector3.zero;
+            prevRightControllerPosition = Vector3.zero;
+        }
+
+        private void Update()
+        {
+            Vector3 currentLeftControllerPos = controllerPostProcess.leftHandInputs.transform.position;
+            leftControllerVelocity = (currentLeftControllerPos - prevLeftControllerPosition) / Time.deltaTime;
+            prevLeftControllerPosition = currentLeftControllerPos;
+
+            Vector3 currentRightControllerPos = controllerPostProcess.rightHandInputs.transform.position;
+            rightControllerVelocity = (currentRightControllerPos - prevRightControllerPosition) / Time.deltaTime;
+            prevRightControllerPosition = currentRightControllerPos;
         }
 
         public void Setup(LeapProvider originalProvider, InputMethodType[] initialInputMethodTypes)
@@ -130,6 +148,9 @@ namespace Leap.Unity.Controllers
         /// <returns></returns>
         public bool IsStageValid(ControllerProfile.InputCheckStage stage)
         {
+#if !ENABLE_INPUT_SYSTEM
+            UpdateLegacyInputSystemVariables(ref stage);
+#endif
             List<InputCheckBase> mandatoryElements = stage.checks.FindAll(x => x.mandatory);
             bool mandatory = true;
             List<InputCheckBase> notMandatoryElements = stage.checks.FindAll(x => !x.mandatory);
@@ -151,6 +172,49 @@ namespace Leap.Unity.Controllers
             }
             notMandatory = count > 0;
             return mandatory && notMandatory;
+        }
+
+        private void UpdateLegacyInputSystemVariables(ref ControllerProfile.InputCheckStage stage)
+        {
+            stage.checks.FindAll(check => check is InputVelocity)
+                .ForEach(check =>
+                {
+                    InputVelocity inputVelocityCheck = check as InputVelocity;
+                    inputVelocityCheck.currentVelocity = inputVelocityCheck.hand == Chirality.Left ?
+                    leftControllerVelocity : 
+                    rightControllerVelocity;
+                }
+            );
+
+            stage.checks.FindAll(check => check is DistanceFromHead)
+                .ForEach(check =>
+                {
+                    DistanceFromHead distanceFromHeadCheck = check as DistanceFromHead;
+                    distanceFromHeadCheck.currentXRControllerPosition = distanceFromHeadCheck.hand == Chirality.Left ? 
+                    controllerPostProcess.leftHandInputs.transform.position :
+                    controllerPostProcess.rightHandInputs.transform.position;
+                }
+            );
+            
+            stage.checks.FindAll(check => check is DistanceBetweenInputs)
+                .ForEach(check =>
+                {
+                    DistanceBetweenInputs distanceBetweenInputsCheck = check as DistanceBetweenInputs;
+                    distanceBetweenInputsCheck.currentXRControllerPosition = distanceBetweenInputsCheck.hand == Chirality.Left ? 
+                    controllerPostProcess.leftHandInputs.transform.position :
+                    controllerPostProcess.rightHandInputs.transform.position;
+                }
+            );
+            
+            stage.checks.FindAll(check => check is IsFacingDown)
+                .ForEach(check =>
+                {
+                    IsFacingDown isFacingDownCheck = check as IsFacingDown;
+                    isFacingDownCheck.currentXRControllerRotation = isFacingDownCheck.hand == Chirality.Left ? 
+                    controllerPostProcess.leftHandInputs.transform.rotation :
+                    controllerPostProcess.rightHandInputs.transform.rotation;
+                }
+            );
         }
     }
 }

@@ -18,6 +18,7 @@ namespace Leap.Unity.Controllers
     /// </summary>
     public class IsFacingDown : InputCheckBase
     {
+        public Quaternion currentXRControllerRotation;
         protected override bool IsTrueLogic()
         {
             float angle;
@@ -45,7 +46,11 @@ namespace Leap.Unity.Controllers
                 case InputMethodType.XRController:
                     if (GetController())
                     {
+#if ENABLE_INPUT_SYSTEM
                         angle = Vector3.Angle(_xrController.deviceRotation.ReadValue() * Vector3.forward, Vector3.down);
+#else
+                        angle = Vector3.Angle(currentXRControllerRotation * Vector3.forward, Vector3.down);
+#endif
                         return true;
                     }
                     break;

@@ -10,7 +10,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Leap.Unity;
+
+#if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
+#endif
 
 namespace Leap.Unity.Controllers
 {
@@ -20,10 +23,13 @@ namespace Leap.Unity.Controllers
     /// </summary>
     public class InputVelocity : InputCheckBase
     {
+#if ENABLE_INPUT_SYSTEM
         InputAction _controllerAction;
+#else
+        public Vector3 currentVelocity;
+#endif
 
         public bool velocityIsLower = false;
-
         protected override bool IsTrueLogic()
         {
             Vector3 vel;
@@ -51,7 +57,11 @@ namespace Leap.Unity.Controllers
                 case InputMethodType.XRController:
                     if (GetController())
                     {
+#if ENABLE_INPUT_SYSTEM
                         vel = _controllerAction.ReadValue<Vector3>();
+#else
+                        vel = currentVelocity;
+#endif
                         return true;
                     }
                     break;
@@ -63,6 +73,14 @@ namespace Leap.Unity.Controllers
         public override void Setup(LeapProvider originalProvider)
         {
             base.Setup(originalProvider);
+#if ENABLE_INPUT_SYSTEM
+            SetupInputSystem();
+#endif
+        }
+
+#if ENABLE_INPUT_SYSTEM
+        private void SetupInputSystem()
+        {
             string inputaction = hand.ToString() + " InputVelocityCheck";
             List<InputAction> actions = InputSystem.ListEnabledActions();
             int ind = actions.FindIndex(x => x.name == inputaction);
@@ -77,5 +95,6 @@ namespace Leap.Unity.Controllers
                 _controllerAction = actions[ind];
             }
         }
+#endif
     }
 }

@@ -21,6 +21,7 @@ namespace Leap.Unity.Controllers
     {
         public bool lessThan = false;
         float distance = 0;
+        public Vector3 currentXRControllerPosition;
         protected override bool IsTrueLogic()
         {
             Vector3 inputPosition;
@@ -54,7 +55,11 @@ namespace Leap.Unity.Controllers
                 case InputMethodType.XRController:
                     if (GetController())
                     {
+#if ENABLE_INPUT_SYSTEM
                         inputPosition = _xrController.devicePosition.ReadValue();
+#else
+                        inputPosition = currentXRControllerPosition;
+#endif
                         return true;
                     }
                     break;

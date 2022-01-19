@@ -10,7 +10,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Leap.Unity;
+using System;
+
+#if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
+#endif
 
 namespace Leap.Unity.Controllers
 {
@@ -20,8 +24,10 @@ namespace Leap.Unity.Controllers
     /// </summary>
     public class HasButtonBeenPressed : InputCheckBase
     {
-
+#if ENABLE_INPUT_SYSTEM
         InputAction anyButton;
+#endif
+
         private bool _buttonPressed = false;
 
         public override void Reset()
@@ -31,6 +37,18 @@ namespace Leap.Unity.Controllers
         }
 
         public override void Setup(LeapProvider originalProvider)
+        {
+#if ENABLE_INPUT_SYSTEM
+            SetupInputSystem();
+#endif
+
+            _buttonPressed = false;
+            base.Setup(originalProvider);
+        }
+
+#if ENABLE_INPUT_SYSTEM
+
+        private void SetupInputSystem()
         {
             string inputaction = $"{hand} HasButtonBeenPressed";
             List<InputAction> actions = InputSystem.ListEnabledActions();
@@ -53,15 +71,17 @@ namespace Leap.Unity.Controllers
                 anyButton.performed += _ => { OnButtonDown(); };
                 anyButton.canceled += _ => { OnButtonUp(); };
             }
-
-            _buttonPressed = false;
-            base.Setup(originalProvider);
         }
+#endif
 
         protected override bool IsTrueLogic()
         {
             if (GetController())
             {
+#if !ENABLE_INPUT_SYSTEM
+                _buttonPressed = IsLegacyXRButtonPressed();
+#endif
+
                 return _buttonPressed;
             }
             return false;
@@ -75,6 +95,46 @@ namespace Leap.Unity.Controllers
         private void OnButtonUp()
         {
             _buttonPressed = false;
+        }
+
+        private bool IsLegacyXRButtonPressed()
+        {
+            if (Mathf.Abs(Input.GetAxis(("XRI_" + hand + "_Primary2DAxisTouch"))) > 0)
+            {
+                return true;
+            }
+
+            if (Mathf.Abs(Input.GetAxis(("XRI_" + hand + "_Primary2DAxisClick"))) > 0)
+            {
+                return true;
+            }
+
+            if (Mathf.Abs(Input.GetAxis(("XRI_" + hand + "_PrimaryButton"))) > 0)
+            {
+                return true;
+            }
+
+            if (Mathf.Abs(Input.GetAxis(("XRI_" + hand + "_Trigger"))) > 0)
+            {
+                return true;
+            }
+
+            if (Mathf.Abs(Input.GetAxis(("XRI_" + hand + "_Grip"))) > 0)
+            {
+                return true;
+            }
+
+            if (Mathf.Abs(Input.GetAxis(("XRI_" + hand + "_Grip"))) > 0)
+            {
+                return true;
+            }
+
+            if (Mathf.Abs(Input.GetAxis(("XRI_" + hand + "_Grip"))) > 0)
+            {
+                return true;
+            }
+
+            return false;
         }
 
     }
