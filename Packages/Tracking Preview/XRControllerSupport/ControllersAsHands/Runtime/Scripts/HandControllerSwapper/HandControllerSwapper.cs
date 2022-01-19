@@ -43,6 +43,7 @@ namespace Leap.Unity.Controllers
 
         private void Update()
         {
+#if !ENABLE_INPUT_SYSTEM
             Vector3 currentLeftControllerPos = controllerPostProcess.leftHandInputs.transform.position;
             leftControllerVelocity = (currentLeftControllerPos - prevLeftControllerPosition) / Time.deltaTime;
             prevLeftControllerPosition = currentLeftControllerPos;
@@ -50,6 +51,7 @@ namespace Leap.Unity.Controllers
             Vector3 currentRightControllerPos = controllerPostProcess.rightHandInputs.transform.position;
             rightControllerVelocity = (currentRightControllerPos - prevRightControllerPosition) / Time.deltaTime;
             prevRightControllerPosition = currentRightControllerPos;
+#endif
         }
 
         public void Setup(LeapProvider originalProvider, InputMethodType[] initialInputMethodTypes)
@@ -174,6 +176,7 @@ namespace Leap.Unity.Controllers
             return mandatory && notMandatory;
         }
 
+#if !ENABLE_INPUT_SYSTEM
         private void UpdateLegacyInputSystemVariables(ref ControllerProfile.InputCheckStage stage)
         {
             stage.checks.FindAll(check => check is InputVelocity)
@@ -216,5 +219,6 @@ namespace Leap.Unity.Controllers
                 }
             );
         }
+#endif
     }
 }
