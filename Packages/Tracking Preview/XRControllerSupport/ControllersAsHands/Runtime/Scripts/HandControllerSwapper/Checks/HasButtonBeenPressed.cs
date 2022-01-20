@@ -99,37 +99,32 @@ namespace Leap.Unity.Controllers
 
         private bool IsLegacyXRButtonPressed()
         {
-            if (Mathf.Abs(Input.GetAxis(("XRI_" + hand + "_Primary2DAxisTouch"))) > 0)
+            if (Input.GetButton("XRI_" + hand + "_Primary2DAxisTouch"))
             {
                 return true;
             }
 
-            if (Mathf.Abs(Input.GetAxis(("XRI_" + hand + "_Primary2DAxisClick"))) > 0)
+            if (Input.GetButton("XRI_" + hand + "_Primary2DAxisClick"))
             {
                 return true;
             }
 
-            if (Mathf.Abs(Input.GetAxis(("XRI_" + hand + "_PrimaryButton"))) > 0)
+            if (Input.GetButton("XRI_" + hand + "_PrimaryButton"))
+            {
+                return true;
+            }
+            
+            if (Input.GetButton("XRI_" + hand + "_SecondaryButton"))
             {
                 return true;
             }
 
-            if (Mathf.Abs(Input.GetAxis(("XRI_" + hand + "_Trigger"))) > 0)
+            if (Mathf.Abs(Input.GetAxis("XRI_" + hand + "_Trigger")) > 0)
             {
                 return true;
             }
 
-            if (Mathf.Abs(Input.GetAxis(("XRI_" + hand + "_Grip"))) > 0)
-            {
-                return true;
-            }
-
-            if (Mathf.Abs(Input.GetAxis(("XRI_" + hand + "_Grip"))) > 0)
-            {
-                return true;
-            }
-
-            if (Mathf.Abs(Input.GetAxis(("XRI_" + hand + "_Grip"))) > 0)
+            if (Mathf.Abs(Input.GetAxis("XRI_" + hand + "_Grip")) > 0)
             {
                 return true;
             }
