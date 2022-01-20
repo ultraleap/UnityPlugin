@@ -93,6 +93,7 @@ namespace Leap.Unity
             {
                 if (_deviceBaseline == Maybe.None)
                 {
+                    _provider.OnDeviceSafe -= onDevice;
                     _provider.OnDeviceSafe += onDevice;
                 }
                 baselineToUse = _deviceBaseline;

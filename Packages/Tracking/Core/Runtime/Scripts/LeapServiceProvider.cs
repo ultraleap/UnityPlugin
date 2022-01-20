@@ -754,12 +754,10 @@ namespace Leap.Unity
                     _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
                     break;
                 case TrackingOptimizationMode.Screentop:
-                    _leapController.SetPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP);
-                    _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
+                    _leapController.SetAndClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP, Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
                     break;
                 case TrackingOptimizationMode.HMD:
-                    _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP);
-                    _leapController.SetPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
+                    _leapController.SetAndClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD, Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP);
                     break;
             }
         }
