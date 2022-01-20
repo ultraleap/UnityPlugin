@@ -347,7 +347,7 @@ GameObject:
   m_Component:
   - component: {fileID: 606755134}
   m_Layer: 0
-  m_Name: ValveIndexOffset
+  m_Name: ControllerOffsets
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -755,7 +755,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1379353075}
   m_Layer: 0
-  m_Name: ValveIndexOffset
+  m_Name: ControllerOffsets
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
