@@ -108,7 +108,7 @@ Material:
     - _Mode: 0
     - _OcclusionStrength: 1
     - _OpaqueCullMode: 2
-    - _Outline: 0.001
+    - _Outline: 0.0005
     - _Parallax: 0.02
     - _ReceivesSSR: 0
     - _RenderQueueType: 1
@@ -146,7 +146,7 @@ Material:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _DoubleSidedConstants: {r: 1, g: 1, b: -1, a: 0}
     - _EmissionColor: {r: 1, g: 1, b: 1, a: 1}
-    - _OutlineColor: {r: 0.4433962, g: 0.4433962, b: 0.4433962, a: 1}
+    - _OutlineColor: {r: 0, g: 0, b: 0, a: 1}
 --- !u!114 &4961438190780558890
 MonoBehaviour:
   m_ObjectHideFlags: 11
