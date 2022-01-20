@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6b3d386ba5cd94485973aee1479b272e, type: 3}
   m_Name: Outline
   m_EditorClassIdentifier: 
-  m_Active: 1
+  m_Active: 0
   settings:
     passTag: Outline
     Event: 500
@@ -20,7 +20,7 @@ MonoBehaviour:
       RenderQueueType: 1
       LayerMask:
         serializedVersion: 2
-        m_Bits: 256
+        m_Bits: 32
       PassNames: []
     overrideMaterial: {fileID: 2100000, guid: d9c11e18744f17e44a653f01ba8c96aa, type: 2}
     overrideMaterialPassIndex: 0
@@ -97,7 +97,7 @@ MonoBehaviour:
       RenderQueueType: 1
       LayerMask:
         serializedVersion: 2
-        m_Bits: 256
+        m_Bits: 4294967295
       PassNames: []
     overrideMaterial: {fileID: 2100000, guid: e7651a03291328040a35844843863bf3, type: 2}
     overrideMaterialPassIndex: 0
