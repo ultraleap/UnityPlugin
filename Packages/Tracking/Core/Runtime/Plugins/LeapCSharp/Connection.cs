@@ -516,6 +516,7 @@ namespace LeapInternal
             {
                 LeapConnectionLost.DispatchOnContext(this, EventContext, new ConnectionLostEventArgs());
             }
+            _devices.Clear();
         }
         private void handleDeviceStatusEvent(ref LEAP_DEVICE_STATUS_CHANGE_EVENT statusEvent)
         {
