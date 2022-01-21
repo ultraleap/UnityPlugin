@@ -65,6 +65,8 @@ namespace Leap.Unity
 
             _camera.ResetStereoViewMatrices();
 
+            Camera.onPreCull -= OnCameraPreCull;
+
             _provider.OnDeviceSafe -= onDevice;
         }
 
@@ -72,17 +74,18 @@ namespace Leap.Unity
         {
             if (_camera == null) return;
 
-            _camera.ResetStereoViewMatrices();
             _hasVisitedPreCull = false;
         }
 
         private void OnCameraPreCull(Camera cam)
         {
-            if (_hasVisitedPreCull)
+            if (_hasVisitedPreCull || cam != _camera)
             {
                 return;
             }
             _hasVisitedPreCull = true;
+
+            _camera.ResetStereoViewMatrices();
 
             Maybe<float> baselineToUse = Maybe.None;
             if (_useCustomBaseline)
