@@ -37,7 +37,6 @@ namespace Leap.Unity.Controllers
         private void Start()
         {
             Setup(_controllerPostProcess.inputLeapProvider, _controllerPostProcess.CurrentInputTypes);
-            _controllerPostProcess.OnControllerActiveFrame += SetCurrentInputType;
             _controllerPostProcess.AlwaysEnableControllersIfActive = false;
         }
 
@@ -52,6 +51,16 @@ namespace Leap.Unity.Controllers
             _rightControllerVelocity = (currentRightControllerPos - _prevRightControllerPosition) / Time.deltaTime;
             _prevRightControllerPosition = currentRightControllerPos;
 #endif
+        }
+
+        private void OnEnable()
+        {
+            _controllerPostProcess.OnControllerActiveFrame += SetCurrentInputType;
+        }
+
+        private void OnDisable()
+        {
+            _controllerPostProcess.OnControllerActiveFrame -= SetCurrentInputType;
         }
 
         public void Setup(LeapProvider originalProvider, InputMethodType[] initialInputMethodTypes)
