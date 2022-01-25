@@ -38,21 +38,21 @@ namespace Leap.Unity.Controllers
 
         public class InputCheckStage
         {
-            public List<InputCheckBase> checks = new List<InputCheckBase>();
+            public List<InputCheckBase> Checks = new List<InputCheckBase>();
 
             public InputCheckStage()
             {
-                checks = new List<InputCheckBase>();
+                Checks = new List<InputCheckBase>();
             }
 
             public InputCheckStage(List<InputCheckBase> checks)
             {
-                this.checks = checks;
+                this.Checks = checks;
             }
 
             public void SetInputCheckChirality(Chirality chirality)
             {
-                checks.ForEach(check => check.Hand = chirality);
+                Checks.ForEach(check => check.Hand = chirality);
             }
 
         }
@@ -69,9 +69,9 @@ namespace Leap.Unity.Controllers
         {
             for (int i = 0; i < checks.Count; i++)
             {
-                for (int j = 0; j < checks[i].checks.Count; j++)
+                for (int j = 0; j < checks[i].Checks.Count; j++)
                 {
-                    checks[i].checks[j].Setup(provider);
+                    checks[i].Checks[j].Setup(provider);
                 }
             }
         }

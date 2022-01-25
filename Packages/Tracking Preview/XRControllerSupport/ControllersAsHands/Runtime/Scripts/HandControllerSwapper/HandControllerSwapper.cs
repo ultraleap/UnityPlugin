@@ -143,7 +143,7 @@ namespace Leap.Unity.Controllers
             }
             for (int i = 0; i < inputs.Count; i++)
             {
-                inputs[i].checks.ForEach(x => x.Reset());
+                inputs[i].Checks.ForEach(x => x.Reset());
             }
             return true;
         }
@@ -162,33 +162,20 @@ namespace Leap.Unity.Controllers
 #if !ENABLE_INPUT_SYSTEM
             UpdateLegacyInputSystemVariables(ref stage);
 #endif
-            List<InputCheckBase> mandatoryElements = stage.checks.FindAll(x => x.Mandatory);
-            bool mandatory = true;
-            List<InputCheckBase> notMandatoryElements = stage.checks.FindAll(x => !x.Mandatory);
-            bool notMandatory = true;
-            for (int i = 0; i < mandatoryElements.Count; i++)
+            for (int i = 0; i < stage.Checks.Count; i++)
             {
-                if (!mandatoryElements[i].IsTrue())
+                if (stage.Checks[i].IsTrue())
                 {
-                    mandatory = false;
+                    return true;
                 }
             }
-            int count = 0;
-            for (int i = 0; i < notMandatoryElements.Count; i++)
-            {
-                if (notMandatoryElements[i].IsTrue())
-                {
-                    count++;
-                }
-            }
-            notMandatory = count > 0;
-            return mandatory && notMandatory;
+            return false;
         }
 
 #if !ENABLE_INPUT_SYSTEM
         private void UpdateLegacyInputSystemVariables(ref ControllerProfile.InputCheckStage stage)
         {
-            stage.checks.FindAll(check => check is InputVelocity)
+            stage.Checks.FindAll(check => check is InputVelocity)
                 .ForEach(check =>
                 {
                     InputVelocity inputVelocityCheck = check as InputVelocity;
@@ -198,7 +185,7 @@ namespace Leap.Unity.Controllers
                 }
             );
 
-            stage.checks.FindAll(check => check is DistanceFromHead)
+            stage.Checks.FindAll(check => check is DistanceFromHead)
                 .ForEach(check =>
                 {
                     DistanceFromHead distanceFromHeadCheck = check as DistanceFromHead;
@@ -208,7 +195,7 @@ namespace Leap.Unity.Controllers
                 }
             );
 
-            stage.checks.FindAll(check => check is DistanceBetweenInputs)
+            stage.Checks.FindAll(check => check is DistanceBetweenInputs)
                 .ForEach(check =>
                 {
                     DistanceBetweenInputs distanceBetweenInputsCheck = check as DistanceBetweenInputs;
@@ -218,7 +205,7 @@ namespace Leap.Unity.Controllers
                 }
             );
 
-            stage.checks.FindAll(check => check is IsFacingDown)
+            stage.Checks.FindAll(check => check is IsFacingDown)
                 .ForEach(check =>
                 {
                     IsFacingDown isFacingDownCheck = check as IsFacingDown;

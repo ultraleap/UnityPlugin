@@ -23,7 +23,6 @@ namespace Leap.Unity.Controllers
     public class InputCheckBase
     {
         public bool Enabled = true;
-        public bool Mandatory = false;
         public bool UseTime = false;
         public InputMethodType InputMethodType = InputMethodType.LeapHand;
         public float TimeThreshold = 0;
