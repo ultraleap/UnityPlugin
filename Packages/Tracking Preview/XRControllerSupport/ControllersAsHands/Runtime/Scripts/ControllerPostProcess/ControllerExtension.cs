@@ -14,7 +14,7 @@ namespace Leap.Unity.Controllers
     public static class ControllerExtension
     {
         /// <summary>
-        /// Returns whether a controller is active based on the whether the controller is null,
+        /// Returns whether a controller is active based on if the controller is null,
         /// if the controller has been added and if the controller is tracked
         /// </summary>
         public static bool IsControllerActive(this TrackedDevice controller)
