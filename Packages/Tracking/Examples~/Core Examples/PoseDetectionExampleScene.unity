@@ -843,7 +843,7 @@ MonoBehaviour:
   Pinky: 0
   MinimumExtendedCount: 3
   MaximumExtendedCount: 3
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &17475716
 GameObject:
   m_ObjectHideFlags: 0
@@ -1037,7 +1037,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 30
   OffAngle: 40
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &24571776
 GameObject:
   m_ObjectHideFlags: 0
@@ -1224,7 +1224,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 45
   OffAngle: 65
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!114 &27502604
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1250,7 +1250,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 45
   OffAngle: 65
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!114 &27502605
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1276,7 +1276,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 45
   OffAngle: 65
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!114 &27502606
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1324,7 +1324,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 45
   OffAngle: 65
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &28248041
 GameObject:
   m_ObjectHideFlags: 0
@@ -2151,7 +2151,7 @@ MonoBehaviour:
   Pinky: 0
   MinimumExtendedCount: 2
   MaximumExtendedCount: 2
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &46697767
 GameObject:
   m_ObjectHideFlags: 0
@@ -3340,7 +3340,7 @@ MonoBehaviour:
   Pinky: 2
   MinimumExtendedCount: 1
   MaximumExtendedCount: 5
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &77425973
 GameObject:
   m_ObjectHideFlags: 0
@@ -3478,7 +3478,7 @@ MonoBehaviour:
   Pinky: 0
   MinimumExtendedCount: 2
   MaximumExtendedCount: 2
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &77962506
 GameObject:
   m_ObjectHideFlags: 0
@@ -3547,7 +3547,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 30
   OffAngle: 40
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &79220613
 GameObject:
   m_ObjectHideFlags: 0
@@ -3764,7 +3764,7 @@ MonoBehaviour:
   Pinky: 0
   MinimumExtendedCount: 5
   MaximumExtendedCount: 5
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &82636300
 GameObject:
   m_ObjectHideFlags: 0
@@ -4116,7 +4116,7 @@ MonoBehaviour:
   Pinky: 0
   MinimumExtendedCount: 5
   MaximumExtendedCount: 5
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &91124360
 GameObject:
   m_ObjectHideFlags: 0
@@ -7137,7 +7137,7 @@ MonoBehaviour:
   Pinky: 0
   MinimumExtendedCount: 3
   MaximumExtendedCount: 3
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &151515372
 GameObject:
   m_ObjectHideFlags: 0
@@ -7557,7 +7557,7 @@ MonoBehaviour:
   Pinky: 2
   MinimumExtendedCount: 3
   MaximumExtendedCount: 3
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &157285125
 GameObject:
   m_ObjectHideFlags: 0
@@ -7819,7 +7819,7 @@ MonoBehaviour:
   Pinky: 2
   MinimumExtendedCount: 5
   MaximumExtendedCount: 5
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &165599816
 GameObject:
   m_ObjectHideFlags: 0
@@ -8217,7 +8217,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 30
   OffAngle: 40
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &174370235
 GameObject:
   m_ObjectHideFlags: 0
@@ -8276,7 +8276,7 @@ MonoBehaviour:
   Pinky: 0
   MinimumExtendedCount: 5
   MaximumExtendedCount: 5
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &176481017
 GameObject:
   m_ObjectHideFlags: 0
@@ -8457,7 +8457,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 30
   OffAngle: 40
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &179007495
 GameObject:
   m_ObjectHideFlags: 0
@@ -8482,8 +8482,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 179007495}
-  m_LocalRotation: {x: 0.81150734, y: 0.18218763, z: -0.32016483, w: 0.4536055}
-  m_LocalPosition: {x: 0.3600009, y: -0.06377434, z: 0.11477514}
+  m_LocalRotation: {x: 0.869729, y: 0.03509846, z: -0.06797927, w: 0.48756373}
+  m_LocalPosition: {x: -0.13119453, y: -0.06377434, z: 0.3543473}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1108021887}
@@ -8531,7 +8531,7 @@ MonoBehaviour:
         m_CallState: 2
   _handModel: {fileID: 571943066}
   ControlsTransform: 1
-  ShowGizmos: 1
+  ShowGizmos: 0
   ActivateDistance: 0.03
   DeactivateDistance: 0.04
 --- !u!1 &180199168
@@ -8681,7 +8681,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 30
   OffAngle: 40
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &185750695
 GameObject:
   m_ObjectHideFlags: 0
@@ -9262,7 +9262,7 @@ MonoBehaviour:
   Pinky: 1
   MinimumExtendedCount: 3
   MaximumExtendedCount: 3
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &196416717
 GameObject:
   m_ObjectHideFlags: 0
@@ -10676,7 +10676,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 30
   OffAngle: 40
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &232438674
 GameObject:
   m_ObjectHideFlags: 0
@@ -11664,7 +11664,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 30
   OffAngle: 40
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &252794577
 GameObject:
   m_ObjectHideFlags: 0
@@ -12126,7 +12126,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 30
   OffAngle: 40
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &260960349
 GameObject:
   m_ObjectHideFlags: 0
@@ -12194,7 +12194,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 45
   OffAngle: 65
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &262851411
 GameObject:
   m_ObjectHideFlags: 0
@@ -12523,7 +12523,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 30
   OffAngle: 40
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &266608225
 GameObject:
   m_ObjectHideFlags: 0
@@ -12671,7 +12671,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 30
   OffAngle: 40
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &269872788
 GameObject:
   m_ObjectHideFlags: 0
@@ -12819,7 +12819,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 30
   OffAngle: 40
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &274046230
 GameObject:
   m_ObjectHideFlags: 0
@@ -12887,7 +12887,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 45
   OffAngle: 65
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &274947277
 GameObject:
   m_ObjectHideFlags: 0
@@ -13957,7 +13957,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 45
   OffAngle: 55
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &310838437
 GameObject:
   m_ObjectHideFlags: 0
@@ -14998,7 +14998,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 30
   OffAngle: 40
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &336383089
 GameObject:
   m_ObjectHideFlags: 0
@@ -15336,7 +15336,7 @@ MonoBehaviour:
   Pinky: 1
   MinimumExtendedCount: 2
   MaximumExtendedCount: 2
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &344862993
 GameObject:
   m_ObjectHideFlags: 0
@@ -15672,8 +15672,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 358754729}
-  m_LocalRotation: {x: 0.86272997, y: 0.07547913, z: -0.12940957, w: 0.48296294}
-  m_LocalPosition: {x: 0.27325255, y: -0.06377434, z: 0.26097324}
+  m_LocalRotation: {x: 0.86272997, y: -0.0754791, z: 0.1294095, w: 0.48296297}
+  m_LocalPosition: {x: -0.2732525, y: -0.06377434, z: 0.2609733}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 901574158}
@@ -15699,7 +15699,7 @@ MonoBehaviour:
       m_Calls: []
   _handModel: {fileID: 571943066}
   ControlsTransform: 1
-  ShowGizmos: 1
+  ShowGizmos: 0
   ActivateDistance: 0.03
   DeactivateDistance: 0.04
 --- !u!1 &360341603
@@ -15953,7 +15953,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 45
   OffAngle: 65
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!114 &370702039
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -15979,7 +15979,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 45
   OffAngle: 65
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!114 &370702040
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -16005,7 +16005,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 45
   OffAngle: 65
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!114 &370702041
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -16031,7 +16031,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 45
   OffAngle: 65
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!114 &370702042
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -16257,7 +16257,7 @@ MonoBehaviour:
   Pinky: 0
   MinimumExtendedCount: 5
   MaximumExtendedCount: 5
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &377175450
 GameObject:
   m_ObjectHideFlags: 0
@@ -19306,7 +19306,7 @@ MonoBehaviour:
   Pinky: 0
   MinimumExtendedCount: 5
   MaximumExtendedCount: 5
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &442856197
 GameObject:
   m_ObjectHideFlags: 0
@@ -20059,7 +20059,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 45
   OffAngle: 55
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &460713793
 GameObject:
   m_ObjectHideFlags: 0
@@ -21270,7 +21270,7 @@ MonoBehaviour:
     m_Bits: 0
   OnDistance: 0.03
   OffDistance: 0.04
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &480735847
 GameObject:
   m_ObjectHideFlags: 0
@@ -21718,7 +21718,7 @@ MonoBehaviour:
     m_Bits: 0
   OnDistance: 0.02
   OffDistance: 0.03
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &492849195
 GameObject:
   m_ObjectHideFlags: 0
@@ -21821,7 +21821,7 @@ MonoBehaviour:
   Pinky: 2
   MinimumExtendedCount: 1
   MaximumExtendedCount: 1
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &496547563
 GameObject:
   m_ObjectHideFlags: 0
@@ -22069,7 +22069,7 @@ MonoBehaviour:
         m_CallState: 2
   _handModel: {fileID: 947752008}
   ControlsTransform: 1
-  ShowGizmos: 1
+  ShowGizmos: 0
   ActivateDistance: 0.03
   DeactivateDistance: 0.04
 --- !u!1 &508028664
@@ -22130,7 +22130,7 @@ MonoBehaviour:
   Pinky: 1
   MinimumExtendedCount: 2
   MaximumExtendedCount: 2
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &509872551
 GameObject:
   m_ObjectHideFlags: 0
@@ -23164,7 +23164,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 30
   OffAngle: 40
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &526311775
 GameObject:
   m_ObjectHideFlags: 0
@@ -23484,7 +23484,7 @@ MonoBehaviour:
   Pinky: 2
   MinimumExtendedCount: 2
   MaximumExtendedCount: 2
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &530592634
 GameObject:
   m_ObjectHideFlags: 0
@@ -23648,7 +23648,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 30
   OffAngle: 40
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &532932110
 GameObject:
   m_ObjectHideFlags: 0
@@ -23707,7 +23707,7 @@ MonoBehaviour:
   Pinky: 1
   MinimumExtendedCount: 1
   MaximumExtendedCount: 1
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &533050950
 GameObject:
   m_ObjectHideFlags: 0
@@ -24084,7 +24084,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 45
   OffAngle: 65
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!114 &544101897
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -24110,7 +24110,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 45
   OffAngle: 65
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!114 &544101898
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -24136,7 +24136,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 45
   OffAngle: 65
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!114 &544101899
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -24162,7 +24162,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 45
   OffAngle: 65
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!114 &544101900
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -24612,7 +24612,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 30
   OffAngle: 40
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &556017705
 GameObject:
   m_ObjectHideFlags: 0
@@ -25934,7 +25934,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 30
   OffAngle: 40
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &590113498
 GameObject:
   m_ObjectHideFlags: 0
@@ -26155,7 +26155,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 45
   OffAngle: 65
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &591313140
 GameObject:
   m_ObjectHideFlags: 0
@@ -28154,7 +28154,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 45
   OffAngle: 65
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &635019262
 GameObject:
   m_ObjectHideFlags: 0
@@ -28211,7 +28211,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 45
   OffAngle: 65
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &635762585
 GameObject:
   m_ObjectHideFlags: 0
@@ -28662,7 +28662,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 30
   OffAngle: 40
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &647074602
 GameObject:
   m_ObjectHideFlags: 0
@@ -28720,7 +28720,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 45
   OffAngle: 55
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &648771006
 GameObject:
   m_ObjectHideFlags: 0
@@ -28814,7 +28814,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 45
   OffAngle: 65
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!114 &650351499
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -28840,7 +28840,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 45
   OffAngle: 65
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!114 &650351500
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -28866,7 +28866,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 45
   OffAngle: 65
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!114 &650351501
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -28914,7 +28914,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 45
   OffAngle: 65
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &650581636
 GameObject:
   m_ObjectHideFlags: 0
@@ -29379,7 +29379,7 @@ MonoBehaviour:
   Pinky: 2
   MinimumExtendedCount: 2
   MaximumExtendedCount: 2
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &658419977
 GameObject:
   m_ObjectHideFlags: 0
@@ -30518,7 +30518,7 @@ MonoBehaviour:
   Pinky: 1
   MinimumExtendedCount: 3
   MaximumExtendedCount: 3
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &695599929
 GameObject:
   m_ObjectHideFlags: 0
@@ -31066,7 +31066,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 45
   OffAngle: 55
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!114 &704241579
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -31093,7 +31093,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 45
   OffAngle: 55
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!114 &704241580
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -31120,7 +31120,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 45
   OffAngle: 55
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!114 &704241581
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -31918,7 +31918,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 30
   OffAngle: 40
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &721511688
 GameObject:
   m_ObjectHideFlags: 0
@@ -32490,7 +32490,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 45
   OffAngle: 65
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &732583323
 GameObject:
   m_ObjectHideFlags: 0
@@ -32819,7 +32819,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 30
   OffAngle: 40
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &744744050
 GameObject:
   m_ObjectHideFlags: 0
@@ -33115,7 +33115,7 @@ MonoBehaviour:
   Pinky: 0
   MinimumExtendedCount: 5
   MaximumExtendedCount: 5
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &751503005
 GameObject:
   m_ObjectHideFlags: 0
@@ -33174,7 +33174,7 @@ MonoBehaviour:
   Pinky: 0
   MinimumExtendedCount: 5
   MaximumExtendedCount: 5
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &755104888
 GameObject:
   m_ObjectHideFlags: 0
@@ -33232,7 +33232,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 45
   OffAngle: 55
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &756375306
 GameObject:
   m_ObjectHideFlags: 0
@@ -33934,7 +33934,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 45
   OffAngle: 65
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &780007471
 GameObject:
   m_ObjectHideFlags: 0
@@ -34658,7 +34658,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 30
   OffAngle: 40
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &793201403
 GameObject:
   m_ObjectHideFlags: 0
@@ -35371,7 +35371,7 @@ MonoBehaviour:
   Pinky: 1
   MinimumExtendedCount: 1
   MaximumExtendedCount: 1
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &811994774
 GameObject:
   m_ObjectHideFlags: 0
@@ -35877,7 +35877,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 30
   OffAngle: 40
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &822518909
 GameObject:
   m_ObjectHideFlags: 0
@@ -36589,7 +36589,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 45
   OffAngle: 65
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &846681793
 GameObject:
   m_ObjectHideFlags: 0
@@ -37296,7 +37296,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 30
   OffAngle: 40
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &858798774
 GameObject:
   m_ObjectHideFlags: 0
@@ -37938,7 +37938,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 45
   OffAngle: 65
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &868692859
 GameObject:
   m_ObjectHideFlags: 0
@@ -38007,7 +38007,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 30
   OffAngle: 40
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &868771572
 GameObject:
   m_ObjectHideFlags: 0
@@ -38155,7 +38155,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 30
   OffAngle: 40
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &874866489
 GameObject:
   m_ObjectHideFlags: 0
@@ -38607,7 +38607,7 @@ MonoBehaviour:
   Pinky: 1
   MinimumExtendedCount: 0
   MaximumExtendedCount: 0
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &888761903
 GameObject:
   m_ObjectHideFlags: 0
@@ -38709,7 +38709,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 30
   OffAngle: 40
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &890120918
 GameObject:
   m_ObjectHideFlags: 0
@@ -39785,7 +39785,7 @@ MonoBehaviour:
   Pinky: 2
   MinimumExtendedCount: 4
   MaximumExtendedCount: 4
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &914824554
 GameObject:
   m_ObjectHideFlags: 0
@@ -39887,7 +39887,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 30
   OffAngle: 40
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &917611161
 GameObject:
   m_ObjectHideFlags: 0
@@ -40541,7 +40541,7 @@ MonoBehaviour:
     m_Bits: 0
   OnDistance: 0.03
   OffDistance: 0.04
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!114 &926263049
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -41379,7 +41379,7 @@ MonoBehaviour:
     m_Bits: 0
   OnDistance: 0.03
   OffDistance: 0.04
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &943521010
 GameObject:
   m_ObjectHideFlags: 0
@@ -41818,7 +41818,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 45
   OffAngle: 65
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &951735459
 GameObject:
   m_ObjectHideFlags: 0
@@ -42548,7 +42548,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 30
   OffAngle: 40
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &976213110
 GameObject:
   m_ObjectHideFlags: 0
@@ -42870,7 +42870,7 @@ MonoBehaviour:
   Pinky: 2
   MinimumExtendedCount: 1
   MaximumExtendedCount: 1
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &981470770
 GameObject:
   m_ObjectHideFlags: 0
@@ -45495,7 +45495,7 @@ MonoBehaviour:
     m_Bits: 0
   OnDistance: 0.02
   OffDistance: 0.03
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &1066979901
 GameObject:
   m_ObjectHideFlags: 0
@@ -45759,7 +45759,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 45
   OffAngle: 65
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!114 &1070140579
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -45785,7 +45785,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 45
   OffAngle: 65
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!114 &1070140580
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -45811,7 +45811,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 45
   OffAngle: 65
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!114 &1070140581
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -45859,7 +45859,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 45
   OffAngle: 65
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &1074346386
 GameObject:
   m_ObjectHideFlags: 0
@@ -46981,7 +46981,7 @@ MonoBehaviour:
     m_Bits: 0
   OnDistance: 0.03
   OffDistance: 0.04
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &1098858657
 GameObject:
   m_ObjectHideFlags: 0
@@ -49336,7 +49336,7 @@ MonoBehaviour:
   Pinky: 2
   MinimumExtendedCount: 1
   MaximumExtendedCount: 5
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &1149494246
 GameObject:
   m_ObjectHideFlags: 0
@@ -49846,7 +49846,7 @@ MonoBehaviour:
   Pinky: 0
   MinimumExtendedCount: 2
   MaximumExtendedCount: 2
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &1160481988
 GameObject:
   m_ObjectHideFlags: 0
@@ -50140,7 +50140,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 30
   OffAngle: 40
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &1169023989
 GameObject:
   m_ObjectHideFlags: 0
@@ -51871,7 +51871,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 55
   OffAngle: 65
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &1207754378
 GameObject:
   m_ObjectHideFlags: 0
@@ -52872,7 +52872,7 @@ MonoBehaviour:
       m_Calls: []
   _handModel: {fileID: 947752008}
   ControlsTransform: 1
-  ShowGizmos: 1
+  ShowGizmos: 0
   ActivateDistance: 0.03
   DeactivateDistance: 0.04
 --- !u!1 &1230547745
@@ -53022,7 +53022,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 30
   OffAngle: 40
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &1231983756
 GameObject:
   m_ObjectHideFlags: 0
@@ -53432,7 +53432,7 @@ MonoBehaviour:
   Pinky: 2
   MinimumExtendedCount: 3
   MaximumExtendedCount: 3
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &1241037451
 GameObject:
   m_ObjectHideFlags: 0
@@ -53501,7 +53501,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 30
   OffAngle: 40
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &1241327768
 GameObject:
   m_ObjectHideFlags: 0
@@ -54308,7 +54308,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 45
   OffAngle: 55
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!114 &1260862608
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -54335,7 +54335,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 45
   OffAngle: 55
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!114 &1260862609
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -54362,7 +54362,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 45
   OffAngle: 55
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!114 &1260862610
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -54922,7 +54922,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 30
   OffAngle: 40
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &1273371510
 GameObject:
   m_ObjectHideFlags: 0
@@ -56339,7 +56339,7 @@ MonoBehaviour:
   Pinky: 1
   MinimumExtendedCount: 1
   MaximumExtendedCount: 1
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &1306161536
 GameObject:
   m_ObjectHideFlags: 0
@@ -56534,7 +56534,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 30
   OffAngle: 40
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &1316063827
 GameObject:
   m_ObjectHideFlags: 0
@@ -56809,7 +56809,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 45
   OffAngle: 55
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!114 &1319921349
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -56836,7 +56836,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 45
   OffAngle: 55
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!114 &1319921350
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -56863,7 +56863,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 45
   OffAngle: 55
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!114 &1319921351
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -56954,7 +56954,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 30
   OffAngle: 40
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &1323511770
 GameObject:
   m_ObjectHideFlags: 0
@@ -57420,7 +57420,7 @@ MonoBehaviour:
   Pinky: 0
   MinimumExtendedCount: 1
   MaximumExtendedCount: 5
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &1333446726
 GameObject:
   m_ObjectHideFlags: 0
@@ -57568,7 +57568,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 30
   OffAngle: 40
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &1334612750
 GameObject:
   m_ObjectHideFlags: 0
@@ -58578,7 +58578,7 @@ MonoBehaviour:
   Pinky: 2
   MinimumExtendedCount: 1
   MaximumExtendedCount: 5
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &1356016034
 GameObject:
   m_ObjectHideFlags: 0
@@ -59088,7 +59088,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 30
   OffAngle: 40
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &1364962551
 GameObject:
   m_ObjectHideFlags: 0
@@ -59454,7 +59454,7 @@ MonoBehaviour:
   Pinky: 2
   MinimumExtendedCount: 1
   MaximumExtendedCount: 5
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &1386348744
 GameObject:
   m_ObjectHideFlags: 0
@@ -61510,7 +61510,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 30
   OffAngle: 40
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &1429803424
 GameObject:
   m_ObjectHideFlags: 0
@@ -61942,7 +61942,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 30
   OffAngle: 40
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &1440728070
 GameObject:
   m_ObjectHideFlags: 0
@@ -62638,7 +62638,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 30
   OffAngle: 40
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &1451147377
 GameObject:
   m_ObjectHideFlags: 0
@@ -63064,7 +63064,7 @@ MonoBehaviour:
   Pinky: 1
   MinimumExtendedCount: 1
   MaximumExtendedCount: 1
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &1457171219
 GameObject:
   m_ObjectHideFlags: 0
@@ -63122,7 +63122,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 45
   OffAngle: 55
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &1457189454
 GameObject:
   m_ObjectHideFlags: 0
@@ -63349,7 +63349,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 30
   OffAngle: 40
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &1463624605
 GameObject:
   m_ObjectHideFlags: 0
@@ -64199,7 +64199,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 30
   OffAngle: 40
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &1477396557
 GameObject:
   m_ObjectHideFlags: 0
@@ -64280,7 +64280,7 @@ MonoBehaviour:
   Pinky: 2
   MinimumExtendedCount: 1
   MaximumExtendedCount: 5
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &1477936463
 GameObject:
   m_ObjectHideFlags: 0
@@ -64434,7 +64434,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 45
   OffAngle: 55
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!114 &1481590817
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -64461,7 +64461,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 45
   OffAngle: 55
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!114 &1481590818
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -64488,7 +64488,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 45
   OffAngle: 55
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!114 &1481590819
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -64848,7 +64848,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 45
   OffAngle: 65
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &1503142072
 GameObject:
   m_ObjectHideFlags: 0
@@ -65892,7 +65892,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 30
   OffAngle: 40
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &1518139706
 GameObject:
   m_ObjectHideFlags: 0
@@ -66917,7 +66917,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 30
   OffAngle: 40
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &1531511576
 GameObject:
   m_ObjectHideFlags: 0
@@ -67406,7 +67406,7 @@ MonoBehaviour:
     m_Bits: 0
   OnDistance: 0.03
   OffDistance: 0.04
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!114 &1542857676
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -67894,7 +67894,7 @@ MonoBehaviour:
   Pinky: 2
   MinimumExtendedCount: 4
   MaximumExtendedCount: 4
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &1555020977
 GameObject:
   m_ObjectHideFlags: 0
@@ -68233,7 +68233,7 @@ MonoBehaviour:
   Pinky: 2
   MinimumExtendedCount: 0
   MaximumExtendedCount: 0
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &1555584371
 GameObject:
   m_ObjectHideFlags: 0
@@ -68460,7 +68460,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 30
   OffAngle: 40
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &1560213500
 GameObject:
   m_ObjectHideFlags: 0
@@ -69097,7 +69097,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 45
   OffAngle: 55
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &1575746805
 GameObject:
   m_ObjectHideFlags: 0
@@ -69639,7 +69639,7 @@ MonoBehaviour:
   Pinky: 2
   MinimumExtendedCount: 1
   MaximumExtendedCount: 5
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &1592683036
 GameObject:
   m_ObjectHideFlags: 0
@@ -69777,7 +69777,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 30
   OffAngle: 40
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &1600250110
 GameObject:
   m_ObjectHideFlags: 0
@@ -70597,7 +70597,7 @@ MonoBehaviour:
     m_Bits: 0
   OnDistance: 0.02
   OffDistance: 0.03
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &1617269285
 GameObject:
   m_ObjectHideFlags: 0
@@ -70733,7 +70733,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 45
   OffAngle: 65
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &1618759816
 GameObject:
   m_ObjectHideFlags: 0
@@ -70794,7 +70794,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 45
   OffAngle: 65
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!114 &1618759819
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -70820,7 +70820,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 45
   OffAngle: 65
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!114 &1618759820
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -70846,7 +70846,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 45
   OffAngle: 65
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!114 &1618759821
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -70872,7 +70872,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 45
   OffAngle: 65
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!114 &1618759822
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -70963,7 +70963,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 30
   OffAngle: 40
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &1620012852
 GameObject:
   m_ObjectHideFlags: 0
@@ -71387,7 +71387,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 45
   OffAngle: 55
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!114 &1624247678
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -71414,7 +71414,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 45
   OffAngle: 55
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!114 &1624247679
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -71463,7 +71463,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 45
   OffAngle: 55
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &1624449207
 GameObject:
   m_ObjectHideFlags: 0
@@ -71825,7 +71825,7 @@ MonoBehaviour:
   Pinky: 0
   MinimumExtendedCount: 5
   MaximumExtendedCount: 5
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &1630435248
 GameObject:
   m_ObjectHideFlags: 0
@@ -72521,7 +72521,7 @@ MonoBehaviour:
   Pinky: 0
   MinimumExtendedCount: 1
   MaximumExtendedCount: 5
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &1651765501
 GameObject:
   m_ObjectHideFlags: 0
@@ -73662,7 +73662,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 45
   OffAngle: 65
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &1680695241
 GameObject:
   m_ObjectHideFlags: 0
@@ -74066,7 +74066,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 45
   OffAngle: 55
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!114 &1687819049
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -74093,7 +74093,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 45
   OffAngle: 55
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!114 &1687819050
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -74120,7 +74120,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 45
   OffAngle: 55
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!114 &1687819051
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -74642,7 +74642,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 30
   OffAngle: 40
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &1702016587
 GameObject:
   m_ObjectHideFlags: 0
@@ -74705,7 +74705,7 @@ MonoBehaviour:
     m_Bits: 0
   OnDistance: 0.03
   OffDistance: 0.04
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &1705211111
 GameObject:
   m_ObjectHideFlags: 0
@@ -74924,7 +74924,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 45
   OffAngle: 65
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!114 &1712853626
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -74950,7 +74950,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 45
   OffAngle: 65
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!114 &1712853627
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -74976,7 +74976,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 45
   OffAngle: 65
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!114 &1712853628
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -75024,7 +75024,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 45
   OffAngle: 65
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &1712943695
 GameObject:
   m_ObjectHideFlags: 0
@@ -75093,7 +75093,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 30
   OffAngle: 40
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &1713286479
 GameObject:
   m_ObjectHideFlags: 0
@@ -75241,7 +75241,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 30
   OffAngle: 40
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &1718292639
 GameObject:
   m_ObjectHideFlags: 0
@@ -76199,7 +76199,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 30
   OffAngle: 40
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &1731600023
 GameObject:
   m_ObjectHideFlags: 0
@@ -76262,7 +76262,7 @@ MonoBehaviour:
     m_Bits: 0
   OnDistance: 0.03
   OffDistance: 0.04
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &1734677082
 GameObject:
   m_ObjectHideFlags: 0
@@ -76692,7 +76692,7 @@ MonoBehaviour:
   Pinky: 2
   MinimumExtendedCount: 1
   MaximumExtendedCount: 5
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &1743230237
 GameObject:
   m_ObjectHideFlags: 0
@@ -77234,7 +77234,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 45
   OffAngle: 55
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &1751783379
 GameObject:
   m_ObjectHideFlags: 0
@@ -77775,7 +77775,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 30
   OffAngle: 40
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &1760435560
 GameObject:
   m_ObjectHideFlags: 0
@@ -78183,7 +78183,7 @@ MonoBehaviour:
   Pinky: 0
   MinimumExtendedCount: 3
   MaximumExtendedCount: 4
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &1770905442
 GameObject:
   m_ObjectHideFlags: 0
@@ -78410,7 +78410,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 30
   OffAngle: 40
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &1772743133
 GameObject:
   m_ObjectHideFlags: 0
@@ -78579,7 +78579,7 @@ MonoBehaviour:
     m_Bits: 0
   OnDistance: 0.03
   OffDistance: 0.04
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &1777297372
 GameObject:
   m_ObjectHideFlags: 0
@@ -79014,7 +79014,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 45
   OffAngle: 65
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &1802369511
 GameObject:
   m_ObjectHideFlags: 0
@@ -79082,7 +79082,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 45
   OffAngle: 65
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &1806067416
 GameObject:
   m_ObjectHideFlags: 0
@@ -79562,7 +79562,7 @@ MonoBehaviour:
   Pinky: 2
   MinimumExtendedCount: 0
   MaximumExtendedCount: 0
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &1815346011
 GameObject:
   m_ObjectHideFlags: 0
@@ -80885,7 +80885,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 45
   OffAngle: 55
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &1842466911
 GameObject:
   m_ObjectHideFlags: 0
@@ -81036,7 +81036,7 @@ MonoBehaviour:
   Pinky: 1
   MinimumExtendedCount: 2
   MaximumExtendedCount: 2
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &1844536000
 GameObject:
   m_ObjectHideFlags: 0
@@ -81095,7 +81095,7 @@ MonoBehaviour:
   Pinky: 1
   MinimumExtendedCount: 0
   MaximumExtendedCount: 0
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &1845616337
 GameObject:
   m_ObjectHideFlags: 0
@@ -81621,7 +81621,7 @@ MonoBehaviour:
   Pinky: 1
   MinimumExtendedCount: 2
   MaximumExtendedCount: 2
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &1857337733
 GameObject:
   m_ObjectHideFlags: 0
@@ -81999,7 +81999,7 @@ MonoBehaviour:
   Pinky: 0
   MinimumExtendedCount: 3
   MaximumExtendedCount: 4
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &1874300018
 GameObject:
   m_ObjectHideFlags: 0
@@ -82700,7 +82700,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 30
   OffAngle: 40
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &1901775423
 GameObject:
   m_ObjectHideFlags: 0
@@ -82848,7 +82848,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 30
   OffAngle: 40
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &1902079574
 GameObject:
   m_ObjectHideFlags: 0
@@ -83279,7 +83279,7 @@ MonoBehaviour:
   Pinky: 2
   MinimumExtendedCount: 1
   MaximumExtendedCount: 5
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &1913858062
 GameObject:
   m_ObjectHideFlags: 0
@@ -83463,7 +83463,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 55
   OffAngle: 65
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &1919060807
 GameObject:
   m_ObjectHideFlags: 0
@@ -86110,7 +86110,7 @@ MonoBehaviour:
     m_Bits: 0
   OnDistance: 0.04
   OffDistance: 0.06
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &1982016036
 GameObject:
   m_ObjectHideFlags: 0
@@ -86599,7 +86599,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 45
   OffAngle: 65
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!114 &1988071036
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -86625,7 +86625,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 45
   OffAngle: 65
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!114 &1988071037
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -86651,7 +86651,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 45
   OffAngle: 65
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!114 &1988071038
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -86677,7 +86677,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 45
   OffAngle: 65
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!114 &1988071039
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -87765,7 +87765,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 45
   OffAngle: 65
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &2013244251
 GameObject:
   m_ObjectHideFlags: 0
@@ -87881,7 +87881,7 @@ MonoBehaviour:
   Pinky: 2
   MinimumExtendedCount: 5
   MaximumExtendedCount: 5
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &2018143857
 GameObject:
   m_ObjectHideFlags: 0
@@ -88075,7 +88075,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 30
   OffAngle: 40
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &2021711610
 GameObject:
   m_ObjectHideFlags: 0
@@ -88729,7 +88729,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 30
   OffAngle: 40
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &2035359157
 GameObject:
   m_ObjectHideFlags: 0
@@ -88923,7 +88923,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 30
   OffAngle: 40
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &2040847137
 GameObject:
   m_ObjectHideFlags: 0
@@ -89448,7 +89448,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 30
   OffAngle: 40
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &2058423070
 GameObject:
   m_ObjectHideFlags: 0
@@ -90573,7 +90573,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 30
   OffAngle: 40
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &2083076265
 GameObject:
   m_ObjectHideFlags: 0
@@ -92117,7 +92117,7 @@ MonoBehaviour:
     m_Bits: 0
   OnDistance: 0.03
   OffDistance: 0.04
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!114 &2099637673
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -92877,7 +92877,7 @@ MonoBehaviour:
   Pinky: 0
   MinimumExtendedCount: 2
   MaximumExtendedCount: 2
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &2123580017
 GameObject:
   m_ObjectHideFlags: 0
@@ -93659,7 +93659,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 30
   OffAngle: 40
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &2139331245
 GameObject:
   m_ObjectHideFlags: 0
@@ -93840,7 +93840,7 @@ MonoBehaviour:
   TargetObject: {fileID: 0}
   OnAngle: 30
   OffAngle: 40
-  ShowGizmos: 1
+  ShowGizmos: 0
 --- !u!1 &2142571654
 GameObject:
   m_ObjectHideFlags: 0
