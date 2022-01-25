@@ -454,7 +454,12 @@ namespace Leap.Unity.Controllers
             RotateFinger(h.Fingers[4], this.PinkyFinger);
 
             h.Transform(_currentPosition, _currentRotation);
-            h.PalmVelocity = ((_currentPosition - _oldPosition) / Mathf.Clamp(Time.time - _oldTime, 0.000001f, Mathf.Infinity)).ToVector();
+
+            // If this Time.time -_oldTime = 0 then this has been called on the same frame, so we don't want to recalc palmVelocity
+            if (Time.time - _oldTime != 0)
+            {
+                h.PalmVelocity = ((_currentPosition - _oldPosition) / (Time.time - _oldTime)).ToVector();
+            }
 
             _oldPosition = _currentPosition;
 
