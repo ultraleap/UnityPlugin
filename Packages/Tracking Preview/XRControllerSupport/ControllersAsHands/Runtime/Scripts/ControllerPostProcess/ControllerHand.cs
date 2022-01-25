@@ -399,17 +399,17 @@ namespace Leap.Unity.Controllers
         {
             string hand = chirality.ToString();
 
-            this.Thumb.axes.Add("XRI_" + hand + "_Primary2DAxisTouch");
-            this.Thumb.axes.Add("XRI_" + hand + "_Primary2DAxisClick");
-            this.Thumb.axes.Add("XRI_" + hand + "_PrimaryButton");
+            this.Thumb.axes.Add($"XRI_{hand}_Primary2DAxisTouch");
+            this.Thumb.axes.Add($"XRI_{hand}_Primary2DAxisClick");
+            this.Thumb.axes.Add($"XRI_{hand}_PrimaryButton");
 
-            this.IndexFinger.axes.Add("XRI_" + hand + "_Trigger");
+            this.IndexFinger.axes.Add($"XRI_{hand}_Trigger");
 
-            this.MiddleFinger.axes.Add("XRI_" + hand + "_Grip");
+            this.MiddleFinger.axes.Add($"XRI_{hand}_Grip");
 
-            this.RingFinger.axes.Add("XRI_" + hand + "_Grip");
+            this.RingFinger.axes.Add($"XRI_{hand}_Grip");
 
-            this.PinkyFinger.axes.Add("XRI_" + hand + "_Grip");
+            this.PinkyFinger.axes.Add($"XRI_{hand}_Grip");
         }
 #endif
         #endregion
