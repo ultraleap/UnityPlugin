@@ -25,6 +25,10 @@ public class ControllerModelEnableDisable : MonoBehaviour
         controllerPostProcess.OnHandInputTypeChange += OnHandInputTypeChange;
     }
 
+    private void OnDestroy() {
+        controllerPostProcess.OnHandInputTypeChange -= OnHandInputTypeChange;
+    }
+
     private void OnHandInputTypeChange(Chirality chirality, InputMethodType inputMethodType)
     {
         if(this.chirality == chirality)
