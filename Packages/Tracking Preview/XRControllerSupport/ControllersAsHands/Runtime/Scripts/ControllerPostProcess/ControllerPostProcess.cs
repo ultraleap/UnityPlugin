@@ -50,14 +50,12 @@ namespace Leap.Unity.Controllers
             rightHandInputs = new ControllerHand(Chirality.Right);
 
 #else
-            Transform lc = null;
-            if (leftHandInputs != null) lc = leftHandInputs.transform;
+            Transform lc = leftHandInputs?.transform;;
 
             leftHandInputs = new ControllerHand(Chirality.Left);
             if (lc != null) leftHandInputs.transform = lc;
 
-            Transform rc = null;
-            if (rightHandInputs != null) rc = rightHandInputs.transform;
+            Transform rc = rightHandInputs?.transform;
 
             rightHandInputs = new ControllerHand(Chirality.Right);
             if (rc != null) rightHandInputs.transform = rc;
