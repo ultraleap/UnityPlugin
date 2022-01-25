@@ -354,23 +354,18 @@ namespace Leap.Unity.Controllers
             {
                 this.offsetRotationEuler.y *= -1;
                 this.offsetRotationEuler.z *= -1;
-            }
 
-            switch (chirality)
-            {
-                case Chirality.Right:
-                    for (int i = 0; i < this.fingers.Length; i++)
-                    {
-                        this.fingers[i].metacarpalRotation.y *= -1;
-                        this.fingers[i].proximalRotation.y *= -1;
-                        this.fingers[i].intermediateRotation.y *= -1;
-                        this.fingers[i].distalRotation.y *= -1;
-                        this.fingers[i].metacarpalRotation.z *= -1;
-                        this.fingers[i].proximalRotation.z *= -1;
-                        this.fingers[i].intermediateRotation.z *= -1;
-                        this.fingers[i].distalRotation.z *= -1;
-                    }
-                    break;
+                for (int i = 0; i < this.fingers.Length; i++)
+                {
+                    this.fingers[i].metacarpalRotation.y *= -1;
+                    this.fingers[i].proximalRotation.y *= -1;
+                    this.fingers[i].intermediateRotation.y *= -1;
+                    this.fingers[i].distalRotation.y *= -1;
+                    this.fingers[i].metacarpalRotation.z *= -1;
+                    this.fingers[i].proximalRotation.z *= -1;
+                    this.fingers[i].intermediateRotation.z *= -1;
+                    this.fingers[i].distalRotation.z *= -1;
+                }
             }
         }
 #if ENABLE_INPUT_SYSTEM
