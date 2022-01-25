@@ -267,7 +267,10 @@ namespace Leap.Unity.Controllers
             {
                 fingers[i].CreateAction();
             }
-            if (Controller != null) { _oldPosition = ControllerPosition; }
+            if (Controller != null)
+            {
+                _oldPosition = ControllerPosition;
+            }
 #else
             _oldPosition = transform.position;
 #endif
