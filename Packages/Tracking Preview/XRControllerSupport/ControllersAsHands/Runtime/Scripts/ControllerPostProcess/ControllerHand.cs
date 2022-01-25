@@ -469,35 +469,35 @@ namespace Leap.Unity.Controllers
             return h;
         }
 
-        private void SetFingerSizes(ref Hand hand, float boneSize)
+        private void SetFingerSizes(ref Hand hand, float boneWidth)
         {
             for (int i = 0; i < hand.Fingers.Count; i++)
             {
                 for (int j = 0; j < hand.Fingers[i].bones.Length; j++)
                 {
-                    hand.Fingers[i].bones[j].Width = boneSize;
+                    hand.Fingers[i].bones[j].Width = boneWidth;
                 }
             }
         }
         /// <summary>
         /// Generates a Leap Finger from ControllerFinger
         /// </summary>
-        /// <param name="f"></param>
+        /// <param name="leapFinger"></param>
         /// <param name="finger"></param>
-        private void RotateFinger(Finger f, ControllerFinger finger)
+        private void RotateFinger(Finger leapFinger, ControllerFinger finger)
         {
-            RotateJoint(ref f.bones[0], ref f.bones[1], Vector3.Slerp(Vector3.zero, finger.MetacarpalRotation, finger.Value));
+            RotateJoint(ref leapFinger.bones[0], ref leapFinger.bones[1], Vector3.Slerp(Vector3.zero, finger.MetacarpalRotation, finger.Value));
             if (finger.CompoundRotations)
             {
-                RotateJoint(ref f.bones[1], ref f.bones[2], Vector3.Slerp(Vector3.zero, finger.MetacarpalRotation + finger.ProximalRotation, finger.Value));
-                RotateJoint(ref f.bones[2], ref f.bones[3], Vector3.Slerp(Vector3.zero, finger.MetacarpalRotation + finger.ProximalRotation + finger.IntermediateRotation, finger.Value));
-                RotateJoint(ref f.bones[3], ref f.bones[3], Vector3.Slerp(Vector3.zero, finger.MetacarpalRotation + finger.ProximalRotation + finger.IntermediateRotation + finger.DistalRotation, finger.Value));
+                RotateJoint(ref leapFinger.bones[1], ref leapFinger.bones[2], Vector3.Slerp(Vector3.zero, finger.MetacarpalRotation + finger.ProximalRotation, finger.Value));
+                RotateJoint(ref leapFinger.bones[2], ref leapFinger.bones[3], Vector3.Slerp(Vector3.zero, finger.MetacarpalRotation + finger.ProximalRotation + finger.IntermediateRotation, finger.Value));
+                RotateJoint(ref leapFinger.bones[3], ref leapFinger.bones[3], Vector3.Slerp(Vector3.zero, finger.MetacarpalRotation + finger.ProximalRotation + finger.IntermediateRotation + finger.DistalRotation, finger.Value));
             }
             else
             {
-                RotateJoint(ref f.bones[1], ref f.bones[2], Vector3.Slerp(Vector3.zero, finger.ProximalRotation, finger.Value));
-                RotateJoint(ref f.bones[2], ref f.bones[3], Vector3.Slerp(Vector3.zero, finger.IntermediateRotation, finger.Value));
-                RotateJoint(ref f.bones[3], ref f.bones[3], Vector3.Slerp(Vector3.zero, finger.DistalRotation, finger.Value));
+                RotateJoint(ref leapFinger.bones[1], ref leapFinger.bones[2], Vector3.Slerp(Vector3.zero, finger.ProximalRotation, finger.Value));
+                RotateJoint(ref leapFinger.bones[2], ref leapFinger.bones[3], Vector3.Slerp(Vector3.zero, finger.IntermediateRotation, finger.Value));
+                RotateJoint(ref leapFinger.bones[3], ref leapFinger.bones[3], Vector3.Slerp(Vector3.zero, finger.DistalRotation, finger.Value));
             }
         }
 
