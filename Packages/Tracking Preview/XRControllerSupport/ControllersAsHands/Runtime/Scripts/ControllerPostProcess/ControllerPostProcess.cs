@@ -83,8 +83,8 @@ namespace Leap.Unity.Controllers
                             " XR Legacy Input Helpers package when using the Legacy Input Module. Please add this package to your project" +
                             "and Seed XR Input Bindings.");
             }
-            if (leftHandInputs.transform == null) Debug.LogError("Please assign a left controller.", this);
-            if (rightHandInputs.transform == null) Debug.LogError("Please assign a right controller.", this);
+            if (leftHandInputs.transform == null) Debug.LogError("Please assign a left controller to Left Hand Inputs -> Transform.", this);
+            if (rightHandInputs.transform == null) Debug.LogError("Please assign a right controller to Right Hand Inputs -> Transform", this);
 #endif
 
             leftHandInputs.Setup(Chirality.Left);
