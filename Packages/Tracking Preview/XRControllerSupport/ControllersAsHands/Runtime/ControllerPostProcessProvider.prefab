@@ -202,11 +202,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e933f13d48c681d48b14750922ac906d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _comment: Controller Post Process Setup Guide - Sensible values should already
-    be pre-populated for the Input System. If this is not the case, use the context
-    menu option "Generate Default Axis".  If you are using the Legacy Input Module,
-    you must install the XR Legacy Input Helpers package and use the option "Generate
-    Seed Bindings" in the assets menu.
+  _comment: "The Controller Post Process should have sensible values & axes set up
+    correctly if using the correct prefab, or if just dragged into the scene.\r If
+    you have swapped input systems after the post process provider has been in the
+    scene,\r please regenerate this by using the context menu option \"Generate Default
+    Axis\" on the Post Process Provider. If using the Legacy Input Module, you must
+    install the XR Legacy Input Helpers package and use\r the \"Generate Seed Bindings\"
+    option in the Assets menu."
   _isEditing: 0
 --- !u!114 &7919004661373399488
 MonoBehaviour:
