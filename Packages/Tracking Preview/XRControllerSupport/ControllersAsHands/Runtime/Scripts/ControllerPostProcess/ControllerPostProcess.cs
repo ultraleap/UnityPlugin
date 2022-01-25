@@ -120,26 +120,6 @@ namespace Leap.Unity.Controllers
         /// </summary>
         private void UpdateInputTypes()
         {
-#if ENABLE_INPUT_SYSTEM
-
-            if (LeftHandInputs.Controller.IsControllerActive())
-            {
-         //       CurrentInputTypes[(int)Chirality.Left] = InputMethodType.XRController;
-            }
-            else
-            {
-        //        CurrentInputTypes[(int)Chirality.Left] = InputMethodType.LeapHand;
-            }
-
-            if (RightHandInputs.Controller.IsControllerActive())
-            {
-        //        CurrentInputTypes[(int)Chirality.Right] = InputMethodType.XRController;
-            }
-            else
-            {
-        //        CurrentInputTypes[(int)Chirality.Right] = InputMethodType.LeapHand;
-            }
-#endif
 
 #if ENABLE_INPUT_SYSTEM
             if (LeftHandInputs.Controller.IsControllerActive())

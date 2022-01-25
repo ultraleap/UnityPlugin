@@ -21,7 +21,7 @@ namespace Leap.Unity.Controllers
     {
         public Vector3 CurrentXRControllerPosition;
         public bool LessThan = false;
-        
+
         private float _distance = 0;
 
         protected override bool IsTrueLogic()
