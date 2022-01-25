@@ -85,30 +85,21 @@ namespace Leap.Unity.Controllers
                 float temp = 0;
                 for (int i = 0; i < this.axes.Count; i++)
                 {
-                    try
+                    if (this.analog)
                     {
-                        if (this.analog)
+                        temp = Mathf.Abs(Input.GetAxis(this.axes[i]));
+                        if (temp > result)
                         {
-                            temp = Mathf.Abs(Input.GetAxis(this.axes[i]));
-                            if (temp > result)
-                            {
-                                result = temp;
-                            }
-                        }
-                        else
-                        {
-                            if (Input.GetButton(this.axes[i]))
-                            {
-                                result = 1;
-                                break;
-                            }
+                            result = temp;
                         }
                     }
-                    catch (System.ArgumentException e)
+                    else
                     {
-                        Debug.LogError("The controller post processor is reliant on the" +
-                            " XR Legacy Input Helpers package when using the Legacy Input Module. Please add this package to your project" +
-                            "and Seed XR Input Bindings.\n" + e.Message);
+                        if (Input.GetButton(this.axes[i]))
+                        {
+                            result = 1;
+                            break;
+                        }
                     }
                 }
 #endif
