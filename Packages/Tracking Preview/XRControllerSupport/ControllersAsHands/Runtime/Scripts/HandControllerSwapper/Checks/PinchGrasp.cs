@@ -18,10 +18,10 @@ namespace Leap.Unity.Controllers
     {
         protected override bool IsTrueLogic()
         {
-            Hand hand = _provider.Get(this.hand);
+            Hand hand = _provider.Get(this.Hand);
             if (hand != null)
             {
-                if (hand.PinchStrength > actionThreshold || hand.GrabStrength > actionThreshold)
+                if (hand.PinchStrength > ActionThreshold || hand.GrabStrength > ActionThreshold)
                 {
                     return true;
                 }

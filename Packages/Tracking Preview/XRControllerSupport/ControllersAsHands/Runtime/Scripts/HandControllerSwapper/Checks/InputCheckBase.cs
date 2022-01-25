@@ -22,28 +22,17 @@ namespace Leap.Unity.Controllers
     [System.Serializable]
     public class InputCheckBase
     {
-
-        public bool enabled = true;
-#if UNITY_EDITOR
-        public bool expanded = true;
-#endif
-        public bool mandatory = false;
-
-        public bool useTime = false;
-
-        public InputMethodType inputMethodType = InputMethodType.LeapHand;
-
-        public float timeThreshold = 0;
-
-        public float timeValue { get { return useTime ? timeThreshold : 0; } }
-
-        protected float _currentTime = 0;
-
-        public float actionThreshold = 0;
-
-        public Chirality hand = Chirality.Left;
+        public bool Enabled = true;
+        public bool Mandatory = false;
+        public bool UseTime = false;
+        public InputMethodType InputMethodType = InputMethodType.LeapHand;
+        public float TimeThreshold = 0;
+        public float TimeValue { get { return UseTime ? TimeThreshold : 0; } }
+        public float ActionThreshold = 0;
+        public Chirality Hand = Chirality.Left;
 
         protected LeapProvider _provider;
+        protected float _currentTime = 0;
 
 #if ENABLE_INPUT_SYSTEM
         protected XRController _xrController;
@@ -61,7 +50,7 @@ namespace Leap.Unity.Controllers
             if (IsTrueLogic())
             {
                 _currentTime += Time.deltaTime;
-                if (_currentTime > timeValue)
+                if (_currentTime > TimeValue)
                 {
                     return true;
                 }
@@ -82,7 +71,7 @@ namespace Leap.Unity.Controllers
 
             if (_xrController == null)
             {
-                switch (hand)
+                switch (Hand)
                 {
                     case Chirality.Left:
                         _xrController = XRController.leftHand;

@@ -50,145 +50,145 @@ MonoBehaviour:
   _inputLeapProvider: {fileID: 0}
   dataUpdateMode: 2
   passthroughOnly: 0
-  leftHandInputs:
-    offsetPosition: {x: 0, y: 0, z: 0}
-    offsetRotationEuler: {x: -10, y: 260, z: 235}
-    fingers:
-    - name: Left Thumb
-      analog: 0
-      interpolate: 1
-      axes:
+  LeftHandInputs:
+    OffsetPosition: {x: 0, y: 0, z: 0}
+    OffsetRotationEuler: {x: -10, y: 260, z: 235}
+    Fingers:
+    - Name: Left Thumb
+      Analog: 0
+      Interpolate: 1
+      Axes:
       - <XRController>{LeftHand}/touchpadTouched
       - <XRController>{LeftHand}/touchpadClicked
       - <XRController>{LeftHand}/primaryTouched
       - <XRController>{LeftHand}/secondaryTouched
       - <XRController>{LeftHand}/thumbstickTouched
-      value: 0
-      interpolationTime: 0.04
-      compoundRotations: 1
-      metacarpalRotation: {x: 0, y: 0, z: 0}
-      proximalRotation: {x: -5, y: 0, z: 25}
-      intermediateRotation: {x: -10, y: 0, z: -65}
-      distalRotation: {x: 0, y: 0, z: -45}
-    - name: Left Index
-      analog: 1
-      interpolate: 1
-      axes:
+      Value: 0
+      InterpolationTime: 0.04
+      CompoundRotations: 1
+      MetacarpalRotation: {x: 0, y: 0, z: 0}
+      ProximalRotation: {x: -5, y: 0, z: 25}
+      IntermediateRotation: {x: -10, y: 0, z: -65}
+      DistalRotation: {x: 0, y: 0, z: -45}
+    - Name: Left Index
+      Analog: 1
+      Interpolate: 1
+      Axes:
       - <XRController>{LeftHand}/trigger
-      value: 0
-      interpolationTime: 0.04
-      compoundRotations: 1
-      metacarpalRotation: {x: 0, y: 0, z: 0}
-      proximalRotation: {x: -70, y: -10, z: 0}
-      intermediateRotation: {x: -45, y: 0, z: -5}
-      distalRotation: {x: -45, y: 0, z: 0}
-    - name: Left Middle
-      analog: 1
-      interpolate: 1
-      axes:
+      Value: 0
+      InterpolationTime: 0.04
+      CompoundRotations: 1
+      MetacarpalRotation: {x: 0, y: 0, z: 0}
+      ProximalRotation: {x: -70, y: -10, z: 0}
+      IntermediateRotation: {x: -45, y: 0, z: -5}
+      DistalRotation: {x: -45, y: 0, z: 0}
+    - Name: Left Middle
+      Analog: 1
+      Interpolate: 1
+      Axes:
       - <XRController>{LeftHand}/grip
-      value: 0
-      interpolationTime: 0.04
-      compoundRotations: 1
-      metacarpalRotation: {x: 0, y: -2, z: 0}
-      proximalRotation: {x: -65, y: 1, z: 0}
-      intermediateRotation: {x: -55, y: 0, z: 2}
-      distalRotation: {x: -40, y: -6, z: 3}
-    - name: Left Ring
-      analog: 1
-      interpolate: 1
-      axes:
+      Value: 0
+      InterpolationTime: 0.04
+      CompoundRotations: 1
+      MetacarpalRotation: {x: 0, y: -2, z: 0}
+      ProximalRotation: {x: -65, y: 1, z: 0}
+      IntermediateRotation: {x: -55, y: 0, z: 2}
+      DistalRotation: {x: -40, y: -6, z: 3}
+    - Name: Left Ring
+      Analog: 1
+      Interpolate: 1
+      Axes:
       - <XRController>{LeftHand}/grip
-      value: 0
-      interpolationTime: 0.04
-      compoundRotations: 1
-      metacarpalRotation: {x: 0, y: 0, z: 0}
-      proximalRotation: {x: -65, y: 8, z: 0}
-      intermediateRotation: {x: -50, y: 12, z: 0}
-      distalRotation: {x: -40, y: -35, z: 14}
-    - name: Left Pinky
-      analog: 1
-      interpolate: 1
-      axes:
+      Value: 0
+      InterpolationTime: 0.04
+      CompoundRotations: 1
+      MetacarpalRotation: {x: 0, y: 0, z: 0}
+      ProximalRotation: {x: -65, y: 8, z: 0}
+      IntermediateRotation: {x: -50, y: 12, z: 0}
+      DistalRotation: {x: -40, y: -35, z: 14}
+    - Name: Left Pinky
+      Analog: 1
+      Interpolate: 1
+      Axes:
       - <XRController>{LeftHand}/grip
-      value: 0
-      interpolationTime: 0.04
-      compoundRotations: 1
-      metacarpalRotation: {x: 0, y: 0, z: 0}
-      proximalRotation: {x: -65, y: 15, z: 2}
-      intermediateRotation: {x: -40, y: 9, z: 5}
-      distalRotation: {x: -45, y: -20, z: 20}
-    timeVisible: 0
-  rightHandInputs:
-    offsetPosition: {x: 0, y: 0, z: 0}
-    offsetRotationEuler: {x: -10, y: -260, z: -235}
-    fingers:
-    - name: Right Thumb
-      analog: 0
-      interpolate: 1
-      axes:
+      Value: 0
+      InterpolationTime: 0.04
+      CompoundRotations: 1
+      MetacarpalRotation: {x: 0, y: 0, z: 0}
+      ProximalRotation: {x: -65, y: 15, z: 2}
+      IntermediateRotation: {x: -40, y: 9, z: 5}
+      DistalRotation: {x: -45, y: -20, z: 20}
+    TimeVisible: 0
+  RightHandInputs:
+    OffsetPosition: {x: 0, y: 0, z: 0}
+    OffsetRotationEuler: {x: -10, y: -260, z: -235}
+    Fingers:
+    - Name: Right Thumb
+      Analog: 0
+      Interpolate: 1
+      Axes:
       - <XRController>{RightHand}/touchpadTouched
       - <XRController>{RightHand}/touchpadClicked
       - <XRController>{RightHand}/primaryTouched
       - <XRController>{RightHand}/secondaryTouched
       - <XRController>{RightHand}/thumbstickTouched
-      value: 0
-      interpolationTime: 0.04
-      compoundRotations: 1
-      metacarpalRotation: {x: 0, y: -0, z: -0}
-      proximalRotation: {x: -5, y: -0, z: -25}
-      intermediateRotation: {x: -10, y: -0, z: 65}
-      distalRotation: {x: 0, y: -0, z: 45}
-    - name: Right Index
-      analog: 1
-      interpolate: 1
-      axes:
+      Value: 0
+      InterpolationTime: 0.04
+      CompoundRotations: 1
+      MetacarpalRotation: {x: 0, y: -0, z: -0}
+      ProximalRotation: {x: -5, y: -0, z: -25}
+      IntermediateRotation: {x: -10, y: -0, z: 65}
+      DistalRotation: {x: 0, y: -0, z: 45}
+    - Name: Right Index
+      Analog: 1
+      Interpolate: 1
+      Axes:
       - <XRController>{RightHand}/trigger
-      value: 0
-      interpolationTime: 0.04
-      compoundRotations: 1
-      metacarpalRotation: {x: 0, y: -0, z: -0}
-      proximalRotation: {x: -70, y: 10, z: -0}
-      intermediateRotation: {x: -45, y: -0, z: 5}
-      distalRotation: {x: -45, y: -0, z: -0}
-    - name: Right Middle
-      analog: 1
-      interpolate: 1
-      axes:
+      Value: 0
+      InterpolationTime: 0.04
+      CompoundRotations: 1
+      MetacarpalRotation: {x: 0, y: -0, z: -0}
+      ProximalRotation: {x: -70, y: 10, z: -0}
+      IntermediateRotation: {x: -45, y: -0, z: 5}
+      DistalRotation: {x: -45, y: -0, z: -0}
+    - Name: Right Middle
+      Analog: 1
+      Interpolate: 1
+      Axes:
       - <XRController>{RightHand}/grip
-      value: 0
-      interpolationTime: 0.04
-      compoundRotations: 1
-      metacarpalRotation: {x: 0, y: 2, z: -0}
-      proximalRotation: {x: -65, y: -1, z: -0}
-      intermediateRotation: {x: -55, y: -0, z: -2}
-      distalRotation: {x: -40, y: 6, z: -3}
-    - name: Right Ring
-      analog: 1
-      interpolate: 1
-      axes:
+      Value: 0
+      InterpolationTime: 0.04
+      CompoundRotations: 1
+      MetacarpalRotation: {x: 0, y: 2, z: -0}
+      ProximalRotation: {x: -65, y: -1, z: -0}
+      IntermediateRotation: {x: -55, y: -0, z: -2}
+      DistalRotation: {x: -40, y: 6, z: -3}
+    - Name: Right Ring
+      Analog: 1
+      Interpolate: 1
+      Axes:
       - <XRController>{RightHand}/grip
-      value: 0
-      interpolationTime: 0.04
-      compoundRotations: 1
-      metacarpalRotation: {x: 0, y: -0, z: -0}
-      proximalRotation: {x: -65, y: -8, z: -0}
-      intermediateRotation: {x: -50, y: -12, z: -0}
-      distalRotation: {x: -40, y: 35, z: -14}
-    - name: Right Pinky
-      analog: 1
-      interpolate: 1
-      axes:
+      Value: 0
+      InterpolationTime: 0.04
+      CompoundRotations: 1
+      MetacarpalRotation: {x: 0, y: -0, z: -0}
+      ProximalRotation: {x: -65, y: -8, z: -0}
+      IntermediateRotation: {x: -50, y: -12, z: -0}
+      DistalRotation: {x: -40, y: 35, z: -14}
+    - Name: Right Pinky
+      Analog: 1
+      Interpolate: 1
+      Axes:
       - <XRController>{RightHand}/grip
-      value: 0
-      interpolationTime: 0.04
-      compoundRotations: 1
-      metacarpalRotation: {x: 0, y: -0, z: -0}
-      proximalRotation: {x: -65, y: -15, z: -2}
-      intermediateRotation: {x: -40, y: -9, z: -5}
-      distalRotation: {x: -45, y: 20, z: -20}
-    timeVisible: 0
-  currentInputTypes: 
+      Value: 0
+      InterpolationTime: 0.04
+      CompoundRotations: 1
+      MetacarpalRotation: {x: 0, y: -0, z: -0}
+      ProximalRotation: {x: -65, y: -15, z: -2}
+      IntermediateRotation: {x: -40, y: -9, z: -5}
+      DistalRotation: {x: -45, y: 20, z: -20}
+    TimeVisible: 0
+  CurrentInputTypes: 
   AlwaysEnableControllersIfActive: 1
 --- !u!114 &1891710994397277429
 MonoBehaviour:
@@ -222,7 +222,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fc2b432fd8b072f469b250d9f4d1ad1f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  controllerPostProcess: {fileID: 6612547581167370260}
+  _controllerPostProcess: {fileID: 6612547581167370260}
 --- !u!1 &6612547581555058608
 GameObject:
   m_ObjectHideFlags: 0

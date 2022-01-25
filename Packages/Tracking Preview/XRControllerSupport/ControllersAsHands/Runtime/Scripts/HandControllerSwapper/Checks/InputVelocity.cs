@@ -24,9 +24,9 @@ namespace Leap.Unity.Controllers
     public class InputVelocity : InputCheckBase
     {
 #if ENABLE_INPUT_SYSTEM
-        InputAction _controllerAction;
+        private InputAction _controllerAction;
 #else
-        public Vector3 currentVelocity;
+        public Vector3 CurrentVelocity;
 #endif
 
         public bool velocityIsLower = false;
@@ -35,7 +35,7 @@ namespace Leap.Unity.Controllers
             Vector3 vel;
             if (GetVelocity(out vel))
             {
-                if (velocityIsLower ? vel.magnitude < actionThreshold : vel.magnitude > actionThreshold)
+                if (velocityIsLower ? vel.magnitude < ActionThreshold : vel.magnitude > ActionThreshold)
                 {
                     return true;
                 }
@@ -45,12 +45,12 @@ namespace Leap.Unity.Controllers
 
         public bool GetVelocity(out Vector3 vel)
         {
-            switch (inputMethodType)
+            switch (InputMethodType)
             {
                 case InputMethodType.LeapHand:
-                    if (_provider.Get(hand) != null)
+                    if (_provider.Get(Hand) != null)
                     {
-                        vel = _provider.Get(hand).PalmPosition.ToVector3();
+                        vel = _provider.Get(Hand).PalmPosition.ToVector3();
                         return true;
                     }
                     break;
@@ -60,7 +60,7 @@ namespace Leap.Unity.Controllers
 #if ENABLE_INPUT_SYSTEM
                         vel = _controllerAction.ReadValue<Vector3>();
 #else
-                        vel = currentVelocity;
+                        vel = CurrentVelocity;
 #endif
                         return true;
                     }
@@ -81,13 +81,13 @@ namespace Leap.Unity.Controllers
 #if ENABLE_INPUT_SYSTEM
         private void SetupInputSystem()
         {
-            string inputaction = hand.ToString() + " InputVelocityCheck";
+            string inputaction = Hand.ToString() + " InputVelocityCheck";
             List<InputAction> actions = InputSystem.ListEnabledActions();
             int ind = actions.FindIndex(x => x.name == inputaction);
             if (ind == -1)
             {
                 _controllerAction = new InputAction(inputaction);
-                _controllerAction.AddBinding().WithPath("<XRController>{" + hand.ToString() + "Hand}/devicePose/velocity");
+                _controllerAction.AddBinding().WithPath("<XRController>{" + Hand.ToString() + "Hand}/devicePose/velocity");
                 _controllerAction.Enable();
             }
             else

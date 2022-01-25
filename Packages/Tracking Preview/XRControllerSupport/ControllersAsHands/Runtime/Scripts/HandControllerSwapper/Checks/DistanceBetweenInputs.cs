@@ -20,11 +20,11 @@ namespace Leap.Unity.Controllers
     /// </summary>
     public class DistanceBetweenInputs : InputCheckBase
     {
-        public Vector3 currentXRControllerPosition;
+        public Vector3 CurrentXRControllerPosition;
 
         protected override bool IsTrueLogic()
         {
-            if (GetController() && _provider.Get(hand) != null)
+            if (GetController() && _provider.Get(Hand) != null)
             {
                 if (InputDistanceCheck())
                 {
@@ -40,19 +40,19 @@ namespace Leap.Unity.Controllers
 #if ENABLE_INPUT_SYSTEM
             xrControllerPosition = _xrController.devicePosition.ReadValue();
 #else
-            xrControllerPosition = currentXRControllerPosition;
+            xrControllerPosition = CurrentXRControllerPosition;
 #endif
 
-            if (inputMethodType == InputMethodType.LeapHand)
+            if (InputMethodType == InputMethodType.LeapHand)
             {
-                if (Vector3.Distance(_provider.Get(hand).PalmPosition.ToVector3(), xrControllerPosition) <= actionThreshold)
+                if (Vector3.Distance(_provider.Get(Hand).PalmPosition.ToVector3(), xrControllerPosition) <= ActionThreshold)
                 {
                     return true;
                 }
             }
             else
             {
-                if (Vector3.Distance(_provider.Get(hand).PalmPosition.ToVector3(), xrControllerPosition) >= actionThreshold)
+                if (Vector3.Distance(_provider.Get(Hand).PalmPosition.ToVector3(), xrControllerPosition) >= ActionThreshold)
                 {
                     return true;
                 }

@@ -18,13 +18,14 @@ namespace Leap.Unity.Controllers
     /// </summary>
     public class IsFacingDown : InputCheckBase
     {
-        public Quaternion currentXRControllerRotation;
+        public Quaternion CurrentXRControllerRotation;
+
         protected override bool IsTrueLogic()
         {
             float angle;
             if (GetAngleBetweenInputAndFloor(out angle))
             {
-                if (angle <= actionThreshold)
+                if (angle <= ActionThreshold)
                 {
                     return true;
                 }
@@ -34,12 +35,12 @@ namespace Leap.Unity.Controllers
 
         private bool GetAngleBetweenInputAndFloor(out float angle)
         {
-            switch (inputMethodType)
+            switch (InputMethodType)
             {
                 case InputMethodType.LeapHand:
-                    if (_provider.Get(hand) != null)
+                    if (_provider.Get(Hand) != null)
                     {
-                        angle = Vector3.Angle(_provider.Get(hand).Direction.ToVector3(), Vector3.down);
+                        angle = Vector3.Angle(_provider.Get(Hand).Direction.ToVector3(), Vector3.down);
                         return true;
                     }
                     break;
@@ -49,7 +50,7 @@ namespace Leap.Unity.Controllers
 #if ENABLE_INPUT_SYSTEM
                         angle = Vector3.Angle(_xrController.deviceRotation.ReadValue() * Vector3.forward, Vector3.down);
 #else
-                        angle = Vector3.Angle(currentXRControllerRotation * Vector3.forward, Vector3.down);
+                        angle = Vector3.Angle(CurrentXRControllerRotation * Vector3.forward, Vector3.down);
 #endif
                         return true;
                     }

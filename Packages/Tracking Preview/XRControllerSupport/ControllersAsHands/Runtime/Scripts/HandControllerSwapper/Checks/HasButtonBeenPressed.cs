@@ -25,7 +25,7 @@ namespace Leap.Unity.Controllers
     public class HasButtonBeenPressed : InputCheckBase
     {
 #if ENABLE_INPUT_SYSTEM
-        InputAction anyButton;
+        private InputAction _anyButton;
 #endif
 
         private bool _buttonPressed = false;
@@ -50,26 +50,26 @@ namespace Leap.Unity.Controllers
 
         private void SetupInputSystem()
         {
-            string inputaction = $"{hand} HasButtonBeenPressed";
+            string inputaction = $"{Hand} HasButtonBeenPressed";
             List<InputAction> actions = InputSystem.ListEnabledActions();
             int ind = actions.FindIndex(x => x.name == inputaction);
             if (ind == -1)
             {
-                anyButton = new InputAction(name: inputaction);
-                anyButton.AddBinding().WithPath("<XRController>{" + hand + "Hand}/*pressed");
-                anyButton.AddBinding().WithPath("<XRController>{" + hand + "Hand}/*touched");
-                anyButton.AddBinding().WithPath("<XRController>{" + hand + "Hand}/*clicked");
-                anyButton.AddBinding().WithPath("<XRController>{" + hand + "Hand}/<Analog>");
+                _anyButton = new InputAction(name: inputaction);
+                _anyButton.AddBinding().WithPath("<XRController>{" + Hand + "Hand}/*pressed");
+                _anyButton.AddBinding().WithPath("<XRController>{" + Hand + "Hand}/*touched");
+                _anyButton.AddBinding().WithPath("<XRController>{" + Hand + "Hand}/*clicked");
+                _anyButton.AddBinding().WithPath("<XRController>{" + Hand + "Hand}/<Analog>");
 
-                anyButton.performed += _ => { OnButtonDown(); };
-                anyButton.canceled += _ => { OnButtonUp(); };
-                anyButton.Enable();
+                _anyButton.performed += _ => { OnButtonDown(); };
+                _anyButton.canceled += _ => { OnButtonUp(); };
+                _anyButton.Enable();
             }
             else
             {
-                anyButton = actions[ind];
-                anyButton.performed += _ => { OnButtonDown(); };
-                anyButton.canceled += _ => { OnButtonUp(); };
+                _anyButton = actions[ind];
+                _anyButton.performed += _ => { OnButtonDown(); };
+                _anyButton.canceled += _ => { OnButtonUp(); };
             }
         }
 #endif
@@ -99,38 +99,37 @@ namespace Leap.Unity.Controllers
 
         private bool IsLegacyXRButtonPressed()
         {
-            if (Input.GetButton("XRI_" + hand + "_Primary2DAxisTouch"))
+            if (Input.GetButton("XRI_" + Hand + "_Primary2DAxisTouch"))
             {
                 return true;
             }
 
-            if (Input.GetButton("XRI_" + hand + "_Primary2DAxisClick"))
+            if (Input.GetButton("XRI_" + Hand + "_Primary2DAxisClick"))
             {
                 return true;
             }
 
-            if (Input.GetButton("XRI_" + hand + "_PrimaryButton"))
-            {
-                return true;
-            }
-            
-            if (Input.GetButton("XRI_" + hand + "_SecondaryButton"))
+            if (Input.GetButton("XRI_" + Hand + "_PrimaryButton"))
             {
                 return true;
             }
 
-            if (Mathf.Abs(Input.GetAxis("XRI_" + hand + "_Trigger")) > 0)
+            if (Input.GetButton("XRI_" + Hand + "_SecondaryButton"))
             {
                 return true;
             }
 
-            if (Mathf.Abs(Input.GetAxis("XRI_" + hand + "_Grip")) > 0)
+            if (Mathf.Abs(Input.GetAxis("XRI_" + Hand + "_Trigger")) > 0)
+            {
+                return true;
+            }
+
+            if (Mathf.Abs(Input.GetAxis("XRI_" + Hand + "_Grip")) > 0)
             {
                 return true;
             }
 
             return false;
         }
-
     }
 }

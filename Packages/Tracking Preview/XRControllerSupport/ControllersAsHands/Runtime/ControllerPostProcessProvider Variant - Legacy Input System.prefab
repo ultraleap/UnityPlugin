@@ -14,9 +14,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
         type: 3}
+      propertyPath: LeftHandInputs.Transform
+      value: 
+      objectReference: {fileID: 922652788511593908}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
       propertyPath: leftHandInputs.transform
       value: 
       objectReference: {fileID: 922652788511593908}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: RightHandInputs.Transform
+      value: 
+      objectReference: {fileID: 922652789936134003}
     - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
         type: 3}
       propertyPath: rightHandInputs.transform
@@ -24,13 +34,558 @@ PrefabInstance:
       objectReference: {fileID: 922652789936134003}
     - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
         type: 3}
+      propertyPath: LeftHandInputs.Fingers.Array.size
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: RightHandInputs.Fingers.Array.size
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: LeftHandInputs.OffsetRotationEuler.x
+      value: -10
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: LeftHandInputs.OffsetRotationEuler.y
+      value: 260
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: LeftHandInputs.OffsetRotationEuler.z
+      value: 235
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: RightHandInputs.OffsetRotationEuler.x
+      value: -10
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: RightHandInputs.OffsetRotationEuler.y
+      value: -260
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: RightHandInputs.OffsetRotationEuler.z
+      value: -235
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: LeftHandInputs.Fingers.Array.data[0].Name
+      value: Left Thumb
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: LeftHandInputs.Fingers.Array.data[1].Name
+      value: Left Index
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: LeftHandInputs.Fingers.Array.data[2].Name
+      value: Left Middle
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: LeftHandInputs.Fingers.Array.data[3].Name
+      value: Left Ring
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: LeftHandInputs.Fingers.Array.data[4].Name
+      value: Left Pinky
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: RightHandInputs.Fingers.Array.data[0].Name
+      value: Right Thumb
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: RightHandInputs.Fingers.Array.data[1].Name
+      value: Right Index
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: RightHandInputs.Fingers.Array.data[2].Name
+      value: Right Middle
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: RightHandInputs.Fingers.Array.data[3].Name
+      value: Right Ring
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: RightHandInputs.Fingers.Array.data[4].Name
+      value: Right Pinky
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: LeftHandInputs.Fingers.Array.data[1].Analog
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: LeftHandInputs.Fingers.Array.data[2].Analog
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: LeftHandInputs.Fingers.Array.data[3].Analog
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: LeftHandInputs.Fingers.Array.data[4].Analog
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: RightHandInputs.Fingers.Array.data[1].Analog
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: RightHandInputs.Fingers.Array.data[2].Analog
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: RightHandInputs.Fingers.Array.data[3].Analog
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: RightHandInputs.Fingers.Array.data[4].Analog
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: LeftHandInputs.Fingers.Array.data[0].Interpolate
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: LeftHandInputs.Fingers.Array.data[1].Interpolate
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: LeftHandInputs.Fingers.Array.data[2].Interpolate
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: LeftHandInputs.Fingers.Array.data[3].Interpolate
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: LeftHandInputs.Fingers.Array.data[4].Interpolate
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: RightHandInputs.Fingers.Array.data[0].Interpolate
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: RightHandInputs.Fingers.Array.data[1].Interpolate
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: RightHandInputs.Fingers.Array.data[2].Interpolate
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: RightHandInputs.Fingers.Array.data[3].Interpolate
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: RightHandInputs.Fingers.Array.data[4].Interpolate
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: LeftHandInputs.Fingers.Array.data[0].Axes.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: LeftHandInputs.Fingers.Array.data[1].Axes.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: LeftHandInputs.Fingers.Array.data[2].Axes.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: LeftHandInputs.Fingers.Array.data[3].Axes.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: LeftHandInputs.Fingers.Array.data[4].Axes.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
       propertyPath: leftHandInputs.fingers.Array.data[0].axes.Array.size
       value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
         type: 3}
+      propertyPath: LeftHandInputs.Fingers.Array.data[0].DistalRotation.z
+      value: -45
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: LeftHandInputs.Fingers.Array.data[1].DistalRotation.x
+      value: -45
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: LeftHandInputs.Fingers.Array.data[2].DistalRotation.x
+      value: -40
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: LeftHandInputs.Fingers.Array.data[2].DistalRotation.y
+      value: -6
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: LeftHandInputs.Fingers.Array.data[2].DistalRotation.z
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: LeftHandInputs.Fingers.Array.data[3].DistalRotation.x
+      value: -40
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: LeftHandInputs.Fingers.Array.data[3].DistalRotation.y
+      value: -35
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: LeftHandInputs.Fingers.Array.data[3].DistalRotation.z
+      value: 14
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: LeftHandInputs.Fingers.Array.data[4].DistalRotation.x
+      value: -45
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: LeftHandInputs.Fingers.Array.data[4].DistalRotation.y
+      value: -20
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: LeftHandInputs.Fingers.Array.data[4].DistalRotation.z
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: RightHandInputs.Fingers.Array.data[0].Axes.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: RightHandInputs.Fingers.Array.data[1].Axes.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: RightHandInputs.Fingers.Array.data[2].Axes.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: RightHandInputs.Fingers.Array.data[3].Axes.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: RightHandInputs.Fingers.Array.data[4].Axes.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
       propertyPath: rightHandInputs.fingers.Array.data[0].axes.Array.size
       value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: LeftHandInputs.Fingers.Array.data[0].CompoundRotations
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: LeftHandInputs.Fingers.Array.data[0].InterpolationTime
+      value: 0.04
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: LeftHandInputs.Fingers.Array.data[1].CompoundRotations
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: LeftHandInputs.Fingers.Array.data[1].InterpolationTime
+      value: 0.04
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: LeftHandInputs.Fingers.Array.data[2].CompoundRotations
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: LeftHandInputs.Fingers.Array.data[2].InterpolationTime
+      value: 0.04
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: LeftHandInputs.Fingers.Array.data[3].CompoundRotations
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: LeftHandInputs.Fingers.Array.data[3].InterpolationTime
+      value: 0.04
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: LeftHandInputs.Fingers.Array.data[4].CompoundRotations
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: LeftHandInputs.Fingers.Array.data[4].InterpolationTime
+      value: 0.04
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: RightHandInputs.Fingers.Array.data[0].DistalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: RightHandInputs.Fingers.Array.data[0].DistalRotation.z
+      value: 45
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: RightHandInputs.Fingers.Array.data[1].DistalRotation.x
+      value: -45
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: RightHandInputs.Fingers.Array.data[1].DistalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: RightHandInputs.Fingers.Array.data[1].DistalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: RightHandInputs.Fingers.Array.data[2].DistalRotation.x
+      value: -40
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: RightHandInputs.Fingers.Array.data[2].DistalRotation.y
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: RightHandInputs.Fingers.Array.data[2].DistalRotation.z
+      value: -3
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: RightHandInputs.Fingers.Array.data[3].DistalRotation.x
+      value: -40
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: RightHandInputs.Fingers.Array.data[3].DistalRotation.y
+      value: 35
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: RightHandInputs.Fingers.Array.data[3].DistalRotation.z
+      value: -14
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: RightHandInputs.Fingers.Array.data[4].DistalRotation.x
+      value: -45
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: RightHandInputs.Fingers.Array.data[4].DistalRotation.y
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: RightHandInputs.Fingers.Array.data[4].DistalRotation.z
+      value: -20
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: LeftHandInputs.Fingers.Array.data[0].Axes.Array.data[0]
+      value: XRI_Left_Primary2DAxisTouch
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: LeftHandInputs.Fingers.Array.data[0].Axes.Array.data[1]
+      value: XRI_Left_Primary2DAxisClick
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: LeftHandInputs.Fingers.Array.data[0].Axes.Array.data[2]
+      value: XRI_Left_PrimaryButton
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: LeftHandInputs.Fingers.Array.data[0].ProximalRotation.x
+      value: -5
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: LeftHandInputs.Fingers.Array.data[0].ProximalRotation.z
+      value: 25
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: LeftHandInputs.Fingers.Array.data[1].Axes.Array.data[0]
+      value: XRI_Left_Trigger
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: LeftHandInputs.Fingers.Array.data[1].ProximalRotation.x
+      value: -70
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: LeftHandInputs.Fingers.Array.data[1].ProximalRotation.y
+      value: -10
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: LeftHandInputs.Fingers.Array.data[2].Axes.Array.data[0]
+      value: XRI_Left_Grip
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: LeftHandInputs.Fingers.Array.data[2].ProximalRotation.x
+      value: -65
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: LeftHandInputs.Fingers.Array.data[2].ProximalRotation.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: LeftHandInputs.Fingers.Array.data[3].Axes.Array.data[0]
+      value: XRI_Left_Grip
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: LeftHandInputs.Fingers.Array.data[3].ProximalRotation.x
+      value: -65
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: LeftHandInputs.Fingers.Array.data[3].ProximalRotation.y
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: LeftHandInputs.Fingers.Array.data[4].Axes.Array.data[0]
+      value: XRI_Left_Grip
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: LeftHandInputs.Fingers.Array.data[4].ProximalRotation.x
+      value: -65
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: LeftHandInputs.Fingers.Array.data[4].ProximalRotation.y
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: LeftHandInputs.Fingers.Array.data[4].ProximalRotation.z
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: RightHandInputs.Fingers.Array.data[0].CompoundRotations
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: RightHandInputs.Fingers.Array.data[0].InterpolationTime
+      value: 0.04
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: RightHandInputs.Fingers.Array.data[1].CompoundRotations
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: RightHandInputs.Fingers.Array.data[1].InterpolationTime
+      value: 0.04
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: RightHandInputs.Fingers.Array.data[2].CompoundRotations
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: RightHandInputs.Fingers.Array.data[2].InterpolationTime
+      value: 0.04
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: RightHandInputs.Fingers.Array.data[3].CompoundRotations
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: RightHandInputs.Fingers.Array.data[3].InterpolationTime
+      value: 0.04
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: RightHandInputs.Fingers.Array.data[4].CompoundRotations
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: RightHandInputs.Fingers.Array.data[4].InterpolationTime
+      value: 0.04
       objectReference: {fileID: 0}
     - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
         type: 3}
@@ -69,6 +624,116 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
         type: 3}
+      propertyPath: RightHandInputs.Fingers.Array.data[0].Axes.Array.data[0]
+      value: XRI_Right_Primary2DAxisTouch
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: RightHandInputs.Fingers.Array.data[0].Axes.Array.data[1]
+      value: XRI_Right_Primary2DAxisClick
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: RightHandInputs.Fingers.Array.data[0].Axes.Array.data[2]
+      value: XRI_Right_PrimaryButton
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: RightHandInputs.Fingers.Array.data[0].ProximalRotation.x
+      value: -5
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: RightHandInputs.Fingers.Array.data[0].ProximalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: RightHandInputs.Fingers.Array.data[0].ProximalRotation.z
+      value: -25
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: RightHandInputs.Fingers.Array.data[1].Axes.Array.data[0]
+      value: XRI_Right_Trigger
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: RightHandInputs.Fingers.Array.data[1].ProximalRotation.x
+      value: -70
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: RightHandInputs.Fingers.Array.data[1].ProximalRotation.y
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: RightHandInputs.Fingers.Array.data[1].ProximalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: RightHandInputs.Fingers.Array.data[2].Axes.Array.data[0]
+      value: XRI_Right_Grip
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: RightHandInputs.Fingers.Array.data[2].ProximalRotation.x
+      value: -65
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: RightHandInputs.Fingers.Array.data[2].ProximalRotation.y
+      value: -1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: RightHandInputs.Fingers.Array.data[2].ProximalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: RightHandInputs.Fingers.Array.data[3].Axes.Array.data[0]
+      value: XRI_Right_Grip
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: RightHandInputs.Fingers.Array.data[3].ProximalRotation.x
+      value: -65
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: RightHandInputs.Fingers.Array.data[3].ProximalRotation.y
+      value: -8
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: RightHandInputs.Fingers.Array.data[3].ProximalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: RightHandInputs.Fingers.Array.data[4].Axes.Array.data[0]
+      value: XRI_Right_Grip
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: RightHandInputs.Fingers.Array.data[4].ProximalRotation.x
+      value: -65
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: RightHandInputs.Fingers.Array.data[4].ProximalRotation.y
+      value: -15
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: RightHandInputs.Fingers.Array.data[4].ProximalRotation.z
+      value: -2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
       propertyPath: rightHandInputs.fingers.Array.data[0].axes.Array.data[0]
       value: XRI_Right_Primary2DAxisTouch
       objectReference: {fileID: 0}
@@ -101,6 +766,191 @@ PrefabInstance:
         type: 3}
       propertyPath: rightHandInputs.fingers.Array.data[4].axes.Array.data[0]
       value: XRI_Right_Grip
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: LeftHandInputs.Fingers.Array.data[2].MetacarpalRotation.y
+      value: -2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: RightHandInputs.Fingers.Array.data[0].MetacarpalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: RightHandInputs.Fingers.Array.data[0].MetacarpalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: RightHandInputs.Fingers.Array.data[1].MetacarpalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: RightHandInputs.Fingers.Array.data[1].MetacarpalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: RightHandInputs.Fingers.Array.data[2].MetacarpalRotation.y
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: RightHandInputs.Fingers.Array.data[2].MetacarpalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: RightHandInputs.Fingers.Array.data[3].MetacarpalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: RightHandInputs.Fingers.Array.data[3].MetacarpalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: RightHandInputs.Fingers.Array.data[4].MetacarpalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: RightHandInputs.Fingers.Array.data[4].MetacarpalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: LeftHandInputs.Fingers.Array.data[0].IntermediateRotation.x
+      value: -10
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: LeftHandInputs.Fingers.Array.data[0].IntermediateRotation.z
+      value: -65
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: LeftHandInputs.Fingers.Array.data[1].IntermediateRotation.x
+      value: -45
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: LeftHandInputs.Fingers.Array.data[1].IntermediateRotation.z
+      value: -5
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: LeftHandInputs.Fingers.Array.data[2].IntermediateRotation.x
+      value: -55
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: LeftHandInputs.Fingers.Array.data[2].IntermediateRotation.z
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: LeftHandInputs.Fingers.Array.data[3].IntermediateRotation.x
+      value: -50
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: LeftHandInputs.Fingers.Array.data[3].IntermediateRotation.y
+      value: 12
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: LeftHandInputs.Fingers.Array.data[4].IntermediateRotation.x
+      value: -40
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: LeftHandInputs.Fingers.Array.data[4].IntermediateRotation.y
+      value: 9
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: LeftHandInputs.Fingers.Array.data[4].IntermediateRotation.z
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: RightHandInputs.Fingers.Array.data[0].IntermediateRotation.x
+      value: -10
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: RightHandInputs.Fingers.Array.data[0].IntermediateRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: RightHandInputs.Fingers.Array.data[0].IntermediateRotation.z
+      value: 65
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: RightHandInputs.Fingers.Array.data[1].IntermediateRotation.x
+      value: -45
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: RightHandInputs.Fingers.Array.data[1].IntermediateRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: RightHandInputs.Fingers.Array.data[1].IntermediateRotation.z
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: RightHandInputs.Fingers.Array.data[2].IntermediateRotation.x
+      value: -55
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: RightHandInputs.Fingers.Array.data[2].IntermediateRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: RightHandInputs.Fingers.Array.data[2].IntermediateRotation.z
+      value: -2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: RightHandInputs.Fingers.Array.data[3].IntermediateRotation.x
+      value: -50
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: RightHandInputs.Fingers.Array.data[3].IntermediateRotation.y
+      value: -12
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: RightHandInputs.Fingers.Array.data[3].IntermediateRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: RightHandInputs.Fingers.Array.data[4].IntermediateRotation.x
+      value: -40
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: RightHandInputs.Fingers.Array.data[4].IntermediateRotation.y
+      value: -9
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612547581167370260, guid: c3578bd76f7b2784faf4bf41b77663e2,
+        type: 3}
+      propertyPath: RightHandInputs.Fingers.Array.data[4].IntermediateRotation.z
+      value: -5
       objectReference: {fileID: 0}
     - target: {fileID: 6612547581167370261, guid: c3578bd76f7b2784faf4bf41b77663e2,
         type: 3}

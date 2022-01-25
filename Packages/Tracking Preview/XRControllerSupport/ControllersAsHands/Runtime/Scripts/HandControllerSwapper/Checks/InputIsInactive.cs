@@ -20,10 +20,10 @@ namespace Leap.Unity.Controllers
     {
         protected override bool IsTrueLogic()
         {
-            switch (inputMethodType)
+            switch (InputMethodType)
             {
                 case InputMethodType.LeapHand:
-                    return _provider.Get(hand) == null;
+                    return _provider.Get(Hand) == null;
                 case InputMethodType.XRController:
                     return !GetController();
             }
