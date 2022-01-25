@@ -6,13 +6,9 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using Leap.Unity;
-using System;
-
 #if ENABLE_INPUT_SYSTEM
+using System.Collections.Generic;
 using UnityEngine.InputSystem;
 #endif
 
@@ -50,16 +46,16 @@ namespace Leap.Unity.Controllers
 
         private void SetupInputSystem()
         {
-            string inputaction = $"{Hand} HasButtonBeenPressed";
+            string inputaction = $"{hand} HasButtonBeenPressed";
             List<InputAction> actions = InputSystem.ListEnabledActions();
             int ind = actions.FindIndex(x => x.name == inputaction);
             if (ind == -1)
             {
                 _anyButton = new InputAction(name: inputaction);
-                _anyButton.AddBinding().WithPath("<XRController>{" + Hand + "Hand}/*pressed");
-                _anyButton.AddBinding().WithPath("<XRController>{" + Hand + "Hand}/*touched");
-                _anyButton.AddBinding().WithPath("<XRController>{" + Hand + "Hand}/*clicked");
-                _anyButton.AddBinding().WithPath("<XRController>{" + Hand + "Hand}/<Analog>");
+                _anyButton.AddBinding().WithPath("<XRController>{" + hand + "Hand}/*pressed");
+                _anyButton.AddBinding().WithPath("<XRController>{" + hand + "Hand}/*touched");
+                _anyButton.AddBinding().WithPath("<XRController>{" + hand + "Hand}/*clicked");
+                _anyButton.AddBinding().WithPath("<XRController>{" + hand + "Hand}/<Analog>");
 
                 _anyButton.performed += _ => { OnButtonDown(); };
                 _anyButton.canceled += _ => { OnButtonUp(); };
@@ -99,32 +95,32 @@ namespace Leap.Unity.Controllers
 
         private bool IsLegacyXRButtonPressed()
         {
-            if (Input.GetButton("XRI_" + Hand + "_Primary2DAxisTouch"))
+            if (Input.GetButton("XRI_" + hand + "_Primary2DAxisTouch"))
             {
                 return true;
             }
 
-            if (Input.GetButton("XRI_" + Hand + "_Primary2DAxisClick"))
+            if (Input.GetButton("XRI_" + hand + "_Primary2DAxisClick"))
             {
                 return true;
             }
 
-            if (Input.GetButton("XRI_" + Hand + "_PrimaryButton"))
+            if (Input.GetButton("XRI_" + hand + "_PrimaryButton"))
             {
                 return true;
             }
 
-            if (Input.GetButton("XRI_" + Hand + "_SecondaryButton"))
+            if (Input.GetButton("XRI_" + hand + "_SecondaryButton"))
             {
                 return true;
             }
 
-            if (Mathf.Abs(Input.GetAxis("XRI_" + Hand + "_Trigger")) > 0)
+            if (Mathf.Abs(Input.GetAxis("XRI_" + hand + "_Trigger")) > 0)
             {
                 return true;
             }
 
-            if (Mathf.Abs(Input.GetAxis("XRI_" + Hand + "_Grip")) > 0)
+            if (Mathf.Abs(Input.GetAxis("XRI_" + hand + "_Grip")) > 0)
             {
                 return true;
             }

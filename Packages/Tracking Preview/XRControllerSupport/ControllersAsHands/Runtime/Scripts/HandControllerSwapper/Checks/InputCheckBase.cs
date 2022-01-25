@@ -6,7 +6,6 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Leap.Unity;
 using UnityEngine;
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem.XR;
@@ -22,13 +21,13 @@ namespace Leap.Unity.Controllers
     [System.Serializable]
     public class InputCheckBase
     {
-        public bool Enabled = true;
-        public bool UseTime = false;
-        public InputMethodType InputMethodType = InputMethodType.LeapHand;
-        public float TimeThreshold = 0;
-        public float TimeValue { get { return UseTime ? TimeThreshold : 0; } }
-        public float ActionThreshold = 0;
-        public Chirality Hand = Chirality.Left;
+        public bool enabled = true;
+        public bool useTime = false;
+        public InputMethodType inputMethodType = InputMethodType.LeapHand;
+        public float timeThreshold = 0;
+        public float TimeValue { get { return useTime ? timeThreshold : 0; } }
+        public float actionThreshold = 0;
+        public Chirality hand = Chirality.Left;
 
         protected LeapProvider _provider;
         protected float _currentTime = 0;
@@ -70,7 +69,7 @@ namespace Leap.Unity.Controllers
 
             if (_xrController == null)
             {
-                switch (Hand)
+                switch (hand)
                 {
                     case Chirality.Left:
                         _xrController = XRController.leftHand;

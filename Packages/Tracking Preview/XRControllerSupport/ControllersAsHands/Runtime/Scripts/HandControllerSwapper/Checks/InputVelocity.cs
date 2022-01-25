@@ -6,12 +6,10 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using Leap.Unity;
 
+using UnityEngine;
 #if ENABLE_INPUT_SYSTEM
+using System.Collections.Generic;
 using UnityEngine.InputSystem;
 #endif
 
@@ -26,7 +24,7 @@ namespace Leap.Unity.Controllers
 #if ENABLE_INPUT_SYSTEM
         private InputAction _controllerAction;
 #else
-        public Vector3 CurrentVelocity;
+        public Vector3 currentVelocity;
 #endif
 
         public bool velocityIsLower = false;
@@ -35,7 +33,7 @@ namespace Leap.Unity.Controllers
             Vector3 vel;
             if (GetVelocity(out vel))
             {
-                if (velocityIsLower ? vel.magnitude < ActionThreshold : vel.magnitude > ActionThreshold)
+                if (velocityIsLower ? vel.magnitude < actionThreshold : vel.magnitude > actionThreshold)
                 {
                     return true;
                 }
@@ -45,12 +43,12 @@ namespace Leap.Unity.Controllers
 
         public bool GetVelocity(out Vector3 vel)
         {
-            switch (InputMethodType)
+            switch (inputMethodType)
             {
                 case InputMethodType.LeapHand:
-                    if (_provider.Get(Hand) != null)
+                    if (_provider.Get(hand) != null)
                     {
-                        vel = _provider.Get(Hand).PalmPosition.ToVector3();
+                        vel = _provider.Get(hand).PalmPosition.ToVector3();
                         return true;
                     }
                     break;
@@ -60,7 +58,7 @@ namespace Leap.Unity.Controllers
 #if ENABLE_INPUT_SYSTEM
                         vel = _controllerAction.ReadValue<Vector3>();
 #else
-                        vel = CurrentVelocity;
+                        vel = currentVelocity;
 #endif
                         return true;
                     }
@@ -81,13 +79,13 @@ namespace Leap.Unity.Controllers
 #if ENABLE_INPUT_SYSTEM
         private void SetupInputSystem()
         {
-            string inputaction = Hand.ToString() + " InputVelocityCheck";
+            string inputAction = hand.ToString() + " InputVelocityCheck";
             List<InputAction> actions = InputSystem.ListEnabledActions();
-            int ind = actions.FindIndex(x => x.name == inputaction);
+            int ind = actions.FindIndex(x => x.name == inputAction);
             if (ind == -1)
             {
-                _controllerAction = new InputAction(inputaction);
-                _controllerAction.AddBinding().WithPath("<XRController>{" + Hand.ToString() + "Hand}/devicePose/velocity");
+                _controllerAction = new InputAction(inputAction);
+                _controllerAction.AddBinding().WithPath("<XRController>{" + hand.ToString() + "Hand}/devicePose/velocity");
                 _controllerAction.Enable();
             }
             else

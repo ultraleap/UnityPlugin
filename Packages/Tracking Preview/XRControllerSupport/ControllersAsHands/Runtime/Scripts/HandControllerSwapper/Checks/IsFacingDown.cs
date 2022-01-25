@@ -6,7 +6,6 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Leap.Unity;
 using UnityEngine;
 
 namespace Leap.Unity.Controllers
@@ -18,14 +17,14 @@ namespace Leap.Unity.Controllers
     /// </summary>
     public class IsFacingDown : InputCheckBase
     {
-        public Quaternion CurrentXRControllerRotation;
+        public Quaternion currentXRControllerRotation;
 
         protected override bool IsTrueLogic()
         {
             float angle;
             if (GetAngleBetweenInputAndFloor(out angle))
             {
-                if (angle <= ActionThreshold)
+                if (angle <= actionThreshold)
                 {
                     return true;
                 }
@@ -35,12 +34,12 @@ namespace Leap.Unity.Controllers
 
         private bool GetAngleBetweenInputAndFloor(out float angle)
         {
-            switch (InputMethodType)
+            switch (inputMethodType)
             {
                 case InputMethodType.LeapHand:
-                    if (_provider.Get(Hand) != null)
+                    if (_provider.Get(hand) != null)
                     {
-                        angle = Vector3.Angle(_provider.Get(Hand).Direction.ToVector3(), Vector3.down);
+                        angle = Vector3.Angle(_provider.Get(hand).Direction.ToVector3(), Vector3.down);
                         return true;
                     }
                     break;
@@ -50,7 +49,7 @@ namespace Leap.Unity.Controllers
 #if ENABLE_INPUT_SYSTEM
                         angle = Vector3.Angle(_xrController.deviceRotation.ReadValue() * Vector3.forward, Vector3.down);
 #else
-                        angle = Vector3.Angle(CurrentXRControllerRotation * Vector3.forward, Vector3.down);
+                        angle = Vector3.Angle(currentXRControllerRotation * Vector3.forward, Vector3.down);
 #endif
                         return true;
                     }

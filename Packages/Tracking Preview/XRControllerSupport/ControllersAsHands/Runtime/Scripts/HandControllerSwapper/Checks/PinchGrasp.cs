@@ -6,9 +6,6 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Leap;
-using Leap.Unity;
-
 namespace Leap.Unity.Controllers
 {
     /// <summary>
@@ -18,10 +15,10 @@ namespace Leap.Unity.Controllers
     {
         protected override bool IsTrueLogic()
         {
-            Hand hand = _provider.Get(this.Hand);
+            Hand hand = _provider.Get(this.hand);
             if (hand != null)
             {
-                if (hand.PinchStrength > ActionThreshold || hand.GrabStrength > ActionThreshold)
+                if (hand.PinchStrength > actionThreshold || hand.GrabStrength > actionThreshold)
                 {
                     return true;
                 }

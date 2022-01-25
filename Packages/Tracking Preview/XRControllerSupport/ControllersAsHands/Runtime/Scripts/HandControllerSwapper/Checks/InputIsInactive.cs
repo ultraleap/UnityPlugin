@@ -6,11 +6,6 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using System.Collections;
-using System.Collections.Generic;
-using Leap.Unity;
-using UnityEngine;
-
 namespace Leap.Unity.Controllers
 {
     /// <summary>
@@ -20,10 +15,10 @@ namespace Leap.Unity.Controllers
     {
         protected override bool IsTrueLogic()
         {
-            switch (InputMethodType)
+            switch (inputMethodType)
             {
                 case InputMethodType.LeapHand:
-                    return _provider.Get(Hand) == null;
+                    return _provider.Get(hand) == null;
                 case InputMethodType.XRController:
                     return !GetController();
             }

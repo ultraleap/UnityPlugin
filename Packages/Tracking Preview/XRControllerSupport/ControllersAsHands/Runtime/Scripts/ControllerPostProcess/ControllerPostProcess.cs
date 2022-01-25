@@ -26,16 +26,16 @@ namespace Leap.Unity.Controllers
     /// </summary>
     public class ControllerPostProcess : PostProcessProvider
     {
-        public ControllerHand LeftHandInputs;
-        public ControllerHand RightHandInputs;
+        public ControllerHand leftHandInputs;
+        public ControllerHand rightHandInputs;
 
-        [HideInInspector] public InputMethodType[] CurrentInputTypes;
+        [HideInInspector] public InputMethodType[] currentInputTypes;
         private InputMethodType[] _oldInputTypes;
 
         public Action<Chirality, InputMethodType> OnHandInputTypeChange;
         public Action<Chirality> OnControllerActiveFrame;
 
-        public bool AlwaysEnableControllersIfActive = true;
+        public bool alwaysEnableControllersIfActive = true;
 
         /// <summary>
         /// Generates input axes/actions for each finger (e.g. binds the trigger to the index)
@@ -46,24 +46,24 @@ namespace Leap.Unity.Controllers
         {
 #if ENABLE_INPUT_SYSTEM
 
-            LeftHandInputs = new ControllerHand(Chirality.Left);
-            RightHandInputs = new ControllerHand(Chirality.Right);
+            leftHandInputs = new ControllerHand(Chirality.Left);
+            rightHandInputs = new ControllerHand(Chirality.Right);
 
 #else
             Transform lc = null;
-            if (LeftHandInputs != null) lc = LeftHandInputs.Transform;
+            if (leftHandInputs != null) lc = leftHandInputs.transform;
 
-            LeftHandInputs = new ControllerHand(Chirality.Left);
-            if (lc != null) LeftHandInputs.Transform = lc;
+            leftHandInputs = new ControllerHand(Chirality.Left);
+            if (lc != null) leftHandInputs.transform = lc;
 
             Transform rc = null;
-            if (RightHandInputs != null) rc = RightHandInputs.Transform;
+            if (rightHandInputs != null) rc = rightHandInputs.transform;
 
-            RightHandInputs = new ControllerHand(Chirality.Right);
-            if (rc != null) RightHandInputs.Transform = rc;
+            rightHandInputs = new ControllerHand(Chirality.Right);
+            if (rc != null) rightHandInputs.transform = rc;
 #endif
-            LeftHandInputs.GenerateFingers();
-            RightHandInputs.GenerateFingers();
+            leftHandInputs.GenerateFingers();
+            rightHandInputs.GenerateFingers();
 
         }
 
@@ -83,24 +83,24 @@ namespace Leap.Unity.Controllers
                             " XR Legacy Input Helpers package when using the Legacy Input Module. Please add this package to your project" +
                             "and Seed XR Input Bindings.");
             }
-            if (LeftHandInputs.Transform == null) Debug.LogError("Please assign a left controller.", this);
-            if (RightHandInputs.Transform == null) Debug.LogError("Please assign a right controller.", this);
+            if (leftHandInputs.transform == null) Debug.LogError("Please assign a left controller.", this);
+            if (rightHandInputs.transform == null) Debug.LogError("Please assign a right controller.", this);
 #endif
 
-            LeftHandInputs.Setup(Chirality.Left);
-            RightHandInputs.Setup(Chirality.Right);
+            leftHandInputs.Setup(Chirality.Left);
+            rightHandInputs.Setup(Chirality.Right);
 
-            if (AlwaysEnableControllersIfActive)
+            if (alwaysEnableControllersIfActive)
             {
-                CurrentInputTypes = new InputMethodType[] { InputMethodType.XRController, InputMethodType.XRController };
+                currentInputTypes = new InputMethodType[] { InputMethodType.XRController, InputMethodType.XRController };
             }
             else
             {
-                CurrentInputTypes = new InputMethodType[] { InputMethodType.LeapHand, InputMethodType.LeapHand };
+                currentInputTypes = new InputMethodType[] { InputMethodType.LeapHand, InputMethodType.LeapHand };
             }
 
-            _oldInputTypes = new InputMethodType[CurrentInputTypes.Length];
-            CurrentInputTypes.CopyTo(_oldInputTypes, 0);
+            _oldInputTypes = new InputMethodType[currentInputTypes.Length];
+            currentInputTypes.CopyTo(_oldInputTypes, 0);
         }
 
         private void Update()
@@ -122,52 +122,52 @@ namespace Leap.Unity.Controllers
         {
 
 #if ENABLE_INPUT_SYSTEM
-            if (LeftHandInputs.Controller.IsControllerActive())
+            if (leftHandInputs.Controller.IsControllerActive())
             {
                 OnControllerActiveFrame?.Invoke(Chirality.Left);
-                if (AlwaysEnableControllersIfActive)
+                if (alwaysEnableControllersIfActive)
                 {
-                    CurrentInputTypes[(int)Chirality.Left] = InputMethodType.XRController;
+                    currentInputTypes[(int)Chirality.Left] = InputMethodType.XRController;
                 }
             }
             else
             {
-                CurrentInputTypes[(int)Chirality.Left] = InputMethodType.LeapHand;
+                currentInputTypes[(int)Chirality.Left] = InputMethodType.LeapHand;
             }
 
-            if (RightHandInputs.Controller.IsControllerActive())
+            if (rightHandInputs.Controller.IsControllerActive())
             {
                 OnControllerActiveFrame?.Invoke(Chirality.Right);
-                if (AlwaysEnableControllersIfActive)
+                if (alwaysEnableControllersIfActive)
                 {
-                    CurrentInputTypes[(int)Chirality.Right] = InputMethodType.XRController;
+                    currentInputTypes[(int)Chirality.Right] = InputMethodType.XRController;
                 }
             }
             else
             {
-                CurrentInputTypes[(int)Chirality.Right] = InputMethodType.LeapHand;
+                currentInputTypes[(int)Chirality.Right] = InputMethodType.LeapHand;
             }
 #else
             OnControllerActiveFrame?.Invoke(Chirality.Left);
             OnControllerActiveFrame?.Invoke(Chirality.Right);
 #endif
 
-            if (_oldInputTypes[(int)Chirality.Left] != CurrentInputTypes[(int)Chirality.Left])
+            if (_oldInputTypes[(int)Chirality.Left] != currentInputTypes[(int)Chirality.Left])
             {
-                _oldInputTypes[(int)Chirality.Left] = CurrentInputTypes[(int)Chirality.Left];
-                OnHandInputTypeChange?.Invoke(Chirality.Left, CurrentInputTypes[(int)Chirality.Left]);
+                _oldInputTypes[(int)Chirality.Left] = currentInputTypes[(int)Chirality.Left];
+                OnHandInputTypeChange?.Invoke(Chirality.Left, currentInputTypes[(int)Chirality.Left]);
             }
 
-            if (_oldInputTypes[(int)Chirality.Right] != CurrentInputTypes[(int)Chirality.Right])
+            if (_oldInputTypes[(int)Chirality.Right] != currentInputTypes[(int)Chirality.Right])
             {
-                _oldInputTypes[(int)Chirality.Right] = CurrentInputTypes[(int)Chirality.Right];
-                OnHandInputTypeChange?.Invoke(Chirality.Right, CurrentInputTypes[(int)Chirality.Right]);
+                _oldInputTypes[(int)Chirality.Right] = currentInputTypes[(int)Chirality.Right];
+                OnHandInputTypeChange?.Invoke(Chirality.Right, currentInputTypes[(int)Chirality.Right]);
             }
         }
 
         public void SetInputMethodType(Chirality chirality, InputMethodType inputMethodType)
         {
-            CurrentInputTypes[(int)chirality] = inputMethodType;
+            currentInputTypes[(int)chirality] = inputMethodType;
         }
 
         /// <summary>
@@ -176,28 +176,28 @@ namespace Leap.Unity.Controllers
         private void UpdateControllers()
         {
 #if ENABLE_INPUT_SYSTEM
-            if (LeftHandInputs.Controller == null)
+            if (leftHandInputs.Controller == null)
             {
-                LeftHandInputs.Controller = XRController.leftHand;
+                leftHandInputs.Controller = XRController.leftHand;
             }
 
-            if (LeftHandInputs.Controller != null && LeftHandInputs.Controller.wasUpdatedThisFrame)
+            if (leftHandInputs.Controller != null && leftHandInputs.Controller.wasUpdatedThisFrame)
             {
-                LeftHandInputs.Update();
+                leftHandInputs.Update();
             }
 
-            if (RightHandInputs.Controller == null)
+            if (rightHandInputs.Controller == null)
             {
-                RightHandInputs.Controller = XRController.rightHand;
+                rightHandInputs.Controller = XRController.rightHand;
             }
 
-            if (RightHandInputs.Controller != null && RightHandInputs.Controller.wasUpdatedThisFrame)
+            if (rightHandInputs.Controller != null && rightHandInputs.Controller.wasUpdatedThisFrame)
             {
-                RightHandInputs.Update();
+                rightHandInputs.Update();
             }
 #else
-            LeftHandInputs.Update();
-            RightHandInputs.Update();
+            leftHandInputs.Update();
+            rightHandInputs.Update();
 #endif
         }
 
@@ -216,17 +216,17 @@ namespace Leap.Unity.Controllers
         /// <param name="inputFrame"></param>
         private void ProcessHandData(Chirality chirality, ref Frame inputFrame)
         {
-            switch (CurrentInputTypes[(int)chirality])
+            switch (currentInputTypes[(int)chirality])
             {
                 case InputMethodType.XRController:
                     inputFrame.Hands.RemoveAll(o => (chirality == Chirality.Left) ? o.IsLeft : o.IsRight);
                     switch (chirality)
                     {
                         case Chirality.Left:
-                            inputFrame.Hands.Add(LeftHandInputs.Hand);
+                            inputFrame.Hands.Add(leftHandInputs.Hand);
                             break;
                         case Chirality.Right:
-                            inputFrame.Hands.Add(RightHandInputs.Hand);
+                            inputFrame.Hands.Add(rightHandInputs.Hand);
                             break;
                     }
                     break;
@@ -234,10 +234,10 @@ namespace Leap.Unity.Controllers
                     switch (chirality)
                     {
                         case Chirality.Left:
-                            LeftHandInputs.TimeVisible = 0;
+                            leftHandInputs.timeVisible = 0;
                             break;
                         case Chirality.Right:
-                            RightHandInputs.TimeVisible = 0;
+                            rightHandInputs.timeVisible = 0;
                             break;
                     }
                     break;
@@ -254,12 +254,12 @@ namespace Leap.Unity.Controllers
 
         private bool LegacyXRInputBindingsNotSeeded(Chirality chirality)
         {
-            ControllerHand controllerHand = chirality == Chirality.Left ? LeftHandInputs : RightHandInputs;
-            for (int i = 0; i < LeftHandInputs.Fingers[i].Axes.Count; i++)
+            ControllerHand controllerHand = chirality == Chirality.Left ? leftHandInputs : rightHandInputs;
+            for (int i = 0; i < leftHandInputs.fingers[i].axes.Count; i++)
             {
                 try
                 {
-                    Mathf.Abs(Input.GetAxis(controllerHand.Fingers[i].Axes[i]));
+                    Mathf.Abs(Input.GetAxis(controllerHand.fingers[i].axes[i]));
                 }
                 catch
                 {

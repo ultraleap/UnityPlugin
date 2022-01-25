@@ -6,13 +6,8 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using Leap;
-using Leap.Unity;
 using UnityEngine;
-using System.Reflection;
 
 namespace Leap.Unity.Controllers
 {
@@ -36,18 +31,18 @@ namespace Leap.Unity.Controllers
 
         private void Start()
         {
-            Setup(_controllerPostProcess.inputLeapProvider, _controllerPostProcess.CurrentInputTypes);
-            _controllerPostProcess.AlwaysEnableControllersIfActive = false;
+            Setup(_controllerPostProcess.inputLeapProvider, _controllerPostProcess.currentInputTypes);
+            _controllerPostProcess.alwaysEnableControllersIfActive = false;
         }
 
         private void Update()
         {
 #if !ENABLE_INPUT_SYSTEM
-            Vector3 currentLeftControllerPos = _controllerPostProcess.LeftHandInputs.Transform.position;
+            Vector3 currentLeftControllerPos = _controllerPostProcess.leftHandInputs.transform.position;
             _leftControllerVelocity = (currentLeftControllerPos - _prevLeftControllerPosition) / Time.deltaTime;
             _prevLeftControllerPosition = currentLeftControllerPos;
 
-            Vector3 currentRightControllerPos = _controllerPostProcess.RightHandInputs.Transform.position;
+            Vector3 currentRightControllerPos = _controllerPostProcess.rightHandInputs.transform.position;
             _rightControllerVelocity = (currentRightControllerPos - _prevRightControllerPosition) / Time.deltaTime;
             _prevRightControllerPosition = currentRightControllerPos;
 #endif
@@ -92,7 +87,7 @@ namespace Leap.Unity.Controllers
             switch (chirality)
             {
                 case Chirality.Left:
-                    if (IsInputGroupValid(_inputType[(int)chirality] == InputMethodType.LeapHand ? _controllerProfile.LeftHandChecks : _controllerProfile.LeftControllerChecks))
+                    if (IsInputGroupValid(_inputType[(int)chirality] == InputMethodType.LeapHand ? _controllerProfile.leftHandChecks : _controllerProfile.leftControllerChecks))
                     {
                         if (_inputType[(int)chirality] == InputMethodType.LeapHand)
                         {
@@ -107,7 +102,7 @@ namespace Leap.Unity.Controllers
                     break;
 
                 case Chirality.Right:
-                    if (IsInputGroupValid(_inputType[(int)chirality] == InputMethodType.LeapHand ? _controllerProfile.RightHandChecks : _controllerProfile.RightControllerChecks))
+                    if (IsInputGroupValid(_inputType[(int)chirality] == InputMethodType.LeapHand ? _controllerProfile.rightHandChecks : _controllerProfile.rightControllerChecks))
                     {
                         if (_inputType[(int)chirality] == InputMethodType.LeapHand)
                         {
@@ -179,7 +174,7 @@ namespace Leap.Unity.Controllers
                 .ForEach(check =>
                 {
                     InputVelocity inputVelocityCheck = check as InputVelocity;
-                    inputVelocityCheck.CurrentVelocity = inputVelocityCheck.Hand == Chirality.Left ?
+                    inputVelocityCheck.currentVelocity = inputVelocityCheck.hand == Chirality.Left ?
                     _leftControllerVelocity :
                     _rightControllerVelocity;
                 }
@@ -189,9 +184,9 @@ namespace Leap.Unity.Controllers
                 .ForEach(check =>
                 {
                     DistanceFromHead distanceFromHeadCheck = check as DistanceFromHead;
-                    distanceFromHeadCheck.CurrentXRControllerPosition = distanceFromHeadCheck.Hand == Chirality.Left ?
-                    _controllerPostProcess.LeftHandInputs.Transform.position :
-                    _controllerPostProcess.RightHandInputs.Transform.position;
+                    distanceFromHeadCheck.currentXRControllerPosition = distanceFromHeadCheck.hand == Chirality.Left ?
+                    _controllerPostProcess.leftHandInputs.transform.position :
+                    _controllerPostProcess.rightHandInputs.transform.position;
                 }
             );
 
@@ -199,9 +194,9 @@ namespace Leap.Unity.Controllers
                 .ForEach(check =>
                 {
                     DistanceBetweenInputs distanceBetweenInputsCheck = check as DistanceBetweenInputs;
-                    distanceBetweenInputsCheck.CurrentXRControllerPosition = distanceBetweenInputsCheck.Hand == Chirality.Left ?
-                    _controllerPostProcess.LeftHandInputs.Transform.position :
-                    _controllerPostProcess.RightHandInputs.Transform.position;
+                    distanceBetweenInputsCheck.currentXRControllerPosition = distanceBetweenInputsCheck.hand == Chirality.Left ?
+                    _controllerPostProcess.leftHandInputs.transform.position :
+                    _controllerPostProcess.rightHandInputs.transform.position;
                 }
             );
 
@@ -209,9 +204,9 @@ namespace Leap.Unity.Controllers
                 .ForEach(check =>
                 {
                     IsFacingDown isFacingDownCheck = check as IsFacingDown;
-                    isFacingDownCheck.CurrentXRControllerRotation = isFacingDownCheck.Hand == Chirality.Left ?
-                    _controllerPostProcess.LeftHandInputs.Transform.rotation :
-                    _controllerPostProcess.RightHandInputs.Transform.rotation;
+                    isFacingDownCheck.currentXRControllerRotation = isFacingDownCheck.hand == Chirality.Left ?
+                    _controllerPostProcess.leftHandInputs.transform.rotation :
+                    _controllerPostProcess.rightHandInputs.transform.rotation;
                 }
             );
         }

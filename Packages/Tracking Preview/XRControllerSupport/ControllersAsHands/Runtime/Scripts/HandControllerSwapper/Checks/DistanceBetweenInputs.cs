@@ -6,10 +6,7 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using Leap.Unity;
 
 namespace Leap.Unity.Controllers
 {
@@ -20,11 +17,11 @@ namespace Leap.Unity.Controllers
     /// </summary>
     public class DistanceBetweenInputs : InputCheckBase
     {
-        public Vector3 CurrentXRControllerPosition;
+        public Vector3 currentXRControllerPosition;
 
         protected override bool IsTrueLogic()
         {
-            if (GetController() && _provider.Get(Hand) != null)
+            if (GetController() && _provider.Get(hand) != null)
             {
                 if (InputDistanceCheck())
                 {
@@ -40,19 +37,19 @@ namespace Leap.Unity.Controllers
 #if ENABLE_INPUT_SYSTEM
             xrControllerPosition = _xrController.devicePosition.ReadValue();
 #else
-            xrControllerPosition = CurrentXRControllerPosition;
+            xrControllerPosition = currentXRControllerPosition;
 #endif
 
-            if (InputMethodType == InputMethodType.LeapHand)
+            if (inputMethodType == InputMethodType.LeapHand)
             {
-                if (Vector3.Distance(_provider.Get(Hand).PalmPosition.ToVector3(), xrControllerPosition) <= ActionThreshold)
+                if (Vector3.Distance(_provider.Get(hand).PalmPosition.ToVector3(), xrControllerPosition) <= actionThreshold)
                 {
                     return true;
                 }
             }
             else
             {
-                if (Vector3.Distance(_provider.Get(Hand).PalmPosition.ToVector3(), xrControllerPosition) >= ActionThreshold)
+                if (Vector3.Distance(_provider.Get(hand).PalmPosition.ToVector3(), xrControllerPosition) >= actionThreshold)
                 {
                     return true;
                 }

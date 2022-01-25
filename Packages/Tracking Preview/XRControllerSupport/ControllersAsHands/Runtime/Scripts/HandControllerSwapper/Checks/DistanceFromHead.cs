@@ -6,9 +6,6 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using System.Collections;
-using System.Collections.Generic;
-using Leap.Unity;
 using UnityEngine;
 
 namespace Leap.Unity.Controllers
@@ -19,8 +16,8 @@ namespace Leap.Unity.Controllers
     /// </summary>
     public class DistanceFromHead : InputCheckBase
     {
-        public Vector3 CurrentXRControllerPosition;
-        public bool LessThan = false;
+        public Vector3 currentXRControllerPosition;
+        public bool lessThan = false;
 
         private float _distance = 0;
 
@@ -31,13 +28,13 @@ namespace Leap.Unity.Controllers
             {
                 _distance = Vector3.Distance(inputPosition, MainCameraProvider.mainCamera.transform.position);
 
-                if (LessThan)
+                if (lessThan)
                 {
-                    return _distance <= ActionThreshold;
+                    return _distance <= actionThreshold;
                 }
                 else
                 {
-                    return _distance >= ActionThreshold;
+                    return _distance >= actionThreshold;
                 }
             }
             return false;
@@ -45,12 +42,12 @@ namespace Leap.Unity.Controllers
 
         private bool GetPosition(out Vector3 inputPosition)
         {
-            switch (InputMethodType)
+            switch (inputMethodType)
             {
                 case InputMethodType.LeapHand:
-                    if (_provider.Get(Hand) != null)
+                    if (_provider.Get(hand) != null)
                     {
-                        inputPosition = _provider.Get(Hand).PalmPosition.ToVector3();
+                        inputPosition = _provider.Get(hand).PalmPosition.ToVector3();
                         return true;
                     }
                     break;
@@ -60,14 +57,14 @@ namespace Leap.Unity.Controllers
 #if ENABLE_INPUT_SYSTEM
                         inputPosition = _xrController.devicePosition.ReadValue();
 #else
-                        inputPosition = CurrentXRControllerPosition;
+                        inputPosition = currentXRControllerPosition;
 #endif
                         return true;
                     }
                     break;
             }
 
-            inputPosition = LessThan ? Vector3.positiveInfinity : Vector3.zero;
+            inputPosition = lessThan ? Vector3.positiveInfinity : Vector3.zero;
             return false;
         }
     }

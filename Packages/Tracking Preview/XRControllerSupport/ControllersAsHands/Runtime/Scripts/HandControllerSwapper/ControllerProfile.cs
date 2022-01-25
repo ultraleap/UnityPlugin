@@ -6,11 +6,7 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
-using Leap.Unity;
-using System.Linq;
 
 namespace Leap.Unity.Controllers
 {
@@ -21,19 +17,19 @@ namespace Leap.Unity.Controllers
     /// </summary>
     public class ControllerProfile
     {
-        public List<InputCheckStage> LeftHandChecks = new List<InputCheckStage>();
-        public List<InputCheckStage> RightHandChecks = new List<InputCheckStage>();
+        public List<InputCheckStage> leftHandChecks = new List<InputCheckStage>();
+        public List<InputCheckStage> rightHandChecks = new List<InputCheckStage>();
 
-        public List<InputCheckStage> LeftControllerChecks = new List<InputCheckStage>();
-        public List<InputCheckStage> RightControllerChecks = new List<InputCheckStage>();
+        public List<InputCheckStage> leftControllerChecks = new List<InputCheckStage>();
+        public List<InputCheckStage> rightControllerChecks = new List<InputCheckStage>();
 
         public ControllerProfile()
         {
-            PopulateHandToControllerInputCheckStagesList(ref LeftHandChecks, Chirality.Left);
-            PopulateHandToControllerInputCheckStagesList(ref RightHandChecks, Chirality.Right);
+            PopulateHandToControllerInputCheckStagesList(ref leftHandChecks, Chirality.Left);
+            PopulateHandToControllerInputCheckStagesList(ref rightHandChecks, Chirality.Right);
 
-            PopulateControllerToHandInputCheckStagesList(ref LeftControllerChecks, Chirality.Left);
-            PopulateControllerToHandInputCheckStagesList(ref RightControllerChecks, Chirality.Right);
+            PopulateControllerToHandInputCheckStagesList(ref leftControllerChecks, Chirality.Left);
+            PopulateControllerToHandInputCheckStagesList(ref rightControllerChecks, Chirality.Right);
         }
 
         public class InputCheckStage
@@ -52,17 +48,17 @@ namespace Leap.Unity.Controllers
 
             public void SetInputCheckChirality(Chirality chirality)
             {
-                Checks.ForEach(check => check.Hand = chirality);
+                Checks.ForEach(check => check.hand = chirality);
             }
 
         }
 
         public void SetupProfiles(LeapProvider originalProvider)
         {
-            SetupProfiles(LeftHandChecks, originalProvider);
-            SetupProfiles(RightHandChecks, originalProvider);
-            SetupProfiles(LeftControllerChecks, originalProvider);
-            SetupProfiles(RightControllerChecks, originalProvider);
+            SetupProfiles(leftHandChecks, originalProvider);
+            SetupProfiles(rightHandChecks, originalProvider);
+            SetupProfiles(leftControllerChecks, originalProvider);
+            SetupProfiles(rightControllerChecks, originalProvider);
         }
 
         private void SetupProfiles(List<InputCheckStage> checks, LeapProvider provider)
@@ -82,16 +78,16 @@ namespace Leap.Unity.Controllers
             {
                 new DistanceBetweenInputs()
                 {
-                    InputMethodType = InputMethodType.LeapHand,
-                    ActionThreshold = 0.12f
+                    inputMethodType = InputMethodType.LeapHand,
+                    actionThreshold = 0.12f
                 },
                 new HasButtonBeenPressed()
                 {
-                    InputMethodType = InputMethodType.XRController,
+                    inputMethodType = InputMethodType.XRController,
                 },
                 new InputIsInactive()
                 {
-                    InputMethodType = InputMethodType.LeapHand,
+                    inputMethodType = InputMethodType.LeapHand,
                 },
             };
 
@@ -99,22 +95,22 @@ namespace Leap.Unity.Controllers
             {
                new DistanceBetweenInputs()
                {
-                    InputMethodType = InputMethodType.LeapHand,
-                    ActionThreshold = 0.12f,
-                    UseTime = true,
-                    TimeThreshold = 2,
+                    inputMethodType = InputMethodType.LeapHand,
+                    actionThreshold = 0.12f,
+                    useTime = true,
+                    timeThreshold = 2,
                },
                new HasButtonBeenPressed()
                {
-                    InputMethodType = InputMethodType.XRController,
+                    inputMethodType = InputMethodType.XRController,
                },
                new InputVelocity()
                {
-                    InputMethodType = InputMethodType.XRController,
+                    inputMethodType = InputMethodType.XRController,
                     velocityIsLower = false,
-                    ActionThreshold = 0.015f,
-                    UseTime = true,
-                    TimeThreshold = 0.2f
+                    actionThreshold = 0.015f,
+                    useTime = true,
+                    timeThreshold = 0.2f
                }
             };
 
@@ -132,26 +128,26 @@ namespace Leap.Unity.Controllers
             {
                 new DistanceFromHead()
                 {
-                    InputMethodType = InputMethodType.XRController,
-                    LessThan = false,
-                    ActionThreshold = 1.1f,
-                    UseTime = true,
-                    TimeThreshold = 0.1f
+                    inputMethodType = InputMethodType.XRController,
+                    lessThan = false,
+                    actionThreshold = 1.1f,
+                    useTime = true,
+                    timeThreshold = 0.1f
                 },
                 new InputVelocity()
                 {
-                    InputMethodType = InputMethodType.XRController,
+                    inputMethodType = InputMethodType.XRController,
                     velocityIsLower = true,
-                    ActionThreshold = 0.01f,
-                    UseTime = true,
-                    TimeThreshold = 0.2f,
+                    actionThreshold = 0.01f,
+                    useTime = true,
+                    timeThreshold = 0.2f,
                 },
                 new IsFacingDown()
                 {
-                    InputMethodType = InputMethodType.XRController,
-                    UseTime = true,
-                    ActionThreshold = 30,
-                    TimeThreshold = 0.2f
+                    inputMethodType = InputMethodType.XRController,
+                    useTime = true,
+                    actionThreshold = 30,
+                    timeThreshold = 0.2f
                 }
             };
 
@@ -159,8 +155,8 @@ namespace Leap.Unity.Controllers
             {
                 new DistanceBetweenInputs()
                 {
-                    InputMethodType = InputMethodType.XRController,
-                    ActionThreshold = 0.2f
+                    inputMethodType = InputMethodType.XRController,
+                    actionThreshold = 0.2f
                 },
             };
 
@@ -168,20 +164,20 @@ namespace Leap.Unity.Controllers
             {
                 new DistanceBetweenInputs()
                 {
-                    InputMethodType= InputMethodType.XRController,
-                    ActionThreshold = 0.2f
+                    inputMethodType= InputMethodType.XRController,
+                    actionThreshold = 0.2f
                 },
                 new PinchGrasp()
                 {
-                    InputMethodType = InputMethodType.LeapHand
+                    inputMethodType = InputMethodType.LeapHand
                 },
                 new InputVelocity()
                 {
-                    InputMethodType = InputMethodType.XRController,
+                    inputMethodType = InputMethodType.XRController,
                     velocityIsLower = true,
-                    ActionThreshold = 0.01f,
-                    UseTime = true,
-                    TimeThreshold = 0.1f
+                    actionThreshold = 0.01f,
+                    useTime = true,
+                    timeThreshold = 0.1f
                 }
             };
 
