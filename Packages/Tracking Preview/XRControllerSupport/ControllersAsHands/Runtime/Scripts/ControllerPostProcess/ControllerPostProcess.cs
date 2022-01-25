@@ -38,8 +38,8 @@ namespace Leap.Unity.Controllers
         public bool AlwaysEnableControllersIfActive = true;
 
         /// <summary>
-        /// Generates default axis for controllers. 
-        /// This fills the Left & Right Hand Inputs with sensible default data. 
+        /// Generates input axes/actions for each finger (e.g. binds the trigger to the index)
+        /// Generates sensible default rotation values for the ControllerHand - these can then be customised
         /// </summary>
         [ContextMenu("Generate Default Axis")]
         private void GenerateInputDefaultAxis()
