@@ -322,32 +322,32 @@ namespace Leap.Unity.Controllers
             this.Thumb.proximalRotation = new Vector3(-5, 0, 25);
             this.Thumb.intermediateRotation = new Vector3(-10, 0, -65);
             this.Thumb.distalRotation = new Vector3(0, 0, -45);
-            this.Thumb.name = chirality.ToString() + " Thumb";
+            this.Thumb.name = $"{chirality} Thumb";
 
             this.IndexFinger.interpolate = true;
             this.IndexFinger.proximalRotation = new Vector3(-70, -10, 0);
             this.IndexFinger.intermediateRotation = new Vector3(-45, 0, -5);
             this.IndexFinger.distalRotation = new Vector3(-45, 0, 0);
-            this.IndexFinger.name = chirality.ToString() + " Index";
+            this.IndexFinger.name = $"{chirality} Index";
 
             this.MiddleFinger.interpolate = true;
             this.MiddleFinger.metacarpalRotation = new Vector3(0, -2, 0);
             this.MiddleFinger.proximalRotation = new Vector3(-65, 1, 0);
             this.MiddleFinger.intermediateRotation = new Vector3(-55, 0, 2);
             this.MiddleFinger.distalRotation = new Vector3(-40, -6, 3);
-            this.MiddleFinger.name = chirality.ToString() + " Middle";
+            this.MiddleFinger.name = $"{chirality} Middle";
 
             this.RingFinger.interpolate = true;
             this.RingFinger.proximalRotation = new Vector3(-65, 8, 0);
             this.RingFinger.intermediateRotation = new Vector3(-50, 12, 0);
             this.RingFinger.distalRotation = new Vector3(-40, -35, 14);
-            this.RingFinger.name = chirality.ToString() + " Ring";
+            this.RingFinger.name = $"{chirality} Ring";
 
             this.PinkyFinger.interpolate = true;
             this.PinkyFinger.proximalRotation = new Vector3(-65, 15, 2);
             this.PinkyFinger.intermediateRotation = new Vector3(-40, 9, 5);
             this.PinkyFinger.distalRotation = new Vector3(-45, -20, 20);
-            this.PinkyFinger.name = chirality.ToString() + " Pinky";
+            this.PinkyFinger.name = $"{chirality} Pinky";
 
             this.offsetRotationEuler = new Vector3(-10, 260, 235);
             if (chirality == Chirality.Right)
