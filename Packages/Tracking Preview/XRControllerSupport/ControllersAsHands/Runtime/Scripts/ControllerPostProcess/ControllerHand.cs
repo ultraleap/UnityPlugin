@@ -111,9 +111,9 @@ namespace Leap.Unity.Controllers
                     }
                     catch (System.ArgumentException e)
                     {
-                        Debug.LogWarning(e.Message + "\n The controller post processor is reliant on the" +
+                        Debug.LogError("The controller post processor is reliant on the" +
                             " XR Legacy Input Helpers package when using the Legacy Input Module. Please add this package to your project" +
-                            "and Seed XR Input Bindings.");
+                            "and Seed XR Input Bindings.\n" + e.Message);
                     }
                 }
 #endif
