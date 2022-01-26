@@ -5,9 +5,9 @@
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
-using UnityEngine;
 using System;
 using System.Linq;
+using UnityEngine;
 
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem.XR;
@@ -52,7 +52,7 @@ namespace Leap.Unity.Controllers
             rightHandInputs = new ControllerHand(Chirality.Right);
 
 #else
-            Transform lc = leftHandInputs?.transform;;
+            Transform lc = leftHandInputs?.transform;
 
             leftHandInputs = new ControllerHand(Chirality.Left);
             if (lc != null) leftHandInputs.transform = lc;
@@ -113,7 +113,8 @@ namespace Leap.Unity.Controllers
             GenerateInputDefaultAxis();
         }
 
-        public InputMethodType GetCurrentInputMethodTypeByChirality(Chirality chirality){
+        public InputMethodType GetCurrentInputMethodTypeByChirality(Chirality chirality)
+        {
             return currentInputTypes[(int)chirality];
         }
 

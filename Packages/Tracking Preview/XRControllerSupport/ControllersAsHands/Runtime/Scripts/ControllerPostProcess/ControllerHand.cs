@@ -33,19 +33,19 @@ namespace Leap.Unity.Controllers
             
             [Tooltip("If enabled, in the legacy input system this will be read as an axis which varies between 0 & 1. If disabled it will be read as a button, which can be either on or off.")]
             public bool analog = true;
-            
+
             [Tooltip("If enabled, values will smoothly interpolate over interpolationTime to its current value")]
             public bool interpolate = true;
-            
+
             [Tooltip("The amount of time it takes to interpolate to the current value")]
             public float interpolationTime = 0.04f;
-            
+
             [Tooltip("The axes this finger is bound to.")]
             public List<string> axes = new List<string>();
-            
+
             [Tooltip("If enabled, finger joint rotations will be compounded, meaning the metacarpal value will be added to the proximal etc.")]
             public bool compoundRotations = true;
-            
+
             [Tooltip("Euler angles. These values are compounded by default, meaning the metacarpal value will be added to the proximal etc.")]
             public Vector3 metacarpalRotation = Vector3.zero, proximalRotation = Vector3.zero, intermediateRotation = Vector3.zero, distalRotation = Vector3.zero;
 

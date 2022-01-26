@@ -18,7 +18,7 @@ public class ControllerModelEnableDisable : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        if(controllerPostProcess == null)
+        if (controllerPostProcess == null)
         {
             controllerPostProcess = FindObjectOfType<ControllerPostProcess>();
         }
@@ -27,13 +27,14 @@ public class ControllerModelEnableDisable : MonoBehaviour
         OnHandInputTypeChange(chirality, controllerPostProcess.GetCurrentInputMethodTypeByChirality(chirality));
     }
 
-    private void OnDestroy() {
+    private void OnDestroy()
+    {
         controllerPostProcess.OnHandInputTypeChange -= OnHandInputTypeChange;
     }
 
     private void OnHandInputTypeChange(Chirality chirality, InputMethodType inputMethodType)
     {
-        if(this.chirality == chirality)
+        if (this.chirality == chirality)
         {
             gameObject.SetActive(inputMethodType == InputMethodType.LeapHand);
         }
