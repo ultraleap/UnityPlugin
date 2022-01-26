@@ -30,7 +30,7 @@ namespace Leap.Unity.Controllers
         {
             [HideInInspector]
             public string name = "";
-            
+
             [Tooltip("If enabled, in the legacy input system this will be read as an axis which varies between 0 & 1. If disabled it will be read as a button, which can be either on or off.")]
             public bool analog = true;
 
