@@ -7,6 +7,7 @@
  ******************************************************************************/
 using UnityEngine;
 using System;
+using System.Linq;
 
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem.XR;
@@ -97,8 +98,7 @@ namespace Leap.Unity.Controllers
                 currentInputTypes = new InputMethodType[] { InputMethodType.LeapHand, InputMethodType.LeapHand };
             }
 
-            _oldInputTypes = new InputMethodType[currentInputTypes.Length];
-            currentInputTypes.CopyTo(_oldInputTypes, 0);
+            _oldInputTypes = currentInputTypes.ToArray();
         }
 
         private void Update()
