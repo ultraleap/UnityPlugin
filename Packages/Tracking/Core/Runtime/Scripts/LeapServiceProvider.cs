@@ -70,6 +70,9 @@ namespace Leap.Unity
 
         #region Inspector
 
+        /// <summary>
+        /// The supported interaction volumes that will be visualized in the scene view
+        /// </summary>
         public enum InteractionVolumeVisualization
         {
             None,
@@ -81,8 +84,15 @@ namespace Leap.Unity
         [SerializeField]
         protected InteractionVolumeVisualization _interactionVolumeVisualization = InteractionVolumeVisualization.Automatic;
 
+        /// <summary>
+        /// Which interaction volume is selected to be visualized in the scene view
+        /// </summary>
         public InteractionVolumeVisualization SelectedInteractionVolumeVisualization => _interactionVolumeVisualization;
 
+        /// <summary>
+        /// Supported modes to optimize frame updates.
+        /// When enabled, the provider will only calculate one leap frame instead of two.
+        /// </summary>
         public enum FrameOptimizationMode
         {
             None,
@@ -93,10 +103,22 @@ namespace Leap.Unity
         [SerializeField]
         protected FrameOptimizationMode _frameOptimization = FrameOptimizationMode.None;
 
+        /// <summary>
+        /// Supported modes to use when extrapolating physics.
+        /// </summary>
         public enum PhysicsExtrapolationMode
         {
+            /// <summary>
+            /// No extrapolation is used at all
+            /// </summary>
             None,
+            /// <summary>
+            /// Extrapolation is chosen based on the fixed timestep
+            /// </summary>
             Auto,
+            /// <summary>
+            /// Extrapolation time is chosen manually by the user
+            /// </summary>
             Manual
         }
         [Tooltip("The mode to use when extrapolating physics.\n" +
@@ -110,10 +132,17 @@ namespace Leap.Unity
         [SerializeField]
         protected float _physicsExtrapolationTime = 1.0f / 90.0f;
 
+        /// <summary>
+        /// (Service must be >= 4.9.2)
+        /// which tracking mode to request that the service optimizes for.
+        /// </summary>
         public enum TrackingOptimizationMode
         {
             Desktop,
             Screentop,
+            /// <summary>
+            /// Use the LeapXRServiceProvider for HMD mode instead of this option
+            /// </summary>
             HMD
         }
         [Tooltip("[Service must be >= 4.9.2!] " +
@@ -615,6 +644,12 @@ namespace Leap.Unity
             _isDestroyed = true;
         }
 
+        /// <summary>
+        /// Calculates the physics extrapolation time depending on the PhysicsExtrapolationMode.
+        /// </summary>
+        /// <returns>A float that can be used to compensate for latency when ensuring that our 
+        /// hands are on the same timline as Update.</returns>
+        /// <exception cref="System.InvalidOperationException"></exception>
         public float CalculatePhysicsExtrapolation()
         {
             switch (_physicsExtrapolation)
@@ -637,6 +672,7 @@ namespace Leap.Unity
 
         /// <summary>
         /// Returns the Leap Controller instance.
+        /// If not found, it creates a new controller instance.
         /// </summary>
         public Controller GetLeapController()
         {
