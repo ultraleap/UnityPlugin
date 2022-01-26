@@ -36,6 +36,7 @@ namespace Leap.Unity.Controllers
         public Action<Chirality, InputMethodType> OnHandInputTypeChange;
         public Action<Chirality> OnControllerActiveFrame;
 
+        [Tooltip("If controllers are active, always use them as our Leap Hand Data.")]
         public bool alwaysEnableControllersIfActive = true;
 
         /// <summary>
@@ -124,7 +125,7 @@ namespace Leap.Unity.Controllers
         {
 
 #if ENABLE_INPUT_SYSTEM
-            if (leftHandInputs.Controller.IsControllerActive())
+            if (leftHandInputs.controller.IsControllerActive())
             {
                 OnControllerActiveFrame?.Invoke(Chirality.Left);
                 if (alwaysEnableControllersIfActive)
@@ -137,7 +138,7 @@ namespace Leap.Unity.Controllers
                 currentInputTypes[(int)Chirality.Left] = InputMethodType.LeapHand;
             }
 
-            if (rightHandInputs.Controller.IsControllerActive())
+            if (rightHandInputs.controller.IsControllerActive())
             {
                 OnControllerActiveFrame?.Invoke(Chirality.Right);
                 if (alwaysEnableControllersIfActive)
@@ -178,22 +179,22 @@ namespace Leap.Unity.Controllers
         private void UpdateControllers()
         {
 #if ENABLE_INPUT_SYSTEM
-            if (leftHandInputs.Controller == null)
+            if (leftHandInputs.controller == null)
             {
-                leftHandInputs.Controller = XRController.leftHand;
+                leftHandInputs.controller = XRController.leftHand;
             }
 
-            if (leftHandInputs.Controller != null && leftHandInputs.Controller.wasUpdatedThisFrame)
+            if (leftHandInputs.controller != null && leftHandInputs.controller.wasUpdatedThisFrame)
             {
                 leftHandInputs.Update();
             }
 
-            if (rightHandInputs.Controller == null)
+            if (rightHandInputs.controller == null)
             {
-                rightHandInputs.Controller = XRController.rightHand;
+                rightHandInputs.controller = XRController.rightHand;
             }
 
-            if (rightHandInputs.Controller != null && rightHandInputs.Controller.wasUpdatedThisFrame)
+            if (rightHandInputs.controller != null && rightHandInputs.controller.wasUpdatedThisFrame)
             {
                 rightHandInputs.Update();
             }

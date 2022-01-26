@@ -30,14 +30,26 @@ namespace Leap.Unity.Controllers
         {
             [HideInInspector]
             public string name = "";
-            public bool analog = true, interpolate = true;
-            public List<string> axes = new List<string>();
-            public float value = 0;
+            
+            [Tooltip("If enabled, in the legacy input system this will be read as an axis which varies between 0 & 1. If disabled it will be read as a button, which can be either on or off.")]
+            public bool analog = true;
+            
+            [Tooltip("If enabled, values will smoothly interpolate over interpolationTime to its current value")]
+            public bool interpolate = true;
+            
+            [Tooltip("The amount of time it takes to interpolate to the current value")]
             public float interpolationTime = 0.04f;
+            
+            [Tooltip("The axes this finger is bound to.")]
+            public List<string> axes = new List<string>();
+            
+            [Tooltip("If enabled, finger joint rotations will be compounded, meaning the metacarpal value will be added to the proximal etc.")]
             public bool compoundRotations = true;
+            
             [Tooltip("Euler angles. These values are compounded by default, meaning the metacarpal value will be added to the proximal etc.")]
             public Vector3 metacarpalRotation = Vector3.zero, proximalRotation = Vector3.zero, intermediateRotation = Vector3.zero, distalRotation = Vector3.zero;
 
+            [HideInInspector] public float value = 0;
 #if ENABLE_INPUT_SYSTEM
             private InputAction _inputAction;
             private System.Type _inputType = null;
@@ -116,18 +128,19 @@ namespace Leap.Unity.Controllers
 
 #if ENABLE_INPUT_SYSTEM
         [HideInInspector]
-        public XRController Controller;
-        public Vector3 OffsetPosition;
+        public XRController controller;
+        [Tooltip("An offset to the device position read in from the input system")]
+        public Vector3 offsetPosition;
 
         public Vector3 ControllerPosition
         {
             get
             {
-                if (!Controller.added)
+                if (!controller.added)
                 {
                     return Vector3.zero;
                 }
-                return Controller.devicePosition.ReadValue() + (ControllerRotation * OffsetPosition);
+                return controller.devicePosition.ReadValue() + (ControllerRotation * offsetPosition);
             }
         }
 
@@ -135,11 +148,11 @@ namespace Leap.Unity.Controllers
         {
             get
             {
-                if (!Controller.added)
+                if (!controller.added)
                 {
                     return Quaternion.identity;
                 }
-                return Controller.deviceRotation.ReadValue() * Quaternion.Euler(offsetRotationEuler);
+                return controller.deviceRotation.ReadValue() * Quaternion.Euler(offsetRotationEuler);
             }
         }
 
@@ -164,6 +177,7 @@ namespace Leap.Unity.Controllers
         private Vector3 _currentPosition;
         private Quaternion _currentRotation;
 
+        [Tooltip("An offset to the device rotation read in from the input system")]
         public Vector3 offsetRotationEuler;
         public ControllerFinger[] fingers = new ControllerFinger[5];
 
@@ -248,17 +262,17 @@ namespace Leap.Unity.Controllers
             switch (this._chirality)
             {
                 case Chirality.Left:
-                    Controller = XRController.leftHand;
+                    controller = XRController.leftHand;
                     break;
                 case Chirality.Right:
-                    Controller = XRController.rightHand;
+                    controller = XRController.rightHand;
                     break;
             }
             for (int i = 0; i < fingers.Length; i++)
             {
                 fingers[i].CreateAction();
             }
-            if (Controller != null)
+            if (controller != null)
             {
                 _oldPosition = ControllerPosition;
             }
