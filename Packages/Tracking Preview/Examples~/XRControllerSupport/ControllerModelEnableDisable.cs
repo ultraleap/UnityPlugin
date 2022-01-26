@@ -23,6 +23,8 @@ public class ControllerModelEnableDisable : MonoBehaviour
             controllerPostProcess = FindObjectOfType<ControllerPostProcess>();
         }
         controllerPostProcess.OnHandInputTypeChange += OnHandInputTypeChange;
+
+        OnHandInputTypeChange(chirality, controllerPostProcess.GetCurrentInputMethodTypeByChirality(chirality));
     }
 
     private void OnDestroy() {

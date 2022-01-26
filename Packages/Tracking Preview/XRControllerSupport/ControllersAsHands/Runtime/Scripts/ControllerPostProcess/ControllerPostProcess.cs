@@ -112,6 +112,10 @@ namespace Leap.Unity.Controllers
             GenerateInputDefaultAxis();
         }
 
+        public InputMethodType GetCurrentInputMethodTypeByChirality(Chirality chirality){
+            return currentInputTypes[(int)chirality];
+        }
+
         /// <summary>
         /// Updates input types based on whether a controller is active or not.
         /// If the project is using the Legacy Input System, this does not check for an active controller.
