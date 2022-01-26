@@ -20,6 +20,11 @@ namespace Leap.Unity
     /// <summary>
     /// The LeapServiceProvider provides tracked Leap Hand data and images from the device
     /// via the Leap service running on the client machine.
+    /// 
+    /// It communicates with the Ultraleap Tracking Service running on your platform, and 
+    /// provides Frame objects containing Leap hands to your application. Generally, any 
+    /// class that needs hand tracking data from the camera will need a reference to a 
+    /// LeapServiceProvider to get that data.
     /// </summary>
     public class LeapServiceProvider : LeapProvider
     {
@@ -279,6 +284,14 @@ namespace Leap.Unity
 
         #region LeapProvider Implementation
 
+        /// <summary>
+        /// The current frame for this update cycle, in world space. 
+        /// 
+        /// IMPORTANT!  This frame might be mutable!  If you hold onto a reference
+        /// to this frame, or a reference to any object that is a part of this frame,
+        /// it might change unexpectedly.  If you want to save a reference, make sure
+        /// to make a copy.
+        /// </summary>
         public override Frame CurrentFrame
         {
             get
@@ -305,6 +318,14 @@ namespace Leap.Unity
             }
         }
 
+        /// <summary>
+        /// The current frame for this fixed update cycle, in world space.
+        /// 
+        /// IMPORTANT!  This frame might be mutable!  If you hold onto a reference
+        /// to this frame, or a reference to any object that is a part of this frame,
+        /// it might change unexpectedly.  If you want to save a reference, make sure
+        /// to make a copy.
+        /// </summary>
         public override Frame CurrentFixedFrame
         {
             get

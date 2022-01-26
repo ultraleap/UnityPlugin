@@ -22,6 +22,9 @@ namespace Leap.Unity
     /// account for the offset of the Leap device with respect to the attached HMD and
     /// warp tracked hand positions based on the motion of the headset to account for the
     /// differing latencies of the two tracking systems.
+    /// 
+    /// This component can be placed anywhere in your scene as long as mainCamera 
+    /// references the XR camera. 
     /// </summary>
     public class LeapXRServiceProvider : LeapServiceProvider
     {
