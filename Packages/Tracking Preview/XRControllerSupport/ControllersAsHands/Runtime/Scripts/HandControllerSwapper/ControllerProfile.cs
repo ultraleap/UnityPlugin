@@ -17,24 +17,24 @@ namespace Leap.Unity.Controllers
     /// </summary>
     public class ControllerProfile
     {
-        public List<InputCheckStage> leftHandChecks = new List<InputCheckStage>();
-        public List<InputCheckStage> rightHandChecks = new List<InputCheckStage>();
+        public readonly List<InputCheckStage> leftHandChecks = new List<InputCheckStage>();
+        public readonly List<InputCheckStage> rightHandChecks = new List<InputCheckStage>();
 
-        public List<InputCheckStage> leftControllerChecks = new List<InputCheckStage>();
-        public List<InputCheckStage> rightControllerChecks = new List<InputCheckStage>();
+        public readonly List<InputCheckStage> leftControllerChecks = new List<InputCheckStage>();
+        public readonly List<InputCheckStage> rightControllerChecks = new List<InputCheckStage>();
 
         public ControllerProfile()
         {
-            PopulateHandToControllerInputCheckStagesList(ref leftHandChecks, Chirality.Left);
-            PopulateHandToControllerInputCheckStagesList(ref rightHandChecks, Chirality.Right);
+            PopulateHandToControllerInputCheckStagesList(out leftHandChecks, Chirality.Left);
+            PopulateHandToControllerInputCheckStagesList(out rightHandChecks, Chirality.Right);
 
-            PopulateControllerToHandInputCheckStagesList(ref leftControllerChecks, Chirality.Left);
-            PopulateControllerToHandInputCheckStagesList(ref rightControllerChecks, Chirality.Right);
+            PopulateControllerToHandInputCheckStagesList(out leftControllerChecks, Chirality.Left);
+            PopulateControllerToHandInputCheckStagesList(out rightControllerChecks, Chirality.Right);
         }
 
         public class InputCheckStage
         {
-            public List<InputCheckBase> Checks = new List<InputCheckBase>();
+            public List<InputCheckBase> Checks;
 
             public InputCheckStage()
             {
@@ -72,7 +72,7 @@ namespace Leap.Unity.Controllers
             }
         }
 
-        private void PopulateHandToControllerInputCheckStagesList(ref List<InputCheckStage> inputCheckStages, Chirality chirality)
+        private void PopulateHandToControllerInputCheckStagesList(out List<InputCheckStage> inputCheckStages, Chirality chirality)
         {
             List<InputCheckBase> handToControllerChecksStage0 = new List<InputCheckBase>()
             {
@@ -122,7 +122,7 @@ namespace Leap.Unity.Controllers
             inputCheckStages.ForEach(inputCheckStage => inputCheckStage.SetInputCheckChirality(chirality));
         }
 
-        private void PopulateControllerToHandInputCheckStagesList(ref List<InputCheckStage> inputCheckStages, Chirality chirality)
+        private void PopulateControllerToHandInputCheckStagesList(out List<InputCheckStage> inputCheckStages, Chirality chirality)
         {
             List<InputCheckBase> controllerToHandChecksStage0 = new List<InputCheckBase>()
             {
