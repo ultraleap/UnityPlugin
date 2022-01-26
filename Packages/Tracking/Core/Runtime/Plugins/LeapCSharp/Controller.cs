@@ -96,7 +96,6 @@ namespace Leap
             }
         }
 
-        private bool _hasConnected = false;
         private EventHandler<ConnectionEventArgs> _connect;
 
         /// <summary>
@@ -825,13 +824,11 @@ namespace Leap
 
         protected virtual void OnConnect(object sender, ConnectionEventArgs eventArgs)
         {
-            _hasConnected = true;
         }
 
         protected virtual void OnDisconnect(object sender, ConnectionLostEventArgs eventArgs)
         {
             _hasInitialized = false;
-            _hasConnected = false;
         }
     }
 }
