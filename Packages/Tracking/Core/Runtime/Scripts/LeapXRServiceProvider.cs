@@ -50,11 +50,27 @@ namespace Leap.Unity
 
         private TimewarpMode _xr2TimewarpMode = TimewarpMode.Default;
 #endif
-
+        /// <summary>
+        /// Supported modes for device offset. Used for deviceOffsetMode which allows 
+        /// manual adjustment of the Leap device's virtual offset and tilt.
+        /// </summary>
         public enum DeviceOffsetMode
         {
+            /// <summary>
+            /// Defaults to constants set at the top of LeapServiceProvider 
+            /// (currently: offset y axis = 0; offset z axis = 0.12; tilt x axis = 5)
+            /// </summary>
             Default,
+            /// <summary>
+            /// Allows to specify the offset as a combination of 
+            /// deviceOffsetYAxis, deviceOffsetZAxis and deviceTiltXAxis.
+            /// </summary>
             ManualHeadOffset,
+            /// <summary>
+            /// Allows for the manual placement of the Leap Tracking Device.
+            /// This device offset mode is incompatible with Temporal Warping.
+            /// When choosing this mode, deviceOrigin has to be set.
+            /// </summary>
             Transform
         }
 
@@ -65,6 +81,11 @@ namespace Leap.Unity
                + "headset). ")]
         [SerializeField, OnEditorChange("deviceOffsetMode")]
         private DeviceOffsetMode _deviceOffsetMode;
+        /// <summary>
+        /// Allow manual adjustment of the Leap device's virtual offset and tilt. 
+        /// These settings can be used to match the physical position and orientation of the
+        /// Leap Motion sensor on a tracked device it is mounted on (such as a VR headset)
+        /// </summary>
         public DeviceOffsetMode deviceOffsetMode
         {
             get { return _deviceOffsetMode; }
@@ -86,6 +107,11 @@ namespace Leap.Unity
         [SerializeField]
         [Range(-0.50F, 0.50F)]
         private float _deviceOffsetYAxis = DEFAULT_DEVICE_OFFSET_Y_AXIS;
+        /// <summary>
+        /// Adjusts the Leap Motion device's virtual height offset from the tracked 
+        /// headset position. This should match the vertical offset of the physical device
+        /// with respect to the headset in meters.
+        /// </summary>
         public float deviceOffsetYAxis
         {
             get { return _deviceOffsetYAxis; }
@@ -98,6 +124,11 @@ namespace Leap.Unity
         [SerializeField]
         [Range(-0.50F, 0.50F)]
         private float _deviceOffsetZAxis = DEFAULT_DEVICE_OFFSET_Z_AXIS;
+        /// <summary>
+        /// Adjusts the Leap Motion device's virtual depth offset from the tracked 
+        /// headset position. This should match the forward offset of the physical 
+        /// device with respect to the headset in meters.
+        /// </summary>
         public float deviceOffsetZAxis
         {
             get { return _deviceOffsetZAxis; }
@@ -109,6 +140,10 @@ namespace Leap.Unity
         [SerializeField]
         [Range(-90.0F, 90.0F)]
         private float _deviceTiltXAxis = DEFAULT_DEVICE_TILT_X_AXIS;
+        /// <summary>
+        /// Adjusts the Leap Motion device's virtual X axis tilt. This should match 
+        /// the tilt of the physical device with respect to the headset in degrees.
+        /// </summary>
         public float deviceTiltXAxis
         {
             get { return _deviceTiltXAxis; }
@@ -119,6 +154,11 @@ namespace Leap.Unity
           "This device offset mode is incompatible with Temporal Warping.")]
         [SerializeField]
         private Transform _deviceOrigin;
+        /// <summary>
+        /// Allows for the manual placement of the Leap Tracking Device.
+        /// This device offset mode is incompatible with Temporal Warping.
+        /// This is only used if the deviceOffsetMode is 'Transform'.
+        /// </summary>
         public Transform deviceOrigin
         {
             get { return _deviceOrigin; }
@@ -129,7 +169,10 @@ namespace Leap.Unity
                + "Falls back to Camera.main if not set")]
         [SerializeField]
         private Camera _mainCamera; // Redundant backing field, used to present value in editor at parent level
-
+        /// <summary>
+        /// Specifies the main camera. Required for XR2 based platforms.
+        /// Falls back to Camera.main if not set.
+        /// </summary>
         public Camera mainCamera
         {
             get
@@ -153,10 +196,28 @@ namespace Leap.Unity
         private const int DEFAULT_WARP_ADJUSTMENT = 17;
 #endif
 
+        /// <summary>
+        /// Temporal warping prevents the hand coordinate system from 'swimming' or 
+        /// 'bouncing' when the headset moves and the user's hands stay still. 
+        /// This phenomenon is caused by the differing amounts of latencies inherent 
+        /// in the two systems.
+        /// </summary>
         public enum TemporalWarpingMode
         {
+            /// <summary>
+            /// For PC VR and Android VR, temporal warping should set to 'Auto', as the 
+            /// correct value can be chosen automatically for these platforms.
+            /// </summary>
             Auto,
+            /// <summary>
+            /// Some non-standard platforms may use 'Manual' mode to adjust their 
+            /// latency compensation amount for temporal warping.
+            /// </summary>
             Manual,
+            /// <summary>
+            /// Use 'Images' for scenarios that overlay Leap device images on tracked 
+            /// hand data.
+            /// </summary>
             Images,
             Off
         }
@@ -173,14 +234,16 @@ namespace Leap.Unity
         [SerializeField]
         private TemporalWarpingMode _temporalWarpingMode = TemporalWarpingMode.Auto;
 
-        /// <summary>
-        /// The time in milliseconds between the current frame's headset position and the
-        /// time at which the Leap frame was captured.
-        /// </summary>
+        
         [Tooltip("The time in milliseconds between the current frame's headset position and "
                + "the time at which the Leap frame was captured.")]
         [SerializeField]
         private int _customWarpAdjustment = DEFAULT_WARP_ADJUSTMENT;
+        /// <summary>
+        /// The time in milliseconds between the current frame's headset position and the
+        /// time at which the Leap frame was captured.
+        /// Change this only when the TemporalWarpingMode is 'Manual'.
+        /// </summary>
         public int warpingAdjustment
         {
             get
@@ -213,6 +276,11 @@ namespace Leap.Unity
                + "account shader-global vertex offsets in their material shaders.")]
         [SerializeField]
         protected bool _updateHandInPrecull = false;
+        /// <summary>
+        /// Pass updated transform matrices to hands with materials that utilize the 
+        /// VertexOffsetShader. Won't have any effect on hands that don't take into 
+        /// account shader-global vertex offsets in their material shaders.
+        /// </summary>
         public bool updateHandInPrecull
         {
             get { return _updateHandInPrecull; }
@@ -234,6 +302,11 @@ namespace Leap.Unity
         protected Matrix4x4[] _transformArray = new Matrix4x4[2];
         private Pose? _trackingBaseDeltaPose = null;
 
+        /// <summary>
+        /// Contains the timestamp of the most recent tracked frame.
+        /// It is used for Image warping if the temporalWarpingMode is set to 
+        /// Auto, Manual or Images
+        /// </summary>
         [NonSerialized]
         public long imageTimeStamp = 0;
 
