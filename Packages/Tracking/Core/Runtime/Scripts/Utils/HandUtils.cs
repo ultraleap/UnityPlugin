@@ -170,6 +170,7 @@ namespace Leap.Unity
             }
         }
 
+        /// <summary>
         /// Shorthand for hand.Fingers[(int)Leap.Finger.FingerType.TYPE_THUMB],
         /// or, alternatively, hand.Fingers[0].
         /// </summary>
@@ -560,12 +561,24 @@ namespace Leap.Unity
 
         #region Frame Utils
 
+        /// <summary>
+        /// OBSOLETE - use GetHand instead.
+        /// </summary>
+        /// <param name="frame"></param>
+        /// <param name="whichHand"></param>
+        /// <returns></returns>
         [System.Obsolete("Method is obsolete, use GetHand instead", true)]
         public static Hand Get(this Frame frame, Chirality whichHand)
         {
             return GetHand(frame, whichHand);
         }
 
+        /// <summary>
+        /// Returns the first hand of the argument whichHand found in the argument frame.
+        /// </summary>
+        /// <param name="frame"></param>
+        /// <param name="whichHand"></param>
+        /// <returns></returns>
         public static Hand GetHand(this Frame frame, Chirality whichHand)
         {
             if (frame.Hands == null) { return null; }
@@ -577,6 +590,13 @@ namespace Leap.Unity
 
         #region Provider Utils
 
+        /// <summary>
+        /// Returns the first hand of the argument whichHand found in the current frame of 
+        /// the argument provider.
+        /// </summary>
+        /// <param name="provider"></param>
+        /// <param name="whichHand"></param>
+        /// <returns></returns>
         public static Hand Get(this LeapProvider provider, Chirality whichHand)
         {
             Frame frame;
