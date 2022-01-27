@@ -234,7 +234,7 @@ namespace Leap.Unity
         [SerializeField]
         private TemporalWarpingMode _temporalWarpingMode = TemporalWarpingMode.Auto;
 
-        
+
         [Tooltip("The time in milliseconds between the current frame's headset position and "
                + "the time at which the Leap frame was captured.")]
         [SerializeField]

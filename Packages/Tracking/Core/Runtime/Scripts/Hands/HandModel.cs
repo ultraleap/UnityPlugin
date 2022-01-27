@@ -85,7 +85,7 @@ namespace Leap.Unity
         /// </summary>
         protected Hand hand_;
 
-       
+
         /// <summary>
         /// Calculates the position of the palm in global coordinates.
         /// </summary>

@@ -22,7 +22,7 @@ namespace Leap.Unity
     /// LeapProvider defines the basic interface our plugin expects to use to retrieve 
     /// Frame data. This abstraction allows you to create your own LeapProviders, which 
     /// is useful when testing or developing in a context where Ultraleap Hand Tracking 
-    /// hardware isn’t immediately available.
+    /// hardware isnï¿½t immediately available.
     /// </summary>
     public abstract class LeapProvider : MonoBehaviour
     {
