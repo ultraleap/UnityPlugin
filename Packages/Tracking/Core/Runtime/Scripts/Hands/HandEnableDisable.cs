@@ -10,6 +10,12 @@ using UnityEngine;
 
 namespace Leap.Unity
 {
+    /// <summary>
+    /// A component to be attached to a HandModelBase to handle starting and ending of
+    /// tracking. 
+    /// The parent gameobjet is activated when tracking begins and deactivated when
+    /// tracking ends.
+    /// </summary>
     public class HandEnableDisable : HandTransitionBehavior
     {
         protected override void Awake()
