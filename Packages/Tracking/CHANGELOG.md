@@ -31,6 +31,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Outline/Ghost hands sometimes show a shader issue when upgrading to SRP (TOON shader)
 - Issues with slider button movements not being possible or registering false presses in moving reference frames scene when frame is moving (inconsistent). Only affects slider buttons - normal buttons work fine.
 - Possible hand offset issues on XR2 headsets using SVR plugin
+- Hands in Desktop scenes can appear far away from the camera
+- Interactions callback scene allows blocks to be moved without doing a grasp pose.
+- Interactions object scene platform/stage seems to move a lot
+- Dynamic UI objects throwing backwards most of the time.
 
 ## [5.1.0]
 
