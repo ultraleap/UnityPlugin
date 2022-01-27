@@ -19,13 +19,11 @@ using UnityEngine;
 
 namespace Leap.Unity.Interaction
 {
-
     public enum HandDataMode { PlayerLeft, PlayerRight, Custom }
 
     [DisallowMultipleComponent]
     public class InteractionHand : InteractionController
     {
-
         #region Inspector
 
         [SerializeField]
@@ -39,6 +37,10 @@ namespace Leap.Unity.Interaction
                + "users only).")]
         [SerializeField, EditTimeOnly]
         private HandDataMode _handDataMode;
+
+        /// <summary>
+        /// Should the data for the underlying Leap hand come from the player's left hand or their right hand? Alternatively, you can set this mode to Custom to specify accessor functions manually via script (recommended for advanced users only).
+        /// </summary>
         public HandDataMode handDataMode
         {
             get { return _handDataMode; }
@@ -50,6 +52,9 @@ namespace Leap.Unity.Interaction
         }
 
         private bool _indexOnly = false;
+        /// <summary>
+        /// //An option to just Initialise the index finger for interaction
+        /// </summary>
         public bool OnlyInitialiseIndexFinger
         {
             get { return _indexOnly; }
@@ -124,9 +129,6 @@ namespace Leap.Unity.Interaction
         /// </summary>
         private Hand _hand;
 
-
-
-        public Transform headTransform;
         #endregion
 
         #region Unity Events
@@ -350,6 +352,10 @@ namespace Leap.Unity.Interaction
         #region Hovering Controller Implementation
 
         private Transform _backingHoverPointTransform = null;
+
+        /// <summary>
+        /// The point in space where a hover is happening for this interacion hand
+        /// </summary>
         public override Vector3 hoverPoint
         {
             get
@@ -437,6 +443,10 @@ namespace Leap.Unity.Interaction
         private const int BONES_PER_FINGER = 3;
 
         private ContactBone[] _contactBones;
+
+        /// <summary>
+        /// Get an array of Contact bones that are used to calculate interactions
+        /// </summary>
         public override ContactBone[] contactBones
         {
             get { return _contactBones; }
@@ -734,6 +744,9 @@ namespace Leap.Unity.Interaction
         #region Grasp Controller Implementation
 
         private List<Vector3> _graspManipulatorPoints = new List<Vector3>();
+        /// <summary>
+        /// Get the list of graspManipulatorPoints from this interaction hand
+        /// </summary>
         public override List<Vector3> graspManipulatorPoints
         {
             get
@@ -768,6 +781,7 @@ namespace Leap.Unity.Interaction
         }
 
         private HeuristicGrabClassifier _grabClassifier;
+
         /// <summary>
         /// Handles logic determining whether a hand has grabbed or released an interaction object.
         /// </summary>
@@ -781,6 +795,7 @@ namespace Leap.Unity.Interaction
         }
 
         private Vector3[] _fingertipPositionsBuffer = new Vector3[5];
+
         /// <summary>
         /// Returns approximately where the controller is grasping the currently-grasped
         /// InteractionBehaviour. Specifically, returns the average position of all grasping
@@ -841,6 +856,10 @@ namespace Leap.Unity.Interaction
             return false;
         }
 
+        /// <summary>
+        /// Can be used to swap the current graspedObject for another interaction behaviour
+        /// </summary>
+        /// <param name="replacement"></param>
         public override void SwapGrasp(IInteractionBehaviour replacement)
         {
             var original = graspedObject;
@@ -853,7 +872,7 @@ namespace Leap.Unity.Interaction
         protected override void fixedUpdateGraspingState()
         {
             //Feed Camera Transform in for Projective Grabbing Hack (details inside)
-            grabClassifier.FixedUpdateClassifierHandState(headTransform);
+            grabClassifier.FixedUpdateClassifierHandState();
         }
 
         protected override void onGraspedObjectForciblyReleased(IInteractionBehaviour objectToBeReleased)
@@ -879,6 +898,10 @@ namespace Leap.Unity.Interaction
 
         private Leap.Hand _testHand = null;
 
+        /// <summary>
+        /// Draw gizmos during runtime to help with debugging
+        /// </summary>
+        /// <param name="drawer"></param>
         public override void OnDrawRuntimeGizmos(RuntimeGizmoDrawer drawer)
         {
             if (Application.isPlaying)
