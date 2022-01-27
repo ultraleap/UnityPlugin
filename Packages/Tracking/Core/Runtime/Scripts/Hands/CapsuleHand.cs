@@ -12,7 +12,14 @@ using UnityEngine;
 
 namespace Leap.Unity
 {
-    /** A basic Leap hand model constructed dynamically vs. using pre-existing geometry*/
+
+    /// <summary>
+    /// The CapsuleHand is a basic Leap hand model that generates a set of spheres and 
+    /// cylinders to render hands using Leap hand data.
+    /// It is constructed dynamically rather than using pre-existing geometry which
+    /// allows hand visuals to scale to the size of the users hand and 
+    /// is a reliable way to visualize the raw tracking data.
+    /// </summary>
     public class CapsuleHand : HandModelBase
     {
         private const int TOTAL_JOINT_COUNT = 4 * 5;
@@ -76,6 +83,9 @@ namespace Leap.Unity
         private int _curSphereIndex = 0, _curCylinderIndex = 0;
         private Color _backingDefault = Color.white;
 
+        /// <summary>
+        /// The type of the Hand model (set to Graphics)
+        /// </summary>
         public override ModelType HandModelType
         {
             get
@@ -84,6 +94,10 @@ namespace Leap.Unity
             }
         }
 
+        /// <summary>
+        /// The chirality of handedness of this hand.
+        /// This can be set in the inspector.
+        /// </summary>
         public override Chirality Handedness
         {
             get
@@ -93,21 +107,40 @@ namespace Leap.Unity
             set { }
         }
 
+        /// <summary>
+        /// Returns whether or not this hand model supports editor persistence. 
+        /// (set to true for the CapsuleHand)
+        /// </summary>
         public override bool SupportsEditorPersistence()
         {
             return true;
         }
 
+        /// <summary>
+        /// Returns the Leap Hand object represented by this HandModelBase. 
+        /// Note that any physical quantities and directions obtained from the Leap Hand object are 
+        /// relative to the Leap Motion coordinate system, which uses a right-handed axes and units 
+        /// of millimeters.
+        /// </summary>
+        /// <returns></returns>
         public override Hand GetLeapHand()
         {
             return _hand;
         }
 
+        /// <summary>
+        /// Assigns a Leap Hand object to this HandModelBase.
+        /// </summary>
+        /// <param name="hand"></param>
         public override void SetLeapHand(Hand hand)
         {
             _hand = hand;
         }
 
+        /// <summary>
+        /// This function is called when a new hand is detected by the Leap Motion device.
+        /// Materials and Colors for the hand are set up.
+        /// </summary>
         public override void InitHand()
         {
             if (_material != null && (_backing_material == null || !_backing_material.enableInstancing))
@@ -167,6 +200,11 @@ namespace Leap.Unity
         }
 #endif
 
+        /// <summary>
+        /// Called after the hand is initialised. 
+        /// Calls the event OnBegin and sets isTracked to true.
+        /// Assigns colors to materials for the hand.
+        /// </summary>
         public override void BeginHand()
         {
             base.BeginHand();
@@ -192,6 +230,10 @@ namespace Leap.Unity
 
         }
 
+        /// <summary>
+        /// Called once per frame when the LeapProvider calls the event OnUpdateFrame.
+        /// Updates all joint sphere positions and draws the spheres and cylinders of the hand.
+        /// </summary>
         public override void UpdateHand()
         {
             _curSphereIndex = 0;
