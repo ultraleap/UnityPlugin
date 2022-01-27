@@ -5,9 +5,8 @@
   "displayName": "Ultraleap Tracking Preview",
   "unity": "2019.4",
   "license": "Apache-2.0",
-  "dependencies" : 
-  {
-     "com.ultraleap.tracking" : "5.0.0"
+  "dependencies": {
+    "com.ultraleap.tracking": "5.0.0"
   },
   "keywords": [
     "ultraleap",
@@ -21,11 +20,11 @@
     "email": "contact@ultraleap.com",
     "url": "https://www.ultraleap.com"
   },
-"samples": [
-        {
-            "displayName": "Examples",
-            "description": "",
-            "path": "Examples~"
-        }
-    ]
+  "samples": [
+    {
+      "displayName": "Examples",
+      "description": "",
+      "path": "Examples~"
+    }
+  ]
 }
