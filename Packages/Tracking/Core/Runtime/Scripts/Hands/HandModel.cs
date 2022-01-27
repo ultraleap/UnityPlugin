@@ -12,22 +12,25 @@ using UnityEngine;
 
 namespace Leap.Unity
 {
-    /**
-    * The base class for all hand models, both graphics and physics.
-    *
-    * This class serves as the interface between the HandController object
-    * and the concrete hand object containing the graphics and physics of a hand.
-    *
-    * Subclasses of HandModel must implement InitHand() and UpdateHand(). The UpdateHand()
-    * function is called in the Unity Update() phase for graphics HandModel instances;
-    * and in the Unity FixedUpdate() phase for physics objects. InitHand() is called once,
-    * when the hand is created and is followed by a call to UpdateHand().
-    */
+    /// <summary>
+    /// The base class for all hand models, both graphics and physics.
+    ///
+    /// This class serves as the interface between the LeapProvider
+    /// and the concrete hand object containing the graphics and physics of a hand.
+    ///
+    /// Subclasses of HandModel must implement InitHand() and UpdateHand(). The UpdateHand()
+    /// function is called in the Unity Update() phase for graphics HandModel instances;
+    /// and in the Unity FixedUpdate() phase for physics objects. InitHand() is called once,
+    /// when the hand is created and is followed by a call to UpdateHand().
+    /// </summary>
     public abstract class HandModel : HandModelBase
     {
 
         [SerializeField]
         private Chirality handedness;
+        /// <summary>
+        /// The chirality or handedness of this hand (left or right).
+        /// </summary>
         public override Chirality Handedness
         {
             get { return handedness; }
@@ -35,46 +38,67 @@ namespace Leap.Unity
         }
 
         private ModelType handModelType;
+        /// <summary>
+        /// The type of the Hand model (graphics or physics).
+        /// </summary>
         public override abstract ModelType HandModelType
         {
             get;
         }
 
-        /** The number of fingers on a hand.*/
+        /// <summary> 
+        /// The number of fingers on a hand.
+        /// </summary>
         public const int NUM_FINGERS = 5;
 
-        /** The model width of the hand in meters. This value is used with the measured value
-        * of the user's hand to scale the model proportionally.
-        */
+        /// <summary>
+        /// The model width of the hand in meters. This value is used with the measured value
+        /// of the user's hand to scale the model proportionally.
+        /// </summary>
         public float handModelPalmWidth = 0.085f;
-        /** The array of finger objects for this hand. The array is ordered from thumb (element 0) to pinky (element 4).*/
+        /// <summary> 
+        /// The array of finger objects for this hand. The array is ordered from thumb (element 0) to pinky (element 4).
+        /// </summary>
         public FingerModel[] fingers = new FingerModel[NUM_FINGERS];
 
         // Unity references
-        /** Transform object for the palm object of this hand. */
+        /// <summary> 
+        /// Transform object for the palm object of this hand. 
+        /// </summary>
         public Transform palm;
-        /** Transform object for the forearm object of this hand. */
+        /// <summary> 
+        /// Transform object for the forearm object of this hand. 
+        /// </summary>
         public Transform forearm;
-        /** Transform object for the wrist joint of this hand. */
+        /// <summary> 
+        /// Transform object for the wrist joint of this hand. 
+        /// </summary>
         public Transform wristJoint;
-        /** Transform object for the elbow joint of this hand. */
+        /// <summary> 
+        /// Transform object for the elbow joint of this hand.
+        /// </summary>
         public Transform elbowJoint;
 
         // Leap references
-        /** The Leap Hand object this hand model represents. */
+        /// <summary> 
+        /// The Leap Hand object this hand model represents. 
+        /// </summary>
         protected Hand hand_;
 
-        /** Calculates the position of the palm in global coordinates.
-        * @returns A Vector3 containing the Unity coordinates of the palm position.
-        */
+       
+        /// <summary>
+        /// Calculates the position of the palm in global coordinates.
+        /// </summary>
+        /// <returns> A Vector3 containing the Unity coordinates of the palm position. </returns>
         public Vector3 GetPalmPosition()
         {
             return hand_.PalmPosition.ToVector3();
         }
 
-        /** Calculates the rotation of the hand in global coordinates.
-        * @returns A Quaternion representing the rotation of the hand.
-        */
+        /// <summary> 
+        /// Calculates the rotation of the hand in global coordinates.
+        /// </summary>
+        /// <returns> A Quaternion representing the rotation of the hand. </returns>
         public Quaternion GetPalmRotation()
         {
             if (hand_ != null)
@@ -90,9 +114,10 @@ namespace Leap.Unity
             return Quaternion.identity;
         }
 
-        /** Calculates the direction vector of the hand in global coordinates.
-        * @returns A Vector3 representing the direction of the hand.
-        */
+        /// <summary> 
+        /// Calculates the direction vector of the hand in global coordinates.
+        /// </summary>
+        /// <returns> A Vector3 representing the direction of the hand. </returns>
         public Vector3 GetPalmDirection()
         {
             if (hand_ != null)
@@ -106,9 +131,10 @@ namespace Leap.Unity
             return Vector3.forward;
         }
 
-        /** Calculates the normal vector projecting from the hand in global coordinates.
-        * @returns A Vector3 representing the vector perpendicular to the palm.
-        */
+        /// <summary> 
+        /// Calculates the normal vector projecting from the hand in global coordinates.
+        /// </summary>
+        /// <returns> A Vector3 representing the vector perpendicular to the palm. </returns>
         public Vector3 GetPalmNormal()
         {
             if (hand_ != null)
@@ -122,9 +148,10 @@ namespace Leap.Unity
             return -Vector3.up;
         }
 
-        /** Calculates the direction vector of the forearm in global coordinates.
-        * @returns A Vector3 representing the direction of the forearm (pointing from elbow to wrist).
-        */
+        /// <summary> 
+        /// Calculates the direction vector of the forearm in global coordinates.
+        /// </summary>
+        /// <returns> A Vector3 representing the direction of the forearm (pointing from elbow to wrist). </returns>
         public Vector3 GetArmDirection()
         {
             if (hand_ != null)
@@ -138,9 +165,10 @@ namespace Leap.Unity
             return Vector3.forward;
         }
 
-        /** Calculates the center of the forearm in global coordinates.
-        * @returns A Vector3 containing the Unity coordinates of the center of the forearm.
-        */
+        /// <summary> 
+        /// Calculates the center of the forearm in global coordinates.
+        /// </summary>
+        /// <returns> A Vector3 containing the Unity coordinates of the center of the forearm. </returns>
         public Vector3 GetArmCenter()
         {
             if (hand_ != null)
@@ -155,21 +183,26 @@ namespace Leap.Unity
             return Vector3.zero;
         }
 
-        /** Returns the measured length of the forearm in meters.*/
+        /// <summary> 
+        /// Returns the measured length of the forearm in meters.
+        /// </summary>
         public float GetArmLength()
         {
             return (hand_.Arm.WristPosition - hand_.Arm.ElbowPosition).Magnitude;
         }
 
-        /** Returns the measured width of the forearm in meters.*/
+        /// <summary> 
+        /// Returns the measured width of the forearm in meters.
+        /// </summary>
         public float GetArmWidth()
         {
             return hand_.Arm.Width;
         }
 
-        /** Calculates the position of the elbow in global coordinates.
-        * @returns A Vector3 containing the Unity coordinates of the elbow.
-        */
+        /// <summary> 
+        /// Calculates the position of the elbow in global coordinates.
+        /// </summary>
+        /// <returns> A Vector3 containing the Unity coordinates of the elbow. </returns>
         public Vector3 GetElbowPosition()
         {
             if (hand_ != null)
@@ -184,9 +217,10 @@ namespace Leap.Unity
             return Vector3.zero;
         }
 
-        /** Calculates the position of the wrist in global coordinates.
-        * @returns A Vector3 containing the Unity coordinates of the wrist.
-        */
+        /// <summary> 
+        /// Calculates the position of the wrist in global coordinates.
+        /// </summary>
+        /// <returns> A Vector3 containing the Unity coordinates of the wrist. </returns>
         public Vector3 GetWristPosition()
         {
             if (hand_ != null)
@@ -201,9 +235,10 @@ namespace Leap.Unity
             return Vector3.zero;
         }
 
-        /** Calculates the rotation of the forearm in global coordinates.
-        * @returns A Quaternion representing the rotation of the arm.
-        */
+        /// <summary> 
+        /// Calculates the rotation of the forearm in global coordinates.
+        /// </summary>
+        /// <returns> A Quaternion representing the rotation of the arm. </returns>
         public Quaternion GetArmRotation()
         {
             if (hand_ != null)
@@ -218,22 +253,20 @@ namespace Leap.Unity
             return Quaternion.identity;
         }
 
-        /**
-        * Returns the Leap Hand object represented by this HandModel.
-        * Note that any physical quantities and directions obtained from the
-        * Leap Hand object are relative to the Leap Motion coordinate system,
-        * which uses a right-handed axes and units of millimeters.
-        */
+        /// <summary>
+        /// Returns the Leap Hand object represented by this HandModel.
+        /// Note that any physical quantities and directions obtained from the
+        /// Leap Hand object are relative to the Leap Motion coordinate system,
+        /// which uses a right-handed axes and units of millimeters.
+        /// </summary>
         public override Hand GetLeapHand()
         {
             return hand_;
         }
 
-        /**
-        * Assigns a Leap Hand object to this hand model.
-        * Note that the Leap Hand objects are recreated every frame. The parent
-        * HandController calls this method to set or update the underlying hand.
-        */
+        /// <summary>
+        /// Assigns a Leap Hand object to this hand model.
+        /// </summary>
         public override void SetLeapHand(Hand hand)
         {
             hand_ = hand;
@@ -246,11 +279,10 @@ namespace Leap.Unity
             }
         }
 
-        /**
-        * Implement this function to initialise this hand after it is created.
-        * This function is called by the HandController during the Unity Update() phase when a new hand is detected
-        * by the Leap Motion device.
-        */
+        /// <summary>
+        /// Implement this function to initialise this hand after it is created.
+        /// This function is called when a new hand is detected by the Leap Motion device.
+        /// </summary>
         public override void InitHand()
         {
             for (int f = 0; f < fingers.Length; ++f)
@@ -263,11 +295,11 @@ namespace Leap.Unity
             }
         }
 
-        /**
-         * Returns the ID associated with the hand in the Leap API.
-         * This ID is guaranteed to be unique among all hands in a frame,
-         * and is invariant for the lifetime of the hand model.
-        */
+        /// <summary>
+        /// Returns the ID associated with the hand in the Leap API.
+        /// This ID is guaranteed to be unique among all hands in a frame,
+        /// and is invariant for the lifetime of the hand model.
+        /// </summary>
         public int LeapID()
         {
             if (hand_ != null)
@@ -277,12 +309,11 @@ namespace Leap.Unity
             return -1;
         }
 
-        /**
-        * Implement this function to update this hand once every game loop.
-        * For HandModel instances assigned to the HandController graphics hand list, the HandController calls this
-        * function during the Unity Update() phase. For HandModel instances in the physics hand list, the HandController
-        * calls this function in the FixedUpdate() phase.
-        */
+        /// <summary>
+        /// Implement this function to update this hand once every game loop.
+        /// Called once per frame when the LeapProvider calls the event 
+        /// OnUpdateFrame (graphics hand) or OnFixedFrame (physics hand)
+        /// </summary>
         public override abstract void UpdateHand();
     }
 }
