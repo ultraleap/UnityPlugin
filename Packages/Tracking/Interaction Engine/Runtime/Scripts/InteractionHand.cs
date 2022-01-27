@@ -21,6 +21,9 @@ namespace Leap.Unity.Interaction
 {
     public enum HandDataMode { PlayerLeft, PlayerRight, Custom }
 
+    /// <summary>
+    /// This class allows you to use hand tracking as the controller for the interaction engine.
+    /// </summary>
     [DisallowMultipleComponent]
     public class InteractionHand : InteractionController
     {

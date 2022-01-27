@@ -35,6 +35,9 @@ namespace Leap.Unity.Interaction
     /// </summary>
     public enum ControllerType { Hand, XRController }
 
+    /// <summary>
+    /// Defines an abstract class with a set of actions the interaction engine is capable of raising, InteractionHand and InteractionXRController inherit from this.
+    /// </summary>
     [DisallowMultipleComponent]
     public abstract class InteractionController : MonoBehaviour,
                                                   IInternalInteractionController
@@ -108,6 +111,7 @@ namespace Leap.Unity.Interaction
         [SerializeField]
         [OnEditorChange("graspingEnabled")]
         private bool _graspingEnabled = true;
+
         /// <summary>
         /// If disabled, this interaction controller will not be able to grasp interaction objects.
         /// </summary>
