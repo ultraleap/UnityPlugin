@@ -13,53 +13,136 @@ using UnityEngine;
 namespace Leap.Unity.HandsModule
 {
 
+    /// <summary>
+    /// The HandBinder allows you to use your own hand models so that they follow the 
+    /// leap tracking data.
+    /// You can bind your model by specifying transforms for the different joints and 
+    /// use the debug and fine tuning options to test and adjust it.
+    /// </summary>
     [DisallowMultipleComponent]
     public class HandBinder : HandModelBase
     {
+        /// <summary>
+        /// The Leap Hand object this hand model represents.
+        /// </summary>
         public Hand LeapHand;
 
+        /// <summary> 
+        /// The size of the debug gizmos 
+        /// </summary>
         [Tooltip("The size of the debug gizmos")]
         public float GizmoSize = 0.004f;
+        /// <summary> 
+        /// The length of the elbow to maintain the correct offset from the wrist 
+        /// </summary>
         [Tooltip("The length of the elbow to maintain the correct offset from the wrist")]
         public float ElbowLength;
+        /// <summary> 
+        /// The rotation offset that will be assigned to all the fingers 
+        /// </summary>
         [Tooltip("The rotation offset that will be assigned to all the fingers")]
         public Vector3 GlobalFingerRotationOffset;
+        /// <summary> 
+        /// The rotation offset that will be assigned to the wrist 
+        /// </summary>
         [Tooltip("The rotation offset that will be assigned to the wrist")]
         public Vector3 WristRotationOffset;
+        /// <summary> 
+        /// Set the assigned transforms to the leap hand during editor 
+        /// </summary>
         [Tooltip("Set the assigned transforms to the leap hand during editor")]
         public bool SetEditorPose;
+        /// <summary> 
+        /// Set the assigned transforms to the same position as the Leap Hand 
+        /// </summary>
         [Tooltip("Set the assigned transforms to the same position as the Leap Hand")]
         public bool SetPositions;
+        /// <summary> 
+        /// Use metacarpal bones 
+        /// </summary>
         [Tooltip("Use metacarpal bones")]
         public bool UseMetaBones;
+        /// <summary> 
+        /// Show the Leap Hand in the scene 
+        /// </summary>
         [Tooltip("Show the Leap Hand in the scene")]
         public bool DebugLeapHand = true;
+        /// <summary> 
+        /// Show the leap's rotation axis in the scene 
+        /// </summary>
         [Tooltip("Show the leap's rotation axis in the scene")]
         public bool DebugLeapRotationAxis = false;
+        /// <summary> 
+        /// Show the assigned gameobjects as gizmos in the scene 
+        /// </summary>
         [Tooltip("Show the assigned gameobjects as gizmos in the scene")]
         public bool DebugModelTransforms = true;
+        /// <summary> 
+        /// Show the assigned gameobjects rotation axis in the scene 
+        /// </summary>
         [Tooltip("Show the assigned gameobjects rotation axis in the scene")]
         public bool DebugModelRotationAxis;
 
-        //Used by editor script
+        /// <summary> 
+        /// Used by the editor script. Fine tuning allows to specify custom wrist and 
+        /// finger rotation offsets. 
+        /// </summary>
         public bool FineTuning;
+        /// <summary>  
+        /// Used by the editor script. The DebugOptions allow to show a debug hand in the scene view
+        /// and visualize its rotation and its attached gameobjects
+        /// </summary>
         public bool DebugOptions;
+        /// <summary> 
+        /// Used by the editor script. 
+        /// </summary>
         public bool EditPoseNeedsResetting = false;
+        /// <summary> 
+        /// The chirality or handedness of the hand.
+        /// Custom editor requires Chirality in a non overridden property, Public Chirality exists for the editor.
+        /// </summary>
         public Chirality Chirality;
 
-        //The data structure that contains transforms that get bound to the leap data
+        /// <summary> 
+        /// The data structure that contains transforms that get bound to the leap data 
+        /// </summary>
         public BoundHand BoundHand = new BoundHand();
-        //User defines offsets in editor script
+        /// <summary> 
+        /// User defines offsets in editor script 
+        /// </summary>
         public List<BoundTypes> Offsets = new List<BoundTypes>();
-        //Stores all the childrens default pose
+        /// <summary> 
+        /// Stores all the childrens default pose 
+        /// </summary>
         public SerializedTransform[] DefaultHandPose;
 
-        //Custom editor requires Chirality in a non overridden property, Public Chirality exists for the editor.
+        /// <summary>
+        /// The chirality or handedness of this hand (left or right).
+        /// To set, change the public Chirality.
+        /// </summary>
         public override Chirality Handedness { get { return Chirality; } set { } }
+        /// <summary>
+        /// The type of the Hand model (set to Graphics).
+        /// </summary>
         public override ModelType HandModelType { get { return ModelType.Graphics; } }
+        /// <summary>
+        /// Returns the Leap Hand object represented by this HandModelBase. 
+        /// Note that any physical quantities and directions obtained from the Leap Hand object are 
+        /// relative to the Leap Motion coordinate system, which uses a right-handed axes and units 
+        /// of millimeters.
+        /// </summary>
+        /// <returns></returns>
         public override Hand GetLeapHand() { return LeapHand; }
+        /// <summary>
+        /// Assigns a Leap Hand object to this HandModelBase.
+        /// </summary>
+        /// <param name="hand"></param>
         public override void SetLeapHand(Hand hand) { LeapHand = hand; }
 
+        /// <summary>
+        /// Returns whether or not this hand model supports editor persistence. 
+        /// Set by public SetEditorPose.
+        /// </summary>
         public override bool SupportsEditorPersistence()
         {
 
@@ -116,6 +199,7 @@ namespace Leap.Unity.HandsModule
         }
 
         /// <summary>
+        /// Called once per frame when the LeapProvider calls the event OnUpdateFrame.
         /// Update the BoundGameobjects so that the positions and rotations match that of the leap hand
         /// </summary>
         public override void UpdateHand()
@@ -214,7 +298,7 @@ namespace Leap.Unity.HandsModule
         }
 
         /// <summary>
-        /// Reset the boundGameobjects back to the default pose
+        /// Reset the boundGameobjects back to the default pose given by DefaultHandPose.
         /// </summary>
         public void ResetHand(bool forceReset = false)
         {
