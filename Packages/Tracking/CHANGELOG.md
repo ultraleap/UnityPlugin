@@ -31,6 +31,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Interactions callback scene allows blocks to be moved without doing a grasp pose.
 - Interactions object scene platform/stage seems to move a lot
 - Dynamic UI objects throwing backwards most of the time.
+- Toon Basic Outline depends on an SRP and causes an error
 
 
 ## [5.2.0]
