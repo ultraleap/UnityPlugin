@@ -6,6 +6,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [docs-website]: https://docs.ultraleap.com/ "Ultraleap Docs"
 
+### Added
+### Changed
+### Removed
+### Fixed
+- When using LeapXRServiceProvider with Temporal Warping enabled, the hands fly off in the first few frames.
+### Known Issues
+
 ## [5.2.0]
 
 ### Added
