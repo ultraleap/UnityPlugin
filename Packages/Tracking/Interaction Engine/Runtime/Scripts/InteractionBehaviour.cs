@@ -18,10 +18,19 @@ using UnityEngine;
 namespace Leap.Unity.Interaction
 {
     /// <summary>
-    /// UI: This will make the objects to feel lighter and more reactive to gentle touches; 
-    /// Object : For normal physical objects, you'll almost always want to use Object."
+    /// Determines how much force an interaction controller should apply to this object. 
     /// </summary>
-    public enum ContactForceMode { Object, UI };
+    public enum ContactForceMode 
+    {
+        /// <summary>
+        /// For normal physical objects, you'll almost always want to use Object.
+        /// </summary>
+        Object,
+        /// <summary>
+        /// For interface-style objects like buttons and sliders, choose UI. This will make the objects to feel lighter and more reactive to gentle touches.
+        /// </summary>
+        UI
+    };
 
     /// <summary>
     /// InteractionBehaviours are components that enable GameObjects to interact with
