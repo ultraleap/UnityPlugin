@@ -91,15 +91,32 @@ namespace Leap.Unity
 
         /// <summary>
         /// Supported modes to optimize frame updates.
-        /// When enabled, the provider will only calculate one leap frame instead of two.
+        /// When enabled, the provider will reuse some hand data:
+        /// By default the mode is set to None, which implies that we want to use hand tracking in time with Unity's Update loop.
+        /// It can be set to ReuseUpdateForPhysics (choose as Android user), or ReusePhysicsForUpdate (reinterpolates the hand data for the 
+        /// physics timestep).
         /// </summary>
         public enum FrameOptimizationMode
         {
+            /// <summary>
+            /// By default the mode is set to None, this implies that we want to use hand tracking in time with Unity’s Update loop.
+            /// </summary>
             None,
+            /// <summary>
+            /// Android users should choose Reuse Update for Physics.
+            /// </summary>
             ReuseUpdateForPhysics,
+            /// <summary>
+            /// Provides the option to reinterpolate the hand data for the physics timestep, improving the movement of objects being 
+            /// manipulated by hands when using the interaction engine. Enabling this incurs a small time penalty (fraction of a ms).
+            /// </summary>
             ReusePhysicsForUpdate,
         }
-        [Tooltip("When enabled, the provider will only calculate one leap frame instead of two.")]
+        [Tooltip("When enabled, the provider will reuse some hand data:\n" 
+            + "None - By default the mode is set to None, which implies that we want to use hand tracking in time with Unity's Update loop.\n" 
+            + "ReuseUpdateForPhysics - Android users should choose Reuse Update for Physics.\n"
+            + "ReusePhysicsForUpdate - Provides the option to reinterpolate the hand data for the physics timestep, improving the movement of objects being " 
+            + "manipulated by hands when using the interaction engine. Enabling this incurs a small time penalty (fraction of a ms).")]
         [SerializeField]
         protected FrameOptimizationMode _frameOptimization = FrameOptimizationMode.None;
 
@@ -134,7 +151,7 @@ namespace Leap.Unity
 
         /// <summary>
         /// (Service must be >= 4.9.2)
-        /// which tracking mode to request that the service optimizes for.
+        /// The tracking mode used by the service. Should be set to match the orientation of the hand tracking hardware.
         /// </summary>
         public enum TrackingOptimizationMode
         {
@@ -648,7 +665,7 @@ namespace Leap.Unity
         /// Calculates the physics extrapolation time depending on the PhysicsExtrapolationMode.
         /// </summary>
         /// <returns>A float that can be used to compensate for latency when ensuring that our 
-        /// hands are on the same timline as Update.</returns>
+        /// hands are on the same timeline as Update.</returns>
         /// <exception cref="System.InvalidOperationException"></exception>
         public float CalculatePhysicsExtrapolation()
         {

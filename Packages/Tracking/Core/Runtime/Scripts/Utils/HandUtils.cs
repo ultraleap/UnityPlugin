@@ -566,7 +566,7 @@ namespace Leap.Unity
         /// </summary>
         /// <param name="frame"></param>
         /// <param name="whichHand"></param>
-        /// <returns></returns>
+        /// <returns>The first hand of the argument whichHand found in the argument frame.</returns>
         [System.Obsolete("Method is obsolete, use GetHand instead", true)]
         public static Hand Get(this Frame frame, Chirality whichHand)
         {
@@ -574,11 +574,11 @@ namespace Leap.Unity
         }
 
         /// <summary>
-        /// Returns the first hand of the argument whichHand found in the argument frame.
+        /// Finds a hand in the given frame.
         /// </summary>
         /// <param name="frame"></param>
         /// <param name="whichHand"></param>
-        /// <returns></returns>
+        /// <returns>The first hand of the argument whichHand found in the argument frame.</returns>
         public static Hand GetHand(this Frame frame, Chirality whichHand)
         {
             if (frame.Hands == null) { return null; }
@@ -591,12 +591,12 @@ namespace Leap.Unity
         #region Provider Utils
 
         /// <summary>
-        /// Returns the first hand of the argument whichHand found in the current frame of 
-        /// the argument provider.
+        /// Finds a hand in the current frame.
         /// </summary>
         /// <param name="provider"></param>
         /// <param name="whichHand"></param>
-        /// <returns></returns>
+        /// <returns>The first hand of the argument whichHand found in the current frame of 
+        /// the argument provider.</returns>
         public static Hand Get(this LeapProvider provider, Chirality whichHand)
         {
             Frame frame;
