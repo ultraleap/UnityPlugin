@@ -67,7 +67,7 @@ namespace Leap.Unity
         public abstract ModelType HandModelType { get; }
         /// <summary>
         /// Implement this function to initialise this hand after it is created.
-        /// This function is called when a new hand is detected by the Leap device.
+        /// This function is called when a new hand is detected by the Tracking Service.
         /// </summary>
         public virtual void InitHand() { }
         /// <summary>

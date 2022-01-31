@@ -52,7 +52,7 @@ namespace Leap.Unity
 #endif
         /// <summary>
         /// Supported modes for device offset. Used for deviceOffsetMode which allows 
-        /// manual adjustment of the Leap device's virtual offset and tilt.
+        /// manual adjustment of the Tracking Hardware's virtual offset and tilt.
         /// </summary>
         public enum DeviceOffsetMode
         {
@@ -67,7 +67,7 @@ namespace Leap.Unity
             /// </summary>
             ManualHeadOffset,
             /// <summary>
-            /// Allows for the manual placement of the Leap Tracking Device.
+            /// Allows for the manual placement of the Tracking Hardware.
             /// This device offset mode is incompatible with Temporal Warping.
             /// When choosing this mode, deviceOrigin has to be set.
             /// </summary>
@@ -75,16 +75,16 @@ namespace Leap.Unity
         }
 
 
-        [Tooltip("Allow manual adjustment of the Leap device's virtual offset and tilt. These "
+        [Tooltip("Allow manual adjustment of the Tracking Hardware's virtual offset and tilt. These "
                + "settings can be used to match the physical position and orientation of the "
-               + "Leap device on a tracked device it is mounted on (such as a VR "
+               + "Tracking Hardware on a tracked device it is mounted on (such as a VR "
                + "headset). ")]
         [SerializeField, OnEditorChange("deviceOffsetMode")]
         private DeviceOffsetMode _deviceOffsetMode;
         /// <summary>
-        /// Allow manual adjustment of the Leap device's virtual offset and tilt. 
+        /// Allow manual adjustment of the Tracking Hardware's virtual offset and tilt. 
         /// These settings can be used to match the physical position and orientation of the
-        /// Leap device on a tracked device it is mounted on (such as a VR headset)
+        /// Tracking Hardware on a tracked device it is mounted on (such as a VR headset)
         /// </summary>
         public DeviceOffsetMode deviceOffsetMode
         {
@@ -101,14 +101,14 @@ namespace Leap.Unity
             }
         }
 
-        [Tooltip("Adjusts the Leap device's virtual height offset from the tracked "
+        [Tooltip("Adjusts the Tracking Hardware's virtual height offset from the tracked "
                + "headset position. This should match the vertical offset of the physical "
                + "device with respect to the headset in meters.")]
         [SerializeField]
         [Range(-0.50F, 0.50F)]
         private float _deviceOffsetYAxis = DEFAULT_DEVICE_OFFSET_Y_AXIS;
         /// <summary>
-        /// Adjusts the Leap device's virtual height offset from the tracked 
+        /// Adjusts the Tracking Hardware's virtual height offset from the tracked 
         /// headset position. This should match the vertical offset of the physical device
         /// with respect to the headset in meters.
         /// </summary>
@@ -118,14 +118,14 @@ namespace Leap.Unity
             set { _deviceOffsetYAxis = value; }
         }
 
-        [Tooltip("Adjusts the Leap device's virtual depth offset from the tracked "
+        [Tooltip("Adjusts the Tracking Hardware's virtual depth offset from the tracked "
                + "headset position. This should match the forward offset of the physical "
                + "device with respect to the headset in meters.")]
         [SerializeField]
         [Range(-0.50F, 0.50F)]
         private float _deviceOffsetZAxis = DEFAULT_DEVICE_OFFSET_Z_AXIS;
         /// <summary>
-        /// Adjusts the Leap device's virtual depth offset from the tracked 
+        /// Adjusts the Tracking Hardware's virtual depth offset from the tracked 
         /// headset position. This should match the forward offset of the physical 
         /// device with respect to the headset in meters.
         /// </summary>
@@ -135,13 +135,13 @@ namespace Leap.Unity
             set { _deviceOffsetZAxis = value; }
         }
 
-        [Tooltip("Adjusts the Leap device's virtual X axis tilt. This should match "
+        [Tooltip("Adjusts the Tracking Hardware's virtual X axis tilt. This should match "
                + "the tilt of the physical device with respect to the headset in degrees.")]
         [SerializeField]
         [Range(-90.0F, 90.0F)]
         private float _deviceTiltXAxis = DEFAULT_DEVICE_TILT_X_AXIS;
         /// <summary>
-        /// Adjusts the Leap device's virtual X axis tilt. This should match 
+        /// Adjusts the Tracking Hardware's virtual X axis tilt. This should match 
         /// the tilt of the physical device with respect to the headset in degrees.
         /// </summary>
         public float deviceTiltXAxis
@@ -150,12 +150,12 @@ namespace Leap.Unity
             set { _deviceTiltXAxis = value; }
         }
 
-        [Tooltip("Allows for the manual placement of the Leap Tracking Device." +
+        [Tooltip("Allows for the manual placement of the Tracking Hardware." +
           "This device offset mode is incompatible with Temporal Warping.")]
         [SerializeField]
         private Transform _deviceOrigin;
         /// <summary>
-        /// Allows for the manual placement of the Leap Tracking Device.
+        /// Allows for the manual placement of the Tracking Hardware.
         /// This device offset mode is incompatible with Temporal Warping.
         /// This is only used if the deviceOffsetMode is 'Transform'.
         /// </summary>
@@ -215,7 +215,7 @@ namespace Leap.Unity
             /// </summary>
             Manual,
             /// <summary>
-            /// Use 'Images' for scenarios that overlay Leap device images on tracked 
+            /// Use 'Images' for scenarios that overlay Tracking Service images on tracked 
             /// hand data.
             /// </summary>
             Images,
@@ -229,7 +229,7 @@ namespace Leap.Unity
                + "correct value can be chosen automatically for these platforms. "
                + "Some non-standard platforms may use 'Manual' mode to adjust their "
                + "latency compensation amount for temporal warping. "
-               + "Use 'Images' for scenarios that overlay Leap device images on tracked "
+               + "Use 'Images' for scenarios that overlay Tracking Service images on tracked "
                + "hand data.")]
         [SerializeField]
         private TemporalWarpingMode _temporalWarpingMode = TemporalWarpingMode.Auto;

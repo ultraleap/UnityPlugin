@@ -653,7 +653,8 @@ namespace Leap.Unity.Interaction
         private Rigidbody _rigidbody;
 
 #if UNITY_EDITOR
-        //This creates a new rigidbody property, overriding the MonoBehaviour one but in a way where the base class can still use the original rigidbody instead of getting the override as well.
+        // This creates a new rigidbody property, overriding the MonoBehaviour one but in a way where the base class can still use the original rigidbody instead of getting the override as well.
+        // (It makes the rigidbody read as 'new public Rigidbody rigidbody')
         new
 #endif
         /// <summary>
@@ -799,7 +800,7 @@ namespace Leap.Unity.Interaction
         private ContactForceMode _contactForceMode = ContactForceMode.Object;
 
         /// <summary>
-        /// Determines how much force an interaction controller should apply to this "object. For interface-style objects like buttons and sliders, choose UI. This will make the objects to feel lighter and more reactive to gentle touches; for normal physical objects, you'll almost always want Object."
+        /// Determines how much force an interaction controller should apply to this object. For interface-style objects like buttons and sliders, choose UI. This will make the objects to feel lighter and more reactive to gentle touches; for normal physical objects, you'll almost always want Object.
         /// </summary>
         public ContactForceMode contactForceMode
         {
@@ -850,12 +851,21 @@ namespace Leap.Unity.Interaction
         }
 
         /// <summary>
-        /// When the object is held by an interaction controller, how should it move to its new position? Nonkinematic bodies will collide with other Rigidbodies, so they might not reach the target position. Kinematic rigidbodies will always move to the target position, ignoring collisions. Inherit will simply use the isKinematic state of the Rigidbody from before it was grasped.
+        /// When the object is held by an interaction controller, how should it move to its new position?
         /// </summary>
         public enum GraspedMovementType
         {
+            /// <summary>
+            /// Inherit will simply use the isKinematic state of the Rigidbody from before it was grasped.
+            /// </summary>
             Inherit,
+            /// <summary>
+            /// Kinematic rigidbodies will always move to the target position, ignoring collisions.
+            /// </summary>
             Kinematic,
+            /// <summary>
+            /// Nonkinematic bodies will collide with other Rigidbodies, so they might not reach the target position.
+            /// </summary>
             Nonkinematic
         }
 
@@ -1106,9 +1116,8 @@ namespace Leap.Unity.Interaction
         }
 
         /// <summary>
-        /// Foreach InteractionController sort the closest hovering controller and raise OnHoverBegin event.
+        /// For each InteractionController sort the closest hovering controller and raise OnHoverBegin event.
         /// </summary>
-        /// <param name="controllers"></param>
         public void BeginHover(List<InteractionController> controllers)
         {
             foreach (var controller in controllers)
@@ -1130,9 +1139,8 @@ namespace Leap.Unity.Interaction
         }
 
         /// <summary>
-        /// Foreach InteractionController sort the closest hovering controller and raise OnHoverEnd event.
+        /// For each InteractionController sort the closest hovering controller and raise OnHoverEnd event.
         /// </summary>
-        /// <param name="controllers"></param>
         public void EndHover(List<InteractionController> controllers)
         {
             foreach (var controller in controllers)
@@ -1156,7 +1164,6 @@ namespace Leap.Unity.Interaction
         /// <summary>
         /// Refresh the list of closest hovering InteractionControllers and raise the OnHoverStay event
         /// </summary>
-        /// <param name="controllers"></param>
         public void StayHovered(List<InteractionController> controllers)
         {
             refreshClosestHoveringController();
@@ -1239,9 +1246,8 @@ namespace Leap.Unity.Interaction
         private InteractionHand _closestPrimaryHoveringHand = null;
 
         /// <summary>
-        /// Foreach InteractionController sort the closest primary hovering controller and raise OnPrimaryHoverBegin & OnPerControllerPrimaryHoverBegin events.
+        /// For each InteractionController sort the closest primary hovering controller and raise OnPrimaryHoverBegin & OnPerControllerPrimaryHoverBegin events.
         /// </summary>
-        /// <param name="controllers"></param>
         public void BeginPrimaryHover(List<InteractionController> controllers)
         {
             foreach (var controller in controllers)
@@ -1263,9 +1269,8 @@ namespace Leap.Unity.Interaction
         }
 
         /// <summary>
-        /// Foreach InteractionController sort the closest primary hovering controller and raise OnPerControllerPrimaryHoverEnd & OnPrimaryHoverEnd events.
+        /// For each InteractionController sort the closest primary hovering controller and raise OnPerControllerPrimaryHoverEnd & OnPrimaryHoverEnd events.
         /// </summary>
-        /// <param name="controllers"></param>
         public void EndPrimaryHover(List<InteractionController> controllers)
         {
             foreach (var controller in controllers)
@@ -1287,9 +1292,8 @@ namespace Leap.Unity.Interaction
         }
 
         /// <summary>
-        /// Refresh the closest promary hovering controllers and raise the OnPrimaryHoverStay event
+        /// Refresh the closest primary hovering controllers and raise the OnPrimaryHoverStay event
         /// </summary>
-        /// <param name="controllers"></param>
         public void StayPrimaryHovered(List<InteractionController> controllers)
         {
             refreshClosestPrimaryHoveringController();
@@ -1382,9 +1386,8 @@ namespace Leap.Unity.Interaction
         private HashSet<InteractionController> _contactingControllers = new HashSet<InteractionController>();
 
         /// <summary>
-        /// Foreach InteractionController raise the OnContactBegin event
+        /// For each InteractionController raise the OnContactBegin event
         /// </summary>
-        /// <param name="controllers"></param>
         public void BeginContact(List<InteractionController> controllers)
         {
             foreach (var controller in controllers)
@@ -1401,9 +1404,8 @@ namespace Leap.Unity.Interaction
         }
 
         /// <summary>
-        /// Foreach InteractionController raise the OnContactEnd event
+        /// For each InteractionController raise the OnContactEnd event
         /// </summary>
-        /// <param name="controllers"></param>
         public void EndContact(List<InteractionController> controllers)
         {
             foreach (var controller in controllers)
@@ -1422,7 +1424,6 @@ namespace Leap.Unity.Interaction
         /// <summary>
         /// Raise the OnContactStay event
         /// </summary>
-        /// <param name="controllers"></param>
         public void StayContacted(List<InteractionController> controllers)
         {
             OnContactStay();
@@ -1536,9 +1537,8 @@ namespace Leap.Unity.Interaction
         }
 
         /// <summary>
-        /// Foreach InteractionController Raise a OnPerControllerGraspBegin event and store rigidbody data
+        /// For each InteractionController Raise a OnPerControllerGraspBegin event and store rigidbody data
         /// </summary>
-        /// <param name="controllers"></param>
         public void BeginGrasp(List<InteractionController> controllers)
         {
             _justGrasped = true;
@@ -1599,9 +1599,8 @@ namespace Leap.Unity.Interaction
         }
 
         /// <summary>
-        /// Foreach InteractionController Raise a OnPerControllerGraspEnd event and store rigidbody data
+        /// For each InteractionController Raise a OnPerControllerGraspEnd event and store rigidbody data
         /// </summary>
-        /// <param name="controllers"></param>
         public void EndGrasp(List<InteractionController> controllers)
         {
             if (_graspingControllers.Count == controllers.Count && isSuspended)
@@ -1659,9 +1658,8 @@ namespace Leap.Unity.Interaction
         }
 
         /// <summary>
-        /// Foreach InteractionController calculate the grasped position and calculate the grasped movement in fixed update
+        /// For each InteractionController calculate the grasped position and calculate the grasped movement in fixed update
         /// </summary>
-        /// <param name="controllers"></param>
         public void StayGrasped(List<InteractionController> controllers)
         {
             if (moveObjectWhenGrasped)
@@ -1705,7 +1703,6 @@ namespace Leap.Unity.Interaction
         /// <summary>
         /// For a given InteractionController call the OnSuspensionBegin event
         /// </summary>
-        /// <param name="controller"></param>
         public void BeginSuspension(InteractionController controller)
         {
             _suspendingController = controller;
@@ -1716,7 +1713,6 @@ namespace Leap.Unity.Interaction
         /// <summary>
         /// For a given InteractionController call the OnSuspensionEnd event
         /// </summary>
-        /// <param name="controller"></param>
         public void EndSuspension(InteractionController controller)
         {
             _suspendingController = null;

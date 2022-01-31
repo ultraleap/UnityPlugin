@@ -158,13 +158,14 @@ namespace Leap.Unity
             Desktop,
             Screentop,
             /// <summary>
-            /// Use the LeapXRServiceProvider for HMD mode instead of this option
+            /// The LeapXRServiceProvider should be used for all XR headset based applications, where hand tracking 
+            /// devices are mounted on the headset. The LeapXRServiceProvider uses the HMD tracking optimization mode.
             /// </summary>
             HMD
         }
         [Tooltip("[Service must be >= 4.9.2!] " +
           "Which tracking mode to request that the service optimize for. " +
-          "(Use the LeapXRServiceProvider for HMD Mode instead of this option!)")]
+          "(The LeapXRServiceProvider should be used for all XR headset based applications, where hand tracking devices are mounted on the headset)")]
         [SerializeField]
         [EditTimeOnly]
         protected TrackingOptimizationMode _trackingOptimization = TrackingOptimizationMode.Desktop;

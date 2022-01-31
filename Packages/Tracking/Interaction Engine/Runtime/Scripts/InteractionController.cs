@@ -298,7 +298,6 @@ namespace Leap.Unity.Interaction
         /// <summary>
         /// Unregister an interaction Behaviour from the hover and contact tracking for an object
         /// </summary>
-        /// <param name="intObj"></param>
         public void NotifyObjectUnregistered(IInteractionBehaviour intObj)
         {
             ClearHoverTrackingForObject(intObj);
@@ -1257,7 +1256,7 @@ namespace Leap.Unity.Interaction
 
         private bool _softContactEnabled = false;
         /// <summary>
-        /// Get the _softContactEnabled state
+        /// Is soft contact enabled?
         /// </summary>
         public bool softContactEnabled { get { return _softContactEnabled; } }
 
@@ -1606,10 +1605,8 @@ namespace Leap.Unity.Interaction
         private HashSet<IInteractionBehaviour> _contactBeganBuffer = new HashSet<IInteractionBehaviour>();
 
         /// <summary>
-        /// Add an InteractionBehaviour to the _contactBehavioursSet OnEnter
+        /// Add contact bone to set of ongoing collisions with given interaction behaviour
         /// </summary>
-        /// <param name="contactBone"></param>
-        /// <param name="interactionObj"></param>
         public void NotifyContactBoneCollisionEnter(ContactBone contactBone, IInteractionBehaviour interactionObj)
         {
             int count;
@@ -1625,10 +1622,8 @@ namespace Leap.Unity.Interaction
         }
 
         /// <summary>
-        /// Add an InteractionBehaviour to the _contactBehavioursSet OnStay
+        /// Refresh contact bone state as being in an ongoing collision with given interaction object.
         /// </summary>
-        /// <param name="contactBone"></param>
-        /// <param name="interactionObj"></param>
         public void NotifyContactBoneCollisionStay(ContactBone contactBone, IInteractionBehaviour interactionObj)
         {
             // If Contact state is cleared manually or due to the controller being disabled,
@@ -1643,10 +1638,8 @@ namespace Leap.Unity.Interaction
         }
 
         /// <summary>
-        /// Remove an InteractionBehaviour to the _contactBehavioursSet OnExit
+        /// Remove contact bone from set of ongoing collisions with given interaction behaviour.
         /// </summary>
-        /// <param name="contactBone"></param>
-        /// <param name="interactionObj"></param>
         public void NotifyContactBoneCollisionExit(ContactBone contactBone, IInteractionBehaviour interactionObj)
         {
             if (interactionObj.ignoreContact)

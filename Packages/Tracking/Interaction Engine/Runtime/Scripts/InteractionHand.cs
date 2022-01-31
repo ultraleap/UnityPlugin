@@ -862,7 +862,6 @@ namespace Leap.Unity.Interaction
         /// <summary>
         /// Can be used to swap the current graspedObject for another interaction behaviour
         /// </summary>
-        /// <param name="replacement"></param>
         public override void SwapGrasp(IInteractionBehaviour replacement)
         {
             var original = graspedObject;
@@ -904,7 +903,6 @@ namespace Leap.Unity.Interaction
         /// <summary>
         /// Draw gizmos during runtime to help with debugging
         /// </summary>
-        /// <param name="drawer"></param>
         public override void OnDrawRuntimeGizmos(RuntimeGizmoDrawer drawer)
         {
             if (Application.isPlaying)

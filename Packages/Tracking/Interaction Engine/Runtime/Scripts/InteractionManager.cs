@@ -21,7 +21,7 @@ namespace Leap.Unity.Interaction
 {
 
     /// <summary>
-    /// This class allows IInteractionBehaviours to register with it and provides all of the callbacks needed for operation. This class also takes care of all bookkeeping to keep track of the objects, hands, and the internal state of the interaction plugin.
+    /// This class allows IInteractionBehaviours to register with it and provides all of the callbacks needed for operation. This class also takes care of all bookkeeping to keep track of the objects, hands, and the internal state of the interaction engine.
     /// </summary>
     [DisallowMultipleComponent]
     [ExecuteInEditMode]
@@ -65,14 +65,20 @@ namespace Leap.Unity.Interaction
         public float touchActivationRadius = 0.075F;
 
         /// <summary>
-        /// If set to PreservePosePerController, when holding a multi-grasp-enabled object and releasing with a single hand or controller, the object's held pose will adjust to reflect only the remaining holding controllers.\n\nIf set to PreservePosePerController, when any hand or controller releases an object, the remaining controllers will reinitialize their holding pose to match the last-held state of the object, allowing the user to rotate and translate the object more loosely.\n\nPreservePosePerController is the default setting.
+        /// Defines what happens when releasing a multi-grasp-enabled object with a single hand or controller.
         /// </summary>
         public enum MultiGraspHoldingMode
         {
+            /// <summary>
+            /// Default Setting - If set to PreservePosePerController, when holding a multi-grasp-enabled object and releasing with a single hand or controller, the object's held pose will adjust to reflect only the remaining holding controllers. 
+            /// </summary>
             PreservePosePerController,
+            /// <summary>
+            /// If set to ReinitializeOnAnyRelease, when any hand or controller releases an object, the remaining controllers will reinitialize their holding pose to match the last-held state of the object, allowing the user to rotate and translate the object more loosely.
+            /// </summary>
             ReinitializeOnAnyRelease
         }
-        [Tooltip("If set to PreservePosePerController, when holding a multi-grasp-enabled object and releasing with a single hand or controller, the object's held pose will adjust to reflect only the remaining holding controllers.\n\nIf set to PreservePosePerController, when any hand or controller releases an object, the remaining controllers will reinitialize their holding pose to match the last-held state of the object, allowing the user to rotate and translate the object more loosely.\n\nPreservePosePerController is the default setting.")]
+        [Tooltip("If set to PreservePosePerController, when holding a multi-grasp-enabled object and releasing with a single hand or controller, the object's held pose will adjust to reflect only the remaining holding controllers.\n\nIf set to ReinitializeOnAnyRelease, when any hand or controller releases an object, the remaining controllers will reinitialize their holding pose to match the last-held state of the object, allowing the user to rotate and translate the object more loosely.\n\nPreservePosePerController is the default setting.")]
         public MultiGraspHoldingMode multiGraspHoldingMode = MultiGraspHoldingMode.PreservePosePerController;
 
         [Header("Layer Settings")]
@@ -772,9 +778,8 @@ namespace Leap.Unity.Interaction
         #region Object Registration
 
         /// <summary>
-        /// Register an InteractionBehaviour to the _interactionObjects Hashset
+        /// Register an interaction behaviour with this interaction manager.
         /// </summary>
-        /// <param name="interactionObj"></param>
         public void RegisterInteractionBehaviour(IInteractionBehaviour interactionObj)
         {
             _interactionObjects.Add(interactionObj);
@@ -803,10 +808,8 @@ namespace Leap.Unity.Interaction
         }
 
         /// <summary>
-        /// Get whether the _interactionObjects HashSet contains this InteractionBehaviour
+        /// Is interaction behaviour registered with this interaction manager?
         /// </summary>
-        /// <param name="interactionObj"></param>
-        /// <returns></returns>
         public bool IsBehaviourRegistered(IInteractionBehaviour interactionObj)
         {
             return _interactionObjects.Contains(interactionObj);
@@ -1125,7 +1128,6 @@ namespace Leap.Unity.Interaction
         /// <summary>
         /// Draw runtime gizmos in the scene to help with debugging
         /// </summary>
-        /// <param name="drawer"></param>
         public void OnDrawRuntimeGizmos(RuntimeGizmoDrawer drawer)
         {
             if (_drawControllerRuntimeGizmos)
