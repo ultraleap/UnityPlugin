@@ -141,18 +141,36 @@ namespace Ultraleap.Tracking.OpenXR
 #if UNITY_EDITOR
         protected override void GetValidationChecks(List<ValidationRule> rules, BuildTargetGroup targetGroup)
         {
+            // Check the active input handling supports New (for OpenXR) and Legacy (for Ultraleap Plugin support).
             rules.Add(new ValidationRule(this)
             {
                 message = "Active Input Handling is not set to Both. While New is required for OpenXR, Both is recommended as the Ultraleap Unity Plugin does not fully support the New Input System.",
                 error = false,
-                fixItAutomatic = false,
-                fixItMessage = "Enable the Legacy Input Manager and replacement Input System together (Both)",
-                fixIt = () => SettingsService.OpenProjectSettings("Project/Player"),
 #if !ENABLE_LEGACY_INPUT_MANAGER || !ENABLE_INPUT_SYSTEM
                 checkPredicate = () => false,
 #else
                 checkPredicate = () => true,
 #endif
+                fixItAutomatic = false,
+                fixItMessage = "Enable the Legacy Input Manager and replacement Input System together (Both)",
+                fixIt = () => SettingsService.OpenProjectSettings("Project/Player"),
+            });
+
+            // Check that the Main camera has a suitable near clipping plane for hand-tracking.
+            rules.Add(new ValidationRule(this)
+            {
+                message = "Main camera near clipping plane is further than recommend and tracked hands may show visual clipping artifacts.",
+                error = false,
+                checkPredicate = () => Camera.main == null || Camera.main.nearClipPlane <= 0.01,
+                fixItAutomatic = true,
+                fixItMessage = "Set main camera clipping plane to 0.01",
+                fixIt = () =>
+                {
+                    if (Camera.main != null)
+                    {
+                        Camera.main.nearClipPlane = 0.01f;
+                    }
+                },
             });
         }
 #endif
