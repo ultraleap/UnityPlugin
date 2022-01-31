@@ -155,14 +155,11 @@ namespace Leap.Unity.Interaction
                         }
                     }
 
-                    if (collision.impulse.magnitude > 0f)
+                    if (!contactingInteractionBehaviours.ContainsKey(interactionObj))
                     {
-                        if (!contactingInteractionBehaviours.ContainsKey(interactionObj))
-                        {
-                            interactionController.NotifyContactBoneCollisionEnter(this, interactionObj);
-                            contactingInteractionBehaviours.Add(interactionObj, Time.fixedTime);
-                        }
-                    }
+                        interactionController.NotifyContactBoneCollisionEnter(this, interactionObj);
+                        contactingInteractionBehaviours.Add(interactionObj, Time.fixedTime);
+                    }            
                 }
             }
         }
@@ -175,12 +172,12 @@ namespace Leap.Unity.Interaction
             float timeEntered = 0;
             if (interactionController.manager.interactionObjectBodies.TryGetValue(collision.rigidbody, out interactionObj))
             {
-                if (collision.impulse.magnitude > 0f && !contactingInteractionBehaviours.ContainsKey(interactionObj))
+                if (!contactingInteractionBehaviours.ContainsKey(interactionObj))
                 {
                     interactionController.NotifyContactBoneCollisionEnter(this, interactionObj);
                     contactingInteractionBehaviours.Add(interactionObj, Time.fixedTime);
                 }
-                else if (contactingInteractionBehaviours.TryGetValue(interactionObj, out timeEntered) && Time.fixedTime - timeEntered > Time.fixedDeltaTime * 10f)
+                else if (contactingInteractionBehaviours.TryGetValue(interactionObj, out timeEntered) && Time.fixedTime - timeEntered > Time.fixedDeltaTime * 20f)
                 {
                     interactionController.NotifyContactBoneCollisionExit(this, interactionObj);
                     contactingInteractionBehaviours.Remove(interactionObj);
