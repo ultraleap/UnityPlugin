@@ -77,14 +77,14 @@ namespace Leap.Unity
 
         [Tooltip("Allow manual adjustment of the Leap device's virtual offset and tilt. These "
                + "settings can be used to match the physical position and orientation of the "
-               + "Leap Motion sensor on a tracked device it is mounted on (such as a VR "
+               + "Leap device on a tracked device it is mounted on (such as a VR "
                + "headset). ")]
         [SerializeField, OnEditorChange("deviceOffsetMode")]
         private DeviceOffsetMode _deviceOffsetMode;
         /// <summary>
         /// Allow manual adjustment of the Leap device's virtual offset and tilt. 
         /// These settings can be used to match the physical position and orientation of the
-        /// Leap Motion sensor on a tracked device it is mounted on (such as a VR headset)
+        /// Leap device on a tracked device it is mounted on (such as a VR headset)
         /// </summary>
         public DeviceOffsetMode deviceOffsetMode
         {
@@ -101,14 +101,14 @@ namespace Leap.Unity
             }
         }
 
-        [Tooltip("Adjusts the Leap Motion device's virtual height offset from the tracked "
+        [Tooltip("Adjusts the Leap device's virtual height offset from the tracked "
                + "headset position. This should match the vertical offset of the physical "
                + "device with respect to the headset in meters.")]
         [SerializeField]
         [Range(-0.50F, 0.50F)]
         private float _deviceOffsetYAxis = DEFAULT_DEVICE_OFFSET_Y_AXIS;
         /// <summary>
-        /// Adjusts the Leap Motion device's virtual height offset from the tracked 
+        /// Adjusts the Leap device's virtual height offset from the tracked 
         /// headset position. This should match the vertical offset of the physical device
         /// with respect to the headset in meters.
         /// </summary>
@@ -118,14 +118,14 @@ namespace Leap.Unity
             set { _deviceOffsetYAxis = value; }
         }
 
-        [Tooltip("Adjusts the Leap Motion device's virtual depth offset from the tracked "
+        [Tooltip("Adjusts the Leap device's virtual depth offset from the tracked "
                + "headset position. This should match the forward offset of the physical "
                + "device with respect to the headset in meters.")]
         [SerializeField]
         [Range(-0.50F, 0.50F)]
         private float _deviceOffsetZAxis = DEFAULT_DEVICE_OFFSET_Z_AXIS;
         /// <summary>
-        /// Adjusts the Leap Motion device's virtual depth offset from the tracked 
+        /// Adjusts the Leap device's virtual depth offset from the tracked 
         /// headset position. This should match the forward offset of the physical 
         /// device with respect to the headset in meters.
         /// </summary>
@@ -135,13 +135,13 @@ namespace Leap.Unity
             set { _deviceOffsetZAxis = value; }
         }
 
-        [Tooltip("Adjusts the Leap Motion device's virtual X axis tilt. This should match "
+        [Tooltip("Adjusts the Leap device's virtual X axis tilt. This should match "
                + "the tilt of the physical device with respect to the headset in degrees.")]
         [SerializeField]
         [Range(-90.0F, 90.0F)]
         private float _deviceTiltXAxis = DEFAULT_DEVICE_TILT_X_AXIS;
         /// <summary>
-        /// Adjusts the Leap Motion device's virtual X axis tilt. This should match 
+        /// Adjusts the Leap device's virtual X axis tilt. This should match 
         /// the tilt of the physical device with respect to the headset in degrees.
         /// </summary>
         public float deviceTiltXAxis

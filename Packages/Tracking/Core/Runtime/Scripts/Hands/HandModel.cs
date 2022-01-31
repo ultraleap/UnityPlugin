@@ -18,7 +18,7 @@ namespace Leap.Unity
     /// This class serves as the interface between the LeapProvider
     /// and the concrete hand object containing the graphics and physics of a hand.
     ///
-    /// Subclasses of HandModel must implement InitHand() and UpdateHand(). The UpdateHand()
+    /// The UpdateHand()
     /// function is called in the Unity Update() phase for graphics HandModel instances;
     /// and in the Unity FixedUpdate() phase for physics objects. InitHand() is called once,
     /// when the hand is created and is followed by a call to UpdateHand().

@@ -666,7 +666,6 @@ namespace Leap.Unity
         /// </summary>
         /// <returns>A float that can be used to compensate for latency when ensuring that our 
         /// hands are on the same timeline as Update.</returns>
-        /// <exception cref="System.InvalidOperationException"></exception>
         public float CalculatePhysicsExtrapolation()
         {
             switch (_physicsExtrapolation)

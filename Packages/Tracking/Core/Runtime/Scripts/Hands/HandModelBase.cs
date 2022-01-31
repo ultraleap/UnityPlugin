@@ -41,8 +41,7 @@ namespace Leap.Unity
         /// </summary>
         public event Action OnFinish;
         /// <summary> 
-        /// Called directly after the HandModelBase's UpdateHand() only if calling 
-        /// UpdateHandWithEvent() instead on UpdateHand() from UpdateBase().
+        /// Called when hand model is active and updated with new data.
         /// </summary>
         public event Action OnUpdate;
 
@@ -51,7 +50,7 @@ namespace Leap.Unity
         private bool isTracked = false;
         /// <summary>
         /// Reports whether the hand is detected and tracked in the current frame.
-        /// It should be true between the events OnBegin and OnFinish.
+        /// It is set to true after the event OnBegin and set to false after the event OnFinish
         /// </summary>
         public bool IsTracked
         {
@@ -68,7 +67,7 @@ namespace Leap.Unity
         public abstract ModelType HandModelType { get; }
         /// <summary>
         /// Implement this function to initialise this hand after it is created.
-        /// This function is called when a new hand is detected by the Leap Motion device.
+        /// This function is called when a new hand is detected by the Leap device.
         /// </summary>
         public virtual void InitHand() { }
         /// <summary>
@@ -116,7 +115,7 @@ namespace Leap.Unity
         /// <summary>
         /// Returns the Leap Hand object represented by this HandModelBase. 
         /// Note that any physical quantities and directions obtained from the Leap Hand object are 
-        /// relative to the Leap Motion coordinate system, which uses a right-handed axes and units 
+        /// relative to the Leap coordinate system, which uses a right-handed axes and units 
         /// of millimeters.
         /// </summary>
         /// <returns></returns>
