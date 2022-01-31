@@ -8,6 +8,7 @@
         "GUID:2ee0542102ac1084e8d9a910885c1e81"
     ],
     "includePlatforms": [
+        "Android",
         "Editor",
         "WindowsStandalone64"
     ],
