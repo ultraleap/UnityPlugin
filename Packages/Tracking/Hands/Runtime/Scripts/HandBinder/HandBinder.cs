@@ -108,11 +108,11 @@ namespace Leap.Unity.HandsModule
         /// </summary>
         public BoundHand BoundHand = new BoundHand();
         /// <summary> 
-        /// User defines offsets in editor script 
+        /// User defined offsets in editor script 
         /// </summary>
         public List<BoundTypes> Offsets = new List<BoundTypes>();
         /// <summary> 
-        /// Stores all the childrens default pose 
+        /// Stores all the children's default pose 
         /// </summary>
         public SerializedTransform[] DefaultHandPose;
 

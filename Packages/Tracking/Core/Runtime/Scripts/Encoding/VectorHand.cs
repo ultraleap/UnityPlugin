@@ -477,9 +477,9 @@ namespace Leap.Unity.Encoding
         }
 
         /// <summary> 
-        /// Fills the ref-argument VectorHand with interpolated data
-        /// between the two other VectorHands, by t (unclamped), and return true.
-        /// If either a or b is null, the ref-argument VectorHand is also set to
+        /// Fills the VectorHand with interpolated data
+        /// between the two argument VectorHands, by t (unclamped), and return true.
+        /// If either a or b is null, the resulting VectorHand is also set to
         /// null, and the method returns false.
         /// An exception is thrown if the interpolation arguments a and b don't
         /// have the same chirality.
@@ -504,9 +504,9 @@ namespace Leap.Unity.Encoding
         }
 
         /// <summary> 
-        /// Fills the ref-argument VectorHand with interpolated data
-        /// between the 4 other VectorHands, by t (unclamped), and return true.
-        /// If either a, b, c or d is null, the ref-argument VectorHand is also set to
+        /// Fills the VectorHand with interpolated data
+        /// between the 4 argument VectorHands, by t (unclamped), and return true.
+        /// If either a, b, c or d is null, the resulting VectorHand is also set to
         /// null, and the method returns false.
         /// An exception is thrown if the interpolation arguments a and b don't
         /// have the same chirality.
