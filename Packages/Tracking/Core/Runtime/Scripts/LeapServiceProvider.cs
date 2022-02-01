@@ -99,7 +99,7 @@ namespace Leap.Unity
         public enum FrameOptimizationMode
         {
             /// <summary>
-            /// By default the mode is set to None, this implies that we want to use hand tracking in time with Unity’s Update loop.
+            /// By default the mode is set to None, this implies that we want to use hand tracking in time with Unity's Update loop.
             /// </summary>
             None,
             /// <summary>
