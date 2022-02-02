@@ -303,7 +303,7 @@ namespace Leap.Unity
         private Pose? _trackingBaseDeltaPose = null;
 
         /// <summary>
-        /// Contains the timestamp of the most recent tracked frame.
+        /// Contains the Frame.Timestamp of the most recent tracked frame.
         /// It is used for Image warping if the temporalWarpingMode is set to 
         /// Auto, Manual or Images
         /// </summary>
