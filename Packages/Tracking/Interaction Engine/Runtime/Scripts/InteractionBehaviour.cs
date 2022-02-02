@@ -20,7 +20,7 @@ namespace Leap.Unity.Interaction
     /// <summary>
     /// Determines how much force an interaction controller should apply to this object. 
     /// </summary>
-    public enum ContactForceMode 
+    public enum ContactForceMode
     {
         /// <summary>
         /// For normal physical objects, you'll almost always want to use Object.

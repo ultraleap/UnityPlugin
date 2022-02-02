@@ -112,10 +112,10 @@ namespace Leap.Unity
             /// </summary>
             ReusePhysicsForUpdate,
         }
-        [Tooltip("When enabled, the provider will reuse some hand data:\n" 
-            + "None - By default the mode is set to None, which implies that we want to use hand tracking in time with Unity's Update loop.\n" 
+        [Tooltip("When enabled, the provider will reuse some hand data:\n"
+            + "None - By default the mode is set to None, which implies that we want to use hand tracking in time with Unity's Update loop.\n"
             + "ReuseUpdateForPhysics - Android users should choose Reuse Update for Physics.\n"
-            + "ReusePhysicsForUpdate - Provides the option to reinterpolate the hand data for the physics timestep, improving the movement of objects being " 
+            + "ReusePhysicsForUpdate - Provides the option to reinterpolate the hand data for the physics timestep, improving the movement of objects being "
             + "manipulated by hands when using the interaction engine. Enabling this incurs a small time penalty (fraction of a ms).")]
         [SerializeField]
         protected FrameOptimizationMode _frameOptimization = FrameOptimizationMode.None;
