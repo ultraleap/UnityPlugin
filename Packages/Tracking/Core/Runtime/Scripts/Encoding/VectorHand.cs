@@ -135,8 +135,7 @@ namespace Leap.Unity.Encoding
         }
 
         /// <summary>
-        /// Offset between the palm position and the wrist position
-        /// When multiplied to the palm position, the result should be the wrist position
+        /// Offset between the palm pose and the wrist position
         /// </summary>
         public static Vector3 tweakWristPosition = new Vector3(0f, -0.015f, -0.065f);
 
