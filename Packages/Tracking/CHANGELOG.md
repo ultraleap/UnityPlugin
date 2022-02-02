@@ -9,7 +9,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [5.3.0]
 
 ### Added
-- A new example scene that demonstrate the detection utility scripts
 
 ### Changed
 - Clear devices list on disconnect of service Connection.cs
