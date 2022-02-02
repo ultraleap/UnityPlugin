@@ -132,6 +132,9 @@ namespace Leap.Unity.Interaction
         /// </summary>
         private Hand _hand;
 
+
+        [Obsolete("This is unused", false)]
+        public Transform headTransform;
         #endregion
 
         #region Unity Events

@@ -63,7 +63,7 @@ namespace Leap.Unity.Interaction.Internal
             }
         }
 
-        public void FixedUpdateClassifierHandState()
+        public void FixedUpdateClassifierHandState(Transform headTransform = null)
         {
             using (new ProfilerSample("Update Classifier Hand State"))
             {
