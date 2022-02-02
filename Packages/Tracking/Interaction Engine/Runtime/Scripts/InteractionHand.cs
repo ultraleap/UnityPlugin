@@ -877,7 +877,7 @@ namespace Leap.Unity.Interaction
         protected override void fixedUpdateGraspingState()
         {
             //Feed Camera Transform in for Projective Grabbing Hack (details inside)
-            grabClassifier.FixedUpdateClassifierHandState();
+            grabClassifier.FixedUpdateClassifierHandState(headTransform);
         }
 
         protected override void onGraspedObjectForciblyReleased(IInteractionBehaviour objectToBeReleased)
