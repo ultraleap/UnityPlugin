@@ -26,6 +26,18 @@ namespace Leap.Unity.Examples
         float logoSize = 15;
         Color32 highlightColor = new Color32(0, 235, 133, 255);
 
+        Rect urlRect;
+        Rect logoRect;
+
+        Texture2D background;
+
+        void Awake()
+        {
+            urlRect = new Rect();
+            logoRect = new Rect();
+            background = new Texture2D(0, 0);
+        }
+
         /// <summary>
         /// Draw GUI to the screen
         /// </summary>
@@ -47,7 +59,6 @@ namespace Leap.Unity.Examples
         /// <param name="skin"></param>
         void AdjustSkin(GUISkin skin)
         {
-            Texture2D background = new Texture2D(0, 0);
             skin.button.normal.background = background;
             skin.button.hover.background = background;
             skin.button.hover.textColor = highlightColor;
@@ -87,12 +98,14 @@ namespace Leap.Unity.Examples
             if (dif >= 0)
             {
                 skin.button.fontSize = Screen.height / fontSize;
-                return new Rect(0, 0, Screen.width, Screen.height / (fontSize / 2));
+                urlRect.Set(0, 0, Screen.width, Screen.height / (fontSize / 2));
+                return urlRect;
             }
             else
             {
                 skin.button.fontSize = Screen.width / fontSize;
-                return new Rect(0, 0, Screen.width - Screen.height / fontSize, Screen.height / (fontSize / 2));
+                urlRect.Set(0, 0, Screen.width - Screen.height / fontSize, Screen.height / (fontSize / 2));
+                return urlRect;
             }
         }
 
@@ -105,12 +118,14 @@ namespace Leap.Unity.Examples
             var dif = Screen.width - Screen.height;
             if (dif >= 0)
             {
-                return new Rect((Screen.width - Screen.width / logoSize), 0, Screen.width / logoSize, Screen.width / logoSize);
+                logoRect.Set((Screen.width - Screen.width / logoSize), 0, Screen.width / logoSize, Screen.width / logoSize);
+                return logoRect;
 
             }
             else
             {
-                return new Rect((Screen.width - Screen.height / logoSize), 0, Screen.height / logoSize, Screen.height / logoSize);
+                logoRect.Set((Screen.width - Screen.height / logoSize), 0, Screen.height / logoSize, Screen.height / logoSize);
+                return logoRect;
             }
         }
     }
