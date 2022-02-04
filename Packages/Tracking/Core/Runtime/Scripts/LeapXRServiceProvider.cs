@@ -644,16 +644,16 @@ namespace Leap.Unity
                 warpedRotation = currentPose.rotation;
             }
             //Calculate a Temporally Warped Pose
-            else if (updateTemporalCompensation && transformHistory.history.IsFull)
+            else if (updateTemporalCompensation)
             {
-#if SVR
-                if (_xr2TimewarpMode == TimewarpMode.Default && transformHistory.history.IsFull)
+                void DefaultTimeWarping()
                 {
                     var imageAdjustment = _temporalWarpingMode == TemporalWarpingMode.Images ? -20000 : 0;
                     var sampleTimestamp = timestamp - (long)(warpingAdjustment * 1000f) - imageAdjustment;
                     transformHistory.SampleTransform(sampleTimestamp, out warpedPosition, out warpedRotation);
                 }
-                else if (_xr2TimewarpMode == TimewarpMode.Experimental_XR2)
+#if SVR
+                void ExperimentalXR2TimeWarping()
                 {
                     // Get the predicted display time for the current frame in milliseconds, then get the predicted head pose
                     float predictedDisplayTime_ms = SxrShim.GetPredictedDisplayTime(SystemInfo.graphicsMultiThreaded);
@@ -666,13 +666,17 @@ namespace Leap.Unity
                     warpedPosition.z = predictedWarpedPosition.z;
                     warpedRotation = predictedWarpedRotation;
                 }
-#else
-                if (transformHistory.history.IsFull)
+
+                switch(_xr2TimeWarpMode)
                 {
-                    var imageAdjustment = _temporalWarpingMode == TemporalWarpingMode.Images ? -20000 : 0;
-                    var sampleTimestamp = timestamp - (long)(warpingAdjustment * 1000f) - imageAdjustment;
-                    transformHistory.SampleTransform(sampleTimestamp, out warpedPosition, out warpedRotation);
-                }
+                    case TimewarpMode.Default:
+                        DefaultTimeWarping();
+                        break;
+                    case TimewarpMode.Experimental_XR2:
+                        ExperimentalXR2TimeWarping();
+                        break;
+#else
+                DefaultTimeWarping();
 #endif
             }
 
