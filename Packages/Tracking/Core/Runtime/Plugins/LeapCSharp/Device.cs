@@ -41,22 +41,23 @@ namespace Leap
         public Device() { }
 
         public Device(IntPtr deviceHandle,
-                       IntPtr internalHandle,
-                       float horizontalViewAngle,
-                       float verticalViewAngle,
-                       float range,
-                       float baseline,
-                       DeviceType type,
-                       uint status,
-                       string serialNumber)
+                  IntPtr internalHandle,
+                  float horizontalViewAngle,
+                  float verticalViewAngle,
+                  float range,
+                  float baseline,
+                  DeviceType type,
+                  bool isStreaming,
+                  uint status,
+                  string serialNumber)
         {
             Handle = deviceHandle;
             InternalHandle = internalHandle;
             HorizontalViewAngle = horizontalViewAngle;
-            VerticalViewAngle = verticalViewAngle;
             Range = range;
             Baseline = baseline;
             Type = type;
+            IsStreaming = isStreaming;
             SerialNumber = serialNumber;
             UpdateStatus((eLeapDeviceStatus)status);
         }
