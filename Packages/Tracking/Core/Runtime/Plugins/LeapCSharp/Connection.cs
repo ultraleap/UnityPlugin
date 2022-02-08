@@ -913,7 +913,7 @@ namespace LeapInternal
                 eLeapRS result = LeapC.GetConnectionInfo(_leapConnection, ref pInfo);
                 reportAbnormalResults("LeapC GetConnectionInfo call was ", result);
 
-                if (pInfo.status == eLeapConnectionStatus.eLeapConnectionStatus_Connected)
+                if (pInfo.status == eLeapConnectionStatus.Connected)
                     return true;
 
                 return false;
