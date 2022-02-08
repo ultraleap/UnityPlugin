@@ -26,15 +26,10 @@ namespace Leap.Unity.Examples
         float logoSize = 15;
         Color32 highlightColor = new Color32(0, 235, 133, 255);
 
-        Rect urlRect;
-        Rect logoRect;
-
         Texture2D background;
 
         void Awake()
         {
-            urlRect = new Rect();
-            logoRect = new Rect();
             background = new Texture2D(0, 0);
         }
 
@@ -98,14 +93,12 @@ namespace Leap.Unity.Examples
             if (dif >= 0)
             {
                 skin.button.fontSize = Screen.height / fontSize;
-                urlRect.Set(0, 0, Screen.width, Screen.height / (fontSize / 2));
-                return urlRect;
+                return new Rect(0, 0, Screen.width, Screen.height / (fontSize / 2));
             }
             else
             {
                 skin.button.fontSize = Screen.width / fontSize;
-                urlRect.Set(0, 0, Screen.width - Screen.height / fontSize, Screen.height / (fontSize / 2));
-                return urlRect;
+                return new Rect(0, 0, Screen.width - Screen.height / fontSize, Screen.height / (fontSize / 2));
             }
         }
 
@@ -118,14 +111,12 @@ namespace Leap.Unity.Examples
             var dif = Screen.width - Screen.height;
             if (dif >= 0)
             {
-                logoRect.Set((Screen.width - Screen.width / logoSize), 0, Screen.width / logoSize, Screen.width / logoSize);
-                return logoRect;
+                return new Rect((Screen.width - Screen.width / logoSize), 0, Screen.width / logoSize, Screen.width / logoSize);
 
             }
             else
             {
-                logoRect.Set((Screen.width - Screen.height / logoSize), 0, Screen.height / logoSize, Screen.height / logoSize);
-                return logoRect;
+                return new Rect((Screen.width - Screen.height / logoSize), 0, Screen.height / logoSize, Screen.height / logoSize);
             }
         }
     }
