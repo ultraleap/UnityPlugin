@@ -1,0 +1,30 @@
+{
+    "name": "Ultraleap.Tracking.Core",
+    "rootNamespace": "",
+    "references": [
+        "GUID:2ee0542102ac1084e8d9a910885c1e81",
+        "GUID:ba171b3dd2a51234ab864770f99741a5",
+        "GUID:5e7012d466e434045ac4e3a510836ec0",
+        "GUID:e40ba710768534012815d3193fa296cb"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": true,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [
+        {
+            "name": "com.unity.xr.legacyinputhelpers",
+            "expression": "1.0",
+            "define": "XR_LEGACY_INPUT_AVAILABLE"
+        },
+        {
+            "name": "com.unity.xr.management",
+            "expression": "1.0",
+            "define": "XR_MANAGEMENT_AVAILABLE"
+        }
+    ],
+    "noEngineReferences": false
+}

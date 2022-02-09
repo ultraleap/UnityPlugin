@@ -1,1 +1,0 @@
-This Unity Asset is dependent on Leap Motion tracking and the Leap Motion Controller which can be installed from: https://developer.leapmotion.com/

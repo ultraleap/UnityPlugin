@@ -1,0 +1,23 @@
+{
+    "name": "Ultraleap.Tracking.OpenXR",
+    "rootNamespace": "Ultraleap.Tracking.OpenXR",
+    "references": [
+        "GUID:4847341ff46394e83bb78fbd0652937e",
+        "GUID:96aa6ba065960476598f8f643e7252b6",
+        "GUID:cec9848704c49724192ff47f9b3e9156",
+        "GUID:2ee0542102ac1084e8d9a910885c1e81"
+    ],
+    "includePlatforms": [
+        "Android",
+        "Editor",
+        "WindowsStandalone64"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
