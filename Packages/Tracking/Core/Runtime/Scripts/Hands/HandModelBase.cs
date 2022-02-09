@@ -144,23 +144,23 @@ namespace Leap.Unity
         /// If no provider is found this gameobject will disable itself.
         /// </summary>
 
-        public LeapProvider LeapProvider
+        public LeapProvider leapProvider
         {
             get { return _leapProvider; }
             set
             {
                 if (_leapProvider != null && Application.isPlaying)
                 {
-                    LeapProvider.OnUpdateFrame -= UpdateFrame;
-                    LeapProvider.OnFixedFrame -= FixedUpdateFrame;
+                    leapProvider.OnUpdateFrame -= UpdateFrame;
+                    leapProvider.OnFixedFrame -= FixedUpdateFrame;
                 }
 
                 _leapProvider = value;
 
                 if (_leapProvider != null && Application.isPlaying)
                 {
-                    LeapProvider.OnUpdateFrame += UpdateFrame;
-                    LeapProvider.OnFixedFrame += FixedUpdateFrame;
+                    leapProvider.OnUpdateFrame += UpdateFrame;
+                    leapProvider.OnFixedFrame += FixedUpdateFrame;
                 }
             }
         }
@@ -174,12 +174,12 @@ namespace Leap.Unity
 
             init = false;
 
-            if (LeapProvider == null)
+            if (leapProvider == null)
             {
                 //Try to set the provider for the user
-                LeapProvider = Hands.Provider;
+                leapProvider = Hands.Provider;
 
-                if (LeapProvider == null)
+                if (leapProvider == null)
                 {
                     Debug.LogError("No leap provider found in the scene, hand model has been disabled", this.gameObject);
                     this.enabled = false;
@@ -190,31 +190,31 @@ namespace Leap.Unity
 
             if (HandModelType == ModelType.Graphics)
             {
-                LeapProvider.OnUpdateFrame -= UpdateFrame;
-                LeapProvider.OnUpdateFrame += UpdateFrame;
+                leapProvider.OnUpdateFrame -= UpdateFrame;
+                leapProvider.OnUpdateFrame += UpdateFrame;
             }
 
             else
             {
-                LeapProvider.OnFixedFrame -= FixedUpdateFrame;
-                LeapProvider.OnFixedFrame += FixedUpdateFrame;
+                leapProvider.OnFixedFrame -= FixedUpdateFrame;
+                leapProvider.OnFixedFrame += FixedUpdateFrame;
             }
 
         }
 
         private void OnDestroy()
         {
-            if (LeapProvider == null) { return; }
+            if (leapProvider == null) { return; }
 
-            LeapProvider.OnUpdateFrame -= UpdateFrame;
-            LeapProvider.OnFixedFrame -= FixedUpdateFrame;
+            leapProvider.OnUpdateFrame -= UpdateFrame;
+            leapProvider.OnFixedFrame -= FixedUpdateFrame;
         }
 
         void UpdateFrame(Frame frame)
         {
             if (this == null)
             {
-                LeapProvider.OnUpdateFrame -= UpdateFrame;
+                leapProvider.OnUpdateFrame -= UpdateFrame;
                 return;
             }
 
