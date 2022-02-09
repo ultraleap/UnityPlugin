@@ -891,14 +891,16 @@ namespace Leap.Unity
 
             if (_multipleDeviceMode == MultipleDeviceMode.All)
             {
-                _onDeviceSafe += (d) => {
+                _onDeviceSafe += (d) =>
+                {
                     Debug.Log("Connecting to Device with Serial: " + d.SerialNumber);
                     _leapController.SubscribeToDeviceEvents(d);
                 };
             }
             else if (_multipleDeviceMode == MultipleDeviceMode.Specific)
             {
-                _onDeviceSafe += (d) => {
+                _onDeviceSafe += (d) =>
+                {
                     int DeviceID = 0;
                     _numDevicesSeen++;
                     if ((int.TryParse(_specificSerialNumber, out DeviceID) &&
