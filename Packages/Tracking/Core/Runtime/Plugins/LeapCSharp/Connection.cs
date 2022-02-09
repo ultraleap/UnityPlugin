@@ -51,10 +51,6 @@ namespace LeapInternal
         private static long _handPositionOffset;
         private static long _handOrientationOffset;
 
-        private UInt64 _policiesSetBeforeConnection = 0;
-        private UInt64 _policiesClearedBeforeConnection = 0;
-        private bool _connected = false;
-
         static Connection()
         {
             _handIdOffset = Marshal.OffsetOf(typeof(LEAP_HAND), "id").ToInt64();
@@ -273,14 +269,6 @@ namespace LeapInternal
                     {
                         reportAbnormalResults("LeapC PollConnection call was ", result);
                         continue;
-                    }
-
-                    if (!_connected)
-                    {
-                        // Set cached policy flags that came in too early.
-                        LeapC.SetPolicyFlags(_leapConnection, _policiesSetBeforeConnection, _policiesClearedBeforeConnection);
-
-                        _connected = true;
                     }
 
                     if (LeapBeginProfilingBlock != null && hasBegunProfilingForThread)
@@ -805,23 +793,15 @@ namespace LeapInternal
         public void SetPolicy(Controller.PolicyFlag policy)
         {
             UInt64 setFlags = (ulong)FlagForPolicy(policy);
-            _policiesSetBeforeConnection |= setFlags;
-            if (_connected)
-            {
-                eLeapRS result = LeapC.SetPolicyFlags(_leapConnection, setFlags, 0);
-                reportAbnormalResults("LeapC SetPolicyFlags call was ", result);
-            }
+            eLeapRS result = LeapC.SetPolicyFlags(_leapConnection, setFlags, 0);
+            reportAbnormalResults("LeapC SetPolicyFlags call was ", result);
         }
 
         public void ClearPolicy(Controller.PolicyFlag policy)
         {
             UInt64 clearFlags = (ulong)FlagForPolicy(policy);
-            _policiesClearedBeforeConnection |= clearFlags;
-            if (_connected)
-            {
-                eLeapRS result = LeapC.SetPolicyFlags(_leapConnection, 0, clearFlags);
-                reportAbnormalResults("LeapC SetPolicyFlags call was ", result);
-            }
+            eLeapRS result = LeapC.SetPolicyFlags(_leapConnection, 0, clearFlags);
+            reportAbnormalResults("LeapC SetPolicyFlags call was ", result);
         }
 
         static public eLeapPolicyFlag FlagForPolicy(Controller.PolicyFlag singlePolicy)
