@@ -135,16 +135,36 @@ namespace Leap.Unity
             return false;
         }
 
+        [Tooltip("Optionally set a Leap Provider to use for tracking frames, If you do not set one, the first provider found in the scene will be used. If no provider is found this gameobject will disable itself")]
+        [SerializeField]
+        private LeapProvider _leapProvider;
+
         /// <summary>
         /// Optionally set a Leap Provider to use for tracking frames.
         /// If you do not set one, the first provider found in the scene will be used.
         /// If no provider is found this gameobject will disable itself.
         /// </summary>
-        [Tooltip("Optionally set a Leap Provider to use for tracking frames  \n" +
-        "If you do not set one, the first provider found in the scene will be used. \n" +
-        "If no provider is found this gameobject will disable itself")]
-        public LeapProvider leapProvider;
 
+        public LeapProvider LeapProvider
+        {
+            get { return _leapProvider; }
+            set
+            {
+                if (_leapProvider != null && Application.isPlaying)
+                {
+                    LeapProvider.OnUpdateFrame -= UpdateFrame;
+                    LeapProvider.OnFixedFrame -= FixedUpdateFrame;
+                }
+
+                _leapProvider = value;
+
+                if (_leapProvider != null && Application.isPlaying)
+                {
+                    LeapProvider.OnUpdateFrame += UpdateFrame;
+                    LeapProvider.OnFixedFrame += FixedUpdateFrame;
+                }
+            }
+        }
 
         private void Awake()
         {
@@ -155,12 +175,12 @@ namespace Leap.Unity
 
             init = false;
 
-            if (leapProvider == null)
+            if (LeapProvider == null)
             {
                 //Try to set the provider for the user
-                leapProvider = Hands.Provider;
+                LeapProvider = Hands.Provider;
 
-                if (leapProvider == null)
+                if (LeapProvider == null)
                 {
                     Debug.LogError("No leap provider found in the scene, hand model has been disabled", this.gameObject);
                     this.enabled = false;
@@ -171,31 +191,31 @@ namespace Leap.Unity
 
             if (HandModelType == ModelType.Graphics)
             {
-                leapProvider.OnUpdateFrame -= UpdateFrame;
-                leapProvider.OnUpdateFrame += UpdateFrame;
+                LeapProvider.OnUpdateFrame -= UpdateFrame;
+                LeapProvider.OnUpdateFrame += UpdateFrame;
             }
 
             else
             {
-                leapProvider.OnFixedFrame -= FixedUpdateFrame;
-                leapProvider.OnFixedFrame += FixedUpdateFrame;
+                LeapProvider.OnFixedFrame -= FixedUpdateFrame;
+                LeapProvider.OnFixedFrame += FixedUpdateFrame;
             }
 
         }
 
         private void OnDestroy()
         {
-            if (leapProvider == null) { return; }
+            if (LeapProvider == null) { return; }
 
-            leapProvider.OnUpdateFrame -= UpdateFrame;
-            leapProvider.OnFixedFrame -= FixedUpdateFrame;
+            LeapProvider.OnUpdateFrame -= UpdateFrame;
+            LeapProvider.OnFixedFrame -= FixedUpdateFrame;
         }
 
         void UpdateFrame(Frame frame)
         {
             if (this == null)
             {
-                leapProvider.OnUpdateFrame -= UpdateFrame;
+                LeapProvider.OnUpdateFrame -= UpdateFrame;
                 return;
             }
 

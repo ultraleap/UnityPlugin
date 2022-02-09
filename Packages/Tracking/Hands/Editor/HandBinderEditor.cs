@@ -66,7 +66,7 @@ namespace Leap.Unity.HandsModule
             debugOptions = serializedObject.FindProperty("DebugOptions");
             boundHand = serializedObject.FindProperty("BoundHand");
             offsets = serializedObject.FindProperty("Offsets");
-            leapProvider = serializedObject.FindProperty("leapProvider");
+            leapProvider = serializedObject.FindProperty("_leapProvider");
 
 
             dividerLine = Resources.Load<Texture>("EditorDividerLine");
