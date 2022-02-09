@@ -516,7 +516,7 @@ namespace LeapInternal
         }
         private void handleDeviceStatusEvent(ref LEAP_DEVICE_STATUS_CHANGE_EVENT statusEvent)
         {
-            var device = _devices.FindDeviceByHandle(statusEvent.device.handle);
+            var device = _devices.FindDeviceByHandle(statusEvent.device.connectionHandle);
             if (device == null)
             {
                 return;
@@ -528,7 +528,7 @@ namespace LeapInternal
 
         private void handleDevice(ref LEAP_DEVICE_EVENT deviceMsg)
         {
-            IntPtr deviceHandle = deviceMsg.device.handle;
+            IntPtr deviceHandle = deviceMsg.device.connectionHandle;
             if (deviceHandle == IntPtr.Zero)
                 return;
 
@@ -789,20 +789,18 @@ namespace LeapInternal
             _activePolicies = policyMsg.current_policy;
         }
 
-        public void SetAndClearPolicy(Controller.PolicyFlag set, Controller.PolicyFlag clear)
+        public void SetAndClearPolicy(Controller.PolicyFlag set, Controller.PolicyFlag clear, string deviceSerial)
         {
             UInt64 setFlags = (ulong)FlagForPolicy(set);
             UInt64 clearFlags = (ulong)FlagForPolicy(clear);
-            eLeapRS result = LeapC.SetPolicyFlags(_leapConnection, setFlags, clearFlags);
+            eLeapRS result = LeapC.SetPolicyFlags(_leapConnection, setFlags, clearFlags, deviceSerial);
             reportAbnormalResults("LeapC SetAndClearPolicy call was ", result);
         }
 
         public void SetPolicy(Controller.PolicyFlag policy, string deviceSerial)
         {
             UInt64 setFlags = (ulong)FlagForPolicy(policy);
-            eLeapRS result = LeapC.SetPolicyFlags(_leapConnection, setFlags,
-                    clearFlags, deviceSerial);
-
+            eLeapRS result = LeapC.SetPolicyFlags(_leapConnection, setFlags, 0, deviceSerial);
             reportAbnormalResults("LeapC SetPolicyFlags call was ", result);
         }
 

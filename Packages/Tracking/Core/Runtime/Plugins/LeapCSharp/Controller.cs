@@ -509,9 +509,9 @@ namespace Leap
         /// the change was accepted. 
         /// @since 2.1.6 
         /// </summary>
-        public void SetAndClearPolicy(PolicyFlag set, PolicyFlag clear)
+        public void SetAndClearPolicy(PolicyFlag set, PolicyFlag clear, string deviceSerial = "")
         {
-            _connection.SetAndClearPolicy(set, clear);
+            _connection.SetAndClearPolicy(set, clear, deviceSerial);
         }
         public void SetPolicy(PolicyFlag policy)
         {
