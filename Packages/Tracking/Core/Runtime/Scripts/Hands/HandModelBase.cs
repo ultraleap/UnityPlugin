@@ -87,10 +87,9 @@ namespace Leap.Unity
         /// OnUpdateFrame (graphics hand) or OnFixedFrame (physics hand)
         /// </summary>
         public abstract void UpdateHand();
+
         /// <summary>
         /// Calls UpdateHand() and calls the event OnUpdate.
-        /// To call this function once per frame, adjust UpdateBase() to call
-        /// UpdateHandWithEvent() instead of UpdateHand().
         /// </summary>
         public void UpdateHandWithEvent()
         {
@@ -255,7 +254,7 @@ namespace Leap.Unity
 
                 if (gameObject.activeInHierarchy)
                 {
-                    UpdateHand();
+                    UpdateHandWithEvent();
                 }
             }
         }
