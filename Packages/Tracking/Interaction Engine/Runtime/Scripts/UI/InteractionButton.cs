@@ -294,7 +294,7 @@ namespace Leap.Unity.Interaction
                 _physicsOccurred = false;
 
                 // Record and enforce the sliding state from the previous frame.
-                if (this.primaryHoverDistance < 0.005f || isGrasped)
+                if (this.primaryHoverDistance < 0.005f || isGrasped || isPressed)
                 {
                     localPhysicsPosition
                       = constrainDepressedLocalPosition(
