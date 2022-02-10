@@ -177,7 +177,7 @@ namespace Leap.Unity
         {
             get
             {
-                if(_mainCamera != null)
+                if (_mainCamera != null)
                 {
                     if (_mainCamera != MainCameraProvider.mainCamera)
                     {
