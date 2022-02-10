@@ -177,11 +177,18 @@ namespace Leap.Unity
         {
             get
             {
-                return MainCameraProvider.mainCamera;
+                if(_mainCamera != null)
+                {
+                    if (_mainCamera != MainCameraProvider.mainCamera)
+                    {
+                        MainCameraProvider.mainCamera = _mainCamera;
+                    }
+                }
+
+                return _mainCamera;
             }
             set
             {
-                // Not everything accesses the main camera via the property, so to be safe we also set the backing field
                 _mainCamera = value;
                 MainCameraProvider.mainCamera = value;
             }
@@ -320,8 +327,8 @@ namespace Leap.Unity
             editTimePose = TestHandFactory.TestHandPose.HeadMountedB;
 
             _interactionVolumeVisualization = InteractionVolumeVisualization.Automatic;
-            _mainCamera = MainCameraProvider.mainCamera;
-            if (_mainCamera != null)
+            mainCamera = MainCameraProvider.mainCamera;
+            if (mainCamera != null)
             {
                 Debug.Log("Camera.Main automatically assigned");
             }
@@ -338,15 +345,15 @@ namespace Leap.Unity
 
             // Assign the main camera if it looks like one is available and it's not yet been set on the backing field
             // NB this may be the case if the provider is created via AddComponent, as in MRTK
-            if (_mainCamera == null && MainCameraProvider.mainCamera != null)
+            if (mainCamera == null && MainCameraProvider.mainCamera != null)
             {
-                _mainCamera = MainCameraProvider.mainCamera;
+                mainCamera = MainCameraProvider.mainCamera;
             }
 
 #if XR_LEGACY_INPUT_AVAILABLE
-            if (_mainCamera.GetComponent<UnityEngine.SpatialTracking.TrackedPoseDriver>() == null) 
-			{
-                _mainCamera.gameObject.AddComponent<UnityEngine.SpatialTracking.TrackedPoseDriver>().UseRelativeTransform = true;
+            if (mainCamera.GetComponent<UnityEngine.SpatialTracking.TrackedPoseDriver>() == null)
+            {
+                mainCamera.gameObject.AddComponent<UnityEngine.SpatialTracking.TrackedPoseDriver>().UseRelativeTransform = true;
             }
 #endif
 
@@ -404,7 +411,7 @@ namespace Leap.Unity
                 _deviceOffsetMode = DeviceOffsetMode.Default;
             }
 
-            if (Application.isPlaying && _mainCamera == null && _temporalWarpingMode != TemporalWarpingMode.Off)
+            if (Application.isPlaying && mainCamera == null && _temporalWarpingMode != TemporalWarpingMode.Off)
             {
                 Debug.LogError("Cannot perform temporal warping with no pre-cull camera.");
             }
@@ -415,7 +422,7 @@ namespace Leap.Unity
             //Find the pose delta from the "local" tracked pose to the actual camera pose, we will use this later on to maintain offsets
             if (!_trackingBaseDeltaPose.HasValue)
             {
-                _trackingBaseDeltaPose = _mainCamera.transform.ToLocalPose().mul(trackedPose.inverse());
+                _trackingBaseDeltaPose = mainCamera.transform.ToLocalPose().mul(trackedPose.inverse());
             }
         }
 
@@ -431,8 +438,8 @@ namespace Leap.Unity
 
         void LateUpdate()
         {
-            var projectionMatrix = _mainCamera == null ? Matrix4x4.identity
-              : _mainCamera.projectionMatrix;
+            var projectionMatrix = mainCamera == null ? Matrix4x4.identity
+              : mainCamera.projectionMatrix;
             switch (SystemInfo.graphicsDeviceType)
             {
 #if !UNITY_2017_2_OR_NEWER
@@ -492,7 +499,7 @@ namespace Leap.Unity
         protected virtual void onPreCull(Camera preCullingCamera)
         {
 
-            if (preCullingCamera != _mainCamera)
+            if (preCullingCamera != mainCamera)
             {
                 return;
             }
@@ -505,7 +512,7 @@ namespace Leap.Unity
 
 #endif
 
-            if (_mainCamera == null || _leapController == null)
+            if (mainCamera == null || _leapController == null)
             {
                 if (_temporalWarpingMode == TemporalWarpingMode.Auto || _temporalWarpingMode == TemporalWarpingMode.Manual)
                 {
@@ -537,7 +544,7 @@ namespace Leap.Unity
 
             transformHistory.UpdateDelay(trackedPose, _leapController.Now());
 
-            OnPreCullHandTransforms(_mainCamera);
+            OnPreCullHandTransforms(mainCamera);
         }
 
         #endregion
@@ -619,7 +626,7 @@ namespace Leap.Unity
 
         protected virtual LeapTransform GetWarpedMatrix(long timestamp, bool updateTemporalCompensation = true)
         {
-            if (_mainCamera == null || this == null)
+            if (mainCamera == null || this == null)
             {
                 return LeapTransform.Identity;
             }
@@ -699,12 +706,12 @@ namespace Leap.Unity
 
 
 #if !SVR
-            // Use the _mainCamera parent to transfrom the warped positions so the player can move around
-            if (_mainCamera.transform.parent != null)
+            // Use the mainCamera parent to transfrom the warped positions so the player can move around
+            if (mainCamera.transform.parent != null)
             {
                 leapTransform = new LeapTransform(
-                  _mainCamera.transform.parent.TransformPoint(warpedPosition).ToVector(),
-                  _mainCamera.transform.parent.TransformRotation(warpedRotation).ToLeapQuaternion(),
+                  mainCamera.transform.parent.TransformPoint(warpedPosition).ToVector(),
+                  mainCamera.transform.parent.TransformRotation(warpedRotation).ToLeapQuaternion(),
                   Vector.Ones * 1e-3f
                 );
             }
@@ -739,7 +746,7 @@ namespace Leap.Unity
                 //Don't update pre cull for preview, reflection, or scene view cameras
                 if (camera == null)
                 {
-                    camera = _mainCamera;
+                    camera = mainCamera;
                 }
 
                 switch (camera.cameraType)
