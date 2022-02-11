@@ -159,7 +159,7 @@ namespace Leap.Unity.Interaction
                     {
                         interactionController.NotifyContactBoneCollisionEnter(this, interactionObj);
                         contactingInteractionBehaviours.Add(interactionObj, Time.fixedTime);
-                    }            
+                    }
                 }
             }
         }
