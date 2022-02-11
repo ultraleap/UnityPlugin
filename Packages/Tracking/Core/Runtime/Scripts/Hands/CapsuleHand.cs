@@ -163,6 +163,40 @@ namespace Leap.Unity
             }
         }
 
+        /// <summary>
+        /// The colour of the Capsule Hand's spheres.
+        /// </summary>
+        public Color SphereColour
+        {
+            get
+            {
+                return _sphereColor;
+            }
+        }
+
+        /// <summary>
+        /// The colour of the Capsule Hand's cylinders.
+        /// </summary>
+        public Color CylinderColour
+        {
+            get
+            {
+                return _cylinderColor;
+            }
+        }
+
+        /// <summary>
+        /// In-code alternative to the editor properties for setting custom sphere/cylinder colours.
+        /// </summary>
+        /// <param name="sphere"></param>
+        /// <param name="cylinder"></param>
+        public void SetCustomColours(Color sphere, Color cylinder)
+        {
+            _useCustomColors = true;
+            _sphereColor = sphere;
+            _cylinderColor = cylinder;
+        }
+
 #if UNITY_EDITOR
         private void OnValidate()
         {
