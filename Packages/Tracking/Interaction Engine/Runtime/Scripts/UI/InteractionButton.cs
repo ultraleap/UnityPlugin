@@ -264,7 +264,7 @@ namespace Leap.Unity.Interaction
                             _physicsVelocity = Vector3.zero;
                         }
 
-                        rigidbody.position = physicsPosition;
+                        rigidbody.position = transform.parent.TransformPoint(localPhysicsPosition);
                         rigidbody.velocity = _physicsVelocity;
                     }
                 }
@@ -438,6 +438,8 @@ namespace Leap.Unity.Interaction
 
                     _lastDepressor = null;
                 }
+
+                localPhysicsPosition = transform.parent.InverseTransformPoint(physicsPosition);
             }
         }
 
