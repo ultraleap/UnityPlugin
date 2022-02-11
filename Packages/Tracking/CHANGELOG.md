@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - When using LeapXRServiceProvider with Temporal Warping enabled, the hands fly off in the first few frames.
 - Reduced number of OnContactBegin / OnContactEnd events when a finger is in contact with a slider
+- Jittery sliders and slider problems in a moving reference frame
 ### Known Issues
 
 ## [5.2.0]
