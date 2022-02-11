@@ -170,7 +170,7 @@ namespace Leap.Unity
         {
             get
             {
-                return _sphereColor;
+                return _sphereMat.color;
             }
         }
 
@@ -181,7 +181,7 @@ namespace Leap.Unity
         {
             get
             {
-                return _cylinderColor;
+                return _backing_material.color;
             }
         }
 
@@ -195,6 +195,8 @@ namespace Leap.Unity
             _useCustomColors = true;
             _sphereColor = sphere;
             _cylinderColor = cylinder;
+            _sphereMat.color = _sphereColor;
+            _backing_material.color = _cylinderColor;
         }
 
 #if UNITY_EDITOR
