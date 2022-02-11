@@ -141,6 +141,12 @@ namespace Leap.Unity.Interaction
         protected Vector3 localPhysicsPosition;
 
         /// <summary>
+        /// The physical position of this element in local space, constrained on the local z axis 
+        /// by the minMaxHeight of the button.
+        /// </summary>
+        protected Vector3 localPhysicsPositionConstrained;
+
+        /// <summary>
         /// The physical position of this element in world space; may diverge from the
         /// graphical position.
         /// </summary>
@@ -220,6 +226,7 @@ namespace Leap.Unity.Interaction
               + Vector3.back * Mathf.Lerp(minMaxHeight.x, minMaxHeight.y, restingHeight);
 
             localPhysicsPosition = transform.localPosition;
+            localPhysicsPositionConstrained = localPhysicsPosition;
             physicsPosition = transform.position;
             rigidbody.position = physicsPosition;
             _initialIgnoreGrasping = ignoreGrasping;
@@ -264,7 +271,7 @@ namespace Leap.Unity.Interaction
                             _physicsVelocity = Vector3.zero;
                         }
 
-                        rigidbody.position = transform.parent.TransformPoint(localPhysicsPosition);
+                        rigidbody.position = transform.parent.TransformPoint(localPhysicsPositionConstrained);
                         rigidbody.velocity = _physicsVelocity;
                     }
                 }
@@ -439,7 +446,7 @@ namespace Leap.Unity.Interaction
                     _lastDepressor = null;
                 }
 
-                localPhysicsPosition = transform.parent.InverseTransformPoint(physicsPosition);
+                localPhysicsPositionConstrained = transform.parent.InverseTransformPoint(physicsPosition);
             }
         }
 
