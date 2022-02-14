@@ -125,8 +125,9 @@ namespace Leap
 
         public bool SetPaused(bool pause)
         {
-            eLeapRS result = LeapC.LeapSetPause(Handle, pause);
-            return result == eLeapRS.eLeapRS_Success;
+            //eLeapRS result = LeapC.LeapSetPause(Handle, pause);
+            //return result == eLeapRS.eLeapRS_Success;
+            return false;
         }
 
         /// <summary>
