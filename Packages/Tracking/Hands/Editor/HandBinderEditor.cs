@@ -32,7 +32,7 @@ namespace Leap.Unity.HandsModule
         private SerializedProperty debugModelTransforms;
         private SerializedProperty DebugModelRotationAxis;
         private SerializedProperty setPositions;
-        private SerializedProperty useMetaBones;
+        private SerializedProperty setScale;
         private SerializedProperty setEditorPose;
         private SerializedProperty globalFingerRotationOffset;
         private SerializedProperty wristRotationOffset;
@@ -58,7 +58,7 @@ namespace Leap.Unity.HandsModule
             debugModelTransforms = serializedObject.FindProperty("DebugModelTransforms");
             DebugModelRotationAxis = serializedObject.FindProperty("DebugModelRotationAxis");
             setPositions = serializedObject.FindProperty("SetPositions");
-            useMetaBones = serializedObject.FindProperty("UseMetaBones");
+            setScale = serializedObject.FindProperty("SetScale");
             setEditorPose = serializedObject.FindProperty("SetEditorPose");
             globalFingerRotationOffset = serializedObject.FindProperty("GlobalFingerRotationOffset");
             wristRotationOffset = serializedObject.FindProperty("WristRotationOffset");
@@ -102,6 +102,12 @@ namespace Leap.Unity.HandsModule
             DrawBindingOptions();
             DrawDebugOptions();
             DrawFineTuningOptions();
+
+            if (serializedObject.hasModifiedProperties)
+            {
+                myTarget.UpdateHand();
+            }
+
             serializedObject.ApplyModifiedProperties();
         }
 
@@ -137,8 +143,8 @@ namespace Leap.Unity.HandsModule
             EditorGUILayout.Space();
 
             setEditorPose.boolValue = GUILayout.Toggle(setEditorPose.boolValue, new GUIContent("Set Leap Editor Pose", "Should the Leap Editor Pose be used during Edit mode?"), editorSkin.toggle);
-            useMetaBones.boolValue = GUILayout.Toggle(useMetaBones.boolValue, new GUIContent("Use Metacarpal Bones", "Does this binding require Metacarpal Bones?"), editorSkin.toggle);
             setPositions.boolValue = GUILayout.Toggle(setPositions.boolValue, new GUIContent("Set Bone Positions", "Does this binding require the positional leap data to be applied to the 3D model?"), editorSkin.toggle);
+            setScale.boolValue = GUILayout.Toggle(setScale.boolValue, new GUIContent("Set Scale", "Should the hand binder adjust the models scale?"), editorSkin.toggle);
 
             EditorGUILayout.Space();
             GUILayout.Label(dividerLine);
