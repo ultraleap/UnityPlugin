@@ -58,7 +58,7 @@ namespace Leap.Unity.HandsModule
             debugModelTransforms = serializedObject.FindProperty("DebugModelTransforms");
             DebugModelRotationAxis = serializedObject.FindProperty("DebugModelRotationAxis");
             setPositions = serializedObject.FindProperty("SetPositions");
-            setScale = serializedObject.FindProperty("SetScale");
+            setScale = serializedObject.FindProperty("SetModelScale");
             setEditorPose = serializedObject.FindProperty("SetEditorPose");
             globalFingerRotationOffset = serializedObject.FindProperty("GlobalFingerRotationOffset");
             wristRotationOffset = serializedObject.FindProperty("WristRotationOffset");
@@ -142,9 +142,13 @@ namespace Leap.Unity.HandsModule
             EditorGUILayout.PropertyField(chirality, new GUIContent("Hand Type", "Which hand does this binder target?"), editorSkin);
             EditorGUILayout.Space();
 
-            setEditorPose.boolValue = GUILayout.Toggle(setEditorPose.boolValue, new GUIContent("Set Leap Editor Pose", "Should the Leap Editor Pose be used during Edit mode?"), editorSkin.toggle);
-            setPositions.boolValue = GUILayout.Toggle(setPositions.boolValue, new GUIContent("Set Bone Positions", "Does this binding require the positional leap data to be applied to the 3D model?"), editorSkin.toggle);
-            setScale.boolValue = GUILayout.Toggle(setScale.boolValue, new GUIContent("Set Scale", "Should the hand binder adjust the models scale?"), editorSkin.toggle);
+            setEditorPose.boolValue = GUILayout.Toggle(setEditorPose.boolValue, new GUIContent("Set Hand Pose In Editor", "Should the Leap Editor Pose be used during Edit mode?"), editorSkin.toggle);
+            setPositions.boolValue = GUILayout.Toggle(setPositions.boolValue, new GUIContent("Match Joint Positions With Tracking Data", "Does this binding require the positional leap data to be applied to the 3D model?"), editorSkin.toggle);
+
+            if (setPositions.boolValue)
+            {
+                setScale.boolValue = GUILayout.Toggle(setScale.boolValue, new GUIContent("Scale Model to Tracking Data", "Should the hand binder adjust the models scale?"), editorSkin.toggle);
+            }
 
             EditorGUILayout.Space();
             GUILayout.Label(dividerLine);

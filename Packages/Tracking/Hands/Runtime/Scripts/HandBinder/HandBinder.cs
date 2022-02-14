@@ -59,7 +59,7 @@ namespace Leap.Unity.HandsModule
         /// <summary>
         /// Should the hand binder modify the scale of the hand
         /// </summary>
-        public bool SetScale = true;
+        public bool SetModelScale = true;
 
         /// <summary> 
         /// Show the Leap Hand in the scene 
@@ -214,11 +214,11 @@ namespace Leap.Unity.HandsModule
                 return;
             }
 
-            if (SetScale)
+            if (SetModelScale && SetPositions && BoundHand.startScale != Vector3.zero)
             {
                 transform.localScale = BoundHand.startScale * CalculateRatio();
             }
-            else
+            else 
             {
                 transform.localScale = BoundHand.startScale;
             }
