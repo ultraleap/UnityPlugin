@@ -271,7 +271,7 @@ namespace Leap.Unity.HandsModule
 
                     if (bone.boundTransform != null && nextBone.boundTransform != null)
                     {
-                        t = (bone.boundTransform.position - nextBone.boundTransform.position).magnitude;
+                        var t = (bone.boundTransform.position - nextBone.boundTransform.position).magnitude;
                         length += t;
                     }
                 }
