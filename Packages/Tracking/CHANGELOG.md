@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [docs-website]: https://docs.ultraleap.com/ "Ultraleap Docs"
 
-## [5.3.0]
+## [5.3.0] 
 
 ### Added
 
@@ -19,6 +19,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Outline/Ghost hands sometimes show a shader issue when upgrading to SRP (TOON shader)
+- Jittery Sliders and slider problems in moving reference frame
+- When using LeapXRServiceProvider with Temporal Warping enabled, the hands fly off in the first few frames.
+- Reduced the number of OnContactBegin / OnContactEnd events when a finger is in contact with a slider
 
 ### Known issues
 -	Scenes containing the infrared viewer render incorrectly on systems using single pass stereo with the XR plugin system - e.g. Windows Mixed Reality headsets. SteamVR headsets may also default to single pass stereo, showing the same issue. However in this case, the OpenVR settings can be changed to multipass which resolves the problem.
@@ -30,7 +33,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Interactions callback scene allows blocks to be moved without doing a grasp pose.
 - Interactions object scene platform/stage seems to move a lot
 - Dynamic UI objects throwing backwards most of the time.
-- Toon Basic Outline depends on an SRP and causes an error
 
 
 ## [5.2.0]
