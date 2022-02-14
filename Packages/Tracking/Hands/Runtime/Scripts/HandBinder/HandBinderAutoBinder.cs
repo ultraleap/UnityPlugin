@@ -259,10 +259,25 @@ namespace Leap.Unity.HandsModule
 
         public static void CalculateHandSize(BoundHand boundHand)
         {
-            var indexProximal = boundHand.fingers[(int)Finger.FingerType.TYPE_INDEX].boundBones[(int)Bone.BoneType.TYPE_PROXIMAL].boundTransform.position;
-            var pinkyProximal = boundHand.fingers[(int)Finger.FingerType.TYPE_PINKY].boundBones[(int)Bone.BoneType.TYPE_PROXIMAL].boundTransform.position;
+            var length = 0f;
 
-            boundHand.baseScale = (indexProximal - pinkyProximal).magnitude;
+            //Loop through the bones and sum up there lengths
+            for (int boneID = 0; boneID < boundHand.fingers[(int)Finger.FingerType.TYPE_MIDDLE].boundBones.Length; boneID++)
+            {
+                if(boneID + 1 <= boundHand.fingers[(int)Finger.FingerType.TYPE_MIDDLE].boundBones.Length)
+                {
+                    var bone = boundHand.fingers[(int)Finger.FingerType.TYPE_MIDDLE].boundBones[boneID];
+                    var nextBone = boundHand.fingers[(int)Finger.FingerType.TYPE_MIDDLE].boundBones[boneID + 1];
+
+                    if (bone.boundTransform != null && nextBone.boundTransform != null)
+                    {
+                        t = (bone.boundTransform.position - nextBone.boundTransform.position).magnitude;
+                        length += t;
+                    }
+                }
+            }
+
+            boundHand.baseScale = length;
         }
 
         #endregion
