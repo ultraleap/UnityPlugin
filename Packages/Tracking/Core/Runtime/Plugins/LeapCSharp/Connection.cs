@@ -793,21 +793,21 @@ namespace LeapInternal
         {
             UInt64 setFlags = (ulong)FlagForPolicy(set);
             UInt64 clearFlags = (ulong)FlagForPolicy(clear);
-            eLeapRS result = LeapC.SetPolicyFlags(_leapConnection, setFlags, clearFlags, deviceSerial);
+            eLeapRS result = LeapC.SetPolicyFlags(_leapConnection, setFlags, clearFlags); //, deviceSerial);
             reportAbnormalResults("LeapC SetAndClearPolicy call was ", result);
         }
 
         public void SetPolicy(Controller.PolicyFlag policy, string deviceSerial)
         {
             UInt64 setFlags = (ulong)FlagForPolicy(policy);
-            eLeapRS result = LeapC.SetPolicyFlags(_leapConnection, setFlags, 0, deviceSerial);
+            eLeapRS result = LeapC.SetPolicyFlags(_leapConnection, setFlags, 0); //, deviceSerial);
             reportAbnormalResults("LeapC SetPolicyFlags call was ", result);
         }
 
         public void ClearPolicy(Controller.PolicyFlag policy, string deviceSerial)
         {
             UInt64 clearFlags = (ulong)FlagForPolicy(policy);
-            eLeapRS result = LeapC.SetPolicyFlags(_leapConnection, 0, clearFlags, deviceSerial);
+            eLeapRS result = LeapC.SetPolicyFlags(_leapConnection, 0, clearFlags); //, deviceSerial);
             reportAbnormalResults("LeapC SetPolicyFlags call was ", result);
         }
 
