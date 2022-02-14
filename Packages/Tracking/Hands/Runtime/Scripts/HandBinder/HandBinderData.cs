@@ -12,20 +12,31 @@ using UnityEngine;
 namespace Leap.Unity.HandsModule
 {
 
+    /// <summary>
+    /// A data structure to define all the fingers in a hand, the wrist and elbow
+    /// </summary>
     [System.Serializable]
     public class BoundHand
     {
         public BoundFinger[] fingers = new BoundFinger[5];
         public BoundBone wrist = new BoundBone();
         public BoundBone elbow = new BoundBone();
+        public float baseScale;
+        public Vector3 startScale;
     }
 
+    /// <summary>
+    /// A data structure to define a finger
+    /// </summary>
     [System.Serializable]
     public class BoundFinger
     {
         public BoundBone[] boundBones = new BoundBone[4];
     }
 
+    /// <summary>
+    /// A data structure to define starting position, an offset and the Transform reference found in the scene
+    /// </summary>
     [System.Serializable]
     public class BoundBone
     {
@@ -34,6 +45,9 @@ namespace Leap.Unity.HandsModule
         public TransformStore offset = new TransformStore();
     }
 
+    /// <summary>
+    /// A data structure to store a transforms position and rotation
+    /// </summary>
     [System.Serializable]
     public class TransformStore
     {
@@ -41,6 +55,9 @@ namespace Leap.Unity.HandsModule
         public Vector3 rotation = Vector3.zero;
     }
 
+    /// <summary>
+    /// A data structure to store information about a transform and a Gameobject
+    /// </summary>
     [System.Serializable]
     public class SerializedTransform
     {
@@ -48,6 +65,9 @@ namespace Leap.Unity.HandsModule
         public GameObject reference;
     }
 
+    /// <summary>
+    /// ENUM types for bones of the hand the hand binder can attach to
+    /// </summary>
     public enum BoundTypes
     {
         THUMB_METACARPAL,

@@ -35,10 +35,10 @@ namespace Leap.Unity.HandsModule
             children.AddRange(GetAllChildren(handBinder.transform));
 
             var thumbBones = SortBones(SelectBones(children, boneDefinitions.DefinitionThumb), false, true);
-            var indexBones = SortBones(SelectBones(children, boneDefinitions.DefinitionIndex), handBinder.UseMetaBones);
-            var middleBones = SortBones(SelectBones(children, boneDefinitions.DefinitionMiddle), handBinder.UseMetaBones);
-            var ringBones = SortBones(SelectBones(children, boneDefinitions.DefinitionRing), handBinder.UseMetaBones);
-            var pinkyBones = SortBones(SelectBones(children, boneDefinitions.DefinitionPinky), handBinder.UseMetaBones);
+            var indexBones = SortBones(SelectBones(children, boneDefinitions.DefinitionIndex));
+            var middleBones = SortBones(SelectBones(children, boneDefinitions.DefinitionMiddle));
+            var ringBones = SortBones(SelectBones(children, boneDefinitions.DefinitionRing));
+            var pinkyBones = SortBones(SelectBones(children, boneDefinitions.DefinitionPinky));
             var wrist = SelectBones(children, boneDefinitions.DefinitionWrist).FirstOrDefault();
             var elbow = SelectBones(children, boneDefinitions.DefinitionElbow).FirstOrDefault();
 
@@ -57,6 +57,8 @@ namespace Leap.Unity.HandsModule
 
             EstimateWristRotationOffset(handBinder);
             CalculateElbowLength(handBinder);
+            CalculateHandSize(handBinder.BoundHand);
+            handBinder.BoundHand.startScale = handBinder.transform.localScale;
 
             handBinder.GetLeapHand();
             handBinder.UpdateHand();
@@ -233,8 +235,13 @@ namespace Leap.Unity.HandsModule
                 Vector3.OrthoNormalize(ref up, ref forward, ref right);
                 var modelRotation = Quaternion.LookRotation(forward, up);
 
+                var roundedRotationOffset = (Quaternion.Inverse(modelRotation) * wrist.transform.rotation).eulerAngles;
+                roundedRotationOffset.x = Mathf.Round(roundedRotationOffset.x / 90) * 90;
+                roundedRotationOffset.y = Mathf.Round(roundedRotationOffset.y / 90) * 90;
+                roundedRotationOffset.z = Mathf.Round(roundedRotationOffset.z / 90) * 90;
+
                 //Calculate the difference between the Calculated hand basis and the wrists rotation
-                handBinder.WristRotationOffset = (Quaternion.Inverse(modelRotation) * wrist.transform.rotation).eulerAngles;
+                handBinder.WristRotationOffset = roundedRotationOffset;
                 //Assuming the fingers have been created using the same rotation axis as the wrist
                 handBinder.GlobalFingerRotationOffset = handBinder.WristRotationOffset;
             }
@@ -247,5 +254,17 @@ namespace Leap.Unity.HandsModule
                 handBinder.ElbowLength = (handBinder.BoundHand.wrist.boundTransform.position - handBinder.BoundHand.elbow.boundTransform.position).magnitude;
             }
         }
+
+        #region Calculate Hand Scale
+
+        public static void CalculateHandSize(BoundHand boundHand)
+        {
+            var indexProximal = boundHand.fingers[(int)Finger.FingerType.TYPE_INDEX].boundBones[(int)Bone.BoneType.TYPE_PROXIMAL].boundTransform.position;
+            var pinkyProximal = boundHand.fingers[(int)Finger.FingerType.TYPE_PINKY].boundBones[(int)Bone.BoneType.TYPE_PROXIMAL].boundTransform.position;
+
+            boundHand.baseScale = (indexProximal - pinkyProximal).magnitude;
+        }
+
+        #endregion
     }
 }
