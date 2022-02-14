@@ -202,69 +202,65 @@ namespace Leap.Unity.HandsModule
         /// </summary>
         public override void UpdateHand()
         {
-
             if (!SetEditorPose && !Application.isPlaying)
             {
                 return;
             }
 
-            if (LeapHand == null)
-            {
-                ResetHand();
-                return;
-            }
+            var hand = GetLeapHand();
 
-            if (SetModelScale && SetPositions && BoundHand.startScale != Vector3.zero)
+            if (hand != null)
             {
-                transform.localScale = BoundHand.startScale * CalculateRatio();
-            }
-            else
-            {
-                transform.localScale = BoundHand.startScale;
-            }
-
-            if (BoundHand.elbow.boundTransform != null)
-            {
-                if (SetPositions)
+                if (SetModelScale && SetPositions && BoundHand.startScale != Vector3.zero)
                 {
-                    BoundHand.elbow.boundTransform.transform.position = GetLeapHand().Arm.ElbowPosition.ToVector3();
-                    BoundHand.elbow.boundTransform.transform.rotation = LeapHand.Arm.Rotation.ToQuaternion() * Quaternion.Euler(BoundHand.elbow.offset.rotation) * Quaternion.Euler(WristRotationOffset);
+                    transform.localScale = BoundHand.startScale * CalculateRatio(hand);
                 }
-                //Calculate the elbows position and rotation making sure to maintain the models forearm length
-                else if (BoundHand.wrist.boundTransform != null)
+                else
                 {
-                    var dir = (LeapHand.Arm.PrevJoint.ToVector3() - LeapHand.WristPosition.ToVector3()).normalized;
-                    var position = LeapHand.WristPosition.ToVector3() + dir * ElbowLength;
-                    position += BoundHand.elbow.offset.position;
-
-                    BoundHand.elbow.boundTransform.transform.position = position;
-                    BoundHand.elbow.boundTransform.transform.rotation = LeapHand.Arm.Rotation.ToQuaternion()
-                        * Quaternion.Euler(BoundHand.elbow.offset.rotation)
-                        * Quaternion.Euler(WristRotationOffset);
+                    transform.localScale = BoundHand.startScale;
                 }
-            }
 
-            //Update the wrist's position and rotation to leap data
-            if (BoundHand.wrist.boundTransform != null)
-            {
-
-                //Calculate the position of the wrist to the leap position + offset defined by the user
-                var wristPosition = LeapHand.WristPosition.ToVector3() + BoundHand.wrist.offset.position;
-
-                //Calculate rotation offset needed to get the wrist into the same rotation as the leap based on the calculated wrist offset
-                var leapRotationOffset = ((Quaternion.Inverse(BoundHand.wrist.boundTransform.transform.rotation) * LeapHand.Rotation.ToQuaternion()) * Quaternion.Euler(WristRotationOffset)).eulerAngles;
-
-                //Set the wrist bone to the calculated values
-                BoundHand.wrist.boundTransform.transform.position = wristPosition;
-                BoundHand.wrist.boundTransform.transform.rotation *= Quaternion.Euler(leapRotationOffset);
-            }
-
-            //Loop through all the leap fingers and update the bound fingers to the leap data
-            if (LeapHand != null)
-            {
-                for (int fingerIndex = 0; fingerIndex < LeapHand.Fingers.Count; fingerIndex++)
+                if (BoundHand.elbow.boundTransform != null)
                 {
-                    for (int boneIndex = 0; boneIndex < LeapHand.Fingers[fingerIndex].bones.Length; boneIndex++)
+                    if (SetPositions)
+                    {
+                        BoundHand.elbow.boundTransform.transform.position = hand.Arm.ElbowPosition.ToVector3();
+                        BoundHand.elbow.boundTransform.transform.rotation = hand.Arm.Rotation.ToQuaternion() * Quaternion.Euler(BoundHand.elbow.offset.rotation) * Quaternion.Euler(WristRotationOffset);
+                    }
+                    //Calculate the elbows position and rotation making sure to maintain the models forearm length
+                    else if (BoundHand.wrist.boundTransform != null)
+                    {
+                        var dir = (hand.Arm.PrevJoint.ToVector3() - hand.WristPosition.ToVector3()).normalized;
+                        var position = hand.WristPosition.ToVector3() + dir * ElbowLength;
+                        position += BoundHand.elbow.offset.position;
+
+                        BoundHand.elbow.boundTransform.transform.position = position;
+                        BoundHand.elbow.boundTransform.transform.rotation = hand.Arm.Rotation.ToQuaternion()
+                            * Quaternion.Euler(BoundHand.elbow.offset.rotation)
+                            * Quaternion.Euler(WristRotationOffset);
+                    }
+                }
+
+                //Update the wrist's position and rotation to leap data
+                if (BoundHand.wrist.boundTransform != null)
+                {
+
+                    //Calculate the position of the wrist to the leap position + offset defined by the user
+                    var wristPosition = hand.WristPosition.ToVector3() + BoundHand.wrist.offset.position;
+
+                    //Calculate rotation offset needed to get the wrist into the same rotation as the leap based on the calculated wrist offset
+                    var leapRotationOffset = ((Quaternion.Inverse(BoundHand.wrist.boundTransform.transform.rotation) * hand.Rotation.ToQuaternion()) * Quaternion.Euler(WristRotationOffset)).eulerAngles;
+
+                    //Set the wrist bone to the calculated values
+                    BoundHand.wrist.boundTransform.transform.position = wristPosition;
+                    BoundHand.wrist.boundTransform.transform.rotation *= Quaternion.Euler(leapRotationOffset);
+                }
+
+                //Loop through all the leap fingers and update the bound fingers to the leap data
+
+                for (int fingerIndex = 0; fingerIndex < hand.Fingers.Count; fingerIndex++)
+                {
+                    for (int boneIndex = 0; boneIndex < hand.Fingers[fingerIndex].bones.Length; boneIndex++)
                     {
 
                         //The transform that the user has defined
@@ -280,7 +276,7 @@ namespace Leap.Unity.HandsModule
                         var startTransform = BoundHand.fingers[fingerIndex].boundBones[boneIndex].startTransform;
 
                         //Get the leap bone to extract the position and rotation values
-                        var leapBone = LeapHand.Fingers[fingerIndex].bones[boneIndex];
+                        var leapBone = hand.Fingers[fingerIndex].bones[boneIndex];
                         //Get any offsets the user has set up
                         var boneOffset = BoundHand.fingers[fingerIndex].boundBones[boneIndex].offset;
 
@@ -300,28 +296,29 @@ namespace Leap.Unity.HandsModule
                         boundTransform.transform.rotation = leapBone.Rotation.ToQuaternion() * Quaternion.Euler(GlobalFingerRotationOffset) * Quaternion.Euler(boneOffset.rotation);
                     }
                 }
+
+                EditPoseNeedsResetting = true;
             }
 
-            EditPoseNeedsResetting = true;
         }
 
         /// <summary>
         /// Compare the 3D models scale with the current leap data scale 
         /// </summary>
-        float CalculateRatio()
+        float CalculateRatio(Hand hand)
         {
-            return CalculateLeapSize() / BoundHand.baseScale;
+            return CalculateLeapSize(hand) / BoundHand.baseScale;
         }
 
         /// <summary>
         /// Calculate the leap hand size
         /// </summary>
-        float CalculateLeapSize()
+        float CalculateLeapSize(Hand hand)
         {
             var length = 0f;
-            for (int i = 0; i < GetLeapHand().Fingers[(int)Finger.FingerType.TYPE_MIDDLE].bones.Length; i++)
+            for (int i = 0; i < hand.Fingers[(int)Finger.FingerType.TYPE_MIDDLE].bones.Length; i++)
             {
-                var bone = GetLeapHand().Fingers[(int)Finger.FingerType.TYPE_MIDDLE].bones[i];
+                var bone = hand.Fingers[(int)Finger.FingerType.TYPE_MIDDLE].bones[i];
                 length += (bone.PrevJoint - bone.NextJoint).Magnitude;
             }
             return length;

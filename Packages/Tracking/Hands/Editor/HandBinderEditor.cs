@@ -103,11 +103,6 @@ namespace Leap.Unity.HandsModule
             DrawDebugOptions();
             DrawFineTuningOptions();
 
-            if (serializedObject.hasModifiedProperties)
-            {
-                myTarget.UpdateHand();
-            }
-
             serializedObject.ApplyModifiedProperties();
         }
 
