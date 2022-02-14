@@ -22,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Jittery Sliders and slider problems in moving reference frame
 - When using LeapXRServiceProvider with Temporal Warping enabled, the hands fly off in the first few frames.
 - Reduced the number of OnContactBegin / OnContactEnd events when a finger is in contact with a slider
+- Fixed issues with HDRP and URP example scenes not containing the correct shader when switching graphics pipelines.
 
 ### Known issues
 -	Scenes containing the infrared viewer render incorrectly on systems using single pass stereo with the XR plugin system - e.g. Windows Mixed Reality headsets. SteamVR headsets may also default to single pass stereo, showing the same issue. However in this case, the OpenVR settings can be changed to multipass which resolves the problem.
