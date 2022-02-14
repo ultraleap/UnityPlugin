@@ -318,11 +318,13 @@ namespace Leap.Unity.HandsModule
         /// </summary>
         float CalculateLeapSize()
         {
-            var indexProximal = GetLeapHand().Fingers[(int)Finger.FingerType.TYPE_INDEX].bones[(int)Bone.BoneType.TYPE_PROXIMAL].PrevJoint.ToVector3();
-
-            var pinkyProximal = GetLeapHand().Fingers[(int)Finger.FingerType.TYPE_PINKY].bones[(int)Bone.BoneType.TYPE_PROXIMAL].PrevJoint.ToVector3();
-
-            return (indexProximal - pinkyProximal).magnitude;
+            var length = 0f;
+            for (int i = 0; i < GetLeapHand().Fingers[(int)Finger.FingerType.TYPE_MIDDLE].bones.Length; i++)
+            {
+                var bone = GetLeapHand().Fingers[(int)Finger.FingerType.TYPE_MIDDLE].bones[i];
+                length += (bone.PrevJoint - bone.NextJoint).Magnitude;
+            }
+            return length;
         }
 
         /// <summary>
