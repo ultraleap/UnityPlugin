@@ -22,6 +22,9 @@ namespace Leap.Unity
     /// account for the offset of the Leap device with respect to the attached HMD and
     /// warp tracked hand positions based on the motion of the headset to account for the
     /// differing latencies of the two tracking systems.
+    /// 
+    /// This component can be placed anywhere in your scene as long as mainCamera 
+    /// references the XR camera. 
     /// </summary>
     public class LeapXRServiceProvider : LeapServiceProvider
     {
@@ -47,21 +50,42 @@ namespace Leap.Unity
 
         private TimewarpMode _xr2TimewarpMode = TimewarpMode.Default;
 #endif
-
+        /// <summary>
+        /// Supported modes for device offset. Used for deviceOffsetMode which allows 
+        /// manual adjustment of the Tracking Hardware's virtual offset and tilt.
+        /// </summary>
         public enum DeviceOffsetMode
         {
+            /// <summary>
+            /// Defaults to constants set at the top of LeapServiceProvider 
+            /// (currently: offset y axis = 0; offset z axis = 0.12; tilt x axis = 5)
+            /// </summary>
             Default,
+            /// <summary>
+            /// Allows to specify the offset as a combination of 
+            /// deviceOffsetYAxis, deviceOffsetZAxis and deviceTiltXAxis.
+            /// </summary>
             ManualHeadOffset,
+            /// <summary>
+            /// Allows for the manual placement of the Tracking Hardware.
+            /// This device offset mode is incompatible with Temporal Warping.
+            /// When choosing this mode, deviceOrigin has to be set.
+            /// </summary>
             Transform
         }
 
 
-        [Tooltip("Allow manual adjustment of the Leap device's virtual offset and tilt. These "
+        [Tooltip("Allow manual adjustment of the Tracking Hardware's virtual offset and tilt. These "
                + "settings can be used to match the physical position and orientation of the "
-               + "Leap Motion sensor on a tracked device it is mounted on (such as a VR "
+               + "Tracking Hardware on a tracked device it is mounted on (such as a VR "
                + "headset). ")]
         [SerializeField, OnEditorChange("deviceOffsetMode")]
         private DeviceOffsetMode _deviceOffsetMode;
+        /// <summary>
+        /// Allow manual adjustment of the Tracking Hardware's virtual offset and tilt. 
+        /// These settings can be used to match the physical position and orientation of the
+        /// Tracking Hardware on a tracked device it is mounted on (such as a VR headset)
+        /// </summary>
         public DeviceOffsetMode deviceOffsetMode
         {
             get { return _deviceOffsetMode; }
@@ -77,45 +101,64 @@ namespace Leap.Unity
             }
         }
 
-        [Tooltip("Adjusts the Leap Motion device's virtual height offset from the tracked "
+        [Tooltip("Adjusts the Tracking Hardware's virtual height offset from the tracked "
                + "headset position. This should match the vertical offset of the physical "
                + "device with respect to the headset in meters.")]
         [SerializeField]
         [Range(-0.50F, 0.50F)]
         private float _deviceOffsetYAxis = DEFAULT_DEVICE_OFFSET_Y_AXIS;
+        /// <summary>
+        /// Adjusts the Tracking Hardware's virtual height offset from the tracked 
+        /// headset position. This should match the vertical offset of the physical device
+        /// with respect to the headset in meters.
+        /// </summary>
         public float deviceOffsetYAxis
         {
             get { return _deviceOffsetYAxis; }
             set { _deviceOffsetYAxis = value; }
         }
 
-        [Tooltip("Adjusts the Leap Motion device's virtual depth offset from the tracked "
+        [Tooltip("Adjusts the Tracking Hardware's virtual depth offset from the tracked "
                + "headset position. This should match the forward offset of the physical "
                + "device with respect to the headset in meters.")]
         [SerializeField]
         [Range(-0.50F, 0.50F)]
         private float _deviceOffsetZAxis = DEFAULT_DEVICE_OFFSET_Z_AXIS;
+        /// <summary>
+        /// Adjusts the Tracking Hardware's virtual depth offset from the tracked 
+        /// headset position. This should match the forward offset of the physical 
+        /// device with respect to the headset in meters.
+        /// </summary>
         public float deviceOffsetZAxis
         {
             get { return _deviceOffsetZAxis; }
             set { _deviceOffsetZAxis = value; }
         }
 
-        [Tooltip("Adjusts the Leap Motion device's virtual X axis tilt. This should match "
+        [Tooltip("Adjusts the Tracking Hardware's virtual X axis tilt. This should match "
                + "the tilt of the physical device with respect to the headset in degrees.")]
         [SerializeField]
         [Range(-90.0F, 90.0F)]
         private float _deviceTiltXAxis = DEFAULT_DEVICE_TILT_X_AXIS;
+        /// <summary>
+        /// Adjusts the Tracking Hardware's virtual X axis tilt. This should match 
+        /// the tilt of the physical device with respect to the headset in degrees.
+        /// </summary>
         public float deviceTiltXAxis
         {
             get { return _deviceTiltXAxis; }
             set { _deviceTiltXAxis = value; }
         }
 
-        [Tooltip("Allows for the manual placement of the Leap Tracking Device." +
+        [Tooltip("Allows for the manual placement of the Tracking Hardware." +
           "This device offset mode is incompatible with Temporal Warping.")]
         [SerializeField]
         private Transform _deviceOrigin;
+        /// <summary>
+        /// Allows for the manual placement of the Tracking Hardware.
+        /// This device offset mode is incompatible with Temporal Warping.
+        /// This is only used if the deviceOffsetMode is 'Transform'.
+        /// </summary>
         public Transform deviceOrigin
         {
             get { return _deviceOrigin; }
@@ -126,16 +169,26 @@ namespace Leap.Unity
                + "Falls back to Camera.main if not set")]
         [SerializeField]
         private Camera _mainCamera; // Redundant backing field, used to present value in editor at parent level
-
+        /// <summary>
+        /// Specifies the main camera. Required for XR2 based platforms.
+        /// Falls back to Camera.main if not set.
+        /// </summary>
         public Camera mainCamera
         {
             get
             {
-                return MainCameraProvider.mainCamera;
+                if (_mainCamera != null)
+                {
+                    if (_mainCamera != MainCameraProvider.mainCamera)
+                    {
+                        MainCameraProvider.mainCamera = _mainCamera;
+                    }
+                }
+
+                return _mainCamera;
             }
             set
             {
-                // Not everything accesses the main camera via the property, so to be safe we also set the backing field
                 _mainCamera = value;
                 MainCameraProvider.mainCamera = value;
             }
@@ -150,10 +203,28 @@ namespace Leap.Unity
         private const int DEFAULT_WARP_ADJUSTMENT = 17;
 #endif
 
+        /// <summary>
+        /// Temporal warping prevents the hand coordinate system from 'swimming' or 
+        /// 'bouncing' when the headset moves and the user's hands stay still. 
+        /// This phenomenon is caused by the differing amounts of latencies inherent 
+        /// in the two systems.
+        /// </summary>
         public enum TemporalWarpingMode
         {
+            /// <summary>
+            /// For PC VR and Android VR, temporal warping should set to 'Auto', as the 
+            /// correct value can be chosen automatically for these platforms.
+            /// </summary>
             Auto,
+            /// <summary>
+            /// Some non-standard platforms may use 'Manual' mode to adjust their 
+            /// latency compensation amount for temporal warping.
+            /// </summary>
             Manual,
+            /// <summary>
+            /// Use 'Images' for scenarios that overlay Tracking Service images on tracked 
+            /// hand data.
+            /// </summary>
             Images,
             Off
         }
@@ -165,19 +236,21 @@ namespace Leap.Unity
                + "correct value can be chosen automatically for these platforms. "
                + "Some non-standard platforms may use 'Manual' mode to adjust their "
                + "latency compensation amount for temporal warping. "
-               + "Use 'Images' for scenarios that overlay Leap device images on tracked "
+               + "Use 'Images' for scenarios that overlay Tracking Service images on tracked "
                + "hand data.")]
         [SerializeField]
         private TemporalWarpingMode _temporalWarpingMode = TemporalWarpingMode.Auto;
 
-        /// <summary>
-        /// The time in milliseconds between the current frame's headset position and the
-        /// time at which the Leap frame was captured.
-        /// </summary>
+
         [Tooltip("The time in milliseconds between the current frame's headset position and "
                + "the time at which the Leap frame was captured.")]
         [SerializeField]
         private int _customWarpAdjustment = DEFAULT_WARP_ADJUSTMENT;
+        /// <summary>
+        /// The time in milliseconds between the current frame's headset position and the
+        /// time at which the Leap frame was captured.
+        /// Change this only when the TemporalWarpingMode is 'Manual'.
+        /// </summary>
         public int warpingAdjustment
         {
             get
@@ -210,6 +283,11 @@ namespace Leap.Unity
                + "account shader-global vertex offsets in their material shaders.")]
         [SerializeField]
         protected bool _updateHandInPrecull = false;
+        /// <summary>
+        /// Pass updated transform matrices to hands with materials that utilize the 
+        /// VertexOffsetShader. Won't have any effect on hands that don't take into 
+        /// account shader-global vertex offsets in their material shaders.
+        /// </summary>
         public bool updateHandInPrecull
         {
             get { return _updateHandInPrecull; }
@@ -231,6 +309,11 @@ namespace Leap.Unity
         protected Matrix4x4[] _transformArray = new Matrix4x4[2];
         private Pose? _trackingBaseDeltaPose = null;
 
+        /// <summary>
+        /// Contains the Frame.Timestamp of the most recent tracked frame.
+        /// It is used for Image warping if the temporalWarpingMode is set to 
+        /// Auto, Manual or Images
+        /// </summary>
         [NonSerialized]
         public long imageTimeStamp = 0;
 
@@ -244,8 +327,8 @@ namespace Leap.Unity
             editTimePose = TestHandFactory.TestHandPose.HeadMountedB;
 
             _interactionVolumeVisualization = InteractionVolumeVisualization.Automatic;
-            _mainCamera = MainCameraProvider.mainCamera;
-            if (_mainCamera != null)
+            mainCamera = MainCameraProvider.mainCamera;
+            if (mainCamera != null)
             {
                 Debug.Log("Camera.Main automatically assigned");
             }
@@ -262,15 +345,15 @@ namespace Leap.Unity
 
             // Assign the main camera if it looks like one is available and it's not yet been set on the backing field
             // NB this may be the case if the provider is created via AddComponent, as in MRTK
-            if (_mainCamera == null && MainCameraProvider.mainCamera != null)
+            if (mainCamera == null && MainCameraProvider.mainCamera != null)
             {
-                _mainCamera = MainCameraProvider.mainCamera;
+                mainCamera = MainCameraProvider.mainCamera;
             }
 
 #if XR_LEGACY_INPUT_AVAILABLE
-            if (_mainCamera.GetComponent<UnityEngine.SpatialTracking.TrackedPoseDriver>() == null) 
-			{
-                _mainCamera.gameObject.AddComponent<UnityEngine.SpatialTracking.TrackedPoseDriver>().UseRelativeTransform = true;
+            if (mainCamera.GetComponent<UnityEngine.SpatialTracking.TrackedPoseDriver>() == null)
+            {
+                mainCamera.gameObject.AddComponent<UnityEngine.SpatialTracking.TrackedPoseDriver>().UseRelativeTransform = true;
             }
 #endif
 
@@ -328,7 +411,7 @@ namespace Leap.Unity
                 _deviceOffsetMode = DeviceOffsetMode.Default;
             }
 
-            if (Application.isPlaying && _mainCamera == null && _temporalWarpingMode != TemporalWarpingMode.Off)
+            if (Application.isPlaying && mainCamera == null && _temporalWarpingMode != TemporalWarpingMode.Off)
             {
                 Debug.LogError("Cannot perform temporal warping with no pre-cull camera.");
             }
@@ -339,7 +422,7 @@ namespace Leap.Unity
             //Find the pose delta from the "local" tracked pose to the actual camera pose, we will use this later on to maintain offsets
             if (!_trackingBaseDeltaPose.HasValue)
             {
-                _trackingBaseDeltaPose = _mainCamera.transform.ToLocalPose().mul(trackedPose.inverse());
+                _trackingBaseDeltaPose = mainCamera.transform.ToLocalPose().mul(trackedPose.inverse());
             }
         }
 
@@ -355,8 +438,8 @@ namespace Leap.Unity
 
         void LateUpdate()
         {
-            var projectionMatrix = _mainCamera == null ? Matrix4x4.identity
-              : _mainCamera.projectionMatrix;
+            var projectionMatrix = mainCamera == null ? Matrix4x4.identity
+              : mainCamera.projectionMatrix;
             switch (SystemInfo.graphicsDeviceType)
             {
 #if !UNITY_2017_2_OR_NEWER
@@ -416,7 +499,7 @@ namespace Leap.Unity
         protected virtual void onPreCull(Camera preCullingCamera)
         {
 
-            if (preCullingCamera != _mainCamera)
+            if (preCullingCamera != mainCamera)
             {
                 return;
             }
@@ -429,7 +512,7 @@ namespace Leap.Unity
 
 #endif
 
-            if (_mainCamera == null || _leapController == null)
+            if (mainCamera == null || _leapController == null)
             {
                 if (_temporalWarpingMode == TemporalWarpingMode.Auto || _temporalWarpingMode == TemporalWarpingMode.Manual)
                 {
@@ -461,7 +544,7 @@ namespace Leap.Unity
 
             transformHistory.UpdateDelay(trackedPose, _leapController.Now());
 
-            OnPreCullHandTransforms(_mainCamera);
+            OnPreCullHandTransforms(mainCamera);
         }
 
         #endregion
@@ -543,7 +626,7 @@ namespace Leap.Unity
 
         protected virtual LeapTransform GetWarpedMatrix(long timestamp, bool updateTemporalCompensation = true)
         {
-            if (_mainCamera == null || this == null)
+            if (mainCamera == null || this == null)
             {
                 return LeapTransform.Identity;
             }
@@ -568,16 +651,16 @@ namespace Leap.Unity
                 warpedRotation = currentPose.rotation;
             }
             //Calculate a Temporally Warped Pose
-            else if (updateTemporalCompensation && transformHistory.history.IsFull)
+            else if (updateTemporalCompensation)
             {
-#if SVR
-                if (_xr2TimewarpMode == TimewarpMode.Default && transformHistory.history.IsFull)
+                void DefaultTimeWarping()
                 {
                     var imageAdjustment = _temporalWarpingMode == TemporalWarpingMode.Images ? -20000 : 0;
                     var sampleTimestamp = timestamp - (long)(warpingAdjustment * 1000f) - imageAdjustment;
                     transformHistory.SampleTransform(sampleTimestamp, out warpedPosition, out warpedRotation);
                 }
-                else if (_xr2TimewarpMode == TimewarpMode.Experimental_XR2)
+#if SVR
+                void ExperimentalXR2TimeWarping()
                 {
                     // Get the predicted display time for the current frame in milliseconds, then get the predicted head pose
                     float predictedDisplayTime_ms = SxrShim.GetPredictedDisplayTime(SystemInfo.graphicsMultiThreaded);
@@ -590,13 +673,17 @@ namespace Leap.Unity
                     warpedPosition.z = predictedWarpedPosition.z;
                     warpedRotation = predictedWarpedRotation;
                 }
-#else
-                if (transformHistory.history.IsFull)
+
+                switch(_xr2TimeWarpMode)
                 {
-                    var imageAdjustment = _temporalWarpingMode == TemporalWarpingMode.Images ? -20000 : 0;
-                    var sampleTimestamp = timestamp - (long)(warpingAdjustment * 1000f) - imageAdjustment;
-                    transformHistory.SampleTransform(sampleTimestamp, out warpedPosition, out warpedRotation);
-                }
+                    case TimewarpMode.Default:
+                        DefaultTimeWarping();
+                        break;
+                    case TimewarpMode.Experimental_XR2:
+                        ExperimentalXR2TimeWarping();
+                        break;
+#else
+                DefaultTimeWarping();
 #endif
             }
 
@@ -619,12 +706,12 @@ namespace Leap.Unity
 
 
 #if !SVR
-            // Use the _mainCamera parent to transfrom the warped positions so the player can move around
-            if (_mainCamera.transform.parent != null)
+            // Use the mainCamera parent to transfrom the warped positions so the player can move around
+            if (mainCamera.transform.parent != null)
             {
                 leapTransform = new LeapTransform(
-                  _mainCamera.transform.parent.TransformPoint(warpedPosition).ToVector(),
-                  _mainCamera.transform.parent.TransformRotation(warpedRotation).ToLeapQuaternion(),
+                  mainCamera.transform.parent.TransformPoint(warpedPosition).ToVector(),
+                  mainCamera.transform.parent.TransformRotation(warpedRotation).ToLeapQuaternion(),
                   Vector.Ones * 1e-3f
                 );
             }
@@ -659,7 +746,7 @@ namespace Leap.Unity
                 //Don't update pre cull for preview, reflection, or scene view cameras
                 if (camera == null)
                 {
-                    camera = _mainCamera;
+                    camera = mainCamera;
                 }
 
                 switch (camera.cameraType)

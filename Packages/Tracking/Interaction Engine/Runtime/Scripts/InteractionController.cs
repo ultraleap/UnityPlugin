@@ -35,6 +35,9 @@ namespace Leap.Unity.Interaction
     /// </summary>
     public enum ControllerType { Hand, XRController }
 
+    /// <summary>
+    /// Defines an abstract class with a set of actions the interaction engine is capable of raising, InteractionHand and InteractionXRController inherit from this.
+    /// </summary>
     [DisallowMultipleComponent]
     public abstract class InteractionController : MonoBehaviour,
                                                   IInternalInteractionController
@@ -56,6 +59,9 @@ namespace Leap.Unity.Interaction
         [SerializeField]
         [OnEditorChange("hoverEnabled")]
         private bool _hoverEnabled = true;
+        /// <summary>
+        /// If disabled, this interaction controller will not be used to generate hover information or primary hover information. Warning: Primary hover data is required for Interaction Engine user interface components like InteractionButton and InteractionSlider to function, so this controller won't able to interact with UI components.
+        /// </summary>
         public bool hoverEnabled
         {
             get { return _hoverEnabled; }
@@ -75,6 +81,9 @@ namespace Leap.Unity.Interaction
         [SerializeField]
         [OnEditorChange("contactEnabled")]
         private bool _contactEnabled = true;
+        /// <summary>
+        /// If disabled, this interaction controller will not collide with interaction objects and objects will not receive contact callbacks.
+        /// </summary>
         public bool contactEnabled
         {
             get { return _contactEnabled; }
@@ -102,6 +111,10 @@ namespace Leap.Unity.Interaction
         [SerializeField]
         [OnEditorChange("graspingEnabled")]
         private bool _graspingEnabled = true;
+
+        /// <summary>
+        /// If disabled, this interaction controller will not be able to grasp interaction objects.
+        /// </summary>
         public bool graspingEnabled
         {
             get { return _graspingEnabled; }
@@ -282,6 +295,9 @@ namespace Leap.Unity.Interaction
             if (graspingEnabled) fixedUpdateGrasping();
         }
 
+        /// <summary>
+        /// Unregister an interaction Behaviour from the hover and contact tracking for an object
+        /// </summary>
         public void NotifyObjectUnregistered(IInteractionBehaviour intObj)
         {
             ClearHoverTrackingForObject(intObj);
@@ -339,6 +355,10 @@ namespace Leap.Unity.Interaction
 
         // Hover Activity Manager
         private ActivityManager<IInteractionBehaviour> _hoverActivityManager;
+
+        /// <summary>
+        /// Get the _hoverActivityManager OR make a new one if it does not exist
+        /// </summary>
         public ActivityManager<IInteractionBehaviour> hoverActivityManager
         {
             get
@@ -1235,6 +1255,9 @@ namespace Leap.Unity.Interaction
         #region Soft Contact
 
         private bool _softContactEnabled = false;
+        /// <summary>
+        /// Is soft contact enabled?
+        /// </summary>
         public bool softContactEnabled { get { return _softContactEnabled; } }
 
         private bool _disableSoftContactEnqueued = false;
@@ -1427,6 +1450,9 @@ namespace Leap.Unity.Interaction
         /// </summary>
         protected virtual void onPostDisableSoftContact() { }
 
+        /// <summary>
+        /// Enable soft contact for each of the contact bones
+        /// </summary>
         public void EnableSoftContact()
         {
             if (!isTracked) return;
@@ -1457,6 +1483,9 @@ namespace Leap.Unity.Interaction
             }
         }
 
+        /// <summary>
+        /// Disable soft contact for each of the contact bones
+        /// </summary>
         public void DisableSoftContact()
         {
             using (new ProfilerSample("Enqueue Disable Soft Contact"))
@@ -1575,6 +1604,9 @@ namespace Leap.Unity.Interaction
         private HashSet<IInteractionBehaviour> _contactEndedBuffer = new HashSet<IInteractionBehaviour>();
         private HashSet<IInteractionBehaviour> _contactBeganBuffer = new HashSet<IInteractionBehaviour>();
 
+        /// <summary>
+        /// Add contact bone to set of ongoing collisions with given interaction behaviour
+        /// </summary>
         public void NotifyContactBoneCollisionEnter(ContactBone contactBone, IInteractionBehaviour interactionObj)
         {
             int count;
@@ -1589,6 +1621,9 @@ namespace Leap.Unity.Interaction
             }
         }
 
+        /// <summary>
+        /// Refresh contact bone state as being in an ongoing collision with given interaction object.
+        /// </summary>
         public void NotifyContactBoneCollisionStay(ContactBone contactBone, IInteractionBehaviour interactionObj)
         {
             // If Contact state is cleared manually or due to the controller being disabled,
@@ -1602,6 +1637,9 @@ namespace Leap.Unity.Interaction
             }
         }
 
+        /// <summary>
+        /// Remove contact bone from set of ongoing collisions with given interaction behaviour.
+        /// </summary>
         public void NotifyContactBoneCollisionExit(ContactBone contactBone, IInteractionBehaviour interactionObj)
         {
             if (interactionObj.ignoreContact)
@@ -1823,13 +1861,20 @@ namespace Leap.Unity.Interaction
 
         #region Grasping
 
-        /// <summary> Gets whether the controller is currently grasping an object. </summary>
+
+        /// <summary>
+        /// Gets whether the controller is currently grasping an object.
+        /// </summary>
         public bool isGraspingObject { get { return _graspedObject != null; } }
 
-        /// <summary> Gets the object the controller is currently grasping, or null if there is no such object. </summary>
+        /// <summary>
+        /// Gets the object the controller is currently grasping, or null if there is no such object. 
+        /// </summary>
         public IInteractionBehaviour graspedObject { get { return _graspedObject; } }
 
-        /// <summary> Gets the set of objects currently considered graspable. </summary>
+        /// <summary>
+        /// Gets the set of objects currently considered graspable.
+        /// </summary>
         public ReadonlyHashSet<IInteractionBehaviour> graspCandidates { get { return graspActivityManager.ActiveObjects; } }
 
         /// <summary>

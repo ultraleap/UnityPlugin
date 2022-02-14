@@ -141,6 +141,12 @@ namespace Leap.Unity.Interaction
         protected Vector3 localPhysicsPosition;
 
         /// <summary>
+        /// The physical position of this element in local space, constrained on the local z axis 
+        /// by the minMaxHeight of the button.
+        /// </summary>
+        protected Vector3 localPhysicsPositionConstrained;
+
+        /// <summary>
         /// The physical position of this element in world space; may diverge from the
         /// graphical position.
         /// </summary>
@@ -220,6 +226,7 @@ namespace Leap.Unity.Interaction
               + Vector3.back * Mathf.Lerp(minMaxHeight.x, minMaxHeight.y, restingHeight);
 
             localPhysicsPosition = transform.localPosition;
+            localPhysicsPositionConstrained = localPhysicsPosition;
             physicsPosition = transform.position;
             rigidbody.position = physicsPosition;
             _initialIgnoreGrasping = ignoreGrasping;
@@ -264,7 +271,7 @@ namespace Leap.Unity.Interaction
                             _physicsVelocity = Vector3.zero;
                         }
 
-                        rigidbody.position = physicsPosition;
+                        rigidbody.position = transform.parent.TransformPoint(localPhysicsPositionConstrained);
                         rigidbody.velocity = _physicsVelocity;
                     }
                 }
@@ -294,7 +301,7 @@ namespace Leap.Unity.Interaction
                 _physicsOccurred = false;
 
                 // Record and enforce the sliding state from the previous frame.
-                if (this.primaryHoverDistance < 0.005f || isGrasped)
+                if (this.primaryHoverDistance < 0.005f || isGrasped || isPressed)
                 {
                     localPhysicsPosition
                       = constrainDepressedLocalPosition(
@@ -438,6 +445,8 @@ namespace Leap.Unity.Interaction
 
                     _lastDepressor = null;
                 }
+
+                localPhysicsPositionConstrained = transform.parent.InverseTransformPoint(physicsPosition);
             }
         }
 

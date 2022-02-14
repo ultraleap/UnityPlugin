@@ -26,6 +26,13 @@ namespace Leap.Unity.Examples
         float logoSize = 15;
         Color32 highlightColor = new Color32(0, 235, 133, 255);
 
+        Texture2D background;
+
+        void Awake()
+        {
+            background = new Texture2D(0, 0);
+        }
+
         /// <summary>
         /// Draw GUI to the screen
         /// </summary>
@@ -47,7 +54,6 @@ namespace Leap.Unity.Examples
         /// <param name="skin"></param>
         void AdjustSkin(GUISkin skin)
         {
-            Texture2D background = new Texture2D(0, 0);
             skin.button.normal.background = background;
             skin.button.hover.background = background;
             skin.button.hover.textColor = highlightColor;

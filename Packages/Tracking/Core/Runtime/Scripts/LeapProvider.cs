@@ -18,6 +18,11 @@ namespace Leap.Unity
     /// Provides Frame object data to the Unity application by firing events as soon
     /// as Frame data is available. Frames contain all currently tracked Hands in view
     /// of the Leap Motion Controller.
+    /// 
+    /// LeapProvider defines the basic interface our plugin expects to use to retrieve 
+    /// Frame data. This abstraction allows you to create your own LeapProviders, which 
+    /// is useful when testing or developing in a context where Ultraleap Hand Tracking 
+    /// hardware isn't immediately available.
     /// </summary>
     public abstract class LeapProvider : MonoBehaviour
     {

@@ -17,8 +17,20 @@ using UnityEngine;
 
 namespace Leap.Unity.Interaction
 {
-
-    public enum ContactForceMode { Object, UI };
+    /// <summary>
+    /// Determines how much force an interaction controller should apply to this object. 
+    /// </summary>
+    public enum ContactForceMode
+    {
+        /// <summary>
+        /// For normal physical objects, you'll almost always want to use Object.
+        /// </summary>
+        Object,
+        /// <summary>
+        /// For interface-style objects like buttons and sliders, choose UI. This will make the objects to feel lighter and more reactive to gentle touches.
+        /// </summary>
+        UI
+    };
 
     /// <summary>
     /// InteractionBehaviours are components that enable GameObjects to interact with
@@ -36,14 +48,18 @@ namespace Leap.Unity.Interaction
     [RequireComponent(typeof(Rigidbody))]
     public class InteractionBehaviour : MonoBehaviour, IInteractionBehaviour
     {
-
+        /// <summary>
+        /// Used to constrain a Rigidbody.maxAngularVelocity
+        /// </summary>
         public const float MAX_ANGULAR_VELOCITY = 100F;
 
         #region Public API
 
         #region Hovering API
 
-        /// <summary> Gets whether any interaction controller is nearby. </summary>
+        /// <summary>
+        /// Gets whether any interaction controller is nearby.
+        /// </summary>
         public bool isHovered { get { return _hoveringControllers.Count > 0; } }
 
         /// <summary>
@@ -59,7 +75,9 @@ namespace Leap.Unity.Interaction
             }
         }
 
-        /// <summary> Gets the closest Leap hand to this object, or null if no hand is nearby. </summary>
+        /// <summary>
+        /// Gets the closest Leap hand to this object, or null if no hand is nearby.
+        /// </summary>
         public Hand closestHoveringHand
         {
             get
@@ -299,7 +317,9 @@ namespace Leap.Unity.Interaction
 
         #region Grasping API
 
-        /// <summary> Gets whether this object is grasped by any interaction controller. </summary>
+        /// <summary>
+        /// Gets whether this object is grasped by any interaction controller.
+        /// </summary>
         public bool isGrasped { get { return _graspingControllers.Count > 0; } }
 
         /// <summary>
@@ -611,6 +631,9 @@ namespace Leap.Unity.Interaction
         [Tooltip("The Interaction Manager responsible for this interaction object.")]
         [SerializeField]
         private InteractionManager _manager;
+        /// <summary>
+        /// The Interaction Manager responsible for this interaction object.
+        /// </summary>
         public InteractionManager manager
         {
             get { return _manager; }
@@ -637,16 +660,24 @@ namespace Leap.Unity.Interaction
         }
 
         private Rigidbody _rigidbody;
+
 #if UNITY_EDITOR
+        // This creates a new rigidbody property, overriding the MonoBehaviour one but in a way where the base class can still use the original rigidbody instead of getting the override as well.
+        // (It makes the rigidbody read as 'new public Rigidbody rigidbody')
         new
 #endif
-        /// <summary> The Rigidbody associated with this interaction object. </summary>
+        /// <summary>
+        /// The Rigidbody associated with this interaction object.
+        /// </summary>
         public Rigidbody rigidbody
         {
             get { return _rigidbody; }
             protected set { _rigidbody = value; }
         }
 
+        /// <summary>
+        /// A maximum of one (1) LeapSpace is supported per InteractionBehaviour.
+        /// </summary>
         public ISpaceComponent space { get; protected set; }
 
         [Header("Interaction Overrides")]
@@ -656,6 +687,9 @@ namespace Leap.Unity.Interaction
                + "None.")]
         [SerializeField]
         private IgnoreHoverMode _ignoreHoverMode = IgnoreHoverMode.None;
+        /// <summary>
+        /// This object will not receive hover callbacks from left controllers, right controllers, or either hand if this mode is set to anything other than None.
+        /// </summary>
         public IgnoreHoverMode ignoreHoverMode
         {
             get { return _ignoreHoverMode; }
@@ -678,6 +712,10 @@ namespace Leap.Unity.Interaction
         [SerializeField]
         [DisableIf("_isIgnoringAllHoverState", isEqualTo: true)]
         private bool _ignorePrimaryHover = false;
+
+        /// <summary>
+        /// Interaction controllers will not be able to mark this object as their primary hover if this property is checked. Primary hover requires hovering enabled to function, but it can be disabled independently of hovering.
+        /// </summary>
         public bool ignorePrimaryHover
         {
             get { return _ignorePrimaryHover; }
@@ -696,6 +734,9 @@ namespace Leap.Unity.Interaction
                + "property is checked.")]
         [SerializeField]
         private bool _ignoreContact = false;
+        /// <summary>
+        /// Interaction controllers will not be able to touch this object if this property is checked.
+        /// </summary>
         public bool ignoreContact
         {
             get { return _ignoreContact; }
@@ -715,6 +756,10 @@ namespace Leap.Unity.Interaction
                + "None.")]
         [SerializeField]
         private IgnoreHoverMode _ignoreGraspingMode = IgnoreHoverMode.None;
+
+        /// <summary>
+        /// This object will not receive grasping callbacks from left controllers, right controllers, or either hand if this mode is set to anything other than None.
+        /// </summary>
         public IgnoreHoverMode ignoreGraspingMode
         {
             get { return _ignoreGraspingMode; }
@@ -736,6 +781,10 @@ namespace Leap.Unity.Interaction
                + "property is checked.")]
         [SerializeField]
         private bool _ignoreGrasping = false;
+
+        /// <summary>
+        /// Interaction controllers will not be able to grasp this object if this property is checked.
+        /// </summary>
         public bool ignoreGrasping
         {
             get { return _ignoreGrasping; }
@@ -758,6 +807,10 @@ namespace Leap.Unity.Interaction
                + "touches; for normal physical objects, you'll almost always want Object.")]
         [SerializeField]
         private ContactForceMode _contactForceMode = ContactForceMode.Object;
+
+        /// <summary>
+        /// Determines how much force an interaction controller should apply to this object. For interface-style objects like buttons and sliders, choose UI. This will make the objects to feel lighter and more reactive to gentle touches; for normal physical objects, you'll almost always want Object.
+        /// </summary>
         public ContactForceMode contactForceMode
         {
             get { return _contactForceMode; }
@@ -770,6 +823,10 @@ namespace Leap.Unity.Interaction
                + "controllers?")]
         [SerializeField]
         private bool _allowMultiGrasp = false;
+
+        /// <summary>
+        /// Can this object be grasped simultaneously with two or more interaction controllers?
+        /// </summary>
         public bool allowMultiGrasp
         {
             get { return _allowMultiGrasp; }
@@ -782,6 +839,10 @@ namespace Leap.Unity.Interaction
         [SerializeField]
         [OnEditorChange("moveObjectWhenGrasped")]
         private bool _moveObjectWhenGrasped = true;
+
+        /// <summary>
+        /// Should interaction controllers move this object when it is grasped? Without this property checked, objects will still receive grasp callbacks, but you will need to move them manually via script.
+        /// </summary>
         public bool moveObjectWhenGrasped
         {
             get { return _moveObjectWhenGrasped; }
@@ -798,12 +859,25 @@ namespace Leap.Unity.Interaction
             }
         }
 
+        /// <summary>
+        /// When the object is held by an interaction controller, how should it move to its new position?
+        /// </summary>
         public enum GraspedMovementType
         {
+            /// <summary>
+            /// Inherit will simply use the isKinematic state of the Rigidbody from before it was grasped.
+            /// </summary>
             Inherit,
+            /// <summary>
+            /// Kinematic rigidbodies will always move to the target position, ignoring collisions.
+            /// </summary>
             Kinematic,
+            /// <summary>
+            /// Nonkinematic bodies will collide with other Rigidbodies, so they might not reach the target position.
+            /// </summary>
             Nonkinematic
         }
+
         [Tooltip("When the object is held by an interaction controller, how should it move to "
                + "its new position? Nonkinematic bodies will collide with other Rigidbodies, "
                + "so they might not reach the target position. Kinematic rigidbodies will "
@@ -821,6 +895,10 @@ namespace Leap.Unity.Interaction
                + "Manager's layer setting for its default layer. The interaction layer is "
                + "used for an object when it is not grasped and not ignoring contact.")]
         private bool _overrideInteractionLayer = false;
+
+        /// <summary>
+        /// If set to true, this interaction object will override the Interaction Manager's layer setting for its default layer. The interaction layer is used for an object when it is not grasped and not ignoring contact.
+        /// </summary>
         public bool overrideInteractionLayer
         {
             get
@@ -837,6 +915,10 @@ namespace Leap.Unity.Interaction
                + "not ignoring contact.")]
         [SerializeField]
         private SingleLayer _interactionLayer;
+
+        /// <summary>
+        /// Sets the override layer to use for this object when it is not grasped and not ignoring contact.
+        /// </summary>
         public SingleLayer interactionLayer
         {
             get { return _interactionLayer; }
@@ -850,6 +932,10 @@ namespace Leap.Unity.Interaction
                + "layer should not collide with the contact bone layer; it is used when the "
                + "interaction object is grasped or when it is ignoring contact.")]
         private bool _overrideNoContactLayer = false;
+
+        /// <summary>
+        /// If set to true, this interaction object will override the Interaction Manager's layer setting for its default no-contact layer. The no-contact layer should not collide with the contact bone layer; it is used when the interaction object is grasped or when it is ignoring contact.
+        /// </summary>
         public bool overrideNoContactLayer
         {
             get
@@ -867,6 +953,10 @@ namespace Leap.Unity.Interaction
                + "layer -- the layer interaction controllers' colliders are on.")]
         [SerializeField]
         private SingleLayer _noContactLayer;
+
+        /// <summary>
+        /// Overrides the layer this interaction object should be on when it is grasped or ignoring contact. This layer should not collide with the contact bone layer -- the layer interaction controllers' colliders are on.
+        /// </summary>
         public SingleLayer noContactLayer
         {
             get { return _noContactLayer; }
@@ -1034,6 +1124,9 @@ namespace Leap.Unity.Interaction
             }
         }
 
+        /// <summary>
+        /// For each InteractionController sort the closest hovering controller and raise OnHoverBegin event.
+        /// </summary>
         public void BeginHover(List<InteractionController> controllers)
         {
             foreach (var controller in controllers)
@@ -1054,6 +1147,9 @@ namespace Leap.Unity.Interaction
             }
         }
 
+        /// <summary>
+        /// For each InteractionController sort the closest hovering controller and raise OnHoverEnd event.
+        /// </summary>
         public void EndHover(List<InteractionController> controllers)
         {
             foreach (var controller in controllers)
@@ -1074,6 +1170,9 @@ namespace Leap.Unity.Interaction
             }
         }
 
+        /// <summary>
+        /// Refresh the list of closest hovering InteractionControllers and raise the OnHoverStay event
+        /// </summary>
         public void StayHovered(List<InteractionController> controllers)
         {
             refreshClosestHoveringController();
@@ -1155,6 +1254,9 @@ namespace Leap.Unity.Interaction
         private InteractionController _closestPrimaryHoveringController = null;
         private InteractionHand _closestPrimaryHoveringHand = null;
 
+        /// <summary>
+        /// For each InteractionController sort the closest primary hovering controller and raise OnPrimaryHoverBegin & OnPerControllerPrimaryHoverBegin events.
+        /// </summary>
         public void BeginPrimaryHover(List<InteractionController> controllers)
         {
             foreach (var controller in controllers)
@@ -1175,6 +1277,9 @@ namespace Leap.Unity.Interaction
             }
         }
 
+        /// <summary>
+        /// For each InteractionController sort the closest primary hovering controller and raise OnPerControllerPrimaryHoverEnd & OnPrimaryHoverEnd events.
+        /// </summary>
         public void EndPrimaryHover(List<InteractionController> controllers)
         {
             foreach (var controller in controllers)
@@ -1195,6 +1300,9 @@ namespace Leap.Unity.Interaction
             }
         }
 
+        /// <summary>
+        /// Refresh the closest primary hovering controllers and raise the OnPrimaryHoverStay event
+        /// </summary>
         public void StayPrimaryHovered(List<InteractionController> controllers)
         {
             refreshClosestPrimaryHoveringController();
@@ -1223,6 +1331,7 @@ namespace Leap.Unity.Interaction
             }
             return closestController;
         }
+
         /// <summary>
         /// Clears primary hover tracking state for this object on all of the currently-
         /// primary-hovering controllers. New priamry hover state will begin anew on the next
@@ -1285,6 +1394,9 @@ namespace Leap.Unity.Interaction
 
         private HashSet<InteractionController> _contactingControllers = new HashSet<InteractionController>();
 
+        /// <summary>
+        /// For each InteractionController raise the OnContactBegin event
+        /// </summary>
         public void BeginContact(List<InteractionController> controllers)
         {
             foreach (var controller in controllers)
@@ -1300,6 +1412,9 @@ namespace Leap.Unity.Interaction
             }
         }
 
+        /// <summary>
+        /// For each InteractionController raise the OnContactEnd event
+        /// </summary>
         public void EndContact(List<InteractionController> controllers)
         {
             foreach (var controller in controllers)
@@ -1315,6 +1430,9 @@ namespace Leap.Unity.Interaction
             }
         }
 
+        /// <summary>
+        /// Raise the OnContactStay event
+        /// </summary>
         public void StayContacted(List<InteractionController> controllers)
         {
             OnContactStay();
@@ -1360,7 +1478,10 @@ namespace Leap.Unity.Interaction
         private float _angularDragBeforeGrasp = 0.05F;
 
         private IGraspedPoseHandler _graspedPoseHandler;
-        /// <summary> Gets or sets the grasped pose handler for this Interaction object. </summary>
+
+        /// <summary>
+        /// Gets or sets the grasped pose handler for this Interaction object.
+        /// </summary>
         public IGraspedPoseHandler graspedPoseHandler
         {
             get
@@ -1404,7 +1525,10 @@ namespace Leap.Unity.Interaction
         }
 
         private IThrowHandler _throwHandler;
-        /// <summary> Gets or sets the throw handler for this Interaction object. </summary>
+
+        /// <summary>
+        /// Gets or sets the throw handler for this Interaction object.
+        /// </summary>
         public IThrowHandler throwHandler
         {
             get
@@ -1421,6 +1545,9 @@ namespace Leap.Unity.Interaction
             }
         }
 
+        /// <summary>
+        /// For each InteractionController Raise a OnPerControllerGraspBegin event and store rigidbody data
+        /// </summary>
         public void BeginGrasp(List<InteractionController> controllers)
         {
             _justGrasped = true;
@@ -1480,6 +1607,9 @@ namespace Leap.Unity.Interaction
             }
         }
 
+        /// <summary>
+        /// For each InteractionController Raise a OnPerControllerGraspEnd event and store rigidbody data
+        /// </summary>
         public void EndGrasp(List<InteractionController> controllers)
         {
             if (_graspingControllers.Count == controllers.Count && isSuspended)
@@ -1536,6 +1666,9 @@ namespace Leap.Unity.Interaction
             }
         }
 
+        /// <summary>
+        /// For each InteractionController calculate the grasped position and calculate the grasped movement in fixed update
+        /// </summary>
         public void StayGrasped(List<InteractionController> controllers)
         {
             if (moveObjectWhenGrasped)
@@ -1576,6 +1709,9 @@ namespace Leap.Unity.Interaction
 
         protected InteractionController _suspendingController = null;
 
+        /// <summary>
+        /// For a given InteractionController call the OnSuspensionBegin event
+        /// </summary>
         public void BeginSuspension(InteractionController controller)
         {
             _suspendingController = controller;
@@ -1583,6 +1719,9 @@ namespace Leap.Unity.Interaction
             OnSuspensionBegin(controller);
         }
 
+        /// <summary>
+        /// For a given InteractionController call the OnSuspensionEnd event
+        /// </summary>
         public void EndSuspension(InteractionController controller)
         {
             _suspendingController = null;
@@ -1598,6 +1737,9 @@ namespace Leap.Unity.Interaction
         protected Vector3 _accumulatedLinearAcceleration = Vector3.zero;
         protected Vector3 _accumulatedAngularAcceleration = Vector3.zero;
 
+        /// <summary>
+        /// When grasping, update the rigidbody of this Interaction Behaviour to accumulate the linear acceleration and angular forces
+        /// </summary>
         public void FixedUpdateForces()
         {
             if (!isGrasped)
@@ -1846,6 +1988,9 @@ namespace Leap.Unity.Interaction
         [SerializeField]
         private EnumEventTable _eventTable;
 
+        /// <summary>
+        /// Enum representing the types of events an InteractionBehaviour can invoke
+        /// </summary>
         public enum EventType
         {
             HoverBegin = 100,
