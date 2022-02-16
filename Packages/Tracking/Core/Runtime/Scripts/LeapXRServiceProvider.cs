@@ -414,9 +414,6 @@ namespace Leap.Unity
             {
                 Debug.LogError("Cannot perform temporal warping with no pre-cull camera.");
             }
-
-            //Get the local tracked pose from the XR Headset so we can calculate the _trackingBaseDeltaPose from it 
-            var trackedPose = mainCamera.transform.ToPose();
         }
 
         protected override void Update()
