@@ -37,6 +37,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Interactions callback scene allows blocks to be moved without doing a grasp pose.
 - Interactions object scene platform/stage seems to move a lot
 - Dynamic UI objects throwing backwards most of the time.
+- Service Providers not referenced in Hand Post-Process example scene (to fix: drag 'Intertia Hand Models' into the leap Provider of its children capsule hands)
 
 
 ## [5.2.0]
