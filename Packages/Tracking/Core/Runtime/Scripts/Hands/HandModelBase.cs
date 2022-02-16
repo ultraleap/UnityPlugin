@@ -159,8 +159,18 @@ namespace Leap.Unity
 
                 if (_leapProvider != null && Application.isPlaying)
                 {
-                    leapProvider.OnUpdateFrame += UpdateFrame;
-                    leapProvider.OnFixedFrame += FixedUpdateFrame;
+                    if (HandModelType == ModelType.Graphics)
+                    {
+                        leapProvider.OnUpdateFrame -= UpdateFrame;
+                        leapProvider.OnUpdateFrame += UpdateFrame;
+                    }
+                    else
+                    {
+                        leapProvider.OnFixedFrame -= FixedUpdateFrame;
+                        leapProvider.OnFixedFrame += FixedUpdateFrame;
+                    }
+                   
+                    
                 }
             }
         }
