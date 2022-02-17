@@ -261,13 +261,15 @@ namespace Leap.Unity.HandsModule
         {
             var length = 0f;
 
+            var finger = boundHand.fingers[(int)Finger.FingerType.TYPE_MIDDLE];
+
             //Loop through the bones and sum up there lengths
-            for (int boneID = 0; boneID < boundHand.fingers[(int)Finger.FingerType.TYPE_MIDDLE].boundBones.Length; boneID++)
+            for (int boneID = 0; boneID < finger.boundBones.Length; boneID++)
             {
-                if(boneID + 1 <= boundHand.fingers[(int)Finger.FingerType.TYPE_MIDDLE].boundBones.Length - 1)
+                if(boneID + 1 <= finger.boundBones.Length - 1)
                 {
-                    var bone = boundHand.fingers[(int)Finger.FingerType.TYPE_MIDDLE].boundBones[boneID];
-                    var nextBone = boundHand.fingers[(int)Finger.FingerType.TYPE_MIDDLE].boundBones[boneID + 1];
+                    var bone = finger.boundBones[boneID];
+                    var nextBone = finger.boundBones[boneID + 1];
 
                     if (bone.boundTransform != null && nextBone.boundTransform != null)
                     {

@@ -88,6 +88,8 @@ namespace Leap.Unity.HandsModule
             }
 
             SetSerializedProperties();
+            UpgradeHelper();
+
         }
 
         /// <summary>
@@ -926,5 +928,26 @@ namespace Leap.Unity.HandsModule
                 GUILayout.Space(handTexture.height * 1.25f);
             }
         }
+
+        #region Hand Binder Upgrade Utility Functions
+
+        void UpgradeHelper()
+        {
+            UpgradeHandScaleFeature();
+        }
+
+        void UpgradeHandScaleFeature()
+        {
+            if (myTarget.BoundHand != null)
+            {
+                if (myTarget.BoundHand.baseScale == 0)
+                {
+                    myTarget.ResetHand();
+                    HandBinderAutoBinder.CalculateHandSize(myTarget.BoundHand);
+                    Debug.Log("Hand Binder performed an upgrade to allow scaling the model based on the tracking data");
+                }
+            }
+        }
+        #endregion
     }
 }
