@@ -21,8 +21,8 @@ namespace Leap.Unity.HandsModule
         public BoundFinger[] fingers = new BoundFinger[5];
         public BoundBone wrist = new BoundBone();
         public BoundBone elbow = new BoundBone();
-        public float baseScale = Mathf.NegativeInfinity;
-        public Vector3 startScale = Vector3.negativeInfinity;
+        public float baseScale;
+        public Vector3 startScale;
     }
 
     /// <summary>

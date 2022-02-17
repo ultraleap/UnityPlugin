@@ -940,12 +940,15 @@ namespace Leap.Unity.HandsModule
         {
             if (myTarget.BoundHand != null)
             {
-                if (myTarget.BoundHand.baseScale == 0 && myTarget.BoundHand.startScale == Vector3.zero)
+                if(myTarget.BoundHand.startScale == Vector3.negativeInfinity || myTarget.BoundHand.startScale == Vector3.zero)
+                {
+                    myTarget.BoundHand.startScale = myTarget.transform.localScale;
+                }
+
+                if (myTarget.BoundHand.baseScale == 0)
                 {
                     myTarget.ResetHand();
                     HandBinderAutoBinder.CalculateHandSize(myTarget.BoundHand);
-                    myTarget.BoundHand.startScale = myTarget.transform.localScale;
-                    Debug.Log("Hand Binder performed an upgrade to allow scaling the model based on the tracking data");
                 }
             }
         }
