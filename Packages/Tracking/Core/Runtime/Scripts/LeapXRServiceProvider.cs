@@ -695,11 +695,26 @@ namespace Leap.Unity
                 warpedRotation *= Quaternion.Euler(-90f, 90f, 90f);
             }
 
-            leapTransform = new LeapTransform(
-                warpedPosition.ToVector(),
-                warpedRotation.ToLeapQuaternion(),
-                Vector.Ones * 1e-3f
-            );
+
+#if !SVR
+            // Use the mainCamera parent to transfrom the warped positions so the player can move around
+            if (mainCamera.transform.parent != null)
+            {
+                leapTransform = new LeapTransform(
+                  mainCamera.transform.parent.TransformPoint(warpedPosition).ToVector(),
+                  mainCamera.transform.parent.TransformRotation(warpedRotation).ToLeapQuaternion(),
+                  Vector.Ones * 1e-3f
+                );
+            }
+            else
+#endif
+            {
+                leapTransform = new LeapTransform(
+                  warpedPosition.ToVector(),
+                  warpedRotation.ToLeapQuaternion(),
+                  Vector.Ones * 1e-3f
+                );
+            }
 
             leapTransform.MirrorZ();
 
