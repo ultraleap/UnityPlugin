@@ -516,7 +516,7 @@ namespace Leap.Unity
             if (_deviceOffsetMode == DeviceOffsetMode.Default
                 || _deviceOffsetMode == DeviceOffsetMode.ManualHeadOffset)
             {
-                if(mainCamera.transform.parent != null)
+                if (mainCamera.transform.parent != null)
                 {
                     var position = mainCamera.transform.parent.InverseTransformPoint(mainCamera.transform.position);
                     var rotation = mainCamera.transform.parent.InverseTransformRotation(mainCamera.transform.rotation);
