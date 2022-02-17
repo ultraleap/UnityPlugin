@@ -202,7 +202,7 @@ namespace Leap.Unity.HandsModule
         /// </summary>
         public override void UpdateHand()
         {
-            if (!SetEditorPose && !Application.isPlaying)
+            if (!SetEditorPose && !Application.isPlaying || (BoundHand.baseScale == Mathf.NegativeInfinity && BoundHand.startScale == Vector3.negativeInfinity))
             {
                 return;
             }
