@@ -20,36 +20,30 @@ namespace Leap.Unity.HandsModule
     [DisallowMultipleComponent]
     public class HandBinder : HandModelBase
     {
-        /// <summary>
-        /// The Leap Hand object this hand model represents.
-        /// </summary>
-        public Hand LeapHand;
-
+        #region Hand Binder
         /// <summary> 
-        /// The size of the debug gizmos 
+        /// The data structure that contains transforms that get bound to the leap data 
         /// </summary>
-        [Tooltip("The size of the debug gizmos")]
-        public float GizmoSize = 0.004f;
+        public BoundHand BoundHand = new BoundHand();
+
         /// <summary> 
         /// The length of the elbow to maintain the correct offset from the wrist 
         /// </summary>
         [Tooltip("The length of the elbow to maintain the correct offset from the wrist")]
         public float ElbowLength;
+
         /// <summary> 
         /// The rotation offset that will be assigned to all the fingers 
         /// </summary>
         [Tooltip("The rotation offset that will be assigned to all the fingers")]
         public Vector3 GlobalFingerRotationOffset;
+
         /// <summary> 
         /// The rotation offset that will be assigned to the wrist 
         /// </summary>
         [Tooltip("The rotation offset that will be assigned to the wrist")]
         public Vector3 WristRotationOffset;
-        /// <summary> 
-        /// Set the assigned transforms to the leap hand during editor 
-        /// </summary>
-        [Tooltip("Set the assigned transforms to the leap hand during editor")]
-        public bool SetEditorPose;
+
         /// <summary> 
         /// Set the assigned transforms to the same position as the Leap Hand 
         /// </summary>
@@ -60,6 +54,31 @@ namespace Leap.Unity.HandsModule
         /// Should the hand binder modify the scale of the hand
         /// </summary>
         public bool SetModelScale = true;
+
+        /// <summary> 
+        /// User defined offsets in editor script 
+        /// </summary>
+        public List<BoundTypes> Offsets = new List<BoundTypes>();
+
+        /// <summary> 
+        /// Stores all the children's default pose 
+        /// </summary>
+        public SerializedTransform[] DefaultHandPose;
+        #endregion
+
+        #region Editor
+
+        /// <summary> 
+        /// Set the assigned transforms to the leap hand during editor 
+        /// </summary>
+        [Tooltip("Set the assigned transforms to the leap hand during editor")]
+        public bool SetEditorPose;
+
+        /// <summary> 
+        /// The size of the debug gizmos 
+        /// </summary>
+        [Tooltip("The size of the debug gizmos")]
+        public float GizmoSize = 0.004f;
 
         /// <summary> 
         /// Show the Leap Hand in the scene 
@@ -96,47 +115,6 @@ namespace Leap.Unity.HandsModule
         /// Used by the editor script. 
         /// </summary>
         public bool EditPoseNeedsResetting = false;
-        /// <summary> 
-        /// The chirality or handedness of the hand.
-        /// Custom editor requires Chirality in a non overridden property, Public Chirality exists for the editor.
-        /// </summary>
-        public Chirality Chirality;
-
-        /// <summary> 
-        /// The data structure that contains transforms that get bound to the leap data 
-        /// </summary>
-        public BoundHand BoundHand = new BoundHand();
-        /// <summary> 
-        /// User defined offsets in editor script 
-        /// </summary>
-        public List<BoundTypes> Offsets = new List<BoundTypes>();
-        /// <summary> 
-        /// Stores all the children's default pose 
-        /// </summary>
-        public SerializedTransform[] DefaultHandPose;
-
-        /// <summary>
-        /// The chirality or handedness of this hand (left or right).
-        /// To set, change the public Chirality.
-        /// </summary>
-        public override Chirality Handedness { get { return Chirality; } set { } }
-        /// <summary>
-        /// The type of the Hand model (set to Graphics).
-        /// </summary>
-        public override ModelType HandModelType { get { return ModelType.Graphics; } }
-        /// <summary>
-        /// Returns the Leap Hand object represented by this HandModelBase. 
-        /// Note that any physical quantities and directions obtained from the Leap Hand object are 
-        /// relative to the Leap Motion coordinate system, which uses a right-handed axes and units 
-        /// of millimeters.
-        /// </summary>
-        /// <returns></returns>
-        public override Hand GetLeapHand() { return LeapHand; }
-        /// <summary>
-        /// Assigns a Leap Hand object to this HandModelBase.
-        /// </summary>
-        /// <param name="hand"></param>
-        public override void SetLeapHand(Hand hand) { LeapHand = hand; }
 
         /// <summary>
         /// Returns whether or not this hand model supports editor persistence. 
@@ -159,42 +137,47 @@ namespace Leap.Unity.HandsModule
             return editorPersistance;
         }
 
-        private void OnDestroy()
-        {
-            ResetHand();
-        }
+        #endregion
 
-        //Reset is called when the user hits the Reset button in the Inspector's context menu or when adding the component the first time.
-        private void Reset()
-        {
+        #region Hand Model Base
 
-            //Return if we already have assigned base transforms
-            if (DefaultHandPose != null)
-            {
-                ResetHand();
-                return;
-            }
+        /// <summary> 
+        /// The chirality or handedness of the hand.
+        /// Custom editor requires Chirality in a non overridden property, Public Chirality exists for the editor.
+        /// </summary>
+        public Chirality Chirality;
 
-            else
-            {
-                //Store all children transforms so the user has the ability to reset back to a default pose
-                var allChildren = new List<Transform>();
-                allChildren.Add(transform);
-                allChildren.AddRange(HandBinderAutoBinder.GetAllChildren(transform));
+        /// <summary>
+        /// The chirality or handedness of this hand (left or right).
+        /// To set, change the public Chirality.
+        /// </summary>
+        public override Chirality Handedness { get { return Chirality; } set { } }
+        /// <summary>
+        /// The type of the Hand model (set to Graphics).
+        /// </summary>
+        public override ModelType HandModelType { get { return ModelType.Graphics; } }
 
-                var baseTransforms = new List<SerializedTransform>();
-                foreach (var child in allChildren)
-                {
-                    var serializedTransform = new SerializedTransform();
-                    serializedTransform.reference = child.gameObject;
-                    serializedTransform.transform = new TransformStore();
-                    serializedTransform.transform.position = child.localPosition;
-                    serializedTransform.transform.rotation = child.localRotation.eulerAngles;
-                    baseTransforms.Add(serializedTransform);
-                }
-                DefaultHandPose = baseTransforms.ToArray();
-            }
-        }
+        /// <summary>
+        /// The Leap Hand object this hand model represents.
+        /// </summary>
+        public Hand LeapHand;
+
+        /// <summary>
+        /// Returns the Leap Hand object represented by this HandModelBase. 
+        /// Note that any physical quantities and directions obtained from the Leap Hand object are 
+        /// relative to the Leap Motion coordinate system, which uses a right-handed axes and units 
+        /// of millimeters.
+        /// </summary>
+        /// <returns></returns>
+        public override Hand GetLeapHand() { return LeapHand; }
+
+        /// <summary>
+        /// Assigns a Leap Hand object to this HandModelBase.
+        /// </summary>
+        /// <param name="hand"></param>
+        public override void SetLeapHand(Hand hand) { LeapHand = hand; }
+
+        #endregion
 
         /// <summary>
         /// Called once per frame when the LeapProvider calls the event OnUpdateFrame.
@@ -202,104 +185,134 @@ namespace Leap.Unity.HandsModule
         /// </summary>
         public override void UpdateHand()
         {
-            if (!SetEditorPose && !Application.isPlaying || (BoundHand.baseScale == Mathf.NegativeInfinity && BoundHand.startScale == Vector3.negativeInfinity))
+            if (!SetEditorPose && !Application.isPlaying)
             {
                 return;
             }
 
-            var hand = GetLeapHand();
-
-            if (hand != null)
+            if (LeapHand != null)
             {
-                if (SetModelScale && SetPositions && BoundHand.startScale != Vector3.zero)
-                {
-                    transform.localScale = BoundHand.startScale * CalculateRatio(hand);
-                }
-                else
-                {
-                    transform.localScale = BoundHand.startScale;
-                }
-
-                if (BoundHand.elbow.boundTransform != null)
-                {
-                    if (SetPositions)
-                    {
-                        BoundHand.elbow.boundTransform.transform.position = hand.Arm.ElbowPosition.ToVector3();
-                        BoundHand.elbow.boundTransform.transform.rotation = hand.Arm.Rotation.ToQuaternion() * Quaternion.Euler(BoundHand.elbow.offset.rotation) * Quaternion.Euler(WristRotationOffset);
-                    }
-                    //Calculate the elbows position and rotation making sure to maintain the models forearm length
-                    else if (BoundHand.wrist.boundTransform != null)
-                    {
-                        var dir = (hand.Arm.PrevJoint.ToVector3() - hand.WristPosition.ToVector3()).normalized;
-                        var position = hand.WristPosition.ToVector3() + dir * ElbowLength;
-                        position += BoundHand.elbow.offset.position;
-
-                        BoundHand.elbow.boundTransform.transform.position = position;
-                        BoundHand.elbow.boundTransform.transform.rotation = hand.Arm.Rotation.ToQuaternion()
-                            * Quaternion.Euler(BoundHand.elbow.offset.rotation)
-                            * Quaternion.Euler(WristRotationOffset);
-                    }
-                }
-
-                //Update the wrist's position and rotation to leap data
-                if (BoundHand.wrist.boundTransform != null)
-                {
-
-                    //Calculate the position of the wrist to the leap position + offset defined by the user
-                    var wristPosition = hand.WristPosition.ToVector3() + BoundHand.wrist.offset.position;
-
-                    //Calculate rotation offset needed to get the wrist into the same rotation as the leap based on the calculated wrist offset
-                    var leapRotationOffset = ((Quaternion.Inverse(BoundHand.wrist.boundTransform.transform.rotation) * hand.Rotation.ToQuaternion()) * Quaternion.Euler(WristRotationOffset)).eulerAngles;
-
-                    //Set the wrist bone to the calculated values
-                    BoundHand.wrist.boundTransform.transform.position = wristPosition;
-                    BoundHand.wrist.boundTransform.transform.rotation *= Quaternion.Euler(leapRotationOffset);
-                }
+                SetHandScale();
+                SetElbow();
+                SetWrist();
 
                 //Loop through all the leap fingers and update the bound fingers to the leap data
-
-                for (int fingerIndex = 0; fingerIndex < hand.Fingers.Count; fingerIndex++)
+                for (int fingerIndex = 0; fingerIndex < LeapHand.Fingers.Count; fingerIndex++)
                 {
-                    for (int boneIndex = 0; boneIndex < hand.Fingers[fingerIndex].bones.Length; boneIndex++)
+                    for (int boneIndex = 0; boneIndex < LeapHand.Fingers[fingerIndex].bones.Length; boneIndex++)
                     {
-
-                        //The transform that the user has defined
-                        var boundTransform = BoundHand.fingers[fingerIndex].boundBones[boneIndex].boundTransform;
-
-                        //Continue if the user has not defined a transform for this finger
-                        if (boundTransform == null)
-                        {
-                            continue;
-                        }
-
-                        //Get the start transform that was stored for each assigned transform
-                        var startTransform = BoundHand.fingers[fingerIndex].boundBones[boneIndex].startTransform;
-
-                        //Get the leap bone to extract the position and rotation values
-                        var leapBone = hand.Fingers[fingerIndex].bones[boneIndex];
-                        //Get any offsets the user has set up
-                        var boneOffset = BoundHand.fingers[fingerIndex].boundBones[boneIndex].offset;
-
-                        //Only update the finger position if the user has defined this behaviour
-                        if (SetPositions)
-                        {
-                            boundTransform.transform.position = leapBone.PrevJoint.ToVector3();
-                            boundTransform.transform.localPosition += boneOffset.position;
-                        }
-
-                        else
-                        {
-                            boundTransform.transform.localPosition = startTransform.position + boneOffset.position;
-                        }
-
-                        //Update the bound transforms rotation to the leap's rotation * global rotation offset * any further offsets the user has defined
-                        boundTransform.transform.rotation = leapBone.Rotation.ToQuaternion() * Quaternion.Euler(GlobalFingerRotationOffset) * Quaternion.Euler(boneOffset.rotation);
+                        SetBonePosition(fingerIndex, boneIndex);
                     }
                 }
 
                 EditPoseNeedsResetting = true;
             }
+        }
 
+        /// <summary>
+        /// Set the hand model scale based on the CalculatedRatio()
+        /// </summary>
+        void SetHandScale()
+        {
+            if(SetPositions)
+            {
+                if (SetModelScale)
+                {
+                    if(BoundHand.startScale != Vector3.zero)
+                    {
+                        transform.localScale = BoundHand.startScale * CalculateRatio(LeapHand);
+                    }
+                }
+                else if (BoundHand.startScale != Vector3.zero)
+                {
+                    transform.localScale = BoundHand.startScale;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Set the Elbow joint into the correct position and rotation
+        /// </summary>
+        void SetElbow()
+        {
+            if (BoundHand.elbow.boundTransform != null)
+            {
+                if (SetPositions)
+                {
+                    BoundHand.elbow.boundTransform.transform.position = LeapHand.Arm.ElbowPosition.ToVector3();
+                    BoundHand.elbow.boundTransform.transform.rotation = LeapHand.Arm.Rotation.ToQuaternion() * Quaternion.Euler(BoundHand.elbow.offset.rotation) * Quaternion.Euler(WristRotationOffset);
+                }
+                //Calculate the elbows position and rotation making sure to maintain the models forearm length
+                else if (BoundHand.wrist.boundTransform != null)
+                {
+                    var dir = (LeapHand.Arm.PrevJoint.ToVector3() - LeapHand.WristPosition.ToVector3()).normalized;
+                    var position = LeapHand.WristPosition.ToVector3() + dir * ElbowLength;
+                    position += BoundHand.elbow.offset.position;
+
+                    BoundHand.elbow.boundTransform.transform.position = position;
+                    BoundHand.elbow.boundTransform.transform.rotation = LeapHand.Arm.Rotation.ToQuaternion()
+                        * Quaternion.Euler(BoundHand.elbow.offset.rotation)
+                        * Quaternion.Euler(WristRotationOffset);
+                }
+            }
+        }
+        
+        /// <summary>
+        /// Set the wrist into the correct position and rotation
+        /// </summary>
+        void SetWrist()
+        {
+            //Update the wrist's position and rotation to leap data
+            if (BoundHand.wrist.boundTransform != null)
+            {
+                //Calculate the position of the wrist to the leap position + offset defined by the user
+                var wristPosition = LeapHand.WristPosition.ToVector3() + BoundHand.wrist.offset.position;
+
+                //Calculate rotation offset needed to get the wrist into the same rotation as the leap based on the calculated wrist offset
+                var leapRotationOffset = ((Quaternion.Inverse(BoundHand.wrist.boundTransform.transform.rotation) * LeapHand.Rotation.ToQuaternion()) * Quaternion.Euler(WristRotationOffset)).eulerAngles;
+
+                //Set the wrist bone to the calculated values
+                BoundHand.wrist.boundTransform.transform.position = wristPosition;
+                BoundHand.wrist.boundTransform.transform.rotation *= Quaternion.Euler(leapRotationOffset);
+            }
+        }
+
+        /// <summary>
+        /// Set a bone of the hand model into the correct position and rotation
+        /// </summary>
+        void SetBonePosition(int fingerIndex, int boneIndex)
+        {
+            var boundBone = BoundHand.fingers[fingerIndex].boundBones[boneIndex];
+
+            //Continue if the user has not defined a transform for this finger
+            if (boundBone.boundTransform == null)
+            {
+                return;
+            }
+
+            //Get the start transform that was stored for each assigned transform
+            var startTransform = boundBone.startTransform;
+            //Get the leap bone to extract the position and rotation values
+            var leapBone = LeapHand.Fingers[fingerIndex].bones[boneIndex];
+            //Get any offsets the user has set up
+            var boneOffset = boundBone.offset;
+
+            var boundTransform = boundBone.boundTransform;
+
+            //Only update the finger position if the user has defined this behaviour
+            if (SetPositions)
+            {
+                boundTransform.transform.position = leapBone.PrevJoint.ToVector3();
+                boundTransform.transform.localPosition += boneOffset.position;
+            }
+
+            else
+            {
+                boundTransform.transform.localPosition = startTransform.position + boneOffset.position;
+            }
+
+            //Update the bound transforms rotation to the leap's rotation * global rotation offset * any further offsets the user has defined
+            boundTransform.transform.rotation = leapBone.Rotation.ToQuaternion() * Quaternion.Euler(GlobalFingerRotationOffset) * Quaternion.Euler(boneOffset.rotation);
         }
 
         /// <summary>
@@ -325,11 +338,56 @@ namespace Leap.Unity.HandsModule
         }
 
         /// <summary>
+        /// When this component is removed from an object, ensure the hand is reset back to how it started
+        /// </summary>
+        private void OnDestroy()
+        {
+            ResetHand();
+        }
+
+        /// <summary>
+        /// Reset is called when the user hits the Reset button in the Inspector's context menu or when adding the component the first time.
+        /// </summary>
+        private void Reset()
+        {
+            //Return if we already have assigned base transforms
+            if (DefaultHandPose != null)
+            {
+                ResetHand();
+                return;
+            }
+
+            else
+            {
+                SetDefaultHandPose();
+            }
+        }
+
+        void SetDefaultHandPose()
+        {
+            //Store all children transforms so the user has the ability to reset back to a default pose
+            var allChildren = new List<Transform>();
+            allChildren.Add(transform);
+            allChildren.AddRange(HandBinderAutoBinder.GetAllChildren(transform));
+
+            var baseTransforms = new List<SerializedTransform>();
+            foreach (var child in allChildren)
+            {
+                var serializedTransform = new SerializedTransform();
+                serializedTransform.reference = child.gameObject;
+                serializedTransform.transform = new TransformStore();
+                serializedTransform.transform.position = child.localPosition;
+                serializedTransform.transform.rotation = child.localRotation.eulerAngles;
+                baseTransforms.Add(serializedTransform);
+            }
+            DefaultHandPose = baseTransforms.ToArray();
+        }
+
+        /// <summary>
         /// Reset the boundGameobjects back to the default pose given by DefaultHandPose.
         /// </summary>
         public void ResetHand(bool forceReset = false)
         {
-
             if (DefaultHandPose == null || EditPoseNeedsResetting == false && forceReset == false)
             {
                 return;
@@ -345,6 +403,12 @@ namespace Leap.Unity.HandsModule
                     baseTransform.reference.transform.localRotation = Quaternion.Euler(baseTransform.transform.rotation);
                 }
             }
+
+            if (BoundHand.startScale != Vector3.zero)
+            {
+                transform.localScale = BoundHand.startScale;
+            }
+
             EditPoseNeedsResetting = false;
         }
     }
