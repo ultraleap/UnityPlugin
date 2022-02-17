@@ -307,6 +307,7 @@ namespace Leap.Unity
         protected Vector3 warpedPosition = Vector3.zero;
         protected Quaternion warpedRotation = Quaternion.identity;
         protected Matrix4x4[] _transformArray = new Matrix4x4[2];
+        private Pose? _trackingBaseDeltaPose = null;
 
         /// <summary>
         /// Contains the Frame.Timestamp of the most recent tracked frame.
@@ -416,7 +417,13 @@ namespace Leap.Unity
             }
 
             //Get the local tracked pose from the XR Headset so we can calculate the _trackingBaseDeltaPose from it 
-            var trackedPose = mainCamera.transform.ToPose();
+            var trackedPose = new Pose(XRSupportUtil.GetXRNodeCenterEyeLocalPosition(), XRSupportUtil.GetXRNodeCenterEyeLocalRotation());
+
+            //Find the pose delta from the "local" tracked pose to the actual camera pose, we will use this later on to maintain offsets
+            if (!_trackingBaseDeltaPose.HasValue)
+            {
+                _trackingBaseDeltaPose = mainCamera.transform.ToLocalPose().mul(trackedPose.inverse());
+            }
         }
 
         protected override void Update()
@@ -520,7 +527,9 @@ namespace Leap.Unity
                 || _deviceOffsetMode == DeviceOffsetMode.ManualHeadOffset)
             {
                 //Get the local tracked pose from the XR Headset
-                trackedPose = mainCamera.transform.ToPose();
+                trackedPose = new Pose(XRSupportUtil.GetXRNodeCenterEyeLocalPosition(), XRSupportUtil.GetXRNodeCenterEyeLocalRotation());
+                //Use the _trackingBaseDeltaPose calculated on start to convert the local spaced trackedPose into a world space position
+                trackedPose = _trackingBaseDeltaPose.Value.mul(trackedPose);
 
             }
             else if (_deviceOffsetMode == DeviceOffsetMode.Transform)
