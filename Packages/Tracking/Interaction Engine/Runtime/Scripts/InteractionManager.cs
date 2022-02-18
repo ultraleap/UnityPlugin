@@ -20,6 +20,9 @@ using UnityEditor;
 namespace Leap.Unity.Interaction
 {
 
+    /// <summary>
+    /// This class allows IInteractionBehaviours to register with it and provides all of the callbacks needed for operation. This class also takes care of all bookkeeping to keep track of the objects, hands, and the internal state of the interaction engine.
+    /// </summary>
     [DisallowMultipleComponent]
     [ExecuteInEditMode]
     public class InteractionManager : MonoBehaviour, IInternalInteractionManager,
@@ -31,6 +34,7 @@ namespace Leap.Unity.Interaction
         // Header "Interaction Controllers" via InteractionManagerEditor.cs.
         [SerializeField]
         private InteractionControllerSet _interactionControllers = new InteractionControllerSet();
+
         /// <summary>
         /// Gets the list of interaction controllers managed by this InteractionManager.
         /// </summary>
@@ -60,12 +64,21 @@ namespace Leap.Unity.Interaction
                + "you expect your player's hands or controllers to ever have non-unit scale.")]
         public float touchActivationRadius = 0.075F;
 
+        /// <summary>
+        /// Defines what happens when releasing a multi-grasp-enabled object with a single hand or controller.
+        /// </summary>
         public enum MultiGraspHoldingMode
         {
+            /// <summary>
+            /// Default Setting - If set to PreservePosePerController, when holding a multi-grasp-enabled object and releasing with a single hand or controller, the object's held pose will adjust to reflect only the remaining holding controllers. 
+            /// </summary>
             PreservePosePerController,
+            /// <summary>
+            /// If set to ReinitializeOnAnyRelease, when any hand or controller releases an object, the remaining controllers will reinitialize their holding pose to match the last-held state of the object, allowing the user to rotate and translate the object more loosely.
+            /// </summary>
             ReinitializeOnAnyRelease
         }
-        [Tooltip("If set to PreservePosePerController, when holding a multi-grasp-enabled object and releasing with a single hand or controller, the object's held pose will adjust to reflect only the remaining holding controllers.\n\nIf set to PreservePosePerController, when any hand or controller releases an object, the remaining controllers will reinitialize their holding pose to match the last-held state of the object, allowing the user to rotate and translate the object more loosely.\n\nPreservePosePerController is the default setting.")]
+        [Tooltip("If set to PreservePosePerController, when holding a multi-grasp-enabled object and releasing with a single hand or controller, the object's held pose will adjust to reflect only the remaining holding controllers.\n\nIf set to ReinitializeOnAnyRelease, when any hand or controller releases an object, the remaining controllers will reinitialize their holding pose to match the last-held state of the object, allowing the user to rotate and translate the object more loosely.\n\nPreservePosePerController is the default setting.")]
         public MultiGraspHoldingMode multiGraspHoldingMode = MultiGraspHoldingMode.PreservePosePerController;
 
         [Header("Layer Settings")]
@@ -78,6 +91,7 @@ namespace Leap.Unity.Interaction
         [SerializeField]
         [EditTimeOnly]
         protected bool _autoGenerateLayers = true;
+
         /// <summary>
         /// Gets whether auto-generate layers was enabled for this Interaction Manager.
         /// </summary>
@@ -88,6 +102,9 @@ namespace Leap.Unity.Interaction
                + "layer specified here.")]
         [SerializeField]
         protected SingleLayer _templateLayer = 0;
+        /// <summary>
+        /// When automatically generating layers, the Interaction layer (for interactable objects) will use the same physics collision flags as the layer specified here.
+        /// </summary>
         public SingleLayer templateLayer { get { return _templateLayer; } }
 
         [Tooltip("The layer for interactable objects (i.e. InteractionBehaviours). Usually "
@@ -96,6 +113,10 @@ namespace Leap.Unity.Interaction
                + "collision against all physics objects in the scene.")]
         [SerializeField]
         protected SingleLayer _interactionLayer = 0;
+
+        /// <summary>
+        /// The layer for interactable objects (i.e. InteractionBehaviours). Usually this would have the same collision flags as the Default layer, but it should be its own layer so interaction controllers don't have to check collision against all physics objects in the scene.
+        /// </summary>
         public SingleLayer interactionLayer { get { return _interactionLayer; } }
 
         [Tooltip("The layer objects are moved to when they become grasped, or if they are "
@@ -104,6 +125,10 @@ namespace Leap.Unity.Interaction
                + "interaction layer collides with.")]
         [SerializeField]
         protected SingleLayer _interactionNoContactLayer = 0;
+
+        /// <summary>
+        /// The layer objects are moved to when they become grasped, or if they are otherwise ignoring controller contact. This layer should not collide with the contact bone layer, but should collide with everything else that the interaction layer collides with.
+        /// </summary>
         public SingleLayer interactionNoContactLayer { get { return _interactionNoContactLayer; } }
 
         [Tooltip("The layer containing the collider 'bones' of the interaction controller. "
@@ -111,6 +136,10 @@ namespace Leap.Unity.Interaction
                + "but it should not collide with the grasped object layer.")]
         [SerializeField]
         protected SingleLayer _contactBoneLayer = 0;
+
+        /// <summary>
+        /// The layer containing the collider 'bones' of the interaction controller. This layer should collide with anything you'd like to be able to touch, but it should not collide with the grasped object layer.
+        /// </summary>
         public SingleLayer contactBoneLayer { get { return _contactBoneLayer; } }
 
         [Header("Debug Settings")]
@@ -123,8 +152,17 @@ namespace Leap.Unity.Interaction
 
         #region Events
 
+        /// <summary>
+        /// An Action that is called in Late Update
+        /// </summary>
         public Action OnGraphicalUpdate = () => { };
+        /// <summary>
+        /// An Action that is at the start of Fixed Update
+        /// </summary>
         public Action OnPrePhysicalUpdate = () => { };
+        /// <summary>
+        /// An Action that is called at the end of fixed update
+        /// </summary>
         public Action OnPostPhysicalUpdate = () => { };
 
         #endregion
@@ -735,85 +773,13 @@ namespace Leap.Unity.Interaction
 
         #endregion
 
-        #region State Notifications
-
-        // TODO: Delete this whole sction
-
-        //private HashSet<InteractionController> controllerSetBuffer = new HashSet<InteractionController>();
-
-        //void IInternalInteractionManager.NotifyControllerDisabled(InteractionController controller) {
-        //  controllerSetBuffer.Clear();
-        //  controllerSetBuffer.Add(controller);
-
-        //  checkEndingGrasps(controllerSetBuffer);
-        //  checkEndingContacts(controllerSetBuffer);
-        //  checkEndingPrimaryHovers(controllerSetBuffer);
-        //  checkEndingHovers(controllerSetBuffer);
-        //}
-
-        //void IInternalInteractionManager.NotifyHoverDisabled(InteractionController controller) {
-        //  controllerSetBuffer.Clear();
-        //  controllerSetBuffer.Add(controller);
-
-        //  checkEndingPrimaryHovers(controllerSetBuffer);
-        //  checkEndingHovers(controllerSetBuffer);
-        //}
-
-        //void IInternalInteractionManager.NotifyContactDisabled(InteractionController controller) {
-        //  controllerSetBuffer.Clear();
-        //  controllerSetBuffer.Add(controller);
-
-        //  checkEndingContacts(controllerSetBuffer);
-        //}
-
-        //void IInternalInteractionManager.NotifyObjectHoverIgnored(IInteractionBehaviour intObj) {
-        //  controllerSetBuffer.Clear();
-
-        //  foreach (var controller in interactionControllers) {
-        //    if (controller.hoveredObjects.Contains(intObj)) {
-        //      (controller as IInternalInteractionController).ClearHoverTrackingForObject(intObj);
-
-        //      controllerSetBuffer.Add(controller);
-        //    }
-        //  }
-
-        //  checkEndingHovers(controllerSetBuffer);
-        //}
-
-        //void IInternalInteractionManager.NotifyObjectPrimaryHoverIgnored(IInteractionBehaviour intObj) {
-        //  controllerSetBuffer.Clear();
-
-        //  foreach (var controller in interactionControllers) {
-        //    if (controller.primaryHoveredObject == intObj) {
-        //      (controller as IInternalInteractionController).ClearPrimaryHoverTrackingForObject(intObj);
-
-        //      controllerSetBuffer.Add(controller);
-        //    }
-        //  }
-
-        //  checkEndingPrimaryHovers(controllerSetBuffer);
-        //}
-
-        //void IInternalInteractionManager.NotifyObjectContactIgnored(IInteractionBehaviour intObj) {
-        //  controllerSetBuffer.Clear();
-
-        //  foreach (var controller in interactionControllers) {
-        //    if (controller.contactingObjects.Contains(intObj)) {
-        //      (controller as IInternalInteractionController).ClearContactTrackingForObject(intObj);
-
-        //      controllerSetBuffer.Add(controller);
-        //    }
-        //  }
-
-        //  checkEndingContacts(controllerSetBuffer);
-        //}
-
-        #endregion
-
         #endregion
 
         #region Object Registration
 
+        /// <summary>
+        /// Register an interaction behaviour with this interaction manager.
+        /// </summary>
         public void RegisterInteractionBehaviour(IInteractionBehaviour interactionObj)
         {
             _interactionObjects.Add(interactionObj);
@@ -841,6 +807,9 @@ namespace Leap.Unity.Interaction
             return wasRemovalSuccessful;
         }
 
+        /// <summary>
+        /// Is interaction behaviour registered with this interaction manager?
+        /// </summary>
         public bool IsBehaviourRegistered(IInteractionBehaviour interactionObj)
         {
             return _interactionObjects.Contains(interactionObj);
@@ -850,6 +819,9 @@ namespace Leap.Unity.Interaction
 
         #region Moving Frame of Reference Support
 
+        /// <summary>
+        /// Check if this Interaction Manager is moving
+        /// </summary>
         public bool hasMovingFrameOfReference
         {
             get
@@ -1019,6 +991,7 @@ namespace Leap.Unity.Interaction
         private Dictionary<SingleLayer, HashSet<IInteractionBehaviour>> _intObjNoContactLayers = new Dictionary<SingleLayer, HashSet<IInteractionBehaviour>>();
 
         private int _interactionLayerMask = 0;
+
         /// <summary>
         /// Returns a layer mask containing all layers that might contain interaction objects.
         /// </summary>
@@ -1152,6 +1125,9 @@ namespace Leap.Unity.Interaction
 
         #region Runtime Gizmos
 
+        /// <summary>
+        /// Draw runtime gizmos in the scene to help with debugging
+        /// </summary>
         public void OnDrawRuntimeGizmos(RuntimeGizmoDrawer drawer)
         {
             if (_drawControllerRuntimeGizmos)

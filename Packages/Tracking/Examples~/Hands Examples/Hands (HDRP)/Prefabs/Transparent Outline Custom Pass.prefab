@@ -49,11 +49,12 @@ MonoBehaviour:
   customPasses:
   - id: 0
   - id: 1
-  injectionPoint: 1
+  injectionPoint: 4
   references:
     version: 1
     00000000:
-      type: {class: DrawRenderersCustomPass, ns: UnityEngine.Rendering.HighDefinition, asm: Unity.RenderPipelines.HighDefinition.Runtime}
+      type: {class: DrawRenderersCustomPass, ns: UnityEngine.Rendering.HighDefinition,
+        asm: Unity.RenderPipelines.HighDefinition.Runtime}
       data:
         m_Name: Outline Replacement
         enabled: 1
@@ -65,30 +66,36 @@ MonoBehaviour:
         filterFoldout: 1
         rendererFoldout: 1
         renderQueueType: 5
+        passNames:
+        - Forward
         layerMask:
           serializedVersion: 2
-          m_Bits: 256
+          m_Bits: 32
         sortingCriteria: 23
-        overrideMaterial: {fileID: 2100000, guid: b7695fa0c1c9d634c95dfec24e245ee7, type: 2}
+        overrideMaterial: {fileID: 2100000, guid: b7695fa0c1c9d634c95dfec24e245ee7,
+          type: 2}
         overrideMaterialPassIndex: 0
-        overrideMaterialPassName: ForwardOnly
+        overrideMaterialPassName: OUTLINE
         overrideDepthState: 1
         depthCompareFunction: 2
         depthWrite: 1
         shaderPass: 0
     00000001:
-      type: {class: DrawRenderersCustomPass, ns: UnityEngine.Rendering.HighDefinition, asm: Unity.RenderPipelines.HighDefinition.Runtime}
+      type: {class: DrawRenderersCustomPass, ns: UnityEngine.Rendering.HighDefinition,
+        asm: Unity.RenderPipelines.HighDefinition.Runtime}
       data:
         m_Name: Outline Overlay
-        enabled: 1
+        enabled: 0
         targetColorBuffer: 0
         targetDepthBuffer: 0
         clearFlags: 0
-        passFoldout: 0
+        passFoldout: 1
         m_Version: 0
         filterFoldout: 1
         rendererFoldout: 1
         renderQueueType: 9
+        passNames:
+        - Forward
         layerMask:
           serializedVersion: 2
           m_Bits: 256

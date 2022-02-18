@@ -567,11 +567,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: Transparent Outline Custom Pass
       objectReference: {fileID: 0}
-    - target: {fileID: 85284570596778481, guid: c74f59ecd5115b04b9b5251542eb80a2,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 3835637263124925718, guid: c74f59ecd5115b04b9b5251542eb80a2,
         type: 3}
       propertyPath: m_RootOrder
@@ -625,36 +620,6 @@ PrefabInstance:
     - target: {fileID: 3835637263124925718, guid: c74f59ecd5115b04b9b5251542eb80a2,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4460465394218524224, guid: c74f59ecd5115b04b9b5251542eb80a2,
-        type: 3}
-      propertyPath: injectionPoint
-      value: 4
-      objectReference: {fileID: 0}
-    - target: {fileID: 4460465394218524224, guid: c74f59ecd5115b04b9b5251542eb80a2,
-        type: 3}
-      propertyPath: customPasses.Array.data[0].enabled
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4460465394218524224, guid: c74f59ecd5115b04b9b5251542eb80a2,
-        type: 3}
-      propertyPath: customPasses.Array.data[1].enabled
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4460465394218524224, guid: c74f59ecd5115b04b9b5251542eb80a2,
-        type: 3}
-      propertyPath: customPasses.Array.data[0].passFoldout
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4460465394218524224, guid: c74f59ecd5115b04b9b5251542eb80a2,
-        type: 3}
-      propertyPath: customPasses.Array.data[1].passFoldout
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4460465394218524224, guid: c74f59ecd5115b04b9b5251542eb80a2,
-        type: 3}
-      propertyPath: customPasses.Array.data[1].overrideDepthState
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
@@ -813,25 +778,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 2666898851272659032, guid: 39280b6d3158d154093b638d5ef19d54,
-        type: 3}
-      propertyPath: customPasses.Array.data[0].filterFoldout
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2666898851272659032, guid: 39280b6d3158d154093b638d5ef19d54,
-        type: 3}
-      propertyPath: customPasses.Array.data[0].rendererFoldout
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 2666898851272659033, guid: 39280b6d3158d154093b638d5ef19d54,
         type: 3}
       propertyPath: m_Name
       value: Opaque Outline Custom Pass
-      objectReference: {fileID: 0}
-    - target: {fileID: 2666898851272659033, guid: 39280b6d3158d154093b638d5ef19d54,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2666898851272659035, guid: 39280b6d3158d154093b638d5ef19d54,
         type: 3}
@@ -1142,11 +1092,6 @@ PrefabInstance:
       propertyPath: m_LocalRotation.z
       value: 0.0000000061700107
       objectReference: {fileID: 0}
-    - target: {fileID: 634877682355294969, guid: 213c84271d0adc34c8c965ffb91726bc,
-        type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0.16950001
-      objectReference: {fileID: 0}
     - target: {fileID: 1640905544392993078, guid: 213c84271d0adc34c8c965ffb91726bc,
         type: 3}
       propertyPath: m_LocalRotation.w
@@ -1166,16 +1111,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalRotation.z
       value: -0.07499385
-      objectReference: {fileID: 0}
-    - target: {fileID: 1702950851601054572, guid: 213c84271d0adc34c8c965ffb91726bc,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1864554848874170188, guid: 213c84271d0adc34c8c965ffb91726bc,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1983328666965102078, guid: 213c84271d0adc34c8c965ffb91726bc,
         type: 3}
@@ -1206,11 +1141,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalRotation.z
       value: 0.000000014493702
-      objectReference: {fileID: 0}
-    - target: {fileID: 3348264233697173254, guid: 213c84271d0adc34c8c965ffb91726bc,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3690038486693012929, guid: 213c84271d0adc34c8c965ffb91726bc,
         type: 3}
@@ -1352,16 +1282,6 @@ PrefabInstance:
       propertyPath: m_LocalRotation.z
       value: 0.0000000013969834
       objectReference: {fileID: 0}
-    - target: {fileID: 6161339098374374095, guid: 213c84271d0adc34c8c965ffb91726bc,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 6846551122537688529, guid: 213c84271d0adc34c8c965ffb91726bc,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 7009777130497087607, guid: 213c84271d0adc34c8c965ffb91726bc,
         type: 3}
       propertyPath: m_LocalRotation.w
@@ -1371,11 +1291,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalRotation.y
       value: 0.3630744
-      objectReference: {fileID: 0}
-    - target: {fileID: 8002815319220913221, guid: 213c84271d0adc34c8c965ffb91726bc,
-        type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0.16950001
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 213c84271d0adc34c8c965ffb91726bc, type: 3}

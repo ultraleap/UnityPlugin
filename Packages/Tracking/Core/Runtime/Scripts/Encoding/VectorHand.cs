@@ -30,9 +30,6 @@ namespace Leap.Unity.Encoding
     /// You can Encode a VectorHand from a Leap hand, Decode a VectorHand into a Leap hand,
     /// convert the VectorHand to a compressed byte representation using FillBytes,
     /// and decompress back into a VectorHand using FromBytes.
-    /// 
-    /// Also see CurlHand for a more compressed but slightly less articulated encoding.
-    /// TODO: CurlHand not yet brought in from Networking module!
     /// </summary>
     [Serializable]
     public class VectorHand : IInterpolable<VectorHand>
@@ -42,13 +39,28 @@ namespace Leap.Unity.Encoding
 
         public const int NUM_JOINT_POSITIONS = 25;
 
+        /// <summary>
+        /// Identifies whether this Hand is a left hand.
+        /// </summary>
         public bool isLeft;
+        /// <summary>
+        /// palm position
+        /// </summary>
         public Vector3 palmPos;
+        /// <summary>
+        /// palm rotation
+        /// </summary>
         public Quaternion palmRot;
+        /// <summary>
+        /// The palmPose is a combination of palmPos and palmRot.
+        /// </summary>
         public Pose palmPose { get { return new Pose(palmPos, palmRot); } }
 
         [SerializeField]
         private Vector3[] _backingJointPositions;
+        /// <summary>
+        /// A list of all the joint positions
+        /// </summary>
         public Vector3[] jointPositions
         {
             get
@@ -64,6 +76,10 @@ namespace Leap.Unity.Encoding
 
         #endregion
 
+        /// <summary>
+        /// VectorHand constructor.
+        /// If using this, call Encode(Hand hand) afterwards, or use the constructor VectorHand(Hand hand) instead.
+        /// </summary>
         public VectorHand() { }
 
         /// <summary>
@@ -93,6 +109,10 @@ namespace Leap.Unity.Encoding
 
         #region Hand Encoding
 
+        /// <summary>
+        /// Encodes a Hand into the vector hand representation.
+        /// </summary>
+        /// <param name="fromHand"></param>
         public void Encode(Hand fromHand)
         {
             isLeft = fromHand.IsLeft;
@@ -114,9 +134,15 @@ namespace Leap.Unity.Encoding
             }
         }
 
-        // TODO: DELETEME
+        /// <summary>
+        /// Offset between the palm pose and the wrist position
+        /// </summary>
         public static Vector3 tweakWristPosition = new Vector3(0f, -0.015f, -0.065f);
 
+        /// <summary>
+        /// Decodes a hand in VectorHand representation back into a Leap hand.
+        /// </summary>
+        /// <param name="intoHand"> intoHand will contain the resulting Leap hand</param>
         public void Decode(Hand intoHand)
         {
             int boneIdx = 0;
@@ -210,17 +236,6 @@ namespace Leap.Unity.Encoding
               wristPosition: wristPos.ToVector()
             );
 
-            // TODO: DELETEME
-            // var sphere = new Geometry.Sphere(radius: 0.008f);
-            // var drawer = HyperMegaStuff.HyperMegaLines.drawer;
-            // drawer.color = LeapColor.cerulean;
-            // sphere.WithCenter(wristPos).DrawLines(drawer.DrawLine);
-
-            // sphere.radius = 0.007f;
-            // drawer.color = LeapColor.white;
-            // foreach (var point in jointPositions) {
-            //   sphere.WithCenter((palmPose * point).position).DrawLines(drawer.DrawLine);
-            // }
         }
 
         #endregion
@@ -460,9 +475,10 @@ namespace Leap.Unity.Encoding
             return Quaternion.Inverse(localRot) * (worldPoint - localOrigin);
         }
 
-        /// <summary> Fills the ref-argument VectorHand with interpolated data
-        /// between the two other VectorHands, by t (unclamped), and return true.
-        /// If either a or b is null, the ref-argument VectorHand is also set to
+        /// <summary> 
+        /// Fills the VectorHand with interpolated data
+        /// between the two argument VectorHands, by t (unclamped), and return true.
+        /// If either a or b is null, the resulting VectorHand is also set to
         /// null, and the method returns false.
         /// An exception is thrown if the interpolation arguments a and b don't
         /// have the same chirality.
@@ -486,9 +502,10 @@ namespace Leap.Unity.Encoding
             return true;
         }
 
-        /// <summary> Fills the ref-argument VectorHand with interpolated data
-        /// between the 4 other VectorHands, by t (unclamped), and return true.
-        /// If either a, b, c or d is null, the ref-argument VectorHand is also set to
+        /// <summary> 
+        /// Fills the VectorHand with interpolated data
+        /// between the 4 argument VectorHands, by t (unclamped), and return true.
+        /// If either a, b, c or d is null, the resulting VectorHand is also set to
         /// null, and the method returns false.
         /// An exception is thrown if the interpolation arguments a and b don't
         /// have the same chirality.
@@ -529,6 +546,9 @@ namespace Leap.Unity.Encoding
 
     #region Utility Extension Methods
 
+    /// <summary>
+    /// Defines Utility Extension Methods for a VectorHand
+    /// </summary>
     public static class VectorHandExtensions
     {
 

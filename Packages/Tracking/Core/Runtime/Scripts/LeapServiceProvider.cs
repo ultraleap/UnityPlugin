@@ -20,6 +20,11 @@ namespace Leap.Unity
     /// <summary>
     /// The LeapServiceProvider provides tracked Leap Hand data and images from the device
     /// via the Leap service running on the client machine.
+    /// 
+    /// It communicates with the Ultraleap Tracking Service running on your platform, and 
+    /// provides Frame objects containing Leap hands to your application. Generally, any 
+    /// class that needs hand tracking data from the camera will need a reference to a 
+    /// LeapServiceProvider to get that data.
     /// </summary>
     public class LeapServiceProvider : LeapProvider
     {
@@ -65,6 +70,9 @@ namespace Leap.Unity
 
         #region Inspector
 
+        /// <summary>
+        /// The supported interaction volumes that will be visualized in the scene view
+        /// </summary>
         public enum InteractionVolumeVisualization
         {
             None,
@@ -76,22 +84,58 @@ namespace Leap.Unity
         [SerializeField]
         protected InteractionVolumeVisualization _interactionVolumeVisualization = InteractionVolumeVisualization.Automatic;
 
+        /// <summary>
+        /// Which interaction volume is selected to be visualized in the scene view
+        /// </summary>
         public InteractionVolumeVisualization SelectedInteractionVolumeVisualization => _interactionVolumeVisualization;
 
+        /// <summary>
+        /// Supported modes to optimize frame updates.
+        /// When enabled, the provider will reuse some hand data:
+        /// By default the mode is set to None, which implies that we want to use hand tracking in time with Unity's Update loop.
+        /// It can be set to ReuseUpdateForPhysics (choose as Android user), or ReusePhysicsForUpdate (reinterpolates the hand data for the 
+        /// physics timestep).
+        /// </summary>
         public enum FrameOptimizationMode
         {
+            /// <summary>
+            /// By default the mode is set to None, this implies that we want to use hand tracking in time with Unity's Update loop.
+            /// </summary>
             None,
+            /// <summary>
+            /// Android users should choose Reuse Update for Physics.
+            /// </summary>
             ReuseUpdateForPhysics,
+            /// <summary>
+            /// Provides the option to reinterpolate the hand data for the physics timestep, improving the movement of objects being 
+            /// manipulated by hands when using the interaction engine. Enabling this incurs a small time penalty (fraction of a ms).
+            /// </summary>
             ReusePhysicsForUpdate,
         }
-        [Tooltip("When enabled, the provider will only calculate one leap frame instead of two.")]
+        [Tooltip("When enabled, the provider will reuse some hand data:\n"
+            + "None - By default the mode is set to None, which implies that we want to use hand tracking in time with Unity's Update loop.\n"
+            + "ReuseUpdateForPhysics - Android users should choose Reuse Update for Physics.\n"
+            + "ReusePhysicsForUpdate - Provides the option to reinterpolate the hand data for the physics timestep, improving the movement of objects being "
+            + "manipulated by hands when using the interaction engine. Enabling this incurs a small time penalty (fraction of a ms).")]
         [SerializeField]
         protected FrameOptimizationMode _frameOptimization = FrameOptimizationMode.None;
 
+        /// <summary>
+        /// Supported modes to use when extrapolating physics.
+        /// </summary>
         public enum PhysicsExtrapolationMode
         {
+            /// <summary>
+            /// No extrapolation is used at all
+            /// </summary>
             None,
+            /// <summary>
+            /// Extrapolation is chosen based on the fixed timestep
+            /// </summary>
             Auto,
+            /// <summary>
+            /// Extrapolation time is chosen manually by the user
+            /// </summary>
             Manual
         }
         [Tooltip("The mode to use when extrapolating physics.\n" +
@@ -105,15 +149,23 @@ namespace Leap.Unity
         [SerializeField]
         protected float _physicsExtrapolationTime = 1.0f / 90.0f;
 
+        /// <summary>
+        /// (Service must be >= 4.9.2)
+        /// The tracking mode used by the service. Should be set to match the orientation of the hand tracking hardware.
+        /// </summary>
         public enum TrackingOptimizationMode
         {
             Desktop,
             Screentop,
+            /// <summary>
+            /// The LeapXRServiceProvider should be used for all XR headset based applications, where hand tracking 
+            /// devices are mounted on the headset. The LeapXRServiceProvider uses the HMD tracking optimization mode.
+            /// </summary>
             HMD
         }
         [Tooltip("[Service must be >= 4.9.2!] " +
           "Which tracking mode to request that the service optimize for. " +
-          "(Use the LeapXRServiceProvider for HMD Mode instead of this option!)")]
+          "(The LeapXRServiceProvider should be used for all XR headset based applications, where hand tracking devices are mounted on the headset)")]
         [SerializeField]
         [EditTimeOnly]
         protected TrackingOptimizationMode _trackingOptimization = TrackingOptimizationMode.Desktop;
@@ -279,6 +331,14 @@ namespace Leap.Unity
 
         #region LeapProvider Implementation
 
+        /// <summary>
+        /// The current frame for this update cycle, in world space. 
+        /// 
+        /// IMPORTANT!  This frame might be mutable!  If you hold onto a reference
+        /// to this frame, or a reference to any object that is a part of this frame,
+        /// it might change unexpectedly.  If you want to save a reference, make sure
+        /// to make a copy.
+        /// </summary>
         public override Frame CurrentFrame
         {
             get
@@ -305,6 +365,14 @@ namespace Leap.Unity
             }
         }
 
+        /// <summary>
+        /// The current frame for this fixed update cycle, in world space.
+        /// 
+        /// IMPORTANT!  This frame might be mutable!  If you hold onto a reference
+        /// to this frame, or a reference to any object that is a part of this frame,
+        /// it might change unexpectedly.  If you want to save a reference, make sure
+        /// to make a copy.
+        /// </summary>
         public override Frame CurrentFixedFrame
         {
             get
@@ -594,6 +662,11 @@ namespace Leap.Unity
             _isDestroyed = true;
         }
 
+        /// <summary>
+        /// Calculates the physics extrapolation time depending on the PhysicsExtrapolationMode.
+        /// </summary>
+        /// <returns>A float that can be used to compensate for latency when ensuring that our 
+        /// hands are on the same timeline as Update.</returns>
         public float CalculatePhysicsExtrapolation()
         {
             switch (_physicsExtrapolation)
@@ -616,6 +689,7 @@ namespace Leap.Unity
 
         /// <summary>
         /// Returns the Leap Controller instance.
+        /// If not found, it creates a new controller instance.
         /// </summary>
         public Controller GetLeapController()
         {
@@ -680,12 +754,10 @@ namespace Leap.Unity
                     _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
                     break;
                 case TrackingOptimizationMode.Screentop:
-                    _leapController.SetPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP);
-                    _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
+                    _leapController.SetAndClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP, Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
                     break;
                 case TrackingOptimizationMode.HMD:
-                    _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP);
-                    _leapController.SetPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
+                    _leapController.SetAndClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD, Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP);
                     break;
             }
         }

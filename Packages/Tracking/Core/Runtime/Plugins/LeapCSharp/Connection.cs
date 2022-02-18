@@ -75,7 +75,6 @@ namespace LeapInternal
         private Thread _polster;
 
         //Policy and enabled features
-        private UInt64 _requestedPolicies = 0;
         private UInt64 _activePolicies = 0;
 
         //Config change status
@@ -514,6 +513,7 @@ namespace LeapInternal
         {
             if (LeapConnectionLost != null)
             {
+                _devices.Clear();
                 LeapConnectionLost.DispatchOnContext(this, EventContext, new ConnectionLostEventArgs());
             }
         }
@@ -771,6 +771,9 @@ namespace LeapInternal
 
         private void handlePolicyChange(ref LEAP_POLICY_EVENT policyMsg)
         {
+            // Avoid raising spurious policy change signals.
+            if (policyMsg.current_policy == _activePolicies) return;
+
             if (LeapPolicyChange != null)
             {
                 LeapPolicyChange.DispatchOnContext(this, EventContext, new PolicyEventArgs(policyMsg.current_policy, _activePolicies));

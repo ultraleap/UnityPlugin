@@ -120,7 +120,7 @@ PrefabInstance:
     - target: {fileID: 1015311468456129628, guid: e7e358565e530214c97adba8c82fedc6,
         type: 3}
       propertyPath: m_Name
-      value: Ghost Hands (HDRP)
+      value: Ghost Hands (HDRP) Variant
       objectReference: {fileID: 0}
     - target: {fileID: 1015311468456129628, guid: e7e358565e530214c97adba8c82fedc6,
         type: 3}
@@ -227,6 +227,11 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 8
       objectReference: {fileID: 0}
+    - target: {fileID: 1867558777296241280, guid: e7e358565e530214c97adba8c82fedc6,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 99e72411c84c47c43af45b5fb3ae46f6, type: 2}
     - target: {fileID: 1913499476620621228, guid: e7e358565e530214c97adba8c82fedc6,
         type: 3}
       propertyPath: m_Layer
@@ -1967,6 +1972,11 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 8
       objectReference: {fileID: 0}
+    - target: {fileID: 9091317471554311228, guid: e7e358565e530214c97adba8c82fedc6,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 99e72411c84c47c43af45b5fb3ae46f6, type: 2}
     - target: {fileID: 9100249359162881267, guid: e7e358565e530214c97adba8c82fedc6,
         type: 3}
       propertyPath: m_Layer
