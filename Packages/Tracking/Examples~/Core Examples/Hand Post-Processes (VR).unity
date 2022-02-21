@@ -327,9 +327,16 @@ PrefabInstance:
       propertyPath: leapProvider
       value: 
       objectReference: {fileID: 271253207}
-    - target: {fileID: 5468038821422412440, guid: fff9f8f885bed8f4cadbd1f179efd843,
-        type: 3}
+    - target: {fileID: 5468038821146861654, guid: fff9f8f885bed8f4cadbd1f179efd843, type: 3}
+      propertyPath: _leapProvider
+      value: 
+      objectReference: {fileID: 271253207}
+    - target: {fileID: 5468038821422412440, guid: fff9f8f885bed8f4cadbd1f179efd843, type: 3}
       propertyPath: leapProvider
+      value: 
+      objectReference: {fileID: 271253207}
+    - target: {fileID: 5468038821422412440, guid: fff9f8f885bed8f4cadbd1f179efd843, type: 3}
+      propertyPath: _leapProvider
       value: 
       objectReference: {fileID: 271253207}
     m_RemovedComponents:
