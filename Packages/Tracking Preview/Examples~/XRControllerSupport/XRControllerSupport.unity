@@ -142,12 +142,20 @@ PrefabInstance:
       propertyPath: leapProvider
       value: 
       objectReference: {fileID: 1254230924}
+    - target: {fileID: 5410597111759705603, guid: 8163655ae6e81f149b112acc9972a9d3, type: 3}
+      propertyPath: _leapProvider
+      value: 
+      objectReference: {fileID: 1254230924}
     - target: {fileID: 8522039520641505686, guid: 8163655ae6e81f149b112acc9972a9d3, type: 3}
       propertyPath: _showArm
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8522039520641505686, guid: 8163655ae6e81f149b112acc9972a9d3, type: 3}
       propertyPath: leapProvider
+      value: 
+      objectReference: {fileID: 1254230924}
+    - target: {fileID: 8522039520641505686, guid: 8163655ae6e81f149b112acc9972a9d3, type: 3}
+      propertyPath: _leapProvider
       value: 
       objectReference: {fileID: 1254230924}
     - target: {fileID: 8639571069925577598, guid: 8163655ae6e81f149b112acc9972a9d3, type: 3}
