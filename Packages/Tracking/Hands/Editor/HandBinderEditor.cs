@@ -793,9 +793,11 @@ namespace Leap.Unity.HandsModule
                     if (EditorUtility.DisplayDialog("Auto Calculate Rotation Offsets",
                        "Are you sure you want to recalculate the rotation offsets?", "Yes", "No"))
                     {
+                        handBinder.ResetHand();
                         Undo.RegisterFullObjectHierarchyUndo(handBinder.gameObject, "Recalculate Offsets");
                         HandBinderAutoBinder.EstimateWristRotationOffset(handBinder);
                         HandBinderAutoBinder.CalculateElbowLength(handBinder);
+                        HandBinderAutoBinder.CalculateHandSize(handBinder.BoundHand);
                         handBinder.SetEditorPose = true;
                         handBinder.UpdateHand();
                     }
