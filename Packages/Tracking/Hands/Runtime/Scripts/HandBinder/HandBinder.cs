@@ -219,6 +219,8 @@ namespace Leap.Unity.HandsModule
         /// </summary>
         void SetHandScale()
         {
+            if (LeapHand == null) return;
+
             if(SetPositions)
             {
                 if (SetModelScale)
@@ -336,8 +338,13 @@ namespace Leap.Unity.HandsModule
             var length = 0f;
             for (int i = 0; i < hand.Fingers[(int)Finger.FingerType.TYPE_MIDDLE].bones.Length; i++)
             {
-                var bone = hand.Fingers[(int)Finger.FingerType.TYPE_MIDDLE].bones[i];
-                length += (bone.PrevJoint - bone.NextJoint).Magnitude;
+                //If the bound hand does not contain a bone then don't count this in the calculation for leap length
+                var boundBone = BoundHand.fingers[(int)Finger.FingerType.TYPE_MIDDLE].boundBones[i];
+                if (boundBone.boundTransform != null)
+                {
+                    var bone = hand.Fingers[(int)Finger.FingerType.TYPE_MIDDLE].bones[i];
+                    length += (bone.PrevJoint - bone.NextJoint).Magnitude;
+                }
             }
             return length;
         }
