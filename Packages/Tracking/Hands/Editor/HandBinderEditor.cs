@@ -41,6 +41,8 @@ namespace Leap.Unity.HandsModule
         private SerializedProperty fineTuning;
         private SerializedProperty debugOptions;
         private SerializedProperty leapProvider;
+        private SerializedProperty scaleOffset;
+
 
 
         private Color green = new Color32(140, 234, 40, 255);
@@ -67,7 +69,7 @@ namespace Leap.Unity.HandsModule
             boundHand = serializedObject.FindProperty("BoundHand");
             offsets = serializedObject.FindProperty("Offsets");
             leapProvider = serializedObject.FindProperty("leapProvider");
-
+            scaleOffset = serializedObject.FindProperty("ScaleOffset"); 
 
             dividerLine = Resources.Load<Texture>("EditorDividerLine");
             editorSkin = Resources.Load<GUISkin>("UltraleapEditorStyle");
@@ -145,6 +147,12 @@ namespace Leap.Unity.HandsModule
             if (setPositions.boolValue)
             {
                 setScale.boolValue = GUILayout.Toggle(setScale.boolValue, new GUIContent("Scale Model to Tracking Data", "Should the hand binder adjust the models scale?"), editorSkin.toggle);
+
+                if (setScale.boolValue)
+                {
+                    EditorGUILayout.Space();
+                    EditorGUILayout.PropertyField(scaleOffset, new GUIContent("Scale Offset", "The hand scale will be modified by this amount"));
+                }
             }
 
             EditorGUILayout.Space();
@@ -931,16 +939,22 @@ namespace Leap.Unity.HandsModule
 
         #region Hand Binder Upgrade Utility Functions
 
+        /// <summary>
+        /// This calls upgrade functions to ensure the users hands remain up to date with each new feature
+        /// </summary>
         void UpgradeHelper()
         {
             UpgradeHandScaleFeature();
         }
 
+        /// <summary>
+        /// Calculate the hand scale for the user if the rig does not already include it
+        /// </summary>
         void UpgradeHandScaleFeature()
         {
             if (myTarget.BoundHand != null)
             {
-                if(myTarget.BoundHand.startScale == Vector3.negativeInfinity || myTarget.BoundHand.startScale == Vector3.zero)
+                if(myTarget.BoundHand.startScale == Vector3.zero)
                 {
                     myTarget.BoundHand.startScale = myTarget.transform.localScale;
                 }
@@ -949,6 +963,7 @@ namespace Leap.Unity.HandsModule
                 {
                     myTarget.ResetHand();
                     HandBinderAutoBinder.CalculateHandSize(myTarget.BoundHand);
+                    Debug.Log("Hand Scale Feature Added");
                 }
             }
         }
