@@ -266,7 +266,7 @@ namespace Leap.Unity.HandsModule
             //Loop through the bones and sum up there lengths
             for (int boneID = 0; boneID < finger.boundBones.Length - 1; boneID++)
             {
-                if(boneID + 1 <= finger.boundBones.Length)
+                if (boneID + 1 <= finger.boundBones.Length)
                 {
                     var bone = finger.boundBones[boneID];
                     var nextBone = finger.boundBones[boneID + 1];

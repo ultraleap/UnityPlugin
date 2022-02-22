@@ -69,7 +69,7 @@ namespace Leap.Unity.HandsModule
             boundHand = serializedObject.FindProperty("BoundHand");
             offsets = serializedObject.FindProperty("Offsets");
             leapProvider = serializedObject.FindProperty("leapProvider");
-            scaleOffset = serializedObject.FindProperty("ScaleOffset"); 
+            scaleOffset = serializedObject.FindProperty("ScaleOffset");
 
             dividerLine = Resources.Load<Texture>("EditorDividerLine");
             editorSkin = Resources.Load<GUISkin>("UltraleapEditorStyle");
@@ -956,7 +956,7 @@ namespace Leap.Unity.HandsModule
         {
             if (myTarget.BoundHand != null)
             {
-                if(myTarget.BoundHand.startScale == Vector3.zero)
+                if (myTarget.BoundHand.startScale == Vector3.zero)
                 {
                     myTarget.BoundHand.startScale = myTarget.transform.localScale;
                 }
