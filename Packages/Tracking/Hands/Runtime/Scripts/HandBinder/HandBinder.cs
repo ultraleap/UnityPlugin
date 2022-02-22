@@ -55,6 +55,11 @@ namespace Leap.Unity.HandsModule
         /// </summary>
         public bool SetModelScale = true;
 
+        /// <summary>
+        /// Adjust the calculated scale ratio by this value
+        /// </summary>
+        [Range(0, 2)] public float ScaleOffset = 0.8f;
+
         /// <summary> 
         /// User defined offsets in editor script 
         /// </summary>
@@ -220,7 +225,7 @@ namespace Leap.Unity.HandsModule
                 {
                     if(BoundHand.startScale != Vector3.zero)
                     {
-                        transform.localScale = BoundHand.startScale * CalculateRatio(LeapHand);
+                        transform.localScale = BoundHand.startScale * (CalculateRatio(LeapHand) * ScaleOffset);
                     }
                 }
                 else if (BoundHand.startScale != Vector3.zero)
