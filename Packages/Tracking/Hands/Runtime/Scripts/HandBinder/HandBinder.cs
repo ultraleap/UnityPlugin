@@ -221,11 +221,11 @@ namespace Leap.Unity.HandsModule
         {
             if (LeapHand == null) return;
 
-            if(SetPositions)
+            if (SetPositions)
             {
                 if (SetModelScale)
                 {
-                    if(BoundHand.startScale != Vector3.zero)
+                    if (BoundHand.startScale != Vector3.zero)
                     {
                         transform.localScale = BoundHand.startScale * (CalculateRatio(LeapHand) * ScaleOffset);
                     }
@@ -263,7 +263,7 @@ namespace Leap.Unity.HandsModule
                 }
             }
         }
-        
+
         /// <summary>
         /// Set the wrist into the correct position and rotation
         /// </summary>
