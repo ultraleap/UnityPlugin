@@ -316,8 +316,18 @@ namespace Leap.Unity.HandsModule
                 boundTransform.transform.localPosition = startTransform.position + boneOffset.position;
             }
 
-            //Update the bound transforms rotation to the leap's rotation * global rotation offset * any further offsets the user has defined
-            boundTransform.transform.rotation = leapBone.Rotation.ToQuaternion() * Quaternion.Euler(GlobalFingerRotationOffset) * Quaternion.Euler(boneOffset.rotation);
+
+            if (boneIndex == 0 || (fingerIndex == 0 && boneIndex == 1))
+            {
+                boundTransform.transform.localRotation = Quaternion.Euler(boundBone.startTransform.rotation);
+            }
+            else
+            {
+                //Update the bound transforms rotation to the leap's rotation * global rotation offset * any further offsets the user has defined
+                boundTransform.transform.rotation = leapBone.Rotation.ToQuaternion() * Quaternion.Euler(GlobalFingerRotationOffset) * Quaternion.Euler(boneOffset.rotation);
+            }
+
+
         }
 
         /// <summary>
