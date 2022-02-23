@@ -8,6 +8,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Leap.Unity.HandsModule
@@ -59,6 +60,12 @@ namespace Leap.Unity.HandsModule
         /// Adjust the calculated scale ratio by this value
         /// </summary>
         [Range(0, 2)] public float ScaleOffset = 0.8f;
+
+        /// <summary>
+        /// Adjust the finger tip scale ratio by this value
+        /// </summary>
+        [Range(0, 2)] public float FingertipScaleOffset = 1f;
+
 
         /// <summary> 
         /// User defined offsets in editor script 
@@ -225,14 +232,46 @@ namespace Leap.Unity.HandsModule
             {
                 if (SetModelScale)
                 {
+                    var scaleRatio = (CalculateRatio(LeapHand) * ScaleOffset);
                     if (BoundHand.startScale != Vector3.zero)
                     {
-                        transform.localScale = BoundHand.startScale * (CalculateRatio(LeapHand) * ScaleOffset);
+                        transform.localScale = BoundHand.startScale * scaleRatio;
+                    }
+
+                    for (int i = 0; i < BoundHand.fingers.Length; i++)
+                    {
+                        var finger = BoundHand.fingers[i];
+                        var lastBone = finger.boundBones.LastOrDefault();
+                        var lastBoneT = lastBone.boundTransform;
+                        var leapFinger = LeapHand.Fingers[i];
+
+                        if (finger.fingerTip.boundTransform == null || lastBone == null || lastBone.boundTransform == null || leapFinger == null) return;
+
+                        var dir = (finger.fingerTip.boundTransform.position - lastBoneT.position);
+
+                        var leapFingerLength = CalculateLeapFingerTipLength(leapFinger);
+                        var fingerTipLength = finger.fingerTipBaseLength;
+                        var ratio = leapFingerLength / fingerTipLength;
+
+                        var axis = CalculateAxis(lastBoneT, dir);
+
+                        lastBoneT.localScale = Vector3.one + (axis * ((ratio * FingertipScaleOffset) - scaleRatio));
                     }
                 }
                 else if (BoundHand.startScale != Vector3.zero)
                 {
                     transform.localScale = BoundHand.startScale;
+
+                    for (int i = 0; i < BoundHand.fingers.Length; i++)
+                    {
+                        var finger = BoundHand.fingers[i];
+                        var lastBone = finger.boundBones.LastOrDefault().boundTransform;
+
+                        if (finger.fingerTip.boundTransform == null || lastBone == null) return;
+
+                        lastBone.localScale = Vector3.one;
+
+                    }
                 }
             }
         }
@@ -347,6 +386,25 @@ namespace Leap.Unity.HandsModule
                 }
             }
             return length;
+        }
+
+        /// <summary>
+        /// Calculate the length of the leap fingers tip bone
+        /// </summary>
+        float CalculateLeapFingerTipLength(Finger finger)
+        {
+            var bone = finger.bones.Last();
+            return bone.Length;
+        }
+
+        Vector3 CalculateAxis(Transform t, Vector3 dir)
+        {
+            var boneForward = t.InverseTransformDirection(-dir.normalized).normalized;
+            boneForward.x = Mathf.Round(boneForward.x);
+            boneForward.y = Mathf.Round(boneForward.y);
+            boneForward.z = Mathf.Round(boneForward.z);
+
+            return boneForward;
         }
 
         /// <summary>

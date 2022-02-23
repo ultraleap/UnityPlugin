@@ -32,6 +32,8 @@ namespace Leap.Unity.HandsModule
     public class BoundFinger
     {
         public BoundBone[] boundBones = new BoundBone[4];
+        public BoundBone fingerTip = new BoundBone();
+        public float fingerTipBaseLength;
     }
 
     /// <summary>
