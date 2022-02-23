@@ -41,19 +41,20 @@ namespace Leap
         public Device() { }
 
         public Device(IntPtr deviceHandle,
-                  IntPtr internalHandle,
-                  float horizontalViewAngle,
-                  float verticalViewAngle,
-                  float range,
-                  float baseline,
-                  DeviceType type,
-                  bool isStreaming,
-                  uint status,
-                  string serialNumber)
+                      IntPtr internalHandle,
+                      float horizontalViewAngle,
+                      float verticalViewAngle,
+                      float range,
+                      float baseline,
+                      DeviceType type,
+                      bool isStreaming,
+                      uint status,
+                      string serialNumber)
         {
             Handle = deviceHandle;
             InternalHandle = internalHandle;
             HorizontalViewAngle = horizontalViewAngle;
+            VerticalViewAngle = verticalViewAngle;
             Range = range;
             Baseline = baseline;
             Type = type;
@@ -126,9 +127,8 @@ namespace Leap
 
         public bool SetPaused(bool pause)
         {
-            //eLeapRS result = LeapC.LeapSetPause(Handle, pause);
-            //return result == eLeapRS.eLeapRS_Success;
-            return false;
+            eLeapRS result = LeapC.LeapSetPause(Handle, pause);
+            return result == eLeapRS.eLeapRS_Success;
         }
 
         /// <summary>

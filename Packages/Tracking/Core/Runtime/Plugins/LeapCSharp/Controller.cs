@@ -447,6 +447,7 @@ namespace Leap
             _connection = Connection.GetConnection(new Connection.Key(connectionKey, serverNamespace));
             _connection.EventContext = SynchronizationContext.Current;
 
+            _connection.LeapInit += OnInit;
             _connection.LeapConnection += OnConnect;
             _connection.LeapConnectionLost += OnDisconnect;
 
@@ -511,17 +512,12 @@ namespace Leap
         /// </summary>
         public void SetAndClearPolicy(PolicyFlag set, PolicyFlag clear, string deviceSerial = "")
         {
-            _connection.SetAndClearPolicy(set, clear, deviceSerial);
+            _connection.SetAndClearPolicy(set, clear);
         }
         public void SetPolicy(PolicyFlag policy)
         {
-            _connection.SetPolicy(policy, "");
+            _connection.SetPolicy(policy);
         }
-        public void SetPolicy(PolicyFlag policy, string deviceSerial = "")
-        {
-            _connection.SetPolicy(policy, deviceSerial);
-        }
-
 
         /// <summary>
         /// Requests clearing a policy.
@@ -534,13 +530,8 @@ namespace Leap
         /// </summary>
         public void ClearPolicy(PolicyFlag policy)
         {
-            _connection.ClearPolicy(policy, "");
+            _connection.ClearPolicy(policy);
         }
-        public void ClearPolicy(PolicyFlag policy, string deviceSerial = "")
-        {
-            _connection.ClearPolicy(policy, deviceSerial);
-        }
-
 
         /// <summary>
         /// Gets the active setting for a specific policy.

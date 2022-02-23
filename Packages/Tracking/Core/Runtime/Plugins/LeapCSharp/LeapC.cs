@@ -20,25 +20,25 @@ namespace LeapInternal
         eLeapConnectionFlag_MultipleDevicesAware = 0x00000001,
     };
 
-
+    // 
     public enum eLeapConnectionStatus : uint
     {
         /// <summary>
         /// A connection has been established.
         /// </summary>
-        NotConnected = 0,
+        eLeapConnectionStatus_NotConnected = 0,
         /// <summary>
         /// The connection has not been completed. Call OpenConnection.
         /// </summary>
-        Connected,
+        eLeapConnectionStatus_Connected,
         /// <summary>
         /// The connection handshake has not completed.
         /// </summary>
-        HandshakeIncomplete,
+        eLeapConnectionStatus_HandshakeIncomplete,
         /// <summary>
         /// A connection could not be established because the server does not appear to be running.
         /// </summary>
-        NotRunning = 0xE7030004
+        eLeapConnectionStatus_NotRunning = 0xE7030004
     };
 
     public enum eLeapDeviceCaps : uint
@@ -60,7 +60,6 @@ namespace LeapInternal
         /// <summary> The tracking mode optimised for screen top-mounted devices @since 5.0.0 </summary>
         eLeapTrackingMode_ScreenTop = 2
     };
-
 
     public enum eLeapDeviceType : uint
     {
@@ -586,7 +585,7 @@ namespace LeapInternal
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct LEAP_DEVICE_REF
     {
-        public IntPtr connectionHandle; //void *
+        public IntPtr handle; //void *
         public UInt32 id;
     }
 
@@ -1020,6 +1019,9 @@ namespace LeapInternal
 
         [DllImport("LeapC", EntryPoint = "LeapSetPolicyFlags")]
         public static extern eLeapRS SetPolicyFlags(IntPtr hConnection, UInt64 set, UInt64 clear);
+
+        [DllImport("LeapC", EntryPoint = "LeapSetPause")]
+        public static extern eLeapRS LeapSetPause(IntPtr hConnection, bool pause);
 
         [DllImport("LeapC", EntryPoint = "LeapSetDeviceFlags")]
         public static extern eLeapRS SetDeviceFlags(IntPtr hDevice, UInt64 set, UInt64 clear, out UInt64 prior);

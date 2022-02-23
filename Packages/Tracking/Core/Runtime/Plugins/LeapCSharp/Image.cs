@@ -26,9 +26,7 @@ namespace Leap
         private Int64 timestamp = 0;
         private UInt32 deviceId = 0;
 
-        public Image(Int64 frameId, Int64 timestamp,
-                 ImageData leftImage, ImageData rightImage,
-                 UInt32 deviceId)
+        public Image(Int64 frameId, Int64 timestamp, ImageData leftImage, ImageData rightImage, UInt32 deviceId = 0)
         {
             if (leftImage == null || rightImage == null)
             {

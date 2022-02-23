@@ -184,7 +184,14 @@ namespace LeapInternal
             eLeapRS result;
             if (_leapConnection == IntPtr.Zero)
             {
-                result = LeapC.CreateConnection(ref config, out _leapConnection);
+                if (ConnectionKey.serverNamespace == null)
+                {
+                    result = LeapC.CreateConnection(out _leapConnection);
+                }
+                else
+                {
+                    result = LeapC.CreateConnection(ref config, out _leapConnection);
+                }
 
                 if (result != eLeapRS.eLeapRS_Success || _leapConnection == IntPtr.Zero)
                 {
@@ -516,7 +523,7 @@ namespace LeapInternal
         }
         private void handleDeviceStatusEvent(ref LEAP_DEVICE_STATUS_CHANGE_EVENT statusEvent)
         {
-            var device = _devices.FindDeviceByHandle(statusEvent.device.connectionHandle);
+            var device = _devices.FindDeviceByHandle(statusEvent.device.handle);
             if (device == null)
             {
                 return;
@@ -528,11 +535,11 @@ namespace LeapInternal
 
         private void handleDevice(ref LEAP_DEVICE_EVENT deviceMsg)
         {
-            IntPtr deviceHandle = deviceMsg.device.connectionHandle;
+            IntPtr deviceHandle = deviceMsg.device.handle;
             if (deviceHandle == IntPtr.Zero)
                 return;
 
-            IntPtr connectionHandle = deviceMsg.device.connectionHandle;
+            IntPtr connectionHandle = deviceMsg.device.handle;
             if (connectionHandle == IntPtr.Zero)
                 return;
 
@@ -577,7 +584,7 @@ namespace LeapInternal
 
         private void handleLostDevice(ref LEAP_DEVICE_EVENT deviceMsg)
         {
-            Device lost = _devices.FindDeviceByHandle(deviceMsg.device.connectionHandle);
+            Device lost = _devices.FindDeviceByHandle(deviceMsg.device.handle);
             if (lost != null)
             {
                 _devices.Remove(lost);
@@ -763,13 +770,11 @@ namespace LeapInternal
                 //Update distortion data, if changed
                 if ((_currentLeftDistortionData.Version != imageMsg.leftImage.matrix_version) || !_currentLeftDistortionData.IsValid)
                 {
-                    _currentLeftDistortionData = createDistortionData(imageMsg.leftImage,
-                      Image.CameraType.LEFT);
+                    _currentLeftDistortionData = createDistortionData(imageMsg.leftImage, Image.CameraType.LEFT);
                 }
                 if ((_currentRightDistortionData.Version != imageMsg.rightImage.matrix_version) || !_currentRightDistortionData.IsValid)
                 {
-                    _currentRightDistortionData = createDistortionData(imageMsg.rightImage,
-                      Image.CameraType.RIGHT);
+                    _currentRightDistortionData = createDistortionData(imageMsg.rightImage, Image.CameraType.RIGHT);
                 }
 
                 ImageData leftImage = new ImageData(Image.CameraType.LEFT, imageMsg.leftImage, _currentLeftDistortionData);
@@ -789,25 +794,25 @@ namespace LeapInternal
             _activePolicies = policyMsg.current_policy;
         }
 
-        public void SetAndClearPolicy(Controller.PolicyFlag set, Controller.PolicyFlag clear, string deviceSerial)
+        public void SetAndClearPolicy(Controller.PolicyFlag set, Controller.PolicyFlag clear)
         {
             UInt64 setFlags = (ulong)FlagForPolicy(set);
             UInt64 clearFlags = (ulong)FlagForPolicy(clear);
-            eLeapRS result = LeapC.SetPolicyFlags(_leapConnection, setFlags, clearFlags); //, deviceSerial);
+            eLeapRS result = LeapC.SetPolicyFlags(_leapConnection, setFlags, clearFlags);
             reportAbnormalResults("LeapC SetAndClearPolicy call was ", result);
         }
 
-        public void SetPolicy(Controller.PolicyFlag policy, string deviceSerial)
+        public void SetPolicy(Controller.PolicyFlag policy)
         {
             UInt64 setFlags = (ulong)FlagForPolicy(policy);
-            eLeapRS result = LeapC.SetPolicyFlags(_leapConnection, setFlags, 0); //, deviceSerial);
+            eLeapRS result = LeapC.SetPolicyFlags(_leapConnection, setFlags, 0);
             reportAbnormalResults("LeapC SetPolicyFlags call was ", result);
         }
 
-        public void ClearPolicy(Controller.PolicyFlag policy, string deviceSerial)
+        public void ClearPolicy(Controller.PolicyFlag policy)
         {
             UInt64 clearFlags = (ulong)FlagForPolicy(policy);
-            eLeapRS result = LeapC.SetPolicyFlags(_leapConnection, 0, clearFlags); //, deviceSerial);
+            eLeapRS result = LeapC.SetPolicyFlags(_leapConnection, 0, clearFlags);
             reportAbnormalResults("LeapC SetPolicyFlags call was ", result);
         }
 
@@ -911,7 +916,7 @@ namespace LeapInternal
                 eLeapRS result = LeapC.GetConnectionInfo(_leapConnection, ref pInfo);
                 reportAbnormalResults("LeapC GetConnectionInfo call was ", result);
 
-                if (pInfo.status == eLeapConnectionStatus.Connected)
+                if (pInfo.status == eLeapConnectionStatus.eLeapConnectionStatus_Connected)
                     return true;
 
                 return false;
