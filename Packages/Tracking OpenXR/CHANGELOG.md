@@ -6,6 +6,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [docs-website]: https://docs.ultraleap.com/ "Ultraleap Docs"
 
+## [1.0.0-pre.1]
+
+### Fixed
+
+- Fixed Android missing from the list of supported targets for the Runtime package.
+- Added example scene showing Capsule Hands used with a `Service Provider (OpenXR)` prefab.
+
 ## [1.0.0-pre.0]
 
 ### Added
