@@ -42,6 +42,7 @@ namespace Leap.Unity.HandsModule
         private SerializedProperty debugOptions;
         private SerializedProperty leapProvider;
         private SerializedProperty scaleOffset;
+        private SerializedProperty fingertipScaleOffset;
 
 
 
@@ -70,6 +71,8 @@ namespace Leap.Unity.HandsModule
             offsets = serializedObject.FindProperty("Offsets");
             leapProvider = serializedObject.FindProperty("leapProvider");
             scaleOffset = serializedObject.FindProperty("ScaleOffset");
+            fingertipScaleOffset = serializedObject.FindProperty("FingertipScaleOffset");
+
 
             dividerLine = Resources.Load<Texture>("EditorDividerLine");
             editorSkin = Resources.Load<GUISkin>("UltraleapEditorStyle");
@@ -151,7 +154,9 @@ namespace Leap.Unity.HandsModule
                 if (setScale.boolValue)
                 {
                     EditorGUILayout.Space();
-                    EditorGUILayout.PropertyField(scaleOffset, new GUIContent("Scale Offset", "The hand scale will be modified by this amount"));
+                    EditorGUILayout.PropertyField(scaleOffset, new GUIContent("Scale Offset", "The hand scale will be modified by this amount")); 
+                    EditorGUILayout.PropertyField(fingertipScaleOffset, new GUIContent("Fingertip Scale Offset", "The hand finger tip scale will be modified by this amount"));
+
                 }
             }
 
@@ -408,8 +413,13 @@ namespace Leap.Unity.HandsModule
                                 Handles.DrawWireDisc(target.position, target.forward, myTarget.GizmoSize);
                             }
                         }
-
                         index++;
+                    }
+
+                    if(FINGER.fingerTip.boundTransform && FINGER.boundBones.Last().boundTransform)
+                    {
+                        Handles.DrawLine(FINGER.boundBones.Last().boundTransform.position, FINGER.fingerTip.boundTransform.position);
+                        Handles.SphereHandleCap(-1, FINGER.fingerTip.boundTransform.position, Quaternion.identity, myTarget.GizmoSize, EventType.Repaint);
                     }
                 }
 
@@ -484,6 +494,10 @@ namespace Leap.Unity.HandsModule
 
                         index++;
                     }
+
+                    Handles.DrawLine(finger.bones.Last().PrevJoint.ToVector3(), finger.TipPosition.ToVector3());
+                    Handles.SphereHandleCap(-1, finger.TipPosition.ToVector3(), Quaternion.identity, myTarget.GizmoSize, EventType.Repaint);
+
                 }
 
                 Handles.SphereHandleCap(-1, myTarget.LeapHand.WristPosition.ToVector3(), Quaternion.identity, myTarget.GizmoSize, EventType.Repaint);
@@ -946,6 +960,7 @@ namespace Leap.Unity.HandsModule
         /// </summary>
         void UpgradeHelper()
         {
+            if (myTarget == null) return;
             UpgradeHandScaleFeature();
         }
 
@@ -965,6 +980,9 @@ namespace Leap.Unity.HandsModule
                 {
                     myTarget.ResetHand();
                     HandBinderAutoBinder.CalculateHandSize(myTarget.BoundHand);
+                    HandBinderAutoBinder.CalculateFingerTipLength(myTarget);
+                    myTarget.SetPositions = true;
+                    myTarget.SetModelScale = true;
                     Debug.Log("Hand Scale Feature Added");
                 }
             }

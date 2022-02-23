@@ -47,6 +47,9 @@ namespace Leap.Unity.HandsModule
             handBinder.BoundHand.fingers[2].boundBones = AssignTransformToBoundBone(middleBones);
             handBinder.BoundHand.fingers[3].boundBones = AssignTransformToBoundBone(ringBones);
             handBinder.BoundHand.fingers[4].boundBones = AssignTransformToBoundBone(pinkyBones);
+
+            CalculateFingerTipLength(handBinder);
+
             handBinder.BoundHand.wrist = AssignBoundBone(wrist);
             handBinder.BoundHand.elbow = AssignBoundBone(elbow);
 
@@ -209,6 +212,30 @@ namespace Leap.Unity.HandsModule
             return newBone;
         }
 
+        static BoundBone AssignFingerTip(BoundFinger finger)
+        {
+            var t = finger.boundBones.LastOrDefault().boundTransform;
+
+            var newBone = new BoundBone();
+            if (t != null)
+            {
+                if(t.childCount > 0)
+                {
+                    if(t.GetChild(0) != null)
+                    {
+                        var fingerTip = t.GetChild(0);
+                        newBone.boundTransform = fingerTip;
+                        newBone.startTransform = new TransformStore();
+                        newBone.startTransform.position = fingerTip.localPosition;
+                        newBone.startTransform.rotation = fingerTip.localRotation.eulerAngles;
+                        finger.fingerTipBaseLength = (t.transform.position - fingerTip.position).magnitude;
+                    }
+                }
+
+            }
+            return newBone;
+        }
+
         /// <summary>
         /// Estimate the rotation offset needed to get the rigged hand into the same orientation as the leap hand
         /// </summary>
@@ -280,6 +307,14 @@ namespace Leap.Unity.HandsModule
             }
 
             boundHand.baseScale = length;
+        }
+
+        public static void CalculateFingerTipLength(HandBinder handBinder)
+        {
+            for (int i = 0; i < handBinder.BoundHand.fingers.Length; i++)
+            {
+                handBinder.BoundHand.fingers[i].fingerTip = AssignFingerTip(handBinder.BoundHand.fingers[i]);
+            }
         }
 
         #endregion
