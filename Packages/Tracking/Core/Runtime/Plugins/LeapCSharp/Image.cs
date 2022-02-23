@@ -24,8 +24,9 @@ namespace Leap
         private ImageData rightImage;
         private Int64 frameId = 0;
         private Int64 timestamp = 0;
+        private UInt32 deviceId = 0;
 
-        public Image(Int64 frameId, Int64 timestamp, ImageData leftImage, ImageData rightImage)
+        public Image(Int64 frameId, Int64 timestamp, ImageData leftImage, ImageData rightImage, UInt32 deviceId = 1)
         {
             if (leftImage == null || rightImage == null)
             {
@@ -44,6 +45,7 @@ namespace Leap
             this.timestamp = timestamp;
             this.leftImage = leftImage;
             this.rightImage = rightImage;
+            this.deviceId = deviceId;
         }
 
         private ImageData imageData(CameraType camera)
@@ -57,7 +59,7 @@ namespace Leap
         /// The image data is a set of 8-bit intensity values. The buffer is
         /// image.Width * image.Height * image.BytesPerPixel bytes long.
         /// 
-        /// Use the ByteOffset(` method to find the beginning offset
+        /// Use the ByteOffset method to find the beginning offset
         /// of the data for the specified camera.
         /// 
         /// @since 4.0
@@ -69,6 +71,29 @@ namespace Leap
 
             return imageData(camera).AsByteArray;
         }
+
+        /// <summary>
+        /// Returns a convenience device ID based on which attached device sent this
+        /// image.
+        /// @since 4.5.0
+        /// </summary>
+        public UInt32 DeviceID
+        {
+            get
+            {
+                return deviceId;
+            }
+        }
+
+        /// <summary>
+        /// Calibration type
+        /// </summary>
+        public enum CalibrationType
+        {
+            INFRARED = 0,
+            VISIBLE = 1
+        };
+
 
         /// <summary>
         /// The offset, in number of bytes, from the beginning of the Data()

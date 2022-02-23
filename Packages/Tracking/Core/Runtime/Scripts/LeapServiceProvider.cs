@@ -149,6 +149,35 @@ namespace Leap.Unity
         [SerializeField]
         protected float _physicsExtrapolationTime = 1.0f / 90.0f;
 
+        #region Multiple Device
+        public enum MultipleDeviceMode
+        {
+            Disabled,
+            All,
+            Specific
+        }
+
+        [Tooltip("When set to `All`, provider will receive data from all connected devices.")]
+        [EditTimeOnly]
+        [SerializeField]
+        protected MultipleDeviceMode _multipleDeviceMode = MultipleDeviceMode.Disabled;
+
+        [Tooltip("When Multiple Device Mode is set to `Specific`, the provider will " +
+          "receive data from only the devices that contain this in their serial number.  " +
+          "If the serial number is unknown, simply specify which DeviceID to " +
+          "sample from (0 is invalid, 1 and above are valid).")]
+        [EditTimeOnly]
+        [SerializeField]
+        protected string _specificSerialNumber;
+
+        /// <summary> A counter to keep track of how many devices have been seen up
+        /// through this point. Allows a provider to latch onto a device based on
+        /// its order of appearance, which corresponds to that device's DeviceID.
+        /// </summary>
+        protected uint _numDevicesSeen = 0;
+
+        #endregion
+
         /// <summary>
         /// (Service must be >= 4.9.2)
         /// The tracking mode used by the service. Should be set to match the orientation of the hand tracking hardware.
@@ -192,6 +221,10 @@ namespace Leap.Unity
         #endregion
 
         #region Internal Settings & Memory
+
+        /// <summary>
+        /// Determines if the service provider should temporally resample frames for smoothness.
+        /// </summary>
         protected bool _useInterpolation = true;
 
 #if SVR
@@ -497,6 +530,7 @@ namespace Leap.Unity
         {
             _fixedOffset.delay = 0.4f;
             _smoothedTrackingLatency.SetBlend(0.99f, 0.0111f);
+            _useInterpolation = _multipleDeviceMode.Equals(MultipleDeviceMode.Disabled) ? _useInterpolation : false;
         }
 
         protected virtual void Start()
@@ -750,14 +784,20 @@ namespace Leap.Unity
             switch (trackingMode)
             {
                 case TrackingOptimizationMode.Desktop:
+                    _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_DEFAULT);
                     _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP);
                     _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
                     break;
                 case TrackingOptimizationMode.Screentop:
-                    _leapController.SetAndClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP, Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
+                    _leapController.SetPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP);
+                    _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_DEFAULT);
+                    _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
+                    _leapController.SetPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP);
                     break;
                 case TrackingOptimizationMode.HMD:
-                    _leapController.SetAndClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD, Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP);
+                    _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_DEFAULT);
+                    _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP);
+                    _leapController.SetPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
                     break;
             }
         }
@@ -842,7 +882,8 @@ namespace Leap.Unity
                 return;
             }
 
-            _leapController = new Controller(0, _serverNameSpace);
+            _leapController = new Controller(_specificSerialNumber.GetHashCode(), _serverNameSpace, _multipleDeviceMode != MultipleDeviceMode.Disabled);
+
             _leapController.Device += (s, e) =>
             {
                 if (_onDeviceSafe != null)
@@ -850,6 +891,31 @@ namespace Leap.Unity
                     _onDeviceSafe(e.Device);
                 }
             };
+
+            if (_multipleDeviceMode == MultipleDeviceMode.All)
+            {
+                _onDeviceSafe += (d) =>
+                {
+                    Debug.Log("Connecting to Device with Serial: " + d.SerialNumber);
+                    _leapController.SubscribeToDeviceEvents(d);
+                };
+            }
+            else if (_multipleDeviceMode == MultipleDeviceMode.Specific)
+            {
+                _onDeviceSafe += (d) =>
+                {
+                    int DeviceID = 0;
+                    _numDevicesSeen++;
+                    if ((int.TryParse(_specificSerialNumber, out DeviceID) &&
+                        _numDevicesSeen == (uint)DeviceID) ||
+                       (_specificSerialNumber.Length > 1 &&
+                        d.SerialNumber.Contains(_specificSerialNumber)))
+                    {
+                        Debug.Log("Connecting to Device with Serial: " + d.SerialNumber);
+                        _leapController.SubscribeToDeviceEvents(d);
+                    }
+                };
+            }
 
             if (_leapController.IsConnected)
             {
@@ -880,6 +946,7 @@ namespace Leap.Unity
         {
             if (_leapController != null)
             {
+                _leapController.UnsubscribeFromAllDevices();
                 _leapController.StopConnection();
                 _leapController.Dispose();
                 _leapController = null;
