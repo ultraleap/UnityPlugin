@@ -219,9 +219,9 @@ namespace Leap.Unity.HandsModule
             var newBone = new BoundBone();
             if (t != null)
             {
-                if(t.childCount > 0)
+                if (t.childCount > 0)
                 {
-                    if(t.GetChild(0) != null)
+                    if (t.GetChild(0) != null)
                     {
                         var fingerTip = t.GetChild(0);
                         newBone.boundTransform = fingerTip;
