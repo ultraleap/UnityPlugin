@@ -154,7 +154,7 @@ namespace Leap.Unity.HandsModule
                 if (setScale.boolValue)
                 {
                     EditorGUILayout.Space();
-                    EditorGUILayout.PropertyField(scaleOffset, new GUIContent("Scale Offset", "The hand scale will be modified by this amount")); 
+                    EditorGUILayout.PropertyField(scaleOffset, new GUIContent("Scale Offset", "The hand scale will be modified by this amount"));
                     EditorGUILayout.PropertyField(fingertipScaleOffset, new GUIContent("Fingertip Scale Offset", "The hand finger tip scale will be modified by this amount"));
 
                 }
@@ -416,7 +416,7 @@ namespace Leap.Unity.HandsModule
                         index++;
                     }
 
-                    if(FINGER.fingerTip.boundTransform && FINGER.boundBones.Last().boundTransform)
+                    if (FINGER.fingerTip.boundTransform && FINGER.boundBones.Last().boundTransform)
                     {
                         Handles.DrawLine(FINGER.boundBones.Last().boundTransform.position, FINGER.fingerTip.boundTransform.position);
                         Handles.SphereHandleCap(-1, FINGER.fingerTip.boundTransform.position, Quaternion.identity, myTarget.GizmoSize, EventType.Repaint);
