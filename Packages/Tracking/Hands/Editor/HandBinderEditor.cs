@@ -41,6 +41,7 @@ namespace Leap.Unity.HandsModule
         private SerializedProperty fineTuning;
         private SerializedProperty debugOptions;
         private SerializedProperty leapProvider;
+        private SerializedProperty useMetaBones;
         private SerializedProperty scaleOffset;
         private SerializedProperty fingertipScaleOffset;
 
@@ -72,7 +73,7 @@ namespace Leap.Unity.HandsModule
             leapProvider = serializedObject.FindProperty("leapProvider");
             scaleOffset = serializedObject.FindProperty("ScaleOffset");
             fingertipScaleOffset = serializedObject.FindProperty("FingertipScaleOffset");
-
+            useMetaBones = serializedObject.FindProperty("UseMetaBones");
 
             dividerLine = Resources.Load<Texture>("EditorDividerLine");
             editorSkin = Resources.Load<GUISkin>("UltraleapEditorStyle");
@@ -145,20 +146,28 @@ namespace Leap.Unity.HandsModule
             EditorGUILayout.Space();
 
             setEditorPose.boolValue = GUILayout.Toggle(setEditorPose.boolValue, new GUIContent("Set Hand Pose In Editor", "Should the Leap Editor Pose be used during Edit mode?"), editorSkin.toggle);
+
+            useMetaBones.boolValue = GUILayout.Toggle(useMetaBones.boolValue, new GUIContent("Use Metacarpal bones", "Does this model have weighted metacarpal bones you want to move and rotate?"), editorSkin.toggle);
+
             setPositions.boolValue = GUILayout.Toggle(setPositions.boolValue, new GUIContent("Match Joint Positions With Tracking Data", "Does this binding require the positional leap data to be applied to the 3D model?"), editorSkin.toggle);
 
-            if (setPositions.boolValue)
+            setScale.boolValue = GUILayout.Toggle(setScale.boolValue, new GUIContent("Scale Model to Tracking Data", "Should the hand binder adjust the models scale?"), editorSkin.toggle);
+
+            if (setScale.boolValue)
             {
-                setScale.boolValue = GUILayout.Toggle(setScale.boolValue, new GUIContent("Scale Model to Tracking Data", "Should the hand binder adjust the models scale?"), editorSkin.toggle);
-
-                if (setScale.boolValue)
-                {
-                    EditorGUILayout.Space();
-                    EditorGUILayout.PropertyField(scaleOffset, new GUIContent("Scale Offset", "The hand scale will be modified by this amount"));
-                    EditorGUILayout.PropertyField(fingertipScaleOffset, new GUIContent("Fingertip Scale Offset", "The hand finger tip scale will be modified by this amount"));
-
-                }
+                EditorGUILayout.Space();
+                EditorGUILayout.PropertyField(scaleOffset, new GUIContent("Scale Offset", "The hand scale will be modified by this amount"));
+                EditorGUILayout.PropertyField(fingertipScaleOffset, new GUIContent("Fingertip Scale Offset", "The hand finger tip scale will be modified by this amount"));
             }
+
+            ////Reset the hand scale
+            //if(EditorPrefs.GetBool("setPositions") == true && setPositions.boolValue == false)
+            //{
+            //    //setScale.boolValue = false;
+            //    //myTarget.ResetHand();
+            //}
+
+            //EditorPrefs.SetBool("setPositions", setPositions.boolValue);
 
             EditorGUILayout.Space();
             GUILayout.Label(dividerLine);
@@ -961,29 +970,19 @@ namespace Leap.Unity.HandsModule
         void UpgradeHelper()
         {
             if (myTarget == null) return;
-            UpgradeHandScaleFeature();
+            CheckHandScaleFeature();
         }
 
         /// <summary>
         /// Calculate the hand scale for the user if the rig does not already include it
         /// </summary>
-        void UpgradeHandScaleFeature()
+        void CheckHandScaleFeature()
         {
             if (myTarget.BoundHand != null)
             {
-                if (myTarget.BoundHand.startScale == Vector3.zero)
+                if (myTarget.BoundHand.startScale == Vector3.zero || myTarget.BoundHand.baseScale == 0 || myTarget.BoundHand.fingers.Any(x => x.fingerTipBaseLength == 0))
                 {
-                    myTarget.BoundHand.startScale = myTarget.transform.localScale;
-                }
-
-                if (myTarget.BoundHand.baseScale == 0)
-                {
-                    myTarget.ResetHand();
-                    HandBinderAutoBinder.CalculateHandSize(myTarget.BoundHand);
-                    HandBinderAutoBinder.CalculateFingerTipLength(myTarget);
-                    myTarget.SetPositions = true;
-                    myTarget.SetModelScale = true;
-                    Debug.Log("Hand Scale Feature Added");
+                    Debug.Log("Hand Scale feature is missing, rebind the hand model to active it", myTarget);
                 }
             }
         }

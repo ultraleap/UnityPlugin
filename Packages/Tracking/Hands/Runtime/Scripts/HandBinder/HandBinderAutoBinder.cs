@@ -259,6 +259,7 @@ namespace Leap.Unity.HandsModule
                     right = -right;
                 }
                 var up = Vector3.Cross(forward, right);
+
                 Vector3.OrthoNormalize(ref up, ref forward, ref right);
                 var modelRotation = Quaternion.LookRotation(forward, up);
 
@@ -272,6 +273,16 @@ namespace Leap.Unity.HandsModule
                 //Assuming the fingers have been created using the same rotation axis as the wrist
                 handBinder.GlobalFingerRotationOffset = handBinder.WristRotationOffset;
             }
+        }
+
+        static Vector3 CalculateAxis(Transform t, Vector3 dir)
+        {
+            var boneForward = t.InverseTransformDirection(-dir.normalized).normalized;
+            boneForward.x = Mathf.Round(boneForward.x);
+            boneForward.y = Mathf.Round(boneForward.y);
+            boneForward.z = Mathf.Round(boneForward.z);
+
+            return boneForward;
         }
 
         public static void CalculateElbowLength(HandBinder handBinder)
