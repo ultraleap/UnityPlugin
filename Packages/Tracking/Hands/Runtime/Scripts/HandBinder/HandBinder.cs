@@ -157,30 +157,45 @@ namespace Leap.Unity.HandsModule
 
             if (SetModelScale)
             {
-                var scaleRatio = (CalculateRatio(LeapHand) * ScaleOffset);
+                //Scale the entire model by a ratio of leap middle finger length compared to the models middle finger length
+                float middleFingerRatio = (CalculateLeapMiddleFingerLength(LeapHand) / BoundHand.baseScale);
+                float scaleRatio = (middleFingerRatio * ScaleOffset);
                 if (BoundHand.startScale != Vector3.zero)
                 {
                     transform.localScale = BoundHand.startScale * scaleRatio;
                 }
 
+                //Scale all the finger tips to match
                 for (int i = 0; i < BoundHand.fingers.Length; i++)
                 {
-                    var finger = BoundHand.fingers[i];
-                    var lastBone = finger.boundBones.LastOrDefault();
-                    var lastBoneT = lastBone.boundTransform;
-                    var leapFinger = LeapHand.Fingers[i];
+                    BoundFinger finger = BoundHand.fingers[i];
+                    BoundBone lastBone = finger.boundBones.LastOrDefault();
+                    Transform lastBoneT = lastBone.boundTransform;
+                    Finger leapFinger = LeapHand.Fingers[i];
 
-                    if (finger.fingerTip.boundTransform == null || lastBone == null || lastBone.boundTransform == null || leapFinger == null) return;
+                    if (finger.fingerTip.boundTransform == null || lastBone == null || lastBoneT == null || leapFinger == null)
+                    {
+                        return;
+                    }
 
-                    var dir = (finger.fingerTip.boundTransform.position - lastBoneT.position);
+                    //Get the length of the leap finger tip
+                    float leapFingerLength = leapFinger.bones.Last().Length;
+                    //Get the length of the models finger tip (Calculated when the hand was first bound)
+                    float fingerTipLength = finger.fingerTipBaseLength;
+                    //Calculate a ratio to use for scaling the finger tip
+                    float ratio = leapFingerLength / fingerTipLength;
+                    //Adjust the ratio by an offset value exposed in the inspector and the overal scale that has been calculated
+                    float adjustedRatio = (ratio * FingertipScaleOffset) - scaleRatio;
 
-                    var leapFingerLength = CalculateLeapFingerTipLength(leapFinger);
-                    var fingerTipLength = finger.fingerTipBaseLength;
-                    var ratio = leapFingerLength / fingerTipLength;
+                    //Calculate the direction that goes up the bone towards the next bone
+                    Vector3 direction = (finger.fingerTip.boundTransform.position - lastBoneT.position);
+                    //Calculate which axis to scale along
+                    Vector3 axis = CalculateAxis(lastBoneT, direction);
 
-                    var axis = CalculateAxis(lastBoneT, dir);
-
-                    lastBoneT.localScale = Vector3.one + (axis * ((ratio * FingertipScaleOffset) - scaleRatio));
+                    //Calculate the scale by ensuring all axis are 1 apart from the axis to scale along
+                    Vector3 scale = Vector3.one + (axis * adjustedRatio);
+                    //Scale the last finger bone 
+                    lastBoneT.localScale = scale;
                 }
             }
 
@@ -307,17 +322,9 @@ namespace Leap.Unity.HandsModule
         #region Scale
 
         /// <summary>
-        /// Compare the 3D models scale with the current leap data scale 
-        /// </summary>
-        float CalculateRatio(Hand hand)
-        {
-            return CalculateLeapSize(hand) / BoundHand.baseScale;
-        }
-
-        /// <summary>
         /// Calculate the leap hand size
         /// </summary>
-        float CalculateLeapSize(Hand hand)
+        float CalculateLeapMiddleFingerLength(Hand hand)
         {
             var length = 0f;
             for (int i = 0; i < hand.Fingers[(int)Finger.FingerType.TYPE_MIDDLE].bones.Length; i++)
@@ -331,15 +338,6 @@ namespace Leap.Unity.HandsModule
                 }
             }
             return length;
-        }
-
-        /// <summary>
-        /// Calculate the length of the leap fingers tip bone
-        /// </summary>
-        float CalculateLeapFingerTipLength(Finger finger)
-        {
-            var bone = finger.bones.Last();
-            return bone.Length;
         }
 
         Vector3 CalculateAxis(Transform t, Vector3 dir)

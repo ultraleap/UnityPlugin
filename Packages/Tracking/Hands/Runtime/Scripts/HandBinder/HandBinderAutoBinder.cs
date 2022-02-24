@@ -212,7 +212,7 @@ namespace Leap.Unity.HandsModule
             return newBone;
         }
 
-        static BoundBone AssignFingerTip(BoundFinger finger)
+        static BoundBone CreateFingerTipWithLength(BoundFinger finger)
         {
             var t = finger.boundBones.LastOrDefault().boundTransform;
 
@@ -221,15 +221,13 @@ namespace Leap.Unity.HandsModule
             {
                 if (t.childCount > 0)
                 {
-                    if (t.GetChild(0) != null)
-                    {
-                        var fingerTip = t.GetChild(0);
-                        newBone.boundTransform = fingerTip;
-                        newBone.startTransform = new TransformStore();
-                        newBone.startTransform.position = fingerTip.localPosition;
-                        newBone.startTransform.rotation = fingerTip.localRotation.eulerAngles;
-                        finger.fingerTipBaseLength = (t.transform.position - fingerTip.position).magnitude;
-                    }
+                    //Guess that the first child will be the finger tip bone, if its not then this wont work..
+                    var fingerTip = t.GetChild(0);
+                    newBone.boundTransform = fingerTip;
+                    newBone.startTransform = new TransformStore();
+                    newBone.startTransform.position = fingerTip.localPosition;
+                    newBone.startTransform.rotation = fingerTip.localRotation.eulerAngles;
+                    finger.fingerTipBaseLength = (t.transform.position - fingerTip.position).magnitude;
                 }
 
             }
@@ -304,16 +302,13 @@ namespace Leap.Unity.HandsModule
             //Loop through the bones and sum up there lengths
             for (int boneID = 0; boneID < finger.boundBones.Length - 1; boneID++)
             {
-                if (boneID + 1 <= finger.boundBones.Length)
-                {
-                    var bone = finger.boundBones[boneID];
-                    var nextBone = finger.boundBones[boneID + 1];
+                var bone = finger.boundBones[boneID];
+                var nextBone = finger.boundBones[boneID + 1];
 
-                    if (bone.boundTransform != null && nextBone.boundTransform != null)
-                    {
-                        var t = (bone.boundTransform.position - nextBone.boundTransform.position).magnitude;
-                        length += t;
-                    }
+                if (bone.boundTransform != null && nextBone.boundTransform != null)
+                {
+                    var t = (bone.boundTransform.position - nextBone.boundTransform.position).magnitude;
+                    length += t;
                 }
             }
 
@@ -324,7 +319,7 @@ namespace Leap.Unity.HandsModule
         {
             for (int i = 0; i < handBinder.BoundHand.fingers.Length; i++)
             {
-                handBinder.BoundHand.fingers[i].fingerTip = AssignFingerTip(handBinder.BoundHand.fingers[i]);
+                handBinder.BoundHand.fingers[i].fingerTip = CreateFingerTipWithLength(handBinder.BoundHand.fingers[i]);
             }
         }
 
