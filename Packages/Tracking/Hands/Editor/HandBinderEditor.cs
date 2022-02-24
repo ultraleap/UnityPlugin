@@ -648,7 +648,7 @@ namespace Leap.Unity.HandsModule
 
             void OnGUI()
             {
-                GUIHandGraphic.DrawHandGraphic(handBinder.Handedness, GUIHandGraphic.FlattenHandBinderTransforms(handBinder));
+                GUIHandGraphic.DrawHandGraphic(handBinder.Handedness, GUIHandGraphic.FlattenHandBinderTransforms(handBinder), handBinder);
                 DrawAutoBindButton();
                 DrawObjectFields();
                 DrawRotationOffsets();
@@ -701,24 +701,41 @@ namespace Leap.Unity.HandsModule
 
                 //Draw the wrist bone object field
                 DrawObjectField("WRIST : ", ref handBinder.BoundHand.wrist);
+
+                GUILayout.BeginHorizontal();
+                string length = handBinder.BoundHand.baseScale.ToString();
+                GUILayout.Label("HAND LENGTH", editorSkin.label);
+                GUILayout.Label(length, editorSkin.label, GUILayout.MaxWidth(EditorGUIUtility.labelWidth * 2));
+                GUILayout.EndHorizontal();
+
                 GUILayout.Space(spaceSize);
 
                 for (int fingerID = 0; fingerID < handBinder.BoundHand.fingers.Length; fingerID++)
                 {
+                    var fingerType = ((Finger.FingerType)fingerID).ToString().Remove(0, 5).ToString();
+                    var objectFieldName = "";
                     for (int boneID = 0; boneID < handBinder.BoundHand.fingers[fingerID].boundBones.Length; boneID++)
                     {
                         if ((Finger.FingerType)fingerID == Finger.FingerType.TYPE_THUMB && (Bone.BoneType)boneID == Bone.BoneType.TYPE_METACARPAL)
                         {
                             continue;
                         }
-                        var fingerType = ((Finger.FingerType)fingerID).ToString().Remove(0, 5).ToString();
+
                         var boneType = ((Bone.BoneType)boneID).ToString().Remove(0, 5).ToString();
                         //var boneType = (fingerID == 0 ? boneID - 1: boneID).ToString();
 
-                        var objectFieldName = ((fingerType + " " + boneType + " :").ToString());
+                        objectFieldName = ((fingerType + " " + boneType + " :").ToString());
                         DrawObjectField(objectFieldName, ref handBinder.BoundHand.fingers[fingerID].boundBones[boneID], true, fingerID, boneID);
-
                     }
+
+                    objectFieldName = ((fingerType + " " + "TIP" + " :").ToString());
+                    DrawObjectField(objectFieldName, ref handBinder.BoundHand.fingers[fingerID].fingerTip, false, fingerID, 0);
+
+                    GUILayout.BeginHorizontal();
+                    string fingerLength = handBinder.BoundHand.fingers[fingerID].fingerTipBaseLength.ToString();
+                    GUILayout.Label("FINGER LENGTH", editorSkin.label);
+                    GUILayout.Label(fingerLength, editorSkin.label, GUILayout.MaxWidth(EditorGUIUtility.labelWidth * 2));
+                    GUILayout.EndHorizontal();
                     GUILayout.Space(spaceSize);
                 }
 
@@ -837,34 +854,39 @@ namespace Leap.Unity.HandsModule
             static public Vector2[] handPoints = new Vector2[]
             {
                 //Thumb
-                new Vector2(-20.9F, 51),
-                new Vector2(-25.6f, 53.9f),
-                new Vector2(-60.3f, 100.9f),
-                new Vector2(-94.2f, 146.9f),
+                Vector2.Lerp(new Vector2(-20.9F, 51), new Vector2(-94.2f, 146.9f), 0),
+                Vector2.Lerp(new Vector2(-20.9F, 51), new Vector2(-94.2f, 146.9f), .2f),
+                Vector2.Lerp(new Vector2(-20.9F, 51), new Vector2(-94.2f, 146.9f), .5f),
+                Vector2.Lerp(new Vector2(-20.9F, 51), new Vector2(-94.2f, 146.9f), .8f),
+                Vector2.Lerp(new Vector2(-20.9F, 51), new Vector2(-94.2f, 146.9f), 1),
                 
                 //Index
-                new Vector2(-7.1f, 89.37f),
-                new Vector2(-2, 151.19f),
-                new Vector2(-0.2f, 190.37f),
-                new Vector2(0.9f, 229.8f),
+                Vector2.Lerp(new Vector2(-7.1f, 89.37f), new Vector2(0.9f, 229.8f), 0),
+                Vector2.Lerp(new Vector2(-7.1f, 89.37f), new Vector2(0.9f, 229.8f), .45f),
+                Vector2.Lerp(new Vector2(-7.1f, 89.37f), new Vector2(0.9f, 229.8f), .65f),
+                Vector2.Lerp(new Vector2(-7.1f, 89.37f), new Vector2(0.9f, 229.8f), .85f),
+                Vector2.Lerp(new Vector2(-7.1f, 89.37f), new Vector2(0.9f, 229.8f), 1),
 
                 //Middle
-                new Vector2(17.5f, 99.4f),
-                new Vector2(32.2f, 149.5f),
-                new Vector2(41.3f, 185.7f),
-                new Vector2(51.6f, 229.2f),
+                Vector2.Lerp(new Vector2(17.5f, 99.4f), new Vector2(51.6f, 229.2f), 0),
+                Vector2.Lerp(new Vector2(17.5f, 99.4f), new Vector2(51.6f, 229.2f), .4f),
+                Vector2.Lerp(new Vector2(17.5f, 99.4f), new Vector2(51.6f, 229.2f), .6f),
+                Vector2.Lerp(new Vector2(17.5f, 99.4f), new Vector2(51.6f, 229.2f), .8f),
+                Vector2.Lerp(new Vector2(17.5f, 99.4f), new Vector2(51.6f, 229.2f), 1),
 
                 //Ring
-                new Vector2(33.2f, 82.3f),
-                new Vector2(58.6f, 132.6f),
-                new Vector2(76.7f, 166.2f),
-                new Vector2(91.3f, 200f),
+                Vector2.Lerp(new Vector2(33.2f, 82.3f), new Vector2(91.3f, 200f), 0),
+                Vector2.Lerp(new Vector2(33.2f, 82.3f), new Vector2(91.3f, 200f), .4f),
+                Vector2.Lerp(new Vector2(33.2f, 82.3f), new Vector2(91.3f, 200f), .6f),
+                Vector2.Lerp(new Vector2(33.2f, 82.3f), new Vector2(91.3f, 200f), .8f),
+                Vector2.Lerp(new Vector2(33.2f, 82.3f), new Vector2(91.3f, 200f), 1),
 
                 //Pinky
-                new Vector2(39.6f, 53.9f),
-                new Vector2(75.4f, 98.6f),
-                new Vector2(103, 119),
-                new Vector2(125, 138.01f),
+                Vector2.Lerp(new Vector2(39.6f, 53.9f), new Vector2(125, 138.01f), 0),
+                Vector2.Lerp(new Vector2(75.4f, 98.6f), new Vector2(125, 138.01f), 0),
+                Vector2.Lerp(new Vector2(75.4f, 98.6f), new Vector2(125, 138.01f), .4f),
+                Vector2.Lerp(new Vector2(75.4f, 98.6f), new Vector2(125, 138.01f), .7f),
+                Vector2.Lerp(new Vector2(75.4f, 98.6f), new Vector2(125, 138.01f), 1),
 
                 //Wrist
                 new Vector2(0, 0),
@@ -887,6 +909,7 @@ namespace Leap.Unity.HandsModule
                         bones.Add(BONE.boundTransform);
                         index++;
                     }
+                    bones.Add(handBinder.BoundHand.fingers[FINGERID].fingerTip.boundTransform);
                     index++;
                 }
                 bones.Add(handBinder.BoundHand.wrist.boundTransform);
@@ -907,7 +930,7 @@ namespace Leap.Unity.HandsModule
             /// </summary>
             /// <param name="handedness"></param>
             /// <param name="bones"></param>
-            static public void DrawHandGraphic(Chirality handedness, Transform[] bones = null)
+            static public void DrawHandGraphic(Chirality handedness, Transform[] bones = null, HandBinder handBinder = null)
             {
                 if (handTexture == null || dotTexture == null)
                 {
