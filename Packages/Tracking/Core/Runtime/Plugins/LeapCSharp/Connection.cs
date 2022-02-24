@@ -588,7 +588,6 @@ namespace LeapInternal
             if (lost != null)
             {
                 _devices.Remove(lost);
-                UnityEngine.Debug.Log("Lost a device.");
 
                 if (LeapDeviceLost != null)
                 {
@@ -623,7 +622,6 @@ namespace LeapInternal
             if (failed != null)
             {
                 _devices.Remove(failed);
-                UnityEngine.Debug.Log("Removed a failed device.");
             }
 
             if (LeapDeviceFailure != null)
