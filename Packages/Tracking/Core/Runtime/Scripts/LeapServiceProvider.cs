@@ -734,6 +734,7 @@ namespace Leap.Unity
                 createController();
             }
 #endif
+
             return _leapController;
         }
 
@@ -784,18 +785,14 @@ namespace Leap.Unity
             switch (trackingMode)
             {
                 case TrackingOptimizationMode.Desktop:
-                    _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_DEFAULT);
                     _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP);
                     _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
                     break;
                 case TrackingOptimizationMode.Screentop:
-                    _leapController.SetPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP);
-                    _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_DEFAULT);
                     _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
                     _leapController.SetPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP);
                     break;
                 case TrackingOptimizationMode.HMD:
-                    _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_DEFAULT);
                     _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP);
                     _leapController.SetPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
                     break;

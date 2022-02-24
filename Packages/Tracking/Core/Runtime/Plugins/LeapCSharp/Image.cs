@@ -33,11 +33,11 @@ namespace Leap
                 throw new ArgumentNullException("images");
             }
             if (leftImage.type != rightImage.type ||
-               leftImage.format != rightImage.format ||
-               leftImage.width != rightImage.width ||
-               leftImage.height != rightImage.height ||
-               leftImage.bpp != rightImage.bpp ||
-               leftImage.DistortionSize != rightImage.DistortionSize)
+                leftImage.format != rightImage.format ||
+                leftImage.width != rightImage.width ||
+                leftImage.height != rightImage.height ||
+                leftImage.bpp != rightImage.bpp ||
+                leftImage.DistortionSize != rightImage.DistortionSize)
             {
                 throw new ArgumentException("image mismatch");
             }
@@ -47,6 +47,7 @@ namespace Leap
             this.rightImage = rightImage;
             this.deviceId = deviceId;
         }
+
 
         private ImageData imageData(CameraType camera)
         {
@@ -85,15 +86,11 @@ namespace Leap
             }
         }
 
-        /// <summary>
-        /// Calibration type
-        /// </summary>
         public enum CalibrationType
         {
             INFRARED = 0,
             VISIBLE = 1
         };
-
 
         /// <summary>
         /// The offset, in number of bytes, from the beginning of the Data()

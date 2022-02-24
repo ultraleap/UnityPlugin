@@ -1059,13 +1059,20 @@ namespace LeapInternal
         public static extern eLeapRS InterpolateEyePositions(IntPtr hConnection, Int64 timestamp, ref LEAP_EYE_EVENT eyes);
 
         [DllImport("LeapC", EntryPoint = "LeapPixelToRectilinear")]
-        public static extern LEAP_VECTOR LeapPixelToRectilinear(IntPtr hConnection, eLeapPerspectiveType camera, LEAP_VECTOR pixel);
+        public static extern LEAP_VECTOR LeapPixelToRectilinear(IntPtr hConnection,
+          eLeapPerspectiveType camera, LEAP_VECTOR pixel);
+
+        [DllImport("LeapC", EntryPoint = "LeapPixelToRectilinearEx")]
+        public static extern LEAP_VECTOR LeapPixelToRectilinearEx(IntPtr hConnection,
+          IntPtr hDevice, eLeapPerspectiveType camera, eLeapCameraCalibrationType calibrationType, LEAP_VECTOR pixel);
 
         [DllImport("LeapC", EntryPoint = "LeapRectilinearToPixel")]
-        public static extern LEAP_VECTOR LeapRectilinearToPixel(IntPtr hConnection, eLeapPerspectiveType camera, LEAP_VECTOR rectilinear);
+        public static extern LEAP_VECTOR LeapRectilinearToPixel(IntPtr hConnection,
+          eLeapPerspectiveType camera, LEAP_VECTOR rectilinear);
 
         [DllImport("LeapC", EntryPoint = "LeapRectilinearToPixelEx")]
-        public static extern LEAP_VECTOR LeapRectilinearToPixelEx(IntPtr hConnection, IntPtr hDevice, eLeapPerspectiveType camera, eLeapCameraCalibrationType calibrationType, LEAP_VECTOR rectilinear);
+        public static extern LEAP_VECTOR LeapRectilinearToPixelEx(IntPtr hConnection,
+          IntPtr hDevice, eLeapPerspectiveType camera, eLeapCameraCalibrationType calibrationType, LEAP_VECTOR rectilinear);
 
         [DllImport("LeapC", EntryPoint = "LeapCloseDevice")]
         public static extern void CloseDevice(IntPtr pDevice);

@@ -41,9 +41,9 @@ namespace Leap
     {
         Connection _connection;
         bool _disposed = false;
-        Config _config;
         bool _supportsMultipleDevices = true;
         string _serverNamespace = "Leap Service";
+        Config _config;
 
         /// <summary>
         /// The SynchronizationContext used for dispatching events.
@@ -455,8 +455,8 @@ namespace Leap
             _serverNamespace = serverNamespace;
 
             _connection.Start(serverNamespace, supportsMultipleDevices);
-
         }
+
 
         /// <summary>
         /// Starts the connection.
@@ -693,7 +693,6 @@ namespace Leap
                 _connection.UnsubscribeFromDeviceEvents(Devices[i]);
             }
         }
-
 
         public void TelemetryProfiling(ref LEAP_TELEMETRY_DATA telemetryData)
         {

@@ -191,7 +191,6 @@ namespace LeapInternal
                 else
                 {
                     result = LeapC.CreateConnection(ref config, out _leapConnection);
-                    Marshal.FreeHGlobal(config.server_namespace);
                 }
 
                 if (result != eLeapRS.eLeapRS_Success || _leapConnection == IntPtr.Zero)
@@ -527,7 +526,10 @@ namespace LeapInternal
         {
             var device = _devices.FindDeviceByHandle(statusEvent.device.handle);
             if (device == null)
+            {
                 return;
+            }
+
             device.UpdateStatus(statusEvent.status);
         }
 
@@ -774,6 +776,7 @@ namespace LeapInternal
                 {
                     _currentRightDistortionData = createDistortionData(imageMsg.rightImage, Image.CameraType.RIGHT);
                 }
+
                 ImageData leftImage = new ImageData(Image.CameraType.LEFT, imageMsg.leftImage, _currentLeftDistortionData);
                 ImageData rightImage = new ImageData(Image.CameraType.RIGHT, imageMsg.rightImage, _currentRightDistortionData);
                 Image stereoImage = new Image(imageMsg.info.frame_id, imageMsg.info.timestamp, leftImage, rightImage, deviceID);
@@ -1004,6 +1007,32 @@ namespace LeapInternal
             return new Vector(ray.x, ray.y, ray.z);
         }
 
+        /// <summary>
+        /// Converts from image-space pixel coordinates to camera-space rectilinear coordinates
+        /// 
+        /// Also allows specifying a specific device handle and calibration type.
+        /// 
+        /// @since 4.1
+        /// </summary>
+        public Vector PixelToRectilinearEx(IntPtr deviceHandle,
+                                           Image.CameraType camera, Image.CalibrationType calibType, Vector pixel)
+        {
+            LEAP_VECTOR pixelStruct = new LEAP_VECTOR(pixel);
+            LEAP_VECTOR ray = LeapC.LeapPixelToRectilinearEx(_leapConnection,
+                   deviceHandle,
+                   (camera == Image.CameraType.LEFT ?
+                   eLeapPerspectiveType.eLeapPerspectiveType_stereo_left :
+                   eLeapPerspectiveType.eLeapPerspectiveType_stereo_right),
+                   (calibType == Image.CalibrationType.INFRARED ?
+                   eLeapCameraCalibrationType.eLeapCameraCalibrationType_infrared :
+                   eLeapCameraCalibrationType.eLeapCameraCalibrationType_visual),
+                   pixelStruct);
+            return new Vector(ray.x, ray.y, ray.z);
+        }
+
+        /// <summary>
+        /// Converts from camera-space rectilinear coordinates to image-space pixel coordinates
+        /// </summary>
         public Vector RectilinearToPixel(Image.CameraType camera, Vector ray)
         {
             LEAP_VECTOR rayStruct = new LEAP_VECTOR(ray);
