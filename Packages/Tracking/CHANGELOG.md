@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [5.4.0] 
 
 ### Added
-- Basic support for specifying which device a LeapProvider should connect to. Can be specified by device index or serial number. If multiple service providers are in a scene set to use the multiple device mode, they must be set to use the same tracking optimization mode.
+- Basic support for specifying which device a LeapProvider should connect to. Can be specified by device index or serial number. If multiple service providers are in a scene set to use the multiple device mode, they must be set to use the same tracking optimization mode. _(Multiple Device Mode is only supported on the Ultraleap Tracking Service version 5.3.6 and above)_
 
 ### Changed
 - Updated LeapC.dll client to latest service release. Service supports multiple devices.
