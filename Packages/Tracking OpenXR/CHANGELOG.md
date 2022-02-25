@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.0.0-pre.1]
 
+### Added
+
+- Added an OpenXR validation check/auto-fix for the main camera near clipping plain distance, to ensure tracked hands are not clipped at normal hand interaction distances.
+
 ### Fixed
 
 - Fixed Android missing from the list of supported targets for the Runtime package.
