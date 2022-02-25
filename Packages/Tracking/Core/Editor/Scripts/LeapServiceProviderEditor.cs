@@ -59,6 +59,10 @@ namespace Leap.Unity
                                       (int)LeapServiceProvider.PhysicsExtrapolationMode.Manual,
                                       "_physicsExtrapolationTime");
 
+            specifyConditionalDrawing("_multipleDeviceMode",
+                          (int)LeapServiceProvider.MultipleDeviceMode.Specific,
+                          "_specificSerialNumber");
+
             deferProperty("_serverNameSpace");
             deferProperty("_workerThreadProfiling");
 

@@ -801,7 +801,7 @@ namespace LeapInternal
         {
             UInt64 setFlags = (ulong)FlagForPolicy(set);
             UInt64 clearFlags = (ulong)FlagForPolicy(clear);
-            eLeapRS result = LeapC.SetPolicyFlags(_leapConnection, setFlags, clearFlags); 
+            eLeapRS result = LeapC.SetPolicyFlags(_leapConnection, setFlags, clearFlags);
             reportAbnormalResults("LeapC SetAndClearPolicy call was ", result);
         }
 

@@ -153,7 +153,6 @@ namespace Leap.Unity
         public enum MultipleDeviceMode
         {
             Disabled,
-            All,
             Specific
         }
 
@@ -889,15 +888,7 @@ namespace Leap.Unity
                 }
             };
 
-            if (_multipleDeviceMode == MultipleDeviceMode.All)
-            {
-                _onDeviceSafe += (d) =>
-                {
-                    Debug.Log("Connecting to Device with Serial: " + d.SerialNumber);
-                    _leapController.SubscribeToDeviceEvents(d);
-                };
-            }
-            else if (_multipleDeviceMode == MultipleDeviceMode.Specific)
+            if (_multipleDeviceMode == MultipleDeviceMode.Specific)
             {
                 _onDeviceSafe += (d) =>
                 {
@@ -913,6 +904,18 @@ namespace Leap.Unity
                     }
                 };
             }
+
+            //TO DO - Enable Multiple Device Mode All
+            /*
+            else if (_multipleDeviceMode == MultipleDeviceMode.All)
+            {
+                _onDeviceSafe += (d) =>
+                {
+                    Debug.Log("Connecting to Device with Serial: " + d.SerialNumber);
+                    _leapController.SubscribeToDeviceEvents(d);
+                };
+            }
+            */
 
             if (_leapController.IsConnected)
             {
