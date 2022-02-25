@@ -6,6 +6,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [docs-website]: https://docs.ultraleap.com/ "Ultraleap Docs"
 
+## [5.4.0] 
+
+### Added
+- Basic support for specifying which device a LeapProvider should connect to. Can be specified by device index or serial number. If multiple service providers are in a scene set to use the multiple device mode, they must be set to use the same tracking optimization mode. _(Multiple Device Mode is only supported on the Ultraleap Tracking Service version 5.3.6 and above)_
+
+### Changed
+- Updated LeapC.dll client to latest service release. Service supports multiple devices.
+
+### Removed
+
+### Fixed
+- Fixed issue with incorrect enum ordering in eLeapEventType (now matches LeapC.h ordering). Inserted eLeapEventType_TrackingMode
+
 ## [5.3.0] 
 
 ### Added
@@ -26,7 +39,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Reduced the number of OnContactBegin / OnContactEnd events when a finger is in contact with a slider
 - Fixed issues with HDRP and URP example scenes not containing the correct shader when switching graphics pipelines.
 - Fixing eye dislocator misalignment
-
 
 ### Known issues
 -	Scenes containing the infrared viewer render incorrectly on systems using single pass stereo with the XR plugin system - e.g. Windows Mixed Reality headsets. SteamVR headsets may also default to single pass stereo, showing the same issue. However in this case, the OpenVR settings can be changed to multipass which resolves the problem.
