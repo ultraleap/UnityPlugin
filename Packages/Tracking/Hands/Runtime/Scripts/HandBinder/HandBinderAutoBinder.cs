@@ -61,6 +61,12 @@ namespace Leap.Unity.HandsModule
                 handBinder.ElbowLength = (wrist.position - elbow.position).magnitude;
             }
 
+            BindHand(handBinder);
+        }
+
+        public static void BindHand(HandBinder handBinder)
+        {
+            CalculateFingerTipLengths(handBinder);
             EstimateWristRotationOffset(handBinder);
             CalculateElbowLength(handBinder);
             CalculateHandSize(handBinder.BoundHand);
@@ -211,6 +217,8 @@ namespace Leap.Unity.HandsModule
                 newBone.startTransform = new TransformStore();
                 newBone.startTransform.position = transform.localPosition;
                 newBone.startTransform.rotation = transform.localRotation.eulerAngles;
+                newBone.startTransform.scale = transform.localScale;
+
             }
             return newBone;
         }
@@ -230,6 +238,8 @@ namespace Leap.Unity.HandsModule
                     newBone.startTransform = new TransformStore();
                     newBone.startTransform.position = fingerTip.localPosition;
                     newBone.startTransform.rotation = fingerTip.localRotation.eulerAngles;
+                    newBone.startTransform.scale = fingerTip.localScale;
+
                     finger.fingerTipBaseLength = (t.transform.position - fingerTip.position).magnitude;
                 }
 

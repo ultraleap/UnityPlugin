@@ -43,9 +43,6 @@ namespace Leap.Unity.HandsModule
         private SerializedProperty leapProvider;
         private SerializedProperty useMetaBones;
         private SerializedProperty scaleOffset;
-        private SerializedProperty fingertipScaleOffset;
-
-
 
         private Color green = new Color32(140, 234, 40, 255);
         private GUISkin editorSkin;
@@ -71,8 +68,7 @@ namespace Leap.Unity.HandsModule
             boundHand = serializedObject.FindProperty("BoundHand");
             offsets = serializedObject.FindProperty("Offsets");
             leapProvider = serializedObject.FindProperty("leapProvider");
-            scaleOffset = serializedObject.FindProperty("ScaleOffset");
-            fingertipScaleOffset = serializedObject.FindProperty("FingertipScaleOffset");
+            scaleOffset = boundHand.FindPropertyRelative("scaleOffset");
             useMetaBones = serializedObject.FindProperty("UseMetaBones");
 
             dividerLine = Resources.Load<Texture>("EditorDividerLine");
@@ -156,8 +152,15 @@ namespace Leap.Unity.HandsModule
             if (setScale.boolValue)
             {
                 EditorGUILayout.Space();
-                EditorGUILayout.PropertyField(scaleOffset, new GUIContent("Scale Offset", "The hand scale will be modified by this amount"));
-                EditorGUILayout.PropertyField(fingertipScaleOffset, new GUIContent("Fingertip Scale Offset", "The hand finger tip scale will be modified by this amount"));
+                EditorGUILayout.PropertyField(scaleOffset, new GUIContent("Model Scale Offset", "The hand scale will be modified by this amount"));
+
+                for (int i = 0; i < myTarget.BoundHand.fingers.Length; i++)
+                {
+                    var offset = boundHand.FindPropertyRelative("fingers").GetArrayElementAtIndex(i).FindPropertyRelative("fingerTipScaleOffset");
+                    var fingerType = ((Finger.FingerType)i).ToString().Remove(0, 5).ToString();
+                    EditorGUILayout.PropertyField(offset, new GUIContent(fingerType + " Tip Offset", "The hand finger tip scale will be modified by this amount"));
+                }
+
             }
 
             ////Reset the hand scale
@@ -614,7 +617,7 @@ namespace Leap.Unity.HandsModule
             private float spaceSize = 30f;
             private GUISkin editorSkin;
             private string message1 = "Reference the GameObjects you wish to use from the scene into the fields below, once assigned the dots above will appear green to show they are bound to tracking data.";
-            private string message2 = "Once you have assigned the bones you wish to use, the button below will attempt to calculate the rotational offsets needed to line the 3D Model hand with the tracking data.";
+            private string message2 = "Once you have assigned the bones you wish to use, the button below will bind the 3D Model  to the tracking data.";
             private Vector2 scrollPosition;
 
             /// <summary>
@@ -673,8 +676,8 @@ namespace Leap.Unity.HandsModule
                     }
                 }
 
-                GUILayout.Label(message1, editorSkin.label);
                 GUILayout.Label(dividerLine);
+                GUILayout.Label(message1, editorSkin.label);
             }
 
             /// <summary>
@@ -828,17 +831,15 @@ namespace Leap.Unity.HandsModule
             {
                 GUILayout.Label(dividerLine);
                 GUILayout.Label(message2, editorSkin.label);
-                if (GUILayout.Button("Calculate Rotation Offsets", editorSkin.button, GUILayout.MaxWidth(EditorGUIUtility.currentViewWidth), GUILayout.MinHeight(spaceSize)))
+                if (GUILayout.Button("Bind Hand", editorSkin.button, GUILayout.MaxWidth(EditorGUIUtility.currentViewWidth), GUILayout.MinHeight(spaceSize)))
                 {
-                    if (EditorUtility.DisplayDialog("Auto Calculate Rotation Offsets",
-                       "Are you sure you want to recalculate the rotation offsets?", "Yes", "No"))
+                    if (EditorUtility.DisplayDialog("Bind Hand",
+                       "Are you sure you want to recalculate the hand binding ?", "Yes", "No"))
                     {
                         handBinder.ResetHand();
-                        Undo.RegisterFullObjectHierarchyUndo(handBinder.gameObject, "Recalculate Offsets");
-                        HandBinderAutoBinder.CalculateFingerTipLengths(handBinder);
-                        HandBinderAutoBinder.EstimateWristRotationOffset(handBinder);
-                        HandBinderAutoBinder.CalculateElbowLength(handBinder);
-                        HandBinderAutoBinder.CalculateHandSize(handBinder.BoundHand);
+                        Undo.RegisterFullObjectHierarchyUndo(handBinder.gameObject, "Bind Hand");
+                        HandBinderAutoBinder.BindHand(handBinder);
+
                         handBinder.SetEditorPose = true;
                         handBinder.UpdateHand();
                     }
