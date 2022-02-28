@@ -394,6 +394,8 @@ namespace Leap.Unity.HandsModule
                 serializedTransform.transform = new TransformStore();
                 serializedTransform.transform.position = child.localPosition;
                 serializedTransform.transform.rotation = child.localRotation.eulerAngles;
+                serializedTransform.transform.scale = child.localScale;
+
                 baseTransforms.Add(serializedTransform);
             }
             DefaultHandPose = baseTransforms.ToArray();
@@ -417,6 +419,8 @@ namespace Leap.Unity.HandsModule
                 {
                     baseTransform.reference.transform.localPosition = baseTransform.transform.position;
                     baseTransform.reference.transform.localRotation = Quaternion.Euler(baseTransform.transform.rotation);
+                    baseTransform.reference.transform.localScale = baseTransform.transform.scale;
+
                 }
             }
 

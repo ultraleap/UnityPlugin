@@ -1001,7 +1001,7 @@ namespace Leap.Unity.HandsModule
         /// </summary>
         void CheckHandScaleFeature()
         {
-            if (myTarget.BoundHand != null)
+            if (myTarget.BoundHand != null && myTarget.BoundHand.wrist.boundTransform != null)
             {
                 if (myTarget.BoundHand.startScale == Vector3.zero || myTarget.BoundHand.baseScale == 0 || myTarget.BoundHand.fingers.Any(x => x.fingerTipBaseLength == 0))
                 {
