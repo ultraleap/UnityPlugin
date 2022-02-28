@@ -979,7 +979,24 @@ namespace Leap.Unity.HandsModule
                     }
 
                     GUI.color = bone != null ? Color.green : Color.grey;
-                    GUI.DrawTextureWithTexCoords(pointRect, isSelectedOrHovered ? EditorGUIUtility.IconContent("DotFrameDotted").image : dotTexture, new Rect(0, 0, 11f, 11f));
+
+                    if(bone != null)
+                    {
+                        if (isSelectedOrHovered)
+                        {
+                            GUI.DrawTextureWithTexCoords(pointRect, EditorGUIUtility.IconContent("DotFrameDotted").image, new Rect(0, 0, 11f, 11f));
+                        }
+                        else
+                        {
+                            GUI.DrawTextureWithTexCoords(pointRect, dotTexture, new Rect(0, 0, 11f, 11f));
+                        }
+                    }
+                    else
+                    {
+                        GUI.DrawTextureWithTexCoords(pointRect, EditorGUIUtility.IconContent("DotFrameDotted").image, new Rect(0, 0, 11f, 11f));
+                    }
+
+
                     GUI.color = Color.white;
                 }
 
