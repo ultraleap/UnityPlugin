@@ -151,17 +151,18 @@ namespace Leap.Unity.HandsModule
                 float scaleRatio = (middleFingerRatio * BoundHand.scaleOffset);
 
                 //Set the object the hand bidner is attached to to scale based on the scale ratio
-                transform.localScale = BoundHand.startScale * scaleRatio;
+                transform.localScale = Vector3.Lerp(transform.localScale, BoundHand.startScale * scaleRatio, Time.deltaTime);
 
                 //Scale all the finger tips to match
                 for (int i = 0; i < BoundHand.fingers.Length; i++)
                 {
                     BoundFinger finger = BoundHand.fingers[i];
-                    BoundBone lastBone = finger.boundBones.LastOrDefault();
-                    Transform lastBoneT = lastBone.boundTransform;
+                    BoundBone distalBone = finger.boundBones[(int)Bone.BoneType.TYPE_DISTAL];
+                    BoundBone intermediateBone = finger.boundBones[(int)Bone.BoneType.TYPE_INTERMEDIATE];
+
                     Finger leapFinger = LeapHand.Fingers[i];
 
-                    if (finger.fingerTip.boundTransform == null || lastBone == null || lastBoneT == null || leapFinger == null)
+                    if (intermediateBone.boundTransform == null || distalBone.boundTransform == null || leapFinger == null || finger.fingerTipBaseLength == 0)
                     {
                         return;
                     }
@@ -176,14 +177,14 @@ namespace Leap.Unity.HandsModule
                     float adjustedRatio = (ratio * (finger.fingerTipScaleOffset) - BoundHand.scaleOffset);
 
                     //Calculate the direction that goes up the bone towards the next bone
-                    Vector3 direction = (finger.fingerTip.boundTransform.position - lastBoneT.position);
+                    Vector3 direction = (distalBone.boundTransform.position - intermediateBone.boundTransform.position);
                     //Calculate which axis to scale along
-                    Vector3 axis = CalculateAxis(lastBoneT, direction);
+                    Vector3 axis = CalculateAxis(distalBone.boundTransform, direction);
 
                     //Calculate the scale by ensuring all axis are 1 apart from the axis to scale along
                     Vector3 scale = Vector3.one + (axis * adjustedRatio);
                     //Scale the last finger bone 
-                    lastBoneT.localScale = scale;
+                    distalBone.boundTransform.localScale = Vector3.Lerp(distalBone.boundTransform.localScale, scale, Time.deltaTime);
                 }
             }
 
@@ -330,7 +331,7 @@ namespace Leap.Unity.HandsModule
 
         Vector3 CalculateAxis(Transform t, Vector3 dir)
         {
-            var boneForward = t.InverseTransformDirection(-dir.normalized).normalized;
+            var boneForward = t.InverseTransformDirection(dir.normalized).normalized;
             boneForward.x = Mathf.Round(boneForward.x);
             boneForward.y = Mathf.Round(boneForward.y);
             boneForward.z = Mathf.Round(boneForward.z);
