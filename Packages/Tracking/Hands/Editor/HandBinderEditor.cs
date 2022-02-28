@@ -1007,7 +1007,7 @@ namespace Leap.Unity.HandsModule
             {
                 if (myTarget.BoundHand.startScale == Vector3.zero || myTarget.BoundHand.baseScale == 0 || myTarget.BoundHand.fingers.Any(x => x.fingerTipBaseLength == 0))
                 {
-                    Debug.Log("Hand Scale feature is missing, rebind the hand model to active it", myTarget);
+                    Debug.Log("Hand Scale feature is disabled, ensure the hand has finger tips to enable the hand scale feature", myTarget);
                 }
             }
         }
