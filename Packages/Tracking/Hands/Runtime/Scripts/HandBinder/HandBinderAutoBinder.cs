@@ -48,7 +48,10 @@ namespace Leap.Unity.HandsModule
             handBinder.BoundHand.fingers[3].boundBones = AssignTransformToBoundBone(ringBones);
             handBinder.BoundHand.fingers[4].boundBones = AssignTransformToBoundBone(pinkyBones);
 
-            CalculateFingerTipLength(handBinder);
+            for (int i = 0; i < handBinder.BoundHand.fingers.Length; i++)
+            {
+                handBinder.BoundHand.fingers[i].fingerTip = CreateFingerTipWithLength(handBinder.BoundHand.fingers[i]);
+            }
 
             handBinder.BoundHand.wrist = AssignBoundBone(wrist);
             handBinder.BoundHand.elbow = AssignBoundBone(elbow);
@@ -315,13 +318,22 @@ namespace Leap.Unity.HandsModule
             boundHand.baseScale = length;
         }
 
-        public static void CalculateFingerTipLength(HandBinder handBinder)
+        public static void CalculateFingerTipLengths(HandBinder handBinder)
         {
             for (int i = 0; i < handBinder.BoundHand.fingers.Length; i++)
             {
-                handBinder.BoundHand.fingers[i].fingerTip = CreateFingerTipWithLength(handBinder.BoundHand.fingers[i]);
+                var finger = handBinder.BoundHand.fingers[i];
+                var lastBone = finger.boundBones.LastOrDefault().boundTransform;
+                var tip = finger.fingerTip.boundTransform;
+
+                if (lastBone != null && tip != null)
+                {
+                    finger.fingerTipBaseLength = (lastBone.position - tip.position).magnitude;
+                }
             }
         }
+
+
 
         #endregion
     }
