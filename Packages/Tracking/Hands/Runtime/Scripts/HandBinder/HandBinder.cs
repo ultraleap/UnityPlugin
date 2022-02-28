@@ -180,6 +180,7 @@ namespace Leap.Unity.HandsModule
 
                     //Get the length of the leap finger tip
                     float leapFingerLength = leapFinger.bones.Last().Length;
+
                     //Get the length of the models finger tip (Calculated when the hand was first bound)
                     float fingerTipLength = finger.fingerTipBaseLength;
                     //Calculate a ratio to use for scaling the finger tip
@@ -218,7 +219,10 @@ namespace Leap.Unity.HandsModule
 
                     if (lastBone.boundTransform == null) continue;
 
-                    lastBone.boundTransform.localScale = lastBone.startTransform.scale;
+                    if(lastBone.startTransform.scale != Vector3.zero)
+                    {
+                        lastBone.boundTransform.localScale = lastBone.startTransform.scale;
+                    }
                 }
             }
         }
@@ -431,8 +435,13 @@ namespace Leap.Unity.HandsModule
                 {
                     baseTransform.reference.transform.localPosition = baseTransform.transform.position;
                     baseTransform.reference.transform.localRotation = Quaternion.Euler(baseTransform.transform.rotation);
-                    baseTransform.reference.transform.localScale = baseTransform.transform.scale;
 
+                    if (baseTransform.transform.scale == Vector3.zero)
+                    {
+                        baseTransform.transform.scale = baseTransform.reference.transform.localScale;
+                    }
+
+                    baseTransform.reference.transform.localScale = baseTransform.transform.scale;
                 }
             }
 

@@ -143,12 +143,26 @@ namespace Leap.Unity.HandsModule
 
             setEditorPose.boolValue = GUILayout.Toggle(setEditorPose.boolValue, new GUIContent("Set Hand Pose In Editor", "Should the Leap Editor Pose be used during Edit mode?"), editorSkin.toggle);
 
-            useMetaBones.boolValue = GUILayout.Toggle(useMetaBones.boolValue, new GUIContent("Use Metacarpal bones", "Does this model have weighted metacarpal bones you want to move and rotate?"), editorSkin.toggle);
+            //If the hand has meta bones display the option to toggle them on and off
+            if (myTarget.BoundHand.fingers[1].boundBones[0].boundTransform != null)
+            {
+                useMetaBones.boolValue = GUILayout.Toggle(useMetaBones.boolValue, new GUIContent("Use Metacarpal bones", "Does this model have weighted metacarpal bones you want to move and rotate?"), editorSkin.toggle);
+            }
 
             setPositions.boolValue = GUILayout.Toggle(setPositions.boolValue, new GUIContent("Match Joint Positions With Tracking Data", "Does this binding require the positional leap data to be applied to the 3D model?"), editorSkin.toggle);
 
             setScale.boolValue = GUILayout.Toggle(setScale.boolValue, new GUIContent("Scale Model to Tracking Data", "Should the hand binder adjust the models scale?"), editorSkin.toggle);
 
+            if(myTarget.BoundHand.baseScale == 0)
+            {
+                EditorGUILayout.Space();
+                GUILayout.Label("Rebind the hand to enable scaling");
+                GUI.enabled = false;
+            }
+            else
+            {
+                GUI.enabled = true;
+            }
             if (setScale.boolValue)
             {
                 EditorGUILayout.Space();
@@ -160,8 +174,9 @@ namespace Leap.Unity.HandsModule
                     var fingerType = ((Finger.FingerType)i).ToString().Remove(0, 5).ToString();
                     EditorGUILayout.PropertyField(offset, new GUIContent(fingerType + " Tip Offset", "The hand finger tip scale will be modified by this amount"));
                 }
-
             }
+
+            GUI.enabled = true;
 
             ////Reset the hand scale
             //if(EditorPrefs.GetBool("setPositions") == true && setPositions.boolValue == false)
@@ -414,7 +429,7 @@ namespace Leap.Unity.HandsModule
                                 var joint = FINGER.boundBones[index + 1];
                                 if (joint.boundTransform != null)
                                 {
-                                    Handles.DrawLine(target.position, joint.boundTransform.position);
+                                    Handles.DrawAAPolyLine(target.position, joint.boundTransform.position);
                                 }
                             }
 
@@ -426,12 +441,6 @@ namespace Leap.Unity.HandsModule
                             }
                         }
                         index++;
-                    }
-
-                    if (FINGER.fingerTip.boundTransform && FINGER.boundBones.Last().boundTransform)
-                    {
-                        Handles.DrawLine(FINGER.boundBones.Last().boundTransform.position, FINGER.fingerTip.boundTransform.position);
-                        Handles.SphereHandleCap(-1, FINGER.fingerTip.boundTransform.position, Quaternion.identity, myTarget.GizmoSize, EventType.Repaint);
                     }
                 }
 
@@ -472,12 +481,12 @@ namespace Leap.Unity.HandsModule
 
                         if (bone != null)
                         {
-                            Handles.DrawLine(wrist.position, bone.position);
+                            Handles.DrawAAPolyLine(wrist.position, bone.position);
                         }
 
                     }
                     Handles.SphereHandleCap(-1, wrist.position, Quaternion.identity, myTarget.GizmoSize, EventType.Repaint);
-                    Handles.DrawLine(wrist.position, myTarget.LeapHand.Arm.PrevJoint.ToVector3());
+                    Handles.DrawAAPolyLine(wrist.position, myTarget.LeapHand.Arm.PrevJoint.ToVector3());
                     Handles.SphereHandleCap(-1, myTarget.LeapHand.Arm.PrevJoint.ToVector3(), Quaternion.identity, myTarget.GizmoSize, EventType.Repaint);
                 }
             }
@@ -501,24 +510,23 @@ namespace Leap.Unity.HandsModule
                         Handles.SphereHandleCap(-1, bone.PrevJoint.ToVector3(), Quaternion.identity, myTarget.GizmoSize, EventType.Repaint);
                         if ((index + 1) <= finger.bones.Length - 1)
                         {
-                            Handles.DrawLine(finger.bones[index].PrevJoint.ToVector3(), finger.bones[index + 1].PrevJoint.ToVector3());
+                            Handles.DrawAAPolyLine(finger.bones[index].PrevJoint.ToVector3(), finger.bones[index + 1].PrevJoint.ToVector3());
                         }
 
                         index++;
                     }
 
-                    Handles.DrawLine(finger.bones.Last().PrevJoint.ToVector3(), finger.TipPosition.ToVector3());
+                    Handles.DrawDottedLine(finger.bones.Last().PrevJoint.ToVector3(), finger.TipPosition.ToVector3(), 5);
                     Handles.SphereHandleCap(-1, finger.TipPosition.ToVector3(), Quaternion.identity, myTarget.GizmoSize, EventType.Repaint);
-
                 }
 
                 Handles.SphereHandleCap(-1, myTarget.LeapHand.WristPosition.ToVector3(), Quaternion.identity, myTarget.GizmoSize, EventType.Repaint);
-                Handles.DrawLine(myTarget.LeapHand.WristPosition.ToVector3(), myTarget.LeapHand.Fingers[0].bones[0].PrevJoint.ToVector3());
-                Handles.DrawLine(myTarget.LeapHand.WristPosition.ToVector3(), myTarget.LeapHand.Fingers[1].bones[0].PrevJoint.ToVector3());
-                Handles.DrawLine(myTarget.LeapHand.WristPosition.ToVector3(), myTarget.LeapHand.Fingers[2].bones[0].PrevJoint.ToVector3());
-                Handles.DrawLine(myTarget.LeapHand.WristPosition.ToVector3(), myTarget.LeapHand.Fingers[3].bones[0].PrevJoint.ToVector3());
-                Handles.DrawLine(myTarget.LeapHand.WristPosition.ToVector3(), myTarget.LeapHand.Fingers[4].bones[0].PrevJoint.ToVector3());
-                Handles.DrawLine(myTarget.LeapHand.WristPosition.ToVector3(), myTarget.LeapHand.Arm.PrevJoint.ToVector3());
+                Handles.DrawAAPolyLine(myTarget.LeapHand.WristPosition.ToVector3(), myTarget.LeapHand.Fingers[0].bones[0].PrevJoint.ToVector3());
+                Handles.DrawAAPolyLine(myTarget.LeapHand.WristPosition.ToVector3(), myTarget.LeapHand.Fingers[1].bones[0].PrevJoint.ToVector3());
+                Handles.DrawAAPolyLine(myTarget.LeapHand.WristPosition.ToVector3(), myTarget.LeapHand.Fingers[2].bones[0].PrevJoint.ToVector3());
+                Handles.DrawAAPolyLine(myTarget.LeapHand.WristPosition.ToVector3(), myTarget.LeapHand.Fingers[3].bones[0].PrevJoint.ToVector3());
+                Handles.DrawAAPolyLine(myTarget.LeapHand.WristPosition.ToVector3(), myTarget.LeapHand.Fingers[4].bones[0].PrevJoint.ToVector3());
+                Handles.DrawAAPolyLine(myTarget.LeapHand.WristPosition.ToVector3(), myTarget.LeapHand.Arm.PrevJoint.ToVector3());
                 Handles.SphereHandleCap(-1, myTarget.LeapHand.Arm.PrevJoint.ToVector3(), Quaternion.identity, myTarget.GizmoSize, EventType.Repaint);
             }
         }
@@ -732,7 +740,7 @@ namespace Leap.Unity.HandsModule
                     }
 
                     objectFieldName = ((fingerType + " " + "TIP" + " :").ToString());
-                    DrawObjectField(objectFieldName, ref handBinder.BoundHand.fingers[fingerID].fingerTip, false, fingerID, 0);
+                    //DrawObjectField(objectFieldName, ref handBinder.BoundHand.fingers[fingerID].fingerTip, false, fingerID, 0);
 
                     GUILayout.BeginHorizontal();
                     string fingerLength = handBinder.BoundHand.fingers[fingerID].fingerTipBaseLength.ToString();
@@ -860,35 +868,35 @@ namespace Leap.Unity.HandsModule
                 Vector2.Lerp(new Vector2(-20.9F, 51), new Vector2(-94.2f, 146.9f), .2f),
                 Vector2.Lerp(new Vector2(-20.9F, 51), new Vector2(-94.2f, 146.9f), .5f),
                 Vector2.Lerp(new Vector2(-20.9F, 51), new Vector2(-94.2f, 146.9f), .8f),
-                Vector2.Lerp(new Vector2(-20.9F, 51), new Vector2(-94.2f, 146.9f), 1),
+                //Vector2.Lerp(new Vector2(-20.9F, 51), new Vector2(-94.2f, 146.9f), 1),
                 
                 //Index
                 Vector2.Lerp(new Vector2(-7.1f, 89.37f), new Vector2(0.9f, 229.8f), 0),
                 Vector2.Lerp(new Vector2(-7.1f, 89.37f), new Vector2(0.9f, 229.8f), .45f),
                 Vector2.Lerp(new Vector2(-7.1f, 89.37f), new Vector2(0.9f, 229.8f), .65f),
                 Vector2.Lerp(new Vector2(-7.1f, 89.37f), new Vector2(0.9f, 229.8f), .85f),
-                Vector2.Lerp(new Vector2(-7.1f, 89.37f), new Vector2(0.9f, 229.8f), 1),
+                //Vector2.Lerp(new Vector2(-7.1f, 89.37f), new Vector2(0.9f, 229.8f), 1),
 
                 //Middle
                 Vector2.Lerp(new Vector2(17.5f, 99.4f), new Vector2(51.6f, 229.2f), 0),
                 Vector2.Lerp(new Vector2(17.5f, 99.4f), new Vector2(51.6f, 229.2f), .4f),
                 Vector2.Lerp(new Vector2(17.5f, 99.4f), new Vector2(51.6f, 229.2f), .6f),
                 Vector2.Lerp(new Vector2(17.5f, 99.4f), new Vector2(51.6f, 229.2f), .8f),
-                Vector2.Lerp(new Vector2(17.5f, 99.4f), new Vector2(51.6f, 229.2f), 1),
+                //Vector2.Lerp(new Vector2(17.5f, 99.4f), new Vector2(51.6f, 229.2f), 1),
 
                 //Ring
                 Vector2.Lerp(new Vector2(33.2f, 82.3f), new Vector2(91.3f, 200f), 0),
                 Vector2.Lerp(new Vector2(33.2f, 82.3f), new Vector2(91.3f, 200f), .4f),
                 Vector2.Lerp(new Vector2(33.2f, 82.3f), new Vector2(91.3f, 200f), .6f),
                 Vector2.Lerp(new Vector2(33.2f, 82.3f), new Vector2(91.3f, 200f), .8f),
-                Vector2.Lerp(new Vector2(33.2f, 82.3f), new Vector2(91.3f, 200f), 1),
+                //Vector2.Lerp(new Vector2(33.2f, 82.3f), new Vector2(91.3f, 200f), 1),
 
                 //Pinky
                 Vector2.Lerp(new Vector2(39.6f, 53.9f), new Vector2(125, 138.01f), 0),
                 Vector2.Lerp(new Vector2(75.4f, 98.6f), new Vector2(125, 138.01f), 0),
                 Vector2.Lerp(new Vector2(75.4f, 98.6f), new Vector2(125, 138.01f), .4f),
                 Vector2.Lerp(new Vector2(75.4f, 98.6f), new Vector2(125, 138.01f), .7f),
-                Vector2.Lerp(new Vector2(75.4f, 98.6f), new Vector2(125, 138.01f), 1),
+                //Vector2.Lerp(new Vector2(75.4f, 98.6f), new Vector2(125, 138.01f), 1),
 
                 //Wrist
                 new Vector2(0, 0),
@@ -911,7 +919,7 @@ namespace Leap.Unity.HandsModule
                         bones.Add(BONE.boundTransform);
                         index++;
                     }
-                    bones.Add(handBinder.BoundHand.fingers[FINGERID].fingerTip.boundTransform);
+                    //bones.Add(handBinder.BoundHand.fingers[FINGERID].fingerTip.boundTransform);
                     index++;
                 }
                 bones.Add(handBinder.BoundHand.wrist.boundTransform);
@@ -1024,7 +1032,7 @@ namespace Leap.Unity.HandsModule
             {
                 if (myTarget.BoundHand.startScale == Vector3.zero || myTarget.BoundHand.baseScale == 0 || myTarget.BoundHand.fingers.Any(x => x.fingerTipBaseLength == 0))
                 {
-                    Debug.Log("Hand Scale feature is disabled, ensure the hand has finger tips to enable the hand scale feature", myTarget);
+                    Debug.Log("Hand Scale feature is disabled, rebind the hand to enable it", myTarget);
                 }
             }
         }

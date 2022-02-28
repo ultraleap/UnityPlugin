@@ -48,11 +48,6 @@ namespace Leap.Unity.HandsModule
             handBinder.BoundHand.fingers[3].boundBones = AssignTransformToBoundBone(ringBones);
             handBinder.BoundHand.fingers[4].boundBones = AssignTransformToBoundBone(pinkyBones);
 
-            for (int i = 0; i < handBinder.BoundHand.fingers.Length; i++)
-            {
-                handBinder.BoundHand.fingers[i].fingerTip = CreateFingerTipWithLength(handBinder.BoundHand.fingers[i]);
-            }
-
             handBinder.BoundHand.wrist = AssignBoundBone(wrist);
             handBinder.BoundHand.elbow = AssignBoundBone(elbow);
 
@@ -70,6 +65,7 @@ namespace Leap.Unity.HandsModule
         /// <param name="handBinder"></param>
         public static void BindHand(HandBinder handBinder)
         {
+            handBinder.ResetHand();
             CalculateFingerTipLengths(handBinder);
             EstimateWristRotationOffset(handBinder);
             CalculateElbowLength(handBinder);
@@ -227,30 +223,6 @@ namespace Leap.Unity.HandsModule
             return newBone;
         }
 
-        static BoundBone CreateFingerTipWithLength(BoundFinger finger)
-        {
-            var t = finger.boundBones.LastOrDefault().boundTransform;
-
-            var newBone = new BoundBone();
-            if (t != null)
-            {
-                if (t.childCount > 0)
-                {
-                    //Guess that the first child will be the finger tip bone, if its not then this wont work..
-                    var fingerTip = t.GetChild(0);
-                    newBone.boundTransform = fingerTip;
-                    newBone.startTransform = new TransformStore();
-                    newBone.startTransform.position = fingerTip.localPosition;
-                    newBone.startTransform.rotation = fingerTip.localRotation.eulerAngles;
-                    newBone.startTransform.scale = fingerTip.localScale;
-
-                    finger.fingerTipBaseLength = (t.transform.position - fingerTip.position).magnitude;
-                }
-
-            }
-            return newBone;
-        }
-
         /// <summary>
         /// Estimate the rotation offset needed to get the rigged hand into the same orientation as the leap hand
         /// </summary>
@@ -330,12 +302,15 @@ namespace Leap.Unity.HandsModule
             {
                 var finger = handBinder.BoundHand.fingers[i];
                 var lastBone = finger.boundBones.LastOrDefault().boundTransform;
-                var tip = finger.fingerTip.boundTransform;
+                var previousBone = finger.boundBones[(int)Bone.BoneType.TYPE_INTERMEDIATE].boundTransform;
 
-                if (lastBone != null && tip != null)
+                if (lastBone != null)
                 {
-                    finger.fingerTipBaseLength = (lastBone.position - tip.position).magnitude;
-                    finger.fingerTipScaleOffset = 1;
+                    if (previousBone != null)
+                    {
+                        finger.fingerTipBaseLength = (lastBone.position - previousBone.position).magnitude;
+                        finger.fingerTipScaleOffset = 1;
+                    }
                 }
             }
         }
