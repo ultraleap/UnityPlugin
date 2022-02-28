@@ -22,7 +22,7 @@ namespace Leap.Unity.HandsModule
         public BoundBone elbow = new BoundBone();
         public float baseScale;
         public Vector3 startScale;
-        [Range(0,2)] public float scaleOffset = 1;
+        [Range(0, 2)] public float scaleOffset = 1;
     }
 
     /// <summary>
