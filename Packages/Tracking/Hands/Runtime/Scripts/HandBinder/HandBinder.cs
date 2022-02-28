@@ -62,17 +62,6 @@ namespace Leap.Unity.HandsModule
         /// </summary>
         public bool SetModelScale = true;
 
-        /// <summary>
-        /// Adjust the calculated scale ratio by this value
-        /// </summary>
-        [Range(0, 2)] public float ScaleOffset = 0.8f;
-
-        /// <summary>
-        /// Adjust the finger tip scale ratio by this value
-        /// </summary>
-        [Range(0, 2)] public float FingertipScaleOffset = 1f;
-
-
         /// <summary> 
         /// User defined offsets in editor script 
         /// </summary>
@@ -159,11 +148,10 @@ namespace Leap.Unity.HandsModule
             {
                 //Scale the entire model by a ratio of leap middle finger length compared to the models middle finger length
                 float middleFingerRatio = (CalculateLeapMiddleFingerLength(LeapHand) / BoundHand.baseScale);
-                float scaleRatio = (middleFingerRatio * ScaleOffset);
-                if (BoundHand.startScale != Vector3.zero)
-                {
-                    transform.localScale = BoundHand.startScale * scaleRatio;
-                }
+                float scaleRatio = (middleFingerRatio * BoundHand.scaleOffset);
+
+                //Set the object the hand bidner is attached to to scale based on the scale ratio
+                transform.localScale = BoundHand.startScale * scaleRatio;
 
                 //Scale all the finger tips to match
                 for (int i = 0; i < BoundHand.fingers.Length; i++)
@@ -185,7 +173,7 @@ namespace Leap.Unity.HandsModule
                     //Calculate a ratio to use for scaling the finger tip
                     float ratio = leapFingerLength / fingerTipLength;
                     //Adjust the ratio by an offset value exposed in the inspector and the overal scale that has been calculated
-                    float adjustedRatio = (ratio * FingertipScaleOffset) - scaleRatio;
+                    float adjustedRatio = (ratio * (finger.fingerTipScaleOffset) - BoundHand.scaleOffset);
 
                     //Calculate the direction that goes up the bone towards the next bone
                     Vector3 direction = (finger.fingerTip.boundTransform.position - lastBoneT.position);
@@ -199,18 +187,18 @@ namespace Leap.Unity.HandsModule
                 }
             }
 
-            else if (BoundHand.startScale != Vector3.zero)
+            else
             {
                 transform.localScale = BoundHand.startScale;
 
                 for (int i = 0; i < BoundHand.fingers.Length; i++)
                 {
                     var finger = BoundHand.fingers[i];
-                    var lastBone = finger.boundBones.LastOrDefault().boundTransform;
+                    var lastBone = finger.boundBones.LastOrDefault();
 
-                    if (finger.fingerTip.boundTransform == null || lastBone == null) return;
+                    if (lastBone.boundTransform == null) continue;
 
-                    lastBone.localScale = Vector3.one;
+                    lastBone.boundTransform.localScale = lastBone.startTransform.scale;
 
                 }
             }
