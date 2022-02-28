@@ -64,6 +64,10 @@ namespace Leap.Unity.HandsModule
             BindHand(handBinder);
         }
 
+        /// <summary>
+        /// Using the bound transforms, run the hand binding process to calculate rotation offsets and scale
+        /// </summary>
+        /// <param name="handBinder"></param>
         public static void BindHand(HandBinder handBinder)
         {
             CalculateFingerTipLengths(handBinder);
@@ -286,16 +290,6 @@ namespace Leap.Unity.HandsModule
             }
         }
 
-        static Vector3 CalculateAxis(Transform t, Vector3 dir)
-        {
-            var boneForward = t.InverseTransformDirection(-dir.normalized).normalized;
-            boneForward.x = Mathf.Round(boneForward.x);
-            boneForward.y = Mathf.Round(boneForward.y);
-            boneForward.z = Mathf.Round(boneForward.z);
-
-            return boneForward;
-        }
-
         public static void CalculateElbowLength(HandBinder handBinder)
         {
             if (handBinder.BoundHand.elbow.boundTransform != null && handBinder.BoundHand.wrist.boundTransform != null)
@@ -325,6 +319,8 @@ namespace Leap.Unity.HandsModule
                 }
             }
 
+            //Reset the scale offset to 1
+            boundHand.scaleOffset = 1;
             boundHand.baseScale = length;
         }
 
@@ -339,6 +335,7 @@ namespace Leap.Unity.HandsModule
                 if (lastBone != null && tip != null)
                 {
                     finger.fingerTipBaseLength = (lastBone.position - tip.position).magnitude;
+                    finger.fingerTipScaleOffset = 1;
                 }
             }
         }

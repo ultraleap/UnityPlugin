@@ -146,12 +146,23 @@ namespace Leap.Unity.HandsModule
 
             if (SetModelScale)
             {
+
+                if (BoundHand.baseScale == 0) return;
+
                 //Scale the entire model by a ratio of leap middle finger length compared to the models middle finger length
                 float middleFingerRatio = (CalculateLeapMiddleFingerLength(LeapHand) / BoundHand.baseScale);
                 float scaleRatio = (middleFingerRatio * BoundHand.scaleOffset);
 
-                //Set the object the hand bidner is attached to to scale based on the scale ratio
-                transform.localScale = Vector3.Lerp(transform.localScale, BoundHand.startScale * scaleRatio, Time.deltaTime);
+                if (!Application.isPlaying && Application.isEditor)
+                {
+                    //Set the object the hand bidner is attached to to scale based on the scale ratio
+                    transform.localScale = BoundHand.startScale * scaleRatio;
+                }
+                else
+                {
+                    //Set the object the hand bidner is attached to to scale based on the scale ratio
+                    transform.localScale = Vector3.Lerp(transform.localScale, BoundHand.startScale * scaleRatio, Time.deltaTime);
+                }
 
                 //Scale all the finger tips to match
                 for (int i = 0; i < BoundHand.fingers.Length; i++)
@@ -184,7 +195,15 @@ namespace Leap.Unity.HandsModule
                     //Calculate the scale by ensuring all axis are 1 apart from the axis to scale along
                     Vector3 scale = Vector3.one + (axis * adjustedRatio);
                     //Scale the last finger bone 
-                    distalBone.boundTransform.localScale = Vector3.Lerp(distalBone.boundTransform.localScale, scale, Time.deltaTime);
+
+                    if (!Application.isPlaying && Application.isEditor)
+                    {
+                        distalBone.boundTransform.localScale = scale;
+                    }
+                    else
+                    {
+                        distalBone.boundTransform.localScale = Vector3.Lerp(distalBone.boundTransform.localScale, scale, Time.deltaTime);
+                    }
                 }
             }
 
@@ -200,7 +219,6 @@ namespace Leap.Unity.HandsModule
                     if (lastBone.boundTransform == null) continue;
 
                     lastBone.boundTransform.localScale = lastBone.startTransform.scale;
-
                 }
             }
         }
@@ -329,6 +347,9 @@ namespace Leap.Unity.HandsModule
             return length;
         }
 
+        /// <summary>
+        /// Calculate the local axis given a direcition
+        /// </summary>
         Vector3 CalculateAxis(Transform t, Vector3 dir)
         {
             var boneForward = t.InverseTransformDirection(dir.normalized).normalized;
