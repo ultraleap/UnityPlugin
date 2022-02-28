@@ -835,6 +835,7 @@ namespace Leap.Unity.HandsModule
                     {
                         handBinder.ResetHand();
                         Undo.RegisterFullObjectHierarchyUndo(handBinder.gameObject, "Recalculate Offsets");
+                        HandBinderAutoBinder.CalculateFingerTipLengths(handBinder);
                         HandBinderAutoBinder.EstimateWristRotationOffset(handBinder);
                         HandBinderAutoBinder.CalculateElbowLength(handBinder);
                         HandBinderAutoBinder.CalculateHandSize(handBinder.BoundHand);
