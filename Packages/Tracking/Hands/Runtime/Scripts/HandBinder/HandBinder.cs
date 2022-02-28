@@ -153,7 +153,7 @@ namespace Leap.Unity.HandsModule
         /// </summary>
         void SetHandScale()
         {
-            if (LeapHand == null) return;
+            if (LeapHand == null || (leapProvider == null && Hands.Provider == null)) return;
 
             if (SetModelScale)
             {
@@ -406,6 +406,8 @@ namespace Leap.Unity.HandsModule
         /// </summary>
         public void ResetHand(bool forceReset = false)
         {
+            if (this == null) return;
+
             if (DefaultHandPose == null || EditPoseNeedsResetting == false && forceReset == false)
             {
                 return;
