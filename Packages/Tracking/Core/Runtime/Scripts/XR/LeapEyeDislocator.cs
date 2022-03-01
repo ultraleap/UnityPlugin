@@ -7,6 +7,9 @@
  ******************************************************************************/
 
 using UnityEngine;
+#if UNITY_2019_1_OR_NEWER
+using UnityEngine.Rendering;
+#endif
 
 namespace Leap.Unity
 {
@@ -42,7 +45,18 @@ namespace Leap.Unity
 
         private void OnDestroy()
         {
-            Camera.onPreCull -= OnCameraPreCull;
+#if UNITY_2019_1_OR_NEWER
+            if (GraphicsSettings.renderPipelineAsset != null)
+            {
+                RenderPipelineManager.beginCameraRendering -= onBeginRendering;
+            }
+            else
+            {
+                Camera.onPreCull -= OnCameraPreCull; // No multiple-subscription.
+            }
+#else
+            Camera.onPreCull -= OnCameraPreCull; // No multiple-subscription.
+#endif
         }
 
         private void OnEnable()
@@ -53,8 +67,21 @@ namespace Leap.Unity
                 return;
             }
 
-            Camera.onPreCull -= OnCameraPreCull;
+#if UNITY_2019_1_OR_NEWER
+            if (GraphicsSettings.renderPipelineAsset != null)
+            {
+                RenderPipelineManager.beginCameraRendering -= onBeginRendering;
+                RenderPipelineManager.beginCameraRendering += onBeginRendering;
+            }
+            else
+            {
+                Camera.onPreCull -= OnCameraPreCull; // No multiple-subscription.
+                Camera.onPreCull += OnCameraPreCull;
+            }
+#else
+            Camera.onPreCull -= OnCameraPreCull; // No multiple-subscription.
             Camera.onPreCull += OnCameraPreCull;
+#endif
 
             _provider.OnDeviceSafe += onDevice;
         }
@@ -80,6 +107,10 @@ namespace Leap.Unity
 
             _hasVisitedPreCull = false;
         }
+
+#if UNITY_2019_1_OR_NEWER
+        protected virtual void onBeginRendering(ScriptableRenderContext context, Camera camera) { OnCameraPreCull(camera); }
+#endif
 
         private void OnCameraPreCull(Camera cam)
         {
