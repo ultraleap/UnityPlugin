@@ -209,7 +209,7 @@ namespace Leap.Unity.HandsModule
                 }
             }
 
-            else if(BoundHand.startScale != Vector3.zero)
+            else if (BoundHand.startScale != Vector3.zero)
             {
                 transform.localScale = BoundHand.startScale;
 
@@ -220,7 +220,7 @@ namespace Leap.Unity.HandsModule
 
                     if (lastBone.boundTransform == null) continue;
 
-                    if(lastBone.startTransform.scale != Vector3.zero)
+                    if (lastBone.startTransform.scale != Vector3.zero)
                     {
                         lastBone.boundTransform.localScale = lastBone.startTransform.scale;
                     }
