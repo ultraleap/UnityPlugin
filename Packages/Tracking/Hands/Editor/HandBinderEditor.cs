@@ -155,15 +155,6 @@ namespace Leap.Unity.HandsModule
 
             setScale.boolValue = GUILayout.Toggle(setScale.boolValue, new GUIContent("Scale Model to Tracking Data", "Should the hand binder adjust the models scale?"), editorSkin.toggle);
 
-            ////Reset the hand scale
-            //if(EditorPrefs.GetBool("setPositions") == true && setPositions.boolValue == false)
-            //{
-            //    //setScale.boolValue = false;
-            //    //myTarget.ResetHand();
-            //}
-
-            //EditorPrefs.SetBool("setPositions", setPositions.boolValue);
-
             EditorGUILayout.Space();
             GUILayout.Label(dividerLine);
             EditorGUILayout.Space();
@@ -741,14 +732,11 @@ namespace Leap.Unity.HandsModule
                         }
 
                         var boneType = ((Bone.BoneType)boneID).ToString().Remove(0, 5).ToString();
-                        //var boneType = (fingerID == 0 ? boneID - 1: boneID).ToString();
 
                         objectFieldName = ((fingerType + " " + boneType + " :").ToString());
                         DrawObjectField(objectFieldName, ref handBinder.BoundHand.fingers[fingerID].boundBones[boneID], true, fingerID, boneID);
                     }
 
-                    objectFieldName = ((fingerType + " " + "TIP" + " :").ToString());
-                    //DrawObjectField(objectFieldName, ref handBinder.BoundHand.fingers[fingerID].fingerTip, false, fingerID, 0);
 
                     GUILayout.BeginHorizontal();
                     string fingerLength = handBinder.BoundHand.fingers[fingerID].fingerTipBaseLength.ToString();

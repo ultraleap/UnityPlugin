@@ -358,10 +358,6 @@ namespace Leap.Unity.HandsModule
         Vector3 CalculateAxis(Transform t, Vector3 dir)
         {
             var boneForward = t.InverseTransformDirection(dir.normalized).normalized;
-            //boneForward.x = Mathf.Round(boneForward.x);
-            //boneForward.y = Mathf.Round(boneForward.y);
-            //boneForward.z = Mathf.Round(boneForward.z);
-
             return boneForward;
         }
         #endregion
