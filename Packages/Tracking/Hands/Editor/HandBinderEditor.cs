@@ -220,7 +220,7 @@ namespace Leap.Unity.HandsModule
                 EditorGUILayout.Space();
                 EditorGUILayout.PropertyField(wristRotationOffset, new GUIContent("Wrist Rotation Offset", "Adjusting this value will modify how the 3D Models wrist is rotated in relation to the tracking data"), editorSkin);
                 EditorGUILayout.Space();
-                EditorGUILayout.PropertyField(globalFingerRotationOffset, new GUIContent("Fingers Rotation Offset","Adjusting this value will modify how the 3D Models fingers are rotated in relation to the tracking data"), editorSkin);
+                EditorGUILayout.PropertyField(globalFingerRotationOffset, new GUIContent("Fingers Rotation Offset", "Adjusting this value will modify how the 3D Models fingers are rotated in relation to the tracking data"), editorSkin);
                 GUI.color = previousCol;
                 GUILayout.EndVertical();
 
@@ -984,7 +984,7 @@ namespace Leap.Unity.HandsModule
 
                     GUI.color = bone != null ? Color.green : Color.grey;
 
-                    if(bone != null)
+                    if (bone != null)
                     {
                         if (isSelectedOrHovered)
                         {
