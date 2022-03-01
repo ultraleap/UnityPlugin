@@ -138,7 +138,9 @@ namespace Leap.Unity.HandsModule
         {
             EditorGUILayout.Space();
             EditorGUILayout.PropertyField(leapProvider, editorSkin);
+
             EditorGUILayout.PropertyField(chirality, new GUIContent("Hand Type", "Which hand does this binder target?"), editorSkin);
+
             EditorGUILayout.Space();
 
             setEditorPose.boolValue = GUILayout.Toggle(setEditorPose.boolValue, new GUIContent("Set Hand Pose In Editor", "Should the Leap Editor Pose be used during Edit mode?"), editorSkin.toggle);
@@ -152,31 +154,6 @@ namespace Leap.Unity.HandsModule
             setPositions.boolValue = GUILayout.Toggle(setPositions.boolValue, new GUIContent("Match Joint Positions With Tracking Data", "Does this binding require the positional leap data to be applied to the 3D model?"), editorSkin.toggle);
 
             setScale.boolValue = GUILayout.Toggle(setScale.boolValue, new GUIContent("Scale Model to Tracking Data", "Should the hand binder adjust the models scale?"), editorSkin.toggle);
-
-            if(myTarget.BoundHand.baseScale == 0)
-            {
-                EditorGUILayout.Space();
-                GUILayout.Label("Rebind the hand to enable scaling");
-                GUI.enabled = false;
-            }
-            else
-            {
-                GUI.enabled = true;
-            }
-            if (setScale.boolValue)
-            {
-                EditorGUILayout.Space();
-                EditorGUILayout.PropertyField(scaleOffset, new GUIContent("Model Scale Offset", "The hand scale will be modified by this amount"));
-
-                for (int i = 0; i < myTarget.BoundHand.fingers.Length; i++)
-                {
-                    var offset = boundHand.FindPropertyRelative("fingers").GetArrayElementAtIndex(i).FindPropertyRelative("fingerTipScaleOffset");
-                    var fingerType = ((Finger.FingerType)i).ToString().Remove(0, 5).ToString();
-                    EditorGUILayout.PropertyField(offset, new GUIContent(fingerType + " Tip Offset", "The hand finger tip scale will be modified by this amount"));
-                }
-            }
-
-            GUI.enabled = true;
 
             ////Reset the hand scale
             //if(EditorPrefs.GetBool("setPositions") == true && setPositions.boolValue == false)
@@ -250,15 +227,46 @@ namespace Leap.Unity.HandsModule
                 //Draw the Calculated Offsets for the wrist and Fingers
                 GUILayout.BeginVertical(editorSkin.box);
                 EditorGUILayout.Space();
-                EditorGUILayout.PropertyField(wristRotationOffset, new GUIContent("Wrist Rotation Offset"), editorSkin);
+                EditorGUILayout.PropertyField(wristRotationOffset, new GUIContent("Wrist Rotation Offset", "Adjusting this value will modify how the 3D Models wrist is rotated in relation to the tracking data"), editorSkin);
                 EditorGUILayout.Space();
-                EditorGUILayout.PropertyField(globalFingerRotationOffset, new GUIContent("Fingers Rotation Offset"), editorSkin);
+                EditorGUILayout.PropertyField(globalFingerRotationOffset, new GUIContent("Fingers Rotation Offset","Adjusting this value will modify how the 3D Models fingers are rotated in relation to the tracking data"), editorSkin);
                 GUI.color = previousCol;
                 GUILayout.EndVertical();
 
                 EditorGUILayout.Space();
                 GUILayout.Label(dividerLine);
                 EditorGUILayout.Space();
+
+                if (myTarget.BoundHand.baseScale == 0)
+                {
+                    EditorGUILayout.Space();
+                    GUILayout.Label("Rebind the hand to enable scaling");
+                    GUI.enabled = false;
+                }
+                else
+                {
+                    GUI.enabled = true;
+                }
+                if (setScale.boolValue)
+                {
+                    EditorGUILayout.Space();
+                    EditorGUILayout.PropertyField(scaleOffset, new GUIContent("Model Scale Offset", "The hand scale will be modified by this amount"));
+
+                    for (int i = 0; i < myTarget.BoundHand.fingers.Length; i++)
+                    {
+                        var offset = boundHand.FindPropertyRelative("fingers").GetArrayElementAtIndex(i).FindPropertyRelative("fingerTipScaleOffset");
+                        var fingerType = ((Finger.FingerType)i).ToString().Remove(0, 5).ToString();
+                        EditorGUILayout.PropertyField(offset, new GUIContent(fingerType + " Tip Offset", "The hand finger tip scale will be modified by this amount"));
+                    }
+                }
+
+                GUI.enabled = true;
+
+
+                EditorGUILayout.Space();
+                GUILayout.Label(dividerLine);
+                EditorGUILayout.Space();
+
 
                 DrawBoneOffsets();
                 DrawAddBoneOffsetButton();
