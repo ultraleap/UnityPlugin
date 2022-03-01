@@ -133,6 +133,7 @@ namespace Leap.Unity.HandsModule
                 TransformElbow();
                 TransformWrist();
                 TransformFingerBones();
+
                 EditPoseNeedsResetting = true;
             }
         }
@@ -189,7 +190,7 @@ namespace Leap.Unity.HandsModule
                     float adjustedRatio = (ratio * (finger.fingerTipScaleOffset) - BoundHand.scaleOffset);
 
                     //Calculate the direction that goes up the bone towards the next bone
-                    Vector3 direction = (distalBone.boundTransform.position - intermediateBone.boundTransform.position);
+                    Vector3 direction = (intermediateBone.boundTransform.position - distalBone.boundTransform.position).normalized;
                     //Calculate which axis to scale along
                     Vector3 axis = CalculateAxis(distalBone.boundTransform, direction);
 
@@ -357,9 +358,9 @@ namespace Leap.Unity.HandsModule
         Vector3 CalculateAxis(Transform t, Vector3 dir)
         {
             var boneForward = t.InverseTransformDirection(dir.normalized).normalized;
-            boneForward.x = Mathf.Round(boneForward.x);
-            boneForward.y = Mathf.Round(boneForward.y);
-            boneForward.z = Mathf.Round(boneForward.z);
+            //boneForward.x = Mathf.Round(boneForward.x);
+            //boneForward.y = Mathf.Round(boneForward.y);
+            //boneForward.z = Mathf.Round(boneForward.z);
 
             return boneForward;
         }

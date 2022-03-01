@@ -31,8 +31,16 @@ namespace Leap.Unity.HandsModule
 
             //Get all children of the hand
             var children = new List<Transform>();
-            children.Add(handBinder.transform);
-            children.AddRange(GetAllChildren(handBinder.transform));
+
+            //If the user has set the wrist, use that as the root to search for bones
+            var root = handBinder.transform;
+            if (handBinder.BoundHand.wrist.boundTransform != null)
+            {
+                root = handBinder.BoundHand.wrist.boundTransform;
+            }
+
+            children.Add(root);
+            children.AddRange(GetAllChildren(root));
 
             var thumbBones = SortBones(SelectBones(children, boneDefinitions.DefinitionThumb), false, true);
             var indexBones = SortBones(SelectBones(children, boneDefinitions.DefinitionIndex));
