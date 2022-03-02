@@ -43,6 +43,7 @@ namespace Leap.Unity.HandsModule
         private SerializedProperty leapProvider;
         private SerializedProperty useMetaBones;
         private SerializedProperty scaleOffset;
+        private SerializedProperty elbowOffset;
 
         private Color green = new Color32(140, 234, 40, 255);
         private GUISkin editorSkin;
@@ -69,6 +70,7 @@ namespace Leap.Unity.HandsModule
             offsets = serializedObject.FindProperty("Offsets");
             leapProvider = serializedObject.FindProperty("leapProvider");
             scaleOffset = boundHand.FindPropertyRelative("scaleOffset");
+            elbowOffset = boundHand.FindPropertyRelative("elbowOffset");
             useMetaBones = serializedObject.FindProperty("UseMetaBones");
 
             dividerLine = Resources.Load<Texture>("EditorDividerLine");
@@ -242,6 +244,7 @@ namespace Leap.Unity.HandsModule
                 {
                     EditorGUILayout.Space();
                     EditorGUILayout.PropertyField(scaleOffset, new GUIContent("Model Scale Offset", "The hand scale will be modified by this amount"));
+                    EditorGUILayout.PropertyField(elbowOffset, new GUIContent("Elbow Scale Offset", "The Elbow Length will be modified by this amount"));
 
                     for (int i = 0; i < myTarget.BoundHand.fingers.Length; i++)
                     {

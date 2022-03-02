@@ -23,6 +23,7 @@ namespace Leap.Unity.HandsModule
         public float baseScale;
         public Vector3 startScale;
         [Range(-1, 3)] public float scaleOffset = 1;
+        [Range(-1, 3)] public float elbowOffset = 1;
     }
 
     /// <summary>
