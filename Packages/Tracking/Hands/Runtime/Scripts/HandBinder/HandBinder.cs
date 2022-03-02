@@ -232,12 +232,13 @@ namespace Leap.Unity.HandsModule
                 for (int i = 0; i < BoundHand.fingers.Length; i++)
                 {
                     var finger = BoundHand.fingers[i];
-                    var lastBone = finger.boundBones[(int)Bone.BoneType.TYPE_INTERMEDIATE];
+                    var lastBone = finger.boundBones[(int)Bone.BoneType.TYPE_DISTAL];
 
                     if (lastBone.boundTransform == null) continue;
 
                     if (lastBone.startTransform.scale != Vector3.zero)
                     {
+                        Debug.Log(lastBone.startTransform.scale);
                         lastBone.boundTransform.localScale = lastBone.startTransform.scale;
                     }
                 }
