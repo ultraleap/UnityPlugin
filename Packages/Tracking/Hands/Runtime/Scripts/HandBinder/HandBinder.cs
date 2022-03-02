@@ -72,6 +72,7 @@ namespace Leap.Unity.HandsModule
         /// </summary>
         public SerializedTransform[] DefaultHandPose;
 
+
         #endregion
 
         #region Hand Model Base
@@ -112,6 +113,12 @@ namespace Leap.Unity.HandsModule
         /// <param name="hand"></param>
         public override void SetLeapHand(Hand hand) { LeapHand = hand; }
 
+        float previousScaleRatio;
+        public float[] fingerTipsRatio = new float[5]
+        {
+            1,1,1,1,1
+        };
+
         #endregion
 
         #region Hand Binder Logic
@@ -143,26 +150,22 @@ namespace Leap.Unity.HandsModule
         /// </summary>
         void SetHandScale()
         {
-            if (LeapHand == null || (leapProvider == null && Hands.Provider == null)) return;
-
             if (SetModelScale)
             {
-
-                if (BoundHand.baseScale == 0) return;
-
-                //Scale the entire model by a ratio of leap middle finger length compared to the models middle finger length
                 float middleFingerRatio = (CalculateLeapMiddleFingerLength(LeapHand) / BoundHand.baseScale);
                 float scaleRatio = (middleFingerRatio * BoundHand.scaleOffset);
 
-                if (!Application.isPlaying && Application.isEditor)
+                if (BoundHand.baseScale == 0) return;
+
+                if (Mathf.Abs(scaleRatio - previousScaleRatio) > 0.1f && Application.isPlaying)
                 {
                     //Set the object the hand bidner is attached to to scale based on the scale ratio
-                    transform.localScale = BoundHand.startScale * scaleRatio;
+                    transform.localScale = Vector3.Lerp(transform.localScale, BoundHand.startScale * scaleRatio, Time.deltaTime);
                 }
                 else
                 {
                     //Set the object the hand bidner is attached to to scale based on the scale ratio
-                    transform.localScale = Vector3.Lerp(transform.localScale, BoundHand.startScale * scaleRatio, Time.deltaTime);
+                    transform.localScale = BoundHand.startScale * scaleRatio;
                 }
 
                 //Scale all the finger tips to match
@@ -189,6 +192,13 @@ namespace Leap.Unity.HandsModule
                     //Adjust the ratio by an offset value exposed in the inspector and the overal scale that has been calculated
                     float adjustedRatio = (ratio * (finger.fingerTipScaleOffset) - BoundHand.scaleOffset);
 
+                    //Is the difference big enough to need to change?
+                    if (Mathf.Abs(fingerTipsRatio[i] - adjustedRatio) > 0.1 && Application.isPlaying)
+                    {
+                        fingerTipsRatio[i] = adjustedRatio;
+                        continue;
+                    }
+
                     //Calculate the direction that goes up the bone towards the next bone
                     Vector3 direction = (intermediateBone.boundTransform.position - distalBone.boundTransform.position).normalized;
                     //Calculate which axis to scale along
@@ -206,7 +216,13 @@ namespace Leap.Unity.HandsModule
                     {
                         distalBone.boundTransform.localScale = Vector3.Lerp(distalBone.boundTransform.localScale, scale, Time.deltaTime);
                     }
+
+                    //Store the ratio for later
+                    fingerTipsRatio[i] = adjustedRatio;
                 }
+
+                //Store the ratio for later
+                previousScaleRatio = scaleRatio;
             }
 
             else if (BoundHand.startScale != Vector3.zero)
@@ -216,7 +232,7 @@ namespace Leap.Unity.HandsModule
                 for (int i = 0; i < BoundHand.fingers.Length; i++)
                 {
                     var finger = BoundHand.fingers[i];
-                    var lastBone = finger.boundBones.LastOrDefault();
+                    var lastBone = finger.boundBones[(int)Bone.BoneType.TYPE_INTERMEDIATE];
 
                     if (lastBone.boundTransform == null) continue;
 
@@ -237,21 +253,31 @@ namespace Leap.Unity.HandsModule
             {
                 if (SetPositions)
                 {
-                    BoundHand.elbow.boundTransform.transform.position = LeapHand.Arm.ElbowPosition.ToVector3();
-                    BoundHand.elbow.boundTransform.transform.rotation = LeapHand.Arm.Rotation.ToQuaternion() * Quaternion.Euler(BoundHand.elbow.offset.rotation) * Quaternion.Euler(WristRotationOffset);
-                }
-                //Calculate the elbows position and rotation making sure to maintain the models forearm length
-                else if (BoundHand.wrist.boundTransform != null)
-                {
-                    var dir = (LeapHand.Arm.PrevJoint.ToVector3() - LeapHand.WristPosition.ToVector3()).normalized;
-                    var position = LeapHand.WristPosition.ToVector3() + dir * ElbowLength;
-                    position += BoundHand.elbow.offset.position;
+                    //Set the position of the elbow
+                    float diff = (LeapHand.Arm.Length - (ElbowLength * BoundHand.elbowOffset));
+                    Vector3 offset = (-LeapHand.Arm.Direction).ToVector3() * diff;
+                    var position = LeapHand.Arm.ElbowPosition.ToVector3() + offset;
+                    BoundHand.elbow.boundTransform.transform.position = position;
 
+                    //Set the rotation of the elbow
+                    Quaternion leapRotation = LeapHand.Arm.Rotation.ToQuaternion();
+                    Quaternion modelRotation = Quaternion.Euler(BoundHand.elbow.offset.rotation);
+                    Quaternion rotationOffset = Quaternion.Euler(WristRotationOffset);
+                    BoundHand.elbow.boundTransform.transform.rotation = leapRotation * modelRotation * rotationOffset;
+                }
+                else
+                {
+                    //Calculate the elbows position and rotation making sure to maintain the models forearm length
+                    var dir = (LeapHand.Arm.PrevJoint.ToVector3() - LeapHand.WristPosition.ToVector3()).normalized;
+                    var position = LeapHand.WristPosition.ToVector3() + dir * (ElbowLength * BoundHand.elbowOffset);
                     BoundHand.elbow.boundTransform.transform.position = position;
                     BoundHand.elbow.boundTransform.transform.rotation = LeapHand.Arm.Rotation.ToQuaternion()
                         * Quaternion.Euler(BoundHand.elbow.offset.rotation)
                         * Quaternion.Euler(WristRotationOffset);
                 }
+
+                //Apply any offsets
+                BoundHand.elbow.boundTransform.transform.localPosition += BoundHand.elbow.offset.position;
             }
         }
 
@@ -378,15 +404,13 @@ namespace Leap.Unity.HandsModule
         private void Reset()
         {
             //Return if we already have assigned base transforms
-            if (DefaultHandPose != null)
-            {
-                ResetHand();
-                return;
-            }
-
-            else
+            if (DefaultHandPose == null || DefaultHandPose.Length == 0)
             {
                 SetDefaultHandPose();
+            }
+            else
+            {
+                ResetHand();
             }
         }
 
@@ -419,10 +443,16 @@ namespace Leap.Unity.HandsModule
         {
             if (this == null) return;
 
-            if (DefaultHandPose == null || EditPoseNeedsResetting == false && forceReset == false)
+            if (DefaultHandPose == null)
             {
+                Debug.Log("Default hand pose is missing, please reset the 3D model and rebind the hand");
                 return;
             };
+
+            if (BoundHand.startScale != Vector3.zero)
+            {
+                transform.localScale = BoundHand.startScale;
+            }
 
             for (int i = 0; i < DefaultHandPose.Length; i++)
             {
@@ -442,10 +472,7 @@ namespace Leap.Unity.HandsModule
                 }
             }
 
-            if (BoundHand.startScale != Vector3.zero)
-            {
-                transform.localScale = BoundHand.startScale;
-            }
+
 
             EditPoseNeedsResetting = false;
         }
