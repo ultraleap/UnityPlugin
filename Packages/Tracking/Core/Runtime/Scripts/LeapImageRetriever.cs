@@ -128,7 +128,7 @@ namespace Leap.Unity
             public void UpdateTexture(Image image, Controller controller)
             {
                 byte[] data = image.Data(Image.CameraType.LEFT);
-                if (_hideLeapDebugInfo)
+                if (_hideLeapDebugInfo && controller != null)
                 {
                     switch (controller.Devices.ActiveDevice.Type)
                     {
@@ -426,7 +426,7 @@ namespace Leap.Unity
                     _eyeTextureData.Reconstruct(_currentImage);
                 }
 
-                _eyeTextureData.UpdateTextures(_currentImage, _provider.GetLeapController());
+                _eyeTextureData.UpdateTextures(_currentImage, _provider?.GetLeapController());
             }
         }
 
