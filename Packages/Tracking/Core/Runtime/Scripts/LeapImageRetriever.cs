@@ -48,6 +48,7 @@ namespace Leap.Unity
 
         //Rigel tracking cameras produce debug info in the image output, enable this to hide it.
         [SerializeField] private bool _hideLeapDebugInfo = false;
+        public bool HideRigelDebug { get { return _hideLeapDebugInfo; } set { _hideLeapDebugInfo = value; } }
 
         // If image IDs from the libtrack server do not reset with the Visualiser, it triggers out-of-sequence
         // checks and we lose images. Detecting this and setting an offset allows us to compensate.
