@@ -25,7 +25,7 @@ namespace Leap.Unity.HandsModule
         /// <param name="handBinder">The HandBinder that the found Transform target will get assigned to</param>
         public static void AutoBind(HandBinder handBinder)
         {
-            if(handBinder.DefaultHandPose == null || handBinder.DefaultHandPose.Length == 0)
+            if (handBinder.DefaultHandPose == null || handBinder.DefaultHandPose.Length == 0)
             {
                 Debug.Log("Default Hand Pose is missing, please restart the hand binding process to ensure the 3D models default pose is recorded");
                 return;
