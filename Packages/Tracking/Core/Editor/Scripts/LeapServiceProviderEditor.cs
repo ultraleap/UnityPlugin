@@ -40,9 +40,14 @@ namespace Leap.Unity
         private LeapServiceProvider _leapServiceProvider;
         private Controller _leapController;
 
+        private List<string> _serialNumbers;
+        private int _chosenDeviceIndex;
+        private SerializedProperty serialNumber;
+
 
         protected override void OnEnable()
         {
+            serializedObject.Update();
 
             base.OnEnable();
 
@@ -76,6 +81,9 @@ namespace Leap.Unity
             }
             addPropertyToFoldout("_workerThreadProfiling", "Advanced Options");
             addPropertyToFoldout("_serverNameSpace", "Advanced Options");
+
+            serialNumber = serializedObject.FindProperty("_specificSerialNumber");
+            
         }
 
         private void frameOptimizationWarning(SerializedProperty property)
@@ -116,7 +124,33 @@ namespace Leap.Unity
             }
 #endif
 
+            drawSerialNumberToggle();
+
             base.OnInspectorGUI();
+        }
+
+        void drawSerialNumberToggle()
+        {
+            if (LeapController != null)
+            {
+                for (int i = 0; i < LeapController.Devices.Count; i++)
+                {
+                    if (LeapController.Devices[i].SerialNumber == serialNumber.stringValue)
+                    {
+                        _chosenDeviceIndex = i;
+                        break;
+                    }
+                }
+                if (!Application.isPlaying)
+                {
+                    _chosenDeviceIndex = EditorGUILayout.Popup("Specific Serial Number", _chosenDeviceIndex, SerialNumbers.ToArray());
+                    serialNumber.stringValue = SerialNumbers[_chosenDeviceIndex];
+                }
+                else
+                {
+                    EditorGUILayout.PropertyField(serialNumber);
+                }
+            }
         }
 
         public virtual void OnSceneGUI()
@@ -214,10 +248,33 @@ namespace Leap.Unity
             }
         }
 
+        private List<string> SerialNumbers
+        {
+            get
+            {
+                if (this._serialNumbers != null)
+                {
+                    return this._serialNumbers;
+                }
+                else
+                {
+                    this._serialNumbers = new List<string>();
+                    List<Device> connectedDevices = LeapController.Devices;
+                    foreach (Device d in connectedDevices)
+                    {
+                        this._serialNumbers.Add(d.SerialNumber);
+                    }
+                    return this._serialNumbers;
+                }
+            }
+        }
+
         private void _leapController_DeviceChanged(object sender, DeviceEventArgs e)
         {
             EditorWindow view = EditorWindow.GetWindow<SceneView>();
             view.Repaint();
+
+            SerialNumbers.Add(e.Device.SerialNumber);
         }
 
         private void DetectConnectedDevice(Transform targetTransform)
