@@ -114,9 +114,19 @@ namespace Leap.Unity.HandsModule
         public override void SetLeapHand(Hand hand) { LeapHand = hand; }
 
         float previousScaleRatio;
-        public float[] fingerTipsRatio = new float[5]
+        Vector3 targetScale;
+
+        float[] fingerTipsRatio = new float[5]
         {
             1,1,1,1,1
+        };
+        Vector3[] fingerTipTargetScale = new Vector3[]
+        {
+            Vector3.one,
+            Vector3.one,
+            Vector3.one,
+            Vector3.one,
+            Vector3.one,
         };
 
         #endregion
@@ -145,6 +155,18 @@ namespace Leap.Unity.HandsModule
             }
         }
 
+        //A check to ensure the hand is configured correctly
+        public override void BeginHand()
+        {
+            base.BeginHand();
+
+            //When upgrading a hand, it might not have the correct data run this check to ensure the hand is properly bound
+            if (BoundHand.startScale == Vector3.zero || BoundHand.fingers.Any(x => x.boundBones.Any(y => y.boundTransform != null && y.startTransform.scale == Vector3.zero)))
+            {
+                Debug.Log("Hand is missing scale information, please rebind the hand to fix", gameObject);
+            }
+        }
+
         /// <summary>
         /// Set the hand model scale based on the CalculatedRatio()
         /// </summary>
@@ -155,17 +177,20 @@ namespace Leap.Unity.HandsModule
                 float middleFingerRatio = (CalculateLeapMiddleFingerLength(LeapHand) / BoundHand.baseScale);
                 float scaleRatio = (middleFingerRatio * BoundHand.scaleOffset);
 
-                if (BoundHand.baseScale == 0) return;
-
-                if (Mathf.Abs(scaleRatio - previousScaleRatio) > 0.1f && Application.isPlaying)
+                //Apply the target scale directly during editor
+                if(!Application.isPlaying)
                 {
-                    //Set the object the hand bidner is attached to to scale based on the scale ratio
-                    transform.localScale = Vector3.Lerp(transform.localScale, BoundHand.startScale * scaleRatio, Time.deltaTime);
-                }
-                else
-                {
-                    //Set the object the hand bidner is attached to to scale based on the scale ratio
                     transform.localScale = BoundHand.startScale * scaleRatio;
+                }
+                else // Lerp the scale during playmode
+                {
+                    //Set the target scale if the difference is large enough
+                    if (Mathf.Abs(scaleRatio - previousScaleRatio) < 0.1f)
+                    {
+                        targetScale = BoundHand.startScale * scaleRatio;
+                    }
+
+                    transform.localScale = Vector3.Lerp(transform.localScale, targetScale, Time.deltaTime);
                 }
 
                 //Scale all the finger tips to match
@@ -174,9 +199,9 @@ namespace Leap.Unity.HandsModule
                     BoundFinger finger = BoundHand.fingers[i];
                     BoundBone distalBone = finger.boundBones[(int)Bone.BoneType.TYPE_DISTAL];
                     BoundBone intermediateBone = finger.boundBones[(int)Bone.BoneType.TYPE_INTERMEDIATE];
-
                     Finger leapFinger = LeapHand.Fingers[i];
 
+                    //Check we have the correct information to be able to scale
                     if (intermediateBone.boundTransform == null || distalBone.boundTransform == null || leapFinger == null || finger.fingerTipBaseLength == 0)
                     {
                         return;
@@ -184,7 +209,6 @@ namespace Leap.Unity.HandsModule
 
                     //Get the length of the leap finger tip
                     float leapFingerLength = leapFinger.bones.Last().Length;
-
                     //Get the length of the models finger tip (Calculated when the hand was first bound)
                     float fingerTipLength = finger.fingerTipBaseLength;
                     //Calculate a ratio to use for scaling the finger tip
@@ -192,29 +216,29 @@ namespace Leap.Unity.HandsModule
                     //Adjust the ratio by an offset value exposed in the inspector and the overal scale that has been calculated
                     float adjustedRatio = (ratio * (finger.fingerTipScaleOffset) - BoundHand.scaleOffset);
 
-                    //Is the difference big enough to need to change?
-                    if (Mathf.Abs(fingerTipsRatio[i] - adjustedRatio) > 0.1 && Application.isPlaying)
-                    {
-                        fingerTipsRatio[i] = adjustedRatio;
-                        continue;
-                    }
-
                     //Calculate the direction that goes up the bone towards the next bone
                     Vector3 direction = (intermediateBone.boundTransform.position - distalBone.boundTransform.position).normalized;
                     //Calculate which axis to scale along
                     Vector3 axis = CalculateAxis(distalBone.boundTransform, direction);
-
                     //Calculate the scale by ensuring all axis are 1 apart from the axis to scale along
                     Vector3 scale = Vector3.one + (axis * adjustedRatio);
-                    //Scale the last finger bone 
 
-                    if (!Application.isPlaying && Application.isEditor)
+                    //Apply the target scale directly during editor
+                    if (!Application.isPlaying)
                     {
                         distalBone.boundTransform.localScale = scale;
                     }
-                    else
+                    else // Lerp the scale during playmode
                     {
-                        distalBone.boundTransform.localScale = Vector3.Lerp(distalBone.boundTransform.localScale, scale, Time.deltaTime);
+                        //Set the target scale if the difference is large enough
+                        if (Mathf.Abs(fingerTipsRatio[i] - adjustedRatio) < 0.1)
+                        {
+                            //Store the target scale
+                            fingerTipTargetScale[i] = scale;
+                        }
+
+                        //Lerp the scale to the target scale
+                        distalBone.boundTransform.localScale = Vector3.Lerp(distalBone.boundTransform.localScale, fingerTipTargetScale[i], Time.deltaTime);
                     }
 
                     //Store the ratio for later
@@ -225,7 +249,7 @@ namespace Leap.Unity.HandsModule
                 previousScaleRatio = scaleRatio;
             }
 
-            else if (BoundHand.startScale != Vector3.zero)
+            else
             {
                 transform.localScale = BoundHand.startScale;
 
@@ -236,11 +260,7 @@ namespace Leap.Unity.HandsModule
 
                     if (lastBone.boundTransform == null) continue;
 
-                    if (lastBone.startTransform.scale != Vector3.zero)
-                    {
-                        Debug.Log(lastBone.startTransform.scale);
-                        lastBone.boundTransform.localScale = lastBone.startTransform.scale;
-                    }
+                    lastBone.boundTransform.localScale = lastBone.startTransform.scale;
                 }
             }
         }
@@ -252,33 +272,45 @@ namespace Leap.Unity.HandsModule
         {
             if (BoundHand.elbow.boundTransform != null)
             {
-                if (SetPositions)
-                {
-                    //Set the position of the elbow
-                    float diff = (LeapHand.Arm.Length - (ElbowLength * BoundHand.elbowOffset));
-                    Vector3 offset = (-LeapHand.Arm.Direction).ToVector3() * diff;
-                    var position = LeapHand.Arm.ElbowPosition.ToVector3() + offset;
-                    BoundHand.elbow.boundTransform.transform.position = position;
+                //Calculate the direction of the elbow 
+                Vector3 dir = -LeapHand.Arm.Direction.ToVector3().normalized;
 
-                    //Set the rotation of the elbow
-                    Quaternion leapRotation = LeapHand.Arm.Rotation.ToQuaternion();
-                    Quaternion modelRotation = Quaternion.Euler(BoundHand.elbow.offset.rotation);
-                    Quaternion rotationOffset = Quaternion.Euler(WristRotationOffset);
-                    BoundHand.elbow.boundTransform.transform.rotation = leapRotation * modelRotation * rotationOffset;
+                //Position the elbow at the models elbow length
+                Vector3 position = LeapHand.WristPosition.ToVector3() + dir * (ElbowLength);
+
+                if(SetModelScale)
+                {
+                    if(SetPositions)
+                    {
+                        //Use the leap length to position the elbow and allow it to be mofied by the user
+                        position = LeapHand.WristPosition.ToVector3() + dir * (LeapHand.Arm.Length * BoundHand.elbowOffset);
+                    }
+                    else
+                    {
+                        //Use the models length to position the elbow and allow it to be mofied by elbow offset
+                        position = LeapHand.WristPosition.ToVector3() + dir * (ElbowLength * BoundHand.elbowOffset);
+                    }
                 }
                 else
                 {
-                    //Calculate the elbows position and rotation making sure to maintain the models forearm length
-                    var dir = (LeapHand.Arm.PrevJoint.ToVector3() - LeapHand.WristPosition.ToVector3()).normalized;
-                    var position = LeapHand.WristPosition.ToVector3() + dir * (ElbowLength * BoundHand.elbowOffset);
-                    BoundHand.elbow.boundTransform.transform.position = position;
-                    BoundHand.elbow.boundTransform.transform.rotation = LeapHand.Arm.Rotation.ToQuaternion()
-                        * Quaternion.Euler(BoundHand.elbow.offset.rotation)
-                        * Quaternion.Euler(WristRotationOffset);
+                    if (SetPositions)
+                    {
+                        //Use the leap data to position the elbow
+                        position = LeapHand.Arm.ElbowPosition.ToVector3();
+                    }
                 }
+
+                //Set the position of the elbow
+                BoundHand.elbow.boundTransform.transform.position = position;
 
                 //Apply any offsets
                 BoundHand.elbow.boundTransform.transform.localPosition += BoundHand.elbow.offset.position;
+
+                //Set the rotation of the elbow
+                Quaternion leapRotation = LeapHand.Arm.Rotation.ToQuaternion();
+                Quaternion modelRotation = Quaternion.Euler(BoundHand.elbow.offset.rotation);
+                Quaternion rotationOffset = Quaternion.Euler(WristRotationOffset);
+                BoundHand.elbow.boundTransform.transform.rotation = leapRotation * modelRotation * rotationOffset;
             }
         }
 

@@ -41,8 +41,8 @@ MonoBehaviour:
       - boundTransform: {fileID: 6152174209907804688}
         startTransform:
           position: {x: -0.022049556, y: 0.0055027115, z: -0.02042907}
-          rotation: {x: 57.63192, y: 288.61453, z: 318.2934}
-          scale: {x: 0, y: 0, z: 0}
+          rotation: {x: 57.631935, y: 288.61453, z: 318.2934}
+          scale: {x: 1, y: 1, z: 1}
         offset:
           position: {x: 0, y: 0, z: 0}
           rotation: {x: 0, y: 0, z: 0}
@@ -51,7 +51,7 @@ MonoBehaviour:
         startTransform:
           position: {x: -0.039247386, y: 1.7763568e-17, z: -4.440892e-18}
           rotation: {x: -0.0000068301883, y: -2.0355545e-13, z: 0.0000034150942}
-          scale: {x: 0, y: 0, z: 0}
+          scale: {x: 1, y: 1, z: 1}
         offset:
           position: {x: 0, y: 0, z: 0}
           rotation: {x: 0, y: 0, z: 0}
@@ -60,7 +60,7 @@ MonoBehaviour:
         startTransform:
           position: {x: -0.027161183, y: 0, z: 0}
           rotation: {x: -0, y: 0, z: 0}
-          scale: {x: 0, y: 0, z: 0}
+          scale: {x: 1, y: 1, z: 1}
         offset:
           position: {x: 0, y: 0, z: 0}
           rotation: {x: 0, y: 0, z: 0}
@@ -71,8 +71,8 @@ MonoBehaviour:
       - boundTransform: {fileID: 2182935335142892868}
         startTransform:
           position: {x: -0.026815364, y: -0.0038297235, z: -0.01722223}
-          rotation: {x: 10.05613, y: 352.7981, z: 356.4258}
-          scale: {x: 0, y: 0, z: 0}
+          rotation: {x: 10.056131, y: 352.7981, z: 356.4258}
+          scale: {x: 1, y: 1, z: 1}
         offset:
           position: {x: 0, y: 0, z: 0}
           rotation: {x: 0, y: 0, z: 0}
@@ -81,7 +81,7 @@ MonoBehaviour:
         startTransform:
           position: {x: -0.06101329, y: -1.9984014e-17, z: 1.0658141e-16}
           rotation: {x: 350.91263, y: 356.87375, z: 355.55957}
-          scale: {x: 0, y: 0, z: 0}
+          scale: {x: 1, y: 1, z: 1}
         offset:
           position: {x: 0, y: 0, z: 0}
           rotation: {x: 0, y: 0, z: 0}
@@ -90,7 +90,7 @@ MonoBehaviour:
         startTransform:
           position: {x: -0.027736768, y: -2.1316282e-16, z: -8.8817837e-17}
           rotation: {x: 0.00000085377343, y: -0.00000021344336, z: -0.00000016008252}
-          scale: {x: 0, y: 0, z: 0}
+          scale: {x: 1, y: 1, z: 1}
         offset:
           position: {x: 0, y: 0, z: 0}
           rotation: {x: 0, y: 0, z: 0}
@@ -98,8 +98,8 @@ MonoBehaviour:
       - boundTransform: {fileID: 369465886481600252}
         startTransform:
           position: {x: -0.020685617, y: 1.7763568e-17, z: 1.7763568e-17}
-          rotation: {x: -0, y: -0, z: 1.5902766e-15}
-          scale: {x: 0, y: 0, z: 0}
+          rotation: {x: -0, y: 0, z: 1.5902766e-15}
+          scale: {x: 1, y: 1, z: 1}
         offset:
           position: {x: 0, y: 0, z: 0}
           rotation: {x: 0, y: 0, z: 0}
@@ -111,7 +111,7 @@ MonoBehaviour:
         startTransform:
           position: {x: -0.03152068, y: -0.00965535, z: -0.0024167688}
           rotation: {x: 8.237034, y: 356.8983, z: 353.6903}
-          scale: {x: 0, y: 0, z: 0}
+          scale: {x: 1, y: 1, z: 1}
         offset:
           position: {x: 0, y: 0, z: 0}
           rotation: {x: 0, y: 0, z: 0}
@@ -119,8 +119,8 @@ MonoBehaviour:
       - boundTransform: {fileID: 4069502397648336642}
         startTransform:
           position: {x: -0.059184518, y: -4.440892e-18, z: -1.7763568e-17}
-          rotation: {x: 343.5357, y: 0.56346357, z: 357.1989}
-          scale: {x: 0, y: 0, z: 0}
+          rotation: {x: 343.5357, y: 0.56346345, z: 357.1989}
+          scale: {x: 1, y: 1, z: 1}
         offset:
           position: {x: 0, y: 0, z: 0}
           rotation: {x: 0, y: 0, z: 0}
@@ -128,8 +128,8 @@ MonoBehaviour:
       - boundTransform: {fileID: 4004357699977641678}
         startTransform:
           position: {x: -0.029554103, y: 0, z: 1.0658141e-16}
-          rotation: {x: -0, y: 0, z: -0.0000001834279}
-          scale: {x: 0, y: 0, z: 0}
+          rotation: {x: 0, y: 0, z: -0.0000001834279}
+          scale: {x: 1, y: 1, z: 1}
         offset:
           position: {x: 0, y: 0, z: 0}
           rotation: {x: 0, y: 0, z: 0}
@@ -138,7 +138,7 @@ MonoBehaviour:
         startTransform:
           position: {x: -0.023103267, y: -4.4408918e-17, z: -8.8817837e-17}
           rotation: {x: -0, y: 0, z: 0}
-          scale: {x: 0, y: 0, z: 0}
+          scale: {x: 1, y: 1, z: 1}
         offset:
           position: {x: 0, y: 0, z: 0}
           rotation: {x: 0, y: 0, z: 0}
@@ -149,8 +149,8 @@ MonoBehaviour:
       - boundTransform: {fileID: 982273793453877819}
         startTransform:
           position: {x: -0.028662479, y: -0.007954737, z: 0.010319745}
-          rotation: {x: 3.708696, y: 3.589366, z: 354.8198}
-          scale: {x: 0, y: 0, z: 0}
+          rotation: {x: 3.7086954, y: 3.589366, z: 354.8198}
+          scale: {x: 1, y: 1, z: 1}
         offset:
           position: {x: 0, y: 0, z: 0}
           rotation: {x: 0, y: 0, z: 0}
@@ -158,8 +158,8 @@ MonoBehaviour:
       - boundTransform: {fileID: 7763931647753658585}
         startTransform:
           position: {x: -0.056782074, y: 4.4408918e-17, z: 7.105427e-17}
-          rotation: {x: 344.64655, y: 3.4566677, z: 355.7298}
-          scale: {x: 0, y: 0, z: 0}
+          rotation: {x: 344.64655, y: 3.4566681, z: 355.7298}
+          scale: {x: 1, y: 1, z: 1}
         offset:
           position: {x: 0, y: 0, z: 0}
           rotation: {x: 0, y: 0, z: 0}
@@ -167,8 +167,8 @@ MonoBehaviour:
       - boundTransform: {fileID: 5565047511808063054}
         startTransform:
           position: {x: -0.02793383, y: -8.881784e-18, z: -5.3290704e-17}
-          rotation: {x: -0, y: 0, z: -0.000000080041275}
-          scale: {x: 0, y: 0, z: 0}
+          rotation: {x: 0, y: 0, z: -0.000000080041275}
+          scale: {x: 1, y: 1, z: 1}
         offset:
           position: {x: 0, y: 0, z: 0}
           rotation: {x: 0, y: 0, z: 0}
@@ -177,7 +177,7 @@ MonoBehaviour:
         startTransform:
           position: {x: -0.022412032, y: 8.881784e-18, z: 1.7763568e-17}
           rotation: {x: -0, y: 0, z: 0}
-          scale: {x: 0, y: 0, z: 0}
+          scale: {x: 1, y: 1, z: 1}
         offset:
           position: {x: 0, y: 0, z: 0}
           rotation: {x: 0, y: 0, z: 0}
@@ -188,8 +188,8 @@ MonoBehaviour:
       - boundTransform: {fileID: 1224919784555392553}
         startTransform:
           position: {x: -0.024579609, y: -0.0056739524, z: 0.023602597}
-          rotation: {x: 6.2252383, y: 9.158102, z: 352.93903}
-          scale: {x: 0, y: 0, z: 0}
+          rotation: {x: 6.225239, y: 9.158104, z: 352.93903}
+          scale: {x: 1, y: 1, z: 1}
         offset:
           position: {x: 0, y: 0, z: 0}
           rotation: {x: 0, y: 0, z: 0}
@@ -197,8 +197,8 @@ MonoBehaviour:
       - boundTransform: {fileID: 7668690456461132593}
         startTransform:
           position: {x: -0.05157233, y: -1.7763568e-17, z: -1.4210854e-16}
-          rotation: {x: 333.13382, y: 4.457178, z: 359.385}
-          scale: {x: 0, y: 0, z: 0}
+          rotation: {x: 333.13382, y: 4.457179, z: 359.385}
+          scale: {x: 1, y: 1, z: 1}
         offset:
           position: {x: 0, y: 0, z: 0}
           rotation: {x: 0, y: 0, z: 0}
@@ -207,7 +207,7 @@ MonoBehaviour:
         startTransform:
           position: {x: -0.0227088, y: -2.2204459e-17, z: 1.5987211e-16}
           rotation: {x: -3.9756915e-16, y: -0.00000042688671, z: -0.00000010672168}
-          scale: {x: 0, y: 0, z: 0}
+          scale: {x: 1, y: 1, z: 1}
         offset:
           position: {x: 0, y: 0, z: 0}
           rotation: {x: 0, y: 0, z: 0}
@@ -216,7 +216,7 @@ MonoBehaviour:
         startTransform:
           position: {x: -0.016491236, y: -4.440892e-18, z: -8.8817837e-17}
           rotation: {x: -0, y: 0, z: 0}
-          scale: {x: 0, y: 0, z: 0}
+          scale: {x: 1, y: 1, z: 1}
         offset:
           position: {x: 0, y: 0, z: 0}
           rotation: {x: 0, y: 0, z: 0}
@@ -228,7 +228,7 @@ MonoBehaviour:
       startTransform:
         position: {x: -0.12887, y: 0.16950001, z: -0.08512}
         rotation: {x: 359.7198, y: 267.04218, z: 177.9738}
-        scale: {x: 0, y: 0, z: 0}
+        scale: {x: 1, y: 1, z: 1}
       offset:
         position: {x: 0, y: 0, z: 0}
         rotation: {x: 0, y: 0, z: 0}
@@ -246,6 +246,7 @@ MonoBehaviour:
     baseScale: 0.11184189
     startScale: {x: 1, y: 1, z: 1}
     scaleOffset: 0.78
+    elbowOffset: 1
   ElbowLength: 0
   GlobalFingerRotationOffset: {x: 360, y: 270, z: 180}
   WristRotationOffset: {x: 360, y: 270, z: 180}
@@ -1032,7 +1033,7 @@ MonoBehaviour:
   DebugLeapRotationAxis: 0
   DebugModelTransforms: 1
   DebugModelRotationAxis: 0
-  FineTuning: 1
+  FineTuning: 0
   DebugOptions: 0
   EditPoseNeedsResetting: 1
 --- !u!1 &4756413710029136320
@@ -1096,7 +1097,7 @@ MonoBehaviour:
         startTransform:
           position: {x: -0.022049556, y: 0.0055027115, z: -0.02042907}
           rotation: {x: 57.63192, y: 288.61453, z: 318.29337}
-          scale: {x: 0, y: 0, z: 0}
+          scale: {x: 1, y: 1, z: 1}
         offset:
           position: {x: 0, y: 0, z: 0}
           rotation: {x: 0, y: 0, z: 0}
@@ -1105,7 +1106,7 @@ MonoBehaviour:
         startTransform:
           position: {x: -0.039247386, y: 1.7763568e-17, z: -4.440892e-18}
           rotation: {x: 5.0888862e-14, y: -0.0000034150942, z: 0.0000017075471}
-          scale: {x: 0, y: 0, z: 0}
+          scale: {x: 1, y: 1, z: 1}
         offset:
           position: {x: 0, y: 0, z: 0}
           rotation: {x: 0, y: 0, z: 0}
@@ -1114,7 +1115,7 @@ MonoBehaviour:
         startTransform:
           position: {x: -0.027161183, y: 0, z: 0}
           rotation: {x: -0, y: 0, z: 0}
-          scale: {x: 0, y: 0, z: 0}
+          scale: {x: 1, y: 1, z: 1}
         offset:
           position: {x: 0, y: 0, z: 0}
           rotation: {x: 0, y: 0, z: 0}
@@ -1125,8 +1126,8 @@ MonoBehaviour:
       - boundTransform: {fileID: 8758208101913261048}
         startTransform:
           position: {x: -0.026815364, y: -0.0038297235, z: -0.01722223}
-          rotation: {x: 10.05613, y: 352.7981, z: 356.4258}
-          scale: {x: 0, y: 0, z: 0}
+          rotation: {x: 10.056131, y: 352.7981, z: 356.4258}
+          scale: {x: 1, y: 1, z: 1}
         offset:
           position: {x: 0, y: 0, z: 0}
           rotation: {x: 0, y: 0, z: 0}
@@ -1135,7 +1136,7 @@ MonoBehaviour:
         startTransform:
           position: {x: -0.06101329, y: -1.9984014e-17, z: 1.0658141e-16}
           rotation: {x: 350.9126, y: 356.87375, z: 355.55957}
-          scale: {x: 0, y: 0, z: 0}
+          scale: {x: 1, y: 1, z: 1}
         offset:
           position: {x: 0, y: 0, z: 0}
           rotation: {x: 0, y: 0, z: 0}
@@ -1143,8 +1144,8 @@ MonoBehaviour:
       - boundTransform: {fileID: 8214526309287836010}
         startTransform:
           position: {x: -0.027736768, y: -2.1316282e-16, z: -8.8817837e-17}
-          rotation: {x: -0, y: 0, z: -0.000000053360846}
-          scale: {x: 0, y: 0, z: 0}
+          rotation: {x: 0, y: 0, z: -0.000000053360846}
+          scale: {x: 1, y: 1, z: 1}
         offset:
           position: {x: 0, y: 0, z: 0}
           rotation: {x: 0, y: 0, z: 0}
@@ -1153,7 +1154,7 @@ MonoBehaviour:
         startTransform:
           position: {x: -0.020685617, y: 1.7763568e-17, z: 1.7763568e-17}
           rotation: {x: -0, y: 0, z: 0}
-          scale: {x: 0, y: 0, z: 0}
+          scale: {x: 1, y: 1, z: 1}
         offset:
           position: {x: 0, y: 0, z: 0}
           rotation: {x: 0, y: 0, z: 0}
@@ -1165,7 +1166,7 @@ MonoBehaviour:
         startTransform:
           position: {x: -0.03152068, y: -0.00965535, z: -0.0024167688}
           rotation: {x: 8.237034, y: 356.8983, z: 353.6903}
-          scale: {x: 0, y: 0, z: 0}
+          scale: {x: 1, y: 1, z: 1}
         offset:
           position: {x: 0, y: 0, z: 0}
           rotation: {x: 0, y: 0, z: 0}
@@ -1173,8 +1174,8 @@ MonoBehaviour:
       - boundTransform: {fileID: 6897818203582767550}
         startTransform:
           position: {x: -0.059184518, y: -4.440892e-18, z: -1.7763568e-17}
-          rotation: {x: 343.53568, y: 0.5634638, z: 357.1989}
-          scale: {x: 0, y: 0, z: 0}
+          rotation: {x: 343.53568, y: 0.56346375, z: 357.1989}
+          scale: {x: 1, y: 1, z: 1}
         offset:
           position: {x: 0, y: 0, z: 0}
           rotation: {x: 0, y: 0, z: 0}
@@ -1182,8 +1183,8 @@ MonoBehaviour:
       - boundTransform: {fileID: 5787804873486477426}
         startTransform:
           position: {x: -0.029554103, y: 0, z: 1.0658141e-16}
-          rotation: {x: -0, y: -0, z: 0.000000006670106}
-          scale: {x: 0, y: 0, z: 0}
+          rotation: {x: -0, y: 0, z: 0.000000006670106}
+          scale: {x: 1, y: 1, z: 1}
         offset:
           position: {x: 0, y: 0, z: 0}
           rotation: {x: 0, y: 0, z: 0}
@@ -1192,7 +1193,7 @@ MonoBehaviour:
         startTransform:
           position: {x: -0.023103267, y: -4.4408918e-17, z: -8.8817837e-17}
           rotation: {x: -0, y: 0, z: 0}
-          scale: {x: 0, y: 0, z: 0}
+          scale: {x: 1, y: 1, z: 1}
         offset:
           position: {x: 0, y: 0, z: 0}
           rotation: {x: 0, y: 0, z: 0}
@@ -1203,8 +1204,8 @@ MonoBehaviour:
       - boundTransform: {fileID: 7665552133413256327}
         startTransform:
           position: {x: -0.028662479, y: -0.007954737, z: 0.010319745}
-          rotation: {x: 3.708696, y: 3.589366, z: 354.8198}
-          scale: {x: 0, y: 0, z: 0}
+          rotation: {x: 3.7086954, y: 3.589366, z: 354.8198}
+          scale: {x: 1, y: 1, z: 1}
         offset:
           position: {x: 0, y: 0, z: 0}
           rotation: {x: 0, y: 0, z: 0}
@@ -1212,8 +1213,8 @@ MonoBehaviour:
       - boundTransform: {fileID: 900501605465388645}
         startTransform:
           position: {x: -0.056782074, y: 4.4408918e-17, z: 7.105427e-17}
-          rotation: {x: 344.64655, y: 3.4566681, z: 355.7298}
-          scale: {x: 0, y: 0, z: 0}
+          rotation: {x: 344.64655, y: 3.4566684, z: 355.7298}
+          scale: {x: 1, y: 1, z: 1}
         offset:
           position: {x: 0, y: 0, z: 0}
           rotation: {x: 0, y: 0, z: 0}
@@ -1222,7 +1223,7 @@ MonoBehaviour:
         startTransform:
           position: {x: -0.02793383, y: -8.881784e-18, z: -5.3290704e-17}
           rotation: {x: -9.939229e-17, y: 0.00000021344336, z: 0.00000005336084}
-          scale: {x: 0, y: 0, z: 0}
+          scale: {x: 1, y: 1, z: 1}
         offset:
           position: {x: 0, y: 0, z: 0}
           rotation: {x: 0, y: 0, z: 0}
@@ -1231,7 +1232,7 @@ MonoBehaviour:
         startTransform:
           position: {x: -0.022412032, y: 8.881784e-18, z: 1.7763568e-17}
           rotation: {x: -0, y: 0, z: 0}
-          scale: {x: 0, y: 0, z: 0}
+          scale: {x: 1, y: 1, z: 1}
         offset:
           position: {x: 0, y: 0, z: 0}
           rotation: {x: 0, y: 0, z: 0}
@@ -1242,8 +1243,8 @@ MonoBehaviour:
       - boundTransform: {fileID: 8592856885087860885}
         startTransform:
           position: {x: -0.024579609, y: -0.0056739524, z: 0.023602597}
-          rotation: {x: 6.2252383, y: 9.158102, z: 352.93903}
-          scale: {x: 0, y: 0, z: 0}
+          rotation: {x: 6.225239, y: 9.158104, z: 352.93903}
+          scale: {x: 1, y: 1, z: 1}
         offset:
           position: {x: 0, y: 0, z: 0}
           rotation: {x: 0, y: 0, z: 0}
@@ -1251,8 +1252,8 @@ MonoBehaviour:
       - boundTransform: {fileID: 985327982100911501}
         startTransform:
           position: {x: -0.05157233, y: -1.7763568e-17, z: -1.4210854e-16}
-          rotation: {x: 333.13382, y: 4.457181, z: 359.385}
-          scale: {x: 0, y: 0, z: 0}
+          rotation: {x: 333.13382, y: 4.4571815, z: 359.385}
+          scale: {x: 1, y: 1, z: 1}
         offset:
           position: {x: 0, y: 0, z: 0}
           rotation: {x: 0, y: 0, z: 0}
@@ -1260,8 +1261,8 @@ MonoBehaviour:
       - boundTransform: {fileID: 6696042776796616799}
         startTransform:
           position: {x: -0.0227088, y: -2.2204459e-17, z: 1.5987211e-16}
-          rotation: {x: -0, y: 0, z: -0.00000010672168}
-          scale: {x: 0, y: 0, z: 0}
+          rotation: {x: 0, y: 0, z: -0.00000010672168}
+          scale: {x: 1, y: 1, z: 1}
         offset:
           position: {x: 0, y: 0, z: 0}
           rotation: {x: 0, y: 0, z: 0}
@@ -1270,7 +1271,7 @@ MonoBehaviour:
         startTransform:
           position: {x: -0.016491236, y: -4.440892e-18, z: -8.8817837e-17}
           rotation: {x: -0, y: 0, z: 0}
-          scale: {x: 0, y: 0, z: 0}
+          scale: {x: 1, y: 1, z: 1}
         offset:
           position: {x: 0, y: 0, z: 0}
           rotation: {x: 0, y: 0, z: 0}
@@ -1282,7 +1283,7 @@ MonoBehaviour:
       startTransform:
         position: {x: -0.12887, y: 0.16950001, z: -0.085120015}
         rotation: {x: 359.7198, y: 267.04218, z: 177.9738}
-        scale: {x: 0, y: 0, z: 0}
+        scale: {x: 1, y: 1, z: 1}
       offset:
         position: {x: 0, y: 0, z: 0}
         rotation: {x: 0, y: 0, z: 0}
@@ -1300,6 +1301,7 @@ MonoBehaviour:
     baseScale: 0.11184189
     startScale: {x: -1, y: 1, z: 1}
     scaleOffset: 0.78
+    elbowOffset: 1
   ElbowLength: 0
   GlobalFingerRotationOffset: {x: 360, y: 90, z: 180}
   WristRotationOffset: {x: 360, y: 90, z: 180}
@@ -2086,7 +2088,7 @@ MonoBehaviour:
   DebugLeapRotationAxis: 0
   DebugModelTransforms: 1
   DebugModelRotationAxis: 0
-  FineTuning: 1
+  FineTuning: 0
   DebugOptions: 0
   EditPoseNeedsResetting: 1
 --- !u!114 &8524905651843177826
@@ -2222,7 +2224,7 @@ PrefabInstance:
     - target: {fileID: -5600788652843122234, guid: 4577231256ebec149ac8882d93c98cda,
         type: 3}
       propertyPath: m_LocalScale.y
-      value: 0.99999964
+      value: 0.9999998
       objectReference: {fileID: 0}
     - target: {fileID: -5600788652843122234, guid: 4577231256ebec149ac8882d93c98cda,
         type: 3}
@@ -2272,12 +2274,12 @@ PrefabInstance:
     - target: {fileID: -5551060787284206838, guid: 4577231256ebec149ac8882d93c98cda,
         type: 3}
       propertyPath: m_LocalScale.y
-      value: 1
+      value: 0.9999996
       objectReference: {fileID: 0}
     - target: {fileID: -5551060787284206838, guid: 4577231256ebec149ac8882d93c98cda,
         type: 3}
       propertyPath: m_LocalScale.z
-      value: 1.0000004
+      value: 1.0000005
       objectReference: {fileID: 0}
     - target: {fileID: -5551060787284206838, guid: 4577231256ebec149ac8882d93c98cda,
         type: 3}
@@ -2322,7 +2324,7 @@ PrefabInstance:
     - target: {fileID: -4617996336636734431, guid: 4577231256ebec149ac8882d93c98cda,
         type: 3}
       propertyPath: m_LocalScale.y
-      value: 0.9999997
+      value: 0.9999998
       objectReference: {fileID: 0}
     - target: {fileID: -4617996336636734431, guid: 4577231256ebec149ac8882d93c98cda,
         type: 3}
@@ -2862,12 +2864,12 @@ PrefabInstance:
     - target: {fileID: 7143105681070063681, guid: 4577231256ebec149ac8882d93c98cda,
         type: 3}
       propertyPath: m_LocalScale.y
-      value: 1.0000001
+      value: 1.0000002
       objectReference: {fileID: 0}
     - target: {fileID: 7143105681070063681, guid: 4577231256ebec149ac8882d93c98cda,
         type: 3}
       propertyPath: m_LocalScale.z
-      value: 0.9999997
+      value: 0.9999995
       objectReference: {fileID: 0}
     - target: {fileID: 7143105681070063681, guid: 4577231256ebec149ac8882d93c98cda,
         type: 3}
@@ -2912,12 +2914,12 @@ PrefabInstance:
     - target: {fileID: 7217712482098854712, guid: 4577231256ebec149ac8882d93c98cda,
         type: 3}
       propertyPath: m_LocalScale.y
-      value: 0.9999991
+      value: 0.9999995
       objectReference: {fileID: 0}
     - target: {fileID: 7217712482098854712, guid: 4577231256ebec149ac8882d93c98cda,
         type: 3}
       propertyPath: m_LocalScale.z
-      value: 0.9999997
+      value: 0.9999999
       objectReference: {fileID: 0}
     - target: {fileID: 7217712482098854712, guid: 4577231256ebec149ac8882d93c98cda,
         type: 3}
