@@ -87,10 +87,9 @@ namespace Leap.Unity
         /// OnUpdateFrame (graphics hand) or OnFixedFrame (physics hand)
         /// </summary>
         public abstract void UpdateHand();
+
         /// <summary>
         /// Calls UpdateHand() and calls the event OnUpdate.
-        /// To call this function once per frame, adjust UpdateBase() to call
-        /// UpdateHandWithEvent() instead of UpdateHand().
         /// </summary>
         public void UpdateHandWithEvent()
         {
@@ -135,16 +134,46 @@ namespace Leap.Unity
             return false;
         }
 
+        [Tooltip("Optionally set a Leap Provider to use for tracking frames, If you do not set one, the first provider found in the scene will be used. If no provider is found this gameobject will disable itself")]
+        [SerializeField]
+        private LeapProvider _leapProvider;
+
         /// <summary>
         /// Optionally set a Leap Provider to use for tracking frames.
         /// If you do not set one, the first provider found in the scene will be used.
         /// If no provider is found this gameobject will disable itself.
         /// </summary>
-        [Tooltip("Optionally set a Leap Provider to use for tracking frames  \n" +
-        "If you do not set one, the first provider found in the scene will be used. \n" +
-        "If no provider is found this gameobject will disable itself")]
-        public LeapProvider leapProvider;
 
+        public LeapProvider leapProvider
+        {
+            get { return _leapProvider; }
+            set
+            {
+                if (_leapProvider != null && Application.isPlaying)
+                {
+                    leapProvider.OnUpdateFrame -= UpdateFrame;
+                    leapProvider.OnFixedFrame -= FixedUpdateFrame;
+                }
+
+                _leapProvider = value;
+
+                if (_leapProvider != null && Application.isPlaying)
+                {
+                    if (HandModelType == ModelType.Graphics)
+                    {
+                        leapProvider.OnUpdateFrame -= UpdateFrame;
+                        leapProvider.OnUpdateFrame += UpdateFrame;
+                    }
+                    else
+                    {
+                        leapProvider.OnFixedFrame -= FixedUpdateFrame;
+                        leapProvider.OnFixedFrame += FixedUpdateFrame;
+                    }
+
+
+                }
+            }
+        }
 
         private void Awake()
         {
@@ -235,7 +264,7 @@ namespace Leap.Unity
 
                 if (gameObject.activeInHierarchy)
                 {
-                    UpdateHand();
+                    UpdateHandWithEvent();
                 }
             }
         }

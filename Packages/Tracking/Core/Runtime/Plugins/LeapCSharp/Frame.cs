@@ -39,10 +39,12 @@ namespace Leap
         /// 
         /// @since 1.0
         /// </summary>
-        public Frame()
+        public Frame(UInt32 DeviceID = 1)
         {
             Hands = new List<Hand>();
+            this.DeviceID = DeviceID;
         }
+
 
         /// <summary>
         /// Constructs a new Frame.
@@ -54,7 +56,19 @@ namespace Leap
             Timestamp = timestamp;
             CurrentFramesPerSecond = fps;
             Hands = hands;
+            DeviceID = 1;
         }
+
+        /// <summary>
+        /// The Device ID that this frame was seen from.
+        /// 
+        /// 1-Indexed; Non-Deterministic order
+        ///
+        /// Only valid when `supportsMultipleDevices` is true on the LeapProvider.
+        /// 
+        /// @since 4.1
+        /// </summary>
+        public UInt32 DeviceID;
 
         [Obsolete]
         public int SerializeLength
