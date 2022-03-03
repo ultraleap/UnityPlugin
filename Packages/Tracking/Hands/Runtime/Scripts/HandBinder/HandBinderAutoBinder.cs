@@ -229,11 +229,12 @@ namespace Leap.Unity.HandsModule
             if (transform != null)
             {
                 newBone.boundTransform = transform;
-                newBone.startTransform = new TransformStore();
-                newBone.startTransform.position = transform.localPosition;
-                newBone.startTransform.rotation = transform.localRotation.eulerAngles;
-                newBone.startTransform.scale = transform.localScale;
-
+                newBone.startTransform = new TransformStore()
+                {
+                    position = transform.localPosition,
+                    rotation = transform.localRotation.eulerAngles,
+                    scale = transform.localScale
+                };
             }
             return newBone;
         }
