@@ -50,6 +50,7 @@ To use this plugin you will need the following:
 2. An Ultraleap Hand Tracking Camera - follow setup process [here][developer-site-setup-camera].
 3. Unity 2019.4 LTS or newer. UnityPlugin packages have been tested to work against 2019.4 LTS and 2020.3 LTS.
 4. Windows® 10, 64-bit
+5. Follow one of the Installation workflows listed below.
 
 **Please note:**
 
@@ -107,7 +108,9 @@ In `Edit -> Project Settings -> Package Manager`, add a new scoped registry with
 
   ![my_registries.png](Markdown/images/myregistries.png)
 
-  Ultraleap UPM packages should be available in the list. Click on the package you wish to modify.
+  Ultraleap UPM packages should be available in the list. Click on the package you wish to install/modify.
+  
+  Note: Ultraleap Tracking contains the Core, Hands and Interaction Engine modules. There are older packages created indepentently by a third party for these modules that are no longer updated.
 
   ![packagelist.png](Markdown/images/packagelist.png)
 
