@@ -178,7 +178,7 @@ namespace Leap.Unity.HandsModule
                 float scaleRatio = (middleFingerRatio * BoundHand.scaleOffset);
 
                 //Apply the target scale directly during editor
-                if(!Application.isPlaying)
+                if (!Application.isPlaying)
                 {
                     transform.localScale = BoundHand.startScale * scaleRatio;
                 }
@@ -278,9 +278,9 @@ namespace Leap.Unity.HandsModule
                 //Position the elbow at the models elbow length
                 Vector3 position = LeapHand.WristPosition.ToVector3() + dir * (ElbowLength);
 
-                if(SetModelScale)
+                if (SetModelScale)
                 {
-                    if(SetPositions)
+                    if (SetPositions)
                     {
                         //Use the leap length to position the elbow and allow it to be mofied by the user
                         position = LeapHand.WristPosition.ToVector3() + dir * (LeapHand.Arm.Length * BoundHand.elbowOffset);
