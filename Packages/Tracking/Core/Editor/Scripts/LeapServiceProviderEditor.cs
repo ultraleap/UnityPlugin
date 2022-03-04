@@ -108,7 +108,7 @@ namespace Leap.Unity
         {
             if (LeapController != null)
             {
-                if(SerialNumbers.Count == 0)
+                if (SerialNumbers.Count == 0)
                 {
                     EditorGUILayout.HelpBox("There are no devices connected. Connect a device to use the Multiple Device Mode 'Specific'", MessageType.Warning);
                     return;
