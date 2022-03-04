@@ -174,79 +174,8 @@ namespace Leap.Unity.HandsModule
         {
             if (SetModelScale)
             {
-                float middleFingerRatio = (CalculateLeapMiddleFingerLength(LeapHand) / BoundHand.baseScale);
-                float scaleRatio = (middleFingerRatio * BoundHand.scaleOffset);
-
-                //Apply the target scale directly during editor
-                if (!Application.isPlaying)
-                {
-                    transform.localScale = BoundHand.startScale * scaleRatio;
-                }
-                else // Lerp the scale during playmode
-                {
-                    //Set the target scale if the difference is large enough
-                    if (Mathf.Abs(scaleRatio - previousScaleRatio) > 0.1f)
-                    {
-                        targetScale = BoundHand.startScale * scaleRatio;
-                    }
-
-                    transform.localScale = Vector3.Lerp(transform.localScale, targetScale, Time.deltaTime);
-                }
-
-                //Scale all the finger tips to match
-                for (int i = 0; i < BoundHand.fingers.Length; i++)
-                {
-                    BoundFinger finger = BoundHand.fingers[i];
-                    BoundBone distalBone = finger.boundBones[(int)Bone.BoneType.TYPE_DISTAL];
-                    BoundBone intermediateBone = finger.boundBones[(int)Bone.BoneType.TYPE_INTERMEDIATE];
-                    Finger leapFinger = LeapHand.Fingers[i];
-
-                    //Check we have the correct information to be able to scale
-                    if (intermediateBone.boundTransform == null || distalBone.boundTransform == null || leapFinger == null || finger.fingerTipBaseLength == 0)
-                    {
-                        return;
-                    }
-
-                    //Get the length of the leap finger tip
-                    float leapFingerLength = leapFinger.bones.Last().Length;
-                    //Get the length of the models finger tip (Calculated when the hand was first bound)
-                    float fingerTipLength = finger.fingerTipBaseLength;
-                    //Calculate a ratio to use for scaling the finger tip
-                    float ratio = leapFingerLength / fingerTipLength;
-                    //Adjust the ratio by an offset value exposed in the inspector and the overal scale that has been calculated
-                    float adjustedRatio = (ratio * (finger.fingerTipScaleOffset) - BoundHand.scaleOffset);
-
-                    //Calculate the direction that goes up the bone towards the next bone
-                    Vector3 direction = (intermediateBone.boundTransform.position - distalBone.boundTransform.position).normalized;
-                    //Calculate which axis to scale along
-                    Vector3 axis = CalculateAxis(distalBone.boundTransform, direction);
-                    //Calculate the scale by ensuring all axis are 1 apart from the axis to scale along
-                    Vector3 scale = Vector3.one + (axis * adjustedRatio);
-
-                    //Apply the target scale directly during editor
-                    if (!Application.isPlaying)
-                    {
-                        distalBone.boundTransform.localScale = scale;
-                    }
-                    else // Lerp the scale during playmode
-                    {
-                        //Set the target scale if the difference is large enough
-                        if (Mathf.Abs(fingerTipsRatio[i] - adjustedRatio) > 0.1)
-                        {
-                            //Store the target scale
-                            fingerTipTargetScale[i] = scale;
-                        }
-
-                        //Lerp the scale to the target scale
-                        distalBone.boundTransform.localScale = Vector3.Lerp(distalBone.boundTransform.localScale, fingerTipTargetScale[i], Time.deltaTime);
-                    }
-
-                    //Store the ratio for later
-                    fingerTipsRatio[i] = adjustedRatio;
-                }
-
-                //Store the ratio for later
-                previousScaleRatio = scaleRatio;
+                ScaleModel();
+                ScaleFingertips();
             }
 
             else
@@ -262,6 +191,92 @@ namespace Leap.Unity.HandsModule
 
                     lastBone.boundTransform.localScale = lastBone.startTransform.scale;
                 }
+            }
+        }
+
+        /// <summary>
+        /// Set the scale of the model 
+        /// </summary>
+        void ScaleModel()
+        {
+            float middleFingerRatio = (CalculateLeapMiddleFingerLength(LeapHand) / BoundHand.baseScale);
+            float scaleRatio = (middleFingerRatio * BoundHand.scaleOffset);
+
+            //Apply the target scale directly during editor
+            if (!Application.isPlaying)
+            {
+                transform.localScale = BoundHand.startScale * scaleRatio;
+            }
+            else // Lerp the scale during playmode
+            {
+                //Set the target scale if the difference is large enough
+                if (Mathf.Abs(scaleRatio - previousScaleRatio) > 0.1f)
+                {
+                    targetScale = BoundHand.startScale * scaleRatio;
+                }
+
+                transform.localScale = Vector3.Lerp(transform.localScale, targetScale, Time.deltaTime);
+            }
+
+            //Store the ratio for later
+            previousScaleRatio = scaleRatio;
+        }
+
+        /// <summary>
+        /// Set the scale for each finger tip
+        /// </summary>
+        void ScaleFingertips()
+        {
+            //Scale all the finger tips to match the leap data 
+            for (int i = 0; i < BoundHand.fingers.Length; i++)
+            {
+                BoundFinger finger = BoundHand.fingers[i];
+                BoundBone distalBone = finger.boundBones[(int)Bone.BoneType.TYPE_DISTAL];
+                BoundBone intermediateBone = finger.boundBones[(int)Bone.BoneType.TYPE_INTERMEDIATE];
+                Finger leapFinger = LeapHand.Fingers[i];
+
+                //Check we have the correct information to be able to scale
+                if (intermediateBone.boundTransform == null || distalBone.boundTransform == null || leapFinger == null || finger.fingerTipBaseLength == 0)
+                {
+                    return;
+                }
+
+                //Get the length of the leap finger tip
+                float leapFingerLength = leapFinger.bones.Last().Length;
+                //Get the length of the models finger tip (Calculated when the hand was first bound)
+                float fingerTipLength = finger.fingerTipBaseLength;
+                //Calculate a ratio to use for scaling the finger tip
+                float ratio = leapFingerLength / fingerTipLength;
+                //Adjust the ratio by an offset value exposed in the inspector and the overal scale that has been calculated
+                float adjustedRatio = (ratio * (finger.fingerTipScaleOffset) - BoundHand.scaleOffset);
+
+                //Calculate the direction that goes up the bone towards the next bone
+                Vector3 direction = (intermediateBone.boundTransform.position - distalBone.boundTransform.position).normalized;
+                //Calculate which axis to scale along
+                Vector3 axis = CalculateAxis(distalBone.boundTransform, direction);
+                //Calculate the scale by ensuring all axis are 1 apart from the axis to scale along
+                Vector3 scale = Vector3.one + (axis * adjustedRatio);
+
+                //Apply the target scale directly during editor
+                if (!Application.isPlaying)
+                {
+                    distalBone.boundTransform.localScale = scale;
+                }
+                else // Lerp the scale during playmode
+                {
+                    //Set the target scale if the difference is large enough
+                    if (Mathf.Abs(fingerTipsRatio[i] - adjustedRatio) > 0.1)
+                    {
+                        //Store the target scale
+                        fingerTipTargetScale[i] = scale;
+                    }
+
+                    //Lerp the scale to the target scale
+                    distalBone.boundTransform.localScale = Vector3.Lerp(distalBone.boundTransform.localScale, fingerTipTargetScale[i], Time.deltaTime);
+                }
+
+                //Store the ratio for later
+                fingerTipsRatio[i] = adjustedRatio;
             }
         }
 
