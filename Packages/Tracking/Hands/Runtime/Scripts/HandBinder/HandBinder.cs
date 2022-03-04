@@ -185,7 +185,7 @@ namespace Leap.Unity.HandsModule
                 else // Lerp the scale during playmode
                 {
                     //Set the target scale if the difference is large enough
-                    if (Mathf.Abs(scaleRatio - previousScaleRatio) < 0.1f)
+                    if (Mathf.Abs(scaleRatio - previousScaleRatio) > 0.1f)
                     {
                         targetScale = BoundHand.startScale * scaleRatio;
                     }
@@ -231,7 +231,7 @@ namespace Leap.Unity.HandsModule
                     else // Lerp the scale during playmode
                     {
                         //Set the target scale if the difference is large enough
-                        if (Mathf.Abs(fingerTipsRatio[i] - adjustedRatio) < 0.1)
+                        if (Mathf.Abs(fingerTipsRatio[i] - adjustedRatio) > 0.1)
                         {
                             //Store the target scale
                             fingerTipTargetScale[i] = scale;
