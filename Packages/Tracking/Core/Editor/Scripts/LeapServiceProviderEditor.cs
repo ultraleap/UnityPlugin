@@ -108,17 +108,17 @@ namespace Leap.Unity
         {
             if (LeapController != null)
             {
-                _chosenDeviceIndex = 0;
-                for (int i = 0; i < LeapController.Devices.Count; i++)
+                if(SerialNumbers.Count == 0)
                 {
-                    if (LeapController.Devices[i].SerialNumber == property.stringValue)
-                    {
-                        _chosenDeviceIndex = i;
-                        break;
-                    }
+                    EditorGUILayout.HelpBox("There are no devices connected. Connect a device to use the Multiple Device Mode 'Specific'", MessageType.Warning);
+                    return;
                 }
+
                 if (!Application.isPlaying)
                 {
+                    _chosenDeviceIndex = SerialNumbers.IndexOf(property.stringValue);
+                    if (_chosenDeviceIndex == -1 || _chosenDeviceIndex > SerialNumbers.Count) _chosenDeviceIndex = 0;
+
                     _chosenDeviceIndex = EditorGUILayout.Popup("Specific Serial Number", _chosenDeviceIndex, SerialNumbers.ToArray());
                     property.stringValue = SerialNumbers[_chosenDeviceIndex];
                 }
