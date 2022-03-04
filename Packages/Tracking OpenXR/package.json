@@ -1,6 +1,6 @@
 {
   "name": "com.ultraleap.tracking.openxr",
-  "version": "1.0.0-pre.0",
+  "version": "1.0.0-pre.1",
   "displayName": "Ultraleap Tracking OpenXR",
   "description": "Support for OpenXR Hand Tracking",
   "unity": "2020.3",
@@ -22,5 +22,11 @@
     "name": "Ultraleap",
     "email": "contact@ultraleap.com",
     "url": "https://www.ultraleap.com"
-  }
+  },
+  "samples": [
+    {
+       "displayName": "Examples",
+       "description": "",
+       "path": "Examples~"
+    }]
 }

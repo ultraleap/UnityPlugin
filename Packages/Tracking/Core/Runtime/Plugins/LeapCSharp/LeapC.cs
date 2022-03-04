@@ -12,6 +12,15 @@ namespace LeapInternal
     using System;
     using System.Runtime.InteropServices;
 
+    public enum eLeapConnectionFlag : uint
+    {
+        /// <summary>
+        /// Allows subscription to multiple devices
+        /// </summary>
+        eLeapConnectionFlag_MultipleDevicesAware = 0x00000001,
+    };
+
+    // 
     public enum eLeapConnectionStatus : uint
     {
         /// <summary>
@@ -81,6 +90,16 @@ namespace LeapInternal
         /// @since 3.1.3
         /// </summary>
         eLeapServiceState_PoorPerformancePause = 0x00000002,
+
+        /// <summary>
+        /// The service has failed to start tracking due to unknown reasons.
+        /// </summary>
+        eLeapServiceState_TrackingErrorUnknown = 0x00000004,
+
+        /// <summary>
+        /// The combination of all valid flags in this enumeration
+        /// </summary>
+        eLeapServiceState_ALL = eLeapServiceState_LowFpsDetected | eLeapServiceState_PoorPerformancePause | eLeapServiceState_TrackingErrorUnknown
     };
 
     public enum eDistortionMatrixType
@@ -90,6 +109,20 @@ namespace LeapInternal
         /// </summary>
         eDistortionMatrixType_64x64
     };
+
+    public enum eLeapCameraCalibrationType
+    {
+        /// <summary>
+        /// Infrared calibration (default)
+        /// </summary>
+        eLeapCameraCalibrationType_infrared = 0,
+
+        /// <summary>
+        /// Visual calibration. 
+        /// </summary>
+        eLeapCameraCalibrationType_visual = 1
+    }
+
 
     public enum eLeapPolicyFlag : uint
     {
@@ -366,7 +399,34 @@ namespace LeapInternal
         /// is invalid, or that the device has been disconnected since being enumerated.
         /// </summary>
         eLeapRS_CannotOpenDevice = 0xE7010005,
+        /// <summary>
+        /// The request is not supported by this version of the service.
+        /// </summary>
+        eLeapRS_Unsupported = 0xE7010006
     };
+
+    public enum eLeapTrackingMode
+    {
+        /// <summary>
+        /// The tracking mode optimised for desktop devices 
+        /// </summary>
+        eLeapTrackingMode_Desktop = 0,
+
+        /// <summary>
+        /// The tracking mode optimised for head-mounted devices
+        /// </summary>
+        eLeapTrackingMode_HMD = 1,
+
+        /// <summary>
+        /// The tracking mode optimised for screen top-mounted devices
+        /// </summary>
+        eLeapTrackingMode_ScreenTop = 2,
+
+        /// <summary>
+        /// Tracking mode is not known (allows triggering of a new LEAP_TRACKING_MODE_EVENT) 
+        /// </summary>
+        eLeapTrackingMode_Unknown = 3
+    }
 
     public enum eLeapEventType
     {
@@ -457,13 +517,27 @@ namespace LeapInternal
         /// </summary>
         eLeapEventType_PointMappingChange,
         /// <summary>
+        /// A tracking mode change has occurred.
+        /// This can be due to changing the hmd or screentop policy with SetPolicyFlags().
+        /// or setting the tracking mode using SetTrackingMode().
+        /// </summary>
+        eLeapEventType_TrackingMode,
+        /// <summary>
         /// An array of system messages.
         /// </summary>
         eLeapEventType_LogEvents,
         /// <summary>
         /// A new head pose is available.
         /// </summary>
-        eLeapEventType_HeadPose
+        eLeapEventType_HeadPose,
+        /// <summary>
+        /// A new head pose is available.
+        /// </summary>
+        eLeapEventType_Eyes,
+        /// <summary>
+        /// A new head pose is available.
+        /// </summary>
+        eLeapEventType_IMU
     };
 
     public enum eLeapDeviceFlag : uint
@@ -485,12 +559,28 @@ namespace LeapInternal
         eLeapDroppedFrameType_Other
     };
 
+    public enum eLeapVersionPart
+    {
+        eLeapVersionPart_ClientLibrary = 0,
+        eLeapVersionPart_ClientProtocol = 1,
+        eLeapVersionPart_ServerLibrary = 2,
+        eLeapVersionPart_ServerProtocol = 3
+    };
+
     //Note the following LeapC structs are just IntPtrs in C#:
     // LEAP_CONNECTION is an IntPtr
     // LEAP_DEVICE is an IntPtr
     // LEAP_CLOCK_REBASER is an IntPtr
 
     [StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Ansi)]
+    public struct LEAP_VERSION
+    {
+        public Int32 major;
+        public Int32 minor;
+        public Int32 patch;
+    }
+
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct LEAP_CONNECTION_CONFIG
     {
         public UInt32 size;
@@ -593,6 +683,17 @@ namespace LeapInternal
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public struct LEAP_EYE_EVENT
+    {
+        public Int64 frame_id;
+        public Int64 timestamp;
+        public LEAP_VECTOR left_eye_position;
+        public LEAP_VECTOR right_eye_position;
+        public float left_eye_estimated_error;
+        public float right_eye_estimated_error;
+    }
+
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct LEAP_HEAD_POSE_EVENT
     {
         public Int64 timestamp;
@@ -606,6 +707,7 @@ namespace LeapInternal
         public UInt32 size;
         public eLeapEventType type;
         public IntPtr eventStructPtr;
+        public UInt32 deviceID;
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -860,6 +962,12 @@ namespace LeapInternal
         private LeapC() { }
         public static int DistortionSize = 64;
 
+        [DllImport("LeapC", EntryPoint = "LeapSetTrackingMode")]
+        public static extern eLeapRS SetTrackingMode(IntPtr hConnection, eLeapTrackingMode mode);
+
+        [DllImport("LeapC", EntryPoint = "LeapGetTrackingMode")]
+        public static extern eLeapRS LeapGetTrackingMode(IntPtr hConnection);
+
         [DllImport("LeapC", EntryPoint = "LeapGetNow")]
         public static extern long GetNow();
 
@@ -909,14 +1017,28 @@ namespace LeapInternal
         [DllImport("LeapC", EntryPoint = "LeapOpenDevice")]
         public static extern eLeapRS OpenDevice(LEAP_DEVICE_REF rDevice, out IntPtr pDevice);
 
+        [DllImport("LeapC", EntryPoint = "LeapSubscribeEvents")]
+        public static extern eLeapRS LeapSubscribeEvents(IntPtr hConnection, IntPtr hDevice);
+
+        [DllImport("LeapC", EntryPoint = "LeapUnsubscribeEvents")]
+        public static extern eLeapRS LeapUnsubscribeEvents(IntPtr hConnection, IntPtr hDevice);
+
         [DllImport("LeapC", EntryPoint = "LeapGetDeviceInfo", CharSet = CharSet.Ansi)]
         public static extern eLeapRS GetDeviceInfo(IntPtr hDevice, ref LEAP_DEVICE_INFO info);
+
+        [DllImport("LeapC", EntryPoint = "LeapGetDeviceTransform")]
+        public static extern eLeapRS GetDeviceTransform(IntPtr hDevice, out float[] transform);
+
+        // Will be a SetPolicyFlagsEx()..
 
         [DllImport("LeapC", EntryPoint = "LeapSetPolicyFlags")]
         public static extern eLeapRS SetPolicyFlags(IntPtr hConnection, UInt64 set, UInt64 clear);
 
         [DllImport("LeapC", EntryPoint = "LeapSetPause")]
         public static extern eLeapRS LeapSetPause(IntPtr hConnection, bool pause);
+
+        [DllImport("LeapC", EntryPoint = "LeapSetDeviceFlags")]
+        public static extern eLeapRS SetDeviceFlags(IntPtr hDevice, UInt64 set, UInt64 clear, out UInt64 prior);
 
         [DllImport("LeapC", EntryPoint = "LeapPollConnection")]
         public static extern eLeapRS PollConnection(IntPtr hConnection, UInt32 timeout, ref LEAP_CONNECTION_MESSAGE msg);
@@ -933,11 +1055,24 @@ namespace LeapInternal
         [DllImport("LeapC", EntryPoint = "LeapInterpolateHeadPose")]
         public static extern eLeapRS InterpolateHeadPose(IntPtr hConnection, Int64 timestamp, ref LEAP_HEAD_POSE_EVENT headPose);
 
+        [DllImport("LeapC", EntryPoint = "LeapInterpolateEyePositions")]
+        public static extern eLeapRS InterpolateEyePositions(IntPtr hConnection, Int64 timestamp, ref LEAP_EYE_EVENT eyes);
+
         [DllImport("LeapC", EntryPoint = "LeapPixelToRectilinear")]
-        public static extern LEAP_VECTOR LeapPixelToRectilinear(IntPtr hConnection, eLeapPerspectiveType camera, LEAP_VECTOR pixel);
+        public static extern LEAP_VECTOR LeapPixelToRectilinear(IntPtr hConnection,
+          eLeapPerspectiveType camera, LEAP_VECTOR pixel);
+
+        [DllImport("LeapC", EntryPoint = "LeapPixelToRectilinearEx")]
+        public static extern LEAP_VECTOR LeapPixelToRectilinearEx(IntPtr hConnection,
+          IntPtr hDevice, eLeapPerspectiveType camera, eLeapCameraCalibrationType calibrationType, LEAP_VECTOR pixel);
 
         [DllImport("LeapC", EntryPoint = "LeapRectilinearToPixel")]
-        public static extern LEAP_VECTOR LeapRectilinearToPixel(IntPtr hConnection, eLeapPerspectiveType camera, LEAP_VECTOR rectilinear);
+        public static extern LEAP_VECTOR LeapRectilinearToPixel(IntPtr hConnection,
+          eLeapPerspectiveType camera, LEAP_VECTOR rectilinear);
+
+        [DllImport("LeapC", EntryPoint = "LeapRectilinearToPixelEx")]
+        public static extern LEAP_VECTOR LeapRectilinearToPixelEx(IntPtr hConnection,
+          IntPtr hDevice, eLeapPerspectiveType camera, eLeapCameraCalibrationType calibrationType, LEAP_VECTOR rectilinear);
 
         [DllImport("LeapC", EntryPoint = "LeapCloseDevice")]
         public static extern void CloseDevice(IntPtr pDevice);
@@ -1053,5 +1188,8 @@ namespace LeapInternal
 
         [DllImport("LeapC", EntryPoint = "LeapTelemetryGetNow")]
         public static extern UInt64 TelemetryGetNow();
+
+        [DllImport("LeapC", EntryPoint = "LeapGetVersion")]
+        public static extern eLeapRS GetVersion(IntPtr hConnection, eLeapVersionPart versionPart, ref LEAP_VERSION pVersion);
     }
 }

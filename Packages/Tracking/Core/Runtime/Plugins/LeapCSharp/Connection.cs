@@ -167,7 +167,16 @@ namespace LeapInternal
 
         private LEAP_ALLOCATOR _pLeapAllocator = new LEAP_ALLOCATOR();
 
-        public void Start()
+        public void Start(string serverNamespace = "Leap Service", bool multiDeviceAware = true)
+        {
+            LEAP_CONNECTION_CONFIG config = new LEAP_CONNECTION_CONFIG();
+            config.server_namespace = Marshal.StringToHGlobalAnsi(serverNamespace);
+            config.flags = multiDeviceAware ? (uint)eLeapConnectionFlag.eLeapConnectionFlag_MultipleDevicesAware : 0;
+            config.size = (uint)Marshal.SizeOf(config);
+            Start(config);
+        }
+
+        public void Start(LEAP_CONNECTION_CONFIG config)
         {
             if (_isRunning)
                 return;
@@ -181,12 +190,7 @@ namespace LeapInternal
                 }
                 else
                 {
-                    LEAP_CONNECTION_CONFIG config = new LEAP_CONNECTION_CONFIG();
-                    config.size = (uint)Marshal.SizeOf(config);
-                    config.flags = 0;
-                    config.server_namespace = Marshal.StringToHGlobalAnsi(ConnectionKey.serverNamespace);
                     result = LeapC.CreateConnection(ref config, out _leapConnection);
-                    Marshal.FreeHGlobal(config.server_namespace);
                 }
 
                 if (result != eLeapRS.eLeapRS_Success || _leapConnection == IntPtr.Zero)
@@ -315,7 +319,7 @@ namespace LeapInternal
                         case eLeapEventType.eLeapEventType_Tracking:
                             LEAP_TRACKING_EVENT tracking_evt;
                             StructMarshal<LEAP_TRACKING_EVENT>.PtrToStruct(_msg.eventStructPtr, out tracking_evt);
-                            handleTrackingMessage(ref tracking_evt);
+                            handleTrackingMessage(ref tracking_evt, _msg.deviceID);
                             break;
                         case eLeapEventType.eLeapEventType_LogEvent:
                             LEAP_LOG_EVENT log_evt;
@@ -343,7 +347,7 @@ namespace LeapInternal
                         case eLeapEventType.eLeapEventType_Image:
                             LEAP_IMAGE_EVENT image_evt;
                             StructMarshal<LEAP_IMAGE_EVENT>.PtrToStruct(_msg.eventStructPtr, out image_evt);
-                            handleImage(ref image_evt);
+                            handleImage(ref image_evt, _msg.deviceID);
                             break;
                         case eLeapEventType.eLeapEventType_PointMappingChange:
                             LEAP_POINT_MAPPING_CHANGE_EVENT point_mapping_change_evt;
@@ -382,15 +386,16 @@ namespace LeapInternal
             }
         }
 
-        private void handleTrackingMessage(ref LEAP_TRACKING_EVENT trackingMsg)
+        private void handleTrackingMessage(ref LEAP_TRACKING_EVENT trackingMsg, UInt32 deviceID)
         {
             Frames.Put(ref trackingMsg);
 
             if (LeapFrame != null)
             {
-                LeapFrame.DispatchOnContext(this, EventContext, new FrameEventArgs(new Frame().CopyFrom(ref trackingMsg)));
+                LeapFrame.DispatchOnContext(this, EventContext, new FrameEventArgs(new Frame(deviceID).CopyFrom(ref trackingMsg)));
             }
         }
+
 
         public UInt64 GetInterpolatedFrameSize(Int64 time)
         {
@@ -521,7 +526,10 @@ namespace LeapInternal
         {
             var device = _devices.FindDeviceByHandle(statusEvent.device.handle);
             if (device == null)
+            {
                 return;
+            }
+
             device.UpdateStatus(statusEvent.status);
         }
 
@@ -530,6 +538,10 @@ namespace LeapInternal
         {
             IntPtr deviceHandle = deviceMsg.device.handle;
             if (deviceHandle == IntPtr.Zero)
+                return;
+
+            IntPtr connectionHandle = deviceMsg.device.handle;
+            if (connectionHandle == IntPtr.Zero)
                 return;
 
             LEAP_DEVICE_INFO deviceInfo = new LEAP_DEVICE_INFO();
@@ -551,15 +563,17 @@ namespace LeapInternal
 
             if (result == eLeapRS.eLeapRS_Success)
             {
-                Device apiDevice = new Device(deviceHandle,
-                                       device,
+                Device apiDevice = new Device(device,
+                                       deviceHandle,
                                        deviceInfo.h_fov, //radians
                                        deviceInfo.v_fov, //radians
                                        deviceInfo.range / 1000.0f, //to mm
                                        deviceInfo.baseline / 1000.0f, //to mm
                                        (Device.DeviceType)deviceInfo.type,
+                                       deviceInfo.status == (uint)eLeapDeviceStatus.eLeapDeviceStatus_Streaming,
                                        deviceInfo.status,
                                        Marshal.PtrToStringAnsi(deviceInfo.serial));
+
                 Marshal.FreeCoTaskMem(deviceInfo.serial);
                 _devices.AddOrUpdate(apiDevice);
 
@@ -749,7 +763,7 @@ namespace LeapInternal
             return distortionData;
         }
 
-        private void handleImage(ref LEAP_IMAGE_EVENT imageMsg)
+        private void handleImage(ref LEAP_IMAGE_EVENT imageMsg, UInt32 deviceID)
         {
             if (LeapImage != null)
             {
@@ -762,9 +776,10 @@ namespace LeapInternal
                 {
                     _currentRightDistortionData = createDistortionData(imageMsg.rightImage, Image.CameraType.RIGHT);
                 }
+
                 ImageData leftImage = new ImageData(Image.CameraType.LEFT, imageMsg.leftImage, _currentLeftDistortionData);
                 ImageData rightImage = new ImageData(Image.CameraType.RIGHT, imageMsg.rightImage, _currentRightDistortionData);
-                Image stereoImage = new Image(imageMsg.info.frame_id, imageMsg.info.timestamp, leftImage, rightImage);
+                Image stereoImage = new Image(imageMsg.info.frame_id, imageMsg.info.timestamp, leftImage, rightImage, deviceID);
                 LeapImage.DispatchOnContext(this, EventContext, new ImageEventArgs(stereoImage));
             }
         }
@@ -950,6 +965,37 @@ namespace LeapInternal
             }
         }
 
+        /// <summary>
+        /// Subscribes to the events coming from an individual device
+        /// 
+        /// If this is not called, only the primary device will be subscribed.
+        /// Will automatically unsubscribe the primary device if this is called 
+        /// on a secondary device, but not a primary one.  
+        /// 
+        /// @since 4.1
+        /// </summary>
+        public void SubscribeToDeviceEvents(Device device)
+        {
+            eLeapRS result = LeapC.LeapSubscribeEvents(_leapConnection, device.Handle);
+            reportAbnormalResults("LeapC SubscribeEvents call was ", result);
+        }
+
+        /// <summary>
+        /// Unsubscribes from the events coming from an individual device
+        /// 
+        /// This can be called safely, even if the device has not been subscribed.
+        /// 
+        /// @since 4.1
+        /// </summary>
+        public void UnsubscribeFromDeviceEvents(Device device)
+        {
+            eLeapRS result = LeapC.LeapUnsubscribeEvents(_leapConnection, device.Handle);
+            reportAbnormalResults("LeapC UnsubscribeEvents call was ", result);
+        }
+
+        /// <summary>
+        /// Converts from image-space pixel coordinates to camera-space rectilinear coordinates
+        /// </summary>
         public Vector PixelToRectilinear(Image.CameraType camera, Vector pixel)
         {
             LEAP_VECTOR pixelStruct = new LEAP_VECTOR(pixel);
@@ -961,6 +1007,32 @@ namespace LeapInternal
             return new Vector(ray.x, ray.y, ray.z);
         }
 
+        /// <summary>
+        /// Converts from image-space pixel coordinates to camera-space rectilinear coordinates
+        /// 
+        /// Also allows specifying a specific device handle and calibration type.
+        /// 
+        /// @since 4.1
+        /// </summary>
+        public Vector PixelToRectilinearEx(IntPtr deviceHandle,
+                                           Image.CameraType camera, Image.CalibrationType calibType, Vector pixel)
+        {
+            LEAP_VECTOR pixelStruct = new LEAP_VECTOR(pixel);
+            LEAP_VECTOR ray = LeapC.LeapPixelToRectilinearEx(_leapConnection,
+                   deviceHandle,
+                   (camera == Image.CameraType.LEFT ?
+                   eLeapPerspectiveType.eLeapPerspectiveType_stereo_left :
+                   eLeapPerspectiveType.eLeapPerspectiveType_stereo_right),
+                   (calibType == Image.CalibrationType.INFRARED ?
+                   eLeapCameraCalibrationType.eLeapCameraCalibrationType_infrared :
+                   eLeapCameraCalibrationType.eLeapCameraCalibrationType_visual),
+                   pixelStruct);
+            return new Vector(ray.x, ray.y, ray.z);
+        }
+
+        /// <summary>
+        /// Converts from camera-space rectilinear coordinates to image-space pixel coordinates
+        /// </summary>
         public Vector RectilinearToPixel(Image.CameraType camera, Vector ray)
         {
             LEAP_VECTOR rayStruct = new LEAP_VECTOR(ray);
