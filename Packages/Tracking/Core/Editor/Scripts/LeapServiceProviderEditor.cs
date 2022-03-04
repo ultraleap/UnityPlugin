@@ -42,12 +42,9 @@ namespace Leap.Unity
 
         private List<string> _serialNumbers;
         private int _chosenDeviceIndex;
-        private SerializedProperty serialNumber;
-
 
         protected override void OnEnable()
         {
-            serializedObject.Update();
 
             base.OnEnable();
 
@@ -68,6 +65,8 @@ namespace Leap.Unity
                           (int)LeapServiceProvider.MultipleDeviceMode.Specific,
                           "_specificSerialNumber");
 
+            specifyCustomDrawer("_specificSerialNumber", drawSerialNumberToggle);
+
             deferProperty("_serverNameSpace");
             deferProperty("_workerThreadProfiling");
 
@@ -81,9 +80,6 @@ namespace Leap.Unity
             }
             addPropertyToFoldout("_workerThreadProfiling", "Advanced Options");
             addPropertyToFoldout("_serverNameSpace", "Advanced Options");
-
-            serialNumber = serializedObject.FindProperty("_specificSerialNumber");
-            
         }
 
         private void frameOptimizationWarning(SerializedProperty property)
@@ -108,6 +104,32 @@ namespace Leap.Unity
             EditorGUILayout.HelpBox(warningText, MessageType.Warning);
         }
 
+        private void drawSerialNumberToggle(SerializedProperty property)
+        {
+            if (LeapController != null)
+            {
+                _chosenDeviceIndex = 0;
+                for (int i = 0; i < LeapController.Devices.Count; i++)
+                {
+                    if (LeapController.Devices[i].SerialNumber == property.stringValue)
+                    {
+                        _chosenDeviceIndex = i;
+                        break;
+                    }
+                }
+                if (!Application.isPlaying)
+                {
+                    _chosenDeviceIndex = EditorGUILayout.Popup("Specific Serial Number", _chosenDeviceIndex, SerialNumbers.ToArray());
+                    property.stringValue = SerialNumbers[_chosenDeviceIndex];
+                }
+                else
+                {
+                    EditorGUILayout.PropertyField(property);
+                }
+            }
+        }
+
+
         public override void OnInspectorGUI()
         {
 
@@ -124,33 +146,7 @@ namespace Leap.Unity
             }
 #endif
 
-            drawSerialNumberToggle();
-
             base.OnInspectorGUI();
-        }
-
-        void drawSerialNumberToggle()
-        {
-            if (LeapController != null)
-            {
-                for (int i = 0; i < LeapController.Devices.Count; i++)
-                {
-                    if (LeapController.Devices[i].SerialNumber == serialNumber.stringValue)
-                    {
-                        _chosenDeviceIndex = i;
-                        break;
-                    }
-                }
-                if (!Application.isPlaying)
-                {
-                    _chosenDeviceIndex = EditorGUILayout.Popup("Specific Serial Number", _chosenDeviceIndex, SerialNumbers.ToArray());
-                    serialNumber.stringValue = SerialNumbers[_chosenDeviceIndex];
-                }
-                else
-                {
-                    EditorGUILayout.PropertyField(serialNumber);
-                }
-            }
         }
 
         public virtual void OnSceneGUI()
