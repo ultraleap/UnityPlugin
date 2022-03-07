@@ -103,7 +103,7 @@ namespace Leap.Unity.HandsModule
         ELBOW,
     }
 
-    public class HandBinderUtilities
+    public static class HandBinderUtilities
     {
 
         /// <summary>
@@ -132,5 +132,100 @@ namespace Leap.Unity.HandsModule
             {BoundTypes.PINKY_INTERMEDIATE, (Finger.FingerType.TYPE_PINKY, Bone.BoneType.TYPE_INTERMEDIATE)},
             {BoundTypes.PINKY_DISTAL, (Finger.FingerType.TYPE_PINKY, Bone.BoneType.TYPE_DISTAL)},
         };
+
+
+        public static Hand GenerateLeapHand(this BoundHand boundHand, Hand leapHand, float fingerTipScale = 0.8f)
+        {
+            if (leapHand == null)
+                return null;
+
+            for (int fingerID = 0; fingerID < leapHand.Fingers.Count; fingerID++)
+            {
+                var finger = leapHand.Fingers[fingerID];
+
+                for (int boneID = 0; boneID < finger.bones.Length; boneID++)
+                {
+                    var leapBone = finger.bones[boneID];
+
+                    if (boneID == (int)Bone.BoneType.TYPE_DISTAL)
+                    {
+                        var thisBone = boundHand.fingers[fingerID].boundBones[boneID];
+                        var prevBone = boundHand.fingers[fingerID].boundBones[boneID - 1];
+
+                        if (prevBone.boundTransform && thisBone.boundTransform)
+                        {
+                            var nextJoint = thisBone.boundTransform.position.ToVector();
+                            var prevJoint = prevBone.boundTransform.position.ToVector();
+
+                            var dir = (prevJoint - nextJoint);
+                            var length = dir.Magnitude;
+
+                            prevJoint += -dir.Normalized * (length * fingerTipScale);
+                            nextJoint += -dir.Normalized * (length * fingerTipScale);
+
+                            var center = Vector.Lerp(prevJoint, nextJoint, 0.5f);
+
+                            finger.bones[boneID] = new Bone(prevJoint, nextJoint, center, dir, length, leapBone.Width, leapBone.Type, leapBone.Rotation);
+                            finger.TipPosition = nextJoint;
+                        }
+                    }
+                    else
+                    {
+                        var prevBone = boundHand.fingers[fingerID].boundBones[boneID];
+                        var nextBone = boundHand.fingers[fingerID].boundBones[boneID + 1];
+
+                        if (prevBone.boundTransform && nextBone.boundTransform)
+                        {
+                            var prevJoint = prevBone.boundTransform.position.ToVector();
+                            var nextJoint = nextBone.boundTransform.position.ToVector();
+                            var dir = (prevJoint - nextJoint);
+                            var length = dir.Magnitude;
+                            var center = Vector.Lerp(prevJoint, nextJoint, 0.5f);
+
+                            finger.bones[boneID] = new Bone(prevJoint, nextJoint, center, dir, length, leapBone.Width, leapBone.Type, leapBone.Rotation);
+                        }
+                        else if (boneID == (int)Bone.BoneType.TYPE_METACARPAL)
+                        {
+                            nextBone = boundHand.fingers[fingerID].boundBones[boneID + 1];
+                            var wristBone = boundHand.wrist.boundTransform;
+
+                            if (nextBone.boundTransform && wristBone)
+                            {
+                                var nextJoint = nextBone.boundTransform.position.ToVector();
+                                var prevJoint = Vector.Lerp(wristBone.position.ToVector(), nextJoint, 0.5f);
+                                var dir = (nextJoint - prevJoint);
+                                var length = dir.Magnitude;
+                                var center = Vector.Lerp(prevJoint, nextJoint, 0.5f);
+                                finger.bones[boneID] = new Bone(prevJoint, nextJoint, center, dir, length, leapBone.Width, leapBone.Type, leapBone.Rotation);
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (boundHand.wrist.boundTransform != null)
+            {
+                leapHand.WristPosition = boundHand.wrist.boundTransform.position.ToVector();
+
+                if (boundHand.elbow.boundTransform != null)
+                {
+                    var elbowPos = boundHand.elbow.boundTransform.position.ToVector();
+                    var wristPos = boundHand.wrist.boundTransform.position.ToVector();
+                    var center = Vector.Lerp(elbowPos, wristPos, 0.5f);
+                    var dir = (elbowPos - wristPos);
+                    var length = dir.Magnitude;
+
+                    leapHand.Arm = new Arm(elbowPos, wristPos, center, dir, length, leapHand.Arm.Width, leapHand.Arm.Rotation);
+                    leapHand.Arm.NextJoint = leapHand.WristPosition;
+                    leapHand.Arm.PrevJoint = elbowPos;
+                }
+            }
+
+            leapHand.PalmPosition = Vector.Lerp(leapHand.WristPosition, leapHand.GetMiddle().bones[1].PrevJoint, 0.5f);
+            leapHand.StabilizedPalmPosition = leapHand.PalmPosition;
+            leapHand.PalmWidth = (leapHand.GetPinky().bones[1].PrevJoint - leapHand.GetIndex().bones[1].PrevJoint).Magnitude;
+
+            return leapHand;
+        }
     }
 }
