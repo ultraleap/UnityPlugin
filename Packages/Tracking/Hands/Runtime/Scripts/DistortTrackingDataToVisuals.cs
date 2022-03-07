@@ -10,7 +10,6 @@
 using Leap;
 using Leap.Unity;
 using Leap.Unity.HandsModule;
-using Leap.Unity.Interaction;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -79,8 +78,6 @@ public class DistortTrackingDataToVisuals : PostProcessProvider
 {
     public HandBinder LeftHand;
     public HandBinder RightHand;
-
-    public InteractionHand interactionHand;
 
     public float fingerTipScale = 0.8f;
 
