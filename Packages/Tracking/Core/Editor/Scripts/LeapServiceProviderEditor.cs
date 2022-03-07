@@ -235,8 +235,8 @@ namespace Leap.Unity
 
                     if (this._leapController != null)
                     {
-                        this._leapController.Device += _leapController_DeviceChanged;
-                        this._leapController.DeviceLost += _leapController_DeviceChanged;
+                        this._leapController.Device += _leapController_DeviceAdded;
+                        this._leapController.DeviceLost += _leapController_DeviceLost;
                     }
 
                     return this._leapController;
@@ -265,12 +265,23 @@ namespace Leap.Unity
             }
         }
 
+
+        private void _leapController_DeviceAdded(object sender, DeviceEventArgs e)
+        {
+            SerialNumbers.Add(e.Device.SerialNumber);
+            _leapController_DeviceChanged(sender, e);
+        }
+
+        private void _leapController_DeviceLost(object sender, DeviceEventArgs e)
+        {
+            SerialNumbers.Remove(e.Device.SerialNumber);
+            _leapController_DeviceChanged(sender, e);
+        }
+
         private void _leapController_DeviceChanged(object sender, DeviceEventArgs e)
         {
             EditorWindow view = EditorWindow.GetWindow<SceneView>();
             view.Repaint();
-
-            SerialNumbers.Add(e.Device.SerialNumber);
         }
 
         private void DetectConnectedDevice(Transform targetTransform)
