@@ -10,11 +10,17 @@
 using Leap;
 using Leap.Unity;
 using Leap.Unity.HandsModule;
+=======
+﻿using Leap;
+using Leap.Unity;
+using Leap.Unity.HandsModule;
 using Leap.Unity.Interaction;
+>>>>>>> a188f9c9 (Distort the tracked data to the art)
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+<<<<<<< HEAD
 namespace Leap.Unity.HandsModule
 {
     /// <summary>
@@ -70,7 +76,7 @@ namespace Leap.Unity.HandsModule
         }
     }
 }
-
+=======
 /// <summary>
 /// A post process provider that allows hand visuals to generate leap hands that can be used to distort tracking data to visuals
 /// This should be used in cases where you have visual hands that do not conform to leap data size, e.g. a monster hand that has extra long fingers
@@ -123,4 +129,4 @@ public class DistortTrackingDataToVisuals : PostProcessProvider
     }
 
 }
-
+>>>>>>> a188f9c9 (Distort the tracked data to the art)
