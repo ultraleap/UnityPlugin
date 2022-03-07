@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Basic support for specifying which device a LeapProvider should connect to. Can be specified by device index or serial number. If multiple service providers are in a scene set to use the multiple device mode, they must be set to use the same tracking optimization mode. _(Multiple Device Mode is only supported on the Ultraleap Tracking Service version 5.3.6 and above)_
+- Added ability to get / set custom capsule hand colours in code
 
 ### Changed
 - Updated LeapC.dll client to latest service release. Service supports multiple devices.
@@ -18,6 +19,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Fixed issue with incorrect enum ordering in eLeapEventType (now matches LeapC.h ordering). Inserted eLeapEventType_TrackingMode
+- Service Providers not referenced in Hand Post-Process example scene
+
+### Known issues
+-	Scenes containing the infrared viewer render incorrectly on systems using single pass stereo with the XR plugin system - e.g. Windows Mixed Reality headsets. SteamVR headsets may also default to single pass stereo, showing the same issue. However in this case, the OpenVR settings can be changed to multipass which resolves the problem.
+-	Demo scenes do not start at the correct height for a seated user. The XR Plugin Management System adjusts the camera height. This means the user has to adjust components in the scene to the correct height - e.g. camera height. Currently our position is to support the legacy XR system height settings.
+-	Capsule hands appear small compared to size of 'IR hands' of user using HDRP / URP and do not line up. Using standard rendering on Unity 2019.4 LTS  hands are usually not visible (but are being tracked). When they appear they do not line up with the hands in the image.
+- Possible hand offset issues on XR2 headsets using SVR plugin
+- Hands in Desktop scenes can appear far away from the camera
+- Interactions callback scene allows blocks to be moved without doing a grasp pose.
+- Interactions object scene platform/stage seems to move a lot
+- Dynamic UI objects throwing backwards most of the time.
+
 
 ## [5.3.0] 
 
