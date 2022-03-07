@@ -164,7 +164,7 @@ namespace Leap.Unity.HandsModule
 
             else
             {
-                if(BoundHand.startScale != Vector3.zero)
+                if (BoundHand.startScale != Vector3.zero)
                 {
                     transform.localScale = BoundHand.startScale;
                 }
