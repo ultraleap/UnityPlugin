@@ -107,7 +107,7 @@ namespace Leap.Unity.HandsModule
                 {
                     //Update the binding
                     var BONE = handBinder.BoundHand.fingers[FINGERID].boundBones[BONEID];
-                    BONE = AssignBoundBone(BONE.boundTransform);
+                    handBinder.BoundHand.fingers[FINGERID].boundBones[BONEID] = AssignBoundBone(BONE.boundTransform);
                 }
             }
 
