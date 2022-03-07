@@ -145,7 +145,7 @@ namespace Leap.Unity.HandsModule
             base.BeginHand();
 
             //Disable the hand scale feature if its incorrectly set up
-            if(SetModelScale == true && !CanUseScaleFeature())
+            if(SetModelScale == true && CanUseScaleFeature() == false)
             {
                 SetModelScale = false;
             }
@@ -156,16 +156,7 @@ namespace Leap.Unity.HandsModule
         /// </summary>
         void SetHandScale()
         {
-            //Don't allow the user to enable scale feature if it is not set up
-            if(Application.isEditor && !Application.isPlaying)
-            {
-                if (SetModelScale == true && !CanUseScaleFeature())
-                {
-                    SetModelScale = false;
-                }
-            }
-
-            if (SetModelScale)
+            if (SetModelScale && CanUseScaleFeature())
             {
                 ScaleModel();
                 ScaleFingertips();
