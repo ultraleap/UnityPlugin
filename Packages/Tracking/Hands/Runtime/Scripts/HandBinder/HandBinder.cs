@@ -113,22 +113,6 @@ namespace Leap.Unity.HandsModule
         /// <param name="hand"></param>
         public override void SetLeapHand(Hand hand) { LeapHand = hand; }
 
-        float previousScaleRatio;
-        Vector3 targetScale;
-
-        float[] fingerTipsRatio = new float[5]
-        {
-            1,1,1,1,1
-        };
-        Vector3[] fingerTipTargetScale = new Vector3[]
-        {
-            Vector3.one,
-            Vector3.one,
-            Vector3.one,
-            Vector3.one,
-            Vector3.one,
-        };
-
         #endregion
 
         #region Hand Binder Logic
@@ -180,14 +164,17 @@ namespace Leap.Unity.HandsModule
 
             else
             {
-                transform.localScale = BoundHand.startScale;
+                if(BoundHand.startScale != Vector3.zero)
+                {
+                    transform.localScale = BoundHand.startScale;
+                }
 
                 for (int i = 0; i < BoundHand.fingers.Length; i++)
                 {
                     var finger = BoundHand.fingers[i];
                     var lastBone = finger.boundBones[(int)Bone.BoneType.TYPE_DISTAL];
 
-                    if (lastBone.boundTransform == null) continue;
+                    if (lastBone.boundTransform == null || lastBone.startTransform.scale == Vector3.zero) continue;
 
                     lastBone.boundTransform.localScale = lastBone.startTransform.scale;
                 }
@@ -209,17 +196,9 @@ namespace Leap.Unity.HandsModule
             }
             else // Lerp the scale during playmode
             {
-                //Set the target scale if the difference is large enough
-                if (Mathf.Abs(scaleRatio - previousScaleRatio) > 0.1f)
-                {
-                    targetScale = BoundHand.startScale * scaleRatio;
-                }
-
+                var targetScale = BoundHand.startScale * scaleRatio;
                 transform.localScale = Vector3.Lerp(transform.localScale, targetScale, Time.deltaTime);
             }
-
-            //Store the ratio for later
-            previousScaleRatio = scaleRatio;
         }
 
         /// <summary>
@@ -264,19 +243,9 @@ namespace Leap.Unity.HandsModule
                 }
                 else // Lerp the scale during playmode
                 {
-                    //Set the target scale if the difference is large enough
-                    if (Mathf.Abs(fingerTipsRatio[i] - adjustedRatio) > 0.1)
-                    {
-                        //Store the target scale
-                        fingerTipTargetScale[i] = scale;
-                    }
-
                     //Lerp the scale to the target scale
-                    distalBone.boundTransform.localScale = Vector3.Lerp(distalBone.boundTransform.localScale, fingerTipTargetScale[i], Time.deltaTime);
+                    distalBone.boundTransform.localScale = Vector3.Lerp(distalBone.boundTransform.localScale, scale, Time.deltaTime);
                 }
-
-                //Store the ratio for later
-                fingerTipsRatio[i] = adjustedRatio;
             }
         }
 
