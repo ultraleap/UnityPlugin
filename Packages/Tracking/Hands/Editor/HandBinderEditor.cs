@@ -68,7 +68,7 @@ namespace Leap.Unity.HandsModule
             debugOptions = serializedObject.FindProperty("DebugOptions");
             boundHand = serializedObject.FindProperty("BoundHand");
             offsets = serializedObject.FindProperty("Offsets");
-            leapProvider = serializedObject.FindProperty("leapProvider");
+            leapProvider = serializedObject.FindProperty("_leapProvider");
             scaleOffset = boundHand.FindPropertyRelative("scaleOffset");
             elbowOffset = boundHand.FindPropertyRelative("elbowOffset");
             useMetaBones = serializedObject.FindProperty("UseMetaBones");
@@ -244,7 +244,12 @@ namespace Leap.Unity.HandsModule
                 {
                     EditorGUILayout.Space();
                     EditorGUILayout.PropertyField(scaleOffset, new GUIContent("Model Scale Offset", "The hand scale will be modified by this amount"));
+
+                    GUI.enabled = myTarget.BoundHand.elbow.boundTransform != null;
+
                     EditorGUILayout.PropertyField(elbowOffset, new GUIContent("Elbow Scale Offset", "The Elbow Length will be modified by this amount"));
+
+                    GUI.enabled = true;
 
                     for (int i = 0; i < myTarget.BoundHand.fingers.Length; i++)
                     {
@@ -1029,9 +1034,10 @@ namespace Leap.Unity.HandsModule
         {
             if (myTarget.BoundHand != null && myTarget.BoundHand.wrist.boundTransform != null)
             {
-                if (myTarget.BoundHand.startScale == Vector3.zero || myTarget.BoundHand.baseScale == 0 || myTarget.BoundHand.fingers.Any(x => x.fingerTipBaseLength == 0))
+                if (myTarget.BoundHand.startScale == Vector3.zero || myTarget.BoundHand.baseScale == 0 || myTarget.BoundHand.fingers.Any(x => x.fingerTipBaseLength == 0) || myTarget.BoundHand.fingers.Any(x => x.boundBones.Any(y => y.boundTransform != null && y.startTransform.scale == Vector3.zero)))
                 {
                     Debug.Log("Hand Scale feature is disabled, rebind the hand to enable it", myTarget);
+                    myTarget.SetModelScale = false;
                 }
             }
         }
