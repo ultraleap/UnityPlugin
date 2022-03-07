@@ -276,21 +276,29 @@ namespace Leap.Unity
         {
             if (!Application.isPlaying && SupportsEditorPersistence())
             {
-                //Try to set the provider for the user
-                var Provider = Hands.Provider;
                 Hand hand = null;
-                if (Provider == null)
+
+                if (leapProvider == null)
                 {
-                    //If we still have a null hand, construct one manually
-                    if (hand == null)
+                    //Try to set the provider for the user
+                    var Provider = Hands.Provider;
+                    if (Provider == null)
                     {
-                        hand = TestHandFactory.MakeTestHand(Handedness == Chirality.Left, unitType: TestHandFactory.UnitType.LeapUnits);
-                        hand.Transform(transform.GetLeapMatrix());
+                        //If we still have a null hand, construct one manually
+                        if (hand == null)
+                        {
+                            hand = TestHandFactory.MakeTestHand(Handedness == Chirality.Left, unitType: TestHandFactory.UnitType.LeapUnits);
+                            hand.Transform(transform.GetLeapMatrix());
+                        }
+                    }
+                    else
+                    {
+                        hand = Provider.CurrentFrame.GetHand(Handedness);
                     }
                 }
                 else
                 {
-                    hand = Provider.CurrentFrame.GetHand(Handedness);
+                    hand = leapProvider.CurrentFrame.GetHand(Handedness);
                 }
 
                 UpdateBase(hand);
