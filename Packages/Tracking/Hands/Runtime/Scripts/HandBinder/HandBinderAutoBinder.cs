@@ -79,6 +79,7 @@ namespace Leap.Unity.HandsModule
         public static void BindHand(HandBinder handBinder)
         {
             handBinder.ResetHand();
+            UpdateBoundBones(handBinder);
             CalculateFingerTipLengths(handBinder);
             EstimateWristRotationOffset(handBinder);
             CalculateElbowLength(handBinder);
@@ -91,6 +92,27 @@ namespace Leap.Unity.HandsModule
             handBinder.SetModelScale = true;
             handBinder.UseMetaBones = true;
             handBinder.SetEditorPose = true;
+        }
+
+        //Update all the bound bone bindings
+        static void UpdateBoundBones(HandBinder handBinder)
+        {
+            //Reset the hand back to its bound pose
+            handBinder.ResetHand();
+
+            //Now loop though all the bones and make sure the binding is correctly configured
+            for (int FINGERID = 0; FINGERID < handBinder.BoundHand.fingers.Length; FINGERID++)
+            {
+                for (int BONEID = 0; BONEID < handBinder.BoundHand.fingers[FINGERID].boundBones.Length; BONEID++)
+                {
+                    //Update the binding
+                    var BONE = handBinder.BoundHand.fingers[FINGERID].boundBones[BONEID];
+                    BONE = AssignBoundBone(BONE.boundTransform);
+                }
+            }
+
+            handBinder.BoundHand.wrist = AssignBoundBone(handBinder.BoundHand.wrist.boundTransform);
+            handBinder.BoundHand.elbow = AssignBoundBone(handBinder.BoundHand.elbow.boundTransform);
         }
 
         /// <summary>

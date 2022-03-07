@@ -92,8 +92,6 @@ namespace Leap.Unity.HandsModule
             }
 
             SetSerializedProperties();
-            UpgradeHelper();
-
         }
 
         /// <summary>
@@ -1015,32 +1013,5 @@ namespace Leap.Unity.HandsModule
                 GUILayout.Space(handTexture.height * 1.25f);
             }
         }
-
-        #region Hand Binder Upgrade Utility Functions
-
-        /// <summary>
-        /// This calls upgrade functions to ensure the users hands remain up to date with each new feature
-        /// </summary>
-        void UpgradeHelper()
-        {
-            if (myTarget == null) return;
-            CheckHandScaleFeature();
-        }
-
-        /// <summary>
-        /// Calculate the hand scale for the user if the rig does not already include it
-        /// </summary>
-        void CheckHandScaleFeature()
-        {
-            if (myTarget.BoundHand != null && myTarget.BoundHand.wrist.boundTransform != null)
-            {
-                if (myTarget.BoundHand.startScale == Vector3.zero || myTarget.BoundHand.baseScale == 0 || myTarget.BoundHand.fingers.Any(x => x.fingerTipBaseLength == 0) || myTarget.BoundHand.fingers.Any(x => x.boundBones.Any(y => y.boundTransform != null && y.startTransform.scale == Vector3.zero)))
-                {
-                    Debug.Log("Hand Scale feature is disabled, rebind the hand to enable it", myTarget);
-                    myTarget.SetModelScale = false;
-                }
-            }
-        }
-        #endregion
     }
 }

@@ -144,10 +144,10 @@ namespace Leap.Unity.HandsModule
         {
             base.BeginHand();
 
-            //When upgrading a hand, it might not have the correct data run this check to ensure the hand is properly bound
-            if (BoundHand.startScale == Vector3.zero || BoundHand.fingers.Any(x => x.boundBones.Any(y => y.boundTransform != null && y.startTransform.scale == Vector3.zero)))
+            //Disable the hand scale feature if its incorrectly set up
+            if(SetModelScale == true && CanUseScaleFeature())
             {
-                Debug.Log("Hand is missing scale information, please rebind the hand to fix", gameObject);
+                SetModelScale = false;
             }
         }
 
@@ -156,6 +156,15 @@ namespace Leap.Unity.HandsModule
         /// </summary>
         void SetHandScale()
         {
+            //Don't allow the user to enable scale feature if it is not set up
+            if(Application.isEditor && !Application.isPlaying)
+            {
+                if (SetModelScale == true && !CanUseScaleFeature())
+                {
+                    SetModelScale = false;
+                }
+            }
+
             if (SetModelScale)
             {
                 ScaleModel();
@@ -489,10 +498,24 @@ namespace Leap.Unity.HandsModule
                 }
             }
 
-
-
             EditPoseNeedsResetting = false;
         }
+
+        bool CanUseScaleFeature()
+        {
+            if (BoundHand.startScale == Vector3.zero || BoundHand.baseScale == 0 || BoundHand.fingers.Any(x => x.fingerTipBaseLength == 0) || BoundHand.fingers.Any(x => x.boundBones.Any(y => y.boundTransform != null && y.startTransform.scale == Vector3.zero)))
+            {
+                if (SetModelScale == true)
+                {
+                    Debug.Log("Hand Scale feature is disabled, rebind the hand to enable it", transform);
+                    SetModelScale = false;
+                }
+                return false;
+            }
+
+            return true;
+        }
+
         #endregion
 
         #region Editor
