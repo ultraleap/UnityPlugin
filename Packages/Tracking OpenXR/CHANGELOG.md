@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [docs-website]: https://docs.ultraleap.com/ "Ultraleap Docs"
 
+## [1.0.0-pre.2]
+
+### Fixed
+
+- Fixed a marshalling issue that resulted in crashes when errors during creation of OpenXR hand trackers.
+
 ## [1.0.0-pre.1]
 
 ### Added
