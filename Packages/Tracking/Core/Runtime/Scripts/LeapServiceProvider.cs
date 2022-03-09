@@ -28,6 +28,7 @@ namespace Leap.Unity
     /// </summary>
     public class LeapServiceProvider : LeapProvider
     {
+        private Device _device;  
 
         #region Constants
 
@@ -670,8 +671,8 @@ namespace Leap.Unity
                         throw new System.InvalidOperationException(
                           "Unexpected frame optimization mode: " + _frameOptimization);
                 }
-                _leapController.GetInterpolatedFrame(_untransformedFixedFrame, timestamp, _currentDevice);
 
+                _leapController.GetInterpolatedFrame(_untransformedFixedFrame, timestamp, _currentDevice);
             }
             else
             {
@@ -941,19 +942,7 @@ namespace Leap.Unity
                 {
                     _currentDevice = d;
                 };
-             }
-
-            //TO DO - Enable Multiple Device Mode All
-            /*
-            else if (_multipleDeviceMode == MultipleDeviceMode.All)
-            {
-                _onDeviceSafe += (d) =>
-                {
-                    Debug.Log("Connecting to Device with Serial: " + d.SerialNumber);
-                    _leapController.SubscribeToDeviceEvents(d);
-                };
             }
-            */
 
             if (_leapController.IsConnected)
             {
