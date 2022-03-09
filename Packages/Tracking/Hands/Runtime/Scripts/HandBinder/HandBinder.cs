@@ -145,7 +145,7 @@ namespace Leap.Unity.HandsModule
             base.BeginHand();
 
             //Disable the hand scale feature if its incorrectly set up
-            if(SetModelScale == true && CanUseScaleFeature() == false)
+            if (SetModelScale == true && CanUseScaleFeature() == false)
             {
                 SetModelScale = false;
             }
