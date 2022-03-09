@@ -28,6 +28,7 @@ namespace Leap.Unity
     /// </summary>
     public class LeapServiceProvider : LeapProvider
     {
+        private Device _device;  
 
         #region Constants
 
@@ -529,7 +530,7 @@ namespace Leap.Unity
         {
             _fixedOffset.delay = 0.4f;
             _smoothedTrackingLatency.SetBlend(0.99f, 0.0111f);
-            _useInterpolation = _multipleDeviceMode.Equals(MultipleDeviceMode.Disabled) ? _useInterpolation : false;
+            //_useInterpolation = _multipleDeviceMode.Equals(MultipleDeviceMode.Disabled) ? _useInterpolation : false;
         }
 
         protected virtual void Start()
@@ -587,7 +588,7 @@ namespace Leap.Unity
                 long timestamp = CalculateInterpolationTime() + (ExtrapolationAmount * 1000);
                 _unityToLeapOffset = timestamp - (long)(Time.time * S_TO_NS);
 
-                _leapController.GetInterpolatedFrameFromTime(_untransformedUpdateFrame, timestamp, CalculateInterpolationTime() - (BounceAmount * 1000));
+                _leapController.GetInterpolatedFrameFromTime(_untransformedUpdateFrame, timestamp, CalculateInterpolationTime() - (BounceAmount * 1000), _device);
             }
             else
             {
@@ -633,7 +634,7 @@ namespace Leap.Unity
                         throw new System.InvalidOperationException(
                           "Unexpected frame optimization mode: " + _frameOptimization);
                 }
-                _leapController.GetInterpolatedFrame(_untransformedFixedFrame, timestamp);
+                _leapController.GetInterpolatedFrame(_untransformedFixedFrame, timestamp, _device);
 
             }
             else
@@ -899,11 +900,20 @@ namespace Leap.Unity
                        (_specificSerialNumber.Length > 1 &&
                         d.SerialNumber.Contains(_specificSerialNumber)))
                     {
-                        Debug.Log("Connecting to Device with Serial: " + d.SerialNumber);
+                        Debug.Log($"Connecting to Device with Serial:{d.SerialNumber}");
+
                         _leapController.SubscribeToDeviceEvents(d);
+                        _device = d;
                     }
                 };
             }
+            else
+            {
+                _onDeviceSafe += (d) =>
+                {
+                    _device = d;
+                };
+             }
 
             //TO DO - Enable Multiple Device Mode All
             /*

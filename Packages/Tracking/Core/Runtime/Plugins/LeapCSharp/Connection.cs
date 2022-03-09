@@ -135,6 +135,24 @@ namespace LeapInternal
             GC.SuppressFinalize(this);
         }
 
+        public (int Major, int Minor, int Patch) GetServiceVersion()
+        {
+            LEAP_VERSION leapVersion = new LEAP_VERSION();
+            var result = LeapC.GetVersion(_leapConnection, eLeapVersionPart.eLeapVersionPart_ServerLibrary, ref leapVersion);
+
+            if (result == eLeapRS.eLeapRS_Success)
+            { 
+                return (leapVersion.major, leapVersion.minor, leapVersion.patch);
+            }
+            else
+            {
+                UnityEngine.Debug.Log($"GetServiceVersion returned {result.ToString()}");
+            }
+
+            return(0,0,0);
+        }
+
+
         // Protected implementation of Dispose pattern.
         protected virtual void Dispose(bool disposing)
         {
@@ -405,14 +423,28 @@ namespace LeapInternal
             return size;
         }
 
-        public void GetInterpolatedFrame(Frame toFill, Int64 time)
+        public void GetInterpolatedFrame(Frame toFill, Int64 time, Device device = null)
         {
             UInt64 size = GetInterpolatedFrameSize(time);
             IntPtr trackingBuffer = Marshal.AllocHGlobal((Int32)size);
-            eLeapRS result = LeapC.InterpolateFrame(_leapConnection, time, trackingBuffer, size);
+            eLeapRS result;
+
+            if (device != null)
+            {
+                result = LeapC.InterpolateFrameEx(_leapConnection, device.Handle, time, trackingBuffer, size);
+            }
+            else
+            {
+                result = LeapC.InterpolateFrame(_leapConnection, time, trackingBuffer, size);
+            }
+
+            UnityEngine.Debug.Log($"Device {device} result {result} time {time}");
+
             reportAbnormalResults("LeapC get interpolated frame call was ", result);
             if (result == eLeapRS.eLeapRS_Success)
             {
+                UnityEngine.Debug.Log($"It worked! {device}");
+
                 LEAP_TRACKING_EVENT tracking_evt;
                 StructMarshal<LEAP_TRACKING_EVENT>.PtrToStruct(trackingBuffer, out tracking_evt);
                 toFill.CopyFrom(ref tracking_evt);
@@ -420,11 +452,22 @@ namespace LeapInternal
             Marshal.FreeHGlobal(trackingBuffer);
         }
 
-        public void GetInterpolatedFrameFromTime(Frame toFill, Int64 time, Int64 sourceTime)
+        public void GetInterpolatedFrameFromTime(Frame toFill, Int64 time, Int64 sourceTime, Device device = null)
         {
             UInt64 size = GetInterpolatedFrameSize(time);
             IntPtr trackingBuffer = Marshal.AllocHGlobal((Int32)size);
-            eLeapRS result = LeapC.InterpolateFrameFromTime(_leapConnection, time, sourceTime, trackingBuffer, size);
+
+            eLeapRS result;
+
+            if (device != null)
+            {
+                result = LeapC.InterpolateFrameFromTimeEx(_leapConnection, device.Handle, time, sourceTime, trackingBuffer, size);
+            }
+            else
+            {
+                result = LeapC.InterpolateFrameFromTime(_leapConnection, time, sourceTime, trackingBuffer, size);
+            }
+
             reportAbnormalResults("LeapC get interpolated frame from time call was ", result);
             if (result == eLeapRS.eLeapRS_Success)
             {
@@ -435,10 +478,10 @@ namespace LeapInternal
             Marshal.FreeHGlobal(trackingBuffer);
         }
 
-        public Frame GetInterpolatedFrame(Int64 time)
+        public Frame GetInterpolatedFrame(Int64 time, Device device = null)
         {
             Frame frame = new Frame();
-            GetInterpolatedFrame(frame, time);
+            GetInterpolatedFrame(frame, time, device);
             return frame;
         }
 
@@ -532,7 +575,6 @@ namespace LeapInternal
 
             device.UpdateStatus(statusEvent.status);
         }
-
 
         private void handleDevice(ref LEAP_DEVICE_EVENT deviceMsg)
         {

@@ -616,17 +616,17 @@ namespace Leap
         /// <summary>
         /// Returns the Frame at the specified time, interpolating the data between existing frames, if necessary.
         /// </summary>
-        public Frame GetInterpolatedFrame(Int64 time)
+        public Frame GetInterpolatedFrame(Int64 time, Device device = null)
         {
-            return _connection.GetInterpolatedFrame(time);
+            return _connection.GetInterpolatedFrame(time, device);
         }
 
         /// <summary>
         /// Fills the Frame with data taken at the specified time, interpolating the data between existing frames, if necessary.
         /// </summary>
-        public void GetInterpolatedFrame(Frame toFill, Int64 time)
+        public void GetInterpolatedFrame(Frame toFill, Int64 time, Device device = null)
         {
-            _connection.GetInterpolatedFrame(toFill, time);
+            _connection.GetInterpolatedFrame(toFill, time, device); // Replace with Devices.ActiveDevice?
         }
 
         /// <summary>
@@ -728,9 +728,9 @@ namespace Leap
             _connection.GetInterpolatedLeftRightTransform(time, sourceTime, leftId, rightId, out leftTransform, out rightTransform);
         }
 
-        public void GetInterpolatedFrameFromTime(Frame toFill, Int64 time, Int64 sourceTime)
+        public void GetInterpolatedFrameFromTime(Frame toFill, Int64 time, Int64 sourceTime, Device device = null)
         {
-            _connection.GetInterpolatedFrameFromTime(toFill, time, sourceTime);
+            _connection.GetInterpolatedFrameFromTime(toFill, time, sourceTime, device);
         }
 
         /// <summary>
