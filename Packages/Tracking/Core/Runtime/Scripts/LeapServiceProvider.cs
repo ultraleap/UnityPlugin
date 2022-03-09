@@ -169,6 +169,13 @@ namespace Leap.Unity
         [SerializeField]
         protected string _specificSerialNumber;
 
+        /// <summary> A counter to keep track of how many devices have been seen up
+        /// through this point. Allows a provider to latch onto a device based on
+        /// its order of appearance, which corresponds to that device's DeviceID.
+        /// </summary>
+        [Obsolete("not used anymore", false)]
+        protected uint _numDevicesSeen = 0;
+
         #endregion
 
         /// <summary>
