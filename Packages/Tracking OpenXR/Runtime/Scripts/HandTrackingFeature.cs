@@ -25,7 +25,7 @@ namespace Ultraleap.Tracking.OpenXR
         Category = FeatureCategory.Feature,
         Required = false,
         OpenxrExtensionStrings = "XR_EXT_hand_tracking",
-        BuildTargetGroups = new[] { BuildTargetGroup.Standalone, BuildTargetGroup.Android }
+        BuildTargetGroups = new[] {BuildTargetGroup.Standalone, BuildTargetGroup.Android}
     )]
 #endif
     public class HandTrackingFeature : OpenXRFeature
@@ -36,7 +36,7 @@ namespace Ultraleap.Tracking.OpenXR
         {
             private const string NativeDLL = "UltraleapOpenXRUnity";
             private const string NativePrefix = "Unity_HandTrackingFeature_";
-            
+
             [DllImport(NativeDLL, EntryPoint = NativePrefix + "HookGetInstanceProcAddr", ExactSpelling = true)]
             internal static extern IntPtr HookGetInstanceProcAddr(IntPtr func);
 
