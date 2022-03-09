@@ -147,6 +147,7 @@ namespace Leap.Unity.HandsModule
                 {
                     var leapBone = finger.bones[boneID];
 
+                    //If this bone is the distal bone, calculate a finger tip position
                     if (boneID == (int)Bone.BoneType.TYPE_DISTAL)
                     {
                         var thisBone = boundHand.fingers[fingerID].boundBones[boneID];
@@ -184,16 +185,21 @@ namespace Leap.Unity.HandsModule
 
                             finger.bones[boneID] = new Bone(prevJoint, nextJoint, center, dir, length, leapBone.Width, leapBone.Type, leapBone.Rotation);
                         }
+                        //The thumb is a special case
+                        else if (fingerID == (int)Finger.FingerType.TYPE_THUMB)
+                        {
+                            continue;
+                        }
                         else if (boneID == (int)Bone.BoneType.TYPE_METACARPAL)
                         {
-                            nextBone = boundHand.fingers[fingerID].boundBones[boneID + 1];
+                            var proximal  = boundHand.fingers[fingerID].boundBones[(int)Bone.BoneType.TYPE_PROXIMAL];
                             var wristBone = boundHand.wrist.boundTransform;
 
-                            if (nextBone.boundTransform && wristBone)
+                            if (proximal.boundTransform && wristBone)
                             {
-                                var nextJoint = nextBone.boundTransform.position.ToVector();
+                                var nextJoint = proximal.boundTransform.position.ToVector();
                                 var prevJoint = Vector.Lerp(wristBone.position.ToVector(), nextJoint, 0.5f);
-                                var dir = (nextJoint - prevJoint);
+                                var dir = (prevJoint - nextJoint);
                                 var length = dir.Magnitude;
                                 var center = Vector.Lerp(prevJoint, nextJoint, 0.5f);
                                 finger.bones[boneID] = new Bone(prevJoint, nextJoint, center, dir, length, leapBone.Width, leapBone.Type, leapBone.Rotation);
@@ -216,14 +222,16 @@ namespace Leap.Unity.HandsModule
                     var length = dir.Magnitude;
 
                     leapHand.Arm = new Arm(elbowPos, wristPos, center, dir, length, leapHand.Arm.Width, leapHand.Arm.Rotation);
-                    leapHand.Arm.NextJoint = leapHand.WristPosition;
                     leapHand.Arm.PrevJoint = elbowPos;
                 }
             }
 
-            leapHand.PalmPosition = Vector.Lerp(leapHand.WristPosition, leapHand.GetMiddle().bones[1].PrevJoint, 0.5f);
+            var palmPos = Vector.Lerp(leapHand.WristPosition, leapHand.GetMiddle().bones[(int)Bone.BoneType.TYPE_PROXIMAL].PrevJoint, 0.5f);
+            leapHand.PalmPosition = palmPos;
             leapHand.StabilizedPalmPosition = leapHand.PalmPosition;
             leapHand.PalmWidth = (leapHand.GetPinky().bones[1].PrevJoint - leapHand.GetIndex().bones[1].PrevJoint).Magnitude;
+            leapHand.Arm.NextJoint = leapHand.WristPosition;
+
 
             return leapHand;
         }
