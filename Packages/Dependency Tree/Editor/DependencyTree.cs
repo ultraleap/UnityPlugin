@@ -31,65 +31,72 @@ namespace Leap.Unity
                 ".asmdef"
             };
 
-        private static readonly Regex GuidRegex = new Regex("guid: ([0-9a-f]{32})",
+        // GUID format prefix label is slightly different in asmdef files
+        private static readonly Regex GuidRegex = new Regex("(?:GUID:|guid: )([0-9a-f]{32})",
             RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
-        private static readonly Regex AsmGuidRegex = new Regex("GUID:([0-9a-f]{32})");
-
-        private static void ParseFileContent(string content, List<string> references)
+        private static List<AssetReference> ParseDirectories(params string[] directories)
         {
-            foreach (Match match in GuidRegex.Matches(content)) {
-                references.Add(match.Groups[1].Value);
-            }
-        }
+            static void ParseFileContent(string content, List<string> references) =>
+                references.AddRange(GuidRegex.Matches(content)
+                    .Cast<Match>()
+                    .Select(match => match.Groups[1].Value));
 
-        /// <summary>
-        /// Adds all GUIDs referenced by the asset to the list.
-        /// The first added element is always its own GUID.
-        /// </summary>
-        public static void ParseAssetFile(string path, List<string> references)
-        {
-            var metaFile = path + ".meta";
-            if (File.Exists(metaFile)) {
-                ParseFileContent(File.ReadAllText(metaFile), references);
-            }
-            if (YamlFileExtensions.Contains(Path.GetExtension(path) ?? "")) {
-                ParseFileContent(File.ReadAllText(path), references);
-            }
-        }
-
-        public static List<AssetReference> ParseDirectory(string dir = "Assets")
-        {
-            var tmpReferences = new List<string>();
-            var refMap = new Dictionary<string, AssetReference>();
-            var allFiles = Directory.GetFiles(dir, "*", SearchOption.AllDirectories);
-            for (int i = 0; i < allFiles.Length; i++)
+            // Adds all GUIDs referenced by the asset to the list.
+            // The first added element is always its own GUID.
+            static void ParseAssetFile(string path, List<string> references)
             {
-                var file = allFiles[i];
-                var ext = Path.GetExtension(file);
+                var metaFile = $"{path}.meta";
+                if (File.Exists(metaFile)) {
+                    // TODO: Warn about assets missing meta files?
+                    ParseFileContent(File.ReadAllText(metaFile), references);
+                }
+                if (YamlFileExtensions.Contains(Path.GetExtension(path) ?? string.Empty)) {
+                    ParseFileContent(File.ReadAllText(path), references);
+                }
+            }
+
+            var intermediateGuidsList = new List<string>();
+            var assetsByGuid = new Dictionary<string, AssetReference>();
+            var allFilesPaths = AssetDatabase.FindAssets("", directories)
+                .Select(AssetDatabase.GUIDToAssetPath)
+                .Where(p => !Directory.Exists(p)) // Exclude folders for now, Unity treats them as Assets but we don't care about them
+                .ToArray();
+            for (int i = 0; i < allFilesPaths.Length; i++)
+            {
+                var filePath = allFilesPaths[i];
+                if (filePath.Equals(DependencyTreePath)) continue; // Don't parse the dependency tree itself as it will be cyclic
+                var ext = Path.GetExtension(filePath);
                 if (ext.Equals(".meta", StringComparison.OrdinalIgnoreCase)) {
                     // Skip .meta files on their own; we'll find them later
                     continue;
                 }
-                EditorUtility.DisplayProgressBar("Parsing tree", file, (float)i/allFiles.Length);
-                tmpReferences.Clear();
-                ParseAssetFile(file, tmpReferences);
-                if (tmpReferences.Count < 1) { continue; }
-                foreach (var guid in tmpReferences) {
-                    if (!refMap.ContainsKey(guid)) {
-                        refMap.Add(guid, new AssetReference{guid = guid});
+
+                if (EditorUtility.DisplayCancelableProgressBar("Parsing all files", filePath, (float)i / allFilesPaths.Length))
+                {
+                    return null;
+                }
+                intermediateGuidsList.Clear();
+
+                ParseAssetFile(filePath, intermediateGuidsList);
+                if (intermediateGuidsList.Count < 1) { continue; }
+
+                // Add every new guid to the map
+                foreach (var guid in intermediateGuidsList) {
+                    if (!assetsByGuid.ContainsKey(guid)) {
+                        assetsByGuid.Add(guid, new AssetReference{guid = guid});
                     }
                 }
-                var dest = refMap[tmpReferences[0]];
-                dest.path = file;
-                dest.references.Capacity += (tmpReferences.Count - 1);
-                dest.size = (float)(new FileInfo(file).Length);
-                for (int j = 1; j < tmpReferences.Count; j++) {
-                    dest.references.Add(tmpReferences[j]);
-                }
+
+                // Get this asset to fill in the details
+                // It might already be in the map if some other asset references it and was processed first
+                var thisAsset = assetsByGuid[intermediateGuidsList[0]];
+                thisAsset.path = filePath;
+                thisAsset.references.AddRange(intermediateGuidsList.Skip(1).Distinct()); // TODO: Count references instead of throwing away count?
+                thisAsset.size = (float)(new FileInfo(filePath).Length);
             }
             EditorUtility.ClearProgressBar();
-            return refMap.Values.ToList();
+            return assetsByGuid.Values.ToList();
         }
 
         public static DependencyFolderNode BuildFolderTree(List<AssetReference> rawTree)
@@ -136,10 +143,10 @@ namespace Leap.Unity
                     continue;
                 }
                 var nodeA = guidMap[asset.guid];
-                foreach (var r in asset.references)
+                foreach (var guid in asset.references)
                 {
                     DependencyNode nodeB;
-                    if (guidMap.TryGetValue(r, out nodeB)) {
+                    if (guidMap.TryGetValue(guid, out nodeB)) {
                         nodeA.Dependencies.Add(nodeB);
                     }
                 }
@@ -147,13 +154,13 @@ namespace Leap.Unity
             return root;
         }
 
-        public string RootDir = "Assets";
+        public string[] RootDirectories = new []{"Assets", "Packages"};
         public List<AssetReference> RawTree = new List<AssetReference>();
         [NonSerialized] public DependencyFolderNode RootNode;
 
         public void Refresh()
         {
-            RawTree = ParseDirectory(RootDir);
+            RawTree = ParseDirectories(RootDirectories) ?? RawTree;
             EditorUtility.SetDirty(this);
             AssetDatabase.SaveAssets();
             RootNode = null;
@@ -167,18 +174,21 @@ namespace Leap.Unity
             return RootNode;
         }
 
+        private static string DependencyTreePath = "Assets/DependencyTree.asset";
+
         [MenuItem("Assets/Generate Dependency Tree")]
         public static void Generate()
         {
-            var path = "Assets/DependencyTree.asset";
-            if (File.Exists(path))
+            // TODO: Put the asset somewhere less annoying to users
+            if (File.Exists(DependencyTreePath))
             {
-                Selection.activeObject =
-                    AssetDatabase.LoadAssetAtPath<DependencyTree>(path);
-            } else {
+                Selection.activeObject = AssetDatabase.LoadAssetAtPath<DependencyTree>(DependencyTreePath);
+            }
+            else
+            {
                 var holder = CreateInstance<DependencyTree>();
                 Selection.activeObject = holder;
-                AssetDatabase.CreateAsset(holder, path);
+                AssetDatabase.CreateAsset(holder, DependencyTreePath);
                 holder.Refresh();
             }
         }

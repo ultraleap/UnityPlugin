@@ -56,13 +56,13 @@ namespace Leap.Unity
 
             Sort = (SortMode)EditorGUILayout.EnumPopup("Sort by", Sort);
             GUI.color = ModColor(Color.blue);
-            EditorGUILayout.LabelField("Click the button to select an asset or folder");
+            EditorGUILayout.LabelField("Blue items are selected - click the button to select an asset or folder");
             GUI.color = ModColor(Color.red);
-            EditorGUILayout.LabelField("Red indicates that this item depends on the selection");
+            EditorGUILayout.LabelField("Red indicates dependants - these items depends on the selection");
             GUI.color = ModColor(Color.green);
-            EditorGUILayout.LabelField("Green indicates an asset that the selection depends on");
+            EditorGUILayout.LabelField("Green indicates dependencies - these are items that the selection depends on");
             GUI.color = ModColor(Color.yellow);
-            EditorGUILayout.LabelField("Yellow indicates that the selection and current item depend on each other");
+            EditorGUILayout.LabelField("Yellow indicates circular dependencies");
             GUI.color = Color.white;
             DrawElement(_specialResourcesNode, 0);
             foreach (var c in rootNode.Children)
@@ -81,17 +81,20 @@ namespace Leap.Unity
         private Color GetColor(DependencyNodeBase node)
         {
             var selected = FromPath(Selected);
-            if (selected == null) return Color.white;
-            if (node == selected) return Color.blue;
-            var nDs = node.DependsOnCached(selected);
-            var sDn = selected.DependsOnCached(node);
-            if (nDs && sDn) return Color.yellow;
-            if (nDs) return Color.red;
-            if (sDn) return Color.green;
-            return Color.white;
+            if (selected == null) return Color.white; // Default color
+            if (node == selected) return Color.blue; // Selected
+            var dependsOnSelected = node.DependsOnCached(selected);
+            var selectedDependsOn = selected.DependsOnCached(node);
+            return (dependsOnSelected, selectedDependsOn) switch
+            {
+                (true, true) => Color.yellow, // Circular dependency
+                (true, false) => Color.red, // Depends on selected
+                (false, true) => Color.green,
+                _ => Color.white
+            };
         }
 
-        private Color ModColor(Color color)
+        private static Color ModColor(Color color)
         {
             const float tintLow = 0.6f;
             return new Color(
@@ -107,22 +110,23 @@ namespace Leap.Unity
             return node != null ? GetPath(node.Parents.FirstOrDefault()) + "/" + node.Name : "";
         }
 
-        private DependencyNodeBase FromPath(string nodeP)
+        private DependencyNodeBase FromPath(string nodePath)
         {
-            if (string.IsNullOrEmpty(nodeP)) return null;
+            if (string.IsNullOrEmpty(nodePath)) return null;
             DependencyFolderNode current;
             const string specialResourcesPath = "//" + SpecialResourcesName;
-            if (nodeP.StartsWith(specialResourcesPath)) {
+            if (nodePath.StartsWith(specialResourcesPath)) {
                 current = _specialResourcesNode;
-                nodeP = nodeP.Substring(specialResourcesPath.Length);
+                nodePath = nodePath.Substring(specialResourcesPath.Length);
             } else {
                 current = ((DependencyTree)target).GetRootNode();
             }
-            foreach (var t in nodeP.Split(new []{'/'}, StringSplitOptions.RemoveEmptyEntries))
+
+            foreach (var t in nodePath.Split(new []{'/'}, StringSplitOptions.RemoveEmptyEntries))
             {
-                var c = current.Children.FirstOrDefault(o => o.Name == t);
-                current = c as DependencyFolderNode;
-                if (current == null) return c;
+                var child = current.Children.FirstOrDefault(o => o.Name == t);
+                current = child as DependencyFolderNode;
+                if (current == null) return child;
             }
             return current;
         }

@@ -11,7 +11,7 @@ namespace Leap.Unity
 
         public List<DependencyNode> Dependencies = new List<DependencyNode>();
 
-        public override float GetSize() { return Size; }
+        public override float GetSize() => Size;
 
         public override bool DependsOn(DependencyNodeBase other)
         {
