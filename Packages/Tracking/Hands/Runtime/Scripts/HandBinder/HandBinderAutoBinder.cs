@@ -310,7 +310,7 @@ namespace Leap.Unity.HandsModule
 
         #region Calculate Hand Scale
 
-        public static void CalculateHandSize(BoundHand boundHand)
+        static void CalculateHandSize(BoundHand boundHand)
         {
             var length = 0f;
 
@@ -333,7 +333,7 @@ namespace Leap.Unity.HandsModule
             boundHand.baseScale = length;
         }
 
-        public static void CalculateFingerTipLengths(HandBinder handBinder)
+        static void CalculateFingerTipLengths(HandBinder handBinder)
         {
             for (int i = 0; i < handBinder.BoundHand.fingers.Length; i++)
             {
