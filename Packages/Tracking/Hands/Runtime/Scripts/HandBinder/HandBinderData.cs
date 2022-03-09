@@ -205,7 +205,6 @@ namespace Leap.Unity.HandsModule
                             //Set the data for a new leap bone
                             leapFinger.bones[leapBoneID] = new Bone(previousBoundJointPosition, nextBoundJointPosition, center, direction, length, leapBone.Width, leapBone.Type, leapBone.Rotation);
                         }
-
                         //If the bone is a metacarpal, use the wrist bone as the previous joint
                         else if (leapBoneID == (int)Bone.BoneType.TYPE_METACARPAL)
                         {
