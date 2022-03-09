@@ -245,6 +245,13 @@ namespace LeapInternal
             _polster.Join();
         }
 
+        public LEAP_VERSION GetCurrentServiceVersion()
+        {
+            LEAP_VERSION currentVersion = new LEAP_VERSION { major = 0, minor = 0, patch = 0 };
+            LeapC.GetVersion(_leapConnection, eLeapVersionPart.eLeapVersionPart_ServerLibrary, ref currentVersion);
+            return currentVersion;
+        }
+
         //Run in Polster thread, fills in object queues
         private void processMessages()
         {

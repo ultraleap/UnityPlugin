@@ -497,6 +497,20 @@ namespace Leap
             }
         }
 
+        public bool CheckRequiredServiceVersion(LEAP_VERSION minServiceVersion)
+        {
+            LEAP_VERSION currentServiceVersion = _connection.GetCurrentServiceVersion();
+
+            // check that minServiceVersion is smaller or equal to the current service version
+            if (minServiceVersion.major < currentServiceVersion.major) return true;
+            else if (minServiceVersion.major == currentServiceVersion.major)
+            {
+                if (minServiceVersion.minor < currentServiceVersion.minor) return true;
+                else if (minServiceVersion.minor == currentServiceVersion.minor && minServiceVersion.patch <= currentServiceVersion.patch) return true;
+            }
+            return false;
+        }
+
         /// <summary>
         /// Requests setting a policy.
         ///  

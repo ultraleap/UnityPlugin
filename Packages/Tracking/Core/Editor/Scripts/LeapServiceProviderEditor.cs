@@ -61,6 +61,7 @@ namespace Leap.Unity
                                       (int)LeapServiceProvider.PhysicsExtrapolationMode.Manual,
                                       "_physicsExtrapolationTime");
 
+            specifyCustomDrawer("_multipleDeviceMode", multiDeviceToggleWithVersionCheck);
             specifyConditionalDrawing("_multipleDeviceMode",
                           (int)LeapServiceProvider.MultipleDeviceMode.Specific,
                           "_specificSerialNumber");
@@ -103,6 +104,21 @@ namespace Leap.Unity
 
             EditorGUILayout.HelpBox(warningText, MessageType.Warning);
         }
+
+        private void multiDeviceToggleWithVersionCheck(SerializedProperty property)
+        {
+            // this is the minimum service version that supports Multiple devices
+            LEAP_VERSION minimumServiceVersion = new LEAP_VERSION { major = 5, minor = 3, patch = 6 };
+
+            if (!LeapController.CheckRequiredServiceVersion(minimumServiceVersion) && property.enumValueIndex == (int)LeapServiceProvider.MultipleDeviceMode.Specific)
+            {
+                property.enumValueIndex = (int)LeapServiceProvider.MultipleDeviceMode.Disabled;
+                Debug.LogWarning("Your current tracking service does not support 'Multiple Device Mode' = 'Specific' (min version is 5.3.6). Please update your service: https://developer.leapmotion.com/tracking-software-download");
+            }
+
+            EditorGUILayout.PropertyField(property);
+        }
+
 
         private void drawSerialNumberToggle(SerializedProperty property)
         {

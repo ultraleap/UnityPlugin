@@ -156,7 +156,8 @@ namespace Leap.Unity
             Specific
         }
 
-        [Tooltip("When set to `All`, provider will receive data from all connected devices.")]
+        [Tooltip("When set to 'Default', provider will receive data from the first connected device. \n" +
+            "When set to `Specific`, provider will receive data from the device specified by 'Specific Serial Number'.")]
         [EditTimeOnly]
         [SerializeField]
         protected MultipleDeviceMode _multipleDeviceMode = MultipleDeviceMode.Disabled;
