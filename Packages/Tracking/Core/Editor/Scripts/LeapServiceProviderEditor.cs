@@ -110,7 +110,7 @@ namespace Leap.Unity
             // this is the minimum service version that supports Multiple devices
             LEAP_VERSION minimumServiceVersion = new LEAP_VERSION { major = 5, minor = 3, patch = 6 };
 
-            if (!LeapController.CheckRequiredServiceVersion(minimumServiceVersion) && property.enumValueIndex == (int)LeapServiceProvider.MultipleDeviceMode.Specific)
+            if (LeapController.IsConnected && !LeapController.CheckRequiredServiceVersion(minimumServiceVersion) && property.enumValueIndex == (int)LeapServiceProvider.MultipleDeviceMode.Specific)
             {
                 property.enumValueIndex = (int)LeapServiceProvider.MultipleDeviceMode.Disabled;
                 Debug.LogWarning("Your current tracking service does not support 'Multiple Device Mode' = 'Specific' (min version is 5.3.6). Please update your service: https://developer.leapmotion.com/tracking-software-download");
