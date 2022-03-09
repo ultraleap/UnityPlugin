@@ -445,8 +445,6 @@ namespace LeapInternal
             return size;
         }
 
-
-
         public void GetInterpolatedFrame(Frame toFill, Int64 time, Device device = null)
         {
             UInt64 size = GetInterpolatedFrameSize(time, device);
@@ -456,7 +454,6 @@ namespace LeapInternal
             if (device != null)
             {
                 result = LeapC.InterpolateFrameEx(_leapConnection, device.Handle, time, trackingBuffer, size);
-                UnityEngine.Debug.Log($"Device {device} result {result}");
             }
             else
             {
@@ -479,11 +476,11 @@ namespace LeapInternal
         {
             UInt64 size = GetInterpolatedFrameSize(time, device);
             IntPtr trackingBuffer = Marshal.AllocHGlobal((Int32)size);
+
             eLeapRS result;
 
             if (device != null)
             {
-                
                 result = LeapC.InterpolateFrameFromTimeEx(_leapConnection, device.Handle, time, sourceTime, trackingBuffer, size);
             }
             else
