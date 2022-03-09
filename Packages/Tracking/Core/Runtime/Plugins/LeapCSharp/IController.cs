@@ -15,7 +15,7 @@ namespace Leap
     {
         Frame Frame(int history = 0);
         Frame GetTransformedFrame(LeapTransform trs, int history = 0);
-        Frame GetInterpolatedFrame(Int64 time);
+        Frame GetInterpolatedFrame(Int64 time, Device device = null);
 
         void SetPolicy(Controller.PolicyFlag policy);
         void ClearPolicy(Controller.PolicyFlag policy);
