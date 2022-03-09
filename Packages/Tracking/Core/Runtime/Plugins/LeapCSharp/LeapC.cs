@@ -648,7 +648,7 @@ namespace LeapInternal
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public struct LEAP_TRACKING_EVENT
+    public struct LEAP_TRACKING_EVENT 
     {
         public LEAP_FRAME_HEADER info;
         public Int64 tracking_id;
@@ -906,6 +906,13 @@ namespace LeapInternal
         public IntPtr message; //char*
     }
 
+    //[StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Ansi)]
+    //public struct LEAP_LOG_EVENTS
+    //{
+    //    public UInt32 nEvents;
+    //    public IntPtr pEvents; //Array of LEAP_LOG_EVENTs
+    //}
+
     [StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Ansi)]
     public struct LEAP_POLICY_EVENT
     {
@@ -1101,6 +1108,24 @@ namespace LeapInternal
         [DllImport("LeapC", EntryPoint = "LeapRectilinearToPixelEx")]
         public static extern LEAP_VECTOR LeapRectilinearToPixelEx(IntPtr hConnection,
           IntPtr hDevice, eLeapPerspectiveType camera, eLeapCameraCalibrationType calibrationType, LEAP_VECTOR rectilinear);
+
+        //[DllImport("LeapC", EntryPoint = "LeapCameraMatrix")]
+        //public static extern LEAP_VECTOR CameraMatrix(IntPtr hConnection, eLeapPerspectiveType camera, LEAP_MATRIX_3x3 matrix);
+
+        //[DllImport("LeapC", EntryPoint = "LeapCameraMatrixEx")]
+        //public static extern LEAP_VECTOR CameraMatrixEx(IntPtr hConnection, IntPtr hDevice, eLeapPerspectiveType camera, LEAP_MATRIX_3x3 matrix);
+
+        //[DllImport("LeapC", EntryPoint = "LeapExtrinsicCameraMatrix")]
+        //public static extern LEAP_VECTOR CameraExtrinsicMatrix(IntPtr hConnection, eLeapPerspectiveType camera, ...);
+
+        //[DllImport("LeapC", EntryPoint = "LeapExtrinsicCameraMatrixEx")]
+        //public static extern LEAP_VECTOR CameraExtrinsicMatrixEx(IntPtr hConnection, IntPtr hDevice, eLeapPerspectiveType camera, ...);
+
+        //[DllImport("LeapC", EntryPoint = "LeapDistortionCoeffs")]
+        //public static extern LEAP_VECTOR DistortionCoeffs(IntPtr hConnection, eLeapPerspectiveType camera, ...);
+
+        //[DllImport("LeapC", EntryPoint = "LeapDistortionCoeffsEx")]
+        //public static extern LEAP_VECTOR DistortionCoeffsEx(IntPtr hConnection, IntPtr hDevice, eLeapPerspectiveType camera, ...);
 
         [DllImport("LeapC", EntryPoint = "LeapCloseDevice")]
         public static extern void CloseDevice(IntPtr pDevice);

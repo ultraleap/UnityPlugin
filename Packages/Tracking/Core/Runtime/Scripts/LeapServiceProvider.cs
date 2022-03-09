@@ -939,7 +939,8 @@ namespace Leap.Unity
                 {
                     _currentDevice = d;
                 };
-            }
+             }
+
 
             if (_leapController.IsConnected)
             {
