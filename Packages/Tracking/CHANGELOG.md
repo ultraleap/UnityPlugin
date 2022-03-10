@@ -6,10 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [docs-website]: https://docs.ultraleap.com/ "Ultraleap Docs"
 
-
-## [5.4.0] 
+## [5.5.0] 
 
 ### Added
+- Hand Binder Scale feature, uniformly scale the 3D model model up or down based on the ratio between the leap data and the 3D model. This will require a rebind to calculate the correct scale.
 
 ### Changed
 - Serial numbers for 'multiple device mode' = 'Specific' can be chosen from a drop down list in the inspector instead of a text field. Using Device indices is no longer supported.
