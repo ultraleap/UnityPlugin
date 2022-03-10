@@ -126,7 +126,6 @@ namespace Leap.Unity.HandsModule
 
                 //Set the size of the window equal to the size of the hand texture
                 var handTexture = Resources.Load<Texture>("EditorHand");
-                window.minSize = new Vector2(handTexture.width, 900);
             }
             EditorGUILayout.Space();
         }
