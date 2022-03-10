@@ -1,20 +1,50 @@
+/******************************************************************************
+ * Copyright (C) Ultraleap, Inc. 2011-2021.                                   *
+ *                                                                            *
+ * Use subject to the terms of the Apache License 2.0 available at            *
+ * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
+ * between Ultraleap and you, your company or other organization.             *
+ ******************************************************************************/
+
 using System.Collections.Generic;
 using Leap;
 using Leap.Unity;
-//using NaughtyAttributes;
 using UnityEngine;
 
+/// <summary>
+/// infers a body position from .. including predicted shoulder positions and stable pinch position.
+/// Used by the 'FarFieldDirection', 
+/// and requires a 'RotationDeadzone' component on the same script.
+/// </summary>
 [RequireComponent(typeof(RotationDeadzone))]
 public class InferredBodyPositions : MonoBehaviour
 {
+    /// <summary>
+    /// should the NeckRotation be used to predict shoulder positions?
+    /// </summary>
     public bool useNeckPositionForShoulders = true;
-    public RotationDeadzone neckYawDeadzone;
+    /// <summary>
+    /// use a deadzone for a neck's y-rotation
+    /// </summary>
     public bool useNeckYawDeadzone = true;
+    /// <summary>
+    /// the shoulder offset from the neck
+    /// </summary>
     public float shoulderOffset = 0.1f;
+    /// <summary>
+    /// the neck offset from the head
+    /// </summary>
     public float neckOffset = -0.1f;
+    /// <summary>
+    /// blend between the NeckPositionLocalOffset and the NeckPositionWorldOffset
+    /// </summary>
     [Range(0.01f, 1)] public float WorldLocalNeckPositionBlend = 0.5f;
+    /// <summary>
+    /// how quickly to update the neck rotation
+    /// </summary>
     [Range(0.01f, 30)] public float NeckRotationLerpSpeed = 22;
 
+    // Debug gizmo settings
     public bool drawDebugGizmos = true;
     public float gizmoRadius = 0.05f;
     public bool drawRawHead = true;
@@ -25,19 +55,44 @@ public class InferredBodyPositions : MonoBehaviour
     public bool drawDeadzonedShoulders = true;
     public bool drawPinchPositions = true;
 
+    private RotationDeadzone neckYawDeadzone;
     private Transform head;
     private Transform transformHelper;
 
     //Inferred Body Positions
 
+    /// <summary>
+    /// Inferred Neck position
+    /// </summary>
     public Vector3 NeckPosition { get; private set; }
+    /// <summary>
+    /// Inferred local offset of the neck position (relative to head)
+    /// </summary>
     public Vector3 NeckPositionLocalOffset { get; private set; }
+    /// <summary>
+    /// Inferred world offset of the neck position (relative to head)
+    /// </summary>
     public Vector3 NeckPositionWorldOffset { get; private set; }
+    /// <summary>
+    /// Inferred neck rotation
+    /// </summary>
     public Quaternion NeckRotation { get; private set; }
 
+    /// <summary>
+    /// Inferrerd shoulder position
+    /// </summary>
     public Vector3[] ShoulderPositions { get; private set; }
+    /// <summary>
+    /// Inferred recentred shoulder position
+    /// </summary>
     public Vector3[] ShoulderPositionsRecentred { get; private set; }
+    /// <summary>
+    /// Inferred shoulder position offset (relative to head)
+    /// </summary>
     public Vector3[] ShoulderPositionsHeadOffset { get; private set; }
+    /// <summary>
+    /// Inferred Stable pinch position. Can be used instead of the normal pinch position
+    /// </summary>
     public Vector3[] StablePinchPosition { get; private set; }
 
     private void Start()

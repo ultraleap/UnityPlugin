@@ -1,11 +1,17 @@
-﻿using System;
-using UnityEngine.InputSystem;
-using UnityEngine.InputSystem.Controls;
-using UnityEngine.InputSystem.XR;
-using UnityEngine.XR.Interaction.Toolkit.Inputs;
-using Leap.Unity;
+﻿/******************************************************************************
+ * Copyright (C) Ultraleap, Inc. 2011-2021.                                   *
+ *                                                                            *
+ * Use subject to the terms of the Apache License 2.0 available at            *
+ * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
+ * between Ultraleap and you, your company or other organization.             *
+ ******************************************************************************/
 
-namespace UnityEngine.XR.Interaction.Toolkit
+using UnityEngine.XR.Interaction.Toolkit;
+using UnityEngine.XR;
+using Leap.Unity;
+using UnityEngine;
+
+namespace Leap.Unity.Preview.XRInteractionToolkit
 {
     /// <summary>
     /// Integrating hand tracking into the XR Interaction Engine.
