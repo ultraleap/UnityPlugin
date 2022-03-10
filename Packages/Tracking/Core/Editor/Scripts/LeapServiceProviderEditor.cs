@@ -40,6 +40,8 @@ namespace Leap.Unity
         private LeapServiceProvider _leapServiceProvider;
         private Controller _leapController;
 
+        private List<string> _serialNumbers;
+        private int _chosenDeviceIndex;
 
         protected override void OnEnable()
         {
@@ -62,6 +64,8 @@ namespace Leap.Unity
             specifyConditionalDrawing("_multipleDeviceMode",
                           (int)LeapServiceProvider.MultipleDeviceMode.Specific,
                           "_specificSerialNumber");
+
+            specifyCustomDrawer("_specificSerialNumber", drawSerialNumberToggle);
 
             deferProperty("_serverNameSpace");
             deferProperty("_workerThreadProfiling");
@@ -99,6 +103,32 @@ namespace Leap.Unity
 
             EditorGUILayout.HelpBox(warningText, MessageType.Warning);
         }
+
+        private void drawSerialNumberToggle(SerializedProperty property)
+        {
+            if (LeapController != null)
+            {
+                if (SerialNumbers.Count == 0)
+                {
+                    EditorGUILayout.HelpBox("There are no devices connected. Connect a device to use the Multiple Device Mode 'Specific'", MessageType.Warning);
+                    return;
+                }
+
+                if (!Application.isPlaying)
+                {
+                    _chosenDeviceIndex = SerialNumbers.IndexOf(property.stringValue);
+                    if (_chosenDeviceIndex == -1 || _chosenDeviceIndex > SerialNumbers.Count) _chosenDeviceIndex = 0;
+
+                    _chosenDeviceIndex = EditorGUILayout.Popup("Specific Serial Number", _chosenDeviceIndex, SerialNumbers.ToArray());
+                    property.stringValue = SerialNumbers[_chosenDeviceIndex];
+                }
+                else
+                {
+                    EditorGUILayout.PropertyField(property);
+                }
+            }
+        }
+
 
         public override void OnInspectorGUI()
         {
@@ -205,13 +235,47 @@ namespace Leap.Unity
 
                     if (this._leapController != null)
                     {
-                        this._leapController.Device += _leapController_DeviceChanged;
-                        this._leapController.DeviceLost += _leapController_DeviceChanged;
+                        this._leapController.Device += _leapController_DeviceAdded;
+                        this._leapController.DeviceLost += _leapController_DeviceLost;
                     }
 
                     return this._leapController;
                 }
             }
+        }
+
+        private List<string> SerialNumbers
+        {
+            get
+            {
+                if (this._serialNumbers != null)
+                {
+                    return this._serialNumbers;
+                }
+                else
+                {
+                    this._serialNumbers = new List<string>();
+                    List<Device> connectedDevices = LeapController.Devices;
+                    foreach (Device d in connectedDevices)
+                    {
+                        this._serialNumbers.Add(d.SerialNumber);
+                    }
+                    return this._serialNumbers;
+                }
+            }
+        }
+
+
+        private void _leapController_DeviceAdded(object sender, DeviceEventArgs e)
+        {
+            SerialNumbers.Add(e.Device.SerialNumber);
+            _leapController_DeviceChanged(sender, e);
+        }
+
+        private void _leapController_DeviceLost(object sender, DeviceEventArgs e)
+        {
+            SerialNumbers.Remove(e.Device.SerialNumber);
+            _leapController_DeviceChanged(sender, e);
         }
 
         private void _leapController_DeviceChanged(object sender, DeviceEventArgs e)

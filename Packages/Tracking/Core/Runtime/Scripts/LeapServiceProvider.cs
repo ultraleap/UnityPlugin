@@ -173,6 +173,7 @@ namespace Leap.Unity
         /// through this point. Allows a provider to latch onto a device based on
         /// its order of appearance, which corresponds to that device's DeviceID.
         /// </summary>
+        [Obsolete("not used anymore", false)]
         protected uint _numDevicesSeen = 0;
 
         #endregion
@@ -892,12 +893,7 @@ namespace Leap.Unity
             {
                 _onDeviceSafe += (d) =>
                 {
-                    int DeviceID = 0;
-                    _numDevicesSeen++;
-                    if ((int.TryParse(_specificSerialNumber, out DeviceID) &&
-                        _numDevicesSeen == (uint)DeviceID) ||
-                       (_specificSerialNumber.Length > 1 &&
-                        d.SerialNumber.Contains(_specificSerialNumber)))
+                    if (d.SerialNumber.Contains(_specificSerialNumber))
                     {
                         Debug.Log("Connecting to Device with Serial: " + d.SerialNumber);
                         _leapController.SubscribeToDeviceEvents(d);

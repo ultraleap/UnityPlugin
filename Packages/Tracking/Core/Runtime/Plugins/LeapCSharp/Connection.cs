@@ -586,7 +586,13 @@ namespace LeapInternal
 
         private void handleLostDevice(ref LEAP_DEVICE_EVENT deviceMsg)
         {
-            Device lost = _devices.FindDeviceByHandle(deviceMsg.device.handle);
+            IntPtr deviceHandle;
+            eLeapRS result = LeapC.OpenDevice(deviceMsg.device, out deviceHandle);
+            if (result != eLeapRS.eLeapRS_Success)
+                return;
+
+            //UnityEngine.Debug.Log("handleLostDevice: " + deviceHandle);
+            Device lost = _devices.FindDeviceByHandle(deviceHandle);
             if (lost != null)
             {
                 _devices.Remove(lost);
