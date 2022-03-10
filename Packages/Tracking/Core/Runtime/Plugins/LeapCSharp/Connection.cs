@@ -427,30 +427,41 @@ namespace LeapInternal
         }
 
 
-        public UInt64 GetInterpolatedFrameSize(Int64 time)
+        public UInt64 GetInterpolatedFrameSize(Int64 time, Device device = null)
         {
             UInt64 size = 0;
-            eLeapRS result = LeapC.GetFrameSize(_leapConnection, time, out size);
+            eLeapRS result;
+
+            if (device != null)
+            {
+                result = LeapC.GetFrameSizeEx(_leapConnection, device.Handle, time, out size);
+            }
+            else
+            {
+                result = LeapC.GetFrameSize(_leapConnection, time, out size);
+            }
+
             reportAbnormalResults("LeapC get interpolated frame call was ", result);
             return size;
         }
 
+
+
         public void GetInterpolatedFrame(Frame toFill, Int64 time, Device device = null)
         {
-            UInt64 size = GetInterpolatedFrameSize(time);
+            UInt64 size = GetInterpolatedFrameSize(time, device);
             IntPtr trackingBuffer = Marshal.AllocHGlobal((Int32)size);
             eLeapRS result;
 
             if (device != null)
             {
                 result = LeapC.InterpolateFrameEx(_leapConnection, device.Handle, time, trackingBuffer, size);
+                UnityEngine.Debug.Log($"Device {device} result {result}");
             }
             else
             {
                 result = LeapC.InterpolateFrame(_leapConnection, time, trackingBuffer, size);
             }
-
-            UnityEngine.Debug.Log($"Device {device} result {result} time {time}");
 
             reportAbnormalResults("LeapC get interpolated frame call was ", result);
             if (result == eLeapRS.eLeapRS_Success)
@@ -466,13 +477,13 @@ namespace LeapInternal
 
         public void GetInterpolatedFrameFromTime(Frame toFill, Int64 time, Int64 sourceTime, Device device = null)
         {
-            UInt64 size = GetInterpolatedFrameSize(time);
+            UInt64 size = GetInterpolatedFrameSize(time, device);
             IntPtr trackingBuffer = Marshal.AllocHGlobal((Int32)size);
-
             eLeapRS result;
 
             if (device != null)
             {
+                
                 result = LeapC.InterpolateFrameFromTimeEx(_leapConnection, device.Handle, time, sourceTime, trackingBuffer, size);
             }
             else
