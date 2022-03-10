@@ -6,11 +6,11 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using UnityEngine.XR.Interaction.Toolkit;
-using UnityEngine.XR;
 using Leap.Unity;
-using UnityEngine;
 using Leap.Unity.Preview.FarFieldInteractions;
+using UnityEngine;
+using UnityEngine.XR;
+using UnityEngine.XR.Interaction.Toolkit;
 
 namespace Leap.Unity.Preview.XRInteractionToolkit
 {
@@ -96,7 +96,7 @@ namespace Leap.Unity.Preview.XRInteractionToolkit
             // set rotation for the ray if a xr ray interactor is attached
             if (GetComponent<XRRayInteractor>() != null)
             {
-                if(RayOrigin == null) RayOrigin = GetComponent<XRRayInteractor>().rayOriginTransform;
+                if (RayOrigin == null) RayOrigin = GetComponent<XRRayInteractor>().rayOriginTransform;
                 if (RayOrigin != null)
                 {
                     int handIndex = HandModel.Handedness == Chirality.Left ? 0 : 1;
@@ -114,7 +114,7 @@ namespace Leap.Unity.Preview.XRInteractionToolkit
 
 
             controllerState.ResetFrameDependentStates();
-            
+
 
             if (HandModel.GetLeapHand() == null) return;
 
@@ -152,18 +152,18 @@ namespace Leap.Unity.Preview.XRInteractionToolkit
 
                 case InteractionPose.LongGrab:
                     bool longGrab = false;
-                    
-                        if (HandModel.GetLeapHand().GrabStrength > 0.7f && lastGrabState && Time.time - lastGrabTime > lengthGrabPinchTime)
-                            longPinch = true;
 
-                        else if (!(HandModel.GetLeapHand().GrabStrength > 0.7f) && lastGrabState)
-                            lastGrabState = false;
+                    if (HandModel.GetLeapHand().GrabStrength > 0.7f && lastGrabState && Time.time - lastGrabTime > lengthGrabPinchTime)
+                        longPinch = true;
 
-                        else if (HandModel.GetLeapHand().GrabStrength > 0.7f && !lastGrabState)
-                        {
-                            lastGrabState = true;
-                            lastGrabTime = Time.time;
-                        }
+                    else if (!(HandModel.GetLeapHand().GrabStrength > 0.7f) && lastGrabState)
+                        lastGrabState = false;
+
+                    else if (HandModel.GetLeapHand().GrabStrength > 0.7f && !lastGrabState)
+                    {
+                        lastGrabState = true;
+                        lastGrabTime = Time.time;
+                    }
                     return longGrab;
             }
             return false;

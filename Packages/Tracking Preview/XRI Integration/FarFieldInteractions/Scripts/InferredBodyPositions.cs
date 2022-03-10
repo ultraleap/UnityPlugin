@@ -6,9 +6,9 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using System.Collections.Generic;
 using Leap;
 using Leap.Unity;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Leap.Unity.Preview.FarFieldInteractions
