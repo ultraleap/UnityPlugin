@@ -25,20 +25,33 @@ namespace Leap.Unity.HandsModule
         /// <param name="handBinder">The HandBinder that the found Transform target will get assigned to</param>
         public static void AutoBind(HandBinder handBinder)
         {
+            if (handBinder.DefaultHandPose == null || handBinder.DefaultHandPose.Length == 0)
+            {
+                Debug.Log("Default Hand Pose is missing, please restart the hand binding process to ensure the 3D models default pose is recorded");
+                return;
+            }
 
             handBinder.ResetHand();
             BoneNameDefinitions boneDefinitions = new BoneNameDefinitions();
 
             //Get all children of the hand
             var children = new List<Transform>();
-            children.Add(handBinder.transform);
-            children.AddRange(GetAllChildren(handBinder.transform));
+
+            //If the user has set the wrist, use that as the root to search for bones
+            var root = handBinder.transform;
+            if (handBinder.BoundHand.wrist.boundTransform != null)
+            {
+                root = handBinder.BoundHand.wrist.boundTransform;
+            }
+
+            children.Add(root);
+            children.AddRange(GetAllChildren(root));
 
             var thumbBones = SortBones(SelectBones(children, boneDefinitions.DefinitionThumb), false, true);
-            var indexBones = SortBones(SelectBones(children, boneDefinitions.DefinitionIndex), handBinder.UseMetaBones);
-            var middleBones = SortBones(SelectBones(children, boneDefinitions.DefinitionMiddle), handBinder.UseMetaBones);
-            var ringBones = SortBones(SelectBones(children, boneDefinitions.DefinitionRing), handBinder.UseMetaBones);
-            var pinkyBones = SortBones(SelectBones(children, boneDefinitions.DefinitionPinky), handBinder.UseMetaBones);
+            var indexBones = SortBones(SelectBones(children, boneDefinitions.DefinitionIndex));
+            var middleBones = SortBones(SelectBones(children, boneDefinitions.DefinitionMiddle));
+            var ringBones = SortBones(SelectBones(children, boneDefinitions.DefinitionRing));
+            var pinkyBones = SortBones(SelectBones(children, boneDefinitions.DefinitionPinky));
             var wrist = SelectBones(children, boneDefinitions.DefinitionWrist).FirstOrDefault();
             var elbow = SelectBones(children, boneDefinitions.DefinitionElbow).FirstOrDefault();
 
@@ -47,6 +60,7 @@ namespace Leap.Unity.HandsModule
             handBinder.BoundHand.fingers[2].boundBones = AssignTransformToBoundBone(middleBones);
             handBinder.BoundHand.fingers[3].boundBones = AssignTransformToBoundBone(ringBones);
             handBinder.BoundHand.fingers[4].boundBones = AssignTransformToBoundBone(pinkyBones);
+
             handBinder.BoundHand.wrist = AssignBoundBone(wrist);
             handBinder.BoundHand.elbow = AssignBoundBone(elbow);
 
@@ -55,13 +69,50 @@ namespace Leap.Unity.HandsModule
                 handBinder.ElbowLength = (wrist.position - elbow.position).magnitude;
             }
 
+            BindHand(handBinder);
+        }
+
+        /// <summary>
+        /// Using the bound transforms, run the hand binding process to calculate rotation offsets and scale
+        /// </summary>
+        /// <param name="handBinder"></param>
+        public static void BindHand(HandBinder handBinder)
+        {
+            handBinder.ResetHand();
+            UpdateBoundBones(handBinder);
+            CalculateFingerTipLengths(handBinder);
             EstimateWristRotationOffset(handBinder);
             CalculateElbowLength(handBinder);
+            CalculateHandSize(handBinder.BoundHand);
+            handBinder.BoundHand.startScale = handBinder.transform.localScale;
 
             handBinder.GetLeapHand();
             handBinder.UpdateHand();
             handBinder.DebugModelTransforms = true;
+            handBinder.SetModelScale = true;
+            handBinder.UseMetaBones = true;
             handBinder.SetEditorPose = true;
+        }
+
+        //Update all the bound bone bindings
+        static void UpdateBoundBones(HandBinder handBinder)
+        {
+            //Reset the hand back to its bound pose
+            handBinder.ResetHand();
+
+            //Now loop though all the bones and make sure the binding is correctly configured
+            for (int FINGERID = 0; FINGERID < handBinder.BoundHand.fingers.Length; FINGERID++)
+            {
+                for (int BONEID = 0; BONEID < handBinder.BoundHand.fingers[FINGERID].boundBones.Length; BONEID++)
+                {
+                    //Update the binding
+                    var BONE = handBinder.BoundHand.fingers[FINGERID].boundBones[BONEID];
+                    handBinder.BoundHand.fingers[FINGERID].boundBones[BONEID] = AssignBoundBone(BONE.boundTransform);
+                }
+            }
+
+            handBinder.BoundHand.wrist = AssignBoundBone(handBinder.BoundHand.wrist.boundTransform);
+            handBinder.BoundHand.elbow = AssignBoundBone(handBinder.BoundHand.elbow.boundTransform);
         }
 
         /// <summary>
@@ -200,9 +251,12 @@ namespace Leap.Unity.HandsModule
             if (transform != null)
             {
                 newBone.boundTransform = transform;
-                newBone.startTransform = new TransformStore();
-                newBone.startTransform.position = transform.localPosition;
-                newBone.startTransform.rotation = transform.localRotation.eulerAngles;
+                newBone.startTransform = new TransformStore()
+                {
+                    position = transform.localPosition,
+                    rotation = transform.localRotation.eulerAngles,
+                    scale = transform.localScale
+                };
             }
             return newBone;
         }
@@ -230,11 +284,17 @@ namespace Leap.Unity.HandsModule
                     right = -right;
                 }
                 var up = Vector3.Cross(forward, right);
+
                 Vector3.OrthoNormalize(ref up, ref forward, ref right);
                 var modelRotation = Quaternion.LookRotation(forward, up);
 
+                var roundedRotationOffset = (Quaternion.Inverse(modelRotation) * wrist.transform.rotation).eulerAngles;
+                roundedRotationOffset.x = Mathf.Round(roundedRotationOffset.x / 90) * 90;
+                roundedRotationOffset.y = Mathf.Round(roundedRotationOffset.y / 90) * 90;
+                roundedRotationOffset.z = Mathf.Round(roundedRotationOffset.z / 90) * 90;
+
                 //Calculate the difference between the Calculated hand basis and the wrists rotation
-                handBinder.WristRotationOffset = (Quaternion.Inverse(modelRotation) * wrist.transform.rotation).eulerAngles;
+                handBinder.WristRotationOffset = roundedRotationOffset;
                 //Assuming the fingers have been created using the same rotation axis as the wrist
                 handBinder.GlobalFingerRotationOffset = handBinder.WristRotationOffset;
             }
@@ -247,5 +307,52 @@ namespace Leap.Unity.HandsModule
                 handBinder.ElbowLength = (handBinder.BoundHand.wrist.boundTransform.position - handBinder.BoundHand.elbow.boundTransform.position).magnitude;
             }
         }
+
+        #region Calculate Hand Scale
+
+        static void CalculateHandSize(BoundHand boundHand)
+        {
+            var length = 0f;
+
+            var finger = boundHand.fingers[(int)Finger.FingerType.TYPE_MIDDLE];
+
+            //Loop through the bones and sum up there lengths
+            for (int boneID = 0; boneID < finger.boundBones.Length - 1; boneID++)
+            {
+                var bone = finger.boundBones[boneID];
+                var nextBone = finger.boundBones[boneID + 1];
+
+                if (bone.boundTransform != null && nextBone.boundTransform != null)
+                {
+                    var t = (bone.boundTransform.position - nextBone.boundTransform.position).magnitude;
+                    length += t;
+                }
+            }
+
+            //Reset the scale offset to 1
+            boundHand.baseScale = length;
+        }
+
+        static void CalculateFingerTipLengths(HandBinder handBinder)
+        {
+            for (int i = 0; i < handBinder.BoundHand.fingers.Length; i++)
+            {
+                var finger = handBinder.BoundHand.fingers[i];
+                var lastBone = finger.boundBones.LastOrDefault().boundTransform;
+                var previousBone = finger.boundBones[(int)Bone.BoneType.TYPE_INTERMEDIATE].boundTransform;
+
+                if (lastBone != null)
+                {
+                    if (previousBone != null)
+                    {
+                        finger.fingerTipBaseLength = (lastBone.position - previousBone.position).magnitude;
+                    }
+                }
+            }
+        }
+
+
+
+        #endregion
     }
 }
