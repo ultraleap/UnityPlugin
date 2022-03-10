@@ -10,6 +10,7 @@ using UnityEngine.XR.Interaction.Toolkit;
 using UnityEngine.XR;
 using Leap.Unity;
 using UnityEngine;
+using Leap.Unity.Preview.FarFieldInteractions;
 
 namespace Leap.Unity.Preview.XRInteractionToolkit
 {
