@@ -1,6 +1,7 @@
 using JetBrains.Annotations;
 using System;
 using System.Runtime.InteropServices;
+using UnityEditor.XR.OpenXR;
 using UnityEngine;
 using UnityEngine.XR.OpenXR;
 using UnityEngine.XR.OpenXR.Features;
@@ -72,6 +73,11 @@ namespace Ultraleap.Tracking.OpenXR
                 [Out, NotNull, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 4)]
                 HandJointLocation[] joints,
                 uint jointCount);
+
+            [DllImport(NativeDLL, EntryPoint = NativePrefix + "XrResultToString", ExactSpelling = true)]
+            private static extern IntPtr XrResultToString(int result);
+
+            internal static string ResultToString(int result) => Marshal.PtrToStringAnsi(XrResultToString(result));
         }
 
         protected override IntPtr HookGetInstanceProcAddr(IntPtr func) => Native.HookGetInstanceProcAddr(func);
@@ -100,28 +106,30 @@ namespace Ultraleap.Tracking.OpenXR
 
         protected override void OnSubsystemStart()
         {
-            if (Native.CreateHandTrackers() < 0)
+            int result = Native.CreateHandTrackers();
+            if (result < 0)
             {
-                Debug.LogError("Failed to create hand-trackers");
+                Debug.LogError($"Failed to create hand-trackers: {Native.ResultToString(result)}");
             }
         }
 
         protected override void OnSubsystemStop()
         {
-            if (Native.DestroyHandTrackers() < 0)
+            int result = Native.DestroyHandTrackers();
+            if (result < 0)
             {
-                Debug.LogError("Failed to destroy hand-trackers");
+                Debug.LogError($"Failed to destroy hand-trackers: {Native.ResultToString(result)}");
             }
         }
 
         internal bool LocateHandJoints(Handedness handedness, FrameTime frameTime, HandJointLocation[] handJointLocations)
         {
-            if (Native.LocateHandJoints(handedness, frameTime, out uint isActive, handJointLocations, (uint)handJointLocations.Length) < 0)
+            int result = Native.LocateHandJoints(handedness, frameTime, out uint isActive, handJointLocations, (uint)handJointLocations.Length);
+            if(result < 0)
             {
-                Debug.LogError("Failed to locate hand-joints");
+                Debug.LogError($"Failed to locate hand-joints: {Native.ResultToString(result)}");
                 return false;
             }
-
             return Convert.ToBoolean(isActive);
         }
 
