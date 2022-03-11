@@ -10,18 +10,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Hand Binder Scale feature, uniformly scale the 3D model model up or down based on the ratio between the leap data and the 3D model. This will require a rebind to calculate the correct scale.
+- tracking service version check for multiple device mode. Warning appears if trying to select the 'specific' multi device mode in a service version < 5.3.6
 
 ### Changed
 - Serial numbers for 'multiple device mode' = 'Specific' can be chosen from a drop down list in the inspector instead of a text field. Using Device indices is no longer supported.
 
 ### Removed
+- x86 LeapC.dll
 
 ### Fixed
+- Dynamic UI scene - blocks sometimes did not expand when undocked
+-	Capsule hands appear small compared to size of 'IR hands' of user using HDRP / URP and do not line up. Using standard rendering on Unity 2019.4 LTS  hands are usually not visible (but are being tracked). When they appear they do not line up with the hands in the image.
 
 ### Known issues
 -	Scenes containing the infrared viewer render incorrectly on systems using single pass stereo with the XR plugin system - e.g. Windows Mixed Reality headsets. SteamVR headsets may also default to single pass stereo, showing the same issue. However in this case, the OpenVR settings can be changed to multipass which resolves the problem.
 -	Demo scenes do not start at the correct height for a seated user. The XR Plugin Management System adjusts the camera height. This means the user has to adjust components in the scene to the correct height - e.g. camera height. Currently our position is to support the legacy XR system height settings.
--	Capsule hands appear small compared to size of 'IR hands' of user using HDRP / URP and do not line up. Using standard rendering on Unity 2019.4 LTS  hands are usually not visible (but are being tracked). When they appear they do not line up with the hands in the image.
 - Possible hand offset issues on XR2 headsets using SVR plugin
 - Hands in Desktop scenes can appear far away from the camera
 - Interactions callback scene allows blocks to be moved without doing a grasp pose.
