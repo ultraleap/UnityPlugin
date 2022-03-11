@@ -1,7 +1,6 @@
 using JetBrains.Annotations;
 using System;
 using System.Runtime.InteropServices;
-using UnityEditor.XR.OpenXR;
 using UnityEngine;
 using UnityEngine.XR.OpenXR;
 using UnityEngine.XR.OpenXR.Features;
