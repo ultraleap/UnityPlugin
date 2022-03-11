@@ -113,7 +113,7 @@ namespace Leap.Unity
             if (LeapController.IsConnected && !LeapController.CheckRequiredServiceVersion(minimumServiceVersion) && property.enumValueIndex == (int)LeapServiceProvider.MultipleDeviceMode.Specific)
             {
                 property.enumValueIndex = (int)LeapServiceProvider.MultipleDeviceMode.Disabled;
-                Debug.LogWarning("Your current tracking service does not support 'Multiple Device Mode' = 'Specific' (min version is 5.3.6). Please update your service: https://developer.leapmotion.com/tracking-software-download");
+                Debug.LogWarning(String.Format("Your current tracking service does not support 'Multiple Device Mode' = 'Specific' (min version is {0}.{1}.{2}). Please update your service: https://developer.leapmotion.com/tracking-software-download", minimumServiceVersion.major, minimumServiceVersion.minor, minimumServiceVersion.patch));
             }
 
             EditorGUILayout.PropertyField(property);

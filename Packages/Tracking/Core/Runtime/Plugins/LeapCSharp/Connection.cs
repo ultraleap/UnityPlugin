@@ -245,6 +245,11 @@ namespace LeapInternal
             _polster.Join();
         }
 
+        /// <summary>
+        /// Returns the version of the currently installed Tracking Service. 
+        /// Might return 0.0.0 if no device is connected or it cannot get the current version.
+        /// </summary>
+        /// <returns>the current tracking service version</returns>
         public LEAP_VERSION GetCurrentServiceVersion()
         {
             LEAP_VERSION currentVersion = new LEAP_VERSION { major = 0, minor = 0, patch = 0 };
