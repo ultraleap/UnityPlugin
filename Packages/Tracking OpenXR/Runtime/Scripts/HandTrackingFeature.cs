@@ -1,6 +1,7 @@
 using JetBrains.Annotations;
 using System;
 using System.Runtime.InteropServices;
+using UnityEditor.XR.OpenXR;
 using UnityEngine;
 using UnityEngine.XR.OpenXR;
 using UnityEngine.XR.OpenXR.Features;
@@ -25,7 +26,7 @@ namespace Ultraleap.Tracking.OpenXR
         Category = FeatureCategory.Feature,
         Required = false,
         OpenxrExtensionStrings = "XR_EXT_hand_tracking",
-        BuildTargetGroups = new[] { BuildTargetGroup.Standalone, BuildTargetGroup.Android }
+        BuildTargetGroups = new[] {BuildTargetGroup.Standalone, BuildTargetGroup.Android}
     )]
 #endif
     public class HandTrackingFeature : OpenXRFeature
@@ -36,17 +37,6 @@ namespace Ultraleap.Tracking.OpenXR
         {
             private const string NativeDLL = "UltraleapOpenXRUnity";
             private const string NativePrefix = "Unity_HandTrackingFeature_";
-
-            [StructLayout(LayoutKind.Sequential, Pack = 8)]
-            internal readonly struct Result
-            {
-                public bool Succeeded => _result >= 0;
-                public bool Failed => _result < 0;
-                [CanBeNull] public string Message => _message;
-
-                private readonly int _result;
-                [MarshalAs(UnmanagedType.LPStr)] private readonly string _message;
-            }
 
             [DllImport(NativeDLL, EntryPoint = NativePrefix + "HookGetInstanceProcAddr", ExactSpelling = true)]
             internal static extern IntPtr HookGetInstanceProcAddr(IntPtr func);
@@ -70,19 +60,24 @@ namespace Ultraleap.Tracking.OpenXR
             internal static extern void OnAppSpaceChange(ulong xrSpace);
 
             [DllImport(NativeDLL, EntryPoint = NativePrefix + "CreateHandTrackers", ExactSpelling = true)]
-            internal static extern Result CreateHandTrackers();
+            internal static extern int CreateHandTrackers();
 
             [DllImport(NativeDLL, EntryPoint = NativePrefix + "DestroyHandTrackers", ExactSpelling = true)]
-            internal static extern Result DestroyHandTrackers();
+            internal static extern int DestroyHandTrackers();
 
             [DllImport(NativeDLL, EntryPoint = NativePrefix + "LocateHandJoints", ExactSpelling = true)]
-            internal static extern Result LocateHandJoints(
+            internal static extern int LocateHandJoints(
                 Handedness chirality,
                 FrameTime frameTime,
                 out uint isActive,
                 [Out, NotNull, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 4)]
                 HandJointLocation[] joints,
                 uint jointCount);
+
+            [DllImport(NativeDLL, EntryPoint = NativePrefix + "XrResultToString", ExactSpelling = true)]
+            private static extern IntPtr XrResultToString(int result);
+
+            internal static string ResultToString(int result) => Marshal.PtrToStringAnsi(XrResultToString(result));
         }
 
         protected override IntPtr HookGetInstanceProcAddr(IntPtr func) => Native.HookGetInstanceProcAddr(func);
@@ -111,32 +106,35 @@ namespace Ultraleap.Tracking.OpenXR
 
         protected override void OnSubsystemStart()
         {
-            Native.Result result = Native.CreateHandTrackers();
-            if (result.Failed)
+            int result = Native.CreateHandTrackers();
+            if (IsResultFailure(result))
             {
-                Debug.LogError(result.Message);
+                Debug.LogError($"Failed to create hand-trackers: {Native.ResultToString(result)}");
             }
         }
 
         protected override void OnSubsystemStop()
         {
-            Native.Result result = Native.DestroyHandTrackers();
-            if (result.Failed)
+            int result = Native.DestroyHandTrackers();
+            if (IsResultFailure(result))
             {
-                Debug.LogError(result.Message);
+                Debug.LogError($"Failed to destroy hand-trackers: {Native.ResultToString(result)}");
             }
         }
 
         internal bool LocateHandJoints(Handedness handedness, FrameTime frameTime, HandJointLocation[] handJointLocations)
         {
-            Native.Result result = Native.LocateHandJoints(handedness, frameTime, out uint isActive, handJointLocations, (uint)handJointLocations.Length);
-            if (result.Failed)
+            int result = Native.LocateHandJoints(handedness, frameTime, out uint isActive, handJointLocations, (uint)handJointLocations.Length);
+            if (IsResultFailure(result))
             {
-                Debug.LogError(result.Message);
+                Debug.LogError($"Failed to locate hand-joints: {Native.ResultToString(result)}");
+                return false;
             }
-
-            return result.Succeeded && Convert.ToBoolean(isActive);
+            return Convert.ToBoolean(isActive);
         }
+
+        // All OpenXR error codes are negative.
+        private static bool IsResultFailure(int result) => result < 0;
 
 #if UNITY_EDITOR
         protected override void GetValidationChecks(List<ValidationRule> rules, BuildTargetGroup targetGroup)
