@@ -107,7 +107,7 @@ namespace Ultraleap.Tracking.OpenXR
         protected override void OnSubsystemStart()
         {
             int result = Native.CreateHandTrackers();
-            if (result < 0)
+            if (IsResultFailure(result))
             {
                 Debug.LogError($"Failed to create hand-trackers: {Native.ResultToString(result)}");
             }
@@ -116,7 +116,7 @@ namespace Ultraleap.Tracking.OpenXR
         protected override void OnSubsystemStop()
         {
             int result = Native.DestroyHandTrackers();
-            if (result < 0)
+            if (IsResultFailure(result))
             {
                 Debug.LogError($"Failed to destroy hand-trackers: {Native.ResultToString(result)}");
             }
@@ -125,13 +125,16 @@ namespace Ultraleap.Tracking.OpenXR
         internal bool LocateHandJoints(Handedness handedness, FrameTime frameTime, HandJointLocation[] handJointLocations)
         {
             int result = Native.LocateHandJoints(handedness, frameTime, out uint isActive, handJointLocations, (uint)handJointLocations.Length);
-            if (result < 0)
+            if (IsResultFailure(result))
             {
                 Debug.LogError($"Failed to locate hand-joints: {Native.ResultToString(result)}");
                 return false;
             }
             return Convert.ToBoolean(isActive);
         }
+
+        // All OpenXR error codes are negative.
+        private static bool IsResultFailure(int result) => result < 0;
 
 #if UNITY_EDITOR
         protected override void GetValidationChecks(List<ValidationRule> rules, BuildTargetGroup targetGroup)
