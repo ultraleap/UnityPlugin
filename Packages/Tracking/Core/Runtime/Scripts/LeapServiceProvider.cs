@@ -894,7 +894,7 @@ namespace Leap.Unity
             {
                 _onDeviceSafe += (d) =>
                 {
-                    if (d.SerialNumber.Contains(_specificSerialNumber))
+                    if (d.SerialNumber.Contains(_specificSerialNumber) && _leapController != null)
                     {
                         Debug.Log("Connecting to Device with Serial: " + d.SerialNumber);
                         _leapController.SubscribeToDeviceEvents(d);
