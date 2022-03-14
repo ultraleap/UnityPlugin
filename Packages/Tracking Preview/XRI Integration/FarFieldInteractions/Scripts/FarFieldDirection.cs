@@ -89,6 +89,11 @@ namespace Leap.Unity.Preview.FarFieldInteractions
         public Vector3 elbowOffset = Vector3.zero;
 
         /// <summary>
+        /// The one Euro Filter reduces jitter and increases stability
+        /// </summary>
+        public bool useOneEuroFilter = true;
+
+        /// <summary>
         /// the wrist offset is only used when the rayOrigin is the wrist or wristShoulderLerp and 
         /// specifies a position offset
         /// </summary>
@@ -121,8 +126,23 @@ namespace Leap.Unity.Preview.FarFieldInteractions
         /// </summary>
         [HideInInspector] public FarFieldHandDirection[] FarFieldRays = new FarFieldHandDirection[2];
 
-        InferredBodyPositions inferredBodyPositions;
+        private InferredBodyPositions inferredBodyPositions;
         private Transform transformHelper;
+        private OneEuroFilter<Vector3>[] aimPositionFilters;
+        private OneEuroFilter<Vector3>[] rayOriginFilters;
+
+        // Debug filters used in case we need to output a value which isn't currently being filtered.
+        // E.g. if we want to compare a different aim position to the one being used
+        private OneEuroFilter<Vector3>[] debugAimPositionFilters;
+        /// <summary>
+        /// parameter beta for the one euro filter (see https://cristal.univ-lille.fr/~casiez/1euro/)
+        /// </summary>
+        public float oneEuroBeta = 100;
+        /// <summary>
+        /// parameter minCutoff for the one euro filter (see https://cristal.univ-lille.fr/~casiez/1euro/)
+        /// </summary>
+        public float oneEuroMinCutoff = 0.4f;
+        private readonly float oneEurofreq = 30;
 
         // Start is called before the first frame update
         void Start()
@@ -134,6 +154,10 @@ namespace Leap.Unity.Preview.FarFieldInteractions
             {
                 inferredBodyPositions = GetComponent<InferredBodyPositions>();
             }
+
+            aimPositionFilters = new OneEuroFilter<Vector3>[2] { new OneEuroFilter<Vector3>(oneEurofreq), new OneEuroFilter<Vector3>(oneEurofreq) };
+            debugAimPositionFilters = new OneEuroFilter<Vector3>[2] { new OneEuroFilter<Vector3>(oneEurofreq), new OneEuroFilter<Vector3>(oneEurofreq) };
+            rayOriginFilters = new OneEuroFilter<Vector3>[2] { new OneEuroFilter<Vector3>(oneEurofreq), new OneEuroFilter<Vector3>(oneEurofreq) };
         }
 
         // Update is called once per frame
@@ -181,6 +205,13 @@ namespace Leap.Unity.Preview.FarFieldInteractions
                 //Filtering using the One Euro filter reduces jitter from both positions
                 FarFieldRays[i].AimPosition = GetAimPosition(HandShoulders[i]);
                 FarFieldRays[i].RayOrigin = FarFieldRays[i].RayOriginRaw;
+
+                if (useOneEuroFilter)
+                {
+                    //Filtering using the One Euro filter reduces jitter from both positions
+                    FarFieldRays[i].AimPosition = aimPositionFilters[i].Filter(GetAimPosition(HandShoulders[i]), Time.time);
+                    FarFieldRays[i].RayOrigin = rayOriginFilters[i].Filter(FarFieldRays[i].RayOriginRaw, Time.time);
+                }
 
                 FarFieldRays[i].Direction = (FarFieldRays[i].AimPosition - FarFieldRays[i].RayOrigin).normalized;
 
