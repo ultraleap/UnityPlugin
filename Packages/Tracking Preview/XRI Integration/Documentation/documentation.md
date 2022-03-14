@@ -43,7 +43,7 @@ The following is a short step-by-step on how you could set up a simple example s
 - Add a floor plane and a cube to the scene and adjust the cube’s position and scale
 - Attach the ‘XR Grab Interactable’ script to the cube. This allows any interactors that you add later (ie. Controllers or Hands) to interact with the cube. This also automatically adds a Rigidbody to the cube if it doesn’t have one already.
 
-![Add Interactable Script](Images/AddInteractableScript.png)
+![Add Interactable Script](Images/addInteractableScript.png)
 
 - Optionally you can now add tracked Controllers to the scene. Skip this step if you want to use hand tracking interactions without any controllers. 
 Add Ray Interactors or Direct Interactors using Controllers by going to the hierarchy and clicking on the Plus → XR and then choosing any interactors from that list.
