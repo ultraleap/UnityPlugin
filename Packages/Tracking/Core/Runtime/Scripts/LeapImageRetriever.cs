@@ -47,8 +47,8 @@ namespace Leap.Unity
         private bool _needQueueReset;
 
         //Rigel tracking cameras produce debug info in the image output, enable this to hide it.
-        [SerializeField] private bool _hideLeapDebugInfo = false;
-        public bool HideRigelDebug { get { return _hideLeapDebugInfo; } set { _hideLeapDebugInfo = value; } }
+        [field: SerializeField]
+        public bool HideRigelDebug { get; set; }
 
         // If image IDs from the libtrack server do not reset with the Visualiser, it triggers out-of-sequence
         // checks and we lose images. Detecting this and setting an offset allows us to compensate.
@@ -125,7 +125,7 @@ namespace Leap.Unity
                 Shader.SetGlobalVector(pixelSizeName, new Vector2(1.0f / image.Width, 1.0f / image.Height));
             }
 
-            public void UpdateTexture(Image image, Controller controller)
+            public void UpdateTexture(Image image, Controller controller = null)
             {
                 byte[] data = image.Data(Image.CameraType.LEFT);
                 if (_hideLeapDebugInfo && controller != null)
@@ -291,7 +291,7 @@ namespace Leap.Unity
                 _isStale = false;
             }
 
-            public void UpdateTextures(Image image, Controller controller)
+            public void UpdateTextures(Image image, Controller controller = null)
             {
                 TextureData.UpdateTexture(image, controller);
             }
@@ -370,7 +370,7 @@ namespace Leap.Unity
 
         private void LateUpdate()
         {
-            _eyeTextureData.HideDebugInfo(_hideLeapDebugInfo);
+            _eyeTextureData.HideDebugInfo(HideRigelDebug);
 
             var xrProvider = _provider as LeapXRServiceProvider;
             if (xrProvider != null)
