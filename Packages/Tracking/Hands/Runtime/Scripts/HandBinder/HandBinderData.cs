@@ -139,6 +139,10 @@ namespace Leap.Unity.HandsModule
         public static Hand GenerateLeapHand(this BoundHand boundHand, Hand leapHand, float fingerTipScale = 0.8f)
         {
             if (leapHand == null)
+                return null;
+
+            //Loop through all the fingers of the hand to calculate where the leap data should be in relation to the Bound Hand
+            for (int fingerID = 0; fingerID < leapHand.Fingers.Count; fingerID++)
             {
                 return leapHand;
             }
@@ -257,6 +261,7 @@ namespace Leap.Unity.HandsModule
 
             leapHand.StabilizedPalmPosition = leapHand.PalmPosition;
             leapHand.PalmWidth = (leapHand.GetPinky().bones[1].PrevJoint - leapHand.GetIndex().bones[1].PrevJoint).Magnitude;
+            leapHand.Arm.NextJoint = leapHand.WristPosition;
             return leapHand;
         }
     }
