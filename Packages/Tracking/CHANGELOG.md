@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [docs-website]: https://docs.ultraleap.com/ "Ultraleap Docs"
 
-## [5.5.0] - 15/03/2022
+## [5.5.0] - 17/03/2022
 
 ### Added
 - Hand Binder Scale feature, uniformly scale the 3D model model up or down based on the ratio between the leap data and the 3D model. This will require a rebind to calculate the correct scale.
@@ -31,6 +31,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Interactions callback scene allows blocks to be moved without doing a grasp pose.
 - Interactions object scene platform/stage seems to move a lot
 - Dynamic UI objects throwing backwards most of the time.
+- Wobbly Inertia hands in the Hands Post Process scene
+- The Moving Reference Scene stop button doesn't reset the angle.
 
 
 ## [5.4.0] 
