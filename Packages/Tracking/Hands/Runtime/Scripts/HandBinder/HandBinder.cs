@@ -218,7 +218,7 @@ namespace Leap.Unity.HandsModule
             {
                 transform.localScale = BoundHand.startScale * CalculateRatio();
             }
-            else 
+            else
             {
                 transform.localScale = BoundHand.startScale;
             }
