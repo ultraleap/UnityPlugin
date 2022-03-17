@@ -45,13 +45,4 @@ public class DistortTrackingDataToVisuals : PostProcessProvider
         inputFrame.Hands.Clear();
         inputFrame.Hands = hands;
     }
-
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            passthroughOnly = !passthroughOnly;
-        }
-    }
-
 }
