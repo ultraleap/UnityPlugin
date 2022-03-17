@@ -156,7 +156,8 @@ namespace Leap.Unity
             Specific
         }
 
-        [Tooltip("When set to `All`, provider will receive data from all connected devices.")]
+        [Tooltip("When set to 'Default', provider will receive data from the first connected device. \n" +
+            "When set to `Specific`, provider will receive data from the device specified by 'Specific Serial Number'.")]
         [EditTimeOnly]
         [SerializeField]
         protected MultipleDeviceMode _multipleDeviceMode = MultipleDeviceMode.Disabled;
@@ -173,6 +174,7 @@ namespace Leap.Unity
         /// through this point. Allows a provider to latch onto a device based on
         /// its order of appearance, which corresponds to that device's DeviceID.
         /// </summary>
+        [Obsolete("not used anymore", false)]
         protected uint _numDevicesSeen = 0;
 
         #endregion
@@ -892,12 +894,7 @@ namespace Leap.Unity
             {
                 _onDeviceSafe += (d) =>
                 {
-                    int DeviceID = 0;
-                    _numDevicesSeen++;
-                    if ((int.TryParse(_specificSerialNumber, out DeviceID) &&
-                        _numDevicesSeen == (uint)DeviceID) ||
-                       (_specificSerialNumber.Length > 1 &&
-                        d.SerialNumber.Contains(_specificSerialNumber)))
+                    if (d.SerialNumber.Contains(_specificSerialNumber) && _leapController != null)
                     {
                         Debug.Log("Connecting to Device with Serial: " + d.SerialNumber);
                         _leapController.SubscribeToDeviceEvents(d);

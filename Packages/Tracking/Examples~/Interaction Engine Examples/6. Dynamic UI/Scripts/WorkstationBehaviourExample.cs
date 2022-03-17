@@ -149,8 +149,10 @@ namespace Leap.InteractionEngine.Examples
             _intObj = GetComponent<InteractionBehaviour>();
             _anchObj = GetComponent<AnchorableBehaviour>();
 
+            _intObj.OnGraspedMovement -= onGraspedMovement;
             _intObj.OnGraspedMovement += onGraspedMovement;
 
+            _anchObj.OnPostTryAnchorOnGraspEnd -= onPostObjectGraspEnd;
             _anchObj.OnPostTryAnchorOnGraspEnd += onPostObjectGraspEnd;
         }
 
@@ -165,8 +167,9 @@ namespace Leap.InteractionEngine.Examples
             }
 
             // If the velocity of the object while grasped is too large, exit workstation mode.
-            if (_intObj.rigidbody.velocity.magnitude > MAX_SPEED_AS_WORKSTATION
-                || (_intObj.rigidbody.isKinematic && ((preSolvePos - curPos).magnitude / Time.fixedDeltaTime) > MAX_SPEED_AS_WORKSTATION))
+            else if (workstationState == WorkstationState.Open
+                && (_intObj.rigidbody.velocity.magnitude > MAX_SPEED_AS_WORKSTATION
+                || (_intObj.rigidbody.isKinematic && ((preSolvePos - curPos).magnitude / Time.fixedDeltaTime) > MAX_SPEED_AS_WORKSTATION)))
             {
                 DeactivateWorkstation();
             }
@@ -181,7 +184,7 @@ namespace Leap.InteractionEngine.Examples
 
         private void onPostObjectGraspEnd()
         {
-            if (_anchObj.preferredAnchor == null)
+            if (_anchObj.FindPreferredAnchor() == null && !_anchObj.isAttached)
             {
                 // Choose a good position and rotation for workstation mode and begin traveling there.
                 Vector3 targetPosition;

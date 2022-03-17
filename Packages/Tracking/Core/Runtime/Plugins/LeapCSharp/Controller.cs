@@ -498,6 +498,27 @@ namespace Leap
         }
 
         /// <summary>
+        /// Checks whether a minimum or required tracking service version is installed.
+        /// Gets the currently installed service version from the connection and checks whether 
+        /// the argument minServiceVersion is smaller or equal to it
+        /// </summary>
+        /// <param name="minServiceVersion">The minimum service version to check against</param>
+        /// <returns></returns>
+        public bool CheckRequiredServiceVersion(LEAP_VERSION minServiceVersion)
+        {
+            LEAP_VERSION currentServiceVersion = _connection.GetCurrentServiceVersion();
+
+            // check that minServiceVersion is smaller or equal to the current service version
+            if (minServiceVersion.major < currentServiceVersion.major) return true;
+            else if (minServiceVersion.major == currentServiceVersion.major)
+            {
+                if (minServiceVersion.minor < currentServiceVersion.minor) return true;
+                else if (minServiceVersion.minor == currentServiceVersion.minor && minServiceVersion.patch <= currentServiceVersion.patch) return true;
+            }
+            return false;
+        }
+
+        /// <summary>
         /// Requests setting a policy.
         ///  
         /// A request to change a policy is subject to user approval and a policy 

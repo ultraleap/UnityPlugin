@@ -245,6 +245,18 @@ namespace LeapInternal
             _polster.Join();
         }
 
+        /// <summary>
+        /// Returns the version of the currently installed Tracking Service. 
+        /// Might return 0.0.0 if no device is connected or it cannot get the current version.
+        /// </summary>
+        /// <returns>the current tracking service version</returns>
+        public LEAP_VERSION GetCurrentServiceVersion()
+        {
+            LEAP_VERSION currentVersion = new LEAP_VERSION { major = 0, minor = 0, patch = 0 };
+            LeapC.GetVersion(_leapConnection, eLeapVersionPart.eLeapVersionPart_ServerLibrary, ref currentVersion);
+            return currentVersion;
+        }
+
         //Run in Polster thread, fills in object queues
         private void processMessages()
         {
@@ -586,7 +598,13 @@ namespace LeapInternal
 
         private void handleLostDevice(ref LEAP_DEVICE_EVENT deviceMsg)
         {
-            Device lost = _devices.FindDeviceByHandle(deviceMsg.device.handle);
+            IntPtr deviceHandle;
+            eLeapRS result = LeapC.OpenDevice(deviceMsg.device, out deviceHandle);
+            if (result != eLeapRS.eLeapRS_Success)
+                return;
+
+            //UnityEngine.Debug.Log("handleLostDevice: " + deviceHandle);
+            Device lost = _devices.FindDeviceByHandle(deviceHandle);
             if (lost != null)
             {
                 _devices.Remove(lost);
