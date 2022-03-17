@@ -169,7 +169,7 @@ namespace Leap.Unity
 
         /// <summary>
         /// When Multiple Device Mode is set to `Specific`, the provider will
-        /// receive data from only the devices that contain this in their serial number.
+        /// receive data from only the first device that contain this in their serial number.
         /// If no device serial number contains SpecificSerialNumber, the first device in 
         /// the list of connected devices (controller.Devices) is used
         /// </summary>
@@ -180,15 +180,13 @@ namespace Leap.Unity
             {
                 _specificSerialNumber = value;
                 if (_multipleDeviceMode != MultipleDeviceMode.Specific) Debug.Log("You are trying to set a Specific Serial Number while Multiple Device Mode is not set to 'Specific'. Please change the Multiple Device Mode to 'Specific'");
-                else if (lastSerialNumber != _specificSerialNumber)
+                else if (currentDevice.SerialNumber != _specificSerialNumber)
                 {
                     updateDevice();
-                    lastSerialNumber = _specificSerialNumber;
                 }
             }
         }
 
-        string lastSerialNumber;
         Device currentDevice;
 
         /// <summary> A counter to keep track of how many devices have been seen up
@@ -602,10 +600,9 @@ namespace Leap.Unity
 #endif
 
             // if the serial number has changed since the last update(), update the device
-            if (_multipleDeviceMode == MultipleDeviceMode.Specific && lastSerialNumber != SpecificSerialNumber)
+            if (_multipleDeviceMode == MultipleDeviceMode.Specific && (currentDevice == null || currentDevice.SerialNumber != SpecificSerialNumber))
             {
                 updateDevice();
-                lastSerialNumber = SpecificSerialNumber;
             }
 
             if (_useInterpolation)
