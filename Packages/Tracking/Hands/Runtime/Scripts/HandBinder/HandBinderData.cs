@@ -139,6 +139,7 @@ namespace Leap.Unity.HandsModule
             if (leapHand == null)
                 return null;
 
+            //Loop through all the fingers of the hand to calculate where the leap data should be in relation to the Bound Hand
             for (int fingerID = 0; fingerID < leapHand.Fingers.Count; fingerID++)
             {
                 var finger = leapHand.Fingers[fingerID];
@@ -185,11 +186,7 @@ namespace Leap.Unity.HandsModule
 
                             finger.bones[boneID] = new Bone(prevJoint, nextJoint, center, dir, length, leapBone.Width, leapBone.Type, leapBone.Rotation);
                         }
-                        //The thumb is a special case
-                        else if (fingerID == (int)Finger.FingerType.TYPE_THUMB)
-                        {
-                            continue;
-                        }
+
                         else if (boneID == (int)Bone.BoneType.TYPE_METACARPAL)
                         {
                             var proximal  = boundHand.fingers[fingerID].boundBones[(int)Bone.BoneType.TYPE_PROXIMAL];
@@ -231,7 +228,6 @@ namespace Leap.Unity.HandsModule
             leapHand.StabilizedPalmPosition = leapHand.PalmPosition;
             leapHand.PalmWidth = (leapHand.GetPinky().bones[1].PrevJoint - leapHand.GetIndex().bones[1].PrevJoint).Magnitude;
             leapHand.Arm.NextJoint = leapHand.WristPosition;
-
 
             return leapHand;
         }
