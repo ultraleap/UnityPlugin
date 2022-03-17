@@ -602,7 +602,7 @@ namespace Leap.Unity
 #endif
 
             // if the serial number has changed since the last update(), update the device
-            if(_multipleDeviceMode == MultipleDeviceMode.Specific && lastSerialNumber != SpecificSerialNumber)
+            if (_multipleDeviceMode == MultipleDeviceMode.Specific && lastSerialNumber != SpecificSerialNumber)
             {
                 updateDevice();
                 lastSerialNumber = SpecificSerialNumber;
@@ -991,7 +991,7 @@ namespace Leap.Unity
         {
             if (_leapController == null) return;
 
-            foreach(Device d in _leapController.Devices)
+            foreach (Device d in _leapController.Devices)
             {
                 if (d.SerialNumber.Contains(SpecificSerialNumber))
                 {
