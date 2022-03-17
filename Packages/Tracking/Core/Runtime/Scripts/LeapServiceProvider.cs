@@ -163,12 +163,30 @@ namespace Leap.Unity
         protected MultipleDeviceMode _multipleDeviceMode = MultipleDeviceMode.Disabled;
 
         [Tooltip("When Multiple Device Mode is set to `Specific`, the provider will " +
-          "receive data from only the devices that contain this in their serial number.  " +
-          "If the serial number is unknown, simply specify which DeviceID to " +
-          "sample from (0 is invalid, 1 and above are valid).")]
-        [EditTimeOnly]
+          "receive data from only the devices that contain this in their serial number.")]
         [SerializeField]
         protected string _specificSerialNumber;
+
+        /// <summary>
+        /// When Multiple Device Mode is set to `Specific`, the provider will
+        /// receive data from only the devices that contain this in their serial number.
+        /// </summary>
+        public string SpecificSerialNumber
+        {
+            get { return _specificSerialNumber; }
+            set
+            {
+                _specificSerialNumber = value;
+                if (_multipleDeviceMode == MultipleDeviceMode.Specific && lastSerialNumber != _specificSerialNumber)
+                {
+                    updateDevice();
+                    lastSerialNumber = _specificSerialNumber;
+                }
+            }
+        }
+
+        string lastSerialNumber;
+        Device currentDevice;
 
         /// <summary> A counter to keep track of how many devices have been seen up
         /// through this point. Allows a provider to latch onto a device based on
@@ -580,6 +598,13 @@ namespace Leap.Unity
             }
 #endif
 
+            // if the serial number has changed since the last update(), update the device
+            if(_multipleDeviceMode == MultipleDeviceMode.Specific && lastSerialNumber != SpecificSerialNumber)
+            {
+                updateDevice();
+                lastSerialNumber = SpecificSerialNumber;
+            }
+
             if (_useInterpolation)
             {
 #if !UNITY_ANDROID || UNITY_EDITOR
@@ -880,7 +905,7 @@ namespace Leap.Unity
                 return;
             }
 
-            _leapController = new Controller(_specificSerialNumber.GetHashCode(), _serverNameSpace, _multipleDeviceMode != MultipleDeviceMode.Disabled);
+            _leapController = new Controller(SpecificSerialNumber.GetHashCode(), _serverNameSpace, _multipleDeviceMode != MultipleDeviceMode.Disabled);
 
             _leapController.Device += (s, e) =>
             {
@@ -894,10 +919,9 @@ namespace Leap.Unity
             {
                 _onDeviceSafe += (d) =>
                 {
-                    if (d.SerialNumber.Contains(_specificSerialNumber) && _leapController != null)
+                    if (d.SerialNumber.Contains(SpecificSerialNumber) && _leapController != null)
                     {
-                        Debug.Log("Connecting to Device with Serial: " + d.SerialNumber);
-                        _leapController.SubscribeToDeviceEvents(d);
+                        connectToNewDevice(d);
                     }
                 };
             }
@@ -932,6 +956,45 @@ namespace Leap.Unity
 
                 _leapController.EndProfilingForThread += LeapProfiling.EndProfilingForThread;
                 _leapController.BeginProfilingForThread += LeapProfiling.BeginProfilingForThread;
+            }
+        }
+
+        /// <summary>
+        /// Only during runtime:
+        /// connects to a new device (param d) and subscribes to its device events. 
+        /// Also unsubscribes from all device events from the last connected device.
+        /// </summary>
+        /// <param name="d"></param>
+        /// <returns>true if connection was successfull, false if there is no leapController set up correctly 
+        /// or application is not playing or already connected to Device d</returns>
+        private bool connectToNewDevice(Device d)
+        {
+            if (_leapController == null || !Application.isPlaying || currentDevice == d) return false;
+
+            if (currentDevice != null) _leapController.UnsubscribeFromDeviceEvents(currentDevice);
+
+            Debug.Log("Connecting to Device with Serial: " + d.SerialNumber);
+            _leapController.SubscribeToDeviceEvents(d);
+            currentDevice = d;
+            return true;
+        }
+
+        /// <summary>
+        /// update the connected device. This should be called when the serial number has been changed and 
+        /// the currently connected device isn't the right one anymore.
+        /// searches for a device with matching serial number (same as SpecificSerialNumber) and connects to the first on it finds.
+        /// </summary>
+        private void updateDevice()
+        {
+            if (_leapController == null) return;
+
+            foreach(Device d in _leapController.Devices)
+            {
+                if (d.SerialNumber.Contains(SpecificSerialNumber))
+                {
+                    connectToNewDevice(d);
+                    return;
+                }
             }
         }
 
