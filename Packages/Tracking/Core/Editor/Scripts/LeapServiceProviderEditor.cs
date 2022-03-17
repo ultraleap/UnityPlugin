@@ -130,7 +130,7 @@ namespace Leap.Unity
                     return;
                 }
 
-                _chosenDeviceIndex = SerialNumbers.IndexOf(property.stringValue);
+                _chosenDeviceIndex = SerialNumbers.FindIndex(x => x.Contains(property.stringValue));
                 if (_chosenDeviceIndex == -1 || _chosenDeviceIndex > SerialNumbers.Count) _chosenDeviceIndex = 0;
 
                 _chosenDeviceIndex = EditorGUILayout.Popup("Specific Serial Number", _chosenDeviceIndex, SerialNumbers.ToArray());
