@@ -30,7 +30,7 @@ namespace Leap.Unity.HandsModule
         {
             var hands = new List<Hand>();
 
-            if (LeftHand != null)
+            if (LeftHand != null && LeftHand.gameObject.activeInHierarchy)
             {
                 var leapHand = LeftHand.BoundHand.GenerateLeapHand(LeftHand.LeapHand, fingerTipScale);
 
@@ -41,7 +41,7 @@ namespace Leap.Unity.HandsModule
                 }
             }
 
-            if (RightHand != null)
+            if (RightHand != null && RightHand.gameObject.activeInHierarchy)
             {
                 var leapHand = RightHand.BoundHand.GenerateLeapHand(RightHand.LeapHand, fingerTipScale);
 
@@ -52,8 +52,11 @@ namespace Leap.Unity.HandsModule
                 }
             }
 
-            inputFrame.Hands.Clear();
-            inputFrame.Hands = hands;
+            if (hands.Count > 0)
+            {
+                inputFrame.Hands.Clear();
+                inputFrame.Hands = hands;
+            }
         }
     }
 }
