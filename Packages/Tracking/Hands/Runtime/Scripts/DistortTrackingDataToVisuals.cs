@@ -32,23 +32,31 @@ namespace Leap.Unity.HandsModule
 
             if (LeftHand != null && LeftHand.gameObject.activeInHierarchy)
             {
-                var leapHand = LeftHand.BoundHand.GenerateLeapHand(LeftHand.LeapHand, fingerTipScale);
-
-                if (leapHand != null)
+                var leftLeapHand = inputFrame.GetHand(Chirality.Left);
+                if (leftLeapHand != null)
                 {
-                    leapHand.IsLeft = true;
-                    hands.Add(leapHand);
+                    leftLeapHand = LeftHand.BoundHand.GenerateLeapHand(leftLeapHand, fingerTipScale);
+
+                    if (leftLeapHand != null)
+                    {
+                        leftLeapHand.IsLeft = true;
+                        hands.Add(leftLeapHand);
+                    }
                 }
             }
 
             if (RightHand != null && RightHand.gameObject.activeInHierarchy)
             {
-                var leapHand = RightHand.BoundHand.GenerateLeapHand(RightHand.LeapHand, fingerTipScale);
-
-                if (leapHand != null)
+                var rightLeapHand = inputFrame.GetHand(Chirality.Right);
+                if (rightLeapHand != null)
                 {
-                    leapHand.IsLeft = false;
-                    hands.Add(leapHand);
+                    rightLeapHand = RightHand.BoundHand.GenerateLeapHand(rightLeapHand, fingerTipScale);
+
+                    if (rightLeapHand != null)
+                    {
+                        rightLeapHand.IsLeft = false;
+                        hands.Add(rightLeapHand);
+                    }
                 }
             }
 
