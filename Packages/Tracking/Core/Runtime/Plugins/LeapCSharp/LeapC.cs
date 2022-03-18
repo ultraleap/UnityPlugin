@@ -980,7 +980,7 @@ namespace LeapInternal
         [DllImport("LeapC", EntryPoint = "LeapGetTrackingMode")]
         public static extern eLeapRS LeapGetTrackingMode(IntPtr hConnection);
 
-        [DllImport("LeapC", EntryPoint = "LeapGetTrackingMode")]
+        [DllImport("LeapC", EntryPoint = "LeapGetTrackingModeEx")]
         public static extern eLeapRS LeapGetTrackingModeEx(IntPtr hConnection, IntPtr hDevice);
 
         [DllImport("LeapC", EntryPoint = "LeapGetNow")]
