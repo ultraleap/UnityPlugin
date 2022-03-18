@@ -730,6 +730,27 @@ namespace Leap
             _connection.GetPointMapping(ref pointMapping);
         }
 
+
+        /// <summary>
+        /// This is a special variant of GetInterpolatedFrameFromTime, for use with special
+        /// features that only require the position and orientation of the palm positions, and do
+        /// not care about pose data or any other data.
+        /// 
+        /// You must specify the id of the hand that you wish to get a transform for.  If you specify
+        /// an id that is not present in the interpolated frame, the output transform will be the
+        /// identity transform.
+        /// </summary>
+        public void GetInterpolatedLeftRightTransform(Int64 time,
+                                                      Int64 sourceTime,
+                                                      int leftId,
+                                                      int rightId,
+                                                      Device device,
+                                                  out LeapTransform leftTransform,
+                                                  out LeapTransform rightTransform)
+        {
+            _connection.GetInterpolatedLeftRightTransform(time, sourceTime, leftId, rightId, device, out leftTransform, out rightTransform);
+        }
+
         /// <summary>
         /// This is a special variant of GetInterpolatedFrameFromTime, for use with special
         /// features that only require the position and orientation of the palm positions, and do
@@ -746,7 +767,7 @@ namespace Leap
                                                   out LeapTransform leftTransform,
                                                   out LeapTransform rightTransform)
         {
-            _connection.GetInterpolatedLeftRightTransform(time, sourceTime, leftId, rightId, out leftTransform, out rightTransform);
+            GetInterpolatedLeftRightTransform(time, sourceTime, leftId, rightId, null, out leftTransform, out rightTransform);
         }
 
         public void GetInterpolatedFrameFromTime(Frame toFill, Int64 time, Int64 sourceTime, Device device = null)

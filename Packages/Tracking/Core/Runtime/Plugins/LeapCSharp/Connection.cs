@@ -504,15 +504,26 @@ namespace LeapInternal
                                                       Int64 sourceTime,
                                                       Int64 leftId,
                                                       Int64 rightId,
+                                                      Device device,
                                                   out LeapTransform leftTransform,
                                                   out LeapTransform rightTransform)
         {
             leftTransform = LeapTransform.Identity;
             rightTransform = LeapTransform.Identity;
 
-            UInt64 size = GetInterpolatedFrameSize(time);
+            UInt64 size = GetInterpolatedFrameSize(time, device);
             IntPtr trackingBuffer = Marshal.AllocHGlobal((Int32)size);
-            eLeapRS result = LeapC.InterpolateFrameFromTime(_leapConnection, time, sourceTime, trackingBuffer, size);
+            eLeapRS result;
+
+            if (device != null)
+            {
+                result = LeapC.InterpolateFrameFromTimeEx(_leapConnection, device.Handle, time, sourceTime, trackingBuffer, size);
+            }
+            else
+            {
+                result = LeapC.InterpolateFrameFromTime(_leapConnection, time, sourceTime, trackingBuffer, size);
+            }
+
             reportAbnormalResults("LeapC get interpolated frame from time call was ", result);
 
             if (result == eLeapRS.eLeapRS_Success)
@@ -549,6 +560,17 @@ namespace LeapInternal
             }
 
             Marshal.FreeHGlobal(trackingBuffer);
+
+        }
+
+        public void GetInterpolatedLeftRightTransform(Int64 time,
+                                                      Int64 sourceTime,
+                                                      Int64 leftId,
+                                                      Int64 rightId,
+                                                  out LeapTransform leftTransform,
+                                                  out LeapTransform rightTransform)
+        {
+            GetInterpolatedLeftRightTransform(time, sourceTime, leftId, rightId, null, out leftTransform, out rightTransform);
         }
 
         private void handleConnection(ref LEAP_CONNECTION_EVENT connectionMsg)

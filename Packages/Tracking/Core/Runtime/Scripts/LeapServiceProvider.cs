@@ -186,7 +186,7 @@ namespace Leap.Unity
             }
         }
 
-        private Device _currentDevice;
+        protected Device _currentDevice;
 
         /// <summary>
         /// The list of currently attached and recognized Leap Motion controller devices.
