@@ -647,7 +647,7 @@ namespace Leap
         /// </summary>
         public void GetInterpolatedFrame(Frame toFill, Int64 time, Device device = null)
         {
-            _connection.GetInterpolatedFrame(toFill, time, device); // Replace with Devices.ActiveDevice?
+            _connection.GetInterpolatedFrame(toFill, time, device);
         }
 
         /// <summary>
