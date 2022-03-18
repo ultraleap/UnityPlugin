@@ -191,7 +191,6 @@ namespace Leap.Unity.HandsModule
 
                             //Set the leap finger
                             leapFinger.bones[leapBoneID] = new Bone(distalBoundBonePosition, tipPosition, center, distalDirection, distalDirection.Magnitude, leapBone.Width, leapBone.Type, leapBone.Rotation);
-                            //Set the finger tip position
                         }
                     }
                     else
