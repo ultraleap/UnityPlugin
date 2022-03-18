@@ -625,7 +625,11 @@ namespace Leap.Unity
                 long timestamp = CalculateInterpolationTime() + (ExtrapolationAmount * 1000);
                 _unityToLeapOffset = timestamp - (long)(Time.time * S_TO_NS);
 
+<<<<<<< HEAD
                 _leapController.GetInterpolatedFrameFromTime(_untransformedUpdateFrame, timestamp, CalculateInterpolationTime() - (BounceAmount * 1000), _currentDevice);
+=======
+                _leapController.GetInterpolatedFrameFromTime(_untransformedUpdateFrame, timestamp, CalculateInterpolationTime() - (BounceAmount * 1000), _device);
+>>>>>>> a877c8dcfdd2539c6338f0cc2a4ee96d2ec674be
             }
             else
             {
@@ -671,8 +675,11 @@ namespace Leap.Unity
                         throw new System.InvalidOperationException(
                           "Unexpected frame optimization mode: " + _frameOptimization);
                 }
-
+<<<<<<< HEAD
                 _leapController.GetInterpolatedFrame(_untransformedFixedFrame, timestamp, _currentDevice);
+=======
+                _leapController.GetInterpolatedFrame(_untransformedFixedFrame, timestamp, _device);
+>>>>>>> a877c8dcfdd2539c6338f0cc2a4ee96d2ec674be
 
             }
             else
@@ -933,8 +940,14 @@ namespace Leap.Unity
                 {
                     if (d.SerialNumber.Contains(SpecificSerialNumber) && _leapController != null)
                     {
-
+<<<<<<< HEAD
                         connectToNewDevice(d);
+=======
+                        Debug.Log($"Connecting to Device with Serial:{d.SerialNumber}");
+
+                        _leapController.SubscribeToDeviceEvents(d);
+                        _device = d;
+>>>>>>> a877c8dcfdd2539c6338f0cc2a4ee96d2ec674be
                     }
                 };
             }
@@ -942,7 +955,11 @@ namespace Leap.Unity
             {
                 _onDeviceSafe += (d) =>
                 {
+<<<<<<< HEAD
                     _currentDevice = d;
+=======
+                    _device = d;
+>>>>>>> a877c8dcfdd2539c6338f0cc2a4ee96d2ec674be
                 };
              }
 
