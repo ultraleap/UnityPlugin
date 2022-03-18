@@ -648,7 +648,7 @@ namespace LeapInternal
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public struct LEAP_TRACKING_EVENT 
+    public struct LEAP_TRACKING_EVENT
     {
         public LEAP_FRAME_HEADER info;
         public Int64 tracking_id;
@@ -658,7 +658,7 @@ namespace LeapInternal
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public struct LEAP_TRACKING_MODE_EVENT 
+    public struct LEAP_TRACKING_MODE_EVENT
     {
         public UInt32 reserved;
         public eLeapTrackingMode current_tracking_mode;
