@@ -447,8 +447,6 @@ namespace LeapInternal
             reportAbnormalResults("LeapC get interpolated frame call was ", result);
             if (result == eLeapRS.eLeapRS_Success)
             {
-                UnityEngine.Debug.Log($"It worked! {device}");
-
                 LEAP_TRACKING_EVENT tracking_evt;
                 StructMarshal<LEAP_TRACKING_EVENT>.PtrToStruct(trackingBuffer, out tracking_evt);
                 toFill.CopyFrom(ref tracking_evt);
