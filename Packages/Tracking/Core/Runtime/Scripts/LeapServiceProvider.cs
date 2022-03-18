@@ -27,7 +27,7 @@ namespace Leap.Unity
     /// LeapServiceProvider to get that data.
     /// </summary>
     public class LeapServiceProvider : LeapProvider
-    { 
+    {
         #region Constants
 
         /// <summary>
@@ -972,12 +972,12 @@ namespace Leap.Unity
         /// or application is not playing or already connected to Device d</returns>
         private bool connectToNewDevice(Device d)
         {
-            if (_leapController == null || !Application.isPlaying || _currentDevice == d) 
+            if (_leapController == null || !Application.isPlaying || _currentDevice == d)
             {
                 return false;
             }
 
-            if (_currentDevice != null) 
+            if (_currentDevice != null)
             {
                 _leapController.UnsubscribeFromDeviceEvents(_currentDevice);
             }
