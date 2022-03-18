@@ -438,7 +438,6 @@ namespace LeapInternal
             if (device != null)
             {
                 result = LeapC.InterpolateFrameEx(_leapConnection, device.Handle, time, trackingBuffer, size);
-                UnityEngine.Debug.Log($"Device {device} result {result}");
             }
             else
             {
