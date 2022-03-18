@@ -27,9 +27,7 @@ namespace Leap.Unity
     /// LeapServiceProvider to get that data.
     /// </summary>
     public class LeapServiceProvider : LeapProvider
-    {
-        private Device _device;  
-
+    { 
         #region Constants
 
         /// <summary>
