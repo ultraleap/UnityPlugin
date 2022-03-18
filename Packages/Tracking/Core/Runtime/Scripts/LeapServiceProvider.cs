@@ -189,6 +189,16 @@ namespace Leap.Unity
 
         Device currentDevice;
 
+        /// <summary>
+        /// The list of currently attached and recognized Leap Motion controller devices.
+        /// The Device objects in the list describe information such as the range and
+        /// tracking volume.
+        /// </summary>
+        public List<Device> Devices
+        {
+            get { return _leapController.Devices; }
+        }
+
         /// <summary> A counter to keep track of how many devices have been seen up
         /// through this point. Allows a provider to latch onto a device based on
         /// its order of appearance, which corresponds to that device's DeviceID.
