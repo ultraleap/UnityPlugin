@@ -559,7 +559,6 @@ namespace Leap.Unity
         {
             _fixedOffset.delay = 0.4f;
             _smoothedTrackingLatency.SetBlend(0.99f, 0.0111f);
-            //_useInterpolation = _multipleDeviceMode.Equals(MultipleDeviceMode.Disabled) ? _useInterpolation : false;
         }
 
         protected virtual void Start()
@@ -987,9 +986,15 @@ namespace Leap.Unity
         /// or application is not playing or already connected to Device d</returns>
         private bool connectToNewDevice(Device d)
         {
-            if (_leapController == null || !Application.isPlaying || _currentDevice == d) return false;
+            if (_leapController == null || !Application.isPlaying || _currentDevice == d) 
+            {
+                return false;
+            }
 
-            if (_currentDevice != null) _leapController.UnsubscribeFromDeviceEvents(_currentDevice);
+            if (_currentDevice != null) 
+            {
+                _leapController.UnsubscribeFromDeviceEvents(_currentDevice);
+            }
 
             Debug.Log("Connecting to Device with Serial: " + d.SerialNumber);
             _leapController.SubscribeToDeviceEvents(d);
