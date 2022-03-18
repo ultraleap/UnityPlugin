@@ -69,4 +69,3 @@ namespace Leap.Unity.HandsModule
         }
     }
 }
-
