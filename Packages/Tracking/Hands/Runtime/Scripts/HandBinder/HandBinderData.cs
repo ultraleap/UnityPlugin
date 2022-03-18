@@ -205,7 +205,7 @@ namespace Leap.Unity.HandsModule
                         //If the bone is a metacarpal, use the wrist bone as the previous joint
                         else if (leapBoneID == (int)Bone.BoneType.TYPE_METACARPAL)
                         {
-                            BoundBone proximalBoundBone  = boundHand.fingers[leapFingerID].boundBones[(int)Bone.BoneType.TYPE_PROXIMAL];
+                            BoundBone proximalBoundBone = boundHand.fingers[leapFingerID].boundBones[(int)Bone.BoneType.TYPE_PROXIMAL];
                             BoundBone wristBoundBone = boundHand.wrist;
 
                             if (proximalBoundBone.boundTransform && wristBoundBone.boundTransform)
