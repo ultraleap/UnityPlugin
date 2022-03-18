@@ -219,7 +219,9 @@ namespace Leap.Unity
             leapProvider.OnUpdateFrame -= UpdateFrame;
             leapProvider.OnFixedFrame -= FixedUpdateFrame;
 
+#if UNITY_EDITOR
             Update();
+#endif
         }
 
         void UpdateFrame(Frame frame)
