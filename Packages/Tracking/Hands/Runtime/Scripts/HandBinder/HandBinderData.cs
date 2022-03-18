@@ -150,16 +150,16 @@ namespace Leap.Unity.HandsModule
                 //Get the leap Finger
                 Finger leapFinger = leapHand.Fingers[leapFingerID];
 
-                for (int boneID = 0; boneID < leapFinger.bones.Length; boneID++)
+                for (int leapBoneID = 0; leapBoneID < leapFinger.bones.Length; leapBoneID++)
                 {
                     //Get the leapBone
-                    Bone leapBone = leapFinger.bones[boneID];
+                    Bone leapBone = leapFinger.bones[leapBoneID];
 
                     //If this bone is the distal bone, calculate a finger tip position
-                    if (boneID == (int)Bone.BoneType.TYPE_DISTAL)
+                    if (leapBoneID == (int)Bone.BoneType.TYPE_DISTAL)
                     {
-                        BoundBone currentBoundBone = boundHand.fingers[leapFingerID].boundBones[boneID];
-                        BoundBone previousBoundBone = boundHand.fingers[leapFingerID].boundBones[boneID - 1];
+                        BoundBone currentBoundBone = boundHand.fingers[leapFingerID].boundBones[leapBoneID];
+                        BoundBone previousBoundBone = boundHand.fingers[leapFingerID].boundBones[leapBoneID - 1];
 
                         if (previousBoundBone.boundTransform && currentBoundBone.boundTransform)
                         {
@@ -179,15 +179,15 @@ namespace Leap.Unity.HandsModule
                             Vector center = Vector.Lerp(previousBoundBonePosition, nextBoundBonePosition, 0.5f);
 
                             //Set the leap finger
-                            leapFinger.bones[boneID] = new Bone(previousBoundBonePosition, nextBoundBonePosition, center, direction, length, leapBone.Width, leapBone.Type, leapBone.Rotation);
+                            leapFinger.bones[leapBoneID] = new Bone(previousBoundBonePosition, nextBoundBonePosition, center, direction, length, leapBone.Width, leapBone.Type, leapBone.Rotation);
                             //Set the finger tip position
                             leapFinger.TipPosition = nextBoundBonePosition;
                         }
                     }
                     else
                     {
-                        BoundBone previousBoundBone = boundHand.fingers[leapFingerID].boundBones[boneID];
-                        BoundBone nextBoundBone = boundHand.fingers[leapFingerID].boundBones[boneID + 1];
+                        BoundBone previousBoundBone = boundHand.fingers[leapFingerID].boundBones[leapBoneID];
+                        BoundBone nextBoundBone = boundHand.fingers[leapFingerID].boundBones[leapBoneID + 1];
 
                         //If the bones are not null, calculate the data needed for this bone
                         if (previousBoundBone.boundTransform && nextBoundBone.boundTransform)
@@ -199,11 +199,11 @@ namespace Leap.Unity.HandsModule
                             Vector center = Vector.Lerp(previousBoundJointPosition, nextBoundJointPosition, 0.5f);
 
                             //Set the data for a new leap bone
-                            leapFinger.bones[boneID] = new Bone(previousBoundJointPosition, nextBoundJointPosition, center, direction, length, leapBone.Width, leapBone.Type, leapBone.Rotation);
+                            leapFinger.bones[leapBoneID] = new Bone(previousBoundJointPosition, nextBoundJointPosition, center, direction, length, leapBone.Width, leapBone.Type, leapBone.Rotation);
                         }
 
                         //If the bone is a metacarpal, use the wrist bone as the previous joint
-                        else if (boneID == (int)Bone.BoneType.TYPE_METACARPAL)
+                        else if (leapBoneID == (int)Bone.BoneType.TYPE_METACARPAL)
                         {
                             BoundBone proximalBoundBone  = boundHand.fingers[leapFingerID].boundBones[(int)Bone.BoneType.TYPE_PROXIMAL];
                             BoundBone wristBoundBone = boundHand.wrist;
@@ -217,7 +217,7 @@ namespace Leap.Unity.HandsModule
                                 Vector center = Vector.Lerp(previousBoundJointPosition, nextBoundJointPosition, 0.5f);
 
                                 //Set the data for the leap finger
-                                leapFinger.bones[boneID] = new Bone(previousBoundJointPosition, nextBoundJointPosition, center, direction, length, leapBone.Width, leapBone.Type, leapBone.Rotation);
+                                leapFinger.bones[leapBoneID] = new Bone(previousBoundJointPosition, nextBoundJointPosition, center, direction, length, leapBone.Width, leapBone.Type, leapBone.Rotation);
                             }
                         }
                     }
