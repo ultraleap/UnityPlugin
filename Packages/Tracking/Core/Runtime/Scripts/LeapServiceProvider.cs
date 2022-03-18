@@ -972,9 +972,15 @@ namespace Leap.Unity
         /// or application is not playing or already connected to Device d</returns>
         private bool connectToNewDevice(Device d)
         {
-            if (_leapController == null || !Application.isPlaying || _currentDevice == d) return false;
+            if (_leapController == null || !Application.isPlaying || _currentDevice == d) 
+            {
+                return false;
+            }
 
-            if (_currentDevice != null) _leapController.UnsubscribeFromDeviceEvents(_currentDevice);
+            if (_currentDevice != null) 
+            {
+                _leapController.UnsubscribeFromDeviceEvents(_currentDevice);
+            }
 
             Debug.Log("Connecting to Device with Serial: " + d.SerialNumber);
             _leapController.SubscribeToDeviceEvents(d);
