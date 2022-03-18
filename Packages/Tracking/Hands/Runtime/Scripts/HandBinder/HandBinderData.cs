@@ -134,96 +134,120 @@ namespace Leap.Unity.HandsModule
         };
 
 
+        /// <summary>
+        /// Calculate a Hand from a BoundHand
+        /// </summary>
         public static Hand GenerateLeapHand(this BoundHand boundHand, Hand leapHand, float fingerTipScale = 0.8f)
         {
             if (leapHand == null)
+            {
                 return null;
+            }
 
             //Loop through all the fingers of the hand to calculate where the leap data should be in relation to the Bound Hand
-            for (int fingerID = 0; fingerID < leapHand.Fingers.Count; fingerID++)
+            for (int leapFingerID = 0; leapFingerID < leapHand.Fingers.Count; leapFingerID++)
             {
-                var finger = leapHand.Fingers[fingerID];
+                //Get the leap Finger
+                Finger leapFinger = leapHand.Fingers[leapFingerID];
 
-                for (int boneID = 0; boneID < finger.bones.Length; boneID++)
+                for (int boneID = 0; boneID < leapFinger.bones.Length; boneID++)
                 {
-                    var leapBone = finger.bones[boneID];
+                    //Get the leapBone
+                    Bone leapBone = leapFinger.bones[boneID];
 
                     //If this bone is the distal bone, calculate a finger tip position
                     if (boneID == (int)Bone.BoneType.TYPE_DISTAL)
                     {
-                        var thisBone = boundHand.fingers[fingerID].boundBones[boneID];
-                        var prevBone = boundHand.fingers[fingerID].boundBones[boneID - 1];
+                        BoundBone currentBoundBone = boundHand.fingers[leapFingerID].boundBones[boneID];
+                        BoundBone previousBoundBone = boundHand.fingers[leapFingerID].boundBones[boneID - 1];
 
-                        if (prevBone.boundTransform && thisBone.boundTransform)
+                        if (previousBoundBone.boundTransform && currentBoundBone.boundTransform)
                         {
-                            var nextJoint = thisBone.boundTransform.position.ToVector();
-                            var prevJoint = prevBone.boundTransform.position.ToVector();
+                            //Get the positions of the rigged joints
+                            Vector nextBoundBonePosition = currentBoundBone.boundTransform.position.ToVector();
+                            Vector previousBoundBonePosition = previousBoundBone.boundTransform.position.ToVector();
 
-                            var dir = (prevJoint - nextJoint);
-                            var length = dir.Magnitude;
+                            //Get the direction of the finger
+                            Vector direction = (previousBoundBonePosition - nextBoundBonePosition);
+                            float length = direction.Magnitude;
 
-                            prevJoint += -dir.Normalized * (length * fingerTipScale);
-                            nextJoint += -dir.Normalized * (length * fingerTipScale);
+                            //Calculate the finger tip position given an offset
+                            previousBoundBonePosition += -direction.Normalized * (length * fingerTipScale);
+                            nextBoundBonePosition += -direction.Normalized * (length * fingerTipScale);
 
-                            var center = Vector.Lerp(prevJoint, nextJoint, 0.5f);
+                            //Calculate the center of the finger
+                            Vector center = Vector.Lerp(previousBoundBonePosition, nextBoundBonePosition, 0.5f);
 
-                            finger.bones[boneID] = new Bone(prevJoint, nextJoint, center, dir, length, leapBone.Width, leapBone.Type, leapBone.Rotation);
-                            finger.TipPosition = nextJoint;
+                            //Set the leap finger
+                            leapFinger.bones[boneID] = new Bone(previousBoundBonePosition, nextBoundBonePosition, center, direction, length, leapBone.Width, leapBone.Type, leapBone.Rotation);
+                            //Set the finger tip position
+                            leapFinger.TipPosition = nextBoundBonePosition;
                         }
                     }
                     else
                     {
-                        var prevBone = boundHand.fingers[fingerID].boundBones[boneID];
-                        var nextBone = boundHand.fingers[fingerID].boundBones[boneID + 1];
+                        BoundBone previousBoundBone = boundHand.fingers[leapFingerID].boundBones[boneID];
+                        BoundBone nextBoundBone = boundHand.fingers[leapFingerID].boundBones[boneID + 1];
 
-                        if (prevBone.boundTransform && nextBone.boundTransform)
+                        //If the bones are not null, calculate the data needed for this bone
+                        if (previousBoundBone.boundTransform && nextBoundBone.boundTransform)
                         {
-                            var prevJoint = prevBone.boundTransform.position.ToVector();
-                            var nextJoint = nextBone.boundTransform.position.ToVector();
-                            var dir = (prevJoint - nextJoint);
-                            var length = dir.Magnitude;
-                            var center = Vector.Lerp(prevJoint, nextJoint, 0.5f);
+                            Vector previousBoundJointPosition = previousBoundBone.boundTransform.position.ToVector();
+                            Vector nextBoundJointPosition = nextBoundBone.boundTransform.position.ToVector();
+                            Vector direction = (previousBoundJointPosition - nextBoundJointPosition);
+                            float length = direction.Magnitude;
+                            Vector center = Vector.Lerp(previousBoundJointPosition, nextBoundJointPosition, 0.5f);
 
-                            finger.bones[boneID] = new Bone(prevJoint, nextJoint, center, dir, length, leapBone.Width, leapBone.Type, leapBone.Rotation);
+                            //Set the data for a new leap bone
+                            leapFinger.bones[boneID] = new Bone(previousBoundJointPosition, nextBoundJointPosition, center, direction, length, leapBone.Width, leapBone.Type, leapBone.Rotation);
                         }
 
+                        //If the bone is a metacarpal, use the wrist bone as the previous joint
                         else if (boneID == (int)Bone.BoneType.TYPE_METACARPAL)
                         {
-                            var proximal  = boundHand.fingers[fingerID].boundBones[(int)Bone.BoneType.TYPE_PROXIMAL];
-                            var wristBone = boundHand.wrist.boundTransform;
+                            BoundBone proximalBoundBone  = boundHand.fingers[leapFingerID].boundBones[(int)Bone.BoneType.TYPE_PROXIMAL];
+                            BoundBone wristBoundBone = boundHand.wrist;
 
-                            if (proximal.boundTransform && wristBone)
+                            if (proximalBoundBone.boundTransform && wristBoundBone.boundTransform)
                             {
-                                var nextJoint = proximal.boundTransform.position.ToVector();
-                                var prevJoint = Vector.Lerp(wristBone.position.ToVector(), nextJoint, 0.5f);
-                                var dir = (prevJoint - nextJoint);
-                                var length = dir.Magnitude;
-                                var center = Vector.Lerp(prevJoint, nextJoint, 0.5f);
-                                finger.bones[boneID] = new Bone(prevJoint, nextJoint, center, dir, length, leapBone.Width, leapBone.Type, leapBone.Rotation);
+                                Vector nextBoundJointPosition = proximalBoundBone.boundTransform.position.ToVector();
+                                Vector previousBoundJointPosition = Vector.Lerp(wristBoundBone.boundTransform.position.ToVector(), nextBoundJointPosition, 0.5f);
+                                Vector direction = (previousBoundJointPosition - nextBoundJointPosition);
+                                float length = direction.Magnitude;
+                                Vector center = Vector.Lerp(previousBoundJointPosition, nextBoundJointPosition, 0.5f);
+
+                                //Set the data for the leap finger
+                                leapFinger.bones[boneID] = new Bone(previousBoundJointPosition, nextBoundJointPosition, center, direction, length, leapBone.Width, leapBone.Type, leapBone.Rotation);
                             }
                         }
                     }
                 }
             }
 
+            //Calculate the data for the wrist
             if (boundHand.wrist.boundTransform != null)
             {
                 leapHand.WristPosition = boundHand.wrist.boundTransform.position.ToVector();
 
+                //Sor the elbow data
                 if (boundHand.elbow.boundTransform != null)
                 {
-                    var elbowPos = boundHand.elbow.boundTransform.position.ToVector();
-                    var wristPos = boundHand.wrist.boundTransform.position.ToVector();
-                    var center = Vector.Lerp(elbowPos, wristPos, 0.5f);
-                    var dir = (elbowPos - wristPos);
-                    var length = dir.Magnitude;
+                    Vector elbowPos = boundHand.elbow.boundTransform.position.ToVector();
+                    Vector wristPos = boundHand.wrist.boundTransform.position.ToVector();
+                    Vector center = Vector.Lerp(elbowPos, wristPos, 0.5f);
+                    Vector dir = (elbowPos - wristPos);
+                    float length = dir.Magnitude;
 
+                    //Set the data on the leap Arm
                     leapHand.Arm = new Arm(elbowPos, wristPos, center, dir, length, leapHand.Arm.Width, leapHand.Arm.Rotation);
                     leapHand.Arm.PrevJoint = elbowPos;
                 }
             }
 
-            var palmPos = Vector.Lerp(leapHand.WristPosition, leapHand.GetMiddle().bones[(int)Bone.BoneType.TYPE_PROXIMAL].PrevJoint, 0.5f);
+            //Calculate the palm position half way between the wrist and the middle proximal bone
+            Vector palmPos = Vector.Lerp(leapHand.WristPosition, leapHand.GetMiddle().bones[(int)Bone.BoneType.TYPE_PROXIMAL].PrevJoint, 0.5f);
+
+            //Set the data on the leap hand
             leapHand.PalmPosition = palmPos;
             leapHand.StabilizedPalmPosition = leapHand.PalmPosition;
             leapHand.PalmWidth = (leapHand.GetPinky().bones[1].PrevJoint - leapHand.GetIndex().bones[1].PrevJoint).Magnitude;
