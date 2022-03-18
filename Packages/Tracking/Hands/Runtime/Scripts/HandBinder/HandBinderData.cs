@@ -140,7 +140,7 @@ namespace Leap.Unity.HandsModule
         {
             if (leapHand == null)
             {
-                return null;
+                return leapHand;
             }
 
             //Loop through all the fingers of the hand to calculate where the leap data should be in relation to the Bound Hand
