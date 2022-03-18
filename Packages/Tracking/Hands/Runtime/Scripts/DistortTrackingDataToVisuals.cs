@@ -1,48 +1,59 @@
-﻿using Leap;
+﻿/******************************************************************************
+ * Copyright (C) Ultraleap, Inc. 2011-2021.                                   *
+ *                                                                            *
+ * Use subject to the terms of the Apache License 2.0 available at            *
+ * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
+ * between Ultraleap and you, your company or other organization.             *
+ ******************************************************************************/
+
+using Leap;
 using Leap.Unity;
 using Leap.Unity.HandsModule;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-/// <summary>
-/// A post process provider that allows hand visuals to generate leap hands that can be used to distort tracking data to visuals
-/// This should be used in cases where you have visual hands that do not conform to leap data size, e.g. a monster hand that has extra long fingers
-/// </summary>
-public class DistortTrackingDataToVisuals : PostProcessProvider
+namespace Leap.Unity.HandsModule
 {
-    public HandBinder LeftHand;
-    public HandBinder RightHand;
-
-    public float fingerTipScale = 0.8f;
-
-    public override void ProcessFrame(ref Frame inputFrame)
+    /// <summary>
+    /// A post process provider that allows hand visuals to generate leap hands that can be used to distort tracking data to visuals
+    /// This should be used in cases where you have visual hands that do not conform to leap data size, e.g. a monster hand that has extra long fingers
+    /// </summary>
+    public class DistortTrackingDataToVisuals : PostProcessProvider
     {
-        var hands = new List<Hand>();
+        public HandBinder LeftHand;
+        public HandBinder RightHand;
 
-        if (LeftHand != null)
+        public float fingerTipScale = 0.8f;
+
+        public override void ProcessFrame(ref Frame inputFrame)
         {
-            var lHand = LeftHand.BoundHand.GenerateLeapHand(LeftHand.LeapHand, fingerTipScale);
+            var hands = new List<Hand>();
 
-            if (lHand != null)
+            if (LeftHand != null)
             {
-                lHand.IsLeft = true;
-                hands.Add(lHand);
+                var lHand = LeftHand.BoundHand.GenerateLeapHand(LeftHand.LeapHand, fingerTipScale);
+
+                if (lHand != null)
+                {
+                    lHand.IsLeft = true;
+                    hands.Add(lHand);
+                }
             }
-        }
 
-        if (RightHand != null)
-        {
-            var rHand = RightHand.BoundHand.GenerateLeapHand(RightHand.LeapHand, fingerTipScale);
-
-            if (rHand != null)
+            if (RightHand != null)
             {
-                rHand.IsLeft = false;
-                hands.Add(rHand);
-            }
-        }
+                var rHand = RightHand.BoundHand.GenerateLeapHand(RightHand.LeapHand, fingerTipScale);
 
-        inputFrame.Hands.Clear();
-        inputFrame.Hands = hands;
+                if (rHand != null)
+                {
+                    rHand.IsLeft = false;
+                    hands.Add(rHand);
+                }
+            }
+
+            inputFrame.Hands.Clear();
+            inputFrame.Hands = hands;
+        }
     }
 }
