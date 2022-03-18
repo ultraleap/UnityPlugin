@@ -135,24 +135,6 @@ namespace LeapInternal
             GC.SuppressFinalize(this);
         }
 
-        public (int Major, int Minor, int Patch) GetServiceVersion()
-        {
-            LEAP_VERSION leapVersion = new LEAP_VERSION();
-            var result = LeapC.GetVersion(_leapConnection, eLeapVersionPart.eLeapVersionPart_ServerLibrary, ref leapVersion);
-
-            if (result == eLeapRS.eLeapRS_Success)
-            { 
-                return (leapVersion.major, leapVersion.minor, leapVersion.patch);
-            }
-            else
-            {
-                UnityEngine.Debug.Log($"GetServiceVersion returned {result.ToString()}");
-            }
-
-            return(0,0,0);
-        }
-
-
         // Protected implementation of Dispose pattern.
         protected virtual void Dispose(bool disposing)
         {
