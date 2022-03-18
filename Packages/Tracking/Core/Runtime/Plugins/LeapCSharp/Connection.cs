@@ -462,7 +462,7 @@ namespace LeapInternal
 
             if (device != null)
             {
-                
+
                 result = LeapC.InterpolateFrameFromTimeEx(_leapConnection, device.Handle, time, sourceTime, trackingBuffer, size);
             }
             else
