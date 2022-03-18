@@ -559,7 +559,6 @@ namespace Leap.Unity
         {
             _fixedOffset.delay = 0.4f;
             _smoothedTrackingLatency.SetBlend(0.99f, 0.0111f);
-            //_useInterpolation = _multipleDeviceMode.Equals(MultipleDeviceMode.Disabled) ? _useInterpolation : false;
         }
 
         protected virtual void Start()
