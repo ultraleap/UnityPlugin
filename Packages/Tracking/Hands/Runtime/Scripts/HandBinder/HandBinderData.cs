@@ -228,6 +228,7 @@ namespace Leap.Unity.HandsModule
             if (boundHand.wrist.boundTransform != null)
             {
                 leapHand.WristPosition = boundHand.wrist.boundTransform.position.ToVector();
+                leapHand.Arm.NextJoint = boundHand.wrist.boundTransform.position.ToVector();
 
                 //Sor the elbow data
                 if (boundHand.elbow.boundTransform != null)
@@ -251,7 +252,6 @@ namespace Leap.Unity.HandsModule
             leapHand.PalmPosition = palmPos;
             leapHand.StabilizedPalmPosition = leapHand.PalmPosition;
             leapHand.PalmWidth = (leapHand.GetPinky().bones[1].PrevJoint - leapHand.GetIndex().bones[1].PrevJoint).Magnitude;
-            leapHand.Arm.NextJoint = leapHand.WristPosition;
 
             return leapHand;
         }
