@@ -929,6 +929,7 @@ namespace Leap.Unity
                 {
                     if (d.SerialNumber.Contains(SpecificSerialNumber) && _leapController != null)
                     {
+
                         connectToNewDevice(d);
                     }
                 };
