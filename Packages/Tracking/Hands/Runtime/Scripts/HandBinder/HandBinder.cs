@@ -164,7 +164,7 @@ namespace Leap.Unity.HandsModule
                 resetScale = true;
             }
 
-            else if(resetScale)
+            else if (resetScale)
             {
                 if (BoundHand.startScale != Vector3.zero)
                 {
