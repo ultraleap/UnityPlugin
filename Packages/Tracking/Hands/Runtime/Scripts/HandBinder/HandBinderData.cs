@@ -181,7 +181,7 @@ namespace Leap.Unity.HandsModule
 
                             //Calculate the tip position
                             Vector tipPosition = (distalBoundBonePosition + direction * (length * fingerTipScale));
-                            leapFinger.TipPosition = tipPosition;
+                            leapFinger.TipPosition = tipPosition
 
                             //Calculate the center of the finger
                             Vector center = Vector.Lerp(distalBoundBonePosition, tipPosition, 0.5f);
