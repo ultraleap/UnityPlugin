@@ -289,8 +289,11 @@ namespace Leap.Unity
 
         private void _leapController_DeviceChanged(object sender, DeviceEventArgs e)
         {
-            EditorWindow view = EditorWindow.GetWindow<SceneView>();
-            view.Repaint();
+            if (!Application.isPlaying || EditorWindow.focusedWindow.GetType() == typeof(SceneView))
+            {
+                EditorWindow view = EditorWindow.GetWindow<SceneView>();
+                view.Repaint();
+            }
         }
 
         private void DetectConnectedDevice(Transform targetTransform)
