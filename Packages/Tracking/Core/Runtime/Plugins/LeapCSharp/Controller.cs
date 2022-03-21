@@ -643,6 +643,14 @@ namespace Leap
         }
 
         /// <summary>
+        /// Returns the Frame at the specified time, interpolating the data between existing frames, if necessary.
+        /// </summary>
+        public Frame GetInterpolatedFrame(Int64 time)
+        {
+            return GetInterpolatedFrame(time, null);
+        }
+
+        /// <summary>
         /// Fills the Frame with data taken at the specified time, interpolating the data between existing frames, if necessary.
         /// </summary>
         public void GetInterpolatedFrame(Frame toFill, Int64 time, Device device = null)
