@@ -668,6 +668,11 @@ namespace Leap.Unity
                         throw new System.InvalidOperationException(
                           "Unexpected frame optimization mode: " + _frameOptimization);
                 }
+<<<<<<< HEAD
+=======
+
+                _leapController.GetInterpolatedFrame(_untransformedFixedFrame, timestamp, _currentDevice);
+>>>>>>> a3d96d09394777b15612af9d55d055b0c61caad7
 
                 _leapController.GetInterpolatedFrame(_untransformedFixedFrame, timestamp, _currentDevice);
             }
@@ -929,6 +934,7 @@ namespace Leap.Unity
                 {
                     if (d.SerialNumber.Contains(SpecificSerialNumber) && _leapController != null)
                     {
+
                         connectToNewDevice(d);
                     }
                 };
