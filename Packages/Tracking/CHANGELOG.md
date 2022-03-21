@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - The LeapServiceProvider provides a list of connected devices (LeapServiceProvider.Devices)
+- Example scene for multiple devices
 - Added a new post process provider to distort tracking data to the 3D visuals
 - Added the ability to generate a leap hand from a bound hand (Hand Binder) 
 
