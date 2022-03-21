@@ -167,13 +167,16 @@ namespace Leap.Unity.HandsModule
                             Vector nextBoundBonePosition = currentBoundBone.boundTransform.position.ToVector();
                             Vector previousBoundBonePosition = previousBoundBone.boundTransform.position.ToVector();
 
-                            //Get the direction of the finger
-                            Vector direction = (previousBoundBonePosition - nextBoundBonePosition);
-                            float length = direction.Magnitude;
+                            //Calculate the length of the previous bone
+                            Vector previousBone = (previousBoundBonePosition - nextBoundBonePosition);
+                            float length = previousBone.Magnitude;
+
+                            //Get the direction of the bone
+                            Vector direction = leapBone.Direction;
 
                             //Calculate the finger tip position given an offset
-                            previousBoundBonePosition += -direction.Normalized * (length * fingerTipScale);
-                            nextBoundBonePosition += -direction.Normalized * (length * fingerTipScale);
+                            previousBoundBonePosition += direction.Normalized * (length * fingerTipScale);
+                            nextBoundBonePosition += direction.Normalized * (length * fingerTipScale);
 
                             //Calculate the center of the finger
                             Vector center = Vector.Lerp(previousBoundBonePosition, nextBoundBonePosition, 0.5f);
