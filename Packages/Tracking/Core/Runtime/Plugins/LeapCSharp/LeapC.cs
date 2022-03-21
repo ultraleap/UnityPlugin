@@ -578,6 +578,11 @@ namespace LeapInternal
         public Int32 major;
         public Int32 minor;
         public Int32 patch;
+
+        public new string ToString()
+        {
+            return major + "." + minor + "." + patch;
+        }
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
