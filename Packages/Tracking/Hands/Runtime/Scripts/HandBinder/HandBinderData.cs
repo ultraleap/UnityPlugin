@@ -158,33 +158,35 @@ namespace Leap.Unity.HandsModule
                     //If this bone is the distal bone, calculate a finger tip position
                     if (leapBoneID == (int)Bone.BoneType.TYPE_DISTAL)
                     {
-                        BoundBone currentBoundBone = boundHand.fingers[leapFingerID].boundBones[leapBoneID];
-                        BoundBone previousBoundBone = boundHand.fingers[leapFingerID].boundBones[leapBoneID - 1];
+                        BoundBone distalBoundBone = boundHand.fingers[leapFingerID].boundBones[leapBoneID];
+                        BoundBone intermediateBoundBone = boundHand.fingers[leapFingerID].boundBones[leapBoneID - 1];
 
-                        if (previousBoundBone.boundTransform && currentBoundBone.boundTransform)
+                        if (intermediateBoundBone.boundTransform && distalBoundBone.boundTransform)
                         {
                             //Get the positions of the rigged joints
-                            Vector nextBoundBonePosition = currentBoundBone.boundTransform.position.ToVector();
-                            Vector previousBoundBonePosition = previousBoundBone.boundTransform.position.ToVector();
+                            Vector distalBoundBonePosition = distalBoundBone.boundTransform.position.ToVector();
+                            Vector previousBoundBonePosition = intermediateBoundBone.boundTransform.position.ToVector();
 
                             //Calculate the length of the previous bone
-                            Vector previousBone = (previousBoundBonePosition - nextBoundBonePosition);
+                            Vector previousBone = (previousBoundBonePosition - distalBoundBonePosition);
                             float length = previousBone.Magnitude;
 
                             //Get the direction of the bone
                             Vector direction = leapBone.Direction;
 
-                            //Calculate the finger tip position given an offset
-                            previousBoundBonePosition += direction.Normalized * (length * fingerTipScale);
-                            nextBoundBonePosition += direction.Normalized * (length * fingerTipScale);
+                            //Calculate the tip position
+                            Vector tipPosition = (distalBoundBonePosition + direction * (length * fingerTipScale));
+                            leapFinger.TipPosition = tipPosition;
 
                             //Calculate the center of the finger
-                            Vector center = Vector.Lerp(previousBoundBonePosition, nextBoundBonePosition, 0.5f);
+                            Vector center = Vector.Lerp(distalBoundBonePosition, tipPosition, 0.5f);
+
+                            //Get the direction of distal to tip
+                            Vector distalDirection = (distalBoundBonePosition - tipPosition);
 
                             //Set the leap finger
-                            leapFinger.bones[leapBoneID] = new Bone(previousBoundBonePosition, nextBoundBonePosition, center, direction, length, leapBone.Width, leapBone.Type, leapBone.Rotation);
+                            leapFinger.bones[leapBoneID] = new Bone(distalBoundBonePosition, tipPosition, center, distalDirection, distalDirection.Magnitude, leapBone.Width, leapBone.Type, leapBone.Rotation);
                             //Set the finger tip position
-                            leapFinger.TipPosition = nextBoundBonePosition;
                         }
                     }
                     else
