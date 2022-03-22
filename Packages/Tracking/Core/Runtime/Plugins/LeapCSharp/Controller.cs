@@ -637,17 +637,25 @@ namespace Leap
         /// <summary>
         /// Returns the Frame at the specified time, interpolating the data between existing frames, if necessary.
         /// </summary>
+        public Frame GetInterpolatedFrame(Int64 time, Device device = null)
+        {
+            return _connection.GetInterpolatedFrame(time, device);
+        }
+
+        /// <summary>
+        /// Returns the Frame at the specified time, interpolating the data between existing frames, if necessary.
+        /// </summary>
         public Frame GetInterpolatedFrame(Int64 time)
         {
-            return _connection.GetInterpolatedFrame(time);
+            return GetInterpolatedFrame(time, null);
         }
 
         /// <summary>
         /// Fills the Frame with data taken at the specified time, interpolating the data between existing frames, if necessary.
         /// </summary>
-        public void GetInterpolatedFrame(Frame toFill, Int64 time)
+        public void GetInterpolatedFrame(Frame toFill, Int64 time, Device device = null)
         {
-            _connection.GetInterpolatedFrame(toFill, time);
+            _connection.GetInterpolatedFrame(toFill, time, device);
         }
 
         /// <summary>
@@ -730,6 +738,27 @@ namespace Leap
             _connection.GetPointMapping(ref pointMapping);
         }
 
+
+        /// <summary>
+        /// This is a special variant of GetInterpolatedFrameFromTime, for use with special
+        /// features that only require the position and orientation of the palm positions, and do
+        /// not care about pose data or any other data.
+        /// 
+        /// You must specify the id of the hand that you wish to get a transform for.  If you specify
+        /// an id that is not present in the interpolated frame, the output transform will be the
+        /// identity transform.
+        /// </summary>
+        public void GetInterpolatedLeftRightTransform(Int64 time,
+                                                      Int64 sourceTime,
+                                                      int leftId,
+                                                      int rightId,
+                                                      Device device,
+                                                  out LeapTransform leftTransform,
+                                                  out LeapTransform rightTransform)
+        {
+            _connection.GetInterpolatedLeftRightTransform(time, sourceTime, leftId, rightId, device, out leftTransform, out rightTransform);
+        }
+
         /// <summary>
         /// This is a special variant of GetInterpolatedFrameFromTime, for use with special
         /// features that only require the position and orientation of the palm positions, and do
@@ -746,12 +775,12 @@ namespace Leap
                                                   out LeapTransform leftTransform,
                                                   out LeapTransform rightTransform)
         {
-            _connection.GetInterpolatedLeftRightTransform(time, sourceTime, leftId, rightId, out leftTransform, out rightTransform);
+            GetInterpolatedLeftRightTransform(time, sourceTime, leftId, rightId, null, out leftTransform, out rightTransform);
         }
 
-        public void GetInterpolatedFrameFromTime(Frame toFill, Int64 time, Int64 sourceTime)
+        public void GetInterpolatedFrameFromTime(Frame toFill, Int64 time, Int64 sourceTime, Device device = null)
         {
-            _connection.GetInterpolatedFrameFromTime(toFill, time, sourceTime);
+            _connection.GetInterpolatedFrameFromTime(toFill, time, sourceTime, device);
         }
 
         /// <summary>
