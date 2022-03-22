@@ -958,6 +958,14 @@ namespace Leap.Unity
                     _onDeviceSafe(e.Device);
                 }
             };
+            
+            _leapController.DeviceLost += (s, e) =>
+            {
+                if (e.Device == _currentDevice)
+                {
+                    _currentDevice = null;
+                }
+            };
 
             _onDeviceSafe += _multipleDeviceMode switch
             {
