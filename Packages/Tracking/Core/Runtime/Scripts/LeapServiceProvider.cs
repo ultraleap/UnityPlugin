@@ -958,7 +958,7 @@ namespace Leap.Unity
                     _onDeviceSafe(e.Device);
                 }
             };
-            
+
             _leapController.DeviceLost += (s, e) =>
             {
                 if (e.Device == _currentDevice)
