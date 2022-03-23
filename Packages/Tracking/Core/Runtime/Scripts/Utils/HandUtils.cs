@@ -331,7 +331,7 @@ namespace Leap.Unity
         /// </summary>
         public static float GetFistStrength(this Hand hand)
         {
-            return (Vector3.Dot(hand.Fingers[1].Direction.ToVector3(), -hand.DistalAxis())
+            return hand == null ? 0 : (Vector3.Dot(hand.Fingers[1].Direction.ToVector3(), -hand.DistalAxis())
                   + Vector3.Dot(hand.Fingers[2].Direction.ToVector3(), -hand.DistalAxis())
                   + Vector3.Dot(hand.Fingers[3].Direction.ToVector3(), -hand.DistalAxis())
                   + Vector3.Dot(hand.Fingers[4].Direction.ToVector3(), -hand.DistalAxis())
