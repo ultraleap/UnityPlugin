@@ -1,10 +1,10 @@
+using Leap.Unity.Encoding;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Leap.Unity.Encoding;
 
 
-namespace Leap.Unity 
+namespace Leap.Unity
 {
 
     /// <summary>

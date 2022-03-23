@@ -7,10 +7,10 @@
  * between Leap Motion and you, your company or other organization.           *
  ******************************************************************************/
 
+using Leap.Unity.Encoding;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using Leap.Unity.Encoding;
 
 namespace Leap.Unity
 {
@@ -46,8 +46,8 @@ namespace Leap.Unity
         [Tooltip("When checked, profiling data from the LeapCSharp worker thread will be used to populate the UnityProfiler.")]
         [EditTimeOnly]
 #else
-    [Tooltip("Worker thread profiling requires a Unity version of 2017.3 or greater.")]
-    [Disable]
+        [Tooltip("Worker thread profiling requires a Unity version of 2017.3 or greater.")]
+        [Disable]
 #endif
         [SerializeField]
         protected bool _workerThreadProfiling = false;
@@ -222,9 +222,9 @@ namespace Leap.Unity
         {
             if (seenProviders.Contains(currentProvider)) return true;
 
-            foreach(LeapProvider provider in currentProvider.providers)
+            foreach (LeapProvider provider in currentProvider.providers)
             {
-                if(provider is LeapAggregatedProviderBase)
+                if (provider is LeapAggregatedProviderBase)
                 {
                     List<LeapAggregatedProviderBase> newSeenProvider = new List<LeapAggregatedProviderBase>(seenProviders);
                     newSeenProvider.Add(currentProvider);
@@ -237,9 +237,9 @@ namespace Leap.Unity
         protected virtual void Awake()
         {
             // if any of the providers are aggregation providers, warn the user 
-            foreach(LeapProvider provider in providers)
+            foreach (LeapProvider provider in providers)
             {
-                if(provider is LeapAggregatedProviderBase)
+                if (provider is LeapAggregatedProviderBase)
                 {
                     Debug.LogWarning("You are trying to aggregate an aggregation provider. This might lead to latency. " +
                         "consider writing your own aggregator instead");
@@ -258,12 +258,12 @@ namespace Leap.Unity
                 providers[i].OnUpdateFrame += (x) =>
                 {
                     updateFramesToCombine[idx] = x;
-                    if(CheckFramesFilled(updateFramesToCombine)) UpdateFrame();
+                    if (CheckFramesFilled(updateFramesToCombine)) UpdateFrame();
                 };
                 providers[i].OnFixedFrame += (x) =>
                 {
                     fixedUpdateFramesToCombine[idx] = x;
-                    if(CheckFramesFilled(fixedUpdateFramesToCombine)) UpdateFixedFrame();
+                    if (CheckFramesFilled(fixedUpdateFramesToCombine)) UpdateFixedFrame();
                 };
             }
         }
@@ -292,9 +292,9 @@ namespace Leap.Unity
 
         bool CheckFramesFilled(Frame[] frames)
         {
-            foreach(Frame frame in frames)
+            foreach (Frame frame in frames)
             {
-                if (frame == null) return false; 
+                if (frame == null) return false;
             }
             return true;
         }
