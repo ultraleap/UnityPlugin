@@ -28,6 +28,7 @@ namespace Leap.Unity
         /// A list of providers that are used for aggregation
         /// </summary>
         [Tooltip("Add all providers here that you want to be used for aggregation")]
+        [EditTimeOnly]
         public LeapProvider[] providers;
 
         public enum FrameOptimizationMode
@@ -198,23 +199,71 @@ namespace Leap.Unity
             editTimePose = TestHandFactory.TestHandPose.DesktopModeA;
         }
 
+        protected virtual void OnValidate()
+        {
+            validateInput();
+        }
+
+        private void validateInput()
+        {
+            if (detectCycle(this, new List<LeapAggregatedProviderBase>()))
+            {
+                enabled = false;
+                Debug.LogError("The input providers on the aggregation provider on " + gameObject.name
+                             + " causes an infinite cycle, so it has been disabled.");
+            }
+        }
+
+        /// <summary>
+        /// aggregation providers wait for all their input providers' update events, so looping them won't work
+        /// this detects a cycle
+        /// </summary>
+        private bool detectCycle(LeapAggregatedProviderBase currentProvider, List<LeapAggregatedProviderBase> seenProviders)
+        {
+            if (seenProviders.Contains(currentProvider)) return true;
+
+            foreach(LeapProvider provider in currentProvider.providers)
+            {
+                if(provider is LeapAggregatedProviderBase)
+                {
+                    List<LeapAggregatedProviderBase> newSeenProvider = new List<LeapAggregatedProviderBase>(seenProviders);
+                    newSeenProvider.Add(currentProvider);
+                    if (detectCycle(provider as LeapAggregatedProviderBase, newSeenProvider)) return true;
+                }
+            }
+            return false;
+        }
+
         protected virtual void Awake()
         {
+            // if any of the providers are aggregation providers, warn the user 
+            foreach(LeapProvider provider in providers)
+            {
+                if(provider is LeapAggregatedProviderBase)
+                {
+                    Debug.LogWarning("You are trying to aggregate an aggregation provider. This might lead to latency. " +
+                        "consider writing your own aggregator instead");
+                }
+            }
+
             updateFramesToCombine = new Frame[providers.Length];
             fixedUpdateFramesToCombine = new Frame[providers.Length];
 
+            // subscribe to the update events and fixed update events of all providers in the public list 'providers'
+            // when an update event happens, add its frame to the framesToCombine lists and then check whether the whole list is filled.
+            // if it is, call updateFrame or updateFixedFrame
             for (int i = 0; i < providers.Length; i++)
             {
                 int idx = i;
                 providers[i].OnUpdateFrame += (x) =>
                 {
                     updateFramesToCombine[idx] = x;
-                    if(checkReady(updateFramesToCombine)) UpdateAfterDispatch();
+                    if(CheckFramesFilled(updateFramesToCombine)) UpdateFrame();
                 };
                 providers[i].OnFixedFrame += (x) =>
                 {
                     fixedUpdateFramesToCombine[idx] = x;
-                    if(checkReady(fixedUpdateFramesToCombine)) FixedUpdateAfterDispatch();
+                    if(CheckFramesFilled(fixedUpdateFramesToCombine)) UpdateFixedFrame();
                 };
             }
         }
@@ -229,7 +278,7 @@ namespace Leap.Unity
 
         #region aggregation functions
 
-        bool checkReady(Frame[] frames)
+        bool CheckFramesFilled(Frame[] frames)
         {
             foreach(Frame frame in frames)
             {
@@ -238,7 +287,7 @@ namespace Leap.Unity
             return true;
         }
 
-        protected virtual void UpdateAfterDispatch()
+        protected virtual void UpdateFrame()
         {
             // get timestamp and other frame info from the first leap provider
             _transformedUpdateFrame = MergeFrames(updateFramesToCombine);
@@ -276,7 +325,7 @@ namespace Leap.Unity
             }
         }
 
-        protected virtual void FixedUpdateAfterDispatch()
+        protected virtual void UpdateFixedFrame()
         {
 
             // get timestamp and other frame info from the first leap provider
