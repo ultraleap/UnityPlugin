@@ -329,15 +329,17 @@ namespace Leap.Unity
         /// <summary>
         /// Returns a confidence value from 0 to 1 indicating how strongly the Hand is making a fist.
         /// </summary>
-        public static float GetFistStrength(this Hand hand)
+        public static float GetFistStrength(this Hand hand) =>
+        hand switch
         {
-            return hand == null ? 0 : (Vector3.Dot(hand.Fingers[1].Direction.ToVector3(), -hand.DistalAxis())
-                  + Vector3.Dot(hand.Fingers[2].Direction.ToVector3(), -hand.DistalAxis())
-                  + Vector3.Dot(hand.Fingers[3].Direction.ToVector3(), -hand.DistalAxis())
-                  + Vector3.Dot(hand.Fingers[4].Direction.ToVector3(), -hand.DistalAxis())
-                  + Vector3.Dot(hand.Fingers[0].Direction.ToVector3(), -hand.RadialAxis())
-                  ).Map(-5, 5, 0, 1);
-        }
+            null => 0,
+            _ => (Vector3.Dot(hand.Fingers[1].Direction.ToVector3(), -hand.DistalAxis())
+                    + Vector3.Dot(hand.Fingers[2].Direction.ToVector3(), -hand.DistalAxis())
+                    + Vector3.Dot(hand.Fingers[3].Direction.ToVector3(), -hand.DistalAxis())
+                    + Vector3.Dot(hand.Fingers[4].Direction.ToVector3(), -hand.DistalAxis())
+                    + Vector3.Dot(hand.Fingers[0].Direction.ToVector3(), -hand.RadialAxis())
+                    ).Map(-5, 5, 0, 1)
+        };
 
         /// <summary>
         /// Returns an unsmoothed ray representing the general reaching/interaction intent direction.
