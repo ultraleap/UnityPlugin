@@ -274,6 +274,18 @@ namespace Leap.Unity
             _transformedFixedFrame = new Frame();
         }
 
+        protected void OnPostRender()
+        {
+            // reset all frames in framesToCombineLists, if they haven't been used this unity frame
+            // This can happen, if one of the providers doesn't dispatch an update event
+            for (int i = 0; i < updateFramesToCombine.Length; i++)
+            {
+                updateFramesToCombine[i] = null;
+                fixedUpdateFramesToCombine[i] = null;
+            }
+        }
+
+
         #endregion
 
         #region aggregation functions
