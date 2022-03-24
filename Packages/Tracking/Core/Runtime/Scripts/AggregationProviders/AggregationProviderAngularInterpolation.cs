@@ -9,8 +9,9 @@ namespace Leap.Unity
 
     /// <summary>
     /// John's and Flo's aggregation code. An example of how aggregation could be implemented.
+    /// only works for the first two hands it sees (of the same chirality)
     /// </summary>
-    public class LeapAggregatedProvider : LeapAggregatedProviderBase
+    public class AggregationProviderAngularInterpolation : LeapAggregatedProviderBase
     {
 
         private Vector3 tempHandPalmPosition;

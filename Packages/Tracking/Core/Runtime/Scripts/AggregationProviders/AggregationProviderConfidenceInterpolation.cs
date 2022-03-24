@@ -12,7 +12,7 @@ namespace Leap.Unity
     /// gets all hands and lerps between them using confidences (could be extended to treat joints and overall hand pos + rot differently),
     /// Confidences could be calculated as a combination of lots of things (example: relative hand pos)
     /// </summary>
-    public class MergerExperiment : LeapAggregatedProviderBase
+    public class AggregationProviderConfidenceInterpolation : LeapAggregatedProviderBase
     {
         protected override Frame MergeFrames(Frame[] frames)
         {
