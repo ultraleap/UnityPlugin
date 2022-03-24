@@ -785,6 +785,7 @@ namespace Leap.Unity
                                       interpolationTime - (BounceAmount * 1000),
                                       (leftHand != null ? leftHand.Id : 0),
                                       (rightHand != null ? rightHand.Id : 0),
+                                      _currentDevice,
                                       out precullLeftHand,
                                       out precullRightHand);
                     bool leftValid = precullLeftHand.translation != Vector.Zero;

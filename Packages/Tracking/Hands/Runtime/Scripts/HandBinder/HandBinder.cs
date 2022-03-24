@@ -160,9 +160,11 @@ namespace Leap.Unity.HandsModule
             {
                 ScaleModel();
                 ScaleFingertips();
+
+                resetScale = true;
             }
 
-            else
+            else if (resetScale)
             {
                 if (BoundHand.startScale != Vector3.zero)
                 {
@@ -178,6 +180,8 @@ namespace Leap.Unity.HandsModule
 
                     lastBone.boundTransform.localScale = lastBone.startTransform.scale;
                 }
+
+                resetScale = false;
             }
         }
 
@@ -579,6 +583,8 @@ namespace Leap.Unity.HandsModule
 
             return editorPersistance;
         }
+
+        bool resetScale = false;
 
         #endregion
     }

@@ -28,7 +28,6 @@ namespace Leap.Unity
     /// </summary>
     public class LeapServiceProvider : LeapProvider
     {
-
         #region Constants
 
         /// <summary>
@@ -180,14 +179,14 @@ namespace Leap.Unity
             {
                 _specificSerialNumber = value;
                 if (_multipleDeviceMode != MultipleDeviceMode.Specific) Debug.Log("You are trying to set a Specific Serial Number while Multiple Device Mode is not set to 'Specific'. Please change the Multiple Device Mode to 'Specific'");
-                else if (currentDevice.SerialNumber != _specificSerialNumber)
+                else if (_currentDevice.SerialNumber != _specificSerialNumber)
                 {
                     updateDevice();
                 }
             }
         }
 
-        Device currentDevice;
+        protected Device _currentDevice;
 
         /// <summary>
         /// The list of currently attached and recognized Leap Motion controller devices.
@@ -560,7 +559,6 @@ namespace Leap.Unity
         {
             _fixedOffset.delay = 0.4f;
             _smoothedTrackingLatency.SetBlend(0.99f, 0.0111f);
-            _useInterpolation = _multipleDeviceMode.Equals(MultipleDeviceMode.Disabled) ? _useInterpolation : false;
         }
 
         protected virtual void Start()
@@ -610,7 +608,7 @@ namespace Leap.Unity
 #endif
 
             // if the serial number has changed since the last update(), update the device
-            if (_multipleDeviceMode == MultipleDeviceMode.Specific && (currentDevice == null || currentDevice.SerialNumber != SpecificSerialNumber))
+            if (_multipleDeviceMode == MultipleDeviceMode.Specific && (_currentDevice == null || _currentDevice.SerialNumber != SpecificSerialNumber))
             {
                 updateDevice();
             }
@@ -624,7 +622,7 @@ namespace Leap.Unity
                 long timestamp = CalculateInterpolationTime() + (ExtrapolationAmount * 1000);
                 _unityToLeapOffset = timestamp - (long)(Time.time * S_TO_NS);
 
-                _leapController.GetInterpolatedFrameFromTime(_untransformedUpdateFrame, timestamp, CalculateInterpolationTime() - (BounceAmount * 1000));
+                _leapController.GetInterpolatedFrameFromTime(_untransformedUpdateFrame, timestamp, CalculateInterpolationTime() - (BounceAmount * 1000), _currentDevice);
             }
             else
             {
@@ -670,8 +668,8 @@ namespace Leap.Unity
                         throw new System.InvalidOperationException(
                           "Unexpected frame optimization mode: " + _frameOptimization);
                 }
-                _leapController.GetInterpolatedFrame(_untransformedFixedFrame, timestamp);
 
+                _leapController.GetInterpolatedFrame(_untransformedFixedFrame, timestamp, _currentDevice);
             }
             else
             {
@@ -925,28 +923,20 @@ namespace Leap.Unity
                 }
             };
 
-            if (_multipleDeviceMode == MultipleDeviceMode.Specific)
+            _onDeviceSafe += _multipleDeviceMode switch
             {
-                _onDeviceSafe += (d) =>
+                MultipleDeviceMode.Specific => (d) =>
                 {
                     if (d.SerialNumber.Contains(SpecificSerialNumber) && _leapController != null)
                     {
                         connectToNewDevice(d);
                     }
-                };
-            }
+                }
+                ,
+                MultipleDeviceMode.Disabled => (d) => _currentDevice = d,
+                _ => throw new NotImplementedException($"{nameof(MultipleDeviceMode)} case not implemented")
+            };
 
-            //TO DO - Enable Multiple Device Mode All
-            /*
-            else if (_multipleDeviceMode == MultipleDeviceMode.All)
-            {
-                _onDeviceSafe += (d) =>
-                {
-                    Debug.Log("Connecting to Device with Serial: " + d.SerialNumber);
-                    _leapController.SubscribeToDeviceEvents(d);
-                };
-            }
-            */
 
             if (_leapController.IsConnected)
             {
@@ -979,13 +969,19 @@ namespace Leap.Unity
         /// or application is not playing or already connected to Device d</returns>
         private bool connectToNewDevice(Device d)
         {
-            if (_leapController == null || !Application.isPlaying || currentDevice == d) return false;
+            if (_leapController == null || !Application.isPlaying || _currentDevice == d)
+            {
+                return false;
+            }
 
-            if (currentDevice != null) _leapController.UnsubscribeFromDeviceEvents(currentDevice);
+            if (_currentDevice != null)
+            {
+                _leapController.UnsubscribeFromDeviceEvents(_currentDevice);
+            }
 
             Debug.Log("Connecting to Device with Serial: " + d.SerialNumber);
             _leapController.SubscribeToDeviceEvents(d);
-            currentDevice = d;
+            _currentDevice = d;
             return true;
         }
 

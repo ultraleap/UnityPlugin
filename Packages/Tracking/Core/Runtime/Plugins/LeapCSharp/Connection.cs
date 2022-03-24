@@ -409,19 +409,41 @@ namespace LeapInternal
         }
 
 
-        public UInt64 GetInterpolatedFrameSize(Int64 time)
+        public UInt64 GetInterpolatedFrameSize(Int64 time, Device device = null)
         {
             UInt64 size = 0;
-            eLeapRS result = LeapC.GetFrameSize(_leapConnection, time, out size);
+            eLeapRS result;
+
+            if (device != null)
+            {
+                result = LeapC.GetFrameSizeEx(_leapConnection, device.Handle, time, out size);
+            }
+            else
+            {
+                result = LeapC.GetFrameSize(_leapConnection, time, out size);
+            }
+
             reportAbnormalResults("LeapC get interpolated frame call was ", result);
             return size;
         }
 
-        public void GetInterpolatedFrame(Frame toFill, Int64 time)
+
+
+        public void GetInterpolatedFrame(Frame toFill, Int64 time, Device device = null)
         {
-            UInt64 size = GetInterpolatedFrameSize(time);
+            UInt64 size = GetInterpolatedFrameSize(time, device);
             IntPtr trackingBuffer = Marshal.AllocHGlobal((Int32)size);
-            eLeapRS result = LeapC.InterpolateFrame(_leapConnection, time, trackingBuffer, size);
+            eLeapRS result;
+
+            if (device != null)
+            {
+                result = LeapC.InterpolateFrameEx(_leapConnection, device.Handle, time, trackingBuffer, size);
+            }
+            else
+            {
+                result = LeapC.InterpolateFrame(_leapConnection, time, trackingBuffer, size);
+            }
+
             reportAbnormalResults("LeapC get interpolated frame call was ", result);
             if (result == eLeapRS.eLeapRS_Success)
             {
@@ -432,11 +454,22 @@ namespace LeapInternal
             Marshal.FreeHGlobal(trackingBuffer);
         }
 
-        public void GetInterpolatedFrameFromTime(Frame toFill, Int64 time, Int64 sourceTime)
+        public void GetInterpolatedFrameFromTime(Frame toFill, Int64 time, Int64 sourceTime, Device device = null)
         {
-            UInt64 size = GetInterpolatedFrameSize(time);
+            UInt64 size = GetInterpolatedFrameSize(time, device);
             IntPtr trackingBuffer = Marshal.AllocHGlobal((Int32)size);
-            eLeapRS result = LeapC.InterpolateFrameFromTime(_leapConnection, time, sourceTime, trackingBuffer, size);
+            eLeapRS result;
+
+            if (device != null)
+            {
+
+                result = LeapC.InterpolateFrameFromTimeEx(_leapConnection, device.Handle, time, sourceTime, trackingBuffer, size);
+            }
+            else
+            {
+                result = LeapC.InterpolateFrameFromTime(_leapConnection, time, sourceTime, trackingBuffer, size);
+            }
+
             reportAbnormalResults("LeapC get interpolated frame from time call was ", result);
             if (result == eLeapRS.eLeapRS_Success)
             {
@@ -447,10 +480,10 @@ namespace LeapInternal
             Marshal.FreeHGlobal(trackingBuffer);
         }
 
-        public Frame GetInterpolatedFrame(Int64 time)
+        public Frame GetInterpolatedFrame(Int64 time, Device device = null)
         {
             Frame frame = new Frame();
-            GetInterpolatedFrame(frame, time);
+            GetInterpolatedFrame(frame, time, device);
             return frame;
         }
 
@@ -471,15 +504,26 @@ namespace LeapInternal
                                                       Int64 sourceTime,
                                                       Int64 leftId,
                                                       Int64 rightId,
+                                                      Device device,
                                                   out LeapTransform leftTransform,
                                                   out LeapTransform rightTransform)
         {
             leftTransform = LeapTransform.Identity;
             rightTransform = LeapTransform.Identity;
 
-            UInt64 size = GetInterpolatedFrameSize(time);
+            UInt64 size = GetInterpolatedFrameSize(time, device);
             IntPtr trackingBuffer = Marshal.AllocHGlobal((Int32)size);
-            eLeapRS result = LeapC.InterpolateFrameFromTime(_leapConnection, time, sourceTime, trackingBuffer, size);
+            eLeapRS result;
+
+            if (device != null)
+            {
+                result = LeapC.InterpolateFrameFromTimeEx(_leapConnection, device.Handle, time, sourceTime, trackingBuffer, size);
+            }
+            else
+            {
+                result = LeapC.InterpolateFrameFromTime(_leapConnection, time, sourceTime, trackingBuffer, size);
+            }
+
             reportAbnormalResults("LeapC get interpolated frame from time call was ", result);
 
             if (result == eLeapRS.eLeapRS_Success)
@@ -516,6 +560,17 @@ namespace LeapInternal
             }
 
             Marshal.FreeHGlobal(trackingBuffer);
+
+        }
+
+        public void GetInterpolatedLeftRightTransform(Int64 time,
+                                                      Int64 sourceTime,
+                                                      Int64 leftId,
+                                                      Int64 rightId,
+                                                  out LeapTransform leftTransform,
+                                                  out LeapTransform rightTransform)
+        {
+            GetInterpolatedLeftRightTransform(time, sourceTime, leftId, rightId, null, out leftTransform, out rightTransform);
         }
 
         private void handleConnection(ref LEAP_CONNECTION_EVENT connectionMsg)
@@ -544,7 +599,6 @@ namespace LeapInternal
 
             device.UpdateStatus(statusEvent.status);
         }
-
 
         private void handleDevice(ref LEAP_DEVICE_EVENT deviceMsg)
         {

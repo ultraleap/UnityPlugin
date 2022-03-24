@@ -578,6 +578,11 @@ namespace LeapInternal
         public Int32 major;
         public Int32 minor;
         public Int32 patch;
+
+        public new string ToString()
+        {
+            return major + "." + minor + "." + patch;
+        }
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -658,6 +663,13 @@ namespace LeapInternal
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public struct LEAP_TRACKING_MODE_EVENT
+    {
+        public UInt32 reserved;
+        public eLeapTrackingMode current_tracking_mode;
+    }
+
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct LEAP_DROPPED_FRAME_EVENT
     {
         public Int64 frame_id;
@@ -699,6 +711,8 @@ namespace LeapInternal
         public Int64 timestamp;
         public LEAP_VECTOR head_position;
         public LEAP_QUATERNION head_orientation;
+        public LEAP_VECTOR head_linear_velocity;
+        public LEAP_VECTOR head_angular_velocity;
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -965,8 +979,14 @@ namespace LeapInternal
         [DllImport("LeapC", EntryPoint = "LeapSetTrackingMode")]
         public static extern eLeapRS SetTrackingMode(IntPtr hConnection, eLeapTrackingMode mode);
 
+        [DllImport("LeapC", EntryPoint = "LeapSetTrackingModeEx")]
+        public static extern eLeapRS SetTrackingModeEx(IntPtr hConnection, IntPtr hDevice, eLeapTrackingMode mode);
+
         [DllImport("LeapC", EntryPoint = "LeapGetTrackingMode")]
         public static extern eLeapRS LeapGetTrackingMode(IntPtr hConnection);
+
+        [DllImport("LeapC", EntryPoint = "LeapGetTrackingModeEx")]
+        public static extern eLeapRS LeapGetTrackingModeEx(IntPtr hConnection, IntPtr hDevice);
 
         [DllImport("LeapC", EntryPoint = "LeapGetNow")]
         public static extern long GetNow();
@@ -1017,6 +1037,9 @@ namespace LeapInternal
         [DllImport("LeapC", EntryPoint = "LeapOpenDevice")]
         public static extern eLeapRS OpenDevice(LEAP_DEVICE_REF rDevice, out IntPtr pDevice);
 
+        [DllImport("LeapC", EntryPoint = "LeapSetPrimaryDevice")]
+        public static extern eLeapRS LeapSetPrimaryDevice(IntPtr hConnection, IntPtr hDevice, bool unsubscribeOthers);
+
         [DllImport("LeapC", EntryPoint = "LeapSubscribeEvents")]
         public static extern eLeapRS LeapSubscribeEvents(IntPtr hConnection, IntPtr hDevice);
 
@@ -1029,10 +1052,11 @@ namespace LeapInternal
         [DllImport("LeapC", EntryPoint = "LeapGetDeviceTransform")]
         public static extern eLeapRS GetDeviceTransform(IntPtr hDevice, out float[] transform);
 
-        // Will be a SetPolicyFlagsEx()..
-
         [DllImport("LeapC", EntryPoint = "LeapSetPolicyFlags")]
         public static extern eLeapRS SetPolicyFlags(IntPtr hConnection, UInt64 set, UInt64 clear);
+
+        [DllImport("LeapC", EntryPoint = "LeapSetPolicyFlagsEx")]
+        public static extern eLeapRS SetPolicyFlagsEx(IntPtr hConnection, IntPtr hDevice, UInt64 set, UInt64 clear);
 
         [DllImport("LeapC", EntryPoint = "LeapSetPause")]
         public static extern eLeapRS LeapSetPause(IntPtr hConnection, bool pause);
@@ -1046,11 +1070,20 @@ namespace LeapInternal
         [DllImport("LeapC", EntryPoint = "LeapGetFrameSize")]
         public static extern eLeapRS GetFrameSize(IntPtr hConnection, Int64 timestamp, out UInt64 pncbEvent);
 
+        [DllImport("LeapC", EntryPoint = "LeapGetFrameSizeEx")]
+        public static extern eLeapRS GetFrameSizeEx(IntPtr hConnection, IntPtr hDevice, Int64 timestamp, out UInt64 pncbEvent);
+
         [DllImport("LeapC", EntryPoint = "LeapInterpolateFrame")]
         public static extern eLeapRS InterpolateFrame(IntPtr hConnection, Int64 timestamp, IntPtr pEvent, UInt64 ncbEvent);
 
+        [DllImport("LeapC", EntryPoint = "LeapInterpolateFrameEx")]
+        public static extern eLeapRS InterpolateFrameEx(IntPtr hConnection, IntPtr hDevice, Int64 timestamp, IntPtr pEvent, UInt64 ncbEvent);
+
         [DllImport("LeapC", EntryPoint = "LeapInterpolateFrameFromTime")]
         public static extern eLeapRS InterpolateFrameFromTime(IntPtr hConnection, Int64 timestamp, Int64 sourceTimestamp, IntPtr pEvent, UInt64 ncbEvent);
+
+        [DllImport("LeapC", EntryPoint = "LeapInterpolateFrameFromTimeEx")]
+        public static extern eLeapRS InterpolateFrameFromTimeEx(IntPtr hConnection, IntPtr hDevice, Int64 timestamp, Int64 sourceTimestamp, IntPtr pEvent, UInt64 ncbEvent);
 
         [DllImport("LeapC", EntryPoint = "LeapInterpolateHeadPose")]
         public static extern eLeapRS InterpolateHeadPose(IntPtr hConnection, Int64 timestamp, ref LEAP_HEAD_POSE_EVENT headPose);
