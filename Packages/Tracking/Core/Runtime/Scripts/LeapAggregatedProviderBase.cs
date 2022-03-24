@@ -206,7 +206,7 @@ namespace Leap.Unity
 
         private void validateInput()
         {
-            if (detectCycle(this, new List<LeapAggregatedProviderBase>()))
+            if (detectCircularProviderReferenece(this, new List<LeapAggregatedProviderBase>()))
             {
                 enabled = false;
                 Debug.LogError("The input providers on the aggregation provider on " + gameObject.name
@@ -216,9 +216,9 @@ namespace Leap.Unity
 
         /// <summary>
         /// aggregation providers wait for all their input providers' update events, so looping them won't work
-        /// this detects a cycle
+        /// this detects a circular reference
         /// </summary>
-        private bool detectCycle(LeapAggregatedProviderBase currentProvider, List<LeapAggregatedProviderBase> seenProviders)
+        private bool detectCircularProviderReferenece(LeapAggregatedProviderBase currentProvider, List<LeapAggregatedProviderBase> seenProviders)
         {
             if (seenProviders.Contains(currentProvider)) return true;
 
@@ -228,7 +228,7 @@ namespace Leap.Unity
                 {
                     List<LeapAggregatedProviderBase> newSeenProvider = new List<LeapAggregatedProviderBase>(seenProviders);
                     newSeenProvider.Add(currentProvider);
-                    if (detectCycle(provider as LeapAggregatedProviderBase, newSeenProvider)) return true;
+                    if (detectCircularProviderReferenece(provider as LeapAggregatedProviderBase, newSeenProvider)) return true;
                 }
             }
             return false;
@@ -278,11 +278,8 @@ namespace Leap.Unity
         {
             // reset all frames in framesToCombineLists, if they haven't been used this unity frame
             // This can happen, if one of the providers doesn't dispatch an update event
-            for (int i = 0; i < updateFramesToCombine.Length; i++)
-            {
-                updateFramesToCombine[i] = null;
-                fixedUpdateFramesToCombine[i] = null;
-            }
+            updateFramesToCombine.ClearWith(null);
+            fixedUpdateFramesToCombine.ClearWith(null);
         }
 
 
@@ -301,14 +298,11 @@ namespace Leap.Unity
 
         protected virtual void UpdateFrame()
         {
-            // get timestamp and other frame info from the first leap provider
+            // merge all update frames
             _transformedUpdateFrame = MergeFrames(updateFramesToCombine);
 
             // reset all the update frames received from providers to null again
-            for (int i = 0; i < updateFramesToCombine.Length; i++)
-            {
-                updateFramesToCombine[i] = null;
-            }
+            updateFramesToCombine.ClearWith(null);
 
             // ??? needed?
             if (_workerThreadProfiling)
@@ -340,14 +334,11 @@ namespace Leap.Unity
         protected virtual void UpdateFixedFrame()
         {
 
-            // get timestamp and other frame info from the first leap provider
+            // merge all fixed update frames
             _transformedFixedFrame = MergeFrames(fixedUpdateFramesToCombine);
 
-            // reset all the update frames received from providers to null again
-            for (int i = 0; i < fixedUpdateFramesToCombine.Length; i++)
-            {
-                fixedUpdateFramesToCombine[i] = null;
-            }
+            // reset all the fixed update frames received from providers to null again
+            fixedUpdateFramesToCombine.ClearWith(null);
 
             if (_frameOptimization == FrameOptimizationMode.ReuseUpdateForPhysics)
             {
@@ -361,6 +352,12 @@ namespace Leap.Unity
             }
         }
 
+        /// <summary>
+        /// defines how a list of frames can be merged into a single frame. 
+        /// This needs to be implemented in every aggregation provider
+        /// </summary>
+        /// <param name="frames"> a list of all frames received from the providers</param>
+        /// <returns> a merged frame </returns>
         protected abstract Frame MergeFrames(Frame[] frames);
 
         #endregion
