@@ -164,7 +164,7 @@ namespace Leap.Unity
         [Tooltip("When Multiple Device Mode is set to `Specific`, the provider will " +
           "receive data from only the devices that contain this in their serial number.")]
         [SerializeField]
-        protected string _specificSerialNumber;
+        protected string _specificSerialNumber = "";
 
         /// <summary>
         /// When Multiple Device Mode is set to `Specific`, the provider will
@@ -179,7 +179,7 @@ namespace Leap.Unity
             {
                 _specificSerialNumber = value;
                 if (_multipleDeviceMode != MultipleDeviceMode.Specific) Debug.Log("You are trying to set a Specific Serial Number while Multiple Device Mode is not set to 'Specific'. Please change the Multiple Device Mode to 'Specific'");
-                else if (_currentDevice.SerialNumber != _specificSerialNumber)
+                else if (_currentDevice == null || _currentDevice.SerialNumber != _specificSerialNumber)
                 {
                     updateDevice();
                 }
@@ -993,6 +993,7 @@ namespace Leap.Unity
         private void updateDevice()
         {
             if (_leapController == null) return;
+            if (SpecificSerialNumber == null || SpecificSerialNumber == "") return;
 
             foreach (Device d in _leapController.Devices)
             {
