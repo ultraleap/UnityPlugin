@@ -206,7 +206,7 @@ namespace Leap.Unity
 
         private void validateInput()
         {
-            if (detectCircularProviderReferenece(this, new List<LeapAggregatedProviderBase>()))
+            if (detectCircularProviderReference(this, new List<LeapAggregatedProviderBase>()))
             {
                 enabled = false;
                 Debug.LogError("The input providers on the aggregation provider on " + gameObject.name
@@ -218,7 +218,7 @@ namespace Leap.Unity
         /// aggregation providers wait for all their input providers' update events, so looping them won't work
         /// this detects a circular reference
         /// </summary>
-        private bool detectCircularProviderReferenece(LeapAggregatedProviderBase currentProvider, List<LeapAggregatedProviderBase> seenProviders)
+        private bool detectCircularProviderReference(LeapAggregatedProviderBase currentProvider, List<LeapAggregatedProviderBase> seenProviders)
         {
             if (seenProviders.Contains(currentProvider)) return true;
 
@@ -228,7 +228,7 @@ namespace Leap.Unity
                 {
                     List<LeapAggregatedProviderBase> newSeenProvider = new List<LeapAggregatedProviderBase>(seenProviders);
                     newSeenProvider.Add(currentProvider);
-                    if (detectCircularProviderReferenece(provider as LeapAggregatedProviderBase, newSeenProvider)) return true;
+                    if (detectCircularProviderReference(provider as LeapAggregatedProviderBase, newSeenProvider)) return true;
                 }
             }
             return false;
