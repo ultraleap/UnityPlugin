@@ -531,14 +531,19 @@ namespace Leap
         /// the change was accepted. 
         /// @since 2.1.6 
         /// </summary>
-        public void SetAndClearPolicy(PolicyFlag set, PolicyFlag clear, string deviceSerial = "")
+        public void SetAndClearPolicy(PolicyFlag set, PolicyFlag clear, string deviceSerial = "", Device device = null)
         {
             _connection.SetAndClearPolicy(set, clear);
         }
 
+        public void SetPolicy(PolicyFlag policy, Device device = null)
+        {
+            _connection.SetPolicy(policy, device);
+        }
+
         public void SetPolicy(PolicyFlag policy)
         {
-            _connection.SetPolicy(policy);
+            SetPolicy(policy, null);
         }
 
         /// <summary>
@@ -550,9 +555,14 @@ namespace Leap
         /// the change was accepted.
         /// @since 2.1.6
         /// </summary>
+        public void ClearPolicy(PolicyFlag policy, Device device = null)
+        {
+            _connection.ClearPolicy(policy, device);
+        }
+
         public void ClearPolicy(PolicyFlag policy)
         {
-            _connection.ClearPolicy(policy);
+            ClearPolicy(policy, null);
         }
 
         /// <summary>
@@ -569,9 +579,14 @@ namespace Leap
         ///
         /// @since 2.1.6
         /// </summary>
+        public bool IsPolicySet(PolicyFlag policy, Device device = null)
+        {
+            return _connection.IsPolicySet(policy, device);
+        }
+
         public bool IsPolicySet(PolicyFlag policy)
         {
-            return _connection.IsPolicySet(policy);
+            return IsPolicySet(policy, null);
         }
 
         /// <summary>

@@ -17,9 +17,16 @@ namespace Leap
         Frame GetTransformedFrame(LeapTransform trs, int history = 0);
         Frame GetInterpolatedFrame(Int64 time);
 
+        [Obsolete]
         void SetPolicy(Controller.PolicyFlag policy);
+        [Obsolete]
         void ClearPolicy(Controller.PolicyFlag policy);
+        [Obsolete]
         bool IsPolicySet(Controller.PolicyFlag policy);
+
+        void SetPolicy(Controller.PolicyFlag policy, Device device = null);
+        void ClearPolicy(Controller.PolicyFlag policy, Device device = null);
+        bool IsPolicySet(Controller.PolicyFlag policy, Device device = null);
 
         long Now();
 

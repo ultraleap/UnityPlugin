@@ -106,6 +106,14 @@ namespace Leap
     /// </summary>
     public class PolicyEventArgs : LeapEventArgs
     {
+        public PolicyEventArgs(UInt64 currentPolicies, UInt64 oldPolicies, Device device) : base(LeapEvent.EVENT_POLICY_CHANGE)
+        {
+            this.currentPolicies = currentPolicies;
+            this.oldPolicies = oldPolicies;
+            this.device = device;
+        }
+
+        [Obsolete("Use the constructor that takes the device")]
         public PolicyEventArgs(UInt64 currentPolicies, UInt64 oldPolicies) : base(LeapEvent.EVENT_POLICY_CHANGE)
         {
             this.currentPolicies = currentPolicies;
@@ -114,6 +122,7 @@ namespace Leap
 
         public UInt64 currentPolicies { get; set; }
         public UInt64 oldPolicies { get; set; }
+        public Device device { get; set; }
     }
 
     /// <summary>
