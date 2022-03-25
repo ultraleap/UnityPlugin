@@ -884,6 +884,7 @@ namespace LeapInternal
 
         private void handlePolicyChange(ref LEAP_POLICY_EVENT policyMsg, UInt32 deviceID)
         {
+            UnityEngine.Debug.Log($"handlePolicyChange for device {deviceID}. New value is {policyMsg.current_policy} in {this.GetHashCode()}");
             // Avoid raising spurious policy change signals.
             if (_activePolicies.ContainsKey(deviceID))
             {
@@ -942,6 +943,15 @@ namespace LeapInternal
 
         public void SetPolicy(Controller.PolicyFlag policy, Device device = null)
         {
+            if (device != null)
+            {
+                UnityEngine.Debug.Log($"Setting policy flag for device {device.DeviceID} to {policy} {this.GetHashCode()}");
+            }
+            else
+            {
+                UnityEngine.Debug.Log($"Setting policy flag for unknown device to {policy} {this.GetHashCode()}");
+            }
+
             UInt64 setFlags = (ulong)FlagForPolicy(policy);
 
             eLeapRS result;
@@ -970,6 +980,15 @@ namespace LeapInternal
 
         public void ClearPolicy(Controller.PolicyFlag policy, Device device = null)
         {
+            if (device != null)
+            {
+                UnityEngine.Debug.Log($"Clearing policy flag for device {device.DeviceID} for {policy} {this.GetHashCode()}");
+            }
+            else
+            {
+                UnityEngine.Debug.Log($"Clearing policy flag for default (unknown) device for {policy} {this.GetHashCode()}");
+            }
+
             UInt64 clearFlags = (ulong)FlagForPolicy(policy);
 
             eLeapRS result;

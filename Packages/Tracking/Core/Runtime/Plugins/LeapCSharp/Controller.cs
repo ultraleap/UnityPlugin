@@ -543,6 +543,24 @@ namespace Leap
         }
 
         /// <summary>
+        /// Requests setting and clearing policy flags
+        ///  
+        /// A request to change a policy is subject to user approval and a policy 
+        /// can be changed by the user at any time (using the Leap Motion settings dialog). 
+        /// The desired policy flags must be set every time an application runs. 
+        ///  
+        /// Policy changes are completed asynchronously and, because they are subject 
+        /// to user approval or system compatibility checks, may not complete successfully. Call 
+        /// Controller.IsPolicySet() after a suitable interval to test whether 
+        /// the change was accepted. 
+        /// @since 2.1.6 
+        /// </summary>   
+        public void SetAndClearPolicy(PolicyFlag set, PolicyFlag clear, string deviceSerial = "", Device device = null)
+        {
+            _connection.SetAndClearPolicy(set, clear, device);
+        }
+
+        /// <summary>
         /// Requests setting a policy.
         ///  
         /// A request to change a policy is subject to user approval and a policy 
@@ -554,23 +572,17 @@ namespace Leap
         /// Controller.IsPolicySet() after a suitable interval to test whether 
         /// the change was accepted. 
         /// @since 2.1.6 
-        /// </summary>
-        [Obsolete("Use the version of SetPolicy that also takes the device")]
-        public void SetAndClearPolicy(PolicyFlag set, PolicyFlag clear, string deviceSerial = "", Device device = null)
-        {
-            _connection.SetAndClearPolicy(set, clear);
-        }
-
+        /// </summary>   
         public void SetPolicy(PolicyFlag policy, Device device = null)
         { 
             _connection.SetPolicy(policy, device);
         }
 
+        [Obsolete("Use the version of SetPolicy that also takes the device")] 
         public void SetPolicy(PolicyFlag policy)
         {
             SetPolicy(policy, null);
         }
-
 
         /// <summary>
         /// Requests clearing a policy
@@ -624,6 +636,15 @@ namespace Leap
         /// state for the selected policy is returned.
         ///
         /// @since 2.1.6
+<<<<<<< HEAD
+=======
+        /// </summary>
+        public bool IsPolicySet(PolicyFlag policy, Device device = null)
+        {
+            return _connection.IsPolicySet(policy, device);
+        }
+
+>>>>>>> cd1c15e4 (Enabled setting tracking modes (policy flags) work across multiple devices. Fixed potential crash / issue with polling not stopping. Added support to query ActiveDevices)
         public bool IsPolicySet(PolicyFlag policy)
         {
             return IsPolicySet(policy, null);
