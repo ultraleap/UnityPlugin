@@ -561,8 +561,8 @@ namespace Leap
         }
 
         public void SetPolicy(PolicyFlag policy, Device device = null)
-        { 
-            _connection.SetPolicy(policy, device);
+		{
+			_connection.SetPolicy(policy, device);
         }
 
         public void SetPolicy(PolicyFlag policy)

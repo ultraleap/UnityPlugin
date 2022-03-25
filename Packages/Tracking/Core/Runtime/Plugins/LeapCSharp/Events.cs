@@ -105,7 +105,7 @@ namespace Leap
     /// @since 3.0
     /// </summary>
     public class PolicyEventArgs : LeapEventArgs
-    {
+	{
         public PolicyEventArgs(UInt64 currentPolicies, UInt64 oldPolicies, bool oldPolicyIsValid, Device device) : base(LeapEvent.EVENT_POLICY_CHANGE)
         {
             this.currentPolicies = currentPolicies;
