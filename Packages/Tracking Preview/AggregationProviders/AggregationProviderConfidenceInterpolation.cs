@@ -1,8 +1,8 @@
 using Leap.Unity.Encoding;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using System.Linq;
+using UnityEngine;
 
 namespace Leap.Unity
 {
@@ -26,7 +26,7 @@ namespace Leap.Unity
             for (int i = 0; i < frames.Length; i++)
             {
                 Frame frame = frames[i];
-                foreach(Hand hand in frame.Hands)
+                foreach (Hand hand in frame.Hands)
                 {
                     if (hand.IsLeft)
                     {
@@ -44,7 +44,7 @@ namespace Leap.Unity
 
             // normalize confidences:
             float sum = leftHandConfidences.Sum();
-            for(int i = 0; i < leftHandConfidences.Count; i++)
+            for (int i = 0; i < leftHandConfidences.Count; i++)
             {
                 leftHandConfidences[i] /= sum;
             }
