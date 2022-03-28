@@ -841,6 +841,15 @@ namespace Leap.Unity
                 return;
             }
 
+            if (_currentDevice != null)
+            {
+                Debug.Log($"Setting tracking mode to {trackingMode} for device:{_currentDevice.DeviceID} with serial {_currentDevice.SerialNumber} ({this.GetHashCode()})");
+            }
+            else
+            {
+                Debug.Log($"Setting tracking mode to {trackingMode} for default (unspecified) device ({this.GetHashCode()})");
+            }
+
             switch (trackingMode)
             {
                 case TrackingOptimizationMode.Desktop:
