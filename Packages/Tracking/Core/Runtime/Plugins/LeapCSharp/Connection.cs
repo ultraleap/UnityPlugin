@@ -195,6 +195,15 @@ namespace LeapInternal
             eLeapRS result;
             if (_leapConnection == IntPtr.Zero)
             {
+                if (config.flags == (uint)eLeapConnectionFlag.eLeapConnectionFlag_MultipleDevicesAware)
+                {
+                    UnityEngine.Debug.Log($"Opening connection in multidevice mode {this.GetHashCode()}");
+                }
+                else
+                {
+                    UnityEngine.Debug.Log($"Opening connection in non multidevice mode {this.GetHashCode()}");
+                }
+                
                 if (ConnectionKey.serverNamespace == null)
                 {
                     result = LeapC.CreateConnection(out _leapConnection);
@@ -252,6 +261,8 @@ namespace LeapInternal
             //unblock in these cases, so just make sure to close the connection
             //before trying to join the worker thread.
             LeapC.CloseConnection(_leapConnection);
+
+            UnityEngine.Debug.Log($"Closing connectin and polling for {_leapConnection.GetHashCode()}");
 
             _polster.Join();
         }
@@ -880,6 +891,7 @@ namespace LeapInternal
         private void handlePolicyChange(ref LEAP_POLICY_EVENT policyMsg, UInt32 deviceID)
         {
             UnityEngine.Debug.Log($"handlePolicyChange for device {deviceID}. New value is {policyMsg.current_policy} in {this.GetHashCode()}");
+            
             // Avoid raising spurious policy change signals.
             if (_activePolicies.ContainsKey(deviceID))
             {
@@ -951,11 +963,11 @@ namespace LeapInternal
         {
             if (device != null)
             {
-                UnityEngine.Debug.Log($"Setting policy flag for device {device.DeviceID} to {policy} {this.GetHashCode()}");
+                UnityEngine.Debug.Log($"Setting policy flag for device {device.DeviceID} to {policy} ({(int)policy}) {this.GetHashCode()}");
             }
             else
             {
-                UnityEngine.Debug.Log($"Setting policy flag for unknown device to {policy} {this.GetHashCode()}");
+                UnityEngine.Debug.Log($"Setting policy flag for unknown device to {policy} ({(int)policy}) {this.GetHashCode()}");
             }
 
             UInt64 setFlags = (ulong)FlagForPolicy(policy);
@@ -988,11 +1000,11 @@ namespace LeapInternal
         {
             if (device != null)
             {
-                UnityEngine.Debug.Log($"Clearing policy flag for device {device.DeviceID} for {policy} {this.GetHashCode()}");
+                UnityEngine.Debug.Log($"Clearing policy flag for device {device.DeviceID} for {policy} ({(int)policy}) {this.GetHashCode()}");
             }
             else
             {
-                UnityEngine.Debug.Log($"Clearing policy flag for default (unknown) device for {policy} {this.GetHashCode()}");
+                UnityEngine.Debug.Log($"Clearing policy flag for default (unknown) device for {policy} ({(int)policy}) {this.GetHashCode()}");
             }
 
             UInt64 clearFlags = (ulong)FlagForPolicy(policy);
