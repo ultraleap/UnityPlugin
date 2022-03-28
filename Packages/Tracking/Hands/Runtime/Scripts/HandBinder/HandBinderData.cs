@@ -210,6 +210,7 @@ namespace Leap.Unity.HandsModule
                             //Set the data for a new leap bone
                             leapFinger.bones[leapBoneID] = new Bone(previousBoundJointPosition, nextBoundJointPosition, center, direction, length, leapBone.Width, leapBone.Type, leapBone.Rotation);
                         }
+						
                         //If the bone is a metacarpal, use the wrist bone as the previous joint
                         else if (leapBoneID == (int)Bone.BoneType.TYPE_METACARPAL)
                         {
@@ -258,7 +259,6 @@ namespace Leap.Unity.HandsModule
 
             //Set the data on the leap hand
             leapHand.PalmPosition = palmPos;
-
             leapHand.StabilizedPalmPosition = leapHand.PalmPosition;
             leapHand.PalmWidth = (leapHand.GetPinky().bones[1].PrevJoint - leapHand.GetIndex().bones[1].PrevJoint).Magnitude;
             leapHand.Arm.NextJoint = leapHand.WristPosition;
