@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - In 'Multiple Device Mode' = 'Specific', Serial Numbers can be changed at Runtime via the Inspector or via code (new public property LeapServiceProvider.SpecificSerialNumber)
 - Exposed SimpleFacingCameraCallbacks.IsFacingCamera in the Interaction Engine
 - Allow mesh hands that use the hand binder to be scaled during editor
+- Updated the LeapC.dll client to 5.5.-.22-57dcaafe
 
 ### Removed
 
@@ -27,6 +28,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed issues with multi-device interpolation failing
 
 ### Known issues
+- Service provider in multi-device scene does not track using selected device (by serial number) unless it's been selected in the editor
 -	Scenes containing the infrared viewer render incorrectly on systems using single pass stereo with the XR plugin system - e.g. Windows Mixed Reality headsets. SteamVR headsets may also default to single pass stereo, showing the same issue. However in this case, the OpenVR settings can be changed to multipass which resolves the problem.
 -	Demo scenes do not start at the correct height for a seated user. The XR Plugin Management System adjusts the camera height. This means the user has to adjust components in the scene to the correct height - e.g. camera height. Currently our position is to support the legacy XR system height settings.
 - Possible hand offset issues on XR2 headsets using SVR plugin
