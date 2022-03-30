@@ -18,7 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - In 'Multiple Device Mode' = 'Specific', Serial Numbers can be changed at Runtime via the Inspector or via code (new public property LeapServiceProvider.SpecificSerialNumber)
 - Exposed SimpleFacingCameraCallbacks.IsFacingCamera in the Interaction Engine
 - Allow mesh hands that use the hand binder to be scaled during editor
-- Updated the LeapC.dll client to 5.5.-.22-57dcaafe
+- Updated the LeapC.dll client to 5.5.0.22-57dcaafe
 
 ### Removed
 
