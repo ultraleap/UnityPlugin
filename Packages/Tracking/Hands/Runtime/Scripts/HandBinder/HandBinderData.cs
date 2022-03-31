@@ -146,12 +146,6 @@ namespace Leap.Unity.HandsModule
             //Loop through all the fingers of the hand to calculate where the leap data should be in relation to the Bound Hand
             for (int leapFingerID = 0; leapFingerID < leapHand.Fingers.Count; leapFingerID++)
             {
-                return leapHand;
-            }
-
-            //Loop through all the fingers of the hand to calculate where the leap data should be in relation to the Bound Hand
-            for (int leapFingerID = 0; leapFingerID < leapHand.Fingers.Count; leapFingerID++)
-            {
                 //Get the leap Finger
                 Finger leapFinger = leapHand.Fingers[leapFingerID];
 
@@ -181,7 +175,7 @@ namespace Leap.Unity.HandsModule
 
                             //Calculate the tip position
                             Vector tipPosition = (distalBoundBonePosition + direction * (length * fingerTipScale));
-                            leapFinger.TipPosition = tipPosition
+                            leapFinger.TipPosition = tipPosition;
 
                             //Calculate the center of the finger
                             Vector center = Vector.Lerp(distalBoundBonePosition, tipPosition, 0.5f);
