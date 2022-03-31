@@ -44,8 +44,6 @@
 	  }
 
 	  float4 frag(frag_in i) : COLOR {
-		float4 mirroredScreenPos = i.screenPos; 
-		mirroredScreenPos.x = 1- i.screenPos.x; 
 		return float4(LeapGetStereoColor(i.screenPos), 1);
 	  }
 
