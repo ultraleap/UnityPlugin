@@ -1,4 +1,8 @@
 ﻿Shader "LeapMotion/Passthrough/Background" {
+	Properties
+	{
+		[Toggle] _MirrorImageHorizontally ("MirrorImageHorizontally", Float) = 0
+	}
 	SubShader{
 	  Tags {"Queue" = "Background" "IgnoreProjector" = "True"}
 
@@ -17,6 +21,7 @@
 	  #pragma fragment frag
 
 	  uniform float _LeapGlobalColorSpaceGamma;
+	  float _MirrorImageHorizontally;
 
 	  struct frag_in {
 		float4 position : SV_POSITION;
@@ -26,11 +31,21 @@
 	  frag_in vert(appdata_img v) {
 		frag_in o;
 		o.position = UnityObjectToClipPos(v.vertex);
-		o.screenPos = LeapGetWarpedScreenPos(o.position);
+		if(_MirrorImageHorizontally)
+		{
+			o.screenPos = LeapGetWarpedAndHorizontallyMirroredScreenPos(o.position);
+		}
+		else
+		{
+			o.screenPos = LeapGetWarpedScreenPos(o.position);
+		}
+
 		return o;
 	  }
 
 	  float4 frag(frag_in i) : COLOR {
+		float4 mirroredScreenPos = i.screenPos; 
+		mirroredScreenPos.x = 1- i.screenPos.x; 
 		return float4(LeapGetStereoColor(i.screenPos), 1);
 	  }
 
