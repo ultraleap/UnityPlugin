@@ -94,9 +94,7 @@ float4 LeapGetWarpedAndHorizontallyMirroredScreenPos(float4 transformedVertex){
 	transformedVertex.x = transformedVertex.x + 1;
 	transformedVertex.x = 2 - transformedVertex.x;
 	transformedVertex.x = transformedVertex.x - 1;
-		
-	float4 warpedPosition = mul(_LeapGlobalWarpedOffset, transformedVertex);
-	return ComputeScreenPos(warpedPosition);
+	return LeapGetWarpedScreenPos(transformedVertex);
 }
 
 
