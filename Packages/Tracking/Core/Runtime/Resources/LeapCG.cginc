@@ -89,6 +89,16 @@ float4 LeapGetWarpedScreenPos(float4 transformedVertex) {
 	return ComputeScreenPos(warpedPosition);
 }
 
+float4 LeapGetWarpedAndHorizontallyMirroredScreenPos(float4 transformedVertex){
+	// Clip space is from -1 to 1. We remap this value to 0-2, flip the value, then map it back to -1 to 1
+	transformedVertex.x = transformedVertex.x + 1;
+	transformedVertex.x = 2 - transformedVertex.x;
+	transformedVertex.x = transformedVertex.x - 1;
+		
+	float4 warpedPosition = mul(_LeapGlobalWarpedOffset, transformedVertex);
+	return ComputeScreenPos(warpedPosition);
+}
+
 
 /*** LEAP VERTEX WARPING ***/
 
