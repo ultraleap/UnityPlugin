@@ -74,7 +74,7 @@ namespace Leap
                       DeviceType type,
                       bool isStreaming,
                       uint status,
-                      string serialNumber) : this(deviceHandle, internalHandle, horizontalViewAngle, 
+                      string serialNumber) : this(deviceHandle, internalHandle, horizontalViewAngle,
                           verticalViewAngle, range, baseline, type, isStreaming, status, serialNumber, 0)
         {
         }

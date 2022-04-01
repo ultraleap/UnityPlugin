@@ -502,7 +502,7 @@ namespace LeapInternal
             {
                 frame = new Frame(device.DeviceID);
             }
-            
+
             GetInterpolatedFrame(frame, time, device);
             return frame;
         }
@@ -1001,7 +1001,7 @@ namespace LeapInternal
 
                 result = LeapC.SetPolicyFlagsEx(_leapConnection, device.Handle, 0, clearFlags);
             }
- 
+
             reportAbnormalResults("LeapC SetPolicyFlags call was ", result);
         }
 
