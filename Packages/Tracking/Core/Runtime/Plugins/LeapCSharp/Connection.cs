@@ -74,6 +74,16 @@ namespace LeapInternal
         private volatile bool _isRunning = false;
         private Thread _polster;
 
+        /// <summary>
+        /// Has the connection been set up in multi device aware mode
+        /// </summary>
+        private bool _multiDeviceAwareConnection = false;
+
+        /// <summary>
+        /// Minimum service version that support setting the tracking mode on a per dervice basis
+        /// </summary>
+        private static LEAP_VERSION MinServiceVersionForMultiModeSupport = new LEAP_VERSION() { major = 5, minor = 4, patch = 4 };
+
         //Policy and enabled features, indexed by device ID
         private Dictionary<uint, UInt64> _activePolicies = new Dictionary<uint, ulong>();
 
@@ -173,6 +183,7 @@ namespace LeapInternal
             config.server_namespace = Marshal.StringToHGlobalAnsi(serverNamespace);
             config.flags = multiDeviceAware ? (uint)eLeapConnectionFlag.eLeapConnectionFlag_MultipleDevicesAware : 0;
             config.size = (uint)Marshal.SizeOf(config);
+            _multiDeviceAwareConnection = multiDeviceAware;
             Start(config);
         }
 
@@ -926,13 +937,23 @@ namespace LeapInternal
             UInt64 clearFlags = (ulong)FlagForPolicy(clear);
             eLeapRS result;
 
-            if (device != null)
+            if (device == null || !_multiDeviceAwareConnection)
             {
-                result = LeapC.SetPolicyFlagsEx(_leapConnection, device.Handle, setFlags, clearFlags);
+                result = LeapC.SetPolicyFlags(_leapConnection, setFlags, clearFlags);
             }
             else
             {
-                result = LeapC.SetPolicyFlags(_leapConnection, setFlags, clearFlags);
+                if (!Controller.CheckRequiredServiceVersion(MinServiceVersionForMultiModeSupport, this))
+                {
+                    UnityEngine.Debug.LogWarning(String.Format("Your current tracking service does not support setting policy flags on a per device basis (min version is {0}.{1}.{2}). Please update your service: https://developer.leapmotion.com/tracking-software-download",
+                        MinServiceVersionForMultiModeSupport.major,
+                        MinServiceVersionForMultiModeSupport.minor,
+                        MinServiceVersionForMultiModeSupport.patch));
+
+                    return;
+                }
+
+                result = LeapC.SetPolicyFlagsEx(_leapConnection, device.Handle, setFlags, clearFlags);
             }
 
             reportAbnormalResults("LeapC SetAndClearPolicy call was ", result);
@@ -953,13 +974,23 @@ namespace LeapInternal
 
             eLeapRS result;
 
-            if (device != null)
+            if (device == null || !_multiDeviceAwareConnection)
             {
-                result = LeapC.SetPolicyFlagsEx(_leapConnection, device.Handle, setFlags, 0);
+                result = LeapC.SetPolicyFlags(_leapConnection, setFlags, 0);
             }
             else
             {
-                result = LeapC.SetPolicyFlags(_leapConnection, setFlags, 0);
+                if (!Controller.CheckRequiredServiceVersion(MinServiceVersionForMultiModeSupport, this))
+                {
+                    UnityEngine.Debug.LogWarning(String.Format("Your current tracking service does not support setting policy flags on a per device basis (min version is {0}.{1}.{2}). Please update your service: https://developer.leapmotion.com/tracking-software-download",
+                        MinServiceVersionForMultiModeSupport.major,
+                        MinServiceVersionForMultiModeSupport.minor,
+                        MinServiceVersionForMultiModeSupport.patch));
+
+                    return;
+                }
+
+                result = LeapC.SetPolicyFlagsEx(_leapConnection, device.Handle, setFlags, 0);
             }
 
             reportAbnormalResults("LeapC SetPolicyFlags call was ", result);
@@ -980,13 +1011,23 @@ namespace LeapInternal
 
             eLeapRS result;
 
-            if (device != null)
+            if (device == null || !_multiDeviceAwareConnection)
             {
-                result = LeapC.SetPolicyFlagsEx(_leapConnection, device.Handle, 0, clearFlags);
+                result = LeapC.SetPolicyFlags(_leapConnection, 0, clearFlags);
             }
             else
             {
-                result = LeapC.SetPolicyFlags(_leapConnection, 0, clearFlags);
+                if (!Controller.CheckRequiredServiceVersion(MinServiceVersionForMultiModeSupport, this))
+                {
+                    UnityEngine.Debug.LogWarning(String.Format("Your current tracking service does not support clearing policy flags on a per device basis (min version is {0}.{1}.{2}). Please update your service: https://developer.leapmotion.com/tracking-software-download",
+                        MinServiceVersionForMultiModeSupport.major,
+                        MinServiceVersionForMultiModeSupport.minor,
+                        MinServiceVersionForMultiModeSupport.patch));
+
+                    return;
+                }
+
+                result = LeapC.SetPolicyFlagsEx(_leapConnection, device.Handle, 0, clearFlags);
             }
  
             reportAbnormalResults("LeapC SetPolicyFlags call was ", result);
