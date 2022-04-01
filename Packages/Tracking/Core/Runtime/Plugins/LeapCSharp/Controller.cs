@@ -39,8 +39,6 @@ namespace Leap
     public class Controller :
       IController
     {
-        private static LEAP_VERSION MinServiceVersionForMultiModeSupport = new LEAP_VERSION() { major = 5, minor = 4, patch = 4 };
-
         Connection _connection;
         bool _disposed = false;
         bool _supportsMultipleDevices = true;
@@ -516,10 +514,11 @@ namespace Leap
         /// the argument minServiceVersion is smaller or equal to it
         /// </summary>
         /// <param name="minServiceVersion">The minimum service version to check against</param>
-        /// <returns></returns>
-        public bool CheckRequiredServiceVersion(LEAP_VERSION minServiceVersion)
+        /// <param name="connection">The connection</param>
+        /// <returns>True if the version of the running service is equal to or less than the minimum version specified</returns>
+        public static bool CheckRequiredServiceVersion(LEAP_VERSION minServiceVersion, Connection connection)
         {
-            LEAP_VERSION currentServiceVersion = _connection.GetCurrentServiceVersion();
+            LEAP_VERSION currentServiceVersion = connection.GetCurrentServiceVersion();
 
             // check that minServiceVersion is smaller or equal to the current service version
             if (minServiceVersion.major < currentServiceVersion.major) return true;
@@ -529,6 +528,18 @@ namespace Leap
                 else if (minServiceVersion.minor == currentServiceVersion.minor && minServiceVersion.patch <= currentServiceVersion.patch) return true;
             }
             return false;
+        }
+
+        /// <summary>
+        /// Checks whether a minimum or required tracking service version is installed.
+        /// Gets the currently installed service version from the connection and checks whether 
+        /// the argument minServiceVersion is smaller or equal to it
+        /// </summary>
+        /// <param name="minServiceVersion">The minimum service version to check against</param>
+        /// <returns>True if the version of the running service is equal to or less than the minimum version specified</returns>
+        public bool CheckRequiredServiceVersion(LEAP_VERSION minServiceVersion)
+        {
+            return Controller.CheckRequiredServiceVersion(minServiceVersion, _connection);
         }
 
         /// <summary>
@@ -550,12 +561,7 @@ namespace Leap
         }
 
         public void SetPolicy(PolicyFlag policy, Device device = null)
-        {
-            if (device != null && !CheckRequiredServiceVersion(MinServiceVersionForMultiModeSupport))
-            {
-                Debug.LogWarning(String.Format("Your current tracking service does not support setting the policy flags per device (min version is {0}.{1}.{2}). Please update your service: https://developer.leapmotion.com/tracking-software-download", MinServiceVersionForMultiModeSupport.major, MinServiceVersionForMultiModeSupport.minor, MinServiceVersionForMultiModeSupport.patch));
-            }
-
+        { 
             _connection.SetPolicy(policy, device);
         }
 
@@ -575,11 +581,6 @@ namespace Leap
         /// </summary>
         public void ClearPolicy(PolicyFlag policy, Device device = null)
         {
-            if (device != null && !CheckRequiredServiceVersion(MinServiceVersionForMultiModeSupport))
-            {
-                Debug.LogWarning(String.Format("Your current tracking service does not support setting the policy flags per device (min version is {0}.{1}.{2}). Please update your service: https://developer.leapmotion.com/tracking-software-download", MinServiceVersionForMultiModeSupport.major, MinServiceVersionForMultiModeSupport.minor, MinServiceVersionForMultiModeSupport.patch));
-            }
-
             _connection.ClearPolicy(policy, device);
         }
 
