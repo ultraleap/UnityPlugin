@@ -961,7 +961,6 @@ namespace Leap.Unity
                 MultipleDeviceMode.Disabled => (d) =>
                 {
                     _currentDevice = d;
-                    UnityEngine.Debug.Log($"Single device mode setting current device to {d}");
                 }
                 ,
                 _ => throw new NotImplementedException($"{nameof(MultipleDeviceMode)} case not implemented")
