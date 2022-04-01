@@ -498,6 +498,17 @@ namespace Leap
         }
 
         /// <summary>
+        /// Returns the current Leap service version information.
+        /// </summary>
+        public LEAP_VERSION ServiceVersion
+        {
+            get
+            {
+                return _connection.GetCurrentServiceVersion();
+            }
+        }
+
+        /// <summary>
         /// Checks whether a minimum or required tracking service version is installed.
         /// Gets the currently installed service version from the connection and checks whether 
         /// the argument minServiceVersion is smaller or equal to it
