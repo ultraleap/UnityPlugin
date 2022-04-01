@@ -553,15 +553,15 @@ namespace Leap
         /// to user approval or system compatibility checks, may not complete successfully. Call 
         /// Controller.IsPolicySet() after a suitable interval to test whether 
         /// the change was accepted. 
-        /// @since 2.1.6 
-        /// </summary>   
+        /// @since 2.1.6 (5.4.4 for specific device)
+        /// </summary>
         public void SetAndClearPolicy(PolicyFlag set, PolicyFlag clear, string deviceSerial = "", Device device = null)
         {
-            _connection.SetAndClearPolicy(set, clear, device);
+            _connection.SetAndClearPolicy(set, clear);
         }
 
         /// <summary>
-        /// Requests setting a policy.
+        /// Requests setting a policy on a specific device
         ///  
         /// A request to change a policy is subject to user approval and a policy 
         /// can be changed by the user at any time (using the Leap Motion settings dialog). 
@@ -571,8 +571,8 @@ namespace Leap
         /// to user approval or system compatibility checks, may not complete successfully. Call 
         /// Controller.IsPolicySet() after a suitable interval to test whether 
         /// the change was accepted. 
-        /// @since 2.1.6 
-        /// </summary>   
+        /// @since 2.1.6 (5.4.4 for specific device)
+        /// </summary>
         public void SetPolicy(PolicyFlag policy, Device device = null)
         { 
             _connection.SetPolicy(policy, device);
@@ -585,13 +585,13 @@ namespace Leap
         }
 
         /// <summary>
-        /// Requests clearing a policy
+        /// Requests clearing a policy on a specific device
         /// 
         /// Policy changes are completed asynchronously and, because they are subject
         /// to user approval or system compatibility checks, may not complete successfully. Call
         /// Controller.IsPolicySet() after a suitable interval to test whether
         /// the change was accepted.
-        /// @since 2.1.6
+        /// @since 2.1.6 (5.4.4 for specific device)
         /// </summary>
         public void ClearPolicy(PolicyFlag policy, Device device = null)
         {
