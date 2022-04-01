@@ -574,7 +574,7 @@ namespace Leap
         /// @since 2.1.6 (5.4.4 for specific device)
         /// </summary>
         public void SetPolicy(PolicyFlag policy, Device device = null)
-        { 
+        {
             _connection.SetPolicy(policy, device);
         }
 
