@@ -39,6 +39,8 @@ namespace Leap
     public class Controller :
       IController
     {
+        private static LEAP_VERSION MinServiceVersionForMultiModeSupport = new LEAP_VERSION() { major = 5, minor = 4, patch = 4 };
+
         Connection _connection;
         bool _disposed = false;
         bool _supportsMultipleDevices = true;

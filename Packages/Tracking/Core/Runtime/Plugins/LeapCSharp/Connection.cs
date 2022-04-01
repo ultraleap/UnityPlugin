@@ -919,7 +919,7 @@ namespace LeapInternal
                     // have a record of a 'previous' policy, so assume it's zero and raise an event
                     LeapPolicyChange.DispatchOnContext(this, EventContext,
                         new PolicyEventArgs(policyMsg.current_policy, 0, false, _devices.FindDeviceByID(deviceID)));
-               }
+                }
             }
 
             _activePolicies[deviceID] = policyMsg.current_policy;
