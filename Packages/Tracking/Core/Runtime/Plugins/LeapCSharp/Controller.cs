@@ -39,6 +39,8 @@ namespace Leap
     public class Controller :
       IController
     {
+        private static LEAP_VERSION MinServiceVersionForMultiModeSupport = new LEAP_VERSION() { major = 5, minor = 4, patch = 4 };
+
         Connection _connection;
         bool _disposed = false;
         bool _supportsMultipleDevices = true;
@@ -595,6 +597,11 @@ namespace Leap
         /// </summary>
         public void ClearPolicy(PolicyFlag policy, Device device = null)
         {
+            if (device != null && !CheckRequiredServiceVersion(MinServiceVersionForMultiModeSupport))
+            {
+                Debug.LogWarning(String.Format("Your current tracking service does not support setting the policy flags per device (min version is {0}.{1}.{2}). Please update your service: https://developer.leapmotion.com/tracking-software-download", MinServiceVersionForMultiModeSupport.major, MinServiceVersionForMultiModeSupport.minor, MinServiceVersionForMultiModeSupport.patch));
+            }
+
             _connection.ClearPolicy(policy, device);
         }
 
@@ -636,15 +643,7 @@ namespace Leap
         /// state for the selected policy is returned.
         ///
         /// @since 2.1.6
-<<<<<<< HEAD
-=======
         /// </summary>
-        public bool IsPolicySet(PolicyFlag policy, Device device = null)
-        {
-            return _connection.IsPolicySet(policy, device);
-        }
-
->>>>>>> cd1c15e4 (Enabled setting tracking modes (policy flags) work across multiple devices. Fixed potential crash / issue with polling not stopping. Added support to query ActiveDevices)
         public bool IsPolicySet(PolicyFlag policy)
         {
             return IsPolicySet(policy, null);
