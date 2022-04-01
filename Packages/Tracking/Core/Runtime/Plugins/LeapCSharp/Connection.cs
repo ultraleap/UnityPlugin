@@ -906,12 +906,14 @@ namespace LeapInternal
                 if (_activePolicies.ContainsKey(deviceID))
                 {
                     LeapPolicyChange.DispatchOnContext(this, EventContext,
-                        new PolicyEventArgs(policyMsg.current_policy, _activePolicies[deviceID], _devices.FindDeviceByID(deviceID)));
+                        new PolicyEventArgs(policyMsg.current_policy, _activePolicies[deviceID], true, _devices.FindDeviceByID(deviceID)));
                 }
                 else
                 {
+                    // We should get a policy flags event on device connection. This tells us the current policy. From our perspective we don't
+                    // have a record of a 'previous' policy, so assume it's zero and raise an event
                     LeapPolicyChange.DispatchOnContext(this, EventContext,
-                        new PolicyEventArgs(policyMsg.current_policy, 0, _devices.FindDeviceByID(deviceID)));
+                        new PolicyEventArgs(policyMsg.current_policy, 0, false, _devices.FindDeviceByID(deviceID)));
                 }
             }
 
