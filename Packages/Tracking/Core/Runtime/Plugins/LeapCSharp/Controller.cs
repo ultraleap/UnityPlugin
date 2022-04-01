@@ -39,6 +39,8 @@ namespace Leap
     public class Controller :
       IController
     {
+        private static LEAP_VERSION MinServiceVersionForMultiModeSupport = new LEAP_VERSION() { major = 5, minor = 4, patch = 4 };
+
         Connection _connection;
         bool _disposed = false;
         bool _supportsMultipleDevices = true;
@@ -549,6 +551,11 @@ namespace Leap
 
         public void SetPolicy(PolicyFlag policy, Device device = null)
         {
+            if (device != null && !CheckRequiredServiceVersion(MinServiceVersionForMultiModeSupport))
+            {
+                Debug.LogWarning(String.Format("Your current tracking service does not support setting the policy flags per device (min version is {0}.{1}.{2}). Please update your service: https://developer.leapmotion.com/tracking-software-download", MinServiceVersionForMultiModeSupport.major, MinServiceVersionForMultiModeSupport.minor, MinServiceVersionForMultiModeSupport.patch));
+            }
+
             _connection.SetPolicy(policy, device);
         }
 
@@ -568,6 +575,11 @@ namespace Leap
         /// </summary>
         public void ClearPolicy(PolicyFlag policy, Device device = null)
         {
+            if (device != null && !CheckRequiredServiceVersion(MinServiceVersionForMultiModeSupport))
+            {
+                Debug.LogWarning(String.Format("Your current tracking service does not support setting the policy flags per device (min version is {0}.{1}.{2}). Please update your service: https://developer.leapmotion.com/tracking-software-download", MinServiceVersionForMultiModeSupport.major, MinServiceVersionForMultiModeSupport.minor, MinServiceVersionForMultiModeSupport.patch));
+            }
+
             _connection.ClearPolicy(policy, device);
         }
 
