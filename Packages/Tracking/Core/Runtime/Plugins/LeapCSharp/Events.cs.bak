@@ -105,7 +105,11 @@ namespace Leap
     /// @since 3.0
     /// </summary>
     public class PolicyEventArgs : LeapEventArgs
+<<<<<<< HEAD
+	{
+=======
     {
+>>>>>>> d8630fd7 (Added minimum service version check for setting and clearing policy flags per device. Added a flag to the policy change event args to indicate if the old policy flags are valid)
         public PolicyEventArgs(UInt64 currentPolicies, UInt64 oldPolicies, bool oldPolicyIsValid, Device device) : base(LeapEvent.EVENT_POLICY_CHANGE)
         {
             this.currentPolicies = currentPolicies;
