@@ -130,18 +130,11 @@ namespace Leap.Unity
                     return;
                 }
 
-                if (!Application.isPlaying)
-                {
-                    _chosenDeviceIndex = SerialNumbers.IndexOf(property.stringValue);
-                    if (_chosenDeviceIndex == -1 || _chosenDeviceIndex > SerialNumbers.Count) _chosenDeviceIndex = 0;
+                _chosenDeviceIndex = SerialNumbers.FindIndex(x => x.Contains(property.stringValue));
+                if (_chosenDeviceIndex == -1 || _chosenDeviceIndex > SerialNumbers.Count) _chosenDeviceIndex = 0;
 
-                    _chosenDeviceIndex = EditorGUILayout.Popup("Specific Serial Number", _chosenDeviceIndex, SerialNumbers.ToArray());
-                    property.stringValue = SerialNumbers[_chosenDeviceIndex];
-                }
-                else
-                {
-                    EditorGUILayout.PropertyField(property);
-                }
+                _chosenDeviceIndex = EditorGUILayout.Popup("Specific Serial Number", _chosenDeviceIndex, SerialNumbers.ToArray());
+                property.stringValue = SerialNumbers[_chosenDeviceIndex];
             }
         }
 
@@ -296,8 +289,11 @@ namespace Leap.Unity
 
         private void _leapController_DeviceChanged(object sender, DeviceEventArgs e)
         {
-            EditorWindow view = EditorWindow.GetWindow<SceneView>();
-            view.Repaint();
+            if (!Application.isPlaying || EditorWindow.focusedWindow.GetType() == typeof(SceneView))
+            {
+                EditorWindow view = EditorWindow.GetWindow<SceneView>();
+                view.Repaint();
+            }
         }
 
         private void DetectConnectedDevice(Transform targetTransform)
