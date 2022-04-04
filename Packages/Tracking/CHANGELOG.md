@@ -21,7 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Known issues
 
 
-## [5.6.0] - 30/03/2022
+## [5.6.0] - 04/04/2022
 
 ### Added
 - The LeapServiceProvider provides a list of connected devices (LeapServiceProvider.Devices)
