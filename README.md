@@ -254,23 +254,9 @@ Changing package versions is done through the git repository itself. Released ve
 
 Unity's [upm-troubleshooting] can help with common issues encountered when using UPM packages. If you have any questions or problems see [Contact](#contact) or [Community Support](#community-support).
 
-## Packages
+## Key Features
 
-- Tracking *[required]*
-  - Provides the core components to enable Ultraleap hand tracking in your project, and some additional useful functionality.
-    - Core
-    - Hands
-    - Interaction Engine
-- Tracking Preview *[optional]*
-  - Provides access to in-development features which may not be ready for our main Tracking plugin yet. We're open to feedback!
-    - UI Input
-    - Controller Hands & Controller Swapping
-    - XR Interaction Toolkit Integration
-    - Android Suppport (for SVR)
-- Tracking OpenXR *[optional]*
-  - Provides support for integrating OpenXR hand data, currently in development, and will eventually become a part of Tracking.
-
-## Features
+The Tracking package offers Ultraleap's core functionality, as well as a variety of additional components which we think are fundamental to an unforgettable hands-first experience.
 
 ### Core
 
@@ -299,11 +285,18 @@ Enables developers to use hand tracking data to drive their own 3D Hand assets w
 - No programming knowledge is needed  
 - We provide shaders to support HDRP/URP & the Standard render pipeline.
 
-### UI Input
+## Preview Features
 
-Enables developers to retrofit their existing 2D UIs so that they can be interacted with using hand tracking. Helps developers to get started with hand tracking without needing to build something from scratch.
+Our Tracking Preview package gives you early access to additional functionality we're currently working on at Ultraleap. These features may not be ready for our main Tracking package yet - we're open to feedback!
 
-****Discover more about our recommended examples and the applicable use cases in our [XR Design Guidelines][xr-guidelines]****.
+- UI Input
+  - Enables the ability to easily retrofit Unity canvases for support of direct and/or indirect hand interaction.
+- XR Controller Support
+  - Allows XR controller input to drive our hand data, and unlocks the ability to seamlessly swap between controller data and real hands.
+- XR Interaction Toolkit Integration
+  - Provides support for Ultraleap hand data in Unity's XR Interaction Toolkit.
+- Android Support (for SVR)
+  - Support for Qualcomm's legacy SVR package for XR2 devices, soon to be deprecated by OpenXR.
 
 ## Contributing
 
