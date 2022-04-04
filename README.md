@@ -254,6 +254,22 @@ Changing package versions is done through the git repository itself. Released ve
 
 Unity's [upm-troubleshooting] can help with common issues encountered when using UPM packages. If you have any questions or problems see [Contact](#contact) or [Community Support](#community-support).
 
+## Packages
+
+- Tracking *[required]*
+  - Provides the core components to enable Ultraleap hand tracking in your project, and some additional useful functionality.
+    - Core
+    - Hands
+    - Interaction Engine
+- Tracking Preview *[optional]*
+  - Provides access to in-development features which may not be ready for our main Tracking plugin yet. We're open to feedback!
+    - UI Input
+    - Controller Hands & Controller Swapping
+    - XR Interaction Toolkit Integration
+    - Android Suppport (for SVR)
+- Tracking OpenXR *[optional]*
+  - Provides support for integrating OpenXR hand data, currently in development, and will eventually become a part of Tracking.
+
 ## Features
 
 ### Core
