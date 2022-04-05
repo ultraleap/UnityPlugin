@@ -342,6 +342,16 @@ namespace Leap.Unity
         };
 
         /// <summary>
+        /// Returns a confidence value from 0 to 1 indicating how strongly a finger is curled.
+        /// </summary>
+        public static float GetFingerStrength(this Hand hand, int finger) =>
+        hand switch
+        {
+            null => 0,
+            _ => Vector3.Dot(hand.Fingers[finger].Direction.ToVector3(), -hand.DistalAxis())
+        };
+
+        /// <summary>
         /// Returns an unsmoothed ray representing the general reaching/interaction intent direction.
         /// </summary>
         public static Ray HandRay(this Hand hand, Transform headTransform)
