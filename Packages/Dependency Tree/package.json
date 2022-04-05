@@ -2,7 +2,7 @@
     "name": "com.ultraleap.dependencytree",
     "version": "1.0.0",
     "displayName": "Ultraleap Dependency Tree",
-    "description": "Allows you to visualize an asset dependencies.",
+    "description": "Allows you to visualize asset dependencies as a tree.",
     "unity": "2018.3",
     "license": "Apache-2.0",
     "keywords": [

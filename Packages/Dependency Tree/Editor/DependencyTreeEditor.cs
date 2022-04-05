@@ -19,8 +19,11 @@ namespace Leap.Unity
         public SortMode Sort = SortMode.Directory;
         public List<string> Expanded = new List<string>();
         public string Selected;
+
+        private SerializedProperty _ignorePatterns;
         private DependencyFolderNode _root;
         private DependencyFolderNode _specialResourcesNode;
+
         private const string SpecialResourcesName = "[All Resources]";
 
         private IEnumerable<DependencyFolderNode> Flatten(DependencyFolderNode node)
@@ -28,10 +31,19 @@ namespace Leap.Unity
             return new []{node}.Concat(node.Children.OfType<DependencyFolderNode>().SelectMany(Flatten));
         }
 
+        private void OnEnable()
+        {
+            _ignorePatterns = serializedObject.FindProperty(nameof(DependencyTree.GenerationIgnorePatterns));
+        }
+
         public override void OnInspectorGUI()
         {
+            serializedObject.Update();
+            EditorGUILayout.PropertyField(_ignorePatterns);
+            serializedObject.ApplyModifiedProperties();
+
             var rootNode = ((DependencyTree)target).GetRootNode();
-            if (_specialResourcesNode == null || _root != rootNode)
+            if (_specialResourcesNode == null || _root != rootNode && rootNode != null)
             {
                 _root = rootNode;
                 _specialResourcesNode = new DependencyFolderNode();
@@ -65,7 +77,7 @@ namespace Leap.Unity
             EditorGUILayout.LabelField("Yellow indicates circular dependencies");
             GUI.color = Color.white;
             DrawElement(_specialResourcesNode, 0);
-            foreach (var c in rootNode.Children)
+            foreach (var c in rootNode?.Children ?? Enumerable.Empty<DependencyNodeBase>())
             {
                 DrawElement(c, 0);
             }
