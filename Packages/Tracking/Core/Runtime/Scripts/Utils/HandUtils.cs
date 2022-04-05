@@ -348,7 +348,12 @@ namespace Leap.Unity
         hand switch
         {
             null => 0,
-            _ => Vector3.Dot(hand.Fingers[finger].Direction.ToVector3(), -hand.DistalAxis()).Map(-1, 1, 0, 1)
+            _ =>
+            finger switch
+            {
+                0 => Vector3.Dot(hand.Fingers[finger].Direction.ToVector3(), -hand.RadialAxis()).Map(-1, 1, 0, 1),
+                _ => Vector3.Dot(hand.Fingers[finger].Direction.ToVector3(), -hand.DistalAxis()).Map(-1, 1, 0, 1)
+            }
         };
 
         /// <summary>
