@@ -25,7 +25,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [5.6.0] - 30/03/2022
 
-
 ### Added
 - Added a new post process provider to distort tracking data to the 3D visuals
 - Added the ability to generate a leap hand from a bound hand (Hand Binder) 
