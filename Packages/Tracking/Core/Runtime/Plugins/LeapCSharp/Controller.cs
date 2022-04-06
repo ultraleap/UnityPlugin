@@ -557,7 +557,7 @@ namespace Leap
         /// </summary>
         public void SetAndClearPolicy(PolicyFlag set, PolicyFlag clear, string deviceSerial = "", Device device = null)
         {
-            _connection.SetAndClearPolicy(set, clear);
+            _connection.SetAndClearPolicy(set, clear, device);
         }
 
         /// <summary>
@@ -591,6 +591,7 @@ namespace Leap
         /// the change was accepted. 
         /// @since 2.1.6 
         /// </summary>
+        [Obsolete("Use the version of SetPolicy that also takes the device")]
         public void SetPolicy(PolicyFlag policy)
         {
             SetPolicy(policy, null);
@@ -619,6 +620,7 @@ namespace Leap
         /// the change was accepted.
         /// @since 2.1.6
         /// </summary>
+        [Obsolete("Use the version of SetPolicy that also takes the device")]
         public void ClearPolicy(PolicyFlag policy)
         {
             ClearPolicy(policy, null);
