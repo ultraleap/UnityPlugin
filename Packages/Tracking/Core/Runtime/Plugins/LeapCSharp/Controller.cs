@@ -620,7 +620,7 @@ namespace Leap
         /// the change was accepted.
         /// @since 2.1.6
         /// </summary>
-        [Obsolete("Use the version of SetPolicy that also takes the device")]
+        [Obsolete("Use the version of ClearPolicy that also takes the device")]
         public void ClearPolicy(PolicyFlag policy)
         {
             ClearPolicy(policy, null);
