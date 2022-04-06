@@ -186,6 +186,17 @@ namespace Leap.Unity
         protected Device _currentDevice;
 
         /// <summary>
+        /// The tracking device currently associated with this provider
+        /// </summary>
+        public Device CurrentDevice
+        {
+            get
+            {
+                return _currentDevice;
+            }
+        }
+
+        /// <summary>
         /// The list of currently attached and recognized Leap Motion controller devices.
         /// The Device objects in the list describe information such as the range and
         /// tracking volume.
