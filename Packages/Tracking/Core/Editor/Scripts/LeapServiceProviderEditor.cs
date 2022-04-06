@@ -130,11 +130,26 @@ namespace Leap.Unity
                     return;
                 }
 
+                // try to find the specificSerialNumber in the list of available serial numbers
                 _chosenDeviceIndex = SerialNumbers.FindIndex(x => x.Contains(property.stringValue));
-                if (_chosenDeviceIndex == -1 || _chosenDeviceIndex > SerialNumbers.Count) _chosenDeviceIndex = 0;
+                if (_chosenDeviceIndex == -1 || _chosenDeviceIndex >= SerialNumbers.Count)
+                {
+                    // if it couldn't find the specificSerialNumber, display it at the end of the list with 'not available' behind it
+                    _chosenDeviceIndex = EditorGUILayout.Popup("Specific Serial Number", SerialNumbers.Count, SerialNumbers.Append(property.stringValue + " (not available)").ToArray());
+                }
+                else
+                {
+                    // display the dropdown with all available serial numbers, selecting the specificSerialNumber
+                    _chosenDeviceIndex = EditorGUILayout.Popup("Specific Serial Number", _chosenDeviceIndex, SerialNumbers.ToArray());
+                }
 
-                _chosenDeviceIndex = EditorGUILayout.Popup("Specific Serial Number", _chosenDeviceIndex, SerialNumbers.ToArray());
-                property.stringValue = SerialNumbers[_chosenDeviceIndex];
+                // check whether the chosenDeviceIndex is within range of the list of serial numbers
+                // It isn't in case a serial number with 'not available' was selected
+                if (_chosenDeviceIndex < SerialNumbers.Count)
+                {
+                    // assign the valid chosen serial number to the specificSerialNumber
+                    property.stringValue = SerialNumbers[_chosenDeviceIndex];
+                }
             }
         }
 
