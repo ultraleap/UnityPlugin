@@ -3,6 +3,7 @@ using Leap.Unity;
 using Leap.Unity.Encoding;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using Bone = Leap.Bone;
 using Hand = Leap.Hand;
@@ -83,7 +84,7 @@ namespace Ultraleap.Tracking.OpenXR
                         prevJoint.Pose.position.ToVector(),
                         nextJoint.Pose.position.ToVector(),
                         ((prevJoint.Pose.position + nextJoint.Pose.position) / 2f).ToVector(),
-                        (joints[(int)HandJoint.Palm].Pose.rotation * Vector3.forward).ToVector(),
+                        (prevJoint.Pose.rotation * Vector3.forward).ToVector(),
                         (prevJoint.Pose.position - nextJoint.Pose.position).magnitude,
                         prevJoint.Radius * 2f,
                         (Bone.BoneType)boneIndex,
@@ -107,6 +108,8 @@ namespace Ultraleap.Tracking.OpenXR
                     (Finger.FingerType)fingerIndex);
             }
 
+            var palmWidth = joints[(int)HandJoint.Palm].Radius * 2.0f;
+
             // Populate the whole hand information.
             hand.Fill(
                 -1,
@@ -114,9 +117,9 @@ namespace Ultraleap.Tracking.OpenXR
                 1f,
                 0.5f, // Fixed for now
                 100f, // Fixed for now
-                0.5f, // Fixed for now
-                50f, // Fixed for now
-                0.085f, // Fixed for now
+                CalculatePinchStrength(ref hand, palmWidth),
+                CalculatePinchDistance(ref hand),
+                palmWidth,
                 handTracker == HandTracker.Left,
                 10f, // Fixed for now
                 null, // Already Populated
@@ -169,6 +172,68 @@ namespace Ultraleap.Tracking.OpenXR
                 );
             }
             return true;
+        }
+
+        private float CalculatePinchStrength(ref Hand hand, float palmWidth)
+        {
+            // Magic values taken from existing LeapC implementation (scaled to metres)
+            float handScale = palmWidth / 0.08425f;
+            float distanceZero = 0.0600f * handScale;
+            float distanceOne = 0.0220f * handScale;
+
+            // Get the thumb position.
+            var thumbTipPosition = hand.GetThumb().TipPosition;
+
+            // Compute the distance midpoints between the thumb and the each finger and find the smallest.
+            var minDistanceSquared = float.MaxValue;
+            foreach (var finger in hand.Fingers.Skip(1))
+            {
+                var distanceSquared = (finger.TipPosition - thumbTipPosition).MagnitudeSquared;
+                minDistanceSquared = Mathf.Min(distanceSquared, minDistanceSquared);
+            }
+
+            // Compute the pinch strength.
+            return Mathf.Clamp01((Mathf.Sqrt(minDistanceSquared) - distanceZero) / (distanceOne - distanceZero));
+        }
+
+        private float CalculateBoneDistanceSquared(Bone boneA, Bone boneB)
+        {
+            // Denormalize directions to bone length.
+            var boneAJoint = boneA.PrevJoint;
+            var boneBJoint = boneB.PrevJoint;
+            var boneADirection = boneA.Direction * boneA.Length;
+            var boneBDirection = boneB.Direction * boneB.Length;
+
+            // Compute the minimum (squared) distance between two bones.
+            var diff = boneBJoint - boneAJoint;
+            var d1 = boneADirection.Dot(diff);
+            var d2 = boneBDirection.Dot(diff);
+            var a = boneADirection.MagnitudeSquared;
+            var b = boneADirection.Dot(boneBDirection);
+            var c = boneBDirection.MagnitudeSquared;
+            var det = b * b - a * c;
+            var t1 = Mathf.Clamp01((b * d2 - c * d1) / det);
+            var t2 = Mathf.Clamp01((a * d2 - b * d1) / det);
+            var pa = boneAJoint + t1 * boneADirection;
+            var pb = boneBJoint + t2 * boneBDirection;
+            return (pa - pb).MagnitudeSquared;
+        }
+
+        private float CalculatePinchDistance(ref Hand hand)
+        {
+            // Get the farthest 2 segments of thumb and index finger, respectively, and compute distances.
+            var minDistanceSquared = float.MaxValue;
+            foreach (var thumbBone in hand.GetThumb().bones.Skip(2))
+            {
+                foreach (var indexBone in hand.GetIndex().bones.Skip(2))
+                {
+                    var distanceSquared = CalculateBoneDistanceSquared(thumbBone, indexBone);
+                    minDistanceSquared = Mathf.Min(distanceSquared, minDistanceSquared);
+                }
+            }
+
+            // Return the pinch distance, converted to millimeters to match other providers.
+            return Mathf.Sqrt(minDistanceSquared) * 1000.0f;
         }
 
         #region LeapProvider Implementation
