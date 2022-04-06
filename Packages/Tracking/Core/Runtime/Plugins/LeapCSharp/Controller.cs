@@ -557,7 +557,7 @@ namespace Leap
         /// </summary>
         public void SetAndClearPolicy(PolicyFlag set, PolicyFlag clear, string deviceSerial = "", Device device = null)
         {
-            _connection.SetAndClearPolicy(set, clear);
+            _connection.SetAndClearPolicy(set, clear, device);
         }
 
         /// <summary>
@@ -578,7 +578,20 @@ namespace Leap
             _connection.SetPolicy(policy, device);
         }
 
-        [Obsolete("Use the version of SetPolicy that also takes the device")] 
+        /// <summary>
+        /// Requests setting a policy.
+        ///  
+        /// A request to change a policy is subject to user approval and a policy 
+        /// can be changed by the user at any time (using the Leap Motion settings dialog). 
+        /// The desired policy flags must be set every time an application runs. 
+        ///  
+        /// Policy changes are completed asynchronously and, because they are subject 
+        /// to user approval or system compatibility checks, may not complete successfully. Call 
+        /// Controller.IsPolicySet() after a suitable interval to test whether 
+        /// the change was accepted. 
+        /// @since 2.1.6 
+        /// </summary>
+        [Obsolete("Use the version of SetPolicy that also takes the device")]
         public void SetPolicy(PolicyFlag policy)
         {
             SetPolicy(policy, null);
@@ -598,7 +611,16 @@ namespace Leap
             _connection.ClearPolicy(policy, device);
         }
 
-        [Obsolete("Use the version of ClearPolicy that also takes the device")]
+        /// <summary>
+        /// Requests clearing a policy
+        /// 
+        /// Policy changes are completed asynchronously and, because they are subject
+        /// to user approval or system compatibility checks, may not complete successfully. Call
+        /// Controller.IsPolicySet() after a suitable interval to test whether
+        /// the change was accepted.
+        /// @since 2.1.6
+        /// </summary>
+        [Obsolete("Use the version of SetPolicy that also takes the device")]
         public void ClearPolicy(PolicyFlag policy)
         {
             ClearPolicy(policy, null);
