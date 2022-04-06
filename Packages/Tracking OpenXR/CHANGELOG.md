@@ -6,6 +6,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [docs-website]: https://docs.ultraleap.com/ "Ultraleap Docs"
 
+## [1.0.0-pre.2] - 13/04/2022
+
+### Changed
+
+- The OpenXR service provider now populates frames in Update() and reuses the update frame in FixedUpdate() (similar to '_Reuse Update for Physics_' option other service providers)
+
+### Fixed
+
+- Issues with Capsule Hands rendering in both the scene and the game view if both tabs are open
+
 ## [1.0.0-pre.2] - 15/03/2022
 
 ### Fixed
