@@ -429,7 +429,7 @@ namespace Leap.Unity
             var controller = _provider.GetLeapController();
             if (controller != null)
             {
-                controller.ClearPolicy(Controller.PolicyFlag.POLICY_IMAGES);
+                controller.ClearPolicy(Controller.PolicyFlag.POLICY_IMAGES, _provider.CurrentDevice);
                 controller.Disconnect -= onDisconnect;
                 controller.ImageReady -= onImageReady;
                 controller.DistortionChange -= onDistortionChange;
@@ -482,7 +482,7 @@ namespace Leap.Unity
             if (controller != null)
             {
                 controller.FrameReady -= onFrameReady;
-                controller.SetPolicy(Controller.PolicyFlag.POLICY_IMAGES);
+                controller.SetPolicy(Controller.PolicyFlag.POLICY_IMAGES, _provider.CurrentDevice);
             }
         }
 
@@ -492,9 +492,9 @@ namespace Leap.Unity
             if (controller != null)
             {
                 controller.FrameReady += onFrameReady;
-                controller.ClearPolicy(Controller.PolicyFlag.POLICY_IMAGES);
+                controller.ClearPolicy(Controller.PolicyFlag.POLICY_IMAGES, _provider.CurrentDevice);
             }
-        }
+        } 
 
         public void ApplyGammaCorrectionValues()
         {
