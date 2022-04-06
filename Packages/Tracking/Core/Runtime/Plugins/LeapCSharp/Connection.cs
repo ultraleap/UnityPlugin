@@ -684,6 +684,11 @@ namespace LeapInternal
             {
                 _devices.Remove(lost);
 
+                if (_activePolicies.ContainsKey(deviceMsg.device.id))
+                {
+                    _activePolicies.Remove(deviceMsg.device.id);
+                }
+
                 if (LeapDeviceLost != null)
                 {
                     LeapDeviceLost.DispatchOnContext(this, EventContext, new DeviceEventArgs(lost));
