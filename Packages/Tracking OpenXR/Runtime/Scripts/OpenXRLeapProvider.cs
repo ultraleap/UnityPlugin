@@ -4,36 +4,26 @@ using Leap.Unity.Encoding;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Bone = Leap.Bone;
+using Hand = Leap.Hand;
 
 namespace Ultraleap.Tracking.OpenXR
 {
     public class OpenXRLeapProvider : LeapProvider
     {
-        private Frame _beforeRenderFrame = new Frame();
-        private Frame _fixedUpdateFrame = new Frame();
+        private Frame _updateFrame = new Frame();
         private Hand _leftHand = new Hand();
         private Hand _rightHand = new Hand();
 
-        private void OnEnable()
+        private void Update()
         {
-            Application.onBeforeRender += Application_onBeforeRender;
+            PopulateLeapFrame(FrameTime.OnUpdate, ref _updateFrame);
+            DispatchUpdateFrameEvent(_updateFrame);
         }
 
-        private void OnDisable()
+        void FixedUpdate()
         {
-            Application.onBeforeRender -= Application_onBeforeRender;
-        }
-
-        private void Application_onBeforeRender()
-        {
-            PopulateLeapFrame(FrameTime.OnBeforeRender, ref _beforeRenderFrame);
-            DispatchUpdateFrameEvent(_beforeRenderFrame);
-        }
-
-        private void FixedUpdate()
-        {
-            PopulateLeapFrame(FrameTime.OnUpdate, ref _fixedUpdateFrame);
-            DispatchFixedFrameEvent(_fixedUpdateFrame);
+            DispatchFixedFrameEvent(_updateFrame);
         }
 
         private void PopulateLeapFrame(FrameTime frameTime, ref Frame leapFrame)
@@ -189,25 +179,15 @@ namespace Ultraleap.Tracking.OpenXR
             get
             {
 #if UNITY_EDITOR
-                return !Application.isPlaying ? EditTimeFrame : _beforeRenderFrame;
+                return !Application.isPlaying ? EditTimeFrame : _updateFrame;
 #else
-                return _beforeRenderFrame;
+                return _updateFrame;
 #endif
             }
         }
 
         [JetBrains.Annotations.NotNull]
-        public override Frame CurrentFixedFrame
-        {
-            get
-            {
-#if UNITY_EDITOR
-                return !Application.isPlaying ? EditTimeFrame : _fixedUpdateFrame;
-#else
-                return _fixedUpdateFrame;
-#endif
-            }
-        }
+        public override Frame CurrentFixedFrame => CurrentFrame;
 
 #if UNITY_EDITOR
         private Frame _backingUntransformedEditTimeFrame;
