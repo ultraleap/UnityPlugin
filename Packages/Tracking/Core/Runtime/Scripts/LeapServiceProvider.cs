@@ -876,8 +876,8 @@ namespace Leap.Unity
         {
             if (_leapController == null) return _trackingOptimization;
 
-            var screenTopPolicySet = _leapController.IsPolicySet(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP);
-            var headMountedPolicySet = _leapController.IsPolicySet(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
+            var screenTopPolicySet = _leapController.IsPolicySet(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP, _currentDevice);
+            var headMountedPolicySet = _leapController.IsPolicySet(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD, _currentDevice);
 
             var desktopMode = !screenTopPolicySet && !headMountedPolicySet;
             if (desktopMode)
