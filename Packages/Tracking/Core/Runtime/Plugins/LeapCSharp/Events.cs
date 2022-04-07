@@ -113,7 +113,6 @@ namespace Leap
             this.device = device;
         }
 
-
         [Obsolete("Use the constructor that takes the device and oldPolicyIsValid flag")]
         public PolicyEventArgs(UInt64 currentPolicies, UInt64 oldPolicies) : base(LeapEvent.EVENT_POLICY_CHANGE)
         {

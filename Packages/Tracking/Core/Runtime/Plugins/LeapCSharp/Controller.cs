@@ -543,7 +543,7 @@ namespace Leap
         }
 
         /// <summary>
-        /// Requests setting and clearing policy flags
+        /// Requests setting and clearing policy flags on a specific device
         ///  
         /// A request to change a policy is subject to user approval and a policy 
         /// can be changed by the user at any time (using the Leap Motion settings dialog). 
@@ -658,7 +658,6 @@ namespace Leap
         /// state for the selected policy is returned.
         ///
         /// @since 2.1.6
-        /// </summary>
         public bool IsPolicySet(PolicyFlag policy)
         {
             return IsPolicySet(policy, null);
