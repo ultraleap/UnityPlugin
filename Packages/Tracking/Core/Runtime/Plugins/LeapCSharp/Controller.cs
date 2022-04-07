@@ -658,6 +658,7 @@ namespace Leap
         /// state for the selected policy is returned.
         ///
         /// @since 2.1.6
+        [Obsolete("Use the version of IsPolicySet that also takes the device")]
         public bool IsPolicySet(PolicyFlag policy)
         {
             return IsPolicySet(policy, null);
