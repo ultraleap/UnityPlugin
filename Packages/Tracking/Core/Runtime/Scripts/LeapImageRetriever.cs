@@ -494,7 +494,7 @@ namespace Leap.Unity
                 controller.FrameReady += onFrameReady;
                 controller.ClearPolicy(Controller.PolicyFlag.POLICY_IMAGES, _provider.CurrentDevice);
             }
-        } 
+        }
 
         public void ApplyGammaCorrectionValues()
         {
