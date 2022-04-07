@@ -9,6 +9,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [5.7.0] - 13/04/2022
 
 ### Added
+- Can now set different tracking optimization modes on tracking devices when running with multiple devices
+
+### Changed
+- Policy flags are now handled on a per device basis / contain information about the device they relate to
+- ActiveDevice replaced by ActiveDevices. ActiveDevice marked as obsolete
+- Legacy SetPolicy/ClearPolicy/IsPolicySet methods on IController marked as obsolete. Use new methods that also take a Device
+
+### Fixed
+- Ocassional ThreadAbortException on connection polling thread
+- Sometimes Frame objects where being constructed without a device ID, even if known
+
+### Known issues
+
+
+## [5.6.0] - 04/04/2022
+
+### Added
 - Added a new post process provider to distort tracking data to the 3D visuals
 - Added the ability to generate a leap hand from a bound hand (Hand Binder) 
 

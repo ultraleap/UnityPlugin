@@ -106,14 +106,41 @@ namespace Leap
     /// </summary>
     public class PolicyEventArgs : LeapEventArgs
     {
+        public PolicyEventArgs(UInt64 currentPolicies, UInt64 oldPolicies, bool oldPolicyIsValid, Device device) : base(LeapEvent.EVENT_POLICY_CHANGE)
+        {
+            this.currentPolicies = currentPolicies;
+            this.oldPolicies = oldPolicies;
+            this.device = device;
+        }
+
+        [Obsolete("Use the constructor that takes the device and oldPolicyIsValid flag")]
         public PolicyEventArgs(UInt64 currentPolicies, UInt64 oldPolicies) : base(LeapEvent.EVENT_POLICY_CHANGE)
         {
             this.currentPolicies = currentPolicies;
             this.oldPolicies = oldPolicies;
         }
 
+        /// <summary>
+        /// Current policy flags
+        /// </summary>
         public UInt64 currentPolicies { get; set; }
+
+        /// <summary>
+        /// Previous policy flags, if known
+        /// </summary>
         public UInt64 oldPolicies { get; set; }
+
+        /// <summary>
+        /// Is the value for the old policy flags valid / known
+        /// @since 5.7.0 (plugin)
+        /// </summary>
+        public bool oldPolicyIsValid { get; set; }
+
+        /// <summary>
+        /// The device associated with the policy flag change
+        /// @since 5.7.0 (plugin)
+        /// </summary>
+        public Device device { get; set; }
     }
 
     /// <summary>

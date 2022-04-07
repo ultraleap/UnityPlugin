@@ -6,10 +6,7 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Leap.Unity.Attributes;
-using LeapInternal;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -189,6 +186,17 @@ namespace Leap.Unity
         protected Device _currentDevice;
 
         /// <summary>
+        /// The tracking device currently associated with this provider
+        /// </summary>
+        public Device CurrentDevice
+        {
+            get
+            {
+                return _currentDevice;
+            }
+        }
+
+        /// <summary>
         /// The list of currently attached and recognized Leap Motion controller devices.
         /// The Device objects in the list describe information such as the range and
         /// tracking volume.
@@ -329,7 +337,14 @@ namespace Leap.Unity
             {
                 if (_backingUntransformedEditTimeFrame == null)
                 {
-                    _backingUntransformedEditTimeFrame = new Frame();
+                    if (_currentDevice == null)
+                    {
+                        _backingUntransformedEditTimeFrame = new Frame();
+                    }
+                    else
+                    {
+                        _backingUntransformedEditTimeFrame = new Frame(_currentDevice.DeviceID);
+                    }  
                 }
                 return _backingUntransformedEditTimeFrame;
             }
@@ -341,7 +356,14 @@ namespace Leap.Unity
             {
                 if (_backingEditTimeFrame == null)
                 {
-                    _backingEditTimeFrame = new Frame();
+                    if (_currentDevice == null)
+                    {
+                        _backingEditTimeFrame = new Frame();
+                    }
+                    else
+                    {
+                        _backingEditTimeFrame = new Frame(_currentDevice.DeviceID);
+                    }
                 }
                 return _backingEditTimeFrame;
             }
@@ -564,10 +586,21 @@ namespace Leap.Unity
         protected virtual void Start()
         {
             createController();
-            _transformedUpdateFrame = new Frame();
-            _transformedFixedFrame = new Frame();
-            _untransformedUpdateFrame = new Frame();
-            _untransformedFixedFrame = new Frame();
+
+            if (_currentDevice == null)
+            {
+                _transformedUpdateFrame = new Frame();
+                _transformedFixedFrame = new Frame();
+                _untransformedUpdateFrame = new Frame();
+                _untransformedFixedFrame = new Frame();
+            }
+            else
+            {
+                _transformedUpdateFrame = new Frame(_currentDevice.DeviceID);
+                _transformedFixedFrame = new Frame(_currentDevice.DeviceID);
+                _untransformedUpdateFrame = new Frame(_currentDevice.DeviceID);
+                _untransformedFixedFrame = new Frame(_currentDevice.DeviceID);
+            }
         }
 
         protected virtual void Update()
@@ -814,21 +847,24 @@ namespace Leap.Unity
         {
             _trackingOptimization = trackingMode;
 
-            if (_leapController == null) return;
+            if (_leapController == null)
+            {
+                return;
+            }
 
             switch (trackingMode)
             {
                 case TrackingOptimizationMode.Desktop:
-                    _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP);
-                    _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
+                    _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP, _currentDevice);
+                    _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD, _currentDevice);
                     break;
                 case TrackingOptimizationMode.Screentop:
-                    _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
-                    _leapController.SetPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP);
+                    _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD, _currentDevice);
+                    _leapController.SetPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP, _currentDevice);
                     break;
                 case TrackingOptimizationMode.HMD:
-                    _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP);
-                    _leapController.SetPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
+                    _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP, _currentDevice);
+                    _leapController.SetPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD, _currentDevice);
                     break;
             }
         }
@@ -840,8 +876,8 @@ namespace Leap.Unity
         {
             if (_leapController == null) return _trackingOptimization;
 
-            var screenTopPolicySet = _leapController.IsPolicySet(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP);
-            var headMountedPolicySet = _leapController.IsPolicySet(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
+            var screenTopPolicySet = _leapController.IsPolicySet(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP, _currentDevice);
+            var headMountedPolicySet = _leapController.IsPolicySet(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD, _currentDevice);
 
             var desktopMode = !screenTopPolicySet && !headMountedPolicySet;
             if (desktopMode)
@@ -933,7 +969,11 @@ namespace Leap.Unity
                     }
                 }
                 ,
-                MultipleDeviceMode.Disabled => (d) => _currentDevice = d,
+                MultipleDeviceMode.Disabled => (d) =>
+                {
+                    _currentDevice = d;
+                }
+                ,
                 _ => throw new NotImplementedException($"{nameof(MultipleDeviceMode)} case not implemented")
             };
 
@@ -979,7 +1019,7 @@ namespace Leap.Unity
                 _leapController.UnsubscribeFromDeviceEvents(_currentDevice);
             }
 
-            Debug.Log("Connecting to Device with Serial: " + d.SerialNumber);
+            Debug.Log($"Connecting to Device with Serial: {d.SerialNumber} and ID {d.DeviceID}");
             _leapController.SubscribeToDeviceEvents(d);
             _currentDevice = d;
             return true;
