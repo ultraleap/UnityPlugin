@@ -131,11 +131,11 @@ namespace Leap.Unity
                 }
 
                 // check whether the current SpecificSerialNumber is an empty string
-                if(String.IsNullOrEmpty(property.stringValue))
+                if (String.IsNullOrEmpty(property.stringValue))
                 {
                     _chosenDeviceIndex = EditorGUILayout.Popup("Specific Serial Number", 0, new List<string>() { "Select an available Serial Number" }.Concat(SerialNumbers).ToArray());
 
-                    if(_chosenDeviceIndex > 0)
+                    if (_chosenDeviceIndex > 0)
                     {
                         property.stringValue = SerialNumbers[_chosenDeviceIndex - 1];
                     }
