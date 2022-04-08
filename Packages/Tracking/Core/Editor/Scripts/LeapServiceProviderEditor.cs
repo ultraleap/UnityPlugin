@@ -130,6 +130,18 @@ namespace Leap.Unity
                     return;
                 }
 
+                // check whether the current SpecificSerialNumber is an empty string
+                if(String.IsNullOrEmpty(property.stringValue))
+                {
+                    _chosenDeviceIndex = EditorGUILayout.Popup("Specific Serial Number", 0, new List<string>() { "Select an available Serial Number" }.Concat(SerialNumbers).ToArray());
+
+                    if(_chosenDeviceIndex > 0)
+                    {
+                        property.stringValue = SerialNumbers[_chosenDeviceIndex - 1];
+                    }
+                    return;
+                }
+
                 // try to find the specificSerialNumber in the list of available serial numbers
                 _chosenDeviceIndex = SerialNumbers.FindIndex(x => x.Contains(property.stringValue));
                 if (_chosenDeviceIndex == -1 || _chosenDeviceIndex >= SerialNumbers.Count)
@@ -309,6 +321,9 @@ namespace Leap.Unity
                 EditorWindow view = EditorWindow.GetWindow<SceneView>();
                 view.Repaint();
             }
+
+            // Repaint the inspector windows if the devices have changed
+            Repaint();
         }
 
         private void DetectConnectedDevice(Transform targetTransform)
