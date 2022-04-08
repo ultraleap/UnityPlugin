@@ -514,10 +514,11 @@ namespace Leap
         /// the argument minServiceVersion is smaller or equal to it
         /// </summary>
         /// <param name="minServiceVersion">The minimum service version to check against</param>
-        /// <returns></returns>
-        public bool CheckRequiredServiceVersion(LEAP_VERSION minServiceVersion)
+        /// <param name="connection">The connection</param>
+        /// <returns>True if the version of the running service is equal to or less than the minimum version specified</returns>
+        public static bool CheckRequiredServiceVersion(LEAP_VERSION minServiceVersion, Connection connection)
         {
-            LEAP_VERSION currentServiceVersion = _connection.GetCurrentServiceVersion();
+            LEAP_VERSION currentServiceVersion = connection.GetCurrentServiceVersion();
 
             // check that minServiceVersion is smaller or equal to the current service version
             if (minServiceVersion.major < currentServiceVersion.major) return true;
@@ -527,6 +528,54 @@ namespace Leap
                 else if (minServiceVersion.minor == currentServiceVersion.minor && minServiceVersion.patch <= currentServiceVersion.patch) return true;
             }
             return false;
+        }
+
+        /// <summary>
+        /// Checks whether a minimum or required tracking service version is installed.
+        /// Gets the currently installed service version from the connection and checks whether 
+        /// the argument minServiceVersion is smaller or equal to it
+        /// </summary>
+        /// <param name="minServiceVersion">The minimum service version to check against</param>
+        /// <returns>True if the version of the running service is equal to or less than the minimum version specified</returns>
+        public bool CheckRequiredServiceVersion(LEAP_VERSION minServiceVersion)
+        {
+            return Controller.CheckRequiredServiceVersion(minServiceVersion, _connection);
+        }
+
+        /// <summary>
+        /// Requests setting and clearing policy flags on a specific device
+        ///  
+        /// A request to change a policy is subject to user approval and a policy 
+        /// can be changed by the user at any time (using the Leap Motion settings dialog). 
+        /// The desired policy flags must be set every time an application runs. 
+        ///  
+        /// Policy changes are completed asynchronously and, because they are subject 
+        /// to user approval or system compatibility checks, may not complete successfully. Call 
+        /// Controller.IsPolicySet() after a suitable interval to test whether 
+        /// the change was accepted. 
+        /// @since 2.1.6 (5.4.4 for specific device)
+        /// </summary>
+        public void SetAndClearPolicy(PolicyFlag set, PolicyFlag clear, string deviceSerial = "", Device device = null)
+        {
+            _connection.SetAndClearPolicy(set, clear, device);
+        }
+
+        /// <summary>
+        /// Requests setting a policy on a specific device
+        ///  
+        /// A request to change a policy is subject to user approval and a policy 
+        /// can be changed by the user at any time (using the Leap Motion settings dialog). 
+        /// The desired policy flags must be set every time an application runs. 
+        ///  
+        /// Policy changes are completed asynchronously and, because they are subject 
+        /// to user approval or system compatibility checks, may not complete successfully. Call 
+        /// Controller.IsPolicySet() after a suitable interval to test whether 
+        /// the change was accepted. 
+        /// @since 2.1.6 (5.4.4 for specific device)
+        /// </summary>
+        public void SetPolicy(PolicyFlag policy, Device device = null)
+        {
+            _connection.SetPolicy(policy, device);
         }
 
         /// <summary>
@@ -542,18 +591,28 @@ namespace Leap
         /// the change was accepted. 
         /// @since 2.1.6 
         /// </summary>
-        public void SetAndClearPolicy(PolicyFlag set, PolicyFlag clear, string deviceSerial = "")
-        {
-            _connection.SetAndClearPolicy(set, clear);
-        }
-
+        [Obsolete("Use the version of SetPolicy that also takes the device")]
         public void SetPolicy(PolicyFlag policy)
         {
-            _connection.SetPolicy(policy);
+            SetPolicy(policy, null);
         }
 
         /// <summary>
-        /// Requests clearing a policy.
+        /// Requests clearing a policy on a specific device
+        /// 
+        /// Policy changes are completed asynchronously and, because they are subject
+        /// to user approval or system compatibility checks, may not complete successfully. Call
+        /// Controller.IsPolicySet() after a suitable interval to test whether
+        /// the change was accepted.
+        /// @since 2.1.6 (5.4.4 for specific device)
+        /// </summary>
+        public void ClearPolicy(PolicyFlag policy, Device device = null)
+        {
+            _connection.ClearPolicy(policy, device);
+        }
+
+        /// <summary>
+        /// Requests clearing a policy
         /// 
         /// Policy changes are completed asynchronously and, because they are subject
         /// to user approval or system compatibility checks, may not complete successfully. Call
@@ -561,13 +620,33 @@ namespace Leap
         /// the change was accepted.
         /// @since 2.1.6
         /// </summary>
+        [Obsolete("Use the version of ClearPolicy that also takes the device")]
         public void ClearPolicy(PolicyFlag policy)
         {
-            _connection.ClearPolicy(policy);
+            ClearPolicy(policy, null);
         }
 
         /// <summary>
-        /// Gets the active setting for a specific policy.
+        /// Gets the active setting for a specific device.
+        /// 
+        /// Keep in mind that setting a policy flag is asynchronous, so changes are
+        /// not effective immediately after calling setPolicyFlag(). In addition, a
+        /// policy request can be declined by the user. You should always set the
+        /// policy flags required by your application at startup and check that the
+        /// policy change request was successful after an appropriate interval.
+        /// 
+        /// If the controller object is not connected to the Leap Motion software, then the default
+        /// state for the selected policy is returned.
+        ///
+        /// @since 2.1.6 (5.4.4 for specific device)
+        /// </summary>
+        public bool IsPolicySet(PolicyFlag policy, Device device = null)
+        {
+            return _connection.IsPolicySet(policy, device);
+        }
+
+        /// <summary>
+        /// Gets the active setting 
         /// 
         /// Keep in mind that setting a policy flag is asynchronous, so changes are
         /// not effective immediately after calling setPolicyFlag(). In addition, a
@@ -579,10 +658,10 @@ namespace Leap
         /// state for the selected policy is returned.
         ///
         /// @since 2.1.6
-        /// </summary>
+        [Obsolete("Use the version of IsPolicySet that also takes the device")]
         public bool IsPolicySet(PolicyFlag policy)
         {
-            return _connection.IsPolicySet(policy);
+            return IsPolicySet(policy, null);
         }
 
         /// <summary>

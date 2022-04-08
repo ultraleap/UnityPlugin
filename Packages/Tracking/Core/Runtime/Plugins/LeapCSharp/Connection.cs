@@ -71,11 +71,21 @@ namespace LeapInternal
         private int _frameBufferLength = 60; //TODO, surface this value in LeapC, currently hardcoded!
 
         private IntPtr _leapConnection;
-        private bool _isRunning = false;
+        private volatile bool _isRunning = false;
         private Thread _polster;
 
-        //Policy and enabled features
-        private UInt64 _activePolicies = 0;
+        /// <summary>
+        /// Has the connection been set up in multi device aware mode
+        /// </summary>
+        private bool _multiDeviceAwareConnection = false;
+
+        /// <summary>
+        /// Minimum service version that support setting the tracking mode on a per dervice basis
+        /// </summary>
+        private static LEAP_VERSION MinServiceVersionForMultiModeSupport = new LEAP_VERSION() { major = 5, minor = 4, patch = 4 };
+
+        //Policy and enabled features, indexed by device ID
+        private Dictionary<uint, UInt64> _activePolicies = new Dictionary<uint, ulong>();
 
         //Config change status
         private Dictionary<uint, string> _configRequests = new Dictionary<uint, string>();
@@ -173,6 +183,7 @@ namespace LeapInternal
             config.server_namespace = Marshal.StringToHGlobalAnsi(serverNamespace);
             config.flags = multiDeviceAware ? (uint)eLeapConnectionFlag.eLeapConnectionFlag_MultipleDevicesAware : 0;
             config.size = (uint)Marshal.SizeOf(config);
+            _multiDeviceAwareConnection = multiDeviceAware;
             Start(config);
         }
 
@@ -279,6 +290,7 @@ namespace LeapInternal
 
                     LEAP_CONNECTION_MESSAGE _msg = new LEAP_CONNECTION_MESSAGE();
                     uint timeout = 150;
+
                     result = LeapC.PollConnection(_leapConnection, timeout, ref _msg);
 
                     if (result != eLeapRS.eLeapRS_Success)
@@ -325,9 +337,8 @@ namespace LeapInternal
                         case eLeapEventType.eLeapEventType_Policy:
                             LEAP_POLICY_EVENT policy_evt;
                             StructMarshal<LEAP_POLICY_EVENT>.PtrToStruct(_msg.eventStructPtr, out policy_evt);
-                            handlePolicyChange(ref policy_evt);
+                            handlePolicyChange(ref policy_evt, _msg.deviceID);
                             break;
-
                         case eLeapEventType.eLeapEventType_Tracking:
                             LEAP_TRACKING_EVENT tracking_evt;
                             StructMarshal<LEAP_TRACKING_EVENT>.PtrToStruct(_msg.eventStructPtr, out tracking_evt);
@@ -482,7 +493,16 @@ namespace LeapInternal
 
         public Frame GetInterpolatedFrame(Int64 time, Device device = null)
         {
-            Frame frame = new Frame();
+            Frame frame;
+            if (device == null)
+            {
+                frame = new Frame();
+            }
+            else
+            {
+                frame = new Frame(device.DeviceID);
+            }
+
             GetInterpolatedFrame(frame, time, device);
             return frame;
         }
@@ -638,7 +658,8 @@ namespace LeapInternal
                                        (Device.DeviceType)deviceInfo.type,
                                        deviceInfo.status == (uint)eLeapDeviceStatus.eLeapDeviceStatus_Streaming,
                                        deviceInfo.status,
-                                       Marshal.PtrToStringAnsi(deviceInfo.serial));
+                                       Marshal.PtrToStringAnsi(deviceInfo.serial),
+                                       deviceMsg.device.id);
 
                 Marshal.FreeCoTaskMem(deviceInfo.serial);
                 _devices.AddOrUpdate(apiDevice);
@@ -662,6 +683,11 @@ namespace LeapInternal
             if (lost != null)
             {
                 _devices.Remove(lost);
+
+                if (_activePolicies.ContainsKey(deviceMsg.device.id))
+                {
+                    _activePolicies.Remove(deviceMsg.device.id);
+                }
 
                 if (LeapDeviceLost != null)
                 {
@@ -856,38 +882,117 @@ namespace LeapInternal
             }
         }
 
-        private void handlePolicyChange(ref LEAP_POLICY_EVENT policyMsg)
+        private void handlePolicyChange(ref LEAP_POLICY_EVENT policyMsg, UInt32 deviceID)
         {
             // Avoid raising spurious policy change signals.
-            if (policyMsg.current_policy == _activePolicies) return;
+            if (_activePolicies.ContainsKey(deviceID))
+            {
+                if (policyMsg.current_policy == _activePolicies[deviceID])
+                {
+                    return;
+                }
+            }
 
             if (LeapPolicyChange != null)
             {
-                LeapPolicyChange.DispatchOnContext(this, EventContext, new PolicyEventArgs(policyMsg.current_policy, _activePolicies));
+                if (_activePolicies.ContainsKey(deviceID))
+                {
+                    LeapPolicyChange.DispatchOnContext(this, EventContext,
+                        new PolicyEventArgs(policyMsg.current_policy, _activePolicies[deviceID], true, _devices.FindDeviceByID(deviceID)));
+                }
+                else
+                {
+                    // We should get a policy flags event on device connection. This tells us the current policy. From our perspective we don't
+                    // have a record of a 'previous' policy, so assume it's zero and raise an event
+                    LeapPolicyChange.DispatchOnContext(this, EventContext,
+                        new PolicyEventArgs(policyMsg.current_policy, 0, false, _devices.FindDeviceByID(deviceID)));
+                }
             }
 
-            _activePolicies = policyMsg.current_policy;
+            _activePolicies[deviceID] = policyMsg.current_policy;
         }
 
-        public void SetAndClearPolicy(Controller.PolicyFlag set, Controller.PolicyFlag clear)
+        public void SetAndClearPolicy(Controller.PolicyFlag set, Controller.PolicyFlag clear, Device device = null)
         {
             UInt64 setFlags = (ulong)FlagForPolicy(set);
             UInt64 clearFlags = (ulong)FlagForPolicy(clear);
-            eLeapRS result = LeapC.SetPolicyFlags(_leapConnection, setFlags, clearFlags);
+            eLeapRS result;
+
+            if (device == null || !_multiDeviceAwareConnection)
+            {
+                result = LeapC.SetPolicyFlags(_leapConnection, setFlags, clearFlags);
+            }
+            else
+            {
+                if (!Controller.CheckRequiredServiceVersion(MinServiceVersionForMultiModeSupport, this))
+                {
+                    UnityEngine.Debug.LogWarning(String.Format("Your current tracking service does not support setting policy flags on a per device basis (min version is {0}.{1}.{2}). Please update your service: https://developer.leapmotion.com/tracking-software-download",
+                        MinServiceVersionForMultiModeSupport.major,
+                        MinServiceVersionForMultiModeSupport.minor,
+                        MinServiceVersionForMultiModeSupport.patch));
+
+                    return;
+                }
+
+                result = LeapC.SetPolicyFlagsEx(_leapConnection, device.Handle, setFlags, clearFlags);
+            }
+
             reportAbnormalResults("LeapC SetAndClearPolicy call was ", result);
         }
 
-        public void SetPolicy(Controller.PolicyFlag policy)
+        public void SetPolicy(Controller.PolicyFlag policy, Device device = null)
         {
             UInt64 setFlags = (ulong)FlagForPolicy(policy);
-            eLeapRS result = LeapC.SetPolicyFlags(_leapConnection, setFlags, 0);
+
+            eLeapRS result;
+
+            if (device == null || !_multiDeviceAwareConnection)
+            {
+                result = LeapC.SetPolicyFlags(_leapConnection, setFlags, 0);
+            }
+            else
+            {
+                if (!Controller.CheckRequiredServiceVersion(MinServiceVersionForMultiModeSupport, this))
+                {
+                    UnityEngine.Debug.LogWarning(String.Format("Your current tracking service does not support setting policy flags on a per device basis (min version is {0}.{1}.{2}). Please update your service: https://developer.leapmotion.com/tracking-software-download",
+                        MinServiceVersionForMultiModeSupport.major,
+                        MinServiceVersionForMultiModeSupport.minor,
+                        MinServiceVersionForMultiModeSupport.patch));
+
+                    return;
+                }
+
+                result = LeapC.SetPolicyFlagsEx(_leapConnection, device.Handle, setFlags, 0);
+            }
+
             reportAbnormalResults("LeapC SetPolicyFlags call was ", result);
         }
 
-        public void ClearPolicy(Controller.PolicyFlag policy)
+        public void ClearPolicy(Controller.PolicyFlag policy, Device device = null)
         {
             UInt64 clearFlags = (ulong)FlagForPolicy(policy);
-            eLeapRS result = LeapC.SetPolicyFlags(_leapConnection, 0, clearFlags);
+
+            eLeapRS result;
+
+            if (device == null || !_multiDeviceAwareConnection)
+            {
+                result = LeapC.SetPolicyFlags(_leapConnection, 0, clearFlags);
+            }
+            else
+            {
+                if (!Controller.CheckRequiredServiceVersion(MinServiceVersionForMultiModeSupport, this))
+                {
+                    UnityEngine.Debug.LogWarning(String.Format("Your current tracking service does not support clearing policy flags on a per device basis (min version is {0}.{1}.{2}). Please update your service: https://developer.leapmotion.com/tracking-software-download",
+                        MinServiceVersionForMultiModeSupport.major,
+                        MinServiceVersionForMultiModeSupport.minor,
+                        MinServiceVersionForMultiModeSupport.patch));
+
+                    return;
+                }
+
+                result = LeapC.SetPolicyFlagsEx(_leapConnection, device.Handle, 0, clearFlags);
+            }
+
             reportAbnormalResults("LeapC SetPolicyFlags call was ", result);
         }
 
@@ -929,10 +1034,26 @@ namespace LeapInternal
         ///
         /// @since 2.1.6
         /// </summary>
-        public bool IsPolicySet(Controller.PolicyFlag policy)
+        public bool IsPolicySet(Controller.PolicyFlag policy, Device device = null)
         {
             UInt64 policyToCheck = (ulong)FlagForPolicy(policy);
-            return (_activePolicies & policyToCheck) == policyToCheck;
+
+            uint deviceID = 0;
+            if (device != null)
+            {
+                deviceID = device.DeviceID;
+            }
+
+            if (_activePolicies.ContainsKey(deviceID))
+            {
+                return (_activePolicies[deviceID] & policyToCheck) == policyToCheck;
+            }
+            else
+            {
+                Logger.Log("Warning: an attempt has been made to check whether a policy flag is set for an unknown device");
+            }
+
+            return false;
         }
 
         public uint GetConfigValue(string config_key)

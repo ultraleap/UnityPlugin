@@ -1,5 +1,6 @@
 ﻿Shader "LeapMotion/Passthrough/Foreground" {
 	Properties{
+	  [Toggle] _MirrorImageHorizontally ("MirrorImageHorizontally", Float) = 0
 	}
 
 	SubShader{
@@ -21,6 +22,7 @@
 	  #pragma fragment frag
 
 	  uniform float _LeapGlobalColorSpaceGamma;
+	  float _MirrorImageHorizontally;
 
 	  struct frag_in {
 		float4 position : SV_POSITION;
@@ -30,7 +32,16 @@
 	  frag_in vert(appdata_img v) {
 		frag_in o;
 		o.position = UnityObjectToClipPos(v.vertex);
-		o.screenPos = LeapGetWarpedScreenPos(o.position);
+		
+		if(_MirrorImageHorizontally)
+		{
+			o.screenPos = LeapGetWarpedAndHorizontallyMirroredScreenPos(o.position);
+		}
+		else
+		{
+			o.screenPos = LeapGetWarpedScreenPos(o.position);
+		}
+
 		return o;
 	  }
 

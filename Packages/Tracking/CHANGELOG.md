@@ -6,7 +6,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [docs-website]: https://docs.ultraleap.com/ "Ultraleap Docs"
 
-## [5.6.0] - 30/03/2022
+## [5.7.0] - 13/04/2022
+
+### Added
+- Can now set different tracking optimization modes on tracking devices when running with multiple devices
+
+### Changed
+- Policy flags are now handled on a per device basis / contain information about the device they relate to
+- ActiveDevice replaced by ActiveDevices. ActiveDevice marked as obsolete
+- Legacy SetPolicy/ClearPolicy/IsPolicySet methods on IController marked as obsolete. Use new methods that also take a Device
+
+### Fixed
+- Ocassional ThreadAbortException on connection polling thread
+- Sometimes Frame objects where being constructed without a device ID, even if known
+
+### Known issues
+
+
+## [5.6.0] - 04/04/2022
+
+### Added
+- Added a new post process provider to distort tracking data to the 3D visuals
+- Added the ability to generate a leap hand from a bound hand (Hand Binder) 
+
+### Changed
+
+### Removed
+
+### Fixed
+
+### Known issues
+
+
+## [5.6.0] - 04/04/2022
 
 ### Added
 - The LeapServiceProvider provides a list of connected devices (LeapServiceProvider.Devices)
@@ -30,8 +62,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Known issues
 - Multiple device mode remembers device serial numbers after devices are disconnected
 - Service provider in multi-device scene does not track using selected device (by serial number) unless it's been selected in the editor
--	Scenes containing the infrared viewer render incorrectly on systems using single pass stereo with the XR plugin system - e.g. Windows Mixed Reality headsets. SteamVR headsets may also default to single pass stereo, showing the same issue. However in this case, the OpenVR settings can be changed to multipass which resolves the problem.
--	Demo scenes do not start at the correct height for a seated user. The XR Plugin Management System adjusts the camera height. This means the user has to adjust components in the scene to the correct height - e.g. camera height. Currently our position is to support the legacy XR system height settings.
+- Scenes containing the infrared viewer render incorrectly on systems using single pass stereo with the XR plugin system - e.g. Windows Mixed Reality headsets. SteamVR headsets may also default to single pass stereo, showing the same issue. However in this case, the OpenVR settings can be changed to multipass which resolves the problem.
+- Demo scenes do not start at the correct height for a seated user. The XR Plugin Management System adjusts the camera height. This means the user has to adjust components in the scene to the correct height - e.g. camera height. Currently our position is to support the legacy XR system height settings.
 - Possible hand offset issues on XR2 headsets using SVR plugin
 - Hands in Desktop scenes can appear far away from the camera
 - Interactions callback scene allows blocks to be moved without doing a grasp pose.
@@ -112,6 +144,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Reduced the number of OnContactBegin / OnContactEnd events when a finger is in contact with a slider
 - Fixed issues with HDRP and URP example scenes not containing the correct shader when switching graphics pipelines.
 - Fixing eye dislocator misalignment
+- Unused variables in LeapCSharp Controller and Connection causing warnings [[#1181]](https://github.com/ultraleap/UnityPlugin/issues/1181)
 
 ### Known issues
 -	Scenes containing the infrared viewer render incorrectly on systems using single pass stereo with the XR plugin system - e.g. Windows Mixed Reality headsets. SteamVR headsets may also default to single pass stereo, showing the same issue. However in this case, the OpenVR settings can be changed to multipass which resolves the problem.
