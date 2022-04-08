@@ -8,10 +8,8 @@
 
 namespace Leap.Unity
 {
-
     public class StationaryTestLeapProvider : LeapProvider
     {
-
         private Frame _curFrame;
 
         private Hand _leftHand;
@@ -60,7 +58,5 @@ namespace Leap.Unity
         {
             DispatchFixedFrameEvent(_curFrame);
         }
-
     }
-
 }

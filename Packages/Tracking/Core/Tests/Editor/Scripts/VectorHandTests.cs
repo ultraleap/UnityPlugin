@@ -17,7 +17,6 @@ namespace Leap.Unity.Tests
 
     public class VectorHandTests
     {
-
         [Test]
         public void EncodeDecodeTest()
         {

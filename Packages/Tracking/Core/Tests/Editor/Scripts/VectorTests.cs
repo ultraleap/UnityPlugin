@@ -11,7 +11,6 @@ using System;
 
 namespace Leap.LeapCSharp.Tests
 {
-    [TestFixture()]
     public class VectorTests
     {
         Vector thisVector = Vector.Up;
@@ -21,7 +20,7 @@ namespace Leap.LeapCSharp.Tests
         [OneTimeSetUp]
         public void Init() { }
 
-        [Test()]
+        [Test]
         public void Vector_Up()
         {
             Vector vec = Vector.Up;
@@ -30,7 +29,7 @@ namespace Leap.LeapCSharp.Tests
             Assert.AreEqual(0, vec.z, "z");
         }
 
-        [Test()]
+        [Test]
         public void Vector_Down()
         {
             Vector vec = Vector.Down;
@@ -39,7 +38,7 @@ namespace Leap.LeapCSharp.Tests
             Assert.AreEqual(0, vec.z, "z");
         }
 
-        [Test()]
+        [Test]
         public void Vector_Forward()
         {
             Vector vec = Vector.Forward;
@@ -48,7 +47,7 @@ namespace Leap.LeapCSharp.Tests
             Assert.AreEqual(-1, vec.z, "z");
         }
 
-        [Test()]
+        [Test]
         public void Vector_Backward()
         {
             Vector vec = Vector.Backward;
@@ -57,7 +56,7 @@ namespace Leap.LeapCSharp.Tests
             Assert.AreEqual(1, vec.z, "z");
         }
 
-        [Test()]
+        [Test]
         public void Vector_Left()
         {
             Vector vec = Vector.Left;
@@ -66,7 +65,7 @@ namespace Leap.LeapCSharp.Tests
             Assert.AreEqual(0, vec.z, "z");
         }
 
-        [Test()]
+        [Test]
         public void Vector_Right()
         {
             Vector vec = Vector.Right;
@@ -75,7 +74,7 @@ namespace Leap.LeapCSharp.Tests
             Assert.AreEqual(0, vec.z, "z");
         }
 
-        [Test()]
+        [Test]
         public void Vector_Zero()
         {
             Vector vec = Vector.Zero;
@@ -84,7 +83,7 @@ namespace Leap.LeapCSharp.Tests
             Assert.AreEqual(0, vec.z, "z");
         }
 
-        [Test()]
+        [Test]
         public void Vector_XAxis()
         {
             Vector vec = Vector.XAxis;
@@ -93,7 +92,7 @@ namespace Leap.LeapCSharp.Tests
             Assert.AreEqual(0, vec.z, "z");
         }
 
-        [Test()]
+        [Test]
         public void Vector_YAxis()
         {
             Vector vec = Vector.YAxis;
@@ -102,7 +101,7 @@ namespace Leap.LeapCSharp.Tests
             Assert.AreEqual(0, vec.z, "z");
         }
 
-        [Test()]
+        [Test]
         public void Vector_ZAxis()
         {
             Vector vec = Vector.ZAxis;
@@ -111,7 +110,7 @@ namespace Leap.LeapCSharp.Tests
             Assert.AreEqual(1, vec.z, "z");
         }
 
-        [Test()]
+        [Test]
         public void Vector_Constructor_1()
         {
             Vector vec = new Vector(0.5f, 200.3f, 67f);
@@ -124,7 +123,7 @@ namespace Leap.LeapCSharp.Tests
             Assert.AreEqual(0, vec.z, "z");
         }
 
-        [Test()]
+        [Test]
         public void Vector_Constructor_2()
         {
             Vector baseVector = new Vector(3, 4, 5);
@@ -136,7 +135,7 @@ namespace Leap.LeapCSharp.Tests
             Assert.AreEqual(3, baseVector.x, "z");
         }
 
-        [Test()]
+        [Test]
         public void Vector_Magnitude()
         {
             Assert.AreEqual(0, Vector.Zero.Magnitude, "Zero has 0 length");
@@ -155,7 +154,7 @@ namespace Leap.LeapCSharp.Tests
             Assert.AreEqual((float)Math.Sqrt(3f), new Vector(-1, -1, -1).Magnitude, "(-1,-1,-1) has sqrt(3) length");
         }
 
-        [Test()]
+        [Test]
         public void Vector_Magnitude_Squared()
         {
             Assert.AreEqual(0, Vector.Zero.MagnitudeSquared, "Zero has 0 length");
@@ -174,7 +173,7 @@ namespace Leap.LeapCSharp.Tests
             Assert.AreEqual(3, new Vector(-1, -1, -1).MagnitudeSquared, "(-1,-1,-1) 3 length");
         }
 
-        [Test()]
+        [Test]
         public void Vector_DistanceTo()
         {
             Vector origin = Vector.Zero;
@@ -194,7 +193,7 @@ namespace Leap.LeapCSharp.Tests
             Assert.AreEqual((float)Math.Sqrt(3f), origin.DistanceTo(new Vector(-1, -1, -1)), "distance to (-1,-1,-1) is sqrt(3)");
         }
 
-        [Test()]
+        [Test]
         public void Vector_AngleTo()
         {
             //The angle returned is always the smaller of the two conjugate angles. Thus A.angleTo(B) == B.angleTo(A) and is always a positive value less than or equal to pi radians (180 degrees).
@@ -246,7 +245,7 @@ namespace Leap.LeapCSharp.Tests
             }
         }
 
-        [Test()]
+        [Test]
         public void Vector_Pitch()
         {
             //If the vector points upward, the returned angle is between 0 and pi radians (180 degrees); if it points downward, the angle is between 0 and -pi radians
@@ -269,7 +268,7 @@ namespace Leap.LeapCSharp.Tests
             }
         }
 
-        [Test()]
+        [Test]
         public void Vector_Yaw()
         {
             //If the vector points to the right of the negative z-axis, then the returned angle is between 0 and pi radians (180 degrees); if it points to the left, the angle is between 0 and -pi radians.
@@ -292,7 +291,7 @@ namespace Leap.LeapCSharp.Tests
             }
         }
 
-        [Test()]
+        [Test]
         public void Vector_Roll()
         {
             // If the vector points to the left of the y-axis, then the returned angle is between 0 and pi radians (180 degrees); if it points to the right, the angle is between 0 and -pi radians.
@@ -315,7 +314,7 @@ namespace Leap.LeapCSharp.Tests
             }
         }
 
-        [Test()]
+        [Test]
         public void Vector_Dot()
         {
             Assert.AreEqual(0, Vector.Up.Dot(Vector.Forward), "Orthogonal");
@@ -325,7 +324,7 @@ namespace Leap.LeapCSharp.Tests
             Assert.AreEqual((float)Math.Sqrt(2) / 2, Vector.Backward.Dot(new Vector(0, 1, 1).Normalized), "45 degree unit vectors");
         }
 
-        [Test()]
+        [Test]
         public void Vector_Cross()
         {
             Vector v1 = new Vector(1, 2, 3);
@@ -338,7 +337,7 @@ namespace Leap.LeapCSharp.Tests
 
         }
 
-        [Test()]
+        [Test]
         public void Vector_Normalized()
         {
             Vector v1 = new Vector(1, 2, 3);
@@ -353,7 +352,7 @@ namespace Leap.LeapCSharp.Tests
             Assert.AreEqual(1.0f, v5.Normalized.Magnitude, Constants.EPSILON, "large negative");
         }
 
-        [Test()]
+        [Test]
         public void Vector_Plus()
         {
             Vector v1 = new Vector(1, 2, 3);
@@ -361,7 +360,7 @@ namespace Leap.LeapCSharp.Tests
             Assert.AreEqual(new Vector(-3, 10, -1), v1 + v2);
         }
 
-        [Test()]
+        [Test]
         public void Vector_Minus()
         {
             Vector v1 = new Vector(1, 2, 3);
@@ -369,28 +368,28 @@ namespace Leap.LeapCSharp.Tests
             Assert.AreEqual(new Vector(5, -6, 7), v1 - v2);
         }
 
-        [Test()]
+        [Test]
         public void Vector_Negate()
         {
             Vector v1 = new Vector(1, 2, -3);
             Assert.AreEqual(new Vector(-1, -2, 3), -v1);
         }
 
-        [Test()]
+        [Test]
         public void Vector_Times()
         {
             Vector v1 = new Vector(1, 2, -3);
             Assert.AreEqual(new Vector(5.2f, 10.4f, -15.6f), (v1 * 5.2f));
         }
 
-        [Test()]
+        [Test]
         public void Vector_Divide()
         {
             Vector v1 = new Vector(25, 150, -300);
             Assert.AreEqual(new Vector(5f, 30f, -60f), (v1 / 5.0f));
         }
 
-        [Test()]
+        [Test]
         public void Vector_Equals()
         {
             Vector v1 = new Vector(1, 2, 3);
@@ -441,7 +440,7 @@ namespace Leap.LeapCSharp.Tests
 
         }
 
-        [Test()]
+        [Test]
         public void Vector_NotEqual()
         {
             // !!!Vector_NotEqual
@@ -450,7 +449,7 @@ namespace Leap.LeapCSharp.Tests
             Assert.IsTrue(vectorsNotEqual);
         }
 
-        [Test()]
+        [Test]
         public void Vector_IsValid()
         {
             Vector xInvalid = new Vector(float.NaN, 3f, 45f);

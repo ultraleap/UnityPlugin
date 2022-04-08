@@ -43,6 +43,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 
 ### Fixed
+- Unit tests break downstream package dependencies [[#1182]](https://github.com/ultraleap/UnityPlugin/issues/1182)
 
 ### Known issues
 

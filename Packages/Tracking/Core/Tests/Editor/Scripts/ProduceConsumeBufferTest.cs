@@ -12,10 +12,8 @@ using System.Threading;
 
 namespace Leap.Unity.Tests
 {
-
     public class ProduceConsumeBufferTest
     {
-
         private ProduceConsumeBuffer<TestStruct> buffer;
 
         [SetUp]

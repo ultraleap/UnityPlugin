@@ -14,7 +14,6 @@ using System.Reflection;
 
 namespace Leap.Unity.Tests
 {
-
     public class TransformCopyIdentity : FrameValidator
     {
         protected Frame _originalFrame;
