@@ -17,8 +17,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Legacy SetPolicy/ClearPolicy/IsPolicySet methods on IController marked as obsolete. Use new methods that also take a Device
 
 ### Fixed
-- Ocassional ThreadAbortException on connection polling thread
+- Occasional ThreadAbortException on connection polling thread
 - Sometimes Frame objects where being constructed without a device ID, even if known
+- SIR170 Tracking Volume Visualisation was not appearing 
 
 ### Known issues
 
