@@ -50,13 +50,6 @@ namespace Ultraleap.Tracking.OpenXR
             {
                 mainCamera = MainCameraProvider.mainCamera;
             }
-
-#if XR_LEGACY_INPUT_AVAILABLE
-            if (mainCamera.GetComponent<UnityEngine.SpatialTracking.TrackedPoseDriver>() == null)
-            {
-                mainCamera.gameObject.AddComponent<UnityEngine.SpatialTracking.TrackedPoseDriver>().UseRelativeTransform = true;
-            }
-#endif
         }
 
         private void Update()
@@ -65,7 +58,7 @@ namespace Ultraleap.Tracking.OpenXR
 
             // Transform for the camera parent transform if this camera is part of a rig.
             var parentTransform = mainCamera.transform.parent;
-            if (mainCamera.transform.parent != null)
+            if (parentTransform != null)
             {
                 _currentFrame = _updateFrame.TransformedCopy(new LeapTransform(parentTransform.position.ToVector(), parentTransform.rotation.ToLeapQuaternion()));
             }
