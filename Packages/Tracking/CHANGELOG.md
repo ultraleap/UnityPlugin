@@ -19,7 +19,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Occasional ThreadAbortException on connection polling thread
 - Sometimes Frame objects where being constructed without a device ID, even if known
-- SIR170 Tracking Volume Visualisation was not appearing 
+- SIR170 Tracking Volume Visualisation was not appearing
+- The automatic option on Tracking Volume Visualisation was not working for SIR170s or 3Dis
 
 ### Known issues
 
