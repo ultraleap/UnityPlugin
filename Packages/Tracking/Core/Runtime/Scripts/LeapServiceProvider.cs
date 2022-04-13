@@ -971,7 +971,7 @@ namespace Leap.Unity
             {
                 MultipleDeviceMode.Specific => (d) =>
                 {
-                    if (d.SerialNumber.Contains(SpecificSerialNumber) && _leapController != null)
+                    if (SpecificSerialNumber != null && SpecificSerialNumber != "" && d.SerialNumber.Contains(SpecificSerialNumber) && _leapController != null)
                     {
                         connectToNewDevice(d);
                     }
