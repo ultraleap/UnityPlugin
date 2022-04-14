@@ -967,22 +967,23 @@ namespace Leap.Unity
                 }
             };
 
-            _onDeviceSafe += _multipleDeviceMode switch
+            _onDeviceSafe +=  (d) => 
             {
-                MultipleDeviceMode.Specific => (d) =>
+                if (_multipleDeviceMode == MultipleDeviceMode.Specific) 
                 {
                     if (SpecificSerialNumber != null && SpecificSerialNumber != "" && d.SerialNumber.Contains(SpecificSerialNumber) && _leapController != null)
                     {
                         connectToNewDevice(d);
                     }
                 }
-                ,
-                MultipleDeviceMode.Disabled => (d) =>
+                else if (_multipleDeviceMode == MultipleDeviceMode.Disabled)
                 {
                     _currentDevice = d;
                 }
-                ,
-                _ => throw new NotImplementedException($"{nameof(MultipleDeviceMode)} case not implemented")
+                else
+                {
+                    throw new NotImplementedException($"{nameof(MultipleDeviceMode)} case not implemented");
+                }
             };
 
 
