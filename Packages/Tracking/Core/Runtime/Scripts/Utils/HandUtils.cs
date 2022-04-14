@@ -349,12 +349,12 @@ namespace Leap.Unity
         /// </summary>
         public static float GetFingerStrength(this Hand hand, int finger)
         {
-            if(hand == null)
+            if (hand == null)
             {
                 return 0;
             }
 
-            if(finger == 0)
+            if (finger == 0)
             {
                 return Vector3.Dot(hand.Fingers[finger].Direction.ToVector3(), -hand.RadialAxis()).Map(-1, 1, 0, 1);
             }
