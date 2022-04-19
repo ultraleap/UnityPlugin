@@ -10,6 +10,7 @@ namespace Leap
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
 
     /// <summary>
     /// The DeviceList class represents a list of Device objects.
@@ -41,6 +42,20 @@ namespace Leap
         }
 
         /// <summary>
+        /// For internal use only.
+        /// </summary>
+        public Device FindDeviceByID(uint deviceID)
+        {
+            for (int d = 0; d < this.Count; d++)
+            {
+                if (this[d].DeviceID == deviceID)
+                    return this[d];
+            }
+            return null;
+        }
+
+        [Obsolete("Multiple devices can now be streaming, use ActiveDevices instead.", false)]
+        /// <summary>
         /// The device that is currently streaming tracking data.
         /// If no streaming devices are found, returns null
         /// </summary>
@@ -63,6 +78,23 @@ namespace Leap
                 }
 
                 return null;
+            }
+        }
+
+        /// <summary>
+        /// The devices that are currently streaming tracking data.
+        /// If no streaming devices are found, returns null
+        /// </summary>
+        public IEnumerable<Device> ActiveDevices
+        {
+            get
+            {
+                for (int d = 0; d < Count; d++)
+                {
+                    this[d].UpdateStatus(LeapInternal.eLeapDeviceStatus.eLeapDeviceStatus_Streaming);
+                }
+
+                return this.Where(d => d.IsStreaming);
             }
         }
 

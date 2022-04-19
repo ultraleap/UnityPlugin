@@ -49,7 +49,8 @@ namespace Leap
                       DeviceType type,
                       bool isStreaming,
                       uint status,
-                      string serialNumber)
+                      string serialNumber,
+                      uint deviceID)
         {
             Handle = deviceHandle;
             InternalHandle = internalHandle;
@@ -60,7 +61,22 @@ namespace Leap
             Type = type;
             IsStreaming = isStreaming;
             SerialNumber = serialNumber;
+            DeviceID = deviceID;
             UpdateStatus((eLeapDeviceStatus)status);
+        }
+
+        public Device(IntPtr deviceHandle,
+                      IntPtr internalHandle,
+                      float horizontalViewAngle,
+                      float verticalViewAngle,
+                      float range,
+                      float baseline,
+                      DeviceType type,
+                      bool isStreaming,
+                      uint status,
+                      string serialNumber) : this(deviceHandle, internalHandle, horizontalViewAngle,
+                          verticalViewAngle, range, baseline, type, isStreaming, status, serialNumber, 0)
+        {
         }
 
         /// <summary>
@@ -227,6 +243,12 @@ namespace Leap
         /// @since 2.2.2
         /// </summary>
         public string SerialNumber { get; private set; }
+
+        /// <summary>
+        /// Reports the ID assoicated with the device
+        /// 
+        /// </summary>
+        public uint DeviceID { get; private set; }
 
         /// <summary>
         /// Returns the internal status field of the current device
