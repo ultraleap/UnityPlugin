@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [docs-website]: https://docs.ultraleap.com/ "Ultraleap Docs"
 
-## [5.7.0] - 13/04/2022
+## [5.7.0] - 19/04/2022
 
 ### Added
 - Added a new post process provider to distort tracking data to the 3D visuals
