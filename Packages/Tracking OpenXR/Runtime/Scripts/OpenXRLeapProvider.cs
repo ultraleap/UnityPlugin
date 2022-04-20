@@ -67,12 +67,12 @@ namespace Ultraleap.Tracking.OpenXR
                 _currentFrame = _updateFrame;
             }
 
-            DispatchUpdateFrameEvent(_updateFrame);
+            DispatchUpdateFrameEvent(_currentFrame);
         }
 
         private void FixedUpdate()
         {
-            DispatchFixedFrameEvent(_updateFrame);
+            DispatchFixedFrameEvent(_currentFrame);
         }
 
         private void PopulateLeapFrame(FrameTime frameTime, ref Frame leapFrame)
