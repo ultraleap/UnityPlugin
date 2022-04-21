@@ -28,6 +28,11 @@ namespace Leap.Unity
         public float lengthVisibleFactor = 1;
         public Transform debugCube;
 
+        public CapsuleHand debugHandLeft;
+        public CapsuleHand debugHandRight;
+
+        public Color[] debugColors;
+
         Dictionary<LeapProvider, LastHandPositions> lastLeftHandPositions = new Dictionary<LeapProvider, LastHandPositions>();
         Dictionary<LeapProvider, LastHandPositions> lastRightHandPositions = new Dictionary<LeapProvider, LastHandPositions>();
 
@@ -232,16 +237,12 @@ namespace Leap.Unity
                 }
             }
 
-            //if (hands.Count >= 1)
-            //{
-            //    Debug.Log("pos: " + vectorHands[0].jointPositions[5] + ", conf: " + jointConfidences[0][5] +
-            //       // "\n pos: " + vectorHands[1].jointPositions[5] + ", conf: " + jointConfidences[0][5] +
-            //        "\n pos: " + mergedJointPositions[5]);
-            //}
-
             // combine everything to a hand
             Hand mergedHand = new Hand();
             new VectorHand(isLeft, mergedPalmPos, mergedPalmRot, mergedJointPositions).Decode(mergedHand);
+
+            // visualize the joint merge:
+            //if(isLeft && )
 
             return mergedHand;
         }

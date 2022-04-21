@@ -83,6 +83,26 @@ namespace Leap.Unity
         private int _curSphereIndex = 0, _curCylinderIndex = 0;
         private Color _backingDefault = Color.white;
 
+        private Color[] _sphereColors = new Color[32];
+
+        public bool SetIndividualSphereColors = false;
+        public Color[] SphereColors
+        {
+            get
+            {
+                if(_sphereColors == null)
+                {
+                    _sphereColors = new Color[32];
+                    _sphereColors.Fill(SphereColour);
+                }
+                return _sphereColors;
+            }
+            set
+            {
+                _sphereColors = value;
+            }
+        }
+
         /// <summary>
         /// The type of the Hand model (set to Graphics)
         /// </summary>
@@ -372,10 +392,18 @@ namespace Leap.Unity
             drawCylinder(mockThumbJointPos, THUMB_BASE_INDEX);
             drawCylinder(mockThumbJointPos, PINKY_BASE_INDEX);
 
-            // Draw Spheres
-            Graphics.DrawMeshInstanced(_sphereMesh, 0, _sphereMat, _sphereMatrices, _curSphereIndex, null,
-              _castShadows ? UnityEngine.Rendering.ShadowCastingMode.On : UnityEngine.Rendering.ShadowCastingMode.Off, true, gameObject.layer);
 
+            MaterialPropertyBlock materialPropertyBlock = new MaterialPropertyBlock();
+
+            for (int i = 0; i < _sphereMatrices.Length; i++)
+            {
+                if(SetIndividualSphereColors) materialPropertyBlock.SetColor("_Color", SphereColors[i]);
+
+                Graphics.DrawMeshInstanced(_sphereMesh, 0, _sphereMat, new Matrix4x4[] { _sphereMatrices[i] }, 1, materialPropertyBlock,
+                  _castShadows ? UnityEngine.Rendering.ShadowCastingMode.On : UnityEngine.Rendering.ShadowCastingMode.Off, true, gameObject.layer);
+            }
+
+            
             // Draw Cylinders
             if (_cylinderMesh == null) { _cylinderMesh = getCylinderMesh(1f); }
             Graphics.DrawMeshInstanced(_cylinderMesh, 0, _backing_material, _cylinderMatrices, _curCylinderIndex, null,
