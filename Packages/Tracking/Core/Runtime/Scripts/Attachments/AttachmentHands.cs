@@ -29,7 +29,7 @@ namespace Leap.Unity.Attachments
     [ExecuteInEditMode]
     public class AttachmentHands : MonoBehaviour
     {
-        [Tooltip("The service provider the attachment hands use to generate the transform hierarchy." +
+        [Tooltip("The Leap Provider the attachment hands use to generate the transform hierarchy." +
             " If left empty, AttachmentHands defaults to the provider used in Leap.Unity.Hands")]
         [SerializeField]
         private LeapProvider _leapProvider;
