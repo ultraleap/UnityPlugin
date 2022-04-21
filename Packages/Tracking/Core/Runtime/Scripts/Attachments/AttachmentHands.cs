@@ -161,7 +161,7 @@ namespace Leap.Unity.Attachments
             {
                 _handAccessors = new Func<Hand>[2];
 
-                if(_leapProvider == null)
+                if (_leapProvider == null)
                 {
                     _handAccessors[0] = new Func<Hand>(() => { return Hands.Left; });
                     _handAccessors[1] = new Func<Hand>(() => { return Hands.Right; });
