@@ -93,6 +93,14 @@ namespace Leap.Unity.Encoding
             Encode(hand);
         }
 
+        public VectorHand(bool isLeft, Vector3 palmPos, Quaternion palmRot, Vector3[] jointPositions)
+        {
+            this.isLeft = isLeft;
+            this.palmPos = palmPos;
+            this.palmRot = palmRot;
+            this._backingJointPositions = jointPositions;
+        }
+
         /// <summary>
         /// Copies a VectorHand from another VectorHand
         /// </summary>
