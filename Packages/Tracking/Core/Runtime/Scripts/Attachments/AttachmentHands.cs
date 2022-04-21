@@ -163,13 +163,13 @@ namespace Leap.Unity.Attachments
 
                 if (_leapProvider == null)
                 {
-                    _handAccessors[0] = new Func<Hand>(() => { return Hands.Left; });
-                    _handAccessors[1] = new Func<Hand>(() => { return Hands.Right; });
+                    _handAccessors[0] = new Func<Hand>(() => Hands.Left);
+                    _handAccessors[1] = new Func<Hand>(() => Hands.Right);
                 }
                 else
                 {
-                    _handAccessors[0] = new Func<Hand>(() => { return _leapProvider.CurrentFrame?.GetHand(Chirality.Left); });
-                    _handAccessors[1] = new Func<Hand>(() => { return _leapProvider.CurrentFrame?.GetHand(Chirality.Right); });
+                    _handAccessors[0] = new Func<Hand>(() => _leapProvider.CurrentFrame?.GetHand(Chirality.Left));
+                    _handAccessors[1] = new Func<Hand>(() => _leapProvider.CurrentFrame?.GetHand(Chirality.Right));
                 }
 
             }
