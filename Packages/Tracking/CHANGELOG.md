@@ -6,6 +6,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [docs-website]: https://docs.ultraleap.com/ "Ultraleap Docs"
 
+## [5.8.0]
+
+### Added
+- A Leap Provider can now be specified for attachment hands
+
+### Fixed
+- SIR170 Tracking Volume Visualisation was not appearing
+- The automatic option on Tracking Volume Visualisation was not working for SIR170s or 3Dis
+
 ## [5.7.0] - 13/04/2022
 
 ### Added
@@ -19,8 +28,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Occasional ThreadAbortException on connection polling thread
 - Sometimes Frame objects where being constructed without a device ID, even if known
-- SIR170 Tracking Volume Visualisation was not appearing
-- The automatic option on Tracking Volume Visualisation was not working for SIR170s or 3Dis
 
 ### Known issues
 
