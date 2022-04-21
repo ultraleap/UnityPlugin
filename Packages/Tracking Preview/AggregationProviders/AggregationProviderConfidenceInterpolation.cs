@@ -100,6 +100,9 @@ namespace Leap.Unity
             List<float> leftHandConfidences = new List<float>();
             List<float> rightHandConfidences = new List<float>();
 
+            List<float[]> leftJointConfidences = new List<float[]>();
+            List<float[]> rightJointConfidences = new List<float[]>();
+
 
             // make lists of all left and right hands found in each frame and also make a list of their confidences
             for (int i = 0; i < frames.Length; i++)
@@ -112,13 +115,23 @@ namespace Leap.Unity
                     if (hand.IsLeft)
                     {
                         leftHands.Add(hand);
-                        leftHandConfidences.Add(CalculateHandConfidence(i, hand));
+
+                        float handConfidence = CalculateHandConfidence(i, hand);
+                        float[] jointConfidences = CalculateJointConfidence(i, hand);
+
+                        leftHandConfidences.Add(handConfidence);
+                        leftJointConfidences.Add(jointConfidences.Select(x => x * handConfidence).ToArray());
                     }
 
                     else
                     {
                         rightHands.Add(hand);
-                        rightHandConfidences.Add(CalculateHandConfidence(i, hand));
+
+                        float handConfidence = CalculateHandConfidence(i, hand);
+                        float[] jointConfidences = CalculateJointConfidence(i, hand);
+
+                        rightHandConfidences.Add(handConfidence);
+                        rightJointConfidences.Add(jointConfidences.Select(x => x * handConfidence).ToArray());
                     }
                 }
             }
@@ -141,47 +154,42 @@ namespace Leap.Unity
                     rightHandConfidences[i] /= sum;
                 }
             }
+
+            // normalize joint confidences:
+            for(int i = 0; i < VectorHand.NUM_JOINT_POSITIONS; i++)
+            {
+                sum = leftJointConfidences.Sum(x => x[i]);
+                if(sum != 0)
+                {
+                    for (int j = 0; j < leftJointConfidences.Count; j++)
+                    {
+                        leftJointConfidences[j][i] /= sum;
+                    }
+                }
+
+                sum = rightJointConfidences.Sum(x => x[i]);
+                if (sum != 0)
+                {
+                    for (int j = 0; j < rightJointConfidences.Count; j++)
+                    {
+                        rightJointConfidences[j][i] /= sum;
+                    }
+                }
             }
+
             
 
             // combine hands using their confidences
-            // --> could write a function in VectorHand that combines a list of VectorHands using list of confidences to make this more efficient if there are more than two providers
             List<Hand> mergedHands = new List<Hand>();
 
             if (leftHands.Count > 0)
             {
-                VectorHand leftHand = new VectorHand(leftHands[0]);
-
-                for (int i = 1; i < leftHands.Count; i++)
-                {
-                    float lerpValue = leftHandConfidences.Take(i).Sum() / leftHandConfidences.Take(i + 1).Sum();
-
-                    VectorHand temp = new VectorHand();
-                    temp.FillLerped(new VectorHand(leftHands[i]), leftHand, lerpValue);
-                    leftHand = temp;
-                }
-
-                Hand decodedHand = new Hand();
-                leftHand.Decode(decodedHand);
-                mergedHands.Add(decodedHand);
+                mergedHands.Add(MergeHands(leftHands, leftHandConfidences, leftJointConfidences));
             }
 
             if (rightHands.Count > 0)
             {
-                VectorHand rightHand = new VectorHand(rightHands[0]);
-
-                for (int i = 1; i < rightHands.Count; i++)
-                {
-                    float lerpValue = rightHandConfidences.Take(i).Sum() / rightHandConfidences.Take(i + 1).Sum();
-
-                    VectorHand temp = new VectorHand();
-                    temp.FillLerped(new VectorHand(rightHands[i]), rightHand, lerpValue);
-                    rightHand = temp;
-                }
-
-                Hand decodedHand = new Hand();
-                rightHand.Decode(decodedHand);
-                mergedHands.Add(decodedHand);
+                mergedHands.Add(MergeHands(rightHands, rightHandConfidences, rightJointConfidences));
             }
 
             // get frame data from first frame and add merged hands to it
@@ -190,6 +198,52 @@ namespace Leap.Unity
 
             return mergedFrame;
 
+        }
+
+        public Hand MergeHands(List<Hand> hands, List<float> handConfidences, List<float[]> jointConfidences)
+        {
+            bool isLeft = hands[0].IsLeft;
+            Vector3 mergedPalmPos = hands[0].PalmPosition.ToVector3() * handConfidences[0];
+            Quaternion mergedPalmRot = hands[0].Rotation.ToQuaternion();
+
+            for(int i = 1; i < hands.Count; i++)
+            {
+                // position
+                mergedPalmPos += hands[i].PalmPosition.ToVector3() * handConfidences[i];
+
+                // rotation
+                float lerpValue = handConfidences.Take(i).Sum() / handConfidences.Take(i + 1).Sum();
+                mergedPalmRot = Quaternion.Lerp(hands[i].Rotation.ToQuaternion(), mergedPalmRot, lerpValue);
+            }
+
+            // joints
+            Vector3[] mergedJointPositions = new Vector3[VectorHand.NUM_JOINT_POSITIONS];
+            List<VectorHand> vectorHands = new List<VectorHand>();
+            foreach(Hand hand in hands)
+            {
+                vectorHands.Add(new VectorHand(hand));
+            }
+
+            for(int hands_idx = 0; hands_idx < hands.Count; hands_idx++)
+            {
+                for(int joint_idx = 0; joint_idx < VectorHand.NUM_JOINT_POSITIONS; joint_idx++)
+                {
+                    mergedJointPositions[joint_idx] += vectorHands[hands_idx].jointPositions[joint_idx] * jointConfidences[hands_idx][joint_idx];
+                }
+            }
+
+            //if (hands.Count >= 1)
+            //{
+            //    Debug.Log("pos: " + vectorHands[0].jointPositions[5] + ", conf: " + jointConfidences[0][5] +
+            //       // "\n pos: " + vectorHands[1].jointPositions[5] + ", conf: " + jointConfidences[0][5] +
+            //        "\n pos: " + mergedJointPositions[5]);
+            //}
+
+            // combine everything to a hand
+            Hand mergedHand = new Hand();
+            new VectorHand(isLeft, mergedPalmPos, mergedPalmRot, mergedJointPositions).Decode(mergedHand);
+
+            return mergedHand;
         }
 
         /// <summary>
@@ -208,13 +262,26 @@ namespace Leap.Unity
             return confidence;
         }
 
+        /// <summary>
+        /// Combine different confidence functions to get an overall confidence for each joint in the given hand
+        /// uses frame_idx to find the corresponding provider that saw this hand
+        /// </summary>
+        float[] CalculateJointConfidence(int frame_idx, Hand hand)
+        {
+            float[] confidences = new float[VectorHand.NUM_JOINT_POSITIONS];
+
+            confidences.Fill(1);
+
+            return confidences;
+        }
+
         void AddFrameToLengthVisibleDicts(Frame[] frames, int frameIdx)
         {
             bool[] handsVisible = new bool[2];
 
             foreach(Hand hand in frames[frameIdx].Hands)
             {
-                Debug.Log(hand.Id);
+                //Debug.Log(hand.Id);
                 if(hand.IsLeft)
                 {
                     handsVisible[0] = true;
