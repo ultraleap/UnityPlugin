@@ -546,46 +546,36 @@ namespace Leap.Unity
             CreateAndroidBinding();
         }
 
-        public bool CreateAndroidBinding()
+        private void CreateAndroidBinding()
         {
             try
             {
-                if (_serviceBinder != null)
+                bool isServiceBound = _serviceBinder?.Call<bool>("isBound") ?? false;
+                if (isServiceBound) return;
+
+                _serviceBinder = null;
+
+                //Get activity and context
+                if (unityPlayer == null)
                 {
-                    //Check binding status before calling rebind
-                    bool bindStatus = _serviceBinder.Call<bool>("isBound");
-                    Debug.Log("CreateAndroidBinding - Current service binder status " + bindStatus);
-                    if (bindStatus)
-                    {
-                        return true;
-                    }
-                    else
-                    {
-                        _serviceBinder = null;
-                    }
+                    Debug.Log("CreateAndroidBinding - Getting activity and context");
+                    unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
+                    activity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
+                    context = activity.Call<AndroidJavaObject>("getApplicationContext");
+                    serviceCallbacks = new ServiceCallbacks();
                 }
 
-                if (_serviceBinder == null)
+                //Create a new service binding
+                Debug.Log("CreateAndroidBinding - Creating a new service binder");
+                _serviceBinder = new AndroidJavaObject("com.ultraleap.tracking.service_binder.ServiceBinder", context, serviceCallbacks);
+                bool success = _serviceBinder.Call<bool>("bind");
+                if (success)
                 {
-                    //Get activity and context
-                    if (unityPlayer == null)
-                    {
-                        Debug.Log("CreateAndroidBinding - Getting activity and context");
-                        unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
-                        activity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
-                        context = activity.Call<AndroidJavaObject>("getApplicationContext");
-                        serviceCallbacks = new ServiceCallbacks();
-                    }
-
-                    //Create a new service binding
-                    Debug.Log("CreateAndroidBinding - Creating a new service binder");
-                    _serviceBinder = new AndroidJavaObject("com.ultraleap.tracking.service_binder.ServiceBinder", context, serviceCallbacks);
-                    bool success = _serviceBinder.Call<bool>("bind");
-                    if (success)
-                    {
-                        Debug.Log("CreateAndroidBinding - Binding of service binder complete");
-                    }
-                    return true;
+                    Debug.Log("CreateAndroidBinding - Binding of service binder complete");
+                }
+                else
+                {
+                    Debug.LogWarning("CreateAndroidBinding - service binder bind call failed");
                 }
             }
             catch (Exception e)
@@ -593,7 +583,6 @@ namespace Leap.Unity
                 Debug.LogWarning("CreateAndroidBinding - Failed to bind service: " + e.Message);
                 _serviceBinder = null;
             }
-            return false;
         }
 
         protected virtual void OnDisable()
@@ -770,27 +759,8 @@ namespace Leap.Unity
             _isDestroyed = true;
         }
 
-        protected virtual void OnApplicationFocus(bool hasFocus)
-        {
-#if UNITY_ANDROID
-            if (hasFocus)
-            {
-                CreateAndroidBinding();
-            }
-#endif
-        }
-
         protected virtual void OnApplicationPause(bool isPaused)
         {
-#if UNITY_ANDROID
-            if (_leapController != null)
-            {
-                if (isPaused)
-                {
-                    _serviceBinder.Call("unbind");
-                }
-            }
-#endif
             if (_leapController != null)
             {
                 if (isPaused)
