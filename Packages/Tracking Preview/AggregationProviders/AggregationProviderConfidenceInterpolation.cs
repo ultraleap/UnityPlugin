@@ -121,6 +121,13 @@ namespace Leap.Unity
                         leftJointConfidences[j][i] /= sum;
                     }
                 }
+                else
+                {
+                    for (int j = 0; j < leftJointConfidences.Count; j++)
+                    {
+                        leftJointConfidences[j][i] = 1f / leftJointConfidences.Count;
+                    }
+                }
 
                 sum = rightJointConfidences.Sum(x => x[i]);
                 if (sum != 0)
@@ -128,6 +135,13 @@ namespace Leap.Unity
                     for (int j = 0; j < rightJointConfidences.Count; j++)
                     {
                         rightJointConfidences[j][i] /= sum;
+                    }
+                }
+                else
+                {
+                    for (int j = 0; j < rightJointConfidences.Count; j++)
+                    {
+                        rightJointConfidences[j][i] = 1f / rightJointConfidences.Count;
                     }
                 }
             }
