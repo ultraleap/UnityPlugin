@@ -242,9 +242,24 @@ namespace Leap.Unity
             new VectorHand(isLeft, mergedPalmPos, mergedPalmRot, mergedJointPositions).Decode(mergedHand);
 
             // visualize the joint merge:
-            //if(isLeft && )
+            if (isLeft && debugHandLeft != null) VisualizeMergedJoints(debugHandLeft, jointConfidences);
+            else if (!isLeft && debugHandRight != null) VisualizeMergedJoints(debugHandRight, jointConfidences);
 
-            return mergedHand;
+                return mergedHand;
+        }
+
+        void VisualizeMergedJoints(CapsuleHand hand, List<float[]> jointConfidences)
+        {
+            Color[] colors = hand.SphereColors;
+            for(int i = 0; i < jointConfidences[0].Length; i++)
+            {
+                colors[i] = debugColors[0];
+
+                for(int j = 1; j < jointConfidences.Count; j++)
+                {
+
+                }
+            }
         }
 
         /// <summary>
