@@ -83,7 +83,7 @@ namespace Leap.Unity
         private int _curSphereIndex = 0, _curCylinderIndex = 0;
         private Color _backingDefault = Color.white;
 
-        private Color[] _sphereColors = new Color[32];
+        private Color[] _sphereColors; 
 
         [HideInInspector]
         public bool SetIndividualSphereColors = false;
@@ -191,6 +191,7 @@ namespace Leap.Unity
         {
             get
             {
+                if (_sphereMat == null) return _sphereColor;
                 return _sphereMat.color;
             }
         }
