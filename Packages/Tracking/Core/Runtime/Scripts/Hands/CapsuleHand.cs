@@ -396,7 +396,7 @@ namespace Leap.Unity
 
             MaterialPropertyBlock materialPropertyBlock = new MaterialPropertyBlock();
 
-            for (int i = 0; i < _sphereMatrices.Length; i++)
+            for (int i = 0; i < _sphereMatrices.Length && i < _curSphereIndex; i++)
             {
                 if(SetIndividualSphereColors) materialPropertyBlock.SetColor("_Color", SphereColors[i]);
 
