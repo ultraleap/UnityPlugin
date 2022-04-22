@@ -18,7 +18,6 @@ namespace Leap.LeapCSharp.Tests
         public TestObjectType(int t) { id = t; }
     }
 
-    [TestFixture]
     public class CircularObjectBufferTests
     {
         [Test]
@@ -86,7 +85,8 @@ namespace Leap.LeapCSharp.Tests
                 Assert.AreEqual(-1, foo.id, "Get default object past last item in full buffer");
             }
         }
-        [Test()]
+
+        [Test]
         public void OrderTests()
         {
             CircularObjectBuffer<TestObjectType> ciq = new CircularObjectBuffer<TestObjectType>(10);
@@ -112,7 +112,7 @@ namespace Leap.LeapCSharp.Tests
             Assert.AreEqual(bar.id, 0, "Objects are still in order: " + bar.id + ", " + 0);
         }
 
-        [Test()]
+        [Test]
         public void ResizeTests()
         {
             CircularObjectBuffer<TestObjectType> ciq = new CircularObjectBuffer<TestObjectType>(10);

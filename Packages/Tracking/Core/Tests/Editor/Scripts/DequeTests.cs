@@ -11,10 +11,8 @@ using System;
 
 namespace Leap.Unity.Tests
 {
-
     public class DequeTests
     {
-
         private Deque<int> _buffer;
 
         [SetUp]
@@ -57,7 +55,6 @@ namespace Leap.Unity.Tests
                 int value = _buffer.Front;
                 Assert.NotNull(value);  //Just to remove unused value warning
             }, Throws.InstanceOf<InvalidOperationException>());
-
         }
 
         [Test]
@@ -131,5 +128,4 @@ namespace Leap.Unity.Tests
             }
         }
     }
-
 }

@@ -12,7 +12,6 @@ using UnityEngine;
 
 namespace Leap.Unity.Tests
 {
-
     public class ListAndArrayExtensionTests
     {
 
