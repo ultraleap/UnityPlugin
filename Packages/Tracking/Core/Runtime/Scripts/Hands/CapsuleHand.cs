@@ -83,7 +83,7 @@ namespace Leap.Unity
         private int _curSphereIndex = 0, _curCylinderIndex = 0;
         private Color _backingDefault = Color.white;
 
-        private Color[] _sphereColors; 
+        private Color[] _sphereColors;
 
         [HideInInspector]
         public bool SetIndividualSphereColors = false;
@@ -91,7 +91,7 @@ namespace Leap.Unity
         {
             get
             {
-                if(_sphereColors == null)
+                if (_sphereColors == null)
                 {
                     _sphereColors = new Color[32];
                     _sphereColors.Fill(SphereColour);
@@ -412,7 +412,7 @@ namespace Leap.Unity
                   _castShadows ? UnityEngine.Rendering.ShadowCastingMode.On : UnityEngine.Rendering.ShadowCastingMode.Off, true, gameObject.layer);
             }
 
-            
+
             // Draw Cylinders
             if (_cylinderMesh == null) { _cylinderMesh = getCylinderMesh(1f); }
             Graphics.DrawMeshInstanced(_cylinderMesh, 0, _backing_material, _cylinderMatrices, _curCylinderIndex, null,

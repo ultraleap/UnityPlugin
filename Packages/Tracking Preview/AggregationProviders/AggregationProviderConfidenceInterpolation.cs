@@ -24,7 +24,7 @@ namespace Leap.Unity
     public class AggregationProviderConfidenceInterpolation : LeapAggregatedProviderBase
     {
         // factors that get multiplied to the corresponding cofidence values to get an overall weighted confidence value
-        
+
         public float palmPosFactor = 1;
         public float palmRotFactor = 1;
         public float palmVelocityFactor = 1;
@@ -111,10 +111,10 @@ namespace Leap.Unity
             }
 
             // normalize joint confidences:
-            for(int i = 0; i < VectorHand.NUM_JOINT_POSITIONS; i++)
+            for (int i = 0; i < VectorHand.NUM_JOINT_POSITIONS; i++)
             {
                 sum = leftJointConfidences.Sum(x => x[i]);
-                if(sum != 0)
+                if (sum != 0)
                 {
                     for (int j = 0; j < leftJointConfidences.Count; j++)
                     {
@@ -132,7 +132,7 @@ namespace Leap.Unity
                 }
             }
 
-            
+
 
             // combine hands using their confidences
             List<Hand> mergedHands = new List<Hand>();
@@ -164,7 +164,7 @@ namespace Leap.Unity
             Vector3 mergedPalmPos = hands[0].PalmPosition.ToVector3() * handConfidences[0];
             Quaternion mergedPalmRot = hands[0].Rotation.ToQuaternion();
 
-            for(int i = 1; i < hands.Count; i++)
+            for (int i = 1; i < hands.Count; i++)
             {
                 // position
                 mergedPalmPos += hands[i].PalmPosition.ToVector3() * handConfidences[i];
@@ -177,14 +177,14 @@ namespace Leap.Unity
             // joints
             Vector3[] mergedJointPositions = new Vector3[VectorHand.NUM_JOINT_POSITIONS];
             List<VectorHand> vectorHands = new List<VectorHand>();
-            foreach(Hand hand in hands)
+            foreach (Hand hand in hands)
             {
                 vectorHands.Add(new VectorHand(hand));
             }
 
-            for(int hands_idx = 0; hands_idx < hands.Count; hands_idx++)
+            for (int hands_idx = 0; hands_idx < hands.Count; hands_idx++)
             {
-                for(int joint_idx = 0; joint_idx < VectorHand.NUM_JOINT_POSITIONS; joint_idx++)
+                for (int joint_idx = 0; joint_idx < VectorHand.NUM_JOINT_POSITIONS; joint_idx++)
                 {
                     mergedJointPositions[joint_idx] += vectorHands[hands_idx].jointPositions[joint_idx] * jointConfidences[hands_idx][joint_idx];
                 }
@@ -201,7 +201,7 @@ namespace Leap.Unity
             return mergedHand;
         }
 
-        
+
         /// <summary>
         /// combine different confidence functions to get an overall confidence for the given hand
         /// uses frame_idx to find the corresponding provider that saw this hand
@@ -229,7 +229,7 @@ namespace Leap.Unity
             float[] confidences_jointRot = Confidence_RelativeJointRot(providers[frame_idx].transform, hand);
             float[] confidences_jointPalmRot = Confidence_relativeJointRotToPalmRot(providers[frame_idx].transform, hand);
 
-            for(int i = 0; i < confidences.Length; i++)
+            for (int i = 0; i < confidences.Length; i++)
             {
                 confidences[i] = jointRotFactor * confidences_jointRot[i] +
                                  jointRotToPalmFactor * confidences_jointPalmRot[i];
@@ -238,7 +238,7 @@ namespace Leap.Unity
             return confidences;
         }
 
-        
+
 
         #region Hand Confidence Methods
 
@@ -280,7 +280,7 @@ namespace Leap.Unity
                     // Field Of View: 170 x 170 degrees typical (160 x 160 degrees minimum)
                     float currentDepth = relativeHandPos.y;
 
-                    float requiredWidth = (currentDepth / 2) / Mathf.Sin(Mathf.Deg2Rad * 170/2);
+                    float requiredWidth = (currentDepth / 2) / Mathf.Sin(Mathf.Deg2Rad * 170 / 2);
                     sigmaX = 0.2f * requiredWidth;
                     sigmaY = 0.2f * requiredWidth;
 
@@ -295,7 +295,7 @@ namespace Leap.Unity
                     }
                     else if (currentDepth > 0.75f)
                     {
-                        a = - 0.55f / (Mathf.PI / 2) * Mathf.Atan(50 * (currentDepth - 0.875f)) + 0.5f;
+                        a = -0.55f / (Mathf.PI / 2) * Mathf.Atan(50 * (currentDepth - 0.875f)) + 0.5f;
                     }
                 }
                 else if (deviceType == Device.DeviceType.TYPE_PERIPHERAL)
@@ -303,8 +303,8 @@ namespace Leap.Unity
                     // Depth: Between 10cm to 60cm preferred, up to 80cm maximum
                     // Field Of View: 140 x 120 degrees typical
                     float currentDepth = relativeHandPos.y;
-                    float requiredWidthX = (currentDepth / 2) / Mathf.Sin(Mathf.Deg2Rad * 120/2);
-                    float requiredWidthY = (currentDepth / 2) / Mathf.Sin(Mathf.Deg2Rad * 140/2);
+                    float requiredWidthX = (currentDepth / 2) / Mathf.Sin(Mathf.Deg2Rad * 120 / 2);
+                    float requiredWidthY = (currentDepth / 2) / Mathf.Sin(Mathf.Deg2Rad * 140 / 2);
                     sigmaX = 0.2f * requiredWidthX;
                     sigmaY = 0.2f * requiredWidthY;
 
@@ -360,7 +360,7 @@ namespace Leap.Unity
             bool positionsRecorded = isLeft ? lastLeftHandPositions[provider].GetOldestPosition(out oldPosition, out oldTime) : lastRightHandPositions[provider].GetOldestPosition(out oldPosition, out oldTime);
 
             // if we haven't recorded any positions yet, or the hand hasn't been present in the last 10 frames (oldest position is older than 10 * frame time), return 0
-            if(!positionsRecorded || (Time.time - oldTime) > Time.deltaTime * 10)
+            if (!positionsRecorded || (Time.time - oldTime) > Time.deltaTime * 10)
             {
                 return 0;
             }
@@ -368,7 +368,7 @@ namespace Leap.Unity
             float velocity = Vector3.Distance(handPos, oldPosition) / (Time.time - oldTime);
 
             float confidence = 0;
-            if(velocity < 2)
+            if (velocity < 2)
             {
                 confidence = -0.5f * velocity + 1;
             }
@@ -378,7 +378,7 @@ namespace Leap.Unity
 
         float Confidence_LengthHandVisible(LeapProvider provider, bool isLeft)
         {
-            if((isLeft ? leftHandFirstVisible[provider] : rightHandFirstVisible[provider]) == 0)
+            if ((isLeft ? leftHandFirstVisible[provider] : rightHandFirstVisible[provider]) == 0)
             {
                 return 0;
             }
@@ -386,7 +386,7 @@ namespace Leap.Unity
             float lengthVisible = Time.time - (isLeft ? leftHandFirstVisible[provider] : rightHandFirstVisible[provider]);
 
             float confidence = 1;
-            if(lengthVisible < 1)
+            if (lengthVisible < 1)
             {
                 confidence = lengthVisible;
             }

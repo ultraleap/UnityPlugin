@@ -1,7 +1,7 @@
+using Leap.Unity;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Leap.Unity;
 
 public class VisualizeJointConfidence : MonoBehaviour
 {
@@ -27,7 +27,7 @@ public class VisualizeJointConfidence : MonoBehaviour
 
         float[] confidences = aggregationProvider.CalculateJointConfidence(provider_idx, hand.GetLeapHand());
 
-        for(int i = 0; i < confidences.Length; i++)
+        for (int i = 0; i < confidences.Length; i++)
         {
             colors[i] = Color.Lerp(Color.black, colors[i], confidences[i]);
         }
