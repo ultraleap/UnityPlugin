@@ -394,14 +394,21 @@ namespace Leap.Unity
             drawCylinder(mockThumbJointPos, THUMB_BASE_INDEX);
             drawCylinder(mockThumbJointPos, PINKY_BASE_INDEX);
 
-
-            MaterialPropertyBlock materialPropertyBlock = new MaterialPropertyBlock();
-
-            for (int i = 0; i < _sphereMatrices.Length && i < _curSphereIndex; i++)
+            if (SetIndividualSphereColors)
             {
-                if(SetIndividualSphereColors) materialPropertyBlock.SetColor("_Color", SphereColors[i]);
+                MaterialPropertyBlock materialPropertyBlock = new MaterialPropertyBlock();
 
-                Graphics.DrawMeshInstanced(_sphereMesh, 0, _sphereMat, new Matrix4x4[] { _sphereMatrices[i] }, 1, materialPropertyBlock,
+                for (int i = 0; i < _sphereMatrices.Length && i < _curSphereIndex; i++)
+                {
+                    materialPropertyBlock.SetColor("_Color", SphereColors[i]);
+
+                    Graphics.DrawMeshInstanced(_sphereMesh, 0, _sphereMat, new Matrix4x4[] { _sphereMatrices[i] }, 1, materialPropertyBlock,
+                      _castShadows ? UnityEngine.Rendering.ShadowCastingMode.On : UnityEngine.Rendering.ShadowCastingMode.Off, true, gameObject.layer);
+                }
+            }
+            else
+            {
+                Graphics.DrawMeshInstanced(_sphereMesh, 0, _sphereMat, _sphereMatrices, _curSphereIndex, null,
                   _castShadows ? UnityEngine.Rendering.ShadowCastingMode.On : UnityEngine.Rendering.ShadowCastingMode.Off, true, gameObject.layer);
             }
 
