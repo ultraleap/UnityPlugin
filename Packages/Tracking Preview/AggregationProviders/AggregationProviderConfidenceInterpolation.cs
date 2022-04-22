@@ -40,63 +40,6 @@ namespace Leap.Unity
         Dictionary<LeapProvider, float> rightHandFirstVisible = new Dictionary<LeapProvider, float>();
 
 
-        // small class to save hand positions from old frames along with a timestamp
-        class LastHandPositions
-        {
-            LeapProvider provider;
-            Vector3[] positions;
-            float[] times;
-            int index;
-
-            public LastHandPositions()
-            {
-                this.positions = new Vector3[10];
-                this.times = new float[10];
-                this.index = 0;
-            }
-
-            public void ClearAllPositions()
-            {
-                positions.ClearWith(Vector3.zero);
-            }
-
-            public void AddPosition(Vector3 position, float time)
-            {
-                positions[index] = position;
-                times[index] = time;
-                index = (index + 1) % 10;
-            }
-
-            public bool GetPastPosition(int pastIndex, out Vector3 position, out float time)
-            {
-                position = positions[(index - 1 - pastIndex + 10) % 10];
-                time = times[(index - 1 - pastIndex + 10) % 10];
-
-                if (position == null || position == Vector3.zero)
-                {
-                    return false;
-                }
-                else
-                {
-                    return true;
-                }
-            }
-
-            public bool GetOldestPosition(out Vector3 position, out float time)
-            {
-                for (int i = 9; i >= 0; i--)
-                {
-                    if(GetPastPosition(i, out position, out time))
-                    {
-                        return true;
-                    }
-                }
-
-                GetPastPosition(0, out position, out time);
-                return false;
-            }
-        }
-
         protected override Frame MergeFrames(Frame[] frames)
         {
             List<Hand> leftHands = new List<Hand>();
@@ -205,6 +148,9 @@ namespace Leap.Unity
 
         }
 
+        /// <summary>
+        /// Merge hands based on hand confidences and joint confidences
+        /// </summary>
         public Hand MergeHands(List<Hand> hands, List<float> handConfidences, List<float[]> jointConfidences)
         {
             bool isLeft = hands[0].IsLeft;
@@ -245,23 +191,10 @@ namespace Leap.Unity
             if (isLeft && debugHandLeft != null) VisualizeMergedJoints(debugHandLeft, jointConfidences);
             else if (!isLeft && debugHandRight != null) VisualizeMergedJoints(debugHandRight, jointConfidences);
 
-                return mergedHand;
+            return mergedHand;
         }
 
-        void VisualizeMergedJoints(CapsuleHand hand, List<float[]> jointConfidences)
-        {
-            Color[] colors = hand.SphereColors;
-            for(int i = 0; i < jointConfidences[0].Length; i++)
-            {
-                colors[i] = debugColors[0];
-
-                for(int j = 1; j < jointConfidences.Count; j++)
-                {
-
-                }
-            }
-        }
-
+        
         /// <summary>
         /// combine different confidence functions to get an overall confidence for the given hand
         /// uses frame_idx to find the corresponding provider that saw this hand
@@ -291,55 +224,6 @@ namespace Leap.Unity
             return confidences;
         }
 
-        void AddFrameToLengthVisibleDicts(Frame[] frames, int frameIdx)
-        {
-            bool[] handsVisible = new bool[2];
-
-            foreach(Hand hand in frames[frameIdx].Hands)
-            {
-                //Debug.Log(hand.Id);
-                if(hand.IsLeft)
-                {
-                    handsVisible[0] = true;
-                    if (leftHandFirstVisible[providers[frameIdx]] == 0)
-                    {
-                        leftHandFirstVisible[providers[frameIdx]] = Time.time;
-                    }
-
-                    if (!lastLeftHandPositions.ContainsKey(providers[frameIdx]))
-                    {
-                        lastLeftHandPositions.Add(providers[frameIdx], new LastHandPositions());
-                    }
-
-                    lastLeftHandPositions[providers[frameIdx]].AddPosition(hand.PalmPosition.ToVector3(), Time.time);
-                }
-                else
-                {
-                    handsVisible[1] = true;
-                    if (rightHandFirstVisible[providers[frameIdx]] == 0)
-                    {
-                        rightHandFirstVisible[providers[frameIdx]] = Time.time;
-                    }
-
-                    if (!lastRightHandPositions.ContainsKey(providers[frameIdx]))
-                    {
-                        lastRightHandPositions.Add(providers[frameIdx], new LastHandPositions());
-                    }
-
-                    lastRightHandPositions[providers[frameIdx]].AddPosition(hand.PalmPosition.ToVector3(), Time.time);
-
-                }
-            }
-
-            if (!handsVisible[0])
-            {
-                leftHandFirstVisible[providers[frameIdx]] = 0;
-            }
-            if (!handsVisible[1])
-            {
-                rightHandFirstVisible[providers[frameIdx]] = 0;
-            }
-        }
 
         #region Hand Confidence Methods
 
@@ -496,6 +380,145 @@ namespace Leap.Unity
 
             return confidence;
         }
+        #endregion
+
+        #region Helper Methods
+
+        // small class to save hand positions from old frames along with a timestamp
+        class LastHandPositions
+        {
+            LeapProvider provider;
+            Vector3[] positions;
+            float[] times;
+            int index;
+
+            public LastHandPositions()
+            {
+                this.positions = new Vector3[10];
+                this.times = new float[10];
+                this.index = 0;
+            }
+
+            public void ClearAllPositions()
+            {
+                positions.ClearWith(Vector3.zero);
+            }
+
+            public void AddPosition(Vector3 position, float time)
+            {
+                positions[index] = position;
+                times[index] = time;
+                index = (index + 1) % 10;
+            }
+
+            public bool GetPastPosition(int pastIndex, out Vector3 position, out float time)
+            {
+                position = positions[(index - 1 - pastIndex + 10) % 10];
+                time = times[(index - 1 - pastIndex + 10) % 10];
+
+                if (position == null || position == Vector3.zero)
+                {
+                    return false;
+                }
+                else
+                {
+                    return true;
+                }
+            }
+
+            public bool GetOldestPosition(out Vector3 position, out float time)
+            {
+                for (int i = 9; i >= 0; i--)
+                {
+                    if (GetPastPosition(i, out position, out time))
+                    {
+                        return true;
+                    }
+                }
+
+                GetPastPosition(0, out position, out time);
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// add all hands in the frame given by frames[frameIdx] to the Dictionaries lastLeftHandPositions and lastRightHandPositions,
+        /// and update leftHandFirstVisible and rightHandFirstVisible
+        /// </summary>
+        void AddFrameToLengthVisibleDicts(Frame[] frames, int frameIdx)
+        {
+            bool[] handsVisible = new bool[2];
+
+            foreach (Hand hand in frames[frameIdx].Hands)
+            {
+                //Debug.Log(hand.Id);
+                if (hand.IsLeft)
+                {
+                    handsVisible[0] = true;
+                    if (leftHandFirstVisible[providers[frameIdx]] == 0)
+                    {
+                        leftHandFirstVisible[providers[frameIdx]] = Time.time;
+                    }
+
+                    if (!lastLeftHandPositions.ContainsKey(providers[frameIdx]))
+                    {
+                        lastLeftHandPositions.Add(providers[frameIdx], new LastHandPositions());
+                    }
+
+                    lastLeftHandPositions[providers[frameIdx]].AddPosition(hand.PalmPosition.ToVector3(), Time.time);
+                }
+                else
+                {
+                    handsVisible[1] = true;
+                    if (rightHandFirstVisible[providers[frameIdx]] == 0)
+                    {
+                        rightHandFirstVisible[providers[frameIdx]] = Time.time;
+                    }
+
+                    if (!lastRightHandPositions.ContainsKey(providers[frameIdx]))
+                    {
+                        lastRightHandPositions.Add(providers[frameIdx], new LastHandPositions());
+                    }
+
+                    lastRightHandPositions[providers[frameIdx]].AddPosition(hand.PalmPosition.ToVector3(), Time.time);
+
+                }
+            }
+
+            if (!handsVisible[0])
+            {
+                leftHandFirstVisible[providers[frameIdx]] = 0;
+            }
+            if (!handsVisible[1])
+            {
+                rightHandFirstVisible[providers[frameIdx]] = 0;
+            }
+        }
+
+        /// <summary>
+        /// visualize where the merged joint data comes from, by using the debugColors in the same order as the providers in the provider list.
+        /// the color is then linearly interpolated based on the joint confidences
+        /// </summary>
+        void VisualizeMergedJoints(CapsuleHand hand, List<float[]> jointConfidences)
+        {
+
+
+            Color[] colors = hand.SphereColors;
+
+            for (int i = 0; i < jointConfidences[0].Length; i++)
+            {
+                colors[i] = debugColors[0];
+
+                for (int j = 1; j < jointConfidences.Count; j++)
+                {
+                    float lerpValue = jointConfidences.Take(j).Sum(x => x[i]) / jointConfidences.Take(j + 1).Sum(x => x[i]);
+                    colors[i] = Color.Lerp(debugColors[j], colors[i], lerpValue);
+                }
+            }
+            hand.SphereColors = colors;
+            hand.SetIndividualSphereColors = true;
+        }
+
         #endregion
     }
 }

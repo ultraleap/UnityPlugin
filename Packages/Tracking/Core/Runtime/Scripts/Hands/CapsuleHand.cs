@@ -85,6 +85,7 @@ namespace Leap.Unity
 
         private Color[] _sphereColors = new Color[32];
 
+        [HideInInspector]
         public bool SetIndividualSphereColors = false;
         public Color[] SphereColors
         {
