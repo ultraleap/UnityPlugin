@@ -6,6 +6,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [docs-website]: https://docs.ultraleap.com/ "Ultraleap Docs"
 
+## [5.8.0]
+
+### Added
+- A Leap Provider can now be specified for attachment hands
+
+### Fixed
+- SIR170 Tracking Volume Visualisation was not appearing
+- The automatic option on Tracking Volume Visualisation was not working for SIR170s or 3Dis
+
 ## [5.7.0] - 19/04/2022
 
 ### Added
@@ -22,7 +31,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - In multiple Device Mode = specific, if the specific serial number is null or an empty string, no device is tracking
 
 ### Fixed
-- Ocassional ThreadAbortException on connection polling thread
+- Occasional ThreadAbortException on connection polling thread
 - Sometimes Frame objects where being constructed without a device ID, even if known
 - Multiple device mode remembers device serial numbers after devices are disconnected
 - Service provider in multi-device scene does not track using selected device (by serial number) unless it's been selected in the editor
