@@ -17,19 +17,27 @@ namespace Leap.Unity
 
     /// <summary>
     /// possible structure to implement our own aggregation code,
-    /// gets all hands and lerps between them using confidences (could be extended to treat joints and overall hand pos + rot differently),
-    /// Confidences could be calculated as a combination of lots of things (example: relative hand pos)
+    /// calculates hand and joint confidences and interpolates linearly between hands based on their confidences,
+    /// it uses hand confidences for the overall position and orientation of the hand (palmPos and PalmRot),
+    /// and joint confidences for the per joint positions relative to the hand Pose
     /// </summary>
     public class AggregationProviderConfidenceInterpolation : LeapAggregatedProviderBase
     {
+        // factors that get multiplied to the corresponding cofidence values to get an overall weighted confidence value
+        
         public float palmPosFactor = 1;
         public float palmRotFactor = 1;
         public float palmVelocityFactor = 1;
         public float lengthVisibleFactor = 1;
 
+        public float jointRotFactor = 1;
+        public float jointRotToPalmFactor = 1;
+
+        // if the debug hands are not null, their joint colors are given by interpolating between the debugColors based on joint confidences
         public CapsuleHand debugHandLeft;
         public CapsuleHand debugHandRight;
 
+        // The debug colors should have the same order and length as the provider list
         public Color[] debugColors;
 
         Dictionary<LeapProvider, LastHandPositions> lastLeftHandPositions = new Dictionary<LeapProvider, LastHandPositions>();
@@ -218,11 +226,19 @@ namespace Leap.Unity
         {
             float[] confidences = new float[VectorHand.NUM_JOINT_POSITIONS];
 
-            confidences.Fill(1);
+            float[] confidences_jointRot = Confidence_RelativeJointRot(providers[frame_idx].transform, hand);
+            float[] confidences_jointPalmRot = Confidence_relativeJointRotToPalmRot(providers[frame_idx].transform, hand);
+
+            for(int i = 0; i < confidences.Length; i++)
+            {
+                confidences[i] = jointRotFactor * confidences_jointRot[i] +
+                                 jointRotToPalmFactor * confidences_jointPalmRot[i];
+            }
 
             return confidences;
         }
 
+        
 
         #region Hand Confidence Methods
 
@@ -377,6 +393,75 @@ namespace Leap.Unity
 
             return confidence;
         }
+        #endregion
+
+        #region Joint Confidence Methods
+
+        /// <summary>
+        /// uses the normal vector of a joint / bone (outwards pointing one) and the direction from joint to device 
+        /// to calculate per-joint confidence values
+        /// </summary>
+        float[] Confidence_RelativeJointRot(Transform deviceOrigin, Hand hand)
+        {
+            float[] confidences = new float[VectorHand.NUM_JOINT_POSITIONS];
+
+            foreach (var finger in hand.Fingers)
+            {
+                for (int j = 0; j < 4; j++)
+                {
+                    int key = (int)finger.Type * 4 + j;
+
+                    Vector3 jointPos = finger.Bone((Bone.BoneType)j).NextJoint.ToVector3();
+                    Vector3 jointNormalVector = new Vector3();
+                    if ((int)finger.Type == 0) jointNormalVector = finger.Bone((Bone.BoneType)j).Rotation.ToQuaternion() * Vector3.right;
+                    else jointNormalVector = finger.Bone((Bone.BoneType)j).Rotation.ToQuaternion() * Vector3.up * -1;
+
+                    float angle = Vector3.Angle(jointPos - deviceOrigin.position, jointNormalVector);
+
+
+                    // get confidence based on a cos where it should be 1 if the angle is 0 or 180 degrees,
+                    // and it should be 0 if it is 90 degrees
+                    confidences[key] = (Mathf.Cos(Mathf.Deg2Rad * 2 * angle) + 1f) / 2;
+                }
+            }
+            // in the capsule hands joint 21 is copied and mirrored from joint 0
+            confidences[21] = confidences[0];
+
+            return confidences;
+        }
+
+        /// <summary>
+        /// uses the normal vector of a joint / bone (outwards pointing one) and the palm normal vector
+        /// to calculate per-joint confidence values
+        /// </summary>
+        float[] Confidence_relativeJointRotToPalmRot(Transform deviceOrigin, Hand hand)
+        {
+            float[] confidences = new float[VectorHand.NUM_JOINT_POSITIONS];
+
+            foreach (var finger in hand.Fingers)
+            {
+                for (int j = 0; j < 4; j++)
+                {
+                    int key = (int)finger.Type * 4 + j;
+
+                    Vector3 jointPos = finger.Bone((Bone.BoneType)j).NextJoint.ToVector3();
+                    Vector3 jointNormalVector = new Vector3();
+                    jointNormalVector = finger.Bone((Bone.BoneType)j).Rotation.ToQuaternion() * Vector3.up * -1;
+
+                    float angle = Vector3.Angle(hand.PalmNormal.ToVector3(), jointNormalVector);
+
+
+                    // get confidence based on a cos where it should be 1 if the angle is 0,
+                    // and it should be 0 if the angle is 180 degrees
+                    confidences[key] = (Mathf.Cos(Mathf.Deg2Rad * angle) + 1f) / 2;
+                }
+            }
+            // in the capsule hands joint 21 is copied and mirrored from joint 0
+            confidences[21] = confidences[0];
+
+            return confidences;
+        }
+
         #endregion
 
         #region Helper Methods
