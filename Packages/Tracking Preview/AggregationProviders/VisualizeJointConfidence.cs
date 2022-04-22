@@ -20,13 +20,16 @@ public class VisualizeJointConfidence : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (hand.GetLeapHand() == null) return;
+
         Color[] colors = hand.SphereColors;
+        colors.Fill(hand.SphereColour);
 
         float[] confidences = aggregationProvider.CalculateJointConfidence(provider_idx, hand.GetLeapHand());
 
         for(int i = 0; i < confidences.Length; i++)
         {
-            colors[i].a = confidences[i];
+            colors[i] = Color.Lerp(Color.black, colors[i], confidences[i]);
         }
 
         hand.SphereColors = colors;
