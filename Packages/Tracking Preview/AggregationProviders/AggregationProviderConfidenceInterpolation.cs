@@ -26,7 +26,6 @@ namespace Leap.Unity
         public float palmRotFactor = 1;
         public float palmVelocityFactor = 1;
         public float lengthVisibleFactor = 1;
-        public Transform debugCube;
 
         public CapsuleHand debugHandLeft;
         public CapsuleHand debugHandRight;
@@ -199,7 +198,7 @@ namespace Leap.Unity
         /// combine different confidence functions to get an overall confidence for the given hand
         /// uses frame_idx to find the corresponding provider that saw this hand
         /// </summary>
-        float CalculateHandConfidence(int frame_idx, Hand hand)
+        public float CalculateHandConfidence(int frame_idx, Hand hand)
         {
             float confidence = 0;
 
@@ -215,7 +214,7 @@ namespace Leap.Unity
         /// Combine different confidence functions to get an overall confidence for each joint in the given hand
         /// uses frame_idx to find the corresponding provider that saw this hand
         /// </summary>
-        float[] CalculateJointConfidence(int frame_idx, Hand hand)
+        public float[] CalculateJointConfidence(int frame_idx, Hand hand)
         {
             float[] confidences = new float[VectorHand.NUM_JOINT_POSITIONS];
 
@@ -321,8 +320,6 @@ namespace Leap.Unity
         /// </summary>
         float Confidence_RelativeHandRot(Transform deviceOrigin, Vector3 handPos, Vector3 palmNormal)
         {
-            debugCube.forward = palmNormal;
-
             // angle between palm normal and the direction from hand pos to device origin
             float palmAngle = Vector3.Angle(palmNormal, deviceOrigin.position - handPos);
 
