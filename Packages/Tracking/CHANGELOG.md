@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - SIR170 Tracking Volume Visualisation was not appearing
 - The automatic option on Tracking Volume Visualisation was not working for SIR170s or 3Dis
+- Unit tests break downstream package dependencies [[#1182]](https://github.com/ultraleap/UnityPlugin/issues/1182)
 
 ## [5.7.0] - 19/04/2022
 

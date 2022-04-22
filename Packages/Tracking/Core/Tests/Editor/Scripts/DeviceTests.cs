@@ -13,7 +13,6 @@ using System;
 
 namespace Leap.LeapCSharp.Tests
 {
-    [TestFixture()]
     public class DeviceTests
     {
         Controller controller;
@@ -32,7 +31,7 @@ namespace Leap.LeapCSharp.Tests
               "A Leap device must be connected to successfully test LeapCSharp.");
         }
 
-        [Test()]
+        [Test]
         public void Device_operator_equals()
         {
             Device thisDevice = new Device();
@@ -41,10 +40,9 @@ namespace Leap.LeapCSharp.Tests
             Boolean isEqual = thisDevice == thatDevice;
             // !!!END
             Assert.False(isEqual);
-
         }
 
-        [Test()]
+        [Test]
         public void DeviceList_operator_index()
         {
             // !!!DeviceList_operator_index
@@ -57,7 +55,7 @@ namespace Leap.LeapCSharp.Tests
 
         }
 
-        [Test()]
+        [Test]
         public void DeviceList_isEmpty()
         {
             // !!!DeviceList_isEmpty

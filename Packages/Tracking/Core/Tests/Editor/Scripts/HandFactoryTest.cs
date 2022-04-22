@@ -11,8 +11,6 @@ using System;
 
 namespace Leap.Unity.Tests
 {
-
-    [TestFixture(Category = "TestHandFactory")]
     public class HandFactoryTwoHands : FrameValidator
     {
         protected override Frame createFrame()
@@ -27,7 +25,6 @@ namespace Leap.Unity.Tests
         }
     }
 
-    [TestFixture(Category = "TestHandFactory")]
     public class HandFactoryLeft : FrameValidator
     {
         protected override Frame createFrame()
@@ -42,7 +39,6 @@ namespace Leap.Unity.Tests
         }
     }
 
-    [TestFixture(Category = "TestHandFactory")]
     public class HandFactoryRight : FrameValidator
     {
         protected override Frame createFrame()

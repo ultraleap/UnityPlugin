@@ -11,10 +11,8 @@ using System;
 
 namespace Leap.Unity.Tests
 {
-
     public class MinHeapTest
     {
-
         private class HeapElement : IMinHeapNode, IComparable<HeapElement>
         {
             public int heapIndex { get; set; }

@@ -10,10 +10,8 @@ using NUnit.Framework;
 
 namespace Leap.Unity.Tests
 {
-
     public class MultiTypedReferenceTests
     {
-
         public class BaseClass { }
         public class A : BaseClass { }
         public class B : BaseClass { }

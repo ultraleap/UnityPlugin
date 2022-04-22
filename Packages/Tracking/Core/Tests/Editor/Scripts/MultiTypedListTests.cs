@@ -11,10 +11,8 @@ using System.Collections.Generic;
 
 namespace Leap.Unity.Tests
 {
-
     public class MultiTypedListTests
     {
-
         public class BaseClass { }
         public class A : BaseClass { }
         public class B : BaseClass { }
@@ -179,6 +177,5 @@ namespace Leap.Unity.Tests
             _list.Add(new G());
             _list.Add(new H());
         }
-
     }
 }
