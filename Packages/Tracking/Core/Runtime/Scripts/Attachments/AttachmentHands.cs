@@ -29,6 +29,10 @@ namespace Leap.Unity.Attachments
     [ExecuteInEditMode]
     public class AttachmentHands : MonoBehaviour
     {
+        [Tooltip("The Leap Provider the attachment hands use to generate the transform hierarchy." +
+            " If left empty, AttachmentHands defaults to the provider used in Leap.Unity.Hands")]
+        [SerializeField]
+        private LeapProvider _leapProvider;
 
         [SerializeField]
         private AttachmentPointFlags _attachmentPoints = AttachmentPointFlags.Palm | AttachmentPointFlags.Wrist;
@@ -157,8 +161,17 @@ namespace Leap.Unity.Attachments
             {
                 _handAccessors = new Func<Hand>[2];
 
-                _handAccessors[0] = new Func<Hand>(() => { return Hands.Left; });
-                _handAccessors[1] = new Func<Hand>(() => { return Hands.Right; });
+                if (_leapProvider == null)
+                {
+                    _handAccessors[0] = new Func<Hand>(() => Hands.Left);
+                    _handAccessors[1] = new Func<Hand>(() => Hands.Right);
+                }
+                else
+                {
+                    _handAccessors[0] = new Func<Hand>(() => _leapProvider.CurrentFrame?.GetHand(Chirality.Left));
+                    _handAccessors[1] = new Func<Hand>(() => _leapProvider.CurrentFrame?.GetHand(Chirality.Right));
+                }
+
             }
         }
 
