@@ -329,28 +329,38 @@ namespace Leap.Unity
         /// <summary>
         /// Returns a confidence value from 0 to 1 indicating how strongly the Hand is making a fist.
         /// </summary>
-        public static float GetFistStrength(this Hand hand) =>
-        hand switch
+        public static float GetFistStrength(this Hand hand)
         {
-            null => 0,
-            _ => (Vector3.Dot(hand.Fingers[1].Direction.ToVector3(), -hand.DistalAxis())
+            if (hand == null)
+            {
+                return 0;
+            }
+
+            return (Vector3.Dot(hand.Fingers[1].Direction.ToVector3(), -hand.DistalAxis())
                     + Vector3.Dot(hand.Fingers[2].Direction.ToVector3(), -hand.DistalAxis())
                     + Vector3.Dot(hand.Fingers[3].Direction.ToVector3(), -hand.DistalAxis())
                     + Vector3.Dot(hand.Fingers[4].Direction.ToVector3(), -hand.DistalAxis())
                     + Vector3.Dot(hand.Fingers[0].Direction.ToVector3(), -hand.RadialAxis())
-                    ).Map(-5, 5, 0, 1)
-        };
+                    ).Map(-5, 5, 0, 1);
+        }
 
         /// <summary>
         /// Returns a confidence value from 0 to 1 indicating how strongly a finger is curled.
         /// </summary>
-        public static float GetFingerStrength(this Hand hand, int finger) =>
-        (hand, finger) switch
+        public static float GetFingerStrength(this Hand hand, int finger)
         {
-            (null, _) => 0,
-            (_, 0) => Vector3.Dot(hand.Fingers[finger].Direction.ToVector3(), -hand.RadialAxis()).Map(-1, 1, 0, 1),
-            _ => Vector3.Dot(hand.Fingers[finger].Direction.ToVector3(), -hand.DistalAxis()).Map(-1, 1, 0, 1)
-        };
+            if (hand == null)
+            {
+                return 0;
+            }
+
+            if (finger == 0)
+            {
+                return Vector3.Dot(hand.Fingers[finger].Direction.ToVector3(), -hand.RadialAxis()).Map(-1, 1, 0, 1);
+            }
+
+            return Vector3.Dot(hand.Fingers[finger].Direction.ToVector3(), -hand.DistalAxis()).Map(-1, 1, 0, 1);
+        }
 
         /// <summary>
         /// Returns an unsmoothed ray representing the general reaching/interaction intent direction.
