@@ -43,12 +43,16 @@ namespace Leap.Unity
         private List<string> _serialNumbers;
         private int _chosenDeviceIndex;
 
+        private LeapFOVInfos leapFOVInfos;
+
         protected override void OnEnable()
         {
 
             base.OnEnable();
 
             ParseStereoIR170InteractionMeshData();
+
+            LoadFOVData();
 
             specifyCustomDecorator("_frameOptimization", frameOptimizationWarning);
 
@@ -207,11 +211,17 @@ namespace Leap.Unity
             switch (GetSelectedInteractionVolume())
             {
                 case LeapServiceProvider.InteractionVolumeVisualization.None:
+                    if (targetTransform.Find("DeviceModel") != null)
+                    {
+                        GameObject.DestroyImmediate(targetTransform.Find("DeviceModel").gameObject);
+                    }
                     break;
                 case LeapServiceProvider.InteractionVolumeVisualization.LeapMotionController:
+                    DrawTrackingDevice(targetTransform, "Leap Motion Controller");
                     DrawLeapMotionControllerInteractionZone(LMC_BOX_WIDTH, LMC_BOX_DEPTH, LMC_BOX_RADIUS, Color.white, targetTransform);
                     break;
                 case LeapServiceProvider.InteractionVolumeVisualization.StereoIR170:
+                    DrawTrackingDevice(targetTransform, "Stereo IR 170");
                     DrawStereoIR170InteractionZoneMesh(targetTransform);
                     break;
                 case LeapServiceProvider.InteractionVolumeVisualization.Automatic:
@@ -220,6 +230,7 @@ namespace Leap.Unity
                 default:
                     break;
             }
+
 
         }
 
@@ -328,16 +339,38 @@ namespace Leap.Unity
 
         private void DetectConnectedDevice(Transform targetTransform)
         {
-
-            if (LeapController?.Devices?.Count == 1)
+            
+            if (LeapController?.Devices?.Count >= 1)
             {
-                Device.DeviceType deviceType = LeapController.Devices.First().Type;
+                Device currentDevice = target.CurrentDevice;
+                if (currentDevice == null || currentDevice.SerialNumber != target.SpecificSerialNumber)
+                {
+                    foreach (Device d in LeapController.Devices)
+                    {
+                        Debug.Log(d.SerialNumber + ", " + target.SpecificSerialNumber);
+                        if (d.SerialNumber.Contains(target.SpecificSerialNumber))
+                        {
+                            currentDevice = d;
+                            break;
+                        }
+                    }
+                }
+
+                if(currentDevice == null)
+                {
+                    Debug.Log("not found");
+                    return;
+                }
+
+                Device.DeviceType deviceType = currentDevice.Type;
                 if (deviceType == Device.DeviceType.TYPE_RIGEL || deviceType == Device.DeviceType.TYPE_SIR170 || deviceType == Device.DeviceType.TYPE_3DI)
                 {
+                    DrawTrackingDevice(targetTransform, "Stereo IR 170");
                     DrawStereoIR170InteractionZoneMesh(targetTransform);
                 }
                 else if (deviceType == Device.DeviceType.TYPE_PERIPHERAL)
                 {
+                    DrawTrackingDevice(targetTransform, "Leap Motion Controller");
                     DrawLeapMotionControllerInteractionZone(LMC_BOX_WIDTH, LMC_BOX_DEPTH, LMC_BOX_RADIUS, Color.white, targetTransform);
                 }
             }
@@ -347,6 +380,53 @@ namespace Leap.Unity
         {
 
             return LeapServiceProvider?.SelectedInteractionVolumeVisualization;
+        }
+
+        private void DrawTrackingDevice(Transform targetTransform, string deviceType)
+        {
+            Transform deviceModelParent = targetTransform.Find("DeviceModel");
+            if(deviceModelParent == null)
+            {
+                deviceModelParent = new GameObject("DeviceModel").transform;
+                deviceModelParent.SetParent(targetTransform, false);
+            }
+
+            if (deviceModelParent.childCount > 0)
+            {
+                var child = deviceModelParent.GetChild(0).gameObject;
+
+                // if the name is the device type or it isn't a DevieModel at all,
+                // this object was already the same type last frame, and shouldn't be re instantiated
+                if(child.name == deviceType + "(Clone)")
+                {
+                    return;
+                }
+
+                GameObject.DestroyImmediate(child);
+            }
+
+            LeapFOVInfo info = null;
+            GameObject newDevice = null;
+            foreach (var leapInfo in leapFOVInfos.SupportedDevices)
+            {
+                if (leapInfo.Name == deviceType)
+                {
+                    info = leapInfo;
+                    newDevice = Instantiate(Resources.Load("TrackingDevices/" + deviceType)) as GameObject;
+                    break;
+                }
+            }
+            if (info != null)
+            {
+            }
+            else
+            {
+                Debug.LogError("Tried to load invalid device type: " + deviceType);
+            }
+            newDevice.transform.SetParent(deviceModelParent, false);
+            newDevice.transform.localScale = Vector3.one * 0.01f;
+
+            Transform trackerTransform = newDevice.GetComponentInChildren<Collider>().transform;
         }
 
         private void DrawStereoIR170InteractionZoneMesh(Transform targetTransform)
@@ -438,6 +518,27 @@ namespace Leap.Unity
 
                 Handles.DrawAAPolyLine(origin + begin, origin + end);
             }
+        }
+        private void LoadFOVData()
+        {
+            //Debug.Log(Resources.Load<TextAsset>("SupportedTrackingDevices").text);
+            leapFOVInfos = Newtonsoft.Json.JsonConvert.DeserializeObject<LeapFOVInfos>(Resources.Load<TextAsset>("SupportedTrackingDevices").text);
+
+        }
+
+        public class LeapFOVInfos
+        {
+            public List<LeapFOVInfo> SupportedDevices;
+        }
+
+        public class LeapFOVInfo
+        {
+            public string Name;
+            public float HorizontalFOV;
+            public float VerticalFOV;
+            public float OptimalDistance;
+            public float MinDistance;
+            public float MaxDistance;
         }
     }
 }
