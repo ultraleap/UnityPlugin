@@ -135,7 +135,8 @@ namespace Leap.Unity
                         case Device.DeviceType.TYPE_RIGEL:
                         case Device.DeviceType.TYPE_SIR170:
                         case Device.DeviceType.TYPE_3DI:
-                            for (int i = (int)image.NumBytes - image.Width; i < (int)image.NumBytes; i++) data[i] = 0x00;
+                            Array.Clear(data, 0, image.Width);
+                            Array.Clear(data, (int)image.NumBytes - image.Width, (int)image.NumBytes);
                             break;
                     }
                 }
