@@ -87,6 +87,8 @@ namespace Leap.Unity
         /// </summary>
         public InteractionVolumeVisualization SelectedInteractionVolumeVisualization => _interactionVolumeVisualization;
 
+        public bool FOV_Visualization = true;
+
         /// <summary>
         /// Supported modes to optimize frame updates.
         /// When enabled, the provider will reuse some hand data:
