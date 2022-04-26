@@ -224,6 +224,10 @@ namespace Leap.Unity
                     DrawTrackingDevice(targetTransform, "Stereo IR 170");
                     DrawStereoIR170InteractionZoneMesh(targetTransform);
                     break;
+                case LeapServiceProvider.InteractionVolumeVisualization.Device_3Di:
+                    DrawTrackingDevice(targetTransform, "3Di");
+                    DrawStereoIR170InteractionZoneMesh(targetTransform);
+                    break;
                 case LeapServiceProvider.InteractionVolumeVisualization.Automatic:
                     DetectConnectedDevice(targetTransform);
                     break;
@@ -343,11 +347,10 @@ namespace Leap.Unity
             if (LeapController?.Devices?.Count >= 1)
             {
                 Device currentDevice = target.CurrentDevice;
-                if (currentDevice == null || currentDevice.SerialNumber != target.SpecificSerialNumber)
+                if (currentDevice == null || (target.CurrentMultipleDeviceMode == LeapServiceProvider.MultipleDeviceMode.Specific && currentDevice.SerialNumber != target.SpecificSerialNumber))
                 {
                     foreach (Device d in LeapController.Devices)
                     {
-                        Debug.Log(d.SerialNumber + ", " + target.SpecificSerialNumber);
                         if (d.SerialNumber.Contains(target.SpecificSerialNumber))
                         {
                             currentDevice = d;
@@ -356,23 +359,41 @@ namespace Leap.Unity
                     }
                 }
 
-                if(currentDevice == null)
+                if(currentDevice == null || (target.CurrentMultipleDeviceMode == LeapServiceProvider.MultipleDeviceMode.Specific && currentDevice.SerialNumber != target.SpecificSerialNumber))
                 {
-                    Debug.Log("not found");
+                    if (targetTransform.Find("DeviceModel") != null)
+                    {
+                        GameObject.DestroyImmediate(targetTransform.Find("DeviceModel").gameObject);
+                    }
                     return;
                 }
 
                 Device.DeviceType deviceType = currentDevice.Type;
-                if (deviceType == Device.DeviceType.TYPE_RIGEL || deviceType == Device.DeviceType.TYPE_SIR170 || deviceType == Device.DeviceType.TYPE_3DI)
+                if (deviceType == Device.DeviceType.TYPE_RIGEL || deviceType == Device.DeviceType.TYPE_SIR170)
                 {
                     DrawTrackingDevice(targetTransform, "Stereo IR 170");
                     DrawStereoIR170InteractionZoneMesh(targetTransform);
+                    return;
+                }
+                else if (deviceType == Device.DeviceType.TYPE_3DI)
+                {
+                    DrawTrackingDevice(targetTransform, "3Di");
+                    DrawStereoIR170InteractionZoneMesh(targetTransform);
+                    return;
                 }
                 else if (deviceType == Device.DeviceType.TYPE_PERIPHERAL)
                 {
                     DrawTrackingDevice(targetTransform, "Leap Motion Controller");
                     DrawLeapMotionControllerInteractionZone(LMC_BOX_WIDTH, LMC_BOX_DEPTH, LMC_BOX_RADIUS, Color.white, targetTransform);
+                    return;
                 }
+            }
+
+            // if no devices connected, no serial number selected or the connected device type isn't matching one of the above,
+            // delete any device model that is currently displayed
+            if (targetTransform.Find("DeviceModel") != null)
+            {
+                GameObject.DestroyImmediate(targetTransform.Find("DeviceModel").gameObject);
             }
         }
 
