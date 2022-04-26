@@ -43,7 +43,9 @@ namespace Leap.Unity
         private List<string> _serialNumbers;
         private int _chosenDeviceIndex;
 
+        private VisualFOV _visualFOV;
         private LeapFOVInfos leapFOVInfos;
+        private Mesh optimalFOVMesh;
 
         protected override void OnEnable()
         {
@@ -222,6 +224,7 @@ namespace Leap.Unity
                     break;
                 case LeapServiceProvider.InteractionVolumeVisualization.StereoIR170:
                     DrawTrackingDevice(targetTransform, "Stereo IR 170");
+                    DrawInteractionZone(targetTransform);
                     DrawStereoIR170InteractionZoneMesh(targetTransform);
                     break;
                 case LeapServiceProvider.InteractionVolumeVisualization.Device_3Di:
@@ -418,7 +421,7 @@ namespace Leap.Unity
 
                 // if the name is the device type or it isn't a DevieModel at all,
                 // this object was already the same type last frame, and shouldn't be re instantiated
-                if(child.name == deviceType + "(Clone)")
+                if(child.name == deviceType + "(Clone)" && optimalFOVMesh != null)
                 {
                     return;
                 }
@@ -439,6 +442,7 @@ namespace Leap.Unity
             }
             if (info != null)
             {
+                SetDeviceInfo(info);
             }
             else
             {
@@ -447,19 +451,51 @@ namespace Leap.Unity
             newDevice.transform.SetParent(deviceModelParent, false);
             newDevice.transform.localScale = Vector3.one * 0.01f;
 
+
+
             Transform trackerTransform = newDevice.GetComponentInChildren<Collider>().transform;
+            _visualFOV.target = trackerTransform.GetChild(0);
+            _visualFOV.RefreshFOV();
+
+            optimalFOVMesh = _visualFOV._optimalFOVMesh;
+        }
+
+        private void DrawInteractionZone(Transform targetTransform)
+        {
+            if(!target.FOV_Visualization)
+            {
+                return;
+            }
+
+            Material mat = Resources.Load("OptimalFOVMat_Volume") as Material;
+            mat.SetPass(0);
+
+            if (optimalFOVMesh == null)
+            {
+                optimalFOVMesh = _visualFOV._optimalFOVMesh;
+            }
+
+            Debug.Log(optimalFOVMesh);
+
+            if (optimalFOVMesh != null)
+            {
+                Graphics.DrawMeshNow(optimalFOVMesh, targetTransform.localToWorldMatrix *
+                       Matrix4x4.Scale(Vector3.one * 0.01f));
+
+                Debug.Log("Drawn");
+            }
         }
 
         private void DrawStereoIR170InteractionZoneMesh(Transform targetTransform)
         {
-            if (_stereoIR170InteractionMaterial != null && _stereoIR170InteractionZoneMesh != null)
-            {
-                _stereoIR170InteractionMaterial.SetPass(0);
+            //if (_stereoIR170InteractionMaterial != null && _stereoIR170InteractionZoneMesh != null)
+            //{
+            //    _stereoIR170InteractionMaterial.SetPass(0);
 
-                Graphics.DrawMeshNow(_stereoIR170InteractionZoneMesh,
-                   targetTransform.localToWorldMatrix *
-                   Matrix4x4.TRS(controllerOffset + _stereoIR170InteractionZoneMeshOffset, deviceRotation * Quaternion.Euler(-90, 0, 0), Vector3.one * 0.001f));
-            }
+            //    Graphics.DrawMeshNow(_stereoIR170InteractionZoneMesh,
+            //       targetTransform.localToWorldMatrix *
+            //       Matrix4x4.TRS(controllerOffset + _stereoIR170InteractionZoneMeshOffset, deviceRotation * Quaternion.Euler(-90, 0, 0), Vector3.one * 0.001f));
+            //}
         }
 
         private void DrawLeapMotionControllerInteractionZone(float box_width,
@@ -545,6 +581,16 @@ namespace Leap.Unity
             //Debug.Log(Resources.Load<TextAsset>("SupportedTrackingDevices").text);
             leapFOVInfos = Newtonsoft.Json.JsonConvert.DeserializeObject<LeapFOVInfos>(Resources.Load<TextAsset>("SupportedTrackingDevices").text);
 
+            if (_visualFOV == null) _visualFOV = new VisualFOV(target.transform);
+        }
+
+        public void SetDeviceInfo(LeapFOVInfo leapInfo)
+        {
+            _visualFOV.HorizontalFOV = leapInfo.HorizontalFOV;
+            _visualFOV.VerticalFOV = leapInfo.VerticalFOV;
+            _visualFOV.MinDistance = leapInfo.MinDistance;
+            _visualFOV.MaxDistance = leapInfo.MaxDistance;
+            _visualFOV.OptimalMaxDistance = leapInfo.OptimalDistance;
         }
 
         public class LeapFOVInfos
