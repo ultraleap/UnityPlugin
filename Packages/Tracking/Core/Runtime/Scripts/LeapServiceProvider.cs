@@ -75,6 +75,7 @@ namespace Leap.Unity
             None,
             LeapMotionController,
             StereoIR170,
+            Device_3Di,
             Automatic
         }
         [Tooltip("Displays a representation of the interaction volume in the scene view")]
@@ -158,6 +159,11 @@ namespace Leap.Unity
         [EditTimeOnly]
         [SerializeField]
         protected MultipleDeviceMode _multipleDeviceMode = MultipleDeviceMode.Disabled;
+
+        public MultipleDeviceMode CurrentMultipleDeviceMode
+        {
+            get { return _multipleDeviceMode; }
+        }
 
         [Tooltip("When Multiple Device Mode is set to `Specific`, the provider will " +
           "receive data from only the devices that contain this in their serial number.")]
