@@ -331,6 +331,10 @@ namespace Leap.Unity
 
         private Action<Device> _onDeviceChanged;
 
+        /// <summary>
+        /// An event that is dispatched whenever the Service provider changes device (eg. when the SpecificSerialNumber changes during runtime) 
+        /// the param Device is the new CurrentDevice
+        /// </summary>
         public event Action<Device> OnDeviceChanged
         {
             add
