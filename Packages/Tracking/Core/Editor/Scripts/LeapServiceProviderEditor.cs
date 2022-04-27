@@ -46,6 +46,8 @@ namespace Leap.Unity
         private VisualFOV _visualFOV;
         private LeapFOVInfos leapFOVInfos;
         private Mesh optimalFOVMesh;
+        private Mesh noTrackingFOVMesh;
+        private Mesh maxFOVMesh;
 
         protected override void OnEnable()
         {
@@ -55,6 +57,11 @@ namespace Leap.Unity
             ParseStereoIR170InteractionMeshData();
 
             LoadFOVData();
+
+            specifyConditionalDrawing("FOV_Visualization",
+                                        "OptimalFOV_Visualization",
+                                        "NoTrackingFOV_Visualization",
+                                        "MaxFOV_Visualization");
 
             specifyCustomDecorator("_frameOptimization", frameOptimizationWarning);
 
@@ -220,16 +227,15 @@ namespace Leap.Unity
                     break;
                 case LeapServiceProvider.InteractionVolumeVisualization.LeapMotionController:
                     DrawTrackingDevice(targetTransform, "Leap Motion Controller");
-                    DrawLeapMotionControllerInteractionZone(LMC_BOX_WIDTH, LMC_BOX_DEPTH, LMC_BOX_RADIUS, Color.white, targetTransform);
+                    DrawInteractionZone(targetTransform);
                     break;
                 case LeapServiceProvider.InteractionVolumeVisualization.StereoIR170:
                     DrawTrackingDevice(targetTransform, "Stereo IR 170");
                     DrawInteractionZone(targetTransform);
-                    DrawStereoIR170InteractionZoneMesh(targetTransform);
                     break;
                 case LeapServiceProvider.InteractionVolumeVisualization.Device_3Di:
                     DrawTrackingDevice(targetTransform, "3Di");
-                    DrawStereoIR170InteractionZoneMesh(targetTransform);
+                    DrawInteractionZone(targetTransform);
                     break;
                 case LeapServiceProvider.InteractionVolumeVisualization.Automatic:
                     DetectConnectedDevice(targetTransform);
@@ -375,19 +381,19 @@ namespace Leap.Unity
                 if (deviceType == Device.DeviceType.TYPE_RIGEL || deviceType == Device.DeviceType.TYPE_SIR170)
                 {
                     DrawTrackingDevice(targetTransform, "Stereo IR 170");
-                    DrawStereoIR170InteractionZoneMesh(targetTransform);
+                    DrawInteractionZone(targetTransform);
                     return;
                 }
                 else if (deviceType == Device.DeviceType.TYPE_3DI)
                 {
                     DrawTrackingDevice(targetTransform, "3Di");
-                    DrawStereoIR170InteractionZoneMesh(targetTransform);
+                    DrawInteractionZone(targetTransform);
                     return;
                 }
                 else if (deviceType == Device.DeviceType.TYPE_PERIPHERAL)
                 {
                     DrawTrackingDevice(targetTransform, "Leap Motion Controller");
-                    DrawLeapMotionControllerInteractionZone(LMC_BOX_WIDTH, LMC_BOX_DEPTH, LMC_BOX_RADIUS, Color.white, targetTransform);
+                    DrawInteractionZone(targetTransform);
                     return;
                 }
             }
@@ -419,9 +425,9 @@ namespace Leap.Unity
             {
                 var child = deviceModelParent.GetChild(0).gameObject;
 
-                // if the name is the device type or it isn't a DevieModel at all,
-                // this object was already the same type last frame, and shouldn't be re instantiated
-                if(child.name == deviceType + "(Clone)" && optimalFOVMesh != null)
+                // if the name is the device type and the FOV mesh exists if needed,
+                // this object was already the same type last frame, and doesn't need to be re instantiated
+                if(child.name == deviceType + "(Clone)" && (!target.FOV_Visualization || optimalFOVMesh != null))
                 {
                     return;
                 }
@@ -455,9 +461,6 @@ namespace Leap.Unity
 
             Transform trackerTransform = newDevice.GetComponentInChildren<Collider>().transform;
             _visualFOV.target = trackerTransform.GetChild(0);
-            _visualFOV.RefreshFOV();
-
-            optimalFOVMesh = _visualFOV._optimalFOVMesh;
         }
 
         private void DrawInteractionZone(Transform targetTransform)
@@ -467,115 +470,40 @@ namespace Leap.Unity
                 return;
             }
 
-            Material mat = Resources.Load("OptimalFOVMat_Volume") as Material;
-            mat.SetPass(0);
+            _visualFOV.RefreshFOV();
 
-            if (optimalFOVMesh == null)
+            optimalFOVMesh = _visualFOV._optimalFOVMesh;
+            noTrackingFOVMesh = _visualFOV._noTrackingFOVMesh;
+            maxFOVMesh = _visualFOV._maxFOVMesh;
+
+
+            if (target.OptimalFOV_Visualization && optimalFOVMesh != null)
             {
-                optimalFOVMesh = _visualFOV._optimalFOVMesh;
-            }
+                Material mat = Resources.Load("OptimalFOVMat_Volume") as Material;
+                mat.SetPass(0);
 
-            Debug.Log(optimalFOVMesh);
-
-            if (optimalFOVMesh != null)
-            {
                 Graphics.DrawMeshNow(optimalFOVMesh, targetTransform.localToWorldMatrix *
                        Matrix4x4.Scale(Vector3.one * 0.01f));
-
-                Debug.Log("Drawn");
             }
-        }
-
-        private void DrawStereoIR170InteractionZoneMesh(Transform targetTransform)
-        {
-            //if (_stereoIR170InteractionMaterial != null && _stereoIR170InteractionZoneMesh != null)
-            //{
-            //    _stereoIR170InteractionMaterial.SetPass(0);
-
-            //    Graphics.DrawMeshNow(_stereoIR170InteractionZoneMesh,
-            //       targetTransform.localToWorldMatrix *
-            //       Matrix4x4.TRS(controllerOffset + _stereoIR170InteractionZoneMeshOffset, deviceRotation * Quaternion.Euler(-90, 0, 0), Vector3.one * 0.001f));
-            //}
-        }
-
-        private void DrawLeapMotionControllerInteractionZone(float box_width,
-            float box_depth,
-            float box_radius,
-            Color interactionZoneColor,
-            Transform targetTransform)
-        {
-
-            Color previousColor = Handles.color;
-            Handles.color = interactionZoneColor;
-
-            Vector3 origin = targetTransform.TransformPoint(controllerOffset);
-            Vector3 local_top_left, top_left, local_top_right, top_right, local_bottom_left, bottom_left, local_bottom_right, bottom_right;
-            getLocalGlobalPoint(-1, 1, 1, box_width, box_depth, box_radius, out local_top_left, out top_left, targetTransform);
-            getLocalGlobalPoint(1, 1, 1, box_width, box_depth, box_radius, out local_top_right, out top_right, targetTransform);
-            getLocalGlobalPoint(-1, 1, -1, box_width, box_depth, box_radius, out local_bottom_left, out bottom_left, targetTransform);
-            getLocalGlobalPoint(1, 1, -1, box_width, box_depth, box_radius, out local_bottom_right, out bottom_right, targetTransform);
-
-            Handles.DrawAAPolyLine(origin, top_left);
-            Handles.DrawAAPolyLine(origin, top_right);
-            Handles.DrawAAPolyLine(origin, bottom_left);
-            Handles.DrawAAPolyLine(origin, bottom_right);
-
-            drawControllerEdge(origin, local_top_left, local_top_right, box_radius, targetTransform);
-            drawControllerEdge(origin, local_bottom_left, local_top_left, box_radius, targetTransform);
-            drawControllerEdge(origin, local_bottom_left, local_bottom_right, box_radius, targetTransform);
-            drawControllerEdge(origin, local_bottom_right, local_top_right, box_radius, targetTransform);
-
-            drawControllerArc(origin, local_top_left, local_bottom_left, local_top_right,
-                              local_bottom_right, box_radius, targetTransform);
-            drawControllerArc(origin, local_top_left, local_top_right, local_bottom_left,
-                              local_bottom_right, box_radius, targetTransform);
-
-            Handles.color = previousColor;
-        }
-
-        private void getLocalGlobalPoint(int x, int y, int z, float box_width, float box_depth,
-            float box_radius, out Vector3 local, out Vector3 global, Transform targetTransform)
-        {
-
-            local = deviceRotation * new Vector3(x * box_width, y * box_radius, z * box_depth);
-            global = targetTransform.TransformPoint(controllerOffset
-                                                     + box_radius * local.normalized);
-        }
-
-        private void drawControllerEdge(Vector3 origin,
-                                        Vector3 edge0, Vector3 edge1,
-                                        float box_radius,
-                                        Transform targetTransform)
-        {
-
-            Vector3 right_normal = targetTransform.TransformDirection(Vector3.Cross(edge0, edge1));
-            float right_angle = Vector3.Angle(edge0, edge1);
-
-            Handles.DrawWireArc(origin, right_normal, targetTransform.TransformDirection(edge0),
-                                right_angle, targetTransform.lossyScale.x * box_radius);
-        }
-
-        private void drawControllerArc(Vector3 origin,
-                                       Vector3 edgeA0, Vector3 edgeA1,
-                                       Vector3 edgeB0, Vector3 edgeB1,
-                                       float box_radius,
-                                       Transform targetTransform)
-        {
-
-            Vector3 faceA = targetTransform.rotation * Vector3.Lerp(edgeA0, edgeA1, 0.5f);
-            Vector3 faceB = targetTransform.rotation * Vector3.Lerp(edgeB0, edgeB1, 0.5f);
-
-            float resolutionIncrement = 1f / 50f;
-            for (float i = 0f; i < 1f; i += resolutionIncrement)
+            if (target.NoTrackingFOV_Visualization && noTrackingFOVMesh != null)
             {
-                Vector3 begin = Vector3.Lerp(faceA, faceB, i).normalized
-                                * targetTransform.lossyScale.x * box_radius;
-                Vector3 end = Vector3.Lerp(faceA, faceB, i + resolutionIncrement).normalized
-                              * targetTransform.lossyScale.x * box_radius;
+                Material mat = Resources.Load("UntrackableFOVMat_Volume") as Material;
+                mat.SetPass(0);
 
-                Handles.DrawAAPolyLine(origin + begin, origin + end);
+                Graphics.DrawMeshNow(noTrackingFOVMesh, targetTransform.localToWorldMatrix *
+                       Matrix4x4.Scale(Vector3.one * 0.01f));
+            }
+            if (target.MaxFOV_Visualization && maxFOVMesh != null)
+            {
+                Material mat = Resources.Load("MaxFOVMat_Volume") as Material;
+                mat.SetPass(0);
+
+                Graphics.DrawMeshNow(maxFOVMesh, targetTransform.localToWorldMatrix *
+                       Matrix4x4.Scale(Vector3.one * 0.01f));
             }
         }
+
+        
         private void LoadFOVData()
         {
             //Debug.Log(Resources.Load<TextAsset>("SupportedTrackingDevices").text);
