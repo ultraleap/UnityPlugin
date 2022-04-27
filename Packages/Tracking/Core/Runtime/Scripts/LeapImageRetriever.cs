@@ -330,6 +330,7 @@ namespace Leap.Unity
                 controller.Disconnect -= onDisconnect;
                 controller.ImageReady -= onImageReady;
                 controller.FrameReady -= onFrameReady;
+                _provider.OnDeviceChanged -= OnDeviceChanged;
             }
 #if UNITY_2019_3_OR_NEWER
             //SRP require subscribing to RenderPipelineManagers
@@ -434,6 +435,7 @@ namespace Leap.Unity
                 controller.ImageReady -= onImageReady;
                 controller.DistortionChange -= onDistortionChange;
                 controller.FrameReady -= onFrameReady;
+                _provider.OnDeviceChanged -= OnDeviceChanged;
             }
             _eyeTextureData.MarkStale();
         }
@@ -452,6 +454,13 @@ namespace Leap.Unity
             controller.Disconnect += onDisconnect;
             controller.ImageReady += onImageReady;
             controller.DistortionChange += onDistortionChange;
+            _provider.OnDeviceChanged += OnDeviceChanged;
+        }
+
+        private void OnDeviceChanged(Device d)
+        {
+            Controller controller = _provider.GetLeapController();
+            controller.FrameReady += onFrameReady;
         }
 
         private void onImageReady(object sender, ImageEventArgs args)
