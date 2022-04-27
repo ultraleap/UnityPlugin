@@ -329,6 +329,21 @@ namespace Leap.Unity
             }
         }
 
+        private Action<Device> _onDeviceChanged;
+
+        public event Action<Device> OnDeviceChanged
+        {
+            add
+            {
+                _onDeviceChanged += value;
+            }
+            remove
+            {
+                _onDeviceChanged -= value;
+            }
+        }
+
+
 #if UNITY_EDITOR
         private Frame _backingUntransformedEditTimeFrame = null;
         private Frame _untransformedEditTimeFrame
@@ -1031,6 +1046,12 @@ namespace Leap.Unity
             Debug.Log($"Connecting to Device with Serial: {d.SerialNumber} and ID {d.DeviceID}");
             _leapController.SubscribeToDeviceEvents(d);
             _currentDevice = d;
+
+            if (_onDeviceChanged != null)
+            {
+                _onDeviceChanged(d);
+            }
+
             return true;
         }
 
