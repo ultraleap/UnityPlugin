@@ -21,9 +21,6 @@ namespace Leap.Unity
     [CustomEditor(typeof(LeapServiceProvider))]
     public class LeapServiceProviderEditor : CustomEditorBase<LeapServiceProvider>
     {
-
-        internal const float INTERACTION_VOLUME_MODEL_IMPORT_SCALE_FACTOR = 0.001f;
-
         protected Quaternion deviceRotation = Quaternion.identity;
         protected bool isVRProvider = false;
 
@@ -32,10 +29,6 @@ namespace Leap.Unity
         private const float LMC_BOX_RADIUS = 0.45f;
         private const float LMC_BOX_WIDTH = 0.965f;
         private const float LMC_BOX_DEPTH = 0.6671f;
-
-        private Mesh _stereoIR170InteractionZoneMesh;
-        private Material _stereoIR170InteractionMaterial;
-        private readonly Vector3 _stereoIR170InteractionZoneMeshOffset = new Vector3(0.0523f, 0, 0.005f);
 
         private LeapServiceProvider _leapServiceProvider;
         private Controller _leapController;
@@ -53,8 +46,6 @@ namespace Leap.Unity
         {
 
             base.OnEnable();
-
-            ParseStereoIR170InteractionMeshData();
 
             LoadFOVData();
 
@@ -212,18 +203,18 @@ namespace Leap.Unity
                 targetTransform = xrProvider.mainCamera.transform;
 
                 // deviceOrigin is set if camera follows a transform
-                if (xrProvider.deviceOrigin != null)
+                if (xrProvider.deviceOffsetMode == LeapXRServiceProvider.DeviceOffsetMode.Transform && xrProvider.deviceOrigin != null)
                 {
-                    targetTransform.InverseTransformPoint(xrProvider.deviceOrigin.position);
+                    targetTransform = xrProvider.deviceOrigin;
                 }
             }
 
             switch (GetSelectedInteractionVolume())
             {
                 case LeapServiceProvider.InteractionVolumeVisualization.None:
-                    if (targetTransform.Find("DeviceModel") != null)
+                    if (target.transform.Find("DeviceModel") != null)
                     {
-                        GameObject.DestroyImmediate(targetTransform.Find("DeviceModel").gameObject);
+                        GameObject.DestroyImmediate(target.transform.Find("DeviceModel").gameObject);
                     }
                     break;
                 case LeapServiceProvider.InteractionVolumeVisualization.LeapMotionController:
@@ -248,20 +239,6 @@ namespace Leap.Unity
 
         }
 
-        private void ParseStereoIR170InteractionMeshData()
-        {
-
-            if (_stereoIR170InteractionZoneMesh == null)
-            {
-                _stereoIR170InteractionZoneMesh = (Mesh)Resources.Load("StereoIR170-interaction-cone", typeof(Mesh));
-            }
-
-            if (_stereoIR170InteractionMaterial == null)
-            {
-                _stereoIR170InteractionMaterial = (Material)Resources.Load("StereoIR170InteractionVolume", typeof(Material));
-            }
-
-        }
 
         private LeapServiceProvider LeapServiceProvider
         {
@@ -416,12 +393,30 @@ namespace Leap.Unity
         private void DrawTrackingDevice(Transform targetTransform, string deviceType)
         {
             LeapXRServiceProvider xrProvider = target as LeapXRServiceProvider;
-            Transform deviceModelParent = targetTransform.Find("DeviceModel");
+            Transform deviceModelParent = target.transform.Find("DeviceModel");
             if(deviceModelParent == null)
             {
                 deviceModelParent = new GameObject("DeviceModel").transform;
-                deviceModelParent.SetParent(targetTransform, false);
+                deviceModelParent.SetParent(target.transform, false);
+                deviceModelParent.gameObject.AddComponent<UnityEngine.Animations.ParentConstraint>();
             }
+
+            UnityEngine.Animations.ParentConstraint parentConstraint = deviceModelParent.GetComponent<UnityEngine.Animations.ParentConstraint>();
+            UnityEngine.Animations.ConstraintSource constraintSource = new UnityEngine.Animations.ConstraintSource();
+            constraintSource.sourceTransform = targetTransform;
+            constraintSource.weight = 1;
+            if (parentConstraint.sourceCount > 0)
+            {
+                parentConstraint.RemoveSource(0);
+                parentConstraint.AddSource(constraintSource);
+            }
+            else
+            {
+                parentConstraint.AddSource(constraintSource);
+            }
+            
+
+            //deviceModelParent.SetWorldPose(targetTransform.ToWorldPose());
 
             if (deviceModelParent.childCount > 0)
             {
@@ -435,8 +430,8 @@ namespace Leap.Unity
                     // if the provider is an XRServiceProvider
                     if (xrProvider != null && xrProvider.deviceOffsetMode != LeapXRServiceProvider.DeviceOffsetMode.Transform)
                     {
-                        deviceModelParent.transform.localPosition = new Vector3(0, xrProvider.deviceOffsetYAxis, xrProvider.deviceOffsetZAxis);
-                        deviceModelParent.transform.localRotation = Quaternion.Euler(-90 + xrProvider.deviceTiltXAxis, 180, 0);
+                        parentConstraint.SetTranslationOffset(0, new Vector3(0, xrProvider.deviceOffsetYAxis, xrProvider.deviceOffsetZAxis));
+                        parentConstraint.SetRotationOffset(0, new Vector3(-90 - xrProvider.deviceTiltXAxis, 180, 0));
                     }
                     return;
                 }
@@ -468,12 +463,16 @@ namespace Leap.Unity
             // if the provider is an XRServiceProvider
             if (xrProvider != null && xrProvider.deviceOffsetMode != LeapXRServiceProvider.DeviceOffsetMode.Transform)
             {
-                deviceModelParent.transform.localPosition = new Vector3(0, xrProvider.deviceOffsetYAxis, xrProvider.deviceOffsetZAxis);
-                deviceModelParent.transform.localRotation = Quaternion.Euler(-90 + xrProvider.deviceTiltXAxis, 180, 0);
+                parentConstraint.SetTranslationOffset(0, new Vector3(0, xrProvider.deviceOffsetYAxis, xrProvider.deviceOffsetZAxis));
+                parentConstraint.SetRotationOffset(0, new Vector3(-90 - xrProvider.deviceTiltXAxis, 180, 0));
             }
 
             newDevice.transform.SetParent(deviceModelParent, false);
             newDevice.transform.localScale = Vector3.one * 0.01f;
+
+
+            parentConstraint.locked = true;
+            parentConstraint.constraintActive = true;
 
         }
 
@@ -490,11 +489,10 @@ namespace Leap.Unity
             noTrackingFOVMesh = _visualFOV._noTrackingFOVMesh;
             maxFOVMesh = _visualFOV._maxFOVMesh;
 
-            Transform deviceModelParent = targetTransform.Find("DeviceModel");
+            Transform deviceModelParent = target.transform.Find("DeviceModel");
             if (deviceModelParent == null)
             {
-                deviceModelParent = new GameObject("DeviceModel").transform;
-                deviceModelParent.SetParent(targetTransform, false);
+                return;
             }
 
 
