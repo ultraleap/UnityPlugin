@@ -22,7 +22,7 @@ namespace Leap.Unity
         public Mesh _optimalFOVMesh;
         public Mesh _noTrackingFOVMesh;
         public Mesh _maxFOVMesh;
-        
+
 
         public bool ShowRaycasts = false;
         public bool ShowMaximumField = true;

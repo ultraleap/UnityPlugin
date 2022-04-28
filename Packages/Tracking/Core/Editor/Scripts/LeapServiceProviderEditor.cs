@@ -330,7 +330,7 @@ namespace Leap.Unity
 
         private void DetectConnectedDevice(Transform targetTransform)
         {
-            
+
             if (LeapController?.Devices?.Count >= 1)
             {
                 Device currentDevice = target.CurrentDevice;
@@ -346,7 +346,7 @@ namespace Leap.Unity
                     }
                 }
 
-                if(currentDevice == null || (target.CurrentMultipleDeviceMode == LeapServiceProvider.MultipleDeviceMode.Specific && currentDevice.SerialNumber != target.SpecificSerialNumber))
+                if (currentDevice == null || (target.CurrentMultipleDeviceMode == LeapServiceProvider.MultipleDeviceMode.Specific && currentDevice.SerialNumber != target.SpecificSerialNumber))
                 {
                     if (targetTransform.Find("DeviceModel") != null)
                     {
@@ -394,7 +394,7 @@ namespace Leap.Unity
         {
             LeapXRServiceProvider xrProvider = target as LeapXRServiceProvider;
             Transform deviceModelParent = target.transform.Find("DeviceModel");
-            if(deviceModelParent == null)
+            if (deviceModelParent == null)
             {
                 deviceModelParent = new GameObject("DeviceModel").transform;
                 deviceModelParent.SetParent(target.transform, false);
@@ -414,7 +414,7 @@ namespace Leap.Unity
             {
                 parentConstraint.AddSource(constraintSource);
             }
-            
+
 
             //deviceModelParent.SetWorldPose(targetTransform.ToWorldPose());
 
@@ -424,7 +424,7 @@ namespace Leap.Unity
 
                 // if the name is the device type and the FOV mesh exists if needed,
                 // this object was already the same type last frame, and doesn't need to be re instantiated
-                if(child.name == deviceType + "(Clone)" && (!target.FOV_Visualization || optimalFOVMesh != null))
+                if (child.name == deviceType + "(Clone)" && (!target.FOV_Visualization || optimalFOVMesh != null))
                 {
                     // rotation and translation should be updated to fit the deviceOffsets specified in the XRServiceProvider, 
                     // if the provider is an XRServiceProvider
@@ -478,7 +478,7 @@ namespace Leap.Unity
 
         private void DrawInteractionZone(Transform targetTransform)
         {
-            if(!target.FOV_Visualization)
+            if (!target.FOV_Visualization)
             {
                 return;
             }
@@ -522,7 +522,7 @@ namespace Leap.Unity
             }
         }
 
-        
+
         private void LoadFOVData()
         {
             //Debug.Log(Resources.Load<TextAsset>("SupportedTrackingDevices").text);
