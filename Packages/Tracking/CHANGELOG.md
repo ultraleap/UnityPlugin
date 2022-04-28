@@ -13,9 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - SIR170 Tracking Volume Visualisation was not appearing
-- The automatic option on Tracking Volume Visualisation was not working for SIR170s or 3Dis
+- The automatic option on Tracking Volume Visualisation was not working for SIR170s or 3Dis in single device usage
 - Unit tests break downstream package dependencies [[#1182]](https://github.com/ultraleap/UnityPlugin/issues/1182)
 - reassigned Low Poly Hand material to prefab
+- An image from the image Retriever would freeze when switching devices on the relevant Service Provider
 
 ### Known issues
 - Scenes containing the infrared viewer render incorrectly on systems using single pass stereo with the XR plugin system - e.g. Windows Mixed Reality headsets. SteamVR headsets may also default to single pass stereo, showing the same issue. However in this case, the OpenVR settings can be changed to multipass which resolves the problem.
@@ -24,7 +25,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Possible hand offset issues on XR2 headsets using SVR plugin
 - Hands in Desktop scenes can appear far away from the camera
 - Interactions callback scene allows blocks to be moved without doing a grasp pose.
-- Interactions object scene platform/stage seems to move a lot
+- Automatic Volume visualization does not work in multi device mode
+- Capsule hands don't have a joint colour in HDRP
 
 ## [5.7.0] - 19/04/2022
 
