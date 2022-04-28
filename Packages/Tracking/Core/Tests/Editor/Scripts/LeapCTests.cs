@@ -17,10 +17,8 @@
 // namespace Leap.LeapCSharp.Tests
 // {
 //
-//     [TestFixture]
 //     public class LeapCTests
 //     {
-//
 //         [Test]
 //         public void TestNow()
 //         {

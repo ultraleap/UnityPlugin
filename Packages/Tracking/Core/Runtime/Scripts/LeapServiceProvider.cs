@@ -329,6 +329,25 @@ namespace Leap.Unity
             }
         }
 
+        private Action<Device> _onDeviceChanged;
+
+        /// <summary>
+        /// An event that is dispatched whenever the Service provider changes device (eg. when the SpecificSerialNumber changes during runtime) 
+        /// the param Device is the new CurrentDevice
+        /// </summary>
+        public event Action<Device> OnDeviceChanged
+        {
+            add
+            {
+                _onDeviceChanged += value;
+            }
+            remove
+            {
+                _onDeviceChanged -= value;
+            }
+        }
+
+
 #if UNITY_EDITOR
         private Frame _backingUntransformedEditTimeFrame = null;
         private Frame _untransformedEditTimeFrame
@@ -1031,6 +1050,12 @@ namespace Leap.Unity
             Debug.Log($"Connecting to Device with Serial: {d.SerialNumber} and ID {d.DeviceID}");
             _leapController.SubscribeToDeviceEvents(d);
             _currentDevice = d;
+
+            if (_onDeviceChanged != null)
+            {
+                _onDeviceChanged(d);
+            }
+
             return true;
         }
 

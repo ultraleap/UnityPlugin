@@ -12,7 +12,6 @@ using UnityEngine;
 
 namespace Leap.Unity.Tests
 {
-
     public class SlidingMaxTest
     {
         public const int MAX_HISTORY = 64;

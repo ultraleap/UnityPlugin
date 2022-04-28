@@ -11,24 +11,23 @@ using System.Linq;
 
 namespace Leap.Unity.Tests
 {
-
     public abstract class FrameValidator
     {
         protected const float TOLERANCE = 0.0001f;
         protected static Finger.FingerType[] _fingers = {
-      Finger.FingerType.TYPE_INDEX,
-      Finger.FingerType.TYPE_MIDDLE,
-      Finger.FingerType.TYPE_PINKY,
-      Finger.FingerType.TYPE_RING,
-      Finger.FingerType.TYPE_THUMB
-    };
+            Finger.FingerType.TYPE_INDEX,
+            Finger.FingerType.TYPE_MIDDLE,
+            Finger.FingerType.TYPE_PINKY,
+            Finger.FingerType.TYPE_RING,
+            Finger.FingerType.TYPE_THUMB
+        };
 
         protected static Bone.BoneType[] _bones = {
-      Bone.BoneType.TYPE_DISTAL,
-      Bone.BoneType.TYPE_INTERMEDIATE,
-      Bone.BoneType.TYPE_METACARPAL,
-      Bone.BoneType.TYPE_PROXIMAL
-    };
+            Bone.BoneType.TYPE_DISTAL,
+            Bone.BoneType.TYPE_INTERMEDIATE,
+            Bone.BoneType.TYPE_METACARPAL,
+            Bone.BoneType.TYPE_PROXIMAL
+        };
 
         protected Frame _frame;
 

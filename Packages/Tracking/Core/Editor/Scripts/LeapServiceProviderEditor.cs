@@ -331,11 +331,12 @@ namespace Leap.Unity
 
             if (LeapController?.Devices?.Count == 1)
             {
-                if (LeapController.Devices.First().Type == Device.DeviceType.TYPE_RIGEL)
+                Device.DeviceType deviceType = LeapController.Devices.First().Type;
+                if (deviceType == Device.DeviceType.TYPE_RIGEL || deviceType == Device.DeviceType.TYPE_SIR170 || deviceType == Device.DeviceType.TYPE_3DI)
                 {
                     DrawStereoIR170InteractionZoneMesh(targetTransform);
                 }
-                else if (LeapController.Devices.First().Type == Device.DeviceType.TYPE_PERIPHERAL)
+                else if (deviceType == Device.DeviceType.TYPE_PERIPHERAL)
                 {
                     DrawLeapMotionControllerInteractionZone(LMC_BOX_WIDTH, LMC_BOX_DEPTH, LMC_BOX_RADIUS, Color.white, targetTransform);
                 }
