@@ -1,7 +1,15 @@
+/******************************************************************************
+ * Copyright (C) Ultraleap, Inc. 2011-2021.                                   *
+ *                                                                            *
+ * Use subject to the terms of the Apache License 2.0 available at            *
+ * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
+ * between Ultraleap and you, your company or other organization.             *
+ ******************************************************************************/
+
+using Leap.Unity;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Leap.Unity;
 #if UNITY_2019_1_OR_NEWER
 using UnityEngine.Rendering;
 #endif
@@ -61,8 +69,8 @@ public class LeapDistortImage : MonoBehaviour
             Camera.onPreCull += OnCameraPreCull;
         }
 #else
-            Camera.onPreCull -= OnCameraPreCull;
-            Camera.onPreCull += OnCameraPreCull;
+        Camera.onPreCull -= OnCameraPreCull;
+        Camera.onPreCull += OnCameraPreCull;
 #endif
     }
 
@@ -78,7 +86,7 @@ public class LeapDistortImage : MonoBehaviour
             Camera.onPreCull -= OnCameraPreCull;
         }
 #else
-            Camera.onPreCull -= OnCameraPreCull;
+        Camera.onPreCull -= OnCameraPreCull;
 #endif
     }
 
@@ -92,7 +100,7 @@ public class LeapDistortImage : MonoBehaviour
         float deviceOffsetY = 0;
         float deviceOffsetZ = 0;
         float deviceTiltX = 0;
-        
+
         if (_provider is LeapXRServiceProvider || _provider.GetType().BaseType == typeof(LeapXRServiceProvider))
         {
             LeapXRServiceProvider _xrProvider = _provider as LeapXRServiceProvider;
@@ -122,7 +130,7 @@ public class LeapDistortImage : MonoBehaviour
 
             imageMatWarp *= MVP;
             imageMatWarp *= Matrix4x4.Scale(new Vector3(1, -1, 1));
-            imageMatWarp *= Matrix4x4.Translate(new Vector3(0, deviceOffsetY * 0.55f, - deviceOffsetZ / (9 * deviceOffsetZ + 1f) * scale.z));
+            imageMatWarp *= Matrix4x4.Translate(new Vector3(0, deviceOffsetY * 0.55f, -deviceOffsetZ / (9 * deviceOffsetZ + 1f) * scale.z));
             imageMatWarp *= MVP.inverse;
         }
 
