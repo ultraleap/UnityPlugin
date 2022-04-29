@@ -485,9 +485,9 @@ namespace Leap.Unity
 
             _visualFOV.UpdateFOVS();
 
-            optimalFOVMesh = _visualFOV._optimalFOVMesh;
-            noTrackingFOVMesh = _visualFOV._noTrackingFOVMesh;
-            maxFOVMesh = _visualFOV._maxFOVMesh;
+            optimalFOVMesh = _visualFOV.OptimalFOVMesh;
+            noTrackingFOVMesh = _visualFOV.NoTrackingFOVMesh;
+            maxFOVMesh = _visualFOV.MaxFOVMesh;
 
             Transform deviceModelParent = target.transform.Find("DeviceModel");
             if (deviceModelParent == null)
