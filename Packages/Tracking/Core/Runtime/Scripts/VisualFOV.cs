@@ -1,10 +1,22 @@
+/******************************************************************************
+ * Copyright (C) Ultraleap, Inc. 2011-2021.                                   *
+ *                                                                            *
+ * Use subject to the terms of the Apache License 2.0 available at            *
+ * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
+ * between Ultraleap and you, your company or other organization.             *
+ ******************************************************************************/
+
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace Leap.Unity
 {
-
+    /// <summary>
+    /// Class to generate meshes that can be used for field of view visualization.
+    /// Set the FOV variables depending on the device type used, call UpdateFOVs() and 
+    /// access the meshes OptimalFOVMesh, NoTrackingFOVMesh and MaxFOVMesh.
+    /// </summary>
     public class VisualFOV
     {
 
@@ -19,9 +31,9 @@ namespace Leap.Unity
         // Quality settings
         public int RayCount = 50;
 
-        public Mesh _optimalFOVMesh;
-        public Mesh _noTrackingFOVMesh;
-        public Mesh _maxFOVMesh;
+        public Mesh OptimalFOVMesh;
+        public Mesh NoTrackingFOVMesh;
+        public Mesh MaxFOVMesh;
 
 
         public bool ShowRaycasts = false;
@@ -36,28 +48,31 @@ namespace Leap.Unity
 
         public VisualFOV()
         {
-            _optimalFOVMesh = new Mesh();
-            _noTrackingFOVMesh = new Mesh();
-            _maxFOVMesh = new Mesh();
+            OptimalFOVMesh = new Mesh();
+            NoTrackingFOVMesh = new Mesh();
+            MaxFOVMesh = new Mesh();
 
             UpdateFOVS();
         }
 
+        /// <summary>
+        /// regenerate the FOV meshes. 
+        /// </summary>
         public void UpdateFOVS()
         {
             if (ShowNoTrackingField)
             {
-                DrawFOV(_noTrackingFOVMesh, 0, MinDistance);
+                DrawFOV(NoTrackingFOVMesh, 0, MinDistance);
             }
             var _currentMinDistance = MinDistance;
             if (ShowOptimalField)
             {
-                DrawFOV(_optimalFOVMesh, _currentMinDistance, OptimalMaxDistance);
+                DrawFOV(OptimalFOVMesh, _currentMinDistance, OptimalMaxDistance);
                 _currentMinDistance = OptimalMaxDistance;
             }
             if (ShowMaximumField)
             {
-                DrawFOV(_maxFOVMesh, _currentMinDistance, MaxDistance);
+                DrawFOV(MaxFOVMesh, _currentMinDistance, MaxDistance);
             }
         }
 
