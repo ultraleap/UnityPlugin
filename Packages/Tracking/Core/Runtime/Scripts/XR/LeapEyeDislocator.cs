@@ -83,7 +83,7 @@ namespace Leap.Unity
             Camera.onPreCull += OnCameraPreCull;
 #endif
 
-            _provider.OnDeviceSafe += onDevice;
+            _provider.OnDeviceChanged += onDevice;
         }
 
         private void OnDisable()
@@ -94,7 +94,7 @@ namespace Leap.Unity
 
             Camera.onPreCull -= OnCameraPreCull;
 
-            _provider.OnDeviceSafe -= onDevice;
+            _provider.OnDeviceChanged -= onDevice;
         }
 
         private void Update()
@@ -134,8 +134,8 @@ namespace Leap.Unity
             {
                 if (_deviceBaseline == Maybe.None)
                 {
-                    _provider.OnDeviceSafe -= onDevice;
-                    _provider.OnDeviceSafe += onDevice;
+                    _provider.OnDeviceChanged -= onDevice;
+                    _provider.OnDeviceChanged += onDevice;
                 }
                 baselineToUse = _deviceBaseline;
             }
