@@ -46,6 +46,10 @@ namespace Leap.Unity
         private long _prevSequenceId;
         private bool _needQueueReset;
 
+        //Rigel tracking cameras produce debug info in the image output, enable this to hide it.
+        [field: SerializeField]
+        public bool HideRigelDebug { get; set; }
+
         // If image IDs from the libtrack server do not reset with the Visualiser, it triggers out-of-sequence
         // checks and we lose images. Detecting this and setting an offset allows us to compensate.
         private long _frameIDOffset = -1;
@@ -62,6 +66,12 @@ namespace Leap.Unity
         {
             private Texture2D _combinedTexture = null;
             private byte[] _intermediateArray = null;
+
+            private bool _hideLeapDebugInfo = true;
+            public void HideDebugInfo(bool hideDebug)
+            {
+                _hideLeapDebugInfo = hideDebug;
+            }
 
             public Texture2D CombinedTexture
             {
@@ -115,9 +125,24 @@ namespace Leap.Unity
                 Shader.SetGlobalVector(pixelSizeName, new Vector2(1.0f / image.Width, 1.0f / image.Height));
             }
 
-            public void UpdateTexture(Image image)
+            public void UpdateTexture(Image image, Controller controller = null)
             {
-                _combinedTexture.LoadRawTextureData(image.Data(Image.CameraType.LEFT));
+                byte[] data = image.Data(Image.CameraType.LEFT);
+                if (_hideLeapDebugInfo && controller != null)
+                {
+                    switch (controller.Devices.ActiveDevice.Type)
+                    {
+                        case Device.DeviceType.TYPE_RIGEL:
+                        case Device.DeviceType.TYPE_SIR170:
+                        case Device.DeviceType.TYPE_3DI:
+                            for (int i = 0; i < image.Width; i++)
+                                data[i] = 0x00;
+                            for (int i = (int)image.NumBytes - image.Width; i < image.NumBytes; i++)
+                                data[i] = 0x00;
+                            break;
+                    }
+                }
+                _combinedTexture.LoadRawTextureData(data);
                 _combinedTexture.Apply();
             }
 
@@ -245,6 +270,11 @@ namespace Leap.Unity
                 Distortion = new LeapDistortionData();
             }
 
+            public void HideDebugInfo(bool hideDebug)
+            {
+                TextureData?.HideDebugInfo(hideDebug);
+            }
+
             public bool CheckStale(Image image)
             {
                 return TextureData.CheckStale(image) ||
@@ -264,9 +294,9 @@ namespace Leap.Unity
                 _isStale = false;
             }
 
-            public void UpdateTextures(Image image)
+            public void UpdateTextures(Image image, Controller controller = null)
             {
-                TextureData.UpdateTexture(image);
+                TextureData.UpdateTexture(image, controller);
             }
         }
 
@@ -343,6 +373,7 @@ namespace Leap.Unity
 
         private void LateUpdate()
         {
+            _eyeTextureData.HideDebugInfo(HideRigelDebug);
 
             var xrProvider = _provider as LeapXRServiceProvider;
             if (xrProvider != null)
@@ -398,7 +429,7 @@ namespace Leap.Unity
                     _eyeTextureData.Reconstruct(_currentImage);
                 }
 
-                _eyeTextureData.UpdateTextures(_currentImage);
+                _eyeTextureData.UpdateTextures(_currentImage, _provider?.GetLeapController());
             }
         }
 
