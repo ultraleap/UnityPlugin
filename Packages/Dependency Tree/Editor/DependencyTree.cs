@@ -41,6 +41,31 @@ namespace Leap.Unity
             public List<string> missingGuidReferences = new List<string>();
         }
 
+        /// <summary>
+        /// This class is used to bundle up information required for tree generation
+        /// </summary>
+        private class GenerationContext
+        {
+            public PackageCollection PackageCollection;
+            public IgnorePatterns IgnorePatterns;
+            public List<string> KnownBuiltinAssetFilePaths;
+
+            public GenerationContext(PackageCollection packageCollection, IgnorePatterns ignorePatterns, List<string> knownBuiltinAssetFilePaths)
+            {
+                PackageCollection = packageCollection;
+                IgnorePatterns = ignorePatterns;
+                KnownBuiltinAssetFilePaths = knownBuiltinAssetFilePaths;
+            }
+
+            public void Validate()
+            {
+                // Make sure none of the ignore pattern stuff is null
+                IgnorePatterns ??= new IgnorePatterns();
+                IgnorePatterns.AssetPathRegex ??= Array.Empty<string>();
+                IgnorePatterns.PackageNameRegex ??= Array.Empty<string>();
+            }
+        }
+
         private static readonly HashSet<string> YamlFileExtensions
             = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
             {
@@ -57,32 +82,45 @@ namespace Leap.Unity
         private static readonly Regex GuidRegex = new Regex("(?:GUID:|guid: )([0-9a-f]{32})",
             RegexOptions.CultureInvariant);
 
-        private static (bool Success, List<AssetReference> AssetReferences, StaticAnalysisResults AnalysisResults) GenerateTree(PackageCollection packages, IgnorePatterns ignorePatterns)
+        private static (bool Success, List<AssetReference> AssetReferences, StaticAnalysisResults AnalysisResults) GenerateTree(GenerationContext generationContext)
         {
+            generationContext.Validate();
+
             bool CheckPatternsDontMatch(string p, IEnumerable<string> patterns) => patterns.All(pattern => !Regex.IsMatch(p, pattern, RegexOptions.CultureInvariant));
-            bool PassesAssetPathIgnorePatterns(string p) => CheckPatternsDontMatch(p, ignorePatterns.AssetPathRegex);
-            bool PassesPkgNameIgnorePatterns(UnityEditor.PackageManager.PackageInfo pkg) => CheckPatternsDontMatch(pkg.name, ignorePatterns.PackageNameRegex);
+            bool PassesAssetPathIgnorePatterns(string p) => CheckPatternsDontMatch(p, generationContext.IgnorePatterns.AssetPathRegex);
+            bool PassesPkgNameIgnorePatterns(UnityEditor.PackageManager.PackageInfo pkg) => CheckPatternsDontMatch(pkg.name, generationContext.IgnorePatterns.PackageNameRegex);
 
             var intermediateGuidsList = new List<string>();
             var filesMissingMetas = new List<string>();
             var assetsByGuid = new Dictionary<string, AssetReference>();
             var analysis = new StaticAnalysisResults();
 
-            var filteredPackages = packages.Where(PassesPkgNameIgnorePatterns).ToArray();
+            var filteredPackages = generationContext.PackageCollection.Where(PassesPkgNameIgnorePatterns).ToArray();
 
-            static void UpdateAssetReferenceFromFilePath(AssetReference assetReference, string filePath)
+            static void UpdateAssetReferenceFromFilePath(AssetReference assetReference, string filePath, GenerationContext generationContext)
             {
+                var isBuiltinAsset = generationContext.KnownBuiltinAssetFilePaths.Any(path => path.Equals(filePath));
+
                 assetReference.path = filePath;
-                try
+
+                if (!isBuiltinAsset)
                 {
-                    assetReference.size = (float)(new FileInfo(filePath).Length);
+                    try
+                    {
+                        assetReference.size = (float)(new FileInfo(filePath).Length);
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.LogError($"Skipping file due to exception. See exception trace in following message.");
+                        Debug.LogException(e);
+                    }
+                    assetReference.packageName = UnityEditor.PackageManager.PackageInfo.FindForAssetPath(filePath)?.name;
+                    assetReference.asmdefName = CompilationPipeline.GetAssemblyNameFromScriptPath(filePath);
                 }
-                catch (Exception e)
+                else
                 {
-                    Debug.LogException(e);
+                    assetReference.packageName = "<builtin>";
                 }
-                assetReference.packageName = UnityEditor.PackageManager.PackageInfo.FindForAssetPath(filePath)?.name;
-                assetReference.asmdefName = CompilationPipeline.GetAssemblyNameFromScriptPath(filePath);
             }
 
             void ParseDirectory(string directoryPath)
@@ -116,7 +154,7 @@ namespace Leap.Unity
                     return guidFound;
                 }
 
-                var directoryAssets = AssetDatabase.FindAssets(ignorePatterns.FindAssetsFilter, new []{directoryPath})
+                var directoryAssets = AssetDatabase.FindAssets(generationContext.IgnorePatterns.FindAssetsFilter, new []{directoryPath})
                     .Select(AssetDatabase.GUIDToAssetPath)
                     .Where(p => !Directory.Exists(p)) // Exclude folders for now, Unity treats them as Assets but we don't care about them
                     .Where(PassesAssetPathIgnorePatterns)
@@ -159,7 +197,7 @@ namespace Leap.Unity
                     }
                     if (!string.IsNullOrEmpty(thisAsset.path) && !thisAsset.path.Equals(filePath)) analysis.duplicatedGuids.Add(thisAsset.guid);
                     thisAsset.references.AddRange(intermediateGuidsList.Skip(1).Distinct()); // TODO: Count references instead of throwing away count?
-                    UpdateAssetReferenceFromFilePath(thisAsset, filePath);
+                    UpdateAssetReferenceFromFilePath(thisAsset, filePath, generationContext);
                 }
             }
 
@@ -195,7 +233,7 @@ namespace Leap.Unity
                 if (!string.IsNullOrEmpty(assetRef.path)) continue;
                 var assetPath = AssetDatabase.GUIDToAssetPath(guid);
                 if (string.IsNullOrEmpty(assetPath)) analysis.missingGuidReferences.Add(guid);
-                else UpdateAssetReferenceFromFilePath(assetRef, assetPath);
+                else UpdateAssetReferenceFromFilePath(assetRef, assetPath, generationContext);
             }
 
             return (true, assetsByGuid.Values.ToList(), analysis);
@@ -258,6 +296,12 @@ namespace Leap.Unity
         }
 
         public IgnorePatterns GenerationIgnorePatterns;
+        public List<string> KnownBuiltinAssetFilePaths = new List<string>
+        {
+            "Resources/unity_builtin_extra",
+            "Library/unity default resources",
+            "Library/unity editor resources"
+        };
         public List<AssetReference> RawTree = new List<AssetReference>();
         public StaticAnalysisResults AnalysisResults;
         [NonSerialized] public DependencyFolderNode RootNode;
@@ -279,8 +323,12 @@ namespace Leap.Unity
                     return;
                 }
 
-                var packages = listRequest.Result;
-                (_, RawTree, AnalysisResults) = GenerateTree(packages, GenerationIgnorePatterns);
+                var generationContext = new GenerationContext(listRequest.Result, GenerationIgnorePatterns, KnownBuiltinAssetFilePaths);
+                var (succeeded, rawTree, analysisResults) = GenerateTree(generationContext);
+                if (!succeeded) return;
+
+                RawTree = rawTree;
+                AnalysisResults = analysisResults;
                 EditorUtility.SetDirty(this);
                 AssetDatabase.SaveAssets();
                 RootNode = null;
@@ -310,7 +358,6 @@ namespace Leap.Unity
                 var holder = CreateInstance<DependencyTree>();
                 Selection.activeObject = holder;
                 AssetDatabase.CreateAsset(holder, DependencyTreePath);
-                holder.Refresh();
             }
         }
     }

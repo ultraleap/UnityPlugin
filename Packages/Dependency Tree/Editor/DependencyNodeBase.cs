@@ -5,7 +5,7 @@ namespace Leap.Unity
     internal abstract class DependencyNodeBase
     {
         public string Name;
-        public List<DependencyNodeBase> Parents = new List<DependencyNodeBase>();
+        public List<DependencyNodeBase> Parents { get; } = new List<DependencyNodeBase>();
 
         public abstract float GetSize();
 
