@@ -73,8 +73,8 @@ namespace Leap.Unity
             addPropertyToFoldout("_deviceTiltXAxis", "Advanced Options");
             addPropertyToFoldout("_deviceOrigin", "Advanced Options");
             addPropertyToFoldout("_updateHandInPrecull", "Advanced Options");
-            addPropertyToFoldout("_preventInitializingTrackingMode", "Advanced Options");
             hideField("_trackingOptimization");
+            hideField("_preventInitializingTrackingMode");
         }
 
         private void DrawCustomEnum(SerializedProperty property)

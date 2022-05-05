@@ -238,7 +238,7 @@ namespace Leap.Unity
 
         [Tooltip("Enable to prevent changes to tracking mode during initialization. The mode the service is currently set to will be retained.")]
         [SerializeField]
-        protected bool _preventInitializingTrackingMode;
+        private bool _preventInitializingTrackingMode;
 
 #if UNITY_2017_3_OR_NEWER
         [Tooltip("When checked, profiling data from the LeapCSharp worker thread will be used to populate the UnityProfiler.")]
