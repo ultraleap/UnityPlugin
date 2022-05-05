@@ -74,7 +74,6 @@ namespace Leap.Unity
             Transform
         }
 
-
         [Tooltip("Allow manual adjustment of the Tracking Hardware's virtual offset and tilt. These "
                + "settings can be used to match the physical position and orientation of the "
                + "Tracking Hardware on a tracked device it is mounted on (such as a VR "
@@ -584,6 +583,7 @@ namespace Leap.Unity
         /// </summary>
         protected override void initializeFlags()
         {
+            if (_preventInitializingTrackingMode) return;
             ChangeTrackingMode(TrackingOptimizationMode.HMD);
         }
 
