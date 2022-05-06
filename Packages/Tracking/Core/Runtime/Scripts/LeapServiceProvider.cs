@@ -871,7 +871,7 @@ namespace Leap.Unity
 
         private IEnumerator ChangeTrackingMode_Coroutine(TrackingOptimizationMode trackingMode)
         {
-            yield return new WaitWhile(() => _leapController == null);
+            yield return new WaitWhile(() => _leapController == null || !_leapController.IsConnected);
 
 
             switch (trackingMode)
