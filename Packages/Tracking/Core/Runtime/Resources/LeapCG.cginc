@@ -1,5 +1,6 @@
 
-uniform sampler2D _LeapGlobalRawTexture;
+//uniform sampler2D _LeapGlobalRawTexture;
+UNITY_DECLARE_TEX2DARRAY(_LeapGlobalRawTexture);
 
 uniform sampler2D _LeapGlobalDistortion;
 
@@ -104,28 +105,28 @@ float4 LeapGetLateVertexPos(float4 vertex, int isLeft) {
 
 /*** LEAP RAW COLOR ***/
 
-float3 LeapGetUVRawColor(float2 uv) {
-	float color = tex2D(_LeapGlobalRawTexture, uv).a;
+float3 LeapGetUVRawColor(float2 uv, float z) {
+	float color = UNITY_SAMPLE_TEX2DARRAY(_LeapGlobalRawTexture, float3(uv, 0)).a;
 	return float3(color, color, color);
 }
 
 float3 LeapGetLeftRawColor(float4 screenPos) {
-	return LeapGetUVRawColor(LeapGetLeftUndistortedUV(screenPos));
+	return LeapGetUVRawColor(LeapGetLeftUndistortedUV(screenPos), screenPos.z);
 }
 
 float3 LeapGetRightRawColor(float4 screenPos) {
-	return LeapGetUVRawColor(LeapGetRightUndistortedUV(screenPos));
+	return LeapGetUVRawColor(LeapGetRightUndistortedUV(screenPos), screenPos.z);
 }
 
 float3 LeapGetStereoRawColor(float4 screenPos) {
-	return LeapGetUVRawColor(LeapGetStereoUndistortedUV(screenPos));
+	return LeapGetUVRawColor(LeapGetStereoUndistortedUV(screenPos), screenPos.z);
 }
 
 
 /*** LEAP COLOR ***/
 
-float3 LeapGetUVColor(float2 uv) {
-	return pow(LeapGetUVRawColor(uv), _LeapGlobalGammaCorrectionExponent);
+float3 LeapGetUVColor(float2 uv, float z) {
+	return pow(LeapGetUVRawColor(uv, z), _LeapGlobalGammaCorrectionExponent);
 }
 
 float3 LeapGetLeftColor(float4 screenPos) {
