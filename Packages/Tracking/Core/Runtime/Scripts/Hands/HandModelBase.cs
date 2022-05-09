@@ -187,7 +187,7 @@ namespace Leap.Unity
             if (leapProvider == null)
             {
                 //Try to set the provider for the user
-                leapProvider = Hands.Provider;
+                leapProvider = FindObjectOfType<LeapProvider>();
 
                 if (leapProvider == null)
                 {
@@ -285,7 +285,7 @@ namespace Leap.Unity
                 if (leapProvider == null)
                 {
                     //Try to set the provider for the user
-                    var Provider = Hands.Provider;
+                    var Provider = FindObjectOfType<LeapProvider>();
                     if (Provider == null)
                     {
                         //If we still have a null hand, construct one manually
