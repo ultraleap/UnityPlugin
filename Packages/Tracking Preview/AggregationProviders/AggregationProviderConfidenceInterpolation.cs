@@ -28,7 +28,7 @@ namespace Leap.Unity
         public float palmPosFactor = 1;
         public float palmRotFactor = 1;
         public float palmVelocityFactor = 1;
-        public float lengthVisibleFactor = 1;
+        public float timeSinceHandFirstVisibleFactor = 1;
 
         public float jointRotFactor = 1;
         public float jointRotToPalmFactor = 1;
@@ -40,11 +40,17 @@ namespace Leap.Unity
         // The debug colors should have the same order and length as the provider list
         public Color[] debugColors;
 
-        Dictionary<LeapProvider, LastHandPositions> lastLeftHandPositions = new Dictionary<LeapProvider, LastHandPositions>();
-        Dictionary<LeapProvider, LastHandPositions> lastRightHandPositions = new Dictionary<LeapProvider, LastHandPositions>();
+        Dictionary<LeapProvider, HandPositionHistory> lastLeftHandPositions = new Dictionary<LeapProvider, HandPositionHistory>();
+        Dictionary<LeapProvider, HandPositionHistory> lastRightHandPositions = new Dictionary<LeapProvider, HandPositionHistory>();
 
         Dictionary<LeapProvider, float> leftHandFirstVisible = new Dictionary<LeapProvider, float>();
         Dictionary<LeapProvider, float> rightHandFirstVisible = new Dictionary<LeapProvider, float>();
+
+        Vector3[] mergedJointPositions = new Vector3[VectorHand.NUM_JOINT_POSITIONS];
+
+        private float[] jointConfidences = new float[VectorHand.NUM_JOINT_POSITIONS];
+        private float[] confidences_jointRot = new float[VectorHand.NUM_JOINT_POSITIONS];
+        private float[] confidences_jointPalmRot = new float[VectorHand.NUM_JOINT_POSITIONS];
 
 
         protected override Frame MergeFrames(Frame[] frames)
@@ -63,7 +69,7 @@ namespace Leap.Unity
             for (int i = 0; i < frames.Length; i++)
             {
                 Frame frame = frames[i];
-                AddFrameToLengthVisibleDicts(frames, i);
+                AddFrameToTimeVisibleDicts(frames, i);
 
                 foreach (Hand hand in frame.Hands)
                 {
@@ -189,7 +195,7 @@ namespace Leap.Unity
             }
 
             // joints
-            Vector3[] mergedJointPositions = new Vector3[VectorHand.NUM_JOINT_POSITIONS];
+            mergedJointPositions.ClearWith(Vector3.zero);
             List<VectorHand> vectorHands = new List<VectorHand>();
             foreach (Hand hand in hands)
             {
@@ -227,10 +233,11 @@ namespace Leap.Unity
             confidence = palmPosFactor * Confidence_RelativeHandPos(providers[frame_idx], providers[frame_idx].transform, hand.PalmPosition.ToVector3());
             confidence += palmRotFactor * Confidence_RelativeHandRot(providers[frame_idx].transform, hand.PalmPosition.ToVector3(), hand.PalmNormal.ToVector3());
             confidence += palmVelocityFactor * Confidence_RelativeHandVelocity(providers[frame_idx], providers[frame_idx].transform, hand.PalmPosition.ToVector3(), hand.IsLeft);
-            confidence += lengthVisibleFactor * Confidence_LengthHandVisible(providers[frame_idx], hand.IsLeft);
+            confidence += timeSinceHandFirstVisibleFactor * Confidence_TimeSinceHandFirstVisible(providers[frame_idx], hand.IsLeft);
 
             return confidence;
         }
+
 
         /// <summary>
         /// Combine different confidence functions to get an overall confidence for each joint in the given hand
@@ -238,18 +245,21 @@ namespace Leap.Unity
         /// </summary>
         public float[] CalculateJointConfidence(int frame_idx, Hand hand)
         {
-            float[] confidences = new float[VectorHand.NUM_JOINT_POSITIONS];
-
-            float[] confidences_jointRot = Confidence_RelativeJointRot(providers[frame_idx].transform, hand);
-            float[] confidences_jointPalmRot = Confidence_relativeJointRotToPalmRot(providers[frame_idx].transform, hand);
-
-            for (int i = 0; i < confidences.Length; i++)
+            if (jointConfidences == null)
             {
-                confidences[i] = jointRotFactor * confidences_jointRot[i] +
+                jointConfidences = new float[VectorHand.NUM_JOINT_POSITIONS];
+            }
+
+            confidences_jointRot = Confidence_RelativeJointRot(confidences_jointRot, providers[frame_idx].transform, hand);
+            confidences_jointPalmRot = Confidence_relativeJointRotToPalmRot(confidences_jointPalmRot, providers[frame_idx].transform, hand);
+
+            for (int i = 0; i < jointConfidences.Length; i++)
+            {
+                jointConfidences[i] = jointRotFactor * confidences_jointRot[i] +
                                  jointRotToPalmFactor * confidences_jointPalmRot[i];
             }
 
-            return confidences;
+            return jointConfidences;
         }
 
 
@@ -390,7 +400,7 @@ namespace Leap.Unity
             return confidence;
         }
 
-        float Confidence_LengthHandVisible(LeapProvider provider, bool isLeft)
+        float Confidence_TimeSinceHandFirstVisible(LeapProvider provider, bool isLeft)
         {
             if ((isLeft ? leftHandFirstVisible[provider] : rightHandFirstVisible[provider]) == 0)
             {
@@ -415,9 +425,12 @@ namespace Leap.Unity
         /// uses the normal vector of a joint / bone (outwards pointing one) and the direction from joint to device 
         /// to calculate per-joint confidence values
         /// </summary>
-        float[] Confidence_RelativeJointRot(Transform deviceOrigin, Hand hand)
+        float[] Confidence_RelativeJointRot(float[] confidences, Transform deviceOrigin, Hand hand)
         {
-            float[] confidences = new float[VectorHand.NUM_JOINT_POSITIONS];
+            if (confidences == null)
+            {
+                confidences = new float[VectorHand.NUM_JOINT_POSITIONS];
+            }
 
             foreach (var finger in hand.Fingers)
             {
@@ -448,9 +461,12 @@ namespace Leap.Unity
         /// uses the normal vector of a joint / bone (outwards pointing one) and the palm normal vector
         /// to calculate per-joint confidence values
         /// </summary>
-        float[] Confidence_relativeJointRotToPalmRot(Transform deviceOrigin, Hand hand)
+        float[] Confidence_relativeJointRotToPalmRot(float[] confidences, Transform deviceOrigin, Hand hand)
         {
-            float[] confidences = new float[VectorHand.NUM_JOINT_POSITIONS];
+            if (confidences == null)
+            {
+                confidences = new float[VectorHand.NUM_JOINT_POSITIONS];
+            }
 
             foreach (var finger in hand.Fingers)
             {
@@ -481,14 +497,14 @@ namespace Leap.Unity
         #region Helper Methods
 
         // small class to save hand positions from old frames along with a timestamp
-        class LastHandPositions
+        class HandPositionHistory
         {
             LeapProvider provider;
             Vector3[] positions;
             float[] times;
             int index;
 
-            public LastHandPositions()
+            public HandPositionHistory()
             {
                 this.positions = new Vector3[10];
                 this.times = new float[10];
@@ -541,7 +557,7 @@ namespace Leap.Unity
         /// add all hands in the frame given by frames[frameIdx] to the Dictionaries lastLeftHandPositions and lastRightHandPositions,
         /// and update leftHandFirstVisible and rightHandFirstVisible
         /// </summary>
-        void AddFrameToLengthVisibleDicts(Frame[] frames, int frameIdx)
+        void AddFrameToTimeVisibleDicts(Frame[] frames, int frameIdx)
         {
             bool[] handsVisible = new bool[2];
 
@@ -558,7 +574,7 @@ namespace Leap.Unity
 
                     if (!lastLeftHandPositions.ContainsKey(providers[frameIdx]))
                     {
-                        lastLeftHandPositions.Add(providers[frameIdx], new LastHandPositions());
+                        lastLeftHandPositions.Add(providers[frameIdx], new HandPositionHistory());
                     }
 
                     lastLeftHandPositions[providers[frameIdx]].AddPosition(hand.PalmPosition.ToVector3(), Time.time);
@@ -573,7 +589,7 @@ namespace Leap.Unity
 
                     if (!lastRightHandPositions.ContainsKey(providers[frameIdx]))
                     {
-                        lastRightHandPositions.Add(providers[frameIdx], new LastHandPositions());
+                        lastRightHandPositions.Add(providers[frameIdx], new HandPositionHistory());
                     }
 
                     lastRightHandPositions[providers[frameIdx]].AddPosition(hand.PalmPosition.ToVector3(), Time.time);
