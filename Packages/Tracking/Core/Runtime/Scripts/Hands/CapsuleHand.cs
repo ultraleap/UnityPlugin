@@ -83,6 +83,7 @@ namespace Leap.Unity
         private int _curSphereIndex = 0, _curCylinderIndex = 0;
         private Color _backingDefault = Color.white;
 
+        private MaterialPropertyBlock _materialPropertyBlock;
         private Color[] _sphereColors;
 
         [HideInInspector]
@@ -396,13 +397,16 @@ namespace Leap.Unity
 
             if (SetIndividualSphereColors)
             {
-                MaterialPropertyBlock materialPropertyBlock = new MaterialPropertyBlock();
+                if (_materialPropertyBlock == null)
+                {
+                    _materialPropertyBlock = new MaterialPropertyBlock();
+                }
 
                 for (int i = 0; i < _sphereMatrices.Length && i < _curSphereIndex; i++)
                 {
-                    materialPropertyBlock.SetColor("_Color", SphereColors[i]);
+                    _materialPropertyBlock.SetColor("_Color", SphereColors[i]);
 
-                    Graphics.DrawMeshInstanced(_sphereMesh, 0, _sphereMat, new Matrix4x4[] { _sphereMatrices[i] }, 1, materialPropertyBlock,
+                    Graphics.DrawMeshInstanced(_sphereMesh, 0, _sphereMat, new Matrix4x4[] { _sphereMatrices[i] }, 1, _materialPropertyBlock,
                       _castShadows ? UnityEngine.Rendering.ShadowCastingMode.On : UnityEngine.Rendering.ShadowCastingMode.Off, true, gameObject.layer);
                 }
             }
