@@ -64,6 +64,7 @@ namespace Leap.Unity
 
         public class LeapTextureData
         {
+            private Texture2DArray _globalRawTextures = null;
             private Texture2D _combinedTexture = null;
             private byte[] _intermediateArray = null;
 
@@ -103,9 +104,9 @@ namespace Leap.Unity
 
             public void Reconstruct(Image image, string globalShaderName, string pixelSizeName, int deviceID)
             {
-                if(deviceID > 1)
+                if (deviceID > 4)
                 {
-                    Debug.LogWarning("deviceID is too high: " + deviceID);
+                    Debug.LogWarning("DeviceID too high: " + deviceID);
                     return;
                 }
 
@@ -127,29 +128,25 @@ namespace Leap.Unity
 
                 _intermediateArray = new byte[combinedWidth * combinedHeight * bytesPerPixel(format)];
 
-                Texture temp = Shader.GetGlobalTexture(globalShaderName);
 
-                Texture2DArray globalRawTexture;
-                if (temp.dimension != UnityEngine.Rendering.TextureDimension.Tex2DArray || temp.width == 1)
-                {
-                    globalRawTexture = new Texture2DArray(_combinedTexture.width, _combinedTexture.height, 1, _combinedTexture.format, false, true);
-                    globalRawTexture.wrapMode = TextureWrapMode.Clamp;
-                    globalRawTexture.filterMode = FilterMode.Bilinear;
-                    globalRawTexture.hideFlags = HideFlags.DontSave;
-                }
-                else
-                {
-                    globalRawTexture = (Texture2DArray)temp;
-                }
-
-                Graphics.CopyTexture(_combinedTexture, 0, globalRawTexture, 0);
-                Shader.SetGlobalTexture(globalShaderName, globalRawTexture);
+                _globalRawTextures = new Texture2DArray(_combinedTexture.width, _combinedTexture.height, 5, _combinedTexture.format, false, true);
+                _globalRawTextures.wrapMode = TextureWrapMode.Clamp;
+                _globalRawTextures.filterMode = FilterMode.Bilinear;
+                _globalRawTextures.hideFlags = HideFlags.DontSave;
+                Shader.SetGlobalTexture(globalShaderName, _globalRawTextures);
 
                 Shader.SetGlobalVector(pixelSizeName, new Vector2(1.0f / image.Width, 1.0f / image.Height));
             }
 
-            public void UpdateTexture(Image image, Controller controller = null)
+            public void UpdateTexture(Image image, int deviceID, Controller controller = null)
             {
+                Debug.Log(deviceID);
+                if(deviceID > 4)
+                {
+                    Debug.LogWarning("DeviceID too high: " + deviceID);
+                    return;
+                }
+
                 byte[] data = image.Data(Image.CameraType.LEFT);
                 if (_hideLeapDebugInfo && controller != null)
                 {
@@ -167,6 +164,23 @@ namespace Leap.Unity
                 }
                 _combinedTexture.LoadRawTextureData(data);
                 _combinedTexture.Apply();
+
+                Texture temp = Shader.GetGlobalTexture("_LeapGlobalRawTexture");
+
+                //Texture2DArray globalRawTexture;
+                if (_globalRawTextures == null || temp.dimension != UnityEngine.Rendering.TextureDimension.Tex2DArray || temp.width == 1)
+                {
+                    _globalRawTextures = new Texture2DArray(_combinedTexture.width, _combinedTexture.height, 5, _combinedTexture.format, false, true);
+                    _globalRawTextures.wrapMode = TextureWrapMode.Clamp;
+                    _globalRawTextures.filterMode = FilterMode.Bilinear;
+                    _globalRawTextures.hideFlags = HideFlags.DontSave;
+                }
+                else
+                {
+                    _globalRawTextures = (Texture2DArray)temp;
+                }
+
+                Graphics.CopyTexture(_combinedTexture, 0, _globalRawTextures, deviceID);
             }
 
             private TextureFormat getTextureFormat(Image image)
@@ -283,23 +297,7 @@ namespace Leap.Unity
                 empty.hideFlags = HideFlags.DontSave;
                 empty.SetPixel(0, 0, new Color(0, 0, 0, 0));
 
-                Texture temp = Shader.GetGlobalTexture(GLOBAL_RAW_TEXTURE_NAME);
-
-                Texture2DArray globalRawTexture;
-                if (temp.dimension != UnityEngine.Rendering.TextureDimension.Tex2DArray || temp.width != 1)
-                {
-                    globalRawTexture = new Texture2DArray(empty.width, empty.height, 1, empty.format, false, false);
-                    globalRawTexture.hideFlags = HideFlags.DontSave;
-                }
-                else
-                {
-                    globalRawTexture = (Texture2DArray)temp;
-                }
-
-                Graphics.CopyTexture(empty, 0, globalRawTexture, 0);
-                Shader.SetGlobalTexture(GLOBAL_RAW_TEXTURE_NAME, globalRawTexture);
-
-                //Shader.SetGlobalTexture(GLOBAL_RAW_TEXTURE_NAME, empty);
+                Shader.SetGlobalTexture(GLOBAL_RAW_TEXTURE_NAME, empty);
                 Shader.SetGlobalTexture(GLOBAL_DISTORTION_TEXTURE_NAME, empty);
             }
 
@@ -333,9 +331,9 @@ namespace Leap.Unity
                 _isStale = false;
             }
 
-            public void UpdateTextures(Image image, Controller controller = null)
+            public void UpdateTextures(Image image, int deviceID, Controller controller = null)
             {
-                TextureData.UpdateTexture(image, controller);
+                TextureData.UpdateTexture(image, deviceID, controller);
             }
         }
 
@@ -468,7 +466,7 @@ namespace Leap.Unity
                     _eyeTextureData.Reconstruct(_currentImage, (int)_provider.CurrentDevice.DeviceID);
                 }
 
-                _eyeTextureData.UpdateTextures(_currentImage, _provider?.GetLeapController());
+                _eyeTextureData.UpdateTextures(_currentImage, (int)_provider.CurrentDevice.DeviceID, _provider?.GetLeapController());
             }
         }
 
@@ -588,7 +586,7 @@ namespace Leap.Unity
 
         void onDistortionChange(object sender, LeapEventArgs args)
         {
-            _eyeTextureData.MarkStale();
+            //_eyeTextureData.MarkStale();
         }
     }
 }

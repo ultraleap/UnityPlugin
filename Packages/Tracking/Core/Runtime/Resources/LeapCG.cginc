@@ -106,7 +106,7 @@ float4 LeapGetLateVertexPos(float4 vertex, int isLeft) {
 /*** LEAP RAW COLOR ***/
 
 float3 LeapGetUVRawColor(float2 uv, float z) {
-	float color = UNITY_SAMPLE_TEX2DARRAY(_LeapGlobalRawTexture, float3(uv, 0)).a;
+	float color = UNITY_SAMPLE_TEX2DARRAY(_LeapGlobalRawTexture, float3(uv, z)).a;
 	return float3(color, color, color);
 }
 
