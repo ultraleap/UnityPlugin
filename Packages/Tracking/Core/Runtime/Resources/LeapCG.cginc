@@ -2,6 +2,8 @@
 //uniform sampler2D _LeapGlobalRawTexture;
 UNITY_DECLARE_TEX2DARRAY(_LeapGlobalRawTexture);
 
+uniform float2 _LeapGlobalTextureSizeFactor[5];
+
 uniform sampler2D _LeapGlobalDistortion;
 
 uniform float2 _LeapGlobalRawPixelSize;
@@ -106,6 +108,10 @@ float4 LeapGetLateVertexPos(float4 vertex, int isLeft) {
 /*** LEAP RAW COLOR ***/
 
 float3 LeapGetUVRawColor(float2 uv, float z) {
+	// the textures have padding around them (to be able to use texture2DArray), 
+	// that's why we need to adjust the uv value accordingly
+	int idx = int(z);
+	uv = float2(_LeapGlobalTextureSizeFactor[idx].x * uv.x, _LeapGlobalTextureSizeFactor[idx].y * uv.y);
 	float color = UNITY_SAMPLE_TEX2DARRAY(_LeapGlobalRawTexture, float3(uv, z)).a;
 	return float3(color, color, color);
 }

@@ -23,7 +23,7 @@
 
 	  uniform float _LeapGlobalColorSpaceGamma;
 	  float _MirrorImageHorizontally;
-	  int _DeviceID;
+	  float _DeviceID;
 
 	  struct frag_in {
 		float4 position : SV_POSITION;
@@ -43,7 +43,7 @@
 		}
 
 		// set z as the index for the texture array
-		o.screenPos.z = _DeviceID;
+		o.screenPos.z = floor(_DeviceID) + 0.1;
 
 		return o;
 	  }
