@@ -181,6 +181,14 @@ namespace Leap.Unity
                             break;
                     }
                 }
+
+                // image data is sometimes too small for one frame when there are multiple image retrievers (why?)
+                // to avoid errors, don't update the texture if that is the case
+                if (_combinedTexture.GetRawTextureData().Length > data.Length)
+                {
+                    return;
+                }
+
                 _combinedTexture.LoadRawTextureData(data);
                 _combinedTexture.Apply();
 
@@ -265,7 +273,7 @@ namespace Leap.Unity
 
                 Texture2DArray globalDistortionTextures;
                 Texture temp = Shader.GetGlobalTexture(shaderName);
-                if(temp == null || temp.dimension != UnityEngine.Rendering.TextureDimension.Tex2DArray || temp.width == 1)
+                if (temp == null || temp.dimension != UnityEngine.Rendering.TextureDimension.Tex2DArray || temp.width == 1)
                 {
                     globalDistortionTextures = new Texture2DArray(_combinedTexture.width, _combinedTexture.height, 5, _combinedTexture.format, false, true);
                     globalDistortionTextures.wrapMode = TextureWrapMode.Clamp;
