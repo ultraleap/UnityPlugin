@@ -4,7 +4,8 @@ UNITY_DECLARE_TEX2DARRAY(_LeapGlobalRawTexture);
 
 uniform float2 _LeapGlobalTextureSizeFactor[5];
 
-uniform sampler2D _LeapGlobalDistortion;
+//uniform sampler2D _LeapGlobalDistortion;
+UNITY_DECLARE_TEX2DARRAY(_LeapGlobalDistortion);
 
 uniform float2 _LeapGlobalRawPixelSize;
 
@@ -60,7 +61,8 @@ float2 LeapGetUndistortedUVWithOffset(float4 screenPos, float2 uvOffset) {
 	// so apparently we won't either.
 	float2 distortionUV = saturate(0.125 * tangent + float2(0.5, 0.5))
 		* float2(1, 0.5) + uvOffset;
-	float4 distortionAmount = tex2D(_LeapGlobalDistortion, distortionUV);
+	//float4 distortionAmount = tex2D(_LeapGlobalDistortion, distortionUV);
+	float4 distortionAmount = UNITY_SAMPLE_TEX2DARRAY(_LeapGlobalDistortion, float3(distortionUV, screenPos.z));
 
 	// DecodeFloatRG decodes two 8-bit/channel RG values into a single float between [0..1).
 	// More magic number alerts: I have no idea why 2.3 - float2(0.6, 0.6)

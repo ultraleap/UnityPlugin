@@ -113,8 +113,6 @@ namespace Leap.Unity
                 int combinedWidth = image.Width;
                 int combinedHeight = image.Height * 2;
 
-                Debug.Log(combinedWidth + ", " + combinedHeight);
-
                 TextureFormat format = getTextureFormat(image);
 
                 if (_combinedTexture != null)
@@ -162,7 +160,6 @@ namespace Leap.Unity
 
             public void UpdateTexture(Image image, int deviceID, Controller controller = null)
             {
-                Debug.Log(deviceID);
                 if(deviceID > 4)
                 {
                     Debug.LogWarning("DeviceID too high: " + deviceID);
@@ -190,7 +187,7 @@ namespace Leap.Unity
                 Texture temp = Shader.GetGlobalTexture("_LeapGlobalRawTexture");
 
                 //Texture2DArray globalRawTexture;
-                if (_globalRawTextures == null || temp.dimension != UnityEngine.Rendering.TextureDimension.Tex2DArray || temp.width == 1)
+                if (temp == null || temp.dimension != UnityEngine.Rendering.TextureDimension.Tex2DArray || temp.width == 1)
                 {
                     _globalRawTextures = new Texture2DArray(_combinedTexture.width, _combinedTexture.height, 5, _combinedTexture.format, false, true);
                     _globalRawTextures.wrapMode = TextureWrapMode.Clamp;
@@ -245,7 +242,7 @@ namespace Leap.Unity
                 return _combinedTexture == null;
             }
 
-            public void Reconstruct(Image image, string shaderName)
+            public void Reconstruct(Image image, string shaderName, int deviceID)
             {
                 int combinedWidth = image.DistortionWidth / 2;
                 int combinedHeight = image.DistortionHeight * 2;
@@ -266,7 +263,23 @@ namespace Leap.Unity
                 _combinedTexture.SetPixels32(colorArray);
                 _combinedTexture.Apply();
 
-                Shader.SetGlobalTexture(shaderName, _combinedTexture);
+                Texture2DArray globalDistortionTextures;
+                Texture temp = Shader.GetGlobalTexture(shaderName);
+                if(temp == null || temp.dimension != UnityEngine.Rendering.TextureDimension.Tex2DArray || temp.width == 1)
+                {
+                    globalDistortionTextures = new Texture2DArray(_combinedTexture.width, _combinedTexture.height, 5, _combinedTexture.format, false, true);
+                    globalDistortionTextures.wrapMode = TextureWrapMode.Clamp;
+                    globalDistortionTextures.filterMode = FilterMode.Bilinear;
+                    globalDistortionTextures.hideFlags = HideFlags.DontSave;
+                }
+                else
+                {
+                    globalDistortionTextures = (Texture2DArray)temp;
+                }
+
+                Graphics.CopyTexture(_combinedTexture, 0, globalDistortionTextures, deviceID);
+
+                Shader.SetGlobalTexture(shaderName, globalDistortionTextures);
             }
 
             private void addDistortionData(Image image, Color32[] colors, int startIndex)
@@ -349,7 +362,7 @@ namespace Leap.Unity
             public void Reconstruct(Image image, int deviceID)
             {
                 TextureData.Reconstruct(image, GLOBAL_RAW_TEXTURE_NAME, GLOBAL_RAW_PIXEL_SIZE_NAME, deviceID);
-                Distortion.Reconstruct(image, GLOBAL_DISTORTION_TEXTURE_NAME);
+                Distortion.Reconstruct(image, GLOBAL_DISTORTION_TEXTURE_NAME, deviceID);
                 _isStale = false;
             }
 
@@ -421,6 +434,9 @@ namespace Leap.Unity
                 controller.FrameReady -= onFrameReady;
                 _provider.OnDeviceChanged -= OnDeviceChanged;
             }
+
+            Camera.onPreRender -= OnCameraPreRender;
+
 #if UNITY_2019_3_OR_NEWER
             //SRP require subscribing to RenderPipelineManagers
             if (UnityEngine.Rendering.GraphicsSettings.renderPipelineAsset != null)
@@ -486,6 +502,12 @@ namespace Leap.Unity
                 if (_eyeTextureData.CheckStale(_currentImage))
                 {
                     _eyeTextureData.Reconstruct(_currentImage, (int)_provider.CurrentDevice.DeviceID);
+                    // if there is a quad that renders the infrared image, set the correct deviceID on its material
+                    Renderer quadRenderer = GetComponentInChildren<Renderer>();
+                    if(quadRenderer != null)
+                    {
+                        quadRenderer.material.SetFloat("_DeviceID", _provider.CurrentDevice.DeviceID);
+                    }
                 }
 
                 _eyeTextureData.UpdateTextures(_currentImage, (int)_provider.CurrentDevice.DeviceID, _provider?.GetLeapController());
