@@ -113,6 +113,8 @@ namespace Leap.Unity
                 int combinedWidth = image.Width;
                 int combinedHeight = image.Height * 2;
 
+                Debug.Log(combinedWidth + ", " + combinedHeight);
+
                 TextureFormat format = getTextureFormat(image);
 
                 if (_combinedTexture != null)
@@ -128,12 +130,32 @@ namespace Leap.Unity
 
                 _intermediateArray = new byte[combinedWidth * combinedHeight * bytesPerPixel(format)];
 
+                Texture temp = Shader.GetGlobalTexture(globalShaderName);
+                if (temp == null || temp.dimension != UnityEngine.Rendering.TextureDimension.Tex2DArray)
+                {
+                    // rawTextureWidth and Height are a bigger than the combinedTexture width and height, 
+                    // so that all different textures (from different devices) fit into it
+                    int rawTextureWidth = 800;
+                    int rawTextureHeight = 800;
+                    _globalRawTextures = new Texture2DArray(rawTextureWidth, rawTextureHeight, 5, _combinedTexture.format, false, true);
+                    _globalRawTextures.wrapMode = TextureWrapMode.Clamp;
+                    _globalRawTextures.filterMode = FilterMode.Bilinear;
+                    _globalRawTextures.hideFlags = HideFlags.DontSave;
+                    Shader.SetGlobalTexture(globalShaderName, _globalRawTextures);
+                }
+                else
+                {
+                    _globalRawTextures = (Texture2DArray)temp;
+                }
 
-                _globalRawTextures = new Texture2DArray(_combinedTexture.width, _combinedTexture.height, 5, _combinedTexture.format, false, true);
-                _globalRawTextures.wrapMode = TextureWrapMode.Clamp;
-                _globalRawTextures.filterMode = FilterMode.Bilinear;
-                _globalRawTextures.hideFlags = HideFlags.DontSave;
-                Shader.SetGlobalTexture(globalShaderName, _globalRawTextures);
+                // set factors to multiply to uv coordinates, so that we sample from the globalRawTexture where it is actually filled with the _combinedTexture
+                Vector4[] textureSizeFactors = Shader.GetGlobalVectorArray("_LeapGlobalTextureSizeFactor");
+                if(textureSizeFactors == null)
+                {
+                    textureSizeFactors = new Vector4[5];
+                }
+                textureSizeFactors[deviceID] = new Vector4((float)_combinedTexture.width / _globalRawTextures.width, (float)_combinedTexture.height / _globalRawTextures.height, 0, 0);
+                Shader.SetGlobalVectorArray("_LeapGlobalTextureSizeFactor", textureSizeFactors);
 
                 Shader.SetGlobalVector(pixelSizeName, new Vector2(1.0f / image.Width, 1.0f / image.Height));
             }
@@ -180,7 +202,7 @@ namespace Leap.Unity
                     _globalRawTextures = (Texture2DArray)temp;
                 }
 
-                Graphics.CopyTexture(_combinedTexture, 0, _globalRawTextures, deviceID);
+                Graphics.CopyTexture(_combinedTexture, 0, 0, 0, 0, _combinedTexture.width, _combinedTexture.height, _globalRawTextures, deviceID, 0, 0, 0);
             }
 
             private TextureFormat getTextureFormat(Image image)
@@ -586,7 +608,7 @@ namespace Leap.Unity
 
         void onDistortionChange(object sender, LeapEventArgs args)
         {
-            //_eyeTextureData.MarkStale();
+            _eyeTextureData.MarkStale();
         }
     }
 }
