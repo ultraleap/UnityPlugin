@@ -109,7 +109,7 @@ namespace Leap.Unity
         /// </summary>
         public Maybe(T t)
         {
-            if (Type<T>.isValueType)
+            if (typeof(T).IsValueType)
             {
                 hasValue = true;
             }
@@ -126,7 +126,7 @@ namespace Leap.Unity
         /// </summary>
         public static Maybe<T> Some(T t)
         {
-            if (!Type<T>.isValueType && t == null)
+            if (!typeof(T).IsValueType && t == null)
             {
                 throw new ArgumentNullException("Cannot use Some with a null argument.");
             }
