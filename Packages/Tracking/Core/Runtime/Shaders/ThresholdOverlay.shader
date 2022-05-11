@@ -3,6 +3,7 @@
 	  _Min("Min Brightness", Range(0, 1)) = 0.1
 	  _Max("Max Brightness", Range(0, 1)) = 0.3
 	  _Fade("Alpha Fade", Float) = 0.5
+	  _DeviceID ("DeviceID", Range(0,5)) = 0
 	}
 
 		SubShader{
@@ -27,6 +28,8 @@
 		  #pragma vertex vert
 		  #pragma fragment frag
 
+		  float _DeviceID;
+
 		  struct frag_in {
 			float4 position : SV_POSITION;
 			float4 screenPos  : TEXCOORD1;
@@ -36,6 +39,8 @@
 			frag_in o;
 			o.position = UnityObjectToClipPos(v.vertex);
 			o.screenPos = LeapGetWarpedScreenPos(o.position);
+			// set z as the index for the texture array
+			o.screenPos.z = floor(_DeviceID) + 0.1;
 			return o;
 		  }
 
