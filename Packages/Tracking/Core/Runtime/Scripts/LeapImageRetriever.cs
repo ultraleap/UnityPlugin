@@ -509,7 +509,10 @@ namespace Leap.Unity
             {
                 if (_eyeTextureData.CheckStale(_currentImage))
                 {
+                    _needQueueReset = true;
+
                     _eyeTextureData.Reconstruct(_currentImage, (int)_provider.CurrentDevice.DeviceID);
+
                     // if there is a quad that renders the infrared image, set the correct deviceID on its material
                     Renderer quadRenderer = GetComponentInChildren<Renderer>();
                     if(quadRenderer != null)
@@ -587,7 +590,7 @@ namespace Leap.Unity
         {
             Image image = args.image;
 
-            if (!_imageQueue.TryEnqueue(image))
+            if (!_needQueueReset && !_imageQueue.TryEnqueue(image))
             {
                 Debug.LogWarning("Image buffer filled up. This is unexpected and means images are being provided faster than " +
                                  "LeapImageRetriever can consume them.  This might happen if the application has stalled " +
