@@ -1,8 +1,8 @@
-#define _LeapMaxNumberOfGlobalTextures 5
+#define MAX_NUMBER_OF_GLOBAL_TEXTURES 5
 
 UNITY_DECLARE_TEX2DARRAY(_LeapGlobalRawTexture);
 
-uniform float2 _LeapGlobalTextureSizeFactor[_LeapMaxNumberOfGlobalTextures];
+uniform float2 _LeapGlobalTextureSizeFactor[MAX_NUMBER_OF_GLOBAL_TEXTURES];
 
 UNITY_DECLARE_TEX2DARRAY(_LeapGlobalDistortion);
 

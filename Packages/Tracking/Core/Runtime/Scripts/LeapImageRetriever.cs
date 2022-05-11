@@ -31,6 +31,7 @@ namespace Leap.Unity
         public const int LEFT_IMAGE_INDEX = 0;
         public const int RIGHT_IMAGE_INDEX = 1;
         public const float IMAGE_SETTING_POLL_RATE = 2.0f;
+        public const int MAX_NUMBER_OF_GLOBAL_TEXTURES = 5;
 
         [SerializeField]
         [FormerlySerializedAs("gammaCorrection")]
@@ -104,7 +105,7 @@ namespace Leap.Unity
 
             public void Reconstruct(Image image, string globalShaderName, string pixelSizeName, int deviceID)
             {
-                if (deviceID >= Shader.GetGlobalInt("_LeapMaxNumberOfGlobalTextures"))
+                if (deviceID >= MAX_NUMBER_OF_GLOBAL_TEXTURES)
                 {
                     Debug.LogWarning("DeviceID too high: " + deviceID);
                     return;
@@ -135,7 +136,7 @@ namespace Leap.Unity
                     // so that all different textures (from different devices) fit into it
                     int rawTextureWidth = 800;
                     int rawTextureHeight = 800;
-                    _globalRawTextures = new Texture2DArray(rawTextureWidth, rawTextureHeight, Shader.GetGlobalInt("_LeapMaxNumberOfGlobalTextures"), _combinedTexture.format, false, true);
+                    _globalRawTextures = new Texture2DArray(rawTextureWidth, rawTextureHeight, MAX_NUMBER_OF_GLOBAL_TEXTURES, _combinedTexture.format, false, true);
                     _globalRawTextures.wrapMode = TextureWrapMode.Clamp;
                     _globalRawTextures.filterMode = FilterMode.Bilinear;
                     _globalRawTextures.hideFlags = HideFlags.DontSave;
@@ -150,7 +151,7 @@ namespace Leap.Unity
                 Vector4[] textureSizeFactors = Shader.GetGlobalVectorArray("_LeapGlobalTextureSizeFactor");
                 if (textureSizeFactors == null)
                 {
-                    textureSizeFactors = new Vector4[Shader.GetGlobalInt("_LeapMaxNumberOfGlobalTextures")];
+                    textureSizeFactors = new Vector4[MAX_NUMBER_OF_GLOBAL_TEXTURES];
                 }
                 textureSizeFactors[deviceID] = new Vector4((float)_combinedTexture.width / _globalRawTextures.width, (float)_combinedTexture.height / _globalRawTextures.height, 0, 0);
                 Shader.SetGlobalVectorArray("_LeapGlobalTextureSizeFactor", textureSizeFactors);
@@ -160,7 +161,7 @@ namespace Leap.Unity
 
             public void UpdateTexture(Image image, int deviceID, Controller controller = null)
             {
-                if (deviceID >= Shader.GetGlobalInt("_LeapMaxNumberOfGlobalTextures"))
+                if (deviceID >= MAX_NUMBER_OF_GLOBAL_TEXTURES)
                 {
                     Debug.LogWarning("DeviceID too high: " + deviceID);
                     return;
@@ -197,7 +198,7 @@ namespace Leap.Unity
                 //Texture2DArray globalRawTexture;
                 if (temp == null || temp.dimension != UnityEngine.Rendering.TextureDimension.Tex2DArray || temp.width == 1)
                 {
-                    _globalRawTextures = new Texture2DArray(_combinedTexture.width, _combinedTexture.height, Shader.GetGlobalInt("_LeapMaxNumberOfGlobalTextures"), _combinedTexture.format, false, true);
+                    _globalRawTextures = new Texture2DArray(_combinedTexture.width, _combinedTexture.height, MAX_NUMBER_OF_GLOBAL_TEXTURES, _combinedTexture.format, false, true);
                     _globalRawTextures.wrapMode = TextureWrapMode.Clamp;
                     _globalRawTextures.filterMode = FilterMode.Bilinear;
                     _globalRawTextures.hideFlags = HideFlags.DontSave;
@@ -275,7 +276,7 @@ namespace Leap.Unity
                 Texture temp = Shader.GetGlobalTexture(shaderName);
                 if (temp == null || temp.dimension != UnityEngine.Rendering.TextureDimension.Tex2DArray || temp.width == 1)
                 {
-                    globalDistortionTextures = new Texture2DArray(_combinedTexture.width, _combinedTexture.height, Shader.GetGlobalInt("_LeapMaxNumberOfGlobalTextures"), _combinedTexture.format, false, true);
+                    globalDistortionTextures = new Texture2DArray(_combinedTexture.width, _combinedTexture.height, MAX_NUMBER_OF_GLOBAL_TEXTURES, _combinedTexture.format, false, true);
                     globalDistortionTextures.wrapMode = TextureWrapMode.Clamp;
                     globalDistortionTextures.filterMode = FilterMode.Bilinear;
                     globalDistortionTextures.hideFlags = HideFlags.DontSave;
