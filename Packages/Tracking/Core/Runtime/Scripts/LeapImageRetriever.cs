@@ -148,7 +148,7 @@ namespace Leap.Unity
 
                 // set factors to multiply to uv coordinates, so that we sample from the globalRawTexture where it is actually filled with the _combinedTexture
                 Vector4[] textureSizeFactors = Shader.GetGlobalVectorArray("_LeapGlobalTextureSizeFactor");
-                if(textureSizeFactors == null)
+                if (textureSizeFactors == null)
                 {
                     textureSizeFactors = new Vector4[5];
                 }
@@ -160,7 +160,7 @@ namespace Leap.Unity
 
             public void UpdateTexture(Image image, int deviceID, Controller controller = null)
             {
-                if(deviceID > 4)
+                if (deviceID > 4)
                 {
                     Debug.LogWarning("DeviceID too high: " + deviceID);
                     return;
@@ -515,7 +515,7 @@ namespace Leap.Unity
 
                     // if there is a quad that renders the infrared image, set the correct deviceID on its material
                     Renderer quadRenderer = GetComponentInChildren<Renderer>();
-                    if(quadRenderer != null)
+                    if (quadRenderer != null)
                     {
                         quadRenderer.material.SetFloat("_DeviceID", _provider.CurrentDevice.DeviceID);
                     }
