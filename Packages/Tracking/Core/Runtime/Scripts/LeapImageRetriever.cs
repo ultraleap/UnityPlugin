@@ -194,19 +194,7 @@ namespace Leap.Unity
                 _combinedTexture.Apply();
 
                 Texture temp = Shader.GetGlobalTexture("_LeapGlobalRawTexture");
-
-                //Texture2DArray globalRawTexture;
-                if (temp == null || temp.dimension != UnityEngine.Rendering.TextureDimension.Tex2DArray || temp.width == 1)
-                {
-                    _globalRawTextures = new Texture2DArray(_combinedTexture.width, _combinedTexture.height, MAX_NUMBER_OF_GLOBAL_TEXTURES, _combinedTexture.format, false, true);
-                    _globalRawTextures.wrapMode = TextureWrapMode.Clamp;
-                    _globalRawTextures.filterMode = FilterMode.Bilinear;
-                    _globalRawTextures.hideFlags = HideFlags.DontSave;
-                }
-                else
-                {
-                    _globalRawTextures = (Texture2DArray)temp;
-                }
+                _globalRawTextures = (Texture2DArray)temp;
 
                 Graphics.CopyTexture(_combinedTexture, 0, 0, 0, 0, _combinedTexture.width, _combinedTexture.height, _globalRawTextures, deviceID, 0, 0, 0);
             }
