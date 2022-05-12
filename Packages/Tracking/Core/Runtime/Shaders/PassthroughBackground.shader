@@ -2,7 +2,7 @@
 	Properties
 	{
 		[Toggle] _MirrorImageHorizontally ("MirrorImageHorizontally", Float) = 0
-		_DeviceID ("DeviceID", Range(0,5)) = 0
+		_DeviceID ("DeviceID", Int) = 0
 	}
 	SubShader{
 	  Tags {"Queue" = "Background" "IgnoreProjector" = "True"}
@@ -23,7 +23,7 @@
 
 	  uniform float _LeapGlobalColorSpaceGamma;
 	  float _MirrorImageHorizontally;
-	  float _DeviceID;
+	  int _DeviceID;
 
 	  struct frag_in {
 		float4 position : SV_POSITION;
@@ -51,7 +51,7 @@
 		}
 
 		// set z as the index for the texture array
-		o.screenPos.z = floor(_DeviceID) + 0.1;
+		o.screenPos.z = _DeviceID + 0.1;
 
 		o.stereoEyeIndex = unity_StereoEyeIndex;
 

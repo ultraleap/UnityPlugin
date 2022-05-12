@@ -1,4 +1,4 @@
-#define MAX_NUMBER_OF_GLOBAL_TEXTURES 5
+#define MAX_NUMBER_OF_GLOBAL_TEXTURES 6 // note that this number should be the same as MAX_NUMBER_OF_GLOBAL_TEXTURES in LeapImageRetriever.cs
 
 UNITY_DECLARE_TEX2DARRAY(_LeapGlobalRawTexture);
 
