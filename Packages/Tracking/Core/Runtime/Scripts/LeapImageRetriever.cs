@@ -31,7 +31,7 @@ namespace Leap.Unity
         public const int LEFT_IMAGE_INDEX = 0;
         public const int RIGHT_IMAGE_INDEX = 1;
         public const float IMAGE_SETTING_POLL_RATE = 2.0f;
-        public const int MAX_NUMBER_OF_GLOBAL_TEXTURES = 5;
+        public const int MAX_NUMBER_OF_GLOBAL_TEXTURES = 6; // note that this number should be the same as MAX_NUMBER_OF_GLOBAL_TEXTURES in LeapCG.cginc
 
         [SerializeField]
         [FormerlySerializedAs("gammaCorrection")]
