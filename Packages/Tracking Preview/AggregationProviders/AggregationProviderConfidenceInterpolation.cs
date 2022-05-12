@@ -23,7 +23,7 @@ namespace Leap.Unity
     /// </summary>
     public class AggregationProviderConfidenceInterpolation : LeapAggregatedProviderBase
     {
-        // factors that get multiplied to the corresponding cofidence values to get an overall weighted confidence value
+        // factors that get multiplied to the corresponding confidence values to get an overall weighted confidence value
 
         public float palmPosFactor = 1;
         public float palmRotFactor = 1;
@@ -66,10 +66,10 @@ namespace Leap.Unity
 
 
             // make lists of all left and right hands found in each frame and also make a list of their confidences
-            for (int i = 0; i < frames.Length; i++)
+            for (int frame_idx = 0; frame_idx < frames.Length; frame_idx++)
             {
-                Frame frame = frames[i];
-                AddFrameToTimeVisibleDicts(frames, i);
+                Frame frame = frames[frame_idx];
+                AddFrameToTimeVisibleDicts(frames, frame_idx);
 
                 foreach (Hand hand in frame.Hands)
                 {
@@ -77,8 +77,8 @@ namespace Leap.Unity
                     {
                         leftHands.Add(hand);
 
-                        float handConfidence = CalculateHandConfidence(i, hand);
-                        float[] jointConfidences = CalculateJointConfidence(i, hand);
+                        float handConfidence = CalculateHandConfidence(frame_idx, hand);
+                        float[] jointConfidences = CalculateJointConfidence(frame_idx, hand);
 
                         leftHandConfidences.Add(handConfidence);
                         leftJointConfidences.Add(jointConfidences.Select(x => x * handConfidence).ToArray());
@@ -88,8 +88,8 @@ namespace Leap.Unity
                     {
                         rightHands.Add(hand);
 
-                        float handConfidence = CalculateHandConfidence(i, hand);
-                        float[] jointConfidences = CalculateJointConfidence(i, hand);
+                        float handConfidence = CalculateHandConfidence(frame_idx, hand);
+                        float[] jointConfidences = CalculateJointConfidence(frame_idx, hand);
 
                         rightHandConfidences.Add(handConfidence);
                         rightJointConfidences.Add(jointConfidences.Select(x => x * handConfidence).ToArray());
@@ -102,52 +102,52 @@ namespace Leap.Unity
             float sum = leftHandConfidences.Sum();
             if (sum != 0)
             {
-                for (int i = 0; i < leftHandConfidences.Count; i++)
+                for (int hands_idx = 0; hands_idx < leftHandConfidences.Count; hands_idx++)
                 {
-                    leftHandConfidences[i] /= sum;
+                    leftHandConfidences[hands_idx] /= sum;
                 }
             }
             sum = rightHandConfidences.Sum();
             if (sum != 0)
             {
-                for (int i = 0; i < rightHandConfidences.Count; i++)
+                for (int hands_idx = 0; hands_idx < rightHandConfidences.Count; hands_idx++)
                 {
-                    rightHandConfidences[i] /= sum;
+                    rightHandConfidences[hands_idx] /= sum;
                 }
             }
 
             // normalize joint confidences:
-            for (int i = 0; i < VectorHand.NUM_JOINT_POSITIONS; i++)
+            for (int joint_idx = 0; joint_idx < VectorHand.NUM_JOINT_POSITIONS; joint_idx++)
             {
-                sum = leftJointConfidences.Sum(x => x[i]);
+                sum = leftJointConfidences.Sum(x => x[joint_idx]);
                 if (sum != 0)
                 {
-                    for (int j = 0; j < leftJointConfidences.Count; j++)
+                    for (int hands_idx = 0; hands_idx < leftJointConfidences.Count; hands_idx++)
                     {
-                        leftJointConfidences[j][i] /= sum;
+                        leftJointConfidences[hands_idx][joint_idx] /= sum;
                     }
                 }
                 else
                 {
-                    for (int j = 0; j < leftJointConfidences.Count; j++)
+                    for (int hands_idx = 0; hands_idx < leftJointConfidences.Count; hands_idx++)
                     {
-                        leftJointConfidences[j][i] = 1f / leftJointConfidences.Count;
+                        leftJointConfidences[hands_idx][joint_idx] = 1f / leftJointConfidences.Count;
                     }
                 }
 
-                sum = rightJointConfidences.Sum(x => x[i]);
+                sum = rightJointConfidences.Sum(x => x[joint_idx]);
                 if (sum != 0)
                 {
-                    for (int j = 0; j < rightJointConfidences.Count; j++)
+                    for (int hands_idx = 0; hands_idx < rightJointConfidences.Count; hands_idx++)
                     {
-                        rightJointConfidences[j][i] /= sum;
+                        rightJointConfidences[hands_idx][joint_idx] /= sum;
                     }
                 }
                 else
                 {
-                    for (int j = 0; j < rightJointConfidences.Count; j++)
+                    for (int hands_idx = 0; hands_idx < rightJointConfidences.Count; hands_idx++)
                     {
-                        rightJointConfidences[j][i] = 1f / rightJointConfidences.Count;
+                        rightJointConfidences[hands_idx][joint_idx] = 1f / rightJointConfidences.Count;
                     }
                 }
             }
@@ -184,14 +184,14 @@ namespace Leap.Unity
             Vector3 mergedPalmPos = hands[0].PalmPosition.ToVector3() * handConfidences[0];
             Quaternion mergedPalmRot = hands[0].Rotation.ToQuaternion();
 
-            for (int i = 1; i < hands.Count; i++)
+            for (int hands_idx = 1; hands_idx < hands.Count; hands_idx++)
             {
                 // position
-                mergedPalmPos += hands[i].PalmPosition.ToVector3() * handConfidences[i];
+                mergedPalmPos += hands[hands_idx].PalmPosition.ToVector3() * handConfidences[hands_idx];
 
                 // rotation
-                float lerpValue = handConfidences.Take(i).Sum() / handConfidences.Take(i + 1).Sum();
-                mergedPalmRot = Quaternion.Lerp(hands[i].Rotation.ToQuaternion(), mergedPalmRot, lerpValue);
+                float lerpValue = handConfidences.Take(hands_idx).Sum() / handConfidences.Take(hands_idx + 1).Sum();
+                mergedPalmRot = Quaternion.Lerp(hands[hands_idx].Rotation.ToQuaternion(), mergedPalmRot, lerpValue);
             }
 
             // joints
@@ -253,10 +253,10 @@ namespace Leap.Unity
             confidences_jointRot = Confidence_RelativeJointRot(confidences_jointRot, providers[frame_idx].transform, hand);
             confidences_jointPalmRot = Confidence_relativeJointRotToPalmRot(confidences_jointPalmRot, providers[frame_idx].transform, hand);
 
-            for (int i = 0; i < jointConfidences.Length; i++)
+            for (int joint_idx = 0; joint_idx < jointConfidences.Length; joint_idx++)
             {
-                jointConfidences[i] = jointRotFactor * confidences_jointRot[i] +
-                                 jointRotToPalmFactor * confidences_jointPalmRot[i];
+                jointConfidences[joint_idx] = jointRotFactor * confidences_jointRot[joint_idx] +
+                                 jointRotToPalmFactor * confidences_jointPalmRot[joint_idx];
             }
 
             return jointConfidences;
@@ -434,14 +434,14 @@ namespace Leap.Unity
 
             foreach (var finger in hand.Fingers)
             {
-                for (int j = 0; j < 4; j++)
+                for (int bone_idx = 0; bone_idx < 4; bone_idx++)
                 {
-                    int key = (int)finger.Type * 4 + j;
+                    int key = (int)finger.Type * 4 + bone_idx;
 
-                    Vector3 jointPos = finger.Bone((Bone.BoneType)j).NextJoint.ToVector3();
+                    Vector3 jointPos = finger.Bone((Bone.BoneType)bone_idx).NextJoint.ToVector3();
                     Vector3 jointNormalVector = new Vector3();
-                    if ((int)finger.Type == 0) jointNormalVector = finger.Bone((Bone.BoneType)j).Rotation.ToQuaternion() * Vector3.right;
-                    else jointNormalVector = finger.Bone((Bone.BoneType)j).Rotation.ToQuaternion() * Vector3.up * -1;
+                    if ((int)finger.Type == 0) jointNormalVector = finger.Bone((Bone.BoneType)bone_idx).Rotation.ToQuaternion() * Vector3.right;
+                    else jointNormalVector = finger.Bone((Bone.BoneType)bone_idx).Rotation.ToQuaternion() * Vector3.up * -1;
 
                     float angle = Vector3.Angle(jointPos - deviceOrigin.position, jointNormalVector);
 
@@ -470,13 +470,13 @@ namespace Leap.Unity
 
             foreach (var finger in hand.Fingers)
             {
-                for (int j = 0; j < 4; j++)
+                for (int bone_idx = 0; bone_idx < 4; bone_idx++)
                 {
-                    int key = (int)finger.Type * 4 + j;
+                    int key = (int)finger.Type * 4 + bone_idx;
 
-                    Vector3 jointPos = finger.Bone((Bone.BoneType)j).NextJoint.ToVector3();
+                    Vector3 jointPos = finger.Bone((Bone.BoneType)bone_idx).NextJoint.ToVector3();
                     Vector3 jointNormalVector = new Vector3();
-                    jointNormalVector = finger.Bone((Bone.BoneType)j).Rotation.ToQuaternion() * Vector3.up * -1;
+                    jointNormalVector = finger.Bone((Bone.BoneType)bone_idx).Rotation.ToQuaternion() * Vector3.up * -1;
 
                     float angle = Vector3.Angle(hand.PalmNormal.ToVector3(), jointNormalVector);
 
@@ -617,14 +617,14 @@ namespace Leap.Unity
 
             Color[] colors = hand.SphereColors;
 
-            for (int i = 0; i < jointConfidences[0].Length; i++)
+            for (int joint_idx = 0; joint_idx < jointConfidences[0].Length; joint_idx++)
             {
-                colors[i] = debugColors[0];
+                colors[joint_idx] = debugColors[0];
 
-                for (int j = 1; j < jointConfidences.Count; j++)
+                for (int hand_idx = 1; hand_idx < jointConfidences.Count; hand_idx++)
                 {
-                    float lerpValue = jointConfidences.Take(j).Sum(x => x[i]) / jointConfidences.Take(j + 1).Sum(x => x[i]);
-                    colors[i] = Color.Lerp(debugColors[j], colors[i], lerpValue);
+                    float lerpValue = jointConfidences.Take(hand_idx).Sum(x => x[joint_idx]) / jointConfidences.Take(hand_idx + 1).Sum(x => x[joint_idx]);
+                    colors[joint_idx] = Color.Lerp(debugColors[hand_idx], colors[joint_idx], lerpValue);
                 }
             }
             hand.SphereColors = colors;
