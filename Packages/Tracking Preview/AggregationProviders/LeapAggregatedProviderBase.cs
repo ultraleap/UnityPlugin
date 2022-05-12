@@ -208,6 +208,8 @@ namespace Leap.Unity
         /// </summary>
         private bool detectCircularProviderReference(LeapAggregatedProviderBase currentProvider, List<LeapAggregatedProviderBase> seenProviders)
         {
+            if (currentProvider.providers == null) return false;
+
             if (seenProviders.Contains(currentProvider)) return true;
 
             foreach (LeapProvider provider in currentProvider.providers)
