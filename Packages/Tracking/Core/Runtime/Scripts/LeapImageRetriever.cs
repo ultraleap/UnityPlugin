@@ -31,6 +31,7 @@ namespace Leap.Unity
         public const int LEFT_IMAGE_INDEX = 0;
         public const int RIGHT_IMAGE_INDEX = 1;
         public const float IMAGE_SETTING_POLL_RATE = 2.0f;
+        public const int MAX_NUMBER_OF_GLOBAL_TEXTURES = 6; // note that this number should be the same as MAX_NUMBER_OF_GLOBAL_TEXTURES in LeapCG.cginc
 
         [SerializeField]
         [FormerlySerializedAs("gammaCorrection")]
@@ -64,6 +65,7 @@ namespace Leap.Unity
 
         public class LeapTextureData
         {
+            private Texture2DArray _globalRawTextures = null;
             private Texture2D _combinedTexture = null;
             private byte[] _intermediateArray = null;
 
@@ -101,8 +103,14 @@ namespace Leap.Unity
                 return false;
             }
 
-            public void Reconstruct(Image image, string globalShaderName, string pixelSizeName)
+            public void Reconstruct(Image image, string globalShaderName, string pixelSizeName, int deviceID)
             {
+                if (deviceID >= MAX_NUMBER_OF_GLOBAL_TEXTURES)
+                {
+                    Debug.LogWarning("DeviceID too high: " + deviceID);
+                    return;
+                }
+
                 int combinedWidth = image.Width;
                 int combinedHeight = image.Height * 2;
 
@@ -121,12 +129,44 @@ namespace Leap.Unity
 
                 _intermediateArray = new byte[combinedWidth * combinedHeight * bytesPerPixel(format)];
 
-                Shader.SetGlobalTexture(globalShaderName, _combinedTexture);
+                Texture temp = Shader.GetGlobalTexture(globalShaderName);
+                if (temp == null || temp.dimension != UnityEngine.Rendering.TextureDimension.Tex2DArray)
+                {
+                    // rawTextureWidth and Height are a bigger than the combinedTexture width and height, 
+                    // so that all different textures (from different devices) fit into it
+                    int rawTextureWidth = 800;
+                    int rawTextureHeight = 800;
+                    _globalRawTextures = new Texture2DArray(rawTextureWidth, rawTextureHeight, MAX_NUMBER_OF_GLOBAL_TEXTURES, _combinedTexture.format, false, true);
+                    _globalRawTextures.wrapMode = TextureWrapMode.Clamp;
+                    _globalRawTextures.filterMode = FilterMode.Bilinear;
+                    _globalRawTextures.hideFlags = HideFlags.DontSave;
+                    Shader.SetGlobalTexture(globalShaderName, _globalRawTextures);
+                }
+                else
+                {
+                    _globalRawTextures = (Texture2DArray)temp;
+                }
+
+                // set factors to multiply to uv coordinates, so that we sample from the globalRawTexture where it is actually filled with the _combinedTexture
+                Vector4[] textureSizeFactors = Shader.GetGlobalVectorArray("_LeapGlobalTextureSizeFactor");
+                if (textureSizeFactors == null)
+                {
+                    textureSizeFactors = new Vector4[MAX_NUMBER_OF_GLOBAL_TEXTURES];
+                }
+                textureSizeFactors[deviceID] = new Vector4((float)_combinedTexture.width / _globalRawTextures.width, (float)_combinedTexture.height / _globalRawTextures.height, 0, 0);
+                Shader.SetGlobalVectorArray("_LeapGlobalTextureSizeFactor", textureSizeFactors);
+
                 Shader.SetGlobalVector(pixelSizeName, new Vector2(1.0f / image.Width, 1.0f / image.Height));
             }
 
-            public void UpdateTexture(Image image, Controller controller = null)
+            public void UpdateTexture(Image image, int deviceID, Controller controller = null)
             {
+                if (deviceID >= MAX_NUMBER_OF_GLOBAL_TEXTURES)
+                {
+                    Debug.LogWarning("DeviceID too high: " + deviceID);
+                    return;
+                }
+
                 byte[] data = image.Data(Image.CameraType.LEFT);
                 if (_hideLeapDebugInfo && controller != null)
                 {
@@ -142,8 +182,21 @@ namespace Leap.Unity
                             break;
                     }
                 }
+
+                // image data is sometimes too small for one frame when there are multiple image retrievers (why?)
+                // to avoid errors, don't update the texture if that is the case
+                if (_combinedTexture.GetRawTextureData().Length > data.Length)
+                {
+                    return;
+                }
+
                 _combinedTexture.LoadRawTextureData(data);
                 _combinedTexture.Apply();
+
+                Texture temp = Shader.GetGlobalTexture("_LeapGlobalRawTexture");
+                _globalRawTextures = (Texture2DArray)temp;
+
+                Graphics.CopyTexture(_combinedTexture, 0, 0, 0, 0, _combinedTexture.width, _combinedTexture.height, _globalRawTextures, deviceID, 0, 0, 0);
             }
 
             private TextureFormat getTextureFormat(Image image)
@@ -186,7 +239,7 @@ namespace Leap.Unity
                 return _combinedTexture == null;
             }
 
-            public void Reconstruct(Image image, string shaderName)
+            public void Reconstruct(Image image, string shaderName, int deviceID)
             {
                 int combinedWidth = image.DistortionWidth / 2;
                 int combinedHeight = image.DistortionHeight * 2;
@@ -207,7 +260,23 @@ namespace Leap.Unity
                 _combinedTexture.SetPixels32(colorArray);
                 _combinedTexture.Apply();
 
-                Shader.SetGlobalTexture(shaderName, _combinedTexture);
+                Texture2DArray globalDistortionTextures;
+                Texture temp = Shader.GetGlobalTexture(shaderName);
+                if (temp == null || temp.dimension != UnityEngine.Rendering.TextureDimension.Tex2DArray || temp.width == 1)
+                {
+                    globalDistortionTextures = new Texture2DArray(_combinedTexture.width, _combinedTexture.height, MAX_NUMBER_OF_GLOBAL_TEXTURES, _combinedTexture.format, false, true);
+                    globalDistortionTextures.wrapMode = TextureWrapMode.Clamp;
+                    globalDistortionTextures.filterMode = FilterMode.Bilinear;
+                    globalDistortionTextures.hideFlags = HideFlags.DontSave;
+                }
+                else
+                {
+                    globalDistortionTextures = (Texture2DArray)temp;
+                }
+
+                Graphics.CopyTexture(_combinedTexture, 0, globalDistortionTextures, deviceID);
+
+                Shader.SetGlobalTexture(shaderName, globalDistortionTextures);
             }
 
             private void addDistortionData(Image image, Color32[] colors, int startIndex)
@@ -287,16 +356,16 @@ namespace Leap.Unity
                 _isStale = true;
             }
 
-            public void Reconstruct(Image image)
+            public void Reconstruct(Image image, int deviceID)
             {
-                TextureData.Reconstruct(image, GLOBAL_RAW_TEXTURE_NAME, GLOBAL_RAW_PIXEL_SIZE_NAME);
-                Distortion.Reconstruct(image, GLOBAL_DISTORTION_TEXTURE_NAME);
+                TextureData.Reconstruct(image, GLOBAL_RAW_TEXTURE_NAME, GLOBAL_RAW_PIXEL_SIZE_NAME, deviceID);
+                Distortion.Reconstruct(image, GLOBAL_DISTORTION_TEXTURE_NAME, deviceID);
                 _isStale = false;
             }
 
-            public void UpdateTextures(Image image, Controller controller = null)
+            public void UpdateTextures(Image image, int deviceID, Controller controller = null)
             {
-                TextureData.UpdateTexture(image, controller);
+                TextureData.UpdateTexture(image, deviceID, controller);
             }
         }
 
@@ -362,6 +431,9 @@ namespace Leap.Unity
                 controller.FrameReady -= onFrameReady;
                 _provider.OnDeviceChanged -= OnDeviceChanged;
             }
+
+            Camera.onPreRender -= OnCameraPreRender;
+
 #if UNITY_2019_3_OR_NEWER
             //SRP require subscribing to RenderPipelineManagers
             if (UnityEngine.Rendering.GraphicsSettings.renderPipelineAsset != null)
@@ -426,10 +498,19 @@ namespace Leap.Unity
             {
                 if (_eyeTextureData.CheckStale(_currentImage))
                 {
-                    _eyeTextureData.Reconstruct(_currentImage);
+                    _needQueueReset = true;
+
+                    _eyeTextureData.Reconstruct(_currentImage, (int)_provider.CurrentDevice.DeviceID);
+
+                    // if there is a quad that renders the infrared image, set the correct deviceID on its material
+                    Renderer quadRenderer = GetComponentInChildren<Renderer>();
+                    if (quadRenderer != null)
+                    {
+                        quadRenderer.material.SetFloat("_DeviceID", _provider.CurrentDevice.DeviceID);
+                    }
                 }
 
-                _eyeTextureData.UpdateTextures(_currentImage, _provider?.GetLeapController());
+                _eyeTextureData.UpdateTextures(_currentImage, (int)_provider.CurrentDevice.DeviceID, _provider?.GetLeapController());
             }
         }
 
@@ -498,7 +579,7 @@ namespace Leap.Unity
         {
             Image image = args.image;
 
-            if (!_imageQueue.TryEnqueue(image))
+            if (!_needQueueReset && !_imageQueue.TryEnqueue(image))
             {
                 Debug.LogWarning("Image buffer filled up. This is unexpected and means images are being provided faster than " +
                                  "LeapImageRetriever can consume them.  This might happen if the application has stalled " +
