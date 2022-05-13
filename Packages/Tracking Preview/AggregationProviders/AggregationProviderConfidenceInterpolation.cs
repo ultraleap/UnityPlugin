@@ -54,6 +54,12 @@ namespace Leap.Unity
         private float[] jointConfidences = new float[VectorHand.NUM_JOINT_POSITIONS];
         private float[] confidences_jointRot = new float[VectorHand.NUM_JOINT_POSITIONS];
         private float[] confidences_jointPalmRot = new float[VectorHand.NUM_JOINT_POSITIONS];
+        private float[] confidences_jointOcclusion = new float[VectorHand.NUM_JOINT_POSITIONS];
+
+        Dictionary<LeapProvider, JointConfidenceHistory> jointConfidenceHistoriesLeft = new Dictionary<LeapProvider, JointConfidenceHistory>();
+        Dictionary<LeapProvider, JointConfidenceHistory> jointConfidenceHistoriesRight = new Dictionary<LeapProvider, JointConfidenceHistory>();
+
+
 
 
         protected override Frame MergeFrames(Frame[] frames)
@@ -84,7 +90,8 @@ namespace Leap.Unity
                         float[] jointConfidences = CalculateJointConfidence(frame_idx, hand);
 
                         leftHandConfidences.Add(handConfidence);
-                        leftJointConfidences.Add(jointConfidences.Select(x => x * handConfidence).ToArray());
+                        leftJointConfidences.Add(jointConfidences);
+                        //leftJointConfidences.Add(jointConfidences.Select(x => x * handConfidence).ToArray());
                     }
 
                     else
@@ -95,7 +102,8 @@ namespace Leap.Unity
                         float[] jointConfidences = CalculateJointConfidence(frame_idx, hand);
 
                         rightHandConfidences.Add(handConfidence);
-                        rightJointConfidences.Add(jointConfidences.Select(x => x * handConfidence).ToArray());
+                        rightJointConfidences.Add(jointConfidences);
+                        //rightJointConfidences.Add(jointConfidences.Select(x => x * handConfidence).ToArray());
                     }
                 }
             }
@@ -255,17 +263,52 @@ namespace Leap.Unity
 
             confidences_jointRot = Confidence_RelativeJointRot(confidences_jointRot, providers[frame_idx].transform, hand);
             confidences_jointPalmRot = Confidence_relativeJointRotToPalmRot(confidences_jointPalmRot, providers[frame_idx].transform, hand);
-            float[] confidences_jointOcclusion = new float[VectorHand.NUM_JOINT_POSITIONS];
-
             confidences_jointOcclusion = jointOcclusions[frame_idx].Confidence_JointOcclusion(confidences_jointOcclusion, providers[frame_idx].transform, hand);
 
             for (int joint_idx = 0; joint_idx < jointConfidences.Length; joint_idx++)
             {
-                // add up weighted confidences and multiply confidence of last bone for fingers as well
+                // add up weighted confidences and add weighted confidence of last bone for fingers as well
                 jointConfidences[joint_idx] = 
                     jointRotFactor * confidences_jointRot[joint_idx] +
                                  jointRotToPalmFactor * confidences_jointPalmRot[joint_idx] +
                                  jointOcclusionFactor * confidences_jointOcclusion[joint_idx];
+            }
+
+            for (int finger_idx = 0; finger_idx < 5; finger_idx++)
+            {
+                for (int bone_idx = 0; bone_idx < 5; bone_idx++)
+                {
+                    int key = finger_idx * 5 + bone_idx;
+                    jointConfidences[key] =
+                    jointRotFactor * confidences_jointRot[key] +
+                                 jointRotToPalmFactor * confidences_jointPalmRot[key] +
+                                 jointOcclusionFactor * confidences_jointOcclusion[key];
+
+                    if(bone_idx != 0)
+                    {
+                        jointConfidences[key] += jointConfidences[key - 1];
+                    }
+                }
+            }
+
+            // average out new joint confidence with that of the last few frames
+            if (hand.IsLeft)
+            {
+                if (!jointConfidenceHistoriesLeft.ContainsKey(providers[frame_idx]))
+                {
+                    jointConfidenceHistoriesLeft.Add(providers[frame_idx], new JointConfidenceHistory());
+                }
+                jointConfidenceHistoriesLeft[providers[frame_idx]].AddConfidences(jointConfidences);
+                jointConfidences = jointConfidenceHistoriesLeft[providers[frame_idx]].GetAveragedConfidences();
+            }
+            else
+            {
+                if (!jointConfidenceHistoriesRight.ContainsKey(providers[frame_idx]))
+                {
+                    jointConfidenceHistoriesRight.Add(providers[frame_idx], new JointConfidenceHistory());
+                }
+                jointConfidenceHistoriesRight[providers[frame_idx]].AddConfidences(jointConfidences);
+                jointConfidences = jointConfidenceHistoriesRight[providers[frame_idx]].GetAveragedConfidences();
             }
 
             return jointConfidences;
@@ -613,6 +656,70 @@ namespace Leap.Unity
             if (!handsVisible[1])
             {
                 rightHandFirstVisible[providers[frameIdx]] = 0;
+            }
+        }
+
+
+        // small helper class to save previous joint confidences and average over them
+        class JointConfidenceHistory
+        {
+            int length;
+            float[,] jointConfidences;
+            float[] averageConfidences;
+            int index;
+            List<int> validIndices;
+
+            public JointConfidenceHistory(int length = 60)
+            {
+                this.length = length;
+                this.jointConfidences = new float[length, VectorHand.NUM_JOINT_POSITIONS];
+                this.index = 0;
+                validIndices = new List<int>();
+            }
+
+            public void ClearAll()
+            {
+                validIndices = new List<int>();
+            }
+
+            public void AddConfidences(float[] confidences)
+            {
+                for (int joint_idx = 0; joint_idx < confidences.Length; joint_idx++)
+                {
+                    jointConfidences[index, joint_idx] = confidences[joint_idx];
+                }
+                if (validIndices.IndexOf(index) == -1)
+                {
+                    validIndices.Add(index);
+                }
+                index = (index + 1) % length;
+            }
+
+            public float[] GetAveragedConfidences()
+            {
+                if (validIndices.Count == 0)
+                {
+                    return null;
+                }
+
+                if (averageConfidences == null)
+                {
+                    averageConfidences = new float[jointConfidences.GetLength(1)];
+                }
+                else
+                {
+                    averageConfidences.ClearWith(0);
+                }
+
+                for (int i = 0; i < averageConfidences.Length; i++) 
+                {
+                    foreach (int j in validIndices)
+                    {
+                        averageConfidences[i] += jointConfidences[j,i] / validIndices.Count;
+                    }
+                }
+
+                return averageConfidences;
             }
         }
 
