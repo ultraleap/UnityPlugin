@@ -27,9 +27,19 @@ public class VisualizeJointConfidence : MonoBehaviour
 
         float[] confidences = aggregationProvider.CalculateJointConfidence(provider_idx, hand.GetLeapHand());
 
-        for (int i = 0; i < confidences.Length; i++)
+        //for (int i = 0; i < confidences.Length; i++)
+        //{
+        //    colors[i] = Color.Lerp(Color.black, colors[i], confidences[i]);
+        //}
+        for (int i = 0; i < 5; i++)
         {
-            colors[i] = Color.Lerp(Color.black, colors[i], confidences[i]);
+            for (int j = 0; j < 4; j++)
+            {
+                int key = i * 5 + j + 1;
+                int capsuleHandKey = i * 4 + j;
+
+                colors[capsuleHandKey] = Color.Lerp(Color.black, colors[key], confidences[key]);
+            }
         }
 
         hand.SphereColors = colors;
