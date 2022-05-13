@@ -23,6 +23,8 @@ namespace Leap.Unity
     /// </summary>
     public class AggregationProviderConfidenceInterpolation : LeapAggregatedProviderBase
     {
+        public List<JointOcclusion> jointOcclusions;
+
         // factors that get multiplied to the corresponding confidence values to get an overall weighted confidence value
 
         public float palmPosFactor = 1;
@@ -32,6 +34,7 @@ namespace Leap.Unity
 
         public float jointRotFactor = 1;
         public float jointRotToPalmFactor = 1;
+        public float jointOcclusionFactor = 1;
 
         // if the debug hands are not null, their joint colors are given by interpolating between the debugColors based on joint confidences
         public CapsuleHand debugHandLeft;
@@ -252,11 +255,17 @@ namespace Leap.Unity
 
             confidences_jointRot = Confidence_RelativeJointRot(confidences_jointRot, providers[frame_idx].transform, hand);
             confidences_jointPalmRot = Confidence_relativeJointRotToPalmRot(confidences_jointPalmRot, providers[frame_idx].transform, hand);
+            float[] confidences_jointOcclusion = new float[VectorHand.NUM_JOINT_POSITIONS];
+
+            confidences_jointOcclusion = jointOcclusions[frame_idx].Confidence_JointOcclusion(confidences_jointOcclusion, providers[frame_idx].transform, hand);
 
             for (int joint_idx = 0; joint_idx < jointConfidences.Length; joint_idx++)
             {
-                jointConfidences[joint_idx] = jointRotFactor * confidences_jointRot[joint_idx] +
-                                 jointRotToPalmFactor * confidences_jointPalmRot[joint_idx];
+                // add up weighted confidences and multiply confidence of last bone for fingers as well
+                jointConfidences[joint_idx] = 
+                    jointRotFactor * confidences_jointRot[joint_idx] +
+                                 jointRotToPalmFactor * confidences_jointPalmRot[joint_idx] +
+                                 jointOcclusionFactor * confidences_jointOcclusion[joint_idx];
             }
 
             return jointConfidences;
@@ -617,16 +626,23 @@ namespace Leap.Unity
 
             Color[] colors = hand.SphereColors;
 
-            for (int joint_idx = 0; joint_idx < jointConfidences[0].Length; joint_idx++)
+            for (int finger_idx = 0; finger_idx < 5; finger_idx++)
             {
-                colors[joint_idx] = debugColors[0];
-
-                for (int hand_idx = 1; hand_idx < jointConfidences.Count; hand_idx++)
+                for (int bone_idx = 0; bone_idx < 4; finger_idx++)
                 {
-                    float lerpValue = jointConfidences.Take(hand_idx).Sum(x => x[joint_idx]) / jointConfidences.Take(hand_idx + 1).Sum(x => x[joint_idx]);
-                    colors[joint_idx] = Color.Lerp(debugColors[hand_idx], colors[joint_idx], lerpValue);
+                    int confidence_idx = finger_idx * 5 + bone_idx + 1;
+                    int capsuleHand_idx = finger_idx * 4 + bone_idx;
+
+                    colors[capsuleHand_idx] = debugColors[0];
+
+                    for (int hand_idx = 1; hand_idx < jointConfidences.Count; hand_idx++)
+                    {
+                        float lerpValue = jointConfidences.Take(hand_idx).Sum(x => x[confidence_idx]) / jointConfidences.Take(hand_idx + 1).Sum(x => x[confidence_idx]);
+                        colors[capsuleHand_idx] = Color.Lerp(debugColors[hand_idx], colors[capsuleHand_idx], lerpValue);
+                    }
                 }
             }
+            
             hand.SphereColors = colors;
             hand.SetIndividualSphereColors = true;
         }
