@@ -22,13 +22,17 @@ public class JointOcclusion : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        List<JointOcclusion> allJointOcclusions = FindObjectsOfType<JointOcclusion>().ToList();
+        string layerName = "JointOcclusion" + allJointOcclusions.IndexOf(this).ToString();
+
         camera = GetComponent<Camera>();
         camera.SetReplacementShader(replacementShader, "RenderType");
-        camera.cullingMask = LayerMask.GetMask("JointOcclusion");
+        camera.cullingMask = LayerMask.GetMask(layerName);
 
         tex = new Texture2D(camera.targetTexture.width, camera.targetTexture.height);
         regionToReadFrom = new Rect(0, 0, camera.targetTexture.width, camera.targetTexture.height);
 
+        occlusionHand.gameObject.layer = LayerMask.NameToLayer(layerName);
         occlusionHand.SetIndividualSphereColors = true;
 
         occlusionSphereColors = occlusionHand.SphereColors;
