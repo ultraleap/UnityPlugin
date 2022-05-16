@@ -76,7 +76,7 @@ namespace Leap.Unity
             List<float[]> leftJointConfidences = new List<float[]>();
             List<float[]> rightJointConfidences = new List<float[]>();
 
-            if(jointOcclusionFactor != 0 && jointOcclusions == null)
+            if (jointOcclusionFactor != 0 && jointOcclusions == null)
             {
                 jointOcclusions = new List<JointOcclusion>();
                 foreach (LeapProvider provider in providers)
@@ -87,7 +87,7 @@ namespace Leap.Unity
                     {
                         jointOcclusion = GameObject.Instantiate(Resources.Load<GameObject>("JointOcclusionPrefab"), provider.transform).GetComponent<JointOcclusion>();
 
-                        foreach(CapsuleHand jointOcclusionHand in jointOcclusion.GetComponentsInChildren<CapsuleHand>(true))
+                        foreach (CapsuleHand jointOcclusionHand in jointOcclusion.GetComponentsInChildren<CapsuleHand>(true))
                         {
                             jointOcclusionHand.leapProvider = provider;
                         }
@@ -332,7 +332,7 @@ namespace Leap.Unity
                                  jointRotToPalmFactor * confidences_jointPalmRot[key] +
                                  jointOcclusionFactor * confidences_jointOcclusion[key];
 
-                    if(bone_idx != 0)
+                    if (bone_idx != 0)
                     {
                         // average with the confidence from the last joint on the same finger,
                         // so that outer joints jump around less. 
@@ -764,11 +764,11 @@ namespace Leap.Unity
                     averageConfidences.ClearWith(0);
                 }
 
-                for (int i = 0; i < averageConfidences.Length; i++) 
+                for (int i = 0; i < averageConfidences.Length; i++)
                 {
                     foreach (int j in validIndices)
                     {
-                        averageConfidences[i] += jointConfidences[j,i] / validIndices.Count;
+                        averageConfidences[i] += jointConfidences[j, i] / validIndices.Count;
                     }
                 }
 
@@ -802,7 +802,7 @@ namespace Leap.Unity
             public void AddConfidence(float confidence)
             {
                 handConfidences[index] = confidence;
-                
+
                 if (validIndices.IndexOf(index) == -1)
                 {
                     validIndices.Add(index);
@@ -853,7 +853,7 @@ namespace Leap.Unity
                     }
                 }
             }
-            
+
             hand.SphereColors = colors;
             hand.SetIndividualSphereColors = true;
         }

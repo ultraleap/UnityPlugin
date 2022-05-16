@@ -1,10 +1,10 @@
+using Leap;
+using Leap.Unity;
+using Leap.Unity.Encoding;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
-using Leap.Unity;
 using System.Linq;
-using Leap;
-using Leap.Unity.Encoding;
+using UnityEngine;
 
 public class JointOcclusion : MonoBehaviour
 {
@@ -138,7 +138,7 @@ public class JointOcclusion : MonoBehaviour
                 int key = (int)finger.Type * 5 + j + 1;
                 int capsuleHandKey = (int)finger.Type * 4 + j;
 
-                
+
                 float jointRadius = 0.008f;
 
                 // get the joint position from the given hand and use it to calculate the screen position of the joint's center and 
@@ -174,7 +174,7 @@ public class JointOcclusion : MonoBehaviour
         }
 
 
-        for(int i = 0; i < confidences.Length; i++)
+        for (int i = 0; i < confidences.Length; i++)
         {
             if (optimalPixelsCount[i] != 0)
             {
