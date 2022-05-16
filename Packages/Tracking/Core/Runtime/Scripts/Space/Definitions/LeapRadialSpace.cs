@@ -36,13 +36,6 @@ namespace Leap.Unity.Space
             }
         }
 
-        public override Hash GetSettingHash()
-        {
-            return new Hash() {
-        _radius
-      };
-        }
-
         protected sealed override void UpdateTransformer(ITransformer transformer, ITransformer parent)
         {
             Vector3 anchorRectPos = transform.InverseTransformPoint(transformer.anchor.transform.position);

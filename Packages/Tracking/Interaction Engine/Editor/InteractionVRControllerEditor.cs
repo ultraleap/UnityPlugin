@@ -6,10 +6,10 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Leap.Unity.Query;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
@@ -30,8 +30,7 @@ namespace Leap.Unity.Interaction
             base.OnEnable();
 
             //_vrController = (target as InteractionVRController);
-            _vrControllers = targets.Query()
-                                    .Where(c => c is InteractionXRController)
+            _vrControllers = targets.Where(c => c is InteractionXRController)
                                     .Cast<InteractionXRController>()
                                     .ToList();
             _pluralPossibleControllers = _vrControllers.Count > 1;
@@ -42,8 +41,7 @@ namespace Leap.Unity.Interaction
         private void drawGraspButtonAxisDecorator(SerializedProperty property)
         {
             // Whether the axis is overriden.
-            int numGraspAxisOverrides = _vrControllers.Query()
-                                                      .Where(c => c.graspAxisOverride != null)
+            int numGraspAxisOverrides = _vrControllers.Where(c => c.graspAxisOverride != null)
                                                       .Count();
             bool anyGraspAxisOverrides = numGraspAxisOverrides > 0;
 
@@ -66,8 +64,7 @@ namespace Leap.Unity.Interaction
             }
 
             // Whether the axis is valid.
-            bool anyInvalidGraspAxes = _vrControllers.Query()
-                                                     .Select(c => isGraspAxisConfigured(c))
+            bool anyInvalidGraspAxes = _vrControllers.Select(c => isGraspAxisConfigured(c))
                                                      .Where(b => b == false)
                                                      .Any();
 

@@ -7,13 +7,12 @@
  ******************************************************************************/
 
 using System;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
 namespace Leap.Unity.Interaction.Internal
 {
-
-    using Query;
     using UnityObject = UnityEngine.Object;
 
     public static class InteractionChecks
@@ -235,7 +234,7 @@ namespace Leap.Unity.Interaction.Internal
                 return true;
             }
 
-            rigidHandObjects = UnityObject.FindObjectsOfType<RigidHand>().Query()
+            rigidHandObjects = UnityObject.FindObjectsOfType<RigidHand>()
               .Select(x => x.gameObject).ToArray();
             if (rigidHandObjects.Length != 0
                   && UnityObject.FindObjectOfType<InteractionManager>() != null)

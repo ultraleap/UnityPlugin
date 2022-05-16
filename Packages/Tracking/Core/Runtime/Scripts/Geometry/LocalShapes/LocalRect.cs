@@ -121,16 +121,6 @@ namespace Leap.Unity.Geometry
             return true;
         }
 
-        public bool FillSplined(LocalRect a, LocalRect b, LocalRect c, LocalRect d,
-          float t)
-        {
-            center = Splines.CatmullRom.ToCHS(a.center, b.center, c.center, d.center,
-              centripetal: false).PositionAt(t);
-            radii = Vector2.Max(Splines.CatmullRom.ToCHS(a.radii, b.radii, c.radii,
-              d.radii, centripetal: false).PositionAt(t).ToVector2(), Vector2.zero);
-            return true;
-        }
-
         public LineEnumerator TakeLines(float height,
           Margins? cellMargins = null, VerticalOrigin? verticalOrigin = null)
         {

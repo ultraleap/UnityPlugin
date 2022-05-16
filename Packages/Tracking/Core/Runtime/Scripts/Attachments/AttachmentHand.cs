@@ -7,10 +7,10 @@
  ******************************************************************************/
 
 using Leap.Unity.Attributes;
-using Leap.Unity.Query;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -327,9 +327,7 @@ namespace Leap.Unity.Attachments
             if (pointBehaviour == null)
             {
                 // First, see if there's already one in the hierarchy! Might exist due to, e.g. an Undo operation
-                var existingPointBehaviour = this.gameObject.GetComponentsInChildren<AttachmentPointBehaviour>()
-                                                            .Query()
-                                                            .FirstOrDefault(p => p.attachmentPoint == singlePoint);
+                var existingPointBehaviour = this.gameObject.GetComponentsInChildren<AttachmentPointBehaviour>().FirstOrDefault(p => p.attachmentPoint == singlePoint);
 
                 // Only make a new object if the transform really doesn't exist.
                 if (existingPointBehaviour == AttachmentPointFlags.None)
@@ -488,7 +486,7 @@ namespace Leap.Unity.Attachments
 
             int hierarchyCount = 0;
 
-            foreach (var transform in transforms.Query().Where(t => t != null))
+            foreach (var transform in transforms.Where(t => t != null))
             {
                 s_hierarchyTransformsBuffer[hierarchyCount++] = transform;
             }
@@ -515,7 +513,7 @@ namespace Leap.Unity.Attachments
             }
 
             int tIdx = 0;
-            foreach (var behaviour in monoBehaviours.Query().Where(b => b != null))
+            foreach (var behaviour in monoBehaviours.Where(b => b != null))
             {
                 s_transformsBuffer[tIdx++] = behaviour.transform;
             }

@@ -6,8 +6,8 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Leap.Unity.Query;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -27,7 +27,8 @@ namespace Leap.Unity.Space
                 //just use FindObjectsOfType!
                 if (!Application.isPlaying)
                 {
-                    FindObjectsOfType<LeapSpace>().Query().Where(c => c.enabled).FillList(_enabledSpaces);
+                    _enabledSpaces.Clear();
+                    _enabledSpaces.AddRange(FindObjectsOfType<LeapSpace>().Where(c => c.enabled));
                 }
 #endif
                 return _enabledSpaces;
@@ -112,12 +113,6 @@ namespace Leap.Unity.Space
                 UpdateTransformer(anchor.transformer, parent.transformer);
             }
         }
-
-        /// <summary>
-        /// Get a hash of all features in this space.  This is useful if you want to know
-        /// if anything has changed about the settings of this space. 
-        /// </summary>
-        public abstract Hash GetSettingHash();
 
         protected abstract ITransformer CosntructBaseTransformer();
         protected abstract ITransformer ConstructTransformer(LeapSpaceAnchor anchor);

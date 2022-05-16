@@ -9,12 +9,12 @@
 using Leap.Interaction.Internal.InteractionEngineUtility;
 using Leap.Unity.Attributes;
 using Leap.Unity.Interaction.Internal;
-using Leap.Unity.Query;
 using Leap.Unity.RuntimeGizmos;
 using Leap.Unity.Space;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Leap.Unity.Interaction
@@ -192,13 +192,11 @@ namespace Leap.Unity.Interaction
                 {
                     if (handDataMode == HandDataMode.PlayerLeft)
                     {
-                        handAccessorFunc = (frame) => frame.Hands.Query()
-                                                                 .FirstOrDefault(hand => hand.IsLeft);
+                        handAccessorFunc = (frame) => frame.Hands.FirstOrDefault(hand => hand.IsLeft);
                     }
                     else
                     {
-                        handAccessorFunc = (frame) => frame.Hands.Query()
-                                                                 .FirstOrDefault(hand => hand.IsRight);
+                        handAccessorFunc = (frame) => frame.Hands.FirstOrDefault(hand => hand.IsRight);
                     }
                 }
             }

@@ -10,8 +10,6 @@ using System;
 
 namespace Leap.Unity
 {
-    using Query;
-
     public static class Maybe
     {
         public static readonly NoneType None = new NoneType();
@@ -226,18 +224,6 @@ namespace Leap.Unity
             else
             {
                 return maybeCustomDefault;
-            }
-        }
-
-        public Query<T> Query()
-        {
-            if (hasValue)
-            {
-                return Values.Single(_t);
-            }
-            else
-            {
-                return Values.Empty<T>();
             }
         }
 

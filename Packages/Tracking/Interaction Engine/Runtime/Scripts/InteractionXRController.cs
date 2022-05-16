@@ -17,9 +17,9 @@ using UnityEngine.VR;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using Leap.Unity.Query;
 using Leap.Unity.Space;
 using UnityEngine.Serialization;
+using System.Linq;
 
 namespace Leap.Unity.Interaction
 {
@@ -252,12 +252,12 @@ namespace Leap.Unity.Interaction
 
             if (deviceJoystickTokens != null && deviceJoystickTokens.Length > 0)
             {
-                string[] joysticksConnected = Input.GetJoystickNames().Query()
+                string[] joysticksConnected = Input.GetJoystickNames()
                   .Select(s => s.ToLower()).ToArray();
                 string[] controllerSupportTokens = deviceJoystickTokens.ToLower()
                   .Split(" ".ToCharArray());
-                bool matchesController = joysticksConnected.Query()
-                                         .Any(joystick => controllerSupportTokens.Query()
+                bool matchesController = joysticksConnected
+                                         .Any(joystick => controllerSupportTokens
                                                          .All(token => joystick.Contains(token)));
 
                 _isJoystickDetected = matchesController;

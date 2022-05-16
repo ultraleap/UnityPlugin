@@ -7,11 +7,10 @@
  ******************************************************************************/
 
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Leap.Unity
 {
-    using Query;
-
     /// <summary>
     /// A simple wrapper around HashSet to provide readonly access.
     /// Useful when you want to return a HashSet to someone but you want
@@ -33,6 +32,10 @@ namespace Leap.Unity
                 return _set.Count;
             }
         }
+        public HashSet<T> GetHashSet()
+        {
+            return _set;
+        }
 
         public HashSet<T>.Enumerator GetEnumerator()
         {
@@ -42,11 +45,6 @@ namespace Leap.Unity
         public bool Contains(T obj)
         {
             return _set.Contains(obj);
-        }
-
-        public Query<T> Query()
-        {
-            return _set.Query();
         }
 
         public static implicit operator ReadonlyHashSet<T>(HashSet<T> set)

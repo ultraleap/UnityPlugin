@@ -7,7 +7,6 @@
  ******************************************************************************/
 
 using Leap.Unity.Encoding;
-using Leap.Unity.Splines;
 using System;
 using UnityEngine;
 
@@ -134,13 +133,6 @@ namespace Leap.Unity
         public static bool FillLerped(this Pose orig, Pose a, Pose b, float t)
         {
             orig = LerpUnclamped(a, b, t);
-            return true;
-        }
-        public static bool FillSplined(this Pose orig, Pose a, Pose b, Pose c, Pose d, float t)
-        {
-            orig.position = CatmullRom.ToCHS(a.position, b.position, c.position, d.position,
-              centripetal: false).PositionAt(t);
-            orig.rotation = Quaternion.SlerpUnclamped(b.rotation, c.rotation, t);
             return true;
         }
 

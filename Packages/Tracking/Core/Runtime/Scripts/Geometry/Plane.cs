@@ -7,7 +7,6 @@
  ******************************************************************************/
 
 using Leap.Unity.Infix;
-using Leap.Unity.Query;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -123,24 +122,6 @@ namespace Leap.Unity.Geometry
                 }
                 return s_backingUnityBodyCollidersCache;
             }
-        }
-        public bool CollidesWith(UnityEngine.Rigidbody unityBody,
-                                 bool includeBehindPlane = false)
-        {
-            s_unityBodyCollidersCache.Clear();
-            Leap.Unity.Utils.FindOwnedChildComponents<Collider, Rigidbody>(
-              unityBody,
-              s_unityBodyCollidersCache,
-              includeInactiveObjects: false
-            );
-            foreach (var collider in s_unityBodyCollidersCache)
-            {
-                if (this.CollidesWith(collider, includeBehindPlane))
-                {
-                    return true;
-                }
-            }
-            return false;
         }
 
         /// <summary>

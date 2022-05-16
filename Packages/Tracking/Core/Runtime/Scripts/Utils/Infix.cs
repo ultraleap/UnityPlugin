@@ -6,7 +6,6 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Leap.Unity.Query;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -259,24 +258,6 @@ namespace Leap.Unity.Infix
         public static Vector3 LerpUnclamped(this Vector3 a, Vector3 b, float t)
         {
             return Vector3.LerpUnclamped(a, b, t);
-        }
-
-        #endregion
-
-        #region List<Vector3>
-
-        public static Vector3 GetCentroid(this List<Vector3> vs)
-        {
-            return vs.Query().Fold((v, acc) => v + acc) / vs.Count;
-        }
-
-        /// <summary> Sets the points' centroid to the argument value and, in case it's useful, returns the delta that was required to move to the new centroid. </summary>
-        public static Vector3 SetCentroid(this List<Vector3> vs, Vector3 c)
-        {
-            var oldC = vs.GetCentroid();
-            var toNewC = c - oldC;
-            for (var i = 0; i < vs.Count; i++) { vs[i] = vs[i] + toNewC; }
-            return toNewC;
         }
 
         #endregion

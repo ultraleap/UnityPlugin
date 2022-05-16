@@ -8,10 +8,10 @@
 
 using System;
 using UnityEngine;
+using System.Linq;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
-using Leap.Unity.Query;
 
 namespace Leap.Unity
 {
@@ -129,7 +129,7 @@ namespace Leap.Unity
 
         public static bool ContainsKeyAtTime(this AnimationCurve curve, float time, float tolerance = 0.0000001f)
         {
-            return curve.keys.Query().Any(k => Mathf.Abs(k.time - time) < tolerance);
+            return curve.keys.Any(k => Mathf.Abs(k.time - time) < tolerance);
         }
 
         public static AnimationCurve GetCropped(this AnimationCurve curve, float start, float end, bool slideToStart = true)
@@ -432,7 +432,7 @@ namespace Leap.Unity
                         position[i]--;
                     }
                 }
-            } while (position.Query().Any(p => p > 0));
+            } while (position.Any(p => p > 0));
 
             return compressedCurves;
         }

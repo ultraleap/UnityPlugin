@@ -6,7 +6,6 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Leap.Unity.Query;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -61,7 +60,7 @@ namespace Leap.Unity.Attributes
         {
             getAttributes(property);
 
-            var topPanelDrawer = attributes.Query().Cast<ITopPanelDrawer>()
+            var topPanelDrawer = attributes.Cast<ITopPanelDrawer>()
               .Where(o => o != null).FirstOrDefault();
             if (topPanelDrawer != null)
             {

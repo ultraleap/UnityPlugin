@@ -6,9 +6,9 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Leap.Unity.Query;
 using System;
 using System.Collections;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -281,10 +281,8 @@ namespace Leap.Unity
 
             private void addDistortionData(Image image, Color32[] colors, int startIndex)
             {
-                float[] distortionData = image.Distortion(Image.CameraType.LEFT).
-                                               Query().
-                                               Concat(image.Distortion(Image.CameraType.RIGHT)).
-                                               ToArray();
+                float[] distortionData = image.Distortion(Image.CameraType.LEFT)
+                    .Concat(image.Distortion(Image.CameraType.RIGHT)).ToArray();
 
                 for (int i = 0; i < distortionData.Length; i += 2)
                 {

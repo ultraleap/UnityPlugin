@@ -6,7 +6,6 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Leap.Unity.Splines;
 using System;
 using UnityEngine;
 
@@ -21,7 +20,6 @@ namespace Leap.Unity.Encoding
     {
         T CopyFrom(T toCopy);
         bool FillLerped(T from, T to, float t);
-        bool FillSplined(T a, T b, T c, T d, float t);
     }
 
     /// <summary>
@@ -498,44 +496,6 @@ namespace Leap.Unity.Encoding
             {
                 jointPositions[i] = Vector3.LerpUnclamped(a.jointPositions[i],
                 b.jointPositions[i], t);
-            }
-            return true;
-        }
-
-        /// <summary> 
-        /// Fills the VectorHand with interpolated data
-        /// between the 4 argument VectorHands, by t (unclamped), and return true.
-        /// If either a, b, c or d is null, the resulting VectorHand is also set to
-        /// null, and the method returns false.
-        /// An exception is thrown if the interpolation arguments a and b don't
-        /// have the same chirality.
-        /// </summary>
-        public bool FillSplined(VectorHand a, VectorHand b, VectorHand c, VectorHand d, float t)
-        {
-            if (a == null || b == null || c == null || d == null)
-            {
-                return false;
-            }
-            if (b.isLeft != c.isLeft)
-            {
-                throw new System.Exception("VectorHands must be interpolated with the " +
-                "same chirality.");
-            }
-            isLeft = a.isLeft;
-            palmPos = CatmullRom.ToCHS(
-                               a.palmPos, b.palmPos, c.palmPos, d.palmPos, false).PositionAt(t);
-            palmRot = Quaternion.SlerpUnclamped(b.palmRot, c.palmRot, t);
-            //Quaternion splines are not as robust
-            //CatmullRom.ToQuaternionCHS(
-            //  a.palmRot, b.palmRot, c.palmRot, d.palmRot, false).RotationAt(t);
-
-            for (int i = 0; i < jointPositions.Length; i++)
-            {
-                jointPositions[i] = CatmullRom.ToCHS(
-                                             a.jointPositions[i],
-                                             b.jointPositions[i],
-                                             c.jointPositions[i],
-                                             d.jointPositions[i], false).PositionAt(t);
             }
             return true;
         }

@@ -6,11 +6,11 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Leap.Unity.Query;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
+using System.Linq;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -71,7 +71,7 @@ namespace Leap.Unity
             _projectChecks = new List<ProjectCheck>();
 
             var assemblies = AppDomain.CurrentDomain.GetAssemblies();
-            foreach (var type in assemblies.Query().SelectMany(a => a.GetTypes()))
+            foreach (var type in assemblies.SelectMany(a => a.GetTypes()))
             {
                 foreach (var method in type.GetMethods(BindingFlags.Public
                                                        | BindingFlags.NonPublic
@@ -234,7 +234,7 @@ namespace Leap.Unity
 
         private static string joinBySemicolon(HashSet<string> keys)
         {
-            return string.Join(";", keys.Query().ToArray());
+            return string.Join(";", keys.ToArray());
         }
 
         private static void uploadignoredKeyChangesToEditorPrefs()

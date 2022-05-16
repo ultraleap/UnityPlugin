@@ -9,10 +9,10 @@
 using Leap.Interaction.Internal.InteractionEngineUtility;
 using Leap.Unity.Attributes;
 using Leap.Unity.Interaction.Internal;
-using Leap.Unity.Query;
 using Leap.Unity.Space;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Leap.Unity.Interaction
@@ -329,7 +329,7 @@ namespace Leap.Unity.Interaction
         /// If no controllers (Leap hands or supported VR controllers) are currently grasping this object,
         /// returns null.
         /// </summary>
-        public InteractionController graspingController { get { return _graspingControllers.Query().FirstOrDefault(); } }
+        public InteractionController graspingController { get { return _graspingControllers.FirstOrDefault(); } }
 
         /// <summary>
         /// Gets the set of all interaction controllers currently grasping this object. Interaction
@@ -346,7 +346,13 @@ namespace Leap.Unity.Interaction
             get
             {
                 _graspingHandsBuffer.Clear();
-                _graspingControllers.Query().OfType<InteractionHand>().FillHashSet(_graspingHandsBuffer);
+                var hands = _graspingControllers.OfType<InteractionHand>();
+
+                foreach(InteractionHand hand in hands)
+                {
+                    _graspingHandsBuffer.Add(hand);
+                }
+
                 return _graspingHandsBuffer;
             }
         }
@@ -769,10 +775,13 @@ namespace Leap.Unity.Interaction
 
                 if (isGrasped && _ignoreGraspingMode != IgnoreHoverMode.None)
                 {
-                    if ((_ignoreGraspingMode == IgnoreHoverMode.Left && graspingControllers.Query().FirstOrNone(x => x.isLeft) != null) ||
-                        (_ignoreGraspingMode == IgnoreHoverMode.Right && graspingControllers.Query().FirstOrNone(x => x.isRight) != null))
+                    foreach(var graspingController in graspingControllers)
                     {
-                        graspingController.ReleaseGrasp();
+                        if((graspingController.isLeft && _ignoreGraspingMode == IgnoreHoverMode.Left) ||
+                            graspingController.isRight && _ignoreGraspingMode == IgnoreHoverMode.Right)
+                        {
+                            graspingController.ReleaseGrasp();
+                        }
                     }
                 }
             }
@@ -1562,7 +1571,7 @@ namespace Leap.Unity.Interaction
             // If multi-grasp is not allowed, release the old grasp.
             if (!allowMultiGrasp && isGrasped)
             {
-                _graspingControllers.Query().First().ReleaseGrasp();
+                _graspingControllers.First().ReleaseGrasp();
             }
 
             // Add each newly grasping hand to internal reference and pose solver.
@@ -1657,7 +1666,7 @@ namespace Leap.Unity.Interaction
 
                 if (controllers.Count == 1)
                 {
-                    throwHandler.OnThrow(this, controllers.Query().First());
+                    throwHandler.OnThrow(this, controllers.First());
                 }
 
                 OnGraspEnd();
