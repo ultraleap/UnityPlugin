@@ -418,7 +418,11 @@ namespace Leap.Unity
 
 
             // Draw Cylinders
+#if UNITY_EDITOR
+            _cylinderMesh = getCylinderMesh(1f);
+#else
             if (_cylinderMesh == null) { _cylinderMesh = getCylinderMesh(1f); }
+#endif
             Graphics.DrawMeshInstanced(_cylinderMesh, 0, _backing_material, _cylinderMatrices, _curCylinderIndex, null,
               _castShadows ? UnityEngine.Rendering.ShadowCastingMode.On : UnityEngine.Rendering.ShadowCastingMode.Off, true, gameObject.layer);
         }
