@@ -59,6 +59,9 @@ namespace Leap.Unity
         Dictionary<LeapProvider, JointConfidenceHistory> jointConfidenceHistoriesLeft = new Dictionary<LeapProvider, JointConfidenceHistory>();
         Dictionary<LeapProvider, JointConfidenceHistory> jointConfidenceHistoriesRight = new Dictionary<LeapProvider, JointConfidenceHistory>();
 
+        Dictionary<LeapProvider, HandConfidenceHistory> handConfidenceHistoriesLeft = new Dictionary<LeapProvider, HandConfidenceHistory>();
+        Dictionary<LeapProvider, HandConfidenceHistory> handConfidenceHistoriesRight = new Dictionary<LeapProvider, HandConfidenceHistory>();
+
 
 
 
@@ -265,7 +268,31 @@ namespace Leap.Unity
             confidence = palmPosFactor * Confidence_RelativeHandPos(providers[frame_idx], providers[frame_idx].transform, hand.PalmPosition.ToVector3());
             confidence += palmRotFactor * Confidence_RelativeHandRot(providers[frame_idx].transform, hand.PalmPosition.ToVector3(), hand.PalmNormal.ToVector3());
             confidence += palmVelocityFactor * Confidence_RelativeHandVelocity(providers[frame_idx], providers[frame_idx].transform, hand.PalmPosition.ToVector3(), hand.IsLeft);
-            confidence += timeSinceHandFirstVisibleFactor * Confidence_TimeSinceHandFirstVisible(providers[frame_idx], hand.IsLeft);
+
+            // if timeSinceHandFirstVisibleFactor is 1, then
+            // the confidence should be 0 when it is the first frame with the hand in it.
+            confidence = Mathf.Lerp(confidence, confidence * Confidence_TimeSinceHandFirstVisible(providers[frame_idx], hand.IsLeft), timeSinceHandFirstVisibleFactor);
+
+
+            // average out new hand confidence with that of the last few frames
+            if (hand.IsLeft)
+            {
+                if (!handConfidenceHistoriesLeft.ContainsKey(providers[frame_idx]))
+                {
+                    handConfidenceHistoriesLeft.Add(providers[frame_idx], new HandConfidenceHistory());
+                }
+                handConfidenceHistoriesLeft[providers[frame_idx]].AddConfidence(confidence);
+                confidence = handConfidenceHistoriesLeft[providers[frame_idx]].GetAveragedConfidence();
+            }
+            else
+            {
+                if (!handConfidenceHistoriesRight.ContainsKey(providers[frame_idx]))
+                {
+                    handConfidenceHistoriesRight.Add(providers[frame_idx], new HandConfidenceHistory());
+                }
+                handConfidenceHistoriesRight[providers[frame_idx]].AddConfidence(confidence);
+                confidence = handConfidenceHistoriesRight[providers[frame_idx]].GetAveragedConfidence();
+            }
 
             return confidence;
         }
@@ -445,7 +472,6 @@ namespace Leap.Unity
             // and it should be 0 if it is 90 degrees
             float confidence = (Mathf.Cos(Mathf.Deg2Rad * 2 * palmAngle) + 1f) / 2;
 
-            //Debug.Log(confidence);
             return confidence;
         }
 
@@ -685,8 +711,9 @@ namespace Leap.Unity
             }
         }
 
-
-        // small helper class to save previous joint confidences and average over them
+        /// <summary>
+        /// small helper class to save previous joint confidences and average over them
+        /// </summary>
         class JointConfidenceHistory
         {
             int length;
@@ -746,6 +773,57 @@ namespace Leap.Unity
                 }
 
                 return averageConfidences;
+            }
+        }
+
+        /// <summary>
+        /// small helper class to save previous whole-hand confidences and average over them
+        /// </summary>
+        class HandConfidenceHistory
+        {
+            int length;
+            float[] handConfidences;
+            int index;
+            List<int> validIndices;
+
+            public HandConfidenceHistory(int length = 60)
+            {
+                this.length = length;
+                this.handConfidences = new float[length];
+                this.index = 0;
+                validIndices = new List<int>();
+            }
+
+            public void ClearAll()
+            {
+                validIndices = new List<int>();
+            }
+
+            public void AddConfidence(float confidence)
+            {
+                handConfidences[index] = confidence;
+                
+                if (validIndices.IndexOf(index) == -1)
+                {
+                    validIndices.Add(index);
+                }
+                index = (index + 1) % length;
+            }
+
+            public float GetAveragedConfidence()
+            {
+                if (validIndices.Count == 0)
+                {
+                    return 0;
+                }
+
+                float confidenceSum = 0;
+                foreach (int j in validIndices)
+                {
+                    confidenceSum += handConfidences[j];
+                }
+
+                return confidenceSum / validIndices.Count;
             }
         }
 
