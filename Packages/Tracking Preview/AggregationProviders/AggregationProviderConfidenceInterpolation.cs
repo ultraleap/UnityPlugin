@@ -73,7 +73,7 @@ namespace Leap.Unity
             List<float[]> leftJointConfidences = new List<float[]>();
             List<float[]> rightJointConfidences = new List<float[]>();
 
-            if(jointOcclusions == null)
+            if(jointOcclusionFactor != 0 && jointOcclusions == null)
             {
                 jointOcclusions = new List<JointOcclusion>();
                 foreach (LeapProvider provider in providers)
@@ -282,18 +282,18 @@ namespace Leap.Unity
                 jointConfidences = new float[VectorHand.NUM_JOINT_POSITIONS];
             }
 
-            confidences_jointRot = Confidence_RelativeJointRot(confidences_jointRot, providers[frame_idx].transform, hand);
-            confidences_jointPalmRot = Confidence_relativeJointRotToPalmRot(confidences_jointPalmRot, providers[frame_idx].transform, hand);
-            confidences_jointOcclusion = jointOcclusions[frame_idx].Confidence_JointOcclusion(confidences_jointOcclusion, providers[frame_idx].transform, hand);
-
-            //for (int joint_idx = 0; joint_idx < jointConfidences.Length; joint_idx++)
-            //{
-            //    // add up weighted confidences and add weighted confidence of last bone for fingers as well
-            //    jointConfidences[joint_idx] = 
-            //        jointRotFactor * confidences_jointRot[joint_idx] +
-            //                     jointRotToPalmFactor * confidences_jointPalmRot[joint_idx] +
-            //                     jointOcclusionFactor * confidences_jointOcclusion[joint_idx];
-            //}
+            if (jointRotFactor != 0)
+            {
+                confidences_jointRot = Confidence_RelativeJointRot(confidences_jointRot, providers[frame_idx].transform, hand);
+            }
+            if (jointRotToPalmFactor != 0)
+            {
+                confidences_jointPalmRot = Confidence_relativeJointRotToPalmRot(confidences_jointPalmRot, providers[frame_idx].transform, hand);
+            }
+            if (jointOcclusionFactor != 0)
+            {
+                confidences_jointOcclusion = jointOcclusions[frame_idx].Confidence_JointOcclusion(confidences_jointOcclusion, providers[frame_idx].transform, hand);
+            }
 
             for (int finger_idx = 0; finger_idx < 5; finger_idx++)
             {
@@ -307,6 +307,10 @@ namespace Leap.Unity
 
                     if(bone_idx != 0)
                     {
+                        // average with the confidence from the last joint on the same finger,
+                        // so that outer joints jump around less. 
+                        // eg. when a confidence is low on the knuckle of a finger, the finger tip confidence for the same finger
+                        // should take that into account and be slightly lower too
                         jointConfidences[key] += jointConfidences[key - 1];
                         jointConfidences[key] /= 2;
                     }
