@@ -40,17 +40,6 @@ namespace Leap.Unity
         [SerializeField]
         protected FrameOptimizationMode _frameOptimization = FrameOptimizationMode.None;
 
-
-#if UNITY_2017_3_OR_NEWER
-        [Tooltip("When checked, profiling data from the LeapCSharp worker thread will be used to populate the UnityProfiler.")]
-        [EditTimeOnly]
-#else
-        [Tooltip("Worker thread profiling requires a Unity version of 2017.3 or greater.")]
-        [Disable]
-#endif
-        [SerializeField]
-        protected bool _workerThreadProfiling = false;
-
         #endregion
 
         #region Internal Settings & Memory
@@ -219,6 +208,8 @@ namespace Leap.Unity
         /// </summary>
         private bool detectCircularProviderReference(LeapAggregatedProviderBase currentProvider, List<LeapAggregatedProviderBase> seenProviders)
         {
+            if (currentProvider.providers == null) return false;
+
             if (seenProviders.Contains(currentProvider)) return true;
 
             foreach (LeapProvider provider in currentProvider.providers)
@@ -302,12 +293,6 @@ namespace Leap.Unity
 
             // reset all the update frames received from providers to null again
             updateFramesToCombine.ClearWith(null);
-
-            // ??? needed?
-            if (_workerThreadProfiling)
-            {
-                LeapProfiling.Update();
-            }
 
 #if UNITY_EDITOR
             if (UnityEditor.EditorApplication.isCompiling)

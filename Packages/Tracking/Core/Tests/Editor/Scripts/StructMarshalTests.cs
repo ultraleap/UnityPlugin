@@ -13,7 +13,6 @@ using System.Runtime.InteropServices;
 
 namespace Leap.LeapCSharp.Tests
 {
-
     [StructLayout(LayoutKind.Sequential)]
     struct TestMarshaledStruct
     {
@@ -21,7 +20,6 @@ namespace Leap.LeapCSharp.Tests
         public TestMarshaledStruct(int t) { id = t; }
     }
 
-    [TestFixture()]
     public class StructMarshalTests
     {
         public const int ARRAY_SIZE = 5;

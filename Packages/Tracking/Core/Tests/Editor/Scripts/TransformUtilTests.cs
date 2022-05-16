@@ -11,10 +11,8 @@ using UnityEngine;
 
 namespace Leap.Unity.Tests
 {
-
     public class TransformUtilTests
     {
-
         private GameObject _gameObject;
         private GameObject _child;
 

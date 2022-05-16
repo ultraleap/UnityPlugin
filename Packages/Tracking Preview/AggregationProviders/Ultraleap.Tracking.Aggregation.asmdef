@@ -1,13 +1,11 @@
 {
-    "name": "Ultraleap.Tracking.Core.Tests",
+    "name": "Ultraleap.Tracking.Aggregation",
     "rootNamespace": "",
     "references": [
         "GUID:2ee0542102ac1084e8d9a910885c1e81",
         "GUID:cec9848704c49724192ff47f9b3e9156"
     ],
-    "includePlatforms": [
-        "Editor"
-    ],
+    "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,

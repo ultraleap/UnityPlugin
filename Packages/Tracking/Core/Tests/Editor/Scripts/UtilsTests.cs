@@ -10,7 +10,6 @@ using NUnit.Framework;
 
 namespace Leap.Unity.Tests
 {
-
     public class UtilsTests
     {
 

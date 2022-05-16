@@ -12,10 +12,8 @@ using System.Linq;
 
 namespace Leap.Unity.Tests
 {
-
     public class BitConverterTests
     {
-
         private byte[] _bytes;
 
         [SetUp]

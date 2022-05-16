@@ -19,7 +19,6 @@ namespace Leap.Unity.Tests
 
     public class QueryTests
     {
-
         [Test]
         public void AllTest([ValueSource("list0")] QueryArg arg)
         {
@@ -590,12 +589,7 @@ namespace Leap.Unity.Tests
             get
             {
                 List<int> values = new List<int>() { 6, 7, 8, 9, 10, 1, 1, 9, 300, 6, 900, int.MaxValue };
-                List<int> lengths = new List<int>() {
-          0,
-          1,
-          2,
-          int.MaxValue
-        };
+                List<int> lengths = new List<int>() { 0, 1, 2, int.MaxValue };
 
                 foreach (var length in lengths)
                 {
