@@ -9,13 +9,15 @@ using Leap.Unity.Encoding;
 public class JointOcclusion : MonoBehaviour
 {
     public Shader replacementShader;
-    public CapsuleHand occlusionHand;
+    public CapsuleHand occlusionHandLeft;
+    public CapsuleHand occlusionHandRight;
 
     Camera camera;
 
     Texture2D tex;
     Rect regionToReadFrom;
-    Color[] occlusionSphereColors;
+    Color[] occlusionSphereColorsLeft;
+    Color[] occlusionSphereColorsRight;
     Mesh cubeMesh;
     Material cubeMaterial;
     string layerName;
@@ -33,16 +35,22 @@ public class JointOcclusion : MonoBehaviour
         tex = new Texture2D(camera.targetTexture.width, camera.targetTexture.height);
         regionToReadFrom = new Rect(0, 0, camera.targetTexture.width, camera.targetTexture.height);
 
-        occlusionHand.gameObject.layer = LayerMask.NameToLayer(layerName);
-        occlusionHand.SetIndividualSphereColors = true;
+        occlusionHandLeft.gameObject.layer = LayerMask.NameToLayer(layerName);
+        occlusionHandLeft.SetIndividualSphereColors = true;
+        occlusionHandRight.gameObject.layer = LayerMask.NameToLayer(layerName);
+        occlusionHandRight.SetIndividualSphereColors = true;
 
-        occlusionSphereColors = occlusionHand.SphereColors;
+        occlusionSphereColorsLeft = occlusionHandLeft.SphereColors;
+        occlusionSphereColorsRight = occlusionHandRight.SphereColors;
 
-        for (int i = 0; i < occlusionSphereColors.Length; i++)
+        for (int i = 0; i < occlusionSphereColorsLeft.Length; i++)
         {
-            occlusionSphereColors[i] = Color.Lerp(Color.red, Color.green, (float)i / occlusionSphereColors.Length);
+            occlusionSphereColorsLeft[i] = Color.Lerp(Color.red, Color.green, (float)i / occlusionSphereColorsLeft.Length);
+            occlusionSphereColorsRight[i] = Color.Lerp(Color.red, Color.green, (float)i / occlusionSphereColorsRight.Length);
         }
-        occlusionHand.SphereColors = occlusionSphereColors;
+        occlusionHandLeft.SphereColors = occlusionSphereColorsLeft;
+        occlusionHandRight.SphereColors = occlusionSphereColorsRight;
+
 
 
         cubeMesh = createCubeMesh();
@@ -87,6 +95,11 @@ public class JointOcclusion : MonoBehaviour
         return cubeMesh;
     }
 
+    /// <summary>
+    /// return an array of joint confidences that is determined by joint occlusion.
+    /// It uses a capsule hand rendered on a camera sitting at the deviceOrigin.
+    /// Note that as the capsule hand doesn't have metacarpal bones, their corresponding confidence will be zero)
+    /// </summary>
     public float[] Confidence_JointOcclusion(float[] confidences, Transform deviceOrigin, Hand hand)
     {
         if (hand == null)
@@ -94,13 +107,16 @@ public class JointOcclusion : MonoBehaviour
             return confidences.ClearWith(0);
         }
 
+        // draw a cube where the palm is, so that joints cannot be seen 'through' the palm
+        // the following values are determined by experimenting with different cube sizes, positions and rotations and picking one 
+        // that fills out the palm of the capsule hand well.
         Vector3 posOffset = new Vector3(-0.03f, 0.005f, -0.045f);
         Quaternion rotOffset = Quaternion.Euler(-5.366f, 0, 0);
         Vector3 scale = new Vector3(0.1f, 0.01f, 0.13f);
-
-        //Graphics.DrawMeshNow(cubeMesh, Matrix4x4.TRS(hand.PalmPosition.ToVector3(), hand.Rotation.ToQuaternion(), Vector3.one), cubeMaterial, );
         Graphics.DrawMesh(cubeMesh, Matrix4x4.TRS(hand.PalmPosition.ToVector3() + hand.Direction.ToVector3() * posOffset.z + hand.PalmNormal.ToVector3() * posOffset.y + Vector3.Cross(hand.Direction.ToVector3(), hand.PalmNormal.ToVector3()) * posOffset.x, hand.Rotation.ToQuaternion() * rotOffset, scale), cubeMaterial, LayerMask.NameToLayer(layerName));
 
+
+        // render the camera and copy the resulting render texture to tex
         camera.Render();
         RenderTexture.active = camera.targetTexture;
 
@@ -108,40 +124,33 @@ public class JointOcclusion : MonoBehaviour
         tex.Apply();
 
 
-        int[] pixelCounts = new int[confidences.Length];
-
-        //var pixels = tex.GetPixels();
-        //for (int i = 0; i < occlusionSphereColors.Length; i++)
-        //{
-        //    pixelCounts[i] = pixels.Where(x => DistanceBetweenColors(x, occlusionSphereColors[i]) < 0.01f).Count();
-        //}
-
-        int[] jointPixelCount = new int[confidences.Length];
+        // loop through all joints that are visible (all joints that are rendered on a capsule hand),
+        // and save how many pixels of a joint can be seen (in pixelsSeenCount)
+        // and how many pixels of a joint would be seen if the joint was not occluded at all (in optimalPixelsCount)
+        int[] pixelsSeenCount = new int[confidences.Length];
+        int[] optimalPixelsCount = new int[confidences.Length];
         foreach (var finger in hand.Fingers)
         {
             for (int j = 0; j < 4; j++)
             {
-                // the capsule hands don't use metacarpal bones, so we don't get a confidence for them
+                // as the capsule hands doesn't render metacarpal bones, the indexing of capsule hand colors is different
+                // from the indexing of the jointPositions on a VectorHand (which is used for confidence indexing)
                 int key = (int)finger.Type * 5 + j + 1;
                 int capsuleHandKey = (int)finger.Type * 4 + j;
 
-                //jointDistances[(int)finger.Type * 4 + j]
-                //float jointDistance = deviceOrigin.InverseTransformPoint(finger.Bone((Leap.Bone.BoneType)j).NextJoint.ToVector3()).y;
-                //float jointDistance = Vector3.Distance(finger.Bone((Leap.Bone.BoneType)j).NextJoint.ToVector3(), capsuleHand.leapProvider.transform.position);
-
-
-                // get projected sphere radius
+                
                 float jointRadius = 0.008f;
-                //float radius = 1f / Mathf.Tan(Mathf.Deg2Rad * camera.fieldOfView) * jointRadius / Mathf.Sqrt(jointDistance * jointDistance - jointRadius * jointRadius);
 
+                // get the joint position from the given hand and use it to calculate the screen position of the joint's center and 
+                // a point on the outside border of the joint (both in pixel coordinates)
                 Vector3 jointPos = finger.Bone((Leap.Bone.BoneType)j).NextJoint.ToVector3();
                 Vector3 screenPosCenter = camera.WorldToScreenPoint(jointPos);
                 Vector3 screenPosSphereOutside = camera.WorldToScreenPoint(jointPos + camera.transform.right * jointRadius);
 
+                // the sphere radius (in pixels) is given by the distance between the screenPosCenter and the screenPosOutside
                 float radius = new Vector2(screenPosSphereOutside.x - screenPosCenter.x, screenPosSphereOutside.y - screenPosCenter.y).magnitude;
-                //radius *= 3.42f * tex.height / 2;
 
-                jointPixelCount[key] = (int)(Mathf.PI * radius * radius);
+                optimalPixelsCount[key] = (int)(Mathf.PI * radius * radius);
 
 
                 // only count pixels around where the sphere is supposed to be (+5 pixel margin)
@@ -151,38 +160,25 @@ public class JointOcclusion : MonoBehaviour
                 int width = Mathf.Clamp((int)(screenPosCenter.x + radius + margin), 0, tex.width) - x0;
                 int height = Mathf.Clamp((int)(screenPosCenter.y + radius + margin), 0, tex.height) - y0;
 
-                //Debug.Log(x0 + ", " + y0 + ", " + width + ", " + height);
-
                 Color[] tempPixels = tex.GetPixels(x0, y0, width, height);
-                pixelCounts[key] = tempPixels.Where(x => DistanceBetweenColors(x, occlusionSphereColors[capsuleHandKey]) < 0.01f).Count();
 
-
-                // get the pixel where the mid of the sphere is rendered to
-
-                //if (key == 3)
-                //{
-                //    // only count pixels around where the sphere is supposed to be (+5 pixel margin)
-                //    int margin = 5;
-                //    int x0 = Mathf.Max(0, (int)(screenPosCenter.x - radius - margin));
-                //    int y0 = Mathf.Max(0, (int)(screenPosCenter.y - radius - margin));
-                //    int width = Mathf.Min(tex.width, (int)(screenPosCenter.x + radius + margin)) - x0;
-                //    int height = Mathf.Min(tex.height, (int)(screenPosCenter.y + radius + margin)) - y0;
-
-                //    Color[] tempPixels = tex.GetPixels(x0, y0, width, height);
-                //    int count = tempPixels.Where(x => DistanceBetweenColors(x, occlusionSphereColors[key]) < 0.01f).Count();
-
-                //    Debug.Log(radius + ". " + jointPixelCount[key] + "; " + pixelCounts[key] + "; " + count);
-                //}
-
+                if (hand.IsLeft)
+                {
+                    pixelsSeenCount[key] = tempPixels.Where(x => DistanceBetweenColors(x, occlusionSphereColorsLeft[capsuleHandKey]) < 0.01f).Count();
+                }
+                else
+                {
+                    pixelsSeenCount[key] = tempPixels.Where(x => DistanceBetweenColors(x, occlusionSphereColorsRight[capsuleHandKey]) < 0.01f).Count();
+                }
             }
         }
 
 
         for(int i = 0; i < confidences.Length; i++)
         {
-            if (jointPixelCount[i] != 0)
+            if (optimalPixelsCount[i] != 0)
             {
-                confidences[i] = (float)pixelCounts[i] / jointPixelCount[i];
+                confidences[i] = (float)pixelsSeenCount[i] / optimalPixelsCount[i];
             }
         }
 
@@ -193,18 +189,6 @@ public class JointOcclusion : MonoBehaviour
         return confidences;
     }
 
-    private void Update()
-    {
-        //float[] confidences = new float[VectorHand.NUM_JOINT_POSITIONS];
-        //confidences = Confidence_JointOcclusion(confidences, transform, occlusionHand.GetLeapHand());
-
-        //Color[] sphereColors = debugHand.SphereColors;
-        //for (int i = 0; i < confidences.Length; i++)
-        //{
-        //    sphereColors[i] = Color.Lerp(Color.black, Color.white, confidences[i]);
-        //}
-        //debugHand.SphereColors = sphereColors;
-    }
 
     float DistanceBetweenColors(Color color1, Color color2)
     {
