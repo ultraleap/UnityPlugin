@@ -8,8 +8,6 @@ using Leap.Unity.Encoding;
 
 public class JointOcclusion : MonoBehaviour
 {
-    public CapsuleHand debugHand;
-
     public Shader replacementShader;
     public CapsuleHand occlusionHand;
 
@@ -18,12 +16,15 @@ public class JointOcclusion : MonoBehaviour
     Texture2D tex;
     Rect regionToReadFrom;
     Color[] occlusionSphereColors;
+    Mesh cubeMesh;
+    Material cubeMaterial;
+    string layerName;
 
     // Start is called before the first frame update
     void Start()
     {
         List<JointOcclusion> allJointOcclusions = FindObjectsOfType<JointOcclusion>().ToList();
-        string layerName = "JointOcclusion" + allJointOcclusions.IndexOf(this).ToString();
+        layerName = "JointOcclusion" + allJointOcclusions.IndexOf(this).ToString();
 
         camera = GetComponent<Camera>();
         camera.SetReplacementShader(replacementShader, "RenderType");
@@ -42,6 +43,48 @@ public class JointOcclusion : MonoBehaviour
             occlusionSphereColors[i] = Color.Lerp(Color.red, Color.green, (float)i / occlusionSphereColors.Length);
         }
         occlusionHand.SphereColors = occlusionSphereColors;
+
+
+        cubeMesh = createCubeMesh();
+        cubeMaterial = new Material(Shader.Find("Standard"));
+
+    }
+
+    private Mesh createCubeMesh()
+    {
+        Mesh cubeMesh = new Mesh();
+
+        Vector3[] vertices = {
+            new Vector3 (0, 0, 0),
+            new Vector3 (0.5f, 0, 0),
+            new Vector3 (0.5f, 0.5f, 0),
+            new Vector3 (0, 0.5f, 0),
+            new Vector3 (0, 0.5f, 0.5f),
+            new Vector3 (0.5f, 0.5f, 0.5f),
+            new Vector3 (0.5f, 0, 0.5f),
+            new Vector3 (0, 0, 0.5f),
+        };
+
+        int[] triangles = {
+         0, 2, 1, //face front
+         0, 3, 2,
+         2, 3, 4, //face top
+         2, 4, 5,
+         1, 2, 5, //face right
+         1, 5, 6,
+         0, 7, 4, //face left
+         0, 4, 3,
+         5, 4, 7, //face back
+         5, 7, 6,
+         0, 6, 7, //face bottom
+         0, 1, 6
+         };
+
+        cubeMesh.vertices = vertices;
+        cubeMesh.triangles = triangles;
+        cubeMesh.RecalculateNormals();
+
+        return cubeMesh;
     }
 
     public float[] Confidence_JointOcclusion(float[] confidences, Transform deviceOrigin, Hand hand)
@@ -50,6 +93,13 @@ public class JointOcclusion : MonoBehaviour
         {
             return confidences.ClearWith(0);
         }
+
+        Vector3 posOffset = new Vector3(-0.03f, 0.005f, -0.045f);
+        Quaternion rotOffset = Quaternion.Euler(-5.366f, 0, 0);
+        Vector3 scale = new Vector3(0.1f, 0.01f, 0.13f);
+
+        //Graphics.DrawMeshNow(cubeMesh, Matrix4x4.TRS(hand.PalmPosition.ToVector3(), hand.Rotation.ToQuaternion(), Vector3.one), cubeMaterial, );
+        Graphics.DrawMesh(cubeMesh, Matrix4x4.TRS(hand.PalmPosition.ToVector3() + hand.Direction.ToVector3() * posOffset.z + hand.PalmNormal.ToVector3() * posOffset.y + Vector3.Cross(hand.Direction.ToVector3(), hand.PalmNormal.ToVector3()) * posOffset.x, hand.Rotation.ToQuaternion() * rotOffset, scale), cubeMaterial, LayerMask.NameToLayer(layerName));
 
         camera.Render();
         RenderTexture.active = camera.targetTexture;
