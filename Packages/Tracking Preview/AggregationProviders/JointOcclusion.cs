@@ -46,7 +46,7 @@ public class JointOcclusion : MonoBehaviour
         for (int i = 0; i < occlusionSphereColorsLeft.Length; i++)
         {
             occlusionSphereColorsLeft[i] = Color.Lerp(Color.red, Color.green, (float)i / occlusionSphereColorsLeft.Length);
-            occlusionSphereColorsRight[i] = Color.Lerp(Color.red, Color.green, (float)i / occlusionSphereColorsRight.Length);
+            occlusionSphereColorsRight[i] = Color.Lerp(Color.yellow, Color.blue, (float)i / occlusionSphereColorsRight.Length);
         }
         occlusionHandLeft.SphereColors = occlusionSphereColorsLeft;
         occlusionHandRight.SphereColors = occlusionSphereColorsRight;
