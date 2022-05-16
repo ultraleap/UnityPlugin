@@ -23,8 +23,6 @@ namespace Leap.Unity
     /// </summary>
     public class AggregationProviderConfidenceInterpolation : LeapAggregatedProviderBase
     {
-        public List<JointOcclusion> jointOcclusions;
-
         // factors that get multiplied to the corresponding confidence values to get an overall weighted confidence value
 
         public float palmPosFactor = 1;
@@ -49,6 +47,8 @@ namespace Leap.Unity
         Dictionary<LeapProvider, float> leftHandFirstVisible = new Dictionary<LeapProvider, float>();
         Dictionary<LeapProvider, float> rightHandFirstVisible = new Dictionary<LeapProvider, float>();
 
+        List<JointOcclusion> jointOcclusions;
+
         Vector3[] mergedJointPositions = new Vector3[VectorHand.NUM_JOINT_POSITIONS];
 
         private float[] jointConfidences = new float[VectorHand.NUM_JOINT_POSITIONS];
@@ -72,6 +72,27 @@ namespace Leap.Unity
 
             List<float[]> leftJointConfidences = new List<float[]>();
             List<float[]> rightJointConfidences = new List<float[]>();
+
+            if(jointOcclusions == null)
+            {
+                jointOcclusions = new List<JointOcclusion>();
+                foreach (LeapProvider provider in providers)
+                {
+                    JointOcclusion jointOcclusion = provider.gameObject.GetComponentInChildren<JointOcclusion>();
+
+                    if (jointOcclusion == null)
+                    {
+                        jointOcclusion = GameObject.Instantiate(Resources.Load<GameObject>("JointOcclusionPrefab"), provider.transform).GetComponent<JointOcclusion>();
+
+                        foreach(CapsuleHand jointOcclusionHand in jointOcclusion.GetComponentsInChildren<CapsuleHand>(true))
+                        {
+                            jointOcclusionHand.leapProvider = provider;
+                        }
+                    }
+
+                    jointOcclusions.Add(jointOcclusion);
+                }
+            }
 
 
             // make lists of all left and right hands found in each frame and also make a list of their confidences
@@ -265,14 +286,14 @@ namespace Leap.Unity
             confidences_jointPalmRot = Confidence_relativeJointRotToPalmRot(confidences_jointPalmRot, providers[frame_idx].transform, hand);
             confidences_jointOcclusion = jointOcclusions[frame_idx].Confidence_JointOcclusion(confidences_jointOcclusion, providers[frame_idx].transform, hand);
 
-            for (int joint_idx = 0; joint_idx < jointConfidences.Length; joint_idx++)
-            {
-                // add up weighted confidences and add weighted confidence of last bone for fingers as well
-                jointConfidences[joint_idx] = 
-                    jointRotFactor * confidences_jointRot[joint_idx] +
-                                 jointRotToPalmFactor * confidences_jointPalmRot[joint_idx] +
-                                 jointOcclusionFactor * confidences_jointOcclusion[joint_idx];
-            }
+            //for (int joint_idx = 0; joint_idx < jointConfidences.Length; joint_idx++)
+            //{
+            //    // add up weighted confidences and add weighted confidence of last bone for fingers as well
+            //    jointConfidences[joint_idx] = 
+            //        jointRotFactor * confidences_jointRot[joint_idx] +
+            //                     jointRotToPalmFactor * confidences_jointPalmRot[joint_idx] +
+            //                     jointOcclusionFactor * confidences_jointOcclusion[joint_idx];
+            //}
 
             for (int finger_idx = 0; finger_idx < 5; finger_idx++)
             {
@@ -287,6 +308,7 @@ namespace Leap.Unity
                     if(bone_idx != 0)
                     {
                         jointConfidences[key] += jointConfidences[key - 1];
+                        jointConfidences[key] /= 2;
                     }
                 }
             }
