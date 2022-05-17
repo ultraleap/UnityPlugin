@@ -272,9 +272,17 @@ namespace Leap.Unity
         {
             float confidence = 0;
 
-            confidence = palmPosFactor * Confidence_RelativeHandPos(providers[frame_idx], providers[frame_idx].transform, hand.PalmPosition.ToVector3());
-            confidence += palmRotFactor * Confidence_RelativeHandRot(providers[frame_idx].transform, hand.PalmPosition.ToVector3(), hand.PalmNormal.ToVector3());
-            confidence += palmVelocityFactor * Confidence_RelativeHandVelocity(providers[frame_idx], providers[frame_idx].transform, hand.PalmPosition.ToVector3(), hand.IsLeft);
+            Transform deviceOrigin = providers[frame_idx].transform;
+
+            LeapXRServiceProvider xrProvider = providers[frame_idx] as LeapXRServiceProvider;
+            if (xrProvider != null)
+            {
+                deviceOrigin = xrProvider.mainCamera.transform.GetChild(0);
+            }
+
+            confidence = palmPosFactor * Confidence_RelativeHandPos(providers[frame_idx], deviceOrigin, hand.PalmPosition.ToVector3());
+            confidence += palmRotFactor * Confidence_RelativeHandRot(deviceOrigin, hand.PalmPosition.ToVector3(), hand.PalmNormal.ToVector3());
+            confidence += palmVelocityFactor * Confidence_RelativeHandVelocity(providers[frame_idx], deviceOrigin, hand.PalmPosition.ToVector3(), hand.IsLeft);
 
             // if timeSinceHandFirstVisibleFactor is 1, then
             // the confidence should be 0 when it is the first frame with the hand in it.
@@ -316,17 +324,25 @@ namespace Leap.Unity
                 jointConfidences = new float[VectorHand.NUM_JOINT_POSITIONS];
             }
 
+            Transform deviceOrigin = providers[frame_idx].transform;
+
+            LeapXRServiceProvider xrProvider = providers[frame_idx] as LeapXRServiceProvider;
+            if (xrProvider != null)
+            {
+                deviceOrigin = xrProvider.mainCamera.transform.GetChild(0);
+            }
+
             if (jointRotFactor != 0)
             {
-                confidences_jointRot = Confidence_RelativeJointRot(confidences_jointRot, providers[frame_idx].transform, hand);
+                confidences_jointRot = Confidence_RelativeJointRot(confidences_jointRot, deviceOrigin, hand);
             }
             if (jointRotToPalmFactor != 0)
             {
-                confidences_jointPalmRot = Confidence_relativeJointRotToPalmRot(confidences_jointPalmRot, providers[frame_idx].transform, hand);
+                confidences_jointPalmRot = Confidence_relativeJointRotToPalmRot(confidences_jointPalmRot, deviceOrigin, hand);
             }
             if (jointOcclusionFactor != 0)
             {
-                confidences_jointOcclusion = jointOcclusions[frame_idx].Confidence_JointOcclusion(confidences_jointOcclusion, providers[frame_idx].transform, hand);
+                confidences_jointOcclusion = jointOcclusions[frame_idx].Confidence_JointOcclusion(confidences_jointOcclusion, deviceOrigin, hand);
             }
 
             for (int finger_idx = 0; finger_idx < 5; finger_idx++)
