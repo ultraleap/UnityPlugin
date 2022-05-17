@@ -525,8 +525,7 @@ namespace Leap.Unity
 
         private void LoadFOVData()
         {
-            //Debug.Log(Resources.Load<TextAsset>("SupportedTrackingDevices").text);
-            leapFOVInfos = Newtonsoft.Json.JsonConvert.DeserializeObject<LeapFOVInfos>(Resources.Load<TextAsset>("SupportedTrackingDevices").text);
+            leapFOVInfos = JsonUtility.FromJson<LeapFOVInfos>(Resources.Load<TextAsset>("SupportedTrackingDevices").text);
 
             if (_visualFOV == null) _visualFOV = new VisualFOV();
         }
@@ -540,11 +539,13 @@ namespace Leap.Unity
             _visualFOV.OptimalMaxDistance = leapInfo.OptimalDistance;
         }
 
+        [Serializable]
         public class LeapFOVInfos
         {
             public List<LeapFOVInfo> SupportedDevices;
         }
 
+        [Serializable]
         public class LeapFOVInfo
         {
             public string Name;
