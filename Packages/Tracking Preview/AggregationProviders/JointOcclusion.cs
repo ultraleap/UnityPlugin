@@ -6,6 +6,9 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
+/// <summary>
+/// class to calculate confidence values based on joint occlusion.
+/// </summary>
 public class JointOcclusion : MonoBehaviour
 {
     public Shader replacementShader;
