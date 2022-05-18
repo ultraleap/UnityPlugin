@@ -10,6 +10,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.ComponentModel;
 using UnityEngine;
 
 namespace Leap.Unity
@@ -547,6 +548,7 @@ namespace Leap.Unity
         }
 
         [Obsolete("Intended to be internal function, will be removed in next breaking version")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public bool CreateAndroidBinding() => EnsureAndroidBinding();
 
         private bool EnsureAndroidBinding()
