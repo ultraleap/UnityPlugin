@@ -9,7 +9,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4929949832114178341}
-  - component: {fileID: 6813099381697644921}
   m_Layer: 8
   m_Name: 3Di
   m_TagString: Untagged
@@ -32,19 +31,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!65 &6813099381697644921
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5064678774480423651}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 15.13126, y: 1.65473, z: 2.30946}
-  m_Center: {x: -0.0272789, y: 0.10912132, z: 0.05456108}
 --- !u!1 &7492700049904025523
 GameObject:
   m_ObjectHideFlags: 0
@@ -127,6 +113,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -90.00001
       objectReference: {fileID: 0}
+    - target: {fileID: -7635826562936255635, guid: 75176171bd677c34793ed022a855970a, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 8eca0b31e096dbb4e9ec168e385043a9, type: 2}
     - target: {fileID: 919132149155446097, guid: 75176171bd677c34793ed022a855970a, type: 3}
       propertyPath: m_Name
       value: 3Di

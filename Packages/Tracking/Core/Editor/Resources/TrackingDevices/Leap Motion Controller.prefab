@@ -91,35 +91,21 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -2416733968201007103, guid: eb6b9d5620ff2b04695ca7155bf7b0c7, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 8eca0b31e096dbb4e9ec168e385043a9, type: 2}
     - target: {fileID: -927199367670048503, guid: eb6b9d5620ff2b04695ca7155bf7b0c7, type: 3}
       propertyPath: m_Name
       value: Leap Motion Controller
       objectReference: {fileID: 0}
     - target: {fileID: -927199367670048503, guid: eb6b9d5620ff2b04695ca7155bf7b0c7, type: 3}
       propertyPath: m_Layer
-      value: 8
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2534866581884222612, guid: eb6b9d5620ff2b04695ca7155bf7b0c7, type: 3}
       propertyPath: m_Layer
-      value: 8
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: eb6b9d5620ff2b04695ca7155bf7b0c7, type: 3}
---- !u!1 &6203509084584322800 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: -927199367670048503, guid: eb6b9d5620ff2b04695ca7155bf7b0c7, type: 3}
-  m_PrefabInstance: {fileID: 2681515017492365305}
-  m_PrefabAsset: {fileID: 0}
---- !u!65 &7341757917051354528
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6203509084584322800}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 13.22, y: 1.115, z: 3}
-  m_Center: {x: 2.6100001, y: 0, z: 0}
