@@ -543,15 +543,19 @@ namespace Leap.Unity
 
         protected virtual void OnEnable()
         {
-            CreateAndroidBinding();
+            EnsureAndroidBinding();
         }
 
-        private void CreateAndroidBinding()
+        [Obsolete("Intended to be internal function, will be removed in next breaking version")]
+        public bool CreateAndroidBinding() => EnsureAndroidBinding();
+
+        private bool EnsureAndroidBinding()
         {
+            bool success;
             try
             {
                 bool isServiceBound = _serviceBinder?.Call<bool>("isBound") ?? false;
-                if (isServiceBound) return;
+                if (isServiceBound) return true; // Already bound
 
                 _serviceBinder = null;
 
@@ -568,7 +572,7 @@ namespace Leap.Unity
                 //Create a new service binding
                 Debug.Log("CreateAndroidBinding - Creating a new service binder");
                 _serviceBinder = new AndroidJavaObject("com.ultraleap.tracking.service_binder.ServiceBinder", context, serviceCallbacks);
-                bool success = _serviceBinder.Call<bool>("bind");
+                success = _serviceBinder.Call<bool>("bind");
                 if (success)
                 {
                     Debug.Log("CreateAndroidBinding - Binding of service binder complete");
@@ -582,7 +586,10 @@ namespace Leap.Unity
             {
                 Debug.LogWarning("CreateAndroidBinding - Failed to bind service: " + e.Message);
                 _serviceBinder = null;
+                success = false;
             }
+
+            return success;
         }
 
         protected virtual void OnDisable()
@@ -954,7 +961,7 @@ namespace Leap.Unity
         protected void createController()
         {
 #if SVR
-            var bindStatus = CreateAndroidBinding();
+            var bindStatus = EnsureAndroidBinding();
             if (!bindStatus)
                 return;
 
