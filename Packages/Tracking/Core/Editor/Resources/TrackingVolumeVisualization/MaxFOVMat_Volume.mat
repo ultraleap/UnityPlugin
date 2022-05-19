@@ -116,7 +116,7 @@ Material:
     m_Colors:
     - Color_7B0DEFE0: {r: 2.6387439, g: 2.5023966, b: 0, a: 1}
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
-    - _Color: {r: 0.5188679, g: 0.47759435, b: 0, a: 0.3019608}
+    - _Color: {r: 0, g: 0, b: 0, a: 0.11764706}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _LeapPos: {r: 0, g: 0, b: 0, a: 0}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}

@@ -1312,10 +1312,10 @@ namespace Leap.Unity
                 if (leapInfo.Name == deviceType)
                 {
                     info = leapInfo;
-                    Material mat = Resources.Load("DeviceModelMat") as Material;
+                    Material mat = Resources.Load("TrackingVolumeVisualization/DeviceModelMat") as Material;
                     mat.SetPass(0);
 
-                    Graphics.DrawMeshNow(Resources.Load<Mesh>("Meshes/" + deviceType), deviceModelMatrix *
+                    Graphics.DrawMeshNow(Resources.Load<Mesh>("TrackingVolumeVisualization/Meshes/" + deviceType), deviceModelMatrix *
                            Matrix4x4.Scale(Vector3.one * 0.01f));
                     break;
                 }
@@ -1348,7 +1348,7 @@ namespace Leap.Unity
 
             if (OptimalFOV_Visualization && optimalFOVMesh != null)
             {
-                Material mat = Resources.Load("OptimalFOVMat_Volume") as Material;
+                Material mat = Resources.Load("TrackingVolumeVisualization/OptimalFOVMat_Volume") as Material;
                 mat.SetPass(0);
 
                 Graphics.DrawMeshNow(optimalFOVMesh, deviceModelMatrix *
@@ -1356,7 +1356,7 @@ namespace Leap.Unity
             }
             if (MaxFOV_Visualization && maxFOVMesh != null)
             {
-                Material mat = Resources.Load("MaxFOVMat_Volume") as Material;
+                Material mat = Resources.Load("TrackingVolumeVisualization/MaxFOVMat_Volume") as Material;
                 mat.SetPass(0);
 
                 Graphics.DrawMeshNow(maxFOVMesh, deviceModelMatrix *
@@ -1367,7 +1367,7 @@ namespace Leap.Unity
 
         private void LoadFOVData()
         {
-            leapFOVInfos = JsonUtility.FromJson<LeapFOVInfos>(Resources.Load<TextAsset>("SupportedTrackingDevices").text);
+            leapFOVInfos = JsonUtility.FromJson<LeapFOVInfos>(Resources.Load<TextAsset>("TrackingVolumeVisualization/SupportedTrackingDevices").text);
 
             if (_visualFOV == null) _visualFOV = new VisualFOV();
         }
