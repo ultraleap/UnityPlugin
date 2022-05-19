@@ -6,9 +6,15 @@ This is an experimental compatibility layer that allows to use Quest hand tracki
 
 ## Setup
 
-1. Download the [Oculus Integration] (https://assetstore.unity.com/packages/tools/integration/oculus-integration-82022) from the Asset Store
+1. Download the [Oculus Integration](https://assetstore.unity.com/packages/tools/integration/oculus-integration-82022) from the Asset Store
 1. Create a new Unity Project
-1. Follow [these instructions] (https://developer.oculus.com/documentation/unity/unity-handtracking/) provided by Oculus to set up hand tracking in Unity 
+1. Follow [these instructions](https://developer.oculus.com/documentation/unity/unity-handtracking/) provided by Oculus to set up hand tracking in Unity
+1. Import packages from disk:
+	- dsd
+2. Fix Oculus-Leap circular dependency by adding an asmdef for the sample framework:
+  	- Copy the following:
+  	- src: `./ASMDEF - Oculus Sample Framework/oculus.sampleframework.asmdef` 
+  	- dest: `Assets/Oculus/SampleFramework`
 
 ## Requirements
 
