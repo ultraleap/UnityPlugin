@@ -1,8 +1,8 @@
 {
-	"name": "com.ultraleap.ovrleapprovider",
+	"name": "com.ultraleap.ovrprovider",
 	"version": "5.8.0",
-	"description": "Ultraleap OVR Leap Provider",
-	"displayName": "Ultraleap OVR Leap Provider",
+	"description": "Ultraleap OVR Provider",
+	"displayName": "Ultraleap OVR Provider",
 	"unity": "2019.4",
 	"license": "Apache-2.0",
 	"dependencies": {

@@ -1,4 +1,4 @@
-# Ultraleap OVRLeapProvider
+# Ultraleap OVRProvider
 
 Update of [[DRAFT] OVRProvider - Oculus Quest Hand Tracking](https://github.com/ultraleap/UnityPlugin/pull/1166), based on the latest develop branch.
 
