@@ -29,7 +29,7 @@ namespace Leap.Unity
         public float OptimalMaxDistance = 50f;
         public float MinDistance = 1f;
         // Quality settings
-        public int RayCount = 50;
+        public int RayCount = 10;
 
         public Mesh OptimalFOVMesh;
         public Mesh NoTrackingFOVMesh;
