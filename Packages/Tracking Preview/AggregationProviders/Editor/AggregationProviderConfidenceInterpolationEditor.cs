@@ -15,7 +15,7 @@ namespace Leap.Unity
     [CustomEditor(typeof(AggregationProviderConfidenceInterpolation))]
     public class AggregationProviderConfidenceInterpolationEditor : CustomEditorBase
     {
-        
+
         protected override void OnEnable()
         {
             base.OnEnable();
