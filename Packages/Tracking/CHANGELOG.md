@@ -6,7 +6,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [docs-website]: https://docs.ultraleap.com/ "Ultraleap Docs"
 
-## [5.8.0]
+## [5.9.0] - 25/05/2022
+ 
+### Added 
+
+- Add option to prevent initializing tracking mode for XR service provider 
+- Added an option in LeapImageRetriever to hide Rigel device's debug information 
+- Enable the use of multiple image retrievers in a scene that correspond to different devices 
+- Better visualization for a tracking device’s position and rotation and its FOV as gizmos 
+
+ 
+### Fixed 
+
+- Automatic Volume visualization does not work in multi device mode 
+- Switching between HMD and Screentop using ChangeTrackingMode() briefly switches to Desktop 
+- when rendering a passthrough image with OpenGL, the hand visualization is flipped in the undistorted view 
+- Changing tracking mode on the same frame as enabling a service provider has no effect 
+- Capsule Hands "Cylinder Radius" only updates after hitting play 
+- LeapEyeDislocator updates distortion values whenever a new device is plugged in, even if that device is not used for retrieving an image 
+
+### Known issues 
+- Scenes containing the infrared viewer render incorrectly on systems using single pass stereo with the XR plugin system - e.g. Windows Mixed Reality headsets. SteamVR headsets may also default to single pass stereo, showing the same issue. However in this case, the OpenVR settings can be changed to multipass which resolves the problem. 
+- Scenes containing the infrared viewer render incorrectly on Android build targets and in scriptable render pipelines such as URP and HDRP. 
+- Demo scenes do not start at the correct height for a seated user. The XR Plugin Management System adjusts the camera height. This means the user has to adjust components in the scene to the correct height - e.g. camera height. Currently our position is to support the legacy XR system height settings. 
+- Possible hand offset issues on XR2 headsets using SVR plugin 
+- Hands in Desktop scenes can appear far away from the camera 
+- Interactions callback scene allows blocks to be moved without doing a grasp pose. 
+- Capsule hands don't have a joint colour in HDRP 
+ 
+
+## [5.8.0] - 28/04/2022
 
 ### Added
 - A Leap Provider can now be specified for attachment hands
