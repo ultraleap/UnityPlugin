@@ -38,7 +38,7 @@ namespace Leap.Unity
 
         public bool ShowRaycasts = false;
         public bool ShowMaximumField = true;
-        public bool ShowNoTrackingField = true;
+        public bool ShowNoTrackingField = false;
         public bool ShowOptimalField = true;
 
 
