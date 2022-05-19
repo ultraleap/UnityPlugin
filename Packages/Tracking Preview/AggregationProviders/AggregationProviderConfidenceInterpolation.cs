@@ -149,12 +149,26 @@ namespace Leap.Unity
                     leftHandConfidences[hands_idx] /= sum;
                 }
             }
+            else
+            {
+                for (int hands_idx = 0; hands_idx < leftHandConfidences.Count; hands_idx++)
+                {
+                    leftHandConfidences[hands_idx] = 1f / leftHandConfidences.Count;
+                }
+            }
             sum = rightHandConfidences.Sum();
             if (sum != 0)
             {
                 for (int hands_idx = 0; hands_idx < rightHandConfidences.Count; hands_idx++)
                 {
                     rightHandConfidences[hands_idx] /= sum;
+                }
+            }
+            else
+            {
+                for (int hands_idx = 0; hands_idx < rightHandConfidences.Count; hands_idx++)
+                {
+                    rightHandConfidences[hands_idx] = 1f / rightHandConfidences.Count;
                 }
             }
 
