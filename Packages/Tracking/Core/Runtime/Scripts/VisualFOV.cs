@@ -22,7 +22,7 @@ namespace Leap.Unity
 
         // FOV Variables
         [Range(0, 360)]
-        public float HorizontalFOV = 90f;
+        public float HorizontalFOV = 0f;
         [Range(0, 360)]
         public float VerticalFOV = 90f;
         public float MaxDistance = 100f;
