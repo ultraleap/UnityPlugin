@@ -104,24 +104,5 @@ namespace Leap.Unity
             }
         }
 
-        public override void OnSceneGUI()
-        {
-            LeapXRServiceProvider xrProvider = target as LeapXRServiceProvider;
-
-            if (_mainCamera.objectReferenceValue == null)
-            {
-                return;
-            }
-
-            controllerOffset = new Vector3(0f,
-                                xrProvider.deviceOffsetYAxis,
-                                xrProvider.deviceOffsetZAxis);
-
-            deviceRotation = xrProvider.mainCamera.transform.InverseTransformRotation(xrProvider.mainCamera.transform.TransformRotation(Quaternion.Euler(xrProvider.deviceTiltXAxis, 0f, 0f))) * Quaternion.Euler(90f, 0f, 0f);
-
-
-            base.OnSceneGUI();
-
-        }
     }
 }
