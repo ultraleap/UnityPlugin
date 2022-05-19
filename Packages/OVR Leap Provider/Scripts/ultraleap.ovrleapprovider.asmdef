@@ -1,0 +1,19 @@
+{
+    "name": "ultraleap.ovrleapprovider",
+    "rootNamespace": "",
+    "references": [
+        "GUID:2ee0542102ac1084e8d9a910885c1e81",
+        "GUID:cec9848704c49724192ff47f9b3e9156",
+        "GUID:f64c9ebcd7899c3448a08dc9f9ddbe30",
+        "GUID:0bfda78d878aceb4cadad476b02b7361"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
