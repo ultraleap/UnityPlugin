@@ -1205,7 +1205,7 @@ namespace Leap.Unity
 
         private void OnDrawGizmos()
         {
-            if(_visualFOV == null || leapFOVInfos == null || leapFOVInfos.SupportedDevices.Count == 0)
+            if (_visualFOV == null || leapFOVInfos == null || leapFOVInfos.SupportedDevices.Count == 0)
             {
                 LoadFOVData();
             }
@@ -1298,7 +1298,7 @@ namespace Leap.Unity
             Matrix4x4 deviceModelMatrix = targetTransform.localToWorldMatrix;
 
             LeapXRServiceProvider xrProvider = this as LeapXRServiceProvider;
-            if(xrProvider != null && xrProvider.deviceOffsetMode != LeapXRServiceProvider.DeviceOffsetMode.Transform)
+            if (xrProvider != null && xrProvider.deviceOffsetMode != LeapXRServiceProvider.DeviceOffsetMode.Transform)
             {
                 deviceModelMatrix *= Matrix4x4.Translate(new Vector3(0, xrProvider.deviceOffsetYAxis, xrProvider.deviceOffsetZAxis));
                 deviceModelMatrix *= Matrix4x4.Rotate(Quaternion.Euler(-90 - xrProvider.deviceTiltXAxis, 180, 0));
