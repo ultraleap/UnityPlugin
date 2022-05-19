@@ -455,22 +455,35 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
         #region Hand Updating
 
-        public static void UpdatePhysicsPalm(ref PhysicsHand.Hand physicsHand, Leap.Hand leapHand, float interpFactor = 1f, float distanceForceReduction = 0f)
+        public static void UpdatePhysicsPalm(ref PhysicsHand.Hand physicsHand, Vector3 position, Quaternion rotation, float interpFactor = 0f, float distanceForceReduction = 0f)
         {
             physicsHand.oldPosition = physicsHand.transform.position;
             // Apply tracking position velocity
             physicsHand.palmBody.velocity *= 0;
-            physicsHand.palmBody.AddForce(Vector3.ClampMagnitude((leapHand.PalmPosition.ToVector3() - physicsHand.transform.position) * interpFactor / Time.fixedDeltaTime / Time.fixedDeltaTime * physicsHand.palmBody.mass * (1f - distanceForceReduction),
+
+            Vector3 delta = position - physicsHand.transform.position;
+
+            if (interpFactor > 0)
+            {
+                delta.x *= (1f - interpFactor);
+                if(delta.y > 0)
+                {
+                    delta.y *= (1f - interpFactor);
+                }
+                delta.z *= (1f - interpFactor);
+            }
+
+            physicsHand.palmBody.AddForce(Vector3.ClampMagnitude((delta) / Time.fixedDeltaTime / Time.fixedDeltaTime * physicsHand.palmBody.mass * (1f - distanceForceReduction),
                 1000f * physicsHand.strength));
 
             // Apply tracking rotation velocity
             // TODO: Compensate for phantom forces on strongly misrotated appendages
-            Quaternion rotation = leapHand.Rotation.ToQuaternion() * Quaternion.Inverse(physicsHand.transform.rotation);
-            rotation = Quaternion.Slerp(Quaternion.identity, rotation, interpFactor);
+            Quaternion rotationDelta = rotation * Quaternion.Inverse(physicsHand.transform.rotation);
+            rotationDelta = Quaternion.Slerp(Quaternion.identity, rotationDelta, 1f - interpFactor);
             physicsHand.palmBody.angularVelocity = Vector3.ClampMagnitude((new Vector3(
-                Mathf.DeltaAngle(0, rotation.eulerAngles.x),
-                Mathf.DeltaAngle(0, rotation.eulerAngles.y),
-                Mathf.DeltaAngle(0, rotation.eulerAngles.z)) / Time.fixedDeltaTime) * Mathf.Deg2Rad, 45f * physicsHand.strength);
+                Mathf.DeltaAngle(0, rotationDelta.eulerAngles.x),
+                Mathf.DeltaAngle(0, rotationDelta.eulerAngles.y),
+                Mathf.DeltaAngle(0, rotationDelta.eulerAngles.z)) / Time.fixedDeltaTime) * Mathf.Deg2Rad, 45f * physicsHand.strength);
         }
 
         public static float CalculateXTargetAngle(Bone previous, Bone current, int fingerIndex, int jointIndex)

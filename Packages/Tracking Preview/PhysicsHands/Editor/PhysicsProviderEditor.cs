@@ -23,6 +23,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
         SerializedProperty _interHandCollisions;
         SerializedProperty _strength, _perBoneMass;
+        SerializedProperty _handTeleportDistance, _handGraspTeleportDistance;
 
         SerializedProperty _enableHelpers;
         SerializedProperty _interpolateMass, _maxMass;
@@ -50,6 +51,8 @@ namespace Leap.Unity.Interaction.PhysicsHands
             _interHandCollisions = serializedObject.FindProperty("_interHandCollisions");
             _strength = serializedObject.FindProperty("_strength");
             _perBoneMass = serializedObject.FindProperty("_perBoneMass");
+            _handTeleportDistance = serializedObject.FindProperty("_handTeleportDistance");
+            _handGraspTeleportDistance = serializedObject.FindProperty("_handGraspTeleportDistance");
 
             _enableHelpers = serializedObject.FindProperty("_enableHelpers");
             _interpolateMass = serializedObject.FindProperty("_interpolateMass");
@@ -142,7 +145,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 }
             }
             EditorGUI.BeginDisabledGroup(true);
-            EditorGUILayout.ObjectField($"{hand.Handedness.ToString()} Hand", hand, typeof(PhysicsHand));
+            EditorGUILayout.ObjectField($"{hand.Handedness.ToString()} Hand", hand, typeof(PhysicsHand), true);
             EditorGUI.EndDisabledGroup();
         }
 
@@ -185,6 +188,8 @@ namespace Leap.Unity.Interaction.PhysicsHands
             EditorGUILayout.PropertyField(_interHandCollisions);
             EditorGUILayout.PropertyField(_strength);
             EditorGUILayout.PropertyField(_perBoneMass);
+            EditorGUILayout.PropertyField(_handTeleportDistance);
+            EditorGUILayout.PropertyField(_handGraspTeleportDistance);
             EditorGUILayout.EndVertical();
         }
 

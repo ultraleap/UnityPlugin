@@ -59,6 +59,14 @@ namespace Leap.Unity.Interaction.PhysicsHands
         [SerializeField, Tooltip("The mass of each finger bone; the palm will be 3x this.")]
         private float _perBoneMass = 0.6f;
 
+        public float HandTeleportDistance => _handTeleportDistance;
+        [SerializeField, Tooltip("The distance between the physics and original data hand can reach before it snaps back to the original hand position."), Range(0.01f, 0.5f)]
+        private float _handTeleportDistance = 0.1f;
+
+        public float HandGraspTeleportDistance => _handGraspTeleportDistance;
+        [SerializeField, Tooltip("The distance between the physics and original data hand can reach before it snaps back to the original hand position. This is used when a hand is reported as grasping."), Range(0.01f, 0.5f)]
+        private float _handGraspTeleportDistance = 0.2f;
+
         // Helper Settings
         [SerializeField, Tooltip("Enabling helpers is recommended as these allow the user to pick up objects larger than they normally would. " +
             "They also significantly improve picking up small objects.")]

@@ -118,6 +118,10 @@ namespace Leap.Unity.Interaction.PhysicsHands
         private int _teleportFrameCount = 0;
         private Collider[] _teleportColliders = new Collider[10];
 
+        private Vector3 _originalOldPosition = Vector3.zero;
+        private float _graspingDelta = 0;
+        private float _graspingDeltaCurrent = 0;
+
         private int[] _graspingFingers = new int[5];
         private bool[] _wasGraspingBones;
         private float[] _graspingXDrives;
@@ -135,7 +139,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
         {
             get
             {
-                if (_originalLeapHand == null || _physicsHand == null || _physicsHand.transform) return -1;
+                if (_originalLeapHand == null || _physicsHand == null || _physicsHand.transform == null) return -1;
                 return Vector3.Distance(_originalLeapHand.PalmPosition.ToVector3(), _physicsHand.transform.position);
             }
         }
@@ -214,6 +218,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             if (active)
             {
                 _physicsHand.palmBody.immovable = false;
+                _originalOldPosition = _originalLeapHand.PalmPosition.ToVector3();
 
                 _physicsHand.transform.position = _originalLeapHand.PalmPosition.ToVector3();
                 _physicsHand.transform.rotation = _originalLeapHand.Rotation.ToQuaternion();
@@ -293,7 +298,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             }
 #endif
 
-            _originalLeapHand.CopyFrom(hand);
+            _originalLeapHand.CopyFrom(hand);   
 
             if (!_hasReset && _resetWait > 0)
             {
@@ -310,9 +315,19 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 }
             }
 
-            PhysicsHandsUtils.UpdatePhysicsPalm(ref _physicsHand, _originalLeapHand,
-                _isGrasping && _physicsProvider.InterpolatingMass && _graspMass > 1 ? 1.0f - Mathf.InverseLerp(0.001f, _physicsProvider.MaxMass, _graspMass).EaseOut() : 1f,
-                0f);
+            if(!IsGrasping && _graspingDeltaCurrent > 0)
+            {
+                _graspingDeltaCurrent -= Vector3.Distance(_originalOldPosition, _originalLeapHand.PalmPosition.ToVector3());
+            }
+
+            PhysicsHandsUtils.UpdatePhysicsPalm(ref _physicsHand,
+                // If the hand was grasping then we want to smoothly interpolate back to where it was based on distance
+                !IsGrasping && _graspingDeltaCurrent > 0 ? Vector3.Lerp(_physicsHand.transform.position, _originalLeapHand.PalmPosition.ToVector3(), Mathf.InverseLerp(_graspingDelta, 0, _graspingDeltaCurrent)) : _originalLeapHand.PalmPosition.ToVector3(),
+                !IsGrasping && _graspingDeltaCurrent > 0 ? Quaternion.Slerp(_physicsHand.transform.rotation,  _originalLeapHand.Rotation.ToQuaternion(), Mathf.InverseLerp(_graspingDelta, 0, _graspingDeltaCurrent)) : _originalLeapHand.Rotation.ToQuaternion(),
+                // Interpolate the object if it's heavier
+                _isGrasping && _physicsProvider.InterpolatingMass && _graspMass > 1 ? Mathf.InverseLerp(0.001f, _physicsProvider.MaxMass, _graspMass).EaseOut() : 0f,
+                // Reduce force of hand as it gets further from the original data hand
+                !_ghosted && !_isGrasping && _graspingDeltaCurrent > 0 ? Mathf.InverseLerp(_physicsProvider.HandTeleportDistance * 0.5f, _physicsProvider.HandTeleportDistance, DistanceFromDataHand).EaseOut() : 0f);
 
             // Fix the hand if it gets into a bad situation by teleporting and holding in place until its bad velocities disappear
             HandleTeleportingHands();
@@ -370,7 +385,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                     Mathf.InverseLerp(body.xDrive.lowerLimit, _physicsHand.jointBones[boneArrayIndex].OriginalXDriveLimit, xTargetAngle);
 
                     // Clamp the max until we've moved the bone to a lower amount than originally grasped at
-                    if (_wasGraspingBones[boneArrayIndex] && (xTargetAngle < _graspingXDrives[boneArrayIndex] || Mathf.InverseLerp(body.xDrive.lowerLimit, _physicsHand.jointBones[boneArrayIndex].OriginalXDriveLimit, xTargetAngle) < .2f))
+                    if (_wasGraspingBones[boneArrayIndex] && (xTargetAngle < _graspingXDrives[boneArrayIndex] || Mathf.InverseLerp(body.xDrive.lowerLimit, _physicsHand.jointBones[boneArrayIndex].OriginalXDriveLimit, xTargetAngle) < .25f))
                     {
                         _wasGraspingBones[boneArrayIndex] = false;
                     }
@@ -403,6 +418,13 @@ namespace Leap.Unity.Interaction.PhysicsHands
             }
 
             _wasGrasping = IsGrasping;
+            _originalOldPosition = _originalLeapHand.PalmPosition.ToVector3();
+
+            if (IsGrasping)
+            {
+                _graspingDelta = DistanceFromDataHand;
+                _graspingDeltaCurrent = _graspingDelta;
+            }
 
             PhysicsHandsUtils.ConvertPhysicsToLeapHand(_physicsHand, ref _leapHand, _originalLeapHand, Time.fixedDeltaTime);
 
@@ -447,7 +469,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
         private void HandleTeleportingHands()
         {
             // Fix the hand if it gets into a bad situation by teleporting and holding in place until its bad velocities disappear
-            if (!_isGrasping && Vector3.Distance(_physicsHand.transform.position, _originalLeapHand.PalmPosition.ToVector3()) > 0.1f)
+            if (DistanceFromDataHand > (IsGrasping ? _physicsProvider.HandGraspTeleportDistance : _physicsProvider.HandTeleportDistance))
             {
                 ResetPhysicsHand(true);
                 //_palmBody.TeleportRoot(_hand.PalmPosition.ToVector3(), _hand.Rotation.ToQuaternion());
