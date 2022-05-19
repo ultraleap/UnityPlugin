@@ -24,20 +24,28 @@ namespace Leap.Unity
     public class AggregationProviderConfidenceInterpolation : LeapAggregatedProviderBase
     {
         // factors that get multiplied to the corresponding confidence values to get an overall weighted confidence value
+        [Tooltip("How much should the Palm position relative to the tracking camera influence the overall hand confidence? A confidence value is determined by whether the hand is within the optimal FOV of the tracking camera")]
+        public float palmPosFactor = 0;
+        [Tooltip("How much should the Palm orientation relative to the tracking camera influence the overall hand confidence? A confidence value is determined by looking at the angle between the palm normal and the direction from hand to camera.")]
+        public float palmRotFactor = 0;
+        [Tooltip("How much should the Palm velocity relative to the tracking camera influence the overall hand confidence?")]
+        public float palmVelocityFactor = 0;
+        [Tooltip("How much should the duration that a hand has been visible for, influence the overall hand confidence?")]
+        public float timeSinceHandFirstVisibleFactor = 0;
 
-        public float palmPosFactor = 1;
-        public float palmRotFactor = 1;
-        public float palmVelocityFactor = 1;
-        public float timeSinceHandFirstVisibleFactor = 1;
+        [Tooltip("How much should the joint rotation relative to the tracking camera influence the overall hand confidence? A confidence value is determined for a joint by looking at the angle between the joint normal and the direction from hand to camera.")]
+        public float jointRotFactor = 0;
+        [Tooltip("How much should the joint rotation relative to the palm normal influence the overall hand confidence?")]
+        public float jointRotToPalmFactor = 0;
+        [Tooltip("How much should joint occlusion influence the overall hand confidence?")]
+        public float jointOcclusionFactor = 0;
 
-        public float jointRotFactor = 1;
-        public float jointRotToPalmFactor = 1;
-
-        // if the debug hands are not null, their joint colors are given by interpolating between the debugColors based on joint confidences
+        [Tooltip("if the debug hand is not null, its joint colors are given by interpolating between the debugColors based on which hand the aggregated data came from (in order of the providers)")]
         public CapsuleHand debugHandLeft;
+        [Tooltip("if the debug hand is not null, its joint colors are given by interpolating between the debugColors based on which hand the aggregated data came from (in order of the providers)")]
         public CapsuleHand debugHandRight;
 
-        // The debug colors should have the same order and length as the provider list
+        [Tooltip("The debug colors should have the same order and length as the provider list")]
         public Color[] debugColors;
 
         Dictionary<LeapProvider, HandPositionHistory> lastLeftHandPositions = new Dictionary<LeapProvider, HandPositionHistory>();
@@ -46,11 +54,22 @@ namespace Leap.Unity
         Dictionary<LeapProvider, float> leftHandFirstVisible = new Dictionary<LeapProvider, float>();
         Dictionary<LeapProvider, float> rightHandFirstVisible = new Dictionary<LeapProvider, float>();
 
+        List<JointOcclusion> jointOcclusions;
+
         Vector3[] mergedJointPositions = new Vector3[VectorHand.NUM_JOINT_POSITIONS];
 
         private float[] jointConfidences = new float[VectorHand.NUM_JOINT_POSITIONS];
         private float[] confidences_jointRot = new float[VectorHand.NUM_JOINT_POSITIONS];
         private float[] confidences_jointPalmRot = new float[VectorHand.NUM_JOINT_POSITIONS];
+        private float[] confidences_jointOcclusion = new float[VectorHand.NUM_JOINT_POSITIONS];
+
+        Dictionary<LeapProvider, JointConfidenceHistory> jointConfidenceHistoriesLeft = new Dictionary<LeapProvider, JointConfidenceHistory>();
+        Dictionary<LeapProvider, JointConfidenceHistory> jointConfidenceHistoriesRight = new Dictionary<LeapProvider, JointConfidenceHistory>();
+
+        Dictionary<LeapProvider, HandConfidenceHistory> handConfidenceHistoriesLeft = new Dictionary<LeapProvider, HandConfidenceHistory>();
+        Dictionary<LeapProvider, HandConfidenceHistory> handConfidenceHistoriesRight = new Dictionary<LeapProvider, HandConfidenceHistory>();
+
+
 
 
         protected override Frame MergeFrames(Frame[] frames)
@@ -63,6 +82,27 @@ namespace Leap.Unity
 
             List<float[]> leftJointConfidences = new List<float[]>();
             List<float[]> rightJointConfidences = new List<float[]>();
+
+            if (jointOcclusionFactor != 0 && jointOcclusions == null)
+            {
+                jointOcclusions = new List<JointOcclusion>();
+                foreach (LeapProvider provider in providers)
+                {
+                    JointOcclusion jointOcclusion = provider.gameObject.GetComponentInChildren<JointOcclusion>();
+
+                    if (jointOcclusion == null)
+                    {
+                        jointOcclusion = GameObject.Instantiate(Resources.Load<GameObject>("JointOcclusionPrefab"), provider.transform).GetComponent<JointOcclusion>();
+
+                        foreach (CapsuleHand jointOcclusionHand in jointOcclusion.GetComponentsInChildren<CapsuleHand>(true))
+                        {
+                            jointOcclusionHand.leapProvider = provider;
+                        }
+                    }
+
+                    jointOcclusions.Add(jointOcclusion);
+                }
+            }
 
 
             // make lists of all left and right hands found in each frame and also make a list of their confidences
@@ -81,7 +121,8 @@ namespace Leap.Unity
                         float[] jointConfidences = CalculateJointConfidence(frame_idx, hand);
 
                         leftHandConfidences.Add(handConfidence);
-                        leftJointConfidences.Add(jointConfidences.Select(x => x * handConfidence).ToArray());
+                        leftJointConfidences.Add(jointConfidences);
+                        //leftJointConfidences.Add(jointConfidences.Select(x => x * handConfidence).ToArray());
                     }
 
                     else
@@ -92,7 +133,8 @@ namespace Leap.Unity
                         float[] jointConfidences = CalculateJointConfidence(frame_idx, hand);
 
                         rightHandConfidences.Add(handConfidence);
-                        rightJointConfidences.Add(jointConfidences.Select(x => x * handConfidence).ToArray());
+                        rightJointConfidences.Add(jointConfidences);
+                        //rightJointConfidences.Add(jointConfidences.Select(x => x * handConfidence).ToArray());
                     }
                 }
             }
@@ -107,12 +149,26 @@ namespace Leap.Unity
                     leftHandConfidences[hands_idx] /= sum;
                 }
             }
+            else
+            {
+                for (int hands_idx = 0; hands_idx < leftHandConfidences.Count; hands_idx++)
+                {
+                    leftHandConfidences[hands_idx] = 1f / leftHandConfidences.Count;
+                }
+            }
             sum = rightHandConfidences.Sum();
             if (sum != 0)
             {
                 for (int hands_idx = 0; hands_idx < rightHandConfidences.Count; hands_idx++)
                 {
                     rightHandConfidences[hands_idx] /= sum;
+                }
+            }
+            else
+            {
+                for (int hands_idx = 0; hands_idx < rightHandConfidences.Count; hands_idx++)
+                {
+                    rightHandConfidences[hands_idx] = 1f / rightHandConfidences.Count;
                 }
             }
 
@@ -230,10 +286,42 @@ namespace Leap.Unity
         {
             float confidence = 0;
 
-            confidence = palmPosFactor * Confidence_RelativeHandPos(providers[frame_idx], providers[frame_idx].transform, hand.PalmPosition.ToVector3());
-            confidence += palmRotFactor * Confidence_RelativeHandRot(providers[frame_idx].transform, hand.PalmPosition.ToVector3(), hand.PalmNormal.ToVector3());
-            confidence += palmVelocityFactor * Confidence_RelativeHandVelocity(providers[frame_idx], providers[frame_idx].transform, hand.PalmPosition.ToVector3(), hand.IsLeft);
-            confidence += timeSinceHandFirstVisibleFactor * Confidence_TimeSinceHandFirstVisible(providers[frame_idx], hand.IsLeft);
+            Transform deviceOrigin = providers[frame_idx].transform;
+
+            LeapXRServiceProvider xrProvider = providers[frame_idx] as LeapXRServiceProvider;
+            if (xrProvider != null)
+            {
+                deviceOrigin = xrProvider.mainCamera.transform.GetChild(0);
+            }
+
+            confidence = palmPosFactor * Confidence_RelativeHandPos(providers[frame_idx], deviceOrigin, hand.PalmPosition.ToVector3());
+            confidence += palmRotFactor * Confidence_RelativeHandRot(deviceOrigin, hand.PalmPosition.ToVector3(), hand.PalmNormal.ToVector3());
+            confidence += palmVelocityFactor * Confidence_RelativeHandVelocity(providers[frame_idx], deviceOrigin, hand.PalmPosition.ToVector3(), hand.IsLeft);
+
+            // if timeSinceHandFirstVisibleFactor is 1, then
+            // the confidence should be 0 when it is the first frame with the hand in it.
+            confidence = Mathf.Lerp(confidence, confidence * Confidence_TimeSinceHandFirstVisible(providers[frame_idx], hand.IsLeft), timeSinceHandFirstVisibleFactor);
+
+
+            // average out new hand confidence with that of the last few frames
+            if (hand.IsLeft)
+            {
+                if (!handConfidenceHistoriesLeft.ContainsKey(providers[frame_idx]))
+                {
+                    handConfidenceHistoriesLeft.Add(providers[frame_idx], new HandConfidenceHistory());
+                }
+                handConfidenceHistoriesLeft[providers[frame_idx]].AddConfidence(confidence);
+                confidence = handConfidenceHistoriesLeft[providers[frame_idx]].GetAveragedConfidence();
+            }
+            else
+            {
+                if (!handConfidenceHistoriesRight.ContainsKey(providers[frame_idx]))
+                {
+                    handConfidenceHistoriesRight.Add(providers[frame_idx], new HandConfidenceHistory());
+                }
+                handConfidenceHistoriesRight[providers[frame_idx]].AddConfidence(confidence);
+                confidence = handConfidenceHistoriesRight[providers[frame_idx]].GetAveragedConfidence();
+            }
 
             return confidence;
         }
@@ -250,13 +338,67 @@ namespace Leap.Unity
                 jointConfidences = new float[VectorHand.NUM_JOINT_POSITIONS];
             }
 
-            confidences_jointRot = Confidence_RelativeJointRot(confidences_jointRot, providers[frame_idx].transform, hand);
-            confidences_jointPalmRot = Confidence_relativeJointRotToPalmRot(confidences_jointPalmRot, providers[frame_idx].transform, hand);
+            Transform deviceOrigin = providers[frame_idx].transform;
 
-            for (int joint_idx = 0; joint_idx < jointConfidences.Length; joint_idx++)
+            LeapXRServiceProvider xrProvider = providers[frame_idx] as LeapXRServiceProvider;
+            if (xrProvider != null)
             {
-                jointConfidences[joint_idx] = jointRotFactor * confidences_jointRot[joint_idx] +
-                                 jointRotToPalmFactor * confidences_jointPalmRot[joint_idx];
+                deviceOrigin = xrProvider.mainCamera.transform.GetChild(0);
+            }
+
+            if (jointRotFactor != 0)
+            {
+                confidences_jointRot = Confidence_RelativeJointRot(confidences_jointRot, deviceOrigin, hand);
+            }
+            if (jointRotToPalmFactor != 0)
+            {
+                confidences_jointPalmRot = Confidence_relativeJointRotToPalmRot(confidences_jointPalmRot, deviceOrigin, hand);
+            }
+            if (jointOcclusionFactor != 0)
+            {
+                confidences_jointOcclusion = jointOcclusions[frame_idx].Confidence_JointOcclusion(confidences_jointOcclusion, deviceOrigin, hand);
+            }
+
+            for (int finger_idx = 0; finger_idx < 5; finger_idx++)
+            {
+                for (int bone_idx = 0; bone_idx < 5; bone_idx++)
+                {
+                    int key = finger_idx * 5 + bone_idx;
+                    jointConfidences[key] =
+                    jointRotFactor * confidences_jointRot[key] +
+                                 jointRotToPalmFactor * confidences_jointPalmRot[key] +
+                                 jointOcclusionFactor * confidences_jointOcclusion[key];
+
+                    if (bone_idx != 0)
+                    {
+                        // average with the confidence from the last joint on the same finger,
+                        // so that outer joints jump around less. 
+                        // eg. when a confidence is low on the knuckle of a finger, the finger tip confidence for the same finger
+                        // should take that into account and be slightly lower too
+                        jointConfidences[key] += jointConfidences[key - 1];
+                        jointConfidences[key] /= 2;
+                    }
+                }
+            }
+
+            // average out new joint confidence with that of the last few frames
+            if (hand.IsLeft)
+            {
+                if (!jointConfidenceHistoriesLeft.ContainsKey(providers[frame_idx]))
+                {
+                    jointConfidenceHistoriesLeft.Add(providers[frame_idx], new JointConfidenceHistory());
+                }
+                jointConfidenceHistoriesLeft[providers[frame_idx]].AddConfidences(jointConfidences);
+                jointConfidences = jointConfidenceHistoriesLeft[providers[frame_idx]].GetAveragedConfidences();
+            }
+            else
+            {
+                if (!jointConfidenceHistoriesRight.ContainsKey(providers[frame_idx]))
+                {
+                    jointConfidenceHistoriesRight.Add(providers[frame_idx], new JointConfidenceHistory());
+                }
+                jointConfidenceHistoriesRight[providers[frame_idx]].AddConfidences(jointConfidences);
+                jointConfidences = jointConfidenceHistoriesRight[providers[frame_idx]].GetAveragedConfidences();
             }
 
             return jointConfidences;
@@ -367,7 +509,6 @@ namespace Leap.Unity
             // and it should be 0 if it is 90 degrees
             float confidence = (Mathf.Cos(Mathf.Deg2Rad * 2 * palmAngle) + 1f) / 2;
 
-            //Debug.Log(confidence);
             return confidence;
         }
 
@@ -608,6 +749,122 @@ namespace Leap.Unity
         }
 
         /// <summary>
+        /// small helper class to save previous joint confidences and average over them
+        /// </summary>
+        class JointConfidenceHistory
+        {
+            int length;
+            float[,] jointConfidences;
+            float[] averageConfidences;
+            int index;
+            List<int> validIndices;
+
+            public JointConfidenceHistory(int length = 60)
+            {
+                this.length = length;
+                this.jointConfidences = new float[length, VectorHand.NUM_JOINT_POSITIONS];
+                this.index = 0;
+                validIndices = new List<int>();
+            }
+
+            public void ClearAll()
+            {
+                validIndices = new List<int>();
+            }
+
+            public void AddConfidences(float[] confidences)
+            {
+                for (int joint_idx = 0; joint_idx < confidences.Length; joint_idx++)
+                {
+                    jointConfidences[index, joint_idx] = confidences[joint_idx];
+                }
+                if (validIndices.IndexOf(index) == -1)
+                {
+                    validIndices.Add(index);
+                }
+                index = (index + 1) % length;
+            }
+
+            public float[] GetAveragedConfidences()
+            {
+                if (validIndices.Count == 0)
+                {
+                    return null;
+                }
+
+                if (averageConfidences == null)
+                {
+                    averageConfidences = new float[jointConfidences.GetLength(1)];
+                }
+                else
+                {
+                    averageConfidences.ClearWith(0);
+                }
+
+                for (int i = 0; i < averageConfidences.Length; i++)
+                {
+                    foreach (int j in validIndices)
+                    {
+                        averageConfidences[i] += jointConfidences[j, i] / validIndices.Count;
+                    }
+                }
+
+                return averageConfidences;
+            }
+        }
+
+        /// <summary>
+        /// small helper class to save previous whole-hand confidences and average over them
+        /// </summary>
+        class HandConfidenceHistory
+        {
+            int length;
+            float[] handConfidences;
+            int index;
+            List<int> validIndices;
+
+            public HandConfidenceHistory(int length = 60)
+            {
+                this.length = length;
+                this.handConfidences = new float[length];
+                this.index = 0;
+                validIndices = new List<int>();
+            }
+
+            public void ClearAll()
+            {
+                validIndices = new List<int>();
+            }
+
+            public void AddConfidence(float confidence)
+            {
+                handConfidences[index] = confidence;
+
+                if (validIndices.IndexOf(index) == -1)
+                {
+                    validIndices.Add(index);
+                }
+                index = (index + 1) % length;
+            }
+
+            public float GetAveragedConfidence()
+            {
+                if (validIndices.Count == 0)
+                {
+                    return 0;
+                }
+
+                float confidenceSum = 0;
+                foreach (int j in validIndices)
+                {
+                    confidenceSum += handConfidences[j];
+                }
+
+                return confidenceSum / validIndices.Count;
+            }
+        }
+
+        /// <summary>
         /// visualize where the merged joint data comes from, by using the debugColors in the same order as the providers in the provider list.
         /// the color is then linearly interpolated based on the joint confidences
         /// </summary>
@@ -617,16 +874,23 @@ namespace Leap.Unity
 
             Color[] colors = hand.SphereColors;
 
-            for (int joint_idx = 0; joint_idx < jointConfidences[0].Length; joint_idx++)
+            for (int finger_idx = 0; finger_idx < 5; finger_idx++)
             {
-                colors[joint_idx] = debugColors[0];
-
-                for (int hand_idx = 1; hand_idx < jointConfidences.Count; hand_idx++)
+                for (int bone_idx = 0; bone_idx < 4; finger_idx++)
                 {
-                    float lerpValue = jointConfidences.Take(hand_idx).Sum(x => x[joint_idx]) / jointConfidences.Take(hand_idx + 1).Sum(x => x[joint_idx]);
-                    colors[joint_idx] = Color.Lerp(debugColors[hand_idx], colors[joint_idx], lerpValue);
+                    int confidence_idx = finger_idx * 5 + bone_idx + 1;
+                    int capsuleHand_idx = finger_idx * 4 + bone_idx;
+
+                    colors[capsuleHand_idx] = debugColors[0];
+
+                    for (int hand_idx = 1; hand_idx < jointConfidences.Count; hand_idx++)
+                    {
+                        float lerpValue = jointConfidences.Take(hand_idx).Sum(x => x[confidence_idx]) / jointConfidences.Take(hand_idx + 1).Sum(x => x[confidence_idx]);
+                        colors[capsuleHand_idx] = Color.Lerp(debugColors[hand_idx], colors[capsuleHand_idx], lerpValue);
+                    }
                 }
             }
+
             hand.SphereColors = colors;
             hand.SetIndividualSphereColors = true;
         }
