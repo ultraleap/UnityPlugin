@@ -48,6 +48,14 @@ namespace Leap.Unity
 
             LoadFOVData();
 
+            specifyConditionalDrawing("_interactionVolumeVisualization",
+                                        new int[]{
+                                        (int)LeapServiceProvider.InteractionVolumeVisualization.StereoIR170,
+                                        (int)LeapServiceProvider.InteractionVolumeVisualization.Device_3Di,
+                                        (int)LeapServiceProvider.InteractionVolumeVisualization.LeapMotionController,
+                                        (int)LeapServiceProvider.InteractionVolumeVisualization.Automatic},
+                                        "FOV_Visualization");
+
             specifyConditionalDrawing("FOV_Visualization",
                                         "OptimalFOV_Visualization",
                                         "MaxFOV_Visualization");
