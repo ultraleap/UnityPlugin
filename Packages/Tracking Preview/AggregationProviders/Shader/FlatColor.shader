@@ -17,9 +17,6 @@ Shader "FlatColor"{
 
 			#include "UnityCG.cginc"
 
-			//// user defined variables
-			//uniform float4 _Color;
-
 
 			// base structs
 			struct vertexInput
@@ -49,9 +46,6 @@ Shader "FlatColor"{
 
 				o.pos = UnityObjectToClipPos(v.vertex);
 
-				//o.depth = -mul(UNITY_MATRIX_MV, v.vertex).z * _ProjectionParams.w;
-				o.depth = o.pos.z / o.pos.w;
-
 				return o;
 			}
 
@@ -59,8 +53,6 @@ Shader "FlatColor"{
 			float4 frag(vertexOutput i) : COLOR
 			{
 				UNITY_SETUP_INSTANCE_ID(i);
-				fixed invert = (i.depth);
-				//return fixed4(invert, invert, invert,1);
                 return UNITY_ACCESS_INSTANCED_PROP(Props, _Color);
 			}
 
