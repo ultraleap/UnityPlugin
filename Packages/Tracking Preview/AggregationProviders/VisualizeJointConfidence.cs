@@ -27,10 +27,6 @@ public class VisualizeJointConfidence : MonoBehaviour
 
         float[] confidences = aggregationProvider.CalculateJointConfidence(provider_idx, hand.GetLeapHand());
 
-        //for (int i = 0; i < confidences.Length; i++)
-        //{
-        //    colors[i] = Color.Lerp(Color.black, colors[i], confidences[i]);
-        //}
         for (int i = 0; i < 5; i++)
         {
             for (int j = 0; j < 4; j++)
