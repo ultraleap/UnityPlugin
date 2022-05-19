@@ -25,20 +25,20 @@ namespace Leap.Unity
     {
         // factors that get multiplied to the corresponding confidence values to get an overall weighted confidence value
         [Tooltip("How much should the Palm position relative to the tracking camera influence the overall hand confidence? A confidence value is determined by whether the hand is within the optimal FOV of the tracking camera")]
-        public float palmPosFactor = 1;
+        public float palmPosFactor = 0;
         [Tooltip("How much should the Palm orientation relative to the tracking camera influence the overall hand confidence? A confidence value is determined by looking at the angle between the palm normal and the direction from hand to camera.")]
-        public float palmRotFactor = 1;
+        public float palmRotFactor = 0;
         [Tooltip("How much should the Palm velocity relative to the tracking camera influence the overall hand confidence?")]
-        public float palmVelocityFactor = 1;
+        public float palmVelocityFactor = 0;
         [Tooltip("How much should the duration that a hand has been visible for, influence the overall hand confidence?")]
-        public float timeSinceHandFirstVisibleFactor = 1;
+        public float timeSinceHandFirstVisibleFactor = 0;
 
         [Tooltip("How much should the joint rotation relative to the tracking camera influence the overall hand confidence? A confidence value is determined for a joint by looking at the angle between the joint normal and the direction from hand to camera.")]
-        public float jointRotFactor = 1;
+        public float jointRotFactor = 0;
         [Tooltip("How much should the joint rotation relative to the palm normal influence the overall hand confidence?")]
-        public float jointRotToPalmFactor = 1;
+        public float jointRotToPalmFactor = 0;
         [Tooltip("How much should joint occlusion influence the overall hand confidence?")]
-        public float jointOcclusionFactor = 1;
+        public float jointOcclusionFactor = 0;
 
         [Tooltip("if the debug hand is not null, its joint colors are given by interpolating between the debugColors based on which hand the aggregated data came from (in order of the providers)")]
         public CapsuleHand debugHandLeft;

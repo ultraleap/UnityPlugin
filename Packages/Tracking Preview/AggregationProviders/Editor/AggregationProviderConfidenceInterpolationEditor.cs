@@ -29,7 +29,7 @@ namespace Leap.Unity
 
             if (property.floatValue != 0)
             {
-                EditorGUILayout.HelpBox("If you want to use jointOcclusion, you need to add a Layers named 'JointOcclusion[idx]'. One for each provider in the providers list above. (eg. Add 'JointOcclusion0' and 'JointOcclusion1' when using two source providers.)", MessageType.Warning);
+                EditorGUILayout.HelpBox("To use jointOcclusion, you must add a Layer for each ServiceProvider named 'JointOcclusion[idx]'. (eg. Add 'JointOcclusion0' and 'JointOcclusion1' when using two source providers.)", MessageType.Warning);
             }
         }
 
