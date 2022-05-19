@@ -40,7 +40,8 @@ namespace Leap.Unity
 
         private void onDevice(Device device)
         {
-            _deviceBaseline = Maybe.Some(device.Baseline);
+            if (device == _provider.CurrentDevice || _deviceBaseline == Maybe.None)
+                _deviceBaseline = Maybe.Some(device.Baseline);
         }
 
         private void OnDestroy()
@@ -83,7 +84,7 @@ namespace Leap.Unity
             Camera.onPreCull += OnCameraPreCull;
 #endif
 
-            _provider.OnDeviceChanged += onDevice;
+            _provider.OnDeviceSafe += onDevice;
         }
 
         private void OnDisable()
@@ -94,7 +95,7 @@ namespace Leap.Unity
 
             Camera.onPreCull -= OnCameraPreCull;
 
-            _provider.OnDeviceChanged -= onDevice;
+            _provider.OnDeviceSafe -= onDevice;
         }
 
         private void Update()
