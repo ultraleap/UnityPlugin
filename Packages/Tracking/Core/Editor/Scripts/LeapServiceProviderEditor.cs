@@ -39,7 +39,6 @@ namespace Leap.Unity
         private VisualFOV _visualFOV;
         private LeapFOVInfos leapFOVInfos;
         private Mesh optimalFOVMesh;
-        private Mesh noTrackingFOVMesh;
         private Mesh maxFOVMesh;
 
         protected override void OnEnable()
@@ -51,7 +50,6 @@ namespace Leap.Unity
 
             specifyConditionalDrawing("FOV_Visualization",
                                         "OptimalFOV_Visualization",
-                                        "NoTrackingFOV_Visualization",
                                         "MaxFOV_Visualization");
 
             specifyCustomDecorator("_frameOptimization", frameOptimizationWarning);
@@ -486,7 +484,6 @@ namespace Leap.Unity
             _visualFOV.UpdateFOVS();
 
             optimalFOVMesh = _visualFOV.OptimalFOVMesh;
-            noTrackingFOVMesh = _visualFOV.NoTrackingFOVMesh;
             maxFOVMesh = _visualFOV.MaxFOVMesh;
 
             Transform deviceModelParent = target.transform.Find("DeviceModel");
@@ -502,14 +499,6 @@ namespace Leap.Unity
                 mat.SetPass(0);
 
                 Graphics.DrawMeshNow(optimalFOVMesh, deviceModelParent.localToWorldMatrix *
-                       Matrix4x4.Scale(Vector3.one * 0.01f));
-            }
-            if (target.NoTrackingFOV_Visualization && noTrackingFOVMesh != null)
-            {
-                Material mat = Resources.Load("UntrackableFOVMat_Volume") as Material;
-                mat.SetPass(0);
-
-                Graphics.DrawMeshNow(noTrackingFOVMesh, deviceModelParent.localToWorldMatrix *
                        Matrix4x4.Scale(Vector3.one * 0.01f));
             }
             if (target.MaxFOV_Visualization && maxFOVMesh != null)
