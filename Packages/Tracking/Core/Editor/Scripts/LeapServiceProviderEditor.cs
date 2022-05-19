@@ -21,14 +21,12 @@ namespace Leap.Unity
     [CustomEditor(typeof(LeapServiceProvider))]
     public class LeapServiceProviderEditor : CustomEditorBase<LeapServiceProvider>
     {
+        [Obsolete]
         protected Quaternion deviceRotation = Quaternion.identity;
         protected bool isVRProvider = false;
 
+        [Obsolete]
         protected Vector3 controllerOffset = Vector3.zero;
-
-        private const float LMC_BOX_RADIUS = 0.45f;
-        private const float LMC_BOX_WIDTH = 0.965f;
-        private const float LMC_BOX_DEPTH = 0.6671f;
 
         private LeapServiceProvider _leapServiceProvider;
         private Controller _leapController;
