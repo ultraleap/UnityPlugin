@@ -11,7 +11,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
     [System.Serializable]
     public class PhysicsGraspHelper
     {
-        private const float GRAB_COOLDOWNTIME = 0.025f, VELOCITY_LERPTIME = 0.02f, BONE_MOVEMENT_THRESHOLD = 0.02f;
+        private const float GRAB_COOLDOWNTIME = 0.025f;
         private const float MINIMUM_STRENGTH = 0.25f, MINIMUM_THUMB_STRENGTH = 0.2f;
         private const float REQUIRED_ENTRY_STRENGTH = 0.15f, REQUIRED_EXIT_STRENGTH = 0.05f, REQUIRED_THUMB_EXIT_STRENGTH = 0.1f, REQUIRED_PINCH_DISTANCE = 0.018f;
 
@@ -20,7 +20,6 @@ namespace Leap.Unity.Interaction.PhysicsHands
             Idle,
             Contact,
             Grasp
-            // possible releasing state?
         }
 
         public State GraspState { get; private set; } = State.Idle;
@@ -76,6 +75,9 @@ namespace Leap.Unity.Interaction.PhysicsHands
         private List<PhysicsBone> _boneCooldownItems = new List<PhysicsBone>();
         private List<float> _boneCooldownTime = new List<float>();
 
+        public bool Ignored { get { return _ignored != null; } }
+        private PhysicsIgnoreHelpers _ignored = null;
+
         // Check we got thumb or palm and at least one finger
         private bool Grasped(PhysicsHand hand)
         {
@@ -121,6 +123,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             _oldKinematic = _rigid.isKinematic;
             _oldGravity = _rigid.useGravity;
             _colliders = rigid.GetComponentsInChildren<Collider>(true).ToList();
+            _ignored = rigid.GetComponentInChildren<PhysicsIgnoreHelpers>();
             Manager = manager;
         }
 
@@ -347,6 +350,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                         if (_graspingHands.Count == 0)
                         {
                             _rigid.useGravity = false;
+                            _rigid.isKinematic = false;
                         }
                         _graspingHands.Add(hand);
                         if (_graspingHands.Count > 0)
@@ -635,11 +639,20 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
         private void MoveObject()
         {
+            // Fixes issues with kinematic objects
+            // Making them affected by physics instead of kinematic is much more stable
+            if (_rigid.isKinematic)
+            {
+                _rigid.isKinematic = false;
+            }
+            if (_rigid.useGravity)
+            {
+                _rigid.useGravity = false;
+            }
             PhysicsMovement(_newPosition, _newRotation, _rigid, _justGrasped);
         }
 
         // Ripped from IE
-
         protected float _maxVelocity = 6F;
         private Vector3 _lastSolvedCoMPosition = Vector3.zero;
         protected AnimationCurve _strengthByDistance = new AnimationCurve(new Keyframe(0.0f, 1.0f, 0.0f, 0.0f),
@@ -674,8 +687,6 @@ namespace Leap.Unity.Interaction.PhysicsHands
             Vector3 lerpedVelocity = Vector3.Lerp(intObj.velocity, targetVelocity, followStrength);
             Vector3 lerpedAngularVelocity = Vector3.Lerp(intObj.angularVelocity, targetAngularVelocity, followStrength);
 
-            // Add max velocity from hands
-
             intObj.velocity = lerpedVelocity;
             if (lerpedAngularVelocity.IsValid())
             {
@@ -685,13 +696,13 @@ namespace Leap.Unity.Interaction.PhysicsHands
             _lastSolvedCoMPosition = solvedCenterOfMass;
         }
 
-        // Do this if you like your hands as spaghetti
+        // It's more stable to use physics movement currently
+        // Using this will result in large amounts of spaghetti
         private void KinematicMovement(Vector3 solvedPosition, Quaternion solvedRotation,
                                Rigidbody intObj)
         {
             intObj.MovePosition(solvedPosition);
             intObj.MoveRotation(solvedRotation);
-            // Add max velocity from hands
         }
     }
 }

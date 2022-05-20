@@ -68,8 +68,8 @@ namespace Leap.Unity.Interaction.PhysicsHands
         private float _handGraspTeleportDistance = 0.2f;
 
         // Helper Settings
-        [SerializeField, Tooltip("Enabling helpers is recommended as these allow the user to pick up objects larger than they normally would. " +
-            "They also significantly improve picking up small objects.")]
+        [SerializeField, Tooltip("Enabling helpers is recommended as these allow the user to pick up objects they normally would not be able to. " +
+            "This includes large and very small objects, as well as kinematic objects.")]
         private bool _enableHelpers = true;
 
         [SerializeField, Tooltip("Enabling this will cause the hand to move more slowly when grasping objects of higher weights.")]
@@ -334,6 +334,10 @@ namespace Leap.Unity.Interaction.PhysicsHands
             PhysicsGraspHelper.State oldState, state;
             foreach (var helper in _graspHelpers)
             {
+                if (helper.Value.Ignored)
+                {
+                    continue;
+                }
                 oldState = helper.Value.GraspState;
                 state = helper.Value.UpdateHelper();
                 if (state != oldState)

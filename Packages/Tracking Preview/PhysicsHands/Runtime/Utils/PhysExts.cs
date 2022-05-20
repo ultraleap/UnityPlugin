@@ -8,54 +8,6 @@ namespace Leap.Unity.Interaction.PhysicsHands
     public static class PhysExts
     {
 
-        public static bool BoxCast(BoxCollider box, Vector3 direction, float maxDistance = Mathf.Infinity, int layerMask = Physics.DefaultRaycastLayers, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal)
-        {
-            Vector3 center, halfExtents;
-            Quaternion orientation;
-            box.ToWorldSpaceBox(out center, out halfExtents, out orientation);
-            return Physics.BoxCast(center, halfExtents, direction, orientation, maxDistance, layerMask, queryTriggerInteraction);
-        }
-
-        public static bool BoxCast(BoxCollider box, Vector3 direction, out RaycastHit hitInfo, float maxDistance = Mathf.Infinity, int layerMask = Physics.DefaultRaycastLayers, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal)
-        {
-            Vector3 center, halfExtents;
-            Quaternion orientation;
-            box.ToWorldSpaceBox(out center, out halfExtents, out orientation);
-            return Physics.BoxCast(center, halfExtents, direction, out hitInfo, orientation, maxDistance, layerMask, queryTriggerInteraction);
-        }
-
-        public static RaycastHit[] BoxCastAll(BoxCollider box, Vector3 direction, float maxDistance = Mathf.Infinity, int layerMask = Physics.DefaultRaycastLayers, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal)
-        {
-            Vector3 center, halfExtents;
-            Quaternion orientation;
-            box.ToWorldSpaceBox(out center, out halfExtents, out orientation);
-            return Physics.BoxCastAll(center, halfExtents, direction, orientation, maxDistance, layerMask, queryTriggerInteraction);
-        }
-
-        public static int BoxCastNonAlloc(BoxCollider box, Vector3 direction, RaycastHit[] results, float maxDistance = Mathf.Infinity, int layerMask = Physics.DefaultRaycastLayers, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal)
-        {
-            Vector3 center, halfExtents;
-            Quaternion orientation;
-            box.ToWorldSpaceBox(out center, out halfExtents, out orientation);
-            return Physics.BoxCastNonAlloc(center, halfExtents, direction, results, orientation, maxDistance, layerMask, queryTriggerInteraction);
-        }
-
-        public static bool CheckBox(BoxCollider box, int layerMask = Physics.DefaultRaycastLayers, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal)
-        {
-            Vector3 center, halfExtents;
-            Quaternion orientation;
-            box.ToWorldSpaceBox(out center, out halfExtents, out orientation);
-            return Physics.CheckBox(center, halfExtents, orientation, layerMask, queryTriggerInteraction);
-        }
-
-        public static Collider[] OverlapBox(BoxCollider box, int layerMask = Physics.DefaultRaycastLayers, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal)
-        {
-            Vector3 center, halfExtents;
-            Quaternion orientation;
-            box.ToWorldSpaceBox(out center, out halfExtents, out orientation);
-            return Physics.OverlapBox(center, halfExtents, orientation, layerMask, queryTriggerInteraction);
-        }
-
         public static int OverlapBoxNonAlloc(BoxCollider box, Collider[] results, int layerMask = Physics.DefaultRaycastLayers, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal)
         {
             return OverlapBoxNonAllocOffset(box, Vector3.zero, results, layerMask, queryTriggerInteraction);
@@ -83,46 +35,6 @@ namespace Leap.Unity.Interaction.PhysicsHands
             halfExtents = Vector3.Scale(scale, box.size) * 0.5f;
         }
 
-        public static bool SphereCast(SphereCollider sphere, Vector3 direction, out RaycastHit hitInfo, float maxDistance = Mathf.Infinity, int layerMask = Physics.DefaultRaycastLayers, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal)
-        {
-            Vector3 center;
-            float radius;
-            sphere.ToWorldSpaceSphere(out center, out radius);
-            return Physics.SphereCast(center, radius, direction, out hitInfo, maxDistance, layerMask, queryTriggerInteraction);
-        }
-
-        public static RaycastHit[] SphereCastAll(SphereCollider sphere, Vector3 direction, float maxDistance = Mathf.Infinity, int layerMask = Physics.DefaultRaycastLayers, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal)
-        {
-            Vector3 center;
-            float radius;
-            sphere.ToWorldSpaceSphere(out center, out radius);
-            return Physics.SphereCastAll(center, radius, direction, maxDistance, layerMask, queryTriggerInteraction);
-        }
-
-        public static int SphereCastNonAlloc(SphereCollider sphere, Vector3 direction, RaycastHit[] results, float maxDistance = Mathf.Infinity, int layerMask = Physics.DefaultRaycastLayers, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal)
-        {
-            Vector3 center;
-            float radius;
-            sphere.ToWorldSpaceSphere(out center, out radius);
-            return Physics.SphereCastNonAlloc(center, radius, direction, results, maxDistance, layerMask, queryTriggerInteraction);
-        }
-
-        public static bool CheckSphere(SphereCollider sphere, int layerMask = Physics.DefaultRaycastLayers, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal)
-        {
-            Vector3 center;
-            float radius;
-            sphere.ToWorldSpaceSphere(out center, out radius);
-            return Physics.CheckSphere(center, radius, layerMask, queryTriggerInteraction);
-        }
-
-        public static Collider[] OverlapSphere(SphereCollider sphere, int layerMask = Physics.DefaultRaycastLayers, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal)
-        {
-            Vector3 center;
-            float radius;
-            sphere.ToWorldSpaceSphere(out center, out radius);
-            return Physics.OverlapSphere(center, radius, layerMask, queryTriggerInteraction);
-        }
-
         public static int OverlapSphereNonAlloc(SphereCollider sphere, Collider[] results, int layerMask = Physics.DefaultRaycastLayers, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal)
         {
             Vector3 center;
@@ -135,46 +47,6 @@ namespace Leap.Unity.Interaction.PhysicsHands
         {
             center = sphere.transform.TransformPoint(sphere.center);
             radius = sphere.radius * MaxVec3(AbsVec3(sphere.transform.lossyScale));
-        }
-
-        public static bool CapsuleCast(CapsuleCollider capsule, Vector3 direction, out RaycastHit hitInfo, float maxDistance = Mathf.Infinity, int layerMask = Physics.DefaultRaycastLayers, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal)
-        {
-            Vector3 point0, point1;
-            float radius;
-            capsule.ToWorldSpaceCapsule(out point0, out point1, out radius);
-            return Physics.CapsuleCast(point0, point1, radius, direction, out hitInfo, maxDistance, layerMask, queryTriggerInteraction);
-        }
-
-        public static RaycastHit[] CapsuleCastAll(CapsuleCollider capsule, Vector3 direction, float maxDistance = Mathf.Infinity, int layerMask = Physics.DefaultRaycastLayers, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal)
-        {
-            Vector3 point0, point1;
-            float radius;
-            capsule.ToWorldSpaceCapsule(out point0, out point1, out radius);
-            return Physics.CapsuleCastAll(point0, point1, radius, direction, maxDistance, layerMask, queryTriggerInteraction);
-        }
-
-        public static int CapsuleCastNonAlloc(CapsuleCollider capsule, Vector3 direction, RaycastHit[] results, float maxDistance = Mathf.Infinity, int layerMask = Physics.DefaultRaycastLayers, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal)
-        {
-            Vector3 point0, point1;
-            float radius;
-            capsule.ToWorldSpaceCapsule(out point0, out point1, out radius);
-            return Physics.CapsuleCastNonAlloc(point0, point1, radius, direction, results, maxDistance, layerMask, queryTriggerInteraction);
-        }
-
-        public static bool CheckCapsule(CapsuleCollider capsule, int layerMask = Physics.DefaultRaycastLayers, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal)
-        {
-            Vector3 point0, point1;
-            float radius;
-            capsule.ToWorldSpaceCapsule(out point0, out point1, out radius);
-            return Physics.CheckCapsule(point0, point1, radius, layerMask, queryTriggerInteraction);
-        }
-
-        public static Collider[] OverlapCapsule(CapsuleCollider capsule, int layerMask = Physics.DefaultRaycastLayers, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal)
-        {
-            Vector3 point0, point1;
-            float radius;
-            capsule.ToWorldSpaceCapsule(out point0, out point1, out radius);
-            return Physics.OverlapCapsule(point0, point1, radius, layerMask, queryTriggerInteraction);
         }
 
         public static int OverlapCapsuleNonAlloc(CapsuleCollider capsule, Collider[] results, int layerMask = Physics.DefaultRaycastLayers, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal)
@@ -230,31 +102,6 @@ namespace Leap.Unity.Interaction.PhysicsHands
             point0 = center + dir * (height * 0.5f - radius);
             point1 = center - dir * (height * 0.5f - radius);
         }
-
-        public static void SortClosestToFurthest(RaycastHit[] hits, int hitCount = -1)
-        {
-            if (hitCount == 0)
-            {
-                return;
-            }
-
-            if (hitCount < 0)
-            {
-                hitCount = hits.Length;
-            }
-
-            Array.Sort<RaycastHit>(hits, 0, hitCount, ascendDistance);
-        }
-
-        private class AscendingDistanceComparer : IComparer<RaycastHit>
-        {
-            public int Compare(RaycastHit h1, RaycastHit h2)
-            {
-                return h1.distance < h2.distance ? -1 : (h1.distance > h2.distance ? 1 : 0);
-            }
-        }
-
-        private static AscendingDistanceComparer ascendDistance = new AscendingDistanceComparer();
 
         private static Vector3 AbsVec3(Vector3 v)
         {

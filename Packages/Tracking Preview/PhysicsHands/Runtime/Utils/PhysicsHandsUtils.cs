@@ -473,7 +473,12 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 delta.z *= (1f - interpFactor);
             }
 
-            physicsHand.palmBody.AddForce(Vector3.ClampMagnitude((delta) / Time.fixedDeltaTime / Time.fixedDeltaTime * physicsHand.palmBody.mass * (1f - distanceForceReduction),
+            if(distanceForceReduction > 0)
+            {
+                delta *= 1f - distanceForceReduction;
+            }
+
+            physicsHand.palmBody.AddForce(Vector3.ClampMagnitude((delta) / Time.fixedDeltaTime / Time.fixedDeltaTime * physicsHand.palmBody.mass,
                 1000f * physicsHand.strength));
 
             // Apply tracking rotation velocity

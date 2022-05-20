@@ -422,7 +422,8 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
             if (IsGrasping)
             {
-                _graspingDelta = DistanceFromDataHand;
+                // Makes the hands a bit smoother when we release
+                _graspingDelta = DistanceFromDataHand * 1.5f;
                 _graspingDeltaCurrent = _graspingDelta;
             }
 
