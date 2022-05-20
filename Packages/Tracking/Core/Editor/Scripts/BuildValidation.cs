@@ -20,7 +20,8 @@ public class BuildValidation : IPreprocessBuildWithReport
     private void AndroidBuild()
     {
         if (PlayerSettings.Android.targetArchitectures != AndroidArchitecture.ARM64) // Must be only arm64 so direct equality check, not checking for IL2CPP explicitly because it's required to select ARM64 anyway...
-            DoValidationPopup($"Android target architecture for an android build including Ultraleap hand tracking must be ARM64. To fix this, go to 'Edit -> Project Settings -> Player -> Other Settings -> Configuration' and select 'Scripting Backend' 'IL2CPP' and only 'ARM64' for 'Target Architectures'.");
+            DoValidationPopup($"Android target architecture for an android build including Ultraleap hand tracking must be ARM64." + Environment.NewLine
+                + "To fix this, go to 'Edit -> Project Settings -> Player -> Other Settings -> Configuration' and select 'Scripting Backend' 'IL2CPP' and only 'ARM64' for 'Target Architectures'.");
     }
 
     private void DoValidationPopup(string error)
