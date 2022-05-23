@@ -15,6 +15,4 @@ This approach relies heavily on the physics simulation and will work with any ri
 - Press the "Generate Hands" button.
 - Re-assign your hands to have the PhysicsProvider as their input.
 - Change your physics settings to the following:
-  - Default Solver Iterations: 15
-  - Default Solver Velocity Iterations: 5
   - Solver Type: Temporal Gauss Seidel
