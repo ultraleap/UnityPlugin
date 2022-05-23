@@ -85,12 +85,8 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
             if (_physicsProvider.LeftHand == null && _physicsProvider.RightHand == null)
             {
-                if (GUILayout.Button("Generate Hands"))
-                {
-                    _physicsProvider.GenerateHands();
-
-                    serializedObject.Update();
-                }
+                _physicsProvider.GenerateHands();
+                serializedObject.Update();
             }
             else
             {
