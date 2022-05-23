@@ -12,7 +12,6 @@ This approach relies heavily on the physics simulation and will work with any ri
 ## Setup
 - Setup your scene with hands as you normally would.
 - Place the PhysicsProvider in your scene.
-- Press the "Generate Hands" button.
-- Re-assign your hands to have the PhysicsProvider as their input.
+- Re-assign the other hands within your scene to have the PhysicsProvider as their Leap Provider.
 - Change your physics settings to the following:
   - Solver Type: Temporal Gauss Seidel
