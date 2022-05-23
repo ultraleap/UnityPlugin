@@ -17,4 +17,4 @@ This approach relies heavily on the physics simulation and will work with any ri
 - Change your physics settings to the following:
   - Default Solver Iterations: 15
   - Default Solver Velocity Iterations: 5
-  - Solver Type: Temporal Guass Seidel
+  - Solver Type: Temporal Gauss Seidel
