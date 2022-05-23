@@ -11,13 +11,9 @@ using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
-
-using Leap;
 using Leap.Unity;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using Leap.Unity.Interaction;
 
 namespace Leap.Unity.Interaction.PhysicsHands
 {
@@ -32,6 +28,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             // You can change this to move your helper physics checks further forward
             public float triggerDistance = TRIGGER_DISTANCE;
 
+            [HideInInspector]
             public Vector3 oldPosition;
             public GameObject gameObject, rootObject;
             public Transform transform;
@@ -44,9 +41,11 @@ namespace Leap.Unity.Interaction.PhysicsHands
             public ArticulationBody[] jointBodies;
             public CapsuleCollider[] jointColliders;
 
+            [HideInInspector]
             public Quaternion[] defaultRotations;
 
             public float strength;
+            [HideInInspector]
             public float stiffness, forceLimit;
             public float boneMass;
         }
@@ -55,8 +54,6 @@ namespace Leap.Unity.Interaction.PhysicsHands
         public PhysicsProvider Provider => _physicsProvider;
         [SerializeField]
         private Hand _physicsHand;
-        [SerializeField, HideInInspector]
-        private Quaternion[] _defaultRotations;
 
         public ArticulationBody[] Bodies
         {

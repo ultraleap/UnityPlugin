@@ -1,9 +1,6 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Leap.Unity;
 using System.Linq;
-using System;
 using Leap.Interaction.Internal.InteractionEngineUtility;
 
 namespace Leap.Unity.Interaction.PhysicsHands
@@ -56,7 +53,6 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
         public bool WasGrasped { get; private set; }
         private bool _justGrasped = false;
-        private Transform _transform;
         private Rigidbody _rigid;
         public Rigidbody Rigidbody => _rigid;
         private List<Collider> _colliders = new List<Collider>();
@@ -119,7 +115,6 @@ namespace Leap.Unity.Interaction.PhysicsHands
         public PhysicsGraspHelper(Rigidbody rigid, PhysicsProvider manager)
         {
             _rigid = rigid;
-            _transform = rigid.transform;
             _oldKinematic = _rigid.isKinematic;
             _oldGravity = _rigid.useGravity;
             _colliders = rigid.GetComponentsInChildren<Collider>(true).ToList();
@@ -479,7 +474,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
         private bool DataHandIntersection(PhysicsHand hand)
         {
-            bool thumbPalm = false, otherFinger = false;
+            bool thumb = false, otherFinger = false;
             bool earlyQuit;
 
             Leap.Hand lHand = hand.GetOriginalLeapHand();
@@ -502,12 +497,12 @@ namespace Leap.Unity.Interaction.PhysicsHands
                     switch (bone.Finger)
                     {
                         case 0: // thumb
-                            if (thumbPalm)
+                            if (thumb)
                                 continue;
 
                             if (IsBoneWithinObject(lHand.Fingers[bone.Finger].bones[bone.Joint]))
                             {
-                                thumbPalm = true;
+                                thumb = true;
                                 earlyQuit = true;
                             }
                             break;
@@ -527,19 +522,9 @@ namespace Leap.Unity.Interaction.PhysicsHands
                                 earlyQuit = true;
                             }
                             break;
-                            //case 5: // palm
-                            //    if (thumbPalm)
-                            //        continue;
-
-                            //    if (IsPointWithinObject(lHand.PalmPosition.ToVector3()))
-                            //    {
-                            //        thumbPalm = true;
-                            //        earlyQuit = true;
-                            //    }
-                            //    break;
                     }
                     // If we've got we need then we can just return now
-                    if (thumbPalm && otherFinger)
+                    if (thumb && otherFinger)
                     {
                         return true;
                     }
@@ -549,7 +534,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                     }
                 }
             }
-            return thumbPalm && otherFinger;
+            return thumb && otherFinger;
         }
 
         private bool IsBoneWithinObject(Leap.Bone bone)
@@ -564,38 +549,9 @@ namespace Leap.Unity.Interaction.PhysicsHands
             return false;
         }
 
-        private bool IsPointWithinObject(Vector3 pos)
-        {
-            for (int i = 0; i < _colliders.Count; i++)
-            {
-                if (IsPointWithinCollider(_colliders[i], pos))
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
-
         private bool IsPointWithinCollider(Collider collider, Vector3 point)
         {
             return collider.ClosestPoint(point) == point;
-        }
-
-        private bool DistanceToClosestPoint(Vector3 pos, float distance)
-        {
-            for (int i = 0; i < _colliders.Count; i++)
-            {
-                if (IsPointCloseToCollider(_colliders[i], pos, distance))
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        private bool IsPointCloseToCollider(Collider collider, Vector3 point, float distance)
-        {
-            return Vector3.Distance(collider.ClosestPoint(point), point) <= distance;
         }
 
         private void UpdateHandPositions()

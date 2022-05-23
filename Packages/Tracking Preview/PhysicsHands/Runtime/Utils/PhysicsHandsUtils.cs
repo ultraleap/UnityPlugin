@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -160,8 +158,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             }
 
             // Size the palm
-            Vector3 averageKnuckle = (leapHand.Fingers[1].bones[0].NextJoint.ToVector3() + leapHand.Fingers[2].bones[0].NextJoint.ToVector3() + leapHand.Fingers[3].bones[0].NextJoint.ToVector3() + leapHand.Fingers[4].bones[0].NextJoint.ToVector3()) / 4;
-            physicsHand.palmCollider.size = new Vector3(leapHand.PalmWidth, 0.02f, Vector3.Distance(averageKnuckle, leapHand.WristPosition.ToVector3()));
+            physicsHand.palmCollider.size = CalculatePalmSize(leapHand);
 
             SetupPalmBody(physicsHand.palmBody, physicsHand.boneMass * 3f);
             physicsHand.palmBone.SetBoneIndexes(5, 0);
@@ -564,7 +561,6 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
             leapHand.Arm.NextJoint = leapHand.WristPosition;
             leapHand.Arm.Direction = (leapHand.WristPosition - leapHand.Arm.PrevJoint).Normalized;
-            //leapHand.Arm.Rotation = Quaternion.LookRotation(leapHand.Arm.Direction.ToVector3()).ToLeapQuaternion();
 
             leapHand.PalmWidth = physicsHand.palmCollider.size.y;
             leapHand.Confidence = originalHand.Confidence;
