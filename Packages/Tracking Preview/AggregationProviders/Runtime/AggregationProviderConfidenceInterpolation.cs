@@ -291,7 +291,18 @@ namespace Leap.Unity
             LeapXRServiceProvider xrProvider = providers[frame_idx] as LeapXRServiceProvider;
             if (xrProvider != null)
             {
-                deviceOrigin = xrProvider.mainCamera.transform.GetChild(0);
+                deviceOrigin = xrProvider.mainCamera.transform;
+
+                // xrProvider.deviceOrigin is set if camera follows a transform
+                if (xrProvider.deviceOffsetMode == LeapXRServiceProvider.DeviceOffsetMode.Transform && xrProvider.deviceOrigin != null)
+                {
+                    deviceOrigin = xrProvider.deviceOrigin;
+                }
+                else if (xrProvider.deviceOffsetMode != LeapXRServiceProvider.DeviceOffsetMode.Transform)
+                {
+                    deviceOrigin.Translate(new Vector3(0, xrProvider.deviceOffsetYAxis, xrProvider.deviceOffsetZAxis));
+                    deviceOrigin.Rotate(new Vector3(-90 - xrProvider.deviceTiltXAxis, 180, 0));
+                }
             }
 
             confidence = palmPosFactor * Confidence_RelativeHandPos(providers[frame_idx], deviceOrigin, hand.PalmPosition.ToVector3());
@@ -343,7 +354,18 @@ namespace Leap.Unity
             LeapXRServiceProvider xrProvider = providers[frame_idx] as LeapXRServiceProvider;
             if (xrProvider != null)
             {
-                deviceOrigin = xrProvider.mainCamera.transform.GetChild(0);
+                deviceOrigin = xrProvider.mainCamera.transform;
+
+                // xrProvider.deviceOrigin is set if camera follows a transform
+                if (xrProvider.deviceOffsetMode == LeapXRServiceProvider.DeviceOffsetMode.Transform && xrProvider.deviceOrigin != null)
+                {
+                    deviceOrigin = xrProvider.deviceOrigin;
+                }
+                else if (xrProvider.deviceOffsetMode != LeapXRServiceProvider.DeviceOffsetMode.Transform)
+                {
+                    deviceOrigin.Translate(new Vector3(0, xrProvider.deviceOffsetYAxis, xrProvider.deviceOffsetZAxis));
+                    deviceOrigin.Rotate(new Vector3(-90 - xrProvider.deviceTiltXAxis, 180, 0));
+                }
             }
 
             if (jointRotFactor != 0)
@@ -876,7 +898,7 @@ namespace Leap.Unity
 
             for (int finger_idx = 0; finger_idx < 5; finger_idx++)
             {
-                for (int bone_idx = 0; bone_idx < 4; finger_idx++)
+                for (int bone_idx = 0; bone_idx < 4; bone_idx++)
                 {
                     int confidence_idx = finger_idx * 5 + bone_idx + 1;
                     int capsuleHand_idx = finger_idx * 4 + bone_idx;
