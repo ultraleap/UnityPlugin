@@ -105,6 +105,11 @@ public class JointOcclusion : MonoBehaviour
     /// </summary>
     public float[] Confidence_JointOcclusion(float[] confidences, Transform deviceOrigin, Hand hand)
     {
+        if (confidences == null)
+        {
+            confidences = new float[VectorHand.NUM_JOINT_POSITIONS];
+        }
+
         if (hand == null)
         {
             return confidences.ClearWith(0);
