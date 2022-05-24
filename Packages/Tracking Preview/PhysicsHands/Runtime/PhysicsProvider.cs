@@ -110,7 +110,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
         public Action<Rigidbody> OnContact, OnContactExit;
 
-        public Action<Rigidbody, PhysicsGraspHelper.State> OnObjectStateChange;
+        public Action<Rigidbody, PhysicsGraspHelper> OnObjectStateChange;
 
         private int _leftIndex = -1, _rightIndex = -1;
         private Hand _leftOriginalLeap, _rightOriginalLeap;
@@ -318,7 +318,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
         {
             if (LeftHand == null || RightHand == null)
             {
-                Debug.LogError("Physics hands have not been correctly generated. Please exit play mode and press \"Generate Hands\".");
+                Debug.LogError("Physics hands have not been correctly generated. Please exit play mode and press \"Re-generate Hands\".");
                 this.enabled = false;
                 return;
             }
@@ -342,7 +342,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 state = helper.Value.UpdateHelper();
                 if (state != oldState)
                 {
-                    OnObjectStateChange?.Invoke(helper.Value.Rigidbody, state);
+                    OnObjectStateChange?.Invoke(helper.Value.Rigidbody, helper.Value);
                 }
             }
 
@@ -568,18 +568,6 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 hand.SetGrasping(found);
             }
             hand.SetGraspingMass(mass);
-        }
-
-        private void ApplyLayerToRigidbody(Rigidbody rigid, SingleLayer layer)
-        {
-            Collider[] colliders = rigid.GetComponentsInChildren<Collider>(true);
-            foreach (var col in colliders)
-            {
-                if (col.gameObject.layer != layer)
-                {
-                    col.gameObject.layer = layer;
-                }
-            }
         }
 
         private void OnDrawGizmos()

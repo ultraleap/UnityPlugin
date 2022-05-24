@@ -128,6 +128,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             {
                 SetBoneGrasping(item, false);
             }
+            GraspState = State.Idle;
             _valuesD.Clear();
             _graspingValues.Clear();
             _graspingCandidates.Clear();
