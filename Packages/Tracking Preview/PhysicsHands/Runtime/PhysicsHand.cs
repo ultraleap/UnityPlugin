@@ -220,6 +220,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 _physicsHand.transform.position = _originalLeapHand.PalmPosition.ToVector3();
                 _physicsHand.transform.rotation = _originalLeapHand.Rotation.ToQuaternion();
                 _physicsHand.palmBody.WakeUp();
+                _physicsHand.palmBody.TeleportRoot(_physicsHand.transform.position, _physicsHand.transform.rotation);
 
                 PhysicsHandsUtils.ResetPhysicsHandSizes(_physicsHand, _originalLeapHand);
 
