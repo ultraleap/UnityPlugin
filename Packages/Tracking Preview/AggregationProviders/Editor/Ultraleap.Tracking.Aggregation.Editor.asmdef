@@ -2,8 +2,6 @@
     "name": "Ultraleap.Tracking.Aggregation.Editor",
     "rootNamespace": "",
     "references": [
-        "GUID:2ee0542102ac1084e8d9a910885c1e81",
-        "GUID:cec9848704c49724192ff47f9b3e9156",
         "GUID:db4e617c04f44c144bc19216a63dd19b",
         "GUID:10857128242f0ed4996ead64a2dc4b7e"
     ],
