@@ -50,12 +50,14 @@ namespace Leap.Unity.Interaction.PhysicsHands
         // Hand Settings
         [SerializeField, Tooltip("Allows the hands to collide with one another.")]
         private bool _interHandCollisions = false;
+        public float Strength => _strength;
         [SerializeField, Range(0.1f, 2f)]
         private float _strength = 2f;
 
         private float _forceLimit = 1000f;
         private float _stiffness = 100f;
 
+        public float PerBoneMass => _perBoneMass;
         [SerializeField, Tooltip("The mass of each finger bone; the palm will be 3x this.")]
         private float _perBoneMass = 0.6f;
 
@@ -419,6 +421,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                         OnGraspExit?.Invoke(rigid);
                     }
                     _graspHelpers[rigid].ReleaseHelper();
+                    OnObjectStateChange?.Invoke(rigid, _graspHelpers[rigid]);
                     _graspHelpers.Remove(rigid);
                 }
                 return true;

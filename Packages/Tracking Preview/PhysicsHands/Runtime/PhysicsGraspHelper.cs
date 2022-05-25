@@ -132,8 +132,11 @@ namespace Leap.Unity.Interaction.PhysicsHands
             _valuesD.Clear();
             _graspingValues.Clear();
             _graspingCandidates.Clear();
-            _rigid.isKinematic = _oldKinematic;
-            _rigid.useGravity = _oldGravity;
+            if (_rigid != null)
+            {
+                _rigid.isKinematic = _oldKinematic;
+                _rigid.useGravity = _oldGravity;
+            }
             _boneHash.Clear();
             foreach(var pair in _bones)
             {

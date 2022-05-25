@@ -313,7 +313,9 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 }
             }
 
-            if(!IsGrasping && _graspingDeltaCurrent > 0)
+            UpdateSettings();
+
+            if (!IsGrasping && _graspingDeltaCurrent > 0)
             {
                 _graspingDeltaCurrent -= Vector3.Distance(_originalOldPosition, _originalLeapHand.PalmPosition.ToVector3());
             }
@@ -428,6 +430,16 @@ namespace Leap.Unity.Interaction.PhysicsHands
             PhysicsHandsUtils.ConvertPhysicsToLeapHand(_physicsHand, ref _leapHand, _originalLeapHand, Time.fixedDeltaTime);
 
             OnUpdatePhysics?.Invoke();
+        }
+
+        private void UpdateSettings()
+        {
+            if(_physicsProvider == null)
+            {
+                return;
+            }
+            _physicsHand.strength = _physicsProvider.Strength;
+            _physicsHand.boneMass = _physicsProvider.PerBoneMass;
         }
 
         private void DelayedReset()
