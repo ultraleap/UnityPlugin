@@ -76,10 +76,10 @@ namespace Leap.Unity
         {
             if (jointConfidences == null || confidences_jointRot == null || confidences_jointPalmRot == null || confidences_jointOcclusion == null)
             {
-                jointConfidences = new float[providers.Length][];
-                confidences_jointRot = new float[providers.Length][];
-                confidences_jointPalmRot = new float[providers.Length][];
-                confidences_jointOcclusion = new float[providers.Length][];
+                jointConfidences = new float[providers.Length * 2][];
+                confidences_jointRot = new float[providers.Length * 2][];
+                confidences_jointPalmRot = new float[providers.Length * 2][];
+                confidences_jointOcclusion = new float[providers.Length * 2][];
             }
 
 
@@ -92,26 +92,12 @@ namespace Leap.Unity
             List<float[]> leftJointConfidences = new List<float[]>();
             List<float[]> rightJointConfidences = new List<float[]>();
 
-            if (jointOcclusionFactor != 0 && jointOcclusions == null)
+            if (jointOcclusionFactor != 0)
             {
-                jointOcclusions = new List<JointOcclusion>();
-                foreach (LeapProvider provider in providers)
-                {
-                    JointOcclusion jointOcclusion = provider.gameObject.GetComponentInChildren<JointOcclusion>();
-
-                    if (jointOcclusion == null)
-                    {
-                        jointOcclusion = GameObject.Instantiate(Resources.Load<GameObject>("JointOcclusionPrefab"), provider.transform).GetComponent<JointOcclusion>();
-
-                        foreach (CapsuleHand jointOcclusionHand in jointOcclusion.GetComponentsInChildren<CapsuleHand>(true))
-                        {
-                            jointOcclusionHand.leapProvider = provider;
-                        }
-                    }
-
-                    jointOcclusions.Add(jointOcclusion);
-                }
+                SetupJointOcclusion();
             }
+
+
 
 
             // make lists of all left and right hands found in each frame and also make a list of their confidences
@@ -353,12 +339,15 @@ namespace Leap.Unity
         /// </summary>
         public float[] CalculateJointConfidence(int frame_idx, Hand hand)
         {
-            if (jointConfidences[frame_idx] == null || confidences_jointRot[frame_idx] == null || confidences_jointPalmRot[frame_idx] == null || confidences_jointOcclusion[frame_idx] == null)
+            // get index in confidence arrays
+            int idx = frame_idx * 2 + (hand.IsLeft ? 0 : 1);
+
+            if (jointConfidences[idx] == null || confidences_jointRot[idx] == null || confidences_jointPalmRot[idx] == null || confidences_jointOcclusion[idx] == null)
             {
-                jointConfidences[frame_idx] = new float[VectorHand.NUM_JOINT_POSITIONS];
-                confidences_jointRot[frame_idx] = new float[VectorHand.NUM_JOINT_POSITIONS];
-                confidences_jointPalmRot[frame_idx] = new float[VectorHand.NUM_JOINT_POSITIONS];
-                confidences_jointOcclusion[frame_idx] = new float[VectorHand.NUM_JOINT_POSITIONS];
+                jointConfidences[idx] = new float[VectorHand.NUM_JOINT_POSITIONS];
+                confidences_jointRot[idx] = new float[VectorHand.NUM_JOINT_POSITIONS];
+                confidences_jointPalmRot[idx] = new float[VectorHand.NUM_JOINT_POSITIONS];
+                confidences_jointOcclusion[idx] = new float[VectorHand.NUM_JOINT_POSITIONS];
             }
 
             Transform deviceOrigin = providers[frame_idx].transform;
@@ -382,15 +371,15 @@ namespace Leap.Unity
 
             if (jointRotFactor != 0)
             {
-                confidences_jointRot[frame_idx] = Confidence_RelativeJointRot(confidences_jointRot[frame_idx], deviceOrigin, hand);
+                confidences_jointRot[idx] = Confidence_RelativeJointRot(confidences_jointRot[idx], deviceOrigin, hand);
             }
             if (jointRotToPalmFactor != 0)
             {
-                confidences_jointPalmRot[frame_idx] = Confidence_relativeJointRotToPalmRot(confidences_jointPalmRot[frame_idx], deviceOrigin, hand);
+                confidences_jointPalmRot[idx] = Confidence_relativeJointRotToPalmRot(confidences_jointPalmRot[idx], deviceOrigin, hand);
             }
             if (jointOcclusionFactor != 0)
             {
-                confidences_jointOcclusion[frame_idx] = jointOcclusions[frame_idx].Confidence_JointOcclusion(confidences_jointOcclusion[frame_idx], deviceOrigin, hand);
+                confidences_jointOcclusion[idx] = jointOcclusions[frame_idx].Confidence_JointOcclusion(confidences_jointOcclusion[idx], deviceOrigin, hand);
             }
 
             for (int finger_idx = 0; finger_idx < 5; finger_idx++)
@@ -398,10 +387,10 @@ namespace Leap.Unity
                 for (int bone_idx = 0; bone_idx < 5; bone_idx++)
                 {
                     int key = finger_idx * 5 + bone_idx;
-                    jointConfidences[frame_idx][key] =
-                                    jointRotFactor * confidences_jointRot[frame_idx][key] +
-                    jointRotToPalmFactor* confidences_jointPalmRot[frame_idx][key] +
-                   jointOcclusionFactor * confidences_jointOcclusion[frame_idx][key];
+                    jointConfidences[idx][key] =
+                                    jointRotFactor * confidences_jointRot[idx][key] +
+                    jointRotToPalmFactor* confidences_jointPalmRot[idx][key] +
+                   jointOcclusionFactor * confidences_jointOcclusion[idx][key];
 
                     if (bone_idx != 0)
                     {
@@ -409,8 +398,8 @@ namespace Leap.Unity
                         // so that outer joints jump around less. 
                         // eg. when a confidence is low on the knuckle of a finger, the finger tip confidence for the same finger
                         // should take that into account and be slightly lower too
-                        jointConfidences[frame_idx][key] += jointConfidences[frame_idx][key - 1];
-                        jointConfidences[frame_idx][key] /= 2;
+                        jointConfidences[idx][key] += jointConfidences[idx][key - 1];
+                        jointConfidences[idx][key] /= 2;
                     }
                 }
             }
@@ -422,8 +411,8 @@ namespace Leap.Unity
                 {
                     jointConfidenceHistoriesLeft.Add(providers[frame_idx], new JointConfidenceHistory());
                 }
-                jointConfidenceHistoriesLeft[providers[frame_idx]].AddConfidences(jointConfidences[frame_idx]);
-                jointConfidences[frame_idx] = jointConfidenceHistoriesLeft[providers[frame_idx]].GetAveragedConfidences();
+                jointConfidenceHistoriesLeft[providers[frame_idx]].AddConfidences(jointConfidences[idx]);
+                jointConfidences[idx] = jointConfidenceHistoriesLeft[providers[frame_idx]].GetAveragedConfidences();
             }
             else
             {
@@ -431,11 +420,11 @@ namespace Leap.Unity
                 {
                     jointConfidenceHistoriesRight.Add(providers[frame_idx], new JointConfidenceHistory());
                 }
-                jointConfidenceHistoriesRight[providers[frame_idx]].AddConfidences(jointConfidences[frame_idx]);
-                jointConfidences[frame_idx] = jointConfidenceHistoriesRight[providers[frame_idx]].GetAveragedConfidences();
+                jointConfidenceHistoriesRight[providers[frame_idx]].AddConfidences(jointConfidences[idx]);
+                jointConfidences[idx] = jointConfidenceHistoriesRight[providers[frame_idx]].GetAveragedConfidences();
             }
 
-            return jointConfidences[frame_idx];
+            return jointConfidences[idx];
         }
 
 
@@ -626,8 +615,6 @@ namespace Leap.Unity
                     confidences[key] = (Mathf.Cos(Mathf.Deg2Rad * 2 * angle) + 1f) / 2;
                 }
             }
-            // in the capsule hands joint 21 is copied and mirrored from joint 0
-            confidences[21] = confidences[0];
 
             return confidences;
         }
@@ -661,8 +648,6 @@ namespace Leap.Unity
                     confidences[key] = (Mathf.Cos(Mathf.Deg2Rad * angle) + 1f) / 2;
                 }
             }
-            // in the capsule hands joint 21 is copied and mirrored from joint 0
-            confidences[21] = confidences[0];
 
             return confidences;
         }
@@ -895,6 +880,64 @@ namespace Leap.Unity
                 }
 
                 return confidenceSum / validIndices.Count;
+            }
+        }
+
+        /// <summary>
+        /// create joint occlusion gameobjects if they are not there yet and update the position of all joint occlusion gameobjects that are attached to a xr service provider
+        /// </summary>
+        void SetupJointOcclusion()
+        {
+            if (jointOcclusions == null)
+            {
+                jointOcclusions = new List<JointOcclusion>();
+
+                foreach (LeapProvider provider in providers)
+                {
+                    JointOcclusion jointOcclusion = provider.gameObject.GetComponentInChildren<JointOcclusion>();
+
+                    if (jointOcclusion == null)
+                    {
+                        jointOcclusion = GameObject.Instantiate(Resources.Load<GameObject>("JointOcclusionPrefab"), provider.transform).GetComponent<JointOcclusion>();
+
+                        foreach (CapsuleHand jointOcclusionHand in jointOcclusion.GetComponentsInChildren<CapsuleHand>(true))
+                        {
+                            jointOcclusionHand.leapProvider = provider;
+                        }
+                    }
+
+                    jointOcclusion.Setup();
+
+                    jointOcclusions.Add(jointOcclusion);
+                }
+            }
+
+            // if any providers are xr providers, update their jointOcclusions position and rotation
+            for (int i = 0; i < jointOcclusions.Count; i++)
+            {
+                LeapXRServiceProvider xrProvider = providers[i] as LeapXRServiceProvider;
+                if (xrProvider != null)
+                {
+
+                    Transform deviceOrigin = providers[i].transform;
+                    deviceOrigin = xrProvider.mainCamera.transform;
+
+                    // xrProvider.deviceOrigin is set if camera follows a transform
+                    if (xrProvider.deviceOffsetMode == LeapXRServiceProvider.DeviceOffsetMode.Transform && xrProvider.deviceOrigin != null)
+                    {
+                        deviceOrigin = xrProvider.deviceOrigin;
+                    }
+                    else if (xrProvider.deviceOffsetMode != LeapXRServiceProvider.DeviceOffsetMode.Transform)
+                    {
+                        deviceOrigin.Translate(new Vector3(0, xrProvider.deviceOffsetYAxis, xrProvider.deviceOffsetZAxis));
+                        deviceOrigin.Rotate(new Vector3(-90 - xrProvider.deviceTiltXAxis, 180, 0));
+                    }
+
+
+                    jointOcclusions[i].transform.SetPose(deviceOrigin.GetPose());
+                    jointOcclusions[i].transform.Rotate(new Vector3(-90, 0, 180));
+                }
+
             }
         }
 
