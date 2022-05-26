@@ -12,6 +12,8 @@ using UnityEngine;
 /** HandModelBase defines abstract methods as a template for building Leap hand models*/
 namespace Leap.Unity
 {
+    using Attributes;
+
     /// <summary>
     /// Supported chiralities
     /// </summary>
@@ -136,6 +138,7 @@ namespace Leap.Unity
 
         [Tooltip("Optionally set a Leap Provider to use for tracking frames, If you do not set one, the first provider found in the scene will be used. If no provider is found this gameobject will disable itself")]
         [SerializeField]
+        [EditTimeOnly]
         private LeapProvider _leapProvider;
 
         /// <summary>
