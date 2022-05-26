@@ -389,7 +389,7 @@ namespace Leap.Unity
                     int key = finger_idx * 5 + bone_idx;
                     jointConfidences[idx][key] =
                                     jointRotFactor * confidences_jointRot[idx][key] +
-                    jointRotToPalmFactor* confidences_jointPalmRot[idx][key] +
+                    jointRotToPalmFactor * confidences_jointPalmRot[idx][key] +
                    jointOcclusionFactor * confidences_jointOcclusion[idx][key];
 
                     if (bone_idx != 0)
@@ -909,7 +909,7 @@ namespace Leap.Unity
                     jointOcclusions.Add(jointOcclusion);
                 }
 
-                foreach(JointOcclusion jointOcclusion in jointOcclusions)
+                foreach (JointOcclusion jointOcclusion in jointOcclusions)
                 {
                     jointOcclusion.Setup();
                 }
