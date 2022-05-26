@@ -218,8 +218,8 @@ namespace Leap.Unity
                 mergedHands.Add(MergeHands(rightHands, rightHandConfidences, rightJointConfidences));
             }
 
-            // get frame data from first frame and add merged hands to it
-            Frame mergedFrame = frames[0];
+            // create new frame and add merged hands to it
+            Frame mergedFrame = new Frame();
             mergedFrame.Hands = mergedHands;
 
             return mergedFrame;
@@ -906,9 +906,12 @@ namespace Leap.Unity
                         }
                     }
 
-                    jointOcclusion.Setup();
-
                     jointOcclusions.Add(jointOcclusion);
+                }
+
+                foreach(JointOcclusion jointOcclusion in jointOcclusions)
+                {
+                    jointOcclusion.Setup();
                 }
             }
 
