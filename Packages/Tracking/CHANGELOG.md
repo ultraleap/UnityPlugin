@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [docs-website]: https://docs.ultraleap.com/ "Ultraleap Docs"
 
-## [5.9.0] - 25/05/2022
+## [5.9.0] - 26/05/2022
  
 ### Added 
 
@@ -33,6 +33,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Hands in Desktop scenes can appear far away from the camera 
 - Interactions callback scene allows blocks to be moved without doing a grasp pose. 
 - Capsule hands don't have a joint colour in HDRP 
+- Hand UI can become detached from hand when hand is removed from view
  
 
 ## [5.8.0] - 28/04/2022
