@@ -42,6 +42,7 @@ namespace Leap.Unity
         protected Dictionary<string, bool> _foldoutStates;
         protected List<string> _deferredProperties;
         protected bool _showScriptField = true;
+        protected bool _drawFoldoutInLine = false;
 
         private bool _canCallSpecifyFunctions = false;
         private GUIStyle _boldFoldoutStyle;
@@ -51,6 +52,11 @@ namespace Leap.Unity
         protected void dontShowScriptField()
         {
             _showScriptField = false;
+        }
+
+        protected void drawFoldoutInLine()
+        {
+            _drawFoldoutInLine = true;
         }
 
         /// <summary>
@@ -342,9 +348,14 @@ namespace Leap.Unity
                 }
 
                 if (_deferredProperties.Contains(iterator.name) ||
-                    isInFoldout(iterator.name))
+                    (isInFoldout(iterator.name) && !_drawFoldoutInLine))
                 {
                     continue;
+                }
+
+                if (isInFoldout(iterator.name))
+                {
+
                 }
 
                 using (new EditorGUI.DisabledGroupScope(isFirst))

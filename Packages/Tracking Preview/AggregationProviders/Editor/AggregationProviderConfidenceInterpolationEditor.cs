@@ -21,6 +21,10 @@ namespace Leap.Unity
             base.OnEnable();
 
             specifyCustomDrawer("jointOcclusionFactor", drawJointOcclusionWarning);
+
+            drawFoldoutInLine();
+
+            addPropertyToFoldout("palmPosFactor", "testtest");
         }
 
         private void drawJointOcclusionWarning(SerializedProperty property)
