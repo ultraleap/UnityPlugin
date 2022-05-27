@@ -31,7 +31,7 @@ namespace Ultraleap.Tracking.OpenXR
             {
                 if (_mainCamera != null && _mainCamera != MainCameraProvider.mainCamera)
                 {
-                        MainCameraProvider.mainCamera = _mainCamera;
+                    MainCameraProvider.mainCamera = _mainCamera;
                 }
                 return _mainCamera;
             }
@@ -56,16 +56,28 @@ namespace Ultraleap.Tracking.OpenXR
         {
             PopulateLeapFrame(FrameTime.OnUpdate, ref _updateFrame);
 
-            // Transform for the camera parent transform if this camera is part of a rig.
+            Pose trackerTransform = new Pose(Vector3.zero, Quaternion.identity);
+
+#if XR_LEGACY_INPUT_AVAILABLE
+            // Adjust for relative transform if it's in use.
+            var trackedPoseDriver = mainCamera.GetComponent<UnityEngine.SpatialTracking.TrackedPoseDriver>();
+            if (trackedPoseDriver != null && trackedPoseDriver.UseRelativeTransform)
+            {
+                trackerTransform.position += trackedPoseDriver.originPose.position;
+                trackerTransform.rotation *= trackedPoseDriver.originPose.rotation;
+            }
+#endif
+            // Adjust for the camera parent transform if this camera is part of a rig.
             var parentTransform = mainCamera.transform.parent;
             if (parentTransform != null)
             {
-                _currentFrame = _updateFrame.TransformedCopy(new LeapTransform(parentTransform.position.ToVector(), parentTransform.rotation.ToLeapQuaternion()));
+                trackerTransform.position += parentTransform.position;
+                trackerTransform.rotation *= parentTransform.rotation;
             }
-            else
-            {
-                _currentFrame = _updateFrame;
-            }
+
+            _currentFrame = _updateFrame.TransformedCopy(new LeapTransform(
+                trackerTransform.position.ToVector(),
+                trackerTransform.rotation.ToLeapQuaternion()));
 
             DispatchUpdateFrameEvent(_currentFrame);
         }
@@ -314,7 +326,7 @@ namespace Ultraleap.Tracking.OpenXR
                 (_backingUntransformedEditTimeFrame ??= new Frame()).Hands.Clear();
                 _backingUntransformedEditTimeFrame.Hands.Add(EditTimeLeftHand);
                 _backingUntransformedEditTimeFrame.Hands.Add(EditTimeRightHand);
-                _backingEditTimeFrame.CopyFrom(_backingUntransformedEditTimeFrame).Transform(transform.GetLeapMatrix());
+                _backingEditTimeFrame = _backingUntransformedEditTimeFrame.TransformedCopy(mainCamera.transform.GetLeapMatrix());
                 return _backingEditTimeFrame;
             }
         }
