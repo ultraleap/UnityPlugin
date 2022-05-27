@@ -281,24 +281,7 @@ namespace Leap.Unity
         {
             float confidence = 0;
 
-            Transform deviceOrigin = providers[frame_idx].transform;
-
-            LeapXRServiceProvider xrProvider = providers[frame_idx] as LeapXRServiceProvider;
-            if (xrProvider != null)
-            {
-                deviceOrigin = xrProvider.mainCamera.transform;
-
-                // xrProvider.deviceOrigin is set if camera follows a transform
-                if (xrProvider.deviceOffsetMode == LeapXRServiceProvider.DeviceOffsetMode.Transform && xrProvider.deviceOrigin != null)
-                {
-                    deviceOrigin = xrProvider.deviceOrigin;
-                }
-                else if (xrProvider.deviceOffsetMode != LeapXRServiceProvider.DeviceOffsetMode.Transform)
-                {
-                    deviceOrigin.Translate(new Vector3(0, xrProvider.deviceOffsetYAxis, xrProvider.deviceOffsetZAxis));
-                    deviceOrigin.Rotate(new Vector3(-90 - xrProvider.deviceTiltXAxis, 180, 0));
-                }
-            }
+            Transform deviceOrigin = GetDeviceOrigin(providers[frame_idx]);
 
             confidence = palmPosFactor * Confidence_RelativeHandPos(providers[frame_idx], deviceOrigin, hand.PalmPosition.ToVector3());
             confidence += palmRotFactor * Confidence_RelativeHandRot(deviceOrigin, hand.PalmPosition.ToVector3(), hand.PalmNormal.ToVector3());
@@ -350,24 +333,7 @@ namespace Leap.Unity
                 confidences_jointOcclusion[idx] = new float[VectorHand.NUM_JOINT_POSITIONS];
             }
 
-            Transform deviceOrigin = providers[frame_idx].transform;
-
-            LeapXRServiceProvider xrProvider = providers[frame_idx] as LeapXRServiceProvider;
-            if (xrProvider != null)
-            {
-                deviceOrigin = xrProvider.mainCamera.transform;
-
-                // xrProvider.deviceOrigin is set if camera follows a transform
-                if (xrProvider.deviceOffsetMode == LeapXRServiceProvider.DeviceOffsetMode.Transform && xrProvider.deviceOrigin != null)
-                {
-                    deviceOrigin = xrProvider.deviceOrigin;
-                }
-                else if (xrProvider.deviceOffsetMode != LeapXRServiceProvider.DeviceOffsetMode.Transform)
-                {
-                    deviceOrigin.Translate(new Vector3(0, xrProvider.deviceOffsetYAxis, xrProvider.deviceOffsetZAxis));
-                    deviceOrigin.Rotate(new Vector3(-90 - xrProvider.deviceTiltXAxis, 180, 0));
-                }
-            }
+            Transform deviceOrigin = GetDeviceOrigin(providers[frame_idx]);
 
             if (jointRotFactor != 0)
             {
@@ -921,27 +887,42 @@ namespace Leap.Unity
                 LeapXRServiceProvider xrProvider = providers[i] as LeapXRServiceProvider;
                 if (xrProvider != null)
                 {
-
-                    Transform deviceOrigin = providers[i].transform;
-                    deviceOrigin = xrProvider.mainCamera.transform;
-
-                    // xrProvider.deviceOrigin is set if camera follows a transform
-                    if (xrProvider.deviceOffsetMode == LeapXRServiceProvider.DeviceOffsetMode.Transform && xrProvider.deviceOrigin != null)
-                    {
-                        deviceOrigin = xrProvider.deviceOrigin;
-                    }
-                    else if (xrProvider.deviceOffsetMode != LeapXRServiceProvider.DeviceOffsetMode.Transform)
-                    {
-                        deviceOrigin.Translate(new Vector3(0, xrProvider.deviceOffsetYAxis, xrProvider.deviceOffsetZAxis));
-                        deviceOrigin.Rotate(new Vector3(-90 - xrProvider.deviceTiltXAxis, 180, 0));
-                    }
-
+                    Transform deviceOrigin = GetDeviceOrigin(providers[i]);
 
                     jointOcclusions[i].transform.SetPose(deviceOrigin.GetPose());
                     jointOcclusions[i].transform.Rotate(new Vector3(-90, 0, 180));
                 }
 
             }
+        }
+
+        /// <summary>
+        /// returns the transform of the device origin of the device corresponding to the given provider.
+        /// If it is a desktop or screentop provider, this is simply provider.transform.
+        /// If it is an XR provider, the main camera's transform is taken into account as well as the manual head offset values of the device
+        /// </summary>
+        Transform GetDeviceOrigin(LeapProvider provider)
+        {
+            Transform deviceOrigin = provider.transform;
+
+            LeapXRServiceProvider xrProvider = provider as LeapXRServiceProvider;
+            if (xrProvider != null)
+            {
+                deviceOrigin = xrProvider.mainCamera.transform;
+
+                // xrProvider.deviceOrigin is set if camera follows a transform
+                if (xrProvider.deviceOffsetMode == LeapXRServiceProvider.DeviceOffsetMode.Transform && xrProvider.deviceOrigin != null)
+                {
+                    deviceOrigin = xrProvider.deviceOrigin;
+                }
+                else if (xrProvider.deviceOffsetMode != LeapXRServiceProvider.DeviceOffsetMode.Transform)
+                {
+                    deviceOrigin.Translate(new Vector3(0, xrProvider.deviceOffsetYAxis, xrProvider.deviceOffsetZAxis));
+                    deviceOrigin.Rotate(new Vector3(-90 - xrProvider.deviceTiltXAxis, 180, 0));
+                }
+            }
+
+            return deviceOrigin;
         }
 
         /// <summary>

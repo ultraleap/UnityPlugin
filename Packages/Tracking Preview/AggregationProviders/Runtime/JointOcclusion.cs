@@ -9,12 +9,14 @@ using UnityEngine;
 /// <summary>
 /// class to calculate confidence values based on joint occlusion.
 /// </summary>
+[RequireComponent(typeof(Camera))]
 public class JointOcclusion : MonoBehaviour
 {
     public Shader replacementShader;
     public CapsuleHand occlusionHandLeft;
     public CapsuleHand occlusionHandRight;
 
+    Camera cam;
     Texture2D tex;
     Rect regionToReadFrom;
     Color[] occlusionSphereColorsLeft;
@@ -31,7 +33,7 @@ public class JointOcclusion : MonoBehaviour
         List<JointOcclusion> allJointOcclusions = FindObjectsOfType<JointOcclusion>().ToList();
         layerName = "JointOcclusion" + allJointOcclusions.IndexOf(this).ToString();
 
-        Camera cam = GetComponent<Camera>();
+        cam = GetComponent<Camera>();
         cam.SetReplacementShader(replacementShader, "RenderType");
         cam.cullingMask = LayerMask.GetMask(layerName);
 
@@ -125,7 +127,7 @@ public class JointOcclusion : MonoBehaviour
         Vector3 scale = new Vector3(0.1f, 0.01f, 0.13f);
         Graphics.DrawMesh(cubeMesh, Matrix4x4.TRS(hand.PalmPosition.ToVector3() + hand.Direction.ToVector3() * posOffset.z + hand.PalmNormal.ToVector3() * posOffset.y + Vector3.Cross(hand.Direction.ToVector3(), hand.PalmNormal.ToVector3()) * posOffset.x, hand.Rotation.ToQuaternion() * rotOffset, scale), cubeMaterial, LayerMask.NameToLayer(layerName));
 
-        RenderTexture.active = GetComponent<Camera>().targetTexture;
+        RenderTexture.active = cam.targetTexture;
 
         tex.ReadPixels(regionToReadFrom, 0, 0);
         tex.Apply();
@@ -150,8 +152,8 @@ public class JointOcclusion : MonoBehaviour
                 // get the joint position from the given hand and use it to calculate the screen position of the joint's center and 
                 // a point on the outside border of the joint (both in pixel coordinates)
                 Vector3 jointPos = finger.Bone((Leap.Bone.BoneType)j).NextJoint.ToVector3();
-                Vector3 screenPosCenter = GetComponent<Camera>().WorldToScreenPoint(jointPos);
-                Vector3 screenPosSphereOutside = GetComponent<Camera>().WorldToScreenPoint(jointPos + GetComponent<Camera>().transform.right * jointRadius);
+                Vector3 screenPosCenter = cam.WorldToScreenPoint(jointPos);
+                Vector3 screenPosSphereOutside = cam.WorldToScreenPoint(jointPos + cam.transform.right * jointRadius);
 
                 // the sphere radius (in pixels) is given by the distance between the screenPosCenter and the screenPosOutside
                 float radius = new Vector2(screenPosSphereOutside.x - screenPosCenter.x, screenPosSphereOutside.y - screenPosCenter.y).magnitude;
