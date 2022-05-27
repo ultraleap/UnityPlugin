@@ -27,8 +27,8 @@ namespace Leap.Unity
         private Vector3 midDevicePointForward;
         private Vector3 midDevicePointUp;
 
-        public float cam1Aplha;
-        public float cam2Aplha;
+        public float cam1Alpha;
+        public float cam2Alpha;
 
         public float leftAngle;
         public float rightAngle;
@@ -72,8 +72,8 @@ namespace Leap.Unity
             }
 
             //combine hands using relative angle between devices:
-            Hand confidentLeft = AngularInterpolate(LeftHands, ref cam1Aplha, ref leftAngle);
-            Hand confidentRight = AngularInterpolate(RightHands, ref cam2Aplha, ref rightAngle);
+            Hand confidentLeft = AngularInterpolate(LeftHands, ref cam1Alpha, ref leftAngle);
+            Hand confidentRight = AngularInterpolate(RightHands, ref cam2Alpha, ref rightAngle);
 
             //clean up and return hand arrays with only valid hands
             #region Clean hand arrays

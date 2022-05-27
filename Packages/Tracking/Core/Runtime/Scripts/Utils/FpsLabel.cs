@@ -25,7 +25,7 @@ namespace Leap.Unity
         {
             if (_provider == null)
             {
-                _provider = Hands.Provider;
+                _provider = FindObjectOfType<LeapProvider>();
             }
 
             if (_frameRateText == null)

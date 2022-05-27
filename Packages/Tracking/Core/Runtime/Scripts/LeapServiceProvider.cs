@@ -7,6 +7,7 @@
  ******************************************************************************/
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -74,9 +75,10 @@ namespace Leap.Unity
             None,
             LeapMotionController,
             StereoIR170,
+            Device_3Di,
             Automatic
         }
-        [Tooltip("Displays a representation of the interaction volume in the scene view")]
+        [Tooltip("Displays a representation of the traking device")]
         [SerializeField]
         protected InteractionVolumeVisualization _interactionVolumeVisualization = InteractionVolumeVisualization.Automatic;
 
@@ -84,6 +86,22 @@ namespace Leap.Unity
         /// Which interaction volume is selected to be visualized in the scene view
         /// </summary>
         public InteractionVolumeVisualization SelectedInteractionVolumeVisualization => _interactionVolumeVisualization;
+
+        [Tooltip("Displays a visualization of the Field Of View of the chosen device as a Gizmo")]
+        [SerializeField]
+        protected bool FOV_Visualization = true;
+        [Tooltip("Displays the optimal FOV for tracking")]
+        [SerializeField]
+        protected bool OptimalFOV_Visualization = true;
+        [Tooltip("Displays the maximum FOV for tracking")]
+        [SerializeField]
+        protected bool MaxFOV_Visualization = true;
+
+        [SerializeField, HideInInspector]
+        private VisualFOV _visualFOV;
+        private LeapFOVInfos leapFOVInfos;
+        private Mesh optimalFOVMesh;
+        private Mesh maxFOVMesh;
 
         /// <summary>
         /// Supported modes to optimize frame updates.
@@ -157,6 +175,11 @@ namespace Leap.Unity
         [EditTimeOnly]
         [SerializeField]
         protected MultipleDeviceMode _multipleDeviceMode = MultipleDeviceMode.Disabled;
+
+        public MultipleDeviceMode CurrentMultipleDeviceMode
+        {
+            get { return _multipleDeviceMode; }
+        }
 
         [Tooltip("When Multiple Device Mode is set to `Specific`, the provider will " +
           "receive data from only the devices that contain this in their serial number.")]
@@ -238,7 +261,7 @@ namespace Leap.Unity
 
         [Tooltip("Enable to prevent changes to tracking mode during initialization. The mode the service is currently set to will be retained.")]
         [SerializeField]
-        private bool _preventInitializingTrackingMode;
+        protected bool _preventInitializingTrackingMode;
 
 #if UNITY_2017_3_OR_NEWER
         [Tooltip("When checked, profiling data from the LeapCSharp worker thread will be used to populate the UnityProfiler.")]
@@ -865,11 +888,13 @@ namespace Leap.Unity
         public void ChangeTrackingMode(TrackingOptimizationMode trackingMode)
         {
             _trackingOptimization = trackingMode;
+            StartCoroutine(ChangeTrackingMode_Coroutine(trackingMode));
+        }
 
-            if (_leapController == null)
-            {
-                return;
-            }
+        private IEnumerator ChangeTrackingMode_Coroutine(TrackingOptimizationMode trackingMode)
+        {
+            yield return new WaitWhile(() => _leapController == null || !_leapController.IsConnected);
+
 
             switch (trackingMode)
             {
@@ -878,12 +903,10 @@ namespace Leap.Unity
                     _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD, _currentDevice);
                     break;
                 case TrackingOptimizationMode.Screentop:
-                    _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD, _currentDevice);
-                    _leapController.SetPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP, _currentDevice);
+                    _leapController.SetAndClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP, Controller.PolicyFlag.POLICY_OPTIMIZE_HMD, device: _currentDevice);
                     break;
                 case TrackingOptimizationMode.HMD:
-                    _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP, _currentDevice);
-                    _leapController.SetPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD, _currentDevice);
+                    _leapController.SetAndClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD, Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP, device: _currentDevice);
                     break;
             }
         }
@@ -1175,6 +1198,205 @@ namespace Leap.Unity
             }
         }
 #endif
+
+        #endregion
+
+        #region Draw Gizmos
+
+        private void OnDrawGizmos()
+        {
+            if (_visualFOV == null || leapFOVInfos == null || leapFOVInfos.SupportedDevices.Count == 0)
+            {
+                LoadFOVData();
+            }
+
+            Transform targetTransform = transform;
+            LeapXRServiceProvider xrProvider = this as LeapXRServiceProvider;
+            if (xrProvider != null)
+            {
+                targetTransform = xrProvider.mainCamera.transform;
+
+                // deviceOrigin is set if camera follows a transform
+                if (xrProvider.deviceOffsetMode == LeapXRServiceProvider.DeviceOffsetMode.Transform && xrProvider.deviceOrigin != null)
+                {
+                    targetTransform = xrProvider.deviceOrigin;
+                }
+            }
+
+            switch (_interactionVolumeVisualization)
+            {
+                case LeapServiceProvider.InteractionVolumeVisualization.LeapMotionController:
+                    DrawTrackingDevice(targetTransform, "Leap Motion Controller");
+                    break;
+                case LeapServiceProvider.InteractionVolumeVisualization.StereoIR170:
+                    DrawTrackingDevice(targetTransform, "Stereo IR 170");
+                    break;
+                case LeapServiceProvider.InteractionVolumeVisualization.Device_3Di:
+                    DrawTrackingDevice(targetTransform, "3Di");
+                    break;
+                case LeapServiceProvider.InteractionVolumeVisualization.Automatic:
+                    DetectConnectedDevice(targetTransform);
+                    break;
+                default:
+                    break;
+            }
+        }
+
+
+        private void DetectConnectedDevice(Transform targetTransform)
+        {
+
+            if (GetLeapController().Devices?.Count >= 1)
+            {
+                Device currentDevice = _currentDevice;
+                if (currentDevice == null || (_multipleDeviceMode == LeapServiceProvider.MultipleDeviceMode.Specific && currentDevice.SerialNumber != _specificSerialNumber))
+                {
+                    foreach (Device d in GetLeapController().Devices)
+                    {
+                        if (d.SerialNumber.Contains(_specificSerialNumber))
+                        {
+                            currentDevice = d;
+                            break;
+                        }
+                    }
+                }
+
+                if (currentDevice == null || (_multipleDeviceMode == LeapServiceProvider.MultipleDeviceMode.Specific && currentDevice.SerialNumber != _specificSerialNumber))
+                {
+                    return;
+                }
+
+                Device.DeviceType deviceType = currentDevice.Type;
+                if (deviceType == Device.DeviceType.TYPE_RIGEL || deviceType == Device.DeviceType.TYPE_SIR170)
+                {
+                    DrawTrackingDevice(targetTransform, "Stereo IR 170");
+                    return;
+                }
+                else if (deviceType == Device.DeviceType.TYPE_3DI)
+                {
+                    DrawTrackingDevice(targetTransform, "3Di");
+                    return;
+                }
+                else if (deviceType == Device.DeviceType.TYPE_PERIPHERAL)
+                {
+                    DrawTrackingDevice(targetTransform, "Leap Motion Controller");
+                    return;
+                }
+            }
+
+            // if no devices connected, no serial number selected or the connected device type isn't matching one of the above,
+            // delete any device model that is currently displayed
+            if (targetTransform.Find("DeviceModel") != null)
+            {
+                GameObject.DestroyImmediate(targetTransform.Find("DeviceModel").gameObject);
+            }
+        }
+
+
+        private void DrawTrackingDevice(Transform targetTransform, string deviceType)
+        {
+            Matrix4x4 deviceModelMatrix = targetTransform.localToWorldMatrix;
+
+            LeapXRServiceProvider xrProvider = this as LeapXRServiceProvider;
+            if (xrProvider != null && xrProvider.deviceOffsetMode != LeapXRServiceProvider.DeviceOffsetMode.Transform)
+            {
+                deviceModelMatrix *= Matrix4x4.Translate(new Vector3(0, xrProvider.deviceOffsetYAxis, xrProvider.deviceOffsetZAxis));
+                deviceModelMatrix *= Matrix4x4.Rotate(Quaternion.Euler(-90 - xrProvider.deviceTiltXAxis, 180, 0));
+            }
+
+
+            LeapFOVInfo info = null;
+            GameObject newDevice = null;
+            foreach (var leapInfo in leapFOVInfos.SupportedDevices)
+            {
+                if (leapInfo.Name == deviceType)
+                {
+                    info = leapInfo;
+                    Material mat = Resources.Load("TrackingVolumeVisualization/DeviceModelMat") as Material;
+                    mat.SetPass(0);
+
+                    Graphics.DrawMeshNow(Resources.Load<Mesh>("TrackingVolumeVisualization/Meshes/" + deviceType), deviceModelMatrix *
+                           Matrix4x4.Scale(Vector3.one * 0.01f));
+                    break;
+                }
+            }
+
+            if (info != null)
+            {
+                SetDeviceInfo(info);
+            }
+            else
+            {
+                Debug.LogError("Tried to load invalid device type: " + deviceType);
+                return;
+            }
+
+            if (FOV_Visualization)
+            {
+                DrawInteractionZone(deviceModelMatrix);
+            }
+        }
+
+        private void DrawInteractionZone(Matrix4x4 deviceModelMatrix)
+        {
+
+            _visualFOV.UpdateFOVS();
+
+            optimalFOVMesh = _visualFOV.OptimalFOVMesh;
+            maxFOVMesh = _visualFOV.MaxFOVMesh;
+
+
+            if (OptimalFOV_Visualization && optimalFOVMesh != null)
+            {
+                Material mat = Resources.Load("TrackingVolumeVisualization/OptimalFOVMat_Volume") as Material;
+                mat.SetPass(0);
+
+                Graphics.DrawMeshNow(optimalFOVMesh, deviceModelMatrix *
+                       Matrix4x4.Scale(Vector3.one * 0.01f));
+            }
+            if (MaxFOV_Visualization && maxFOVMesh != null)
+            {
+                Material mat = Resources.Load("TrackingVolumeVisualization/MaxFOVMat_Volume") as Material;
+                mat.SetPass(0);
+
+                Graphics.DrawMeshNow(maxFOVMesh, deviceModelMatrix *
+                       Matrix4x4.Scale(Vector3.one * 0.01f));
+            }
+        }
+
+
+        private void LoadFOVData()
+        {
+            leapFOVInfos = JsonUtility.FromJson<LeapFOVInfos>(Resources.Load<TextAsset>("TrackingVolumeVisualization/SupportedTrackingDevices").text);
+
+            if (_visualFOV == null) _visualFOV = new VisualFOV();
+        }
+
+        public void SetDeviceInfo(LeapFOVInfo leapInfo)
+        {
+            _visualFOV.HorizontalFOV = leapInfo.HorizontalFOV;
+            _visualFOV.VerticalFOV = leapInfo.VerticalFOV;
+            _visualFOV.MinDistance = leapInfo.MinDistance;
+            _visualFOV.MaxDistance = leapInfo.MaxDistance;
+            _visualFOV.OptimalMaxDistance = leapInfo.OptimalDistance;
+        }
+
+        [Serializable]
+        public class LeapFOVInfos
+        {
+            public List<LeapFOVInfo> SupportedDevices;
+        }
+
+        [Serializable]
+        public class LeapFOVInfo
+        {
+            public string Name;
+            public float HorizontalFOV;
+            public float VerticalFOV;
+            public float OptimalDistance;
+            public float MinDistance;
+            public float MaxDistance;
+        }
 
         #endregion
 

@@ -163,10 +163,9 @@ namespace Leap.Unity.Attachments
 
                 if (_leapProvider == null)
                 {
-                    _handAccessors[0] = new Func<Hand>(() => Hands.Left);
-                    _handAccessors[1] = new Func<Hand>(() => Hands.Right);
+                    _leapProvider = FindObjectOfType<LeapProvider>();
                 }
-                else
+                if (_leapProvider != null)
                 {
                     _handAccessors[0] = new Func<Hand>(() => _leapProvider.CurrentFrame?.GetHand(Chirality.Left));
                     _handAccessors[1] = new Func<Hand>(() => _leapProvider.CurrentFrame?.GetHand(Chirality.Right));
