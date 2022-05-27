@@ -332,11 +332,6 @@ namespace Leap.Unity
             }
         }
 
-        private void OnValidate()
-        {
-            this.transform.hideFlags = HideFlags.NotEditable;
-        }
-
         protected override void OnEnable()
         {
             resetShaderTransforms();
