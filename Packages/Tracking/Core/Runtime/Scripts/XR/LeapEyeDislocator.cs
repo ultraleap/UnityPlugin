@@ -40,7 +40,8 @@ namespace Leap.Unity
 
         private void onDevice(Device device)
         {
-            _deviceBaseline = Maybe.Some(device.Baseline);
+            if (device == _provider.CurrentDevice || _deviceBaseline == Maybe.None)
+                _deviceBaseline = Maybe.Some(device.Baseline);
         }
 
         private void OnDestroy()

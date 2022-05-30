@@ -167,6 +167,29 @@ namespace Leap.Unity
             }, dependantProperties);
         }
 
+        protected void specifyConditionalDrawing(string enumName, int[] enumValues, params string[] dependantProperties)
+        {
+            throwIfNotInOnEnable("specifyConditionalDrawing");
+
+            if (!validateProperty(enumName))
+            {
+                return;
+            }
+
+            SerializedProperty enumProp = serializedObject.FindProperty(enumName);
+            specifyConditionalDrawing(() =>
+            {
+                if (enumProp.hasMultipleDifferentValues)
+                {
+                    return false;
+                }
+                else
+                {
+                    return enumValues.Contains(enumProp.intValue);
+                }
+            }, dependantProperties);
+        }
+
         protected void hideField(string propertyName)
         {
             throwIfNotInOnEnable("hideField");

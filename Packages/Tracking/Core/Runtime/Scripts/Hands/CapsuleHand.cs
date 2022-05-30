@@ -83,6 +83,28 @@ namespace Leap.Unity
         private int _curSphereIndex = 0, _curCylinderIndex = 0;
         private Color _backingDefault = Color.white;
 
+        private MaterialPropertyBlock _materialPropertyBlock;
+        private Color[] _sphereColors;
+
+        [HideInInspector]
+        public bool SetIndividualSphereColors = false;
+        public Color[] SphereColors
+        {
+            get
+            {
+                if (_sphereColors == null)
+                {
+                    _sphereColors = new Color[32];
+                    _sphereColors.Fill(SphereColour);
+                }
+                return _sphereColors;
+            }
+            set
+            {
+                _sphereColors = value;
+            }
+        }
+
         /// <summary>
         /// The type of the Hand model (set to Graphics)
         /// </summary>
@@ -170,6 +192,7 @@ namespace Leap.Unity
         {
             get
             {
+                if (_sphereMat == null) return _sphereColor;
                 return _sphereMat.color;
             }
         }
@@ -372,12 +395,34 @@ namespace Leap.Unity
             drawCylinder(mockThumbJointPos, THUMB_BASE_INDEX);
             drawCylinder(mockThumbJointPos, PINKY_BASE_INDEX);
 
-            // Draw Spheres
-            Graphics.DrawMeshInstanced(_sphereMesh, 0, _sphereMat, _sphereMatrices, _curSphereIndex, null,
-              _castShadows ? UnityEngine.Rendering.ShadowCastingMode.On : UnityEngine.Rendering.ShadowCastingMode.Off, true, gameObject.layer);
+            if (SetIndividualSphereColors)
+            {
+                if (_materialPropertyBlock == null)
+                {
+                    _materialPropertyBlock = new MaterialPropertyBlock();
+                }
+
+                for (int i = 0; i < _sphereMatrices.Length && i < _curSphereIndex; i++)
+                {
+                    _materialPropertyBlock.SetColor("_Color", SphereColors[i]);
+
+                    Graphics.DrawMeshInstanced(_sphereMesh, 0, _sphereMat, new Matrix4x4[] { _sphereMatrices[i] }, 1, _materialPropertyBlock,
+                      _castShadows ? UnityEngine.Rendering.ShadowCastingMode.On : UnityEngine.Rendering.ShadowCastingMode.Off, true, gameObject.layer);
+                }
+            }
+            else
+            {
+                Graphics.DrawMeshInstanced(_sphereMesh, 0, _sphereMat, _sphereMatrices, _curSphereIndex, null,
+                  _castShadows ? UnityEngine.Rendering.ShadowCastingMode.On : UnityEngine.Rendering.ShadowCastingMode.Off, true, gameObject.layer);
+            }
+
 
             // Draw Cylinders
+#if UNITY_EDITOR
+            _cylinderMesh = getCylinderMesh(1f);
+#else
             if (_cylinderMesh == null) { _cylinderMesh = getCylinderMesh(1f); }
+#endif
             Graphics.DrawMeshInstanced(_cylinderMesh, 0, _backing_material, _cylinderMatrices, _curCylinderIndex, null,
               _castShadows ? UnityEngine.Rendering.ShadowCastingMode.On : UnityEngine.Rendering.ShadowCastingMode.Off, true, gameObject.layer);
         }
