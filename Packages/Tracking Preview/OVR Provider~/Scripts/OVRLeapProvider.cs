@@ -1,7 +1,7 @@
-using System.Collections.Generic;
-using UnityEngine;
 using Leap.Unity.Encoding;
 using OculusSampleFramework;
+using System.Collections.Generic;
+using UnityEngine;
 
 namespace Leap.Unity
 {
