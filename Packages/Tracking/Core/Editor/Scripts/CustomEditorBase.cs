@@ -43,6 +43,7 @@ namespace Leap.Unity
         protected List<string> _deferredProperties;
         protected bool _showScriptField = true;
         protected bool _drawFoldoutInLine = false;
+        protected Dictionary<string, bool> _foldoutDrawn;
 
         private bool _canCallSpecifyFunctions = false;
         private GUIStyle _boldFoldoutStyle;
@@ -306,6 +307,7 @@ namespace Leap.Unity
             _conditionalProperties = new Dictionary<string, List<Func<bool>>>();
             _foldoutProperties = new Dictionary<string, List<string>>();
             _foldoutStates = new Dictionary<string, bool>();
+            _foldoutDrawn = new Dictionary<string, bool>();
             _deferredProperties = new List<string>();
             _canCallSpecifyFunctions = true;
         }
@@ -335,6 +337,7 @@ namespace Leap.Unity
 
             _canCallSpecifyFunctions = false;
 
+            _foldoutDrawn.Clear();
             _modifiedProperties.Clear();
             SerializedProperty iterator = serializedObject.GetIterator();
             bool isFirst = true;
@@ -347,15 +350,34 @@ namespace Leap.Unity
                     continue;
                 }
 
-                if (_deferredProperties.Contains(iterator.name) ||
-                    (isInFoldout(iterator.name) && !_drawFoldoutInLine))
+                if (_deferredProperties.Contains(iterator.name))
                 {
                     continue;
                 }
 
                 if (isInFoldout(iterator.name))
                 {
+                    if (_drawFoldoutInLine)
+                    {
+                        foreach (var foldout in _foldoutProperties)
+                        {
+                            if (_foldoutDrawn.ContainsKey(foldout.Key) && _foldoutDrawn[foldout.Key]) { continue; }
 
+                            foreach (string property in foldout.Value)
+                            {
+                                if (property.Equals(iterator.name))
+                                {
+                                    EditorGUILayout.Space();
+                                    drawFoldout(foldout);
+                                    EditorGUILayout.Space();
+
+                                    _foldoutDrawn[foldout.Key] = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    continue;
                 }
 
                 using (new EditorGUI.DisabledGroupScope(isFirst))
@@ -374,32 +396,40 @@ namespace Leap.Unity
                 }
             }
 
-            foreach (var foldout in _foldoutProperties)
+            if(!_drawFoldoutInLine) 
             {
-                _foldoutStates[foldout.Key] =
-                  EditorGUILayout.Foldout(_foldoutStates[foldout.Key], foldout.Key, _boldFoldoutStyle);
-                if (_foldoutStates[foldout.Key])
+                foreach (var foldout in _foldoutProperties)
                 {
-                    // Draw normal priority properties first
-                    foreach (var property in foldout.Value)
-                    {
-                        if (!_deferredProperties.Contains(property))
-                        {
-                            drawProperty(serializedObject.FindProperty(property));
-                        }
-                    }
-                    // Draw deferred properties second
-                    foreach (var property in foldout.Value)
-                    {
-                        if (_deferredProperties.Contains(property))
-                        {
-                            drawProperty(serializedObject.FindProperty(property));
-                        }
-                    }
+                    drawFoldout(foldout);
                 }
             }
 
             serializedObject.ApplyModifiedProperties();
+        }
+
+        private void drawFoldout(KeyValuePair<string, List<string>> foldout)
+        {
+            _foldoutStates[foldout.Key] =
+                      EditorGUILayout.Foldout(_foldoutStates[foldout.Key], foldout.Key, _boldFoldoutStyle);
+            if (_foldoutStates[foldout.Key])
+            {
+                // Draw normal priority properties first
+                foreach (var property in foldout.Value)
+                {
+                    if (!_deferredProperties.Contains(property))
+                    {
+                        drawProperty(serializedObject.FindProperty(property));
+                    }
+                }
+                // Draw deferred properties second
+                foreach (var property in foldout.Value)
+                {
+                    if (_deferredProperties.Contains(property))
+                    {
+                        drawProperty(serializedObject.FindProperty(property));
+                    }
+                }
+            }
         }
 
         private void drawProperty(SerializedProperty property)

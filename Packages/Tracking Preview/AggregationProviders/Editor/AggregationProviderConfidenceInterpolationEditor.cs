@@ -24,7 +24,13 @@ namespace Leap.Unity
 
             drawFoldoutInLine();
 
-            addPropertyToFoldout("palmPosFactor", "testtest");
+            addPropertyToFoldout("palmPosFactor", "Palm Factors");
+            addPropertyToFoldout("palmRotFactor", "Palm Factors");
+            addPropertyToFoldout("palmVelocityFactor", "Palm Factors");
+
+            addPropertyToFoldout("jointRotFactor", "Joint Factors");
+            addPropertyToFoldout("jointRotToPalmFactor", "Joint Factors");
+            addPropertyToFoldout("jointOcclusionFactor", "Joint Factors");
         }
 
         private void drawJointOcclusionWarning(SerializedProperty property)
