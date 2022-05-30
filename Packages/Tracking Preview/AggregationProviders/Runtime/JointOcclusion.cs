@@ -37,6 +37,9 @@ public class JointOcclusion : MonoBehaviour
         cam.SetReplacementShader(replacementShader, "RenderType");
         cam.cullingMask = LayerMask.GetMask(layerName);
 
+        // remove the joint occlusion layer from the main camera:
+        MainCameraProvider.mainCamera.cullingMask &= ~(1 << LayerMask.NameToLayer(layerName));
+
         cam.targetTexture = new RenderTexture(cam.targetTexture);
 
         tex = new Texture2D(cam.targetTexture.width, cam.targetTexture.height);
