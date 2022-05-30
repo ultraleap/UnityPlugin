@@ -9,14 +9,14 @@ using UnityEngine;
 /// <summary>
 /// class to calculate confidence values based on joint occlusion.
 /// </summary>
+[RequireComponent(typeof(Camera))]
 public class JointOcclusion : MonoBehaviour
 {
     public Shader replacementShader;
     public CapsuleHand occlusionHandLeft;
     public CapsuleHand occlusionHandRight;
 
-    Camera camera;
-
+    Camera cam;
     Texture2D tex;
     Rect regionToReadFrom;
     Color[] occlusionSphereColorsLeft;
@@ -25,18 +25,25 @@ public class JointOcclusion : MonoBehaviour
     Material cubeMaterial;
     string layerName;
 
-    // Start is called before the first frame update
-    void Start()
+    /// <summary>
+    /// this sets everything up, so that joint occlusion works (eg. rendering layers)
+    /// </summary>
+    public void Setup()
     {
         List<JointOcclusion> allJointOcclusions = FindObjectsOfType<JointOcclusion>().ToList();
         layerName = "JointOcclusion" + allJointOcclusions.IndexOf(this).ToString();
 
-        camera = GetComponent<Camera>();
-        camera.SetReplacementShader(replacementShader, "RenderType");
-        camera.cullingMask = LayerMask.GetMask(layerName);
+        cam = GetComponent<Camera>();
+        cam.SetReplacementShader(replacementShader, "RenderType");
+        cam.cullingMask = LayerMask.GetMask(layerName);
 
-        tex = new Texture2D(camera.targetTexture.width, camera.targetTexture.height);
-        regionToReadFrom = new Rect(0, 0, camera.targetTexture.width, camera.targetTexture.height);
+        // remove the joint occlusion layer from the main camera:
+        MainCameraProvider.mainCamera.cullingMask &= ~(1 << LayerMask.NameToLayer(layerName));
+
+        cam.targetTexture = new RenderTexture(cam.targetTexture);
+
+        tex = new Texture2D(cam.targetTexture.width, cam.targetTexture.height);
+        regionToReadFrom = new Rect(0, 0, cam.targetTexture.width, cam.targetTexture.height);
 
         occlusionHandLeft.gameObject.layer = LayerMask.NameToLayer(layerName);
         occlusionHandLeft.SetIndividualSphereColors = true;
@@ -105,6 +112,11 @@ public class JointOcclusion : MonoBehaviour
     /// </summary>
     public float[] Confidence_JointOcclusion(float[] confidences, Transform deviceOrigin, Hand hand)
     {
+        if (confidences == null)
+        {
+            confidences = new float[VectorHand.NUM_JOINT_POSITIONS];
+        }
+
         if (hand == null)
         {
             return confidences.ClearWith(0);
@@ -118,10 +130,7 @@ public class JointOcclusion : MonoBehaviour
         Vector3 scale = new Vector3(0.1f, 0.01f, 0.13f);
         Graphics.DrawMesh(cubeMesh, Matrix4x4.TRS(hand.PalmPosition.ToVector3() + hand.Direction.ToVector3() * posOffset.z + hand.PalmNormal.ToVector3() * posOffset.y + Vector3.Cross(hand.Direction.ToVector3(), hand.PalmNormal.ToVector3()) * posOffset.x, hand.Rotation.ToQuaternion() * rotOffset, scale), cubeMaterial, LayerMask.NameToLayer(layerName));
 
-
-        // render the camera and copy the resulting render texture to tex
-        camera.Render();
-        RenderTexture.active = camera.targetTexture;
+        RenderTexture.active = cam.targetTexture;
 
         tex.ReadPixels(regionToReadFrom, 0, 0);
         tex.Apply();
@@ -141,14 +150,13 @@ public class JointOcclusion : MonoBehaviour
                 int key = (int)finger.Type * 5 + j + 1;
                 int capsuleHandKey = (int)finger.Type * 4 + j;
 
-
                 float jointRadius = 0.008f;
 
                 // get the joint position from the given hand and use it to calculate the screen position of the joint's center and 
                 // a point on the outside border of the joint (both in pixel coordinates)
                 Vector3 jointPos = finger.Bone((Leap.Bone.BoneType)j).NextJoint.ToVector3();
-                Vector3 screenPosCenter = camera.WorldToScreenPoint(jointPos);
-                Vector3 screenPosSphereOutside = camera.WorldToScreenPoint(jointPos + camera.transform.right * jointRadius);
+                Vector3 screenPosCenter = cam.WorldToScreenPoint(jointPos);
+                Vector3 screenPosSphereOutside = cam.WorldToScreenPoint(jointPos + cam.transform.right * jointRadius);
 
                 // the sphere radius (in pixels) is given by the distance between the screenPosCenter and the screenPosOutside
                 float radius = new Vector2(screenPosSphereOutside.x - screenPosCenter.x, screenPosSphereOutside.y - screenPosCenter.y).magnitude;
@@ -184,10 +192,6 @@ public class JointOcclusion : MonoBehaviour
                 confidences[i] = (float)pixelsSeenCount[i] / optimalPixelsCount[i];
             }
         }
-
-        // in the capsule hands joint 21 is copied and mirrored from joint 0
-        confidences[21] = confidences[0];
-
 
         return confidences;
     }

@@ -13,7 +13,7 @@ namespace Leap.Unity
 {
 
     [CustomEditor(typeof(AggregationProviderConfidenceInterpolation))]
-    public class AggregationProviderConfidenceInterpolationEditor : CustomEditorBase
+    public class AggregationProviderConfidenceInterpolationEditor : CustomEditorBase<AggregationProviderConfidenceInterpolation>
     {
 
         protected override void OnEnable()
@@ -21,15 +21,46 @@ namespace Leap.Unity
             base.OnEnable();
 
             specifyCustomDrawer("jointOcclusionFactor", drawJointOcclusionWarning);
+
+            drawFoldoutInLine();
+
+            addPropertyToFoldout("palmPosFactor", "Palm Factors");
+            addPropertyToFoldout("palmRotFactor", "Palm Factors");
+            addPropertyToFoldout("palmVelocityFactor", "Palm Factors");
+
+            addPropertyToFoldout("jointRotFactor", "Joint Factors");
+            addPropertyToFoldout("jointRotToPalmFactor", "Joint Factors");
+            addPropertyToFoldout("jointOcclusionFactor", "Joint Factors");
+
+            specifyConditionalDrawing("debugJointOrigins",
+                                        "debugHandLeft",
+                                        "debugHandRight",
+                                        "debugColors");
         }
 
         private void drawJointOcclusionWarning(SerializedProperty property)
         {
             EditorGUILayout.PropertyField(property, true);
 
+
             if (property.floatValue != 0)
             {
-                EditorGUILayout.HelpBox("To use jointOcclusion, you must add a Layer for each ServiceProvider named 'JointOcclusion[idx]'. (eg. Add 'JointOcclusion0' and 'JointOcclusion1' when using two source providers.)", MessageType.Warning);
+                bool showWarning = false;
+                string warningText = "To use jointOcclusion, you must add the following Layers: ";
+                for (int i = 0; i < target.providers.Length; i++)
+                {
+                    string layerName = "JointOcclusion" + i.ToString();
+                    if (LayerMask.NameToLayer(layerName) == -1)
+                    {
+                        showWarning = true;
+                        warningText += layerName + ", ";
+                    }
+                }
+
+                if (showWarning)
+                {
+                    EditorGUILayout.HelpBox(warningText.TrimEnd(' ', ','), MessageType.Warning);
+                }
             }
         }
 
