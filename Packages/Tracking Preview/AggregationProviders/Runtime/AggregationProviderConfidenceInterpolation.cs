@@ -47,13 +47,15 @@ namespace Leap.Unity
         [Range(0f, 1f)]
         public float jointOcclusionFactor = 0;
 
-        [Tooltip("if the debug hand is not null, its joint colors are given by interpolating between the debugColors based on which hand the aggregated data came from (in order of the providers)")]
+
+        public bool debugJointOrigins = false;
+        [Tooltip("if the debug hand is not null, its joint colors are given by interpolating between the debugColors based on which hand the aggregated joint data came from (in order of the providers)")]
         public CapsuleHand debugHandLeft;
-        [Tooltip("if the debug hand is not null, its joint colors are given by interpolating between the debugColors based on which hand the aggregated data came from (in order of the providers)")]
+        [Tooltip("if the debug hand is not null, its joint colors are given by interpolating between the debugColors based on which hand the aggregated joint data came from (in order of the providers)")]
         public CapsuleHand debugHandRight;
 
         [Tooltip("The debug colors should have the same order and length as the provider list")]
-        public Color[] debugColors;
+        public Color[] debugColors = new Color[] {Color.red, Color.green};
 
         Dictionary<LeapProvider, HandPositionHistory> lastLeftHandPositions = new Dictionary<LeapProvider, HandPositionHistory>();
         Dictionary<LeapProvider, HandPositionHistory> lastRightHandPositions = new Dictionary<LeapProvider, HandPositionHistory>();
@@ -273,8 +275,8 @@ namespace Leap.Unity
             new VectorHand(isLeft, mergedPalmPos, mergedPalmRot, mergedJointPositions).Decode(mergedHand);
 
             // visualize the joint merge:
-            if (isLeft && debugHandLeft != null) VisualizeMergedJoints(debugHandLeft, jointConfidences);
-            else if (!isLeft && debugHandRight != null) VisualizeMergedJoints(debugHandRight, jointConfidences);
+            if (debugJointOrigins && isLeft && debugHandLeft != null) VisualizeMergedJoints(debugHandLeft, jointConfidences);
+            else if (debugJointOrigins && !isLeft && debugHandRight != null) VisualizeMergedJoints(debugHandRight, jointConfidences);
 
             return mergedHand;
         }

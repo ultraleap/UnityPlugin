@@ -31,6 +31,11 @@ namespace Leap.Unity
             addPropertyToFoldout("jointRotFactor", "Joint Factors");
             addPropertyToFoldout("jointRotToPalmFactor", "Joint Factors");
             addPropertyToFoldout("jointOcclusionFactor", "Joint Factors");
+
+            specifyConditionalDrawing("debugJointOrigins",
+                                        "debugHandLeft",
+                                        "debugHandRight",
+                                        "debugColors");
         }
 
         private void drawJointOcclusionWarning(SerializedProperty property)
