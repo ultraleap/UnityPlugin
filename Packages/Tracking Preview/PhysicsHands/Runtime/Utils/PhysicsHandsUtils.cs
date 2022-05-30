@@ -27,7 +27,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
             physicsHandComponent.Handedness = handedness;
 
-            palmGameObject.name = $"{(handedness == Chirality.Left ? "Left" : "Right")} Palm";            
+            palmGameObject.name = $"{(handedness == Chirality.Left ? "Left" : "Right")} Palm";
 
             Leap.Hand leapHand = TestHandFactory.MakeTestHand(isLeft: handedness == Chirality.Left ? true : false, pose: TestHandFactory.TestHandPose.HeadMountedB, unitType: TestHandFactory.UnitType.UnityUnits);
 
@@ -85,8 +85,8 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
                     GameObject capsuleGameObject = new GameObject("", typeof(CapsuleCollider));
                     capsuleGameObject.name = $"{(handedness == Chirality.Left ? "Left" : "Right")} {IndexToFinger(fingerIndex)} Joint {jointIndex}";
-                    if(parent != null)
-                    { 
+                    if (parent != null)
+                    {
                         capsuleGameObject.layer = parent.layer;
                     }
 
@@ -293,7 +293,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             bone.useGravity = false;
             bone.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
         }
-       
+
         public static void SetupKnuckleDrives(ArticulationBody knuckle, int fingerIndex, float stiffness, float forceLimit, float strength)
         {
             knuckle.twistLock = ArticulationDofLock.LimitedMotion;
@@ -346,7 +346,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
         {
             collider.center = new Vector3(0f, 0.0025f, -0.015f);
             collider.size = CalculatePalmSize(hand);
-            if(material != null)
+            if (material != null)
             {
                 collider.material = material;
             }
@@ -358,7 +358,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             collider.radius = bone.Width * 0.5f;
             collider.height = bone.Length + bone.Width;
             collider.center = new Vector3(0f, 0f, bone.Length / 2f);
-            if(material != null)
+            if (material != null)
             {
                 collider.material = material;
             }
@@ -463,14 +463,14 @@ namespace Leap.Unity.Interaction.PhysicsHands
             if (interpFactor > 0)
             {
                 delta.x *= (1f - interpFactor);
-                if(delta.y > 0)
+                if (delta.y > 0)
                 {
                     delta.y *= (1f - interpFactor);
                 }
                 delta.z *= (1f - interpFactor);
             }
 
-            if(distanceForceReduction > 0)
+            if (distanceForceReduction > 0)
             {
                 delta *= 1f - distanceForceReduction;
             }
@@ -534,12 +534,12 @@ namespace Leap.Unity.Interaction.PhysicsHands
             leapHand.SetTransform(physicsHand.transform.position, physicsHand.transform.rotation);
             int boneInd = 0;
             Vector3 posA, posB;
-            
+
             float r;
             for (int i = 0; i < leapHand.Fingers.Count; i++)
             {
                 Bone b = leapHand.Fingers[i].bones[0];
-                PhysExts.ToWorldSpaceCapsule(physicsHand.jointColliders[boneInd],out posA, out posB, out r);
+                PhysExts.ToWorldSpaceCapsule(physicsHand.jointColliders[boneInd], out posA, out posB, out r);
                 b.NextJoint = posB.ToVector();
 
                 for (int j = 1; j < leapHand.Fingers[i].bones.Length; j++)
@@ -550,7 +550,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                     b.NextJoint = posA.ToVector();
                     b.Width = r;
                     b.Center = (b.PrevJoint + b.NextJoint) / 2f;
-                    b.Direction = (b.PrevJoint - b.NextJoint).Normalized; 
+                    b.Direction = (b.PrevJoint - b.NextJoint).Normalized;
                     b.Length = Vector3.Distance(posA, posB);
                     b.Rotation = physicsHand.jointColliders[boneInd].transform.rotation.ToLeapQuaternion();
                     boneInd++;

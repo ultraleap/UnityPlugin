@@ -1,8 +1,8 @@
+using Leap.Unity;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
-using Leap.Unity;
 using System.Linq;
+using UnityEngine;
 
 namespace Leap.Unity.Interaction.PhysicsHands
 {
@@ -58,11 +58,11 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
         private void OnValidate()
         {
-            if(_handModel == null)
+            if (_handModel == null)
             {
                 _handModel = GetComponent<HandModelBase>();
             }
-            if(_handModel != null && _physicsHand == null)
+            if (_handModel != null && _physicsHand == null)
             {
                 _physicsHand = FindObjectsOfType<PhysicsHand>().Where(x => x.Handedness == _handModel.Handedness).DefaultIfEmpty(null).First();
             }

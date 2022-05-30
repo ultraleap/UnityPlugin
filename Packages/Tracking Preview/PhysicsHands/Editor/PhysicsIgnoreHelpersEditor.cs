@@ -1,5 +1,5 @@
-using UnityEngine;
 using UnityEditor;
+using UnityEngine;
 
 namespace Leap.Unity.Interaction.PhysicsHands
 {
