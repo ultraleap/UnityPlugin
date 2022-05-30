@@ -1,0 +1,19 @@
+{
+    "name": "Ultraleap.Tracking.PhysicsHands.Editor",
+    "rootNamespace": "",
+    "references": [
+        "GUID:a3f8d628d2d27f049908570fb6d4c60e",
+        "GUID:cec9848704c49724192ff47f9b3e9156"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

@@ -297,6 +297,8 @@ Our Tracking Preview package gives you early access to additional functionality 
   - Provides support for Ultraleap hand data in Unity's XR Interaction Toolkit.
 - Android Support (for SVR)
   - Support for Qualcomm's legacy SVR package for XR2 devices, soon to be deprecated by OpenXR.
+- Physics Hands
+  - Physically simulated hand interactions. A new way to interact with objects, without having the hand pass through colliders.
 
 ## Contributing
 
