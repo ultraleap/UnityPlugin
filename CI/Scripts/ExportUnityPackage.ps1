@@ -146,7 +146,6 @@ function global:Export-UnityPackage
 			Move-Item $ExamplesHiddenPath $ExamplesRootPath
 
 			$ExamplesImportPath = Join-Path $PackageImportPath $ExamplesUnhiddenSubPath
-			$ExamplesOutputPath = $PackageOutputPath.Replace(".unitypackage", " " + ExamplesSubPath +".unitypackage")
 
 			Export-UnityPackage-Impl -ExportPath $ExamplesRootPath -ImportPath $ExamplesImportPath -Output $ExamplesOutputPath
 		}
