@@ -23,21 +23,28 @@ namespace Leap.Unity
     /// </summary>
     public class AggregationProviderConfidenceInterpolation : LeapAggregatedProviderBase
     {
+        [Tooltip("If true, the overall hand confidence is affected by the duration a new hand has been visible for. When a new hand is seen for the first time, its confidence is 0. After a hand has been visible for a second, its confidence is determined by the below palm factors and palm confidences")]
+        public bool ignoreRecentNewHands = true;
+
         // factors that get multiplied to the corresponding confidence values to get an overall weighted confidence value
         [Tooltip("How much should the Palm position relative to the tracking camera influence the overall hand confidence? A confidence value is determined by whether the hand is within the optimal FOV of the tracking camera")]
+        [Range(0f,1f)]
         public float palmPosFactor = 0;
         [Tooltip("How much should the Palm orientation relative to the tracking camera influence the overall hand confidence? A confidence value is determined by looking at the angle between the palm normal and the direction from hand to camera.")]
+        [Range(0f, 1f)]
         public float palmRotFactor = 0;
         [Tooltip("How much should the Palm velocity relative to the tracking camera influence the overall hand confidence?")]
+        [Range(0f, 1f)]
         public float palmVelocityFactor = 0;
-        [Tooltip("How much should the duration that a hand has been visible for, influence the overall hand confidence?")]
-        public float timeSinceHandFirstVisibleFactor = 0;
 
         [Tooltip("How much should the joint rotation relative to the tracking camera influence the overall hand confidence? A confidence value is determined for a joint by looking at the angle between the joint normal and the direction from hand to camera.")]
+        [Range(0f, 1f)]
         public float jointRotFactor = 0;
         [Tooltip("How much should the joint rotation relative to the palm normal influence the overall hand confidence?")]
+        [Range(0f, 1f)]
         public float jointRotToPalmFactor = 0;
         [Tooltip("How much should joint occlusion influence the overall hand confidence?")]
+        [Range(0f, 1f)]
         public float jointOcclusionFactor = 0;
 
         [Tooltip("if the debug hand is not null, its joint colors are given by interpolating between the debugColors based on which hand the aggregated data came from (in order of the providers)")]
@@ -287,9 +294,12 @@ namespace Leap.Unity
             confidence += palmRotFactor * Confidence_RelativeHandRot(deviceOrigin, hand.PalmPosition.ToVector3(), hand.PalmNormal.ToVector3());
             confidence += palmVelocityFactor * Confidence_RelativeHandVelocity(providers[frame_idx], deviceOrigin, hand.PalmPosition.ToVector3(), hand.IsLeft);
 
-            // if timeSinceHandFirstVisibleFactor is 1, then
+            // if ignoreRecentNewHands is true, then
             // the confidence should be 0 when it is the first frame with the hand in it.
-            confidence = Mathf.Lerp(confidence, confidence * Confidence_TimeSinceHandFirstVisible(providers[frame_idx], hand.IsLeft), timeSinceHandFirstVisibleFactor);
+            if (ignoreRecentNewHands)
+            {
+                confidence = confidence * Confidence_TimeSinceHandFirstVisible(providers[frame_idx], hand.IsLeft);
+            }
 
 
             // average out new hand confidence with that of the last few frames

@@ -367,9 +367,11 @@ namespace Leap.Unity
                             {
                                 if (property.Equals(iterator.name))
                                 {
-                                    EditorGUILayout.Space();
                                     drawFoldout(foldout);
-                                    EditorGUILayout.Space();
+                                    if (_foldoutStates[foldout.Key])
+                                    {
+                                        EditorGUILayout.Space();
+                                    }
 
                                     _foldoutDrawn[foldout.Key] = true;
                                     break;
