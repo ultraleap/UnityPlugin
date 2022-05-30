@@ -33,7 +33,7 @@ function global:Export-UnityPackage
         [Parameter(Mandatory)][string] $PackageRootPath,
         [Parameter(Mandatory)][string] $PackageImportPath,
         [Parameter(Mandatory)][string] $PackageOutputPath,
-        [ValidateScript({[string[]]::IsNullOrEmpty($_) -or $($(Test-Path $(Join-Path $PackageRootPath $_) -PathType Container) -and $_.EndsWith('~'))}, ErrorMessage = "If provided, example path must be an existing subdirectory hidden with a trailing '~'")]
+        [ValidateScript({$($(Test-Path $(Join-Path $PackageRootPath $_) -PathType Container) -and $_.EndsWith('~'))}, ErrorMessage = "If provided, example path must be an existing subdirectory hidden with a trailing '~'")]
         [string[]]
         $ExamplesSubPaths = $null
     )
