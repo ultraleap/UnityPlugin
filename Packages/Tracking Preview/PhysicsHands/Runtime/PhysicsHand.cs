@@ -143,7 +143,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
         public Vector3 GetTipPosition(int index)
         {
-            if(GetLeapHand() == null)
+            if (GetLeapHand() == null)
             {
                 return Vector3.zero;
             }
@@ -296,7 +296,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             }
 #endif
 
-            _originalLeapHand.CopyFrom(hand);   
+            _originalLeapHand.CopyFrom(hand);
 
             if (!_hasReset && _resetWait > 0)
             {
@@ -323,7 +323,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             PhysicsHandsUtils.UpdatePhysicsPalm(ref _physicsHand,
                 // If the hand was grasping then we want to smoothly interpolate back to where it was based on distance
                 !IsGrasping && _graspingDeltaCurrent > 0 ? Vector3.Lerp(_physicsHand.transform.position, _originalLeapHand.PalmPosition.ToVector3(), Mathf.InverseLerp(_graspingDelta, 0, _graspingDeltaCurrent)) : _originalLeapHand.PalmPosition.ToVector3(),
-                !IsGrasping && _graspingDeltaCurrent > 0 ? Quaternion.Slerp(_physicsHand.transform.rotation,  _originalLeapHand.Rotation.ToQuaternion(), Mathf.InverseLerp(_graspingDelta, 0, _graspingDeltaCurrent)) : _originalLeapHand.Rotation.ToQuaternion(),
+                !IsGrasping && _graspingDeltaCurrent > 0 ? Quaternion.Slerp(_physicsHand.transform.rotation, _originalLeapHand.Rotation.ToQuaternion(), Mathf.InverseLerp(_graspingDelta, 0, _graspingDeltaCurrent)) : _originalLeapHand.Rotation.ToQuaternion(),
                 // Interpolate the object if it's heavier
                 _isGrasping && _physicsProvider.InterpolatingMass && _graspMass > 1 ? Mathf.InverseLerp(0.001f, _physicsProvider.MaxMass, _graspMass).EaseOut() : 0f,
                 // Reduce force of hand as it gets further from the original data hand
@@ -434,7 +434,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
         private void UpdateSettings()
         {
-            if(_physicsProvider == null)
+            if (_physicsProvider == null)
             {
                 return;
             }

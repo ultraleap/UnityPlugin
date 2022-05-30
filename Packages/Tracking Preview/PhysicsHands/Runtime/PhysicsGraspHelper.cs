@@ -1,7 +1,7 @@
-using System.Collections.Generic;
-using UnityEngine;
-using System.Linq;
 using Leap.Interaction.Internal.InteractionEngineUtility;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
 
 namespace Leap.Unity.Interaction.PhysicsHands
 {
@@ -138,7 +138,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 _rigid.useGravity = _oldGravity;
             }
             _boneHash.Clear();
-            foreach(var pair in _bones)
+            foreach (var pair in _bones)
             {
                 for (int j = 0; j < pair.Value.Length; j++)
                 {
@@ -215,7 +215,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             if (!bones.Contains(bone))
             {
                 int ind = _boneCooldownItems.IndexOf(bone);
-                Debug.DrawLine(bone.transform.position, bone.transform.position + (Vector3.up * 0.01f),Color.green,0.1f);
+                Debug.DrawLine(bone.transform.position, bone.transform.position + (Vector3.up * 0.01f), Color.green, 0.1f);
                 if (ind != -1)
                 {
                     _boneCooldownTime[ind] = GRAB_COOLDOWNTIME;
@@ -329,9 +329,9 @@ namespace Leap.Unity.Interaction.PhysicsHands
                         if (_graspingValues[hand].fingerStrength[i] == -1)
                             continue;
 
-                        if(i == 0)
+                        if (i == 0)
                         {
-                            if(hand.GetOriginalLeapHand().PinchDistance / 1000f <= REQUIRED_PINCH_DISTANCE)
+                            if (hand.GetOriginalLeapHand().PinchDistance / 1000f <= REQUIRED_PINCH_DISTANCE)
                             {
                                 c = 2;
                                 break;

@@ -1,8 +1,8 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using System.Linq;
+using UnityEngine;
 
 namespace Leap.Unity.Interaction.PhysicsHands
 {
@@ -146,7 +146,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             }
             for (int i = 0; i < _noContactLayers.Count; i++)
             {
-                if(_noContactLayers[i] == DefaultLayer)
+                if (_noContactLayers[i] == DefaultLayer)
                 {
                     _noContactLayers.Remove(i);
                     i--;
@@ -158,7 +158,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 string layerName = LayerMask.LayerToName(i);
                 if (string.IsNullOrEmpty(layerName))
                 {
-                    if(_noContactLayers.Count == 0)
+                    if (_noContactLayers.Count == 0)
                     {
                         _noContactLayers.Add(new SingleLayer() { layerIndex = i });
                         continue;
@@ -187,7 +187,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 return;
             }
 
-            if(_interactableLayers.Count == 0)
+            if (_interactableLayers.Count == 0)
             {
                 _interactableLayers.Add(new SingleLayer() { layerIndex = 0 });
             }
@@ -297,7 +297,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 return;
             }
 
-            if(leapHand != null && leapHand.TimeVisible > 0)
+            if (leapHand != null && leapHand.TimeVisible > 0)
             {
                 if (wasNull)
                 {
@@ -550,7 +550,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
         private void FindHandState(PhysicsHand hand)
         {
-            if(hand == null)
+            if (hand == null)
             {
                 return;
             }
@@ -586,7 +586,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             base.OnValidate();
             dataUpdateMode = DataUpdateMode.UpdateAndFixedUpdate;
             passthroughOnly = false;
-            if(inputLeapProvider != null)
+            if (inputLeapProvider != null)
             {
                 editTimePose = inputLeapProvider.editTimePose;
             }

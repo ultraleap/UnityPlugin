@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using UnityEditor;
+using UnityEngine;
 
 namespace Leap.Unity.Interaction.PhysicsHands
 {
@@ -74,13 +74,13 @@ namespace Leap.Unity.Interaction.PhysicsHands
             HandsSection();
 
             HelperSection();
-            
+
             serializedObject.ApplyModifiedProperties();
         }
 
         private void SetupSection()
         {
-            EditorGUILayout.LabelField("Provider Setup",EditorStyles.boldLabel);
+            EditorGUILayout.LabelField("Provider Setup", EditorStyles.boldLabel);
             EditorGUILayout.BeginVertical(EditorStyles.helpBox);
 
             if (_physicsProvider.LeftHand == null && _physicsProvider.RightHand == null)

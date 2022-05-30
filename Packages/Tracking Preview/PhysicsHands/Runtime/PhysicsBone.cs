@@ -30,13 +30,13 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
         [SerializeField, HideInInspector]
         private ArticulationBody _body;
-        [SerializeField,HideInInspector]
+        [SerializeField, HideInInspector]
         private float _origXDriveLimit = float.MaxValue, _currentXDriveLimit = float.MaxValue;
         public float OriginalXDriveLimit => _origXDriveLimit;
         public float XDriveLimit => _currentXDriveLimit;
 
         public int Finger => _finger;
-        [SerializeField,HideInInspector]
+        [SerializeField, HideInInspector]
         private int _finger;
 
         public int Joint => _joint;
@@ -71,11 +71,11 @@ namespace Leap.Unity.Interaction.PhysicsHands
             _finger = finger;
             _joint = joint;
 
-            if(_body == null)
+            if (_body == null)
             {
                 _body = GetComponent<ArticulationBody>();
             }
-            if(_hand == null)
+            if (_hand == null)
             {
                 _hand = GetComponentInParent<PhysicsHand>();
             }
