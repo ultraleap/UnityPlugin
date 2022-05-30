@@ -398,7 +398,7 @@ namespace Leap.Unity
                 }
             }
 
-            if(!_drawFoldoutInLine) 
+            if (!_drawFoldoutInLine)
             {
                 foreach (var foldout in _foldoutProperties)
                 {

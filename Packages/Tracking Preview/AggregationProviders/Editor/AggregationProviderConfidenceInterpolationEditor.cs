@@ -59,7 +59,7 @@ namespace Leap.Unity
 
                 if (showWarning)
                 {
-                    EditorGUILayout.HelpBox(warningText.TrimEnd(' ',','), MessageType.Warning);
+                    EditorGUILayout.HelpBox(warningText.TrimEnd(' ', ','), MessageType.Warning);
                 }
             }
         }

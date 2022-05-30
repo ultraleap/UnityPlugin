@@ -28,7 +28,7 @@ namespace Leap.Unity
 
         // factors that get multiplied to the corresponding confidence values to get an overall weighted confidence value
         [Tooltip("How much should the Palm position relative to the tracking camera influence the overall hand confidence? A confidence value is determined by whether the hand is within the optimal FOV of the tracking camera")]
-        [Range(0f,1f)]
+        [Range(0f, 1f)]
         public float palmPosFactor = 0;
         [Tooltip("How much should the Palm orientation relative to the tracking camera influence the overall hand confidence? A confidence value is determined by looking at the angle between the palm normal and the direction from hand to camera.")]
         [Range(0f, 1f)]
@@ -55,7 +55,7 @@ namespace Leap.Unity
         public CapsuleHand debugHandRight;
 
         [Tooltip("The debug colors should have the same order and length as the provider list")]
-        public Color[] debugColors = new Color[] {Color.red, Color.green};
+        public Color[] debugColors = new Color[] { Color.red, Color.green };
 
         Dictionary<LeapProvider, HandPositionHistory> lastLeftHandPositions = new Dictionary<LeapProvider, HandPositionHistory>();
         Dictionary<LeapProvider, HandPositionHistory> lastRightHandPositions = new Dictionary<LeapProvider, HandPositionHistory>();
