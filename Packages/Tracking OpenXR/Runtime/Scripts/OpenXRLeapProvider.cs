@@ -13,18 +13,78 @@ namespace Ultraleap.Tracking.OpenXR
     public class OpenXRLeapProvider : LeapProvider
     {
         private Frame _updateFrame = new Frame();
+        private Frame _currentFrame = new Frame();
+
         private Hand _leftHand = new Hand();
         private Hand _rightHand = new Hand();
+
+        [Tooltip("Specifies the main camera. Falls back to Camera.main if not set")]
+        [SerializeField]
+        private Camera _mainCamera; // Redundant backing field, used to present value in editor at parent level
+        /// <summary>
+        /// Specifies the main camera.
+        /// Falls back to Camera.main if not set.
+        /// </summary>
+        public Camera mainCamera
+        {
+            get
+            {
+                if (_mainCamera != null && _mainCamera != MainCameraProvider.mainCamera)
+                {
+                    MainCameraProvider.mainCamera = _mainCamera;
+                }
+                return _mainCamera;
+            }
+            set
+            {
+                _mainCamera = value;
+                MainCameraProvider.mainCamera = value;
+            }
+        }
+
+        protected void OnEnable()
+        {
+            // Assign the main camera if it looks like one is available and it's not yet been set on the backing field
+            // NB this may be the case if the provider is created via AddComponent, as in MRTK
+            if (mainCamera == null && MainCameraProvider.mainCamera != null)
+            {
+                mainCamera = MainCameraProvider.mainCamera;
+            }
+        }
 
         private void Update()
         {
             PopulateLeapFrame(FrameTime.OnUpdate, ref _updateFrame);
-            DispatchUpdateFrameEvent(_updateFrame);
+
+            Pose trackerTransform = new Pose(Vector3.zero, Quaternion.identity);
+
+#if XR_LEGACY_INPUT_AVAILABLE
+            // Adjust for relative transform if it's in use.
+            var trackedPoseDriver = mainCamera.GetComponent<UnityEngine.SpatialTracking.TrackedPoseDriver>();
+            if (trackedPoseDriver != null && trackedPoseDriver.UseRelativeTransform)
+            {
+                trackerTransform.position += trackedPoseDriver.originPose.position;
+                trackerTransform.rotation *= trackedPoseDriver.originPose.rotation;
+            }
+#endif
+            // Adjust for the camera parent transform if this camera is part of a rig.
+            var parentTransform = mainCamera.transform.parent;
+            if (parentTransform != null)
+            {
+                trackerTransform.position += parentTransform.position;
+                trackerTransform.rotation *= parentTransform.rotation;
+            }
+
+            _currentFrame = _updateFrame.TransformedCopy(new LeapTransform(
+                trackerTransform.position.ToVector(),
+                trackerTransform.rotation.ToLeapQuaternion()));
+
+            DispatchUpdateFrameEvent(_currentFrame);
         }
 
-        void FixedUpdate()
+        private void FixedUpdate()
         {
-            DispatchFixedFrameEvent(_updateFrame);
+            DispatchFixedFrameEvent(_currentFrame);
         }
 
         private void PopulateLeapFrame(FrameTime frameTime, ref Frame leapFrame)
@@ -244,9 +304,9 @@ namespace Ultraleap.Tracking.OpenXR
             get
             {
 #if UNITY_EDITOR
-                return !Application.isPlaying ? EditTimeFrame : _updateFrame;
+                return !Application.isPlaying ? EditTimeFrame : _currentFrame;
 #else
-                return _updateFrame;
+                return _currentFrame;
 #endif
             }
         }
@@ -266,7 +326,7 @@ namespace Ultraleap.Tracking.OpenXR
                 (_backingUntransformedEditTimeFrame ??= new Frame()).Hands.Clear();
                 _backingUntransformedEditTimeFrame.Hands.Add(EditTimeLeftHand);
                 _backingUntransformedEditTimeFrame.Hands.Add(EditTimeRightHand);
-                _backingEditTimeFrame.CopyFrom(_backingUntransformedEditTimeFrame).Transform(transform.GetLeapMatrix());
+                _backingEditTimeFrame = _backingUntransformedEditTimeFrame.TransformedCopy(mainCamera.transform.GetLeapMatrix());
                 return _backingEditTimeFrame;
             }
         }
