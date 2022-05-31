@@ -33,9 +33,23 @@ function global:Export-UnityPackage
         [Parameter(Mandatory)][string] $PackageRootPath,
         [Parameter(Mandatory)][string] $PackageImportPath,
         [Parameter(Mandatory)][string] $PackageOutputPath,
-        [ValidateScript({$($(Test-Path $(Join-Path $PackageRootPath $_) -PathType Container) -and $_.EndsWith('~'))}, ErrorMessage = "If provided, example path must be an existing subdirectory hidden with a trailing '~'")]
+        [ValidateScript(
+            {
+                foreach($item in $_)
+                {
+                    if([string]::IsNullOrEmpty($item) -or $($(Test-Path $(Join-Path $PackageRootPath $item) -PathType Container) -and $item.EndsWith('~')))
+                    {
+                        $true
+                    }
+                    else
+                    {
+                        throw "Could not find hidden subpath $item."
+                    }
+                }
+            },
+            ErrorMessage = "If provided, hidden folder paths must be an existing subdirectory with a trailing '~'")]
         [string[]]
-        $ExamplesSubPaths = $null
+        $HiddenSubPaths = $null
     )
     function Export-UnityPackage-Impl
     {
@@ -135,17 +149,18 @@ function global:Export-UnityPackage
 
     Export-UnityPackage-Impl -ExportPath $PackageRootPath -ImportPath $PackageImportPath -Output $PackageOutputPath
 
-    if ($ExamplesSubPaths)
+    if ($HiddenSubPaths)
     {
-		foreach ($ExamplesSubPath in $ExamplesSubPaths)
+		foreach ($HiddenSubPath in $HiddenSubPaths)
 		{
-			$ExamplesUnhiddenSubPath = $ExamplesSubPath.TrimEnd('~')
-			$ExamplesHiddenPath = Join-Path $PackageRootPath $ExamplesSubPath
+			$ExamplesUnhiddenSubPath = $HiddenSubPath.TrimEnd('~')
+			$ExamplesHiddenPath = Join-Path $PackageRootPath $HiddenSubPath
 			$ExamplesRootPath = Join-Path $PackageRootPath $ExamplesUnhiddenSubPath
 
 			Move-Item $ExamplesHiddenPath $ExamplesRootPath
 
 			$ExamplesImportPath = Join-Path $PackageImportPath $ExamplesUnhiddenSubPath
+            $ExamplesOutputPath = $PackageOutputPath.Replace(".unitypackage", " $ExamplesUnhiddenSubPath.unitypackage")
 
 			Export-UnityPackage-Impl -ExportPath $ExamplesRootPath -ImportPath $ExamplesImportPath -Output $ExamplesOutputPath
 		}
