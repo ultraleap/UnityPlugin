@@ -1,7 +1,7 @@
 <!--links-->
 [apache]: http://www.apache.org/licenses/LICENSE-2.0 "Apache V2 License"
 
-[documentation]: https://docs.ultraleap.com/ "Ultraleap UnityPlugin Documentation"
+[documentation]: https://docs.ultraleap.com/unity-api/ "Ultraleap UnityPlugin Documentation"
 [xr-guidelines]: https://docs.ultraleap.com/xr-guidelines/ "XR Guidelines"
 
 [developer-site]: https://developer.leapmotion.com/ "Ultraleap Developer Site"
