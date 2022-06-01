@@ -431,6 +431,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Service Provider (OpenXR)
       objectReference: {fileID: 0}
+    - target: {fileID: 6382174844009596092, guid: d774afbb462004749918d3e350ef43ff, type: 3}
+      propertyPath: _mainCamera
+      value: 
+      objectReference: {fileID: 41947977}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d774afbb462004749918d3e350ef43ff, type: 3}
 --- !u!1 &1966885502

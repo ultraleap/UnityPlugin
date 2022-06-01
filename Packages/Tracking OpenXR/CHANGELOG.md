@@ -6,6 +6,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [docs-website]: https://docs.ultraleap.com/ "Ultraleap Docs"
 
+## [1.0.0-pre.4] - UNRELEASED
+
+### Fixed
+
+- Fixed Hand data provided via the OpenXR Leap Provider was always relative to the scene origin. It now respects any parent transforms applied to the main camera and works correctly with `Tracked Pose Driver`
+
+
 ## [1.0.0-pre.3] - 19/04/2022
 
 ### Added
@@ -22,7 +29,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Known issues
 
-- Hand data provided via the OpenXR Leap Provider is currently always relative to the scene origin. It will not respect any parent transforms applied to the main camera.
 - Currently the Ultraleap Hand Tracking feature for OpenXR requires the New and Legacy input systems to be enabled, to simultaneously use OpenXR and the Ultraleap Unity Plugin's features.
 - The OpenXR Leap Provider does not currently support the following hand properties (and will return fixed values):
   - Hand and Finger: `FrameId`
