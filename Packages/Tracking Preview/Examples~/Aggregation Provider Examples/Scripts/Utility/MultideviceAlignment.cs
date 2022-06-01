@@ -1,71 +1,79 @@
-using System;
-using System.Collections;
+/******************************************************************************
+ * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
+ *                                                                            *
+ * Use subject to the terms of the Apache License 2.0 available at            *
+ * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
+ * between Ultraleap and you, your company or other organization.             *
+ ******************************************************************************/
+
 using System.Collections.Generic;
 using UnityEngine;
-using Leap.Unity;
-using Leap;
+using Leap.Unity.Interaction;
 
-public class MultideviceAlignment : MonoBehaviour
+namespace Leap.Unity
 {
-    public LeapProvider sourceDevice;
-    public LeapProvider targetDevice;
-
-    [Tooltip("The maximum variance in bone positions allowed to consider the provider aligned. (in metres)")]
-    public float alignmentVariance = 0.02f;
-
-    List<Vector3> sourceHandPoints = new List<Vector3>();
-    List<Vector3> targetHandPoints = new List<Vector3>();
-
-    bool positioningComplete = false;
-
-    public void ReAlignProvider()
+    public class MultideviceAlignment : MonoBehaviour
     {
-        targetDevice.transform.position = Vector3.zero;
-        positioningComplete = false;
-    }
+        public LeapProvider sourceDevice;
+        public LeapProvider targetDevice;
 
-    void Update()
-    {
-        if (!positioningComplete)
+        [Tooltip("The maximum variance in bone positions allowed to consider the provider aligned. (in metres)")]
+        public float alignmentVariance = 0.02f;
+
+        List<Vector3> sourceHandPoints = new List<Vector3>();
+        List<Vector3> targetHandPoints = new List<Vector3>();
+
+        bool positioningComplete = false;
+
+        public void ReAlignProvider()
         {
-            foreach (var sourceHand in sourceDevice.CurrentFrame.Hands)
+            targetDevice.transform.position = Vector3.zero;
+            positioningComplete = false;
+        }
+
+        void Update()
+        {
+            if (!positioningComplete)
             {
-                var targetHand = targetDevice.CurrentFrame.GetHand(sourceHand.IsLeft ? Chirality.Left : Chirality.Right);
-
-                if (targetHand != null)
+                foreach (var sourceHand in sourceDevice.CurrentFrame.Hands)
                 {
-                    for (int j = 0; j < 5; j++)
+                    var targetHand = targetDevice.CurrentFrame.GetHand(sourceHand.IsLeft ? Chirality.Left : Chirality.Right);
+
+                    if (targetHand != null)
                     {
-                        for (int k = 0; k < 4; k++)
+                        for (int j = 0; j < 5; j++)
                         {
-                            sourceHandPoints.Add(sourceHand.Fingers[j].bones[k].Center.ToVector3());
-                            targetHandPoints.Add(targetHand.Fingers[j].bones[k].Center.ToVector3());
+                            for (int k = 0; k < 4; k++)
+                            {
+                                sourceHandPoints.Add(sourceHand.Fingers[j].bones[k].Center.ToVector3());
+                                targetHandPoints.Add(targetHand.Fingers[j].bones[k].Center.ToVector3());
+                            }
                         }
-                    }
 
-                    // This is temporary while we check if any of the hands points are not close enough to eachother
-                    positioningComplete = true;
+                        // This is temporary while we check if any of the hands points are not close enough to eachother
+                        positioningComplete = true;
 
-                    for(int i = 0; i < sourceHandPoints.Count; i++)
-                    {
-                        if (Vector3.Distance(sourceHandPoints[i], targetHandPoints[i]) > alignmentVariance)
+                        for (int i = 0; i < sourceHandPoints.Count; i++)
                         {
-                            // we are already as aligned as we need to be, we can exit the alignment stage
-                            positioningComplete = false;
-                            break;
+                            if (Vector3.Distance(sourceHandPoints[i], targetHandPoints[i]) > alignmentVariance)
+                            {
+                                // we are already as aligned as we need to be, we can exit the alignment stage
+                                positioningComplete = false;
+                                break;
+                            }
                         }
+
+                        KabschSolver solver = new KabschSolver();
+
+                        Matrix4x4 deviceToOriginDeviceMatrix =
+                          solver.SolveKabsch(targetHandPoints, sourceHandPoints, 200);
+
+                        targetDevice.transform.Transform(deviceToOriginDeviceMatrix);
+
+                        targetHandPoints.Clear();
+                        sourceHandPoints.Clear();
+                        return;
                     }
-
-                    KabschSolver solver = new KabschSolver();
-
-                    Matrix4x4 deviceToOriginDeviceMatrix =
-                      solver.SolveKabsch(targetHandPoints, sourceHandPoints, 200);
-
-                    targetDevice.transform.Transform(deviceToOriginDeviceMatrix);
-
-                    targetHandPoints.Clear();
-                    sourceHandPoints.Clear();
-                    return;
                 }
             }
         }
