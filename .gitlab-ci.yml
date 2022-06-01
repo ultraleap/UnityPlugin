@@ -387,8 +387,6 @@ export-unitypackages:
     EXAMPLES_SUBPATH_Tracking_Preview:          "Examples~"
     OVRPROVIDER_SUBPATH_Tracking_Preview:       "OVR Provider~"
     UNITYPACKAGE_OUTPUT_PATH_Tracking_Preview:  "$UNITYPACKAGES_OUTPUT_PATH/Tracking Preview.unitypackage"
-    
-    UNITYPACKAGE_OUTPUT_PATH_Tracking_Preview:  "$UNITYPACKAGES_OUTPUT_PATH/Tracking Preview.unitypackage"
 
     PACKAGE_IMPORT_PATH_Tracking_OpenXR:       "$UNITYPLUGIN_ASSETS_PATH/Tracking OpenXR"
     EXAMPLES_SUBPATH_Tracking_OpenXR:          "Examples~"
