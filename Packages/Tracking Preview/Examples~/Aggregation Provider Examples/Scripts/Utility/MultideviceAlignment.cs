@@ -6,9 +6,9 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
+using Leap.Unity.Interaction;
 using System.Collections.Generic;
 using UnityEngine;
-using Leap.Unity.Interaction;
 
 namespace Leap.Unity
 {
@@ -71,7 +71,7 @@ namespace Leap.Unity
                             }
                         }
 
-                        if(positioningComplete)
+                        if (positioningComplete)
                         {
                             return;
                         }
