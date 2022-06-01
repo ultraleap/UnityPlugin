@@ -18,7 +18,7 @@ If you have any concerns about this, please contact us on [Github Discussions](h
  
 ### Added 
 
-- 
+- Inform user with a popup error dialog when trying to build for Android without ARM64 set as the only target architecture. User can choose to continue the build if this is intended.
  
 ### Fixed 
 
