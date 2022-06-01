@@ -1,17 +1,31 @@
 ﻿using Leap.Unity;
 using UnityEditor;
+using UnityEngine;
 
 namespace Ultraleap.Tracking.OpenXR
 {
-
     [CustomEditor(typeof(OpenXRLeapProvider))]
     public class OpenXRLeapProviderEditor : CustomEditorBase
     {
         private readonly string[] _testHandPoses = { "HeadMountedA", "HeadMountedB" };
+        private SerializedProperty _mainCamera;
 
         protected override void OnEnable()
         {
             base.OnEnable();
+
+            _mainCamera = serializedObject.FindProperty("_mainCamera");
+            if (_mainCamera.objectReferenceValue == null)
+            {
+                _mainCamera.objectReferenceValue = MainCameraProvider.mainCamera;
+                serializedObject.ApplyModifiedProperties();
+
+                if (_mainCamera.objectReferenceValue != null)
+                {
+                    Debug.Log("Camera.Main automatically assigned");
+                }
+            }
+
             specifyCustomDrawer("editTimePose", DrawCustomEnum);
         }
 
@@ -20,6 +34,5 @@ namespace Ultraleap.Tracking.OpenXR
             property.enumValueIndex = EditorGUILayout.Popup("Edit Time Pose", property.enumValueIndex, _testHandPoses);
             serializedObject.ApplyModifiedProperties();
         }
-
     }
 }
