@@ -4,7 +4,36 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-[docs-website]: https://docs.ultraleap.com/ "Ultraleap Docs"
+[docs-website]: https://docs.ultraleap.com/unity-api/ "Ultraleap Docs"
+
+## [NEXT]
+
+### Announcements
+
+In line with Unity's end of support of Unity 2019 LTS, we will no longer be actively supporting Unity 2019.
+
+We will also be deprecating some functionality and moving core utilities into a separate package.
+
+If you have any concerns about this, please contact us on [Github Discussions](https://github.com/ultraleap/UnityPlugin/discussions)
+ 
+### Added 
+
+- Inform user with a popup error dialog when trying to build for Android without ARM64 set as the only target architecture. User can choose to continue the build if this is intended.
+ 
+### Fixed 
+
+- Tracking Examples Capsule Hands (VR - Infrared Viewer) scene: hands are aligned with passthrough hands
+- After removing XR Service Providers from Transforms, the transform is uneditable
+
+### Known issues 
+- Scenes containing the infrared viewer render incorrectly on systems using single pass stereo with the XR plugin system - e.g. Windows Mixed Reality headsets. SteamVR headsets may also default to single pass stereo, showing the same issue. However in this case, the OpenVR settings can be changed to multipass which resolves the problem. 
+- Scenes containing the infrared viewer render incorrectly on Android build targets and in scriptable render pipelines such as URP and HDRP. 
+- Demo scenes do not start at the correct height for a seated user. The XR Plugin Management System adjusts the camera height. This means the user has to adjust components in the scene to the correct height - e.g. camera height. Currently our position is to support the legacy XR system height settings. 
+- Possible hand offset issues on XR2 headsets using SVR plugin 
+- Hands in Desktop scenes can appear far away from the camera 
+- Interactions callback scene allows blocks to be moved without doing a grasp pose. 
+- Capsule hands don't have a joint colour in HDRP 
+- Hand UI can become detached from hand when hand is removed from view
 
 ## [NEXT]
 
