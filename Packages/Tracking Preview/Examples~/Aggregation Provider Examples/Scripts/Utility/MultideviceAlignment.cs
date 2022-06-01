@@ -12,6 +12,12 @@ using Leap.Unity.Interaction;
 
 namespace Leap.Unity
 {
+    /// <summary>
+    /// Takes a sourceDevice and aligns a targetDevice to it by transforming the targetDevice 
+    /// until all bones from both hands align to within the alignmentVariance value
+    /// 
+    /// Can be forced to re-align by calling ReAlignProvider()
+    /// </summary>
     public class MultideviceAlignment : MonoBehaviour
     {
         public LeapProvider sourceDevice;
@@ -24,6 +30,8 @@ namespace Leap.Unity
         List<Vector3> targetHandPoints = new List<Vector3>();
 
         bool positioningComplete = false;
+
+        KabschSolver solver = new KabschSolver();
 
         public void ReAlignProvider()
         {
@@ -63,7 +71,10 @@ namespace Leap.Unity
                             }
                         }
 
-                        KabschSolver solver = new KabschSolver();
+                        if(positioningComplete)
+                        {
+                            return;
+                        }
 
                         Matrix4x4 deviceToOriginDeviceMatrix =
                           solver.SolveKabsch(targetHandPoints, sourceHandPoints, 200);
