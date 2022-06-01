@@ -17,6 +17,8 @@ namespace Leap.Unity
     {
         SerializedProperty _mainCamera;
 
+        Transform targetTransform;
+
         string[] testHandPoses = new string[] { "HeadMountedA", "HeadMountedB" };
 
         protected override void OnEnable()
@@ -75,6 +77,21 @@ namespace Leap.Unity
             addPropertyToFoldout("_updateHandInPrecull", "Advanced Options");
             addPropertyToFoldout("_preventInitializingTrackingMode", "Advanced Options");
             hideField("_trackingOptimization");
+
+            targetTransform = (target as LeapXRServiceProvider).transform;
+
+            if (targetTransform != null)
+            {
+                targetTransform.hideFlags = HideFlags.NotEditable;
+            }
+        }
+
+        void OnDisable()
+        {
+            if (targetTransform != null)
+            {
+                targetTransform.hideFlags = HideFlags.None;
+            }
         }
 
         private void DrawCustomEnum(SerializedProperty property)
