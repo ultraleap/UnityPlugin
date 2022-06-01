@@ -21,7 +21,7 @@ function global:Export-VersionTxt
 }
 
 # Exports a unitypackage at the package root path with the given ImportPath when importing into unity.
-# Optionally provide an examples subpath with trailing '~' - examples will be exported as a second unitypackage.
+# Optionally provide extra subpaths with trailing '~' - these will be exported as extra unitypackages.
 # Example:
 #  Export-UnityPackage "Packages/MyPackage" "Assets/ThirdParty" "MyPackage.unitypackage" "Examples~"
 #  This will create bundle the content of "Packages/MyPackage" into the output package file "MyPackage.unitypackage".
@@ -33,9 +33,23 @@ function global:Export-UnityPackage
         [Parameter(Mandatory)][string] $PackageRootPath,
         [Parameter(Mandatory)][string] $PackageImportPath,
         [Parameter(Mandatory)][string] $PackageOutputPath,
-        [ValidateScript({[string]::IsNullOrEmpty($_) -or $($(Test-Path $(Join-Path $PackageRootPath $_) -PathType Container) -and $_.EndsWith('~'))}, ErrorMessage = "If provided, example path must be an existing subdirectory hidden with a trailing '~'")]
-        [string]
-        $ExamplesSubPath = $null
+        [ValidateScript(
+            {
+                foreach($item in $_)
+                {
+                    if([string]::IsNullOrEmpty($item) -or $($(Test-Path $(Join-Path $PackageRootPath $item) -PathType Container) -and $item.EndsWith('~')))
+                    {
+                        $true
+                    }
+                    else
+                    {
+                        throw "Could not find hidden subpath '$item'."
+                    }
+                }
+            },
+            ErrorMessage = "If provided, hidden folder paths must be an existing subdirectory with a trailing '~'")]
+        [string[]]
+        $ExtraHiddenSubPaths = $null
     )
     function Export-UnityPackage-Impl
     {
@@ -135,17 +149,23 @@ function global:Export-UnityPackage
 
     Export-UnityPackage-Impl -ExportPath $PackageRootPath -ImportPath $PackageImportPath -Output $PackageOutputPath
 
-    if ($ExamplesSubPath)
+    if ($ExtraHiddenSubPaths)
     {
-        $ExamplesUnhiddenSubPath = $ExamplesSubPath.TrimEnd('~')
-        $ExamplesHiddenPath = Join-Path $PackageRootPath $ExamplesSubPath
-        $ExamplesRootPath = Join-Path $PackageRootPath $ExamplesUnhiddenSubPath
+		foreach ($SubPath in $ExtraHiddenSubPaths)
+		{
+			$UnhiddenSubPath = $SubPath.TrimEnd('~')
 
-        Move-Item $ExamplesHiddenPath $ExamplesRootPath
+			$OriginalPath = Join-Path $PackageRootPath $SubPath
+			$NewPath = Join-Path $PackageRootPath $UnhiddenSubPath
 
-        $ExamplesImportPath = Join-Path $PackageImportPath $ExamplesUnhiddenSubPath
-        $ExamplesOutputPath = $PackageOutputPath.Replace(".unitypackage", " Examples.unitypackage")
+			Move-Item $OriginalPath $NewPath
 
-        Export-UnityPackage-Impl -ExportPath $ExamplesRootPath -ImportPath $ExamplesImportPath -Output $ExamplesOutputPath
+			$ExtraUnitypackageImportPath = Join-Path $PackageImportPath $UnhiddenSubPath
+            # Appends the subpath within the package to the name of the generated unitypackage so it's unique
+            $ExtraUnitypackageOutputPath = $PackageOutputPath.Replace(".unitypackage", " $UnhiddenSubPath.unitypackage")
+
+			Export-UnityPackage-Impl -ExportPath $NewPath -ImportPath $ExtraUnitypackageImportPath -Output $ExtraUnitypackageOutputPath
+		}
     }
+	# loop through list of samples and generate example packages
 }
