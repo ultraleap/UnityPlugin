@@ -351,6 +351,10 @@ namespace Leap.Unity.Interaction
                                                     out transformAheadRotation);
                 _unwarpedHandData.SetTransform(transformAheadPosition, transformAheadRotation);
             }
+            if (isTracked && !_wasContactInitialized)
+            {
+                initContact();
+            }
         }
 
         #endregion
@@ -482,8 +486,11 @@ namespace Leap.Unity.Interaction
 
         protected override bool initContact()
         {
-            if (!isTracked) return false;
-
+            if (!isTracked)
+            {
+                _contactInitialized = false;
+                return false;
+            }
             initContactBoneContainer();
             initContactBones();
 

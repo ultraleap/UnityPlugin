@@ -1013,7 +1013,7 @@ namespace Leap.Unity.Interaction
             s_defaultContactBoneMaterial.bounciness = 0F;
         }
 
-        private bool _contactInitialized = false;
+        protected bool _contactInitialized = false;
         protected bool _wasContactInitialized { get { return _contactInitialized; } }
         public abstract ContactBone[] contactBones { get; }
         protected abstract GameObject contactBoneParent { get; }
