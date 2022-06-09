@@ -64,7 +64,7 @@ namespace Leap.Unity.Interaction
             set
             {
                 _indexOnly = value;
-                initContact();
+                _wasContactInitialized = false;
             }
         }
 
@@ -488,7 +488,7 @@ namespace Leap.Unity.Interaction
         {
             if (!isTracked)
             {
-                _contactInitialized = false;
+                _wasContactInitialized = false;
                 return false;
             }
             initContactBoneContainer();
