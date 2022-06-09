@@ -1014,7 +1014,7 @@ namespace Leap.Unity.Interaction
         }
 
         private bool _contactInitialized = false;
-        protected bool _wasContactInitialized { get { return _contactInitialized; } }
+        protected bool _wasContactInitialized { get { return _contactInitialized; } set { _contactInitialized = value; } }
         public abstract ContactBone[] contactBones { get; }
         protected abstract GameObject contactBoneParent { get; }
         protected float lastObjectTouchedAdjustedMassMass = 0.2f;
