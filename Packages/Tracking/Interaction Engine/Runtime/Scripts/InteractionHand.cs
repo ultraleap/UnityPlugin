@@ -351,10 +351,6 @@ namespace Leap.Unity.Interaction
                                                     out transformAheadRotation);
                 _unwarpedHandData.SetTransform(transformAheadPosition, transformAheadRotation);
             }
-            if (isTracked && !_wasContactInitialized)
-            {
-                initContact();
-            }
         }
 
         #endregion
