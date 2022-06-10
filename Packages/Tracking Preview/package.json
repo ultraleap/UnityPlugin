@@ -1,6 +1,6 @@
 {
   "name": "com.ultraleap.tracking.preview",
-  "version": "5.9.0",
+  "version": "5.10.0",
   "description": "Ultraleap Tracking Preview",
   "displayName": "Ultraleap Tracking Preview",
   "unity": "2019.4",
@@ -23,8 +23,13 @@
   "samples": [
     {
       "displayName": "Examples",
-      "description": "",
+      "description": "A collection of examples for the Preview package",
       "path": "Examples~"
+    },
+	{
+      "displayName": "OVR Provider",
+      "description": "An experimental compatibility layer to connect Ultraleap interactions with Oculus hand tracking through a Provider",
+      "path": "OVR Provider~"
     }
   ]
 }

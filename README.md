@@ -1,7 +1,7 @@
 <!--links-->
 [apache]: http://www.apache.org/licenses/LICENSE-2.0 "Apache V2 License"
 
-[documentation]: https://docs.ultraleap.com/ "Ultraleap UnityPlugin Documentation"
+[documentation]: https://docs.ultraleap.com/unity-api/ "Ultraleap UnityPlugin Documentation"
 [xr-guidelines]: https://docs.ultraleap.com/xr-guidelines/ "XR Guidelines"
 
 [developer-site]: https://developer.leapmotion.com/ "Ultraleap Developer Site"
@@ -297,7 +297,11 @@ Our Tracking Preview package gives you early access to additional functionality 
   - Provides support for Ultraleap hand data in Unity's XR Interaction Toolkit.
 - Android Support (for SVR)
   - Support for Qualcomm's legacy SVR package for XR2 devices, soon to be deprecated by OpenXR.
-
+- Physics Hands
+  - Physically simulated hand interactions. A new way to interact with objects, without having the hand pass through colliders.
+- Hand Aggregation
+  - Combines hands seen by multiple devices into one aggregated pair of hands.
+  
 ## Contributing
 
 Our vision is to make it as easy as possible to design the best user experience for hand tracking use cases in XR. We learn and are inspired by the creations from our open source community - any contributions you make are greatly appreciated.
