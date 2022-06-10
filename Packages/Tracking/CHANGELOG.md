@@ -6,6 +6,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [docs-website]: https://docs.ultraleap.com/unity-api/ "Ultraleap Docs"
 
+## [NEXT] - unreleased
+
+### Announcements
+
+In line with Unity's end of support of Unity 2019 LTS, we will no longer be actively supporting Unity 2019.
+
+We will also be deprecating some functionality and moving core utilities into a separate package.
+
+If you have any concerns about this, please contact us on [Github Discussions](https://github.com/ultraleap/UnityPlugin/discussions)
+ 
+### Added 
+
+
+### Changed
+
+ 
+### Fixed 
+
+
+
 ## [5.10.0] - 10/06/2022
 
 ### Announcements
