@@ -170,7 +170,7 @@ namespace Leap.Unity
                 byte[] data = image.Data(Image.CameraType.LEFT);
                 if (_hideLeapDebugInfo && controller != null)
                 {
-                    switch (controller.Devices.ActiveDevice.Type)
+                    switch (controller.Devices[deviceID].Type)
                     {
                         case Device.DeviceType.TYPE_RIGEL:
                         case Device.DeviceType.TYPE_SIR170:
@@ -392,30 +392,42 @@ namespace Leap.Unity
                 return;
             }
 
-            Camera.onPreRender -= OnCameraPreRender;
-            Camera.onPreRender += OnCameraPreRender;
-
             //Enable pooling to reduce overhead of images
             LeapInternal.MemoryManager.EnablePooling = true;
 
             ApplyGammaCorrectionValues();
+        }
+
+        private void OnEnable()
+        {
+            subscribeToService();
+
+            Camera.onPreRender -= OnCameraPreRender;
+            Camera.onPreRender += OnCameraPreRender;
+
 #if UNITY_2019_3_OR_NEWER
             //SRP require subscribing to RenderPipelineManagers
-            if(UnityEngine.Rendering.GraphicsSettings.renderPipelineAsset != null) {
+            if (UnityEngine.Rendering.GraphicsSettings.renderPipelineAsset != null)
+            {
                 UnityEngine.Rendering.RenderPipelineManager.beginCameraRendering -= onBeginRendering;
                 UnityEngine.Rendering.RenderPipelineManager.beginCameraRendering += onBeginRendering;
             }
 #endif
         }
 
-        private void OnEnable()
-        {
-            subscribeToService();
-        }
-
         private void OnDisable()
         {
             unsubscribeFromService();
+
+            Camera.onPreRender -= OnCameraPreRender;
+
+#if UNITY_2019_3_OR_NEWER
+            //SRP require subscribing to RenderPipelineManagers
+            if (UnityEngine.Rendering.GraphicsSettings.renderPipelineAsset != null)
+            {
+                UnityEngine.Rendering.RenderPipelineManager.beginCameraRendering -= onBeginRendering;
+            }
+#endif
         }
 
         private void OnDestroy()
@@ -494,6 +506,12 @@ namespace Leap.Unity
 
         private void OnCameraPreRender(Camera cam)
         {
+            var controller = _provider.GetLeapController();
+            if (controller != null && !controller.IsPolicySet(Controller.PolicyFlag.POLICY_IMAGES, _provider.CurrentDevice))
+            {
+                controller.SetPolicy(Controller.PolicyFlag.POLICY_IMAGES, _provider.CurrentDevice);
+            }
+
             if (_currentImage != null)
             {
                 if (_eyeTextureData.CheckStale(_currentImage))
@@ -572,6 +590,7 @@ namespace Leap.Unity
         private void OnDeviceChanged(Device d)
         {
             Controller controller = _provider.GetLeapController();
+            controller.FrameReady -= onFrameReady;
             controller.FrameReady += onFrameReady;
         }
 
@@ -612,6 +631,7 @@ namespace Leap.Unity
             var controller = _provider.GetLeapController();
             if (controller != null)
             {
+                controller.FrameReady -= onFrameReady;
                 controller.FrameReady += onFrameReady;
                 controller.ClearPolicy(Controller.PolicyFlag.POLICY_IMAGES, _provider.CurrentDevice);
             }
