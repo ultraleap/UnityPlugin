@@ -18,6 +18,7 @@ namespace Leap.Unity
     /// <summary>
     /// Static convenience methods and extension methods for getting useful Hand data.
     /// </summary>
+    [System.Obsolete("Use of the static Hands class is no longer recommended and will be removed in a future update.")]
     public static class Hands
     {
 
