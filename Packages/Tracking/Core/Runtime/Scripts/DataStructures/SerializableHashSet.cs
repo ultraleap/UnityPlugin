@@ -20,6 +20,14 @@ namespace Leap.Unity
 
     public abstract class SerializableHashSetBase { }
 
+    public interface ICanReportDuplicateInformation
+    {
+#if UNITY_EDITOR
+        List<int> GetDuplicationInformation();
+        void ClearDuplicates();
+#endif
+    }
+
     public class SerializableHashSet<T> : SerializableHashSetBase,
                                           ICanReportDuplicateInformation,
                                           ISerializationCallbackReceiver,

@@ -12,7 +12,7 @@ using UnityEngine;
 namespace Leap.Unity
 {
 
-    public class RingBuffer<T> : IIndexable<T>
+    public class RingBuffer<T>
     {
 
         private T[] arr;

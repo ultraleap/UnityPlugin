@@ -305,7 +305,6 @@ namespace Leap.Unity
         protected Controller _leapController;
         protected bool _isDestroyed;
 
-        protected SmoothedFloat _fixedOffset = new SmoothedFloat();
         protected SmoothedFloat _smoothedTrackingLatency = new SmoothedFloat();
         protected long _unityToLeapOffset;
 
@@ -621,7 +620,6 @@ namespace Leap.Unity
 
         protected virtual void Awake()
         {
-            _fixedOffset.delay = 0.4f;
             _smoothedTrackingLatency.SetBlend(0.99f, 0.0111f);
         }
 
@@ -662,8 +660,6 @@ namespace Leap.Unity
                 return;
             }
 #endif
-
-            _fixedOffset.Update(Time.time - Time.fixedTime, Time.deltaTime);
 
             if (_frameOptimization == FrameOptimizationMode.ReusePhysicsForUpdate)
             {

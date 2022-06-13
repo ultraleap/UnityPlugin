@@ -1006,6 +1006,16 @@ namespace Leap.Unity
             return dst;
         }
 
+        public static T[] Fill<T>(this T[] array, T fillWith)
+        {
+            for (int i = 0; i < array.Length; i++)
+            {
+                array[i] = fillWith;
+            }
+
+            return array;
+        }
+
         #endregion
 
 
@@ -1692,6 +1702,16 @@ namespace Leap.Unity
         public static Quaternion MirroredZ(this Quaternion q)
         {
             return new Quaternion(q.x, q.y, -q.z, -q.w);
+        }
+
+        public static Quaternion TransformRotation(this Transform transform, Quaternion rotation)
+        {
+            return transform.rotation * rotation;
+        }
+
+        public static Quaternion InverseTransformRotation(this Transform transform, Quaternion rotation)
+        {
+            return Quaternion.Inverse(transform.rotation) * rotation;
         }
 
         #region Compression

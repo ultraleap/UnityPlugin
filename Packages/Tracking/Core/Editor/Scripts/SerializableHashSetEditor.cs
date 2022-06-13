@@ -14,11 +14,9 @@ using UnityEngine;
 
 namespace Leap.Unity
 {
-
     [CustomPropertyDrawer(typeof(SerializableHashSetBase), useForChildren: true)]
     public class SerializableHashSetEditor : PropertyDrawer
     {
-
         private ReorderableList _list;
         private SerializedProperty _currProperty;
 
