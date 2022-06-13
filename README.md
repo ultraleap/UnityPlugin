@@ -299,7 +299,9 @@ Our Tracking Preview package gives you early access to additional functionality 
   - Support for Qualcomm's legacy SVR package for XR2 devices, soon to be deprecated by OpenXR.
 - Physics Hands
   - Physically simulated hand interactions. A new way to interact with objects, without having the hand pass through colliders.
-
+- Hand Aggregation
+  - Combines hands seen by multiple devices into one aggregated pair of hands.
+  
 ## Contributing
 
 Our vision is to make it as easy as possible to design the best user experience for hand tracking use cases in XR. We learn and are inspired by the creations from our open source community - any contributions you make are greatly appreciated.
