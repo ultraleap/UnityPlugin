@@ -385,6 +385,8 @@ namespace Leap.Unity.HandsModule
         /// </summary>
         float CalculateLeapMiddleFingerLength(Hand hand)
         {
+            bool AddedWristToFirstBone = false;
+
             var length = 0f;
             for (int i = 0; i < hand.Fingers[(int)Finger.FingerType.TYPE_MIDDLE].bones.Length; i++)
             {
@@ -393,6 +395,13 @@ namespace Leap.Unity.HandsModule
                 if (boundBone.boundTransform != null)
                 {
                     var bone = hand.Fingers[(int)Finger.FingerType.TYPE_MIDDLE].bones[i];
+
+                    if (!AddedWristToFirstBone)
+                    {
+                        length += (hand.WristPosition - bone.PrevJoint).Magnitude;
+                        AddedWristToFirstBone = true;
+                    }
+
                     length += (bone.PrevJoint - bone.NextJoint).Magnitude;
                 }
             }

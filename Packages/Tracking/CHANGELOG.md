@@ -17,9 +17,11 @@ We will also be deprecating some functionality and moving core utilities into a 
 If you have any concerns about this, please contact us on [Github Discussions](https://github.com/ultraleap/UnityPlugin/discussions)
  
 ### Added 
+- Added a hand enable and disable script to the GenericHand_Arm prefab
 
 
 ### Changed
+- Changed scale calculations on the Auto-Scale function of the Handbinder, to make it more consistent across different tracking models and more stable when using a hand without metacarpal bones. The scales of all hand prefabs have been slightly changed because of that.
 
  
 ### Fixed 
