@@ -881,19 +881,6 @@ namespace Leap.Unity.RuntimeGizmos
             DrawPosition(pos, Color.white, 0f, overrideScale);
         }
 
-        public void DrawRect(Transform frame, Rect rect)
-        {
-            PushMatrix();
-
-            this.matrix = frame.localToWorldMatrix;
-            DrawLine(rect.Corner00(), rect.Corner01());
-            DrawLine(rect.Corner01(), rect.Corner11());
-            DrawLine(rect.Corner11(), rect.Corner10());
-            DrawLine(rect.Corner10(), rect.Corner00());
-
-            PopMatrix();
-        }
-
         public void ClearAllGizmos()
         {
             _operations.Clear();

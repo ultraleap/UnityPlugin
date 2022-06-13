@@ -7,9 +7,9 @@
  ******************************************************************************/
 
 using Leap.Unity.Interaction;
-using Leap.Unity.Query;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 namespace Leap.InteractionEngine.Examples
 {
@@ -120,7 +120,7 @@ namespace Leap.InteractionEngine.Examples
                     TransformHandle closestHandleToAnyHand = null;
                     float closestHandleDist = float.PositiveInfinity;
                     foreach (var intController in interactionManager.interactionControllers
-                                                                    .Query()
+                                                                    .GetHashSet()
                                                                     .Where(controller => controller.isTracked))
                     {
                         if (!intController.isPrimaryHovering)

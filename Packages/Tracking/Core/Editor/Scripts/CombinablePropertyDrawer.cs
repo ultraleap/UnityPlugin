@@ -60,7 +60,7 @@ namespace Leap.Unity.Attributes
         {
             getAttributes(property);
 
-            var topPanelDrawer = attributes.Cast<ITopPanelDrawer>()
+            var topPanelDrawer = attributes.Select(item => item as ITopPanelDrawer)
               .Where(o => o != null).FirstOrDefault();
             if (topPanelDrawer != null)
             {
