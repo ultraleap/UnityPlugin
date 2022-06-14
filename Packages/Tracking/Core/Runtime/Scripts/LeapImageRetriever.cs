@@ -170,7 +170,7 @@ namespace Leap.Unity
                 byte[] data = image.Data(Image.CameraType.LEFT);
                 if (_hideLeapDebugInfo && controller != null)
                 {
-                    switch (controller.Devices[deviceID - 1].Type)
+                    switch (controller.Devices.ActiveDevice.Type)
                     {
                         case Device.DeviceType.TYPE_RIGEL:
                         case Device.DeviceType.TYPE_SIR170:
