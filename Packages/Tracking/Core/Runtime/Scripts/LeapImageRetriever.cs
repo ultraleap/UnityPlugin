@@ -582,6 +582,8 @@ namespace Leap.Unity
 
         private void OnDeviceChanged(Device d)
         {
+            unsubscribeFromService();
+            subscribeToService();
             Controller controller = _provider.GetLeapController();
             controller.FrameReady += onFrameReady;
         }
