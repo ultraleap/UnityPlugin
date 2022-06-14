@@ -7,19 +7,15 @@
  ******************************************************************************/
 
 using Leap.Unity.Attributes;
-
-#if UNITY_2017_2_OR_NEWER
-using UnityEngine.XR;
-#else
-using UnityEngine.VR;
-#endif
+using Leap.Unity.Space;
 
 using System;
-using System.Collections.Generic;
-using UnityEngine;
-using Leap.Unity.Space;
-using UnityEngine.Serialization;
 using System.Linq;
+using System.Collections.Generic;
+
+using UnityEngine;
+using UnityEngine.Serialization;
+using UnityEngine.XR;
 
 namespace Leap.Unity.Interaction
 {
@@ -441,17 +437,10 @@ namespace Leap.Unity.Interaction
         /// may be ignored.
         /// </summary>
         /// 
-#if UNITY_2017_2_OR_NEWER
         public XRNode xrNode
         {
             get { return chirality == Chirality.Left ? XRNode.LeftHand : XRNode.RightHand; }
         }
-#else
-        public VRNode xrNode
-        {
-            get { return chirality == Chirality.Left ? VRNode.LeftHand : VRNode.RightHand; }
-        }
-#endif
 
         /// <summary>
         /// Gets whether the controller is a left-hand controller.

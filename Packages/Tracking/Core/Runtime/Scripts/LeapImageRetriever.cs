@@ -397,13 +397,12 @@ namespace Leap.Unity
             LeapInternal.MemoryManager.EnablePooling = true;
 
             ApplyGammaCorrectionValues();
-#if UNITY_2019_3_OR_NEWER
             //SRP require subscribing to RenderPipelineManagers
-            if(UnityEngine.Rendering.GraphicsSettings.renderPipelineAsset != null) {
+            if (UnityEngine.Rendering.GraphicsSettings.renderPipelineAsset != null)
+            {
                 UnityEngine.Rendering.RenderPipelineManager.beginCameraRendering -= onBeginRendering;
                 UnityEngine.Rendering.RenderPipelineManager.beginCameraRendering += onBeginRendering;
             }
-#endif
         }
 
         private void OnEnable()
@@ -432,13 +431,11 @@ namespace Leap.Unity
 
             Camera.onPreRender -= OnCameraPreRender;
 
-#if UNITY_2019_3_OR_NEWER
             //SRP require subscribing to RenderPipelineManagers
             if (UnityEngine.Rendering.GraphicsSettings.renderPipelineAsset != null)
             {
                 UnityEngine.Rendering.RenderPipelineManager.beginCameraRendering -= onBeginRendering;
             }
-#endif
         }
 
         private void LateUpdate()
@@ -512,12 +509,10 @@ namespace Leap.Unity
             }
         }
 
-#if UNITY_2019_3_OR_NEWER
         private void onBeginRendering(UnityEngine.Rendering.ScriptableRenderContext scriptableRenderContext, Camera camera)
         {
             OnCameraPreRender(camera);
         }
-#endif
 
         private void subscribeToService()
         {

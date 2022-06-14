@@ -136,7 +136,10 @@ namespace Leap.Unity.Interaction.PhysicsHands
 #endif
 #if UNITY_2021_2_OR_NEWER
                     so.FindProperty("m_MatchAnchors").boolValue = false; // this should still work
+
 #endif
+       
+                    
                     so.ApplyModifiedProperties();
                 }
             }

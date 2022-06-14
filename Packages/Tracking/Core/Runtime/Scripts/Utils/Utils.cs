@@ -1182,14 +1182,9 @@ namespace Leap.Unity
         public static bool IsObjectPartOfPrefabAsset(UnityEngine.Object obj)
         {
 #if UNITY_EDITOR
-#if UNITY_2018_3_OR_NEWER
             // Exclude objects that are not part of any prefab, and exclude prefab _instances_.
             return UnityEditor.PrefabUtility.IsPartOfAnyPrefab(obj) &&
               UnityEditor.PrefabUtility.GetPrefabInstanceStatus(obj) == UnityEditor.PrefabInstanceStatus.NotAPrefab;
-#else
-      // Before 2018.3, use GetPrefabType.
-      return UnityEditor.PrefabUtility.GetPrefabType(obj) == UnityEditor.PrefabType.Prefab;
-#endif
 #else
             return false;
 #endif
@@ -1856,20 +1851,10 @@ namespace Leap.Unity
 
         public static Matrix4x4 CompMul(Matrix4x4 m, float f)
         {
-#if UNITY_2017_1_OR_NEWER
             return new Matrix4x4(m.GetColumn(0) * f,
                                  m.GetColumn(1) * f,
                                  m.GetColumn(2) * f,
                                  m.GetColumn(3) * f);
-#else
-            Matrix4x4 toReturn = m;
-            for (int i = 0; i < 4; i++)
-            {
-                toReturn.SetColumn(i, toReturn.GetColumn(i) * f);
-            }
-            return toReturn;
-#endif
-
         }
 
         public static Vector3 GetTranslation(this Matrix4x4 m)
@@ -2416,11 +2401,6 @@ namespace Leap.Unity
       TextureFormat.EAC_R_SIGNED,
       TextureFormat.EAC_RG,
       TextureFormat.EAC_RG_SIGNED
-      #if !UNITY_2018_2_OR_NEWER
-      ,
-      TextureFormat.ETC_RGB4_3DS,
-      TextureFormat.ETC_RGBA8_3DS
-      #endif
     };
 
         /// <summary>

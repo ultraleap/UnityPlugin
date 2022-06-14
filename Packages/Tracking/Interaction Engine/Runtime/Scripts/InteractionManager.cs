@@ -345,10 +345,8 @@ namespace Leap.Unity.Interaction
 
             // Physics should only be synced once at the beginning of the physics simulation.
             // (Will be re-set to its original value at the end of the update.)
-#if UNITY_2017_2_OR_NEWER
             var preUpdateAutoSyncTransforms = Physics.autoSyncTransforms;
             Physics.autoSyncTransforms = false;
-#endif
             try
             {
 
@@ -402,11 +400,9 @@ namespace Leap.Unity.Interaction
             }
             finally
             {
-#if UNITY_2017_2_OR_NEWER
                 // Restore the autoSyncTransforms setting to whatever the user had it as before
                 // the Manager FixedUpdate.
                 Physics.autoSyncTransforms = preUpdateAutoSyncTransforms;
-#endif
             }
         }
 
