@@ -8,9 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.0.0-pre.4] - 10/06/2022
 
+### Added
+
+- Added support for `XR_ULTRALEAP_hand_tracking_elbow` which provides elbow tracking if supported on the system.
+
 ### Fixed
 
-- Fixed Hand data provided via the OpenXR Leap Provider was always relative to the scene origin. It now respects any parent transforms applied to the main camera and works correctly with `Tracked Pose Driver`
+- Fixed Hand data provided via the OpenXR Leap Provider was always relative to the scene origin. It now respects any parent transforms applied to the main camera and works correctly with `Tracked Pose Driver`.
 
 ### Known issues
 
