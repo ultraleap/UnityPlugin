@@ -69,10 +69,6 @@ namespace Leap.Unity
             private Texture2D _combinedTexture = null;
             private byte[] _intermediateArray = null;
 
-            // Adding this to the texture size factor removes a white pixel border around the image.
-            // TODO: This needs investigating to work out why!
-            private const float TEXTURE_SIZE_FACTOR_PADDING = -0.01f;
-
             private bool _hideLeapDebugInfo = true;
             public void HideDebugInfo(bool hideDebug)
             {
@@ -157,14 +153,7 @@ namespace Leap.Unity
                 {
                     textureSizeFactors = new Vector4[MAX_NUMBER_OF_GLOBAL_TEXTURES];
                 }
-                textureSizeFactors[deviceID] = new Vector4()
-                {
-                    x = ((float)_combinedTexture.width / _globalRawTextures.width) + TEXTURE_SIZE_FACTOR_PADDING,
-                    y = ((float)_combinedTexture.height / _globalRawTextures.height) + TEXTURE_SIZE_FACTOR_PADDING,
-                    z = 0,
-                    w = 0
-                };
-
+                textureSizeFactors[deviceID] = new Vector4((float)_combinedTexture.width / _globalRawTextures.width, (float)_combinedTexture.height / _globalRawTextures.height, 0, 0);
                 Shader.SetGlobalVectorArray("_LeapGlobalTextureSizeFactor", textureSizeFactors);
 
                 Shader.SetGlobalVector(pixelSizeName, new Vector2(1.0f / image.Width, 1.0f / image.Height));
