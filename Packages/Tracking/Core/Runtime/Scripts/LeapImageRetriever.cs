@@ -506,10 +506,21 @@ namespace Leap.Unity
 
         private void OnCameraPreRender(Camera cam)
         {
+            // set image policy if it is not set. This could happen when eg. another image retriever corresponding to the same device is disabled
             var controller = _provider.GetLeapController();
-            if (controller != null && !controller.IsPolicySet(Controller.PolicyFlag.POLICY_IMAGES, _provider.CurrentDevice))
+            if (controller != null)
             {
-                controller.SetPolicy(Controller.PolicyFlag.POLICY_IMAGES, _provider.CurrentDevice);
+                var currentDevice = _provider.CurrentDevice;
+
+                if (_provider.CurrentMultipleDeviceMode == LeapServiceProvider.MultipleDeviceMode.Disabled)
+                {
+                    currentDevice = null;
+                }
+
+                if (!controller.IsPolicySet(Controller.PolicyFlag.POLICY_IMAGES, currentDevice))
+                {
+                    controller.SetPolicy(Controller.PolicyFlag.POLICY_IMAGES, currentDevice);
+                }
             }
 
             if (_currentImage != null)
