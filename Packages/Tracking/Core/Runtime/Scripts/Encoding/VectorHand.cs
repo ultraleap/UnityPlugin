@@ -17,6 +17,7 @@ namespace Leap.Unity.Encoding
     /// An interface that signifies this class can interpolate
     /// via the standard techniques
     /// </summary>
+    [System.Obsolete("This interface will change: The bool FillSplined will be removed in the next major version of the plugin. If you believe that it needs to be kept, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
     public interface IInterpolable<T>
     {
         T CopyFrom(T toCopy);
