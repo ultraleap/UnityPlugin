@@ -45,7 +45,7 @@ namespace Leap.InteractionEngine.Examples
 
         public enum WorkstationState { Closed, Open }
         public WorkstationState workstationState;
-        
+
 
         void OnValidate()
         {
