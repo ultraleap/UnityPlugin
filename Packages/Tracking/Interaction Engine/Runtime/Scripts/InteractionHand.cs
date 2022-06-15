@@ -469,12 +469,9 @@ namespace Leap.Unity.Interaction
                                                                       out Vector3 targetPosition,
                                                                       out Quaternion targetRotation)
         {
-            using (new ProfilerSample("InteractionHand: getColliderBoneTargetPositionRotation"))
-            {
-                _handContactBoneMapFunctions[contactBoneIndex](_unwarpedHandData,
-                                                               out targetPosition,
-                                                               out targetRotation);
-            }
+            _handContactBoneMapFunctions[contactBoneIndex](_unwarpedHandData,
+                                                           out targetPosition,
+                                                           out targetRotation);
         }
 
         protected override bool initContact()

@@ -10,6 +10,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Leap.Unity.Internal;
 
 namespace Leap.Unity
 {
@@ -263,11 +264,6 @@ namespace Leap.Unity
         [SerializeField]
         protected bool _preventInitializingTrackingMode;
 
-        [Tooltip("When checked, profiling data from the LeapCSharp worker thread will be used to populate the UnityProfiler.")]
-        [EditTimeOnly]
-        [SerializeField]
-        protected bool _workerThreadProfiling = false;
-
         [Tooltip("Which Leap Service API Endpoint to connect to.  This is configured on the service with the 'api_namespace' argument.")]
         [SerializeField]
         [EditTimeOnly]
@@ -300,7 +296,7 @@ namespace Leap.Unity
         protected Controller _leapController;
         protected bool _isDestroyed;
 
-        protected SmoothedFloat _smoothedTrackingLatency = new SmoothedFloat();
+        private protected SmoothedFloat _smoothedTrackingLatency = new SmoothedFloat();
         protected long _unityToLeapOffset;
 
         protected Frame _untransformedUpdateFrame;
@@ -640,11 +636,6 @@ namespace Leap.Unity
 
         protected virtual void Update()
         {
-            if (_workerThreadProfiling)
-            {
-                LeapProfiling.Update();
-            }
-
             if (!checkConnectionIntegrity()) { return; }
 
 #if UNITY_EDITOR
@@ -869,7 +860,6 @@ namespace Leap.Unity
             leapXRServiceProvider._frameOptimization = _frameOptimization;
             leapXRServiceProvider._physicsExtrapolation = _physicsExtrapolation;
             leapXRServiceProvider._physicsExtrapolationTime = _physicsExtrapolationTime;
-            leapXRServiceProvider._workerThreadProfiling = _workerThreadProfiling;
         }
 
         /// <summary>
@@ -1028,17 +1018,6 @@ namespace Leap.Unity
             {
                 _leapController.Device += onHandControllerConnect;
             }
-
-            if (_workerThreadProfiling)
-            {
-                //A controller will report profiling statistics for the duration of it's lifetime
-                //so these events will never be unsubscribed from.
-                _leapController.EndProfilingBlock += LeapProfiling.EndProfilingBlock;
-                _leapController.BeginProfilingBlock += LeapProfiling.BeginProfilingBlock;
-
-                _leapController.EndProfilingForThread += LeapProfiling.EndProfilingForThread;
-                _leapController.BeginProfilingForThread += LeapProfiling.BeginProfilingForThread;
-            }
         }
 
         /// <summary>
@@ -1143,11 +1122,9 @@ namespace Leap.Unity
                     Debug.LogWarning("Leap Service not connected; attempting to reconnect for try " +
                                      _numberOfReconnectionAttempts + "/" + MAX_RECONNECTION_ATTEMPTS +
                                      "...", this);
-                    using (new ProfilerSample("Reconnection Attempt"))
-                    {
-                        destroyController();
-                        createController();
-                    }
+
+                    destroyController();
+                    createController();
                 }
             }
             return false;

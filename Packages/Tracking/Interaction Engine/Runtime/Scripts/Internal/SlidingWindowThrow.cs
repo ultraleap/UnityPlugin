@@ -69,7 +69,7 @@ namespace Leap.Unity.Interaction
         /// Samples the current velocity and adds it to a rolling average.
         /// </summary>
         public void OnHold(InteractionBehaviour intObj,
-                           ReadonlyList<InteractionController> controllers)
+                           IReadOnlyList<InteractionController> controllers)
         {
             _velocityQueue.Enqueue(new VelocitySample(intObj.rigidbody.position,
                                                       intObj.rigidbody.rotation,
@@ -153,7 +153,5 @@ namespace Leap.Unity.Interaction
 
             intObj.rigidbody.velocity *= _velocityMultiplierCurve.Evaluate(intObj.rigidbody.velocity.magnitude);
         }
-
     }
-
 }

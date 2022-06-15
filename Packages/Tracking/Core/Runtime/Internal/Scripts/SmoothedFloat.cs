@@ -8,7 +8,7 @@
 
 using UnityEngine;
 
-namespace Leap.Unity
+namespace Leap.Unity.Internal
 {
     /// <summary>
     /// Time-step independent exponential smoothing.
@@ -17,7 +17,7 @@ namespace Leap.Unity
     /// When moving at a constant speed: speed * delay = Value - SmoothedFloat.value.
     /// </remarks>
     [System.Serializable]
-    public class SmoothedFloat
+    internal class SmoothedFloat
     {
         public float value = 0f; // Filtered value
         public float delay = 0f; // Mean delay

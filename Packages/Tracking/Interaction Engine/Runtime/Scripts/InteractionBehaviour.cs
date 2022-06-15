@@ -1834,50 +1834,47 @@ namespace Leap.Unity.Interaction
 
         private void fixedUpdateLayers()
         {
-            using (new ProfilerSample("Interaction Behaviour: fixedUpdateLayers"))
-            {
-                int layer;
-                refreshInteractionLayer();
-                refreshNoContactLayer();
+            int layer;
+            refreshInteractionLayer();
+            refreshNoContactLayer();
 
-                // Update the object's layer based on interaction state.
-                if (ignoreContact)
+            // Update the object's layer based on interaction state.
+            if (ignoreContact)
+            {
+                layer = noContactLayer;
+            }
+            else
+            {
+                if (isGrasped)
                 {
                     layer = noContactLayer;
                 }
                 else
                 {
-                    if (isGrasped)
-                    {
-                        layer = noContactLayer;
-                    }
-                    else
-                    {
-                        layer = interactionLayer;
-                    }
+                    layer = interactionLayer;
                 }
-                if (this.gameObject.layer != layer)
-                {
-                    this.gameObject.layer = layer;
+            }
+            if (this.gameObject.layer != layer)
+            {
+                this.gameObject.layer = layer;
 
-                    refreshInteractionColliderLayers();
-                }
+                refreshInteractionColliderLayers();
+            }
 
-                // Update the manager if necessary.
+            // Update the manager if necessary.
 
-                if (interactionLayer != _lastInteractionLayer)
-                {
-                    (manager as IInternalInteractionManager).NotifyIntObjHasNewInteractionLayer(this, oldInteractionLayer: _lastInteractionLayer,
-                                                                                                      newInteractionLayer: interactionLayer);
-                    _lastInteractionLayer = interactionLayer;
-                }
+            if (interactionLayer != _lastInteractionLayer)
+            {
+                (manager as IInternalInteractionManager).NotifyIntObjHasNewInteractionLayer(this, oldInteractionLayer: _lastInteractionLayer,
+                                                                                                  newInteractionLayer: interactionLayer);
+                _lastInteractionLayer = interactionLayer;
+            }
 
-                if (noContactLayer != _lastNoContactLayer)
-                {
-                    (manager as IInternalInteractionManager).NotifyIntObjHasNewNoContactLayer(this, oldNoContactLayer: _lastNoContactLayer,
-                                                                                                    newNoContactLayer: noContactLayer);
-                    _lastNoContactLayer = noContactLayer;
-                }
+            if (noContactLayer != _lastNoContactLayer)
+            {
+                (manager as IInternalInteractionManager).NotifyIntObjHasNewNoContactLayer(this, oldNoContactLayer: _lastNoContactLayer,
+                                                                                                newNoContactLayer: noContactLayer);
+                _lastNoContactLayer = noContactLayer;
             }
         }
 
