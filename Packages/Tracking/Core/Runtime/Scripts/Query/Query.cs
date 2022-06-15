@@ -12,7 +12,7 @@ using System.Collections.Generic;
 
 namespace Leap.Unity.Query
 {
-
+    [System.Obsolete("This code will be moved to a legacy package in the next major version of the plugin. If you believe that it needs to be kept in tracking, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
     public static class QueryConversionExtensions
     {
 
@@ -102,6 +102,7 @@ namespace Leap.Unity.Query
     ///    method to destroy the query and get access to its underlying data.  You
     ///    will be responsible for cleaning up or disposing the data you get.
     /// </summary>
+    [System.Obsolete("This code will be moved to a legacy package in the next major version of the plugin. If you believe that it needs to be kept in tracking, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
     public struct Query<T>
     {
         private T[] _array;

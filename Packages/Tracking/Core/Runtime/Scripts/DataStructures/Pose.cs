@@ -13,7 +13,7 @@ using UnityEngine;
 
 namespace Leap.Unity
 {
-
+    
     public static class PoseExtensions
     {
 
@@ -136,6 +136,8 @@ namespace Leap.Unity
             orig = LerpUnclamped(a, b, t);
             return true;
         }
+
+        [System.Obsolete("This code will be moved to a legacy package in the next major version of the plugin. If you believe that it needs to be kept in tracking, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
         public static bool FillSplined(this Pose orig, Pose a, Pose b, Pose c, Pose d, float t)
         {
             orig.position = CatmullRom.ToCHS(a.position, b.position, c.position, d.position,

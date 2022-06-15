@@ -518,6 +518,7 @@ namespace Leap.Unity.Encoding
         /// An exception is thrown if the interpolation arguments a and b don't
         /// have the same chirality.
         /// </summary>
+        [System.Obsolete("This code will be moved to a legacy package in the next major version of the plugin. If you believe that it needs to be kept in tracking, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
         public bool FillSplined(VectorHand a, VectorHand b, VectorHand c, VectorHand d, float t)
         {
             if (a == null || b == null || c == null || d == null)

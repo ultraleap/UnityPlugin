@@ -15,7 +15,6 @@ using UnityEngine;
 
 namespace Leap.Unity.Attributes
 {
-
     [CustomPropertyDrawer(typeof(CombinablePropertyAttribute), true)]
     public class CombinablePropertyDrawer : PropertyDrawer
     {
