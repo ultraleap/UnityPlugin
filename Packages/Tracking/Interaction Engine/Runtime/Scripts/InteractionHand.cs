@@ -14,7 +14,6 @@ using Leap.Unity.Space;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 namespace Leap.Unity.Interaction
@@ -192,11 +191,11 @@ namespace Leap.Unity.Interaction
                 {
                     if (handDataMode == HandDataMode.PlayerLeft)
                     {
-                        handAccessorFunc = (frame) => frame.Hands.FirstOrDefault(hand => hand.IsLeft);
+                        handAccessorFunc = (frame) => frame.GetHand(Chirality.Left);
                     }
                     else
                     {
-                        handAccessorFunc = (frame) => frame.Hands.FirstOrDefault(hand => hand.IsRight);
+                        handAccessorFunc = (frame) => frame.GetHand(Chirality.Right);
                     }
                 }
             }

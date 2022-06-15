@@ -9,8 +9,6 @@
 using Leap.Unity.Attributes;
 using System;
 using System.Linq;
-using System.Collections;
-using System.Collections.Generic;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -487,9 +485,12 @@ namespace Leap.Unity.Attachments
 
             int hierarchyCount = 0;
 
-            foreach (var transform in transforms.Where(t => t != null))
+            foreach (var transform in transforms)
             {
-                s_hierarchyTransformsBuffer[hierarchyCount++] = transform;
+                if (transform != null)
+                {
+                    s_hierarchyTransformsBuffer[hierarchyCount++] = transform;
+                }
             }
 
             for (int i = hierarchyCount - 1; i > 0; i--)
@@ -514,9 +515,12 @@ namespace Leap.Unity.Attachments
             }
 
             int tIdx = 0;
-            foreach (var behaviour in monoBehaviours.Where(b => b != null))
+            foreach (var behaviour in monoBehaviours)
             {
-                s_transformsBuffer[tIdx++] = behaviour.transform;
+                if (transform != null)
+                {
+                    s_transformsBuffer[tIdx++] = behaviour.transform;
+                }
             }
 
             return tryStackTransformHierarchy(s_transformsBuffer);
