@@ -24,7 +24,7 @@ namespace Ultraleap.Tracking.OpenXR
         Desc = "Articulated hands using XR_EXT_hand_tracking",
         Category = FeatureCategory.Feature,
         Required = false,
-        OpenxrExtensionStrings = "XR_EXT_hand_tracking",
+        OpenxrExtensionStrings = "XR_EXT_hand_tracking XR_ULTRALEAP_hand_tracking_forearm",
         BuildTargetGroups = new[] {BuildTargetGroup.Standalone, BuildTargetGroup.Android}
     )]
 #endif
@@ -59,7 +59,7 @@ namespace Ultraleap.Tracking.OpenXR
             internal static extern void OnAppSpaceChange(ulong xrSpace);
 
             [DllImport(NativeDLL, EntryPoint = NativePrefix + "CreateHandTrackers", ExactSpelling = true)]
-            internal static extern int CreateHandTrackers();
+            internal static extern int CreateHandTrackers(HandJointSet jointSet);
 
             [DllImport(NativeDLL, EntryPoint = NativePrefix + "DestroyHandTrackers", ExactSpelling = true)]
             internal static extern int DestroyHandTrackers();
@@ -94,6 +94,10 @@ namespace Ultraleap.Tracking.OpenXR
                 return false;
             }
 
+            JointSet = OpenXRRuntime.IsExtensionEnabled("XR_ULTRALEAP_hand_tracking_forearm")
+                ? HandJointSet.HandWithForearm
+                : HandJointSet.Default;
+
             if (OpenXRRuntime.GetExtensionVersion("XR_EXT_hand_tracking") < 4)
             {
                 Debug.LogWarning("XR_EXT_hand_tracking is not at least version 4, disabling Hand Tracking");
@@ -105,7 +109,7 @@ namespace Ultraleap.Tracking.OpenXR
 
         protected override void OnSubsystemStart()
         {
-            int result = Native.CreateHandTrackers();
+            int result = Native.CreateHandTrackers(JointSet);
             if (IsResultFailure(result))
             {
                 Debug.LogError($"Failed to create hand-trackers: {Native.ResultToString(result)}");
@@ -131,6 +135,8 @@ namespace Ultraleap.Tracking.OpenXR
             }
             return Convert.ToBoolean(isActive);
         }
+
+        internal HandJointSet JointSet { get; private set; }
 
         // All OpenXR error codes are negative.
         private static bool IsResultFailure(int result) => result < 0;

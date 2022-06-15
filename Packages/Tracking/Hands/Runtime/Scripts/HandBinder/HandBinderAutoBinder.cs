@@ -276,7 +276,7 @@ namespace Leap.Unity.HandsModule
             if (middleBone != null && indexBone != null && pinkyBone != null && wrist != null)
             {
 
-                //Calculate model's rotation
+                // Calculate model's rotation
                 var forward = (middleBone.position - wrist.position);
                 var right = (indexBone.position - pinkyBone.position);
                 if (handBinder.Handedness == Chirality.Right)
@@ -293,9 +293,9 @@ namespace Leap.Unity.HandsModule
                 roundedRotationOffset.y = Mathf.Round(roundedRotationOffset.y / 90) * 90;
                 roundedRotationOffset.z = Mathf.Round(roundedRotationOffset.z / 90) * 90;
 
-                //Calculate the difference between the Calculated hand basis and the wrists rotation
+                // Calculate the difference between the Calculated hand basis and the wrists rotation
                 handBinder.WristRotationOffset = roundedRotationOffset;
-                //Assuming the fingers have been created using the same rotation axis as the wrist
+                // Assuming the fingers have been created using the same rotation axis as the wrist
                 handBinder.GlobalFingerRotationOffset = handBinder.WristRotationOffset;
             }
         }
@@ -314,9 +314,11 @@ namespace Leap.Unity.HandsModule
         {
             var length = 0f;
 
+            bool AddedWristToFirstBone = false;
+
             var finger = boundHand.fingers[(int)Finger.FingerType.TYPE_MIDDLE];
 
-            //Loop through the bones and sum up there lengths
+            // Loop through the bones and sum up their lengths
             for (int boneID = 0; boneID < finger.boundBones.Length - 1; boneID++)
             {
                 var bone = finger.boundBones[boneID];
@@ -324,12 +326,18 @@ namespace Leap.Unity.HandsModule
 
                 if (bone.boundTransform != null && nextBone.boundTransform != null)
                 {
+                    if (!AddedWristToFirstBone)
+                    {
+                        length += (boundHand.wrist.boundTransform.position - bone.boundTransform.position).magnitude;
+                        AddedWristToFirstBone = true;
+                    }
+
                     var t = (bone.boundTransform.position - nextBone.boundTransform.position).magnitude;
                     length += t;
                 }
             }
 
-            //Reset the scale offset to 1
+            // Reset the scale offset to 1
             boundHand.baseScale = length;
         }
 

@@ -6,11 +6,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [docs-website]: https://docs.ultraleap.com/ "Ultraleap Docs"
 
-## [1.0.0-pre.4] - UNRELEASED
+## [1.0.0-pre.4] - 10/06/2022
+
+### Added
+
+- Added support for `XR_ULTRALEAP_hand_tracking_elbow` which provides elbow tracking if supported on the system.
 
 ### Fixed
 
-- Fixed Hand data provided via the OpenXR Leap Provider was always relative to the scene origin. It now respects any parent transforms applied to the main camera and works correctly with `Tracked Pose Driver`
+- Fixed Hand data provided via the OpenXR Leap Provider was always relative to the scene origin. It now respects any parent transforms applied to the main camera and works correctly with `Tracked Pose Driver`.
+
+### Known issues
+
+- Currently the Ultraleap Hand Tracking feature for OpenXR requires the New and Legacy input systems to be enabled, to simultaneously use OpenXR and the Ultraleap Unity Plugin's features.
+- The OpenXR Leap Provider does not currently support the following hand properties (and will return fixed values):
+  - Hand and Finger: `FrameId`
+  - Hand: `Confidence`
+  - Hand: `GrabAngle`
+  - Hand and Finger: `Id` & `HandId` will always return `0` and `1` for the left and right hand respectively
+  - Hand and Finger: `TimeVisible`
+  - Finger: `IsExtended`
+- The elbow joint is not currently tracked and the OpenXR Leap Provider infers the elbow/forearm from the hand-data.
 
 
 ## [1.0.0-pre.3] - 19/04/2022

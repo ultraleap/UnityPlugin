@@ -1,9 +1,9 @@
 {
   "name": "com.ultraleap.tracking",
-  "version": "5.9.0",
+  "version": "5.10.0",
   "description": "Ultraleap's Unity Plugin enables the data produced by Ultraleap tracking hardware to be used by developers inside their Unity projects. It includes various utilities and prefabs that make it as easy as possible to design and use hand tracking in XR projects",
   "displayName": "Ultraleap Tracking",
-  "unity": "2019.4",
+  "unity": "2020.3",
   "license": "Apache-2.0",
   "keywords": [
     "ultraleap",
@@ -17,10 +17,11 @@
     "email": "contact@ultraleap.com",
     "url": "https://www.ultraleap.com"
   },
-"samples": [
-  {
-     "displayName": "Examples",
-     "description": "",
-     "path": "Examples~"
-  }]
+  "samples": [
+    {
+      "displayName": "Examples",
+      "description": "",
+      "path": "Examples~"
+    }
+  ]
 }
