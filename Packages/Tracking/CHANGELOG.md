@@ -25,7 +25,8 @@ If you have any concerns about this, please contact us on [Github Discussions](h
 
  
 ### Fixed 
-
+- Turning on and off multiple image retrievers referencing the same service provider or the same device results in a very low framerate
+- When having two image retrievers that both reference the same device and turning one of them off, then the other one shows a grey image
 
 
 ## [5.10.0] - 10/06/2022
