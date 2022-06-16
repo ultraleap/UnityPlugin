@@ -31,15 +31,15 @@ namespace Leap.Unity
         private bool _showEyePositions = false;
 
         [SerializeField] private LeapServiceProvider _provider = null;
-        private Maybe<float> _deviceBaseline = Maybe.None;
+        private float _deviceBaseline = -1;
         private bool _hasVisitedPreCull = false;
 
         [SerializeField] private Camera _camera = null;
 
         private void onDevice(Device device)
         {
-            if (device == _provider.CurrentDevice || _deviceBaseline == Maybe.None)
-                _deviceBaseline = Maybe.Some(device.Baseline);
+            if (device == _provider.CurrentDevice || _deviceBaseline == -1)
+                _deviceBaseline = device.Baseline;
         }
 
         private void OnDestroy()
@@ -108,14 +108,14 @@ namespace Leap.Unity
             // XR applications need to be rendered in multipass or it will fail.
             _camera.ResetStereoViewMatrices();
 
-            Maybe<float> baselineToUse = Maybe.None;
+            float baselineToUse = -1;
             if (_useCustomBaseline)
             {
-                baselineToUse = Maybe.Some(_customBaselineValue);
+                baselineToUse = _customBaselineValue;
             }
             else
             {
-                if (_deviceBaseline == Maybe.None)
+                if (_deviceBaseline == -1)
                 {
                     _provider.OnDeviceSafe -= onDevice;
                     _provider.OnDeviceSafe += onDevice;
@@ -124,8 +124,10 @@ namespace Leap.Unity
             }
 
             float baselineValue;
-            if (baselineToUse.TryGetValue(out baselineValue))
+            if (baselineToUse != -1)
             {
+                baselineValue = baselineToUse;
+
                 baselineValue *= 1e-3f;
 
                 Matrix4x4 leftMat = _camera.GetStereoViewMatrix(Camera.StereoscopicEye.Left);
