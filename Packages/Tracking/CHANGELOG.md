@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [docs-website]: https://docs.ultraleap.com/unity-api/ "Ultraleap Docs"
 
-## [NEXT] - unreleased
+## [5.11.0] - unreleased
 
 ### Announcements
 
@@ -22,11 +22,25 @@ If you have any concerns about this, please contact us on [Github Discussions](h
 
 ### Changed
 - Changed scale calculations on the Auto-Scale function of the Handbinder, to make it more consistent across different tracking models and more stable when using a hand without metacarpal bones. The scales of all hand prefabs have been slightly changed because of that.
+- Disable FOV visualization gizmos by default
+- update minimum unity version to 2020.3
 
  
 ### Fixed 
 - Turning on and off multiple image retrievers referencing the same service provider or the same device results in a very low framerate
 - When having two image retrievers that both reference the same device and turning one of them off, then the other one shows a grey image
+- Initialising contact for an interaction hand while the hand is not tracked does not work and doesn't attempt again once the hand is tracked
+
+
+### Known issues 
+- Scenes containing the infrared viewer render incorrectly on systems using single pass stereo with the XR plugin system - e.g. Windows Mixed Reality headsets. SteamVR headsets may also default to single pass stereo, showing the same issue. However in this case, the OpenVR settings can be changed to multipass which resolves the problem. 
+- Scenes containing the infrared viewer render incorrectly on Android build targets and in scriptable render pipelines such as URP and HDRP. 
+- Demo scenes do not start at the correct height for a seated user. The XR Plugin Management System adjusts the camera height. This means the user has to adjust components in the scene to the correct height - e.g. camera height. Currently our position is to support the legacy XR system height settings. 
+- Possible hand offset issues on XR2 headsets using SVR plugin 
+- Hands in Desktop scenes can appear far away from the camera 
+- Interactions callback scene allows blocks to be moved without doing a grasp pose. 
+- Capsule hands don't have a joint colour in HDRP 
+- Hand UI can become detached from hand when hand is removed from view
 
 
 ## [5.10.0] - 10/06/2022
