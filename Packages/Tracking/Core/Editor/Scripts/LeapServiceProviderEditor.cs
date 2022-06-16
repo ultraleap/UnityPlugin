@@ -45,13 +45,13 @@ namespace Leap.Unity
                                         (int)LeapServiceProvider.InteractionVolumeVisualization.Device_3Di,
                                         (int)LeapServiceProvider.InteractionVolumeVisualization.LeapMotionController,
                                         (int)LeapServiceProvider.InteractionVolumeVisualization.Automatic},
-                                        "showFOVVisualisation",
-                                        "showOptimalFOVVisualisation",
-                                        "showMaxFOVVisualisation");
+                                        "FOV_Visualisation",
+                                        "OptimalFOV_Visualisation",
+                                        "MaxFOV_Visualisation");
 
-            specifyConditionalDrawing("showFOVVisualisation",
-                                        "showOptimalFOVVisualisation",
-                                        "showMaxFOVVisualisation");
+            specifyConditionalDrawing("FOV_Visualisation",
+                                        "OptimalFOV_Visualisation",
+                                        "MaxFOV_Visualisation");
 
             specifyCustomDecorator("_frameOptimization", frameOptimizationWarning);
 
