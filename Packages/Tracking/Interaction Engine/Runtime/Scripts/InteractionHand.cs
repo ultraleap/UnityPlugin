@@ -419,6 +419,7 @@ namespace Leap.Unity.Interaction
             }
         }
 
+        [System.Obsolete("This code will be removed in the next major version of the plugin. If you believe that it needs to be kept, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
         protected override void unwarpColliders(Transform primaryHoverPoint,
                                                 ISpaceComponent warpedSpaceElement)
         {

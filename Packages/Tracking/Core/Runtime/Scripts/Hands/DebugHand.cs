@@ -19,7 +19,6 @@ namespace Leap.Unity
      * not in the Game view. Use debug hands when you aren't using visible hands in a scene
      * so that you can see where the hands are in the scene view.
      * */
-    [System.Obsolete("This code will be moved to a legacy package in the next major version of the plugin. If you believe that it needs to be kept in tracking, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
     public class DebugHand : HandModelBase
     {
         private Hand hand_;

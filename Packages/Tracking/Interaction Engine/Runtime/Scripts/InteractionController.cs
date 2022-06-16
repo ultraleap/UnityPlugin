@@ -539,6 +539,7 @@ namespace Leap.Unity.Interaction
         /// primary hover candidate, so it is used as the pivot point for unwarping
         /// the colliders of this InteractionController.
         /// </remarks>
+        [System.Obsolete("This code will be removed in the next major version of the plugin. If you believe that it needs to be kept, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
         protected abstract void unwarpColliders(Transform primaryHoverPoint,
                                                 ISpaceComponent warpedSpaceElement);
 
@@ -936,6 +937,7 @@ namespace Leap.Unity.Interaction
         /// Returns the hover distance from the hoverPoint to the specified object, automatically
         /// accounting for ISpaceComponent warping if necessary.
         /// </summary>
+        [System.Obsolete("This code will be removed in the next major version of the plugin. If you believe that it needs to be kept, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
         public static float GetHoverDistance(Vector3 hoverPoint, IInteractionBehaviour behaviour)
         {
             if (behaviour.space != null)
@@ -951,6 +953,7 @@ namespace Leap.Unity.Interaction
         /// <summary>
         /// Applies the spatial warping of the provided ISpaceComponent to a world-space point.
         /// </summary>
+        [System.Obsolete("This code will be removed in the next major version of the plugin. If you believe that it needs to be kept, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
         public static Vector3 TransformPoint(Vector3 worldPoint, ISpaceComponent element)
         {
             if (element.anchor != null && element.anchor.space != null)

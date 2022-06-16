@@ -554,6 +554,7 @@ namespace Leap.Unity.Interaction
         private Vector3 _unwarpingPositionOffset = Vector3.zero;
         private Quaternion _unwarpingRotationOffset = Quaternion.identity;
 
+        [System.Obsolete("This code will be removed in the next major version of the plugin. If you believe that it needs to be kept, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
         protected override void unwarpColliders(Transform primaryHoverPoint, ISpaceComponent warpedSpaceElement)
         {
             // Extension method calculates "unwarped" pose in world space.

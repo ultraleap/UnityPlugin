@@ -678,6 +678,7 @@ namespace Leap.Unity.Interaction
         /// <summary>
         /// A maximum of one (1) LeapSpace is supported per InteractionBehaviour.
         /// </summary>
+        [System.Obsolete("This code will be removed in the next major version of the plugin. If you believe that it needs to be kept, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
         public ISpaceComponent space { get; protected set; }
 
         [Header("Interaction Overrides")]
