@@ -10,7 +10,6 @@ using Leap.Interaction.Internal.InteractionEngineUtility;
 using Leap.Unity.Attributes;
 using Leap.Unity.Interaction.Internal;
 using Leap.Unity.RuntimeGizmos;
-using Leap.Unity.Space;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -481,7 +480,7 @@ namespace Leap.Unity.Interaction
             hoverActivityManager.activationRadius = manager.WorldHoverActivationRadius;
 
             Vector3? queryPosition = isTracked ? (Vector3?)hoverPoint : null;
-            hoverActivityManager.UpdateActivityQuery(queryPosition, LeapSpace.allEnabled);
+            hoverActivityManager.UpdateActivityQuery(queryPosition);
 
             refreshHoverState(_hoverActivityManager.ActiveObjects);
 
@@ -489,50 +488,7 @@ namespace Leap.Unity.Interaction
             // the appropriate hover state callbacks.
             refreshHoverStateBuffers();
             refreshPrimaryHoverStateBuffers();
-
-            // Support interactions in curved ("warped") space by "unwarping" hands into
-            // the curved space's physics (rectilinear) space.
-            if (isTracked && isPrimaryHovering)
-            {
-                ISpaceComponent space = primaryHoveredObject.space;
-
-                if (space != null
-                 && space.anchor != null
-                 && space.anchor.space != null)
-                {
-                    unwarpColliders(primaryHoverPoints[_primaryHoverPointIdx], space);
-                }
-            }
         }
-
-        /// <summary>
-        /// Implementing this method is necessary to support curved spaces as
-        /// rendered by a Leap Graphic Renderer. See InteractionHand for an example
-        /// implementation. (Implementing this method is optional if you are not
-        /// using a curved space as rendered by a Leap Graphic Renderer.)
-        /// </summary>
-        /// <remarks>
-        /// Warps the collider transforms of this controller by the inverse of the
-        /// transformation that is applied on the provided warpedSpaceElement, using
-        /// the primaryHoverPoint as the pivot transform for the transformation.
-        ///
-        /// ITransformer.WorldSpaceUnwarp is a useful method here. (ISpaceComponents
-        /// contain references to their transformers via their anchors.)
-        ///
-        /// ISpaceComponents denote game objects whose visual positions are warped
-        /// from rectilinear (non-warped) space into a curved space (via, for example,
-        /// a LeapCylindricalSpace, which can only be rendered correctly by the Leap
-        /// Graphic Renderer). This method reverses that transformation for the hand,
-        /// bringing it into the object's rectilinear space, allowing objects curved
-        /// in this way to correctly collide with the bones in the hand or collider of
-        /// a held controller.
-        ///
-        /// The provided Transform is the closest primary hover point to any given
-        /// primary hover candidate, so it is used as the pivot point for unwarping
-        /// the colliders of this InteractionController.
-        /// </remarks>
-        protected abstract void unwarpColliders(Transform primaryHoverPoint,
-                                                ISpaceComponent warpedSpaceElement);
 
         // Hover history, handled as part of the Interaction Manager's state-check calls.
         private IInteractionBehaviour _primaryHoveredLastFrame = null;
@@ -638,7 +594,7 @@ namespace Leap.Unity.Interaction
                 }
 
                 // Check primary hover for the primary hover point.
-                float behaviourDistance = GetHoverDistance(primaryHoverPoint.position, behaviour);
+                float behaviourDistance = behaviour.GetHoverDistance(primaryHoverPoint.position);
                 if (behaviourDistance < shortestPointDistance)
                 {
 
@@ -923,38 +879,6 @@ namespace Leap.Unity.Interaction
         }
 
         #endregion
-
-        /// <summary>
-        /// Returns the hover distance from the hoverPoint to the specified object, automatically
-        /// accounting for ISpaceComponent warping if necessary.
-        /// </summary>
-        public static float GetHoverDistance(Vector3 hoverPoint, IInteractionBehaviour behaviour)
-        {
-            if (behaviour.space != null)
-            {
-                return behaviour.GetHoverDistance(TransformPoint(hoverPoint, behaviour.space));
-            }
-            else
-            {
-                return behaviour.GetHoverDistance(hoverPoint);
-            }
-        }
-
-        /// <summary>
-        /// Applies the spatial warping of the provided ISpaceComponent to a world-space point.
-        /// </summary>
-        public static Vector3 TransformPoint(Vector3 worldPoint, ISpaceComponent element)
-        {
-            if (element.anchor != null && element.anchor.space != null)
-            {
-                Vector3 localPos = element.anchor.space.transform.InverseTransformPoint(worldPoint);
-                return element.anchor.space.transform.TransformPoint(element.anchor.transformer.InverseTransformPoint(localPos));
-            }
-            else
-            {
-                return worldPoint;
-            }
-        }
 
         #endregion
 
@@ -1978,7 +1902,7 @@ namespace Leap.Unity.Interaction
         private void fixedUpdateGrasping()
         {
             Vector3? graspPoint = isTracked ? (Vector3?)hoverPoint : null;
-            graspActivityManager.UpdateActivityQuery(graspPoint, LeapSpace.allEnabled);
+            graspActivityManager.UpdateActivityQuery(graspPoint);
 
             fixedUpdateGraspingState();
         }

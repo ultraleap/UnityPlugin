@@ -10,7 +10,6 @@ using Leap.Interaction.Internal.InteractionEngineUtility;
 using Leap.Unity.Attributes;
 using Leap.Unity.Interaction.Internal;
 using Leap.Unity.RuntimeGizmos;
-using Leap.Unity.Space;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -414,28 +413,6 @@ namespace Leap.Unity.Interaction
                     _fingertipTransforms[i] = null;
                 }
             }
-        }
-
-        protected override void unwarpColliders(Transform primaryHoverPoint,
-                                                ISpaceComponent warpedSpaceElement)
-        {
-            // Extension method calculates "unwarped" pose in world space.
-            Vector3 unwarpedPosition;
-            Quaternion unwarpedRotation;
-            warpedSpaceElement.anchor.transformer.WorldSpaceUnwarp(primaryHoverPoint.position,
-                                                                   primaryHoverPoint.rotation,
-                                                                   out unwarpedPosition,
-                                                                   out unwarpedRotation);
-
-            // First shift the hand to be centered on the fingertip position so that rotations
-            // applied to the hand will pivot around the fingertip, then apply the rest of the
-            // transformation.
-            _unwarpedHandData.Transform(-primaryHoverPoint.position, Quaternion.identity);
-            _unwarpedHandData.Transform(unwarpedPosition, unwarpedRotation
-                                                          * Quaternion.Inverse(primaryHoverPoint.rotation));
-
-            // Hand data was modified, so refresh point data.
-            refreshPointDataFromHand();
         }
 
         #endregion

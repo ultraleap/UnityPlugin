@@ -9,7 +9,6 @@
 using Leap.Interaction.Internal.InteractionEngineUtility;
 using Leap.Unity.Attributes;
 using Leap.Unity.Interaction.Internal;
-using Leap.Unity.Space;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -681,11 +680,6 @@ namespace Leap.Unity.Interaction
             protected set { _rigidbody = value; }
         }
 
-        /// <summary>
-        /// A maximum of one (1) LeapSpace is supported per InteractionBehaviour.
-        /// </summary>
-        public ISpaceComponent space { get; protected set; }
-
         [Header("Interaction Overrides")]
 
         [Tooltip("This object will not receive hover callbacks from left controllers, right "
@@ -1013,18 +1007,6 @@ namespace Leap.Unity.Interaction
 
             // Make sure we have a list of all of this object's colliders.
             RefreshInteractionColliders();
-
-            // Refresh curved space. Currently a maximum of one (1) LeapSpace is supported per
-            // InteractionBehaviour.
-            foreach (var collider in _interactionColliders)
-            {
-                var leapSpace = collider.transform.GetComponentInParent<ISpaceComponent>();
-                if (leapSpace != null)
-                {
-                    space = leapSpace;
-                    break;
-                }
-            }
 
             // Ensure physics layers are set up properly.
             initLayers();

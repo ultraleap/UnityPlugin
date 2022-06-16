@@ -7,7 +7,6 @@
  ******************************************************************************/
 
 using Leap.Unity.Attributes;
-using Leap.Unity.Space;
 
 using System;
 using System.Linq;
@@ -539,30 +538,6 @@ namespace Leap.Unity.Interaction
             get { return primaryHoverPoints; }
         }
 
-        private Vector3 _pivotingPositionOffset = Vector3.zero;
-        private Vector3 _unwarpingPositionOffset = Vector3.zero;
-        private Quaternion _unwarpingRotationOffset = Quaternion.identity;
-
-        protected override void unwarpColliders(Transform primaryHoverPoint, ISpaceComponent warpedSpaceElement)
-        {
-            // Extension method calculates "unwarped" pose in world space.
-            Vector3 unwarpedPosition;
-            Quaternion unwarpedRotation;
-            warpedSpaceElement.anchor.transformer.WorldSpaceUnwarp(primaryHoverPoint.position,
-                                                                   primaryHoverPoint.rotation,
-                                                                   out unwarpedPosition,
-                                                                   out unwarpedRotation);
-
-            // Shift the controller to have its origin on the primary hover point so that
-            // rotations applied to the hand cause it to pivot around that point, then apply
-            // the position and rotation transformation.
-            _pivotingPositionOffset = -primaryHoverPoint.position;
-            _unwarpingPositionOffset = unwarpedPosition;
-            _unwarpingRotationOffset = unwarpedRotation * Quaternion.Inverse(primaryHoverPoint.rotation);
-
-            refreshContactBoneTargets(useUnwarpingData: true);
-        }
-
         #endregion
 
         #region Contact Implementation
@@ -603,32 +578,16 @@ namespace Leap.Unity.Interaction
             return true;
         }
 
-        private void refreshContactBoneTargets(bool useUnwarpingData = false)
+        private void refreshContactBoneTargets()
         {
             if (_wasContactInitialized)
             {
-
-                // Move the controller transform temporarily into its "unwarped space" pose
-                // (only if we are using the controller in a curved space)
-                if (useUnwarpingData)
-                {
-                    moveControllerTransform(_pivotingPositionOffset, Quaternion.identity);
-                    moveControllerTransform(_unwarpingPositionOffset, _unwarpingRotationOffset);
-                }
-
                 for (int i = 0; i < _contactBones.Length; i++)
                 {
                     _contactBoneTargetPositions[i]
                       = this.transform.TransformPoint(_contactBoneLocalPositions[i]);
                     _contactBoneTargetRotations[i]
                       = this.transform.TransformRotation(_contactBoneLocalRotations[i]);
-                }
-
-                // Move the controller transform back to its original pose.
-                if (useUnwarpingData)
-                {
-                    moveControllerTransform(-_unwarpingPositionOffset, Quaternion.Inverse(_unwarpingRotationOffset));
-                    moveControllerTransform(-_pivotingPositionOffset, Quaternion.identity);
                 }
             }
         }

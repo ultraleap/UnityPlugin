@@ -8,7 +8,6 @@
 
 using Leap;
 using Leap.Unity.Attributes;
-using Leap.Unity.Space;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -31,8 +30,6 @@ namespace Leap.Unity.Interaction
         // Properties for interaction.
         InteractionManager manager { get; }
         Rigidbody rigidbody { get; }
-        ISpaceComponent space { get; } // OK to return null if this object is not in
-                                       // curved space.
 
         // Interaction overrides.
         IgnoreHoverMode ignoreHoverMode { get; }

@@ -6,8 +6,6 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Leap.Unity.Interaction.Internal;
-using Leap.Unity.Space;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -93,7 +91,7 @@ namespace Leap.Unity.Interaction
 
         [ThreadStatic]
         private static Collider[] s_colliderResultsBuffer = new Collider[32];
-        public void UpdateActivityQuery(Vector3? queryPosition, List<LeapSpace> spaces = null)
+        public void UpdateActivityQuery(Vector3? queryPosition)
         {
             _activeObjects.Clear();
 
@@ -111,16 +109,6 @@ namespace Leap.Unity.Interaction
 
                 int count = GetSphereColliderResults(actualQueryPosition, ref s_colliderResultsBuffer);
                 UpdateActiveList(count, s_colliderResultsBuffer);
-
-                if (spaces != null)
-                {
-                    //Check once in each of the GUI's subspaces
-                    foreach (LeapSpace space in spaces)
-                    {
-                        count = GetSphereColliderResults(transformPoint(actualQueryPosition, space), ref s_colliderResultsBuffer);
-                        UpdateActiveList(count, s_colliderResultsBuffer);
-                    }
-                }
             }
 
             if (trackStateChanges)
@@ -196,12 +184,6 @@ namespace Leap.Unity.Interaction
                     _activeObjects.Add(obj);
                 }
             }
-        }
-
-        private Vector3 transformPoint(Vector3 worldPoint, LeapSpace space)
-        {
-            Vector3 localPalmPos = space.transform.InverseTransformPoint(worldPoint);
-            return space.transform.TransformPoint(space.transformer.InverseTransformPoint(localPalmPos));
         }
     }
 }
