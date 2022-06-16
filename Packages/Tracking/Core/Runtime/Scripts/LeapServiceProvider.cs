@@ -266,6 +266,7 @@ namespace Leap.Unity
 #if UNITY_2017_3_OR_NEWER
         [Tooltip("When checked, profiling data from the LeapCSharp worker thread will be used to populate the UnityProfiler.")]
         [EditTimeOnly]
+        [System.Obsolete("This code will be deleted in the next major version of the plugin. If you believe that it needs to be kept, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
 #else
         [Tooltip("Worker thread profiling requires a Unity version of 2017.3 or greater.")]
         [Disable]
@@ -305,7 +306,9 @@ namespace Leap.Unity
         protected Controller _leapController;
         protected bool _isDestroyed;
 
+        [System.Obsolete("This code will be removed in the next major version of the plugin. If you believe that it needs to be kept, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
         protected SmoothedFloat _fixedOffset = new SmoothedFloat();
+        [System.Obsolete("This code will become private in the next major version of the plugin. If you believe that it needs to be kept protected, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
         protected SmoothedFloat _smoothedTrackingLatency = new SmoothedFloat();
         protected long _unityToLeapOffset;
 
