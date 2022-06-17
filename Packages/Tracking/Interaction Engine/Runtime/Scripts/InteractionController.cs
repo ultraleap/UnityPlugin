@@ -9,6 +9,7 @@
 using Leap.Interaction.Internal.InteractionEngineUtility;
 using Leap.Unity.Attributes;
 using Leap.Unity.Interaction.Internal;
+using Leap.Unity.Internal;
 using Leap.Unity.RuntimeGizmos;
 using System;
 using System.Collections;

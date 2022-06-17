@@ -15,6 +15,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.XR;
+using Leap.Unity.Internal;
 
 namespace Leap.Unity.Interaction
 {

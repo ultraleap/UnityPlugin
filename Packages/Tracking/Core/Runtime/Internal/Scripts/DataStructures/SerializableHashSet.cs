@@ -12,7 +12,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 
-namespace Leap.Unity
+namespace Leap.Unity.Internal
 {
 
     [Obsolete("It is no longer required to annotate SerializableHashSets with the SHashSet attribute.")]

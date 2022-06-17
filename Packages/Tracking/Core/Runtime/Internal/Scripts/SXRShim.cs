@@ -8,7 +8,7 @@ using UnityEngine;
 
 #if SVR
 
-namespace Leap.Unity
+namespace Leap.Unity.Internal
 {
     public class SxrShim
     {

@@ -6,6 +6,7 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
+using Leap.Unity.Internal;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -908,18 +909,6 @@ namespace Leap.Unity
             return arr;
         }
 
-        /// <summary>
-        /// Sets all elements in the array of type T to the argument value.
-        /// </summary>
-        public static T[] ClearWith<T>(this T[] arr, T value)
-        {
-            for (int i = 0; i < arr.Length; i++)
-            {
-                arr[i] = value;
-            }
-            return arr;
-        }
-
         /// <summary> Executes the delegate for each object in the array that is
         /// non-null. </summary>
         public static void ForEach<T>(this T[] arr, Action<T> doFunc)
@@ -1005,6 +994,9 @@ namespace Leap.Unity
             return dst;
         }
 
+        /// <summary>
+        /// Sets all elements in the array of type T to the argument value.
+        /// </summary>
         public static T[] Fill<T>(this T[] array, T fillWith)
         {
             for (int i = 0; i < array.Length; i++)
@@ -2152,14 +2144,14 @@ namespace Leap.Unity
             switch (capsule.direction)
             {
                 case 0:
-                    effRadiusMult = Swizzle.Swizzle.yz(capsule.transform.lossyScale).CompMax();
+                    effRadiusMult = Swizzle.yz(capsule.transform.lossyScale).CompMax();
                     break;
                 case 1:
-                    effRadiusMult = Swizzle.Swizzle.xz(capsule.transform.lossyScale).CompMax();
+                    effRadiusMult = Swizzle.xz(capsule.transform.lossyScale).CompMax();
                     break;
                 case 2:
                 default:
-                    effRadiusMult = Swizzle.Swizzle.xy(capsule.transform.lossyScale).CompMax();
+                    effRadiusMult = Swizzle.xy(capsule.transform.lossyScale).CompMax();
                     break;
             }
             return effRadiusMult;

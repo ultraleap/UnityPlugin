@@ -8,7 +8,7 @@
 
 using UnityEngine;
 
-namespace Leap.Unity.Swizzle
+namespace Leap.Unity.Internal
 {
 
     public static class Swizzle

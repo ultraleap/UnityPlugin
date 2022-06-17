@@ -12,6 +12,7 @@ using Leap.Unity.RuntimeGizmos;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Leap.Unity.Internal;
 
 #if UNITY_EDITOR
 using UnityEditor;

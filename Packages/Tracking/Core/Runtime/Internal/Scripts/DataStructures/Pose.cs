@@ -10,7 +10,7 @@ using Leap.Unity.Encoding;
 using System;
 using UnityEngine;
 
-namespace Leap.Unity
+namespace Leap.Unity.Internal
 {
 
     public static class PoseExtensions

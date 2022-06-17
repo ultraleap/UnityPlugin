@@ -9,7 +9,7 @@
 using System;
 using UnityEngine;
 
-namespace Leap.Unity
+namespace Leap.Unity.Internal
 {
 
     public class RingBuffer<T>
