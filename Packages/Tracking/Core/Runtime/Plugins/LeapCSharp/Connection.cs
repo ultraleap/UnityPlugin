@@ -567,7 +567,7 @@ namespace LeapInternal
                     StructMarshal<LEAP_VECTOR>.PtrToStruct(new IntPtr(posPtr), out position);
                     StructMarshal<LEAP_QUATERNION>.PtrToStruct(new IntPtr(rotPtr), out orientation);
 
-                    LeapTransform transform = new LeapTransform(position.ToLeapVector(), orientation.ToLeapQuaternion());
+                    LeapTransform transform = new LeapTransform(position.ToVector3(), orientation.ToQuaternion());
                     if (id == leftId)
                     {
                         leftTransform = transform;
@@ -1189,7 +1189,7 @@ namespace LeapInternal
         /// <summary>
         /// Converts from image-space pixel coordinates to camera-space rectilinear coordinates
         /// </summary>
-        public Vector PixelToRectilinear(Image.CameraType camera, Vector pixel)
+        public UnityEngine.Vector3 PixelToRectilinear(Image.CameraType camera, UnityEngine.Vector3 pixel)
         {
             LEAP_VECTOR pixelStruct = new LEAP_VECTOR(pixel);
             LEAP_VECTOR ray = LeapC.LeapPixelToRectilinear(_leapConnection,
@@ -1197,7 +1197,7 @@ namespace LeapInternal
                    eLeapPerspectiveType.eLeapPerspectiveType_stereo_left :
                    eLeapPerspectiveType.eLeapPerspectiveType_stereo_right),
                    pixelStruct);
-            return new Vector(ray.x, ray.y, ray.z);
+            return new UnityEngine.Vector3(ray.x, ray.y, ray.z);
         }
 
         /// <summary>
@@ -1207,8 +1207,8 @@ namespace LeapInternal
         /// 
         /// @since 4.1
         /// </summary>
-        public Vector PixelToRectilinearEx(IntPtr deviceHandle,
-                                           Image.CameraType camera, Image.CalibrationType calibType, Vector pixel)
+        public UnityEngine.Vector3 PixelToRectilinearEx(IntPtr deviceHandle,
+                                           Image.CameraType camera, Image.CalibrationType calibType, UnityEngine.Vector3 pixel)
         {
             LEAP_VECTOR pixelStruct = new LEAP_VECTOR(pixel);
             LEAP_VECTOR ray = LeapC.LeapPixelToRectilinearEx(_leapConnection,
@@ -1220,13 +1220,13 @@ namespace LeapInternal
                    eLeapCameraCalibrationType.eLeapCameraCalibrationType_infrared :
                    eLeapCameraCalibrationType.eLeapCameraCalibrationType_visual),
                    pixelStruct);
-            return new Vector(ray.x, ray.y, ray.z);
+            return new UnityEngine.Vector3(ray.x, ray.y, ray.z);
         }
 
         /// <summary>
         /// Converts from camera-space rectilinear coordinates to image-space pixel coordinates
         /// </summary>
-        public Vector RectilinearToPixel(Image.CameraType camera, Vector ray)
+        public UnityEngine.Vector3 RectilinearToPixel(Image.CameraType camera, UnityEngine.Vector3 ray)
         {
             LEAP_VECTOR rayStruct = new LEAP_VECTOR(ray);
             LEAP_VECTOR pixel = LeapC.LeapRectilinearToPixel(_leapConnection,
@@ -1234,7 +1234,7 @@ namespace LeapInternal
                    eLeapPerspectiveType.eLeapPerspectiveType_stereo_left :
                    eLeapPerspectiveType.eLeapPerspectiveType_stereo_right),
                    rayStruct);
-            return new Vector(pixel.x, pixel.y, pixel.z);
+            return new UnityEngine.Vector3(pixel.x, pixel.y, pixel.z);
         }
 
         public void TelemetryProfiling(ref LEAP_TELEMETRY_DATA telemetryData)
@@ -1272,7 +1272,7 @@ namespace LeapInternal
 
             pm.frameId = pmi.frame_id;
             pm.timestamp = pmi.timestamp;
-            pm.points = new Vector[nPoints];
+            pm.points = new UnityEngine.Vector3[nPoints];
             pm.ids = new UInt32[nPoints];
 
             float[] points = new float[3 * nPoints];

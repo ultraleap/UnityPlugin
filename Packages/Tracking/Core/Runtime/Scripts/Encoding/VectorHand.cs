@@ -123,19 +123,19 @@ namespace Leap.Unity.Encoding
         public void Encode(Hand fromHand)
         {
             isLeft = fromHand.IsLeft;
-            palmPos = fromHand.PalmPosition.ToVector3();
-            palmRot = fromHand.Rotation.ToQuaternion();
+            palmPos = fromHand.PalmPosition;
+            palmRot = fromHand.Rotation;
 
             int boneIdx = 0;
             for (int i = 0; i < 5; i++)
             {
                 Vector3 baseMetacarpal = ToLocal(
-                  fromHand.Fingers[i].bones[0].PrevJoint.ToVector3(), palmPos, palmRot);
+                  fromHand.Fingers[i].bones[0].PrevJoint, palmPos, palmRot);
                 jointPositions[boneIdx++] = baseMetacarpal;
                 for (int j = 0; j < 4; j++)
                 {
                     Vector3 joint = ToLocal(
-                      fromHand.Fingers[i].bones[j].NextJoint.ToVector3(), palmPos, palmRot);
+                      fromHand.Fingers[i].bones[j].NextJoint, palmPos, palmRot);
                     jointPositions[boneIdx++] = joint;
                 }
             }
@@ -187,22 +187,22 @@ namespace Leap.Unity.Encoding
                     boneRot = palmRot * boneRot;
 
                     intoHand.GetBone(boneIdx).Fill(
-                      prevJoint: prevJoint.ToVector(),
-                      nextJoint: nextJoint.ToVector(),
-                      center: ((nextJoint + prevJoint) / 2f).ToVector(),
-                      direction: (palmRot * Vector3.forward).ToVector(),
+                      prevJoint: prevJoint,
+                      nextJoint: nextJoint,
+                      center: ((nextJoint + prevJoint) / 2f),
+                      direction: (palmRot * Vector3.forward),
                       length: (prevJoint - nextJoint).magnitude,
                       width: 0.01f,
                       type: (Bone.BoneType)jointIdx,
-                      rotation: boneRot.ToLeapQuaternion());
+                      rotation: boneRot);
                 }
                 intoHand.Fingers[fingerIdx].Fill(
                   frameId: -1,
                   handId: (isLeft ? 0 : 1),
                   fingerId: fingerIdx,
                   timeVisible: 10f,// Time.time, <- This is unused and main thread only
-                  tipPosition: nextJoint.ToVector(),
-                  direction: (boneRot * Vector3.forward).ToVector(),
+                  tipPosition: nextJoint,
+                  direction: (boneRot * Vector3.forward),
                   width: 1f,
                   length: 1f,
                   isExtended: true,
@@ -210,13 +210,13 @@ namespace Leap.Unity.Encoding
             }
 
             // Fill arm data.
-            intoHand.Arm.Fill(ToWorld(new Vector3(0f, 0f, -0.3f), palmPos, palmRot).ToVector(),
-                            ToWorld(new Vector3(0f, 0f, -0.055f), palmPos, palmRot).ToVector(),
-                            ToWorld(new Vector3(0f, 0f, -0.125f), palmPos, palmRot).ToVector(),
-                            Vector.Zero,
+            intoHand.Arm.Fill(ToWorld(new Vector3(0f, 0f, -0.3f), palmPos, palmRot),
+                            ToWorld(new Vector3(0f, 0f, -0.055f), palmPos, palmRot),
+                            ToWorld(new Vector3(0f, 0f, -0.125f), palmPos, palmRot),
+                            Vector3.zero,
                             0.3f,
                             0.05f,
-                            (palmRot).ToLeapQuaternion());
+                            (palmRot));
 
             // Finally, fill hand data.
             var palmPose = new Pose(palmPos, palmRot);
@@ -234,13 +234,13 @@ namespace Leap.Unity.Encoding
               isLeft: isLeft,
               timeVisible: 1f,
               fingers: null /* already uploaded finger data */,
-              palmPosition: palmPos.ToVector(),
-              stabilizedPalmPosition: palmPos.ToVector(),
-              palmVelocity: Vector3.zero.ToVector(),
-              palmNormal: (palmRot * Vector3.down).ToVector(),
-              rotation: (palmRot.ToLeapQuaternion()),
-              direction: (palmRot * Vector3.forward).ToVector(),
-              wristPosition: wristPos.ToVector()
+              palmPosition: palmPos,
+              stabilizedPalmPosition: palmPos,
+              palmVelocity: Vector3.zero,
+              palmNormal: (palmRot * Vector3.down),
+              rotation: (palmRot),
+              direction: (palmRot * Vector3.forward),
+              wristPosition: wristPos
             );
 
         }

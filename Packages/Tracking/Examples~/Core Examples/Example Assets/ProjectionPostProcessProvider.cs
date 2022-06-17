@@ -45,12 +45,12 @@ namespace Leap.Unity.Examples
 
                 // Calculate the projection of the hand if it extends beyond the
                 // handMergeDistance.
-                Vector3 shoulderToHand = hand.PalmPosition.ToVector3() - shoulderPos;
+                Vector3 shoulderToHand = hand.PalmPosition - shoulderPos;
                 float handShoulderDist = shoulderToHand.magnitude;
                 float projectionDistance = Mathf.Max(0f, handShoulderDist - handMergeDistance);
                 float projectionAmount = 1f + (projectionDistance * projectionScale);
                 hand.SetTransform(shoulderPos + shoulderToHand * projectionAmount,
-                                  hand.Rotation.ToQuaternion());
+                                  hand.Rotation);
             }
         }
 
