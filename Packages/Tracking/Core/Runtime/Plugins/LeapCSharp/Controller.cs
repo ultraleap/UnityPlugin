@@ -555,7 +555,7 @@ namespace Leap
         /// the change was accepted. 
         /// @since 2.1.6 (5.4.4 for specific device)
         /// </summary>
-        [Obsolete("This method signiture will be removed in a future update. Please use the equivalent method that does not take the serial number")]
+        [Obsolete("This method signature will be removed in a future update. Please use the equivalent method that does not take the serial number")]
         public void SetAndClearPolicy(PolicyFlag set, PolicyFlag clear, string deviceSerial = "", Device device = null)
         {
             _connection.SetAndClearPolicy(set, clear, device);
