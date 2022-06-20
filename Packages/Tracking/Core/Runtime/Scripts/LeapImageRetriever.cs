@@ -69,10 +69,6 @@ namespace Leap.Unity
             private Texture2D _combinedTexture = null;
             private byte[] _intermediateArray = null;
 
-            // Adding this to the texture size factor removes a white pixel border around the image.
-            // TODO: This needs investigating to work out why!
-            private const float TEXTURE_SIZE_FACTOR_PADDING = -0.01f;
-
             private bool _hideLeapDebugInfo = true;
             public void HideDebugInfo(bool hideDebug)
             {
@@ -157,14 +153,7 @@ namespace Leap.Unity
                 {
                     textureSizeFactors = new Vector4[MAX_NUMBER_OF_GLOBAL_TEXTURES];
                 }
-                textureSizeFactors[deviceID] = new Vector4()
-                {
-                    x = ((float)_combinedTexture.width / _globalRawTextures.width) + TEXTURE_SIZE_FACTOR_PADDING,
-                    y = ((float)_combinedTexture.height / _globalRawTextures.height) + TEXTURE_SIZE_FACTOR_PADDING,
-                    z = 0,
-                    w = 0
-                };
-
+                textureSizeFactors[deviceID] = new Vector4((float)_combinedTexture.width / _globalRawTextures.width, (float)_combinedTexture.height / _globalRawTextures.height, 0, 0);
                 Shader.SetGlobalVectorArray("_LeapGlobalTextureSizeFactor", textureSizeFactors);
 
                 Shader.SetGlobalVector(pixelSizeName, new Vector2(1.0f / image.Width, 1.0f / image.Height));
@@ -403,30 +392,42 @@ namespace Leap.Unity
                 return;
             }
 
-            Camera.onPreRender -= OnCameraPreRender;
-            Camera.onPreRender += OnCameraPreRender;
-
             //Enable pooling to reduce overhead of images
             LeapInternal.MemoryManager.EnablePooling = true;
 
             ApplyGammaCorrectionValues();
+        }
+
+        private void OnEnable()
+        {
+            subscribeToService();
+
+            Camera.onPreRender -= OnCameraPreRender;
+            Camera.onPreRender += OnCameraPreRender;
+
 #if UNITY_2019_3_OR_NEWER
             //SRP require subscribing to RenderPipelineManagers
-            if(UnityEngine.Rendering.GraphicsSettings.renderPipelineAsset != null) {
+            if (UnityEngine.Rendering.GraphicsSettings.renderPipelineAsset != null)
+            {
                 UnityEngine.Rendering.RenderPipelineManager.beginCameraRendering -= onBeginRendering;
                 UnityEngine.Rendering.RenderPipelineManager.beginCameraRendering += onBeginRendering;
             }
 #endif
         }
 
-        private void OnEnable()
-        {
-            subscribeToService();
-        }
-
         private void OnDisable()
         {
             unsubscribeFromService();
+
+            Camera.onPreRender -= OnCameraPreRender;
+
+#if UNITY_2019_3_OR_NEWER
+            //SRP require subscribing to RenderPipelineManagers
+            if (UnityEngine.Rendering.GraphicsSettings.renderPipelineAsset != null)
+            {
+                UnityEngine.Rendering.RenderPipelineManager.beginCameraRendering -= onBeginRendering;
+            }
+#endif
         }
 
         private void OnDestroy()
@@ -505,6 +506,23 @@ namespace Leap.Unity
 
         private void OnCameraPreRender(Camera cam)
         {
+            // set image policy if it is not set. This could happen when eg. another image retriever corresponding to the same device is disabled
+            var controller = _provider.GetLeapController();
+            if (controller != null)
+            {
+                var currentDevice = _provider.CurrentDevice;
+
+                if (_provider.CurrentMultipleDeviceMode == LeapServiceProvider.MultipleDeviceMode.Disabled)
+                {
+                    currentDevice = null;
+                }
+
+                if (!controller.IsPolicySet(Controller.PolicyFlag.POLICY_IMAGES, currentDevice))
+                {
+                    controller.SetPolicy(Controller.PolicyFlag.POLICY_IMAGES, currentDevice);
+                }
+            }
+
             if (_currentImage != null)
             {
                 if (_eyeTextureData.CheckStale(_currentImage))
@@ -585,6 +603,7 @@ namespace Leap.Unity
             unsubscribeFromService();
             subscribeToService();
             Controller controller = _provider.GetLeapController();
+            controller.FrameReady -= onFrameReady;
             controller.FrameReady += onFrameReady;
         }
 
@@ -625,6 +644,7 @@ namespace Leap.Unity
             var controller = _provider.GetLeapController();
             if (controller != null)
             {
+                controller.FrameReady -= onFrameReady;
                 controller.FrameReady += onFrameReady;
                 controller.ClearPolicy(Controller.PolicyFlag.POLICY_IMAGES, _provider.CurrentDevice);
             }
