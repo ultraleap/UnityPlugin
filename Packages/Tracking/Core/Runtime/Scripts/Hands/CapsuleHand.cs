@@ -95,7 +95,7 @@ namespace Leap.Unity
                 if (_sphereColors == null)
                 {
                     _sphereColors = new Color[32];
-                    _sphereColors.Fill(SphereColour);
+                    Utils.Fill(_sphereColors, SphereColour);
                 }
                 return _sphereColors;
             }
