@@ -7,6 +7,7 @@
  ******************************************************************************/
 
 using Leap.Unity;
+using Leap.Unity.Internal;
 using System.Linq;
 using UnityEngine;
 
