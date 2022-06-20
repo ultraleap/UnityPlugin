@@ -268,8 +268,8 @@ namespace Leap.Unity
         {
             // reset all frames in framesToCombineLists, if they haven't been used this unity frame
             // This can happen, if one of the providers doesn't dispatch an update event
-            updateFramesToCombine.Fill(null);
-            fixedUpdateFramesToCombine.Fill(null);
+            Utils.Fill(updateFramesToCombine, null);
+            Utils.Fill(fixedUpdateFramesToCombine, null);
         }
 
 
@@ -292,7 +292,7 @@ namespace Leap.Unity
             _transformedUpdateFrame = MergeFrames(updateFramesToCombine);
 
             // reset all the update frames received from providers to null again
-            updateFramesToCombine.Fill(null);
+            Utils.Fill(updateFramesToCombine, null);
 
 #if UNITY_EDITOR
             if (UnityEditor.EditorApplication.isCompiling)
@@ -322,7 +322,7 @@ namespace Leap.Unity
             _transformedFixedFrame = MergeFrames(fixedUpdateFramesToCombine);
 
             // reset all the fixed update frames received from providers to null again
-            fixedUpdateFramesToCombine.Fill(null);
+            Utils.Fill(fixedUpdateFramesToCombine, null);
 
             if (_frameOptimization == FrameOptimizationMode.ReuseUpdateForPhysics)
             {

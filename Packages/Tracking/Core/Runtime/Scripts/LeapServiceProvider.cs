@@ -618,10 +618,6 @@ namespace Leap.Unity
             editTimePose = TestHandFactory.TestHandPose.DesktopModeA;
         }
 
-        protected virtual void Awake()
-        {
-            _smoothedTrackingLatency.SetBlend(0.99f, 0.0111f);
-        }
 
         protected virtual void Start()
         {

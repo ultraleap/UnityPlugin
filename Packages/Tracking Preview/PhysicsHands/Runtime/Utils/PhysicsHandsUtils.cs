@@ -1,4 +1,3 @@
-using Leap.Unity.Internal;
 using System.Linq;
 using UnityEngine;
 

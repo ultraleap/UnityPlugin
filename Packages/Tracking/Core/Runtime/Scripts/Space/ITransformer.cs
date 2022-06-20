@@ -53,6 +53,7 @@ namespace Leap.Unity.Space
         Matrix4x4 GetTransformationMatrix(Vector3 localRectPos);
     }
 
+    [System.Obsolete("This code will be moved to a legacy package in the next major version of the plugin. If you believe that it needs to be kept in tracking, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
     public class IdentityTransformer : ITransformer
     {
         public static readonly IdentityTransformer single = new IdentityTransformer();
@@ -101,6 +102,7 @@ namespace Leap.Unity.Space
         }
     }
 
+    [System.Obsolete("This code will be moved to a legacy package in the next major version of the plugin. If you believe that it needs to be kept in tracking, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
     public static class ITransformerExtensions
     {
 

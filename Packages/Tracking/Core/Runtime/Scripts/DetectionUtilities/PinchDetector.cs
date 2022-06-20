@@ -7,7 +7,6 @@
  ******************************************************************************/
 
 using Leap.Unity.Attributes;
-using Leap.Unity.Internal;
 using UnityEngine;
 using UnityEngine.Serialization;
 

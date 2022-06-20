@@ -138,8 +138,8 @@ namespace Leap.Unity
           */
         public static Quaternion CalculateRotation(this LeapTransform trs)
         {
-            Vector3 up = trs.yBasis.ToVector3();
-            Vector3 forward = -trs.zBasis.ToVector3();
+            Vector3 up = trs.yBasis;
+            Vector3 forward = -trs.zBasis;
             return Quaternion.LookRotation(forward, up);
         }
 
@@ -156,8 +156,8 @@ namespace Leap.Unity
          */
         public static LeapTransform GetLeapMatrix(this Transform t)
         {
-            Vector scale = new Vector(t.lossyScale.x * MM_TO_M, t.lossyScale.y * MM_TO_M, t.lossyScale.z * MM_TO_M);
-            LeapTransform transform = new LeapTransform(t.position.ToVector(), t.rotation.ToLeapQuaternion(), scale);
+            Vector3 scale = new Vector3(t.lossyScale.x * MM_TO_M, t.lossyScale.y * MM_TO_M, t.lossyScale.z * MM_TO_M);
+            LeapTransform transform = new LeapTransform(t.position, t.rotation, scale);
             transform.MirrorZ(); // Unity is left handed.
             return transform;
         }

@@ -7,7 +7,6 @@
  ******************************************************************************/
 
 using Leap.Unity.Encoding;
-using Leap.Unity.Internal;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -256,7 +255,7 @@ namespace Leap.Unity
             }
 
             // joints
-            mergedJointPositions.Fill(Vector3.zero);
+            Utils.Fill(mergedJointPositions, Vector3.zero);
             List<VectorHand> vectorHands = new List<VectorHand>();
             foreach (Hand hand in hands)
             {
@@ -652,7 +651,7 @@ namespace Leap.Unity
 
             public void ClearAllPositions()
             {
-                positions.Fill(Vector3.zero);
+                Utils.Fill(positions, Vector3.zero);
             }
 
             public void AddPosition(Vector3 position, float time)
@@ -796,7 +795,7 @@ namespace Leap.Unity
                 }
                 else
                 {
-                    averageConfidences.Fill(0);
+                    Utils.Fill(averageConfidences, 0);
                 }
 
                 for (int i = 0; i < averageConfidences.Length; i++)
