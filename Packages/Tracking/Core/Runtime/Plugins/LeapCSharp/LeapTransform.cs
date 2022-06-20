@@ -5,6 +5,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
+using UnityEngine;
 
 namespace Leap
 {
@@ -22,8 +23,8 @@ namespace Leap
         /// Constructs a new transform from the specified translation and rotation.
         /// @since 3.1.2
         /// </summary>
-        public LeapTransform(Vector translation, LeapQuaternion rotation) :
-          this(translation, rotation, Vector.Ones)
+        public LeapTransform(Vector3 translation, Quaternion rotation) :
+          this(translation, rotation, Vector3.one)
         {
         }
 
@@ -31,7 +32,7 @@ namespace Leap
         /// Constructs a new transform from the specified translation, rotation and scale.
         /// @since 3.1.2
         /// </summary>
-        public LeapTransform(Vector translation, LeapQuaternion rotation, Vector scale) :
+        public LeapTransform(Vector3 translation, Quaternion rotation, Vector3 scale) :
           this()
         {
             _scale = scale;
@@ -41,10 +42,23 @@ namespace Leap
         }
 
         /// <summary>
+        /// Constructs a new Leap transform from a Unity Transform
+        /// </summary>
+        /// <param name="t">Unity Transform</param>
+        public LeapTransform(Transform t) : this()
+        {
+            float MM_TO_M = 1e-3f;
+            _scale = new Vector3(t.lossyScale.x * MM_TO_M, t.lossyScale.y * MM_TO_M, t.lossyScale.z * MM_TO_M);
+            this.translation = t.position;
+            this.rotation = t.rotation;
+            this.MirrorZ(); // Unity is left handed.
+        }
+
+        /// <summary>
         /// Transforms the specified position vector, applying translation, rotation and scale.
         /// @since 3.1.2
         /// </summary>
-        public Vector TransformPoint(Vector point)
+        public Vector3 TransformPoint(Vector3 point)
         {
             return _xBasisScaled * point.x + _yBasisScaled * point.y + _zBasisScaled * point.z + translation;
         }
@@ -53,7 +67,7 @@ namespace Leap
         /// Transforms the specified direction vector, applying rotation only.
         /// @since 3.1.2
         /// </summary>
-        public Vector TransformDirection(Vector direction)
+        public Vector3 TransformDirection(Vector3 direction)
         {
             return _xBasis * direction.x + _yBasis * direction.y + _zBasis * direction.z;
         }
@@ -62,7 +76,7 @@ namespace Leap
         /// Transforms the specified velocity vector, applying rotation and scale.
         /// @since 3.1.2
         /// </summary>
-        public Vector TransformVelocity(Vector velocity)
+        public Vector3 TransformVelocity(Vector3 velocity)
         {
             return _xBasisScaled * velocity.x + _yBasisScaled * velocity.y + _zBasisScaled * velocity.z;
         }
@@ -78,7 +92,7 @@ namespace Leap
         ///
         /// @since 3.1.2
         /// </summary>
-        public LeapQuaternion TransformQuaternion(LeapQuaternion rhs)
+        public Quaternion TransformQuaternion(Quaternion rhs)
         {
             if (_quaternionDirty)
                 throw new InvalidOperationException("Calling TransformQuaternion after Basis vectors have been modified.");
@@ -91,7 +105,7 @@ namespace Leap
                 rhs.z *= _flipAxes.z;
             }
 
-            LeapQuaternion t = _quaternion.Multiply(rhs);
+            Quaternion t = _quaternion * rhs;
             return t;
         }
 
@@ -132,7 +146,7 @@ namespace Leap
         ///
         /// @since 3.1.2
         /// </summary>
-        public Vector xBasis
+        public Vector3 xBasis
         {
             get { return _xBasis; }
             set
@@ -152,7 +166,7 @@ namespace Leap
         ///
         /// @since 3.1.2
         /// </summary>
-        public Vector yBasis
+        public Vector3 yBasis
         {
             get { return _yBasis; }
             set
@@ -172,7 +186,7 @@ namespace Leap
         ///
         /// @since 3.1.2
         /// </summary>
-        public Vector zBasis
+        public Vector3 zBasis
         {
             get { return _zBasis; }
             set
@@ -187,7 +201,7 @@ namespace Leap
         /// The translation component of the transform.
         /// @since 3.1.2
         /// </summary>
-        public Vector translation
+        public Vector3 translation
         {
             get { return _translation; }
             set
@@ -201,7 +215,7 @@ namespace Leap
         /// Scale is kept separate from translation.
         /// @since 3.1.2
         /// </summary>
-        public Vector scale
+        public Vector3 scale
         {
             get { return _scale; }
             set
@@ -222,7 +236,7 @@ namespace Leap
         ///
         /// @since 3.1.2
         /// </summary>
-        public LeapQuaternion rotation
+        public Quaternion rotation
         {
             get
             {
@@ -234,16 +248,16 @@ namespace Leap
             {
                 _quaternion = value;
 
-                float d = value.MagnitudeSquared;
+                float d = value.x * value.x + value.y * value.y + value.z * value.z + value.w * value.w;
                 float s = 2.0f / d;
                 float xs = value.x * s, ys = value.y * s, zs = value.z * s;
                 float wx = value.w * xs, wy = value.w * ys, wz = value.w * zs;
                 float xx = value.x * xs, xy = value.x * ys, xz = value.x * zs;
                 float yy = value.y * ys, yz = value.y * zs, zz = value.z * zs;
 
-                _xBasis = new Vector(1.0f - (yy + zz), xy + wz, xz - wy);
-                _yBasis = new Vector(xy - wz, 1.0f - (xx + zz), yz + wx);
-                _zBasis = new Vector(xz + wy, yz - wx, 1.0f - (xx + yy));
+                _xBasis = new Vector3(1.0f - (yy + zz), xy + wz, xz - wy);
+                _yBasis = new Vector3(xy - wz, 1.0f - (xx + zz), yz + wx);
+                _zBasis = new Vector3(xz + wy, yz - wx, 1.0f - (xx + yy));
 
                 _xBasisScaled = _xBasis * scale.x;
                 _yBasisScaled = _yBasis * scale.y;
@@ -251,7 +265,7 @@ namespace Leap
 
                 _quaternionDirty = false;
                 _flip = false;
-                _flipAxes = new Vector(1.0f, 1.0f, 1.0f);
+                _flipAxes = new Vector3(1.0f, 1.0f, 1.0f);
             }
         }
 
@@ -259,19 +273,19 @@ namespace Leap
         /// The identity transform.
         /// @since 3.1.2
         /// </summary>
-        public static readonly LeapTransform Identity = new LeapTransform(Vector.Zero, LeapQuaternion.Identity, Vector.Ones);
+        public static readonly LeapTransform Identity = new LeapTransform(Vector3.zero, Quaternion.identity, Vector3.one);
 
-        private Vector _translation;
-        private Vector _scale;
-        private LeapQuaternion _quaternion;
+        private Vector3 _translation;
+        private Vector3 _scale;
+        private Quaternion _quaternion;
         private bool _quaternionDirty;
         private bool _flip;
-        private Vector _flipAxes;
-        private Vector _xBasis;
-        private Vector _yBasis;
-        private Vector _zBasis;
-        private Vector _xBasisScaled;
-        private Vector _yBasisScaled;
-        private Vector _zBasisScaled;
+        private Vector3 _flipAxes;
+        private Vector3 _xBasis;
+        private Vector3 _yBasis;
+        private Vector3 _zBasis;
+        private Vector3 _xBasisScaled;
+        private Vector3 _yBasisScaled;
+        private Vector3 _zBasisScaled;
     }
 }

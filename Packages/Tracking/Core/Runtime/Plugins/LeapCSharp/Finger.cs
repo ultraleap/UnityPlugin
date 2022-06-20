@@ -6,6 +6,8 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
+using UnityEngine;
+
 namespace Leap
 {
     using System;
@@ -50,8 +52,8 @@ namespace Leap
                      int handId,
                      int fingerId,
                      float timeVisible,
-                     Vector tipPosition,
-                     Vector direction,
+                     Vector3 tipPosition,
+                     Vector3 direction,
                      float width,
                      float length,
                      bool isExtended,
@@ -125,14 +127,14 @@ namespace Leap
         /// The tip position of this Finger.
         /// @since 1.0
         /// </summary>
-        public Vector TipPosition;
+        public Vector3 TipPosition;
 
         /// <summary>
         /// The direction in which this finger or tool is pointing. The direction is expressed 
         /// as a unit vector pointing in the same direction as the tip.
         /// @since 1.0
         /// </summary>
-        public Vector Direction;
+        public Vector3 Direction;
 
         /// <summary>
         /// The estimated width of the finger.

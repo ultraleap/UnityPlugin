@@ -147,8 +147,8 @@ namespace Leap.Unity
                     hand = HandModel.GetLeapHand();
                     if (hand != null)
                     {
-                        normal = hand.PalmNormal.ToVector3();
-                        float angleTo = Vector3.Angle(normal, selectedDirection(hand.PalmPosition.ToVector3()));
+                        normal = hand.PalmNormal;
+                        float angleTo = Vector3.Angle(normal, selectedDirection(hand.PalmPosition));
                         if (angleTo <= OnAngle)
                         {
                             Activate();
@@ -200,10 +200,10 @@ namespace Leap.Unity
                     centerColor = OffColor;
                 }
                 Hand hand = HandModel.GetLeapHand();
-                Utils.DrawCone(hand.PalmPosition.ToVector3(), hand.PalmNormal.ToVector3(), OnAngle, hand.PalmWidth, centerColor, 8);
-                Utils.DrawCone(hand.PalmPosition.ToVector3(), hand.PalmNormal.ToVector3(), OffAngle, hand.PalmWidth, LimitColor, 8);
+                Utils.DrawCone(hand.PalmPosition, hand.PalmNormal, OnAngle, hand.PalmWidth, centerColor, 8);
+                Utils.DrawCone(hand.PalmPosition, hand.PalmNormal, OffAngle, hand.PalmWidth, LimitColor, 8);
                 Gizmos.color = DirectionColor;
-                Gizmos.DrawRay(hand.PalmPosition.ToVector3(), selectedDirection(hand.PalmPosition.ToVector3()));
+                Gizmos.DrawRay(hand.PalmPosition, selectedDirection(hand.PalmPosition));
             }
         }
 #endif

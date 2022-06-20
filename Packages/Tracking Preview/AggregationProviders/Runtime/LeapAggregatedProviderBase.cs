@@ -350,7 +350,7 @@ namespace Leap.Unity
 
         protected virtual void transformFrame(Frame source, Frame dest)
         {
-            dest.CopyFrom(source).Transform(transform.GetLeapMatrix());
+            dest.CopyFrom(source).Transform(new LeapTransform(transform));
         }
 
         #endregion

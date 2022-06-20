@@ -60,8 +60,8 @@ namespace Leap.Unity
 
         private float GetPinchDistance(Hand hand)
         {
-            var indexTipPosition = hand.GetIndex().TipPosition.ToVector3();
-            var thumbTipPosition = hand.GetThumb().TipPosition.ToVector3();
+            var indexTipPosition = hand.GetIndex().TipPosition;
+            var thumbTipPosition = hand.GetThumb().TipPosition;
             return Vector3.Distance(indexTipPosition, thumbTipPosition);
         }
 
@@ -84,8 +84,8 @@ namespace Leap.Unity
             }
 
             _distance = GetPinchDistance(hand);
-            _rotation = hand.Basis.CalculateRotation();
-            _position = ((hand.Fingers[0].TipPosition + hand.Fingers[1].TipPosition) * .5f).ToVector3();
+            _rotation = hand.Basis.rotation;
+            _position = ((hand.Fingers[0].TipPosition + hand.Fingers[1].TipPosition) * .5f);
 
             if (IsActive)
             {
@@ -140,8 +140,8 @@ namespace Leap.Unity
                         Finger thumb = hand.Fingers[0];
                         Finger index = hand.Fingers[1];
                         centerColor = Color.red;
-                        centerPosition = ((thumb.Bone(Bone.BoneType.TYPE_DISTAL).NextJoint + index.Bone(Bone.BoneType.TYPE_DISTAL).NextJoint) / 2).ToVector3();
-                        circleRotation = hand.Basis.CalculateRotation();
+                        centerPosition = ((thumb.Bone(Bone.BoneType.TYPE_DISTAL).NextJoint + index.Bone(Bone.BoneType.TYPE_DISTAL).NextJoint) / 2);
+                        circleRotation = hand.Basis.rotation;
                     }
                 }
                 Vector3 axis;

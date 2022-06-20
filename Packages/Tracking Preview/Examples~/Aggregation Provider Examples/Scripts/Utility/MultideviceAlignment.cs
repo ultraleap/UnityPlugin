@@ -53,8 +53,8 @@ namespace Leap.Unity
                         {
                             for (int k = 0; k < 4; k++)
                             {
-                                sourceHandPoints.Add(sourceHand.Fingers[j].bones[k].Center.ToVector3());
-                                targetHandPoints.Add(targetHand.Fingers[j].bones[k].Center.ToVector3());
+                                sourceHandPoints.Add(sourceHand.Fingers[j].bones[k].Center);
+                                targetHandPoints.Add(targetHand.Fingers[j].bones[k].Center);
                             }
                         }
 
@@ -79,7 +79,12 @@ namespace Leap.Unity
                         Matrix4x4 deviceToOriginDeviceMatrix =
                           solver.SolveKabsch(targetHandPoints, sourceHandPoints, 200);
 
-                        targetDevice.transform.Transform(deviceToOriginDeviceMatrix);
+                        // transform the targetDevice.transform by the deviceToOriginDeviceMatrix
+                        Matrix4x4 newTransform = deviceToOriginDeviceMatrix * targetDevice.transform.localToWorldMatrix;
+                        targetDevice.transform.position = newTransform.GetVector3();
+                        targetDevice.transform.rotation = newTransform.GetQuaternion();
+                        targetDevice.transform.localScale = Vector3.Scale(targetDevice.transform.localScale, deviceToOriginDeviceMatrix.lossyScale);
+
 
                         targetHandPoints.Clear();
                         sourceHandPoints.Clear();
