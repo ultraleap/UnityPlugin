@@ -6,6 +6,8 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
+using UnityEngine;
+
 namespace Leap
 {
     using System;
@@ -151,7 +153,7 @@ namespace Leap
 
             if (bone.Length < float.Epsilon)
             {
-                bone.Direction = Vector.Zero;
+                bone.Direction = Vector3.zero;
             }
             else
             {

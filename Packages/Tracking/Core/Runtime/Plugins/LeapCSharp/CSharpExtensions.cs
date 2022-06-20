@@ -20,7 +20,7 @@ namespace Leap
         /// Compares whether two floating point numbers are within an epsilon value of each other.
         /// @since 3.0
         /// </summary>
-        public static bool NearlyEquals(this float a, float b, float epsilon = Constants.EPSILON)
+        public static bool NearlyEquals(this float a, float b, float epsilon = 1.192092896e-07f)
         {
             float absA = Math.Abs(a);
             float absB = Math.Abs(b);

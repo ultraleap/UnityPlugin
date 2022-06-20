@@ -39,7 +39,7 @@ namespace Leap.Unity.Controllers
                 case InputMethodType.LeapHand:
                     if (_provider.Get(hand) != null)
                     {
-                        angle = Vector3.Angle(_provider.Get(hand).Direction.ToVector3(), Vector3.down);
+                        angle = Vector3.Angle(_provider.Get(hand).Direction, Vector3.down);
                         return true;
                     }
                     break;

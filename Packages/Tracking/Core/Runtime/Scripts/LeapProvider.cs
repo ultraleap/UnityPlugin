@@ -81,7 +81,7 @@ namespace Leap.Unity
         public static Leap.Hand MakeTestHand(this LeapProvider provider, bool isLeft)
         {
             return TestHandFactory.MakeTestHand(isLeft, provider.editTimePose)
-                                  .Transform(UnityMatrixExtension.GetLeapMatrix(provider.transform));
+                                  .Transform(new LeapTransform(provider.transform));
         }
 
     }

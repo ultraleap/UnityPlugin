@@ -89,7 +89,7 @@ namespace Leap.Unity
         {
             if (finger_ != null)
             {
-                Vector3 local_tip = finger_.Bone((Bone.BoneType.TYPE_DISTAL)).NextJoint.ToVector3();
+                Vector3 local_tip = finger_.Bone((Bone.BoneType.TYPE_DISTAL)).NextJoint;
                 return local_tip;
             }
             if (bones[NUM_BONES - 1] && joints[NUM_JOINTS - 2])
@@ -108,7 +108,7 @@ namespace Leap.Unity
             }
             if (finger_ != null)
             {
-                Vector3 local_position = finger_.Bone((Bone.BoneType)(joint)).PrevJoint.ToVector3();
+                Vector3 local_position = finger_.Bone((Bone.BoneType)(joint)).PrevJoint;
                 return local_position;
             }
             if (joints[joint])
@@ -131,7 +131,7 @@ namespace Leap.Unity
             if (finger_ != null)
             {
                 Bone bone = finger_.Bone((Bone.BoneType)(bone_type));
-                return bone.Center.ToVector3();
+                return bone.Center;
             }
             if (bones[bone_type])
             {
@@ -160,7 +160,7 @@ namespace Leap.Unity
         {
             if (finger_ != null)
             {
-                Quaternion local_rotation = finger_.Bone((Bone.BoneType)(bone_type)).Rotation.ToQuaternion();
+                Quaternion local_rotation = finger_.Bone((Bone.BoneType)(bone_type)).Rotation;
                 return local_rotation;
             }
             if (bones[bone_type])
@@ -194,8 +194,8 @@ namespace Leap.Unity
             Quaternion jointRotation = Quaternion.identity;
             if (finger_ != null)
             {
-                jointRotation = Quaternion.Inverse(finger_.Bone((Bone.BoneType)(joint_type)).Rotation.ToQuaternion())
-                  * finger_.Bone((Bone.BoneType)(joint_type + 1)).Rotation.ToQuaternion();
+                jointRotation = Quaternion.Inverse(finger_.Bone((Bone.BoneType)(joint_type)).Rotation)
+                  * finger_.Bone((Bone.BoneType)(joint_type + 1)).Rotation;
             }
             else if (bones[joint_type] && bones[joint_type + 1])
             {
@@ -225,8 +225,8 @@ namespace Leap.Unity
             Quaternion jointRotation = Quaternion.identity;
             if (finger_ != null)
             {
-                jointRotation = Quaternion.Inverse(finger_.Bone((Bone.BoneType)(0)).Rotation.ToQuaternion())
-                  * finger_.Bone((Bone.BoneType)(1)).Rotation.ToQuaternion();
+                jointRotation = Quaternion.Inverse(finger_.Bone((Bone.BoneType)(0)).Rotation)
+                  * finger_.Bone((Bone.BoneType)(1)).Rotation;
             }
             else if (bones[0] && bones[1])
             {

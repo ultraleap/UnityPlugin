@@ -174,7 +174,7 @@ namespace Leap
         /// Note, this function was formerly named Rectify().
         /// @since 2.1.0
         /// </summary>
-        public Vector PixelToRectilinear(CameraType camera, Vector pixel)
+        public UnityEngine.Vector3 PixelToRectilinear(CameraType camera, UnityEngine.Vector3 pixel)
         {
             return Connection.GetConnection().PixelToRectilinear(camera, pixel);
         }
@@ -204,7 +204,7 @@ namespace Leap
         /// Note, this function was formerly named Warp().
         /// @since 2.1.0
         /// </summary>
-        public Vector RectilinearToPixel(CameraType camera, Vector ray)
+        public UnityEngine.Vector3 RectilinearToPixel(CameraType camera, UnityEngine.Vector3 ray)
         {
             return Connection.GetConnection().RectilinearToPixel(camera, ray);
         }

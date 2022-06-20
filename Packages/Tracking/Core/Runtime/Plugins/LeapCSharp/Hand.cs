@@ -5,6 +5,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
+using UnityEngine;
 
 namespace Leap
 {
@@ -66,13 +67,13 @@ namespace Leap
                     float timeVisible,
                     Arm arm,
                     List<Finger> fingers,
-                    Vector palmPosition,
-                    Vector stabilizedPalmPosition,
-                    Vector palmVelocity,
-                    Vector palmNormal,
-                    LeapQuaternion palmOrientation,
-                    Vector direction,
-                    Vector wristPosition)
+                    Vector3 palmPosition,
+                    Vector3 stabilizedPalmPosition,
+                    Vector3 palmVelocity,
+                    Vector3 palmNormal,
+                    Quaternion palmOrientation,
+                    Vector3 direction,
+                    Vector3 wristPosition)
         {
             FrameId = frameID;
             Id = id;
@@ -171,13 +172,13 @@ namespace Leap
         /// The center position of the palm.
         /// @since 1.0
         /// </summary>
-        public Vector PalmPosition;
+        public Vector3 PalmPosition;
 
         /// <summary>
         /// The rate of change of the palm position.
         /// @since 1.0
         /// </summary>
-        public Vector PalmVelocity;
+        public Vector3 PalmVelocity;
 
         /// <summary>
         /// The normal vector to the palm. If your hand is flat, this vector will
@@ -190,7 +191,7 @@ namespace Leap
         /// respect to the horizontal plane.
         /// @since 1.0
         /// </summary>
-        public Vector PalmNormal;
+        public Vector3 PalmNormal;
 
         /// <summary>
         /// The direction from the palm position toward the fingers.
@@ -202,7 +203,7 @@ namespace Leap
         /// respect to the horizontal plane.
         /// @since 1.0
         /// </summary>
-        public Vector Direction;
+        public Vector3 Direction;
 
         /// <summary>
         /// The transform of the hand.
@@ -217,7 +218,7 @@ namespace Leap
         /// 
         /// @since 3.1
         /// </summary>
-        public LeapQuaternion Rotation;
+        public Quaternion Rotation;
 
         /// <summary>
         /// The strength of a grab hand pose.
@@ -276,13 +277,13 @@ namespace Leap
         /// primarily on the speed of movement.
         /// @since 1.0
         /// </summary>
-        public Vector StabilizedPalmPosition;
+        public Vector3 StabilizedPalmPosition;
 
         /// <summary>
         /// The position of the wrist of this hand.
         /// @since 2.0.3
         /// </summary>
-        public Vector WristPosition;
+        public Vector3 WristPosition;
 
         /// <summary>
         /// The duration of time this Hand has been visible to the Leap Motion Controller.
