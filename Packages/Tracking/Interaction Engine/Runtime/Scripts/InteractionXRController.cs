@@ -7,12 +7,11 @@
  ******************************************************************************/
 
 using Leap.Unity.Attributes;
-
-using System;
-using System.Linq;
-using System.Collections.Generic;
-using UnityEngine;
 using Leap.Unity.Space;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.XR;
 

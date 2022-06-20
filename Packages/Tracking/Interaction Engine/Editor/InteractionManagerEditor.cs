@@ -8,9 +8,9 @@
 
 using Leap.Unity.RuntimeGizmos;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
-using System.Linq;
 
 namespace Leap.Unity.Interaction
 {

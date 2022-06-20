@@ -8,8 +8,8 @@
 
 using Leap.Interaction.Internal.InteractionEngineUtility;
 using Leap.Unity.Attributes;
-using Leap.Unity.Space;
 using Leap.Unity.Interaction.Internal;
+using Leap.Unity.Space;
 using System;
 using System.Collections.Generic;
 using System.Linq;
