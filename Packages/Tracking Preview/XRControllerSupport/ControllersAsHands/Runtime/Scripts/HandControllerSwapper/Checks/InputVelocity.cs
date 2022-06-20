@@ -48,7 +48,7 @@ namespace Leap.Unity.Controllers
                 case InputMethodType.LeapHand:
                     if (_provider.Get(hand) != null)
                     {
-                        vel = _provider.Get(hand).PalmPosition.ToVector3();
+                        vel = _provider.Get(hand).PalmPosition;
                         return true;
                     }
                     break;

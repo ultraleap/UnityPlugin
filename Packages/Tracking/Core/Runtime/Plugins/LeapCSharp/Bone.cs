@@ -5,6 +5,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
+using UnityEngine;
 
 namespace Leap
 {
@@ -41,14 +42,14 @@ namespace Leap
         /// Constructs a new Bone object.
         /// @since 3.0
         /// </summary>
-        public Bone(Vector prevJoint,
-                    Vector nextJoint,
-                    Vector center,
-                    Vector direction,
+        public Bone(Vector3 prevJoint,
+                    Vector3 nextJoint,
+                    Vector3 center,
+                    Vector3 direction,
                     float length,
                     float width,
                     Bone.BoneType type,
-                    LeapQuaternion rotation)
+                    Quaternion rotation)
         {
             PrevJoint = prevJoint;
             NextJoint = nextJoint;
@@ -86,26 +87,26 @@ namespace Leap
         /// In anatomical terms, this is the proximal end of the bone.
         /// @since 2.0
         /// </summary>
-        public Vector PrevJoint;
+        public Vector3 PrevJoint;
 
         /// <summary>
         /// The end of the bone, closest to the finger tip.
         /// In anatomical terms, this is the distal end of the bone.
         /// @since 2.0
         /// </summary>
-        public Vector NextJoint;
+        public Vector3 NextJoint;
 
         /// <summary>
         /// The midpoint of the bone. 
         /// @since 2.0 
         /// </summary>
-        public Vector Center;
+        public Vector3 Center;
 
         /// <summary>
         /// The normalized direction of the bone from base to tip.
         /// @since 2.0
         /// </summary>
-        public Vector Direction;
+        public Vector3 Direction;
 
         /// <summary>
         /// The estimated length of the bone.
@@ -129,7 +130,7 @@ namespace Leap
         /// The orientation of this Bone as a Quaternion.
         /// @since 2.0
         /// </summary>
-        public LeapQuaternion Rotation;
+        public Quaternion Rotation;
 
         /// <summary>
         /// The orthonormal basis vectors for this Bone as a Matrix.

@@ -16,7 +16,7 @@ using UnityEditor;
 
 namespace Leap.Unity
 {
-
+    [System.Obsolete("This code will be moved to a legacy package in the next major version of the plugin. If you believe that it needs to be kept in tracking, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
     public abstract class MultiTypedList
     {
         [Serializable]
@@ -36,6 +36,7 @@ namespace Leap.Unity
     /// possibly added.  You must also pre-declare a non-generic version
     /// of the chosen class, much in the same style as UnityEvent.
     /// </summary>
+    [System.Obsolete("This code will be moved to a legacy package in the next major version of the plugin. If you believe that it needs to be kept in tracking, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
     public abstract class MultiTypedList<BaseType> : MultiTypedList, IList<BaseType>
     {
         public abstract int Count { get; }
@@ -175,6 +176,7 @@ namespace Leap.Unity
         }
     }
 
+    [System.Obsolete("This code will be moved to a legacy package in the next major version of the plugin. If you believe that it needs to be kept in tracking, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
     public class MultiTypedListUtil
     {
 
@@ -217,6 +219,7 @@ namespace Leap.Unity
 #endif
     }
 
+    [System.Obsolete("This code will be moved to a legacy package in the next major version of the plugin. If you believe that it needs to be kept in tracking, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
     [Serializable]
     public class MultiTypedList<BaseType, A, B> : MultiTypedList<BaseType>
       where A : BaseType
@@ -337,6 +340,7 @@ namespace Leap.Unity
         }
     }
 
+    [System.Obsolete("This code will be moved to a legacy package in the next major version of the plugin. If you believe that it needs to be kept in tracking, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
     public class MultiTypedList<BaseType, A, B, C> : MultiTypedList<BaseType, A, B>
       where A : BaseType
       where B : BaseType
@@ -363,6 +367,7 @@ namespace Leap.Unity
         }
     }
 
+    [System.Obsolete("This code will be moved to a legacy package in the next major version of the plugin. If you believe that it needs to be kept in tracking, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
     public class MultiTypedList<BaseType, A, B, C, D> : MultiTypedList<BaseType, A, B, C>
       where A : BaseType
       where B : BaseType
@@ -390,6 +395,7 @@ namespace Leap.Unity
         }
     }
 
+    [System.Obsolete("This code will be moved to a legacy package in the next major version of the plugin. If you believe that it needs to be kept in tracking, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
     public class MultiTypedList<BaseType, A, B, C, D, E> : MultiTypedList<BaseType, A, B, C, D>
       where A : BaseType
       where B : BaseType
@@ -418,6 +424,7 @@ namespace Leap.Unity
         }
     }
 
+    [System.Obsolete("This code will be moved to a legacy package in the next major version of the plugin. If you believe that it needs to be kept in tracking, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
     public class MultiTypedList<BaseType, A, B, C, D, E, F> : MultiTypedList<BaseType, A, B, C, D, E>
       where A : BaseType
       where B : BaseType
@@ -447,6 +454,7 @@ namespace Leap.Unity
         }
     }
 
+    [System.Obsolete("This code will be moved to a legacy package in the next major version of the plugin. If you believe that it needs to be kept in tracking, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
     public class MultiTypedList<BaseType, A, B, C, D, E, F, G> : MultiTypedList<BaseType, A, B, C, D, E, F>
       where A : BaseType
       where B : BaseType
@@ -477,6 +485,7 @@ namespace Leap.Unity
         }
     }
 
+    [System.Obsolete("This code will be moved to a legacy package in the next major version of the plugin. If you believe that it needs to be kept in tracking, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
     public class MultiTypedList<BaseType, A, B, C, D, E, F, G, H> : MultiTypedList<BaseType, A, B, C, D, E, F, G>
       where A : BaseType
       where B : BaseType

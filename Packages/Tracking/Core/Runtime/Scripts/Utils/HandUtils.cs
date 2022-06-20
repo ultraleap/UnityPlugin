@@ -6,10 +6,9 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Leap.Unity.Query;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.SceneManagement;
 
 namespace Leap.Unity
@@ -125,7 +124,7 @@ namespace Leap.Unity
             {
                 if (Provider == null) return null;
                 if (Provider.CurrentFrame == null) return null;
-                return Provider.CurrentFrame.Hands.Query().FirstOrDefault(hand => hand.IsLeft);
+                return Provider.CurrentFrame.Hands.FirstOrDefault(hand => hand.IsLeft);
             }
         }
 
@@ -139,7 +138,7 @@ namespace Leap.Unity
             {
                 if (Provider == null) return null;
                 if (Provider.CurrentFrame == null) return null;
-                else return Provider.CurrentFrame.Hands.Query().FirstOrDefault(hand => hand.IsRight);
+                else return Provider.CurrentFrame.Hands.FirstOrDefault(hand => hand.IsRight);
             }
         }
 
@@ -153,7 +152,7 @@ namespace Leap.Unity
             {
                 if (Provider == null) return null;
                 if (Provider.CurrentFixedFrame == null) return null;
-                return Provider.CurrentFixedFrame.Hands.Query().FirstOrDefault(hand => hand.IsLeft);
+                return Provider.CurrentFixedFrame.Hands.FirstOrDefault(hand => hand.IsLeft);
             }
         }
 
@@ -167,7 +166,7 @@ namespace Leap.Unity
             {
                 if (Provider == null) return null;
                 if (Provider.CurrentFixedFrame == null) return null;
-                else return Provider.CurrentFixedFrame.Hands.Query().FirstOrDefault(hand => hand.IsRight);
+                else return Provider.CurrentFixedFrame.Hands.FirstOrDefault(hand => hand.IsRight);
             }
         }
 
@@ -221,7 +220,7 @@ namespace Leap.Unity
         /// </summary>
         public static Pose GetPalmPose(this Hand hand)
         {
-            return new Pose(hand.PalmPosition.ToVector3(), hand.Rotation.ToQuaternion());
+            return new Pose(hand.PalmPosition, hand.Rotation);
         }
 
         /// <summary>
@@ -240,7 +239,7 @@ namespace Leap.Unity
         /// </summary>
         public static Vector3 PalmarAxis(this Hand hand)
         {
-            return -hand.Basis.yBasis.ToVector3();
+            return -hand.Basis.yBasis;
         }
 
         /// <summary>
@@ -253,11 +252,11 @@ namespace Leap.Unity
         {
             if (hand.IsRight)
             {
-                return -hand.Basis.xBasis.ToVector3();
+                return -hand.Basis.xBasis;
             }
             else
             {
-                return hand.Basis.xBasis.ToVector3();
+                return hand.Basis.xBasis;
             }
         }
 
@@ -269,7 +268,7 @@ namespace Leap.Unity
         /// </summary>
         public static Vector3 DistalAxis(this Hand hand)
         {
-            return hand.Basis.zBasis.ToVector3();
+            return hand.Basis.zBasis;
         }
 
         /// <summary>
@@ -286,9 +285,9 @@ namespace Leap.Unity
         /// </summary>
         public static Vector3 GetPinchPosition(this Hand hand)
         {
-            Vector indexPosition = hand.Fingers[(int)Finger.FingerType.TYPE_INDEX].TipPosition;
-            Vector thumbPosition = hand.Fingers[(int)Finger.FingerType.TYPE_THUMB].TipPosition;
-            return (2 * thumbPosition + indexPosition).ToVector3() * 0.333333F;
+            Vector3 indexPosition = hand.Fingers[(int)Finger.FingerType.TYPE_INDEX].TipPosition;
+            Vector3 thumbPosition = hand.Fingers[(int)Finger.FingerType.TYPE_THUMB].TipPosition;
+            return (2 * thumbPosition + indexPosition) * 0.333333F;
         }
 
         /// <summary>
@@ -299,13 +298,13 @@ namespace Leap.Unity
         /// </summary>
         public static Vector3 GetPredictedPinchPosition(this Hand hand)
         {
-            Vector3 indexTip = hand.GetIndex().TipPosition.ToVector3();
-            Vector3 thumbTip = hand.GetThumb().TipPosition.ToVector3();
+            Vector3 indexTip = hand.GetIndex().TipPosition;
+            Vector3 thumbTip = hand.GetThumb().TipPosition;
 
             // The predicted pinch point is a rigid point in hand-space linearly offset by the
             // index finger knuckle position, scaled by the index finger's length, and lightly
             // influenced by the actual thumb and index tip positions.
-            Vector3 indexKnuckle = hand.Fingers[1].bones[1].PrevJoint.ToVector3();
+            Vector3 indexKnuckle = hand.Fingers[1].bones[1].PrevJoint;
             float indexLength = hand.Fingers[1].Length;
             Vector3 radialAxis = hand.RadialAxis();
             float thumbInfluence = Vector3.Dot((thumbTip - indexKnuckle).normalized, radialAxis).Map(0F, 1F, 0.5F, 0F);
@@ -337,11 +336,11 @@ namespace Leap.Unity
                 return 0;
             }
 
-            return (Vector3.Dot(hand.Fingers[1].Direction.ToVector3(), -hand.DistalAxis())
-                    + Vector3.Dot(hand.Fingers[2].Direction.ToVector3(), -hand.DistalAxis())
-                    + Vector3.Dot(hand.Fingers[3].Direction.ToVector3(), -hand.DistalAxis())
-                    + Vector3.Dot(hand.Fingers[4].Direction.ToVector3(), -hand.DistalAxis())
-                    + Vector3.Dot(hand.Fingers[0].Direction.ToVector3(), -hand.RadialAxis())
+            return (Vector3.Dot(hand.Fingers[1].Direction, -hand.DistalAxis())
+                    + Vector3.Dot(hand.Fingers[2].Direction, -hand.DistalAxis())
+                    + Vector3.Dot(hand.Fingers[3].Direction, -hand.DistalAxis())
+                    + Vector3.Dot(hand.Fingers[4].Direction, -hand.DistalAxis())
+                    + Vector3.Dot(hand.Fingers[0].Direction, -hand.RadialAxis())
                     ).Map(-5, 5, 0, 1);
         }
 
@@ -357,10 +356,10 @@ namespace Leap.Unity
 
             if (finger == 0)
             {
-                return Vector3.Dot(hand.Fingers[finger].Direction.ToVector3(), -hand.RadialAxis()).Map(-1, 1, 0, 1);
+                return Vector3.Dot(hand.Fingers[finger].Direction, -hand.RadialAxis()).Map(-1, 1, 0, 1);
             }
 
-            return Vector3.Dot(hand.Fingers[finger].Direction.ToVector3(), -hand.DistalAxis()).Map(-1, 1, 0, 1);
+            return Vector3.Dot(hand.Fingers[finger].Direction, -hand.DistalAxis()).Map(-1, 1, 0, 1);
         }
 
         /// <summary>
@@ -376,7 +375,7 @@ namespace Leap.Unity
             // Compare against this
             //Vector3 ProjectionOrigin    = headTransform.position + shoulderYaw * 
             //                                new Vector3(0.15f * (hand.IsLeft ? -1f : 1f), -0.13f, 0.05f);
-            Vector3 ProjectionDirection = hand.Fingers[1].bones[0].NextJoint.ToVector3() - ProjectionOrigin;
+            Vector3 ProjectionDirection = hand.Fingers[1].bones[0].NextJoint - ProjectionOrigin;
             return new Ray(ProjectionOrigin, ProjectionDirection);
         }
 
@@ -385,7 +384,7 @@ namespace Leap.Unity
         /// </summary>
         public static void Transform(this Bone bone, Vector3 position, Quaternion rotation)
         {
-            bone.Transform(new LeapTransform(position.ToVector(), rotation.ToLeapQuaternion()));
+            bone.Transform(new LeapTransform(position, rotation));
         }
 
         /// <summary>
@@ -393,7 +392,7 @@ namespace Leap.Unity
         /// </summary>
         public static void Transform(this Finger finger, Vector3 position, Quaternion rotation)
         {
-            finger.Transform(new LeapTransform(position.ToVector(), rotation.ToLeapQuaternion()));
+            finger.Transform(new LeapTransform(position, rotation));
         }
 
         /// <summary>
@@ -401,7 +400,7 @@ namespace Leap.Unity
         /// </summary>
         public static void Transform(this Hand hand, Vector3 position, Quaternion rotation)
         {
-            hand.Transform(new LeapTransform(position.ToVector(), rotation.ToLeapQuaternion()));
+            hand.Transform(new LeapTransform(position, rotation));
         }
 
         /// <summary>
@@ -409,7 +408,7 @@ namespace Leap.Unity
         /// </summary>
         public static void Transform(this Frame frame, Vector3 position, Quaternion rotation)
         {
-            frame.Transform(new LeapTransform(position.ToVector(), rotation.ToLeapQuaternion()));
+            frame.Transform(new LeapTransform(position, rotation));
         }
 
         /// <summary>
@@ -417,8 +416,8 @@ namespace Leap.Unity
         /// </summary>
         public static void SetTransform(this Bone bone, Vector3 position, Quaternion rotation)
         {
-            bone.Transform(Vector3.zero, (rotation * Quaternion.Inverse(bone.Rotation.ToQuaternion())));
-            bone.Transform(position - bone.PrevJoint.ToVector3(), Quaternion.identity);
+            bone.Transform(Vector3.zero, (rotation * Quaternion.Inverse(bone.Rotation)));
+            bone.Transform(position - bone.PrevJoint, Quaternion.identity);
         }
 
         /// <summary>
@@ -426,8 +425,8 @@ namespace Leap.Unity
         /// </summary>
         public static void SetTipTransform(this Finger finger, Vector3 position, Quaternion rotation)
         {
-            finger.Transform(Vector3.zero, (rotation * Quaternion.Inverse(finger.bones[3].Rotation.ToQuaternion())));
-            finger.Transform(position - finger.bones[3].NextJoint.ToVector3(), Quaternion.identity);
+            finger.Transform(Vector3.zero, (rotation * Quaternion.Inverse(finger.bones[3].Rotation)));
+            finger.Transform(position - finger.bones[3].NextJoint, Quaternion.identity);
         }
 
         /// <summary>
@@ -435,8 +434,8 @@ namespace Leap.Unity
         /// </summary>
         public static void SetTransform(this Hand hand, Vector3 position, Quaternion rotation)
         {
-            hand.Transform(Vector3.zero, Quaternion.Slerp((rotation * Quaternion.Inverse(hand.Rotation.ToQuaternion())), Quaternion.identity, 0f));
-            hand.Transform(position - hand.PalmPosition.ToVector3(), Quaternion.identity);
+            hand.Transform(Vector3.zero, Quaternion.Slerp((rotation * Quaternion.Inverse(hand.Rotation)), Quaternion.identity, 0f));
+            hand.Transform(position - hand.PalmPosition, Quaternion.identity);
         }
 
     }
@@ -464,13 +463,13 @@ namespace Leap.Unity
                                 float timeVisible,
                                 /* Arm arm,*/
                                 List<Finger> fingers,
-                                Vector palmPosition,
-                                Vector stabilizedPalmPosition,
-                                Vector palmVelocity,
-                                Vector palmNormal,
-                                LeapQuaternion rotation,
-                                Vector direction,
-                                Vector wristPosition)
+                                Vector3 palmPosition,
+                                Vector3 stabilizedPalmPosition,
+                                Vector3 palmVelocity,
+                                Vector3 palmNormal,
+                                Quaternion rotation,
+                                Vector3 direction,
+                                Vector3 wristPosition)
         {
             toFill.FrameId = frameID;
             toFill.Id = id;
@@ -496,14 +495,14 @@ namespace Leap.Unity
         /// Fills the Bone object with the provided bone data.
         /// </summary>
         public static void Fill(this Bone toFill,
-                                Vector prevJoint,
-                                Vector nextJoint,
-                                Vector center,
-                                Vector direction,
+                                Vector3 prevJoint,
+                                Vector3 nextJoint,
+                                Vector3 center,
+                                Vector3 direction,
                                 float length,
                                 float width,
                                 Bone.BoneType type,
-                                LeapQuaternion rotation)
+                                Quaternion rotation)
         {
             toFill.PrevJoint = prevJoint;
             toFill.NextJoint = nextJoint;
@@ -524,8 +523,8 @@ namespace Leap.Unity
                                 int handId,
                                 int fingerId,
                                 float timeVisible,
-                                Vector tipPosition,
-                                Vector direction,
+                                Vector3 tipPosition,
+                                Vector3 direction,
                                 float width,
                                 float length,
                                 bool isExtended,
@@ -555,13 +554,13 @@ namespace Leap.Unity
         /// Fills the Arm object with the provided arm data.
         /// </summary>
         public static void Fill(this Arm toFill,
-                                Vector elbow,
-                                Vector wrist,
-                                Vector center,
-                                Vector direction,
+                                Vector3 elbow,
+                                Vector3 wrist,
+                                Vector3 center,
+                                Vector3 direction,
                                 float length,
                                 float width,
-                                LeapQuaternion rotation)
+                                Quaternion rotation)
         {
             toFill.PrevJoint = elbow;
             toFill.NextJoint = wrist;
@@ -602,7 +601,7 @@ namespace Leap.Unity
         public static Hand GetHand(this Frame frame, Chirality whichHand)
         {
             if (frame.Hands == null) { return null; }
-            return frame.Hands.Query().FirstOrDefault(
+            return frame.Hands.FirstOrDefault(
               h => h.IsLeft == (whichHand == Chirality.Left));
         }
 

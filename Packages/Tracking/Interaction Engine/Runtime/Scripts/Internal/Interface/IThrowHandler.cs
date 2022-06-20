@@ -6,6 +6,7 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Leap.Unity.Interaction
@@ -27,7 +28,7 @@ namespace Leap.Unity.Interaction
         /// <param name="hands">A list of the interaction controllers currently grasping
         /// the object.</param>
         void OnHold(InteractionBehaviour intObj,
-                   ReadonlyList<InteractionController> controllers);
+                   IReadOnlyList<InteractionController> controllers);
 
         /// <summary>
         /// Called when an Interaction object is released by the last interaction controller

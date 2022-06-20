@@ -7,12 +7,9 @@
  ******************************************************************************/
 
 using Leap.Unity.Attributes;
-using LeapInternal;
 using System;
 using UnityEngine;
-#if UNITY_2019_1_OR_NEWER
 using UnityEngine.Rendering;
-#endif
 
 namespace Leap.Unity
 {
@@ -350,7 +347,6 @@ namespace Leap.Unity
             }
 #endif
 
-#if UNITY_2019_1_OR_NEWER
             if (GraphicsSettings.renderPipelineAsset != null)
             {
                 RenderPipelineManager.beginCameraRendering -= onBeginRendering;
@@ -361,10 +357,6 @@ namespace Leap.Unity
                 Camera.onPreCull -= onPreCull; // No multiple-subscription.
                 Camera.onPreCull += onPreCull;
             }
-#else
-            Camera.onPreCull -= onPreCull; // No multiple-subscription.
-            Camera.onPreCull += onPreCull;
-#endif
 
 #if UNITY_ANDROID
             base.OnEnable();
@@ -375,7 +367,6 @@ namespace Leap.Unity
         {
             resetShaderTransforms();
 
-#if UNITY_2019_1_OR_NEWER
             if (GraphicsSettings.renderPipelineAsset != null)
             {
                 RenderPipelineManager.beginCameraRendering -= onBeginRendering;
@@ -384,9 +375,6 @@ namespace Leap.Unity
             {
                 Camera.onPreCull -= onPreCull; // No multiple-subscription.
             }
-#else
-            Camera.onPreCull -= onPreCull; // No multiple-subscription.
-#endif
 
 #if UNITY_ANDROID
             base.OnDisable();
@@ -426,9 +414,6 @@ namespace Leap.Unity
               : mainCamera.projectionMatrix;
             switch (SystemInfo.graphicsDeviceType)
             {
-#if !UNITY_2017_2_OR_NEWER
-                case UnityEngine.Rendering.GraphicsDeviceType.Direct3D9:
-#endif
                 case UnityEngine.Rendering.GraphicsDeviceType.Direct3D11:
                 case UnityEngine.Rendering.GraphicsDeviceType.Direct3D12:
                     for (int i = 0; i < 4; i++)
@@ -463,22 +448,13 @@ namespace Leap.Unity
                                              imageQuatWarp.eulerAngles.y,
                                             -imageQuatWarp.eulerAngles.z);
             Matrix4x4 imageMatWarp = projectionMatrix
-#if UNITY_2019_2_OR_NEWER
-                                     // The camera projection matrices seem to have vertically inverted...
-                                     * Matrix4x4.TRS(Vector3.zero, imageQuatWarp, new Vector3(1f, -1f, 1f))
-
-#else
-                                    * Matrix4x4.TRS(Vector3.zero, imageQuatWarp, Vector3.one)
-
-#endif
+                                    * Matrix4x4.TRS(Vector3.zero, imageQuatWarp, new Vector3(1f, -1f, 1f))
                                     * projectionMatrix.inverse;
 
             Shader.SetGlobalMatrix("_LeapGlobalWarpedOffset", imageMatWarp);
         }
 
-#if UNITY_2019_1_OR_NEWER
         protected virtual void onBeginRendering(ScriptableRenderContext context, Camera camera) { onPreCull(camera); }
-#endif
 
         protected virtual void onPreCull(Camera preCullingCamera)
         {
@@ -589,8 +565,8 @@ namespace Leap.Unity
             if (mainCamera != null)
             {
                 //By default, use the camera transform matrix to transform the frame into 
-                leapTransform = mainCamera.transform.GetLeapMatrix();
-                leapTransform.scale = Vector.Ones * 1e-3f;
+                leapTransform = new LeapTransform(mainCamera.transform);
+                leapTransform.scale = Vector3.one * 1e-3f;
 
                 //If the application is playing then we can try to use temporal warping
                 if (Application.isPlaying)
@@ -702,18 +678,18 @@ namespace Leap.Unity
             if (mainCamera.transform.parent != null)
             {
                 leapTransform = new LeapTransform(
-                  mainCamera.transform.parent.TransformPoint(warpedPosition).ToVector(),
-                  mainCamera.transform.parent.TransformRotation(warpedRotation).ToLeapQuaternion(),
-                  Vector.Ones * 1e-3f
+                  mainCamera.transform.parent.TransformPoint(warpedPosition),
+                  mainCamera.transform.parent.TransformRotation(warpedRotation),
+                  Vector3.one * 1e-3f
                 );
             }
             else
 #endif
             {
                 leapTransform = new LeapTransform(
-                  warpedPosition.ToVector(),
-                  warpedRotation.ToLeapQuaternion(),
-                  Vector.Ones * 1e-3f
+                  warpedPosition,
+                  warpedRotation,
+                  Vector3.one * 1e-3f
                 );
             }
 
@@ -744,9 +720,7 @@ namespace Leap.Unity
                 switch (camera.cameraType)
                 {
                     case CameraType.Preview:
-#if UNITY_2017_1_OR_NEWER
                     case CameraType.Reflection:
-#endif
                     case CameraType.SceneView:
                         return;
                 }
@@ -783,29 +757,29 @@ namespace Leap.Unity
                                       _currentDevice,
                                       out precullLeftHand,
                                       out precullRightHand);
-                    bool leftValid = precullLeftHand.translation != Vector.Zero;
-                    bool rightValid = precullRightHand.translation != Vector.Zero;
+                    bool leftValid = precullLeftHand.translation != Vector3.zero;
+                    bool rightValid = precullRightHand.translation != Vector3.zero;
                     transformHands(ref precullLeftHand, ref precullRightHand);
 
                     //Calculate the delta Transforms
                     if (rightHand != null && rightValid)
                     {
                         _transformArray[0] =
-                          Matrix4x4.TRS(precullRightHand.translation.ToVector3(),
-                                        precullRightHand.rotation.ToQuaternion(),
+                          Matrix4x4.TRS(precullRightHand.translation,
+                                        precullRightHand.rotation,
                                         Vector3.one)
-                          * Matrix4x4.Inverse(Matrix4x4.TRS(rightHand.PalmPosition.ToVector3(),
-                                                            rightHand.Rotation.ToQuaternion(),
+                          * Matrix4x4.Inverse(Matrix4x4.TRS(rightHand.PalmPosition,
+                                                            rightHand.Rotation,
                                                             Vector3.one));
                     }
                     if (leftHand != null && leftValid)
                     {
                         _transformArray[1] =
-                          Matrix4x4.TRS(precullLeftHand.translation.ToVector3(),
-                                        precullLeftHand.rotation.ToQuaternion(),
+                          Matrix4x4.TRS(precullLeftHand.translation,
+                                        precullLeftHand.rotation,
                                         Vector3.one)
-                          * Matrix4x4.Inverse(Matrix4x4.TRS(leftHand.PalmPosition.ToVector3(),
-                                                            leftHand.Rotation.ToQuaternion(),
+                          * Matrix4x4.Inverse(Matrix4x4.TRS(leftHand.PalmPosition,
+                                                            leftHand.Rotation,
                                                             Vector3.one));
                     }
 

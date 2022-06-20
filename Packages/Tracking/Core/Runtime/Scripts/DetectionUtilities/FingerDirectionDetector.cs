@@ -152,8 +152,8 @@ namespace Leap.Unity
                     hand = HandModel.GetLeapHand();
                     if (hand != null)
                     {
-                        targetDirection = selectedDirection(hand.Fingers[selectedFinger].TipPosition.ToVector3());
-                        fingerDirection = hand.Fingers[selectedFinger].Bone(Bone.BoneType.TYPE_DISTAL).Direction.ToVector3();
+                        targetDirection = selectedDirection(hand.Fingers[selectedFinger].TipPosition);
+                        fingerDirection = hand.Fingers[selectedFinger].Bone(Bone.BoneType.TYPE_DISTAL).Direction;
                         float angleTo = Vector3.Angle(fingerDirection, targetDirection);
                         if (HandModel.IsTracked && angleTo <= OnAngle)
                         {
@@ -223,11 +223,11 @@ namespace Leap.Unity
                     innerColor = OffColor;
                 }
                 Finger finger = HandModel.GetLeapHand().Fingers[selectedFingerOrdinal()];
-                Vector3 fingerDirection = finger.Bone(Bone.BoneType.TYPE_DISTAL).Direction.ToVector3();
-                Utils.DrawCone(finger.TipPosition.ToVector3(), fingerDirection, OnAngle, finger.Length, innerColor);
-                Utils.DrawCone(finger.TipPosition.ToVector3(), fingerDirection, OffAngle, finger.Length, LimitColor);
+                Vector3 fingerDirection = finger.Bone(Bone.BoneType.TYPE_DISTAL).Direction;
+                Utils.DrawCone(finger.TipPosition, fingerDirection, OnAngle, finger.Length, innerColor);
+                Utils.DrawCone(finger.TipPosition, fingerDirection, OffAngle, finger.Length, LimitColor);
                 Gizmos.color = DirectionColor;
-                Gizmos.DrawRay(finger.TipPosition.ToVector3(), selectedDirection(finger.TipPosition.ToVector3()));
+                Gizmos.DrawRay(finger.TipPosition, selectedDirection(finger.TipPosition));
             }
         }
 #endif

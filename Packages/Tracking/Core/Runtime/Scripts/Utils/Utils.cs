@@ -8,6 +8,7 @@
 
 using Leap.Unity.Query;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
@@ -15,7 +16,6 @@ using UnityEngine.Assertions;
 
 namespace Leap.Unity
 {
-
     public static class Utils
     {
 
@@ -102,6 +102,7 @@ namespace Leap.Unity
             array = newArray;
         }
 
+        [System.Obsolete("This code will be removed in the next major version of the plugin. If you believe that it needs to be kept, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
         /// <summary>
         /// Returns whether or not two lists contain the same elements ignoring order.
         /// </summary>
@@ -227,6 +228,7 @@ namespace Leap.Unity
             return ordering;
         }
 
+        [System.Obsolete("This code will be removed in the next major version of the plugin. If you believe that it needs to be kept, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
         /// <summary>
         /// Given a list and an ordering, order the list according to the ordering.
         /// This method assumes the ordering is a valid ordering.
@@ -991,6 +993,7 @@ namespace Leap.Unity
         /// <summary>
         /// Sets all elements in the array of type T to default(T).
         /// </summary>
+        [System.Obsolete("This code will be removed in the next major version of the plugin. If you believe that it needs to be kept, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
         public static T[] ClearWithDefaults<T>(this T[] arr)
         {
             for (int i = 0; i < arr.Length; i++)
@@ -1003,6 +1006,7 @@ namespace Leap.Unity
         /// <summary>
         /// Sets all elements in the array of type T to the argument value.
         /// </summary>
+        [System.Obsolete("This code will be removed in the next major version of the plugin. If you believe that it needs to be kept, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
         public static T[] ClearWith<T>(this T[] arr, T value)
         {
             for (int i = 0; i < arr.Length; i++)
@@ -1097,10 +1101,21 @@ namespace Leap.Unity
             return dst;
         }
 
+        public static T[] Fill<T>(this T[] array, T fillWith)
+        {
+            for (int i = 0; i < array.Length; i++)
+            {
+                array[i] = fillWith;
+            }
+
+            return array;
+        }
+
         #endregion
 
         #region Dictionary Utils
 
+        [System.Obsolete("This code will be removed in the next major version of the plugin. If you believe that it needs to be kept, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
         /// <summary> Removes all entries where check returns true. </summary>
         public static void RemoveAll<K, V>(this Dictionary<K, V> d, Func<K, V, bool> check)
         {
@@ -1289,14 +1304,9 @@ namespace Leap.Unity
         public static bool IsObjectPartOfPrefabAsset(UnityEngine.Object obj)
         {
 #if UNITY_EDITOR
-#if UNITY_2018_3_OR_NEWER
             // Exclude objects that are not part of any prefab, and exclude prefab _instances_.
             return UnityEditor.PrefabUtility.IsPartOfAnyPrefab(obj) &&
               UnityEditor.PrefabUtility.GetPrefabInstanceStatus(obj) == UnityEditor.PrefabInstanceStatus.NotAPrefab;
-#else
-      // Before 2018.3, use GetPrefabType.
-      return UnityEditor.PrefabUtility.GetPrefabType(obj) == UnityEditor.PrefabType.Prefab;
-#endif
 #else
             return false;
 #endif
@@ -1309,6 +1319,7 @@ namespace Leap.Unity
         /// Use this method to search for singleton-pattern objects even if they are disabled,
         /// but be warned that it's not cheap to call!
         /// </summary>
+        [System.Obsolete("This code will be removed in the next major version of the plugin. If you believe that it needs to be kept, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
         public static T FindObjectInHierarchy<T>() where T : UnityEngine.Object
         {
             return Resources.FindObjectsOfTypeAll<T>().Query()
@@ -1571,6 +1582,7 @@ namespace Leap.Unity
         /// The component type that assumes ownership of any ComponentType in its own Transform
         /// or its Transform's children/grandchildren.
         /// </typeparam>
+        [System.Obsolete("This code will be removed in the next major version of the plugin. If you believe that it needs to be kept, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
         public static void FindOwnedChildComponents<ComponentType, OwnerType>
                                                    (OwnerType rootObj,
                                                     List<ComponentType> ownedComponents,
@@ -1780,6 +1792,7 @@ namespace Leap.Unity
               maxAngle);
         }
 
+        [System.Obsolete("This code will be removed in the next major version of the plugin. If you believe that it needs to be kept, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
         public static Vector3 GetCentroid(
           System.Action<List<Vector3>> fillPoints)
         {
@@ -2075,20 +2088,10 @@ namespace Leap.Unity
 
         public static Matrix4x4 CompMul(Matrix4x4 m, float f)
         {
-#if UNITY_2017_1_OR_NEWER
             return new Matrix4x4(m.GetColumn(0) * f,
                                  m.GetColumn(1) * f,
                                  m.GetColumn(2) * f,
                                  m.GetColumn(3) * f);
-#else
-            Matrix4x4 toReturn = m;
-            for (int i = 0; i < 4; i++)
-            {
-                toReturn.SetColumn(i, toReturn.GetColumn(i) * f);
-            }
-            return toReturn;
-#endif
-
         }
 
         public static Vector3 GetTranslation(this Matrix4x4 m)
@@ -2371,6 +2374,7 @@ namespace Leap.Unity
         /// If you have many colliders that need to ignore collisions, consider utilizing
         /// Layer collision settings as an optimization.
         /// </summary>
+        [System.Obsolete("This code will be removed in the next major version of the plugin. If you believe that it needs to be kept, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
         public static void IgnoreCollisions(GameObject first, GameObject second,
                                             bool ignore = true)
         {
@@ -2498,48 +2502,37 @@ namespace Leap.Unity
                                         where T : Collider
         {
             colliders.Clear();
-            Stack<Transform> toVisit = Pool<Stack<Transform>>.Spawn();
-            List<T> collidersBuffer = Pool<List<T>>.Spawn();
+            ConcurrentQueue<Transform> toVisitQueue = new ConcurrentQueue<Transform>();
+            List<T> collidersBuffer = new List<T>();
 
-            try
+            // Traverse the hierarchy of this object's transform to find
+            // all of its Colliders.
+            toVisitQueue.Enqueue(obj.transform);
+            Transform curTransform;
+            while (toVisitQueue.Count > 0)
             {
-                // Traverse the hierarchy of this object's transform to find
-                // all of its Colliders.
-                toVisit.Push(obj.transform);
-                Transform curTransform;
-                while (toVisit.Count > 0)
+                toVisitQueue.TryDequeue(out curTransform);
+
+                // Recursively search children and children's children
+                foreach (var child in curTransform.GetChildren())
                 {
-                    curTransform = toVisit.Pop();
-
-                    // Recursively search children and children's children
-                    foreach (var child in curTransform.GetChildren())
+                    // Ignore children with Rigidbodies of their own; its own Rigidbody
+                    // owns its own colliders and the colliders of its children
+                    if (child.GetComponent<Rigidbody>() == null
+                        && (includeInactiveObjects || child.gameObject.activeSelf))
                     {
-                        // Ignore children with Rigidbodies of their own; its own Rigidbody
-                        // owns its own colliders and the colliders of its children
-                        if (child.GetComponent<Rigidbody>() == null
-                            && (includeInactiveObjects || child.gameObject.activeSelf))
-                        {
-                            toVisit.Push(child);
-                        }
-                    }
-
-                    // Since we'll visit every valid child, all we need to do is add the colliders
-                    // of every transform we visit.
-                    collidersBuffer.Clear();
-                    curTransform.GetComponents<T>(collidersBuffer);
-                    foreach (var collider in collidersBuffer)
-                    {
-                        colliders.Add(collider);
+                        toVisitQueue.Enqueue(child);
                     }
                 }
-            }
-            finally
-            {
-                toVisit.Clear();
-                Pool<Stack<Transform>>.Recycle(toVisit);
 
+                // Since we'll visit every valid child, all we need to do is add the colliders
+                // of every transform we visit.
                 collidersBuffer.Clear();
-                Pool<List<T>>.Recycle(collidersBuffer);
+                curTransform.GetComponents<T>(collidersBuffer);
+                foreach (var collider in collidersBuffer)
+                {
+                    colliders.Add(collider);
+                }
             }
         }
 
@@ -2652,8 +2645,8 @@ namespace Leap.Unity
             Vector3 nextPoint = new Vector3();
             for (float angle = 0; Mathf.Abs(angle) <= Mathf.Abs(arc); angle += deltaAngle)
             {
-                float cosAngle = Mathf.Cos(angle * Constants.DEG_TO_RAD);
-                float sinAngle = Mathf.Sin(angle * Constants.DEG_TO_RAD);
+                float cosAngle = Mathf.Cos(angle * Mathf.Deg2Rad);
+                float sinAngle = Mathf.Sin(angle * Mathf.Deg2Rad);
                 nextPoint.x = center.x + radius * (cosAngle * forward.x + sinAngle * right.x);
                 nextPoint.y = center.y + radius * (cosAngle * forward.y + sinAngle * right.y);
                 nextPoint.z = center.z + radius * (cosAngle * forward.z + sinAngle * right.z);
@@ -2675,7 +2668,7 @@ namespace Leap.Unity
             float step = height / quality;
             for (float q = step; q <= height; q += step)
             {
-                DrawCircle(origin + direction * q, direction, Mathf.Tan(angle * Constants.DEG_TO_RAD) * q, color, quality * 8, duration, depthTest);
+                DrawCircle(origin + direction * q, direction, Mathf.Tan(angle * Mathf.Deg2Rad) * q, color, quality * 8, duration, depthTest);
             }
         }
 
@@ -2689,11 +2682,6 @@ namespace Leap.Unity
       TextureFormat.EAC_R_SIGNED,
       TextureFormat.EAC_RG,
       TextureFormat.EAC_RG_SIGNED
-      #if !UNITY_2018_2_OR_NEWER
-      ,
-      TextureFormat.ETC_RGB4_3DS,
-      TextureFormat.ETC_RGBA8_3DS
-      #endif
     };
 
         /// <summary>
@@ -3034,6 +3022,7 @@ namespace Leap.Unity
                 index = -1;
             }
 
+            [System.Obsolete("This code will be removed in the next major version of the plugin. If you believe that it needs to be kept, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
             public Query<Rect> Query()
             {
                 List<Rect> rects = Pool<List<Rect>>.Spawn();

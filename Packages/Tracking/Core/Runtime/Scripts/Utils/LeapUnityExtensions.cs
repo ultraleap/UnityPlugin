@@ -16,6 +16,7 @@ namespace Leap.Unity
     /**
      * Unity extentions for Leap Vector class.
      */
+    [System.Obsolete("This code will be moved to a legacy package in the next major version of the plugin. If you believe that it needs to be kept in tracking, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
     public static class UnityVectorExtension
     {
 
@@ -73,6 +74,7 @@ namespace Leap.Unity
     /**
      * Unity extentions for Leap Quaternion class.
      */
+    [System.Obsolete("This code will be moved to a legacy package in the next major version of the plugin. If you believe that it needs to be kept in tracking, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
     public static class UnityQuaternionExtension
     {
         /**
@@ -114,6 +116,7 @@ namespace Leap.Unity
     /**
      * Unity extentions for the Leap Motion LeapTransform class.
      */
+    [System.Obsolete("This code will be moved to a legacy package in the next major version of the plugin. If you believe that it needs to be kept in tracking, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
     public static class UnityMatrixExtension
     {
         /** Up in the Leap coordinate system.*/
@@ -135,8 +138,8 @@ namespace Leap.Unity
           */
         public static Quaternion CalculateRotation(this LeapTransform trs)
         {
-            Vector3 up = trs.yBasis.ToVector3();
-            Vector3 forward = -trs.zBasis.ToVector3();
+            Vector3 up = trs.yBasis;
+            Vector3 forward = -trs.zBasis;
             return Quaternion.LookRotation(forward, up);
         }
 
@@ -153,8 +156,8 @@ namespace Leap.Unity
          */
         public static LeapTransform GetLeapMatrix(this Transform t)
         {
-            Vector scale = new Vector(t.lossyScale.x * MM_TO_M, t.lossyScale.y * MM_TO_M, t.lossyScale.z * MM_TO_M);
-            LeapTransform transform = new LeapTransform(t.position.ToVector(), t.rotation.ToLeapQuaternion(), scale);
+            Vector3 scale = new Vector3(t.lossyScale.x * MM_TO_M, t.lossyScale.y * MM_TO_M, t.lossyScale.z * MM_TO_M);
+            LeapTransform transform = new LeapTransform(t.position, t.rotation, scale);
             transform.MirrorZ(); // Unity is left handed.
             return transform;
         }

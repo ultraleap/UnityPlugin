@@ -7,7 +7,7 @@
  ******************************************************************************/
 
 using Leap.Unity;
-using Leap.Unity.Query;
+using System.Linq;
 using UnityEngine;
 
 namespace Leap.Examples
@@ -47,8 +47,8 @@ namespace Leap.Examples
         /// </summary>
         public override void ProcessFrame(ref Frame inputFrame)
         {
-            var leftHand = inputFrame.Hands.Query().FirstOrDefault(h => h.IsLeft);
-            var rightHand = inputFrame.Hands.Query().FirstOrDefault(h => !h.IsLeft);
+            var leftHand = inputFrame.Hands.FirstOrDefault(h => h.IsLeft);
+            var rightHand = inputFrame.Hands.FirstOrDefault(h => !h.IsLeft);
 
             // Frames can potentially come from two time-interwoven sources: Update frames
             // and FixedUpdate frames. Time is not monotonically increasing frame-to-frame

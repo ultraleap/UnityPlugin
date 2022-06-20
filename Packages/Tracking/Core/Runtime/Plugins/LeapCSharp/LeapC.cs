@@ -799,16 +799,16 @@ namespace LeapInternal
         public float y;
         public float z;
 
-        public Leap.Vector ToLeapVector()
+        public UnityEngine.Vector3 ToVector3()
         {
-            return new Leap.Vector(x, y, z);
+            return new UnityEngine.Vector3(x, y, z);
         }
 
-        public LEAP_VECTOR(Leap.Vector leap)
+        public LEAP_VECTOR(UnityEngine.Vector3 vector)
         {
-            x = leap.x;
-            y = leap.y;
-            z = leap.z;
+            x = vector.x;
+            y = vector.y;
+            z = vector.z;
         }
     }
 
@@ -820,12 +820,12 @@ namespace LeapInternal
         public float z;
         public float w;
 
-        public Leap.LeapQuaternion ToLeapQuaternion()
+        public UnityEngine.Quaternion ToQuaternion()
         {
-            return new Leap.LeapQuaternion(x, y, z, w);
+            return new UnityEngine.Quaternion(x, y, z, w);
         }
 
-        public LEAP_QUATERNION(Leap.LeapQuaternion q)
+        public LEAP_QUATERNION(UnityEngine.Quaternion q)
         {
             x = q.x;
             y = q.y;

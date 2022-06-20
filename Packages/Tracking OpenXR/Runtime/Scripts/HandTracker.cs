@@ -34,7 +34,7 @@ namespace Ultraleap.Tracking.OpenXR
         /// The current <see cref="HandJointSet"/> that this tracker is tracking.
         /// </summary>
         [PublicAPI]
-        public HandJointSet JointSet => HandJointSet.Default;
+        public HandJointSet JointSet => _handTracking.JointSet;
 
         /// <summary>
         /// The number of joints in the <see cref="JointSet"/> that this tracker is tracking.
@@ -143,6 +143,7 @@ namespace Ultraleap.Tracking.OpenXR
         Elbow
     }
 
+    [PublicAPI]
     public enum HandJointSet
     {
         /// <summary>
@@ -154,7 +155,7 @@ namespace Ultraleap.Tracking.OpenXR
         /// Default hand-set with the addition of the elbow joint on the forearm.
         /// <remarks>This requires the Ultraleap extension <code>XR_ULTRALEAP_hand_tracking_forearm</code></remarks>
         /// </summary>
-        HandWithForearm = 1000149000
+        [PublicAPI] HandWithForearm = 1000149000
     }
 
     /// <summary>

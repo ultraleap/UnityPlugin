@@ -32,34 +32,28 @@ namespace Leap.Unity
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
-            using (new ProfilerSample(_onGuiSampleName))
-            {
-                init(property);
+            init(property);
 
-                foreach (var drawable in _drawables)
-                {
-                    drawable.Draw(ref position);
-                }
+            foreach (var drawable in _drawables)
+            {
+                drawable.Draw(ref position);
             }
         }
 
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
         {
-            using (new ProfilerSample(_getHeightSampleName))
+            init(property);
+
+            float height = 0;
+            foreach (var drawable in _drawables)
             {
-                init(property);
-
-                float height = 0;
-                foreach (var drawable in _drawables)
+                if (drawable is PropertyContainer)
                 {
-                    if (drawable is PropertyContainer)
-                    {
-                        height += ((PropertyContainer)drawable).getHeight();
-                    }
+                    height += ((PropertyContainer)drawable).getHeight();
                 }
-
-                return height;
             }
+
+            return height;
         }
 
         protected virtual void init(SerializedProperty property)

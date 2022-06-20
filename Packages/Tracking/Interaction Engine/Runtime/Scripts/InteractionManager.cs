@@ -345,10 +345,8 @@ namespace Leap.Unity.Interaction
 
             // Physics should only be synced once at the beginning of the physics simulation.
             // (Will be re-set to its original value at the end of the update.)
-#if UNITY_2017_2_OR_NEWER
             var preUpdateAutoSyncTransforms = Physics.autoSyncTransforms;
             Physics.autoSyncTransforms = false;
-#endif
             try
             {
 
@@ -357,37 +355,27 @@ namespace Leap.Unity.Interaction
 #if UNITY_EDITOR
                 if (!Application.isPlaying) return;
 #endif
+                // Ensure scale information is up-to-date.
+                _scale = this.transform.lossyScale.x;
 
-                using (new ProfilerSample("Interaction Manager FixedUpdate", this.gameObject))
+                // Update each interaction controller (Leap hands or supported VR controllers).
+                fixedUpdateInteractionControllers();
+
+                // Perform each interaction object's FixedUpdateObject.
+                foreach (var interactionObj in _interactionObjects)
                 {
-                    // Ensure scale information is up-to-date.
-                    _scale = this.transform.lossyScale.x;
+                    interactionObj.FixedUpdateObject();
+                }
 
-                    // Update each interaction controller (Leap hands or supported VR controllers).
-                    fixedUpdateInteractionControllers();
-
-                    // Perform each interaction object's FixedUpdateObject.
-                    using (new ProfilerSample("FixedUpdateObject per-InteractionBehaviour"))
-                    {
-                        foreach (var interactionObj in _interactionObjects)
-                        {
-                            interactionObj.FixedUpdateObject();
-                        }
-                    }
-
-                    // Apply soft contacts from all controllers in a unified solve.
-                    // (This will clear softContacts and originalVelocities as well.)
-                    using (new ProfilerSample("Apply Soft Contacts"))
-                    {
-                        if (_drawControllerRuntimeGizmos)
-                        {
-                            _softContactsToDraw = new List<PhysicsUtility.SoftContact>(_softContacts);
-                        }
-                        if (_softContacts.Count > 0)
-                        {
-                            PhysicsUtility.applySoftContacts(_softContacts, _softContactOriginalVelocities);
-                        }
-                    }
+                // Apply soft contacts from all controllers in a unified solve.
+                // (This will clear softContacts and originalVelocities as well.)
+                if (_drawControllerRuntimeGizmos)
+                {
+                    _softContactsToDraw = new List<PhysicsUtility.SoftContact>(_softContacts);
+                }
+                if (_softContacts.Count > 0)
+                {
+                    PhysicsUtility.applySoftContacts(_softContacts, _softContactOriginalVelocities);
                 }
 
                 OnPostPhysicalUpdate();
@@ -402,11 +390,9 @@ namespace Leap.Unity.Interaction
             }
             finally
             {
-#if UNITY_2017_2_OR_NEWER
                 // Restore the autoSyncTransforms setting to whatever the user had it as before
                 // the Manager FixedUpdate.
                 Physics.autoSyncTransforms = preUpdateAutoSyncTransforms;
-#endif
             }
         }
 
@@ -442,81 +428,75 @@ namespace Leap.Unity.Interaction
                 if (controller.graspingEnabled) _graspingControllersBuffer.Add(controller);
             }
 
-            using (new ProfilerSample("Fixed Update Controllers (General Update)"))
+            // Perform general controller update, for controller collider and point
+            // representations.
+            foreach (var controller in _activeControllersBuffer)
             {
-                // Perform general controller update, for controller collider and point
-                // representations.
-                foreach (var controller in _activeControllersBuffer)
+                if (!controller.isActiveAndEnabled) continue;
+                (controller as IInternalInteractionController).FixedUpdateController();
+            }
+
+
+            /*
+              * Interactions are checked here in a very specific manner so that interaction
+              * callbacks always occur in a strict order and interaction object state is
+              * always updated directly before the relevant callbacks occur.
+              *
+              * Interaction callbacks will only occur outside this order if a script
+              * manually forces interaction state-changes; for example, calling
+              * interactionController.ReleaseGrasp() will immediately call
+              * interactionObject.OnPerControllerGraspEnd() on the formerly grasped object.
+              *
+              * Callback order:
+              * - Suspension (when a grasped object's grasping controller loses tracking)
+              * - Just-Ended Interactions (Grasps, then Contacts, then Hovers)
+              * - Just-Begun Interactions (Hovers, then Contacts, then Grasps)
+              * - Sustained Interactions (Hovers, then Contacts, then Grasps)
+              */
+
+            // Suspension //
+
+            // Check controllers beginning object suspension.
+            foreach (var controller in _graspingControllersBuffer)
+            {
+                IInteractionBehaviour suspendedObj;
+                if ((controller as IInternalInteractionController).CheckSuspensionBegin(out suspendedObj))
                 {
-                    if (!controller.isActiveAndEnabled) continue;
-                    (controller as IInternalInteractionController).FixedUpdateController();
+                    suspendedObj.BeginSuspension(controller);
                 }
             }
 
-            using (new ProfilerSample("Fixed Update Controllers (Interaction State and Callbacks)"))
+            // Check controllers ending object suspension.
+            foreach (var controller in _graspingControllersBuffer)
             {
-
-                /*
-                  * Interactions are checked here in a very specific manner so that interaction
-                  * callbacks always occur in a strict order and interaction object state is
-                  * always updated directly before the relevant callbacks occur.
-                  *
-                  * Interaction callbacks will only occur outside this order if a script
-                  * manually forces interaction state-changes; for example, calling
-                  * interactionController.ReleaseGrasp() will immediately call
-                  * interactionObject.OnPerControllerGraspEnd() on the formerly grasped object.
-                  *
-                  * Callback order:
-                  * - Suspension (when a grasped object's grasping controller loses tracking)
-                  * - Just-Ended Interactions (Grasps, then Contacts, then Hovers)
-                  * - Just-Begun Interactions (Hovers, then Contacts, then Grasps)
-                  * - Sustained Interactions (Hovers, then Contacts, then Grasps)
-                  */
-
-                // Suspension //
-
-                // Check controllers beginning object suspension.
-                foreach (var controller in _graspingControllersBuffer)
+                IInteractionBehaviour resumedObj;
+                if ((controller as IInternalInteractionController).CheckSuspensionEnd(out resumedObj))
                 {
-                    IInteractionBehaviour suspendedObj;
-                    if ((controller as IInternalInteractionController).CheckSuspensionBegin(out suspendedObj))
-                    {
-                        suspendedObj.BeginSuspension(controller);
-                    }
+                    resumedObj.EndSuspension(controller);
                 }
-
-                // Check controllers ending object suspension.
-                foreach (var controller in _graspingControllersBuffer)
-                {
-                    IInteractionBehaviour resumedObj;
-                    if ((controller as IInternalInteractionController).CheckSuspensionEnd(out resumedObj))
-                    {
-                        resumedObj.EndSuspension(controller);
-                    }
-                }
-
-                // Ending Interactions //
-
-                checkEndingGrasps(_graspingControllersBuffer);
-                checkEndingContacts(_contactControllersBuffer);
-                checkEndingPrimaryHovers(_hoverControllersBuffer);
-                checkEndingHovers(_hoverControllersBuffer);
-
-                // Beginning Interactions //
-
-                checkBeginningHovers(_hoverControllersBuffer);
-                checkBeginningPrimaryHovers(_hoverControllersBuffer);
-                checkBeginningContacts(_contactControllersBuffer);
-                checkBeginningGrasps(_graspingControllersBuffer);
-
-                // Sustained Interactions //
-
-                checkSustainingHovers(_hoverControllersBuffer);
-                checkSustainingPrimaryHovers(_hoverControllersBuffer);
-                checkSustainingContacts(_contactControllersBuffer);
-                checkSustainingGrasps(_graspingControllersBuffer);
-
             }
+
+            // Ending Interactions //
+
+            checkEndingGrasps(_graspingControllersBuffer);
+            checkEndingContacts(_contactControllersBuffer);
+            checkEndingPrimaryHovers(_hoverControllersBuffer);
+            checkEndingHovers(_hoverControllersBuffer);
+
+            // Beginning Interactions //
+
+            checkBeginningHovers(_hoverControllersBuffer);
+            checkBeginningPrimaryHovers(_hoverControllersBuffer);
+            checkBeginningContacts(_contactControllersBuffer);
+            checkBeginningGrasps(_graspingControllersBuffer);
+
+            // Sustained Interactions //
+
+            checkSustainingHovers(_hoverControllersBuffer);
+            checkSustainingPrimaryHovers(_hoverControllersBuffer);
+            checkSustainingContacts(_contactControllersBuffer);
+            checkSustainingGrasps(_graspingControllersBuffer);
+
         }
 
         #region State-Check Remapping Functions

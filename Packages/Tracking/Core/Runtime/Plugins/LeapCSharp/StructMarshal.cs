@@ -53,13 +53,9 @@ namespace LeapInternal
         public static void PtrToStruct(IntPtr ptr, out T t)
         {
 #if ENABLE_IL2CPP
-#if UNITY_2018_1_OR_NEWER
       unsafe {
         Unity.Collections.LowLevel.Unsafe.UnsafeUtility.CopyPtrToStructure((void*)ptr, out t);
       }
-#else
-#error UnityModules Only supports IL2CPP on versions of Unity 2018.1 or greater.
-#endif
 #else
             if (_container == null)
             {

@@ -42,14 +42,14 @@ namespace Leap.Unity.Controllers
 
             if (inputMethodType == InputMethodType.LeapHand)
             {
-                if (Vector3.Distance(_provider.Get(hand).PalmPosition.ToVector3(), xrControllerPosition) <= actionThreshold)
+                if (Vector3.Distance(_provider.Get(hand).PalmPosition, xrControllerPosition) <= actionThreshold)
                 {
                     return true;
                 }
             }
             else
             {
-                if (Vector3.Distance(_provider.Get(hand).PalmPosition.ToVector3(), xrControllerPosition) >= actionThreshold)
+                if (Vector3.Distance(_provider.Get(hand).PalmPosition, xrControllerPosition) >= actionThreshold)
                 {
                     return true;
                 }
