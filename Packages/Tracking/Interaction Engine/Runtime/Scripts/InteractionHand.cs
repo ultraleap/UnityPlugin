@@ -6,14 +6,11 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Leap.Interaction.Internal.InteractionEngineUtility;
 using Leap.Unity.Attributes;
 using Leap.Unity.Interaction.Internal;
-using Leap.Unity.Query;
 using Leap.Unity.RuntimeGizmos;
 using Leap.Unity.Space;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -192,13 +189,11 @@ namespace Leap.Unity.Interaction
                 {
                     if (handDataMode == HandDataMode.PlayerLeft)
                     {
-                        handAccessorFunc = (frame) => frame.Hands.Query()
-                                                                 .FirstOrDefault(hand => hand.IsLeft);
+                        handAccessorFunc = (frame) => frame.GetHand(Chirality.Left);
                     }
                     else
                     {
-                        handAccessorFunc = (frame) => frame.Hands.Query()
-                                                                 .FirstOrDefault(hand => hand.IsRight);
+                        handAccessorFunc = (frame) => frame.GetHand(Chirality.Right);
                     }
                 }
             }
@@ -473,12 +468,9 @@ namespace Leap.Unity.Interaction
                                                                       out Vector3 targetPosition,
                                                                       out Quaternion targetRotation)
         {
-            using (new ProfilerSample("InteractionHand: getColliderBoneTargetPositionRotation"))
-            {
-                _handContactBoneMapFunctions[contactBoneIndex](_unwarpedHandData,
-                                                               out targetPosition,
-                                                               out targetRotation);
-            }
+            _handContactBoneMapFunctions[contactBoneIndex](_unwarpedHandData,
+                                                           out targetPosition,
+                                                           out targetRotation);
         }
 
         protected override bool initContact()

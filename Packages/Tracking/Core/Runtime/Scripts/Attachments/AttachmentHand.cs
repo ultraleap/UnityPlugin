@@ -7,10 +7,8 @@
  ******************************************************************************/
 
 using Leap.Unity.Attributes;
-using Leap.Unity.Query;
 using System;
-using System.Collections;
-using System.Collections.Generic;
+using System.Linq;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -328,7 +326,6 @@ namespace Leap.Unity.Attachments
             {
                 // First, see if there's already one in the hierarchy! Might exist due to, e.g. an Undo operation
                 var existingPointBehaviour = this.gameObject.GetComponentsInChildren<AttachmentPointBehaviour>()
-                                                            .Query()
                                                             .FirstOrDefault(p => p.attachmentPoint == singlePoint);
 
                 // Only make a new object if the transform really doesn't exist.
@@ -384,7 +381,7 @@ namespace Leap.Unity.Attachments
             var pointBehaviour = GetBehaviourForPoint(singlePoint);
             if (pointBehaviour != null)
             {
-                InternalUtility.Destroy(pointBehaviour.gameObject);
+                Destroy(pointBehaviour.gameObject);
                 setBehaviourForPoint(singlePoint, null);
 
                 pointBehaviour = null;
@@ -488,9 +485,12 @@ namespace Leap.Unity.Attachments
 
             int hierarchyCount = 0;
 
-            foreach (var transform in transforms.Query().Where(t => t != null))
+            foreach (var transform in transforms)
             {
-                s_hierarchyTransformsBuffer[hierarchyCount++] = transform;
+                if (transform != null)
+                {
+                    s_hierarchyTransformsBuffer[hierarchyCount++] = transform;
+                }
             }
 
             for (int i = hierarchyCount - 1; i > 0; i--)
@@ -515,9 +515,12 @@ namespace Leap.Unity.Attachments
             }
 
             int tIdx = 0;
-            foreach (var behaviour in monoBehaviours.Query().Where(b => b != null))
+            foreach (var behaviour in monoBehaviours)
             {
-                s_transformsBuffer[tIdx++] = behaviour.transform;
+                if (transform != null)
+                {
+                    s_transformsBuffer[tIdx++] = behaviour.transform;
+                }
             }
 
             return tryStackTransformHierarchy(s_transformsBuffer);

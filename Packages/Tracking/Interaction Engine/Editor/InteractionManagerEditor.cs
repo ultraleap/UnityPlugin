@@ -6,13 +6,11 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Leap.Unity.Interaction.Internal;
-using Leap.Unity.Query;
 using Leap.Unity.RuntimeGizmos;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
+using System.Linq;
 
 namespace Leap.Unity.Interaction
 {
@@ -328,22 +326,20 @@ namespace Leap.Unity.Interaction
             // Check if the player has multiple left hands or multiple right hands.
             if (intHand.handDataMode != HandDataMode.Custom)
             {
-                int index = target.interactionControllers.Query().IndexOf(intHand);
-
-                if (target.interactionControllers.Query().
-                                                  Take(index).
-                                                  OfType<InteractionHand>().
-                                                  Where(h => h.handDataMode == intHand.handDataMode).
-                                                  Where(h => h.leapProvider == intHand.leapProvider).
-                                                  Any())
+                foreach (var controller in target.interactionControllers)
                 {
-                    messages.Add(new ControllerStatusMessage()
+                    if (controller.intHand.handDataMode == intHand.handDataMode &&
+                        controller.intHand.leapProvider == intHand.leapProvider)
                     {
-                        message = "Duplicate Hand",
-                        tooltip = "You already have a hand with this data mode in your scene. "
-                              + "You should remove one of the duplicates.",
-                        color = Colors.Problem
-                    });
+                        messages.Add(new ControllerStatusMessage()
+                        {
+                            message = "Duplicate Hand",
+                            tooltip = "You already have a hand with this data mode in your scene. "
+                                        + "You should remove one of the duplicates.",
+                            color = Colors.Problem
+                        });
+                        break;
+                    }
                 }
             }
         }

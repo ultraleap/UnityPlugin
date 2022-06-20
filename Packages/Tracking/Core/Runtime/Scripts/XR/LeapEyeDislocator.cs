@@ -7,9 +7,7 @@
  ******************************************************************************/
 
 using UnityEngine;
-#if UNITY_2019_1_OR_NEWER
 using UnityEngine.Rendering;
-#endif
 
 namespace Leap.Unity
 {
@@ -33,20 +31,19 @@ namespace Leap.Unity
         private bool _showEyePositions = false;
 
         [SerializeField] private LeapServiceProvider _provider = null;
-        private Maybe<float> _deviceBaseline = Maybe.None;
+        private float _deviceBaseline = -1;
         private bool _hasVisitedPreCull = false;
 
         [SerializeField] private Camera _camera = null;
 
         private void onDevice(Device device)
         {
-            if (device == _provider.CurrentDevice || _deviceBaseline == Maybe.None)
-                _deviceBaseline = Maybe.Some(device.Baseline);
+            if (device == _provider.CurrentDevice || _deviceBaseline == -1)
+                _deviceBaseline = device.Baseline;
         }
 
         private void OnDestroy()
         {
-#if UNITY_2019_1_OR_NEWER
             if (GraphicsSettings.renderPipelineAsset != null)
             {
                 RenderPipelineManager.beginCameraRendering -= onBeginRendering;
@@ -55,9 +52,6 @@ namespace Leap.Unity
             {
                 Camera.onPreCull -= OnCameraPreCull; // No multiple-subscription.
             }
-#else
-            Camera.onPreCull -= OnCameraPreCull; // No multiple-subscription.
-#endif
         }
 
         private void OnEnable()
@@ -68,7 +62,6 @@ namespace Leap.Unity
                 return;
             }
 
-#if UNITY_2019_1_OR_NEWER
             if (GraphicsSettings.renderPipelineAsset != null)
             {
                 RenderPipelineManager.beginCameraRendering -= onBeginRendering;
@@ -79,10 +72,6 @@ namespace Leap.Unity
                 Camera.onPreCull -= OnCameraPreCull; // No multiple-subscription.
                 Camera.onPreCull += OnCameraPreCull;
             }
-#else
-            Camera.onPreCull -= OnCameraPreCull; // No multiple-subscription.
-            Camera.onPreCull += OnCameraPreCull;
-#endif
 
             _provider.OnDeviceSafe += onDevice;
         }
@@ -102,16 +91,10 @@ namespace Leap.Unity
         {
             if (_camera == null) return;
 
-#if !UNITY_2020_1_OR_NEWER
-            _camera.ResetStereoViewMatrices();
-#endif
-
             _hasVisitedPreCull = false;
         }
 
-#if UNITY_2019_1_OR_NEWER
         protected virtual void onBeginRendering(ScriptableRenderContext context, Camera camera) { OnCameraPreCull(camera); }
-#endif
 
         private void OnCameraPreCull(Camera cam)
         {
@@ -121,19 +104,18 @@ namespace Leap.Unity
             }
             _hasVisitedPreCull = true;
 
-#if UNITY_2020_1_OR_NEWER
             // Unity rendering system changed in 2020. Performing this in update causes misalignment.
             // XR applications need to be rendered in multipass or it will fail.
             _camera.ResetStereoViewMatrices();
-#endif
-            Maybe<float> baselineToUse = Maybe.None;
+
+            float baselineToUse = -1;
             if (_useCustomBaseline)
             {
-                baselineToUse = Maybe.Some(_customBaselineValue);
+                baselineToUse = _customBaselineValue;
             }
             else
             {
-                if (_deviceBaseline == Maybe.None)
+                if (_deviceBaseline == -1)
                 {
                     _provider.OnDeviceSafe -= onDevice;
                     _provider.OnDeviceSafe += onDevice;
@@ -142,8 +124,10 @@ namespace Leap.Unity
             }
 
             float baselineValue;
-            if (baselineToUse.TryGetValue(out baselineValue))
+            if (baselineToUse != -1)
             {
+                baselineValue = baselineToUse;
+
                 baselineValue *= 1e-3f;
 
                 Matrix4x4 leftMat = _camera.GetStereoViewMatrix(Camera.StereoscopicEye.Left);

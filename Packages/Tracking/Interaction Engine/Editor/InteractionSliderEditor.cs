@@ -6,7 +6,10 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Leap.Unity.Query;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
@@ -14,80 +17,93 @@ namespace Leap.Unity.Interaction
 {
 
     [CanEditMultipleObjects]
-    [CustomEditor(typeof(InteractionSlider), editorForChildClasses: true)]
-    public class InteractionSliderEditor : InteractionButtonEditor
+    [CustomEditor(typeof(InteractionXRController), true)]
+    public class InteractionVRControllerEditor : InteractionControllerEditor
     {
+
+        private List<InteractionXRController> _vrControllers;
+
+        bool _pluralPossibleControllers = false;
 
         protected override void OnEnable()
         {
             base.OnEnable();
 
-            // specifyConditionalDrawing(() => noRectTransformParent, "horizontalSlideLimits", "verticalSlideLimits");
+            //_vrController = (target as InteractionVRController);
+            _vrControllers = targets.Where(c => c is InteractionXRController)
+                                    .Cast<InteractionXRController>()
+                                    .ToList();
+            _pluralPossibleControllers = _vrControllers.Count > 1;
 
-            specifyCustomDecorator("horizontalSlideLimits", decorateHorizontalSlideLimits);
-            specifyCustomDecorator("verticalSlideLimits", decorateVerticalSlideLimits);
-            specifyCustomDecorator("horizontalSteps", decorateHorizontalSteps);
-
-            // Only display vertical properties if relevant
-            InteractionSlider[] sliders = targets.Query().Cast<InteractionSlider>().ToArray();
-            specifyConditionalDrawing(() =>
-            {
-                return sliders.Query().Any(slider => slider.sliderType == InteractionSlider.SliderType.Vertical
-                                                  || slider.sliderType == InteractionSlider.SliderType.TwoDimensional);
-            },
-                                      "defaultVerticalValue",
-                                      "_verticalValueRange",
-                                      "verticalSlideLimits",
-                                      "verticalSteps",
-                                      "_verticalSlideEvent");
-            specifyConditionalDrawing(() =>
-            {
-                return sliders.Query().Any(slider => slider.sliderType == InteractionSlider.SliderType.Horizontal
-                                                  || slider.sliderType == InteractionSlider.SliderType.TwoDimensional);
-            },
-                                      "defaultHorizontalValue",
-                                      "_horizontalValueRange",
-                                      "horizontalSlideLimits",
-                                      "horizontalSteps",
-                                      "_horizontalSlideEvent");
+            specifyCustomPostDecorator("graspButtonAxis", drawGraspButtonAxisDecorator);
         }
 
-        public override void OnInspectorGUI()
+        private void drawGraspButtonAxisDecorator(SerializedProperty property)
         {
-            bool noRectTransformParent = !(target.transform.parent != null && target.transform.parent.GetComponent<RectTransform>() != null && !(target as InteractionSlider).overrideRectLimits);
-            if (!noRectTransformParent)
+            // Whether the axis is overriden.
+            int numGraspAxisOverrides = _vrControllers.Where(c => c.graspAxisOverride != null)
+                                                      .Count();
+            bool anyGraspAxisOverrides = numGraspAxisOverrides > 0;
+
+            if (anyGraspAxisOverrides)
             {
-                EditorGUILayout.HelpBox("This slider's limits are being controlled by the rect transform in its parent.", MessageType.Info);
+                string graspAxisOverrideMessage;
+                if (_pluralPossibleControllers)
+                {
+                    graspAxisOverrideMessage = "One or more currently selected interaction VR "
+                                             + "controllers has their grasping axis overridden, "
+                                             + "so their graspButtonAxis settings will be ignored.";
+                }
+                else
+                {
+                    graspAxisOverrideMessage = "This interaction VR controller has its grasping "
+                                             + "axis overridden, so the graspButtonAxis setting "
+                                             + "will be ignored.";
+                }
+                EditorGUILayout.HelpBox(graspAxisOverrideMessage, MessageType.Info);
             }
 
-            if (!Application.isPlaying)
+            // Whether the axis is valid.
+            bool anyInvalidGraspAxes = _vrControllers.Select(c => isGraspAxisConfigured(c))
+                                                     .Where(b => b == false)
+                                                     .Any();
+
+            if (anyInvalidGraspAxes)
             {
-                (target as InteractionSlider).RecalculateSliderLimits();
+                string graspAxisInvalidMessage;
+                if (_pluralPossibleControllers)
+                {
+                    graspAxisInvalidMessage = "One or more currently selected interaction VR "
+                                            + "controllers is configured with a grasping axis name "
+                                            + "that is not set up in Unity's Input settings.";
+                }
+                else
+                {
+                    graspAxisInvalidMessage = "This interaction VR controller is configured with a "
+                                            + "grasping axis name that is not set up in Unity's "
+                                            + "Input settings.";
+                }
+                graspAxisInvalidMessage += " Check your input settings via Edit -> Project "
+                                          + "Settings -> Input. Otherwise, this interaction "
+                                          + "controller will be unable to grasp objects.";
+
+                EditorGUILayout.HelpBox(graspAxisInvalidMessage, MessageType.Warning);
             }
-
-            base.OnInspectorGUI();
         }
 
-        public override bool RequiresConstantRepaint()
+        private bool isGraspAxisConfigured(InteractionXRController controller)
         {
-            return true;
-        }
-
-        private void decorateHorizontalSlideLimits(SerializedProperty property)
-        {
-            EditorGUI.BeginDisabledGroup(target.transform.parent != null && target.transform.parent.GetComponent<RectTransform>() != null && !(target as InteractionSlider).overrideRectLimits);
-        }
-
-        private void decorateVerticalSlideLimits(SerializedProperty property)
-        {
-            EditorGUI.EndDisabledGroup();
-            EditorGUI.BeginDisabledGroup(target.transform.parent != null && target.transform.parent.GetComponent<RectTransform>() != null && !(target as InteractionSlider).overrideRectLimits);
-        }
-
-        private void decorateHorizontalSteps(SerializedProperty property)
-        {
-            EditorGUI.EndDisabledGroup();
+            try
+            {
+                Input.GetAxis(controller.graspButtonAxis);
+                return true;
+            }
+            catch (ArgumentException)
+            {
+                return false;
+            }
         }
 
     }
+
 }

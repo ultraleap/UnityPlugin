@@ -8,18 +8,13 @@
 
 using Leap.Unity.Attributes;
 
-#if UNITY_2017_2_OR_NEWER
-using UnityEngine.XR;
-#else
-using UnityEngine.VR;
-#endif
-
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
-using Leap.Unity.Query;
 using Leap.Unity.Space;
 using UnityEngine.Serialization;
+using UnityEngine.XR;
 
 namespace Leap.Unity.Interaction
 {
@@ -252,12 +247,12 @@ namespace Leap.Unity.Interaction
 
             if (deviceJoystickTokens != null && deviceJoystickTokens.Length > 0)
             {
-                string[] joysticksConnected = Input.GetJoystickNames().Query()
+                string[] joysticksConnected = Input.GetJoystickNames()
                   .Select(s => s.ToLower()).ToArray();
                 string[] controllerSupportTokens = deviceJoystickTokens.ToLower()
                   .Split(" ".ToCharArray());
-                bool matchesController = joysticksConnected.Query()
-                                         .Any(joystick => controllerSupportTokens.Query()
+                bool matchesController = joysticksConnected
+                                         .Any(joystick => controllerSupportTokens
                                                          .All(token => joystick.Contains(token)));
 
                 _isJoystickDetected = matchesController;
@@ -441,17 +436,10 @@ namespace Leap.Unity.Interaction
         /// may be ignored.
         /// </summary>
         /// 
-#if UNITY_2017_2_OR_NEWER
         public XRNode xrNode
         {
             get { return chirality == Chirality.Left ? XRNode.LeftHand : XRNode.RightHand; }
         }
-#else
-        public VRNode xrNode
-        {
-            get { return chirality == Chirality.Left ? VRNode.LeftHand : VRNode.RightHand; }
-        }
-#endif
 
         /// <summary>
         /// Gets whether the controller is a left-hand controller.
@@ -615,6 +603,7 @@ namespace Leap.Unity.Interaction
             return true;
         }
 
+        [System.Obsolete("This method will change to 'private void refreshContactBoneTargets()' in the next major version of the plugin.")]
         private void refreshContactBoneTargets(bool useUnwarpingData = false)
         {
             if (_wasContactInitialized)

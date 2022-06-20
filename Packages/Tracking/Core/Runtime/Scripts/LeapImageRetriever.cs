@@ -6,9 +6,9 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Leap.Unity.Query;
 using System;
 using System.Collections;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -281,10 +281,8 @@ namespace Leap.Unity
 
             private void addDistortionData(Image image, Color32[] colors, int startIndex)
             {
-                float[] distortionData = image.Distortion(Image.CameraType.LEFT).
-                                               Query().
-                                               Concat(image.Distortion(Image.CameraType.RIGHT)).
-                                               ToArray();
+                float[] distortionData = image.Distortion(Image.CameraType.LEFT)
+                    .Concat(image.Distortion(Image.CameraType.RIGHT)).ToArray();
 
                 for (int i = 0; i < distortionData.Length; i += 2)
                 {
@@ -399,13 +397,12 @@ namespace Leap.Unity
             LeapInternal.MemoryManager.EnablePooling = true;
 
             ApplyGammaCorrectionValues();
-#if UNITY_2019_3_OR_NEWER
             //SRP require subscribing to RenderPipelineManagers
-            if(UnityEngine.Rendering.GraphicsSettings.renderPipelineAsset != null) {
+            if (UnityEngine.Rendering.GraphicsSettings.renderPipelineAsset != null)
+            {
                 UnityEngine.Rendering.RenderPipelineManager.beginCameraRendering -= onBeginRendering;
                 UnityEngine.Rendering.RenderPipelineManager.beginCameraRendering += onBeginRendering;
             }
-#endif
         }
 
         private void OnEnable()
@@ -434,13 +431,11 @@ namespace Leap.Unity
 
             Camera.onPreRender -= OnCameraPreRender;
 
-#if UNITY_2019_3_OR_NEWER
             //SRP require subscribing to RenderPipelineManagers
             if (UnityEngine.Rendering.GraphicsSettings.renderPipelineAsset != null)
             {
                 UnityEngine.Rendering.RenderPipelineManager.beginCameraRendering -= onBeginRendering;
             }
-#endif
         }
 
         private void LateUpdate()
@@ -514,12 +509,10 @@ namespace Leap.Unity
             }
         }
 
-#if UNITY_2019_3_OR_NEWER
         private void onBeginRendering(UnityEngine.Rendering.ScriptableRenderContext scriptableRenderContext, Camera camera)
         {
             OnCameraPreRender(camera);
         }
-#endif
 
         private void subscribeToService()
         {

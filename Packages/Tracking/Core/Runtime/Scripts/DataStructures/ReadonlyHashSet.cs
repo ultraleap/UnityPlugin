@@ -34,6 +34,11 @@ namespace Leap.Unity
             }
         }
 
+        public HashSet<T> GetHashSet()
+        {
+            return _set;
+        }
+
         public HashSet<T>.Enumerator GetEnumerator()
         {
             return _set.GetEnumerator();
@@ -44,7 +49,7 @@ namespace Leap.Unity
             return _set.Contains(obj);
         }
 
-        [System.Obsolete("This code will be moved to a legacy package in the next major version of the plugin. If you believe that it needs to be kept in tracking, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
+        [System.Obsolete("This code will be removed in the next major version of the plugin. Use GetHashSet() instead. If you believe that it needs to be kept, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
         public Query<T> Query()
         {
             return _set.Query();

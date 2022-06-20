@@ -8,7 +8,6 @@
 
 using Leap.Interaction.Internal.InteractionEngineUtility;
 using Leap.Unity.Attributes;
-using Leap.Unity.Interaction.Internal;
 using Leap.Unity.RuntimeGizmos;
 using Leap.Unity.Space;
 using System;
@@ -422,6 +421,7 @@ namespace Leap.Unity.Interaction
         /// Gets the list of Transforms to consider against nearby objects to determine
         /// the closest object (primary hover) of this controller.
         /// </summary>
+        [System.Obsolete("This code will be changed to 'IReadOnlyList<Transform> primaryHoverPoints' in the next major version of the plugin.")]
         public ReadonlyList<Transform> primaryHoverPoints { get { return _primaryHoverPoints; } }
 
         /// <summary>
@@ -471,46 +471,24 @@ namespace Leap.Unity.Interaction
 
         private void fixedUpdateHovering()
         {
-            using (new ProfilerSample("Fixed Update InteractionController Hovering"))
+            // Reset hover lock if the controller loses tracking.
+            if (!isTracked && primaryHoverLocked)
             {
-                // Reset hover lock if the controller loses tracking.
-                if (!isTracked && primaryHoverLocked)
-                {
-                    _primaryHoverLocked = false;
-                }
-
-                // Update hover state.
-                hoverActivityManager.activationRadius = manager.WorldHoverActivationRadius;
-
-                Vector3? queryPosition = isTracked ? (Vector3?)hoverPoint : null;
-                hoverActivityManager.UpdateActivityQuery(queryPosition, LeapSpace.allEnabled);
-
-                // Add all returned objects as "hovered".
-                // Find closest objects per primary hover point to update primary hover state.
-                using (new ProfilerSample("Find Closest Objects for Primary Hover"))
-                {
-                    refreshHoverState(_hoverActivityManager.ActiveObjects);
-                }
-
-                // Refresh buffer information from the previous frame to be able to fire
-                // the appropriate hover state callbacks.
-                refreshHoverStateBuffers();
-                refreshPrimaryHoverStateBuffers();
-
-                // Support interactions in curved ("warped") space by "unwarping" hands into
-                // the curved space's physics (rectilinear) space.
-                if (isTracked && isPrimaryHovering)
-                {
-                    ISpaceComponent space = primaryHoveredObject.space;
-
-                    if (space != null
-                     && space.anchor != null
-                     && space.anchor.space != null)
-                    {
-                        unwarpColliders(primaryHoverPoints[_primaryHoverPointIdx], space);
-                    }
-                }
+                _primaryHoverLocked = false;
             }
+
+            // Update hover state.
+            hoverActivityManager.activationRadius = manager.WorldHoverActivationRadius;
+
+            Vector3? queryPosition = isTracked ? (Vector3?)hoverPoint : null;
+            hoverActivityManager.UpdateActivityQuery(queryPosition);
+
+            refreshHoverState(_hoverActivityManager.ActiveObjects);
+
+            // Refresh buffer information from the previous frame to be able to fire
+            // the appropriate hover state callbacks.
+            refreshHoverStateBuffers();
+            refreshPrimaryHoverStateBuffers();
         }
 
         /// <summary>
@@ -647,7 +625,7 @@ namespace Leap.Unity.Interaction
                 }
 
                 // Check primary hover for the primary hover point.
-                float behaviourDistance = GetHoverDistance(primaryHoverPoint.position, behaviour);
+                float behaviourDistance = behaviour.GetHoverDistance(primaryHoverPoint.position);
                 if (behaviourDistance < shortestPointDistance)
                 {
 
@@ -1112,31 +1090,20 @@ namespace Leap.Unity.Interaction
 
             // Request and store target bone positions and rotations
             // for use during the contact update.
-            using (new ProfilerSample("Update Contact Bone Targets"))
+            for (int i = 0; i < contactBones.Length; i++)
             {
-                for (int i = 0; i < contactBones.Length; i++)
-                {
-                    getColliderBoneTargetPositionRotation(i, out _boneTargetPositions[i],
-                                                             out _boneTargetRotations[i]);
-                }
+                getColliderBoneTargetPositionRotation(i, out _boneTargetPositions[i],
+                                                         out _boneTargetRotations[i]);
             }
 
-            using (new ProfilerSample("Update Contact Bones"))
+            normalizeBoneMasses();
+            for (int i = 0; i < contactBones.Length; i++)
             {
-                normalizeBoneMasses();
-                for (int i = 0; i < contactBones.Length; i++)
-                {
-                    updateContactBone(i, _boneTargetPositions[i], _boneTargetRotations[i]);
-                }
+                updateContactBone(i, _boneTargetPositions[i], _boneTargetRotations[i]);
             }
-            using (new ProfilerSample("Update Soft Contact"))
-            {
-                fixedUpdateSoftContact();
-            }
-            using (new ProfilerSample("Update Contact Callbacks"))
-            {
-                fixedUpdateContactState();
-            }
+
+            fixedUpdateSoftContact();
+            fixedUpdateContactState();
         }
 
         /// <summary>
@@ -1181,76 +1148,62 @@ namespace Leap.Unity.Interaction
 
             // Set a fixed rotation for bones; otherwise most friction is lost
             // as any capsule or spherical bones will roll on contact.
-            using (new ProfilerSample("updateContactBone: MoveRotation"))
-            {
-                body.MoveRotation(targetRotation);
-            }
+            body.MoveRotation(targetRotation);
 
             // Calculate how far off its target the contact bone is.
             float errorDistance = 0f;
             float errorFraction = 0f;
-            using (new ProfilerSample("updateContactBone: errorDistance, errorFraction"))
+
+            Vector3 lastTargetPositionTransformedAhead = contactBone.lastTargetPosition;
+            if (manager.hasMovingFrameOfReference)
             {
-                Vector3 lastTargetPositionTransformedAhead = contactBone.lastTargetPosition;
-                if (manager.hasMovingFrameOfReference)
-                {
-                    manager.TransformAheadByFixedUpdate(contactBone.lastTargetPosition, out lastTargetPositionTransformedAhead);
-                }
-                errorDistance = Vector3.Distance(lastTargetPositionTransformedAhead, body.position);
-                errorFraction = errorDistance / contactBone.width;
+                manager.TransformAheadByFixedUpdate(contactBone.lastTargetPosition, out lastTargetPositionTransformedAhead);
             }
+            errorDistance = Vector3.Distance(lastTargetPositionTransformedAhead, body.position);
+            errorFraction = errorDistance / contactBone.width;
 
             // Adjust the mass of the contact bone based on the mass of
             // the object it is currently touching.
             float speed = 0f;
-            using (new ProfilerSample("updateContactBone: speed & massScale"))
+            speed = velocity.magnitude;
+            float massScale = Mathf.Clamp(1.0F - (errorFraction * 2.0F), 0.1F, 1.0F)
+                          * Mathf.Clamp(speed * 10F, 1F, 10F);
+            if (massScale * contactBone._lastObjectTouchedAdjustedMass > 0)
             {
-                speed = velocity.magnitude;
-                float massScale = Mathf.Clamp(1.0F - (errorFraction * 2.0F), 0.1F, 1.0F)
-                              * Mathf.Clamp(speed * 10F, 1F, 10F);
-                if (massScale * contactBone._lastObjectTouchedAdjustedMass > 0)
-                {
-                    body.mass = massScale * contactBone._lastObjectTouchedAdjustedMass;
-                }
+                body.mass = massScale * contactBone._lastObjectTouchedAdjustedMass;
             }
 
             // Potentially enable Soft Contact if our error is too large.
-            using (new ProfilerSample("updateContactBone: maybe enable Soft Contact"))
+            if (!_softContactEnabled && errorDistance >= softContactDislocationDistance
+              && speed < 1.5F
+                /* && boneArrayIndex != NUM_FINGERS * BONES_PER_FINGER */)
             {
-                if (!_softContactEnabled && errorDistance >= softContactDislocationDistance
-                  && speed < 1.5F
-               /* && boneArrayIndex != NUM_FINGERS * BONES_PER_FINGER */)
-                {
-                    EnableSoftContact();
-                }
+                EnableSoftContact();
             }
 
             // Attempt to move the contact bone to its target position and rotation
             // by setting its target velocity and angular velocity. Include a "deadzone"
             // for position to avoid tiny vibrations.
-            using (new ProfilerSample("updateContactBone: Move to target, with deadzone"))
+            float deadzone = Mathf.Min(DEAD_ZONE_FRACTION * contactBone.width, 0.01F * scale);
+            Vector3 delta = (targetPosition - body.position);
+            float deltaMag = delta.magnitude;
+            if (deltaMag <= deadzone)
             {
-                float deadzone = Mathf.Min(DEAD_ZONE_FRACTION * contactBone.width, 0.01F * scale);
-                Vector3 delta = (targetPosition - body.position);
-                float deltaMag = delta.magnitude;
-                if (deltaMag <= deadzone)
-                {
-                    body.velocity = Vector3.zero;
-                    contactBone.lastTargetPosition = body.position;
-                }
-                else
-                {
-                    delta *= (deltaMag - deadzone) / deltaMag;
-                    contactBone.lastTargetPosition = body.position + delta;
-
-                    Vector3 targetVelocity = delta / Time.fixedDeltaTime;
-                    float targetVelocityMag = targetVelocity.magnitude;
-                    body.velocity = (targetVelocity / targetVelocityMag)
-                                  * Mathf.Clamp(targetVelocityMag, 0F, 100F);
-                }
-                Quaternion deltaRot = targetRotation * Quaternion.Inverse(body.rotation);
-                body.angularVelocity = PhysicsUtility.ToAngularVelocity(deltaRot, Time.fixedDeltaTime);
+                body.velocity = Vector3.zero;
+                contactBone.lastTargetPosition = body.position;
             }
+            else
+            {
+                delta *= (deltaMag - deadzone) / deltaMag;
+                contactBone.lastTargetPosition = body.position + delta;
+
+                Vector3 targetVelocity = delta / Time.fixedDeltaTime;
+                float targetVelocityMag = targetVelocity.magnitude;
+                body.velocity = (targetVelocity / targetVelocityMag)
+                              * Mathf.Clamp(targetVelocityMag, 0F, 100F);
+            }
+            Quaternion deltaRot = targetRotation * Quaternion.Inverse(body.rotation);
+            body.angularVelocity = PhysicsUtility.ToAngularVelocity(deltaRot, Time.fixedDeltaTime);
         }
 
         #endregion
@@ -1459,28 +1412,26 @@ namespace Leap.Unity.Interaction
         public void EnableSoftContact()
         {
             if (!isTracked) return;
-            using (new ProfilerSample("Enable Soft Contact"))
+
+            _disableSoftContactEnqueued = false;
+            if (!_softContactEnabled)
             {
-                _disableSoftContactEnqueued = false;
-                if (!_softContactEnabled)
+                onPreEnableSoftContact();
+
+                _softContactEnabled = true;
+
+                if (_delayedDisableSoftContactCoroutine != null)
                 {
-                    onPreEnableSoftContact();
+                    manager.StopCoroutine(_delayedDisableSoftContactCoroutine);
+                }
 
-                    _softContactEnabled = true;
-
-                    if (_delayedDisableSoftContactCoroutine != null)
+                if (contactBones != null)
+                {
+                    for (int i = 0; i < contactBones.Length; i++)
                     {
-                        manager.StopCoroutine(_delayedDisableSoftContactCoroutine);
-                    }
+                        if (contactBones[i].collider == null) continue;
 
-                    if (contactBones != null)
-                    {
-                        for (int i = 0; i < contactBones.Length; i++)
-                        {
-                            if (contactBones[i].collider == null) continue;
-
-                            disableContactBoneCollision();
-                        }
+                        disableContactBoneCollision();
                     }
                 }
             }
@@ -1491,14 +1442,11 @@ namespace Leap.Unity.Interaction
         /// </summary>
         public void DisableSoftContact()
         {
-            using (new ProfilerSample("Enqueue Disable Soft Contact"))
+            if (!_disableSoftContactEnqueued)
             {
-                if (!_disableSoftContactEnqueued)
-                {
-                    _delayedDisableSoftContactCoroutine = DelayedDisableSoftContact();
-                    manager.StartCoroutine(_delayedDisableSoftContactCoroutine);
-                    _disableSoftContactEnqueued = true;
-                }
+                _delayedDisableSoftContactCoroutine = DelayedDisableSoftContact();
+                manager.StartCoroutine(_delayedDisableSoftContactCoroutine);
+                _disableSoftContactEnqueued = true;
             }
         }
 
@@ -1507,12 +1455,9 @@ namespace Leap.Unity.Interaction
             yield return new WaitForSecondsRealtime(0.3f);
             if (_disableSoftContactEnqueued)
             {
-                using (new ProfilerSample("Disable Soft Contact"))
-                {
-                    _softContactEnabled = false;
-                    enableContactBoneCollision();
-                    onPostDisableSoftContact();
-                }
+                _softContactEnabled = false;
+                enableContactBoneCollision();
+                onPostDisableSoftContact();
             }
         }
 
@@ -2021,13 +1966,10 @@ namespace Leap.Unity.Interaction
 
         private void fixedUpdateGrasping()
         {
-            using (new ProfilerSample("Fixed Update Controller Grasping"))
-            {
-                Vector3? graspPoint = isTracked ? (Vector3?)hoverPoint : null;
-                graspActivityManager.UpdateActivityQuery(graspPoint, LeapSpace.allEnabled);
+            Vector3? graspPoint = isTracked ? (Vector3?)hoverPoint : null;
+            graspActivityManager.UpdateActivityQuery(graspPoint);
 
-                fixedUpdateGraspingState();
-            }
+            fixedUpdateGraspingState();
         }
 
         /// <summary>
