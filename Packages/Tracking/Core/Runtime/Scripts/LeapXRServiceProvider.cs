@@ -565,8 +565,8 @@ namespace Leap.Unity
             if (mainCamera != null)
             {
                 //By default, use the camera transform matrix to transform the frame into 
-                leapTransform = mainCamera.transform.GetLeapMatrix();
-                leapTransform.scale = Vector.Ones * 1e-3f;
+                leapTransform = new LeapTransform(mainCamera.transform);
+                leapTransform.scale = Vector3.one * 1e-3f;
 
                 //If the application is playing then we can try to use temporal warping
                 if (Application.isPlaying)
@@ -678,18 +678,18 @@ namespace Leap.Unity
             if (mainCamera.transform.parent != null)
             {
                 leapTransform = new LeapTransform(
-                  mainCamera.transform.parent.TransformPoint(warpedPosition).ToVector(),
-                  mainCamera.transform.parent.TransformRotation(warpedRotation).ToLeapQuaternion(),
-                  Vector.Ones * 1e-3f
+                  mainCamera.transform.parent.TransformPoint(warpedPosition),
+                  mainCamera.transform.parent.TransformRotation(warpedRotation),
+                  Vector3.one * 1e-3f
                 );
             }
             else
 #endif
             {
                 leapTransform = new LeapTransform(
-                  warpedPosition.ToVector(),
-                  warpedRotation.ToLeapQuaternion(),
-                  Vector.Ones * 1e-3f
+                  warpedPosition,
+                  warpedRotation,
+                  Vector3.one * 1e-3f
                 );
             }
 
@@ -757,29 +757,29 @@ namespace Leap.Unity
                                       _currentDevice,
                                       out precullLeftHand,
                                       out precullRightHand);
-                    bool leftValid = precullLeftHand.translation != Vector.Zero;
-                    bool rightValid = precullRightHand.translation != Vector.Zero;
+                    bool leftValid = precullLeftHand.translation != Vector3.zero;
+                    bool rightValid = precullRightHand.translation != Vector3.zero;
                     transformHands(ref precullLeftHand, ref precullRightHand);
 
                     //Calculate the delta Transforms
                     if (rightHand != null && rightValid)
                     {
                         _transformArray[0] =
-                          Matrix4x4.TRS(precullRightHand.translation.ToVector3(),
-                                        precullRightHand.rotation.ToQuaternion(),
+                          Matrix4x4.TRS(precullRightHand.translation,
+                                        precullRightHand.rotation,
                                         Vector3.one)
-                          * Matrix4x4.Inverse(Matrix4x4.TRS(rightHand.PalmPosition.ToVector3(),
-                                                            rightHand.Rotation.ToQuaternion(),
+                          * Matrix4x4.Inverse(Matrix4x4.TRS(rightHand.PalmPosition,
+                                                            rightHand.Rotation,
                                                             Vector3.one));
                     }
                     if (leftHand != null && leftValid)
                     {
                         _transformArray[1] =
-                          Matrix4x4.TRS(precullLeftHand.translation.ToVector3(),
-                                        precullLeftHand.rotation.ToQuaternion(),
+                          Matrix4x4.TRS(precullLeftHand.translation,
+                                        precullLeftHand.rotation,
                                         Vector3.one)
-                          * Matrix4x4.Inverse(Matrix4x4.TRS(leftHand.PalmPosition.ToVector3(),
-                                                            leftHand.Rotation.ToQuaternion(),
+                          * Matrix4x4.Inverse(Matrix4x4.TRS(leftHand.PalmPosition,
+                                                            leftHand.Rotation,
                                                             Vector3.one));
                     }
 

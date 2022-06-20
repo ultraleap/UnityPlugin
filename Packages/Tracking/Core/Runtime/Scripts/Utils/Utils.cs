@@ -2645,8 +2645,8 @@ namespace Leap.Unity
             Vector3 nextPoint = new Vector3();
             for (float angle = 0; Mathf.Abs(angle) <= Mathf.Abs(arc); angle += deltaAngle)
             {
-                float cosAngle = Mathf.Cos(angle * Constants.DEG_TO_RAD);
-                float sinAngle = Mathf.Sin(angle * Constants.DEG_TO_RAD);
+                float cosAngle = Mathf.Cos(angle * Mathf.Deg2Rad);
+                float sinAngle = Mathf.Sin(angle * Mathf.Deg2Rad);
                 nextPoint.x = center.x + radius * (cosAngle * forward.x + sinAngle * right.x);
                 nextPoint.y = center.y + radius * (cosAngle * forward.y + sinAngle * right.y);
                 nextPoint.z = center.z + radius * (cosAngle * forward.z + sinAngle * right.z);
@@ -2668,7 +2668,7 @@ namespace Leap.Unity
             float step = height / quality;
             for (float q = step; q <= height; q += step)
             {
-                DrawCircle(origin + direction * q, direction, Mathf.Tan(angle * Constants.DEG_TO_RAD) * q, color, quality * 8, duration, depthTest);
+                DrawCircle(origin + direction * q, direction, Mathf.Tan(angle * Mathf.Deg2Rad) * q, color, quality * 8, duration, depthTest);
             }
         }
 
