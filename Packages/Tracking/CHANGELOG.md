@@ -30,6 +30,7 @@ If you have any concerns about this, please contact us on [Github Discussions](h
 - Turning on and off multiple image retrievers referencing the same service provider or the same device results in a very low framerate
 - When having two image retrievers that both reference the same device and turning one of them off, then the other one shows a grey image
 - Initialising contact for an interaction hand while the hand is not tracked does not work and doesn't attempt again once the hand is tracked
+- Attachment Hands Example scene has errors when using a project with InputSystem
 
 
 ### Known issues 
