@@ -241,17 +241,17 @@ namespace Leap.Unity
         public Hand MergeHands(List<Hand> hands, List<float> handConfidences, List<float[]> jointConfidences)
         {
             bool isLeft = hands[0].IsLeft;
-            Vector3 mergedPalmPos = hands[0].PalmPosition * handConfidences[0];
-            Quaternion mergedPalmRot = hands[0].Rotation;
+            Vector3 mergedPalmPos = hands[0].PalmPosition.ToVector3() * handConfidences[0];
+            Quaternion mergedPalmRot = hands[0].Rotation.ToQuaternion();
 
             for (int hands_idx = 1; hands_idx < hands.Count; hands_idx++)
             {
                 // position
-                mergedPalmPos += hands[hands_idx].PalmPosition * handConfidences[hands_idx];
+                mergedPalmPos += hands[hands_idx].PalmPosition.ToVector3() * handConfidences[hands_idx];
 
                 // rotation
                 float lerpValue = handConfidences.Take(hands_idx).Sum() / handConfidences.Take(hands_idx + 1).Sum();
-                mergedPalmRot = Quaternion.Lerp(hands[hands_idx].Rotation, mergedPalmRot, lerpValue);
+                mergedPalmRot = Quaternion.Lerp(hands[hands_idx].Rotation.ToQuaternion(), mergedPalmRot, lerpValue);
             }
 
             // joints
@@ -292,9 +292,9 @@ namespace Leap.Unity
 
             Transform deviceOrigin = GetDeviceOrigin(providers[frame_idx]);
 
-            confidence = palmPosFactor * Confidence_RelativeHandPos(providers[frame_idx], deviceOrigin, hand.PalmPosition);
-            confidence += palmRotFactor * Confidence_RelativeHandRot(deviceOrigin, hand.PalmPosition, hand.PalmNormal);
-            confidence += palmVelocityFactor * Confidence_RelativeHandVelocity(providers[frame_idx], deviceOrigin, hand.PalmPosition, hand.IsLeft);
+            confidence = palmPosFactor * Confidence_RelativeHandPos(providers[frame_idx], deviceOrigin, hand.PalmPosition.ToVector3());
+            confidence += palmRotFactor * Confidence_RelativeHandRot(deviceOrigin, hand.PalmPosition.ToVector3(), hand.PalmNormal.ToVector3());
+            confidence += palmVelocityFactor * Confidence_RelativeHandVelocity(providers[frame_idx], deviceOrigin, hand.PalmPosition.ToVector3(), hand.IsLeft);
 
             // if ignoreRecentNewHands is true, then
             // the confidence should be 0 when it is the first frame with the hand in it.
@@ -580,10 +580,10 @@ namespace Leap.Unity
                 {
                     int key = (int)finger.Type * 4 + bone_idx;
 
-                    Vector3 jointPos = finger.Bone((Bone.BoneType)bone_idx).NextJoint;
+                    Vector3 jointPos = finger.Bone((Bone.BoneType)bone_idx).NextJoint.ToVector3();
                     Vector3 jointNormalVector = new Vector3();
-                    if ((int)finger.Type == 0) jointNormalVector = finger.Bone((Bone.BoneType)bone_idx).Rotation * Vector3.right;
-                    else jointNormalVector = finger.Bone((Bone.BoneType)bone_idx).Rotation * Vector3.up * -1;
+                    if ((int)finger.Type == 0) jointNormalVector = finger.Bone((Bone.BoneType)bone_idx).Rotation.ToQuaternion() * Vector3.right;
+                    else jointNormalVector = finger.Bone((Bone.BoneType)bone_idx).Rotation.ToQuaternion() * Vector3.up * -1;
 
                     float angle = Vector3.Angle(jointPos - deviceOrigin.position, jointNormalVector);
 
@@ -614,11 +614,11 @@ namespace Leap.Unity
                 {
                     int key = (int)finger.Type * 4 + bone_idx;
 
-                    Vector3 jointPos = finger.Bone((Bone.BoneType)bone_idx).NextJoint;
+                    Vector3 jointPos = finger.Bone((Bone.BoneType)bone_idx).NextJoint.ToVector3();
                     Vector3 jointNormalVector = new Vector3();
-                    jointNormalVector = finger.Bone((Bone.BoneType)bone_idx).Rotation * Vector3.up * -1;
+                    jointNormalVector = finger.Bone((Bone.BoneType)bone_idx).Rotation.ToQuaternion() * Vector3.up * -1;
 
-                    float angle = Vector3.Angle(hand.PalmNormal, jointNormalVector);
+                    float angle = Vector3.Angle(hand.PalmNormal.ToVector3(), jointNormalVector);
 
 
                     // get confidence based on a cos where it should be 1 if the angle is 0,
@@ -715,7 +715,7 @@ namespace Leap.Unity
                         lastLeftHandPositions.Add(providers[frameIdx], new HandPositionHistory());
                     }
 
-                    lastLeftHandPositions[providers[frameIdx]].AddPosition(hand.PalmPosition, Time.time);
+                    lastLeftHandPositions[providers[frameIdx]].AddPosition(hand.PalmPosition.ToVector3(), Time.time);
                 }
                 else
                 {
@@ -730,7 +730,7 @@ namespace Leap.Unity
                         lastRightHandPositions.Add(providers[frameIdx], new HandPositionHistory());
                     }
 
-                    lastRightHandPositions[providers[frameIdx]].AddPosition(hand.PalmPosition, Time.time);
+                    lastRightHandPositions[providers[frameIdx]].AddPosition(hand.PalmPosition.ToVector3(), Time.time);
 
                 }
             }

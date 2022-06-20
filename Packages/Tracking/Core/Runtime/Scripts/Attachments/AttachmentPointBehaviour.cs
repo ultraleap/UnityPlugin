@@ -95,93 +95,93 @@ namespace Leap.Unity.Attachments
                     return;
 
                 case AttachmentPointFlags.Wrist:
-                    position = hand.WristPosition;
-                    rotation = hand.Arm.Basis.rotation;
+                    position = hand.WristPosition.ToVector3();
+                    rotation = hand.Arm.Basis.rotation.ToQuaternion();
                     break;
                 case AttachmentPointFlags.Palm:
-                    position = hand.PalmPosition;
-                    rotation = hand.Basis.rotation;
+                    position = hand.PalmPosition.ToVector3();
+                    rotation = hand.Basis.rotation.ToQuaternion();
                     break;
 
                 case AttachmentPointFlags.ThumbProximalJoint:
-                    position = hand.Fingers[0].bones[1].NextJoint;
-                    rotation = hand.Fingers[0].bones[2].Rotation;
+                    position = hand.Fingers[0].bones[1].NextJoint.ToVector3();
+                    rotation = hand.Fingers[0].bones[2].Rotation.ToQuaternion();
                     break;
                 case AttachmentPointFlags.ThumbDistalJoint:
-                    position = hand.Fingers[0].bones[2].NextJoint;
-                    rotation = hand.Fingers[0].bones[3].Rotation;
+                    position = hand.Fingers[0].bones[2].NextJoint.ToVector3();
+                    rotation = hand.Fingers[0].bones[3].Rotation.ToQuaternion();
                     break;
                 case AttachmentPointFlags.ThumbTip:
-                    position = hand.Fingers[0].bones[3].NextJoint;
-                    rotation = hand.Fingers[0].bones[3].Rotation;
+                    position = hand.Fingers[0].bones[3].NextJoint.ToVector3();
+                    rotation = hand.Fingers[0].bones[3].Rotation.ToQuaternion();
                     break;
 
                 case AttachmentPointFlags.IndexKnuckle:
-                    position = hand.Fingers[1].bones[0].NextJoint;
-                    rotation = hand.Fingers[1].bones[1].Rotation;
+                    position = hand.Fingers[1].bones[0].NextJoint.ToVector3();
+                    rotation = hand.Fingers[1].bones[1].Rotation.ToQuaternion();
                     break;
                 case AttachmentPointFlags.IndexMiddleJoint:
-                    position = hand.Fingers[1].bones[1].NextJoint;
-                    rotation = hand.Fingers[1].bones[2].Rotation;
+                    position = hand.Fingers[1].bones[1].NextJoint.ToVector3();
+                    rotation = hand.Fingers[1].bones[2].Rotation.ToQuaternion();
                     break;
                 case AttachmentPointFlags.IndexDistalJoint:
-                    position = hand.Fingers[1].bones[2].NextJoint;
-                    rotation = hand.Fingers[1].bones[3].Rotation;
+                    position = hand.Fingers[1].bones[2].NextJoint.ToVector3();
+                    rotation = hand.Fingers[1].bones[3].Rotation.ToQuaternion();
                     break;
                 case AttachmentPointFlags.IndexTip:
-                    position = hand.Fingers[1].bones[3].NextJoint;
-                    rotation = hand.Fingers[1].bones[3].Rotation;
+                    position = hand.Fingers[1].bones[3].NextJoint.ToVector3();
+                    rotation = hand.Fingers[1].bones[3].Rotation.ToQuaternion();
                     break;
 
                 case AttachmentPointFlags.MiddleKnuckle:
-                    position = hand.Fingers[2].bones[0].NextJoint;
-                    rotation = hand.Fingers[2].bones[1].Rotation;
+                    position = hand.Fingers[2].bones[0].NextJoint.ToVector3();
+                    rotation = hand.Fingers[2].bones[1].Rotation.ToQuaternion();
                     break;
                 case AttachmentPointFlags.MiddleMiddleJoint:
-                    position = hand.Fingers[2].bones[1].NextJoint;
-                    rotation = hand.Fingers[2].bones[2].Rotation;
+                    position = hand.Fingers[2].bones[1].NextJoint.ToVector3();
+                    rotation = hand.Fingers[2].bones[2].Rotation.ToQuaternion();
                     break;
                 case AttachmentPointFlags.MiddleDistalJoint:
-                    position = hand.Fingers[2].bones[2].NextJoint;
-                    rotation = hand.Fingers[2].bones[3].Rotation;
+                    position = hand.Fingers[2].bones[2].NextJoint.ToVector3();
+                    rotation = hand.Fingers[2].bones[3].Rotation.ToQuaternion();
                     break;
                 case AttachmentPointFlags.MiddleTip:
-                    position = hand.Fingers[2].bones[3].NextJoint;
-                    rotation = hand.Fingers[2].bones[3].Rotation;
+                    position = hand.Fingers[2].bones[3].NextJoint.ToVector3();
+                    rotation = hand.Fingers[2].bones[3].Rotation.ToQuaternion();
                     break;
 
                 case AttachmentPointFlags.RingKnuckle:
-                    position = hand.Fingers[3].bones[0].NextJoint;
-                    rotation = hand.Fingers[3].bones[1].Rotation;
+                    position = hand.Fingers[3].bones[0].NextJoint.ToVector3();
+                    rotation = hand.Fingers[3].bones[1].Rotation.ToQuaternion();
                     break;
                 case AttachmentPointFlags.RingMiddleJoint:
-                    position = hand.Fingers[3].bones[1].NextJoint;
-                    rotation = hand.Fingers[3].bones[2].Rotation;
+                    position = hand.Fingers[3].bones[1].NextJoint.ToVector3();
+                    rotation = hand.Fingers[3].bones[2].Rotation.ToQuaternion();
                     break;
                 case AttachmentPointFlags.RingDistalJoint:
-                    position = hand.Fingers[3].bones[2].NextJoint;
-                    rotation = hand.Fingers[3].bones[3].Rotation;
+                    position = hand.Fingers[3].bones[2].NextJoint.ToVector3();
+                    rotation = hand.Fingers[3].bones[3].Rotation.ToQuaternion();
                     break;
                 case AttachmentPointFlags.RingTip:
-                    position = hand.Fingers[3].bones[3].NextJoint;
-                    rotation = hand.Fingers[3].bones[3].Rotation;
+                    position = hand.Fingers[3].bones[3].NextJoint.ToVector3();
+                    rotation = hand.Fingers[3].bones[3].Rotation.ToQuaternion();
                     break;
 
                 case AttachmentPointFlags.PinkyKnuckle:
-                    position = hand.Fingers[4].bones[0].NextJoint;
-                    rotation = hand.Fingers[4].bones[1].Rotation;
+                    position = hand.Fingers[4].bones[0].NextJoint.ToVector3();
+                    rotation = hand.Fingers[4].bones[1].Rotation.ToQuaternion();
                     break;
                 case AttachmentPointFlags.PinkyMiddleJoint:
-                    position = hand.Fingers[4].bones[1].NextJoint;
-                    rotation = hand.Fingers[4].bones[2].Rotation;
+                    position = hand.Fingers[4].bones[1].NextJoint.ToVector3();
+                    rotation = hand.Fingers[4].bones[2].Rotation.ToQuaternion();
                     break;
                 case AttachmentPointFlags.PinkyDistalJoint:
-                    position = hand.Fingers[4].bones[2].NextJoint;
-                    rotation = hand.Fingers[4].bones[3].Rotation;
+                    position = hand.Fingers[4].bones[2].NextJoint.ToVector3();
+                    rotation = hand.Fingers[4].bones[3].Rotation.ToQuaternion();
                     break;
                 case AttachmentPointFlags.PinkyTip:
-                    position = hand.Fingers[4].bones[3].NextJoint;
-                    rotation = hand.Fingers[4].bones[3].Rotation;
+                    position = hand.Fingers[4].bones[3].NextJoint.ToVector3();
+                    rotation = hand.Fingers[4].bones[3].Rotation.ToQuaternion();
                     break;
             }
         }

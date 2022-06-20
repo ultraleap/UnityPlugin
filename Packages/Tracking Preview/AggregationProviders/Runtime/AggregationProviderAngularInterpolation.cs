@@ -138,9 +138,9 @@ namespace Leap.Unity
                     }
                     else
                     {
-                        Vector3 nH = hand.PalmPosition;
-                        Vector3 tH = tempHand.PalmPosition;
-                        tempHand.PalmPosition = new Vector3(aprxAvg(nH.x, tH.x), aprxAvg(nH.y, tH.y), aprxAvg(nH.z, tH.z));
+                        Vector3 nH = hand.PalmPosition.ToVector3();
+                        Vector3 tH = tempHand.PalmPosition.ToVector3();
+                        tempHand.PalmPosition = new Vector(aprxAvg(nH.x, tH.x), aprxAvg(nH.y, tH.y), aprxAvg(nH.z, tH.z));
                         //tempHand.PalmPosition = hand.PalmPosition;
 
 
@@ -151,7 +151,7 @@ namespace Leap.Unity
 
             if (tempHand != null)
             {
-                tempHandPalmPosition = tempHand.PalmPosition;
+                tempHandPalmPosition = tempHand.PalmPosition.ToVector3();
             }
             #endregion
 
@@ -176,7 +176,7 @@ namespace Leap.Unity
                 midDevicePointForward = midpointDevices.forward;
                 midDevicePointUp = midpointDevices.up;
 
-                Vector3 angleCalculationHandPosition = tempHand.PalmPosition;
+                Vector3 angleCalculationHandPosition = tempHand.PalmPosition.ToVector3();
 
                 angle = AngleSigned(angleCalculationHandPosition, midpointDevices.position + midpointDevices.up, midpointDevices.forward);
                 //Debug.Log(angle);

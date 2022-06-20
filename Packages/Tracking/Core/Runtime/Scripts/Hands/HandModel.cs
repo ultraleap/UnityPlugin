@@ -92,7 +92,7 @@ namespace Leap.Unity
         /// <returns> A Vector3 containing the Unity coordinates of the palm position. </returns>
         public Vector3 GetPalmPosition()
         {
-            return hand_.PalmPosition;
+            return hand_.PalmPosition.ToVector3();
         }
 
         /// <summary> 
@@ -105,7 +105,7 @@ namespace Leap.Unity
             {
                 // The hand Basis vectors are calculated explicitly.  This requires using Basis.CalculateRotation()
                 // instead of Basis.quaternion.
-                return hand_.Basis.rotation;
+                return hand_.Basis.CalculateRotation();
             }
             if (palm)
             {
@@ -122,7 +122,7 @@ namespace Leap.Unity
         {
             if (hand_ != null)
             {
-                return hand_.Direction;
+                return hand_.Direction.ToVector3();
             }
             if (palm)
             {
@@ -139,7 +139,7 @@ namespace Leap.Unity
         {
             if (hand_ != null)
             {
-                return hand_.PalmNormal;
+                return hand_.PalmNormal.ToVector3();
             }
             if (palm)
             {
@@ -156,7 +156,7 @@ namespace Leap.Unity
         {
             if (hand_ != null)
             {
-                return hand_.Arm.Direction;
+                return hand_.Arm.Direction.ToVector3();
             }
             if (forearm)
             {
@@ -173,8 +173,8 @@ namespace Leap.Unity
         {
             if (hand_ != null)
             {
-                Vector3 leap_center = 0.5f * (hand_.Arm.WristPosition + hand_.Arm.ElbowPosition);
-                return leap_center;
+                Vector leap_center = 0.5f * (hand_.Arm.WristPosition + hand_.Arm.ElbowPosition);
+                return leap_center.ToVector3();
             }
             if (forearm)
             {
@@ -188,7 +188,7 @@ namespace Leap.Unity
         /// </summary>
         public float GetArmLength()
         {
-            return (hand_.Arm.WristPosition - hand_.Arm.ElbowPosition).magnitude;
+            return (hand_.Arm.WristPosition - hand_.Arm.ElbowPosition).Magnitude;
         }
 
         /// <summary> 
@@ -207,7 +207,7 @@ namespace Leap.Unity
         {
             if (hand_ != null)
             {
-                Vector3 local_position = hand_.Arm.ElbowPosition;
+                Vector3 local_position = hand_.Arm.ElbowPosition.ToVector3();
                 return local_position;
             }
             if (elbowJoint)
@@ -225,7 +225,7 @@ namespace Leap.Unity
         {
             if (hand_ != null)
             {
-                Vector3 local_position = hand_.Arm.WristPosition;
+                Vector3 local_position = hand_.Arm.WristPosition.ToVector3();
                 return local_position;
             }
             if (wristJoint)
@@ -243,7 +243,7 @@ namespace Leap.Unity
         {
             if (hand_ != null)
             {
-                Quaternion local_rotation = hand_.Arm.Rotation;
+                Quaternion local_rotation = hand_.Arm.Rotation.ToQuaternion();
                 return local_rotation;
             }
             if (forearm)

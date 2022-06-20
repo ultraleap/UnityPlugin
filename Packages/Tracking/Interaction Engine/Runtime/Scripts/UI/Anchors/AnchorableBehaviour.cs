@@ -744,7 +744,7 @@ namespace Leap.Unity.Interaction
                 if (hoveringController is InteractionHand)
                 {
                     Hand hoveringHand = interactionBehaviour.closestHoveringHand;
-                    hoverTarget = hoveringHand.PalmPosition;
+                    hoverTarget = hoveringHand.PalmPosition.ToVector3();
                 }
                 else
                 {

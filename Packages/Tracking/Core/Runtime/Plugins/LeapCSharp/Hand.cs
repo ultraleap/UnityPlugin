@@ -47,6 +47,7 @@ namespace Leap
             Fingers.Add(new Finger());
         }
 
+
         /// <summary>
         /// Constructs a hand.
         /// 
@@ -54,6 +55,54 @@ namespace Leap
         /// have valid tracking data. Get valid Hand objects from a frame
         /// received from the service.
         /// @since 3.0
+        /// </summary>
+        [System.Obsolete("This signature will be removed in the next major version of the plugin. Use the one with Vector3 and Quaternion instead.")]
+        public Hand(long frameID,
+                    int id,
+                    float confidence,
+                    float grabStrength,
+                    float grabAngle,
+                    float pinchStrength,
+                    float pinchDistance,
+                    float palmWidth,
+                    bool isLeft,
+                    float timeVisible,
+                    Arm arm,
+                    List<Finger> fingers,
+                    Vector palmPosition,
+                    Vector stabilizedPalmPosition,
+                    Vector palmVelocity,
+                    Vector palmNormal,
+                    LeapQuaternion palmOrientation,
+                    Vector direction,
+                    Vector wristPosition)
+        {
+            FrameId = frameID;
+            Id = id;
+            Confidence = confidence;
+            GrabStrength = grabStrength;
+            GrabAngle = grabAngle;
+            PinchStrength = pinchStrength;
+            PinchDistance = pinchDistance;
+            PalmWidth = palmWidth;
+            IsLeft = isLeft;
+            TimeVisible = timeVisible;
+            Arm = arm;
+            Fingers = fingers;
+            PalmPosition = palmPosition;
+            StabilizedPalmPosition = stabilizedPalmPosition;
+            PalmVelocity = palmVelocity;
+            PalmNormal = palmNormal;
+            Rotation = palmOrientation;
+            Direction = direction;
+            WristPosition = wristPosition;
+        }
+        /// <summary>
+        /// Constructs a hand.
+        /// 
+        /// Generally, you should not create your own Hand objects. Such objects will not
+        /// have valid tracking data. Get valid Hand objects from a frame
+        /// received from the service.
         /// </summary>
         public Hand(long frameID,
                     int id,
@@ -87,13 +136,13 @@ namespace Leap
             TimeVisible = timeVisible;
             Arm = arm;
             Fingers = fingers;
-            PalmPosition = palmPosition;
-            StabilizedPalmPosition = stabilizedPalmPosition;
-            PalmVelocity = palmVelocity;
-            PalmNormal = palmNormal;
-            Rotation = palmOrientation;
-            Direction = direction;
-            WristPosition = wristPosition;
+            PalmPosition = ToVector(palmPosition);
+            StabilizedPalmPosition = ToVector(stabilizedPalmPosition);
+            PalmVelocity = ToVector(palmVelocity);
+            PalmNormal = ToVector(palmNormal);
+            Rotation = ToLeapQuaternion(palmOrientation);
+            Direction = ToVector(direction);
+            WristPosition = ToVector(wristPosition);
         }
 
         /// <summary>
@@ -172,13 +221,15 @@ namespace Leap
         /// The center position of the palm.
         /// @since 1.0
         /// </summary>
-        public Vector3 PalmPosition;
+        [System.Obsolete("Its type will be changed from Vector to Vector3")]
+        public Vector PalmPosition;
 
         /// <summary>
         /// The rate of change of the palm position.
         /// @since 1.0
         /// </summary>
-        public Vector3 PalmVelocity;
+        [System.Obsolete("Its type will be changed from Vector to Vector3")]
+        public Vector PalmVelocity;
 
         /// <summary>
         /// The normal vector to the palm. If your hand is flat, this vector will
@@ -191,7 +242,8 @@ namespace Leap
         /// respect to the horizontal plane.
         /// @since 1.0
         /// </summary>
-        public Vector3 PalmNormal;
+        [System.Obsolete("Its type will be changed from Vector to Vector3")]
+        public Vector PalmNormal;
 
         /// <summary>
         /// The direction from the palm position toward the fingers.
@@ -203,7 +255,8 @@ namespace Leap
         /// respect to the horizontal plane.
         /// @since 1.0
         /// </summary>
-        public Vector3 Direction;
+        [System.Obsolete("Its type will be changed from Vector to Vector3")]
+        public Vector Direction;
 
         /// <summary>
         /// The transform of the hand.
@@ -218,7 +271,8 @@ namespace Leap
         /// 
         /// @since 3.1
         /// </summary>
-        public Quaternion Rotation;
+        [System.Obsolete("Its type will be changed from LeapQuaternion to UnityEngine.Quaternion")]
+        public LeapQuaternion Rotation;
 
         /// <summary>
         /// The strength of a grab hand pose.
@@ -277,13 +331,15 @@ namespace Leap
         /// primarily on the speed of movement.
         /// @since 1.0
         /// </summary>
-        public Vector3 StabilizedPalmPosition;
+        [System.Obsolete("Its type will be changed from Vector to Vector3")]
+        public Vector StabilizedPalmPosition;
 
         /// <summary>
         /// The position of the wrist of this hand.
         /// @since 2.0.3
         /// </summary>
-        public Vector3 WristPosition;
+        [System.Obsolete("Its type will be changed from Vector to Vector3")]
+        public Vector WristPosition;
 
         /// <summary>
         /// The duration of time this Hand has been visible to the Leap Motion Controller.
@@ -319,5 +375,19 @@ namespace Leap
         /// @since 2.0.3
         /// </summary>
         public Arm Arm;
+
+
+
+        [Obsolete("This will be removed in the next major version update")]
+        private Vector ToVector(Vector3 v)
+        {
+            return new Vector(v.x, v.y, v.z);
+        }
+
+        [Obsolete("This will be removed in the next major version update")]
+        private LeapQuaternion ToLeapQuaternion(Quaternion q)
+        {
+            return new LeapQuaternion(q.x, q.y, q.z, q.w);
+        }
     }
 }

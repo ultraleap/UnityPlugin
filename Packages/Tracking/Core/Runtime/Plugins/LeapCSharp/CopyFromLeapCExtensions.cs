@@ -57,12 +57,12 @@ namespace LeapInternal
             hand.PalmWidth = leapHand.palm.width;
             hand.IsLeft = leapHand.type == eLeapHandType.eLeapHandType_Left;
             hand.TimeVisible = (float)(leapHand.visible_time * 1e-6);
-            hand.PalmPosition = leapHand.palm.position.ToVector3();
-            hand.StabilizedPalmPosition = leapHand.palm.stabilized_position.ToVector3();
-            hand.PalmVelocity = leapHand.palm.velocity.ToVector3();
-            hand.PalmNormal = leapHand.palm.normal.ToVector3();
-            hand.Rotation = leapHand.palm.orientation.ToQuaternion();
-            hand.Direction = leapHand.palm.direction.ToVector3();
+            hand.PalmPosition = leapHand.palm.position.ToLeapVector();
+            hand.StabilizedPalmPosition = leapHand.palm.stabilized_position.ToLeapVector();
+            hand.PalmVelocity = leapHand.palm.velocity.ToLeapVector();
+            hand.PalmNormal = leapHand.palm.normal.ToLeapVector();
+            hand.Rotation = leapHand.palm.orientation.ToLeapQuaternion();
+            hand.Direction = leapHand.palm.direction.ToLeapVector();
             hand.WristPosition = hand.Arm.NextJoint;
 
             hand.Fingers[0].CopyFrom(leapHand.thumb, Leap.Finger.FingerType.TYPE_THUMB, hand.Id, hand.TimeVisible);
@@ -118,14 +118,14 @@ namespace LeapInternal
         public static Bone CopyFrom(this Bone bone, LEAP_BONE leapBone, Bone.BoneType type)
         {
             bone.Type = type;
-            bone.PrevJoint = leapBone.prev_joint.ToVector3();
-            bone.NextJoint = leapBone.next_joint.ToVector3();
+            bone.PrevJoint = leapBone.prev_joint.ToLeapVector();
+            bone.NextJoint = leapBone.next_joint.ToLeapVector();
             bone.Direction = (bone.NextJoint - bone.PrevJoint);
-            bone.Length = bone.Direction.magnitude;
+            bone.Length = bone.Direction.Magnitude;
 
             if (bone.Length < float.Epsilon)
             {
-                bone.Direction = UnityEngine.Vector3.zero;
+                bone.Direction = Vector.Zero;
             }
             else
             {
@@ -133,7 +133,7 @@ namespace LeapInternal
             }
 
             bone.Center = (bone.PrevJoint + bone.NextJoint) / 2.0f;
-            bone.Rotation = leapBone.rotation.ToQuaternion();
+            bone.Rotation = leapBone.rotation.ToLeapQuaternion();
             bone.Width = leapBone.width;
 
             return bone;

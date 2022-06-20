@@ -138,8 +138,8 @@ namespace Leap.Unity
           */
         public static Quaternion CalculateRotation(this LeapTransform trs)
         {
-            Vector3 up = trs.yBasis;
-            Vector3 forward = -trs.zBasis;
+            Vector3 up = trs.yBasis.ToVector3();
+            Vector3 forward = -trs.zBasis.ToVector3();
             return Quaternion.LookRotation(forward, up);
         }
 

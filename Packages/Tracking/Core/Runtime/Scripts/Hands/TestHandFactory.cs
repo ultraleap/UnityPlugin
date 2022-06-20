@@ -61,10 +61,10 @@ namespace Leap
             // Apply the appropriate mirroring if this is a right hand.
             if (!isLeft)
             {
-                leftHandTransform.translation = new Vector3(-leftHandTransform.translation.x,
+                leftHandTransform.translation = new Vector(-leftHandTransform.translation.x,
                   leftHandTransform.translation.y, leftHandTransform.translation.z);
 
-                leftHandTransform.rotation = new Quaternion(-leftHandTransform.rotation.x,
+                leftHandTransform.rotation = new LeapQuaternion(-leftHandTransform.rotation.x,
                                                                  leftHandTransform.rotation.y,
                                                                  leftHandTransform.rotation.z,
                                                                 -leftHandTransform.rotation.w);
@@ -127,25 +127,25 @@ namespace Leap
             switch (pose)
             {
                 case TestHandPose.HeadMountedA:
-                    transform.rotation = angleAxis(180 * Mathf.Deg2Rad, Vector3.forward);
-                    transform.translation = new Vector3(80f, 120f, 0f);
+                    transform.rotation = angleAxis(180 * Mathf.Deg2Rad, Vector3.forward).ToLeapQuaternion();
+                    transform.translation = new Vector(80f, 120f, 0f);
                     break;
                 case TestHandPose.HeadMountedB:
-                    transform.rotation = Quaternion.Euler(30F, -10F, -20F);
-                    transform.translation = new Vector3(220f, 270f, 130f);
+                    transform.rotation = Quaternion.Euler(30F, -10F, -20F).ToLeapQuaternion();
+                    transform.translation = new Vector(220f, 270f, 130f);
                     break;
                 case TestHandPose.DesktopModeA:
-                    transform.rotation = angleAxis(0f * Mathf.Deg2Rad, Vector3.forward)
+                    transform.rotation = (angleAxis(0f * Mathf.Deg2Rad, Vector3.forward)
                                           * angleAxis(-90f * Mathf.Deg2Rad, Vector3.right)
-                                          * angleAxis(180f * Mathf.Deg2Rad, Vector3.up);
-                    transform.translation = new Vector3(120f, 0f, -170f);
+                                          * angleAxis(180f * Mathf.Deg2Rad, Vector3.up)).ToLeapQuaternion();
+                    transform.translation = new Vector(120f, 0f, -170f);
                     break;
                 case TestHandPose.Screentop:
-                    transform.rotation = angleAxis(0 * Mathf.Deg2Rad, Vector3.forward)
+                    transform.rotation = (angleAxis(0 * Mathf.Deg2Rad, Vector3.forward)
                                           * angleAxis(140 * Mathf.Deg2Rad, Vector3.right)
-                                          * angleAxis(0 * Mathf.Deg2Rad, Vector3.up);
-                    transform.translation = new Vector3(-120f, 20f, -380f);
-                    transform.scale = new Vector3(1, 1, 1);
+                                          * angleAxis(0 * Mathf.Deg2Rad, Vector3.up)).ToLeapQuaternion();
+                    transform.translation = new Vector(-120f, 20f, -380f);
+                    transform.scale = new Vector(1, 1, 1);
                     break;
 
             }
@@ -156,7 +156,8 @@ namespace Leap
 
         #region Leap Space Hand Generation
 
-        public static Vector3 PepperWristOffset = new Vector3(-8.87f, -0.5f, 85.12f);
+        [System.Obsolete("This code will be removed in the next major version of the plugin. If you believe that it needs to be kept, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
+        public static Vector PepperWristOffset = new Vector(-8.87f, -0.5f, 85.12f);
 
         private static Hand makeLeapSpaceTestHand(int frameId, int handId, bool isLeft)
         {
@@ -191,7 +192,7 @@ namespace Leap
                                      Vector3.down,
                                      Quaternion.identity,
                                      Vector3.forward,
-                                     PepperWristOffset);
+                                     new Vector3(-8.87f, -0.5f, 85.12f));
             //  new Vector3(-12.36385750984f, -6.5f, 81.0111342526f));
 
             return testHand;
@@ -292,7 +293,7 @@ namespace Leap
             handId,
             fingerId,
             0.0f,
-            distal.NextJoint,
+            distal.NextJoint.ToVector3(),
             forward,
             8f,
             jointLengths[1] + jointLengths[2] + jointLengths[3],

@@ -199,7 +199,7 @@ namespace Leap.Unity
                     {
                         Gizmos.color = OffColor;
                     }
-                    Gizmos.DrawWireSphere(finger.TipPosition, finger.Width);
+                    Gizmos.DrawWireSphere(finger.TipPosition.ToVector3(), finger.Width);
                 }
             }
         }

@@ -319,7 +319,7 @@ namespace Leap.Unity
                 {
                     int key = getFingerJointIndex((int)finger.Type, j);
 
-                    Vector3 position = finger.Bone((Bone.BoneType)j).NextJoint;
+                    Vector3 position = finger.Bone((Bone.BoneType)j).NextJoint.ToVector3();
                     _spherePositions[key] = position;
 
                     drawSphere(position);
@@ -329,11 +329,11 @@ namespace Leap.Unity
             //Now we just have a few more spheres for the hands
             //PalmPos, WristPos, and mockThumbJointPos, which is derived and not taken from the frame obj
 
-            Vector3 palmPosition = _hand.PalmPosition;
+            Vector3 palmPosition = _hand.PalmPosition.ToVector3();
             drawSphere(palmPosition, _palmRadius);
 
-            Vector3 thumbBaseToPalm = _spherePositions[THUMB_BASE_INDEX] - _hand.PalmPosition;
-            Vector3 mockThumbJointPos = _hand.PalmPosition + Vector3.Reflect(thumbBaseToPalm, _hand.Basis.xBasis);
+            Vector3 thumbBaseToPalm = _spherePositions[THUMB_BASE_INDEX] - _hand.PalmPosition.ToVector3();
+            Vector3 mockThumbJointPos = _hand.PalmPosition.ToVector3() + Vector3.Reflect(thumbBaseToPalm, _hand.Basis.xBasis.ToVector3());
             drawSphere(mockThumbJointPos);
 
             //If we want to show the arm, do the calculations and display the meshes
@@ -341,12 +341,12 @@ namespace Leap.Unity
             {
                 var arm = _hand.Arm;
 
-                Vector3 right = arm.Basis.xBasis * arm.Width * 0.7f * 0.5f;
-                Vector3 wrist = arm.WristPosition;
-                Vector3 elbow = arm.ElbowPosition;
+                Vector3 right = arm.Basis.xBasis.ToVector3() * arm.Width * 0.7f * 0.5f;
+                Vector3 wrist = arm.WristPosition.ToVector3();
+                Vector3 elbow = arm.ElbowPosition.ToVector3();
 
                 float armLength = Vector3.Distance(wrist, elbow);
-                wrist -= arm.Direction * armLength * 0.05f;
+                wrist -= arm.Direction.ToVector3() * armLength * 0.05f;
 
                 Vector3 armFrontRight = wrist + right;
                 Vector3 armFrontLeft = wrist - right;

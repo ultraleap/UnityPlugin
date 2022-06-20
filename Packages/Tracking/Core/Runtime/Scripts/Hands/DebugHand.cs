@@ -88,9 +88,9 @@ namespace Leap.Unity
         protected void DrawDebugLines()
         {
             Hand hand = GetLeapHand();
-            Debug.DrawLine(hand.Arm.ElbowPosition, hand.Arm.WristPosition, Color.red); //Arm
-            Debug.DrawLine(hand.WristPosition, hand.PalmPosition, Color.white); //Wrist to palm line
-            Debug.DrawLine(hand.PalmPosition, (hand.PalmPosition + hand.PalmNormal * hand.PalmWidth / 2), Color.black); //Hand Normal
+            Debug.DrawLine(hand.Arm.ElbowPosition.ToVector3(), hand.Arm.WristPosition.ToVector3(), Color.red); //Arm
+            Debug.DrawLine(hand.WristPosition.ToVector3(), hand.PalmPosition.ToVector3(), Color.white); //Wrist to palm line
+            Debug.DrawLine(hand.PalmPosition.ToVector3(), (hand.PalmPosition + hand.PalmNormal * hand.PalmWidth / 2).ToVector3(), Color.black); //Hand Normal
 
             if (VisualizeBasis)
             {
@@ -104,19 +104,27 @@ namespace Leap.Unity
                 for (int i = 0; i < 4; ++i)
                 {
                     Bone bone = finger.Bone((Bone.BoneType)i);
-                    Debug.DrawLine(bone.PrevJoint, bone.PrevJoint + bone.Direction * bone.Length, colors[i]);
+                    Debug.DrawLine(bone.PrevJoint.ToVector3(), bone.PrevJoint.ToVector3() + bone.Direction.ToVector3() * bone.Length, colors[i]);
                     if (VisualizeBasis)
                         DrawBasis(bone.PrevJoint, bone.Basis, .01f);
                 }
             }
         }
 
+        [System.Obsolete("This signature will be removed in the next major version of the plugin. Use the version with VEctor3 instead. If you believe that it needs to be kept, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
+        public void DrawBasis(Vector position, LeapTransform basis, float scale)
+        {
+            Vector3 origin = position.ToVector3();
+            Debug.DrawLine(origin, origin + basis.xBasis.ToVector3() * scale, Color.red);
+            Debug.DrawLine(origin, origin + basis.yBasis.ToVector3() * scale, Color.green);
+            Debug.DrawLine(origin, origin + basis.zBasis.ToVector3() * scale, Color.blue);
+        }
         public void DrawBasis(Vector3 position, LeapTransform basis, float scale)
         {
             Vector3 origin = position;
-            Debug.DrawLine(origin, origin + basis.xBasis * scale, Color.red);
-            Debug.DrawLine(origin, origin + basis.yBasis * scale, Color.green);
-            Debug.DrawLine(origin, origin + basis.zBasis * scale, Color.blue);
+            Debug.DrawLine(origin, origin + basis.xBasis.ToVector3() * scale, Color.red);
+            Debug.DrawLine(origin, origin + basis.yBasis.ToVector3() * scale, Color.green);
+            Debug.DrawLine(origin, origin + basis.zBasis.ToVector3() * scale, Color.blue);
         }
 
     }

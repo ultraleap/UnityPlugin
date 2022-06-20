@@ -153,7 +153,7 @@ namespace Leap
 
             if (bone.Length < float.Epsilon)
             {
-                bone.Direction = Vector3.zero;
+                bone.Direction = Vector.Zero;
             }
             else
             {
