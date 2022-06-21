@@ -10,6 +10,7 @@ using Hand = Leap.Hand;
 
 namespace Ultraleap.Tracking.OpenXR
 {
+#pragma warning disable 0618
     public class OpenXRLeapProvider : LeapProvider
     {
         private Frame _updateFrame = new Frame();
@@ -370,4 +371,5 @@ namespace Ultraleap.Tracking.OpenXR
 
         #endregion
     }
+#pragma warning restore 0618
 }

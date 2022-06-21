@@ -14,7 +14,7 @@ using UnityEngine;
 
 namespace Leap.Unity
 {
-
+#pragma warning disable 0618
     /// <summary>
     /// possible structure to implement our own aggregation code,
     /// calculates hand and joint confidences and interpolates linearly between hands based on their confidences,
@@ -970,4 +970,5 @@ namespace Leap.Unity
 
         #endregion
     }
+#pragma warning restore 0618
 }

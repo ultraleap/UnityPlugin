@@ -10,6 +10,7 @@ using UnityEngine;
 
 namespace Leap.Unity.Controllers
 {
+#pragma warning disable 0618
     /// <summary>
     /// IsFacingDown checks to see if the angle between the InputMethodType and the floor 
     /// is less than the action threshold. This is useful for checking if XRControllers
@@ -60,4 +61,5 @@ namespace Leap.Unity.Controllers
             return false;
         }
     }
+#pragma warning restore 0618
 }

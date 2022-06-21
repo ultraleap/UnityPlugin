@@ -14,7 +14,7 @@ using UnityEngine;
 
 namespace Leap.Unity
 {
-
+#pragma warning disable 0618
     /// <summary>
     /// John's and Flo's aggregation code. An example of how aggregation could be implemented.
     /// only works for the first two hands it sees (of the same chirality)
@@ -243,4 +243,5 @@ namespace Leap.Unity
             Gizmos.DrawLine(midDevicePointPosition, rightLimit);
         }
     }
+#pragma warning restore 0618
 }

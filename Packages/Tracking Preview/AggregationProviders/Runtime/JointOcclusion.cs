@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
+#pragma warning disable 0618 
 /// <summary>
 /// class to calculate confidence values based on joint occlusion.
 /// </summary>
@@ -205,3 +206,5 @@ public class JointOcclusion : MonoBehaviour
     }
 
 }
+
+#pragma warning restore 0618
