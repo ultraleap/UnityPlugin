@@ -1,6 +1,14 @@
-## This Merge Request Template
+## Pull Request Templates
 
-This merge request template is for contributing to pre-release/preview packages and has fewer tasks to complete. The quality threshold for reviewing these merge requests is lower - prioritize a lean review process.
+Switch template by going to preview and clicking the link - note it not work if you've made any changes to the description.
+
+- [default.md](?expand=1) - for contributions to stable packages.
+- [lightweight.md](?expand=1&template=lightweight.md) - for contributions to pre-release/preview packages use the lightweight merge request template. The quality threshold for reviewing is lower - it prioritizes a lean review process.
+- [release.md](?expand=1&template=release.md) - for release merge requests.
+
+**You are currently using: lightweight.md**
+
+Note: these links work by overwriting query parameters of the current url. If the current url contains any you may want to amend the url with `&template=name.md` instead of using the link. See [query parameter docs](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/using-query-parameters-to-create-a-pull-request) for more information.
 
 ## Summary
 
@@ -19,7 +27,7 @@ _These tasks are for the merge request creator to tick off when creating a merge
 
 _Add any instructions or tasks for the reviewer such as specific test considerations before this can be merged._
 
-[Use emojis in review threads to communicate intent and help contributors.](CONTRIBUTING.md#review-threads)
+[Use emojis in review threads to communicate intent and help contributors.](https://github.com/ultraleap/UnityPlugin/blob/develop/CONTRIBUTING.md#review-threads)
 
 - [ ] Code reviewed.
 - [ ] Non-code assets e.g. Unity assets/scenes reviewed.
