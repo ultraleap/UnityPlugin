@@ -249,7 +249,7 @@ namespace Ultraleap.Tracking.OpenXR
             var minDistanceSquared = float.MaxValue;
             foreach (var finger in hand.Fingers.Skip(1))
             {
-                var distanceSquared = (finger.TipPosition - thumbTipPosition).sqrMagnitude;
+                var distanceSquared = (finger.TipPosition.ToVector3() - thumbTipPosition.ToVector3()).sqrMagnitude;
                 minDistanceSquared = Mathf.Min(distanceSquared, minDistanceSquared);
             }
 
@@ -260,10 +260,10 @@ namespace Ultraleap.Tracking.OpenXR
         private float CalculateBoneDistanceSquared(Bone boneA, Bone boneB)
         {
             // Denormalize directions to bone length.
-            var boneAJoint = boneA.PrevJoint;
-            var boneBJoint = boneB.PrevJoint;
-            var boneADirection = boneA.Direction * boneA.Length;
-            var boneBDirection = boneB.Direction * boneB.Length;
+            var boneAJoint = boneA.PrevJoint.ToVector3();
+            var boneBJoint = boneB.PrevJoint.ToVector3();
+            var boneADirection = boneA.Direction.ToVector3() * boneA.Length;
+            var boneBDirection = boneB.Direction.ToVector3() * boneB.Length;
 
             // Compute the minimum (squared) distance between two bones.
             var diff = boneBJoint - boneAJoint;
