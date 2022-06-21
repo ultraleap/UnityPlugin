@@ -517,7 +517,7 @@ namespace Leap.Unity.Attachments
             int tIdx = 0;
             foreach (var behaviour in monoBehaviours)
             {
-                if (transform != null)
+                if (behaviour != null)
                 {
                     s_transformsBuffer[tIdx++] = behaviour.transform;
                 }
