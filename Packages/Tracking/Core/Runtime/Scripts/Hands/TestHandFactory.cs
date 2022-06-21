@@ -127,7 +127,7 @@ namespace Leap
             switch (pose)
             {
                 case TestHandPose.HeadMountedA:
-                    transform.rotation = angleAxis(180 * Mathf.Deg2Rad, Vector3.back).ToLeapQuaternion();
+                    transform.rotation = angleAxis(180 * Mathf.Deg2Rad, Vector3.back);
                     transform.translation = new Vector3(80f, 120f, 0f);
                     break;
                 case TestHandPose.HeadMountedB:
@@ -135,13 +135,13 @@ namespace Leap
                     transform.translation = new Vector3(220f, 270f, 130f);
                     break;
                 case TestHandPose.DesktopModeA:
-                    transform.rotation = (angleAxis(0f * Mathf.Deg2Rad, Vector3.back)
+                    transform.rotation = angleAxis(0f * Mathf.Deg2Rad, Vector3.back)
                                           * angleAxis(-90f * Mathf.Deg2Rad, Vector3.right)
                                           * angleAxis(180f * Mathf.Deg2Rad, Vector3.up);
                     transform.translation = new Vector3(120f, 0f, -170f);
                     break;
                 case TestHandPose.Screentop:
-                    transform.rotation = (angleAxis(0 * Mathf.Deg2Rad, Vector3.back)
+                    transform.rotation = angleAxis(0 * Mathf.Deg2Rad, Vector3.back)
                                           * angleAxis(140 * Mathf.Deg2Rad, Vector3.right)
                                           * angleAxis(0 * Mathf.Deg2Rad, Vector3.up);
                     transform.translation = new Vector3(-120f, 20f, -380f);
