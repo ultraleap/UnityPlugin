@@ -13,7 +13,7 @@ using UnityEngine.SceneManagement;
 
 namespace Leap.Unity
 {
-
+#pragma warning disable 0618
     /// <summary>
     /// Static convenience methods and extension methods for getting useful Hand data.
     /// </summary>
@@ -742,5 +742,5 @@ namespace Leap.Unity
         #endregion
 
     }
-
+#pragma warning restore 0618
 }

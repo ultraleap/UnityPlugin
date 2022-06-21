@@ -14,7 +14,7 @@ using UnityEngine;
 
 namespace Leap.Unity.Interaction
 {
-
+#pragma warning disable 0618
     [CanEditMultipleObjects]
     [CustomEditor(typeof(InteractionController), true)]
     public class InteractionControllerEditor : CustomEditorBase<InteractionController>
@@ -99,5 +99,5 @@ namespace Leap.Unity.Interaction
             }
         }
     }
-
+#pragma warning restore 0618
 }

@@ -13,7 +13,7 @@ using UnityEngine;
 
 namespace Leap.Unity.HandsModule
 {
-
+#pragma warning disable 0618
     /// <summary>
     /// The HandBinder allows you to use your own hand models so that they follow the leap tracking data.
     /// You can bind your model by specifying transforms for the different joints and use the debug and fine tuning options to test and adjust it.
@@ -597,4 +597,5 @@ namespace Leap.Unity.HandsModule
 
         #endregion
     }
+#pragma warning restore 0618
 }

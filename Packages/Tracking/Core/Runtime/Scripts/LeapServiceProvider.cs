@@ -14,6 +14,7 @@ using UnityEngine;
 namespace Leap.Unity
 {
     using Attributes;
+#pragma warning disable 0618
 
     /// <summary>
     /// The LeapServiceProvider provides tracked Leap Hand data and images from the device
@@ -1373,4 +1374,5 @@ namespace Leap.Unity
         #endregion
 
     }
+#pragma warning restore 0618
 }

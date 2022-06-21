@@ -13,7 +13,7 @@ using UnityEngine;
 
 namespace Leap.Unity.Interaction
 {
-
+#pragma warning disable 0618
     /// <summary>
     /// ActivityManager is a wrapper around PhysX sphere queries for arbitrary Unity objects.
     /// "Active" objects are objects found in the latest query. It's also possible to get the
@@ -187,4 +187,5 @@ namespace Leap.Unity.Interaction
             }
         }
     }
+#pragma warning restore 0618
 }

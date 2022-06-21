@@ -11,7 +11,7 @@ using UnityEngine;
 namespace Leap
 {
     using System;
-
+#pragma warning disable 0618
     /// <summary>
     /// The Finger class represents a tracked finger.
     /// 
@@ -228,4 +228,5 @@ namespace Leap
             return new Vector(v.x, v.y, v.z);
         }
     }
+#pragma warning restore 0618
 }

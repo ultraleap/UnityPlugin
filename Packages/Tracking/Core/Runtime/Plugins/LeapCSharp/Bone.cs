@@ -27,7 +27,7 @@ namespace Leap
     [Serializable]
     public class Bone : IEquatable<Bone>
     {
-
+#pragma warning disable 0618
         /// <summary>
         /// Constructs a default invalid Bone object.
         /// 
@@ -210,5 +210,7 @@ namespace Leap
             TYPE_INTERMEDIATE = 2,
             TYPE_DISTAL = 3
         }
+#pragma warning restore 0618
+
     }
 }

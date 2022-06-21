@@ -13,7 +13,7 @@ using UnityEngine.Rendering;
 
 namespace Leap.Unity
 {
-
+#pragma warning disable 0618
     /// <summary>
     /// The LeapXRServiceProvider expands on the standard LeapServiceProvider to
     /// account for the offset of the Leap device with respect to the attached HMD and
@@ -814,4 +814,5 @@ namespace Leap.Unity
 
         #endregion
     }
+#pragma warning restore 0618
 }

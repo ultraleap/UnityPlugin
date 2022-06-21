@@ -12,7 +12,7 @@ using UnityEngine;
 
 namespace Leap.Unity
 {
-
+#pragma warning disable 0618
     /// <summary>
     /// The CapsuleHand is a basic Leap hand model that generates a set of spheres and 
     /// cylinders to render hands using Leap hand data.
@@ -532,4 +532,5 @@ namespace Leap.Unity
             return mesh;
         }
     }
+#pragma warning restore 0618
 }

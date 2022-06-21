@@ -16,7 +16,7 @@ using UnityEngine;
 
 namespace Leap.Unity.Interaction.Internal
 {
-
+#pragma warning disable 0618
     public class HeuristicGrabClassifier
     {
 
@@ -270,5 +270,5 @@ namespace Leap.Unity.Interaction.Internal
         }
 
     }
-
+#pragma warning restore 0618
 }

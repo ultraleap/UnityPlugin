@@ -10,7 +10,7 @@ using UnityEngine;
 namespace Leap
 {
     using System;
-
+#pragma warning disable 0618
     /// <summary>
     /// The LeapTransform class represents a transform in three dimensional space.
     /// 
@@ -398,4 +398,5 @@ namespace Leap
             return new Quaternion(q.x, q.y, q.z, q.w);
         }
     }
+#pragma warning restore 0618
 }

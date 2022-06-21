@@ -12,6 +12,7 @@ using UnityEngine;
 
 namespace Leap.Unity
 {
+#pragma warning disable 0618
     /**
      * A HandModel that draws lines for the bones in the hand and its fingers.
      *
@@ -128,4 +129,5 @@ namespace Leap.Unity
         }
 
     }
+#pragma warning restore 0618
 }

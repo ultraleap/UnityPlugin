@@ -11,7 +11,7 @@ namespace Leap
 {
     using System;
     using System.Collections.Generic;
-
+#pragma warning disable 0618
     /// <summary>
     /// The Hand class reports the physical characteristics of a detected hand.
     /// 
@@ -390,4 +390,5 @@ namespace Leap
             return new LeapQuaternion(q.x, q.y, q.z, q.w);
         }
     }
+#pragma warning restore 0618
 }

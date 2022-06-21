@@ -16,6 +16,7 @@ using UnityEngine;
 
 namespace Leap.Unity.Interaction
 {
+#pragma warning disable 0618
     public enum HandDataMode { PlayerLeft, PlayerRight, Custom }
 
     /// <summary>
@@ -941,5 +942,5 @@ namespace Leap.Unity.Interaction
         #endregion
 
     }
-
+#pragma warning restore 0618
 }

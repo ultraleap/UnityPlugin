@@ -17,7 +17,7 @@ using UnityEngine;
 
 namespace Leap.Unity.Interaction
 {
-
+#pragma warning disable 0618
     [Serializable]
     public class InteractionControllerSet : SerializableHashSet<InteractionController> { }
 
@@ -2329,5 +2329,5 @@ namespace Leap.Unity.Interaction
         #endregion
 
     }
-
+#pragma warning restore 0618
 }

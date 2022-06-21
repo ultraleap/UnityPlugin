@@ -11,7 +11,7 @@ using UnityEngine;
 namespace Leap
 {
     using System;
-
+#pragma warning disable 0618
     public static class TransformExtensions
     {
 
@@ -175,4 +175,5 @@ namespace Leap
             return new Bone().CopyFrom(bone).Transform(transform);
         }
     }
+#pragma warning restore 0618
 }

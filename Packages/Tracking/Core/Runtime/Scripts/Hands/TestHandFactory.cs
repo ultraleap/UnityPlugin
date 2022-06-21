@@ -13,7 +13,7 @@ namespace Leap
     using System;
     using System.Collections.Generic;
     using UnityEngine;
-
+#pragma warning disable 0618
     public static class TestHandFactory
     {
 
@@ -347,5 +347,5 @@ namespace Leap
         }
 
     }
-
+#pragma warning restore 0618
 }

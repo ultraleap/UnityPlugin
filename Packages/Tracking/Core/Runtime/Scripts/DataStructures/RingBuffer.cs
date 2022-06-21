@@ -11,7 +11,7 @@ using UnityEngine;
 
 namespace Leap.Unity
 {
-
+#pragma warning disable 0618
     public class RingBuffer<T> : IIndexable<T>
     {
 
@@ -181,7 +181,6 @@ namespace Leap.Unity
             }
             public T Current { get { return _buffer[_idx]; } }
         }
-
     }
-
+#pragma warning restore 0618
 }

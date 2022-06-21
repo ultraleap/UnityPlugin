@@ -12,7 +12,7 @@ using UnityEngine;
 
 namespace Leap.Unity.Encoding
 {
-
+#pragma warning disable 0618
     /// <summary>
     /// An interface that signifies this class can interpolate
     /// via the standard techniques
@@ -611,4 +611,5 @@ namespace Leap.Unity.Encoding
 
     #endregion
 
+#pragma warning restore 0618
 }

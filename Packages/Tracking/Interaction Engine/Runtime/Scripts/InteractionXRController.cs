@@ -17,7 +17,7 @@ using UnityEngine.XR;
 
 namespace Leap.Unity.Interaction
 {
-
+#pragma warning disable 0618
     [DisallowMultipleComponent]
     public class InteractionXRController : InteractionController
     {
@@ -966,5 +966,5 @@ namespace Leap.Unity.Interaction
         #endregion
 
     }
-
+#pragma warning restore 0618
 }
