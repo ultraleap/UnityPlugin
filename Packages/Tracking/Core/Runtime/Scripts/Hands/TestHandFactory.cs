@@ -127,7 +127,7 @@ namespace Leap
             switch (pose)
             {
                 case TestHandPose.HeadMountedA:
-                    transform.rotation = angleAxis(180 * Mathf.Deg2Rad, Vector3.forward).ToLeapQuaternion();
+                    transform.rotation = angleAxis(180 * Mathf.Deg2Rad, Vector3.back).ToLeapQuaternion();
                     transform.translation = new Vector(80f, 120f, 0f);
                     break;
                 case TestHandPose.HeadMountedB:
@@ -135,13 +135,13 @@ namespace Leap
                     transform.translation = new Vector(220f, 270f, 130f);
                     break;
                 case TestHandPose.DesktopModeA:
-                    transform.rotation = (angleAxis(0f * Mathf.Deg2Rad, Vector3.forward)
+                    transform.rotation = (angleAxis(0f * Mathf.Deg2Rad, Vector3.back)
                                           * angleAxis(-90f * Mathf.Deg2Rad, Vector3.right)
                                           * angleAxis(180f * Mathf.Deg2Rad, Vector3.up)).ToLeapQuaternion();
                     transform.translation = new Vector(120f, 0f, -170f);
                     break;
                 case TestHandPose.Screentop:
-                    transform.rotation = (angleAxis(0 * Mathf.Deg2Rad, Vector3.forward)
+                    transform.rotation = (angleAxis(0 * Mathf.Deg2Rad, Vector3.back)
                                           * angleAxis(140 * Mathf.Deg2Rad, Vector3.right)
                                           * angleAxis(0 * Mathf.Deg2Rad, Vector3.up)).ToLeapQuaternion();
                     transform.translation = new Vector(-120f, 20f, -380f);
@@ -169,10 +169,10 @@ namespace Leap
             fingers.Add(makePinky(frameId, handId, isLeft));
 
             Vector3 armWrist = new Vector3(-7.05809944059f, 4.0f, 50.0f);
-            Vector3 elbow = armWrist + 250f * Vector3.back;
+            Vector3 elbow = armWrist + 250f * Vector3.forward;
 
             // Adrian: The previous "armBasis" used "elbow" as a translation component.
-            Arm arm = new Arm(elbow, armWrist, (elbow + armWrist) / 2, Vector3.forward,
+            Arm arm = new Arm(elbow, armWrist, (elbow + armWrist) / 2, Vector3.back,
               250f, 41f, Quaternion.identity);
             Hand testHand = new Hand(frameId,
                                      handId,
@@ -191,7 +191,7 @@ namespace Leap
                                      new Vector3(0, 0, 0),
                                      Vector3.down,
                                      Quaternion.identity,
-                                     Vector3.forward,
+                                     Vector3.back,
                                      new Vector3(-8.87f, -0.5f, 85.12f));
             //  new Vector3(-12.36385750984f, -6.5f, 81.0111342526f));
 
