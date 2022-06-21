@@ -12,6 +12,7 @@ using UnityEngine;
 
 namespace Leap.Unity
 {
+#pragma warning disable 0618
     /// <summary>
     /// Takes a sourceDevice and aligns a targetDevice to it by transforming the targetDevice 
     /// until all bones from both hands align to within the alignmentVariance value
@@ -94,4 +95,5 @@ namespace Leap.Unity
             }
         }
     }
+#pragma warning restore 0618
 }

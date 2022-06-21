@@ -7,7 +7,6 @@
  ******************************************************************************/
 
 using Leap.Unity.Interaction;
-using Leap.Unity.Query;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -119,24 +118,25 @@ namespace Leap.InteractionEngine.Examples
                     // Find the closest handle to any InteractionHand.
                     TransformHandle closestHandleToAnyHand = null;
                     float closestHandleDist = float.PositiveInfinity;
-                    foreach (var intController in interactionManager.interactionControllers
-                                                                    .Query()
-                                                                    .Where(controller => controller.isTracked))
+                    foreach (var intController in interactionManager.interactionControllers)
                     {
-                        if (!intController.isPrimaryHovering)
-                            continue;
-                        TransformHandle testHandle = intController.primaryHoveredObject
-                                                                  .gameObject
-                                                                  .GetComponent<TransformHandle>();
-
-                        if (testHandle == null || !_transformHandles.Contains(testHandle))
-                            continue;
-
-                        float testDist = intController.primaryHoverDistance;
-                        if (testDist < closestHandleDist)
+                        if (intController.isTracked)
                         {
-                            closestHandleToAnyHand = testHandle;
-                            closestHandleDist = testDist;
+                            if (!intController.isPrimaryHovering)
+                                continue;
+                            TransformHandle testHandle = intController.primaryHoveredObject
+                                                                      .gameObject
+                                                                      .GetComponent<TransformHandle>();
+
+                            if (testHandle == null || !_transformHandles.Contains(testHandle))
+                                continue;
+
+                            float testDist = intController.primaryHoverDistance;
+                            if (testDist < closestHandleDist)
+                            {
+                                closestHandleToAnyHand = testHandle;
+                                closestHandleDist = testDist;
+                            }
                         }
                     }
 
