@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [docs-website]: https://docs.ultraleap.com/unity-api/ "Ultraleap Docs"
 
-## [5.11.0] - unreleased
+## [5.11.0] - 22/06/2022
 
 ### Announcements
 
@@ -23,8 +23,7 @@ If you have any concerns about this, please contact us on [Github Discussions](h
 ### Changed
 - Changed scale calculations on the Auto-Scale function of the Handbinder, to make it more consistent across different tracking models and more stable when using a hand without metacarpal bones. The scales of all hand prefabs have been slightly changed because of that.
 - Disable FOV visualization gizmos by default
-- update minimum unity version to 2020.3
-
+- Update minimum Unity version to 2020.3 for UPM packages
  
 ### Fixed 
 - Turning on and off multiple image retrievers referencing the same service provider or the same device results in a very low framerate
