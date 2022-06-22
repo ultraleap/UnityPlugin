@@ -23,9 +23,12 @@ namespace Leap.Unity
   	/// </summary>
     public static class XRSupportUtil
     {
+
         private static System.Collections.Generic.List<XRNodeState> nodeStates =
           new System.Collections.Generic.List<XRNodeState>();
+#if UNITY_2020_1_OR_NEWER
         static List<Vector3> _boundaryPoints = new List<Vector3>();
+#endif
 
         public static bool IsXREnabled()
         {
@@ -54,8 +57,10 @@ namespace Leap.Unity
 
 #if XR_MANAGEMENT_AVAILABLE
             return XRGeneralSettings.Instance.Manager.activeLoader != null;
-#else
+#elif UNITY_2020_1_OR_NEWER
             return XRSettings.isDeviceActive;
+#else
+            return XRDevice.isPresent;
 #endif
         }
 
@@ -275,7 +280,24 @@ namespace Leap.Unity
                 return;
 
             var hmdDevice = devices[0];
+#if !UNITY_2020_1_OR_NEWER
+            if (hmdDevice.subsystem != null)
+            {
+#endif
             hmdDevice.subsystem.TryRecenter();
+#if !UNITY_2020_1_OR_NEWER
+            }
+            else
+            {
+#pragma warning disable 0618
+                InputTracking.Recenter();
+#pragma warning restore 0618
+            }
+#else
+#pragma warning disable 0618
+            InputTracking.Recenter();
+#pragma warning restore 0618
+#endif
         }
 
         public static float GetGPUTime()
@@ -324,7 +346,21 @@ namespace Leap.Unity
             }
 
             var hmdDevice = devices[0];
+#if !UNITY_2020_1_OR_NEWER
+
+            if (hmdDevice.subsystem != null)
+            {
+#endif
             return hmdDevice.subsystem.GetTrackingOriginMode().HasFlag(TrackingOriginModeFlags.Floor);
+#if !UNITY_2020_1_OR_NEWER
+            }
+            else
+            {
+#pragma warning disable 0618
+                return XRDevice.GetTrackingSpaceType() == TrackingSpaceType.RoomScale;
+#pragma warning restore 0618
+            }
+#endif
         }
 
         /// <summary> Returns whether the playspace is larger than 1m on its shortest side. </summary>
@@ -339,6 +375,7 @@ namespace Leap.Unity
             }
 #endif
 
+#if UNITY_2020_1_OR_NEWER // Oculus reports a floor centered space now...
             var devices = new List<InputDevice>();
             InputDevices.GetDevicesWithCharacteristics(InputDeviceCharacteristics.HeadMounted, devices);
 
@@ -356,6 +393,9 @@ namespace Leap.Unity
             }
 
             return playspaceSize.size.magnitude > 1f; // Playspace is greater than 1m on its shortest axis
+#else
+            return IsRoomScale();
+#endif
         }
     }
 }

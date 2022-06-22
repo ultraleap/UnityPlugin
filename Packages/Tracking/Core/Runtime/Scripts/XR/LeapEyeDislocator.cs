@@ -91,6 +91,10 @@ namespace Leap.Unity
         {
             if (_camera == null) return;
 
+#if !UNITY_2020_1_OR_NEWER
+            _camera.ResetStereoViewMatrices();
+#endif
+
             _hasVisitedPreCull = false;
         }
 
@@ -104,9 +108,11 @@ namespace Leap.Unity
             }
             _hasVisitedPreCull = true;
 
+#if UNITY_2020_1_OR_NEWER
             // Unity rendering system changed in 2020. Performing this in update causes misalignment.
             // XR applications need to be rendered in multipass or it will fail.
             _camera.ResetStereoViewMatrices();
+#endif
 
             float baselineToUse = -1;
             if (_useCustomBaseline)
