@@ -64,7 +64,7 @@ namespace Leap.Unity.Interaction
             set
             {
                 _indexOnly = value;
-                initContact();
+                _wasContactInitialized = false;
             }
         }
 
@@ -482,8 +482,11 @@ namespace Leap.Unity.Interaction
 
         protected override bool initContact()
         {
-            if (!isTracked) return false;
-
+            if (!isTracked)
+            {
+                _wasContactInitialized = false;
+                return false;
+            }
             initContactBoneContainer();
             initContactBones();
 

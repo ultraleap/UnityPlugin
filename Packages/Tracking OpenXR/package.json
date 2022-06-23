@@ -1,6 +1,6 @@
 {
   "name": "com.ultraleap.tracking.openxr",
-  "version": "1.0.0-pre.4",
+  "version": "1.0.0-pre.5",
   "displayName": "Ultraleap Tracking OpenXR",
   "description": "Support for OpenXR Hand Tracking",
   "unity": "2020.3",

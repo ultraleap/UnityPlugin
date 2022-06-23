@@ -9,6 +9,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Leap.Unity
@@ -89,7 +90,7 @@ namespace Leap.Unity
 
         [Tooltip("Displays a visualization of the Field Of View of the chosen device as a Gizmo")]
         [SerializeField]
-        protected bool FOV_Visualization = true;
+        protected bool FOV_Visualization = false;
         [Tooltip("Displays the optimal FOV for tracking")]
         [SerializeField]
         protected bool OptimalFOV_Visualization = true;
@@ -215,6 +216,10 @@ namespace Leap.Unity
         {
             get
             {
+                if (_currentDevice == null && _multipleDeviceMode == MultipleDeviceMode.Disabled)
+                {
+                    _currentDevice = GetLeapController().Devices.ActiveDevices.FirstOrDefault();
+                }
                 return _currentDevice;
             }
         }

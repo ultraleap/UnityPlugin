@@ -392,30 +392,42 @@ namespace Leap.Unity
                 return;
             }
 
-            Camera.onPreRender -= OnCameraPreRender;
-            Camera.onPreRender += OnCameraPreRender;
-
             //Enable pooling to reduce overhead of images
             LeapInternal.MemoryManager.EnablePooling = true;
 
             ApplyGammaCorrectionValues();
+        }
+
+        private void OnEnable()
+        {
+            subscribeToService();
+
+            Camera.onPreRender -= OnCameraPreRender;
+            Camera.onPreRender += OnCameraPreRender;
+
 #if UNITY_2019_3_OR_NEWER
             //SRP require subscribing to RenderPipelineManagers
-            if(UnityEngine.Rendering.GraphicsSettings.renderPipelineAsset != null) {
+            if (UnityEngine.Rendering.GraphicsSettings.renderPipelineAsset != null)
+            {
                 UnityEngine.Rendering.RenderPipelineManager.beginCameraRendering -= onBeginRendering;
                 UnityEngine.Rendering.RenderPipelineManager.beginCameraRendering += onBeginRendering;
             }
 #endif
         }
 
-        private void OnEnable()
-        {
-            subscribeToService();
-        }
-
         private void OnDisable()
         {
             unsubscribeFromService();
+
+            Camera.onPreRender -= OnCameraPreRender;
+
+#if UNITY_2019_3_OR_NEWER
+            //SRP require subscribing to RenderPipelineManagers
+            if (UnityEngine.Rendering.GraphicsSettings.renderPipelineAsset != null)
+            {
+                UnityEngine.Rendering.RenderPipelineManager.beginCameraRendering -= onBeginRendering;
+            }
+#endif
         }
 
         private void OnDestroy()
@@ -494,6 +506,23 @@ namespace Leap.Unity
 
         private void OnCameraPreRender(Camera cam)
         {
+            // set image policy if it is not set. This could happen when eg. another image retriever corresponding to the same device is disabled
+            var controller = _provider.GetLeapController();
+            if (controller != null)
+            {
+                var currentDevice = _provider.CurrentDevice;
+
+                if (_provider.CurrentMultipleDeviceMode == LeapServiceProvider.MultipleDeviceMode.Disabled)
+                {
+                    currentDevice = null;
+                }
+
+                if (!controller.IsPolicySet(Controller.PolicyFlag.POLICY_IMAGES, currentDevice))
+                {
+                    controller.SetPolicy(Controller.PolicyFlag.POLICY_IMAGES, currentDevice);
+                }
+            }
+
             if (_currentImage != null)
             {
                 if (_eyeTextureData.CheckStale(_currentImage))
@@ -572,6 +601,7 @@ namespace Leap.Unity
         private void OnDeviceChanged(Device d)
         {
             Controller controller = _provider.GetLeapController();
+            controller.FrameReady -= onFrameReady;
             controller.FrameReady += onFrameReady;
         }
 
@@ -612,6 +642,7 @@ namespace Leap.Unity
             var controller = _provider.GetLeapController();
             if (controller != null)
             {
+                controller.FrameReady -= onFrameReady;
                 controller.FrameReady += onFrameReady;
                 controller.ClearPolicy(Controller.PolicyFlag.POLICY_IMAGES, _provider.CurrentDevice);
             }
