@@ -326,11 +326,14 @@ namespace Leap.Unity.Interaction
             // Check if the player has multiple left hands or multiple right hands.
             if (intHand.handDataMode != HandDataMode.Custom)
             {
-                foreach(var controller in target.interactionControllers)
+                foreach (var controller in target.interactionControllers)
                 {
-                    if(controller.intHand.handDataMode == intHand.handDataMode &&
+                    if (controller.intHand.leapProvider != null &&
+                        controller.intHand.handDataMode == intHand.handDataMode &&
                         controller.intHand.leapProvider == intHand.leapProvider)
                     {
+                        Debug.LogWarning(controller.intHand.handDataMode + " _ ");
+
                         messages.Add(new ControllerStatusMessage()
                         {
                             message = "Duplicate Hand",
