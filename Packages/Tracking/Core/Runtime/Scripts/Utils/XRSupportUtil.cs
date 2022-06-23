@@ -284,7 +284,7 @@ namespace Leap.Unity
             if (hmdDevice.subsystem != null)
             {
 #endif
-            hmdDevice.subsystem.TryRecenter();
+                hmdDevice.subsystem.TryRecenter();
 #if !UNITY_2020_1_OR_NEWER
             }
             else
@@ -351,7 +351,7 @@ namespace Leap.Unity
             if (hmdDevice.subsystem != null)
             {
 #endif
-            return hmdDevice.subsystem.GetTrackingOriginMode().HasFlag(TrackingOriginModeFlags.Floor);
+                return hmdDevice.subsystem.GetTrackingOriginMode().HasFlag(TrackingOriginModeFlags.Floor);
 #if !UNITY_2020_1_OR_NEWER
             }
             else
