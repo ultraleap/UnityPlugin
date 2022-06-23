@@ -328,9 +328,12 @@ namespace Leap.Unity.Interaction
             {
                 foreach (var controller in target.interactionControllers)
                 {
-                    if (controller.intHand.handDataMode == intHand.handDataMode &&
+                    if (controller.intHand.leapProvider != null && 
+                        controller.intHand.handDataMode == intHand.handDataMode &&
                         controller.intHand.leapProvider == intHand.leapProvider)
                     {
+                        Debug.LogWarning(controller.intHand.handDataMode + " _ ");
+
                         messages.Add(new ControllerStatusMessage()
                         {
                             message = "Duplicate Hand",
