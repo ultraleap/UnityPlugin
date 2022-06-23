@@ -6,11 +6,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [docs-website]: https://docs.ultraleap.com/ "Ultraleap Docs"
 
-## [1.0.0-pre.4] - 10/06/2022
+## [NEXT] - unreleased
+
+### Added
+
+- 
+
+### Known issues
+
+- Currently the Ultraleap Hand Tracking feature for OpenXR requires the New and Legacy input systems to be enabled, to simultaneously use OpenXR and the Ultraleap Unity Plugin's features.
+- The OpenXR Leap Provider does not currently support the following hand properties (and will return fixed values):
+  - Hand and Finger: `FrameId`
+  - Hand: `Confidence`
+  - Hand: `GrabAngle`
+  - Hand and Finger: `Id` & `HandId` will always return `0` and `1` for the left and right hand respectively
+  - Hand and Finger: `TimeVisible`
+  - Finger: `IsExtended`
+
+## [1.0.0-pre.5] - 23/06/2022
 
 ### Added
 
 - Added support for `XR_ULTRALEAP_hand_tracking_elbow` which provides elbow tracking if supported on the system.
+
+### Known issues
+
+- Currently the Ultraleap Hand Tracking feature for OpenXR requires the New and Legacy input systems to be enabled, to simultaneously use OpenXR and the Ultraleap Unity Plugin's features.
+- The OpenXR Leap Provider does not currently support the following hand properties (and will return fixed values):
+  - Hand and Finger: `FrameId`
+  - Hand: `Confidence`
+  - Hand: `GrabAngle`
+  - Hand and Finger: `Id` & `HandId` will always return `0` and `1` for the left and right hand respectively
+  - Hand and Finger: `TimeVisible`
+  - Finger: `IsExtended`
+
+## [1.0.0-pre.4] - 10/06/2022
 
 ### Fixed
 

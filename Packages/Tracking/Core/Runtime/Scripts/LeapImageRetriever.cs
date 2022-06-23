@@ -6,9 +6,9 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
+using Leap.Unity.Query;
 using System;
 using System.Collections;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -281,8 +281,10 @@ namespace Leap.Unity
 
             private void addDistortionData(Image image, Color32[] colors, int startIndex)
             {
-                float[] distortionData = image.Distortion(Image.CameraType.LEFT)
-                    .Concat(image.Distortion(Image.CameraType.RIGHT)).ToArray();
+                float[] distortionData = image.Distortion(Image.CameraType.LEFT).
+                                               Query().
+                                               Concat(image.Distortion(Image.CameraType.RIGHT)).
+                                               ToArray();
 
                 for (int i = 0; i < distortionData.Length; i += 2)
                 {
@@ -390,29 +392,42 @@ namespace Leap.Unity
                 return;
             }
 
-            Camera.onPreRender -= OnCameraPreRender;
-            Camera.onPreRender += OnCameraPreRender;
-
             //Enable pooling to reduce overhead of images
             LeapInternal.MemoryManager.EnablePooling = true;
 
             ApplyGammaCorrectionValues();
+        }
+
+        private void OnEnable()
+        {
+            subscribeToService();
+
+            Camera.onPreRender -= OnCameraPreRender;
+            Camera.onPreRender += OnCameraPreRender;
+
+#if UNITY_2019_3_OR_NEWER
             //SRP require subscribing to RenderPipelineManagers
             if (UnityEngine.Rendering.GraphicsSettings.renderPipelineAsset != null)
             {
                 UnityEngine.Rendering.RenderPipelineManager.beginCameraRendering -= onBeginRendering;
                 UnityEngine.Rendering.RenderPipelineManager.beginCameraRendering += onBeginRendering;
             }
-        }
-
-        private void OnEnable()
-        {
-            subscribeToService();
+#endif
         }
 
         private void OnDisable()
         {
             unsubscribeFromService();
+
+            Camera.onPreRender -= OnCameraPreRender;
+
+#if UNITY_2019_3_OR_NEWER
+            //SRP require subscribing to RenderPipelineManagers
+            if (UnityEngine.Rendering.GraphicsSettings.renderPipelineAsset != null)
+            {
+                UnityEngine.Rendering.RenderPipelineManager.beginCameraRendering -= onBeginRendering;
+            }
+#endif
         }
 
         private void OnDestroy()
@@ -431,11 +446,13 @@ namespace Leap.Unity
 
             Camera.onPreRender -= OnCameraPreRender;
 
+#if UNITY_2019_3_OR_NEWER
             //SRP require subscribing to RenderPipelineManagers
             if (UnityEngine.Rendering.GraphicsSettings.renderPipelineAsset != null)
             {
                 UnityEngine.Rendering.RenderPipelineManager.beginCameraRendering -= onBeginRendering;
             }
+#endif
         }
 
         private void LateUpdate()
@@ -489,6 +506,23 @@ namespace Leap.Unity
 
         private void OnCameraPreRender(Camera cam)
         {
+            // set image policy if it is not set. This could happen when eg. another image retriever corresponding to the same device is disabled
+            var controller = _provider.GetLeapController();
+            if (controller != null)
+            {
+                var currentDevice = _provider.CurrentDevice;
+
+                if (_provider.CurrentMultipleDeviceMode == LeapServiceProvider.MultipleDeviceMode.Disabled)
+                {
+                    currentDevice = null;
+                }
+
+                if (!controller.IsPolicySet(Controller.PolicyFlag.POLICY_IMAGES, currentDevice))
+                {
+                    controller.SetPolicy(Controller.PolicyFlag.POLICY_IMAGES, currentDevice);
+                }
+            }
+
             if (_currentImage != null)
             {
                 if (_eyeTextureData.CheckStale(_currentImage))
@@ -509,10 +543,12 @@ namespace Leap.Unity
             }
         }
 
+#if UNITY_2019_3_OR_NEWER
         private void onBeginRendering(UnityEngine.Rendering.ScriptableRenderContext scriptableRenderContext, Camera camera)
         {
             OnCameraPreRender(camera);
         }
+#endif
 
         private void subscribeToService()
         {
@@ -564,7 +600,10 @@ namespace Leap.Unity
 
         private void OnDeviceChanged(Device d)
         {
+            unsubscribeFromService();
+            subscribeToService();
             Controller controller = _provider.GetLeapController();
+            controller.FrameReady -= onFrameReady;
             controller.FrameReady += onFrameReady;
         }
 
@@ -605,6 +644,7 @@ namespace Leap.Unity
             var controller = _provider.GetLeapController();
             if (controller != null)
             {
+                controller.FrameReady -= onFrameReady;
                 controller.FrameReady += onFrameReady;
                 controller.ClearPolicy(Controller.PolicyFlag.POLICY_IMAGES, _provider.CurrentDevice);
             }
