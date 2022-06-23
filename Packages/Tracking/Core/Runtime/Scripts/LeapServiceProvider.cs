@@ -91,13 +91,13 @@ namespace Leap.Unity
 
         [Tooltip("Displays a visualization of the Field Of View of the chosen device as a Gizmo")]
         [SerializeField]
-        protected bool showFOVVisualisation = false;
+        protected bool FOV_Visualization = false;
         [Tooltip("Displays the optimal FOV for tracking")]
         [SerializeField]
-        protected bool showOptimalFOVVisualisation = true;
+        protected bool OptimalFOV_Visualization = true;
         [Tooltip("Displays the maximum FOV for tracking")]
         [SerializeField]
-        protected bool showMaxFOVVisualisation = true;
+        protected bool MaxFOV_Visualization = true;
 
         [SerializeField, HideInInspector]
         private VisualFOV _visualFOV;
@@ -1304,7 +1304,7 @@ namespace Leap.Unity
                 return;
             }
 
-            if (showFOVVisualisation)
+            if (FOV_Visualization)
             {
                 DrawInteractionZone(deviceModelMatrix);
             }
@@ -1319,7 +1319,7 @@ namespace Leap.Unity
             maxFOVMesh = _visualFOV.MaxFOVMesh;
 
 
-            if (showOptimalFOVVisualisation && optimalFOVMesh != null)
+            if (OptimalFOV_Visualization && optimalFOVMesh != null)
             {
                 Material mat = Resources.Load("TrackingVolumeVisualization/OptimalFOVMat_Volume") as Material;
                 mat.SetPass(0);
@@ -1327,7 +1327,7 @@ namespace Leap.Unity
                 Graphics.DrawMeshNow(optimalFOVMesh, deviceModelMatrix *
                        Matrix4x4.Scale(Vector3.one * 0.01f));
             }
-            if (showMaxFOVVisualisation && maxFOVMesh != null)
+            if (MaxFOV_Visualization && maxFOVMesh != null)
             {
                 Material mat = Resources.Load("TrackingVolumeVisualization/MaxFOVMat_Volume") as Material;
                 mat.SetPass(0);
