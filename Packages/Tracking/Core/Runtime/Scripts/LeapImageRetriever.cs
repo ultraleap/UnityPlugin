@@ -156,7 +156,6 @@ namespace Leap.Unity
                 textureSizes[deviceID] = new Vector4((float)_combinedTexture.width, (float)_combinedTexture.height, (float)_globalRawTextures.width, (float)_globalRawTextures.height);
                 Shader.SetGlobalVectorArray("_LeapGlobalTextureSizes", textureSizes);
 
-                Debug.Log(Screen.width + " : " + Screen.height);
                 Shader.SetGlobalVector(pixelSizeName, new Vector2(1.0f / image.Width, 1.0f / image.Height));
             }
 
