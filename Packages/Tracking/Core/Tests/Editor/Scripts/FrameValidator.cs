@@ -79,7 +79,7 @@ namespace Leap.Unity.Tests
             foreach (Hand hand in _frame.Hands)
             {
                 Bone bone = getBone(hand, fingerType, boneType);
-                float apparentLength = bone.NextJoint.DistanceTo(bone.PrevJoint);
+                float apparentLength = UnityEngine.Vector3.Distance(bone.NextJoint, bone.PrevJoint);
                 float actualLength = bone.Length;
                 Assert.That(actualLength, Is.EqualTo(apparentLength).Within(TOLERANCE));
             }
@@ -115,7 +115,7 @@ namespace Leap.Unity.Tests
             {
                 Bone bone = getBone(hand, fingerType, boneType);
 
-                Vector jointAverage = (bone.NextJoint + bone.PrevJoint) * 0.5f;
+                UnityEngine.Vector3 jointAverage = (bone.NextJoint + bone.PrevJoint) * 0.5f;
                 assertVectorsEqual(jointAverage, bone.Center);
             }
         }
@@ -129,22 +129,13 @@ namespace Leap.Unity.Tests
                 Bone bone = getBone(hand, fingerType, boneType);
 
                 //If the joints are at the same position this test is meaningless
-                if (bone.NextJoint.DistanceTo(bone.PrevJoint) < TOLERANCE)
+                if (UnityEngine.Vector3.Distance(bone.NextJoint, bone.PrevJoint) < TOLERANCE)
                 {
                     continue;
                 }
 
-                Vector jointDirection = (bone.NextJoint - bone.PrevJoint).Normalized;
+                UnityEngine.Vector3 jointDirection = (bone.NextJoint - bone.PrevJoint).normalized;
                 assertVectorsEqual(jointDirection, bone.Direction);
-            }
-        }
-
-        [Test]
-        public void RotationIsValid()
-        {
-            foreach (Hand hand in _frame.Hands)
-            {
-                Assert.That(hand.Rotation.IsValid());
             }
         }
 
@@ -167,7 +158,7 @@ namespace Leap.Unity.Tests
             return null;
         }
 
-        protected void assertVectorsEqual(Vector a, Vector b, string vectorName = "Vector")
+        protected void assertVectorsEqual(UnityEngine.Vector3 a, UnityEngine.Vector3 b, string vectorName = "Vector")
         {
             Assert.That(a.x, Is.EqualTo(b.x).Within(TOLERANCE), vectorName + ".x");
             Assert.That(a.y, Is.EqualTo(b.y).Within(TOLERANCE), vectorName + ".y");

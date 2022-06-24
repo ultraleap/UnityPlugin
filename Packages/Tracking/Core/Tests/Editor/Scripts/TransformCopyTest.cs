@@ -128,13 +128,13 @@ namespace Leap.Unity.Tests
 
     public class TransformCopyTranslation : FrameValidator
     {
-        protected static Vector translation = Vector.Forward;
+        protected static UnityEngine.Vector3 translation = UnityEngine.Vector3.forward;
         protected Frame _originalFrame;
 
         protected override Frame createFrame()
         {
             _originalFrame = TestHandFactory.MakeTestFrame(0, true, true);
-            LeapTransform forwardTransform = new LeapTransform(translation, LeapQuaternion.Identity);
+            LeapTransform forwardTransform = new LeapTransform(translation, UnityEngine.Quaternion.identity);
             return _originalFrame.TransformedCopy(forwardTransform);
         }
 
