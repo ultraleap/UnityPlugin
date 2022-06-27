@@ -328,7 +328,7 @@ namespace Leap.Unity.Interaction
             {
                 foreach (var controller in target.interactionControllers)
                 {
-                    if (controller.intHand.leapProvider != null && 
+                    if (controller.intHand.leapProvider != null &&
                         controller.intHand.handDataMode == intHand.handDataMode &&
                         controller.intHand.leapProvider == intHand.leapProvider)
                     {
