@@ -12,9 +12,10 @@ using UnityEngine;
 
 namespace Leap.Unity.Attributes
 {
-
+    [System.Obsolete("This code will be moved to a legacy package in the next major version of the plugin. If you believe that it needs to be kept in tracking, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
     public enum FileDialogType { Open, Save, Folder };
 
+    [System.Obsolete("This code will be moved to a legacy package in the next major version of the plugin. If you believe that it needs to be kept in tracking, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
     public class ReadFileChooserAttribute : FileChooserAttribute
     {
         public ReadFileChooserAttribute(bool preserveExistingFileName = false,
@@ -23,6 +24,7 @@ namespace Leap.Unity.Attributes
         { }
     }
 
+    [System.Obsolete("This code will be moved to a legacy package in the next major version of the plugin. If you believe that it needs to be kept in tracking, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
     public class WriteFileChooserAttribute : FileChooserAttribute
     {
         public WriteFileChooserAttribute(bool preserveExistingFileName = false,
@@ -31,6 +33,7 @@ namespace Leap.Unity.Attributes
         { }
     }
 
+    [System.Obsolete("This code will be moved to a legacy package in the next major version of the plugin. If you believe that it needs to be kept in tracking, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
     public class FolderChooserAttribute : FileChooserAttribute
     {
         public FolderChooserAttribute(bool preserveExistingFileName = false,
@@ -39,6 +42,7 @@ namespace Leap.Unity.Attributes
         { }
     }
 
+    [System.Obsolete("This code will be moved to a legacy package in the next major version of the plugin. If you believe that it needs to be kept in tracking, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
     public class FileChooserAttribute : CombinablePropertyAttribute,
       IAfterFieldAdditiveDrawer
     {

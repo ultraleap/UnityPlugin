@@ -82,8 +82,8 @@ namespace Leap.Unity
             {
                 hideField("_trackingOptimization");
             }
-            addPropertyToFoldout("_workerThreadProfiling", "Advanced Options");
             addPropertyToFoldout("_serverNameSpace", "Advanced Options");
+            addPropertyToFoldout("_workerThreadProfiling", "Advanced Options");
         }
 
         private void frameOptimizationWarning(SerializedProperty property)
@@ -167,27 +167,6 @@ namespace Leap.Unity
                 }
             }
         }
-
-
-        public override void OnInspectorGUI()
-        {
-
-#if UNITY_2019_3_OR_NEWER
-      // Easily tracking VR-enabled-or-not requires an XR package installed, so remove this warning for now.
-#else
-            if (UnityEditor.PlayerSettings.virtualRealitySupported && !isVRProvider)
-            {
-                EditorGUILayout.HelpBox(
-                  "VR support is enabled. If your Leap is mounted to your headset, you should be "
-                  + "using LeapXRServiceProvider instead of LeapServiceProvider. (If your Leap "
-                  + "is not mounted to your headset, you can safely ignore this warning.)",
-                  MessageType.Warning);
-            }
-#endif
-
-            base.OnInspectorGUI();
-        }
-
 
         private LeapServiceProvider LeapServiceProvider
         {

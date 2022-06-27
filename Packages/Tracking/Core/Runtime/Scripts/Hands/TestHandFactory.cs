@@ -13,7 +13,7 @@ namespace Leap
     using System;
     using System.Collections.Generic;
     using UnityEngine;
-
+#pragma warning disable 0618
     public static class TestHandFactory
     {
 
@@ -75,14 +75,9 @@ namespace Leap
             // Leap space is oriented differently than Unity space, so correct for this here.
             var hand = makeLeapSpaceTestHand(frameId, handId, isLeft)
                          .Transform(leftHandTransform);
-            var correctingQuaternion = Quaternion.Euler(90f, 0f, 180f);
-            var correctingLeapQuaternion = new LeapQuaternion(correctingQuaternion.x,
-                                                              correctingQuaternion.y,
-                                                              correctingQuaternion.z,
-                                                              correctingQuaternion.w);
 
-            var transformedHand = hand.Transform(new LeapTransform(Vector.Zero,
-                                                                   correctingLeapQuaternion));
+            var transformedHand = hand.Transform(new LeapTransform(Vector3.zero,
+                                                                   Quaternion.Euler(90f, 0f, 180f)));
 
             if (unitType == UnitType.UnityUnits)
             {
@@ -132,7 +127,7 @@ namespace Leap
             switch (pose)
             {
                 case TestHandPose.HeadMountedA:
-                    transform.rotation = angleAxis(180 * Constants.DEG_TO_RAD, Vector.Forward);
+                    transform.rotation = angleAxis(180 * Mathf.Deg2Rad, Vector3.back).ToLeapQuaternion();
                     transform.translation = new Vector(80f, 120f, 0f);
                     break;
                 case TestHandPose.HeadMountedB:
@@ -140,15 +135,15 @@ namespace Leap
                     transform.translation = new Vector(220f, 270f, 130f);
                     break;
                 case TestHandPose.DesktopModeA:
-                    transform.rotation = angleAxis(0f * Constants.DEG_TO_RAD, Vector.Forward)
-                                          .Multiply(angleAxis(-90f * Constants.DEG_TO_RAD, Vector.Right))
-                                          .Multiply(angleAxis(180f * Constants.DEG_TO_RAD, Vector.Up));
+                    transform.rotation = (angleAxis(0f * Mathf.Deg2Rad, Vector3.back)
+                                          * angleAxis(-90f * Mathf.Deg2Rad, Vector3.right)
+                                          * angleAxis(180f * Mathf.Deg2Rad, Vector3.up)).ToLeapQuaternion();
                     transform.translation = new Vector(120f, 0f, -170f);
                     break;
                 case TestHandPose.Screentop:
-                    transform.rotation = angleAxis(0 * Constants.DEG_TO_RAD, Vector.Forward)
-                                          .Multiply(angleAxis(140 * Constants.DEG_TO_RAD, Vector.Right))
-                                          .Multiply(angleAxis(0 * Constants.DEG_TO_RAD, Vector.Up));
+                    transform.rotation = (angleAxis(0 * Mathf.Deg2Rad, Vector3.back)
+                                          * angleAxis(140 * Mathf.Deg2Rad, Vector3.right)
+                                          * angleAxis(0 * Mathf.Deg2Rad, Vector3.up)).ToLeapQuaternion();
                     transform.translation = new Vector(-120f, 20f, -380f);
                     transform.scale = new Vector(1, 1, 1);
                     break;
@@ -161,6 +156,7 @@ namespace Leap
 
         #region Leap Space Hand Generation
 
+        [System.Obsolete("This code will be removed in the next major version of the plugin. If you believe that it needs to be kept, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
         public static Vector PepperWristOffset = new Vector(-8.87f, -0.5f, 85.12f);
 
         private static Hand makeLeapSpaceTestHand(int frameId, int handId, bool isLeft)
@@ -172,12 +168,12 @@ namespace Leap
             fingers.Add(makeRingFinger(frameId, handId, isLeft));
             fingers.Add(makePinky(frameId, handId, isLeft));
 
-            Vector armWrist = new Vector(-7.05809944059f, 4.0f, 50.0f);
-            Vector elbow = armWrist + 250f * Vector.Backward;
+            Vector3 armWrist = new Vector3(-7.05809944059f, 4.0f, 50.0f);
+            Vector3 elbow = armWrist + 250f * Vector3.forward;
 
             // Adrian: The previous "armBasis" used "elbow" as a translation component.
-            Arm arm = new Arm(elbow, armWrist, (elbow + armWrist) / 2, Vector.Forward,
-              250f, 41f, LeapQuaternion.Identity);
+            Arm arm = new Arm(elbow, armWrist, (elbow + armWrist) / 2, Vector3.back,
+              250f, 41f, Quaternion.identity);
             Hand testHand = new Hand(frameId,
                                      handId,
                                      1.0f,
@@ -190,91 +186,91 @@ namespace Leap
                                      0.0f,
                                      arm,
                                      fingers,
-                                     new Vector(0, 0, 0),
-                                     new Vector(0, 0, 0),
-                                     new Vector(0, 0, 0),
-                                     Vector.Down,
-                                     LeapQuaternion.Identity,
-                                     Vector.Forward,
-                                     PepperWristOffset);
-            //  new Vector(-12.36385750984f, -6.5f, 81.0111342526f));
+                                     Vector3.zero,
+                                     Vector3.zero,
+                                     Vector3.zero,
+                                     Vector3.down,
+                                     Quaternion.identity,
+                                     Vector3.back,
+                                     new Vector3(-8.87f, -0.5f, 85.12f));
+            //  new Vector3(-12.36385750984f, -6.5f, 81.0111342526f));
 
             return testHand;
         }
 
-        private static LeapQuaternion angleAxis(float angle, Vector axis)
+        private static Quaternion angleAxis(float angle, Vector3 axis)
         {
-            if (!axis.MagnitudeSquared.NearlyEquals(1.0f))
+            if (!axis.sqrMagnitude.NearlyEquals(1.0f))
             {
                 throw new ArgumentException("Axis must be a unit vector.");
             }
             float sineHalfAngle = Mathf.Sin(angle / 2.0f);
-            LeapQuaternion q = new LeapQuaternion(sineHalfAngle * axis.x,
+            Quaternion q = new Quaternion(sineHalfAngle * axis.x,
                                                       sineHalfAngle * axis.y,
                                                       sineHalfAngle * axis.z,
                                                       Mathf.Cos(angle / 2.0f));
-            return q.Normalized;
+            return q.normalized;
         }
 
-        private static LeapQuaternion rotationBetween(Vector fromDirection, Vector toDirection)
+        private static Quaternion rotationBetween(Vector3 fromDirection, Vector3 toDirection)
         {
-            float m = Mathf.Sqrt(2.0f + 2.0f * fromDirection.Dot(toDirection));
-            Vector w = (1.0f / m) * fromDirection.Cross(toDirection);
-            return new LeapQuaternion(w.x, w.y, w.z, 0.5f * m);
+            float m = Mathf.Sqrt(2.0f + 2.0f * Vector3.Dot(fromDirection, toDirection));
+            Vector3 w = (1.0f / m) * Vector3.Cross(fromDirection, toDirection);
+            return new Quaternion(w.x, w.y, w.z, 0.5f * m);
         }
 
         private static Finger makeThumb(int frameId, int handId, bool isLeft)
         {
-            Vector position = new Vector(19.3382610281f, -6.0f, 53.168484654f);
-            Vector forward = new Vector(0.636329113772f, -0.5f, -0.899787143982f);
-            Vector up = new Vector(0.804793943718f, 0.447213915513f, 0.390264553767f);
+            Vector3 position = new Vector3(19.3382610281f, -6.0f, 53.168484654f);
+            Vector3 forward = new Vector3(0.636329113772f, -0.5f, -0.899787143982f);
+            Vector3 up = new Vector3(0.804793943718f, 0.447213915513f, 0.390264553767f);
             float[] jointLengths = { 0.0f, 46.22f, 31.57f, 21.67f };
             return makeFinger(Finger.FingerType.TYPE_THUMB, position, forward, up, jointLengths, frameId, handId, handId + 0, isLeft);
         }
 
         private static Finger makeIndexFinger(int frameId, int handId, bool isLeft)
         {
-            Vector position = new Vector(23.1812851873f, 2.0f, -23.1493459317f);
-            Vector forward = new Vector(0.166044313785f, -0.14834045293f, -0.974897120667f);
-            Vector up = new Vector(0.0249066470677f, 0.988936352868f, -0.1462345681f);
+            Vector3 position = new Vector3(23.1812851873f, 2.0f, -23.1493459317f);
+            Vector3 forward = new Vector3(0.166044313785f, -0.14834045293f, -0.974897120667f);
+            Vector3 up = new Vector3(0.0249066470677f, 0.988936352868f, -0.1462345681f);
             float[] jointLengths = { 68.12f, 39.78f, 22.38f, 15.82f };
             return makeFinger(Finger.FingerType.TYPE_INDEX, position, forward, up, jointLengths, frameId, handId, handId + 1, isLeft);
         }
 
         private static Finger makeMiddleFinger(int frameId, int handId, bool isLeft)
         {
-            Vector position = new Vector(2.78877821918f, 4.0f, -23.252105626f);
-            Vector forward = new Vector(0.0295207858556f, -0.148340452932f, -0.988495641481f);
-            Vector up = new Vector(-0.145765270107f, 0.977715980076f, -0.151075968756f);
+            Vector3 position = new Vector3(2.78877821918f, 4.0f, -23.252105626f);
+            Vector3 forward = new Vector3(0.0295207858556f, -0.148340452932f, -0.988495641481f);
+            Vector3 up = new Vector3(-0.145765270107f, 0.977715980076f, -0.151075968756f);
             float[] jointLengths = { 64.60f, 44.63f, 26.33f, 17.40f };
             return makeFinger(Finger.FingerType.TYPE_MIDDLE, position, forward, up, jointLengths, frameId, handId, handId + 2, isLeft);
         }
 
         private static Finger makeRingFinger(int frameId, int handId, bool isLeft)
         {
-            Vector position = new Vector(-17.447168266f, 4.0f, -17.2791440615f);
-            Vector forward = new Vector(-0.121317937368f, -0.148340347175f, -0.981466810174f);
-            Vector up = new Vector(-0.216910468316f, 0.968834928679f, -0.119619102602f);
+            Vector3 position = new Vector3(-17.447168266f, 4.0f, -17.2791440615f);
+            Vector3 forward = new Vector3(-0.121317937368f, -0.148340347175f, -0.981466810174f);
+            Vector3 up = new Vector3(-0.216910468316f, 0.968834928679f, -0.119619102602f);
             float[] jointLengths = { 58.00f, 41.37f, 25.65f, 17.30f };
             return makeFinger(Finger.FingerType.TYPE_RING, position, forward, up, jointLengths, frameId, handId, handId + 3, isLeft);
         }
 
         private static Finger makePinky(int frameId, int handId, bool isLeft)
         {
-            Vector position = new Vector(-35.3374394559f, 0.0f, -9.72871382551f);
-            Vector forward = new Vector(-0.259328923438f, -0.105851224797f, -0.959970847306f);
-            Vector up = new Vector(-0.353350220937f, 0.935459475557f, -0.00769356576168f);
+            Vector3 position = new Vector3(-35.3374394559f, 0.0f, -9.72871382551f);
+            Vector3 forward = new Vector3(-0.259328923438f, -0.105851224797f, -0.959970847306f);
+            Vector3 up = new Vector3(-0.353350220937f, 0.935459475557f, -0.00769356576168f);
             float[] jointLengths = { 53.69f, 32.74f, 18.11f, 15.96f };
             return makeFinger(Finger.FingerType.TYPE_PINKY, position, forward, up, jointLengths, frameId, handId, handId + 4, isLeft);
         }
 
 
-        private static Finger makeFinger(Finger.FingerType name, Vector position, Vector forward, Vector up, float[] jointLengths,
+        private static Finger makeFinger(Finger.FingerType name, Vector3 position, Vector3 forward, Vector3 up, float[] jointLengths,
            int frameId, int handId, int fingerId, bool isLeft)
         {
 
-            forward = forward.Normalized;
-            up = up.Normalized;
+            forward = forward.normalized;
+            up = up.normalized;
 
             Bone[] bones = new Bone[5];
             float proximalDistance = -jointLengths[0];
@@ -297,7 +293,7 @@ namespace Leap
             handId,
             fingerId,
             0.0f,
-            distal.NextJoint,
+            distal.NextJoint.ToVector3(),
             forward,
             8f,
             jointLengths[1] + jointLengths[2] + jointLengths[3],
@@ -309,15 +305,15 @@ namespace Leap
             bones[3]);
         }
 
-        private static Bone makeBone(Bone.BoneType name, Vector proximalPosition, float length, float width, Vector direction, Vector up, bool isLeft)
+        private static Bone makeBone(Bone.BoneType name, Vector3 proximalPosition, float length, float width, Vector3 direction, Vector3 up, bool isLeft)
         {
 
-            LeapQuaternion rotation = UnityEngine.Quaternion.LookRotation(-direction.ToVector3(), up.ToVector3()).ToLeapQuaternion();
+            Quaternion rotation = UnityEngine.Quaternion.LookRotation(-direction, up);
 
             return new Bone(
                  proximalPosition,
                  proximalPosition + direction * length,
-                 Vector.Lerp(proximalPosition, proximalPosition + direction * length, .5f),
+                 Vector3.Lerp(proximalPosition, proximalPosition + direction * length, .5f),
                  direction,
                  length,
                  width,
@@ -339,8 +335,8 @@ namespace Leap
 
         public static LeapTransform GetLeapTransform(Vector3 position, Quaternion rotation)
         {
-            Vector scale = new Vector(MM_TO_M, MM_TO_M, MM_TO_M); // Leap units -> Unity units.
-            LeapTransform transform = new LeapTransform(position.ToVector(), rotation.ToLeapQuaternion(), scale);
+            Vector3 scale = new Vector3(MM_TO_M, MM_TO_M, MM_TO_M); // Leap units -> Unity units.
+            LeapTransform transform = new LeapTransform(position, rotation, scale);
             transform.MirrorZ(); // Unity is left handed.
             return transform;
         }
@@ -351,5 +347,5 @@ namespace Leap
         }
 
     }
-
+#pragma warning restore 0618
 }

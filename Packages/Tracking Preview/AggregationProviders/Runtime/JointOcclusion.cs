@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
+#pragma warning disable 0618 
 /// <summary>
 /// class to calculate confidence values based on joint occlusion.
 /// </summary>
@@ -119,7 +120,7 @@ public class JointOcclusion : MonoBehaviour
 
         if (hand == null)
         {
-            return confidences.ClearWith(0);
+            return Utils.Fill(confidences, 0);
         }
 
         // draw a cube where the palm is, so that joints cannot be seen 'through' the palm
@@ -205,3 +206,5 @@ public class JointOcclusion : MonoBehaviour
     }
 
 }
+
+#pragma warning restore 0618

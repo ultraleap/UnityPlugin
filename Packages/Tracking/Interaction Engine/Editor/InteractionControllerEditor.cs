@@ -6,15 +6,15 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Leap.Unity.Query;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
 namespace Leap.Unity.Interaction
 {
-
+#pragma warning disable 0618
     [CanEditMultipleObjects]
     [CustomEditor(typeof(InteractionController), true)]
     public class InteractionControllerEditor : CustomEditorBase<InteractionController>
@@ -78,8 +78,7 @@ namespace Leap.Unity.Interaction
             bool plural = targets.Length > 1;
             bool anyNotParentedToInteractionManager;
 
-            anyNotParentedToInteractionManager = targets.Query()
-                                                        .Any(c => c.GetComponentInParent<InteractionManager>() == null);
+            anyNotParentedToInteractionManager = targets.Any(c => c.GetComponentInParent<InteractionManager>() == null);
 
             if (anyNotParentedToInteractionManager)
             {
@@ -100,5 +99,5 @@ namespace Leap.Unity.Interaction
             }
         }
     }
-
+#pragma warning restore 0618
 }

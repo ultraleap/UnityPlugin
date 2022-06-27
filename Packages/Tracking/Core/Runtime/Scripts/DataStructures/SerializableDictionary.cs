@@ -16,11 +16,13 @@ using UnityEngine;
 namespace Leap.Unity
 {
 
-    [Obsolete("It is no longer required to annotate SerializableDictionary with an SDictionary attribute")]
+    [Obsolete("It is no longer required to annotate SerializableDictionary with an SDictionary attribute. This code will be moved to a legacy package in the next major version of the plugin. If you believe that it needs to be kept in tracking, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
     public class SDictionaryAttribute : PropertyAttribute { }
 
+    [System.Obsolete("This code will be moved to a legacy package in the next major version of the plugin. If you believe that it needs to be kept in tracking, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
     public abstract class SerializableDictionaryBase { }
 
+    // will be moved to SerializableHashSet.cs
     public interface ICanReportDuplicateInformation
     {
 #if UNITY_EDITOR
@@ -29,6 +31,7 @@ namespace Leap.Unity
 #endif
     }
 
+    [System.Obsolete("This code will be moved to a legacy package in the next major version of the plugin. If you believe that it needs to be kept in tracking, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
     public interface ISerializableDictionary
     {
         float KeyDisplayRatio();
@@ -39,6 +42,7 @@ namespace Leap.Unity
     /// non-generic version specific to your needs.  This is the same workflow that exists
     /// for using the UnityEvent class as well. 
     /// </summary>
+    [System.Obsolete("This code will be moved to a legacy package in the next major version of the plugin. If you believe that it needs to be kept in tracking, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
     public class SerializableDictionary<TKey, TValue> : SerializableDictionaryBase,
                                                         IEnumerable<KeyValuePair<TKey, TValue>>,
                                                         ICanReportDuplicateInformation,

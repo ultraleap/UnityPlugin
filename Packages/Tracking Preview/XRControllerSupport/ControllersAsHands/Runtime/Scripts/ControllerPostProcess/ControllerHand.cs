@@ -16,6 +16,7 @@ using UnityEngine.InputSystem;
 
 namespace Leap.Unity.Controllers
 {
+#pragma warning disable 0618
     /// <summary>
     /// Takes in XR Controller data and converts it to Leap Hand Data
     /// </summary>
@@ -533,5 +534,5 @@ namespace Leap.Unity.Controllers
 
         #endregion
     }
-
+#pragma warning restore 0618
 }

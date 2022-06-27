@@ -14,7 +14,7 @@ using UnityEngine;
 
 namespace Leap.Unity.Attachments
 {
-
+#pragma warning disable 0618
     /// <summary>
     /// Simple container class for storing a reference to the attachment point this
     /// transform corresponds to within an AttachmentHand. Also contains mappings from
@@ -187,5 +187,5 @@ namespace Leap.Unity.Attachments
         }
 
     }
-
+#pragma warning restore 0618
 }

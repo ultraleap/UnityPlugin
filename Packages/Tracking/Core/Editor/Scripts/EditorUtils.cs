@@ -6,9 +6,9 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Leap.Unity.Query;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using UnityEditor;
 using UnityEngine;
@@ -54,8 +54,8 @@ namespace Leap.Unity
                         var fieldInfos = compType.GetFields(BindingFlags.Instance
                           | BindingFlags.FlattenHierarchy | BindingFlags.NonPublic
                           | BindingFlags.Public);
-                        foreach (var fieldInfo in fieldInfos.Query()
-                          .Where(fi => fi.FieldType.IsAssignableFrom(refType)))
+                        foreach (var fieldInfo in fieldInfos.
+                            Where(fi => fi.FieldType.IsAssignableFrom(refType)))
                         {
                             var refValue = fieldInfo.GetValue(component) as T;
                             if (refValue.GetInstanceID() == aId)

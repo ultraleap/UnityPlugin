@@ -11,6 +11,7 @@ using UnityEngine;
 
 namespace Leap.Unity.HandsModule
 {
+#pragma warning disable 0618
     /// <summary>
     /// A data structure to define all the fingers in a hand, the wrist and elbow
     /// </summary>
@@ -259,4 +260,5 @@ namespace Leap.Unity.HandsModule
             return leapHand;
         }
     }
+#pragma warning restore 0618
 }

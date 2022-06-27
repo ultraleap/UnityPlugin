@@ -7,23 +7,17 @@
  ******************************************************************************/
 
 using Leap.Unity.Attributes;
-
-#if UNITY_2017_2_OR_NEWER
-using UnityEngine.XR;
-#else
-using UnityEngine.VR;
-#endif
-
+using Leap.Unity.Space;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
-using Leap.Unity.Query;
-using Leap.Unity.Space;
 using UnityEngine.Serialization;
+using UnityEngine.XR;
 
 namespace Leap.Unity.Interaction
 {
-
+#pragma warning disable 0618
     [DisallowMultipleComponent]
     public class InteractionXRController : InteractionController
     {
@@ -252,12 +246,12 @@ namespace Leap.Unity.Interaction
 
             if (deviceJoystickTokens != null && deviceJoystickTokens.Length > 0)
             {
-                string[] joysticksConnected = Input.GetJoystickNames().Query()
+                string[] joysticksConnected = Input.GetJoystickNames()
                   .Select(s => s.ToLower()).ToArray();
                 string[] controllerSupportTokens = deviceJoystickTokens.ToLower()
                   .Split(" ".ToCharArray());
-                bool matchesController = joysticksConnected.Query()
-                                         .Any(joystick => controllerSupportTokens.Query()
+                bool matchesController = joysticksConnected
+                                         .Any(joystick => controllerSupportTokens
                                                          .All(token => joystick.Contains(token)));
 
                 _isJoystickDetected = matchesController;
@@ -441,17 +435,10 @@ namespace Leap.Unity.Interaction
         /// may be ignored.
         /// </summary>
         /// 
-#if UNITY_2017_2_OR_NEWER
         public XRNode xrNode
         {
             get { return chirality == Chirality.Left ? XRNode.LeftHand : XRNode.RightHand; }
         }
-#else
-        public VRNode xrNode
-        {
-            get { return chirality == Chirality.Left ? VRNode.LeftHand : VRNode.RightHand; }
-        }
-#endif
 
         /// <summary>
         /// Gets whether the controller is a left-hand controller.
@@ -554,6 +541,7 @@ namespace Leap.Unity.Interaction
         private Vector3 _unwarpingPositionOffset = Vector3.zero;
         private Quaternion _unwarpingRotationOffset = Quaternion.identity;
 
+        [System.Obsolete("This code will be removed in the next major version of the plugin. If you believe that it needs to be kept, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
         protected override void unwarpColliders(Transform primaryHoverPoint, ISpaceComponent warpedSpaceElement)
         {
             // Extension method calculates "unwarped" pose in world space.
@@ -614,6 +602,7 @@ namespace Leap.Unity.Interaction
             return true;
         }
 
+        [System.Obsolete("This method will change to 'private void refreshContactBoneTargets()' in the next major version of the plugin.")]
         private void refreshContactBoneTargets(bool useUnwarpingData = false)
         {
             if (_wasContactInitialized)
@@ -977,5 +966,5 @@ namespace Leap.Unity.Interaction
         #endregion
 
     }
-
+#pragma warning restore 0618
 }

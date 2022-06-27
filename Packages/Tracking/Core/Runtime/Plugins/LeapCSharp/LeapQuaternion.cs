@@ -14,6 +14,7 @@ namespace Leap
     /// The LeapQuaternion struct represents a rotation in three-dimensional space.
     /// @since 3.1.2
     /// </summary>
+    [System.Obsolete("This code will be moved to a legacy package in the next major version of the plugin. Use Unity's Quaternion instead. If you believe that it needs to be kept in tracking, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
     [Serializable]
     public struct LeapQuaternion :
       IEquatable<LeapQuaternion>
@@ -125,7 +126,7 @@ namespace Leap
             get
             {
                 float denom = MagnitudeSquared;
-                if (denom <= Constants.EPSILON)
+                if (denom <= CSharpExtensions.Constants.EPSILON)
                 {
                     return Identity;
                 }

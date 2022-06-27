@@ -5,6 +5,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
+using UnityEngine;
 
 namespace Leap
 {
@@ -26,7 +27,7 @@ namespace Leap
     [Serializable]
     public class Bone : IEquatable<Bone>
     {
-
+#pragma warning disable 0618
         /// <summary>
         /// Constructs a default invalid Bone object.
         /// 
@@ -41,6 +42,7 @@ namespace Leap
         /// Constructs a new Bone object.
         /// @since 3.0
         /// </summary>
+        [System.Obsolete("This signature will be removed in the next major version of the plugin. Use Bone with Vector3s instead. If you believe that it needs to be kept, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
         public Bone(Vector prevJoint,
                     Vector nextJoint,
                     Vector center,
@@ -55,6 +57,29 @@ namespace Leap
             Center = center;
             Direction = direction;
             Rotation = rotation;
+            Length = length;
+            Width = width;
+            Type = type;
+        }
+
+        /// <summary>
+        /// Constructs a new Bone object.
+        /// @since 3.0
+        /// </summary>
+        public Bone(Vector3 prevJoint,
+                    Vector3 nextJoint,
+                    Vector3 center,
+                    Vector3 direction,
+                    float length,
+                    float width,
+                    Bone.BoneType type,
+                    Quaternion rotation)
+        {
+            PrevJoint = new Vector(prevJoint.x, prevJoint.y, prevJoint.z);
+            NextJoint = new Vector(nextJoint.x, nextJoint.y, nextJoint.z);
+            Center = new Vector(center.x, center.y, center.z);
+            Direction = new Vector(direction.x, direction.y, direction.z);
+            Rotation = new LeapQuaternion(rotation.x, rotation.y, rotation.z, rotation.w);
             Length = length;
             Width = width;
             Type = type;
@@ -86,6 +111,7 @@ namespace Leap
         /// In anatomical terms, this is the proximal end of the bone.
         /// @since 2.0
         /// </summary>
+        [System.Obsolete("Its type will be changed from Vector to Vector3")]
         public Vector PrevJoint;
 
         /// <summary>
@@ -93,18 +119,22 @@ namespace Leap
         /// In anatomical terms, this is the distal end of the bone.
         /// @since 2.0
         /// </summary>
+        [System.Obsolete("Its type will be changed from Vector to Vector3")]
+
         public Vector NextJoint;
 
         /// <summary>
         /// The midpoint of the bone. 
         /// @since 2.0 
         /// </summary>
+        [System.Obsolete("Its type will be changed from Vector to Vector3")]
         public Vector Center;
 
         /// <summary>
         /// The normalized direction of the bone from base to tip.
         /// @since 2.0
         /// </summary>
+        [System.Obsolete("Its type will be changed from Vector to Vector3")]
         public Vector Direction;
 
         /// <summary>
@@ -129,6 +159,7 @@ namespace Leap
         /// The orientation of this Bone as a Quaternion.
         /// @since 2.0
         /// </summary>
+        [System.Obsolete("Its type will be changed from LeapQuaternion to UnityEngine.Quaternion")]
         public LeapQuaternion Rotation;
 
         /// <summary>
@@ -179,5 +210,7 @@ namespace Leap
             TYPE_INTERMEDIATE = 2,
             TYPE_DISTAL = 3
         }
+#pragma warning restore 0618
+
     }
 }

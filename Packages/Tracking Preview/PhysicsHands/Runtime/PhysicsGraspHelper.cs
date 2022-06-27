@@ -5,6 +5,7 @@ using UnityEngine;
 
 namespace Leap.Unity.Interaction.PhysicsHands
 {
+#pragma warning disable 0618
     [System.Serializable]
     public class PhysicsGraspHelper
     {
@@ -665,4 +666,5 @@ namespace Leap.Unity.Interaction.PhysicsHands
             intObj.MoveRotation(solvedRotation);
         }
     }
+#pragma warning restore 0618
 }

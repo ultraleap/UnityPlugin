@@ -15,7 +15,7 @@ using UnityEngine;
 
 namespace Leap.Unity.Interaction
 {
-
+#pragma warning disable 0618
     /// <summary>
     /// IInteractionBehaviour is the interface that defines all Interaction objects,
     /// specifying the minimum set of functionality required to make objects interactable.
@@ -87,5 +87,5 @@ namespace Leap.Unity.Interaction
         void EndSuspension(InteractionController endedSuspending);
 
     }
-
+#pragma warning restore 0618
 }

@@ -12,7 +12,7 @@
 
 		  CGPROGRAM
 		  #pragma surface surf Standard fullforwardshadows vertex:vert
-		  #include "Assets/Plugins/LeapMotion/Core/Resources/LeapCG.cginc"
+		  #include "../Resources/LeapCG.cginc"
 		  #pragma target 3.0
 
 		  int _isLeftHand;

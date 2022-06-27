@@ -13,6 +13,7 @@ using UnityEngine;
 
 namespace Leap.Unity.HandsModule
 {
+#pragma warning disable 0618
     [CanEditMultipleObjects]
     [CustomEditor(typeof(HandBinder))]
     public class HandBinderEditor : Editor
@@ -1013,4 +1014,5 @@ namespace Leap.Unity.HandsModule
             }
         }
     }
+#pragma warning restore 0618
 }
