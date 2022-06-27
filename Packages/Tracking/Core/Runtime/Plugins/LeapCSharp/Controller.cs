@@ -428,7 +428,7 @@ namespace Leap
         /// 
         /// @since 1.0
         /// </summary>
-        public Controller() : this(0, null, true) { }
+        public Controller() : this(0) { }
 
         /// <summary>
         /// Constructs a Controller object using the specified connection key.
