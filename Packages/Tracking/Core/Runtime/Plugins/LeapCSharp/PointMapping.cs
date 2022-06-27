@@ -8,7 +8,7 @@
 
 namespace Leap
 {
-
+#pragma warning disable 0618
     public struct PointMapping
     {
         public long frameId;
@@ -16,4 +16,5 @@ namespace Leap
         public Vector[] points;
         public uint[] ids;
     }
+#pragma warning restore 0618
 }

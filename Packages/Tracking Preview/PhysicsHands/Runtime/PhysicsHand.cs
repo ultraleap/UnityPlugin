@@ -17,6 +17,7 @@ using System.Linq;
 
 namespace Leap.Unity.Interaction.PhysicsHands
 {
+#pragma warning disable 0618
     public class PhysicsHand : MonoBehaviour
     {
         [System.Serializable]
@@ -543,4 +544,5 @@ namespace Leap.Unity.Interaction.PhysicsHands
             return found;
         }
     }
+#pragma warning restore 0618
 }

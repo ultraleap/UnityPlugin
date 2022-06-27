@@ -12,7 +12,7 @@ using UnityEngine;
 
 namespace Leap.Unity
 {
-
+#pragma warning disable 0618
     /**
     * Detects whether the palm of the hand is pointing toward the specified direction.
     * The detector activates when the palm direction is within OnAngle degrees of the
@@ -219,4 +219,5 @@ namespace Leap.Unity
     * @since 4.1.2
     */
     public enum PointingType { RelativeToCamera, RelativeToHorizon, RelativeToWorld, AtTarget }
+#pragma warning restore 0618
 }

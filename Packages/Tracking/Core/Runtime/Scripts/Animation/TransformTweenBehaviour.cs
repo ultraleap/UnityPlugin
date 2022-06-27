@@ -21,6 +21,7 @@ namespace Leap.Unity.Animation
     /// basic functionality of the Tween library. Tweens can interpolate between
     /// more than just Transform properties, so don't be afraid to roll your own.
     /// </summary>
+    [System.Obsolete("This code will be moved to a legacy package in the next major version of the plugin. If you believe that it needs to be kept in tracking, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
     public class TransformTweenBehaviour : MonoBehaviour
     {
 

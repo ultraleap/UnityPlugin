@@ -16,6 +16,7 @@ namespace Leap.Unity.Interaction.Internal
     using Query;
     using UnityObject = UnityEngine.Object;
 
+    [System.Obsolete("This code will be moved to a legacy package in the next major version of the plugin. If you believe that it needs to be kept in tracking, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
     public static class InteractionChecks
     {
         public const float MAX_GRAVITY_MAGNITUDE = 4.905f;

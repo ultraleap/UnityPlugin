@@ -10,6 +10,7 @@ using Hand = Leap.Hand;
 
 namespace Ultraleap.Tracking.OpenXR
 {
+#pragma warning disable 0618
     public class OpenXRLeapProvider : LeapProvider
     {
         private Frame _updateFrame = new Frame();
@@ -76,8 +77,8 @@ namespace Ultraleap.Tracking.OpenXR
             }
 
             _currentFrame = _updateFrame.TransformedCopy(new LeapTransform(
-                trackerTransform.position.ToVector(),
-                trackerTransform.rotation.ToLeapQuaternion()));
+                trackerTransform.position,
+                trackerTransform.rotation));
 
             DispatchUpdateFrameEvent(_currentFrame);
         }
@@ -125,30 +126,30 @@ namespace Ultraleap.Tracking.OpenXR
                     // Ignore thumb Metacarpal
                     if (fingerIndex == 0 && boneIndex == 0)
                     {
-                        var metacarpalPosition = joints[(int)HandJoint.ThumbMetacarpal].Pose.position.ToVector();
+                        var metacarpalPosition = joints[(int)HandJoint.ThumbMetacarpal].Pose.position;
                         hand.GetBone(boneIndex).Fill(
                             metacarpalPosition,
                             metacarpalPosition,
                             metacarpalPosition,
-                            (joints[(int)HandJoint.ThumbMetacarpal].Pose.rotation * Vector3.forward).ToVector(),
+                            (joints[(int)HandJoint.ThumbMetacarpal].Pose.rotation * Vector3.forward),
                             0f,
                             joints[(int)HandJoint.ThumbMetacarpal].Radius * 2f,
                             (Bone.BoneType)boneIndex,
-                            joints[(int)HandJoint.ThumbMetacarpal].Pose.rotation.ToLeapQuaternion());
+                            joints[(int)HandJoint.ThumbMetacarpal].Pose.rotation);
                         continue;
                     }
 
                     // Populate the finger bone information
                     var bone = hand.Fingers[fingerIndex].bones[boneIndex];
                     bone.Fill(
-                        prevJoint.Pose.position.ToVector(),
-                        nextJoint.Pose.position.ToVector(),
-                        ((prevJoint.Pose.position + nextJoint.Pose.position) / 2f).ToVector(),
-                        (prevJoint.Pose.rotation * Vector3.forward).ToVector(),
+                        prevJoint.Pose.position,
+                        nextJoint.Pose.position,
+                        ((prevJoint.Pose.position + nextJoint.Pose.position) / 2f),
+                        (prevJoint.Pose.rotation * Vector3.forward),
                         (prevJoint.Pose.position - nextJoint.Pose.position).magnitude,
                         prevJoint.Radius * 2f,
                         (Bone.BoneType)boneIndex,
-                        prevJoint.Pose.rotation.ToLeapQuaternion());
+                        prevJoint.Pose.rotation);
                     fingerWidth = Math.Max(fingerWidth, bone.Width);
                     fingerLength += bone.Length;
                     xrTipIndex = xrNextIndex;
@@ -160,8 +161,8 @@ namespace Ultraleap.Tracking.OpenXR
                     (handTracker == HandTracker.Left ? 0 : 1),
                     fingerIndex,
                     10f, // Fixed for now
-                    joints[xrTipIndex].Pose.position.ToVector(),
-                    (joints[xrTipIndex].Pose.rotation * Vector3.forward).ToVector(),
+                    joints[xrTipIndex].Pose.position,
+                    (joints[xrTipIndex].Pose.rotation * Vector3.forward),
                     fingerWidth,
                     fingerLength,
                     true, // Fixed for now
@@ -183,13 +184,13 @@ namespace Ultraleap.Tracking.OpenXR
                 handTracker == HandTracker.Left,
                 10f, // Fixed for now
                 null, // Already Populated
-                joints[(int)HandJoint.Palm].Pose.position.ToVector(),
-                joints[(int)HandJoint.Palm].Pose.position.ToVector(),
-                joints[(int)HandJoint.Palm].LinearVelocity.ToVector(),
-                (joints[(int)HandJoint.Palm].Pose.rotation * Vector3.down).ToVector(),
-                joints[(int)HandJoint.Palm].Pose.rotation.ToLeapQuaternion(),
-                (joints[(int)HandJoint.Palm].Pose.rotation * Vector3.forward).ToVector(),
-                joints[(int)HandJoint.Wrist].Pose.position.ToVector()
+                joints[(int)HandJoint.Palm].Pose.position,
+                joints[(int)HandJoint.Palm].Pose.position,
+                joints[(int)HandJoint.Palm].LinearVelocity,
+                (joints[(int)HandJoint.Palm].Pose.rotation * Vector3.down),
+                joints[(int)HandJoint.Palm].Pose.rotation,
+                (joints[(int)HandJoint.Palm].Pose.rotation * Vector3.forward),
+                joints[(int)HandJoint.Wrist].Pose.position
             );
 
             // Fill arm data.
@@ -205,13 +206,13 @@ namespace Ultraleap.Tracking.OpenXR
                 var elbowLength = (elbowPosition - palmPosition).magnitude;
                 var centerPosition = (elbowPosition + palmPosition) / 2f;
                 hand.Arm.Fill(
-                    elbowPosition.ToVector(),
-                    wristPosition.ToVector(),
-                    centerPosition.ToVector(),
-                    elbowDirection.ToVector(),
+                    elbowPosition,
+                    wristPosition,
+                    centerPosition,
+                    elbowDirection,
                     elbowLength,
                     wristWidth,
-                    elbowRotation.ToLeapQuaternion()
+                    elbowRotation
                 );
             }
             else
@@ -222,13 +223,13 @@ namespace Ultraleap.Tracking.OpenXR
                 var elbowLength = 0.3f;
                 var centerPosition = (elbowPosition + palmPosition) / 2f;
                 hand.Arm.Fill(
-                    elbowPosition.ToVector(),
-                    wristPosition.ToVector(),
-                    centerPosition.ToVector(),
-                    elbowDirection.ToVector(),
+                    elbowPosition,
+                    wristPosition,
+                    centerPosition,
+                    elbowDirection,
                     elbowLength,
                     wristWidth,
-                    elbowRotation.ToLeapQuaternion()
+                    elbowRotation
                 );
             }
             return true;
@@ -248,7 +249,7 @@ namespace Ultraleap.Tracking.OpenXR
             var minDistanceSquared = float.MaxValue;
             foreach (var finger in hand.Fingers.Skip(1))
             {
-                var distanceSquared = (finger.TipPosition - thumbTipPosition).MagnitudeSquared;
+                var distanceSquared = (finger.TipPosition.ToVector3() - thumbTipPosition.ToVector3()).sqrMagnitude;
                 minDistanceSquared = Mathf.Min(distanceSquared, minDistanceSquared);
             }
 
@@ -259,24 +260,24 @@ namespace Ultraleap.Tracking.OpenXR
         private float CalculateBoneDistanceSquared(Bone boneA, Bone boneB)
         {
             // Denormalize directions to bone length.
-            var boneAJoint = boneA.PrevJoint;
-            var boneBJoint = boneB.PrevJoint;
-            var boneADirection = boneA.Direction * boneA.Length;
-            var boneBDirection = boneB.Direction * boneB.Length;
+            var boneAJoint = boneA.PrevJoint.ToVector3();
+            var boneBJoint = boneB.PrevJoint.ToVector3();
+            var boneADirection = boneA.Direction.ToVector3() * boneA.Length;
+            var boneBDirection = boneB.Direction.ToVector3() * boneB.Length;
 
             // Compute the minimum (squared) distance between two bones.
             var diff = boneBJoint - boneAJoint;
-            var d1 = boneADirection.Dot(diff);
-            var d2 = boneBDirection.Dot(diff);
-            var a = boneADirection.MagnitudeSquared;
-            var b = boneADirection.Dot(boneBDirection);
-            var c = boneBDirection.MagnitudeSquared;
+            var d1 = Vector3.Dot(boneADirection, diff);
+            var d2 = Vector3.Dot(boneBDirection, diff);
+            var a = boneADirection.sqrMagnitude;
+            var b = Vector3.Dot(boneADirection, boneBDirection);
+            var c = boneBDirection.sqrMagnitude;
             var det = b * b - a * c;
             var t1 = Mathf.Clamp01((b * d2 - c * d1) / det);
             var t2 = Mathf.Clamp01((a * d2 - b * d1) / det);
             var pa = boneAJoint + t1 * boneADirection;
             var pb = boneBJoint + t2 * boneBDirection;
-            return (pa - pb).MagnitudeSquared;
+            return (pa - pb).sqrMagnitude;
         }
 
         private float CalculatePinchDistance(ref Hand hand)
@@ -326,7 +327,7 @@ namespace Ultraleap.Tracking.OpenXR
                 (_backingUntransformedEditTimeFrame ??= new Frame()).Hands.Clear();
                 _backingUntransformedEditTimeFrame.Hands.Add(EditTimeLeftHand);
                 _backingUntransformedEditTimeFrame.Hands.Add(EditTimeRightHand);
-                _backingEditTimeFrame = _backingUntransformedEditTimeFrame.TransformedCopy(mainCamera.transform.GetLeapMatrix());
+                _backingEditTimeFrame = _backingUntransformedEditTimeFrame.TransformedCopy(new LeapTransform(mainCamera.transform));
                 return _backingEditTimeFrame;
             }
         }
@@ -370,4 +371,5 @@ namespace Ultraleap.Tracking.OpenXR
 
         #endregion
     }
+#pragma warning restore 0618
 }

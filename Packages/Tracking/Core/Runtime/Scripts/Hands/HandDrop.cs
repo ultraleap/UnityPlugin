@@ -12,6 +12,7 @@ using UnityEngine;
 namespace Leap.Unity
 {
     /** Simple implementation HandTransitionBehavior to lerp hand models back to their starting position and orientation with tracking ends*/
+    [System.Obsolete("This code will be moved to a legacy package in the next major version of the plugin. If you believe that it needs to be kept in tracking, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
     public class HandDrop : HandTransitionBehavior
     {
         private Vector3 startingPalmPosition;

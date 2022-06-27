@@ -14,13 +14,15 @@ In line with Unity's end of support of Unity 2019 LTS, we will no longer be acti
 
 We will also be deprecating some functionality and moving core utilities into a separate package.
 
+If you are using classes and methods that are marked as obsolete and will be moved to the new legacy package without a replacement, you may wish to use "#pragma warning disable 0618" at the start and "#pragma warning restore 0618" at the end of your method that makes use of it to suppress the warnings.
+
 If you have any concerns about this, please contact us on [Github Discussions](https://github.com/ultraleap/UnityPlugin/discussions)
  
 ### Added 
 - 
 
 ### Changed
-- 
+- Various classes and methods have been marked as obsolete in preparation for a major version change in the near future
  
 ### Fixed 
 - 

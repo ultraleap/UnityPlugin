@@ -12,6 +12,7 @@ using UnityEngine;
 
 namespace Leap.Unity.Interaction
 {
+#pragma warning disable 0618
 
     /// <summary>
     /// The sliding window throw handler implements a simple heuristic that provides a
@@ -153,7 +154,7 @@ namespace Leap.Unity.Interaction
 
             intObj.rigidbody.velocity *= _velocityMultiplierCurve.Evaluate(intObj.rigidbody.velocity.magnitude);
         }
-
     }
+#pragma warning restore 0618
 
 }

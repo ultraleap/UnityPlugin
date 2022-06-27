@@ -295,7 +295,7 @@ namespace Leap.Unity
                         if (hand == null)
                         {
                             hand = TestHandFactory.MakeTestHand(Handedness == Chirality.Left, unitType: TestHandFactory.UnitType.LeapUnits);
-                            hand.Transform(transform.GetLeapMatrix());
+                            hand.Transform(new LeapTransform(transform));
                         }
                     }
                     else

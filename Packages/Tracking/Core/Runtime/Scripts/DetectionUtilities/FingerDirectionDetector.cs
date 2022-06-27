@@ -12,6 +12,7 @@ using UnityEngine;
 
 namespace Leap.Unity
 {
+#pragma warning disable 0618
     /**
      * Detects when specified fingers are pointing in the specified manner.
      * 
@@ -232,4 +233,5 @@ namespace Leap.Unity
         }
 #endif
     }
+#pragma warning restore 0618
 }

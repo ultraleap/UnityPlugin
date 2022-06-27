@@ -6,18 +6,18 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Leap.Unity.Query;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.SceneManagement;
 
 namespace Leap.Unity
 {
-
+#pragma warning disable 0618
     /// <summary>
     /// Static convenience methods and extension methods for getting useful Hand data.
     /// </summary>
+    [System.Obsolete("Use of the static Hands class is no longer recommended and will be removed in a future update.")]
     public static class Hands
     {
 
@@ -124,7 +124,7 @@ namespace Leap.Unity
             {
                 if (Provider == null) return null;
                 if (Provider.CurrentFrame == null) return null;
-                return Provider.CurrentFrame.Hands.Query().FirstOrDefault(hand => hand.IsLeft);
+                return Provider.CurrentFrame.Hands.FirstOrDefault(hand => hand.IsLeft);
             }
         }
 
@@ -138,7 +138,7 @@ namespace Leap.Unity
             {
                 if (Provider == null) return null;
                 if (Provider.CurrentFrame == null) return null;
-                else return Provider.CurrentFrame.Hands.Query().FirstOrDefault(hand => hand.IsRight);
+                else return Provider.CurrentFrame.Hands.FirstOrDefault(hand => hand.IsRight);
             }
         }
 
@@ -152,7 +152,7 @@ namespace Leap.Unity
             {
                 if (Provider == null) return null;
                 if (Provider.CurrentFixedFrame == null) return null;
-                return Provider.CurrentFixedFrame.Hands.Query().FirstOrDefault(hand => hand.IsLeft);
+                return Provider.CurrentFixedFrame.Hands.FirstOrDefault(hand => hand.IsLeft);
             }
         }
 
@@ -166,7 +166,7 @@ namespace Leap.Unity
             {
                 if (Provider == null) return null;
                 if (Provider.CurrentFixedFrame == null) return null;
-                else return Provider.CurrentFixedFrame.Hands.Query().FirstOrDefault(hand => hand.IsRight);
+                else return Provider.CurrentFixedFrame.Hands.FirstOrDefault(hand => hand.IsRight);
             }
         }
 
@@ -445,11 +445,7 @@ namespace Leap.Unity
     /// </summary>
     public static class HandUtils
     {
-
-        /// <summary>
-        /// Fills the Hand object with the provided hand data. You can pass null for the
-        /// fingers input; this will leave the hand's finger data unmodified.
-        /// </summary>
+        [System.Obsolete("This signature will be removed in the next major version of the plugin. Use the one with Vector3s instead. If you believe that it needs to be kept, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
         public static void Fill(this Hand toFill,
                                 long frameID,
                                 int id,
@@ -490,10 +486,52 @@ namespace Leap.Unity
             toFill.Direction = direction;
             toFill.WristPosition = wristPosition;
         }
-
         /// <summary>
-        /// Fills the Bone object with the provided bone data.
+        /// Fills the Hand object with the provided hand data. You can pass null for the
+        /// fingers input; this will leave the hand's finger data unmodified.
         /// </summary>
+        public static void Fill(this Hand toFill,
+                                long frameID,
+                                int id,
+                                float confidence,
+                                float grabStrength,
+                                float grabAngle,
+                                float pinchStrength,
+                                float pinchDistance,
+                                float palmWidth,
+                                bool isLeft,
+                                float timeVisible,
+                                /* Arm arm,*/
+                                List<Finger> fingers,
+                                Vector3 palmPosition,
+                                Vector3 stabilizedPalmPosition,
+                                Vector3 palmVelocity,
+                                Vector3 palmNormal,
+                                Quaternion rotation,
+                                Vector3 direction,
+                                Vector3 wristPosition)
+        {
+            toFill.FrameId = frameID;
+            toFill.Id = id;
+            toFill.Confidence = confidence;
+            toFill.GrabStrength = grabStrength;
+            toFill.GrabAngle = grabAngle;
+            toFill.PinchStrength = pinchStrength;
+            toFill.PinchDistance = pinchDistance;
+            toFill.PalmWidth = palmWidth;
+            toFill.IsLeft = isLeft;
+            toFill.TimeVisible = timeVisible;
+            if (fingers != null) toFill.Fingers = fingers;
+            toFill.PalmPosition = palmPosition.ToVector();
+            toFill.StabilizedPalmPosition = stabilizedPalmPosition.ToVector();
+            toFill.PalmVelocity = palmVelocity.ToVector();
+            toFill.PalmNormal = palmNormal.ToVector();
+            toFill.Rotation = rotation.ToLeapQuaternion();
+            toFill.Direction = direction.ToVector();
+            toFill.WristPosition = wristPosition.ToVector();
+        }
+
+        [System.Obsolete("This signature will be removed in the next major version of the plugin. Use the one with Vector3s instead. If you believe that it needs to be kept, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
         public static void Fill(this Bone toFill,
                                 Vector prevJoint,
                                 Vector nextJoint,
@@ -513,11 +551,30 @@ namespace Leap.Unity
             toFill.Type = type;
             toFill.Rotation = rotation;
         }
-
         /// <summary>
-        /// Fills the Finger object with the provided finger data. You can pass null for
-        /// bones; A null bone will not modify the underlying hand's data for that bone.
+        /// Fills the Bone object with the provided bone data.
         /// </summary>
+        public static void Fill(this Bone toFill,
+                                Vector3 prevJoint,
+                                Vector3 nextJoint,
+                                Vector3 center,
+                                Vector3 direction,
+                                float length,
+                                float width,
+                                Bone.BoneType type,
+                                Quaternion rotation)
+        {
+            toFill.PrevJoint = prevJoint.ToVector();
+            toFill.NextJoint = nextJoint.ToVector();
+            toFill.Center = center.ToVector();
+            toFill.Direction = direction.ToVector();
+            toFill.Length = length;
+            toFill.Width = width;
+            toFill.Type = type;
+            toFill.Rotation = rotation.ToLeapQuaternion();
+        }
+
+        [System.Obsolete("This signature will be removed in the next major version of the plugin. Use the one with Vector3s instead. If you believe that it needs to be kept, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
         public static void Fill(this Finger toFill,
                                 long frameId,
                                 int handId,
@@ -549,10 +606,43 @@ namespace Leap.Unity
             if (intermediate != null) toFill.bones[2] = intermediate;
             if (distal != null) toFill.bones[3] = distal;
         }
-
         /// <summary>
-        /// Fills the Arm object with the provided arm data.
+        /// Fills the Finger object with the provided finger data. You can pass null for
+        /// bones; A null bone will not modify the underlying hand's data for that bone.
         /// </summary>
+        public static void Fill(this Finger toFill,
+                                long frameId,
+                                int handId,
+                                int fingerId,
+                                float timeVisible,
+                                Vector3 tipPosition,
+                                Vector3 direction,
+                                float width,
+                                float length,
+                                bool isExtended,
+                                Finger.FingerType type,
+                                Bone metacarpal = null,
+                                Bone proximal = null,
+                                Bone intermediate = null,
+                                Bone distal = null)
+        {
+            toFill.Id = handId;
+            toFill.HandId = handId;
+            toFill.TimeVisible = timeVisible;
+            toFill.TipPosition = tipPosition.ToVector();
+            toFill.Direction = direction.ToVector();
+            toFill.Width = width;
+            toFill.Length = length;
+            toFill.IsExtended = isExtended;
+            toFill.Type = type;
+
+            if (metacarpal != null) toFill.bones[0] = metacarpal;
+            if (proximal != null) toFill.bones[1] = proximal;
+            if (intermediate != null) toFill.bones[2] = intermediate;
+            if (distal != null) toFill.bones[3] = distal;
+        }
+
+        [System.Obsolete("This signature will be removed in the next major version of the plugin. Use the one with Vector3s instead. If you believe that it needs to be kept, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
         public static void Fill(this Arm toFill,
                                 Vector elbow,
                                 Vector wrist,
@@ -569,6 +659,26 @@ namespace Leap.Unity
             toFill.Length = length;
             toFill.Width = width;
             toFill.Rotation = rotation;
+        }
+        /// <summary>
+        /// Fills the Arm object with the provided arm data.
+        /// </summary>
+        public static void Fill(this Arm toFill,
+                                Vector3 elbow,
+                                Vector3 wrist,
+                                Vector3 center,
+                                Vector3 direction,
+                                float length,
+                                float width,
+                                Quaternion rotation)
+        {
+            toFill.PrevJoint = elbow.ToVector();
+            toFill.NextJoint = wrist.ToVector();
+            toFill.Center = center.ToVector();
+            toFill.Direction = direction.ToVector();
+            toFill.Length = length;
+            toFill.Width = width;
+            toFill.Rotation = rotation.ToLeapQuaternion();
         }
 
         /// <summary>
@@ -601,7 +711,7 @@ namespace Leap.Unity
         public static Hand GetHand(this Frame frame, Chirality whichHand)
         {
             if (frame.Hands == null) { return null; }
-            return frame.Hands.Query().FirstOrDefault(
+            return frame.Hands.FirstOrDefault(
               h => h.IsLeft == (whichHand == Chirality.Left));
         }
 
@@ -632,5 +742,5 @@ namespace Leap.Unity
         #endregion
 
     }
-
+#pragma warning restore 0618
 }

@@ -22,6 +22,7 @@ namespace Leap.Unity
     /// change type (in many cases the these are the same) and implement the Delta()
     /// function to compute the average change of samples currently in the buffer.
     /// </summary>
+    [System.Obsolete("This code will be moved to a legacy package in the next major version of the plugin. If you believe that it needs to be kept in tracking, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
     public abstract class DeltaBuffer<SampleType, DerivativeType> : IIndexable<SampleType>
     {
 
@@ -120,6 +121,7 @@ namespace Leap.Unity
     /// The larger the buffer, the more stable but also delayed the resulting average
     /// change over time. A buffer size of 5 is a good start for 60-90 Hz updates.
     /// </summary>
+    [System.Obsolete("This code will be moved to a legacy package in the next major version of the plugin. If you believe that it needs to be kept in tracking, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
     public class DeltaBuffer : DeltaBuffer<Vector3, Vector3>
     {
 
@@ -154,6 +156,7 @@ namespace Leap.Unity
     /// The larger the buffer, the more stable but also delayed the resulting average
     /// change over time. A buffer size of 5 is a good start for 60-90 Hz updates.
     /// </summary>
+    [System.Obsolete("This code will be moved to a legacy package in the next major version of the plugin. If you believe that it needs to be kept in tracking, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
     public class DeltaFloatBuffer : DeltaBuffer<float, float>
     {
 
@@ -185,6 +188,7 @@ namespace Leap.Unity
     /// The larger the buffer, the more stable but also delayed the resulting average
     /// change over time. A buffer size of 5 is a good start for 60-90 Hz updates.
     /// </summary>
+    [System.Obsolete("This code will be moved to a legacy package in the next major version of the plugin. If you believe that it needs to be kept in tracking, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
     public class DeltaQuaternionBuffer : DeltaBuffer<Quaternion, Vector3>
     {
 

@@ -6,19 +6,17 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Leap.Interaction.Internal.InteractionEngineUtility;
 using Leap.Unity.Attributes;
 using Leap.Unity.Interaction.Internal;
-using Leap.Unity.Query;
 using Leap.Unity.RuntimeGizmos;
 using Leap.Unity.Space;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace Leap.Unity.Interaction
 {
+#pragma warning disable 0618
     public enum HandDataMode { PlayerLeft, PlayerRight, Custom }
 
     /// <summary>
@@ -192,13 +190,11 @@ namespace Leap.Unity.Interaction
                 {
                     if (handDataMode == HandDataMode.PlayerLeft)
                     {
-                        handAccessorFunc = (frame) => frame.Hands.Query()
-                                                                 .FirstOrDefault(hand => hand.IsLeft);
+                        handAccessorFunc = (frame) => frame.GetHand(Chirality.Left);
                     }
                     else
                     {
-                        handAccessorFunc = (frame) => frame.Hands.Query()
-                                                                 .FirstOrDefault(hand => hand.IsRight);
+                        handAccessorFunc = (frame) => frame.GetHand(Chirality.Right);
                     }
                 }
             }
@@ -419,6 +415,7 @@ namespace Leap.Unity.Interaction
             }
         }
 
+        [System.Obsolete("This code will be removed in the next major version of the plugin. If you believe that it needs to be kept, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
         protected override void unwarpColliders(Transform primaryHoverPoint,
                                                 ISpaceComponent warpedSpaceElement)
         {
@@ -472,12 +469,9 @@ namespace Leap.Unity.Interaction
                                                                       out Vector3 targetPosition,
                                                                       out Quaternion targetRotation)
         {
-            using (new ProfilerSample("InteractionHand: getColliderBoneTargetPositionRotation"))
-            {
-                _handContactBoneMapFunctions[contactBoneIndex](_unwarpedHandData,
-                                                               out targetPosition,
-                                                               out targetRotation);
-            }
+            _handContactBoneMapFunctions[contactBoneIndex](_unwarpedHandData,
+                                                           out targetPosition,
+                                                           out targetRotation);
         }
 
         protected override bool initContact()
@@ -723,7 +717,7 @@ namespace Leap.Unity.Interaction
             if (softContactEnabled) { return; }
             if (Application.isPlaying && _contactBones.Length == NUM_FINGERS * BONES_PER_FINGER + 1)
             {
-                Vector elbowPos = inHand.Arm.ElbowPosition;
+                Vector3 elbowPos = inHand.Arm.ElbowPosition.ToVector3();
                 inHand.SetTransform(_contactBones[NUM_FINGERS * BONES_PER_FINGER].rigidbody.position, _contactBones[NUM_FINGERS * BONES_PER_FINGER].rigidbody.rotation);
 
                 for (int fingerIndex = 0; fingerIndex < NUM_FINGERS; fingerIndex++)
@@ -732,15 +726,15 @@ namespace Leap.Unity.Interaction
                     {
                         Bone bone = inHand.Fingers[fingerIndex].Bone((Bone.BoneType)(jointIndex) + 1);
                         int boneArrayIndex = fingerIndex * BONES_PER_FINGER + jointIndex;
-                        Vector displacement = _contactBones[boneArrayIndex].rigidbody.position.ToVector() - bone.Center;
-                        bone.Center += displacement;
-                        bone.PrevJoint += displacement;
-                        bone.NextJoint += displacement;
+                        Vector3 displacement = _contactBones[boneArrayIndex].rigidbody.position - bone.Center.ToVector3();
+                        bone.Center += displacement.ToVector();
+                        bone.PrevJoint += displacement.ToVector();
+                        bone.NextJoint += displacement.ToVector();
                         bone.Rotation = _contactBones[boneArrayIndex].rigidbody.rotation.ToLeapQuaternion();
                     }
                 }
 
-                inHand.Arm.PrevJoint = elbowPos;
+                inHand.Arm.PrevJoint = elbowPos.ToVector();
                 inHand.Arm.Direction = (inHand.Arm.PrevJoint - inHand.Arm.NextJoint).Normalized;
                 inHand.Arm.Center = (inHand.Arm.PrevJoint + inHand.Arm.NextJoint) * 0.5f;
             }
@@ -948,5 +942,5 @@ namespace Leap.Unity.Interaction
         #endregion
 
     }
-
+#pragma warning restore 0618
 }

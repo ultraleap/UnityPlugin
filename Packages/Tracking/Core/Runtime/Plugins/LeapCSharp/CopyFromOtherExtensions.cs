@@ -8,7 +8,7 @@
 
 namespace Leap
 {
-
+#pragma warning disable 0618
     public static class CopyFromOtherExtensions
     {
 
@@ -117,4 +117,5 @@ namespace Leap
             return bone;
         }
     }
+#pragma warning restore 0618
 }

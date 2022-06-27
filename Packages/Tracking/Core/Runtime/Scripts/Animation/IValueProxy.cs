@@ -23,6 +23,7 @@ namespace Leap.Unity
     /// animatable representation.  The proxy stands in as the animatable
     /// representation, while still allowing normal reads and writes.
     /// </summary>
+    [System.Obsolete("This code will be moved to a legacy package in the next major version of the plugin. If you believe that it needs to be kept in tracking, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
     public interface IValueProxy
     {
 
@@ -45,6 +46,7 @@ namespace Leap.Unity
     /// When Auto-pushing is enabled, the behaviour will push the value on every
     /// LateUpdate.
     /// </summary>
+    [System.Obsolete("This code will be moved to a legacy package in the next major version of the plugin. If you believe that it needs to be kept in tracking, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
     public abstract class AutoValueProxy : MonoBehaviour, IValueProxy
     {
 

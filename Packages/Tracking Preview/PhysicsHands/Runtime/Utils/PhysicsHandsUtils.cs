@@ -3,6 +3,7 @@ using UnityEngine;
 
 namespace Leap.Unity.Interaction.PhysicsHands
 {
+#pragma warning disable 0618
     public static class PhysicsHandsUtils
     {
         #region Hand Generation
@@ -687,4 +688,5 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
 
     }
+#pragma warning restore 0618
 }

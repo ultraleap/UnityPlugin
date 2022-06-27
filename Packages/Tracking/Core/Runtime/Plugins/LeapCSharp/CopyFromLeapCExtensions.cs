@@ -9,7 +9,7 @@
 namespace LeapInternal
 {
     using Leap;
-
+#pragma warning disable 0618
     public static class CopyFromLeapCExtensions
     {
 
@@ -139,4 +139,5 @@ namespace LeapInternal
             return bone;
         }
     }
+#pragma warning restore 0618
 }

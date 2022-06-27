@@ -14,6 +14,7 @@ using UnityEngine.UI;
 
 namespace Leap.Unity.InputModule
 {
+#pragma warning disable 0618
     /// <summary>
     /// Representation of a pointer that can be controlled by the LeapInputModule
     /// </summary>
@@ -626,4 +627,5 @@ namespace Leap.Unity.InputModule
             result?.Invoke(module, this);
         }
     }
+#pragma warning restore 0618
 }

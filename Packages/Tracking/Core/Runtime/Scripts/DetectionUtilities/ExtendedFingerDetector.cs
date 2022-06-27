@@ -13,7 +13,7 @@ using UnityEngine;
 
 namespace Leap.Unity
 {
-
+#pragma warning disable 0618
     /**
      * Detects when specified fingers are in an extended or non-extended state.
      * 
@@ -208,4 +208,5 @@ namespace Leap.Unity
 
     /** Defines the settings for comparing extended finger states */
     public enum PointingState { Extended, NotExtended, Either }
+#pragma warning restore 0618
 }
