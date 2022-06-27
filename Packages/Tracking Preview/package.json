@@ -6,7 +6,8 @@
   "unity": "2020.3",
   "license": "Apache-2.0",
   "dependencies": {
-    "com.ultraleap.tracking": "5.10.0"
+    "com.ultraleap.tracking": "5.10.0",
+    "com.unity.inputsystem": "1.0.2"
   },
   "keywords": [
     "ultraleap",
