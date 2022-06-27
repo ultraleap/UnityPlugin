@@ -72,6 +72,7 @@ namespace Leap.Unity
             specifyCustomDrawer("_specificSerialNumber", drawSerialNumberToggle);
 
             deferProperty("_serverNameSpace");
+            deferProperty("_workerThreadProfiling");
 
             if (!(LeapServiceProvider is LeapXRServiceProvider))
             {
@@ -82,6 +83,7 @@ namespace Leap.Unity
                 hideField("_trackingOptimization");
             }
             addPropertyToFoldout("_serverNameSpace", "Advanced Options");
+            addPropertyToFoldout("_workerThreadProfiling", "Advanced Options");
         }
 
         private void frameOptimizationWarning(SerializedProperty property)

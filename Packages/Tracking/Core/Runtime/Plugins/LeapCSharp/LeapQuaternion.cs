@@ -126,7 +126,7 @@ namespace Leap
             get
             {
                 float denom = MagnitudeSquared;
-                if (denom <= Constants.EPSILON)
+                if (denom <= CSharpExtensions.Constants.EPSILON)
                 {
                     return Identity;
                 }

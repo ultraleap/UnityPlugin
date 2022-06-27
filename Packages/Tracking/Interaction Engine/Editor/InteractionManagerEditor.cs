@@ -332,8 +332,6 @@ namespace Leap.Unity.Interaction
                         controller.intHand.handDataMode == intHand.handDataMode &&
                         controller.intHand.leapProvider == intHand.leapProvider)
                     {
-                        Debug.LogWarning(controller.intHand.handDataMode + " _ ");
-
                         messages.Add(new ControllerStatusMessage()
                         {
                             message = "Duplicate Hand",

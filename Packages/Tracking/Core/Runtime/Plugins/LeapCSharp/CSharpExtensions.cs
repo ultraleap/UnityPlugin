@@ -16,11 +16,19 @@ namespace Leap
     /// </summary>
     public static class CSharpExtensions
     {
+        public static class Constants
+        {
+            public const float PI = 3.1415926536f;
+            public const float DEG_TO_RAD = 0.0174532925f;
+            public const float RAD_TO_DEG = 57.295779513f;
+            public const float EPSILON = 1.192092896e-07f;
+        }
+
         /// <summary>
         /// Compares whether two floating point numbers are within an epsilon value of each other.
         /// @since 3.0
         /// </summary>
-        public static bool NearlyEquals(this float a, float b, float epsilon = 1.192092896e-07f)
+        public static bool NearlyEquals(this float a, float b, float epsilon = Constants.EPSILON)
         {
             float absA = Math.Abs(a);
             float absB = Math.Abs(b);

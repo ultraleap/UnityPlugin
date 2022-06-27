@@ -993,7 +993,7 @@ namespace Leap.Unity
         /// <summary>
         /// Sets all elements in the array of type T to default(T).
         /// </summary>
-        [System.Obsolete("This code will be removed in the next major version of the plugin. If you believe that it needs to be kept, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
+        [System.Obsolete("This code will be removed in the next major version of the plugin. Please use Fill<T> instead")]
         public static T[] ClearWithDefaults<T>(this T[] arr)
         {
             for (int i = 0; i < arr.Length; i++)
@@ -1006,7 +1006,7 @@ namespace Leap.Unity
         /// <summary>
         /// Sets all elements in the array of type T to the argument value.
         /// </summary>
-        [System.Obsolete("This code will be removed in the next major version of the plugin. If you believe that it needs to be kept, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
+        [System.Obsolete("This code will be removed in the next major version of the plugin. Please use Fill<T> instead")]
         public static T[] ClearWith<T>(this T[] arr, T value)
         {
             for (int i = 0; i < arr.Length; i++)
@@ -1101,6 +1101,9 @@ namespace Leap.Unity
             return dst;
         }
 
+        /// <summary>
+        /// Sets all elements in the array of type T to the argument value.
+        /// </summary>
         public static T[] Fill<T>(this T[] array, T fillWith)
         {
             for (int i = 0; i < array.Length; i++)

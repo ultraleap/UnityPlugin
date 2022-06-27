@@ -1322,7 +1322,9 @@ namespace LeapInternal
 
             pm.frameId = pmi.frame_id;
             pm.timestamp = pmi.timestamp;
-            pm.points = new UnityEngine.Vector3[nPoints];
+#pragma warning disable 0618
+            pm.points = new Vector[nPoints];
+#pragma warning restore 0618
             pm.ids = new UInt32[nPoints];
 
             float[] points = new float[3 * nPoints];
