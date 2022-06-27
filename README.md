@@ -49,7 +49,7 @@ To use this plugin you will need the following:
 
 1. The latest Ultraleap Hand Tracking Software. You can get this [here][developer-site-tracking-software].
 2. An Ultraleap Hand Tracking Camera - follow setup process [here][developer-site-setup-camera].
-3. Unity 2019.4 LTS or newer. UnityPlugin packages have been tested to work against 2019.4 LTS and 2020.3 LTS.
+3. Unity 2020.3 LTS or newer. UnityPlugin packages have been tested to work against 2020.3 LTS and 2021.3 LTS.
 4. Windows® 10, 64-bit
 5. Follow one of the Installation workflows listed below.
 
@@ -60,7 +60,7 @@ To use this plugin you will need the following:
 
 ### Dependencies
 
-If you are using Unity 2020.4 (LTS) or newer with XR then you will need to follow the Unity documentation on how to configure your project.
+If you are using Unity 2020.3 (LTS) or newer with XR then you will need to follow the Unity documentation on how to configure your project.
 
 - [Upgrading to XR plugin Management System][upgrade-xr]
 
@@ -68,10 +68,6 @@ If you are using any of the scriptable render pipelines (SRP) then you will need
 
 - [Upgrading to Universal Render Pipeline (URP)][upgrade-urp] 
 - [Upgrading to High Definition Render Pipeline (HDRP)][upgrade-hdrp]
-
-If you are using Unity 2019.4 (LTS) and you get errors related to "SpatialTracking" upon importing, you will need to install the following package:
-
-- [XR Legacy Input Helpers][xr-legacy-input-helpers-documentation].
 
 If you are using Unity 2020.1 or newer and you get errors related to "SpatialTracking" upon importing, you will need to install the following package:
 

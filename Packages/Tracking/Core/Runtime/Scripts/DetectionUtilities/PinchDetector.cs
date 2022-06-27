@@ -12,7 +12,7 @@ using UnityEngine.Serialization;
 
 namespace Leap.Unity
 {
-
+#pragma warning disable 0618
     /// <summary>
     /// A basic utility class to aid in creating pinch based actions.  Once linked with a HandModelBase, it can
     /// be used to detect pinch gestures that the hand makes.
@@ -152,4 +152,5 @@ namespace Leap.Unity
         }
 #endif
     }
+#pragma warning restore 0618
 }

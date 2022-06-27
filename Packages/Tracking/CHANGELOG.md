@@ -14,16 +14,18 @@ In line with Unity's end of support of Unity 2019 LTS, we will no longer be acti
 
 We will also be deprecating some functionality and moving core utilities into a separate package.
 
+If you are using classes and methods that are marked as obsolete and will be moved to the new legacy package without a replacement, you may wish to use "#pragma warning disable 0618" at the start and "#pragma warning restore 0618" at the end of your method that makes use of it to suppress the warnings.
+
 If you have any concerns about this, please contact us on [Github Discussions](https://github.com/ultraleap/UnityPlugin/discussions)
  
 ### Added 
 - 
 
 ### Changed
-- 
+- Various classes and methods have been marked as obsolete in preparation for a major version change in the near future
  
 ### Fixed 
-- Thread Abort Exception in editor when using multi-device
+- VertexOffsetShader displays errors in Unity 2021 due to invalid path
 
 ### Known issues 
 - Scenes containing the infrared viewer render incorrectly on systems using single pass stereo with the XR plugin system - e.g. Windows Mixed Reality headsets. SteamVR headsets may also default to single pass stereo, showing the same issue. However in this case, the OpenVR settings can be changed to multipass which resolves the problem. 

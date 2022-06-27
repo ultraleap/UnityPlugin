@@ -7,12 +7,9 @@
  ******************************************************************************/
 
 using Leap.Unity;
-using System.Collections;
-using System.Collections.Generic;
+
 using UnityEngine;
-#if UNITY_2019_1_OR_NEWER
 using UnityEngine.Rendering;
-#endif
 
 
 /// <summary>
@@ -56,8 +53,6 @@ public class LeapDistortImage : MonoBehaviour
     // Start is called before the first frame update
     void OnEnable()
     {
-
-#if UNITY_2019_1_OR_NEWER
         if (GraphicsSettings.renderPipelineAsset != null)
         {
             RenderPipelineManager.beginCameraRendering -= onBeginRendering;
@@ -68,15 +63,10 @@ public class LeapDistortImage : MonoBehaviour
             Camera.onPreCull -= OnCameraPreCull;
             Camera.onPreCull += OnCameraPreCull;
         }
-#else
-        Camera.onPreCull -= OnCameraPreCull;
-        Camera.onPreCull += OnCameraPreCull;
-#endif
     }
 
     private void OnDisable()
     {
-#if UNITY_2019_1_OR_NEWER
         if (GraphicsSettings.renderPipelineAsset != null)
         {
             RenderPipelineManager.beginCameraRendering -= onBeginRendering;
@@ -85,14 +75,9 @@ public class LeapDistortImage : MonoBehaviour
         {
             Camera.onPreCull -= OnCameraPreCull;
         }
-#else
-        Camera.onPreCull -= OnCameraPreCull;
-#endif
     }
 
-#if UNITY_2019_1_OR_NEWER
     protected virtual void onBeginRendering(ScriptableRenderContext context, Camera camera) { OnCameraPreCull(camera); }
-#endif
 
     // Update is called once per frame
     void OnCameraPreCull(Camera cam)

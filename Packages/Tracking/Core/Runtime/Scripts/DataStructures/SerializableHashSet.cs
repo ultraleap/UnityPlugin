@@ -6,10 +6,10 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Leap.Unity.Query;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Leap.Unity
@@ -176,7 +176,7 @@ namespace Leap.Unity
             {
                 if (isNull(value))
                 {
-                    if (!_values.Query().Any(obj => isNull(obj)))
+                    if (!_values.Any(obj => isNull(obj)))
                     {
                         _values.Add(value);
                     }

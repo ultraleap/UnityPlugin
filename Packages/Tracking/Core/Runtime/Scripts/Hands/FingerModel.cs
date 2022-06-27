@@ -13,6 +13,7 @@ using UnityEngine;
 
 namespace Leap.Unity
 {
+#pragma warning disable 0618
     /**
     * The base class for all fingers.
     *
@@ -264,4 +265,5 @@ namespace Leap.Unity
             return spreadAngle;
         }
     }
+#pragma warning restore 0618
 }

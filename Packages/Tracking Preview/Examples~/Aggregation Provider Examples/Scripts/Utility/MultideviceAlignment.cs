@@ -12,6 +12,7 @@ using UnityEngine;
 
 namespace Leap.Unity
 {
+#pragma warning disable 0618
     /// <summary>
     /// Takes a sourceDevice and aligns a targetDevice to it by transforming the targetDevice 
     /// until all bones from both hands align to within the alignmentVariance value
@@ -79,7 +80,12 @@ namespace Leap.Unity
                         Matrix4x4 deviceToOriginDeviceMatrix =
                           solver.SolveKabsch(targetHandPoints, sourceHandPoints, 200);
 
-                        targetDevice.transform.Transform(deviceToOriginDeviceMatrix);
+                        // transform the targetDevice.transform by the deviceToOriginDeviceMatrix
+                        Matrix4x4 newTransform = deviceToOriginDeviceMatrix * targetDevice.transform.localToWorldMatrix;
+                        targetDevice.transform.position = newTransform.GetVector3();
+                        targetDevice.transform.rotation = newTransform.GetQuaternion();
+                        targetDevice.transform.localScale = Vector3.Scale(targetDevice.transform.localScale, deviceToOriginDeviceMatrix.lossyScale);
+
 
                         targetHandPoints.Clear();
                         sourceHandPoints.Clear();
@@ -89,4 +95,5 @@ namespace Leap.Unity
             }
         }
     }
+#pragma warning restore 0618
 }

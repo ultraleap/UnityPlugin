@@ -12,6 +12,7 @@ using UnityEngine;
 
 namespace Leap.Unity
 {
+#pragma warning disable 0618
     /// <summary>
     /// The base class for all hand models, both graphics and physics.
     ///
@@ -316,4 +317,5 @@ namespace Leap.Unity
         /// </summary>
         public override abstract void UpdateHand();
     }
+#pragma warning restore 0618
 }

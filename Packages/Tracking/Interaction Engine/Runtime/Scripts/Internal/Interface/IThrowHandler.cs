@@ -6,11 +6,12 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Leap.Unity.Interaction
 {
-
+#pragma warning disable 0618
     /// <summary>
     /// Interaction objects feed their throw handlers callbacks when they are held (for
     /// data collection) and then fire OnThrow when they are released from all grasping
@@ -36,5 +37,5 @@ namespace Leap.Unity.Interaction
         void OnThrow(InteractionBehaviour intObj, InteractionController controller);
 
     }
-
+#pragma warning restore 0618
 }

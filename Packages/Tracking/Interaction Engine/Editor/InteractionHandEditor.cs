@@ -6,9 +6,7 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Leap.Unity.Query;
-using System.Collections;
-using System.Collections.Generic;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
@@ -92,7 +90,7 @@ namespace Leap.Unity.Interaction
         private void makeFingertipToggle(int fingerIndex, Vector2 offCenterPosImgSpace)
         {
             InteractionHand targetHand = target.intHand;
-            InteractionHand[] targetHands = targets.Query().Cast<InteractionHand>().ToArray();
+            InteractionHand[] targetHands = targets.Cast<InteractionHand>().ToArray();
 
             if (EditorGUI.Toggle(makeToggleRect(_handTexRect.center
                                                 + new Vector2(offCenterPosImgSpace.x * _handTexRect.width,

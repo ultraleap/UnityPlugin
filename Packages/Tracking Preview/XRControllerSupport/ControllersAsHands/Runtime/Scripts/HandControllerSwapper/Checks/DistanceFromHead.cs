@@ -10,6 +10,7 @@ using UnityEngine;
 
 namespace Leap.Unity.Controllers
 {
+#pragma warning disable 0618
     /// <summary>
     /// DistanceFromHead checks to see if the distance of the InputMethodType is less than or equal to the actionThreshold
     /// if lessThan is true, or greater than or equal to the actionThreshold if lessThan is false
@@ -68,4 +69,5 @@ namespace Leap.Unity.Controllers
             return false;
         }
     }
+#pragma warning restore 0618
 }

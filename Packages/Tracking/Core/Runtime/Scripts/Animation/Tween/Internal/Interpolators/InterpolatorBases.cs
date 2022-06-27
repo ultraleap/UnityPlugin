@@ -11,7 +11,7 @@ using UnityEngine;
 
 namespace Leap.Unity.Animation.Internal
 {
-
+    [System.Obsolete("This code will be moved to a legacy package in the next major version of the plugin. If you believe that it needs to be kept in tracking, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
     public abstract class InterpolatorBase<ValueType, ObjType> : IInterpolator
     {
         protected ValueType _a, _b;
@@ -38,6 +38,7 @@ namespace Leap.Unity.Animation.Internal
         public abstract void Dispose();
     }
 
+    [System.Obsolete("This code will be moved to a legacy package in the next major version of the plugin. If you believe that it needs to be kept in tracking, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
     public abstract class FloatInterpolatorBase<ObjType> : InterpolatorBase<float, ObjType>
     {
         public override float length
@@ -57,6 +58,7 @@ namespace Leap.Unity.Animation.Internal
         }
     }
 
+    [System.Obsolete("This code will be moved to a legacy package in the next major version of the plugin. If you believe that it needs to be kept in tracking, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
     public abstract class Vector2InterpolatorBase<ObjType> : InterpolatorBase<Vector2, ObjType>
     {
         public override float length
@@ -76,6 +78,7 @@ namespace Leap.Unity.Animation.Internal
         }
     }
 
+    [System.Obsolete("This code will be moved to a legacy package in the next major version of the plugin. If you believe that it needs to be kept in tracking, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
     public abstract class Vector3InterpolatorBase<ObjType> : InterpolatorBase<Vector3, ObjType>
     {
         public override float length
@@ -95,6 +98,7 @@ namespace Leap.Unity.Animation.Internal
         }
     }
 
+    [System.Obsolete("This code will be moved to a legacy package in the next major version of the plugin. If you believe that it needs to be kept in tracking, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
     public abstract class Vector4InterpolatorBase<ObjType> : InterpolatorBase<Vector4, ObjType>
     {
         public override float length
@@ -114,6 +118,7 @@ namespace Leap.Unity.Animation.Internal
         }
     }
 
+    [System.Obsolete("This code will be moved to a legacy package in the next major version of the plugin. If you believe that it needs to be kept in tracking, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
     public abstract class QuaternionInterpolatorBase<ObjType> : InterpolatorBase<Quaternion, ObjType>
     {
         public override float length
@@ -133,6 +138,7 @@ namespace Leap.Unity.Animation.Internal
         }
     }
 
+    [System.Obsolete("This code will be moved to a legacy package in the next major version of the plugin. If you believe that it needs to be kept in tracking, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
     public abstract class ColorInterpolatorBase<ObjType> : InterpolatorBase<Color, ObjType>
     {
         public override float length
@@ -152,6 +158,7 @@ namespace Leap.Unity.Animation.Internal
         }
     }
 
+    [System.Obsolete("This code will be moved to a legacy package in the next major version of the plugin. If you believe that it needs to be kept in tracking, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
     public abstract class GradientInterpolatorBase : IInterpolator
     {
 

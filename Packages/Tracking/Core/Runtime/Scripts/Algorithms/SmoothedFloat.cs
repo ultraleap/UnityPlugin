@@ -16,6 +16,7 @@ namespace Leap.Unity
     /// <remarks>
     /// When moving at a constant speed: speed * delay = Value - SmoothedFloat.value.
     /// </remarks>
+    [System.Obsolete("This code will become internal in the next major version of the plugin. If you believe that it needs to be kept public, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
     [System.Serializable]
     public class SmoothedFloat
     {

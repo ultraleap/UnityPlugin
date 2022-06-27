@@ -13,7 +13,7 @@ using UnityEngine;
 
 namespace Leap.Unity.Interaction
 {
-
+#pragma warning disable 0618
     /// <summary>
     /// AnchorableBehaviours mix well with InteractionBehaviours you'd like to be able to
     /// pick up and place in specific locations, specified by other GameObjects with an
@@ -1001,5 +1001,5 @@ namespace Leap.Unity.Interaction
         #endregion
 
     }
-
+#pragma warning restore 0618
 }

@@ -16,6 +16,7 @@ using UnityEngine;
 namespace Leap.Unity
 {
     using Attributes;
+#pragma warning disable 0618
 
     /// <summary>
     /// The LeapServiceProvider provides tracked Leap Hand data and images from the device
@@ -269,13 +270,10 @@ namespace Leap.Unity
         [SerializeField]
         protected bool _preventInitializingTrackingMode;
 
-#if UNITY_2017_3_OR_NEWER
+
         [Tooltip("When checked, profiling data from the LeapCSharp worker thread will be used to populate the UnityProfiler.")]
         [EditTimeOnly]
-#else
-        [Tooltip("Worker thread profiling requires a Unity version of 2017.3 or greater.")]
-        [Disable]
-#endif
+        [System.Obsolete("This code will be deleted in the next major version of the plugin. If you believe that it needs to be kept, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
         [SerializeField]
         protected bool _workerThreadProfiling = false;
 
@@ -311,7 +309,9 @@ namespace Leap.Unity
         protected Controller _leapController;
         protected bool _isDestroyed;
 
+        [System.Obsolete("This code will be removed in the next major version of the plugin. If you believe that it needs to be kept, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
         protected SmoothedFloat _fixedOffset = new SmoothedFloat();
+        [System.Obsolete("This code will become private in the next major version of the plugin. If you believe that it needs to be kept protected, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
         protected SmoothedFloat _smoothedTrackingLatency = new SmoothedFloat();
         protected long _unityToLeapOffset;
 
@@ -622,11 +622,6 @@ namespace Leap.Unity
             editTimePose = TestHandFactory.TestHandPose.DesktopModeA;
         }
 
-        protected virtual void Awake()
-        {
-            _fixedOffset.delay = 0.4f;
-            _smoothedTrackingLatency.SetBlend(0.99f, 0.0111f);
-        }
 
         protected virtual void Start()
         {
@@ -650,11 +645,6 @@ namespace Leap.Unity
 
         protected virtual void Update()
         {
-            if (_workerThreadProfiling)
-            {
-                LeapProfiling.Update();
-            }
-
             if (!checkConnectionIntegrity()) { return; }
 
 #if UNITY_EDITOR
@@ -665,8 +655,6 @@ namespace Leap.Unity
                 return;
             }
 #endif
-
-            _fixedOffset.Update(Time.time - Time.fixedTime, Time.deltaTime);
 
             if (_frameOptimization == FrameOptimizationMode.ReusePhysicsForUpdate)
             {
@@ -862,7 +850,6 @@ namespace Leap.Unity
             leapXRServiceProvider._frameOptimization = _frameOptimization;
             leapXRServiceProvider._physicsExtrapolation = _physicsExtrapolation;
             leapXRServiceProvider._physicsExtrapolationTime = _physicsExtrapolationTime;
-            leapXRServiceProvider._workerThreadProfiling = _workerThreadProfiling;
         }
 
         /// <summary>
@@ -1021,17 +1008,6 @@ namespace Leap.Unity
             {
                 _leapController.Device += onHandControllerConnect;
             }
-
-            if (_workerThreadProfiling)
-            {
-                //A controller will report profiling statistics for the duration of it's lifetime
-                //so these events will never be unsubscribed from.
-                _leapController.EndProfilingBlock += LeapProfiling.EndProfilingBlock;
-                _leapController.BeginProfilingBlock += LeapProfiling.BeginProfilingBlock;
-
-                _leapController.EndProfilingForThread += LeapProfiling.EndProfilingForThread;
-                _leapController.BeginProfilingForThread += LeapProfiling.BeginProfilingForThread;
-            }
         }
 
         /// <summary>
@@ -1136,11 +1112,8 @@ namespace Leap.Unity
                     Debug.LogWarning("Leap Service not connected; attempting to reconnect for try " +
                                      _numberOfReconnectionAttempts + "/" + MAX_RECONNECTION_ATTEMPTS +
                                      "...", this);
-                    using (new ProfilerSample("Reconnection Attempt"))
-                    {
-                        destroyController();
-                        createController();
-                    }
+                    destroyController();
+                    createController();
                 }
             }
             return false;
@@ -1162,7 +1135,7 @@ namespace Leap.Unity
 
         protected virtual void transformFrame(Frame source, Frame dest)
         {
-            dest.CopyFrom(source).Transform(transform.GetLeapMatrix());
+            dest.CopyFrom(source).Transform(new LeapTransform(transform));
         }
 
 #if SVR
@@ -1384,4 +1357,5 @@ namespace Leap.Unity
         #endregion
 
     }
+#pragma warning restore 0618
 }

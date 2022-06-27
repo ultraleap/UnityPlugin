@@ -6,7 +6,6 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Leap.Unity.Infix;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -206,9 +205,7 @@ namespace Leap.Unity.RuntimeGizmos
             switch (camera.cameraType)
             {
                 case CameraType.Preview:
-#if UNITY_2017_1_OR_NEWER
                 case CameraType.Reflection:
-#endif
                     return;
                 case CameraType.Game:
                 case CameraType.VR:
@@ -881,6 +878,7 @@ namespace Leap.Unity.RuntimeGizmos
             DrawPosition(pos, Color.white, 0f, overrideScale);
         }
 
+        [System.Obsolete("This code will be moved to a legacy package in the next major version of the plugin. If you believe that it needs to be kept in tracking, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
         public void DrawRect(Transform frame, Rect rect)
         {
             PushMatrix();
@@ -1032,14 +1030,14 @@ namespace Leap.Unity.RuntimeGizmos
         {
             var origCurrColor = _currColor;
 
-            var onPlaneDir = planeNormal.Cross(circleNormal);
+            var onPlaneDir = Vector3.Cross(planeNormal, circleNormal);
             var Q = Quaternion.AngleAxis(360f / numCircleSegments, circleNormal);
             var r = radialStartDirection * radius;
             for (int i = 0; i < numCircleSegments + 1; i++)
             {
                 var nextR = Q * r;
-                var onPlaneAngle = Infix.Infix.SignedAngle(r, onPlaneDir, circleNormal);
-                var nextOnPlaneAngle = Infix.Infix.SignedAngle(nextR, onPlaneDir, circleNormal);
+                var onPlaneAngle = Vector3.SignedAngle(r, onPlaneDir, circleNormal);
+                var nextOnPlaneAngle = Vector3.SignedAngle(nextR, onPlaneDir, circleNormal);
                 var front = onPlaneAngle < 0;
                 var nextFront = nextOnPlaneAngle < 0;
 
