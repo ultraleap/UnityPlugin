@@ -126,9 +126,9 @@ namespace Leap.Unity
         private void drawSerialNumberToggle(SerializedProperty property)
         {
             bool createdController = false;
-            if(_leapController == null)
+            if (_leapController == null)
             {
-                if(LeapController != null)
+                if (LeapController != null)
                 {
                     createdController = true;
                 }
