@@ -10,6 +10,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.ComponentModel;
 using UnityEngine;
 
 namespace Leap.Unity
@@ -543,57 +544,54 @@ namespace Leap.Unity
 
         protected virtual void OnEnable()
         {
-            CreateAndroidBinding();
+            EnsureAndroidBinding();
         }
 
-        public bool CreateAndroidBinding()
+        [Obsolete("Intended to be internal function, will be removed in next breaking version")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public bool CreateAndroidBinding() => EnsureAndroidBinding();
+
+        private bool EnsureAndroidBinding()
         {
+            bool success;
             try
             {
-                if (_serviceBinder != null)
+                bool isServiceBound = _serviceBinder?.Call<bool>("isBound") ?? false;
+                if (isServiceBound) return true; // Already bound
+
+                _serviceBinder = null;
+
+                //Get activity and context
+                if (unityPlayer == null)
                 {
-                    //Check binding status before calling rebind
-                    bool bindStatus = _serviceBinder.Call<bool>("isBound");
-                    Debug.Log("CreateAndroidBinding - Current service binder status " + bindStatus);
-                    if (bindStatus)
-                    {
-                        return true;
-                    }
-                    else
-                    {
-                        _serviceBinder = null;
-                    }
+                    Debug.Log("CreateAndroidBinding - Getting activity and context");
+                    unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
+                    activity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
+                    context = activity.Call<AndroidJavaObject>("getApplicationContext");
+                    serviceCallbacks = new ServiceCallbacks();
                 }
 
-                if (_serviceBinder == null)
+                //Create a new service binding
+                Debug.Log("CreateAndroidBinding - Creating a new service binder");
+                _serviceBinder = new AndroidJavaObject("com.ultraleap.tracking.service_binder.ServiceBinder", context, serviceCallbacks);
+                success = _serviceBinder.Call<bool>("bind");
+                if (success)
                 {
-                    //Get activity and context
-                    if (unityPlayer == null)
-                    {
-                        Debug.Log("CreateAndroidBinding - Getting activity and context");
-                        unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
-                        activity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
-                        context = activity.Call<AndroidJavaObject>("getApplicationContext");
-                        serviceCallbacks = new ServiceCallbacks();
-                    }
-
-                    //Create a new service binding
-                    Debug.Log("CreateAndroidBinding - Creating a new service binder");
-                    _serviceBinder = new AndroidJavaObject("com.ultraleap.tracking.service_binder.ServiceBinder", context, serviceCallbacks);
-                    bool success = _serviceBinder.Call<bool>("bind");
-                    if (success)
-                    {
-                        Debug.Log("CreateAndroidBinding - Binding of service binder complete");
-                    }
-                    return true;
+                    Debug.Log("CreateAndroidBinding - Binding of service binder complete");
+                }
+                else
+                {
+                    Debug.LogWarning("CreateAndroidBinding - service binder bind call failed");
                 }
             }
             catch (Exception e)
             {
                 Debug.LogWarning("CreateAndroidBinding - Failed to bind service: " + e.Message);
                 _serviceBinder = null;
+                success = false;
             }
-            return false;
+
+            return success;
         }
 
         protected virtual void OnDisable()
@@ -758,27 +756,8 @@ namespace Leap.Unity
             _isDestroyed = true;
         }
 
-        protected virtual void OnApplicationFocus(bool hasFocus)
-        {
-#if UNITY_ANDROID
-            if (hasFocus)
-            {
-                CreateAndroidBinding();
-            }
-#endif
-        }
-
         protected virtual void OnApplicationPause(bool isPaused)
         {
-#if UNITY_ANDROID
-            if (_leapController != null)
-            {
-                if (isPaused)
-                {
-                    _serviceBinder.Call("unbind");
-                }
-            }
-#endif
             if (_leapController != null)
             {
                 if (isPaused)
@@ -971,7 +950,7 @@ namespace Leap.Unity
         protected void createController()
         {
 #if SVR
-            var bindStatus = CreateAndroidBinding();
+            var bindStatus = EnsureAndroidBinding();
             if (!bindStatus)
                 return;
 
