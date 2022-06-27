@@ -126,8 +126,11 @@ namespace Leap.Unity
         private void drawSerialNumberToggle(SerializedProperty property)
         {
             bool createdController = false;
+
+            // Check if a controller exists
             if (_leapController == null)
             {
+                // This will generate a new controller if it is possible, we want to treat this newly created controller as temporary
                 if (LeapController != null)
                 {
                     createdController = true;
