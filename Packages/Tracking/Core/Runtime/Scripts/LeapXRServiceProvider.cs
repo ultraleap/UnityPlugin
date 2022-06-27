@@ -39,15 +39,6 @@ namespace Leap.Unity
         private const float DEFAULT_DEVICE_TILT_X_AXIS = 5f;
 #endif
 
-#if SVR
-        private enum TimewarpMode
-        {
-            Default,
-            Experimental_XR2
-        }
-
-        private TimewarpMode _xr2TimewarpMode = TimewarpMode.Default;
-#endif
         /// <summary>
         /// Supported modes for device offset. Used for deviceOffsetMode which allows 
         /// manual adjustment of the Tracking Hardware's virtual offset and tilt.
@@ -192,13 +183,7 @@ namespace Leap.Unity
         }
 
         // Temporal Warping
-#if UNITY_STANDALONE
         private const int DEFAULT_WARP_ADJUSTMENT = 17;
-#elif SVR
-        private const int DEFAULT_WARP_ADJUSTMENT = 35; // Tuned for XR2 on a Morpheus SKU3
-#else
-        private const int DEFAULT_WARP_ADJUSTMENT = 17;
-#endif
 
         /// <summary>
         /// Temporal warping prevents the hand coordinate system from 'swimming' or 
@@ -526,17 +511,7 @@ namespace Leap.Unity
                 return 0;
             }
 
-#if SVR
-            if (_xr2TimewarpMode == TimewarpMode.Experimental_XR2)
-            {
-                return GetPredictedDisplayTime_LeapTime();
-            }
-            else
-            {
-                return _leapController.Now() - 16000;
-            }
-
-#elif UNITY_ANDROID
+#if UNITY_ANDROID
             return _leapController.Now() - 16000;
 #else
 
@@ -628,32 +603,8 @@ namespace Leap.Unity
                     var sampleTimestamp = timestamp - (long)(warpingAdjustment * 1000f) - imageAdjustment;
                     transformHistory.SampleTransform(sampleTimestamp, out warpedPosition, out warpedRotation);
                 }
-#if SVR
-                void ExperimentalXR2TimeWarping()
-                {
-                    // Get the predicted display time for the current frame in milliseconds, then get the predicted head pose
-                    float predictedDisplayTime_ms = SxrShim.GetPredictedDisplayTime(SystemInfo.graphicsMultiThreaded);
 
-                    Vector3 predictedWarpedPosition;
-                    Quaternion predictedWarpedRotation;
-                    SxrShim.GetPredictedHeadPose(predictedDisplayTime_ms, out predictedWarpedRotation, out predictedWarpedPosition);
-                    warpedPosition.x = -predictedWarpedPosition.x;
-                    warpedPosition.y = -predictedWarpedPosition.y;
-                    warpedPosition.z = predictedWarpedPosition.z;
-                    warpedRotation = predictedWarpedRotation;
-                }
-
-                switch(_xr2TimeWarpMode)
-                {
-                    case TimewarpMode.Default:
-                        DefaultTimeWarping();
-                        break;
-                    case TimewarpMode.Experimental_XR2:
-                        ExperimentalXR2TimeWarping();
-                        break;
-#else
                 DefaultTimeWarping();
-#endif
             }
 
             // Normalize the rotation Quaternion.
@@ -673,8 +624,6 @@ namespace Leap.Unity
                 warpedRotation *= Quaternion.Euler(-90f, 90f, 90f);
             }
 
-
-#if !SVR
             // Use the mainCamera parent to transfrom the warped positions so the player can move around
             if (mainCamera.transform.parent != null)
             {
@@ -685,7 +634,6 @@ namespace Leap.Unity
                 );
             }
             else
-#endif
             {
                 leapTransform = new LeapTransform(
                   warpedPosition,
@@ -789,29 +737,6 @@ namespace Leap.Unity
                 }
             }
         }
-
-
-#if SVR
-        /// <summary>
-        /// Return the predicted display time as a leap time
-        /// </summary>
-        /// <returns></returns>
-        private long GetPredictedDisplayTime_LeapTime()
-        {
-
-            long leapClock = 0;
-
-            // Predicted display time for the current frame in milliseconds
-            float displayTime_ms = SxrShim.GetPredictedDisplayTime(SystemInfo.graphicsMultiThreaded);
-
-            if (_clockRebaser != IntPtr.Zero)
-            {
-                LeapC.RebaseClock(_clockRebaser, (long)displayTime_ms + _stopwatch.ElapsedMilliseconds, out leapClock);
-            }
-
-            return leapClock;
-        }
-#endif
 
         #endregion
     }

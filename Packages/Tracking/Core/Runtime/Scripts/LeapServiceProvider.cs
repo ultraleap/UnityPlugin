@@ -283,11 +283,6 @@ namespace Leap.Unity
         /// </summary>
         protected bool _useInterpolation = true;
 
-#if SVR
-        protected IntPtr _clockRebaser;
-        protected System.Diagnostics.Stopwatch _stopwatch = new System.Diagnostics.Stopwatch();
-#endif
-
         // Extrapolate on Android to compensate for the latency introduced by its graphics
         // pipeline.
 #if UNITY_ANDROID && !UNITY_EDITOR
@@ -658,17 +653,6 @@ namespace Leap.Unity
                 return;
             }
 
-#if SVR
-            if (_clockRebaser != IntPtr.Zero)
-            {
-                eLeapRS result = LeapC.UpdateRebase(_clockRebaser, _stopwatch.ElapsedMilliseconds, LeapC.GetNow());
-                if (result != eLeapRS.eLeapRS_Success)
-                {
-                    Debug.LogWarning("UpdateRebase call failed");
-                }
-            }
-#endif
-
             // if the serial number has changed since the last update(), update the device
             if (_multipleDeviceMode == MultipleDeviceMode.Specific && (_currentDevice == null || _currentDevice.SerialNumber != SpecificSerialNumber))
             {
@@ -964,14 +948,6 @@ namespace Leap.Unity
         /// </summary>
         protected void createController()
         {
-#if SVR
-            var bindStatus = CreateAndroidBinding();
-            if (!bindStatus)
-                return;
-
-            InitClockRebaser();
-#endif
-
             if (_leapController != null)
             {
                 return;
@@ -1089,14 +1065,6 @@ namespace Leap.Unity
                 _leapController.StopConnection();
                 _leapController.Dispose();
                 _leapController = null;
-
-#if SVR
-                if (_clockRebaser != IntPtr.Zero)
-                {
-                    LeapC.DestroyClockRebaser(_clockRebaser);
-                    _stopwatch.Stop();
-                }
-#endif
             }
         }
 
@@ -1139,10 +1107,6 @@ namespace Leap.Unity
         {
             initializeFlags();
 
-#if SVR
-            InitClockRebaser();
-#endif
-
             if (_leapController != null)
             {
                 _leapController.Device -= onHandControllerConnect;
@@ -1153,24 +1117,6 @@ namespace Leap.Unity
         {
             dest.CopyFrom(source).Transform(new LeapTransform(transform));
         }
-
-#if SVR
-        private void InitClockRebaser()
-        {
-            _stopwatch.Start();
-            eLeapRS result = LeapC.CreateClockRebaser(out _clockRebaser);
-
-            if (result != eLeapRS.eLeapRS_Success)
-            {
-                Debug.LogError("Failed to create clock rebaser");
-            }
-
-            if (_clockRebaser == IntPtr.Zero)
-            {
-                Debug.LogError("Clock rebaser is null");
-            }
-        }
-#endif
 
         #endregion
 

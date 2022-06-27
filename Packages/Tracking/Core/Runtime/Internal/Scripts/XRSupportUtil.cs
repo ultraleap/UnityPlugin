@@ -29,13 +29,6 @@ namespace Leap.Unity.Internal
 
         public static bool IsXREnabled()
         {
-#if SVR
-            if (SvrManager.Instance != null)
-            {
-                return SvrManager.Instance.Initialized;
-            }
-#endif
-
 #if XR_MANAGEMENT_AVAILABLE
             return XRGeneralSettings.Instance.Manager != null;
 #else
@@ -45,13 +38,6 @@ namespace Leap.Unity.Internal
 
         public static bool IsXRDevicePresent()
         {
-#if SVR
-            if (SvrManager.Instance != null)
-            {
-                return SvrManager.Instance.status.running;
-            }
-#endif
-
 #if XR_MANAGEMENT_AVAILABLE
             return XRGeneralSettings.Instance.Manager.activeLoader != null;
 #else
@@ -62,13 +48,6 @@ namespace Leap.Unity.Internal
         static bool outputPresenceWarning = false;
         public static bool IsUserPresent(bool defaultPresence = true)
         {
-#if SVR
-            if (SvrManager.Instance != null)
-            {
-                return true; // TODO user presence can be queried with recent versions of the SVR SDK (>= v4.0.4) - a proximity detector is fitted to some devices.
-            }
-#endif
-
             var devices = new List<InputDevice>();
             InputDevices.GetDevicesWithCharacteristics(InputDeviceCharacteristics.HeadMounted, devices);
 
@@ -91,20 +70,6 @@ namespace Leap.Unity.Internal
 
         public static Vector3 GetXRNodeCenterEyeLocalPosition()
         {
-#if SVR
-            if (SvrManager.Instance != null)
-            {
-                if (XRSupportUtil.IsXREnabled())
-                {
-                    return SvrManager.Instance.head.transform.localPosition;
-                }
-                else
-                {
-                    Debug.LogWarning("Cannot read XRNodeCenterEyeLocalPosition as XR is not enabled");
-                    return Vector3.zero;
-                }
-            }
-#endif
             InputTracking.GetNodeStates(nodeStates);
             Vector3 position;
 
@@ -122,20 +87,6 @@ namespace Leap.Unity.Internal
 
         public static Quaternion GetXRNodeCenterEyeLocalRotation()
         {
-#if SVR
-            if (SvrManager.Instance != null)
-            {
-                if (XRSupportUtil.IsXREnabled())
-                {
-                    return SvrManager.Instance.head.transform.localRotation;
-                }
-                else
-                {
-                    Debug.LogWarning("Cannot read XRNodeCenterEyeLocalRotation as XR is not enabled");
-                    return Quaternion.identity;
-                }
-            }
-#endif
             InputTracking.GetNodeStates(nodeStates);
             Quaternion rotation;
 
@@ -153,20 +104,6 @@ namespace Leap.Unity.Internal
 
         public static Vector3 GetXRNodeHeadLocalPosition()
         {
-#if SVR
-            if (SvrManager.Instance != null)
-            {
-                if (XRSupportUtil.IsXREnabled())
-                {
-                    return SvrManager.Instance.head.localPosition;
-                }
-                else
-                {
-                    Debug.LogWarning("Cannot read XRNodeHeadLocalPosition as XR is not enabled");
-                    return Vector3.zero;
-                }
-            }
-#endif
             InputTracking.GetNodeStates(nodeStates);
             Vector3 position;
 
@@ -184,20 +121,6 @@ namespace Leap.Unity.Internal
 
         public static Quaternion GetXRNodeHeadLocalRotation()
         {
-#if SVR
-            if (SvrManager.Instance != null)
-            {
-                if (XRSupportUtil.IsXREnabled())
-                {
-                    return SvrManager.Instance.head.transform.localRotation;
-                }
-                else
-                {
-                    Debug.LogWarning("Cannot read XRNodeHeadLocalRotation as XR is not enabled");
-                    return Quaternion.identity;
-                }
-            }
-#endif
             InputTracking.GetNodeStates(nodeStates);
             Quaternion rotation;
 
@@ -215,13 +138,6 @@ namespace Leap.Unity.Internal
 
         public static Vector3 GetXRNodeLocalPosition(int node)
         {
-#if SVR
-            if (SvrManager.Instance != null)
-            {
-                Debug.LogWarning("Not implemented yet");
-                return Vector3.zero;
-            }
-#endif
             InputTracking.GetNodeStates(nodeStates);
             Vector3 position;
 
@@ -239,13 +155,6 @@ namespace Leap.Unity.Internal
 
         public static Quaternion GetXRNodeLocalRotation(int node)
         {
-#if SVR
-            if (SvrManager.Instance != null)
-            {
-                Debug.LogWarning("Not implemented yet");
-                return Quaternion.identity;
-            }
-#endif
             InputTracking.GetNodeStates(nodeStates);
             Quaternion rotation;
 
@@ -262,13 +171,6 @@ namespace Leap.Unity.Internal
 
         public static void Recenter()
         {
-#if SVR
-            if (SvrInput.Instance != null)
-            {
-                SvrInput.Instance.HandleRecenter();
-                return;
-            }
-#endif
             var devices = new List<InputDevice>();
             InputDevices.GetDevicesWithCharacteristics(InputDeviceCharacteristics.HeadMounted, devices);
             if (devices.Count == 0)
@@ -280,14 +182,6 @@ namespace Leap.Unity.Internal
 
         public static float GetGPUTime()
         {
-#if SVR
-            if (SvrManager.Instance != null)
-            {
-                Debug.LogWarning("Not implemented for android");
-                return 0;
-            }
-#endif
-
             float gpuTime = 0f;
             XRStats.TryGetGPUTimeLastFrame(out gpuTime);
             return gpuTime;
@@ -295,26 +189,12 @@ namespace Leap.Unity.Internal
 
         public static string GetLoadedDeviceName()
         {
-#if SVR
-            if (SvrManager.Instance != null)
-            {
-                return "XR2_Device";
-            }
-#endif
-
             return XRSettings.loadedDeviceName;
         }
 
         /// <summary> Returns whether there's a floor available. </summary>
         public static bool IsRoomScale()
         {
-#if SVR
-            if (SvrManager.Instance != null)
-            {
-                return true;
-            }
-#endif
-
             var devices = new List<InputDevice>();
             InputDevices.GetDevicesWithCharacteristics(InputDeviceCharacteristics.HeadMounted, devices);
 
@@ -330,15 +210,6 @@ namespace Leap.Unity.Internal
         /// <summary> Returns whether the playspace is larger than 1m on its shortest side. </summary>
         public static bool IsLargePlayspace()
         {
-#if SVR
-            if (SvrManager.Instance != null)
-            {
-                // The current SVR support for reading the playspace dimensions is crude. Likely to be improved on by 3rd parties
-                // By default, we should consider the current playspace as 'large'
-                return true;
-            }
-#endif
-
             var devices = new List<InputDevice>();
             InputDevices.GetDevicesWithCharacteristics(InputDeviceCharacteristics.HeadMounted, devices);
 
