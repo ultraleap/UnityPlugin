@@ -11,7 +11,7 @@ using UnityEngine;
 
 namespace Leap.Unity.Interaction
 {
-
+#pragma warning disable 0618
     /// <summary>
     /// Interaction objects feed their throw handlers callbacks when they are held (for
     /// data collection) and then fire OnThrow when they are released from all grasping
@@ -28,7 +28,7 @@ namespace Leap.Unity.Interaction
         /// <param name="hands">A list of the interaction controllers currently grasping
         /// the object.</param>
         void OnHold(InteractionBehaviour intObj,
-                   IReadOnlyList<InteractionController> controllers);
+                   ReadonlyList<InteractionController> controllers);
 
         /// <summary>
         /// Called when an Interaction object is released by the last interaction controller
@@ -37,5 +37,5 @@ namespace Leap.Unity.Interaction
         void OnThrow(InteractionBehaviour intObj, InteractionController controller);
 
     }
-
+#pragma warning restore 0618
 }
