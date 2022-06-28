@@ -1202,13 +1202,12 @@ namespace Leap.Unity
 
         private void DetectConnectedDevice(Transform targetTransform)
         {
-
-            if (GetLeapController().Devices?.Count >= 1)
+            if (_leapController != null && _leapController.Devices?.Count >= 1)
             {
                 Device currentDevice = _currentDevice;
                 if (currentDevice == null || (_multipleDeviceMode == LeapServiceProvider.MultipleDeviceMode.Specific && currentDevice.SerialNumber != _specificSerialNumber))
                 {
-                    foreach (Device d in GetLeapController().Devices)
+                    foreach (Device d in _leapController.Devices)
                     {
                         if (d.SerialNumber.Contains(_specificSerialNumber))
                         {
