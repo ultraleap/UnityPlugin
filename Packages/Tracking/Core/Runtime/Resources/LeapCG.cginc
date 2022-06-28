@@ -2,7 +2,7 @@
 
 UNITY_DECLARE_TEX2DARRAY(_LeapGlobalRawTexture);
 
-uniform float2 _LeapGlobalTextureSizeFactor[MAX_NUMBER_OF_GLOBAL_TEXTURES];
+uniform float4 _LeapGlobalTextureSizes[MAX_NUMBER_OF_GLOBAL_TEXTURES];
 
 UNITY_DECLARE_TEX2DARRAY(_LeapGlobalDistortion);
 
@@ -107,14 +107,36 @@ float4 LeapGetLateVertexPos(float4 vertex, int isLeft) {
 
 /*** LEAP RAW COLOR ***/
 
+float2 MapUVInPaddedTexture(float2 uv, int idx) {
+
+	if(uv.x > (_LeapGlobalTextureSizes[idx].z - 1) / _LeapGlobalTextureSizes[idx].z + 1 / (2 * _LeapGlobalTextureSizes[idx].z)) {
+		uv.x = (_LeapGlobalTextureSizes[idx].z - 1) / _LeapGlobalTextureSizes[idx].z + 1 / (2 * _LeapGlobalTextureSizes[idx].z);
+	}
+	
+	float u = (uv.x - 1 / (2 * _LeapGlobalTextureSizes[idx].z)) 
+				* (_LeapGlobalTextureSizes[idx].x - 1) / (_LeapGlobalTextureSizes[idx].z - 1)
+				+ 1 / (2 * _LeapGlobalTextureSizes[idx].z);
+
+
+	if(uv.y > (_LeapGlobalTextureSizes[idx].w - 1) / _LeapGlobalTextureSizes[idx].w + 1 / (2 * _LeapGlobalTextureSizes[idx].w)) {
+		uv.y = (_LeapGlobalTextureSizes[idx].w - 1) / _LeapGlobalTextureSizes[idx].w + 1 / (2 * _LeapGlobalTextureSizes[idx].w);
+	}
+
+	float v = (uv.y - 1 / (2 * _LeapGlobalTextureSizes[idx].w)) 
+				* (_LeapGlobalTextureSizes[idx].y - 1) / (_LeapGlobalTextureSizes[idx].w - 1)
+				+ 1 / (2 * _LeapGlobalTextureSizes[idx].w);
+
+	return float2(u, v);
+	}
+
 float3 LeapGetUVRawColor(float2 uv, float z) {
 	// the textures have padding around them (to be able to use texture2DArray), 
 	// that's why we need to adjust the uv value accordingly
-	int idx = int(z);
-	uv = float2(_LeapGlobalTextureSizeFactor[idx].x * uv.x, _LeapGlobalTextureSizeFactor[idx].y * uv.y);
+	uv = MapUVInPaddedTexture(uv, int(z));
 	float color = UNITY_SAMPLE_TEX2DARRAY(_LeapGlobalRawTexture, float3(uv, z)).a;
 	return float3(color, color, color);
 }
+
 
 float3 LeapGetLeftRawColor(float4 screenPos) {
 	return LeapGetUVRawColor(LeapGetLeftUndistortedUV(screenPos), screenPos.z);
