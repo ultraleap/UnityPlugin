@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [docs-website]: https://docs.ultraleap.com/unity-api/ "Ultraleap Docs"
 
-## [NEXT] - Unreleased
+## [5.12.0] - 30/06/2022
 
 ### Announcements
 
@@ -18,9 +18,6 @@ If you are using classes and methods that are marked as obsolete and will be mov
 
 If you have any concerns about this, please contact us on [Github Discussions](https://github.com/ultraleap/UnityPlugin/discussions)
  
-### Added 
-- 
-
 ### Changed
 - Various classes and methods have been marked as obsolete in preparation for a major version change in the near future
  
@@ -38,6 +35,7 @@ If you have any concerns about this, please contact us on [Github Discussions](h
 - Capsule hands don't have a joint colour in HDRP 
 - Hand UI can become detached from hand when hand is removed from view
 
+
 ## [5.11.0] - 23/06/2022
 
 ### Announcements
@@ -51,7 +49,6 @@ If you have any concerns about this, please contact us on [Github Discussions](h
 ### Added 
 - Added a hand enable and disable script to the GenericHand_Arm prefab
 
-
 ### Changed
 - Changed scale calculations on the Auto-Scale function of the Handbinder, to make it more consistent across different tracking models and more stable when using a hand without metacarpal bones. The scales of all hand prefabs have been slightly changed because of that.
 - Disable FOV visualization gizmos by default
@@ -62,7 +59,6 @@ If you have any concerns about this, please contact us on [Github Discussions](h
 - When having two image retrievers that both reference the same device and turning one of them off, then the other one shows a grey image
 - Initialising contact for an interaction hand while the hand is not tracked does not work and doesn't attempt again once the hand is tracked
 - Attachment Hands Example scene has errors when using a project with InputSystem
-
 
 ### Known issues 
 - Scenes containing the infrared viewer render incorrectly on systems using single pass stereo with the XR plugin system - e.g. Windows Mixed Reality headsets. SteamVR headsets may also default to single pass stereo, showing the same issue. However in this case, the OpenVR settings can be changed to multipass which resolves the problem. 
