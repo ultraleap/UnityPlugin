@@ -26,6 +26,7 @@ If you have any concerns about this, please contact us on [Github Discussions](h
  
 ### Fixed 
 - VertexOffsetShader displays errors in Unity 2021 due to invalid path
+- ThreadAbortException in editor when connecting, most commonly found when using milti-device
 
 ### Known issues 
 - Scenes containing the infrared viewer render incorrectly on systems using single pass stereo with the XR plugin system - e.g. Windows Mixed Reality headsets. SteamVR headsets may also default to single pass stereo, showing the same issue. However in this case, the OpenVR settings can be changed to multipass which resolves the problem. 
