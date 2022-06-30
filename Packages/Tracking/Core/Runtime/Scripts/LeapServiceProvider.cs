@@ -1262,7 +1262,6 @@ namespace Leap.Unity
 
 
             LeapFOVInfo info = null;
-            GameObject newDevice = null;
             foreach (var leapInfo in leapFOVInfos.SupportedDevices)
             {
                 if (leapInfo.Name == deviceType)
