@@ -16,6 +16,7 @@ namespace Leap.Unity.Tests
     {
         public const int MAX_HISTORY = 64;
 
+#pragma warning disable CS0618 // Type or member is obsolete
         private SlidingMax _slidingMax;
 
         [SetUp]
@@ -23,6 +24,7 @@ namespace Leap.Unity.Tests
         {
             _slidingMax = new SlidingMax(MAX_HISTORY);
         }
+#pragma warning restore CS0618 // Type or member is obsolete
 
         [TearDown]
         public void Teardown()

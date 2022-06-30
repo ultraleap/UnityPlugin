@@ -11,6 +11,8 @@ using System.Linq;
 
 namespace Leap.Unity.Tests
 {
+#pragma warning disable CS0618 // Type or member is obsolete
+
     public abstract class FrameValidator
     {
         protected const float TOLERANCE = 0.0001f;
@@ -174,4 +176,6 @@ namespace Leap.Unity.Tests
             Assert.That(a.z, Is.EqualTo(b.z).Within(TOLERANCE), vectorName + ".z");
         }
     }
+#pragma warning restore CS0618 // Type or member is obsolete
+
 }

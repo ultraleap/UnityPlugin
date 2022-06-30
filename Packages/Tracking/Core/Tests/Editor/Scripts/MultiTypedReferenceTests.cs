@@ -20,7 +20,9 @@ namespace Leap.Unity.Tests
 
         public class InvalidClass : BaseClass { }
 
+#pragma warning disable CS0618 // Type or member is obsolete
         private class ReferenceClass : MultiTypedReference<BaseClass, A, B, C, D> { }
+#pragma warning restore CS0618 // Type or member is obsolete
 
         private ReferenceClass _ref;
 
