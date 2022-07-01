@@ -141,45 +141,22 @@ dependencies-libtrack:
   needs: []
 
   variables:
-    LIBTRACK_ROOT_URL: "https://gitlab.ultrahaptics.com/api/v4/projects/leap-v5-platform%2Flibtrack"
-    ANDROID_JOB: "AndroidRelProdLTS"
-    WINDOWS_JOB: "WinRelDebProdLTS"
+    # XR group variables:
+    #  - LIBTRACK_ACCESS_TOKEN
+    #  - LIBTRACK_BRANCH
+    
+    LIBTRACK_URL: "https://gitlab.ultrahaptics.com/api/v4/projects/leap-v5-platform%2Flibtrack/jobs/artifacts/$LIBTRACK_BRANCH/raw"
+    LIBTRACK_ANDROID_JOB: "AndroidRelProdLTS"
+    LIBTRACK_WINDOWS_JOB: "WinRelDebProdLTS"
 
     ANDROID_ARTIFACTS_PATH: "$ARTIFACTS_PATH/Android"
     WINDOWS_ARTIFACTS_PATH: "$ARTIFACTS_PATH/Windows"
     VERSION_SUFFIX_PATH: "$ARTIFACTS_PATH/libtrack_version_suffix.txt"
-
-    # LIBTRACK upstream variables pass from RAD libtrack downstream trigger (see https://gitlab.ultrahaptics.com/xr/rad/triggers/libtrack/-/blob/main/.gitlab-ci.yml)
-    # UPSTREAM_UPSTREAM_BRANCH_REF
-    # UPSTREAM_UPSTREAM_WINDOWS_RELEASE_JOB_NAME
-    # UPSTREAM_UPSTREAM_ANDROID_RELEASE_JOB_NAME
-
-    # XR group variables
-    # LIBTRACK_ACCESS_TOKEN - Access token required to pull artifacts
-    # LIBTRACK_BRANCH - Fallback branch to pull artifacts from when UPSTREAM_UPSTREAM_BRANCH_REF isn't set
-
+    
   script:
-
     # Ensure artifact paths exist
     - New-Item -Path "$ANDROID_ARTIFACTS_PATH" -ItemType Directory -Force
     - New-Item -Path "$WINDOWS_ARTIFACTS_PATH" -ItemType Directory -Force
-
-    ## Work out where to pull Libtrack assets from
-    - | 
-      if($UPSTREAM_UPSTREAM_BRANCH_REF)
-      { $LIBTRACK_URL = "$LIBTRACK_ROOT_URL/jobs/artifacts/$UPSTREAM_UPSTREAM_BRANCH_REF/raw" }
-      else
-      { $LIBTRACK_URL = "$LIBTRACK_ROOT_URL/jobs/artifacts/$LIBTRACK_BRANCH/raw" }
-      
-      if($UPSTREAM_UPSTREAM_WINDOWS_RELEASE_JOB_NAME)
-      { $LIBTRACK_WINDOWS_JOB = $UPSTREAM_UPSTREAM_WINDOWS_RELEASE_JOB_NAME }
-      else
-      { $LIBTRACK_WINDOWS_JOB = $WINDOWS_JOB }
-      
-      if($UPSTREAM_UPSTREAM_ANDROID_RELEASE_JOB_NAME)
-      { $LIBTRACK_ANDROID_JOB = $UPSTREAM_UPSTREAM_ANDROID_RELEASE_JOB_NAME }
-      else
-      { $LIBTRACK_ANDROID_JOB = $ANDROID_JOB }
 
     ## Download version info
     - echo "$LIBTRACK_URL/VERSION_SUFFIX.txt?job=$LIBTRACK_ANDROID_JOB"
