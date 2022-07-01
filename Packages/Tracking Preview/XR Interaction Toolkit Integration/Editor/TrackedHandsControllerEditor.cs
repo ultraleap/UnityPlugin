@@ -13,7 +13,7 @@ using UnityEditor;
 using UnityEngine;
 
 
-namespace Leap.Unity.Preview.XRInteractionToolkit
+namespace Leap.Unity.Preview.XRInteractionToolkit.Editor
 {
     [CustomEditor(typeof(TrackedHandsController))]
     public class TrackedHandsControllerEditor : CustomEditorBase<TrackedHandsController>
