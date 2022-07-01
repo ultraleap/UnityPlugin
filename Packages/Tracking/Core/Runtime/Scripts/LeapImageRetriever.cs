@@ -7,9 +7,9 @@
  ******************************************************************************/
 
 using Leap.Unity.Query;
-using System.Linq;
 using System;
 using System.Collections;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Serialization;
 
