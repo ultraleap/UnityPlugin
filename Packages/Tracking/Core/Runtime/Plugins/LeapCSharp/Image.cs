@@ -154,11 +154,6 @@ namespace Leap
             return imageData(camera).DistortionData.Data;
         }
 
-        [System.Obsolete("This signature will be removed in the next major version of the plugin. Use the one with Vector3 instead.")]
-        public Vector PixelToRectilinear(CameraType camera, Vector pixel)
-        {
-            return Connection.GetConnection().PixelToRectilinear(camera, pixel);
-        }
         /// <summary>
         /// Provides the corrected camera ray intercepting the specified point on the image.
         /// 
@@ -183,11 +178,6 @@ namespace Leap
             return Connection.GetConnection().PixelToRectilinear(camera, pixel);
         }
 
-        [System.Obsolete("This signature will be removed in the next major version of the plugin. Use the one with Vector3 instead.")]
-        public Vector RectilinearToPixel(CameraType camera, Vector ray)
-        {
-            return Connection.GetConnection().RectilinearToPixel(camera, ray);
-        }
         /// <summary>
         /// Provides the point in the image corresponding to a ray projecting
         /// from the camera.

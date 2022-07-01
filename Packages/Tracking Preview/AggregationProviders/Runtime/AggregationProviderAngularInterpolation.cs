@@ -11,17 +11,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-
 namespace Leap.Unity
 {
-#pragma warning disable 0618
     /// <summary>
     /// John's and Flo's aggregation code. An example of how aggregation could be implemented.
     /// only works for the first two hands it sees (of the same chirality)
     /// </summary>
     public class AggregationProviderAngularInterpolation : LeapAggregatedProviderBase
     {
-
         private Vector3 tempHandPalmPosition;
         private Vector3 midDevicePointPosition;
         private Vector3 midDevicePointForward;
@@ -138,9 +135,9 @@ namespace Leap.Unity
                     }
                     else
                     {
-                        Vector3 nH = hand.PalmPosition.ToVector3();
-                        Vector3 tH = tempHand.PalmPosition.ToVector3();
-                        tempHand.PalmPosition = new Vector(aprxAvg(nH.x, tH.x), aprxAvg(nH.y, tH.y), aprxAvg(nH.z, tH.z));
+                        Vector3 nH = hand.PalmPosition;
+                        Vector3 tH = tempHand.PalmPosition;
+                        tempHand.PalmPosition = new Vector3(aprxAvg(nH.x, tH.x), aprxAvg(nH.y, tH.y), aprxAvg(nH.z, tH.z));
                         //tempHand.PalmPosition = hand.PalmPosition;
 
 
@@ -151,7 +148,7 @@ namespace Leap.Unity
 
             if (tempHand != null)
             {
-                tempHandPalmPosition = tempHand.PalmPosition.ToVector3();
+                tempHandPalmPosition = tempHand.PalmPosition;
             }
             #endregion
 
@@ -176,7 +173,7 @@ namespace Leap.Unity
                 midDevicePointForward = midpointDevices.forward;
                 midDevicePointUp = midpointDevices.up;
 
-                Vector3 angleCalculationHandPosition = tempHand.PalmPosition.ToVector3();
+                Vector3 angleCalculationHandPosition = tempHand.PalmPosition;
 
                 angle = AngleSigned(angleCalculationHandPosition, midpointDevices.position + midpointDevices.up, midpointDevices.forward);
                 //Debug.Log(angle);
@@ -243,5 +240,4 @@ namespace Leap.Unity
             Gizmos.DrawLine(midDevicePointPosition, rightLimit);
         }
     }
-#pragma warning restore 0618
 }

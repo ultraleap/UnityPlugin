@@ -13,10 +13,8 @@ using UnityEngine.InputSystem.XR;
 using UnityEngine.InputSystem;
 #endif
 
-
 namespace Leap.Unity.Controllers
 {
-#pragma warning disable 0618
     /// <summary>
     /// Takes in XR Controller data and converts it to Leap Hand Data
     /// </summary>
@@ -458,7 +456,7 @@ namespace Leap.Unity.Controllers
             // If this Time.time -_oldTime = 0 then this has been called on the same frame, so we don't want to recalc palmVelocity
             if (Time.time - _oldTime != 0)
             {
-                h.PalmVelocity = ((_currentPosition - _oldPosition) / (Time.time - _oldTime)).ToVector();
+                h.PalmVelocity = (_currentPosition - _oldPosition) / (Time.time - _oldTime);
             }
 
             _oldPosition = _currentPosition;
@@ -506,8 +504,8 @@ namespace Leap.Unity.Controllers
             if (deg == Vector3.zero)
                 return;
 
-            b.NextJoint = RotatePointAroundPivot(b.NextJoint.ToVector3(), b.PrevJoint.ToVector3(), deg).ToVector();
-            Vector diffPos = b.NextJoint - b2.PrevJoint;
+            b.NextJoint = RotatePointAroundPivot(b.NextJoint, b.PrevJoint, deg);
+            Vector3 diffPos = b.NextJoint - b2.PrevJoint;
             if (b2 != b)
             {
                 b2.PrevJoint += diffPos;
@@ -517,14 +515,14 @@ namespace Leap.Unity.Controllers
 
             if (b.Length < float.Epsilon)
             {
-                b.Direction = Vector.Zero;
+                b.Direction = Vector3.zero;
             }
             else
             {
                 b.Direction = (b.NextJoint - b.PrevJoint) / b.Length;
             }
 
-            b.Rotation = Quaternion.Euler(deg).ToLeapQuaternion().Multiply(b.Rotation);
+            b.Rotation = Quaternion.Euler(deg) * b.Rotation;
         }
 
         public Vector3 RotatePointAroundPivot(Vector3 point, Vector3 pivot, Vector3 angles)
@@ -534,5 +532,4 @@ namespace Leap.Unity.Controllers
 
         #endregion
     }
-#pragma warning restore 0618
 }

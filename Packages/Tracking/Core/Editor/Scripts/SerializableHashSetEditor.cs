@@ -6,19 +6,17 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
+using Leap.Unity.Internal;
 
 namespace Leap.Unity
 {
-
     [CustomPropertyDrawer(typeof(SerializableHashSetBase), useForChildren: true)]
     public class SerializableHashSetEditor : PropertyDrawer
     {
-
         private ReorderableList _list;
         private SerializedProperty _currProperty;
 

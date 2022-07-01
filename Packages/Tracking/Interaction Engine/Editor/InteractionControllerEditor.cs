@@ -6,20 +6,15 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
-using UnityEngine;
 
 namespace Leap.Unity.Interaction
 {
-#pragma warning disable 0618
     [CanEditMultipleObjects]
     [CustomEditor(typeof(InteractionController), true)]
     public class InteractionControllerEditor : CustomEditorBase<InteractionController>
     {
-
         public override void OnInspectorGUI()
         {
             checkParentedToManager();
@@ -99,5 +94,4 @@ namespace Leap.Unity.Interaction
             }
         }
     }
-#pragma warning restore 0618
 }

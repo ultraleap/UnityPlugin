@@ -21,7 +21,6 @@ namespace Leap.Unity.Interaction
     ///</summary>
     public class InteractionSlider : InteractionButton
     {
-
         #region Inspector & Properties
 
         public enum SliderType

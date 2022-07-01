@@ -9,7 +9,7 @@
 using Leap.Interaction.Internal.InteractionEngineUtility;
 using Leap.Unity.Attributes;
 using Leap.Unity.Interaction.Internal;
-using Leap.Unity.Space;
+using Leap.Unity.Internal;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -680,12 +680,6 @@ namespace Leap.Unity.Interaction
             get { return _rigidbody; }
             protected set { _rigidbody = value; }
         }
-
-        /// <summary>
-        /// A maximum of one (1) LeapSpace is supported per InteractionBehaviour.
-        /// </summary>
-        [System.Obsolete("This code will be removed in the next major version of the plugin. If you believe that it needs to be kept, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
-        public ISpaceComponent space { get; protected set; }
 
         [Header("Interaction Overrides")]
 

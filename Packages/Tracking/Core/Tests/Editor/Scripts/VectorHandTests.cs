@@ -53,7 +53,7 @@ namespace Leap.Unity.Tests
                 }
 
                 Assert.That(result.IsLeft, Is.EqualTo(hand.IsLeft));
-                Assert.That((result.PalmPosition - hand.PalmPosition).Magnitude, Is.LessThan(TOLERANCE));
+                Assert.That((result.PalmPosition - hand.PalmPosition).magnitude, Is.LessThan(TOLERANCE));
 
                 foreach (var resultFinger in result.Fingers)
                 {
@@ -64,9 +64,9 @@ namespace Leap.Unity.Tests
                         Bone resultBone = resultFinger.bones[i];
                         Bone bone = finger.bones[i];
 
-                        Assert.That((resultBone.NextJoint - bone.NextJoint).Magnitude, Is.LessThan(TOLERANCE));
-                        Assert.That((resultBone.PrevJoint - bone.PrevJoint).Magnitude, Is.LessThan(TOLERANCE));
-                        Assert.That((resultBone.Center - bone.Center).Magnitude, Is.LessThan(TOLERANCE));
+                        Assert.That((resultBone.NextJoint - bone.NextJoint).magnitude, Is.LessThan(TOLERANCE));
+                        Assert.That((resultBone.PrevJoint - bone.PrevJoint).magnitude, Is.LessThan(TOLERANCE));
+                        Assert.That((resultBone.Center - bone.Center).magnitude, Is.LessThan(TOLERANCE));
                     }
                 }
             }

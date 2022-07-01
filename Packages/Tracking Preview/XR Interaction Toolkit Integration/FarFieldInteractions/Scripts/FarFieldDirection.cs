@@ -284,8 +284,8 @@ namespace Leap.Unity.Preview.FarFieldInteractions
                 worldWristPosition.x = -worldWristPosition.x;
             }
 
-            transformHelper.transform.position = handShoulder.Hand.WristPosition.ToVector3();
-            transformHelper.transform.rotation = handShoulder.Hand.Rotation.ToQuaternion();
+            transformHelper.transform.position = handShoulder.Hand.WristPosition;
+            transformHelper.transform.rotation = handShoulder.Hand.Rotation;
 
             return transformHelper.TransformPoint(worldWristPosition);
         }
@@ -298,8 +298,8 @@ namespace Leap.Unity.Preview.FarFieldInteractions
                 worldElbowPosition.x = -worldElbowPosition.x;
             }
 
-            transformHelper.transform.position = handShoulder.Hand.Arm.ElbowPosition.ToVector3();
-            transformHelper.transform.rotation = handShoulder.Hand.Arm.Rotation.ToQuaternion();
+            transformHelper.transform.position = handShoulder.Hand.Arm.ElbowPosition;
+            transformHelper.transform.rotation = handShoulder.Hand.Arm.Rotation;
             return transformHelper.TransformPoint(worldElbowPosition);
         }
 

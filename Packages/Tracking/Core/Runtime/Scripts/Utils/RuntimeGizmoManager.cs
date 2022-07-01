@@ -878,20 +878,6 @@ namespace Leap.Unity.RuntimeGizmos
             DrawPosition(pos, Color.white, 0f, overrideScale);
         }
 
-        [System.Obsolete("This code will be moved to a legacy package in the next major version of the plugin. If you believe that it needs to be kept in tracking, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
-        public void DrawRect(Transform frame, Rect rect)
-        {
-            PushMatrix();
-
-            this.matrix = frame.localToWorldMatrix;
-            DrawLine(rect.Corner00(), rect.Corner01());
-            DrawLine(rect.Corner01(), rect.Corner11());
-            DrawLine(rect.Corner11(), rect.Corner10());
-            DrawLine(rect.Corner10(), rect.Corner00());
-
-            PopMatrix();
-        }
-
         public void ClearAllGizmos()
         {
             _operations.Clear();

@@ -12,21 +12,21 @@ using UnityEngine;
 namespace Leap.InteractionEngine.Examples
 {
 
-    [RequireComponent(typeof(Anchor))]
+    [RequireComponent(typeof(Leap.Unity.Interaction.Anchor))]
     [AddComponentMenu("")]
     public class SimpleAnchorFeedback : MonoBehaviour
     {
 
         public Transform scaleTarget;
 
-        private Anchor _anchor;
+        private Leap.Unity.Interaction.Anchor _anchor;
 
         private Vector3 _initScaleVector;
         private float _curScale = 1F;
 
         void Start()
         {
-            _anchor = GetComponent<Anchor>();
+            _anchor = GetComponent<Leap.Unity.Interaction.Anchor>();
 
             _initScaleVector = scaleTarget.transform.localScale;
         }

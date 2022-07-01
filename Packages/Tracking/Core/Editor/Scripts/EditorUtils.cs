@@ -16,7 +16,6 @@ using UnityEngine.SceneManagement;
 
 namespace Leap.Unity
 {
-
     using UnityObject = UnityEngine.Object;
 
     public static class EditorUtils
@@ -79,7 +78,5 @@ namespace Leap.Unity
                 }
             }
         }
-
     }
-
 }

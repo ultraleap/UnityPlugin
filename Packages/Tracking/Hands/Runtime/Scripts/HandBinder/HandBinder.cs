@@ -13,7 +13,6 @@ using UnityEngine;
 
 namespace Leap.Unity.HandsModule
 {
-#pragma warning disable 0618
     /// <summary>
     /// The HandBinder allows you to use your own hand models so that they follow the leap tracking data.
     /// You can bind your model by specifying transforms for the different joints and use the debug and fine tuning options to test and adjust it.
@@ -261,22 +260,22 @@ namespace Leap.Unity.HandsModule
             if (BoundHand.elbow.boundTransform != null)
             {
                 //Calculate the direction of the elbow 
-                Vector3 dir = -LeapHand.Arm.Direction.ToVector3().normalized;
+                Vector3 dir = -LeapHand.Arm.Direction.normalized;
 
                 //Position the elbow at the models elbow length
-                Vector3 position = LeapHand.WristPosition.ToVector3() + dir * (ElbowLength);
+                Vector3 position = LeapHand.WristPosition + dir * (ElbowLength);
 
                 if (SetModelScale)
                 {
                     if (SetPositions)
                     {
                         //Use the leap length to position the elbow and allow it to be mofied by the user
-                        position = LeapHand.WristPosition.ToVector3() + dir * (LeapHand.Arm.Length * BoundHand.elbowOffset);
+                        position = LeapHand.WristPosition + dir * (LeapHand.Arm.Length * BoundHand.elbowOffset);
                     }
                     else
                     {
                         //Use the models length to position the elbow and allow it to be mofied by elbow offset
-                        position = LeapHand.WristPosition.ToVector3() + dir * (ElbowLength * BoundHand.elbowOffset);
+                        position = LeapHand.WristPosition + dir * (ElbowLength * BoundHand.elbowOffset);
                     }
                 }
                 else
@@ -284,7 +283,7 @@ namespace Leap.Unity.HandsModule
                     if (SetPositions)
                     {
                         //Use the leap data to position the elbow
-                        position = LeapHand.Arm.ElbowPosition.ToVector3();
+                        position = LeapHand.Arm.ElbowPosition;
                     }
                 }
 
@@ -295,7 +294,7 @@ namespace Leap.Unity.HandsModule
                 BoundHand.elbow.boundTransform.transform.localPosition += BoundHand.elbow.offset.position;
 
                 //Set the rotation of the elbow
-                Quaternion leapRotation = LeapHand.Arm.Rotation.ToQuaternion();
+                Quaternion leapRotation = LeapHand.Arm.Rotation;
                 Quaternion modelRotation = Quaternion.Euler(BoundHand.elbow.offset.rotation);
                 Quaternion rotationOffset = Quaternion.Euler(WristRotationOffset);
                 BoundHand.elbow.boundTransform.transform.rotation = leapRotation * modelRotation * rotationOffset;
@@ -311,10 +310,10 @@ namespace Leap.Unity.HandsModule
             if (BoundHand.wrist.boundTransform != null)
             {
                 //Calculate the position of the wrist to the leap position + offset defined by the user
-                var wristPosition = LeapHand.WristPosition.ToVector3() + BoundHand.wrist.offset.position;
+                var wristPosition = LeapHand.WristPosition + BoundHand.wrist.offset.position;
 
                 //Calculate rotation offset needed to get the wrist into the same rotation as the leap based on the calculated wrist offset
-                var leapRotationOffset = ((Quaternion.Inverse(BoundHand.wrist.boundTransform.transform.rotation) * LeapHand.Rotation.ToQuaternion()) * Quaternion.Euler(WristRotationOffset)).eulerAngles;
+                var leapRotationOffset = ((Quaternion.Inverse(BoundHand.wrist.boundTransform.transform.rotation) * LeapHand.Rotation) * Quaternion.Euler(WristRotationOffset)).eulerAngles;
 
                 //Set the wrist bone to the calculated values
                 BoundHand.wrist.boundTransform.transform.position = wristPosition;
@@ -357,7 +356,7 @@ namespace Leap.Unity.HandsModule
                         //Only update the finger position if the user has defined this behaviour
                         if (SetPositions)
                         {
-                            boundTransform.transform.position = leapBone.PrevJoint.ToVector3();
+                            boundTransform.transform.position = leapBone.PrevJoint;
                         }
                         else
                         {
@@ -369,7 +368,7 @@ namespace Leap.Unity.HandsModule
                     boundTransform.transform.localPosition += boneOffset.position;
 
                     //Update the bound transforms rotation to the leap's rotation * global rotation offset * any further offsets the user has defined
-                    boundTransform.transform.rotation = leapBone.Rotation.ToQuaternion() * Quaternion.Euler(GlobalFingerRotationOffset) * Quaternion.Euler(boneOffset.rotation);
+                    boundTransform.transform.rotation = leapBone.Rotation * Quaternion.Euler(GlobalFingerRotationOffset) * Quaternion.Euler(boneOffset.rotation);
                 }
             }
 
@@ -398,11 +397,11 @@ namespace Leap.Unity.HandsModule
 
                     if (!AddedWristToFirstBone)
                     {
-                        length += (hand.WristPosition - bone.PrevJoint).Magnitude;
+                        length += (hand.WristPosition - bone.PrevJoint).magnitude;
                         AddedWristToFirstBone = true;
                     }
 
-                    length += (bone.PrevJoint - bone.NextJoint).Magnitude;
+                    length += (bone.PrevJoint - bone.NextJoint).magnitude;
                 }
             }
             return length;
@@ -597,5 +596,4 @@ namespace Leap.Unity.HandsModule
 
         #endregion
     }
-#pragma warning restore 0618
 }

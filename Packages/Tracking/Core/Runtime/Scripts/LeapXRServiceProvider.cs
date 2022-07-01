@@ -6,6 +6,7 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
+using Leap.Unity.Internal;
 using Leap.Unity.Attributes;
 using System;
 using UnityEngine;
@@ -13,7 +14,6 @@ using UnityEngine.Rendering;
 
 namespace Leap.Unity
 {
-#pragma warning disable 0618
     /// <summary>
     /// The LeapXRServiceProvider expands on the standard LeapServiceProvider to
     /// account for the offset of the Leap device with respect to the attached HMD and
@@ -525,26 +525,14 @@ namespace Leap.Unity
                 return 0;
             }
 
-#if SVR
-            if (_xr2TimewarpMode == TimewarpMode.Experimental_XR2)
-            {
-                return GetPredictedDisplayTime_LeapTime();
-            }
-            else
-            {
-                return _leapController.Now() - 16000;
-            }
-
-#elif UNITY_ANDROID
+#if UNITY_ANDROID
             return _leapController.Now() - 16000;
 #else
 
             return _leapController.Now()
-                    - (long)_smoothedTrackingLatency.value
                     + ((updateHandInPrecull && !endOfFrame) ?
                         (long)(Time.smoothDeltaTime * S_TO_NS / Time.timeScale)
                         : 0);
-
 #endif
         }
 
@@ -566,7 +554,7 @@ namespace Leap.Unity
             {
                 //By default, use the camera transform matrix to transform the frame into 
                 leapTransform = new LeapTransform(mainCamera.transform);
-                leapTransform.scale = Vector.Ones * 1e-3f;
+                leapTransform.scale = Vector3.one * 1e-3f;
 
                 //If the application is playing then we can try to use temporal warping
                 if (Application.isPlaying)
@@ -621,38 +609,9 @@ namespace Leap.Unity
             //Calculate a Temporally Warped Pose
             else if (updateTemporalCompensation)
             {
-                void DefaultTimeWarping()
-                {
-                    var imageAdjustment = _temporalWarpingMode == TemporalWarpingMode.Images ? -20000 : 0;
-                    var sampleTimestamp = timestamp - (long)(warpingAdjustment * 1000f) - imageAdjustment;
-                    transformHistory.SampleTransform(sampleTimestamp, out warpedPosition, out warpedRotation);
-                }
-#if SVR
-                void ExperimentalXR2TimeWarping()
-                {
-                    // Get the predicted display time for the current frame in milliseconds, then get the predicted head pose
-                    float predictedDisplayTime_ms = SxrShim.GetPredictedDisplayTime(SystemInfo.graphicsMultiThreaded);
-
-                    Vector3 predictedWarpedPosition;
-                    Quaternion predictedWarpedRotation;
-                    SxrShim.GetPredictedHeadPose(predictedDisplayTime_ms, out predictedWarpedRotation, out predictedWarpedPosition);
-                    warpedPosition.x = -predictedWarpedPosition.x;
-                    warpedPosition.y = -predictedWarpedPosition.y;
-                    warpedPosition.z = predictedWarpedPosition.z;
-                    warpedRotation = predictedWarpedRotation;
-                }
-
-                switch(_xr2TimeWarpMode)
-                {
-                    case TimewarpMode.Default:
-                        DefaultTimeWarping();
-                        break;
-                    case TimewarpMode.Experimental_XR2:
-                        ExperimentalXR2TimeWarping();
-                        break;
-#else
-                DefaultTimeWarping();
-#endif
+                var imageAdjustment = _temporalWarpingMode == TemporalWarpingMode.Images ? -20000 : 0;
+                var sampleTimestamp = timestamp - (long)(warpingAdjustment * 1000f) - imageAdjustment;
+                transformHistory.SampleTransform(sampleTimestamp, out warpedPosition, out warpedRotation);
             }
 
             // Normalize the rotation Quaternion.
@@ -673,23 +632,21 @@ namespace Leap.Unity
             }
 
 
-#if !SVR
             // Use the mainCamera parent to transfrom the warped positions so the player can move around
             if (mainCamera.transform.parent != null)
             {
                 leapTransform = new LeapTransform(
-                  mainCamera.transform.parent.TransformPoint(warpedPosition).ToVector(),
-                  mainCamera.transform.parent.TransformRotation(warpedRotation).ToLeapQuaternion(),
-                  Vector.Ones * 1e-3f
+                  mainCamera.transform.parent.TransformPoint(warpedPosition),
+                  mainCamera.transform.parent.TransformRotation(warpedRotation),
+                  Vector3.one * 1e-3f
                 );
             }
             else
-#endif
             {
                 leapTransform = new LeapTransform(
-                  warpedPosition.ToVector(),
-                  warpedRotation.ToLeapQuaternion(),
-                  Vector.Ones * 1e-3f
+                  warpedPosition,
+                  warpedRotation,
+                  Vector3.one * 1e-3f
                 );
             }
 
@@ -757,29 +714,29 @@ namespace Leap.Unity
                                       _currentDevice,
                                       out precullLeftHand,
                                       out precullRightHand);
-                    bool leftValid = precullLeftHand.translation != Vector.Zero;
-                    bool rightValid = precullRightHand.translation != Vector.Zero;
+                    bool leftValid = precullLeftHand.translation != Vector3.zero;
+                    bool rightValid = precullRightHand.translation != Vector3.zero;
                     transformHands(ref precullLeftHand, ref precullRightHand);
 
                     //Calculate the delta Transforms
                     if (rightHand != null && rightValid)
                     {
                         _transformArray[0] =
-                          Matrix4x4.TRS(precullRightHand.translation.ToVector3(),
-                                        precullRightHand.rotation.ToQuaternion(),
+                          Matrix4x4.TRS(precullRightHand.translation,
+                                        precullRightHand.rotation,
                                         Vector3.one)
-                          * Matrix4x4.Inverse(Matrix4x4.TRS(rightHand.PalmPosition.ToVector3(),
-                                                            rightHand.Rotation.ToQuaternion(),
+                          * Matrix4x4.Inverse(Matrix4x4.TRS(rightHand.PalmPosition,
+                                                            rightHand.Rotation,
                                                             Vector3.one));
                     }
                     if (leftHand != null && leftValid)
                     {
                         _transformArray[1] =
-                          Matrix4x4.TRS(precullLeftHand.translation.ToVector3(),
-                                        precullLeftHand.rotation.ToQuaternion(),
+                          Matrix4x4.TRS(precullLeftHand.translation,
+                                        precullLeftHand.rotation,
                                         Vector3.one)
-                          * Matrix4x4.Inverse(Matrix4x4.TRS(leftHand.PalmPosition.ToVector3(),
-                                                            leftHand.Rotation.ToQuaternion(),
+                          * Matrix4x4.Inverse(Matrix4x4.TRS(leftHand.PalmPosition,
+                                                            leftHand.Rotation,
                                                             Vector3.one));
                     }
 
@@ -788,31 +745,6 @@ namespace Leap.Unity
                 }
             }
         }
-
-
-#if SVR
-        /// <summary>
-        /// Return the predicted display time as a leap time
-        /// </summary>
-        /// <returns></returns>
-        private long GetPredictedDisplayTime_LeapTime()
-        {
-
-            long leapClock = 0;
-
-            // Predicted display time for the current frame in milliseconds
-            float displayTime_ms = SxrShim.GetPredictedDisplayTime(SystemInfo.graphicsMultiThreaded);
-
-            if (_clockRebaser != IntPtr.Zero)
-            {
-                LeapC.RebaseClock(_clockRebaser, (long)displayTime_ms + _stopwatch.ElapsedMilliseconds, out leapClock);
-            }
-
-            return leapClock;
-        }
-#endif
-
         #endregion
     }
-#pragma warning restore 0618
 }

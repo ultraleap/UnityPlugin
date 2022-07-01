@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using Leap.Unity.Internal;
 
 namespace Leap.Unity.Interaction.PhysicsHands
 {

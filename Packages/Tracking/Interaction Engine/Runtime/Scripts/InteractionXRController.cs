@@ -7,7 +7,7 @@
  ******************************************************************************/
 
 using Leap.Unity.Attributes;
-using Leap.Unity.Space;
+using Leap.Unity.Internal;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,11 +17,9 @@ using UnityEngine.XR;
 
 namespace Leap.Unity.Interaction
 {
-#pragma warning disable 0618
     [DisallowMultipleComponent]
     public class InteractionXRController : InteractionController
     {
-
         #region Inspector
 
         [Header("Controller Configuration")]
@@ -32,9 +30,7 @@ namespace Leap.Unity.Interaction
                + "other than the DefaultXRNodeTrackingProvider, the change will be reflected "
                + "here. (Hint: Use the ExecuteInEditMode attribute.)")]
         [Disable, SerializeField]
-#pragma warning disable 0414
         private string _trackingProviderType = "DefaultXRNodeTrackingProvider";
-#pragma warning restore 0414
         public bool isUsingCustomTracking
         {
             get { return !(trackingProvider is DefaultXRNodeTrackingProvider); }
@@ -47,13 +43,11 @@ namespace Leap.Unity.Interaction
         private string _deviceJoystickTokens = "oculus touch right"; // or, e.g., "openvr controller right"
         public string deviceJoystickTokens { get { return _deviceJoystickTokens; } }
 
-#pragma warning disable 0649
         [Tooltip("Which hand will hold this controller? This property cannot be changed "
                + "at runtime.")]
         [SerializeField, EditTimeOnly]
         private Chirality _chirality;
         public Chirality chirality { get { return _chirality; } }
-#pragma warning restore 0649
 
         [Tooltip("Whether to continuously poll attached joystick data for a joystick that "
                + "matches the device joystick tokens, using Input.GetJoystickNames(). This "
@@ -541,27 +535,6 @@ namespace Leap.Unity.Interaction
         private Vector3 _unwarpingPositionOffset = Vector3.zero;
         private Quaternion _unwarpingRotationOffset = Quaternion.identity;
 
-        [System.Obsolete("This code will be removed in the next major version of the plugin. If you believe that it needs to be kept, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
-        protected override void unwarpColliders(Transform primaryHoverPoint, ISpaceComponent warpedSpaceElement)
-        {
-            // Extension method calculates "unwarped" pose in world space.
-            Vector3 unwarpedPosition;
-            Quaternion unwarpedRotation;
-            warpedSpaceElement.anchor.transformer.WorldSpaceUnwarp(primaryHoverPoint.position,
-                                                                   primaryHoverPoint.rotation,
-                                                                   out unwarpedPosition,
-                                                                   out unwarpedRotation);
-
-            // Shift the controller to have its origin on the primary hover point so that
-            // rotations applied to the hand cause it to pivot around that point, then apply
-            // the position and rotation transformation.
-            _pivotingPositionOffset = -primaryHoverPoint.position;
-            _unwarpingPositionOffset = unwarpedPosition;
-            _unwarpingRotationOffset = unwarpedRotation * Quaternion.Inverse(primaryHoverPoint.rotation);
-
-            refreshContactBoneTargets(useUnwarpingData: true);
-        }
-
         #endregion
 
         #region Contact Implementation
@@ -602,33 +575,16 @@ namespace Leap.Unity.Interaction
             return true;
         }
 
-        [System.Obsolete("This method will change to 'private void refreshContactBoneTargets()' in the next major version of the plugin.")]
-        private void refreshContactBoneTargets(bool useUnwarpingData = false)
+        private void refreshContactBoneTargets()
         {
             if (_wasContactInitialized)
             {
-
-                // Move the controller transform temporarily into its "unwarped space" pose
-                // (only if we are using the controller in a curved space)
-                if (useUnwarpingData)
-                {
-                    moveControllerTransform(_pivotingPositionOffset, Quaternion.identity);
-                    moveControllerTransform(_unwarpingPositionOffset, _unwarpingRotationOffset);
-                }
-
                 for (int i = 0; i < _contactBones.Length; i++)
                 {
                     _contactBoneTargetPositions[i]
                       = this.transform.TransformPoint(_contactBoneLocalPositions[i]);
                     _contactBoneTargetRotations[i]
                       = this.transform.TransformRotation(_contactBoneLocalRotations[i]);
-                }
-
-                // Move the controller transform back to its original pose.
-                if (useUnwarpingData)
-                {
-                    moveControllerTransform(-_unwarpingPositionOffset, Quaternion.Inverse(_unwarpingRotationOffset));
-                    moveControllerTransform(-_pivotingPositionOffset, Quaternion.identity);
                 }
             }
         }
@@ -966,5 +922,4 @@ namespace Leap.Unity.Interaction
         #endregion
 
     }
-#pragma warning restore 0618
 }

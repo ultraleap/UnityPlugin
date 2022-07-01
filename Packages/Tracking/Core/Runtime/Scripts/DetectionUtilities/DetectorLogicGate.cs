@@ -28,11 +28,9 @@ namespace Leap.Unity
      */
     public class DetectorLogicGate : Detector
     {
-#pragma warning disable 0649
         [SerializeField]
         [Tooltip("The list of observed detectors.")]
         private List<Detector> Detectors;
-#pragma warning restore 0649
         /**
          * When true, all Detector components of the same game object
          * are added to the list of watched detectors on Awake. When false,

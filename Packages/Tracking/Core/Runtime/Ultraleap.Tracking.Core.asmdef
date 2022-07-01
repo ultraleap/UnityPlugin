@@ -16,11 +16,6 @@
     "defineConstraints": [],
     "versionDefines": [
         {
-            "name": "com.unity.xr.legacyinputhelpers",
-            "expression": "1.0",
-            "define": "XR_LEGACY_INPUT_AVAILABLE"
-        },
-        {
             "name": "com.unity.xr.management",
             "expression": "1.0",
             "define": "XR_MANAGEMENT_AVAILABLE"

@@ -6,9 +6,10 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Leap.Unity.Query;
+using Leap.Unity.Internal;
 using System;
 using System.Collections;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -170,16 +171,22 @@ namespace Leap.Unity
                 byte[] data = image.Data(Image.CameraType.LEFT);
                 if (_hideLeapDebugInfo && controller != null)
                 {
-                    switch (controller.Devices.ActiveDevice.Type)
+                    Device[] devices = controller.Devices.ActiveDevices.ToArray();
+                    Device specificDevice = devices.FirstOrDefault(d => d.DeviceID == deviceID);
+
+                    if (specificDevice != null)
                     {
-                        case Device.DeviceType.TYPE_RIGEL:
-                        case Device.DeviceType.TYPE_SIR170:
-                        case Device.DeviceType.TYPE_3DI:
-                            for (int i = 0; i < image.Width; i++)
-                                data[i] = 0x00;
-                            for (int i = (int)image.NumBytes - image.Width; i < image.NumBytes; i++)
-                                data[i] = 0x00;
-                            break;
+                        switch (specificDevice.Type)
+                        {
+                            case Device.DeviceType.TYPE_RIGEL:
+                            case Device.DeviceType.TYPE_SIR170:
+                            case Device.DeviceType.TYPE_3DI:
+                                for (int i = 0; i < image.Width; i++)
+                                    data[i] = 0x00;
+                                for (int i = (int)image.NumBytes - image.Width; i < image.NumBytes; i++)
+                                    data[i] = 0x00;
+                                break;
+                        }
                     }
                 }
 
@@ -282,7 +289,6 @@ namespace Leap.Unity
             private void addDistortionData(Image image, Color32[] colors, int startIndex)
             {
                 float[] distortionData = image.Distortion(Image.CameraType.LEFT).
-                                               Query().
                                                Concat(image.Distortion(Image.CameraType.RIGHT)).
                                                ToArray();
 

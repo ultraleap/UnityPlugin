@@ -6,15 +6,12 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using System.Collections;
 using UnityEngine;
 
 namespace Leap.Unity
 {
-    [ExecuteInEditMode]
     public class EnableDepthBuffer : MonoBehaviour
     {
-
         [SerializeField] private Camera _camera;
 
         public const string DEPTH_TEXTURE_VARIANT_NAME = "USE_DEPTH_TEXTURE";

@@ -54,33 +54,6 @@ namespace Leap
             return null;
         }
 
-        [Obsolete("Multiple devices can now be streaming, use ActiveDevices instead.", false)]
-        /// <summary>
-        /// The device that is currently streaming tracking data.
-        /// If no streaming devices are found, returns null
-        /// </summary>
-        public Device ActiveDevice
-        {
-            get
-            {
-                if (Count == 1)
-                {
-                    return this[0];
-                }
-
-                for (int d = 0; d < Count; d++)
-                {
-                    this[d].UpdateStatus(LeapInternal.eLeapDeviceStatus.eLeapDeviceStatus_Streaming);
-                    if (this[d].IsStreaming)
-                    {
-                        return this[d];
-                    }
-                }
-
-                return null;
-            }
-        }
-
         /// <summary>
         /// The devices that are currently streaming tracking data.
         /// If no streaming devices are found, returns null

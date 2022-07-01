@@ -70,30 +70,6 @@ namespace Leap
         /// </summary>
         public UInt32 DeviceID;
 
-        [Obsolete]
-        public int SerializeLength
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
-
-        [Obsolete]
-        public byte[] Serialize
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
-
-        [Obsolete]
-        public void Deserialize(byte[] arg)
-        {
-            throw new NotImplementedException();
-        }
-
         /// <summary>
         /// The Hand object with the specified ID in this frame, or null if none
         /// exists.

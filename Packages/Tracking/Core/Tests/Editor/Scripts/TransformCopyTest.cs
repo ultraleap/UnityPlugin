@@ -11,6 +11,7 @@ using System;
 using System.Collections;
 using System.Linq;
 using System.Reflection;
+using UnityEngine;
 
 namespace Leap.Unity.Tests
 {
@@ -128,13 +129,13 @@ namespace Leap.Unity.Tests
 
     public class TransformCopyTranslation : FrameValidator
     {
-        protected static Vector translation = Vector.Forward;
+        protected static Vector3 translation = Vector3.forward;
         protected Frame _originalFrame;
 
         protected override Frame createFrame()
         {
             _originalFrame = TestHandFactory.MakeTestFrame(0, true, true);
-            LeapTransform forwardTransform = new LeapTransform(translation, LeapQuaternion.Identity);
+            LeapTransform forwardTransform = new LeapTransform(translation, Quaternion.identity);
             return _originalFrame.TransformedCopy(forwardTransform);
         }
 

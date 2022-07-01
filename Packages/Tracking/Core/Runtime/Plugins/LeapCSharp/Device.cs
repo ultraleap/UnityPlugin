@@ -328,11 +328,6 @@ namespace Leap
             /// The Ultraleap 3Di hand tracking camera.
             /// </summary>
             TYPE_3DI = (int)eLeapDeviceType.eLeapDevicePID_3Di,
-
-            [Obsolete]
-            TYPE_LAPTOP,
-            [Obsolete]
-            TYPE_KEYBOARD
         }
     }
 }

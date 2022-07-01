@@ -90,7 +90,7 @@ namespace Leap.Unity.Preview.XRInteractionToolkit
             controllerState.position = HandModel.GetLeapHand().GetPredictedPinchPosition();
             controllerState.inputTrackingState |= InputTrackingState.Position;
 
-            controllerState.rotation = HandModel.GetLeapHand().Rotation.ToQuaternion();
+            controllerState.rotation = HandModel.GetLeapHand().Rotation;
             controllerState.inputTrackingState |= InputTrackingState.Rotation;
 
             // set rotation for the ray if a xr ray interactor is attached

@@ -12,7 +12,6 @@ using UnityEngine;
 
 namespace Leap.Unity
 {
-#pragma warning disable 0618
     /// <summary>
     /// The CapsuleHand is a basic Leap hand model that generates a set of spheres and 
     /// cylinders to render hands using Leap hand data.
@@ -32,7 +31,6 @@ namespace Leap.Unity
         private static Color[] _leftColorList = { new Color(0.0f, 0.0f, 1.0f), new Color(0.2f, 0.0f, 0.4f), new Color(0.0f, 0.2f, 0.2f) };
         private static Color[] _rightColorList = { new Color(1.0f, 0.0f, 0.0f), new Color(1.0f, 1.0f, 0.0f), new Color(1.0f, 0.5f, 0.0f) };
 
-#pragma warning disable 0649
         [SerializeField]
         private Chirality handedness;
 
@@ -73,7 +71,6 @@ namespace Leap.Unity
         [SerializeField]
         [DisableIf("_useCustomColors", isEqualTo: false)]
         private Color _sphereColor = Color.green, _cylinderColor = Color.white;
-#pragma warning restore 0649
 
         private Material _sphereMat;
         private Hand _hand;
@@ -319,7 +316,7 @@ namespace Leap.Unity
                 {
                     int key = getFingerJointIndex((int)finger.Type, j);
 
-                    Vector3 position = finger.Bone((Bone.BoneType)j).NextJoint.ToVector3();
+                    Vector3 position = finger.Bone((Bone.BoneType)j).NextJoint;
                     _spherePositions[key] = position;
 
                     drawSphere(position);
@@ -329,11 +326,11 @@ namespace Leap.Unity
             //Now we just have a few more spheres for the hands
             //PalmPos, WristPos, and mockThumbJointPos, which is derived and not taken from the frame obj
 
-            Vector3 palmPosition = _hand.PalmPosition.ToVector3();
+            Vector3 palmPosition = _hand.PalmPosition;
             drawSphere(palmPosition, _palmRadius);
 
-            Vector3 thumbBaseToPalm = _spherePositions[THUMB_BASE_INDEX] - _hand.PalmPosition.ToVector3();
-            Vector3 mockThumbJointPos = _hand.PalmPosition.ToVector3() + Vector3.Reflect(thumbBaseToPalm, _hand.Basis.xBasis.ToVector3());
+            Vector3 thumbBaseToPalm = _spherePositions[THUMB_BASE_INDEX] - _hand.PalmPosition;
+            Vector3 mockThumbJointPos = _hand.PalmPosition + Vector3.Reflect(thumbBaseToPalm, _hand.Basis.xBasis);
             drawSphere(mockThumbJointPos);
 
             //If we want to show the arm, do the calculations and display the meshes
@@ -341,12 +338,12 @@ namespace Leap.Unity
             {
                 var arm = _hand.Arm;
 
-                Vector3 right = arm.Basis.xBasis.ToVector3() * arm.Width * 0.7f * 0.5f;
-                Vector3 wrist = arm.WristPosition.ToVector3();
-                Vector3 elbow = arm.ElbowPosition.ToVector3();
+                Vector3 right = arm.Basis.xBasis * arm.Width * 0.7f * 0.5f;
+                Vector3 wrist = arm.WristPosition;
+                Vector3 elbow = arm.ElbowPosition;
 
                 float armLength = Vector3.Distance(wrist, elbow);
-                wrist -= arm.Direction.ToVector3() * armLength * 0.05f;
+                wrist -= arm.Direction * armLength * 0.05f;
 
                 Vector3 armFrontRight = wrist + right;
                 Vector3 armFrontLeft = wrist - right;
@@ -532,5 +529,4 @@ namespace Leap.Unity
             return mesh;
         }
     }
-#pragma warning restore 0618
 }

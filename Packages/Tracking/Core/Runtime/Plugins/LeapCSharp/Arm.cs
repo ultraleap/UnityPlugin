@@ -28,27 +28,6 @@ namespace Leap
 
         /// <summary>
         /// Constructs a new Arm object. 
-        /// @since 3.0 
-        /// </summary>
-        [System.Obsolete("This signature will be removed in the next major version of the plugin. Use the one with Vector3 and Quaternion instead.")]
-        public Arm(Vector elbow,
-                   Vector wrist,
-                   Vector center,
-                   Vector direction,
-                   float length,
-                   float width,
-                   LeapQuaternion rotation)
-          : base(elbow,
-                 wrist,
-                 center,
-                 direction,
-                 length,
-                 width,
-                 BoneType.TYPE_METACARPAL, //ignored for arms
-                 rotation)
-        { }
-        /// <summary>
-        /// Constructs a new Arm object. 
         /// </summary>
         public Arm(Vector3 elbow,
                    Vector3 wrist,
@@ -94,8 +73,7 @@ namespace Leap
         /// 
         /// @since 2.0.3
         /// </summary>
-        [System.Obsolete("Its type will be changed from Vector to Vector3")]
-        public Vector ElbowPosition
+        public Vector3 ElbowPosition
         {
             get
             {
@@ -112,8 +90,7 @@ namespace Leap
         /// 
         /// @since 2.0.3
         /// </summary>
-        [System.Obsolete("Its type will be changed from Vector to Vector3")]
-        public Vector WristPosition
+        public Vector3 WristPosition
         {
             get
             {
