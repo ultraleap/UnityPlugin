@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [docs-website]: https://docs.ultraleap.com/unity-api/ "Ultraleap Docs"
 
-## [5.12.0] - 30/06/2022
+## [5.12.0] - 04/07/2022
 
 ### Announcements
 
@@ -34,6 +34,8 @@ If you have any concerns about this, please contact us on [Github Discussions](h
 - Interactions callback scene allows blocks to be moved without doing a grasp pose. 
 - Capsule hands don't have a joint colour in HDRP 
 - Hand UI can become detached from hand when hand is removed from view
+- Multi-device (desktop) Scene camera position can become offset
+- FOV visualization does not display after changing render pipelines
 
 
 ## [5.11.0] - 23/06/2022
