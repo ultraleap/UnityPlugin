@@ -8,7 +8,7 @@
 
 using UnityEngine;
 
-namespace UHI.Tracking.InteractionEngine.Examples
+namespace Leap.Unity.InteractionEngine.Examples
 {
 
     /// <summary>

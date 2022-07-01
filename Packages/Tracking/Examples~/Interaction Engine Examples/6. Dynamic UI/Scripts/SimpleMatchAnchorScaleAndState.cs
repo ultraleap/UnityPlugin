@@ -9,7 +9,7 @@
 using Leap.Unity.Interaction;
 using UnityEngine;
 
-namespace UHI.Tracking.InteractionEngine.Examples
+namespace Leap.Unity.InteractionEngine.Examples
 {
 
     [AddComponentMenu("")]

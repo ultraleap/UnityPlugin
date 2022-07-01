@@ -10,7 +10,7 @@ using Leap.Unity;
 using Leap.Unity.Interaction;
 using UnityEngine;
 
-namespace UHI.Tracking.InteractionEngine.Examples
+namespace Leap.Unity.InteractionEngine.Examples
 {
     /// <summary>
     /// This simple script changes the color of an InteractionBehaviour as

@@ -8,7 +8,7 @@
 
 using UnityEngine;
 
-namespace UHI.Tracking.InteractionEngine.Examples
+namespace ULeap.Unity.InteractionEngine.Examples
 {
 
     [RequireComponent(typeof(Renderer))]
