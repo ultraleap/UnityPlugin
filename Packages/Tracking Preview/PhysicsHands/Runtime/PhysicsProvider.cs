@@ -74,6 +74,10 @@ namespace Leap.Unity.Interaction.PhysicsHands
             "This includes large and very small objects, as well as kinematic objects.")]
         private bool _enableHelpers = true;
 
+        [SerializeField, Tooltip("Disabling this will allow for the grasp helper to report heuristical \"grab\" information, but will not move the objects.")]
+        private bool _helperMovesObjects = true;
+        public bool HelperMovesObjects => _helperMovesObjects;
+
         [SerializeField, Tooltip("Enabling this will cause the hand to move more slowly when grasping objects of higher weights.")]
         private bool _interpolateMass = true;
         public bool InterpolatingMass => _interpolateMass;

@@ -234,10 +234,12 @@ namespace Leap.Unity.Interaction.PhysicsHands
         public void ReleaseObject()
         {
             GraspState = State.Idle;
-            Debug.DrawRay(_rigid.position, Vector3.down, Color.blue, 0.2f);
             _releaseTimer = GRAB_COOLDOWNTIME;
-            _rigid.isKinematic = _oldKinematic;
-            _rigid.useGravity = _oldGravity;
+            if (Manager.HelperMovesObjects)
+            {
+                _rigid.isKinematic = _oldKinematic;
+                _rigid.useGravity = _oldGravity;
+            }
         }
 
         public State UpdateHelper()
@@ -276,7 +278,10 @@ namespace Leap.Unity.Interaction.PhysicsHands
                     if (_graspingHands.Count > 0)
                     {
                         UpdateHandPositions();
-                        MoveObject();
+                        if (Manager.HelperMovesObjects)
+                        {
+                            MoveObject();
+                        }
                         _justGrasped = false;
                     }
                     else
@@ -347,7 +352,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                     }
                     if (c == 2)
                     {
-                        if (_graspingHands.Count == 0)
+                        if (Manager.HelperMovesObjects && _graspingHands.Count == 0)
                         {
                             _rigid.useGravity = false;
                             _rigid.isKinematic = false;
