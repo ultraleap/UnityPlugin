@@ -47,7 +47,6 @@ namespace Ultraleap.Tracking.OpenXR
 
             Pose trackerTransform = new Pose(Vector3.zero, Quaternion.identity);
 
-#if XR_LEGACY_INPUT_AVAILABLE
             // Adjust for relative transform if it's in use.
             var trackedPoseDriver = mainCamera.GetComponent<UnityEngine.SpatialTracking.TrackedPoseDriver>();
             if (trackedPoseDriver != null && trackedPoseDriver.UseRelativeTransform)
@@ -55,7 +54,7 @@ namespace Ultraleap.Tracking.OpenXR
                 trackerTransform.position += trackedPoseDriver.originPose.position;
                 trackerTransform.rotation *= trackedPoseDriver.originPose.rotation;
             }
-#endif
+
             // Adjust for the camera parent transform if this camera is part of a rig.
             var parentTransform = mainCamera.transform.parent;
             if (parentTransform != null)
