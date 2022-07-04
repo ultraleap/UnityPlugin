@@ -88,6 +88,7 @@ MeshRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -112,6 +113,7 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
 --- !u!64 &6102045132944367042
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -169,6 +171,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6af7362947abdec42ad19f69c34deb45, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  url: https://docs.ultraleap.com/ultralab/
+  url: https://docs.ultraleap.com/unity-api/
   skin: {fileID: 11400000, guid: 55acdabb497cedb4aa8afc67c8d7fae2, type: 2}
   logo: {fileID: 2800000, guid: 454c0f06c76d7e847bd0f8081e7200c2, type: 3}
