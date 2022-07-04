@@ -26,7 +26,7 @@ namespace Leap.Unity.Controllers
             Vector3 inputPosition;
             if (GetPosition(out inputPosition))
             {
-                _distance = Vector3.Distance(inputPosition, MainCameraProvider.mainCamera.transform.position);
+                _distance = Vector3.Distance(inputPosition, Camera.main.transform.position);
 
                 if (lessThan)
                 {

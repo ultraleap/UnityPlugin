@@ -29,26 +29,15 @@ namespace Ultraleap.Tracking.OpenXR
         {
             get
             {
-                if (_mainCamera != null && _mainCamera != MainCameraProvider.mainCamera)
+                if (_mainCamera == null)
                 {
-                    MainCameraProvider.mainCamera = _mainCamera;
+                    _mainCamera = Camera.main;
                 }
                 return _mainCamera;
             }
             set
             {
                 _mainCamera = value;
-                MainCameraProvider.mainCamera = value;
-            }
-        }
-
-        protected void OnEnable()
-        {
-            // Assign the main camera if it looks like one is available and it's not yet been set on the backing field
-            // NB this may be the case if the provider is created via AddComponent, as in MRTK
-            if (mainCamera == null && MainCameraProvider.mainCamera != null)
-            {
-                mainCamera = MainCameraProvider.mainCamera;
             }
         }
 

@@ -38,15 +38,6 @@ namespace Leap.Unity
         private const float DEFAULT_DEVICE_TILT_X_AXIS = 5f;
 #endif
 
-#if SVR
-        private enum TimewarpMode
-        {
-            Default,
-            Experimental_XR2
-        }
-
-        private TimewarpMode _xr2TimewarpMode = TimewarpMode.Default;
-#endif
         /// <summary>
         /// Supported modes for device offset. Used for deviceOffsetMode which allows 
         /// manual adjustment of the Tracking Hardware's virtual offset and tilt.
@@ -173,12 +164,9 @@ namespace Leap.Unity
         {
             get
             {
-                if (_mainCamera != null)
+                if (_mainCamera == null)
                 {
-                    if (_mainCamera != MainCameraProvider.mainCamera)
-                    {
-                        MainCameraProvider.mainCamera = _mainCamera;
-                    }
+                    _mainCamera = Camera.main;
                 }
 
                 return _mainCamera;
@@ -186,18 +174,11 @@ namespace Leap.Unity
             set
             {
                 _mainCamera = value;
-                MainCameraProvider.mainCamera = value;
             }
         }
 
         // Temporal Warping
-#if UNITY_STANDALONE
         private const int DEFAULT_WARP_ADJUSTMENT = 17;
-#elif SVR
-        private const int DEFAULT_WARP_ADJUSTMENT = 35; // Tuned for XR2 on a Morpheus SKU3
-#else
-        private const int DEFAULT_WARP_ADJUSTMENT = 17;
-#endif
 
         /// <summary>
         /// Temporal warping prevents the hand coordinate system from 'swimming' or 
@@ -322,7 +303,7 @@ namespace Leap.Unity
             editTimePose = TestHandFactory.TestHandPose.HeadMountedB;
 
             _interactionVolumeVisualization = InteractionVolumeVisualization.Automatic;
-            mainCamera = MainCameraProvider.mainCamera;
+            mainCamera = Camera.main;
             if (mainCamera != null)
             {
                 Debug.Log("Camera.Main automatically assigned");
@@ -332,13 +313,6 @@ namespace Leap.Unity
         protected override void OnEnable()
         {
             resetShaderTransforms();
-
-            // Assign the main camera if it looks like one is available and it's not yet been set on the backing field
-            // NB this may be the case if the provider is created via AddComponent, as in MRTK
-            if (mainCamera == null && MainCameraProvider.mainCamera != null)
-            {
-                mainCamera = MainCameraProvider.mainCamera;
-            }
 
 #if XR_LEGACY_INPUT_AVAILABLE
             if (mainCamera.GetComponent<UnityEngine.SpatialTracking.TrackedPoseDriver>() == null)

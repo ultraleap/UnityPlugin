@@ -17,7 +17,7 @@ namespace Ultraleap.Tracking.OpenXR
             _mainCamera = serializedObject.FindProperty("_mainCamera");
             if (_mainCamera.objectReferenceValue == null)
             {
-                _mainCamera.objectReferenceValue = MainCameraProvider.mainCamera;
+                _mainCamera.objectReferenceValue = Camera.main;
                 serializedObject.ApplyModifiedProperties();
 
                 if (_mainCamera.objectReferenceValue != null)

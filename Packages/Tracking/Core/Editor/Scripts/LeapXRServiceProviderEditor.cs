@@ -27,7 +27,7 @@ namespace Leap.Unity
 
             if (_mainCamera.objectReferenceValue == null)
             {
-                _mainCamera.objectReferenceValue = MainCameraProvider.mainCamera;
+                _mainCamera.objectReferenceValue = Camera.main;
                 serializedObject.ApplyModifiedProperties();
 
                 if (_mainCamera.objectReferenceValue != null)
