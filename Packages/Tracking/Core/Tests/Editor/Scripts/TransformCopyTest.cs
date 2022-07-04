@@ -128,6 +128,7 @@ namespace Leap.Unity.Tests
 
     public class TransformCopyTranslation : FrameValidator
     {
+#pragma warning disable CS0618 // Type or member is obsolete
         protected static Vector translation = Vector.Forward;
         protected Frame _originalFrame;
 
@@ -157,5 +158,7 @@ namespace Leap.Unity.Tests
                 }
             }
         }
+#pragma warning restore CS0618 // Type or member is obsolete
+
     }
 }

@@ -13,6 +13,7 @@ using UnityEngine;
 
 namespace Leap.Unity.Preview.FarFieldInteractions
 {
+#pragma warning disable 0618
     /// <summary>
     /// infers a body position from .. including predicted shoulder positions and stable pinch position.
     /// Used by the 'FarFieldDirection', 
@@ -339,4 +340,5 @@ namespace Leap.Unity.Preview.FarFieldInteractions
             }
         }
     }
+#pragma warning restore 0618
 }

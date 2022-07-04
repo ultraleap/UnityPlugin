@@ -10,6 +10,8 @@ using NUnit.Framework;
 
 namespace Leap.LeapCSharp.Tests
 {
+#pragma warning disable CS0618 // Type or member is obsolete
+
     public class ObjectEquality
     {
         [Test]
@@ -39,4 +41,6 @@ namespace Leap.LeapCSharp.Tests
             //Assert.True (thisVector == thatVector, "this == that Vector");
         }
     }
+#pragma warning restore CS0618 // Type or member is obsolete
+
 }

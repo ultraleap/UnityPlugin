@@ -14,6 +14,7 @@ using UnityEngine.XR.Interaction.Toolkit;
 
 namespace Leap.Unity.Preview.XRInteractionToolkit
 {
+#pragma warning disable 0618
     /// <summary>
     /// Integrating hand tracking into the XR Interaction Engine.
     /// This should be used instead of the XRController component and together with either a ray interactor or a direct interactor.
@@ -169,4 +170,5 @@ namespace Leap.Unity.Preview.XRInteractionToolkit
             return false;
         }
     }
+#pragma warning restore 0618
 }

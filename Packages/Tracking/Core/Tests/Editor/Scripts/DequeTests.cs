@@ -11,6 +11,7 @@ using System;
 
 namespace Leap.Unity.Tests
 {
+#pragma warning disable CS0618
     public class DequeTests
     {
         private Deque<int> _buffer;
@@ -128,4 +129,5 @@ namespace Leap.Unity.Tests
             }
         }
     }
+#pragma warning restore CS0618
 }

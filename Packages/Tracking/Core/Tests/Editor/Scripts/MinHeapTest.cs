@@ -11,6 +11,8 @@ using System;
 
 namespace Leap.Unity.Tests
 {
+#pragma warning disable CS0618 // Type or member is obsolete
+
     public class MinHeapTest
     {
         private class HeapElement : IMinHeapNode, IComparable<HeapElement>
@@ -72,4 +74,6 @@ namespace Leap.Unity.Tests
             Assert.That(_heap.Count, Is.EqualTo(4));
         }
     }
+#pragma warning restore CS0618 // Type or member is obsolete
+
 }
