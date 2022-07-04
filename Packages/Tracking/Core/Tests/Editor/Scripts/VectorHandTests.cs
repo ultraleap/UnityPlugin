@@ -13,6 +13,8 @@ using UnityEngine;
 
 namespace Leap.Unity.Tests
 {
+#pragma warning disable CS0618 // Type or member is obsolete
+
     using Encoding;
 
     public class VectorHandTests
@@ -72,4 +74,6 @@ namespace Leap.Unity.Tests
             }
         }
     }
+#pragma warning restore CS0618 // Type or member is obsolete
+
 }

@@ -14,6 +14,8 @@ using UnityEngine;
 
 namespace Leap.Unity.Tests
 {
+#pragma warning disable CS0618 // Type or member is obsolete
+
     using Query;
     using System;
 
@@ -654,4 +656,6 @@ namespace Leap.Unity.Tests
             public void Reset() { }
         }
     }
+#pragma warning restore CS0618 // Type or member is obsolete
+
 }

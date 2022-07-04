@@ -11,6 +11,8 @@ using System;
 
 namespace Leap.LeapCSharp.Tests
 {
+#pragma warning disable CS0618 // Type or member is obsolete
+
     public class VectorTests
     {
         Vector thisVector = Vector.Up;
@@ -468,4 +470,6 @@ namespace Leap.LeapCSharp.Tests
             Assert.IsFalse(mixed.IsValid());
         }
     }
+#pragma warning restore CS0618 // Type or member is obsolete
+
 }
