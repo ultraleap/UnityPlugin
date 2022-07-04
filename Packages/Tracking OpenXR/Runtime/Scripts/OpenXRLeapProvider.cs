@@ -29,26 +29,15 @@ namespace Ultraleap.Tracking.OpenXR
         {
             get
             {
-                if (_mainCamera != null && _mainCamera != MainCameraProvider.mainCamera)
+                if (_mainCamera == null)
                 {
-                    MainCameraProvider.mainCamera = _mainCamera;
+                    _mainCamera = Camera.main;
                 }
                 return _mainCamera;
             }
             set
             {
                 _mainCamera = value;
-                MainCameraProvider.mainCamera = value;
-            }
-        }
-
-        protected void OnEnable()
-        {
-            // Assign the main camera if it looks like one is available and it's not yet been set on the backing field
-            // NB this may be the case if the provider is created via AddComponent, as in MRTK
-            if (mainCamera == null && MainCameraProvider.mainCamera != null)
-            {
-                mainCamera = MainCameraProvider.mainCamera;
             }
         }
 
@@ -58,7 +47,6 @@ namespace Ultraleap.Tracking.OpenXR
 
             Pose trackerTransform = new Pose(Vector3.zero, Quaternion.identity);
 
-#if XR_LEGACY_INPUT_AVAILABLE
             // Adjust for relative transform if it's in use.
             var trackedPoseDriver = mainCamera.GetComponent<UnityEngine.SpatialTracking.TrackedPoseDriver>();
             if (trackedPoseDriver != null && trackedPoseDriver.UseRelativeTransform)
@@ -66,7 +54,7 @@ namespace Ultraleap.Tracking.OpenXR
                 trackerTransform.position += trackedPoseDriver.originPose.position;
                 trackerTransform.rotation *= trackedPoseDriver.originPose.rotation;
             }
-#endif
+
             // Adjust for the camera parent transform if this camera is part of a rig.
             var parentTransform = mainCamera.transform.parent;
             if (parentTransform != null)

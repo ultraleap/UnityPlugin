@@ -80,7 +80,7 @@ namespace Leap.Unity.InputModule
 
         void Update()
         {
-            pointerEvent.position = MainCameraProvider.mainCamera.WorldToScreenPoint(ButtonFace.transform.position);
+            pointerEvent.position = Camera.main.WorldToScreenPoint(ButtonFace.transform.position);
             if (physicsOccurred)
             {
                 physicsOccurred = false;

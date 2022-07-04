@@ -29,7 +29,7 @@ namespace Leap.Unity.Examples
         public override void ProcessFrame(ref Frame inputFrame)
         {
             // Calculate the position of the head and the basis to calculate shoulder position.
-            if (headTransform == null) { headTransform = MainCameraProvider.mainCamera.transform; }
+            if (headTransform == null) { headTransform = Camera.main.transform; }
             Vector3 headPos = headTransform.position;
             var shoulderBasis = Quaternion.LookRotation(
               Vector3.ProjectOnPlane(headTransform.forward, Vector3.up),
