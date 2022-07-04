@@ -25,7 +25,9 @@ namespace Leap.Unity.Tests
 
         public class InvalidClass : BaseClass { }
 
+#pragma warning disable CS0618 // Type or member is obsolete
         private class ListClass : MultiTypedList<BaseClass, A, B, C, D, E, F, G, H> { }
+#pragma warning restore CS0618 // Type or member is obsolete
 
         private ListClass _list;
 

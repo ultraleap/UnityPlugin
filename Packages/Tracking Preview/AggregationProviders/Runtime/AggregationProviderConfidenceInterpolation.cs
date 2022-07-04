@@ -14,7 +14,7 @@ using UnityEngine;
 
 namespace Leap.Unity
 {
-
+#pragma warning disable 0618
     /// <summary>
     /// possible structure to implement our own aggregation code,
     /// calculates hand and joint confidences and interpolates linearly between hands based on their confidences,
@@ -255,7 +255,7 @@ namespace Leap.Unity
             }
 
             // joints
-            mergedJointPositions.ClearWith(Vector3.zero);
+            Utils.Fill(mergedJointPositions, Vector3.zero);
             List<VectorHand> vectorHands = new List<VectorHand>();
             foreach (Hand hand in hands)
             {
@@ -651,7 +651,7 @@ namespace Leap.Unity
 
             public void ClearAllPositions()
             {
-                positions.ClearWith(Vector3.zero);
+                Utils.Fill(positions, Vector3.zero);
             }
 
             public void AddPosition(Vector3 position, float time)
@@ -795,7 +795,7 @@ namespace Leap.Unity
                 }
                 else
                 {
-                    averageConfidences.ClearWith(0);
+                    Utils.Fill(averageConfidences, 0);
                 }
 
                 for (int i = 0; i < averageConfidences.Length; i++)
@@ -970,4 +970,5 @@ namespace Leap.Unity
 
         #endregion
     }
+#pragma warning restore 0618
 }

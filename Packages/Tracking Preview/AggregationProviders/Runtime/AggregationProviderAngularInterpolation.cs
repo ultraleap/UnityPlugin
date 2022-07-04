@@ -14,7 +14,7 @@ using UnityEngine;
 
 namespace Leap.Unity
 {
-
+#pragma warning disable 0618
     /// <summary>
     /// John's and Flo's aggregation code. An example of how aggregation could be implemented.
     /// only works for the first two hands it sees (of the same chirality)
@@ -138,9 +138,9 @@ namespace Leap.Unity
                     }
                     else
                     {
-                        Leap.Vector nH = hand.PalmPosition;
-                        Leap.Vector tH = tempHand.PalmPosition;
-                        tempHand.PalmPosition = new Leap.Vector(aprxAvg(nH.x, tH.x), aprxAvg(nH.y, tH.y), aprxAvg(nH.z, tH.z));
+                        Vector3 nH = hand.PalmPosition.ToVector3();
+                        Vector3 tH = tempHand.PalmPosition.ToVector3();
+                        tempHand.PalmPosition = new Vector(aprxAvg(nH.x, tH.x), aprxAvg(nH.y, tH.y), aprxAvg(nH.z, tH.z));
                         //tempHand.PalmPosition = hand.PalmPosition;
 
 
@@ -243,4 +243,5 @@ namespace Leap.Unity
             Gizmos.DrawLine(midDevicePointPosition, rightLimit);
         }
     }
+#pragma warning restore 0618
 }

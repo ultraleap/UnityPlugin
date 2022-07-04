@@ -13,6 +13,7 @@ namespace Leap
     /// <summary>
     /// Constants used in Leap Motion math functions.
     /// </summary>
+    [System.Obsolete("This code will be moved to Leap.CSharpExtensions.Constants in the next major version of the plugin.")]
     public static class Constants
     {
         public const float PI = 3.1415926536f;
@@ -34,6 +35,7 @@ namespace Leap
     /// The z-axis has positive values increasing away from the computer screen.
     /// @since 1.0
     /// </summary>
+    [System.Obsolete("This code will be moved to a legacy package in the next major version of the plugin. Use Unity's Vector3 instead. If you believe that it needs to be kept in tracking, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
     [Serializable]
     public struct Vector : IEquatable<Vector>
     {
@@ -135,7 +137,7 @@ namespace Leap
         public float AngleTo(Vector other)
         {
             float denom = MagnitudeSquared * other.MagnitudeSquared;
-            if (denom <= Constants.EPSILON)
+            if (denom <= CSharpExtensions.Constants.EPSILON)
             {
                 return 0.0f;
             }
@@ -146,7 +148,7 @@ namespace Leap
             }
             else if (val <= -1.0f)
             {
-                return Constants.PI;
+                return CSharpExtensions.Constants.PI;
             }
             return (float)Math.Acos(val);
         }
@@ -335,7 +337,7 @@ namespace Leap
             get
             {
                 float denom = MagnitudeSquared;
-                if (denom <= Constants.EPSILON)
+                if (denom <= CSharpExtensions.Constants.EPSILON)
                 {
                     return Zero;
                 }

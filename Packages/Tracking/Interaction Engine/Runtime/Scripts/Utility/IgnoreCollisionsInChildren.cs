@@ -33,28 +33,16 @@ namespace Leap.Unity.Examples
 
         public static void IgnoreCollisionsInChildrenOf(Transform t, bool ignore = true)
         {
-            var colliders = Pool<List<Collider>>.Spawn();
-            try
+            Collider[] colliders = t.GetComponentsInChildren<Collider>(true);
+            for (int i = 0; i < colliders.Length; i++)
             {
-                t.GetComponentsInChildren<Collider>(true, colliders);
-
-                for (int i = 0; i < colliders.Count; i++)
+                for (int j = 0; j < colliders.Length; j++)
                 {
-                    for (int j = 0; j < colliders.Count; j++)
-                    {
-                        if (i == j) continue;
+                    if (i == j) continue;
 
-                        Physics.IgnoreCollision(colliders[i], colliders[j], ignore);
-                    }
+                    Physics.IgnoreCollision(colliders[i], colliders[j], ignore);
                 }
             }
-            finally
-            {
-                colliders.Clear();
-                Pool<List<Collider>>.Recycle(colliders);
-            }
         }
-
     }
-
 }

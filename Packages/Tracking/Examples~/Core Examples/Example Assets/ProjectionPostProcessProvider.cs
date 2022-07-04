@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace Leap.Unity.Examples
 {
-
+#pragma warning disable 0618
     public class ProjectionPostProcessProvider : PostProcessProvider
     {
 
@@ -55,4 +55,5 @@ namespace Leap.Unity.Examples
         }
 
     }
+#pragma warning restore 0618
 }

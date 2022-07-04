@@ -39,8 +39,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Hand and Finger: `Id` & `HandId` will always return `0` and `1` for the left and right hand respectively
   - Hand and Finger: `TimeVisible`
   - Finger: `IsExtended`
-- The elbow joint is not currently tracked and the OpenXR Leap Provider infers the elbow/forearm from the hand-data.
-
 
 ## [1.0.0-pre.3] - 19/04/2022
 

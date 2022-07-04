@@ -9,6 +9,7 @@
 using Leap.Unity.Query;
 using System;
 using System.Collections;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -148,13 +149,13 @@ namespace Leap.Unity
                 }
 
                 // set factors to multiply to uv coordinates, so that we sample from the globalRawTexture where it is actually filled with the _combinedTexture
-                Vector4[] textureSizeFactors = Shader.GetGlobalVectorArray("_LeapGlobalTextureSizeFactor");
-                if (textureSizeFactors == null)
+                Vector4[] textureSizes = Shader.GetGlobalVectorArray("_LeapGlobalTextureSizes");
+                if (textureSizes == null)
                 {
-                    textureSizeFactors = new Vector4[MAX_NUMBER_OF_GLOBAL_TEXTURES];
+                    textureSizes = new Vector4[MAX_NUMBER_OF_GLOBAL_TEXTURES];
                 }
-                textureSizeFactors[deviceID] = new Vector4((float)_combinedTexture.width / _globalRawTextures.width, (float)_combinedTexture.height / _globalRawTextures.height, 0, 0);
-                Shader.SetGlobalVectorArray("_LeapGlobalTextureSizeFactor", textureSizeFactors);
+                textureSizes[deviceID] = new Vector4((float)_combinedTexture.width, (float)_combinedTexture.height, (float)_globalRawTextures.width, (float)_globalRawTextures.height);
+                Shader.SetGlobalVectorArray("_LeapGlobalTextureSizes", textureSizes);
 
                 Shader.SetGlobalVector(pixelSizeName, new Vector2(1.0f / image.Width, 1.0f / image.Height));
             }
@@ -170,16 +171,22 @@ namespace Leap.Unity
                 byte[] data = image.Data(Image.CameraType.LEFT);
                 if (_hideLeapDebugInfo && controller != null)
                 {
-                    switch (controller.Devices.ActiveDevice.Type)
+                    Device[] devices = controller.Devices.ActiveDevices.ToArray();
+                    Device specificDevice = devices.FirstOrDefault(d => d.DeviceID == deviceID);
+
+                    if (specificDevice != null)
                     {
-                        case Device.DeviceType.TYPE_RIGEL:
-                        case Device.DeviceType.TYPE_SIR170:
-                        case Device.DeviceType.TYPE_3DI:
-                            for (int i = 0; i < image.Width; i++)
-                                data[i] = 0x00;
-                            for (int i = (int)image.NumBytes - image.Width; i < image.NumBytes; i++)
-                                data[i] = 0x00;
-                            break;
+                        switch (specificDevice.Type)
+                        {
+                            case Device.DeviceType.TYPE_RIGEL:
+                            case Device.DeviceType.TYPE_SIR170:
+                            case Device.DeviceType.TYPE_3DI:
+                                for (int i = 0; i < image.Width; i++)
+                                    data[i] = 0x00;
+                                for (int i = (int)image.NumBytes - image.Width; i < image.NumBytes; i++)
+                                    data[i] = 0x00;
+                                break;
+                        }
                     }
                 }
 
@@ -600,6 +607,8 @@ namespace Leap.Unity
 
         private void OnDeviceChanged(Device d)
         {
+            unsubscribeFromService();
+            subscribeToService();
             Controller controller = _provider.GetLeapController();
             controller.FrameReady -= onFrameReady;
             controller.FrameReady += onFrameReady;

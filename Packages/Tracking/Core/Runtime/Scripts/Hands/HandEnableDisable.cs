@@ -21,7 +21,6 @@ namespace Leap.Unity
         protected override void Awake()
         {
             // Suppress Warnings Related to Kinematic Rigidbodies not supporting Continuous Collision Detection
-#if UNITY_2018_3_OR_NEWER
             Rigidbody[] bodies = GetComponentsInChildren<Rigidbody>();
             foreach (Rigidbody body in bodies)
             {
@@ -30,7 +29,6 @@ namespace Leap.Unity
                     body.collisionDetectionMode = CollisionDetectionMode.ContinuousSpeculative;
                 }
             }
-#endif
 
             base.Awake();
         }

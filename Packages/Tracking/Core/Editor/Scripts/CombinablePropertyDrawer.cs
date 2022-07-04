@@ -15,7 +15,6 @@ using UnityEngine;
 
 namespace Leap.Unity.Attributes
 {
-
     [CustomPropertyDrawer(typeof(CombinablePropertyAttribute), true)]
     public class CombinablePropertyDrawer : PropertyDrawer
     {
@@ -61,7 +60,7 @@ namespace Leap.Unity.Attributes
         {
             getAttributes(property);
 
-            var topPanelDrawer = attributes.Query().Cast<ITopPanelDrawer>()
+            var topPanelDrawer = attributes.Select(item => item as ITopPanelDrawer)
               .Where(o => o != null).FirstOrDefault();
             if (topPanelDrawer != null)
             {

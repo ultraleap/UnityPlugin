@@ -5,12 +5,13 @@
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
+using UnityEngine;
 
 namespace Leap
 {
     using System;
     using System.Collections.Generic;
-
+#pragma warning disable 0618
     /// <summary>
     /// The Hand class reports the physical characteristics of a detected hand.
     /// 
@@ -46,6 +47,7 @@ namespace Leap
             Fingers.Add(new Finger());
         }
 
+
         /// <summary>
         /// Constructs a hand.
         /// 
@@ -54,6 +56,7 @@ namespace Leap
         /// received from the service.
         /// @since 3.0
         /// </summary>
+        [System.Obsolete("This signature will be removed in the next major version of the plugin. Use the one with Vector3 and Quaternion instead.")]
         public Hand(long frameID,
                     int id,
                     float confidence,
@@ -93,6 +96,53 @@ namespace Leap
             Rotation = palmOrientation;
             Direction = direction;
             WristPosition = wristPosition;
+        }
+        /// <summary>
+        /// Constructs a hand.
+        /// 
+        /// Generally, you should not create your own Hand objects. Such objects will not
+        /// have valid tracking data. Get valid Hand objects from a frame
+        /// received from the service.
+        /// </summary>
+        public Hand(long frameID,
+                    int id,
+                    float confidence,
+                    float grabStrength,
+                    float grabAngle,
+                    float pinchStrength,
+                    float pinchDistance,
+                    float palmWidth,
+                    bool isLeft,
+                    float timeVisible,
+                    Arm arm,
+                    List<Finger> fingers,
+                    Vector3 palmPosition,
+                    Vector3 stabilizedPalmPosition,
+                    Vector3 palmVelocity,
+                    Vector3 palmNormal,
+                    Quaternion palmOrientation,
+                    Vector3 direction,
+                    Vector3 wristPosition)
+        {
+            FrameId = frameID;
+            Id = id;
+            Confidence = confidence;
+            GrabStrength = grabStrength;
+            GrabAngle = grabAngle;
+            PinchStrength = pinchStrength;
+            PinchDistance = pinchDistance;
+            PalmWidth = palmWidth;
+            IsLeft = isLeft;
+            TimeVisible = timeVisible;
+            Arm = arm;
+            Fingers = fingers;
+            PalmPosition = ToVector(palmPosition);
+            StabilizedPalmPosition = ToVector(stabilizedPalmPosition);
+            PalmVelocity = ToVector(palmVelocity);
+            PalmNormal = ToVector(palmNormal);
+            Rotation = ToLeapQuaternion(palmOrientation);
+            Direction = ToVector(direction);
+            WristPosition = ToVector(wristPosition);
         }
 
         /// <summary>
@@ -171,12 +221,14 @@ namespace Leap
         /// The center position of the palm.
         /// @since 1.0
         /// </summary>
+        [System.Obsolete("Its type will be changed from Vector to Vector3")]
         public Vector PalmPosition;
 
         /// <summary>
         /// The rate of change of the palm position.
         /// @since 1.0
         /// </summary>
+        [System.Obsolete("Its type will be changed from Vector to Vector3")]
         public Vector PalmVelocity;
 
         /// <summary>
@@ -190,6 +242,7 @@ namespace Leap
         /// respect to the horizontal plane.
         /// @since 1.0
         /// </summary>
+        [System.Obsolete("Its type will be changed from Vector to Vector3")]
         public Vector PalmNormal;
 
         /// <summary>
@@ -202,6 +255,7 @@ namespace Leap
         /// respect to the horizontal plane.
         /// @since 1.0
         /// </summary>
+        [System.Obsolete("Its type will be changed from Vector to Vector3")]
         public Vector Direction;
 
         /// <summary>
@@ -217,6 +271,7 @@ namespace Leap
         /// 
         /// @since 3.1
         /// </summary>
+        [System.Obsolete("Its type will be changed from LeapQuaternion to UnityEngine.Quaternion")]
         public LeapQuaternion Rotation;
 
         /// <summary>
@@ -276,12 +331,14 @@ namespace Leap
         /// primarily on the speed of movement.
         /// @since 1.0
         /// </summary>
+        [System.Obsolete("Its type will be changed from Vector to Vector3")]
         public Vector StabilizedPalmPosition;
 
         /// <summary>
         /// The position of the wrist of this hand.
         /// @since 2.0.3
         /// </summary>
+        [System.Obsolete("Its type will be changed from Vector to Vector3")]
         public Vector WristPosition;
 
         /// <summary>
@@ -318,5 +375,20 @@ namespace Leap
         /// @since 2.0.3
         /// </summary>
         public Arm Arm;
+
+
+
+        [Obsolete("This will be removed in the next major version update")]
+        private Vector ToVector(Vector3 v)
+        {
+            return new Vector(v.x, v.y, v.z);
+        }
+
+        [Obsolete("This will be removed in the next major version update")]
+        private LeapQuaternion ToLeapQuaternion(Quaternion q)
+        {
+            return new LeapQuaternion(q.x, q.y, q.z, q.w);
+        }
     }
+#pragma warning restore 0618
 }

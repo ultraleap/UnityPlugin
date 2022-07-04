@@ -82,8 +82,8 @@ namespace Leap.Unity
             {
                 hideField("_trackingOptimization");
             }
-            addPropertyToFoldout("_workerThreadProfiling", "Advanced Options");
             addPropertyToFoldout("_serverNameSpace", "Advanced Options");
+            addPropertyToFoldout("_workerThreadProfiling", "Advanced Options");
         }
 
         private void frameOptimizationWarning(SerializedProperty property)
@@ -113,7 +113,7 @@ namespace Leap.Unity
             // this is the minimum service version that supports Multiple devices
             LEAP_VERSION minimumServiceVersion = new LEAP_VERSION { major = 5, minor = 3, patch = 6 };
 
-            if (LeapController.IsConnected && !LeapController.CheckRequiredServiceVersion(minimumServiceVersion) && property.enumValueIndex == (int)LeapServiceProvider.MultipleDeviceMode.Specific)
+            if (_leapController != null && _leapController.IsConnected && !_leapController.CheckRequiredServiceVersion(minimumServiceVersion) && property.enumValueIndex == (int)LeapServiceProvider.MultipleDeviceMode.Specific)
             {
                 property.enumValueIndex = (int)LeapServiceProvider.MultipleDeviceMode.Disabled;
                 Debug.LogWarning(String.Format("Your current tracking service does not support 'Multiple Device Mode' = 'Specific' (min version is {0}.{1}.{2}). Please update your service: https://developer.leapmotion.com/tracking-software-download", minimumServiceVersion.major, minimumServiceVersion.minor, minimumServiceVersion.patch));
@@ -125,7 +125,19 @@ namespace Leap.Unity
 
         private void drawSerialNumberToggle(SerializedProperty property)
         {
-            if (LeapController != null)
+            bool createdController = false;
+
+            // Check if a controller exists
+            if (_leapController == null)
+            {
+                // This will generate a new controller if it is possible, we want to treat this newly created controller as temporary
+                if (LeapController != null)
+                {
+                    createdController = true;
+                }
+            }
+
+            if (_leapController != null)
             {
                 if (SerialNumbers.Count == 0)
                 {
@@ -165,29 +177,13 @@ namespace Leap.Unity
                     // assign the valid chosen serial number to the specificSerialNumber
                     property.stringValue = SerialNumbers[_chosenDeviceIndex];
                 }
+
+                if (createdController)
+                {
+                    _leapController.StopConnection();
+                }
             }
         }
-
-
-        public override void OnInspectorGUI()
-        {
-
-#if UNITY_2019_3_OR_NEWER
-      // Easily tracking VR-enabled-or-not requires an XR package installed, so remove this warning for now.
-#else
-            if (UnityEditor.PlayerSettings.virtualRealitySupported && !isVRProvider)
-            {
-                EditorGUILayout.HelpBox(
-                  "VR support is enabled. If your Leap is mounted to your headset, you should be "
-                  + "using LeapXRServiceProvider instead of LeapServiceProvider. (If your Leap "
-                  + "is not mounted to your headset, you can safely ignore this warning.)",
-                  MessageType.Warning);
-            }
-#endif
-
-            base.OnInspectorGUI();
-        }
-
 
         private LeapServiceProvider LeapServiceProvider
         {

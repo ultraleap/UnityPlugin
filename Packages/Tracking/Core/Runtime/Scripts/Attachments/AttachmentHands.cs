@@ -123,34 +123,28 @@ namespace Leap.Unity.Attachments
 
             bool requiresReinitialization = false;
 
-            using (new ProfilerSample("Attachment Hands Update", this.gameObject))
+            for (int i = 0; i < _attachmentHands.Length; i++)
             {
-                for (int i = 0; i < _attachmentHands.Length; i++)
+                var attachmentHand = attachmentHands[i];
+
+                if (attachmentHand == null)
                 {
-                    var attachmentHand = attachmentHands[i];
-
-                    if (attachmentHand == null)
-                    {
-                        requiresReinitialization = true;
-                        break;
-                    }
-
-                    var leapHand = handAccessors[i]();
-                    attachmentHand.isTracked = leapHand != null;
-
-                    using (new ProfilerSample(attachmentHand.gameObject.name + " Update Points"))
-                    {
-                        foreach (var point in attachmentHand.points)
-                        {
-                            point.SetTransformUsingHand(leapHand);
-                        }
-                    }
+                    requiresReinitialization = true;
+                    break;
                 }
 
-                if (requiresReinitialization)
+                var leapHand = handAccessors[i]();
+                attachmentHand.isTracked = leapHand != null;
+
+                foreach (var point in attachmentHand.points)
                 {
-                    reinitialize();
+                    point.SetTransformUsingHand(leapHand);
                 }
+            }
+
+            if (requiresReinitialization)
+            {
+                reinitialize();
             }
         }
 

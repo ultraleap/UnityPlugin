@@ -20,6 +20,7 @@ namespace Leap.Unity.Attributes
     /// values that fall within specific bounds.  The user will be prevented from
     /// entering a curve that lies outside of these bounds.
     /// </summary>
+    [System.Obsolete("This code will be moved to a legacy package in the next major version of the plugin. If you believe that it needs to be kept in tracking, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
     public class CurveBoundsAttribute : CombinablePropertyAttribute, IFullPropertyDrawer
     {
         public readonly Rect bounds;
@@ -55,6 +56,7 @@ namespace Leap.Unity.Attributes
     /// that range from 0 to 1.  The user will be prevented from entering a curve that
     /// lies outside of these bounds.
     /// </summary>
+    [System.Obsolete("This code will be moved to a legacy package in the next major version of the plugin. If you believe that it needs to be kept in tracking, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
     public class UnitCurveAttribute : CurveBoundsAttribute
     {
         public UnitCurveAttribute() : base(new Rect(0, 0, 1, 1)) { }

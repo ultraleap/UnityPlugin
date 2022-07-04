@@ -428,7 +428,7 @@ namespace Leap
         /// 
         /// @since 1.0
         /// </summary>
-        public Controller() : this(0, null, true) { }
+        public Controller() : this(0) { }
 
         /// <summary>
         /// Constructs a Controller object using the specified connection key.
@@ -555,7 +555,26 @@ namespace Leap
         /// the change was accepted. 
         /// @since 2.1.6 (5.4.4 for specific device)
         /// </summary>
+        [Obsolete("This method signature will be removed in a future update. Please use the equivalent method that does not take the serial number")]
         public void SetAndClearPolicy(PolicyFlag set, PolicyFlag clear, string deviceSerial = "", Device device = null)
+        {
+            _connection.SetAndClearPolicy(set, clear, device);
+        }
+
+        /// <summary>
+        /// Requests setting and clearing policy flags on a specific device
+        ///  
+        /// A request to change a policy is subject to user approval and a policy 
+        /// can be changed by the user at any time (using the Leap Motion settings dialog). 
+        /// The desired policy flags must be set every time an application runs. 
+        ///  
+        /// Policy changes are completed asynchronously and, because they are subject 
+        /// to user approval or system compatibility checks, may not complete successfully. Call 
+        /// Controller.IsPolicySet() after a suitable interval to test whether 
+        /// the change was accepted. 
+        /// @since 2.1.6 (5.4.4 for specific device)
+        /// </summary>
+        public void SetAndClearPolicy(PolicyFlag set, PolicyFlag clear, Device device = null)
         {
             _connection.SetAndClearPolicy(set, clear, device);
         }

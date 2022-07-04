@@ -6,7 +6,6 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Leap.Unity.Interaction.Internal;
 using Leap.Unity.Space;
 using System;
 using System.Collections.Generic;
@@ -14,7 +13,7 @@ using UnityEngine;
 
 namespace Leap.Unity.Interaction
 {
-
+#pragma warning disable 0618
     /// <summary>
     /// ActivityManager is a wrapper around PhysX sphere queries for arbitrary Unity objects.
     /// "Active" objects are objects found in the latest query. It's also possible to get the
@@ -95,104 +94,78 @@ namespace Leap.Unity.Interaction
         private static Collider[] s_colliderResultsBuffer = new Collider[32];
         public void UpdateActivityQuery(Vector3? queryPosition, List<LeapSpace> spaces = null)
         {
-            using (new ProfilerSample("Update Activity Manager"))
+            _activeObjects.Clear();
+
+            // Make sure collider results buffer exists (for other threads; see ThreadStatic)
+            if (s_colliderResultsBuffer == null || s_colliderResultsBuffer.Length < 32)
             {
-                using (new ProfilerSample("Initialize Buffers"))
-                {
-                    _activeObjects.Clear();
+                s_colliderResultsBuffer = new Collider[32];
+            }
 
-                    // Make sure collider results buffer exists (for other threads; see ThreadStatic)
-                    if (s_colliderResultsBuffer == null || s_colliderResultsBuffer.Length < 32)
+            // Update object activity by activation radius around the query position (PhysX colliders necessary).
+            // queryPosition can be null, in which case no objects will be found, and they will all become inactive.
+            if (queryPosition.HasValue)
+            {
+                Vector3 actualQueryPosition = queryPosition.GetValueOrDefault();
+
+                int count = GetSphereColliderResults(actualQueryPosition, ref s_colliderResultsBuffer);
+                UpdateActiveList(count, s_colliderResultsBuffer);
+            }
+
+            if (trackStateChanges)
+            {
+                _endedActiveObjects.Clear();
+                _beganActiveObjects.Clear();
+
+                foreach (var behaviour in _activeObjects)
+                {
+                    if (!_activeObjectsLastFrame.Contains(behaviour))
                     {
-                        s_colliderResultsBuffer = new Collider[32];
+                        _beganActiveObjects.Add(behaviour);
                     }
                 }
 
-                // Update object activity by activation radius around the query position (PhysX colliders necessary).
-                // queryPosition can be null, in which case no objects will be found, and they will all become inactive.
-                if (queryPosition.HasValue)
+                foreach (var behaviour in _activeObjectsLastFrame)
                 {
-                    Vector3 actualQueryPosition = queryPosition.GetValueOrDefault();
-
-                    int count = GetSphereColliderResults(actualQueryPosition, ref s_colliderResultsBuffer);
-                    UpdateActiveList(count, s_colliderResultsBuffer);
-
-                    using (new ProfilerSample("Check GUI Spaces"))
+                    if (!_activeObjects.Contains(behaviour))
                     {
-                        if (spaces != null)
-                        {
-                            //Check once in each of the GUI's subspaces
-                            foreach (LeapSpace space in spaces)
-                            {
-                                count = GetSphereColliderResults(transformPoint(actualQueryPosition, space), ref s_colliderResultsBuffer);
-                                UpdateActiveList(count, s_colliderResultsBuffer);
-                            }
-                        }
+                        _endedActiveObjects.Add(behaviour);
                     }
                 }
 
-                using (new ProfilerSample("Track State Changes"))
+                _activeObjectsLastFrame.Clear();
+                foreach (var behaviour in _activeObjects)
                 {
-                    if (trackStateChanges)
-                    {
-                        _endedActiveObjects.Clear();
-                        _beganActiveObjects.Clear();
-
-                        foreach (var behaviour in _activeObjects)
-                        {
-                            if (!_activeObjectsLastFrame.Contains(behaviour))
-                            {
-                                _beganActiveObjects.Add(behaviour);
-                            }
-                        }
-
-                        foreach (var behaviour in _activeObjectsLastFrame)
-                        {
-                            if (!_activeObjects.Contains(behaviour))
-                            {
-                                _endedActiveObjects.Add(behaviour);
-                            }
-                        }
-
-                        _activeObjectsLastFrame.Clear();
-                        foreach (var behaviour in _activeObjects)
-                        {
-                            _activeObjectsLastFrame.Add(behaviour);
-                        }
-                    }
+                    _activeObjectsLastFrame.Add(behaviour);
                 }
             }
         }
 
         private int GetSphereColliderResults(Vector3 position, ref Collider[] resultsBuffer)
         {
-            using (new ProfilerSample("GetSphereColliderResults()"))
+            int layerMask = activationLayerFunction == null ? activationLayerMask : activationLayerFunction();
+            int overlapCount = 0;
+            while (true)
             {
-
-                int layerMask = activationLayerFunction == null ? activationLayerMask : activationLayerFunction();
-                int overlapCount = 0;
-                while (true)
+                overlapCount = Physics.OverlapSphereNonAlloc(position,
+                                                             activationRadius,
+                                                             resultsBuffer,
+                                                             layerMask,
+                                                             QueryTriggerInteraction.Collide);
+                if (overlapCount < resultsBuffer.Length)
                 {
-                    overlapCount = Physics.OverlapSphereNonAlloc(position,
-                                                                 activationRadius,
-                                                                 resultsBuffer,
-                                                                 layerMask,
-                                                                 QueryTriggerInteraction.Collide);
-                    if (overlapCount < resultsBuffer.Length)
-                    {
-                        break;
-                    }
-                    else
-                    {
-                        // Non-allocating sphere-overlap fills the existing _resultsBuffer array.
-                        // If the output overlapCount is equal to the array's length, there might be more collision results
-                        // that couldn't be returned because the array wasn't large enough, so try again with increased length.
-                        // The _in, _out argument setup allows allocating a new array from within this function.
-                        resultsBuffer = new Collider[resultsBuffer.Length * 2];
-                    }
+                    break;
                 }
-                return overlapCount;
+                else
+                {
+                    // Non-allocating sphere-overlap fills the existing _resultsBuffer array.
+                    // If the output overlapCount is equal to the array's length, there might be more collision results
+                    // that couldn't be returned because the array wasn't large enough, so try again with increased length.
+                    // The _in, _out argument setup allows allocating a new array from within this function.
+                    resultsBuffer = new Collider[resultsBuffer.Length * 2];
+                }
             }
+            return overlapCount;
         }
 
         private void UpdateActiveList(int numResults, Collider[] results)
@@ -213,11 +186,6 @@ namespace Leap.Unity.Interaction
                 }
             }
         }
-
-        private Vector3 transformPoint(Vector3 worldPoint, LeapSpace space)
-        {
-            Vector3 localPalmPos = space.transform.InverseTransformPoint(worldPoint);
-            return space.transform.TransformPoint(space.transformer.InverseTransformPoint(localPalmPos));
-        }
     }
+#pragma warning restore 0618
 }

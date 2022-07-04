@@ -6,7 +6,7 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Leap.Unity.Query;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
@@ -30,19 +30,19 @@ namespace Leap.Unity.Interaction
             deferProperty("_eventTable");
             specifyCustomDrawer("_eventTable", drawEventTable);
 
-            specifyConditionalDrawing(() => !targets.Query().All(intObj => intObj.ignoreContact),
+            specifyConditionalDrawing(() => !targets.All(intObj => intObj.ignoreContact),
                                       "_contactForceMode");
 
-            specifyConditionalDrawing(() => !targets.Query().All(intObj => intObj.ignoreGrasping),
+            specifyConditionalDrawing(() => !targets.All(intObj => intObj.ignoreGrasping),
                                       "_allowMultiGrasp",
                                       "_moveObjectWhenGrasped",
                                       "graspedMovementType");
 
             // Layer Overrides
-            specifyConditionalDrawing(() => targets.Query().Any(intObj => intObj.overrideInteractionLayer),
+            specifyConditionalDrawing(() => targets.Any(intObj => intObj.overrideInteractionLayer),
                                       "_interactionLayer");
             specifyCustomDecorator("_interactionLayer", drawInteractionLayerDecorator);
-            specifyConditionalDrawing(() => targets.Query().Any(intObj => intObj.overrideNoContactLayer),
+            specifyConditionalDrawing(() => targets.Any(intObj => intObj.overrideNoContactLayer),
                                       "_noContactLayer");
             specifyCustomDecorator("_noContactLayer", drawNoContactLayerDecorator);
         }

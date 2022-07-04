@@ -12,6 +12,7 @@ using UnityEngine;
 
 namespace Leap.Unity
 {
+#pragma warning disable 0618
     /**
      * A HandModel that draws lines for the bones in the hand and its fingers.
      *
@@ -111,6 +112,7 @@ namespace Leap.Unity
             }
         }
 
+        [System.Obsolete("This signature will be removed in the next major version of the plugin. Use the version with VEctor3 instead. If you believe that it needs to be kept, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
         public void DrawBasis(Vector position, LeapTransform basis, float scale)
         {
             Vector3 origin = position.ToVector3();
@@ -118,6 +120,14 @@ namespace Leap.Unity
             Debug.DrawLine(origin, origin + basis.yBasis.ToVector3() * scale, Color.green);
             Debug.DrawLine(origin, origin + basis.zBasis.ToVector3() * scale, Color.blue);
         }
+        public void DrawBasis(Vector3 position, LeapTransform basis, float scale)
+        {
+            Vector3 origin = position;
+            Debug.DrawLine(origin, origin + basis.xBasis.ToVector3() * scale, Color.red);
+            Debug.DrawLine(origin, origin + basis.yBasis.ToVector3() * scale, Color.green);
+            Debug.DrawLine(origin, origin + basis.zBasis.ToVector3() * scale, Color.blue);
+        }
 
     }
+#pragma warning restore 0618
 }

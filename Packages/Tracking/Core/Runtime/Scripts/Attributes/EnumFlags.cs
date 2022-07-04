@@ -8,6 +8,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
@@ -15,8 +16,6 @@ using UnityEditor;
 
 namespace Leap.Unity.Attributes
 {
-    using Query;
-
     public class EnumFlags : CombinablePropertyAttribute, IFullPropertyDrawer
     {
 
@@ -33,7 +32,7 @@ namespace Leap.Unity.Attributes
                 string[] names = (string[])Enum.GetNames(fieldInfo.FieldType);
                 int[] values = (int[])Enum.GetValues(fieldInfo.FieldType);
 
-                int count = values.Query().Count(v => v != 0);
+                int count = values.Count(v => v != 0);
                 _enumNames = new string[count];
                 _enumValues = new int[count];
 

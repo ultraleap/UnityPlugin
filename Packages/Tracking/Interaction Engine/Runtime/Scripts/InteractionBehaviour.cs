@@ -9,10 +9,10 @@
 using Leap.Interaction.Internal.InteractionEngineUtility;
 using Leap.Unity.Attributes;
 using Leap.Unity.Interaction.Internal;
-using Leap.Unity.Query;
 using Leap.Unity.Space;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Leap.Unity.Interaction
@@ -329,7 +329,7 @@ namespace Leap.Unity.Interaction
         /// If no controllers (Leap hands or supported VR controllers) are currently grasping this object,
         /// returns null.
         /// </summary>
-        public InteractionController graspingController { get { return _graspingControllers.Query().FirstOrDefault(); } }
+        public InteractionController graspingController { get { return _graspingControllers.FirstOrDefault(); } }
 
         /// <summary>
         /// Gets the set of all interaction controllers currently grasping this object. Interaction
@@ -346,7 +346,13 @@ namespace Leap.Unity.Interaction
             get
             {
                 _graspingHandsBuffer.Clear();
-                _graspingControllers.Query().OfType<InteractionHand>().FillHashSet(_graspingHandsBuffer);
+                var hands = _graspingControllers.OfType<InteractionHand>();
+
+                foreach (InteractionHand hand in hands)
+                {
+                    _graspingHandsBuffer.Add(hand);
+                }
+
                 return _graspingHandsBuffer;
             }
         }
@@ -678,6 +684,7 @@ namespace Leap.Unity.Interaction
         /// <summary>
         /// A maximum of one (1) LeapSpace is supported per InteractionBehaviour.
         /// </summary>
+        [System.Obsolete("This code will be removed in the next major version of the plugin. If you believe that it needs to be kept, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
         public ISpaceComponent space { get; protected set; }
 
         [Header("Interaction Overrides")]
@@ -769,10 +776,13 @@ namespace Leap.Unity.Interaction
 
                 if (isGrasped && _ignoreGraspingMode != IgnoreHoverMode.None)
                 {
-                    if ((_ignoreGraspingMode == IgnoreHoverMode.Left && graspingControllers.Query().FirstOrNone(x => x.isLeft) != null) ||
-                        (_ignoreGraspingMode == IgnoreHoverMode.Right && graspingControllers.Query().FirstOrNone(x => x.isRight) != null))
+                    foreach (var graspingController in graspingControllers)
                     {
-                        graspingController.ReleaseGrasp();
+                        if ((graspingController.isLeft && _ignoreGraspingMode == IgnoreHoverMode.Left) ||
+                            graspingController.isRight && _ignoreGraspingMode == IgnoreHoverMode.Right)
+                        {
+                            graspingController.ReleaseGrasp();
+                        }
                     }
                 }
             }
@@ -1004,18 +1014,6 @@ namespace Leap.Unity.Interaction
 
             // Make sure we have a list of all of this object's colliders.
             RefreshInteractionColliders();
-
-            // Refresh curved space. Currently a maximum of one (1) LeapSpace is supported per
-            // InteractionBehaviour.
-            foreach (var collider in _interactionColliders)
-            {
-                var leapSpace = collider.transform.GetComponentInParent<ISpaceComponent>();
-                if (leapSpace != null)
-                {
-                    space = leapSpace;
-                    break;
-                }
-            }
 
             // Ensure physics layers are set up properly.
             initLayers();
@@ -1562,7 +1560,7 @@ namespace Leap.Unity.Interaction
             // If multi-grasp is not allowed, release the old grasp.
             if (!allowMultiGrasp && isGrasped)
             {
-                _graspingControllers.Query().First().ReleaseGrasp();
+                _graspingControllers.First().ReleaseGrasp();
             }
 
             // Add each newly grasping hand to internal reference and pose solver.
@@ -1657,7 +1655,7 @@ namespace Leap.Unity.Interaction
 
                 if (controllers.Count == 1)
                 {
-                    throwHandler.OnThrow(this, controllers.Query().First());
+                    throwHandler.OnThrow(this, controllers.First());
                 }
 
                 OnGraspEnd();
@@ -1825,50 +1823,47 @@ namespace Leap.Unity.Interaction
 
         private void fixedUpdateLayers()
         {
-            using (new ProfilerSample("Interaction Behaviour: fixedUpdateLayers"))
-            {
-                int layer;
-                refreshInteractionLayer();
-                refreshNoContactLayer();
+            int layer;
+            refreshInteractionLayer();
+            refreshNoContactLayer();
 
-                // Update the object's layer based on interaction state.
-                if (ignoreContact)
+            // Update the object's layer based on interaction state.
+            if (ignoreContact)
+            {
+                layer = noContactLayer;
+            }
+            else
+            {
+                if (isGrasped)
                 {
                     layer = noContactLayer;
                 }
                 else
                 {
-                    if (isGrasped)
-                    {
-                        layer = noContactLayer;
-                    }
-                    else
-                    {
-                        layer = interactionLayer;
-                    }
+                    layer = interactionLayer;
                 }
-                if (this.gameObject.layer != layer)
-                {
-                    this.gameObject.layer = layer;
+            }
+            if (this.gameObject.layer != layer)
+            {
+                this.gameObject.layer = layer;
 
-                    refreshInteractionColliderLayers();
-                }
+                refreshInteractionColliderLayers();
+            }
 
-                // Update the manager if necessary.
+            // Update the manager if necessary.
 
-                if (interactionLayer != _lastInteractionLayer)
-                {
-                    (manager as IInternalInteractionManager).NotifyIntObjHasNewInteractionLayer(this, oldInteractionLayer: _lastInteractionLayer,
-                                                                                                      newInteractionLayer: interactionLayer);
-                    _lastInteractionLayer = interactionLayer;
-                }
+            if (interactionLayer != _lastInteractionLayer)
+            {
+                (manager as IInternalInteractionManager).NotifyIntObjHasNewInteractionLayer(this, oldInteractionLayer: _lastInteractionLayer,
+                                                                                                  newInteractionLayer: interactionLayer);
+                _lastInteractionLayer = interactionLayer;
+            }
 
-                if (noContactLayer != _lastNoContactLayer)
-                {
-                    (manager as IInternalInteractionManager).NotifyIntObjHasNewNoContactLayer(this, oldNoContactLayer: _lastNoContactLayer,
-                                                                                                    newNoContactLayer: noContactLayer);
-                    _lastNoContactLayer = noContactLayer;
-                }
+            if (noContactLayer != _lastNoContactLayer)
+            {
+                (manager as IInternalInteractionManager).NotifyIntObjHasNewNoContactLayer(this, oldNoContactLayer: _lastNoContactLayer,
+                                                                                                newNoContactLayer: noContactLayer);
+                _lastNoContactLayer = noContactLayer;
             }
         }
 
