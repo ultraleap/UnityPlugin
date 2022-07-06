@@ -30,7 +30,7 @@ namespace Leap.Unity.Attachments
     public class AttachmentHands : MonoBehaviour
     {
         [Tooltip("The Leap Provider the attachment hands use to generate the transform hierarchy." +
-            " If left empty, AttachmentHands defaults to the provider used in Leap.Unity.Hands")]
+            " If left empty, AttachmentHands will attempt to find a LeapProvider in scene.")]
         [SerializeField]
         private LeapProvider _leapProvider;
 
@@ -81,6 +81,15 @@ namespace Leap.Unity.Attachments
         /// but can be modified freely afterwards.
         /// </summary>
         public AttachmentHand[] attachmentHands { get { return _attachmentHands; } set { _attachmentHands = value; } }
+
+        /// <summary>
+        /// Allows you to set a LeapProvider to generate transforms from for attachment hands.
+        /// </summary>
+        public void SetLeapProvider(LeapProvider provider)
+        {
+            _leapProvider = provider;
+            reinitialize();
+        }
 
 #if UNITY_EDITOR
         void OnValidate()
@@ -163,6 +172,10 @@ namespace Leap.Unity.Attachments
                 {
                     _handAccessors[0] = new Func<Hand>(() => _leapProvider.CurrentFrame?.GetHand(Chirality.Left));
                     _handAccessors[1] = new Func<Hand>(() => _leapProvider.CurrentFrame?.GetHand(Chirality.Right));
+                }
+                else
+                {
+                    Debug.LogWarning("AttachmentHands failed to find a LeapProvider! Is one present in your scene?");
                 }
 
             }
