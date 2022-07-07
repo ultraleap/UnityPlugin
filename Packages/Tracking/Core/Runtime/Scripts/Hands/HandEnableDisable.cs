@@ -18,6 +18,12 @@ namespace Leap.Unity
     /// </summary>
     public class HandEnableDisable : HandTransitionBehavior
     {
+
+        [Tooltip("Enable this to stop HandEnableDisable from changing whether the hand is enabled or disabled"
+       + "when the hand tracked state is changed")]
+        public bool IgnoreHandState = false;
+
+
         protected override void Awake()
         {
             // Suppress Warnings Related to Kinematic Rigidbodies not supporting Continuous Collision Detection
@@ -35,11 +41,20 @@ namespace Leap.Unity
 
         protected override void HandReset()
         {
+            if (IgnoreHandState)
+            {
+                return;
+            }
+
             gameObject.SetActive(true);
         }
 
         protected override void HandFinish()
         {
+            if (IgnoreHandState)
+            {
+                return;
+            }
             gameObject.SetActive(false);
         }
 

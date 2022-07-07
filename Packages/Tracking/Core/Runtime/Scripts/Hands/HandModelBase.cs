@@ -141,6 +141,7 @@ namespace Leap.Unity
         [EditTimeOnly]
         private LeapProvider _leapProvider;
 
+
         /// <summary>
         /// Optionally set a Leap Provider to use for tracking frames.
         /// If you do not set one, the first provider found in the scene will be used.
