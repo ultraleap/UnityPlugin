@@ -7,6 +7,11 @@
  ******************************************************************************/
 
 
+using System.ComponentModel;
+using System.Diagnostics;
+using System.IO;
+using Debug = UnityEngine.Debug;
+
 namespace LeapInternal
 {
     using System;
@@ -998,7 +1003,40 @@ namespace LeapInternal
 
     public class LeapC
     {
-        private LeapC() { }
+#if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
+        [DllImport("kernel32", SetLastError=true, CharSet = CharSet.Ansi)]
+        static extern IntPtr LoadLibrary([MarshalAs(UnmanagedType.LPStr)]string lpFileName);
+
+        static LeapC()
+        {
+            var installLocation = Microsoft.Win32.Registry.GetValue("HKEY_LOCAL_MACHINE\\SOFTWARE\\WOW6432Node\\Ultraleap\\Leap Service-64", "",
+                null);
+
+            if (installLocation == null)
+            {
+                Debug.LogError("Could not locate Leap Service-64: not installed or install is too old (registry key missing)");
+                return;
+            }
+
+            var x64FolderPath = Path.Combine((string)installLocation, "LeapSDK", "lib", "x64", "LeapC.dll");
+            if (!File.Exists(x64FolderPath))
+            {
+                Debug.LogError("Service is installed but could not locate LeapC.dll - install may be too old");
+                return;
+            }
+
+            // Add the directory of the native dll
+            // Unity doesn't allow unloading native dlls - after it's loaded it's in until Unity terminates
+            // so we don't need to care about the handle
+            if (LoadLibrary(x64FolderPath) == IntPtr.Zero)
+            {
+                var error = new Win32Exception(Marshal.GetLastWin32Error());
+                Debug.LogError($"Error while loading LeapC: {error}");
+            }
+        }
+#endif
+        
+        private LeapC() {}
         public static int DistortionSize = 64;
 
         [DllImport("LeapC", EntryPoint = "LeapSetTrackingMode")]
