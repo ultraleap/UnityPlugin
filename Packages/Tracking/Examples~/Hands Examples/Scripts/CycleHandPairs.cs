@@ -13,13 +13,19 @@ namespace Leap.Unity.HandsModule.Examples
 {
     public class CycleHandPairs : MonoBehaviour
     {
-        public List<GameObject> handList;
+        [SerializeField]
+        private HandModelManager handModelManager;
         private int currentHandID;
 
         // Use this for initialization
         void Start()
         {
+            if (handModelManager == null)
+            {
+                handModelManager = FindObjectOfType<HandModelManager>();
+            }
             currentHandID = 0;
+            handModelManager.EnableHandModelPair(currentHandID, true);
         }
 
         // Update is called once per frame
@@ -27,26 +33,27 @@ namespace Leap.Unity.HandsModule.Examples
         {
             if (Input.GetKeyUp(KeyCode.RightArrow))
             {
-                currentHandID++;
-                if (currentHandID > handList.Count - 1) currentHandID = 0;
+                NextHandSet();
             }
 
             if (Input.GetKeyUp(KeyCode.LeftArrow))
             {
-                currentHandID--;
-                if (currentHandID < 0) currentHandID = handList.Count - 1;
+                PreviousHandSet();
             }
-
-            SortHands();
         }
 
-        void SortHands()
+        private void NextHandSet()
         {
-            for (int i = 0; i < handList.Count; i++)
-            {
-                var hand = handList[i];
-                hand.gameObject.SetActive(i == currentHandID ? true : false);
-            }
+            currentHandID++;
+            if (currentHandID > handModelManager.handModelPairs.Count - 1) currentHandID = 0;
+            handModelManager.EnableHandModelPair(currentHandID, true);
+        }
+
+        private void PreviousHandSet()
+        {
+            currentHandID--;
+            if (currentHandID < 0) currentHandID = handModelManager.handModelPairs.Count - 1;
+            handModelManager.EnableHandModelPair(currentHandID, true);
         }
     }
 }
