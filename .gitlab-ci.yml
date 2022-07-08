@@ -69,7 +69,7 @@ check-formatting:
     # Make sure our copyrights have the correct date
     - $CurrentYear = Get-Date -Format yyyy;
     - |
-      Get-ChildItem -Path "Packages/" -Filter *.cs -Recurse -File -Name | ForEach-Object {
+      Get-ChildItem -Path "$PACKAGES_PATH/" -Filter *.cs -Recurse -File -Name | ForEach-Object {
           $ScriptContent = Get-Content -Path "$PACKAGES_PATH/$_";
           if ($ScriptContent[1] -Like "*Copyright (C) Ultraleap*") {
               $ScriptContent[1] =  " * Copyright (C) Ultraleap, Inc. 2011-$CurrentYear.                                   *";
