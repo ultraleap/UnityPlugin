@@ -392,9 +392,12 @@ namespace Leap.Unity.HandsModule
                 {
                     handModelPair.LeftEnableDisable.FreezeHandState = false;
                 }
-                if (handModelPair.Left != null && handModelPair.Left.IsTracked)
+                if (handModelPair.Left != null)
                 {
-                    handModelPair.Left.gameObject.SetActive(true);
+                    if (handModelPair.Left.IsTracked)
+                    {
+                        handModelPair.Left.gameObject.SetActive(true);
+                    }
                     OnHandModelEnabled?.Invoke(handModelPair.Left);
                 }
             }
@@ -407,7 +410,10 @@ namespace Leap.Unity.HandsModule
 
                 if (handModelPair.Right != null && handModelPair.Right.IsTracked)
                 {
-                    handModelPair.Right.gameObject.SetActive(true);
+                    if (handModelPair.Left.IsTracked)
+                    {
+                        handModelPair.Right.gameObject.SetActive(true);
+                    }
                     OnHandModelEnabled?.Invoke(handModelPair.Right);
                 }
             }
