@@ -6,6 +6,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [docs-website]: https://docs.ultraleap.com/unity-api/ "Ultraleap Docs"
 
+## [5.13.0]
+
+### Added
+- Added HandModelManager to the Hands Module - an easy way to enable/disable hand models
+- Added option to freeze hand state on HandEnableDisable
+
+### Changed
+- Changed Rigged Hand Example scenes to use HandModelManager
+
 ## [5.12.0] - 04/07/2022
 
 ### Announcements
