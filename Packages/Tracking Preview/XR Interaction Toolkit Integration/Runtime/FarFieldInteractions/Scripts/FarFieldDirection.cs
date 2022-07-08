@@ -71,11 +71,12 @@ namespace Leap.Unity.Preview.FarFieldInteractions
             public Vector3 ShoulderPosition;
         }
 
-        public delegate void FarFieldHandDirectionFrame(FarFieldHandDirection[] farFieldHandDirection);
         /// <summary>
         /// event that is called after new rays directions have been calculated. Subscribe to it to cast rays with the far field hand directions it provides.
         /// </summary>
-        public static event FarFieldHandDirectionFrame OnFarFieldHandDirectionFrame;
+        public static event Action<FarFieldHandDirection[]> OnFarFieldHandDirectionFrame;
+
+        [Header("Raycast")]
         /// <summary>
         /// the aim position specifies the position that the ray goes through
         /// </summary>
@@ -94,6 +95,7 @@ namespace Leap.Unity.Preview.FarFieldInteractions
         /// </summary>
         public bool useOneEuroFilter = true;
 
+        [Header("WristOffset")]
         /// <summary>
         /// the wrist offset is only used when the rayOrigin is the wrist or wristShoulderLerp and 
         /// specifies a position offset
@@ -104,19 +106,6 @@ namespace Leap.Unity.Preview.FarFieldInteractions
         /// It specifies how much the wrist vs the shoulder is used as a ray origin.
         /// </summary>
         [Range(0.01f, 1)] public float wristShoulderLerpAmount;
-
-        /// <summary>
-        /// show stabilizer cubes
-        /// </summary>
-        public bool showCubes;
-        /// <summary>
-        /// stabilizer cubes
-        /// </summary>
-        public GameObject leftCube, rightCube;
-        /// <summary>
-        /// if true, some default values are used as wrist offset position and aim position
-        /// </summary>
-        public bool fakeRightHandData = false;
 
         /// <summary>
         /// an array holding the left hand and shoulder and the right hand and shoulder
@@ -168,8 +157,6 @@ namespace Leap.Unity.Preview.FarFieldInteractions
             {
                 return;
             }
-            leftCube.SetActive(false);
-            rightCube.SetActive(false);
 
             for (int i = 0; i < aimPositionFilters.Length; i++)
             {
@@ -226,9 +213,6 @@ namespace Leap.Unity.Preview.FarFieldInteractions
                 FarFieldRays[i].DebugAimPosition = FarFieldRays[i].AimPosition;
                 FarFieldRays[i].DebugRayOrigin = FarFieldRays[i].RayOrigin;
                 FarFieldRays[i].DebugDirection = (FarFieldRays[i].DebugAimPosition - FarFieldRays[i].DebugRayOrigin).normalized;
-
-                UpdateCubePosition(HandShoulders[i]);
-
             }
             OnFarFieldHandDirectionFrame?.Invoke(FarFieldRays);
         }
@@ -240,11 +224,6 @@ namespace Leap.Unity.Preview.FarFieldInteractions
 
         private Vector3 GetAimPosition(HandShoulder handShoulder, AimPosition aimPos)
         {
-            if (fakeRightHandData && handShoulder.Hand.IsRight)
-            {
-                return new Vector3(0.215f, 1.23f, -0.164f);
-            }
-
             switch (aimPos)
             {
                 case AimPosition.PREDICTED_PINCH:
@@ -281,11 +260,6 @@ namespace Leap.Unity.Preview.FarFieldInteractions
 
         private Vector3 GetWristOffsetPosition(HandShoulder handShoulder)
         {
-            if (fakeRightHandData && handShoulder.Hand.IsRight)
-            {
-                return new Vector3(0.199f, 1.255f, -0.307f);
-            }
-
             Vector3 worldWristPosition = wristOffset;
             if (handShoulder.Hand.IsRight)
             {
@@ -309,26 +283,6 @@ namespace Leap.Unity.Preview.FarFieldInteractions
             transformHelper.transform.position = handShoulder.Hand.Arm.ElbowPosition.ToVector3();
             transformHelper.transform.rotation = handShoulder.Hand.Arm.Rotation.ToQuaternion();
             return transformHelper.TransformPoint(worldElbowPosition);
-        }
-
-        private void UpdateCubePosition(HandShoulder handShoulder)
-        {
-            if (!showCubes)
-            {
-                return;
-            }
-
-            GameObject cube;
-            if (handShoulder.Hand.IsLeft)
-            {
-                cube = leftCube;
-            }
-            else
-            {
-                cube = rightCube;
-            }
-            cube.SetActive(true);
-            cube.transform.position = FarFieldRays[handShoulder.Hand.IsLeft ? 0 : 1].RayOrigin;
         }
     }
 #pragma warning restore 0618
