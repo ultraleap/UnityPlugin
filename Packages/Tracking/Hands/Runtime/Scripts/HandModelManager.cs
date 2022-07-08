@@ -43,8 +43,7 @@ namespace Leap.Unity.HandsModule
         /// </summary>
         public void RegisterAllUnregisteredHandModels()
         {
-            handModelPairs = new List<HandModelPair>();
-            HandModelBase[] unpairedHandModels = FindObjectsOfType<HandModelBase>();
+            HandModelBase[] unpairedHandModels = FindObjectsOfType<HandModelBase>(true);
 
             for (int i = 0; i < unpairedHandModels.Length; i++)
             {
@@ -80,7 +79,7 @@ namespace Leap.Unity.HandsModule
         public void RegisterHandModel(HandModelBase handModel, bool attemptToRegisterPair = true)
         {
             int handModelPairIndex = GenerateHandModelIndex(handModel, attemptToRegisterPair);
-            
+
             RegisterHandModel(handModel, handModelPairIndex);
         }
 
@@ -108,10 +107,8 @@ namespace Leap.Unity.HandsModule
                 handModelPairs[handModelPairIndex].RightEnableDisable = handEnableDisable;
             }
 
-            if(handModelPairs[handModelPairIndex].HandModelPairId == null || handModelPairs[handModelPairIndex].HandModelPairId == "")
+            if (handModelPairs[handModelPairIndex].HandModelPairId == null || handModelPairs[handModelPairIndex].HandModelPairId == "")
             {
-
-
                 handModelPairs[handModelPairIndex].HandModelPairId = GetDistinctHandModelId(handModel.gameObject.transform.parent.name);
             }
         }
@@ -142,7 +139,7 @@ namespace Leap.Unity.HandsModule
         {
             int handModelPairIndex = handModelPairs.Count;
 
-            if (!attemptToFindPair) 
+            if (!attemptToFindPair)
             {
                 handModelPairs.Add(new HandModelPair());
             }
@@ -161,7 +158,7 @@ namespace Leap.Unity.HandsModule
                     potentialRegisteredHandPair = handModelPairs[i].Left;
                 }
 
-                if (handModel.gameObject.transform.parent == potentialRegisteredHandPair.gameObject.transform.parent && handModel.GetType() == potentialRegisteredHandPair.GetType())
+                if (handModel.gameObject.transform.parent == potentialRegisteredHandPair.gameObject.transform.parent)
                 {
                     handModelPairIndex = i;
                     return handModelPairIndex;
@@ -170,11 +167,11 @@ namespace Leap.Unity.HandsModule
 
             //If not found in previously registered hands, look for in the parent transform
             HandModelBase potentialHandPair = handModel.gameObject.transform.parent.GetComponentsInChildren<HandModelBase>().FirstOrDefault(hmb => hmb != handModel);
-            
+
             handModelPairs.Add(new HandModelPair());
-            
+
             //Register the found pair, then return the pair index
-            if(potentialHandPair != null)
+            if (potentialHandPair != null)
             {
                 RegisterHandModel(potentialHandPair, handModelPairIndex);
             }
@@ -211,12 +208,131 @@ namespace Leap.Unity.HandsModule
             }
         }
 
+        #region Getters
+
+        /// <summary>
+        /// Returns all hands which will be active if a hand appears in the scene
+        /// This includes hands whose EnableDisable is not frozen, or are frozen in an active state
+        /// </summary>
+        /// <returns>Returns all hands which will be active if a hand appears in the scene</returns>
+        public List<HandModelBase> GetActiveHandsInScene()
+        {
+            List<HandModelBase> activeHands = new List<HandModelBase>();
+            foreach (HandModelPair handModelPair in handModelPairs)
+            {
+                if (!handModelPair.LeftEnableDisable.FreezeHandState ||
+                    handModelPair.LeftEnableDisable.FreezeHandState && handModelPair.Left.isActiveAndEnabled)
+                {
+                    activeHands.Add(handModelPair.Left);
+                }
+
+                if (!handModelPair.RightEnableDisable.FreezeHandState ||
+                    handModelPair.RightEnableDisable.FreezeHandState && handModelPair.Right.isActiveAndEnabled)
+                {
+                    activeHands.Add(handModelPair.Right);
+                }
+            }
+            return activeHands;
+        }
+
+        /// <summary>
+        /// Returns a hand model pair by index, if given a valid index
+        /// </summary>
+        /// <param name="index">The index of the hand model pair</param>
+        /// <param name="handModelPair">The hand model pair to be returned</param>
+        /// <returns>Returns true if the pair have been found, and false if not</returns>
+        public bool GetHandModelPair(int index, out HandModelPair handModelPair)
+        {
+            handModelPair = null;
+            if (index >= 0 && index < handModelPairs.Count)
+            {
+                handModelPair = handModelPairs[index];
+                return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Returns a hand model pair by index, if given a valid index
+        /// </summary>
+        /// <param name="handModelPairID">The handModelPairID of the hand model pair</param>
+        /// <param name="handModelPair">The hand model pair to be returned</param>
+        /// <returns>Returns true if the pair have been found, and false if not</returns>
+        public bool GetHandModelPair(string handModelPairID, out HandModelPair handModelPair)
+        {
+            handModelPair = null;
+            if (handModelPairID != null)
+            {
+                handModelPair = handModelPairs.FirstOrDefault(hmp => hmp.HandModelPairId == handModelPairID);
+                return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Returns a hand model by index, if given a valid index
+        /// </summary>
+        /// <param name="chirality">The chirality of the hand model</param>
+        /// <param name="index">The index of the hand model</param>
+        /// <param name="handModelBase">The hand model to be returned</param>
+        /// <returns>Returns true if the pair have been found, and false if not</returns>
+        public bool GetHandModel(Chirality chirality, int index, out HandModelBase handModelBase)
+        {
+            handModelBase = null;
+
+            HandModelPair handModelPair;
+            bool success = GetHandModelPair(index, out handModelPair);
+            if (success)
+            {
+                if (chirality == Chirality.Left)
+                {
+                    handModelBase = handModelPair.Left;
+                }
+                else
+                {
+                    handModelBase = handModelPair.Right;
+                }
+                return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Returns a hand model by index, if given a valid index
+        /// </summary>
+        /// <param name="chirality">The chirality of the hand model</param>
+        /// <param name="handModelPairID">The handModelPairID of the hand model</param>
+        /// <param name="handModelBase">The hand model to be returned</param>
+        /// <returns>Returns true if the pair have been found, and false if not</returns>
+        public bool GetHandModel(Chirality chirality, string handModelPairID, out HandModelBase handModelBase)
+        {
+            handModelBase = null;
+
+            HandModelPair handModelPair;
+            bool success = GetHandModelPair(handModelPairID, out handModelPair);
+            if (success)
+            {
+                if (chirality == Chirality.Left)
+                {
+                    handModelBase = handModelPair.Left;
+                }
+                else
+                {
+                    handModelBase = handModelPair.Right;
+                }
+                return true;
+            }
+            return false;
+        }
+        #endregion
+
+        #region EnableHandModels
         /// <summary>
         /// Enable a hand model pair in the scene
         /// </summary>
         /// <param name="index">The index of the pair to enable</param>
         /// <param name="disableOtherHands">If true, disable all other active hands</param>
-        public void EnableHandModelPair(int index, bool disableOtherHands = false)
+        public void EnableHandModelPair(int index, bool disableOtherHands = true)
         {
             EnableHandModel(Chirality.Left, index, disableOtherHands);
             EnableHandModel(Chirality.Right, index, disableOtherHands);
@@ -227,7 +343,7 @@ namespace Leap.Unity.HandsModule
         /// </summary>
         /// <param name="handModelPairID">The string id of the hand model pair to enable</param>
         /// <param name="disableOtherHands">If true, disable all other active hand models</param>
-        public void EnableHandModelPair(string handModelPairID, bool disableOtherHands = false)
+        public void EnableHandModelPair(string handModelPairID, bool disableOtherHands = true)
         {
             EnableHandModelPair(Chirality.Left, handModelPairID, disableOtherHands);
             EnableHandModelPair(Chirality.Right, handModelPairID, disableOtherHands);
@@ -239,7 +355,7 @@ namespace Leap.Unity.HandsModule
         /// <param name="chirality">The chirality to enable</param>
         /// <param name="index">The index of the hand model to enable</param>
         /// <param name="disableOtherHandsOfSameChirality">If true, disable all other active hand models of the same chirality</param>
-        public void EnableHandModel(Chirality chirality, int index, bool disableOtherHandsOfSameChirality = false)
+        public void EnableHandModel(Chirality chirality, int index, bool disableOtherHandsOfSameChirality = true)
         {
             HandModelPair handModelPair = handModelPairs[index];
             EnableHandModel(chirality, handModelPair, disableOtherHandsOfSameChirality);
@@ -251,7 +367,7 @@ namespace Leap.Unity.HandsModule
         /// <param name="chirality">The chirality to enable</param>
         /// <param name="handModelPairID">The pair id of the hand model to enable</param>
         /// <param name="disableOtherHandsOfSameChirality">If true, disable all other active hand models of the same chirality</param>
-        public void EnableHandModelPair(Chirality chirality, string handModelPairID, bool disableOtherHandsOfSameChirality = false)
+        public void EnableHandModelPair(Chirality chirality, string handModelPairID, bool disableOtherHandsOfSameChirality = true)
         {
             HandModelPair handModelPair = handModelPairs.ToList().Where(hmp => hmp.HandModelPairId == handModelPairID).FirstOrDefault();
             EnableHandModel(chirality, handModelPair, disableOtherHandsOfSameChirality);
@@ -274,7 +390,7 @@ namespace Leap.Unity.HandsModule
             {
                 if (handModelPair.LeftEnableDisable != null)
                 {
-                    handModelPair.LeftEnableDisable.IgnoreHandState = false;
+                    handModelPair.LeftEnableDisable.FreezeHandState = false;
                 }
                 if (handModelPair.Left != null && handModelPair.Left.IsTracked)
                 {
@@ -286,7 +402,7 @@ namespace Leap.Unity.HandsModule
             {
                 if (handModelPair.RightEnableDisable != null)
                 {
-                    handModelPair.RightEnableDisable.IgnoreHandState = false;
+                    handModelPair.RightEnableDisable.FreezeHandState = false;
                 }
 
                 if (handModelPair.Right != null && handModelPair.Right.IsTracked)
@@ -296,7 +412,9 @@ namespace Leap.Unity.HandsModule
                 }
             }
         }
+        #endregion
 
+        #region DisableHandModels
         /// <summary>
         /// Disables all hand models of a certain chirality
         /// </summary>
@@ -367,7 +485,7 @@ namespace Leap.Unity.HandsModule
                 }
                 if (handModelPair.LeftEnableDisable != null)
                 {
-                    handModelPair.LeftEnableDisable.IgnoreHandState = true;
+                    handModelPair.LeftEnableDisable.FreezeHandState = true;
                 }
             }
             else
@@ -379,9 +497,10 @@ namespace Leap.Unity.HandsModule
                 }
                 if (handModelPair.RightEnableDisable != null)
                 {
-                    handModelPair.RightEnableDisable.IgnoreHandState = true;
+                    handModelPair.RightEnableDisable.FreezeHandState = true;
                 }
             }
         }
+        #endregion
     }
 }
