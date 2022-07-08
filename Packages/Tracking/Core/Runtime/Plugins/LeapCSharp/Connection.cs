@@ -58,6 +58,8 @@ namespace LeapInternal
             long palmOffset = Marshal.OffsetOf(typeof(LEAP_HAND), "palm").ToInt64();
             _handPositionOffset = Marshal.OffsetOf(typeof(LEAP_PALM), "position").ToInt64() + palmOffset;
             _handOrientationOffset = Marshal.OffsetOf(typeof(LEAP_PALM), "orientation").ToInt64() + palmOffset;
+            
+            LeapC.Load();
         }
 
         public Key ConnectionKey { get; private set; }

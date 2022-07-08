@@ -1007,8 +1007,16 @@ namespace LeapInternal
         [DllImport("kernel32", SetLastError=true, CharSet = CharSet.Ansi)]
         static extern IntPtr LoadLibrary([MarshalAs(UnmanagedType.LPStr)]string lpFileName);
 
-        static LeapC()
+        private static bool Loaded = false;
+
+        // Load must be called early before any methods of LeapC are used otherwise there is a bizarre caching issue
+        // with DllImport which won't pick up the loaded LeapC.dll until the appdomain is reloaded.
+        // Easiest place to do this is Connection static constructor.
+        // (Already attempted to load in LeapC static constructor or a thin wrapper class while moving all the DllImports
+        // elsewhere and neither were successful workarounds)
+        internal static void Load()
         {
+            if (Loaded) return;
             var installLocation = Microsoft.Win32.Registry.GetValue("HKEY_LOCAL_MACHINE\\SOFTWARE\\WOW6432Node\\Ultraleap\\Leap Service-64", "",
                 null);
 
@@ -1033,6 +1041,8 @@ namespace LeapInternal
                 var error = new Win32Exception(Marshal.GetLastWin32Error());
                 Debug.LogError($"Error while loading LeapC: {error}");
             }
+
+            Loaded = true;
         }
 #endif
         
