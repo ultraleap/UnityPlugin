@@ -19,10 +19,8 @@ namespace Leap.Unity
     public class HandEnableDisable : HandTransitionBehavior
     {
 
-        [Tooltip("Enable this to stop HandEnableDisable from changing whether the hand is enabled or disabled"
-       + "when the hand tracked state is changed")]
-        public bool IgnoreHandState = false;
-
+        [Tooltip("When enabled, freezes the hand in its current active state")]
+        public bool FreezeHandState = false;
 
         protected override void Awake()
         {
@@ -41,7 +39,7 @@ namespace Leap.Unity
 
         protected override void HandReset()
         {
-            if (IgnoreHandState)
+            if (FreezeHandState)
             {
                 return;
             }
@@ -51,7 +49,7 @@ namespace Leap.Unity
 
         protected override void HandFinish()
         {
-            if (IgnoreHandState)
+            if (FreezeHandState)
             {
                 return;
             }
