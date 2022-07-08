@@ -171,6 +171,13 @@ namespace Leap.Unity.Preview.FarFieldInteractions
             leftCube.SetActive(false);
             rightCube.SetActive(false);
 
+            for (int i = 0; i < aimPositionFilters.Length; i++)
+            {
+                aimPositionFilters[i].UpdateParams(oneEurofreq, oneEuroMinCutoff, oneEuroBeta);
+                debugAimPositionFilters[i].UpdateParams(oneEurofreq, oneEuroMinCutoff, oneEuroBeta);
+                rayOriginFilters[i].UpdateParams(oneEurofreq, oneEuroMinCutoff, oneEuroBeta);
+            }
+
             PopulateHandShoulders();
             CastRays();
         }
