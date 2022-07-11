@@ -6,8 +6,6 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Leap;
-using Leap.Unity;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -15,48 +13,82 @@ namespace Leap.Unity.Preview.FarFieldInteractions
 {
 #pragma warning disable 0618
     /// <summary>
-    /// infers a body position from .. including predicted shoulder positions and stable pinch position.
-    /// Used by the 'FarFieldDirection', 
-    /// and requires a 'RotationDeadzone' component on the same script.
+    /// Infers neck and shoulder positions using real world head data.
+    /// Used by the 'FarFieldDirection', and requires a 'RotationDeadzone' component
     /// </summary>
     [RequireComponent(typeof(RotationDeadzone))]
     public class InferredBodyPositions : MonoBehaviour
     {
+        [Header("Inferred Shoulder Settings")]
         /// <summary>
-        /// should the NeckRotation be used to predict shoulder positions?
+        /// Should the Neck Position be used to predict shoulder positions?
+        /// If true, the shoulders are less affected by head roll & pitch rotation (z & x rotation)
         /// </summary>
+        [Tooltip("Should the Neck Position be used to predict shoulder positions?\n" +
+            "If true, the shoulders are less affected by head roll & pitch rotation (z & x rotation)")]
         public bool useNeckPositionForShoulders = true;
+
         /// <summary>
-        /// use a deadzone for a neck's y-rotation
+        /// The shoulder's horizontal offset from the neck.
         /// </summary>
-        public bool useNeckYawDeadzone = true;
-        /// <summary>
-        /// the shoulder offset from the neck
-        /// </summary>
+        [Tooltip("The shoulder's horizontal offset from the neck.")]
         public float shoulderOffset = 0.1f;
+
+        [Header("Inferred Neck Settings")]
         /// <summary>
-        /// the neck offset from the head
+        /// The neck's vertical offset from the head
         /// </summary>
+        [Tooltip("The neck's vertical offset from the head")]
         public float neckOffset = -0.1f;
+
         /// <summary>
-        /// blend between the NeckPositionLocalOffset and the NeckPositionWorldOffset
+        /// Use a deadzone for a neck's y-rotation.
+        /// If true, the neck's Yaw is not affected by the head's Yaw 
+        /// until the head's Yaw has moved over a certain threshold - this has the
+        /// benefit of keeping the neck's rotation fairly stable.
         /// </summary>
-        [Range(0.01f, 1)] public float WorldLocalNeckPositionBlend = 0.5f;
+        [Tooltip("Use a deadzone for a neck's y-rotation.\n" +
+            "If true, the neck's Yaw is not affected by the head's Yaw until the head's" +
+            " Yaw has moved over a certain threshold - this has the benefit of keeping the" +
+            " neck's rotation fairly stable.")]
+        public bool useNeckYawDeadzone = true;
+
         /// <summary>
-        /// how quickly to update the neck rotation
+        /// Blends between the NeckPositionLocalOffset and the NeckPositionWorldOffset.
+        /// At 0, only the local position is into account.
+        /// At 1, only the world position is into account.
+        /// A blend between the two stops head roll & pitch rotation (z & x rotation) 
+        /// having a large effect on the neck position
         /// </summary>
-        [Range(0.01f, 30)] public float NeckRotationLerpSpeed = 22;
+        [Tooltip("Blends between the NeckPositionLocalOffset and the NeckPositionWorldOffset.\n" +
+            " - At 0, only the local position is into account.\n" +
+            " - At 1, only the world position is into account.\n" +
+            " - A blend between the two stops head roll & pitch rotation (z & x rotation) " +
+            "having a large effect on the neck position")]
+        [Range(0f, 1)] 
+        public float WorldLocalNeckPositionBlend = 0.5f;
+
+        /// <summary>
+        /// How quickly the neck rotation updates
+        /// Used to smooth out sudden large rotations
+        /// </summary>
+        [Tooltip("How quickly the neck rotation updates\n" +
+            "Used to smooth out sudden large rotations")]
+        [Range(0.01f, 30)] 
+        public float NeckRotationLerpSpeed = 22;
 
         // Debug gizmo settings
-        public bool drawDebugGizmos = true;
-        public float gizmoRadius = 0.05f;
-        public bool drawRawHead = true;
+        [Header("Debug Gizmos")]
+        [Tooltip("If true, draw any enabled debug gizmos")]
+        public bool drawDebugGizmos = false;
+        public Color debugGizmoColor = Color.green;
+        public bool drawHeadPosition = true;
         public bool drawNeckPosition = true;
-        public bool drawNeckOffset = true;
-        public bool drawRawShoulderOffset = true;
-        public bool drawRecentredShoulders = true;
-        public bool drawDeadzonedShoulders = true;
-        public bool drawPinchPositions = true;
+        public bool drawShoulderPositions = true;
+        
+        private float headGizmoRadius = 0.09f;
+        private float neckGizmoRadius = 0.02f;
+        private float shoulderGizmoRadius = 0.02f;
 
         private RotationDeadzone neckYawDeadzone;
         private Transform head;
@@ -68,14 +100,17 @@ namespace Leap.Unity.Preview.FarFieldInteractions
         /// Inferred Neck position
         /// </summary>
         public Vector3 NeckPosition { get; private set; }
+        
         /// <summary>
-        /// Inferred local offset of the neck position (relative to head)
+        /// Inferred neck position, based purely off of a local space offset to the head
         /// </summary>
-        public Vector3 NeckPositionLocalOffset { get; private set; }
+        public Vector3 NeckPositionLocalSpace { get; private set; }
+        
         /// <summary>
-        /// Inferred world offset of the neck position (relative to head)
+        /// Inferred neck position, based purely off of a world space offset to the head
         /// </summary>
-        public Vector3 NeckPositionWorldOffset { get; private set; }
+        public Vector3 NeckPositionWorldSpace { get; private set; }
+        
         /// <summary>
         /// Inferred neck rotation
         /// </summary>
@@ -85,18 +120,11 @@ namespace Leap.Unity.Preview.FarFieldInteractions
         /// Inferrerd shoulder position
         /// </summary>
         public Vector3[] ShoulderPositions { get; private set; }
+
         /// <summary>
-        /// Inferred recentred shoulder position
+        /// Inferred shoulder position, based purely off of a local space offset to the head
         /// </summary>
-        public Vector3[] ShoulderPositionsRecentred { get; private set; }
-        /// <summary>
-        /// Inferred shoulder position offset (relative to head)
-        /// </summary>
-        public Vector3[] ShoulderPositionsHeadOffset { get; private set; }
-        /// <summary>
-        /// Inferred Stable pinch position. Can be used instead of the normal pinch position
-        /// </summary>
-        public Vector3[] StablePinchPosition { get; private set; }
+        public Vector3[] ShoulderPositionsLocalSpace { get; private set; }
 
         private void Start()
         {
@@ -105,9 +133,7 @@ namespace Leap.Unity.Preview.FarFieldInteractions
             transformHelper.SetParent(transform);
 
             ShoulderPositions = new Vector3[2];
-            ShoulderPositionsRecentred = new Vector3[2];
-            ShoulderPositionsHeadOffset = new Vector3[2];
-            StablePinchPosition = new Vector3[2];
+            ShoulderPositionsLocalSpace = new Vector3[2];
 
             if (neckYawDeadzone == null)
             {
@@ -127,39 +153,6 @@ namespace Leap.Unity.Preview.FarFieldInteractions
             UpdateNeckRotation();
             UpdateHeadOffsetShoulderPositions();
             UpdateShoulderPositions();
-            UpdateRecentredShoulderPositions();
-            UpdatePinchPosition();
-        }
-
-        private void UpdatePinchPosition()
-        {
-            if (Hands.Provider == null || Hands.Provider.CurrentFrame == null)
-            {
-                return;
-            }
-
-            List<Hand> hands = Hands.Provider.CurrentFrame.Hands;
-            foreach (Hand hand in hands)
-            {
-                UpdateStablePinchPosition(hand);
-            }
-        }
-
-        // Predicted Pinch Position without influence from the thumb or index tip
-        private void UpdateStablePinchPosition(Hand hand)
-        {
-            int index = hand.IsLeft ? 0 : 1;
-
-            // The stable pinch point is a rigid point in hand-space linearly offset by the
-            // index finger knuckle position and scaled by the index finger's length
-
-            Vector3 indexKnuckle = hand.Fingers[1].bones[1].PrevJoint.ToVector3();
-            float indexLength = hand.Fingers[1].Length;
-            Vector3 radialAxis = hand.RadialAxis();
-            Vector3 predictedPinchPoint = indexKnuckle + hand.PalmarAxis() * indexLength * 0.85F
-                                                       + hand.DistalAxis() * indexLength * 0.20F
-                                                       + radialAxis * indexLength * 0.20F;
-            StablePinchPosition[index] = predictedPinchPoint;
         }
 
         private void UpdateNeckPositions()
@@ -171,7 +164,7 @@ namespace Leap.Unity.Preview.FarFieldInteractions
 
         private void UpdateNeckPosition()
         {
-            NeckPosition = Vector3.Lerp(NeckPositionLocalOffset, NeckPositionWorldOffset, WorldLocalNeckPositionBlend);
+            NeckPosition = Vector3.Lerp(NeckPositionLocalSpace, NeckPositionWorldSpace, WorldLocalNeckPositionBlend);
         }
 
         private void UpdateNeckRotation()
@@ -191,7 +184,7 @@ namespace Leap.Unity.Preview.FarFieldInteractions
 
             transformHelper.position = head.position;
             transformHelper.rotation = head.rotation;
-            NeckPositionLocalOffset = transformHelper.TransformPoint(localNeckOffset);
+            NeckPositionLocalSpace = transformHelper.TransformPoint(localNeckOffset);
         }
 
         private void UpdateWorldOffsetNeckPosition()
@@ -204,13 +197,13 @@ namespace Leap.Unity.Preview.FarFieldInteractions
             };
 
             Vector3 headPosition = head.position;
-            NeckPositionWorldOffset = headPosition + worldNeckOffset;
+            NeckPositionWorldSpace = headPosition + worldNeckOffset;
         }
 
         private void UpdateHeadOffsetShoulderPositions()
         {
-            ShoulderPositionsHeadOffset[0] = head.TransformPoint(-shoulderOffset, neckOffset, 0);
-            ShoulderPositionsHeadOffset[1] = head.TransformPoint(shoulderOffset, neckOffset, 0);
+            ShoulderPositionsLocalSpace[0] = head.TransformPoint(-shoulderOffset, neckOffset, 0);
+            ShoulderPositionsLocalSpace[1] = head.TransformPoint(shoulderOffset, neckOffset, 0);
         }
 
         private void UpdateShoulderPositions()
@@ -222,16 +215,8 @@ namespace Leap.Unity.Preview.FarFieldInteractions
             }
             else
             {
-                ShoulderPositions = ShoulderPositionsHeadOffset;
+                ShoulderPositions = ShoulderPositionsLocalSpace;
             }
-        }
-
-        private void UpdateRecentredShoulderPositions()
-        {
-            Quaternion neckRotation = Quaternion.Euler(0, head.rotation.eulerAngles.y + neckYawDeadzone.RecentredPositionDelta, 0);
-
-            ShoulderPositionsRecentred[0] = GetShoulderPosAtRotation(true, neckRotation);
-            ShoulderPositionsRecentred[1] = GetShoulderPosAtRotation(false, neckRotation);
         }
 
         private Vector3 GetShoulderPosAtRotation(bool isLeft, Quaternion neckRotation)
@@ -251,92 +236,35 @@ namespace Leap.Unity.Preview.FarFieldInteractions
 
         private void OnDrawGizmos()
         {
-            if (!Application.isPlaying)
+            if (!Application.isPlaying || !drawDebugGizmos)
             {
                 return;
             }
+            Gizmos.color = debugGizmoColor;
 
-            if (!drawDebugGizmos)
-            {
-                return;
-            }
-
-            if (drawRawHead)
+            if (drawHeadPosition)
             {
                 // Draw head
-                Gizmos.color = Color.white;
                 Gizmos.matrix = Matrix4x4.TRS(head.position, head.rotation, Vector3.one);
-                Gizmos.DrawCube(Vector3.zero, Vector3.one * gizmoRadius);
+                Gizmos.DrawCube(Vector3.zero, Vector3.one * headGizmoRadius);
                 Gizmos.matrix = Matrix4x4.identity;
             }
 
             //Draw deadzoned shoulder positions 
-            if (drawDeadzonedShoulders)
+            if (drawShoulderPositions)
             {
-                Gizmos.color = Color.green;
-                Gizmos.DrawSphere(ShoulderPositions[0], gizmoRadius);
-                Gizmos.DrawSphere(ShoulderPositions[1], gizmoRadius);
+                Gizmos.DrawSphere(ShoulderPositions[0], shoulderGizmoRadius);
+                Gizmos.DrawSphere(ShoulderPositions[1], shoulderGizmoRadius);
 
                 //Draw a line between both stable shoulder positions
-                Gizmos.color = Color.white;
                 Gizmos.DrawLine(ShoulderPositions[0], ShoulderPositions[1]);
-            }
-
-            if (drawRawShoulderOffset)
-            {
-                //Draw the non-stabilised shoulder positions
-                Gizmos.color = Color.green;
-
-                Gizmos.DrawSphere(ShoulderPositionsHeadOffset[0], gizmoRadius);
-                Gizmos.DrawSphere(ShoulderPositionsHeadOffset[1], gizmoRadius);
-                Gizmos.DrawLine(ShoulderPositionsHeadOffset[0], head.position);
-                Gizmos.DrawLine(ShoulderPositionsHeadOffset[1], head.position);
-
-            }
-
-            if (drawRecentredShoulders)
-            {
-                Gizmos.color = Color.magenta;
-                Gizmos.DrawWireSphere(ShoulderPositionsRecentred[0], gizmoRadius);
-                Gizmos.DrawWireSphere(ShoulderPositionsRecentred[1], gizmoRadius);
-            }
-
-            if (drawNeckOffset)
-            {
-                //Draw a line between both neck positions
-                Gizmos.color = Color.magenta;
-                Gizmos.DrawLine(NeckPositionLocalOffset, NeckPositionWorldOffset);
-
-                //Draw the local offset neck position
-                Gizmos.color = Color.red;
-                Gizmos.DrawSphere(NeckPositionLocalOffset, gizmoRadius / 4);
-                Gizmos.DrawLine(head.position, NeckPositionLocalOffset);
-
-                //Draw the world offset neck position
-                Gizmos.color = Color.cyan;
-                Gizmos.DrawSphere(NeckPositionWorldOffset, gizmoRadius / 4);
-                Gizmos.DrawLine(head.position, NeckPositionWorldOffset);
             }
 
             if (drawNeckPosition)
             {
                 //Draw the neck position
-                Gizmos.color = Color.white;
-                Gizmos.DrawSphere(NeckPosition, gizmoRadius / 4);
+                Gizmos.DrawSphere(NeckPosition, neckGizmoRadius);
                 Gizmos.DrawLine(head.position, NeckPosition);
-            }
-
-            if (drawPinchPositions)
-            {
-                List<Hand> hands = Hands.Provider.CurrentFrame.Hands;
-                foreach (Hand hand in hands)
-                {
-                    int index = hand.IsLeft ? 0 : 1;
-                    Gizmos.color = LeapColor.orange;
-                    Gizmos.DrawSphere(hand.GetPredictedPinchPosition(), gizmoRadius / 5);
-                    Gizmos.color = LeapColor.green;
-                    Gizmos.DrawSphere(StablePinchPosition[index], gizmoRadius / 5);
-                }
             }
         }
     }

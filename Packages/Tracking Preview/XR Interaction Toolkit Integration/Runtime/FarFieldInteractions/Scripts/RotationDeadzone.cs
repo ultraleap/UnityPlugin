@@ -42,11 +42,6 @@ namespace Leap.Unity.Preview.FarFieldInteractions
         private bool recentredWhilstStill;
         private Queue<TimestampDeadzoneCentre> deadzoneCentreHistory;
 
-        private void Start()
-        {
-
-        }
-
         public void UpdateDeadzone(float headYRotation)
         {
             //Calculate Deadzone

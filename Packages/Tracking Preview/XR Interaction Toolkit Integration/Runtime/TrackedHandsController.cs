@@ -45,7 +45,7 @@ namespace Leap.Unity.Preview.XRInteractionToolkit
         Camera mainCamera;
         Quaternion cameraRotation;
 
-        FarFieldDirection rayDirection;
+        WristShoulderFarFieldRay rayDirection;
 
         bool lastPinchState;
         bool lastGrabState;
@@ -65,7 +65,7 @@ namespace Leap.Unity.Preview.XRInteractionToolkit
             if (GetComponent<XRRayInteractor>() != null)
             {
                 RayOrigin = GetComponent<XRRayInteractor>().rayOriginTransform;
-                rayDirection = FindObjectOfType<FarFieldDirection>();
+                rayDirection = FindObjectOfType<WristShoulderFarFieldRay>();
             }
 
             lastPinchTime = Time.time;
