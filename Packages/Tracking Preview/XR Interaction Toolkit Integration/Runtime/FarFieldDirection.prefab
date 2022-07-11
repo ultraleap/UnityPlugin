@@ -48,16 +48,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f9ef11cfcec89994c9ecbea1b9edf774, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  aimPosition: 0
+  aimPosition: 1
   rayOrigin: 3
   elbowOffset: {x: 0, y: 0, z: 0}
-  useOneEuroFilter: 1
   wristOffset: {x: 0.0425, y: 0.0652, z: 0}
   wristShoulderLerpAmount: 0.3
-  aimPos_oneEuroBeta: 100
-  aimPos_oneEuroMinCutoff: 5
-  rayOrigin_oneEuroBeta: 100
-  rayOrigin_oneEuroMinCutoff: 5
 --- !u!114 &4724727352373523092
 MonoBehaviour:
   m_ObjectHideFlags: 0

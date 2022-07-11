@@ -6,8 +6,6 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Leap;
-using Leap.Unity;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -89,11 +87,6 @@ namespace Leap.Unity.Preview.FarFieldInteractions
         /// the elbow offset is only used when the rayOrigin is the elbow and specifies a position offset
         /// </summary>
         public Vector3 elbowOffset = Vector3.zero;
-
-        /// <summary>
-        /// The one Euro Filter reduces jitter and increases stability
-        /// </summary>
-        public bool useOneEuroFilter = true;
 
         [Header("WristOffset")]
         /// <summary>
@@ -200,15 +193,9 @@ namespace Leap.Unity.Preview.FarFieldInteractions
                 FarFieldRays[i].RayOriginRaw = GetRayOrigin(HandShoulders[i]);
 
                 //Filtering using the One Euro filter reduces jitter from both positions
-                FarFieldRays[i].AimPosition = GetAimPosition(HandShoulders[i]);
-                FarFieldRays[i].RayOrigin = FarFieldRays[i].RayOriginRaw;
-
-                if (useOneEuroFilter)
-                {
-                    //Filtering using the One Euro filter reduces jitter from both positions
-                    FarFieldRays[i].AimPosition = aimPositionFilters[i].Filter(GetAimPosition(HandShoulders[i]), Time.time);
-                    FarFieldRays[i].RayOrigin = rayOriginFilters[i].Filter(FarFieldRays[i].RayOriginRaw, Time.time);
-                }
+                FarFieldRays[i].AimPosition = aimPositionFilters[i].Filter(GetAimPosition(HandShoulders[i]), Time.time);
+                FarFieldRays[i].RayOrigin = rayOriginFilters[i].Filter(FarFieldRays[i].RayOriginRaw, Time.time);
+                
 
                 FarFieldRays[i].Direction = (FarFieldRays[i].AimPosition - FarFieldRays[i].RayOrigin).normalized;
 
