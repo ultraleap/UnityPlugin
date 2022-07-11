@@ -124,14 +124,16 @@ namespace Leap.Unity.Preview.FarFieldInteractions
         // Debug filters used in case we need to output a value which isn't currently being filtered.
         // E.g. if we want to compare a different aim position to the one being used
         private OneEuroFilter<Vector3>[] debugAimPositionFilters;
+
         /// <summary>
         /// parameter beta for the one euro filter (see https://cristal.univ-lille.fr/~casiez/1euro/)
         /// </summary>
-        public float oneEuroBeta = 100;
+        private float oneEuroBeta = 100;
         /// <summary>
         /// parameter minCutoff for the one euro filter (see https://cristal.univ-lille.fr/~casiez/1euro/)
         /// </summary>
-        public float oneEuroMinCutoff = 0.4f;
+        private float oneEuroMinCutoff = 5;       
+        
         private readonly float oneEurofreq = 30;
 
         // Start is called before the first frame update
