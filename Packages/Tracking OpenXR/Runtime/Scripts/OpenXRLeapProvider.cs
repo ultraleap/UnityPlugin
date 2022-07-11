@@ -176,8 +176,8 @@ namespace Ultraleap.Tracking.OpenXR
                 -1,
                 (handTracker == HandTracker.Left ? 0 : 1),
                 1f,
-                0.5f, // Fixed for now
-                100f, // Fixed for now
+                CalculateGrabStrength(hand),
+                CalculateGrabAngle(hand),
                 CalculatePinchStrength(ref hand, palmWidth),
                 CalculatePinchDistance(ref hand),
                 palmWidth,
@@ -295,6 +295,37 @@ namespace Ultraleap.Tracking.OpenXR
 
             // Return the pinch distance, converted to millimeters to match other providers.
             return Mathf.Sqrt(minDistanceSquared) * 1000.0f;
+        }
+
+        float CalculateGrabStrength(Hand hand)
+        {
+            // magic numbers so it approximately lines up with the leap results
+            const float bendZero = 0.25f;
+            const float bendOne = 0.85f;
+
+            // Find the minimum bend angle for the non-thumb fingers.
+            float minBend = float.MaxValue;
+            for (int finger_idx = 1; finger_idx < 5; finger_idx++)
+            {
+                minBend = Mathf.Min(hand.GetFingerStrength(finger_idx), minBend);
+            }
+
+            // Return the grab strength.
+            return Mathf.Clamp01((minBend - bendZero) / (bendOne - bendZero));
+        }
+
+        float CalculateGrabAngle(Hand hand)
+        {
+            // Compute the sum of the angles between the fingertips and hands.
+            // For every finger, the angle is the sumb of bend + pitch + bow.
+            float angleSum = 0.0f;
+            for(int finger_idx = 1; finger_idx < 5; finger_idx++)
+            {
+                
+                angleSum += Mathf.Lerp(0, Mathf.PI, hand.GetFingerStrength(finger_idx));
+            }
+            // Average between all fingers
+            return angleSum / 4.0f;
         }
 
         #region LeapProvider Implementation
