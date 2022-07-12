@@ -16,7 +16,7 @@ namespace Leap.Unity.Preview.FarFieldInteractions
     /// Infers neck and shoulder positions using real world head data.
     /// Used by the 'FarFieldDirection', and requires a 'RotationDeadzone' component
     /// </summary>
-    [RequireComponent(typeof(RotationDeadzone))]
+    [RequireComponent(typeof(EulerAngleDeadzone))]
     public class InferredBodyPositions : MonoBehaviour
     {
         [Header("Inferred Shoulder Settings")]
@@ -65,7 +65,7 @@ namespace Leap.Unity.Preview.FarFieldInteractions
             " - At 1, only the world position is into account.\n" +
             " - A blend between the two stops head roll & pitch rotation (z & x rotation) " +
             "having a large effect on the neck position")]
-        [Range(0f, 1)] 
+        [Range(0f, 1)]
         public float WorldLocalNeckPositionBlend = 0.5f;
 
         /// <summary>
@@ -74,7 +74,7 @@ namespace Leap.Unity.Preview.FarFieldInteractions
         /// </summary>
         [Tooltip("How quickly the neck rotation updates\n" +
             "Used to smooth out sudden large rotations")]
-        [Range(0.01f, 30)] 
+        [Range(0.01f, 30)]
         public float NeckRotationLerpSpeed = 22;
 
         // Debug gizmo settings
@@ -85,12 +85,12 @@ namespace Leap.Unity.Preview.FarFieldInteractions
         public bool drawHeadPosition = true;
         public bool drawNeckPosition = true;
         public bool drawShoulderPositions = true;
-        
+
         private float headGizmoRadius = 0.09f;
         private float neckGizmoRadius = 0.02f;
         private float shoulderGizmoRadius = 0.02f;
 
-        private RotationDeadzone neckYawDeadzone;
+        private EulerAngleDeadzone neckYawDeadzone;
         private Transform head;
         private Transform transformHelper;
 
@@ -100,24 +100,24 @@ namespace Leap.Unity.Preview.FarFieldInteractions
         /// Inferred Neck position
         /// </summary>
         public Vector3 NeckPosition { get; private set; }
-        
+
         /// <summary>
         /// Inferred neck position, based purely off of a local space offset to the head
         /// </summary>
         public Vector3 NeckPositionLocalSpace { get; private set; }
-        
+
         /// <summary>
         /// Inferred neck position, based purely off of a world space offset to the head
         /// </summary>
         public Vector3 NeckPositionWorldSpace { get; private set; }
-        
+
         /// <summary>
         /// Inferred neck rotation
         /// </summary>
         public Quaternion NeckRotation { get; private set; }
 
         /// <summary>
-        /// Inferrerd shoulder position
+        /// Inferred shoulder position
         /// </summary>
         public Vector3[] ShoulderPositions { get; private set; }
 
@@ -135,10 +135,7 @@ namespace Leap.Unity.Preview.FarFieldInteractions
             ShoulderPositions = new Vector3[2];
             ShoulderPositionsLocalSpace = new Vector3[2];
 
-            if (neckYawDeadzone == null)
-            {
-                neckYawDeadzone = GetComponent<RotationDeadzone>();
-            }
+            neckYawDeadzone = GetComponent<EulerAngleDeadzone>();
         }
 
         private void Update()
@@ -244,25 +241,20 @@ namespace Leap.Unity.Preview.FarFieldInteractions
 
             if (drawHeadPosition)
             {
-                // Draw head
                 Gizmos.matrix = Matrix4x4.TRS(head.position, head.rotation, Vector3.one);
                 Gizmos.DrawCube(Vector3.zero, Vector3.one * headGizmoRadius);
                 Gizmos.matrix = Matrix4x4.identity;
             }
 
-            //Draw deadzoned shoulder positions 
             if (drawShoulderPositions)
             {
                 Gizmos.DrawSphere(ShoulderPositions[0], shoulderGizmoRadius);
                 Gizmos.DrawSphere(ShoulderPositions[1], shoulderGizmoRadius);
-
-                //Draw a line between both stable shoulder positions
                 Gizmos.DrawLine(ShoulderPositions[0], ShoulderPositions[1]);
             }
 
             if (drawNeckPosition)
             {
-                //Draw the neck position
                 Gizmos.DrawSphere(NeckPosition, neckGizmoRadius);
                 Gizmos.DrawLine(head.position, NeckPosition);
             }
