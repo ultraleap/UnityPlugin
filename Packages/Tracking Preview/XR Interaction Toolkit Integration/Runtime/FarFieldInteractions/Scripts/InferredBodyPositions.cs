@@ -14,9 +14,7 @@ namespace Leap.Unity.Preview.FarFieldInteractions
 #pragma warning disable 0618
     /// <summary>
     /// Infers neck and shoulder positions using real world head data.
-    /// Used by the 'FarFieldDirection', and requires a 'RotationDeadzone' component
     /// </summary>
-    [RequireComponent(typeof(EulerAngleDeadzone))]
     public class InferredBodyPositions : MonoBehaviour
     {
         [Header("Inferred Shoulder Settings")]
@@ -77,7 +75,6 @@ namespace Leap.Unity.Preview.FarFieldInteractions
         [Range(0.01f, 30)]
         public float NeckRotationLerpSpeed = 22;
 
-        // Debug gizmo settings
         [Header("Debug Gizmos")]
         [Tooltip("If true, draw any enabled debug gizmos")]
         public bool drawDebugGizmos = false;
@@ -135,7 +132,7 @@ namespace Leap.Unity.Preview.FarFieldInteractions
             ShoulderPositions = new Vector3[2];
             ShoulderPositionsLocalSpace = new Vector3[2];
 
-            neckYawDeadzone = GetComponent<EulerAngleDeadzone>();
+            neckYawDeadzone = new EulerAngleDeadzone(25, true, 1.5f, 10, 1);
         }
 
         private void Update()

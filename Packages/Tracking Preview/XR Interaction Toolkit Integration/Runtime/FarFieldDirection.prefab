@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 4724727352373523094}
   - component: {fileID: 4724727352373523089}
   - component: {fileID: 4724727352373523092}
-  - component: {fileID: 4724727352373523095}
   m_Layer: 0
   m_Name: FarFieldDirection
   m_TagString: Untagged
@@ -71,22 +70,3 @@ MonoBehaviour:
   drawHeadPosition: 1
   drawNeckPosition: 1
   drawShoulderPositions: 1
---- !u!114 &4724727352373523095
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4724727352373523088}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cfe0d231253734740843822370291a53, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  DeadzoneSize: 25
-  UseRecentring: 1
-  RecentreTimer: 1.5
-  RecentreDelta: 10
-  RecentreLerpSpeed: 1
-  DeadzoneCentre: 0
-  RecentredPositionDelta: 0

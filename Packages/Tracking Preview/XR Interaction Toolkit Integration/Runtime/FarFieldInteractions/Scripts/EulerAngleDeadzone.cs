@@ -15,7 +15,7 @@ namespace Leap.Unity.Preview.FarFieldInteractions
     /// A Euler angle deadzone. Used to filter a value and stop it from changing until its delta has passed a threshold
     /// This deadzone takes into account the circular relationship between 0 and 360 for Euler Angles
     /// </summary>
-    public class EulerAngleDeadzone : MonoBehaviour
+    public class EulerAngleDeadzone
     {
         private struct TimestampDeadzoneCentre
         {
@@ -29,36 +29,43 @@ namespace Leap.Unity.Preview.FarFieldInteractions
             }
         }
 
+        public EulerAngleDeadzone(float deadzoneSize) {
+            DeadzoneSize = deadzoneSize;
+        }
+
+        public EulerAngleDeadzone(float deadzoneSize, bool useRecentring, float recentreMovementSeconds, float recentreMovementThreshold, float recentreLerpSpeed)
+        {
+            DeadzoneSize = deadzoneSize;
+            UseRecentring = useRecentring;
+            RecentreMovementSeconds = recentreMovementSeconds;
+            RecentreMovementThreshold = recentreMovementThreshold;
+            RecentreLerpSpeed = recentreLerpSpeed;
+        }
+
         /// <summary>
         /// How much the value needs to change before the deadzone begins to move
         /// </summary>
-        [Tooltip("How much the value needs to change before the deadzone begins to move")]
-        public float DeadzoneSize = 25;
-        [Space]
+        public float DeadzoneSize { get; set; }
 
         /// <summary>
         /// If true, when still for RecentreMovementSeconds, the deadzone centre will move to the current position
         /// </summary>
-        [Tooltip("If true, when still for RecentreMovementSeconds amount of time, the deadzone centre will move to the current position")]
-        public bool UseRecentring = true;
+        public bool UseRecentring { get; set; }
 
         /// <summary>
         /// If recentring is enabled, the deadzone will recentre after this amount of time
         /// </summary>
-        [Tooltip("If recentring is enabled, the deadzone will recentre after this amount of time")]
-        [Range(0, 2)] public float RecentreMovementSeconds = 1.5f;
+        public float RecentreMovementSeconds { get; set; }
 
         /// <summary>
         /// Used to check for a 'still' value
         /// </summary>
-        [Tooltip("Used to check for a 'still' value")]
-        [Range(0, 360)] public float RecentreMovementThreshold = 10;
+        public float RecentreMovementThreshold { get; set; }
 
         /// <summary>
         /// How quickly the Recentre delta returns to 0 whilst the value is changing
         /// </summary>
-        [Tooltip("How quickly the Recentre delta returns to 0 whilst the value is changing")]
-        [Range(0.01f, 30)] public float RecentreLerpSpeed = 1;
+        public float RecentreLerpSpeed { get; set; }
 
         /// <summary>
         /// The centre of the deadzone
