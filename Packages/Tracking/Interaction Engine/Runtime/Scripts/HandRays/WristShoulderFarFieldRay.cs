@@ -9,7 +9,7 @@
 using System;
 using UnityEngine;
 
-namespace Leap.Unity.Preview.FarFieldInteractions
+namespace Leap.Unity.Interaction
 {
 #pragma warning disable 0618
     /// <summary>

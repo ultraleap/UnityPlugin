@@ -6,10 +6,9 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using System.Collections.Generic;
 using UnityEngine;
 
-namespace Leap.Unity.Preview.FarFieldInteractions
+namespace Leap.Unity.Interaction
 {
 #pragma warning disable 0618
     /// <summary>

@@ -6,8 +6,7 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Leap.Unity;
-using Leap.Unity.Preview.FarFieldInteractions;
+using Leap.Unity.Interaction;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.XR;

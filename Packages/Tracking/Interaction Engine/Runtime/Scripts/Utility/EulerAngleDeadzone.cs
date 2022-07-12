@@ -9,7 +9,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Leap.Unity.Preview.FarFieldInteractions
+namespace Leap.Unity.Interaction
 {
     /// <summary>
     /// A Euler angle deadzone. Used to filter a value and stop it from changing until its delta has passed a threshold

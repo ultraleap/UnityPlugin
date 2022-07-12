@@ -393,8 +393,8 @@ MonoBehaviour:
     m_NumAlphaKeys: 2
   m_InvalidColorGradient:
     serializedVersion: 2
-    key0: {r: 1, g: 1, b: 1, a: 0.8627451}
-    key1: {r: 1, g: 1, b: 1, a: 0.8627451}
+    key0: {r: 1, g: 0, b: 0, a: 1}
+    key1: {r: 1, g: 0, b: 0, a: 0.8627451}
     key2: {r: 0, g: 0, b: 0, a: 0.7407763}
     key3: {r: 0, g: 0, b: 0, a: 0}
     key4: {r: 0, g: 0, b: 0, a: 0}
@@ -409,7 +409,7 @@ MonoBehaviour:
     ctime5: 0
     ctime6: 0
     ctime7: 0
-    atime0: 0
+    atime0: 64379
     atime1: 65535
     atime2: 40478
     atime3: 0
@@ -623,7 +623,7 @@ PrefabInstance:
     - target: {fileID: 4724727352373523088, guid: 071415ff98e0a6a40b2581f51b99236b,
         type: 3}
       propertyPath: m_Name
-      value: FarFieldDirection for Ray Interaction
+      value: Wrist Shoulder Far Field Rays
       objectReference: {fileID: 0}
     - target: {fileID: 4724727352373523088, guid: 071415ff98e0a6a40b2581f51b99236b,
         type: 3}
@@ -803,11 +803,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3557434566810426996, guid: 15d3b5cf5cea75344a4482323bc124a8,
-        type: 3}
-      propertyPath: _mainCamera
-      value: 
       objectReference: {fileID: 0}
     - target: {fileID: 3557434566810426997, guid: 15d3b5cf5cea75344a4482323bc124a8,
         type: 3}
