@@ -7,7 +7,6 @@
  ******************************************************************************/
 
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace Leap.Unity.Preview.FarFieldInteractions
@@ -31,29 +30,23 @@ namespace Leap.Unity.Preview.FarFieldInteractions
     /// Different parameters can be specified such as where the ray should originate 
     /// or how much its direction is influenced by the wrist orientation vs it's relative 
     /// position to the shoulder.
-    /// It requires a 'InferredBodyPosition' component on the same script.
     /// </summary>
-    [RequireComponent(typeof(InferredBodyPositions))]
     public class WristShoulderFarFieldRay : MonoBehaviour
     {
-        /// <summary>
-        /// a struct holding a hand and a shoulder position
-        /// </summary>
-        public struct HandShoulder
-        {
-            public Hand Hand;
-            public Vector3 ShoulderPosition;
-        }
-
         /// <summary>
         /// The leap provider provides the hand data from which we calculate the far field ray directions 
         /// </summary>
         public LeapProvider leapProvider;
 
         /// <summary>
-        /// event that is called after new rays directions have been calculated. Subscribe to it to cast rays with the far field hand directions it provides.
+        /// The hand this ray is generated for
         /// </summary>
-        public static event Action<FarFieldHandDirection[]> OnFarFieldHandDirectionFrame;
+        public Chirality chirality;
+
+        /// <summary>
+        /// An event that is called after new ray direction has been calculated. Subscribe to it to cast rays with the far field hand directions it provides.
+        /// </summary>
+        public event Action<FarFieldHandDirection> OnFarFieldHandDirectionFrame;
 
         /// <summary>
         /// This local-space offset from the wrist is used to better align the ray to the pinch position
@@ -78,18 +71,14 @@ namespace Leap.Unity.Preview.FarFieldInteractions
         [Range(0f, 1)] public float wristShoulderBlendAmount = 0.532f;
 
         /// <summary>
-        /// an array holding the left hand and shoulder and the right hand and shoulder
+        /// The most recently calculated far field direction
         /// </summary>
-        [HideInInspector] public HandShoulder[] HandShoulders = new HandShoulder[2];
-        /// <summary>
-        /// an array holding left and right ray directions
-        /// </summary>
-        [HideInInspector] public FarFieldHandDirection[] FarFieldRays = new FarFieldHandDirection[2];
+        [HideInInspector] public FarFieldHandDirection FarFieldRay = new FarFieldHandDirection();
 
-        private InferredBodyPositions inferredBodyPositions;
+        [SerializeField] private InferredBodyPositions inferredBodyPositions;
         private Transform wristOffsetTransformHelper;
-        private OneEuroFilter<Vector3>[] aimPositionFilters;
-        private OneEuroFilter<Vector3>[] rayOriginFilters;
+        private OneEuroFilter<Vector3> aimPositionFilter;
+        private OneEuroFilter<Vector3> rayOriginFilter;
 
         /// <summary>
         /// Beta param for OneEuroFilter (see https://cristal.univ-lille.fr/~casiez/1euro/)
@@ -125,17 +114,11 @@ namespace Leap.Unity.Preview.FarFieldInteractions
 
             if (inferredBodyPositions == null)
             {
-                inferredBodyPositions = GetComponent<InferredBodyPositions>();
+                inferredBodyPositions = gameObject.AddComponent<InferredBodyPositions>();
             }
 
-            aimPositionFilters = new OneEuroFilter<Vector3>[2] {
-                new OneEuroFilter<Vector3>(oneEurofreq, oneEuroMinCutoff, oneEuroBeta),
-                new OneEuroFilter<Vector3>(oneEurofreq, oneEuroMinCutoff, oneEuroBeta) 
-            };
-            rayOriginFilters = new OneEuroFilter<Vector3>[2] { 
-                new OneEuroFilter<Vector3>(oneEurofreq, oneEuroMinCutoff, oneEuroBeta),
-                new OneEuroFilter<Vector3>(oneEurofreq, oneEuroMinCutoff, oneEuroBeta) 
-            };
+            aimPositionFilter = new OneEuroFilter<Vector3>(oneEurofreq, oneEuroMinCutoff, oneEuroBeta);
+            rayOriginFilter = new OneEuroFilter<Vector3>(oneEurofreq, oneEuroMinCutoff, oneEuroBeta);
         }
 
         // Update is called once per frame
@@ -145,62 +128,47 @@ namespace Leap.Unity.Preview.FarFieldInteractions
             {
                 return;
             }
-
-            PopulateHandShoulders();
-            CastRays();
+            CalculateRayDirection();
         }
 
-        private void PopulateHandShoulders()
+        private void CalculateRayDirection()
         {
-            List<Hand> hands = leapProvider.CurrentFrame.Hands;
-
-            HandShoulders[0].Hand = null;
-            HandShoulders[1].Hand = null;
-
-            foreach (Hand hand in hands)
+            Hand hand = leapProvider.CurrentFrame.GetHand(chirality);
+            if(hand == null)
             {
-                int index = hand.IsLeft ? 0 : 1;
-                HandShoulders[index].Hand = hand;
-                HandShoulders[index].ShoulderPosition = inferredBodyPositions.ShoulderPositions[index];
+                return;
             }
+
+            int index = hand.IsLeft ? 0 : 1;
+            Vector3 shoulderPosition = inferredBodyPositions.ShoulderPositions[index];
+
+            FarFieldRay.Hand = hand;
+            FarFieldRay.VisualAimPosition = hand.GetPredictedPinchPosition();
+            Vector3 unfilteredRayOrigin = GetRayOrigin(hand, shoulderPosition);
+
+            //Filtering using the One Euro filter reduces jitter from both positions
+            FarFieldRay.AimPosition = aimPositionFilter.Filter(hand.GetStablePinchPosition(), Time.time);
+            FarFieldRay.RayOrigin = rayOriginFilter.Filter(unfilteredRayOrigin, Time.time);
+
+            FarFieldRay.Direction = (FarFieldRay.AimPosition - FarFieldRay.RayOrigin).normalized;  
+            OnFarFieldHandDirectionFrame?.Invoke(FarFieldRay);
         }
 
-        private void CastRays()
+        private Vector3 GetRayOrigin(Hand hand, Vector3 shoulderPosition)
         {
-            for (int i = 0; i < HandShoulders.Length; i++)
-            {
-                FarFieldRays[i].Hand = HandShoulders[i].Hand;
-                if (HandShoulders[i].Hand == null)
-                {
-                    continue;
-                }
-
-                FarFieldRays[i].VisualAimPosition = HandShoulders[i].Hand.GetPredictedPinchPosition();
-                Vector3 unfilteredRayOrigin = GetRayOrigin(HandShoulders[i]);
-
-                //Filtering using the One Euro filter reduces jitter from both positions
-                FarFieldRays[i].AimPosition = aimPositionFilters[i].Filter(HandShoulders[i].Hand.GetStablePinchPosition(), Time.time);
-                FarFieldRays[i].RayOrigin = rayOriginFilters[i].Filter(unfilteredRayOrigin, Time.time);
-                FarFieldRays[i].Direction = (FarFieldRays[i].AimPosition - FarFieldRays[i].RayOrigin).normalized;
-            }
-            OnFarFieldHandDirectionFrame?.Invoke(FarFieldRays);
+            return Vector3.Lerp(GetWristOffsetPosition(hand), shoulderPosition, wristShoulderBlendAmount);
         }
 
-        private Vector3 GetRayOrigin(HandShoulder handShoulder)
-        {
-            return Vector3.Lerp(GetWristOffsetPosition(handShoulder), handShoulder.ShoulderPosition, wristShoulderBlendAmount);
-        }
-
-        private Vector3 GetWristOffsetPosition(HandShoulder handShoulder)
+        private Vector3 GetWristOffsetPosition(Hand hand)
         {
             Vector3 worldWristPosition = wristOffset;
-            if (handShoulder.Hand.IsRight)
+            if (hand.IsRight)
             {
                 worldWristPosition.x = -worldWristPosition.x;
             }
 
-            wristOffsetTransformHelper.transform.position = handShoulder.Hand.WristPosition.ToVector3();
-            wristOffsetTransformHelper.transform.rotation = handShoulder.Hand.Rotation.ToQuaternion();
+            wristOffsetTransformHelper.transform.position = hand.WristPosition.ToVector3();
+            wristOffsetTransformHelper.transform.rotation = hand.Rotation.ToQuaternion();
             return wristOffsetTransformHelper.TransformPoint(worldWristPosition);
         }
     }

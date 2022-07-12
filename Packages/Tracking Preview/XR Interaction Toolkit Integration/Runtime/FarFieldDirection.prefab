@@ -1,5 +1,156 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &1036635026629218460
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6173613186894718278}
+  - component: {fileID: 6993023936228747317}
+  m_Layer: 0
+  m_Name: LeftRay
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6173613186894718278
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1036635026629218460}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4724727352373523094}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6993023936228747317
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1036635026629218460}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f9ef11cfcec89994c9ecbea1b9edf774, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  leapProvider: {fileID: 0}
+  chirality: 0
+  wristShoulderBlendAmount: 0.532
+  inferredBodyPositions: {fileID: 62641835800566604}
+--- !u!1 &1343253908231758702
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4705988859565641443}
+  - component: {fileID: 62641835800566604}
+  m_Layer: 0
+  m_Name: InferredBodyPositions
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4705988859565641443
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1343253908231758702}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4724727352373523094}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &62641835800566604
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1343253908231758702}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d164854dc43149741aa0af2fd1c497be, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  useNeckPositionForShoulders: 1
+  shoulderOffset: 0.1
+  neckOffset: -0.1
+  useNeckYawDeadzone: 1
+  WorldLocalNeckPositionBlend: 0.5
+  NeckRotationLerpSpeed: 22
+  drawDebugGizmos: 1
+  debugGizmoColor: {r: 0, g: 0.9215687, b: 0.52156866, a: 1}
+  drawHeadPosition: 1
+  drawNeckPosition: 1
+  drawShoulderPositions: 1
+--- !u!1 &1514387688938423463
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6582859701132372251}
+  - component: {fileID: 8716250368601519938}
+  m_Layer: 0
+  m_Name: RightRay
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6582859701132372251
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1514387688938423463}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4724727352373523094}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8716250368601519938
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1514387688938423463}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f9ef11cfcec89994c9ecbea1b9edf774, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  leapProvider: {fileID: 0}
+  chirality: 1
+  wristShoulderBlendAmount: 0.532
+  inferredBodyPositions: {fileID: 62641835800566604}
 --- !u!1 &4724727352373523088
 GameObject:
   m_ObjectHideFlags: 0
@@ -9,8 +160,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4724727352373523094}
-  - component: {fileID: 4724727352373523089}
-  - component: {fileID: 4724727352373523092}
   m_Layer: 0
   m_Name: FarFieldDirection
   m_TagString: Untagged
@@ -29,44 +178,10 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 6173613186894718278}
+  - {fileID: 6582859701132372251}
+  - {fileID: 4705988859565641443}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &4724727352373523089
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4724727352373523088}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f9ef11cfcec89994c9ecbea1b9edf774, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  leapProvider: {fileID: 0}
-  wristShoulderBlendAmount: 0.532
---- !u!114 &4724727352373523092
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4724727352373523088}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d164854dc43149741aa0af2fd1c497be, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  useNeckPositionForShoulders: 1
-  shoulderOffset: 0.1
-  neckOffset: -0.1
-  useNeckYawDeadzone: 1
-  WorldLocalNeckPositionBlend: 0.5
-  NeckRotationLerpSpeed: 22
-  drawDebugGizmos: 1
-  debugGizmoColor: {r: 0, g: 0.9215687, b: 0.52156866, a: 1}
-  drawHeadPosition: 1
-  drawNeckPosition: 1
-  drawShoulderPositions: 1
