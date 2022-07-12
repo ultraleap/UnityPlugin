@@ -165,7 +165,7 @@ namespace Ultraleap.Tracking.OpenXR
                     (joints[xrTipIndex].Pose.rotation * Vector3.forward),
                     fingerWidth,
                     fingerLength,
-                    true, // Fixed for now
+                    hand.GetFingerStrength(fingerIndex) < 0.4, // Fixed for now
                     (Finger.FingerType)fingerIndex);
             }
 
