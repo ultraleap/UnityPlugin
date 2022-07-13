@@ -30,7 +30,7 @@ namespace Leap.Unity.HandsModule.Examples
 				}	
             }
             currentHandID = 0;
-            handModelManager.EnableHandModelPair(currentHandID, true);
+            handModelManager.EnableHandModelPair(currentHandID, disableOtherHandModels: true);
         }
 
         // Update is called once per frame
@@ -55,15 +55,15 @@ namespace Leap.Unity.HandsModule.Examples
         private void NextHandSet()
         {
             currentHandID++;
-            if (currentHandID > handModelManager.handModelPairs.Count - 1) currentHandID = 0;
-            handModelManager.EnableHandModelPair(currentHandID, true);
+            if (currentHandID > handModelManager.HandModelPairs.Count - 1) currentHandID = 0;
+            handModelManager.EnableHandModelPair(currentHandID, disableOtherHandModels:true);
         }
 
         private void PreviousHandSet()
         {
             currentHandID--;
-            if (currentHandID < 0) currentHandID = handModelManager.handModelPairs.Count - 1;
-            handModelManager.EnableHandModelPair(currentHandID, true);
+            if (currentHandID < 0) currentHandID = handModelManager.HandModelPairs.Count - 1;
+            handModelManager.EnableHandModelPair(currentHandID, disableOtherHandModels:true);
         }
     }
 }

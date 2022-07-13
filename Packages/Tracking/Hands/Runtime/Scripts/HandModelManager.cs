@@ -332,22 +332,22 @@ namespace Leap.Unity.HandsModule
         /// Enable a hand model pair in the scene
         /// </summary>
         /// <param name="index">The index of the pair to enable</param>
-        /// <param name="disableOtherHands">If true, disable all other active hands</param>
-        public void EnableHandModelPair(int index, bool disableOtherHands = true)
+        /// <param name="disableOtherHandModels">If true, disable all other active hands</param>
+        public void EnableHandModelPair(int index, bool disableOtherHandModels = true)
         {
-            EnableHandModel(Chirality.Left, index, disableOtherHands);
-            EnableHandModel(Chirality.Right, index, disableOtherHands);
+            EnableHandModel(Chirality.Left, index, disableOtherHandModels);
+            EnableHandModel(Chirality.Right, index, disableOtherHandModels);
         }
 
         /// <summary>
         /// Enable a hand model pair in the scene
         /// </summary>
         /// <param name="handModelPairID">The string id of the hand model pair to enable</param>
-        /// <param name="disableOtherHands">If true, disable all other active hand models</param>
-        public void EnableHandModelPair(string handModelPairID, bool disableOtherHands = true)
+        /// <param name="disableOtherHandModels">If true, disable all other active hand models</param>
+        public void EnableHandModelPair(string handModelPairID, bool disableOtherHandModels = true)
         {
-            EnableHandModelPair(Chirality.Left, handModelPairID, disableOtherHands);
-            EnableHandModelPair(Chirality.Right, handModelPairID, disableOtherHands);
+            EnableHandModelPair(Chirality.Left, handModelPairID, disableOtherHandModels);
+            EnableHandModelPair(Chirality.Right, handModelPairID, disableOtherHandModels);
         }
 
         /// <summary>
@@ -355,11 +355,11 @@ namespace Leap.Unity.HandsModule
         /// </summary>
         /// <param name="chirality">The chirality to enable</param>
         /// <param name="index">The index of the hand model to enable</param>
-        /// <param name="disableOtherHandsOfSameChirality">If true, disable all other active hand models of the same chirality</param>
-        public void EnableHandModel(Chirality chirality, int index, bool disableOtherHandsOfSameChirality = true)
+        /// <param name="disableOtherHandModelsOfSameChirality">If true, disable all other active hand models of the same chirality</param>
+        public void EnableHandModel(Chirality chirality, int index, bool disableOtherHandModelsOfSameChirality = true)
         {
             HandModelPair handModelPair = HandModelPairs[index];
-            EnableHandModel(chirality, handModelPair, disableOtherHandsOfSameChirality);
+            EnableHandModel(chirality, handModelPair, disableOtherHandModelsOfSameChirality);
         }
 
         /// <summary>
@@ -367,11 +367,11 @@ namespace Leap.Unity.HandsModule
         /// </summary>
         /// <param name="chirality">The chirality to enable</param>
         /// <param name="handModelPairID">The pair id of the hand model to enable</param>
-        /// <param name="disableOtherHandsOfSameChirality">If true, disable all other active hand models of the same chirality</param>
-        public void EnableHandModelPair(Chirality chirality, string handModelPairID, bool disableOtherHandsOfSameChirality = true)
+        /// <param name="disableOtherHandModelsOfSameChirality">If true, disable all other active hand models of the same chirality</param>
+        public void EnableHandModelPair(Chirality chirality, string handModelPairID, bool disableOtherHandModelsOfSameChirality = true)
         {
             HandModelPair handModelPair = HandModelPairs.ToList().Where(hmp => hmp.HandModelPairId == handModelPairID).FirstOrDefault();
-            EnableHandModel(chirality, handModelPair, disableOtherHandsOfSameChirality);
+            EnableHandModel(chirality, handModelPair, disableOtherHandModelsOfSameChirality);
         }
 
         /// <summary>
@@ -379,10 +379,10 @@ namespace Leap.Unity.HandsModule
         /// </summary>
         /// <param name="chirality">The chirality to enable</param>
         /// <param name="handModelPair">The pair to enable</param>
-        /// <param name="disableOtherHandsOfSameChirality">If true, disable all other active hand models of the same chirality</param>
-        private void EnableHandModel(Chirality chirality, HandModelPair handModelPair, bool disableOtherHandsOfSameChirality)
+        /// <param name="disableOtherHandModelsOfSameChirality">If true, disable all other active hand models of the same chirality</param>
+        private void EnableHandModel(Chirality chirality, HandModelPair handModelPair, bool disableOtherHandModelsOfSameChirality)
         {
-            if (disableOtherHandsOfSameChirality)
+            if (disableOtherHandModelsOfSameChirality)
             {
                 DisableAllHandModelsByChirality(chirality);
             }
