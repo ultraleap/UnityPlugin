@@ -220,8 +220,8 @@ namespace Leap.Unity.Interaction
                 worldWristPosition.x = -worldWristPosition.x;
             }
 
-           // transformHelper.transform.position = hand.WristPosition.ToVector3();
-          //  transformHelper.transform.rotation = hand.Rotation.ToQuaternion();
+            transformHelper.transform.position = hand.WristPosition.ToVector3();
+            transformHelper.transform.rotation = hand.Rotation.ToQuaternion();
             return transformHelper.TransformPoint(worldWristPosition);
         }
     }
