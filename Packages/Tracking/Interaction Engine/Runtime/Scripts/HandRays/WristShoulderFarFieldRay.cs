@@ -34,24 +34,33 @@ namespace Leap.Unity.Interaction
     public class WristShoulderFarFieldRay : MonoBehaviour
     {
         /// <summary>
+        /// Called when a far field ray is calculated.
+        /// Subscribe to it to cast rays with the ray direction it provides
+        /// </summary>
+        public event Action<FarFieldHandDirection> OnHandRayFrame;
+        /// <summary>
+        /// Called on the frame the ray is enabled
+        /// </summary>
+        public event Action<FarFieldHandDirection> OnHandRayEnable;
+        /// <summary>
+        /// Called on the frame the ray is disabled
+        /// </summary>
+        public event Action<FarFieldHandDirection> OnHandRayDisable;
+
+        /// <summary>
+        /// True if the ray should be enabled, false if it should be disabled
+        /// </summary>
+        public bool HandRayEnabled { get; private set; }
+
+        /// <summary>
         /// The leap provider provides the hand data from which we calculate the far field ray directions 
         /// </summary>
-        public LeapProvider leapProvider;
+        public LeapXRServiceProvider leapXRServiceProvider;
 
         /// <summary>
         /// The hand this ray is generated for
         /// </summary>
         public Chirality chirality;
-
-        /// <summary>
-        /// An event that is called after new ray direction has been calculated. Subscribe to it to cast rays with the far field hand directions it provides.
-        /// </summary>
-        public event Action<FarFieldHandDirection> OnFarFieldHandDirectionFrame;
-
-        /// <summary>
-        /// This local-space offset from the wrist is used to better align the ray to the pinch position
-        /// </summary>
-        private Vector3 wristOffset = new Vector3(0.0425f, 0.0652f, 0.0f);
 
         /// <summary>
         /// The wrist shoulder lerp amount is only used when the rayOrigin is wristShoulderLerp. 
@@ -76,7 +85,13 @@ namespace Leap.Unity.Interaction
         [HideInInspector] public FarFieldHandDirection FarFieldRay = new FarFieldHandDirection();
 
         [SerializeField] private InferredBodyPositions inferredBodyPositions;
-        private Transform wristOffsetTransformHelper;
+
+        /// <summary>
+        /// This local-space offset from the wrist is used to better align the ray to the pinch position
+        /// </summary>
+        private Vector3 wristOffset = new Vector3(0.0425f, 0.0652f, 0.0f);
+        private Transform transformHelper;
+
         private OneEuroFilter<Vector3> aimPositionFilter;
         private OneEuroFilter<Vector3> rayOriginFilter;
 
@@ -93,24 +108,25 @@ namespace Leap.Unity.Interaction
         
         private readonly float oneEurofreq = 30;
 
+        /// <summary>
+        /// The min dot product allowed when calculating if the hand is facing the camera
+        /// </summary>
+        private float minDotProductAllowedForFacingCamera = 0.55f;
+
         // Start is called before the first frame update
         void Start()
         {
-            if (leapProvider == null)
+            if (leapXRServiceProvider == null)
             {
-                leapProvider = FindObjectOfType<LeapServiceProvider>();
-                if (leapProvider == null)
+                leapXRServiceProvider = FindObjectOfType<LeapXRServiceProvider>();
+                if (leapXRServiceProvider == null)
                 {
-                    leapProvider = FindObjectOfType<LeapProvider>();
-                    if (leapProvider == null)
-                    {
-                        Debug.LogWarning("No leap provider in scene - FarFieldDirection is dependent on one.");
-                    }
+                    Debug.LogWarning("No leap provider in scene - FarFieldDirection is dependent on one.");
                 }
             }
 
-            wristOffsetTransformHelper = new GameObject("FarFieldRaycast_WristOffset").transform;
-            wristOffsetTransformHelper.SetParent(transform);
+            transformHelper = new GameObject("WristShoulderFarFieldRay_TransformHelper").transform;
+            transformHelper.SetParent(transform);
 
             if (inferredBodyPositions == null)
             {
@@ -124,16 +140,53 @@ namespace Leap.Unity.Interaction
         // Update is called once per frame
         void Update()
         {
-            if (leapProvider == null || leapProvider.CurrentFrame == null)
+            if (leapXRServiceProvider == null || leapXRServiceProvider.CurrentFrame == null)
             {
                 return;
             }
-            CalculateRayDirection();
+
+            if (HandRayEnabled)
+            {
+                if (!ShouldEnableRay())
+                {
+                    HandRayEnabled = false;
+                    OnHandRayDisable?.Invoke(FarFieldRay);
+                } 
+                else
+                {
+                    CalculateRayDirection();
+                }
+            } 
+            else
+            {
+                if(ShouldEnableRay())
+                {
+                    HandRayEnabled = true;
+                    CalculateRayDirection();
+                    OnHandRayEnable?.Invoke(FarFieldRay);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Calculates whether the hand ray should be enabled
+        /// </summary>
+        /// <returns></returns>
+        private bool ShouldEnableRay()
+        {
+            if (leapXRServiceProvider.CurrentFrame.GetHand(chirality) == null)
+            {
+                return false;
+            }
+            transformHelper.position = leapXRServiceProvider.CurrentFrame.GetHand(chirality).PalmPosition.ToVector3();
+            Quaternion palmForwardRotation = leapXRServiceProvider.CurrentFrame.GetHand(chirality).Rotation.ToQuaternion() * Quaternion.Euler(90, 0, 0);
+            transformHelper.rotation = palmForwardRotation;
+            return !SimpleFacingCameraCallbacks.GetIsFacingCamera(transformHelper, leapXRServiceProvider.mainCamera, 0.55f);
         }
 
         private void CalculateRayDirection()
         {
-            Hand hand = leapProvider.CurrentFrame.GetHand(chirality);
+            Hand hand = leapXRServiceProvider.CurrentFrame.GetHand(chirality);
             if(hand == null)
             {
                 return;
@@ -151,7 +204,7 @@ namespace Leap.Unity.Interaction
             FarFieldRay.RayOrigin = rayOriginFilter.Filter(unfilteredRayOrigin, Time.time);
 
             FarFieldRay.Direction = (FarFieldRay.AimPosition - FarFieldRay.RayOrigin).normalized;  
-            OnFarFieldHandDirectionFrame?.Invoke(FarFieldRay);
+            OnHandRayFrame?.Invoke(FarFieldRay);
         }
 
         private Vector3 GetRayOrigin(Hand hand, Vector3 shoulderPosition)
@@ -167,9 +220,9 @@ namespace Leap.Unity.Interaction
                 worldWristPosition.x = -worldWristPosition.x;
             }
 
-            wristOffsetTransformHelper.transform.position = hand.WristPosition.ToVector3();
-            wristOffsetTransformHelper.transform.rotation = hand.Rotation.ToQuaternion();
-            return wristOffsetTransformHelper.TransformPoint(worldWristPosition);
+           // transformHelper.transform.position = hand.WristPosition.ToVector3();
+          //  transformHelper.transform.rotation = hand.Rotation.ToQuaternion();
+            return transformHelper.TransformPoint(worldWristPosition);
         }
     }
 #pragma warning restore 0618
