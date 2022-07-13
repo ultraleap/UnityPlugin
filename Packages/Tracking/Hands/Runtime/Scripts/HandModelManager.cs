@@ -59,7 +59,7 @@ namespace Leap.Unity.HandsModule
         /// </summary>
         /// <param name="handModel">The hand model to check</param>
         /// <returns>Returns true if the hand model is registered, and false if not</returns>
-        private bool IsRegistered(HandModelBase handModel)
+        internal bool IsRegistered(HandModelBase handModel)
         {
             for (int i = 0; i < HandModelPairs.Count; i++)
             {
