@@ -177,7 +177,7 @@ namespace Ultraleap.Tracking.OpenXR
                 (handTracker == HandTracker.Left ? 0 : 1),
                 1f,
                 CalculateGrabStrength(hand),
-                CalculateGrabAngle(hand),
+                0, // fixed as grabAngle is going to be deleted
                 CalculatePinchStrength(ref hand, palmWidth),
                 CalculatePinchDistance(ref hand),
                 palmWidth,
@@ -312,20 +312,6 @@ namespace Ultraleap.Tracking.OpenXR
 
             // Return the grab strength.
             return Mathf.Clamp01((minBend - bendZero) / (bendOne - bendZero));
-        }
-
-        float CalculateGrabAngle(Hand hand)
-        {
-            // Compute the sum of the angles between the fingertips and hands.
-            // For every finger, the angle is the sumb of bend + pitch + bow.
-            float angleSum = 0.0f;
-            for(int finger_idx = 1; finger_idx < 5; finger_idx++)
-            {
-                
-                angleSum += Mathf.Lerp(0, Mathf.PI, hand.GetFingerStrength(finger_idx));
-            }
-            // Average between all fingers
-            return angleSum / 4.0f;
         }
 
         #region LeapProvider Implementation
