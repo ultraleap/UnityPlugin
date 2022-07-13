@@ -73,7 +73,7 @@ namespace Leap.Unity.Preview.XRInteractionToolkit
             {
                 RayOrigin = GetComponent<XRRayInteractor>().rayOriginTransform;
 
-                if (rayDirection != null)
+                if (rayDirection == null)
                 {
                     rayDirection = FindObjectsOfType<WristShoulderFarFieldHandRay>().FirstOrDefault(ray => ray.chirality == chirality);
                 }
