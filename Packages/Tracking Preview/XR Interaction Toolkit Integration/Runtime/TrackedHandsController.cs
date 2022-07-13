@@ -24,7 +24,7 @@ namespace Leap.Unity.Preview.XRInteractionToolkit
     {
         public LeapProvider leapProvider;
         public Chirality chirality;
-        public WristShoulderFarFieldRay rayDirection;
+        public WristShoulderFarFieldHandRay rayDirection;
 
         // Different Interaction poses that can be used for select, activate and UI press interactions
         public enum InteractionPose
@@ -75,7 +75,7 @@ namespace Leap.Unity.Preview.XRInteractionToolkit
 
                 if (rayDirection != null)
                 {
-                    rayDirection = FindObjectsOfType<WristShoulderFarFieldRay>().FirstOrDefault(ray => ray.chirality == chirality);
+                    rayDirection = FindObjectsOfType<WristShoulderFarFieldHandRay>().FirstOrDefault(ray => ray.chirality == chirality);
                 }
             }
 
@@ -114,7 +114,7 @@ namespace Leap.Unity.Preview.XRInteractionToolkit
                 if (RayOrigin == null) RayOrigin = GetComponent<XRRayInteractor>().rayOriginTransform;
                 if (RayOrigin != null)
                 {
-                    RayOrigin.rotation = Quaternion.LookRotation(rayDirection.FarFieldRay.Direction);
+                    RayOrigin.rotation = Quaternion.LookRotation(rayDirection.HandRayDirection.Direction);
                 }
             }
         }
