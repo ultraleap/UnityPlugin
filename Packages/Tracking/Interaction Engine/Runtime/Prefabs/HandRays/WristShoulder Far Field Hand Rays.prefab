@@ -44,7 +44,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f9ef11cfcec89994c9ecbea1b9edf774, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  leapProvider: {fileID: 0}
+  leapXRServiceProvider: {fileID: 0}
   chirality: 0
   wristShoulderBlendAmount: 0.532
   inferredBodyPositions: {fileID: 62641835800566604}
@@ -98,7 +98,7 @@ MonoBehaviour:
   useNeckYawDeadzone: 1
   WorldLocalNeckPositionBlend: 0.5
   NeckRotationLerpSpeed: 22
-  drawDebugGizmos: 1
+  drawDebugGizmos: 0
   debugGizmoColor: {r: 0, g: 0.9215687, b: 0.52156866, a: 1}
   drawHeadPosition: 1
   drawNeckPosition: 1
@@ -147,7 +147,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f9ef11cfcec89994c9ecbea1b9edf774, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  leapProvider: {fileID: 0}
+  leapXRServiceProvider: {fileID: 0}
   chirality: 1
   wristShoulderBlendAmount: 0.532
   inferredBodyPositions: {fileID: 62641835800566604}
@@ -161,7 +161,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4724727352373523094}
   m_Layer: 0
-  m_Name: FarFieldDirection
+  m_Name: WristShoulder Far Field Hand Rays
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
