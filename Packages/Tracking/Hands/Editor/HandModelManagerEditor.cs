@@ -15,6 +15,7 @@ namespace Leap.Unity.HandsModule
             if (GUILayout.Button("Register All Hand Models In Scene", GUILayout.Width(250), GUILayout.Height(20)))
             {
                 manager.RegisterAllUnregisteredHandModels();
+                EditorUtility.SetDirty(manager);
             }
             GUILayout.FlexibleSpace();
             GUILayout.EndHorizontal();

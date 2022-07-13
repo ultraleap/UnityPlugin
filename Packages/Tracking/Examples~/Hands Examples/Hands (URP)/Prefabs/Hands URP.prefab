@@ -62,7 +62,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fb843c47900bfe04382af0bd614fe062, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  handModelPairs:
+  HandModelPairs:
   - HandModelPairId: Skeleton Hands (URP)
     Left: {fileID: 4396368993406644590}
     LeftEnableDisable: {fileID: 7810828021823374354}
