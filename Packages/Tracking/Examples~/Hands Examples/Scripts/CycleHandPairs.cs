@@ -23,6 +23,11 @@ namespace Leap.Unity.HandsModule.Examples
             if (handModelManager == null)
             {
                 handModelManager = FindObjectOfType<HandModelManager>();
+				if(handModelManager == null)
+				{
+					Debug.LogWarning("CycleHandPairs needs a HandModelManager in the scene");
+					return;
+				}	
             }
             currentHandID = 0;
             handModelManager.EnableHandModelPair(currentHandID, true);
@@ -31,6 +36,11 @@ namespace Leap.Unity.HandsModule.Examples
         // Update is called once per frame
         void Update()
         {
+			if(handModelManager == null)
+			{
+				return;
+			}
+			
             if (Input.GetKeyUp(KeyCode.RightArrow))
             {
                 NextHandSet();

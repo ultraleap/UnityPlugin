@@ -107,7 +107,7 @@ namespace Leap.Unity.HandsModule
                 handModelPairs[handModelPairIndex].RightEnableDisable = handEnableDisable;
             }
 
-            if (handModelPairs[handModelPairIndex].HandModelPairId == null || handModelPairs[handModelPairIndex].HandModelPairId == "")
+            if (String.IsNullOrEmpty(handModelPairs[handModelPairIndex].HandModelPairId))
             {
                 handModelPairs[handModelPairIndex].HandModelPairId = GetDistinctHandModelId(handModel.gameObject.transform.parent.name);
             }
