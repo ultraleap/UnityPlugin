@@ -23,11 +23,11 @@ namespace Leap.Unity.HandsModule.Examples
             if (handModelManager == null)
             {
                 handModelManager = FindObjectOfType<HandModelManager>();
-				if(handModelManager == null)
-				{
-					Debug.LogWarning("CycleHandPairs needs a HandModelManager in the scene");
-					return;
-				}	
+                if (handModelManager == null)
+                {
+                    Debug.LogWarning("CycleHandPairs needs a HandModelManager in the scene");
+                    return;
+                }
             }
             currentHandID = 0;
             handModelManager.EnableHandModelPair(currentHandID, disableOtherHandModels: true);
@@ -36,11 +36,11 @@ namespace Leap.Unity.HandsModule.Examples
         // Update is called once per frame
         void Update()
         {
-			if(handModelManager == null)
-			{
-				return;
-			}
-			
+            if (handModelManager == null)
+            {
+                return;
+            }
+
             if (Input.GetKeyUp(KeyCode.RightArrow))
             {
                 NextHandSet();
@@ -56,14 +56,14 @@ namespace Leap.Unity.HandsModule.Examples
         {
             currentHandID++;
             if (currentHandID > handModelManager.HandModelPairs.Count - 1) currentHandID = 0;
-            handModelManager.EnableHandModelPair(currentHandID, disableOtherHandModels:true);
+            handModelManager.EnableHandModelPair(currentHandID, disableOtherHandModels: true);
         }
 
         private void PreviousHandSet()
         {
             currentHandID--;
             if (currentHandID < 0) currentHandID = handModelManager.HandModelPairs.Count - 1;
-            handModelManager.EnableHandModelPair(currentHandID, disableOtherHandModels:true);
+            handModelManager.EnableHandModelPair(currentHandID, disableOtherHandModels: true);
         }
     }
 }
