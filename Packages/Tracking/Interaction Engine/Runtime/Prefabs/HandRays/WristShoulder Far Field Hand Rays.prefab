@@ -189,7 +189,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   leapXRServiceProvider: {fileID: 0}
-  chirality: 0
+  chirality: 1
   wristShoulderBlendAmount: 0.532
   inferredBodyPositions: {fileID: 5506465717556540747}
   drawDebugGizmos: 0
