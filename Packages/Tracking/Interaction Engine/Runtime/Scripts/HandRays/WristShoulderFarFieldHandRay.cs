@@ -14,7 +14,10 @@ namespace Leap.Unity.Interaction
 #pragma warning disable 0618
 
     /// <summary>
-    /// Calculates a far field hand ray based on the wrist, shoulder and pinch position
+    /// Calculates a far field hand ray based on the wrist, shoulder and pinch position.
+    /// This allows a developer to decide how responsive the ray feels to the hand's rotation.
+    /// For a more responsive ray, blend the WristShoulderBlendAmount towards the wrist, 
+    /// For a more stable ray, blend the WristShoulderBlendAmount towards the shoulder.
     /// </summary>
     public class WristShoulderFarFieldHandRay : HandRay
     {
@@ -36,6 +39,20 @@ namespace Leap.Unity.Interaction
         [Range(0f, 1)] public float wristShoulderBlendAmount = 0.532f;
 
         [SerializeField] private InferredBodyPositions inferredBodyPositions;
+
+        [Header("Debug Gizmos")]
+        [SerializeField] private bool drawDebugGizmos;
+        [SerializeField] private float gizmoRadius = 0.01f;
+
+        [SerializeField] private bool drawRay = true;
+        [SerializeField] private Color rayColor = Color.green;
+
+        [SerializeField] private bool drawRayAimAndOrigin = true;
+        [SerializeField] private Color rayAimAndOriginColor = Color.red;
+        
+        [SerializeField] private bool drawWristShoulderBlend = false;
+        [SerializeField] private Color wristShoulderBlendColor = Color.blue;
+
 
         /// <summary>
         /// This local-space offset from the wrist is used to better align the ray to the pinch position
@@ -137,6 +154,41 @@ namespace Leap.Unity.Interaction
             transformHelper.transform.position = hand.WristPosition.ToVector3();
             transformHelper.transform.rotation = hand.Rotation.ToQuaternion();
             return transformHelper.TransformPoint(worldWristPosition);
+        }
+
+        private void OnDrawGizmos()
+        {
+            if (!drawDebugGizmos || !Application.isPlaying || !HandRayEnabled)
+            {
+                return;
+            }
+
+            if (drawRay)
+            {
+                Gizmos.color = rayColor;
+                Gizmos.DrawRay(HandRayDirection.RayOrigin, HandRayDirection.Direction * 10);
+            }
+
+            if (drawWristShoulderBlend)
+            {
+                Gizmos.color = wristShoulderBlendColor;
+
+                Hand hand = leapXRServiceProvider.CurrentFrame.GetHand(chirality);
+                Vector3 shoulderPos = inferredBodyPositions.ShoulderPositions[hand.IsLeft ? 0 : 1];
+                Vector3 wristPos = GetWristOffsetPosition(hand);
+                Gizmos.DrawSphere(shoulderPos, gizmoRadius);
+                Gizmos.DrawSphere(wristPos, gizmoRadius);
+                Gizmos.DrawLine(shoulderPos, wristPos);
+            }
+
+            if (drawRayAimAndOrigin)
+            {
+                Gizmos.color = rayAimAndOriginColor;
+                Gizmos.DrawCube(HandRayDirection.RayOrigin, Vector3.one * gizmoRadius);
+                Gizmos.DrawSphere(HandRayDirection.AimPosition, gizmoRadius);
+            }
+
+
         }
     }
 #pragma warning restore 0618

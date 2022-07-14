@@ -48,6 +48,14 @@ MonoBehaviour:
   chirality: 0
   wristShoulderBlendAmount: 0.532
   inferredBodyPositions: {fileID: 62641835800566604}
+  drawDebugGizmos: 0
+  gizmoRadius: 0.02
+  drawRay: 1
+  rayColor: {r: 0, g: 1, b: 0, a: 1}
+  drawRayAimAndOrigin: 1
+  rayAimAndOriginColor: {r: 1, g: 0, b: 0, a: 1}
+  drawWristShoulderBlend: 0
+  wristShoulderBlendColor: {r: 0, g: 0, b: 1, a: 1}
 --- !u!1 &1343253908231758702
 GameObject:
   m_ObjectHideFlags: 0
@@ -151,6 +159,14 @@ MonoBehaviour:
   chirality: 1
   wristShoulderBlendAmount: 0.532
   inferredBodyPositions: {fileID: 62641835800566604}
+  drawDebugGizmos: 0
+  gizmoRadius: 0.02
+  drawRay: 1
+  rayColor: {r: 0, g: 1, b: 0, a: 1}
+  drawRayAimAndOrigin: 1
+  rayAimAndOriginColor: {r: 1, g: 0, b: 0, a: 1}
+  drawWristShoulderBlend: 0
+  wristShoulderBlendColor: {r: 0, g: 0, b: 1, a: 1}
 --- !u!1 &4724727352373523088
 GameObject:
   m_ObjectHideFlags: 0
