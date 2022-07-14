@@ -29,7 +29,8 @@ namespace Leap.Unity.Interaction
             }
         }
 
-        public EulerAngleDeadzone(float deadzoneSize) {
+        public EulerAngleDeadzone(float deadzoneSize)
+        {
             DeadzoneSize = deadzoneSize;
         }
 

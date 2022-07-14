@@ -42,7 +42,6 @@ namespace Leap.Unity.Interaction
 
         [Header("Debug Gizmos")]
         [SerializeField] private bool drawDebugGizmos;
-        [SerializeField] private float gizmoRadius = 0.01f;
 
         [SerializeField] private bool drawRay = true;
         [SerializeField] private Color rayColor = Color.green;
@@ -53,6 +52,7 @@ namespace Leap.Unity.Interaction
         [SerializeField] private bool drawWristShoulderBlend = false;
         [SerializeField] private Color wristShoulderBlendColor = Color.blue;
 
+        private float gizmoRadius = 0.01f;
 
         /// <summary>
         /// This local-space offset from the wrist is used to better align the ray to the pinch position
