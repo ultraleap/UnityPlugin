@@ -13,40 +13,57 @@ namespace Leap.Unity.HandsModule.Examples
 {
     public class CycleHandPairs : MonoBehaviour
     {
-        public List<GameObject> handList;
+        [SerializeField]
+        private HandModelManager handModelManager;
         private int currentHandID;
 
         // Use this for initialization
         void Start()
         {
+            if (handModelManager == null)
+            {
+                handModelManager = FindObjectOfType<HandModelManager>();
+                if (handModelManager == null)
+                {
+                    Debug.LogWarning("CycleHandPairs needs a HandModelManager in the scene");
+                    return;
+                }
+            }
             currentHandID = 0;
+            handModelManager.EnableHandModelPair(currentHandID, disableOtherHandModels: true);
         }
 
         // Update is called once per frame
         void Update()
         {
+            if (handModelManager == null)
+            {
+                return;
+            }
+
             if (Input.GetKeyUp(KeyCode.RightArrow))
             {
-                currentHandID++;
-                if (currentHandID > handList.Count - 1) currentHandID = 0;
+                NextHandSet();
             }
 
             if (Input.GetKeyUp(KeyCode.LeftArrow))
             {
-                currentHandID--;
-                if (currentHandID < 0) currentHandID = handList.Count - 1;
+                PreviousHandSet();
             }
-
-            SortHands();
         }
 
-        void SortHands()
+        private void NextHandSet()
         {
-            for (int i = 0; i < handList.Count; i++)
-            {
-                var hand = handList[i];
-                hand.gameObject.SetActive(i == currentHandID ? true : false);
-            }
+            currentHandID++;
+            if (currentHandID > handModelManager.HandModelPairs.Count - 1) currentHandID = 0;
+            handModelManager.EnableHandModelPair(currentHandID, disableOtherHandModels: true);
+        }
+
+        private void PreviousHandSet()
+        {
+            currentHandID--;
+            if (currentHandID < 0) currentHandID = handModelManager.HandModelPairs.Count - 1;
+            handModelManager.EnableHandModelPair(currentHandID, disableOtherHandModels: true);
         }
     }
 }
