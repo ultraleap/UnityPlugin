@@ -32,6 +32,13 @@ namespace Ultraleap.Tracking.OpenXR
     {
         [PublicAPI] public const string FeatureId = "com.ultraleap.tracking.openxr.feature.handtracking";
 
+        [Header("Meta Hand-Tracking")]
+        [Tooltip("Adds required permissions and features to the Android manifest")]
+        public bool metaPermissions = true;
+
+        [Tooltip("Enable Meta high-frequency hand-tracking")]
+        public bool metaHighFrequency = true;
+
         private static class Native
         {
             private const string NativeDLL = "UltraleapOpenXRUnity";
