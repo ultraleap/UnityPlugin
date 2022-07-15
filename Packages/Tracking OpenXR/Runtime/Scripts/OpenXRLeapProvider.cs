@@ -19,6 +19,9 @@ namespace Ultraleap.Tracking.OpenXR
         private Hand _leftHand = new Hand();
         private Hand _rightHand = new Hand();
 
+        private int _handId = 0;
+        private int _leftHandId = 0;
+        private int _rightHandId = 0;
         private long _leftHandFirstSeen_ticks;
         private long _rightHandFirstSeen_ticks;
 
@@ -127,6 +130,7 @@ namespace Ultraleap.Tracking.OpenXR
                 if (_leftHandFirstSeen_ticks == -1)
                 {
                     _leftHandFirstSeen_ticks = DateTime.Now.Ticks;
+                    _leftHandId =_handId++;
                 }
             }
             else
@@ -134,6 +138,7 @@ namespace Ultraleap.Tracking.OpenXR
                 if (_rightHandFirstSeen_ticks == -1)
                 {
                     _rightHandFirstSeen_ticks = DateTime.Now.Ticks;
+                    _rightHandId = _handId++;
                 }
             }
 
@@ -201,7 +206,7 @@ namespace Ultraleap.Tracking.OpenXR
             // Populate the whole hand information.
             hand.Fill(
                 -1,
-                (handTracker == HandTracker.Left ? 0 : 1),
+                handTracker == HandTracker.Left ? _leftHandId : _rightHandId,
                 1f,
                 0.5f, // Fixed for now
                 100f, // Fixed for now
