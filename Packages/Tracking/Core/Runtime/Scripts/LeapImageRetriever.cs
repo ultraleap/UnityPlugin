@@ -56,7 +56,7 @@ namespace Leap.Unity
         // checks and we lose images. Detecting this and setting an offset allows us to compensate.
         private long _frameIDOffset = -1;
 
-        private bool _policyHasBeenSet = false;
+        private static bool _policyHasBeenSet = false;
 
         public EyeTextureData TextureData
         {
@@ -580,7 +580,11 @@ namespace Leap.Unity
             var controller = _provider.GetLeapController();
             if (controller != null)
             {
-                controller.ClearPolicy(Controller.PolicyFlag.POLICY_IMAGES, _provider.CurrentDevice);
+                if (_policyHasBeenSet)
+                {
+                    controller.ClearPolicy(Controller.PolicyFlag.POLICY_IMAGES, _provider.CurrentDevice);
+                    _policyHasBeenSet = false;
+                }
                 controller.Disconnect -= onDisconnect;
                 controller.ImageReady -= onImageReady;
                 controller.DistortionChange -= onDistortionChange;
