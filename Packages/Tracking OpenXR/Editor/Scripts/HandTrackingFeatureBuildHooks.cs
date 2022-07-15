@@ -9,7 +9,7 @@ using UnityEngine.XR.OpenXR;
 
 namespace Ultraleap.Tracking.OpenXR
 {
-    internal class HandTrackingFeatureBuildHooks : OpenXRFeatureBuildHooks
+    public class HandTrackingFeatureBuildHooks : OpenXRFeatureBuildHooks
     {
         private const string UltraleapPackageTrackingService = "com.ultraleap.tracking.service";
         private const string UltraleapPackageOpenXRApiLayer = "com.ultraleap.openxr.api_layer";
@@ -93,42 +93,39 @@ namespace Ultraleap.Tracking.OpenXR
                 }
 
                 // Check for the package statement and create it if doesn't exist
-                if (queries
-                    .Elements("package")
-                    .Any(el => el.Attribute(_android + "name")?.Name == packageName))
+                if (queries.Elements("package").All(el => el.Attribute(_android + "name")?.Name != packageName))
                 {
-                    _manifest.Root!.Add(
+                    queries.Add(
                         new XElement("package", new XAttribute(_android + "name", packageName))
                     );
                 }
             }
 
-            public void AddUsesPermission(string permissionName)
+            public void AddUsesPermission(string name)
             {
                 // Check if the uses-permission is already there, and create it if not.
-                if (_manifest.Root!
-                    .Elements("uses-permission")
-                    .Any(el => el.Attribute(_android + "name")?.Name == permissionName))
+                if (_manifest.Root!.Elements("uses-permission")
+                    .All(el => el.Attribute(_android + "name")?.Name != name))
                 {
                     _manifest.Root!.Add(
-                        new XElement("uses-permission", new XAttribute(_android + "name", permissionName))
+                        new XElement("uses-permission", new XAttribute(_android + "name", name))
                     );
                 }
             }
 
-            public void AddUsesFeature(string featureName, bool required)
+            public void AddUsesFeature(string name, bool required)
             {
                 // Check if the uses-feature is already there.
                 var feature = _manifest.Root!
                     .Elements("uses-feature")
-                    .FirstOrDefault(el => el.Attribute(_android + "name")?.Name == featureName);
+                    .FirstOrDefault(el => el.Attribute(_android + "name")?.Name == name);
 
                 // Add if it doesn't exist, or upgrade to required if it does and required was declared.
                 if (feature == null)
                 {
                     _manifest.Root!.Add(
                         new XElement("uses-feature",
-                            new XAttribute(_android + "name", featureName),
+                            new XAttribute(_android + "name", name),
                             new XAttribute(_android + "required", required)
                         )
                     );
