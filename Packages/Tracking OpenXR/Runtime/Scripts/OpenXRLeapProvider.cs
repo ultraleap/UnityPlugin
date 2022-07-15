@@ -19,6 +19,9 @@ namespace Ultraleap.Tracking.OpenXR
         private Hand _leftHand = new Hand();
         private Hand _rightHand = new Hand();
 
+        private long _leftHandFirstSeen_ticks;
+        private long _rightHandFirstSeen_ticks;
+
         [Tooltip("Specifies the main camera. Falls back to Camera.main if not set")]
         [SerializeField]
         private Camera _mainCamera; // Redundant backing field, used to present value in editor at parent level
@@ -107,7 +110,31 @@ namespace Ultraleap.Tracking.OpenXR
             var joints = new HandJointLocation[handTracker.JointCount];
             if (!handTracker.TryLocateHandJoints(frameTime, joints))
             {
+                if (handTracker == HandTracker.Left)
+                {
+                    _leftHandFirstSeen_ticks = -1;
+                }
+                else
+                {
+                    _rightHandFirstSeen_ticks = -1;
+                }
+
                 return false;
+            }
+
+            if (handTracker == HandTracker.Left)
+            {
+                if (_leftHandFirstSeen_ticks == -1)
+                {
+                    _leftHandFirstSeen_ticks = DateTime.Now.Ticks;
+                }
+            }
+            else
+            {
+                if (_rightHandFirstSeen_ticks == -1)
+                {
+                    _rightHandFirstSeen_ticks = DateTime.Now.Ticks;
+                }
             }
 
             for (int fingerIndex = 0; fingerIndex < 5; fingerIndex++)
@@ -182,7 +209,8 @@ namespace Ultraleap.Tracking.OpenXR
                 CalculatePinchDistance(ref hand),
                 palmWidth,
                 handTracker == HandTracker.Left,
-                10f, // Fixed for now
+                handTracker == HandTracker.Left ? ((float) (DateTime.Now.Ticks - _leftHandFirstSeen_ticks)) / (float) TimeSpan.TicksPerSecond :
+                                                  ((float) (DateTime.Now.Ticks - _rightHandFirstSeen_ticks)) / (float) TimeSpan.TicksPerSecond,
                 null, // Already Populated
                 joints[(int)HandJoint.Palm].Pose.position,
                 joints[(int)HandJoint.Palm].Pose.position,
