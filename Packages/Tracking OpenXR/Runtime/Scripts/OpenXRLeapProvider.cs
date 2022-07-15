@@ -218,8 +218,8 @@ namespace Ultraleap.Tracking.OpenXR
                 CalculatePinchDistance(ref hand),
                 palmWidth,
                 handTracker == HandTracker.Left,
-                handTracker == HandTracker.Left ? ((float) (DateTime.Now.Ticks - _leftHandFirstSeen_ticks)) / (float) TimeSpan.TicksPerSecond :
-                                                  ((float) (DateTime.Now.Ticks - _rightHandFirstSeen_ticks)) / (float) TimeSpan.TicksPerSecond,
+                handTracker == HandTracker.Left ? ((float)(DateTime.Now.Ticks - _leftHandFirstSeen_ticks)) / (float)TimeSpan.TicksPerSecond :
+                                                  ((float)(DateTime.Now.Ticks - _rightHandFirstSeen_ticks)) / (float)TimeSpan.TicksPerSecond,
                 null, // Already Populated
                 joints[(int)HandJoint.Palm].Pose.position,
                 joints[(int)HandJoint.Palm].Pose.position,
