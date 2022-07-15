@@ -42,7 +42,7 @@ namespace Leap.Unity.Interaction
         /// <summary>
         /// The leap provider provides the hand data from which we calculate the far field ray directions 
         /// </summary>
-        public LeapXRServiceProvider leapXRServiceProvider;
+        public LeapProvider leapProvider;
 
         /// <summary>
         /// The hand this ray is generated for
@@ -57,12 +57,17 @@ namespace Leap.Unity.Interaction
         // Start is called before the first frame update
         protected virtual void Start()
         {
-            if (leapXRServiceProvider == null)
+
+            if (leapProvider == null)
             {
-                leapXRServiceProvider = FindObjectOfType<LeapXRServiceProvider>();
-                if (leapXRServiceProvider == null)
+                leapProvider = FindObjectOfType<LeapServiceProvider>();
+                if (leapProvider == null)
                 {
-                    Debug.LogWarning("No xr leap provider in scene - Hand Ray is dependent on one.");
+                    leapProvider = FindObjectOfType<LeapProvider>();
+                    if (leapProvider == null)
+                    {
+                        Debug.LogWarning("No xr leap provider in scene - Hand Ray is dependent on one.");
+                    }
                 }
             }
         }
@@ -70,7 +75,7 @@ namespace Leap.Unity.Interaction
         // Update is called once per frame
         protected virtual void Update()
         {
-            if (leapXRServiceProvider == null || leapXRServiceProvider.CurrentFrame == null)
+            if (leapProvider == null || leapProvider.CurrentFrame == null)
             {
                 return;
             }
@@ -111,7 +116,7 @@ namespace Leap.Unity.Interaction
         /// <returns></returns>
         protected virtual bool ShouldEnableRay()
         {
-            if (leapXRServiceProvider.CurrentFrame.GetHand(chirality) == null)
+            if (leapProvider.CurrentFrame.GetHand(chirality) == null)
             {
                 return false;
             }

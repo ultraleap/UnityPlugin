@@ -106,10 +106,10 @@ namespace Leap.Unity.Interaction
             {
                 return false;
             }
-            transformHelper.position = leapXRServiceProvider.CurrentFrame.GetHand(chirality).PalmPosition.ToVector3();
-            Quaternion palmForwardRotation = leapXRServiceProvider.CurrentFrame.GetHand(chirality).Rotation.ToQuaternion() * Quaternion.Euler(90, 0, 0);
+            transformHelper.position = leapProvider.CurrentFrame.GetHand(chirality).PalmPosition.ToVector3();
+            Quaternion palmForwardRotation = leapProvider.CurrentFrame.GetHand(chirality).Rotation.ToQuaternion() * Quaternion.Euler(90, 0, 0);
             transformHelper.rotation = palmForwardRotation;
-            return !SimpleFacingCameraCallbacks.GetIsFacingCamera(transformHelper, leapXRServiceProvider.mainCamera, minDotProductAllowedForFacingCamera);
+            return !IsFacingTransform(transformHelper, inferredBodyPositions.Head, minDotProductAllowedForFacingCamera);
         }
 
         /// <summary>
@@ -117,7 +117,7 @@ namespace Leap.Unity.Interaction
         /// </summary>
         protected override void CalculateRayDirection()
         {
-            Hand hand = leapXRServiceProvider.CurrentFrame.GetHand(chirality);
+            Hand hand = leapProvider.CurrentFrame.GetHand(chirality);
             if(hand == null)
             {
                 return;
@@ -156,6 +156,11 @@ namespace Leap.Unity.Interaction
             return transformHelper.TransformPoint(worldWristPosition);
         }
 
+        private bool IsFacingTransform(Transform facingTransform, Transform transformToCheck, float minAllowedDotProduct = 0.8F)
+        {
+            return Vector3.Dot((transformToCheck.transform.position - facingTransform.position).normalized, facingTransform.forward) > minAllowedDotProduct;
+        }
+
         private void OnDrawGizmos()
         {
             if (!drawDebugGizmos || !Application.isPlaying || !HandRayEnabled)
@@ -173,7 +178,7 @@ namespace Leap.Unity.Interaction
             {
                 Gizmos.color = wristShoulderBlendColor;
 
-                Hand hand = leapXRServiceProvider.CurrentFrame.GetHand(chirality);
+                Hand hand = leapProvider.CurrentFrame.GetHand(chirality);
                 Vector3 shoulderPos = inferredBodyPositions.ShoulderPositions[hand.IsLeft ? 0 : 1];
                 Vector3 wristPos = GetWristOffsetPosition(hand);
                 Gizmos.DrawSphere(shoulderPos, gizmoRadius);
@@ -187,8 +192,6 @@ namespace Leap.Unity.Interaction
                 Gizmos.DrawCube(HandRayDirection.RayOrigin, Vector3.one * gizmoRadius);
                 Gizmos.DrawSphere(HandRayDirection.AimPosition, gizmoRadius);
             }
-
-
         }
     }
 #pragma warning restore 0618

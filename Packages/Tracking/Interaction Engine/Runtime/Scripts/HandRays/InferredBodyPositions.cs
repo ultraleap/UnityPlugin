@@ -87,7 +87,6 @@ namespace Leap.Unity.Interaction
         private float shoulderGizmoRadius = 0.02f;
 
         private EulerAngleDeadzone neckYawDeadzone;
-        private Transform head;
         private Transform transformHelper;
 
         //Inferred Body Positions
@@ -122,9 +121,24 @@ namespace Leap.Unity.Interaction
         /// </summary>
         public Vector3[] ShoulderPositionsLocalSpace { get; private set; }
 
+        /// <summary>
+        /// The head position, taken as the mainCamera from a LeapXRServiceProvider if found in the scene,
+        /// otherwise Camera.main
+        /// </summary>
+        public Transform Head { get; private set; }
+
+
         private void Start()
         {
-            head = Camera.main.transform;
+            LeapXRServiceProvider leapXRServiceProvider = FindObjectOfType<LeapXRServiceProvider>();
+            if(leapXRServiceProvider != null)
+            {
+                Head = leapXRServiceProvider.mainCamera.transform;
+            } 
+            else
+            {
+                Head = Camera.main.transform;
+            }
             transformHelper = new GameObject("InferredBodyPositions_TransformHelper").transform;
             transformHelper.SetParent(transform);
 
@@ -136,7 +150,7 @@ namespace Leap.Unity.Interaction
 
         private void Update()
         {
-            neckYawDeadzone.UpdateDeadzone(head.rotation.eulerAngles.y);
+            neckYawDeadzone.UpdateDeadzone(Head.rotation.eulerAngles.y);
             UpdateBodyPositions();
         }
 
@@ -162,7 +176,7 @@ namespace Leap.Unity.Interaction
 
         private void UpdateNeckRotation()
         {
-            float neckYRotation = useNeckYawDeadzone ? neckYawDeadzone.DeadzoneCentre : head.rotation.eulerAngles.y;
+            float neckYRotation = useNeckYawDeadzone ? neckYawDeadzone.DeadzoneCentre : Head.rotation.eulerAngles.y;
             NeckRotation = Quaternion.Lerp(NeckRotation, Quaternion.Euler(0, neckYRotation, 0), Time.deltaTime * NeckRotationLerpSpeed);
         }
 
@@ -175,8 +189,8 @@ namespace Leap.Unity.Interaction
                 z = 0
             };
 
-            transformHelper.position = head.position;
-            transformHelper.rotation = head.rotation;
+            transformHelper.position = Head.position;
+            transformHelper.rotation = Head.rotation;
             NeckPositionLocalSpace = transformHelper.TransformPoint(localNeckOffset);
         }
 
@@ -189,14 +203,14 @@ namespace Leap.Unity.Interaction
                 z = 0
             };
 
-            Vector3 headPosition = head.position;
+            Vector3 headPosition = Head.position;
             NeckPositionWorldSpace = headPosition + worldNeckOffset;
         }
 
         private void UpdateHeadOffsetShoulderPositions()
         {
-            ShoulderPositionsLocalSpace[0] = head.TransformPoint(-shoulderOffset, neckOffset, 0);
-            ShoulderPositionsLocalSpace[1] = head.TransformPoint(shoulderOffset, neckOffset, 0);
+            ShoulderPositionsLocalSpace[0] = Head.TransformPoint(-shoulderOffset, neckOffset, 0);
+            ShoulderPositionsLocalSpace[1] = Head.TransformPoint(shoulderOffset, neckOffset, 0);
         }
 
         private void UpdateShoulderPositions()
@@ -237,7 +251,7 @@ namespace Leap.Unity.Interaction
 
             if (drawHeadPosition)
             {
-                Gizmos.matrix = Matrix4x4.TRS(head.position, head.rotation, Vector3.one);
+                Gizmos.matrix = Matrix4x4.TRS(Head.position, Head.rotation, Vector3.one);
                 Gizmos.DrawCube(Vector3.zero, Vector3.one * headGizmoRadius);
                 Gizmos.matrix = Matrix4x4.identity;
             }
@@ -252,7 +266,7 @@ namespace Leap.Unity.Interaction
             if (drawNeckPosition)
             {
                 Gizmos.DrawSphere(NeckPosition, neckGizmoRadius);
-                Gizmos.DrawLine(head.position, NeckPosition);
+                Gizmos.DrawLine(Head.position, NeckPosition);
             }
         }
     }

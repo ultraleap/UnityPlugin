@@ -24,7 +24,7 @@ namespace Leap.Unity.Preview.XRInteractionToolkit
     {
         public LeapProvider leapProvider;
         public Chirality chirality;
-        public WristShoulderFarFieldHandRay rayDirection;
+        public HandRay handRay;
 
         // Different Interaction poses that can be used for select, activate and UI press interactions
         public enum InteractionPose
@@ -50,6 +50,8 @@ namespace Leap.Unity.Preview.XRInteractionToolkit
 
         private float lengthGrabPinchTime = 1;
 
+        private XRRayInteractor xrRayInteractor;
+
         /// <inheritdoc />
         protected override void OnEnable()
         {
@@ -68,14 +70,17 @@ namespace Leap.Unity.Preview.XRInteractionToolkit
                 }
             }
 
+            updateTrackingType = UpdateType.UpdateAndBeforeRender;
+
             // if using a ray interactor, set everything up for computing the ray
-            if (GetComponent<XRRayInteractor>() != null)
+            xrRayInteractor = GetComponent<XRRayInteractor>();
+            if (xrRayInteractor != null)
             {
                 RayOrigin = GetComponent<XRRayInteractor>().rayOriginTransform;
 
-                if (rayDirection == null)
+                if (handRay == null)
                 {
-                    rayDirection = FindObjectsOfType<WristShoulderFarFieldHandRay>().FirstOrDefault(ray => ray.chirality == chirality);
+                    handRay = FindObjectsOfType<WristShoulderFarFieldHandRay>().FirstOrDefault(ray => ray.chirality == chirality);
                 }
             }
 
@@ -108,13 +113,22 @@ namespace Leap.Unity.Preview.XRInteractionToolkit
 
             controllerState.rotation = hand.Rotation.ToQuaternion();
             controllerState.inputTrackingState |= InputTrackingState.Rotation;
-
-            if (GetComponent<XRRayInteractor>() != null)
+            if (xrRayInteractor != null)
             {
-                if (RayOrigin == null) RayOrigin = GetComponent<XRRayInteractor>().rayOriginTransform;
+                // Note: this doesn't work too well - XRI processes the positions and
+                // adds a fair amount of latency to them.
+                // This is particularly noticable if using a LineType.ProjectileCurve on your XRRayInteractor,
+                // which  will result in a very noodly & unresponsive line.
+                // We can 'fix' this by setting the updateTrackingType of the TrackedHandsController to UpdateType.Update,
+                // but this XRI then makes our ray direction very jittery.
+                // This will be fixed in the future by better integration with XRI -
+                // potentially through our own implementation of XRRayInteractor
+
+                if (RayOrigin == null) RayOrigin = xrRayInteractor.rayOriginTransform;
                 if (RayOrigin != null)
                 {
-                    RayOrigin.rotation = Quaternion.LookRotation(rayDirection.HandRayDirection.Direction);
+                    RayOrigin.position = handRay.HandRayDirection.VisualAimPosition;
+                    RayOrigin.rotation = Quaternion.LookRotation(handRay.HandRayDirection.Direction);
                 }
             }
         }
@@ -129,6 +143,18 @@ namespace Leap.Unity.Preview.XRInteractionToolkit
             }
 
             controllerState.ResetFrameDependentStates();
+
+            if (xrRayInteractor != null)
+            {
+                if (xrRayInteractor.isActiveAndEnabled && !handRay.HandRayEnabled)
+                {
+                    xrRayInteractor.enabled = false;
+                }
+                else if (!xrRayInteractor.isActiveAndEnabled && handRay.HandRayEnabled)
+                {
+                    xrRayInteractor.enabled = true;
+                }
+            }
 
             Hand hand = leapProvider.CurrentFrame.GetHand(chirality);
             if (hand == null)

@@ -58,7 +58,7 @@ MonoBehaviour:
   m_ModelDeSelectTransition: 
   leapProvider: {fileID: 1935714773915223428}
   chirality: 1
-  rayDirection: {fileID: 0}
+  handRay: {fileID: 759309305292016891}
   selectInteractionPose: 0
   activateInteractionPose: 0
   uiPressInteractionPose: 0
@@ -336,7 +336,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_LineWidth: 0.02
-  m_OverrideInteractorLineLength: 1
+  m_OverrideInteractorLineLength: 0
   m_LineLength: 10
   m_WidthCurve:
     serializedVersion: 2
@@ -518,7 +518,7 @@ MonoBehaviour:
   m_ModelDeSelectTransition: 
   leapProvider: {fileID: 1935714773915223428}
   chirality: 0
-  rayDirection: {fileID: 0}
+  handRay: {fileID: 8910288156287712099}
   selectInteractionPose: 0
   activateInteractionPose: 0
   uiPressInteractionPose: 0
@@ -797,6 +797,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 3135492389399398527}
     m_Modifications:
+    - target: {fileID: 2751656230932833424, guid: 071415ff98e0a6a40b2581f51b99236b,
+        type: 3}
+      propertyPath: leapProvider
+      value: 
+      objectReference: {fileID: 1935714773915223428}
     - target: {fileID: 2967608538607003103, guid: 071415ff98e0a6a40b2581f51b99236b,
         type: 3}
       propertyPath: m_Name
@@ -857,11 +862,40 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6269556964730049288, guid: 071415ff98e0a6a40b2581f51b99236b,
+        type: 3}
+      propertyPath: leapProvider
+      value: 
+      objectReference: {fileID: 1935714773915223428}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 071415ff98e0a6a40b2581f51b99236b, type: 3}
+--- !u!114 &759309305292016891 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6269556964730049288, guid: 071415ff98e0a6a40b2581f51b99236b,
+    type: 3}
+  m_PrefabInstance: {fileID: 6739754618103521267}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f9ef11cfcec89994c9ecbea1b9edf774, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!4 &1030916196488967343 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6036767215400790876, guid: 071415ff98e0a6a40b2581f51b99236b,
     type: 3}
   m_PrefabInstance: {fileID: 6739754618103521267}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &8910288156287712099 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2751656230932833424, guid: 071415ff98e0a6a40b2581f51b99236b,
+    type: 3}
+  m_PrefabInstance: {fileID: 6739754618103521267}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f9ef11cfcec89994c9ecbea1b9edf774, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
