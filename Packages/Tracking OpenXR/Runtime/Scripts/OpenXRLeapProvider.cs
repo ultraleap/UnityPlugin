@@ -25,6 +25,8 @@ namespace Ultraleap.Tracking.OpenXR
         private long _leftHandFirstSeen_ticks;
         private long _rightHandFirstSeen_ticks;
 
+        private long _frameId = 0;
+
         [Tooltip("Specifies the main camera. Falls back to Camera.main if not set")]
         [SerializeField]
         private Camera _mainCamera; // Redundant backing field, used to present value in editor at parent level
@@ -97,6 +99,8 @@ namespace Ultraleap.Tracking.OpenXR
         private void PopulateLeapFrame(FrameTime frameTime, ref Frame leapFrame)
         {
             leapFrame.Hands.Clear();
+            leapFrame.Id = _frameId++;
+
             if (PopulateLeapHandFromOpenXRJoints(HandTracker.Left, frameTime, ref _leftHand))
             {
                 leapFrame.Hands.Add(_leftHand);
@@ -189,7 +193,7 @@ namespace Ultraleap.Tracking.OpenXR
 
                 // Populate the higher - level finger data.
                 hand.Fingers[fingerIndex].Fill(
-                    -1,
+                    _frameId,
                     (handTracker == HandTracker.Left ? 0 : 1),
                     fingerIndex,
                     10f, // Fixed for now
@@ -205,7 +209,7 @@ namespace Ultraleap.Tracking.OpenXR
 
             // Populate the whole hand information.
             hand.Fill(
-                -1,
+                _frameId,
                 handTracker == HandTracker.Left ? _leftHandId : _rightHandId,
                 1f,
                 0.5f, // Fixed for now
