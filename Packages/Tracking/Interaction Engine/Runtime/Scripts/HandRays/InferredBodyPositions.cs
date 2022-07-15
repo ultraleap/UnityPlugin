@@ -131,10 +131,10 @@ namespace Leap.Unity.Interaction
         private void Start()
         {
             LeapXRServiceProvider leapXRServiceProvider = FindObjectOfType<LeapXRServiceProvider>();
-            if(leapXRServiceProvider != null)
+            if (leapXRServiceProvider != null)
             {
                 Head = leapXRServiceProvider.mainCamera.transform;
-            } 
+            }
             else
             {
                 Head = Camera.main.transform;

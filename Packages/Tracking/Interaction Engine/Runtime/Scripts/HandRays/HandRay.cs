@@ -128,11 +128,13 @@ namespace Leap.Unity.Interaction
             OnHandRayFrame?.Invoke(handRayDirection);
         }
 
-        protected void InvokeOnHandRayEnable(HandRayDirection handRayDirection) {
+        protected void InvokeOnHandRayEnable(HandRayDirection handRayDirection)
+        {
             OnHandRayEnable?.Invoke(handRayDirection);
         }
 
-        protected void InvokeOnHandRayDisable(HandRayDirection handRayDirection) {
+        protected void InvokeOnHandRayDisable(HandRayDirection handRayDirection)
+        {
             OnHandRayDisable?.Invoke(handRayDirection);
         }
     }

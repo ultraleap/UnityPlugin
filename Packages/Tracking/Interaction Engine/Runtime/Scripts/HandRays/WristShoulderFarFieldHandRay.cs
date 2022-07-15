@@ -48,7 +48,7 @@ namespace Leap.Unity.Interaction
 
         [SerializeField] private bool drawRayAimAndOrigin = true;
         [SerializeField] private Color rayAimAndOriginColor = Color.red;
-        
+
         [SerializeField] private bool drawWristShoulderBlend = false;
         [SerializeField] private Color wristShoulderBlendColor = Color.blue;
 
@@ -72,8 +72,8 @@ namespace Leap.Unity.Interaction
         /// MinCutoff for OneEuroFilter (see https://cristal.univ-lille.fr/~casiez/1euro/)
         /// If you're experiencing slow speed jitter, decrease MinCutoff
         /// </summary>
-        private float oneEuroMinCutoff = 5;       
-        
+        private float oneEuroMinCutoff = 5;
+
         private readonly float oneEurofreq = 30;
 
         /// <summary>
@@ -118,7 +118,7 @@ namespace Leap.Unity.Interaction
         protected override void CalculateRayDirection()
         {
             Hand hand = leapProvider.CurrentFrame.GetHand(chirality);
-            if(hand == null)
+            if (hand == null)
             {
                 return;
             }
@@ -134,7 +134,7 @@ namespace Leap.Unity.Interaction
             HandRayDirection.AimPosition = aimPositionFilter.Filter(hand.GetStablePinchPosition(), Time.time);
             HandRayDirection.RayOrigin = rayOriginFilter.Filter(unfilteredRayOrigin, Time.time);
 
-            HandRayDirection.Direction = (HandRayDirection.AimPosition - HandRayDirection.RayOrigin).normalized;  
+            HandRayDirection.Direction = (HandRayDirection.AimPosition - HandRayDirection.RayOrigin).normalized;
             InvokeOnHandRayFrame(HandRayDirection);
         }
 
