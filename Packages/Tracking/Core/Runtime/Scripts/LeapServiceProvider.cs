@@ -771,12 +771,6 @@ namespace Leap.Unity
             }
         }
 
-        protected virtual void OnApplicationQuit()
-        {
-            destroyController();
-            _isDestroyed = true;
-        }
-
         /// <summary>
         /// Calculates the physics extrapolation time depending on the PhysicsExtrapolationMode.
         /// </summary>

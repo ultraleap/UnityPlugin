@@ -56,6 +56,8 @@ namespace Leap.Unity
         // checks and we lose images. Detecting this and setting an offset allows us to compensate.
         private long _frameIDOffset = -1;
 
+        private bool _policyHasBeenSet = false;
+
         public EyeTextureData TextureData
         {
             get
@@ -448,7 +450,6 @@ namespace Leap.Unity
                 controller.Disconnect -= onDisconnect;
                 controller.ImageReady -= onImageReady;
                 controller.FrameReady -= onFrameReady;
-                _provider.OnDeviceChanged -= OnDeviceChanged;
             }
 
             Camera.onPreRender -= OnCameraPreRender;
@@ -524,9 +525,10 @@ namespace Leap.Unity
                     currentDevice = null;
                 }
 
-                if (!controller.IsPolicySet(Controller.PolicyFlag.POLICY_IMAGES, currentDevice))
+                if (!_policyHasBeenSet && controller.IsDeviceAvailable(currentDevice) && !controller.IsPolicySet(Controller.PolicyFlag.POLICY_IMAGES, currentDevice))
                 {
                     controller.SetPolicy(Controller.PolicyFlag.POLICY_IMAGES, currentDevice);
+                    _policyHasBeenSet = true;
                 }
             }
 
@@ -583,7 +585,6 @@ namespace Leap.Unity
                 controller.ImageReady -= onImageReady;
                 controller.DistortionChange -= onDistortionChange;
                 controller.FrameReady -= onFrameReady;
-                _provider.OnDeviceChanged -= OnDeviceChanged;
             }
             _eyeTextureData.MarkStale();
         }
@@ -602,16 +603,6 @@ namespace Leap.Unity
             controller.Disconnect += onDisconnect;
             controller.ImageReady += onImageReady;
             controller.DistortionChange += onDistortionChange;
-            _provider.OnDeviceChanged += OnDeviceChanged;
-        }
-
-        private void OnDeviceChanged(Device d)
-        {
-            unsubscribeFromService();
-            subscribeToService();
-            Controller controller = _provider.GetLeapController();
-            controller.FrameReady -= onFrameReady;
-            controller.FrameReady += onFrameReady;
         }
 
         private void onImageReady(object sender, ImageEventArgs args)
@@ -642,7 +633,11 @@ namespace Leap.Unity
             if (controller != null)
             {
                 controller.FrameReady -= onFrameReady;
-                controller.SetPolicy(Controller.PolicyFlag.POLICY_IMAGES, _provider.CurrentDevice);
+                if (!_policyHasBeenSet)
+                {
+                    controller.SetPolicy(Controller.PolicyFlag.POLICY_IMAGES, _provider.CurrentDevice);
+                    _policyHasBeenSet = true;
+                }
             }
         }
 
@@ -653,7 +648,11 @@ namespace Leap.Unity
             {
                 controller.FrameReady -= onFrameReady;
                 controller.FrameReady += onFrameReady;
-                controller.ClearPolicy(Controller.PolicyFlag.POLICY_IMAGES, _provider.CurrentDevice);
+                if (_policyHasBeenSet)
+                {
+                    controller.ClearPolicy(Controller.PolicyFlag.POLICY_IMAGES, _provider.CurrentDevice);
+                    _policyHasBeenSet = false;
+                }
             }
         }
 
