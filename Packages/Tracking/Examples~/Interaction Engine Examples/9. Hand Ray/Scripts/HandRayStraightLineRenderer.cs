@@ -1,7 +1,7 @@
 using Leap.Unity.Interaction;
 using UnityEngine;
 
-public class HandRayLineRenderer : MonoBehaviour
+public class HandRayStraightLineRenderer : MonoBehaviour
 {
     public float LineRendererDistance = 50f;
     public HandRay HandRay;
@@ -13,19 +13,19 @@ public class HandRayLineRenderer : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        if (lineRenderer == null)
+        if(lineRenderer == null)
         {
             lineRenderer = GetComponentInChildren<LineRenderer>();
-            if (lineRenderer == null)
+            if(lineRenderer == null)
             {
-                Debug.LogWarning("HandRayLineRenderer needs a lineRenderer");
+                Debug.LogWarning("HandRayStraightLineRenderer needs a lineRenderer");
             }
         }
 
-        if (trailRendererTransform != null)
+        if(trailRendererTransform != null)
         {
             trailRenderer = trailRendererTransform.GetComponentInChildren<TrailRenderer>();
-            if (trailRenderer == null)
+            if(trailRenderer == null)
             {
                 Debug.LogWarning("The trail renderer transform reference does not have a trailRenderer attached");
             }
@@ -37,12 +37,12 @@ public class HandRayLineRenderer : MonoBehaviour
 
     private void OnEnable()
     {
-        if (HandRay == null)
+        if(HandRay == null)
         {
             HandRay = FindObjectOfType<WristShoulderFarFieldHandRay>();
             if (HandRay == null)
             {
-                Debug.LogWarning("HandRayLineRenderer needs a HandRay");
+                Debug.LogWarning("HandRayStraightLineRenderer needs a HandRay");
                 return;
             }
         }
@@ -67,7 +67,7 @@ public class HandRayLineRenderer : MonoBehaviour
     {
         lineRenderer.enabled = true;
 
-        if (trailRendererTransform != null)
+        if(trailRendererTransform != null)
         {
             trailRenderer.enabled = true;
             trailRenderer.Clear();
@@ -85,7 +85,21 @@ public class HandRayLineRenderer : MonoBehaviour
 
     void UpdateLineRenderer(HandRayDirection handRayDirection)
     {
-        Vector3 lineRendererEndPos = handRayDirection.RayOrigin + handRayDirection.Direction * LineRendererDistance;
+        Vector3 lineRendererEndPos;
+        RaycastHit hitInfo;
+        if (Physics.Raycast(new Ray(handRayDirection.RayOrigin, handRayDirection.Direction), out hitInfo, LineRendererDistance))
+        {
+            Vector3 hitPoint = hitInfo.point;
+
+            // Add a small vertical offset to the hit point in order to see the trail better
+            hitPoint.y += 0.04f;
+            lineRendererEndPos = hitPoint;
+        }
+        else
+        {
+            lineRendererEndPos = handRayDirection.RayOrigin + handRayDirection.Direction * LineRendererDistance;
+        }
+
         UpdateLineRendererPositions(lineRenderer, handRayDirection.VisualAimPosition, lineRendererEndPos);
         if (trailRendererTransform != null)
         {
