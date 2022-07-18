@@ -323,8 +323,6 @@ namespace Leap.Unity
         /// </summary>
         public static Vector3 GetStablePinchPosition(this Hand hand)
         {
-            int index = hand.IsLeft ? 0 : 1;
-
             // The stable pinch point is a rigid point in hand-space linearly offset by the
             // index finger knuckle position and scaled by the index finger's length
 
