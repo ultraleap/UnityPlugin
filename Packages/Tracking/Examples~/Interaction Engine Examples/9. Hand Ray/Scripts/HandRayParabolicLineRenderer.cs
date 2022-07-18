@@ -27,7 +27,7 @@ namespace Leap.Unity
         public HandRay HandRay;
         [SerializeField] private LineRenderer lineRenderer;
         [SerializeField] private Transform trailRendererTransform;
-        
+
         private TrailRenderer trailRenderer;
         private List<Vector3> parabolaPositions = new List<Vector3>();
 
