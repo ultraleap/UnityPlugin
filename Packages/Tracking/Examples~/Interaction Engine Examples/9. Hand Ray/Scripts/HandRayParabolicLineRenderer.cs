@@ -29,7 +29,7 @@ namespace Leap.Unity
         [SerializeField] private LineRenderer lineRenderer;
         [SerializeField] private Transform trailRendererTransform;
         [SerializeField] private float trailRendererYOffset = 0.04f;
-        
+
         private TrailRenderer trailRenderer;
         private List<Vector3> parabolaPositions = new List<Vector3>();
 

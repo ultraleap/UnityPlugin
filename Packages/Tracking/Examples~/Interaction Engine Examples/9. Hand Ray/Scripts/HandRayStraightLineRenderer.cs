@@ -21,19 +21,19 @@ public class HandRayStraightLineRenderer : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        if(lineRenderer == null)
+        if (lineRenderer == null)
         {
             lineRenderer = GetComponentInChildren<LineRenderer>();
-            if(lineRenderer == null)
+            if (lineRenderer == null)
             {
                 Debug.LogWarning($"HandRayStraightLineRenderer needs a lineRenderer");
             }
         }
 
-        if(trailRendererTransform != null)
+        if (trailRendererTransform != null)
         {
             trailRenderer = trailRendererTransform.GetComponentInChildren<TrailRenderer>();
-            if(trailRenderer == null)
+            if (trailRenderer == null)
             {
                 Debug.LogWarning("The trail renderer transform reference does not have a trailRenderer attached");
             }
@@ -45,7 +45,7 @@ public class HandRayStraightLineRenderer : MonoBehaviour
 
     private void OnEnable()
     {
-        if(handRay == null)
+        if (handRay == null)
         {
             handRay = FindObjectOfType<WristShoulderFarFieldHandRay>();
             if (handRay == null)
@@ -75,7 +75,7 @@ public class HandRayStraightLineRenderer : MonoBehaviour
     {
         lineRenderer.enabled = true;
 
-        if(trailRendererTransform != null)
+        if (trailRendererTransform != null)
         {
             trailRenderer.enabled = true;
             trailRenderer.Clear();
