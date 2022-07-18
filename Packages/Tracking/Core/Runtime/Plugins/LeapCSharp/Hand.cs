@@ -294,6 +294,7 @@ namespace Leap
         /// 
         /// @since 3.0
         /// </summary>
+        [System.Obsolete("This code will be removed in the next major version of the plugin. If you believe that it needs to be kept, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
         public float GrabAngle;
 
         /// <summary>
@@ -342,7 +343,7 @@ namespace Leap
         public Vector WristPosition;
 
         /// <summary>
-        /// The duration of time this Hand has been visible to the Leap Motion Controller.
+        /// The duration of time this Hand has been visible to the Leap Motion Controller, in seconds
         /// @since 1.0
         /// </summary>
         public float TimeVisible;

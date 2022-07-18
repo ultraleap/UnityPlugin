@@ -19,6 +19,14 @@ namespace Ultraleap.Tracking.OpenXR
         private Hand _leftHand = new Hand();
         private Hand _rightHand = new Hand();
 
+        private int _handId = 0;
+        private int _leftHandId = 0;
+        private int _rightHandId = 0;
+        private long _leftHandFirstSeen_ticks;
+        private long _rightHandFirstSeen_ticks;
+
+        private long _frameId = 0;
+
         [Tooltip("Specifies the main camera. Falls back to Camera.main if not set")]
         [SerializeField]
         private Camera _mainCamera; // Redundant backing field, used to present value in editor at parent level
@@ -91,6 +99,8 @@ namespace Ultraleap.Tracking.OpenXR
         private void PopulateLeapFrame(FrameTime frameTime, ref Frame leapFrame)
         {
             leapFrame.Hands.Clear();
+            leapFrame.Id = _frameId++;
+
             if (PopulateLeapHandFromOpenXRJoints(HandTracker.Left, frameTime, ref _leftHand))
             {
                 leapFrame.Hands.Add(_leftHand);
@@ -107,7 +117,33 @@ namespace Ultraleap.Tracking.OpenXR
             var joints = new HandJointLocation[handTracker.JointCount];
             if (!handTracker.TryLocateHandJoints(frameTime, joints))
             {
+                if (handTracker == HandTracker.Left)
+                {
+                    _leftHandFirstSeen_ticks = -1;
+                }
+                else
+                {
+                    _rightHandFirstSeen_ticks = -1;
+                }
+
                 return false;
+            }
+
+            if (handTracker == HandTracker.Left)
+            {
+                if (_leftHandFirstSeen_ticks == -1)
+                {
+                    _leftHandFirstSeen_ticks = DateTime.Now.Ticks;
+                    _leftHandId =_handId++;
+                }
+            }
+            else
+            {
+                if (_rightHandFirstSeen_ticks == -1)
+                {
+                    _rightHandFirstSeen_ticks = DateTime.Now.Ticks;
+                    _rightHandId = _handId++;
+                }
             }
 
             for (int fingerIndex = 0; fingerIndex < 5; fingerIndex++)
@@ -157,7 +193,7 @@ namespace Ultraleap.Tracking.OpenXR
 
                 // Populate the higher - level finger data.
                 hand.Fingers[fingerIndex].Fill(
-                    -1,
+                    _frameId,
                     (handTracker == HandTracker.Left ? 0 : 1),
                     fingerIndex,
                     10f, // Fixed for now
@@ -165,7 +201,7 @@ namespace Ultraleap.Tracking.OpenXR
                     (joints[xrTipIndex].Pose.rotation * Vector3.forward),
                     fingerWidth,
                     fingerLength,
-                    true, // Fixed for now
+                    hand.GetFingerStrength(fingerIndex) < 0.4, // Fixed for now
                     (Finger.FingerType)fingerIndex);
             }
 
@@ -173,16 +209,17 @@ namespace Ultraleap.Tracking.OpenXR
 
             // Populate the whole hand information.
             hand.Fill(
-                -1,
-                (handTracker == HandTracker.Left ? 0 : 1),
+                _frameId,
+                handTracker == HandTracker.Left ? _leftHandId : _rightHandId,
                 1f,
-                0.5f, // Fixed for now
-                100f, // Fixed for now
+                CalculateGrabStrength(hand),
+                0, // fixed as grabAngle is going to be deleted
                 CalculatePinchStrength(ref hand, palmWidth),
                 CalculatePinchDistance(ref hand),
                 palmWidth,
                 handTracker == HandTracker.Left,
-                10f, // Fixed for now
+                handTracker == HandTracker.Left ? ((float)(DateTime.Now.Ticks - _leftHandFirstSeen_ticks)) / (float)TimeSpan.TicksPerSecond :
+                                                  ((float)(DateTime.Now.Ticks - _rightHandFirstSeen_ticks)) / (float)TimeSpan.TicksPerSecond,
                 null, // Already Populated
                 joints[(int)HandJoint.Palm].Pose.position,
                 joints[(int)HandJoint.Palm].Pose.position,
@@ -295,6 +332,23 @@ namespace Ultraleap.Tracking.OpenXR
 
             // Return the pinch distance, converted to millimeters to match other providers.
             return Mathf.Sqrt(minDistanceSquared) * 1000.0f;
+        }
+
+        float CalculateGrabStrength(Hand hand)
+        {
+            // magic numbers so it approximately lines up with the leap results
+            const float bendZero = 0.25f;
+            const float bendOne = 0.85f;
+
+            // Find the minimum bend angle for the non-thumb fingers.
+            float minBend = float.MaxValue;
+            for (int finger_idx = 1; finger_idx < 5; finger_idx++)
+            {
+                minBend = Mathf.Min(hand.GetFingerStrength(finger_idx), minBend);
+            }
+
+            // Return the grab strength.
+            return Mathf.Clamp01((minBend - bendZero) / (bendOne - bendZero));
         }
 
         #region LeapProvider Implementation
