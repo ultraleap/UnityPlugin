@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [5.14.0]
 
 ### Added
-- Added Hand Ray to Interaction Engine. These scripts allow you to easily generate and use rays based on the hand position. We've included WristShoulderFarFieldHandRay as a default ray to use - this ray lets you blend between a wrist offset and inferred shoulder position to as a ray origin to create a ray, making a ray that is both expressive and stable. 
+- Added Hand Ray to Interaction Engine. These scripts allow you to easily generate and use rays based on the hand position. We've included WristShoulderFarFieldHandRay as a default ray to use - this ray lets you blend between a wrist offset and inferred shoulder position as a ray origin to create a ray that is both expressive and stable. 
 
 ## [5.13.0]
 
