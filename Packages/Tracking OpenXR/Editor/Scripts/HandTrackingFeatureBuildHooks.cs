@@ -11,6 +11,8 @@ namespace Ultraleap.Tracking.OpenXR
 {
     public class HandTrackingFeatureBuildHooks : OpenXRFeatureBuildHooks
     {
+        private const string OpenXRPackageRuntimeService = "org.khronos.openxr.OpenXRRuntimeService";
+
         private const string UltraleapPackageTrackingService = "com.ultraleap.tracking.service";
         private const string UltraleapPackageOpenXRApiLayer = "com.ultraleap.openxr.api_layer";
 
@@ -32,6 +34,9 @@ namespace Ultraleap.Tracking.OpenXR
 
             if (PlayerSettings.Android.minSdkVersion >= AndroidSdkVersions.AndroidApiLevel30)
             {
+                // Hopefully temporary until Unity fixes this.
+                manifest.AddQueriesIntentAction(OpenXRPackageRuntimeService);
+
                 manifest.AddQueriesPackage(UltraleapPackageTrackingService);
                 manifest.AddQueriesPackage(UltraleapPackageOpenXRApiLayer);
             }
@@ -99,6 +104,23 @@ namespace Ultraleap.Tracking.OpenXR
                         new XElement("package", new XAttribute(_android + "name", packageName))
                     );
                 }
+            }
+
+            public void AddQueriesIntentAction(string name)
+            {
+                // Get the queries element, creating it if it doesn't exist.
+                var queries = _manifest.Root!.Element("queries");
+                if (queries == null)
+                {
+                    queries = new XElement("queries");
+                    _manifest.Root!.Add(queries);
+                }
+
+                // Refactor later if required
+                queries.Add(
+                    new XElement("intent",
+                        new XElement("action",
+                            new XAttribute(_android + "name", name))));
             }
 
             public void AddUsesPermission(string name)
