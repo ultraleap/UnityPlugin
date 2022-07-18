@@ -1,31 +1,39 @@
+/******************************************************************************
+ * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
+ *                                                                            *
+ * Use subject to the terms of the Apache License 2.0 available at            *
+ * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
+ * between Ultraleap and you, your company or other organization.             *
+ ******************************************************************************/
 using Leap.Unity.Interaction;
 using UnityEngine;
 
 public class HandRayStraightLineRenderer : MonoBehaviour
 {
-    public float LineRendererDistance = 50f;
-    public HandRay HandRay;
+    public float lineRendererDistance = 50f;
+    public HandRay handRay;
 
     [SerializeField] private LineRenderer lineRenderer;
     [SerializeField] private Transform trailRendererTransform;
+    [SerializeField] private float trailRendererYOffset = 0.04f;
     private TrailRenderer trailRenderer;
 
     // Start is called before the first frame update
     void Start()
     {
-        if (lineRenderer == null)
+        if(lineRenderer == null)
         {
             lineRenderer = GetComponentInChildren<LineRenderer>();
-            if (lineRenderer == null)
+            if(lineRenderer == null)
             {
-                Debug.LogWarning("HandRayStraightLineRenderer needs a lineRenderer");
+                Debug.LogWarning($"HandRayStraightLineRenderer needs a lineRenderer");
             }
         }
 
-        if (trailRendererTransform != null)
+        if(trailRendererTransform != null)
         {
             trailRenderer = trailRendererTransform.GetComponentInChildren<TrailRenderer>();
-            if (trailRenderer == null)
+            if(trailRenderer == null)
             {
                 Debug.LogWarning("The trail renderer transform reference does not have a trailRenderer attached");
             }
@@ -37,37 +45,37 @@ public class HandRayStraightLineRenderer : MonoBehaviour
 
     private void OnEnable()
     {
-        if (HandRay == null)
+        if(handRay == null)
         {
-            HandRay = FindObjectOfType<WristShoulderFarFieldHandRay>();
-            if (HandRay == null)
+            handRay = FindObjectOfType<WristShoulderFarFieldHandRay>();
+            if (handRay == null)
             {
                 Debug.LogWarning("HandRayStraightLineRenderer needs a HandRay");
                 return;
             }
         }
-        HandRay.OnHandRayFrame += UpdateLineRenderer;
-        HandRay.OnHandRayEnable += EnableLineRenderer;
-        HandRay.OnHandRayDisable += DisableLineRenderer;
+        handRay.OnHandRayFrame += UpdateLineRenderer;
+        handRay.OnHandRayEnable += EnableLineRenderer;
+        handRay.OnHandRayDisable += DisableLineRenderer;
     }
 
     private void OnDisable()
     {
-        if (HandRay == null)
+        if (handRay == null)
         {
             return;
         }
 
-        HandRay.OnHandRayFrame -= UpdateLineRenderer;
-        HandRay.OnHandRayEnable -= EnableLineRenderer;
-        HandRay.OnHandRayDisable -= DisableLineRenderer;
+        handRay.OnHandRayFrame -= UpdateLineRenderer;
+        handRay.OnHandRayEnable -= EnableLineRenderer;
+        handRay.OnHandRayDisable -= DisableLineRenderer;
     }
 
     void EnableLineRenderer(HandRayDirection farFieldDirection)
     {
         lineRenderer.enabled = true;
 
-        if (trailRendererTransform != null)
+        if(trailRendererTransform != null)
         {
             trailRenderer.enabled = true;
             trailRenderer.Clear();
@@ -87,17 +95,17 @@ public class HandRayStraightLineRenderer : MonoBehaviour
     {
         Vector3 lineRendererEndPos;
         RaycastHit hitInfo;
-        if (Physics.Raycast(new Ray(handRayDirection.RayOrigin, handRayDirection.Direction), out hitInfo, LineRendererDistance))
+        if (Physics.Raycast(new Ray(handRayDirection.RayOrigin, handRayDirection.Direction), out hitInfo, lineRendererDistance))
         {
             Vector3 hitPoint = hitInfo.point;
 
             // Add a small vertical offset to the hit point in order to see the trail better
-            hitPoint.y += 0.04f;
+            hitPoint.y += trailRendererYOffset;
             lineRendererEndPos = hitPoint;
         }
         else
         {
-            lineRendererEndPos = handRayDirection.RayOrigin + handRayDirection.Direction * LineRendererDistance;
+            lineRendererEndPos = handRayDirection.RayOrigin + handRayDirection.Direction * lineRendererDistance;
         }
 
         UpdateLineRendererPositions(lineRenderer, handRayDirection.VisualAimPosition, lineRendererEndPos);

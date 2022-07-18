@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2020.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -24,10 +24,12 @@ namespace Leap.Unity
         [Range(0f, 1f)]
         public float handMergeDistance = 0.7f;
 
-        public HandRay HandRay;
+        public HandRay handRay;
+
         [SerializeField] private LineRenderer lineRenderer;
         [SerializeField] private Transform trailRendererTransform;
-
+        [SerializeField] private float trailRendererYOffset = 0.04f;
+        
         private TrailRenderer trailRenderer;
         private List<Vector3> parabolaPositions = new List<Vector3>();
 
@@ -38,7 +40,7 @@ namespace Leap.Unity
                 lineRenderer = GetComponentInChildren<LineRenderer>();
                 if (lineRenderer == null)
                 {
-                    Debug.LogWarning("HandRayStraightLineRenderer needs a lineRenderer");
+                    Debug.LogWarning("HandRayParabolicLineRenderer needs a lineRenderer");
                 }
             }
 
@@ -55,30 +57,30 @@ namespace Leap.Unity
 
         private void OnEnable()
         {
-            if (HandRay == null)
+            if (handRay == null)
             {
-                HandRay = FindObjectOfType<WristShoulderFarFieldHandRay>();
-                if (HandRay == null)
+                handRay = FindObjectOfType<WristShoulderFarFieldHandRay>();
+                if (handRay == null)
                 {
-                    Debug.LogWarning("HandRayStraightLineRenderer needs a HandRay");
+                    Debug.LogWarning("HandRayParabolicLineRenderer needs a HandRay");
                     return;
                 }
             }
-            HandRay.OnHandRayFrame += UpdateLineRenderer;
-            HandRay.OnHandRayEnable += EnableLineRenderer;
-            HandRay.OnHandRayDisable += DisableLineRenderer;
+            handRay.OnHandRayFrame += UpdateLineRenderer;
+            handRay.OnHandRayEnable += EnableLineRenderer;
+            handRay.OnHandRayDisable += DisableLineRenderer;
         }
 
         private void OnDisable()
         {
-            if (HandRay == null)
+            if (handRay == null)
             {
                 return;
             }
 
-            HandRay.OnHandRayFrame -= UpdateLineRenderer;
-            HandRay.OnHandRayEnable -= EnableLineRenderer;
-            HandRay.OnHandRayDisable -= DisableLineRenderer;
+            handRay.OnHandRayFrame -= UpdateLineRenderer;
+            handRay.OnHandRayEnable -= EnableLineRenderer;
+            handRay.OnHandRayDisable -= DisableLineRenderer;
         }
 
         void EnableLineRenderer(HandRayDirection farFieldDirection)
@@ -168,7 +170,7 @@ namespace Leap.Unity
             }
 
             // Add a small vertical offset to the hit point in order to see the trail better
-            hitPoint.y += 0.04f;
+            hitPoint.y += trailRendererYOffset;
             trailRendererTransform.position = hitPoint;
         }
     }

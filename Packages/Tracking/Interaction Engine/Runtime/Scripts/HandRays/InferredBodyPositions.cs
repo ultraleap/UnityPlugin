@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2021.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -63,7 +63,7 @@ namespace Leap.Unity.Interaction
             " - A blend between the two stops head roll & pitch rotation (z & x rotation) " +
             "having a large effect on the neck position")]
         [Range(0f, 1)]
-        public float WorldLocalNeckPositionBlend = 0.5f;
+        public float worldLocalNeckPositionBlend = 0.5f;
 
         /// <summary>
         /// How quickly the neck rotation updates
@@ -72,7 +72,7 @@ namespace Leap.Unity.Interaction
         [Tooltip("How quickly the neck rotation updates\n" +
             "Used to smooth out sudden large rotations")]
         [Range(0.01f, 30)]
-        public float NeckRotationLerpSpeed = 22;
+        public float neckRotationLerpSpeed = 22;
 
         [Header("Debug Gizmos")]
         [Tooltip("If true, draw any enabled debug gizmos")]
@@ -171,13 +171,13 @@ namespace Leap.Unity.Interaction
 
         private void UpdateNeckPosition()
         {
-            NeckPosition = Vector3.Lerp(NeckPositionLocalSpace, NeckPositionWorldSpace, WorldLocalNeckPositionBlend);
+            NeckPosition = Vector3.Lerp(NeckPositionLocalSpace, NeckPositionWorldSpace, worldLocalNeckPositionBlend);
         }
 
         private void UpdateNeckRotation()
         {
             float neckYRotation = useNeckYawDeadzone ? neckYawDeadzone.DeadzoneCentre : Head.rotation.eulerAngles.y;
-            NeckRotation = Quaternion.Lerp(NeckRotation, Quaternion.Euler(0, neckYRotation, 0), Time.deltaTime * NeckRotationLerpSpeed);
+            NeckRotation = Quaternion.Lerp(NeckRotation, Quaternion.Euler(0, neckYRotation, 0), Time.deltaTime * neckRotationLerpSpeed);
         }
 
         private void UpdateLocalOffsetNeckPosition()

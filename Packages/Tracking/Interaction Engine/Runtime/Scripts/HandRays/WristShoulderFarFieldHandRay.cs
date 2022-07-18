@@ -1,5 +1,5 @@
 ﻿/******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2021.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -126,16 +126,16 @@ namespace Leap.Unity.Interaction
             int index = hand.IsLeft ? 0 : 1;
             Vector3 shoulderPosition = inferredBodyPositions.ShoulderPositions[index];
 
-            HandRayDirection.Hand = hand;
-            HandRayDirection.VisualAimPosition = hand.GetPredictedPinchPosition();
+            handRayDirection.Hand = hand;
+            handRayDirection.VisualAimPosition = hand.GetPredictedPinchPosition();
             Vector3 unfilteredRayOrigin = GetRayOrigin(hand, shoulderPosition);
 
             //Filtering using the One Euro filter reduces jitter from both positions
-            HandRayDirection.AimPosition = aimPositionFilter.Filter(hand.GetStablePinchPosition(), Time.time);
-            HandRayDirection.RayOrigin = rayOriginFilter.Filter(unfilteredRayOrigin, Time.time);
+            handRayDirection.AimPosition = aimPositionFilter.Filter(hand.GetStablePinchPosition(), Time.time);
+            handRayDirection.RayOrigin = rayOriginFilter.Filter(unfilteredRayOrigin, Time.time);
 
-            HandRayDirection.Direction = (HandRayDirection.AimPosition - HandRayDirection.RayOrigin).normalized;
-            InvokeOnHandRayFrame(HandRayDirection);
+            handRayDirection.Direction = (handRayDirection.AimPosition - handRayDirection.RayOrigin).normalized;
+            InvokeOnHandRayFrame(handRayDirection);
         }
 
         private Vector3 GetRayOrigin(Hand hand, Vector3 shoulderPosition)
@@ -171,7 +171,7 @@ namespace Leap.Unity.Interaction
             if (drawRay)
             {
                 Gizmos.color = rayColor;
-                Gizmos.DrawRay(HandRayDirection.RayOrigin, HandRayDirection.Direction * 10);
+                Gizmos.DrawRay(handRayDirection.RayOrigin, handRayDirection.Direction * 10);
             }
 
             if (drawWristShoulderBlend)
@@ -189,8 +189,8 @@ namespace Leap.Unity.Interaction
             if (drawRayAimAndOrigin)
             {
                 Gizmos.color = rayAimAndOriginColor;
-                Gizmos.DrawCube(HandRayDirection.RayOrigin, Vector3.one * gizmoRadius);
-                Gizmos.DrawSphere(HandRayDirection.AimPosition, gizmoRadius);
+                Gizmos.DrawCube(handRayDirection.RayOrigin, Vector3.one * gizmoRadius);
+                Gizmos.DrawSphere(handRayDirection.AimPosition, gizmoRadius);
             }
         }
     }

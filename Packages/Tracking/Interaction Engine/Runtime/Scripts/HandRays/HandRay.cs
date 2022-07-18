@@ -1,6 +1,11 @@
+/******************************************************************************
+ * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
+ *                                                                            *
+ * Use subject to the terms of the Apache License 2.0 available at            *
+ * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
+ * between Ultraleap and you, your company or other organization.             *
+ ******************************************************************************/
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace Leap.Unity.Interaction
@@ -52,7 +57,7 @@ namespace Leap.Unity.Interaction
         /// <summary>
         /// The most recently calculated hand ray direction
         /// </summary>
-        [HideInInspector] public HandRayDirection HandRayDirection = new HandRayDirection();
+        [HideInInspector] public HandRayDirection handRayDirection = new HandRayDirection();
 
         // Start is called before the first frame update
         protected virtual void Start()
@@ -66,7 +71,7 @@ namespace Leap.Unity.Interaction
                     leapProvider = FindObjectOfType<LeapProvider>();
                     if (leapProvider == null)
                     {
-                        Debug.LogWarning("No xr leap provider in scene - Hand Ray is dependent on one.");
+                        Debug.LogWarning("No leap provider in scene - HandRay is dependent on one.");
                     }
                 }
             }
@@ -85,7 +90,7 @@ namespace Leap.Unity.Interaction
                 if (!ShouldEnableRay())
                 {
                     HandRayEnabled = false;
-                    InvokeOnHandRayDisable(HandRayDirection);
+                    InvokeOnHandRayDisable(handRayDirection);
                 }
                 else
                 {
@@ -98,7 +103,7 @@ namespace Leap.Unity.Interaction
                 {
                     HandRayEnabled = true;
                     CalculateRayDirection();
-                    InvokeOnHandRayEnable(HandRayDirection);
+                    InvokeOnHandRayEnable(handRayDirection);
                 }
             }
         }

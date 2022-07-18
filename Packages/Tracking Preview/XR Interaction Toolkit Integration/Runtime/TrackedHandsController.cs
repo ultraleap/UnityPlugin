@@ -127,8 +127,8 @@ namespace Leap.Unity.Preview.XRInteractionToolkit
                 if (RayOrigin == null) RayOrigin = xrRayInteractor.rayOriginTransform;
                 if (RayOrigin != null)
                 {
-                    RayOrigin.position = handRay.HandRayDirection.VisualAimPosition;
-                    RayOrigin.rotation = Quaternion.LookRotation(handRay.HandRayDirection.Direction);
+                    RayOrigin.position = handRay.handRayDirection.VisualAimPosition;
+                    RayOrigin.rotation = Quaternion.LookRotation(handRay.handRayDirection.Direction);
                 }
             }
         }

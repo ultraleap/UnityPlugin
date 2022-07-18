@@ -631,9 +631,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   projectionScale: 10
   handMergeDistance: 0.7
-  HandRay: {fileID: 2032573003}
+  handRay: {fileID: 2032573003}
   lineRenderer: {fileID: 211112612}
   trailRendererTransform: {fileID: 889679136}
+  trailRendererYOffset: 0.04
 --- !u!1 &246309800
 GameObject:
   m_ObjectHideFlags: 0
@@ -1656,10 +1657,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ab29bf4f6c25824db2353b21d5fe02a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  LineRendererDistance: 12
-  HandRay: {fileID: 2032573002}
+  lineRendererDistance: 12
+  handRay: {fileID: 2032573002}
   lineRenderer: {fileID: 1009217018}
   trailRendererTransform: {fileID: 112595639}
+  trailRendererYOffset: 0.04
 --- !u!1 &1107863089
 GameObject:
   m_ObjectHideFlags: 0
@@ -2434,6 +2436,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2751656230932833424, guid: 071415ff98e0a6a40b2581f51b99236b,
         type: 3}
+      propertyPath: leapProvider
+      value: 
+      objectReference: {fileID: 1620646538}
+    - target: {fileID: 2751656230932833424, guid: 071415ff98e0a6a40b2581f51b99236b,
+        type: 3}
       propertyPath: leapXRServiceProvider
       value: 
       objectReference: {fileID: 1620646538}
@@ -2497,6 +2504,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6269556964730049288, guid: 071415ff98e0a6a40b2581f51b99236b,
+        type: 3}
+      propertyPath: leapProvider
+      value: 
+      objectReference: {fileID: 1620646538}
     - target: {fileID: 6269556964730049288, guid: 071415ff98e0a6a40b2581f51b99236b,
         type: 3}
       propertyPath: leapXRServiceProvider
