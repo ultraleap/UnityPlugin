@@ -34,21 +34,24 @@ namespace Ultraleap.Tracking.OpenXR
 
             if (PlayerSettings.Android.minSdkVersion >= AndroidSdkVersions.AndroidApiLevel30)
             {
-                // Hopefully temporary until Unity fixes this.
+                // Intent query is required for OpenXR to work correctly.
                 manifest.AddQueriesIntentAction(OpenXRPackageRuntimeService);
 
+                // Allows Ultraleap hand-tracking service & api layer to be accessed.
                 manifest.AddQueriesPackage(UltraleapPackageTrackingService);
                 manifest.AddQueriesPackage(UltraleapPackageOpenXRApiLayer);
             }
 
             if (feature.metaPermissions)
             {
+                // Adds the feature and permission to also work on Meta headsets that support hand-tracking.
                 manifest.AddUsesFeature(MetaHandTrackingFeature, false);
                 manifest.AddUsesPermission(MetaHandTrackingPermission);
             }
 
             if (feature.metaHighFrequency)
             {
+                // Enable Meta high-frequency hand-tracking if requested.
                 manifest.AddApplicationMetadata(MetaHandTrackingFrequency, "HIGH");
             }
 
