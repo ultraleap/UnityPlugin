@@ -55,7 +55,6 @@ MeshRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
-  m_RayTraceProcedural: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -80,7 +79,6 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_AdditionalVertexStreams: {fileID: 0}
 --- !u!1 &1624307276489095892
 GameObject:
   m_ObjectHideFlags: 0
@@ -91,6 +89,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1624307276489095888}
   - component: {fileID: 1624307276489095889}
+  - component: {fileID: 1624307276489095890}
   - component: {fileID: 1624307276489095891}
   - component: {fileID: 1818402001559525666}
   m_Layer: 0
@@ -129,7 +128,23 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _gammaCorrection: 1
   _provider: {fileID: 0}
-  <HideRigelDebug>k__BackingField: 0
+--- !u!114 &1624307276489095890
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1624307276489095892}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cfb12777e12bf9941b23356a343f5016, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _useCustomBaseline: 0
+  _customBaselineValue: 64
+  _showEyePositions: 0
+  _provider: {fileID: 0}
+  _camera: {fileID: 0}
 --- !u!114 &1624307276489095891
 MonoBehaviour:
   m_ObjectHideFlags: 0
