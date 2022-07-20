@@ -11,9 +11,6 @@ namespace Ultraleap.Tracking.OpenXR
     {
         private const string OpenXRPackageRuntimeService = "org.khronos.openxr.OpenXRRuntimeService";
 
-        private const string UltraleapPackageTrackingService = "com.ultraleap.tracking.service";
-        private const string UltraleapPackageOpenXRApiLayer = "com.ultraleap.openxr.api_layer";
-
         private const string MetaHandTrackingFeature = "oculus.software.handtracking";
         private const string MetaHandTrackingPermission = "com.oculus.permission.HAND_TRACKING";
         private const string MetaHandTrackingFrequency = "com.oculus.handtracking.frequency";
@@ -34,10 +31,6 @@ namespace Ultraleap.Tracking.OpenXR
             {
                 // Intent query is required for OpenXR to work correctly.
                 manifest.AddQueriesIntentAction(OpenXRPackageRuntimeService);
-
-                // Allows Ultraleap hand-tracking service & api layer to be accessed.
-                manifest.AddQueriesPackage(UltraleapPackageTrackingService);
-                manifest.AddQueriesPackage(UltraleapPackageOpenXRApiLayer);
             }
 
             if (feature.metaPermissions)
