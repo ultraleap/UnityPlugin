@@ -562,6 +562,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
             leapHand.Arm.NextJoint = leapHand.WristPosition;
             leapHand.Arm.Direction = (leapHand.WristPosition - leapHand.Arm.PrevJoint).Normalized;
+            leapHand.Arm.Rotation = Quaternion.LookRotation(leapHand.Arm.Direction.ToVector3(), -leapHand.PalmNormal.ToVector3()).ToLeapQuaternion();
 
             leapHand.PalmWidth = physicsHand.palmCollider.size.y;
             leapHand.Confidence = originalHand.Confidence;
