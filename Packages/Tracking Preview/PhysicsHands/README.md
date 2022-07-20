@@ -15,3 +15,4 @@ This approach relies heavily on the physics simulation and will work with any ri
 - Re-assign the other hands within your scene to have the PhysicsProvider as their Leap Provider.
 - Change your physics settings to the following:
   - Solver Type: Temporal Gauss Seidel
+- Ensure your rigidbodies have their Collision Detection set to either to Discrete or Continuous Speculative
