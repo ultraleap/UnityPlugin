@@ -98,6 +98,7 @@ rad-builds:
     branch: main
   variables:
     PLUGIN_COMMIT_BRANCH: $CI_COMMIT_BRANCH
+    PLUGIN_COMMIT_HASH: $CI_COMMIT_SHA
 
 # -----------------------------------------------------------------------------
 # Generate API Documentation
