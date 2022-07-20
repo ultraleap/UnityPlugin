@@ -6,7 +6,7 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Leap.Unity.Interaction;
+using Leap.Unity.Preview.HandRays;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.XR;

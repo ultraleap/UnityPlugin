@@ -8,7 +8,7 @@
 using System;
 using UnityEngine;
 
-namespace Leap.Unity.Interaction
+namespace Leap.Unity.Preview.HandRays
 {
     /// <summary>
     /// a HandRayDirection holds data about the hand and the corresponding ray.

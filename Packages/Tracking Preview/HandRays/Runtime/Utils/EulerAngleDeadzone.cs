@@ -9,7 +9,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Leap.Unity.Interaction
+namespace Leap.Unity.Preview.HandRays
 {
     /// <summary>
     /// A Euler angle deadzone. Used to filter a value and stop it from changing until its delta has passed a threshold

@@ -8,7 +8,7 @@
 
 using UnityEngine;
 
-namespace Leap.Unity.Interaction
+namespace Leap.Unity.Preview.HandRays
 {
 #pragma warning disable 0618
     /// <summary>
