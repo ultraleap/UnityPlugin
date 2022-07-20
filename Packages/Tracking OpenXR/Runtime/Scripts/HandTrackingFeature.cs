@@ -144,10 +144,34 @@ namespace Ultraleap.Tracking.OpenXR
 #if UNITY_EDITOR
         protected override void GetValidationChecks(List<ValidationRule> rules, BuildTargetGroup targetGroup)
         {
+            // If building for Android, check that we are targeting Android API 29 for maximum compatibility.
+            rules.Add(new ValidationRule(this)
+            {
+                message = "Android target SDK version is not set to 29",
+                helpLink = "https://registry.khronos.org/OpenXR/specs/1.0/loader.html#android-active-runtime-location",
+                helpText = "OpenXR applications should not target API levels higher than 29 for maximum compatibility," +
+                           "as runtimes may need to query and load classes from their own packages, which are" +
+                           "necessarily not listed in the <queries> tag above.",
+                checkPredicate = () => PlayerSettings.Android.targetSdkVersion == AndroidSdkVersions.AndroidApiLevel29,
+                error = false,
+                fixItAutomatic = true,
+                fixItMessage = "Set the Android target SDK version to 29",
+                fixIt = () =>
+                {
+                    if (PlayerSettings.Android.minSdkVersion > AndroidSdkVersions.AndroidApiLevel29)
+                    {
+                        PlayerSettings.Android.minSdkVersion = AndroidSdkVersions.AndroidApiLevel29;
+                    }
+                    PlayerSettings.Android.targetSdkVersion = AndroidSdkVersions.AndroidApiLevel29;
+                },
+
+            });
+
             // Check the active input handling supports New (for OpenXR) and Legacy (for Ultraleap Plugin support).
             rules.Add(new ValidationRule(this)
             {
-                message = "Active Input Handling is not set to Both. While New is required for OpenXR, Both is recommended as the Ultraleap Unity Plugin does not fully support the New Input System.",
+                message = "Active Input Handling is not set to Both. While New is required for OpenXR, Both is" +
+                          "recommended as the Ultraleap Unity Plugin does not fully support the New Input System.",
                 error = false,
 #if !ENABLE_LEGACY_INPUT_MANAGER || !ENABLE_INPUT_SYSTEM
                 checkPredicate = () => false,
@@ -162,7 +186,8 @@ namespace Ultraleap.Tracking.OpenXR
             // Check that the Main camera has a suitable near clipping plane for hand-tracking.
             rules.Add(new ValidationRule(this)
             {
-                message = "Main camera near clipping plane is further than recommend and tracked hands may show visual clipping artifacts.",
+                message = "Main camera near clipping plane is further than recommend and tracked hands may show visual" +
+                          "clipping artifacts.",
                 error = false,
                 checkPredicate = () => Camera.main == null || Camera.main.nearClipPlane <= 0.01,
                 fixItAutomatic = true,
