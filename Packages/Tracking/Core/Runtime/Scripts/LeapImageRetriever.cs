@@ -398,6 +398,20 @@ namespace Leap.Unity
                 this.enabled = false;
                 return;
             }
+            else
+            {
+                if(_provider is LeapXRServiceProvider)
+                {
+                    LeapXRServiceProvider xrProvider = (LeapXRServiceProvider)_provider;
+
+                    if(xrProvider.deviceOffsetMode != LeapXRServiceProvider.DeviceOffsetMode.ManualHeadOffset ||
+                        xrProvider.deviceOffsetYAxis != 0 || xrProvider.deviceOffsetZAxis != 0 || xrProvider.deviceTiltXAxis != 0)
+                    {
+                        Debug.LogWarning("LeapImageRetrievers with XRServiceProviders that have non-zero offsets or" +
+                            " default offsets can cause misalignment between passthrough images and hand data.");
+                    }
+                }
+            }
 
             //Enable pooling to reduce overhead of images
             LeapInternal.MemoryManager.EnablePooling = true;
