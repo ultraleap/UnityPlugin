@@ -29,7 +29,7 @@ namespace Leap.Unity.HandsModule
 
         bool currentlyShowingArm;
 
-        
+
         // Update is called once per frame
         void Update()
         {
