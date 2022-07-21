@@ -82,6 +82,8 @@ namespace Leap.Interaction.Internal.InteractionEngineUtility
 
         public static void generateBoxContact(BoxCollider box, int layerMask, Collider otherCollider, ref List<SoftContact> softContacts, ref Dictionary<Rigidbody, Velocities> originalVelocities, bool interpretAsEllipsoid = true)
         {
+            if (box == null || box.attachedRigidbody == null) return;
+
             Vector3 boxExtent = Vector3.Scale(box.size * 0.5f, box.transform.lossyScale);
             Vector3 boxCenter = Vector3.Scale(box.center, box.transform.lossyScale);
             Vector3 unrotatedOtherColliderPosition = Quaternion.Inverse(box.attachedRigidbody.rotation) * (otherCollider.attachedRigidbody.position - box.attachedRigidbody.position);
@@ -138,6 +140,7 @@ namespace Leap.Interaction.Internal.InteractionEngineUtility
             }
             Vector3 otherColliderPositionOnCapsule = capsule.transform.TransformPoint(otherColliderPosOnSegment + displacement + capsule.center);
 
+            if (capsule == null || capsule.attachedRigidbody == null) return;
             generateSphereContact(capsule.transform.TransformPoint(capsule.center), (capsule.transform.TransformPoint(capsule.center) - otherColliderPositionOnCapsule).magnitude, capsule.attachedRigidbody.GetPointVelocity(otherColliderPositionOnCapsule), layerMask, ref softContacts, ref originalVelocities, otherCollider, interpretAsEllipsoid);
         }
 

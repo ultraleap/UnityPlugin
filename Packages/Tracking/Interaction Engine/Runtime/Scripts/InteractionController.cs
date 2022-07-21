@@ -1260,7 +1260,7 @@ namespace Leap.Unity.Interaction
                             //NotifySoftContactOverlap(contactBone, _softContactColliderBuffer[i]);
 
                             // If the rigidbody is null, the object may have been destroyed.
-                            if (_softContactColliderBuffer[i].attachedRigidbody == null) continue;
+                            if (_softContactColliderBuffer[i] == null || _softContactColliderBuffer[i].attachedRigidbody == null) continue;
                             IInteractionBehaviour intObj;
                             if (manager.interactionObjectBodies.TryGetValue(_softContactColliderBuffer[i].attachedRigidbody, out intObj))
                             {
@@ -1291,7 +1291,7 @@ namespace Leap.Unity.Interaction
                             //NotifySoftContactOverlap(contactBone, _softContactColliderBuffer[i]);
 
                             // If the rigidbody is null, the object may have been destroyed.
-                            if (_softContactColliderBuffer[i].attachedRigidbody == null) continue;
+                            if (_softContactColliderBuffer[i] == null || _softContactColliderBuffer[i].attachedRigidbody == null) continue;
                             IInteractionBehaviour intObj;
                             if (manager.interactionObjectBodies.TryGetValue(_softContactColliderBuffer[i].attachedRigidbody, out intObj))
                             {
@@ -1329,7 +1329,7 @@ namespace Leap.Unity.Interaction
                             //NotifySoftContactOverlap(contactBone, _softContactColliderBuffer[i]);
 
                             // If the rigidbody is null, the object may have been destroyed.
-                            if (_softContactColliderBuffer[i].attachedRigidbody == null) continue;
+                            if (_softContactColliderBuffer[i] == null || _softContactColliderBuffer[i].attachedRigidbody == null) continue;
                             IInteractionBehaviour intObj;
                             if (manager.interactionObjectBodies.TryGetValue(_softContactColliderBuffer[i].attachedRigidbody, out intObj))
                             {

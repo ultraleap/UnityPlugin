@@ -6,13 +6,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [docs-website]: https://docs.ultraleap.com/ "Ultraleap Docs"
 
+## [1.0.0-pre.7] - 21/07/2022
+
+### Added
+
+- Added implementations of different hand properties (note that they might differ slighly from LeapC values):
+  - Hand: `GrabStrength`
+  - Hand and Finger: `FrameId`
+  - Hand and Finger: `Id` & `HandId`
+  - Hand and Finger: `TimeVisible`
+  - Finger: `IsExtended`
+
+### Known issues
+
+- Currently the Ultraleap Hand Tracking feature for OpenXR requires the New and Legacy input systems to be enabled, to simultaneously use OpenXR and the Ultraleap Unity Plugin's features.
+- The OpenXR Leap Provider does not currently support the following hand properties (and will return fixed values):
+  - Hand: `Confidence`
+  - Hand: `GrabAngle` (GrabAngle is now obsolete and will be removed in the next major version of the plugin)
+
 ## [1.0.0-pre.6] - 04/07/2022
 
 ### Added
 
 - Added pragmas to Runtime Scripts to suppress warnings inside plugin code for other (core) code marked obsolete
 
-## Known issues
+### Known issues
 
 - Currently the Ultraleap Hand Tracking feature for OpenXR requires the New and Legacy input systems to be enabled, to simultaneously use OpenXR and the Ultraleap Unity Plugin's features.
 - The OpenXR Leap Provider does not currently support the following hand properties (and will return fixed values):

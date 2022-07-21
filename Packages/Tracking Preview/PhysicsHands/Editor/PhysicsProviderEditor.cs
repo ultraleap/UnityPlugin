@@ -26,6 +26,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
         SerializedProperty _handTeleportDistance, _handGraspTeleportDistance;
 
         SerializedProperty _enableHelpers;
+        SerializedProperty _helperMovesObjects;
         SerializedProperty _interpolateMass, _maxMass;
 
 
@@ -55,6 +56,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             _handGraspTeleportDistance = serializedObject.FindProperty("_handGraspTeleportDistance");
 
             _enableHelpers = serializedObject.FindProperty("_enableHelpers");
+            _helperMovesObjects = serializedObject.FindProperty("_helperMovesObjects");
             _interpolateMass = serializedObject.FindProperty("_interpolateMass");
             _maxMass = serializedObject.FindProperty("_maxMass");
 
@@ -198,6 +200,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             EditorGUILayout.PropertyField(_enableHelpers);
             if (_enableHelpers.boolValue)
             {
+                EditorGUILayout.PropertyField(_helperMovesObjects);
                 EditorGUILayout.PropertyField(_interpolateMass);
                 if (_interpolateMass.boolValue)
                 {
