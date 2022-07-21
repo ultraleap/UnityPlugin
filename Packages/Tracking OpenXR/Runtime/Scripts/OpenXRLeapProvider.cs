@@ -121,7 +121,7 @@ namespace Ultraleap.Tracking.OpenXR
                 if (_leftHandFirstSeen_ticks == -1)
                 {
                     _leftHandFirstSeen_ticks = DateTime.Now.Ticks;
-                    _leftHandId =_handId++;
+                    _leftHandId = _handId++;
                 }
             }
             else

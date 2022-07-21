@@ -409,9 +409,9 @@ namespace Leap.Unity.HandsModule
                     handModelPair.RightEnableDisable.FreezeHandState = false;
                 }
 
-                if (handModelPair.Right != null && handModelPair.Right.IsTracked)
+                if (handModelPair.Right != null)
                 {
-                    if (handModelPair.Left.IsTracked)
+                    if (handModelPair.Right.IsTracked)
                     {
                         handModelPair.Right.gameObject.SetActive(true);
                     }
