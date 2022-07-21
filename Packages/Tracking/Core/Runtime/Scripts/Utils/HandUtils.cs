@@ -382,7 +382,6 @@ namespace Leap.Unity
 
         /// <summary>
         /// Returns an unsmoothed ray representing the general reaching/interaction intent direction.
-        /// Recommend using Leap.Unity.Interaction.WristShoulderFarFieldHandRay instead.
         /// </summary>
         public static Ray HandRay(this Hand hand, Transform headTransform)
         {
