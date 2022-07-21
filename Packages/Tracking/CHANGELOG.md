@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [docs-website]: https://docs.ultraleap.com/unity-api/ "Ultraleap Docs"
 
-## [5.13.0] - 20/07/2022
+## [5.13.0] - 21/07/2022
 
 ### Announcements
 
@@ -24,6 +24,20 @@ If you have any concerns about this, please contact us on [Github Discussions](h
 
 ### Changed
 - Changed Rigged Hand Example scenes to use HandModelManager
+
+### Fixed
+- Inertia Hands are very jittery and `hand.TimeVisible` is not accurate
+- Compile errors in the Infrared Viewer example scene when using Single Pass Stereo rendering mode
+
+### Known issues 
+- Scenes containing the infrared viewer render incorrectly on Android build targets and in scriptable render pipelines such as URP and HDRP. 
+- Demo scenes do not start at the correct height for a seated user. The XR Plugin Management System adjusts the camera height. This means the user has to adjust components in the scene to the correct height - e.g. camera height. Currently our position is to support the legacy XR system height settings. 
+- Hands in Desktop scenes can appear far away from the camera 
+- Interactions callback scene allows blocks to be moved without doing a grasp pose. 
+- Capsule hands don't have a joint colour in HDRP 
+- Hand UI can become detached from hand when hand is removed from view
+- Multi-device (desktop) Scene camera position can become offset
+- FOV visualization does not display after changing render pipelines
 
 ## [5.12.1] - 06/07/2022
 
