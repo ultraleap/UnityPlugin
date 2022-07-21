@@ -526,50 +526,46 @@ namespace Leap.Unity.HandsModule
         /// <summary> 
         /// Set the assigned transforms to the leap hand during editor 
         /// </summary>
-        [Tooltip("Set the assigned transforms to the leap hand during editor")]
-        public bool SetEditorPose;
+        [Tooltip("Set the assigned transforms to the leap hand during editor"), SerializeField]
+        bool SetEditorPose = true;
 
         /// <summary> 
         /// The size of the debug gizmos 
         /// </summary>
-        [Tooltip("The size of the debug gizmos")]
-        public float GizmoSize = 0.004f;
+        [Tooltip("The size of the debug gizmos"), SerializeField]
+        float GizmoSize = 0.004f;
 
         /// <summary> 
         /// Show the Leap Hand in the scene 
         /// </summary>
-        [Tooltip("Show the Leap Hand in the scene")]
-        public bool DebugLeapHand = true;
+        [Tooltip("Show the Leap Hand in the scene"), SerializeField]
+        bool DebugLeapHand = true;
         /// <summary> 
         /// Show the leap's rotation axis in the scene 
         /// </summary>
-        [Tooltip("Show the leap's rotation axis in the scene")]
-        public bool DebugLeapRotationAxis = false;
+        [Tooltip("Show the leap's rotation axis in the scene"), SerializeField]
+        bool DebugLeapRotationAxis = false;
         /// <summary> 
         /// Show the assigned gameobjects as gizmos in the scene 
         /// </summary>
-        [Tooltip("Show the assigned gameobjects as gizmos in the scene")]
-        public bool DebugModelTransforms = true;
+        [Tooltip("Show the assigned gameobjects as gizmos in the scene"), SerializeField]
+        bool DebugModelTransforms = true;
         /// <summary> 
         /// Show the assigned gameobjects rotation axis in the scene 
         /// </summary>
-        [Tooltip("Show the assigned gameobjects rotation axis in the scene")]
-        public bool DebugModelRotationAxis;
+        [Tooltip("Show the assigned gameobjects rotation axis in the scene"), SerializeField]
+        bool DebugModelRotationAxis;
 
         /// <summary> 
         /// Used by the editor script. Fine tuning allows to specify custom wrist and 
         /// finger rotation offsets. 
         /// </summary>
-        public bool FineTuning;
+        [SerializeField] bool FineTuning;
         /// <summary>  
         /// Used by the editor script. The DebugOptions allow to show a debug hand in the scene view
         /// and visualize its rotation and its attached gameobjects
         /// </summary>
-        public bool DebugOptions;
-        /// <summary> 
-        /// Used by the editor script. 
-        /// </summary>
-        public bool EditPoseNeedsResetting = false;
+        [SerializeField] bool DebugOptions;
 
         /// <summary>
         /// Returns whether or not this hand model supports editor persistence. 
