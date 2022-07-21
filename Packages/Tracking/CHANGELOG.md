@@ -6,6 +6,45 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [docs-website]: https://docs.ultraleap.com/unity-api/ "Ultraleap Docs"
 
+## [5.13.0]
+
+### Added
+- Added HandModelManager to the Hands Module - an easy way to enable/disable hand models
+- Added option to freeze hand state on HandEnableDisable
+
+### Changed
+- Changed Rigged Hand Example scenes to use HandModelManager
+
+## [5.12.1] - 06/07/2022
+
+### Announcements
+
+In line with Unity's end of support of Unity 2019 LTS, we will no longer be actively supporting Unity 2019.
+
+We will also be deprecating some functionality and moving core utilities into a separate package.
+
+If you are using classes and methods that are marked as obsolete and will be moved to the new legacy package without a replacement, you may wish to use "#pragma warning disable 0618" at the start and "#pragma warning restore 0618" at the end of your method that makes use of it to suppress the warnings.
+
+If you have any concerns about this, please contact us on [Github Discussions](https://github.com/ultraleap/UnityPlugin/discussions)
+
+This release is a hotfix for the 5.12.0 release. It fixes the XRI package dependency issue which affects the tracking preview package,
+ 
+### Fixed 
+- XRI package dependency is resolved when using the Tracking Preview package.
+
+### Known issues 
+- Scenes containing the infrared viewer render incorrectly on systems using single pass stereo with the XR plugin system - e.g. Windows Mixed Reality headsets. SteamVR headsets may also default to single pass stereo, showing the same issue. However in this case, the OpenVR settings can be changed to multipass which resolves the problem. 
+- Scenes containing the infrared viewer render incorrectly on Android build targets and in scriptable render pipelines such as URP and HDRP. 
+- Demo scenes do not start at the correct height for a seated user. The XR Plugin Management System adjusts the camera height. This means the user has to adjust components in the scene to the correct height - e.g. camera height. Currently our position is to support the legacy XR system height settings. 
+- Hands in Desktop scenes can appear far away from the camera 
+- Interactions callback scene allows blocks to be moved without doing a grasp pose. 
+- Capsule hands don't have a joint colour in HDRP 
+- Hand UI can become detached from hand when hand is removed from view
+- Multi-device (desktop) Scene camera position can become offset
+- FOV visualization does not display after changing render pipelines
+
+
+
 ## [5.12.0] - 04/07/2022
 
 ### Announcements

@@ -91,6 +91,8 @@ rad-builds:
   stage: test
   allow_failure: true
   needs: []
+  rules:
+    - when: manual
   trigger:
     project: xr/rad/triggers/unityplugin-tests
     branch: main

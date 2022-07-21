@@ -18,6 +18,10 @@ namespace Leap.Unity
     /// </summary>
     public class HandEnableDisable : HandTransitionBehavior
     {
+
+        [Tooltip("When enabled, freezes the hand in its current active state")]
+        public bool FreezeHandState = false;
+
         protected override void Awake()
         {
             // Suppress Warnings Related to Kinematic Rigidbodies not supporting Continuous Collision Detection
@@ -35,11 +39,20 @@ namespace Leap.Unity
 
         protected override void HandReset()
         {
+            if (FreezeHandState)
+            {
+                return;
+            }
+
             gameObject.SetActive(true);
         }
 
         protected override void HandFinish()
         {
+            if (FreezeHandState)
+            {
+                return;
+            }
             gameObject.SetActive(false);
         }
     }
