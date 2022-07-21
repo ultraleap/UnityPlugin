@@ -593,6 +593,7 @@ namespace Leap.Unity
                 controller.ImageReady -= onImageReady;
                 controller.DistortionChange -= onDistortionChange;
                 controller.FrameReady -= onFrameReady;
+                _provider.OnDeviceChanged -= OnDeviceChanged;
             }
             _eyeTextureData.MarkStale();
         }
@@ -611,9 +612,19 @@ namespace Leap.Unity
             controller.Disconnect += onDisconnect;
             controller.ImageReady += onImageReady;
             controller.DistortionChange += onDistortionChange;
+            _provider.OnDeviceChanged += OnDeviceChanged;
         }
 
-        private void onImageReady(object sender, ImageEventArgs args)
+        private void OnDeviceChanged(Device d)
+        {
+            unsubscribeFromService();
+            subscribeToService();
+            Controller controller = _provider.GetLeapController();
+            controller.FrameReady -= onFrameReady;
+            controller.FrameReady += onFrameReady;
+        }
+
+    private void onImageReady(object sender, ImageEventArgs args)
         {
             Image image = args.image;
 
