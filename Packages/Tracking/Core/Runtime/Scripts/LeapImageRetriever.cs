@@ -400,11 +400,11 @@ namespace Leap.Unity
             }
             else
             {
-                if(_provider is LeapXRServiceProvider)
+                if (_provider is LeapXRServiceProvider)
                 {
                     LeapXRServiceProvider xrProvider = (LeapXRServiceProvider)_provider;
 
-                    if(xrProvider.deviceOffsetMode != LeapXRServiceProvider.DeviceOffsetMode.ManualHeadOffset ||
+                    if (xrProvider.deviceOffsetMode != LeapXRServiceProvider.DeviceOffsetMode.ManualHeadOffset ||
                         xrProvider.deviceOffsetYAxis != 0 || xrProvider.deviceOffsetZAxis != 0 || xrProvider.deviceTiltXAxis != 0)
                     {
                         Debug.LogWarning("LeapImageRetrievers with XRServiceProviders that have non-zero offsets or" +
