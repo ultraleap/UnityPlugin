@@ -459,6 +459,7 @@ namespace Leap.Unity
                 controller.Disconnect -= onDisconnect;
                 controller.ImageReady -= onImageReady;
                 controller.FrameReady -= onFrameReady;
+                _provider.OnDeviceChanged -= OnDeviceChanged;
             }
 
             Camera.onPreRender -= OnCameraPreRender;
