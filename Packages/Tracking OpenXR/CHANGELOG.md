@@ -6,6 +6,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [docs-website]: https://docs.ultraleap.com/ "Ultraleap Docs"
 
+## [NEXT] - unreleased
+
+### Added
+
+### Changed
+
+### Fixed
+
+
 ## [1.0.0-pre.7] - 21/07/2022
 
 ### Added
