@@ -133,8 +133,6 @@ namespace Leap.Unity.HandsModule
                 TransformElbow();
                 TransformWrist();
                 TransformFingerBones();
-
-                EditPoseNeedsResetting = true;
             }
         }
 
@@ -500,8 +498,6 @@ namespace Leap.Unity.HandsModule
                     baseTransform.reference.transform.localScale = baseTransform.transform.scale;
                 }
             }
-
-            EditPoseNeedsResetting = false;
         }
 
         bool CanUseScaleFeature()
@@ -561,6 +557,7 @@ namespace Leap.Unity.HandsModule
         /// finger rotation offsets. 
         /// </summary>
         [SerializeField] bool FineTuning;
+
         /// <summary>  
         /// Used by the editor script. The DebugOptions allow to show a debug hand in the scene view
         /// and visualize its rotation and its attached gameobjects
