@@ -255,8 +255,8 @@ namespace Leap.Unity.Encoding
         /// the camera-local hand rotation uses 4 bytes, and each joint position component is
         /// encoded in hand-local space using 3 bytes.
         /// </summary>
-        public int numBytesRequired { get { return 86; } }
-        public const int NUM_BYTES = 86;
+        public int numBytesRequired { get { return 311; } }
+        public const int NUM_BYTES = 311;
 
         /// <summary>
         /// Fills this VectorHand with data read from the provided byte array, starting at
@@ -298,7 +298,14 @@ namespace Leap.Unity.Encoding
             {
                 for (int j = 0; j < 3; j++)
                 {
-                    jointPositions[i][j] = VectorHandExtensions.ByteToFloat(bytes[offset++]);
+                    byte[] floatBytes = new byte[4];
+
+                    for(int k = 0; k < 4; k++)
+                    {
+                        floatBytes[k] = bytes[offset++];
+                    }
+
+                    jointPositions[i][j] = VectorHandExtensions.ByteArrayToFloat(floatBytes);
                 }
             }
         }
@@ -346,8 +353,12 @@ namespace Leap.Unity.Encoding
             {
                 for (int i = 0; i < 3; i++)
                 {
-                    bytesToFill[offset++] =
-                      VectorHandExtensions.FloatToByte(jointPositions[j][i]);
+                    var bytes = VectorHandExtensions.FloatToByteArray(jointPositions[j][i]);
+
+                    foreach(var byt in bytes)
+                    {
+                        bytesToFill[offset++] = byt;
+                    }
                 }
             }
         }
@@ -560,6 +571,22 @@ namespace Leap.Unity.Encoding
             clamped *= movementRange;
             clamped -= movementRange / 2f;
             return clamped;
+        }
+
+        /// <summary>
+        /// Compresses a float into a byte based on the desired movement range.
+        /// </summary>
+        public static byte[] FloatToByteArray(float inFloat)
+        {
+            return BitConverter.GetBytes(inFloat);
+        }
+
+        /// <summary>
+        /// Expands a byte back into a float based on the desired movement range.
+        /// </summary>
+        public static float ByteArrayToFloat(byte[] inByte)
+        {
+            return BitConverter.ToSingle(inByte, 0);
         }
 
         #endregion
