@@ -109,7 +109,7 @@ namespace Leap.Unity
 
         private void validateInput()
         {
-            if (detectCycle())
+            if (detectCircularProviderReference())
             {
                 _inputLeapProvider = null;
                 Debug.LogError("The input to the post-process provider on " + gameObject.name
@@ -117,7 +117,7 @@ namespace Leap.Unity
             }
         }
 
-        private bool detectCycle()
+        private bool detectCircularProviderReference()
         {
             LeapProvider providerA = _inputLeapProvider, providerB = _inputLeapProvider;
             while (providerA is PostProcessProvider)

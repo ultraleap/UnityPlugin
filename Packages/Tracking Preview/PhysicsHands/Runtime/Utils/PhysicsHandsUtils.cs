@@ -276,7 +276,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             palm.solverVelocityIterations = solverVelocity;
             palm.angularDamping = angularDamping;
             palm.useGravity = false;
-            palm.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
+            palm.collisionDetectionMode = CollisionDetectionMode.ContinuousSpeculative;
         }
 
         public static void SetupBoneBody(ArticulationBody bone, float boneMass = 0.6f, int solverIterations = 50, int solverVelocity = 20, float maxAngularVelocity = 1.75f, float maxDepenetrationVelocity = 3f)
@@ -292,7 +292,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             bone.maxAngularVelocity = maxAngularVelocity;
             bone.maxDepenetrationVelocity = maxDepenetrationVelocity;
             bone.useGravity = false;
-            bone.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
+            bone.collisionDetectionMode = CollisionDetectionMode.ContinuousSpeculative;
         }
 
         public static void SetupKnuckleDrives(ArticulationBody knuckle, int fingerIndex, float stiffness, float forceLimit, float strength)
@@ -562,6 +562,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
             leapHand.Arm.NextJoint = leapHand.WristPosition;
             leapHand.Arm.Direction = (leapHand.WristPosition - leapHand.Arm.PrevJoint).Normalized;
+            leapHand.Arm.Rotation = Quaternion.LookRotation(leapHand.Arm.Direction.ToVector3(), -leapHand.PalmNormal.ToVector3()).ToLeapQuaternion();
 
             leapHand.PalmWidth = physicsHand.palmCollider.size.y;
             leapHand.Confidence = originalHand.Confidence;
