@@ -57,7 +57,6 @@ namespace Leap
                     int id,
                     float confidence,
                     float grabStrength,
-                    float grabAngle,
                     float pinchStrength,
                     float pinchDistance,
                     float palmWidth,
@@ -77,7 +76,6 @@ namespace Leap
             Id = id;
             Confidence = confidence;
             GrabStrength = grabStrength;
-            GrabAngle = grabAngle;
             PinchStrength = pinchStrength;
             PinchDistance = pinchDistance;
             PalmWidth = palmWidth;
@@ -226,20 +224,6 @@ namespace Leap
         /// @since 2.0
         /// </summary>
         public float GrabStrength;
-
-        /// <summary>
-        /// The angle between the fingers and the hand of a grab hand pose.
-        /// 
-        /// The angle is computed by looking at the angle between the direction of the
-        /// 4 fingers and the direction of the hand. Thumb is not considered when
-        /// computing the angle.
-        /// The angle is 0 radian for an open hand, and reaches pi radians when the pose
-        /// is a tight fist.
-        /// 
-        /// @since 3.0
-        /// </summary>
-        [System.Obsolete("This code will be removed in the next major version of the plugin. If you believe that it needs to be kept, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
-        public float GrabAngle;
 
         /// <summary>
         /// The holding strength of a pinch hand pose.

@@ -174,7 +174,6 @@ namespace Leap
                                      0.0f,
                                      0.0f,
                                      0.0f,
-                                     0.0f,
                                      85f,
                                      isLeft,
                                      0.0f,

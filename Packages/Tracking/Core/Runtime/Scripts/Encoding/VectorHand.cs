@@ -226,7 +226,6 @@ namespace Leap.Unity.Encoding
               id: (isLeft ? 0 : 1),
               confidence: 1f,
               grabStrength: 0.5f,
-              grabAngle: 100f,
               pinchStrength: 0.5f,
               pinchDistance: 50f,
               palmWidth: 0.085f,

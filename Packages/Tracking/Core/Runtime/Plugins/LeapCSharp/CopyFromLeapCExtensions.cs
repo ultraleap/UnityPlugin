@@ -51,7 +51,6 @@ namespace LeapInternal
 
             hand.Confidence = leapHand.confidence;
             hand.GrabStrength = leapHand.grab_strength;
-            hand.GrabAngle = leapHand.grab_angle;
             hand.PinchStrength = leapHand.pinch_strength;
             hand.PinchDistance = leapHand.pinch_distance;
             hand.PalmWidth = leapHand.palm.width;

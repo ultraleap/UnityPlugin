@@ -567,7 +567,6 @@ namespace Leap.Unity.Interaction.PhysicsHands
             leapHand.Confidence = originalHand.Confidence;
             leapHand.Direction = originalHand.Direction;
             leapHand.FrameId = originalHand.FrameId;
-            leapHand.GrabAngle = originalHand.GrabAngle;
             leapHand.GrabStrength = originalHand.GrabStrength;
             leapHand.Id = originalHand.Id;
             leapHand.PinchStrength = CalculatePinchStrength(leapHand, physicsHand.palmCollider.size.y);

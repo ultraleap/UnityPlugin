@@ -452,7 +452,6 @@ namespace Leap.Unity
                                 int id,
                                 float confidence,
                                 float grabStrength,
-                                float grabAngle,
                                 float pinchStrength,
                                 float pinchDistance,
                                 float palmWidth,
@@ -472,7 +471,6 @@ namespace Leap.Unity
             toFill.Id = id;
             toFill.Confidence = confidence;
             toFill.GrabStrength = grabStrength;
-            toFill.GrabAngle = grabAngle;
             toFill.PinchStrength = pinchStrength;
             toFill.PinchDistance = pinchDistance;
             toFill.PalmWidth = palmWidth;

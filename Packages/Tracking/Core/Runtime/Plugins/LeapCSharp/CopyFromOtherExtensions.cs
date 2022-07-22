@@ -45,7 +45,6 @@ namespace Leap
             hand.Id = source.Id;
             hand.Confidence = source.Confidence;
             hand.GrabStrength = source.GrabStrength;
-            hand.GrabAngle = source.GrabAngle;
             hand.Rotation = source.Rotation;
             hand.PinchStrength = source.PinchStrength;
             hand.PinchDistance = source.PinchDistance;

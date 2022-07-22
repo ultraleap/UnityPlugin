@@ -200,7 +200,6 @@ namespace Ultraleap.Tracking.OpenXR
                 handTracker == HandTracker.Left ? _leftHandId : _rightHandId,
                 1f,
                 CalculateGrabStrength(hand),
-                0, // fixed as grabAngle is going to be deleted
                 CalculatePinchStrength(ref hand, palmWidth),
                 CalculatePinchDistance(ref hand),
                 palmWidth,
