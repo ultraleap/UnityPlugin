@@ -317,6 +317,25 @@ namespace Leap.Unity
         }
 
         /// <summary>
+        /// Predicted Pinch Position without influence from the thumb or index tip.
+        /// Useful for calculating extremely stable pinch calculations.
+        /// Not good for visualising the pinch point - recommended to use PredictedPinchPosition instead
+        /// </summary>
+        public static Vector3 GetStablePinchPosition(this Hand hand)
+        {
+            // The stable pinch point is a rigid point in hand-space linearly offset by the
+            // index finger knuckle position and scaled by the index finger's length
+
+            Vector3 indexKnuckle = hand.Fingers[1].bones[1].PrevJoint.ToVector3();
+            float indexLength = hand.Fingers[1].Length;
+            Vector3 radialAxis = hand.RadialAxis();
+            Vector3 stablePinchPoint = indexKnuckle + hand.PalmarAxis() * indexLength * 0.85F
+                                                       + hand.DistalAxis() * indexLength * 0.20F
+                                                       + radialAxis * indexLength * 0.20F;
+            return stablePinchPoint;
+        }
+
+        /// <summary>
         /// Returns whether this vector faces from a given world position towards another world position within a maximum angle of error.
         /// </summary>
         public static bool IsFacing(this Vector3 facingVector, Vector3 fromWorldPosition, Vector3 towardsWorldPosition, float maxOffsetAngleAllowed)
