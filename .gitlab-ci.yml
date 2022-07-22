@@ -66,6 +66,17 @@ check-formatting:
     # Run dotnet format from location where .editorconfig is defined
     - dotnet-format -f --exclude ".git $CI_PATH Markdown"
     
+    # Make sure our copyrights have the correct date
+    - $CurrentYear = Get-Date -Format yyyy;
+    - |
+      Get-ChildItem -Path "$PACKAGES_PATH/" -Filter *.cs -Recurse -File -Name | ForEach-Object {
+          $ScriptContent = Get-Content -Path "$PACKAGES_PATH/$_";
+          if ($ScriptContent[1] -Like "*Copyright (C) Ultraleap*") {
+              $ScriptContent[1] =  " * Copyright (C) Ultraleap, Inc. 2011-$CurrentYear.                                   *";
+              $ScriptContent -Join "`n" | Set-Content -NoNewline "$PACKAGES_PATH/$_";
+          }
+      }
+    
     # git diff so we can see the changes needed to be made
     - $linter_errors = git --no-pager diff --name-only "*.cs";
 
