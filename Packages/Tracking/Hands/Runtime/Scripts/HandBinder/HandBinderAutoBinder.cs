@@ -88,10 +88,6 @@ namespace Leap.Unity.HandsModule
 
             handBinder.GetLeapHand();
             handBinder.UpdateHand();
-            handBinder.DebugModelTransforms = true;
-            handBinder.SetModelScale = true;
-            handBinder.UseMetaBones = true;
-            handBinder.SetEditorPose = true;
         }
 
         //Update all the bound bone bindings
