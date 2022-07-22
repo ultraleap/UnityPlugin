@@ -3,12 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-#if SVR
 
-namespace Ultraleap
-{
-    public class SlowWake : MonoBehaviour
-    {
+namespace Ultraleap {
+
+
+    public class SlowWake : MonoBehaviour {
         public GameObject[] toEnable; //List in chronological order (E.G. Leap, scene, etc)
 
         public void Awake()
@@ -35,6 +34,8 @@ namespace Ultraleap
 
         private IEnumerator SlowWakeCoroutine()
         {
+
+#if SVR
             var svrManager = SvrManager.Instance;
             Debug.Log("SlowWake : LeapC Unity hand tracking delayed initialisation, have SvrManager.Instance");
             yield return new WaitUntil(() => svrManager.Initialized == true);
@@ -47,7 +48,8 @@ namespace Ultraleap
                 yield return new WaitForSeconds(0.1f);
             }
             Debug.Log("SlowWake : LeapC, slow wake start up sequence completed");
+
+#endif
         }
     }
 }
-#endif

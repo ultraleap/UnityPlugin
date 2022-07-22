@@ -16,6 +16,7 @@ using UnityEngine;
 namespace Leap.Unity
 {
     using Attributes;
+    using LeapInternal;
 #pragma warning disable 0618
 
     /// <summary>

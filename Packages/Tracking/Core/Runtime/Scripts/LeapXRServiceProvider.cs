@@ -7,6 +7,7 @@
  ******************************************************************************/
 
 using Leap.Unity.Attributes;
+using LeapInternal;
 using System;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -642,7 +643,7 @@ namespace Leap.Unity
                     warpedRotation = predictedWarpedRotation;
                 }
 
-                switch(_xr2TimeWarpMode)
+                switch (_xr2TimewarpMode)
                 {
                     case TimewarpMode.Default:
                         DefaultTimeWarping();
@@ -650,6 +651,7 @@ namespace Leap.Unity
                     case TimewarpMode.Experimental_XR2:
                         ExperimentalXR2TimeWarping();
                         break;
+                }
 #else
                 DefaultTimeWarping();
 #endif
