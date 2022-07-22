@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Added OpenXR validation check for ensuring applications target Android SDK 29 as per the [OpenXR recommendations] (https://registry.khronos.org/OpenXR/specs/1.0/loader.html#android-active-runtime-location).
+
 ### Changed
 
 ### Fixed
