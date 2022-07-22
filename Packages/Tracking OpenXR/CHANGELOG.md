@@ -10,12 +10,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Automatic Android manifest permissions for OpenXR and Meta hand-tracking (including support for requesting Meta high-frequency hand-tracking)
 - Added OpenXR validation check for ensuring applications target Android SDK 29 as per the [OpenXR recommendations] (https://registry.khronos.org/OpenXR/specs/1.0/loader.html#android-active-runtime-location).
 
 ### Changed
 
 ### Fixed
 
+### Known issues
+
+- Currently the Ultraleap Hand Tracking feature for OpenXR requires the New and Legacy input systems to be enabled, to simultaneously use OpenXR and the Ultraleap Unity Plugin's features.
+- The OpenXR Leap Provider does not currently support the following hand properties (and will return fixed values):
+  - Hand: `Confidence`
+  - Hand: `GrabAngle` (GrabAngle is now obsolete and will be removed in the next major version of the plugin)
 
 ## [1.0.0-pre.7] - 21/07/2022
 
@@ -51,7 +58,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Hand and Finger: `Id` & `HandId` will always return `0` and `1` for the left and right hand respectively
   - Hand and Finger: `TimeVisible`
   - Finger: `IsExtended`
-
 
 ## [1.0.0-pre.5] - 23/06/2022
 
