@@ -6,8 +6,8 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Leap.Unity;
-using Leap.Unity.Preview.FarFieldInteractions;
+using Leap.Unity.Preview.HandRays;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.XR;
 using UnityEngine.XR.Interaction.Toolkit;
@@ -22,8 +22,9 @@ namespace Leap.Unity.Preview.XRInteractionToolkit
     /// </summary>
     public class TrackedHandsController : XRBaseController
     {
-        // The hand model base that this controller gets its input data from
-        public HandModelBase HandModel = null;
+        public LeapProvider leapProvider;
+        public Chirality chirality;
+        public HandRay handRay;
 
         // Different Interaction poses that can be used for select, activate and UI press interactions
         public enum InteractionPose
@@ -40,32 +41,47 @@ namespace Leap.Unity.Preview.XRInteractionToolkit
         // ui press interaction pose is used to interact with UI
         public InteractionPose uiPressInteractionPose;
 
-        Transform RayOrigin;
+        private Transform RayOrigin;
 
-        Camera mainCamera;
-        Quaternion cameraRotation;
+        private bool lastPinchState;
+        private bool lastGrabState;
+        private float lastPinchTime;
+        private float lastGrabTime;
 
-        FarFieldDirection rayDirection;
+        private float lengthGrabPinchTime = 1;
 
-        bool lastPinchState;
-        bool lastGrabState;
-        float lastPinchTime;
-        float lastGrabTime;
-
-        float lengthGrabPinchTime = 1;
-
-
+        private XRRayInteractor xrRayInteractor;
 
         /// <inheritdoc />
         protected override void OnEnable()
         {
             base.OnEnable();
 
+            if (leapProvider == null)
+            {
+                leapProvider = FindObjectOfType<LeapServiceProvider>();
+                if (leapProvider == null)
+                {
+                    leapProvider = FindObjectOfType<LeapProvider>();
+                    if (leapProvider == null)
+                    {
+                        Debug.LogWarning("No leap provider in scene - TrackedHandsController is dependent on one.");
+                    }
+                }
+            }
+
+            updateTrackingType = UpdateType.UpdateAndBeforeRender;
+
             // if using a ray interactor, set everything up for computing the ray
-            if (GetComponent<XRRayInteractor>() != null)
+            xrRayInteractor = GetComponent<XRRayInteractor>();
+            if (xrRayInteractor != null)
             {
                 RayOrigin = GetComponent<XRRayInteractor>().rayOriginTransform;
-                rayDirection = FindObjectOfType<FarFieldDirection>();
+
+                if (handRay == null)
+                {
+                    handRay = FindObjectsOfType<WristShoulderFarFieldHandRay>().FirstOrDefault(ray => ray.chirality == chirality);
+                }
             }
 
             lastPinchTime = Time.time;
@@ -86,22 +102,33 @@ namespace Leap.Unity.Preview.XRInteractionToolkit
 
             controllerState.inputTrackingState = InputTrackingState.None;
 
-            if (HandModel.GetLeapHand() == null) return;
+            Hand hand = leapProvider.CurrentFrame.GetHand(chirality);
+            if (hand == null)
+            {
+                return;
+            }
 
-            controllerState.position = HandModel.GetLeapHand().GetPredictedPinchPosition();
+            controllerState.position = hand.GetPredictedPinchPosition();
             controllerState.inputTrackingState |= InputTrackingState.Position;
 
-            controllerState.rotation = HandModel.GetLeapHand().Rotation.ToQuaternion();
+            controllerState.rotation = hand.Rotation.ToQuaternion();
             controllerState.inputTrackingState |= InputTrackingState.Rotation;
-
-            // set rotation for the ray if a xr ray interactor is attached
-            if (GetComponent<XRRayInteractor>() != null)
+            if (xrRayInteractor != null)
             {
-                if (RayOrigin == null) RayOrigin = GetComponent<XRRayInteractor>().rayOriginTransform;
+                // Note: this doesn't work too well - XRI processes the positions and
+                // adds a fair amount of latency to them.
+                // This is particularly noticable if using a LineType.ProjectileCurve on your XRRayInteractor,
+                // which  will result in a very noodly & unresponsive line.
+                // We can 'fix' this by setting the updateTrackingType of the TrackedHandsController to UpdateType.Update,
+                // but this XRI then makes our ray direction very jittery.
+                // This will be fixed in the future by better integration with XRI -
+                // potentially through our own implementation of XRRayInteractor
+
+                if (RayOrigin == null) RayOrigin = xrRayInteractor.rayOriginTransform;
                 if (RayOrigin != null)
                 {
-                    int handIndex = HandModel.Handedness == Chirality.Left ? 0 : 1;
-                    RayOrigin.rotation = Quaternion.LookRotation(rayDirection.FarFieldRays[handIndex].Direction);
+                    RayOrigin.position = handRay.handRayDirection.VisualAimPosition;
+                    RayOrigin.rotation = Quaternion.LookRotation(handRay.handRayDirection.Direction);
                 }
             }
         }
@@ -111,40 +138,55 @@ namespace Leap.Unity.Preview.XRInteractionToolkit
         {
             base.UpdateInput(controllerState);
             if (controllerState == null)
+            {
                 return;
-
+            }
 
             controllerState.ResetFrameDependentStates();
 
+            if (xrRayInteractor != null)
+            {
+                if (xrRayInteractor.isActiveAndEnabled && !handRay.HandRayEnabled)
+                {
+                    xrRayInteractor.enabled = false;
+                }
+                else if (!xrRayInteractor.isActiveAndEnabled && handRay.HandRayEnabled)
+                {
+                    xrRayInteractor.enabled = true;
+                }
+            }
 
-            if (HandModel.GetLeapHand() == null) return;
+            Hand hand = leapProvider.CurrentFrame.GetHand(chirality);
+            if (hand == null)
+            {
+                return;
+            }
 
-
-            controllerState.selectInteractionState.SetFrameState(getInteractionState(selectInteractionPose));
-            controllerState.activateInteractionState.SetFrameState(getInteractionState(activateInteractionPose));
-            controllerState.uiPressInteractionState.SetFrameState(getInteractionState(uiPressInteractionPose));
+            controllerState.selectInteractionState.SetFrameState(getInteractionState(selectInteractionPose, hand));
+            controllerState.activateInteractionState.SetFrameState(getInteractionState(activateInteractionPose, hand));
+            controllerState.uiPressInteractionState.SetFrameState(getInteractionState(uiPressInteractionPose, hand));
         }
 
 
-        bool getInteractionState(InteractionPose pose)
+        private bool getInteractionState(InteractionPose pose, Hand hand)
         {
             switch (pose)
             {
                 case InteractionPose.Pinch:
-                    return HandModel.GetLeapHand().IsPinching();
+                    return hand.IsPinching();
 
                 case InteractionPose.Grab:
-                    return HandModel.GetLeapHand().GrabStrength > 0.7f;
+                    return hand.GrabStrength > 0.7f;
 
                 case InteractionPose.LongPinch:
                     bool longPinch = false;
-                    if (HandModel.GetLeapHand().IsPinching() && lastPinchState && Time.time - lastPinchTime > lengthGrabPinchTime)
+                    if (hand.IsPinching() && lastPinchState && Time.time - lastPinchTime > lengthGrabPinchTime)
                         longPinch = true;
 
-                    else if (!HandModel.GetLeapHand().IsPinching() && lastPinchState)
+                    else if (!hand.IsPinching() && lastPinchState)
                         lastPinchState = false;
 
-                    else if (HandModel.GetLeapHand().IsPinching() && !lastPinchState)
+                    else if (hand.IsPinching() && !lastPinchState)
                     {
                         lastPinchState = true;
                         lastPinchTime = Time.time;
@@ -154,13 +196,13 @@ namespace Leap.Unity.Preview.XRInteractionToolkit
                 case InteractionPose.LongGrab:
                     bool longGrab = false;
 
-                    if (HandModel.GetLeapHand().GrabStrength > 0.7f && lastGrabState && Time.time - lastGrabTime > lengthGrabPinchTime)
+                    if (hand.GrabStrength > 0.7f && lastGrabState && Time.time - lastGrabTime > lengthGrabPinchTime)
                         longPinch = true;
 
-                    else if (!(HandModel.GetLeapHand().GrabStrength > 0.7f) && lastGrabState)
+                    else if (!(hand.GrabStrength > 0.7f) && lastGrabState)
                         lastGrabState = false;
 
-                    else if (HandModel.GetLeapHand().GrabStrength > 0.7f && !lastGrabState)
+                    else if (hand.GrabStrength > 0.7f && !lastGrabState)
                     {
                         lastGrabState = true;
                         lastGrabTime = Time.time;
