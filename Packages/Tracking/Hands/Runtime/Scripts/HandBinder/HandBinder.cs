@@ -519,6 +519,8 @@ namespace Leap.Unity.HandsModule
 
         #region Editor
 
+#pragma warning disable 0414
+
         /// <summary> 
         /// Set the assigned transforms to the leap hand during editor 
         /// </summary>
@@ -563,6 +565,8 @@ namespace Leap.Unity.HandsModule
         /// and visualize its rotation and its attached gameobjects
         /// </summary>
         [SerializeField] bool DebugOptions;
+
+#pragma warning restore 0414
 
         /// <summary>
         /// Returns whether or not this hand model supports editor persistence. 
