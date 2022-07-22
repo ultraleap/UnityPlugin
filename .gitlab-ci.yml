@@ -81,13 +81,13 @@ check-formatting:
     when: on_failure
 
 # -----------------------------------------------------------------------------
-# RAD Builds
+# Unity Builds
 # -----------------------------------------------------------------------------
 #
-# This job will trigger various RAD apps to build with the current plugin branch.
-# A failure in any downstream jobs likely represents a breaking change and should be addressed, but will not fail the whole pipeline.
+# This job will trigger various apps to build using the plugin commit that started this pipeline.
+# A failure in a build likely represents a breaking plugin change and should be addressed, but will not fail the whole pipeline.
 #
-rad-builds:
+unity-builds:
   stage: test
   allow_failure: true
   needs: []
@@ -98,6 +98,7 @@ rad-builds:
     branch: main
   variables:
     PLUGIN_COMMIT_BRANCH: $CI_COMMIT_BRANCH
+    PLUGIN_COMMIT_HASH: $CI_COMMIT_SHA
 
 # -----------------------------------------------------------------------------
 # Generate API Documentation
