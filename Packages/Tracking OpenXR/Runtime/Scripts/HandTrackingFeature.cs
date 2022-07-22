@@ -147,6 +147,7 @@ namespace Ultraleap.Tracking.OpenXR
 #if UNITY_EDITOR
         protected override void GetValidationChecks(List<ValidationRule> rules, BuildTargetGroup targetGroup)
         {
+#if UNITY_ANDROID
             // If building for Android, check that we are targeting Android API 29 for maximum compatibility.
             rules.Add(new ValidationRule(this)
             {
@@ -170,6 +171,7 @@ namespace Ultraleap.Tracking.OpenXR
                     PlayerSettings.Android.targetSdkVersion = AndroidSdkVersions.AndroidApiLevel29;
                 },
             });
+#endif
 
             // Check the active input handling supports New (for OpenXR) and Legacy (for Ultraleap Plugin support).
             rules.Add(new ValidationRule(this)
