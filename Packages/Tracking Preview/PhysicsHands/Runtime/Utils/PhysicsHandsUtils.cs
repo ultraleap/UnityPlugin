@@ -48,10 +48,9 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 boneMass = boneMass,
                 strength = strength,
                 forceLimit = forceLimit,
-                stiffness = stiffness
+                stiffness = stiffness,
+                physicMaterial = CreateHandPhysicsMaterial()
             };
-
-            PhysicMaterial physicMaterial = CreateHandPhysicsMaterial();
 
             if (palmTransform.parent != null)
             {
@@ -62,7 +61,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             }
 
             physicsHand.palmCollider = palmGameObject.GetComponent<BoxCollider>();
-            SetupPalmCollider(physicsHand.palmCollider, leapHand);
+            SetupPalmCollider(physicsHand.palmCollider, leapHand, physicsHand.physicMaterial);
 
             physicsHand.palmBody = palmGameObject.GetComponent<ArticulationBody>();
             SetupPalmBody(physicsHand.palmBody, boneMass * 3f);
@@ -113,7 +112,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                     }
 
                     physicsHand.jointColliders[boneArrayIndex] = capsuleGameObject.GetComponent<CapsuleCollider>();
-                    SetupBoneCollider(physicsHand.jointColliders[boneArrayIndex], bone, physicMaterial);
+                    SetupBoneCollider(physicsHand.jointColliders[boneArrayIndex], bone, physicsHand.physicMaterial);
 
                     physicsHand.jointBodies[boneArrayIndex] = capsuleGameObject.AddComponent<ArticulationBody>();
                     SetupBoneBody(physicsHand.jointBodies[boneArrayIndex], boneMass);
@@ -147,7 +146,10 @@ namespace Leap.Unity.Interaction.PhysicsHands
             physicsHand.transform.position = leapHand.PalmPosition.ToVector3();
             physicsHand.transform.rotation = leapHand.Rotation.ToQuaternion();
 
-            PhysicMaterial physicMaterial = CreateHandPhysicsMaterial();
+            if(physicsHand.physicMaterial == null)
+            {
+                physicsHand.physicMaterial = CreateHandPhysicsMaterial();
+            }
 
             if (physicsHand.transform.parent != null)
             {
@@ -158,8 +160,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                     1f / physicsHand.transform.parent.lossyScale.z);
             }
 
-            // Size the palm
-            physicsHand.palmCollider.size = CalculatePalmSize(leapHand);
+            SetupPalmCollider(physicsHand.palmCollider, leapHand, physicsHand.physicMaterial);
 
             SetupPalmBody(physicsHand.palmBody, physicsHand.boneMass * 3f);
             physicsHand.palmBone.SetBoneIndexes(5, 0);
@@ -201,7 +202,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                             1f / capsuleGameObject.transform.parent.lossyScale.z);
                     }
 
-                    SetupBoneCollider(physicsHand.jointColliders[boneArrayIndex], bone, physicMaterial);
+                    SetupBoneCollider(physicsHand.jointColliders[boneArrayIndex], bone, physicsHand.physicMaterial);
 
                     SetupBoneBody(physicsHand.jointBodies[boneArrayIndex], physicsHand.boneMass);
 

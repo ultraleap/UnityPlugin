@@ -49,6 +49,9 @@ namespace Leap.Unity.Interaction.PhysicsHands
             [HideInInspector]
             public float stiffness, forceLimit;
             public float boneMass;
+
+            [HideInInspector]
+            public PhysicMaterial physicMaterial;
         }
 
         private PhysicsProvider _physicsProvider;

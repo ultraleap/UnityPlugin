@@ -6,5 +6,17 @@ namespace Leap.Unity.Interaction.PhysicsHands
     // This allows you to easily prevent important objects from being affected by the player.
     // Note that this will not prevent your object from being collided with.
     public class PhysicsIgnoreHelpers : MonoBehaviour
-    { }
+    {
+        private void OnCollisionEnter(Collision collision)
+        {
+            if(collision.gameObject != null && collision.gameObject.TryGetComponent<PhysicsBone>(out var temp))
+            {
+                foreach (var contact in collision.contacts)
+                {
+                    Physics.IgnoreCollision(temp.Collider, contact.thisCollider);
+                }
+            }
+        }
+
+    }
 }
