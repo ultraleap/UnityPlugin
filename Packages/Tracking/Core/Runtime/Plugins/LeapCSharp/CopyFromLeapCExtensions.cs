@@ -22,13 +22,6 @@ namespace LeapInternal
             hand.Transform(leapTransform);
         }
 
-        public static void TransformToLeapUnits(this Hand hand)
-        {
-            LeapTransform leapTransform = new LeapTransform(Vector3.zero, Quaternion.identity, new Vector3(1/MM_TO_M, 1/MM_TO_M, 1/MM_TO_M));
-            leapTransform.MirrorZ();
-
-            hand.Transform(leapTransform);
-        }
 
         /**
          * Copies the data from an internal tracking message into a frame.
