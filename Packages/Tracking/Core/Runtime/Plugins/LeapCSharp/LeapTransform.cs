@@ -32,7 +32,7 @@ namespace Leap
         public LeapTransform(Vector3 translation, Quaternion rotation, Vector3 scale) :
           this()
         {
-            _scale = scale;
+            this.scale = scale;
             // these are non-trival setters.
             this.translation = translation;
             this.rotation = rotation; // Calls validateBasis
@@ -44,7 +44,7 @@ namespace Leap
         /// <param name="t">Unity Transform</param>
         public LeapTransform(Transform t) : this()
         {
-            _scale = t.lossyScale;
+            this.scale = t.lossyScale;
             this.translation = t.position;
             this.rotation = t.rotation;
         }
