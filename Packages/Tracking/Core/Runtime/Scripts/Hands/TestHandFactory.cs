@@ -11,6 +11,8 @@ namespace Leap
     using System;
     using System.Collections.Generic;
     using UnityEngine;
+    using LeapInternal;
+
     public static class TestHandFactory
     {
 
@@ -29,17 +31,16 @@ namespace Leap
         public static Frame MakeTestFrame(int frameId,
                                           bool includeLeftHand = true,
                                           bool includeRightHand = true,
-                                          TestHandPose handPose = TestHandPose.HeadMountedA,
-                                          UnitType unitType = UnitType.LeapUnits)
+                                          TestHandPose handPose = TestHandPose.HeadMountedA)
         {
 
             var testFrame = new Frame(frameId, 0, 120.0f,
                                       new List<Hand>());
 
             if (includeLeftHand)
-                testFrame.Hands.Add(MakeTestHand(true, handPose, frameId, 10, unitType));
+                testFrame.Hands.Add(MakeTestHand(true, handPose, frameId, 10));
             if (includeRightHand)
-                testFrame.Hands.Add(MakeTestHand(false, handPose, frameId, 20, unitType));
+                testFrame.Hands.Add(MakeTestHand(false, handPose, frameId, 20));
 
             return testFrame;
         }
@@ -51,8 +52,7 @@ namespace Leap
         /// left and right hands.
         /// </summary>
         public static Hand MakeTestHand(bool isLeft, LeapTransform leftHandTransform,
-                                        int frameId = 0, int handId = 0,
-                                        UnitType unitType = UnitType.LeapUnits)
+                                        int frameId = 0, int handId = 0)
         {
 
             // Apply the appropriate mirroring if this is a right hand.
@@ -74,12 +74,9 @@ namespace Leap
                          .Transform(leftHandTransform);
 
             var transformedHand = hand.Transform(new LeapTransform(Vector3.zero,
-                                                                   Quaternion.Euler(90f, 0f, 180f)));
+                  Quaternion.Euler(90f, 0f, 180f)));
 
-            if (unitType == UnitType.UnityUnits)
-            {
-                transformedHand.TransformToUnityUnits();
-            }
+            transformedHand.TransformToUnityUnits();
 
             return transformedHand;
         }
@@ -88,22 +85,19 @@ namespace Leap
         /// Returns a test Hand object.
         /// </summary>
         public static Hand MakeTestHand(bool isLeft,
-                                        int frameId = 0, int handId = 0,
-                                        UnitType unitType = UnitType.LeapUnits)
+                                        int frameId = 0, int handId = 0)
         {
-            return MakeTestHand(isLeft, LeapTransform.Identity, frameId, handId, unitType);
+            return MakeTestHand(isLeft, LeapTransform.Identity, frameId, handId);
         }
 
         /// <summary>
         /// Returns a test Leap Hand object in the argument TestHandPose.
         /// </summary>
         public static Hand MakeTestHand(bool isLeft, TestHandPose pose,
-                                        int frameId = 0, int handId = 0,
-                                        UnitType unitType = UnitType.LeapUnits)
+                                        int frameId = 0, int handId = 0)
         {
             return MakeTestHand(isLeft, GetTestPoseLeftHandTransform(pose),
-                                frameId, handId,
-                                unitType);
+                                frameId, handId);
         }
 
         #endregion
@@ -316,27 +310,5 @@ namespace Leap
 
         #endregion
 
-    }
-
-    // Note: The fact that this class needs to exist is ridiculous
-    // TODO: Look into automatically returning things in Unity units? Would require changes
-    // for everything that uses the TestHandFactory.
-    public static class LeapTestProviderExtensions
-    {
-
-        public static readonly float MM_TO_M = 1e-3f;
-
-        public static LeapTransform GetLeapTransform(Vector3 position, Quaternion rotation)
-        {
-            Vector3 scale = new Vector3(MM_TO_M, MM_TO_M, MM_TO_M); // Leap units -> Unity units.
-            LeapTransform transform = new LeapTransform(position, rotation, scale);
-            transform.MirrorZ(); // Unity is left handed.
-            return transform;
-        }
-
-        public static void TransformToUnityUnits(this Hand hand)
-        {
-            hand.Transform(GetLeapTransform(Vector3.zero, Quaternion.identity));
-        }
     }
 }

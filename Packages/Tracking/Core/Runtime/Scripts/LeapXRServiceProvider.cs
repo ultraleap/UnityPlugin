@@ -526,7 +526,6 @@ namespace Leap.Unity
             {
                 //By default, use the camera transform matrix to transform the frame into 
                 leapTransform = new LeapTransform(mainCamera.transform);
-                leapTransform.scale = Vector3.one * 1e-3f;
 
                 //If the application is playing then we can try to use temporal warping
                 if (Application.isPlaying)
@@ -609,20 +608,16 @@ namespace Leap.Unity
             {
                 leapTransform = new LeapTransform(
                   mainCamera.transform.parent.TransformPoint(warpedPosition),
-                  mainCamera.transform.parent.TransformRotation(warpedRotation),
-                  Vector3.one * 1e-3f
-                );
+                  mainCamera.transform.parent.TransformRotation(warpedRotation)
+                  );
             }
             else
             {
                 leapTransform = new LeapTransform(
                   warpedPosition,
-                  warpedRotation,
-                  Vector3.one * 1e-3f
-                );
+                  warpedRotation
+                  );
             }
-
-            leapTransform.MirrorZ();
 
             return leapTransform;
         }

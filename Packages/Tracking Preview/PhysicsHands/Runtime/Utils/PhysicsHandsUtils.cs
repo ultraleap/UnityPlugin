@@ -30,7 +30,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
             palmGameObject.name = $"{(handedness == Chirality.Left ? "Left" : "Right")} Palm";
 
-            Leap.Hand leapHand = TestHandFactory.MakeTestHand(isLeft: handedness == Chirality.Left ? true : false, pose: TestHandFactory.TestHandPose.HeadMountedB, unitType: TestHandFactory.UnitType.UnityUnits);
+            Leap.Hand leapHand = TestHandFactory.MakeTestHand(isLeft: handedness == Chirality.Left ? true : false, pose: TestHandFactory.TestHandPose.HeadMountedB);
 
             Transform palmTransform = palmGameObject.GetComponent<Transform>();
             palmTransform.position = leapHand.PalmPosition;
