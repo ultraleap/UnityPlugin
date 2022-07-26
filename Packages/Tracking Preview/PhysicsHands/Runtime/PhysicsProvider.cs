@@ -89,6 +89,9 @@ namespace Leap.Unity.Interaction.PhysicsHands
         // Helpers
         private Dictionary<Rigidbody, PhysicsGraspHelper> _graspHelpers = new Dictionary<Rigidbody, PhysicsGraspHelper>();
 
+        public Dictionary<Rigidbody, PhysicsGraspHelper.State> GraspStates => _graspStates;
+        private Dictionary<Rigidbody, PhysicsGraspHelper.State> _graspStates = new Dictionary<Rigidbody,PhysicsGraspHelper.State>();
+
         // This stores the objects as they jump between layers
         private Dictionary<Rigidbody, HashSet<PhysicsBone>> _boneQueue = new Dictionary<Rigidbody, HashSet<PhysicsBone>>();
 
@@ -338,6 +341,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             }
 
             PhysicsGraspHelper.State oldState, state;
+
             foreach (var helper in _graspHelpers)
             {
                 if (helper.Value.Ignored)
@@ -346,6 +350,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 }
                 oldState = helper.Value.GraspState;
                 state = helper.Value.UpdateHelper();
+                _graspStates[helper.Key] = state;
                 if (state != oldState)
                 {
                     OnObjectStateChange?.Invoke(helper.Value.Rigidbody, helper.Value);
@@ -426,6 +431,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                     }
                     _graspHelpers[rigid].ReleaseHelper();
                     OnObjectStateChange?.Invoke(rigid, _graspHelpers[rigid]);
+                    _graspStates.Remove(rigid);
                     _graspHelpers.Remove(rigid);
                 }
                 return true;
@@ -456,6 +462,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                         PhysicsGraspHelper helper = new PhysicsGraspHelper(_resultsCache[i].attachedRigidbody, this);
                         helper.AddHand(hand);
                         _graspHelpers.Add(_resultsCache[i].attachedRigidbody, helper);
+                        _graspStates.Add(_resultsCache[i].attachedRigidbody, helper.GraspState);
                     }
                 }
             }
@@ -575,6 +582,29 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 hand.SetGrasping(found);
             }
             hand.SetGraspingMass(mass);
+        }
+
+        public bool IsGraspingObject(Rigidbody rigid)
+        {
+            if(_graspStates.TryGetValue(rigid,out var state))
+            {
+                return state == PhysicsGraspHelper.State.Grasp;
+            }
+            return false;
+        }
+
+        public bool IsGraspingObject(Rigidbody rigid, out Hand hand)
+        {
+            hand = null;
+            if (IsGraspingObject(rigid))
+            {
+                if(_graspHelpers.TryGetValue(rigid,out var temp))
+                {
+                    hand = temp.GraspingHands[temp.GraspingHands.Count - 1].GetLeapHand();
+                    return true;
+                }
+            }
+            return false;
         }
 
         private void OnDrawGizmos()
