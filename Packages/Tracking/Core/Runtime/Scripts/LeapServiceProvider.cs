@@ -917,6 +917,11 @@ namespace Leap.Unity
         /// </summary>
         protected void createController()
         {
+#if UNITY_ANDROID
+            var bindStatus = EnsureAndroidBinding();
+            if (!bindStatus)
+                return;
+#endif
             if (_leapController != null)
             {
                 return;
