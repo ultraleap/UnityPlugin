@@ -9,8 +9,15 @@ namespace Leap.Unity.Interaction.PhysicsHands
         public override void OnInspectorGUI()
         {
             EditorGUILayout.HelpBox("This script will prevent the physics hands helpers from being applied to your object.\n" +
-                "This allows you to easily prevent important objects from being affected by the player.\n" +
-                "Note that this will not prevent your object from being collided with.", MessageType.Info);
+                "This allows you to easily prevent important objects from being affected by the player.", MessageType.Info);
+
+            GUI.enabled = false;
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("m_Script"), true, new GUILayoutOption[0]);
+            GUI.enabled = true;
+
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("DisableHandCollisions"));
+
+            serializedObject.ApplyModifiedProperties();
         }
     }
 }
