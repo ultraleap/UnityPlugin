@@ -8,20 +8,18 @@ namespace Leap.Unity.Interaction.PhysicsHands
     public class PhysicsIgnoreHelpers : MonoBehaviour
     {
         [Tooltip("This prevents the object from being collided with Physics Hands.")]
-        public bool DisableHandCollisions = true;
+        public bool DisableHandCollisions = false;
 
         private void OnCollisionEnter(Collision collision)
         {
-            if(!DisableHandCollisions)
+            if(DisableHandCollisions)
             {
-                return;
-            }
-
-            if(collision.gameObject != null && collision.gameObject.TryGetComponent<PhysicsBone>(out var temp))
-            {
-                foreach (var contact in collision.contacts)
+                if(collision.gameObject != null && collision.gameObject.TryGetComponent<PhysicsBone>(out var temp))
                 {
-                    Physics.IgnoreCollision(temp.Collider, contact.thisCollider);
+                    foreach (var contact in collision.contacts)
+                    {
+                        Physics.IgnoreCollision(temp.Collider, contact.thisCollider);
+                    }
                 }
             }
         }
