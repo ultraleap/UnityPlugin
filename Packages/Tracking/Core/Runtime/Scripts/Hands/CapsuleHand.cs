@@ -40,6 +40,12 @@ namespace Leap.Unity
         private bool _showArm = true;
 
         [SerializeField]
+        private bool _showUpperArm = true;
+
+        [SerializeField]
+        private bool _showUpperBody = false;
+
+        [SerializeField]
         private bool _castShadows = true;
 
         [SerializeField]
@@ -78,8 +84,8 @@ namespace Leap.Unity
         private Material _sphereMat;
         private Hand _hand;
         private Vector3[] _spherePositions;
-        private Matrix4x4[] _sphereMatrices = new Matrix4x4[32],
-                            _cylinderMatrices = new Matrix4x4[32];
+        private Matrix4x4[] _sphereMatrices = new Matrix4x4[64],
+                            _cylinderMatrices = new Matrix4x4[64];
         private int _curSphereIndex = 0, _curCylinderIndex = 0;
         private Color _backingDefault = Color.white;
 
@@ -339,29 +345,17 @@ namespace Leap.Unity
             //If we want to show the arm, do the calculations and display the meshes
             if (_showArm)
             {
-                var arm = _hand.Arm;
+                DrawArm();
+            }
 
-                Vector3 right = arm.Basis.xBasis.ToVector3() * arm.Width * 0.7f * 0.5f;
-                Vector3 wrist = arm.WristPosition.ToVector3();
-                Vector3 elbow = arm.ElbowPosition.ToVector3();
+            if (_showUpperArm)
+            {
+                DrawUpperArm();
+            }
 
-                float armLength = Vector3.Distance(wrist, elbow);
-                wrist -= arm.Direction.ToVector3() * armLength * 0.05f;
-
-                Vector3 armFrontRight = wrist + right;
-                Vector3 armFrontLeft = wrist - right;
-                Vector3 armBackRight = elbow + right;
-                Vector3 armBackLeft = elbow - right;
-
-                drawSphere(armFrontRight);
-                drawSphere(armFrontLeft);
-                drawSphere(armBackLeft);
-                drawSphere(armBackRight);
-
-                drawCylinder(armFrontLeft, armFrontRight);
-                drawCylinder(armBackLeft, armBackRight);
-                drawCylinder(armFrontLeft, armBackLeft);
-                drawCylinder(armFrontRight, armBackRight);
+            if(_showUpperBody)
+            {
+                DrawUpperBody();
             }
 
             //Draw cylinders between finger joints
@@ -425,6 +419,148 @@ namespace Leap.Unity
 #endif
             Graphics.DrawMeshInstanced(_cylinderMesh, 0, _backing_material, _cylinderMatrices, _curCylinderIndex, null,
               _castShadows ? UnityEngine.Rendering.ShadowCastingMode.On : UnityEngine.Rendering.ShadowCastingMode.Off, true, gameObject.layer);
+        }
+
+        void DrawArm()
+        {
+            var arm = _hand.Arm;
+
+            Vector3 right = arm.Basis.xBasis.ToVector3() * arm.Width * 0.7f * 0.5f;
+            Vector3 wrist = arm.WristPosition.ToVector3();
+            Vector3 elbow = arm.ElbowPosition.ToVector3();
+
+            float armLength = Vector3.Distance(wrist, elbow);
+            wrist -= arm.Direction.ToVector3() * armLength * 0.05f;
+
+            Vector3 armFrontRight = wrist + right;
+            Vector3 armFrontLeft = wrist - right;
+            Vector3 armBackRight = elbow + right;
+            Vector3 armBackLeft = elbow - right;
+
+            drawSphere(armFrontRight);
+            drawSphere(armFrontLeft);
+            drawSphere(armBackLeft);
+            drawSphere(armBackRight);
+
+            drawCylinder(armFrontLeft, armFrontRight);
+            drawCylinder(armBackLeft, armBackRight);
+            drawCylinder(armFrontLeft, armBackLeft);
+            drawCylinder(armFrontRight, armBackRight);
+        }
+
+        void DrawUpperArm()
+        {
+            Vector3 shoulderPos = Camera.main.transform.TransformPoint(handedness == Chirality.Left ? -0.15f : 0.15f, -0.15f, -0.05f);
+
+            var arm = _hand.Arm;
+
+            Vector3 elbow = arm.ElbowPosition.ToVector3();
+            Vector3 right = arm.Basis.xBasis.ToVector3() * arm.Width * 0.7f * 0.5f;
+
+            Vector3 armFrontRight = elbow + right;
+            Vector3 armFrontLeft = elbow - right;
+            Vector3 armBackRight = shoulderPos + right;
+            Vector3 armBackLeft = shoulderPos - right;
+
+            drawSphere(armBackLeft);
+            drawSphere(armBackRight);
+
+            drawCylinder(armFrontLeft, armFrontRight);
+            drawCylinder(armBackLeft, armBackRight);
+            drawCylinder(armFrontLeft, armBackLeft);
+            drawCylinder(armFrontRight, armBackRight);
+        }
+
+        void DrawUpperBody()
+        {
+            if ((leapProvider != null && leapProvider.CurrentFrame.Hands.Count == 1) || handedness == Chirality.Left)
+            {
+                // Head
+
+                Vector3 headBottomLeftFront = Camera.main.transform.TransformPoint(0.06f, -0.05f, 0) + new Vector3(0, -0.05f, 0);
+                Vector3 headBottomRightFront = Camera.main.transform.TransformPoint(-0.06f, -0.05f, 0) + new Vector3(0, -0.05f, 0);
+                Vector3 headTopLeftFront = Camera.main.transform.TransformPoint(0.07f, 0.08f, 0) + new Vector3(0, -0.05f, 0);
+                Vector3 headTopRightFront = Camera.main.transform.TransformPoint(-0.07f, 0.08f, 0) + new Vector3(0, -0.05f, 0);
+
+                Vector3 headBottomLeftBack = Camera.main.transform.TransformPoint(0.06f, -0.05f, -0.1f) + new Vector3(0, -0.05f, 0);
+                Vector3 headBottomRightBack = Camera.main.transform.TransformPoint(-0.06f, -0.05f, -0.1f) + new Vector3(0, -0.05f, 0);
+                Vector3 headTopLeftBack = Camera.main.transform.TransformPoint(0.07f, 0.08f, -0.1f) + new Vector3(0, -0.05f, 0);
+                Vector3 headTopRightBack = Camera.main.transform.TransformPoint(-0.07f, 0.08f, -0.1f) + new Vector3(0, -0.05f, 0);
+
+                drawSphere(headBottomLeftFront);
+                drawSphere(headBottomRightFront);
+                drawSphere(headTopLeftFront);
+                drawSphere(headTopRightFront);
+
+                drawCylinder(headBottomLeftFront, headBottomRightFront);
+                drawCylinder(headTopLeftFront, headTopRightFront);
+                drawCylinder(headBottomLeftFront, headTopLeftFront);
+                drawCylinder(headBottomRightFront, headTopRightFront);
+
+                drawSphere(headBottomLeftBack);
+                drawSphere(headBottomRightBack);
+                drawSphere(headTopLeftBack);
+                drawSphere(headTopRightBack);
+
+                drawCylinder(headBottomLeftBack, headBottomRightBack);
+                drawCylinder(headTopLeftBack, headTopRightBack);
+                drawCylinder(headBottomLeftBack, headTopLeftBack);
+                drawCylinder(headBottomRightBack, headTopRightBack);
+
+                drawCylinder(headTopRightBack, headTopRightFront);
+                drawCylinder(headTopLeftBack, headTopLeftFront);
+                drawCylinder(headBottomLeftBack, headBottomLeftFront);
+                drawCylinder(headBottomRightBack, headBottomRightFront);
+
+                // Neck
+
+                Vector3 neckBottomLeft = Camera.main.transform.TransformPoint(0.02f, -0.15f, -0.05f);
+                Vector3 neckBottomRight = Camera.main.transform.TransformPoint(-0.02f, -0.15f, -0.05f);
+                Vector3 neckTopLeft = (headBottomLeftBack + headBottomLeftFront) / 2;
+                Vector3 neckTopRight = (headBottomRightBack + headBottomRightFront) / 2;
+
+                drawSphere(neckBottomLeft);
+                drawSphere(neckBottomRight);
+                drawSphere(neckTopLeft);
+                drawSphere(neckTopRight);
+
+                drawCylinder(neckBottomLeft, neckBottomRight);
+                drawCylinder(neckTopLeft, neckTopRight);
+                drawCylinder(neckBottomLeft, neckTopLeft);
+                drawCylinder(neckBottomRight, neckTopRight);
+
+                // Torso
+
+                Vector3 torsoBottomLeft = Camera.main.transform.TransformPoint(-0.1f, -0.3f, -0.05f);
+                Vector3 torsoBottomRight = Camera.main.transform.TransformPoint(0.1f, -0.3f, -0.05f);
+                Vector3 torsoTopLeft = Camera.main.transform.TransformPoint(-0.12f, -0.15f, -0.05f);
+                Vector3 torsoTopRight = Camera.main.transform.TransformPoint(0.12f, -0.15f, -0.05f);
+
+                drawSphere(torsoBottomLeft);
+                drawSphere(torsoBottomRight);
+                drawSphere(torsoTopLeft);
+                drawSphere(torsoTopRight);
+
+                drawCylinder(torsoBottomLeft, torsoBottomRight);
+                drawCylinder(torsoTopLeft, torsoTopRight);
+                drawCylinder(torsoBottomLeft, torsoTopLeft);
+                drawCylinder(torsoBottomRight, torsoTopRight);
+
+                Vector3 torsoLowerTopLeft = Camera.main.transform.TransformPoint(-0.05f, -0.3f, -0.05f);
+                Vector3 torsoLowerTopRight = Camera.main.transform.TransformPoint(0.05f, -0.3f, -0.05f);
+                Vector3 torsoLowerBottomLeft = torsoLowerTopLeft + new Vector3(0f, -0.2f, 0);
+                Vector3 torsoLowerBottomRight = torsoLowerTopRight + new Vector3(0f, -0.2f, 0);
+
+                drawSphere(torsoLowerBottomLeft);
+                drawSphere(torsoLowerBottomRight);
+                drawSphere(torsoLowerTopLeft);
+                drawSphere(torsoLowerTopRight);
+
+                drawCylinder(torsoLowerBottomLeft, torsoLowerBottomRight);
+                drawCylinder(torsoLowerTopLeft, torsoLowerTopRight);
+                drawCylinder(torsoLowerBottomLeft, torsoLowerTopLeft);
+                drawCylinder(torsoLowerBottomRight, torsoLowerTopRight);
+            }
         }
 
         private void drawSphere(Vector3 position)
