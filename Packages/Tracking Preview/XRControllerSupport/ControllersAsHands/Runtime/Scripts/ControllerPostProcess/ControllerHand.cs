@@ -437,7 +437,7 @@ namespace Leap.Unity.Controllers
         {
             //TODO: this could do with being changed so it doesn't generate each time.
             // annoying to do because finger positions are in world space, meaning transforms are hard to carry between frames.
-            Hand h = TestHandFactory.MakeTestHand(_chirality == Chirality.Left, unitType: TestHandFactory.UnitType.UnityUnits);
+            Hand h = TestHandFactory.MakeTestHand(_chirality == Chirality.Left);
             SetFingerSizes(ref h, 0.013f);
 
             // Thumb

@@ -12,6 +12,16 @@ namespace LeapInternal
     using UnityEngine;
     public static class CopyFromLeapCExtensions
     {
+        public static readonly float MM_TO_M = 1e-3f;
+
+        public static void TransformToUnityUnits(this Hand hand)
+        {
+            LeapTransform leapTransform = new LeapTransform(Vector3.zero, Quaternion.identity, new Vector3(MM_TO_M, MM_TO_M, MM_TO_M));
+            leapTransform.MirrorZ();
+
+            hand.Transform(leapTransform);
+        }
+
 
         /**
          * Copies the data from an internal tracking message into a frame.
@@ -69,6 +79,8 @@ namespace LeapInternal
             hand.Fingers[2].CopyFrom(leapHand.middle, Leap.Finger.FingerType.TYPE_MIDDLE, hand.Id, hand.TimeVisible);
             hand.Fingers[3].CopyFrom(leapHand.ring, Leap.Finger.FingerType.TYPE_RING, hand.Id, hand.TimeVisible);
             hand.Fingers[4].CopyFrom(leapHand.pinky, Leap.Finger.FingerType.TYPE_PINKY, hand.Id, hand.TimeVisible);
+
+            hand.TransformToUnityUnits();
 
             return hand;
         }
