@@ -9,8 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [NEXT] - unreleased
 
 ### Added
+- Added a low poly hand model with an arm
 
 ### Changed
+- Cleaned up the image retriever and LeapServiceProvider Execution order, reducing unnecessary service and log messages
 
 ### Fixed
 

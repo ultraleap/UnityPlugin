@@ -294,6 +294,9 @@ Our Tracking Preview package gives you early access to additional functionality 
   - Physically simulated hand interactions. A new way to interact with objects, without having the hand pass through colliders.
 - Hand Aggregation
   - Combines hands seen by multiple devices into one aggregated pair of hands.
+- Hand Rays
+  - Allows you to easily generate and use hand rays based on the hand position. Includes WristShoulderFarFieldHandRay as a default ray to use - this ray lets you blend between a wrist offset and inferred shoulder position as a ray origin to create a ray that is both expressive and stable. 
+ 
   
 ## Contributing
 

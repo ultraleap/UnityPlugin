@@ -1,6 +1,6 @@
+using Leap.Unity.Internal;
 using System.Linq;
 using UnityEngine;
-using Leap.Unity.Internal;
 
 namespace Leap.Unity.Interaction.PhysicsHands
 {
@@ -276,7 +276,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             palm.solverVelocityIterations = solverVelocity;
             palm.angularDamping = angularDamping;
             palm.useGravity = false;
-            palm.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
+            palm.collisionDetectionMode = CollisionDetectionMode.ContinuousSpeculative;
         }
 
         public static void SetupBoneBody(ArticulationBody bone, float boneMass = 0.6f, int solverIterations = 50, int solverVelocity = 20, float maxAngularVelocity = 1.75f, float maxDepenetrationVelocity = 3f)
@@ -292,7 +292,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             bone.maxAngularVelocity = maxAngularVelocity;
             bone.maxDepenetrationVelocity = maxDepenetrationVelocity;
             bone.useGravity = false;
-            bone.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
+            bone.collisionDetectionMode = CollisionDetectionMode.ContinuousSpeculative;
         }
 
         public static void SetupKnuckleDrives(ArticulationBody knuckle, int fingerIndex, float stiffness, float forceLimit, float strength)
@@ -551,7 +551,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                     b.NextJoint = posA;
                     b.Width = r;
                     b.Center = (b.PrevJoint + b.NextJoint) / 2f;
-                    b.Direction = (b.PrevJoint - b.NextJoint).normalized;
+                    b.Direction = b.PrevJoint - b.NextJoint;
                     b.Length = Vector3.Distance(posA, posB);
                     b.Rotation = physicsHand.jointColliders[boneInd].transform.rotation;
                     boneInd++;
@@ -562,6 +562,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
             leapHand.Arm.NextJoint = leapHand.WristPosition;
             leapHand.Arm.Direction = (leapHand.WristPosition - leapHand.Arm.PrevJoint).normalized;
+            leapHand.Arm.Rotation = Quaternion.LookRotation(leapHand.Arm.Direction, -leapHand.PalmNormal);
 
             leapHand.PalmWidth = physicsHand.palmCollider.size.y;
             leapHand.Confidence = originalHand.Confidence;
@@ -571,7 +572,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             leapHand.Id = originalHand.Id;
             leapHand.PinchStrength = CalculatePinchStrength(leapHand, physicsHand.palmCollider.size.y);
             leapHand.PinchDistance = CalculatePinchDistance(leapHand);
-            leapHand.PalmVelocity = ((physicsHand.transform.position - physicsHand.oldPosition) / delta);
+            leapHand.PalmVelocity = (physicsHand.transform.position - physicsHand.oldPosition) / delta;
             leapHand.TimeVisible = originalHand.TimeVisible;
         }
 

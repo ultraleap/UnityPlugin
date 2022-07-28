@@ -612,6 +612,17 @@ namespace Leap
         }
 
         /// <summary>
+        /// Checks if the specified device is available.
+        /// 
+        /// Device availability is determined by checking it has active policy flags set against it
+        /// via its connection.
+        /// </summary>
+        public bool IsDeviceAvailable(Device device = null)
+        {
+            return _connection.IsDeviceAvailable(device);
+        }
+
+        /// <summary>
         /// In most cases you should get Frame objects using the LeapProvider.CurrentFrame
         /// property. The data in Frame objects taken directly from a Leap.Controller instance
         /// is still in the Leap Motion frame of reference and will not match the hands

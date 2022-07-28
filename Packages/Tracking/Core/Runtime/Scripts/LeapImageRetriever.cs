@@ -9,6 +9,7 @@
 using Leap.Unity.Internal;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -55,6 +56,8 @@ namespace Leap.Unity
         // If image IDs from the libtrack server do not reset with the Visualiser, it triggers out-of-sequence
         // checks and we lose images. Detecting this and setting an offset allows us to compensate.
         private long _frameIDOffset = -1;
+
+        private static Dictionary<Device, HashSet<LeapImageRetriever>> _policiesSet = new Dictionary<Device, HashSet<LeapImageRetriever>>();
 
         public EyeTextureData TextureData
         {
@@ -450,6 +453,14 @@ namespace Leap.Unity
 #endif
         }
 
+        private void OnApplicationQuit()
+        {
+            foreach (var device in _policiesSet)
+            {
+                device.Value.Clear();
+            }
+        }
+
         private void OnDestroy()
         {
             StopAllCoroutines();
@@ -537,9 +548,9 @@ namespace Leap.Unity
                     currentDevice = null;
                 }
 
-                if (!controller.IsPolicySet(Controller.PolicyFlag.POLICY_IMAGES, currentDevice))
+                if (!HasPolicyBeenSet() && controller.IsDeviceAvailable(currentDevice) && !controller.IsPolicySet(Controller.PolicyFlag.POLICY_IMAGES, currentDevice))
                 {
-                    controller.SetPolicy(Controller.PolicyFlag.POLICY_IMAGES, currentDevice);
+                    SetImagePolicySafely(true);
                 }
             }
 
@@ -591,7 +602,7 @@ namespace Leap.Unity
             var controller = _provider.GetLeapController();
             if (controller != null)
             {
-                controller.ClearPolicy(Controller.PolicyFlag.POLICY_IMAGES, _provider.CurrentDevice);
+                SetImagePolicySafely(false);
                 controller.Disconnect -= onDisconnect;
                 controller.ImageReady -= onImageReady;
                 controller.DistortionChange -= onDistortionChange;
@@ -627,7 +638,7 @@ namespace Leap.Unity
             controller.FrameReady += onFrameReady;
         }
 
-        private void onImageReady(object sender, ImageEventArgs args)
+    private void onImageReady(object sender, ImageEventArgs args)
         {
             Image image = args.image;
 
@@ -655,7 +666,7 @@ namespace Leap.Unity
             if (controller != null)
             {
                 controller.FrameReady -= onFrameReady;
-                controller.SetPolicy(Controller.PolicyFlag.POLICY_IMAGES, _provider.CurrentDevice);
+                SetImagePolicySafely(true);
             }
         }
 
@@ -666,7 +677,7 @@ namespace Leap.Unity
             {
                 controller.FrameReady -= onFrameReady;
                 controller.FrameReady += onFrameReady;
-                controller.ClearPolicy(Controller.PolicyFlag.POLICY_IMAGES, _provider.CurrentDevice);
+                SetImagePolicySafely(false);
             }
         }
 
@@ -684,6 +695,84 @@ namespace Leap.Unity
         void onDistortionChange(object sender, LeapEventArgs args)
         {
             _eyeTextureData.MarkStale();
+        }
+
+        private bool HasPolicyBeenSet()
+        {
+            foreach (var item in _policiesSet)
+            {
+                if (item.Key == _provider.CurrentDevice && item.Value != null && item.Value.Contains(this)) return true;
+            }
+            return false;
+        }
+
+        private void SetImagePolicySafely(bool value)
+        {
+            foreach (var item in _policiesSet)
+            {
+                if (item.Value != null)
+                {
+                    item.Value.Remove(this);
+                }
+            }
+
+            HashSet<Device> devicesToClear = new HashSet<Device>();
+            Device deviceToSet = null;
+
+            if (value)
+            {
+                if(_provider.CurrentDevice == null)
+                {
+                    return;
+                }
+                if (_policiesSet.ContainsKey(_provider.CurrentDevice))
+                {
+                    _policiesSet[_provider.CurrentDevice].Add(this);
+                }
+                else
+                {
+                    deviceToSet = _provider.CurrentDevice;
+                    _policiesSet.Add(_provider.CurrentDevice, new HashSet<LeapImageRetriever>() { this });
+                }
+            }
+
+            var controller = _provider.GetLeapController();
+
+            bool recount = false;
+
+            if (controller != null)
+            {
+                foreach (var item in _policiesSet)
+                {
+                    switch (item.Value.Count)
+                    {
+                        case 0:
+                            devicesToClear.Add(item.Key);
+                            recount = true;
+                            break;
+                    }
+                }
+
+                if(devicesToClear.Count > 0)
+                {
+                    foreach (var device in devicesToClear)
+                    {
+                        controller.ClearPolicy(Controller.PolicyFlag.POLICY_IMAGES, device);
+                    }
+                }
+
+                if(deviceToSet != null)
+                {
+                    controller.SetPolicy(Controller.PolicyFlag.POLICY_IMAGES, deviceToSet);
+                }
+            }
+
+            if (recount)
+            {
+                _policiesSet = _policiesSet.Where(pair => pair.Value.Count > 0)
+                                                 .ToDictionary(pair => pair.Key,
+                                                               pair => pair.Value);
+            }
         }
     }
 }

@@ -6,15 +6,11 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Leap;
-using Leap.Unity;
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace Leap.Unity.Preview.FarFieldInteractions
 {
-#pragma warning disable 0618
     /// <summary>
     /// a FarFieldHandDirection holds data about the hand and the corresponding ray.
     /// Including the ray's origin, aim position and direction.
@@ -324,5 +320,4 @@ namespace Leap.Unity.Preview.FarFieldInteractions
             cube.transform.position = FarFieldRays[handShoulder.Hand.IsLeft ? 0 : 1].RayOrigin;
         }
     }
-#pragma warning restore 0618
 }
