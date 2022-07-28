@@ -24,7 +24,7 @@ namespace Leap.Unity.Tests
         {
             const float TOLERANCE = 0.01f; //1 cm for all positions
 
-            Frame frame = TestHandFactory.MakeTestFrame(0, includeLeftHand: true, includeRightHand: true, unitType: TestHandFactory.UnitType.UnityUnits);
+            Frame frame = TestHandFactory.MakeTestFrame(0, includeLeftHand: true, includeRightHand: true);
 
             foreach (var hand in frame.Hands)
             {
