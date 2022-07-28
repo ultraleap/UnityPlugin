@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5336407799547206892}
   m_Layer: 0
-  m_Name: HandModels
+  m_Name: Capsule Hands
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
