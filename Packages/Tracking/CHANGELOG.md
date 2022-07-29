@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- HandUI example scene panel exists after hand lost
 
 ## [5.13.0] - 21/07/2022
 
