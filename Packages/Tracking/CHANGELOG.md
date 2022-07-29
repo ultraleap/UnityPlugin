@@ -17,6 +17,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 
+- AttachmentHands untick bone in inspector UI causes looping error when deleting gameobject in edit mode
+
 ## [5.13.0] - 21/07/2022
 
 ### Announcements
