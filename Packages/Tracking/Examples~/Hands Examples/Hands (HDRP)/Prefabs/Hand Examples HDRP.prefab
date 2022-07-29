@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 3690038486693012928}
   - component: {fileID: 7439119530633578496}
   m_Layer: 0
-  m_Name: HDRP Hands
+  m_Name: Hand Examples HDRP
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

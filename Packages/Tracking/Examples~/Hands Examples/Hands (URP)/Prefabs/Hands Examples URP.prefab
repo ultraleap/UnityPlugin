@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 4874802415794691800}
   - component: {fileID: 4420390501913608122}
   m_Layer: 0
-  m_Name: Hands URP
+  m_Name: Hands Examples URP
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
