@@ -381,11 +381,24 @@ namespace Leap.Unity.Attachments
             var pointBehaviour = GetBehaviourForPoint(singlePoint);
             if (pointBehaviour != null)
             {
-                Destroy(pointBehaviour.gameObject);
+                if (!Application.isPlaying)
+                {
+                    if (PrefabUtility.IsPartOfPrefabInstance(pointBehaviour.gameObject))
+                    {
+                        PrefabUtility.UnpackPrefabInstance(PrefabUtility.GetOutermostPrefabInstanceRoot(pointBehaviour.transform),
+                              PrefabUnpackMode.Completely,
+                              InteractionMode.AutomatedAction);
+                    }
+
+                    DestroyImmediate(pointBehaviour.gameObject);
+                }
+                else
+                {
+                    Destroy(pointBehaviour.gameObject);
+                }
+
                 setBehaviourForPoint(singlePoint, null);
-
                 pointBehaviour = null;
-
                 _attachmentPointsDirty = true;
 
 #if UNITY_EDITOR
