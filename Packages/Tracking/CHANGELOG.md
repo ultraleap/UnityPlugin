@@ -49,6 +49,7 @@ If you have any concerns about this, please contact us on [Github Discussions](h
 - Hand UI can become detached from hand when hand is removed from view
 - Multi-device (desktop) Scene camera position can become offset
 - FOV visualization does not display after changing render pipelines
+- Use of the LeapCSharp Config class is unavailable with v5.X tracking service
 
 ## [5.12.1] - 06/07/2022
 
