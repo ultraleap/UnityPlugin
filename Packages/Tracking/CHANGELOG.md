@@ -15,7 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Cleaned up the image retriever and LeapServiceProvider Execution order, reducing unnecessary service and log messages
 
 ### Fixed
-
+- Leap.Controller.InternalFrameReady, LeapInternalFrame is never dispatched
 
 ## [5.13.0] - 21/07/2022
 

@@ -417,6 +417,11 @@ namespace LeapInternal
             {
                 LeapFrame.DispatchOnContext(this, EventContext, new FrameEventArgs(new Frame(deviceID).CopyFrom(ref trackingMsg)));
             }
+
+            if (LeapInternalFrame != null)
+            {
+                LeapInternalFrame.DispatchOnContext(this, EventContext, new InternalFrameEventArgs(ref trackingMsg));
+            }
         }
 
 
