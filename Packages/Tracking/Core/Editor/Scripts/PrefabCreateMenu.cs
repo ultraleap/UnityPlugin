@@ -14,7 +14,6 @@ namespace Leap
 {
     public class PrefabCreateMenu
     {
-        [MenuItem("GameObject/Ultraleap")]
         [MenuItem("GameObject/Ultraleap/Service Provider (Desktop)")]
         public static void CreateServiceProviderDesktop()
         {
