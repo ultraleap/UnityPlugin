@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - HandBinder scales hands in edit mode when there is no LeapServiceProvider in the scene
+- Leap.Controller.InternalFrameReady, LeapInternalFrame is never dispatched
 - HandUI example scene panel exists after hand lost
 - ChangeTrackingMode and GetTrackingMode on LeapServiceProvider fail when in disabled multi-device mode
 
