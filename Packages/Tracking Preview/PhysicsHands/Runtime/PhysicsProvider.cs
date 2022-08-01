@@ -596,8 +596,11 @@ namespace Leap.Unity.Interaction.PhysicsHands
             hand = null;
             if(_graspHelpers.TryGetValue(rigid,out PhysicsGraspHelper helper))
             {
-                hand = helper.GraspingHands[helper.GraspingHands.Count - 1].GetLeapHand();
-                return true;
+                if(helper.GraspState == PhysicsGraspHelper.State.Grasp && helper.GraspingHands.Count > 0)
+                {
+                    hand = helper.GraspingHands[helper.GraspingHands.Count - 1].GetLeapHand();
+                    return true;
+                }
             }
             return false;
         }
