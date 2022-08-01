@@ -34,17 +34,15 @@ namespace Leap
 
         public static void CreatePrefab(string prefabName)
         {
-            GameObject newObject = null;
+            var guids = AssetDatabase.FindAssets(prefabName);
+            string assetPath = AssetDatabase.GUIDToAssetPath(guids[0]);
 
-            if(newObject == null)
+            GameObject newObject = (GameObject)AssetDatabase.LoadAssetAtPath(assetPath, typeof(GameObject));
+
+            if (newObject != null)
             {
-                var guids = AssetDatabase.FindAssets(prefabName);
-                string assetPath = AssetDatabase.GUIDToAssetPath(guids[0]);
-
-                newObject = (GameObject)AssetDatabase.LoadAssetAtPath(assetPath, typeof(GameObject));
+                HandleObjectCreation(newObject);
             }
-
-            HandleObjectCreation(newObject);
         }
 
         static void HandleObjectCreation(GameObject gameObject)
