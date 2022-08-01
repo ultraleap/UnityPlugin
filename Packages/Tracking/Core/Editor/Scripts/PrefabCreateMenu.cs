@@ -20,13 +20,13 @@ namespace Leap
             CreatePrefab("Service Provider (Desktop)");
         }
 
-        [MenuItem("GameObject/Ultraleap/Service Provider (Screentop)", false, 1)]
+        [MenuItem("GameObject/Ultraleap/Service Provider (Screentop)", false, 2)]
         public static void CreateServiceProviderScreentop()
         {
             CreatePrefab("Service Provider (Screentop)");
         }
 
-        [MenuItem("GameObject/Ultraleap/Service Provider (XR)", false, 1)]
+        [MenuItem("GameObject/Ultraleap/Service Provider (XR)", false, 3)]
         public static void CreateServiceProviderXR()
         {
             CreatePrefab("Service Provider (XR)");
@@ -59,6 +59,12 @@ namespace Leap
 
             // Record undo, and select
             Undo.RegisterCreatedObjectUndo(gameObject, $"Create Object: {gameObject.name}");
+
+            if (Selection.activeGameObject != null)
+            {
+                gameObject.transform.parent = Selection.activeGameObject.transform;
+            }
+
             Selection.activeGameObject = gameObject;
 
             // For prefabs, let's mark the scene as dirty for saving
