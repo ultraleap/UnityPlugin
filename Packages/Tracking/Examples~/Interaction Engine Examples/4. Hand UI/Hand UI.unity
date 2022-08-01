@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44459036, g: 0.49410313, b: 0.5733681, a: 1}
+  m_IndirectSpecularColor: {r: 0.1662907, g: 0.20862369, b: 0.28834215, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -1945,6 +1945,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1469498930}
   - component: {fileID: 1469498931}
+  - component: {fileID: 1469498932}
   m_Layer: 0
   m_Name: Attachment Hands
   m_TagString: Untagged
@@ -1982,6 +1983,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _leapProvider: {fileID: 613715639}
   _attachmentPoints: 4
+--- !u!114 &1469498932
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1469498929}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 00639652ed959bc428ff1f010f5dd5f8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  attachmentHand: {fileID: 1089287143}
 --- !u!1 &1573557018
 GameObject:
   m_ObjectHideFlags: 0

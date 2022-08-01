@@ -864,18 +864,19 @@ namespace Leap.Unity
         {
             yield return new WaitWhile(() => _leapController == null || !_leapController.IsConnected);
 
+            Device deviceToChange = _multipleDeviceMode == MultipleDeviceMode.Disabled ? null : _currentDevice;
 
             switch (trackingMode)
             {
                 case TrackingOptimizationMode.Desktop:
-                    _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP, _currentDevice);
-                    _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD, _currentDevice);
+                    _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP, deviceToChange);
+                    _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD, deviceToChange);
                     break;
                 case TrackingOptimizationMode.Screentop:
-                    _leapController.SetAndClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP, Controller.PolicyFlag.POLICY_OPTIMIZE_HMD, device: _currentDevice);
+                    _leapController.SetAndClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP, Controller.PolicyFlag.POLICY_OPTIMIZE_HMD, deviceToChange);
                     break;
                 case TrackingOptimizationMode.HMD:
-                    _leapController.SetAndClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD, Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP, device: _currentDevice);
+                    _leapController.SetAndClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD, Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP, deviceToChange);
                     break;
             }
         }
@@ -887,8 +888,10 @@ namespace Leap.Unity
         {
             if (_leapController == null) return _trackingOptimization;
 
-            var screenTopPolicySet = _leapController.IsPolicySet(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP, _currentDevice);
-            var headMountedPolicySet = _leapController.IsPolicySet(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD, _currentDevice);
+            Device deviceToGet = _multipleDeviceMode == MultipleDeviceMode.Disabled ? null : _currentDevice;
+
+            var screenTopPolicySet = _leapController.IsPolicySet(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP, deviceToGet);
+            var headMountedPolicySet = _leapController.IsPolicySet(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD, deviceToGet);
 
             var desktopMode = !screenTopPolicySet && !headMountedPolicySet;
             if (desktopMode)

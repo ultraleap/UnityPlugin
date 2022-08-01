@@ -338,6 +338,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             }
 
             PhysicsGraspHelper.State oldState, state;
+
             foreach (var helper in _graspHelpers)
             {
                 if (helper.Value.Ignored)
@@ -575,6 +576,33 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 hand.SetGrasping(found);
             }
             hand.SetGraspingMass(mass);
+        }
+
+        /// <summary>
+        /// Reports whether a rigidbody is currently being grasped by a helper.
+        /// </summary>
+        /// <param name="rigid">The rigidbody you want to check</param>
+        public bool IsGraspingObject(Rigidbody rigid)
+        {
+            return IsGraspingObject(rigid, out var temp);
+        }
+
+        /// <summary>
+        /// Reports whether a rigidbody is currently being grasped by a helper, while providing the current dominant hand grasping it.
+        /// </summary>
+        /// <param name="rigid">The rigidbody you want to check</param>
+        public bool IsGraspingObject(Rigidbody rigid, out Hand hand)
+        {
+            hand = null;
+            if(_graspHelpers.TryGetValue(rigid,out PhysicsGraspHelper helper))
+            {
+                if(helper.GraspState == PhysicsGraspHelper.State.Grasp && helper.GraspingHands.Count > 0)
+                {
+                    hand = helper.GraspingHands[helper.GraspingHands.Count - 1].GetLeapHand();
+                    return true;
+                }
+            }
+            return false;
         }
 
         private void OnDrawGizmos()
