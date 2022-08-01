@@ -156,7 +156,7 @@ namespace Leap.Unity.HandsModule
         /// </summary>
         void SetHandScale()
         {
-            if(!Application.isPlaying)
+            if (leapProvider == null)
             {
                 return;
             }
