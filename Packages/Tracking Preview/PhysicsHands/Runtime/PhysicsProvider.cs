@@ -578,11 +578,19 @@ namespace Leap.Unity.Interaction.PhysicsHands
             hand.SetGraspingMass(mass);
         }
 
+        /// <summary>
+        /// Reports whether a rigidbody is currently being grasped by a helper.
+        /// </summary>
+        /// <param name="rigid">The rigidbody you want to check</param>
         public bool IsGraspingObject(Rigidbody rigid)
         {
             return IsGraspingObject(rigid, out var temp);
         }
 
+        /// <summary>
+        /// Reports whether a rigidbody is currently being grasped by a helper, while providing the current dominant hand grasping it.
+        /// </summary>
+        /// <param name="rigid">The rigidbody you want to check</param>
         public bool IsGraspingObject(Rigidbody rigid, out Hand hand)
         {
             hand = null;

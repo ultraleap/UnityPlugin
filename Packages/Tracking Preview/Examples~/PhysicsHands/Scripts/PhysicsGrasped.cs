@@ -5,6 +5,10 @@ using TMPro;
 
 namespace Leap.Unity.Interaction.PhysicsHands.Example
 {
+    /// <summary>
+    /// Example script to test whether an object is being grasped or not.
+    /// This function helps you ensure you're doing something when the user is or isn't grasping your object.
+    /// </summary>
     public class PhysicsGrasped : MonoBehaviour
     {
         private TextMeshPro _text;
