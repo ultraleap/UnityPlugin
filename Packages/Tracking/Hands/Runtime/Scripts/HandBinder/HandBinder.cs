@@ -156,6 +156,11 @@ namespace Leap.Unity.HandsModule
         /// </summary>
         void SetHandScale()
         {
+            if (leapProvider == null)
+            {
+                return;
+            }
+
             if (SetModelScale && CanUseScaleFeature())
             {
                 ScaleModel();
