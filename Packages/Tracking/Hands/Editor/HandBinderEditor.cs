@@ -238,7 +238,7 @@ namespace Leap.Unity.HandsModule
                 {
                     GUI.enabled = true;
                 }
-                if (setScale.boolValue)
+                if (setScale.boolValue && leapProvider.objectReferenceValue != null)
                 {
                     EditorGUILayout.Space();
                     EditorGUILayout.PropertyField(scaleOffset, new GUIContent("Model Scale Offset", "The hand scale will be modified by this amount"));
