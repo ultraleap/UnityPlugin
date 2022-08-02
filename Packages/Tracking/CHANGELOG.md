@@ -16,6 +16,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- HandBinder scales hands in edit mode when there is no LeapServiceProvider in the scene
+- Leap.Controller.InternalFrameReady, LeapInternalFrame is never dispatched
+- HandUI example scene panel exists after hand lost
+- ChangeTrackingMode and GetTrackingMode on LeapServiceProvider fail when in disabled multi-device mode
 
 ## [5.13.0] - 21/07/2022
 
@@ -49,6 +53,7 @@ If you have any concerns about this, please contact us on [Github Discussions](h
 - Hand UI can become detached from hand when hand is removed from view
 - Multi-device (desktop) Scene camera position can become offset
 - FOV visualization does not display after changing render pipelines
+- Use of the LeapCSharp Config class is unavailable with v5.X tracking service
 
 ## [5.12.1] - 06/07/2022
 
