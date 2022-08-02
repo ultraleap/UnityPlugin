@@ -20,6 +20,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Leap.Controller.InternalFrameReady, LeapInternalFrame is never dispatched
 - HandUI example scene panel exists after hand lost
 - ChangeTrackingMode and GetTrackingMode on LeapServiceProvider fail when in disabled multi-device mode
+- FOV Gizmos are not visible when opening an example scene containing a Service Provider in multiDeviceMode = disabled.
+- FOV Gizmos are not visible when changing render pipelines
 
 ## [5.13.0] - 21/07/2022
 
