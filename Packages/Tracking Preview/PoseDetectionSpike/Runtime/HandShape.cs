@@ -8,11 +8,14 @@ public class HandShape : MonoBehaviour
     public PoseDetectionRotationToLastBone poseDetectionRecording;
     public PoseDetectionCombineErrors poseDetectionCombineErrors;
 
+    [HideInInspector]
+    public Vector3[] jointPositions;
+
     public enum HandShapeEditorModes
     {
         rotateBones,
-        editThresholds,
-        tryValidPoses
+        editThresholds
+        //tryValidPoses
     }
     public HandShapeEditorModes currentEditorMode = HandShapeEditorModes.rotateBones;
 

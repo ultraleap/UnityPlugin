@@ -31,7 +31,7 @@ public class HandShapeEditor : Editor
         //Handles.zTest = UnityEngine.Rendering.CompareFunction.LessEqual;
 
         EventType eventType = Event.current.type;
-        Debug.Log(eventType);
+        //Debug.Log(eventType);
 
         // this makes sure that the HandShape gameobject stays selected, even if you click somewhere in the scene view
         if (eventType == EventType.Layout)
@@ -48,6 +48,7 @@ public class HandShapeEditor : Editor
             if (boneRotations != null && boneRotations.Length > 0)
             {
                 Vector3[] jointPositions = JointPositionsFromRotations(boneRotations);
+                handShape.jointPositions = jointPositions;
                 // the selectedJointPosition is where the rotational handle and the threshold controls are drawn
                 Vector3 selectedJointPosition = Vector3.zero;
 
@@ -312,7 +313,8 @@ public class HandShapeEditor : Editor
 
 
         Vector3 wristPos = Vector3.zero;
-        Quaternion wristRot = actualWristRot;
+        //Quaternion wristRot = actualWristRot;
+        Quaternion wristRot = Quaternion.identity;
 
         Vector3[] jointPositions = new Vector3[rotations.Length];
 
