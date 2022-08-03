@@ -32,7 +32,7 @@ namespace Leap.Unity
         void Start()
         {
             // Ignore collisions with self.
-            Leap.Unity.Utils.IgnoreCollisions(gameObject, gameObject);
+            UtilsLegacy.IgnoreCollisions(gameObject, gameObject);
 
             for (int i = 0; i < fingers.Length; ++i)
             {

@@ -8,6 +8,7 @@
 
 using Leap.Unity.Drawing;
 using Leap.Unity.Infix;
+using Leap.Unity.Internal;
 using UnityEngine;
 
 namespace Leap.Unity.Geometry
@@ -54,7 +55,7 @@ namespace Leap.Unity.Geometry
         /// maximum section radius. </summary>
         public Vector3 SampleFromUnitCube(Vector3 unitCubePoint)
         {
-            var circlePoint = Swizzle.Swizzle.xy(unitCubePoint).Square2Circle();
+            var circlePoint = Swizzle.xy(unitCubePoint).Square2Circle();
             var circlePointMag = circlePoint.magnitude;
 
             var zFrac = unitCubePoint.z.Map(-1f, 1f, 0f, 1f);

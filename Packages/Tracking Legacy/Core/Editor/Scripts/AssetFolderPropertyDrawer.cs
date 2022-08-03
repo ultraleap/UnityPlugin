@@ -51,7 +51,7 @@ namespace Leap.Unity
                 string resultPath = PromptUserForPath(folderPath);
                 if (!string.IsNullOrEmpty(resultPath))
                 {
-                    string relativePath = Utils.MakeRelativePath(Application.dataPath, resultPath);
+                    string relativePath = UtilsLegacy.MakeRelativePath(Application.dataPath, resultPath);
                     var asset = AssetDatabase.LoadAssetAtPath<DefaultAsset>(relativePath);
 
                     string errorMessage;

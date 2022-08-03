@@ -7,7 +7,6 @@
  ******************************************************************************/
 
 using Leap.Unity.Infix;
-using Leap.Unity.Swizzle;
 using System;
 using UnityEngine;
 

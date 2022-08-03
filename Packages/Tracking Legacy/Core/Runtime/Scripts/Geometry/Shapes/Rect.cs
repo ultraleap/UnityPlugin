@@ -7,6 +7,7 @@
  ******************************************************************************/
 
 using Leap.Unity.Infix;
+using Leap.Unity.Internal;
 using Leap.Unity.RuntimeGizmos;
 using System;
 using System.Collections;

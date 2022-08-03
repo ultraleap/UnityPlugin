@@ -26,8 +26,7 @@ namespace Leap.Unity
                 {
                     frame = TestHandFactory.MakeTestFrame(frameId: 0,
                       includeLeftHand: true, includeRightHand: true,
-                      handPose: editTimePose,
-                      unitType: TestHandFactory.UnitType.UnityUnits);
+                      handPose: editTimePose);
                 }
 #endif
                 return frame;
@@ -42,8 +41,7 @@ namespace Leap.Unity
                 {
                     frame = TestHandFactory.MakeTestFrame(frameId: 0,
                       includeLeftHand: true, includeRightHand: true,
-                      handPose: editTimePose,
-                      unitType: TestHandFactory.UnitType.UnityUnits);
+                      handPose: editTimePose);
                 }
 #endif
                 return frame;
@@ -70,11 +68,9 @@ namespace Leap.Unity
 
         void Awake()
         {
-            _cachedLeftHand = TestHandFactory.MakeTestHand(isLeft: true,
-              unitType: TestHandFactory.UnitType.UnityUnits);
+            _cachedLeftHand = TestHandFactory.MakeTestHand(isLeft: true);
             _cachedLeftHand.Id = 0;
-            _cachedRightHand = TestHandFactory.MakeTestHand(isLeft: false,
-              unitType: TestHandFactory.UnitType.UnityUnits);
+            _cachedRightHand = TestHandFactory.MakeTestHand(isLeft: false);
             _cachedRightHand.Id = 1;
         }
 

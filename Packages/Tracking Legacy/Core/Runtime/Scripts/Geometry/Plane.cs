@@ -7,6 +7,7 @@
  ******************************************************************************/
 
 using Leap.Unity.Infix;
+using Leap.Unity.Internal;
 using Leap.Unity.Query;
 using System.Collections.Generic;
 using UnityEngine;
@@ -128,7 +129,7 @@ namespace Leap.Unity.Geometry
                                  bool includeBehindPlane = false)
         {
             s_unityBodyCollidersCache.Clear();
-            Leap.Unity.Utils.FindOwnedChildComponents<Collider, Rigidbody>(
+            UtilsLegacy.FindOwnedChildComponents<Collider, Rigidbody>(
               unityBody,
               s_unityBodyCollidersCache,
               includeInactiveObjects: false
