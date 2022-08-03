@@ -24,6 +24,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - FOV Gizmos are not visible when opening an example scene containing a Service Provider in multiDeviceMode = disabled.
 - FOV Gizmos are not visible when changing render pipelines
 
+- AttachmentHands untick bone in inspector UI causes looping error when deleting gameobject in edit mode
+
 ## [5.13.0] - 21/07/2022
 
 ### Announcements
