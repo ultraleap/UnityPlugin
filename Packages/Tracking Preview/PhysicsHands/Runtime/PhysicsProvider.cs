@@ -1,9 +1,17 @@
+/******************************************************************************
+ * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
+ *                                                                            *
+ * Use subject to the terms of the Apache License 2.0 available at            *
+ * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
+ * between Ultraleap and you, your company or other organization.             *
+ ******************************************************************************/
+
+using Leap.Unity.Internal;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using Leap.Unity.Internal;
 
 namespace Leap.Unity.Interaction.PhysicsHands
 {
@@ -595,9 +603,9 @@ namespace Leap.Unity.Interaction.PhysicsHands
         public bool IsGraspingObject(Rigidbody rigid, out Hand hand)
         {
             hand = null;
-            if(_graspHelpers.TryGetValue(rigid,out PhysicsGraspHelper helper))
+            if (_graspHelpers.TryGetValue(rigid, out PhysicsGraspHelper helper))
             {
-                if(helper.GraspState == PhysicsGraspHelper.State.Grasp && helper.GraspingHands.Count > 0)
+                if (helper.GraspState == PhysicsGraspHelper.State.Grasp && helper.GraspingHands.Count > 0)
                 {
                     hand = helper.GraspingHands[helper.GraspingHands.Count - 1].GetLeapHand();
                     return true;

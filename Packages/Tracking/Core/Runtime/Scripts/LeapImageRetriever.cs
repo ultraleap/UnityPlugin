@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2021.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -638,7 +638,7 @@ namespace Leap.Unity
             controller.FrameReady += onFrameReady;
         }
 
-    private void onImageReady(object sender, ImageEventArgs args)
+        private void onImageReady(object sender, ImageEventArgs args)
         {
             Image image = args.image;
 
@@ -721,7 +721,7 @@ namespace Leap.Unity
 
             if (value)
             {
-                if(_provider.CurrentDevice == null)
+                if (_provider.CurrentDevice == null)
                 {
                     return;
                 }
@@ -753,7 +753,7 @@ namespace Leap.Unity
                     }
                 }
 
-                if(devicesToClear.Count > 0)
+                if (devicesToClear.Count > 0)
                 {
                     foreach (var device in devicesToClear)
                     {
@@ -761,7 +761,7 @@ namespace Leap.Unity
                     }
                 }
 
-                if(deviceToSet != null)
+                if (deviceToSet != null)
                 {
                     controller.SetPolicy(Controller.PolicyFlag.POLICY_IMAGES, deviceToSet);
                 }

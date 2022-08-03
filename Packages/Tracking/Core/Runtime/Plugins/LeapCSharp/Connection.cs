@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2021.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -1064,7 +1064,7 @@ namespace LeapInternal
         public bool IsDeviceAvailable(Device device = null)
         {
             uint deviceID = 0;
-            if(device != null)
+            if (device != null)
             {
                 deviceID = device.DeviceID;
             }
