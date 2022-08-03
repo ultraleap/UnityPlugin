@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Cleaned up the image retriever and LeapServiceProvider Execution order, reducing unnecessary service and log messages
+- ImageRetriever prefab and LeapEyeDislocator.cs (formerly used for passthrough) removed and replaced by 'VR Infrared Camera' prefab in the Tracking Examples package
 
 ### Fixed
 
