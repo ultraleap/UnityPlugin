@@ -24,8 +24,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - ChangeTrackingMode and GetTrackingMode on LeapServiceProvider fail when in disabled multi-device mode
 - FOV Gizmos are not visible when opening an example scene containing a Service Provider in multiDeviceMode = disabled.
 - FOV Gizmos are not visible when changing render pipelines
-
 - AttachmentHands untick bone in inspector UI causes looping error when deleting gameobject in edit mode
+
+### Known issues
+- Currently the Ultraleap Hand Tracking feature for OpenXR requires the New and Legacy input systems to be enabled, to simultaneously use OpenXR and the Ultraleap Unity Plugin's features.
+- The OpenXR Leap Provider does not currently support the following hand properties (and will return fixed values):
+  - `Confidence`
+  - `GrabAngle` (`GrabAngle` is now obsolete and will be removed in the next major version of the plugin)
 
 ## [5.13.0] - 21/07/2022
 
