@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added create menu options for LeapServiceProviders via GameObject/Ultrealeap/Service Provider (X)
 
 ### Changed
+- Moved OpenXR into a conditionally included asmdef in the main package and removed the separate OpenXR package
 - Cleaned up the image retriever and LeapServiceProvider Execution order, reducing unnecessary service and log messages
 
 ### Fixed
