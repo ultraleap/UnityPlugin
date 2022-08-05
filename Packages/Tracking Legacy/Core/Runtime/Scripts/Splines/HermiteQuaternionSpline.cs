@@ -20,7 +20,6 @@ namespace Leap.Unity.Animation
     /// You may ask for the position, rotation, velocity, or angular velocity at any time
     /// along the spline's duration.
     /// </summary>
-    [System.Obsolete("This code will be moved to a legacy package in the next major version of the plugin. If you believe that it needs to be kept in tracking, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
     [Serializable]
     public struct HermiteQuaternionSpline : ISpline<Quaternion, Vector3>
     {
@@ -289,7 +288,6 @@ namespace Leap.Unity.Animation
     /// <summary>
     /// Quaternion math.
     /// </summary>
-    [System.Obsolete("This code will be moved to a legacy package in the next major version of the plugin. If you believe that it needs to be kept in tracking, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
     public static class Mathq
     {
 

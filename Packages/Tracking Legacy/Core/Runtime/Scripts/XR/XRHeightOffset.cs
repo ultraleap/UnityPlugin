@@ -16,7 +16,7 @@ namespace Leap.Unity
 {
 
     [ExecuteInEditMode]
-    [Obsolete("Recommended to use Unity CameraOffset which is part of xr.legacyinputhelpers instead. See https://docs.unity3d.com/Manual/configuring-project-for-xr.html. This code will be moved to a legacy package in the next major version of the plugin. If you believe that it needs to be kept in tracking, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
+    
     public class XRHeightOffset : MonoBehaviour
     {
 

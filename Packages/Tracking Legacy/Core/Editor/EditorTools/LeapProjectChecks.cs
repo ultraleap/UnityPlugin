@@ -33,7 +33,7 @@ namespace Leap.Unity
     /// LeapProjectsChecks.SetIgnoreKey(string) so that ignore actions can be remembered
     /// and cleared by the project checks GUI.
     /// </summary>
-    [System.Obsolete("This code will be moved to a legacy package in the next major version of the plugin. If you believe that it needs to be kept in tracking, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
+    
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
     public class LeapProjectCheckAttribute : Attribute
     {
@@ -51,7 +51,7 @@ namespace Leap.Unity
     /// Utility class for working with project checks. Note, most features are only
     /// available in the Editor.
     /// </summary>
-    [System.Obsolete("This code will be moved to a legacy package in the next major version of the plugin. If you believe that it needs to be kept in tracking, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
+    
     public static class LeapProjectChecks
     {
 

@@ -19,7 +19,6 @@ namespace Leap.Unity
     /// the implementing type is a struct, be mindful of boxing, and consider using
     /// IIndexableStruct and pooling instead.
     /// </summary>
-    [System.Obsolete("This code will be moved to a legacy package in the next major version of the plugin. If you believe that it needs to be kept in tracking, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
     public interface IIndexable<T>
     {
 
@@ -28,7 +27,6 @@ namespace Leap.Unity
         int Count { get; }
     }
 
-    [System.Obsolete("This code will be moved to a legacy package in the next major version of the plugin. If you believe that it needs to be kept in tracking, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
     public static class IIndexableExtensions
     {
         public static IndexableEnumerator<T> GetEnumerator<T>(this IIndexable<T> indexable)
@@ -47,7 +45,6 @@ namespace Leap.Unity
         }
     }
 
-    [System.Obsolete("This code will be moved to a legacy package in the next major version of the plugin. If you believe that it needs to be kept in tracking, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
     public struct IndexableEnumerator<Element>
     {
         IIndexable<Element> indexable;
