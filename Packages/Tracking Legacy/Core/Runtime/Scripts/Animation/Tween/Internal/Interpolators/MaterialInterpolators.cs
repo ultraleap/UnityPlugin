@@ -6,6 +6,7 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
+using Leap.Unity.Internal;
 using UnityEngine;
 
 namespace Leap.Unity.Animation
@@ -23,7 +24,7 @@ namespace Leap.Unity.Animation
 
 namespace Leap.Unity.Animation.Internal
 {
-    [System.Obsolete("This code will be moved to a legacy package in the next major version of the plugin. If you believe that it needs to be kept in tracking, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
+    
     public struct MaterialSelector
     {
         private Material _target;

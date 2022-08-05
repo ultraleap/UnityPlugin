@@ -29,7 +29,6 @@ namespace Leap.Unity
     /// specify the name of the preferences as well as an order value to specify
     /// how the preferences are ordered relative to other preferences.
     /// </summary>
-    [System.Obsolete("This code will be moved to a legacy package in the next major version of the plugin. If you believe that it needs to be kept in tracking, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
     public class LeapPreferences : Attribute
     {

@@ -1,20 +1,16 @@
 {
   "name": "com.ultraleap.tracking.legacy",
   "version": "1.0.0",
-  "description": "Ultraleap Tracking Legacy, a collection of depricated content",
+  "description": "Ultraleap Tracking Legacy, a collection of depricated content.\nThis package is shared in an as-is state for reference to older content.\n\nWe recommend you make a copy of the contents you require along with the license file",
   "displayName": "Ultraleap Tracking Legacy",
   "unity": "2020.3",
   "license": "Apache-2.0",
-    "dependencies": {
-    "com.ultraleap.tracking": "5.10.0",
-    "com.unity.inputsystem": "1.0.2"
-  },
   "keywords": [
     "ultraleap",
     "leap motion",
     "hand tracking",
     "tracking",
-	"legacy"
+    "legacy"
   ],
   "documentationUrl": "https://docs.ultraleap.com/",
   "author": {
@@ -23,7 +19,6 @@
     "url": "https://www.ultraleap.com"
   },
   "samples": [
-    {
-    }
+    {}
   ]
 }

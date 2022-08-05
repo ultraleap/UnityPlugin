@@ -14,7 +14,6 @@ using UnityEngine;
 
 namespace Leap.Unity
 {
-    [System.Obsolete("This code will be moved to a legacy package in the next major version of the plugin. If you believe that it needs to be kept in tracking, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
     [CustomPropertyDrawer(typeof(AssetFolder), useForChildren: true)]
     public class AssetFolderPropertyDrawer : PropertyDrawer
     {
@@ -51,7 +50,7 @@ namespace Leap.Unity
                 string resultPath = PromptUserForPath(folderPath);
                 if (!string.IsNullOrEmpty(resultPath))
                 {
-                    string relativePath = Utils.MakeRelativePath(Application.dataPath, resultPath);
+                    string relativePath = UtilsLegacy.MakeRelativePath(Application.dataPath, resultPath);
                     var asset = AssetDatabase.LoadAssetAtPath<DefaultAsset>(relativePath);
 
                     string errorMessage;

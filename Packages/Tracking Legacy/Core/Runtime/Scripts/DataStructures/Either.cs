@@ -16,7 +16,7 @@ namespace Leap.Unity
     /// a value of type B.  The value can never be both A and B.
     /// Neither A nor B can ever be null.
     /// </summary>
-    [System.Obsolete("This code will be moved to a legacy package in the next major version of the plugin. If you believe that it needs to be kept in tracking, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
+    
     public struct Either<A, B> : IEquatable<Either<A, B>>, IComparable, IComparable<Either<A, B>>
     {
 

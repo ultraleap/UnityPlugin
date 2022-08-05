@@ -11,13 +11,13 @@ using UnityEngine;
 
 namespace Leap.Unity.Space
 {
-    [System.Obsolete("This code will be moved to a legacy package in the next major version of the plugin. If you believe that it needs to be kept in tracking, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
+    
     public interface IRadialTransformer : ITransformer
     {
         Vector4 GetVectorRepresentation(Transform element);
     }
 
-    [System.Obsolete("This code will be moved to a legacy package in the next major version of the plugin. If you believe that it needs to be kept in tracking, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
+    
     public abstract class LeapRadialSpace : LeapSpace
     {
 
@@ -37,7 +37,7 @@ namespace Leap.Unity.Space
             }
         }
 
-        [System.Obsolete("This code will be moved to a legacy package in the next major version of the plugin. If you believe that it needs to be kept in tracking, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
+        
         public override Hash GetSettingHash()
         {
             return new Hash() {

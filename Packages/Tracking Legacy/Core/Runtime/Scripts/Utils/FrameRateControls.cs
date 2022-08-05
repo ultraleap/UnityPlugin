@@ -17,7 +17,7 @@ namespace Leap.Unity
     /// <remarks>
     /// This utility is useful for verifying frame-rate independence of behaviors.
     /// </remarks>
-    [System.Obsolete("This code will be moved to a legacy package in the next major version of the plugin. If you believe that it needs to be kept in tracking, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
+    
     public class FrameRateControls : MonoBehaviour
     {
         public int targetRenderRate = 60; // must be > 0

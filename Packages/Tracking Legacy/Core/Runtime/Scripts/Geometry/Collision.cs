@@ -7,13 +7,12 @@
  ******************************************************************************/
 
 using Leap.Unity.Infix;
-using Leap.Unity.Swizzle;
 using System;
 using UnityEngine;
 
 namespace Leap.Unity.Geometry
 {
-    [System.Obsolete("This code will be moved to a legacy package in the next major version of the plugin. If you believe that it needs to be kept in tracking, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
+    
     public static class Collision
     {
 

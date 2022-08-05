@@ -7,6 +7,7 @@
  ******************************************************************************/
 
 using Leap.Unity.Infix;
+using Leap.Unity.Internal;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -17,7 +18,7 @@ namespace Leap.Unity.Drawing
     /// <summary> Simple drawing interface abstraction (intended for debug drawing,
     /// not production!) with statically-accessible backend implementations via 
     /// HyperMegaLines, Unity Debug drawing, and Unity Gizmo drawing. </summary>
-    [System.Obsolete("This code will be moved to a legacy package in the next major version of the plugin. If you believe that it needs to be kept in tracking, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
+    
     public class Drawer
     {
 
@@ -221,7 +222,7 @@ namespace Leap.Unity.Drawing
 
     }
 
-    [System.Obsolete("This code will be moved to a legacy package in the next major version of the plugin. If you believe that it needs to be kept in tracking, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
+    
     public static class DrawerExtensions
     {
 

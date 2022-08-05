@@ -21,7 +21,7 @@ namespace Leap.Unity.Geometry
     /// all zero components, but is converted to Vector3.forward upon implicit
     /// conversion to Vector3.
     /// </summary>
-    [System.Obsolete("This code will be moved to a legacy package in the next major version of the plugin. If you believe that it needs to be kept in tracking, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
+    
     [System.Serializable]
     public struct Direction3
     {

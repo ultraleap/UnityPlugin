@@ -19,7 +19,6 @@ namespace Leap.Unity.Infix
     /// Unity math operations like Vector3.Dot put in extension methods so they can be used
     /// in as infix operations, e.g., a.Dot(b).
     /// </summary>
-    [System.Obsolete("This code will be moved to a legacy package in the next major version of the plugin. If you believe that it needs to be kept in tracking, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
     public static class Infix
     {
 

@@ -14,7 +14,7 @@ using UnityEngine;
 
 namespace Leap.Unity.Animation
 {
-    [System.Obsolete("This code will be moved to a legacy package in the next major version of the plugin. If you believe that it needs to be kept in tracking, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
+    
     [CanEditMultipleObjects]
     [CustomEditor(typeof(TransformTweenBehaviour))]
     public class TransformTweenBehaviourEditor : CustomEditorBase<TransformTweenBehaviour>
@@ -48,7 +48,7 @@ namespace Leap.Unity.Animation
 
             EditorGUI.BeginDisabledGroup(target.targetTransform == null
                                         || target.startTransform == null
-                                        || Utils.IsObjectPartOfPrefabAsset(target.gameObject));
+                                        || UtilsLegacy.IsObjectPartOfPrefabAsset(target.gameObject));
 
             EditorGUILayout.BeginHorizontal();
 
@@ -69,7 +69,7 @@ namespace Leap.Unity.Animation
 
             EditorGUI.BeginDisabledGroup(target.targetTransform == null
                                         || target.endTransform == null
-                                        || Utils.IsObjectPartOfPrefabAsset(target.gameObject));
+                                        || UtilsLegacy.IsObjectPartOfPrefabAsset(target.gameObject));
 
             if (GUILayout.Button(new GUIContent("Set Target" + (targets.Length > 1 ? "s" : "") + " To End",
                                                 "If this TransformTweenBehaviour has a valid target and end transform, "
