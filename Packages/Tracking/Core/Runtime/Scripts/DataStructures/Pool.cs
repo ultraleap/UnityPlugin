@@ -10,7 +10,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Leap.Unity.Internal
+namespace Leap.Unity
 {
 
     /// <summary>

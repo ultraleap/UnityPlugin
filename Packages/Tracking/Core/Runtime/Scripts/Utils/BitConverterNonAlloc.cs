@@ -9,7 +9,7 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace Leap.Unity.Internal
+namespace Leap.Unity
 {
 
     public static class BitConverterNonAlloc

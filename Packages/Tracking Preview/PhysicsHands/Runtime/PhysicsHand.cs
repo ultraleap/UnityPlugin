@@ -14,7 +14,7 @@ using UnityEditor;
 using Leap.Unity;
 using System;
 using System.Linq;
-using Leap.Unity.Internal;
+
 
 namespace Leap.Unity.Interaction.PhysicsHands
 {

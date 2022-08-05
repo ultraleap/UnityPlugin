@@ -8,7 +8,7 @@
 
 using Leap.Unity.Drawing;
 using Leap.Unity.Infix;
-using Leap.Unity.Internal;
+
 using UnityEngine;
 
 namespace Leap.Unity.Geometry

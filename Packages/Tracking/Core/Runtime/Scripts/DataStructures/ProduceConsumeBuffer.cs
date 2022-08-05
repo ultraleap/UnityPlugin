@@ -9,7 +9,7 @@
 using System;
 using UnityEngine;
 
-namespace Leap.Unity.Internal
+namespace Leap.Unity
 {
 
     public class ProduceConsumeBuffer<T>

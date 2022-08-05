@@ -7,7 +7,6 @@
  ******************************************************************************/
 
 using Leap.Unity.Encoding;
-using Leap.Unity.Internal;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;

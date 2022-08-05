@@ -7,7 +7,6 @@
  ******************************************************************************/
 
 using Leap.Unity.Attributes;
-using Leap.Unity.Internal;
 using System;
 using UnityEngine;
 using UnityEngine.Rendering;

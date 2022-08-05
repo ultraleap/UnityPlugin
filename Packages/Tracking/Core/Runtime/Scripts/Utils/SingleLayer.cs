@@ -8,7 +8,7 @@
 
 using System;
 
-namespace Leap.Unity.Internal
+namespace Leap.Unity
 {
 
     /// <summary>

@@ -8,7 +8,7 @@
 
 using UnityEngine;
 
-namespace Leap.Unity.Internal
+namespace Leap.Unity
 {
     public static class PoseExtensions
     {
