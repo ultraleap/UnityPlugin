@@ -2,7 +2,6 @@ using Leap.Unity;
 using Leap.Unity.Interaction;
 using Leap.Unity.Interaction.PhysicsHands;
 using Leap.Unity.Preview.HandRays;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
@@ -119,6 +118,14 @@ public abstract class HandRayRenderer : MonoBehaviour
 
     private void UpdateLineRenderer(HandRayDirection handRayDirection)
     {
+        if (!_lineRenderer.enabled)
+        {
+            _lineRenderer.enabled = true;
+        }
+        if(_trailRendererTransform != null)
+        {
+            _trailRenderer.enabled = true;
+        }
         if (UpdateLineRendererLogic(handRayDirection, out RaycastHit result))
         {
             OnRayUpdate?.Invoke(result);
