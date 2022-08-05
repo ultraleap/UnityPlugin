@@ -19,7 +19,7 @@ namespace Leap.Unity
     /// <summary>
     /// This interface describes a generic way to update the progress of an action.
     /// </summary>
-    [System.Obsolete("This code will be moved to a legacy package in the next major version of the plugin. If you believe that it needs to be kept in tracking, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
+    
     public interface IProgressView
     {
 
@@ -41,7 +41,7 @@ namespace Leap.Unity
     /// An example progress view that uses the simple EditorUtility methods to 
     /// provide a developer with progress of an editor action.
     /// </summary>
-    [System.Obsolete("This code will be moved to a legacy package in the next major version of the plugin. If you believe that it needs to be kept in tracking, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
+    
     public class EditorProgressView : IProgressView
     {
         /// <summary>
@@ -70,7 +70,7 @@ namespace Leap.Unity
     /// of a certain number of sections.  The progress bar is hierarchical,
     /// and so each section can itself be another chunk.
     /// </summary>
-    [System.Obsolete("This code will be moved to a legacy package in the next major version of the plugin. If you believe that it needs to be kept in tracking, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
+    
     public class ProgressBar
     {
         private List<int> chunks = new List<int>();

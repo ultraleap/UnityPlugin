@@ -17,7 +17,7 @@ namespace Leap.Unity
      * 
      * The hand can have game objects for the palm, wrist and forearm, as well as fingers.
      */
-    [System.Obsolete("This code will be moved to a legacy package in the next major version of the plugin. If you believe that it needs to be kept in tracking, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
+    
     public class SkeletalHand : HandModel
     {
         public override ModelType HandModelType

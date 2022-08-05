@@ -12,7 +12,7 @@ namespace Leap.Unity
 {
 
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
-    [System.Obsolete("This code will be moved to a legacy package in the next major version of the plugin. If you believe that it needs to be kept in tracking, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
+    
     public class ExecuteBeforeAttribute : Attribute
     {
         public Type beforeType;
@@ -20,7 +20,7 @@ namespace Leap.Unity
     }
 
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
-    [System.Obsolete("This code will be moved to a legacy package in the next major version of the plugin. If you believe that it needs to be kept in tracking, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
+    
     public class ExecuteAfterAttribute : Attribute
     {
         public Type afterType;
@@ -28,11 +28,11 @@ namespace Leap.Unity
     }
 
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
-    [System.Obsolete("This code will be moved to a legacy package in the next major version of the plugin. If you believe that it needs to be kept in tracking, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
+    
     public class ExecuteBeforeDefault : Attribute { }
 
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
-    [System.Obsolete("This code will be moved to a legacy package in the next major version of the plugin. If you believe that it needs to be kept in tracking, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
+    
     public class ExecuteAfterDefault : Attribute { }
 
 }

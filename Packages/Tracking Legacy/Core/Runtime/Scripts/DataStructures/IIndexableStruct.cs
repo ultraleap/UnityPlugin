@@ -28,7 +28,6 @@ namespace Leap.Unity
     /// (This all may change in C# 8 when we get traits, but Unity is still in the C# 4
     /// stone age.)
     /// </summary>
-    [System.Obsolete("This code will be moved to a legacy package in the next major version of the plugin. If you believe that it needs to be kept in tracking, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
     public interface IIndexableStruct<T, ThisIndexableType>
                        where ThisIndexableType : struct,
                                                  IIndexableStruct<T, ThisIndexableType>
@@ -48,7 +47,6 @@ namespace Leap.Unity
     /// allocation, you can use the generic Pool to pool instances of this class and pass
     /// it around as an IIndexable.
     /// </summary>
-    [System.Obsolete("This code will be moved to a legacy package in the next major version of the plugin. If you believe that it needs to be kept in tracking, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
     public class BoxedIndexableStruct<Element, IndexableStruct>
                    : IIndexable<Element>,
                      IPoolable
@@ -93,7 +91,6 @@ namespace Leap.Unity
         }
     }
 
-    [System.Obsolete("This code will be moved to a legacy package in the next major version of the plugin. If you believe that it needs to be kept in tracking, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
     public static class BoxedIndexableStructExtensions
     {
 
@@ -125,7 +122,6 @@ namespace Leap.Unity
     /// A two-generic-argument variant of an enumerator that allows an IIndexableStruct
     /// to quickly define an Enumerator that avoids allocation.
     /// </summary>
-    [System.Obsolete("This code will be moved to a legacy package in the next major version of the plugin. If you believe that it needs to be kept in tracking, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
     public struct IndexableStructEnumerator<Element, IndexableStruct>
       where IndexableStruct : struct, IIndexableStruct<Element, IndexableStruct>
     {

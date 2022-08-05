@@ -13,7 +13,7 @@ namespace Leap
     /// <summary>
     /// Constants used in Leap Motion math functions.
     /// </summary>
-    [System.Obsolete("This code will be moved to Leap.CSharpExtensions.Constants in the next major version of the plugin.")]
+    
     public static class Constants
     {
         public const float PI = 3.1415926536f;
@@ -35,7 +35,7 @@ namespace Leap
     /// The z-axis has positive values increasing away from the computer screen.
     /// @since 1.0
     /// </summary>
-    [System.Obsolete("This code will be moved to a legacy package in the next major version of the plugin. Use Unity's Vector3 instead. If you believe that it needs to be kept in tracking, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
+    
     [Serializable]
     public struct Vector : IEquatable<Vector>
     {

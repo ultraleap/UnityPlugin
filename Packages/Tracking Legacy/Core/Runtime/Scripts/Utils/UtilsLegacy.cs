@@ -16,7 +16,7 @@ namespace Leap.Unity
         /// If you have many colliders that need to ignore collisions, consider utilizing
         /// Layer collision settings as an optimization.
         /// </summary>
-        [System.Obsolete("This code will be removed in the next major version of the plugin. If you believe that it needs to be kept, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
+        
         public static void IgnoreCollisions(GameObject first, GameObject second,
                                             bool ignore = true)
         {
@@ -78,7 +78,7 @@ namespace Leap.Unity
         /// The component type that assumes ownership of any ComponentType in its own Transform
         /// or its Transform's children/grandchildren.
         /// </typeparam>
-        [System.Obsolete("This code will be removed in the next major version of the plugin. If you believe that it needs to be kept, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
+        
         public static void FindOwnedChildComponents<ComponentType, OwnerType>
                                                    (OwnerType rootObj,
                                                     List<ComponentType> ownedComponents,

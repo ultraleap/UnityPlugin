@@ -25,14 +25,14 @@ namespace Leap.Unity
     /// be referenced.  To must also pre-declare a non-generic version of the
     /// chosen class, mucgh in the same style as UnityEvent.
     /// </summary>
-    [System.Obsolete("This code will be moved to a legacy package in the next major version of the plugin. If you believe that it needs to be kept in tracking, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
+    
     public abstract class MultiTypedReference<BaseType> where BaseType : class
     {
         public abstract void Clear();
         public abstract BaseType Value { get; set; }
     }
 
-    [System.Obsolete("This code will be moved to a legacy package in the next major version of the plugin. If you believe that it needs to be kept in tracking, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
+    
     public static class MultiTypedReferenceUtil
     {
 
@@ -55,7 +55,7 @@ namespace Leap.Unity
 #endif
     }
 
-    [System.Obsolete("This code will be moved to a legacy package in the next major version of the plugin. If you believe that it needs to be kept in tracking, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
+    
     public class MultiTypedReference<BaseType, A, B> : MultiTypedReference<BaseType>
       where BaseType : class
       where A : BaseType
@@ -154,7 +154,7 @@ namespace Leap.Unity
         }
     }
 
-    [System.Obsolete("This code will be moved to a legacy package in the next major version of the plugin. If you believe that it needs to be kept in tracking, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
+    
     public class MultiTypedReference<BaseType, A, B, C> : MultiTypedReference<BaseType, A, B>
       where BaseType : class
       where A : BaseType
@@ -201,7 +201,7 @@ namespace Leap.Unity
         }
     }
 
-    [System.Obsolete("This code will be moved to a legacy package in the next major version of the plugin. If you believe that it needs to be kept in tracking, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
+    
     public class MultiTypedReference<BaseType, A, B, C, D> : MultiTypedReference<BaseType, A, B, C>
       where BaseType : class
       where A : BaseType
