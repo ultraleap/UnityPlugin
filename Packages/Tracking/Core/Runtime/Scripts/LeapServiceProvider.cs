@@ -528,6 +528,9 @@ namespace Leap.Unity
 
         private bool EnsureAndroidBinding()
         {
+#if UNITY_EDITOR
+            return false;
+#else
             bool success;
             try
             {
@@ -567,6 +570,7 @@ namespace Leap.Unity
             }
 
             return success;
+#endif
         }
 
         protected virtual void OnDisable()
@@ -588,9 +592,9 @@ namespace Leap.Unity
         }
 
 #endif
-        #endregion
+#endregion
 
-        #region Unity Events
+            #region Unity Events
 
         protected virtual void Reset()
         {
