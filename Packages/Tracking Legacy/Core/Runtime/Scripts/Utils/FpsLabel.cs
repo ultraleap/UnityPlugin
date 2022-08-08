@@ -6,7 +6,7 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Leap.Unity.Internal;
+
 using UnityEngine;
 
 namespace Leap.Unity

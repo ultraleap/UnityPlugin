@@ -11,7 +11,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace Leap.Unity.Internal
+namespace Leap.Unity
 {
     [Serializable]
     public class EnumEventTable : ISerializationCallbackReceiver

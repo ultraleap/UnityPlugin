@@ -7,7 +7,7 @@
  ******************************************************************************/
 
 using Leap.Unity.Infix;
-using Leap.Unity.Internal;
+
 using Leap.Unity.Query;
 using System.Collections.Generic;
 using UnityEngine;

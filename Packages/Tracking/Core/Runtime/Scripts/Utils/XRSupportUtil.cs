@@ -14,7 +14,7 @@ using UnityEngine.XR;
 using UnityEngine.XR.Management;
 #endif
 
-namespace Leap.Unity.Internal
+namespace Leap.Unity
 {
 
     /// <summary>

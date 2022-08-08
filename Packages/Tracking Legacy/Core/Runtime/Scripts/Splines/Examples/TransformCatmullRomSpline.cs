@@ -7,7 +7,7 @@
  ******************************************************************************/
 
 using Leap.Unity.Animation;
-using Leap.Unity.Internal;
+
 using Leap.Unity.RuntimeGizmos;
 using System.Collections;
 using System.Collections.Generic;

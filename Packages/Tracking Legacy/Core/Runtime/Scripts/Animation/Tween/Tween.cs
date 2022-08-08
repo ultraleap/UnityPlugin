@@ -12,7 +12,7 @@ using UnityEngine;
 namespace Leap.Unity.Animation
 {
     using Internal;
-    using Leap.Unity.Internal;
+    
 
     
     public partial struct Tween

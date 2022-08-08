@@ -8,7 +8,7 @@
 
 using System.Collections.Generic;
 
-namespace Leap.Unity.Internal
+namespace Leap.Unity
 {
     /// <summary>
     /// A simple wrapper around HashSet to provide readonly access.
