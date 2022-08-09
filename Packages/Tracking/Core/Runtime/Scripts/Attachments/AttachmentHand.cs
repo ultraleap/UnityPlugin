@@ -381,6 +381,7 @@ namespace Leap.Unity.Attachments
             var pointBehaviour = GetBehaviourForPoint(singlePoint);
             if (pointBehaviour != null)
             {
+#if UNITY_EDITOR
                 if (!Application.isPlaying)
                 {
                     if (PrefabUtility.IsPartOfPrefabInstance(pointBehaviour.gameObject))
@@ -393,6 +394,7 @@ namespace Leap.Unity.Attachments
                     DestroyImmediate(pointBehaviour.gameObject);
                 }
                 else
+#endif
                 {
                     Destroy(pointBehaviour.gameObject);
                 }
