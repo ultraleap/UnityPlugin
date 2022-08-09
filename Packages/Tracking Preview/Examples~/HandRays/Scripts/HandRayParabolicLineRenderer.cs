@@ -12,7 +12,7 @@ using UnityEngine;
 
 namespace Leap.Unity
 {
-    public class HandRayParabolicLineRenderer : MonoBehaviour
+    public class HandRayParabolicLineRenderer : HandRayRenderer
     {
         [Tooltip("The scale of the projection of any hand distance from the approximated "
                + "shoulder beyond the handMergeDistance.")]
@@ -24,88 +24,16 @@ namespace Leap.Unity
         [Range(0f, 1f)]
         public float handMergeDistance = 0.7f;
 
-        public HandRay handRay;
+        private List<Vector3> _parabolaPositions = new List<Vector3>();
 
-        [SerializeField] private LineRenderer lineRenderer;
-        [SerializeField] private Transform trailRendererTransform;
-        [SerializeField] private float trailRendererYOffset = 0.04f;
-
-        private TrailRenderer trailRenderer;
-        private List<Vector3> parabolaPositions = new List<Vector3>();
-
-        void Start()
+        Vector3 evaluateParabola(Vector3 position, Vector3 velocity, Vector3 acceleration, float time)
         {
-            if (lineRenderer == null)
-            {
-                lineRenderer = GetComponentInChildren<LineRenderer>();
-                if (lineRenderer == null)
-                {
-                    Debug.LogWarning("HandRayParabolicLineRenderer needs a lineRenderer");
-                }
-            }
-
-            if (trailRendererTransform != null)
-            {
-                trailRenderer = trailRendererTransform.GetComponentInChildren<TrailRenderer>();
-                if (trailRenderer == null)
-                {
-                    Debug.LogWarning("The trail renderer transform reference does not have a trailRenderer attached");
-                }
-            }
-            lineRenderer.enabled = false;
+            return position + (velocity * time) + (0.5f * acceleration * (time * time));
         }
 
-        private void OnEnable()
+        protected override bool UpdateLineRendererLogic(HandRayDirection handRayDirection, out RaycastHit raycastResult)
         {
-            if (handRay == null)
-            {
-                handRay = FindObjectOfType<WristShoulderFarFieldHandRay>();
-                if (handRay == null)
-                {
-                    Debug.LogWarning("HandRayParabolicLineRenderer needs a HandRay");
-                    return;
-                }
-            }
-            handRay.OnHandRayFrame += UpdateLineRenderer;
-            handRay.OnHandRayEnable += EnableLineRenderer;
-            handRay.OnHandRayDisable += DisableLineRenderer;
-        }
-
-        private void OnDisable()
-        {
-            if (handRay == null)
-            {
-                return;
-            }
-
-            handRay.OnHandRayFrame -= UpdateLineRenderer;
-            handRay.OnHandRayEnable -= EnableLineRenderer;
-            handRay.OnHandRayDisable -= DisableLineRenderer;
-        }
-
-        void EnableLineRenderer(HandRayDirection farFieldDirection)
-        {
-            lineRenderer.enabled = true;
-
-            if (trailRendererTransform != null)
-            {
-                trailRenderer.enabled = true;
-                trailRenderer.Clear();
-            }
-        }
-
-        void DisableLineRenderer(HandRayDirection farFieldDirection)
-        {
-            lineRenderer.enabled = false;
-            if (trailRendererTransform != null)
-            {
-                trailRenderer.enabled = false;
-            }
-        }
-
-        void UpdateLineRenderer(HandRayDirection handRayDirection)
-        {
-            parabolaPositions.Clear();
+            _parabolaPositions.Clear();
 
             // Calculate the projection of the hand if it extends beyond the handMergeDistance.
             Vector3 handProjection = handRayDirection.Direction;
@@ -113,65 +41,30 @@ namespace Leap.Unity
             float projectionDistance = Mathf.Max(0.0f, handShoulderDist - handMergeDistance);
             float projectionAmount = (projectionDistance + 0.15f) * projectionScale;
 
+            raycastResult = new RaycastHit();
+            bool hit = false;
             if (projectionDistance > 0f)
             {
-                bool hit = false;
                 Vector3 startPos = handRayDirection.AimPosition;
-                parabolaPositions.Add(handRayDirection.VisualAimPosition);
+                _parabolaPositions.Add(handRayDirection.VisualAimPosition);
                 Vector3 velocity = handProjection * projectionAmount;
-                Vector3 segmentEnd = Vector3.zero;
                 for (float i = 0; i < 8f; i += 0.1f)
                 {
                     Vector3 segmentStart = evaluateParabola(startPos, velocity, Physics.gravity * 0.25f, i);
-                    segmentEnd = evaluateParabola(startPos, velocity, Physics.gravity * 0.25f, i + 0.1f);
-                    parabolaPositions.Add(segmentEnd);
-                    RaycastHit hitInfo;
-                    if (Physics.Raycast(new Ray(segmentStart, segmentEnd - segmentStart), out hitInfo, Vector3.Distance(segmentStart, segmentEnd)))
+                    Vector3 segmentEnd = evaluateParabola(startPos, velocity, Physics.gravity * 0.25f, i + 0.1f);
+                    _parabolaPositions.Add(segmentEnd);
+                    if (Physics.Raycast(new Ray(segmentStart, segmentEnd - segmentStart), out raycastResult, Vector3.Distance(segmentStart, segmentEnd), _layerMask))
                     {
                         hit = true;
-                        segmentEnd = hitInfo.point;
+                        _parabolaPositions.Add(raycastResult.point);
                     }
 
                     if (hit) { break; }
                 }
-
-                if (hit)
-                {
-                    if (trailRenderer != null)
-                    {
-                        UpdateTrailRenderer(segmentEnd);
-                    }
-                }
-            }
-            UpdateLineRenderer();
-        }
-
-        Vector3 evaluateParabola(Vector3 position, Vector3 velocity, Vector3 acceleration, float time)
-        {
-            return position + (velocity * time) + (0.5f * acceleration * (time * time));
-        }
-
-        void UpdateLineRenderer()
-        {
-            if (lineRenderer == null)
-            {
-                return;
             }
 
-            lineRenderer.positionCount = parabolaPositions.Count;
-            lineRenderer.SetPositions(parabolaPositions.ToArray());
-        }
-
-        void UpdateTrailRenderer(Vector3 hitPoint)
-        {
-            if (trailRendererTransform == null)
-            {
-                return;
-            }
-
-            // Add a small vertical offset to the hit point in order to see the trail better
-            hitPoint.y += trailRendererYOffset;
-            trailRendererTransform.position = hitPoint;
+            UpdateLineRendererPositions(_parabolaPositions.Count, _parabolaPositions.ToArray(), hit);
+            return hit;
         }
     }
 }
