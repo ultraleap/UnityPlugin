@@ -52,7 +52,7 @@ namespace LeapInternal
          * @param leapHand The internal hand definition to be copied into this hand.
          * @param frameId The frame id of the frame this hand belongs to.
          */
-        public static Hand CopyFrom(this Hand hand, ref LEAP_HAND leapHand, long frameId)
+        private static Hand CopyFrom(this Hand hand, ref LEAP_HAND leapHand, long frameId)
         {
             hand.FrameId = frameId;
             hand.Id = (int)leapHand.id;
@@ -94,7 +94,7 @@ namespace LeapInternal
          * @param handId The hand id of the hand this finger belongs to.
          * @param timeVisible The time in seconds that this finger has been visible.
          */
-        public static Finger CopyFrom(this Finger finger, LEAP_DIGIT leapBone, Finger.FingerType type, int handId, float timeVisible)
+        private static Finger CopyFrom(this Finger finger, LEAP_DIGIT leapBone, Finger.FingerType type, int handId, float timeVisible)
         {
             finger.Id = (handId * 10) + leapBone.finger_id;
             finger.HandId = handId;
@@ -126,7 +126,7 @@ namespace LeapInternal
          * @param leapBone The internal bone definition to be copied into this bone.
          * @param type The bone type of this bone.
          */
-        public static Bone CopyFrom(this Bone bone, LEAP_BONE leapBone, Bone.BoneType type)
+        private static Bone CopyFrom(this Bone bone, LEAP_BONE leapBone, Bone.BoneType type)
         {
             bone.Type = type;
             bone.PrevJoint = leapBone.prev_joint.ToVector3();
