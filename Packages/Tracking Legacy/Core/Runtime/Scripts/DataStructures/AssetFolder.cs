@@ -24,7 +24,7 @@ namespace Leap.Unity
     /// property will not be available.
     /// </summary>
     [Serializable]
-    
+
     public class AssetFolder
     {
 

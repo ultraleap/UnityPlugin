@@ -1,6 +1,6 @@
 using Leap.Interaction.Internal.InteractionEngineUtility;
-using System.Collections.Generic;
 using Leap.Unity.Query;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Leap.Unity.Interaction.PhysicsHands

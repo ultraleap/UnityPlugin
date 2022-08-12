@@ -13,7 +13,7 @@ using UnityEngine;
 
 namespace Leap.Unity
 {
-    
+
     [Serializable]
     public struct Hash : IEnumerable, IEquatable<Hash>
     {

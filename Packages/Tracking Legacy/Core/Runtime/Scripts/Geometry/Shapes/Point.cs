@@ -12,7 +12,7 @@ using UnityEngine;
 
 namespace Leap.Unity.Geometry
 {
-    
+
     [System.Serializable]
     public struct Point
     {
@@ -52,7 +52,7 @@ namespace Leap.Unity.Geometry
 
     }
 
-    
+
     public static class PointExtensions
     {
 

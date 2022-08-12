@@ -12,7 +12,7 @@ namespace Leap.Unity
 {
     using Query;
 
-    
+
     public static class Maybe
     {
         public static readonly NoneType None = new NoneType();
@@ -72,7 +72,7 @@ namespace Leap.Unity
     /// the built-int nullable types, you are unable to access the value unless
     /// it does exist, and will never recieve a null value.
     /// </summary>
-    
+
     public struct Maybe<T> : IEquatable<Maybe<T>>, IComparable, IComparable<Maybe<T>>
     {
 
@@ -231,7 +231,7 @@ namespace Leap.Unity
             }
         }
 
-        
+
         public Query<T> Query()
         {
             if (hasValue)

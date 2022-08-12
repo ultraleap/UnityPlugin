@@ -1,9 +1,9 @@
 using Leap;
 using Leap.Unity;
 using Leap.Unity.Encoding;
+using Leap.Unity.Query;
 using System.Collections;
 using System.Collections.Generic;
-using Leap.Unity.Query;
 using UnityEngine;
 
 /// <summary>

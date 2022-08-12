@@ -6,9 +6,9 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
+using Leap.Unity.Query;
 using System;
 using System.Collections.Generic;
-using Leap.Unity.Query;
 using UnityEngine;
 
 namespace Leap.Unity.HandsModule

@@ -12,7 +12,7 @@ namespace Leap.Unity
 {
 
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
-    
+
     public class ExecuteBeforeAttribute : Attribute
     {
         public Type beforeType;
@@ -20,7 +20,7 @@ namespace Leap.Unity
     }
 
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
-    
+
     public class ExecuteAfterAttribute : Attribute
     {
         public Type afterType;
@@ -28,11 +28,11 @@ namespace Leap.Unity
     }
 
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
-    
+
     public class ExecuteBeforeDefault : Attribute { }
 
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
-    
+
     public class ExecuteAfterDefault : Attribute { }
 
 }

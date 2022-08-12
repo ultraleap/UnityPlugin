@@ -7,10 +7,10 @@
  ******************************************************************************/
 
 using Leap.Unity.Preview.HandRays;
+using Leap.Unity.Query;
 using UnityEngine;
 using UnityEngine.XR;
 using UnityEngine.XR.Interaction.Toolkit;
-using Leap.Unity.Query;
 
 namespace Leap.Unity.Preview.XRInteractionToolkit
 {

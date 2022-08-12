@@ -17,7 +17,7 @@ namespace Leap.Unity.Geometry
 
     using UnityRect = UnityEngine.Rect;
 
-    
+
     [System.Serializable]
     public struct LocalRect : IInterpolable<LocalRect>
     {

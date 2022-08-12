@@ -12,7 +12,7 @@ using System.Collections.Generic;
 
 namespace Leap.Unity.Query
 {
-    
+
     public static class QueryCollapseExtensions
     {
 

@@ -16,7 +16,7 @@ namespace Leap.Unity
     /**
      * Unity extentions for Leap Vector class.
      */
-    
+
     public static class UnityVectorExtension
     {
 
@@ -74,7 +74,7 @@ namespace Leap.Unity
     /**
      * Unity extentions for Leap Quaternion class.
      */
-    
+
     public static class UnityQuaternionExtension
     {
         /**
@@ -116,7 +116,7 @@ namespace Leap.Unity
     /**
      * Unity extentions for the Leap Motion LeapTransform class.
      */
-    
+
     public static class UnityMatrixExtension
     {
         /** Up in the Leap coordinate system.*/

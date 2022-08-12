@@ -7,9 +7,9 @@
  ******************************************************************************/
 
 using Leap.Unity.Encoding;
+using Leap.Unity.Query;
 using System.Collections;
 using System.Collections.Generic;
-using Leap.Unity.Query;
 using UnityEngine;
 
 namespace Leap.Unity
@@ -954,7 +954,7 @@ namespace Leap.Unity
 
                     for (int hand_idx = 1; hand_idx < jointConfidences.Count; hand_idx++)
                     {
-                        float lerpValue = jointConfidences.Query().Take(hand_idx).GetEnumerator().Query().Select(x => x[confidence_idx]).Sum() / 
+                        float lerpValue = jointConfidences.Query().Take(hand_idx).GetEnumerator().Query().Select(x => x[confidence_idx]).Sum() /
                                             jointConfidences.Query().Take(hand_idx + 1).GetEnumerator().Query().Select(x => x[confidence_idx]).Sum();
                         colors[capsuleHand_idx] = Color.Lerp(debugColors[hand_idx], colors[capsuleHand_idx], lerpValue);
                     }

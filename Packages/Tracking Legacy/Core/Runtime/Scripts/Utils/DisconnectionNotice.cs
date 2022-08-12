@@ -19,7 +19,7 @@ namespace Leap.Unity
      *
      * @deprecated Use ConnectionMonitor in new code.
      */
-    
+
     public class DisconnectionNotice : MonoBehaviour
     {
 

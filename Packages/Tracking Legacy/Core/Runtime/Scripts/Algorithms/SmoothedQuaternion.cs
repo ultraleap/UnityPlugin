@@ -16,7 +16,7 @@ namespace Leap.Unity
     /// <remarks>
     /// When moving at a constant speed: speed * delay = Value - ExponentialSmoothing.value.
     /// </remarks>
-    
+
     [System.Serializable]
     public class SmoothedQuaternion
     {

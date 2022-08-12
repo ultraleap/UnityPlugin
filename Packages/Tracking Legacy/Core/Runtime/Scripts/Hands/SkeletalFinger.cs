@@ -17,7 +17,7 @@ namespace Leap.Unity
      * 
      * The graphic objects can include both bones and joints, but both are optional.
      */
-    
+
     public class SkeletalFinger : FingerModel
     {
 

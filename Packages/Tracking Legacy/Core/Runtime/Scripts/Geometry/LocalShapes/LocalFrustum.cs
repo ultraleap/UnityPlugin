@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace Leap.Unity.Geometry
 {
-    
+
     [System.Serializable]
     public struct LocalFrustum
     {

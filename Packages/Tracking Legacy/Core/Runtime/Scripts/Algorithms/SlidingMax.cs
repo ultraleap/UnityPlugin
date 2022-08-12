@@ -8,7 +8,7 @@
 
 namespace Leap.Unity
 {
-    
+
     public class SlidingMax
     {
 

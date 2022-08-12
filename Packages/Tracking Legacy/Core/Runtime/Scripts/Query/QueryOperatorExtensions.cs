@@ -19,7 +19,7 @@ namespace Leap.Unity.Query
     /// these methods destroy the original query and return a new Query based on 
     /// the original.
     /// </summary>
-    
+
     public static class QueryOperatorExtensions
     {
 

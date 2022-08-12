@@ -12,7 +12,7 @@ using UnityEngine;
 
 namespace Leap.Unity
 {
-    
+
     [Serializable]
     public struct SerializableType : ISerializationCallbackReceiver
     {

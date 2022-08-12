@@ -7,10 +7,10 @@
  ******************************************************************************/
 
 
+using Leap.Unity.Query;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using Leap.Unity.Query;
 using UnityEngine;
 
 namespace Leap.Unity.Interaction.PhysicsHands

@@ -16,7 +16,7 @@ namespace Leap.Unity
     /// a value of type B.  The value can never be both A and B.
     /// Neither A nor B can ever be null.
     /// </summary>
-    
+
     public struct Either<A, B> : IEquatable<Either<A, B>>, IComparable, IComparable<Either<A, B>>
     {
 

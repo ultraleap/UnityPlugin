@@ -16,7 +16,7 @@ namespace Leap.Unity
     /// <remarks>
     /// When moving at a constant speed: speed * delay = Value - SmoothedVector3.value.
     /// </remarks>
-    
+
     [System.Serializable]
     public class SmoothedVector3
     {

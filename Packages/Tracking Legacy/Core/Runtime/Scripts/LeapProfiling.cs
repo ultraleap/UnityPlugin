@@ -17,7 +17,7 @@ namespace Leap.Unity
     /// <summary>
     /// Utility class used by the LeapServiceProvider for profiling the LeapCSharp dll
     /// </summary>
-    
+
     public static class LeapProfiling
     {
 

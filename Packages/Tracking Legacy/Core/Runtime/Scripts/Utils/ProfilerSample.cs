@@ -21,7 +21,7 @@ namespace Leap.Unity
     ///   code you want to profile
     /// }
     /// </summary>
-    
+
     public struct ProfilerSample : IDisposable
     {
 

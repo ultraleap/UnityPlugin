@@ -10,7 +10,7 @@
 
 namespace Leap.Unity
 {
-    
+
     public class DelayBuffer<T>
     {
 

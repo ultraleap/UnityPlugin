@@ -18,7 +18,7 @@ namespace Leap.Unity
     * available. You can use the PluginLeapNotice sprites in the LeapMotion/Textures
     * folder or create your own.
 */
-    
+
     [RequireComponent(typeof(SpriteRenderer))]
     public class ConnectionMonitor : MonoBehaviour
     {

@@ -11,7 +11,7 @@ using System.Collections.Generic;
 
 namespace Leap.Unity
 {
-    
+
     public static class ListAndArrayExtensions
     {
 

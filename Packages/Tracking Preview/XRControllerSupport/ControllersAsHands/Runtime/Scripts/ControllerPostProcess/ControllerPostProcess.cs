@@ -5,8 +5,8 @@
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
-using System;
 using Leap.Unity.Query;
+using System;
 using UnityEngine;
 
 #if ENABLE_INPUT_SYSTEM

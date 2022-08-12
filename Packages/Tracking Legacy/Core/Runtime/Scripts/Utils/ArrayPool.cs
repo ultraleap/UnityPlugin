@@ -12,7 +12,7 @@ using UnityEngine;
 
 namespace Leap.Unity
 {
-    
+
     public static class ArrayPool<T>
     {
         private static Dictionary<int, Stack<T[]>> _bins;

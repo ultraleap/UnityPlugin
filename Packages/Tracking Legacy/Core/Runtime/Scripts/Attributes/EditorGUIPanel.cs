@@ -18,7 +18,7 @@ using UnityEditor;
 
 namespace Leap.Unity.Attributes
 {
-    
+
     public class EditorGUIPanelAttribute : CombinablePropertyAttribute,
       ITopPanelDrawer
     {

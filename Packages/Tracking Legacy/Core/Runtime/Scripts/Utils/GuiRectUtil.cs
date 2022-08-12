@@ -13,7 +13,7 @@ using UnityEditor;
 
 namespace Leap.Unity
 {
-    
+
     public static class GuiRectUtil
     {
 

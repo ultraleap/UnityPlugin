@@ -22,7 +22,7 @@ namespace Leap.Unity
 #endif
     }
 
-    
+
     [CustomPropertyDrawer(typeof(SerializableDictionaryBase), useForChildren: true)]
     public class SerializableDictionaryEditor : PropertyDrawer
     {

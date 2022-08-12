@@ -25,7 +25,7 @@ namespace Leap.Unity.Animation
 
 namespace Leap.Unity.Animation.Internal
 {
-    
+
     public struct TransformSelector
     {
         private Transform _target;

@@ -19,7 +19,7 @@ namespace Leap.Unity
     /// <summary>
     /// This interface describes a generic way to update the progress of an action.
     /// </summary>
-    
+
     public interface IProgressView
     {
 
@@ -70,7 +70,7 @@ namespace Leap.Unity
     /// of a certain number of sections.  The progress bar is hierarchical,
     /// and so each section can itself be another chunk.
     /// </summary>
-    
+
     public class ProgressBar
     {
         private List<int> chunks = new List<int>();

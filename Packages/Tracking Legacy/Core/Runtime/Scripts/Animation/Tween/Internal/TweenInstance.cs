@@ -13,7 +13,7 @@ using UnityEngine;
 
 namespace Leap.Unity.Animation.Internal
 {
-    
+
     public class TweenInstance : IPoolable, IDisposable
     {
         private static int _nextInstanceId = 1;

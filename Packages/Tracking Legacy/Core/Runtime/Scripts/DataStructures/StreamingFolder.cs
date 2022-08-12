@@ -15,7 +15,7 @@ using UnityEditor;
 
 namespace Leap.Unity
 {
-    
+
     [Serializable]
     public class StreamingFolder : AssetFolder, ISerializationCallbackReceiver
     {

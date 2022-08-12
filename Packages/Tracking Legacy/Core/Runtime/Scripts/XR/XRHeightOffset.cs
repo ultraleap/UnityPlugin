@@ -16,7 +16,7 @@ namespace Leap.Unity
 {
 
     [ExecuteInEditMode]
-    
+
     public class XRHeightOffset : MonoBehaviour
     {
 

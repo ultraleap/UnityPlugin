@@ -10,7 +10,7 @@ namespace Leap.Unity.Animation
 {
 
     /// <summary> Utility functions for producing smooth motion. </summary>
-    
+
     public static class Ease
     {
 

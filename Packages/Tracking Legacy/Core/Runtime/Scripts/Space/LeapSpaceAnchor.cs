@@ -11,7 +11,7 @@ using UnityEngine;
 
 namespace Leap.Unity.Space
 {
-    
+
     [DisallowMultipleComponent]
     public class LeapSpaceAnchor : MonoBehaviour
     {

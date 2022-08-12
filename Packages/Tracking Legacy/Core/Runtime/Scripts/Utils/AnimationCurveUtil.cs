@@ -15,7 +15,7 @@ using Leap.Unity.Query;
 
 namespace Leap.Unity
 {
-    
+
     public static class DefaultCurve
     {
 
@@ -98,7 +98,7 @@ namespace Leap.Unity
         }
     }
 
-    
+
     public static class AnimationCurveUtil
     {
 

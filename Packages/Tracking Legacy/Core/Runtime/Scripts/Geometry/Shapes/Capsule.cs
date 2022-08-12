@@ -12,7 +12,7 @@ using UnityEngine;
 
 namespace Leap.Unity.Geometry
 {
-    
+
     [System.Serializable]
     public struct Capsule
     {
@@ -49,7 +49,7 @@ namespace Leap.Unity.Geometry
 
     }
 
-    
+
     public static class CapsuleExtensions
     {
 

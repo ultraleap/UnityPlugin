@@ -7,10 +7,9 @@
  ******************************************************************************/
 
 using Leap.Unity.Attributes;
-
+using Leap.Unity.Query;
 using System;
 using System.Collections.Generic;
-using Leap.Unity.Query;
 using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.XR;

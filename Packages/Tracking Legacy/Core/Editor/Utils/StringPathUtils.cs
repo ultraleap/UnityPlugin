@@ -10,7 +10,7 @@ using System.IO;
 
 namespace Leap.Unity.StringPathUtils
 {
-    
+
     public static class StringPathUtilExtensions
     {
 

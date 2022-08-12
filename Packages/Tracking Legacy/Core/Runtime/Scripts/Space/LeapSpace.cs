@@ -13,7 +13,7 @@ using UnityEngine.Assertions;
 
 namespace Leap.Unity.Space
 {
-    
+
     [ExecuteInEditMode]
     public abstract class LeapSpace : LeapSpaceAnchor
     {
@@ -117,7 +117,7 @@ namespace Leap.Unity.Space
         /// Get a hash of all features in this space.  This is useful if you want to know
         /// if anything has changed about the settings of this space. 
         /// </summary>
-        
+
         public abstract Hash GetSettingHash();
 
         protected abstract ITransformer CosntructBaseTransformer();

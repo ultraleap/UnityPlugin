@@ -232,7 +232,7 @@ namespace Leap.Unity.Animation
 
     }
 
-    
+
     public static class HermitePoseSplineExtensions
     {
 

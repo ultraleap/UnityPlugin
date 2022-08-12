@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace Leap.Unity
 {
-    
+
     public static class TransformUtil
     {
         public static void SetLocalX(this Transform transform, float localX)

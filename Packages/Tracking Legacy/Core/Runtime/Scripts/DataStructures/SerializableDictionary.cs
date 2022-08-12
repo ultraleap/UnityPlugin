@@ -17,13 +17,13 @@ using UnityEngine;
 namespace Leap.Unity
 {
 
-    
+
     public class SDictionaryAttribute : PropertyAttribute { }
 
-    
+
     public abstract class SerializableDictionaryBase { }
 
-    
+
     public interface ISerializableDictionary
     {
         float KeyDisplayRatio();
@@ -34,7 +34,7 @@ namespace Leap.Unity
     /// non-generic version specific to your needs.  This is the same workflow that exists
     /// for using the UnityEvent class as well. 
     /// </summary>
-    
+
     public class SerializableDictionary<TKey, TValue> : SerializableDictionaryBase,
                                                         IEnumerable<KeyValuePair<TKey, TValue>>,
                                                         ICanReportDuplicateInformation,

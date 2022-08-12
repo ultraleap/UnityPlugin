@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace Leap.Unity
 {
-    
+
     public class AppGlobals<T> : MonoBehaviour where T : AppGlobals<T>
     {
 

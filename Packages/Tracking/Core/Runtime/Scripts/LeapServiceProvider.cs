@@ -6,11 +6,11 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
+using Leap.Unity.Query;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
-using Leap.Unity.Query;
 using UnityEngine;
 
 namespace Leap.Unity
@@ -591,9 +591,9 @@ namespace Leap.Unity
         }
 
 #endif
-#endregion
+        #endregion
 
-            #region Unity Events
+        #region Unity Events
 
         protected virtual void Reset()
         {

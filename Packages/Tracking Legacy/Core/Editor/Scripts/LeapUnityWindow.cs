@@ -12,7 +12,7 @@ using UnityEngine;
 
 namespace Leap.Unity
 {
-    
+
     [InitializeOnLoad]
     public class LeapUnityWindow : EditorWindow
     {

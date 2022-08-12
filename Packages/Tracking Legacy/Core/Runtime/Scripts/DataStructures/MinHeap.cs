@@ -12,13 +12,13 @@ using UnityEngine;
 
 namespace Leap.Unity
 {
-    
+
     public interface IMinHeapNode
     {
         int heapIndex { get; set; }
     }
 
-    
+
     public class MinHeap<T> where T : IMinHeapNode, IComparable<T>
     {
 

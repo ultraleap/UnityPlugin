@@ -13,7 +13,7 @@ namespace Leap.Unity
 
     /// <summary>Ensure this script is on your player object and 
     /// set to execute before the LeapXRServiceProvider</summary>
-    
+
     public class LeapXRPinchLocomotion : MonoBehaviour
     {
 

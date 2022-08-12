@@ -21,7 +21,7 @@ namespace Leap
     /// the * operator.
     /// @since 1.0
     /// </summary>
-    
+
     public struct Matrix
     {
 

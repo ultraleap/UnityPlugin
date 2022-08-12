@@ -21,7 +21,7 @@ namespace Leap.Unity.Geometry
     /// all zero components, but is converted to Vector3.forward upon implicit
     /// conversion to Vector3.
     /// </summary>
-    
+
     [System.Serializable]
     public struct Direction3
     {
