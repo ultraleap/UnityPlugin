@@ -8,7 +8,7 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using Leap.Unity.Query;
 using UnityEngine;
 
 namespace Leap.Unity.HandsModule
@@ -227,7 +227,7 @@ namespace Leap.Unity.HandsModule
                 }
 
                 //Get the length of the leap finger tip
-                float leapFingerLength = leapFinger.bones.Last().Length;
+                float leapFingerLength = leapFinger.bones.Query().Last().Length;
                 //Get the length of the models finger tip (Calculated when the hand was first bound)
                 float fingerTipLength = finger.fingerTipBaseLength;
                 //Calculate a ratio to use for scaling the finger tip
@@ -507,7 +507,7 @@ namespace Leap.Unity.HandsModule
 
         bool CanUseScaleFeature()
         {
-            if (BoundHand.startScale == Vector3.zero || BoundHand.baseScale == 0 || BoundHand.fingers.Any(x => x.fingerTipBaseLength == 0) || BoundHand.fingers.Any(x => x.boundBones.Any(y => y.boundTransform != null && y.startTransform.scale == Vector3.zero)))
+            if (BoundHand.startScale == Vector3.zero || BoundHand.baseScale == 0 || BoundHand.fingers.Query().Any(x => x.fingerTipBaseLength == 0) || BoundHand.fingers.Query().Any(x => x.boundBones.Query().Any(y => y.boundTransform != null && y.startTransform.scale == Vector3.zero)))
             {
                 if (SetModelScale == true)
                 {

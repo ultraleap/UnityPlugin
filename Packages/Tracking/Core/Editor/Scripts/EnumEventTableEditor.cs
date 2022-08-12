@@ -7,7 +7,7 @@
  ******************************************************************************/
 
 using System;
-using System.Linq;
+using Leap.Unity.Query;
 using UnityEditor;
 using UnityEngine;
 
@@ -42,7 +42,7 @@ namespace Leap.Unity
             _iconToolbarMinus = new GUIContent(EditorGUIUtility.IconContent("Toolbar Minus"));
             _iconToolbarMinus.tooltip = "Remove all events in this list.";
 
-            _enumNames = Enum.GetNames(enumType).Select(s => new GUIContent(s)).ToArray();
+            _enumNames = Enum.GetNames(enumType).Query().Select(s => new GUIContent(s)).ToArray();
             _enumValues = (int[])Enum.GetValues(enumType);
         }
 

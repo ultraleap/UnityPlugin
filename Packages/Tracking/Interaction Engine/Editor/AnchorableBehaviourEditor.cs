@@ -6,7 +6,7 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using System.Linq;
+using Leap.Unity.Query;
 using UnityEditor;
 using UnityEngine;
 
@@ -91,7 +91,7 @@ namespace Leap.Unity.Interaction
                 // Attach / Detach Object
                 EditorGUILayout.BeginHorizontal();
 
-                var anyTargetsCanAnchor = targets.Any(t => t.anchor != null && !target.isAttached);
+                var anyTargetsCanAnchor = targets.Query().Any(t => t.anchor != null && !target.isAttached);
 
                 EditorGUI.BeginDisabledGroup(!anyTargetsCanAnchor);
                 if (GUILayout.Button(new GUIContent("Attach Object" + (targets.Length > 1 ? "s" : ""),
@@ -107,7 +107,7 @@ namespace Leap.Unity.Interaction
                 }
                 EditorGUI.EndDisabledGroup();
 
-                var anyTargetsCanDetach = targets.Any(t => t.isAttached);
+                var anyTargetsCanDetach = targets.Query().Any(t => t.isAttached);
 
                 EditorGUI.BeginDisabledGroup(!anyTargetsCanDetach);
                 if (GUILayout.Button(new GUIContent("Detach Object" + (targets.Length > 1 ? "s" : ""),

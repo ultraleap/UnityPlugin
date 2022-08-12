@@ -9,9 +9,10 @@
 using LeapInternal;
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using Leap.Unity.Query;
 using UnityEditor;
 using UnityEngine;
+using System.Linq;
 
 namespace Leap.Unity
 {
@@ -137,7 +138,7 @@ namespace Leap.Unity
                 // check whether the current SpecificSerialNumber is an empty string
                 if (String.IsNullOrEmpty(property.stringValue))
                 {
-                    _chosenDeviceIndex = EditorGUILayout.Popup("Specific Serial Number", 0, new List<string>() { "Select an available Serial Number" }.Concat(SerialNumbers).ToArray());
+                    _chosenDeviceIndex = EditorGUILayout.Popup("Specific Serial Number", 0, new List<string>() { "Select an available Serial Number" }.Query().Concat(SerialNumbers).ToArray());
 
                     if (_chosenDeviceIndex > 0)
                     {

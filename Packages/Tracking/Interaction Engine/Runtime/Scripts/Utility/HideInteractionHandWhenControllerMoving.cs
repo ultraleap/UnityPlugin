@@ -6,7 +6,7 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using System.Linq;
+using Leap.Unity.Query;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -43,7 +43,8 @@ namespace Leap.Unity.Interaction.Examples
             if (intCtrl != null && intHand == null && this.transform.parent != null)
             {
                 intHand = this.transform.parent.GetComponentsInChildren<InteractionHand>()
-                  .FirstOrDefault(h => h.isLeft == intCtrl.isLeft);
+                    .Query()
+                    .FirstOrDefault(h => h.isLeft == intCtrl.isLeft);
             }
         }
 

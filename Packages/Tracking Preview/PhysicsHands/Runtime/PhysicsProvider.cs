@@ -10,7 +10,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
+using Leap.Unity.Query;
 using UnityEngine;
 
 namespace Leap.Unity.Interaction.PhysicsHands
@@ -618,7 +618,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
         {
             for (int i = 0; i < _graspHelpers.Count; i++)
             {
-                _graspHelpers.ElementAt(i).Value.Gizmo();
+                _graspHelpers.Query().ElementAt(i).Value.Gizmo();
             }
         }
 

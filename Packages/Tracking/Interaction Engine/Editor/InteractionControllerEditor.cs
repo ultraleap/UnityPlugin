@@ -6,7 +6,7 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using System.Linq;
+using Leap.Unity.Query;
 using UnityEditor;
 
 namespace Leap.Unity.Interaction
@@ -73,7 +73,7 @@ namespace Leap.Unity.Interaction
             bool plural = targets.Length > 1;
             bool anyNotParentedToInteractionManager;
 
-            anyNotParentedToInteractionManager = targets.Any(c => c.GetComponentInParent<InteractionManager>() == null);
+            anyNotParentedToInteractionManager = targets.Query().Any(c => c.GetComponentInParent<InteractionManager>() == null);
 
             if (anyNotParentedToInteractionManager)
             {

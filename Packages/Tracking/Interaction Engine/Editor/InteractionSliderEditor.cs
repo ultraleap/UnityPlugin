@@ -6,7 +6,7 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using System.Linq;
+using Leap.Unity.Query;
 using UnityEditor;
 using UnityEngine;
 
@@ -29,10 +29,10 @@ namespace Leap.Unity.Interaction
             specifyCustomDecorator("horizontalSteps", decorateHorizontalSteps);
 
             // Only display vertical properties if relevant
-            InteractionSlider[] sliders = targets.Cast<InteractionSlider>().ToArray();
+            InteractionSlider[] sliders = targets.Query().Cast<InteractionSlider>().ToArray();
             specifyConditionalDrawing(() =>
             {
-                return sliders.Any(slider => slider.sliderType == InteractionSlider.SliderType.Vertical
+                return sliders.Query().Any(slider => slider.sliderType == InteractionSlider.SliderType.Vertical
                                                   || slider.sliderType == InteractionSlider.SliderType.TwoDimensional);
             },
                                       "defaultVerticalValue",
@@ -42,7 +42,7 @@ namespace Leap.Unity.Interaction
                                       "_verticalSlideEvent");
             specifyConditionalDrawing(() =>
             {
-                return sliders.Any(slider => slider.sliderType == InteractionSlider.SliderType.Horizontal
+                return sliders.Query().Any(slider => slider.sliderType == InteractionSlider.SliderType.Horizontal
                                                   || slider.sliderType == InteractionSlider.SliderType.TwoDimensional);
             },
                                       "defaultHorizontalValue",

@@ -7,7 +7,7 @@
  ******************************************************************************/
 
 
-using System.Linq;
+using Leap.Unity.Query;
 using UnityEngine;
 
 namespace Leap.Unity.Interaction.PhysicsHands
@@ -597,7 +597,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
             // Compute the distance midpoints between the thumb and the each finger and find the smallest.
             var minDistanceSquared = float.MaxValue;
-            foreach (var finger in hand.Fingers.Skip(1))
+            foreach (var finger in hand.Fingers.Query().Skip(1))
             {
                 var distanceSquared = (finger.TipPosition - thumbTipPosition).sqrMagnitude;
                 minDistanceSquared = Mathf.Min(distanceSquared, minDistanceSquared);
@@ -634,9 +634,9 @@ namespace Leap.Unity.Interaction.PhysicsHands
         {
             // Get the farthest 2 segments of thumb and index finger, respectively, and compute distances.
             var minDistanceSquared = float.MaxValue;
-            foreach (var thumbBone in hand.GetThumb().bones.Skip(2))
+            foreach (var thumbBone in hand.GetThumb().bones.Query().Skip(2))
             {
-                foreach (var indexBone in hand.GetIndex().bones.Skip(2))
+                foreach (var indexBone in hand.GetIndex().bones.Query().Skip(2))
                 {
                     var distanceSquared = CalculateBoneDistanceSquared(thumbBone, indexBone);
                     minDistanceSquared = Mathf.Min(distanceSquared, minDistanceSquared);

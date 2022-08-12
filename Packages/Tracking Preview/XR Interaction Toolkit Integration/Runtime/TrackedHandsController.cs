@@ -7,10 +7,10 @@
  ******************************************************************************/
 
 using Leap.Unity.Preview.HandRays;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.XR;
 using UnityEngine.XR.Interaction.Toolkit;
+using Leap.Unity.Query;
 
 namespace Leap.Unity.Preview.XRInteractionToolkit
 {
@@ -79,7 +79,7 @@ namespace Leap.Unity.Preview.XRInteractionToolkit
 
                 if (handRay == null)
                 {
-                    handRay = FindObjectsOfType<WristShoulderFarFieldHandRay>().FirstOrDefault(ray => ray.chirality == chirality);
+                    handRay = FindObjectsOfType<WristShoulderFarFieldHandRay>().Query().FirstOrDefault(ray => ray.chirality == chirality);
                 }
             }
 

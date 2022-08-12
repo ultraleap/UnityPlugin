@@ -7,7 +7,7 @@
  ******************************************************************************/
 
 using System.Collections.Generic;
-using System.Linq;
+using Leap.Unity.Query;
 using System.Reflection;
 using UnityEditor;
 using UnityEngine;
@@ -38,7 +38,7 @@ namespace Leap.Unity.Attributes
                     CombinablePropertyAttribute combinableProperty = o as CombinablePropertyAttribute;
                     if (combinableProperty != null)
                     {
-                        if (combinableProperty.SupportedTypes.Count() != 0 && !combinableProperty.SupportedTypes.Contains(property.propertyType))
+                        if (combinableProperty.SupportedTypes.Query().Count() != 0 && !combinableProperty.SupportedTypes.Query().Contains(property.propertyType))
                         {
                             Debug.LogError("Property attribute " +
                                            combinableProperty.GetType().Name +
@@ -59,7 +59,7 @@ namespace Leap.Unity.Attributes
         {
             getAttributes(property);
 
-            var topPanelDrawer = attributes.Select(item => item as ITopPanelDrawer)
+            var topPanelDrawer = attributes.Query().Select(item => item as ITopPanelDrawer)
               .Where(o => o != null).FirstOrDefault();
             if (topPanelDrawer != null)
             {
@@ -96,7 +96,7 @@ namespace Leap.Unity.Attributes
             RangeAttribute rangeAttribute = null;
             if (fieldInfo != null)
             {
-                rangeAttribute = fieldInfo.GetCustomAttributes(typeof(RangeAttribute), true).FirstOrDefault() as RangeAttribute;
+                rangeAttribute = fieldInfo.GetCustomAttributes(typeof(RangeAttribute), true).Query().FirstOrDefault() as RangeAttribute;
             }
 
             ISupportDragAndDrop dragAndDropSupport = null;

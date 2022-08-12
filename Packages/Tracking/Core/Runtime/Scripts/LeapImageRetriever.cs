@@ -9,7 +9,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
+using Leap.Unity.Query;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -173,8 +173,8 @@ namespace Leap.Unity
                 byte[] data = image.Data(Image.CameraType.LEFT);
                 if (_hideLeapDebugInfo && controller != null)
                 {
-                    Device[] devices = controller.Devices.ActiveDevices.ToArray();
-                    Device specificDevice = devices.FirstOrDefault(d => d.DeviceID == deviceID);
+                    Device[] devices = controller.Devices.ActiveDevices.Query().ToArray();
+                    Device specificDevice = devices.Query().FirstOrDefault(d => d.DeviceID == deviceID);
 
                     if (specificDevice != null)
                     {
@@ -290,7 +290,7 @@ namespace Leap.Unity
 
             private void addDistortionData(Image image, Color32[] colors, int startIndex)
             {
-                float[] distortionData = image.Distortion(Image.CameraType.LEFT).
+                float[] distortionData = image.Distortion(Image.CameraType.LEFT).Query().
                                                Concat(image.Distortion(Image.CameraType.RIGHT)).
                                                ToArray();
 
@@ -768,7 +768,7 @@ namespace Leap.Unity
 
             if (recount)
             {
-                _policiesSet = _policiesSet.Where(pair => pair.Value.Count > 0)
+                _policiesSet = _policiesSet.Query().Where(pair => pair.Value.Count > 0)
                                                  .ToDictionary(pair => pair.Key,
                                                                pair => pair.Value);
             }

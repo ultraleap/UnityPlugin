@@ -13,7 +13,7 @@ using UnityEditor;
 #endif
 using Leap.Unity;
 using System;
-using System.Linq;
+using Leap.Unity.Query;
 
 
 namespace Leap.Unity.Interaction.PhysicsHands
@@ -527,7 +527,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 {
                     continue;
                 }
-                if (_physicsHand.gameObject != _teleportColliders[i].gameObject && !_physicsHand.jointBodies.Select(x => x.gameObject).Contains(_teleportColliders[i].gameObject))
+                if (_physicsHand.gameObject != _teleportColliders[i].gameObject && !_physicsHand.jointBodies.Query().Select(x => x.gameObject).Contains(_teleportColliders[i].gameObject))
                 {
                     found = true;
                     break;
@@ -546,7 +546,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 {
                     continue;
                 }
-                if (_physicsHand.gameObject != _teleportColliders[i].gameObject && !_physicsHand.jointBodies.Select(x => x.gameObject).Contains(_teleportColliders[i].gameObject))
+                if (_physicsHand.gameObject != _teleportColliders[i].gameObject && !_physicsHand.jointBodies.Query().Select(x => x.gameObject).Contains(_teleportColliders[i].gameObject))
                 {
                     found = true;
                     break;

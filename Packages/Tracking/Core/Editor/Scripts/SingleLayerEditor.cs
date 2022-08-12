@@ -8,9 +8,9 @@
 
 
 using System.Collections.Generic;
-using System.Linq;
 using UnityEditor;
 using UnityEngine;
+using Leap.Unity.Query;
 
 namespace Leap.Unity
 {
@@ -50,7 +50,7 @@ namespace Leap.Unity
                 }
             }
 
-            var tooltipAttribute = fieldInfo.GetCustomAttributes(typeof(TooltipAttribute), true).
+            var tooltipAttribute = fieldInfo.GetCustomAttributes(typeof(TooltipAttribute), true).Query().
                                              Cast<TooltipAttribute>().
                                              FirstOrDefault();
 
@@ -89,8 +89,8 @@ namespace Leap.Unity
                     }
                 }
 
-                _layerValues = valueToLayer.Keys.ToList();
-                _layerNames = valueToLayer.Values.ToArray();
+                _layerValues = valueToLayer.Keys.Query().ToList();
+                _layerNames = valueToLayer.Values.Query().ToArray();
             }
         }
     }

@@ -3,7 +3,7 @@ using Leap.Unity;
 using Leap.Unity.Encoding;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
+using Leap.Unity.Query;
 using UnityEngine;
 
 /// <summary>
@@ -30,7 +30,7 @@ public class JointOcclusion : MonoBehaviour
     /// </summary>
     public void Setup()
     {
-        List<JointOcclusion> allJointOcclusions = FindObjectsOfType<JointOcclusion>().ToList();
+        List<JointOcclusion> allJointOcclusions = FindObjectsOfType<JointOcclusion>().Query().ToList();
         layerName = "JointOcclusion" + allJointOcclusions.IndexOf(this).ToString();
 
         cam = GetComponent<Camera>();
@@ -175,11 +175,11 @@ public class JointOcclusion : MonoBehaviour
 
                 if (hand.IsLeft)
                 {
-                    pixelsSeenCount[key] = tempPixels.Where(x => DistanceBetweenColors(x, occlusionSphereColorsLeft[capsuleHandKey]) < 0.01f).Count();
+                    pixelsSeenCount[key] = tempPixels.Query().Where(x => DistanceBetweenColors(x, occlusionSphereColorsLeft[capsuleHandKey]) < 0.01f).Count();
                 }
                 else
                 {
-                    pixelsSeenCount[key] = tempPixels.Where(x => DistanceBetweenColors(x, occlusionSphereColorsRight[capsuleHandKey]) < 0.01f).Count();
+                    pixelsSeenCount[key] = tempPixels.Query().Where(x => DistanceBetweenColors(x, occlusionSphereColorsRight[capsuleHandKey]) < 0.01f).Count();
                 }
             }
         }

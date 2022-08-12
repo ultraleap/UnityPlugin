@@ -8,7 +8,7 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using Leap.Unity.Query;
 using UnityEditor;
 using UnityEngine;
 
@@ -25,7 +25,8 @@ namespace Leap.Unity
             base.OnEnable();
 
             target = base.target as T;
-            targets = base.targets.Where(t => t != null).
+            targets = base.targets.Query()
+                                   .Where(t => t != null).
                                    OfType<T>().
                                    ToArray();
         }

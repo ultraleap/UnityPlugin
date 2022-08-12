@@ -7,7 +7,7 @@
  ******************************************************************************/
 
 using System.Collections.Generic;
-using System.Linq;
+using Leap.Unity.Query;
 using UnityEditor;
 using UnityEngine;
 
@@ -307,7 +307,7 @@ namespace Leap.Unity.HandsModule
                 if ((int)previousBoundType != boundType.intValue)
                 {
                     //Check to see if any of the offsets are the same as this one
-                    if (myTarget.Offsets.Any(x => (int)x == boundType.intValue))
+                    if (myTarget.Offsets.Query().Any(x => (int)x == boundType.intValue))
                     {
                         boundType.intValue = (int)previousBoundType;
                     }
@@ -351,7 +351,7 @@ namespace Leap.Unity.HandsModule
                         enumList.Add(i);
                     }
 
-                    var result = enumList.Where(typeA => myTarget.Offsets.All(typeB => (int)typeB != typeA)).FirstOrDefault();
+                    var result = enumList.Query().Where(typeA => myTarget.Offsets.Query().All(typeB => (int)typeB != typeA)).FirstOrDefault();
 
                     offset.intValue = result;
                     //Give the UI a chance to update
@@ -517,7 +517,7 @@ namespace Leap.Unity.HandsModule
                         index++;
                     }
 
-                    Handles.DrawDottedLine(finger.bones.Last().PrevJoint, finger.TipPosition, 5);
+                    Handles.DrawDottedLine(finger.bones.Query().Last().PrevJoint, finger.TipPosition, 5);
                     Handles.SphereHandleCap(-1, finger.TipPosition, Quaternion.identity, gizmoSize.floatValue, EventType.Repaint);
                 }
 

@@ -3,7 +3,7 @@ using Leap.Unity;
 using Leap.Unity.Encoding;
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using Leap.Unity.Query;
 using UnityEngine;
 using Bone = Leap.Bone;
 using Hand = Leap.Hand;
@@ -270,7 +270,7 @@ namespace Ultraleap.Tracking.OpenXR
 
             // Compute the distance midpoints between the thumb and the each finger and find the smallest.
             var minDistanceSquared = float.MaxValue;
-            foreach (var finger in hand.Fingers.Skip(1))
+            foreach (var finger in hand.Fingers.Query().Skip(1))
             {
                 var distanceSquared = (finger.TipPosition - thumbTipPosition).sqrMagnitude;
                 minDistanceSquared = Mathf.Min(distanceSquared, minDistanceSquared);
@@ -307,9 +307,9 @@ namespace Ultraleap.Tracking.OpenXR
         {
             // Get the farthest 2 segments of thumb and index finger, respectively, and compute distances.
             var minDistanceSquared = float.MaxValue;
-            foreach (var thumbBone in hand.GetThumb().bones.Skip(2))
+            foreach (var thumbBone in hand.GetThumb().bones.Query().Skip(2))
             {
-                foreach (var indexBone in hand.GetIndex().bones.Skip(2))
+                foreach (var indexBone in hand.GetIndex().bones.Query().Skip(2))
                 {
                     var distanceSquared = CalculateBoneDistanceSquared(thumbBone, indexBone);
                     minDistanceSquared = Mathf.Min(distanceSquared, minDistanceSquared);

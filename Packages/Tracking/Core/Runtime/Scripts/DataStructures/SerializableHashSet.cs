@@ -9,7 +9,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
+using Leap.Unity.Query;
 using UnityEngine;
 
 namespace Leap.Unity
@@ -180,7 +180,7 @@ namespace Leap.Unity
             {
                 if (isNull(value))
                 {
-                    if (!_values.Any(obj => isNull(obj)))
+                    if (!_values.Query().Any(obj => isNull(obj)))
                     {
                         _values.Add(value);
                     }

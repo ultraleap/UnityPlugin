@@ -6,7 +6,7 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 using System;
-using System.Linq;
+using Leap.Unity.Query;
 using UnityEngine;
 
 #if ENABLE_INPUT_SYSTEM
@@ -99,7 +99,7 @@ namespace Leap.Unity.Controllers
                 currentInputTypes = new InputMethodType[] { InputMethodType.LeapHand, InputMethodType.LeapHand };
             }
 
-            _oldInputTypes = currentInputTypes.ToArray();
+            _oldInputTypes = currentInputTypes.Query().ToArray();
         }
 
         private void Update()

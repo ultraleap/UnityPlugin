@@ -1,7 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
+using Leap.Unity.Query;
 using System.Text.RegularExpressions;
 using UnityEngine;
 
@@ -117,7 +117,7 @@ namespace Leap.Unity.HandsModule
         {
             int iteration = 0;
             var name = desiredHandModelId;
-            List<string> existingIds = HandModelPairs.Select(hmp => hmp.HandModelPairId).ToList();
+            List<string> existingIds = HandModelPairs.Query().Select(hmp => hmp.HandModelPairId).ToList();
 
             while (existingIds.Contains(name))
             {
@@ -167,7 +167,7 @@ namespace Leap.Unity.HandsModule
             }
 
             //If not found in previously registered hands, look for in the parent transform
-            HandModelBase potentialHandPair = handModel.gameObject.transform.parent.GetComponentsInChildren<HandModelBase>().FirstOrDefault(hmb => hmb != handModel);
+            HandModelBase potentialHandPair = handModel.gameObject.transform.parent.GetComponentsInChildren<HandModelBase>().Query().FirstOrDefault(hmb => hmb != handModel);
 
             HandModelPairs.Add(new HandModelPair());
 
@@ -264,7 +264,7 @@ namespace Leap.Unity.HandsModule
             handModelPair = null;
             if (handModelPairID != null)
             {
-                handModelPair = HandModelPairs.FirstOrDefault(hmp => hmp.HandModelPairId == handModelPairID);
+                handModelPair = HandModelPairs.Query().FirstOrDefault(hmp => hmp.HandModelPairId == handModelPairID);
                 return true;
             }
             return false;
@@ -370,7 +370,7 @@ namespace Leap.Unity.HandsModule
         /// <param name="disableOtherHandModelsOfSameChirality">If true, disable all other active hand models of the same chirality</param>
         public void EnableHandModelPair(Chirality chirality, string handModelPairID, bool disableOtherHandModelsOfSameChirality = true)
         {
-            HandModelPair handModelPair = HandModelPairs.ToList().Where(hmp => hmp.HandModelPairId == handModelPairID).FirstOrDefault();
+            HandModelPair handModelPair = HandModelPairs.Query().ToList().Query().Where(hmp => hmp.HandModelPairId == handModelPairID).FirstOrDefault();
             EnableHandModel(chirality, handModelPair, disableOtherHandModelsOfSameChirality);
         }
 
@@ -472,7 +472,7 @@ namespace Leap.Unity.HandsModule
         /// <param name="handModelPairId">The model pair id of the model to disable</param>
         public void DisableHandModel(Chirality chirality, string handModelPairId)
         {
-            HandModelPair handModelPair = HandModelPairs.ToList().Where(hmp => hmp.HandModelPairId == handModelPairId).FirstOrDefault();
+            HandModelPair handModelPair = HandModelPairs.Query().ToList().Query().Where(hmp => hmp.HandModelPairId == handModelPairId).FirstOrDefault();
             DisableHandModel(chirality, handModelPair);
         }
 

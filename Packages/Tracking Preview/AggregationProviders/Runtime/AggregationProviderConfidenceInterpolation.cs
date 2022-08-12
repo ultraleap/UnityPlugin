@@ -9,7 +9,7 @@
 using Leap.Unity.Encoding;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
+using Leap.Unity.Query;
 using UnityEngine;
 
 namespace Leap.Unity
@@ -144,7 +144,7 @@ namespace Leap.Unity
 
 
             // normalize hand confidences:
-            float sum = leftHandConfidences.Sum();
+            float sum = leftHandConfidences.Query().Sum();
             if (sum != 0)
             {
                 for (int hands_idx = 0; hands_idx < leftHandConfidences.Count; hands_idx++)
@@ -159,7 +159,7 @@ namespace Leap.Unity
                     leftHandConfidences[hands_idx] = 1f / leftHandConfidences.Count;
                 }
             }
-            sum = rightHandConfidences.Sum();
+            sum = rightHandConfidences.Query().Sum();
             if (sum != 0)
             {
                 for (int hands_idx = 0; hands_idx < rightHandConfidences.Count; hands_idx++)
@@ -178,7 +178,7 @@ namespace Leap.Unity
             // normalize joint confidences:
             for (int joint_idx = 0; joint_idx < VectorHand.NUM_JOINT_POSITIONS; joint_idx++)
             {
-                sum = leftJointConfidences.Sum(x => x[joint_idx]);
+                sum = leftJointConfidences.Query().Select(x => x[joint_idx]).Sum();
                 if (sum != 0)
                 {
                     for (int hands_idx = 0; hands_idx < leftJointConfidences.Count; hands_idx++)
@@ -194,7 +194,7 @@ namespace Leap.Unity
                     }
                 }
 
-                sum = rightJointConfidences.Sum(x => x[joint_idx]);
+                sum = rightJointConfidences.Query().Select(x => x[joint_idx]).Sum();
                 if (sum != 0)
                 {
                     for (int hands_idx = 0; hands_idx < rightJointConfidences.Count; hands_idx++)
@@ -249,7 +249,7 @@ namespace Leap.Unity
                 mergedPalmPos += hands[hands_idx].PalmPosition * handConfidences[hands_idx];
 
                 // rotation
-                float lerpValue = handConfidences.Take(hands_idx).Sum() / handConfidences.Take(hands_idx + 1).Sum();
+                float lerpValue = handConfidences.Query().Take(hands_idx).Sum() / handConfidences.Query().Take(hands_idx + 1).Sum();
                 mergedPalmRot = Quaternion.Lerp(hands[hands_idx].Rotation, mergedPalmRot, lerpValue);
             }
 
@@ -954,7 +954,8 @@ namespace Leap.Unity
 
                     for (int hand_idx = 1; hand_idx < jointConfidences.Count; hand_idx++)
                     {
-                        float lerpValue = jointConfidences.Take(hand_idx).Sum(x => x[confidence_idx]) / jointConfidences.Take(hand_idx + 1).Sum(x => x[confidence_idx]);
+                        float lerpValue = jointConfidences.Query().Take(hand_idx).GetEnumerator().Query().Select(x => x[confidence_idx]).Sum() / 
+                                            jointConfidences.Query().Take(hand_idx + 1).GetEnumerator().Query().Select(x => x[confidence_idx]).Sum();
                         colors[capsuleHand_idx] = Color.Lerp(debugColors[hand_idx], colors[capsuleHand_idx], lerpValue);
                     }
                 }

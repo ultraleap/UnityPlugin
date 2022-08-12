@@ -12,7 +12,7 @@ using Leap.Unity.Interaction.Internal;
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using Leap.Unity.Query;
 using UnityEngine;
 
 namespace Leap.Unity.Interaction
@@ -329,7 +329,7 @@ namespace Leap.Unity.Interaction
         /// If no controllers (Leap hands or supported VR controllers) are currently grasping this object,
         /// returns null.
         /// </summary>
-        public InteractionController graspingController { get { return _graspingControllers.FirstOrDefault(); } }
+        public InteractionController graspingController { get { return _graspingControllers.Query().FirstOrDefault(); } }
 
         /// <summary>
         /// Gets the set of all interaction controllers currently grasping this object. Interaction
@@ -346,7 +346,7 @@ namespace Leap.Unity.Interaction
             get
             {
                 _graspingHandsBuffer.Clear();
-                var hands = _graspingControllers.OfType<InteractionHand>();
+                var hands = _graspingControllers.Query().OfType<InteractionHand>();
 
                 foreach (InteractionHand hand in hands)
                 {
@@ -1554,7 +1554,7 @@ namespace Leap.Unity.Interaction
             // If multi-grasp is not allowed, release the old grasp.
             if (!allowMultiGrasp && isGrasped)
             {
-                _graspingControllers.First().ReleaseGrasp();
+                _graspingControllers.Query().First().ReleaseGrasp();
             }
 
             // Add each newly grasping hand to internal reference and pose solver.
@@ -1649,7 +1649,7 @@ namespace Leap.Unity.Interaction
 
                 if (controllers.Count == 1)
                 {
-                    throwHandler.OnThrow(this, controllers.First());
+                    throwHandler.OnThrow(this, controllers.Query().First());
                 }
 
                 OnGraspEnd();

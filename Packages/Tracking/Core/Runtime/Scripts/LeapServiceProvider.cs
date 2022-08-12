@@ -10,7 +10,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
+using Leap.Unity.Query;
 using UnityEngine;
 
 namespace Leap.Unity
@@ -219,7 +219,7 @@ namespace Leap.Unity
             {
                 if (_currentDevice == null && _multipleDeviceMode == MultipleDeviceMode.Disabled)
                 {
-                    _currentDevice = GetLeapController().Devices.ActiveDevices.FirstOrDefault();
+                    _currentDevice = GetLeapController().Devices.ActiveDevices.Query().FirstOrDefault();
                 }
                 return _currentDevice;
             }

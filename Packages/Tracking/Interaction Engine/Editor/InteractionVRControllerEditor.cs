@@ -8,7 +8,7 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using Leap.Unity.Query;
 using UnityEditor;
 using UnityEngine;
 
@@ -30,6 +30,7 @@ namespace Leap.Unity.Interaction
 
             //_vrController = (target as InteractionVRController);
             _vrControllers = targets
+                                    .Query()
                                     .Where(c => c is InteractionXRController)
                                     .Cast<InteractionXRController>()
                                     .ToList();
@@ -42,8 +43,9 @@ namespace Leap.Unity.Interaction
         {
             // Whether the axis is overriden.
             int numGraspAxisOverrides = _vrControllers
-                                                      .Where(c => c.graspAxisOverride != null)
-                                                      .Count();
+                                    .Query()
+                                    .Where(c => c.graspAxisOverride != null)
+                                    .Count();
             bool anyGraspAxisOverrides = numGraspAxisOverrides > 0;
 
             if (anyGraspAxisOverrides)
@@ -66,9 +68,10 @@ namespace Leap.Unity.Interaction
 
             // Whether the axis is valid.
             bool anyInvalidGraspAxes = _vrControllers
-                                                     .Select(c => isGraspAxisConfigured(c))
-                                                     .Where(b => b == false)
-                                                     .Any();
+                                    .Query()
+                                    .Select(c => isGraspAxisConfigured(c))
+                                    .Where(b => b == false)
+                                    .Any();
 
             if (anyInvalidGraspAxes)
             {

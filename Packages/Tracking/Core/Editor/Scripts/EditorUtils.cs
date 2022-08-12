@@ -8,7 +8,7 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using Leap.Unity.Query;
 using System.Reflection;
 using UnityEditor;
 using UnityEngine;
@@ -53,7 +53,7 @@ namespace Leap.Unity
                         var fieldInfos = compType.GetFields(BindingFlags.Instance
                           | BindingFlags.FlattenHierarchy | BindingFlags.NonPublic
                           | BindingFlags.Public);
-                        foreach (var fieldInfo in fieldInfos.
+                        foreach (var fieldInfo in fieldInfos.Query().
                             Where(fi => fi.FieldType.IsAssignableFrom(refType)))
                         {
                             var refValue = fieldInfo.GetValue(component) as T;

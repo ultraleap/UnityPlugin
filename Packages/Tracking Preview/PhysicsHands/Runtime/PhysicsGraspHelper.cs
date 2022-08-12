@@ -1,6 +1,6 @@
 using Leap.Interaction.Internal.InteractionEngineUtility;
 using System.Collections.Generic;
-using System.Linq;
+using Leap.Unity.Query;
 using UnityEngine;
 
 namespace Leap.Unity.Interaction.PhysicsHands
@@ -101,11 +101,11 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
                     case 1:
                     case 2:
-                        return bones[finger].Count > 0 && bones[finger].Any(x => x.Joint != 0);
+                        return bones[finger].Count > 0 && bones[finger].Query().Any(x => x.Joint != 0);
 
                     case 3:
                     case 4:
-                        return bones[finger].Count > 0 && bones[finger].Any(x => x.Joint == 2);
+                        return bones[finger].Count > 0 && bones[finger].Query().Any(x => x.Joint == 2);
                 }
                 return false;
             }
@@ -117,7 +117,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             _rigid = rigid;
             _oldKinematic = _rigid.isKinematic;
             _oldGravity = _rigid.useGravity;
-            _colliders = rigid.GetComponentsInChildren<Collider>(true).ToList();
+            _colliders = rigid.GetComponentsInChildren<Collider>(true).Query().ToList();
             _ignored = rigid.GetComponentInChildren<PhysicsIgnoreHelpers>();
             Manager = manager;
         }
@@ -464,7 +464,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                     {
                         foreach (var item in pair.Key.GetPhysicsHand().jointBones)
                         {
-                            if (item.Finger == _bones[pair.Key][j].First().Finger)
+                            if (item.Finger == _bones[pair.Key][j].Query().First().Finger)
                             {
                                 item.AddGrasping(_rigid);
                             }

@@ -8,7 +8,7 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using Leap.Unity.Query;
 using UnityEngine;
 
 namespace Leap.Unity.HandsModule
@@ -52,8 +52,8 @@ namespace Leap.Unity.HandsModule
             var middleBones = SortBones(SelectBones(children, boneDefinitions.DefinitionMiddle));
             var ringBones = SortBones(SelectBones(children, boneDefinitions.DefinitionRing));
             var pinkyBones = SortBones(SelectBones(children, boneDefinitions.DefinitionPinky));
-            var wrist = SelectBones(children, boneDefinitions.DefinitionWrist).FirstOrDefault();
-            var elbow = SelectBones(children, boneDefinitions.DefinitionElbow).FirstOrDefault();
+            var wrist = SelectBones(children, boneDefinitions.DefinitionWrist).Query().FirstOrDefault();
+            var elbow = SelectBones(children, boneDefinitions.DefinitionElbow).Query().FirstOrDefault();
 
             handBinder.BoundHand.fingers[0].boundBones = AssignTransformToBoundBone(thumbBones);
             handBinder.BoundHand.fingers[1].boundBones = AssignTransformToBoundBone(indexBones);
@@ -342,7 +342,7 @@ namespace Leap.Unity.HandsModule
             for (int i = 0; i < handBinder.BoundHand.fingers.Length; i++)
             {
                 var finger = handBinder.BoundHand.fingers[i];
-                var lastBone = finger.boundBones.LastOrDefault().boundTransform;
+                var lastBone = finger.boundBones.Query().LastOrDefault().boundTransform;
                 var previousBone = finger.boundBones[(int)Bone.BoneType.TYPE_INTERMEDIATE].boundTransform;
 
                 if (lastBone != null)

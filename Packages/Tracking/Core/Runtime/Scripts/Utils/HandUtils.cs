@@ -7,7 +7,7 @@
  ******************************************************************************/
 
 using System.Collections.Generic;
-using System.Linq;
+using Leap.Unity.Query;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -122,7 +122,7 @@ namespace Leap.Unity
             {
                 if (Provider == null) return null;
                 if (Provider.CurrentFrame == null) return null;
-                return Provider.CurrentFrame.Hands.FirstOrDefault(hand => hand.IsLeft);
+                return Provider.CurrentFrame.Hands.Query().FirstOrDefault(hand => hand.IsLeft);
             }
         }
 
@@ -136,7 +136,7 @@ namespace Leap.Unity
             {
                 if (Provider == null) return null;
                 if (Provider.CurrentFrame == null) return null;
-                else return Provider.CurrentFrame.Hands.FirstOrDefault(hand => hand.IsRight);
+                else return Provider.CurrentFrame.Hands.Query().FirstOrDefault(hand => hand.IsRight);
             }
         }
 
@@ -150,7 +150,7 @@ namespace Leap.Unity
             {
                 if (Provider == null) return null;
                 if (Provider.CurrentFixedFrame == null) return null;
-                return Provider.CurrentFixedFrame.Hands.FirstOrDefault(hand => hand.IsLeft);
+                return Provider.CurrentFixedFrame.Hands.Query().FirstOrDefault(hand => hand.IsLeft);
             }
         }
 
@@ -164,7 +164,7 @@ namespace Leap.Unity
             {
                 if (Provider == null) return null;
                 if (Provider.CurrentFixedFrame == null) return null;
-                else return Provider.CurrentFixedFrame.Hands.FirstOrDefault(hand => hand.IsRight);
+                else return Provider.CurrentFixedFrame.Hands.Query().FirstOrDefault(hand => hand.IsRight);
             }
         }
 
@@ -605,7 +605,7 @@ namespace Leap.Unity
         public static Hand GetHand(this Frame frame, Chirality whichHand)
         {
             if (frame.Hands == null) { return null; }
-            return frame.Hands.FirstOrDefault(
+            return frame.Hands.Query().FirstOrDefault(
               h => h.IsLeft == (whichHand == Chirality.Left));
         }
 

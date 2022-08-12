@@ -8,7 +8,7 @@
 
 using Leap.Unity.Attributes;
 using System;
-using System.Linq;
+using Leap.Unity.Query;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -324,6 +324,7 @@ namespace Leap.Unity.Attachments
             {
                 // First, see if there's already one in the hierarchy! Might exist due to, e.g. an Undo operation
                 var existingPointBehaviour = this.gameObject.GetComponentsInChildren<AttachmentPointBehaviour>()
+                                                            .Query()
                                                             .FirstOrDefault(p => p.attachmentPoint == singlePoint);
 
                 // Only make a new object if the transform really doesn't exist.
