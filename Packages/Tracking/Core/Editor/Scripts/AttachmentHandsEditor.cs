@@ -116,7 +116,7 @@ namespace Leap.Unity.Attachments
 
                 target.attachmentPoints = attachmentPoints | flag; // Set flag bit to 1.
             }
-            else
+            else if ((attachmentPoints & flag) == flag) // only delete the attachment point, if the toggle value has actually just been changed
             {
                 if (!wouldFlagDeletionDestroyData(target, flag))
                 {
