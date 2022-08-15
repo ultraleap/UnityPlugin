@@ -6,6 +6,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [docs-website]: https://docs.ultraleap.com/unity-api/ "Ultraleap Docs"
 
+## [NEXT] - unreleased
+
+### Added
+- Added a low poly hand model with an arm
+- Added create menu options for LeapServiceProviders via GameObject/Ultrealeap/Service Provider (X)
+
+### Changed
+- Cleaned up the image retriever and LeapServiceProvider Execution order, reducing unnecessary service and log messages
+
+### Fixed
+
+- HandBinder scales hands in edit mode when there is no LeapServiceProvider in the scene
+- Leap.Controller.InternalFrameReady, LeapInternalFrame is never dispatched
+- HandUI example scene panel exists after hand lost
+- ChangeTrackingMode and GetTrackingMode on LeapServiceProvider fail when in disabled multi-device mode
+- FOV Gizmos are not visible when opening an example scene containing a Service Provider in multiDeviceMode = disabled.
+- FOV Gizmos are not visible when changing render pipelines
+
+- AttachmentHands untick bone in inspector UI causes looping error when deleting gameobject in edit mode
+
 ## [5.13.0] - 21/07/2022
 
 ### Announcements
@@ -38,6 +58,7 @@ If you have any concerns about this, please contact us on [Github Discussions](h
 - Hand UI can become detached from hand when hand is removed from view
 - Multi-device (desktop) Scene camera position can become offset
 - FOV visualization does not display after changing render pipelines
+- Use of the LeapCSharp Config class is unavailable with v5.X tracking service
 
 ## [5.12.1] - 06/07/2022
 

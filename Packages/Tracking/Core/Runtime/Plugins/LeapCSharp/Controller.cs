@@ -683,6 +683,11 @@ namespace Leap
             return IsPolicySet(policy, null);
         }
 
+        public bool IsDeviceAvailable(Device device = null)
+        {
+            return _connection.IsDeviceAvailable(device);
+        }
+
         /// <summary>
         /// In most cases you should get Frame objects using the LeapProvider.CurrentFrame
         /// property. The data in Frame objects taken directly from a Leap.Controller instance

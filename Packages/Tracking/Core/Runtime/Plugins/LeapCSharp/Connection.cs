@@ -421,6 +421,11 @@ namespace LeapInternal
             {
                 LeapFrame.DispatchOnContext(this, EventContext, new FrameEventArgs(new Frame(deviceID).CopyFrom(ref trackingMsg)));
             }
+
+            if (LeapInternalFrame != null)
+            {
+                LeapInternalFrame.DispatchOnContext(this, EventContext, new InternalFrameEventArgs(ref trackingMsg));
+            }
         }
 
 
@@ -1058,6 +1063,17 @@ namespace LeapInternal
             }
 
             return false;
+        }
+
+        public bool IsDeviceAvailable(Device device = null)
+        {
+            uint deviceID = 0;
+            if(device != null)
+            {
+                deviceID = device.DeviceID;
+            }
+
+            return _activePolicies.ContainsKey(deviceID);
         }
 
         public uint GetConfigValue(string config_key)

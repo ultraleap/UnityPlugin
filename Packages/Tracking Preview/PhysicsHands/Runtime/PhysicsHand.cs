@@ -49,6 +49,9 @@ namespace Leap.Unity.Interaction.PhysicsHands
             [HideInInspector]
             public float stiffness, forceLimit;
             public float boneMass;
+
+            [HideInInspector]
+            public PhysicMaterial physicMaterial;
         }
 
         private PhysicsProvider _physicsProvider;
@@ -520,6 +523,10 @@ namespace Leap.Unity.Interaction.PhysicsHands
             int overlappingColliders = Physics.OverlapSphereNonAlloc(_physicsHand.palmBody.worldCenterOfMass, radius, _teleportColliders, _layerMask, QueryTriggerInteraction.Ignore);
             for (int i = 0; i < overlappingColliders; i++)
             {
+                if (_teleportColliders[i].attachedRigidbody != null && _teleportColliders[i].attachedRigidbody.TryGetComponent<PhysicsIgnoreHelpers>(out var temp))
+                {
+                    continue;
+                }
                 if (_physicsHand.gameObject != _teleportColliders[i].gameObject && !_physicsHand.jointBodies.Select(x => x.gameObject).Contains(_teleportColliders[i].gameObject))
                 {
                     found = true;
@@ -535,6 +542,10 @@ namespace Leap.Unity.Interaction.PhysicsHands
             overlappingColliders = Physics.OverlapSphereNonAlloc(_originalLeapHand.PalmPosition.ToVector3(), radius, _teleportColliders, _layerMask, QueryTriggerInteraction.Ignore);
             for (int i = 0; i < overlappingColliders; i++)
             {
+                if (_teleportColliders[i].attachedRigidbody != null && _teleportColliders[i].attachedRigidbody.TryGetComponent<PhysicsIgnoreHelpers>(out var temp))
+                {
+                    continue;
+                }
                 if (_physicsHand.gameObject != _teleportColliders[i].gameObject && !_physicsHand.jointBodies.Select(x => x.gameObject).Contains(_teleportColliders[i].gameObject))
                 {
                     found = true;
