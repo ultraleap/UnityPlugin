@@ -922,7 +922,9 @@ namespace Leap.Unity
                 return;
             }
 
-            _leapController = new Controller(SpecificSerialNumber.GetHashCode(), _serverNameSpace, _multipleDeviceMode != MultipleDeviceMode.Disabled);
+            string serialNumber = _multipleDeviceMode != MultipleDeviceMode.Disabled ? SpecificSerialNumber : "";
+
+            _leapController = new Controller(serialNumber.GetHashCode(), _serverNameSpace, _multipleDeviceMode != MultipleDeviceMode.Disabled);
 
             _leapController.Device += (s, e) =>
             {
