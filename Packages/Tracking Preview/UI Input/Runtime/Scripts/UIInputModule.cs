@@ -86,6 +86,8 @@ namespace Leap.Unity.InputModule
         private IProjectionOriginProvider _projectionOriginProvider;
         public IProjectionOriginProvider ProjectionOriginProvider => _projectionOriginProvider;
 
+        [SerializeField] private bool _drawGizmos = false;
+
         #endregion
 
         #region Unity methods
@@ -207,6 +209,10 @@ namespace Leap.Unity.InputModule
 
         private void OnDrawGizmos()
         {
+            if (!_drawGizmos)
+            {
+                return;
+            }
             if (_projectionOriginProvider != null)
             {
                 _projectionOriginProvider.DrawGizmos();
