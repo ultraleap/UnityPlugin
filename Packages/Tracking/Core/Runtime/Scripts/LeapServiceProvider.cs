@@ -591,9 +591,9 @@ namespace Leap.Unity
         }
 
 #endif
-#endregion
+        #endregion
 
-            #region Unity Events
+        #region Unity Events
 
         protected virtual void Reset()
         {

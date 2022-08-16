@@ -17,7 +17,7 @@ namespace Leap.Unity
 
     [CanEditMultipleObjects]
     [CustomEditor(typeof(XRHeightOffset))]
-    
+
     public class XRHeightOffsetEditor : CustomEditorBase<XRHeightOffset>
     {
 

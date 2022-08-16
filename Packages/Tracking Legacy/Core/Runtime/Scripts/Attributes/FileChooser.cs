@@ -12,10 +12,10 @@ using UnityEngine;
 
 namespace Leap.Unity.Attributes
 {
-    
+
     public enum FileDialogType { Open, Save, Folder };
 
-    
+
     public class ReadFileChooserAttribute : FileChooserAttribute
     {
         public ReadFileChooserAttribute(bool preserveExistingFileName = false,
@@ -33,7 +33,7 @@ namespace Leap.Unity.Attributes
         { }
     }
 
-    
+
     public class FolderChooserAttribute : FileChooserAttribute
     {
         public FolderChooserAttribute(bool preserveExistingFileName = false,
@@ -42,7 +42,7 @@ namespace Leap.Unity.Attributes
         { }
     }
 
-    
+
     public class FileChooserAttribute : CombinablePropertyAttribute,
       IAfterFieldAdditiveDrawer
     {

@@ -12,7 +12,7 @@ using System.Collections.Generic;
 
 namespace Leap.Unity
 {
-    
+
     public static class SliceExtensions
     {
 
@@ -68,7 +68,7 @@ namespace Leap.Unity
 
     }
 
-    
+
     public struct Slice<T> : IIndexableStruct<T, Slice<T>>
     {
 

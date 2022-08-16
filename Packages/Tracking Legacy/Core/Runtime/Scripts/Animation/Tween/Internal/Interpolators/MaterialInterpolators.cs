@@ -24,7 +24,7 @@ namespace Leap.Unity.Animation
 
 namespace Leap.Unity.Animation.Internal
 {
-    
+
     public struct MaterialSelector
     {
         private Material _target;

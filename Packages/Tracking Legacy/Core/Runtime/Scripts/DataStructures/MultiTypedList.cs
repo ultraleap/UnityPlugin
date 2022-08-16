@@ -16,7 +16,7 @@ using UnityEditor;
 
 namespace Leap.Unity
 {
-    
+
     public abstract class MultiTypedList
     {
         [Serializable]
@@ -36,7 +36,7 @@ namespace Leap.Unity
     /// possibly added.  You must also pre-declare a non-generic version
     /// of the chosen class, much in the same style as UnityEvent.
     /// </summary>
-    
+
     public abstract class MultiTypedList<BaseType> : MultiTypedList, IList<BaseType>
     {
         public abstract int Count { get; }
@@ -176,7 +176,7 @@ namespace Leap.Unity
         }
     }
 
-    
+
     public class MultiTypedListUtil
     {
 
@@ -219,7 +219,7 @@ namespace Leap.Unity
 #endif
     }
 
-    
+
     [Serializable]
     public class MultiTypedList<BaseType, A, B> : MultiTypedList<BaseType>
       where A : BaseType
@@ -340,7 +340,7 @@ namespace Leap.Unity
         }
     }
 
-    
+
     public class MultiTypedList<BaseType, A, B, C> : MultiTypedList<BaseType, A, B>
       where A : BaseType
       where B : BaseType
@@ -367,7 +367,7 @@ namespace Leap.Unity
         }
     }
 
-    
+
     public class MultiTypedList<BaseType, A, B, C, D> : MultiTypedList<BaseType, A, B, C>
       where A : BaseType
       where B : BaseType
@@ -395,7 +395,7 @@ namespace Leap.Unity
         }
     }
 
-    
+
     public class MultiTypedList<BaseType, A, B, C, D, E> : MultiTypedList<BaseType, A, B, C, D>
       where A : BaseType
       where B : BaseType
@@ -424,7 +424,7 @@ namespace Leap.Unity
         }
     }
 
-    
+
     public class MultiTypedList<BaseType, A, B, C, D, E, F> : MultiTypedList<BaseType, A, B, C, D, E>
       where A : BaseType
       where B : BaseType
@@ -454,7 +454,7 @@ namespace Leap.Unity
         }
     }
 
-    
+
     public class MultiTypedList<BaseType, A, B, C, D, E, F, G> : MultiTypedList<BaseType, A, B, C, D, E, F>
       where A : BaseType
       where B : BaseType
@@ -485,7 +485,7 @@ namespace Leap.Unity
         }
     }
 
-    
+
     public class MultiTypedList<BaseType, A, B, C, D, E, F, G, H> : MultiTypedList<BaseType, A, B, C, D, E, F, G>
       where A : BaseType
       where B : BaseType

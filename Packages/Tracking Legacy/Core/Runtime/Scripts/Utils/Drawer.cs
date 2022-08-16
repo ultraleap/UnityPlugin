@@ -18,7 +18,7 @@ namespace Leap.Unity.Drawing
     /// <summary> Simple drawing interface abstraction (intended for debug drawing,
     /// not production!) with statically-accessible backend implementations via 
     /// HyperMegaLines, Unity Debug drawing, and Unity Gizmo drawing. </summary>
-    
+
     public class Drawer
     {
 
@@ -222,7 +222,7 @@ namespace Leap.Unity.Drawing
 
     }
 
-    
+
     public static class DrawerExtensions
     {
 

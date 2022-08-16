@@ -22,7 +22,7 @@ namespace Leap.Unity.Animation
     /// basic functionality of the Tween library. Tweens can interpolate between
     /// more than just Transform properties, so don't be afraid to roll your own.
     /// </summary>
-    
+
     public class TransformTweenBehaviour : MonoBehaviour
     {
 

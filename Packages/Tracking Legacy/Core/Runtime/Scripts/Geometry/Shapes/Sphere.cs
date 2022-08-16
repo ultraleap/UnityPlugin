@@ -16,7 +16,7 @@ namespace Leap.Unity.Geometry
 
     using UnityRect = UnityEngine.Rect;
 
-    
+
     [System.Serializable]
     public struct Sphere
     {
@@ -249,7 +249,7 @@ namespace Leap.Unity.Geometry
 
     }
 
-    
+
     public static class SphereExtensions
     {
 

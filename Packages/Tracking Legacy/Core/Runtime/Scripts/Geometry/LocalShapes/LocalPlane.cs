@@ -13,7 +13,7 @@ using UnityEngine;
 
 namespace Leap.Unity.Geometry
 {
-    
+
     [System.Serializable]
     /// <summary>
     /// A transformless Plane defined by a position and normal vector.
@@ -37,7 +37,7 @@ namespace Leap.Unity.Geometry
 
     }
 
-    
+
     public static class LocalPlaneExtensions
     {
 

@@ -14,7 +14,7 @@ using UnityEngine;
 
 namespace Leap.Unity
 {
-    
+
     public static class ReadonlySliceExtensions
     {
 
@@ -58,7 +58,7 @@ namespace Leap.Unity
 
     }
 
-    
+
     public struct ReadonlySlice<T> : IIndexableStruct<T, ReadonlySlice<T>>
     {
 

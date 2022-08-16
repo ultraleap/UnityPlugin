@@ -10,7 +10,7 @@ using System;
 
 namespace Leap.Unity
 {
-    
+
     public class PipeFileSyntax
     {
 

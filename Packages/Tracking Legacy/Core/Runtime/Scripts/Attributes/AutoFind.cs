@@ -11,7 +11,7 @@ using System;
 namespace Leap.Unity.Attributes
 {
 
-    
+
     public enum AutoFindLocations
     {
         Object = 0x01,
@@ -21,7 +21,7 @@ namespace Leap.Unity.Attributes
         All = 0xFFFF
     }
 
-    
+
     public class AutoFindAttribute : Attribute
     {
         public readonly AutoFindLocations searchLocations;

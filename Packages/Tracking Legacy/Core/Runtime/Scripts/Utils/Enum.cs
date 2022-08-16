@@ -10,7 +10,7 @@ using System;
 
 namespace Leap.Unity
 {
-    
+
     public static class Enum<T>
     {
         public static readonly string[] names;

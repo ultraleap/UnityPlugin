@@ -13,7 +13,7 @@ using UnityEngine;
 
 namespace Leap.Unity.Splines
 {
-    
+
     [ExecuteInEditMode]
     public class BSpline : MonoBehaviour
     {

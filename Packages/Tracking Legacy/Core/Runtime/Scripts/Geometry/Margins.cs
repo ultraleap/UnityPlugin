@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace Leap.Unity.Geometry
 {
-    
+
     public struct Margins
     {
 
@@ -57,7 +57,7 @@ namespace Leap.Unity.Geometry
 
     }
 
-    
+
     public static class MarginExtensions
     {
 

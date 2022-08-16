@@ -12,7 +12,7 @@ using UnityEngine;
 
 namespace Leap.Unity.Animation
 {
-    
+
     [Serializable]
     public struct PoseSplineSequence : IIndexable<HermitePoseSpline>,
                                        ISpline<Pose, Movement>,
@@ -186,7 +186,7 @@ namespace Leap.Unity.Animation
 
     }
 
-    
+
     public static class PoseSplineSequenceExtensions
     {
         public static void DrawPoseSplineSequence(this RuntimeGizmoDrawer drawer,

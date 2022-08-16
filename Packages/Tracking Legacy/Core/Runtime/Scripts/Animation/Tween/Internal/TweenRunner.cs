@@ -13,7 +13,7 @@ using UnityEngine.Assertions;
 
 namespace Leap.Unity.Animation.Internal
 {
-    
+
     public class TweenRunner : MonoBehaviour
     {
         private TweenInstance[] _runningTweens = new TweenInstance[16];

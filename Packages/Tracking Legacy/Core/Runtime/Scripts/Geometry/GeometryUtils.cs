@@ -12,7 +12,7 @@ using UnityEngine;
 
 namespace Leap.Unity.Geometry
 {
-    
+
     public static class GeometryUtils
     {
 

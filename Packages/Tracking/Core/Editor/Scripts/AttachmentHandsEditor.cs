@@ -123,7 +123,7 @@ namespace Leap.Unity.Attachments
 
                     target.attachmentPoints = attachmentPoints & (~flag); // Set flag bit to 0.
                 }
-                else if(EditorUtility.DisplayDialog("Delete " + flag + " Attachment Point?",
+                else if (EditorUtility.DisplayDialog("Delete " + flag + " Attachment Point?",
                                                    "Deleting the " + flag + " attachment point will destroy "
                                                  + "its GameObject and any of its non-Attachment-Point children, "
                                                  + "and will remove any components attached to it.",

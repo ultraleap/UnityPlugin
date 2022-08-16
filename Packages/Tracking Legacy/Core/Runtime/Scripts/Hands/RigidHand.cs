@@ -13,7 +13,7 @@ using UnityEngine;
 namespace Leap.Unity
 {
     /** A physics model for our rigid hand made out of various Unity Collider. */
-    
+
     public class RigidHand : SkeletalHand
     {
         public override ModelType HandModelType

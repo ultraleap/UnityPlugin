@@ -14,7 +14,7 @@ using UnityEngine;
 
 namespace Leap.Unity.Animation
 {
-    
+
     [CanEditMultipleObjects]
     [CustomEditor(typeof(TransformTweenBehaviour))]
     public class TransformTweenBehaviourEditor : CustomEditorBase<TransformTweenBehaviour>

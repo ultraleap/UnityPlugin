@@ -16,7 +16,7 @@ using UnityEngine;
 
 namespace Leap.Unity.Animation.Examples
 {
-    
+
     [ExecuteInEditMode]
     [AddComponentMenu("")]
     public class TransformPoseSpline : MonoBehaviour, IRuntimeGizmoComponent

@@ -17,7 +17,7 @@ using UnityEditor;
 
 namespace Leap.Unity.Attributes
 {
-    
+
     public class QuickButtonAttribute : CombinablePropertyAttribute,
       IAfterFieldAdditiveDrawer
     {

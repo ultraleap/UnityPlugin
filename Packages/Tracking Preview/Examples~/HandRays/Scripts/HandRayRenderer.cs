@@ -122,7 +122,7 @@ public abstract class HandRayRenderer : MonoBehaviour
         {
             _lineRenderer.enabled = true;
         }
-        if(_trailRendererTransform != null)
+        if (_trailRendererTransform != null)
         {
             _trailRenderer.enabled = true;
         }
@@ -149,7 +149,7 @@ public abstract class HandRayRenderer : MonoBehaviour
 
     private void UpdateTrailRenderer(Vector3 position)
     {
-        if(_trailRendererTransform == null)
+        if (_trailRendererTransform == null)
         {
             return;
         }

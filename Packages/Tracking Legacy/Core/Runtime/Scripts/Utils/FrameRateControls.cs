@@ -17,7 +17,7 @@ namespace Leap.Unity
     /// <remarks>
     /// This utility is useful for verifying frame-rate independence of behaviors.
     /// </remarks>
-    
+
     public class FrameRateControls : MonoBehaviour
     {
         public int targetRenderRate = 60; // must be > 0

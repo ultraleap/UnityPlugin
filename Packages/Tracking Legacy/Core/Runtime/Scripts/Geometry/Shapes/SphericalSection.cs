@@ -13,7 +13,7 @@ using UnityEngine;
 
 namespace Leap.Unity.Geometry
 {
-    
+
     public struct SphericalSection
     {
 

@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace Leap.Unity
 {
-    
+
     public struct Movement
     {
 
@@ -116,7 +116,7 @@ namespace Leap.Unity
 
     }
 
-    
+
     public struct KinematicState
     {
 
@@ -151,7 +151,7 @@ namespace Leap.Unity
 
     }
 
-    
+
     public static class MovementExtensions
     {
 

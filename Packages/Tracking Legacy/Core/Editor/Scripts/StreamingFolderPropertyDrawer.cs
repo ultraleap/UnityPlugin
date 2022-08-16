@@ -13,7 +13,7 @@ using UnityEngine;
 
 namespace Leap.Unity
 {
-    
+
     [CustomPropertyDrawer(typeof(StreamingFolder), useForChildren: true)]
     public class StreamingFolderPropertyDrawer : AssetFolderPropertyDrawer
     {

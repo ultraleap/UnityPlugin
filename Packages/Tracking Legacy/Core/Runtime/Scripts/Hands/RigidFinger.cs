@@ -13,7 +13,7 @@ using UnityEngine;
 namespace Leap.Unity
 {
     /** A physics finger model for our rigid hand made out of various cube Unity Colliders. */
-    
+
     public class RigidFinger : SkeletalFinger
     {
 

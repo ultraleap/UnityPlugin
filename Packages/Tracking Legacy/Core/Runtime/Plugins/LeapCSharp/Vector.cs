@@ -13,7 +13,7 @@ namespace Leap
     /// <summary>
     /// Constants used in Leap Motion math functions.
     /// </summary>
-    
+
     public static class Constants
     {
         public const float PI = 3.1415926536f;
@@ -35,7 +35,7 @@ namespace Leap
     /// The z-axis has positive values increasing away from the computer screen.
     /// @since 1.0
     /// </summary>
-    
+
     [Serializable]
     public struct Vector : IEquatable<Vector>
     {

@@ -18,7 +18,7 @@ namespace Leap.Unity
     /// Useful when you want to return a list to someone but you want
     /// to make sure they don't muck it up!
     /// </summary>
-    
+
     public struct ReadonlyList<T>
     {
         private readonly List<T> _list;

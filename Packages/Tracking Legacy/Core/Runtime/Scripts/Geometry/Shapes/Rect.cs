@@ -19,7 +19,7 @@ namespace Leap.Unity.Geometry
 
     using UnityRect = UnityEngine.Rect;
 
-    
+
     public struct Rect
     {
 

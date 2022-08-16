@@ -11,7 +11,7 @@ using UnityEngine;
 
 namespace Leap.Unity
 {
-    
+
     public class Deque<T>
     {
         private T[] _array;

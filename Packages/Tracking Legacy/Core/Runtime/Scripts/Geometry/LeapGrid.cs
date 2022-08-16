@@ -14,10 +14,10 @@ namespace Leap.Unity.Geometry
 
     using UnityRect = UnityEngine.Rect;
 
-    
+
     public enum VerticalOrigin { Top, Bottom }
 
-    
+
     public struct LeapGrid
     {
 

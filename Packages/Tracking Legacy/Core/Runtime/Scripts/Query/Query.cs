@@ -13,7 +13,7 @@ using System.Collections.Generic;
 
 namespace Leap.Unity.Query
 {
-    
+
     public static class QueryConversionExtensions
     {
 
@@ -103,7 +103,7 @@ namespace Leap.Unity.Query
     ///    method to destroy the query and get access to its underlying data.  You
     ///    will be responsible for cleaning up or disposing the data you get.
     /// </summary>
-    
+
     public struct Query<T>
     {
         private T[] _array;

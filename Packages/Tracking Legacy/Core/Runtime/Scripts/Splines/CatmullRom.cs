@@ -15,7 +15,7 @@ namespace Leap.Unity.Splines
     /// <summary>
     /// Interpolate between points using Catmull-Rom splines.
     /// </summary>
-    
+
     public static class CatmullRom
     {
 

@@ -11,13 +11,13 @@ using UnityEngine;
 
 namespace Leap.Unity.Space
 {
-    
+
     public interface IRadialTransformer : ITransformer
     {
         Vector4 GetVectorRepresentation(Transform element);
     }
 
-    
+
     public abstract class LeapRadialSpace : LeapSpace
     {
 
@@ -37,7 +37,7 @@ namespace Leap.Unity.Space
             }
         }
 
-        
+
         public override Hash GetSettingHash()
         {
             return new Hash() {

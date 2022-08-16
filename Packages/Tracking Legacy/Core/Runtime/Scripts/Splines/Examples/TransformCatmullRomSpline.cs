@@ -15,7 +15,7 @@ using UnityEngine;
 
 namespace Leap.Unity.Splines
 {
-    
+
     public class TransformCatmullRomSpline : MonoBehaviour, IRuntimeGizmoComponent
     {
 

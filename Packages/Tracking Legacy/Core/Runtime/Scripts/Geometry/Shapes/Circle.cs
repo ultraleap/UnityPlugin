@@ -16,7 +16,7 @@ namespace Leap.Unity.Geometry
 
     using UnityRect = UnityEngine.Rect;
 
-    
+
     [System.Serializable]
     public struct Circle
     {
@@ -302,7 +302,7 @@ namespace Leap.Unity.Geometry
 
     }
 
-    
+
     public static class CircleExtensions
     {
 

@@ -33,7 +33,7 @@ namespace Leap.Unity
     /// LeapProjectsChecks.SetIgnoreKey(string) so that ignore actions can be remembered
     /// and cleared by the project checks GUI.
     /// </summary>
-    
+
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
     public class LeapProjectCheckAttribute : Attribute
     {
@@ -51,7 +51,7 @@ namespace Leap.Unity
     /// Utility class for working with project checks. Note, most features are only
     /// available in the Editor.
     /// </summary>
-    
+
     public static class LeapProjectChecks
     {
 
