@@ -779,10 +779,22 @@ namespace Leap.Unity
             {
                 createController();
             }
+            UnityEditor.SceneManagement.EditorSceneManager.sceneClosing -= SceneClosing;
+            UnityEditor.SceneManagement.EditorSceneManager.sceneClosing += SceneClosing;
 #endif
 
             return _leapController;
         }
+
+#if UNITY_EDITOR
+        private void SceneClosing(UnityEngine.SceneManagement.Scene scene, bool removingScene)
+        {
+            if (_leapController != null)
+            {
+                destroyController();
+            }
+        }
+#endif
 
         /// <summary>
         /// Returns true if the Leap Motion hardware is plugged in and this application is
