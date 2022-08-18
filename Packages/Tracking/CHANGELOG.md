@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Added a low poly hand model with an arm
 - Added create menu options for LeapServiceProviders via GameObject/Ultrealeap/Service Provider (X)
-- Added TrackedPoseDriver to all example scene
+- Added TrackedPoseDriver to all XR example scenes
 - Added ability to create LeapServiceProviders from the GameObject/Create menu in editor
 - Added Hand Rays to Preview package
 
