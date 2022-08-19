@@ -6,16 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [docs-website]: https://docs.ultraleap.com/ "Ultraleap Docs"
 
-## [NEXT] - unreleased
+## [1.0.0-pre.8] - 17/08/2022
 
 ### Added
 
 - Automatic Android manifest permissions for OpenXR and Meta hand-tracking (including support for requesting Meta high-frequency hand-tracking)
 - Added OpenXR validation check for ensuring applications target Android SDK 29 as per the [OpenXR recommendations] (https://registry.khronos.org/OpenXR/specs/1.0/loader.html#android-active-runtime-location).
-
-### Changed
-
-### Fixed
 
 ### Known issues
 

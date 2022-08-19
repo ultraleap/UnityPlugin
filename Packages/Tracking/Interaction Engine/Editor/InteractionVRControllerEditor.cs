@@ -1,15 +1,14 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2021.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Leap.Unity.Query;
 using System;
-using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
@@ -30,7 +29,7 @@ namespace Leap.Unity.Interaction
             base.OnEnable();
 
             //_vrController = (target as InteractionVRController);
-            _vrControllers = targets.Query()
+            _vrControllers = targets
                                     .Where(c => c is InteractionXRController)
                                     .Cast<InteractionXRController>()
                                     .ToList();
@@ -42,7 +41,7 @@ namespace Leap.Unity.Interaction
         private void drawGraspButtonAxisDecorator(SerializedProperty property)
         {
             // Whether the axis is overriden.
-            int numGraspAxisOverrides = _vrControllers.Query()
+            int numGraspAxisOverrides = _vrControllers
                                                       .Where(c => c.graspAxisOverride != null)
                                                       .Count();
             bool anyGraspAxisOverrides = numGraspAxisOverrides > 0;
@@ -66,7 +65,7 @@ namespace Leap.Unity.Interaction
             }
 
             // Whether the axis is valid.
-            bool anyInvalidGraspAxes = _vrControllers.Query()
+            bool anyInvalidGraspAxes = _vrControllers
                                                      .Select(c => isGraspAxisConfigured(c))
                                                      .Where(b => b == false)
                                                      .Any();

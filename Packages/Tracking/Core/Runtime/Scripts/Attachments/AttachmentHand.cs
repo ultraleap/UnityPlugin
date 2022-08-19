@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2021.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -134,11 +134,9 @@ namespace Leap.Unity.Attachments
         }
 
 #if !UNITY_EDITOR
-#pragma warning disable 0414
 #endif
         private bool _isBeingDestroyed = false;
 #if !UNITY_EDITOR
-#pragma warning restore 0414
 #endif
         void OnDestroy()
         {

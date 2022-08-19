@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2021.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -12,8 +12,6 @@ using UnityEngine;
 
 namespace Leap.Unity.Interaction
 {
-#pragma warning disable 0618
-
     /// <summary>
     /// The sliding window throw handler implements a simple heuristic that provides a
     /// reasonably accurate measure of the user's intended "throw direction" for a physical
@@ -70,7 +68,7 @@ namespace Leap.Unity.Interaction
         /// Samples the current velocity and adds it to a rolling average.
         /// </summary>
         public void OnHold(InteractionBehaviour intObj,
-                           ReadonlyList<InteractionController> controllers)
+                           IReadOnlyList<InteractionController> controllers)
         {
             _velocityQueue.Enqueue(new VelocitySample(intObj.rigidbody.position,
                                                       intObj.rigidbody.rotation,
@@ -155,6 +153,4 @@ namespace Leap.Unity.Interaction
             intObj.rigidbody.velocity *= _velocityMultiplierCurve.Evaluate(intObj.rigidbody.velocity.magnitude);
         }
     }
-#pragma warning restore 0618
-
 }

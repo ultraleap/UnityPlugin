@@ -26,7 +26,7 @@ public class HandRayStraightLineRenderer : HandRayRenderer
         {
             lineRendererEndPos = handRayDirection.RayOrigin + handRayDirection.Direction * lineRendererDistance;
         }
-        UpdateLineRendererPositions(2, new Vector3[]{ handRayDirection.VisualAimPosition, lineRendererEndPos});
+        UpdateLineRendererPositions(2, new Vector3[] { handRayDirection.VisualAimPosition, lineRendererEndPos });
         return hit;
     }
 }

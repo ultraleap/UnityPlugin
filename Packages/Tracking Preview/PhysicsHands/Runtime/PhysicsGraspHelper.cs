@@ -5,7 +5,6 @@ using UnityEngine;
 
 namespace Leap.Unity.Interaction.PhysicsHands
 {
-#pragma warning disable 0618
     [System.Serializable]
     public class PhysicsGraspHelper
     {
@@ -551,7 +550,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
         {
             for (int i = 0; i < _colliders.Count; i++)
             {
-                if (IsPointWithinCollider(_colliders[i], bone.NextJoint.ToVector3()) || IsPointWithinCollider(_colliders[i], bone.Center.ToVector3()))
+                if (IsPointWithinCollider(_colliders[i], bone.NextJoint) || IsPointWithinCollider(_colliders[i], bone.Center))
                 {
                     return true;
                 }
@@ -593,7 +592,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 {
                     try
                     {
-                        Gizmos.DrawSphere(hand.GetOriginalLeapHand().Fingers[bone.Finger].bones[bone.Joint].NextJoint.ToVector3(), 0.005f);
+                        Gizmos.DrawSphere(hand.GetOriginalLeapHand().Fingers[bone.Finger].bones[bone.Joint].NextJoint, 0.005f);
                     }
                     catch
                     {
@@ -671,5 +670,4 @@ namespace Leap.Unity.Interaction.PhysicsHands
             intObj.MoveRotation(solvedRotation);
         }
     }
-#pragma warning restore 0618
 }

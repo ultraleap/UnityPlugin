@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2021.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -8,7 +8,7 @@
 
 using UnityEngine;
 
-namespace UHI.Tracking.InteractionEngine.Examples
+namespace ULeap.Unity.InteractionEngine.Examples
 {
 
     [RequireComponent(typeof(Renderer))]

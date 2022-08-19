@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2021.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -116,66 +116,6 @@ namespace Leap
                 _transactions.Add(requestId, onResult);
                 return true;
             }
-            return false;
-        }
-
-        [Obsolete("Use the generic Set<T> method instead.")]
-        public ValueType Type(string key)
-        {
-            return ValueType.TYPE_UNKNOWN;
-        }
-
-        [Obsolete("Use the generic Get<T> method instead.")]
-        public bool GetBool(string key)
-        {
-            return false;
-        }
-
-        [Obsolete("Use the generic Set<T> method instead.")]
-        public bool SetBool(string key, bool value)
-        {
-            return false;
-        }
-
-        [Obsolete("Use the generic Get<T> method instead.")]
-        public bool GetInt32(string key)
-        {
-            return false;
-        }
-
-        [Obsolete("Use the generic Set<T> method instead.")]
-        public bool SetInt32(string key, int value)
-        {
-            return false;
-        }
-
-        [Obsolete("Use the generic Get<T> method instead.")]
-        public bool GetFloat(string key)
-        {
-            return false;
-        }
-
-        [Obsolete("Use the generic Set<T> method instead.")]
-        public bool SetFloat(string key, float value)
-        {
-            return false;
-        }
-
-        [Obsolete("Use the generic Get<T> method instead.")]
-        public bool GetString(string key)
-        {
-            return false;
-        }
-
-        [Obsolete("Use the generic Set<T> method instead.")]
-        public bool SetString(string key, string value)
-        {
-            return false;
-        }
-
-        [Obsolete]
-        public bool Save()
-        {
             return false;
         }
 

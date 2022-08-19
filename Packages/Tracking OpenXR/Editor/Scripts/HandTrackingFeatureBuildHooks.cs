@@ -1,5 +1,5 @@
-﻿using Leap.Unity.Infix;
-using System;
+﻿using System;
+using System.IO;
 using UnityEditor;
 using UnityEditor.Build.Reporting;
 using UnityEditor.XR.OpenXR.Features;
@@ -55,7 +55,7 @@ namespace Ultraleap.Tracking.OpenXR
 
         private string GetAndroidManifestPath(string projectPath)
         {
-            return projectPath.PathCombine("src").PathCombine("main").PathCombine("AndroidManifest.xml");
+            return Path.Combine(projectPath, "src", "main", "AndroidManifest.xml");
         }
     }
 }

@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-#pragma warning disable 0618 
 /// <summary>
 /// class to calculate confidence values based on joint occlusion.
 /// </summary>
@@ -39,7 +38,7 @@ public class JointOcclusion : MonoBehaviour
         cam.cullingMask = LayerMask.GetMask(layerName);
 
         // remove the joint occlusion layer from the main camera:
-        MainCameraProvider.mainCamera.cullingMask &= ~(1 << LayerMask.NameToLayer(layerName));
+        Camera.main.cullingMask &= ~(1 << LayerMask.NameToLayer(layerName));
 
         cam.targetTexture = new RenderTexture(cam.targetTexture);
 
@@ -129,7 +128,7 @@ public class JointOcclusion : MonoBehaviour
         Vector3 posOffset = new Vector3(-0.03f, 0.005f, -0.045f);
         Quaternion rotOffset = Quaternion.Euler(-5.366f, 0, 0);
         Vector3 scale = new Vector3(0.1f, 0.01f, 0.13f);
-        Graphics.DrawMesh(cubeMesh, Matrix4x4.TRS(hand.PalmPosition.ToVector3() + hand.Direction.ToVector3() * posOffset.z + hand.PalmNormal.ToVector3() * posOffset.y + Vector3.Cross(hand.Direction.ToVector3(), hand.PalmNormal.ToVector3()) * posOffset.x, hand.Rotation.ToQuaternion() * rotOffset, scale), cubeMaterial, LayerMask.NameToLayer(layerName));
+        Graphics.DrawMesh(cubeMesh, Matrix4x4.TRS(hand.PalmPosition + hand.Direction * posOffset.z + hand.PalmNormal * posOffset.y + Vector3.Cross(hand.Direction, hand.PalmNormal) * posOffset.x, hand.Rotation * rotOffset, scale), cubeMaterial, LayerMask.NameToLayer(layerName));
 
         RenderTexture.active = cam.targetTexture;
 
@@ -155,7 +154,7 @@ public class JointOcclusion : MonoBehaviour
 
                 // get the joint position from the given hand and use it to calculate the screen position of the joint's center and 
                 // a point on the outside border of the joint (both in pixel coordinates)
-                Vector3 jointPos = finger.Bone((Leap.Bone.BoneType)j).NextJoint.ToVector3();
+                Vector3 jointPos = finger.Bone((Leap.Bone.BoneType)j).NextJoint;
                 Vector3 screenPosCenter = cam.WorldToScreenPoint(jointPos);
                 Vector3 screenPosSphereOutside = cam.WorldToScreenPoint(jointPos + cam.transform.right * jointRadius);
 
@@ -185,7 +184,6 @@ public class JointOcclusion : MonoBehaviour
             }
         }
 
-
         for (int i = 0; i < confidences.Length; i++)
         {
             if (optimalPixelsCount[i] != 0)
@@ -197,14 +195,10 @@ public class JointOcclusion : MonoBehaviour
         return confidences;
     }
 
-
     float DistanceBetweenColors(Color color1, Color color2)
     {
         Color colorDifference = color1 - color2;
         Vector3 diffVetor = new Vector3(colorDifference.r, colorDifference.g, colorDifference.b);
         return diffVetor.magnitude;
     }
-
 }
-
-#pragma warning restore 0618

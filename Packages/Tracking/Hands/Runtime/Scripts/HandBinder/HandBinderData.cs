@@ -11,7 +11,6 @@ using UnityEngine;
 
 namespace Leap.Unity.HandsModule
 {
-#pragma warning disable 0618
     /// <summary>
     /// A data structure to define all the fingers in a hand, the wrist and elbow
     /// </summary>
@@ -164,28 +163,28 @@ namespace Leap.Unity.HandsModule
                         if (intermediateBoundBone.boundTransform && distalBoundBone.boundTransform)
                         {
                             //Get the positions of the rigged joints
-                            Vector distalBoundBonePosition = distalBoundBone.boundTransform.position.ToVector();
-                            Vector previousBoundBonePosition = intermediateBoundBone.boundTransform.position.ToVector();
+                            Vector3 distalBoundBonePosition = distalBoundBone.boundTransform.position;
+                            Vector3 previousBoundBonePosition = intermediateBoundBone.boundTransform.position;
 
                             //Calculate the length of the previous bone
-                            Vector previousBone = (previousBoundBonePosition - distalBoundBonePosition);
-                            float length = previousBone.Magnitude;
+                            Vector3 previousBone = previousBoundBonePosition - distalBoundBonePosition;
+                            float length = previousBone.magnitude;
 
                             //Get the direction of the bone
-                            Vector direction = leapBone.Direction;
+                            Vector3 direction = leapBone.Direction;
 
                             //Calculate the tip position
-                            Vector tipPosition = (distalBoundBonePosition + direction * (length * fingerTipScale));
+                            Vector3 tipPosition = (distalBoundBonePosition + direction * (length * fingerTipScale));
                             leapFinger.TipPosition = tipPosition;
 
                             //Calculate the center of the finger
-                            Vector center = Vector.Lerp(distalBoundBonePosition, tipPosition, 0.5f);
+                            Vector3 center = Vector3.Lerp(distalBoundBonePosition, tipPosition, 0.5f);
 
                             //Get the direction of distal to tip
-                            Vector distalDirection = (distalBoundBonePosition - tipPosition);
+                            Vector3 distalDirection = (distalBoundBonePosition - tipPosition);
 
                             //Set the leap finger
-                            leapFinger.bones[leapBoneID] = new Bone(distalBoundBonePosition, tipPosition, center, distalDirection, distalDirection.Magnitude, leapBone.Width, leapBone.Type, leapBone.Rotation);
+                            leapFinger.bones[leapBoneID] = new Bone(distalBoundBonePosition, tipPosition, center, distalDirection, distalDirection.magnitude, leapBone.Width, leapBone.Type, leapBone.Rotation);
                         }
                     }
                     else
@@ -196,11 +195,11 @@ namespace Leap.Unity.HandsModule
                         //If the bones are not null, calculate the data needed for this bone
                         if (previousBoundBone.boundTransform && nextBoundBone.boundTransform)
                         {
-                            Vector previousBoundJointPosition = previousBoundBone.boundTransform.position.ToVector();
-                            Vector nextBoundJointPosition = nextBoundBone.boundTransform.position.ToVector();
-                            Vector direction = (previousBoundJointPosition - nextBoundJointPosition);
-                            float length = direction.Magnitude;
-                            Vector center = Vector.Lerp(previousBoundJointPosition, nextBoundJointPosition, 0.5f);
+                            Vector3 previousBoundJointPosition = previousBoundBone.boundTransform.position;
+                            Vector3 nextBoundJointPosition = nextBoundBone.boundTransform.position;
+                            Vector3 direction = previousBoundJointPosition - nextBoundJointPosition;
+                            float length = direction.magnitude;
+                            Vector3 center = Vector3.Lerp(previousBoundJointPosition, nextBoundJointPosition, 0.5f);
 
                             //Set the data for a new leap bone
                             leapFinger.bones[leapBoneID] = new Bone(previousBoundJointPosition, nextBoundJointPosition, center, direction, length, leapBone.Width, leapBone.Type, leapBone.Rotation);
@@ -214,11 +213,11 @@ namespace Leap.Unity.HandsModule
 
                             if (proximalBoundBone.boundTransform && wristBoundBone.boundTransform)
                             {
-                                Vector nextBoundJointPosition = proximalBoundBone.boundTransform.position.ToVector();
-                                Vector previousBoundJointPosition = Vector.Lerp(wristBoundBone.boundTransform.position.ToVector(), nextBoundJointPosition, 0.5f);
-                                Vector direction = (previousBoundJointPosition - nextBoundJointPosition);
-                                float length = direction.Magnitude;
-                                Vector center = Vector.Lerp(previousBoundJointPosition, nextBoundJointPosition, 0.5f);
+                                Vector3 nextBoundJointPosition = proximalBoundBone.boundTransform.position;
+                                Vector3 previousBoundJointPosition = Vector3.Lerp(wristBoundBone.boundTransform.position, nextBoundJointPosition, 0.5f);
+                                Vector3 direction = previousBoundJointPosition - nextBoundJointPosition;
+                                float length = direction.magnitude;
+                                Vector3 center = Vector3.Lerp(previousBoundJointPosition, nextBoundJointPosition, 0.5f);
 
                                 //Set the data for the leap finger
                                 leapFinger.bones[leapBoneID] = new Bone(previousBoundJointPosition, nextBoundJointPosition, center, direction, length, leapBone.Width, leapBone.Type, leapBone.Rotation);
@@ -231,17 +230,17 @@ namespace Leap.Unity.HandsModule
             //Calculate the data for the wrist
             if (boundHand.wrist.boundTransform != null)
             {
-                leapHand.WristPosition = boundHand.wrist.boundTransform.position.ToVector();
-                leapHand.Arm.NextJoint = boundHand.wrist.boundTransform.position.ToVector();
+                leapHand.WristPosition = boundHand.wrist.boundTransform.position;
+                leapHand.Arm.NextJoint = boundHand.wrist.boundTransform.position;
 
                 //Sor the elbow data
                 if (boundHand.elbow.boundTransform != null)
                 {
-                    Vector elbowPos = boundHand.elbow.boundTransform.position.ToVector();
-                    Vector wristPos = boundHand.wrist.boundTransform.position.ToVector();
-                    Vector center = Vector.Lerp(elbowPos, wristPos, 0.5f);
-                    Vector dir = (elbowPos - wristPos);
-                    float length = dir.Magnitude;
+                    Vector3 elbowPos = boundHand.elbow.boundTransform.position;
+                    Vector3 wristPos = boundHand.wrist.boundTransform.position;
+                    Vector3 center = Vector3.Lerp(elbowPos, wristPos, 0.5f);
+                    Vector3 dir = (elbowPos - wristPos);
+                    float length = dir.magnitude;
 
                     //Set the data on the leap Arm
                     leapHand.Arm = new Arm(elbowPos, wristPos, center, dir, length, leapHand.Arm.Width, leapHand.Arm.Rotation);
@@ -250,15 +249,14 @@ namespace Leap.Unity.HandsModule
             }
 
             //Calculate the palm position half way between the wrist and the middle proximal bone
-            Vector palmPos = Vector.Lerp(leapHand.WristPosition, leapHand.GetMiddle().bones[(int)Bone.BoneType.TYPE_PROXIMAL].PrevJoint, 0.5f);
+            Vector3 palmPos = Vector3.Lerp(leapHand.WristPosition, leapHand.GetMiddle().bones[(int)Bone.BoneType.TYPE_PROXIMAL].PrevJoint, 0.5f);
 
             //Set the data on the leap hand
             leapHand.PalmPosition = palmPos;
             leapHand.StabilizedPalmPosition = leapHand.PalmPosition;
-            leapHand.PalmWidth = (leapHand.GetPinky().bones[1].PrevJoint - leapHand.GetIndex().bones[1].PrevJoint).Magnitude;
+            leapHand.PalmWidth = (leapHand.GetPinky().bones[1].PrevJoint - leapHand.GetIndex().bones[1].PrevJoint).magnitude;
             leapHand.Arm.NextJoint = leapHand.WristPosition;
             return leapHand;
         }
     }
-#pragma warning restore 0618
 }
