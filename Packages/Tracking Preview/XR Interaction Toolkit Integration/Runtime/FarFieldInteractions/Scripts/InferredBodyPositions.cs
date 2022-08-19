@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2021.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -13,7 +13,6 @@ using UnityEngine;
 
 namespace Leap.Unity.Preview.FarFieldInteractions
 {
-#pragma warning disable 0618
     /// <summary>
     /// infers a body position from .. including predicted shoulder positions and stable pinch position.
     /// Used by the 'FarFieldDirection', 
@@ -153,7 +152,7 @@ namespace Leap.Unity.Preview.FarFieldInteractions
             // The stable pinch point is a rigid point in hand-space linearly offset by the
             // index finger knuckle position and scaled by the index finger's length
 
-            Vector3 indexKnuckle = hand.Fingers[1].bones[1].PrevJoint.ToVector3();
+            Vector3 indexKnuckle = hand.Fingers[1].bones[1].PrevJoint;
             float indexLength = hand.Fingers[1].Length;
             Vector3 radialAxis = hand.RadialAxis();
             Vector3 predictedPinchPoint = indexKnuckle + hand.PalmarAxis() * indexLength * 0.85F
@@ -332,13 +331,12 @@ namespace Leap.Unity.Preview.FarFieldInteractions
                 foreach (Hand hand in hands)
                 {
                     int index = hand.IsLeft ? 0 : 1;
-                    Gizmos.color = LeapColor.orange;
+                    Gizmos.color = Color.red;
                     Gizmos.DrawSphere(hand.GetPredictedPinchPosition(), gizmoRadius / 5);
-                    Gizmos.color = LeapColor.green;
+                    Gizmos.color = Color.green;
                     Gizmos.DrawSphere(StablePinchPosition[index], gizmoRadius / 5);
                 }
             }
         }
     }
-#pragma warning restore 0618
 }

@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2021.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -8,6 +8,7 @@
 
 using NUnit.Framework;
 using System.Linq;
+using UnityEngine;
 
 namespace Leap.Unity.Tests
 {
@@ -81,7 +82,7 @@ namespace Leap.Unity.Tests
             foreach (Hand hand in _frame.Hands)
             {
                 Bone bone = getBone(hand, fingerType, boneType);
-                float apparentLength = bone.NextJoint.DistanceTo(bone.PrevJoint);
+                float apparentLength = Vector3.Distance(bone.NextJoint, bone.PrevJoint);
                 float actualLength = bone.Length;
                 Assert.That(actualLength, Is.EqualTo(apparentLength).Within(TOLERANCE));
             }
@@ -117,7 +118,7 @@ namespace Leap.Unity.Tests
             {
                 Bone bone = getBone(hand, fingerType, boneType);
 
-                Vector jointAverage = (bone.NextJoint + bone.PrevJoint) * 0.5f;
+                Vector3 jointAverage = (bone.NextJoint + bone.PrevJoint) * 0.5f;
                 assertVectorsEqual(jointAverage, bone.Center);
             }
         }
@@ -131,22 +132,13 @@ namespace Leap.Unity.Tests
                 Bone bone = getBone(hand, fingerType, boneType);
 
                 //If the joints are at the same position this test is meaningless
-                if (bone.NextJoint.DistanceTo(bone.PrevJoint) < TOLERANCE)
+                if (Vector3.Distance(bone.NextJoint, bone.PrevJoint) < TOLERANCE)
                 {
                     continue;
                 }
 
-                Vector jointDirection = (bone.NextJoint - bone.PrevJoint).Normalized;
+                Vector3 jointDirection = (bone.NextJoint - bone.PrevJoint).normalized;
                 assertVectorsEqual(jointDirection, bone.Direction);
-            }
-        }
-
-        [Test]
-        public void RotationIsValid()
-        {
-            foreach (Hand hand in _frame.Hands)
-            {
-                Assert.That(hand.Rotation.IsValid());
             }
         }
 
@@ -169,7 +161,7 @@ namespace Leap.Unity.Tests
             return null;
         }
 
-        protected void assertVectorsEqual(Vector a, Vector b, string vectorName = "Vector")
+        protected void assertVectorsEqual(Vector3 a, Vector3 b, string vectorName = "Vector")
         {
             Assert.That(a.x, Is.EqualTo(b.x).Within(TOLERANCE), vectorName + ".x");
             Assert.That(a.y, Is.EqualTo(b.y).Within(TOLERANCE), vectorName + ".y");

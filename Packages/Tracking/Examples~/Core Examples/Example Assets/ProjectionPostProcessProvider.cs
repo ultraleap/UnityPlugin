@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2021.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -10,7 +10,6 @@ using UnityEngine;
 
 namespace Leap.Unity.Examples
 {
-#pragma warning disable 0618
     public class ProjectionPostProcessProvider : PostProcessProvider
     {
 
@@ -30,7 +29,7 @@ namespace Leap.Unity.Examples
         public override void ProcessFrame(ref Frame inputFrame)
         {
             // Calculate the position of the head and the basis to calculate shoulder position.
-            if (headTransform == null) { headTransform = MainCameraProvider.mainCamera.transform; }
+            if (headTransform == null) { headTransform = Camera.main.transform; }
             Vector3 headPos = headTransform.position;
             var shoulderBasis = Quaternion.LookRotation(
               Vector3.ProjectOnPlane(headTransform.forward, Vector3.up),
@@ -45,15 +44,14 @@ namespace Leap.Unity.Examples
 
                 // Calculate the projection of the hand if it extends beyond the
                 // handMergeDistance.
-                Vector3 shoulderToHand = hand.PalmPosition.ToVector3() - shoulderPos;
+                Vector3 shoulderToHand = hand.PalmPosition - shoulderPos;
                 float handShoulderDist = shoulderToHand.magnitude;
                 float projectionDistance = Mathf.Max(0f, handShoulderDist - handMergeDistance);
                 float projectionAmount = 1f + (projectionDistance * projectionScale);
                 hand.SetTransform(shoulderPos + shoulderToHand * projectionAmount,
-                                  hand.Rotation.ToQuaternion());
+                                  hand.Rotation);
             }
         }
 
     }
-#pragma warning restore 0618
 }

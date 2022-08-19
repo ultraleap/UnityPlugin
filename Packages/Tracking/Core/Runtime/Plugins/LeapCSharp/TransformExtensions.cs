@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2021.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -11,7 +11,6 @@ using UnityEngine;
 namespace Leap
 {
     using System;
-#pragma warning disable 0618
     public static class TransformExtensions
     {
 
@@ -153,7 +152,7 @@ namespace Leap
 
             if (bone.Length < float.Epsilon)
             {
-                bone.Direction = Vector.Zero;
+                bone.Direction = Vector3.zero;
             }
             else
             {
@@ -175,5 +174,4 @@ namespace Leap
             return new Bone().CopyFrom(bone).Transform(transform);
         }
     }
-#pragma warning restore 0618
 }

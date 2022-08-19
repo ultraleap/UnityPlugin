@@ -1,0 +1,20 @@
+{
+    "name": "Ultraleap.Tracking.Legacy.Editor",
+    "rootNamespace": "",
+    "references": [
+        "GUID:2ee0542102ac1084e8d9a910885c1e81",
+        "GUID:f7bca3b5775823a48af014f6934684b8",
+        "GUID:db4e617c04f44c144bc19216a63dd19b"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

@@ -43,6 +43,9 @@ namespace Leap.Unity.Interaction.PhysicsHands
         [SerializeField, HideInInspector]
         private int _joint;
 
+        public Collider Collider => _collider;
+        private Collider _collider;
+
         public bool IsContacting
         {
             get
@@ -64,6 +67,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
         {
             _hand = GetComponentInParent<PhysicsHand>();
             _body = GetComponent<ArticulationBody>();
+            _collider = GetComponent<Collider>();
         }
 
         public void SetBoneIndexes(int finger, int joint)

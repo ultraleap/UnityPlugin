@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2021.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -16,7 +16,6 @@ using UnityEngine;
 namespace Leap.Unity
 {
     using Attributes;
-#pragma warning disable 0618
 
     /// <summary>
     /// The LeapServiceProvider provides tracked Leap Hand data and images from the device
@@ -236,13 +235,6 @@ namespace Leap.Unity
             get { return _leapController.Devices; }
         }
 
-        /// <summary> A counter to keep track of how many devices have been seen up
-        /// through this point. Allows a provider to latch onto a device based on
-        /// its order of appearance, which corresponds to that device's DeviceID.
-        /// </summary>
-        [Obsolete("not used anymore", false)]
-        protected uint _numDevicesSeen = 0;
-
         #endregion
 
         /// <summary>
@@ -270,13 +262,6 @@ namespace Leap.Unity
         [SerializeField]
         protected bool _preventInitializingTrackingMode;
 
-
-        [Tooltip("When checked, profiling data from the LeapCSharp worker thread will be used to populate the UnityProfiler.")]
-        [EditTimeOnly]
-        [System.Obsolete("This code will be deleted in the next major version of the plugin. If you believe that it needs to be kept, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
-        [SerializeField]
-        protected bool _workerThreadProfiling = false;
-
         [Tooltip("Which Leap Service API Endpoint to connect to.  This is configured on the service with the 'api_namespace' argument.")]
         [SerializeField]
         [EditTimeOnly]
@@ -291,11 +276,6 @@ namespace Leap.Unity
         /// </summary>
         protected bool _useInterpolation = true;
 
-#if SVR
-        protected IntPtr _clockRebaser;
-        protected System.Diagnostics.Stopwatch _stopwatch = new System.Diagnostics.Stopwatch();
-#endif
-
         // Extrapolate on Android to compensate for the latency introduced by its graphics
         // pipeline.
 #if UNITY_ANDROID && !UNITY_EDITOR
@@ -309,10 +289,8 @@ namespace Leap.Unity
         protected Controller _leapController;
         protected bool _isDestroyed;
 
-        [System.Obsolete("This code will be removed in the next major version of the plugin. If you believe that it needs to be kept, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
-        protected SmoothedFloat _fixedOffset = new SmoothedFloat();
-        [System.Obsolete("This code will become private in the next major version of the plugin. If you believe that it needs to be kept protected, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
-        protected SmoothedFloat _smoothedTrackingLatency = new SmoothedFloat();
+        private protected SmoothedFloat _fixedOffset = new SmoothedFloat();
+        private protected SmoothedFloat _smoothedTrackingLatency = new SmoothedFloat();
         protected long _unityToLeapOffset;
 
         protected Frame _untransformedUpdateFrame;
@@ -547,12 +525,11 @@ namespace Leap.Unity
             EnsureAndroidBinding();
         }
 
-        [Obsolete("Intended to be internal function, will be removed in next breaking version")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public bool CreateAndroidBinding() => EnsureAndroidBinding();
-
         private bool EnsureAndroidBinding()
         {
+#if UNITY_EDITOR
+            return false;
+#else
             bool success;
             try
             {
@@ -592,6 +569,7 @@ namespace Leap.Unity
             }
 
             return success;
+#endif
         }
 
         protected virtual void OnDisable()
@@ -665,17 +643,6 @@ namespace Leap.Unity
                 DispatchUpdateFrameEvent(_transformedFixedFrame);
                 return;
             }
-
-#if SVR
-            if (_clockRebaser != IntPtr.Zero)
-            {
-                eLeapRS result = LeapC.UpdateRebase(_clockRebaser, _stopwatch.ElapsedMilliseconds, LeapC.GetNow());
-                if (result != eLeapRS.eLeapRS_Success)
-                {
-                    Debug.LogWarning("UpdateRebase call failed");
-                }
-            }
-#endif
 
             // if the serial number has changed since the last update(), update the device
             if (_multipleDeviceMode == MultipleDeviceMode.Specific && (_currentDevice == null || _currentDevice.SerialNumber != SpecificSerialNumber))
@@ -775,12 +742,6 @@ namespace Leap.Unity
             }
         }
 
-        protected virtual void OnApplicationQuit()
-        {
-            destroyController();
-            _isDestroyed = true;
-        }
-
         /// <summary>
         /// Calculates the physics extrapolation time depending on the PhysicsExtrapolationMode.
         /// </summary>
@@ -870,18 +831,19 @@ namespace Leap.Unity
         {
             yield return new WaitWhile(() => _leapController == null || !_leapController.IsConnected);
 
+            Device deviceToChange = _multipleDeviceMode == MultipleDeviceMode.Disabled ? null : _currentDevice;
 
             switch (trackingMode)
             {
                 case TrackingOptimizationMode.Desktop:
-                    _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP, _currentDevice);
-                    _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD, _currentDevice);
+                    _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP, deviceToChange);
+                    _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD, deviceToChange);
                     break;
                 case TrackingOptimizationMode.Screentop:
-                    _leapController.SetAndClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP, Controller.PolicyFlag.POLICY_OPTIMIZE_HMD, device: _currentDevice);
+                    _leapController.SetAndClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP, Controller.PolicyFlag.POLICY_OPTIMIZE_HMD, deviceToChange);
                     break;
                 case TrackingOptimizationMode.HMD:
-                    _leapController.SetAndClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD, Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP, device: _currentDevice);
+                    _leapController.SetAndClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD, Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP, deviceToChange);
                     break;
             }
         }
@@ -893,8 +855,10 @@ namespace Leap.Unity
         {
             if (_leapController == null) return _trackingOptimization;
 
-            var screenTopPolicySet = _leapController.IsPolicySet(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP, _currentDevice);
-            var headMountedPolicySet = _leapController.IsPolicySet(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD, _currentDevice);
+            Device deviceToGet = _multipleDeviceMode == MultipleDeviceMode.Disabled ? null : _currentDevice;
+
+            var screenTopPolicySet = _leapController.IsPolicySet(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP, deviceToGet);
+            var headMountedPolicySet = _leapController.IsPolicySet(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD, deviceToGet);
 
             var desktopMode = !screenTopPolicySet && !headMountedPolicySet;
             if (desktopMode)
@@ -953,14 +917,6 @@ namespace Leap.Unity
         /// </summary>
         protected void createController()
         {
-#if SVR
-            var bindStatus = EnsureAndroidBinding();
-            if (!bindStatus)
-                return;
-
-            InitClockRebaser();
-#endif
-
             if (_leapController != null)
             {
                 return;
@@ -1078,14 +1034,6 @@ namespace Leap.Unity
                 _leapController.StopConnection();
                 _leapController.Dispose();
                 _leapController = null;
-
-#if SVR
-                if (_clockRebaser != IntPtr.Zero)
-                {
-                    LeapC.DestroyClockRebaser(_clockRebaser);
-                    _stopwatch.Stop();
-                }
-#endif
             }
         }
 
@@ -1127,10 +1075,6 @@ namespace Leap.Unity
         {
             initializeFlags();
 
-#if SVR
-            InitClockRebaser();
-#endif
-
             if (_leapController != null)
             {
                 _leapController.Device -= onHandControllerConnect;
@@ -1141,24 +1085,6 @@ namespace Leap.Unity
         {
             dest.CopyFrom(source).Transform(new LeapTransform(transform));
         }
-
-#if SVR
-        private void InitClockRebaser()
-        {
-            _stopwatch.Start();
-            eLeapRS result = LeapC.CreateClockRebaser(out _clockRebaser);
-
-            if (result != eLeapRS.eLeapRS_Success)
-            {
-                Debug.LogError("Failed to create clock rebaser");
-            }
-
-            if (_clockRebaser == IntPtr.Zero)
-            {
-                Debug.LogError("Clock rebaser is null");
-            }
-        }
-#endif
 
         #endregion
 
@@ -1206,12 +1132,12 @@ namespace Leap.Unity
 
         private void DetectConnectedDevice(Transform targetTransform)
         {
-            if (_leapController != null && _leapController.Devices?.Count >= 1)
+            if (GetLeapController() != null && GetLeapController().Devices?.Count >= 1)
             {
                 Device currentDevice = _currentDevice;
                 if (currentDevice == null || (_multipleDeviceMode == LeapServiceProvider.MultipleDeviceMode.Specific && currentDevice.SerialNumber != _specificSerialNumber))
                 {
-                    foreach (Device d in _leapController.Devices)
+                    foreach (Device d in GetLeapController().Devices)
                     {
                         if (d.SerialNumber.Contains(_specificSerialNumber))
                         {
@@ -1219,6 +1145,11 @@ namespace Leap.Unity
                             break;
                         }
                     }
+                }
+
+                if (currentDevice == null && _multipleDeviceMode == MultipleDeviceMode.Disabled)
+                {
+                    currentDevice = GetLeapController().Devices[0];
                 }
 
                 if (currentDevice == null || (_multipleDeviceMode == LeapServiceProvider.MultipleDeviceMode.Specific && currentDevice.SerialNumber != _specificSerialNumber))
@@ -1360,5 +1291,4 @@ namespace Leap.Unity
         #endregion
 
     }
-#pragma warning restore 0618
 }

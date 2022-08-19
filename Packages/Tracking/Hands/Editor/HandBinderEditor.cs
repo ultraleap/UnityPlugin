@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2021.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -13,7 +13,6 @@ using UnityEngine;
 
 namespace Leap.Unity.HandsModule
 {
-#pragma warning disable 0618
     [CanEditMultipleObjects]
     [CustomEditor(typeof(HandBinder))]
     public class HandBinderEditor : Editor
@@ -238,7 +237,7 @@ namespace Leap.Unity.HandsModule
                 {
                     GUI.enabled = true;
                 }
-                if (setScale.boolValue)
+                if (setScale.boolValue && leapProvider.objectReferenceValue != null)
                 {
                     EditorGUILayout.Space();
                     EditorGUILayout.PropertyField(scaleOffset, new GUIContent("Model Scale Offset", "The hand scale will be modified by this amount"));
@@ -415,7 +414,7 @@ namespace Leap.Unity.HandsModule
         void DrawModelHandGizmos()
         {
             //Draw the bound Gameobjects
-            if (myTarget.DebugModelTransforms)
+            if (debugModelTransforms.boolValue)
             {
                 Handles.color = handModelDebugCol;
 
@@ -438,12 +437,9 @@ namespace Leap.Unity.HandsModule
                                 }
                             }
 
-                            if (myTarget.DebugModelTransforms)
-                            {
-                                Handles.DrawWireDisc(target.position, target.right, myTarget.GizmoSize);
-                                Handles.DrawWireDisc(target.position, target.up, myTarget.GizmoSize);
-                                Handles.DrawWireDisc(target.position, target.forward, myTarget.GizmoSize);
-                            }
+                            Handles.DrawWireDisc(target.position, target.right, gizmoSize.floatValue);
+                            Handles.DrawWireDisc(target.position, target.up, gizmoSize.floatValue);
+                            Handles.DrawWireDisc(target.position, target.forward, gizmoSize.floatValue);
                         }
                         index++;
                     }
@@ -453,18 +449,18 @@ namespace Leap.Unity.HandsModule
                 if (myTarget.BoundHand.wrist.boundTransform != null)
                 {
                     var target = myTarget.BoundHand.wrist.boundTransform;
-                    Handles.DrawWireDisc(target.position, target.right, myTarget.GizmoSize);
-                    Handles.DrawWireDisc(target.position, target.up, myTarget.GizmoSize);
-                    Handles.DrawWireDisc(target.position, target.forward, myTarget.GizmoSize);
+                    Handles.DrawWireDisc(target.position, target.right, gizmoSize.floatValue);
+                    Handles.DrawWireDisc(target.position, target.up, gizmoSize.floatValue);
+                    Handles.DrawWireDisc(target.position, target.forward, gizmoSize.floatValue);
                 }
 
                 //Draw the wrist Gizmo
                 if (myTarget.BoundHand.elbow.boundTransform != null)
                 {
                     var target = myTarget.BoundHand.elbow.boundTransform;
-                    Handles.DrawWireDisc(target.position, target.right, myTarget.GizmoSize);
-                    Handles.DrawWireDisc(target.position, target.up, myTarget.GizmoSize);
-                    Handles.DrawWireDisc(target.position, target.forward, myTarget.GizmoSize);
+                    Handles.DrawWireDisc(target.position, target.right, gizmoSize.floatValue);
+                    Handles.DrawWireDisc(target.position, target.up, gizmoSize.floatValue);
+                    Handles.DrawWireDisc(target.position, target.forward, gizmoSize.floatValue);
                 }
 
                 var wrist = myTarget.BoundHand.wrist.boundTransform;
@@ -490,9 +486,9 @@ namespace Leap.Unity.HandsModule
                         }
 
                     }
-                    Handles.SphereHandleCap(-1, wrist.position, Quaternion.identity, myTarget.GizmoSize, EventType.Repaint);
-                    Handles.DrawAAPolyLine(wrist.position, myTarget.LeapHand.Arm.PrevJoint.ToVector3());
-                    Handles.SphereHandleCap(-1, myTarget.LeapHand.Arm.PrevJoint.ToVector3(), Quaternion.identity, myTarget.GizmoSize, EventType.Repaint);
+                    Handles.SphereHandleCap(-1, wrist.position, Quaternion.identity, gizmoSize.floatValue, EventType.Repaint);
+                    Handles.DrawAAPolyLine(wrist.position, myTarget.LeapHand.Arm.PrevJoint);
+                    Handles.SphereHandleCap(-1, myTarget.LeapHand.Arm.PrevJoint, Quaternion.identity, gizmoSize.floatValue, EventType.Repaint);
                 }
             }
         }
@@ -503,7 +499,7 @@ namespace Leap.Unity.HandsModule
         void DrawLeapHandGizmos()
         {
             //Draw the leap hand in the scene
-            if (myTarget.DebugLeapHand)
+            if (debugLeapHand.boolValue)
             {
                 Handles.color = leapHandDebugCol;
                 foreach (var finger in myTarget.LeapHand.Fingers)
@@ -512,27 +508,27 @@ namespace Leap.Unity.HandsModule
 
                     foreach (var bone in finger.bones)
                     {
-                        Handles.SphereHandleCap(-1, bone.PrevJoint.ToVector3(), Quaternion.identity, myTarget.GizmoSize, EventType.Repaint);
+                        Handles.SphereHandleCap(-1, bone.PrevJoint, Quaternion.identity, gizmoSize.floatValue, EventType.Repaint);
                         if ((index + 1) <= finger.bones.Length - 1)
                         {
-                            Handles.DrawAAPolyLine(finger.bones[index].PrevJoint.ToVector3(), finger.bones[index + 1].PrevJoint.ToVector3());
+                            Handles.DrawAAPolyLine(finger.bones[index].PrevJoint, finger.bones[index + 1].PrevJoint);
                         }
 
                         index++;
                     }
 
-                    Handles.DrawDottedLine(finger.bones.Last().PrevJoint.ToVector3(), finger.TipPosition.ToVector3(), 5);
-                    Handles.SphereHandleCap(-1, finger.TipPosition.ToVector3(), Quaternion.identity, myTarget.GizmoSize, EventType.Repaint);
+                    Handles.DrawDottedLine(finger.bones.Last().PrevJoint, finger.TipPosition, 5);
+                    Handles.SphereHandleCap(-1, finger.TipPosition, Quaternion.identity, gizmoSize.floatValue, EventType.Repaint);
                 }
 
-                Handles.SphereHandleCap(-1, myTarget.LeapHand.WristPosition.ToVector3(), Quaternion.identity, myTarget.GizmoSize, EventType.Repaint);
-                Handles.DrawAAPolyLine(myTarget.LeapHand.WristPosition.ToVector3(), myTarget.LeapHand.Fingers[0].bones[0].PrevJoint.ToVector3());
-                Handles.DrawAAPolyLine(myTarget.LeapHand.WristPosition.ToVector3(), myTarget.LeapHand.Fingers[1].bones[0].PrevJoint.ToVector3());
-                Handles.DrawAAPolyLine(myTarget.LeapHand.WristPosition.ToVector3(), myTarget.LeapHand.Fingers[2].bones[0].PrevJoint.ToVector3());
-                Handles.DrawAAPolyLine(myTarget.LeapHand.WristPosition.ToVector3(), myTarget.LeapHand.Fingers[3].bones[0].PrevJoint.ToVector3());
-                Handles.DrawAAPolyLine(myTarget.LeapHand.WristPosition.ToVector3(), myTarget.LeapHand.Fingers[4].bones[0].PrevJoint.ToVector3());
-                Handles.DrawAAPolyLine(myTarget.LeapHand.WristPosition.ToVector3(), myTarget.LeapHand.Arm.PrevJoint.ToVector3());
-                Handles.SphereHandleCap(-1, myTarget.LeapHand.Arm.PrevJoint.ToVector3(), Quaternion.identity, myTarget.GizmoSize, EventType.Repaint);
+                Handles.SphereHandleCap(-1, myTarget.LeapHand.WristPosition, Quaternion.identity, gizmoSize.floatValue, EventType.Repaint);
+                Handles.DrawAAPolyLine(myTarget.LeapHand.WristPosition, myTarget.LeapHand.Fingers[0].bones[0].PrevJoint);
+                Handles.DrawAAPolyLine(myTarget.LeapHand.WristPosition, myTarget.LeapHand.Fingers[1].bones[0].PrevJoint);
+                Handles.DrawAAPolyLine(myTarget.LeapHand.WristPosition, myTarget.LeapHand.Fingers[2].bones[0].PrevJoint);
+                Handles.DrawAAPolyLine(myTarget.LeapHand.WristPosition, myTarget.LeapHand.Fingers[3].bones[0].PrevJoint);
+                Handles.DrawAAPolyLine(myTarget.LeapHand.WristPosition, myTarget.LeapHand.Fingers[4].bones[0].PrevJoint);
+                Handles.DrawAAPolyLine(myTarget.LeapHand.WristPosition, myTarget.LeapHand.Arm.PrevJoint);
+                Handles.SphereHandleCap(-1, myTarget.LeapHand.Arm.PrevJoint, Quaternion.identity, gizmoSize.floatValue, EventType.Repaint);
             }
         }
 
@@ -582,10 +578,10 @@ namespace Leap.Unity.HandsModule
         {
             Vector3 middle, y, x, z;
 
-            middle = bone.PrevJoint.ToVector3();
-            y = bone.Basis.xBasis.ToVector3();
-            x = bone.Basis.yBasis.ToVector3();
-            z = bone.Basis.zBasis.ToVector3();
+            middle = bone.PrevJoint;
+            y = bone.Basis.xBasis;
+            x = bone.Basis.yBasis;
+            z = bone.Basis.zBasis;
 
             Handles.color = Color.green;
             Handles.DrawLine(middle, middle + y.normalized * size);
@@ -850,7 +846,6 @@ namespace Leap.Unity.HandsModule
                         Undo.RegisterFullObjectHierarchyUndo(handBinder.gameObject, "Bind Hand");
                         HandBinderAutoBinder.BindHand(handBinder);
 
-                        handBinder.SetEditorPose = true;
                         handBinder.UpdateHand();
                     }
                 }
@@ -1014,5 +1009,4 @@ namespace Leap.Unity.HandsModule
             }
         }
     }
-#pragma warning restore 0618
 }

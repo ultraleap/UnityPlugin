@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2021.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -24,7 +24,7 @@ namespace Leap.Unity.Tests
         {
             const float TOLERANCE = 0.01f; //1 cm for all positions
 
-            Frame frame = TestHandFactory.MakeTestFrame(0, includeLeftHand: true, includeRightHand: true, unitType: TestHandFactory.UnitType.UnityUnits);
+            Frame frame = TestHandFactory.MakeTestFrame(0, includeLeftHand: true, includeRightHand: true);
 
             foreach (var hand in frame.Hands)
             {
@@ -55,7 +55,7 @@ namespace Leap.Unity.Tests
                 }
 
                 Assert.That(result.IsLeft, Is.EqualTo(hand.IsLeft));
-                Assert.That((result.PalmPosition - hand.PalmPosition).Magnitude, Is.LessThan(TOLERANCE));
+                Assert.That((result.PalmPosition - hand.PalmPosition).magnitude, Is.LessThan(TOLERANCE));
 
                 foreach (var resultFinger in result.Fingers)
                 {
@@ -66,9 +66,9 @@ namespace Leap.Unity.Tests
                         Bone resultBone = resultFinger.bones[i];
                         Bone bone = finger.bones[i];
 
-                        Assert.That((resultBone.NextJoint - bone.NextJoint).Magnitude, Is.LessThan(TOLERANCE));
-                        Assert.That((resultBone.PrevJoint - bone.PrevJoint).Magnitude, Is.LessThan(TOLERANCE));
-                        Assert.That((resultBone.Center - bone.Center).Magnitude, Is.LessThan(TOLERANCE));
+                        Assert.That((resultBone.NextJoint - bone.NextJoint).magnitude, Is.LessThan(TOLERANCE));
+                        Assert.That((resultBone.PrevJoint - bone.PrevJoint).magnitude, Is.LessThan(TOLERANCE));
+                        Assert.That((resultBone.Center - bone.Center).magnitude, Is.LessThan(TOLERANCE));
                     }
                 }
             }

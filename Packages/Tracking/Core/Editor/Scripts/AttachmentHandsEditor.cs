@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2021.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -118,15 +118,19 @@ namespace Leap.Unity.Attachments
             }
             else
             {
-                if (!wouldFlagDeletionDestroyData(target, flag)
-                    || EditorUtility.DisplayDialog("Delete " + flag + " Attachment Point?",
+                if (!wouldFlagDeletionDestroyData(target, flag))
+                {
+
+                    target.attachmentPoints = attachmentPoints & (~flag); // Set flag bit to 0.
+                }
+                else if (EditorUtility.DisplayDialog("Delete " + flag + " Attachment Point?",
                                                    "Deleting the " + flag + " attachment point will destroy "
                                                  + "its GameObject and any of its non-Attachment-Point children, "
                                                  + "and will remove any components attached to it.",
                                                    "Delete " + flag + " Attachment Point", "Cancel"))
                 {
-
                     target.attachmentPoints = attachmentPoints & (~flag); // Set flag bit to 0.
+                    GUIUtility.ExitGUI();
                 }
             }
         }

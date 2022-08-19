@@ -10,7 +10,6 @@ using Hand = Leap.Hand;
 
 namespace Ultraleap.Tracking.OpenXR
 {
-#pragma warning disable 0618
     public class OpenXRLeapProvider : LeapProvider
     {
         private Frame _updateFrame = new Frame();
@@ -38,26 +37,15 @@ namespace Ultraleap.Tracking.OpenXR
         {
             get
             {
-                if (_mainCamera != null && _mainCamera != MainCameraProvider.mainCamera)
+                if (_mainCamera == null)
                 {
-                    MainCameraProvider.mainCamera = _mainCamera;
+                    _mainCamera = Camera.main;
                 }
                 return _mainCamera;
             }
             set
             {
                 _mainCamera = value;
-                MainCameraProvider.mainCamera = value;
-            }
-        }
-
-        protected void OnEnable()
-        {
-            // Assign the main camera if it looks like one is available and it's not yet been set on the backing field
-            // NB this may be the case if the provider is created via AddComponent, as in MRTK
-            if (mainCamera == null && MainCameraProvider.mainCamera != null)
-            {
-                mainCamera = MainCameraProvider.mainCamera;
             }
         }
 
@@ -67,7 +55,6 @@ namespace Ultraleap.Tracking.OpenXR
 
             Pose trackerTransform = new Pose(Vector3.zero, Quaternion.identity);
 
-#if XR_LEGACY_INPUT_AVAILABLE
             // Adjust for relative transform if it's in use.
             var trackedPoseDriver = mainCamera.GetComponent<UnityEngine.SpatialTracking.TrackedPoseDriver>();
             if (trackedPoseDriver != null && trackedPoseDriver.UseRelativeTransform)
@@ -75,7 +62,7 @@ namespace Ultraleap.Tracking.OpenXR
                 trackerTransform.position += trackedPoseDriver.originPose.position;
                 trackerTransform.rotation *= trackedPoseDriver.originPose.rotation;
             }
-#endif
+
             // Adjust for the camera parent transform if this camera is part of a rig.
             var parentTransform = mainCamera.transform.parent;
             if (parentTransform != null)
@@ -213,7 +200,6 @@ namespace Ultraleap.Tracking.OpenXR
                 handTracker == HandTracker.Left ? _leftHandId : _rightHandId,
                 1f,
                 CalculateGrabStrength(hand),
-                0, // fixed as grabAngle is going to be deleted
                 CalculatePinchStrength(ref hand, palmWidth),
                 CalculatePinchDistance(ref hand),
                 palmWidth,
@@ -286,7 +272,7 @@ namespace Ultraleap.Tracking.OpenXR
             var minDistanceSquared = float.MaxValue;
             foreach (var finger in hand.Fingers.Skip(1))
             {
-                var distanceSquared = (finger.TipPosition.ToVector3() - thumbTipPosition.ToVector3()).sqrMagnitude;
+                var distanceSquared = (finger.TipPosition - thumbTipPosition).sqrMagnitude;
                 minDistanceSquared = Mathf.Min(distanceSquared, minDistanceSquared);
             }
 
@@ -297,10 +283,10 @@ namespace Ultraleap.Tracking.OpenXR
         private float CalculateBoneDistanceSquared(Bone boneA, Bone boneB)
         {
             // Denormalize directions to bone length.
-            var boneAJoint = boneA.PrevJoint.ToVector3();
-            var boneBJoint = boneB.PrevJoint.ToVector3();
-            var boneADirection = boneA.Direction.ToVector3() * boneA.Length;
-            var boneBDirection = boneB.Direction.ToVector3() * boneB.Length;
+            var boneAJoint = boneA.PrevJoint;
+            var boneBJoint = boneB.PrevJoint;
+            var boneADirection = boneA.Direction * boneA.Length;
+            var boneBDirection = boneB.Direction * boneB.Length;
 
             // Compute the minimum (squared) distance between two bones.
             var diff = boneBJoint - boneAJoint;
@@ -425,5 +411,4 @@ namespace Ultraleap.Tracking.OpenXR
 
         #endregion
     }
-#pragma warning restore 0618
 }

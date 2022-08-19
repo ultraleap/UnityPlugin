@@ -1,18 +1,15 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2021.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Leap;
-using System.Collections;
 using UnityEngine;
 
 namespace Leap.Unity
 {
-#pragma warning disable 0618
     /// <summary>
     /// The base class for all hand models, both graphics and physics.
     ///
@@ -93,7 +90,7 @@ namespace Leap.Unity
         /// <returns> A Vector3 containing the Unity coordinates of the palm position. </returns>
         public Vector3 GetPalmPosition()
         {
-            return hand_.PalmPosition.ToVector3();
+            return hand_.PalmPosition;
         }
 
         /// <summary> 
@@ -104,9 +101,7 @@ namespace Leap.Unity
         {
             if (hand_ != null)
             {
-                // The hand Basis vectors are calculated explicitly.  This requires using Basis.CalculateRotation()
-                // instead of Basis.quaternion.
-                return hand_.Basis.CalculateRotation();
+                return hand_.Basis.rotation;
             }
             if (palm)
             {
@@ -123,7 +118,7 @@ namespace Leap.Unity
         {
             if (hand_ != null)
             {
-                return hand_.Direction.ToVector3();
+                return hand_.Direction;
             }
             if (palm)
             {
@@ -140,7 +135,7 @@ namespace Leap.Unity
         {
             if (hand_ != null)
             {
-                return hand_.PalmNormal.ToVector3();
+                return hand_.PalmNormal;
             }
             if (palm)
             {
@@ -157,7 +152,7 @@ namespace Leap.Unity
         {
             if (hand_ != null)
             {
-                return hand_.Arm.Direction.ToVector3();
+                return hand_.Arm.Direction;
             }
             if (forearm)
             {
@@ -174,8 +169,8 @@ namespace Leap.Unity
         {
             if (hand_ != null)
             {
-                Vector leap_center = 0.5f * (hand_.Arm.WristPosition + hand_.Arm.ElbowPosition);
-                return leap_center.ToVector3();
+                Vector3 leap_center = 0.5f * (hand_.Arm.WristPosition + hand_.Arm.ElbowPosition);
+                return leap_center;
             }
             if (forearm)
             {
@@ -189,7 +184,7 @@ namespace Leap.Unity
         /// </summary>
         public float GetArmLength()
         {
-            return (hand_.Arm.WristPosition - hand_.Arm.ElbowPosition).Magnitude;
+            return (hand_.Arm.WristPosition - hand_.Arm.ElbowPosition).magnitude;
         }
 
         /// <summary> 
@@ -208,7 +203,7 @@ namespace Leap.Unity
         {
             if (hand_ != null)
             {
-                Vector3 local_position = hand_.Arm.ElbowPosition.ToVector3();
+                Vector3 local_position = hand_.Arm.ElbowPosition;
                 return local_position;
             }
             if (elbowJoint)
@@ -226,7 +221,7 @@ namespace Leap.Unity
         {
             if (hand_ != null)
             {
-                Vector3 local_position = hand_.Arm.WristPosition.ToVector3();
+                Vector3 local_position = hand_.Arm.WristPosition;
                 return local_position;
             }
             if (wristJoint)
@@ -244,7 +239,7 @@ namespace Leap.Unity
         {
             if (hand_ != null)
             {
-                Quaternion local_rotation = hand_.Arm.Rotation.ToQuaternion();
+                Quaternion local_rotation = hand_.Arm.Rotation;
                 return local_rotation;
             }
             if (forearm)
@@ -317,5 +312,4 @@ namespace Leap.Unity
         /// </summary>
         public override abstract void UpdateHand();
     }
-#pragma warning restore 0618
 }

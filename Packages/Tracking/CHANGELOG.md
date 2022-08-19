@@ -6,6 +6,48 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [docs-website]: https://docs.ultraleap.com/unity-api/ "Ultraleap Docs"
 
+## [6.0.0] - 17/08/2022
+
+### Added
+- Added a low poly hand model with an arm
+- Added create menu options for LeapServiceProviders via GameObject/Ultrealeap/Service Provider (X)
+- Added TrackedPoseDriver to all XR example scenes
+- Added ability to create LeapServiceProviders from the GameObject/Create menu in editor
+- Added Hand Rays to Preview package
+
+### Changed
+- Cleaned up the image retriever and LeapServiceProvider Execution order, reducing unnecessary service and log messages
+- ImageRetriever prefab and LeapEyeDislocator.cs (formerly used for passthrough) removed and replaced by 'VR Infrared Camera' prefab in the Tracking Examples package
+- Example scenes URL
+- Hand rigs bones have their  'L and R' prefixes removed
+- Removed Hotkey functionality
+- Removed use of obsolete methods
+- Removed obsolete methods
+- Removed pre-2020LTS specific support
+- Removed use of SVR
+- Changed use of Vector and LeapQuaternion in favour of Vector3 and Quaternion
+- Removed Legacy XR support
+- Removed MainCaneraProvider in favour of Camera.Main
+- All units to be in M rather than MM when getting hand data
+
+### Fixed
+
+- HandBinder scales hands in edit mode when there is no LeapServiceProvider in the scene
+- Leap.Controller.InternalFrameReady, LeapInternalFrame is never dispatched
+- HandUI example scene panel exists after hand lost
+- ChangeTrackingMode and GetTrackingMode on LeapServiceProvider fail when in disabled multi-device mode
+- FOV Gizmos are not visible when opening an example scene containing a Service Provider in multiDeviceMode = disabled.
+- FOV Gizmos are not visible when changing render pipelines
+- AttachmentHands untick bone in inspector UI causes looping error when deleting gameobject in edit mode
+- SpatialTracking dependency errors
+
+### Known issues 
+- Scenes containing the infrared viewer render incorrectly on Android build targets and in scriptable render pipelines such as URP and HDRP. 
+- Interactions callback scene allows blocks to be moved without doing a grasp pose. 
+- Capsule hands don't have a joint colour in HDRP 
+- Use of the LeapCSharp Config class is unavailable with v5.X tracking service
+- Repeatedly opening scenes can cause memory use increase
+
 ## [5.13.0] - 21/07/2022
 
 ### Announcements
@@ -38,6 +80,7 @@ If you have any concerns about this, please contact us on [Github Discussions](h
 - Hand UI can become detached from hand when hand is removed from view
 - Multi-device (desktop) Scene camera position can become offset
 - FOV visualization does not display after changing render pipelines
+- Use of the LeapCSharp Config class is unavailable with v5.X tracking service
 
 ## [5.12.1] - 06/07/2022
 

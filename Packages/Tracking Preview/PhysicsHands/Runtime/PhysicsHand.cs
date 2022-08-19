@@ -15,9 +15,9 @@ using Leap.Unity;
 using System;
 using System.Linq;
 
+
 namespace Leap.Unity.Interaction.PhysicsHands
 {
-#pragma warning disable 0618
     public class PhysicsHand : MonoBehaviour
     {
         [System.Serializable]
@@ -49,6 +49,9 @@ namespace Leap.Unity.Interaction.PhysicsHands
             [HideInInspector]
             public float stiffness, forceLimit;
             public float boneMass;
+
+            [HideInInspector]
+            public PhysicMaterial physicMaterial;
         }
 
         private PhysicsProvider _physicsProvider;
@@ -138,7 +141,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             get
             {
                 if (_originalLeapHand == null || _physicsHand == null || _physicsHand.transform == null) return -1;
-                return Vector3.Distance(_originalLeapHand.PalmPosition.ToVector3(), _physicsHand.transform.position);
+                return Vector3.Distance(_originalLeapHand.PalmPosition, _physicsHand.transform.position);
             }
         }
 
@@ -216,10 +219,10 @@ namespace Leap.Unity.Interaction.PhysicsHands
             if (active)
             {
                 _physicsHand.palmBody.immovable = false;
-                _originalOldPosition = _originalLeapHand.PalmPosition.ToVector3();
+                _originalOldPosition = _originalLeapHand.PalmPosition;
 
-                _physicsHand.transform.position = _originalLeapHand.PalmPosition.ToVector3();
-                _physicsHand.transform.rotation = _originalLeapHand.Rotation.ToQuaternion();
+                _physicsHand.transform.position = _originalLeapHand.PalmPosition;
+                _physicsHand.transform.rotation = _originalLeapHand.Rotation;
                 _physicsHand.palmBody.WakeUp();
                 _physicsHand.palmBody.TeleportRoot(_physicsHand.transform.position, _physicsHand.transform.rotation);
 
@@ -318,13 +321,13 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
             if (!IsGrasping && _graspingDeltaCurrent > 0)
             {
-                _graspingDeltaCurrent -= Vector3.Distance(_originalOldPosition, _originalLeapHand.PalmPosition.ToVector3());
+                _graspingDeltaCurrent -= Vector3.Distance(_originalOldPosition, _originalLeapHand.PalmPosition);
             }
 
             PhysicsHandsUtils.UpdatePhysicsPalm(ref _physicsHand,
                 // If the hand was grasping then we want to smoothly interpolate back to where it was based on distance
-                !IsGrasping && _graspingDeltaCurrent > 0 ? Vector3.Lerp(_physicsHand.transform.position, _originalLeapHand.PalmPosition.ToVector3(), Mathf.InverseLerp(_graspingDelta, 0, _graspingDeltaCurrent)) : _originalLeapHand.PalmPosition.ToVector3(),
-                !IsGrasping && _graspingDeltaCurrent > 0 ? Quaternion.Slerp(_physicsHand.transform.rotation, _originalLeapHand.Rotation.ToQuaternion(), Mathf.InverseLerp(_graspingDelta, 0, _graspingDeltaCurrent)) : _originalLeapHand.Rotation.ToQuaternion(),
+                !IsGrasping && _graspingDeltaCurrent > 0 ? Vector3.Lerp(_physicsHand.transform.position, _originalLeapHand.PalmPosition, Mathf.InverseLerp(_graspingDelta, 0, _graspingDeltaCurrent)) : _originalLeapHand.PalmPosition,
+                !IsGrasping && _graspingDeltaCurrent > 0 ? Quaternion.Slerp(_physicsHand.transform.rotation, _originalLeapHand.Rotation, Mathf.InverseLerp(_graspingDelta, 0, _graspingDeltaCurrent)) : _originalLeapHand.Rotation,
                 // Interpolate the object if it's heavier
                 _isGrasping && _physicsProvider.InterpolatingMass && _graspMass > 1 ? Mathf.InverseLerp(0.001f, _physicsProvider.MaxMass, _graspMass).EaseOut() : 0f,
                 // Reduce force of hand as it gets further from the original data hand
@@ -371,13 +374,13 @@ namespace Leap.Unity.Interaction.PhysicsHands
                     if (jointIndex > 0)
                     {
                         PhysicsHandsUtils.InterpolateBoneSize(_physicsHand.jointBodies[boneArrayIndex], _physicsHand.jointBones[boneArrayIndex], _physicsHand.jointColliders[boneArrayIndex],
-                            prevBone.PrevJoint.ToVector3(), prevBone.Rotation.ToQuaternion(), bone.PrevJoint.ToVector3(),
+                            prevBone.PrevJoint, prevBone.Rotation, bone.PrevJoint,
                             bone.Width, bone.Length, Time.fixedDeltaTime);
                     }
                     else
                     {
                         PhysicsHandsUtils.InterpolateBoneSize(_physicsHand.jointBodies[boneArrayIndex], _physicsHand.jointBones[boneArrayIndex], _physicsHand.jointColliders[boneArrayIndex],
-                            _originalLeapHand.PalmPosition.ToVector3(), _originalLeapHand.Rotation.ToQuaternion(), fingerIndex == 0 ? knuckleBone.PrevJoint.ToVector3() : knuckleBone.NextJoint.ToVector3(),
+                            _originalLeapHand.PalmPosition, _originalLeapHand.Rotation, fingerIndex == 0 ? knuckleBone.PrevJoint : knuckleBone.NextJoint,
                             bone.Width, bone.Length, Time.fixedDeltaTime);
                     }
 
@@ -419,7 +422,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             }
 
             _wasGrasping = IsGrasping;
-            _originalOldPosition = _originalLeapHand.PalmPosition.ToVector3();
+            _originalOldPosition = _originalLeapHand.PalmPosition;
 
             if (IsGrasping)
             {
@@ -520,6 +523,10 @@ namespace Leap.Unity.Interaction.PhysicsHands
             int overlappingColliders = Physics.OverlapSphereNonAlloc(_physicsHand.palmBody.worldCenterOfMass, radius, _teleportColliders, _layerMask, QueryTriggerInteraction.Ignore);
             for (int i = 0; i < overlappingColliders; i++)
             {
+                if (_teleportColliders[i].attachedRigidbody != null && _teleportColliders[i].attachedRigidbody.TryGetComponent<PhysicsIgnoreHelpers>(out var temp))
+                {
+                    continue;
+                }
                 if (_physicsHand.gameObject != _teleportColliders[i].gameObject && !_physicsHand.jointBodies.Select(x => x.gameObject).Contains(_teleportColliders[i].gameObject))
                 {
                     found = true;
@@ -532,9 +539,13 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 return true;
             }
 
-            overlappingColliders = Physics.OverlapSphereNonAlloc(_originalLeapHand.PalmPosition.ToVector3(), radius, _teleportColliders, _layerMask, QueryTriggerInteraction.Ignore);
+            overlappingColliders = Physics.OverlapSphereNonAlloc(_originalLeapHand.PalmPosition, radius, _teleportColliders, _layerMask, QueryTriggerInteraction.Ignore);
             for (int i = 0; i < overlappingColliders; i++)
             {
+                if (_teleportColliders[i].attachedRigidbody != null && _teleportColliders[i].attachedRigidbody.TryGetComponent<PhysicsIgnoreHelpers>(out var temp))
+                {
+                    continue;
+                }
                 if (_physicsHand.gameObject != _teleportColliders[i].gameObject && !_physicsHand.jointBodies.Select(x => x.gameObject).Contains(_teleportColliders[i].gameObject))
                 {
                     found = true;
@@ -544,5 +555,4 @@ namespace Leap.Unity.Interaction.PhysicsHands
             return found;
         }
     }
-#pragma warning restore 0618
 }

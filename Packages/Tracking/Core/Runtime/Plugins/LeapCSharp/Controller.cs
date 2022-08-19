@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2021.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -555,25 +555,6 @@ namespace Leap
         /// the change was accepted. 
         /// @since 2.1.6 (5.4.4 for specific device)
         /// </summary>
-        [Obsolete("This method signature will be removed in a future update. Please use the equivalent method that does not take the serial number")]
-        public void SetAndClearPolicy(PolicyFlag set, PolicyFlag clear, string deviceSerial = "", Device device = null)
-        {
-            _connection.SetAndClearPolicy(set, clear, device);
-        }
-
-        /// <summary>
-        /// Requests setting and clearing policy flags on a specific device
-        ///  
-        /// A request to change a policy is subject to user approval and a policy 
-        /// can be changed by the user at any time (using the Leap Motion settings dialog). 
-        /// The desired policy flags must be set every time an application runs. 
-        ///  
-        /// Policy changes are completed asynchronously and, because they are subject 
-        /// to user approval or system compatibility checks, may not complete successfully. Call 
-        /// Controller.IsPolicySet() after a suitable interval to test whether 
-        /// the change was accepted. 
-        /// @since 2.1.6 (5.4.4 for specific device)
-        /// </summary>
         public void SetAndClearPolicy(PolicyFlag set, PolicyFlag clear, Device device = null)
         {
             _connection.SetAndClearPolicy(set, clear, device);
@@ -598,25 +579,6 @@ namespace Leap
         }
 
         /// <summary>
-        /// Requests setting a policy.
-        ///  
-        /// A request to change a policy is subject to user approval and a policy 
-        /// can be changed by the user at any time (using the Leap Motion settings dialog). 
-        /// The desired policy flags must be set every time an application runs. 
-        ///  
-        /// Policy changes are completed asynchronously and, because they are subject 
-        /// to user approval or system compatibility checks, may not complete successfully. Call 
-        /// Controller.IsPolicySet() after a suitable interval to test whether 
-        /// the change was accepted. 
-        /// @since 2.1.6 
-        /// </summary>
-        [Obsolete("Use the version of SetPolicy that also takes the device")]
-        public void SetPolicy(PolicyFlag policy)
-        {
-            SetPolicy(policy, null);
-        }
-
-        /// <summary>
         /// Requests clearing a policy on a specific device
         /// 
         /// Policy changes are completed asynchronously and, because they are subject
@@ -628,21 +590,6 @@ namespace Leap
         public void ClearPolicy(PolicyFlag policy, Device device = null)
         {
             _connection.ClearPolicy(policy, device);
-        }
-
-        /// <summary>
-        /// Requests clearing a policy
-        /// 
-        /// Policy changes are completed asynchronously and, because they are subject
-        /// to user approval or system compatibility checks, may not complete successfully. Call
-        /// Controller.IsPolicySet() after a suitable interval to test whether
-        /// the change was accepted.
-        /// @since 2.1.6
-        /// </summary>
-        [Obsolete("Use the version of ClearPolicy that also takes the device")]
-        public void ClearPolicy(PolicyFlag policy)
-        {
-            ClearPolicy(policy, null);
         }
 
         /// <summary>
@@ -665,22 +612,14 @@ namespace Leap
         }
 
         /// <summary>
-        /// Gets the active setting 
+        /// Checks if the specified device is available.
         /// 
-        /// Keep in mind that setting a policy flag is asynchronous, so changes are
-        /// not effective immediately after calling setPolicyFlag(). In addition, a
-        /// policy request can be declined by the user. You should always set the
-        /// policy flags required by your application at startup and check that the
-        /// policy change request was successful after an appropriate interval.
-        /// 
-        /// If the controller object is not connected to the Leap Motion software, then the default
-        /// state for the selected policy is returned.
-        ///
-        /// @since 2.1.6
-        [Obsolete("Use the version of IsPolicySet that also takes the device")]
-        public bool IsPolicySet(PolicyFlag policy)
+        /// Device availability is determined by checking it has active policy flags set against it
+        /// via its connection.
+        /// </summary>
+        public bool IsDeviceAvailable(Device device = null)
         {
-            return IsPolicySet(policy, null);
+            return _connection.IsDeviceAvailable(device);
         }
 
         /// <summary>
