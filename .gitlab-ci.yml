@@ -218,10 +218,6 @@ export-unitypackages:
   extends: .base
   stage: build
 
-  needs:
-   - job: dependencies-libtrack
-     artifacts: true
-
   variables:
     # Path to UnityPlugin within a unity project
     # Changing this will change the root where all generated .unitypackages import to in a project
@@ -246,19 +242,7 @@ export-unitypackages:
     EXAMPLES_SUBPATH_Tracking_OpenXR:          "Examples~"
     UNITYPACKAGE_OUTPUT_PATH_Tracking_OpenXR:  "$UNITYPACKAGES_OUTPUT_PATH/Tracking OpenXR.unitypackage"
 
-    LEAPC_SOURCE_PATH: "$ARTIFACTS_PATH/Windows/LeapC.dll"
-    LEAPC_DESTINATION_PATH: "$PLUGIN_LIBS_PATH/x86_64/LeapC.dll"
-
   script:
-    # We only replace libtrack dependencies if there is an upstream branch ref or we are explicitly using the latest stable artifacts.
-    # Upstream branch ref takes precedence, see the libtrack dependencies job.
-    - $REPLACE_LIBTRACK_DEPENDENCIES = "$UPSTREAM_UPSTREAM_BRANCH_REF" -or "$USE_LIBTRACK_STABLE"
-
-    #  Copy libs from libtrack dependencies, overwritting anything already there
-    #- if ($REPLACE_LIBTRACK_DEPENDENCIES) { Copy-Item "$ARTIFACTS_PATH/Android/libLeapC.so" -Destination "$PLUGIN_LIBS_PATH/Android/libLeapC.so" -Force
-    #- if ($REPLACE_LIBTRACK_DEPENDENCIES) { Copy-Item "$ARTIFACTS_PATH/Android/UltraleapTrackingServiceBinder.aar" -Destination "$PLUGIN_LIBS_PATH/Android/libs/UltraleapTrackingServiceBinder.aar" -Force }
-    - if ($REPLACE_LIBTRACK_DEPENDENCIES) { Copy-Item "$LEAPC_SOURCE_PATH" -Destination "$LEAPC_DESTINATION_PATH" -Force }
-
     - New-Item -Path "$UNITYPACKAGES_OUTPUT_PATH" -ItemType Directory -Force
 
     # Import functions required below by calling script to define global functions
