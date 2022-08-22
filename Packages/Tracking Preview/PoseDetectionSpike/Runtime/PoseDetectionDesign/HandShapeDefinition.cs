@@ -109,7 +109,17 @@ namespace Leap.Unity
             return this;
         }
 
+        public HandShapeDefinition IndexProximalRelativeCurl(float expectedCurl, float tolerance)
+        {
+            return this;
+        }
+
         public HandShapeDefinition IndexIntermediateRelativeCurl(float curl)
+        {
+            return this;
+        }
+
+        public HandShapeDefinition IndexIntermediateRelativeCurl(ShapeValidity validity)
         {
             return this;
         }

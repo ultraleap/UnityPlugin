@@ -11,4 +11,9 @@ public class AndStateObserver : IStateObserver
 
     public event EventHandler OnStateObserved;
     public event EventHandler OnStateLost;
+
+    internal AndStateObserver Add(IStateObserver pinchDetector)
+    {
+        return this;
+    }
 }

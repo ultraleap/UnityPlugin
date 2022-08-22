@@ -19,8 +19,7 @@ public class PoseDetectionExample
         PoseDetector pinchDetector = new PoseDetector().Add(pinchShape); // Provide shape and overridden detector
 
         var pinchPoseObserver = new AndStateObserver()
-             .Add(pinchDetector)
-             .Add(thumbAndFingerClose);
+             .Add(pinchDetector).Add(thumbAndFingerClose);
 
         pinchPoseObserver.OnStateObserved += PinchDetector_OnStateObserved;
     }
