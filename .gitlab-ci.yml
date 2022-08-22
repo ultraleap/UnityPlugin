@@ -173,7 +173,7 @@ check-plugins:
     ## Validate our versions
     - $NewLeapVersion = [System.Diagnostics.FileVersionInfo]::GetVersionInfo("$WINDOWS_ARTIFACTS_PATH/LeapC.dll").FileVersion
     - $CurrentLeapVersion = [System.Diagnostics.FileVersionInfo]::GetVersionInfo("$PACKAGE_PATH_Tracking/Core/Runtime/Plugins/x86_64/LeapC.dll").FileVersion
-    - if (-not ($NewLeapVersion -eq $CurrentLeapVersion)) { echo "Plugin version in UnityPlugin: $CurrentLeapVersion"; echo "Plugin version on Libtrack stable: $NewLeapVersion"; exit 1; }
+    - if (-not ($NewLeapVersion -eq $CurrentLeapVersion)) { echo "Plugin version in UnityPlugin - $CurrentLeapVersion"; echo "Plugin version on Libtrack stable - $NewLeapVersion"; exit 1; }
 
   artifacts:
     name: "$ARTIFACTS_NAME-libtrack-dependencies"
