@@ -131,8 +131,8 @@ check-plugins:
     LIBTRACK_ANDROID_JOB: "AndroidRelProdLTS"
     LIBTRACK_WINDOWS_JOB: "WinRelDebProdLTS"
 
-    ANDROID_ARTIFACTS_PATH: "$ARTIFACTS_PATH/Android"
-    WINDOWS_ARTIFACTS_PATH: "$ARTIFACTS_PATH/Windows"
+    ANDROID_ARTIFACTS_PATH: "$ARTIFACTS_PATH/Android/libs"
+    WINDOWS_ARTIFACTS_PATH: "$ARTIFACTS_PATH/x86_64"
     VERSION_SUFFIX_PATH: "$ARTIFACTS_PATH/libtrack_version_suffix.txt"
     
   script:
@@ -145,7 +145,7 @@ check-plugins:
     - Invoke-RestMethod -Headers @{"PRIVATE-TOKEN"="$LIBTRACK_ACCESS_TOKEN"} -Uri "$LIBTRACK_URL/VERSION_SUFFIX.txt?job=$LIBTRACK_ANDROID_JOB" -OutFile "$VERSION_SUFFIX_PATH"
     - if ( -not (Test-Path "$VERSION_SUFFIX_PATH")) { echo "Error downloading version info"; exit 1; }
     - $VERSION_SUFFIX = Get-Content -Path "$VERSION_SUFFIX_PATH"
-    - echo $VERSION_SUFFIX
+    - Remove-Item "$VERSION_SUFFIX_PATH"
     
     ## Download libLeapC ZIP
     - if (-not (Test-Path -Path "LeapC/")) { echo "creating... LeapC"; New-Item "LeapC/" -Type Directory }
