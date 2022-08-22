@@ -293,7 +293,7 @@ consolidate:
     - job: check-formatting
       artifacts: true
       optional: true
-    - job: check-libtrack
+    - job: check-plugins
       artifacts: true
       optional: true
     - job: generate-api-docs
