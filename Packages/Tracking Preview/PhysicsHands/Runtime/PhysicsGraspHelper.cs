@@ -118,9 +118,9 @@ namespace Leap.Unity.Interaction.PhysicsHands
         {
             _rigid = rigid;
             // Doing this prevents objects from misaligning during rotation
-            if(_rigid.maxAngularVelocity < 30f)
+            if(_rigid.maxAngularVelocity < 100f)
             {
-                _rigid.maxAngularVelocity = 30f;
+                _rigid.maxAngularVelocity = 100f;
             }
             _oldKinematic = _rigid.isKinematic;
             _oldGravity = _rigid.useGravity;
