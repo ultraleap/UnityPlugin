@@ -115,6 +115,11 @@ namespace Leap.Unity.Interaction.PhysicsHands
         public PhysicsGraspHelper(Rigidbody rigid, PhysicsProvider manager)
         {
             _rigid = rigid;
+            // Doing this prevents objects from misaligning during rotation
+            if(_rigid.maxAngularVelocity < 30f)
+            {
+                _rigid.maxAngularVelocity = 30f;
+            }
             _oldKinematic = _rigid.isKinematic;
             _oldGravity = _rigid.useGravity;
             _colliders = rigid.GetComponentsInChildren<Collider>(true).ToList();
@@ -618,7 +623,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
         }
 
         // Ripped from IE
-        protected float _maxVelocity = 6F;
+        protected float _maxVelocity = 12F;
         private Vector3 _lastSolvedCoMPosition = Vector3.zero;
         protected AnimationCurve _strengthByDistance = new AnimationCurve(new Keyframe(0.0f, 1.0f, 0.0f, 0.0f),
                                                                              new Keyframe(0.08f, 0.3f, 0.0f, 0.0f));
