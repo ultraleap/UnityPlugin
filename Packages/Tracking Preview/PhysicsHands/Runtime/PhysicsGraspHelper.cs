@@ -74,6 +74,8 @@ namespace Leap.Unity.Interaction.PhysicsHands
         public bool Ignored { get { return _ignored != null; } }
         private PhysicsIgnoreHelpers _ignored = null;
 
+        
+
         // Check we got thumb or palm and at least one finger
         private bool Grasped(PhysicsHand hand)
         {
@@ -244,20 +246,14 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 _rigid.isKinematic = _oldKinematic;
                 _rigid.useGravity = _oldGravity;
             }
+            if (Manager.EnableThrowing)
+            {
+                ThrowingOnRelease();
+            }
         }
 
         public State UpdateHelper()
         {
-            if (GraspState == State.Idle)
-            {
-                // Trying to prevent pinging....
-                if (_releaseTimer > 0)
-                {
-                    _releaseTimer -= Time.fixedDeltaTime;
-                    _rigid.velocity = Vector3.ClampMagnitude(_rigid.velocity, _maxVelocityLerped.magnitude);
-                }
-            }
-
             // Check to see if we no longer have any bones
             UpdateRemovedBones();
 
@@ -285,6 +281,10 @@ namespace Leap.Unity.Interaction.PhysicsHands
                         if (Manager.HelperMovesObjects)
                         {
                             MoveObject();
+                        }
+                        if (Manager.EnableThrowing)
+                        {
+                            ThrowingOnHold();
                         }
                         _justGrasped = false;
                     }
@@ -674,5 +674,138 @@ namespace Leap.Unity.Interaction.PhysicsHands
             intObj.MovePosition(solvedPosition);
             intObj.MoveRotation(solvedRotation);
         }
+
+        #region Throwing
+
+        // Taken from SlidingWindowThrow.cs
+
+        // Length of time to average, and delay between the average and current time.
+        private float _windowLength = 0.05f, _windowDelay = 0.02f;
+
+        // Throwing curve
+        private AnimationCurve _throwVelocityMultiplierCurve = new AnimationCurve(
+                                                            new Keyframe(0.0F, 0.8F, 0, 0),
+                                                            new Keyframe(3.0F, 1.0F, 0, 0));
+
+        private Queue<VelocitySample> _velocityQueue = new Queue<VelocitySample>(64);
+
+        private struct VelocitySample
+        {
+            public float time;
+            public Vector3 position;
+            public Quaternion rotation;
+
+            public VelocitySample(Vector3 position, Quaternion rotation, float time)
+            {
+                this.position = position;
+                this.rotation = rotation;
+                this.time = Time.fixedTime;
+            }
+
+            public static VelocitySample Interpolate(VelocitySample a, VelocitySample b, float time)
+            {
+                float alpha = Mathf.Clamp01(Mathf.InverseLerp(a.time, b.time, time));
+
+                return new VelocitySample(Vector3.Lerp(a.position, b.position, alpha),
+                                          Quaternion.Slerp(a.rotation, b.rotation, alpha),
+                                          time);
+            }
+        }
+
+        private void ThrowingOnHold()
+        {
+            _velocityQueue.Enqueue(new VelocitySample(_rigid.position,
+                                                      _rigid.rotation,
+                                                      Time.fixedTime));
+
+            while (true)
+            {
+                VelocitySample oldestVelocity = _velocityQueue.Peek();
+
+                // Dequeue conservatively if the oldest velocity is more than 4 frames later
+                // than the start of the window.
+                if (oldestVelocity.time + (Time.fixedDeltaTime * 4) < Time.fixedTime
+                                                                      - _windowLength
+                                                                      - _windowDelay)
+                {
+                    _velocityQueue.Dequeue();
+                }
+                else
+                {
+                    break;
+                }
+            }
+        }
+
+        private void ThrowingOnRelease()
+        {
+            if (_velocityQueue.Count < 2)
+            {
+                _rigid.velocity = Vector3.zero;
+                _rigid.angularVelocity = Vector3.zero;
+                return;
+            }
+
+            float windowEnd = Time.fixedTime - _windowDelay;
+            float windowStart = windowEnd - _windowLength;
+
+            // 0 occurs before 1,
+            // start occurs before end.
+            VelocitySample start0, start1;
+            VelocitySample end0, end1;
+            VelocitySample s0, s1;
+
+            s0 = s1 = start0 = start1 = end0 = end1 = _velocityQueue.Dequeue();
+
+            while (_velocityQueue.Count != 0)
+            {
+                s0 = s1;
+                s1 = _velocityQueue.Dequeue();
+
+                if (s0.time < windowStart && s1.time >= windowStart)
+                {
+                    start0 = s0;
+                    start1 = s1;
+                }
+
+                if (s0.time < windowEnd && s1.time >= windowEnd)
+                {
+                    end0 = s0;
+                    end1 = s1;
+
+                    // We have assigned both start and end and can break out of the loop.
+                    _velocityQueue.Clear();
+                    break;
+                }
+            }
+
+            VelocitySample start = VelocitySample.Interpolate(start0, start1, windowStart);
+            VelocitySample end = VelocitySample.Interpolate(end0, end1, windowEnd);
+
+            Vector3 interpolatedVelocity = PhysicsUtility.ToLinearVelocity(start.position,
+                                                                           end.position,
+                                                                           _windowLength);
+
+            if(interpolatedVelocity.magnitude > 0.2f)
+            {
+                foreach (var hand in _graspingCandidates)
+                {
+                    hand.IgnoreCollision(_rigid, 0f, 0.03f);
+                }
+                // We only want to apply the forces if we actually want to cause movement to the object
+                // We're still disabling collisions though to allow for the physics system to fully control if necessary
+                if (Manager.HelperMovesObjects)
+                {
+                    _rigid.velocity = interpolatedVelocity;
+                    _rigid.angularVelocity = PhysicsUtility.ToAngularVelocity(start.rotation,
+                                                                                        end.rotation,
+                                                                                        _windowLength);
+
+                    _rigid.velocity *= _throwVelocityMultiplierCurve.Evaluate(_rigid.velocity.magnitude);
+                }
+            }
+        }
+
+        #endregion
     }
 }

@@ -28,6 +28,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
         SerializedProperty _enableHelpers;
         SerializedProperty _helperMovesObjects;
         SerializedProperty _interpolateMass, _maxMass;
+        SerializedProperty _enableThrowing;
 
 
         private void Awake()
@@ -59,6 +60,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             _helperMovesObjects = serializedObject.FindProperty("_helperMovesObjects");
             _interpolateMass = serializedObject.FindProperty("_interpolateMass");
             _maxMass = serializedObject.FindProperty("_maxMass");
+            _enableThrowing = serializedObject.FindProperty("_enableThrowing");
 
             GUI.enabled = false;
             EditorGUILayout.PropertyField(serializedObject.FindProperty("m_Script"), true, new GUILayoutOption[0]);
@@ -206,6 +208,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 {
                     EditorGUILayout.PropertyField(_maxMass);
                 }
+                EditorGUILayout.PropertyField(_enableThrowing);
             }
             EditorGUILayout.EndVertical();
         }

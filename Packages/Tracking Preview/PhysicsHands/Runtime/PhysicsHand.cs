@@ -136,6 +136,20 @@ namespace Leap.Unity.Interaction.PhysicsHands
         private Dictionary<Rigidbody, Collider[]> _ignoredObjects = new Dictionary<Rigidbody, Collider[]>();
         private Dictionary<Rigidbody, float> _ignoredTimeouts = new Dictionary<Rigidbody, float>();
 
+        private List<IgnoreData> _ignoredData = new List<IgnoreData>();
+        private class IgnoreData
+        {
+            public Rigidbody rigid;
+            public Collider[] colliders;
+            public float timeout = 0;
+            public float radius = 0;
+
+            public IgnoreData(Rigidbody rigid, Collider[] colliders)
+            {
+                this.rigid = rigid;
+                this.colliders = colliders;
+            }
+        }
         public bool IsTracked { get; private set; }
 
         // This is the distance between the raw data hand that the physics hand is derived from.
@@ -509,29 +523,19 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
         private void HandleIgnoredObjects()
         {
-            if (_ignoredObjects.Count > 0)
+            if (_ignoredData.Count > 0)
             {
-                bool rebuild = false;
-                foreach (var timePair in _ignoredTimeouts)
+                for (int i = 0; i < _ignoredData.Count; i++)
                 {
-                    _ignoredTimeouts[timePair.Key] -= Time.fixedDeltaTime;
-                    if (_ignoredTimeouts[timePair.Key] <= 0)
+                    if (_ignoredData[i].timeout >= 0)
                     {
-                        rebuild = true;
+                        _ignoredData[i].timeout -= Time.fixedDeltaTime;
                     }
-                }
-                if (rebuild)
-                {
-                    _ignoredTimeouts = _ignoredTimeouts.Where(pair => pair.Value > 0).ToDictionary(pair => pair.Key, pair => pair.Value);
-                }
 
-                var nonContacting = _ignoredObjects.Where(pair => !IsObjectInHandRadius(pair.Key)).Select(pair => pair.Key);
-
-                foreach (var rigid in nonContacting)
-                {
-                    if (!_ignoredTimeouts.ContainsKey(rigid))
+                    if (_ignoredData[i].timeout <= 0 && !IsObjectInHandRadius(_ignoredData[i].rigid, _ignoredData[i].radius))
                     {
-                        TogglePhysicsIgnore(rigid, false);
+                        TogglePhysicsIgnore(_ignoredData[i].rigid, false);
+                        i--;
                     }
                 }
             }
@@ -622,12 +626,12 @@ namespace Leap.Unity.Interaction.PhysicsHands
         /// <summary>
         /// Disables all collisions between a rigidbody and hand. Will automatically handle all colliders on the rigidbody. Timeout lets you specify a minimum time to ignore collisions for.
         /// </summary>
-        public void IgnoreCollision(Rigidbody rigid, float timeout = 0)
+        public void IgnoreCollision(Rigidbody rigid, float timeout = 0, float radius = 0)
         {
-            TogglePhysicsIgnore(rigid, true, timeout);
+            TogglePhysicsIgnore(rigid, true, timeout, radius);
         }
 
-        private void TogglePhysicsIgnore(Rigidbody rigid, bool ignore, float timeout = 0)
+        private void TogglePhysicsIgnore(Rigidbody rigid, bool ignore, float timeout = 0, float radius = 0)
         {
             Collider[] colliders = rigid.GetComponentsInChildren<Collider>(true);
             foreach (var collider in colliders)
@@ -638,29 +642,24 @@ namespace Leap.Unity.Interaction.PhysicsHands
                     Physics.IgnoreCollision(collider, boneCollider, ignore);
                 }
             }
+            int ind = _ignoredData.FindIndex(x => x.rigid == rigid);
             if (ignore)
             {
-                if (!_ignoredObjects.ContainsKey(rigid))
+                if(ind == -1)
                 {
-                    _ignoredObjects.Add(rigid, colliders);
+                    _ignoredData.Add(new IgnoreData(rigid, colliders) { timeout = timeout, radius = radius });
                 }
-                if(timeout > 0)
+                else
                 {
-                    if (_ignoredTimeouts.ContainsKey(rigid))
-                    {
-                        _ignoredTimeouts[rigid] = timeout;
-                    }
-                    else
-                    {
-                        _ignoredTimeouts.Add(rigid, timeout);
-                    }
+                    _ignoredData[ind].timeout = timeout;
+                    _ignoredData[ind].radius = radius;
                 }
             }
             else
             {
-                if (_ignoredObjects.ContainsKey(rigid))
+                if (ind != -1)
                 {
-                    _ignoredObjects.Remove(rigid);
+                    _ignoredData.RemoveAt(ind);
                 }
             }
         }

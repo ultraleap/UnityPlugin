@@ -95,6 +95,11 @@ namespace Leap.Unity.Interaction.PhysicsHands
         private float _maxMass = 15f;
         public float MaxMass => _maxMass;
 
+        [SerializeField, Tooltip("This option allows the grasp helpers to calculate whether objects should be thrown on release.")]
+        private bool _enableThrowing = true;
+
+        public bool EnableThrowing => _enableThrowing;
+
         // Helpers
         private Dictionary<Rigidbody, PhysicsGraspHelper> _graspHelpers = new Dictionary<Rigidbody, PhysicsGraspHelper>();
 
