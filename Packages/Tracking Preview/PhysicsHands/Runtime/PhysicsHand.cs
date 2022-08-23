@@ -14,7 +14,7 @@ using UnityEditor;
 using Leap.Unity;
 using System;
 using System.Linq;
-
+using System.Collections.Generic;
 
 namespace Leap.Unity.Interaction.PhysicsHands
 {
@@ -117,7 +117,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
         private int _resetWait = 0;
         private int _teleportFrameCount = 0;
-        private Collider[] _teleportColliders = new Collider[10];
+        private Collider[] _colliderCache = new Collider[10];
 
         private Vector3 _originalOldPosition = Vector3.zero;
         private float _graspingDelta = 0;
@@ -132,6 +132,9 @@ namespace Leap.Unity.Interaction.PhysicsHands
         private bool _wasGrasping = false;
         private bool _isGrasping = false;
         public bool IsGrasping => _isGrasping;
+
+        private Dictionary<Rigidbody, Collider[]> _ignoredObjects = new Dictionary<Rigidbody, Collider[]>();
+        private Dictionary<Rigidbody, float> _ignoredTimeouts = new Dictionary<Rigidbody, float>();
 
         public bool IsTracked { get; private set; }
 
@@ -421,6 +424,8 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 }
             }
 
+            HandleIgnoredObjects();
+
             _wasGrasping = IsGrasping;
             _originalOldPosition = _originalLeapHand.PalmPosition;
 
@@ -494,11 +499,41 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 _ghosted = true;
             }
 
-            if (Time.frameCount - _lastFrameTeleport >= _teleportFrameCount && _ghosted && !IsObjectInRadius())
+            if (Time.frameCount - _lastFrameTeleport >= _teleportFrameCount && _ghosted && !IsAnyObjectInHandRadius())
             {
                 ChangeHandLayer(_physicsProvider.HandsLayer);
 
                 _ghosted = false;
+            }
+        }
+
+        private void HandleIgnoredObjects()
+        {
+            if (_ignoredObjects.Count > 0)
+            {
+                bool rebuild = false;
+                foreach (var timePair in _ignoredTimeouts)
+                {
+                    _ignoredTimeouts[timePair.Key] -= Time.fixedDeltaTime;
+                    if (_ignoredTimeouts[timePair.Key] <= 0)
+                    {
+                        rebuild = true;
+                    }
+                }
+                if (rebuild)
+                {
+                    _ignoredTimeouts = _ignoredTimeouts.Where(pair => pair.Value > 0).ToDictionary(pair => pair.Key, pair => pair.Value);
+                }
+
+                var nonContacting = _ignoredObjects.Where(pair => !IsObjectInHandRadius(pair.Key)).Select(pair => pair.Key);
+
+                foreach (var rigid in nonContacting)
+                {
+                    if (!_ignoredTimeouts.ContainsKey(rigid))
+                    {
+                        TogglePhysicsIgnore(rigid, false);
+                    }
+                }
             }
         }
 
@@ -512,47 +547,122 @@ namespace Leap.Unity.Interaction.PhysicsHands
             }
         }
 
-        private bool IsObjectInRadius(float radius = 0.07f)
+        /// <summary>
+        /// Used to make sure that the hand is not going to make contact with any object within the scene. Adjusting radius will inflate the joints. This prevents hands from attacking objects when they swap back to contacting.
+        /// </summary>
+        private bool IsAnyObjectInHandRadius(float radius = 0.005f)
         {
-            // TODO do a Physics.CheckSphere for the layer the hand is in, rather than relying on articulation bodies being present
-            // - this discounts any articulation bodies which aren't hands too
-            // Note: we've struggled doing this in the past as _layermask isn't always the correct mask for the bodies
-            // for reference: Physics.CheckSphere(_palmBody.worldCenterOfMass, 0.1f, _layerMask))
-
-            bool found = false;
-            int overlappingColliders = Physics.OverlapSphereNonAlloc(_physicsHand.palmBody.worldCenterOfMass, radius, _teleportColliders, _layerMask, QueryTriggerInteraction.Ignore);
+            int overlappingColliders = PhysExts.OverlapBoxNonAllocOffset(_physicsHand.palmCollider, Vector3.zero, _colliderCache, _layerMask, QueryTriggerInteraction.Ignore, radius);
             for (int i = 0; i < overlappingColliders; i++)
             {
-                if (_teleportColliders[i].attachedRigidbody != null && _teleportColliders[i].attachedRigidbody.TryGetComponent<PhysicsIgnoreHelpers>(out var temp))
+                if (WillColliderAffectHand(_colliderCache[i]))
                 {
-                    continue;
-                }
-                if (_physicsHand.gameObject != _teleportColliders[i].gameObject && !_physicsHand.jointBodies.Select(x => x.gameObject).Contains(_teleportColliders[i].gameObject))
-                {
-                    found = true;
-                    break;
+                    return true;
                 }
             }
 
-            if (found)
+            foreach (var collider in _physicsHand.jointColliders)
+            {
+                overlappingColliders = PhysExts.OverlapCapsuleNonAllocOffset(collider, Vector3.zero, _colliderCache, _layerMask, QueryTriggerInteraction.Ignore, radius);
+                for (int i = 0; i < overlappingColliders; i++)
+                {
+                    if (WillColliderAffectHand(_colliderCache[i]))
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        private bool WillColliderAffectHand(Collider collider)
+        {
+            if (collider.attachedRigidbody != null && collider.attachedRigidbody.TryGetComponent<PhysicsIgnoreHelpers>(out var temp))
+            {
+                return false;
+            }
+            if (_physicsHand.gameObject != collider.gameObject && !_physicsHand.jointBodies.Select(x => x.gameObject).Contains(collider.gameObject))
             {
                 return true;
             }
+            return false;
+        }
 
-            overlappingColliders = Physics.OverlapSphereNonAlloc(_originalLeapHand.PalmPosition, radius, _teleportColliders, _layerMask, QueryTriggerInteraction.Ignore);
+        /// <summary>
+        /// Checks to see whether the hand will be in contact with a specified object. Radius can be used to inflate the joints.
+        /// </summary>
+        private bool IsObjectInHandRadius(Rigidbody rigid, float radius = 0f)
+        {
+            if (rigid == null)
+                return false;
+
+            int overlappingColliders = PhysExts.OverlapBoxNonAllocOffset(_physicsHand.palmCollider, Vector3.zero, _colliderCache, _layerMask, QueryTriggerInteraction.Ignore, radius);
             for (int i = 0; i < overlappingColliders; i++)
             {
-                if (_teleportColliders[i].attachedRigidbody != null && _teleportColliders[i].attachedRigidbody.TryGetComponent<PhysicsIgnoreHelpers>(out var temp))
+                if (_colliderCache[i].attachedRigidbody == rigid)
                 {
-                    continue;
-                }
-                if (_physicsHand.gameObject != _teleportColliders[i].gameObject && !_physicsHand.jointBodies.Select(x => x.gameObject).Contains(_teleportColliders[i].gameObject))
-                {
-                    found = true;
-                    break;
+                    return true;
                 }
             }
-            return found;
+            foreach (var collider in _physicsHand.jointColliders)
+            {
+                overlappingColliders = PhysExts.OverlapCapsuleNonAllocOffset(collider, Vector3.zero, _colliderCache, _layerMask, QueryTriggerInteraction.Ignore, radius);
+                for (int i = 0; i < overlappingColliders; i++)
+                {
+                    if (_colliderCache[i].attachedRigidbody == rigid)
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Disables all collisions between a rigidbody and hand. Will automatically handle all colliders on the rigidbody. Timeout lets you specify a minimum time to ignore collisions for.
+        /// </summary>
+        public void IgnoreCollision(Rigidbody rigid, float timeout = 0)
+        {
+            TogglePhysicsIgnore(rigid, true, timeout);
+        }
+
+        private void TogglePhysicsIgnore(Rigidbody rigid, bool ignore, float timeout = 0)
+        {
+            Collider[] colliders = rigid.GetComponentsInChildren<Collider>(true);
+            foreach (var collider in colliders)
+            {
+                Physics.IgnoreCollision(collider, _physicsHand.palmCollider, ignore);
+                foreach (var boneCollider in _physicsHand.jointColliders)
+                {
+                    Physics.IgnoreCollision(collider, boneCollider, ignore);
+                }
+            }
+            if (ignore)
+            {
+                if (!_ignoredObjects.ContainsKey(rigid))
+                {
+                    _ignoredObjects.Add(rigid, colliders);
+                }
+                if(timeout > 0)
+                {
+                    if (_ignoredTimeouts.ContainsKey(rigid))
+                    {
+                        _ignoredTimeouts[rigid] = timeout;
+                    }
+                    else
+                    {
+                        _ignoredTimeouts.Add(rigid, timeout);
+                    }
+                }
+            }
+            else
+            {
+                if (_ignoredObjects.ContainsKey(rigid))
+                {
+                    _ignoredObjects.Remove(rigid);
+                }
+            }
         }
     }
 }
