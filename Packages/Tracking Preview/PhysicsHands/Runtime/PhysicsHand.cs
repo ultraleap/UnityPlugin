@@ -503,7 +503,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
         private void HandleTeleportingHands()
         {
             // Fix the hand if it gets into a bad situation by teleporting and holding in place until its bad velocities disappear
-            if (DistanceFromDataHand > (IsGrasping ? _physicsProvider.HandGraspTeleportDistance : _physicsProvider.HandTeleportDistance))
+            if (DistanceFromDataHand > (IsGrasping ? _physicsProvider.HandGraspTeleportDistance : _physicsProvider.HandTeleportDistance) && (IsGrasping || IsAnyObjectInHandRadius()))
             {
                 ResetPhysicsHand(true);
                 //_palmBody.TeleportRoot(_hand.PalmPosition.ToVector3(), _hand.Rotation.ToQuaternion());

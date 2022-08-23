@@ -680,7 +680,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
         // Taken from SlidingWindowThrow.cs
 
         // Length of time to average, and delay between the average and current time.
-        private float _windowLength = 0.05f, _windowDelay = 0.02f;
+        private float _windowLength = 0.05f, _windowDelay = 0.025f;
 
         // Throwing curve
         private AnimationCurve _throwVelocityMultiplierCurve = new AnimationCurve(
@@ -786,11 +786,11 @@ namespace Leap.Unity.Interaction.PhysicsHands
                                                                            end.position,
                                                                            _windowLength);
 
-            if(interpolatedVelocity.magnitude > 0.2f)
+            if(interpolatedVelocity.magnitude > 1.0f)
             {
                 foreach (var hand in _graspingCandidates)
                 {
-                    hand.IgnoreCollision(_rigid, 0f, 0.03f);
+                    hand.IgnoreCollision(_rigid, 0f, 0.04f);
                 }
                 // We only want to apply the forces if we actually want to cause movement to the object
                 // We're still disabling collisions though to allow for the physics system to fully control if necessary
