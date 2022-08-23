@@ -246,7 +246,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 _rigid.isKinematic = _oldKinematic;
                 _rigid.useGravity = _oldGravity;
             }
-            if (Manager.EnableThrowing)
+            if (Manager.EnhanceThrowing)
             {
                 ThrowingOnRelease();
             }
@@ -282,7 +282,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                         {
                             MoveObject();
                         }
-                        if (Manager.EnableThrowing)
+                        if (Manager.EnhanceThrowing)
                         {
                             ThrowingOnHold();
                         }
