@@ -1303,6 +1303,24 @@ namespace LeapInternal
             return new UnityEngine.Vector3(pixel.x, pixel.y, pixel.z);
         }
 
+        /// <summary>
+        /// Converts from camera-space rectilinear coordinates to image-space pixel coordinates
+        /// 
+        /// Also allows specifying a specific device handle and calibration type.
+        /// </summary>
+        public UnityEngine.Vector3 RectilinearToPixelEx(IntPtr deviceHandle,
+                                           Image.CameraType camera, UnityEngine.Vector3 ray)
+        {
+            LEAP_VECTOR rayStruct = new LEAP_VECTOR(ray);
+            LEAP_VECTOR pixel = LeapC.LeapRectilinearToPixelEx(_leapConnection,
+                   deviceHandle,
+                   (camera == Image.CameraType.LEFT ?
+                   eLeapPerspectiveType.eLeapPerspectiveType_stereo_left :
+                   eLeapPerspectiveType.eLeapPerspectiveType_stereo_right),
+                   rayStruct);
+            return new UnityEngine.Vector3(pixel.x, pixel.y, pixel.z);
+        }
+
         public void TelemetryProfiling(ref LEAP_TELEMETRY_DATA telemetryData)
         {
             eLeapRS result = LeapC.LeapTelemetryProfiling(_leapConnection, ref telemetryData);
