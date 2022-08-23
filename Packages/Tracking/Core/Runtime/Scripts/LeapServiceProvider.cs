@@ -964,7 +964,8 @@ namespace Leap.Unity
             }
 
             string serialNumber = _multipleDeviceMode != MultipleDeviceMode.Disabled ? SpecificSerialNumber : "";
-            _leapController = new Controller(0, _serverNameSpace, _multipleDeviceMode != MultipleDeviceMode.Disabled);
+
+            _leapController = new Controller(serialNumber.GetHashCode(), _serverNameSpace, _multipleDeviceMode != MultipleDeviceMode.Disabled);
 
             _leapController.Device += (s, e) =>
             {
