@@ -1,3 +1,4 @@
+#if UNITY_ANDROID
 namespace Leap.Unity
 {
     using System;
@@ -5,14 +6,8 @@ namespace Leap.Unity
 
     public static class AndroidServiceBinder
     {
-#if UNITY_ANDROID
+        public static bool IsBound{ get; private set; }
 
-        private static bool isBound = false;
-        public static bool IsBound
-        { 
-            get { return isBound; }
-            private set { isBound = value; }
-        }
         static AndroidJavaObject _serviceBinder;
         static AndroidJavaClass unityPlayer;
         static AndroidJavaObject activity;
@@ -27,8 +22,11 @@ namespace Leap.Unity
             {
                 isBound = TryBind();
 
-                Application.quitting -= OnApplicationQuitting;
-                Application.quitting += OnApplicationQuitting;
+                if (isBound)
+                {
+                    Application.quitting -= OnApplicationQuitting;
+                    Application.quitting += OnApplicationQuitting;
+                }
             }
 
             return isBound;
@@ -84,11 +82,11 @@ namespace Leap.Unity
         {
             if (_serviceBinder != null)
             {
-                Debug.Log("ServiceBinder.unbind...");
+                Debug.Log("UnbindAndroidBinding - Unbinding of service binder complete");
                 _serviceBinder.Call("unbind");
-                isBound = false;
+                IsBound = false;
             }
         }
-#endif
     }
 }
+#endif
