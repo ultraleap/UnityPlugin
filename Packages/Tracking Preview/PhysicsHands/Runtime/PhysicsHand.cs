@@ -129,13 +129,11 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
         private bool _hasGenerated = false;
         private float _timeOnReset = 0;
+        private float _currentResetLerp { get { return _timeOnReset == 0 ? 1 : Mathf.InverseLerp(0.1f, 0.25f, Time.time - _timeOnReset); } }
 
         private bool _wasGrasping = false;
         private bool _isGrasping = false;
         public bool IsGrasping => _isGrasping;
-
-        private Dictionary<Rigidbody, Collider[]> _ignoredObjects = new Dictionary<Rigidbody, Collider[]>();
-        private Dictionary<Rigidbody, float> _ignoredTimeouts = new Dictionary<Rigidbody, float>();
 
         private List<IgnoreData> _ignoredData = new List<IgnoreData>();
         private class IgnoreData
@@ -355,7 +353,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             HandleTeleportingHands();
 
             // Update the palm collider with the distance between knuckles to wrist + palm width
-            _physicsHand.palmCollider.size = Vector3.Lerp(_physicsHand.palmCollider.size, PhysicsHandsUtils.CalculatePalmSize(_originalLeapHand), Time.fixedDeltaTime);
+            _physicsHand.palmCollider.size = Vector3.Lerp(_physicsHand.palmCollider.size, PhysicsHandsUtils.CalculatePalmSize(_originalLeapHand), _currentResetLerp);
 
             // Iterate through the bones in the hand, applying drive forces
             for (int fingerIndex = 0; fingerIndex < Hand.FINGERS; fingerIndex++)
@@ -394,13 +392,14 @@ namespace Leap.Unity.Interaction.PhysicsHands
                     {
                         PhysicsHandsUtils.InterpolateBoneSize(_physicsHand.jointBodies[boneArrayIndex], _physicsHand.jointBones[boneArrayIndex], _physicsHand.jointColliders[boneArrayIndex],
                             prevBone.PrevJoint, prevBone.Rotation, bone.PrevJoint,
-                            bone.Width, bone.Length, Mathf.Lerp(Time.fixedDeltaTime * 10f, Time.fixedDeltaTime, Mathf.InverseLerp(0.1f, 0.25f, Time.time - _timeOnReset)));
+                            bone.Width, bone.Length, Mathf.Lerp(Time.fixedDeltaTime * 10f, Time.fixedDeltaTime, _currentResetLerp));
                     }
                     else
                     {
+                        PhysicsHandsUtils.InterpolateKnucklePosition(_physicsHand.jointBodies[boneArrayIndex], _physicsHand.jointBones[boneArrayIndex], _originalLeapHand, _currentResetLerp);
                         PhysicsHandsUtils.InterpolateBoneSize(_physicsHand.jointBodies[boneArrayIndex], _physicsHand.jointBones[boneArrayIndex], _physicsHand.jointColliders[boneArrayIndex],
                             _originalLeapHand.PalmPosition, _originalLeapHand.Rotation, fingerIndex == 0 ? knuckleBone.PrevJoint : knuckleBone.NextJoint,
-                            bone.Width, bone.Length, Mathf.Lerp(Time.fixedDeltaTime * 10f, Time.fixedDeltaTime, Mathf.InverseLerp(0.1f, 0.25f, Time.time - _timeOnReset)));
+                            bone.Width, bone.Length, Mathf.Lerp(Time.fixedDeltaTime * 10f, Time.fixedDeltaTime, _currentResetLerp));
                     }
 
                     float xTargetAngle = PhysicsHandsUtils.CalculateXTargetAngle(prevBone, bone, fingerIndex, jointIndex);
