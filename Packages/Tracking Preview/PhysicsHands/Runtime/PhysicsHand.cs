@@ -128,6 +128,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
         private float[] _graspingXDrives;
 
         private bool _hasGenerated = false;
+        private float _timeOnReset = 0;
 
         private bool _wasGrasping = false;
         private bool _isGrasping = false;
@@ -387,23 +388,22 @@ namespace Leap.Unity.Interaction.PhysicsHands
                         _graspingXDrives[boneArrayIndex] = _physicsHand.jointBones[boneArrayIndex].XDriveLimit;
                     }
 
-                    // Trying to get on the fly scaling working but just makes the bones dogspin
+                    // Hand bone resizing, done very slowly during movement.
+                    // Initial resizing is very fast (while the user is bringing their hand into the frame).
                     if (jointIndex > 0)
                     {
                         PhysicsHandsUtils.InterpolateBoneSize(_physicsHand.jointBodies[boneArrayIndex], _physicsHand.jointBones[boneArrayIndex], _physicsHand.jointColliders[boneArrayIndex],
                             prevBone.PrevJoint, prevBone.Rotation, bone.PrevJoint,
-                            bone.Width, bone.Length, Time.fixedDeltaTime);
+                            bone.Width, bone.Length, Mathf.Lerp(Time.fixedDeltaTime * 10f, Time.fixedDeltaTime, Mathf.InverseLerp(0.1f, 0.25f, Time.time - _timeOnReset)));
                     }
                     else
                     {
                         PhysicsHandsUtils.InterpolateBoneSize(_physicsHand.jointBodies[boneArrayIndex], _physicsHand.jointBones[boneArrayIndex], _physicsHand.jointColliders[boneArrayIndex],
                             _originalLeapHand.PalmPosition, _originalLeapHand.Rotation, fingerIndex == 0 ? knuckleBone.PrevJoint : knuckleBone.NextJoint,
-                            bone.Width, bone.Length, Time.fixedDeltaTime);
+                            bone.Width, bone.Length, Mathf.Lerp(Time.fixedDeltaTime * 10f, Time.fixedDeltaTime, Mathf.InverseLerp(0.1f, 0.25f, Time.time - _timeOnReset)));
                     }
 
                     float xTargetAngle = PhysicsHandsUtils.CalculateXTargetAngle(prevBone, bone, fingerIndex, jointIndex);
-
-                    Mathf.InverseLerp(body.xDrive.lowerLimit, _physicsHand.jointBones[boneArrayIndex].OriginalXDriveLimit, xTargetAngle);
 
                     // Clamp the max until we've moved the bone to a lower amount than originally grasped at
                     if (_wasGraspingBones[boneArrayIndex] && (xTargetAngle < _graspingXDrives[boneArrayIndex] || Mathf.InverseLerp(body.xDrive.lowerLimit, _physicsHand.jointBones[boneArrayIndex].OriginalXDriveLimit, xTargetAngle) < .25f))
@@ -477,6 +477,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             {
                 ResetPhysicsHand(true);
             }
+            _timeOnReset = Time.time;
             _leapHand.CopyFrom(_originalLeapHand);
             _hasReset = true;
             OnBeginPhysics?.Invoke();
