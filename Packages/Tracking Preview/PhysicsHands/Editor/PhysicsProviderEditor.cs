@@ -60,7 +60,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             _helperMovesObjects = serializedObject.FindProperty("_helperMovesObjects");
             _interpolateMass = serializedObject.FindProperty("_interpolateMass");
             _maxMass = serializedObject.FindProperty("_maxMass");
-            _enhanceThrowing = serializedObject.FindProperty("_enableThrowing");
+            _enhanceThrowing = serializedObject.FindProperty("_enhanceThrowing");
 
             GUI.enabled = false;
             EditorGUILayout.PropertyField(serializedObject.FindProperty("m_Script"), true, new GUILayoutOption[0]);

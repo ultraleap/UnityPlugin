@@ -74,8 +74,6 @@ namespace Leap.Unity.Interaction.PhysicsHands
         public bool Ignored { get { return _ignored != null; } }
         private PhysicsIgnoreHelpers _ignored = null;
 
-        
-
         // Check we got thumb or palm and at least one finger
         private bool Grasped(PhysicsHand hand)
         {
