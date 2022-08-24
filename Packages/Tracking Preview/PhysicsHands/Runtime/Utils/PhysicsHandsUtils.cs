@@ -316,7 +316,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 stiffness = stiffness * strength,
                 forceLimit = forceLimit * strength / Time.fixedDeltaTime,
                 damping = 3f,
-                lowerLimit = -15f,
+                lowerLimit = -30f,
                 upperLimit = 80f
             };
 
@@ -338,7 +338,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
         public static void SetupBoneDrives(ArticulationBody bone, float stiffness, float forceLimit, float strength)
         {
             bone.jointType = ArticulationJointType.RevoluteJoint;
-            bone.twistLock = ArticulationDofLock.FreeMotion;
+            bone.twistLock = ArticulationDofLock.LimitedMotion;
 
             ArticulationDrive xDrive = new ArticulationDrive()
             {
