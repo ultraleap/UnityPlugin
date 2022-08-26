@@ -3,6 +3,27 @@ using System;
 
 public class PoseDetectionExample
 {
+    public void ThumbsUp()
+    {
+        // Define shape
+        HandShapeDefinition thumbsUpShape = new HandShapeDefinition();
+        thumbsUpShape.ThumbStraight()
+            .IndexCurled()
+            .MiddleCurled()
+            .RingCurled()
+            .PinkyCurled();
+       
+        HandOrientation thumbsPointingUp = new HandOrientation();
+        thumbsPointingUp.
+
+        PoseDetector thumbsUpShapeDetector = new PoseDetector().Add(thumbsUpShape); // Provide shape and overridden detector
+
+        var thumbsUpPoseObserver = new AndStateObserver()
+             .Add(thumbsUpShapeDetector).Add(thumbsPointingUp);
+
+        thumbsUpPoseObserver.OnStateObserved += ThumbsUpPoseObserver_OnStateObserved;
+    }
+
     public void Pinch()
     {
         // Define shape
@@ -14,7 +35,9 @@ public class PoseDetectionExample
             .ThumbCurled();
 
         HandProximity thumbAndFingerClose = new HandProximity();
+
         // TODO define thumb and finger proximity...
+        thumbAndFingerClose.ThumbDistal.IsWithin(0.1f).Of(thumbAndFingerClose.IndexDistal);
 
         PoseDetector pinchDetector = new PoseDetector().Add(pinchShape); // Provide shape and overridden detector
 
@@ -38,7 +61,7 @@ public class PoseDetectionExample
             .ThumbIgnored();
 
         pointingIndexSlightlyBentAtProximal.PinkyIgnored()
-            .IndexProximalRelativeCurl(expectedCurl: 45, tolerance: 15).IndexIntermediateRelativeCurl(ShapeValidity.ignored).IndexDistalRelativeCurl(ShapeValidity.ignored)
+            .IndexProximalRelativeCurl(expectedCurl: 45, tolerance: 15, hysteresisAllowance:10).IndexIntermediateRelativeCurl(ShapeValidity.ignored).IndexDistalRelativeCurl(ShapeValidity.ignored)
             .MiddleIgnored()
             .RingIgnored()
             .ThumbIgnored();
@@ -78,6 +101,11 @@ public class PoseDetectionExample
     }
 
     private void PointingPose_OnStateObserved(object sender, EventArgs e)
+    {
+        throw new NotImplementedException();
+    }
+
+    private void ThumbsUpPoseObserver_OnStateObserved(object sender, EventArgs e)
     {
         throw new NotImplementedException();
     }

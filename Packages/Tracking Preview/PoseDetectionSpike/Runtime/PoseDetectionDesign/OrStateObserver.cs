@@ -15,8 +15,8 @@ public class OrStateObserver : IStateObserver
     public event EventHandler OnStateObserved;
     public event EventHandler OnStateLost;
 
-    internal object Add(PoseDetector poseDetector)
+    internal OrStateObserver Add(IStateObserver poseDetector)
     {
-        throw new NotImplementedException();
+        return this;
     }
 }

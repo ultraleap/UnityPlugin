@@ -7,6 +7,10 @@ using UnityEngine;
 
 namespace Leap.Unity
 {
+    public enum ShapeValidity
+    {
+        ignored
+    }
 
     public class HandShapeDefinition : IHandShapeDefinition
     {
@@ -109,7 +113,7 @@ namespace Leap.Unity
             return this;
         }
 
-        public HandShapeDefinition IndexProximalRelativeCurl(float expectedCurl, float tolerance)
+        public HandShapeDefinition IndexProximalRelativeCurl(float expectedCurl, float tolerance = 15, float hysteresisAllowance = 10)
         {
             return this;
         }
@@ -120,6 +124,11 @@ namespace Leap.Unity
         }
 
         public HandShapeDefinition IndexIntermediateRelativeCurl(ShapeValidity validity)
+        {
+            return this;
+        }
+
+        public HandShapeDefinition IndexDistalRelativeCurl(ShapeValidity validty)
         {
             return this;
         }
@@ -287,7 +296,22 @@ namespace Leap.Unity
             return this;
         }
 
+        public HandShapeDefinition ThumbProximalRelativeCurl(ShapeValidity validity)
+        {
+            return this;
+        }
+
         public HandShapeDefinition ThumbIntermediateRelativeCurl(float curl)
+        {
+            return this;
+        }
+
+        public HandShapeDefinition ThumbIntermediateRelativeCurl(float expectedCurl, float tolerance)
+        {
+            return this;
+        }
+
+        public HandShapeDefinition ThumbDistalRelativeCurl(ShapeValidity validty)
         {
             return this;
         }
@@ -299,6 +323,11 @@ namespace Leap.Unity
 
         // Yaw only applicable for whole finger
         public HandShapeDefinition ThumbYaw(float yaw)
+        {
+            return this;
+        }
+
+        public HandShapeDefinition ThumbYaw(ShapeValidity validty)
         {
             return this;
         }
