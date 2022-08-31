@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2021.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -8,12 +8,11 @@
 
 using UnityEngine;
 
-namespace Leap.Unity.Swizzle
+namespace Leap.Unity
 {
 
     public static class Swizzle
     {
-
         public static Vector2 xx(this Vector2 vector)
         {
             return new Vector2(vector.x, vector.x);

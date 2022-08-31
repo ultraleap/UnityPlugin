@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2021.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -7,13 +7,13 @@
  ******************************************************************************/
 
 using Leap.Unity.Attributes;
+
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace Leap.Unity.Interaction
 {
-#pragma warning disable 0618
     /// <summary>
     /// AnchorableBehaviours mix well with InteractionBehaviours you'd like to be able to
     /// pick up and place in specific locations, specified by other GameObjects with an
@@ -744,7 +744,7 @@ namespace Leap.Unity.Interaction
                 if (hoveringController is InteractionHand)
                 {
                     Hand hoveringHand = interactionBehaviour.closestHoveringHand;
-                    hoverTarget = hoveringHand.PalmPosition.ToVector3();
+                    hoverTarget = hoveringHand.PalmPosition;
                 }
                 else
                 {
@@ -954,10 +954,8 @@ namespace Leap.Unity.Interaction
 
         #region Unity Events (Internal)
 
-#pragma warning disable 0649
         [SerializeField]
         private EnumEventTable _eventTable;
-#pragma warning restore 0649
 
         public enum EventType
         {
@@ -1001,5 +999,4 @@ namespace Leap.Unity.Interaction
         #endregion
 
     }
-#pragma warning restore 0618
 }
