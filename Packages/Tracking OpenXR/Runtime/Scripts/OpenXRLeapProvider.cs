@@ -51,7 +51,7 @@ namespace Ultraleap.Tracking.OpenXR
 
         private void Update()
         {
-            PopulateLeapFrame(FrameTime.OnUpdate, ref _updateFrame);
+            PopulateLeapFrame(ref _updateFrame);
 
             Pose trackerTransform = new Pose(Vector3.zero, Quaternion.identity);
 
@@ -83,26 +83,26 @@ namespace Ultraleap.Tracking.OpenXR
             DispatchFixedFrameEvent(_currentFrame);
         }
 
-        private void PopulateLeapFrame(FrameTime frameTime, ref Frame leapFrame)
+        private void PopulateLeapFrame(ref Frame leapFrame)
         {
             leapFrame.Hands.Clear();
             leapFrame.Id = _frameId++;
 
-            if (PopulateLeapHandFromOpenXRJoints(HandTracker.Left, frameTime, ref _leftHand))
+            if (PopulateLeapHandFromOpenXRJoints(HandTracker.Left, ref _leftHand))
             {
                 leapFrame.Hands.Add(_leftHand);
             }
 
-            if (PopulateLeapHandFromOpenXRJoints(HandTracker.Right, frameTime, ref _rightHand))
+            if (PopulateLeapHandFromOpenXRJoints(HandTracker.Right, ref _rightHand))
             {
                 leapFrame.Hands.Add(_rightHand);
             }
         }
 
-        private bool PopulateLeapHandFromOpenXRJoints(HandTracker handTracker, FrameTime frameTime, ref Hand hand)
+        private bool PopulateLeapHandFromOpenXRJoints(HandTracker handTracker, ref Hand hand)
         {
             var joints = new HandJointLocation[handTracker.JointCount];
-            if (!handTracker.TryLocateHandJoints(frameTime, joints))
+            if (!handTracker.TryLocateHandJoints(joints))
             {
                 if (handTracker == HandTracker.Left)
                 {
