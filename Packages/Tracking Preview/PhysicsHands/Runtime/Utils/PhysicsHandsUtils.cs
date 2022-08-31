@@ -1,9 +1,17 @@
+/******************************************************************************
+ * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
+ *                                                                            *
+ * Use subject to the terms of the Apache License 2.0 available at            *
+ * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
+ * between Ultraleap and you, your company or other organization.             *
+ ******************************************************************************/
+
+
 using System.Linq;
 using UnityEngine;
 
 namespace Leap.Unity.Interaction.PhysicsHands
 {
-#pragma warning disable 0618
     public static class PhysicsHandsUtils
     {
         #region Hand Generation
@@ -30,11 +38,11 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
             palmGameObject.name = $"{(handedness == Chirality.Left ? "Left" : "Right")} Palm";
 
-            Leap.Hand leapHand = TestHandFactory.MakeTestHand(isLeft: handedness == Chirality.Left ? true : false, pose: TestHandFactory.TestHandPose.HeadMountedB, unitType: TestHandFactory.UnitType.UnityUnits);
+            Leap.Hand leapHand = TestHandFactory.MakeTestHand(isLeft: handedness == Chirality.Left ? true : false, pose: TestHandFactory.TestHandPose.HeadMountedB);
 
             Transform palmTransform = palmGameObject.GetComponent<Transform>();
-            palmTransform.position = leapHand.PalmPosition.ToVector3();
-            palmTransform.rotation = leapHand.Rotation.ToQuaternion();
+            palmTransform.position = leapHand.PalmPosition;
+            palmTransform.rotation = leapHand.Rotation;
 
             PhysicsHand.Hand physicsHand = new PhysicsHand.Hand()
             {
@@ -69,7 +77,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             physicsHand.palmBone = palmGameObject.AddComponent<PhysicsBone>();
             physicsHand.palmBone.SetBoneIndexes(5, 0);
 
-            physicsHand.defaultRotations[PhysicsHand.Hand.FINGERS] = leapHand.Rotation.ToQuaternion();
+            physicsHand.defaultRotations[PhysicsHand.Hand.FINGERS] = leapHand.Rotation;
 
             for (int fingerIndex = 0; fingerIndex < PhysicsHand.Hand.FINGERS; fingerIndex++)
             {
@@ -94,14 +102,14 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
                     if (jointIndex == 0)
                     {
-                        capsuleGameObject.transform.position = fingerIndex == 0 ? knuckleBone.PrevJoint.ToVector3() : knuckleBone.NextJoint.ToVector3();
+                        capsuleGameObject.transform.position = fingerIndex == 0 ? knuckleBone.PrevJoint : knuckleBone.NextJoint;
                     }
                     else
                     {
                         capsuleGameObject.transform.localPosition = Vector3.forward * prevBone.Length;
                     }
 
-                    capsuleGameObject.transform.rotation = knuckleBone.Rotation.ToQuaternion();
+                    capsuleGameObject.transform.rotation = knuckleBone.Rotation;
 
                     if (capsuleGameObject.transform.parent != null)
                     {
@@ -124,7 +132,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                     {
                         SetupKnuckleDrives(physicsHand.jointBodies[boneArrayIndex], fingerIndex, stiffness, forceLimit, strength);
 
-                        physicsHand.defaultRotations[fingerIndex] = knuckleBone.Rotation.ToQuaternion();
+                        physicsHand.defaultRotations[fingerIndex] = knuckleBone.Rotation;
                     }
                     else
                     {
@@ -143,10 +151,10 @@ namespace Leap.Unity.Interaction.PhysicsHands
         {
             // A large amount of this function is done to reset the hand to the correct values if they have been changed in the editor
             // Move the root of the hand
-            physicsHand.transform.position = leapHand.PalmPosition.ToVector3();
-            physicsHand.transform.rotation = leapHand.Rotation.ToQuaternion();
+            physicsHand.transform.position = leapHand.PalmPosition;
+            physicsHand.transform.rotation = leapHand.Rotation;
 
-            if(physicsHand.physicMaterial == null)
+            if (physicsHand.physicMaterial == null)
             {
                 physicsHand.physicMaterial = CreateHandPhysicsMaterial();
             }
@@ -185,14 +193,14 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
                     if (jointIndex == 0)
                     {
-                        capsuleGameObject.transform.position = fingerIndex == 0 ? knuckleBone.PrevJoint.ToVector3() : knuckleBone.NextJoint.ToVector3();
+                        capsuleGameObject.transform.position = fingerIndex == 0 ? knuckleBone.PrevJoint : knuckleBone.NextJoint;
                     }
                     else
                     {
                         capsuleGameObject.transform.localPosition = Vector3.forward * prevBone.Length;
                     }
 
-                    capsuleGameObject.transform.rotation = knuckleBone.Rotation.ToQuaternion();
+                    capsuleGameObject.transform.rotation = knuckleBone.Rotation;
 
                     if (capsuleGameObject.transform.parent != null)
                     {
@@ -210,7 +218,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                     {
                         SetupKnuckleDrives(physicsHand.jointBodies[boneArrayIndex], fingerIndex, physicsHand.stiffness, physicsHand.forceLimit, physicsHand.strength);
 
-                        physicsHand.jointBodies[boneArrayIndex].parentAnchorPosition = InverseTransformPoint(leapHand.PalmPosition.ToVector3(), leapHand.Rotation.ToQuaternion(), fingerIndex == 0 ? knuckleBone.PrevJoint.ToVector3() : knuckleBone.NextJoint.ToVector3());
+                        physicsHand.jointBodies[boneArrayIndex].parentAnchorPosition = InverseTransformPoint(leapHand.PalmPosition, leapHand.Rotation, fingerIndex == 0 ? knuckleBone.PrevJoint : knuckleBone.NextJoint);
                         if (fingerIndex == 0)
                         {
                             physicsHand.jointBodies[boneArrayIndex].parentAnchorRotation = Quaternion.Euler(0, leapHand.IsLeft ? 25f : -25f, leapHand.IsLeft ? -65f : 65f);
@@ -224,7 +232,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                     {
                         SetupBoneDrives(physicsHand.jointBodies[boneArrayIndex], physicsHand.stiffness, physicsHand.forceLimit, physicsHand.strength);
 
-                        physicsHand.jointBodies[boneArrayIndex].parentAnchorPosition = InverseTransformPoint(prevBone.PrevJoint.ToVector3(), prevBone.Rotation.ToQuaternion(), bone.PrevJoint.ToVector3());
+                        physicsHand.jointBodies[boneArrayIndex].parentAnchorPosition = InverseTransformPoint(prevBone.PrevJoint, prevBone.Rotation, bone.PrevJoint);
                     }
 
                     physicsHand.jointBones[boneArrayIndex].SetBoneIndexes(fingerIndex, jointIndex);
@@ -391,14 +399,14 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
                     if (jointIndex == 0)
                     {
-                        capsuleGameObject.transform.position = fingerIndex == 0 ? knuckleBone.PrevJoint.ToVector3() : knuckleBone.NextJoint.ToVector3();
+                        capsuleGameObject.transform.position = fingerIndex == 0 ? knuckleBone.PrevJoint : knuckleBone.NextJoint;
                     }
                     else
                     {
                         capsuleGameObject.transform.localPosition = Vector3.forward * prevBone.Length;
                     }
 
-                    capsuleGameObject.transform.rotation = knuckleBone.Rotation.ToQuaternion();
+                    capsuleGameObject.transform.rotation = knuckleBone.Rotation;
 
                     if (capsuleGameObject.transform.parent != null)
                     {
@@ -413,12 +421,12 @@ namespace Leap.Unity.Interaction.PhysicsHands
                     // Move the anchor positions to account for hand sizes
                     if (jointIndex > 0)
                     {
-                        physicsHand.jointBodies[boneArrayIndex].parentAnchorPosition = InverseTransformPoint(prevBone.PrevJoint.ToVector3(), prevBone.Rotation.ToQuaternion(), bone.PrevJoint.ToVector3());
+                        physicsHand.jointBodies[boneArrayIndex].parentAnchorPosition = InverseTransformPoint(prevBone.PrevJoint, prevBone.Rotation, bone.PrevJoint);
                         physicsHand.jointBodies[boneArrayIndex].parentAnchorRotation = Quaternion.identity;
                     }
                     else
                     {
-                        physicsHand.jointBodies[boneArrayIndex].parentAnchorPosition = InverseTransformPoint(leapHand.PalmPosition.ToVector3(), leapHand.Rotation.ToQuaternion(), fingerIndex == 0 ? knuckleBone.PrevJoint.ToVector3() : knuckleBone.NextJoint.ToVector3());
+                        physicsHand.jointBodies[boneArrayIndex].parentAnchorPosition = InverseTransformPoint(leapHand.PalmPosition, leapHand.Rotation, fingerIndex == 0 ? knuckleBone.PrevJoint : knuckleBone.NextJoint);
                     }
 
                     lastTransform = capsuleGameObject.transform;
@@ -428,12 +436,12 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
         public static Vector3 CalculateAverageKnucklePosition(Hand hand)
         {
-            return (hand.Fingers[1].bones[0].NextJoint.ToVector3() + hand.Fingers[2].bones[0].NextJoint.ToVector3() + hand.Fingers[3].bones[0].NextJoint.ToVector3() + hand.Fingers[4].bones[0].NextJoint.ToVector3()) / 4;
+            return (hand.Fingers[1].bones[0].NextJoint + hand.Fingers[2].bones[0].NextJoint + hand.Fingers[3].bones[0].NextJoint + hand.Fingers[4].bones[0].NextJoint) / 4;
         }
 
         public static Vector3 CalculatePalmSize(Hand hand)
         {
-            return new Vector3(hand.PalmWidth * 0.98f, 0.025f, Vector3.Distance(CalculateAverageKnucklePosition(hand), hand.WristPosition.ToVector3()));
+            return new Vector3(hand.PalmWidth * 0.98f, 0.025f, Vector3.Distance(CalculateAverageKnucklePosition(hand), hand.WristPosition));
         }
 
         public static void InterpolateBoneSize(ArticulationBody body, PhysicsBone bone, CapsuleCollider collider, Vector3 parentPosition, Quaternion parentRotation, Vector3 childPosition, float width, float length, float deltaTime)
@@ -495,17 +503,17 @@ namespace Leap.Unity.Interaction.PhysicsHands
             return
                 ((fingerIndex == 0 && jointIndex == 0) ? 90f : 0) +
                 AngleOffAroundAxis(
-                        previous.Rotation.ToQuaternion() * ((fingerIndex == 0 && jointIndex == 0) ? -Vector3.up : Vector3.forward),
-                        current.Direction.ToVector3(),
-                        previous.Rotation.ToQuaternion() * Vector3.right);
+                        previous.Rotation * ((fingerIndex == 0 && jointIndex == 0) ? -Vector3.up : Vector3.forward),
+                        current.Direction,
+                        previous.Rotation * Vector3.right);
         }
 
         public static float CalculateYTargetAngle(Bone previous, Bone current)
         {
             return AngleOffAroundAxis(
-                            previous.Rotation.ToQuaternion() * Vector3.right,
-                            current.Rotation.ToQuaternion() * Vector3.right,
-                            previous.Rotation.ToQuaternion() * Vector3.up);
+                            previous.Rotation * Vector3.right,
+                            current.Rotation * Vector3.right,
+                            previous.Rotation * Vector3.up);
         }
 
         /// <summary>
@@ -542,39 +550,38 @@ namespace Leap.Unity.Interaction.PhysicsHands
             {
                 Bone b = leapHand.Fingers[i].bones[0];
                 PhysExts.ToWorldSpaceCapsule(physicsHand.jointColliders[boneInd], out posA, out posB, out r);
-                b.NextJoint = posB.ToVector();
+                b.NextJoint = posB;
 
                 for (int j = 1; j < leapHand.Fingers[i].bones.Length; j++)
                 {
                     b = leapHand.Fingers[i].bones[j];
                     PhysExts.ToWorldSpaceCapsule(physicsHand.jointColliders[boneInd], out posA, out posB, out r);
-                    b.PrevJoint = posB.ToVector();
-                    b.NextJoint = posA.ToVector();
+                    b.PrevJoint = posB;
+                    b.NextJoint = posA;
                     b.Width = r;
                     b.Center = (b.PrevJoint + b.NextJoint) / 2f;
-                    b.Direction = (b.PrevJoint - b.NextJoint).Normalized;
+                    b.Direction = b.PrevJoint - b.NextJoint;
                     b.Length = Vector3.Distance(posA, posB);
-                    b.Rotation = physicsHand.jointColliders[boneInd].transform.rotation.ToLeapQuaternion();
+                    b.Rotation = physicsHand.jointColliders[boneInd].transform.rotation;
                     boneInd++;
                 }
-                leapHand.Fingers[i].TipPosition = posA.ToVector();
+                leapHand.Fingers[i].TipPosition = posA;
             }
             leapHand.Arm.CopyFrom(originalHand.Arm);
 
             leapHand.Arm.NextJoint = leapHand.WristPosition;
-            leapHand.Arm.Direction = (leapHand.WristPosition - leapHand.Arm.PrevJoint).Normalized;
-            leapHand.Arm.Rotation = Quaternion.LookRotation(leapHand.Arm.Direction.ToVector3(), -leapHand.PalmNormal.ToVector3()).ToLeapQuaternion();
+            leapHand.Arm.Direction = (leapHand.WristPosition - leapHand.Arm.PrevJoint).normalized;
+            leapHand.Arm.Rotation = Quaternion.LookRotation(leapHand.Arm.Direction, -leapHand.PalmNormal);
 
             leapHand.PalmWidth = physicsHand.palmCollider.size.y;
             leapHand.Confidence = originalHand.Confidence;
             leapHand.Direction = originalHand.Direction;
             leapHand.FrameId = originalHand.FrameId;
-            leapHand.GrabAngle = originalHand.GrabAngle;
             leapHand.GrabStrength = originalHand.GrabStrength;
             leapHand.Id = originalHand.Id;
             leapHand.PinchStrength = CalculatePinchStrength(leapHand, physicsHand.palmCollider.size.y);
             leapHand.PinchDistance = CalculatePinchDistance(leapHand);
-            leapHand.PalmVelocity = ((physicsHand.transform.position - physicsHand.oldPosition) / delta).ToVector();
+            leapHand.PalmVelocity = (physicsHand.transform.position - physicsHand.oldPosition) / delta;
             leapHand.TimeVisible = originalHand.TimeVisible;
         }
 
@@ -592,7 +599,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             var minDistanceSquared = float.MaxValue;
             foreach (var finger in hand.Fingers.Skip(1))
             {
-                var distanceSquared = (finger.TipPosition - thumbTipPosition).MagnitudeSquared;
+                var distanceSquared = (finger.TipPosition - thumbTipPosition).sqrMagnitude;
                 minDistanceSquared = Mathf.Min(distanceSquared, minDistanceSquared);
             }
 
@@ -610,17 +617,17 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
             // Compute the minimum (squared) distance between two bones.
             var diff = boneBJoint - boneAJoint;
-            var d1 = boneADirection.Dot(diff);
-            var d2 = boneBDirection.Dot(diff);
-            var a = boneADirection.MagnitudeSquared;
-            var b = boneADirection.Dot(boneBDirection);
-            var c = boneBDirection.MagnitudeSquared;
+            var d1 = Vector3.Dot(boneADirection, diff);
+            var d2 = Vector3.Dot(boneBDirection, diff);
+            var a = boneADirection.sqrMagnitude;
+            var b = Vector3.Dot(boneADirection, boneBDirection);
+            var c = boneBDirection.sqrMagnitude;
             var det = b * b - a * c;
             var t1 = Mathf.Clamp01((b * d2 - c * d1) / det);
             var t2 = Mathf.Clamp01((a * d2 - b * d1) / det);
             var pa = boneAJoint + t1 * boneADirection;
             var pb = boneBJoint + t2 * boneBDirection;
-            return (pa - pb).MagnitudeSquared;
+            return (pa - pb).sqrMagnitude;
         }
 
         private static float CalculatePinchDistance(Hand hand)
@@ -690,5 +697,4 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
 
     }
-#pragma warning restore 0618
 }

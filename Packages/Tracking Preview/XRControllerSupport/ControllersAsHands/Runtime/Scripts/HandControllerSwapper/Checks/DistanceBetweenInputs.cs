@@ -10,7 +10,6 @@ using UnityEngine;
 
 namespace Leap.Unity.Controllers
 {
-#pragma warning disable 0618
     /// <summary>
     /// DistanceBetweenInputs checks to see if the distance between inputs (i.e. distance between hands and controllers)
     /// is less than or equal to the actionThreshold if the InputMethodType is LeapHand, or greater than or 
@@ -43,14 +42,14 @@ namespace Leap.Unity.Controllers
 
             if (inputMethodType == InputMethodType.LeapHand)
             {
-                if (Vector3.Distance(_provider.Get(hand).PalmPosition.ToVector3(), xrControllerPosition) <= actionThreshold)
+                if (Vector3.Distance(_provider.Get(hand).PalmPosition, xrControllerPosition) <= actionThreshold)
                 {
                     return true;
                 }
             }
             else
             {
-                if (Vector3.Distance(_provider.Get(hand).PalmPosition.ToVector3(), xrControllerPosition) >= actionThreshold)
+                if (Vector3.Distance(_provider.Get(hand).PalmPosition, xrControllerPosition) >= actionThreshold)
                 {
                     return true;
                 }
@@ -59,5 +58,4 @@ namespace Leap.Unity.Controllers
         }
 
     }
-#pragma warning restore 0618
 }

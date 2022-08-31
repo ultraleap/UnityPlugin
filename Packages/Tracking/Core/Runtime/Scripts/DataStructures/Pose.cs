@@ -1,22 +1,17 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2021.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Leap.Unity.Encoding;
-using Leap.Unity.Splines;
-using System;
 using UnityEngine;
 
 namespace Leap.Unity
 {
-
     public static class PoseExtensions
     {
-
         public static Pose inverse(this Pose ps)
         {
             Quaternion invQ = Quaternion.Inverse(ps.rotation);
@@ -137,15 +132,6 @@ namespace Leap.Unity
             return true;
         }
 
-        [System.Obsolete("This code will be moved to a legacy package in the next major version of the plugin. If you believe that it needs to be kept in tracking, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
-        public static bool FillSplined(this Pose orig, Pose a, Pose b, Pose c, Pose d, float t)
-        {
-            orig.position = CatmullRom.ToCHS(a.position, b.position, c.position, d.position,
-              centripetal: false).PositionAt(t);
-            orig.rotation = Quaternion.SlerpUnclamped(b.rotation, c.rotation, t);
-            return true;
-        }
-
         /// <summary>
         /// Creates a Pose using the transform's localPosition and localRotation.
         /// </summary>
@@ -213,11 +199,6 @@ namespace Leap.Unity
         {
             return new Pose(position: m.MultiplyPoint3x4(Vector3.zero),
               rotation: m.GetQuaternion());
-            // return new Pose(m.GetColumn(3),
-            //                 m.GetColumn(2) == m.GetColumn(1) ? Quaternion.identity
-            //                                                  : Quaternion.LookRotation(
-            //                                                      m.GetColumn(2),
-            //                                                      m.GetColumn(1)));
         }
 
         /// <summary>
@@ -249,7 +230,5 @@ namespace Leap.Unity
         {
             return (q0.ToAngleAxisVector() - q1.ToAngleAxisVector()).magnitude < EPSILON;
         }
-
     }
-
 }

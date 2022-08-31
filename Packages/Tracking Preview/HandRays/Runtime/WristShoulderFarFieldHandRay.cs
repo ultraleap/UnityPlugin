@@ -1,4 +1,4 @@
-﻿/******************************************************************************
+/******************************************************************************
  * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
@@ -11,8 +11,6 @@ using UnityEngine;
 
 namespace Leap.Unity.Preview.HandRays
 {
-#pragma warning disable 0618
-
     /// <summary>
     /// Calculates a far field hand ray based on the wrist, shoulder and pinch position.
     /// This allows a developer to decide how responsive the ray feels to the hand's rotation.
@@ -106,8 +104,8 @@ namespace Leap.Unity.Preview.HandRays
             {
                 return false;
             }
-            transformHelper.position = leapProvider.CurrentFrame.GetHand(chirality).PalmPosition.ToVector3();
-            Quaternion palmForwardRotation = leapProvider.CurrentFrame.GetHand(chirality).Rotation.ToQuaternion() * Quaternion.Euler(90, 0, 0);
+            transformHelper.position = leapProvider.CurrentFrame.GetHand(chirality).PalmPosition;
+            Quaternion palmForwardRotation = leapProvider.CurrentFrame.GetHand(chirality).Rotation * Quaternion.Euler(90, 0, 0);
             transformHelper.rotation = palmForwardRotation;
             return !IsFacingTransform(transformHelper, inferredBodyPositions.Head, minDotProductAllowedForFacingCamera);
         }
@@ -151,8 +149,8 @@ namespace Leap.Unity.Preview.HandRays
                 worldWristPosition.x = -worldWristPosition.x;
             }
 
-            transformHelper.transform.position = hand.WristPosition.ToVector3();
-            transformHelper.transform.rotation = hand.Rotation.ToQuaternion();
+            transformHelper.transform.position = hand.WristPosition;
+            transformHelper.transform.rotation = hand.Rotation;
             return transformHelper.TransformPoint(worldWristPosition);
         }
 
@@ -194,5 +192,4 @@ namespace Leap.Unity.Preview.HandRays
             }
         }
     }
-#pragma warning restore 0618
 }

@@ -24,7 +24,6 @@
 [upm-giturl-locks]: https://docs.unity3d.com/Manual/upm-git.html#git-locks "Locked Git dependencies"
 [upm-localpath]: https://docs.unity3d.com/Manual/upm-localpath.html "UPM local packages"
 [upm-troubleshooting]: https://docs.unity3d.com/Manual/upm-errors.html "UPM Troubleshooting Page"
-[xr-legacy-input-helpers-documentation]: http://docs.unity3d.com/Packages/com.unity.xr.legacyinputhelpers@2.1/manual/index.html "XR Legacy Input Helpers"
 [oculus-xr-documentation]: http://docs.unity3d.com/Packages/com.unity.xr.oculus@1.4/manual/index.html "Oculus XR package"
 
 [openupm-cli]: https://openupm.com/docs/getting-started.html#installing-openupm-cli "OpenUPM CLI"
@@ -291,8 +290,6 @@ Our Tracking Preview package gives you early access to additional functionality 
   - Allows XR controller input to drive our hand data, and unlocks the ability to seamlessly swap between controller data and real hands.
 - XR Interaction Toolkit Integration
   - Provides support for Ultraleap hand data in Unity's XR Interaction Toolkit.
-- Android Support (for SVR)
-  - Support for Qualcomm's legacy SVR package for XR2 devices, soon to be deprecated by OpenXR.
 - Physics Hands
   - Physically simulated hand interactions. A new way to interact with objects, without having the hand pass through colliders.
 - Hand Aggregation

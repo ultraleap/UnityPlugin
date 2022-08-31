@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2021.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -876,20 +876,6 @@ namespace Leap.Unity.RuntimeGizmos
         public void DrawPosition(Vector3 pos, float overrideScale)
         {
             DrawPosition(pos, Color.white, 0f, overrideScale);
-        }
-
-        [System.Obsolete("This code will be moved to a legacy package in the next major version of the plugin. If you believe that it needs to be kept in tracking, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
-        public void DrawRect(Transform frame, Rect rect)
-        {
-            PushMatrix();
-
-            this.matrix = frame.localToWorldMatrix;
-            DrawLine(rect.Corner00(), rect.Corner01());
-            DrawLine(rect.Corner01(), rect.Corner11());
-            DrawLine(rect.Corner11(), rect.Corner10());
-            DrawLine(rect.Corner10(), rect.Corner00());
-
-            PopMatrix();
         }
 
         public void ClearAllGizmos()

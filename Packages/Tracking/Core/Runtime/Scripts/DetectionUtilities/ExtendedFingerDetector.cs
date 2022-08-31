@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2021.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -13,7 +13,6 @@ using UnityEngine;
 
 namespace Leap.Unity
 {
-#pragma warning disable 0618
     /**
      * Detects when specified fingers are in an extended or non-extended state.
      * 
@@ -199,7 +198,7 @@ namespace Leap.Unity
                     {
                         Gizmos.color = OffColor;
                     }
-                    Gizmos.DrawWireSphere(finger.TipPosition.ToVector3(), finger.Width);
+                    Gizmos.DrawWireSphere(finger.TipPosition, finger.Width);
                 }
             }
         }
@@ -208,5 +207,4 @@ namespace Leap.Unity
 
     /** Defines the settings for comparing extended finger states */
     public enum PointingState { Extended, NotExtended, Either }
-#pragma warning restore 0618
 }

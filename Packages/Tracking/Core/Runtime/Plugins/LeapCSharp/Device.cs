@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2021.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -328,11 +328,6 @@ namespace Leap
             /// The Ultraleap 3Di hand tracking camera.
             /// </summary>
             TYPE_3DI = (int)eLeapDeviceType.eLeapDevicePID_3Di,
-
-            [Obsolete]
-            TYPE_LAPTOP,
-            [Obsolete]
-            TYPE_KEYBOARD
         }
     }
 }

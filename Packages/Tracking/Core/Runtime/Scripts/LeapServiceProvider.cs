@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2021.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -16,7 +16,6 @@ using UnityEngine;
 namespace Leap.Unity
 {
     using Attributes;
-#pragma warning disable 0618
 
     /// <summary>
     /// The LeapServiceProvider provides tracked Leap Hand data and images from the device
@@ -236,13 +235,6 @@ namespace Leap.Unity
             get { return _leapController.Devices; }
         }
 
-        /// <summary> A counter to keep track of how many devices have been seen up
-        /// through this point. Allows a provider to latch onto a device based on
-        /// its order of appearance, which corresponds to that device's DeviceID.
-        /// </summary>
-        [Obsolete("not used anymore", false)]
-        protected uint _numDevicesSeen = 0;
-
         #endregion
 
         /// <summary>
@@ -270,13 +262,6 @@ namespace Leap.Unity
         [SerializeField]
         protected bool _preventInitializingTrackingMode;
 
-
-        [Tooltip("When checked, profiling data from the LeapCSharp worker thread will be used to populate the UnityProfiler.")]
-        [EditTimeOnly]
-        [System.Obsolete("This code will be deleted in the next major version of the plugin. If you believe that it needs to be kept, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
-        [SerializeField]
-        protected bool _workerThreadProfiling = false;
-
         [Tooltip("Which Leap Service API Endpoint to connect to.  This is configured on the service with the 'api_namespace' argument.")]
         [SerializeField]
         [EditTimeOnly]
@@ -291,11 +276,6 @@ namespace Leap.Unity
         /// </summary>
         protected bool _useInterpolation = true;
 
-#if SVR
-        protected IntPtr _clockRebaser;
-        protected System.Diagnostics.Stopwatch _stopwatch = new System.Diagnostics.Stopwatch();
-#endif
-
         // Extrapolate on Android to compensate for the latency introduced by its graphics
         // pipeline.
 #if UNITY_ANDROID && !UNITY_EDITOR
@@ -309,10 +289,8 @@ namespace Leap.Unity
         protected Controller _leapController;
         protected bool _isDestroyed;
 
-        [System.Obsolete("This code will be removed in the next major version of the plugin. If you believe that it needs to be kept, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
-        protected SmoothedFloat _fixedOffset = new SmoothedFloat();
-        [System.Obsolete("This code will become private in the next major version of the plugin. If you believe that it needs to be kept protected, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
-        protected SmoothedFloat _smoothedTrackingLatency = new SmoothedFloat();
+        private protected SmoothedFloat _fixedOffset = new SmoothedFloat();
+        private protected SmoothedFloat _smoothedTrackingLatency = new SmoothedFloat();
         protected long _unityToLeapOffset;
 
         protected Frame _untransformedUpdateFrame;
@@ -536,78 +514,26 @@ namespace Leap.Unity
         #region Android Support
 
 #if UNITY_ANDROID
-        private AndroidJavaObject _serviceBinder;
-        AndroidJavaClass unityPlayer;
-        AndroidJavaObject activity;
-        AndroidJavaObject context;
-        ServiceCallbacks serviceCallbacks;
 
         protected virtual void OnEnable()
         {
-            EnsureAndroidBinding();
+#if !UNITY_EDITOR
+            AndroidServiceBinder.Bind();
+#endif
         }
 
-        [Obsolete("Intended to be internal function, will be removed in next breaking version")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public bool CreateAndroidBinding() => EnsureAndroidBinding();
-
-        private bool EnsureAndroidBinding()
-        {
-            bool success;
-            try
-            {
-                bool isServiceBound = _serviceBinder?.Call<bool>("isBound") ?? false;
-                if (isServiceBound) return true; // Already bound
-
-                _serviceBinder = null;
-
-                //Get activity and context
-                if (unityPlayer == null)
-                {
-                    Debug.Log("CreateAndroidBinding - Getting activity and context");
-                    unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
-                    activity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
-                    context = activity.Call<AndroidJavaObject>("getApplicationContext");
-                    serviceCallbacks = new ServiceCallbacks();
-                }
-
-                //Create a new service binding
-                Debug.Log("CreateAndroidBinding - Creating a new service binder");
-                _serviceBinder = new AndroidJavaObject("com.ultraleap.tracking.service_binder.ServiceBinder", context, serviceCallbacks);
-                success = _serviceBinder.Call<bool>("bind");
-                if (success)
-                {
-                    Debug.Log("CreateAndroidBinding - Binding of service binder complete");
-                }
-                else
-                {
-                    Debug.LogWarning("CreateAndroidBinding - service binder bind call failed");
-                }
-            }
-            catch (Exception e)
-            {
-                Debug.LogWarning("CreateAndroidBinding - Failed to bind service: " + e.Message);
-                _serviceBinder = null;
-                success = false;
-            }
-
-            return success;
-        }
-
+        // No longer necessary but would be a breaking change if removed
         protected virtual void OnDisable()
         {
-            if (_serviceBinder != null)
-            {
-                Debug.Log("ServiceBinder.unbind...");
-                _serviceBinder.Call("unbind");
-            }
         }
 
 #else
+        // No longer necessary but would be a breaking change if removed
         protected virtual void OnEnable()
         {
         }
 
+        // No longer necessary but would be a breaking change if removed
         protected virtual void OnDisable()
         {
         }
@@ -665,17 +591,6 @@ namespace Leap.Unity
                 DispatchUpdateFrameEvent(_transformedFixedFrame);
                 return;
             }
-
-#if SVR
-            if (_clockRebaser != IntPtr.Zero)
-            {
-                eLeapRS result = LeapC.UpdateRebase(_clockRebaser, _stopwatch.ElapsedMilliseconds, LeapC.GetNow());
-                if (result != eLeapRS.eLeapRS_Success)
-                {
-                    Debug.LogWarning("UpdateRebase call failed");
-                }
-            }
-#endif
 
             // if the serial number has changed since the last update(), update the device
             if (_multipleDeviceMode == MultipleDeviceMode.Specific && (_currentDevice == null || _currentDevice.SerialNumber != SpecificSerialNumber))
@@ -950,20 +865,14 @@ namespace Leap.Unity
         /// </summary>
         protected void createController()
         {
-#if SVR
-            var bindStatus = EnsureAndroidBinding();
-            if (!bindStatus)
-                return;
-
-            InitClockRebaser();
-#endif
-
             if (_leapController != null)
             {
                 return;
             }
 
-            _leapController = new Controller(SpecificSerialNumber.GetHashCode(), _serverNameSpace, _multipleDeviceMode != MultipleDeviceMode.Disabled);
+            string serialNumber = _multipleDeviceMode != MultipleDeviceMode.Disabled ? SpecificSerialNumber : "";
+
+            _leapController = new Controller(serialNumber.GetHashCode(), _serverNameSpace, _multipleDeviceMode != MultipleDeviceMode.Disabled);
 
             _leapController.Device += (s, e) =>
             {
@@ -1075,14 +984,6 @@ namespace Leap.Unity
                 _leapController.StopConnection();
                 _leapController.Dispose();
                 _leapController = null;
-
-#if SVR
-                if (_clockRebaser != IntPtr.Zero)
-                {
-                    LeapC.DestroyClockRebaser(_clockRebaser);
-                    _stopwatch.Stop();
-                }
-#endif
             }
         }
 
@@ -1124,10 +1025,6 @@ namespace Leap.Unity
         {
             initializeFlags();
 
-#if SVR
-            InitClockRebaser();
-#endif
-
             if (_leapController != null)
             {
                 _leapController.Device -= onHandControllerConnect;
@@ -1138,24 +1035,6 @@ namespace Leap.Unity
         {
             dest.CopyFrom(source).Transform(new LeapTransform(transform));
         }
-
-#if SVR
-        private void InitClockRebaser()
-        {
-            _stopwatch.Start();
-            eLeapRS result = LeapC.CreateClockRebaser(out _clockRebaser);
-
-            if (result != eLeapRS.eLeapRS_Success)
-            {
-                Debug.LogError("Failed to create clock rebaser");
-            }
-
-            if (_clockRebaser == IntPtr.Zero)
-            {
-                Debug.LogError("Clock rebaser is null");
-            }
-        }
-#endif
 
         #endregion
 
@@ -1362,5 +1241,4 @@ namespace Leap.Unity
         #endregion
 
     }
-#pragma warning restore 0618
 }

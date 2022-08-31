@@ -10,7 +10,6 @@ using UnityEngine;
 
 namespace Leap.Unity.Preview.HandRays
 {
-#pragma warning disable 0618
     /// <summary>
     /// Infers neck and shoulder positions using real world head data.
     /// </summary>
@@ -270,5 +269,4 @@ namespace Leap.Unity.Preview.HandRays
             }
         }
     }
-#pragma warning restore 0618
 }
