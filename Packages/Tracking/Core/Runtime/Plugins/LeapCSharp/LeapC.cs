@@ -1104,7 +1104,7 @@ namespace LeapInternal
 
         [DllImport("LeapC", EntryPoint = "LeapRectilinearToPixelEx")]
         public static extern LEAP_VECTOR LeapRectilinearToPixelEx(IntPtr hConnection,
-          IntPtr hDevice, eLeapPerspectiveType camera, eLeapCameraCalibrationType calibrationType, LEAP_VECTOR rectilinear);
+          IntPtr hDevice, eLeapPerspectiveType camera, LEAP_VECTOR rectilinear);
 
         [DllImport("LeapC", EntryPoint = "LeapCloseDevice")]
         public static extern void CloseDevice(IntPtr pDevice);

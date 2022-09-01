@@ -6,6 +6,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [docs-website]: https://docs.ultraleap.com/unity-api/ "Ultraleap Docs"
 
+## [NEXT] - NOT RELEASED
+
+### Added
+- Device-Specific RectilinearToPixelEx method
+
+### Changed
+- 
+
+### Fixed
+- Tracking Binding is lost when reloading scenes on Android
+- AttachmentHands can get in a popup loop when resetting the component
+- RectilinearToPixel returns NaN
+
+### Known issues 
+- Scenes containing the infrared viewer render incorrectly on Android build targets and in scriptable render pipelines such as URP and HDRP. 
+- Interactions callback scene allows blocks to be moved without doing a grasp pose. 
+- Capsule hands don't have a joint colour in HDRP 
+- Use of the LeapCSharp Config class is unavailable with v5.X tracking service
+- Repeatedly opening scenes can cause memory use increase
+
 ## [6.0.0] - 17/08/2022
 
 ### Added
