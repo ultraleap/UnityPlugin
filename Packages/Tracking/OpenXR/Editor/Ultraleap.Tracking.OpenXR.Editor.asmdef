@@ -28,6 +28,11 @@
             "name": "com.unity.xr.openxr",
             "expression": "1.0",
             "define": "XR_OPENXR_ENABLED"
+        },
+        {
+            "name": "com.ultraleap.tracking.openxr",
+            "expression": "[0,1.0.0-pre.8]",
+            "define": "ULTRALEAP_OPENXR_PACKAGE_INSTALLED"
         }
     ],
     "noEngineReferences": false
