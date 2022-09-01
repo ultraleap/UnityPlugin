@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Device-Specific RectilinearToPixelEx method
+- OpenXR into a conditionally included asmdef taht automatically removes OpenXR Package if necessary
 
 ### Changed
 - 
@@ -25,6 +26,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Capsule hands don't have a joint colour in HDRP 
 - Use of the LeapCSharp Config class is unavailable with v5.X tracking service
 - Repeatedly opening scenes can cause memory use increase
+- Currently the Ultraleap Hand Tracking feature for OpenXR requires the New and Legacy input systems to be enabled, to simultaneously use OpenXR and the Ultraleap Unity Plugin's features.
+- The OpenXR Leap Provider does not currently support the following hand properties (and will return fixed values):
+  - `Confidence`
 
 ## [6.0.0] - 17/08/2022
 
@@ -36,7 +40,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added Hand Rays to Preview package
 
 ### Changed
-- Moved OpenXR into a conditionally included asmdef in the main package and removed the separate OpenXR package
 - Cleaned up the image retriever and LeapServiceProvider Execution order, reducing unnecessary service and log messages
 - ImageRetriever prefab and LeapEyeDislocator.cs (formerly used for passthrough) removed and replaced by 'VR Infrared Camera' prefab in the Tracking Examples package
 - Example scenes URL
@@ -93,12 +96,6 @@ If you have any concerns about this, please contact us on [Github Discussions](h
 - Hand UI can become detached from hand when hand is removed from view
 - Multi-device (desktop) Scene camera position can become offset
 - FOV visualization does not display after changing render pipelines
-
-### Known issues
-- Currently the Ultraleap Hand Tracking feature for OpenXR requires the New and Legacy input systems to be enabled, to simultaneously use OpenXR and the Ultraleap Unity Plugin's features.
-- The OpenXR Leap Provider does not currently support the following hand properties (and will return fixed values):
-  - `Confidence`
-  - `GrabAngle` (`GrabAngle` is now obsolete and will be removed in the next major version of the plugin)
 
 ## [5.13.0] - 21/07/2022
 
