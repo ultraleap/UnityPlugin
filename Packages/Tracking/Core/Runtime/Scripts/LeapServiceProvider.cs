@@ -514,78 +514,26 @@ namespace Leap.Unity
         #region Android Support
 
 #if UNITY_ANDROID
-        private AndroidJavaObject _serviceBinder;
-        AndroidJavaClass unityPlayer;
-        AndroidJavaObject activity;
-        AndroidJavaObject context;
-        ServiceCallbacks serviceCallbacks;
 
         protected virtual void OnEnable()
         {
-            EnsureAndroidBinding();
-        }
-
-        private bool EnsureAndroidBinding()
-        {
-#if UNITY_EDITOR
-            return false;
-#else
-            bool success;
-            try
-            {
-                bool isServiceBound = _serviceBinder?.Call<bool>("isBound") ?? false;
-                if (isServiceBound) return true; // Already bound
-
-                _serviceBinder = null;
-
-                //Get activity and context
-                if (unityPlayer == null)
-                {
-                    Debug.Log("CreateAndroidBinding - Getting activity and context");
-                    unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
-                    activity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
-                    context = activity.Call<AndroidJavaObject>("getApplicationContext");
-                    serviceCallbacks = new ServiceCallbacks();
-                }
-
-                //Create a new service binding
-                Debug.Log("CreateAndroidBinding - Creating a new service binder");
-                _serviceBinder = new AndroidJavaObject("com.ultraleap.tracking.service_binder.ServiceBinder", context, serviceCallbacks);
-                success = _serviceBinder.Call<bool>("bind");
-                if (success)
-                {
-                    Debug.Log("CreateAndroidBinding - Binding of service binder complete");
-                }
-                else
-                {
-                    Debug.LogWarning("CreateAndroidBinding - service binder bind call failed");
-                }
-            }
-            catch (Exception e)
-            {
-                Debug.LogWarning("CreateAndroidBinding - Failed to bind service: " + e.Message);
-                _serviceBinder = null;
-                success = false;
-            }
-
-            return success;
+#if !UNITY_EDITOR
+            AndroidServiceBinder.Bind();
 #endif
         }
 
+        // No longer necessary but would be a breaking change if removed
         protected virtual void OnDisable()
         {
-            if (_serviceBinder != null)
-            {
-                Debug.Log("ServiceBinder.unbind...");
-                _serviceBinder.Call("unbind");
-            }
         }
 
 #else
+        // No longer necessary but would be a breaking change if removed
         protected virtual void OnEnable()
         {
         }
 
+        // No longer necessary but would be a breaking change if removed
         protected virtual void OnDisable()
         {
         }
