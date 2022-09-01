@@ -316,7 +316,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 stiffness = stiffness * strength,
                 forceLimit = forceLimit * strength / Time.fixedDeltaTime,
                 damping = 3f,
-                lowerLimit = -15f,
+                lowerLimit = -30f,
                 upperLimit = 80f
             };
 
@@ -338,7 +338,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
         public static void SetupBoneDrives(ArticulationBody bone, float stiffness, float forceLimit, float strength)
         {
             bone.jointType = ArticulationJointType.RevoluteJoint;
-            bone.twistLock = ArticulationDofLock.FreeMotion;
+            bone.twistLock = ArticulationDofLock.LimitedMotion;
 
             ArticulationDrive xDrive = new ArticulationDrive()
             {
@@ -442,6 +442,18 @@ namespace Leap.Unity.Interaction.PhysicsHands
         public static Vector3 CalculatePalmSize(Hand hand)
         {
             return new Vector3(hand.PalmWidth * 0.98f, 0.025f, Vector3.Distance(CalculateAverageKnucklePosition(hand), hand.WristPosition));
+        }
+
+        public static void InterpolateKnucklePosition(ArticulationBody body, PhysicsBone bone, Leap.Hand leapHand, float deltaTime)
+        {
+            if (bone != null && bone.ContactingObjects.Count > 0)
+            {
+                // Stop bones sizing if they're touching things
+                // Has the benefit of stopping small objects falling through bones
+                return;
+            }
+            Bone knuckleBone = leapHand.Fingers[bone.Finger].bones[bone.Joint];
+            body.parentAnchorPosition = Vector3.Lerp(body.parentAnchorPosition, InverseTransformPoint(leapHand.PalmPosition, leapHand.Rotation, bone.Finger == 0 ? knuckleBone.PrevJoint : knuckleBone.NextJoint), deltaTime);
         }
 
         public static void InterpolateBoneSize(ArticulationBody body, PhysicsBone bone, CapsuleCollider collider, Vector3 parentPosition, Quaternion parentRotation, Vector3 childPosition, float width, float length, float deltaTime)

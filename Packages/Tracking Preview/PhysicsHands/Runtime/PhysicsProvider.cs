@@ -95,6 +95,11 @@ namespace Leap.Unity.Interaction.PhysicsHands
         private float _maxMass = 15f;
         public float MaxMass => _maxMass;
 
+        [SerializeField, Tooltip("This option will disable hand collisions and improve forces on the object when it is detected as being thrown.")]
+        private bool _enhanceThrowing = true;
+
+        public bool EnhanceThrowing => _enhanceThrowing;
+
         // Helpers
         private Dictionary<Rigidbody, PhysicsGraspHelper> _graspHelpers = new Dictionary<Rigidbody, PhysicsGraspHelper>();
 
