@@ -9,7 +9,9 @@
     "ultraleap",
     "leap motion",
     "hand tracking",
-    "tracking"
+    "tracking",
+    "openxr",
+    "xr"
   ],
   "documentationUrl": "https://docs.ultraleap.com/",
   "author": {

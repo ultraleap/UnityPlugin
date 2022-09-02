@@ -1,0 +1,39 @@
+{
+    "name": "Ultraleap.Tracking.OpenXR.Editor",
+    "rootNamespace": "Ultraleap.Tracking.OpenXR",
+    "references": [
+        "GUID:4847341ff46394e83bb78fbd0652937e",
+        "GUID:96aa6ba065960476598f8f643e7252b6",
+        "GUID:90dc2706969e68f4d904b155f1d3674e",
+        "GUID:cec9848704c49724192ff47f9b3e9156",
+        "GUID:db4e617c04f44c144bc19216a63dd19b",
+        "GUID:343deaaf83e0cee4ca978e7df0b80d21",
+        "GUID:2bafac87e7f4b9b418d9448d219b01ab",
+        "GUID:0acc523941302664db1f4e527237feb3",
+        "GUID:27619889b8ba8c24980f49ee34dbb44a"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [
+        "XR_OPENXR_ENABLED"
+    ],
+    "versionDefines": [
+        {
+            "name": "com.unity.xr.openxr",
+            "expression": "1.0",
+            "define": "XR_OPENXR_ENABLED"
+        },
+        {
+            "name": "com.ultraleap.tracking.openxr",
+            "expression": "[0,1.0.0-pre.8]",
+            "define": "ULTRALEAP_OPENXR_PACKAGE_INSTALLED"
+        }
+    ],
+    "noEngineReferences": false
+}
