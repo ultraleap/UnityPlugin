@@ -100,6 +100,19 @@ namespace Leap.Unity.Attachments
         }
 #endif
 
+#if UNITY_EDITOR
+        private void Reset()
+        {
+            attachmentPoints = AttachmentPointFlags.None; // delete all transforms before re-enabling the default attachment points (palm and wrist)
+            refreshAttachmentHandTransforms();
+            attachmentPoints = AttachmentPointFlags.Palm | AttachmentPointFlags.Wrist;
+
+
+            handAccessors = null; // force it to find a leap provider & its leapHands again
+            reinitialize();
+        }
+#endif
+
         void Awake()
         {
 #if UNITY_EDITOR
@@ -129,6 +142,10 @@ namespace Leap.Unity.Attachments
                 return;
             }
 #endif
+            if(_leapProvider == null)
+            {
+                return;
+            }
 
             bool requiresReinitialization = false;
 
@@ -136,7 +153,7 @@ namespace Leap.Unity.Attachments
             {
                 var attachmentHand = attachmentHands[i];
 
-                if (attachmentHand == null)
+                if (attachmentHand == null || handAccessors == null)
                 {
                     requiresReinitialization = true;
                     break;
