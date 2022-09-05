@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Tracking Binding is lost when reloading scenes on Android
 - AttachmentHands can get in a popup loop when resetting the component
 - RectilinearToPixel returns NaN
+- Outline hands do not render in HDRP example
 
 ### Known issues 
 - Scenes containing the infrared viewer render incorrectly on Android build targets and in scriptable render pipelines such as URP and HDRP. 
