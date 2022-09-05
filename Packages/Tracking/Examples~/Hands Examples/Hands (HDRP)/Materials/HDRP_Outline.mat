@@ -8,14 +8,15 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: HDRP_Outline
-  m_Shader: {fileID: 4800000, guid: 5ce2a36449e6e3d4ea1dda8f161bd966, type: 3}
-  m_ShaderKeywords: _BLENDMODE_ALPHA _SURFACE_TYPE_TRANSPARENT
+  m_Shader: {fileID: -6465566751694194690, guid: 00ef0f522aa09f54aad1343dcc056a99, type: 3}
+  m_ShaderKeywords: _SURFACE_TYPE_TRANSPARENT
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
-  m_CustomRenderQueue: -1
+  m_CustomRenderQueue: 3000
   stringTagMap:
     MotionVector: User
+    RenderType: Transparent
   disabledShaderPasses:
   - MOTIONVECTORS
   - TransparentBackface
@@ -82,13 +83,14 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Floats:
     - Vector1_0dcee53de0f242d2afd7a2a9c1d59e75: 0.001
-    - Vector1_D403CB1F: 0.002
+    - Vector1_D403CB1F: 0.1
+    - Vector1_e1bdfe73ebcd488abff57cc010ec410f: 0
     - _AddPrecomputedVelocity: 0
     - _AlphaCutoffEnable: 0
     - _AlphaDstBlend: 10
     - _AlphaSrcBlend: 1
     - _AlphaToMask: 0
-    - _AlphaToMaskInspectorValue: 0
+    - _AlphaToMaskInspectorValue: 1
     - _BlendMode: 0
     - _BumpScale: 1
     - _CullMode: 1
@@ -111,7 +113,7 @@ Material:
     - _Outline: 0.002
     - _Parallax: 0.02
     - _ReceivesSSR: 0
-    - _RenderQueueType: 5
+    - _RenderQueueType: 4
     - _RequireSplitLighting: 0
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
@@ -133,20 +135,21 @@ Material:
     - _TransparentDepthPrepassEnable: 0
     - _TransparentSortPriority: 0
     - _TransparentWritingMotionVec: 0
-    - _TransparentZWrite: 1
+    - _TransparentZWrite: 0
     - _UVSec: 0
     - _UseShadowThreshold: 0
-    - _ZTestDepthEqualForOpaque: 4
+    - _ZTestDepthEqualForOpaque: 2
     - _ZTestGBuffer: 4
-    - _ZTestTransparent: 4
-    - _ZWrite: 1
+    - _ZTestTransparent: 2
+    - _ZWrite: 0
     m_Colors:
-    - Color_C3680710: {r: 1, g: 1, b: 1, a: 1}
+    - Color_C3680710: {r: 0, g: 0, b: 0, a: 1}
     - Color_d44fb4ac1c574be9b0434136db3dcadd: {r: 1, g: 1, b: 1, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _DoubleSidedConstants: {r: 1, g: 1, b: -1, a: 0}
     - _EmissionColor: {r: 1, g: 1, b: 1, a: 1}
     - _OutlineColor: {r: 0, g: 0, b: 0, a: 1}
+  m_BuildTextureStacks: []
 --- !u!114 &4961438190780558890
 MonoBehaviour:
   m_ObjectHideFlags: 11
