@@ -74,9 +74,8 @@ namespace Ultraleap.Tracking.OpenXR
             [DllImport(NativeDLL, EntryPoint = NativePrefix + "LocateHandJoints", ExactSpelling = true)]
             internal static extern int LocateHandJoints(
                 Handedness chirality,
-                FrameTime frameTime,
                 out uint isActive,
-                [Out, NotNull, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 4)]
+                [Out, NotNull, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 3)]
                 HandJointLocation[] joints,
                 uint jointCount);
 
@@ -132,10 +131,9 @@ namespace Ultraleap.Tracking.OpenXR
             }
         }
 
-        internal bool LocateHandJoints(Handedness handedness, FrameTime frameTime,
-            HandJointLocation[] handJointLocations)
+        internal bool LocateHandJoints(Handedness handedness, HandJointLocation[] handJointLocations)
         {
-            int result = Native.LocateHandJoints(handedness, frameTime, out uint isActive, handJointLocations,
+            int result = Native.LocateHandJoints(handedness, out uint isActive, handJointLocations,
                 (uint)handJointLocations.Length);
             if (IsResultFailure(result))
             {

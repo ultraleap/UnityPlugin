@@ -68,11 +68,10 @@ namespace Ultraleap.Tracking.OpenXR
         /// <summary>
         /// Attempts to locate the user's hand joints, and populates the supplied array.
         /// </summary>
-        /// <param name="frameTime"></param>
         /// <param name="handJointLocations">An array of <see cref="HandJointLocation"/>s which is index by the <see cref="HandJoint"/> enumberation.</param>
         /// <returns>True if the returned joint poses are valid</returns>
         [PublicAPI]
-        public bool TryLocateHandJoints(FrameTime frameTime, HandJointLocation[] handJointLocations)
+        public bool TryLocateHandJoints(HandJointLocation[] handJointLocations)
         {
             if (!_enabled)
             {
@@ -85,7 +84,7 @@ namespace Ultraleap.Tracking.OpenXR
                 return false;
             }
 
-            return _handTracking.LocateHandJoints(_handedness, frameTime, handJointLocations);
+            return _handTracking.LocateHandJoints(_handedness, handJointLocations);
         }
     }
 
