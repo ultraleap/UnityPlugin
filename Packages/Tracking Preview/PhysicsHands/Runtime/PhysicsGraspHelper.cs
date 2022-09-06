@@ -553,6 +553,10 @@ namespace Leap.Unity.Interaction.PhysicsHands
         {
             for (int i = 0; i < _colliders.Count; i++)
             {
+                if (_colliders[i] == null)
+                {
+                    continue;
+                }
                 if (IsPointWithinCollider(_colliders[i], bone.NextJoint) || IsPointWithinCollider(_colliders[i], bone.Center))
                 {
                     return true;

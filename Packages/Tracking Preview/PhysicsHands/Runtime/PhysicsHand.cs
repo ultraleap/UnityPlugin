@@ -358,7 +358,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             // Iterate through the bones in the hand, applying drive forces
             for (int fingerIndex = 0; fingerIndex < Hand.FINGERS; fingerIndex++)
             {
-                Bone knuckleBone = _originalLeapHand.Fingers[fingerIndex].Bone((Bone.BoneType)(0));
+                Bone knuckleBone = _originalLeapHand.Fingers[fingerIndex].Bone(0);
                 _graspingFingers[fingerIndex] = -1;
                 if (IsGrasping)
                 {
@@ -375,7 +375,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
                 for (int jointIndex = 0; jointIndex < Hand.BONES; jointIndex++)
                 {
-                    Bone prevBone = _originalLeapHand.Fingers[fingerIndex].Bone((Bone.BoneType)(jointIndex));
+                    Bone prevBone = _originalLeapHand.Fingers[fingerIndex].Bone((Bone.BoneType)jointIndex);
                     Bone bone = _originalLeapHand.Fingers[fingerIndex].Bone((Bone.BoneType)(jointIndex + 1));
 
                     int boneArrayIndex = fingerIndex * Hand.BONES + jointIndex;
@@ -554,26 +554,44 @@ namespace Leap.Unity.Interaction.PhysicsHands
         /// <summary>
         /// Used to make sure that the hand is not going to make contact with any object within the scene. Adjusting radius will inflate the joints. This prevents hands from attacking objects when they swap back to contacting.
         /// </summary>
-        private bool IsAnyObjectInHandRadius(float radius = 0.005f)
+        public bool IsAnyObjectInHandRadius(float radius = 0.005f)
         {
-            int overlappingColliders = PhysExts.OverlapBoxNonAllocOffset(_physicsHand.palmCollider, Vector3.zero, _colliderCache, _layerMask, QueryTriggerInteraction.Ignore, radius);
-            for (int i = 0; i < overlappingColliders; i++)
+            if (IsAnyObjectInBoneRadius(_physicsHand.palmBone, radius))
             {
-                if (WillColliderAffectHand(_colliderCache[i]))
+                return true;
+            }
+
+            foreach (var bone in _physicsHand.jointBones)
+            {
+                if (IsAnyObjectInBoneRadius(bone,radius))
                 {
                     return true;
                 }
             }
 
-            foreach (var collider in _physicsHand.jointColliders)
+            return false;
+        }
+
+        /// <summary>
+        /// Used to make sure that a bone is not going to make contact with any object within the scene. Adjusting radius will inflate the joints.
+        /// </summary>
+        public bool IsAnyObjectInBoneRadius(PhysicsBone bone, float radius = 0.005f)
+        {
+            int overlappingColliders;
+            if(bone.Finger == 5)
             {
-                overlappingColliders = PhysExts.OverlapCapsuleNonAllocOffset(collider, Vector3.zero, _colliderCache, _layerMask, QueryTriggerInteraction.Ignore, radius);
-                for (int i = 0; i < overlappingColliders; i++)
+                overlappingColliders = PhysExts.OverlapBoxNonAllocOffset((BoxCollider)bone.Collider, Vector3.zero, _colliderCache, _layerMask, QueryTriggerInteraction.Ignore, radius);
+            }
+            else
+            {
+                overlappingColliders = PhysExts.OverlapCapsuleNonAllocOffset((CapsuleCollider)bone.Collider, Vector3.zero, _colliderCache, _layerMask, QueryTriggerInteraction.Ignore, radius);
+            }
+
+            for (int i = 0; i < overlappingColliders; i++)
+            {
+                if (WillColliderAffectHand(_colliderCache[i]))
                 {
-                    if (WillColliderAffectHand(_colliderCache[i]))
-                    {
-                        return true;
-                    }
+                    return true;
                 }
             }
 
@@ -594,30 +612,48 @@ namespace Leap.Unity.Interaction.PhysicsHands
         }
 
         /// <summary>
-        /// Checks to see whether the hand will be in contact with a specified object. Radius can be used to inflate the joints.
+        /// Checks to see whether the hand will be in contact with a specified object. Radius can be used to inflate the bones.
         /// </summary>
-        private bool IsObjectInHandRadius(Rigidbody rigid, float radius = 0f)
+        public bool IsObjectInHandRadius(Rigidbody rigid, float radius = 0f)
         {
             if (rigid == null)
                 return false;
 
-            int overlappingColliders = PhysExts.OverlapBoxNonAllocOffset(_physicsHand.palmCollider, Vector3.zero, _colliderCache, _layerMask, QueryTriggerInteraction.Ignore, radius);
+            if (IsObjectInBoneRadius(rigid, _physicsHand.palmBone, radius))
+            {
+                return true;
+            }
+
+            foreach (var bone in _physicsHand.jointBones)
+            {
+                if(IsObjectInBoneRadius(rigid,bone,radius))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Checks to see whether a specific bone will be in contact with a specified object. Radius can be used to inflate the bone.
+        /// </summary>
+        public bool IsObjectInBoneRadius(Rigidbody rigid, PhysicsBone bone, float radius = 0f)
+        {
+            int overlappingColliders;
+            if(bone.Finger == 5)
+            {
+                overlappingColliders = PhysExts.OverlapBoxNonAllocOffset((BoxCollider)bone.Collider, Vector3.zero, _colliderCache, _layerMask, QueryTriggerInteraction.Ignore, radius);
+            }
+            else
+            {
+                overlappingColliders = PhysExts.OverlapCapsuleNonAllocOffset((CapsuleCollider)bone.Collider, Vector3.zero, _colliderCache, _layerMask, QueryTriggerInteraction.Ignore, radius);
+            }
             for (int i = 0; i < overlappingColliders; i++)
             {
                 if (_colliderCache[i].attachedRigidbody == rigid)
                 {
                     return true;
-                }
-            }
-            foreach (var collider in _physicsHand.jointColliders)
-            {
-                overlappingColliders = PhysExts.OverlapCapsuleNonAllocOffset(collider, Vector3.zero, _colliderCache, _layerMask, QueryTriggerInteraction.Ignore, radius);
-                for (int i = 0; i < overlappingColliders; i++)
-                {
-                    if (_colliderCache[i].attachedRigidbody == rigid)
-                    {
-                        return true;
-                    }
                 }
             }
             return false;
@@ -645,7 +681,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             int ind = _ignoredData.FindIndex(x => x.rigid == rigid);
             if (ignore)
             {
-                if(ind == -1)
+                if (ind == -1)
                 {
                     _ignoredData.Add(new IgnoreData(rigid, colliders) { timeout = timeout, radius = radius });
                 }
