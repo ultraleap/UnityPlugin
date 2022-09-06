@@ -6,14 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [docs-website]: https://docs.ultraleap.com/unity-api/ "Ultraleap Docs"
 
-## [NEXT] - NOT RELEASED
+## [6.1.0] - 09/09/2022
 
 ### Added
 - Device-Specific RectilinearToPixelEx method
 - OpenXR into a conditionally included asmdef taht automatically removes OpenXR Package if necessary
-
-### Changed
-- 
 
 ### Fixed
 - Tracking Binding is lost when reloading scenes on Android
@@ -27,8 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Use of the LeapCSharp Config class is unavailable with v5.X tracking service
 - Repeatedly opening scenes can cause memory use increase
 - Currently the Ultraleap Hand Tracking feature for OpenXR requires the New and Legacy input systems to be enabled, to simultaneously use OpenXR and the Ultraleap Unity Plugin's features.
-- The OpenXR Leap Provider does not currently support the following hand properties (and will return fixed values):
-  - `Confidence`
+- The OpenXR Leap Provider does not currently support the `Confidence` hand property (and will return fixed values)
 
 ## [6.0.0] - 17/08/2022
 
