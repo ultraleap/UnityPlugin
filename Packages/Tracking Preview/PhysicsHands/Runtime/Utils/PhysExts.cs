@@ -32,7 +32,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             center = box.transform.TransformPoint(box.center + offset);
             var lossyScale = box.transform.lossyScale;
             var scale = AbsVec3(lossyScale);
-            halfExtents = Vector3.Scale(scale, box.size) * 0.5f + (radius == 0 ? Vector3.zero : new Vector3(radius,radius,radius));
+            halfExtents = Vector3.Scale(scale, box.size) * 0.5f + (radius == 0 ? Vector3.zero : new Vector3(radius, radius, radius));
         }
 
         public static int OverlapSphereNonAlloc(SphereCollider sphere, Collider[] results, int layerMask = Physics.DefaultRaycastLayers, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal)

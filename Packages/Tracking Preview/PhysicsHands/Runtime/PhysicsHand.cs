@@ -645,7 +645,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             int ind = _ignoredData.FindIndex(x => x.rigid == rigid);
             if (ignore)
             {
-                if(ind == -1)
+                if (ind == -1)
                 {
                     _ignoredData.Add(new IgnoreData(rigid, colliders) { timeout = timeout, radius = radius });
                 }
