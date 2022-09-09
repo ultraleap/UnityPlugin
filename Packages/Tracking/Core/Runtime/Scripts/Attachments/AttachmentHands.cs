@@ -142,7 +142,7 @@ namespace Leap.Unity.Attachments
                 return;
             }
 #endif
-            if(_leapProvider == null)
+            if (_leapProvider == null)
             {
                 return;
             }

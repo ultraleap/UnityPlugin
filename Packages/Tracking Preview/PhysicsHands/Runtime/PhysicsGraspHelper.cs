@@ -116,7 +116,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
         {
             _rigid = rigid;
             // Doing this prevents objects from misaligning during rotation
-            if(_rigid.maxAngularVelocity < 100f)
+            if (_rigid.maxAngularVelocity < 100f)
             {
                 _rigid.maxAngularVelocity = 100f;
             }
@@ -784,7 +784,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                                                                            end.position,
                                                                            _windowLength);
 
-            if(interpolatedVelocity.magnitude > 1.0f)
+            if (interpolatedVelocity.magnitude > 1.0f)
             {
                 foreach (var hand in _graspingCandidates)
                 {
