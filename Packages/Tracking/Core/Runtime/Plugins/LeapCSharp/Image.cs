@@ -204,7 +204,11 @@ namespace Leap
         /// </summary>
         public UnityEngine.Vector3 RectilinearToPixel(CameraType camera, UnityEngine.Vector3 ray)
         {
-            return Connection.GetConnection().RectilinearToPixel(camera, ray);
+            return Connection.GetConnection().RectilinearToPixelEx(
+                Connection.GetConnection().Devices.FindDeviceByID(deviceId).Handle,
+                camera,
+                ray
+            );
         }
 
         /// <summary>

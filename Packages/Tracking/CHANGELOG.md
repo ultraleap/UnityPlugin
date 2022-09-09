@@ -6,6 +6,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [docs-website]: https://docs.ultraleap.com/unity-api/ "Ultraleap Docs"
 
+## [6.1.0] - 09/09/2022
+
+### Added
+- Device-Specific RectilinearToPixelEx method
+- OpenXR into a conditionally included asmdef taht automatically removes OpenXR Package if necessary
+
+### Fixed
+- Tracking Binding is lost when reloading scenes on Android
+- AttachmentHands can get in a popup loop when resetting the component
+- RectilinearToPixel returns NaN
+
+### Known issues 
+- Scenes containing the infrared viewer render incorrectly on Android build targets and in scriptable render pipelines such as URP and HDRP. 
+- Interactions callback scene allows blocks to be moved without doing a grasp pose. 
+- Capsule hands don't have a joint colour in HDRP 
+- Use of the LeapCSharp Config class is unavailable with v5.X tracking service
+- Repeatedly opening scenes can cause memory use increase
+- Currently the Ultraleap Hand Tracking feature for OpenXR requires the New and Legacy input systems to be enabled, to simultaneously use OpenXR and the Ultraleap Unity Plugin's features.
+- The OpenXR Leap Provider does not currently support the `Confidence` hand property (and will return fixed values)
+- If using OpenXR with OpenXR package imported, when using Unity 2020 and Ultraleap Tracking Plugin via .unitypackage, an error will appear on import relating to HandTrackingFeature. This has been fixed by Unity on Unity 2021
+	- A workarond is to right click on \ThirdParty\Ultraleap\Tracking\OpenXR\Runtime\Scripts\HandTrackingFeature.cs and select 'Reimport'
+
 ## [6.0.0] - 17/08/2022
 
 ### Added
@@ -47,6 +69,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Capsule hands don't have a joint colour in HDRP 
 - Use of the LeapCSharp Config class is unavailable with v5.X tracking service
 - Repeatedly opening scenes can cause memory use increase
+
+## [5.13.1] - 26/08/2022
+
+### Announcements
+
+In line with Unity's end of support of Unity 2019 LTS, we will no longer be actively supporting Unity 2019.
+
+We will also be deprecating some functionality and moving core utilities into a separate package.
+
+If you are using classes and methods that are marked as obsolete and will be moved to the new legacy package without a replacement, you may wish to use "#pragma warning disable 0618" at the start and "#pragma warning restore 0618" at the end of your method that makes use of it to suppress the warnings.
+
+If you have any concerns about this, please contact us on [Github Discussions](https://github.com/ultraleap/UnityPlugin/discussions)
+
+### Fixed
+- Tracking Binding is lost when reloading scenes on Android
+
+### Known issues 
+- Scenes containing the infrared viewer render incorrectly on Android build targets and in scriptable render pipelines such as URP and HDRP. 
+- Demo scenes do not start at the correct height for a seated user. The XR Plugin Management System adjusts the camera height. This means the user has to adjust components in the scene to the correct height - e.g. camera height. Currently our position is to support the legacy XR system height settings. 
+- Hands in Desktop scenes can appear far away from the camera 
+- Interactions callback scene allows blocks to be moved without doing a grasp pose. 
+- Capsule hands don't have a joint colour in HDRP 
+- Hand UI can become detached from hand when hand is removed from view
+- Multi-device (desktop) Scene camera position can become offset
+- FOV visualization does not display after changing render pipelines
 
 ## [5.13.0] - 21/07/2022
 
@@ -109,7 +156,6 @@ This release is a hotfix for the 5.12.0 release. It fixes the XRI package depend
 - Hand UI can become detached from hand when hand is removed from view
 - Multi-device (desktop) Scene camera position can become offset
 - FOV visualization does not display after changing render pipelines
-
 
 
 ## [5.12.0] - 04/07/2022

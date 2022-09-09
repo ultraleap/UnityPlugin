@@ -13,11 +13,11 @@ namespace Leap.Unity.Interaction.PhysicsHands
             return OverlapBoxNonAllocOffset(box, Vector3.zero, results, layerMask, queryTriggerInteraction);
         }
 
-        public static int OverlapBoxNonAllocOffset(BoxCollider box, Vector3 offset, Collider[] results, int layerMask = Physics.DefaultRaycastLayers, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal)
+        public static int OverlapBoxNonAllocOffset(BoxCollider box, Vector3 offset, Collider[] results, int layerMask = Physics.DefaultRaycastLayers, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal, float radius = 0)
         {
             Vector3 center, halfExtents;
             Quaternion orientation;
-            box.ToWorldSpaceBoxOffset(offset, out center, out halfExtents, out orientation);
+            box.ToWorldSpaceBoxOffset(offset, out center, out halfExtents, out orientation, radius);
             return Physics.OverlapBoxNonAlloc(center, halfExtents, results, orientation, layerMask, queryTriggerInteraction);
         }
 
@@ -26,13 +26,13 @@ namespace Leap.Unity.Interaction.PhysicsHands
             ToWorldSpaceBoxOffset(box, Vector3.zero, out center, out halfExtents, out orientation);
         }
 
-        public static void ToWorldSpaceBoxOffset(this BoxCollider box, Vector3 offset, out Vector3 center, out Vector3 halfExtents, out Quaternion orientation)
+        public static void ToWorldSpaceBoxOffset(this BoxCollider box, Vector3 offset, out Vector3 center, out Vector3 halfExtents, out Quaternion orientation, float radius = 0)
         {
             orientation = box.transform.rotation;
             center = box.transform.TransformPoint(box.center + offset);
             var lossyScale = box.transform.lossyScale;
             var scale = AbsVec3(lossyScale);
-            halfExtents = Vector3.Scale(scale, box.size) * 0.5f;
+            halfExtents = Vector3.Scale(scale, box.size) * 0.5f + (radius == 0 ? Vector3.zero : new Vector3(radius, radius, radius));
         }
 
         public static int OverlapSphereNonAlloc(SphereCollider sphere, Collider[] results, int layerMask = Physics.DefaultRaycastLayers, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal)

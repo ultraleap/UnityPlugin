@@ -364,16 +364,27 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e933f13d48c681d48b14750922ac906d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _comment: 'To enable hand-tracking for this scene for OpenXR you''ll need to enable
-    the "Ultraleap Hand Tracking" features under:
+  _comment: 'This scene requires the OpenXR Plugin to be installed if it is not already.
+    You can install it here:
 
 
-    "Edit" -> "Project Settings"
-    -> "XR Plug-in Management" -> "OpenXR"
+    "Window" -> "Package Manager" -> "Unity Registry"
+    -> "OpenXR Plugin"
 
 
-    Any OpenXR Project validation settings
-    should also be appropriately resolved.'
+    ----------
+
+
+    To enable hand-tracking for this scene
+    for OpenXR you''ll need to enable the "Ultraleap Hand Tracking" features under:
+
+
+    "Edit"
+    -> "Project Settings" -> "XR Plug-in Management" -> "OpenXR"
+
+
+    Any OpenXR
+    Project validation settings should also be appropriately resolved.'
   _isEditing: 0
 --- !u!1001 &1169454468
 PrefabInstance:
