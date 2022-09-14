@@ -49,6 +49,7 @@ public class MenuWheel : MonoBehaviour
     public void ShowMenu()
     {
         transform.position = Hands.Right.GetPinchPosition();
+        transform.up = ((Camera.main.transform.position + Vector3.up * 0.1f) - transform.position).normalized;
     }
 
     public void SelectCurrent()
