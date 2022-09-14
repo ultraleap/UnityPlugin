@@ -45,6 +45,11 @@ public class EyePinchHandRay : HandRay
 
     private readonly float oneEurofreq = 30;
 
+    /// <summary>
+    /// The min dot product allowed when calculating if the hand is facing the camera
+    /// </summary>
+    private float minDotProductAllowedForFacingCamera = 0.55f;
+
     // Start is called before the first frame update
     protected override void Start()
     {
@@ -70,7 +75,15 @@ public class EyePinchHandRay : HandRay
         {
             return false;
         }
-        return true;
+        transformHelper.position = leapProvider.CurrentFrame.GetHand(chirality).PalmPosition;
+        Quaternion palmForwardRotation = leapProvider.CurrentFrame.GetHand(chirality).Rotation * Quaternion.Euler(90, 0, 0);
+        transformHelper.rotation = palmForwardRotation;
+        return !IsFacingTransform(transformHelper, inferredBodyPositions.Head, minDotProductAllowedForFacingCamera);
+    }
+
+    private bool IsFacingTransform(Transform facingTransform, Transform transformToCheck, float minAllowedDotProduct = 0.8F)
+    {
+        return Vector3.Dot((transformToCheck.transform.position - facingTransform.position).normalized, facingTransform.forward) > minAllowedDotProduct;
     }
 
     /// <summary>
