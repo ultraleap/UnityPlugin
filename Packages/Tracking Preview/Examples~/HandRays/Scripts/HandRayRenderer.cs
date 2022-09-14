@@ -1,3 +1,10 @@
+/******************************************************************************
+ * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
+ *                                                                            *
+ * Use subject to the terms of the Apache License 2.0 available at            *
+ * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
+ * between Ultraleap and you, your company or other organization.             *
+ ******************************************************************************/
 using Leap.Unity;
 using Leap.Unity.Interaction;
 using Leap.Unity.Interaction.PhysicsHands;
@@ -11,7 +18,7 @@ public abstract class HandRayRenderer : MonoBehaviour
     [SerializeField] private HandRay _handRay;
 
     [Header("Rendering")]
-    [SerializeField] private LineRenderer _lineRenderer;
+    [SerializeField] internal LineRenderer _lineRenderer;
 
     [Header("Trail")]
     [SerializeField] private Transform _trailRendererTransform;
