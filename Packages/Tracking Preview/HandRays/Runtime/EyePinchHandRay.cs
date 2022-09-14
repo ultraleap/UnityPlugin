@@ -3,6 +3,11 @@ using Leap.Unity;
 using Leap.Unity.Preview.HandRays;
 using UnityEngine;
 
+/// <summary>
+/// Calculates a far field hand ray that goes from the eye through the pinch position.
+/// This allows for a really precise ray that is great for inferring gaze and selecting objects,
+/// as the user forced to look through the pinch position in order to aim.
+/// </summary>
 public class EyePinchHandRay : HandRay
 {
     [SerializeField] private InferredBodyPositions inferredBodyPositions;
