@@ -11,7 +11,7 @@ public abstract class HandRayRenderer : MonoBehaviour
     [SerializeField] private HandRay _handRay;
 
     [Header("Rendering")]
-    [SerializeField] private LineRenderer _lineRenderer;
+    [SerializeField] internal LineRenderer _lineRenderer;
 
     [Header("Trail")]
     [SerializeField] private Transform _trailRendererTransform;
