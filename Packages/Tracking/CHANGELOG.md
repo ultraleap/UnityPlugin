@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Device-Specific RectilinearToPixelEx method
 - OpenXR into a conditionally included asmdef taht automatically removes OpenXR Package if necessary
+- Getting Started example scene to showcase core features of the Plugin
 
 ### Fixed
 - Tracking Binding is lost when reloading scenes on Android
