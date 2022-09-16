@@ -5,6 +5,8 @@ using Leap.Unity;
 
 public class Bow : MonoBehaviour
 {
+    public Chirality chirality;
+
     public Transform bowTransform;
 
     public Transform arrow;
@@ -32,13 +34,13 @@ public class Bow : MonoBehaviour
 
     private void Update()
     {
-        if (Hands.Right != null)
+        if (Hands.Get(chirality) != null)
         {
             line1.SetPosition(0, line1.transform.position);
             line2.SetPosition(0, line2.transform.position);
 
-            line1.SetPosition(1, Hands.Right.GetPinchPosition());
-            line2.SetPosition(1, Hands.Right.GetPinchPosition());
+            line1.SetPosition(1, Hands.Get(chirality).GetPinchPosition());
+            line2.SetPosition(1, Hands.Get(chirality).GetPinchPosition());
 
             arrow.LookAt(bowTransform);
             bowTransform.LookAt(bowTransform.position + (bowTransform.position - arrow.position));

@@ -7,6 +7,8 @@ using Leap.Unity;
 
 public class MenuWheel : MonoBehaviour
 {
+    public Chirality chirality;
+
     public Transform segmentPrefab;
     public Transform borderPrefab;
     public Transform titlePrefab;
@@ -48,7 +50,7 @@ public class MenuWheel : MonoBehaviour
 
     public void ShowMenu()
     {
-        transform.position = Hands.Right.GetPinchPosition();
+        transform.position = Hands.Get(chirality).GetPinchPosition();
         transform.up = ((Camera.main.transform.position + Vector3.up * 0.1f) - transform.position).normalized;
     }
 
@@ -73,7 +75,7 @@ public class MenuWheel : MonoBehaviour
 
     private void Update()
     {
-        if(Hands.Right != null)
+        if(Hands.Get(chirality) != null)
         {
             float angle = GetAngleToPinchPos();
             bool set = false;
@@ -100,7 +102,7 @@ public class MenuWheel : MonoBehaviour
 
     float GetAngleToPinchPos()
     {
-        Vector3 flatPinchPos = Hands.Right.GetPinchPosition();
+        Vector3 flatPinchPos = Hands.Get(chirality).GetPinchPosition();
         flatPinchPos.y = 0;
 
         Vector3 flatPos = transform.position;

@@ -1,20 +1,12 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-
-using Leap.Unity;
 
 public class ObjectLauncher : MonoBehaviour
 {
-    public Chirality chirality;
-
-    public LeapProvider leapProvider;
-
     public Transform objectToSpawnPrefab;
     public Transform spawnAtTransform;
 
-    Vector3 startPos;
-    Vector3 lastPinchPos;
+    [HideInInspector] public Vector3 startPos;
+    [HideInInspector] public Vector3 lastPinchPos;
 
     public float launchVelocityMultiplier = 80;
 

@@ -20,7 +20,7 @@ public class Firework : MonoBehaviour
         Explode();
     }
 
-    void Explode()
+    public void Explode()
     {
         StopAllCoroutines();
         rend.enabled = false;
