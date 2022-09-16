@@ -68,10 +68,6 @@ If you are using any of the scriptable render pipelines (SRP) then you will need
 - [Upgrading to Universal Render Pipeline (URP)][upgrade-urp] 
 - [Upgrading to High Definition Render Pipeline (HDRP)][upgrade-hdrp]
 
-If you are using Unity 2020.1 or newer and you get errors related to "SpatialTracking" upon importing, you will need to install the following package:
-
-- [Oculus XR package][oculus-xr-documentation].
-
 ## Installation
 
 There are several ways you can consume this plugin. We've listed several recommended workflows for different users below. This list is by no means exhaustive - if you are aware of a workflow not listed that you think others would appreciate, please consider contributing!
