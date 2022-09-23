@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [docs-website]: https://docs.ultraleap.com/unity-api/ "Ultraleap Docs"
 
-## [NEXT] - Unreleased
+## [6.2.0] - 23/09/22
 
 ### Added
 - Getting Started example scene
@@ -20,6 +20,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 
 
 ### Known issues 
+- Offset between skeleton hand wrist and forearm in sample scenes
+- Outline hands aren't displaying
 - Scenes containing the infrared viewer render incorrectly on Android build targets and in scriptable render pipelines such as URP and HDRP. 
 - Interactions callback scene allows blocks to be moved without doing a grasp pose. 
 - Capsule hands don't have a joint colour in HDRP 
