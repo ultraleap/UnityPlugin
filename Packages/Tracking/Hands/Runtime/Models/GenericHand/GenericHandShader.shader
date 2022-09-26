@@ -112,7 +112,7 @@
 
 					o.worldNormal = worldNormal;
 					o.viewDir = WorldSpaceViewDir(v.vertex);
-					TRANSFER_SHADOW(o)
+					UNITY_TRANSFER_SHADOW(o, o.uv);
 					return o;
 				}
 

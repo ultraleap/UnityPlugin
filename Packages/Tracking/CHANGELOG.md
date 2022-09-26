@@ -17,7 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Removed HDRP hands example scenes
 
 ### Fixed
-- 
+- Fixed compile error with GenericHandShader's use of TRANSFER_SHADOW
 
 ### Known issues 
 - Scenes containing the infrared viewer render incorrectly on Android build targets and in scriptable render pipelines such as URP and HDRP. 
@@ -35,7 +35,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Device-Specific RectilinearToPixelEx method
 - OpenXR into a conditionally included asmdef taht automatically removes OpenXR Package if necessary
-- Getting Started example scene to showcase core features of the Plugin
 
 ### Fixed
 - Tracking Binding is lost when reloading scenes on Android
