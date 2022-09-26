@@ -20,7 +20,7 @@ public class HandRayDotRenderer : HandRayRenderer
         if (Physics.Raycast(new Ray(handRayDirection.RayOrigin, handRayDirection.Direction), out raycastResult, rayDistance, _layerMask))
         {
             hit = true;
-            lineRendererEndPos = raycastResult.point + handRayDirection.Direction * -(_lineRenderer.widthMultiplier /2);
+            lineRendererEndPos = raycastResult.point + handRayDirection.Direction * -(_lineRenderer.widthMultiplier / 2);
         }
         else
         {
