@@ -36,7 +36,7 @@ public class GettingStartedExampleManager : MonoBehaviour
     {
         remainingInteractions--;
 
-        if(currentState == SettingStartedState.STEP_1 && remainingInteractions <= 0)
+        if (currentState == SettingStartedState.STEP_1 && remainingInteractions <= 0)
         {
             DisableStepObjects(step1Objects);
             currentState = SettingStartedState.NONE;

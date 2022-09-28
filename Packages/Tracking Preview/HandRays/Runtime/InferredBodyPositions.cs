@@ -176,7 +176,7 @@ namespace Leap.Unity.Preview.HandRays
             ShoulderPositionsLocalSpace = new Vector3[2];
 
             HipPositions = new Vector3[2];
-            
+
             EyePositions = new Vector3[2];
 
             neckYawDeadzone = new EulerAngleDeadzone(25, true, 1.5f, 10, 1);

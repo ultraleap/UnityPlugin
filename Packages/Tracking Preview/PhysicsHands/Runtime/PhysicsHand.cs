@@ -563,7 +563,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
             foreach (var bone in _physicsHand.jointBones)
             {
-                if (IsAnyObjectInBoneRadius(bone,radius))
+                if (IsAnyObjectInBoneRadius(bone, radius))
                 {
                     return true;
                 }
@@ -578,7 +578,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
         public bool IsAnyObjectInBoneRadius(PhysicsBone bone, float radius = 0.005f)
         {
             int overlappingColliders;
-            if(bone.Finger == 5)
+            if (bone.Finger == 5)
             {
                 overlappingColliders = PhysExts.OverlapBoxNonAllocOffset((BoxCollider)bone.Collider, Vector3.zero, _colliderCache, _layerMask, QueryTriggerInteraction.Ignore, radius);
             }
@@ -626,7 +626,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
             foreach (var bone in _physicsHand.jointBones)
             {
-                if(IsObjectInBoneRadius(rigid,bone,radius))
+                if (IsObjectInBoneRadius(rigid, bone, radius))
                 {
                     return true;
                 }
@@ -641,7 +641,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
         public bool IsObjectInBoneRadius(Rigidbody rigid, PhysicsBone bone, float radius = 0f)
         {
             int overlappingColliders;
-            if(bone.Finger == 5)
+            if (bone.Finger == 5)
             {
                 overlappingColliders = PhysExts.OverlapBoxNonAllocOffset((BoxCollider)bone.Collider, Vector3.zero, _colliderCache, _layerMask, QueryTriggerInteraction.Ignore, radius);
             }
