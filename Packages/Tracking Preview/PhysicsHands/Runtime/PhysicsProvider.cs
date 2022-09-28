@@ -437,6 +437,8 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 {
                     if (_graspHelpers[rigid].GraspState == PhysicsGraspHelper.State.Grasp)
                     {
+                        // Ensure we release the object first
+                        _graspHelpers[rigid].ReleaseObject();
                         OnGraspExit?.Invoke(rigid);
                     }
                     _graspHelpers[rigid].ReleaseHelper();

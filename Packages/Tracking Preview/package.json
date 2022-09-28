@@ -1,12 +1,12 @@
 {
   "name": "com.ultraleap.tracking.preview",
-  "version": "6.1.0",
+  "version": "6.2.0",
   "description": "Ultraleap Tracking Preview",
   "displayName": "Ultraleap Tracking Preview",
   "unity": "2020.3",
   "license": "Apache-2.0",
   "dependencies": {
-    "com.ultraleap.tracking": "6.1.0",
+    "com.ultraleap.tracking": "6.2.0",
     "com.unity.inputsystem": "1.0.2",
     "com.unity.xr.interaction.toolkit": "2.0.0"
   },

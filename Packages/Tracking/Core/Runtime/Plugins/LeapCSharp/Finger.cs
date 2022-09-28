@@ -21,6 +21,12 @@ namespace Leap
     [Serializable]
     public class Finger
     {
+        /// <summary>
+        /// An array of Bone objects that represents each bone of the finger
+        /// 
+        /// There are 4 bones per finger by default
+        /// @since 3.0
+        /// </summary>
         public Bone[] bones = new Bone[4];
 
         /// <summary>
