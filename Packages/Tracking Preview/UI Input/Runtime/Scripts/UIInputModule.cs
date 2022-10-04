@@ -43,12 +43,14 @@ namespace Leap.Unity.InputModule
         [SerializeField]
         private Camera mainCamera;
         public Camera MainCamera => mainCamera;
+        public void SetMainCamera(Camera c) { mainCamera = c; }
 
         //The LeapProvider providing tracking data to the scene.
         [Tooltip("The current Leap Data Provider for the scene.")]
         [SerializeField]
         private LeapProvider leapDataProvider;
         public LeapProvider LeapDataProvider => leapDataProvider;
+        public void SetLeapProvider(LeapProvider provider) { leapDataProvider = provider; }
 
         //Calibration Setup
 
