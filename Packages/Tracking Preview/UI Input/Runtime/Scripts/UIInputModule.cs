@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.XR;
 
 namespace Leap.Unity.InputModule
 {
@@ -42,15 +43,29 @@ namespace Leap.Unity.InputModule
         [Tooltip("The main camera used for calculating interactions.")]
         [SerializeField]
         private Camera mainCamera;
-        public Camera MainCamera => mainCamera;
-        public void SetMainCamera(Camera c) { mainCamera = c; }
+
+        /// <summary>
+        /// The main camera reference
+        /// </summary>
+        public Camera MainCamera
+        {
+            get => mainCamera;
+            set => mainCamera = value;
+        }
 
         //The LeapProvider providing tracking data to the scene.
         [Tooltip("The current Leap Data Provider for the scene.")]
         [SerializeField]
         private LeapProvider leapDataProvider;
-        public LeapProvider LeapDataProvider => leapDataProvider;
-        public void SetLeapProvider(LeapProvider provider) { leapDataProvider = provider; }
+        
+        /// <summary>
+        /// A reference to the source of hand tracking data to use, the 'leap provider'
+        /// </summary>
+        public LeapProvider LeapDataProvider
+        {
+            get => leapDataProvider;
+            set => leapDataProvider = value;
+        }
 
         //Calibration Setup
 
