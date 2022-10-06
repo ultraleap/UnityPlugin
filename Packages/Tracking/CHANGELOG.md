@@ -8,14 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [NEXT] - unreleased
 
-### Added
-- 
-
-### Changed
-- 
-
 ### Fixed
-- 
+- Fixed `DeviceID`, `Timestamp` and `CurrentFramesPerSecond` for `Frames` from the OpenXR Provider
 
 ### Known issues 
 - Offset between skeleton hand wrist and forearm in sample scenes
