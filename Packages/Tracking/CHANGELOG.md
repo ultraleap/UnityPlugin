@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [docs-website]: https://docs.ultraleap.com/unity-api/ "Ultraleap Docs"
 
-## [NEXT] - unreleased
+## [6.2.1] - 07/10/2022
 
 ### Fixed
 - Fixed `DeviceID`, `Timestamp` and `CurrentFramesPerSecond` for `Frames` from the OpenXR Provider
@@ -24,8 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - If using OpenXR with OpenXR package imported, when using Unity 2020 and Ultraleap Tracking Plugin via .unitypackage, an error will appear on import relating to HandTrackingFeature. This has been fixed by Unity on Unity 2021
 	- A workarond is to right click on \ThirdParty\Ultraleap\Tracking\OpenXR\Runtime\Scripts\HandTrackingFeature.cs and select 'Reimport'
 
-
-## [6.2.0] - 23/09/22
+## [6.2.0] - 23/09/2022
 
 ### Added
 - Getting Started example scene

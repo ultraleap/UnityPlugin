@@ -56,7 +56,7 @@ namespace Leap.Unity.InputModule
         [Tooltip("The current Leap Data Provider for the scene.")]
         [SerializeField]
         private LeapProvider leapDataProvider;
-        
+
         /// <summary>
         /// A reference to the source of hand tracking data to use, the 'leap provider'
         /// </summary>
