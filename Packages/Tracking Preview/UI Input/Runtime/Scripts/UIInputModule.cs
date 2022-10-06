@@ -42,13 +42,29 @@ namespace Leap.Unity.InputModule
         [Tooltip("The main camera used for calculating interactions.")]
         [SerializeField]
         private Camera mainCamera;
-        public Camera MainCamera => mainCamera;
+
+        /// <summary>
+        /// The main camera reference
+        /// </summary>
+        public Camera MainCamera
+        {
+            get => mainCamera;
+            set => mainCamera = value;
+        }
 
         //The LeapProvider providing tracking data to the scene.
         [Tooltip("The current Leap Data Provider for the scene.")]
         [SerializeField]
         private LeapProvider leapDataProvider;
-        public LeapProvider LeapDataProvider => leapDataProvider;
+        
+        /// <summary>
+        /// A reference to the source of hand tracking data to use, the 'leap provider'
+        /// </summary>
+        public LeapProvider LeapDataProvider
+        {
+            get => leapDataProvider;
+            set => leapDataProvider = value;
+        }
 
         //Calibration Setup
 
