@@ -58,7 +58,7 @@ namespace Leap.Unity
             if (!IsActive)
             {
                 _isActive = true;
-                OnActivate.Invoke();
+                if (OnActivate != null) OnActivate.Invoke();
             }
         }
 
@@ -72,7 +72,7 @@ namespace Leap.Unity
             if (IsActive)
             {
                 _isActive = false;
-                OnDeactivate.Invoke();
+                if (OnDeactivate != null) OnDeactivate.Invoke();
             }
         }
 
