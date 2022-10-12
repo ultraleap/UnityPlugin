@@ -403,14 +403,15 @@ namespace Leap.Unity
                 {
                     _materialPropertyBlock.SetColor("_Color", SphereColors[i]);
 
-                    Graphics.DrawMeshInstanced(_sphereMesh, 0, _sphereMat, new Matrix4x4[] { _sphereMatrices[i] }, 1, _materialPropertyBlock,
-                      _castShadows ? UnityEngine.Rendering.ShadowCastingMode.On : UnityEngine.Rendering.ShadowCastingMode.Off, true, gameObject.layer);
+                    Graphics.DrawMesh(_sphereMesh, _sphereMatrices[i], _sphereMat, gameObject.layer, null,0, _materialPropertyBlock,true, true);
                 }
             }
             else
             {
-                Graphics.DrawMeshInstanced(_sphereMesh, 0, _sphereMat, _sphereMatrices, _curSphereIndex, null,
-                  _castShadows ? UnityEngine.Rendering.ShadowCastingMode.On : UnityEngine.Rendering.ShadowCastingMode.Off, true, gameObject.layer);
+                for (int i = 0; i < _sphereMatrices.Length && i < _curSphereIndex; i++)
+                {
+                    Graphics.DrawMesh(_sphereMesh, _sphereMatrices[i], _sphereMat, gameObject.layer, null, 0, _materialPropertyBlock, true, true);
+                }
             }
 
 
@@ -420,8 +421,10 @@ namespace Leap.Unity
 #else
             if (_cylinderMesh == null) { _cylinderMesh = getCylinderMesh(1f); }
 #endif
-            Graphics.DrawMeshInstanced(_cylinderMesh, 0, _backing_material, _cylinderMatrices, _curCylinderIndex, null,
-              _castShadows ? UnityEngine.Rendering.ShadowCastingMode.On : UnityEngine.Rendering.ShadowCastingMode.Off, true, gameObject.layer);
+           for (int i = 0; i < _cylinderMatrices.Length && i < _curCylinderIndex; i++)
+            {
+                Graphics.DrawMesh(_cylinderMesh, _cylinderMatrices[i], _backing_material, gameObject.layer, null, 0, _materialPropertyBlock, true, true);
+            }
         }
 
         private void drawSphere(Vector3 position)
