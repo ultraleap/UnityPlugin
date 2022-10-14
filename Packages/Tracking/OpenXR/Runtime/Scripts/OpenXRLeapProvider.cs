@@ -87,6 +87,9 @@ namespace Ultraleap.Tracking.OpenXR
         {
             leapFrame.Hands.Clear();
             leapFrame.Id = _frameId++;
+            leapFrame.DeviceID = 0;
+            leapFrame.Timestamp = (long)(Time.realtimeSinceStartup * 1000000f);
+            leapFrame.CurrentFramesPerSecond = 1.0f / Time.smoothDeltaTime;
 
             if (PopulateLeapHandFromOpenXRJoints(HandTracker.Left, ref _leftHand))
             {
