@@ -6,8 +6,8 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace Leap.Unity.Preview
 {
@@ -86,7 +86,7 @@ namespace Leap.Unity.Preview
             _isBufferingStroke = true;
 
             if (_strokeBuffer != null) _strokeBuffer.Clear();
-            if (_actualizedStrokeIdxBuffer != null)_actualizedStrokeIdxBuffer.Clear();
+            if (_actualizedStrokeIdxBuffer != null) _actualizedStrokeIdxBuffer.Clear();
 
             StrokeRenderer.InitializeRenderer();
         }
@@ -125,7 +125,7 @@ namespace Leap.Unity.Preview
         // at the end.</param>
         private void UpdateStroke(StrokePoint strokePoint, bool shouldUpdateRenderers = true)
         {
-            if(_strokeBuffer == null)
+            if (_strokeBuffer == null)
             {
                 _strokeBuffer = new RingBuffer<StrokePoint>(8);
                 _actualizedStrokeIdxBuffer = new RingBuffer<int>(8);

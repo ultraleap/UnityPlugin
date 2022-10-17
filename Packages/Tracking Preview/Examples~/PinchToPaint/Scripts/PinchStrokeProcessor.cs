@@ -6,9 +6,9 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
+using Leap.Unity.Attributes;
 using System.Collections.Generic;
 using UnityEngine;
-using Leap.Unity.Attributes;
 
 namespace Leap.Unity.Preview
 {
@@ -25,10 +25,10 @@ namespace Leap.Unity.Preview
         /// <summary>
         /// The thickness of the created strokes.
         /// </summary>
-        [SerializeField, Tooltip("The thickness of the created strokes")] 
+        [SerializeField, Tooltip("The thickness of the created strokes")]
         private float Thickness = 0.001f;
 
-        [SerializeField, Tooltip("A PinchStrokeProcessor needs a reference to a PaintCursor, for information such as pinch status and position")] 
+        [SerializeField, Tooltip("A PinchStrokeProcessor needs a reference to a PaintCursor, for information such as pinch status and position")]
         private PaintCursor _paintCursor;
         [SerializeField, Tooltip("Empty GameObject that will be the parent object for the ribbon objects created at runtime")]
         private GameObject _ribbonParentObject;
@@ -92,7 +92,7 @@ namespace Leap.Unity.Preview
 
             if (_paintCursor.DidStartPinch && withinAcceptableCameraFOV && !_strokeProcessor.IsActualizingStroke)
             {
-                    StartActualizingStroke();
+                StartActualizingStroke();
             }
 
             if (_paintCursor.IsTracked && _strokeProcessor.IsBufferingStroke)

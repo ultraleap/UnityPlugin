@@ -6,9 +6,9 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 
 namespace Leap.Unity.Preview
 {
@@ -86,7 +86,7 @@ namespace Leap.Unity.Preview
             // Calculate cursor radius. Mulitply by 0.8, because the cursor should be between the
             // pinching fingers rather than exactly on them
             float pinchRadiusTarget = indexThumbDist / 2f * 0.8f;
-            
+
             pinchRadiusTarget = Mathf.Clamp(pinchRadiusTarget, _minRadius, _maxRadius);
             _radius = Mathf.Lerp(_radius, pinchRadiusTarget, 20f * Time.deltaTime);
 
