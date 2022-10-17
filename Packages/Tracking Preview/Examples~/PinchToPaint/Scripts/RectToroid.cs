@@ -27,30 +27,15 @@ namespace Leap.Unity.Preview
         [SerializeField]
         private bool _alwaysUpdate = false;
 
+        /// <summary>
+        /// Radius of the toroid
+        /// </summary>
         public float Radius
         {
             get { return _radius; }
             set
             {
                 _radius = value;
-                _isDirty = true;
-            }
-        }
-        public float RadialThickness
-        {
-            get { return _radialThickness; }
-            set
-            {
-                _radialThickness = value;
-                _isDirty = true;
-            }
-        }
-        public float VerticalThickness
-        {
-            get { return _verticalThickness; }
-            set
-            {
-                _verticalThickness = value;
                 _isDirty = true;
             }
         }

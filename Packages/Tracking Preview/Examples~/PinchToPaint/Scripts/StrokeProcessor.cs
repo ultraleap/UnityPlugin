@@ -11,6 +11,10 @@ using System.Collections.Generic;
 
 namespace Leap.Unity.Preview
 {
+    /// <summary>
+    /// A Stroke is made out of multiple stroke points. 
+    /// A stroke point holds info such as position, rotation, normal, thickness and color of the stroke at this point
+    /// </summary>
     [System.Serializable]
     public struct StrokePoint
     {
@@ -25,8 +29,15 @@ namespace Leap.Unity.Preview
 
     }
 
+    /// <summary>
+    /// Deals with the actual stroke logic, smoothing or averaging out the stroke and updating the stroke renderer
+    /// </summary>
     public class StrokeProcessor
     {
+        /// <summary>
+        /// Renderer that will render the strokes
+        /// </summary>
+        public ThickRibbonRenderer StrokeRenderer;
 
         // Stroke processing configuration
         private int _maxMemory = 8;
@@ -42,42 +53,30 @@ namespace Leap.Unity.Preview
         private List<StrokePoint> _strokeOutput = null;
         private int _outputBufferEndOffset = 0;
 
+        /// <summary>
+        /// true while the stroke is buffering / being processed
+        /// </summary>
         public bool IsBufferingStroke { get { return _isBufferingStroke; } }
+        /// <summary>
+        /// true while the stroke is being drawn
+        /// </summary>
         public bool IsActualizingStroke { get { return _isActualizingStroke; } }
 
-        // Stroke renderers
-        private List<IStrokeRenderer> _strokeRenderers = null;
-
-        // Stroke buffer renderers
-        private List<IStrokeBufferRenderer> _strokeBufferRenderers = null;
-
+        /// <summary>
+        /// Constructor for a strokeProcessor.
+        /// Sets up new lists and buffers for the strokes.
+        /// </summary>
         public StrokeProcessor()
         {
-            _strokeRenderers = new List<IStrokeRenderer>();
-            _strokeBufferRenderers = new List<IStrokeBufferRenderer>();
             _strokeOutput = new List<StrokePoint>();
             _strokeBuffer = new RingBuffer<StrokePoint>(_maxMemory);
             _actualizedStrokeIdxBuffer = new RingBuffer<int>(_maxMemory);
         }
 
-        public void RegisterStrokeRenderer(IStrokeRenderer strokeRenderer)
-        {
-            _strokeRenderers.Add(strokeRenderer);
-            if (_isBufferingStroke)
-            {
-                Debug.LogError("[StrokeProcessor] Stroke in progress; Newly registered stroke renderers will not render the entire stroke if a stroke is already in progress.");
-            }
-        }
-
-        public void RegisterPreviewStrokeRenderer(IStrokeBufferRenderer strokeBufferRenderer)
-        {
-            _strokeBufferRenderers.Add(strokeBufferRenderer);
-            if (_isBufferingStroke)
-            {
-                Debug.LogError("[StrokeProcessor] Stroke buffer already active; Newly registered stroke buffer renderers will not render the entire preview stroke if a stroke is already in progress.");
-            }
-        }
-
+        /// <summary>
+        /// Start stroke buffering.
+        /// Clears the stroke buffer and initializes the renderer
+        /// </summary>
         public void BeginTrackingStroke()
         {
             if (_isBufferingStroke)
@@ -90,12 +89,13 @@ namespace Leap.Unity.Preview
             if (_strokeBuffer != null) _strokeBuffer.Clear();
             if (_actualizedStrokeIdxBuffer != null)_actualizedStrokeIdxBuffer.Clear();
 
-            for (int i = 0; i < _strokeBufferRenderers.Count; i++)
-            {
-                _strokeBufferRenderers[i].InitializeRenderer();
-            }
+            StrokeRenderer.InitializeRenderer();
         }
 
+        /// <summary>
+        /// Start actualizing the stroke.
+        /// Creates a new list of stroke points and initializes the renderer.
+        /// </summary>
         public void StartStroke()
         {
             if (!_isBufferingStroke)
@@ -113,16 +113,17 @@ namespace Leap.Unity.Preview
             _strokeOutput = new List<StrokePoint>(); // can't clear -- other objects have references to the old stroke output.
             _outputBufferEndOffset = 0;
 
-            for (int i = 0; i < _strokeRenderers.Count; i++)
-            {
-                _strokeRenderers[i].InitializeRenderer();
-            }
+            StrokeRenderer.InitializeRenderer();
         }
 
 
-        // shouldUpdateRenderers provides an optimization for updating multiple stroke points at once,
+        /// <summary>
+        /// Adds a stroke point to the stroke, applies any filters and optionally updates the renderer
+        /// </summary>
+        /// <param name="strokePoint">Stroke point to add to the stroke</param>
+        /// <param name="shouldUpdateRenderers">provides an optimization for updating multiple stroke points at once,
         // where it's more efficient to do the updating without rendering and then refreshing renderers
-        // at the end.
+        // at the end.</param>
         private void UpdateStroke(StrokePoint strokePoint, bool shouldUpdateRenderers = true)
         {
             if(_strokeBuffer == null)
@@ -164,13 +165,63 @@ namespace Leap.Unity.Preview
                     UpdateStrokeRenderers();
                 }
             }
+        }
 
-            // Refresh stroke preview renderers.
-            if (shouldUpdateRenderers)
+        /// <summary>
+        /// Adds stroke points to the stroke and updates renderes after adding all given stroke points
+        /// </summary>
+        public void UpdateStroke(List<StrokePoint> strokePoints)
+        {
+            // UpdateStroke without updating renderers.
+            for (int i = 0; i < strokePoints.Count; i++)
             {
-                UpdateStrokeBufferRenderers();
+                UpdateStroke(strokePoints[i], false);
+            }
+
+            // Manually update renderers.
+            if (strokePoints.Count > 0)
+            {
+                if (_isActualizingStroke)
+                {
+                    UpdateStrokeRenderers();
+                }
             }
         }
+
+        private void UpdateStrokeRenderers()
+        {
+            StrokeRenderer.UpdateRenderer(_strokeOutput, _maxMemory);
+        }
+
+        /// <summary>
+        /// Stops making a stroke and finalizes the renderer
+        /// </summary>
+        public void StopActualizingStroke()
+        {
+            if (!_isActualizingStroke)
+            {
+                Debug.LogError("[StrokeProcessor] Can't stop actualizing stroke; stroke never began actualizing in the first place.");
+                Debug.Break();
+            }
+            _isActualizingStroke = false;
+
+            StrokeRenderer.FinalizeRenderer();
+        }
+
+        /// <summary>
+        /// Ends stroke buffering
+        /// </summary>
+        public void EndStroke()
+        {
+            if (_isActualizingStroke)
+            {
+                StopActualizingStroke();
+            }
+
+            _isBufferingStroke = false;
+        }
+
+        #region Filters
 
         private void FilterPositionMovingAverage(RingBuffer<StrokePoint> data)
         {
@@ -280,81 +331,26 @@ namespace Leap.Unity.Preview
             return Mathf.Max(0F, (input - deadzone) * dampen);
         }
 
-        public void UpdateStroke(List<StrokePoint> strokePoints)
-        {
-            // UpdateStroke without updating renderers.
-            for (int i = 0; i < strokePoints.Count; i++)
-            {
-                UpdateStroke(strokePoints[i], false);
-            }
-
-            // Manually update renderers.
-            if (strokePoints.Count > 0)
-            {
-                if (_isActualizingStroke)
-                {
-                    UpdateStrokeRenderers();
-                }
-                UpdateStrokeBufferRenderers();
-            }
-        }
-
-        private void UpdateStrokeRenderers()
-        {
-            for (int i = 0; i < _strokeRenderers.Count; i++)
-            {
-                _strokeRenderers[i].UpdateRenderer(_strokeOutput, _maxMemory);
-            }
-        }
-
-        private void UpdateStrokeBufferRenderers()
-        {
-            for (int i = 0; i < _strokeBufferRenderers.Count; i++)
-            {
-                _strokeBufferRenderers[i].RefreshRenderer(_strokeBuffer);
-            }
-        }
-
-        public void StopActualizingStroke()
-        {
-            if (!_isActualizingStroke)
-            {
-                Debug.LogError("[StrokeProcessor] Can't stop actualizing stroke; stroke never began actualizing in the first place.");
-                Debug.Break();
-            }
-            _isActualizingStroke = false;
-
-            for (int i = 0; i < _strokeRenderers.Count; i++)
-            {
-                _strokeRenderers[i].FinalizeRenderer();
-            }
-        }
-
-        public void EndStroke()
-        {
-            if (_isActualizingStroke)
-            {
-                StopActualizingStroke();
-            }
-
-            _isBufferingStroke = false;
-
-            for (int i = 0; i < _strokeBufferRenderers.Count; i++)
-            {
-                _strokeBufferRenderers[i].StopRenderer();
-            }
-        }
+        #endregion
 
     }
 
+    /// <summary>
+    /// Extension methods for a ringBuffer
+    /// </summary>
     public static class RingBufferExtensions
     {
-
+        /// <summary>
+        /// Gets the element in a ringBuffer with the index that is idxFromEnd from the end of the buffer
+        /// </summary>
         public static T GetFromEnd<T>(this RingBuffer<T> ringBuffer, int idxFromEnd)
         {
             return ringBuffer.Get(ringBuffer.Count - 1 - idxFromEnd);
         }
 
+        /// <summary>
+        /// Sets the element in a ringBuffer with the index that is idxFromEnd from the end of the buffer
+        /// </summary>
         public static void SetFromEnd<T>(this RingBuffer<T> ringBuffer, int idxFromEnd, T value)
         {
             ringBuffer.Set(ringBuffer.Count - 1 - idxFromEnd, value);

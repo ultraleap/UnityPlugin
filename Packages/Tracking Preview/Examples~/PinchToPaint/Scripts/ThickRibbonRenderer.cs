@@ -14,19 +14,23 @@ using System.Collections.Generic;
 namespace Leap.Unity.Preview
 {
 
-
+    /// <summary>
+    /// Renderer for a PinchStrokeProcessor that renders thick ribbons.
+    /// It neeeds a mesh filter and a mesh renderer
+    /// </summary>
     [RequireComponent(typeof(MeshFilter))]
     [RequireComponent(typeof(MeshRenderer))]
-    public class ThickRibbonRenderer : MonoBehaviour, IStrokeRenderer
+    public class ThickRibbonRenderer : MonoBehaviour
     {
-        public Action OnInitializeRenderer;
-        public Action<List<StrokePoint>, int> OnUpdateRenderer;
-        public Action OnFinalizeRenderer;
-        public Action<GameObject, Mesh, int> OnFinalizeMesh;
-
         private const float VERTICAL_THICKNESS_MULTIPLIER = 1 / 40F;
 
+        /// <summary>
+        /// The material of the ribbons
+        /// </summary>
         public Material _ribbonMaterial;
+        /// <summary>
+        /// The gameobject where the ribbons should be placed under in the scene
+        /// </summary>
         public GameObject _finalizedRibbonParent;
 
         private Mesh _mesh;
@@ -50,15 +54,16 @@ namespace Leap.Unity.Preview
             _colors = new List<Color>();
             _normals = new List<Vector3>();
 
-            transform.position = Vector3.zero;
-            transform.rotation = Quaternion.identity;
+            transform.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
             transform.localScale = Vector3.one;
         }
 
+        /// <summary>
+        /// initialize the renderer.
+        /// Clears all lists such as vertices and normals of a generated ribbon mesh
+        /// </summary>
         public void InitializeRenderer()
         {
-            if (OnInitializeRenderer != null) OnInitializeRenderer();
-
             _meshFilter.mesh = _mesh = new Mesh();
             _mesh.MarkDynamic();
 
@@ -71,11 +76,15 @@ namespace Leap.Unity.Preview
         }
 
         private List<RibbonSegment> _ribbonSegments = new List<RibbonSegment>();
+        /// <summary>
+        /// Updates the renderer.
+        /// Adds new vertices to the ribbon based on the changed stroke points
+        /// </summary>
+        /// <param name="stroke">The complete stroke</param>
+        /// <param name="maxChangedFromEnd">The number of stroke points that have been changed at the end of the stroke</param>
         public void UpdateRenderer(List<StrokePoint> stroke, int maxChangedFromEnd)
         {
             if (stroke.Count <= 1 || maxChangedFromEnd == 0) return;
-
-            if (OnUpdateRenderer != null) OnUpdateRenderer(stroke, maxChangedFromEnd);
 
             int startIdx = Mathf.Max(0, (stroke.Count - 1) - maxChangedFromEnd - 1);
             int endIdx = stroke.Count - 1;
@@ -439,18 +448,18 @@ namespace Leap.Unity.Preview
 
         }
 
+        /// <summary>
+        /// Finalize the renderer.
+        /// Creates a gameobject for the finished ribbon and places it under the ribbonParent in the scene
+        /// </summary>
         public void FinalizeRenderer()
         {
-            if (OnFinalizeRenderer != null) OnFinalizeRenderer();
-
             GameObject meshObj = new GameObject();
             meshObj.transform.parent = _finalizedRibbonParent.transform;
             MeshRenderer renderer = meshObj.AddComponent<MeshRenderer>();
             renderer.material = _meshRenderer.material;
             MeshFilter filter = meshObj.AddComponent<MeshFilter>();
             filter.mesh = _mesh;
-
-            if (OnFinalizeMesh != null) OnFinalizeMesh(meshObj, _mesh, _cachedStrokeRenderered.Count);
 
 
             _cachedStrokeRenderered = new List<StrokePoint>();
@@ -459,7 +468,9 @@ namespace Leap.Unity.Preview
         }
 
     }
-
+    /// <summary>
+    /// Used by the ThickRibbonRenderer to create the ribbon mesh
+    /// </summary>
     public struct RibbonSegment
     {
         public Vector3 startPos;
