@@ -78,12 +78,13 @@ namespace Leap.Unity.Preview
 
             // Update the cursor position
             Vector3 indexThumbMiddle = (indexPos + thumbPos) / 2f;
-            float effPinchStrength = pinchDetector.IsActive ? 1f : indexThumbDist.Map(0.10f, 0.02f, 0f, 1f);
+            float effectivePinchStrength = pinchDetector.IsActive ? 1f : indexThumbDist.Map(0.10f, 0.02f, 0f, 1f);
 
-            var finalPos = Vector3.Lerp(hand.GetPredictedPinchPosition(), indexThumbMiddle, effPinchStrength);
+            var finalPos = Vector3.Lerp(hand.GetPredictedPinchPosition(), indexThumbMiddle, effectivePinchStrength);
             this.transform.position = finalPos;
 
-            // Calc radius
+            // Calculate cursor radius. Mulitply by 0.8, because the cursor should be between the
+            // pinching fingers rather than exactly on them
             float pinchRadiusTarget = indexThumbDist / 2f * 0.8f;
             
             pinchRadiusTarget = Mathf.Clamp(pinchRadiusTarget, _minRadius, _maxRadius);

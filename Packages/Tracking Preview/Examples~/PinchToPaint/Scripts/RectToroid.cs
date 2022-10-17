@@ -62,7 +62,7 @@ namespace Leap.Unity.Preview
         {
             if (_isDirty || _alwaysUpdate)
             {
-                refreshVerts();
+                refreshVertices();
             }
         }
 
@@ -82,11 +82,11 @@ namespace Leap.Unity.Preview
             _mesh.Clear();
             _verts = new Vector3[NUM_DIVISIONS * 4]; // 4 verts per division (rectangular cross section)
             _tris = new int[NUM_DIVISIONS * 24];  // 8 tris per division * 3 entries per tri
-            refreshVerts();
-            refreshTris();
+            refreshVertices();
+            refreshTriangles();
         }
 
-        private void refreshVerts()
+        private void refreshVertices()
         {
             Vector3 r = Vector3.right;
             Vector3 h = Vector3.up;
@@ -104,7 +104,7 @@ namespace Leap.Unity.Preview
             _mesh.RecalculateBounds();
         }
 
-        private void refreshTris()
+        private void refreshTriangles()
         {
             int numVerts = _verts.Length;
             int trisIdx = 0;

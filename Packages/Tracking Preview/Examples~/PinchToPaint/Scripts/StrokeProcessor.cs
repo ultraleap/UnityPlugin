@@ -23,7 +23,6 @@ namespace Leap.Unity.Preview
         public Vector3 normal;
         public Quaternion rotation;
         public Quaternion handOrientation;
-        public float deltaTime;
         public float thickness;
         public Color color;
 
@@ -40,7 +39,7 @@ namespace Leap.Unity.Preview
         public ThickRibbonRenderer StrokeRenderer;
 
         // Stroke processing configuration
-        private int _maxMemory = 8;
+        private int _maxStrokeBufferSize = 8;
 
         // Stroke state
         private bool _isBufferingStroke = false;
@@ -69,8 +68,8 @@ namespace Leap.Unity.Preview
         public StrokeProcessor()
         {
             _strokeOutput = new List<StrokePoint>();
-            _strokeBuffer = new RingBuffer<StrokePoint>(_maxMemory);
-            _actualizedStrokeIdxBuffer = new RingBuffer<int>(_maxMemory);
+            _strokeBuffer = new RingBuffer<StrokePoint>(_maxStrokeBufferSize);
+            _actualizedStrokeIdxBuffer = new RingBuffer<int>(_maxStrokeBufferSize);
         }
 
         /// <summary>
@@ -81,7 +80,7 @@ namespace Leap.Unity.Preview
         {
             if (_isBufferingStroke)
             {
-                Debug.LogError("[StrokeProcessor] Stroke in progress; cannot begin new stroke. Call EndStroke() to finalize the current stroke first.");
+                Debug.LogError(nameof(StrokeProcessor) + " Stroke in progress; cannot begin new stroke. Call EndStroke() to finalize the current stroke first.");
                 return;
             }
             _isBufferingStroke = true;
@@ -105,7 +104,7 @@ namespace Leap.Unity.Preview
 
             if (_isActualizingStroke)
             {
-                Debug.LogError("[StrokeProcessor] Stroke already actualizing; cannot begin actualizing stroke. Call StopActualizingStroke() first.");
+                Debug.LogError(nameof(StrokeProcessor) + " Stroke already actualizing; cannot begin actualizing stroke. Call StopActualizingStroke() first.");
                 return;
             }
             _isActualizingStroke = true;
@@ -190,7 +189,7 @@ namespace Leap.Unity.Preview
 
         private void UpdateStrokeRenderers()
         {
-            StrokeRenderer.UpdateRenderer(_strokeOutput, _maxMemory);
+            StrokeRenderer.UpdateRenderer(_strokeOutput, _maxStrokeBufferSize);
         }
 
         /// <summary>
@@ -200,7 +199,7 @@ namespace Leap.Unity.Preview
         {
             if (!_isActualizingStroke)
             {
-                Debug.LogError("[StrokeProcessor] Can't stop actualizing stroke; stroke never began actualizing in the first place.");
+                Debug.LogError(nameof(StrokeProcessor) + " Can't stop actualizing stroke; stroke never began actualizing in the first place.");
                 Debug.Break();
             }
             _isActualizingStroke = false;
