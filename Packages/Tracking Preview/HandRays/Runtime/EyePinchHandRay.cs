@@ -96,29 +96,6 @@ namespace Leap.Unity.Preview.HandRays
             return Vector3.Dot((transformToCheck.transform.position - facingTransform.position).normalized, facingTransform.forward) > minAllowedDotProduct;
         }
 
-        /// <summary>
-        /// Calculates the Ray Direction using the wrist and shoulder position aimed through a stable pinch position
-        /// </summary>
-        protected override void CalculateRayDirection()
-        {
-            Hand hand = leapProvider.CurrentFrame.GetHand(chirality);
-            if (hand == null)
-            {
-                return;
-            }
-
-            handRayDirection.Hand = hand;
-            handRayDirection.VisualAimPosition = hand.GetPredictedPinchPosition();
-            Vector3 unfilteredRayOrigin = GetRayOrigin();
-
-            //Filtering using the One Euro filter reduces jitter from both positions
-            handRayDirection.AimPosition = aimPositionFilter.Filter(hand.GetPredictedPinchPosition(), Time.time);
-            handRayDirection.RayOrigin = rayOriginFilter.Filter(unfilteredRayOrigin, Time.time);
-
-            handRayDirection.Direction = (handRayDirection.AimPosition - handRayDirection.RayOrigin).normalized;
-            InvokeOnHandRayFrame(handRayDirection);
-        }
-
         private Vector3 GetRayOrigin()
         {
             return chirality == Chirality.Left ? inferredBodyPositions.EyePositions[0] : inferredBodyPositions.EyePositions[1];
@@ -143,6 +120,26 @@ namespace Leap.Unity.Preview.HandRays
                 Gizmos.DrawCube(handRayDirection.RayOrigin, Vector3.one * gizmoRadius);
                 Gizmos.DrawSphere(handRayDirection.AimPosition, gizmoRadius);
             }
+        }
+
+        protected override Vector3 CalculateVisualAimPosition()
+        {
+            return handRayDirection.Hand.GetPredictedPinchPosition();
+        }
+
+        protected override Vector3 CalculateAimPosition()
+        {
+            return aimPositionFilter.Filter(handRayDirection.Hand.GetPredictedPinchPosition(), Time.time);
+        }
+
+        protected override Vector3 CalculateRayOrigin()
+        {
+            return rayOriginFilter.Filter(GetRayOrigin(), Time.time);
+        }
+
+        protected override Vector3 CalculateDirection()
+        {
+            return (handRayDirection.AimPosition - handRayDirection.RayOrigin).normalized;
         }
     }
 }

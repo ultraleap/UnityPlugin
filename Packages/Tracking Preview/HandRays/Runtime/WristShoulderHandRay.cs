@@ -17,7 +17,7 @@ namespace Leap.Unity.Preview.HandRays
     /// For a more responsive ray, blend the WristShoulderBlendAmount towards the wrist, 
     /// For a more stable ray, blend the WristShoulderBlendAmount towards the shoulder.
     /// </summary>
-    public class WristShoulderFarFieldHandRay : HandRay
+    public class WristShoulderHandRay : HandRay
     {
         /// <summary>
         /// The wrist shoulder lerp amount is only used when the rayOrigin is wristShoulderLerp. 
@@ -36,7 +36,7 @@ namespace Leap.Unity.Preview.HandRays
             " - Keep the value central for a blend between the two.")]
         [Range(0f, 1)] public float wristShoulderBlendAmount = 0.532f;
 
-        [SerializeField] private InferredBodyPositions inferredBodyPositions;
+        [SerializeField] protected InferredBodyPositions inferredBodyPositions;
 
         [Header("Debug Gizmos")]
         [SerializeField] private bool drawDebugGizmos;
@@ -58,8 +58,8 @@ namespace Leap.Unity.Preview.HandRays
         private Vector3 wristOffset = new Vector3(0.0425f, 0.0652f, 0.0f);
         private Transform transformHelper;
 
-        private OneEuroFilter<Vector3> aimPositionFilter;
-        private OneEuroFilter<Vector3> rayOriginFilter;
+        protected OneEuroFilter<Vector3> aimPositionFilter;
+        protected OneEuroFilter<Vector3> rayOriginFilter;
 
         /// <summary>
         /// Beta param for OneEuroFilter (see https://cristal.univ-lille.fr/~casiez/1euro/)
@@ -78,6 +78,8 @@ namespace Leap.Unity.Preview.HandRays
         /// The min dot product allowed when calculating if the hand is facing the camera
         /// </summary>
         private float minDotProductAllowedForFacingCamera = 0.55f;
+
+        public bool debug;
 
         // Start is called before the first frame update
         protected override void Start()
@@ -107,38 +109,8 @@ namespace Leap.Unity.Preview.HandRays
             transformHelper.position = leapProvider.CurrentFrame.GetHand(chirality).PalmPosition;
             Quaternion palmForwardRotation = leapProvider.CurrentFrame.GetHand(chirality).Rotation * Quaternion.Euler(90, 0, 0);
             transformHelper.rotation = palmForwardRotation;
-            return !IsFacingTransform(transformHelper, inferredBodyPositions.Head, minDotProductAllowedForFacingCamera);
-        }
-
-        /// <summary>
-        /// Calculates the Ray Direction using the wrist and shoulder position aimed through a stable pinch position
-        /// </summary>
-        protected override void CalculateRayDirection()
-        {
-            Hand hand = leapProvider.CurrentFrame.GetHand(chirality);
-            if (hand == null)
-            {
-                return;
-            }
-
-            int index = hand.IsLeft ? 0 : 1;
-            Vector3 shoulderPosition = inferredBodyPositions.ShoulderPositions[index];
-
-            handRayDirection.Hand = hand;
-            handRayDirection.VisualAimPosition = hand.GetPredictedPinchPosition();
-            Vector3 unfilteredRayOrigin = GetRayOrigin(hand, shoulderPosition);
-
-            //Filtering using the One Euro filter reduces jitter from both positions
-            handRayDirection.AimPosition = aimPositionFilter.Filter(hand.GetStablePinchPosition(), Time.time);
-            handRayDirection.RayOrigin = rayOriginFilter.Filter(unfilteredRayOrigin, Time.time);
-
-            handRayDirection.Direction = (handRayDirection.AimPosition - handRayDirection.RayOrigin).normalized;
-            InvokeOnHandRayFrame(handRayDirection);
-        }
-
-        private Vector3 GetRayOrigin(Hand hand, Vector3 shoulderPosition)
-        {
-            return Vector3.Lerp(GetWristOffsetPosition(hand), shoulderPosition, wristShoulderBlendAmount);
+            debug = !IsFacingTransform(transformHelper, inferredBodyPositions.Head, minDotProductAllowedForFacingCamera);
+            return debug;
         }
 
         private Vector3 GetWristOffsetPosition(Hand hand)
@@ -190,6 +162,35 @@ namespace Leap.Unity.Preview.HandRays
                 Gizmos.DrawCube(handRayDirection.RayOrigin, Vector3.one * gizmoRadius);
                 Gizmos.DrawSphere(handRayDirection.AimPosition, gizmoRadius);
             }
+        }
+
+        protected override Vector3 CalculateVisualAimPosition()
+        {
+            return handRayDirection.Hand.GetPredictedPinchPosition();
+        }
+
+        protected override Vector3 CalculateAimPosition()
+        {
+            return aimPositionFilter.Filter(handRayDirection.Hand.GetStablePinchPosition(), Time.time);
+        }
+
+        protected override Vector3 CalculateRayOrigin()
+        {
+            int index = handRayDirection.Hand.IsLeft ? 0 : 1;
+
+            return rayOriginFilter.Filter(
+                GetRayOrigin(handRayDirection.Hand, inferredBodyPositions.ShoulderPositions[index]),
+                Time.time);
+        }
+
+        private Vector3 GetRayOrigin(Hand hand, Vector3 shoulderPosition)
+        {
+            return Vector3.Lerp(GetWristOffsetPosition(hand), shoulderPosition, wristShoulderBlendAmount);
+        }
+
+        protected override Vector3 CalculateDirection()
+        {
+            return (handRayDirection.AimPosition - handRayDirection.RayOrigin).normalized;
         }
     }
 }

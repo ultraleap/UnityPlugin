@@ -31,13 +31,9 @@ namespace Leap.Unity.Preview.HandRays
         /// </summary>
         public event Action<HandRayDirection> OnHandRayFrame;
         /// <summary>
-        /// Called on the frame the ray is enabled
+        /// Called on the frame the ray is enabled or disabled
         /// </summary>
-        public event Action<HandRayDirection> OnHandRayEnable;
-        /// <summary>
-        /// Called on the frame the ray is disabled
-        /// </summary>
-        public event Action<HandRayDirection> OnHandRayDisable;
+        public event Action<HandRayDirection, bool> OnHandRayStateChange;
 
         /// <summary>
         /// True if the ray should be enabled, false if it should be disabled
@@ -90,7 +86,7 @@ namespace Leap.Unity.Preview.HandRays
                 if (!ShouldEnableRay())
                 {
                     HandRayEnabled = false;
-                    InvokeOnHandRayDisable(handRayDirection);
+                    OnHandRayStateChange?.Invoke(handRayDirection, HandRayEnabled);
                 }
                 else
                 {
@@ -103,7 +99,7 @@ namespace Leap.Unity.Preview.HandRays
                 {
                     HandRayEnabled = true;
                     CalculateRayDirection();
-                    InvokeOnHandRayEnable(handRayDirection);
+                    OnHandRayStateChange?.Invoke(handRayDirection, HandRayEnabled);
                 }
             }
         }
@@ -111,8 +107,23 @@ namespace Leap.Unity.Preview.HandRays
         /// <summary>
         /// Calculates the Ray Direction
         /// </summary>
-        protected virtual void CalculateRayDirection()
+        private void CalculateRayDirection()
         {
+            Hand hand = leapProvider.CurrentFrame.GetHand(chirality);
+            if (hand == null)
+            {
+                return;
+            }
+
+            handRayDirection.Hand = hand;
+            handRayDirection.VisualAimPosition = CalculateVisualAimPosition();
+
+            //Filtering using the One Euro filter reduces jitter from both positions
+            handRayDirection.AimPosition = CalculateAimPosition();
+            handRayDirection.RayOrigin = CalculateRayOrigin();
+
+            handRayDirection.Direction = CalculateDirection();
+            OnHandRayFrame?.Invoke(handRayDirection);
         }
 
         /// <summary>
@@ -128,19 +139,12 @@ namespace Leap.Unity.Preview.HandRays
             return true;
         }
 
-        protected void InvokeOnHandRayFrame(HandRayDirection handRayDirection)
-        {
-            OnHandRayFrame?.Invoke(handRayDirection);
-        }
+        protected abstract Vector3 CalculateVisualAimPosition();
 
-        protected void InvokeOnHandRayEnable(HandRayDirection handRayDirection)
-        {
-            OnHandRayEnable?.Invoke(handRayDirection);
-        }
+        protected abstract Vector3 CalculateAimPosition();
 
-        protected void InvokeOnHandRayDisable(HandRayDirection handRayDirection)
-        {
-            OnHandRayDisable?.Invoke(handRayDirection);
-        }
+        protected abstract Vector3 CalculateRayOrigin();
+
+        protected abstract Vector3 CalculateDirection();
     }
 }

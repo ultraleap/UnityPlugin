@@ -3,8 +3,8 @@ using UnityEditor;
 namespace Leap.Unity.Preview.HandRays
 
 {
-    [CustomEditor(typeof(WristShoulderFarFieldHandRay))]
-    public class WristShoulderFarFieldHandRayEditor : CustomEditorBase<WristShoulderFarFieldHandRay>
+    [CustomEditor(typeof(WristShoulderHandRay))]
+    public class WristShoulderHandRayEditor : CustomEditorBase<WristShoulderHandRay>
     {
         protected override void OnEnable()
         {
