@@ -86,16 +86,20 @@ namespace Leap.Unity.Preview.HandRays
             //Calculate Deadzone
             if (!initialised)
             {
-                DeadzoneCentre = currentAngle;
-                recentredPositionDelta = 0;
-                deadzoneCentreHistory = new Queue<TimestampDeadzoneCentre>();
-                initialised = true;
-                recentredWhilstStill = false;
+                ResetDeadzone(currentAngle);
                 return;
             }
 
             float delta = currentAngle + recentredPositionDelta - DeadzoneCentre;
             delta = SimplifyAngle(delta);
+
+            // You've rotated too far in a single frame
+            if(Mathf.Abs(delta) > 45)
+            {
+                ResetDeadzone(currentAngle);
+                return;
+            }
+
             float signDelta = Mathf.Sign(delta);
             float absDelta = Mathf.Abs(delta);
 
@@ -121,6 +125,18 @@ namespace Leap.Unity.Preview.HandRays
             {
                 RecentreDeadzone(currentAngle);
             }
+        }
+
+        /// <summary>
+        /// Resets the deadzone to the base values.
+        /// </summary>
+        private void ResetDeadzone(float currentAngle)
+        {
+            DeadzoneCentre = currentAngle;
+            recentredPositionDelta = 0;
+            deadzoneCentreHistory = new Queue<TimestampDeadzoneCentre>();
+            initialised = true;
+            recentredWhilstStill = false;
         }
 
         /// <summary>
