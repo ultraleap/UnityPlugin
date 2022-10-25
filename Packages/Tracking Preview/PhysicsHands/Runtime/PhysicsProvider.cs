@@ -272,25 +272,56 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 return;
             }
 
-            if (LeftHand != null)
+            if (LeftHand == null || RightHand == null)
             {
-                _leftIndex = inputFrame.Hands.FindIndex(x => x.IsLeft);
-                if (_leftIndex != -1)
-                {
-                    _leftOriginalLeap.CopyFrom(inputFrame.Hands[_leftIndex]);
-                }
-                ApplyHand(_leftIndex, ref inputFrame, LeftHand);
+                Debug.LogError("Physics hands have not been correctly generated. Please exit play mode and press \"Re-generate Hands\".");
+                this.enabled = false;
+                return;
             }
 
-            if (RightHand != null)
+            _leftIndex = inputFrame.Hands.FindIndex(x => x.IsLeft);
+            if (_leftIndex != -1)
             {
-                _rightIndex = inputFrame.Hands.FindIndex(x => x.IsRight);
-                if (_rightIndex != -1)
-                {
-                    _rightOriginalLeap.CopyFrom(inputFrame.Hands[_rightIndex]);
-                }
-                ApplyHand(_rightIndex, ref inputFrame, RightHand);
+                _leftOriginalLeap.CopyFrom(inputFrame.Hands[_leftIndex]);
             }
+
+            _rightIndex = inputFrame.Hands.FindIndex(x => x.IsRight);
+            if (_rightIndex != -1)
+            {
+                _rightOriginalLeap.CopyFrom(inputFrame.Hands[_rightIndex]);
+            }
+
+            if (Time.inFixedTimeStep)
+            {
+                UpdatePhysicsHand(LeftHand, _leftIndex == -1 ? null : _leftOriginalLeap, ref _leftWasNull);
+                UpdatePhysicsHand(RightHand, _rightIndex == -1 ? null : _rightOriginalLeap, ref _rightWasNull);
+
+                if (_enableHelpers)
+                {
+                    ComputeHelperBones();
+                }
+
+                PhysicsGraspHelper.State oldState, state;
+
+                foreach (var helper in _graspHelpers)
+                {
+                    if (helper.Value.Ignored)
+                    {
+                        continue;
+                    }
+                    oldState = helper.Value.GraspState;
+                    state = helper.Value.UpdateHelper();
+                    if (state != oldState)
+                    {
+                        OnObjectStateChange?.Invoke(helper.Value.Rigidbody, helper.Value);
+                    }
+                }
+
+                UpdateHandStates();
+            }
+
+            ApplyHand(_leftIndex, ref inputFrame, LeftHand);
+            ApplyHand(_rightIndex, ref inputFrame, RightHand);
         }
 
         private void ApplyHand(int index, ref Frame inputFrame, PhysicsHand hand)
@@ -332,42 +363,6 @@ namespace Leap.Unity.Interaction.PhysicsHands
                     wasNull = true;
                 }
             }
-        }
-
-        private void FixedUpdate()
-        {
-            if (LeftHand == null || RightHand == null)
-            {
-                Debug.LogError("Physics hands have not been correctly generated. Please exit play mode and press \"Re-generate Hands\".");
-                this.enabled = false;
-                return;
-            }
-
-            UpdatePhysicsHand(LeftHand, _leftIndex == -1 ? null : _leftOriginalLeap, ref _leftWasNull);
-            UpdatePhysicsHand(RightHand, _rightIndex == -1 ? null : _rightOriginalLeap, ref _rightWasNull);
-
-            if (_enableHelpers)
-            {
-                ComputeHelperBones();
-            }
-
-            PhysicsGraspHelper.State oldState, state;
-
-            foreach (var helper in _graspHelpers)
-            {
-                if (helper.Value.Ignored)
-                {
-                    continue;
-                }
-                oldState = helper.Value.GraspState;
-                state = helper.Value.UpdateHelper();
-                if (state != oldState)
-                {
-                    OnObjectStateChange?.Invoke(helper.Value.Rigidbody, helper.Value);
-                }
-            }
-
-            UpdateHandStates();
         }
 
         #region Helper Physics
