@@ -98,6 +98,7 @@ namespace Leap.Unity.Preview.HandRays
                 if (ShouldEnableRay())
                 {
                     HandRayEnabled = true;
+                    ResetRay();
                     CalculateRayDirection();
                     OnHandRayStateChange?.Invoke(handRayDirection, HandRayEnabled);
                 }
@@ -146,5 +147,7 @@ namespace Leap.Unity.Preview.HandRays
         protected abstract Vector3 CalculateRayOrigin();
 
         protected abstract Vector3 CalculateDirection();
+
+        public abstract void ResetRay();
     }
 }

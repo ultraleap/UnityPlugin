@@ -83,6 +83,7 @@ namespace Leap.Unity.Preview.HandRays
         /// </summary>
         public void UpdateDeadzone(float currentAngle)
         {
+
             //Calculate Deadzone
             if (!initialised)
             {
@@ -94,7 +95,7 @@ namespace Leap.Unity.Preview.HandRays
             delta = SimplifyAngle(delta);
 
             // You've rotated too far in a single frame
-            if(Mathf.Abs(delta) > 45)
+            if(Mathf.Abs(delta) > 15)
             {
                 ResetDeadzone(currentAngle);
                 return;

@@ -23,7 +23,7 @@ namespace Leap.Unity.Preview.HandRays
         [SerializeField] private InferredBodyPositions inferredBodyPositions;
 
         [Header("Debug Gizmos")]
-        [SerializeField] private bool drawDebugGizmos;
+        [SerializeField] private bool drawDebugGizmos = false;
 
         [SerializeField] private bool drawRay = true;
         [SerializeField] private Color rayColor = Color.green;
@@ -72,8 +72,7 @@ namespace Leap.Unity.Preview.HandRays
                 inferredBodyPositions = gameObject.AddComponent<InferredBodyPositions>();
             }
 
-            aimPositionFilter = new OneEuroFilter<Vector3>(oneEurofreq, oneEuroMinCutoff, oneEuroBeta);
-            rayOriginFilter = new OneEuroFilter<Vector3>(oneEurofreq, oneEuroMinCutoff, oneEuroBeta);
+            ResetFilters();
         }
 
         /// <summary>
@@ -140,6 +139,17 @@ namespace Leap.Unity.Preview.HandRays
         protected override Vector3 CalculateDirection()
         {
             return (handRayDirection.AimPosition - handRayDirection.RayOrigin).normalized;
+        }
+
+        public override void ResetRay()
+        {
+            ResetFilters();
+        }
+
+        protected void ResetFilters()
+        {
+            aimPositionFilter = new OneEuroFilter<Vector3>(oneEurofreq, oneEuroMinCutoff, oneEuroBeta);
+            rayOriginFilter = new OneEuroFilter<Vector3>(oneEurofreq, oneEuroMinCutoff, oneEuroBeta);
         }
     }
 }

@@ -101,6 +101,7 @@ namespace Leap.Unity.Preview.HandRays
         private float neckGizmoRadius = 0.02f;
         private float shoulderHipGizmoRadius = 0.02f;
         private float eyeGizmoRadius = 0.01f;
+        private Quaternion storedNeckRotation;
 
         private EulerAngleDeadzone neckYawDeadzone;
         private Transform transformHelper;
@@ -179,6 +180,7 @@ namespace Leap.Unity.Preview.HandRays
 
             EyePositions = new Vector3[2];
 
+            storedNeckRotation = Quaternion.identity;
             neckYawDeadzone = new EulerAngleDeadzone(25, true, 1.5f, 10, 1);
         }
 
@@ -213,7 +215,16 @@ namespace Leap.Unity.Preview.HandRays
         private void UpdateNeckRotation()
         {
             float neckYRotation = useNeckYawDeadzone ? neckYawDeadzone.DeadzoneCentre : Head.rotation.eulerAngles.y;
-            NeckRotation = Quaternion.Lerp(NeckRotation, Quaternion.Euler(0, neckYRotation, 0), Time.deltaTime * neckRotationLerpSpeed);
+
+            // Rotated too far in a single frame
+            if(Quaternion.Angle(storedNeckRotation, Quaternion.Euler(0, neckYRotation, 0)) > 15)
+            {
+                NeckRotation = Quaternion.Euler(0, neckYRotation, 0);
+            }
+
+            storedNeckRotation = Quaternion.Euler(0, neckYRotation, 0);
+
+            NeckRotation = Quaternion.Lerp(NeckRotation, storedNeckRotation, Time.deltaTime * neckRotationLerpSpeed);
         }
 
         private void UpdateLocalOffsetNeckPosition()
