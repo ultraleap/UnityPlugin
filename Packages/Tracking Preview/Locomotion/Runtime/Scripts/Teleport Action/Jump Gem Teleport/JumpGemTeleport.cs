@@ -1,4 +1,5 @@
 using Leap.Unity.Preview.HandRays;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -19,6 +20,8 @@ namespace Leap.Unity.Preview.Locomotion
         public Transform targetLocation = null;
 
         private Transform _head;
+
+        public Action<bool> OnJewelPinched;
 
         private void Awake()
         {
@@ -107,6 +110,7 @@ namespace Leap.Unity.Preview.Locomotion
             {
                 ((TransformWristShoulderHandRay)handRayInteractor.handRay).transformToFollow = _jumpGems[index].PinchItem;
             }
+            OnJewelPinched?.Invoke(true);
         }
 
         private void OnJewelRelease(bool enough)
@@ -124,6 +128,7 @@ namespace Leap.Unity.Preview.Locomotion
             {
                 SelectTeleport(false);
             }
+            OnJewelPinched?.Invoke(false);
         }
     }
 }

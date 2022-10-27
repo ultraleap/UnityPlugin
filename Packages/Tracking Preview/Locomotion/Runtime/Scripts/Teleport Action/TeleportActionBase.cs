@@ -42,13 +42,15 @@ namespace Leap.Unity.Preview.Locomotion
         protected bool _validTarget { get; private set; }
         protected bool _validPoint { get; private set; }
 
+        public bool findTeleportAnchorsOnStart = true;
+
         public bool IsValid { get { return movementType == TeleportActionMovementType.FIXED ? _validTarget : _validPoint; } }
 
         private bool _isSelected;
         public bool IsSelected => _isSelected;
         public Action<TeleportActionMovementType> OnChangeMode;
+        public Action<bool> OnTeleportSelected;
 
-        public Action OnStartTeleport;
         /// <summary>
         /// This will return the position and rotation of the player.
         /// </summary>
@@ -69,8 +71,32 @@ namespace Leap.Unity.Preview.Locomotion
                 handRayInteractor.OnRaycastUpdate += OnRayUpdate;
             }
 
-            _teleportAnchors = new List<TeleportAnchor>(FindObjectsOfType<TeleportAnchor>());
+            if (findTeleportAnchorsOnStart)
+            {
+                _teleportAnchors = new List<TeleportAnchor>(FindObjectsOfType<TeleportAnchor>());
+            }
             SelectTeleport(false);
+        }
+
+        public void AddTeleportAnchor(TeleportAnchor teleportAnchor)
+        {
+            if (teleportAnchor == null) return;
+            if (_teleportAnchors == null)
+            {
+                _teleportAnchors = new List<TeleportAnchor>();
+            }
+            _teleportAnchors.Add(teleportAnchor);
+            Debug.Log("Added teleport anchor");
+        }
+
+        public void SetTeleportAnchors(List<TeleportAnchor> teleportAnchors)
+        {
+            _teleportAnchors = teleportAnchors;
+        }
+
+        public void ClearTeleportAnchors()
+        {
+            _teleportAnchors.Clear();
         }
 
         private void OnRayUpdate(RaycastHit[] results)
@@ -152,6 +178,16 @@ namespace Leap.Unity.Preview.Locomotion
 
         public void SelectTeleport(bool selected = true)
         {
+            if(selected && !IsSelected)
+            {
+                OnTeleportSelected?.Invoke(true);
+            }
+            else if (!selected && IsSelected)
+            {
+                OnTeleportSelected?.Invoke(false);
+            }
+
+
             _isSelected = selected;
             if (handRayRenderer != null)
             {
