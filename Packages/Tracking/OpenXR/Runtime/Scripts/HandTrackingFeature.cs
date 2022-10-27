@@ -64,6 +64,9 @@ namespace Ultraleap.Tracking.OpenXR
 
             [DllImport(NativeDLL, EntryPoint = NativePrefix + "OnAppSpaceChange", ExactSpelling = true)]
             internal static extern void OnAppSpaceChange(ulong xrSpace);
+            
+            [DllImport(NativeDLL, EntryPoint = NativePrefix + "IsHandTrackingSupported", ExactSpelling = true)]
+            internal static extern bool IsHandTrackingSupported();
 
             [DllImport(NativeDLL, EntryPoint = NativePrefix + "CreateHandTrackers", ExactSpelling = true)]
             internal static extern int CreateHandTrackers(HandJointSet jointSet);
@@ -89,8 +92,18 @@ namespace Ultraleap.Tracking.OpenXR
         protected override void OnInstanceDestroy(ulong xrInstance) => Native.OnInstanceDestroy(xrInstance);
         protected override void OnSessionCreate(ulong xrSession) => Native.OnSessionCreate(xrSession);
         protected override void OnSessionDestroy(ulong xrSession) => Native.OnSessionDestroy(xrSession);
-        protected override void OnSystemChange(ulong xrSystemId) => Native.OnSystemChange(xrSystemId);
         protected override void OnAppSpaceChange(ulong xrSpace) => Native.OnAppSpaceChange(xrSpace);
+
+        protected override void OnSystemChange(ulong xrSystemId)
+        {
+            Native.OnSystemChange(xrSystemId);
+            
+            // Check if hand-tracking is supported on this system.
+            if (!Native.IsHandTrackingSupported())
+            {
+                enabled = false;
+            }
+        }
 
         protected override bool OnInstanceCreate(ulong xrInstance)
         {
@@ -115,6 +128,12 @@ namespace Ultraleap.Tracking.OpenXR
 
         protected override void OnSubsystemStart()
         {
+            if (!enabled)
+            {
+                Debug.LogWarning("Hand tracking is not support currently on this device");
+                return;
+            }
+            
             int result = Native.CreateHandTrackers(JointSet);
             if (IsResultFailure(result))
             {
@@ -124,6 +143,11 @@ namespace Ultraleap.Tracking.OpenXR
 
         protected override void OnSubsystemStop()
         {
+            if (!enabled)
+            {
+                return;
+            }
+            
             int result = Native.DestroyHandTrackers();
             if (IsResultFailure(result))
             {
@@ -133,6 +157,11 @@ namespace Ultraleap.Tracking.OpenXR
 
         internal bool LocateHandJoints(Handedness handedness, HandJointLocation[] handJointLocations)
         {
+            if (!enabled)
+            {
+                return false;
+            }
+            
             int result = Native.LocateHandJoints(handedness, out uint isActive, handJointLocations,
                 (uint)handJointLocations.Length);
             if (IsResultFailure(result))
