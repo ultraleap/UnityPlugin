@@ -610,14 +610,16 @@ namespace Leap.Unity
             {
                 leapTransform = new LeapTransform(
                   mainCamera.transform.parent.TransformPoint(warpedPosition),
-                  mainCamera.transform.parent.TransformRotation(warpedRotation)
+                  mainCamera.transform.parent.TransformRotation(warpedRotation),
+                  mainCamera.transform.parent.lossyScale
                   );
             }
             else
             {
                 leapTransform = new LeapTransform(
                   warpedPosition,
-                  warpedRotation
+                  warpedRotation,
+                  transform.lossyScale
                   );
             }
 
