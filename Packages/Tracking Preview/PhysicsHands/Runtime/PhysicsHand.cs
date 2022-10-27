@@ -383,10 +383,17 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
                     if (_wasGraspingBones[boneArrayIndex])
                     {
-                        _graspingXDrives[boneArrayIndex] = _physicsHand.jointBones[boneArrayIndex].XDriveLimit;
+                        if (!IsGrasping && !IsAnyObjectInBoneRadius(_physicsHand.jointBones[boneArrayIndex], 0.01f) && !IsAnyObjectInBoneRadius(bone, _physicsHand.jointColliders[boneArrayIndex].radius * 1.25f))
+                        {
+                            _wasGraspingBones[boneArrayIndex] = false;
+                        }
+                        else
+                        {
+                            _graspingXDrives[boneArrayIndex] = _physicsHand.jointBones[boneArrayIndex].XDriveLimit;
+                        }
                     }
 
-                    // Hand bone resizing, done very slowly during movement.
+                    // Hand physicsBone resizing, done very slowly during movement.
                     // Initial resizing is very fast (while the user is bringing their hand into the frame).
                     if (jointIndex > 0)
                     {
@@ -404,7 +411,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
                     float xTargetAngle = PhysicsHandsUtils.CalculateXTargetAngle(prevBone, bone, fingerIndex, jointIndex);
 
-                    // Clamp the max until we've moved the bone to a lower amount than originally grasped at
+                    // Clamp the max until we've moved the physicsBone to a lower amount than originally grasped at
                     if (_wasGraspingBones[boneArrayIndex] && (xTargetAngle < _graspingXDrives[boneArrayIndex] || Mathf.InverseLerp(body.xDrive.lowerLimit, _physicsHand.jointBones[boneArrayIndex].OriginalXDriveLimit, xTargetAngle) < .25f))
                     {
                         _wasGraspingBones[boneArrayIndex] = false;
@@ -552,18 +559,18 @@ namespace Leap.Unity.Interaction.PhysicsHands
         }
 
         /// <summary>
-        /// Used to make sure that the hand is not going to make contact with any object within the scene. Adjusting radius will inflate the joints. This prevents hands from attacking objects when they swap back to contacting.
+        /// Used to make sure that the hand is not going to make contact with any object within the scene. Adjusting extraRadius will inflate the joints. This prevents hands from attacking objects when they swap back to contacting.
         /// </summary>
-        public bool IsAnyObjectInHandRadius(float radius = 0.005f)
+        public bool IsAnyObjectInHandRadius(float extraRadius = 0.005f)
         {
-            if (IsAnyObjectInBoneRadius(_physicsHand.palmBone, radius))
+            if (IsAnyObjectInBoneRadius(_physicsHand.palmBone, extraRadius))
             {
                 return true;
             }
 
             foreach (var bone in _physicsHand.jointBones)
             {
-                if (IsAnyObjectInBoneRadius(bone, radius))
+                if (IsAnyObjectInBoneRadius(bone, extraRadius))
                 {
                     return true;
                 }
@@ -573,18 +580,18 @@ namespace Leap.Unity.Interaction.PhysicsHands
         }
 
         /// <summary>
-        /// Used to make sure that a bone is not going to make contact with any object within the scene. Adjusting radius will inflate the joints.
+        /// Used to make sure that a physicsBone is not going to make contact with any object within the scene. Adjusting extraRadius will inflate the joints.
         /// </summary>
-        public bool IsAnyObjectInBoneRadius(PhysicsBone bone, float radius = 0.005f)
+        public bool IsAnyObjectInBoneRadius(PhysicsBone physicsBone, float extraRadius = 0.005f)
         {
             int overlappingColliders;
-            if (bone.Finger == 5)
+            if (physicsBone.Finger == 5)
             {
-                overlappingColliders = PhysExts.OverlapBoxNonAllocOffset((BoxCollider)bone.Collider, Vector3.zero, _colliderCache, _layerMask, QueryTriggerInteraction.Ignore, radius);
+                overlappingColliders = PhysExts.OverlapBoxNonAllocOffset((BoxCollider)physicsBone.Collider, Vector3.zero, _colliderCache, _layerMask, QueryTriggerInteraction.Ignore, extraRadius);
             }
             else
             {
-                overlappingColliders = PhysExts.OverlapCapsuleNonAllocOffset((CapsuleCollider)bone.Collider, Vector3.zero, _colliderCache, _layerMask, QueryTriggerInteraction.Ignore, radius);
+                overlappingColliders = PhysExts.OverlapCapsuleNonAllocOffset((CapsuleCollider)physicsBone.Collider, Vector3.zero, _colliderCache, _layerMask, QueryTriggerInteraction.Ignore, extraRadius);
             }
 
             for (int i = 0; i < overlappingColliders; i++)
@@ -598,9 +605,26 @@ namespace Leap.Unity.Interaction.PhysicsHands
             return false;
         }
 
+        /// <summary>
+        /// Used to ensure that a leapBone is not going to be in a problematic state. This can be used to ensure that a desired location is clear of an object.
+        /// </summary>
+        public bool IsAnyObjectInBoneRadius(Bone leapBone, float radius = 0.005f)
+        {
+            int overlappingColliders = Physics.OverlapCapsuleNonAlloc(leapBone.PrevJoint, leapBone.NextJoint, radius, _colliderCache, _layerMask, QueryTriggerInteraction.Ignore);
+            for (int i = 0; i < overlappingColliders; i++)
+            {
+                if (WillColliderAffectHand(_colliderCache[i]))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         private bool WillColliderAffectHand(Collider collider)
         {
-            if (collider.attachedRigidbody != null && collider.attachedRigidbody.TryGetComponent<PhysicsIgnoreHelpers>(out var temp))
+            if (collider.attachedRigidbody != null && collider.attachedRigidbody.TryGetComponent<PhysicsIgnoreHelpers>(out var temp) && temp.DisableHandCollisions)
             {
                 return false;
             }
@@ -636,7 +660,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
         }
 
         /// <summary>
-        /// Checks to see whether a specific bone will be in contact with a specified object. Radius can be used to inflate the bone.
+        /// Checks to see whether a specific physicsBone will be in contact with a specified object. Radius can be used to inflate the physicsBone.
         /// </summary>
         public bool IsObjectInBoneRadius(Rigidbody rigid, PhysicsBone bone, float radius = 0f)
         {

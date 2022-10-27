@@ -321,6 +321,8 @@ namespace Leap.Unity.Interaction.PhysicsHands
             }
 
             ApplyHand(_leftIndex, ref inputFrame, LeftHand);
+            // If the left hand has been removed we need to refind the right index
+            _rightIndex = inputFrame.Hands.FindIndex(x => x.IsRight);
             ApplyHand(_rightIndex, ref inputFrame, RightHand);
         }
 
