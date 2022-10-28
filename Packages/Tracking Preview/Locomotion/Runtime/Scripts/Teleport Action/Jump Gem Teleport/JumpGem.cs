@@ -10,9 +10,11 @@ namespace Leap.Unity.Preview.Locomotion
     {
         #region Editor Settings
 
+        public LeapProvider leapProvider;
+
         [SerializeField, Header("Pinch")]
         protected LightweightPinchDetector _pinchDetector = null;
-
+        
         [SerializeField, Tooltip("This dictates the required pinch value and overall size of the visual elements used. " +
             "This value is a radius and will be used *0.5 on visual items.")]
         protected float _gemSize = 0.033f;
@@ -148,6 +150,11 @@ namespace Leap.Unity.Preview.Locomotion
                 return;
             }
 
+            if(leapProvider == null)
+            {
+                leapProvider = FindObjectOfType<LeapProvider>();
+            }
+
             _jumpGemTeleport = FindObjectOfType<JumpGemTeleport>(true);
             _audioSource = GetComponentInChildren<AudioSource>(true);
             _attachmentHand = GetComponentInParent<AttachmentHand>();
@@ -173,7 +180,7 @@ namespace Leap.Unity.Preview.Locomotion
         {
             if (_attachmentHand != null)
             {
-                _attachedHand = Hands.Get(_attachmentHand.chirality);
+                _attachedHand = leapProvider.CurrentFrame.GetHand(_attachmentHand.chirality);
             }
 
             if (_isPinched)
@@ -270,8 +277,8 @@ namespace Leap.Unity.Preview.Locomotion
         {
             chirality = Chirality.Left;
             pinchPosition = Vector3.zero;
-            Hand left = Hands.Get(Chirality.Left);
-            Hand right = Hands.Get(Chirality.Right);
+            Hand left = leapProvider.CurrentFrame.GetHand(Chirality.Left);
+            Hand right = leapProvider.CurrentFrame.GetHand(Chirality.Right);
             if (left == null && right == null)
             {
                 return false;
@@ -328,7 +335,7 @@ namespace Leap.Unity.Preview.Locomotion
         private void PinchedGem()
         {
             _facingAmount = 1f;
-            _pinchedHand = Hands.Get(_pinchedChirality);
+            _pinchedHand = leapProvider.CurrentFrame.GetHand(_pinchedChirality);
             _pinchAmount = 1f;
             if (_pinchedHand != null)
             {

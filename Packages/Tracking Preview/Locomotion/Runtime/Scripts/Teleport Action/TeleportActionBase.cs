@@ -86,7 +86,6 @@ namespace Leap.Unity.Preview.Locomotion
                 _teleportAnchors = new List<TeleportAnchor>();
             }
             _teleportAnchors.Add(teleportAnchor);
-            Debug.Log("Added teleport anchor");
         }
 
         public void SetTeleportAnchors(List<TeleportAnchor> teleportAnchors)
