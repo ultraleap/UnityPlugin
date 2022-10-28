@@ -98,6 +98,15 @@ namespace Leap.Unity.Preview.Locomotion
             _teleportAnchors.Clear();
         }
 
+        /// <summary>
+        /// This ensures that all teleport anchors will become visible on the next enable.
+        /// This helps prevent situations where you may have moved the player without explicitly teleporting.
+        /// </summary>
+        public void ClearLastPoint()
+        {
+            _lastTeleportedPoint = null;
+        }
+
         private void OnRayUpdate(RaycastHit[] results)
         {
             if (!IsSelected || _currentTeleportAnchorLocked)
