@@ -32,8 +32,12 @@ namespace Leap.Unity.Preview.Locomotion
 
         [SerializeField, Header("Visuals"), Tooltip("The visual item you want to represent as the gem.")]
         protected Transform _pinchItem = null;
+
         [SerializeField, Tooltip("The visual item you want to represent where the gem originally came from. This will transition in when the gem moves further away during a pinch.")]
         protected Transform _outlineItem = null;
+
+        [SerializeField, Tooltip("The keyword within the shader to use when changing the color value of the outline shader.")]
+        protected string _outlineShaderKeyword = "_OutlineColor";
 
         [SerializeField, Tooltip("Hides the gem unless this object's blue axis is facing the user.")]
         protected bool _onlyShowWhenFacingUser = true;
@@ -75,6 +79,7 @@ namespace Leap.Unity.Preview.Locomotion
         protected AttachmentHand _attachmentHand;
 
         protected MeshRenderer _meshRenderer, _outlineRenderer;
+        protected bool _outlineShaderKeywordFound = false;
 
         protected bool _forcedHidden = false, _detectedHidden = false;
 
@@ -172,6 +177,7 @@ namespace Leap.Unity.Preview.Locomotion
                 if (_outlineRenderer != null && _outlineRenderer.materials.Length > 0 && _outlineRenderer.materials[0] != null)
                 {
                     _outlineRenderer.materials[0] = new Material(_outlineRenderer.materials[0]);
+                    _outlineShaderKeywordFound = _outlineRenderer.materials[0].HasProperty(_outlineShaderKeyword);
                 }
             }
         }
@@ -528,7 +534,10 @@ namespace Leap.Unity.Preview.Locomotion
                 _hiddenOutlineCurrent = Mathf.Clamp01(_hiddenOutlineCurrent);
 
                 c.a = _distanceLerp * (1 - _hiddenOutlineCurrent);
-                _outlineRenderer.materials[0].SetColor("_OutlineColor", c);
+                if (_outlineShaderKeywordFound)
+                {
+                    _outlineRenderer.materials[0].SetColor(_outlineShaderKeyword, c);
+                }
             }
         }
 
