@@ -161,17 +161,6 @@ namespace Leap.Unity.Interaction.PhysicsHands
             }
         }
 
-        public Vector3 GetTipPosition(int index)
-        {
-            if (GetLeapHand() == null)
-            {
-                return Vector3.zero;
-            }
-            Vector3 outPos;
-            PhysExts.ToWorldSpaceCapsule(_physicsHand.jointColliders[(Hand.FINGERS * index) + Hand.BONES - 1], out outPos, out var temp, out var temp2);
-            return outPos;
-        }
-
         private void Start()
         {
             _physicsProvider = GetComponentInParent<PhysicsProvider>();

@@ -577,7 +577,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                     b.Rotation = physicsHand.jointColliders[boneInd].transform.rotation;
                     boneInd++;
                 }
-                leapHand.Fingers[i].TipPosition = posA;
+                leapHand.Fingers[i].TipPosition = physicsHand.GetTipPosition(i);
             }
             leapHand.Arm.CopyFrom(originalHand.Arm);
 
@@ -657,6 +657,17 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
             // Return the pinch distance, converted to millimeters to match other providers.
             return Mathf.Sqrt(minDistanceSquared) * 1000.0f;
+        }
+
+        public static Vector3 GetTipPosition(this PhysicsHand.Hand hand, int index)
+        {
+            if (index > 4)
+            {
+                return Vector3.zero;
+            }
+            PhysExts.ToWorldSpaceCapsule(hand.jointColliders[(PhysicsHand.Hand.BONES * index) + PhysicsHand.Hand.BONES - 1], out Vector3 outPos, out var outB, out var outRadius);
+            outPos += (outPos - outB).normalized * outRadius;
+            return outPos;
         }
 
         #endregion
