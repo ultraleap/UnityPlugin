@@ -21,9 +21,7 @@ namespace Leap.Unity
         protected bool isVRProvider = false;
 
         private LeapServiceProvider _leapServiceProvider;
-        private Controller _leapController;
 
-        private List<string> _serialNumbers;
         private int _chosenDeviceIndex;
 
         protected override void OnEnable()
@@ -102,7 +100,7 @@ namespace Leap.Unity
             // this is the minimum service version that supports Multiple devices
             LEAP_VERSION minimumServiceVersion = new LEAP_VERSION { major = 5, minor = 3, patch = 6 };
 
-            if (_leapController != null && _leapController.IsConnected && !_leapController.CheckRequiredServiceVersion(minimumServiceVersion) && property.enumValueIndex == (int)LeapServiceProvider.MultipleDeviceMode.Specific)
+            if (!ServerStatus.IsServiceVersionValid(minimumServiceVersion) && property.enumValueIndex == (int)LeapServiceProvider.MultipleDeviceMode.Specific)
             {
                 property.enumValueIndex = (int)LeapServiceProvider.MultipleDeviceMode.Disabled;
                 Debug.LogWarning(String.Format("Your current tracking service does not support 'Multiple Device Mode' = 'Specific' (min version is {0}.{1}.{2}). Please update your service: https://developer.leapmotion.com/tracking-software-download", minimumServiceVersion.major, minimumServiceVersion.minor, minimumServiceVersion.patch));
@@ -114,63 +112,45 @@ namespace Leap.Unity
 
         private void drawSerialNumberToggle(SerializedProperty property)
         {
-            bool createdController = false;
+            List<string> SerialNumbers = ServerStatus.GetSerialNumbers().ToList();
 
-            // Check if a controller exists
-            if (_leapController == null)
+            if (SerialNumbers.Count == 0)
             {
-                // This will generate a new controller if it is possible, we want to treat this newly created controller as temporary
-                if (LeapController != null)
-                {
-                    createdController = true;
-                }
+                EditorGUILayout.HelpBox("There are no devices connected. Connect a device to use the Multiple Device Mode 'Specific'", MessageType.Warning);
+                return;
             }
 
-            if (_leapController != null)
+            // check whether the current SpecificSerialNumber is an empty string
+            if (String.IsNullOrEmpty(property.stringValue))
             {
-                if (SerialNumbers.Count == 0)
-                {
-                    EditorGUILayout.HelpBox("There are no devices connected. Connect a device to use the Multiple Device Mode 'Specific'", MessageType.Warning);
-                    return;
-                }
+                _chosenDeviceIndex = EditorGUILayout.Popup("Specific Serial Number", 0, new List<string>() { "Select an available Serial Number" }.Concat(SerialNumbers).ToArray());
 
-                // check whether the current SpecificSerialNumber is an empty string
-                if (String.IsNullOrEmpty(property.stringValue))
+                if (_chosenDeviceIndex > 0)
                 {
-                    _chosenDeviceIndex = EditorGUILayout.Popup("Specific Serial Number", 0, new List<string>() { "Select an available Serial Number" }.Concat(SerialNumbers).ToArray());
+                    property.stringValue = SerialNumbers[_chosenDeviceIndex - 1];
+                }
+                return;
+            }
 
-                    if (_chosenDeviceIndex > 0)
-                    {
-                        property.stringValue = SerialNumbers[_chosenDeviceIndex - 1];
-                    }
-                    return;
-                }
+            // try to find the specificSerialNumber in the list of available serial numbers
+            _chosenDeviceIndex = SerialNumbers.FindIndex(x => x.Contains(property.stringValue));
+            if (_chosenDeviceIndex == -1 || _chosenDeviceIndex >= SerialNumbers.Count)
+            {
+                // if it couldn't find the specificSerialNumber, display it at the end of the list with 'not available' behind it
+                _chosenDeviceIndex = EditorGUILayout.Popup("Specific Serial Number", SerialNumbers.Count, SerialNumbers.Append(property.stringValue + " (not available)").ToArray());
+            }
+            else
+            {
+                // display the dropdown with all available serial numbers, selecting the specificSerialNumber
+                _chosenDeviceIndex = EditorGUILayout.Popup("Specific Serial Number", _chosenDeviceIndex, SerialNumbers.ToArray());
+            }
 
-                // try to find the specificSerialNumber in the list of available serial numbers
-                _chosenDeviceIndex = SerialNumbers.FindIndex(x => x.Contains(property.stringValue));
-                if (_chosenDeviceIndex == -1 || _chosenDeviceIndex >= SerialNumbers.Count)
-                {
-                    // if it couldn't find the specificSerialNumber, display it at the end of the list with 'not available' behind it
-                    _chosenDeviceIndex = EditorGUILayout.Popup("Specific Serial Number", SerialNumbers.Count, SerialNumbers.Append(property.stringValue + " (not available)").ToArray());
-                }
-                else
-                {
-                    // display the dropdown with all available serial numbers, selecting the specificSerialNumber
-                    _chosenDeviceIndex = EditorGUILayout.Popup("Specific Serial Number", _chosenDeviceIndex, SerialNumbers.ToArray());
-                }
-
-                // check whether the chosenDeviceIndex is within range of the list of serial numbers
-                // It isn't in case a serial number with 'not available' was selected
-                if (_chosenDeviceIndex < SerialNumbers.Count)
-                {
-                    // assign the valid chosen serial number to the specificSerialNumber
-                    property.stringValue = SerialNumbers[_chosenDeviceIndex];
-                }
-
-                if (createdController)
-                {
-                    _leapController.StopConnection();
-                }
+            // check whether the chosenDeviceIndex is within range of the list of serial numbers
+            // It isn't in case a serial number with 'not available' was selected
+            if (_chosenDeviceIndex < SerialNumbers.Count)
+            {
+                // assign the valid chosen serial number to the specificSerialNumber
+                property.stringValue = SerialNumbers[_chosenDeviceIndex];
             }
         }
 
@@ -190,76 +170,6 @@ namespace Leap.Unity
                     return this._leapServiceProvider;
                 }
             }
-        }
-
-        private Controller LeapController
-        {
-            get
-            {
-
-                if (this._leapController != null)
-                {
-                    return this._leapController;
-                }
-                else
-                {
-                    this._leapController = LeapServiceProvider?.GetLeapController();
-
-                    if (this._leapController != null)
-                    {
-                        this._leapController.Device += _leapController_DeviceAdded;
-                        this._leapController.DeviceLost += _leapController_DeviceLost;
-                    }
-
-                    return this._leapController;
-                }
-            }
-        }
-
-        private List<string> SerialNumbers
-        {
-            get
-            {
-                if (this._serialNumbers != null)
-                {
-                    return this._serialNumbers;
-                }
-                else
-                {
-                    this._serialNumbers = new List<string>();
-                    List<Device> connectedDevices = LeapController.Devices;
-                    foreach (Device d in connectedDevices)
-                    {
-                        this._serialNumbers.Add(d.SerialNumber);
-                    }
-                    return this._serialNumbers;
-                }
-            }
-        }
-
-
-        private void _leapController_DeviceAdded(object sender, DeviceEventArgs e)
-        {
-            SerialNumbers.Add(e.Device.SerialNumber);
-            _leapController_DeviceChanged(sender, e);
-        }
-
-        private void _leapController_DeviceLost(object sender, DeviceEventArgs e)
-        {
-            SerialNumbers.Remove(e.Device.SerialNumber);
-            _leapController_DeviceChanged(sender, e);
-        }
-
-        private void _leapController_DeviceChanged(object sender, DeviceEventArgs e)
-        {
-            if (!Application.isPlaying || EditorWindow.focusedWindow.GetType() == typeof(SceneView))
-            {
-                EditorWindow view = EditorWindow.GetWindow<SceneView>();
-                view.Repaint();
-            }
-
-            // Repaint the inspector windows if the devices have changed
-            Repaint();
         }
     }
 }

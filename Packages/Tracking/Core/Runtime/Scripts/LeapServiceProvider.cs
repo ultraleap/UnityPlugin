@@ -1082,54 +1082,28 @@ namespace Leap.Unity
 
         private void DetectConnectedDevice(Transform targetTransform)
         {
-            if (GetLeapController() != null && GetLeapController().Devices?.Count >= 1)
+            string deviceType = "";
+            
+            if(_multipleDeviceMode == MultipleDeviceMode.Disabled)
             {
-                Device currentDevice = _currentDevice;
-                if (currentDevice == null || (_multipleDeviceMode == LeapServiceProvider.MultipleDeviceMode.Specific && currentDevice.SerialNumber != _specificSerialNumber))
-                {
-                    foreach (Device d in GetLeapController().Devices)
-                    {
-                        if (d.SerialNumber.Contains(_specificSerialNumber))
-                        {
-                            currentDevice = d;
-                            break;
-                        }
-                    }
-                }
-
-                if (currentDevice == null && _multipleDeviceMode == MultipleDeviceMode.Disabled)
-                {
-                    currentDevice = GetLeapController().Devices[0];
-                }
-
-                if (currentDevice == null || (_multipleDeviceMode == LeapServiceProvider.MultipleDeviceMode.Specific && currentDevice.SerialNumber != _specificSerialNumber))
-                {
-                    return;
-                }
-
-                Device.DeviceType deviceType = currentDevice.Type;
-                if (deviceType == Device.DeviceType.TYPE_RIGEL || deviceType == Device.DeviceType.TYPE_SIR170)
-                {
-                    DrawTrackingDevice(targetTransform, "Stereo IR 170");
-                    return;
-                }
-                else if (deviceType == Device.DeviceType.TYPE_3DI)
-                {
-                    DrawTrackingDevice(targetTransform, "3Di");
-                    return;
-                }
-                else if (deviceType == Device.DeviceType.TYPE_PERIPHERAL)
-                {
-                    DrawTrackingDevice(targetTransform, "Leap Motion Controller");
-                    return;
-                }
+                deviceType = LeapInternal.ServerStatus.GetDeviceType("");
+            }
+            else
+            {
+                deviceType = LeapInternal.ServerStatus.GetDeviceType(_specificSerialNumber);
             }
 
-            // if no devices connected, no serial number selected or the connected device type isn't matching one of the above,
-            // delete any device model that is currently displayed
-            if (targetTransform.Find("DeviceModel") != null)
+            if (deviceType == "SIR170")
             {
-                GameObject.DestroyImmediate(targetTransform.Find("DeviceModel").gameObject);
+                DrawTrackingDevice(targetTransform, "Stereo IR 170");
+            }
+            else if (deviceType == "3Di")
+            {
+                DrawTrackingDevice(targetTransform, "3Di");
+            }
+            else
+            {
+                DrawTrackingDevice(targetTransform, "Leap Motion Controller");
             }
         }
 
