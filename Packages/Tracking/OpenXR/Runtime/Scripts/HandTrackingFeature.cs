@@ -24,14 +24,16 @@ namespace Ultraleap.Tracking.OpenXR
         Desc = "Articulated hands using XR_EXT_hand_tracking",
         Category = FeatureCategory.Feature,
         Required = false,
-        OpenxrExtensionStrings = "XR_EXT_hand_tracking XR_ULTRALEAP_hand_tracking_forearm",
+        OpenxrExtensionStrings = XRExtHandTrackingString + " " + XRUltraleapHandTrackingForearmString,
         BuildTargetGroups = new[] { BuildTargetGroup.Standalone, BuildTargetGroup.Android }
     )]
 #endif
     public class HandTrackingFeature : OpenXRFeature
     {
         [PublicAPI] public const string FeatureId = "com.ultraleap.tracking.openxr.feature.handtracking";
-
+        [PublicAPI] public const string XRExtHandTrackingString = "XR_EXT_hand_tracking";
+        [PublicAPI] public const string XRUltraleapHandTrackingForearmString = "XR_ULTRALEAP_hand_tracking_forearm";
+        
         [Header("Meta Hand-Tracking")]
         [Tooltip("Adds required permissions and features to the Android manifest")]
         public bool metaPermissions = true;
@@ -104,6 +106,8 @@ namespace Ultraleap.Tracking.OpenXR
                 enabled = false;
             }
         }
+        
+        
 
         protected override bool OnInstanceCreate(ulong xrInstance)
         {
@@ -112,18 +116,24 @@ namespace Ultraleap.Tracking.OpenXR
                 Debug.LogWarning("XR_EXT_hand_tracking is not enabled, disabling Hand Tracking");
                 return false;
             }
-
-            JointSet = OpenXRRuntime.IsExtensionEnabled("XR_ULTRALEAP_hand_tracking_forearm")
-                ? HandJointSet.HandWithForearm
-                : HandJointSet.Default;
-
+            
             if (OpenXRRuntime.GetExtensionVersion("XR_EXT_hand_tracking") < 4)
             {
                 Debug.LogWarning("XR_EXT_hand_tracking is not at least version 4, disabling Hand Tracking");
                 return false;
             }
+            
+            JointSet = OpenXRRuntime.IsExtensionEnabled("XR_ULTRALEAP_hand_tracking_forearm")
+                ? HandJointSet.HandWithForearm
+                : HandJointSet.Default;
+            
+            if (!Native.OnInstanceCreate(xrInstance))
+            {
+                Debug.LogError("Failed to initialise Ultraleap Tracking native plugin");
+                return false;
+            }
 
-            return Native.OnInstanceCreate(xrInstance);
+            return true;
         }
 
         protected override void OnSubsystemStart()

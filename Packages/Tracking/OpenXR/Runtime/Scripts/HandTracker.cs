@@ -23,7 +23,6 @@ namespace Ultraleap.Tracking.OpenXR
 
             if (_handTracking == null || !_handTracking.enabled)
             {
-                Debug.LogError("Ultraleap HandTracker was used without the Ultraleap Hand Tracking OpenXR Feature enabled");
                 return;
             }
 

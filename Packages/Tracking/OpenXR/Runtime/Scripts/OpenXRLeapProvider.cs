@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.XR.OpenXR;
 using Bone = Leap.Bone;
 using Hand = Leap.Hand;
 
@@ -12,9 +13,11 @@ namespace Ultraleap.Tracking.OpenXR
 {
     public class OpenXRLeapProvider : LeapProvider
     {
+        private bool _handTrackingEnabled = false;
+        
         private Frame _updateFrame = new Frame();
         private Frame _currentFrame = new Frame();
-
+        
         private Hand _leftHand = new Hand();
         private Hand _rightHand = new Hand();
 
@@ -49,8 +52,19 @@ namespace Ultraleap.Tracking.OpenXR
             }
         }
 
+        private void Start()
+        {
+            var handTracking = OpenXRSettings.Instance.GetFeature<HandTrackingFeature>();
+            _handTrackingEnabled = (handTracking == null || !handTracking.enabled);
+        }
+
         private void Update()
         {
+            if (!_handTrackingEnabled)
+            {
+                return;
+            }
+            
             PopulateLeapFrame(ref _updateFrame);
 
             Pose trackerTransform = new Pose(Vector3.zero, Quaternion.identity);
@@ -80,6 +94,11 @@ namespace Ultraleap.Tracking.OpenXR
 
         private void FixedUpdate()
         {
+            if (!_handTrackingEnabled)
+            {
+                return;
+            }
+            
             DispatchFixedFrameEvent(_currentFrame);
         }
 
