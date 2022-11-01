@@ -88,6 +88,9 @@ namespace Ultraleap.Tracking.OpenXR
             internal static string ResultToString(int result) => Marshal.PtrToStringAnsi(XrResultToString(result));
         }
 
+        private bool _supportsHandTracking;
+        [PublicAPI] public bool SupportsHandTracking => enabled && _supportsHandTracking;
+
         protected override IntPtr HookGetInstanceProcAddr(IntPtr func) => Native.HookGetInstanceProcAddr(func);
         protected override void OnInstanceDestroy(ulong xrInstance) => Native.OnInstanceDestroy(xrInstance);
         protected override void OnSessionCreate(ulong xrSession) => Native.OnSessionCreate(xrSession);
@@ -97,12 +100,7 @@ namespace Ultraleap.Tracking.OpenXR
         protected override void OnSystemChange(ulong xrSystemId)
         {
             Native.OnSystemChange(xrSystemId);
-            
-            // Check if hand-tracking is supported on this system.
-            if (!Native.IsHandTrackingSupported())
-            {
-                enabled = false;
-            }
+            _supportsHandTracking = Native.IsHandTrackingSupported();
         }
 
         protected override bool OnInstanceCreate(ulong xrInstance)
@@ -128,7 +126,7 @@ namespace Ultraleap.Tracking.OpenXR
 
         protected override void OnSubsystemStart()
         {
-            if (!enabled)
+            if (!SupportsHandTracking)
             {
                 Debug.LogWarning("Hand tracking is not support currently on this device");
                 return;
@@ -143,7 +141,7 @@ namespace Ultraleap.Tracking.OpenXR
 
         protected override void OnSubsystemStop()
         {
-            if (!enabled)
+            if (!SupportsHandTracking)
             {
                 return;
             }
@@ -157,7 +155,7 @@ namespace Ultraleap.Tracking.OpenXR
 
         internal bool LocateHandJoints(Handedness handedness, HandJointLocation[] handJointLocations)
         {
-            if (!enabled)
+            if (!SupportsHandTracking)
             {
                 return false;
             }
