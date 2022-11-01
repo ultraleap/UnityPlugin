@@ -18,7 +18,7 @@ namespace Leap.Unity
     /// available at the time of application launch.
     /// The order of selection is: OpenXR -> LeapC
     /// </summary>
-    public class XRLeapProviderManager : PostProcessProvider
+    public class XRLeapProviderManager : LeapProvider
     {
         [SerializeField] private LeapProvider openXRLeapProvider;
         [SerializeField] private LeapProvider leapXRServiceProvider;
@@ -38,7 +38,28 @@ namespace Leap.Unity
             {
                 return (_leapProvider == null) ? leapXRServiceProvider : _leapProvider;
             }
+            private set
+            {
+                if (Application.isPlaying && _leapProvider != null)
+                {
+                    _leapProvider.OnFixedFrame -= HandleFixedFrame;
+                    _leapProvider.OnUpdateFrame -= HandleUpdateFrame;
+                }
+
+                _leapProvider = value;
+
+                if (Application.isPlaying && _leapProvider != null)
+                {
+                    _leapProvider.OnFixedFrame -= HandleFixedFrame; // safeguard double-subscription
+                    _leapProvider.OnFixedFrame += HandleFixedFrame;
+                    _leapProvider.OnUpdateFrame -= HandleUpdateFrame; // safeguard double-subscription
+                    _leapProvider.OnUpdateFrame += HandleUpdateFrame;
+                }
+            }
         }
+
+        public override Frame CurrentFrame => LeapProvider.CurrentFrame;
+        public override Frame CurrentFixedFrame => LeapProvider.CurrentFixedFrame;
 
         /// <summary>
         /// An optional override to force the use of the LeapC tracking data
@@ -53,7 +74,7 @@ namespace Leap.Unity
             if (!forceLeapService && openXRLeapProvider != null && openXRLeapProvider.CanProvideData)
             {
                 Debug.Log("Using OpenXR for Hand Tracking");
-                _leapProvider = openXRLeapProvider;
+                LeapProvider = openXRLeapProvider;
 
                 if (leapXRServiceProvider != null)
                 {
@@ -63,7 +84,7 @@ namespace Leap.Unity
             else
             {
                 Debug.Log("Using LeapService for Hand Tracking");
-                _leapProvider = leapXRServiceProvider;
+                LeapProvider = leapXRServiceProvider;
 
                 if (openXRLeapProvider != null)
                 {
@@ -71,12 +92,23 @@ namespace Leap.Unity
                 }
             }
 
-            inputLeapProvider = LeapProvider;
-            OnProviderSet?.Invoke(inputLeapProvider);
+            OnProviderSet?.Invoke(LeapProvider);
         }
 
-        public override void ProcessFrame(ref Frame inputFrame)
+        /// <summary>
+        /// Directly pass the Frame data through to anyone that is listening to our own events
+        /// </summary>
+        void HandleUpdateFrame(Frame _frame)
         {
+            DispatchUpdateFrameEvent(_frame);
+        }
+
+        /// <summary>
+        /// Directly pass the Frame data through to anyone that is listening to our own events
+        /// </summary>
+        void HandleFixedFrame(Frame _frame)
+        {
+            DispatchFixedFrameEvent(_frame);
         }
     }
 }
