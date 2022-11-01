@@ -33,6 +33,7 @@ namespace Leap.Unity.HandsModule
         private SerializedProperty DebugModelRotationAxis;
         private SerializedProperty setPositions;
         private SerializedProperty setScale;
+        private SerializedProperty scaleSpeed;
         private SerializedProperty setEditorPose;
         private SerializedProperty globalFingerRotationOffset;
         private SerializedProperty wristRotationOffset;
@@ -61,6 +62,7 @@ namespace Leap.Unity.HandsModule
             DebugModelRotationAxis = serializedObject.FindProperty("DebugModelRotationAxis");
             setPositions = serializedObject.FindProperty("SetPositions");
             setScale = serializedObject.FindProperty("SetModelScale");
+            scaleSpeed = serializedObject.FindProperty("scalingSpeed");
             setEditorPose = serializedObject.FindProperty("SetEditorPose");
             globalFingerRotationOffset = serializedObject.FindProperty("GlobalFingerRotationOffset");
             wristRotationOffset = serializedObject.FindProperty("WristRotationOffset");
@@ -153,6 +155,11 @@ namespace Leap.Unity.HandsModule
             setPositions.boolValue = GUILayout.Toggle(setPositions.boolValue, new GUIContent("Match Joint Positions With Tracking Data", "Does this binding require the positional leap data to be applied to the 3D model?"), editorSkin.toggle);
 
             setScale.boolValue = GUILayout.Toggle(setScale.boolValue, new GUIContent("Scale Model to Tracking Data", "Should the hand binder adjust the models scale?"), editorSkin.toggle);
+
+            if(setScale.boolValue)
+            {
+                EditorGUILayout.PropertyField(scaleSpeed, editorSkin);
+            }
 
             EditorGUILayout.Space();
             GUILayout.Label(dividerLine);
