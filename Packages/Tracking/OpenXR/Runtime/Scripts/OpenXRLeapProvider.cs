@@ -5,6 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.XR.Management;
+using UnityEngine.XR.OpenXR;
 using Bone = Leap.Bone;
 using Hand = Leap.Hand;
 
@@ -47,6 +49,20 @@ namespace Ultraleap.Tracking.OpenXR
             {
                 _mainCamera = value;
             }
+        }
+
+        public override bool CanProvideData { get { return CheckOpenXRAvailable(); } }
+
+        private bool CheckOpenXRAvailable()
+        {
+            if (XRGeneralSettings.Instance.Manager.activeLoader.name == "Open XR Loader" &&
+                OpenXRSettings.Instance.GetFeature<HandTrackingFeature>() != null &&
+                OpenXRSettings.Instance.GetFeature<HandTrackingFeature>().SupportsHandTracking)
+            {
+                return true;
+            }
+
+            return false;
         }
 
         private void Update()

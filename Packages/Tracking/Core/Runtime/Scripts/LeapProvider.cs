@@ -53,6 +53,11 @@ namespace Leap.Unity
         /// </summary>
         public abstract Frame CurrentFixedFrame { get; }
 
+        /// <summary>
+        /// Can be used to provide information as to whether the tracking data source is valid
+        /// </summary>
+        public virtual bool CanProvideData { get { return true; } }
+
         protected void DispatchUpdateFrameEvent(Frame frame)
         {
             if (OnUpdateFrame != null)

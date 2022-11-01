@@ -10,8 +10,6 @@ using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.XR.Management;
-using UnityEngine.XR.OpenXR;
-using Ultraleap.Tracking.OpenXR;
 
 namespace Leap.Unity
 {
@@ -22,8 +20,8 @@ namespace Leap.Unity
     /// </summary>
     public class XRLeapProviderManager : PostProcessProvider
     {
-        [SerializeField] private OpenXRLeapProvider openXRLeapProvider;
-        [SerializeField] private LeapXRServiceProvider leapXRServiceProvider;
+        [SerializeField] private LeapProvider openXRLeapProvider;
+        [SerializeField] private LeapProvider leapXRServiceProvider;
 
         /// <summary>
         /// An event that is fired when a LeapProvider is chosen
@@ -52,22 +50,26 @@ namespace Leap.Unity
         {
             while (XRGeneralSettings.Instance == null) yield return new WaitForEndOfFrame();
 
-            if (XRGeneralSettings.Instance.Manager.activeLoader.name == "Open XR Loader" &&
-                OpenXRSettings.Instance.GetFeature<HandTrackingFeature>() != null &&
-                OpenXRSettings.Instance.GetFeature<HandTrackingFeature>().enabled &&
-                !forceLeapService)
+            if (!forceLeapService && openXRLeapProvider != null && openXRLeapProvider.CanProvideData)
             {
                 Debug.Log("Using OpenXR for Hand Tracking");
                 _leapProvider = openXRLeapProvider;
-                Destroy(leapXRServiceProvider.gameObject);
+
+                if (leapXRServiceProvider != null)
+                {
+                    Destroy(leapXRServiceProvider.gameObject);
+                }
             }
             else
             {
                 Debug.Log("Using LeapService for Hand Tracking");
                 _leapProvider = leapXRServiceProvider;
-                Destroy(openXRLeapProvider.gameObject);
-            }
 
+                if (openXRLeapProvider != null)
+                {
+                    Destroy(openXRLeapProvider.gameObject);
+                }
+            }
 
             inputLeapProvider = LeapProvider;
             OnProviderSet?.Invoke(inputLeapProvider);
