@@ -249,6 +249,17 @@ namespace Leap.Unity.Preview.Locomotion
         /// </summary>
         private void DetectPinchingHand()
         {
+            Chirality chirality;
+            Vector3 position;
+            if (GetClosestHand(out chirality, out position))
+            {
+                if(chirality != _pinchDetector.chirality)
+                {
+                    _pinchDetector.chirality = chirality;
+                    _wasPinched = false;
+                }
+            }
+
             if (_wasPinched && _pinchDetector.IsPinching)
             {
                 return;
@@ -259,23 +270,16 @@ namespace Leap.Unity.Preview.Locomotion
                 return;
             }
 
-            Chirality chirality;
-            Vector3 position;
-            if (GetClosestHand(out chirality, out position))
+            _wasPinched = _pinchDetector.IsPinching;
+
+            if (!_wasPinched)
             {
-                _pinchDetector.chirality = chirality;
+                return;
+            }
 
-                _wasPinched = _pinchDetector.IsPinching;
-
-                if (!_wasPinched)
-                {
-                    return;
-                }
-
-                if (ValidateDistanceBetweenGem(position))
-                {
-                    PinchJewel(chirality);
-                }
+            if (ValidateDistanceBetweenGem(position))
+            {
+                PinchJewel(chirality);
             }
         }
 
@@ -500,7 +504,6 @@ namespace Leap.Unity.Preview.Locomotion
                 PlaySound(_showClip);
             }
         }
-
 
         protected virtual void UpdateGemVisual()
         {
