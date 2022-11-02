@@ -486,7 +486,6 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 return;
             }
 #endif
-
             _hasReset = false;
 
             ResetPhysicsHand(false);
@@ -548,6 +547,8 @@ namespace Leap.Unity.Interaction.PhysicsHands
             }
         }
 
+        #region External Factors Functions
+
         /// <summary>
         /// Used to make sure that the hand is not going to make contact with any object within the scene. Adjusting extraRadius will inflate the joints. This prevents hands from attacking objects when they swap back to contacting.
         /// </summary>
@@ -591,7 +592,6 @@ namespace Leap.Unity.Interaction.PhysicsHands
                     return true;
                 }
             }
-
             return false;
         }
 
@@ -608,7 +608,6 @@ namespace Leap.Unity.Interaction.PhysicsHands
                     return true;
                 }
             }
-
             return false;
         }
 
@@ -645,7 +644,6 @@ namespace Leap.Unity.Interaction.PhysicsHands
                     return true;
                 }
             }
-
             return false;
         }
 
@@ -713,5 +711,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 }
             }
         }
+
+        #endregion
     }
 }

@@ -59,8 +59,6 @@ namespace Leap.Unity.Interaction.PhysicsHands
         public Pose previousPose;
         public Pose previousPalmPose;
 
-        private Vector3 _maxVelocityLerped = Vector3.zero;
-
         private Vector3 _newPosition;
         private Quaternion _newRotation;
 
@@ -230,13 +228,13 @@ namespace Leap.Unity.Interaction.PhysicsHands
         public void ReleaseObject()
         {
             GraspState = State.Idle;
-            if (Manager.HelperMovesObjects)
+            if (Manager.HelperMovesObjects && !Ignored)
             {
                 // Only ever unset the rigidbody values here otherwise outside logic will get confused
                 _rigid.isKinematic = _oldKinematic;
                 _rigid.useGravity = _oldGravity;
             }
-            if (Manager.EnhanceThrowing)
+            if (Manager.EnhanceThrowing && !Ignored)
             {
                 ThrowingOnRelease();
             }
@@ -268,11 +266,11 @@ namespace Leap.Unity.Interaction.PhysicsHands
                     if (_graspingHands.Count > 0)
                     {
                         UpdateHandPositions();
-                        if (Manager.HelperMovesObjects)
+                        if (Manager.HelperMovesObjects && !Ignored)
                         {
                             MoveObject();
                         }
-                        if (Manager.EnhanceThrowing)
+                        if (Manager.EnhanceThrowing && !Ignored)
                         {
                             ThrowingOnHold();
                         }
@@ -346,7 +344,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                     }
                     if (c == 2)
                     {
-                        if (Manager.HelperMovesObjects && _graspingHands.Count == 0)
+                        if (Manager.HelperMovesObjects && !Ignored && _graspingHands.Count == 0)
                         {
                             // Store the original rigidbody variables
                             _oldKinematic = _rigid.isKinematic;
@@ -791,7 +789,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 }
                 // We only want to apply the forces if we actually want to cause movement to the object
                 // We're still disabling collisions though to allow for the physics system to fully control if necessary
-                if (Manager.HelperMovesObjects)
+                if (Manager.HelperMovesObjects && !Ignored)
                 {
                     _rigid.velocity = interpolatedVelocity;
                     _rigid.angularVelocity = PhysicsUtility.ToAngularVelocity(start.rotation,
