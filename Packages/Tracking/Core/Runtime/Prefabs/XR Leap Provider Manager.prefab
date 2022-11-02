@@ -10,8 +10,9 @@ GameObject:
   m_Component:
   - component: {fileID: 5270838610523157748}
   - component: {fileID: 5270838610523157747}
+  - component: {fileID: 2683451079520186211}
   m_Layer: 0
-  m_Name: Leap XR Provider Manager
+  m_Name: XR Leap Provider Manager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -46,12 +47,34 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   editTimePose: 1
-  _inputLeapProvider: {fileID: 1276715513614782159}
-  dataUpdateMode: 0
-  passthroughOnly: 1
   openXRLeapProvider: {fileID: 1276715513614782159}
   leapXRServiceProvider: {fileID: 8681616449881122529}
   forceLeapService: 0
+--- !u!114 &2683451079520186211
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5270838610523157746}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e933f13d48c681d48b14750922ac906d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _comment: 'The XR Leap Provider Manager provides a single access point to the best
+    possible source of tracking.
+
+
+    This means you can distribute built applications
+    for users that may be using either OpenXR or LeapC directly and the XR Leap Provider
+    Manager will select the most suitable source.
+
+
+    Please ensure the Service
+    Providers that are child objects to this are set up correctly to allow for both
+    to be suitable options.'
+  _isEditing: 0
 --- !u!1001 &5270838609458788501
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -113,7 +136,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3557434566810426996, guid: 15d3b5cf5cea75344a4482323bc124a8, type: 3}
       propertyPath: _multipleDeviceMode
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3557434566810426996, guid: 15d3b5cf5cea75344a4482323bc124a8, type: 3}
       propertyPath: _specificSerialNumber
@@ -122,6 +145,10 @@ PrefabInstance:
     - target: {fileID: 3557434566810426996, guid: 15d3b5cf5cea75344a4482323bc124a8, type: 3}
       propertyPath: _trackingOptimization
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3557434566810426996, guid: 15d3b5cf5cea75344a4482323bc124a8, type: 3}
+      propertyPath: _interactionVolumeVisualization
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3557434566810426997, guid: 15d3b5cf5cea75344a4482323bc124a8, type: 3}
       propertyPath: m_Name
