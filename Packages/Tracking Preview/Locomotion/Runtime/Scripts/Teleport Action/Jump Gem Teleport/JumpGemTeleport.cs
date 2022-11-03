@@ -26,7 +26,7 @@ namespace Leap.Unity.Preview.Locomotion
         private void Awake()
         {
             _head = Camera.main.transform;
-            _jumpGems = FindObjectsOfType<JumpGem>().ToList();
+            _jumpGems = FindObjectsOfType<JumpGem>(true).ToList();
             for (int i = 0; i < _jumpGems.Count; i++)
             {
                 int j = i;
