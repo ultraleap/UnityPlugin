@@ -53,13 +53,13 @@ namespace Ultraleap.Tracking.OpenXR
         {
             PopulateLeapFrame(ref _updateFrame);
 
-            Pose trackerTransform = new Pose(Vector3.zero, Quaternion.identity);
+            LeapTransform trackerTransform = new LeapTransform(Vector3.zero, Quaternion.identity, Vector3.one);
 
             // Adjust for relative transform if it's in use.
             var trackedPoseDriver = mainCamera.GetComponent<UnityEngine.SpatialTracking.TrackedPoseDriver>();
             if (trackedPoseDriver != null && trackedPoseDriver.UseRelativeTransform)
             {
-                trackerTransform.position += trackedPoseDriver.originPose.position;
+                trackerTransform.translation += trackedPoseDriver.originPose.position;
                 trackerTransform.rotation *= trackedPoseDriver.originPose.rotation;
             }
 
@@ -67,13 +67,16 @@ namespace Ultraleap.Tracking.OpenXR
             var parentTransform = mainCamera.transform.parent;
             if (parentTransform != null)
             {
-                trackerTransform.position += parentTransform.position;
+                trackerTransform.translation += parentTransform.position;
                 trackerTransform.rotation *= parentTransform.rotation;
+                trackerTransform.scale = parentTransform.lossyScale;
+            }
+            else
+            {
+                trackerTransform.scale = transform.lossyScale;
             }
 
-            _currentFrame = _updateFrame.TransformedCopy(new LeapTransform(
-                trackerTransform.position,
-                trackerTransform.rotation));
+            _currentFrame = _updateFrame.TransformedCopy(trackerTransform);
 
             DispatchUpdateFrameEvent(_currentFrame);
         }
