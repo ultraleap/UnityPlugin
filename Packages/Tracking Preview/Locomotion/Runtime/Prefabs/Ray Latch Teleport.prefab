@@ -228,7 +228,7 @@ MonoBehaviour:
   leapProvider: {fileID: 0}
   chirality: 0
   wristShoulderBlendAmount: 0.532
-  inferredBodyPositions: {fileID: 0}
+  inferredBodyPositions: {fileID: 7090704560414030351}
   drawDebugGizmos: 0
   drawRay: 1
   rayColor: {r: 0, g: 1, b: 0, a: 1}
