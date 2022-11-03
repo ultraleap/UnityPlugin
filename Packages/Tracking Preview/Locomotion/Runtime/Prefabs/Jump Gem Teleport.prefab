@@ -49,6 +49,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   handRayInteractor: {fileID: 1135228147649426941}
   lineRenderer: {fileID: 1135228147649426936}
+  hideRayOnNoPoints: 0
   validColorGradient:
     serializedVersion: 2
     key0: {r: 0.8726415, g: 1, b: 0.8877089, a: 1}
@@ -141,7 +142,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   leapProvider: {fileID: 0}
   chirality: 0
-  wristShoulderBlendAmount: 0.532
+  wristShoulderBlendAmount: 0.8
   inferredBodyPositions: {fileID: 0}
   drawDebugGizmos: 0
   drawRay: 1
@@ -331,6 +332,7 @@ MonoBehaviour:
     layerIndex: 0
   _teleportFloorLayer:
     layerIndex: 0
+  findTeleportAnchorsOnStart: 1
   Head: {fileID: 0}
   Player: {fileID: 0}
   _minimumDistanceToActivate: 0.1

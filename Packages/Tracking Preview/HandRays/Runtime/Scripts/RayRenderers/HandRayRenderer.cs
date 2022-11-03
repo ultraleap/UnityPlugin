@@ -12,6 +12,8 @@ namespace Leap.Unity.Preview.HandRays
         private bool _isActive = true;
         private bool _isValid = true;
 
+        public bool overrideRayInteractor = false;
+
         [SerializeField]
         public Gradient validColorGradient = new Gradient
         {
@@ -29,13 +31,29 @@ namespace Leap.Unity.Preview.HandRays
         public virtual void SetActive(bool isActive = true)
         {
             _isActive = isActive;
-            lineRenderer.enabled = _isActive && _isRayEnabled;
+
+            if (overrideRayInteractor)
+            {
+                lineRenderer.enabled = _isActive;
+            }
+            else
+            {
+                lineRenderer.enabled = _isActive && _isRayEnabled;
+            }
         }
 
         private void OnRaycastStateChange(HandRayDirection direction, bool enabled)
         {
             _isRayEnabled = enabled;
-            lineRenderer.enabled = _isActive && _isRayEnabled;
+
+            if (overrideRayInteractor)
+            {
+                lineRenderer.enabled = _isActive;
+            }
+            else
+            {
+                lineRenderer.enabled = _isActive && _isRayEnabled;
+            }
         }
 
         public virtual void SetValid(bool isValid = true)
@@ -58,6 +76,11 @@ namespace Leap.Unity.Preview.HandRays
 
         protected virtual void OnRaycastUpdate(RaycastHit[] results)
         {
+            if (overrideRayInteractor)
+            {
+                return;
+            }
+
             if (!_isActive || !_isRayEnabled)
             {
                 return;

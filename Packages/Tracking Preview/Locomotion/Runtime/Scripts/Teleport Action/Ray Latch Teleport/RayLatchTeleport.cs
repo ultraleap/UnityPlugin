@@ -7,7 +7,6 @@ namespace Leap.Unity.Preview.Locomotion
         private PullUI _pullUI = null;
         private TeleportAnchor _latchedAnchor = null;
 
-        private bool _latched = false;
         private Transform _transformWhenActivated;
         [SerializeField, Range(0.01f, 0.5f)] private float _distToGrabAndPull = 0.1f;
 
@@ -69,10 +68,10 @@ namespace Leap.Unity.Preview.Locomotion
                 return;
             }
 
-            UpdateTeleportSelection(activeHand);
 
-            if (!_latched)
+            if (!_currentTeleportAnchorLocked)
             {
+                UpdateTeleportSelection(activeHand);
                 if (IsValid)
                 {
                     if (_currentPoint != _latchedAnchor)
@@ -86,7 +85,7 @@ namespace Leap.Unity.Preview.Locomotion
                 }
             }
 
-            if (_latchedAnchor != null && activeHand != null)
+            if (_currentTeleportAnchorLocked && activeHand != null)
             {
                 handRayRenderer.lineRenderer.positionCount = 2;
                 handRayRenderer.lineRenderer.SetPosition(0, activeHand.PalmPosition);
@@ -107,7 +106,9 @@ namespace Leap.Unity.Preview.Locomotion
         {
             if (_latchedAnchor != null && !_grabbingLastFrame)
             {
-                _latched = true;
+                _currentTeleportAnchorLocked = true;
+
+                handRayRenderer.overrideRayInteractor = true;
 
                 _pullUI.gameObject.SetActive(true);
                 _pullUI.transform.position = hand.PalmPosition;
@@ -118,7 +119,7 @@ namespace Leap.Unity.Preview.Locomotion
 
         void OnGrabbing(Hand hand)
         {
-            if (!_latched)
+            if (!_currentTeleportAnchorLocked)
             {
                 return;
             }
@@ -133,10 +134,9 @@ namespace Leap.Unity.Preview.Locomotion
         void OnUngrab(Hand hand)
         {
             _pullUI.gameObject.SetActive(false);
-            _latched = false;
+            _currentTeleportAnchorLocked = false;
+            handRayRenderer.overrideRayInteractor = false;
         }
-
-        
 
         private void UpdatePullUI(Hand hand, out bool hasPulled) 
         {
@@ -168,25 +168,26 @@ namespace Leap.Unity.Preview.Locomotion
             bool isFacingObjectValue = _isFacingObject.ValueThisFrame;
             if (!IsSelected)
             {
-                if (!isFacingObjectValue && handRayInteractor.handRay.HandRayEnabled )
+                if (!isFacingObjectValue && handRayInteractor.handRay.HandRayEnabled)
                 {
                     SelectTeleport(true);
                 }
             }
             else
             {
-                if (isFacingObjectValue || !handRayInteractor.handRay.HandRayEnabled)
+                if (!_currentTeleportAnchorLocked && (isFacingObjectValue || !handRayInteractor.handRay.HandRayEnabled))
                 {
                     SelectTeleport(false);
                 }
             }
         }
 
-
         /* When teleporter is used, unlatch from it and remember it */
         private void OnTeleportActivated(TeleportAnchor anchor, Vector3 position, Quaternion rotation)
         {
-            _latched = false;
+            _currentTeleportAnchorLocked = false;
+            handRayRenderer.overrideRayInteractor = false;
+
             _pullUI.gameObject.SetActive(false);
             _pullUI.SetLength(0.0f, 1.0f, Vector3.up);
             _latchedAnchor = null;

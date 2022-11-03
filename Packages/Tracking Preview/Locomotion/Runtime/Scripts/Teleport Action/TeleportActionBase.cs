@@ -11,7 +11,7 @@ namespace Leap.Unity.Preview.Locomotion
 
         [Header("Teleport Action Setup")]
         [SerializeField] private TeleportAnchor freeTeleportAnchor;
-        public Leap.Unity.Preview.HandRays.HandRayRenderer handRayRenderer = null;
+        public HandRayRenderer handRayRenderer = null;
         public HandRayInteractor handRayInteractor = null;
         public TeleportActionMovementType movementType = TeleportActionMovementType.FIXED;
 

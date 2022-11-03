@@ -131,6 +131,7 @@ MonoBehaviour:
   handRayInteractor: {fileID: 7090704560414030349}
   lineRenderer: {fileID: 7090704560414030350}
   hideRayOnNoPoints: 1
+  overrideRayInteractor: 0
   validColorGradient:
     serializedVersion: 2
     key0: {r: 1, g: 1, b: 1, a: 1}
@@ -204,7 +205,7 @@ MonoBehaviour:
   _handRay: {fileID: 2816721751959635280}
   layerMask:
     serializedVersion: 2
-    m_Bits: 72
+    m_Bits: 8
   linePoints: []
   numPoints: 0
   maxRayDistance: 50
@@ -632,7 +633,7 @@ MonoBehaviour:
   Head: {fileID: 0}
   Player: {fileID: 0}
   _distToGrabAndPull: 0.1
-  rayLatchDirection: 0
+  rayLatchDirection: 1
   leapProvider: {fileID: 0}
   grabDetector: {fileID: 6649805490014903038}
   chirality: 1
