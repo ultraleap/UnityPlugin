@@ -46,7 +46,7 @@ namespace Leap.Unity.Preview.Locomotion
                 return;
             }
 
-            if (hand.GrabStrength < activateStrength)
+            if (hand.GrabStrength >= activateStrength)
             {
                 if (!IsGrabbing)
                 {
@@ -59,7 +59,7 @@ namespace Leap.Unity.Preview.Locomotion
 
                 IsGrabbing = true;
             }
-            else if (hand.GrabStrength > deactivateStrength)
+            else if (hand.GrabStrength <= deactivateStrength)
             {
                 if (IsGrabbing)
                 {

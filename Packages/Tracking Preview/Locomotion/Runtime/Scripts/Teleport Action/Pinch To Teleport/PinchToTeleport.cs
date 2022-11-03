@@ -22,7 +22,6 @@ namespace Leap.Unity.Preview.Locomotion
         [Tooltip("The distance your hand needs to move to rotate the teleport anchor 180 degrees")]
         public float maxRotationMovementDistance = 0.2f;
 
-        private Transform _palmForwardTransformHelper;
         private Transform _pinchTransformHelper;
         private Vector3 _rotationOnPinch = Vector3.zero;
         private bool _validOnPinch = false;
@@ -38,8 +37,7 @@ namespace Leap.Unity.Preview.Locomotion
 
             _pinchTransformHelper = new GameObject("PinchToTeleport_PinchTransformHelper").transform;
             _pinchTransformHelper.SetParent(transform);
-            _palmForwardTransformHelper = new GameObject("PinchToTeleport_PalmForwardTransformHelper").transform;
-            _palmForwardTransformHelper.SetParent(transform);
+            _chiralityLastFrame = chirality;
         }
 
         private void OnEnable()
@@ -74,7 +72,7 @@ namespace Leap.Unity.Preview.Locomotion
             }
             _chiralityLastFrame = chirality;
 
-            Hand activeHand = leapProvider.CurrentFrame.GetHand(_pinchDetector.chirality);
+            Hand activeHand = leapProvider.CurrentFrame.GetHand(chirality);
             if (activeHand == null)
             {
                 return;
@@ -85,11 +83,6 @@ namespace Leap.Unity.Preview.Locomotion
 
         private void UpdateTeleportSelection(Hand activeHand)
         {
-            handRayInteractor.handRay.chirality = _pinchDetector.chirality;
-            _palmForwardTransformHelper.position = activeHand.PalmPosition;
-            Quaternion palmForwardRotation = activeHand.Rotation * Quaternion.Euler(90, 0, 0);
-            _palmForwardTransformHelper.rotation = palmForwardRotation;
-
             bool isFacingObjectValue = _isFacingObject.ValueThisFrame;
             if (!IsSelected)
             {

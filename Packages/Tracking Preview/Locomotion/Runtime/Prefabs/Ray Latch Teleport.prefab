@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 7090704560042220624}
   - component: {fileID: 7090704560042220655}
   - component: {fileID: 7090704560042220654}
-  - component: {fileID: 7090704560042220625}
   m_Layer: 0
   m_Name: Sphere
   m_TagString: Untagged
@@ -60,7 +59,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 154b4cbee7a5efe4baac9419129d5885, type: 2}
+  - {fileID: 2100000, guid: 5220067c88ca0cd4ea1e633214468f9d, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -82,19 +81,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!135 &7090704560042220625
-SphereCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7090704560042220627}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.5
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &7090704560414030448
 GameObject:
   m_ObjectHideFlags: 0
@@ -106,7 +92,7 @@ GameObject:
   - component: {fileID: 7090704560414030449}
   - component: {fileID: 7090704560414030346}
   - component: {fileID: 7090704560414030349}
-  - component: {fileID: 7090704560414030348}
+  - component: {fileID: 2816721751959635280}
   - component: {fileID: 7090704560414030351}
   - component: {fileID: 7090704560414030350}
   m_Layer: 0
@@ -144,6 +130,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   handRayInteractor: {fileID: 7090704560414030349}
   lineRenderer: {fileID: 7090704560414030350}
+  hideRayOnNoPoints: 1
   validColorGradient:
     serializedVersion: 2
     key0: {r: 1, g: 1, b: 1, a: 1}
@@ -214,7 +201,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4435fe4cd4dae6c4cae22e39096212bf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _handRay: {fileID: 7090704560414030348}
+  _handRay: {fileID: 2816721751959635280}
   layerMask:
     serializedVersion: 2
     m_Bits: 72
@@ -225,7 +212,7 @@ MonoBehaviour:
   conecastAngle: 30
   floorLayer:
     layerIndex: 0
---- !u!114 &7090704560414030348
+--- !u!114 &2816721751959635280
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -234,13 +221,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 7090704560414030448}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f9ef11cfcec89994c9ecbea1b9edf774, type: 3}
+  m_Script: {fileID: 11500000, guid: e003f0e6d42601442b93050d950bbf16, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   leapProvider: {fileID: 0}
-  chirality: 1
+  chirality: 0
   wristShoulderBlendAmount: 0.532
-  inferredBodyPositions: {fileID: 7090704560414030351}
+  inferredBodyPositions: {fileID: 0}
   drawDebugGizmos: 0
   drawRay: 1
   rayColor: {r: 0, g: 1, b: 0, a: 1}
@@ -386,7 +373,7 @@ GameObject:
   - component: {fileID: 7090704560993488598}
   - component: {fileID: 7090704560993488599}
   m_Layer: 0
-  m_Name: Pull Up Line Target
+  m_Name: Pull UI Line Target
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -515,7 +502,6 @@ GameObject:
   - component: {fileID: 7090704561112065386}
   - component: {fileID: 7090704561112065385}
   - component: {fileID: 7090704561112065384}
-  - component: {fileID: 7090704561112065387}
   m_Layer: 0
   m_Name: Sphere Target
   m_TagString: Untagged
@@ -564,7 +550,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: f8aaa7719f0f59247b51789350583dc9, type: 2}
+  - {fileID: 2100000, guid: 09d4ee2e7c35e684ca3d979f826155ba, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -586,19 +572,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!135 &7090704561112065387
-SphereCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7090704561112065389}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.5
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &7090704561337631632
 GameObject:
   m_ObjectHideFlags: 0
@@ -609,6 +582,8 @@ GameObject:
   m_Component:
   - component: {fileID: 7090704561337631662}
   - component: {fileID: 7090704561337631633}
+  - component: {fileID: 6649805490014903038}
+  - component: {fileID: 6162318093243395883}
   m_Layer: 0
   m_Name: Ray Latch Teleport
   m_TagString: Untagged
@@ -653,11 +628,48 @@ MonoBehaviour:
     layerIndex: 3
   _teleportFloorLayer:
     layerIndex: 6
+  findTeleportAnchorsOnStart: 1
   Head: {fileID: 0}
   Player: {fileID: 0}
   _distToGrabAndPull: 0.1
   rayLatchDirection: 0
   leapProvider: {fileID: 0}
+  grabDetector: {fileID: 6649805490014903038}
+  chirality: 1
+  _isFacingObject: {fileID: 6162318093243395883}
+--- !u!114 &6649805490014903038
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7090704561337631632}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f2489f6e8410e8749bfde5e04b820ca1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  leapProvider: {fileID: 0}
+  chirality: 0
+  activateStrength: 1
+  deactivateStrength: 0.65
+--- !u!114 &6162318093243395883
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7090704561337631632}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b04ce9da9d411ac488391fbb6e8a4352, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _layersToIgnore: []
+  _sphereCastRadius: 0.3
+  _sphereCastMaxLength: 0.5
+  _teleportAnchorTag: LEAP_TELEPORTER
+  _teleportFloorTag: LEAP_FLOOR
 --- !u!1 &7090704561384797356
 GameObject:
   m_ObjectHideFlags: 0
@@ -669,7 +681,7 @@ GameObject:
   - component: {fileID: 7090704561384797357}
   - component: {fileID: 7090704561384797354}
   m_Layer: 0
-  m_Name: Pull Up UI
+  m_Name: Pull UI
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -721,7 +733,7 @@ GameObject:
   - component: {fileID: 7090704561440259812}
   - component: {fileID: 7090704561440259813}
   m_Layer: 0
-  m_Name: Pull Up Line
+  m_Name: Pull UI Line
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -780,7 +792,7 @@ LineRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 1
   m_Positions:
   - {x: 0, y: 0, z: 0}
   - {x: 0, y: 0, z: 1}
