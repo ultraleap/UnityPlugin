@@ -14,12 +14,12 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
         public enum State
         {
-            Idle,
+            Hover,
             Contact,
             Grasp
         }
 
-        public State GraspState { get; private set; } = State.Idle;
+        public State GraspState { get; private set; } = State.Hover;
 
         public HashSet<PhysicsBone> BoneHash => _boneHash;
         private HashSet<PhysicsBone> _boneHash = new HashSet<PhysicsBone>();
@@ -128,7 +128,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             {
                 SetBoneGrasping(item, false);
             }
-            GraspState = State.Idle;
+            GraspState = State.Hover;
             _valuesD.Clear();
             _graspingValues.Clear();
             _graspingCandidates.Clear();
@@ -227,7 +227,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
         public void ReleaseObject()
         {
-            GraspState = State.Idle;
+            GraspState = State.Hover;
             if (Manager.HelperMovesObjects && !Ignored)
             {
                 // Only ever unset the rigidbody values here otherwise outside logic will get confused
@@ -248,14 +248,14 @@ namespace Leap.Unity.Interaction.PhysicsHands
             if (_boneHash.Count == 0 && GraspState != State.Grasp)
             {
                 // If we don't then and we're not grasping then just return
-                return GraspState = State.Idle;
+                return GraspState = State.Hover;
             }
 
             GraspingContactCheck();
 
             switch (GraspState)
             {
-                case State.Idle:
+                case State.Hover:
                     if (_boneHash.Count > 0)
                     {
                         GraspState = State.Contact;

@@ -631,7 +631,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
         /// </summary>
         public bool GetObjectState(Rigidbody rigid, out PhysicsGraspHelper.State state)
         {
-            state = PhysicsGraspHelper.State.Idle;
+            state = PhysicsGraspHelper.State.Hover;
             if (_graspHelpers.TryGetValue(rigid, out PhysicsGraspHelper helper))
             {
                 state = helper.GraspState;
@@ -646,13 +646,13 @@ namespace Leap.Unity.Interaction.PhysicsHands
         public bool GetObjectState(Rigidbody rigid, out PhysicsGraspHelper.State state, out List<PhysicsHand> hands)
         {
             hands = null;
-            state = PhysicsGraspHelper.State.Idle;
+            state = PhysicsGraspHelper.State.Hover;
             if (_graspHelpers.TryGetValue(rigid, out PhysicsGraspHelper helper))
             {
                 state = helper.GraspState;
                 switch (state)
                 {
-                    case PhysicsGraspHelper.State.Idle:
+                    case PhysicsGraspHelper.State.Hover:
                     case PhysicsGraspHelper.State.Contact:
                         hands = helper.GraspingCandidates.ToList();
                         break;
