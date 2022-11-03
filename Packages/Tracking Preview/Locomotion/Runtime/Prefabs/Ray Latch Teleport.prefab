@@ -227,7 +227,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   leapProvider: {fileID: 0}
   chirality: 0
-  wristShoulderBlendAmount: 0.532
+  wristShoulderBlendAmount: 0
   inferredBodyPositions: {fileID: 7090704560414030351}
   drawDebugGizmos: 0
   drawRay: 1
@@ -666,7 +666,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b04ce9da9d411ac488391fbb6e8a4352, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _layersToIgnore: []
+  _layersToIgnore:
+  - layerIndex: 3
+  - layerIndex: 6
   _sphereCastRadius: 0.3
   _sphereCastMaxLength: 0.5
   _teleportAnchorTag: LEAP_TELEPORTER
