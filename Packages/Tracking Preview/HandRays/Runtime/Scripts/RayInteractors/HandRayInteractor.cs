@@ -1,8 +1,4 @@
-using Leap.Unity.Interaction;
-using Leap.Unity.Interaction.PhysicsHands;
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace Leap.Unity.Preview.HandRays
@@ -15,13 +11,12 @@ namespace Leap.Unity.Preview.HandRays
         [Tooltip("Note that the Interaction Engine and Physics Hands layers will be ignored automatically.")]
         [Header("Layer Logic")]
         public LayerMask layerMask;
-        private bool _rayFrozen = false;
 
         [Header("Events")]
         public Action<RaycastHit[]> OnRaycastUpdate;
 
-        public Vector3[] linePoints;
-        public int numPoints;
+        [HideInInspector] public Vector3[] linePoints;
+        [HideInInspector] public int numPoints;
 
         private void OnEnable()
         {
@@ -49,25 +44,10 @@ namespace Leap.Unity.Preview.HandRays
 
         private void UpdateRayInteractor(HandRayDirection handRayDirection)
         {
-            if (_rayFrozen)
-            {
-                return;
-            }
-
             UpdateRayInteractorLogic(handRayDirection, out RaycastHit[] result);
             OnRaycastUpdate?.Invoke(result);
         }
 
         protected abstract int UpdateRayInteractorLogic(HandRayDirection handRayDirection, out RaycastHit[] results);
-
-        public void FreezeRay()
-        {
-            _rayFrozen = true;
-        }
-
-        public void UnfreezeRay()
-        {
-            _rayFrozen = false;
-        }
     }
 }

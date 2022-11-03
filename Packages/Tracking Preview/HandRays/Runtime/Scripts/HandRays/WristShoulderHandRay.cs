@@ -55,8 +55,8 @@ namespace Leap.Unity.Preview.HandRays
         /// <summary>
         /// This local-space offset from the wrist is used to better align the ray to the pinch position
         /// </summary>
-        private Vector3 wristOffset = new Vector3(0.0425f, 0.0652f, 0.0f);
-        private Transform transformHelper;
+        private Vector3 pinchWristOffset = new Vector3(0.0425f, 0.0652f, 0.0f);
+        protected Transform transformHelper;
 
         protected OneEuroFilter<Vector3> aimPositionFilter;
         protected OneEuroFilter<Vector3> rayOriginFilter;
@@ -112,22 +112,62 @@ namespace Leap.Unity.Preview.HandRays
             return debug;
         }
 
-        private Vector3 GetWristOffsetPosition(Hand hand)
+        protected virtual Vector3 GetWristOffsetPosition(Hand hand)
         {
-            Vector3 worldWristPosition = wristOffset;
+            Vector3 localWristPosition = pinchWristOffset;
             if (hand.IsRight)
             {
-                worldWristPosition.x = -worldWristPosition.x;
+                localWristPosition.x = -localWristPosition.x;
             }
 
             transformHelper.transform.position = hand.WristPosition;
             transformHelper.transform.rotation = hand.Rotation;
-            return transformHelper.TransformPoint(worldWristPosition);
+            return transformHelper.TransformPoint(localWristPosition);
         }
 
         private bool IsFacingTransform(Transform facingTransform, Transform transformToCheck, float minAllowedDotProduct = 0.8F)
         {
             return Vector3.Dot((transformToCheck.transform.position - facingTransform.position).normalized, facingTransform.forward) > minAllowedDotProduct;
+        }
+
+        protected override Vector3 CalculateVisualAimPosition()
+        {
+            return handRayDirection.Hand.GetPredictedPinchPosition();
+        }
+
+        protected override Vector3 CalculateAimPosition()
+        {
+            return aimPositionFilter.Filter(handRayDirection.Hand.GetStablePinchPosition(), Time.time);
+        }
+
+        protected override Vector3 CalculateRayOrigin()
+        {
+            int index = handRayDirection.Hand.IsLeft ? 0 : 1;
+
+            return rayOriginFilter.Filter(
+                GetRayOrigin(handRayDirection.Hand, inferredBodyPositions.ShoulderPositions[index]),
+                Time.time);
+        }
+
+        protected virtual Vector3 GetRayOrigin(Hand hand, Vector3 shoulderPosition)
+        {
+            return Vector3.Lerp(GetWristOffsetPosition(hand), shoulderPosition, wristShoulderBlendAmount);
+        }
+
+        protected override Vector3 CalculateDirection()
+        {
+            return (handRayDirection.AimPosition - handRayDirection.RayOrigin).normalized;
+        }
+
+        public override void ResetRay()
+        {
+            ResetFilters();
+        }
+
+        protected void ResetFilters()
+        {
+            aimPositionFilter = new OneEuroFilter<Vector3>(oneEurofreq, oneEuroMinCutoff, oneEuroBeta);
+            rayOriginFilter = new OneEuroFilter<Vector3>(oneEurofreq, oneEuroMinCutoff, oneEuroBeta);
         }
 
         private void OnDrawGizmos()
@@ -161,46 +201,6 @@ namespace Leap.Unity.Preview.HandRays
                 Gizmos.DrawCube(handRayDirection.RayOrigin, Vector3.one * gizmoRadius);
                 Gizmos.DrawSphere(handRayDirection.AimPosition, gizmoRadius);
             }
-        }
-
-        protected override Vector3 CalculateVisualAimPosition()
-        {
-            return handRayDirection.Hand.GetPredictedPinchPosition();
-        }
-
-        protected override Vector3 CalculateAimPosition()
-        {
-            return aimPositionFilter.Filter(handRayDirection.Hand.GetStablePinchPosition(), Time.time);
-        }
-
-        protected override Vector3 CalculateRayOrigin()
-        {
-            int index = handRayDirection.Hand.IsLeft ? 0 : 1;
-
-            return rayOriginFilter.Filter(
-                GetRayOrigin(handRayDirection.Hand, inferredBodyPositions.ShoulderPositions[index]),
-                Time.time);
-        }
-
-        private Vector3 GetRayOrigin(Hand hand, Vector3 shoulderPosition)
-        {
-            return Vector3.Lerp(GetWristOffsetPosition(hand), shoulderPosition, wristShoulderBlendAmount);
-        }
-
-        protected override Vector3 CalculateDirection()
-        {
-            return (handRayDirection.AimPosition - handRayDirection.RayOrigin).normalized;
-        }
-
-        public override void ResetRay()
-        {
-            ResetFilters();
-        }
-
-        protected void ResetFilters()
-        {
-            aimPositionFilter = new OneEuroFilter<Vector3>(oneEurofreq, oneEuroMinCutoff, oneEuroBeta);
-            rayOriginFilter = new OneEuroFilter<Vector3>(oneEurofreq, oneEuroMinCutoff, oneEuroBeta);
         }
     }
 }

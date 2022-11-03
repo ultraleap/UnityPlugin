@@ -14,7 +14,6 @@ namespace Leap.Unity.Preview.HandRays
         {
             int hits = ConeCastExtension.ConeCastAll(handRayDirection.RayOrigin, conecastMaxRadius, handRayDirection.Direction, maxRayDistance, conecastAngle, layerMask, out results);
             Vector3 endPos = Vector3.zero;
-            
 
             if(hits > 0)
             {
@@ -25,11 +24,15 @@ namespace Leap.Unity.Preview.HandRays
                     {
                         endPos = results[i].collider.transform.position;
                     }
-
                 }
+                linePoints = new Vector3[] { handRayDirection.VisualAimPosition, endPos };
+            } 
+            else
+            {
+                linePoints = new Vector3[] { handRayDirection.VisualAimPosition, handRayDirection.VisualAimPosition + (handRayDirection.Direction * maxRayDistance) };
             }
-            
-            linePoints = new Vector3[] { handRayDirection.VisualAimPosition, endPos };
+
+            numPoints = linePoints.Length;
             return hits;
         }
     }

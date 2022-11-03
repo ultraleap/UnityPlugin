@@ -6,6 +6,7 @@ namespace Leap.Unity.Preview.HandRays
     {
         public HandRayInteractor handRayInteractor;
         public LineRenderer lineRenderer;
+        public bool hideRayOnNoPoints = false;
 
         private bool _isRayEnabled = true;
         private bool _isActive = true;
@@ -59,6 +60,12 @@ namespace Leap.Unity.Preview.HandRays
         {
             if (!_isActive || !_isRayEnabled)
             {
+                return;
+            }
+
+            if(hideRayOnNoPoints && (results == null || results.Length == 0 && hideRayOnNoPoints))
+            {
+                lineRenderer.positionCount = 0;
                 return;
             }
 
