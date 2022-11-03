@@ -10,7 +10,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
     {
         private const float GRAB_COOLDOWNTIME = 0.025f;
         private const float MINIMUM_STRENGTH = 0.25f, MINIMUM_THUMB_STRENGTH = 0.2f;
-        private const float REQUIRED_ENTRY_STRENGTH = 0.15f, REQUIRED_EXIT_STRENGTH = 0.05f, REQUIRED_THUMB_EXIT_STRENGTH = 0.1f, REQUIRED_PINCH_DISTANCE = 0.018f;
+        private const float REQUIRED_ENTRY_STRENGTH = 0.15f, REQUIRED_EXIT_STRENGTH = 0.05f, REQUIRED_THUMB_EXIT_STRENGTH = 0.1f, REQUIRED_PINCH_DISTANCE = 0.012f;
 
         public enum State
         {
@@ -332,6 +332,9 @@ namespace Leap.Unity.Interaction.PhysicsHands
                             if (hand.GetOriginalLeapHand().PinchDistance / 1000f <= REQUIRED_PINCH_DISTANCE)
                             {
                                 c = 2;
+                                // Make very small pinches more sticky
+                                _graspingValues[hand].fingerStrength[0] *= 0.85f;
+                                _graspingValues[hand].fingerStrength[1] *= 0.85f;
                                 break;
                             }
                         }

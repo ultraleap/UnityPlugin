@@ -521,17 +521,30 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 if (pH.jointBones[i].Joint == 0)
                     continue;
 
+                float radius = pH.jointColliders[i].radius;
+                // Move the thumb closer to the palm
                 if (pH.jointBones[i].Finger == 0)
                 {
                     _tempVector.x = -pH.triggerDistance / 2f;
                     _tempVector.z = pH.triggerDistance / 2f;
+                    radius *= 1.8f;
                 }
                 else
-                {
+                { 
+                    // Inflate the bones slightly
                     _tempVector.x = 0;
                     _tempVector.z = 0;
-                }         
-                _resultCount = PhysExts.OverlapCapsuleNonAllocOffset(pH.jointColliders[i], _tempVector, _resultsCache, _contactMask, radius: pH.jointBones[i].Finger == 0 ? pH.jointColliders[i].radius * 1.8f : -1);
+                    radius *= 1.2f;
+                }
+                // Move the finger tips forward a tad
+                if (pH.jointBones[i].Joint == 2)
+                {
+                    _tempVector.z += pH.triggerDistance;
+                }
+                pH.jointColliders[i].ToWorldSpaceCapsuleOffset(_tempVector, out var point0, out var point1, out var radiusOut);
+                Debug.DrawLine(point0, point1, Color.magenta, Time.fixedDeltaTime);
+
+                _resultCount = PhysExts.OverlapCapsuleNonAllocOffset(pH.jointColliders[i], _tempVector, _resultsCache, _contactMask, radius: radius);
                 for (int j = 0; j < _resultCount; j++)
                 {
                     if (_resultsCache[j].attachedRigidbody != null)
