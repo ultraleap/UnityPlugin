@@ -11,6 +11,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace Leap.Unity.Interaction.PhysicsHands
 {
@@ -541,8 +544,14 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 {
                     _tempVector.z += pH.triggerDistance;
                 }
-                pH.jointColliders[i].ToWorldSpaceCapsuleOffset(_tempVector, out var point0, out var point1, out var radiusOut);
-                Debug.DrawLine(point0, point1, Color.magenta, Time.fixedDeltaTime);
+
+#if UNITY_EDITOR
+                if (Selection.activeGameObject == gameObject)
+                {
+                    pH.jointColliders[i].ToWorldSpaceCapsuleOffset(_tempVector, out var point0, out var point1, out var radiusOut);
+                    Debug.DrawLine(point0, point1, Color.magenta, Time.fixedDeltaTime);
+                }
+#endif
 
                 _resultCount = PhysExts.OverlapCapsuleNonAllocOffset(pH.jointColliders[i], _tempVector, _resultsCache, _contactMask, radius: radius);
                 for (int j = 0; j < _resultCount; j++)
