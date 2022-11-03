@@ -74,7 +74,7 @@ namespace Leap.Unity.Preview.HandRays
             handRayInteractor.handRay.OnHandRayStateChange -= OnRaycastStateChange;
         }
 
-        protected virtual void OnRaycastUpdate(RaycastHit[] results)
+        protected virtual void OnRaycastUpdate(RaycastHit[] results, RaycastHit primaryHit)
         {
             if (overrideRayInteractor)
             {

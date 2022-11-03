@@ -22,9 +22,10 @@ namespace Leap.Unity.Preview.HandRays
             return position + (velocity * time) + (0.5f * acceleration * (time * time));
         }
 
-        protected override int UpdateRayInteractorLogic(HandRayDirection handRayDirection, out RaycastHit[] results)
+        protected override int UpdateRayInteractorLogic(HandRayDirection handRayDirection, out RaycastHit[] results, out RaycastHit primaryHit)
         {
             _parabolaPositions.Clear();
+            primaryHit = new RaycastHit();
 
             // Calculate the projection of the hand if it extends beyond the handMergeDistance.
             Vector3 handProjection = handRayDirection.Direction;
@@ -40,18 +41,17 @@ namespace Leap.Unity.Preview.HandRays
                 _parabolaPositions.Add(handRayDirection.VisualAimPosition);
                 Vector3 velocity = handProjection * projectionAmount;
 
-                RaycastHit raycastResult;
                 for (float i = 0; i < 8f; i += 0.1f)
                 {
                     Vector3 segmentStart = evaluateParabola(startPos, velocity, Physics.gravity * 0.25f, i);
                     Vector3 segmentEnd = evaluateParabola(startPos, velocity, Physics.gravity * 0.25f, i + 0.1f);
                     _parabolaPositions.Add(segmentEnd);
 
-                    if (Physics.Raycast(new Ray(segmentStart, segmentEnd - segmentStart), out raycastResult, Vector3.Distance(segmentStart, segmentEnd), layerMask))
+                    if (Physics.Raycast(new Ray(segmentStart, segmentEnd - segmentStart), out primaryHit, Vector3.Distance(segmentStart, segmentEnd), layerMask))
                     {
                         hits = 1;
-                        _parabolaPositions.Add(raycastResult.point);
-                        results = new RaycastHit[] { raycastResult };
+                        _parabolaPositions.Add(primaryHit.point);
+                        results = new RaycastHit[] { primaryHit };
                     }
 
                     if (hits == 1) { break; }

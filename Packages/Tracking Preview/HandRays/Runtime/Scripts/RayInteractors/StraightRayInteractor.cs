@@ -8,16 +8,15 @@ namespace Leap.Unity.Preview.HandRays
     {
         public float maxRayDistance = 50f;
 
-        protected override int UpdateRayInteractorLogic(HandRayDirection handRayDirection, out RaycastHit[] results)
+        protected override int UpdateRayInteractorLogic(HandRayDirection handRayDirection, out RaycastHit[] results, out RaycastHit primaryHit)
         {
-            RaycastHit raycastResult = new RaycastHit();
             int hits = 0;
             results = null;
-            if (Physics.Raycast(new Ray(handRayDirection.RayOrigin, handRayDirection.Direction), out raycastResult, maxRayDistance, layerMask))
+            if (Physics.Raycast(new Ray(handRayDirection.RayOrigin, handRayDirection.Direction), out primaryHit, maxRayDistance, layerMask))
             {
                 hits = 1;
-                results = new RaycastHit[] { raycastResult };
-                linePoints = new Vector3[] { handRayDirection.VisualAimPosition, raycastResult.collider.transform.position };
+                results = new RaycastHit[] { primaryHit };
+                linePoints = new Vector3[] { handRayDirection.VisualAimPosition, primaryHit.collider.transform.position };
             } 
             else
             {

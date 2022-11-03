@@ -13,7 +13,7 @@ namespace Leap.Unity.Preview.HandRays
         public LayerMask layerMask;
 
         [Header("Events")]
-        public Action<RaycastHit[]> OnRaycastUpdate;
+        public Action<RaycastHit[], RaycastHit> OnRaycastUpdate;
 
         [HideInInspector] public Vector3[] linePoints;
         [HideInInspector] public int numPoints;
@@ -44,10 +44,10 @@ namespace Leap.Unity.Preview.HandRays
 
         private void UpdateRayInteractor(HandRayDirection handRayDirection)
         {
-            UpdateRayInteractorLogic(handRayDirection, out RaycastHit[] result);
-            OnRaycastUpdate?.Invoke(result);
+            UpdateRayInteractorLogic(handRayDirection, out RaycastHit[] allHits, out RaycastHit primaryHit);
+            OnRaycastUpdate?.Invoke(allHits, primaryHit);
         }
 
-        protected abstract int UpdateRayInteractorLogic(HandRayDirection handRayDirection, out RaycastHit[] results);
+        protected abstract int UpdateRayInteractorLogic(HandRayDirection handRayDirection, out RaycastHit[] allHits, out RaycastHit primaryHit);
     }
 }

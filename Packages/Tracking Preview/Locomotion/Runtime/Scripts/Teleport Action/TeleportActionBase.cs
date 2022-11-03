@@ -107,7 +107,7 @@ namespace Leap.Unity.Preview.Locomotion
             _lastTeleportedPoint = null;
         }
 
-        private void OnRayUpdate(RaycastHit[] results)
+        private void OnRayUpdate(RaycastHit[] results, RaycastHit primaryHit)
         {
             if (!IsSelected || _currentTeleportAnchorLocked)
             {
@@ -132,35 +132,34 @@ namespace Leap.Unity.Preview.Locomotion
                 return;
             }
 
-            foreach(RaycastHit rayhit in results)
+
+            if (primaryHit.collider != null)
             {
-                if (rayhit.collider != null)
+                if (movementType == TeleportActionMovementType.FIXED)
+                {  
+                    _validTarget = primaryHit.collider.gameObject.layer == _teleportAnchorLayer && primaryHit.collider.TryGetComponent(out _currentPointVal);
+                }
+                else
                 {
-                    if (movementType == TeleportActionMovementType.FIXED)
-                    {  
-                        _validTarget = rayhit.collider.gameObject.layer == _teleportAnchorLayer && rayhit.collider.TryGetComponent(out _currentPointVal);
+                    if (primaryHit.collider.gameObject.layer == _teleportFloorLayer)
+                    {
+                        freeTeleportAnchor.gameObject.SetActive(true);
+                        freeTeleportAnchor.transform.position = primaryHit.point;
+                        Vector3 rotation = Quaternion.LookRotation(handRayInteractor.handRay.handRayDirection.Direction, Vector3.up).eulerAngles;
+                        rotation.x = 0;
+                        freeTeleportAnchor.transform.rotation = Quaternion.Euler(rotation);
+                        _currentPoint = freeTeleportAnchor;
+                        _validPoint = true;
                     }
                     else
                     {
-                        if (rayhit.collider.gameObject.layer == _teleportFloorLayer)
-                        {
-                            freeTeleportAnchor.gameObject.SetActive(true);
-                            freeTeleportAnchor.transform.position = rayhit.point;
-                            Vector3 rotation = Quaternion.LookRotation(handRayInteractor.handRay.handRayDirection.Direction, Vector3.up).eulerAngles;
-                            rotation.x = 0;
-                            freeTeleportAnchor.transform.rotation = Quaternion.Euler(rotation);
-                            _currentPoint = freeTeleportAnchor;
-                            _validPoint = true;
-                        }
-                        else
-                        {
-                            _currentPoint = null;
-                            freeTeleportAnchor.gameObject.SetActive(false);
-                        }
+                        _currentPoint = null;
+                        freeTeleportAnchor.gameObject.SetActive(false);
                     }
-                    handRayRenderer.SetValid(IsValid);
                 }
+                handRayRenderer.SetValid(IsValid);
             }
+            
 
             if (_oldPosition == Vector3.negativeInfinity && _currentPosition != Vector3.negativeInfinity)
             {
