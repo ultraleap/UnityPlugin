@@ -8,6 +8,9 @@ namespace Leap.Unity.Preview.Locomotion
     public class TeleportActionBase : MonoBehaviour
     {
         public enum TeleportActionMovementType { FREE, FIXED };
+        [Tooltip("If true, when teleporting, the teleport anchor's forward direction will match your headset's world forward direction." +
+            "\nIf false, your rotation will be the same way you are currently facing")]
+        public bool useHeadsetForwardRotation = true;
 
         [Header("Teleport Action Setup")]
         [SerializeField] private TeleportAnchor freeTeleportAnchor;
@@ -109,8 +112,14 @@ namespace Leap.Unity.Preview.Locomotion
 
         private void OnRayUpdate(RaycastHit[] results, RaycastHit primaryHit)
         {
-            if (!IsSelected || _currentTeleportAnchorLocked)
+            if (!IsSelected)
             {
+                return;
+            }
+
+            if (_currentTeleportAnchorLocked)
+            {
+                UpdateCurrentPointRotation();
                 return;
             }
 
@@ -131,7 +140,6 @@ namespace Leap.Unity.Preview.Locomotion
                 }
                 return;
             }
-
 
             if (primaryHit.collider != null)
             {
@@ -180,6 +188,25 @@ namespace Leap.Unity.Preview.Locomotion
             if (_currentPoint != _lastHighlightedPoint && _lastHighlightedPoint != null)
             {
                 _lastHighlightedPoint.SetHighlighted(false);
+            }
+
+            UpdateCurrentPointRotation();
+        }
+
+        private void UpdateCurrentPointRotation()
+        {
+            if (_isSelected && IsValid)
+            {
+                Quaternion playerRotation;
+                if (useHeadsetForwardRotation)
+                {
+                    playerRotation = Quaternion.Euler(0, _currentPoint.transform.TransformRotation(Head.transform.rotation).eulerAngles.y, 0);
+                }
+                else
+                {
+                    playerRotation = _useCustomRotation ? _customRotation : _currentRotation;
+                }
+                _currentPoint.IndicateRotation(playerRotation);
             }
         }
 
@@ -257,7 +284,14 @@ namespace Leap.Unity.Preview.Locomotion
 
         private void RotatePlayer(Quaternion newRotation)
         {
-            Player.transform.rotation = Quaternion.Euler(0, (newRotation * Quaternion.Inverse(Head.transform.rotation) * Player.transform.rotation).eulerAngles.y, 0);
+            if (useHeadsetForwardRotation)
+            {
+                Player.transform.rotation = Quaternion.Euler(0, newRotation.eulerAngles.y, 0);
+            }
+            else
+            {
+                Player.transform.rotation = Quaternion.Euler(0, (newRotation * Quaternion.Inverse(Head.transform.rotation) * Player.transform.rotation).eulerAngles.y, 0);
+            }
         }
 
         private void MovePlayer(Vector3 newPosition)

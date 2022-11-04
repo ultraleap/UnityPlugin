@@ -1,4 +1,3 @@
-using Leap.Unity.Preview.HandRays;
 using UnityEngine;
 
 namespace Leap.Unity.Preview.Locomotion
@@ -13,7 +12,7 @@ namespace Leap.Unity.Preview.Locomotion
         [SerializeField]
         private LightweightPinchDetector _pinchDetector;
 
-        [Header("The chirality which will be used for pinch to teleport. This will update the chirality in the pinch detector and hand ray.")]
+        [Tooltip("The chirality which will be used for pinch to teleport. This will update the chirality in the pinch detector and hand ray.")]
         public Chirality chirality;
 
         [Header("Rotation Settings"), Tooltip("If true, allows you to move your hand left/right whilst pinching to control the direction you're facing upon teleporting")]
@@ -64,8 +63,6 @@ namespace Leap.Unity.Preview.Locomotion
 
         private void Update()
         {
-            _useCustomRotation = useRotation;
-
             if(chirality != _chiralityLastFrame)
             {
                 UpdateChirality();
@@ -107,6 +104,8 @@ namespace Leap.Unity.Preview.Locomotion
                 _pinchTransformHelper.position = hand.PalmPosition;
                 _pinchTransformHelper.rotation = hand.Rotation;
                 _rotationOnPinch = _currentPoint.transform.rotation.eulerAngles;
+                _useCustomRotation = useRotation;
+                CalculateCustomRotation(hand);
             }
 
             _validOnPinch = IsValid;
@@ -124,11 +123,7 @@ namespace Leap.Unity.Preview.Locomotion
                 handRayRenderer.SetActive(false);
                 _currentTeleportAnchorLocked = true;
 
-                float rotationDistance = _pinchTransformHelper.InverseTransformPoint(hand.PalmPosition).x;
-                float rotationAngle = rotationDistance * (180 / maxRotationMovementDistance);
-                Quaternion newRotation = Quaternion.Euler(_rotationOnPinch.x, _rotationOnPinch.y + rotationAngle, _rotationOnPinch.z);
-                _customRotation = newRotation;
-                _currentPoint.IndicateRotation(newRotation);
+                CalculateCustomRotation(hand);
             }
             else
             {
@@ -152,7 +147,16 @@ namespace Leap.Unity.Preview.Locomotion
                 _currentPoint.transform.rotation = Quaternion.Euler(_rotationOnPinch);
                 handRayRenderer.SetActive(true);
                 _currentTeleportAnchorLocked = false;
+                _useCustomRotation = false;
             }
+        }
+
+        private void CalculateCustomRotation(Hand hand)
+        {
+            float rotationDistance = _pinchTransformHelper.InverseTransformPoint(hand.PalmPosition).x;
+            float rotationAngle = rotationDistance * (180 / maxRotationMovementDistance);
+            Quaternion newRotation = Quaternion.Euler(_rotationOnPinch.x, _rotationOnPinch.y + rotationAngle, _rotationOnPinch.z);
+            _customRotation = newRotation;
         }
 
         private void OnValidate()

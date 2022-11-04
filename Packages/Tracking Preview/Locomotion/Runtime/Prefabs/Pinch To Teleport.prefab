@@ -49,6 +49,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   handRayInteractor: {fileID: 1239028838941531412}
   lineRenderer: {fileID: 1239028838941531413}
+  hideRayOnNoPoints: 0
+  overrideRayInteractor: 0
   validColorGradient:
     serializedVersion: 2
     key0: {r: 1, g: 1, b: 1, a: 1}
@@ -324,6 +326,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f0a9798e186bda438f26bdbd3fc74ec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  useHeadsetForwardRotation: 1
   freeTeleportAnchor: {fileID: 6821247378321582377}
   handRayRenderer: {fileID: 1239028838941531414}
   handRayInteractor: {fileID: 1239028838941531412}
@@ -332,13 +335,14 @@ MonoBehaviour:
     layerIndex: 0
   _teleportFloorLayer:
     layerIndex: 0
+  findTeleportAnchorsOnStart: 1
   Head: {fileID: 0}
   Player: {fileID: 0}
   leapProvider: {fileID: 0}
   _isFacingObject: {fileID: 1239028840639913089}
   _pinchDetector: {fileID: 1239028840639913091}
-  chirality: 0
-  useRotation: 1
+  chirality: 1
+  useRotation: 0
   maxRotationMovementDistance: 0.2
 --- !u!114 &1239028840639913089
 MonoBehaviour:
@@ -352,7 +356,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b04ce9da9d411ac488391fbb6e8a4352, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _layersToIgnore: []
+  _layersToIgnore:
+  - layerIndex: 3
+  - layerIndex: 6
   _sphereCastRadius: 0.3
   _sphereCastMaxLength: 0.5
   _teleportAnchorTag: LEAP_TELEPORTER

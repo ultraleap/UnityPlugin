@@ -48,6 +48,13 @@ namespace Leap.Unity.Preview.HandRays
             OnRaycastUpdate?.Invoke(allHits, primaryHit);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="handRayDirection"></param>
+        /// <param name="allHits"></param>
+        /// <param name="primaryHit"></param>
+        /// <returns></returns>
         protected abstract int UpdateRayInteractorLogic(HandRayDirection handRayDirection, out RaycastHit[] allHits, out RaycastHit primaryHit);
     }
 }
