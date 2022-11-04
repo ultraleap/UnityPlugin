@@ -181,7 +181,7 @@ namespace Ultraleap.Tracking.OpenXR
             // Check the active input handling supports New (for OpenXR) and Legacy (for Ultraleap Plugin support).
             rules.Add(new ValidationRule(this)
             {
-                message = "Active Input Handling is not set to Both. While New is required for OpenXR, Both is" +
+                message = "Active Input Handling is not set to Both. While New is required for OpenXR, Both is " +
                           "recommended as the Ultraleap Unity Plugin does not fully support the New Input System.",
                 error = false,
 #if !ENABLE_LEGACY_INPUT_MANAGER || !ENABLE_INPUT_SYSTEM
