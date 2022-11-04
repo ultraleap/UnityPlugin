@@ -92,6 +92,8 @@ namespace Leap.Unity
                 }
             }
 
+            LeapProvider.gameObject.SetActive(true);
+
             OnProviderSet?.Invoke(LeapProvider);
         }
 

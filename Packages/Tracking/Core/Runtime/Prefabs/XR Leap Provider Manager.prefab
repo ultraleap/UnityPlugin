@@ -73,7 +73,8 @@ MonoBehaviour:
 
     Please ensure the Service
     Providers that are child objects to this are set up correctly to allow for both
-    to be suitable options.'
+    to be suitable options. Child GameObjects will be automatically enabled when
+    required, please do not enable them.'
   _isEditing: 0
 --- !u!1001 &5270838609458788501
 PrefabInstance:
@@ -154,6 +155,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Service Provider (XR)
       objectReference: {fileID: 0}
+    - target: {fileID: 3557434566810426997, guid: 15d3b5cf5cea75344a4482323bc124a8, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 15d3b5cf5cea75344a4482323bc124a8, type: 3}
 --- !u!4 &8681616449881122558 stripped
@@ -229,7 +234,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5825201617405793992, guid: d774afbb462004749918d3e350ef43ff, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6382174844009596092, guid: d774afbb462004749918d3e350ef43ff, type: 3}
       propertyPath: _mainCamera
