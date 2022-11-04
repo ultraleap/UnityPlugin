@@ -122,6 +122,8 @@ namespace Ultraleap.Tracking.OpenXR
                 return false;
             }
 
+
+            float timeVisible = 0;
             if (handTracker == HandTracker.Left)
             {
                 if (_leftHandFirstSeen_ticks == -1)
@@ -129,6 +131,7 @@ namespace Ultraleap.Tracking.OpenXR
                     _leftHandFirstSeen_ticks = DateTime.Now.Ticks;
                     _leftHandId = _handId++;
                 }
+                timeVisible = ((float)(DateTime.Now.Ticks - _leftHandFirstSeen_ticks)) / (float)TimeSpan.TicksPerSecond;
             }
             else
             {
@@ -137,6 +140,8 @@ namespace Ultraleap.Tracking.OpenXR
                     _rightHandFirstSeen_ticks = DateTime.Now.Ticks;
                     _rightHandId = _handId++;
                 }
+                timeVisible = ((float)(DateTime.Now.Ticks - _rightHandFirstSeen_ticks)) /
+                              (float)TimeSpan.TicksPerSecond;
             }
 
             for (int fingerIndex = 0; fingerIndex < 5; fingerIndex++)
@@ -189,7 +194,7 @@ namespace Ultraleap.Tracking.OpenXR
                     _frameId,
                     (handTracker == HandTracker.Left ? 0 : 1),
                     fingerIndex,
-                    10f, // Fixed for now
+                    timeVisible,
                     joints[xrTipIndex].Pose.position,
                     (joints[xrTipIndex].Pose.rotation * Vector3.forward),
                     fingerWidth,
@@ -210,8 +215,7 @@ namespace Ultraleap.Tracking.OpenXR
                 CalculatePinchDistance(ref hand),
                 palmWidth,
                 handTracker == HandTracker.Left,
-                handTracker == HandTracker.Left ? ((float)(DateTime.Now.Ticks - _leftHandFirstSeen_ticks)) / (float)TimeSpan.TicksPerSecond :
-                                                  ((float)(DateTime.Now.Ticks - _rightHandFirstSeen_ticks)) / (float)TimeSpan.TicksPerSecond,
+                timeVisible,
                 null, // Already Populated
                 joints[(int)HandJoint.Palm].Pose.position,
                 joints[(int)HandJoint.Palm].Pose.position,
