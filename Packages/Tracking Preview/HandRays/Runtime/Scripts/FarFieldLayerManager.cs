@@ -1,13 +1,17 @@
-using Leap.Unity;
-using Leap.Unity.Preview.HandRays;
 using UnityEngine;
 
 namespace Leap.Unity.Preview.HandRays
 {
+    /// <summary>
+    /// Assigns the correct layer to far field objects
+    /// </summary>
     public class FarFieldLayerManager : MonoBehaviour
     {
+        [Tooltip("If enabled, assigns the next available layer to FarFieldObjectLayer")]
         public bool AutomaticFarFieldObjectLayer = true;
+        [Tooltip("The layer to be assigned to all far field objects")]
         public SingleLayer FarFieldObjectLayer;
+        [Tooltip("The layer assigned to the floor")]
         public SingleLayer FloorLayer;
 
         private bool _layersGenerated = false;

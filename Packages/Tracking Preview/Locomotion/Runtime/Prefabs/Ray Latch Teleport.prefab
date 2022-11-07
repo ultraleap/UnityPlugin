@@ -128,10 +128,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f902b9a4f38c74143b927f930fb60ee7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  handRayInteractor: {fileID: 7090704560414030349}
   lineRenderer: {fileID: 7090704560414030350}
+  handRayInteractor: {fileID: 7090704560414030349}
   hideRayOnNoPoints: 1
-  overrideRayInteractor: 0
   validColorGradient:
     serializedVersion: 2
     key0: {r: 1, g: 1, b: 1, a: 1}
@@ -202,11 +201,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4435fe4cd4dae6c4cae22e39096212bf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  farFieldLayerManager: {fileID: 0}
   _handRay: {fileID: 2816721751959635280}
+  farFieldLayerManager: {fileID: 0}
   layerMask:
     serializedVersion: 2
     m_Bits: 0
+  autoIncludeFloorLayer: 0
   linePoints: []
   numPoints: 0
   maxRayDistance: 50
@@ -621,20 +621,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   farFieldLayerManager: {fileID: 0}
-  freeTeleportAnchor: {fileID: 3314407747814847813}
   handRayRenderer: {fileID: 7090704560414030346}
   handRayInteractor: {fileID: 7090704560414030349}
+  freeTeleportAnchor: {fileID: 3314407747814847813}
   movementType: 1
   useHeadsetForwardRotation: 1
   findTeleportAnchorsOnStart: 1
   Head: {fileID: 0}
   Player: {fileID: 0}
-  _distToGrabAndPull: 0.1
-  rayLatchDirection: 1
   leapProvider: {fileID: 0}
   grabDetector: {fileID: 6649805490014903038}
-  chirality: 1
   _isFacingObject: {fileID: 6162318093243395883}
+  chirality: 1
+  rayLatchDirection: 1
+  _distanceToGrabAndPull: 0.1
 --- !u!114 &6649805490014903038
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -862,7 +862,7 @@ PrefabInstance:
     - target: {fileID: 5735363209408796238, guid: 44bc0a3baddb5764981270e8bad5f608,
         type: 3}
       propertyPath: m_Name
-      value: Teleport Anchor
+      value: Free Teleport Anchor
       objectReference: {fileID: 0}
     - target: {fileID: 5735363209408796238, guid: 44bc0a3baddb5764981270e8bad5f608,
         type: 3}

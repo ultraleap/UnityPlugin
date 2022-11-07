@@ -1,4 +1,12 @@
-using Leap.Unity;
+/******************************************************************************
+ * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
+ * Ultraleap proprietary and confidential.                                    *
+ *                                                                            *
+ * Use subject to the terms of the Leap Motion SDK Agreement available at     *
+ * https://developer.leapmotion.com/sdk_agreement, or another agreement       *
+ * between Ultraleap and you, your company or other organization.             *
+ ******************************************************************************/
+
 using Leap.Unity.Interaction;
 using Leap.Unity.Interaction.PhysicsHands;
 using Leap.Unity.Preview.HandRays;
@@ -7,6 +15,11 @@ using UnityEngine;
 
 namespace Leap.Unity.Preview.Locomotion
 {
+    /// <summary>
+    /// Small script that detects whether the user is facing an object this frame.
+    /// Useful for contextual activation of interactions.
+    /// Spherecasts out through the user's gaze
+    /// </summary>
     public class IsFacingObject : MonoBehaviour
     {
         [Tooltip("Note that the Interaction Engine, Physics Hands and FarFieldObject layers will be ignored automatically.")]
@@ -15,12 +28,15 @@ namespace Leap.Unity.Preview.Locomotion
 
         protected LayerMask _layerMask;
 
-        private bool hasCastThisFrame = false;
+        protected bool hasCastThisFrame = false;
 
-        private bool _valueThisFrame = false;
+        protected bool _valueThisFrame = false;
 
+        [Tooltip("Size of the spherecast radius to cast")]
         [SerializeField] private float _sphereCastRadius = 0.3f;
+        [Tooltip("Max distance to spherecast")]
         [SerializeField] private float _sphereCastMaxLength = 0.5f;
+
         public bool ValueThisFrame
         {
             get
@@ -77,6 +93,5 @@ namespace Leap.Unity.Preview.Locomotion
             Transform head = Camera.main.transform;
             _valueThisFrame = Physics.SphereCast(new Ray(head.position, head.forward), _sphereCastRadius, out RaycastHit hit, _sphereCastMaxLength, _layerMask);
         }
-
     }
 }

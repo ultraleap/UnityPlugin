@@ -1,11 +1,33 @@
+/******************************************************************************
+ * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
+ * Ultraleap proprietary and confidential.                                    *
+ *                                                                            *
+ * Use subject to the terms of the Leap Motion SDK Agreement available at     *
+ * https://developer.leapmotion.com/sdk_agreement, or another agreement       *
+ * between Ultraleap and you, your company or other organization.             *
+ ******************************************************************************/
 using UnityEngine;
 
 namespace Leap.Unity.Preview.HandRays
 {
+    /// <summary>
+    /// Performs a conecast in the handraydirection passed in.
+    /// Returns primary hit as the object closest to a straight hand ray
+    /// </summary>
     public class ConeCastRayInteractor : HandRayInteractor
     {
+        /// <summary>
+        /// Max distance to conecast in 
+        /// </summary>
         public float maxRayDistance = 50f;
+        /// <summary>
+        /// The max radius used in the spherecast before objects are filtered out by the conecast angle
+        /// </summary>
         public float conecastMaxRadius = 1f;
+
+        /// <summary>
+        /// The angle of the cone used to filter out objects from a spherecast into a coneshape
+        /// </summary>
         public float conecastAngle = 30f;
 
         protected override int UpdateRayInteractorLogic(HandRayDirection handRayDirection, out RaycastHit[] results, out RaycastHit primaryHit)

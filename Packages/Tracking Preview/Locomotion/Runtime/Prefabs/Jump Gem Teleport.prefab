@@ -47,10 +47,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f902b9a4f38c74143b927f930fb60ee7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  handRayInteractor: {fileID: 1135228147649426941}
   lineRenderer: {fileID: 1135228147649426936}
+  handRayInteractor: {fileID: 1135228147649426941}
   hideRayOnNoPoints: 0
-  overrideRayInteractor: 0
   validColorGradient:
     serializedVersion: 2
     key0: {r: 0.8726415, g: 1, b: 0.8877089, a: 1}
@@ -121,8 +120,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 63e1eae231d74354faee12391cbfbf6e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  farFieldLayerManager: {fileID: 0}
   _handRay: {fileID: 1135228147649426938}
+  farFieldLayerManager: {fileID: 0}
   layerMask:
     serializedVersion: 2
     m_Bits: 0
@@ -329,9 +328,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   farFieldLayerManager: {fileID: 0}
-  freeTeleportAnchor: {fileID: 4636800580180853980}
   handRayRenderer: {fileID: 1135228147649426934}
   handRayInteractor: {fileID: 1135228147649426941}
+  freeTeleportAnchor: {fileID: 4636800580180853980}
   movementType: 1
   useHeadsetForwardRotation: 1
   findTeleportAnchorsOnStart: 1
@@ -354,7 +353,7 @@ PrefabInstance:
     - target: {fileID: 5735363209408796238, guid: 44bc0a3baddb5764981270e8bad5f608,
         type: 3}
       propertyPath: m_Name
-      value: Teleport Anchor
+      value: Free Teleport Anchor
       objectReference: {fileID: 0}
     - target: {fileID: 5735363209408796238, guid: 44bc0a3baddb5764981270e8bad5f608,
         type: 3}

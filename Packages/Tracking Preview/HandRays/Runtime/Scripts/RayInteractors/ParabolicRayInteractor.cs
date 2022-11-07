@@ -1,8 +1,19 @@
+/******************************************************************************
+ * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
+ * Ultraleap proprietary and confidential.                                    *
+ *                                                                            *
+ * Use subject to the terms of the Leap Motion SDK Agreement available at     *
+ * https://developer.leapmotion.com/sdk_agreement, or another agreement       *
+ * between Ultraleap and you, your company or other organization.             *
+ ******************************************************************************/
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace Leap.Unity.Preview.HandRays
 {
+    /// <summary>
+    /// Takes in a ray direction and casts it out in a parabolic curve
+    /// </summary>
     public class ParabolicRayInteractor : HandRayInteractor
     {
         [Tooltip("The scale of the projection of any hand distance from the approximated "
@@ -20,11 +31,6 @@ namespace Leap.Unity.Preview.HandRays
         [Tooltip("If true, the points passed to the RayRenderer stop when the ray hits an object, or reaches max distance." +
             "\nIf false, the points passed to the RayRenderer stop when the ray hits the floor, or reaches max distance")]
         public bool stopRayOnHit = false;
-
-        Vector3 evaluateParabola(Vector3 position, Vector3 velocity, Vector3 acceleration, float time)
-        {
-            return position + (velocity * time) + (0.5f * acceleration * (time * time));
-        }
 
         protected override int UpdateRayInteractorLogic(HandRayDirection handRayDirection, out RaycastHit[] results, out RaycastHit primaryHit)
         {
@@ -79,6 +85,11 @@ namespace Leap.Unity.Preview.HandRays
             linePoints = _parabolaPositions.ToArray();
             numPoints = linePoints.Length;
             return hits;
+        }
+
+        private Vector3 evaluateParabola(Vector3 position, Vector3 velocity, Vector3 acceleration, float time)
+        {
+            return position + (velocity * time) + (0.5f * acceleration * (time * time));
         }
     }
 }
