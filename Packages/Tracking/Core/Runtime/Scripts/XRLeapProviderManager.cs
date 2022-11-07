@@ -71,7 +71,7 @@ namespace Leap.Unity
         /// <summary>
         /// The chosen source of hand tracking data
         /// </summary>
-        [Tooltip("AUTOMATIC - Windows will use LeapService, Other platforms will use OpenXR if available and LeapService if OpenXR if not" +
+        [Tooltip("AUTOMATIC - Windows will use LeapService, other platforms will use OpenXR if available and LeapService if OpenXR if not" +
                     "OPEN_XR - Use OpenXR as the source of tracking" +
                     "LEAP_SERVICE - Use LeapC as the source of tracking")]
         public TrackingSource trackingSource;
@@ -116,13 +116,13 @@ namespace Leap.Unity
         /// <param name="_source">A tracking source. Where possible, this should not be AUTOMATIC when this method is called</param>
         void SelectTrackingSource(TrackingSource _source)
         {
-            if(_source == TrackingSource.AUTOMATIC)
+            if (_source == TrackingSource.AUTOMATIC)
             {
                 Debug.LogWarning("No specific Tracking Source selected. Automatically selecting Leap Service");
                 _source = TrackingSource.LEAP_SERVICE;
             }
-            
-            if(_source == TrackingSource.OPEN_XR)
+
+            if (_source == TrackingSource.OPEN_XR)
             {
                 Debug.Log("Using OpenXR for Hand Tracking");
                 LeapProvider = openXRLeapProvider;

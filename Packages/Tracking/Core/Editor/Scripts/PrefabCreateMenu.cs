@@ -42,7 +42,7 @@ namespace Leap
         public static void CreateServiceProviderScreentop()
         {
             CreatePrefab("Service Provider (Screentop)");
-        }        
+        }
 
         public static void CreatePrefab(string prefabName)
         {
