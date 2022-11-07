@@ -17,6 +17,11 @@ namespace Leap.Unity.Preview.HandRays
 
         private List<Vector3> _parabolaPositions = new List<Vector3>();
 
+        [Tooltip("If true, the points passed to the RayRenderer stop when the ray hits an object, or reaches max distance." +
+            "\nIf false, the points passed to the RayRenderer stop when the ray hits the floor, or reaches max distance")]
+        public bool stopRayOnHit = false;
+        public SingleLayer floorLayer;
+
         Vector3 evaluateParabola(Vector3 position, Vector3 velocity, Vector3 acceleration, float time)
         {
             return position + (velocity * time) + (0.5f * acceleration * (time * time));
@@ -34,6 +39,7 @@ namespace Leap.Unity.Preview.HandRays
             float projectionAmount = (projectionDistance + 0.15f) * projectionScale;
 
             results = null;
+            bool foundFloor = false;
             int hits = 0;
             if (projectionDistance > 0f)
             {
@@ -47,14 +53,27 @@ namespace Leap.Unity.Preview.HandRays
                     Vector3 segmentEnd = evaluateParabola(startPos, velocity, Physics.gravity * 0.25f, i + 0.1f);
                     _parabolaPositions.Add(segmentEnd);
 
-                    if (Physics.Raycast(new Ray(segmentStart, segmentEnd - segmentStart), out primaryHit, Vector3.Distance(segmentStart, segmentEnd), layerMask))
+                    if (Physics.Raycast(new Ray(segmentStart, segmentEnd - segmentStart), out RaycastHit hit, Vector3.Distance(segmentStart, segmentEnd), layerMask))
                     {
-                        hits = 1;
-                        _parabolaPositions.Add(primaryHit.point);
-                        results = new RaycastHit[] { primaryHit };
+                        if (hits == 0)
+                        {
+                            primaryHit = hit;
+                            results = new RaycastHit[] { primaryHit };
+                            hits = 1;
+                        }
+
+                        if(hit.transform.gameObject.layer == floorLayer)
+                        {
+                            foundFloor = true;
+                        }
+
+                        _parabolaPositions.Add(hit.point);
                     }
 
-                    if (hits == 1) { break; }
+                    if((hits == 1 && stopRayOnHit) || (foundFloor && !stopRayOnHit))
+                    { 
+                        break;
+                    }
                 }
             }
 
