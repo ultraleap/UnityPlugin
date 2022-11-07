@@ -6,6 +6,10 @@ using UnityEngine;
 
 namespace Leap.Unity.Preview.Locomotion
 {
+    /// <summary>
+    /// This teleport method snaps a ray to a "gem" object within your scene when said gem is activated (e.g. through a pinch).
+    /// When the user releases the gem a teleport action is fired, if valid.
+    /// </summary>
     public class JumpGemTeleport : TeleportActionBase
     {
         private List<JumpGem> _jumpGems = new List<JumpGem>();
@@ -60,6 +64,9 @@ namespace Leap.Unity.Preview.Locomotion
             }
         }
 
+        /// <summary>
+        /// Hides all non-active gems.
+        /// </summary>
         private void ChangeVisibleJewels()
         {
             bool anyPinched = _jumpGems.Any(x => x.IsPinched);
@@ -85,6 +92,9 @@ namespace Leap.Unity.Preview.Locomotion
             }
         }
 
+        /// <summary>
+        /// Checks the gem to ensure that the ray should be activated.
+        /// </summary>
         private void ProcessPinchedJewel()
         {
             if (_pinchedGem != null)
@@ -102,6 +112,9 @@ namespace Leap.Unity.Preview.Locomotion
             }
         }
 
+        /// <summary>
+        /// When the jewel is pinched, we set the ray to the correct hand and hide other gems.
+        /// </summary>
         private void OnJewelPinch(Chirality hand, int index)
         {
             handRayInteractor.handRay.chirality = hand;
@@ -113,6 +126,9 @@ namespace Leap.Unity.Preview.Locomotion
             OnJewelPinched?.Invoke(true);
         }
 
+        /// <summary>
+        /// When the gem is released, we either teleport if pre-requisites have been met, or fail if they have not.
+        /// </summary>
         private void OnJewelRelease(bool enough)
         {
             if (handRayInteractor.handRay is TransformWristShoulderHandRay)
