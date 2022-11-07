@@ -14,19 +14,31 @@ namespace Leap
 {
     public class PrefabCreateMenu
     {
-        [MenuItem("GameObject/Ultraleap/XR Leap Provider Manager")]
+        [MenuItem("GameObject/Ultraleap/XR/XR Leap Provider Manager", false, 0)]
         public static void CreateProviderXR()
         {
             CreatePrefab("XR Leap Provider Manager");
         }
 
-        [MenuItem("GameObject/Ultraleap/Service Provider (Desktop)")]
+        [MenuItem("GameObject/Ultraleap/XR/Service Provider (XR)", false, 11)]
+        public static void CreateServiceProviderXR()
+        {
+            CreatePrefab("Service Provider (XR)");
+        }
+
+        [MenuItem("GameObject/Ultraleap/XR/Service Provider (OpenXR)", false, 12)]
+        public static void CreateServiceProviderOpenXR()
+        {
+            CreatePrefab("Service Provider (OpenXR)");
+        }
+
+        [MenuItem("GameObject/Ultraleap/Non-XR/Service Provider (Desktop)", false, 23)]
         public static void CreateServiceProviderDesktop()
         {
             CreatePrefab("Service Provider (Desktop)");
         }
 
-        [MenuItem("GameObject/Ultraleap/Service Provider (Screentop)")]
+        [MenuItem("GameObject/Ultraleap/Non-XR/Service Provider (Screentop)", false, 24)]
         public static void CreateServiceProviderScreentop()
         {
             CreatePrefab("Service Provider (Screentop)");
