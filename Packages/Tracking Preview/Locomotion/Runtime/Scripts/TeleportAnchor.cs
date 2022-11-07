@@ -17,7 +17,7 @@ namespace Leap.Unity.Preview.Locomotion
         private Color32 _highlightedColor = new Color(1, 1, 1, 0.25f);
 
         [SerializeField, Tooltip("A higher value will tile the texture more and appear smaller.")]
-        private float _idleSize = 4f, _hightlightedSize = 1f;
+        private float _idleSize = 4f, _highlightedSize = 1f;
 
         [SerializeField, Tooltip("The speed at which the markers visuals will transition.")]
         private float _transitionTime = 0.2f;
@@ -90,7 +90,7 @@ namespace Leap.Unity.Preview.Locomotion
         private void UpdateMaterials()
         {
             _storedMaterial.SetColor("_MainColor", Color.Lerp(_idleColor, _highlightedColor, _currentTransition));
-            _storedMaterial.mainTextureScale = new Vector2(1, Mathf.Lerp(_idleSize, _hightlightedSize, _currentTransition));
+            _storedMaterial.mainTextureScale = new Vector2(1, Mathf.Lerp(_idleSize, _highlightedSize, _currentTransition));
         }
 
         public virtual void OnDisable()
