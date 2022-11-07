@@ -195,18 +195,9 @@ namespace Leap.Unity.Preview.Locomotion
 
         private void UpdateCurrentPointRotation()
         {
-            if (_isSelected && IsValid)
+            if (_isSelected && IsValid && _useCustomRotation)
             {
-                Quaternion playerRotation;
-                if (useHeadsetForwardRotation)
-                {
-                    playerRotation = Quaternion.Euler(0, _currentPoint.transform.TransformRotation(Head.transform.rotation).eulerAngles.y, 0);
-                }
-                else
-                {
-                    playerRotation = _useCustomRotation ? _customRotation : _currentRotation;
-                }
-                _currentPoint.IndicateRotation(playerRotation);
+                _currentPoint.IndicateRotation(_useCustomRotation ? _customRotation : _currentRotation);
             }
         }
 

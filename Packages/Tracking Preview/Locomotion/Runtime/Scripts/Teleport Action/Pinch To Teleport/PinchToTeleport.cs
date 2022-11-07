@@ -15,7 +15,8 @@ namespace Leap.Unity.Preview.Locomotion
         [Tooltip("The chirality which will be used for pinch to teleport. This will update the chirality in the pinch detector and hand ray.")]
         public Chirality chirality;
 
-        [Header("Rotation Settings"), Tooltip("If true, allows you to move your hand left/right whilst pinching to control the direction you're facing upon teleporting")]
+        [Header("Rotation Settings"), Tooltip("If true, allows you to move your hand left/right whilst pinching to control the direction you're facing upon teleporting" +
+            "\n Not to be used in tandem with useHeadsetForwardRotation.")]
         public bool useRotation = false;
 
         [Tooltip("The distance your hand needs to move to rotate the teleport anchor 180 degrees")]
@@ -104,7 +105,7 @@ namespace Leap.Unity.Preview.Locomotion
                 _pinchTransformHelper.position = hand.PalmPosition;
                 _pinchTransformHelper.rotation = hand.Rotation;
                 _rotationOnPinch = _currentPoint.transform.rotation.eulerAngles;
-                _useCustomRotation = useRotation;
+                _useCustomRotation = useRotation && !useHeadsetForwardRotation;
                 CalculateCustomRotation(hand);
             }
 
