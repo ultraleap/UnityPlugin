@@ -315,23 +315,23 @@ namespace Leap.Unity
                 for (int j = 0; j < 4; j++)
                 {
                     int key = getFingerJointIndex((int)finger.Type, j);
-
-                    Vector3 position = finger.Bone((Bone.BoneType)j).NextJoint;
+                    
+                    
+                    Vector3 position;
+                    if (finger.Type == Finger.FingerType.TYPE_THUMB && j == 0)
+                    {
+                        // Hand the base of the thumb differently, and move it to the base of the index metacarpal.
+                        position = _hand.GetIndex().Bone((Bone.BoneType)j).PrevJoint;
+                    }
+                    else
+                    {
+                        position = finger.Bone((Bone.BoneType)j).NextJoint;
+                    }
+                    
                     _spherePositions[key] = position;
-
                     drawSphere(position);
                 }
             }
-
-            //Now we just have a few more spheres for the hands
-            //PalmPos, WristPos, and mockThumbJointPos, which is derived and not taken from the frame obj
-
-            Vector3 palmPosition = _hand.PalmPosition;
-            drawSphere(palmPosition, _palmRadius);
-
-            Vector3 thumbBaseToPalm = _spherePositions[THUMB_BASE_INDEX] - _hand.PalmPosition;
-            Vector3 mockThumbJointPos = _hand.PalmPosition + Vector3.Reflect(thumbBaseToPalm, _hand.Basis.xBasis);
-            drawSphere(mockThumbJointPos);
 
             //If we want to show the arm, do the calculations and display the meshes
             if (_showArm)
@@ -388,9 +388,17 @@ namespace Leap.Unity
                 drawCylinder(posA, posB);
             }
 
-            //Draw the rest of the hand
-            drawCylinder(mockThumbJointPos, THUMB_BASE_INDEX);
-            drawCylinder(mockThumbJointPos, PINKY_BASE_INDEX);
+            //Now we just have a few more spheres for the hands
+            //PalmPos, WristPos, and the virtual palm drawn from the metacarpals.
+            Vector3 palmPosition = _hand.PalmPosition;
+            drawSphere(palmPosition, _palmRadius);
+            
+            Vector3 pinkyMetacarpal = _hand.GetPinky().Bone(Bone.BoneType.TYPE_METACARPAL).PrevJoint;
+            Vector3 indexMetacarpal = _hand.GetIndex().Bone(Bone.BoneType.TYPE_METACARPAL).PrevJoint;
+            
+            drawSphere(pinkyMetacarpal);
+            drawCylinder(pinkyMetacarpal, indexMetacarpal);
+            drawCylinder(pinkyMetacarpal, PINKY_BASE_INDEX);
 
             if (SetIndividualSphereColors)
             {
