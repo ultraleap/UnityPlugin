@@ -50,6 +50,7 @@ MonoBehaviour:
   handRayInteractor: {fileID: 1135228147649426941}
   lineRenderer: {fileID: 1135228147649426936}
   hideRayOnNoPoints: 0
+  overrideRayInteractor: 0
   validColorGradient:
     serializedVersion: 2
     key0: {r: 0.8726415, g: 1, b: 0.8877089, a: 1}
@@ -120,14 +121,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 63e1eae231d74354faee12391cbfbf6e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  farFieldLayerManager: {fileID: 0}
   _handRay: {fileID: 1135228147649426938}
   layerMask:
     serializedVersion: 2
-    m_Bits: 72
+    m_Bits: 0
+  autoIncludeFloorLayer: 1
   linePoints: []
   numPoints: 8
   projectionScale: 10
   handMergeDistance: 0.7
+  stopRayOnHit: 0
 --- !u!114 &1135228147649426938
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -324,14 +328,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5742ff5179a14a242883e39d8e4e55d7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  farFieldLayerManager: {fileID: 0}
   freeTeleportAnchor: {fileID: 4636800580180853980}
   handRayRenderer: {fileID: 1135228147649426934}
   handRayInteractor: {fileID: 1135228147649426941}
   movementType: 1
-  _teleportAnchorLayer:
-    layerIndex: 0
-  _teleportFloorLayer:
-    layerIndex: 0
+  useHeadsetForwardRotation: 1
   findTeleportAnchorsOnStart: 1
   Head: {fileID: 0}
   Player: {fileID: 0}

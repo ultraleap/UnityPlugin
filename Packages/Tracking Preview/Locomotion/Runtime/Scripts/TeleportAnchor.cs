@@ -1,8 +1,9 @@
+using Leap.Unity.Preview.HandRays;
 using UnityEngine;
 
 namespace Leap.Unity.Preview.Locomotion
 {
-    public class TeleportAnchor : MonoBehaviour
+    public class TeleportAnchor : FarFieldObject
     {
         [SerializeField, Tooltip("The main teleport anchor mesh.")]
         private MeshRenderer _markerMesh = null;

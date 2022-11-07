@@ -202,17 +202,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4435fe4cd4dae6c4cae22e39096212bf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  farFieldLayerManager: {fileID: 0}
   _handRay: {fileID: 2816721751959635280}
   layerMask:
     serializedVersion: 2
-    m_Bits: 8
+    m_Bits: 0
   linePoints: []
   numPoints: 0
   maxRayDistance: 50
   conecastMaxRadius: 1
   conecastAngle: 30
-  floorLayer:
-    layerIndex: 0
 --- !u!114 &2816721751959635280
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -621,14 +620,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6fd9b7d4f90f2044ea4e838858afcbd8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  farFieldLayerManager: {fileID: 0}
   freeTeleportAnchor: {fileID: 3314407747814847813}
   handRayRenderer: {fileID: 7090704560414030346}
   handRayInteractor: {fileID: 7090704560414030349}
   movementType: 1
-  _teleportAnchorLayer:
-    layerIndex: 3
-  _teleportFloorLayer:
-    layerIndex: 6
+  useHeadsetForwardRotation: 1
   findTeleportAnchorsOnStart: 1
   Head: {fileID: 0}
   Player: {fileID: 0}
@@ -666,13 +663,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b04ce9da9d411ac488391fbb6e8a4352, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _layersToIgnore:
-  - layerIndex: 3
-  - layerIndex: 6
+  _layersToIgnore: []
   _sphereCastRadius: 0.3
   _sphereCastMaxLength: 0.5
-  _teleportAnchorTag: LEAP_TELEPORTER
-  _teleportFloorTag: LEAP_FLOOR
 --- !u!1 &7090704561384797356
 GameObject:
   m_ObjectHideFlags: 0

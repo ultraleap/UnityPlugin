@@ -20,7 +20,6 @@ namespace Leap.Unity.Preview.HandRays
         [Tooltip("If true, the points passed to the RayRenderer stop when the ray hits an object, or reaches max distance." +
             "\nIf false, the points passed to the RayRenderer stop when the ray hits the floor, or reaches max distance")]
         public bool stopRayOnHit = false;
-        public SingleLayer floorLayer;
 
         Vector3 evaluateParabola(Vector3 position, Vector3 velocity, Vector3 acceleration, float time)
         {
@@ -62,7 +61,7 @@ namespace Leap.Unity.Preview.HandRays
                             hits = 1;
                         }
 
-                        if(hit.transform.gameObject.layer == floorLayer)
+                        if(hit.transform.gameObject.layer == farFieldLayerManager.FloorLayer)
                         {
                             foundFloor = true;
                         }

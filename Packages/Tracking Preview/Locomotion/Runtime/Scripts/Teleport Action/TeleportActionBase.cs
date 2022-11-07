@@ -10,16 +10,15 @@ namespace Leap.Unity.Preview.Locomotion
         public enum TeleportActionMovementType { FREE, FIXED };
         [Tooltip("If true, when teleporting, the teleport anchor's forward direction will match your headset's world forward direction." +
             "\nIf false, your rotation will be the same way you are currently facing")]
-        public bool useHeadsetForwardRotation = true;
 
         [Header("Teleport Action Setup")]
+        public FarFieldLayerManager farFieldLayerManager;
         [SerializeField] private TeleportAnchor freeTeleportAnchor;
         public HandRayRenderer handRayRenderer = null;
         public HandRayInteractor handRayInteractor = null;
         public TeleportActionMovementType movementType = TeleportActionMovementType.FIXED;
-
-        [SerializeField] private SingleLayer _teleportAnchorLayer;
-        [SerializeField] private SingleLayer _teleportFloorLayer;
+        public bool useHeadsetForwardRotation = true;
+        
         private List<TeleportAnchor> _teleportAnchors = new List<TeleportAnchor>();
 
         /// <summary>
@@ -68,6 +67,11 @@ namespace Leap.Unity.Preview.Locomotion
         {
             if (Head == null) Head = Camera.main.transform;
             if (Player == null) Player = Head.parent.gameObject == null ? Head.gameObject : Head.parent.gameObject;
+            if (farFieldLayerManager == null)
+            {
+                farFieldLayerManager = FindObjectOfType<FarFieldLayerManager>();
+            }
+
 
             if (handRayInteractor != null)
             {
@@ -145,11 +149,11 @@ namespace Leap.Unity.Preview.Locomotion
             {
                 if (movementType == TeleportActionMovementType.FIXED)
                 {  
-                    _validTarget = primaryHit.collider.gameObject.layer == _teleportAnchorLayer && primaryHit.collider.TryGetComponent(out _currentPointVal);
+                    _validTarget = primaryHit.collider.gameObject.layer == farFieldLayerManager.FarFieldObjectLayer && primaryHit.collider.TryGetComponent(out _currentPointVal);
                 }
                 else
                 {
-                    if (primaryHit.collider.gameObject.layer == _teleportFloorLayer)
+                    if (primaryHit.collider.gameObject.layer == farFieldLayerManager.FloorLayer)
                     {
                         freeTeleportAnchor.gameObject.SetActive(true);
                         freeTeleportAnchor.transform.position = primaryHit.point;
@@ -297,6 +301,11 @@ namespace Leap.Unity.Preview.Locomotion
                 Head = Camera.main.transform;
             }
             if (Player == null && Head != null) Player = Head.parent.gameObject == null ? Head.gameObject : Head.parent.gameObject;
+
+            if (farFieldLayerManager == null)
+            {
+                farFieldLayerManager = FindObjectOfType<FarFieldLayerManager>();
+            }
         }
     }
 }

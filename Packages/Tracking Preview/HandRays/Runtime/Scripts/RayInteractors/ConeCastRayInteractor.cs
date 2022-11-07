@@ -8,8 +8,6 @@ namespace Leap.Unity.Preview.HandRays
         public float conecastMaxRadius = 1f;
         public float conecastAngle = 30f;
 
-        public SingleLayer floorLayer;
-
         protected override int UpdateRayInteractorLogic(HandRayDirection handRayDirection, out RaycastHit[] results, out RaycastHit primaryHit)
         {
             int hits = ConeCastExtension.ConeCastAll(handRayDirection.RayOrigin, conecastMaxRadius, handRayDirection.Direction, maxRayDistance, conecastAngle, layerMask, out results);
@@ -24,7 +22,7 @@ namespace Leap.Unity.Preview.HandRays
                 for (int i = 0; i < hits; i++)
                 {
                     //Prioritise other colliders over the floor collider
-                    if (results[i].collider.gameObject.layer != floorLayer || endPos == Vector3.zero)
+                    if (results[i].collider.gameObject.layer != farFieldLayerManager.FloorLayer || endPos == Vector3.zero)
                     {
                         Vector3 point = results[i].collider.transform.position;
                         float newDistance = Vector3.Cross(ray.direction, point - ray.origin).magnitude;

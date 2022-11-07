@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3181448828126822367}
-  m_Layer: 3
+  m_Layer: 0
   m_Name: Rotation Indicators
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -125,7 +125,7 @@ GameObject:
   - component: {fileID: 5986391113671406640}
   - component: {fileID: 5735363209408796233}
   - component: {fileID: 548817556192081509}
-  m_Layer: 3
+  m_Layer: 0
   m_Name: Teleport Anchor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -167,7 +167,7 @@ MonoBehaviour:
     serializedVersion: 2
     rgba: 2868894110
   _idleSize: 5
-  _hightlightedSize: 1
+  _highlightedSize: 1
   _transitionTime: 0.2
 --- !u!64 &548817556192081509
 MeshCollider:

@@ -5,12 +5,14 @@ namespace Leap.Unity.Preview.HandRays
 {
     public abstract class HandRayInteractor : MonoBehaviour
     {
+        public FarFieldLayerManager farFieldLayerManager;
         [SerializeField] private HandRay _handRay;
         public HandRay handRay => _handRay;
 
-        [Tooltip("Note that the Interaction Engine and Physics Hands layers will be ignored automatically.")]
+        [Tooltip("Note that the far field object layer will be added automatically from the FarFieldLayerManager")]
         [Header("Layer Logic")]
-        public LayerMask layerMask;
+        public LayerMask layerMask = 0;
+        public bool autoIncludeFloorLayer = false;
 
         [Header("Events")]
         public Action<RaycastHit[], RaycastHit> OnRaycastUpdate;
@@ -18,7 +20,29 @@ namespace Leap.Unity.Preview.HandRays
         [HideInInspector] public Vector3[] linePoints;
         [HideInInspector] public int numPoints;
 
-        private void OnEnable()
+        protected virtual void Start()
+        {
+            if (farFieldLayerManager == null)
+            {
+                farFieldLayerManager = FindObjectOfType<FarFieldLayerManager>();
+            }
+
+            layerMask |= farFieldLayerManager.FarFieldObjectLayer.layerMask;
+            if (autoIncludeFloorLayer)
+            {
+                layerMask |= farFieldLayerManager.FloorLayer.layerMask;
+            }
+        }
+
+        protected virtual void OnValidate()
+        {
+            if (farFieldLayerManager == null)
+            {
+                farFieldLayerManager = FindObjectOfType<FarFieldLayerManager>();
+            }
+        }
+
+        protected virtual void OnEnable()
         {
             if (_handRay == null)
             {
@@ -32,7 +56,7 @@ namespace Leap.Unity.Preview.HandRays
             _handRay.OnHandRayFrame += UpdateRayInteractor;
         }
 
-        private void OnDisable()
+        protected virtual void OnDisable()
         {
             if (_handRay == null)
             {
@@ -42,7 +66,7 @@ namespace Leap.Unity.Preview.HandRays
             _handRay.OnHandRayFrame -= UpdateRayInteractor;
         }
 
-        private void UpdateRayInteractor(HandRayDirection handRayDirection)
+        protected virtual void UpdateRayInteractor(HandRayDirection handRayDirection)
         {
             UpdateRayInteractorLogic(handRayDirection, out RaycastHit[] allHits, out RaycastHit primaryHit);
             OnRaycastUpdate?.Invoke(allHits, primaryHit);
