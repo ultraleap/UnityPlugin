@@ -7,6 +7,7 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 using Leap.Unity.Preview.HandRays;
+using System;
 using UnityEngine;
 
 namespace Leap.Unity.Preview.Locomotion
@@ -44,6 +45,8 @@ namespace Leap.Unity.Preview.Locomotion
         private Vector3 initialPosition;
         private Quaternion initialRotation;
         private Quaternion initialRotationIndicatorsRotation;
+
+        public Action<TeleportAnchor> OnTeleportedTo;
 
         private void Awake()
         {

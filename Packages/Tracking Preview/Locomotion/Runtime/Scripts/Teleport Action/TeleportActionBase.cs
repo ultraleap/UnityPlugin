@@ -44,7 +44,7 @@ namespace Leap.Unity.Preview.Locomotion
             "\nIf false, your rotation will be the same way you are currently facing")]
         public bool useHeadsetForwardRotationForFixed = true;
         
-        protected TeleportAnchor _currentPoint { get { return _currentPointVal; } private set { _currentPointVal = value; } }
+        protected TeleportAnchor _currentAnchor { get { return _currentAnchorVal; } private set { _currentAnchorVal = value; } }
         protected List<TeleportAnchor> _teleportAnchors = new List<TeleportAnchor>();
         
         protected Vector3 _currentPosition { get; private set; }
@@ -61,16 +61,16 @@ namespace Leap.Unity.Preview.Locomotion
         /// </summary>
         protected bool _currentTeleportAnchorLocked = false;
 
-        private TeleportAnchor _lastHighlightedPoint;
-        private TeleportAnchor _lastTeleportedPoint;
-        private TeleportAnchor _currentPointVal;
+        private TeleportAnchor _lastHighlightedAnchor;
+        private TeleportAnchor _lastTeleportedAnchor;
+        private TeleportAnchor _currentAnchorVal;
 
         /// <summary>
         /// Returns if the current target is a valid place to teleport to
         /// </summary>
-        public bool IsValid { get { return movementType == TeleportActionMovementType.FIXED ? _validTarget : _validPoint; } }
+        public bool IsValid { get { return movementType == TeleportActionMovementType.FIXED ? _validTarget : _validAnchor; } }
         protected bool _validTarget { get; private set; }
-        protected bool _validPoint { get; private set; }
+        protected bool _validAnchor { get; private set; }
 
         /// <summary>
         /// Returns true if the current teleport action is selected
@@ -106,10 +106,10 @@ namespace Leap.Unity.Preview.Locomotion
 
             if (findTeleportAnchorsOnStart)
             {
-                _teleportAnchors = new List<TeleportAnchor>(FindObjectsOfType<TeleportAnchor>());
+                _teleportAnchors = new List<TeleportAnchor>(FindObjectsOfType<TeleportAnchor>(true));
             }
 
-            if(freeTeleportAnchor.GetComponent<MeshCollider>() != null)
+            if (freeTeleportAnchor.GetComponent<MeshCollider>() != null)
             {
                 Destroy(freeTeleportAnchor.GetComponent<MeshCollider>());
             }
@@ -165,9 +165,37 @@ namespace Leap.Unity.Preview.Locomotion
         /// This ensures that all teleport anchors will become visible on the next enable.
         /// This helps prevent situations where you may have moved the player without explicitly teleporting.
         /// </summary>
-        public void ClearLastPoint()
+        public void ClearLastTeleportedAnchor()
         {
-            _lastTeleportedPoint = null;
+            _lastTeleportedAnchor = null;
+        }
+
+        /// <summary>
+        /// Sets the last teleported point - this can be useful when switching teleport actions
+        /// </summary>
+        /// <param name="teleportAnchor"></param>
+        public void SetLastTeleportedAnchor(TeleportAnchor teleportAnchor)
+        {
+            _lastTeleportedAnchor = teleportAnchor;
+        }
+
+        /// <summary>
+        /// Removes a teleport anchor from the list of valid anchors to teleport to in fixed mode.
+        /// </summary>
+        /// <param name="teleportAnchor"></param>
+        public void RemoveTeleportAnchorFromFixedAnchors(TeleportAnchor teleportAnchor)
+        {
+
+        }
+
+        /// <summary>
+        /// Can be used by a class which isn't the teleport action to activate a teleport
+        /// </summary>
+        /// <param name="teleportAnchor"></param>
+        public void TeleportToAnchor(TeleportAnchor teleportAnchor)
+        {
+            _currentAnchor = teleportAnchor;
+            ActivateTeleport(teleportAnchor);
         }
 
         private void OnRayUpdate(RaycastHit[] results, RaycastHit primaryHit)
@@ -179,22 +207,22 @@ namespace Leap.Unity.Preview.Locomotion
 
             if (_currentTeleportAnchorLocked)
             {
-                UpdateCurrentPointRotation();
+                UpdateCurrentAnchorRotation();
                 return;
             }
 
-            _lastHighlightedPoint = _currentPoint;
+            _lastHighlightedAnchor = _currentAnchor;
             _validTarget = false;
-            _validPoint = false;
-            _currentPoint = null;
+            _validAnchor = false;
+            _currentAnchor = null;
             _currentPosition = Vector3.negativeInfinity;
             _currentRotation = Quaternion.identity;
 
             if(results == null || results.Length == 0)
             {
-                if (_lastHighlightedPoint != null)
+                if (_lastHighlightedAnchor != null)
                 {
-                    _lastHighlightedPoint.SetHighlighted(false);
+                    _lastHighlightedAnchor.SetHighlighted(false);
                 }
                 return;
             }
@@ -203,7 +231,7 @@ namespace Leap.Unity.Preview.Locomotion
             {
                 if (movementType == TeleportActionMovementType.FIXED)
                 {  
-                    _validTarget = primaryHit.collider.gameObject.layer == farFieldLayerManager.FarFieldObjectLayer && primaryHit.collider.TryGetComponent(out _currentPointVal);
+                    _validTarget = primaryHit.collider.gameObject.layer == farFieldLayerManager.FarFieldObjectLayer && primaryHit.collider.TryGetComponent(out _currentAnchorVal);
                 }
                 else
                 {
@@ -214,38 +242,38 @@ namespace Leap.Unity.Preview.Locomotion
                         Vector3 rotation = Quaternion.LookRotation(handRayInteractor.handRay.handRayDirection.Direction, Vector3.up).eulerAngles;
                         rotation.x = 0;
                         freeTeleportAnchor.transform.rotation = Quaternion.Euler(rotation);
-                        _currentPoint = freeTeleportAnchor;
-                        _validPoint = true;
+                        _currentAnchor = freeTeleportAnchor;
+                        _validAnchor = true;
                     }
                     else
                     {
-                        _currentPoint = null;
+                        _currentAnchor = null;
                         freeTeleportAnchor.gameObject.SetActive(false);
                     }
                 }
                 handRayRenderer.SetValid(IsValid);
             }
 
-            if (_currentPoint != null)
+            if (_currentAnchor != null)
             {
-                _currentPoint.SetHighlighted(true);
-                _currentPosition = _currentPoint.transform.position;
-                _currentRotation = _currentPoint.transform.rotation;
+                _currentAnchor.SetHighlighted(true);
+                _currentPosition = _currentAnchor.transform.position;
+                _currentRotation = _currentAnchor.transform.rotation;
             }
 
-            if (_currentPoint != _lastHighlightedPoint && _lastHighlightedPoint != null)
+            if (_currentAnchor != _lastHighlightedAnchor && _lastHighlightedAnchor != null)
             {
-                _lastHighlightedPoint.SetHighlighted(false);
+                _lastHighlightedAnchor.SetHighlighted(false);
             }
 
-            UpdateCurrentPointRotation();
+            UpdateCurrentAnchorRotation();
         }
 
-        private void UpdateCurrentPointRotation()
+        private void UpdateCurrentAnchorRotation()
         {
             if (_isSelected && IsValid && _useCustomRotation)
             {
-                _currentPoint.UpdateRotationVisuals(_useCustomRotation ? _customRotation : _currentRotation);
+                _currentAnchor.UpdateRotationVisuals(_useCustomRotation ? _customRotation : _currentRotation);
             }
         }
 
@@ -268,7 +296,7 @@ namespace Leap.Unity.Preview.Locomotion
             }
             for (int i = 0; i < _teleportAnchors.Count; i++)
             {
-                if (selected && _teleportAnchors[i] == _lastTeleportedPoint)
+                if (selected && _teleportAnchors[i] == _lastTeleportedAnchor)
                     continue;
 
                 _teleportAnchors[i].gameObject.SetActive(movementType == TeleportActionMovementType.FIXED && selected);
@@ -276,9 +304,9 @@ namespace Leap.Unity.Preview.Locomotion
 
             if (!selected)
             {
-                if (_currentPoint != null)
+                if (_currentAnchor != null)
                 {
-                    _currentPoint.SetHighlighted(false);
+                    _currentAnchor.SetHighlighted(false);
                 }
 
                 _validTarget = false;
@@ -295,13 +323,13 @@ namespace Leap.Unity.Preview.Locomotion
 
         protected void ActivateTeleport(bool keepActiveAfterTeleport = false)
         {
-            if (_currentPoint != null)
+            if (_currentAnchor != null)
             {
-                _currentPosition = _currentPoint.transform.position;
-                _currentRotation = _currentPoint.transform.rotation;
+                _currentPosition = _currentAnchor.transform.position;
+                _currentRotation = _currentAnchor.transform.rotation;
             }
 
-            _lastTeleportedPoint = _lastHighlightedPoint;
+            _lastTeleportedAnchor = _lastHighlightedAnchor;
             TeleportHere(_currentPosition, _useCustomRotation ? _customRotation : _currentRotation);
             SelectTeleport(keepActiveAfterTeleport);
         }
@@ -311,7 +339,8 @@ namespace Leap.Unity.Preview.Locomotion
             RotatePlayer(newRotation);
             MovePlayer(newPosition);
             handRayInteractor?.handRay?.ResetRay();
-            OnTeleport?.Invoke(_currentPoint, newPosition, newRotation);
+            OnTeleport?.Invoke(_currentAnchor, newPosition, newRotation);
+            _currentAnchor.OnTeleportedTo?.Invoke(_currentAnchor);
         }
 
         private void RotatePlayer(Quaternion newRotation)

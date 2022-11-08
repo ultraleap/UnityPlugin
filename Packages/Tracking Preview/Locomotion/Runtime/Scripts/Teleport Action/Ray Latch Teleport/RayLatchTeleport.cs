@@ -42,7 +42,7 @@ namespace Leap.Unity.Preview.Locomotion
         private TeleportAnchor _latchedAnchor = null;
         private Transform _transformWhenActivated;
 
-        private void OnEnable()
+        protected void OnEnable()
         {
             movementType = TeleportActionMovementType.FIXED;
             grabDetector.OnGrab += OnGrab;
@@ -62,6 +62,11 @@ namespace Leap.Unity.Preview.Locomotion
         public override void Start()
         {
             base.Start();
+
+            if(leapProvider == null)
+            {
+                leapProvider = FindObjectOfType<LeapProvider>();
+            }
 
             _pullUI = GetComponentInChildren<PullUI>();
             _pullUI.gameObject.SetActive(false);
@@ -92,9 +97,9 @@ namespace Leap.Unity.Preview.Locomotion
                 UpdateTeleportSelection(activeHand);
                 if (IsValid)
                 {
-                    if (_currentPoint != _latchedAnchor)
+                    if (_currentAnchor != _latchedAnchor)
                     {
-                        _latchedAnchor = _currentPoint;
+                        _latchedAnchor = _currentAnchor;
                     }
                 }
                 else
