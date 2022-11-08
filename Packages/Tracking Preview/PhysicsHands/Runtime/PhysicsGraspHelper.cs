@@ -228,15 +228,19 @@ namespace Leap.Unity.Interaction.PhysicsHands
         public void ReleaseObject()
         {
             GraspState = State.Hover;
-            if (Manager.HelperMovesObjects && !Ignored)
+            // Make sure the object hasn't been destroyed
+            if (_rigid != null)
             {
-                // Only ever unset the rigidbody values here otherwise outside logic will get confused
-                _rigid.isKinematic = _oldKinematic;
-                _rigid.useGravity = _oldGravity;
-            }
-            if (Manager.EnhanceThrowing && !Ignored)
-            {
-                ThrowingOnRelease();
+                if (Manager.HelperMovesObjects && !Ignored)
+                {
+                    // Only ever unset the rigidbody values here otherwise outside logic will get confused
+                    _rigid.isKinematic = _oldKinematic;
+                    _rigid.useGravity = _oldGravity;
+                }
+                if (Manager.EnhanceThrowing && !Ignored)
+                {
+                    ThrowingOnRelease();
+                }
             }
         }
 
