@@ -6,13 +6,18 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using System;
 using UnityEngine;
 
 namespace Leap.Unity.Preview.HandRays
 {
+    /// <summary>
+    /// Casts a ray out from a position between a wrist offset and the shoulder, through a transform.
+    /// </summary>
     public class TransformWristShoulderHandRay : WristShoulderHandRay
     {
+        /// <summary>
+        /// The transform used to calculate the hand ray's aim position
+        /// </summary>
         public Transform transformToFollow;
 
         protected override Vector3 CalculateVisualAimPosition()

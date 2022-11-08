@@ -1,8 +1,21 @@
+/******************************************************************************
+ * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
+ * Ultraleap proprietary and confidential.                                    *
+ *                                                                            *
+ * Use subject to the terms of the Leap Motion SDK Agreement available at     *
+ * https://developer.leapmotion.com/sdk_agreement, or another agreement       *
+ * between Ultraleap and you, your company or other organization.             *
+ ******************************************************************************/
+using Leap.Unity.Preview.HandRays;
+using System;
 using UnityEngine;
 
 namespace Leap.Unity.Preview.Locomotion
 {
-    public class TeleportAnchor : MonoBehaviour
+    /// <summary>
+    /// A teleport anchor is a point in space a user is able to teleport to
+    /// </summary>
+    public class TeleportAnchor : FarFieldObject
     {
         [SerializeField, Tooltip("The main teleport anchor mesh.")]
         private MeshRenderer _markerMesh = null;
@@ -17,7 +30,7 @@ namespace Leap.Unity.Preview.Locomotion
         private Color32 _highlightedColor = new Color(1, 1, 1, 0.25f);
 
         [SerializeField, Tooltip("A higher value will tile the texture more and appear smaller.")]
-        private float _idleSize = 4f, _hightlightedSize = 1f;
+        private float _idleSize = 4f, _highlightedSize = 1f;
 
         [SerializeField, Tooltip("The speed at which the markers visuals will transition.")]
         private float _transitionTime = 0.2f;
@@ -25,13 +38,15 @@ namespace Leap.Unity.Preview.Locomotion
         private float _oldTransition = 0f;
         private float _currentTransition = 0f;
 
-        protected bool _isHighlighted = false;
+        private bool _isHighlighted = false;
 
         private Material _storedMaterial;
 
         private Vector3 initialPosition;
         private Quaternion initialRotation;
         private Quaternion initialRotationIndicatorsRotation;
+
+        public Action<TeleportAnchor> OnTeleportedTo;
 
         private void Awake()
         {
@@ -48,6 +63,20 @@ namespace Leap.Unity.Preview.Locomotion
             }
         }
 
+        public virtual void Update()
+        {
+            UpdateVisuals();
+        }
+
+        public virtual void OnDisable()
+        {
+            ResetPoint();
+        }
+
+        /// <summary>
+        /// Sets the teleport anchor as highlighted, or unhighlighted
+        /// </summary>
+        /// <param name="highlighted">Whether the teleport anchor is highlighted or unhighlighted</param>
         public void SetHighlighted(bool highlighted = true)
         {
             _isHighlighted = highlighted;
@@ -58,9 +87,13 @@ namespace Leap.Unity.Preview.Locomotion
             }
         }
 
-        public virtual void Update()
+        /// <summary>
+        /// Points the rotation visuals to a new rotation
+        /// </summary>
+        /// <param name="newRotation">The rotation to point the rotation visuals to</param>
+        public void UpdateRotationVisuals(Quaternion newRotation)
         {
-            UpdateVisuals();
+            _rotationIndicators.rotation = newRotation;
         }
 
         private void UpdateVisuals()
@@ -90,17 +123,7 @@ namespace Leap.Unity.Preview.Locomotion
         private void UpdateMaterials()
         {
             _storedMaterial.SetColor("_MainColor", Color.Lerp(_idleColor, _highlightedColor, _currentTransition));
-            _storedMaterial.mainTextureScale = new Vector2(1, Mathf.Lerp(_idleSize, _hightlightedSize, _currentTransition));
-        }
-
-        public virtual void OnDisable()
-        {
-            ResetPoint();
-        }
-
-        public virtual bool IsValid()
-        {
-            return true;
+            _storedMaterial.mainTextureScale = new Vector2(1, Mathf.Lerp(_idleSize, _highlightedSize, _currentTransition));
         }
 
         protected virtual void ResetPoint()
@@ -108,11 +131,6 @@ namespace Leap.Unity.Preview.Locomotion
             transform.position = initialPosition;
             transform.rotation = initialRotation;
             _rotationIndicators.rotation = initialRotationIndicatorsRotation;
-        }
-
-        public void IndicateRotation(Quaternion newRotation)
-        {
-            _rotationIndicators.rotation = newRotation;
         }
     }
 }

@@ -1,12 +1,25 @@
+/******************************************************************************
+ * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
+ * Ultraleap proprietary and confidential.                                    *
+ *                                                                            *
+ * Use subject to the terms of the Leap Motion SDK Agreement available at     *
+ * https://developer.leapmotion.com/sdk_agreement, or another agreement       *
+ * between Ultraleap and you, your company or other organization.             *
+ ******************************************************************************/
 using UnityEngine;
 
 namespace Leap.Unity.Preview.Locomotion
 {
+    /// <summary>
+    /// PinchToTeleport allows you to point with a hand ray interactor and pinch with your hand to teleport where you're pointing to
+    /// It has an optional rotation toggle, which when enabled, whilst pinching allows you to set your rotation by moving your hand horizontally
+    /// </summary>
     public class PinchToTeleport : TeleportActionBase
     {
+        [Header("Pinch To Teleport - Setup")]
         public LeapProvider leapProvider;
 
-        [SerializeField]
+        [SerializeField] 
         private IsFacingObject _isFacingObject;
 
         [SerializeField]
@@ -15,7 +28,9 @@ namespace Leap.Unity.Preview.Locomotion
         [Tooltip("The chirality which will be used for pinch to teleport. This will update the chirality in the pinch detector and hand ray.")]
         public Chirality chirality;
 
-        [Header("Rotation Settings"), Tooltip("If true, allows you to move your hand left/right whilst pinching to control the direction you're facing upon teleporting")]
+        [Header("Pinch To Teleport - Rotation Settings")]
+        [Tooltip("If true, allows you to move your hand left/right whilst pinching to control the direction you're facing upon teleporting" +
+            "\n Not to be used in tandem with useHeadsetForwardRotation.")]
         public bool useRotation = false;
 
         [Tooltip("The distance your hand needs to move to rotate the teleport anchor 180 degrees")]
@@ -39,7 +54,7 @@ namespace Leap.Unity.Preview.Locomotion
             _chiralityLastFrame = chirality;
         }
 
-        private void OnEnable()
+        protected void OnEnable()
         {
             _pinchDetector.OnPinch += OnPinch;
             _pinchDetector.OnPinching += OnPinching;
@@ -103,8 +118,8 @@ namespace Leap.Unity.Preview.Locomotion
             {
                 _pinchTransformHelper.position = hand.PalmPosition;
                 _pinchTransformHelper.rotation = hand.Rotation;
-                _rotationOnPinch = _currentPoint.transform.rotation.eulerAngles;
-                _useCustomRotation = useRotation;
+                _rotationOnPinch = _currentAnchor.transform.rotation.eulerAngles;
+                _useCustomRotation = useRotation && !useHeadsetForwardRotationForFixed;
                 CalculateCustomRotation(hand);
             }
 
@@ -144,7 +159,7 @@ namespace Leap.Unity.Preview.Locomotion
             if (useRotation && IsSelected && IsValid)
             {
                 ActivateTeleport();
-                _currentPoint.transform.rotation = Quaternion.Euler(_rotationOnPinch);
+                _currentAnchor.transform.rotation = Quaternion.Euler(_rotationOnPinch);
                 handRayRenderer.SetActive(true);
                 _currentTeleportAnchorLocked = false;
                 _useCustomRotation = false;

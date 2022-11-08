@@ -1,32 +1,50 @@
+/******************************************************************************
+ * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
+ * Ultraleap proprietary and confidential.                                    *
+ *                                                                            *
+ * Use subject to the terms of the Leap Motion SDK Agreement available at     *
+ * https://developer.leapmotion.com/sdk_agreement, or another agreement       *
+ * between Ultraleap and you, your company or other organization.             *
+ ******************************************************************************/
 using UnityEngine;
 
 namespace Leap.Unity.Preview.Locomotion
 {
+    /// <summary>
+    /// RayLatchTeleport snaps onto the teleport anchor you're pointing at, and teleports you once you pull either up or down.
+    /// Note: Free Teleportation is not currently supported by RayLatchTeleport.
+    /// </summary>
     public class RayLatchTeleport : TeleportActionBase
     {
-        private PullUI _pullUI = null;
-        private TeleportAnchor _latchedAnchor = null;
-
-        private Transform _transformWhenActivated;
-        [SerializeField, Range(0.01f, 0.5f)] private float _distToGrabAndPull = 0.1f;
-
         public enum Direction { UP, DOWN };
-        public Direction rayLatchDirection = Direction.UP;
+        [Header("Ray Latch - Setup")]
         public LeapProvider leapProvider;
-
         public LightweightGrabDetector grabDetector;
-
-        [Tooltip("The chirality which will be used for pinch to teleport. This will update the chirality in the pinch detector and hand ray.")]
-        public Chirality chirality;
-        private Chirality _chiralityLastFrame;
 
         [SerializeField]
         private IsFacingObject _isFacingObject;
 
-        private bool _grabbingLastFrame = false;
+        [Tooltip("The chirality which will be used for teleporting. Setting this will also set the chirality in the grab detector and hand ray.")]
+        public Chirality chirality;
 
-        private void OnEnable()
+        [Tooltip("The direction in which you will need to pull in order to teleport")]
+        public Direction rayLatchDirection = Direction.UP;
+
+        [Header("Ray Latch - Interaction Setup")]
+
+        [Tooltip("How far you will need to pull, in order to activate the teleport")]
+        [SerializeField, Range(0.01f, 0.5f)]
+        private float _distanceToGrabAndPull = 0.1f;
+
+        private Chirality _chiralityLastFrame;
+        private bool _grabbingLastFrame = false;
+        private PullUI _pullUI = null;
+        private TeleportAnchor _latchedAnchor = null;
+        private Transform _transformWhenActivated;
+
+        protected void OnEnable()
         {
+            movementType = TeleportActionMovementType.FIXED;
             grabDetector.OnGrab += OnGrab;
             grabDetector.OnGrabbing += OnGrabbing;
             grabDetector.OnUngrab += OnUngrab;
@@ -45,6 +63,11 @@ namespace Leap.Unity.Preview.Locomotion
         {
             base.Start();
 
+            if(leapProvider == null)
+            {
+                leapProvider = FindObjectOfType<LeapProvider>();
+            }
+
             _pullUI = GetComponentInChildren<PullUI>();
             _pullUI.gameObject.SetActive(false);
 
@@ -54,7 +77,7 @@ namespace Leap.Unity.Preview.Locomotion
             _chiralityLastFrame = chirality;
         }
 
-        void Update()
+        private void Update()
         {
             if (chirality != _chiralityLastFrame)
             {
@@ -74,9 +97,9 @@ namespace Leap.Unity.Preview.Locomotion
                 UpdateTeleportSelection(activeHand);
                 if (IsValid)
                 {
-                    if (_currentPoint != _latchedAnchor)
+                    if (_currentAnchor != _latchedAnchor)
                     {
-                        _latchedAnchor = _currentPoint;
+                        _latchedAnchor = _currentAnchor;
                     }
                 }
                 else
@@ -102,22 +125,23 @@ namespace Leap.Unity.Preview.Locomotion
             grabDetector.chirality = chirality;
         }
 
-        void OnGrab(Hand hand)
+        private void OnGrab(Hand hand)
         {
             if (_latchedAnchor != null && !_grabbingLastFrame)
             {
                 _currentTeleportAnchorLocked = true;
 
-                handRayRenderer.overrideRayInteractor = true;
+                handRayRenderer.ignoreRayInteractor = true;
 
                 _pullUI.gameObject.SetActive(true);
                 _pullUI.transform.position = hand.PalmPosition;
                 _transformWhenActivated.position = hand.PalmPosition;
-                _transformWhenActivated.rotation = Quaternion.LookRotation((hand.PalmPosition - Camera.main.transform.position).normalized.ProjectOnPlane(Vector3.up));
+                Vector3 forward = Vector3.ProjectOnPlane((hand.PalmPosition - Camera.main.transform.position).normalized, Vector3.up);
+                _transformWhenActivated.rotation = Quaternion.LookRotation(forward);
             }
         }
 
-        void OnGrabbing(Hand hand)
+        private void OnGrabbing(Hand hand)
         {
             if (!_currentTeleportAnchorLocked)
             {
@@ -131,11 +155,11 @@ namespace Leap.Unity.Preview.Locomotion
             }
         }
 
-        void OnUngrab(Hand hand)
+        private void OnUngrab(Hand hand)
         {
             _pullUI.gameObject.SetActive(false);
             _currentTeleportAnchorLocked = false;
-            handRayRenderer.overrideRayInteractor = false;
+            handRayRenderer.ignoreRayInteractor = false;
         }
 
         private void UpdatePullUI(Hand hand, out bool hasPulled) 
@@ -146,19 +170,19 @@ namespace Leap.Unity.Preview.Locomotion
             switch (rayLatchDirection)
             {
                 case Direction.UP:
-                    hasPulled = palmPositionRelativeToStart.y > _distToGrabAndPull;
+                    hasPulled = palmPositionRelativeToStart.y > _distanceToGrabAndPull;
                     direction = _transformWhenActivated.up;
                     length = palmPositionRelativeToStart.y;
                     break;
                 default:
                 case Direction.DOWN:
-                    hasPulled = palmPositionRelativeToStart.y < -_distToGrabAndPull;
+                    hasPulled = palmPositionRelativeToStart.y < -_distanceToGrabAndPull;
                     direction = -_transformWhenActivated.up;
                     length = -palmPositionRelativeToStart.y;
                     break;
             }
 
-            _pullUI.SetLength(length, _distToGrabAndPull, direction);
+            _pullUI.SetProgress(length, _distanceToGrabAndPull, direction);
             var lookPos = Camera.main.transform.position - _pullUI.transform.position; lookPos.y = 0;
             _pullUI.transform.rotation = Quaternion.LookRotation(lookPos);
         }
@@ -182,26 +206,14 @@ namespace Leap.Unity.Preview.Locomotion
             }
         }
 
-        /* When teleporter is used, unlatch from it and remember it */
         private void OnTeleportActivated(TeleportAnchor anchor, Vector3 position, Quaternion rotation)
         {
             _currentTeleportAnchorLocked = false;
-            handRayRenderer.overrideRayInteractor = false;
+            handRayRenderer.ignoreRayInteractor = false;
 
             _pullUI.gameObject.SetActive(false);
-            _pullUI.SetLength(0.0f, 1.0f, Vector3.up);
+            _pullUI.SetProgress(0.0f, 1.0f, Vector3.up);
             _latchedAnchor = null;
         }
     }
-    #region Extensions
-
-    public static class RayLatchVector3Extensions
-    {
-        public static Vector3 ProjectOnPlane(this Vector3 v, Vector3 n)
-        {
-            return Vector3.ProjectOnPlane(v, n);
-        }
-    }
-
-    #endregion
 }

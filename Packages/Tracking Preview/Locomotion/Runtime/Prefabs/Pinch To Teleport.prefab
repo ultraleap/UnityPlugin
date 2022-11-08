@@ -47,10 +47,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f902b9a4f38c74143b927f930fb60ee7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  handRayInteractor: {fileID: 1239028838941531412}
   lineRenderer: {fileID: 1239028838941531413}
+  handRayInteractor: {fileID: 1239028838941531412}
   hideRayOnNoPoints: 0
-  overrideRayInteractor: 0
   validColorGradient:
     serializedVersion: 2
     key0: {r: 1, g: 1, b: 1, a: 1}
@@ -122,13 +121,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _handRay: {fileID: 1239028838941531419}
+  farFieldLayerManager: {fileID: 0}
   layerMask:
     serializedVersion: 2
-    m_Bits: 72
+    m_Bits: 0
+  autoIncludeFloorLayer: 1
   linePoints: []
   numPoints: 8
   projectionScale: 10
   handMergeDistance: 0.7
+  stopRayOnHit: 0
 --- !u!114 &1239028838941531419
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -326,15 +328,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f0a9798e186bda438f26bdbd3fc74ec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  useHeadsetForwardRotation: 1
-  freeTeleportAnchor: {fileID: 6821247378321582377}
+  farFieldLayerManager: {fileID: 0}
   handRayRenderer: {fileID: 1239028838941531414}
   handRayInteractor: {fileID: 1239028838941531412}
+  freeTeleportAnchor: {fileID: 6821247378321582377}
   movementType: 1
-  _teleportAnchorLayer:
-    layerIndex: 0
-  _teleportFloorLayer:
-    layerIndex: 0
+  useHeadsetForwardRotation: 1
   findTeleportAnchorsOnStart: 1
   Head: {fileID: 0}
   Player: {fileID: 0}
@@ -361,8 +360,6 @@ MonoBehaviour:
   - layerIndex: 6
   _sphereCastRadius: 0.3
   _sphereCastMaxLength: 0.5
-  _teleportAnchorTag: LEAP_TELEPORTER
-  _teleportFloorTag: LEAP_FLOOR
 --- !u!114 &1239028840639913091
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -394,7 +391,7 @@ PrefabInstance:
     - target: {fileID: 5735363209408796238, guid: 44bc0a3baddb5764981270e8bad5f608,
         type: 3}
       propertyPath: m_Name
-      value: Teleport Anchor
+      value: Free Teleport Anchor
       objectReference: {fileID: 0}
     - target: {fileID: 5735363209408796238, guid: 44bc0a3baddb5764981270e8bad5f608,
         type: 3}

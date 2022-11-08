@@ -1,27 +1,42 @@
-using Leap.Unity;
+/******************************************************************************
+ * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
+ * Ultraleap proprietary and confidential.                                    *
+ *                                                                            *
+ * Use subject to the terms of the Leap Motion SDK Agreement available at     *
+ * https://developer.leapmotion.com/sdk_agreement, or another agreement       *
+ * between Ultraleap and you, your company or other organization.             *
+ ******************************************************************************/
+
 using Leap.Unity.Interaction;
 using Leap.Unity.Interaction.PhysicsHands;
+using Leap.Unity.Preview.HandRays;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace Leap.Unity.Preview.Locomotion
 {
+    /// <summary>
+    /// Small script that detects whether the user is facing an object this frame.
+    /// Useful for contextual activation of interactions.
+    /// Spherecasts out through the user's gaze
+    /// </summary>
     public class IsFacingObject : MonoBehaviour
     {
-        [Tooltip("Note that the Interaction Engine and Physics Hands layers will be ignored automatically.")]
+        [Tooltip("Note that the Interaction Engine, Physics Hands and FarFieldObject layers will be ignored automatically.")]
         [Header("Layer Logic")]
         [SerializeField] private List<SingleLayer> _layersToIgnore = new List<SingleLayer>();
 
         protected LayerMask _layerMask;
 
-        private bool hasCastThisFrame = false;
+        protected bool hasCastThisFrame = false;
 
-        private bool _valueThisFrame = false;
+        protected bool _valueThisFrame = false;
 
+        [Tooltip("Size of the spherecast radius to cast")]
         [SerializeField] private float _sphereCastRadius = 0.3f;
+        [Tooltip("Max distance to spherecast")]
         [SerializeField] private float _sphereCastMaxLength = 0.5f;
-        [SerializeField] private string _teleportAnchorTag = "LEAP_TELEPORTER";
-        [SerializeField] private string _teleportFloorTag = "LEAP_FLOOR";
+
         public bool ValueThisFrame
         {
             get
@@ -60,6 +75,13 @@ namespace Leap.Unity.Preview.Locomotion
                 _layerMask ^= physicsProvider.HandsResetLayer.layerMask;
             }
 
+            FarFieldLayerManager farFieldLayerManager = FindObjectOfType<FarFieldLayerManager>();
+            if (physicsProvider != null)
+            {
+                _layerMask ^= farFieldLayerManager.FarFieldObjectLayer.layerMask;
+                _layerMask ^= farFieldLayerManager.FloorLayer.layerMask;
+            }
+
             foreach (var layers in _layersToIgnore)
             {
                 _layerMask ^= layers.layerMask;
@@ -69,49 +91,7 @@ namespace Leap.Unity.Preview.Locomotion
         private void CheckIfFacingObject()
         {
             Transform head = Camera.main.transform;
-            RaycastHit hit;
-
-            Debug.DrawRay(head.position, head.forward);
-            if (Physics.SphereCast(new Ray(head.position, head.forward), _sphereCastRadius, out hit, _sphereCastMaxLength, _layerMask))
-            {
-                if (hit.transform.tag == _teleportFloorTag || hit.transform.tag == _teleportAnchorTag)
-                {
-                    _valueThisFrame = false;
-
-                }
-                else
-                {
-                    _valueThisFrame = true;
-                }
-            }
-            else
-            {
-                _valueThisFrame = false;
-            }
-        }
-
-        private void OnDrawGizmos()
-        {
-            //TODO - fix this spherecast visualisation
-            //Gizmos.DrawWireSphere(transform.position, _sphereCastMaxLength);
-            //Transform head = Camera.main.transform;
-
-            //RaycastHit hit;
-            //if (Physics.SphereCast(new Ray(head.position, head.forward), _sphereCastRadius, out hit, _sphereCastMaxLength, _layerMask))
-            //{
-            //    Gizmos.color = Color.green;
-            //    Vector3 sphereCastMidpoint = transform.position + (transform.forward * hit.distance);
-            //    Gizmos.DrawWireSphere(sphereCastMidpoint, _sphereCastRadius);
-            //    Gizmos.DrawSphere(hit.point, 0.1f);
-            //    Debug.DrawLine(transform.position, sphereCastMidpoint, Color.green);
-            //}
-            //else
-            //{
-            //    Gizmos.color = Color.red;
-            //    Vector3 sphereCastMidpoint = transform.position + (transform.forward * (_sphereCastMaxLength - _sphereCastRadius));
-            //    Gizmos.DrawWireSphere(sphereCastMidpoint, _sphereCastRadius);
-            //    Debug.DrawLine(transform.position, sphereCastMidpoint, Color.red);
-            //}
+            _valueThisFrame = Physics.SphereCast(new Ray(head.position, head.forward), _sphereCastRadius, out RaycastHit hit, _sphereCastMaxLength, _layerMask);
         }
     }
 }

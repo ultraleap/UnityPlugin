@@ -1,8 +1,19 @@
+/******************************************************************************
+ * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
+ * Ultraleap proprietary and confidential.                                    *
+ *                                                                            *
+ * Use subject to the terms of the Leap Motion SDK Agreement available at     *
+ * https://developer.leapmotion.com/sdk_agreement, or another agreement       *
+ * between Ultraleap and you, your company or other organization.             *
+ ******************************************************************************/
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace Leap.Unity.Preview.HandRays
 {
+    /// <summary>
+    /// Takes in a ray direction and casts it out in a parabolic curve
+    /// </summary>
     public class ParabolicRayInteractor : HandRayInteractor
     {
         [Tooltip("The scale of the projection of any hand distance from the approximated "
@@ -17,10 +28,9 @@ namespace Leap.Unity.Preview.HandRays
 
         private List<Vector3> _parabolaPositions = new List<Vector3>();
 
-        Vector3 evaluateParabola(Vector3 position, Vector3 velocity, Vector3 acceleration, float time)
-        {
-            return position + (velocity * time) + (0.5f * acceleration * (time * time));
-        }
+        [Tooltip("If true, the points passed to the RayRenderer stop when the ray hits an object, or reaches max distance." +
+            "\nIf false, the points passed to the RayRenderer stop when the ray hits the floor, or reaches max distance")]
+        public bool stopRayOnHit = false;
 
         protected override int UpdateRayInteractorLogic(HandRayDirection handRayDirection, out RaycastHit[] results, out RaycastHit primaryHit)
         {
@@ -34,6 +44,7 @@ namespace Leap.Unity.Preview.HandRays
             float projectionAmount = (projectionDistance + 0.15f) * projectionScale;
 
             results = null;
+            bool foundFloor = false;
             int hits = 0;
             if (projectionDistance > 0f)
             {
@@ -47,20 +58,38 @@ namespace Leap.Unity.Preview.HandRays
                     Vector3 segmentEnd = evaluateParabola(startPos, velocity, Physics.gravity * 0.25f, i + 0.1f);
                     _parabolaPositions.Add(segmentEnd);
 
-                    if (Physics.Raycast(new Ray(segmentStart, segmentEnd - segmentStart), out primaryHit, Vector3.Distance(segmentStart, segmentEnd), layerMask))
+                    if (Physics.Raycast(new Ray(segmentStart, segmentEnd - segmentStart), out RaycastHit hit, Vector3.Distance(segmentStart, segmentEnd), layerMask))
                     {
-                        hits = 1;
-                        _parabolaPositions.Add(primaryHit.point);
-                        results = new RaycastHit[] { primaryHit };
+                        if (hits == 0)
+                        {
+                            primaryHit = hit;
+                            results = new RaycastHit[] { primaryHit };
+                            hits = 1;
+                        }
+
+                        if(hit.transform.gameObject.layer == farFieldLayerManager.FloorLayer)
+                        {
+                            foundFloor = true;
+                        }
+
+                        _parabolaPositions.Add(hit.point);
                     }
 
-                    if (hits == 1) { break; }
+                    if((hits == 1 && stopRayOnHit) || (foundFloor && !stopRayOnHit))
+                    { 
+                        break;
+                    }
                 }
             }
 
             linePoints = _parabolaPositions.ToArray();
             numPoints = linePoints.Length;
             return hits;
+        }
+
+        private Vector3 evaluateParabola(Vector3 position, Vector3 velocity, Vector3 acceleration, float time)
+        {
+            return position + (velocity * time) + (0.5f * acceleration * (time * time));
         }
     }
 }

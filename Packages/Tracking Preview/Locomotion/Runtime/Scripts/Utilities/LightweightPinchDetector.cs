@@ -1,8 +1,20 @@
+/******************************************************************************
+ * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
+ * Ultraleap proprietary and confidential.                                    *
+ *                                                                            *
+ * Use subject to the terms of the Leap Motion SDK Agreement available at     *
+ * https://developer.leapmotion.com/sdk_agreement, or another agreement       *
+ * between Ultraleap and you, your company or other organization.             *
+ ******************************************************************************/
 using System;
 using UnityEngine;
 
 namespace Leap.Unity.Preview.Locomotion
 {
+    /// <summary>
+    /// A lightweight Pinch Detector, that calculates a pinch value based on the distance between the 
+    /// index tip and the thumb tip. Utilises hysteresis in order to have different pinch and unpinch thresholds.
+    /// </summary>
     public class LightweightPinchDetector : MonoBehaviour
     {
         public LeapProvider leapProvider;
@@ -10,12 +22,13 @@ namespace Leap.Unity.Preview.Locomotion
 
         [Header("Pinch Activation Settings")]
         [Tooltip("The distance between index and thumb at which to enter the pinching state.")]
-        public float activateDistance = .018f;
+        public float activateDistance = 0.018f;
         [Tooltip("The distance between index and thumb at which to leave the pinching state.")]
-        public float deactivateDistance = .024f;
+        public float deactivateDistance = 0.024f;
 
         public Action<Hand> OnPinch, OnUnpinch, OnPinching;
 
+        public bool IsPinching { get; private set; }
         /// <summary>
         /// The percent value (0-1) between the activate distance and absolute pinch.
         /// Note that it is virtually impossible for the hand to be completely pinched.
@@ -23,8 +36,6 @@ namespace Leap.Unity.Preview.Locomotion
         public float SquishPercent { get; private set; }
 
         private Chirality _chiralityLastFrame;
-
-        public bool IsPinching { get; private set; }
 
         private void Start()
         {
@@ -52,7 +63,10 @@ namespace Leap.Unity.Preview.Locomotion
                 return;
             }
 
-            if (hand.PinchDistance * 0.001f < activateDistance)
+            // Convert from mm to m
+            float pinchDistance = hand.PinchDistance * 0.001f;
+            
+            if (pinchDistance < activateDistance)
             {
                 if (!IsPinching)
                 {
@@ -65,7 +79,7 @@ namespace Leap.Unity.Preview.Locomotion
 
                 IsPinching = true;
             }
-            else if (hand.PinchDistance * 0.001f > deactivateDistance)
+            else if (pinchDistance > deactivateDistance)
             {
                 if (IsPinching)
                 {
@@ -76,7 +90,7 @@ namespace Leap.Unity.Preview.Locomotion
 
             if (IsPinching)
             {
-                SquishPercent = Mathf.InverseLerp(activateDistance, 0, hand.PinchDistance * 0.001f);
+                SquishPercent = Mathf.InverseLerp(activateDistance, 0, pinchDistance);
             }
             else
             {

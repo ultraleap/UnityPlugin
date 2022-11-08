@@ -191,7 +191,7 @@ GameObject:
   - component: {fileID: 3353867236534347363}
   - component: {fileID: 3353867236534347362}
   m_Layer: 0
-  m_Name: Attachment Hands with Jump Gems
+  m_Name: Jump Gem Attachment Hands
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

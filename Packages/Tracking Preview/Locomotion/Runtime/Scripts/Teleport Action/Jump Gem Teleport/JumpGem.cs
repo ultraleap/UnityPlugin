@@ -1,10 +1,20 @@
+/******************************************************************************
+ * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
+ * Ultraleap proprietary and confidential.                                    *
+ *                                                                            *
+ * Use subject to the terms of the Leap Motion SDK Agreement available at     *
+ * https://developer.leapmotion.com/sdk_agreement, or another agreement       *
+ * between Ultraleap and you, your company or other organization.             *
+ ******************************************************************************/
 using UnityEngine;
 using System;
 using Leap.Unity.Attachments;
-using Leap.Unity.Preview.HandRays;
 
 namespace Leap.Unity.Preview.Locomotion
 {
+    /// <summary>
+    /// Used in conjunction with JumpGemTeleport, a Jump Gem can be pinched, aimed and released in order to teleport
+    /// </summary>
     [RequireComponent(typeof(LightweightPinchDetector))]
     public class JumpGem : MonoBehaviour
     {
@@ -50,6 +60,9 @@ namespace Leap.Unity.Preview.Locomotion
 
         [SerializeField, Tooltip("Decides whether the above gradient will also affect the emission value of the material.")]
         private bool _gradientControlsEmission = true;
+
+        [SerializeField, Tooltip("Controls the vibrancy of the emission amount."), Range(0, 1f)]
+        private float _gradientEmissionAmount = 0.5f;
 
         [SerializeField, Header("Audio"), Tooltip("Audio source on the gem to use for all of the specified clips below.")]
         private AudioSource _audioSource = null;
@@ -283,6 +296,9 @@ namespace Leap.Unity.Preview.Locomotion
             }
         }
 
+        /// <summary>
+        /// Checks to see which hand is closest. Returning false means that there is no hand present.
+        /// </summary>
         private bool GetClosestHand(out Chirality chirality, out Vector3 pinchPosition)
         {
             chirality = Chirality.Left;
@@ -505,6 +521,9 @@ namespace Leap.Unity.Preview.Locomotion
             }
         }
 
+        /// <summary>
+        /// Update the visuals of the gem. This should happen after all processing has occurred so the visuals and data are in the correct step.
+        /// </summary>
         protected virtual void UpdateGemVisual()
         {
             // Interpolate the sizes of the gem when pinched
@@ -520,7 +539,7 @@ namespace Leap.Unity.Preview.Locomotion
                 // Full emission colors are very bright so tone it down a bit
                 float h, s, v;
                 Color.RGBToHSV(gradientColor, out h, out s, out v);
-                v *= .5f;
+                v *= _gradientEmissionAmount;
                 gradientColor = Color.HSVToRGB(h, s, v);
 
                 _meshRenderer.materials[0].SetColor("_EmissionColor", gradientColor);
