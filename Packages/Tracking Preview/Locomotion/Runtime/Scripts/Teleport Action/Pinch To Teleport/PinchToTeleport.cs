@@ -16,7 +16,7 @@ namespace Leap.Unity.Preview.Locomotion
     /// </summary>
     public class PinchToTeleport : TeleportActionBase
     {
-        [Header("Pinch To Teleport Setup")]
+        [Header("Pinch To Teleport - Setup")]
         public LeapProvider leapProvider;
 
         [SerializeField] 
@@ -28,7 +28,7 @@ namespace Leap.Unity.Preview.Locomotion
         [Tooltip("The chirality which will be used for pinch to teleport. This will update the chirality in the pinch detector and hand ray.")]
         public Chirality chirality;
 
-        [Header("Pinch To Teleport Rotation Settings")]
+        [Header("Pinch To Teleport - Rotation Settings")]
         [Tooltip("If true, allows you to move your hand left/right whilst pinching to control the direction you're facing upon teleporting" +
             "\n Not to be used in tandem with useHeadsetForwardRotation.")]
         public bool useRotation = false;
@@ -119,7 +119,7 @@ namespace Leap.Unity.Preview.Locomotion
                 _pinchTransformHelper.position = hand.PalmPosition;
                 _pinchTransformHelper.rotation = hand.Rotation;
                 _rotationOnPinch = _currentPoint.transform.rotation.eulerAngles;
-                _useCustomRotation = useRotation && !useHeadsetForwardRotation;
+                _useCustomRotation = useRotation && !useHeadsetForwardRotationForFixed;
                 CalculateCustomRotation(hand);
             }
 

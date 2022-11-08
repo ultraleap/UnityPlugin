@@ -1,10 +1,20 @@
+/******************************************************************************
+ * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
+ * Ultraleap proprietary and confidential.                                    *
+ *                                                                            *
+ * Use subject to the terms of the Leap Motion SDK Agreement available at     *
+ * https://developer.leapmotion.com/sdk_agreement, or another agreement       *
+ * between Ultraleap and you, your company or other organization.             *
+ ******************************************************************************/
 using UnityEngine;
 using System;
 using Leap.Unity.Attachments;
-using Leap.Unity.Preview.HandRays;
 
 namespace Leap.Unity.Preview.Locomotion
 {
+    /// <summary>
+    /// Used in conjunction with JumpGemTeleport, a Jump Gem can be pinched, aimed and released in order to teleport
+    /// </summary>
     [RequireComponent(typeof(LightweightPinchDetector))]
     public class JumpGem : MonoBehaviour
     {

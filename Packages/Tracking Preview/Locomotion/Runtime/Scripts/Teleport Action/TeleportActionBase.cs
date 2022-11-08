@@ -24,7 +24,7 @@ namespace Leap.Unity.Preview.Locomotion
     {
         public enum TeleportActionMovementType { FREE, FIXED };
 
-        [Header("Teleport Action Base Setup")]
+        [Header("Teleport Action Base - Setup")]
         public FarFieldLayerManager farFieldLayerManager;
         public HandRayRenderer handRayRenderer = null;
         public HandRayInteractor handRayInteractor = null;
@@ -35,14 +35,14 @@ namespace Leap.Unity.Preview.Locomotion
         [Tooltip("If set to true, the teleport action base will find all teleport anchors on start")]
         public bool findTeleportAnchorsOnStart = true;
 
-        [Header("Teleport Action Base Interaction Setup")]
+        [Header("Teleport Action Base - Interaction Setup")]
 
         [Tooltip("If set to FIXED, you can only teleport to anchors in the world. If set to FREE, you can teleport anywhere you point.")]
         public TeleportActionMovementType movementType = TeleportActionMovementType.FIXED;
 
         [Tooltip("If true, when teleporting, the teleport anchor's forward direction will match your headset's world forward direction." +
             "\nIf false, your rotation will be the same way you are currently facing")]
-        public bool useHeadsetForwardRotation = true;
+        public bool useHeadsetForwardRotationForFixed = true;
         
         protected TeleportAnchor _currentPoint { get { return _currentPointVal; } private set { _currentPointVal = value; } }
         protected List<TeleportAnchor> _teleportAnchors = new List<TeleportAnchor>();
@@ -316,7 +316,7 @@ namespace Leap.Unity.Preview.Locomotion
 
         private void RotatePlayer(Quaternion newRotation)
         {
-            if (useHeadsetForwardRotation)
+            if (movementType == TeleportActionMovementType.FIXED && useHeadsetForwardRotationForFixed)
             {
                 Player.transform.rotation = Quaternion.Euler(0, newRotation.eulerAngles.y, 0);
             }

@@ -17,7 +17,7 @@ namespace Leap.Unity.Preview.Locomotion
     public class RayLatchTeleport : TeleportActionBase
     {
         public enum Direction { UP, DOWN };
-        [Header("Ray Latch Setup")]
+        [Header("Ray Latch - Setup")]
         public LeapProvider leapProvider;
         public LightweightGrabDetector grabDetector;
 
@@ -30,7 +30,7 @@ namespace Leap.Unity.Preview.Locomotion
         [Tooltip("The direction in which you will need to pull in order to teleport")]
         public Direction rayLatchDirection = Direction.UP;
 
-        [Header("Ray Latch Interaction Setup")]
+        [Header("Ray Latch - Interaction Setup")]
 
         [Tooltip("How far you will need to pull, in order to activate the teleport")]
         [SerializeField, Range(0.01f, 0.5f)]

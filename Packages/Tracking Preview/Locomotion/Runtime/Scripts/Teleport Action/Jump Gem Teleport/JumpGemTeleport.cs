@@ -1,3 +1,11 @@
+/******************************************************************************
+ * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
+ * Ultraleap proprietary and confidential.                                    *
+ *                                                                            *
+ * Use subject to the terms of the Leap Motion SDK Agreement available at     *
+ * https://developer.leapmotion.com/sdk_agreement, or another agreement       *
+ * between Ultraleap and you, your company or other organization.             *
+ ******************************************************************************/
 using Leap.Unity.Preview.HandRays;
 using System;
 using System.Collections.Generic;
@@ -13,23 +21,25 @@ namespace Leap.Unity.Preview.Locomotion
     public class JumpGemTeleport : TeleportActionBase
     {
         private List<JumpGem> _jumpGems = new List<JumpGem>();
-        private JumpGem _pinchedGem;
-        public JumpGem PinchedGem => _pinchedGem;
 
+        public JumpGem PinchedGem => _pinchedGem;
+        private JumpGem _pinchedGem;
+
+        [Header("Jump Gem Teleport - Interaction Setup")]
         [SerializeField, Range(0.0001f,1f), Tooltip("The distance the user has to pinch a gem before the ray will be activated.")]
         private float _minimumDistanceToActivate = 0.1f;
+        /// <summary>
+        /// The distance the user has to pinch a gem before the ray will be activated.
+        /// </summary>
         public float DistanceToActivate => _minimumDistanceToActivate;
 
-        [Tooltip("When using free locomotion, this should be a pre-assigned object. When using fixed, it will automatically obtain it from the elements in the scene.")]
-        public Transform targetLocation = null;
-
-        private Transform _head;
-
-        public Action<bool> OnJewelPinched;
+        /// <summary>
+        /// Called when the gem is pinched or unpinched - passes true if pinched, or false if released
+        /// </summary>
+        public Action<bool> OnGemPinched;
 
         private void Awake()
         {
-            _head = Camera.main.transform;
             _jumpGems = FindObjectsOfType<JumpGem>(true).ToList();
             for (int i = 0; i < _jumpGems.Count; i++)
             {
@@ -43,25 +53,6 @@ namespace Leap.Unity.Preview.Locomotion
         {
             ChangeVisibleJewels();
             ProcessPinchedJewel();
-            if (movementType == TeleportActionMovementType.FIXED)
-            {
-                _useCustomRotation = false;
-                targetLocation.gameObject.SetActive(false);
-            }
-            else
-            {
-                _useCustomRotation = true;
-                _customRotation = _head.rotation;
-                targetLocation.gameObject.SetActive(IsSelected && IsValid);
-                if (_pinchedGem != null && IsSelected && IsValid)
-                {
-                    try
-                    {
-                        targetLocation.position = _currentPosition;
-                    }
-                    catch { }
-                }
-            }
         }
 
         /// <summary>
@@ -123,7 +114,7 @@ namespace Leap.Unity.Preview.Locomotion
             {
                 ((TransformWristShoulderHandRay)handRayInteractor.handRay).transformToFollow = _jumpGems[index].PinchItem;
             }
-            OnJewelPinched?.Invoke(true);
+            OnGemPinched?.Invoke(true);
         }
 
         /// <summary>
@@ -144,7 +135,7 @@ namespace Leap.Unity.Preview.Locomotion
             {
                 SelectTeleport(false);
             }
-            OnJewelPinched?.Invoke(false);
+            OnGemPinched?.Invoke(false);
         }
     }
 }
