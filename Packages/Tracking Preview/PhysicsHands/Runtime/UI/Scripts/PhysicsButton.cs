@@ -54,16 +54,16 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
         #region Events
 
-        [SerializeField, Header("Events")]
+        [SerializeField, Header("Events"), Tooltip("This event will only take into account hand presence and will not fire if only an object is used to hover it.")]
         private UnityEvent _OnHover = new UnityEvent();
 
-        [SerializeField]
+        [SerializeField, Tooltip("This event will only take into account hand presence and will not fire if only an object is used to hover it.")]
         private UnityEvent _OnUnhover = new UnityEvent();
 
-        [SerializeField]
+        [SerializeField, Tooltip("This event will only take into account hand presence and will not fire if only an object is used to hover it.")]
         private UnityEvent _OnContact = new UnityEvent();
 
-        [SerializeField]
+        [SerializeField, Tooltip("This event will only take into account hand presence and will not fire if only an object is used to hover it.")]
         private UnityEvent _OnUncontact = new UnityEvent();
 
         [SerializeField]
@@ -78,10 +78,22 @@ namespace Leap.Unity.Interaction.PhysicsHands
         public Action OnPress = () => { };
         public Action OnUnpress = () => { };
 
+        /// <summary>
+        /// This event will only take into account hand presence and will not fire if only an object is used to hover it.
+        /// </summary>
         public Action OnHover = () => { };
+        /// <summary>
+        /// This event will only take into account hand presence and will not fire if only an object is used to hover it.
+        /// </summary>
         public Action OnUnhover = () => { };
 
+        /// <summary>
+        /// This event will only take into account hand presence and will not fire if only an object is used to hover it.
+        /// </summary>
         public Action OnContact = () => { };
+        /// <summary>
+        /// This event will only take into account hand presence and will not fire if only an object is used to hover it.
+        /// </summary>
         public Action OnUncontact = () => { };
 
         public Action<float> OnPressedAmountChanged = (value) => { };
@@ -250,14 +262,6 @@ namespace Leap.Unity.Interaction.PhysicsHands
                                 // Small wait to reduce erroneous uncontact events
                                 _contactReleaseTime = 10;
                             }
-
-                            if(!_isPressed && _buttonElement.transform.localPosition.y <= buttonHeightLimit * 0.01f)
-                            {
-                                _isPressed = true;
-                                _pressedThisFrame = true;
-                                OnPress?.Invoke();
-                            }
-
                             break;
                     }
                 }
@@ -276,7 +280,14 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 }
             }
 
-            if(_isPressed && _buttonElement.transform.localPosition.y >= buttonHeightLimit * 0.04f)
+            if (!_isPressed && _buttonElement.transform.localPosition.y <= buttonHeightLimit * 0.01f)
+            {
+                _isPressed = true;
+                _pressedThisFrame = true;
+                OnPress?.Invoke();
+            }
+
+            if (_isPressed && _buttonElement.transform.localPosition.y >= buttonHeightLimit * 0.05f)
             {
                 _isPressed = false;
                 _unpressedThisFrame = true;
@@ -303,6 +314,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             if (_buttonElement == null)
                 return;
 
+            _rigidbody.mass = 1f;
             _rigidbody.isKinematic = true;
             _rigidbody.useGravity = false;
             _rigidbody.collisionDetectionMode = CollisionDetectionMode.ContinuousSpeculative;
