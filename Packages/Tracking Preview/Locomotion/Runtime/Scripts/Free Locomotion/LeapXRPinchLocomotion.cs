@@ -8,7 +8,7 @@
 
 using UnityEngine;
 
-namespace Leap.Unity
+namespace Leap.Unity.Preview.Locomotion
 {
 
     /// <summary>Ensure this script is on your player object and 
