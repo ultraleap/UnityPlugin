@@ -64,7 +64,7 @@ namespace Ultraleap.Tracking.OpenXR
 
             [DllImport(NativeDLL, EntryPoint = NativePrefix + "OnAppSpaceChange", ExactSpelling = true)]
             internal static extern void OnAppSpaceChange(ulong xrSpace);
-            
+
             [DllImport(NativeDLL, EntryPoint = NativePrefix + "IsHandTrackingSupported", ExactSpelling = true)]
             internal static extern bool IsHandTrackingSupported();
 
@@ -131,7 +131,7 @@ namespace Ultraleap.Tracking.OpenXR
                 Debug.LogWarning("Hand tracking is not support currently on this device");
                 return;
             }
-            
+
             int result = Native.CreateHandTrackers(JointSet);
             if (IsResultFailure(result))
             {
@@ -145,7 +145,7 @@ namespace Ultraleap.Tracking.OpenXR
             {
                 return;
             }
-            
+
             int result = Native.DestroyHandTrackers();
             if (IsResultFailure(result))
             {
@@ -159,7 +159,7 @@ namespace Ultraleap.Tracking.OpenXR
             {
                 return false;
             }
-            
+
             int result = Native.LocateHandJoints(handedness, out uint isActive, handJointLocations,
                 (uint)handJointLocations.Length);
             if (IsResultFailure(result))

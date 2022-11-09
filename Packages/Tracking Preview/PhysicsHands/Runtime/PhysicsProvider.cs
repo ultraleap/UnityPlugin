@@ -533,7 +533,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                     radius *= 1.8f;
                 }
                 else
-                { 
+                {
                     // Inflate the bones slightly
                     _tempVector.x = 0;
                     _tempVector.z = 0;
