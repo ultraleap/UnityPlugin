@@ -69,7 +69,15 @@ namespace Leap.Unity.Preview.HandRays
         protected virtual void OnRaycastStateChange(HandRayDirection direction, bool enabled)
         {
             _isRayEnabled = enabled;
-            SetActive(enabled);
+
+            if (_ignoreRayInteractor)
+            {
+                lineRenderer.enabled = _isActive;
+            }
+            else
+            {
+                lineRenderer.enabled = _isActive && _isRayEnabled;
+            }
         }
 
         /// <summary>

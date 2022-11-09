@@ -26,6 +26,21 @@ namespace Leap.Unity.Preview.HandRays
             }
         }
 
+        protected override void OnRaycastStateChange(HandRayDirection direction, bool enabled)
+        {
+            _isRayEnabled = enabled;
+
+            if (_ignoreRayInteractor)
+            {
+                sphere.gameObject.SetActive(_isActive);
+            }
+            else
+            {
+                sphere.gameObject.SetActive(_isActive && _isRayEnabled);
+            }
+        }
+    
+
         /// <summary>
         /// Sets whether the ray is over a valid point or not
         /// </summary>
