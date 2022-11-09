@@ -13,7 +13,7 @@ namespace Leap.Unity.Preview.HandRays
     /// <summary>
     /// Renders a line based on a handRayInteractor's data
     /// </summary>
-    public class HandRayRenderer : MonoBehaviour
+    public class HandRayLineRenderer : HandRayRenderer
     {
         public LineRenderer lineRenderer;
 
@@ -69,7 +69,15 @@ namespace Leap.Unity.Preview.HandRays
         protected virtual void OnRaycastStateChange(HandRayDirection direction, bool enabled)
         {
             _isRayEnabled = enabled;
-            SetActive(enabled);
+
+            if (_ignoreRayInteractor)
+            {
+                lineRenderer.enabled = _isActive;
+            }
+            else
+            {
+                lineRenderer.enabled = _isActive && _isRayEnabled;
+            }
         }
 
         /// <summary>
@@ -106,7 +114,7 @@ namespace Leap.Unity.Preview.HandRays
                 return;
             }
 
-            if(hideRayOnNoPoints && (results == null || results.Length == 0))
+            if (hideRayOnNoPoints && (results == null || results.Length == 0))
             {
                 lineRenderer.positionCount = 0;
                 return;
