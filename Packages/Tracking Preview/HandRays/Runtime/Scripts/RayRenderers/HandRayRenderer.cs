@@ -21,16 +21,16 @@ namespace Leap.Unity.Preview.HandRays
         /// If true, the ray renderer ignores the points given by the ray interactor.
         /// </summary>
         public bool ignoreRayInteractor { get { return _ignoreRayInteractor; } set { _ignoreRayInteractor = value; } }
-        private bool _ignoreRayInteractor = false;
+        protected bool _ignoreRayInteractor = false;
 
         [Tooltip("The handRayInteractor the RayRenderer gets its points from")]
         public HandRayInteractor handRayInteractor;
         [Tooltip("If enabled, the ray is hidden when no points are provided by the hand ray interactor")]
         public bool hideRayOnNoPoints = false;
 
-        private bool _isRayEnabled = true;
-        private bool _isActive = true;
-        private bool _isValid = true;
+        protected bool _isRayEnabled = true;
+        protected bool _isActive = true;
+        protected bool _isValid = true;
 
         [SerializeField, Tooltip("The colour the ray turns when hovering over a valid point")]
         public Gradient validColorGradient = new Gradient
@@ -66,7 +66,7 @@ namespace Leap.Unity.Preview.HandRays
             }
         }
 
-        private void OnRaycastStateChange(HandRayDirection direction, bool enabled)
+        protected virtual void OnRaycastStateChange(HandRayDirection direction, bool enabled)
         {
             _isRayEnabled = enabled;
 
@@ -114,7 +114,7 @@ namespace Leap.Unity.Preview.HandRays
                 return;
             }
 
-            if(hideRayOnNoPoints && (results == null || results.Length == 0 && hideRayOnNoPoints))
+            if(hideRayOnNoPoints && (results == null || results.Length == 0))
             {
                 lineRenderer.positionCount = 0;
                 return;

@@ -5,6 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.XR.Management;
+using UnityEngine.XR.OpenXR;
 using Bone = Leap.Bone;
 using Hand = Leap.Hand;
 
@@ -49,17 +51,31 @@ namespace Ultraleap.Tracking.OpenXR
             }
         }
 
+        public override bool CanProvideData { get { return CheckOpenXRAvailable(); } }
+
+        private bool CheckOpenXRAvailable()
+        {
+            if (XRGeneralSettings.Instance.Manager.activeLoader.name == "Open XR Loader" &&
+                OpenXRSettings.Instance.GetFeature<HandTrackingFeature>() != null &&
+                OpenXRSettings.Instance.GetFeature<HandTrackingFeature>().SupportsHandTracking)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
         private void Update()
         {
             PopulateLeapFrame(ref _updateFrame);
 
-            Pose trackerTransform = new Pose(Vector3.zero, Quaternion.identity);
+            LeapTransform trackerTransform = new LeapTransform(Vector3.zero, Quaternion.identity, Vector3.one);
 
             // Adjust for relative transform if it's in use.
             var trackedPoseDriver = mainCamera.GetComponent<UnityEngine.SpatialTracking.TrackedPoseDriver>();
             if (trackedPoseDriver != null && trackedPoseDriver.UseRelativeTransform)
             {
-                trackerTransform.position += trackedPoseDriver.originPose.position;
+                trackerTransform.translation += trackedPoseDriver.originPose.position;
                 trackerTransform.rotation *= trackedPoseDriver.originPose.rotation;
             }
 
@@ -67,13 +83,16 @@ namespace Ultraleap.Tracking.OpenXR
             var parentTransform = mainCamera.transform.parent;
             if (parentTransform != null)
             {
-                trackerTransform.position += parentTransform.position;
+                trackerTransform.translation += parentTransform.position;
                 trackerTransform.rotation *= parentTransform.rotation;
+                trackerTransform.scale = parentTransform.lossyScale;
+            }
+            else
+            {
+                trackerTransform.scale = transform.lossyScale;
             }
 
-            _currentFrame = _updateFrame.TransformedCopy(new LeapTransform(
-                trackerTransform.position,
-                trackerTransform.rotation));
+            _currentFrame = _updateFrame.TransformedCopy(trackerTransform);
 
             DispatchUpdateFrameEvent(_currentFrame);
         }

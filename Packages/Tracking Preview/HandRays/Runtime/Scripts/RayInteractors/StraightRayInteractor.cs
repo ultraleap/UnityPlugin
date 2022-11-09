@@ -28,7 +28,7 @@ namespace Leap.Unity.Preview.HandRays
             {
                 hits = 1;
                 results = new RaycastHit[] { primaryHit };
-                linePoints = new Vector3[] { handRayDirection.VisualAimPosition, primaryHit.collider.transform.position };
+                linePoints = new Vector3[] { handRayDirection.VisualAimPosition, primaryHit.point};
             } 
             else
             {

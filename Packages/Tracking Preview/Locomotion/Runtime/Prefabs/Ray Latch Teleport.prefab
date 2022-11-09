@@ -210,7 +210,7 @@ MonoBehaviour:
   linePoints: []
   numPoints: 0
   maxRayDistance: 50
-  conecastMaxRadius: 1
+  conecastMaxRadius: 3
   conecastAngle: 30
 --- !u!114 &2816721751959635280
 MonoBehaviour:
@@ -624,11 +624,11 @@ MonoBehaviour:
   handRayRenderer: {fileID: 7090704560414030346}
   handRayInteractor: {fileID: 7090704560414030349}
   freeTeleportAnchor: {fileID: 3314407747814847813}
-  movementType: 1
-  useHeadsetForwardRotation: 1
-  findTeleportAnchorsOnStart: 1
   Head: {fileID: 0}
   Player: {fileID: 0}
+  findTeleportAnchorsOnStart: 1
+  movementType: 1
+  useHeadsetForwardRotationForFixed: 1
   leapProvider: {fileID: 0}
   grabDetector: {fileID: 6649805490014903038}
   _isFacingObject: {fileID: 6162318093243395883}
