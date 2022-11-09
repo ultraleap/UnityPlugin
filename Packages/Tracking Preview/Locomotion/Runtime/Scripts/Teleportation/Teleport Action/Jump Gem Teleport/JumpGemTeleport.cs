@@ -49,8 +49,9 @@ namespace Leap.Unity.Preview.Locomotion
             }
         }
 
-        private void Update()
+        protected override void Update()
         {
+            base.Update();
             ChangeVisibleJewels();
             ProcessPinchedJewel();
         }

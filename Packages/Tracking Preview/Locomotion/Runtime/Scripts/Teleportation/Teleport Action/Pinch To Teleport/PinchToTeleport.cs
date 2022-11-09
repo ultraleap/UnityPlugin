@@ -76,8 +76,10 @@ namespace Leap.Unity.Preview.Locomotion
             _pinchDetector.chirality = chirality;
         }
 
-        private void Update()
+        protected override void Update()
         {
+            base.Update();
+
             if(chirality != _chiralityLastFrame)
             {
                 UpdateChirality();

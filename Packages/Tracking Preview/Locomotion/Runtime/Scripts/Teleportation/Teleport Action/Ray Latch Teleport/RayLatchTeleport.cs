@@ -6,6 +6,7 @@
  * https://developer.leapmotion.com/sdk_agreement, or another agreement       *
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
+using Leap.Unity.Preview.HandRays;
 using UnityEngine;
 
 namespace Leap.Unity.Preview.Locomotion
@@ -20,6 +21,8 @@ namespace Leap.Unity.Preview.Locomotion
         [Header("Ray Latch - Setup")]
         public LeapProvider leapProvider;
         public LightweightGrabDetector grabDetector;
+        public GameObject FixedHandRay;
+        public GameObject FreeHandRay;
 
         [SerializeField]
         private IsFacingObject _isFacingObject;
@@ -44,11 +47,15 @@ namespace Leap.Unity.Preview.Locomotion
 
         protected void OnEnable()
         {
-            movementType = TeleportActionMovementType.FIXED;
+            //movementType = TeleportActionMovementType.FIXED;
             grabDetector.OnGrab += OnGrab;
             grabDetector.OnGrabbing += OnGrabbing;
             grabDetector.OnUngrab += OnUngrab;
 
+            OnTeleport += OnTeleportActivated;
+            OnMovementTypeChanged += MovementTypeChanged;
+
+            OnMovementTypeChanged(movementType);
             UpdateChirality();
         }
 
@@ -57,6 +64,9 @@ namespace Leap.Unity.Preview.Locomotion
             grabDetector.OnGrab -= OnGrab;
             grabDetector.OnGrabbing -= OnGrabbing;
             grabDetector.OnUngrab -= OnUngrab;
+
+            OnTeleport -= OnTeleportActivated;
+            OnMovementTypeChanged -= MovementTypeChanged;
         }
 
         public override void Start()
@@ -73,12 +83,14 @@ namespace Leap.Unity.Preview.Locomotion
 
             _transformWhenActivated = new GameObject("RayLatchTransformHelper").transform;
             _transformWhenActivated.transform.parent = transform;
-            OnTeleport += OnTeleportActivated;
             _chiralityLastFrame = chirality;
         }
 
-        private void Update()
+
+        protected override void Update()
         {
+            base.Update();
+
             if (chirality != _chiralityLastFrame)
             {
                 UpdateChirality();
@@ -214,6 +226,24 @@ namespace Leap.Unity.Preview.Locomotion
             _pullUI.gameObject.SetActive(false);
             _pullUI.SetProgress(0.0f, 1.0f, Vector3.up);
             _latchedAnchor = null;
+        }
+
+        private void MovementTypeChanged(TeleportActionMovementType movementType)
+        {
+            GameObject handRayRig;
+            if(movementType == TeleportActionMovementType.FREE)
+            {
+                handRayRig = FreeHandRay;
+                FixedHandRay.SetActive(false);
+            }
+            else
+            {
+                handRayRig = FixedHandRay;
+                FreeHandRay.SetActive(false);
+            }
+
+            handRayRenderer = handRayRig.GetComponent<HandRayRenderer>();
+            handRayInteractor = handRayRig.GetComponent<HandRayInteractor>();
         }
     }
 }

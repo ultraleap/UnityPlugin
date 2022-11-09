@@ -39,6 +39,7 @@ namespace Leap.Unity.Preview.Locomotion
 
         [Tooltip("If set to FIXED, you can only teleport to anchors in the world. If set to FREE, you can teleport anywhere you point.")]
         public TeleportActionMovementType movementType = TeleportActionMovementType.FIXED;
+        private TeleportActionMovementType _movementTypeLastFrame;
 
         [Tooltip("If true, when teleporting, the teleport anchor's forward direction will match your headset's world forward direction." +
             "\nIf false, your rotation will be the same way you are currently facing")]
@@ -90,6 +91,8 @@ namespace Leap.Unity.Preview.Locomotion
         /// </summary>
         public Action<TeleportAnchor, Vector3, Quaternion> OnTeleport;
 
+        public Action<TeleportActionMovementType> OnMovementTypeChanged;
+
         public virtual void Start()
         {
             if (Head == null) Head = Camera.main.transform;
@@ -113,7 +116,18 @@ namespace Leap.Unity.Preview.Locomotion
             {
                 Destroy(freeTeleportAnchor.GetComponent<MeshCollider>());
             }
+
+            _movementTypeLastFrame = movementType;
             SelectTeleport(false);
+        }
+
+        protected virtual void Update()
+        {
+            if(_movementTypeLastFrame != movementType)
+            {
+                OnMovementTypeChanged?.Invoke(movementType);
+                _movementTypeLastFrame = movementType;
+            }
         }
 
         private void OnValidate()

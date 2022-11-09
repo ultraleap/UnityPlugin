@@ -26,8 +26,6 @@ Ray Latch Teleport is a teleportation method which uses a Palm Ray combined with
 
 Ray Latch uses `IsFacingObject` to provide a small form of contextual activation - if you're facing a collider in your scene whilst using Ray Latch, it won't activate.
 
-Note: At the moment, Ray Latch can only be used in a Fixed configuration.
-
 ### Pinch To Teleport
 
 To get started with Pinch To Teleport, drag the "Pinch To Teleport" prefab into the scene.
