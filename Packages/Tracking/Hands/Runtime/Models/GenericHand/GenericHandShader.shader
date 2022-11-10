@@ -15,7 +15,6 @@
         [MaterialToggle] _useFresnel("Use Fresnel", Float) = 0
         [HDR]_FresnelColor("Fresnel Color", Color) = (1,1,1,0)
         _FresnelPower("Fresnel Power", Range(0,1)) = 1
-
     }
 
     CGINCLUDE
@@ -54,6 +53,7 @@
         {
             "Queue" = "Transparent" "IgnoreProjector" = "True" "RenderType" = "Transparent" "LightMode" = "ForwardBase"
         }
+
         ZWrite On
         Blend SrcAlpha OneMinusSrcAlpha
 
@@ -62,6 +62,7 @@
             Cull Back
             Blend Zero One
         }
+
         Pass
         {
             Cull Front
@@ -142,6 +143,7 @@
             }
             ENDCG
         }
+
         UsePass "Legacy Shaders/VertexLit/SHADOWCASTER"
     }
 
