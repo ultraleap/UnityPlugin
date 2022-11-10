@@ -9,14 +9,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [NEXT] - unreleased
 
 ### Added
-- 
+- Added XRLeapProviderManager script and Prefab which auto-selects a LeapXRServiceProvider or OpenXRLeapProvider depending on the avaiability of OpenXR
 
 ### Changed
 - 
 
 ### Fixed
 - Detector null reference error when creating a detector at runtime
-- XRServiceProvider does not scale when the player scales
+- InteractionSlider now raises event for value changes when setting values via the Horizontal and Vertical Percent properties
+- XRServiceProvider and OpenXRLeapProvider do not scale when the player scales
 - `timeVisible` was not populated on the OpenXR Provider for `Finger`s
 
 ### Known issues 
