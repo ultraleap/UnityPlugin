@@ -41,8 +41,8 @@
         float3 viewDir : TEXCOORD1;
         fixed4 diff : COLOR0;
 
-        UNITY_VERTEX_OUTPUT_STEREO;
-        UNITY_SHADOW_COORDS(1);
+        UNITY_VERTEX_OUTPUT_STEREO
+        UNITY_SHADOW_COORDS(2) // Uses TEXCOORD2
     };
 
     ENDCG
