@@ -262,6 +262,11 @@ namespace Leap.Unity.Interaction.PhysicsHands
                                 // Small wait to reduce erroneous uncontact events
                                 _contactReleaseTime = 10;
                             }
+                            // Ensure that we only allow hands to press the button
+                            if (_handsOnly)
+                            {
+                                PressValidation();
+                            }
                             break;
                     }
                 }
@@ -280,11 +285,10 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 }
             }
 
-            if (!_isPressed && _buttonElement.transform.localPosition.y <= buttonHeightLimit * 0.01f)
+            // If we want all physics objects to press it then go wild
+            if (!_handsOnly)
             {
-                _isPressed = true;
-                _pressedThisFrame = true;
-                OnPress?.Invoke();
+                PressValidation();
             }
 
             if (_isPressed && _buttonElement.transform.localPosition.y >= buttonHeightLimit * 0.05f)
@@ -295,6 +299,16 @@ namespace Leap.Unity.Interaction.PhysicsHands
             }
 
             pressedAmount = Mathf.InverseLerp(buttonHeightLimit * 0.99f, buttonHeightLimit * 0.01f, _buttonElement.transform.localPosition.y);
+        }
+
+        private void PressValidation()
+        {
+            if (!_isPressed && _buttonElement.transform.localPosition.y <= buttonHeightLimit * 0.01f)
+            {
+                _isPressed = true;
+                _pressedThisFrame = true;
+                OnPress?.Invoke();
+            }
         }
 
         private void LateUpdate()
@@ -380,9 +394,8 @@ namespace Leap.Unity.Interaction.PhysicsHands
         {
             if (transform != null)
             {
-                Gizmos.matrix = transform.localToWorldMatrix;
                 Gizmos.color = Color.green;
-                Gizmos.DrawLine(transform.position, transform.position + (Vector3.up * buttonHeightLimit));
+                Gizmos.DrawLine(transform.position, transform.position + (transform.up * buttonHeightLimit));
             }
         }
 
