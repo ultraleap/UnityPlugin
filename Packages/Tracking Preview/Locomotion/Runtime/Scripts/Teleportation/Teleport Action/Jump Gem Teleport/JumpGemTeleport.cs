@@ -31,7 +31,7 @@ namespace Leap.Unity.Preview.Locomotion
 
         [SerializeField, Range(0f, 1f), Tooltip("The point at which the ray should interpolate when releasing. " +
             "E.g. 0.8 will activate when the user is 80% released.")]
-        private float _releaseInterpolationPoint = 0.8f;
+        private float _releaseInterpolationPoint = 0.75f;
 
         [SerializeField, Range(0f, 4f), Tooltip("The interpolation time that will be applied when releasing.")]
         private float _releaseInterpolationTime = 2f;
