@@ -26,8 +26,16 @@ namespace Leap.Unity.Preview.Locomotion
         private JumpGem _pinchedGem;
 
         [Header("Jump Gem Teleport - Interaction Setup")]
-        [SerializeField, Range(0.0001f,1f), Tooltip("The distance the user has to pinch a gem before the ray will be activated.")]
+        [SerializeField, Range(0.0001f, 1f), Tooltip("The distance the user has to pinch a gem before the ray will be activated.")]
         private float _minimumDistanceToActivate = 0.1f;
+
+        [SerializeField, Range(0f, 1f), Tooltip("The point at which the ray should interpolate when releasing. " +
+            "E.g. 0.8 will activate when the user is 80% released.")]
+        private float _releaseInterpolationPoint = 0.8f;
+
+        [SerializeField, Range(0f, 4f), Tooltip("The interpolation time that will be applied when releasing.")]
+        private float _releaseInterpolationTime = 2f;
+
         /// <summary>
         /// The distance the user has to pinch a gem before the ray will be activated.
         /// </summary>
@@ -91,6 +99,15 @@ namespace Leap.Unity.Preview.Locomotion
         {
             if (_pinchedGem != null)
             {
+                if (_pinchedGem.HasPinchedEnough)
+                {
+                    ((TransformWristShoulderHandRay)handRayInteractor.handRay).interpolationAmount = Mathf.InverseLerp(1f - _releaseInterpolationPoint, 0f, _pinchedGem.PinchDetector.SquishPercent);
+                }
+                else
+                {
+                    ((TransformWristShoulderHandRay)handRayInteractor.handRay).interpolationAmount = 0f;
+                }
+
                 if (_pinchedGem.DistanceFromPoint() > _minimumDistanceToActivate && _pinchedGem.HasPinchedEnough && !IsSelected)
                 {
                     SelectTeleport(true);
@@ -114,6 +131,7 @@ namespace Leap.Unity.Preview.Locomotion
             if (handRayInteractor.handRay is TransformWristShoulderHandRay && _jumpGems[index].PinchItem != null)
             {
                 ((TransformWristShoulderHandRay)handRayInteractor.handRay).transformToFollow = _jumpGems[index].PinchItem;
+                ((TransformWristShoulderHandRay)handRayInteractor.handRay).interpolationTime = _releaseInterpolationTime;
             }
             OnGemPinched?.Invoke(true);
         }
