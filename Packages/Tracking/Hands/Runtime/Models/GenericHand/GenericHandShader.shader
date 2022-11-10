@@ -20,8 +20,9 @@
 
     CGINCLUDE
 
-    #include "UnityCG.cginc"
-
+    #include "UnityCG.cginc"   // for & UNITY_VERTEX_OUTPUT_STEREO UnityObjectToWorldNormal() 
+    #include "AutoLight.cginc" // for UNITY_SHADOW_COORDS() & UNITY_TRANSFER_SHADOW()
+    
     float4 _MainColor;
     float _Outline;
     float4 _OutlineColor;
@@ -41,7 +42,8 @@
         float3 viewDir : TEXCOORD1;
         fixed4 diff : COLOR0;
 
-        UNITY_VERTEX_OUTPUT_STEREO
+        UNITY_VERTEX_OUTPUT_STEREO;
+        UNITY_SHADOW_COORDS(1);
     };
 
     ENDCG
@@ -97,9 +99,7 @@
             #pragma vertex vert
             #pragma fragment frag
             #pragma multi_compile_fwdbase nolightmap nodirlightmap nodynlightmap novertexlight
-            #include "UnityCG.cginc" // for UnityObjectToWorldNormal
             #include "UnityLightingCommon.cginc" // for _LightColor0
-            #include "AutoLight.cginc"
 
             v2f vert(appdata_base v)
             {
