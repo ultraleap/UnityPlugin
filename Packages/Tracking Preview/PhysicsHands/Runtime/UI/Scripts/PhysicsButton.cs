@@ -485,20 +485,20 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 _buttonElement = GetComponentInChildren<PhysicsButtonElement>(true);
             }
 
+            if (buttonToggleHeightLimit > buttonHeightLimit)
+            {
+                buttonHeightLimit = buttonToggleHeightLimit;
+            }
+
+            if (buttonHeightLimit < buttonToggleHeightLimit)
+            {
+                buttonToggleHeightLimit = buttonHeightLimit;
+            }
+
             if (_buttonElement != null)
             {
                 _buttonElement.transform.localPosition = new Vector3(0, buttonHeightLimit, 0);
                 SetupButton();
-            }
-
-            if(buttonToggleHeightLimit > buttonHeightLimit)
-            {
-                buttonHeightLimit = buttonToggleHeightLimit;
-            }
-            
-            if(buttonHeightLimit < buttonToggleHeightLimit)
-            {
-                buttonToggleHeightLimit = buttonHeightLimit;
             }
         }
         #endregion
