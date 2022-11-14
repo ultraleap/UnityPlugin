@@ -15,6 +15,8 @@
         [MaterialToggle] _useFresnel("Use Fresnel", Float) = 0
         [HDR]_FresnelColor("Fresnel Color", Color) = (1,1,1,0)
         _FresnelPower("Fresnel Power", Range(0,1)) = 1
+    	
+    	[HideInInspector] _Confidence("Confidence", Range(0, 1)) = 1
     }
 
     CGINCLUDE
@@ -29,6 +31,7 @@
     float4 _FresnelColor;
     float _FresnelPower;
     float _LightIntensity;
+    float _Confidence;
     float _useLighting;
     float _useFresnel;
     float _useOutline;
@@ -88,7 +91,7 @@
 
             half4 frag(v2f i) :COLOR
             {
-                fixed4 col = tex2D(_MainTex, i.uv) * _OutlineColor;
+                fixed4 col = tex2D(_MainTex, i.uv) * _OutlineColor * _Confidence;
                 return col;
             }
             ENDCG
@@ -130,8 +133,7 @@
 
             half4 frag(v2f i) :COLOR
             {
-                fixed4 col = tex2D(_MainTex, i.uv);
-                col *= _MainColor;
+                fixed4 col = tex2D(_MainTex, i.uv) * _MainColor * _Confidence;
 
                 if (_useLighting)
                     col.rgb *= (i.diff * _LightIntensity);

@@ -20,13 +20,15 @@ namespace Ultraleap.Tracking.OpenXR
         private Hand _leftHand = new Hand();
         private Hand _rightHand = new Hand();
 
-        private int _handId = 0;
-        private int _leftHandId = 0;
-        private int _rightHandId = 0;
-        private long _leftHandFirstSeen_ticks;
-        private long _rightHandFirstSeen_ticks;
+        private int _handId;
+        private int _leftHandId;
+        private int _rightHandId;
+        private long _leftHandFirstSeenTicks;
+        private long _rightHandFirstSeenTicks;
+        private long _leftHandLastTrackedTicks;
+        private long _rightHandLastTrackedTicks;
 
-        private long _frameId = 0;
+        private long _frameId;
 
         [Tooltip("Specifies the main camera. Falls back to Camera.main if not set")]
         [SerializeField]
@@ -128,11 +130,11 @@ namespace Ultraleap.Tracking.OpenXR
             {
                 if (handTracker == HandTracker.Left)
                 {
-                    _leftHandFirstSeen_ticks = -1;
+                    _leftHandFirstSeenTicks = -1;
                 }
                 else
                 {
-                    _rightHandFirstSeen_ticks = -1;
+                    _rightHandFirstSeenTicks = -1;
                 }
 
                 return false;
@@ -140,24 +142,40 @@ namespace Ultraleap.Tracking.OpenXR
 
 
             float timeVisible = 0;
+            float timeSinceTracked = 0;
             if (handTracker == HandTracker.Left)
             {
-                if (_leftHandFirstSeen_ticks == -1)
+                if (_leftHandFirstSeenTicks == -1)
                 {
-                    _leftHandFirstSeen_ticks = DateTime.Now.Ticks;
+                    _leftHandFirstSeenTicks = DateTime.Now.Ticks;
                     _leftHandId = _handId++;
                 }
-                timeVisible = ((float)(DateTime.Now.Ticks - _leftHandFirstSeen_ticks)) / (float)TimeSpan.TicksPerSecond;
+                timeVisible = (DateTime.Now.Ticks - _leftHandFirstSeenTicks) / (float)TimeSpan.TicksPerSecond;
+                if (joints[(int)HandJoint.Palm].IsTracked)
+                {
+                    _leftHandLastTrackedTicks = DateTime.Now.Ticks;
+                }
+                else
+                {
+                    timeSinceTracked = (DateTime.Now.Ticks - _leftHandLastTrackedTicks) / (float)TimeSpan.TicksPerSecond;
+                }
             }
             else
             {
-                if (_rightHandFirstSeen_ticks == -1)
+                if (_rightHandFirstSeenTicks == -1)
                 {
-                    _rightHandFirstSeen_ticks = DateTime.Now.Ticks;
+                    _rightHandFirstSeenTicks = DateTime.Now.Ticks;
                     _rightHandId = _handId++;
                 }
-                timeVisible = ((float)(DateTime.Now.Ticks - _rightHandFirstSeen_ticks)) /
-                              (float)TimeSpan.TicksPerSecond;
+                timeVisible = (DateTime.Now.Ticks - _rightHandFirstSeenTicks) / (float)TimeSpan.TicksPerSecond;
+                if (joints[(int)HandJoint.Palm].IsTracked)
+                {
+                    _rightHandLastTrackedTicks = DateTime.Now.Ticks;
+                }
+                else
+                {
+                    timeSinceTracked = (DateTime.Now.Ticks - _rightHandLastTrackedTicks) / (float)TimeSpan.TicksPerSecond;
+                }
             }
 
             for (int fingerIndex = 0; fingerIndex < 5; fingerIndex++)
@@ -219,13 +237,20 @@ namespace Ultraleap.Tracking.OpenXR
                     (Finger.FingerType)fingerIndex);
             }
 
+
+            if (timeSinceTracked != 0)
+            {
+                Debug.Log($"Time since tracked: {timeSinceTracked}");
+            }
+            
             var palmWidth = joints[(int)HandJoint.Palm].Radius * 2.0f;
+            var confidence = Mathf.Clamp01(Mathf.Clamp01(timeVisible * 5.0f) - Mathf.Clamp01(timeSinceTracked * 5.0f));
 
             // Populate the whole hand information.
             hand.Fill(
                 _frameId,
                 handTracker == HandTracker.Left ? _leftHandId : _rightHandId,
-                1f,
+                confidence,
                 CalculateGrabStrength(hand),
                 CalculatePinchStrength(ref hand, palmWidth),
                 CalculatePinchDistance(ref hand),
