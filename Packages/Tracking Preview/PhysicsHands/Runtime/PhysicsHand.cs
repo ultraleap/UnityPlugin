@@ -41,6 +41,8 @@ namespace Leap.Unity.Interaction.PhysicsHands
             public PhysicsBone[] jointBones;
             public ArticulationBody[] jointBodies;
             public CapsuleCollider[] jointColliders;
+            [HideInInspector]
+            public int[] overRotationCount;
 
             [HideInInspector]
             public Quaternion[] defaultRotations;
@@ -228,7 +230,6 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
                 _physicsHand.transform.position = _originalLeapHand.PalmPosition;
                 _physicsHand.transform.rotation = _originalLeapHand.Rotation;
-                _physicsHand.palmBody.WakeUp();
                 _physicsHand.palmBody.TeleportRoot(_physicsHand.transform.position, _physicsHand.transform.rotation);
 
                 PhysicsHandsUtils.ResetPhysicsHandSizes(_physicsHand, _originalLeapHand);
@@ -244,7 +245,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                         int boneArrayIndex = fingerIndex * Hand.BONES + jointIndex;
                         _wasGraspingBones[boneArrayIndex] = false;
                         ArticulationBody body = _physicsHand.jointBodies[boneArrayIndex];
-
+                        
                         float xTargetAngle = PhysicsHandsUtils.CalculateXTargetAngle(prevBone, bone, fingerIndex, jointIndex);
                         body.xDrive = new ArticulationDrive()
                         {
@@ -270,11 +271,11 @@ namespace Leap.Unity.Interaction.PhysicsHands
                                 target = yTargetAngle
                             };
                         }
-                        body.WakeUp();
                     }
                 }
-                _ghosted = true;
 
+                _ghosted = true;
+                _physicsHand.gameObject.SetActive(false);
             }
             else
             {
@@ -333,6 +334,12 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 _graspingDeltaCurrent -= Vector3.Distance(_originalOldPosition, _originalLeapHand.PalmPosition);
             }
 
+            // Reset timer on hand release so hands quickly restore size
+            if (!IsGrasping && _wasGrasping)
+            {
+                _timeOnReset = Time.time;
+            }
+
             PhysicsHandsUtils.UpdatePhysicsPalm(ref _physicsHand,
                 // If the hand was grasping then we want to smoothly interpolate back to where it was based on distance
                 !IsGrasping && _graspingDeltaCurrent > 0 ? Vector3.Lerp(_physicsHand.transform.position, _originalLeapHand.PalmPosition, Mathf.InverseLerp(_graspingDelta, 0, _graspingDeltaCurrent)) : _originalLeapHand.PalmPosition,
@@ -342,13 +349,15 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 // Reduce force of hand as it gets further from the original data hand
                 !_ghosted && !_isGrasping && _graspingDeltaCurrent > 0 ? Mathf.InverseLerp(_physicsProvider.HandTeleportDistance * 0.5f, _physicsProvider.HandTeleportDistance, DistanceFromDataHand).EaseOut() : 0f);
 
+            AreBonesRotatedBeyondThreshold();
+
             // Fix the hand if it gets into a bad situation by teleporting and holding in place until its bad velocities disappear
             HandleTeleportingHands();
 
             // Update the palm collider with the distance between knuckles to wrist + palm width
             _physicsHand.palmCollider.size = Vector3.Lerp(_physicsHand.palmCollider.size, PhysicsHandsUtils.CalculatePalmSize(_originalLeapHand), _currentResetLerp);
 
-            // Iterate through the bones in the hand, applying drive forces
+            // Iterate through the bones in the hand, applying xDrive forces
             for (int fingerIndex = 0; fingerIndex < Hand.FINGERS; fingerIndex++)
             {
                 Bone knuckleBone = _originalLeapHand.Fingers[fingerIndex].Bone(0);
@@ -388,18 +397,21 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
                     // Hand physicsBone resizing, done very slowly during movement.
                     // Initial resizing is very fast (while the user is bringing their hand into the frame).
-                    if (jointIndex > 0)
+                    if (!_physicsHand.jointBones[boneArrayIndex].IsContacting)
                     {
-                        PhysicsHandsUtils.InterpolateBoneSize(_physicsHand.jointBodies[boneArrayIndex], _physicsHand.jointBones[boneArrayIndex], _physicsHand.jointColliders[boneArrayIndex],
-                            prevBone.PrevJoint, prevBone.Rotation, bone.PrevJoint,
-                            bone.Width, bone.Length, Mathf.Lerp(Time.fixedDeltaTime * 10f, Time.fixedDeltaTime, _currentResetLerp));
-                    }
-                    else
-                    {
-                        PhysicsHandsUtils.InterpolateKnucklePosition(_physicsHand.jointBodies[boneArrayIndex], _physicsHand.jointBones[boneArrayIndex], _originalLeapHand, _currentResetLerp);
-                        PhysicsHandsUtils.InterpolateBoneSize(_physicsHand.jointBodies[boneArrayIndex], _physicsHand.jointBones[boneArrayIndex], _physicsHand.jointColliders[boneArrayIndex],
-                            _originalLeapHand.PalmPosition, _originalLeapHand.Rotation, fingerIndex == 0 ? knuckleBone.PrevJoint : knuckleBone.NextJoint,
-                            bone.Width, bone.Length, Mathf.Lerp(Time.fixedDeltaTime * 10f, Time.fixedDeltaTime, _currentResetLerp));
+                        if (jointIndex > 0)
+                        {
+                            PhysicsHandsUtils.InterpolateBoneSize(_physicsHand.jointBodies[boneArrayIndex], _physicsHand.jointBones[boneArrayIndex], _physicsHand.jointColliders[boneArrayIndex],
+                                prevBone.PrevJoint, prevBone.Rotation, bone.PrevJoint,
+                                bone.Width, bone.Length, Mathf.Lerp(Time.fixedDeltaTime * 10f, Time.fixedDeltaTime, _currentResetLerp));
+                        }
+                        else
+                        {
+                            PhysicsHandsUtils.InterpolateKnucklePosition(_physicsHand.jointBodies[boneArrayIndex], _physicsHand.jointBones[boneArrayIndex], _originalLeapHand, _currentResetLerp);
+                            PhysicsHandsUtils.InterpolateBoneSize(_physicsHand.jointBodies[boneArrayIndex], _physicsHand.jointBones[boneArrayIndex], _physicsHand.jointColliders[boneArrayIndex],
+                                _originalLeapHand.PalmPosition, _originalLeapHand.Rotation, fingerIndex == 0 ? knuckleBone.PrevJoint : knuckleBone.NextJoint,
+                                bone.Width, bone.Length, Mathf.Lerp(Time.fixedDeltaTime * 10f, Time.fixedDeltaTime, _currentResetLerp));
+                        }
                     }
 
                     float xTargetAngle = PhysicsHandsUtils.CalculateXTargetAngle(prevBone, bone, fingerIndex, jointIndex);
@@ -410,29 +422,26 @@ namespace Leap.Unity.Interaction.PhysicsHands
                         _wasGraspingBones[boneArrayIndex] = false;
                     }
 
-                    body.xDrive = new ArticulationDrive()
-                    {
-                        stiffness = _physicsHand.stiffness * _physicsHand.strength,
-                        forceLimit = _wasGraspingBones[boneArrayIndex] ? 0.1f / Time.fixedDeltaTime : _physicsHand.forceLimit * _physicsHand.strength / Time.fixedDeltaTime,
-                        damping = body.xDrive.damping,
-                        lowerLimit = body.xDrive.lowerLimit,
-                        upperLimit = _graspingFingers[fingerIndex] > jointIndex ? body.xDrive.target : _physicsHand.jointBones[boneArrayIndex].OriginalXDriveLimit,
-                        target = _wasGraspingBones[boneArrayIndex] ? Mathf.Clamp(xTargetAngle, body.xDrive.lowerLimit, _graspingXDrives[boneArrayIndex]) : xTargetAngle
-                    };
+                    ArticulationDrive xDrive = body.xDrive;
+
+                    xDrive.stiffness = _physicsHand.stiffness * _physicsHand.strength;
+                    xDrive.forceLimit = _wasGraspingBones[boneArrayIndex] ? 0.05f / Time.fixedDeltaTime : 10f / Time.fixedDeltaTime;
+                    xDrive.upperLimit = _graspingFingers[fingerIndex] > jointIndex ? body.xDrive.target : _physicsHand.jointBones[boneArrayIndex].OriginalXDriveLimit;
+                    xDrive.target = _wasGraspingBones[boneArrayIndex] ? Mathf.Clamp(xTargetAngle, body.xDrive.lowerLimit, _graspingXDrives[boneArrayIndex]) : xTargetAngle;
+
+                    body.xDrive = xDrive;
 
                     if (jointIndex == 0)
                     {
                         float yTargetAngle = PhysicsHandsUtils.CalculateYTargetAngle(prevBone, bone);
 
-                        body.yDrive = new ArticulationDrive()
-                        {
-                            stiffness = _physicsHand.stiffness * _physicsHand.strength,
-                            forceLimit = _physicsHand.forceLimit * _physicsHand.strength / Time.fixedDeltaTime,
-                            damping = body.yDrive.damping,
-                            upperLimit = body.yDrive.upperLimit,
-                            lowerLimit = body.yDrive.lowerLimit,
-                            target = yTargetAngle
-                        };
+                        ArticulationDrive yDrive = body.yDrive;
+
+                        yDrive.stiffness = _physicsHand.stiffness * _physicsHand.strength;
+                        yDrive.forceLimit = 10f / Time.fixedDeltaTime;
+                        yDrive.target = yTargetAngle;
+
+                        body.yDrive = yDrive;
                     }
                 }
             }
@@ -505,10 +514,11 @@ namespace Leap.Unity.Interaction.PhysicsHands
         {
             // Fix the hand if it gets into a bad situation by teleporting and holding in place until its bad velocities disappear
             if (Vector3.Distance(_originalOldPosition, _originalLeapHand.PalmPosition) > _physicsProvider.HandTeleportDistance ||
-                DistanceFromDataHand > (IsGrasping ? _physicsProvider.HandGraspTeleportDistance : _physicsProvider.HandTeleportDistance) && (IsGrasping || IsAnyObjectInHandRadius()))
+                AreBonesRotatedBeyondThreshold() ||
+                DistanceFromDataHand > (IsGrasping ? _physicsProvider.HandGraspTeleportDistance : _physicsProvider.HandTeleportDistance) && (IsGrasping ||
+                IsAnyObjectInHandRadius()))
             {
                 ResetPhysicsHand(true);
-                //_palmBody.TeleportRoot(_hand.PalmPosition.ToVector3(), _hand.Rotation.ToQuaternion());
                 // Don't need to wait for the hand to reset as much here
                 _teleportFrameCount = 5;
 
@@ -604,9 +614,9 @@ namespace Leap.Unity.Interaction.PhysicsHands
         /// <summary>
         /// Used to ensure that a leapBone is not going to be in a problematic state. This can be used to ensure that a desired location is clear of an object.
         /// </summary>
-        public bool IsAnyObjectInBoneRadius(Bone leapBone, float radius = 0.005f)
+        public bool IsAnyObjectInBoneRadius(Bone leapBone, float extraRadius = 0.005f)
         {
-            int overlappingColliders = Physics.OverlapCapsuleNonAlloc(leapBone.PrevJoint, leapBone.NextJoint, radius, _colliderCache, _layerMask, QueryTriggerInteraction.Ignore);
+            int overlappingColliders = Physics.OverlapCapsuleNonAlloc(leapBone.PrevJoint, leapBone.NextJoint, (leapBone.Width / 2f) + extraRadius, _colliderCache, _layerMask, QueryTriggerInteraction.Ignore);
             for (int i = 0; i < overlappingColliders; i++)
             {
                 if (WillColliderAffectHand(_colliderCache[i]))
@@ -633,19 +643,19 @@ namespace Leap.Unity.Interaction.PhysicsHands
         /// <summary>
         /// Checks to see whether the hand will be in contact with a specified object. Radius can be used to inflate the bones.
         /// </summary>
-        public bool IsObjectInHandRadius(Rigidbody rigid, float radius = 0f)
+        public bool IsObjectInHandRadius(Rigidbody rigid, float extraRadius = 0f)
         {
             if (rigid == null)
                 return false;
 
-            if (IsObjectInBoneRadius(rigid, _physicsHand.palmBone, radius))
+            if (IsObjectInBoneRadius(rigid, _physicsHand.palmBone, extraRadius))
             {
                 return true;
             }
 
             foreach (var bone in _physicsHand.jointBones)
             {
-                if (IsObjectInBoneRadius(rigid, bone, radius))
+                if (IsObjectInBoneRadius(rigid, bone, extraRadius))
                 {
                     return true;
                 }
@@ -656,22 +666,73 @@ namespace Leap.Unity.Interaction.PhysicsHands
         /// <summary>
         /// Checks to see whether a specific physicsBone will be in contact with a specified object. Radius can be used to inflate the physicsBone.
         /// </summary>
-        public bool IsObjectInBoneRadius(Rigidbody rigid, PhysicsBone bone, float radius = 0f)
+        public bool IsObjectInBoneRadius(Rigidbody rigid, PhysicsBone bone, float extraRadius = 0f)
         {
             int overlappingColliders;
             if (bone.Finger == 5)
             {
-                overlappingColliders = PhysExts.OverlapBoxNonAllocOffset((BoxCollider)bone.Collider, Vector3.zero, _colliderCache, _layerMask, QueryTriggerInteraction.Ignore, radius);
+                overlappingColliders = PhysExts.OverlapBoxNonAllocOffset((BoxCollider)bone.Collider, Vector3.zero, _colliderCache, _layerMask, QueryTriggerInteraction.Ignore, extraRadius);
             }
             else
             {
-                overlappingColliders = PhysExts.OverlapCapsuleNonAllocOffset((CapsuleCollider)bone.Collider, Vector3.zero, _colliderCache, _layerMask, QueryTriggerInteraction.Ignore, radius);
+                overlappingColliders = PhysExts.OverlapCapsuleNonAllocOffset((CapsuleCollider)bone.Collider, Vector3.zero, _colliderCache, _layerMask, QueryTriggerInteraction.Ignore, extraRadius);
             }
             for (int i = 0; i < overlappingColliders; i++)
             {
                 if (_colliderCache[i].attachedRigidbody == rigid)
                 {
                     return true;
+                }
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Have the bones been forced beyond acceptable rotation amounts by external forces?
+        /// </summary>
+        private bool AreBonesRotatedBeyondThreshold(float eulerThreshold = 20f)
+        {
+            if (IsGrasping)
+                return false;
+
+            int boneArrayIndex = -1;
+            ArticulationBody body = null;
+
+            for (int fingerIndex = 0; fingerIndex < Hand.FINGERS; fingerIndex++)
+            {
+                for (int jointIndex = 1; jointIndex < Hand.BONES; jointIndex++)
+                {
+                    boneArrayIndex = fingerIndex * Hand.BONES + jointIndex;
+                    
+                    // Skip finger if a bone's contacting
+                    if (_physicsHand.jointBones[boneArrayIndex].IsContacting)
+                    {
+                        break;
+                    }
+
+                    body = _physicsHand.jointBodies[boneArrayIndex];
+                    float angle = Mathf.Repeat(body.transform.localRotation.eulerAngles.x + 180, 360) - 180;
+                    if(angle < body.xDrive.lowerLimit - eulerThreshold)
+                    {
+                        return true;
+                    }
+
+                    if(angle > body.xDrive.upperLimit + eulerThreshold)
+                    {
+                        return true;
+                    }
+                    
+                    float delta = Mathf.DeltaAngle(Mathf.Repeat(body.transform.localRotation.eulerAngles.x + 180, 360) - 180, body.xDrive.target);
+
+                    if (delta > eulerThreshold)
+                    {
+                        // Spent 5 frames further than threshold compared to the target angle?
+                        _physicsHand.overRotationCount[boneArrayIndex]++;
+                        if (_physicsHand.overRotationCount[boneArrayIndex] > 5)
+                        {
+                            return true;
+                        }
+                    }
                 }
             }
             return false;

@@ -71,6 +71,8 @@ namespace Leap.Unity.Interaction.PhysicsHands
         {
             GetProperties();
 
+            WarningsSection();
+
             SetupSection();
 
             PhysicsSection();
@@ -80,6 +82,34 @@ namespace Leap.Unity.Interaction.PhysicsHands
             HelperSection();
 
             serializedObject.ApplyModifiedProperties();
+        }
+
+        private void WarningsSection()
+        {
+            // Solver iterations
+            if (Physics.defaultSolverIterations < 15)
+            {
+                EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.HelpBox($"Project solver iterations are lower than 15 ({Physics.defaultSolverIterations}). It is highly recommended to increase this." +
+                    $"Hands will not be directly affected by this, but all other objects in your scene will be.", MessageType.Warning);
+                if (GUILayout.Button("Fix Now", GUILayout.Width(80)))
+                {
+                    Physics.defaultSolverIterations = 15;
+                }
+                EditorGUILayout.EndHorizontal();
+            }
+            // Solver iterations
+            if (Physics.defaultSolverVelocityIterations < 5)
+            {
+                EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.HelpBox($"Project solver velocity iterations are lower than 5 ({Physics.defaultSolverVelocityIterations}). It is highly recommended to increase this." +
+                    $"Hands will not be directly affected by this, but all other objects in your scene will be.", MessageType.Warning);
+                if (GUILayout.Button("Fix Now", GUILayout.Width(80)))
+                {
+                    Physics.defaultSolverVelocityIterations = 5;
+                }
+                EditorGUILayout.EndHorizontal();
+            }
         }
 
         private void SetupSection()
