@@ -149,7 +149,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 this.colliders = colliders;
             }
         }
-        public bool IsTracked { get; private set; }
+        public bool IsTracked { get; private set; } = false;
 
         // This is the distance between the raw data hand that the physics hand is derived from.
         public float DistanceFromDataHand
@@ -305,6 +305,8 @@ namespace Leap.Unity.Interaction.PhysicsHands
             }
 #endif
 
+            IsTracked = false;
+
             _originalLeapHand.CopyFrom(hand);
 
             if (!_hasReset && _resetWait > 0)
@@ -321,6 +323,8 @@ namespace Leap.Unity.Interaction.PhysicsHands
                     return;
                 }
             }
+
+            IsTracked = true;
 
             UpdateSettings();
 
@@ -487,6 +491,8 @@ namespace Leap.Unity.Interaction.PhysicsHands
             }
 #endif
             _hasReset = false;
+
+            IsTracked = false;
 
             ResetPhysicsHand(false);
 

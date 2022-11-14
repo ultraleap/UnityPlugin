@@ -292,34 +292,39 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
             if (Time.inFixedTimeStep)
             {
-                UpdatePhysicsHand(LeftHand, _leftIndex == -1 ? null : _leftOriginalLeap, ref _leftWasNull);
-                UpdatePhysicsHand(RightHand, _rightIndex == -1 ? null : _rightOriginalLeap, ref _rightWasNull);
-
-                if (_enableHelpers)
-                {
-                    ComputeHelperBones();
-                }
-
-                PhysicsGraspHelper.State oldState, state;
-
-                foreach (var helper in _graspHelpers)
-                {
-                    // Removed ignore check here and moved into the helper so we can still get state information
-                    oldState = helper.Value.GraspState;
-                    state = helper.Value.UpdateHelper();
-                    if (state != oldState)
-                    {
-                        OnObjectStateChange?.Invoke(helper.Value.Rigidbody, helper.Value);
-                    }
-                }
-
-                UpdateHandStates();
+                FixedFrameProcess();
             }
 
             ApplyHand(_leftIndex, ref inputFrame, LeftHand);
             // If the left hand has been removed we need to refind the right index
             _rightIndex = inputFrame.Hands.FindIndex(x => x.IsRight);
             ApplyHand(_rightIndex, ref inputFrame, RightHand);
+        }
+
+        private void FixedFrameProcess()
+        {
+            UpdatePhysicsHand(LeftHand, _leftIndex == -1 ? null : _leftOriginalLeap, ref _leftWasNull);
+            UpdatePhysicsHand(RightHand, _rightIndex == -1 ? null : _rightOriginalLeap, ref _rightWasNull);
+
+            if (_enableHelpers)
+            {
+                ComputeHelperBones();
+            }
+
+            PhysicsGraspHelper.State oldState, state;
+
+            foreach (var helper in _graspHelpers)
+            {
+                // Removed ignore check here and moved into the helper so we can still get state information
+                oldState = helper.Value.GraspState;
+                state = helper.Value.UpdateHelper();
+                if (state != oldState)
+                {
+                    OnObjectStateChange?.Invoke(helper.Value.Rigidbody, helper.Value);
+                }
+            }
+
+            UpdateHandStates();
         }
 
         private void ApplyHand(int index, ref Frame inputFrame, PhysicsHand hand)

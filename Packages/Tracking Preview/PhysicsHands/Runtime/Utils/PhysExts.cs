@@ -103,12 +103,12 @@ namespace Leap.Unity.Interaction.PhysicsHands
             point1 = center - dir * (height * 0.5f - radius);
         }
 
-        private static Vector3 AbsVec3(Vector3 v)
+        public static Vector3 AbsVec3(Vector3 v)
         {
             return new Vector3(Mathf.Abs(v.x), Mathf.Abs(v.y), Mathf.Abs(v.z));
         }
 
-        private static float MaxVec3(Vector3 v)
+        public static float MaxVec3(Vector3 v)
         {
             return Mathf.Max(v.x, Mathf.Max(v.y, v.z));
         }
