@@ -79,8 +79,6 @@ namespace Leap.Unity.Preview.HandRays
         /// </summary>
         private float minDotProductAllowedForFacingCamera = 0.55f;
 
-        public bool debug;
-
         // Start is called before the first frame update
         protected override void Start()
         {
@@ -108,8 +106,7 @@ namespace Leap.Unity.Preview.HandRays
             transformHelper.position = leapProvider.CurrentFrame.GetHand(chirality).PalmPosition;
             Quaternion palmForwardRotation = leapProvider.CurrentFrame.GetHand(chirality).Rotation * Quaternion.Euler(90, 0, 0);
             transformHelper.rotation = palmForwardRotation;
-            debug = !IsFacingTransform(transformHelper, inferredBodyPositions.Head, minDotProductAllowedForFacingCamera);
-            return debug;
+            return !IsFacingTransform(transformHelper, inferredBodyPositions.Head, minDotProductAllowedForFacingCamera);
         }
 
         protected virtual Vector3 GetWristOffsetPosition(Hand hand)
