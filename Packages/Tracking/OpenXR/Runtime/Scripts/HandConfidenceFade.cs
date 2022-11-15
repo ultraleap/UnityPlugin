@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Ultraleap.Tracking.OpenXR
 {
-    public class ConfidenceFader : MonoBehaviour
+    public class HandConfidenceFade : MonoBehaviour
     {
         private HandModelBase _handModel;
         private Renderer _renderer;
