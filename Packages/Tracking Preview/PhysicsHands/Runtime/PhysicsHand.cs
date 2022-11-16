@@ -528,6 +528,9 @@ namespace Leap.Unity.Interaction.PhysicsHands
                         _ignoredData[i].timeout -= Time.fixedDeltaTime;
                     }
 
+                    if (_ignoredData[i].rigid == null)
+                        continue;
+
                     if (_ignoredData[i].timeout <= 0 && !IsObjectInHandRadius(_ignoredData[i].rigid, _ignoredData[i].radius))
                     {
                         TogglePhysicsIgnore(_ignoredData[i].rigid, false);
