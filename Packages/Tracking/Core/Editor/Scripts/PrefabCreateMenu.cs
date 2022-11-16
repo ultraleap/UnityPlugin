@@ -14,31 +14,31 @@ namespace Leap
 {
     public class PrefabCreateMenu
     {
-        [MenuItem("GameObject/Ultraleap/XR/XR Leap Provider Manager", false, 0)]
+        [MenuItem("GameObject/Ultraleap/XR/XR Leap Provider Manager", false, 20)]
         public static void CreateProviderXR()
         {
             CreatePrefab("XR Leap Provider Manager");
         }
 
-        [MenuItem("GameObject/Ultraleap/XR/Service Provider (XR)", false, 11)]
+        [MenuItem("GameObject/Ultraleap/XR/Service Provider (XR)", false, 31)]
         public static void CreateServiceProviderXR()
         {
             CreatePrefab("Service Provider (XR)");
         }
 
-        [MenuItem("GameObject/Ultraleap/XR/Service Provider (OpenXR)", false, 12)]
+        [MenuItem("GameObject/Ultraleap/XR/Service Provider (OpenXR)", false, 32)]
         public static void CreateServiceProviderOpenXR()
         {
             CreatePrefab("Service Provider (OpenXR)");
         }
 
-        [MenuItem("GameObject/Ultraleap/Non-XR/Service Provider (Desktop)", false, 23)]
+        [MenuItem("GameObject/Ultraleap/Non-XR/Service Provider (Desktop)", false, 43)]
         public static void CreateServiceProviderDesktop()
         {
             CreatePrefab("Service Provider (Desktop)");
         }
 
-        [MenuItem("GameObject/Ultraleap/Non-XR/Service Provider (Screentop)", false, 24)]
+        [MenuItem("GameObject/Ultraleap/Non-XR/Service Provider (Screentop)", false, 44)]
         public static void CreateServiceProviderScreentop()
         {
             CreatePrefab("Service Provider (Screentop)");
@@ -47,13 +47,17 @@ namespace Leap
         public static void CreatePrefab(string prefabName)
         {
             var guids = AssetDatabase.FindAssets(prefabName);
-            string assetPath = AssetDatabase.GUIDToAssetPath(guids[0]);
 
-            GameObject newObject = (GameObject)AssetDatabase.LoadAssetAtPath(assetPath, typeof(GameObject));
-
-            if (newObject != null)
+            foreach(var guid in guids)
             {
-                HandleObjectCreation(newObject);
+                string assetPath = AssetDatabase.GUIDToAssetPath(guid);
+                GameObject newObject = (GameObject)AssetDatabase.LoadAssetAtPath(assetPath, typeof(GameObject));
+
+                if (newObject != null)
+                {
+                    HandleObjectCreation(newObject);
+                    break;
+                }
             }
         }
 
