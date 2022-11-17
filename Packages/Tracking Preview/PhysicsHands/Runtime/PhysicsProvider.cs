@@ -426,7 +426,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
             HashSet<int> foundBodies = new HashSet<int>();
 
-            _resultCount = PhysExts.OverlapBoxNonAllocOffset(pH.palmCollider, Vector3.zero, _resultsCache, _contactMask, extraRadius: -PhysExts.MaxVec3(radiusAmount));
+            _resultCount = PhysExts.OverlapBoxNonAllocOffset(pH.palmCollider, Vector3.zero, _resultsCache, _contactMask, QueryTriggerInteraction.Ignore, extraRadius: -PhysExts.MaxVec3(radiusAmount));
             for (int i = 0; i < _resultCount; i++)
             {
                 if (_resultsCache[i] != null && _resultsCache[i].attachedRigidbody != null)
@@ -445,7 +445,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
             for (int i = 0; i < pH.jointColliders.Length; i++)
             {
-                _resultCount = PhysExts.OverlapCapsuleNonAllocOffset(pH.jointColliders[i], Vector3.zero, _resultsCache, _contactMask, extraRadius: -pH.jointColliders[i].radius * 0.2f);
+                _resultCount = PhysExts.OverlapCapsuleNonAllocOffset(pH.jointColliders[i], Vector3.zero, _resultsCache, _contactMask, QueryTriggerInteraction.Ignore, extraRadius: -pH.jointColliders[i].radius * 0.2f);
                 for (int j = 0; j < _resultCount; j++)
                 {
                     if (_resultsCache[i] != null && _resultsCache[i].attachedRigidbody != null)
