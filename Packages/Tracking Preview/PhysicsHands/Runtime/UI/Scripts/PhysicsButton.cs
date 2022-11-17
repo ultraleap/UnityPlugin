@@ -50,6 +50,18 @@ namespace Leap.Unity.Interaction.PhysicsHands
         [SerializeField, Tooltip("The dampening amount to slow down the button when returning to its resting height.")]
         private float _springDampening = 5f;
 
+        [Header("Toggle Configuration")]
+        /// <summary>
+        /// Enables the button to be used as a toggle. No toggle events will fire unless this is set to true.
+        /// </summary>
+        [Tooltip("Enables the button to be used as a toggle. No toggle events will fire unless this is set to true.")]
+        public bool isToggleable = false;
+        /// <summary>
+        /// The local position which the button will be limited to and will try to return to when toggled.
+        /// </summary>
+        [Tooltip("The local position which the button will be limited to and will try to return to when toggled.")]
+        public float buttonToggleHeightLimit = 0.01f;
+
         #endregion
 
         #region Events
@@ -75,6 +87,9 @@ namespace Leap.Unity.Interaction.PhysicsHands
         [SerializeField]
         private UnityEvent<float> _OnPressedAmountChanged = new UnityEvent<float>();
 
+        [SerializeField]
+        private UnityEvent<bool> _OnToggle = new UnityEvent<bool>();
+
         public Action OnPress = () => { };
         public Action OnUnpress = () => { };
 
@@ -97,6 +112,8 @@ namespace Leap.Unity.Interaction.PhysicsHands
         public Action OnUncontact = () => { };
 
         public Action<float> OnPressedAmountChanged = (value) => { };
+
+        public Action<bool> OnToggle = (value) => { };
 
         #endregion
 
@@ -142,7 +159,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
         /// </summary>
         public float pressedAmount
         {
-            set
+            private set
             {
                 if (value != _pressedAmount)
                 {
@@ -152,6 +169,9 @@ namespace Leap.Unity.Interaction.PhysicsHands
             }
             get { return _pressedAmount; }
         }
+
+        private bool _isToggled = false;
+        public bool IsToggled => _isToggled;
 
         private PhysicsProvider _provider;
         public PhysicsProvider Provider => _provider;
@@ -189,6 +209,12 @@ namespace Leap.Unity.Interaction.PhysicsHands
             {
                 _unpressedThisFrame = true;
                 OnUnpress?.Invoke();
+                if (isToggleable)
+                {
+                    _isToggled = !_isToggled;
+                    UpdateToggleJoint();
+                    OnToggle?.Invoke(_isToggled);
+                }
             }
             if (_hovered)
             {
@@ -221,6 +247,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             OnContact += _OnContact.Invoke;
             OnUncontact += _OnUncontact.Invoke;
             OnPressedAmountChanged += _OnPressedAmountChanged.Invoke;
+            OnToggle += _OnToggle.Invoke;
         }
 
         protected void FixedUpdate()
@@ -262,6 +289,11 @@ namespace Leap.Unity.Interaction.PhysicsHands
                                 // Small wait to reduce erroneous uncontact events
                                 _contactReleaseTime = 10;
                             }
+                            // Ensure that we only allow hands to press the button
+                            if (_handsOnly)
+                            {
+                                PressValidation();
+                            }
                             break;
                     }
                 }
@@ -280,11 +312,10 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 }
             }
 
-            if (!_isPressed && _buttonElement.transform.localPosition.y <= buttonHeightLimit * 0.01f)
+            // If we want all physics objects to press it then go wild
+            if (!_handsOnly)
             {
-                _isPressed = true;
-                _pressedThisFrame = true;
-                OnPress?.Invoke();
+                PressValidation();
             }
 
             if (_isPressed && _buttonElement.transform.localPosition.y >= buttonHeightLimit * 0.05f)
@@ -295,6 +326,23 @@ namespace Leap.Unity.Interaction.PhysicsHands
             }
 
             pressedAmount = Mathf.InverseLerp(buttonHeightLimit * 0.99f, buttonHeightLimit * 0.01f, _buttonElement.transform.localPosition.y);
+
+            if (_pressedThisFrame && isToggleable)
+            {
+                _isToggled = !_isToggled;
+                UpdateToggleJoint();
+                OnToggle?.Invoke(_isToggled);
+            }
+        }
+
+        private void PressValidation()
+        {
+            if (!_isPressed && _buttonElement.transform.localPosition.y <= buttonHeightLimit * 0.01f)
+            {
+                _isPressed = true;
+                _pressedThisFrame = true;
+                OnPress?.Invoke();
+            }
         }
 
         private void LateUpdate()
@@ -372,6 +420,29 @@ namespace Leap.Unity.Interaction.PhysicsHands
             joint.connectedMassScale = 1;
         }
 
+        private void UpdateToggleJoint()
+        {
+            float heighLimit = _isToggled ? buttonToggleHeightLimit : buttonHeightLimit;
+
+            SoftJointLimit softLimit = _buttonElement.Joint.linearLimit;
+            softLimit.limit = heighLimit / 2f;
+            _buttonElement.Joint.linearLimit = softLimit;
+
+            _buttonElement.Joint.connectedAnchor = Vector3.up * heighLimit;
+            _buttonElement.Joint.targetPosition = Vector3.down * heighLimit;
+        }
+
+        #endregion
+
+        #region Public Functions
+
+        public void ForceToggleState(bool toggled)
+        {
+            _isToggled = toggled;
+            OnToggle?.Invoke(_isToggled);
+            UpdateToggleJoint();
+        }
+
         #endregion
 
         #region Gizmos
@@ -380,9 +451,17 @@ namespace Leap.Unity.Interaction.PhysicsHands
         {
             if (transform != null)
             {
-                Gizmos.matrix = transform.localToWorldMatrix;
                 Gizmos.color = Color.green;
-                Gizmos.DrawLine(transform.position, transform.position + (Vector3.up * buttonHeightLimit));
+                if (isToggleable)
+                {
+                    Gizmos.DrawLine(transform.position + (transform.up * buttonToggleHeightLimit), transform.position + (transform.up * buttonHeightLimit));
+                    Gizmos.color = Color.blue;
+                    Gizmos.DrawLine(transform.position, transform.position + (transform.up * buttonToggleHeightLimit));
+                }
+                else
+                {
+                    Gizmos.DrawLine(transform.position, transform.position + (transform.up * buttonHeightLimit));
+                }
             }
         }
 
@@ -406,12 +485,21 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 _buttonElement = GetComponentInChildren<PhysicsButtonElement>(true);
             }
 
+            if (buttonToggleHeightLimit > buttonHeightLimit)
+            {
+                buttonHeightLimit = buttonToggleHeightLimit;
+            }
+
+            if (buttonHeightLimit < buttonToggleHeightLimit)
+            {
+                buttonToggleHeightLimit = buttonHeightLimit;
+            }
+
             if (_buttonElement != null)
             {
                 _buttonElement.transform.localPosition = new Vector3(0, buttonHeightLimit, 0);
                 SetupButton();
             }
-
         }
         #endregion
     }

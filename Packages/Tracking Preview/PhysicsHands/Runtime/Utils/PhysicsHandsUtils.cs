@@ -286,7 +286,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             palm.angularDamping = angularDamping;
             palm.useGravity = false;
             palm.collisionDetectionMode = CollisionDetectionMode.ContinuousSpeculative;
-            palm.maxDepenetrationVelocity = 0.1f;
+            palm.maxDepenetrationVelocity = 0.001f;
         }
 
         public static void SetupBoneBody(ArticulationBody bone, float boneMass = 0.6f, int solverIterations = 50, int solverVelocity = 20, float maxAngularVelocity = 1.75f, float maxDepenetrationVelocity = 3f)
@@ -303,7 +303,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             bone.maxDepenetrationVelocity = maxDepenetrationVelocity;
             bone.useGravity = false;
             bone.collisionDetectionMode = CollisionDetectionMode.ContinuousSpeculative;
-            bone.maxDepenetrationVelocity = 0.1f;
+            bone.maxDepenetrationVelocity = 0.001f;
         }
 
         public static void SetupKnuckleDrives(ArticulationBody knuckle, int fingerIndex, float stiffness, float forceLimit, float strength)
