@@ -9,6 +9,8 @@
 [developer-site-setup-camera]: https://developer.leapmotion.com/setup-camera "Ultraleap Setup Camera"
 [developer-site-unity]: https://developer.leapmotion.com/unity/ "Ultraleap Developer site - Unity"
 [developer-forum]: https://forums.leapmotion.com/ "Developer Forum"
+[discord]: https://discord.com/invite/3VCndThqxS "Discord Server"
+[github-discussions]: https://github.com/ultraleap/UnityPlugin/discussions "Github Discussions"
 
 [releases]: https://github.com/ultraleap/UnityPlugin/releases "UnityPlugin releases"
 [repository-url]: https://github.com/ultraleap/UnityPlugin.git "Repository URL"
@@ -56,6 +58,8 @@ To use this plugin you will need the following:
 
 - Due to the ever changing landscape of package dependencies in Unity we cannot guarantee compatibility with every plugin or variant of Unity, but aim to provide support for any LTS versions that are under continuous support from Unity.
 - If you are sourcing the Unity Plugin directly from this repository, you may find that it does not function well with earlier versions of Unity.
+
+More detailed Getting Started documentation is available on [our website][documentation]
 
 ### Dependencies
 
@@ -272,9 +276,9 @@ Enables developers to use hand tracking data to drive their own 3D Hand assets w
 
 - We provide different styles of 3D hands that you can use
 - We have in-depth documentation online with an explanation of each feature
-- We have included step by step guides within the Editor which teaches you how to set up hands without the need to open online documentation
+- We have included step by step guides within the Editor which teaches you how to set up hands without the need to open online [documentation][documentation]
 - No programming knowledge is needed  
-- We provide shaders to support HDRP/URP & the Standard render pipeline.
+- We provide shaders to support URP & the Standard render pipeline.
 
 ## Preview Features
 
@@ -317,8 +321,9 @@ User Support: support@ultraleap.com
 
 ## Community Support
 
-Our [Developer Forum][developer-forum] is a place where you are actively encouraged to share your questions, insights, ideas, feature requests and projects.
+Our [Discord Server][discord], [Github Discussions][github-discussions] and [Developer Forum][developer-forum] are places where you are actively encouraged to share your questions, insights, ideas, feature requests and projects.
 
 ## Links
 
 [Ultraleap Unity Plugin][repository-url]
+[Documentation][documentation]
