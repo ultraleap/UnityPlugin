@@ -67,6 +67,9 @@ namespace Ultraleap.Tracking.OpenXR
             
             [DllImport(NativeDLL, EntryPoint = NativePrefix + "IsHandTrackingSupported", ExactSpelling = true)]
             internal static extern bool IsHandTrackingSupported();
+            
+            [DllImport(NativeDLL, EntryPoint = NativePrefix + "IsUltraleapHandTracking", ExactSpelling = true)]
+            internal static extern bool IsUltraleapHandTracking();
 
             [DllImport(NativeDLL, EntryPoint = NativePrefix + "CreateHandTrackers", ExactSpelling = true)]
             internal static extern int CreateHandTrackers(HandJointSet jointSet);
@@ -90,6 +93,7 @@ namespace Ultraleap.Tracking.OpenXR
 
         private bool _supportsHandTracking;
         [PublicAPI] public bool SupportsHandTracking => enabled && _supportsHandTracking;
+        [PublicAPI] public bool IsUltraleapHandTracking => enabled && Native.IsUltraleapHandTracking();
 
         protected override IntPtr HookGetInstanceProcAddr(IntPtr func) => Native.HookGetInstanceProcAddr(func);
         protected override void OnInstanceDestroy(ulong xrInstance) => Native.OnInstanceDestroy(xrInstance);
