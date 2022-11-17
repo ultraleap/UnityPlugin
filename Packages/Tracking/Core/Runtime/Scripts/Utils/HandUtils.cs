@@ -382,7 +382,8 @@ namespace Leap.Unity
         /// <summary>
         /// Returns the Chirality of the hand
         /// </summary>
-        public static Chirality GetChirality(this Hand hand) {
+        public static Chirality GetChirality(this Hand hand) 
+        {
             return hand.IsLeft ? Chirality.Left : Chirality.Right;
         }
 
