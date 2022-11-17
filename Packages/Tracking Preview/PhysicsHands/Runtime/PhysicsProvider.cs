@@ -20,6 +20,8 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
     public class PhysicsProvider : PostProcessProvider
     {
+
+        #region Inspector
         // Hands
         [field: SerializeField, HideInInspector]
         public PhysicsHand LeftHand { get; private set; } = null;
@@ -102,6 +104,8 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
         public bool EnhanceThrowing => _enhanceThrowing;
 
+#endregion
+
         // Helpers
         private Dictionary<Rigidbody, PhysicsGraspHelper> _graspHelpers = new Dictionary<Rigidbody, PhysicsGraspHelper>();
 
@@ -133,6 +137,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
         private int _leftIndex = -1, _rightIndex = -1;
         private Hand _leftOriginalLeap, _rightOriginalLeap;
+        private float _physicsSyncTime = 0f;
 
         private bool _leftWasNull = true, _rightWasNull = true;
 
@@ -368,7 +373,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             }
         }
 
-        private void LateUpdate()
+        private void FixedUpdate()
         {
             PostUpdateOverlapCheck(LeftHand);
             PostUpdateOverlapCheck(RightHand);
@@ -408,9 +413,16 @@ namespace Leap.Unity.Interaction.PhysicsHands
             if (hand == null || !hand.IsTracked)
                 return;
 
+            // Sync transforms in case someone's done a transform.position on a rigidbody
+            if(_physicsSyncTime != Time.time)
+            {
+                Physics.SyncTransforms();
+                _physicsSyncTime = Time.time;
+            }
+
             PhysicsHand.Hand pH = hand.GetPhysicsHand();
 
-            Vector3 radiusAmount = Vector3.Scale(pH.palmCollider.size,PhysExts.AbsVec3(pH.palmCollider.transform.lossyScale)) * 0.1f;
+            Vector3 radiusAmount = Vector3.Scale(pH.palmCollider.size,PhysExts.AbsVec3(pH.palmCollider.transform.lossyScale)) * 0.2f;
 
             HashSet<int> foundBodies = new HashSet<int>();
 
@@ -433,7 +445,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
             for (int i = 0; i < pH.jointColliders.Length; i++)
             {
-                _resultCount = PhysExts.OverlapCapsuleNonAllocOffset(pH.jointColliders[i], Vector3.zero, _resultsCache, _contactMask, extraRadius: -pH.jointColliders[i].radius * 0.4f);
+                _resultCount = PhysExts.OverlapCapsuleNonAllocOffset(pH.jointColliders[i], Vector3.zero, _resultsCache, _contactMask, extraRadius: -pH.jointColliders[i].radius * 0.2f);
                 for (int j = 0; j < _resultCount; j++)
                 {
                     if (_resultsCache[i] != null && _resultsCache[i].attachedRigidbody != null)
@@ -614,19 +626,19 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 {
                     _tempVector.x = -pH.triggerDistance / 2f;
                     _tempVector.z = pH.triggerDistance / 2f;
-                    radius *= 1.8f;
+                    radius *= 0.8f;
                 }
                 else
                 {
                     // Inflate the bones slightly
                     _tempVector.x = 0;
                     _tempVector.z = 0;
-                    radius *= 1.2f;
+                    radius *= 0.2f;
                 }
                 // Move the finger tips forward a tad
                 if (pH.jointBones[i].Joint == 2)
                 {
-                    _tempVector.z += pH.triggerDistance;
+                    _tempVector.z += pH.triggerDistance / 2f;
                 }
 
 #if UNITY_EDITOR
