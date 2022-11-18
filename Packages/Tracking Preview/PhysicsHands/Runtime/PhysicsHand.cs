@@ -425,7 +425,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                     ArticulationDrive xDrive = body.xDrive;
 
                     xDrive.stiffness = _physicsHand.stiffness * _physicsHand.strength;
-                    xDrive.forceLimit = _wasGraspingBones[boneArrayIndex] ? 0.05f / Time.fixedDeltaTime : 10f / Time.fixedDeltaTime;
+                    xDrive.forceLimit = _wasGraspingBones[boneArrayIndex] ? 0.05f / Time.fixedDeltaTime : _physicsHand.forceLimit * _physicsHand.strength / Time.fixedDeltaTime;
                     xDrive.upperLimit = _graspingFingers[fingerIndex] > jointIndex ? body.xDrive.target : _physicsHand.jointBones[boneArrayIndex].OriginalXDriveLimit;
                     xDrive.target = _wasGraspingBones[boneArrayIndex] ? Mathf.Clamp(xTargetAngle, body.xDrive.lowerLimit, _graspingXDrives[boneArrayIndex]) : xTargetAngle;
 
@@ -438,7 +438,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                         ArticulationDrive yDrive = body.yDrive;
 
                         yDrive.stiffness = _physicsHand.stiffness * _physicsHand.strength;
-                        yDrive.forceLimit = 10f / Time.fixedDeltaTime;
+                        yDrive.forceLimit = _physicsHand.forceLimit * _physicsHand.strength / Time.fixedDeltaTime;
                         yDrive.target = yTargetAngle;
 
                         body.yDrive = yDrive;
