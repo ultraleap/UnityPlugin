@@ -469,6 +469,10 @@ namespace Leap.Unity.Interaction.PhysicsHands
         /// </summary>
         private bool IsRigidbodyAlreadyColliding(Rigidbody body)
         {
+            if (!_enableHelpers)
+            {
+                return false;
+            }
             // Does a helper alread exist (we would be at least hovering)
             if (_graspHelpers.TryGetValue(body, out var helper))
             {

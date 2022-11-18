@@ -721,17 +721,20 @@ namespace Leap.Unity.Interaction.PhysicsHands
                     {
                         return true;
                     }
-                    
-                    float delta = Mathf.DeltaAngle(Mathf.Repeat(body.transform.localRotation.eulerAngles.x + 180, 360) - 180, body.xDrive.target);
 
-                    if (delta > eulerThreshold)
+                    // If the bone's meant to be pretty flat
+                    float delta = Mathf.DeltaAngle(angle, body.xDrive.target);
+                    if(Mathf.Abs(body.xDrive.target) < eulerThreshold / 2f && delta > eulerThreshold)
                     {
-                        // Spent 5 frames further than threshold compared to the target angle?
                         _physicsHand.overRotationCount[boneArrayIndex]++;
-                        if (_physicsHand.overRotationCount[boneArrayIndex] > 5)
+                        if (_physicsHand.overRotationCount[boneArrayIndex] > 10)
                         {
                             return true;
                         }
+                    }
+                    else
+                    {
+                        _physicsHand.overRotationCount[boneArrayIndex] = Mathf.Clamp(_physicsHand.overRotationCount[boneArrayIndex] - 1, 0, 10);
                     }
                 }
             }
