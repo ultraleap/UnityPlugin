@@ -539,6 +539,13 @@ namespace Leap.Unity.Interaction.PhysicsHands
             {
                 for (int i = 0; i < _ignoredData.Count; i++)
                 {
+                    // Handle destoryed objects
+                    if (_ignoredData[i].rigid == null)
+                    {
+                        _ignoredData.RemoveAt(i);
+                        continue;
+                    }
+
                     if (_ignoredData[i].timeout >= 0)
                     {
                         _ignoredData[i].timeout -= Time.fixedDeltaTime;
@@ -751,6 +758,11 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
         private void TogglePhysicsIgnore(Rigidbody rigid, bool ignore, float timeout = 0, float radius = 0)
         {
+            // If the rigid has been destroyed we can't do anything
+            if(rigid == null)
+            {
+                return;
+            }
             Collider[] colliders = rigid.GetComponentsInChildren<Collider>(true);
             foreach (var collider in colliders)
             {
