@@ -380,6 +380,14 @@ namespace Leap.Unity
         }
 
         /// <summary>
+        /// Returns the Chirality of the hand
+        /// </summary>
+        public static Chirality GetChirality(this Hand hand) 
+        {
+            return hand.IsLeft ? Chirality.Left : Chirality.Right;
+        }
+
+        /// <summary>
         /// Returns an unsmoothed ray representing the general reaching/interaction intent direction.
         /// </summary>
         public static Ray HandRay(this Hand hand, Transform headTransform)
