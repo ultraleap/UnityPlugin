@@ -53,10 +53,12 @@ namespace Leap.Unity
         /// </summary>
         public abstract Frame CurrentFixedFrame { get; }
 
+        protected TrackingSource _trackingSource;
+
         /// <summary>
-        /// Can be used to provide information as to whether the tracking data source is valid
+        /// Represents the source of tracking data
         /// </summary>
-        public virtual bool CanProvideData { get { return true; } }
+        public virtual TrackingSource TrackingDataSource { get { return _trackingSource; } }
 
         protected void DispatchUpdateFrameEvent(Frame frame)
         {
@@ -78,6 +80,14 @@ namespace Leap.Unity
             }
         }
 
+    }
+
+    public enum TrackingSource
+    {
+        NONE,
+        LEAPC,
+        OPENXR,
+        OPENXR_LEAP
     }
 
     public static class LeapProviderExtensions

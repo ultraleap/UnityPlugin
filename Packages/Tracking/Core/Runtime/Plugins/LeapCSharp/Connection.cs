@@ -1024,6 +1024,49 @@ namespace LeapInternal
             }
         }
 
+        public static bool IsConnectionAvailable(string serverNamespace = "Leap Service")
+        {
+            LEAP_CONNECTION_CONFIG config = new LEAP_CONNECTION_CONFIG();
+            config.server_namespace = Marshal.StringToHGlobalAnsi(serverNamespace);
+            config.flags = 0;
+            config.size = (uint)Marshal.SizeOf(config);
+
+            IntPtr tempConnection;
+
+            eLeapRS result;
+
+            result = LeapC.CreateConnection(ref config, out tempConnection);
+
+            if (result != eLeapRS.eLeapRS_Success || tempConnection == IntPtr.Zero)
+            {
+                return false;
+            }
+
+            result = LeapC.OpenConnection(tempConnection);
+
+            if (result != eLeapRS.eLeapRS_Success)
+            {
+                return false;
+            }
+
+            LEAP_CONNECTION_MESSAGE _msg = new LEAP_CONNECTION_MESSAGE();
+            uint timeout = 150;
+            result = LeapC.PollConnection(tempConnection, timeout, ref _msg);
+
+            LEAP_CONNECTION_INFO pInfo = new LEAP_CONNECTION_INFO();
+            pInfo.size = (uint)Marshal.SizeOf(pInfo);
+            result = LeapC.GetConnectionInfo(tempConnection, ref pInfo);
+
+            if (pInfo.status == eLeapConnectionStatus.eLeapConnectionStatus_Connected)
+            {
+                return true;
+            }
+
+            LeapC.CloseConnection(tempConnection);
+
+            return false;
+        }
+
         /// <summary>
         /// Gets the active setting for a specific policy.
         ///
