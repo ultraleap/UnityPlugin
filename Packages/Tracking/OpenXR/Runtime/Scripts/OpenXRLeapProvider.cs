@@ -393,7 +393,12 @@ namespace Ultraleap.Tracking.OpenXR
                 (_backingUntransformedEditTimeFrame ??= new Frame()).Hands.Clear();
                 _backingUntransformedEditTimeFrame.Hands.Add(EditTimeLeftHand);
                 _backingUntransformedEditTimeFrame.Hands.Add(EditTimeRightHand);
-                _backingEditTimeFrame = _backingUntransformedEditTimeFrame.TransformedCopy(new LeapTransform(mainCamera.transform));
+
+                if (mainCamera != null)
+                {
+                    _backingEditTimeFrame = _backingUntransformedEditTimeFrame.TransformedCopy(new LeapTransform(mainCamera.transform));
+                }
+
                 return _backingEditTimeFrame;
             }
         }
