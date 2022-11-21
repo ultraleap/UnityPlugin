@@ -16,7 +16,7 @@ namespace Leap.Unity
     /// <summary>
     /// XRLeapProviderManager offers a single access point while selecting the most suitable Hand Tracking Data source
     /// available at the time of application launch.
-    /// The order of selection is: OpenXR -> Leap Direct
+    /// The order of selection is: UL OpenXR -> Leap Direct -> OpenXR
     /// </summary>
     public class XRLeapProviderManager : LeapProvider
     {

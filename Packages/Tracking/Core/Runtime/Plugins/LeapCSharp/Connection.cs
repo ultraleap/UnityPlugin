@@ -1024,6 +1024,10 @@ namespace LeapInternal
             }
         }
 
+        /// <summary>
+        /// Temporarily makes a connection to determine if a Service is available.
+        /// Returns the result and closes the temporary connection upon completion.
+        /// </summary>
         public static bool IsConnectionAvailable(string serverNamespace = "Leap Service")
         {
             LEAP_CONNECTION_CONFIG config = new LEAP_CONNECTION_CONFIG();
@@ -1039,6 +1043,7 @@ namespace LeapInternal
 
             if (result != eLeapRS.eLeapRS_Success || tempConnection == IntPtr.Zero)
             {
+                LeapC.CloseConnection(tempConnection);
                 return false;
             }
 
@@ -1046,6 +1051,7 @@ namespace LeapInternal
 
             if (result != eLeapRS.eLeapRS_Success)
             {
+                LeapC.CloseConnection(tempConnection);
                 return false;
             }
 
@@ -1059,6 +1065,7 @@ namespace LeapInternal
 
             if (pInfo.status == eLeapConnectionStatus.eLeapConnectionStatus_Connected)
             {
+                LeapC.CloseConnection(tempConnection);
                 return true;
             }
 
