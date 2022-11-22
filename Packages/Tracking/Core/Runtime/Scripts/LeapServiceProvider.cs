@@ -267,6 +267,8 @@ namespace Leap.Unity
         [EditTimeOnly]
         protected string _serverNameSpace = "Leap Service";
 
+        public override TrackingSource TrackingDataSource { get { return CheckLeapServiceAvailable(); } }
+
         #endregion
 
         #region Internal Settings & Memory
@@ -1034,6 +1036,25 @@ namespace Leap.Unity
         protected virtual void transformFrame(Frame source, Frame dest)
         {
             dest.CopyFrom(source).Transform(new LeapTransform(transform));
+        }
+
+        private TrackingSource CheckLeapServiceAvailable()
+        {
+            if (_trackingSource != TrackingSource.NONE)
+            {
+                return _trackingSource;
+            }
+
+            if (LeapInternal.Connection.IsConnectionAvailable(_serverNameSpace))
+            {
+                _trackingSource = TrackingSource.LEAPC;
+            }
+            else
+            {
+                _trackingSource = TrackingSource.NONE;
+            }
+
+            return _trackingSource;
         }
 
         #endregion
