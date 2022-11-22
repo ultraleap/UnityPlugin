@@ -17,6 +17,9 @@
         _FresnelPower("Fresnel Power", Range(0,1)) = 1
     	
     	[HideInInspector] _Confidence("Confidence", Range(0, 1)) = 1
+        
+        [HDR]_SelectColor("Select Color", Color) = (1,0,0,1)
+        [HideInInspector] _Pinch("Pinch", Vector) = (0,0,0,0)
     }
 
     CGINCLUDE
@@ -36,6 +39,9 @@
     float _useFresnel;
     float _useOutline;
 
+    float4 _Pinch;
+    float4 _SelectColor;
+
     struct v2f
     {
         float2 uv : TEXCOORD0;
@@ -43,9 +49,10 @@
         float3 worldNormal : NORMAL;
         float3 viewDir : TEXCOORD1;
         fixed4 diff : COLOR0;
-
+        float3 worldPos : TEXCOORD2;
+        
         UNITY_VERTEX_OUTPUT_STEREO
-        UNITY_SHADOW_COORDS(2) // Uses TEXCOORD2
+        UNITY_SHADOW_COORDS(3) // Uses TEXCOORD3
     };
 
     ENDCG
@@ -86,13 +93,15 @@
                 float2 offset = TransformViewToProjection(norm.xy);
                 o.uv = v.texcoord;
                 o.pos.xy = _useOutline ? o.pos.xy + offset * _Outline : o.pos.xy;
+                o.worldPos = mul(unity_ObjectToWorld, v.vertex);
                 return o;
             }
 
             half4 frag(v2f i) :COLOR
             {
-                fixed4 col = tex2D(_MainTex, i.uv) * _OutlineColor * _Confidence;
-                return col;
+                float4 outlineColor = tex2D(_MainTex, i.uv) * _OutlineColor;
+                float alpha = smoothstep(0.01, 0.03, distance(i.worldPos, _Pinch.xyz)) * _Pinch.a;
+                return lerp(_SelectColor, outlineColor, alpha);
             }
             ENDCG
         }
@@ -120,6 +129,7 @@
                 o.diff.rgb += ShadeSH9(half4(worldNormal, 1));
 
                 o.worldNormal = worldNormal;
+                o.worldPos = mul(unity_ObjectToWorld, v.vertex);
                 o.viewDir = WorldSpaceViewDir(v.vertex);
                 UNITY_TRANSFER_SHADOW(o, o.uv);
                 return o;
@@ -133,15 +143,16 @@
 
             half4 frag(v2f i) :COLOR
             {
-                fixed4 col = tex2D(_MainTex, i.uv) * _MainColor * _Confidence;
+                fixed4 col = tex2D(_MainTex, i.uv) * _MainColor;
 
                 if (_useLighting)
                     col.rgb *= (i.diff * _LightIntensity);
                 if (_useFresnel)
                     col.rgb *= _FresnelColor * Unity_FresnelEffect_float(i.worldNormal, i.viewDir, _FresnelPower) *
                         _FresnelColor.a;
-
-                return col;
+                
+                float alpha = (smoothstep(0.01, 0.02, distance(i.worldPos, _Pinch.xyz)) / 2.0f + 0.5f) * _Pinch.a;
+                return lerp(_SelectColor, col, alpha) * _Confidence;
             }
             ENDCG
         }

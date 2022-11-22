@@ -236,12 +236,6 @@ namespace Ultraleap.Tracking.OpenXR
                     hand.GetFingerStrength(fingerIndex) < 0.4, // Fixed for now
                     (Finger.FingerType)fingerIndex);
             }
-
-
-            if (timeSinceTracked != 0)
-            {
-                Debug.Log($"Time since tracked: {timeSinceTracked}");
-            }
             
             var palmWidth = joints[(int)HandJoint.Palm].Radius * 2.0f;
             var confidence = Mathf.Clamp01(Mathf.Clamp01(timeVisible * 5.0f) - Mathf.Clamp01(timeSinceTracked * 5.0f));
