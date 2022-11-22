@@ -29,6 +29,8 @@ namespace Leap.Unity
 
         public override void OnInspectorGUI()
         {
+            serializedObject.Update();
+
             EditorGUILayout.PropertyField(trackingSourceProp);
 
             EditorGUILayout.Space();
@@ -45,6 +47,8 @@ namespace Leap.Unity
                 EditorGUILayout.PropertyField(serviceProviderProp);
                 EditorGUILayout.PropertyField(openXRProviderProp);
             }
+
+            serializedObject.ApplyModifiedProperties();
         }
     }
 }
