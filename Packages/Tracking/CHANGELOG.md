@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added GetChirality extension method to hand which returns the Chirality enum of the hand
 
 ### Changed
-- 
+- Reduced the contact offset for Interaction Hands colliders so contact is closer
 
 ### Fixed
 - Detector null reference error when creating a detector at runtime
