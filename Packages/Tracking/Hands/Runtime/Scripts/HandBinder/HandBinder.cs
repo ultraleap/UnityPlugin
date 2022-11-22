@@ -64,6 +64,7 @@ namespace Leap.Unity.HandsModule
         /// <summary>
         /// A multiplier to the base speed of the lerp when scaling hands
         /// </summary>
+        [Tooltip("A multiplier used to adjust the default interpolation of hand scaling")]
         public float scalingSpeed = 1;
 
         /// <summary> 
