@@ -1045,6 +1045,16 @@ namespace Leap.Unity
                 return _trackingSource;
             }
 
+#if UNITY_ANDROID && !UNITY_EDITOR
+            AndroidServiceBinder.Bind();
+
+            if(!AndroidServiceBinder.IsBound)
+            {
+                _trackingSource = TrackingSource.NONE;
+                return _trackingSource;
+            }
+#endif
+
             if (LeapInternal.Connection.IsConnectionAvailable(_serverNameSpace))
             {
                 _trackingSource = TrackingSource.LEAPC;
