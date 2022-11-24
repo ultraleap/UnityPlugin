@@ -33,6 +33,7 @@ namespace Ultraleap.Tracking.OpenXR.ApiLayer
     {
         [PublicAPI] public const string FeatureId = "com.ultraleap.tracking.openxr.feature.handtracking.api_layer";
 
+#if UNITY_EDITOR
         protected override void GetValidationChecks(List<ValidationRule> rules, BuildTargetGroup targetGroup)
         {
             // Attempt to check the version of OpenXR for at least 1.0.25 as a proxy for what loader version is
@@ -41,14 +42,11 @@ namespace Ultraleap.Tracking.OpenXR.ApiLayer
             {
                 message = "The OpenXR loader must be at least version 1.0.25 to support embedding the Ultraleap API layer",
                 error = false,
-                checkPredicate = () =>
-                {
-                    var versionParts = Array.ConvertAll(OpenXRRuntime.apiVersion.Split("."), int.Parse);
-                    return versionParts[0] >= 1 && versionParts[1] >= 0 && versionParts[2] >= 25;
-                },
+                checkPredicate = () => Version.Parse(OpenXRRuntime.apiVersion) >= new Version(1, 0, 25),
                 fixItAutomatic = false,
             });
         }
+#endif
     }
 
 #if UNITY_EDITOR
