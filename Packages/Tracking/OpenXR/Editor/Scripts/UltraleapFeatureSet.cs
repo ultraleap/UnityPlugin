@@ -1,7 +1,6 @@
 using Ultraleap.Tracking.OpenXR.ApiLayer;
 using UnityEditor;
 using UnityEditor.XR.OpenXR.Features;
-using UnityEngine.XR.OpenXR.Features.Interactions;
 
 namespace Ultraleap.Tracking.OpenXR
 {
@@ -20,7 +19,7 @@ namespace Ultraleap.Tracking.OpenXR
             BuildTargetGroup.Android
         }
     )]
-    class UltraleapFeatureSet
+    public class UltraleapFeatureSet
     {
         public const string FeatureSetId = "com.ultraleap.tracking.openxr.featureset.handtracking";
     }
