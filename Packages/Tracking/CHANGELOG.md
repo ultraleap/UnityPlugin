@@ -17,7 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added ability to change HandBinder scaling speed
 
 ### Changed
-- 
+- Reduced the contact offset for Interaction Hands colliders so contact is closer
 
 ### Fixed
 - Check for main camera being null in (get) EditTimeFrame in OpenXRLeapProvider
