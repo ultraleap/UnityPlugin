@@ -260,8 +260,8 @@
     ],
     "controlSchemes": [
         {
-            "name": "New control scheme",
-            "bindingGroup": "New control scheme",
+            "name": "Ultraleap control scheme",
+            "bindingGroup": "Ultraleap control scheme",
             "devices": [
                 {
                     "devicePath": "<Leap Hand>",

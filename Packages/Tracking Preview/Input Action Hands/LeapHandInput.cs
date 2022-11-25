@@ -88,6 +88,9 @@ namespace Leap.Unity.Preview.InputActions
 
     #endregion
 
+    /// <summary>
+    /// The structure used to pass hand data to InputDevices
+    /// </summary>
     public struct LeapHandState : IInputStateTypeInfo
 {
     public FourCC format => new FourCC('L', 'H', 'N', 'D');
@@ -126,7 +129,9 @@ namespace Leap.Unity.Preview.InputActions
 
     #endregion
 }
-
+    /// <summary>
+    /// An Input Device generated using two individual hand Input Devices representing left and right hands.
+    /// </summary>
 #if UNITY_EDITOR
     [InitializeOnLoad]
 #endif

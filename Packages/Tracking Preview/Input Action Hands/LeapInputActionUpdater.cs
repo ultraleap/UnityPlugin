@@ -17,11 +17,13 @@ using UnityEngine.InputSystem.Layouts;
 
 namespace Leap.Unity.Preview.InputActions
 {
-    public class LeapHandUpdater : PostProcessProvider
+    /// <summary>
+    /// Updates Ultraleap Input Actions with the latest available hand data
+    /// Must be provided information from a LeapProvider
+    /// </summary>
+    public class LeapInputActionUpdater : PostProcessProvider
     {
         private LeapHandState _leftState = new LeapHandState(), _rightState = new LeapHandState();
-
-        private bool _leftReportedNull = false, _rightReportedNull = false;
 
         private InputDevice _leftDevice, _rightDevice;
 
@@ -29,49 +31,35 @@ namespace Leap.Unity.Preview.InputActions
         {
             if (Application.isPlaying)
             {
-                if (LeapHandInput.leftHand != null)
-                {
-                    Hand hand = inputFrame.GetHand(Chirality.Left);
-                    if (hand != null)
-                    {
-                        _leftReportedNull = false;
-                        ConvertLeapHandToState(ref _leftState, hand);
-                        InputSystem.QueueStateEvent(LeapHandInput.leftHand, _leftState);
-                    }
-                    else
-                    {
-                        if (!_leftReportedNull)
-                        {
-                            _leftState.tracked = 0;
-                            InputSystem.QueueStateEvent(LeapHandInput.leftHand, _leftState);
-                            _leftReportedNull = true;
-                        }
-                    }
-                }
+                UpdateStateWithLeapHand(_leftDevice, inputFrame.GetHand(Chirality.Left), ref _leftState);
+                UpdateStateWithLeapHand(_rightDevice, inputFrame.GetHand(Chirality.Right), ref _rightState);
+            }
+        }
 
-                if (LeapHandInput.rightHand != null)
+        /// <summary>
+        /// Handles updating the inputDevice with chosen data from the hand using the cached handState structure as a base
+        /// </summary>
+        private static void UpdateStateWithLeapHand(InputDevice inputDevice, Hand hand, ref LeapHandState handState)
+        {
+            if (inputDevice != null)
+            {
+                if (hand != null)
                 {
-                    Hand hand = inputFrame.GetHand(Chirality.Right);
-                    if (hand != null)
+                    ConvertLeapHandToState(ref handState, hand);
+                    InputSystem.QueueStateEvent(inputDevice, handState);
+                }
+                else
+                {
+                    if (handState.tracked != 0)
                     {
-                        _rightReportedNull = false;
-                        ConvertLeapHandToState(ref _rightState, hand);
-                        InputSystem.QueueStateEvent(LeapHandInput.rightHand, _rightState);
-                    }
-                    else
-                    {
-                        if (!_rightReportedNull)
-                        {
-                            _rightState.tracked = 0;
-                            InputSystem.QueueStateEvent(LeapHandInput.rightHand, _rightState);
-                            _rightReportedNull = true;
-                        }
+                        handState.tracked = 0;
+                        InputSystem.QueueStateEvent(inputDevice, handState);
                     }
                 }
             }
         }
 
-        public static void ConvertLeapHandToState(ref LeapHandState state, Hand hand)
+        private static void ConvertLeapHandToState(ref LeapHandState state, Hand hand)
         {
             state.tracked = (int)(UnityEngine.XR.InputTrackingState.Position | UnityEngine.XR.InputTrackingState.Rotation);
             state.position = hand.PalmPosition;
