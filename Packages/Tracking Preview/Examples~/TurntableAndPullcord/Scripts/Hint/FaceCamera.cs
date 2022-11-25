@@ -10,9 +10,11 @@ using UnityEngine;
 
 namespace Leap.Unity.Preview
 {
+	/// <summary>
+	/// FaceCamera is used to update a transform, so that it always points in direction of the camera.
+	/// </summary>
 	public class FaceCamera : MonoBehaviour
 	{
-
 		[SerializeField] private bool _lockZRotation = true;
 
 		private float _initialZRot;

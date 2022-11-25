@@ -11,6 +11,10 @@ using UnityEngine;
 
 namespace Leap.Unity.Preview
 {
+    /// <summary>
+    /// This creates a circle and dashes with line renderers.
+    /// It takes info such as the height and radius of the turntable from Turntable.
+    /// </summary>
     public class TurntableVisuals : MonoBehaviour
     {
         [SerializeField] private LineRenderer _circle;

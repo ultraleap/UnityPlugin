@@ -10,6 +10,9 @@ using UnityEngine;
 
 namespace Leap.Unity.Preview
 {
+	/// <summary>
+	/// This updates the start and end position of a line renderer to be the positions of the transforms _pointA and _pointB.
+	/// </summary>
 	[RequireComponent(typeof(LineRenderer))]
 	public class LineBetweenTransforms : MonoBehaviour
 	{

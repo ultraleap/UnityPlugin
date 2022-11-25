@@ -13,6 +13,10 @@ using Leap.Unity.Attributes;
 
 namespace Leap.Unity.Preview
 {
+    /// <summary>
+    /// This deals with rotating the turntable whenever any fingertips are intersecting with it.
+    /// It also calls TurntableVisuals.UpdateVisuals() when any turntable parameters have changed.
+    /// </summary>
     public class Turntable : MonoBehaviour
     {
         [SerializeField]
