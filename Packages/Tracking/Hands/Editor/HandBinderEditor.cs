@@ -62,7 +62,7 @@ namespace Leap.Unity.HandsModule
             DebugModelRotationAxis = serializedObject.FindProperty("DebugModelRotationAxis");
             setPositions = serializedObject.FindProperty("SetPositions");
             setScale = serializedObject.FindProperty("SetModelScale");
-            scaleSpeed = serializedObject.FindProperty("scalingSpeed");
+            scaleSpeed = serializedObject.FindProperty("ScalingSpeedMultiplier");
             setEditorPose = serializedObject.FindProperty("SetEditorPose");
             globalFingerRotationOffset = serializedObject.FindProperty("GlobalFingerRotationOffset");
             wristRotationOffset = serializedObject.FindProperty("WristRotationOffset");
