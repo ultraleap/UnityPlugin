@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Added XRLeapProviderManager script and Prefab which auto-selects a LeapXRServiceProvider or OpenXRLeapProvider depending on the avaiability of OpenXR
 - Added GetChirality extension method to hand which returns the Chirality enum of the hand
+- Added ability to change HandBinder scaling speed
 
 ### Changed
 - 
