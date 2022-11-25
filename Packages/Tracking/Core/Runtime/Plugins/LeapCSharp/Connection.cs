@@ -1025,6 +1025,56 @@ namespace LeapInternal
         }
 
         /// <summary>
+        /// Temporarily makes a connection to determine if a Service is available.
+        /// Returns the result and closes the temporary connection upon completion.
+        /// </summary>
+        public static bool IsConnectionAvailable(string serverNamespace = "Leap Service")
+        {
+            LEAP_CONNECTION_CONFIG config = new LEAP_CONNECTION_CONFIG();
+            config.server_namespace = Marshal.StringToHGlobalAnsi(serverNamespace);
+            config.flags = 0;
+            config.size = (uint)Marshal.SizeOf(config);
+
+            IntPtr tempConnection;
+
+            eLeapRS result;
+
+            result = LeapC.CreateConnection(ref config, out tempConnection);
+
+            if (result != eLeapRS.eLeapRS_Success || tempConnection == IntPtr.Zero)
+            {
+                LeapC.CloseConnection(tempConnection);
+                return false;
+            }
+
+            result = LeapC.OpenConnection(tempConnection);
+
+            if (result != eLeapRS.eLeapRS_Success)
+            {
+                LeapC.CloseConnection(tempConnection);
+                return false;
+            }
+
+            LEAP_CONNECTION_MESSAGE _msg = new LEAP_CONNECTION_MESSAGE();
+            uint timeout = 150;
+            result = LeapC.PollConnection(tempConnection, timeout, ref _msg);
+
+            LEAP_CONNECTION_INFO pInfo = new LEAP_CONNECTION_INFO();
+            pInfo.size = (uint)Marshal.SizeOf(pInfo);
+            result = LeapC.GetConnectionInfo(tempConnection, ref pInfo);
+
+            if (pInfo.status == eLeapConnectionStatus.eLeapConnectionStatus_Connected)
+            {
+                LeapC.CloseConnection(tempConnection);
+                return true;
+            }
+
+            LeapC.CloseConnection(tempConnection);
+
+            return false;
+        }
+
+        /// <summary>
         /// Gets the active setting for a specific policy.
         ///
         /// Keep in mind that setting a policy flag is asynchronous, so changes are
