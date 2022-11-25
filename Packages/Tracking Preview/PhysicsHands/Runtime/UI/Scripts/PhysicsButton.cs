@@ -19,6 +19,10 @@ namespace Leap.Unity.Interaction.PhysicsHands
     [RequireComponent(typeof(Rigidbody))]
     public class PhysicsButton : MonoBehaviour
     {
+        // Consts used to modify thresholds of buttons pressed
+        private const float FIVE_PERCENT_MULTIPLIER = 0.05F;
+        private const float ONE_PERCENT_MULTIPLIER = 0.01F;
+
         #region Inspector
 
         [SerializeField, Tooltip("The rigidbody to use as spring anchor.")]
@@ -318,14 +322,16 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 PressValidation();
             }
 
-            if (_isPressed && _buttonElement.transform.localPosition.y >= buttonHeightLimit * 0.05f)
+            // Check if the button is at least 5% unpressed
+            if (_isPressed && _buttonElement.transform.localPosition.y >= buttonHeightLimit * FIVE_PERCENT_MULTIPLIER)
             {
                 _isPressed = false;
                 _unpressedThisFrame = true;
                 OnUnpress?.Invoke();
             }
 
-            pressedAmount = Mathf.InverseLerp(buttonHeightLimit * 0.99f, buttonHeightLimit * 0.01f, _buttonElement.transform.localPosition.y);
+            // Lerps up to 99% pressed to account for physics wobble
+            pressedAmount = Mathf.InverseLerp(buttonHeightLimit * 0.99f, buttonHeightLimit * ONE_PERCENT_MULTIPLIER, _buttonElement.transform.localPosition.y);
 
             if (_pressedThisFrame && isToggleable)
             {
@@ -337,7 +343,8 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
         private void PressValidation()
         {
-            if (!_isPressed && _buttonElement.transform.localPosition.y <= buttonHeightLimit * 0.01f)
+            // Check if the button is more than 99% pressed to account for physics wobble
+            if (!_isPressed && _buttonElement.transform.localPosition.y <= buttonHeightLimit * ONE_PERCENT_MULTIPLIER)
             {
                 _isPressed = true;
                 _pressedThisFrame = true;
@@ -422,14 +429,14 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
         private void UpdateToggleJoint()
         {
-            float heighLimit = _isToggled ? buttonToggleHeightLimit : buttonHeightLimit;
+            float heightLimit = _isToggled ? buttonToggleHeightLimit : buttonHeightLimit;
 
             SoftJointLimit softLimit = _buttonElement.Joint.linearLimit;
-            softLimit.limit = heighLimit / 2f;
+            softLimit.limit = heightLimit / 2f;
             _buttonElement.Joint.linearLimit = softLimit;
 
-            _buttonElement.Joint.connectedAnchor = Vector3.up * heighLimit;
-            _buttonElement.Joint.targetPosition = Vector3.down * heighLimit;
+            _buttonElement.Joint.connectedAnchor = Vector3.up * heightLimit;
+            _buttonElement.Joint.targetPosition = Vector3.down * heightLimit;
         }
 
         #endregion
