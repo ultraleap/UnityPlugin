@@ -136,7 +136,10 @@ namespace Leap.Unity.Preview.Locomotion
             {
                 Head = Camera.main.transform;
             }
-            if (Player == null && Head != null) Player = Head.parent.gameObject == null ? Head.gameObject : Head.parent.gameObject;
+            if (Player == null && Head != null)
+            {
+                Player = Head.parent?.gameObject == null ? Head.gameObject : Head.parent.gameObject;
+            }
 
             if (farFieldLayerManager == null)
             {
