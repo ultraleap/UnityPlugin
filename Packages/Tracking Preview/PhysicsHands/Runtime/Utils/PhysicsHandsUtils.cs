@@ -50,7 +50,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 jointColliders = new CapsuleCollider[PhysicsHand.Hand.FINGERS * PhysicsHand.Hand.BONES],
                 jointBodies = new ArticulationBody[PhysicsHand.Hand.FINGERS * PhysicsHand.Hand.BONES],
                 defaultRotations = new Quaternion[PhysicsHand.Hand.FINGERS + 1],
-                overRotationCount = new int[PhysicsHand.Hand.FINGERS * PhysicsHand.Hand.BONES],
+                overRotationFrameCount = new int[PhysicsHand.Hand.FINGERS * PhysicsHand.Hand.BONES],
                 gameObject = palmGameObject,
                 transform = palmTransform,
                 rootObject = rootObject,
@@ -155,7 +155,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             physicsHand.transform.position = leapHand.PalmPosition;
             physicsHand.transform.rotation = leapHand.Rotation;
 
-            physicsHand.overRotationCount = new int[PhysicsHand.Hand.FINGERS * PhysicsHand.Hand.BONES];
+            physicsHand.overRotationFrameCount = new int[PhysicsHand.Hand.FINGERS * PhysicsHand.Hand.BONES];
 
             if (physicsHand.physicMaterial == null)
             {
@@ -388,7 +388,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
         public static void ResetPhysicsHandSizes(PhysicsHand.Hand physicsHand, Leap.Hand leapHand)
         {
             SetupPalmCollider(physicsHand.palmCollider, leapHand);
-            physicsHand.overRotationCount = new int[PhysicsHand.Hand.FINGERS * PhysicsHand.Hand.BONES];
+            physicsHand.overRotationFrameCount = new int[PhysicsHand.Hand.FINGERS * PhysicsHand.Hand.BONES];
             for (int fingerIndex = 0; fingerIndex < PhysicsHand.Hand.FINGERS; fingerIndex++)
             {
                 Transform lastTransform = physicsHand.palmBone.transform;

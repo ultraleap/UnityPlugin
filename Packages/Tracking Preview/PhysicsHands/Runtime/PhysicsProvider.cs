@@ -411,7 +411,9 @@ namespace Leap.Unity.Interaction.PhysicsHands
         private void PostUpdateOverlapCheck(PhysicsHand hand)
         {
             if (hand == null || !hand.IsTracked)
+            {
                 return;
+            }
 
             // Sync transforms in case someone's done a transform.position on a rigidbody
             if(_physicsSyncTime != Time.time)
@@ -424,41 +426,35 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
             Vector3 radiusAmount = Vector3.Scale(pH.palmCollider.size,PhysExts.AbsVec3(pH.palmCollider.transform.lossyScale)) * 0.2f;
 
+            _resultCount = PhysExts.OverlapBoxNonAllocOffset(pH.palmCollider, Vector3.zero, _resultsCache, _contactMask, QueryTriggerInteraction.Ignore, extraRadius: -PhysExts.MaxVec3(radiusAmount));
+            HandleOverlaps(hand);
+
+            for (int i = 0; i < pH.jointColliders.Length; i++)
+            {
+                _resultCount = PhysExts.OverlapCapsuleNonAllocOffset(pH.jointColliders[i], Vector3.zero, _resultsCache, _contactMask, QueryTriggerInteraction.Ignore, extraRadius: -pH.jointColliders[i].radius * 0.2f);
+                HandleOverlaps(hand);
+            }
+        }
+
+        void HandleOverlaps(PhysicsHand hand)
+        {
             HashSet<int> foundBodies = new HashSet<int>();
 
-            _resultCount = PhysExts.OverlapBoxNonAllocOffset(pH.palmCollider, Vector3.zero, _resultsCache, _contactMask, QueryTriggerInteraction.Ignore, extraRadius: -PhysExts.MaxVec3(radiusAmount));
             for (int i = 0; i < _resultCount; i++)
             {
                 if (_resultsCache[i] != null && _resultsCache[i].attachedRigidbody != null)
                 {
                     int id = _resultsCache[i].attachedRigidbody.gameObject.GetInstanceID();
+
                     if (foundBodies.Contains(id))
+                    {
                         continue;
+                    }
 
                     if (IsRigidbodyAlreadyColliding(_resultsCache[i].attachedRigidbody))
                     {
                         hand.IgnoreCollision(_resultsCache[i].attachedRigidbody, timeout: Time.fixedDeltaTime * 5f);
                         foundBodies.Add(id);
-                    }
-                }
-            }
-
-            for (int i = 0; i < pH.jointColliders.Length; i++)
-            {
-                _resultCount = PhysExts.OverlapCapsuleNonAllocOffset(pH.jointColliders[i], Vector3.zero, _resultsCache, _contactMask, QueryTriggerInteraction.Ignore, extraRadius: -pH.jointColliders[i].radius * 0.2f);
-                for (int j = 0; j < _resultCount; j++)
-                {
-                    if (_resultsCache[i] != null && _resultsCache[i].attachedRigidbody != null)
-                    {
-                        int id = _resultsCache[i].attachedRigidbody.gameObject.GetInstanceID();
-                        if (foundBodies.Contains(id))
-                            continue;
-
-                        if (IsRigidbodyAlreadyColliding(_resultsCache[i].attachedRigidbody))
-                        {
-                            hand.IgnoreCollision(_resultsCache[i].attachedRigidbody, timeout: Time.fixedDeltaTime * 5f);
-                            foundBodies.Add(id);
-                        }
                     }
                 }
             }
@@ -473,7 +469,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             {
                 return false;
             }
-            // Does a helper alread exist (we would be at least hovering)
+            // Does a helper already exist (we would be at least hovering)
             if (_graspHelpers.TryGetValue(body, out var helper))
             {
                 // Is that helper only hovering?

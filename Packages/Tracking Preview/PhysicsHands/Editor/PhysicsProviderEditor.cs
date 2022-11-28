@@ -8,6 +8,9 @@ namespace Leap.Unity.Interaction.PhysicsHands
     [CustomEditor(typeof(PhysicsProvider))]
     public class PhysicsProviderEditor : Editor
     {
+        private const int RECOMMENDED_SOLVER_ITERATIONS = 15;
+        private const int RECOMMENDED_SOLVER_VELOCITY_ITERATIONS = 5;
+
         PhysicsProvider _physicsProvider;
 
         SerializedProperty _inputProvider;
@@ -87,26 +90,26 @@ namespace Leap.Unity.Interaction.PhysicsHands
         private void WarningsSection()
         {
             // Solver iterations
-            if (Physics.defaultSolverIterations < 15)
+            if (Physics.defaultSolverIterations < RECOMMENDED_SOLVER_ITERATIONS)
             {
                 EditorGUILayout.BeginHorizontal();
-                EditorGUILayout.HelpBox($"Project solver iterations are lower than 15 ({Physics.defaultSolverIterations}). It is highly recommended to increase this." +
+                EditorGUILayout.HelpBox($"Project solver iterations are lower than {RECOMMENDED_SOLVER_ITERATIONS} ({Physics.defaultSolverIterations}). It is highly recommended to increase this." +
                     $"Hands will not be directly affected by this, but all other objects in your scene will be.", MessageType.Warning);
                 if (GUILayout.Button("Fix Now", GUILayout.Width(80)))
                 {
-                    Physics.defaultSolverIterations = 15;
+                    Physics.defaultSolverIterations = RECOMMENDED_SOLVER_ITERATIONS;
                 }
                 EditorGUILayout.EndHorizontal();
             }
             // Solver iterations
-            if (Physics.defaultSolverVelocityIterations < 5)
+            if (Physics.defaultSolverVelocityIterations < RECOMMENDED_SOLVER_VELOCITY_ITERATIONS)
             {
                 EditorGUILayout.BeginHorizontal();
-                EditorGUILayout.HelpBox($"Project solver velocity iterations are lower than 5 ({Physics.defaultSolverVelocityIterations}). It is highly recommended to increase this." +
+                EditorGUILayout.HelpBox($"Project solver velocity iterations are lower than {RECOMMENDED_SOLVER_VELOCITY_ITERATIONS} ({Physics.defaultSolverVelocityIterations}). It is highly recommended to increase this." +
                     $"Hands will not be directly affected by this, but all other objects in your scene will be.", MessageType.Warning);
                 if (GUILayout.Button("Fix Now", GUILayout.Width(80)))
                 {
-                    Physics.defaultSolverVelocityIterations = 5;
+                    Physics.defaultSolverVelocityIterations = RECOMMENDED_SOLVER_VELOCITY_ITERATIONS;
                 }
                 EditorGUILayout.EndHorizontal();
             }

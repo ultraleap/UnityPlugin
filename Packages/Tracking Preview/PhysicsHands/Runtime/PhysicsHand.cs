@@ -42,7 +42,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             public ArticulationBody[] jointBodies;
             public CapsuleCollider[] jointColliders;
             [HideInInspector]
-            public int[] overRotationCount;
+            public int[] overRotationFrameCount;
 
             [HideInInspector]
             public Quaternion[] defaultRotations;
@@ -349,10 +349,8 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 // Reduce force of hand as it gets further from the original data hand
                 !_ghosted && !_isGrasping && _graspingDeltaCurrent > 0 ? Mathf.InverseLerp(_physicsProvider.HandTeleportDistance * 0.5f, _physicsProvider.HandTeleportDistance, DistanceFromDataHand).EaseOut() : 0f);
 
-            bool bonesOverrotated = AreBonesRotatedBeyondThreshold();
-
             // Fix the hand if it gets into a bad situation by teleporting and holding in place until its bad velocities disappear
-            HandleTeleportingHands(bonesOverrotated);
+            HandleTeleportingHands(AreBonesRotatedBeyondThreshold());
 
             // Update the palm collider with the distance between knuckles to wrist + palm width
             _physicsHand.palmCollider.size = Vector3.Lerp(_physicsHand.palmCollider.size, PhysicsHandsUtils.CalculatePalmSize(_originalLeapHand), _currentResetLerp);
@@ -510,11 +508,11 @@ namespace Leap.Unity.Interaction.PhysicsHands
             _physicsHand.gameObject.SetActive(false);
         }
 
-        private void HandleTeleportingHands(bool bonesOverrotated)
+        private void HandleTeleportingHands(bool bonesAreOverRotated)
         {
             // Fix the hand if it gets into a bad situation by teleporting and holding in place until its bad velocities disappear
             if (Vector3.Distance(_originalOldPosition, _originalLeapHand.PalmPosition) > _physicsProvider.HandTeleportDistance ||
-                bonesOverrotated ||
+                bonesAreOverRotated ||
                 DistanceFromDataHand > (IsGrasping ? _physicsProvider.HandGraspTeleportDistance : _physicsProvider.HandTeleportDistance) && (IsGrasping ||
                 IsAnyObjectInHandRadius()))
             {
@@ -539,7 +537,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             {
                 for (int i = 0; i < _ignoredData.Count; i++)
                 {
-                    // Handle destoryed objects
+                    // Handle destroyed objects
                     if (_ignoredData[i].rigid == null)
                     {
                         _ignoredData.RemoveAt(i);
@@ -700,16 +698,15 @@ namespace Leap.Unity.Interaction.PhysicsHands
         private bool AreBonesRotatedBeyondThreshold(float eulerThreshold = 20f)
         {
             if (IsGrasping)
+            {
                 return false;
-
-            int boneArrayIndex = -1;
-            ArticulationBody body = null;
+            }
 
             for (int fingerIndex = 0; fingerIndex < Hand.FINGERS; fingerIndex++)
             {
                 for (int jointIndex = 1; jointIndex < Hand.BONES; jointIndex++)
                 {
-                    boneArrayIndex = fingerIndex * Hand.BONES + jointIndex;
+                    int boneArrayIndex = fingerIndex * Hand.BONES + jointIndex;
                     
                     // Skip finger if a bone's contacting
                     if (_physicsHand.jointBones[boneArrayIndex].IsContacting)
@@ -717,7 +714,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                         break;
                     }
 
-                    body = _physicsHand.jointBodies[boneArrayIndex];
+                    ArticulationBody body = _physicsHand.jointBodies[boneArrayIndex];
                     float angle = Mathf.Repeat(body.transform.localRotation.eulerAngles.x + 180, 360) - 180;
                     if(angle < body.xDrive.lowerLimit - eulerThreshold)
                     {
@@ -733,15 +730,17 @@ namespace Leap.Unity.Interaction.PhysicsHands
                     float delta = Mathf.DeltaAngle(angle, body.xDrive.target);
                     if(Mathf.Abs(body.xDrive.target) < eulerThreshold / 2f && delta > eulerThreshold)
                     {
-                        _physicsHand.overRotationCount[boneArrayIndex]++;
-                        if (_physicsHand.overRotationCount[boneArrayIndex] > 10)
+                        // We are over rotated, add a frame to the frame count
+                        _physicsHand.overRotationFrameCount[boneArrayIndex]++;
+                        if (_physicsHand.overRotationFrameCount[boneArrayIndex] > 10)
                         {
                             return true;
                         }
                     }
                     else
                     {
-                        _physicsHand.overRotationCount[boneArrayIndex] = Mathf.Clamp(_physicsHand.overRotationCount[boneArrayIndex] - 1, 0, 10);
+                        // We were over rotated, but no longer are, remove a frame from the frame count
+                        _physicsHand.overRotationFrameCount[boneArrayIndex] = Mathf.Clamp(_physicsHand.overRotationFrameCount[boneArrayIndex] - 1, 0, 10);
                     }
                 }
             }
