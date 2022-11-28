@@ -61,6 +61,12 @@ namespace Leap.Unity.HandsModule
         /// </summary>
         public bool SetModelScale = true;
 
+        /// <summary>
+        /// A multiplier to the base speed of the lerp when scaling hands
+        /// </summary>
+        [Tooltip("A multiplier used to adjust the default interpolation of hand scaling, 1 = default, 0.01 = slowest, 100 = fastest"), Range(0.01f, 100f)]
+        public float ScalingSpeedMultiplier = 1;
+
         /// <summary> 
         /// User defined offsets in editor script 
         /// </summary>
@@ -203,7 +209,7 @@ namespace Leap.Unity.HandsModule
             else // Lerp the scale during playmode
             {
                 var targetScale = BoundHand.startScale * scaleRatio;
-                transform.localScale = Vector3.Lerp(transform.localScale, targetScale, Time.deltaTime);
+                transform.localScale = Vector3.Lerp(transform.localScale, targetScale, Time.deltaTime * ScalingSpeedMultiplier);
             }
         }
 
@@ -250,7 +256,7 @@ namespace Leap.Unity.HandsModule
                 else // Lerp the scale during playmode
                 {
                     //Lerp the scale to the target scale
-                    distalBone.boundTransform.localScale = Vector3.Lerp(distalBone.boundTransform.localScale, scale, Time.deltaTime);
+                    distalBone.boundTransform.localScale = Vector3.Lerp(distalBone.boundTransform.localScale, scale, Time.deltaTime * ScalingSpeedMultiplier);
                 }
             }
         }
