@@ -245,7 +245,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                         int boneArrayIndex = fingerIndex * Hand.BONES + jointIndex;
                         _wasGraspingBones[boneArrayIndex] = false;
                         ArticulationBody body = _physicsHand.jointBodies[boneArrayIndex];
-                        
+
                         float xTargetAngle = PhysicsHandsUtils.CalculateXTargetAngle(prevBone, bone, fingerIndex, jointIndex);
                         body.xDrive = new ArticulationDrive()
                         {
@@ -707,7 +707,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 for (int jointIndex = 1; jointIndex < Hand.BONES; jointIndex++)
                 {
                     int boneArrayIndex = fingerIndex * Hand.BONES + jointIndex;
-                    
+
                     // Skip finger if a bone's contacting
                     if (_physicsHand.jointBones[boneArrayIndex].IsContacting)
                     {
@@ -716,19 +716,19 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
                     ArticulationBody body = _physicsHand.jointBodies[boneArrayIndex];
                     float angle = Mathf.Repeat(body.transform.localRotation.eulerAngles.x + 180, 360) - 180;
-                    if(angle < body.xDrive.lowerLimit - eulerThreshold)
+                    if (angle < body.xDrive.lowerLimit - eulerThreshold)
                     {
                         return true;
                     }
 
-                    if(angle > body.xDrive.upperLimit + eulerThreshold)
+                    if (angle > body.xDrive.upperLimit + eulerThreshold)
                     {
                         return true;
                     }
 
                     // If the bone's meant to be pretty flat
                     float delta = Mathf.DeltaAngle(angle, body.xDrive.target);
-                    if(Mathf.Abs(body.xDrive.target) < eulerThreshold / 2f && delta > eulerThreshold)
+                    if (Mathf.Abs(body.xDrive.target) < eulerThreshold / 2f && delta > eulerThreshold)
                     {
                         // We are over rotated, add a frame to the frame count
                         _physicsHand.overRotationFrameCount[boneArrayIndex]++;
@@ -758,7 +758,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
         private void TogglePhysicsIgnore(Rigidbody rigid, bool ignore, float timeout = 0, float radius = 0)
         {
             // If the rigid has been destroyed we can't do anything
-            if(rigid == null)
+            if (rigid == null)
             {
                 return;
             }

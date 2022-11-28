@@ -92,11 +92,11 @@ namespace Leap.Unity
                 {
                     SelectTrackingSource(TrackingSourceType.OPEN_XR);
                 }
-                else if(leapXRServiceProvider != null && leapXRServiceProvider.TrackingDataSource == TrackingSource.LEAPC)
+                else if (leapXRServiceProvider != null && leapXRServiceProvider.TrackingDataSource == TrackingSource.LEAPC)
                 {
                     SelectTrackingSource(TrackingSourceType.LEAP_DIRECT);
                 }
-                else if(openXRLeapProvider != null && openXRLeapProvider.TrackingDataSource == TrackingSource.OPENXR)
+                else if (openXRLeapProvider != null && openXRLeapProvider.TrackingDataSource == TrackingSource.OPENXR)
                 {
                     SelectTrackingSource(TrackingSourceType.OPEN_XR);
                 }
@@ -133,7 +133,7 @@ namespace Leap.Unity
             {
                 LeapProvider = openXRLeapProvider;
 
-                if(openXRLeapProvider != null && openXRLeapProvider.TrackingDataSource == TrackingSource.OPENXR_LEAP)
+                if (openXRLeapProvider != null && openXRLeapProvider.TrackingDataSource == TrackingSource.OPENXR_LEAP)
                 {
                     Debug.Log("Using Ultraleap OpenXR for Hand Tracking");
                 }

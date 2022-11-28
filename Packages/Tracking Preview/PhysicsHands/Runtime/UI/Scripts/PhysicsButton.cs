@@ -200,7 +200,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 _buttonElement = GetComponentInChildren<PhysicsButtonElement>(true);
             }
 
-            if(_buttonElement == null)
+            if (_buttonElement == null)
             {
                 Debug.LogError("The PhysicsButton is missing a PhysicsButtonElement and has been disabled. Please ensure it has been added and assigned.", this);
                 enabled = false;
@@ -478,16 +478,16 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
         private void OnValidate()
         {
-            if(_rigidbody == null)
+            if (_rigidbody == null)
             {
                 _rigidbody = GetComponent<Rigidbody>();
-                if(_rigidbody == null)
+                if (_rigidbody == null)
                 {
                     _rigidbody = gameObject.AddComponent<Rigidbody>();
                 }
             }
 
-            if(_buttonElement == null)
+            if (_buttonElement == null)
             {
                 _buttonElement = GetComponentInChildren<PhysicsButtonElement>(true);
             }
