@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [docs-website]: https://docs.ultraleap.com/unity-api/ "Ultraleap Docs"
 
-## [NEXT] - unreleased
+## [6.3.0] - 02/12/22
 
 ### Fixed
 - Fix issue with generic hand-shader giving compile errors in some circumstances

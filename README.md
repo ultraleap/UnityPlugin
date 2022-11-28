@@ -34,13 +34,12 @@
 # Ultraleap Unity Plugin
 
 [![documentation](https://img.shields.io/badge/Documentation-docs.ultraleap.com-00cf75)][documentation]
-[![forum](https://img.shields.io/badge/Community-Developer%20Forum-00cf75)][developer-forum]
+[![discord](https://img.shields.io/badge/Discord-Server-blueviolet)[discord]]
 [![mail](https://img.shields.io/badge/Contact-support%40ultraleap.com-00cf75)](mailto:support@ultraleap.com)
 ![GitHub](https://img.shields.io/github/license/ultraleap/UnityPlugin)
 
 [![openupm-tracking](https://img.shields.io/npm/v/com.ultraleap.tracking?label=OpenUPM%20Tracking&registry_uri=https://package.openupm.com)](https://openupm.com/packages/com.ultraleap.tracking/)
 [![openupm-tracking-preview](https://img.shields.io/npm/v/com.ultraleap.tracking.preview?label=OpenUPM%20Tracking%20Preview&registry_uri=https://package.openupm.com)](https://openupm.com/packages/com.ultraleap.tracking.preview/)
-[![openupm-tracking-openxr](https://img.shields.io/npm/v/com.ultraleap.tracking.openxr?label=OpenUPM%20Tracking%20OpenXR&registry_uri=https://package.openupm.com)](https://openupm.com/packages/com.ultraleap.tracking.openxr/)
 
 The Ultraleap Unity Plugin empowers developers to build Unity applications using Ultraleap's hand tracking technology. It includes various assets, examples, and utilities that make it easy to design and build applications using hand tracking in XR projects.
 
