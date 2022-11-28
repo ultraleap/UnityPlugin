@@ -35,7 +35,7 @@
 
 [![documentation](https://img.shields.io/badge/Documentation-docs.ultraleap.com-00cf75)][documentation]
 [![mail](https://img.shields.io/badge/Contact-support%40ultraleap.com-00cf75)](mailto:support@ultraleap.com)
-![discord](https://img.shields.io/badge/Discord-Server-blueviolet)
+[![discord](https://img.shields.io/badge/Discord-Server-blueviolet)][discord]
 ![GitHub](https://img.shields.io/github/license/ultraleap/UnityPlugin)
 
 [![openupm-tracking](https://img.shields.io/npm/v/com.ultraleap.tracking?label=OpenUPM%20Tracking&registry_uri=https://package.openupm.com)](https://openupm.com/packages/com.ultraleap.tracking/)
