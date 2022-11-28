@@ -349,10 +349,10 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 // Reduce force of hand as it gets further from the original data hand
                 !_ghosted && !_isGrasping && _graspingDeltaCurrent > 0 ? Mathf.InverseLerp(_physicsProvider.HandTeleportDistance * 0.5f, _physicsProvider.HandTeleportDistance, DistanceFromDataHand).EaseOut() : 0f);
 
-            AreBonesRotatedBeyondThreshold();
+            bool bonesOverrotated = AreBonesRotatedBeyondThreshold();
 
             // Fix the hand if it gets into a bad situation by teleporting and holding in place until its bad velocities disappear
-            HandleTeleportingHands();
+            HandleTeleportingHands(bonesOverrotated);
 
             // Update the palm collider with the distance between knuckles to wrist + palm width
             _physicsHand.palmCollider.size = Vector3.Lerp(_physicsHand.palmCollider.size, PhysicsHandsUtils.CalculatePalmSize(_originalLeapHand), _currentResetLerp);
@@ -510,11 +510,11 @@ namespace Leap.Unity.Interaction.PhysicsHands
             _physicsHand.gameObject.SetActive(false);
         }
 
-        private void HandleTeleportingHands()
+        private void HandleTeleportingHands(bool bonesOverrotated)
         {
             // Fix the hand if it gets into a bad situation by teleporting and holding in place until its bad velocities disappear
             if (Vector3.Distance(_originalOldPosition, _originalLeapHand.PalmPosition) > _physicsProvider.HandTeleportDistance ||
-                AreBonesRotatedBeyondThreshold() ||
+                bonesOverrotated ||
                 DistanceFromDataHand > (IsGrasping ? _physicsProvider.HandGraspTeleportDistance : _physicsProvider.HandTeleportDistance) && (IsGrasping ||
                 IsAnyObjectInHandRadius()))
             {
