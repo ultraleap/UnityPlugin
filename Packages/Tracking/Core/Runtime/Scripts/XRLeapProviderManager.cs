@@ -86,7 +86,12 @@ namespace Leap.Unity
         {
             if (trackingSource == TrackingSourceType.AUTOMATIC)
             {
-                while (XRGeneralSettings.Instance == null) yield return new WaitForEndOfFrame();
+                while (XRGeneralSettings.Instance == null &&
+                        XRGeneralSettings.Instance.Manager == null &&
+                        XRGeneralSettings.Instance.Manager.activeLoader == null)
+                {
+                    yield return new WaitForEndOfFrame();
+                }
 
                 if (openXRLeapProvider != null && openXRLeapProvider.TrackingDataSource == TrackingSource.OPENXR_LEAP)
                 {
