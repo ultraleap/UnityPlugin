@@ -39,7 +39,7 @@ namespace Leap.Unity.Preview.InputActions
         /// <summary>
         /// Handles updating the inputDevice with chosen data from the hand using the cached handState structure as a base
         /// </summary>
-        private static void UpdateStateWithLeapHand(InputDevice inputDevice, Hand hand, ref LeapHandState handState)
+        private void UpdateStateWithLeapHand(InputDevice inputDevice, Hand hand, ref LeapHandState handState)
         {
             if (inputDevice != null)
             {
@@ -59,16 +59,37 @@ namespace Leap.Unity.Preview.InputActions
             }
         }
 
-        private static void ConvertLeapHandToState(ref LeapHandState state, Hand hand)
+        private void ConvertLeapHandToState(ref LeapHandState state, Hand hand)
         {
             state.tracked = (int)(UnityEngine.XR.InputTrackingState.Position | UnityEngine.XR.InputTrackingState.Rotation);
             state.position = hand.PalmPosition;
-            state.direction = Quaternion.LookRotation(hand.PalmNormal, hand.Direction);
+
+            if(Camera.main != null)
+            {
+                state.direction = GetSimpleShoulderPinchDirection(hand);
+            }
+            else
+            {
+                state.direction = Quaternion.LookRotation(hand.PalmNormal, hand.Direction);
+            }
 
             state.indexTipPosition = hand.Fingers[1].Bone(Bone.BoneType.TYPE_DISTAL).NextJoint;
 
             state.isGrabbing = hand.GrabStrength > 0.8 ? 1 : 0;
             state.isPinching = hand.PinchStrength > 0.8 ? 1 : 0;
+        }
+
+        Quaternion GetSimpleShoulderPinchDirection(Hand hand)
+        {
+            // First get the shoulder position
+            Vector3 direction = Camera.main.transform.position;
+            direction += Vector3.down * 0.1f;
+            direction += Camera.main.transform.right * (hand.GetChirality() == Chirality.Left ? -0.1f : 0.1f);
+
+            // Use the shoulder position to determine an aim direction
+            direction = (hand.GetStablePinchPosition() - direction).normalized;
+
+            return Quaternion.LookRotation(direction);
         }
 
         // "Leap Bone" is Not currently required as we are not sending full data
