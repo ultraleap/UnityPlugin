@@ -17,6 +17,12 @@ using UnityEngine.InputSystem.Layouts;
 
 namespace Leap.Unity.Preview.InputActions
 {
+    public enum LeapInputDirection
+    {
+        PALM_DIRECTION,
+        PINCH_DIRECTION
+    }
+
     /// <summary>
     /// Updates Ultraleap Input Actions with the latest available hand data
     /// Must be provided information from a LeapProvider
@@ -26,6 +32,8 @@ namespace Leap.Unity.Preview.InputActions
         private LeapHandState _leftState = new LeapHandState(), _rightState = new LeapHandState();
 
         private InputDevice _leftDevice, _rightDevice;
+
+        public LeapInputDirection directionSource;
 
         public override void ProcessFrame(ref Frame inputFrame)
         {
@@ -64,13 +72,14 @@ namespace Leap.Unity.Preview.InputActions
             state.tracked = (int)(UnityEngine.XR.InputTrackingState.Position | UnityEngine.XR.InputTrackingState.Rotation);
             state.position = hand.PalmPosition;
 
-            if(Camera.main != null)
+            switch (directionSource)
             {
-                state.direction = GetSimpleShoulderPinchDirection(hand);
-            }
-            else
-            {
-                state.direction = Quaternion.LookRotation(hand.PalmNormal, hand.Direction);
+                case LeapInputDirection.PALM_DIRECTION:
+                    state.direction = Quaternion.LookRotation(hand.PalmNormal, hand.Direction);
+                    break;
+                case LeapInputDirection.PINCH_DIRECTION:
+                    state.direction = GetSimpleShoulderPinchDirection(hand);
+                    break;
             }
 
             state.indexTipPosition = hand.Fingers[1].Bone(Bone.BoneType.TYPE_DISTAL).NextJoint;
