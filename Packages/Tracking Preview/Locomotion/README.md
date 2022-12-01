@@ -10,7 +10,7 @@ This preview package contains experimental locomotion methods - both for telepor
 
 Ultraleap currently offer three teleportation methods - each packaged up as a prefab.
 
-#### Jump Gem Teleportation
+### Jump Gem Teleportation
 
 To get started with Jump Gem Teleportation, drag the "Jump Gem Teleport With Attachment Hands" prefab into the scene.
 
@@ -35,3 +35,10 @@ Pinch To Teleport is a simple teleportation method - point your hand outwards, a
 Pinch To Teleport uses `IsFacingObject` to provide a small form of contextual activation - if you're facing a collider in your scene whilst using Pinch To Teleport, it won't activate.
 
 Pinch To Teleport has an optional "Use Rotation" checkbox - if ticked, whilst pinching on a Teleport Anchor, move your hand horizontally to adjust where you'll face when you land.
+
+## Free Locomotion
+
+### XR Leap Pinch Locomotion
+
+In this interaction, users use both hands to 'pinch' the world around them, before moving their hands apart to enlarge the world or together to shrink it, smoothly, with an interaction similar to zooming in and out on a touchscreen. Whilst you are scaling yourself, rather than the world, it is an effect means of locomoting, without triggering much motion sickness.
+This interaction is particularly appropriate for applications where there is a 3D model to explore, for example in art or 3D modelling scenarios.
