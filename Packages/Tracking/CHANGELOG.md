@@ -8,9 +8,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [6.3.0] - 02/12/22
 
-### Fixed
-- Fix issue with generic hand-shader giving compile errors in some circumstances
-
 ### Added
 - Added XRLeapProviderManager script and Prefab which auto-selects a LeapXRServiceProvider or OpenXRLeapProvider depending on the avaiability of OpenXR
 - Added GetChirality extension method to hand which returns the Chirality enum of the hand
@@ -25,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - InteractionSlider now raises event for value changes when setting values via the Horizontal and Vertical Percent properties
 - XRServiceProvider and OpenXRLeapProvider do not scale when the player scales
 - `timeVisible` was not populated on the OpenXR Provider for `Finger`s
+- Fix issue with generic hand-shader giving compile errors in some circumstances
 
 ### Known issues 
 - Offset between skeleton hand wrist and forearm in sample scenes
