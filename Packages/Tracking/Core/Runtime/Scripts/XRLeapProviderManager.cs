@@ -9,7 +9,10 @@
 using System;
 using System.Collections;
 using UnityEngine;
+
+#if XR_MANAGEMENT_AVAILABLE
 using UnityEngine.XR.Management;
+#endif
 
 namespace Leap.Unity
 {
@@ -84,15 +87,21 @@ namespace Leap.Unity
 
         private IEnumerator Start()
         {
+#if !XR_MANAGEMENT_AVAILABLE
+            trackingSource = TrackingSourceType.LEAP_DIRECT;
+            Debug.Log("Unity XR Management not available. Automatically selecting LEAP_DIRECT for Hand Tracking");
+#endif
+
             if (trackingSource == TrackingSourceType.AUTOMATIC)
             {
+#if XR_MANAGEMENT_AVAILABLE
                 while (XRGeneralSettings.Instance == null &&
                         XRGeneralSettings.Instance.Manager == null &&
                         XRGeneralSettings.Instance.Manager.activeLoader == null)
                 {
                     yield return new WaitForEndOfFrame();
                 }
-
+                
                 if (openXRLeapProvider != null && openXRLeapProvider.TrackingDataSource == TrackingSource.OPENXR_LEAP)
                 {
                     SelectTrackingSource(TrackingSourceType.OPEN_XR);
@@ -110,6 +119,7 @@ namespace Leap.Unity
                     Debug.LogWarning("No hand tracking sources found");
                     yield break;
                 }
+#endif
             }
             else
             {
@@ -119,6 +129,8 @@ namespace Leap.Unity
             LeapProvider.gameObject.SetActive(true);
 
             OnProviderSet?.Invoke(LeapProvider);
+
+            yield break;
         }
 
 
