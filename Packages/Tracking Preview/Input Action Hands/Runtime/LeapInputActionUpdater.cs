@@ -17,6 +17,10 @@ using UnityEngine.InputSystem.Layouts;
 
 namespace Leap.Unity.Preview.InputActions
 {
+    /// <summary>
+    /// PALM_DIRECTION - Uses the palm normal to set the direction of the hands
+    /// PINCH_DIRECTION - Determines a pinch direction based on an assumed shoulder position relative to the camera
+    /// </summary>
     public enum LeapInputDirection
     {
         PALM_DIRECTION,
@@ -33,7 +37,17 @@ namespace Leap.Unity.Preview.InputActions
 
         private InputDevice _leftDevice, _rightDevice;
 
-        public LeapInputDirection directionSource;
+        [Tooltip("The source of the hand direction output. Adjust depending on your use case")]
+        public LeapInputDirection directionSource = LeapInputDirection.PINCH_DIRECTION;
+
+        [Tooltip("Should the pinching InputAction be set via a binary decision, or a float PinchStrength?")]
+        public bool isPinchingIsBinary = true;
+
+        [Tooltip("Should the grabbing InputAction be set via a binary decision, or a float GrabStrength?")]
+        public bool isGrabbingIsBinary = true;
+
+        [Tooltip("Should interactions (e.g. grabbing and pinching) reset when the hand is lost?")]
+        public bool resetInteractionsOnTrackingLost = true;
 
         public override void ProcessFrame(ref Frame inputFrame)
         {
@@ -61,6 +75,13 @@ namespace Leap.Unity.Preview.InputActions
                     if (handState.tracked != 0)
                     {
                         handState.tracked = 0;
+
+                        if (resetInteractionsOnTrackingLost)
+                        {
+                            handState.isGrabbing = 0;
+                            handState.isPinching = 0;
+                        }
+
                         InputSystem.QueueStateEvent(inputDevice, handState);
                     }
                 }
@@ -84,10 +105,13 @@ namespace Leap.Unity.Preview.InputActions
 
             state.indexTipPosition = hand.Fingers[1].Bone(Bone.BoneType.TYPE_DISTAL).NextJoint;
 
-            state.isGrabbing = hand.GrabStrength > 0.8 ? 1 : 0;
-            state.isPinching = hand.PinchStrength > 0.8 ? 1 : 0;
+            state.isGrabbing = isGrabbingIsBinary ? (hand.GrabStrength > 0.8 ? 1 : 0) : hand.GrabStrength;
+            state.isPinching = isPinchingIsBinary ? (hand.PinchStrength > 0.8 ? 1 : 0) : hand.PinchStrength;
         }
 
+        /// <summary>
+        /// Uses an assumed shoulder position relative to the main camera to determine a pinch direction
+        /// </summary>
         Quaternion GetSimpleShoulderPinchDirection(Hand hand)
         {
             // First get the shoulder position
