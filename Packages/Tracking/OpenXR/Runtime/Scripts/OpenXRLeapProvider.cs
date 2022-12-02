@@ -5,6 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.XR.Management;
+using UnityEngine.XR.OpenXR;
 using Bone = Leap.Bone;
 using Hand = Leap.Hand;
 
@@ -49,17 +51,48 @@ namespace Ultraleap.Tracking.OpenXR
             }
         }
 
+        public override TrackingSource TrackingDataSource { get { return CheckOpenXRAvailable(); } }
+
+        private TrackingSource CheckOpenXRAvailable()
+        {
+            if (_trackingSource != TrackingSource.NONE)
+            {
+                return _trackingSource;
+            }
+
+            if (XRGeneralSettings.Instance.Manager.activeLoader.name == "Open XR Loader" &&
+                OpenXRSettings.Instance != null &&
+                OpenXRSettings.Instance.GetFeature<HandTrackingFeature>() != null &&
+                OpenXRSettings.Instance.GetFeature<HandTrackingFeature>().SupportsHandTracking)
+            {
+                if (OpenXRSettings.Instance.GetFeature<HandTrackingFeature>().IsUltraleapHandTracking)
+                {
+                    _trackingSource = TrackingSource.OPENXR_LEAP;
+                }
+                else
+                {
+                    _trackingSource = TrackingSource.OPENXR;
+                }
+            }
+            else
+            {
+                _trackingSource = TrackingSource.NONE;
+            }
+
+            return _trackingSource;
+        }
+
         private void Update()
         {
             PopulateLeapFrame(ref _updateFrame);
 
-            Pose trackerTransform = new Pose(Vector3.zero, Quaternion.identity);
+            LeapTransform trackerTransform = new LeapTransform(Vector3.zero, Quaternion.identity, Vector3.one);
 
             // Adjust for relative transform if it's in use.
             var trackedPoseDriver = mainCamera.GetComponent<UnityEngine.SpatialTracking.TrackedPoseDriver>();
             if (trackedPoseDriver != null && trackedPoseDriver.UseRelativeTransform)
             {
-                trackerTransform.position += trackedPoseDriver.originPose.position;
+                trackerTransform.translation += trackedPoseDriver.originPose.position;
                 trackerTransform.rotation *= trackedPoseDriver.originPose.rotation;
             }
 
@@ -67,13 +100,16 @@ namespace Ultraleap.Tracking.OpenXR
             var parentTransform = mainCamera.transform.parent;
             if (parentTransform != null)
             {
-                trackerTransform.position += parentTransform.position;
+                trackerTransform.translation += parentTransform.position;
                 trackerTransform.rotation *= parentTransform.rotation;
+                trackerTransform.scale = parentTransform.lossyScale;
+            }
+            else
+            {
+                trackerTransform.scale = transform.lossyScale;
             }
 
-            _currentFrame = _updateFrame.TransformedCopy(new LeapTransform(
-                trackerTransform.position,
-                trackerTransform.rotation));
+            _currentFrame = _updateFrame.TransformedCopy(trackerTransform);
 
             DispatchUpdateFrameEvent(_currentFrame);
         }
@@ -119,6 +155,8 @@ namespace Ultraleap.Tracking.OpenXR
                 return false;
             }
 
+
+            float timeVisible = 0;
             if (handTracker == HandTracker.Left)
             {
                 if (_leftHandFirstSeen_ticks == -1)
@@ -126,6 +164,7 @@ namespace Ultraleap.Tracking.OpenXR
                     _leftHandFirstSeen_ticks = DateTime.Now.Ticks;
                     _leftHandId = _handId++;
                 }
+                timeVisible = ((float)(DateTime.Now.Ticks - _leftHandFirstSeen_ticks)) / (float)TimeSpan.TicksPerSecond;
             }
             else
             {
@@ -134,6 +173,8 @@ namespace Ultraleap.Tracking.OpenXR
                     _rightHandFirstSeen_ticks = DateTime.Now.Ticks;
                     _rightHandId = _handId++;
                 }
+                timeVisible = ((float)(DateTime.Now.Ticks - _rightHandFirstSeen_ticks)) /
+                              (float)TimeSpan.TicksPerSecond;
             }
 
             for (int fingerIndex = 0; fingerIndex < 5; fingerIndex++)
@@ -186,7 +227,7 @@ namespace Ultraleap.Tracking.OpenXR
                     _frameId,
                     (handTracker == HandTracker.Left ? 0 : 1),
                     fingerIndex,
-                    10f, // Fixed for now
+                    timeVisible,
                     joints[xrTipIndex].Pose.position,
                     (joints[xrTipIndex].Pose.rotation * Vector3.forward),
                     fingerWidth,
@@ -207,8 +248,7 @@ namespace Ultraleap.Tracking.OpenXR
                 CalculatePinchDistance(ref hand),
                 palmWidth,
                 handTracker == HandTracker.Left,
-                handTracker == HandTracker.Left ? ((float)(DateTime.Now.Ticks - _leftHandFirstSeen_ticks)) / (float)TimeSpan.TicksPerSecond :
-                                                  ((float)(DateTime.Now.Ticks - _rightHandFirstSeen_ticks)) / (float)TimeSpan.TicksPerSecond,
+                timeVisible,
                 null, // Already Populated
                 joints[(int)HandJoint.Palm].Pose.position,
                 joints[(int)HandJoint.Palm].Pose.position,
@@ -370,7 +410,12 @@ namespace Ultraleap.Tracking.OpenXR
                 (_backingUntransformedEditTimeFrame ??= new Frame()).Hands.Clear();
                 _backingUntransformedEditTimeFrame.Hands.Add(EditTimeLeftHand);
                 _backingUntransformedEditTimeFrame.Hands.Add(EditTimeRightHand);
-                _backingEditTimeFrame = _backingUntransformedEditTimeFrame.TransformedCopy(new LeapTransform(mainCamera.transform));
+
+                if (mainCamera != null)
+                {
+                    _backingEditTimeFrame = _backingUntransformedEditTimeFrame.TransformedCopy(new LeapTransform(mainCamera.transform));
+                }
+
                 return _backingEditTimeFrame;
             }
         }

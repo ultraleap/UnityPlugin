@@ -174,6 +174,7 @@ namespace Leap.Unity.Interaction
                 localPhysicsPosition.x = Mathf.Lerp(initialLocalPosition.x + horizontalSlideLimits.x, initialLocalPosition.x + horizontalSlideLimits.y, _horizontalSliderPercent);
                 physicsPosition = transform.parent.TransformPoint(localPhysicsPosition);
                 rigidbody.position = physicsPosition;
+                HorizontalSlideEvent(HorizontalSliderValue);
             }
         }
 
@@ -195,6 +196,7 @@ namespace Leap.Unity.Interaction
                 localPhysicsPosition.y = Mathf.Lerp(initialLocalPosition.y + verticalSlideLimits.x, initialLocalPosition.y + verticalSlideLimits.y, _verticalSliderPercent);
                 physicsPosition = transform.parent.TransformPoint(localPhysicsPosition);
                 rigidbody.position = physicsPosition;
+                VerticalSlideEvent(VerticalSliderValue);
             }
         }
 
