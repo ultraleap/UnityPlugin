@@ -156,7 +156,7 @@ namespace Leap.Unity.HandsModule
 
             setScale.boolValue = GUILayout.Toggle(setScale.boolValue, new GUIContent("Scale Model to Tracking Data", "Should the hand binder adjust the models scale?"), editorSkin.toggle);
 
-            if(setScale.boolValue)
+            if (setScale.boolValue)
             {
                 EditorGUILayout.PropertyField(scaleSpeed, editorSkin);
             }

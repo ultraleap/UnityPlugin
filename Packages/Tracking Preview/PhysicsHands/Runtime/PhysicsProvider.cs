@@ -104,7 +104,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
         public bool EnhanceThrowing => _enhanceThrowing;
 
-#endregion
+        #endregion
 
         // Helpers
         private Dictionary<Rigidbody, PhysicsGraspHelper> _graspHelpers = new Dictionary<Rigidbody, PhysicsGraspHelper>();
@@ -416,7 +416,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             }
 
             // Sync transforms in case someone's done a transform.position on a rigidbody
-            if(_physicsSyncTime != Time.time)
+            if (_physicsSyncTime != Time.time)
             {
                 Physics.SyncTransforms();
                 _physicsSyncTime = Time.time;
@@ -424,7 +424,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
             PhysicsHand.Hand pH = hand.GetPhysicsHand();
 
-            Vector3 radiusAmount = Vector3.Scale(pH.palmCollider.size,PhysExts.AbsVec3(pH.palmCollider.transform.lossyScale)) * 0.2f;
+            Vector3 radiusAmount = Vector3.Scale(pH.palmCollider.size, PhysExts.AbsVec3(pH.palmCollider.transform.lossyScale)) * 0.2f;
 
             _resultCount = PhysExts.OverlapBoxNonAllocOffset(pH.palmCollider, Vector3.zero, _resultsCache, _contactMask, QueryTriggerInteraction.Ignore, extraRadius: -PhysExts.MaxVec3(radiusAmount));
             HandleOverlaps(hand);

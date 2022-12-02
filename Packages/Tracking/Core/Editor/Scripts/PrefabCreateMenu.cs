@@ -48,7 +48,7 @@ namespace Leap
         {
             var guids = AssetDatabase.FindAssets(prefabName);
 
-            foreach(var guid in guids)
+            foreach (var guid in guids)
             {
                 string assetPath = AssetDatabase.GUIDToAssetPath(guid);
                 GameObject newObject = (GameObject)AssetDatabase.LoadAssetAtPath(assetPath, typeof(GameObject));
