@@ -105,7 +105,7 @@ In `Edit -> Project Settings -> Package Manager`, add a new scoped registry with
 
   Ultraleap UPM packages should be available in the list. Click on the package you wish to install/modify.
   
-  Note: Ultraleap Tracking contains the Core, Hands and Interaction Engine modules. There are older packages created indepentently by a third party for these modules that are no longer updated.
+  Note: Ultraleap Tracking contains the Core, Hands and Interaction Engine modules. There are older packages created independently by a third party for these modules that are no longer updated.
 
   ![packagelist.png](Markdown/images/packagelist.png)
 
@@ -138,7 +138,7 @@ Git URL is available as another option to consume the UnityPlugin as a UPM packa
 > - Does not resolve dependencies automatically.
 > - Discovering versions requires looking through repository tags.
 >
-> If the OpenUPM workflow does not meet your needs, consider using the Local UPM Package contributor workflow instead of a Git URL. It is not suspectable to the non-deterministic version pitfall and will resolve dependencies automatically. However, the contributor workflow requires using git to change between versions.
+> If the OpenUPM workflow does not meet your needs, consider using the Local UPM Package contributor workflow instead of a Git URL. It is not susceptible to the non-deterministic version pitfall and will resolve dependencies automatically. However, the contributor workflow requires using git to change between versions.
 > Another alternative is to use 
 
 The headings below will guide you in accomplishing specific tasks tailored to the UnityPlugin but for more details it is recommended to read Unity's documentation for [installing using Git URL][upm-giturl-installing] and handling [Git dependencies][upm-giturl-dependencies].
