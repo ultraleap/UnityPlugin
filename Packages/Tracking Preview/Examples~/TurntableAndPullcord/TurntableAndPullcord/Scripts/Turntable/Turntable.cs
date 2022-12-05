@@ -26,11 +26,13 @@ namespace Leap.Unity.Preview
         [SerializeField]
         [Tooltip("The local height of the upper section of the turntable.")]
         private float _tableHeight;
+        public float TableHeight => _tableHeight;
 
         [MinValue(0)]
         [SerializeField]
         [Tooltip("The radius of the upper section of the turntable.")]
         private float _tableRadius;
+        public float TableRadius => _tableRadius;
 
         [MinValue(0)]
         [SerializeField]
@@ -63,7 +65,7 @@ namespace Leap.Unity.Preview
         [Tooltip("The speed under which the turntable will stop completely.")]
         private float _minimumSpeed = 0.01f;
 
-        private float LowerLevelHeight
+        public float LowerLevelHeight
         {
             get
             {
@@ -71,7 +73,7 @@ namespace Leap.Unity.Preview
             }
         }
 
-        private float LowerLevelRadius
+        public float LowerLevelRadius
         {
             get
             {
@@ -93,7 +95,7 @@ namespace Leap.Unity.Preview
             if (!Application.isPlaying)
             {
                 if (_turntableVisuals == null) _turntableVisuals = GetComponent<TurntableVisuals>();
-                if (_turntableVisuals != null) _turntableVisuals.UpdateVisuals(_tableHeight, LowerLevelHeight, _tableRadius, LowerLevelRadius);
+                if (_turntableVisuals != null) _turntableVisuals.UpdateVisuals();
             }
         }
 
@@ -108,7 +110,7 @@ namespace Leap.Unity.Preview
             _smoothedVelocity.delay = _rotationSmoothing;
 
             if (_turntableVisuals == null) _turntableVisuals = GetComponent<TurntableVisuals>();
-            if (_turntableVisuals != null) _turntableVisuals.UpdateVisuals(_tableHeight, LowerLevelHeight, _tableRadius, LowerLevelRadius);
+            if (_turntableVisuals != null) _turntableVisuals.ArcDegrees = 360;
         }
 
         private void Update()

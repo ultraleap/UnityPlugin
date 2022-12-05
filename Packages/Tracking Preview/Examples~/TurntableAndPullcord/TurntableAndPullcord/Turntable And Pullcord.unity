@@ -414,7 +414,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1743462710}
-  - {fileID: 5200292112622486861}
+  - {fileID: 6468165990322698804}
   - {fileID: 3888267153745313842}
   m_Father: {fileID: 0}
   m_RootOrder: 5
@@ -868,7 +868,7 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1743462709}
   m_Mesh: {fileID: 5151382180428610131, guid: ed2c706c936646a4e956039e522ae59e, type: 3}
---- !u!1001 &1004561402278190236
+--- !u!1001 &527039713317941142
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -934,10 +934,10 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4983487451737576753, guid: 0f3768b220c90bd45a0d80701a3fe3ae, type: 3}
   m_PrefabInstance: {fileID: 8132657666534167811}
   m_PrefabAsset: {fileID: 0}
---- !u!4 &5200292112622486861 stripped
+--- !u!4 &6468165990322698804 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5033842795567978961, guid: 0178e6ea93582fa4c9bc35ff1f43345e, type: 3}
-  m_PrefabInstance: {fileID: 1004561402278190236}
+  m_PrefabInstance: {fileID: 527039713317941142}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &8132657666534167811
 PrefabInstance:
@@ -952,7 +952,7 @@ PrefabInstance:
       objectReference: {fileID: 398367461}
     - target: {fileID: 4983487451737576752, guid: 0f3768b220c90bd45a0d80701a3fe3ae, type: 3}
       propertyPath: m_Name
-      value: pullCord
+      value: Pull Cord
       objectReference: {fileID: 0}
     - target: {fileID: 4983487451737576753, guid: 0f3768b220c90bd45a0d80701a3fe3ae, type: 3}
       propertyPath: m_RootOrder

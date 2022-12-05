@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 4983487451737576753}
   - component: {fileID: 4983487451737576754}
   m_Layer: 0
-  m_Name: pullCord
+  m_Name: Pull Cord
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
