@@ -61,8 +61,9 @@ namespace Ultraleap.Tracking.OpenXR
             }
 
             if (XRGeneralSettings.Instance.Manager.activeLoader.name == "Open XR Loader" &&
-            OpenXRSettings.Instance.GetFeature<HandTrackingFeature>() != null &&
-            OpenXRSettings.Instance.GetFeature<HandTrackingFeature>().SupportsHandTracking)
+                OpenXRSettings.Instance != null &&
+                OpenXRSettings.Instance.GetFeature<HandTrackingFeature>() != null &&
+                OpenXRSettings.Instance.GetFeature<HandTrackingFeature>().SupportsHandTracking)
             {
                 if (OpenXRSettings.Instance.GetFeature<HandTrackingFeature>().IsUltraleapHandTracking)
                 {
