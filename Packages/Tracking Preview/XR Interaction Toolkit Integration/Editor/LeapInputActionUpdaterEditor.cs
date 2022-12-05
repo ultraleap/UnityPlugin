@@ -7,6 +7,7 @@
  ******************************************************************************/
 
 using UnityEditor;
+using UnityEngine;
 
 namespace Leap.Unity.Preview.InputActions
 {
@@ -37,6 +38,10 @@ namespace Leap.Unity.Preview.InputActions
         public override void OnInspectorGUI()
         {
             serializedObject.Update();
+
+            using (new EditorGUI.DisabledScope(true))
+                EditorGUILayout.ObjectField("Script", MonoScript.FromMonoBehaviour((MonoBehaviour)target), GetType(), false);
+            EditorGUILayout.Space();
 
             EditorGUILayout.PropertyField(inputLeapProviderProp);
 
