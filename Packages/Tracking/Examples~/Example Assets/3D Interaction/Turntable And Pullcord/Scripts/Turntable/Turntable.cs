@@ -82,8 +82,8 @@ namespace Leap.Unity.Preview
         }
 
         // Maps a finger from a specific finger to the world tip position when it first entered the turntable
-        private Dictionary<Finger, Vector3> _currTipPoints = new Dictionary<Finger, Vector3>();
-        private Dictionary<Finger, Vector3> _prevTipPoints = new Dictionary<Finger, Vector3>();
+        private Dictionary<int, Vector3> _currTipPoints = new Dictionary<int, Vector3>();
+        private Dictionary<int, Vector3> _prevTipPoints = new Dictionary<int, Vector3>();
 
         private SmoothedFloat _smoothedVelocity;
         private float _rotationalVelocity;
@@ -120,6 +120,7 @@ namespace Leap.Unity.Preview
             _currTipPoints.Clear();
             foreach (var hand in _provider.CurrentFrame.Hands)
             {
+                int fingerID = 0;
                 foreach (var finger in hand.Fingers)
                 {
                     Vector3 worldTip = finger.Bone(Bone.BoneType.TYPE_DISTAL).NextJoint;
@@ -127,8 +128,10 @@ namespace Leap.Unity.Preview
 
                     if (IsPointInsideTurntable(localTip))
                     {
-                        _currTipPoints[finger] = worldTip;
+                        _currTipPoints[fingerID] = worldTip;
                     }
+
+                    fingerID++;
                 }
             }
 
@@ -138,6 +141,7 @@ namespace Leap.Unity.Preview
             {
                 Vector3 currWorldTip = pair.Value;
                 Vector3 prevWorldTip;
+
                 if (!_prevTipPoints.TryGetValue(pair.Key, out prevWorldTip))
                 {
                     continue;
