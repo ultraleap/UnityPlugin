@@ -1,4 +1,4 @@
-﻿using JetBrains.Annotations;
+using JetBrains.Annotations;
 using System.Linq;
 using System.Xml.Linq;
 
@@ -42,7 +42,7 @@ namespace Ultraleap.Tracking.OpenXR
             }
 
             // Check for the package statement and create it if doesn't exist
-            if (queries.Elements("package").All(el => el.Attribute(_android + "name")?.Name != packageName))
+            if (queries.Elements("package").All(el => el.Attribute(_android + "name")?.Value != packageName))
             {
                 queries.Add(
                     new XElement("package", new XAttribute(_android + "name", packageName))
@@ -73,7 +73,7 @@ namespace Ultraleap.Tracking.OpenXR
         {
             // Check if the uses-permission is already there, and create it if not.
             if (_manifest.Root!.Elements("uses-permission")
-                .All(el => el.Attribute(_android + "name")?.Name != name))
+                .All(el => el.Attribute(_android + "name")?.Value != name))
             {
                 _manifest.Root!.Add(
                     new XElement("uses-permission", new XAttribute(_android + "name", name))
@@ -87,7 +87,7 @@ namespace Ultraleap.Tracking.OpenXR
             // Check if the uses-feature is already there.
             var feature = _manifest.Root!
                 .Elements("uses-feature")
-                .FirstOrDefault(el => el.Attribute(_android + "name")?.Name == name);
+                .FirstOrDefault(el => el.Attribute(_android + "name")?.Value == name);
 
             // Add if it doesn't exist, or upgrade to required if it does and required was declared.
             if (feature == null)
@@ -112,7 +112,7 @@ namespace Ultraleap.Tracking.OpenXR
             var application = _manifest.Root!.Element("application")!;
             var metaData = application
                 .Elements("meta-data")
-                .FirstOrDefault(el => el.Attribute(_android + "name")?.Name == name);
+                .FirstOrDefault(el => el.Attribute(_android + "name")?.Value == name);
 
             // Check for the meta-data element and create it if doesn't exist, or update if it does.
             if (metaData == null)
