@@ -10,8 +10,7 @@ using Leap.Unity.Attributes;
 using System.Collections.Generic;
 using UnityEngine;
 
-
-namespace Leap.Unity.Preview
+namespace Leap.Unity.Examples
 {
     /// <summary>
     /// This deals with rotating the turntable whenever any fingertips are intersecting with it.

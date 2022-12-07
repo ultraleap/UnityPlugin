@@ -9,7 +9,7 @@
 using System.Collections;
 using UnityEngine;
 
-namespace Leap.Unity.Preview
+namespace Leap.Unity.Examples
 {
     /// <summary>
     /// An exploding item has a start position and an end position and can linearly move between the two given a percent value.

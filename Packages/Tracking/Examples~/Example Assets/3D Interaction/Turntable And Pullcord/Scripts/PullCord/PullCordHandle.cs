@@ -11,7 +11,7 @@ using Leap.Unity.Interaction;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Leap.Unity.Preview
+namespace Leap.Unity.Examples
 {
     /// <summary>
     /// PullCordHandle keeps track of the handle's position and moves it according to hand attraction and pinching.

@@ -9,7 +9,7 @@
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace Leap.Unity.Preview
+namespace Leap.Unity.Examples
 {
     /// <summary>
     /// PullCord updates the handle projection position, 

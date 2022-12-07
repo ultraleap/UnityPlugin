@@ -8,7 +8,7 @@
 
 using UnityEngine;
 
-namespace Leap.Unity.Preview
+namespace Leap.Unity.Examples
 {
     /// <summary>
     /// This updates the start and end position of a line renderer to be the positions of the transforms _pointA and _pointB.
