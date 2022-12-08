@@ -366,6 +366,24 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &339624730 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6469087422038056047, guid: 0178e6ea93582fa4c9bc35ff1f43345e, type: 3}
+  m_PrefabInstance: {fileID: 527039713317941142}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &339624731
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 339624730}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d65614e3dcb2f64eb6983652f2d0537, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _explodingItemsRoot: {fileID: 527039713317941143}
 --- !u!43 &398367461
 Mesh:
   m_ObjectHideFlags: 0
@@ -1483,6 +1501,34 @@ PrefabInstance:
       propertyPath: _explodingItemsRoot
       value: 
       objectReference: {fileID: 527039713317941143}
+    - target: {fileID: 4983487451737576754, guid: 0f3768b220c90bd45a0d80701a3fe3ae, type: 3}
+      propertyPath: OnProgressChanged.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4983487451737576754, guid: 0f3768b220c90bd45a0d80701a3fe3ae, type: 3}
+      propertyPath: OnProgressChanged.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4983487451737576754, guid: 0f3768b220c90bd45a0d80701a3fe3ae, type: 3}
+      propertyPath: OnProgressChanged.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 339624731}
+    - target: {fileID: 4983487451737576754, guid: 0f3768b220c90bd45a0d80701a3fe3ae, type: 3}
+      propertyPath: OnProgressChanged.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4983487451737576754, guid: 0f3768b220c90bd45a0d80701a3fe3ae, type: 3}
+      propertyPath: OnProgressChanged.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: UpdateItems
+      objectReference: {fileID: 0}
+    - target: {fileID: 4983487451737576754, guid: 0f3768b220c90bd45a0d80701a3fe3ae, type: 3}
+      propertyPath: OnProgressChanged.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: Leap.Unity.Examples.ExplodingItemController, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 4983487451737576754, guid: 0f3768b220c90bd45a0d80701a3fe3ae, type: 3}
+      propertyPath: OnProgressChanged.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
     - target: {fileID: 8132657666848500461, guid: 0f3768b220c90bd45a0d80701a3fe3ae, type: 3}
       propertyPath: m_IsActive
       value: 0

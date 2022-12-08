@@ -14,8 +14,7 @@ namespace Leap.Unity.Examples
     /// <summary>
     /// PullCord updates the handle projection position, 
     /// updates the resting position for the pullCordHandle,
-    /// provides a value for the progress of the pull cord 
-    /// and updates the exploding items.
+    /// provides a value for the progress of the pull cord
     /// </summary>
     public class PullCord : MonoBehaviour
     {
@@ -28,45 +27,41 @@ namespace Leap.Unity.Examples
         [SerializeField, Tooltip("Between 0 and 1. The pullCordHandle will be at this pos by default when it is collapsed")]
         private float _restingPoint = 0.2f;
         [SerializeField, Tooltip("Between 0 and 1. If pullCord progress exceeds this number, the handle's resting position is changed to the pullCord end")]
-        private float _explosionPoint = 0.7f;
-        [SerializeField, Tooltip("If the progress changes by at least this much towards the pull cord end in one frame, the pull cord explodes")]
+        private float _pulledPoint = 0.7f;
+        [SerializeField, Tooltip("If the progress changes by at least this much towards the pull cord end in one frame, the pull cord completes the pull")]
         private float _progressVelocityThreshold = 0.005f;
 
-        [SerializeField]
-        private Transform _explodingItemsRoot = null;
+        /// <summary>
+        /// Dispatched when the Progress of the pull cord gets bigger than the _pulledPoint
+        /// </summary>
+        public UnityEvent OnPulled;
 
         /// <summary>
-        /// Dispatched when the Progress of the pull cord gets bigger than the _explosionPoint
+        /// Dispatched when the Progress of the pull cord gets smaller than the _pulledPoint
         /// </summary>
-        public UnityEvent OnExploded;
+        public UnityEvent OnUnpulled;
+
         /// <summary>
-        /// Dispatched when the Progress of the pull cord gets smaller than the _explosionPoint
-        /// </summary>
-        public UnityEvent OnImploded;
-        /// <summary>
-        /// Dispatched when the explosion progress of the pull cord changes. Progress is between 0 and 1
+        /// Dispatched when the progress of the pull cord changes. Progress is between 0 and 1
         /// </summary>
         public UnityEvent<float> OnProgressChanged;
 
         private float _progress;
         /// <summary>
-        /// Progress of the pull cord. 0 means it is fully collapsed, 1 means it is fully exploded.
+        /// Progress of the pull cord. 0 means it is fully collapsed, 1 means it is fully pulled.
         /// </summary>
-        [HideInInspector] public float Progress => _progress;
+        public float Progress => _progress;
 
         private Vector3 _defaultRestingPos;
-        private bool _exploded = false;
-        [HideInInspector] public bool Exploded => _exploded;
+        private bool _pulled = false;
 
         private float _pullCordLength;
-        private ExplodingItem[] _explodingItems;
 
         private float _currentProgressVelocity;
 
         private void Start()
         {
             _pullCordLength = Vector3.Distance(_pullCordStart.position, _pullCordEnd.position);
-            _explodingItems = _explodingItemsRoot.GetComponentsInChildren<ExplodingItem>(true);
 
             _defaultRestingPos = _pullCordStart.position + _restingPoint * (_pullCordEnd.position - _pullCordStart.position);
             _pullCordHandle.RestingPos = _defaultRestingPos;
@@ -87,33 +82,30 @@ namespace Leap.Unity.Examples
             float newProgress = Vector3.Distance(_pullCordStart.position, _handleProjection.position) / _pullCordLength;
             _currentProgressVelocity = newProgress - Progress;
 
-            if (newProgress == Progress) return;
+            if (newProgress == Progress)
+            {
+                return;
+            }
 
             _progress = newProgress;
 
-            // update exploding items
-            // needs to ignore the first bit of the progress as that is where the handle's resting pos is
-            float explosionProgress = (Progress - _restingPoint) / (1 - _restingPoint);
-            foreach (ExplodingItem explodingItem in _explodingItems)
-            {
-                explodingItem.SetPercent(explosionProgress);
-            }
-            if (OnProgressChanged != null) OnProgressChanged.Invoke(explosionProgress);
-
+            // Ignore the first bit of the progress as that is where the handle's resting pos is
+            float restinglessProgress = (Progress - _restingPoint) / (1 - _restingPoint);
+            OnProgressChanged?.Invoke(restinglessProgress);
 
             if (_pullCordHandle.State == PullCordHandle.PullCordState.Pinched)
             {
-                // update resting pos of handle, if the explosion status has changed since last frame:
-                if (!_exploded && _progress > _explosionPoint)
+                // update resting pos of handle, if the pulled status has changed since last frame:
+                if (!_pulled && _progress > _pulledPoint)
                 {
-                    if (OnExploded != null) OnExploded.Invoke();
-                    _exploded = true;
+                    if (OnPulled != null) OnPulled.Invoke();
+                    _pulled = true;
                     _pullCordHandle.RestingPos = _pullCordEnd.position;
                 }
-                else if (_exploded && _progress < _explosionPoint)
+                else if (_pulled && _progress < _pulledPoint)
                 {
-                    if (OnImploded != null) OnImploded.Invoke();
-                    _exploded = false;
+                    if (OnUnpulled != null) OnUnpulled.Invoke();
+                    _pulled = false;
                     _pullCordHandle.RestingPos = _defaultRestingPos;
                 }
             }
@@ -131,11 +123,11 @@ namespace Leap.Unity.Examples
 
         private void OnPinchEnd()
         {
-            // if the velocity of the progress is bigger than some threshold, set the resting position to the exploded position
+            // if the velocity of the progress is bigger than some threshold, set the resting position to the pulled position
             if (_currentProgressVelocity > _progressVelocityThreshold)
             {
-                if (OnExploded != null) OnExploded.Invoke();
-                _exploded = true;
+                if (OnPulled != null) OnPulled.Invoke();
+                _pulled = true;
                 _pullCordHandle.RestingPos = _pullCordEnd.position;
             }
         }
