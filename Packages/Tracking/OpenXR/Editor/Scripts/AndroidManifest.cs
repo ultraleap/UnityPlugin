@@ -71,9 +71,13 @@ namespace Ultraleap.Tracking.OpenXR
         [PublicAPI]
         public void AddUsesPermission(string name)
         {
-            // Check if the uses-permission is already there, and create it if not.
-            if (_manifest.Root!.Elements("uses-permission")
-                .All(el => el.Attribute(_android + "name")?.Value != name))
+            // Check if the uses-feature is already there.
+            var feature = _manifest.Root!
+                .Elements("uses-permission")
+                .FirstOrDefault(el => el.Attribute(_android + "name")?.Value == name);
+
+            // Create it if not.
+            if (feature == null)
             {
                 _manifest.Root!.Add(
                     new XElement("uses-permission", new XAttribute(_android + "name", name))
