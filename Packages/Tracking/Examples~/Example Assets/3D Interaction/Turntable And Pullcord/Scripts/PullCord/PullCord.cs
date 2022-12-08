@@ -61,8 +61,6 @@ namespace Leap.Unity.Examples
         private float _pullCordLength;
         private ExplodingItem[] _explodingItems;
 
-        private bool setupComplete = false;
-
         private float _currentProgressVelocity;
 
         private void Start()
@@ -74,8 +72,6 @@ namespace Leap.Unity.Examples
             _pullCordHandle.RestingPos = _defaultRestingPos;
 
             _pullCordHandle.OnPinchEnd.AddListener(OnPinchEnd);
-
-            setupComplete = true;
         }
 
         private void OnDestroy()

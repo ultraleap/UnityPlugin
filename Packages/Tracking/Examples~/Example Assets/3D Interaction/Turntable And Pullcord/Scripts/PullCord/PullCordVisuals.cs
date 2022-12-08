@@ -33,6 +33,10 @@ namespace Leap.Unity.Examples
             initialHandleScale = _pullCordHandle.transform.localScale;
             initialLineColor = _pullCordLine.material.color;
 
+            newHandleColor = initialHandleColor;
+            newHandleScale = initialHandleScale;
+            newLineColor = initialLineColor;
+
             if (_pullCordHandle != null)
             {
                 _pullCordHandle.OnStateChanged.AddListener(OnStateChanged);
