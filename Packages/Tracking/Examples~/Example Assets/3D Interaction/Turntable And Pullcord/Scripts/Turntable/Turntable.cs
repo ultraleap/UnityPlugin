@@ -120,7 +120,7 @@ namespace Leap.Unity.Examples
             foreach (var hand in _provider.CurrentFrame.Hands)
             {
                 // use a fingerID that allows for unique IDs for each finger of each hand. 0-4 = left, 5-9 = right
-                int fingerID = hand.isLeft ? 0 : hand.Fingers.Length;
+                int fingerID = hand.IsLeft ? 0 : hand.Fingers.Count;
                 foreach (var finger in hand.Fingers)
                 {
                     Vector3 worldTip = finger.Bone(Bone.BoneType.TYPE_DISTAL).NextJoint;
