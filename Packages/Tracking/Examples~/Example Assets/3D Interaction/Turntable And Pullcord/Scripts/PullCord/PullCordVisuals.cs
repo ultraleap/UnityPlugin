@@ -50,7 +50,7 @@ namespace Leap.Unity.Examples
         private void Update()
         {
             _pullCordLine.material.color = Color.Lerp(_pullCordLine.material.color, newLineColor, Time.deltaTime * 10f);
-            _handleRenderer.material.color = Color.Lerp(_handleRenderer.material.color, newHandleColor, Time.deltaTime * 10f); 
+            _handleRenderer.material.color = Color.Lerp(_handleRenderer.material.color, newHandleColor, Time.deltaTime * 10f);
             _pullCordHandle.transform.localScale = Vector3.Lerp(_pullCordHandle.transform.localScale, newHandleScale, Time.deltaTime * 10f);
 
             if (!hintDisabled && hintShouldBeDisabled)

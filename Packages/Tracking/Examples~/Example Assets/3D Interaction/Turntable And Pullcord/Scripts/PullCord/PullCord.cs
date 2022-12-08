@@ -92,7 +92,7 @@ namespace Leap.Unity.Examples
             _currentProgressVelocity = newProgress - Progress;
 
             if (newProgress == Progress) return;
-            
+
             _progress = newProgress;
 
             // update exploding items
