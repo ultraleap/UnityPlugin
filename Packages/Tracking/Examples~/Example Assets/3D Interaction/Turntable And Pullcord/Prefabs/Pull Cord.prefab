@@ -113,7 +113,7 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 446698066004742678}
-  m_LocalRotation: {x: -0.061152864, y: 0.9080911, z: 0.14279495, w: 0.38889655}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: -0.38}
   m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
   m_Children:
@@ -302,6 +302,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4983487451737576753}
   - component: {fileID: 4983487451737576754}
+  - component: {fileID: 7997837082204452372}
   m_Layer: 0
   m_Name: Pull Cord
   m_TagString: Untagged
@@ -346,12 +347,38 @@ MonoBehaviour:
   _handleProjection: {fileID: 2881968771593536365}
   _restingPoint: 0.2
   _explosionPoint: 0.7
+  _progressVelocityThreshold: 0.005
+  _explodingItemsRoot: {fileID: 0}
   OnExploded:
     m_PersistentCalls:
       m_Calls: []
   OnImploded:
     m_PersistentCalls:
       m_Calls: []
+  OnProgressChanged:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!114 &7997837082204452372
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4983487451737576752}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 87672f3c3ed32d440ae12806d4037776, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _pullCordLine: {fileID: 8132657667263544079}
+  _pullCordHandle: {fileID: 4983487453734733579}
+  _hint: {fileID: 372457006590983720}
+  _objectsToDisable:
+  - {fileID: 7716754499617034643}
+  - {fileID: 8690463979111186164}
+  - {fileID: 8132657667255691299}
+  - {fileID: 8132657666848500461}
+  - {fileID: 8285332414973314320}
 --- !u!1 &4983487452004084630
 GameObject:
   m_ObjectHideFlags: 0
@@ -522,16 +549,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fdd80592cce6eb347a269bcc33e364a1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  OnStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  OnPinchEnd:
+    m_PersistentCalls:
+      m_Calls: []
   _distanceToHandThreshold: 0.09
   _stretchThreshold: 0.6
-  _objectsToDisable:
-  - {fileID: 7716754499617034643}
-  - {fileID: 8690463979111186164}
-  - {fileID: 8132657667255691299}
-  - {fileID: 8132657666848500461}
-  - {fileID: 8285332414973314320}
-  _handleSphere: {fileID: 8285332414829706002}
-  _hint: {fileID: 372457006590983720}
 --- !u!1 &5335273625103661626
 GameObject:
   m_ObjectHideFlags: 0

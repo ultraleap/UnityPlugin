@@ -1465,6 +1465,11 @@ PrefabInstance:
       objectReference: {fileID: 118444020}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0178e6ea93582fa4c9bc35ff1f43345e, type: 3}
+--- !u!4 &527039713317941143 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2259098394990712912, guid: 0178e6ea93582fa4c9bc35ff1f43345e, type: 3}
+  m_PrefabInstance: {fileID: 527039713317941142}
+  m_PrefabAsset: {fileID: 0}
 --- !u!222 &806429292433981324
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1930,14 +1935,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 276590359}
     m_Modifications:
-    - target: {fileID: 372457006590983720, guid: 0f3768b220c90bd45a0d80701a3fe3ae, type: 3}
-      propertyPath: m_SizeDelta.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 372457006590983720, guid: 0f3768b220c90bd45a0d80701a3fe3ae, type: 3}
-      propertyPath: m_SizeDelta.y
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 451254006320517414, guid: 0f3768b220c90bd45a0d80701a3fe3ae, type: 3}
       propertyPath: m_Mesh
       value: 
@@ -1994,5 +1991,9 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4983487451737576754, guid: 0f3768b220c90bd45a0d80701a3fe3ae, type: 3}
+      propertyPath: _explodingItemsRoot
+      value: 
+      objectReference: {fileID: 527039713317941143}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0f3768b220c90bd45a0d80701a3fe3ae, type: 3}

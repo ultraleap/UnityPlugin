@@ -29,6 +29,11 @@ namespace Leap.Unity.Examples
         private float _restingPoint = 0.2f;
         [SerializeField, Tooltip("Between 0 and 1. If pullCord progress exceeds this number, the handle's resting position is changed to the pullCord end")]
         private float _explosionPoint = 0.7f;
+        [SerializeField, Tooltip("If the progress changes by at least this much towards the pull cord end in one frame, the pull cord explodes")]
+        private float _progressVelocityThreshold = 0.005f;
+
+        [SerializeField]
+        private Transform _explodingItemsRoot = null;
 
         /// <summary>
         /// Dispatched when the Progress of the pull cord gets bigger than the _explosionPoint
@@ -38,6 +43,10 @@ namespace Leap.Unity.Examples
         /// Dispatched when the Progress of the pull cord gets smaller than the _explosionPoint
         /// </summary>
         public UnityEvent OnImploded;
+        /// <summary>
+        /// Dispatched when the explosion progress of the pull cord changes. Progress is between 0 and 1
+        /// </summary>
+        public UnityEvent<float> OnProgressChanged;
 
         private float _progress;
         /// <summary>
@@ -47,17 +56,31 @@ namespace Leap.Unity.Examples
 
         private Vector3 _defaultRestingPos;
         private bool _exploded = false;
+        [HideInInspector] public bool Exploded => _exploded;
 
         private float _pullCordLength;
         private ExplodingItem[] _explodingItems;
 
+        private bool setupComplete = false;
+
+        private float _currentProgressVelocity;
+
         private void Start()
         {
             _pullCordLength = Vector3.Distance(_pullCordStart.position, _pullCordEnd.position);
-            _explodingItems = FindObjectsOfType<ExplodingItem>();
+            _explodingItems = _explodingItemsRoot.GetComponentsInChildren<ExplodingItem>(true);
 
             _defaultRestingPos = _pullCordStart.position + _restingPoint * (_pullCordEnd.position - _pullCordStart.position);
             _pullCordHandle.RestingPos = _defaultRestingPos;
+
+            _pullCordHandle.OnPinchEnd.AddListener(OnPinchEnd);
+
+            setupComplete = true;
+        }
+
+        private void OnDestroy()
+        {
+            _pullCordHandle.OnPinchEnd.RemoveListener(OnPinchEnd);
         }
 
 
@@ -66,8 +89,10 @@ namespace Leap.Unity.Examples
             UpdateProjection();
 
             float newProgress = Vector3.Distance(_pullCordStart.position, _handleProjection.position) / _pullCordLength;
-            if (newProgress == Progress) return;
+            _currentProgressVelocity = newProgress - Progress;
 
+            if (newProgress == Progress) return;
+            
             _progress = newProgress;
 
             // update exploding items
@@ -77,19 +102,24 @@ namespace Leap.Unity.Examples
             {
                 explodingItem.SetPercent(explosionProgress);
             }
+            if (OnProgressChanged != null) OnProgressChanged.Invoke(explosionProgress);
 
-            // update resting pos of handle, if the explosion status has changed since last frame:
-            if (!_exploded && _progress > _explosionPoint)
+
+            if (_pullCordHandle.State == PullCordHandle.PullCordState.Pinched)
             {
-                if (OnExploded != null) OnExploded.Invoke();
-                _exploded = true;
-                _pullCordHandle.RestingPos = _pullCordEnd.position;
-            }
-            else if (_exploded && _progress < _explosionPoint)
-            {
-                if (OnImploded != null) OnImploded.Invoke();
-                _exploded = false;
-                _pullCordHandle.RestingPos = _defaultRestingPos;
+                // update resting pos of handle, if the explosion status has changed since last frame:
+                if (!_exploded && _progress > _explosionPoint)
+                {
+                    if (OnExploded != null) OnExploded.Invoke();
+                    _exploded = true;
+                    _pullCordHandle.RestingPos = _pullCordEnd.position;
+                }
+                else if (_exploded && _progress < _explosionPoint)
+                {
+                    if (OnImploded != null) OnImploded.Invoke();
+                    _exploded = false;
+                    _pullCordHandle.RestingPos = _defaultRestingPos;
+                }
             }
         }
 
@@ -101,6 +131,17 @@ namespace Leap.Unity.Examples
             direction.Normalize();
             float projectionLength = Mathf.Clamp(Vector3.Dot(_pullCordHandle.transform.position - _pullCordStart.position, direction), 0f, length);
             _handleProjection.position = _pullCordStart.position + direction * projectionLength;
+        }
+
+        private void OnPinchEnd()
+        {
+            // if the velocity of the progress is bigger than some threshold, set the resting position to the exploded position
+            if (_currentProgressVelocity > _progressVelocityThreshold)
+            {
+                if (OnExploded != null) OnExploded.Invoke();
+                _exploded = true;
+                _pullCordHandle.RestingPos = _pullCordEnd.position;
+            }
         }
     }
 }
