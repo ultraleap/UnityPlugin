@@ -9,6 +9,8 @@
 [developer-site-setup-camera]: https://developer.leapmotion.com/setup-camera "Ultraleap Setup Camera"
 [developer-site-unity]: https://developer.leapmotion.com/unity/ "Ultraleap Developer site - Unity"
 [developer-forum]: https://forums.leapmotion.com/ "Developer Forum"
+[discord]: https://discord.com/invite/3VCndThqxS "Discord Server"
+[github-discussions]: https://github.com/ultraleap/UnityPlugin/discussions "Github Discussions"
 
 [releases]: https://github.com/ultraleap/UnityPlugin/releases "UnityPlugin releases"
 [repository-url]: https://github.com/ultraleap/UnityPlugin.git "Repository URL"
@@ -24,7 +26,6 @@
 [upm-giturl-locks]: https://docs.unity3d.com/Manual/upm-git.html#git-locks "Locked Git dependencies"
 [upm-localpath]: https://docs.unity3d.com/Manual/upm-localpath.html "UPM local packages"
 [upm-troubleshooting]: https://docs.unity3d.com/Manual/upm-errors.html "UPM Troubleshooting Page"
-[xr-legacy-input-helpers-documentation]: http://docs.unity3d.com/Packages/com.unity.xr.legacyinputhelpers@2.1/manual/index.html "XR Legacy Input Helpers"
 [oculus-xr-documentation]: http://docs.unity3d.com/Packages/com.unity.xr.oculus@1.4/manual/index.html "Oculus XR package"
 
 [openupm-cli]: https://openupm.com/docs/getting-started.html#installing-openupm-cli "OpenUPM CLI"
@@ -33,13 +34,12 @@
 # Ultraleap Unity Plugin
 
 [![documentation](https://img.shields.io/badge/Documentation-docs.ultraleap.com-00cf75)][documentation]
-[![forum](https://img.shields.io/badge/Community-Developer%20Forum-00cf75)][developer-forum]
 [![mail](https://img.shields.io/badge/Contact-support%40ultraleap.com-00cf75)](mailto:support@ultraleap.com)
+[![discord](https://img.shields.io/badge/Discord-Server-blueviolet)][discord]
 ![GitHub](https://img.shields.io/github/license/ultraleap/UnityPlugin)
 
 [![openupm-tracking](https://img.shields.io/npm/v/com.ultraleap.tracking?label=OpenUPM%20Tracking&registry_uri=https://package.openupm.com)](https://openupm.com/packages/com.ultraleap.tracking/)
 [![openupm-tracking-preview](https://img.shields.io/npm/v/com.ultraleap.tracking.preview?label=OpenUPM%20Tracking%20Preview&registry_uri=https://package.openupm.com)](https://openupm.com/packages/com.ultraleap.tracking.preview/)
-[![openupm-tracking-openxr](https://img.shields.io/npm/v/com.ultraleap.tracking.openxr?label=OpenUPM%20Tracking%20OpenXR&registry_uri=https://package.openupm.com)](https://openupm.com/packages/com.ultraleap.tracking.openxr/)
 
 The Ultraleap Unity Plugin empowers developers to build Unity applications using Ultraleap's hand tracking technology. It includes various assets, examples, and utilities that make it easy to design and build applications using hand tracking in XR projects.
 
@@ -58,6 +58,8 @@ To use this plugin you will need the following:
 - Due to the ever changing landscape of package dependencies in Unity we cannot guarantee compatibility with every plugin or variant of Unity, but aim to provide support for any LTS versions that are under continuous support from Unity.
 - If you are sourcing the Unity Plugin directly from this repository, you may find that it does not function well with earlier versions of Unity.
 
+More detailed Getting Started documentation is available on [our website][documentation]
+
 ### Dependencies
 
 If you are using Unity 2020.3 (LTS) or newer with XR then you will need to follow the Unity documentation on how to configure your project.
@@ -68,10 +70,6 @@ If you are using any of the scriptable render pipelines (SRP) then you will need
 
 - [Upgrading to Universal Render Pipeline (URP)][upgrade-urp] 
 - [Upgrading to High Definition Render Pipeline (HDRP)][upgrade-hdrp]
-
-If you are using Unity 2020.1 or newer and you get errors related to "SpatialTracking" upon importing, you will need to install the following package:
-
-- [Oculus XR package][oculus-xr-documentation].
 
 ## Installation
 
@@ -107,7 +105,7 @@ In `Edit -> Project Settings -> Package Manager`, add a new scoped registry with
 
   Ultraleap UPM packages should be available in the list. Click on the package you wish to install/modify.
   
-  Note: Ultraleap Tracking contains the Core, Hands and Interaction Engine modules. There are older packages created indepentently by a third party for these modules that are no longer updated.
+  Note: Ultraleap Tracking contains the Core, Hands and Interaction Engine modules. There are older packages created independently by a third party for these modules that are no longer updated.
 
   ![packagelist.png](Markdown/images/packagelist.png)
 
@@ -140,7 +138,7 @@ Git URL is available as another option to consume the UnityPlugin as a UPM packa
 > - Does not resolve dependencies automatically.
 > - Discovering versions requires looking through repository tags.
 >
-> If the OpenUPM workflow does not meet your needs, consider using the Local UPM Package contributor workflow instead of a Git URL. It is not suspectable to the non-deterministic version pitfall and will resolve dependencies automatically. However, the contributor workflow requires using git to change between versions.
+> If the OpenUPM workflow does not meet your needs, consider using the Local UPM Package contributor workflow instead of a Git URL. It is not susceptible to the non-deterministic version pitfall and will resolve dependencies automatically. However, the contributor workflow requires using git to change between versions.
 > Another alternative is to use 
 
 The headings below will guide you in accomplishing specific tasks tailored to the UnityPlugin but for more details it is recommended to read Unity's documentation for [installing using Git URL][upm-giturl-installing] and handling [Git dependencies][upm-giturl-dependencies].
@@ -277,9 +275,9 @@ Enables developers to use hand tracking data to drive their own 3D Hand assets w
 
 - We provide different styles of 3D hands that you can use
 - We have in-depth documentation online with an explanation of each feature
-- We have included step by step guides within the Editor which teaches you how to set up hands without the need to open online documentation
+- We have included step by step guides within the Editor which teaches you how to set up hands without the need to open online [documentation][documentation]
 - No programming knowledge is needed  
-- We provide shaders to support HDRP/URP & the Standard render pipeline.
+- We provide shaders to support URP & the Standard render pipeline.
 
 ## Preview Features
 
@@ -291,8 +289,6 @@ Our Tracking Preview package gives you early access to additional functionality 
   - Allows XR controller input to drive our hand data, and unlocks the ability to seamlessly swap between controller data and real hands.
 - XR Interaction Toolkit Integration
   - Provides support for Ultraleap hand data in Unity's XR Interaction Toolkit.
-- Android Support (for SVR)
-  - Support for Qualcomm's legacy SVR package for XR2 devices, soon to be deprecated by OpenXR.
 - Physics Hands
   - Physically simulated hand interactions. A new way to interact with objects, without having the hand pass through colliders.
 - Hand Aggregation
@@ -324,8 +320,9 @@ User Support: support@ultraleap.com
 
 ## Community Support
 
-Our [Developer Forum][developer-forum] is a place where you are actively encouraged to share your questions, insights, ideas, feature requests and projects.
+Our [Discord Server][discord], [Github Discussions][github-discussions] and [Developer Forum][developer-forum] are places where you are actively encouraged to share your questions, insights, ideas, feature requests and projects.
 
 ## Links
 
 [Ultraleap Unity Plugin][repository-url]
+[Documentation][documentation]

@@ -6,8 +6,8 @@
 //using Leap.Unity.Encoding;
 
 
-//public class PoseDetectionRotationToPalm : PoseDetectionBase
-//{
+public class PoseDetectionRotationToPalm : PoseDetectionBase
+{
 //    Color[] capsuleHandColours;
 
 //    Quaternion[] savedBoneRotations;
@@ -61,4 +61,4 @@
 //            }
 //        }
 //    }
-//}
+}

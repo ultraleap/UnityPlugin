@@ -8,6 +8,9 @@ namespace Leap.Unity.Interaction.PhysicsHands
     [CustomEditor(typeof(PhysicsProvider))]
     public class PhysicsProviderEditor : Editor
     {
+        private const int RECOMMENDED_SOLVER_ITERATIONS = 15;
+        private const int RECOMMENDED_SOLVER_VELOCITY_ITERATIONS = 5;
+
         PhysicsProvider _physicsProvider;
 
         SerializedProperty _inputProvider;
@@ -28,6 +31,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
         SerializedProperty _enableHelpers;
         SerializedProperty _helperMovesObjects;
         SerializedProperty _interpolateMass, _maxMass;
+        SerializedProperty _enhanceThrowing;
 
 
         private void Awake()
@@ -59,6 +63,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             _helperMovesObjects = serializedObject.FindProperty("_helperMovesObjects");
             _interpolateMass = serializedObject.FindProperty("_interpolateMass");
             _maxMass = serializedObject.FindProperty("_maxMass");
+            _enhanceThrowing = serializedObject.FindProperty("_enhanceThrowing");
 
             GUI.enabled = false;
             EditorGUILayout.PropertyField(serializedObject.FindProperty("m_Script"), true, new GUILayoutOption[0]);
@@ -69,6 +74,8 @@ namespace Leap.Unity.Interaction.PhysicsHands
         {
             GetProperties();
 
+            WarningsSection();
+
             SetupSection();
 
             PhysicsSection();
@@ -78,6 +85,34 @@ namespace Leap.Unity.Interaction.PhysicsHands
             HelperSection();
 
             serializedObject.ApplyModifiedProperties();
+        }
+
+        private void WarningsSection()
+        {
+            // Solver iterations
+            if (Physics.defaultSolverIterations < RECOMMENDED_SOLVER_ITERATIONS)
+            {
+                EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.HelpBox($"Project solver iterations are lower than {RECOMMENDED_SOLVER_ITERATIONS} ({Physics.defaultSolverIterations}). It is highly recommended to increase this." +
+                    $"Hands will not be directly affected by this, but all other objects in your scene will be.", MessageType.Warning);
+                if (GUILayout.Button("Fix Now", GUILayout.Width(80)))
+                {
+                    Physics.defaultSolverIterations = RECOMMENDED_SOLVER_ITERATIONS;
+                }
+                EditorGUILayout.EndHorizontal();
+            }
+            // Solver iterations
+            if (Physics.defaultSolverVelocityIterations < RECOMMENDED_SOLVER_VELOCITY_ITERATIONS)
+            {
+                EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.HelpBox($"Project solver velocity iterations are lower than {RECOMMENDED_SOLVER_VELOCITY_ITERATIONS} ({Physics.defaultSolverVelocityIterations}). It is highly recommended to increase this." +
+                    $"Hands will not be directly affected by this, but all other objects in your scene will be.", MessageType.Warning);
+                if (GUILayout.Button("Fix Now", GUILayout.Width(80)))
+                {
+                    Physics.defaultSolverVelocityIterations = RECOMMENDED_SOLVER_VELOCITY_ITERATIONS;
+                }
+                EditorGUILayout.EndHorizontal();
+            }
         }
 
         private void SetupSection()
@@ -206,6 +241,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 {
                     EditorGUILayout.PropertyField(_maxMass);
                 }
+                EditorGUILayout.PropertyField(_enhanceThrowing);
             }
             EditorGUILayout.EndVertical();
         }

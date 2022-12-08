@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2021.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -12,7 +12,6 @@ using UnityEngine.Serialization;
 
 namespace Leap.Unity
 {
-#pragma warning disable 0618
     /// <summary>
     /// A basic utility class to aid in creating pinch based actions.  Once linked with a HandModelBase, it can
     /// be used to detect pinch gestures that the hand makes.
@@ -59,8 +58,8 @@ namespace Leap.Unity
 
         private float GetPinchDistance(Hand hand)
         {
-            var indexTipPosition = hand.GetIndex().TipPosition.ToVector3();
-            var thumbTipPosition = hand.GetThumb().TipPosition.ToVector3();
+            var indexTipPosition = hand.GetIndex().TipPosition;
+            var thumbTipPosition = hand.GetThumb().TipPosition;
             return Vector3.Distance(indexTipPosition, thumbTipPosition);
         }
 
@@ -83,8 +82,8 @@ namespace Leap.Unity
             }
 
             _distance = GetPinchDistance(hand);
-            _rotation = hand.Basis.CalculateRotation();
-            _position = ((hand.Fingers[0].TipPosition + hand.Fingers[1].TipPosition) * .5f).ToVector3();
+            _rotation = hand.Basis.rotation;
+            _position = (hand.Fingers[0].TipPosition + hand.Fingers[1].TipPosition) * .5f;
 
             if (IsActive)
             {
@@ -139,8 +138,8 @@ namespace Leap.Unity
                         Finger thumb = hand.Fingers[0];
                         Finger index = hand.Fingers[1];
                         centerColor = Color.red;
-                        centerPosition = ((thumb.Bone(Bone.BoneType.TYPE_DISTAL).NextJoint + index.Bone(Bone.BoneType.TYPE_DISTAL).NextJoint) / 2).ToVector3();
-                        circleRotation = hand.Basis.CalculateRotation();
+                        centerPosition = (thumb.Bone(Bone.BoneType.TYPE_DISTAL).NextJoint + index.Bone(Bone.BoneType.TYPE_DISTAL).NextJoint) / 2;
+                        circleRotation = hand.Basis.rotation;
                     }
                 }
                 Vector3 axis;
@@ -152,5 +151,4 @@ namespace Leap.Unity
         }
 #endif
     }
-#pragma warning restore 0618
 }

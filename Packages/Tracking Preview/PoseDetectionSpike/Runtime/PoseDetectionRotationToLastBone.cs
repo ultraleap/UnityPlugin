@@ -39,20 +39,20 @@ public class PoseDetectionRotationToLastBone : PoseDetectionBase
         {
             savedBoneRotations = new Quaternion[32];
             savedBonePositions = new Vector3[20];
-            savedWristPosition = leapHand.WristPosition.ToVector3();
-            savedWristRotation = leapHand.Rotation.ToQuaternion();
+            savedWristPosition = leapHand.WristPosition;
+            savedWristRotation = leapHand.Rotation;
 
             // loop through bones
             for (int i = 0; i < 5; i++)
             {
-                Quaternion lastBoneRotation = leapHand.Rotation.ToQuaternion();
+                Quaternion lastBoneRotation = leapHand.Rotation;
                 for (int j = 0; j < 4; j++)
                 {
-                    Quaternion boneRotation = leapHand.Fingers[i].bones[j].Rotation.ToQuaternion();
+                    Quaternion boneRotation = leapHand.Fingers[i].bones[j].Rotation;
                     savedBoneRotations[i * 4 + j] = Quaternion.Inverse(lastBoneRotation) * boneRotation;
                     lastBoneRotation = boneRotation;
 
-                    savedBonePositions[i * 4 + j] = leapHand.Fingers[i].bones[j].NextJoint.ToVector3();
+                    savedBonePositions[i * 4 + j] = leapHand.Fingers[i].bones[j].NextJoint;
                 }
             }
         }
@@ -61,10 +61,10 @@ public class PoseDetectionRotationToLastBone : PoseDetectionBase
 
             for (int i = 0; i < 5; i++)
             {
-                Quaternion lastBoneRotation = leapHand.Rotation.ToQuaternion();
+                Quaternion lastBoneRotation = leapHand.Rotation;
                 for (int j = 0; j < 4; j++)
                 {
-                    Quaternion boneRotation = leapHand.Fingers[i].bones[j].Rotation.ToQuaternion();
+                    Quaternion boneRotation = leapHand.Fingers[i].bones[j].Rotation;
                     Vector3 savedRotEuler = savedBoneRotations[i * 4 + j].eulerAngles;
                     Vector3 currentRotEuler = (Quaternion.Inverse(lastBoneRotation) * boneRotation).eulerAngles;
 

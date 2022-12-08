@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2021.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -10,8 +10,6 @@ using System.Collections.Generic;
 
 namespace Leap.Unity
 {
-    using Query;
-
     /// <summary>
     /// A simple wrapper around HashSet to provide readonly access.
     /// Useful when you want to return a HashSet to someone but you want
@@ -47,12 +45,6 @@ namespace Leap.Unity
         public bool Contains(T obj)
         {
             return _set.Contains(obj);
-        }
-
-        [System.Obsolete("This code will be removed in the next major version of the plugin. Use GetHashSet() instead. If you believe that it needs to be kept, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
-        public Query<T> Query()
-        {
-            return _set.Query();
         }
 
         public static implicit operator ReadonlyHashSet<T>(HashSet<T> set)

@@ -1,7 +1,15 @@
+/******************************************************************************
+ * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
+ *                                                                            *
+ * Use subject to the terms of the Apache License 2.0 available at            *
+ * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
+ * between Ultraleap and you, your company or other organization.             *
+ ******************************************************************************/
+
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using TMPro;
+using UnityEngine;
 
 namespace Leap.Unity.Interaction.PhysicsHands.Example
 {
@@ -27,33 +35,28 @@ namespace Leap.Unity.Interaction.PhysicsHands.Example
 
         private void OnEnable()
         {
-            if(_physicsProvider == null)
+            if (_physicsProvider == null)
             {
                 _physicsProvider = FindObjectOfType<PhysicsProvider>(true);
             }
-            if(_physicsProvider != null)
-            {
-                _physicsProvider.OnObjectStateChange -= OnObjectStateChanged;
-                _physicsProvider.OnObjectStateChange += OnObjectStateChanged;
-            }
         }
 
-        private void OnDisable()
+        private void FixedUpdate()
         {
-            if(_physicsProvider != null)
+            if (_physicsProvider != null)
             {
-                _physicsProvider.OnObjectStateChange -= OnObjectStateChanged;
+                if (_physicsProvider.IsObjectHovered(_rigid))
+                {
+                    if (_physicsProvider.GetObjectState(_rigid, out var state))
+                    {
+                        _text.text = _prefix + state.ToString();
+                    }
+                }
+                else
+                {
+                    _text.text = _prefix + "Idle";
+                }
             }
         }
-
-
-        private void OnObjectStateChanged(Rigidbody rigid, PhysicsGraspHelper helper)
-        {
-            if(rigid == _rigid)
-            {
-                _text.text = _prefix + helper.GraspState.ToString();
-            }
-        }
-
     }
 }

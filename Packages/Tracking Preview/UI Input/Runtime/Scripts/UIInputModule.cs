@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2021.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -42,13 +42,29 @@ namespace Leap.Unity.InputModule
         [Tooltip("The main camera used for calculating interactions.")]
         [SerializeField]
         private Camera mainCamera;
-        public Camera MainCamera => mainCamera;
+
+        /// <summary>
+        /// The main camera reference
+        /// </summary>
+        public Camera MainCamera
+        {
+            get => mainCamera;
+            set => mainCamera = value;
+        }
 
         //The LeapProvider providing tracking data to the scene.
         [Tooltip("The current Leap Data Provider for the scene.")]
         [SerializeField]
         private LeapProvider leapDataProvider;
-        public LeapProvider LeapDataProvider => leapDataProvider;
+
+        /// <summary>
+        /// A reference to the source of hand tracking data to use, the 'leap provider'
+        /// </summary>
+        public LeapProvider LeapDataProvider
+        {
+            get => leapDataProvider;
+            set => leapDataProvider = value;
+        }
 
         //Calibration Setup
 
@@ -85,6 +101,8 @@ namespace Leap.Unity.InputModule
         private bool _prevTouchingMode;
         private IProjectionOriginProvider _projectionOriginProvider;
         public IProjectionOriginProvider ProjectionOriginProvider => _projectionOriginProvider;
+
+        [SerializeField] private bool _drawGizmos = false;
 
         #endregion
 
@@ -207,6 +225,10 @@ namespace Leap.Unity.InputModule
 
         private void OnDrawGizmos()
         {
+            if (!_drawGizmos)
+            {
+                return;
+            }
             if (_projectionOriginProvider != null)
             {
                 _projectionOriginProvider.DrawGizmos();

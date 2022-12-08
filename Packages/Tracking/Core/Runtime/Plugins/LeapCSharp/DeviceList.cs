@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2021.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -52,33 +52,6 @@ namespace Leap
                     return this[d];
             }
             return null;
-        }
-
-        [Obsolete("Multiple devices can now be streaming, use ActiveDevices instead.", false)]
-        /// <summary>
-        /// The device that is currently streaming tracking data.
-        /// If no streaming devices are found, returns null
-        /// </summary>
-        public Device ActiveDevice
-        {
-            get
-            {
-                if (Count == 1)
-                {
-                    return this[0];
-                }
-
-                for (int d = 0; d < Count; d++)
-                {
-                    this[d].UpdateStatus(LeapInternal.eLeapDeviceStatus.eLeapDeviceStatus_Streaming);
-                    if (this[d].IsStreaming)
-                    {
-                        return this[d];
-                    }
-                }
-
-                return null;
-            }
         }
 
         /// <summary>

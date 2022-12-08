@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2021.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -20,7 +20,6 @@ namespace LeapInternal
         eLeapConnectionFlag_MultipleDevicesAware = 0x00000001,
     };
 
-    // 
     public enum eLeapConnectionStatus : uint
     {
         /// <summary>
@@ -799,23 +798,11 @@ namespace LeapInternal
         public float y;
         public float z;
 
-        [System.Obsolete("This code will be removed in the next major version of the plugin. Use 'ToVector3()' instead.")]
-        public Leap.Vector ToLeapVector()
-        {
-            return new Leap.Vector(x, y, z);
-        }
         public UnityEngine.Vector3 ToVector3()
         {
             return new UnityEngine.Vector3(x, y, z);
         }
 
-        [System.Obsolete("This signature will be removed in the next major version of the plugin. Use the one taking a Vector3 instead.")]
-        public LEAP_VECTOR(Leap.Vector leap)
-        {
-            x = leap.x;
-            y = leap.y;
-            z = leap.z;
-        }
         public LEAP_VECTOR(UnityEngine.Vector3 vector)
         {
             x = vector.x;
@@ -832,24 +819,11 @@ namespace LeapInternal
         public float z;
         public float w;
 
-        [System.Obsolete("This code will be removed in the next major version of the plugin. Use 'ToQuaternion()' instead.")]
-        public Leap.LeapQuaternion ToLeapQuaternion()
-        {
-            return new Leap.LeapQuaternion(x, y, z, w);
-        }
         public UnityEngine.Quaternion ToQuaternion()
         {
             return new UnityEngine.Quaternion(x, y, z, w);
         }
 
-        [System.Obsolete("This signature will be removed in the next major version of the plugin. Use the one taking a UnityEngine.Quaternion instead.")]
-        public LEAP_QUATERNION(Leap.LeapQuaternion q)
-        {
-            x = q.x;
-            y = q.y;
-            z = q.z;
-            w = q.w;
-        }
         public LEAP_QUATERNION(UnityEngine.Quaternion q)
         {
             x = q.x;
@@ -1130,7 +1104,7 @@ namespace LeapInternal
 
         [DllImport("LeapC", EntryPoint = "LeapRectilinearToPixelEx")]
         public static extern LEAP_VECTOR LeapRectilinearToPixelEx(IntPtr hConnection,
-          IntPtr hDevice, eLeapPerspectiveType camera, eLeapCameraCalibrationType calibrationType, LEAP_VECTOR rectilinear);
+          IntPtr hDevice, eLeapPerspectiveType camera, LEAP_VECTOR rectilinear);
 
         [DllImport("LeapC", EntryPoint = "LeapCloseDevice")]
         public static extern void CloseDevice(IntPtr pDevice);

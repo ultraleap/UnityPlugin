@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2021.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -14,11 +14,15 @@ using UnityEngine;
 
 namespace Leap.Unity
 {
-
-    [Obsolete("It is no longer required to annotate SerializableHashSets with the SHashSet attribute.")]
-    public class SHashSetAttribute : PropertyAttribute { }
-
     public abstract class SerializableHashSetBase { }
+
+    public interface ICanReportDuplicateInformation
+    {
+#if UNITY_EDITOR
+        List<int> GetDuplicationInformation();
+        void ClearDuplicates();
+#endif
+    }
 
     public class SerializableHashSet<T> : SerializableHashSetBase,
                                           ICanReportDuplicateInformation,

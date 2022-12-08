@@ -10,7 +10,6 @@ using UnityEngine;
 
 namespace Leap.Unity.Controllers
 {
-#pragma warning disable 0618
     /// <summary>
     /// DistanceFromHead checks to see if the distance of the InputMethodType is less than or equal to the actionThreshold
     /// if lessThan is true, or greater than or equal to the actionThreshold if lessThan is false
@@ -27,7 +26,7 @@ namespace Leap.Unity.Controllers
             Vector3 inputPosition;
             if (GetPosition(out inputPosition))
             {
-                _distance = Vector3.Distance(inputPosition, MainCameraProvider.mainCamera.transform.position);
+                _distance = Vector3.Distance(inputPosition, Camera.main.transform.position);
 
                 if (lessThan)
                 {
@@ -48,7 +47,7 @@ namespace Leap.Unity.Controllers
                 case InputMethodType.LeapHand:
                     if (_provider.Get(hand) != null)
                     {
-                        inputPosition = _provider.Get(hand).PalmPosition.ToVector3();
+                        inputPosition = _provider.Get(hand).PalmPosition;
                         return true;
                     }
                     break;
@@ -69,5 +68,4 @@ namespace Leap.Unity.Controllers
             return false;
         }
     }
-#pragma warning restore 0618
 }
