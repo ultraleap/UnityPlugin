@@ -10,7 +10,7 @@ using Leap.Unity.Attributes;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Leap.Unity.Preview
+namespace Leap.Unity.Examples
 {
     /// <summary>
     /// This manages Pinch Painting for one given hand. It needs a PaintCursor. 

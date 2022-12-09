@@ -8,7 +8,7 @@
 
 using UnityEngine;
 
-namespace Leap.Unity.Preview
+namespace Leap.Unity.Examples
 {
 
     /// <summary>

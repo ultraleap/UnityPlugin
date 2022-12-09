@@ -9,7 +9,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Leap.Unity.Preview
+namespace Leap.Unity.Examples
 {
     /// <summary>
     /// A Stroke is made out of multiple stroke points. 
