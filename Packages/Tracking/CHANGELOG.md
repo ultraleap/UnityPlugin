@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Paint To Pinch example scene
 - Explanation text to all XR example scenes
+- Turntable and Pullcord example scene
 
 ### Changed
 - 
