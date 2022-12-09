@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [NEXT] - unreleased
 
 ### Added
-- 
+- Explanation text to all XR example scenes
 
 ### Changed
 - 
