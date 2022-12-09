@@ -753,7 +753,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1282522827012814712, guid: 8801e643e53a19d488f5168057473354, type: 3}
       propertyPath: m_text
-      value: 'Move your hand around the cube to show trandform arrows
+      value: 'Move your hand around the cube to show transform arrows
 
 
         Grab
