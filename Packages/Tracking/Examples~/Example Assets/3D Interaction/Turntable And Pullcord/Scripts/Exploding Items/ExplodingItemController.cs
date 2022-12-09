@@ -26,6 +26,9 @@ namespace Leap.Unity.Examples
             _explodingItems = _explodingItemsRoot.GetComponentsInChildren<ExplodingItem>(true);
         }
 
+        /// <summary>
+        /// Sets the percentage value of all child ExplodingItems of the _explodingItemsRoot with a given explosionProgress value
+        /// </summary>
         public void UpdateItems(float explosionProgress)
         {
             foreach (ExplodingItem explodingItem in _explodingItems)
