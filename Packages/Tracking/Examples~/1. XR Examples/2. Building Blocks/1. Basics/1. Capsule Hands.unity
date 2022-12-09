@@ -291,10 +291,10 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1282522827012814712, guid: 8801e643e53a19d488f5168057473354, type: 3}
       propertyPath: m_text
-      value: 'This shows our simplest hands: The Capsule Hands.
+      value: 'This scene shows the Capsule Hands
 
-        Spheres
-        show the joint locations while capsules show the bones.'
+        Spheres represent the joint
+        locations while capsules represent the bones'
       objectReference: {fileID: 0}
     - target: {fileID: 3047344019473125168, guid: 8801e643e53a19d488f5168057473354, type: 3}
       propertyPath: m_IsActive
