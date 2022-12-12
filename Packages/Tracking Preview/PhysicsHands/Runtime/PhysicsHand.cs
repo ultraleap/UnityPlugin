@@ -313,10 +313,14 @@ namespace Leap.Unity.Interaction.PhysicsHands
             if (!_hasReset && _resetWait > 0)
             {
                 _resetWait--;
-                if (_resetWait == 0)
+                if (_resetWait == 1)
                 {
                     DelayedReset();
-                    _hasReset = true;
+                    return;
+                }
+                else if (_resetWait == 0)
+                {
+                    CompleteReset();
                 }
                 else
                 {
@@ -475,7 +479,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
         {
             if (!_hasGenerated)
             {
-                PhysicsHandsUtils.SetupHand(_physicsHand, _originalLeapHand);
+                PhysicsHandsUtils.SetupHand(_physicsHand, _originalLeapHand, _physicsProvider.SolverIterations, _physicsProvider.SolverVelocityIterations);
                 _physicsHand.gameObject.SetActive(true);
                 _hasGenerated = true;
             }
@@ -483,8 +487,13 @@ namespace Leap.Unity.Interaction.PhysicsHands
             {
                 ResetPhysicsHand(true);
             }
-            _timeOnReset = Time.time;
+        }
+
+        private void CompleteReset()
+        {
+            PhysicsHandsUtils.UpdateIterations(ref _physicsHand, _physicsProvider.SolverIterations, _physicsProvider.SolverVelocityIterations);
             _leapHand.CopyFrom(_originalLeapHand);
+            _timeOnReset = Time.time;
             _hasReset = true;
             OnBeginPhysics?.Invoke();
         }

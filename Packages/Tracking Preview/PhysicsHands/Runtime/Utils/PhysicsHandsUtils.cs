@@ -148,7 +148,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             return physicsHandComponent;
         }
 
-        public static void SetupHand(PhysicsHand.Hand physicsHand, Leap.Hand leapHand)
+        public static void SetupHand(PhysicsHand.Hand physicsHand, Leap.Hand leapHand, int solverIterations = 50, int solverVelocity = 20)
         {
             // A large amount of this function is done to reset the hand to the correct values if they have been changed in the editor
             // Move the root of the hand
@@ -173,7 +173,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
             SetupPalmCollider(physicsHand.palmCollider, leapHand, physicsHand.physicMaterial);
 
-            SetupPalmBody(physicsHand.palmBody, physicsHand.boneMass * 3f);
+            SetupPalmBody(physicsHand.palmBody, physicsHand.boneMass * 3f, solverIterations: solverIterations, solverVelocity: solverVelocity);
             physicsHand.palmBone.SetBoneIndexes(5, 0);
             physicsHand.palmBody.WakeUp();
 
@@ -215,7 +215,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
                     SetupBoneCollider(physicsHand.jointColliders[boneArrayIndex], bone, physicsHand.physicMaterial);
 
-                    SetupBoneBody(physicsHand.jointBodies[boneArrayIndex], physicsHand.boneMass);
+                    SetupBoneBody(physicsHand.jointBodies[boneArrayIndex], physicsHand.boneMass, solverIterations: solverIterations, solverVelocity: solverVelocity);
 
                     if (jointIndex == 0)
                     {
@@ -481,6 +481,18 @@ namespace Leap.Unity.Interaction.PhysicsHands
         #endregion
 
         #region Hand Updating
+
+        public static void UpdateIterations(ref PhysicsHand.Hand physicsHand, int solverIterations, int velocityIterations)
+        {
+            physicsHand.palmBody.solverIterations = solverIterations;
+            physicsHand.palmBody.solverVelocityIterations = velocityIterations;
+
+            for (int i = 0; i < physicsHand.jointBodies.Length; i++)
+            {
+                physicsHand.jointBodies[i].solverIterations = solverIterations;
+                physicsHand.jointBodies[i].solverVelocityIterations = velocityIterations;
+            }
+        }
 
         public static void UpdatePhysicsPalm(ref PhysicsHand.Hand physicsHand, Vector3 position, Quaternion rotation, float interpFactor = 0f, float distanceForceReduction = 0f)
         {
