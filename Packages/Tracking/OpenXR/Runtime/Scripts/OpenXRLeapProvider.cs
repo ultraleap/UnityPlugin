@@ -51,18 +51,35 @@ namespace Ultraleap.Tracking.OpenXR
             }
         }
 
-        public override bool CanProvideData { get { return CheckOpenXRAvailable(); } }
+        public override TrackingSource TrackingDataSource { get { return CheckOpenXRAvailable(); } }
 
-        private bool CheckOpenXRAvailable()
+        private TrackingSource CheckOpenXRAvailable()
         {
+            if (_trackingSource != TrackingSource.NONE)
+            {
+                return _trackingSource;
+            }
+
             if (XRGeneralSettings.Instance.Manager.activeLoader.name == "Open XR Loader" &&
+                OpenXRSettings.Instance != null &&
                 OpenXRSettings.Instance.GetFeature<HandTrackingFeature>() != null &&
                 OpenXRSettings.Instance.GetFeature<HandTrackingFeature>().SupportsHandTracking)
             {
-                return true;
+                if (OpenXRSettings.Instance.GetFeature<HandTrackingFeature>().IsUltraleapHandTracking)
+                {
+                    _trackingSource = TrackingSource.OPENXR_LEAP;
+                }
+                else
+                {
+                    _trackingSource = TrackingSource.OPENXR;
+                }
+            }
+            else
+            {
+                _trackingSource = TrackingSource.NONE;
             }
 
-            return false;
+            return _trackingSource;
         }
 
         private void Update()
@@ -393,7 +410,12 @@ namespace Ultraleap.Tracking.OpenXR
                 (_backingUntransformedEditTimeFrame ??= new Frame()).Hands.Clear();
                 _backingUntransformedEditTimeFrame.Hands.Add(EditTimeLeftHand);
                 _backingUntransformedEditTimeFrame.Hands.Add(EditTimeRightHand);
-                _backingEditTimeFrame = _backingUntransformedEditTimeFrame.TransformedCopy(new LeapTransform(mainCamera.transform));
+
+                if (mainCamera != null)
+                {
+                    _backingEditTimeFrame = _backingUntransformedEditTimeFrame.TransformedCopy(new LeapTransform(mainCamera.transform));
+                }
+
                 return _backingEditTimeFrame;
             }
         }

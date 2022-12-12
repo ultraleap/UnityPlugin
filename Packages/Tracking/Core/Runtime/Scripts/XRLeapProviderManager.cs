@@ -9,22 +9,31 @@
 using System;
 using System.Collections;
 using UnityEngine;
+
+#if XR_MANAGEMENT_AVAILABLE
 using UnityEngine.XR.Management;
+#endif
 
 namespace Leap.Unity
 {
     /// <summary>
     /// XRLeapProviderManager offers a single access point while selecting the most suitable Hand Tracking Data source
     /// available at the time of application launch.
-    /// The order of selection is: OpenXR -> LeapC
+    /// The order of selection is: UL OpenXR -> Leap Direct -> OpenXR
     /// </summary>
     public class XRLeapProviderManager : LeapProvider
     {
-        public enum TrackingSource
+        /// <summary>
+        /// Tracking sources:
+        /// AUTOMATIC - Automatically determines the most suitable tracking type
+        /// OPEN_XR - Ultraleap or other hand tracking provider
+        /// LEAP_DIRECT - Uses the Ultraleap Tracking Service directly
+        /// </summary>
+        public enum TrackingSourceType
         {
             AUTOMATIC,
             OPEN_XR,
-            LEAP_SERVICE
+            LEAP_DIRECT
         }
 
         [SerializeField] private LeapProvider openXRLeapProvider;
@@ -73,31 +82,44 @@ namespace Leap.Unity
         /// </summary>
         [Tooltip("AUTOMATIC - Windows will use LeapService, other platforms will use OpenXR if available and LeapService if OpenXR if not" +
                     "OPEN_XR - Use OpenXR as the source of tracking" +
-                    "LEAP_SERVICE - Use LeapC as the source of tracking")]
-        public TrackingSource trackingSource;
+                    "LEAP_DIRECT - Directly use LeapC as the source of tracking")]
+        public TrackingSourceType trackingSource;
 
         private IEnumerator Start()
         {
-#if UNITY_EDITOR || UNITY_STANDALONE_WIN
-            // Default to Leap Service when using Editor/Windows due to OpenXR tracking source issues when Autmatically selecting
-            if (trackingSource == TrackingSource.AUTOMATIC)
-            {
-                trackingSource = TrackingSource.LEAP_SERVICE;
-            }
+#if !XR_MANAGEMENT_AVAILABLE
+            trackingSource = TrackingSourceType.LEAP_DIRECT;
+            Debug.Log("Unity XR Management not available. Automatically selecting LEAP_DIRECT for Hand Tracking");
 #endif
 
-            if (trackingSource == TrackingSource.AUTOMATIC)
+            if (trackingSource == TrackingSourceType.AUTOMATIC)
             {
-                while (XRGeneralSettings.Instance == null) yield return new WaitForEndOfFrame();
-
-                if (openXRLeapProvider != null && openXRLeapProvider.CanProvideData)
+#if XR_MANAGEMENT_AVAILABLE
+                while (XRGeneralSettings.Instance == null &&
+                        XRGeneralSettings.Instance.Manager == null &&
+                        XRGeneralSettings.Instance.Manager.activeLoader == null)
                 {
-                    SelectTrackingSource(TrackingSource.OPEN_XR);
+                    yield return new WaitForEndOfFrame();
+                }
+                
+                if (openXRLeapProvider != null && openXRLeapProvider.TrackingDataSource == TrackingSource.OPENXR_LEAP)
+                {
+                    SelectTrackingSource(TrackingSourceType.OPEN_XR);
+                }
+                else if (leapXRServiceProvider != null && leapXRServiceProvider.TrackingDataSource == TrackingSource.LEAPC)
+                {
+                    SelectTrackingSource(TrackingSourceType.LEAP_DIRECT);
+                }
+                else if (openXRLeapProvider != null && openXRLeapProvider.TrackingDataSource == TrackingSource.OPENXR)
+                {
+                    SelectTrackingSource(TrackingSourceType.OPEN_XR);
                 }
                 else
                 {
-                    SelectTrackingSource(TrackingSource.LEAP_SERVICE);
+                    Debug.LogWarning("No hand tracking sources found");
+                    yield break;
                 }
+#endif
             }
             else
             {
@@ -107,6 +129,8 @@ namespace Leap.Unity
             LeapProvider.gameObject.SetActive(true);
 
             OnProviderSet?.Invoke(LeapProvider);
+
+            yield break;
         }
 
 
@@ -114,18 +138,26 @@ namespace Leap.Unity
         /// Sets the tracking source by enabling and deleting respective Providers
         /// </summary>
         /// <param name="_source">A tracking source. Where possible, this should not be AUTOMATIC when this method is called</param>
-        void SelectTrackingSource(TrackingSource _source)
+        void SelectTrackingSource(TrackingSourceType _source)
         {
-            if (_source == TrackingSource.AUTOMATIC)
+            if (_source == TrackingSourceType.AUTOMATIC)
             {
-                Debug.LogWarning("No specific Tracking Source selected. Automatically selecting Leap Service");
-                _source = TrackingSource.LEAP_SERVICE;
+                Debug.LogWarning("No specific Tracking Source selected. Automatically selecting LEAP_DIRECT");
+                _source = TrackingSourceType.LEAP_DIRECT;
             }
 
-            if (_source == TrackingSource.OPEN_XR)
+            if (_source == TrackingSourceType.OPEN_XR)
             {
-                Debug.Log("Using OpenXR for Hand Tracking");
                 LeapProvider = openXRLeapProvider;
+
+                if (openXRLeapProvider != null && openXRLeapProvider.TrackingDataSource == TrackingSource.OPENXR_LEAP)
+                {
+                    Debug.Log("Using Ultraleap OpenXR for Hand Tracking");
+                }
+                else
+                {
+                    Debug.Log("Using OpenXR for Hand Tracking");
+                }
 
                 if (leapXRServiceProvider != null)
                 {
@@ -135,6 +167,7 @@ namespace Leap.Unity
             else
             {
                 Debug.Log("Using LeapService for Hand Tracking");
+
                 LeapProvider = leapXRServiceProvider;
 
                 if (openXRLeapProvider != null)
