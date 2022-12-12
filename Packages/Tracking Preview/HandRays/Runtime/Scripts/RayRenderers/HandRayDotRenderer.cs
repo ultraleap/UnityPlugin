@@ -1,10 +1,19 @@
+/******************************************************************************
+ * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
+ *                                                                            *
+ * Use subject to the terms of the Apache License 2.0 available at            *
+ * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
+ * between Ultraleap and you, your company or other organization.             *
+ ******************************************************************************/
+
 using UnityEngine;
 
 namespace Leap.Unity.Preview.HandRays
 {
     public class HandRayDotRenderer : HandRayRenderer
     {
-        public GameObject sphere;
+        // An object that represents the end of the ray
+        public GameObject rayEndObject;
 
         /// <summary>
         /// Sets the ray renderer to be active or inactive
@@ -18,11 +27,11 @@ namespace Leap.Unity.Preview.HandRays
 
             if (_ignoreRayInteractor)
             {
-                sphere.gameObject.SetActive(_isActive);
+                rayEndObject.gameObject.SetActive(_isActive);
             }
             else
             {
-                sphere.gameObject.SetActive(_isActive && _isRayEnabled);
+                rayEndObject.gameObject.SetActive(_isActive && _isRayEnabled);
             }
         }
 
@@ -32,11 +41,11 @@ namespace Leap.Unity.Preview.HandRays
 
             if (_ignoreRayInteractor)
             {
-                sphere.gameObject.SetActive(_isActive);
+                rayEndObject.gameObject.SetActive(_isActive);
             }
             else
             {
-                sphere.gameObject.SetActive(_isActive && _isRayEnabled);
+                rayEndObject.gameObject.SetActive(_isActive && _isRayEnabled);
             }
         }
     
@@ -48,7 +57,7 @@ namespace Leap.Unity.Preview.HandRays
         public override void SetValid(bool isValid = true)
         {
             _isValid = isValid;
-            sphere.GetComponent<MeshRenderer>().material.color = _isValid ? validColorGradient.colorKeys[0].color : invalidColorGradient.colorKeys[0].color;
+            rayEndObject.GetComponent<MeshRenderer>().material.color = _isValid ? validColorGradient.colorKeys[0].color : invalidColorGradient.colorKeys[0].color;
         }
 
         protected override void OnRaycastUpdate(RaycastHit[] results, RaycastHit primaryHit)
@@ -70,7 +79,7 @@ namespace Leap.Unity.Preview.HandRays
             }
 
             lineRenderer.enabled = false;
-            sphere.transform.position = handRayInteractor.linePoints[handRayInteractor.numPoints - 1];
+            rayEndObject.transform.position = handRayInteractor.linePoints[handRayInteractor.numPoints - 1];
         }
     }
 }

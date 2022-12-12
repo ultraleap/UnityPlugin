@@ -1,11 +1,11 @@
 /******************************************************************************
  * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
- * Ultraleap proprietary and confidential.                                    *
  *                                                                            *
- * Use subject to the terms of the Leap Motion SDK Agreement available at     *
- * https://developer.leapmotion.com/sdk_agreement, or another agreement       *
+ * Use subject to the terms of the Apache License 2.0 available at            *
+ * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
+
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -54,8 +54,8 @@ namespace Leap.Unity.Preview.HandRays
 
                 for (float i = 0; i < 8f; i += 0.1f)
                 {
-                    Vector3 segmentStart = evaluateParabola(startPos, velocity, Physics.gravity * 0.25f, i);
-                    Vector3 segmentEnd = evaluateParabola(startPos, velocity, Physics.gravity * 0.25f, i + 0.1f);
+                    Vector3 segmentStart = EvaluateParabola(startPos, velocity, Physics.gravity * 0.25f, i);
+                    Vector3 segmentEnd = EvaluateParabola(startPos, velocity, Physics.gravity * 0.25f, i + 0.1f);
                     _parabolaPositions.Add(segmentEnd);
 
                     if (Physics.Raycast(new Ray(segmentStart, segmentEnd - segmentStart), out RaycastHit hit, Vector3.Distance(segmentStart, segmentEnd), layerMask))
@@ -87,7 +87,7 @@ namespace Leap.Unity.Preview.HandRays
             return hits;
         }
 
-        private Vector3 evaluateParabola(Vector3 position, Vector3 velocity, Vector3 acceleration, float time)
+        private Vector3 EvaluateParabola(Vector3 position, Vector3 velocity, Vector3 acceleration, float time)
         {
             return position + (velocity * time) + (0.5f * acceleration * (time * time));
         }

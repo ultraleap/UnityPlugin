@@ -2659,7 +2659,7 @@ MonoBehaviour:
     m_Mode: 0
     m_NumColorKeys: 2
     m_NumAlphaKeys: 2
-  sphere: {fileID: 220384883}
+  rayEndObject: {fileID: 220384883}
 --- !u!4 &1743215234
 Transform:
   m_ObjectHideFlags: 0
