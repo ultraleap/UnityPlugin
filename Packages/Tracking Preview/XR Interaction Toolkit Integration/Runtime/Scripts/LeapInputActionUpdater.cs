@@ -10,8 +10,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-using Leap.Unity;
-using Leap;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Layouts;
 
@@ -49,13 +47,33 @@ namespace Leap.Unity.Preview.InputActions
         [Tooltip("Should interactions (e.g. grabbing and pinching) reset when the hand is lost?")]
         public bool resetInteractionsOnTrackingLost = true;
 
-        public override void ProcessFrame(ref Frame inputFrame)
+        private void Start()
+        {
+            InputSystem.onBeforeUpdate += InputSystem_onBeforeUpdate;
+        }
+
+        private void OnDestroy()
+        {
+            InputSystem.onBeforeUpdate -= InputSystem_onBeforeUpdate;
+        }
+
+        private void InputSystem_onBeforeUpdate()
         {
             if (Application.isPlaying)
             {
-                UpdateStateWithLeapHand(_leftDevice, inputFrame.GetHand(Chirality.Left), ref _leftState);
-                UpdateStateWithLeapHand(_rightDevice, inputFrame.GetHand(Chirality.Right), ref _rightState);
+                UpdateStateWithLeapHand(_leftDevice, _inputLeapProvider.CurrentFrame.GetHand(Chirality.Left), ref _leftState);
+                UpdateStateWithLeapHand(_rightDevice, _inputLeapProvider.CurrentFrame.GetHand(Chirality.Right), ref _rightState);
             }
+        }
+
+        public override void ProcessFrame(ref Frame inputFrame)
+        {
+            // Running this on ProcessFrame causes jittery results. Probably due to the way the QueueStateEvent is handled, use InputSystem.onBeforeUpdate instead
+            //if (Application.isPlaying) 
+            //{
+            //    UpdateStateWithLeapHand(_leftDevice, inputFrame.GetHand(Chirality.Left), ref _leftState);
+            //    UpdateStateWithLeapHand(_rightDevice, inputFrame.GetHand(Chirality.Right), ref _rightState);
+            //}
         }
 
         /// <summary>
