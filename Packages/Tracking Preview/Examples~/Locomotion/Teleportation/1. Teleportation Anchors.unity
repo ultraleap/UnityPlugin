@@ -1389,7 +1389,7 @@ MonoBehaviour:
   FarFieldObjectLayer:
     layerIndex: 0
   FloorLayer:
-    layerIndex: 6
+    layerIndex: 0
 --- !u!4 &1636922375
 Transform:
   m_ObjectHideFlags: 0
@@ -1899,7 +1899,7 @@ GameObject:
   - component: {fileID: 2048506809}
   - component: {fileID: 2048506808}
   - component: {fileID: 2048506807}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: Floor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
