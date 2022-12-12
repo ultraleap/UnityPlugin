@@ -6,10 +6,6 @@ This preview package contains experimental locomotion methods - both for telepor
 
 ## Teleportation
 
-### Quick Start
-
-Ultraleap currently offer three teleportation methods - each packaged up as a prefab.
-
 ### Jump Gem Teleportation
 
 To get started with Jump Gem Teleportation, drag the "Jump Gem Teleport With Attachment Hands" prefab into the scene.
@@ -17,14 +13,6 @@ To get started with Jump Gem Teleportation, drag the "Jump Gem Teleport With Att
 Jump Gems are small, pinchable objects which can be used to aim a parabolic ray whilst pinched and released to teleport. Ultraleap recommend attaching a Jump Gem to the user's arm, for quick access.
 
 Jump Gems can be used in either a fixed or free mode.
-
-### Ray Latch Teleportation
-
-To get started with Ray Latch Teleportation, drag the "Ray Latch Teleport" prefab into your scene.
-
-Ray Latch Teleport is a teleportation method which uses a Palm Ray combined with a Conecast to latch onto the Teleport Anchor you're aiming at. Once latched, make a grab gesture and pull in the indicated direction - the length and direction of the pull can be configured on the Ray Latch Component.
-
-Ray Latch uses `IsFacingObject` to provide a small form of contextual activation - if you're facing a collider in your scene whilst using Ray Latch, it won't activate.
 
 ### Pinch To Teleport
 
@@ -35,10 +23,3 @@ Pinch To Teleport is a simple teleportation method - point your hand outwards, a
 Pinch To Teleport uses `IsFacingObject` to provide a small form of contextual activation - if you're facing a collider in your scene whilst using Pinch To Teleport, it won't activate.
 
 Pinch To Teleport has an optional "Use Rotation" checkbox - if ticked, whilst pinching on a Teleport Anchor, move your hand horizontally to adjust where you'll face when you land.
-
-## Free Locomotion
-
-### XR Leap Pinch Locomotion
-
-In this interaction, users use both hands to 'pinch' the world around them, before moving their hands apart to enlarge the world or together to shrink it, smoothly, with an interaction similar to zooming in and out on a touchscreen. Whilst you are scaling yourself, rather than the world, it is an effect means of locomoting, without triggering much motion sickness.
-This interaction is particularly appropriate for applications where there is a 3D model to explore, for example in art or 3D modelling scenarios.
