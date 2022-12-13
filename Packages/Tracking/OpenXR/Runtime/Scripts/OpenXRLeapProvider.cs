@@ -218,8 +218,13 @@ namespace Ultraleap.Tracking.OpenXR
                         (Bone.BoneType)boneIndex,
                         prevJoint.Pose.rotation);
                     fingerWidth = Math.Max(fingerWidth, bone.Width);
-                    fingerLength += bone.Length;
                     xrTipIndex = xrNextIndex;
+
+                    // Ignore metacarpals when calculating finger lengths
+                    if(boneIndex != 0)
+                    {
+                        fingerLength += bone.Length;
+                    }
                 }
 
                 // Populate the higher - level finger data.

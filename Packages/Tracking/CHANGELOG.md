@@ -15,7 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 
 
 ### Fixed
-- Android Manifest auto-population when building for OpenXR always adds permissions 
+- Android Manifest auto-population when building for OpenXR always adds permissions
+- OpenXR finger lengths wrongly include metacarpal lengths
 
 ### Known issues 
 - Offset between skeleton hand wrist and forearm in sample scenes
