@@ -198,7 +198,7 @@ namespace Ultraleap.Tracking.OpenXR
                             metacarpalPosition,
                             metacarpalPosition,
                             metacarpalPosition,
-                            (joints[(int)HandJoint.ThumbMetacarpal].Pose.rotation * Vector3.forward),
+                            Vector3.zero,
                             0f,
                             joints[(int)HandJoint.ThumbMetacarpal].Radius * 2f,
                             (Bone.BoneType)boneIndex,
