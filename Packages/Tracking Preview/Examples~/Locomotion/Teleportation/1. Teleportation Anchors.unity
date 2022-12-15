@@ -610,6 +610,11 @@ Canvas:
   m_SortingLayerID: 0
   m_SortingOrder: 0
   m_TargetDisplay: 0
+--- !u!1 &338138175 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1239028840639913094, guid: dd288f86a0eb66243ac630b2a56130aa, type: 3}
+  m_PrefabInstance: {fileID: 8139027189361392720}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &453637401
 GameObject:
   m_ObjectHideFlags: 0
@@ -641,7 +646,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   pinchToTeleportAnchor: {fileID: 1004695889}
   jumpGemTeleportAnchor: {fileID: 88408678}
-  pinchToTeleport: {fileID: 1913348869}
+  pinchToTeleport: {fileID: 338138175}
   jumpGemTeleport: {fileID: 2818466607110763063}
 --- !u!4 &453637403
 Transform:
@@ -684,7 +689,7 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
-  - {fileID: 1913348870}
+  - {fileID: 1239028839030312058}
   - {fileID: 5768915293172270712}
   m_Father: {fileID: 0}
   m_RootOrder: 8
@@ -989,96 +994,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8203c90277bfec6438c88015fb831f99, type: 3}
---- !u!1001 &801874492
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    m_TransformParent: {fileID: 1913348870}
-    m_Modifications:
-    - target: {fileID: 1239028838941531419, guid: dd288f86a0eb66243ac630b2a56130aa, type: 3}
-      propertyPath: leapProvider
-      value: 
-      objectReference: {fileID: 563784108}
-    - target: {fileID: 1239028840639913088, guid: dd288f86a0eb66243ac630b2a56130aa, type: 3}
-      propertyPath: Head
-      value: 
-      objectReference: {fileID: 19638844}
-    - target: {fileID: 1239028840639913088, guid: dd288f86a0eb66243ac630b2a56130aa, type: 3}
-      propertyPath: Player
-      value: 
-      objectReference: {fileID: 1134601055}
-    - target: {fileID: 1239028840639913088, guid: dd288f86a0eb66243ac630b2a56130aa, type: 3}
-      propertyPath: chirality
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1239028840639913088, guid: dd288f86a0eb66243ac630b2a56130aa, type: 3}
-      propertyPath: leapProvider
-      value: 
-      objectReference: {fileID: 563784108}
-    - target: {fileID: 1239028840639913088, guid: dd288f86a0eb66243ac630b2a56130aa, type: 3}
-      propertyPath: farFieldLayerManager
-      value: 
-      objectReference: {fileID: 1636922374}
-    - target: {fileID: 1239028840639913091, guid: dd288f86a0eb66243ac630b2a56130aa, type: 3}
-      propertyPath: leapProvider
-      value: 
-      objectReference: {fileID: 563784108}
-    - target: {fileID: 1239028840639913094, guid: dd288f86a0eb66243ac630b2a56130aa, type: 3}
-      propertyPath: m_Name
-      value: Pinch To Teleport L
-      objectReference: {fileID: 0}
-    - target: {fileID: 1239028840639913095, guid: dd288f86a0eb66243ac630b2a56130aa, type: 3}
-      propertyPath: m_RootOrder
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1239028840639913095, guid: dd288f86a0eb66243ac630b2a56130aa, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1239028840639913095, guid: dd288f86a0eb66243ac630b2a56130aa, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1239028840639913095, guid: dd288f86a0eb66243ac630b2a56130aa, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1239028840639913095, guid: dd288f86a0eb66243ac630b2a56130aa, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1239028840639913095, guid: dd288f86a0eb66243ac630b2a56130aa, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1239028840639913095, guid: dd288f86a0eb66243ac630b2a56130aa, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1239028840639913095, guid: dd288f86a0eb66243ac630b2a56130aa, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1239028840639913095, guid: dd288f86a0eb66243ac630b2a56130aa, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1239028840639913095, guid: dd288f86a0eb66243ac630b2a56130aa, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1239028840639913095, guid: dd288f86a0eb66243ac630b2a56130aa, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: dd288f86a0eb66243ac630b2a56130aa, type: 3}
---- !u!4 &801874493 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 1239028840639913095, guid: dd288f86a0eb66243ac630b2a56130aa, type: 3}
-  m_PrefabInstance: {fileID: 801874492}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &968668647
 GameObject:
   m_ObjectHideFlags: 0
@@ -2022,38 +1937,6 @@ Transform:
   m_Father: {fileID: 1134601057}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1913348869
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1913348870}
-  m_Layer: 0
-  m_Name: Pinch To Teleport
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1913348870
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1913348869}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children:
-  - {fileID: 1239028839030312058}
-  - {fileID: 801874493}
-  m_Father: {fileID: 506092804}
-  m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1917134101
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2514,7 +2397,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 529290695823889759, guid: 96620972cc2c1434ea572c240e6bcb78, type: 3}
       propertyPath: m_RootOrder
-      value: 3
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 529290695823889759, guid: 96620972cc2c1434ea572c240e6bcb78, type: 3}
       propertyPath: m_LocalPosition.x
@@ -2619,7 +2502,7 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
-    m_TransformParent: {fileID: 1913348870}
+    m_TransformParent: {fileID: 506092804}
     m_Modifications:
     - target: {fileID: 1239028838941531419, guid: dd288f86a0eb66243ac630b2a56130aa, type: 3}
       propertyPath: leapProvider
@@ -2647,7 +2530,7 @@ PrefabInstance:
       objectReference: {fileID: 563784108}
     - target: {fileID: 1239028840639913094, guid: dd288f86a0eb66243ac630b2a56130aa, type: 3}
       propertyPath: m_Name
-      value: Pinch To Teleport R
+      value: Pinch To Teleport
       objectReference: {fileID: 0}
     - target: {fileID: 1239028840639913095, guid: dd288f86a0eb66243ac630b2a56130aa, type: 3}
       propertyPath: m_RootOrder
