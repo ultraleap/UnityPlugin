@@ -30,7 +30,7 @@ namespace Leap.Unity.Preview.Locomotion
         private float _minimumDistanceToActivate = 0.1f;
 
         [SerializeField, Range(0f, 1f), Tooltip("The point at which the ray should interpolate when releasing. " +
-            "E.g. 0.8 will activate when the user is 80% released.")]
+            "E.g. 0.8 will activate when the user is 80% released. This percentage relates to the JumpGem's PinchDetector's SquishPercent value")]
         private float _releaseInterpolationPoint = 0.75f;
 
         [SerializeField, Range(0f, 4f), Tooltip("The interpolation time that will be applied when releasing.")]
