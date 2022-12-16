@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Paint To Pinch example scene
 - Explanation text to all XR example scenes
 - Turntable and Pullcord example scene
+- Hands prefabs added to GameObject/Ultraleap/Hands create menu
 
 ### Changed
 - 
