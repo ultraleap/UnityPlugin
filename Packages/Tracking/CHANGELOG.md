@@ -12,7 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Pinch To Paint example scene
 - Explanation text to all XR example scenes
 - Turntable and Pullcord example scene
-- Locomotion example scenes in Preview Package
+- Locomotion teleportation system and example scenes in Preview Package
 
 ### Fixed
 - Android Manifest auto-population when building for OpenXR always adds permissions
