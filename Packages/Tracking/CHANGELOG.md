@@ -14,7 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Turntable and Pullcord example scene
 
 ### Changed
-- 
+- "Hands.Provider" static function now searches for subjectively the best LeapProvider avaliable in the scene. Will use PostProcessProvider first rather than LeapServiceProvider
 
 ### Fixed
 - Android Manifest auto-population when building for OpenXR always adds permissions
