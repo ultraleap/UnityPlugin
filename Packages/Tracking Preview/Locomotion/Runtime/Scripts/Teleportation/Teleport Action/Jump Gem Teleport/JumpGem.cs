@@ -6,9 +6,9 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using UnityEngine;
-using System;
 using Leap.Unity.Attachments;
+using System;
+using UnityEngine;
 
 namespace Leap.Unity.Preview.Locomotion
 {
