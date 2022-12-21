@@ -116,6 +116,9 @@ namespace Leap.Unity.Interaction
 
         Dictionary<IInteractionBehaviour, float> contactingInteractionBehaviours = new Dictionary<IInteractionBehaviour, float>();
 
+        List<IInteractionBehaviour> contactingStayInteractionBehaviours = new List<IInteractionBehaviour>();
+        List<IInteractionBehaviour> ContactingObjectsToRemove = new List<IInteractionBehaviour>();
+
         void Start()
         {
             interactionController.manager.contactBoneBodies[rigidbody] = this;
@@ -126,6 +129,27 @@ namespace Leap.Unity.Interaction
             interactionController.manager.contactBoneBodies.Remove(rigidbody);
         }
 
+        private void FixedUpdate()
+        {
+            foreach (var contacting in contactingInteractionBehaviours)
+            {
+                if (!contactingStayInteractionBehaviours.Contains(contacting.Key))
+                {
+                    interactionController.NotifyContactBoneCollisionExit(this, contacting.Key);
+
+                    ContactingObjectsToRemove.Add(contacting.Key);
+                }
+            }
+
+            foreach(var removed in ContactingObjectsToRemove)
+            {
+                contactingInteractionBehaviours.Remove(removed);
+            }
+
+            ContactingObjectsToRemove.Clear();
+            contactingStayInteractionBehaviours.Clear();
+        }
+
         void OnCollisionEnter(Collision collision)
         {
             if (collision.rigidbody != null)
@@ -133,6 +157,9 @@ namespace Leap.Unity.Interaction
                 IInteractionBehaviour interactionObj;
                 if (interactionController.manager.interactionObjectBodies.TryGetValue(collision.rigidbody, out interactionObj))
                 {
+                    if (!contactingStayInteractionBehaviours.Contains(interactionObj))
+                        contactingStayInteractionBehaviours.Add(interactionObj);
+
                     _lastObjectTouchedAdjustedMass = collision.rigidbody.mass;
                     if (interactionObj is InteractionBehaviour)
                     {
@@ -169,18 +196,15 @@ namespace Leap.Unity.Interaction
             if (collision.rigidbody == null) { return; }
 
             IInteractionBehaviour interactionObj;
-            float timeEntered = 0;
             if (interactionController.manager.interactionObjectBodies.TryGetValue(collision.rigidbody, out interactionObj))
             {
+                if (!contactingStayInteractionBehaviours.Contains(interactionObj))
+                    contactingStayInteractionBehaviours.Add(interactionObj);
+
                 if (!contactingInteractionBehaviours.ContainsKey(interactionObj))
                 {
                     interactionController.NotifyContactBoneCollisionEnter(this, interactionObj);
                     contactingInteractionBehaviours.Add(interactionObj, Time.fixedTime);
-                }
-                else if (contactingInteractionBehaviours.TryGetValue(interactionObj, out timeEntered) && Time.fixedTime - timeEntered > Time.fixedDeltaTime * 20f)
-                {
-                    interactionController.NotifyContactBoneCollisionExit(this, interactionObj);
-                    contactingInteractionBehaviours.Remove(interactionObj);
                 }
             }
         }
@@ -208,7 +232,6 @@ namespace Leap.Unity.Interaction
             if (interactionController.manager.interactionObjectBodies.TryGetValue(collider.attachedRigidbody, out interactionObj))
             {
                 interactionController.NotifyContactBoneCollisionEnter(this, interactionObj);
-
                 interactionController.NotifySoftContactCollisionEnter(this, interactionObj, collider);
             }
         }
@@ -221,11 +244,8 @@ namespace Leap.Unity.Interaction
             if (interactionController.manager.interactionObjectBodies.TryGetValue(collider.attachedRigidbody, out interactionObj))
             {
                 interactionController.NotifyContactBoneCollisionExit(this, interactionObj);
-
                 interactionController.NotifySoftContactCollisionExit(this, interactionObj, collider);
             }
         }
-
     }
-
 }
