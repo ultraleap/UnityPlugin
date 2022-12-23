@@ -269,21 +269,21 @@ namespace Leap.Unity
 
         public override TrackingSource TrackingDataSource { get { return CheckLeapServiceAvailable(); } }
 
+        /// <summary>
+        /// Determines if the service provider should temporally resample frames for smoothness.
+        /// </summary>
+        [SerializeField]
+        public bool _useInterpolation = true;
+
         #endregion
 
         #region Internal Settings & Memory
 
-        /// <summary>
-        /// Determines if the service provider should temporally resample frames for smoothness.
-        /// </summary>
-        public bool UseInterpolation { get { return _useInterpolation; } set { _useInterpolation = value; } }
-        protected bool _useInterpolation = true;
-
         // Extrapolate on Android to compensate for the latency introduced by its graphics
         // pipeline.
 #if UNITY_ANDROID && !UNITY_EDITOR
-    protected int ExtrapolationAmount = 0; // 15;
-    protected int BounceAmount = 70;
+        protected int ExtrapolationAmount = 0; // 15;
+        protected int BounceAmount = 70;
 #else
         protected int ExtrapolationAmount = 0;
         protected int BounceAmount = 0;
