@@ -216,13 +216,15 @@ namespace Leap.Unity.Preview.HandRays
         {
             float neckYRotation = useNeckYawDeadzone ? neckYawDeadzone.DeadzoneCentre : Head.rotation.eulerAngles.y;
 
+            Quaternion newNeckRotation = Quaternion.Euler(0, neckYRotation, 0);
+
             // Rotated too far in a single frame
-            if (Quaternion.Angle(storedNeckRotation, Quaternion.Euler(0, neckYRotation, 0)) > 15)
+            if (Quaternion.Angle(storedNeckRotation, newNeckRotation) > 15)
             {
-                NeckRotation = Quaternion.Euler(0, neckYRotation, 0);
+                NeckRotation = newNeckRotation;
             }
 
-            storedNeckRotation = Quaternion.Euler(0, neckYRotation, 0);
+            storedNeckRotation = newNeckRotation;
 
             NeckRotation = Quaternion.Lerp(NeckRotation, storedNeckRotation, Time.deltaTime * neckRotationLerpSpeed);
         }

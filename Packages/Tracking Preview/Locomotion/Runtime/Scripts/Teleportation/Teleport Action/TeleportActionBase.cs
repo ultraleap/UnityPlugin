@@ -1,11 +1,11 @@
 /******************************************************************************
  * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
- * Ultraleap proprietary and confidential.                                    *
  *                                                                            *
- * Use subject to the terms of the Leap Motion SDK Agreement available at     *
- * https://developer.leapmotion.com/sdk_agreement, or another agreement       *
+ * Use subject to the terms of the Apache License 2.0 available at            *
+ * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
+
 using Leap.Unity.Preview.HandRays;
 using System;
 using System.Collections.Generic;
@@ -39,6 +39,7 @@ namespace Leap.Unity.Preview.Locomotion
 
         [Tooltip("If set to FIXED, you can only teleport to anchors in the world. If set to FREE, you can teleport anywhere you point.")]
         public TeleportActionMovementType movementType = TeleportActionMovementType.FIXED;
+        private TeleportActionMovementType _movementTypeLastFrame;
 
         [Tooltip("If true, when teleporting, the teleport anchor's forward direction will match your headset's world forward direction." +
             "\nIf false, your rotation will be the same way you are currently facing")]
@@ -90,6 +91,8 @@ namespace Leap.Unity.Preview.Locomotion
         /// </summary>
         public Action<TeleportAnchor, Vector3, Quaternion> OnTeleport;
 
+        public Action<TeleportActionMovementType> OnMovementTypeChanged;
+
         public virtual void Start()
         {
             if (Head == null) Head = Camera.main.transform;
@@ -113,7 +116,18 @@ namespace Leap.Unity.Preview.Locomotion
             {
                 Destroy(freeTeleportAnchor.GetComponent<MeshCollider>());
             }
+
+            _movementTypeLastFrame = movementType;
             SelectTeleport(false);
+        }
+
+        protected virtual void Update()
+        {
+            if(_movementTypeLastFrame != movementType)
+            {
+                OnMovementTypeChanged?.Invoke(movementType);
+                _movementTypeLastFrame = movementType;
+            }
         }
 
         private void OnValidate()
@@ -122,7 +136,10 @@ namespace Leap.Unity.Preview.Locomotion
             {
                 Head = Camera.main.transform;
             }
-            if (Player == null && Head != null) Player = Head.parent.gameObject == null ? Head.gameObject : Head.parent.gameObject;
+            if (Player == null && Head != null)
+            {
+                Player = Head.parent?.gameObject == null ? Head.gameObject : Head.parent.gameObject;
+            }
 
             if (farFieldLayerManager == null)
             {
@@ -185,7 +202,7 @@ namespace Leap.Unity.Preview.Locomotion
         /// <param name="teleportAnchor"></param>
         public void RemoveTeleportAnchorFromFixedAnchors(TeleportAnchor teleportAnchor)
         {
-
+            _teleportAnchors.Remove(teleportAnchor);
         }
 
         /// <summary>

@@ -1,11 +1,11 @@
 /******************************************************************************
  * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
- * Ultraleap proprietary and confidential.                                    *
  *                                                                            *
- * Use subject to the terms of the Leap Motion SDK Agreement available at     *
- * https://developer.leapmotion.com/sdk_agreement, or another agreement       *
+ * Use subject to the terms of the Apache License 2.0 available at            *
+ * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
+
 using UnityEngine;
 using System;
 using Leap.Unity.Attachments;
@@ -24,7 +24,8 @@ namespace Leap.Unity.Preview.Locomotion
 
         [SerializeField, Header("Pinch")]
         protected LightweightPinchDetector _pinchDetector = null;
-        
+        public LightweightPinchDetector PinchDetector => _pinchDetector;
+
         [SerializeField, Tooltip("This dictates the required pinch value and overall size of the visual elements used. " +
             "This value is a radius and will be used *0.5 on visual items.")]
         protected float _gemSize = 0.033f;
@@ -168,7 +169,7 @@ namespace Leap.Unity.Preview.Locomotion
                 return;
             }
 
-            if(leapProvider == null)
+            if (leapProvider == null)
             {
                 leapProvider = FindObjectOfType<LeapProvider>();
             }
@@ -266,7 +267,7 @@ namespace Leap.Unity.Preview.Locomotion
             Vector3 position;
             if (GetClosestHand(out chirality, out position))
             {
-                if(chirality != _pinchDetector.chirality)
+                if (chirality != _pinchDetector.chirality)
                 {
                     _pinchDetector.chirality = chirality;
                     _wasPinched = false;

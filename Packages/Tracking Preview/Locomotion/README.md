@@ -6,27 +6,13 @@ This preview package contains experimental locomotion methods - both for telepor
 
 ## Teleportation
 
-### Quick Start
-
-Ultraleap currently offer three teleportation methods - each packaged up as a prefab.
-
-#### Jump Gem Teleportation
+### Jump Gem Teleportation
 
 To get started with Jump Gem Teleportation, drag the "Jump Gem Teleport With Attachment Hands" prefab into the scene.
 
 Jump Gems are small, pinchable objects which can be used to aim a parabolic ray whilst pinched and released to teleport. Ultraleap recommend attaching a Jump Gem to the user's arm, for quick access.
 
 Jump Gems can be used in either a fixed or free mode.
-
-### Ray Latch Teleportation
-
-To get started with Ray Latch Teleportation, drag the "Ray Latch Teleport" prefab into your scene.
-
-Ray Latch Teleport is a teleportation method which uses a Palm Ray combined with a Conecast to latch onto the Teleport Anchor you're aiming at. Once latched, make a grab gesture and pull in the indicated direction - the length and direction of the pull can be configured on the Ray Latch Component.
-
-Ray Latch uses `IsFacingObject` to provide a small form of contextual activation - if you're facing a collider in your scene whilst using Ray Latch, it won't activate.
-
-Note: At the moment, Ray Latch can only be used in a Fixed configuration.
 
 ### Pinch To Teleport
 
