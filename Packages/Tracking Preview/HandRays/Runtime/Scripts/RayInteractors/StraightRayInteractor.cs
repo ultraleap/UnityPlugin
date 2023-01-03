@@ -28,8 +28,8 @@ namespace Leap.Unity.Preview.HandRays
             {
                 hits = 1;
                 results = new RaycastHit[] { primaryHit };
-                linePoints = new Vector3[] { handRayDirection.VisualAimPosition, primaryHit.point};
-            } 
+                linePoints = new Vector3[] { handRayDirection.VisualAimPosition, primaryHit.point };
+            }
             else
             {
                 linePoints = new Vector3[] { handRayDirection.VisualAimPosition, handRayDirection.VisualAimPosition + (handRayDirection.Direction * maxRayDistance) };

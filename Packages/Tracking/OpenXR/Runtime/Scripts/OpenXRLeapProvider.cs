@@ -221,7 +221,7 @@ namespace Ultraleap.Tracking.OpenXR
                     xrTipIndex = xrNextIndex;
 
                     // Ignore metacarpals when calculating finger lengths
-                    if(boneIndex != 0)
+                    if (boneIndex != 0)
                     {
                         fingerLength += bone.Length;
                     }
