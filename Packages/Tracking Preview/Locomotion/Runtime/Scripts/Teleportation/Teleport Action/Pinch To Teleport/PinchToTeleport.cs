@@ -19,7 +19,7 @@ namespace Leap.Unity.Preview.Locomotion
         [Header("Pinch To Teleport - Setup")]
         public LeapProvider leapProvider;
 
-        [SerializeField] 
+        [SerializeField]
         private IsFacingObject _isFacingObject;
 
         [SerializeField]
@@ -80,7 +80,7 @@ namespace Leap.Unity.Preview.Locomotion
         {
             base.Update();
 
-            if(chirality != _chiralityLastFrame)
+            if (chirality != _chiralityLastFrame)
             {
                 UpdateChirality();
             }
@@ -188,7 +188,7 @@ namespace Leap.Unity.Preview.Locomotion
                 _isFacingObject = GetComponentInChildren<IsFacingObject>(true);
             }
 
-            if(_pinchDetector == null)
+            if (_pinchDetector == null)
             {
                 _pinchDetector = GetComponentInChildren<LightweightPinchDetector>(true);
             }

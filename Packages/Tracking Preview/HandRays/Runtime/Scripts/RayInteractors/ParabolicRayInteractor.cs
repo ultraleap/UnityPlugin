@@ -67,7 +67,7 @@ namespace Leap.Unity.Preview.HandRays
                             hits = 1;
                         }
 
-                        if(hit.transform.gameObject.layer == farFieldLayerManager.FloorLayer)
+                        if (hit.transform.gameObject.layer == farFieldLayerManager.FloorLayer)
                         {
                             foundFloor = true;
                         }
@@ -75,8 +75,8 @@ namespace Leap.Unity.Preview.HandRays
                         _parabolaPositions.Add(hit.point);
                     }
 
-                    if((hits == 1 && stopRayOnHit) || (foundFloor && !stopRayOnHit))
-                    { 
+                    if ((hits == 1 && stopRayOnHit) || (foundFloor && !stopRayOnHit))
+                    {
                         break;
                     }
                 }
