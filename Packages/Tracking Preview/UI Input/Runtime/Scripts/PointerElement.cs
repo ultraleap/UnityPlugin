@@ -6,6 +6,7 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
+using Leap.Unity.Preview.HandRays;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -161,7 +162,7 @@ namespace Leap.Unity.InputModule
         private bool IsPermittedTactileInteraction(Hand hand)
             => OnlyTactileInteractionEnabled || !OnlyProjectionInteractionEnabled && DistanceOfTipToPointer(hand) < module.ProjectiveToTactileTransitionDistance;
 
-        internal void Process(Hand hand, IProjectionOriginProvider projectionOriginProvider)
+        internal void Process(Hand hand, HandRayDirection handRayDirection)
         {
             //Control cursor display
             cursor.gameObject.SetActive(true);
@@ -184,13 +185,13 @@ namespace Leap.Unity.InputModule
             switch (module.InteractionMode)
             {
                 case InteractionCapability.Both:
-                    ProcessHybrid(projectionOriginProvider, hand);
+                    ProcessHybrid(handRayDirection, hand);
                     break;
                 case InteractionCapability.Direct:
-                    ProcessTactile(projectionOriginProvider, hand);
+                    ProcessTactile(handRayDirection, hand);
                     break;
                 case InteractionCapability.Indirect:
-                    ProcessProjective(projectionOriginProvider, hand);
+                    ProcessProjective(handRayDirection, hand);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -201,22 +202,22 @@ namespace Leap.Unity.InputModule
             ProcessUnityEvents(hand);
         }
 
-        private void ProcessHybrid(IProjectionOriginProvider projectionOriginProvider, Hand hand)
+        private void ProcessHybrid(HandRayDirection handRayDirection, Hand hand)
         {
-            ProcessTactile(projectionOriginProvider, hand);
+            ProcessTactile(handRayDirection, hand);
 
             if (PointerState == PointerStates.OffCanvas)
             {
-                ProcessProjective(projectionOriginProvider, hand);
+                ProcessProjective(handRayDirection, hand);
             }
         }
 
-        private void ProcessTactile(IProjectionOriginProvider projectionOriginProvider, Hand hand)
+        private void ProcessTactile(HandRayDirection handRayDirection, Hand hand)
         {
             // Raycast from shoulder through tip of the index finger to the UI
             var tipRaycastUsed = GetLookPointerEventData(
+                handRayDirection,
                 hand,
-                projectionOriginProvider.ProjectionOriginForHand(hand),
                 forceTipRaycast: true);
 
             PrevState = PointerState;
@@ -224,12 +225,12 @@ namespace Leap.Unity.InputModule
             ProcessState(hand, tipRaycastUsed);
         }
 
-        private void ProcessProjective(IProjectionOriginProvider projectionOriginProvider, Hand hand)
+        private void ProcessProjective(HandRayDirection handRayDirection, Hand hand)
         {
             // If didn't hit anything near the fingertip, try doing it again, but through the knuckle this time
             var tipRaycastUsed = GetLookPointerEventData(
+                handRayDirection,
                 hand,
-                projectionOriginProvider.ProjectionOriginForHand(hand),
                 forceTipRaycast: false);
 
             PrevState = PointerState;
@@ -469,7 +470,7 @@ namespace Leap.Unity.InputModule
         /// <param name="origin"></param>
         /// <param name="forceTipRaycast"></param>
         /// <returns></returns>
-        private bool GetLookPointerEventData(Hand hand, Vector3 origin, bool forceTipRaycast)
+        private bool GetLookPointerEventData(HandRayDirection handRayDirection, Hand hand, bool forceTipRaycast)
         {
             // Whether or not this will be a raycast through the finger tip
             var tipRaycast = false;
@@ -506,7 +507,7 @@ namespace Leap.Unity.InputModule
             else
             {
                 //Raycast through the knuckle of the finger
-                pointerPosition = mainCamera.transform.position - origin + hand.Fingers[(int)Finger.FingerType.TYPE_INDEX].Bone(Bone.BoneType.TYPE_METACARPAL).Center;
+                pointerPosition = handRayDirection.Direction + hand.Fingers[(int)Finger.FingerType.TYPE_INDEX].Bone(Bone.BoneType.TYPE_METACARPAL).Center;
             }
 
             //Set the Raycast Direction and Delta

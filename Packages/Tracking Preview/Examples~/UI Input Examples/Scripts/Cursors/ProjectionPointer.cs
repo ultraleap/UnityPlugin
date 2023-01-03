@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class ProjectionPointer : MonoBehaviour
 {
-    [SerializeField] private UIInputModule module;
+    [SerializeField] private UIInputModule uiInputModule;
     [SerializeField] Chirality chirality;
     [SerializeField] private LineRenderer line;
     [SerializeField] private UIInputCursor cursor;
@@ -19,13 +19,13 @@ public class ProjectionPointer : MonoBehaviour
 
     private void Awake()
     {
-        leapDataProvider = module.LeapDataProvider;
+        leapDataProvider = uiInputModule.LeapDataProvider;
     }
 
     private void Update()
     {
         hand = leapDataProvider.CurrentFrame.GetHand(chirality);
-        if (module.InteractionMode == InteractionCapability.Direct)
+        if (uiInputModule.InteractionMode == InteractionCapability.Direct)
         {
             return;
         }
@@ -35,15 +35,14 @@ public class ProjectionPointer : MonoBehaviour
             return;
         }
 
-        var projection = module.ProjectionOriginProvider;
-        if (projection == null)
+        var handRay = hand.IsLeft ? uiInputModule.leftHandRay : uiInputModule.rightHandRay;
+        if (handRay == null)
         {
             return;
         }
 
-        var source = projection.ProjectionOriginForHand(hand);
         var target = cursor.transform.position;
-        line.SetPosition(0, source);
+        line.SetPosition(0, handRay.handRayDirection.VisualAimPosition);
         line.SetPosition(1, target);
     }
 }

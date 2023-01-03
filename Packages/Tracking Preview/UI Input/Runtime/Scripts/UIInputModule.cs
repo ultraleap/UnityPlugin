@@ -6,6 +6,7 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
+using Leap.Unity.Preview.HandRays;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -98,9 +99,8 @@ namespace Leap.Unity.InputModule
         [SerializeField] private PointerElement _pointerRight;
 
         //Misc. Objects
-        private bool _prevTouchingMode;
-        private IProjectionOriginProvider _projectionOriginProvider;
-        public IProjectionOriginProvider ProjectionOriginProvider => _projectionOriginProvider;
+        public HandRay leftHandRay, rightHandRay;
+
 
         [SerializeField] private bool _drawGizmos = false;
 
@@ -146,9 +146,6 @@ namespace Leap.Unity.InputModule
         }
         protected override void Start()
         {
-            var shoulderProjectionOriginProvider = new ShoulderProjectionOriginProvider(mainCamera);
-            _projectionOriginProvider = shoulderProjectionOriginProvider;
-
             //Assign mainCamera to Canvases
             var canvases = Resources.FindObjectsOfTypeAll<Canvas>();
             for (int i = 0; i < canvases.Length; i++)
@@ -170,11 +167,6 @@ namespace Leap.Unity.InputModule
             }
         }
 
-        private void Update()
-        {
-            _projectionOriginProvider?.Update();
-        }
-
         /// <summary>
         /// Process is called by UI system to process events
         /// </summary>
@@ -193,11 +185,9 @@ namespace Leap.Unity.InputModule
             // This is important for InputField to receive keyboard events
             SendUpdateEventToSelectedObject();
 
-            _projectionOriginProvider?.Process();
-
             // Begin Processing Each Hand/Pointer
-            _pointerLeft.Process(GetHand(Chirality.Left), _projectionOriginProvider);
-            _pointerRight.Process(GetHand(Chirality.Right), _projectionOriginProvider);
+            _pointerLeft.Process(GetHand(Chirality.Left), leftHandRay.handRayDirection);
+            _pointerRight.Process(GetHand(Chirality.Right), rightHandRay.handRayDirection);
         }
 
         /// <summary>
@@ -228,11 +218,6 @@ namespace Leap.Unity.InputModule
             if (!_drawGizmos)
             {
                 return;
-            }
-            if (_projectionOriginProvider != null)
-            {
-                _projectionOriginProvider.DrawGizmos();
-
             }
         }
 
