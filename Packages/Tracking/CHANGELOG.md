@@ -15,7 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 
 
 ### Fixed
-- 
+- OnAnchorDisabled not being called when an Anchor gameobject is disabled
 
 ### Known issues 
 - Offset between skeleton hand wrist and forearm in sample scenes
@@ -43,7 +43,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Android Manifest auto-population when building for OpenXR always adds permissions
 - OpenXR finger lengths wrongly include metacarpal lengths
-- OnAnchorDisabled not being called when the gameobject is disabled inside "Anchor.cs"
 
 ### Known issues 
 - Offset between skeleton hand wrist and forearm in sample scenes
