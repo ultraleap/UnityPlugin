@@ -19,13 +19,13 @@ namespace Leap.Unity.Preview.HandRays
     {
         public HandRay handRay => _handRay;
         [SerializeField] private HandRay _handRay;
-        
+
         [Header("Layer Logic")]
         public FarFieldLayerManager farFieldLayerManager;
 
         [Tooltip("Note that the far field object layer will be added automatically from the FarFieldLayerManager")]
         public LayerMask layerMask = 0;
-        
+
         [Tooltip("If true, on start the floor layer referenced in FarFieldLayerManager will get added to the layer mask")]
         public bool autoIncludeFloorLayer = false;
 
