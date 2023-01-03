@@ -52,7 +52,10 @@ namespace Leap.Unity.Preview.Locomotion
             {
                 IsPinching = false;
             }
-            UpdatePinchStatus(leapProvider.CurrentFrame.GetHand(chirality));
+            if (leapProvider != null && leapProvider.CurrentFrame != null)
+            {
+                UpdatePinchStatus(leapProvider.CurrentFrame.GetHand(chirality));
+            }
             _chiralityLastFrame = chirality;
         }
 
