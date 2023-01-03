@@ -48,7 +48,7 @@ namespace Leap.Unity.Preview.HandRays
                 rayEndObject.gameObject.SetActive(_isActive && _isRayEnabled);
             }
         }
-    
+
 
         /// <summary>
         /// Sets whether the ray is over a valid point or not
