@@ -44,10 +44,10 @@ namespace Leap.Unity.Preview.Locomotion
         [Tooltip("If true, when teleporting, the teleport anchor's forward direction will match your headset's world forward direction." +
             "\nIf false, your rotation will be the same way you are currently facing")]
         public bool useHeadsetForwardRotationForFixed = true;
-        
+
         protected TeleportAnchor _currentAnchor { get { return _currentAnchorVal; } private set { _currentAnchorVal = value; } }
         protected List<TeleportAnchor> _teleportAnchors = new List<TeleportAnchor>();
-        
+
         protected Vector3 _currentPosition { get; private set; }
         protected Quaternion _currentRotation { get; private set; }
 
@@ -123,7 +123,7 @@ namespace Leap.Unity.Preview.Locomotion
 
         protected virtual void Update()
         {
-            if(_movementTypeLastFrame != movementType)
+            if (_movementTypeLastFrame != movementType)
             {
                 OnMovementTypeChanged?.Invoke(movementType);
                 _movementTypeLastFrame = movementType;
@@ -235,7 +235,7 @@ namespace Leap.Unity.Preview.Locomotion
             _currentPosition = Vector3.negativeInfinity;
             _currentRotation = Quaternion.identity;
 
-            if(results == null || results.Length == 0)
+            if (results == null || results.Length == 0)
             {
                 if (_lastHighlightedAnchor != null)
                 {
@@ -247,7 +247,7 @@ namespace Leap.Unity.Preview.Locomotion
             if (primaryHit.collider != null)
             {
                 if (movementType == TeleportActionMovementType.FIXED)
-                {  
+                {
                     _validTarget = primaryHit.collider.gameObject.layer == farFieldLayerManager.FarFieldObjectLayer && primaryHit.collider.TryGetComponent(out _currentAnchorVal);
                 }
                 else
@@ -296,7 +296,7 @@ namespace Leap.Unity.Preview.Locomotion
 
         protected void SelectTeleport(bool selected = true)
         {
-            if(selected && !IsSelected)
+            if (selected && !IsSelected)
             {
                 OnTeleportSelected?.Invoke(true);
             }
