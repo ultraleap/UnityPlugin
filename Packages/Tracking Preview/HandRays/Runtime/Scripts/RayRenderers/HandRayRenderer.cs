@@ -114,7 +114,7 @@ namespace Leap.Unity.Preview.HandRays
                 return;
             }
 
-            if(hideRayOnNoPoints && (results == null || results.Length == 0))
+            if (hideRayOnNoPoints && (results == null || results.Length == 0))
             {
                 lineRenderer.positionCount = 0;
                 return;
