@@ -18,7 +18,7 @@ If you've set up your XR Controllers and Ultraleap tracking correctly, you shoul
 ### 1) Set up Ultraleap Hand Tracking
 
 - Follow the [Getting Started Guide](https://docs.ultraleap.com/unity-api/unity-user-manual/getting-started.html) to install Ultraleap’s Unity Plugin (make sure to import both the ‘Tracking’ and the ‘Tracking Preview’ package)
-- Add a the prefabs ‘Service Provider (XR)’ and ‘CapsuleHands’ to your scene. When you hit play, you should now be able to see your tracked hands.
+- Add a the prefabs `Service Provider (XR)` and `CapsuleHands` to your scene. When you hit play, you should now be able to see your tracked hands.
 
 ### 2) Choose the correct prefab
 
@@ -43,7 +43,7 @@ Now just hit play! If you've set up your XR Controllers and Ultraleap tracking c
 ### 1) Set up Ultraleap Hand Tracking
 
 - Follow the [Getting Started Guide](https://docs.ultraleap.com/unity-api/unity-user-manual/getting-started.html) to install Ultraleap’s Unity Plugin (make sure to import both the ‘Tracking’ and the ‘Tracking Preview’ package)
-- Add a the prefabs ‘Service Provider (XR)’ and ‘CapsuleHands’ to your scene. When you hit play, you should now be able to see your tracked hands.
+- Add a the prefabs `Service Provider (XR)` and `CapsuleHands` to your scene. When you hit play, you should now be able to see your tracked hands.
 
 ### 2) Set up your Controller Models
 
