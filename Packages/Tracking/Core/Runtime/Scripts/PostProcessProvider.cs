@@ -105,6 +105,15 @@ namespace Leap.Unity
             validateInput();
         }
 
+        private void OnDestroy()
+        {
+            if (_inputLeapProvider != null)
+            {
+                _inputLeapProvider.OnFixedFrame -= processFixedFrame;
+                _inputLeapProvider.OnUpdateFrame -= processUpdateFrame;
+            }
+        }
+
         public abstract void ProcessFrame(ref Frame inputFrame);
 
         private void validateInput()
