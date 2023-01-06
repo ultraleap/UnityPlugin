@@ -484,7 +484,6 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
         public static void UpdatePhysicsPalm(ref PhysicsHand.Hand physicsHand, Vector3 position, Quaternion rotation, float interpFactor = 0f, float distanceForceReduction = 0f)
         {
-            physicsHand.oldPosition = physicsHand.transform.position;
             // Apply tracking position velocity
             physicsHand.palmBody.velocity *= 0;
 
@@ -603,6 +602,9 @@ namespace Leap.Unity.Interaction.PhysicsHands
             leapHand.PinchDistance = CalculatePinchDistance(leapHand);
             leapHand.PalmVelocity = (physicsHand.transform.position - physicsHand.oldPosition) / delta;
             leapHand.TimeVisible = originalHand.TimeVisible;
+
+            physicsHand.oldPosition = physicsHand.transform.position;
+
         }
 
         private static float CalculatePinchStrength(Hand hand, float palmWidth)
