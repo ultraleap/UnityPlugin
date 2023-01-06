@@ -227,8 +227,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             {
                 _physicsHand.palmBody.immovable = false;
 
-                _originalOldPosition = _originalLeapHand.PalmPosition;
-                _physicsHand.oldPosition = _physicsHand.transform.position;
+                CacheOldValues();
 
                 _physicsHand.transform.position = _originalLeapHand.PalmPosition;
                 _physicsHand.transform.rotation = _originalLeapHand.Rotation;
@@ -461,7 +460,11 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
             OnUpdatePhysics?.Invoke();
 
-            // Cache old positions for next frame
+            CacheOldValues();
+        }
+
+        private void CacheOldValues()
+        {
             _physicsHand.oldPosition = _physicsHand.transform.position;
             _originalOldPosition = _originalLeapHand.PalmPosition;
         }
