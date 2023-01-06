@@ -82,3 +82,15 @@ If using Unity's legacy Input Manager, you must install the XR Legacy Input Help
 `ControllerPostProcess` has a `OnControllerActiveFrame` Action you can subscribe to, which is called every frame a controller is detected. If a controller isn't detected, it defaults back to Leap Hands.
 
 You can set which input `ControllerPostProcess` is using, using `SetInputMethodType` and specifying the `Chirality` (Left/Right), and `InputMethodType` (LeapHand/XRController).
+
+## How can I edit the transform offset of my virtual hands from the controllers?
+
+`ControllerPostProcess` contains Left and Right Hand Inputs, available to edit in the editor. These provide you with the ability to add a positional and rotational offset from the controller transform.
+
+## How can I edit what affect controllers have on my virtual hands?
+
+`ControllerPostProcess` contains Left and Right Hand Inputs, available to edit in the editor. Each finger has a neutral, open pose which it starts in, and a curled pose, which gets affected by the state of the controller Input Axes. You can specify:
+
+- What Input Axes cause the finger to curl
+- The rotation of the joints when curled
+- Whether to interpolate the joints when transitioning from one state to another, and how fast
