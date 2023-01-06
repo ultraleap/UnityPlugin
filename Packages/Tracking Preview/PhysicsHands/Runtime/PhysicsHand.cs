@@ -128,7 +128,6 @@ namespace Leap.Unity.Interaction.PhysicsHands
         private int[] _graspingFingers = new int[5];
         private bool[] _wasGraspingBones;
         private float[] _graspingXDrives;
-        private Quaternion _handRotationOffset;
 
         private bool _hasGenerated = false;
         private float _timeOnReset = 0;
@@ -173,10 +172,6 @@ namespace Leap.Unity.Interaction.PhysicsHands
             _originalLeapHand = new Leap.Hand();
             _leapHand = new Leap.Hand();
             _hasReset = false;
-
-            _handRotationOffset = Quaternion.Euler(0,
-                _handedness == Chirality.Left ? PhysicsHandsUtils.HAND_ROTATION_OFFSET_Y : -PhysicsHandsUtils.HAND_ROTATION_OFFSET_Y,
-                _handedness == Chirality.Left ? PhysicsHandsUtils.HAND_ROTATION_OFFSET_Z : -PhysicsHandsUtils.HAND_ROTATION_OFFSET_Z);
 
 #if UNITY_EDITOR
             if (!EditorApplication.isPlaying)
@@ -251,7 +246,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                         _wasGraspingBones[boneArrayIndex] = false;
                         ArticulationBody body = _physicsHand.jointBodies[boneArrayIndex];
 
-                        float xTargetAngle = PhysicsHandsUtils.CalculateXJointAngle(fingerIndex == 0 && jointIndex == 0 ? _originalLeapHand.Rotation * _handRotationOffset : prevBone.Rotation, bone.Direction);
+                        float xTargetAngle = PhysicsHandsUtils.CalculateXJointAngle(prevBone.Rotation, bone.Direction);
                         body.xDrive = new ArticulationDrive()
                         {
                             stiffness = _physicsHand.stiffness * _physicsHand.strength,
@@ -262,7 +257,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                             target = _wasGraspingBones[boneArrayIndex] ? Mathf.Clamp(xTargetAngle, body.xDrive.lowerLimit, _graspingXDrives[boneArrayIndex]) : xTargetAngle
                         };
 
-                        float yTargetAngle = PhysicsHandsUtils.CalculateYJointAngle(fingerIndex == 0 && jointIndex == 0 ? _originalLeapHand.Rotation * _handRotationOffset : prevBone.Rotation, bone.Rotation);
+                        float yTargetAngle = PhysicsHandsUtils.CalculateYJointAngle(prevBone.Rotation, bone.Rotation);
                         body.yDrive = new ArticulationDrive()
                         {
                             stiffness = _physicsHand.stiffness * _physicsHand.strength,
@@ -417,7 +412,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                         }
                     }
 
-                    float xTargetAngle = PhysicsHandsUtils.CalculateXJointAngle(fingerIndex == 0 && jointIndex == 0 ? _originalLeapHand.Rotation * _handRotationOffset : prevBone.Rotation, bone.Direction);
+                    float xTargetAngle = PhysicsHandsUtils.CalculateXJointAngle(prevBone.Rotation, bone.Direction);
 
                     // Clamp the max until we've moved the physicsBone to a lower amount than originally grasped at
                     if (_wasGraspingBones[boneArrayIndex] && (xTargetAngle < _graspingXDrives[boneArrayIndex] || Mathf.InverseLerp(body.xDrive.lowerLimit, _physicsHand.jointBones[boneArrayIndex].OriginalXDriveLimit, xTargetAngle) < .25f))
@@ -432,7 +427,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                     xDrive.target = _wasGraspingBones[boneArrayIndex] ? Mathf.Clamp(xTargetAngle, body.xDrive.lowerLimit, _graspingXDrives[boneArrayIndex]) : xTargetAngle;
                     body.xDrive = xDrive;
 
-                    float yTargetAngle = PhysicsHandsUtils.CalculateYJointAngle(fingerIndex == 0 && jointIndex == 0 ? _originalLeapHand.Rotation * _handRotationOffset : prevBone.Rotation, bone.Rotation);
+                    float yTargetAngle = PhysicsHandsUtils.CalculateYJointAngle(prevBone.Rotation, bone.Rotation);
 
                     ArticulationDrive yDrive = body.yDrive;
                     yDrive.stiffness = _physicsHand.stiffness * _physicsHand.strength;

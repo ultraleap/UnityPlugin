@@ -148,6 +148,9 @@ namespace Leap.Unity.Interaction.PhysicsHands
             return physicsHandComponent;
         }
 
+        // Magic 0th thumb bone rotation offsets from LeapC
+        public const float HAND_ROTATION_OFFSET_Y = 25.9f, HAND_ROTATION_OFFSET_Z = -63.45f;
+
         public static void SetupHand(PhysicsHand.Hand physicsHand, Leap.Hand leapHand, int solverIterations = 50, int solverVelocity = 20)
         {
             // A large amount of this function is done to reset the hand to the correct values if they have been changed in the editor
@@ -564,9 +567,6 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 Mathf.DeltaAngle(0, rotationDelta.eulerAngles.y),
                 Mathf.DeltaAngle(0, rotationDelta.eulerAngles.z)) / Time.fixedDeltaTime) * Mathf.Deg2Rad, 45f * physicsHand.strength);
         }
-
-        // Magic 0th thumb bone rotation offsets from LeapC
-        public const float HAND_ROTATION_OFFSET_Y = 25.9f, HAND_ROTATION_OFFSET_Z = -63.45f;
 
         public static float CalculateXJointAngle(Quaternion previous, Vector3 direction)
         {
