@@ -46,7 +46,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
         {
             _physicsLayersText = new GUIContent("Layer Setup", "Due to the complexity of the physics layer matrix, the system will automatically apply collisions between assigned layers.");
             _solverPresetText = new GUIContent("Solver Quality Preset", "These presets will adjust both how robust the physics calculations are for your hands, and their overall performance cost. " +
-                "This will only apply to the hands objects and can be different to your project settings.");
+                "This will only apply to the hands objects and can be different to your project settings. You can modify these settings during play mode to rapidly test different setups.");
 
             _projectSolverText = new GUIContent("Project Solver Iterations", "The solver iterations of the physics simulation used throughout your project. This can be different to your hands.");
             _projectSolverVelocityText = new GUIContent("Project Solver Velocity Iterations", "The solver iterations of the physics simulation for calculating velocity used throughout your project. This can be different to your hands.");
@@ -110,7 +110,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             if(Time.fixedDeltaTime > RECOMMENDED_TIMESTEP)
             {
                 EditorGUILayout.BeginHorizontal();
-                EditorGUILayout.HelpBox($"Project timestep is larger than {RECOMMENDED_TIMESTEP} ({Time.fixedDeltaTime}). It is highly recommended to decrease this." +
+                EditorGUILayout.HelpBox($"Project timestep is larger than {RECOMMENDED_TIMESTEP} ({Time.fixedDeltaTime}). It is highly recommended to decrease this. " +
                     $"This will significantly improve the responsiveness of all physics calculations.", MessageType.Warning);
                 if (GUILayout.Button("Fix Now", GUILayout.Width(80)))
                 {
@@ -122,7 +122,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             if (Physics.defaultSolverIterations < RECOMMENDED_SOLVER_ITERATIONS)
             {
                 EditorGUILayout.BeginHorizontal();
-                EditorGUILayout.HelpBox($"Project solver iterations are lower than {RECOMMENDED_SOLVER_ITERATIONS} ({Physics.defaultSolverIterations}). It is highly recommended to increase this." +
+                EditorGUILayout.HelpBox($"Project solver iterations are lower than {RECOMMENDED_SOLVER_ITERATIONS} ({Physics.defaultSolverIterations}). It is highly recommended to increase this. " +
                     $"Hands will not be directly affected by this, but all other objects in your scene will be.", MessageType.Warning);
                 if (GUILayout.Button("Fix Now", GUILayout.Width(80)))
                 {
@@ -134,7 +134,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             if (Physics.defaultSolverVelocityIterations < RECOMMENDED_SOLVER_VELOCITY_ITERATIONS)
             {
                 EditorGUILayout.BeginHorizontal();
-                EditorGUILayout.HelpBox($"Project solver velocity iterations are lower than {RECOMMENDED_SOLVER_VELOCITY_ITERATIONS} ({Physics.defaultSolverVelocityIterations}). It is highly recommended to increase this." +
+                EditorGUILayout.HelpBox($"Project solver velocity iterations are lower than {RECOMMENDED_SOLVER_VELOCITY_ITERATIONS} ({Physics.defaultSolverVelocityIterations}). It is highly recommended to increase this. " +
                     $"Hands will not be directly affected by this, but all other objects in your scene will be.", MessageType.Warning);
                 if (GUILayout.Button("Fix Now", GUILayout.Width(80)))
                 {
