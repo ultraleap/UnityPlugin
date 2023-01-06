@@ -29,6 +29,7 @@ Transform:
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 6612547583185595155}
   m_Father: {fileID: 0}
@@ -51,142 +52,142 @@ MonoBehaviour:
   dataUpdateMode: 2
   passthroughOnly: 0
   leftHandInputs:
-    OffsetPosition: {x: 0, y: 0, z: 0}
+    offsetPosition: {x: 0, y: 0, z: 0}
     offsetRotationEuler: {x: -10, y: 260, z: 235}
     fingers:
     - name: Left Thumb
       analog: 0
       interpolate: 1
+      interpolationTime: 0.04
       axes:
       - <XRController>{LeftHand}/touchpadTouched
       - <XRController>{LeftHand}/touchpadClicked
       - <XRController>{LeftHand}/primaryTouched
       - <XRController>{LeftHand}/secondaryTouched
       - <XRController>{LeftHand}/thumbstickTouched
-      value: 0
-      interpolationTime: 0.04
       compoundRotations: 1
       metacarpalRotation: {x: 0, y: 0, z: 0}
       proximalRotation: {x: -5, y: 0, z: 25}
       intermediateRotation: {x: -10, y: 0, z: -65}
       distalRotation: {x: 0, y: 0, z: -45}
+      value: 0
     - name: Left Index
       analog: 1
       interpolate: 1
+      interpolationTime: 0.04
       axes:
       - <XRController>{LeftHand}/trigger
-      value: 0
-      interpolationTime: 0.04
       compoundRotations: 1
       metacarpalRotation: {x: 0, y: 0, z: 0}
       proximalRotation: {x: -70, y: -10, z: 0}
       intermediateRotation: {x: -45, y: 0, z: -5}
       distalRotation: {x: -45, y: 0, z: 0}
+      value: 0
     - name: Left Middle
       analog: 1
       interpolate: 1
+      interpolationTime: 0.04
       axes:
       - <XRController>{LeftHand}/grip
-      value: 0
-      interpolationTime: 0.04
       compoundRotations: 1
       metacarpalRotation: {x: 0, y: -2, z: 0}
       proximalRotation: {x: -65, y: 1, z: 0}
       intermediateRotation: {x: -55, y: 0, z: 2}
       distalRotation: {x: -40, y: -6, z: 3}
+      value: 0
     - name: Left Ring
       analog: 1
       interpolate: 1
+      interpolationTime: 0.04
       axes:
       - <XRController>{LeftHand}/grip
-      value: 0
-      interpolationTime: 0.04
       compoundRotations: 1
       metacarpalRotation: {x: 0, y: 0, z: 0}
       proximalRotation: {x: -65, y: 8, z: 0}
       intermediateRotation: {x: -50, y: 12, z: 0}
       distalRotation: {x: -40, y: -35, z: 14}
+      value: 0
     - name: Left Pinky
       analog: 1
       interpolate: 1
+      interpolationTime: 0.04
       axes:
       - <XRController>{LeftHand}/grip
-      value: 0
-      interpolationTime: 0.04
       compoundRotations: 1
       metacarpalRotation: {x: 0, y: 0, z: 0}
       proximalRotation: {x: -65, y: 15, z: 2}
       intermediateRotation: {x: -40, y: 9, z: 5}
       distalRotation: {x: -45, y: -20, z: 20}
+      value: 0
     timeVisible: 0
   rightHandInputs:
-    OffsetPosition: {x: 0, y: 0, z: 0}
+    offsetPosition: {x: 0, y: 0, z: 0}
     offsetRotationEuler: {x: -10, y: -260, z: -235}
     fingers:
     - name: Right Thumb
       analog: 0
       interpolate: 1
+      interpolationTime: 0.04
       axes:
       - <XRController>{RightHand}/touchpadTouched
       - <XRController>{RightHand}/touchpadClicked
       - <XRController>{RightHand}/primaryTouched
       - <XRController>{RightHand}/secondaryTouched
       - <XRController>{RightHand}/thumbstickTouched
-      value: 0
-      interpolationTime: 0.04
       compoundRotations: 1
       metacarpalRotation: {x: 0, y: -0, z: -0}
       proximalRotation: {x: -5, y: -0, z: -25}
       intermediateRotation: {x: -10, y: -0, z: 65}
       distalRotation: {x: 0, y: -0, z: 45}
+      value: 0
     - name: Right Index
       analog: 1
       interpolate: 1
+      interpolationTime: 0.04
       axes:
       - <XRController>{RightHand}/trigger
-      value: 0
-      interpolationTime: 0.04
       compoundRotations: 1
       metacarpalRotation: {x: 0, y: -0, z: -0}
       proximalRotation: {x: -70, y: 10, z: -0}
       intermediateRotation: {x: -45, y: -0, z: 5}
       distalRotation: {x: -45, y: -0, z: -0}
+      value: 0
     - name: Right Middle
       analog: 1
       interpolate: 1
+      interpolationTime: 0.04
       axes:
       - <XRController>{RightHand}/grip
-      value: 0
-      interpolationTime: 0.04
       compoundRotations: 1
       metacarpalRotation: {x: 0, y: 2, z: -0}
       proximalRotation: {x: -65, y: -1, z: -0}
       intermediateRotation: {x: -55, y: -0, z: -2}
       distalRotation: {x: -40, y: 6, z: -3}
+      value: 0
     - name: Right Ring
       analog: 1
       interpolate: 1
+      interpolationTime: 0.04
       axes:
       - <XRController>{RightHand}/grip
-      value: 0
-      interpolationTime: 0.04
       compoundRotations: 1
       metacarpalRotation: {x: 0, y: -0, z: -0}
       proximalRotation: {x: -65, y: -8, z: -0}
       intermediateRotation: {x: -50, y: -12, z: -0}
       distalRotation: {x: -40, y: 35, z: -14}
+      value: 0
     - name: Right Pinky
       analog: 1
       interpolate: 1
+      interpolationTime: 0.04
       axes:
       - <XRController>{RightHand}/grip
-      value: 0
-      interpolationTime: 0.04
       compoundRotations: 1
       metacarpalRotation: {x: 0, y: -0, z: -0}
       proximalRotation: {x: -65, y: -15, z: -2}
       intermediateRotation: {x: -40, y: -9, z: -5}
       distalRotation: {x: -45, y: 20, z: -20}
+      value: 0
     timeVisible: 0
   currentInputTypes: 
   alwaysEnableControllersIfActive: 1
@@ -206,9 +207,9 @@ MonoBehaviour:
     correctly if using the correct prefab, or if just dragged into the scene.\r If
     you have swapped input systems after the post process provider has been in the
     scene,\r please regenerate this by using the context menu option \"Generate Default
-    Axis\" on the Post Process Provider. If using the Legacy Input Module, you must
-    install the XR Legacy Input Helpers package and use\r the \"Generate Seed Bindings\"
-    option in the Assets menu."
+    Axis\" on the Post Process Provider. If using Unity's legacy Input Manager, you
+    must install the XR Legacy Input Helpers package and use\r the \"Generate Seed
+    Bindings\" option in the Assets menu."
   _isEditing: 0
 --- !u!114 &7919004661373399488
 MonoBehaviour:
@@ -250,6 +251,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 6612547583185595155}
   m_RootOrder: 0
@@ -299,6 +301,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 6612547583185595155}
   m_RootOrder: 1
@@ -347,6 +350,7 @@ Transform:
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 6612547581555058609}
   - {fileID: 6612547583109653878}
