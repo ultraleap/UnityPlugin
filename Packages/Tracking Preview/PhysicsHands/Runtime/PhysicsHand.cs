@@ -226,7 +226,9 @@ namespace Leap.Unity.Interaction.PhysicsHands
             if (active)
             {
                 _physicsHand.palmBody.immovable = false;
+
                 _originalOldPosition = _originalLeapHand.PalmPosition;
+                _physicsHand.oldPosition = _physicsHand.transform.position;
 
                 _physicsHand.transform.position = _originalLeapHand.PalmPosition;
                 _physicsHand.transform.rotation = _originalLeapHand.Rotation;
