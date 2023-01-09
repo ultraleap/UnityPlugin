@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Public toggle for interpolation on LeapServiceProviders
+- Hands prefabs added to GameObject/Ultraleap/Hands create menu
 
 ### Changed
 - 
