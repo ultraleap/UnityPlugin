@@ -267,20 +267,23 @@ namespace Leap.Unity
         [EditTimeOnly]
         protected string _serverNameSpace = "Leap Service";
 
-        #endregion
-
-        #region Internal Settings & Memory
+        public override TrackingSource TrackingDataSource { get { return CheckLeapServiceAvailable(); } }
 
         /// <summary>
         /// Determines if the service provider should temporally resample frames for smoothness.
         /// </summary>
-        protected bool _useInterpolation = true;
+        [SerializeField]
+        public bool _useInterpolation = true;
+
+        #endregion
+
+        #region Internal Settings & Memory
 
         // Extrapolate on Android to compensate for the latency introduced by its graphics
         // pipeline.
 #if UNITY_ANDROID && !UNITY_EDITOR
-    protected int ExtrapolationAmount = 0; // 15;
-    protected int BounceAmount = 70;
+        protected int ExtrapolationAmount = 0; // 15;
+        protected int BounceAmount = 70;
 #else
         protected int ExtrapolationAmount = 0;
         protected int BounceAmount = 0;
@@ -1034,6 +1037,33 @@ namespace Leap.Unity
         protected virtual void transformFrame(Frame source, Frame dest)
         {
             dest.CopyFrom(source).Transform(new LeapTransform(transform));
+        }
+
+        private TrackingSource CheckLeapServiceAvailable()
+        {
+            if (_trackingSource != TrackingSource.NONE)
+            {
+                return _trackingSource;
+            }
+
+#if UNITY_ANDROID && !UNITY_EDITOR
+            if(AndroidServiceBinder.Bind())
+            {
+                _trackingSource = TrackingSource.LEAPC;
+                return _trackingSource;
+            }
+#endif
+
+            if (LeapInternal.Connection.IsConnectionAvailable(_serverNameSpace))
+            {
+                _trackingSource = TrackingSource.LEAPC;
+            }
+            else
+            {
+                _trackingSource = TrackingSource.NONE;
+            }
+
+            return _trackingSource;
         }
 
         #endregion

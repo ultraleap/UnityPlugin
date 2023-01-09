@@ -50,6 +50,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 jointColliders = new CapsuleCollider[PhysicsHand.Hand.FINGERS * PhysicsHand.Hand.BONES],
                 jointBodies = new ArticulationBody[PhysicsHand.Hand.FINGERS * PhysicsHand.Hand.BONES],
                 defaultRotations = new Quaternion[PhysicsHand.Hand.FINGERS + 1],
+                overRotationFrameCount = new int[PhysicsHand.Hand.FINGERS * PhysicsHand.Hand.BONES],
                 gameObject = palmGameObject,
                 transform = palmTransform,
                 rootObject = rootObject,
@@ -153,6 +154,8 @@ namespace Leap.Unity.Interaction.PhysicsHands
             // Move the root of the hand
             physicsHand.transform.position = leapHand.PalmPosition;
             physicsHand.transform.rotation = leapHand.Rotation;
+
+            physicsHand.overRotationFrameCount = new int[PhysicsHand.Hand.FINGERS * PhysicsHand.Hand.BONES];
 
             if (physicsHand.physicMaterial == null)
             {
@@ -283,9 +286,11 @@ namespace Leap.Unity.Interaction.PhysicsHands
             palm.mass = boneMass;
             palm.solverIterations = solverIterations;
             palm.solverVelocityIterations = solverVelocity;
+            palm.linearDamping = 0f;
             palm.angularDamping = angularDamping;
             palm.useGravity = false;
             palm.collisionDetectionMode = CollisionDetectionMode.ContinuousSpeculative;
+            palm.maxDepenetrationVelocity = 0.001f;
         }
 
         public static void SetupBoneBody(ArticulationBody bone, float boneMass = 0.6f, int solverIterations = 50, int solverVelocity = 20, float maxAngularVelocity = 1.75f, float maxDepenetrationVelocity = 3f)
@@ -302,6 +307,8 @@ namespace Leap.Unity.Interaction.PhysicsHands
             bone.maxDepenetrationVelocity = maxDepenetrationVelocity;
             bone.useGravity = false;
             bone.collisionDetectionMode = CollisionDetectionMode.ContinuousSpeculative;
+            bone.maxDepenetrationVelocity = 0.001f;
+            bone.linearDamping = 0f;
         }
 
         public static void SetupKnuckleDrives(ArticulationBody knuckle, int fingerIndex, float stiffness, float forceLimit, float strength)
@@ -315,7 +322,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             {
                 stiffness = stiffness * strength,
                 forceLimit = forceLimit * strength / Time.fixedDeltaTime,
-                damping = 3f,
+                damping = 1f,
                 lowerLimit = -30f,
                 upperLimit = 80f
             };
@@ -326,7 +333,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             {
                 stiffness = stiffness * strength,
                 forceLimit = forceLimit * strength / Time.fixedDeltaTime,
-                damping = 6f,
+                damping = 2f,
                 lowerLimit = -15f,
                 upperLimit = 15f
             };
@@ -344,7 +351,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             {
                 stiffness = stiffness * strength,
                 forceLimit = forceLimit * strength / Time.fixedDeltaTime,
-                damping = 3f,
+                damping = 1f,
                 lowerLimit = -10f,
                 upperLimit = 89f
             };
@@ -381,6 +388,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
         public static void ResetPhysicsHandSizes(PhysicsHand.Hand physicsHand, Leap.Hand leapHand)
         {
             SetupPalmCollider(physicsHand.palmCollider, leapHand);
+            physicsHand.overRotationFrameCount = new int[PhysicsHand.Hand.FINGERS * PhysicsHand.Hand.BONES];
             for (int fingerIndex = 0; fingerIndex < PhysicsHand.Hand.FINGERS; fingerIndex++)
             {
                 Transform lastTransform = physicsHand.palmBone.transform;
@@ -577,7 +585,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                     b.Rotation = physicsHand.jointColliders[boneInd].transform.rotation;
                     boneInd++;
                 }
-                leapHand.Fingers[i].TipPosition = posA;
+                leapHand.Fingers[i].TipPosition = physicsHand.GetTipPosition(i);
             }
             leapHand.Arm.CopyFrom(originalHand.Arm);
 
@@ -657,6 +665,17 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
             // Return the pinch distance, converted to millimeters to match other providers.
             return Mathf.Sqrt(minDistanceSquared) * 1000.0f;
+        }
+
+        public static Vector3 GetTipPosition(this PhysicsHand.Hand hand, int index)
+        {
+            if (index > 4)
+            {
+                return Vector3.zero;
+            }
+            PhysExts.ToWorldSpaceCapsule(hand.jointColliders[(PhysicsHand.Hand.BONES * index) + PhysicsHand.Hand.BONES - 1], out Vector3 outPos, out var outB, out var outRadius);
+            outPos += (outPos - outB).normalized * outRadius;
+            return outPos;
         }
 
         #endregion

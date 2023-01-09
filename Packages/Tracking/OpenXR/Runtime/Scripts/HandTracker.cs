@@ -20,14 +20,7 @@ namespace Ultraleap.Tracking.OpenXR
         {
             _handedness = handedness;
             _handTracking = OpenXRSettings.Instance.GetFeature<HandTrackingFeature>();
-
-            if (_handTracking == null || !_handTracking.enabled)
-            {
-                Debug.LogError("Ultraleap HandTracker was used without the Ultraleap Hand Tracking OpenXR Feature enabled");
-                return;
-            }
-
-            _enabled = true;
+            _enabled = _handTracking != null && _handTracking.SupportsHandTracking;
         }
 
         /// <summary>

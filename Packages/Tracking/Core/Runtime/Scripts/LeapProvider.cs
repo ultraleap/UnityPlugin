@@ -53,6 +53,13 @@ namespace Leap.Unity
         /// </summary>
         public abstract Frame CurrentFixedFrame { get; }
 
+        protected TrackingSource _trackingSource;
+
+        /// <summary>
+        /// Represents the source of tracking data
+        /// </summary>
+        public virtual TrackingSource TrackingDataSource { get { return _trackingSource; } }
+
         protected void DispatchUpdateFrameEvent(Frame frame)
         {
             if (OnUpdateFrame != null)
@@ -73,6 +80,21 @@ namespace Leap.Unity
             }
         }
 
+    }
+
+    /// <summary>
+    /// Used to determine the source of the tracking data.
+    /// NONE - Either not available or has not been detemined yet
+    /// LEAPC - A direct connection to the Leap Service via LeapC
+    /// OPENXR - An OpenXR connection, most likely not Ultraleap Tracking
+    /// OPENXR_LEAP - An OpenXR connection, Ultraleap OpenXR layer is also active
+    /// </summary>
+    public enum TrackingSource
+    {
+        NONE,
+        LEAPC,
+        OPENXR,
+        OPENXR_LEAP
     }
 
     public static class LeapProviderExtensions

@@ -10,16 +10,16 @@ namespace Leap.Unity.Interaction.PhysicsHands
     {
         private const float GRAB_COOLDOWNTIME = 0.025f;
         private const float MINIMUM_STRENGTH = 0.25f, MINIMUM_THUMB_STRENGTH = 0.2f;
-        private const float REQUIRED_ENTRY_STRENGTH = 0.15f, REQUIRED_EXIT_STRENGTH = 0.05f, REQUIRED_THUMB_EXIT_STRENGTH = 0.1f, REQUIRED_PINCH_DISTANCE = 0.018f;
+        private const float REQUIRED_ENTRY_STRENGTH = 0.15f, REQUIRED_EXIT_STRENGTH = 0.05f, REQUIRED_THUMB_EXIT_STRENGTH = 0.1f, REQUIRED_PINCH_DISTANCE = 0.012f;
 
         public enum State
         {
-            Idle,
+            Hover,
             Contact,
             Grasp
         }
 
-        public State GraspState { get; private set; } = State.Idle;
+        public State GraspState { get; private set; } = State.Hover;
 
         public HashSet<PhysicsBone> BoneHash => _boneHash;
         private HashSet<PhysicsBone> _boneHash = new HashSet<PhysicsBone>();
@@ -59,9 +59,6 @@ namespace Leap.Unity.Interaction.PhysicsHands
         public Pose previousPose;
         public Pose previousPalmPose;
 
-        private Vector3 _maxVelocityLerped = Vector3.zero;
-        private float _releaseTimer = 0;
-
         private Vector3 _newPosition;
         private Quaternion _newRotation;
 
@@ -82,9 +79,9 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 // These values are limited by the EligibleBones
                 return (bones[0].Count > 0 || bones[5].Count > 0) && // A thumb or palm bone
                     ((bones[1].Count > 0) || // The intermediate or distal of the index
-                    (bones[2].Count > 0) || // The distal of the middle
+                    (bones[2].Count > 0) || // The intermediate or distal of the middle
                     (bones[3].Count > 0) || // The distal of the ring
-                    (bones[4].Count > 0)); // The distal of the pinky
+                    (bones[4].Count > 0 && bones[4].Any(x => x.Joint == 2))); // The distal of the pinky
             }
             return false;
         }
@@ -101,9 +98,9 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
                     case 1:
                     case 2:
+                    case 3:
                         return bones[finger].Count > 0 && bones[finger].Any(x => x.Joint != 0);
 
-                    case 3:
                     case 4:
                         return bones[finger].Count > 0 && bones[finger].Any(x => x.Joint == 2);
                 }
@@ -120,8 +117,6 @@ namespace Leap.Unity.Interaction.PhysicsHands
             {
                 _rigid.maxAngularVelocity = 100f;
             }
-            _oldKinematic = _rigid.isKinematic;
-            _oldGravity = _rigid.useGravity;
             _colliders = rigid.GetComponentsInChildren<Collider>(true).ToList();
             _ignored = rigid.GetComponentInChildren<PhysicsIgnoreHelpers>();
             Manager = manager;
@@ -133,15 +128,10 @@ namespace Leap.Unity.Interaction.PhysicsHands
             {
                 SetBoneGrasping(item, false);
             }
-            GraspState = State.Idle;
+            GraspState = State.Hover;
             _valuesD.Clear();
             _graspingValues.Clear();
             _graspingCandidates.Clear();
-            if (_rigid != null)
-            {
-                _rigid.isKinematic = _oldKinematic;
-                _rigid.useGravity = _oldGravity;
-            }
             _boneHash.Clear();
             foreach (var pair in _bones)
             {
@@ -237,16 +227,20 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
         public void ReleaseObject()
         {
-            GraspState = State.Idle;
-            _releaseTimer = GRAB_COOLDOWNTIME;
-            if (Manager.HelperMovesObjects)
+            GraspState = State.Hover;
+            // Make sure the object hasn't been destroyed
+            if (_rigid != null)
             {
-                _rigid.isKinematic = _oldKinematic;
-                _rigid.useGravity = _oldGravity;
-            }
-            if (Manager.EnhanceThrowing)
-            {
-                ThrowingOnRelease();
+                if (Manager.HelperMovesObjects && !Ignored)
+                {
+                    // Only ever unset the rigidbody values here otherwise outside logic will get confused
+                    _rigid.isKinematic = _oldKinematic;
+                    _rigid.useGravity = _oldGravity;
+                }
+                if (Manager.EnhanceThrowing && !Ignored)
+                {
+                    ThrowingOnRelease();
+                }
             }
         }
 
@@ -258,14 +252,14 @@ namespace Leap.Unity.Interaction.PhysicsHands
             if (_boneHash.Count == 0 && GraspState != State.Grasp)
             {
                 // If we don't then and we're not grasping then just return
-                return GraspState = State.Idle;
+                return GraspState = State.Hover;
             }
 
             GraspingContactCheck();
 
             switch (GraspState)
             {
-                case State.Idle:
+                case State.Hover:
                     if (_boneHash.Count > 0)
                     {
                         GraspState = State.Contact;
@@ -276,11 +270,11 @@ namespace Leap.Unity.Interaction.PhysicsHands
                     if (_graspingHands.Count > 0)
                     {
                         UpdateHandPositions();
-                        if (Manager.HelperMovesObjects)
+                        if (Manager.HelperMovesObjects && !Ignored)
                         {
                             MoveObject();
                         }
-                        if (Manager.EnhanceThrowing)
+                        if (Manager.EnhanceThrowing && !Ignored)
                         {
                             ThrowingOnHold();
                         }
@@ -342,6 +336,9 @@ namespace Leap.Unity.Interaction.PhysicsHands
                             if (hand.GetOriginalLeapHand().PinchDistance / 1000f <= REQUIRED_PINCH_DISTANCE)
                             {
                                 c = 2;
+                                // Make very small pinches more sticky
+                                _graspingValues[hand].fingerStrength[0] *= 0.85f;
+                                _graspingValues[hand].fingerStrength[1] *= 0.85f;
                                 break;
                             }
                         }
@@ -354,8 +351,11 @@ namespace Leap.Unity.Interaction.PhysicsHands
                     }
                     if (c == 2)
                     {
-                        if (Manager.HelperMovesObjects && _graspingHands.Count == 0)
+                        if (Manager.HelperMovesObjects && !Ignored && _graspingHands.Count == 0)
                         {
+                            // Store the original rigidbody variables
+                            _oldKinematic = _rigid.isKinematic;
+                            _oldGravity = _rigid.useGravity;
                             _rigid.useGravity = false;
                             _rigid.isKinematic = false;
                         }
@@ -553,6 +553,10 @@ namespace Leap.Unity.Interaction.PhysicsHands
         {
             for (int i = 0; i < _colliders.Count; i++)
             {
+                if (_colliders[i] == null)
+                {
+                    continue;
+                }
                 if (IsPointWithinCollider(_colliders[i], bone.NextJoint) || IsPointWithinCollider(_colliders[i], bone.Center))
                 {
                     return true;
@@ -792,7 +796,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 }
                 // We only want to apply the forces if we actually want to cause movement to the object
                 // We're still disabling collisions though to allow for the physics system to fully control if necessary
-                if (Manager.HelperMovesObjects)
+                if (Manager.HelperMovesObjects && !Ignored)
                 {
                     _rigid.velocity = interpolatedVelocity;
                     _rigid.angularVelocity = PhysicsUtility.ToAngularVelocity(start.rotation,

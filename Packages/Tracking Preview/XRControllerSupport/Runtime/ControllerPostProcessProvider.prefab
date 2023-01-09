@@ -1,0 +1,359 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &6612547581167370263
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6612547581167370261}
+  - component: {fileID: 6612547581167370260}
+  - component: {fileID: 1891710994397277429}
+  - component: {fileID: 7919004661373399488}
+  m_Layer: 0
+  m_Name: ControllerPostProcessProvider
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6612547581167370261
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6612547581167370263}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 6612547583185595155}
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6612547581167370260
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6612547581167370263}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 85c3105f3d20a4544b95932c8fb10054, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  editTimePose: 1
+  _inputLeapProvider: {fileID: 0}
+  dataUpdateMode: 2
+  passthroughOnly: 0
+  leftHandInputs:
+    offsetPosition: {x: 0, y: 0, z: 0}
+    offsetRotationEuler: {x: -10, y: 260, z: 235}
+    fingers:
+    - name: Left Thumb
+      analog: 0
+      interpolate: 1
+      interpolationTime: 0.04
+      axes:
+      - <XRController>{LeftHand}/touchpadTouched
+      - <XRController>{LeftHand}/touchpadClicked
+      - <XRController>{LeftHand}/primaryTouched
+      - <XRController>{LeftHand}/secondaryTouched
+      - <XRController>{LeftHand}/thumbstickTouched
+      compoundRotations: 1
+      metacarpalRotation: {x: 0, y: 0, z: 0}
+      proximalRotation: {x: -5, y: 0, z: 25}
+      intermediateRotation: {x: -10, y: 0, z: -65}
+      distalRotation: {x: 0, y: 0, z: -45}
+      value: 0
+    - name: Left Index
+      analog: 1
+      interpolate: 1
+      interpolationTime: 0.04
+      axes:
+      - <XRController>{LeftHand}/trigger
+      compoundRotations: 1
+      metacarpalRotation: {x: 0, y: 0, z: 0}
+      proximalRotation: {x: -70, y: -10, z: 0}
+      intermediateRotation: {x: -45, y: 0, z: -5}
+      distalRotation: {x: -45, y: 0, z: 0}
+      value: 0
+    - name: Left Middle
+      analog: 1
+      interpolate: 1
+      interpolationTime: 0.04
+      axes:
+      - <XRController>{LeftHand}/grip
+      compoundRotations: 1
+      metacarpalRotation: {x: 0, y: -2, z: 0}
+      proximalRotation: {x: -65, y: 1, z: 0}
+      intermediateRotation: {x: -55, y: 0, z: 2}
+      distalRotation: {x: -40, y: -6, z: 3}
+      value: 0
+    - name: Left Ring
+      analog: 1
+      interpolate: 1
+      interpolationTime: 0.04
+      axes:
+      - <XRController>{LeftHand}/grip
+      compoundRotations: 1
+      metacarpalRotation: {x: 0, y: 0, z: 0}
+      proximalRotation: {x: -65, y: 8, z: 0}
+      intermediateRotation: {x: -50, y: 12, z: 0}
+      distalRotation: {x: -40, y: -35, z: 14}
+      value: 0
+    - name: Left Pinky
+      analog: 1
+      interpolate: 1
+      interpolationTime: 0.04
+      axes:
+      - <XRController>{LeftHand}/grip
+      compoundRotations: 1
+      metacarpalRotation: {x: 0, y: 0, z: 0}
+      proximalRotation: {x: -65, y: 15, z: 2}
+      intermediateRotation: {x: -40, y: 9, z: 5}
+      distalRotation: {x: -45, y: -20, z: 20}
+      value: 0
+    timeVisible: 0
+  rightHandInputs:
+    offsetPosition: {x: 0, y: 0, z: 0}
+    offsetRotationEuler: {x: -10, y: -260, z: -235}
+    fingers:
+    - name: Right Thumb
+      analog: 0
+      interpolate: 1
+      interpolationTime: 0.04
+      axes:
+      - <XRController>{RightHand}/touchpadTouched
+      - <XRController>{RightHand}/touchpadClicked
+      - <XRController>{RightHand}/primaryTouched
+      - <XRController>{RightHand}/secondaryTouched
+      - <XRController>{RightHand}/thumbstickTouched
+      compoundRotations: 1
+      metacarpalRotation: {x: 0, y: -0, z: -0}
+      proximalRotation: {x: -5, y: -0, z: -25}
+      intermediateRotation: {x: -10, y: -0, z: 65}
+      distalRotation: {x: 0, y: -0, z: 45}
+      value: 0
+    - name: Right Index
+      analog: 1
+      interpolate: 1
+      interpolationTime: 0.04
+      axes:
+      - <XRController>{RightHand}/trigger
+      compoundRotations: 1
+      metacarpalRotation: {x: 0, y: -0, z: -0}
+      proximalRotation: {x: -70, y: 10, z: -0}
+      intermediateRotation: {x: -45, y: -0, z: 5}
+      distalRotation: {x: -45, y: -0, z: -0}
+      value: 0
+    - name: Right Middle
+      analog: 1
+      interpolate: 1
+      interpolationTime: 0.04
+      axes:
+      - <XRController>{RightHand}/grip
+      compoundRotations: 1
+      metacarpalRotation: {x: 0, y: 2, z: -0}
+      proximalRotation: {x: -65, y: -1, z: -0}
+      intermediateRotation: {x: -55, y: -0, z: -2}
+      distalRotation: {x: -40, y: 6, z: -3}
+      value: 0
+    - name: Right Ring
+      analog: 1
+      interpolate: 1
+      interpolationTime: 0.04
+      axes:
+      - <XRController>{RightHand}/grip
+      compoundRotations: 1
+      metacarpalRotation: {x: 0, y: -0, z: -0}
+      proximalRotation: {x: -65, y: -8, z: -0}
+      intermediateRotation: {x: -50, y: -12, z: -0}
+      distalRotation: {x: -40, y: 35, z: -14}
+      value: 0
+    - name: Right Pinky
+      analog: 1
+      interpolate: 1
+      interpolationTime: 0.04
+      axes:
+      - <XRController>{RightHand}/grip
+      compoundRotations: 1
+      metacarpalRotation: {x: 0, y: -0, z: -0}
+      proximalRotation: {x: -65, y: -15, z: -2}
+      intermediateRotation: {x: -40, y: -9, z: -5}
+      distalRotation: {x: -45, y: 20, z: -20}
+      value: 0
+    timeVisible: 0
+  currentInputTypes: 
+  alwaysEnableControllersIfActive: 1
+--- !u!114 &1891710994397277429
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6612547581167370263}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e933f13d48c681d48b14750922ac906d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _comment: "The Controller Post Process should have sensible values & axes set up
+    correctly if using the correct prefab, or if just dragged into the scene.\r If
+    you have swapped input systems after the post process provider has been in the
+    scene,\r please regenerate this by using the context menu option \"Generate Default
+    Axis\" on the Post Process Provider. If using Unity's legacy Input Manager, you
+    must install the XR Legacy Input Helpers package and use\r the \"Generate Seed
+    Bindings\" option in the Assets menu."
+  _isEditing: 0
+--- !u!114 &7919004661373399488
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6612547581167370263}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fc2b432fd8b072f469b250d9f4d1ad1f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _controllerPostProcess: {fileID: 6612547581167370260}
+--- !u!1 &6612547581555058608
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6612547581555058609}
+  - component: {fileID: 6612547581555058574}
+  m_Layer: 0
+  m_Name: Left
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6612547581555058609
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6612547581555058608}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6612547583185595155}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6612547581555058574
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6612547581555058608}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5a2a9c34df4095f47b9ca8f975175f5b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Device: 1
+  m_PoseSource: 4
+  m_PoseProviderComponent: {fileID: 0}
+  m_TrackingType: 0
+  m_UpdateType: 0
+  m_UseRelativeTransform: 0
+--- !u!1 &6612547583109653881
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6612547583109653878}
+  - component: {fileID: 6612547583109653879}
+  m_Layer: 0
+  m_Name: Right
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6612547583109653878
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6612547583109653881}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6612547583185595155}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6612547583109653879
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6612547583109653881}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5a2a9c34df4095f47b9ca8f975175f5b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Device: 1
+  m_PoseSource: 5
+  m_PoseProviderComponent: {fileID: 0}
+  m_TrackingType: 0
+  m_UpdateType: 0
+  m_UseRelativeTransform: 0
+--- !u!1 &6612547583185595154
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6612547583185595155}
+  m_Layer: 0
+  m_Name: Controllers
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6612547583185595155
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6612547583185595154}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 6612547581555058609}
+  - {fileID: 6612547583109653878}
+  m_Father: {fileID: 6612547581167370261}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

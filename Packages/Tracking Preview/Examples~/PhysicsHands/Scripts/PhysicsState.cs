@@ -39,29 +39,24 @@ namespace Leap.Unity.Interaction.PhysicsHands.Example
             {
                 _physicsProvider = FindObjectOfType<PhysicsProvider>(true);
             }
-            if (_physicsProvider != null)
-            {
-                _physicsProvider.OnObjectStateChange -= OnObjectStateChanged;
-                _physicsProvider.OnObjectStateChange += OnObjectStateChanged;
-            }
         }
 
-        private void OnDisable()
+        private void FixedUpdate()
         {
             if (_physicsProvider != null)
             {
-                _physicsProvider.OnObjectStateChange -= OnObjectStateChanged;
+                if (_physicsProvider.IsObjectHovered(_rigid))
+                {
+                    if (_physicsProvider.GetObjectState(_rigid, out var state))
+                    {
+                        _text.text = _prefix + state.ToString();
+                    }
+                }
+                else
+                {
+                    _text.text = _prefix + "Idle";
+                }
             }
         }
-
-
-        private void OnObjectStateChanged(Rigidbody rigid, PhysicsGraspHelper helper)
-        {
-            if (rigid == _rigid)
-            {
-                _text.text = _prefix + helper.GraspState.ToString();
-            }
-        }
-
     }
 }
