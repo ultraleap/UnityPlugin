@@ -15,7 +15,7 @@ namespace Leap.Unity.Preview.HandRays
     /// </summary>
     public class PalmWristShoulderHandRay : WristShoulderHandRay
     {
-        private Vector3 palmWristOffset = new Vector3(0,0.2f,0);
+        private Vector3 palmWristOffset = new Vector3(0, 0.2f, 0);
 
         protected override Vector3 CalculateVisualAimPosition()
         {

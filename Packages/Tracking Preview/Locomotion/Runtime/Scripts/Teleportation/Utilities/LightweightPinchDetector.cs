@@ -52,7 +52,10 @@ namespace Leap.Unity.Preview.Locomotion
             {
                 IsPinching = false;
             }
-            UpdatePinchStatus(leapProvider.CurrentFrame.GetHand(chirality));
+            if (leapProvider != null && leapProvider.CurrentFrame != null)
+            {
+                UpdatePinchStatus(leapProvider.CurrentFrame.GetHand(chirality));
+            }
             _chiralityLastFrame = chirality;
         }
 
@@ -65,7 +68,7 @@ namespace Leap.Unity.Preview.Locomotion
 
             // Convert from mm to m
             float pinchDistance = hand.PinchDistance * 0.001f;
-            
+
             if (pinchDistance < activateDistance)
             {
                 if (!IsPinching)
