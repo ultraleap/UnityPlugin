@@ -159,10 +159,9 @@ namespace Leap.Unity.Preview.HandRays
         public Vector3[] HipPositions { get; private set; }
 
         /// <summary>
-        /// The midpoint between your hips
+        /// Inferred waist position, calculated the midpoint between the two hips
         /// </summary>
         public Vector3 WaistPosition { get { return Vector3.Lerp(HipPositions[0], HipPositions[1], 0.5f); } }
-
 
         private void Start()
         {
