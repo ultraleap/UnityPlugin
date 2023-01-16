@@ -9,13 +9,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [NEXT] - unreleased
 
 ### Added
-- 
+- Public toggle for interpolation on LeapServiceProviders
+- Hands prefabs added to GameObject/Ultraleap/Hands create menu
 
 ### Changed
 - 
 
 ### Fixed
 - XrLeapProviderManager initialising when there is no active XR Loader
+- OnAnchorDisabled not being called when an Anchor gameobject is disabled
 
 ### Known issues 
 - Offset between skeleton hand wrist and forearm in sample scenes
