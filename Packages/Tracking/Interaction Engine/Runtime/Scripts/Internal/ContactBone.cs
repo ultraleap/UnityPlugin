@@ -7,6 +7,7 @@
  ******************************************************************************/
 
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Leap.Unity.Interaction
@@ -131,22 +132,18 @@ namespace Leap.Unity.Interaction
 
         private void FixedUpdate()
         {
-            foreach (var contacting in contactingInteractionBehaviours)
+            for (int i = contactingInteractionBehaviours.Count-1; i >= contactingInteractionBehaviours.Count; i--)
             {
-                if (!contactingStayInteractionBehaviours.Contains(contacting.Key))
-                {
-                    interactionController.NotifyContactBoneCollisionExit(this, contacting.Key);
+                IInteractionBehaviour currentBehaviour = contactingInteractionBehaviours.ElementAt(i).Key;
 
-                    ContactingObjectsToRemove.Add(contacting.Key);
+                if (!contactingStayInteractionBehaviours.Contains(currentBehaviour))
+                {
+                    interactionController.NotifyContactBoneCollisionExit(this, currentBehaviour);
+
+                    contactingInteractionBehaviours.Remove(currentBehaviour);
                 }
             }
 
-            foreach(var removed in ContactingObjectsToRemove)
-            {
-                contactingInteractionBehaviours.Remove(removed);
-            }
-
-            ContactingObjectsToRemove.Clear();
             contactingStayInteractionBehaviours.Clear();
         }
 
