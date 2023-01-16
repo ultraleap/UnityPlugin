@@ -63,6 +63,7 @@ namespace Leap.Unity
             specifyCustomDrawer("_specificSerialNumber", drawSerialNumberToggle);
 
             deferProperty("_serverNameSpace");
+            deferProperty("_useInterpolation");
 
             if (!(LeapServiceProvider is LeapXRServiceProvider))
             {
@@ -72,6 +73,7 @@ namespace Leap.Unity
             {
                 hideField("_trackingOptimization");
             }
+            addPropertyToFoldout("_useInterpolation", "Advanced Options");
             addPropertyToFoldout("_serverNameSpace", "Advanced Options");
         }
 
