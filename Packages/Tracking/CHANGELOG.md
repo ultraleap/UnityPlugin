@@ -16,7 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 
 
 ### Fixed
-- 
+- OnAnchorDisabled not being called when an Anchor gameobject is disabled
 
 ### Known issues 
 - Offset between skeleton hand wrist and forearm in sample scenes
