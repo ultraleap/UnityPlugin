@@ -9,13 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [NEXT] - unreleased
 
 ### Added
-- 
+- Public toggle for interpolation on LeapServiceProviders
+- Hands prefabs added to GameObject/Ultraleap/Hands create menu
 
 ### Changed
 - "Hands.Provider" static function now searches for subjectively the best LeapProvider avaliable in the scene. Will use PostProcessProvider first rather than LeapServiceProvider
 
 ### Fixed
-- 
+- OnAnchorDisabled not being called when an Anchor gameobject is disabled
 
 ### Known issues 
 - Offset between skeleton hand wrist and forearm in sample scenes
