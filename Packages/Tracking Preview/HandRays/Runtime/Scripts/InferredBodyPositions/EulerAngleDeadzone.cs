@@ -94,9 +94,8 @@ namespace Leap.Unity.Preview.HandRays
             float delta = currentAngle + recentredPositionDelta - DeadzoneCentre;
             delta = SimplifyAngle(delta);
 
-            float signDelta = Mathf.Sign(delta);
             float absDelta = Mathf.Abs(delta);
-
+            
             // You've rotated too far in a single frame
             if (absDelta > 35)
             {
@@ -111,6 +110,8 @@ namespace Leap.Unity.Preview.HandRays
                     deadzoneCentreHistory.Clear();
                     recentredWhilstStill = false;
                 }
+                
+                float signDelta = Mathf.Sign(delta);
                 DeadzoneCentre += (absDelta - DeadzoneSize) * signDelta;
                 DeadzoneCentre %= 360;
 
