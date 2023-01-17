@@ -118,7 +118,6 @@ namespace Leap.Unity.Interaction
         Dictionary<IInteractionBehaviour, float> contactingInteractionBehaviours = new Dictionary<IInteractionBehaviour, float>();
 
         List<IInteractionBehaviour> contactingStayInteractionBehaviours = new List<IInteractionBehaviour>();
-        List<IInteractionBehaviour> ContactingObjectsToRemove = new List<IInteractionBehaviour>();
 
         void Start()
         {
