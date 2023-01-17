@@ -86,6 +86,10 @@ namespace Leap.Unity.Preview.Locomotion
             }
             _chiralityLastFrame = chirality;
 
+            if (leapProvider == null || leapProvider.CurrentFrame == null)
+            {
+                return;
+            }
             Hand activeHand = leapProvider.CurrentFrame.GetHand(chirality);
             if (activeHand == null)
             {
