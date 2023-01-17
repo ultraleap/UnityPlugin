@@ -31,13 +31,15 @@ namespace Leap.Unity
         #region Constants
 
         /// <summary>
-        /// Converts nanoseconds to seconds.
+        /// Converts Microseconds to seconds.
         /// </summary>
+        [Obsolete("This const is named incorrectly and is no longer used in the Plugin.")]
         protected const double NS_TO_S = 1e-6;
 
         /// <summary>
-        /// Converts seconds to nanoseconds.
+        /// Converts seconds to Microseconds.
         /// </summary>
+        [Obsolete("This const is named incorrectly and is no longer used in the Plugin.")]
         protected const double S_TO_NS = 1e6;
 
         /// <summary>
