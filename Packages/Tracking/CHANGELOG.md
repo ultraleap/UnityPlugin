@@ -15,10 +15,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 
 
 ### Fixed
-- 
+- Offset between skeleton hand wrist and forearm in sample scenes
 
 ### Known issues 
-- Offset between skeleton hand wrist and forearm in sample scenes
 - Outline hands aren't displaying
 - Scenes containing the infrared viewer render incorrectly on Android build targets and in scriptable render pipelines such as URP and HDRP. 
 - Interactions callback scene allows blocks to be moved without doing a grasp pose. 
