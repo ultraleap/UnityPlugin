@@ -27,11 +27,6 @@
       "displayName": "Examples",
       "description": "A collection of examples for the Preview package",
       "path": "Examples~"
-    },
-    {
-      "displayName": "OVR Provider",
-      "description": "An experimental compatibility layer to connect Ultraleap interactions with Oculus hand tracking through a Provider",
-      "path": "OVR Provider~"
     }
   ]
 }
