@@ -7,7 +7,7 @@
   "license": "Apache-2.0",
   "dependencies": {
     "com.ultraleap.tracking": "6.4.0",
-    "com.unity.inputsystem": "1.0.2",
+    "com.unity.inputsystem": "1.4.4",
     "com.unity.xr.interaction.toolkit": "2.0.0"
   },
   "keywords": [
