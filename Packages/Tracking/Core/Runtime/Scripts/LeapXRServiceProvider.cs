@@ -505,7 +505,7 @@ namespace Leap.Unity
             return _leapController.Now()
                     - (long)_smoothedTrackingLatency.value
                     + ((updateHandInPrecull && !endOfFrame) ?
-                        (long)(Time.smoothDeltaTime * S_TO_NS / Time.timeScale)
+                        (long)(Time.smoothDeltaTime * S_TO_US / Time.timeScale)
                         : 0);
 #endif
         }
