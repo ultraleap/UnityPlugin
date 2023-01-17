@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 
 
 ### Fixed
+- XrLeapProviderManager initialising when there is no active XR Loader
 - OnAnchorDisabled not being called when an Anchor gameobject is disabled
 
 ### Known issues 
