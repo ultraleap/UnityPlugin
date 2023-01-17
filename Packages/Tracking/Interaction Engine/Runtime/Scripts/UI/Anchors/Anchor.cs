@@ -116,7 +116,7 @@ namespace Leap.Unity.Interaction
             updateAnchorCallbacks();
         }
 
-        void OnAnchorDisabled()
+        void OnDisable()
         {
             if (matchActiveStateWithAttachedObjects)
             {
