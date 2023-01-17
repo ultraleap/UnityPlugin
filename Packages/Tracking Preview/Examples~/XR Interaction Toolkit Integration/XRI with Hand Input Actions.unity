@@ -2445,17 +2445,17 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 782512459}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 6.36}
+  m_LocalRotation: {x: -0, y: 0.34479934, z: -0, w: 0.9386765}
+  m_LocalPosition: {x: 0, y: 0, z: 4.77}
   m_LocalScale: {x: 0.01, y: 0.01, z: 0.01}
   m_Children:
   - {fileID: 698290775}
   m_Father: {fileID: 0}
   m_RootOrder: 6
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 40.339, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0.20466293, y: 0.6141599}
+  m_AnchoredPosition: {x: 7.24, y: 0.6141599}
   m_SizeDelta: {x: 1920, y: 1080}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!4 &817627907 stripped
@@ -2826,6 +2826,31 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1282522827012814712, guid: 8801e643e53a19d488f5168057473354, type: 3}
+      propertyPath: m_text
+      value: '- Aim and pinch with your right hand to interact with the UI to your
+        right and spawn a Sphere
+
+
+        - Grab with your left hand to interact
+        with a Sphere
+
+
+        - Aim and pinch with your right hand to interact
+        with a Sphere'
+      objectReference: {fileID: 0}
+    - target: {fileID: 1282522827012814712, guid: 8801e643e53a19d488f5168057473354, type: 3}
+      propertyPath: m_fontSize
+      value: 4.75
+      objectReference: {fileID: 0}
+    - target: {fileID: 1904030373263600650, guid: 8801e643e53a19d488f5168057473354, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 19.47
+      objectReference: {fileID: 0}
+    - target: {fileID: 1904030373263600650, guid: 8801e643e53a19d488f5168057473354, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -9.74
+      objectReference: {fileID: 0}
     - target: {fileID: 6102045132113314872, guid: 8801e643e53a19d488f5168057473354, type: 3}
       propertyPath: m_Name
       value: Example Assets
@@ -2873,6 +2898,22 @@ PrefabInstance:
     - target: {fileID: 6102045132113314873, guid: 8801e643e53a19d488f5168057473354, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6238703950345947740, guid: 8801e643e53a19d488f5168057473354, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: -20
+      objectReference: {fileID: 0}
+    - target: {fileID: 6238703950345947740, guid: 8801e643e53a19d488f5168057473354, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: -10
+      objectReference: {fileID: 0}
+    - target: {fileID: 6238703950345947740, guid: 8801e643e53a19d488f5168057473354, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6238703950345947740, guid: 8801e643e53a19d488f5168057473354, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8801e643e53a19d488f5168057473354, type: 3}
