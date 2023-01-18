@@ -16,13 +16,19 @@
     "precompiledReferences": [],
     "autoReferenced": true,
     "defineConstraints": [
-        "INTERACTION_TOOLKIT"
+        "INTERACTION_TOOLKIT",
+        "INPUT_SYSTEM"
     ],
     "versionDefines": [
         {
             "name": "com.unity.xr.interaction.toolkit",
             "expression": "2.0.0",
             "define": "INTERACTION_TOOLKIT"
+        },
+        {
+            "name": "com.unity.inputsystem",
+            "expression": "1.4.4",
+            "define": "INPUT_SYSTEM"
         }
     ],
     "noEngineReferences": false

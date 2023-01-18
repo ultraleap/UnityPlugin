@@ -10,12 +10,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Public toggle for interpolation on LeapServiceProviders
+- Hands prefabs added to GameObject/Ultraleap/Hands create menu
+- Action-based XRI implementation with Example scene in Preview package
+- Added const S_TO_US as replacement for incorrectly named S_TO_NS in LeapServiceProvider
 
 ### Changed
-- 
+- "Hands.Provider" static function now searches for subjectively the best LeapProvider avaliable in the scene. Will use PostProcessProvider first rather than LeapServiceProvider
+- Removed the OVRProvider from the Preview Package. This is now achievable via the OpenXR Provider in the main Tracking Package
 
 ### Fixed
-- 
+- OpenXRLeapProvider CheckOpenXRAvailable has a nullref when XRGeneralSettings activeloader is not set up
+- XrLeapProviderManager initialising when there is no active XR Loader
+- OnAnchorDisabled not being called when an Anchor gameobject is disabled
 
 ### Known issues 
 - Offset between skeleton hand wrist and forearm in sample scenes
