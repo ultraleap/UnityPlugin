@@ -392,7 +392,6 @@ export-unitypackages:
 
     PACKAGE_IMPORT_PATH_Tracking_Preview:       "$UNITYPLUGIN_ASSETS_PATH/Tracking Preview"
     EXAMPLES_SUBPATH_Tracking_Preview:          "Examples~"
-    OVRPROVIDER_SUBPATH_Tracking_Preview:       "OVR Provider~"
     UNITYPACKAGE_OUTPUT_PATH_Tracking_Preview:  "$UNITYPACKAGES_OUTPUT_PATH/Tracking Preview.unitypackage"
 
     LEAPC_SOURCE_PATH: "$ARTIFACTS_PATH/Windows/LeapC.dll"
@@ -425,7 +424,7 @@ export-unitypackages:
     #########################
     - Export-UnityPackage -PackageRootPath "$PACKAGE_PATH_Tracking" -PackageImportPath "$PACKAGE_IMPORT_PATH_Tracking" -PackageOutputPath "$UNITYPACKAGE_OUTPUT_PATH_Tracking" -ExtraHiddenSubPaths "$EXAMPLES_SUBPATH_Tracking" -ErrorVariable ExportErrors
     - if ($ExportErrors) { echo "Failed to generate Tracking.unitypackage"; exit 1; }
-    - Export-UnityPackage -PackageRootPath "$PACKAGE_PATH_Tracking_Preview" -PackageImportPath "$PACKAGE_IMPORT_PATH_Tracking_Preview" -PackageOutputPath "$UNITYPACKAGE_OUTPUT_PATH_Tracking_Preview" -ExtraHiddenSubPaths "$EXAMPLES_SUBPATH_Tracking_Preview","$OVRPROVIDER_SUBPATH_Tracking_Preview" -ErrorVariable ExportErrors
+    - Export-UnityPackage -PackageRootPath "$PACKAGE_PATH_Tracking_Preview" -PackageImportPath "$PACKAGE_IMPORT_PATH_Tracking_Preview" -PackageOutputPath "$UNITYPACKAGE_OUTPUT_PATH_Tracking_Preview" -ExtraHiddenSubPaths "$EXAMPLES_SUBPATH_Tracking_Preview" -ErrorVariable ExportErrors
     - if ($ExportErrors) { echo "Failed to generate Tracking Preview.unitypackage"; exit 1; }
 
     ############################

@@ -226,7 +226,8 @@ namespace Leap.Unity.Interaction.PhysicsHands
             if (active)
             {
                 _physicsHand.palmBody.immovable = false;
-                _originalOldPosition = _originalLeapHand.PalmPosition;
+
+                CachePositions();
 
                 _physicsHand.transform.position = _originalLeapHand.PalmPosition;
                 _physicsHand.transform.rotation = _originalLeapHand.Rotation;
@@ -440,7 +441,6 @@ namespace Leap.Unity.Interaction.PhysicsHands
             HandleIgnoredObjects();
 
             _wasGrasping = IsGrasping;
-            _originalOldPosition = _originalLeapHand.PalmPosition;
 
             if (IsGrasping)
             {
@@ -452,6 +452,14 @@ namespace Leap.Unity.Interaction.PhysicsHands
             PhysicsHandsUtils.ConvertPhysicsToLeapHand(_physicsHand, ref _leapHand, _originalLeapHand, Time.fixedDeltaTime);
 
             OnUpdatePhysics?.Invoke();
+
+            CachePositions();
+        }
+
+        private void CachePositions()
+        {
+            _physicsHand.oldPosition = _physicsHand.transform.position;
+            _originalOldPosition = _originalLeapHand.PalmPosition;
         }
 
         private void UpdateSettings()
