@@ -272,7 +272,7 @@ namespace Leap.Unity.HandsModule
                 Vector3 dir = -LeapHand.Arm.Direction.normalized;
 
                 //Position the elbow at the models elbow length
-                Vector3 position = LeapHand.WristPosition + dir * (ElbowLength * transform.localScale.z);
+                Vector3 position = LeapHand.WristPosition + dir * (ElbowLength * BoundHand.elbow.boundTransform.lossyScale.z);
 
                 if (SetModelScale)
                 {
@@ -284,7 +284,7 @@ namespace Leap.Unity.HandsModule
                     else
                     {
                         //Use the models length to position the elbow and allow it to be mofied by elbow offset
-                        position = LeapHand.WristPosition + dir * ((ElbowLength * transform.localScale.z) * BoundHand.elbowOffset);
+                        position = LeapHand.WristPosition + dir * ((ElbowLength * BoundHand.elbow.boundTransform.lossyScale.z) * BoundHand.elbowOffset);
                     }
                 }
                 else
