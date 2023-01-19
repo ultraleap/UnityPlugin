@@ -60,7 +60,10 @@ namespace Ultraleap.Tracking.OpenXR
                 return _trackingSource;
             }
 
-            if (XRGeneralSettings.Instance.Manager.activeLoader.name == "Open XR Loader" &&
+            if (XRGeneralSettings.Instance != null &&
+                XRGeneralSettings.Instance.Manager != null &&
+                XRGeneralSettings.Instance.Manager.activeLoader != null &&
+                XRGeneralSettings.Instance.Manager.activeLoader.name == "Open XR Loader" &&
                 OpenXRSettings.Instance != null &&
                 OpenXRSettings.Instance.GetFeature<HandTrackingFeature>() != null &&
                 OpenXRSettings.Instance.GetFeature<HandTrackingFeature>().SupportsHandTracking)
@@ -221,7 +224,7 @@ namespace Ultraleap.Tracking.OpenXR
                     xrTipIndex = xrNextIndex;
 
                     // Ignore metacarpals when calculating finger lengths
-                    if(boneIndex != 0)
+                    if (boneIndex != 0)
                     {
                         fingerLength += bone.Length;
                     }

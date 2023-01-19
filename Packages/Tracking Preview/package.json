@@ -1,13 +1,13 @@
 {
   "name": "com.ultraleap.tracking.preview",
-  "version": "6.3.0",
+  "version": "6.4.0",
   "description": "Ultraleap Tracking Preview",
   "displayName": "Ultraleap Tracking Preview",
   "unity": "2020.3",
   "license": "Apache-2.0",
   "dependencies": {
-    "com.ultraleap.tracking": "6.3.0",
-    "com.unity.inputsystem": "1.0.2",
+    "com.ultraleap.tracking": "6.4.0",
+    "com.unity.inputsystem": "1.4.4",
     "com.unity.xr.interaction.toolkit": "2.0.0"
   },
   "keywords": [
@@ -27,11 +27,6 @@
       "displayName": "Examples",
       "description": "A collection of examples for the Preview package",
       "path": "Examples~"
-    },
-    {
-      "displayName": "OVR Provider",
-      "description": "An experimental compatibility layer to connect Ultraleap interactions with Oculus hand tracking through a Provider",
-      "path": "OVR Provider~"
     }
   ]
 }
