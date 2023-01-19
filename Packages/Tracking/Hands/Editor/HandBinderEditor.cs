@@ -37,6 +37,7 @@ namespace Leap.Unity.HandsModule
         private SerializedProperty setEditorPose;
         private SerializedProperty globalFingerRotationOffset;
         private SerializedProperty wristRotationOffset;
+        private SerializedProperty useScaleToPositionElbow;
         private SerializedProperty boundHand;
         private SerializedProperty offsets;
         private SerializedProperty fineTuning;
@@ -66,6 +67,7 @@ namespace Leap.Unity.HandsModule
             setEditorPose = serializedObject.FindProperty("SetEditorPose");
             globalFingerRotationOffset = serializedObject.FindProperty("GlobalFingerRotationOffset");
             wristRotationOffset = serializedObject.FindProperty("WristRotationOffset");
+            useScaleToPositionElbow = serializedObject.FindProperty("UseScaleToPositionElbow");
             fineTuning = serializedObject.FindProperty("FineTuning");
             debugOptions = serializedObject.FindProperty("DebugOptions");
             boundHand = serializedObject.FindProperty("BoundHand");
@@ -227,6 +229,8 @@ namespace Leap.Unity.HandsModule
                 EditorGUILayout.PropertyField(wristRotationOffset, new GUIContent("Wrist Rotation Offset", "Adjusting this value will modify how the 3D Models wrist is rotated in relation to the tracking data"), editorSkin);
                 EditorGUILayout.Space();
                 EditorGUILayout.PropertyField(globalFingerRotationOffset, new GUIContent("Fingers Rotation Offset", "Adjusting this value will modify how the 3D Models fingers are rotated in relation to the tracking data"), editorSkin);
+                EditorGUILayout.Space();
+                EditorGUILayout.PropertyField(useScaleToPositionElbow, new GUIContent("Use Scale To Position Elbow", "Moves the elbow so that when the forearm scales the bone doesnt clip into the hand model"), editorSkin);
                 GUI.color = previousCol;
                 GUILayout.EndVertical();
 
