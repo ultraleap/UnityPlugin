@@ -135,7 +135,7 @@ namespace Leap
 
         /// <summary>
         /// The direction in which this finger or tool is pointing. The direction is expressed 
-        /// as a unit vector pointing in the same direction as the tip.
+        /// as a unit vector pointing in the same direction as the intermediate bone.
         /// @since 1.0
         /// </summary>
         public Vector3 Direction;
