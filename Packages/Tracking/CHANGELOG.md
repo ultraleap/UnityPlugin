@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - OpenXRLeapProvider CheckOpenXRAvailable has a nullref when XRGeneralSettings activeloader is not set up
 - XrLeapProviderManager initialising when there is no active XR Loader
 - OnAnchorDisabled not being called when an Anchor gameobject is disabled
+- Documentation for Finger.Direction says it is tip direction but should say intermediate direction
 
 ### Known issues 
 - Outline hands aren't displaying
