@@ -11,19 +11,25 @@ namespace Leap.Unity.Interaction
 
         [Tooltip("The vertical tilt of the attached object")]
         public float xRotation = 0;
+        [Tooltip("The interaction behaviour attached to the grab ball. If left empty, will attempt to find an Interaction Behaviour on the current gameobject.")]
+        public InteractionBehaviour grabBallInteractionBehaviour;
 
         public float maxHorizontalDistanceFromHead = 0.5f;
         public float minHorizontalDistanceFromHead = 0.1f;
         public float maxHeightFromHead = 0.3f;
         public float minHeightFromHead = 0.65f;
+        public float lerpSpeed = 1.0f;
 
         private Vector3 _restrictedGrabBallPosition;
 
         private Pose _targetPose = Pose.identity;
         private Transform _head;
         private Vector3 _grabBallOffset;
-        private InteractionBehaviour _interactionBehaviour;
         private Transform _transformHelper;
+        private bool _moveToPositionOnUngrasp = false;
+
+        private float LERP_POSITION_LIMIT = 0.005f;
+        private float LERP_ROTATION_LIMIT = 1;
 
         private void OnEnable()
         {
@@ -42,7 +48,14 @@ namespace Leap.Unity.Interaction
                 + "Edit->Project Settings->Physics.");
             }
             _head = Camera.main.transform;
-            _interactionBehaviour = GetComponent<InteractionBehaviour>();
+            if(grabBallInteractionBehaviour == null)
+            {
+                grabBallInteractionBehaviour = GetComponent<InteractionBehaviour>();
+                if(grabBallInteractionBehaviour == null)
+                {
+                    Debug.LogWarning("No interaction behaviour found for grab ball", gameObject);
+                }
+            }
 
             _transformHelper = new GameObject("GrabBall_TransformHelper").transform;
             _transformHelper.SetParent(transform);
@@ -51,28 +64,47 @@ namespace Leap.Unity.Interaction
             UpdateTargetPose();
         }
 
-        public float lerpSpeed = 1.0f;
         private void Update()
         {
-            if (_interactionBehaviour.isGrasped)
+            if (!grabBallInteractionBehaviour.isGrasped)
             {
-                RestrictGrabBallPosition();
+                if (!_moveToPositionOnUngrasp)
+                {
+                    return;
+                }
+
                 UpdateTargetPose();
+                _moveToPositionOnUngrasp = IsCloseToTargetPose();
+
+                if (_moveToPositionOnUngrasp)
+                {
+                    grabBallInteractionBehaviour.transform.position = Vector3.Lerp(grabBallInteractionBehaviour.transform.position, _restrictedGrabBallPosition, Time.deltaTime * lerpSpeed);
+                }
+                return;
             }
-            else if (Vector3.Distance(transform.position, _restrictedGrabBallPosition) > 0.001f)
+
+            _moveToPositionOnUngrasp = true;
+            UpdateTargetPose();
+
+            if (IsCloseToTargetPose())
             {
-                transform.position = Vector3.Lerp(transform.position, _restrictedGrabBallPosition, Time.deltaTime * lerpSpeed);
+                return;
             }
 
             Pose attachedObjectPose = attachedObject.ToPose().Lerp(_targetPose, Time.deltaTime * lerpSpeed);
             attachedObject.SetPose(attachedObjectPose);
         }
 
+        private bool IsCloseToTargetPose()
+        {
+            return Vector3.Distance(attachedObject.position, _targetPose.position) < LERP_POSITION_LIMIT
+                && Quaternion.Angle(attachedObject.rotation, _targetPose.rotation) < LERP_ROTATION_LIMIT;
+        }
+
         private void RestrictGrabBallPosition()
         {
-            Vector3 directionToGrabBall = (transform.position - _head.position).normalized;
-
-            float cappedGrabBallDist = Vector3.Distance(transform.position, _head.position);
+            Vector3 directionToGrabBall = (grabBallInteractionBehaviour.transform.position - _head.position).normalized;
+            float cappedGrabBallDist = Vector3.Distance(grabBallInteractionBehaviour.transform.position, _head.position);
 
             if (cappedGrabBallDist >= maxHorizontalDistanceFromHead)
             {
@@ -86,11 +118,13 @@ namespace Leap.Unity.Interaction
 
             if (cappedGrabBallPos.y >= _head.position.y + maxHeightFromHead) cappedGrabBallPos.y = _head.position.y + maxHeightFromHead;
             if (cappedGrabBallPos.y <= _head.position.y - minHeightFromHead) cappedGrabBallPos.y = _head.position.y - minHeightFromHead;
-            _restrictedGrabBallPosition = Vector3.Lerp(transform.position, cappedGrabBallPos, Time.deltaTime * lerpSpeed * 10);
+            _restrictedGrabBallPosition = cappedGrabBallPos;
         }
 
         private void UpdateTargetPose()
         {
+            RestrictGrabBallPosition();
+
             _transformHelper.position = _restrictedGrabBallPosition;
             _transformHelper.rotation = CalculateLookAtRotation(_transformHelper.position, _head.position);
 
@@ -117,23 +151,30 @@ namespace Leap.Unity.Interaction
             return worldToLocalMatrix.MultiplyPoint3x4(position);
         }
 
+        /// <summary>
+        /// Lerps a pose from a to b at a constant speed
+        /// </summary>
+        /// <returns></returns>
+        public Pose ConstantLerp(Pose a, Pose b, float speed)
+        {
+            float moveDir = speed * (1 / Vector3.Distance(a.position, b.position) * Time.deltaTime);
+            return new Pose(
+                Vector3.MoveTowards(a.position, b.position, Time.deltaTime * speed),
+                Quaternion.RotateTowards(a.rotation, b.rotation, Time.deltaTime * speed)
+            );
+        }
+
         /*
          * TODO:
          * [x] restrict grab ball position
          * [x] lerp grab ball back to home position on ungrab
-         * [] visualise restriction
-         * [] make this independent of interaction behaviour
+         * [x] fix bumps on edge of restriction
+         * [x] make this independent of interaction behaviour
          * [] add public way to change offset of attached object
-         * [] constant lerp speed
+         * [] toggle attach object facing user
+         * [] constant lerp speed ?
          * [] nice editor ui
+         * [] visualise restriction
          */
-
-        // Constant Lerp from A to B with speed
-        private float moveDir;
-        private void ConstantLerp(Transform t, Vector3 from, Vector3 to, float speed)
-        {
-            moveDir = speed * (1 / Vector3.Distance(from, to) * Time.deltaTime);
-            t.position = Vector3.Lerp(from, to, moveDir);
-        }
     }
 }
