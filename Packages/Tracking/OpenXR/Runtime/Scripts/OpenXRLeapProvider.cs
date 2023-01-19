@@ -26,6 +26,9 @@ namespace Ultraleap.Tracking.OpenXR
         private long _leftHandFirstSeen_ticks;
         private long _rightHandFirstSeen_ticks;
 
+        // Magic 0th thumb bone rotation offsets from LeapC
+        public const float HAND_ROTATION_OFFSET_Y = 25.9f, HAND_ROTATION_OFFSET_Z = -63.45f;
+
         private long _frameId = 0;
 
         [Tooltip("Specifies the main camera. Falls back to Camera.main if not set")]
@@ -205,7 +208,7 @@ namespace Ultraleap.Tracking.OpenXR
                             0f,
                             joints[(int)HandJoint.ThumbMetacarpal].Radius * 2f,
                             (Bone.BoneType)boneIndex,
-                            joints[(int)HandJoint.ThumbMetacarpal].Pose.rotation);
+                            hand.Rotation * Quaternion.Euler(0, hand.IsLeft ? HAND_ROTATION_OFFSET_Y : -HAND_ROTATION_OFFSET_Y, hand.IsLeft ? HAND_ROTATION_OFFSET_Z : -HAND_ROTATION_OFFSET_Z));
                         continue;
                     }
 
