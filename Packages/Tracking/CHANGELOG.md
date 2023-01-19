@@ -19,13 +19,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Removed the OVRProvider from the Preview Package. This is now achievable via the OpenXR Provider in the main Tracking Package
 
 ### Fixed
+- Offset between skeleton hand wrist and forearm in sample scenes
 - OpenXRLeapProvider CheckOpenXRAvailable has a nullref when XRGeneralSettings activeloader is not set up
 - XrLeapProviderManager initialising when there is no active XR Loader
 - OnAnchorDisabled not being called when an Anchor gameobject is disabled
 - Documentation for Finger.Direction says it is tip direction but should say intermediate direction
 
 ### Known issues 
-- Offset between skeleton hand wrist and forearm in sample scenes
 - Outline hands aren't displaying
 - Scenes containing the infrared viewer render incorrectly on Android build targets and in scriptable render pipelines such as URP and HDRP. 
 - Interactions callback scene allows blocks to be moved without doing a grasp pose. 
@@ -50,6 +50,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Android Manifest auto-population when building for OpenXR always adds permissions
 - OpenXR finger lengths wrongly include metacarpal lengths
+- On contact start and end being called every 20 frames when only 1 bone is colliding
 
 ### Known issues 
 - Offset between skeleton hand wrist and forearm in sample scenes
