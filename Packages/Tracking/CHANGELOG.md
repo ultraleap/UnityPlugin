@@ -22,7 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Offset between skeleton hand wrist and forearm in sample scenes
 - OpenXRLeapProvider CheckOpenXRAvailable has a nullref when XRGeneralSettings activeloader is not set up
-- XrLeapProviderManager initialising when there is no active XR Loader
+- XrLeapProviderManager initialising when there is no active XR Loader - [Github Issue 1360](https://github.com/ultraleap/UnityPlugin/issues/1360)
 - OnAnchorDisabled not being called when an Anchor gameobject is disabled
 - Documentation for Finger.Direction says it is tip direction but should say intermediate direction
 - OpenXR thumb joint rotation offsets do not align with LeapC expectations
