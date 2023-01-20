@@ -51,8 +51,8 @@ namespace Leap.Unity.HandsModule
         public bool SetPositions = true;
 
 
-        [Tooltip("Moves the elbow so that when the forearm scales the bone doesnt clip into the hand model")]
-        public bool UseScaleToPositionElbow = true;
+        [Tooltip("Moves the elbow so that when the forearm scales the bone doesnt clip into the hand model. Particularly useful for non-skinned hands.")]
+        public bool UseScaleToPositionElbow = false;
 
         /// <summary> 
         /// Set the assigned transforms to the same position as the Leap Hand 

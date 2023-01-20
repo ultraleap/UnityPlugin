@@ -1744,6 +1744,7 @@ MonoBehaviour:
   GlobalFingerRotationOffset: {x: 360, y: 0, z: 0}
   WristRotationOffset: {x: 360, y: 5, z: 0}
   SetPositions: 0
+  UseScaleToPositionElbow: 1
   UseMetaBones: 1
   SetModelScale: 1
   ScalingSpeedMultiplier: 1
@@ -4039,6 +4040,7 @@ MonoBehaviour:
   GlobalFingerRotationOffset: {x: 360, y: 360, z: 360}
   WristRotationOffset: {x: 360, y: 355, z: 360}
   SetPositions: 0
+  UseScaleToPositionElbow: 1
   UseMetaBones: 1
   SetModelScale: 1
   ScalingSpeedMultiplier: 1
