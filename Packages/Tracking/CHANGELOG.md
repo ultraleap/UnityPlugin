@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Hands prefabs added to GameObject/Ultraleap/Hands create menu
 - Action-based XRI implementation with Example scene in Preview package
 - Added const S_TO_US as replacement for incorrectly named S_TO_NS in LeapServiceProvider
-- Check box in Hand Binder under fine tuning options to enable or dissable moving the elbow based on forearm scale
+- Check box in Hand Binder under fine tuning options to enable or disable moving the elbow based on forearm scale
 
 ### Changed
 - "Hands.Provider" static function now searches for subjectively the best LeapProvider avaliable in the scene. Will use PostProcessProvider first rather than LeapServiceProvider
