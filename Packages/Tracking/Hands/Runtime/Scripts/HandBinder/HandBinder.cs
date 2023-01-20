@@ -50,6 +50,10 @@ namespace Leap.Unity.HandsModule
         [Tooltip("Set the assigned transforms to the same position as the Leap Hand")]
         public bool SetPositions = true;
 
+
+        [Tooltip("Moves the elbow so that when the forearm scales the bone doesnt clip into the hand model. Particularly useful for non-skinned hands.")]
+        public bool UseScaleToPositionElbow = false;
+
         /// <summary> 
         /// Set the assigned transforms to the same position as the Leap Hand 
         /// </summary>
@@ -266,13 +270,22 @@ namespace Leap.Unity.HandsModule
         /// </summary>
         void TransformElbow()
         {
+
+
             if (BoundHand.elbow.boundTransform != null)
             {
+
+                float scaleElbowLength = 1;
+                if (UseScaleToPositionElbow)
+                {
+                    scaleElbowLength = BoundHand.elbow.boundTransform.lossyScale.z;
+                }
+
                 //Calculate the direction of the elbow 
                 Vector3 dir = -LeapHand.Arm.Direction.normalized;
 
                 //Position the elbow at the models elbow length
-                Vector3 position = LeapHand.WristPosition + dir * (ElbowLength * BoundHand.elbow.boundTransform.lossyScale.z);
+                Vector3 position = LeapHand.WristPosition + dir * (ElbowLength * scaleElbowLength);
 
                 if (SetModelScale)
                 {
@@ -284,7 +297,7 @@ namespace Leap.Unity.HandsModule
                     else
                     {
                         //Use the models length to position the elbow and allow it to be mofied by elbow offset
-                        position = LeapHand.WristPosition + dir * ((ElbowLength * BoundHand.elbow.boundTransform.lossyScale.z) * BoundHand.elbowOffset);
+                        position = LeapHand.WristPosition + dir * ((ElbowLength * scaleElbowLength) * BoundHand.elbowOffset);
                     }
                 }
                 else
