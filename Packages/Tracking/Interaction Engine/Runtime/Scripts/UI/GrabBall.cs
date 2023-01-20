@@ -22,9 +22,9 @@ namespace Leap.Unity.Interaction
 
         private Vector3 _restrictedGrabBallPosition;
 
-        private Pose _targetPose = Pose.identity;
+        private Pose _attachedObjectTargetPose = Pose.identity;
         private Transform _head;
-        private Vector3 _grabBallOffset;
+        private Vector3 _attachedObjectOffset;
         private Transform _transformHelper;
         private bool _moveToPositionOnUngrasp = false;
 
@@ -33,7 +33,7 @@ namespace Leap.Unity.Interaction
 
         private void OnEnable()
         {
-            _grabBallOffset = InverseTransformPointUnscaled(transform, attachedObject.position);
+            _attachedObjectOffset = InverseTransformPointUnscaled(grabBallInteractionBehaviour.transform, attachedObject.position);
             if (useObjectsXRotation) { xRotation = attachedObject.rotation.eulerAngles.x; }
         }
 
@@ -48,10 +48,10 @@ namespace Leap.Unity.Interaction
                 + "Edit->Project Settings->Physics.");
             }
             _head = Camera.main.transform;
-            if(grabBallInteractionBehaviour == null)
+            if (grabBallInteractionBehaviour == null)
             {
                 grabBallInteractionBehaviour = GetComponent<InteractionBehaviour>();
-                if(grabBallInteractionBehaviour == null)
+                if (grabBallInteractionBehaviour == null)
                 {
                     Debug.LogWarning("No interaction behaviour found for grab ball", gameObject);
                 }
@@ -61,7 +61,7 @@ namespace Leap.Unity.Interaction
             _transformHelper.SetParent(transform);
 
             RestrictGrabBallPosition();
-            UpdateTargetPose();
+            UpdateAttachedObjectTargetPose();
         }
 
         private void Update()
@@ -73,8 +73,8 @@ namespace Leap.Unity.Interaction
                     return;
                 }
 
-                UpdateTargetPose();
-                _moveToPositionOnUngrasp = IsCloseToTargetPose();
+                UpdateAttachedObjectTargetPose();
+                _moveToPositionOnUngrasp = IsAttachedObjectCloseToTargetPose();
 
                 if (_moveToPositionOnUngrasp)
                 {
@@ -84,21 +84,21 @@ namespace Leap.Unity.Interaction
             }
 
             _moveToPositionOnUngrasp = true;
-            UpdateTargetPose();
+            UpdateAttachedObjectTargetPose();
 
-            if (IsCloseToTargetPose())
+            if (IsAttachedObjectCloseToTargetPose())
             {
                 return;
             }
 
-            Pose attachedObjectPose = attachedObject.ToPose().Lerp(_targetPose, Time.deltaTime * lerpSpeed);
+            Pose attachedObjectPose = attachedObject.ToPose().Lerp(_attachedObjectTargetPose, Time.deltaTime * lerpSpeed);
             attachedObject.SetPose(attachedObjectPose);
         }
 
-        private bool IsCloseToTargetPose()
+        private bool IsAttachedObjectCloseToTargetPose()
         {
-            return Vector3.Distance(attachedObject.position, _targetPose.position) < LERP_POSITION_LIMIT
-                && Quaternion.Angle(attachedObject.rotation, _targetPose.rotation) < LERP_ROTATION_LIMIT;
+            return Vector3.Distance(attachedObject.position, _attachedObjectTargetPose.position) < LERP_POSITION_LIMIT
+                && Quaternion.Angle(attachedObject.rotation, _attachedObjectTargetPose.rotation) < LERP_ROTATION_LIMIT;
         }
 
         private void RestrictGrabBallPosition()
@@ -121,7 +121,7 @@ namespace Leap.Unity.Interaction
             _restrictedGrabBallPosition = cappedGrabBallPos;
         }
 
-        private void UpdateTargetPose()
+        private void UpdateAttachedObjectTargetPose()
         {
             RestrictGrabBallPosition();
 
@@ -130,8 +130,8 @@ namespace Leap.Unity.Interaction
 
             //Rotation - always face, or maintain initial rotation?
 
-            _targetPose.position = _transformHelper.TransformPoint(_grabBallOffset);
-            _targetPose.rotation = CalculateLookAtRotation(attachedObject.transform.position, _head.position, xRotation);
+            _attachedObjectTargetPose.position = _transformHelper.TransformPoint(_attachedObjectOffset);
+            _attachedObjectTargetPose.rotation = CalculateLookAtRotation(attachedObject.transform.position, _head.position, xRotation);
         }
 
         private Quaternion CalculateLookAtRotation(Vector3 posA, Vector3 posB)
@@ -145,6 +145,9 @@ namespace Leap.Unity.Interaction
             return Quaternion.Euler(xRotation, lookAtRotation.eulerAngles.y, lookAtRotation.eulerAngles.z);
         }
 
+        /// <summary>
+        /// Transforms position from world space to local space, regardless of object scale
+        /// </summary>
         private Vector3 InverseTransformPointUnscaled(Transform transform, Vector3 position)
         {
             var worldToLocalMatrix = Matrix4x4.TRS(transform.position, transform.rotation, Vector3.one).inverse;
@@ -152,16 +155,27 @@ namespace Leap.Unity.Interaction
         }
 
         /// <summary>
-        /// Lerps a pose from a to b at a constant speed
+        /// Sets the Grab Ball's offset, relative to its Attached Object, moving the Grab Ball
+        /// The new offset is treated as a position in the Attached Object's local space.
         /// </summary>
-        /// <returns></returns>
-        public Pose ConstantLerp(Pose a, Pose b, float speed)
+        public void SetGrabBallOffset(Vector3 newOffset)
         {
-            float moveDir = speed * (1 / Vector3.Distance(a.position, b.position) * Time.deltaTime);
-            return new Pose(
-                Vector3.MoveTowards(a.position, b.position, Time.deltaTime * speed),
-                Quaternion.RotateTowards(a.rotation, b.rotation, Time.deltaTime * speed)
-            );
+            _transformHelper.position = grabBallInteractionBehaviour.transform.position;
+            _transformHelper.transform.position = attachedObject.TransformPoint(newOffset);
+            _transformHelper.rotation = attachedObject.rotation;
+            _attachedObjectOffset = InverseTransformPointUnscaled(_transformHelper.transform, attachedObject.position);
+            grabBallInteractionBehaviour.transform.position = _transformHelper.position;
+        }
+
+        /// <summary>
+        /// Sets the Attached Object's offset, relative its Grab Ball, moving the Attached Object
+        /// The new offset is treated as a position in the Grab Ball's local space.
+        /// </summary>
+        public void SetAttachedObjectOffset(Vector3 newOffset)
+        {
+            _attachedObjectOffset = newOffset;
+            UpdateAttachedObjectTargetPose();
+            attachedObject.SetPose(_attachedObjectTargetPose);
         }
 
         /*
@@ -170,7 +184,7 @@ namespace Leap.Unity.Interaction
          * [x] lerp grab ball back to home position on ungrab
          * [x] fix bumps on edge of restriction
          * [x] make this independent of interaction behaviour
-         * [] add public way to change offset of attached object
+         * [x] add public way to change offset of attached object
          * [] toggle attach object facing user
          * [] constant lerp speed ?
          * [] nice editor ui
