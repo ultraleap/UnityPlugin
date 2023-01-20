@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [docs-website]: https://docs.ultraleap.com/unity-api/ "Ultraleap Docs"
 
-## [NEXT] - unreleased
+## [6.5.0] - 26/01/23
 
 ### Added
 - Public toggle for interpolation on LeapServiceProviders
@@ -16,7 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Check box in Hand Binder under fine tuning options to enable or disable moving the elbow based on forearm scale
 
 ### Changed
-- "Hands.Provider" static function now searches for subjectively the best LeapProvider avaliable in the scene. Will use PostProcessProvider first rather than LeapServiceProvider
+- "Hands.Provider" static function now searches for subjectively the best LeapProvider available in the scene. Will use PostProcessProvider first rather than LeapServiceProvider
 - Removed the OVRProvider from the Preview Package. This is now achievable via the OpenXR Provider in the main Tracking Package
 
 ### Fixed
@@ -28,15 +28,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - OpenXR thumb joint rotation offsets do not align with LeapC expectations
 
 ### Known issues 
-- Outline hands aren't displaying
 - Scenes containing the infrared viewer render incorrectly on Android build targets and in scriptable render pipelines such as URP and HDRP. 
-- Interactions callback scene allows blocks to be moved without doing a grasp pose. 
-- Capsule hands don't have a joint colour in HDRP 
 - Use of the LeapCSharp Config class is unavailable with v5.X tracking service
 - Repeatedly opening scenes can cause memory use increase
 - Currently the Ultraleap Hand Tracking feature for OpenXR requires the New and Legacy input systems to be enabled, to simultaneously use OpenXR and the Ultraleap Unity Plugin's features.
 - The OpenXR Leap Provider does not currently support the `Confidence` hand property (and will return fixed values)
-- If using OpenXR with OpenXR package imported, when using Unity 2020 and Ultraleap Tracking Plugin via .unitypackage, an error will appear on import relating to HandTrackingFeature. This has been fixed by Unity on Unity 2021
+- If using OpenXR when using Unity 2020 and Ultraleap Tracking Plugin via .unitypackage, an error will appear on import relating to HandTrackingFeature. This has been fixed by Unity on Unity 2021
 	- A workaround is to right click on \ThirdParty\Ultraleap\Tracking\OpenXR\Runtime\Scripts\HandTrackingFeature.cs and select 'Reimport'
 - DrawMeshInstanced error log on certain Unity versions when using Capsule Hands. [Unity Issue Tracker](https://issuetracker.unity3d.com/issues/drawmeshinstanced-does-not-support-dot-dot-dot-error-in-the-console-pops-up-when-the-shader-does-support-instanced-rendering)
 - After using Ultraleap OpenXR in Unity Editor, the tracking mode of device 0 will be set to HMD until the Unity Editor session ends. This can stop the testing of non-XR scenes until the Unity Editor is re-opened
