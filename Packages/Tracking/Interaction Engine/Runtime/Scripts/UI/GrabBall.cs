@@ -26,7 +26,7 @@ namespace Leap.Unity.Interaction
         private Transform _head;
         private Vector3 _attachedObjectOffset;
         private Transform _transformHelper;
-        private bool _moveToPositionOnUngrasp = false;
+        private bool _moveGrabBallToPositionOnUngrasp = false;
 
         private float LERP_POSITION_LIMIT = 0.005f;
         private float LERP_ROTATION_LIMIT = 1;
@@ -68,22 +68,22 @@ namespace Leap.Unity.Interaction
         {
             if (!grabBallInteractionBehaviour.isGrasped)
             {
-                if (!_moveToPositionOnUngrasp)
+                if (!_moveGrabBallToPositionOnUngrasp)
                 {
                     return;
                 }
 
                 UpdateAttachedObjectTargetPose();
-                _moveToPositionOnUngrasp = IsAttachedObjectCloseToTargetPose();
+                _moveGrabBallToPositionOnUngrasp = Vector3.Distance(grabBallInteractionBehaviour.transform.position, _restrictedGrabBallPosition) > LERP_POSITION_LIMIT;
 
-                if (_moveToPositionOnUngrasp)
+                if (_moveGrabBallToPositionOnUngrasp)
                 {
                     grabBallInteractionBehaviour.transform.position = Vector3.Lerp(grabBallInteractionBehaviour.transform.position, _restrictedGrabBallPosition, Time.deltaTime * lerpSpeed);
                 }
                 return;
             }
 
-            _moveToPositionOnUngrasp = true;
+            _moveGrabBallToPositionOnUngrasp = true;
             UpdateAttachedObjectTargetPose();
 
             if (IsAttachedObjectCloseToTargetPose())
@@ -127,8 +127,6 @@ namespace Leap.Unity.Interaction
 
             _transformHelper.position = _restrictedGrabBallPosition;
             _transformHelper.rotation = CalculateLookAtRotation(_transformHelper.position, _head.position);
-
-            //Rotation - always face, or maintain initial rotation?
 
             _attachedObjectTargetPose.position = _transformHelper.TransformPoint(_attachedObjectOffset);
             _attachedObjectTargetPose.rotation = CalculateLookAtRotation(attachedObject.transform.position, _head.position, xRotation);
@@ -185,10 +183,8 @@ namespace Leap.Unity.Interaction
          * [x] fix bumps on edge of restriction
          * [x] make this independent of interaction behaviour
          * [x] add public way to change offset of attached object
-         * [] toggle attach object facing user
-         * [] constant lerp speed ?
-         * [] nice editor ui
          * [] visualise restriction
+         * [] nice editor ui
          */
     }
 }
