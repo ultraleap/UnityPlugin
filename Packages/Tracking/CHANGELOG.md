@@ -24,6 +24,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - OpenXRLeapProvider CheckOpenXRAvailable has a nullref when XRGeneralSettings activeloader is not set up
 - XrLeapProviderManager initialising when there is no active XR Loader
 - OnAnchorDisabled not being called when an Anchor gameobject is disabled
+- Documentation for Finger.Direction says it is tip direction but should say intermediate direction
+- OpenXR thumb joint rotation offsets do not align with LeapC expectations
 
 ### Known issues 
 - Outline hands aren't displaying
@@ -50,6 +52,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Android Manifest auto-population when building for OpenXR always adds permissions
 - OpenXR finger lengths wrongly include metacarpal lengths
+- On contact start and end being called every 20 frames when only 1 bone is colliding
 
 ### Known issues 
 - Offset between skeleton hand wrist and forearm in sample scenes
