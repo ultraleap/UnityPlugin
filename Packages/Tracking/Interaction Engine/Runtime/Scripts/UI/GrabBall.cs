@@ -106,9 +106,17 @@ namespace Leap.Unity.Interaction
                 {
                     grabBallInteractionBehaviour.transform.position = Vector3.Lerp(grabBallInteractionBehaviour.transform.position, grabBallPose.position, Time.deltaTime * lerpSpeed);
                 }
+                else
+                {
+                    grabBallInteractionBehaviour.transform.position = grabBallPose.position;
+                }
             }
 
-            if (!IsAttachedObjectCloseToTargetPose())
+            if (IsAttachedObjectCloseToTargetPose())
+            {
+                attachedObject.SetPose(_attachedObjectTargetPose);
+            }
+            else
             {
                 UpdateAttachedObjectTargetPose();
                 Pose attachedObjectPose = attachedObject.ToPose().Lerp(_attachedObjectTargetPose, Time.deltaTime * lerpSpeed);
