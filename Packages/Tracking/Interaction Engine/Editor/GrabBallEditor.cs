@@ -33,10 +33,18 @@ namespace Leap.Unity.Interaction
 
             EditorGUILayout.LabelField("X Rotation", EditorStyles.boldLabel);
             EditorGUILayout.PropertyField(_useAttachedObjectsXRotation);
+            
 
-            if (_useAttachedObjectsXRotation.boolValue)
+            if (_useAttachedObjectsXRotation.boolValue && target.attachedObject != null)
             {
-                target.xRotation = target.attachedObject.rotation.eulerAngles.x;
+                if(target.attachedObject == null)
+                {
+                    target.xRotation = 0;
+                }
+                else
+                {
+                    target.xRotation = target.attachedObject.rotation.eulerAngles.x;
+                }
             }
 
             EditorGUI.BeginDisabledGroup(_useAttachedObjectsXRotation.boolValue);
