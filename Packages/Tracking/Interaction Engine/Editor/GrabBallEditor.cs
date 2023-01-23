@@ -19,7 +19,6 @@ namespace Leap.Unity.Interaction
         SerializedProperty _grabBallInteractionBehaviour;
         SerializedProperty _lerpSpeed;
 
-
         public override void OnInspectorGUI()
         {
             GetProperties();
@@ -33,11 +32,10 @@ namespace Leap.Unity.Interaction
 
             EditorGUILayout.LabelField("X Rotation", EditorStyles.boldLabel);
             EditorGUILayout.PropertyField(_useAttachedObjectsXRotation);
-            
 
-            if (_useAttachedObjectsXRotation.boolValue && target.attachedObject != null)
+            if (_useAttachedObjectsXRotation.boolValue)
             {
-                if(target.attachedObject == null)
+                if (target.attachedObject == null)
                 {
                     target.xRotation = 0;
                 }
