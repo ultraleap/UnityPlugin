@@ -11,9 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Public toggle for interpolation on LeapServiceProviders
 - Hands prefabs added to GameObject/Ultraleap/Hands create menu
+- Add Grab Ball component
 
 ### Changed
-- 
+- Update Basic UI Example scene to use Grab Ball component
 
 ### Fixed
 - OnAnchorDisabled not being called when an Anchor gameobject is disabled
