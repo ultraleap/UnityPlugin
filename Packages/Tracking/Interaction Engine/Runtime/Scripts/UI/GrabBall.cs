@@ -4,6 +4,17 @@ namespace Leap.Unity.Interaction
 {
     public class GrabBall : MonoBehaviour
     {
+        public struct GrabBallRestrictionStatus
+        {
+            public bool horizontalMin;
+            public bool horizontalMax;
+            public bool heightMin;
+            public bool heightMax;
+            public bool IsRestricted { get { return (horizontalMin || horizontalMax || heightMin || heightMax); } }
+        }
+
+        public GrabBallRestrictionStatus grabBallRestrictionStatus;
+
         public Transform attachedObject;
 
         [Tooltip("If enabled, the vertical tilt is populated from attached object's x rotation")]
@@ -18,18 +29,17 @@ namespace Leap.Unity.Interaction
         public float minHorizontalDistanceFromHead = 0.1f;
         public float maxHeightFromHead = 0.3f;
         public float minHeightFromHead = 0.65f;
-        public float lerpSpeed = 1.0f;
+        public float lerpSpeed = 10f;
 
         private Vector3 _restrictedGrabBallPosition;
-
         private Pose _attachedObjectTargetPose = Pose.identity;
         private Transform _head;
         private Vector3 _attachedObjectOffset;
         private Transform _transformHelper;
         private bool _moveGrabBallToPositionOnUngrasp = false;
 
-        private float LERP_POSITION_LIMIT = 0.005f;
-        private float LERP_ROTATION_LIMIT = 1;
+        private const float LERP_POSITION_LIMIT = 0.005f;
+        private const float LERP_ROTATION_LIMIT = 1;
 
         private void OnEnable()
         {
@@ -103,22 +113,40 @@ namespace Leap.Unity.Interaction
 
         private void RestrictGrabBallPosition()
         {
-            Vector3 directionToGrabBall = (grabBallInteractionBehaviour.transform.position - _head.position).normalized;
-            float cappedGrabBallDist = Vector3.Distance(grabBallInteractionBehaviour.transform.position, _head.position);
+            _restrictedGrabBallPosition = grabBallInteractionBehaviour.transform.position;
+            Vector3 headAtGrabBallHeight = _head.position;
+            headAtGrabBallHeight.y = grabBallInteractionBehaviour.transform.position.y;
 
-            if (cappedGrabBallDist >= maxHorizontalDistanceFromHead)
-            {
-                cappedGrabBallDist = maxHorizontalDistanceFromHead;
-            }
-            else if (cappedGrabBallDist <= minHorizontalDistanceFromHead)
-            {
-                cappedGrabBallDist = minHorizontalDistanceFromHead;
-            }
-            Vector3 cappedGrabBallPos = _head.position + directionToGrabBall * cappedGrabBallDist;
+            Vector3 grabBallDirection = (grabBallInteractionBehaviour.transform.position - headAtGrabBallHeight).normalized;
+            float clampedDistance = Vector3.Distance(headAtGrabBallHeight, grabBallInteractionBehaviour.transform.position);
+            clampedDistance = Mathf.Clamp(clampedDistance, minHorizontalDistanceFromHead, maxHorizontalDistanceFromHead);
 
-            if (cappedGrabBallPos.y >= _head.position.y + maxHeightFromHead) cappedGrabBallPos.y = _head.position.y + maxHeightFromHead;
-            if (cappedGrabBallPos.y <= _head.position.y - minHeightFromHead) cappedGrabBallPos.y = _head.position.y - minHeightFromHead;
-            _restrictedGrabBallPosition = cappedGrabBallPos;
+            grabBallRestrictionStatus.horizontalMax = clampedDistance >= maxHorizontalDistanceFromHead;
+
+            if (grabBallRestrictionStatus.horizontalMax)
+            {
+                _restrictedGrabBallPosition = headAtGrabBallHeight + grabBallDirection * maxHorizontalDistanceFromHead;
+            }
+            
+            grabBallRestrictionStatus.horizontalMin = clampedDistance <= minHorizontalDistanceFromHead;
+            if (grabBallRestrictionStatus.horizontalMin)
+            {
+                _restrictedGrabBallPosition = headAtGrabBallHeight + grabBallDirection * minHorizontalDistanceFromHead;
+            }
+
+            float verticalDistanceFromHead = grabBallInteractionBehaviour.transform.position.y - _head.position.y;
+
+            grabBallRestrictionStatus.heightMax = verticalDistanceFromHead >= maxHeightFromHead;
+            if (grabBallRestrictionStatus.heightMax)
+            {
+                _restrictedGrabBallPosition.y = _head.position.y + maxHeightFromHead;
+            }
+
+            grabBallRestrictionStatus.heightMin = verticalDistanceFromHead <= -minHeightFromHead;
+            if (grabBallRestrictionStatus.heightMin)
+            {
+                _restrictedGrabBallPosition.y = _head.position.y - minHeightFromHead;
+            }
         }
 
         private void UpdateAttachedObjectTargetPose()
@@ -183,7 +211,9 @@ namespace Leap.Unity.Interaction
          * [x] fix bumps on edge of restriction
          * [x] make this independent of interaction behaviour
          * [x] add public way to change offset of attached object
-         * [] visualise restriction
+         * [x] visualise restriction
+         * [] ghosted grab ball
+         * [] grab ball grow/shrink based on primary hover
          * [] nice editor ui
          */
     }
