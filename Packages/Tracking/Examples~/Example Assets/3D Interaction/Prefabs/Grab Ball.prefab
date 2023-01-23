@@ -114,7 +114,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 4805940a3e1f3fa4e908d737b76ddb38, type: 2}
+  - {fileID: 2100000, guid: f151f4541c949d949aa6dd5050692396, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -383,7 +383,7 @@ MonoBehaviour:
   grabBallInteractionBehaviour: {fileID: 3891926267328605171}
   lerpSpeed: 10
   useAttachedObjectsXRotation: 1
-  xRotation: 25
+  xRotation: 0
   restrictGrabBallDistanceFromHead: 1
   maxHorizontalDistanceFromHead: 0.5
   minHorizontalDistanceFromHead: 0.1
