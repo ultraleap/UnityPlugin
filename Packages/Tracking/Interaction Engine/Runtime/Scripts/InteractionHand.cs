@@ -527,6 +527,7 @@ namespace Leap.Unity.Interaction
                     capsule.radius = bone.Width * 0.5f;
                     capsule.height = bone.Length + bone.Width;
                     capsule.material = defaultContactBoneMaterial;
+                    capsule.contactOffset = 0.001f;
 
                     if (OnlyInitialiseIndexFinger)
                     {
@@ -561,6 +562,7 @@ namespace Leap.Unity.Interaction
                 box.center = new Vector3(_unwarpedHandData.IsLeft ? -0.005f : 0.005f, bone.Width * -0.3f, -0.01f);
                 box.size = new Vector3(bone.Length, bone.Width, bone.Length);
                 box.material = defaultContactBoneMaterial;
+                box.contactOffset = 0.001f;
 
                 if (OnlyInitialiseIndexFinger)
                 {

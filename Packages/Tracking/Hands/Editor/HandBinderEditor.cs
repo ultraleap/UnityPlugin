@@ -33,9 +33,11 @@ namespace Leap.Unity.HandsModule
         private SerializedProperty DebugModelRotationAxis;
         private SerializedProperty setPositions;
         private SerializedProperty setScale;
+        private SerializedProperty scaleSpeed;
         private SerializedProperty setEditorPose;
         private SerializedProperty globalFingerRotationOffset;
         private SerializedProperty wristRotationOffset;
+        private SerializedProperty useScaleToPositionElbow;
         private SerializedProperty boundHand;
         private SerializedProperty offsets;
         private SerializedProperty fineTuning;
@@ -61,9 +63,11 @@ namespace Leap.Unity.HandsModule
             DebugModelRotationAxis = serializedObject.FindProperty("DebugModelRotationAxis");
             setPositions = serializedObject.FindProperty("SetPositions");
             setScale = serializedObject.FindProperty("SetModelScale");
+            scaleSpeed = serializedObject.FindProperty("ScalingSpeedMultiplier");
             setEditorPose = serializedObject.FindProperty("SetEditorPose");
             globalFingerRotationOffset = serializedObject.FindProperty("GlobalFingerRotationOffset");
             wristRotationOffset = serializedObject.FindProperty("WristRotationOffset");
+            useScaleToPositionElbow = serializedObject.FindProperty("UseScaleToPositionElbow");
             fineTuning = serializedObject.FindProperty("FineTuning");
             debugOptions = serializedObject.FindProperty("DebugOptions");
             boundHand = serializedObject.FindProperty("BoundHand");
@@ -154,6 +158,11 @@ namespace Leap.Unity.HandsModule
 
             setScale.boolValue = GUILayout.Toggle(setScale.boolValue, new GUIContent("Scale Model to Tracking Data", "Should the hand binder adjust the models scale?"), editorSkin.toggle);
 
+            if (setScale.boolValue)
+            {
+                EditorGUILayout.PropertyField(scaleSpeed, editorSkin);
+            }
+
             EditorGUILayout.Space();
             GUILayout.Label(dividerLine);
             EditorGUILayout.Space();
@@ -220,6 +229,8 @@ namespace Leap.Unity.HandsModule
                 EditorGUILayout.PropertyField(wristRotationOffset, new GUIContent("Wrist Rotation Offset", "Adjusting this value will modify how the 3D Models wrist is rotated in relation to the tracking data"), editorSkin);
                 EditorGUILayout.Space();
                 EditorGUILayout.PropertyField(globalFingerRotationOffset, new GUIContent("Fingers Rotation Offset", "Adjusting this value will modify how the 3D Models fingers are rotated in relation to the tracking data"), editorSkin);
+                EditorGUILayout.Space();
+                EditorGUILayout.PropertyField(useScaleToPositionElbow, new GUIContent("Use Scale To Position Elbow", "Moves the elbow so that when the forearm scales the bone doesnt clip into the hand model"), editorSkin);
                 GUI.color = previousCol;
                 GUILayout.EndVertical();
 

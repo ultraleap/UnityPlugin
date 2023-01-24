@@ -49,7 +49,7 @@ MonoBehaviour:
   editTimePose: 1
   openXRLeapProvider: {fileID: 1276715513614782159}
   leapXRServiceProvider: {fileID: 8681616449881122529}
-  forceLeapService: 0
+  trackingSource: 0
 --- !u!114 &2683451079520186211
 MonoBehaviour:
   m_ObjectHideFlags: 0

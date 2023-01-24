@@ -26,6 +26,9 @@ namespace Ultraleap.Tracking.OpenXR
         private long _leftHandFirstSeen_ticks;
         private long _rightHandFirstSeen_ticks;
 
+        // Magic 0th thumb bone rotation offsets from LeapC
+        public const float HAND_ROTATION_OFFSET_Y = 25.9f, HAND_ROTATION_OFFSET_Z = -63.45f;
+
         private long _frameId = 0;
 
         [Tooltip("Specifies the main camera. Falls back to Camera.main if not set")]
@@ -51,18 +54,38 @@ namespace Ultraleap.Tracking.OpenXR
             }
         }
 
-        public override bool CanProvideData { get { return CheckOpenXRAvailable(); } }
+        public override TrackingSource TrackingDataSource { get { return CheckOpenXRAvailable(); } }
 
-        private bool CheckOpenXRAvailable()
+        private TrackingSource CheckOpenXRAvailable()
         {
-            if (XRGeneralSettings.Instance.Manager.activeLoader.name == "Open XR Loader" &&
+            if (_trackingSource != TrackingSource.NONE)
+            {
+                return _trackingSource;
+            }
+
+            if (XRGeneralSettings.Instance != null &&
+                XRGeneralSettings.Instance.Manager != null &&
+                XRGeneralSettings.Instance.Manager.activeLoader != null &&
+                XRGeneralSettings.Instance.Manager.activeLoader.name == "Open XR Loader" &&
+                OpenXRSettings.Instance != null &&
                 OpenXRSettings.Instance.GetFeature<HandTrackingFeature>() != null &&
                 OpenXRSettings.Instance.GetFeature<HandTrackingFeature>().SupportsHandTracking)
             {
-                return true;
+                if (OpenXRSettings.Instance.GetFeature<HandTrackingFeature>().IsUltraleapHandTracking)
+                {
+                    _trackingSource = TrackingSource.OPENXR_LEAP;
+                }
+                else
+                {
+                    _trackingSource = TrackingSource.OPENXR;
+                }
+            }
+            else
+            {
+                _trackingSource = TrackingSource.NONE;
             }
 
-            return false;
+            return _trackingSource;
         }
 
         private void Update()
@@ -185,7 +208,7 @@ namespace Ultraleap.Tracking.OpenXR
                             0f,
                             joints[(int)HandJoint.ThumbMetacarpal].Radius * 2f,
                             (Bone.BoneType)boneIndex,
-                            joints[(int)HandJoint.ThumbMetacarpal].Pose.rotation);
+                            hand.Rotation * Quaternion.Euler(0, hand.IsLeft ? HAND_ROTATION_OFFSET_Y : -HAND_ROTATION_OFFSET_Y, hand.IsLeft ? HAND_ROTATION_OFFSET_Z : -HAND_ROTATION_OFFSET_Z));
                         continue;
                     }
 
@@ -201,8 +224,13 @@ namespace Ultraleap.Tracking.OpenXR
                         (Bone.BoneType)boneIndex,
                         prevJoint.Pose.rotation);
                     fingerWidth = Math.Max(fingerWidth, bone.Width);
-                    fingerLength += bone.Length;
                     xrTipIndex = xrNextIndex;
+
+                    // Ignore metacarpals when calculating finger lengths
+                    if (boneIndex != 0)
+                    {
+                        fingerLength += bone.Length;
+                    }
                 }
 
                 // Populate the higher - level finger data.
@@ -393,7 +421,12 @@ namespace Ultraleap.Tracking.OpenXR
                 (_backingUntransformedEditTimeFrame ??= new Frame()).Hands.Clear();
                 _backingUntransformedEditTimeFrame.Hands.Add(EditTimeLeftHand);
                 _backingUntransformedEditTimeFrame.Hands.Add(EditTimeRightHand);
-                _backingEditTimeFrame = _backingUntransformedEditTimeFrame.TransformedCopy(new LeapTransform(mainCamera.transform));
+
+                if (mainCamera != null)
+                {
+                    _backingEditTimeFrame = _backingUntransformedEditTimeFrame.TransformedCopy(new LeapTransform(mainCamera.transform));
+                }
+
                 return _backingEditTimeFrame;
             }
         }

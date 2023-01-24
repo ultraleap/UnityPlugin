@@ -50,6 +50,10 @@ namespace Leap.Unity.HandsModule
         [Tooltip("Set the assigned transforms to the same position as the Leap Hand")]
         public bool SetPositions = true;
 
+
+        [Tooltip("Moves the elbow so that when the forearm scales the bone doesnt clip into the hand model. Particularly useful for non-skinned hands.")]
+        public bool UseScaleToPositionElbow = false;
+
         /// <summary> 
         /// Set the assigned transforms to the same position as the Leap Hand 
         /// </summary>
@@ -60,6 +64,12 @@ namespace Leap.Unity.HandsModule
         /// Should the hand binder modify the scale of the hand
         /// </summary>
         public bool SetModelScale = true;
+
+        /// <summary>
+        /// A multiplier to the base speed of the lerp when scaling hands
+        /// </summary>
+        [Tooltip("A multiplier used to adjust the default interpolation of hand scaling, 1 = default, 0.01 = slowest, 100 = fastest"), Range(0.01f, 100f)]
+        public float ScalingSpeedMultiplier = 1;
 
         /// <summary> 
         /// User defined offsets in editor script 
@@ -203,7 +213,7 @@ namespace Leap.Unity.HandsModule
             else // Lerp the scale during playmode
             {
                 var targetScale = BoundHand.startScale * scaleRatio;
-                transform.localScale = Vector3.Lerp(transform.localScale, targetScale, Time.deltaTime);
+                transform.localScale = Vector3.Lerp(transform.localScale, targetScale, Time.deltaTime * ScalingSpeedMultiplier);
             }
         }
 
@@ -250,7 +260,7 @@ namespace Leap.Unity.HandsModule
                 else // Lerp the scale during playmode
                 {
                     //Lerp the scale to the target scale
-                    distalBone.boundTransform.localScale = Vector3.Lerp(distalBone.boundTransform.localScale, scale, Time.deltaTime);
+                    distalBone.boundTransform.localScale = Vector3.Lerp(distalBone.boundTransform.localScale, scale, Time.deltaTime * ScalingSpeedMultiplier);
                 }
             }
         }
@@ -260,13 +270,22 @@ namespace Leap.Unity.HandsModule
         /// </summary>
         void TransformElbow()
         {
+
+
             if (BoundHand.elbow.boundTransform != null)
             {
+
+                float scaleElbowLength = 1;
+                if (UseScaleToPositionElbow)
+                {
+                    scaleElbowLength = BoundHand.elbow.boundTransform.lossyScale.z;
+                }
+
                 //Calculate the direction of the elbow 
                 Vector3 dir = -LeapHand.Arm.Direction.normalized;
 
                 //Position the elbow at the models elbow length
-                Vector3 position = LeapHand.WristPosition + dir * (ElbowLength);
+                Vector3 position = LeapHand.WristPosition + dir * (ElbowLength * scaleElbowLength);
 
                 if (SetModelScale)
                 {
@@ -278,7 +297,7 @@ namespace Leap.Unity.HandsModule
                     else
                     {
                         //Use the models length to position the elbow and allow it to be mofied by elbow offset
-                        position = LeapHand.WristPosition + dir * (ElbowLength * BoundHand.elbowOffset);
+                        position = LeapHand.WristPosition + dir * ((ElbowLength * scaleElbowLength) * BoundHand.elbowOffset);
                     }
                 }
                 else
