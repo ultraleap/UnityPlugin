@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2023.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -35,15 +35,25 @@ namespace Leap.Unity
 
         private static void InitStatic()
         {
-            s_provider = Object.FindObjectOfType<LeapServiceProvider>();
+            // Fall through to the best available Leap Provider if none is assigned
             if (s_provider == null)
             {
-                s_provider = Object.FindObjectOfType<LeapProvider>();
+                s_provider = Object.FindObjectOfType<PostProcessProvider>();
                 if (s_provider == null)
                 {
-                    return;
+                    s_provider = Object.FindObjectOfType<XRLeapProviderManager>();
+                    if (s_provider == null)
+                    {
+                        s_provider = Object.FindObjectOfType<LeapProvider>();
+                        if (s_provider == null)
+                        {
+                            Debug.Log("There are no Leap Providers in the scene, please assign one manually");
+                            return;
+                        }
+                    }
                 }
             }
+            Debug.Log("LeapProvider was not assigned. Auto assigning: " + s_provider);
 
             Camera providerCamera = s_provider.GetComponentInParent<Camera>();
             if (providerCamera == null) return;

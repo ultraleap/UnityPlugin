@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2023.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -80,7 +80,7 @@ namespace Leap.Unity
         /// <summary>
         /// The chosen source of hand tracking data
         /// </summary>
-        [Tooltip("AUTOMATIC - Windows will use LeapService, other platforms will use OpenXR if available and LeapService if OpenXR if not" +
+        [Tooltip("AUTOMATIC - Windows will use LeapService, other platforms will use OpenXR if available and LeapService if OpenXR is not" +
                     "OPEN_XR - Use OpenXR as the source of tracking" +
                     "LEAP_DIRECT - Directly use LeapC as the source of tracking")]
         public TrackingSourceType trackingSource;
@@ -95,8 +95,8 @@ namespace Leap.Unity
             if (trackingSource == TrackingSourceType.AUTOMATIC)
             {
 #if XR_MANAGEMENT_AVAILABLE
-                while (XRGeneralSettings.Instance == null &&
-                        XRGeneralSettings.Instance.Manager == null &&
+                while (XRGeneralSettings.Instance == null ||
+                        XRGeneralSettings.Instance.Manager == null ||
                         XRGeneralSettings.Instance.Manager.activeLoader == null)
                 {
                     yield return new WaitForEndOfFrame();

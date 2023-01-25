@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2023.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -131,7 +131,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
                     if (jointIndex == 0)
                     {
-                        SetupKnuckleDrives(physicsHand.jointBodies[boneArrayIndex], fingerIndex, stiffness, forceLimit, strength);
+                        SetupKnuckleDrives(physicsHand.jointBodies[boneArrayIndex], leapHand.IsLeft, fingerIndex, stiffness, forceLimit, strength);
 
                         physicsHand.defaultRotations[fingerIndex] = knuckleBone.Rotation;
                     }
@@ -148,7 +148,10 @@ namespace Leap.Unity.Interaction.PhysicsHands
             return physicsHandComponent;
         }
 
-        public static void SetupHand(PhysicsHand.Hand physicsHand, Leap.Hand leapHand)
+        // Magic 0th thumb bone rotation offsets from LeapC
+        public const float HAND_ROTATION_OFFSET_Y = 25.9f, HAND_ROTATION_OFFSET_Z = -63.45f;
+
+        public static void SetupHand(PhysicsHand.Hand physicsHand, Leap.Hand leapHand, int solverIterations = 50, int solverVelocity = 20)
         {
             // A large amount of this function is done to reset the hand to the correct values if they have been changed in the editor
             // Move the root of the hand
@@ -173,7 +176,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
             SetupPalmCollider(physicsHand.palmCollider, leapHand, physicsHand.physicMaterial);
 
-            SetupPalmBody(physicsHand.palmBody, physicsHand.boneMass * 3f);
+            SetupPalmBody(physicsHand.palmBody, physicsHand.boneMass * 3f, solverIterations: solverIterations, solverVelocity: solverVelocity);
             physicsHand.palmBone.SetBoneIndexes(5, 0);
             physicsHand.palmBody.WakeUp();
 
@@ -215,20 +218,16 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
                     SetupBoneCollider(physicsHand.jointColliders[boneArrayIndex], bone, physicsHand.physicMaterial);
 
-                    SetupBoneBody(physicsHand.jointBodies[boneArrayIndex], physicsHand.boneMass);
+                    SetupBoneBody(physicsHand.jointBodies[boneArrayIndex], physicsHand.boneMass, solverIterations: solverIterations, solverVelocity: solverVelocity);
 
                     if (jointIndex == 0)
                     {
-                        SetupKnuckleDrives(physicsHand.jointBodies[boneArrayIndex], fingerIndex, physicsHand.stiffness, physicsHand.forceLimit, physicsHand.strength);
+                        SetupKnuckleDrives(physicsHand.jointBodies[boneArrayIndex], leapHand.IsLeft, fingerIndex, physicsHand.stiffness, physicsHand.forceLimit, physicsHand.strength);
 
-                        physicsHand.jointBodies[boneArrayIndex].parentAnchorPosition = InverseTransformPoint(leapHand.PalmPosition, leapHand.Rotation, fingerIndex == 0 ? knuckleBone.PrevJoint : knuckleBone.NextJoint);
+                        physicsHand.jointBodies[boneArrayIndex].parentAnchorPosition = InverseTransformPoint(leapHand.PalmPosition, leapHand.Rotation, knuckleBone.NextJoint);
                         if (fingerIndex == 0)
                         {
-                            physicsHand.jointBodies[boneArrayIndex].parentAnchorRotation = Quaternion.Euler(0, leapHand.IsLeft ? 25f : -25f, leapHand.IsLeft ? -65f : 65f);
-                        }
-                        else
-                        {
-                            physicsHand.jointBodies[boneArrayIndex].parentAnchorRotation = Quaternion.Inverse(physicsHand.defaultRotations[PhysicsHand.Hand.FINGERS]) * physicsHand.defaultRotations[fingerIndex];
+                            physicsHand.jointBodies[boneArrayIndex].parentAnchorRotation = Quaternion.Euler(0, leapHand.IsLeft ? HAND_ROTATION_OFFSET_Y : -HAND_ROTATION_OFFSET_Y, leapHand.IsLeft ? HAND_ROTATION_OFFSET_Z : -HAND_ROTATION_OFFSET_Z);
                         }
                     }
                     else
@@ -236,6 +235,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                         SetupBoneDrives(physicsHand.jointBodies[boneArrayIndex], physicsHand.stiffness, physicsHand.forceLimit, physicsHand.strength);
 
                         physicsHand.jointBodies[boneArrayIndex].parentAnchorPosition = InverseTransformPoint(prevBone.PrevJoint, prevBone.Rotation, bone.PrevJoint);
+                        physicsHand.jointBodies[boneArrayIndex].parentAnchorRotation = Quaternion.identity;
                     }
 
                     physicsHand.jointBones[boneArrayIndex].SetBoneIndexes(fingerIndex, jointIndex);
@@ -311,12 +311,12 @@ namespace Leap.Unity.Interaction.PhysicsHands
             bone.linearDamping = 0f;
         }
 
-        public static void SetupKnuckleDrives(ArticulationBody knuckle, int fingerIndex, float stiffness, float forceLimit, float strength)
+        public static void SetupKnuckleDrives(ArticulationBody knuckle, bool isLeft, int fingerIndex, float stiffness, float forceLimit, float strength)
         {
-            knuckle.twistLock = ArticulationDofLock.LimitedMotion;
-            knuckle.swingYLock = fingerIndex == 0 ? ArticulationDofLock.FreeMotion : ArticulationDofLock.LimitedMotion;
-            knuckle.swingZLock = ArticulationDofLock.LimitedMotion;
             knuckle.jointType = ArticulationJointType.SphericalJoint;
+            knuckle.twistLock = ArticulationDofLock.LimitedMotion;
+            knuckle.swingYLock = ArticulationDofLock.LimitedMotion;
+            knuckle.swingZLock = ArticulationDofLock.LimitedMotion;
 
             ArticulationDrive xDrive = new ArticulationDrive()
             {
@@ -326,6 +326,12 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 lowerLimit = -30f,
                 upperLimit = 80f
             };
+
+            if (fingerIndex == 0)
+            {
+                xDrive.lowerLimit = -45f;
+                xDrive.upperLimit = 45f;
+            }
 
             knuckle.xDrive = xDrive;
 
@@ -338,14 +344,26 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 upperLimit = 15f
             };
 
+            if (fingerIndex == 0)
+            {
+                yDrive.lowerLimit = isLeft ? -10f : -50f;
+                yDrive.upperLimit = isLeft ? 50f : 10f;
+            }
+
             knuckle.yDrive = yDrive;
+
+            // Set Z limits to 0, locking them causes insane jittering
+            yDrive.lowerLimit = 0f;
+            yDrive.upperLimit = 0f;
             knuckle.zDrive = yDrive;
         }
 
         public static void SetupBoneDrives(ArticulationBody bone, float stiffness, float forceLimit, float strength)
         {
-            bone.jointType = ArticulationJointType.RevoluteJoint;
+            bone.jointType = ArticulationJointType.SphericalJoint;
             bone.twistLock = ArticulationDofLock.LimitedMotion;
+            bone.swingYLock = ArticulationDofLock.LimitedMotion;
+            bone.swingZLock = ArticulationDofLock.LimitedMotion;
 
             ArticulationDrive xDrive = new ArticulationDrive()
             {
@@ -357,6 +375,22 @@ namespace Leap.Unity.Interaction.PhysicsHands
             };
 
             bone.xDrive = xDrive;
+
+            ArticulationDrive yDrive = new ArticulationDrive()
+            {
+                stiffness = stiffness * strength,
+                forceLimit = forceLimit * strength / Time.fixedDeltaTime,
+                damping = 2f,
+                lowerLimit = -8f,
+                upperLimit = 8f
+            };
+
+            bone.yDrive = yDrive;
+
+            // Set Z limits to 0, locking them causes insane jittering
+            yDrive.lowerLimit = 0f;
+            yDrive.upperLimit = 0f;
+            bone.zDrive = yDrive;
         }
 
         public static void SetupPalmCollider(BoxCollider collider, Hand hand, PhysicMaterial material = null)
@@ -411,7 +445,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                     }
                     else
                     {
-                        capsuleGameObject.transform.localPosition = Vector3.forward * prevBone.Length;
+                        capsuleGameObject.transform.localPosition = physicsHand.transform.InverseTransformPoint(prevBone.PrevJoint);
                     }
 
                     capsuleGameObject.transform.rotation = knuckleBone.Rotation;
@@ -434,7 +468,11 @@ namespace Leap.Unity.Interaction.PhysicsHands
                     }
                     else
                     {
-                        physicsHand.jointBodies[boneArrayIndex].parentAnchorPosition = InverseTransformPoint(leapHand.PalmPosition, leapHand.Rotation, fingerIndex == 0 ? knuckleBone.PrevJoint : knuckleBone.NextJoint);
+                        physicsHand.jointBodies[boneArrayIndex].parentAnchorPosition = InverseTransformPoint(leapHand.PalmPosition, leapHand.Rotation, knuckleBone.NextJoint);
+                        if (fingerIndex == 0)
+                        {
+                            physicsHand.jointBodies[boneArrayIndex].parentAnchorRotation = Quaternion.Euler(0, leapHand.IsLeft ? HAND_ROTATION_OFFSET_Y : -HAND_ROTATION_OFFSET_Y, leapHand.IsLeft ? HAND_ROTATION_OFFSET_Z : -HAND_ROTATION_OFFSET_Z);
+                        }
                     }
 
                     lastTransform = capsuleGameObject.transform;
@@ -482,9 +520,20 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
         #region Hand Updating
 
+        public static void UpdateIterations(ref PhysicsHand.Hand physicsHand, int solverIterations, int velocityIterations)
+        {
+            physicsHand.palmBody.solverIterations = solverIterations;
+            physicsHand.palmBody.solverVelocityIterations = velocityIterations;
+
+            for (int i = 0; i < physicsHand.jointBodies.Length; i++)
+            {
+                physicsHand.jointBodies[i].solverIterations = solverIterations;
+                physicsHand.jointBodies[i].solverVelocityIterations = velocityIterations;
+            }
+        }
+
         public static void UpdatePhysicsPalm(ref PhysicsHand.Hand physicsHand, Vector3 position, Quaternion rotation, float interpFactor = 0f, float distanceForceReduction = 0f)
         {
-            physicsHand.oldPosition = physicsHand.transform.position;
             // Apply tracking position velocity
             physicsHand.palmBody.velocity *= 0;
 
@@ -518,22 +567,20 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 Mathf.DeltaAngle(0, rotationDelta.eulerAngles.z)) / Time.fixedDeltaTime) * Mathf.Deg2Rad, 45f * physicsHand.strength);
         }
 
-        public static float CalculateXTargetAngle(Bone previous, Bone current, int fingerIndex, int jointIndex)
-        {
-            return
-                ((fingerIndex == 0 && jointIndex == 0) ? 90f : 0) +
-                AngleOffAroundAxis(
-                        previous.Rotation * ((fingerIndex == 0 && jointIndex == 0) ? -Vector3.up : Vector3.forward),
-                        current.Direction,
-                        previous.Rotation * Vector3.right);
-        }
-
-        public static float CalculateYTargetAngle(Bone previous, Bone current)
+        public static float CalculateXJointAngle(Quaternion previous, Vector3 direction)
         {
             return AngleOffAroundAxis(
-                            previous.Rotation * Vector3.right,
-                            current.Rotation * Vector3.right,
-                            previous.Rotation * Vector3.up);
+                        previous * Vector3.forward,
+                        direction,
+                        previous * Vector3.right);
+        }
+
+        public static float CalculateYJointAngle(Quaternion previous, Quaternion current)
+        {
+            return AngleOffAroundAxis(
+                            previous * Vector3.right,
+                            current * Vector3.right,
+                            previous * Vector3.up);
         }
 
         /// <summary>

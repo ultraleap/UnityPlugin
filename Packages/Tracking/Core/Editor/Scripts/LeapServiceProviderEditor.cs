@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2023.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -63,6 +63,7 @@ namespace Leap.Unity
             specifyCustomDrawer("_specificSerialNumber", drawSerialNumberToggle);
 
             deferProperty("_serverNameSpace");
+            deferProperty("_useInterpolation");
 
             if (!(LeapServiceProvider is LeapXRServiceProvider))
             {
@@ -72,6 +73,7 @@ namespace Leap.Unity
             {
                 hideField("_trackingOptimization");
             }
+            addPropertyToFoldout("_useInterpolation", "Advanced Options");
             addPropertyToFoldout("_serverNameSpace", "Advanced Options");
         }
 
