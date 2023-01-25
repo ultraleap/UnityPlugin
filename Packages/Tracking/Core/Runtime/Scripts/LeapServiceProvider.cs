@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2023.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -30,15 +30,21 @@ namespace Leap.Unity
     {
         #region Constants
 
-        /// <summary>
-        /// Converts nanoseconds to seconds.
-        /// </summary>
+        [Obsolete("This const is named incorrectly. Use US_TO_S instead.")]
         protected const double NS_TO_S = 1e-6;
 
-        /// <summary>
-        /// Converts seconds to nanoseconds.
-        /// </summary>
+        [Obsolete("This const is named incorrectly. Use S_TO_US instead.")]
         protected const double S_TO_NS = 1e6;
+
+        /// <summary>
+        /// Converts Microseconds to seconds.
+        /// </summary>
+        protected const double US_TO_S = 1e-6;
+
+        /// <summary>
+        /// Converts seconds to Microseconds.
+        /// </summary>
+        protected const double S_TO_US = 1e6;
 
         /// <summary>
         /// The transform array used for late-latching.
@@ -608,7 +614,7 @@ namespace Leap.Unity
                 _smoothedTrackingLatency.Update((float)(_leapController.Now() - _leapController.FrameTimestamp()), Time.deltaTime);
 #endif
                 long timestamp = CalculateInterpolationTime() + (ExtrapolationAmount * 1000);
-                _unityToLeapOffset = timestamp - (long)(Time.time * S_TO_NS);
+                _unityToLeapOffset = timestamp - (long)(Time.time * S_TO_US);
 
                 _leapController.GetInterpolatedFrameFromTime(_untransformedUpdateFrame, timestamp, CalculateInterpolationTime() - (BounceAmount * 1000), _currentDevice);
             }
@@ -644,7 +650,7 @@ namespace Leap.Unity
                         // timeline as Update.  We add an extrapolation value to help compensate
                         // for latency.
                         float extrapolatedTime = Time.fixedTime + CalculatePhysicsExtrapolation();
-                        timestamp = (long)(extrapolatedTime * S_TO_NS) + _unityToLeapOffset;
+                        timestamp = (long)(extrapolatedTime * S_TO_US) + _unityToLeapOffset;
                         break;
                     case FrameOptimizationMode.ReusePhysicsForUpdate:
                         // If we are re-using physics frames for update, we don't even want to care

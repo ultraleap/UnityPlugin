@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2023.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -81,6 +81,14 @@ namespace Leap.Unity.Interaction.PhysicsHands
         public float HandGraspTeleportDistance => _handGraspTeleportDistance;
         [SerializeField, Tooltip("The distance between the physics and original data hand can reach before it snaps back to the original hand position. This is used when a hand is reported as grasping."), Range(0.01f, 0.5f)]
         private float _handGraspTeleportDistance = 0.2f;
+
+        public int SolverIterations => _handSolverIterations;
+        [SerializeField, Tooltip("The solver iterations used when calculating the hand. This can be different to your overall project iterations. Higher numbers will be more robust, but more expensive to compute."), Min(10f)]
+        private int _handSolverIterations = 15;
+
+        public int SolverVelocityIterations => _handSolverVelocityIterations;
+        [SerializeField, Tooltip("The solver iterations used when calculating the hand velocity. This can be different to your overall project iterations. Higher numbers will be more robust, but more expensive to compute."), Min(5f)]
+        private int _handSolverVelocityIterations = 5;
 
         // Helper Settings
         [SerializeField, Tooltip("Enabling helpers is recommended as these allow the user to pick up objects they normally would not be able to. " +
@@ -809,7 +817,5 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 editTimePose = inputLeapProvider.editTimePose;
             }
         }
-
     }
-
 }
