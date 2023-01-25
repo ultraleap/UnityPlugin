@@ -22,6 +22,11 @@ namespace Leap.Unity.Interaction
         public override void OnInspectorGUI()
         {
             GetProperties();
+
+            EditorGUI.BeginDisabledGroup(true);
+            EditorGUILayout.ObjectField("Script", MonoScript.FromMonoBehaviour((MonoBehaviour)target), GetType(), false);
+            EditorGUI.EndDisabledGroup();
+
             EditorGUILayout.LabelField("Setup", EditorStyles.boldLabel);
 
             EditorGUILayout.PropertyField(_attachedObject);
