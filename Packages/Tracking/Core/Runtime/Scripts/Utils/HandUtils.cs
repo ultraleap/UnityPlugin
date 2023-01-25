@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2023.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -36,7 +36,7 @@ namespace Leap.Unity
         private static void InitStatic()
         {
             // Fall through to the best available Leap Provider if none is assigned
-            if(s_provider == null)
+            if (s_provider == null)
             {
                 s_provider = Object.FindObjectOfType<PostProcessProvider>();
                 if (s_provider == null)
@@ -49,7 +49,7 @@ namespace Leap.Unity
                         {
                             Debug.Log("There are no Leap Providers in the scene, please assign one manually");
                             return;
-                        }      
+                        }
                     }
                 }
             }

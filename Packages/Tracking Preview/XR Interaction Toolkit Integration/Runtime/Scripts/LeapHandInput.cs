@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2023.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -9,14 +9,14 @@
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
+using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.InputSystem.XR;
 using UnityEngine.InputSystem.Controls;
 using UnityEngine.InputSystem.Layouts;
 using UnityEngine.InputSystem.LowLevel;
 using UnityEngine.InputSystem.Utilities;
-using System.Linq;
+using UnityEngine.InputSystem.XR;
 
 namespace Leap.Unity.Preview.InputActions
 {
@@ -92,43 +92,43 @@ namespace Leap.Unity.Preview.InputActions
     /// The structure used to pass hand data to InputDevices
     /// </summary>
     public struct LeapHandState : IInputStateTypeInfo
-{
-    public FourCC format => new FourCC('L', 'H', 'N', 'D');
+    {
+        public FourCC format => new FourCC('L', 'H', 'N', 'D');
 
-    #region Tracking ID
+        #region Tracking ID
 
-    [InputControl(name = "Tracked", layout = "Integer")]
-    public int tracked;
+        [InputControl(name = "Tracked", layout = "Integer")]
+        public int tracked;
 
-    #endregion
+        #endregion
 
-    #region Palm
+        #region Palm
 
-    [InputControl(name = "Palm Position", layout = "Vector3")]
-    public Vector3 position;
+        [InputControl(name = "Palm Position", layout = "Vector3")]
+        public Vector3 position;
 
-    [InputControl(name = "Palm Direction", layout = "Quaternion")]
-    public Quaternion direction;
+        [InputControl(name = "Palm Direction", layout = "Quaternion")]
+        public Quaternion direction;
 
-    #endregion
+        #endregion
 
-    #region Index
+        #region Index
 
-    [InputControl(name = "Index Tip Position", layout = "Vector3")]
-    public Vector3 indexTipPosition;
+        [InputControl(name = "Index Tip Position", layout = "Vector3")]
+        public Vector3 indexTipPosition;
 
-    #endregion
+        #endregion
 
-    #region Extras
+        #region Extras
 
-    [InputControl(name = "Is Pinching", layout = "Button")]
-    public float isPinching;
+        [InputControl(name = "Is Pinching", layout = "Button")]
+        public float isPinching;
 
-    [InputControl(name = "Is Grabbing", layout = "Button")]
-    public float isGrabbing;
+        [InputControl(name = "Is Grabbing", layout = "Button")]
+        public float isGrabbing;
 
-    #endregion
-}
+        #endregion
+    }
     /// <summary>
     /// An Input Device generated using two individual hand Input Devices representing left and right hands.
     /// </summary>
