@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2023.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -158,6 +158,10 @@ namespace Leap.Unity.Preview.HandRays
         /// </summary>
         public Vector3[] HipPositions { get; private set; }
 
+        /// <summary>
+        /// Inferred waist position, calculated the midpoint between the two hips
+        /// </summary>
+        public Vector3 WaistPosition { get { return Vector3.Lerp(HipPositions[0], HipPositions[1], 0.5f); } }
 
         private void Start()
         {

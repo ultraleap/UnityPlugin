@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2023.                                   *
  * Ultraleap proprietary and confidential.                                    *
  *                                                                            *
  * Use subject to the terms of the Leap Motion SDK Agreement available at     *
@@ -247,7 +247,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                         _wasGraspingBones[boneArrayIndex] = false;
                         ArticulationBody body = _physicsHand.jointBodies[boneArrayIndex];
 
-                        float xTargetAngle = PhysicsHandsUtils.CalculateXTargetAngle(prevBone, bone, fingerIndex, jointIndex);
+                        float xTargetAngle = PhysicsHandsUtils.CalculateXJointAngle(prevBone.Rotation, bone.Direction);
                         body.xDrive = new ArticulationDrive()
                         {
                             stiffness = _physicsHand.stiffness * _physicsHand.strength,
@@ -258,20 +258,16 @@ namespace Leap.Unity.Interaction.PhysicsHands
                             target = _wasGraspingBones[boneArrayIndex] ? Mathf.Clamp(xTargetAngle, body.xDrive.lowerLimit, _graspingXDrives[boneArrayIndex]) : xTargetAngle
                         };
 
-                        if (jointIndex == 0)
+                        float yTargetAngle = PhysicsHandsUtils.CalculateYJointAngle(prevBone.Rotation, bone.Rotation);
+                        body.yDrive = new ArticulationDrive()
                         {
-                            float yTargetAngle = PhysicsHandsUtils.CalculateYTargetAngle(prevBone, bone);
-
-                            body.yDrive = new ArticulationDrive()
-                            {
-                                stiffness = _physicsHand.stiffness * _physicsHand.strength,
-                                forceLimit = _physicsHand.forceLimit * _physicsHand.strength / Time.fixedDeltaTime,
-                                damping = body.yDrive.damping,
-                                upperLimit = body.yDrive.upperLimit,
-                                lowerLimit = body.yDrive.lowerLimit,
-                                target = yTargetAngle
-                            };
-                        }
+                            stiffness = _physicsHand.stiffness * _physicsHand.strength,
+                            forceLimit = _physicsHand.forceLimit * _physicsHand.strength / Time.fixedDeltaTime,
+                            damping = body.yDrive.damping,
+                            upperLimit = body.yDrive.upperLimit,
+                            lowerLimit = body.yDrive.lowerLimit,
+                            target = yTargetAngle
+                        };
                     }
                 }
 
@@ -314,10 +310,14 @@ namespace Leap.Unity.Interaction.PhysicsHands
             if (!_hasReset && _resetWait > 0)
             {
                 _resetWait--;
-                if (_resetWait == 0)
+                if (_resetWait == 1)
                 {
                     DelayedReset();
-                    _hasReset = true;
+                    return;
+                }
+                else if (_resetWait == 0)
+                {
+                    CompleteReset();
                 }
                 else
                 {
@@ -413,7 +413,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                         }
                     }
 
-                    float xTargetAngle = PhysicsHandsUtils.CalculateXTargetAngle(prevBone, bone, fingerIndex, jointIndex);
+                    float xTargetAngle = PhysicsHandsUtils.CalculateXJointAngle(prevBone.Rotation, bone.Direction);
 
                     // Clamp the max until we've moved the physicsBone to a lower amount than originally grasped at
                     if (_wasGraspingBones[boneArrayIndex] && (xTargetAngle < _graspingXDrives[boneArrayIndex] || Mathf.InverseLerp(body.xDrive.lowerLimit, _physicsHand.jointBones[boneArrayIndex].OriginalXDriveLimit, xTargetAngle) < .25f))
@@ -422,26 +422,19 @@ namespace Leap.Unity.Interaction.PhysicsHands
                     }
 
                     ArticulationDrive xDrive = body.xDrive;
-
                     xDrive.stiffness = _physicsHand.stiffness * _physicsHand.strength;
                     xDrive.forceLimit = _wasGraspingBones[boneArrayIndex] ? 0.05f / Time.fixedDeltaTime : _physicsHand.forceLimit * _physicsHand.strength / Time.fixedDeltaTime;
                     xDrive.upperLimit = _graspingFingers[fingerIndex] > jointIndex ? body.xDrive.target : _physicsHand.jointBones[boneArrayIndex].OriginalXDriveLimit;
                     xDrive.target = _wasGraspingBones[boneArrayIndex] ? Mathf.Clamp(xTargetAngle, body.xDrive.lowerLimit, _graspingXDrives[boneArrayIndex]) : xTargetAngle;
-
                     body.xDrive = xDrive;
 
-                    if (jointIndex == 0)
-                    {
-                        float yTargetAngle = PhysicsHandsUtils.CalculateYTargetAngle(prevBone, bone);
+                    float yTargetAngle = PhysicsHandsUtils.CalculateYJointAngle(prevBone.Rotation, bone.Rotation);
 
-                        ArticulationDrive yDrive = body.yDrive;
-
-                        yDrive.stiffness = _physicsHand.stiffness * _physicsHand.strength;
-                        yDrive.forceLimit = _physicsHand.forceLimit * _physicsHand.strength / Time.fixedDeltaTime;
-                        yDrive.target = yTargetAngle;
-
-                        body.yDrive = yDrive;
-                    }
+                    ArticulationDrive yDrive = body.yDrive;
+                    yDrive.stiffness = _physicsHand.stiffness * _physicsHand.strength;
+                    yDrive.forceLimit = _physicsHand.forceLimit * _physicsHand.strength / Time.fixedDeltaTime;
+                    yDrive.target = yTargetAngle;
+                    body.yDrive = yDrive;
                 }
             }
 
@@ -483,7 +476,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
         {
             if (!_hasGenerated)
             {
-                PhysicsHandsUtils.SetupHand(_physicsHand, _originalLeapHand);
+                PhysicsHandsUtils.SetupHand(_physicsHand, _originalLeapHand, _physicsProvider.SolverIterations, _physicsProvider.SolverVelocityIterations);
                 _physicsHand.gameObject.SetActive(true);
                 _hasGenerated = true;
             }
@@ -491,8 +484,13 @@ namespace Leap.Unity.Interaction.PhysicsHands
             {
                 ResetPhysicsHand(true);
             }
-            _timeOnReset = Time.time;
+        }
+
+        private void CompleteReset()
+        {
+            PhysicsHandsUtils.UpdateIterations(ref _physicsHand, _physicsProvider.SolverIterations, _physicsProvider.SolverVelocityIterations);
             _leapHand.CopyFrom(_originalLeapHand);
+            _timeOnReset = Time.time;
             _hasReset = true;
             OnBeginPhysics?.Invoke();
         }

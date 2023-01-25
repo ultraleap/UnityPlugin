@@ -559,6 +559,8 @@ MonoBehaviour:
   buttonHeightLimit: 0.02
   _springForce: 100
   _springDampening: 5
+  isToggleable: 0
+  buttonToggleHeightLimit: 0.01
   _OnHover:
     m_PersistentCalls:
       m_Calls: []
@@ -578,6 +580,9 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   _OnPressedAmountChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  _OnToggle:
     m_PersistentCalls:
       m_Calls: []
 --- !u!54 &7298562659095329044
