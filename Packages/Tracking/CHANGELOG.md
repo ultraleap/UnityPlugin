@@ -12,7 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Interaction Grab Ball for 3D UI
 
 ### Changed
-- 
+- Capsule Hands pinky metacarpal position to better represent the actual joint position
 
 ### Fixed
 - 
