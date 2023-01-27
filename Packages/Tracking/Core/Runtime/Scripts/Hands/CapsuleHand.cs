@@ -21,6 +21,28 @@ namespace Leap.Unity
     /// </summary>
     public class CapsuleHand : HandModelBase
     {
+        public enum CapsuleHandPreset
+        {
+            DEFAULT,
+            CLASSIC,
+            MINIMAL,
+            ULTRALEAP
+        }
+
+        private CapsuleHandPreset _preset;
+        [SerializeField] public CapsuleHandPreset Preset
+        {
+            get
+            {
+                return _preset;
+            }
+            set
+            {
+                _preset = value;
+                ChangePreset(_preset);
+            }
+        }
+
         private const int TOTAL_JOINT_COUNT = 4 * 5;
         private const float CYLINDER_MESH_RESOLUTION = 0.1f; //in centimeters, meshes within this resolution will be re-used
         private const int PINKY_BASE_INDEX = (int)Finger.FingerType.TYPE_PINKY * 4;
@@ -38,6 +60,15 @@ namespace Leap.Unity
 
         [SerializeField]
         private bool _showPalmJoint = true;
+
+        [SerializeField]
+        private bool _showPinkyMetacarpal = true;
+
+        [SerializeField]
+        private bool _joinFingerProximals = true;
+
+        [SerializeField]
+        private bool _joinThumbProximal = true;
 
         [SerializeField]
         private bool _castShadows = true;
@@ -371,23 +402,29 @@ namespace Leap.Unity
                     int keyA = getFingerJointIndex(i, j);
                     int keyB = getFingerJointIndex(i, j + 1);
 
-                    Vector3 posA = _spherePositions[keyA];
-                    Vector3 posB = _spherePositions[keyB];
-
-                    drawCylinder(posA, posB);
+                    drawCylinder(_spherePositions[keyA], _spherePositions[keyB]);
                 }
             }
 
-            //Draw cylinders between finger knuckles
-            for (int i = 0; i < 4; i++)
+            // Draw cylinder between thumb and index finger
+            if (_joinThumbProximal)
             {
-                int keyA = getFingerJointIndex(i, 0);
-                int keyB = getFingerJointIndex(i + 1, 0);
+                int keyA = getFingerJointIndex(0, 0);
+                int keyB = getFingerJointIndex(1, 0);
 
-                Vector3 posA = _spherePositions[keyA];
-                Vector3 posB = _spherePositions[keyB];
+                drawCylinder(_spherePositions[keyA], _spherePositions[keyB]);
+            }
 
-                drawCylinder(posA, posB);
+            if (_joinFingerProximals)
+            {
+                //Draw cylinders between finger knuckles
+                for (int i = 1; i < 4; i++)
+                {
+                    int keyA = getFingerJointIndex(i, 0);
+                    int keyB = getFingerJointIndex(i + 1, 0);
+
+                    drawCylinder(_spherePositions[keyA], _spherePositions[keyB]);
+                }
             }
 
             if (_showPalmJoint)
@@ -398,12 +435,15 @@ namespace Leap.Unity
                 drawSphere(palmPosition, _palmRadius);
             }
 
-            Vector3 pinkyMetacarpal = _hand.GetPinky().Bone(Bone.BoneType.TYPE_METACARPAL).PrevJoint;
-            Vector3 indexMetacarpal = _hand.GetIndex().Bone(Bone.BoneType.TYPE_METACARPAL).PrevJoint;
-            
-            drawSphere(pinkyMetacarpal);
-            drawCylinder(pinkyMetacarpal, indexMetacarpal);
-            drawCylinder(pinkyMetacarpal, PINKY_BASE_INDEX);
+            if (_showPinkyMetacarpal)
+            {
+                Vector3 pinkyMetacarpal = _hand.GetPinky().Bone(Bone.BoneType.TYPE_METACARPAL).PrevJoint;
+                Vector3 indexMetacarpal = _hand.GetIndex().Bone(Bone.BoneType.TYPE_METACARPAL).PrevJoint;
+
+                drawSphere(pinkyMetacarpal);
+                drawCylinder(pinkyMetacarpal, indexMetacarpal);
+                drawCylinder(pinkyMetacarpal, PINKY_BASE_INDEX);
+            }
 
             if (SetIndividualSphereColors)
             {
@@ -540,6 +580,75 @@ namespace Leap.Unity
             _meshMap[lengthKey] = mesh;
 
             return mesh;
+        }
+
+        public void ChangePreset(CapsuleHandPreset preset)
+        {
+            _preset = preset;
+
+            switch (preset)
+            {
+                case CapsuleHandPreset.DEFAULT:
+                    _showArm = true;
+                    _showPalmJoint = false;
+                    _showPinkyMetacarpal = true;
+                    _joinFingerProximals = true;
+                    _joinThumbProximal = true;
+                    _castShadows = true;
+                    _cylinderResolution = 12;
+                    _jointRadius = 0.006f;
+                    _cylinderRadius = 0.006f;
+                    _useCustomColors = true;
+                    _sphereColor = Color.white;
+                    _cylinderColor = Color.white;
+                    break;
+                case CapsuleHandPreset.CLASSIC:
+                    _showArm = true;
+                    _showPalmJoint = true;
+                    _showPinkyMetacarpal = true;
+                    _joinFingerProximals = true;
+                    _joinThumbProximal = true;
+                    _castShadows = true;
+                    _cylinderResolution = 12;
+                    _jointRadius = 0.008f;
+                    _cylinderRadius = 0.006f;
+                    _palmRadius = 0.015f;
+                    _useCustomColors = false;
+                    _cylinderColor = Color.white;
+                    _leftColorList = new Color[] { new Color(0.0f, 0.0f, 1.0f), new Color(0.2f, 0.0f, 0.4f), new Color(0.0f, 0.2f, 0.2f) };
+                    _rightColorList = new Color[] { new Color(1.0f, 0.0f, 0.0f), new Color(1.0f, 1.0f, 0.0f), new Color(1.0f, 0.5f, 0.0f) };
+                    break;
+                case CapsuleHandPreset.MINIMAL:
+                    _showArm = true;
+                    _showPalmJoint = false;
+                    _showPinkyMetacarpal = false;
+                    _joinFingerProximals = true;
+                    _joinThumbProximal = true;
+                    _castShadows = true;
+                    _cylinderResolution = 12;
+                    _jointRadius = 0.006f;
+                    _cylinderRadius = 0.006f;
+                    _useCustomColors = true;
+                    _sphereColor = Color.white;
+                    _cylinderColor = Color.white;
+                    break;
+                case CapsuleHandPreset.ULTRALEAP:
+                    _showArm = true;
+                    _showPalmJoint = false;
+                    _showPinkyMetacarpal = true;
+                    _joinFingerProximals = true;
+                    _joinThumbProximal = true;
+                    _castShadows = true;
+                    _cylinderResolution = 12;
+                    _jointRadius = 0.006f;
+                    _cylinderRadius = 0.006f;
+                    _useCustomColors = true;
+                    _sphereColor = new Color(0.0f, 0.87f, 0.68f);
+                    _cylinderColor = new Color(0.0f, 0.87f, 0.68f);
+                    break;
+            }
+
+            OnValidate();
         }
     }
 }
