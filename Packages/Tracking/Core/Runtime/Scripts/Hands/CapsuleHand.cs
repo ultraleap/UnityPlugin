@@ -23,7 +23,6 @@ namespace Leap.Unity
     {
         private const int TOTAL_JOINT_COUNT = 4 * 5;
         private const float CYLINDER_MESH_RESOLUTION = 0.1f; //in centimeters, meshes within this resolution will be re-used
-        private const int THUMB_BASE_INDEX = (int)Finger.FingerType.TYPE_THUMB * 4;
         private const int PINKY_BASE_INDEX = (int)Finger.FingerType.TYPE_PINKY * 4;
 
         private static int _leftColorIndex = 0;
@@ -36,6 +35,9 @@ namespace Leap.Unity
 
         [SerializeField]
         private bool _showArm = true;
+
+        [SerializeField]
+        private bool _showPalmJoint = true;
 
         [SerializeField]
         private bool _castShadows = true;
@@ -388,11 +390,14 @@ namespace Leap.Unity
                 drawCylinder(posA, posB);
             }
 
-            //Now we just have a few more spheres for the hands
-            //PalmPos, WristPos, and the virtual palm drawn from the metacarpals.
-            Vector3 palmPosition = _hand.PalmPosition;
-            drawSphere(palmPosition, _palmRadius);
-            
+            if (_showPalmJoint)
+            {
+                //Now we just have a few more spheres for the hands
+                //PalmPos, WristPos, and the virtual palm drawn from the metacarpals.
+                Vector3 palmPosition = _hand.PalmPosition;
+                drawSphere(palmPosition, _palmRadius);
+            }
+
             Vector3 pinkyMetacarpal = _hand.GetPinky().Bone(Bone.BoneType.TYPE_METACARPAL).PrevJoint;
             Vector3 indexMetacarpal = _hand.GetIndex().Bone(Bone.BoneType.TYPE_METACARPAL).PrevJoint;
             
