@@ -271,6 +271,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: XR Leap Provider Manager
       objectReference: {fileID: 0}
+    - target: {fileID: 5270838610523157747, guid: d1c00f89ef60a3446ad9eef2d361e2a1, type: 3}
+      propertyPath: trackingSource
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 5270838610523157748, guid: d1c00f89ef60a3446ad9eef2d361e2a1, type: 3}
       propertyPath: m_RootOrder
       value: 2
@@ -2038,6 +2042,17 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1451537958}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &1531103995 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 114892109605653334, guid: 33edf201cbc6fe645ad9078697cd2aea, type: 3}
+  m_PrefabInstance: {fileID: 1032190193}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0625e574c0d47a241b7dfc7a8c67ca2b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!4 &1696508165 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3891926267328605169, guid: 7de8538a4edc3b54e814543f3ad21849, type: 3}
@@ -2796,7 +2811,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3891926267328605169, guid: 7de8538a4edc3b54e814543f3ad21849, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.8
+      value: 0.8000001
       objectReference: {fileID: 0}
     - target: {fileID: 3891926267328605169, guid: 7de8538a4edc3b54e814543f3ad21849, type: 3}
       propertyPath: m_LocalPosition.z
@@ -2808,15 +2823,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3891926267328605169, guid: 7de8538a4edc3b54e814543f3ad21849, type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 3891926267328605169, guid: 7de8538a4edc3b54e814543f3ad21849, type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 3891926267328605169, guid: 7de8538a4edc3b54e814543f3ad21849, type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 3891926267328605169, guid: 7de8538a4edc3b54e814543f3ad21849, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -2831,10 +2846,6 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3891926267328605170, guid: 7de8538a4edc3b54e814543f3ad21849, type: 3}
-      propertyPath: xRotation
-      value: 25
-      objectReference: {fileID: 0}
-    - target: {fileID: 3891926267328605170, guid: 7de8538a4edc3b54e814543f3ad21849, type: 3}
       propertyPath: attachedObject
       value: 
       objectReference: {fileID: 1057954427}
@@ -2842,5 +2853,13 @@ PrefabInstance:
       propertyPath: useAttachedObjectsXRotation
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 3891926267328605170, guid: 7de8538a4edc3b54e814543f3ad21849, type: 3}
+      propertyPath: drawGrabBallRestrictionGizmos
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3891926267328605171, guid: 7de8538a4edc3b54e814543f3ad21849, type: 3}
+      propertyPath: _manager
+      value: 
+      objectReference: {fileID: 1531103995}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 7de8538a4edc3b54e814543f3ad21849, type: 3}

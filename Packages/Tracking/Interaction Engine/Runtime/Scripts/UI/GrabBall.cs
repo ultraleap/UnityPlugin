@@ -10,6 +10,11 @@ using UnityEngine;
 
 namespace Leap.Unity.Interaction
 {
+    /// <summary>
+    /// A representation of an object with an attached object which can be restricted relative to the users head
+    /// 
+    /// Most useful for 3D UI panels to ensure they are reachable
+    /// </summary>
     public class GrabBall : MonoBehaviour
     {
         public struct GrabBallRestrictionStatus
@@ -31,10 +36,11 @@ namespace Leap.Unity.Interaction
         /// </summary>
         [HideInInspector] public Pose grabBallPose;
 
-        [Tooltip("The object controlled by the grab ball")]
-        public Transform attachedObject;
         [Tooltip("The interaction behaviour attached to the grab ball. If left empty, will attempt to find an Interaction Behaviour on the current gameobject")]
         public InteractionBehaviour grabBallInteractionBehaviour;
+
+        [Tooltip("The object controlled by the grab ball")]
+        public Transform attachedObject;
         [Tooltip("How fast the attached object lerps to its new pose, and how fast the grab ball lerps back to its position on ungrasp when restricted")]
         public float lerpSpeed = 10f;
 
@@ -50,10 +56,10 @@ namespace Leap.Unity.Interaction
         public float maxHorizontalDistanceFromHead = 0.5f;
         [Tooltip("The closest to your head horizontally that the grab ball can move")]
         public float minHorizontalDistanceFromHead = 0.1f;
-        [Tooltip("The furthest away from your head vertically that the grab ball can move")]
+        [Tooltip("The highest point from your head vertically that the grab ball can move. This value will be positive in most cases")]
         public float maxHeightFromHead = 0.3f;
-        [Tooltip("The closest to your head vertically that the grab ball can move")]
-        public float minHeightFromHead = 0.65f;
+        [Tooltip("The lowest point from your head vertically that the grab ball can move. This value will be negative in most cases")]
+        public float minHeightFromHead = -0.65f;
         public bool drawGrabBallRestrictionGizmos = true;
 
         private Pose _attachedObjectTargetPose = Pose.identity;
@@ -69,7 +75,11 @@ namespace Leap.Unity.Interaction
         private void OnEnable()
         {
             _attachedObjectOffset = InverseTransformPointUnscaled(grabBallInteractionBehaviour.transform, attachedObject.position);
-            if (useAttachedObjectsXRotation) { xRotation = attachedObject.rotation.eulerAngles.x; }
+
+            if (useAttachedObjectsXRotation)
+            {
+                xRotation = attachedObject.rotation.eulerAngles.x;
+            }
         }
 
         private void Start()
@@ -82,10 +92,13 @@ namespace Leap.Unity.Interaction
                 + "move a parent transform. You can modify this setting in "
                 + "Edit->Project Settings->Physics.");
             }
+
             _head = Camera.main.transform;
+
             if (grabBallInteractionBehaviour == null)
             {
                 grabBallInteractionBehaviour = GetComponent<InteractionBehaviour>();
+
                 if (grabBallInteractionBehaviour == null)
                 {
                     Debug.LogWarning("No interaction behaviour found for grab ball", gameObject);
@@ -99,8 +112,6 @@ namespace Leap.Unity.Interaction
 
         private void Update()
         {
-            _moveGrabBallToPositionOnUngrasp = true;
-
             if (grabBallInteractionBehaviour.isGrasped)
             {
                 UpdateAttachedObjectTargetPose();
@@ -108,15 +119,11 @@ namespace Leap.Unity.Interaction
             }
             else if (_moveGrabBallToPositionOnUngrasp)
             {
-                _moveGrabBallToPositionOnUngrasp = Vector3.Distance(grabBallInteractionBehaviour.transform.position, grabBallPose.position) > LERP_POSITION_LIMIT;
+                grabBallInteractionBehaviour.transform.position = Vector3.Lerp(grabBallInteractionBehaviour.transform.position, grabBallPose.position, Time.deltaTime * lerpSpeed);
 
-                if (_moveGrabBallToPositionOnUngrasp)
+                if (Vector3.Distance(grabBallInteractionBehaviour.transform.position, grabBallPose.position) < LERP_POSITION_LIMIT)
                 {
-                    grabBallInteractionBehaviour.transform.position = Vector3.Lerp(grabBallInteractionBehaviour.transform.position, grabBallPose.position, Time.deltaTime * lerpSpeed);
-                }
-                else
-                {
-                    grabBallInteractionBehaviour.transform.position = grabBallPose.position;
+                    _moveGrabBallToPositionOnUngrasp = false;
                 }
             }
 
@@ -138,10 +145,10 @@ namespace Leap.Unity.Interaction
         /// </summary>
         public void SetGrabBallOffset(Vector3 newOffset)
         {
-            _transformHelper.position = grabBallInteractionBehaviour.transform.position;
-            _transformHelper.transform.position = attachedObject.TransformPoint(newOffset);
+            _transformHelper.position = attachedObject.TransformPoint(newOffset);
             _transformHelper.rotation = attachedObject.rotation;
             _attachedObjectOffset = InverseTransformPointUnscaled(_transformHelper.transform, attachedObject.position);
+
             grabBallInteractionBehaviour.transform.position = _transformHelper.position;
         }
 
@@ -161,39 +168,57 @@ namespace Leap.Unity.Interaction
         /// </summary>
         private void RestrictGrabBallPosition()
         {
-            grabBallPose.position = grabBallInteractionBehaviour.transform.position;
-            Vector3 headAtGrabBallHeight = _head.position;
-            headAtGrabBallHeight.y = grabBallInteractionBehaviour.transform.position.y;
+            // Horizontal restriction
+            Vector3 grabBallHorizontalDiff = grabBallInteractionBehaviour.transform.position - _head.position;
+            grabBallHorizontalDiff.y = 0;
 
-            Vector3 grabBallDirection = (grabBallInteractionBehaviour.transform.position - headAtGrabBallHeight).normalized;
-            float clampedDistance = Vector3.Distance(headAtGrabBallHeight, grabBallInteractionBehaviour.transform.position);
-            clampedDistance = Mathf.Clamp(clampedDistance, minHorizontalDistanceFromHead, maxHorizontalDistanceFromHead);
+            float horizontalDistance = grabBallHorizontalDiff.magnitude;
 
-            grabBallRestrictionStatus.horizontalMax = clampedDistance >= maxHorizontalDistanceFromHead;
-
-            if (grabBallRestrictionStatus.horizontalMax)
+            if (horizontalDistance > maxHorizontalDistanceFromHead)
             {
-                grabBallPose.position = headAtGrabBallHeight + grabBallDirection * maxHorizontalDistanceFromHead;
+                // clamp distance to max
+                grabBallPose.position = _head.position + (grabBallHorizontalDiff.normalized * maxHorizontalDistanceFromHead);
+                grabBallRestrictionStatus.horizontalMax = true;
+                grabBallRestrictionStatus.horizontalMin = false;
+            }
+            else if (horizontalDistance < minHorizontalDistanceFromHead)
+            {
+                // clamp distance to min
+                grabBallPose.position = _head.position + (grabBallHorizontalDiff.normalized * minHorizontalDistanceFromHead);
+                grabBallRestrictionStatus.horizontalMin = true;
+                grabBallRestrictionStatus.horizontalMax = false;
+            }
+            else
+            {
+                // no restriction necessary
+                grabBallPose.position = grabBallInteractionBehaviour.transform.position;
+                grabBallRestrictionStatus.horizontalMax = false;
+                grabBallRestrictionStatus.horizontalMin = false;
             }
 
-            grabBallRestrictionStatus.horizontalMin = clampedDistance <= minHorizontalDistanceFromHead;
-            if (grabBallRestrictionStatus.horizontalMin)
-            {
-                grabBallPose.position = headAtGrabBallHeight + grabBallDirection * minHorizontalDistanceFromHead;
-            }
+            // Y restriction
+            float yDiff = grabBallInteractionBehaviour.transform.position.y - _head.position.y;
 
-            float verticalDistanceFromHead = grabBallInteractionBehaviour.transform.position.y - _head.position.y;
-
-            grabBallRestrictionStatus.heightMax = verticalDistanceFromHead >= maxHeightFromHead;
-            if (grabBallRestrictionStatus.heightMax)
+            if(yDiff > maxHeightFromHead)
             {
+                // clamp height to max
                 grabBallPose.position.y = _head.position.y + maxHeightFromHead;
+                grabBallRestrictionStatus.heightMax = true;
+                grabBallRestrictionStatus.heightMin = false;
             }
-
-            grabBallRestrictionStatus.heightMin = verticalDistanceFromHead <= -minHeightFromHead;
-            if (grabBallRestrictionStatus.heightMin)
+            else if(yDiff < minHeightFromHead)
             {
-                grabBallPose.position.y = _head.position.y - minHeightFromHead;
+                // clamp height to min
+                grabBallPose.position.y = _head.position.y + minHeightFromHead;
+                grabBallRestrictionStatus.heightMin = true;
+                grabBallRestrictionStatus.heightMax = false;
+            }
+            else
+            {
+                // no restriction necessary
+                grabBallPose.position.y = grabBallInteractionBehaviour.transform.position.y;
+                grabBallRestrictionStatus.heightMax = false;
+                grabBallRestrictionStatus.heightMin = false;
             }
         }
 
@@ -213,8 +238,7 @@ namespace Leap.Unity.Interaction
             _transformHelper.rotation = grabBallPose.rotation;
 
             _attachedObjectTargetPose.position = _transformHelper.TransformPoint(_attachedObjectOffset);
-            Quaternion attachedObjectRotation = LookAtRotationParallelToHorizon(attachedObject.transform.position, _head.position);
-            _attachedObjectTargetPose.rotation = Quaternion.Euler(xRotation, attachedObjectRotation.eulerAngles.y, attachedObjectRotation.eulerAngles.z);
+            _attachedObjectTargetPose.rotation = Quaternion.Euler(xRotation, grabBallPose.rotation.eulerAngles.y, grabBallPose.rotation.eulerAngles.z);
         }
         private bool IsAttachedObjectCloseToTargetPose()
         {
@@ -249,7 +273,7 @@ namespace Leap.Unity.Interaction
 
                 // Draw Horizontal Max Restriction
                 Vector3 centerPosition = _head.position;
-                centerPosition.y = Mathf.Clamp(grabBallInteractionBehaviour.transform.position.y, _head.position.y - minHeightFromHead, _head.position.y + maxHeightFromHead);
+                centerPosition.y = Mathf.Clamp(grabBallInteractionBehaviour.transform.position.y, _head.position.y + minHeightFromHead, _head.position.y + maxHeightFromHead);
                 Utils.DrawCircle(centerPosition, normal, maxHorizontalDistanceFromHead, grabBallRestrictionStatus.horizontalMax ? Color.green : Color.gray);
 
                 //Draw Horizontal Min Restriction
@@ -260,7 +284,7 @@ namespace Leap.Unity.Interaction
                 Utils.DrawCircle(centerPosition, normal, maxHorizontalDistanceFromHead, grabBallRestrictionStatus.heightMax ? Color.green : Color.gray);
 
                 //Draw Height Min Restriction
-                centerPosition.y = _head.position.y - minHeightFromHead;
+                centerPosition.y = _head.position.y + minHeightFromHead;
                 Utils.DrawCircle(centerPosition, normal, maxHorizontalDistanceFromHead, grabBallRestrictionStatus.heightMin ? Color.green : Color.gray);
             }
         }

@@ -11,6 +11,9 @@ using UnityEngine;
 
 namespace Leap.InteractionEngine.Examples
 {
+    /// <summary>
+    /// Displays a GrabBalls current state by representing restricted areas with a ghostedMesh and scaling the defaultMesh when close to interaction.
+    /// </summary>
     public class SimpleGrabBallFeedback : MonoBehaviour
     {
         [Header("Setup")]
@@ -18,20 +21,32 @@ namespace Leap.InteractionEngine.Examples
         public MeshRenderer defaultMesh, ghostedMesh;
 
         [Header("Scaling")]
-        [SerializeField] private float distanceToScaleGrabBall = 0.1f;
-        [SerializeField] private Vector3 expandedScale = new Vector3(1, 1, 1);
-        [SerializeField] private Vector3 minimisedScale = new Vector3(0.5f, 0.5f, 0.5f);
-        [SerializeField] private float lerpTime = 6f;
+        [SerializeField, Tooltip("The maximum distance to the nearest interacting hand required before the GrabBall will scale")]
+        private float distanceToScaleGrabBall = 0.1f;
+
+        [SerializeField, Tooltip("The localscale value that the GrabBall will scale to when near an interacting hand")]
+        private Vector3 expandedScale = new Vector3(1, 1, 1);
+
+        [SerializeField, Tooltip("The localscale value that the GrabBall will scale to when idle or not near an interacting hand")]
+        private Vector3 minimisedScale = new Vector3(0.5f, 0.5f, 0.5f);
+
+        [SerializeField, Tooltip("A speed multiplier for scaling, the higher the lerpTime, the faster the scaling")]
+        private float lerpTime = 6f;
 
         private void Start()
         {
+            // Try to find an attached GrabBall, or warn that we require one
             if (grabBall == null)
             {
-                Debug.LogWarning("No grab ball assigned to GrabBallMeshVisuals");
+                grabBall = GetComponent<GrabBall>();
+
+                if (grabBall == null)
+                {
+                    Debug.LogWarning("No grab ball assigned to GrabBallMeshVisuals", gameObject);
+                }
             }
         }
 
-        // Update is called once per frame
         void Update()
         {
             if (grabBall == null)
@@ -39,11 +54,9 @@ namespace Leap.InteractionEngine.Examples
                 return;
             }
 
-            defaultMesh.transform.position = grabBall.grabBallInteractionBehaviour.transform.position;
             defaultMesh.transform.rotation = LookAtRotationParallelToHorizon(defaultMesh.transform.position, Camera.main.transform.position);
 
             bool expanded = grabBall.grabBallInteractionBehaviour.closestHoveringControllerDistance < distanceToScaleGrabBall;
-
             defaultMesh.transform.localScale = Vector3.Lerp(defaultMesh.transform.localScale, (expanded) ? expandedScale : minimisedScale, Time.deltaTime * lerpTime);
 
             if (grabBall.grabBallRestrictionStatus.IsRestricted && grabBall.grabBallInteractionBehaviour.isGrasped)
