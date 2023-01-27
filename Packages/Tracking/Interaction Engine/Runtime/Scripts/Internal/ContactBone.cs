@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2023.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -131,7 +131,7 @@ namespace Leap.Unity.Interaction
 
         private void FixedUpdate()
         {
-            for (int i = contactingInteractionBehaviours.Count-1; i >= contactingInteractionBehaviours.Count; i--)
+            for (int i = contactingInteractionBehaviours.Count - 1; i >= contactingInteractionBehaviours.Count; i--)
             {
                 IInteractionBehaviour currentBehaviour = contactingInteractionBehaviours.ElementAt(i).Key;
 

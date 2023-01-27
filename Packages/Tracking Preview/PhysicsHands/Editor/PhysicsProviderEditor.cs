@@ -107,7 +107,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
         private void WarningsSection()
         {
             // Timestep
-            if(Time.fixedDeltaTime > RECOMMENDED_TIMESTEP)
+            if (Time.fixedDeltaTime > RECOMMENDED_TIMESTEP)
             {
                 EditorGUILayout.BeginHorizontal();
                 EditorGUILayout.HelpBox($"Project timestep is larger than {RECOMMENDED_TIMESTEP} ({Time.fixedDeltaTime}). It is highly recommended to decrease this. " +
@@ -279,7 +279,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             {
                 EditorGUILayout.BeginVertical(EditorStyles.helpBox);
 
-                Time.fixedDeltaTime = EditorGUILayout.FloatField("Physics Timestep",Time.fixedDeltaTime);
+                Time.fixedDeltaTime = EditorGUILayout.FloatField("Physics Timestep", Time.fixedDeltaTime);
                 EditorGUILayout.LabelField($"Physics Updates Per Second: ~{(int)(1.0f / Time.fixedDeltaTime)}");
 
                 EditorGUILayout.Space();
@@ -291,13 +291,13 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 EditorGUI.indentLevel--;
 
                 EditorGUILayout.Space();
-                
+
                 EditorGUILayout.LabelField("Hand Solver", EditorStyles.boldLabel);
                 EditorGUI.indentLevel++;
                 ValidateSolver();
                 int oldPreset = _currentPreset;
                 _currentPreset = EditorGUILayout.Popup(_solverPresetText, _currentPreset, HAND_SOLVER_NAMES);
-                if(oldPreset != _currentPreset && _currentPreset < HAND_SOLVER_NAMES.Length - 1)
+                if (oldPreset != _currentPreset && _currentPreset < HAND_SOLVER_NAMES.Length - 1)
                 {
                     ApplySolverSettings();
                 }
@@ -313,7 +313,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
         {
             int indA = Array.IndexOf(HAND_SOLVER_ITERATIONS, _handSolverIterations.intValue);
             int indB = Array.IndexOf(HAND_SOLVER_VELOCITY_ITERATIONS, _handSolverVelocityIterations.intValue);
-            if(indA != indB)
+            if (indA != indB)
             {
                 _currentPreset = HAND_SOLVER_NAMES.Length - 1;
             }
