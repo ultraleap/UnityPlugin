@@ -123,7 +123,8 @@ namespace Ultraleap.Tracking.OpenXR
                 trackerTransform.scale = transform.lossyScale;
             }
 
-            _currentFrame = _updateFrame.TransformedCopy(trackerTransform);
+            _currentFrame = _updateFrame;
+            _currentFrame.Transform(trackerTransform);
 
             DispatchUpdateFrameEvent(_currentFrame);
         }
