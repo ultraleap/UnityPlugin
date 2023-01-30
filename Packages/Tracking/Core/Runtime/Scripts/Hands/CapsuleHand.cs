@@ -23,10 +23,10 @@ namespace Leap.Unity
     {
         public enum CapsuleHandPreset
         {
-            DEFAULT,
-            CLASSIC,
-            MINIMAL,
-            ULTRALEAP
+            Default,
+            Classic,
+            Minimal,
+            Ultraleap
         }
 
         private CapsuleHandPreset _preset;
@@ -588,7 +588,7 @@ namespace Leap.Unity
 
             switch (preset)
             {
-                case CapsuleHandPreset.DEFAULT:
+                case CapsuleHandPreset.Default:
                     _showArm = true;
                     _showPalmJoint = false;
                     _showPinkyMetacarpal = true;
@@ -602,7 +602,7 @@ namespace Leap.Unity
                     _sphereColor = Color.white;
                     _cylinderColor = Color.white;
                     break;
-                case CapsuleHandPreset.CLASSIC:
+                case CapsuleHandPreset.Classic:
                     _showArm = true;
                     _showPalmJoint = true;
                     _showPinkyMetacarpal = true;
@@ -618,7 +618,7 @@ namespace Leap.Unity
                     _leftColorList = new Color[] { new Color(0.0f, 0.0f, 1.0f), new Color(0.2f, 0.0f, 0.4f), new Color(0.0f, 0.2f, 0.2f) };
                     _rightColorList = new Color[] { new Color(1.0f, 0.0f, 0.0f), new Color(1.0f, 1.0f, 0.0f), new Color(1.0f, 0.5f, 0.0f) };
                     break;
-                case CapsuleHandPreset.MINIMAL:
+                case CapsuleHandPreset.Minimal:
                     _showArm = true;
                     _showPalmJoint = false;
                     _showPinkyMetacarpal = false;
@@ -632,7 +632,7 @@ namespace Leap.Unity
                     _sphereColor = Color.white;
                     _cylinderColor = Color.white;
                     break;
-                case CapsuleHandPreset.ULTRALEAP:
+                case CapsuleHandPreset.Ultraleap:
                     _showArm = true;
                     _showPalmJoint = false;
                     _showPinkyMetacarpal = true;
@@ -648,7 +648,9 @@ namespace Leap.Unity
                     break;
             }
 
+#if UNITY_EDITOR
             OnValidate();
+#endif
         }
     }
 }
