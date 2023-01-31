@@ -57,7 +57,7 @@ namespace Ultraleap.Tracking.OpenXR
             }
         }
 
-        private TrackedPoseDriver   _trackedPoseDriver;
+        private TrackedPoseDriver _trackedPoseDriver;
         private HandJointLocation[] _joints;
 
         public override TrackingSource TrackingDataSource { get { return CheckOpenXRAvailable(); } }
@@ -171,24 +171,26 @@ namespace Ultraleap.Tracking.OpenXR
                 return false;
             }
 
+            long currentDateTimeTicks = DateTime.Now.Ticks;
+
             float timeVisible = 0;
             if (handTracker == HandTracker.Left)
             {
                 if (_leftHandFirstSeen_ticks == -1)
                 {
-                    _leftHandFirstSeen_ticks = DateTime.Now.Ticks;
+                    _leftHandFirstSeen_ticks = currentDateTimeTicks;
                     _leftHandId = _handId++;
                 }
-                timeVisible = ((float)(DateTime.Now.Ticks - _leftHandFirstSeen_ticks)) / (float)TimeSpan.TicksPerSecond;
+                timeVisible = ((float)(currentDateTimeTicks - _leftHandFirstSeen_ticks)) / (float)TimeSpan.TicksPerSecond;
             }
             else
             {
                 if (_rightHandFirstSeen_ticks == -1)
                 {
-                    _rightHandFirstSeen_ticks = DateTime.Now.Ticks;
+                    _rightHandFirstSeen_ticks = currentDateTimeTicks;
                     _rightHandId = _handId++;
                 }
-                timeVisible = ((float)(DateTime.Now.Ticks - _rightHandFirstSeen_ticks)) /
+                timeVisible = ((float)(currentDateTimeTicks - _rightHandFirstSeen_ticks)) /
                               (float)TimeSpan.TicksPerSecond;
             }
 
@@ -232,7 +234,7 @@ namespace Ultraleap.Tracking.OpenXR
                         prevJoint.Radius * 2f,
                         (Bone.BoneType)boneIndex,
                         prevJoint.Pose.rotation);
-                    fingerWidth = Math.Max(fingerWidth, bone.Width);
+                    fingerWidth = Mathf.Max(fingerWidth, bone.Width);
                     xrTipIndex = xrNextIndex;
 
                     // Ignore metacarpals when calculating finger lengths
