@@ -146,7 +146,7 @@ namespace Leap.Unity
             {
                 if (Provider == null) return null;
                 if (Provider.CurrentFrame == null) return null;
-                return Provider.CurrentFrame.GetHand(Chirality.Right); ;
+                return Provider.CurrentFrame.GetHand(Chirality.Right);
             }
         }
 
