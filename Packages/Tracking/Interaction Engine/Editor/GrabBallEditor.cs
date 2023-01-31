@@ -18,6 +18,7 @@ namespace Leap.Unity.Interaction
         SerializedProperty _useAttachedObjectsXRotation;
         SerializedProperty _xRotation;
         SerializedProperty _restrictGrabBallDistanceFromHead;
+        SerializedProperty _dynamicallyLimitHeadDistance;
         SerializedProperty _maxHorizontalDistanceFromHead;
         SerializedProperty _minHorizontalDistanceFromHead;
         SerializedProperty _maxHeightFromHead;
@@ -68,6 +69,7 @@ namespace Leap.Unity.Interaction
             EditorGUILayout.PropertyField(_restrictGrabBallDistanceFromHead);
             if (_restrictGrabBallDistanceFromHead.boolValue)
             {
+                EditorGUILayout.PropertyField(_dynamicallyLimitHeadDistance);
                 GUILayout.Space(2.5f);
                 EditorGUILayout.PropertyField(_maxHorizontalDistanceFromHead);
                 EditorGUILayout.PropertyField(_minHorizontalDistanceFromHead);
@@ -91,6 +93,7 @@ namespace Leap.Unity.Interaction
             _useAttachedObjectsXRotation = serializedObject.FindProperty("useAttachedObjectsXRotation");
             _xRotation = serializedObject.FindProperty("xRotation");
             _restrictGrabBallDistanceFromHead = serializedObject.FindProperty("restrictGrabBallDistanceFromHead");
+            _dynamicallyLimitHeadDistance = serializedObject.FindProperty("dynamicallyLimitHeadDistance");
             _maxHorizontalDistanceFromHead = serializedObject.FindProperty("maxHorizontalDistanceFromHead");
             _minHorizontalDistanceFromHead = serializedObject.FindProperty("minHorizontalDistanceFromHead");
             _maxHeightFromHead = serializedObject.FindProperty("maxHeightFromHead");
