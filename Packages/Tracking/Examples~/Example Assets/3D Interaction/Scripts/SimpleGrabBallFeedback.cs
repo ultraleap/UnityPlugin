@@ -54,8 +54,6 @@ namespace Leap.InteractionEngine.Examples
                 return;
             }
 
-            defaultMesh.transform.rotation = LookAtRotationParallelToHorizon(defaultMesh.transform.position, Camera.main.transform.position);
-
             bool expanded = grabBall.grabBallInteractionBehaviour.closestHoveringControllerDistance < distanceToScaleGrabBall;
             defaultMesh.transform.localScale = Vector3.Lerp(defaultMesh.transform.localScale, (expanded) ? expandedScale : minimisedScale, Time.deltaTime * lerpTime);
 
@@ -69,11 +67,6 @@ namespace Leap.InteractionEngine.Examples
             {
                 ghostedMesh.gameObject.SetActive(false);
             }
-        }
-
-        private Quaternion LookAtRotationParallelToHorizon(Vector3 posA, Vector3 posB)
-        {
-            return Quaternion.AngleAxis(Quaternion.LookRotation((posA - posB).normalized).eulerAngles.y, Vector3.up);
         }
     }
 }

@@ -331,6 +331,7 @@ MonoBehaviour:
   useAttachedObjectsXRotation: 1
   xRotation: 25
   restrictGrabBallDistanceFromHead: 1
+  dynamicallyLimitHeadDistance: 1
   maxHorizontalDistanceFromHead: 0.5
   minHorizontalDistanceFromHead: 0.1
   maxHeightFromHead: 0.3
@@ -350,10 +351,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   useHover: 0
   usePrimaryHover: 1
+  useGrasp: 1
   defaultColor: {r: 0, g: 0.9215687, b: 0.5215686, a: 1}
   suspendedColor: {r: 1, g: 0, b: 0, a: 1}
-  hoverColor: {r: 0.65882355, g: 0.18431373, b: 0.93725497, a: 1}
-  primaryHoverColor: {r: 1, g: 0.5529412, b: 0, a: 1}
+  graspColor: {r: 1, g: 0.5529412, b: 0, a: 1}
+  hoverColor: {r: 0.654902, g: 0.18431373, b: 0.9294118, a: 1}
   pressedColor: {r: 0.65882355, g: 0.18431373, b: 0.93725497, a: 1}
   rends:
   - materialID: 0

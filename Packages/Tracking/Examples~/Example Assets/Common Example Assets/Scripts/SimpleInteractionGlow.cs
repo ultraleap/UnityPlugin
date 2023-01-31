@@ -27,10 +27,14 @@ namespace Leap.Unity.InteractionEngine.Examples
         [Tooltip("If enabled, the object will use its primaryHoverColor when the primary hover of an InteractionHand.")]
         public bool usePrimaryHover = false;
 
+        [Tooltip("If enabled, the object will use its graspColor when grasped by an InteractionHand.")]
+        public bool useGrasp = false;
+
         [Header("InteractionBehaviour Colors")]
         public Color defaultColor = Color.Lerp(Color.black, Color.white, 0.1F);
 
         public Color suspendedColor = Color.red;
+        public Color graspColor = Color.Lerp(Color.black, Color.white, 0.9F);
         public Color hoverColor = Color.Lerp(Color.black, Color.white, 0.7F);
         public Color primaryHoverColor = Color.Lerp(Color.black, Color.white, 0.8F);
 
@@ -95,6 +99,11 @@ namespace Leap.Unity.InteractionEngine.Examples
                     }
                 }
 
+                if (_intObj.isGrasped && useGrasp)
+                {
+                    targetColor = graspColor;
+                }
+
                 if (_intObj.isSuspended)
                 {
                     // If the object is held by only one hand and that holding hand stops tracking, the
@@ -114,7 +123,7 @@ namespace Leap.Unity.InteractionEngine.Examples
                 // Lerp actual material color to the target color.
                 for (int i = 0; i < _materials.Length; i++)
                 {
-                    _materials[i].color = Color.Lerp(_materials[i].color, targetColor, 30F * Time.deltaTime);
+                    _materials[i].color = Color.Lerp(_materials[i].color, targetColor, 10F * Time.deltaTime);
                 }
             }
         }
