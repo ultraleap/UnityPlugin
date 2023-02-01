@@ -17,7 +17,6 @@ namespace Ultraleap.Tracking.OpenXR
     {
         private LeapTransform trackerTransform = new LeapTransform(Vector3.zero, Quaternion.identity);
         
-        private Frame _updateFrame = new Frame();
         private Frame _currentFrame = new Frame();
 
         private Hand _leftHand = new Hand();
@@ -101,7 +100,11 @@ namespace Ultraleap.Tracking.OpenXR
 
         private void Update()
         {
-            PopulateLeapFrame(ref _updateFrame);
+            PopulateLeapFrame(ref _currentFrame);
+
+            trackerTransform.translation = Vector3.zero;
+            trackerTransform.rotation = Quaternion.identity;
+            trackerTransform.scale = mainCamera.transform.lossyScale;
 
             // Adjust for relative transform if it's in use.
             if (_trackedPoseDriver != null && _trackedPoseDriver.UseRelativeTransform)
@@ -116,14 +119,8 @@ namespace Ultraleap.Tracking.OpenXR
             {
                 trackerTransform.translation += parentTransform.position;
                 trackerTransform.rotation *= parentTransform.rotation;
-                trackerTransform.scale = parentTransform.lossyScale;
-            }
-            else
-            {
-                trackerTransform.scale = transform.lossyScale;
             }
 
-            _currentFrame = _updateFrame;
             _currentFrame.Transform(trackerTransform);
 
             DispatchUpdateFrameEvent(_currentFrame);
