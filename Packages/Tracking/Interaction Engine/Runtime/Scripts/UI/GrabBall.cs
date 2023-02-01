@@ -229,18 +229,24 @@ namespace Leap.Unity.Interaction
             if (restrictGrabBallDistanceFromHead || dynamicallyLimitHeadDistance)
             {
                 RestrictGrabBallPosition();
-            } 
+            }
             else
             {
                 grabBallPose.position = grabBallInteractionBehaviour.transform.position;
             }
 
             _transformHelper.position = grabBallPose.position;
-            if (updateRotation) grabBallPose.rotation = LookAtRotationParallelToHorizon(grabBallPose.position, _head.position);
+            if (updateRotation)
+            {
+                grabBallPose.rotation = LookAtRotationParallelToHorizon(grabBallPose.position, _head.position);
+            }
             _transformHelper.rotation = grabBallPose.rotation;
 
             _attachedObjectTargetPose.position = _transformHelper.TransformPoint(_attachedObjectOffset);
-            if (updateRotation) _attachedObjectTargetPose.rotation = Quaternion.Euler(xRotation, grabBallPose.rotation.eulerAngles.y, grabBallPose.rotation.eulerAngles.z);
+            if (updateRotation)
+            {
+                _attachedObjectTargetPose.rotation = Quaternion.Euler(xRotation, grabBallPose.rotation.eulerAngles.y, grabBallPose.rotation.eulerAngles.z);
+            }
         }
         private bool IsAttachedObjectCloseToTargetPose()
         {
