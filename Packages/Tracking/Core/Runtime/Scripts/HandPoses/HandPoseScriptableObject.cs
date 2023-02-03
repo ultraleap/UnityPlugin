@@ -2,7 +2,9 @@ using Leap;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEditor;
+using UnityEditor.Graphs;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -40,62 +42,55 @@ namespace Leap.Unity
         {
             return serialisedHand;
         }
-        //private BoundHand serialisedBoundHand;
-        //public BoundHand GetSerializedBoundHand()
-        //{
-        //    return serialisedBoundHand;
-        //}
 
-
-
-        private static Vector3 JointPos = new Vector3(0, 0, 0);
-        private static Quaternion JointRot = new Quaternion(0, 0, 0, 0);
-
-        [Header("Finger Positional Thresholds")]
-
-        [SerializeField]
-        [NamedListAttribute(new string[] { "Metacarpal", "Proximal", "Intermediate", "Distal" })]
-        private List<Vector3> ThumbJointPosition = new List<Vector3>() { JointPos, JointPos, JointPos, JointPos };
-        [SerializeField]
-        [NamedListAttribute(new string[] { "Metacarpal", "Proximal", "Intermediate", "Distal" })]
-        private List<Vector3> IndexJointPosition = new List<Vector3>() { JointPos, JointPos, JointPos, JointPos };
-        [SerializeField]
-        [NamedListAttribute(new string[] { "Metacarpal", "Proximal", "Intermediate", "Distal" })]
-        private List<Vector3> MiddleJointPosition = new List<Vector3>() { JointPos, JointPos, JointPos, JointPos };
-        [SerializeField]
-        [NamedListAttribute(new string[] { "Metacarpal", "Proximal", "Intermediate", "Distal" })]
-        private List<Vector3> RingJointPosition = new List<Vector3>() { JointPos, JointPos, JointPos, JointPos };
-        [SerializeField]
-        [NamedListAttribute(new string[] { "Metacarpal", "Proximal", "Intermediate", "Distal" })]
-        private List<Vector3> PinkieJointPosition = new List<Vector3>() { JointPos, JointPos, JointPos, JointPos };
-
+        private static float JointRot = 15;
+        private List<float>[] thresholdFingers = new List<float>[5];
 
         [Header("Finger Rotational Thresholds")]
-
         [SerializeField]
         [NamedListAttribute(new string[] { "Metacarpal", "Proximal", "Intermediate", "Distal" })]
-        private List<Quaternion> ThumbJointRotation = new List<Quaternion>() { JointRot, JointRot, JointRot, JointRot };
+        private List<float> ThumbJointRotation = new List<float>() { JointRot, JointRot, JointRot, JointRot };
         [SerializeField]
         [NamedListAttribute(new string[] { "Metacarpal", "Proximal", "Intermediate", "Distal" })]
-        private List<Quaternion> IndexJointRotataion = new List<Quaternion>() { JointRot, JointRot, JointRot, JointRot };
+        private List<float> IndexJointRotataion = new List<float>() { JointRot, JointRot, JointRot, JointRot };
         [SerializeField]
         [NamedListAttribute(new string[] { "Metacarpal", "Proximal", "Intermediate", "Distal" })]
-        private List<Quaternion> MiddleJointRotaion = new List<Quaternion>() { JointRot, JointRot, JointRot, JointRot };
+        private List<float> MiddleJointRotaion = new List<float>() { JointRot, JointRot, JointRot, JointRot };
         [SerializeField]
         [NamedListAttribute(new string[] { "Metacarpal", "Proximal", "Intermediate", "Distal" })]
-        private List<Quaternion> RingJointRotaion = new List<Quaternion>() { JointRot, JointRot, JointRot, JointRot };
+        private List<float> RingJointRotaion = new List<float>() { JointRot, JointRot, JointRot, JointRot };
         [SerializeField]
         [NamedListAttribute(new string[] { "Metacarpal", "Proximal", "Intermediate", "Distal" })]
-        private List<Quaternion> PinkieJointRotaion = new List<Quaternion>() { JointRot, JointRot, JointRot, JointRot };
-
+        private List<float> PinkieJointRotaion = new List<float>() { JointRot, JointRot, JointRot, JointRot };
 
         public void SaveHandPose(Hand handToSerialise)
         {
             serialisedHand = handToSerialise;
+
+            ApplyThresholds();
         }
-        //public void SaveHandPose(BoundHand handToSerialise)
-        //{
-        //    serialisedBoundHand = handToSerialise;
-        //}
+
+        private void ApplyThresholds()
+        {
+            thresholdFingers[0] = ThumbJointRotation;
+            thresholdFingers[1] = IndexJointRotataion;
+            thresholdFingers[2] = MiddleJointRotaion;
+            thresholdFingers[3] = RingJointRotaion;
+            thresholdFingers[4] = PinkieJointRotaion;
+        }
+
+        public float GetBoneRotation(int fingerNum, int boneNum)
+        {
+            ApplyThresholds();
+
+            if (thresholdFingers.Count() > 0)
+            {
+                return thresholdFingers[fingerNum].ElementAt(boneNum);
+            }
+            else
+            {
+                return 0f;
+            }
+        }
     }
 }
