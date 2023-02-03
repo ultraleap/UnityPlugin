@@ -24,46 +24,15 @@ namespace Leap.Unity
         List<HandModelBase> handsToDetect = new();
 
         /// <summary>
-        /// Which fingers should be checked when doing pose detection?
-        /// </summary>
-        [SerializeField]
-        bool checkThumb, checkIndex, checkMiddle, checkRing, checkPinkie;
-
-        /// <summary>
         /// How many bones need to match per finger?
         /// Note by default, a hand has 4 bones.
         /// </summary>
         [SerializeField]
         int perFingerBoneMatches = 3;
 
-        
-
-        List<int> fingerIndexesToCheck = new();
-
         public static event Action<HandPoseScriptableObject> PoseHasBeenDetected;
         public static event Action PoseHasNotBeenDetected;
 
-        // Start is called before the first frame update
-        void Start()
-        {
-            fingerIndexesToCheck.Clear();
-            if (checkThumb) { fingerIndexesToCheck.Add(0); }
-            if (checkIndex) { fingerIndexesToCheck.Add(1); }
-            if (checkMiddle) { fingerIndexesToCheck.Add(2); }
-            if (checkRing) { fingerIndexesToCheck.Add(3); }
-            if (checkPinkie) { fingerIndexesToCheck.Add(4); }
-        }
-
-        // When the Inspector is changed
-        private void OnValidate()
-        {
-            fingerIndexesToCheck.Clear();
-            if (checkThumb) { fingerIndexesToCheck.Add(0); }
-            if (checkIndex) { fingerIndexesToCheck.Add(1); }
-            if (checkMiddle) { fingerIndexesToCheck.Add(2); }
-            if (checkRing) { fingerIndexesToCheck.Add(3); }
-            if (checkPinkie) { fingerIndexesToCheck.Add(4); }
-        }
 
         // Update is called once per frame
         void Update()
@@ -111,7 +80,7 @@ namespace Leap.Unity
             float fingerRotationThreshold = 0;
 
             // Edoes the anach finger
-            foreach (int fingerNum in fingerIndexesToCheck)
+            foreach (int fingerNum in pose.GetFingerIndexesToCheck())
             {
                 // Each bone in the finger 
                 for (int i = 0; i < serializedHand.Fingers[fingerNum].bones.Length; i++)
@@ -143,7 +112,7 @@ namespace Leap.Unity
                 }
             }
 
-            if (numMatchedFingers >= fingerIndexesToCheck.Count)
+            if (numMatchedFingers >= pose.GetFingerIndexesToCheck().Count)
             {
                 return true;
             }
@@ -155,7 +124,7 @@ namespace Leap.Unity
 
         private float GetBoneRotationThreshold(HandPoseScriptableObject pose, int fingerNum, int boneNum)
         {
-            return pose.GetBoneRotation(fingerNum, boneNum);
+            return pose.GetBoneRotationthreshold(fingerNum, boneNum);
         }
 
         /// <summary>
