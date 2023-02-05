@@ -171,6 +171,10 @@ namespace Leap.Unity
         [SerializeField]
         protected float _physicsExtrapolationTime = 1.0f / 90.0f;
 
+        [Tooltip("Makes right hands track for left hands, and left hands track for right hands.")]
+        [SerializeField]
+        protected bool MirrorHandTracking = false;
+        
         #region Multiple Device
         public enum MultipleDeviceMode
         {
@@ -1042,7 +1046,19 @@ namespace Leap.Unity
 
         protected virtual void transformFrame(Frame source, Frame dest)
         {
-            dest.CopyFrom(source).Transform(new LeapTransform(transform));
+            var frameTransform = new LeapTransform(transform);
+
+            if (MirrorHandTracking)
+            {
+                foreach (Hand hand in source.Hands)
+                {
+                    hand.IsLeft = !hand.IsLeft;
+                }
+
+                frameTransform.MirrorX();
+            }
+
+            dest.CopyFrom(source).Transform(frameTransform);
         }
 
         private TrackingSource CheckLeapServiceAvailable()
