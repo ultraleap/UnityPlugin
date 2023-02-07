@@ -2,6 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
+using UnityEngine.Experimental.GlobalIllumination;
+using UnityEngine.Rendering;
+using UnityEngine.XR;
+using System;
+using UnityEngine.EventSystems;
+using UnityEngine.UIElements;
 
 namespace Leap.Unity
 {
@@ -36,7 +42,7 @@ namespace Leap.Unity
             if (leftHandPoseObject != null)
             {
                 PosedHand = leftHandPoseObject.GetSerializedHand();
-                PosedHand.SetTransform(new Vector3(-0.5f, 0, 0), PosedHand.Rotation);
+                PosedHand.SetTransform(new Vector3(0, 0, 0), PosedHand.Rotation);
                 leftHand = PosedHand;
                 currentHands.Add(PosedHand);
             }
@@ -58,10 +64,13 @@ namespace Leap.Unity
         {
             ShowEditorGizmos(rightHand, rightHandPoseObject);
             ShowEditorGizmos(leftHand, leftHandPoseObject);
+            
         }
 
         void ShowEditorGizmos(Hand hand, HandPoseScriptableObject handPoseScriptableObject)
         {
+            float lineThickness = 4;
+
             //foreach (var finger in hand.Fingers)
             for (int j = 0; j < hand.Fingers.Count; j++)
             {
@@ -72,40 +81,41 @@ namespace Leap.Unity
                     {
                         var bone = finger.bones[i];
                         Gizmos.color = gizmoColours[i];
-                        DrawWireArc(bone.PrevJoint, bone.Direction,
-                            handPoseScriptableObject.GetBoneRotationthreshold((int)finger.Type, (int)bone.Type), 0.05f);
+                        Gizmos.matrix = Matrix4x4.identity;
+
+                        Handles.color = gizmoColours[i];
+
+
+                        DrawWireCone(handPoseScriptableObject.GetBoneRotationthreshold(j, i), 0.02f,
+                        bone.Direction.normalized,
+                        bone.PrevJoint, bone.NextJoint, gizmoColours[i], lineThickness);
                     }
                 }
             }
         }
 
-        public static void DrawWireArc(Vector3 position, Vector3 dir, float anglesRange, float radius, float maxSteps = 20)
+
+        private void DrawWireCone(float angle, float coneLength, Vector3 coneDirection, Vector3 pointLocation, Vector3 baseCentrePoint, Color color, float ringThickness)
         {
-            var srcAngles = GetAnglesFromDir(position, dir);
-            var initialPos = position;
-            var posA = initialPos;
-            var stepAngles = anglesRange / maxSteps;
-            var angle = srcAngles - anglesRange / 2;
-            for (var i = 0; i <= maxSteps; i++)
-            {
-                var rad = Mathf.Deg2Rad * angle;
-                var posB = initialPos;
-                posB += new Vector3(radius * Mathf.Cos(rad), dir.y * radius, radius * Mathf.Sin(rad));
 
-                Gizmos.DrawLine(posA, posB);
+            float circleRadius = Mathf.Tan((angle * (float)(Math.PI / 180)) * (Vector3.Distance(pointLocation, pointLocation + (coneDirection * coneLength))));
+            Vector3 normal = Vector3.Normalize(baseCentrePoint - pointLocation);
+            Vector3 circleCentrePoint = pointLocation + (coneDirection * coneLength);
 
-                angle += stepAngles;
-                posA = posB;
-            }
-            Gizmos.DrawLine(posA, initialPos);
-        }
+            var leftPoint = (Vector3.Cross(normal, Vector3.forward).normalized) * circleRadius;
+            var rightPoint = (Vector3.Cross(normal, -Vector3.forward).normalized) * circleRadius;
+            var upPoint = (Vector3.Cross(normal, Vector3.up).normalized) * circleRadius;
+            var downPoint = (Vector3.Cross(normal, -Vector3.up).normalized) * circleRadius;
 
-        static float GetAnglesFromDir(Vector3 position, Vector3 dir)
-        {
-            var forwardLimitPos = position + dir;
-            var srcAngles = Mathf.Rad2Deg * Mathf.Atan2(forwardLimitPos.z - position.z, forwardLimitPos.x - position.x);
+            Debug.DrawLine(pointLocation, leftPoint + circleCentrePoint, color);
+            Debug.DrawLine(pointLocation, rightPoint + circleCentrePoint, color);
+            Debug.DrawLine(pointLocation, upPoint + circleCentrePoint, color);
+            Debug.DrawLine(pointLocation, downPoint + circleCentrePoint, color);
 
-            return srcAngles;
+
+            Handles.DrawWireDisc(circleCentrePoint, normal, circleRadius, ringThickness);
+
+
         }
     }
 }
