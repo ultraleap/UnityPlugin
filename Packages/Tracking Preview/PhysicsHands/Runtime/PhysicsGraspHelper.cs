@@ -792,7 +792,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             {
                 foreach (var hand in _graspingCandidates)
                 {
-                    hand.IgnoreCollision(_rigid, 0f, 0.04f);
+                    hand.IgnoreCollision(_rigid, 0f, 0.005f);
                 }
                 // We only want to apply the forces if we actually want to cause movement to the object
                 // We're still disabling collisions though to allow for the physics system to fully control if necessary

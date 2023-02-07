@@ -137,7 +137,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                     }
                     else
                     {
-                        SetupBoneDrives(physicsHand.jointBodies[boneArrayIndex], stiffness, forceLimit, strength);
+                        SetupBoneDrives(physicsHand.jointBodies[boneArrayIndex], stiffness, forceLimit, strength, fingerIndex);
                     }
                     lastTransform = capsuleGameObject.transform;
                 }
@@ -232,7 +232,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                     }
                     else
                     {
-                        SetupBoneDrives(physicsHand.jointBodies[boneArrayIndex], physicsHand.stiffness, physicsHand.forceLimit, physicsHand.strength);
+                        SetupBoneDrives(physicsHand.jointBodies[boneArrayIndex], physicsHand.stiffness, physicsHand.forceLimit, physicsHand.strength, fingerIndex);
 
                         physicsHand.jointBodies[boneArrayIndex].parentAnchorPosition = InverseTransformPoint(prevBone.PrevJoint, prevBone.Rotation, bone.PrevJoint);
                         physicsHand.jointBodies[boneArrayIndex].parentAnchorRotation = Quaternion.identity;
@@ -358,9 +358,16 @@ namespace Leap.Unity.Interaction.PhysicsHands
             knuckle.zDrive = yDrive;
         }
 
-        public static void SetupBoneDrives(ArticulationBody bone, float stiffness, float forceLimit, float strength)
+        public static void SetupBoneDrives(ArticulationBody bone, float stiffness, float forceLimit, float strength, int fingerIndex)
         {
-            bone.jointType = ArticulationJointType.SphericalJoint;
+            if(fingerIndex == 0)
+            {
+                bone.jointType = ArticulationJointType.RevoluteJoint;
+            }
+            else
+            {
+                bone.jointType = ArticulationJointType.SphericalJoint;
+            }
             bone.twistLock = ArticulationDofLock.LimitedMotion;
             bone.swingYLock = ArticulationDofLock.LimitedMotion;
             bone.swingZLock = ArticulationDofLock.LimitedMotion;
@@ -627,7 +634,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                     b.NextJoint = posA;
                     b.Width = r;
                     b.Center = (b.PrevJoint + b.NextJoint) / 2f;
-                    b.Direction = b.PrevJoint - b.NextJoint;
+                    b.Direction = (b.NextJoint - b.PrevJoint).normalized;
                     b.Length = Vector3.Distance(posA, posB);
                     b.Rotation = physicsHand.jointColliders[boneInd].transform.rotation;
                     boneInd++;
