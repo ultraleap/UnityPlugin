@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2023.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -225,7 +225,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                         SetupKnuckleDrives(physicsHand.jointBodies[boneArrayIndex], leapHand.IsLeft, fingerIndex, physicsHand.stiffness, physicsHand.forceLimit, physicsHand.strength);
 
                         physicsHand.jointBodies[boneArrayIndex].parentAnchorPosition = InverseTransformPoint(leapHand.PalmPosition, leapHand.Rotation, knuckleBone.NextJoint);
-                        if(fingerIndex == 0)
+                        if (fingerIndex == 0)
                         {
                             physicsHand.jointBodies[boneArrayIndex].parentAnchorRotation = Quaternion.Euler(0, leapHand.IsLeft ? HAND_ROTATION_OFFSET_Y : -HAND_ROTATION_OFFSET_Y, leapHand.IsLeft ? HAND_ROTATION_OFFSET_Z : -HAND_ROTATION_OFFSET_Z);
                         }
@@ -386,7 +386,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             };
 
             bone.yDrive = yDrive;
-            
+
             // Set Z limits to 0, locking them causes insane jittering
             yDrive.lowerLimit = 0f;
             yDrive.upperLimit = 0f;
@@ -469,7 +469,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                     else
                     {
                         physicsHand.jointBodies[boneArrayIndex].parentAnchorPosition = InverseTransformPoint(leapHand.PalmPosition, leapHand.Rotation, knuckleBone.NextJoint);
-                        if(fingerIndex == 0)
+                        if (fingerIndex == 0)
                         {
                             physicsHand.jointBodies[boneArrayIndex].parentAnchorRotation = Quaternion.Euler(0, leapHand.IsLeft ? HAND_ROTATION_OFFSET_Y : -HAND_ROTATION_OFFSET_Y, leapHand.IsLeft ? HAND_ROTATION_OFFSET_Z : -HAND_ROTATION_OFFSET_Z);
                         }

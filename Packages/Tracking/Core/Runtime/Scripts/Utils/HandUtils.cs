@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2023.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -36,7 +36,7 @@ namespace Leap.Unity
         private static void InitStatic()
         {
             // Fall through to the best available Leap Provider if none is assigned
-            if(s_provider == null)
+            if (s_provider == null)
             {
                 s_provider = Object.FindObjectOfType<PostProcessProvider>();
                 if (s_provider == null)
@@ -49,7 +49,7 @@ namespace Leap.Unity
                         {
                             Debug.Log("There are no Leap Providers in the scene, please assign one manually");
                             return;
-                        }      
+                        }
                     }
                 }
             }
@@ -132,7 +132,7 @@ namespace Leap.Unity
             {
                 if (Provider == null) return null;
                 if (Provider.CurrentFrame == null) return null;
-                return Provider.CurrentFrame.Hands.FirstOrDefault(hand => hand.IsLeft);
+                return Provider.CurrentFrame.GetHand(Chirality.Left);
             }
         }
 
@@ -146,7 +146,7 @@ namespace Leap.Unity
             {
                 if (Provider == null) return null;
                 if (Provider.CurrentFrame == null) return null;
-                else return Provider.CurrentFrame.Hands.FirstOrDefault(hand => hand.IsRight);
+                return Provider.CurrentFrame.GetHand(Chirality.Right);
             }
         }
 
@@ -160,7 +160,7 @@ namespace Leap.Unity
             {
                 if (Provider == null) return null;
                 if (Provider.CurrentFixedFrame == null) return null;
-                return Provider.CurrentFixedFrame.Hands.FirstOrDefault(hand => hand.IsLeft);
+                return Provider.CurrentFixedFrame.GetHand(Chirality.Left);
             }
         }
 
@@ -174,7 +174,7 @@ namespace Leap.Unity
             {
                 if (Provider == null) return null;
                 if (Provider.CurrentFixedFrame == null) return null;
-                else return Provider.CurrentFixedFrame.Hands.FirstOrDefault(hand => hand.IsRight);
+                return Provider.CurrentFixedFrame.GetHand(Chirality.Right);
             }
         }
 
@@ -622,9 +622,20 @@ namespace Leap.Unity
         /// <returns>The first hand of the argument whichHand found in the argument frame.</returns>
         public static Hand GetHand(this Frame frame, Chirality whichHand)
         {
-            if (frame.Hands == null) { return null; }
-            return frame.Hands.FirstOrDefault(
-              h => h.IsLeft == (whichHand == Chirality.Left));
+            if (frame.Hands == null)
+            {
+                return null;
+            }
+
+            foreach (var hand in frame.Hands)
+            {
+                if (hand.IsLeft && whichHand == Chirality.Left || hand.IsRight && whichHand == Chirality.Right)
+                {
+                    return hand;
+                }
+            }
+
+            return null;
         }
 
         #endregion

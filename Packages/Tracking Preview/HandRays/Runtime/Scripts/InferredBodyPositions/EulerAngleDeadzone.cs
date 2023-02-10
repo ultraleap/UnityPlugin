@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2023.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -95,7 +95,7 @@ namespace Leap.Unity.Preview.HandRays
             delta = SimplifyAngle(delta);
 
             float absDelta = Mathf.Abs(delta);
-            
+
             // You've rotated too far in a single frame
             if (absDelta > 35)
             {
@@ -110,7 +110,7 @@ namespace Leap.Unity.Preview.HandRays
                     deadzoneCentreHistory.Clear();
                     recentredWhilstStill = false;
                 }
-                
+
                 float signDelta = Mathf.Sign(delta);
                 DeadzoneCentre += (absDelta - DeadzoneSize) * signDelta;
                 DeadzoneCentre %= 360;

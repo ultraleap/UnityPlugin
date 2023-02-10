@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
+  m_IndirectSpecularColor: {r: 0.18028378, g: 0.22571412, b: 0.30692285, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -346,7 +346,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &49310698
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -819,18 +819,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 135976652}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
---- !u!134 &140148034
-PhysicMaterial:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: Button Material
-  dynamicFriction: 1
-  staticFriction: 1
-  bounciness: 0
-  frictionCombine: 3
-  bounceCombine: 0
 --- !u!1 &149014349
 GameObject:
   m_ObjectHideFlags: 0
@@ -5217,18 +5205,6 @@ MonoBehaviour:
   _minimumDistance: 0.02
   _maximumDistance: 0.08
   _lerpTime: 0.1
---- !u!134 &445631173
-PhysicMaterial:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: Button Material
-  dynamicFriction: 1
-  staticFriction: 1
-  bounciness: 0
-  frictionCombine: 3
-  bounceCombine: 0
 --- !u!1 &461023103
 GameObject:
   m_ObjectHideFlags: 0
@@ -6688,7 +6664,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &888698409
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7095,6 +7071,18 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 910863327}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!134 &913153326
+PhysicMaterial:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Button Material
+  dynamicFriction: 1
+  staticFriction: 1
+  bounciness: 0
+  frictionCombine: 3
+  bounceCombine: 0
 --- !u!1 &929646170
 GameObject:
   m_ObjectHideFlags: 0
@@ -8162,18 +8150,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
---- !u!134 &1043414932
-PhysicMaterial:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: Button Material
-  dynamicFriction: 1
-  staticFriction: 1
-  bounciness: 0
-  frictionCombine: 3
-  bounceCombine: 0
 --- !u!1001 &1051681184
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -8184,7 +8160,7 @@ PrefabInstance:
     - target: {fileID: 882061857553901801, guid: 5fad9bc118c955741a03cf98cf3f0a46, type: 3}
       propertyPath: m_Material
       value: 
-      objectReference: {fileID: 1139000428}
+      objectReference: {fileID: 913153326}
     - target: {fileID: 882061857767179480, guid: 5fad9bc118c955741a03cf98cf3f0a46, type: 3}
       propertyPath: m_text
       value: Clean The Table!
@@ -8308,7 +8284,7 @@ PrefabInstance:
     - target: {fileID: 6928925247276963121, guid: 5fad9bc118c955741a03cf98cf3f0a46, type: 3}
       propertyPath: _material
       value: 
-      objectReference: {fileID: 445631173}
+      objectReference: {fileID: 913153326}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5fad9bc118c955741a03cf98cf3f0a46, type: 3}
 --- !u!4 &1051681185 stripped
@@ -8475,18 +8451,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!134 &1139000428
-PhysicMaterial:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: Button Material
-  dynamicFriction: 1
-  staticFriction: 1
-  bounciness: 0
-  frictionCombine: 3
-  bounceCombine: 0
 --- !u!1 &1141051099
 GameObject:
   m_ObjectHideFlags: 0
@@ -8978,7 +8942,7 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!134 &1239428109
+--- !u!134 &1247594335
 PhysicMaterial:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -9026,6 +8990,18 @@ Transform:
   m_Father: {fileID: 461023104}
   m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!134 &1280980662
+PhysicMaterial:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Button Material
+  dynamicFriction: 1
+  staticFriction: 1
+  bounciness: 0
+  frictionCombine: 3
+  bounceCombine: 0
 --- !u!1 &1288267143
 GameObject:
   m_ObjectHideFlags: 0
@@ -10186,18 +10162,6 @@ MonoBehaviour:
   _currentXDriveLimit: 3.4028235e+38
   _finger: 4
   _joint: 2
---- !u!134 &1477070531
-PhysicMaterial:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: Button Material
-  dynamicFriction: 1
-  staticFriction: 1
-  bounciness: 0
-  frictionCombine: 3
-  bounceCombine: 0
 --- !u!1 &1523185466
 GameObject:
   m_ObjectHideFlags: 0
@@ -10475,7 +10439,7 @@ PrefabInstance:
     - target: {fileID: 882061857553901801, guid: 5fad9bc118c955741a03cf98cf3f0a46, type: 3}
       propertyPath: m_Material
       value: 
-      objectReference: {fileID: 140148034}
+      objectReference: {fileID: 1280980662}
     - target: {fileID: 882061857767179480, guid: 5fad9bc118c955741a03cf98cf3f0a46, type: 3}
       propertyPath: m_text
       value: Destroy All Cubes!
@@ -10575,7 +10539,7 @@ PrefabInstance:
     - target: {fileID: 6928925247276963121, guid: 5fad9bc118c955741a03cf98cf3f0a46, type: 3}
       propertyPath: _material
       value: 
-      objectReference: {fileID: 1043414932}
+      objectReference: {fileID: 1280980662}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5fad9bc118c955741a03cf98cf3f0a46, type: 3}
 --- !u!1 &1571827756
@@ -10988,7 +10952,7 @@ PrefabInstance:
     - target: {fileID: 882061857553901801, guid: 5fad9bc118c955741a03cf98cf3f0a46, type: 3}
       propertyPath: m_Material
       value: 
-      objectReference: {fileID: 1477070531}
+      objectReference: {fileID: 1247594335}
     - target: {fileID: 882061857767179480, guid: 5fad9bc118c955741a03cf98cf3f0a46, type: 3}
       propertyPath: m_text
       value: Spawn a Cube!
@@ -11088,7 +11052,7 @@ PrefabInstance:
     - target: {fileID: 6928925247276963121, guid: 5fad9bc118c955741a03cf98cf3f0a46, type: 3}
       propertyPath: _material
       value: 
-      objectReference: {fileID: 1239428109}
+      objectReference: {fileID: 1247594335}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5fad9bc118c955741a03cf98cf3f0a46, type: 3}
 --- !u!1 &1656071729
