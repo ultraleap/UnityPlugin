@@ -25,7 +25,8 @@ namespace Leap.Unity.Interaction.PhysicsHands
         {
             public const int FINGERS = 5, BONES = 3;
             public const float TRIGGER_DISTANCE = 0.004f;
-            public const float CONTACT_ENTER_DISTANCE = 0.0025f, CONTACT_EXIT_DISTANCE = 0.012f;
+            public const float CONTACT_ENTER_DISTANCE = 0.002f, CONTACT_EXIT_DISTANCE = 0.01f;
+            public const float CONTACT_THUMB_ENTER_DISTANCE = 0.0045f, CONTACT_THUMB_EXIT_DISTANCE = 0.018f;
 
             // You can change this to move your helper physics checks further forward
             public float triggerDistance = TRIGGER_DISTANCE;
@@ -395,7 +396,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                     {
                         if (_wasGraspingBones[boneArrayIndex])
                         {
-                            if (_physicsHand.jointBones[boneArrayIndex].IsObjectNearBone && _physicsHand.jointBones[boneArrayIndex].ObjectDistance < Hand.CONTACT_EXIT_DISTANCE)
+                            if (_physicsHand.jointBones[boneArrayIndex].IsObjectNearBone && _physicsHand.jointBones[boneArrayIndex].ObjectDistance < (fingerIndex == 0 ? Hand.CONTACT_THUMB_EXIT_DISTANCE : Hand.CONTACT_EXIT_DISTANCE))
                             {
                                 _graspingFingers[fingerIndex] = jointIndex;
                                 _wasGraspingBones[boneArrayIndex] = true;
@@ -407,7 +408,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                         }
                         else
                         {
-                            if (_physicsHand.jointBones[boneArrayIndex].IsObjectNearBone && _physicsHand.jointBones[boneArrayIndex].ObjectDistance < Hand.CONTACT_ENTER_DISTANCE)
+                            if (_physicsHand.jointBones[boneArrayIndex].IsObjectNearBone && _physicsHand.jointBones[boneArrayIndex].ObjectDistance < (fingerIndex == 0 ? Hand.CONTACT_THUMB_ENTER_DISTANCE : Hand.CONTACT_ENTER_DISTANCE))
                             {
                                 _graspingXDrives[boneArrayIndex] = _physicsHand.jointBodies[boneArrayIndex].jointPosition[0] * Mathf.Rad2Deg;
                                 _graspingFingers[fingerIndex] = jointIndex;
@@ -421,7 +422,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                     }
                     else
                     {
-                        if (_wasGraspingBones[boneArrayIndex] && _physicsHand.jointBones[boneArrayIndex].IsObjectNearBone && _physicsHand.jointBones[boneArrayIndex].ObjectDistance < Hand.CONTACT_EXIT_DISTANCE)
+                        if (_wasGraspingBones[boneArrayIndex] && _physicsHand.jointBones[boneArrayIndex].IsObjectNearBone && _physicsHand.jointBones[boneArrayIndex].ObjectDistance < (fingerIndex == 0 ? Hand.CONTACT_THUMB_EXIT_DISTANCE : Hand.CONTACT_EXIT_DISTANCE))
                         {
                             _graspingFingers[fingerIndex] = jointIndex;
                             _wasGraspingBones[boneArrayIndex] = true;
@@ -480,7 +481,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                         _xDampening[boneArrayIndex] = Mathf.Lerp(_xDampening[boneArrayIndex], 2f, Time.fixedDeltaTime * (1.0f / 0.25f));
                     }
 
-                    if (_graspingFingerDistance[fingerIndex] != 1 && _graspingFingerDistance[fingerIndex] > Hand.CONTACT_ENTER_DISTANCE && xTargetAngle > _graspingXDrives[boneArrayIndex])
+                    if (_graspingFingerDistance[fingerIndex] != 1 && _graspingFingerDistance[fingerIndex] > (fingerIndex == 0 ? Hand.CONTACT_THUMB_ENTER_DISTANCE : Hand.CONTACT_ENTER_DISTANCE) && xTargetAngle > _graspingXDrives[boneArrayIndex])
                     {
                         _graspingXDrives[boneArrayIndex] = Mathf.Clamp(Mathf.Lerp(_graspingXDrives[boneArrayIndex], xTargetAngle, Time.fixedDeltaTime),
                             _physicsHand.jointBones[boneArrayIndex].OriginalXDriveLower, _physicsHand.jointBones[boneArrayIndex].OriginalXDriveUpper);

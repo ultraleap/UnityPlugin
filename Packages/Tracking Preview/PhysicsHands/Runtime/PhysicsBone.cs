@@ -128,9 +128,10 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
         public void UpdateBoneDistances()
         {
-            _objectDistance = -1f;
-            _graspedObjectDistance = -1f;
+            _objectDistance = float.MaxValue;
+            _graspedObjectDistance = float.MaxValue;
             _isObjectNearBone = false;
+            _isGraspedObjectNearBone = false;
 
             float height, radius;
 
@@ -151,66 +152,53 @@ namespace Leap.Unity.Interaction.PhysicsHands
             Vector3 position = _collider.bounds.center + transform.rotation * new Vector3(0, 0, height * .25f);
 
             // If we're on the thumb we want to tilt slightly towards the other fingers
-            Vector3 upDirection = Finger == 0 ? Vector3.Lerp(-transform.up, _hand.Handedness == Chirality.Left ? -transform.right : transform.right, 0.2f) : -transform.up;
+            Vector3 upDirection = Finger == 0 ? Vector3.Lerp(-transform.up, _hand.Handedness == Chirality.Left ? -transform.right : transform.right, 0.3f) :
+                Vector3.Lerp(-transform.up, _hand.Handedness == Chirality.Left ? transform.right : -transform.right, 0.1f);
 
-            position += upDirection * radius;
-
-            DistanceCalculation(position, upDirection, radius * 0.5f, height * 2f, out _isObjectNearBone, out _objectDistance, out _isGraspedObjectNearBone, out _graspedObjectDistance);
-
-            if (_isObjectNearBone)
-            {
-                Debug.DrawLine(position, position + (upDirection * _objectDistance), Color.yellow, Time.fixedDeltaTime);
-            }
+            CalculateJointDistance(position, upDirection, radius, height * 2f, true);
 
             // Run a second test pointing forward a bit for the tip
             if (Joint == 2)
             {
-                DistanceCalculation(position, Vector3.Lerp(upDirection, transform.forward, 0.6f), radius * 0.5f, height * 2f, out bool anyFound, out float anyDistance, out bool graspFound, out float graspDistance);
-
-                if (anyFound)
-                {
-                    _isObjectNearBone = true;
-                    if (anyDistance < _objectDistance)
-                    {
-                        _objectDistance = anyDistance;
-                    }
-                    Debug.DrawLine(position, position + (Vector3.Lerp(upDirection, transform.forward, 0.6f) * _objectDistance), Color.yellow, Time.fixedDeltaTime);
-                }
-                
-                if (graspFound)
-                {
-                    _isGraspedObjectNearBone = true;
-                    if (graspDistance < _graspedObjectDistance)
-                    {
-                        _graspedObjectDistance = graspDistance;
-                    }
-                }
+                CalculateJointDistance(position + transform.rotation * new Vector3(0, radius * .2f, height * .15f), Vector3.Lerp(upDirection, transform.forward, 0.6f), radius, height * 2f);
             }
-
-            position = _collider.bounds.center + transform.rotation * new Vector3(0, 0, -height * .15f) + upDirection * radius;
 
             if (Joint > 0)
             {
                 // Second set of distance checks closer to the center of the bone
-                DistanceCalculation(position, upDirection, radius * 0.5f, height * 2f, out bool anyFound, out float objectDistance, out bool graspFound, out float graspDistance);
+                CalculateJointDistance(_collider.bounds.center + transform.rotation * new Vector3(0, 0, -height * .15f), upDirection, radius, height * 2f);
+            }
 
-                if (anyFound)
+            if (Finger == 0)
+            {
+                // Thumb distances closer towards the object
+                Vector3 direction = Vector3.Lerp(-transform.up, _hand.Handedness == Chirality.Left ? transform.right : -transform.right, 0.6f);
+                position = _collider.bounds.center + transform.rotation * new Vector3(0, 0, height * .25f);
+                CalculateJointDistance(position, direction, radius, height * 2f, debug: true);
+            }
+        }
+
+        private void CalculateJointDistance(Vector3 origin, Vector3 direction, float radius, float length, bool forceUpdate = false, bool debug = false)
+        {
+            // Second set of distance checks closer to the center of the bone
+            DistanceCalculation(origin, direction, radius, length, out bool anyFound, out float objectDistance, out bool graspFound, out float graspDistance);
+
+            if (anyFound)
+            {
+                _isObjectNearBone = true;
+                if (objectDistance < _objectDistance || forceUpdate)
                 {
-                    _isObjectNearBone = true;
-                    if (objectDistance < _objectDistance)
-                    {
-                        _objectDistance = objectDistance;
-                    }
-                    Debug.DrawLine(position, position + (upDirection * _objectDistance), Color.yellow, Time.fixedDeltaTime);
+                    _objectDistance = objectDistance;
                 }
+                Debug.DrawLine(origin, origin + (direction * _objectDistance), Color.yellow, Time.fixedDeltaTime);
+            }
 
-                if (graspFound)
+            if (graspFound)
+            {
+                _isGraspedObjectNearBone = true;
+                if (graspDistance < _graspedObjectDistance || forceUpdate)
                 {
-                    _isGraspedObjectNearBone = true;
-                    if (graspDistance < _graspedObjectDistance)
-                    {
-                        _graspedObjectDistance = graspDistance;
-                    }
+                    _graspedObjectDistance = graspDistance;
                 }
             }
         }
