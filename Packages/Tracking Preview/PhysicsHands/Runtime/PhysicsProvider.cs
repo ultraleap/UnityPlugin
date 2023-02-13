@@ -697,8 +697,19 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
         private void UpdateHandStates()
         {
+            UpdateBoneStats(LeftHand);
+            UpdateBoneStats(RightHand);
             FindHandState(LeftHand);
             FindHandState(RightHand);
+        }
+
+        private void UpdateBoneStats(PhysicsHand hand)
+        {
+            hand.GetPhysicsHand().palmBone.UpdateBoneDistances();
+            foreach (var bone in hand.GetPhysicsHand().jointBones)
+            {
+                bone.UpdateBoneDistances();
+            }
         }
 
         private void FindHandState(PhysicsHand hand)
