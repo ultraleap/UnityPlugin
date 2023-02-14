@@ -132,6 +132,8 @@ namespace Leap
         /// </summary>
         public Quaternion Rotation;
 
+        LeapTransform _basis = new LeapTransform(Vector3.one, Quaternion.identity);
+
         /// <summary>
         /// The orthonormal basis vectors for this Bone as a Matrix.
         /// The orientation of this Bone as a Quaternion.
@@ -163,7 +165,16 @@ namespace Leap
         /// 
         /// @since 2.0
         /// </summary>
-        public LeapTransform Basis { get { return new LeapTransform(PrevJoint, Rotation); } }
+        public LeapTransform Basis
+        {
+            get
+            {
+                _basis.translation = PrevJoint;
+                _basis.rotation = Rotation;
+
+                return _basis;
+            }
+        }
 
         /// <summary>
         /// Enumerates the type of bones.

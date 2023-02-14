@@ -9,9 +9,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [NEXT] - unreleased
 
 ### Added
-- 
+- Interaction Grab Ball for 3D UI
+
 ### Changed
-- 
+- Capsule Hands pinky metacarpal position to better represent the actual joint position
+- Reduced performance overhead of OpenXRLeapProvider
+- Reduced performance overhead when accessing Hands via Hands.Right, Hands.Left and Hands.GetHand
+- Reduced performance overhead when transforming Leap.Frames, Leap.Hands and Leap.Bones using Basis
+- Reduced performance overhead when accessing scale in Capsule Hands
+- Reduced performance overhead when using Preview UI Input Cursor
 
 ### Fixed
 - 
