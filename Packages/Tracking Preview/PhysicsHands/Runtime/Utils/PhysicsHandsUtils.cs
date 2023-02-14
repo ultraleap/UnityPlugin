@@ -137,7 +137,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                     }
                     else
                     {
-                        SetupBoneDrives(physicsHand.jointBodies[boneArrayIndex], stiffness, forceLimit, strength, fingerIndex);
+                        SetupBoneDrives(physicsHand.jointBodies[boneArrayIndex], stiffness, forceLimit, strength);
                     }
                     lastTransform = capsuleGameObject.transform;
                 }
@@ -232,7 +232,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                     }
                     else
                     {
-                        SetupBoneDrives(physicsHand.jointBodies[boneArrayIndex], physicsHand.stiffness, physicsHand.forceLimit, physicsHand.strength, fingerIndex);
+                        SetupBoneDrives(physicsHand.jointBodies[boneArrayIndex], physicsHand.stiffness, physicsHand.forceLimit, physicsHand.strength);
 
                         physicsHand.jointBodies[boneArrayIndex].parentAnchorPosition = InverseTransformPoint(prevBone.PrevJoint, prevBone.Rotation, bone.PrevJoint);
                         physicsHand.jointBodies[boneArrayIndex].parentAnchorRotation = Quaternion.identity;
@@ -358,7 +358,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             knuckle.zDrive = yDrive;
         }
 
-        public static void SetupBoneDrives(ArticulationBody bone, float stiffness, float forceLimit, float strength, int fingerIndex)
+        public static void SetupBoneDrives(ArticulationBody bone, float stiffness, float forceLimit, float strength)
         {
             bone.jointType = ArticulationJointType.RevoluteJoint;
             bone.twistLock = ArticulationDofLock.LimitedMotion;

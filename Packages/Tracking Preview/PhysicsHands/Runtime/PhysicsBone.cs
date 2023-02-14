@@ -32,11 +32,8 @@ namespace Leap.Unity.Interaction.PhysicsHands
         private ArticulationBody _body;
 
         private float _origXDriveLower = float.MinValue, _origXDriveUpper = float.MaxValue;
-        private float _origYDriveLower = float.MinValue, _origYDriveUpper = float.MaxValue;
         public float OriginalXDriveLower => _origXDriveLower;
         public float OriginalXDriveUpper => _origXDriveUpper;
-        public float OriginalYDriveLower => _origYDriveLower;
-        public float OriginalYDriveUpper => _origYDriveUpper;
 
         public int Finger => _finger;
         [SerializeField, HideInInspector]
@@ -46,12 +43,24 @@ namespace Leap.Unity.Interaction.PhysicsHands
         [SerializeField, HideInInspector]
         private int _joint;
 
+        /// <summary>
+        /// Reports whether any object is near to the bone
+        /// </summary>
         public bool IsObjectNearBone => _isObjectNearBone;
+        /// <summary>
+        /// Reports whether any of the currently grasped objects are near to the bone
+        /// </summary>
         public bool IsGraspedObjectNearBone => _isGraspedObjectNearBone;
 
         private bool _isObjectNearBone = false, _isGraspedObjectNearBone = false;
 
+        /// <summary>
+        /// Will report float.MaxValue if IsObjectNearBone is false
+        /// </summary>
         public float ObjectDistance => _objectDistance;
+        /// <summary>
+        /// Will report float.MaxValue if IsGraspedObjectNearBone is false
+        /// </summary>
         public float GraspedObjectDistance => _graspedObjectDistance;
         private float _objectDistance = -1f, _graspedObjectDistance = -1f;
 
@@ -101,8 +110,6 @@ namespace Leap.Unity.Interaction.PhysicsHands
             {
                 _origXDriveLower = _body.xDrive.lowerLimit;
                 _origXDriveUpper = _body.xDrive.upperLimit;
-                _origYDriveLower = _body.yDrive.lowerLimit;
-                _origYDriveUpper = _body.yDrive.upperLimit;
             }
         }
 
@@ -157,9 +164,9 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
             CalculateJointDistance(position, upDirection, radius, height * 2f, true);
 
-            // Run a second test pointing forward a bit for the tip
             if (Joint == 2)
             {
+                // Run a second test pointing forward a bit for the tip
                 CalculateJointDistance(position + transform.rotation * new Vector3(0, radius * .2f, height * .15f), Vector3.Lerp(upDirection, transform.forward, 0.6f), radius, height * 2f);
             }
 
@@ -171,7 +178,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
             if (Finger == 0)
             {
-                // Thumb distances closer towards the object
+                // Thumb distances closer towards the object, pointing down a bit
                 Vector3 direction = Vector3.Lerp(-transform.up, _hand.Handedness == Chirality.Left ? transform.right : -transform.right, 0.6f);
                 position = _collider.bounds.center + transform.rotation * new Vector3(0, 0, height * .25f);
                 CalculateJointDistance(position, direction, radius, height * 2f, debug: true);
@@ -180,7 +187,6 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
         private void CalculateJointDistance(Vector3 origin, Vector3 direction, float radius, float length, bool forceUpdate = false, bool debug = false)
         {
-            // Second set of distance checks closer to the center of the bone
             DistanceCalculation(origin, direction, radius, length, out bool anyFound, out float objectDistance, out bool graspFound, out float graspDistance);
 
             if (anyFound)
@@ -211,6 +217,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             _graspRay.origin = origin;
             _graspRay.direction = direction;
 
+            // Using a sphere cast here will result in more reliable contact checks
             int cols = Physics.SphereCastNonAlloc(_graspRay, radius, _rayCache, length, _hand.Provider.InteractionMask, QueryTriggerInteraction.Ignore);
 
             anyFound = false;

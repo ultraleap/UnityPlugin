@@ -549,7 +549,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                     }
                 }
 
-                yield return new WaitForFixedUpdate();
+                yield return _waitForFixedUpdate;
             }
         }
 
