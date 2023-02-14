@@ -1,9 +1,11 @@
+using LeapInternal;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.UIElements;
 
 namespace Leap.Unity
 {
@@ -21,7 +23,11 @@ namespace Leap.Unity
         /// If this is left blank, It will search for all hands in the scene
         /// </summary>
         [SerializeField]
-        List<HandModelBase> handsToDetect = new();
+        List<CapsuleHand> handsToDetect = new();
+
+
+        [SerializeField]
+        LeapProvider leapProvider;
 
         /// <summary>
         /// How many bones need to match per finger?
@@ -32,6 +38,16 @@ namespace Leap.Unity
 
         public static event Action<HandPoseScriptableObject> PoseHasBeenDetected;
         public static event Action PoseHasNotBeenDetected;
+
+        private void Start()
+        {
+            PoseHasBeenDetected += PoseDetected;
+            PoseHasNotBeenDetected += PoseNotDetected;
+        }
+        private void PoseDetected(HandPoseScriptableObject poseScriptableObject) { }
+        private void PoseNotDetected() { }
+
+        
 
 
         // Update is called once per frame
@@ -46,7 +62,7 @@ namespace Leap.Unity
             // This will only do this once unless manually cleared.
             if (handsToDetect.Count <= 0)
             {
-                handsToDetect = GameObject.FindObjectsOfType<HandModelBase>().ToList();
+                handsToDetect = GameObject.FindObjectsOfType<CapsuleHand>().ToList();
                 if(handsToDetect.Count <= 0) 
                 {
                     Debug.Log("Skipping pose detection, there are no Leap hands in the scene");
@@ -54,7 +70,7 @@ namespace Leap.Unity
                 }
             }
 
-            foreach (var activePlayerHand in handsToDetect)
+            foreach (var activePlayerHand in leapProvider.CurrentFrame.Hands)
             {
                 foreach (HandPoseScriptableObject pose in PosesToDetect)
                 {
@@ -68,39 +84,84 @@ namespace Leap.Unity
                         PoseHasBeenDetected.Invoke(pose);
                     }
                 }
+                foreach (var item in handsToDetect)
+                {
+                    var capsuleHand = (CapsuleHand)item;
+                    if (capsuleHand != null && capsuleHand != null)
+                    {
+                        if (capsuleHand.GetLeapHand().Id == activePlayerHand.Id)
+                        {
+                            capsuleHand.SetIndividualSphereColors = true;
+                            capsuleHand.SphereColors = capsuleHandColours;
+
+                        }
+                    }
+                }
             }
+
         }
 
-        private bool CompareHands(HandPoseScriptableObject pose, HandModelBase activePlayerHand)
+        Color[] capsuleHandColours = null;
+
+        private bool CompareHands(HandPoseScriptableObject pose, Hand activePlayerHand)
         {
             Hand serializedHand = pose.GetSerializedHand();
-            Hand playerHand = activePlayerHand.GetLeapHand();
-            int numMatchedBones = 0;
+            Hand playerHand = activePlayerHand;
             int numMatchedFingers = 0;
-            float fingerRotationThreshold = 0;
 
-            // Edoes the anach finger
+            if (serializedHand == null || playerHand == null)
+            {
+                return false;
+            }
+
+            var colourCapsuleHand = handsToDetect.FirstOrDefault();
+            if (colourCapsuleHand != null)
+            {
+                if (capsuleHandColours == null)
+                {
+                    capsuleHandColours = colourCapsuleHand.SphereColors;
+                }
+            }
+
             foreach (int fingerNum in pose.GetFingerIndexesToCheck())
             {
+                int numMatchedBones = 0;
+                Quaternion lastBoneRotation = playerHand.Rotation;
+                Quaternion lastSerializedBoneRotation = serializedHand.Rotation;
                 // Each bone in the finger 
                 for (int i = 0; i < serializedHand.Fingers[fingerNum].bones.Length; i++)
                 {
                     // Get the same bone for both comparison hand and player hand
-                    Bone serializedPoseBone = serializedHand.Fingers[fingerNum].bones[i];
-                    Bone activeHandBone = playerHand.Fingers[fingerNum].Bone(serializedPoseBone.Type);
-                    
+                    Bone activeHandBone = playerHand.Fingers[fingerNum].bones[i];
+                    Bone serializedHandBone = serializedHand.Fingers[fingerNum].bones[i];
+
+
                     // Get the user defined rotation threshold for the current bone (threshold is defined in the pose scriptable object)
-                    fingerRotationThreshold = GetBoneRotationThreshold(pose, fingerNum, (int)serializedPoseBone.Type);
+                    float fingerRotationThreshold = GetBoneRotationThreshold(pose, fingerNum, i);
 
-                    // Get the rotation of the current bone by comparing the top and bottom joint positions of the bone.
-                    var activeHandBoneRotation = Math.Abs(Vector3.Angle(activeHandBone.PrevJoint, activeHandBone.NextJoint));
-                    var serializedPoseBoneRotation = Math.Abs(Vector3.Angle(serializedPoseBone.PrevJoint, serializedPoseBone.NextJoint));
+                    Quaternion activeBoneRotation = activeHandBone.Rotation;
+                    Quaternion serializedBoneRotation = serializedHandBone.Rotation;
 
-                    // Get the difference in angle between the pose rotation and our hand rotation
-                    var angleDifference = Math.Floor(Math.Abs(activeHandBoneRotation - serializedPoseBoneRotation) * 360);
+                    Vector3 activeRotEuler = (Quaternion.Inverse(lastBoneRotation) * activeBoneRotation).eulerAngles;
+                    Vector3 serializedRotEuler = (Quaternion.Inverse(lastSerializedBoneRotation) * serializedBoneRotation).eulerAngles;
+
+                    Vector3 eulerDifference = GetEulerAngleDifference(serializedRotEuler, activeRotEuler);
+                    float boneDifference = GetDegreeAngleDifference(serializedRotEuler, activeRotEuler);
+
+                    lastBoneRotation = activeBoneRotation;
+                    lastSerializedBoneRotation = serializedBoneRotation;
+
+                    if (capsuleHandColours != null)
+                    {
+                        capsuleHandColours[fingerNum * 4 + i] = Color.Lerp(Color.green, Color.red, boneDifference / fingerRotationThreshold);
+                    }
+
+                    Debug.Log("Finger: " + serializedHand.Fingers[fingerNum].ToString() 
+                        + " bone: " + serializedHand.Fingers[fingerNum].bones[i].Type 
+                        + " rotationDifference: " + boneDifference);
 
                     // check is the angle difference is lower than the threshold
-                    if (angleDifference <= fingerRotationThreshold)
+                    if (boneDifference <= fingerRotationThreshold && boneDifference >= -fingerRotationThreshold)
                     {
                         numMatchedBones++;
                     }
@@ -112,6 +173,8 @@ namespace Leap.Unity
                 }
             }
 
+
+
             if (numMatchedFingers >= pose.GetFingerIndexesToCheck().Count)
             {
                 return true;
@@ -120,6 +183,17 @@ namespace Leap.Unity
             {
                 return false;
             }
+        }
+
+        Vector3 GetEulerAngleDifference(Vector3 a, Vector3 b)
+        {
+            return new Vector3(Mathf.DeltaAngle(a.x, b.x), Mathf.DeltaAngle(a.y, b.y), Mathf.DeltaAngle(a.z, b.z));
+        }
+
+        float GetDegreeAngleDifference(Vector3 a, Vector3 b)
+        {
+            var averageAngle = (Mathf.DeltaAngle(a.x, b.x) + Mathf.DeltaAngle(a.y, b.y)/* + Mathf.DeltaAngle(a.z, b.z)*/)/2;
+            return averageAngle;
         }
 
         private float GetBoneRotationThreshold(HandPoseScriptableObject pose, int fingerNum, int boneNum)

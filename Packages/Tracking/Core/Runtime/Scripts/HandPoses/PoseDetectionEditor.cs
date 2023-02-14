@@ -1,13 +1,7 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
-using UnityEngine.Experimental.GlobalIllumination;
-using UnityEngine.Rendering;
-using UnityEngine.XR;
 using System;
-using UnityEngine.EventSystems;
-using UnityEngine.UIElements;
 
 namespace Leap.Unity
 {
