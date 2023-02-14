@@ -15,6 +15,7 @@ using Leap.Unity;
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using System.Collections;
 
 namespace Leap.Unity.Interaction.PhysicsHands
 {
@@ -129,11 +130,12 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
         private int[] _graspingFingers = new int[5];
         private bool[] _wasGraspingBones = new bool[Hand.BONES * Hand.FINGERS];
-        private bool[] _graspingPreviousFrame = new bool[Hand.BONES * Hand.FINGERS];
         private float[] _graspingXDrives = new float[Hand.BONES * Hand.FINGERS];
         private float[] _graspingFingerDistance = new float[5];
         private float[] _xForceLimits = new float[Hand.BONES * Hand.FINGERS];
         private float[] _xDampening = new float[Hand.BONES * Hand.FINGERS];
+
+        private WaitForFixedUpdate _waitForFixedUpdate;
 
         private bool _hasGenerated = false;
         private float _timeOnReset = 0;
@@ -216,6 +218,8 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
             gameObject.SetActive(true);
             _physicsHand.gameObject.SetActive(false);
+            _waitForFixedUpdate = new WaitForFixedUpdate();
+            StartCoroutine(LateFixedUpdate());
         }
 
         #region Hand Reset
@@ -365,83 +369,6 @@ namespace Leap.Unity.Interaction.PhysicsHands
             for (int fingerIndex = 0; fingerIndex < Hand.FINGERS; fingerIndex++)
             {
                 Bone knuckleBone = _originalLeapHand.Fingers[fingerIndex].Bone(0);
-                
-                _graspingFingerDistance[fingerIndex] = 1f;
-
-                _graspingFingers[fingerIndex] = -1;
-                bool hasFingerGrasped = false;
-
-                for (int jointIndex = Hand.BONES - 1; jointIndex >= 0; jointIndex--)
-                {
-                    int boneArrayIndex = fingerIndex * Hand.BONES + jointIndex;
-                    // If we haven't grasped the other joints then we're not going to successfully with the 0th.
-                    if (_graspingFingers[fingerIndex] == -1 && jointIndex == 0)
-                    {
-                        if (!hasFingerGrasped)
-                        {
-                            _wasGraspingBones[boneArrayIndex] = false;
-                        }
-                        continue;
-                    }
-
-                    if (_graspingFingers[fingerIndex] != -1)
-                    {
-                        if (!_wasGraspingBones[boneArrayIndex])
-                        {
-                            _graspingXDrives[boneArrayIndex] = _physicsHand.jointBodies[boneArrayIndex].jointPosition[0] * Mathf.Rad2Deg;
-                            _wasGraspingBones[boneArrayIndex] = true;
-                        }
-                    }
-                    else if (_physicsHand.jointBones[boneArrayIndex].IsGrasping)
-                    {
-                        if (_wasGraspingBones[boneArrayIndex])
-                        {
-                            if (_physicsHand.jointBones[boneArrayIndex].IsObjectNearBone && _physicsHand.jointBones[boneArrayIndex].ObjectDistance < (fingerIndex == 0 ? Hand.CONTACT_THUMB_EXIT_DISTANCE : Hand.CONTACT_EXIT_DISTANCE))
-                            {
-                                _graspingFingers[fingerIndex] = jointIndex;
-                                _wasGraspingBones[boneArrayIndex] = true;
-                            }
-                            else
-                            {
-                                _wasGraspingBones[boneArrayIndex] = false;
-                            }
-                        }
-                        else
-                        {
-                            if (_physicsHand.jointBones[boneArrayIndex].IsObjectNearBone && _physicsHand.jointBones[boneArrayIndex].ObjectDistance < (fingerIndex == 0 ? Hand.CONTACT_THUMB_ENTER_DISTANCE : Hand.CONTACT_ENTER_DISTANCE))
-                            {
-                                _graspingXDrives[boneArrayIndex] = _physicsHand.jointBodies[boneArrayIndex].jointPosition[0] * Mathf.Rad2Deg;
-                                _graspingFingers[fingerIndex] = jointIndex;
-                                _wasGraspingBones[boneArrayIndex] = true;
-                            }
-                            else
-                            {
-                                _wasGraspingBones[boneArrayIndex] = false;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        if (_wasGraspingBones[boneArrayIndex] && _physicsHand.jointBones[boneArrayIndex].IsObjectNearBone && _physicsHand.jointBones[boneArrayIndex].ObjectDistance < (fingerIndex == 0 ? Hand.CONTACT_THUMB_EXIT_DISTANCE : Hand.CONTACT_EXIT_DISTANCE))
-                        {
-                            _graspingFingers[fingerIndex] = jointIndex;
-                            _wasGraspingBones[boneArrayIndex] = true;
-                        }
-                        else
-                        {
-                            _wasGraspingBones[boneArrayIndex] = false;
-                        }
-                    }
-                    if (_wasGraspingBones[boneArrayIndex])
-                    {
-                        hasFingerGrasped = true;
-                        if(_physicsHand.jointBones[boneArrayIndex].IsObjectNearBone && 
-                            (_physicsHand.jointBones[boneArrayIndex].ObjectDistance < _graspingFingerDistance[fingerIndex] || (_graspingFingerDistance[fingerIndex] == 1 && jointIndex == 0)))
-                        {
-                            _graspingFingerDistance[fingerIndex] = _physicsHand.jointBones[boneArrayIndex].ObjectDistance;
-                        }
-                    }
-                }
 
                 for (int jointIndex = 0; jointIndex < Hand.BONES; jointIndex++)
                 {
@@ -504,16 +431,17 @@ namespace Leap.Unity.Interaction.PhysicsHands
                     xDrive.target = _wasGraspingBones[boneArrayIndex] ? Mathf.Clamp(xTargetAngle, body.xDrive.lowerLimit, _graspingXDrives[boneArrayIndex]) : xTargetAngle;
                     body.xDrive = xDrive;
 
-                    float yTargetAngle = PhysicsHandsUtils.CalculateYJointAngle(prevBone.Rotation, bone.Rotation);
+                    if (jointIndex == 0)
+                    {
+                        float yTargetAngle = PhysicsHandsUtils.CalculateYJointAngle(prevBone.Rotation, bone.Rotation);
 
-                    ArticulationDrive yDrive = body.yDrive;
-                    yDrive.damping = _xDampening[boneArrayIndex] * .75f;
-                    yDrive.stiffness = _physicsHand.stiffness * _physicsHand.strength;
-                    yDrive.forceLimit = _physicsHand.forceLimit * _physicsHand.strength / Time.fixedDeltaTime;
-                    yDrive.target = yTargetAngle;
-                    body.yDrive = yDrive;
-
-                    _graspingPreviousFrame[boneArrayIndex] = _wasGraspingBones[boneArrayIndex];
+                        ArticulationDrive yDrive = body.yDrive;
+                        yDrive.damping = _xDampening[boneArrayIndex] * .75f;
+                        yDrive.stiffness = _physicsHand.stiffness * _physicsHand.strength;
+                        yDrive.forceLimit = _physicsHand.forceLimit * _physicsHand.strength / Time.fixedDeltaTime;
+                        yDrive.target = yTargetAngle;
+                        body.yDrive = yDrive;
+                    }
                 }
             }
 
@@ -533,6 +461,96 @@ namespace Leap.Unity.Interaction.PhysicsHands
             OnUpdatePhysics?.Invoke();
 
             CachePositions();
+        }
+
+        // Happens after the physics simulation
+        private IEnumerator LateFixedUpdate()
+        {
+            for(; ; )
+            {
+                for (int fingerIndex = 0; fingerIndex < Hand.FINGERS; fingerIndex++)
+                {
+                    _graspingFingerDistance[fingerIndex] = 1f;
+
+                    _graspingFingers[fingerIndex] = -1;
+
+                    bool hasFingerGrasped = false;
+
+                    for (int jointIndex = Hand.BONES - 1; jointIndex >= 0; jointIndex--)
+                    {
+                        int boneArrayIndex = fingerIndex * Hand.BONES + jointIndex;
+                        // If we haven't grasped the other joints then we're not going to successfully with the 0th.
+                        if (_graspingFingers[fingerIndex] == -1 && jointIndex == 0)
+                        {
+                            if (!hasFingerGrasped)
+                            {
+                                _wasGraspingBones[boneArrayIndex] = false;
+                            }
+                            continue;
+                        }
+
+                        if (_graspingFingers[fingerIndex] != -1)
+                        {
+                            if (!_wasGraspingBones[boneArrayIndex])
+                            {
+                                _graspingXDrives[boneArrayIndex] = _physicsHand.jointBodies[boneArrayIndex].jointPosition[0] * Mathf.Rad2Deg;
+                                _wasGraspingBones[boneArrayIndex] = true;
+                            }
+                        }
+                        else if (_physicsHand.jointBones[boneArrayIndex].IsGrasping)
+                        {
+                            if (_wasGraspingBones[boneArrayIndex])
+                            {
+                                if (_physicsHand.jointBones[boneArrayIndex].IsObjectNearBone && _physicsHand.jointBones[boneArrayIndex].ObjectDistance < (fingerIndex == 0 ? Hand.CONTACT_THUMB_EXIT_DISTANCE : Hand.CONTACT_EXIT_DISTANCE))
+                                {
+                                    _graspingFingers[fingerIndex] = jointIndex;
+                                    _wasGraspingBones[boneArrayIndex] = true;
+                                }
+                                else
+                                {
+                                    _wasGraspingBones[boneArrayIndex] = false;
+                                }
+                            }
+                            else
+                            {
+                                if (_physicsHand.jointBones[boneArrayIndex].IsObjectNearBone && _physicsHand.jointBones[boneArrayIndex].ObjectDistance < (fingerIndex == 0 ? Hand.CONTACT_THUMB_ENTER_DISTANCE : Hand.CONTACT_ENTER_DISTANCE))
+                                {
+                                    _graspingXDrives[boneArrayIndex] = _physicsHand.jointBodies[boneArrayIndex].jointPosition[0] * Mathf.Rad2Deg;
+                                    _graspingFingers[fingerIndex] = jointIndex;
+                                    _wasGraspingBones[boneArrayIndex] = true;
+                                }
+                                else
+                                {
+                                    _wasGraspingBones[boneArrayIndex] = false;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            if (_wasGraspingBones[boneArrayIndex] && _physicsHand.jointBones[boneArrayIndex].IsObjectNearBone && _physicsHand.jointBones[boneArrayIndex].ObjectDistance < (fingerIndex == 0 ? Hand.CONTACT_THUMB_EXIT_DISTANCE : Hand.CONTACT_EXIT_DISTANCE))
+                            {
+                                _graspingFingers[fingerIndex] = jointIndex;
+                                _wasGraspingBones[boneArrayIndex] = true;
+                            }
+                            else
+                            {
+                                _wasGraspingBones[boneArrayIndex] = false;
+                            }
+                        }
+                        if (_wasGraspingBones[boneArrayIndex])
+                        {
+                            hasFingerGrasped = true;
+                            if (_physicsHand.jointBones[boneArrayIndex].IsObjectNearBone &&
+                                (_physicsHand.jointBones[boneArrayIndex].ObjectDistance < _graspingFingerDistance[fingerIndex] || (_graspingFingerDistance[fingerIndex] == 1 && jointIndex == 0)))
+                            {
+                                _graspingFingerDistance[fingerIndex] = _physicsHand.jointBones[boneArrayIndex].ObjectDistance;
+                            }
+                        }
+                    }
+                }
+
+                yield return new WaitForFixedUpdate();
+            }
         }
 
         private void CachePositions()

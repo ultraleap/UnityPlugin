@@ -360,17 +360,8 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
         public static void SetupBoneDrives(ArticulationBody bone, float stiffness, float forceLimit, float strength, int fingerIndex)
         {
-            if(fingerIndex == 0)
-            {
-                bone.jointType = ArticulationJointType.RevoluteJoint;
-            }
-            else
-            {
-                bone.jointType = ArticulationJointType.SphericalJoint;
-            }
+            bone.jointType = ArticulationJointType.RevoluteJoint;
             bone.twistLock = ArticulationDofLock.LimitedMotion;
-            bone.swingYLock = ArticulationDofLock.LimitedMotion;
-            bone.swingZLock = ArticulationDofLock.LimitedMotion;
 
             ArticulationDrive xDrive = new ArticulationDrive()
             {
@@ -382,22 +373,6 @@ namespace Leap.Unity.Interaction.PhysicsHands
             };
 
             bone.xDrive = xDrive;
-
-            ArticulationDrive yDrive = new ArticulationDrive()
-            {
-                stiffness = stiffness * strength,
-                forceLimit = forceLimit * strength / Time.fixedDeltaTime,
-                damping = 2f,
-                lowerLimit = -8f,
-                upperLimit = 8f
-            };
-
-            bone.yDrive = yDrive;
-
-            // Set Z limits to 0, locking them causes insane jittering
-            yDrive.lowerLimit = 0f;
-            yDrive.upperLimit = 0f;
-            bone.zDrive = yDrive;
         }
 
         public static void SetupPalmCollider(BoxCollider collider, Hand hand, PhysicMaterial material = null)
@@ -494,7 +469,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
         public static Vector3 CalculatePalmSize(Hand hand)
         {
-            return new Vector3(hand.PalmWidth * 0.98f, 0.025f, Vector3.Distance(CalculateAverageKnucklePosition(hand), hand.WristPosition));
+            return new Vector3(hand.PalmWidth, 0.025f, Vector3.Distance(CalculateAverageKnucklePosition(hand), hand.WristPosition));
         }
 
         public static void InterpolateKnucklePosition(ArticulationBody body, PhysicsBone bone, Leap.Hand leapHand, float deltaTime)

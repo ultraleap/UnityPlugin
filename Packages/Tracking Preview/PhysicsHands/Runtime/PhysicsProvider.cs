@@ -150,12 +150,21 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
         private bool _leftWasNull = true, _rightWasNull = true;
 
+        private WaitForFixedUpdate _waitForFixedUpdate = new WaitForFixedUpdate();
+
         private void Awake()
         {
             _leftOriginalLeap = new Hand();
             _rightOriginalLeap = new Hand();
             GenerateLayers();
             SetupAutomaticCollisionLayers();
+        }
+
+        protected override void OnEnable()
+        {
+            base.OnEnable();
+            _waitForFixedUpdate = new WaitForFixedUpdate();
+            StartCoroutine(LateFixedFrameProcess());
         }
 
         #region Layer Generation
@@ -319,26 +328,36 @@ namespace Leap.Unity.Interaction.PhysicsHands
         {
             UpdatePhysicsHand(LeftHand, _leftIndex == -1 ? null : _leftOriginalLeap, ref _leftWasNull);
             UpdatePhysicsHand(RightHand, _rightIndex == -1 ? null : _rightOriginalLeap, ref _rightWasNull);
+        }
 
-            if (_enableHelpers)
+        // Happens after the physics simulation
+        private IEnumerator LateFixedFrameProcess()
+        {
+            yield return null;
+            for(; ; )
             {
-                ComputeHelperBones();
-            }
-
-            PhysicsGraspHelper.State oldState, state;
-
-            foreach (var helper in _graspHelpers)
-            {
-                // Removed ignore check here and moved into the helper so we can still get state information
-                oldState = helper.Value.GraspState;
-                state = helper.Value.UpdateHelper();
-                if (state != oldState)
+                if (_enableHelpers)
                 {
-                    OnObjectStateChange?.Invoke(helper.Value.Rigidbody, helper.Value);
+                    ComputeHelperBones();
                 }
-            }
 
-            UpdateHandStates();
+                PhysicsGraspHelper.State oldState, state;
+
+                foreach (var helper in _graspHelpers)
+                {
+                    // Removed ignore check here and moved into the helper so we can still get state information
+                    oldState = helper.Value.GraspState;
+                    state = helper.Value.UpdateHelper();
+                    if (state != oldState)
+                    {
+                        OnObjectStateChange?.Invoke(helper.Value.Rigidbody, helper.Value);
+                    }
+                }
+
+                UpdateHandStates();
+
+                yield return _waitForFixedUpdate;
+            }
         }
 
         private void ApplyHand(int index, ref Frame inputFrame, PhysicsHand hand)
