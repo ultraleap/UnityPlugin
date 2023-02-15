@@ -38,53 +38,69 @@ namespace Leap.Unity
     public class HandPoseScriptableObject : ScriptableObject
     {
 
-        /// <summary>
-        /// Which fingers should be checked when doing pose detection?
-        /// </summary>
+
         public bool CheckThumb = true;
         public bool CheckIndex = true;
         public bool CheckMiddle = true;
         public bool CheckRing = true;
         public bool CheckPinkie = true;
 
+        [SerializeField] int thumbBonesToMatch = 3;
+        [SerializeField] int indexBonesToMatch = 3;
+        [SerializeField] int middleBonesToMatch = 3;
+        [SerializeField] int ringBonesToMatch = 3;
+        [SerializeField] int pinkieBonesToMatch = 3;
+
         [SerializeField]
         private List<int> fingerIndexesToCheck = new();
+        private List<int> bonesPerFingerToMatch = new();
 
         public List<int> GetFingerIndexesToCheck()
         {
             ApplyFingersToUse();
             return fingerIndexesToCheck;
         }
+        public List<int> GetNumBonesForMatch()
+        {
+            ApplyNumBonesToMatch();
+            return bonesPerFingerToMatch;
+        }
+        public int GetNumBonesForMatch(int fingerNum)
+        {
+            ApplyNumBonesToMatch();
+            return bonesPerFingerToMatch[fingerNum];
+        }
 
         [SerializeField]
         private Hand serialisedHand;
-
         public Hand GetSerializedHand()
         {
             return serialisedHand;
         }
 
-        private static float JointRot = 15;
+
 
         #region Finger Thresholds
+
+        private static float defaultRotation = 15;
         public List<float>[] fingerRotationThresholds = new List<float>[5];
 
         [Header("Finger Rotational Thresholds")]
         [SerializeField]
         [NamedListAttribute(new string[] { "Metacarpal", "Proximal", "Intermediate", "Distal" })]
-        private List<float> ThumbJointRotation = new List<float>() { JointRot, JointRot, JointRot, JointRot };
+        private List<float> ThumbJointRotation = new List<float>() { defaultRotation, defaultRotation, defaultRotation, defaultRotation };
         [SerializeField]
         [NamedListAttribute(new string[] { "Metacarpal", "Proximal", "Intermediate", "Distal" })]
-        private List<float> IndexJointRotataion = new List<float>() { JointRot, JointRot, JointRot, JointRot };
+        private List<float> IndexJointRotataion = new List<float>() { defaultRotation, defaultRotation, defaultRotation, defaultRotation };
         [SerializeField]
         [NamedListAttribute(new string[] { "Metacarpal", "Proximal", "Intermediate", "Distal" })]
-        private List<float> MiddleJointRotaion = new List<float>() { JointRot, JointRot, JointRot, JointRot };
+        private List<float> MiddleJointRotaion = new List<float>() { defaultRotation, defaultRotation, defaultRotation, defaultRotation };
         [SerializeField]
         [NamedListAttribute(new string[] { "Metacarpal", "Proximal", "Intermediate", "Distal" })]
-        private List<float> RingJointRotaion = new List<float>() { JointRot, JointRot, JointRot, JointRot };
+        private List<float> RingJointRotaion = new List<float>() { defaultRotation, defaultRotation, defaultRotation, defaultRotation };
         [SerializeField]
         [NamedListAttribute(new string[] { "Metacarpal", "Proximal", "Intermediate", "Distal" })]
-        private List<float> PinkieJointRotaion = new List<float>() { JointRot, JointRot, JointRot, JointRot };
+        private List<float> PinkieJointRotaion = new List<float>() { defaultRotation, defaultRotation, defaultRotation, defaultRotation };
         #endregion
 
         public void SaveHandPose(Hand handToSerialise)
@@ -129,6 +145,17 @@ namespace Leap.Unity
             if (CheckMiddle) { fingerIndexesToCheck.Add(2); }
             if (CheckRing) { fingerIndexesToCheck.Add(3); }
             if (CheckPinkie) { fingerIndexesToCheck.Add(4); }
+
+        }
+
+        private void ApplyNumBonesToMatch()
+        {
+            bonesPerFingerToMatch.Clear();
+            bonesPerFingerToMatch.Add(thumbBonesToMatch);
+            bonesPerFingerToMatch.Add(indexBonesToMatch);
+            bonesPerFingerToMatch.Add(middleBonesToMatch);
+            bonesPerFingerToMatch.Add(ringBonesToMatch);
+            bonesPerFingerToMatch.Add(pinkieBonesToMatch);
         }
     }
 }
