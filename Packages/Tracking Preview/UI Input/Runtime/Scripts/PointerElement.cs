@@ -163,21 +163,30 @@ namespace Leap.Unity.InputModule
 
         internal void Process(Hand hand, IProjectionOriginProvider projectionOriginProvider)
         {
-            //Control cursor display
-            cursor.gameObject.SetActive(true);
+            if (hand == null)
+            {
+                if (cursor.gameObject.activeSelf)
+                {
+                    cursor.gameObject.SetActive(false);
+                }
+
+                return;
+            }
 
             if (forceDisable)
             {
                 cursor.gameObject.SetActive(false);
             }
-
-            if (hand == null || (disableWhenOffCanvas && PointerState == PointerStates.OffCanvas))
+            else if (disableWhenOffCanvas && PointerState == PointerStates.OffCanvas)
             {
-                if (gameObject.activeInHierarchy)
+                if (cursor.gameObject.activeSelf)
                 {
                     cursor.gameObject.SetActive(false);
-                    if (hand == null) return;
                 }
+            }
+            else if (!cursor.gameObject.activeSelf)
+            {
+                cursor.gameObject.SetActive(true);
             }
 
             //Select interaction
