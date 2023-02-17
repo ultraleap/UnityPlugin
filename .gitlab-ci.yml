@@ -159,7 +159,7 @@ dependencies-libtrack:
     #  - LIBTRACK_BRANCH
     
     LIBTRACK_URL: "https://gitlab.ultrahaptics.com/api/v4/projects/leap-v5-platform%2Flibtrack/jobs/artifacts/$LIBTRACK_BRANCH/raw"
-    LIBTRACK_ANDROID_JOB: "AndroidRelProdLTS"
+    LIBTRACK_ANDROID_JOB: "AndroidRelWithDebInfoProdLTS"
     LIBTRACK_WINDOWS_JOB: "WinRelDebProdLTS"
 
     ANDROID_ARTIFACTS_PATH: "$ARTIFACTS_PATH/Android"
