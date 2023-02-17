@@ -23,7 +23,6 @@ namespace Leap.Unity
     {
         private const int TOTAL_JOINT_COUNT = 4 * 5;
         private const float CYLINDER_MESH_RESOLUTION = 0.1f; //in centimeters, meshes within this resolution will be re-used
-        private const int THUMB_BASE_INDEX = (int)Finger.FingerType.TYPE_THUMB * 4;
         private const int PINKY_BASE_INDEX = (int)Finger.FingerType.TYPE_PINKY * 4;
 
         private static int _leftColorIndex = 0;
@@ -36,6 +35,9 @@ namespace Leap.Unity
 
         [SerializeField]
         private bool _showArm = true;
+
+        [SerializeField]
+        private bool _showPalmJoint = true;
 
         [SerializeField]
         private bool _castShadows = true;
@@ -82,6 +84,8 @@ namespace Leap.Unity
 
         private MaterialPropertyBlock _materialPropertyBlock;
         private Color[] _sphereColors;
+
+        private float currentLossyScaleX;
 
         [HideInInspector]
         public bool SetIndividualSphereColors = false;
@@ -292,6 +296,8 @@ namespace Leap.Unity
         /// </summary>
         public override void UpdateHand()
         {
+            currentLossyScaleX = transform.lossyScale.x;
+
             _curSphereIndex = 0;
             _curCylinderIndex = 0;
 
@@ -316,22 +322,22 @@ namespace Leap.Unity
                 {
                     int key = getFingerJointIndex((int)finger.Type, j);
 
-                    Vector3 position = finger.Bone((Bone.BoneType)j).NextJoint;
-                    _spherePositions[key] = position;
 
+                    Vector3 position;
+                    if (finger.Type == Finger.FingerType.TYPE_THUMB && j == 0)
+                    {
+                        // Hand the base of the thumb differently, and move it to the base of the index metacarpal.
+                        position = _hand.GetIndex().Bone((Bone.BoneType)j).PrevJoint;
+                    }
+                    else
+                    {
+                        position = finger.Bone((Bone.BoneType)j).NextJoint;
+                    }
+
+                    _spherePositions[key] = position;
                     drawSphere(position);
                 }
             }
-
-            //Now we just have a few more spheres for the hands
-            //PalmPos, WristPos, and mockThumbJointPos, which is derived and not taken from the frame obj
-
-            Vector3 palmPosition = _hand.PalmPosition;
-            drawSphere(palmPosition, _palmRadius);
-
-            Vector3 thumbBaseToPalm = _spherePositions[THUMB_BASE_INDEX] - _hand.PalmPosition;
-            Vector3 mockThumbJointPos = _hand.PalmPosition + Vector3.Reflect(thumbBaseToPalm, _hand.Basis.xBasis);
-            drawSphere(mockThumbJointPos);
 
             //If we want to show the arm, do the calculations and display the meshes
             if (_showArm)
@@ -388,9 +394,20 @@ namespace Leap.Unity
                 drawCylinder(posA, posB);
             }
 
-            //Draw the rest of the hand
-            drawCylinder(mockThumbJointPos, THUMB_BASE_INDEX);
-            drawCylinder(mockThumbJointPos, PINKY_BASE_INDEX);
+            if (_showPalmJoint)
+            {
+                //Now we just have a few more spheres for the hands
+                //PalmPos, WristPos, and the virtual palm drawn from the metacarpals.
+                Vector3 palmPosition = _hand.PalmPosition;
+                drawSphere(palmPosition, _palmRadius);
+            }
+
+            Vector3 pinkyMetacarpal = _hand.GetPinky().Bone(Bone.BoneType.TYPE_METACARPAL).PrevJoint;
+            Vector3 indexMetacarpal = _hand.GetIndex().Bone(Bone.BoneType.TYPE_METACARPAL).PrevJoint;
+
+            drawSphere(pinkyMetacarpal);
+            drawCylinder(pinkyMetacarpal, indexMetacarpal);
+            drawCylinder(pinkyMetacarpal, PINKY_BASE_INDEX);
 
             if (SetIndividualSphereColors)
             {
@@ -435,7 +452,7 @@ namespace Leap.Unity
 
             //multiply radius by 2 because the default unity sphere has a radius of 0.5 meters at scale 1.
             _sphereMatrices[_curSphereIndex++] = Matrix4x4.TRS(position,
-              Quaternion.identity, Vector3.one * radius * 2.0f * transform.lossyScale.x);
+              Quaternion.identity, Vector3.one * radius * 2.0f * currentLossyScaleX);
         }
 
         private void drawCylinder(Vector3 a, Vector3 b)
@@ -447,7 +464,7 @@ namespace Leap.Unity
             if ((a - b).magnitude > 0.001f)
             {
                 _cylinderMatrices[_curCylinderIndex++] = Matrix4x4.TRS(a,
-                  Quaternion.LookRotation(b - a), new Vector3(transform.lossyScale.x, transform.lossyScale.x, length));
+                  Quaternion.LookRotation(b - a), new Vector3(currentLossyScaleX, currentLossyScaleX, length));
             }
         }
 
