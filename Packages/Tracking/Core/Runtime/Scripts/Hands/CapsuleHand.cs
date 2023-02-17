@@ -321,8 +321,8 @@ namespace Leap.Unity
                 for (int j = 0; j < 4; j++)
                 {
                     int key = getFingerJointIndex((int)finger.Type, j);
-                    
-                    
+
+
                     Vector3 position;
                     if (finger.Type == Finger.FingerType.TYPE_THUMB && j == 0)
                     {
@@ -333,7 +333,7 @@ namespace Leap.Unity
                     {
                         position = finger.Bone((Bone.BoneType)j).NextJoint;
                     }
-                    
+
                     _spherePositions[key] = position;
                     drawSphere(position);
                 }
@@ -404,7 +404,7 @@ namespace Leap.Unity
 
             Vector3 pinkyMetacarpal = _hand.GetPinky().Bone(Bone.BoneType.TYPE_METACARPAL).PrevJoint;
             Vector3 indexMetacarpal = _hand.GetIndex().Bone(Bone.BoneType.TYPE_METACARPAL).PrevJoint;
-            
+
             drawSphere(pinkyMetacarpal);
             drawCylinder(pinkyMetacarpal, indexMetacarpal);
             drawCylinder(pinkyMetacarpal, PINKY_BASE_INDEX);
