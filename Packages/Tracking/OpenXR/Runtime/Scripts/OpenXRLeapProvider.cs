@@ -16,7 +16,7 @@ namespace Ultraleap.Tracking.OpenXR
     public class OpenXRLeapProvider : LeapProvider
     {
         private LeapTransform trackerTransform = new LeapTransform(Vector3.zero, Quaternion.identity);
-        
+
         private Frame _currentFrame = new Frame();
 
         private Hand _leftHand = new Hand();
@@ -153,7 +153,7 @@ namespace Ultraleap.Tracking.OpenXR
         private bool PopulateLeapHandFromOpenXRJoints(HandTracker handTracker, ref Hand hand)
         {
             _joints ??= new HandJointLocation[handTracker.JointCount];
-            
+
             if (!handTracker.TryLocateHandJoints(_joints))
             {
                 if (handTracker == HandTracker.Left)
@@ -332,7 +332,7 @@ namespace Ultraleap.Tracking.OpenXR
 
             // Compute the distance midpoints between the thumb and the each finger and find the smallest.
             var minDistanceSquared = float.MaxValue;
-            
+
             // Iterate through the fingers, skipping the thumb.
             for (var i = 1; i < hand.Fingers.Count; ++i)
             {

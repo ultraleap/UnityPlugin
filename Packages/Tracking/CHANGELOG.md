@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [docs-website]: https://docs.ultraleap.com/unity-api/ "Ultraleap Docs"
 
-## [NEXT] - unreleased
+## [6.6.0] - 17/02/23
 
 ### Added
 - Interaction Grab Ball for 3D UI
@@ -20,7 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Reduced performance overhead when using Preview UI Input Cursor
 
 ### Fixed
-- 
+- Preview package example scene referencing a prefab in the non-preview package
 
 ### Known issues 
 - Scenes containing the infrared viewer render incorrectly on Android build targets and in scriptable render pipelines such as URP and HDRP. 
