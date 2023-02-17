@@ -199,14 +199,14 @@ namespace Leap.Unity.Interaction
             // Y restriction
             float yDiff = grabBallInteractionBehaviour.transform.position.y - _head.position.y;
 
-            if(yDiff > maxHeightFromHead)
+            if (yDiff > maxHeightFromHead)
             {
                 // clamp height to max
                 grabBallPose.position.y = _head.position.y + maxHeightFromHead;
                 grabBallRestrictionStatus.heightMax = true;
                 grabBallRestrictionStatus.heightMin = false;
             }
-            else if(yDiff < minHeightFromHead)
+            else if (yDiff < minHeightFromHead)
             {
                 // clamp height to min
                 grabBallPose.position.y = _head.position.y + minHeightFromHead;
@@ -227,7 +227,7 @@ namespace Leap.Unity.Interaction
             if (restrictGrabBallDistanceFromHead)
             {
                 RestrictGrabBallPosition();
-            } 
+            }
             else
             {
                 grabBallPose.position = grabBallInteractionBehaviour.transform.position;
