@@ -135,6 +135,8 @@ namespace Leap.Unity
         private void OnValidate()
         {
             ApplyFingersToUse();
+            ApplyThresholds();
+            ApplyNumBonesToMatch();
         }
 
         private void ApplyFingersToUse()
@@ -156,6 +158,17 @@ namespace Leap.Unity
             bonesPerFingerToMatch.Add(middleBonesToMatch);
             bonesPerFingerToMatch.Add(ringBonesToMatch);
             bonesPerFingerToMatch.Add(pinkieBonesToMatch);
+        }
+
+        public void SetAllBoneThresholds(float threshold)
+        {
+            ThumbJointRotation = new List<float>() { threshold, threshold, threshold, threshold };
+            IndexJointRotataion = new List<float>() { threshold, threshold, threshold, threshold };
+            MiddleJointRotaion = new List<float>() { threshold, threshold, threshold, threshold };
+            RingJointRotaion = new List<float>() { threshold, threshold, threshold, threshold };
+            PinkieJointRotaion = new List<float>() { threshold, threshold, threshold, threshold };
+
+            ApplyThresholds();
         }
     }
 }

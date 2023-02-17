@@ -15,22 +15,20 @@ namespace Leap.Unity
         /// A List of serialized hand poses to detect. Poses can be created using the "Hand Pose Recoder".
         /// Useful for multiple variations of the same pose i.e. left and right thumbs up.
         /// </summary>
-        [SerializeField]
-        List<HandPoseScriptableObject> PosesToDetect;
+
+        [HideInInspector]
+        public bool CheckBothHands = true;
+        [HideInInspector]
+        public Chirality ChiralityToCheck;
 
         [SerializeField]
-        HandPoseValidator handPoseValidator=null;
-
+        private List<HandPoseScriptableObject> _posesToDetect;
         [SerializeField]
-        bool checkBothHands = true;
+        private HandPoseValidator _handPoseValidator = null;
         [SerializeField]
-        Chirality chirality;
-
+        private LeapProvider _leapProvider = null;
         [SerializeField]
-        LeapProvider leapProvider;
-
-        [SerializeField]
-        float hysteresisThreshold = 5;
+        private float _hysteresisThreshold = 5;
 
         public static event Action<HandPoseScriptableObject> PoseHasBeenDetected;
         public static event Action PoseHasNotBeenDetected;
@@ -39,6 +37,10 @@ namespace Leap.Unity
         {
             PoseHasBeenDetected += PoseDetected;
             PoseHasNotBeenDetected += PoseNotDetected;
+            if(_leapProvider == null)
+            {
+                _leapProvider = FindObjectOfType<LeapProvider>();
+            }
         }
         private void PoseDetected(HandPoseScriptableObject poseScriptableObject) { }
         private void PoseNotDetected() { }
@@ -71,16 +73,16 @@ namespace Leap.Unity
             // This will only do this once unless manually cleared.
             poseAndHandDetected = null;
 
-            foreach (var activePlayerHand in leapProvider.CurrentFrame.Hands)
+            foreach (var activePlayerHand in _leapProvider.CurrentFrame.Hands)
             {
-                if ((!checkBothHands && activePlayerHand.GetChirality() == chirality) || checkBothHands)
+                if ((!CheckBothHands && activePlayerHand.GetChirality() == ChiralityToCheck) || CheckBothHands)
                 {
-                    foreach (HandPoseScriptableObject pose in PosesToDetect)
+                    foreach (HandPoseScriptableObject pose in _posesToDetect)
                     {
                         bool poseDetectedThisFrame = CompareHands(pose, activePlayerHand);
                         if(poseDetectedThisFrame) 
                         {
-                            poseAndHandDetected = new Tuple<HandPoseScriptableObject, Chirality>(pose, chirality);
+                            poseAndHandDetected = new Tuple<HandPoseScriptableObject, Chirality>(pose, ChiralityToCheck);
                             return true;
                         }
                     }
@@ -130,14 +132,14 @@ namespace Leap.Unity
                     lastBoneRotation = activeBoneRotation;
                     lastSerializedBoneRotation = serializedBoneRotation;
 
-                    if(handPoseValidator != null)
+                    if(_handPoseValidator != null)
                     {
-                        handPoseValidator.ShowJointColour(fingerNum, boneNum, boneDifference, jointRotationThreshold);
+                        _handPoseValidator.ShowJointColour(fingerNum, boneNum, boneDifference, jointRotationThreshold);
                     }
 
                     if (poseAlreadyDetected)
                     {
-                        if (boneDifference <= (jointRotationThreshold + hysteresisThreshold) && boneDifference >= (-jointRotationThreshold - hysteresisThreshold))
+                        if (boneDifference <= (jointRotationThreshold + _hysteresisThreshold) && boneDifference >= (-jointRotationThreshold - _hysteresisThreshold))
                         {
                             numMatchedBones++;
                         }
