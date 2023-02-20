@@ -76,11 +76,11 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
         public float HandTeleportDistance => _handTeleportDistance;
         [SerializeField, Tooltip("The distance between the physics and original data hand can reach before it snaps back to the original hand position."), Range(0.01f, 0.5f)]
-        private float _handTeleportDistance = 0.1f;
+        private float _handTeleportDistance = 0.15f;
 
         public float HandGraspTeleportDistance => _handGraspTeleportDistance;
         [SerializeField, Tooltip("The distance between the physics and original data hand can reach before it snaps back to the original hand position. This is used when a hand is reported as grasping."), Range(0.01f, 0.5f)]
-        private float _handGraspTeleportDistance = 0.2f;
+        private float _handGraspTeleportDistance = 0.22f;
 
         public int SolverIterations => _handSolverIterations;
         [SerializeField, Tooltip("The solver iterations used when calculating the hand. This can be different to your overall project iterations. Higher numbers will be more robust, but more expensive to compute."), Min(10f)]
@@ -151,6 +151,8 @@ namespace Leap.Unity.Interaction.PhysicsHands
         private bool _leftWasNull = true, _rightWasNull = true;
 
         private WaitForFixedUpdate _waitForFixedUpdate = new WaitForFixedUpdate();
+
+        public bool oldPalmMethod = false;
 
         private void Awake()
         {

@@ -28,13 +28,29 @@ namespace Leap.Unity.Interaction.PhysicsHands
             public const float TRIGGER_DISTANCE = 0.004f;
             public const float CONTACT_ENTER_DISTANCE = 0.002f, CONTACT_EXIT_DISTANCE = 0.01f;
             public const float CONTACT_THUMB_ENTER_DISTANCE = 0.0045f, CONTACT_THUMB_EXIT_DISTANCE = 0.018f;
+            // Used as velocity * fixedDeltaTime
+            public const float MAXIMUM_PALM_VELOCITY = 150f, MINIMUM_PALM_VELOCITY = 35f;
 
-            // You can change this to move your helper physics checks further forward
+            [Tooltip("The distance that bones will have their radius inflated by when calculating if an object is grabbed.")]
             public float triggerDistance = TRIGGER_DISTANCE;
+            // You can change this to reduce the overall speed of the hands
+            [Tooltip("The velocity at which the hand will move when not contacting or grabbing any object. Reducing this number may result in additional hand latency.")]
+            public float maximumPalmVelocity = MAXIMUM_PALM_VELOCITY;
+            [Tooltip("The velocity that the hand will reduce down to, the further it gets away from the original data hand. " +
+                "Increasing this number will cause the hand to appear \"stronger\" when pushing into objects, if less stable.")]
+            public float minimumPalmVelocity = MINIMUM_PALM_VELOCITY;
+            [HideInInspector]
+            public float currentPalmVelocity = MAXIMUM_PALM_VELOCITY;
 
             [HideInInspector]
             public Vector3 oldPosition;
             public GameObject gameObject, rootObject;
+            [HideInInspector]
+            public Vector3 previousDataPosition, computedPhysicsPosition;
+            [HideInInspector]
+            public float computedHandDistance;
+            [HideInInspector]
+            public Quaternion previousDataRotation, computedPhysicsRotation;
             public Transform transform;
 
             public PhysicsBone palmBone;
@@ -141,9 +157,16 @@ namespace Leap.Unity.Interaction.PhysicsHands
         private float _timeOnReset = 0;
         private float _currentResetLerp { get { return _timeOnReset == 0 ? 1 : Mathf.InverseLerp(0.1f, 0.25f, Time.time - _timeOnReset); } }
 
+        private bool _isCloseToObject = false;
+        public bool IsCloseToObject => _isCloseToObject;
+
+        private bool _isContacting = false;
+        public bool IsContacting => _isContacting;
+
         private bool _wasGrasping = false;
         private bool _isGrasping = false;
         public bool IsGrasping => _isGrasping;
+
 
         private List<IgnoreData> _ignoredData = new List<IgnoreData>();
         private class IgnoreData
@@ -240,6 +263,14 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 _physicsHand.transform.position = _originalLeapHand.PalmPosition;
                 _physicsHand.transform.rotation = _originalLeapHand.Rotation;
                 _physicsHand.palmBody.TeleportRoot(_physicsHand.transform.position, _physicsHand.transform.rotation);
+
+                _physicsHand.previousDataPosition = _originalLeapHand.PalmPosition;
+                _physicsHand.previousDataRotation = _originalLeapHand.Rotation;
+                _physicsHand.computedPhysicsPosition = _originalLeapHand.PalmPosition;
+                _physicsHand.computedPhysicsRotation = _originalLeapHand.Rotation;
+                _physicsHand.computedHandDistance = 0f;
+
+                _physicsHand.currentPalmVelocity = _physicsHand.maximumPalmVelocity;
 
                 PhysicsHandsUtils.ResetPhysicsHandSizes(_physicsHand, _originalLeapHand);
 
@@ -339,6 +370,8 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
             UpdateSettings();
 
+            CalculateContacts();
+
             if (!IsGrasping && _graspingDeltaCurrent > 0)
             {
                 _graspingDeltaCurrent -= Vector3.Distance(_originalOldPosition, _originalLeapHand.PalmPosition);
@@ -350,7 +383,9 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 _timeOnReset = Time.time;
             }
 
-            PhysicsHandsUtils.UpdatePhysicsPalm(ref _physicsHand,
+            if (_physicsProvider.oldPalmMethod)
+            {
+                PhysicsHandsUtils.UpdatePhysicsPalm(ref _physicsHand,
                 // If the hand was grasping then we want to smoothly interpolate back to where it was based on distance
                 !IsGrasping && _graspingDeltaCurrent > 0 ? Vector3.Lerp(_physicsHand.transform.position, _originalLeapHand.PalmPosition, Mathf.InverseLerp(_graspingDelta, 0, _graspingDeltaCurrent)) : _originalLeapHand.PalmPosition,
                 !IsGrasping && _graspingDeltaCurrent > 0 ? Quaternion.Slerp(_physicsHand.transform.rotation, _originalLeapHand.Rotation, Mathf.InverseLerp(_graspingDelta, 0, _graspingDeltaCurrent)) : _originalLeapHand.Rotation,
@@ -358,6 +393,11 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 _isGrasping && _physicsProvider.InterpolatingMass && _graspMass > 1 ? Mathf.InverseLerp(0.001f, _physicsProvider.MaxMass, _graspMass).EaseOut() : 0f,
                 // Reduce force of hand as it gets further from the original data hand
                 !_ghosted && !_isGrasping && _graspingDeltaCurrent > 0 ? Mathf.InverseLerp(_physicsProvider.HandTeleportDistance * 0.5f, _physicsProvider.HandTeleportDistance, DistanceFromDataHand).EaseOut() : 0f);
+            }
+            else
+            {
+                PhysicsHandsUtils.UpdatePhysicsPalm2(ref _physicsHand, _originalLeapHand.PalmPosition, _originalLeapHand.Rotation, _physicsProvider.HandTeleportDistance, IsContacting, IsGrasping);
+            }
 
             // Fix the hand if it gets into a bad situation by teleporting and holding in place until its bad velocities disappear
             HandleTeleportingHands(AreBonesRotatedBeyondThreshold());
@@ -549,6 +589,8 @@ namespace Leap.Unity.Interaction.PhysicsHands
                     }
                 }
 
+                CacheComputedPositions();
+
                 yield return _waitForFixedUpdate;
             }
         }
@@ -557,6 +599,15 @@ namespace Leap.Unity.Interaction.PhysicsHands
         {
             _physicsHand.oldPosition = _physicsHand.transform.position;
             _originalOldPosition = _originalLeapHand.PalmPosition;
+            _physicsHand.previousDataPosition = _originalLeapHand.PalmPosition;
+            _physicsHand.previousDataRotation = _originalLeapHand.Rotation;
+        }
+
+        private void CacheComputedPositions()
+        {
+            _physicsHand.computedPhysicsPosition = _physicsHand.transform.position;
+            _physicsHand.computedPhysicsRotation = _physicsHand.transform.rotation;
+            _physicsHand.computedHandDistance = Vector3.Distance(_physicsHand.previousDataPosition, _physicsHand.computedPhysicsPosition);
         }
 
         private void UpdateSettings()
@@ -567,6 +618,12 @@ namespace Leap.Unity.Interaction.PhysicsHands
             }
             _physicsHand.strength = _physicsProvider.Strength;
             _physicsHand.boneMass = _physicsProvider.PerBoneMass;
+        }
+
+        private void CalculateContacts()
+        {
+            _isContacting = IsAnyObjectInHandRadius(0.001f);
+            _isCloseToObject = IsAnyObjectInHandRadius();
         }
 
         private void DelayedReset()
@@ -617,7 +674,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             if (Vector3.Distance(_originalOldPosition, _originalLeapHand.PalmPosition) > _physicsProvider.HandTeleportDistance ||
                 bonesAreOverRotated ||
                 DistanceFromDataHand > (IsGrasping ? _physicsProvider.HandGraspTeleportDistance : _physicsProvider.HandTeleportDistance) && (IsGrasping ||
-                IsAnyObjectInHandRadius()))
+                IsCloseToObject))
             {
                 ResetPhysicsHand(true);
                 // Don't need to wait for the hand to reset as much here
@@ -626,7 +683,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 _ghosted = true;
             }
 
-            if (Time.frameCount - _lastFrameTeleport >= _teleportFrameCount && _ghosted && !IsAnyObjectInHandRadius())
+            if (Time.frameCount - _lastFrameTeleport >= _teleportFrameCount && _ghosted && !IsCloseToObject)
             {
                 ChangeHandLayer(_physicsProvider.HandsLayer);
 

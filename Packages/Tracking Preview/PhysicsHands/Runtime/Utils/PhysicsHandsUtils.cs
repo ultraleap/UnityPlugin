@@ -148,7 +148,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             return physicsHandComponent;
         }
 
-        // Magic 0th thumb bone rotation offsets from LeapC
+        // Magic 0th thumb bone dataRotation offsets from LeapC
         public const float HAND_ROTATION_OFFSET_Y = 25.9f, HAND_ROTATION_OFFSET_Z = -63.45f;
 
         public static void SetupHand(PhysicsHand.Hand physicsHand, Leap.Hand leapHand, int solverIterations = 50, int solverVelocity = 20)
@@ -518,7 +518,6 @@ namespace Leap.Unity.Interaction.PhysicsHands
         {
             // Apply tracking position velocity
             physicsHand.palmBody.velocity *= 0;
-
             Vector3 delta = position - physicsHand.transform.position;
 
             if (interpFactor > 0)
@@ -539,7 +538,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             physicsHand.palmBody.AddForce(Vector3.ClampMagnitude((delta) / Time.fixedDeltaTime / Time.fixedDeltaTime * physicsHand.palmBody.mass,
                 1000f * physicsHand.strength));
 
-            // Apply tracking rotation velocity
+            // Apply tracking dataRotation velocity
             // TODO: Compensate for phantom forces on strongly misrotated appendages
             Quaternion rotationDelta = rotation * Quaternion.Inverse(physicsHand.transform.rotation);
             rotationDelta = Quaternion.Slerp(Quaternion.identity, rotationDelta, 1f - interpFactor);
@@ -547,6 +546,30 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 Mathf.DeltaAngle(0, rotationDelta.eulerAngles.x),
                 Mathf.DeltaAngle(0, rotationDelta.eulerAngles.y),
                 Mathf.DeltaAngle(0, rotationDelta.eulerAngles.z)) / Time.fixedDeltaTime) * Mathf.Deg2Rad, 45f * physicsHand.strength);
+        }
+
+        public static void UpdatePhysicsPalm2(ref PhysicsHand.Hand physicsHand, Vector3 dataPosition, Quaternion dataRotation, float maximumDistance, bool isContacting, bool isGrasping)
+        {
+            if (isContacting || isGrasping)
+            {
+                physicsHand.currentPalmVelocity = Mathf.Lerp(physicsHand.currentPalmVelocity,
+                    Mathf.Lerp(physicsHand.maximumPalmVelocity, physicsHand.minimumPalmVelocity, Mathf.InverseLerp(maximumDistance * 0.1f, maximumDistance * 0.9f, physicsHand.computedHandDistance).EaseOut()),
+                    Time.fixedDeltaTime * (1.0f / 0.05f));
+            }
+            else
+            {
+                physicsHand.currentPalmVelocity = Mathf.Lerp(physicsHand.currentPalmVelocity, physicsHand.maximumPalmVelocity, Time.fixedDeltaTime * (1.0f / 0.1f));
+            }
+
+            Vector3 delta = dataPosition - physicsHand.transform.position;
+
+            physicsHand.palmBody.velocity = Vector3.ClampMagnitude(Vector3.MoveTowards(physicsHand.palmBody.velocity, delta / Time.fixedDeltaTime, 15f), physicsHand.currentPalmVelocity * Time.fixedDeltaTime);
+
+            Quaternion rotationDelta = dataRotation * Quaternion.Inverse(physicsHand.transform.rotation);
+            physicsHand.palmBody.angularVelocity = Vector3.ClampMagnitude((new Vector3(
+                Mathf.DeltaAngle(0, rotationDelta.eulerAngles.x),
+                Mathf.DeltaAngle(0, rotationDelta.eulerAngles.y),
+                Mathf.DeltaAngle(0, rotationDelta.eulerAngles.z)) / Time.fixedDeltaTime) * Mathf.Deg2Rad, 45f * physicsHand.strength * Mathf.InverseLerp(physicsHand.minimumPalmVelocity, physicsHand.maximumPalmVelocity, physicsHand.currentPalmVelocity));
         }
 
         public static float CalculateXJointAngle(Quaternion previous, Vector3 direction)
