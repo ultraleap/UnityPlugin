@@ -552,13 +552,15 @@ namespace Leap.Unity.Interaction.PhysicsHands
         {
             if (isContacting || isGrasping)
             {
+                physicsHand.currentPalmVelocityInterp = Mathf.InverseLerp(maximumDistance * 0.1f, maximumDistance * 0.9f, physicsHand.computedHandDistance).EaseOut();
                 physicsHand.currentPalmVelocity = Mathf.Lerp(physicsHand.currentPalmVelocity,
-                    Mathf.Lerp(physicsHand.maximumPalmVelocity, physicsHand.minimumPalmVelocity, Mathf.InverseLerp(maximumDistance * 0.1f, maximumDistance * 0.9f, physicsHand.computedHandDistance).EaseOut()),
+                    Mathf.Lerp(physicsHand.maximumPalmVelocity, physicsHand.minimumPalmVelocity, physicsHand.currentPalmVelocityInterp),
                     Time.fixedDeltaTime * (1.0f / 0.05f));
             }
             else
             {
                 physicsHand.currentPalmVelocity = Mathf.Lerp(physicsHand.currentPalmVelocity, physicsHand.maximumPalmVelocity, Time.fixedDeltaTime * (1.0f / 0.1f));
+                physicsHand.currentPalmVelocityInterp = 0f;
             }
 
             Vector3 delta = dataPosition - physicsHand.transform.position;
