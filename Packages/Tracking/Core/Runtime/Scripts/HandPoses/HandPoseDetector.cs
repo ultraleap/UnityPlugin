@@ -30,6 +30,8 @@ namespace Leap.Unity
         [SerializeField]
         private float _hysteresisThreshold = 5;
 
+
+
         public static event Action<HandPoseScriptableObject> PoseHasBeenDetected;
         public static event Action PoseHasNotBeenDetected;
 
@@ -49,7 +51,7 @@ namespace Leap.Unity
         // Update is called once per frame
         void Update()
         {
-            bool anyHandMatched = CompareHandShapes();
+            bool anyHandMatched = CompareAllHandsAndPoses();
             if (anyHandMatched && !poseAlreadyDetected)
             {
                 poseAlreadyDetected = true;
@@ -67,7 +69,7 @@ namespace Leap.Unity
 
         Tuple<HandPoseScriptableObject, Chirality> poseAndHandDetected = null;
 
-        private bool CompareHandShapes()
+        private bool CompareAllHandsAndPoses()
         {
             // If the user hasnt specified the hands to detect, check all Hand Model Bases.
             // This will only do this once unless manually cleared.
@@ -79,7 +81,7 @@ namespace Leap.Unity
                 {
                     foreach (HandPoseScriptableObject pose in _posesToDetect)
                     {
-                        bool poseDetectedThisFrame = CompareHands(pose, activePlayerHand);
+                        bool poseDetectedThisFrame = ComparePoseToHand(pose, activePlayerHand);
                         if(poseDetectedThisFrame) 
                         {
                             poseAndHandDetected = new Tuple<HandPoseScriptableObject, Chirality>(pose, ChiralityToCheck);
@@ -91,8 +93,13 @@ namespace Leap.Unity
             return false;
         }
 
-        private bool CompareHands(HandPoseScriptableObject pose, Hand activePlayerHand)
+        private bool ComparePoseToHand(HandPoseScriptableObject pose, Hand activePlayerHand)
         {
+            if (pose._careAboutOrientation)
+            {
+                if (CheckPoseOrientation(pose, activePlayerHand) == false) { return false; }
+            }
+            
             Hand serializedHand = pose.GetSerializedHand();
             Hand playerHand = activePlayerHand;
             int numMatchedFingers = 0;
@@ -126,8 +133,7 @@ namespace Leap.Unity
                     Vector3 activeRotEuler = (Quaternion.Inverse(lastBoneRotation) * activeBoneRotation).eulerAngles;
                     Vector3 serializedRotEuler = (Quaternion.Inverse(lastSerializedBoneRotation) * serializedBoneRotation).eulerAngles;
 
-                    //Vector3 eulerDifference = GetEulerAngleDifference(serializedRotEuler, activeRotEuler);
-                    float boneDifference = GetDegreeAngleDifference(serializedRotEuler, activeRotEuler);
+                    float boneDifference = GetDegreeAngleDifferenceXY(serializedRotEuler, activeRotEuler);
 
                     lastBoneRotation = activeBoneRotation;
                     lastSerializedBoneRotation = serializedBoneRotation;
@@ -170,14 +176,47 @@ namespace Leap.Unity
             }
         }
 
+        [SerializeField]
+        Transform poseTarget;
+        
+        
+
+
+        private bool CheckPoseOrientation(HandPoseScriptableObject pose, Hand activePlayerHand)
+        {
+            var FaceTowardDirection = activePlayerHand.GetIndex().Bone(Bone.BoneType.TYPE_PROXIMAL).Direction;
+
+            if (GetIsFacingDirection(activePlayerHand.PalmPosition, poseTarget.position, activePlayerHand.PalmNormal))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public static bool GetIsFacingDirection(Vector3 ObjectPosition, Vector3 ComparisonPosition, Vector3 ObjectOrientation, float minAllowedDotProduct = 0.8F)
+        {
+            return Vector3.Dot((ComparisonPosition - ObjectPosition).normalized, ObjectOrientation) > minAllowedDotProduct;
+        }
+
         Vector3 GetEulerAngleDifference(Vector3 a, Vector3 b)
         {
             return new Vector3(Mathf.DeltaAngle(a.x, b.x), Mathf.DeltaAngle(a.y, b.y), Mathf.DeltaAngle(a.z, b.z));
         }
 
-        float GetDegreeAngleDifference(Vector3 a, Vector3 b)
+        float GetDegreeAngleDifferenceXY(Vector3 a, Vector3 b)
         {
             var averageAngle = (Mathf.DeltaAngle(a.x, b.x) + Mathf.DeltaAngle(a.y, b.y)/* + Mathf.DeltaAngle(a.z, b.z)*/)/2;
+            return averageAngle;
+        }
+
+        float GetDegreeAngleDifferenceXYZ(Vector3 a, Vector3 b)
+        {
+            var averageAngle = Vector3.Angle(b, a);
+
+            //var averageAngle = (Mathf.DeltaAngle(a.x, b.x) + Mathf.DeltaAngle(a.y, b.y)+ Mathf.DeltaAngle(a.z, b.z)) / 3;
             return averageAngle;
         }
 

@@ -37,7 +37,8 @@ namespace Leap.Unity
     [CreateAssetMenu(fileName = "HandPose", menuName = "ScriptableObjects/HandPose")]
     public class HandPoseScriptableObject : ScriptableObject
     {
-
+        [SerializeField]
+        public bool _careAboutOrientation = false;
 
         public bool CheckThumb = true;
         public bool CheckIndex = true;

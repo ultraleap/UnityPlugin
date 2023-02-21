@@ -33,21 +33,17 @@ namespace Leap.Unity.HandsModule
             EditorGUILayout.LabelField("Angle of tolerance for pose");
 
             _boneThresholdSlider =  EditorGUILayout.Slider(_boneThresholdSlider, 0f, 90f);
-
             HandPoseScriptableObject serializedObjectScript = (HandPoseScriptableObject)target;
-            if (GUILayout.Button("Set All Finger Thresholds"))
-            {
-                serializedObjectScript.SetAllBoneThresholds(_boneThresholdSlider);
-            }
+            serializedObjectScript.SetAllBoneThresholds(_boneThresholdSlider);
 
             GUILayout.Space(15);
+            //EditorGUILayout.PropertyField(serializedObject.FindProperty("_careAboutOrientation"));
 
             if (GUILayout.Button("Show Fine Tuning Options"))
             {
                 _showFineTuningOptions = !_showFineTuningOptions;
             }
             
-
             if (_showFineTuningOptions)
             {
                 DrawDefaultInspector();
@@ -86,6 +82,8 @@ namespace Leap.Unity.HandsModule
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("_leapProvider"));
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("_hysteresisThreshold"));
             }
+
+            DrawDefaultInspector();
 
         }
     }
