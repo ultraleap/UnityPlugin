@@ -11,11 +11,9 @@ public class HandPoseValidator : MonoBehaviour
     /// Which hand would you like to use for gesture recognition?
     /// If this is left blank, It will search for all hands in the scene
     /// </summary>
-    
     List<CapsuleHand> angleVisualisationHands = new();
 
-    Color[] capsuleHandColours = null;
-    // Start is called before the first frame update
+    private Color[] capsuleHandColours = null;
 
 
     public void ShowJointColour(int fingerNum, int jointNum, float boneDifferenceToThreshold, float jointRotationThreshold)
@@ -40,7 +38,7 @@ public class HandPoseValidator : MonoBehaviour
         }
         if (capsuleHandColours != null)
         {
-            capsuleHandColours[fingerNum * 4 + jointNum] = Color.Lerp(Color.green, Color.red, boneDifferenceToThreshold / jointRotationThreshold);
+            capsuleHandColours[(fingerNum * 4) + jointNum] = Color.Lerp(Color.green, Color.red, boneDifferenceToThreshold / 180);
         }
 
 

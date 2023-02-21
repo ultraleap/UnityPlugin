@@ -8,27 +8,31 @@ namespace Leap.Unity
     [ExecuteInEditMode]
     public class PoseDetectionEditor : LeapProvider
     {
+        [HideInInspector]
         public override Frame CurrentFrame
         { get
             { 
                 return new Frame(0, (long)Time.realtimeSinceStartup, 90, currentHands);
             }
         }
+        [HideInInspector]
         public Frame TestFrame = null;
-
+        [HideInInspector]
         public override Frame CurrentFixedFrame => new Frame();
 
+        // Pose to apply to the left hand
         [SerializeField]
         HandPoseScriptableObject leftHandPoseObject;
+        // Pose to apply to the right hand
         [SerializeField]
         HandPoseScriptableObject rightHandPoseObject;
 
-        List<Hand> currentHands = new List<Hand>();
+        private List<Hand> currentHands = new List<Hand>();
 
-        List<Color> gizmoColours = new List<Color>() { Color.green, Color.yellow, Color.red, Color.blue };
+        private List<Color> gizmoColours = new List<Color>() { Color.green, Color.yellow, Color.red, Color.blue };
 
         // Update is called once per frame
-        void OnValidate()
+        private void OnValidate()
         {
             Hand PosedHand;
             currentHands.Clear();
@@ -61,7 +65,7 @@ namespace Leap.Unity
             
         }
 
-        void ShowEditorGizmos(Hand hand, HandPoseScriptableObject handPoseScriptableObject)
+        private void ShowEditorGizmos(Hand hand, HandPoseScriptableObject handPoseScriptableObject)
         {
             float lineThickness = 4;
 
@@ -91,7 +95,6 @@ namespace Leap.Unity
 
         private void DrawWireCone(float angle, float coneLength, Vector3 coneDirection, Vector3 pointLocation, Vector3 baseCentrePoint, Color color, float ringThickness)
         {
-
             float circleRadius = Mathf.Tan((angle * (float)(Math.PI / 180)) * (Vector3.Distance(pointLocation, pointLocation + (coneDirection * coneLength))));
             Vector3 normal = Vector3.Normalize(baseCentrePoint - pointLocation);
             Vector3 circleCentrePoint = pointLocation + (coneDirection * coneLength);
@@ -108,8 +111,6 @@ namespace Leap.Unity
 
 
             Handles.DrawWireDisc(circleCentrePoint, normal, circleRadius, ringThickness);
-
-
         }
     }
 }

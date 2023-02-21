@@ -12,24 +12,73 @@ namespace Leap.Unity
     public class HandPoseDetector : MonoBehaviour
     {
         /// <summary>
-        /// A List of serialized hand poses to detect. Poses can be created using the "Hand Pose Recoder".
-        /// Useful for multiple variations of the same pose i.e. left and right thumbs up.
+        /// Should the detector try to match this pose with both hands?
+        /// Untick to enable single hand poses. E.g. only allowing left hand to activate pose.
         /// </summary>
-
         [HideInInspector]
         public bool CheckBothHands = true;
+        /// <summary>
+        /// Which hand should the detector check?
+        /// </summary>
         [HideInInspector]
         public Chirality ChiralityToCheck;
-
+        /// <summary>
+        /// List of poses that the detector will check through. This list can be filled with different poses or variations of the same pose.
+        /// Once one of these poses is found, the class will call the "Pose Detected event"
+        /// </summary>
         [SerializeField]
         private List<HandPoseScriptableObject> _posesToDetect;
+        /// <summary>
+        /// OPTIONAL. The object which has the "HandPoseValidator" script on it. This will allow the capsule hands to act as validators
+        /// with the joint spheres changing colour the closer to the pose they get.
+        /// </summary>
         [SerializeField]
         private HandPoseValidator _handPoseValidator = null;
+        /// <summary>
+        /// OPTIONAL. Specify a particular leap provider. If none is selected, the script will automatically find one in the scene.
+        /// </summary>
         [SerializeField]
         private LeapProvider _leapProvider = null;
+        /// <summary>
+        /// The distance a bone must move away from being detected before the pose is no longer enabled.
+        /// This means that users cannot hover just on the edge of a detection and cause it to send rapid detections while straying still.
+        /// E.g. Detection threshold is 15 degrees, so when the user gets within 15 degrees, detection will occur.
+        /// Hysteresis threshold is 5 so the user need to move 20 degrees from the pose before the detection will drop.
+        /// </summary>
         [SerializeField]
         private float _hysteresisThreshold = 5;
+        /// <summary>
+        /// Should the pose use the palm direction to orient the pose?
+        /// </summary>
+        [SerializeField]
+        private bool _usePalmDirectionForPoseOrientation = false;
 
+        /// <summary>
+        /// Add more here to put constraints on when the pose is detected. 
+        /// E.g. if the user needs to point at an object with their index finger for the pose to be considered detected"
+        /// </summary>
+        [SerializeField]
+        public List<FingerDirection> BoneDirectionTargets;
+
+        /// <summary>
+        /// Holds information about different fingers, bones and their directional targets.
+        /// </summary>
+        [Serializable]
+        public struct FingerDirection
+        {
+            public Transform poseTarget;
+            public Finger.FingerType fingerTypeForPoint;
+            public Bone.BoneType boneForPoint;
+        }
+
+        /// <summary>
+        /// Has a pose been detected since last time there was no pose was detected? 
+        /// </summary>
+        private bool _poseAlreadyDetected = false;
+        /// <summary>
+        /// Gives us the pose which has been detected.
+        /// </summary>
+        private HandPoseScriptableObject detectedPose = null;
 
 
         public static event Action<HandPoseScriptableObject> PoseHasBeenDetected;
@@ -37,43 +86,43 @@ namespace Leap.Unity
 
         private void Start()
         {
-            PoseHasBeenDetected += PoseDetected;
-            PoseHasNotBeenDetected += PoseNotDetected;
+            //PoseHasBeenDetected += PoseDetected;
+            //PoseHasNotBeenDetected += PoseNotDetected;
             if(_leapProvider == null)
             {
                 _leapProvider = FindObjectOfType<LeapProvider>();
             }
         }
-        private void PoseDetected(HandPoseScriptableObject poseScriptableObject) { }
-        private void PoseNotDetected() { }
+        //private void PoseDetected(HandPoseScriptableObject poseScriptableObject) { }
+        //private void PoseNotDetected() { }
 
-        bool poseAlreadyDetected = false;
+
         // Update is called once per frame
-        void Update()
+        private void Update()
         {
             bool anyHandMatched = CompareAllHandsAndPoses();
-            if (anyHandMatched && !poseAlreadyDetected)
+            if (anyHandMatched && !_poseAlreadyDetected)
             {
-                poseAlreadyDetected = true;
-                PoseHasBeenDetected(poseAndHandDetected.Item1);
+                _poseAlreadyDetected = true;
+                PoseHasBeenDetected(detectedPose);
                 Debug.Log("pose Detected");
             }
-            else if (!anyHandMatched && poseAlreadyDetected)
+            else if (!anyHandMatched && _poseAlreadyDetected)
             {
-                poseAlreadyDetected = false;
+                _poseAlreadyDetected = false;
                 PoseHasNotBeenDetected();
                 Debug.Log("pose Un Detected");
             }
         }
 
 
-        Tuple<HandPoseScriptableObject, Chirality> poseAndHandDetected = null;
+
 
         private bool CompareAllHandsAndPoses()
         {
             // If the user hasnt specified the hands to detect, check all Hand Model Bases.
             // This will only do this once unless manually cleared.
-            poseAndHandDetected = null;
+            detectedPose = null;
 
             foreach (var activePlayerHand in _leapProvider.CurrentFrame.Hands)
             {
@@ -84,7 +133,7 @@ namespace Leap.Unity
                         bool poseDetectedThisFrame = ComparePoseToHand(pose, activePlayerHand);
                         if(poseDetectedThisFrame) 
                         {
-                            poseAndHandDetected = new Tuple<HandPoseScriptableObject, Chirality>(pose, ChiralityToCheck);
+                            detectedPose = pose;
                             return true;
                         }
                     }
@@ -95,6 +144,7 @@ namespace Leap.Unity
 
         private bool ComparePoseToHand(HandPoseScriptableObject pose, Hand activePlayerHand)
         {
+            // Do we care about the orientation of the hand or fingers?
             if (pose._careAboutOrientation)
             {
                 if (CheckPoseOrientation(pose, activePlayerHand) == false) { return false; }
@@ -127,29 +177,35 @@ namespace Leap.Unity
                     // Get the user defined rotation threshold for the current bone (threshold is defined in the pose scriptable object)
                     float jointRotationThreshold = GetBoneRotationThreshold(pose, fingerNum, boneNum);
 
+                    // Get hand rotation for both hands
                     Quaternion activeBoneRotation = activeHandBone.Rotation;
                     Quaternion serializedBoneRotation = serializedHandBone.Rotation;
 
+                    // Calculate the vector3 rotation between the current bone and the previous one.
                     Vector3 activeRotEuler = (Quaternion.Inverse(lastBoneRotation) * activeBoneRotation).eulerAngles;
                     Vector3 serializedRotEuler = (Quaternion.Inverse(lastSerializedBoneRotation) * serializedBoneRotation).eulerAngles;
 
+                    // Calculate angle difference between the active hand and the serialized hand.
                     float boneDifference = GetDegreeAngleDifferenceXY(serializedRotEuler, activeRotEuler);
 
                     lastBoneRotation = activeBoneRotation;
                     lastSerializedBoneRotation = serializedBoneRotation;
 
+                    // If there is a pose validator present, show the joint colours.
                     if(_handPoseValidator != null)
                     {
                         _handPoseValidator.ShowJointColour(fingerNum, boneNum, boneDifference, jointRotationThreshold);
                     }
 
-                    if (poseAlreadyDetected)
+                    // If the pose has been detected, use the Hysteresis value to check if it should be undetected
+                    if (_poseAlreadyDetected)
                     {
                         if (boneDifference <= (jointRotationThreshold + _hysteresisThreshold) && boneDifference >= (-jointRotationThreshold - _hysteresisThreshold))
                         {
                             numMatchedBones++;
                         }
                     }
+                    // Otherwise, check if the difference between current hand and serialized hand is within the threshold.
                     else
                     {
                         if (boneDifference <= jointRotationThreshold && boneDifference >= -jointRotationThreshold)
@@ -163,8 +219,6 @@ namespace Leap.Unity
                 {
                     ++numMatchedFingers;
                 }
-
-
             }
             if (numMatchedFingers >= fingerIndexesToCheck.Count)
             {
@@ -176,47 +230,53 @@ namespace Leap.Unity
             }
         }
 
-        [SerializeField]
-        Transform poseTarget;
-        
-        
 
 
         private bool CheckPoseOrientation(HandPoseScriptableObject pose, Hand activePlayerHand)
         {
-            var FaceTowardDirection = activePlayerHand.GetIndex().Bone(Bone.BoneType.TYPE_PROXIMAL).Direction;
+            bool allBonesInCorrectDirection = true;
 
-            if (GetIsFacingDirection(activePlayerHand.PalmPosition, poseTarget.position, activePlayerHand.PalmNormal))
+            if (BoneDirectionTargets.Count > 0)
             {
-                return true;
+                foreach (var item in BoneDirectionTargets)
+                {
+                    Vector3 pointDirection;
+                    Vector3 pointPosition;
+
+                    if (_usePalmDirectionForPoseOrientation)
+                    {
+                        pointDirection = activePlayerHand.PalmNormal.normalized;
+                        pointPosition = activePlayerHand.PalmPosition;
+                    }
+                    else
+                    {
+                        pointDirection = activePlayerHand.Fingers[(int)item.fingerTypeForPoint].Bone(item.boneForPoint).Direction.normalized;
+                        pointPosition = activePlayerHand.Fingers[(int)item.fingerTypeForPoint].Bone(item.boneForPoint).NextJoint;
+                    }
+
+                    if (!GetIsFacingDirection(pointPosition, item.poseTarget.position, pointDirection))
+                    {
+                        allBonesInCorrectDirection = false;
+                    }
+                }
+
+                return allBonesInCorrectDirection;
             }
             else
             {
-                return false;
+                Debug.Log("Ignoring Orientation, please assign some finger directions from the inspector.");
+                return true;
             }
         }
 
-        public static bool GetIsFacingDirection(Vector3 ObjectPosition, Vector3 ComparisonPosition, Vector3 ObjectOrientation, float minAllowedDotProduct = 0.8F)
+        private static bool GetIsFacingDirection(Vector3 bonePosition, Vector3 comparisonPosition, Vector3 boneDirection, float minAllowedDotProduct = 0.8F)
         {
-            return Vector3.Dot((ComparisonPosition - ObjectPosition).normalized, ObjectOrientation) > minAllowedDotProduct;
+            return Vector3.Dot((comparisonPosition - bonePosition).normalized, boneDirection.normalized) > minAllowedDotProduct;
         }
 
-        Vector3 GetEulerAngleDifference(Vector3 a, Vector3 b)
+        private float GetDegreeAngleDifferenceXY(Vector3 a, Vector3 b)
         {
-            return new Vector3(Mathf.DeltaAngle(a.x, b.x), Mathf.DeltaAngle(a.y, b.y), Mathf.DeltaAngle(a.z, b.z));
-        }
-
-        float GetDegreeAngleDifferenceXY(Vector3 a, Vector3 b)
-        {
-            var averageAngle = (Mathf.DeltaAngle(a.x, b.x) + Mathf.DeltaAngle(a.y, b.y)/* + Mathf.DeltaAngle(a.z, b.z)*/)/2;
-            return averageAngle;
-        }
-
-        float GetDegreeAngleDifferenceXYZ(Vector3 a, Vector3 b)
-        {
-            var averageAngle = Vector3.Angle(b, a);
-
-            //var averageAngle = (Mathf.DeltaAngle(a.x, b.x) + Mathf.DeltaAngle(a.y, b.y)+ Mathf.DeltaAngle(a.z, b.z)) / 3;
+            var averageAngle = (Mathf.DeltaAngle(a.x, b.x) + Mathf.DeltaAngle(a.y, b.y))/2;
             return averageAngle;
         }
 

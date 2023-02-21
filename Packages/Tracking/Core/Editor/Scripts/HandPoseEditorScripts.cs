@@ -37,7 +37,6 @@ namespace Leap.Unity.HandsModule
             serializedObjectScript.SetAllBoneThresholds(_boneThresholdSlider);
 
             GUILayout.Space(15);
-            //EditorGUILayout.PropertyField(serializedObject.FindProperty("_careAboutOrientation"));
 
             if (GUILayout.Button("Show Fine Tuning Options"))
             {

@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEditor;
 using UnityEngine;
 
@@ -8,14 +9,20 @@ namespace Leap.Unity
 {
     public class HandPoseRecorder : MonoBehaviour
     {
+        /// <summary>
+        /// The name that the pose should have when it is serialised. E.g. "Thumbs Up Left"
+        /// </summary>
+        [SerializeField]
+        private string _handPoseName = "New hand pose";
+        /// <summary>
+        /// The Leap hand which should be used to capture the pose. 
+        /// This can be any Leap hand that inherits from hand model base.
+        /// </summary>
+        [SerializeField]
+        private HandModelBase handToCapture = null;
 
-        [SerializeField]
-        string _handPoseName = "New hand pose";
-        [SerializeField]
-        HandModelBase handToCapture = null;
 
-        [SerializeField]
-        Hand hand = null;
+        private Hand hand = null;
 
         public void SaveCurrentHandPose()
         {
@@ -33,11 +40,15 @@ namespace Leap.Unity
             }
         }
 
-        void createScriptableObject(string handPoseName, Hand handData)
+        private void createScriptableObject(string handPoseName, Hand handData)
         {
             HandPoseScriptableObject newItem = ScriptableObject.CreateInstance<HandPoseScriptableObject>();
             newItem.name = handPoseName;
             newItem.SaveHandPose(handData);
+            if (!Directory.Exists("Assets/HandPoses/"))
+            {
+                Directory.CreateDirectory("Assets/HandPoses/");
+            }
             AssetDatabase.CreateAsset(newItem, "Assets/HandPoses/"+ handPoseName + ".asset");
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
