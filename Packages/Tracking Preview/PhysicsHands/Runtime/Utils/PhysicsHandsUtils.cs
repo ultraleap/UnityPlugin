@@ -295,7 +295,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
         public static void SetupBoneBody(ArticulationBody bone, float boneMass = 0.6f, int solverIterations = 50, int solverVelocity = 20, float maxAngularVelocity = 1.75f, float maxDepenetrationVelocity = 3f)
         {
-            bone.anchorPosition = new Vector3(0f, 0f, 0f);
+            bone.anchorPosition = Vector3.zero;
             bone.anchorRotation = Quaternion.identity;
 #if UNITY_2021_2_OR_NEWER
             bone.matchAnchors = false;
@@ -568,10 +568,12 @@ namespace Leap.Unity.Interaction.PhysicsHands
             physicsHand.palmBody.velocity = Vector3.ClampMagnitude(Vector3.MoveTowards(physicsHand.palmBody.velocity, delta / Time.fixedDeltaTime, 15f), physicsHand.currentPalmVelocity * Time.fixedDeltaTime);
 
             Quaternion rotationDelta = dataRotation * Quaternion.Inverse(physicsHand.transform.rotation);
-            physicsHand.palmBody.angularVelocity = Vector3.ClampMagnitude((new Vector3(
+
+            physicsHand.palmBody.angularVelocity = Vector3.MoveTowards(physicsHand.palmBody.angularVelocity,
+                (new Vector3(
                 Mathf.DeltaAngle(0, rotationDelta.eulerAngles.x),
                 Mathf.DeltaAngle(0, rotationDelta.eulerAngles.y),
-                Mathf.DeltaAngle(0, rotationDelta.eulerAngles.z)) / Time.fixedDeltaTime) * Mathf.Deg2Rad, 45f * physicsHand.strength * Mathf.InverseLerp(physicsHand.minimumPalmVelocity, physicsHand.maximumPalmVelocity, physicsHand.currentPalmVelocity));
+                Mathf.DeltaAngle(0, rotationDelta.eulerAngles.z)) / Time.fixedDeltaTime) * Mathf.Deg2Rad, 20f);
         }
 
         public static float CalculateXJointAngle(Quaternion previous, Vector3 direction)

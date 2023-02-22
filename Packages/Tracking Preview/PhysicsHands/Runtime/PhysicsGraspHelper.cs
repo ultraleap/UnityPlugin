@@ -634,7 +634,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
         }
 
         // Ripped from IE
-        protected float _maxVelocity = 12F;
+        protected float _maxVelocity = 15F;
         private Vector3 _lastSolvedCoMPosition = Vector3.zero;
         protected AnimationCurve _strengthByDistance = new AnimationCurve(new Keyframe(0.0f, 1.0f, 0.0f, 0.0f),
                                                                              new Keyframe(0.08f, 0.3f, 0.0f, 0.0f));
