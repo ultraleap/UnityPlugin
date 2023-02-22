@@ -69,6 +69,7 @@ namespace Leap.Unity.HandsModule
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("ChiralityToCheck"));
             }
 
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("BoneDirectionTargets"));
             serializedObject.ApplyModifiedProperties();
 
             if (GUILayout.Button("Show Fine Tuning Options"))
@@ -82,7 +83,7 @@ namespace Leap.Unity.HandsModule
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("_hysteresisThreshold"));
             }
 
-            DrawDefaultInspector();
+            //DrawDefaultInspector();
 
         }
     }

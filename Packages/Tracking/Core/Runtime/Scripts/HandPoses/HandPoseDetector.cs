@@ -47,29 +47,6 @@ namespace Leap.Unity
         /// </summary>
         [SerializeField]
         private float _hysteresisThreshold = 5;
-        /// <summary>
-        /// Should the pose use the palm direction to orient the pose?
-        /// </summary>
-        [SerializeField]
-        private bool _usePalmDirectionForPoseOrientation = false;
-
-        /// <summary>
-        /// Add more here to put constraints on when the pose is detected. 
-        /// E.g. if the user needs to point at an object with their index finger for the pose to be considered detected"
-        /// </summary>
-        [SerializeField]
-        public List<FingerDirection> BoneDirectionTargets;
-
-        /// <summary>
-        /// Holds information about different fingers, bones and their directional targets.
-        /// </summary>
-        [Serializable]
-        public struct FingerDirection
-        {
-            public Transform poseTarget;
-            public Finger.FingerType fingerTypeForPoint;
-            public Bone.BoneType boneForPoint;
-        }
 
         /// <summary>
         /// Has a pose been detected since last time there was no pose was detected? 
@@ -79,6 +56,60 @@ namespace Leap.Unity
         /// Gives us the pose which has been detected.
         /// </summary>
         private HandPoseScriptableObject detectedPose = null;
+
+
+        #region poseDirectionVariables
+        /// <summary>
+        /// What type of directionality is this check? e.g. pointing towards and object or a world direction.
+        /// </summary>
+        public enum TypeOfDirectionCheck
+        {
+            OBJECT = 0,
+            WORLD = 1,
+            CAMERALOCAL = 2
+        };
+
+        /// <summary>
+        /// Adding the ablility of enum style direction selection in the Inspector.
+        /// </summary>
+        public enum AxisToFace { Back, Down, Forward, Left, Right, Up, Zero };
+        private static readonly Vector3[] vectorAxes = new Vector3[]
+        {
+            Vector3.back,
+            Vector3.down,
+            Vector3.forward,
+            Vector3.left,
+            Vector3.right,
+            Vector3.up,
+            Vector3.zero
+        };
+        public Vector3 GetAxis(AxisToFace axis)
+        {
+            return vectorAxes[(int)axis];
+        }
+
+        /// <summary>
+        /// Add more here to put constraints on when the pose is detected. 
+        /// E.g. if the user needs to point at an object with their index finger for the pose to be considered detected"
+        /// </summary>
+        [SerializeField]
+        private List<FingerDirection> BoneDirectionTargets;
+
+        /// <summary>
+        /// Holds information about different fingers, bones and their directional targets.
+        /// </summary>
+        [Serializable]
+        public struct FingerDirection
+        {
+            public TypeOfDirectionCheck typeOfDirectionCheck;
+            public bool isPalmDirection;
+            public Transform poseTarget;
+            public AxisToFace axisToFace;
+            public Finger.FingerType fingerTypeForPoint;
+            public Bone.BoneType boneForPoint;
+            public float rotationThreshold;
+        }
+        #endregion
 
 
         public static event Action<HandPoseScriptableObject> PoseHasBeenDetected;
@@ -144,11 +175,8 @@ namespace Leap.Unity
 
         private bool ComparePoseToHand(HandPoseScriptableObject pose, Hand activePlayerHand)
         {
-            // Do we care about the orientation of the hand or fingers?
-            if (pose._careAboutOrientation)
-            {
-                if (CheckPoseOrientation(pose, activePlayerHand) == false) { return false; }
-            }
+            // Check any finger directions set up in the pose detector
+            if (CheckPoseDirection(pose, activePlayerHand) == false) { return false; }
             
             Hand serializedHand = pose.GetSerializedHand();
             Hand playerHand = activePlayerHand;
@@ -232,10 +260,9 @@ namespace Leap.Unity
 
 
 
-        private bool CheckPoseOrientation(HandPoseScriptableObject pose, Hand activePlayerHand)
+        private bool CheckPoseDirection(HandPoseScriptableObject pose, Hand activePlayerHand)
         {
             bool allBonesInCorrectDirection = true;
-
             if (BoneDirectionTargets.Count > 0)
             {
                 foreach (var item in BoneDirectionTargets)
@@ -243,7 +270,7 @@ namespace Leap.Unity
                     Vector3 pointDirection;
                     Vector3 pointPosition;
 
-                    if (_usePalmDirectionForPoseOrientation)
+                    if (item.isPalmDirection)
                     {
                         pointDirection = activePlayerHand.PalmNormal.normalized;
                         pointPosition = activePlayerHand.PalmPosition;
@@ -253,23 +280,51 @@ namespace Leap.Unity
                         pointDirection = activePlayerHand.Fingers[(int)item.fingerTypeForPoint].Bone(item.boneForPoint).Direction.normalized;
                         pointPosition = activePlayerHand.Fingers[(int)item.fingerTypeForPoint].Bone(item.boneForPoint).NextJoint;
                     }
-
-                    if (!GetIsFacingDirection(pointPosition, item.poseTarget.position, pointDirection))
+                    switch (item.typeOfDirectionCheck)
                     {
-                        allBonesInCorrectDirection = false;
+                        case TypeOfDirectionCheck.OBJECT:
+                        {
+                            if (!GetIsFacingObject(pointPosition, item.poseTarget.position, pointDirection))
+                            {
+                                allBonesInCorrectDirection = false;
+                            }
+                            break;
+                        }
+                        case TypeOfDirectionCheck.WORLD:
+                        {
+                            if (!GetIsFacingDirection(pointDirection, GetAxis(item.axisToFace), item.rotationThreshold))
+                            {
+                                allBonesInCorrectDirection = false;
+                            }
+                            break;
+                        }
+                        case TypeOfDirectionCheck.CAMERALOCAL:
+                        {
+                            if (!GetIsFacingDirection(pointDirection, 
+                                (Camera.main.transform.rotation.normalized * GetAxis(item.axisToFace).normalized).normalized, item.rotationThreshold))
+                            {
+                                allBonesInCorrectDirection = false;
+                            }
+                            break;
+                        }
                     }
-                }
 
+                }
                 return allBonesInCorrectDirection;
+
             }
             else
             {
                 Debug.Log("Ignoring Orientation, please assign some finger directions from the inspector.");
                 return true;
+            
             }
+            
+            
         }
 
-        private static bool GetIsFacingDirection(Vector3 bonePosition, Vector3 comparisonPosition, Vector3 boneDirection, float minAllowedDotProduct = 0.8F)
+        #region Helper Functions
+        private static bool GetIsFacingObject(Vector3 bonePosition, Vector3 comparisonPosition, Vector3 boneDirection, float minAllowedDotProduct = 0.8F)
         {
             return Vector3.Dot((comparisonPosition - bonePosition).normalized, boneDirection.normalized) > minAllowedDotProduct;
         }
@@ -280,9 +335,15 @@ namespace Leap.Unity
             return averageAngle;
         }
 
+        private bool GetIsFacingDirection(Vector3 boneDirection, Vector3 TargetDirectionDirection, float thresholdInDegrees)
+        {
+            return(Vector3.Angle(boneDirection.normalized, TargetDirectionDirection.normalized) < thresholdInDegrees);
+        }
+
         private float GetBoneRotationThreshold(HandPoseScriptableObject pose, int fingerNum, int boneNum)
         {
             return pose.GetBoneRotationthreshold(fingerNum, boneNum);
         }
+        #endregion
     }
 }

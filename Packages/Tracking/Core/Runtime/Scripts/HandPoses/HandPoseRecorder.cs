@@ -21,8 +21,8 @@ namespace Leap.Unity
         [SerializeField]
         private HandModelBase handToCapture = null;
 
-
-        private Hand hand = null;
+        
+        private Hand hand = new();
 
         public void SaveCurrentHandPose()
         {
