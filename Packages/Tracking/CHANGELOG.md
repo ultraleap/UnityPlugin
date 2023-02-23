@@ -10,11 +10,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [NEXT] - unreleased
 
 ### Added
-- 
+- (Physics Hands) Dynamically adjusting fingers when grabbing objects
+- (Physics Hands) Distance calculations and values for each bone
+- Per finger pinch distances in HandUtils
+
 ### Changed
-- 
+- (Physics Hands) Heuristic calculations moved to WaitForFixedUpdate
+- (Physics Hands) Non-0th joints are now only revolute once again
+
 ### Fixed
 - 
+
 ### Known issues 
 - Scenes containing the infrared viewer render incorrectly on Android build targets and in scriptable render pipelines such as URP and HDRP. 
 - Use of the LeapCSharp Config class is unavailable with v5.X tracking service
@@ -27,14 +33,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - After using Ultraleap OpenXR in Unity Editor, the tracking mode of device 0 will be set to HMD until the Unity Editor session ends. This can stop the testing of non-XR scenes until the Unity Editor is re-opened
 
 
-
 ## [6.6.0] - 17/02/23
 
 ### Added
 - Interaction Grab Ball for 3D UI
-- (Physics Hands) Dynamically adjusting fingers when grabbing objects
-- (Physics Hands) Distance calculations and values for each bone
-- Per finger pinch distances in HandUtils
 
 ### Changed
 - Capsule Hands pinky metacarpal position to better represent the actual joint position
@@ -43,8 +45,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Reduced performance overhead when transforming Leap.Frames, Leap.Hands and Leap.Bones using Basis
 - Reduced performance overhead when accessing scale in Capsule Hands
 - Reduced performance overhead when using Preview UI Input Cursor
-- (Physics Hands) Heuristic calculations moved to WaitForFixedUpdate
-- (Physics Hands) Non-0th joints are now only revolute once again
 
 ### Fixed
 - Preview package example scene referencing a prefab in the non-preview package
