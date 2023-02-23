@@ -12,10 +12,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - (Physics Hands) Warnings for gravity and timestep settings
 - (Physics Hands) Exposed interaction mask
+- (Physics Hands) Dynamically adjusting fingers when grabbing objects
+- (Physics Hands) Distance calculations and values for each bone
+- Per finger pinch distances in HandUtils
+
 ### Changed
 - (Physics Hands) Reduced hand to object collision radius when throwing and testing overlaps
 - (Physics Hands) Thumb joints reverted to revolute for non-0th thumb joints
 - (Physics Hands) Default physics hands solver iterations & presets
+- (Physics Hands) Heuristic calculations moved to WaitForFixedUpdate
+- (Physics Hands) Non-0th joints are now only revolute once again
+
 ### Fixed
 - (Physics Hands) Bone directions when converting back to Leap Hands
 - (Physics Hands) Incorrect setup and positioning of physics buttons
@@ -33,7 +40,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 	- A workaround is to right click on \ThirdParty\Ultraleap\Tracking\OpenXR\Runtime\Scripts\HandTrackingFeature.cs and select 'Reimport'
 - DrawMeshInstanced error log on certain Unity versions when using Capsule Hands. [Unity Issue Tracker](https://issuetracker.unity3d.com/issues/drawmeshinstanced-does-not-support-dot-dot-dot-error-in-the-console-pops-up-when-the-shader-does-support-instanced-rendering)
 - After using Ultraleap OpenXR in Unity Editor, the tracking mode of device 0 will be set to HMD until the Unity Editor session ends. This can stop the testing of non-XR scenes until the Unity Editor is re-opened
-
 
 
 ## [6.6.0] - 17/02/23
