@@ -14,7 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - 
 ### Fixed
-- 
+- 0th thumb bone rotation values when using OpenXR
 - "Pullcord" jitters when being interacted with
 
 ### Known issues 
