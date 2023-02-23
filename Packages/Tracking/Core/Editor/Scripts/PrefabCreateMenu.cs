@@ -91,7 +91,7 @@ namespace Leap
 
                 string[] assetPathSplit = assetPath.Split('/', '\\', '.');
 
-                if (assetPathSplit[assetPathSplit.Length - 2] == prefabName)
+                if (assetPathSplit[assetPathSplit.Length - 2] == prefabName && assetPathSplit[assetPathSplit.Length - 1] == "prefab")
                 {
                     GameObject newObject = (GameObject)AssetDatabase.LoadAssetAtPath(assetPath, typeof(GameObject));
 
