@@ -10,10 +10,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [NEXT] - unreleased
 
 ### Added
-- 
+- (Physics Hands) Warnings for gravity and timestep settings
+- (Physics Hands) Exposed interaction mask
 ### Changed
-- 
+- (Physics Hands) Reduced hand to object collision radius when throwing and testing overlaps
+- (Physics Hands) Thumb joints reverted to revolute for non-0th thumb joints
+- (Physics Hands) Default physics hands solver iterations & presets
 ### Fixed
+- (Physics Hands) Bone directions when converting back to Leap Hands
+- (Physics Hands) Incorrect setup and positioning of physics buttons
 - 0th thumb bone rotation values when using OpenXR
 - "Pullcord" jitters when being interacted with
 - Hand Binder finger tip scale disproportionately when LeapProvider Transform is scaled
