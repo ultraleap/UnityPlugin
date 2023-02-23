@@ -10,6 +10,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Interaction Grab Ball for 3D UI
+- (Physics Hands) Dynamically adjusting fingers when grabbing objects
+- (Physics Hands) Distance calculations and values for each bone
+- Per finger pinch distances in HandUtils
 
 ### Changed
 - Capsule Hands pinky metacarpal position to better represent the actual joint position
@@ -18,6 +21,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Reduced performance overhead when transforming Leap.Frames, Leap.Hands and Leap.Bones using Basis
 - Reduced performance overhead when accessing scale in Capsule Hands
 - Reduced performance overhead when using Preview UI Input Cursor
+- (Physics Hands) Heuristic calculations moved to WaitForFixedUpdate
+- (Physics Hands) Non-0th joints are now only revolute once again
 
 ### Fixed
 - 
