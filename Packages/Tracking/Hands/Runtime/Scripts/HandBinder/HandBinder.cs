@@ -245,7 +245,7 @@ namespace Leap.Unity.HandsModule
                 //Adjust the ratio by an offset value exposed in the inspector and the overal scale that has been calculated
                 float adjustedRatio = (ratio * (finger.fingerTipScaleOffset) - BoundHand.scaleOffset);
                 //Adjust the ratio to account for service provider scale, assuming the service provider is uniformly scaled
-                var serviceProviderScale = leapProvider?.gameObject.transform.localScale.x ?? 1f;
+                var serviceProviderScale = leapProvider?.gameObject.transform.lossyScale.x ?? 1f;
                 adjustedRatio /= serviceProviderScale;
                 //Calculate the direction that goes up the bone towards the next bone
                 Vector3 direction = (intermediateBone.boundTransform.position - distalBone.boundTransform.position).normalized;
