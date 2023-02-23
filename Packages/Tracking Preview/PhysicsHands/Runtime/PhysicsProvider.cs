@@ -84,11 +84,11 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
         public int SolverIterations => _handSolverIterations;
         [SerializeField, Tooltip("The solver iterations used when calculating the hand. This can be different to your overall project iterations. Higher numbers will be more robust, but more expensive to compute."), Min(10f)]
-        private int _handSolverIterations = 15;
+        private int _handSolverIterations = 20;
 
         public int SolverVelocityIterations => _handSolverVelocityIterations;
         [SerializeField, Tooltip("The solver iterations used when calculating the hand velocity. This can be different to your overall project iterations. Higher numbers will be more robust, but more expensive to compute."), Min(5f)]
-        private int _handSolverVelocityIterations = 5;
+        private int _handSolverVelocityIterations = 15;
 
         // Helper Settings
         [SerializeField, Tooltip("Enabling helpers is recommended as these allow the user to pick up objects they normally would not be able to. " +
