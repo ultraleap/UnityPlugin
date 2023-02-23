@@ -28,6 +28,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (Physics Hands) Incorrect setup and positioning of physics buttons
 - 0th thumb bone rotation values when using OpenXR
 - "Pullcord" jitters when being interacted with
+- Hand Binder finger tip scale disproportionately when LeapProvider Transform is scaled
 
 ### Known issues 
 - Scenes containing the infrared viewer render incorrectly on Android build targets and in scriptable render pipelines such as URP and HDRP. 
