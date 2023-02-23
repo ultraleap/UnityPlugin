@@ -19,7 +19,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - (Physics Hands) Bone directions when converting back to Leap Hands
 - (Physics Hands) Incorrect setup and positioning of physics buttons
-- 
+- 0th thumb bone rotation values when using OpenXR
+- "Pullcord" jitters when being interacted with
+
 ### Known issues 
 - Scenes containing the infrared viewer render incorrectly on Android build targets and in scriptable render pipelines such as URP and HDRP. 
 - Use of the LeapCSharp Config class is unavailable with v5.X tracking service
