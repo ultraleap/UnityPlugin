@@ -6,7 +6,44 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [docs-website]: https://docs.ultraleap.com/unity-api/ "Ultraleap Docs"
 
+
 ## [NEXT] - unreleased
+
+### Added
+- (Physics Hands) Warnings for gravity and timestep settings
+- (Physics Hands) Exposed interaction mask
+- (Physics Hands) Dynamically adjusting fingers when grabbing objects
+- (Physics Hands) Distance calculations and values for each bone
+- Per finger pinch distances in HandUtils
+
+### Changed
+- (Physics Hands) Reduced hand to object collision radius when throwing and testing overlaps
+- (Physics Hands) Thumb joints reverted to revolute for non-0th thumb joints
+- (Physics Hands) Default physics hands solver iterations & presets
+- (Physics Hands) Heuristic calculations moved to WaitForFixedUpdate
+- (Physics Hands) Non-0th joints are now only revolute once again
+
+### Fixed
+- (Physics Hands) Bone directions when converting back to Leap Hands
+- (Physics Hands) Incorrect setup and positioning of physics buttons
+- 0th thumb bone rotation values when using OpenXR
+- "Pullcord" jitters when being interacted with
+- Hand Binder finger tip scale disproportionately when LeapProvider Transform is scaled
+- Creating objects from GameObject/Ultraleap/ menu makes more than just prefabs - Ghost Hands (with Arms)
+
+### Known issues 
+- Scenes containing the infrared viewer render incorrectly on Android build targets and in scriptable render pipelines such as URP and HDRP. 
+- Use of the LeapCSharp Config class is unavailable with v5.X tracking service
+- Repeatedly opening scenes can cause memory use increase
+- Currently the Ultraleap Hand Tracking feature for OpenXR requires the New and Legacy input systems to be enabled, to simultaneously use OpenXR and the Ultraleap Unity Plugin's features.
+- The OpenXR Leap Provider does not currently support the `Confidence` hand property (and will return fixed values)
+- If using OpenXR when using Unity 2020 and Ultraleap Tracking Plugin via .unitypackage, an error will appear on import relating to HandTrackingFeature. This has been fixed by Unity on Unity 2021
+	- A workaround is to right click on \ThirdParty\Ultraleap\Tracking\OpenXR\Runtime\Scripts\HandTrackingFeature.cs and select 'Reimport'
+- DrawMeshInstanced error log on certain Unity versions when using Capsule Hands. [Unity Issue Tracker](https://issuetracker.unity3d.com/issues/drawmeshinstanced-does-not-support-dot-dot-dot-error-in-the-console-pops-up-when-the-shader-does-support-instanced-rendering)
+- After using Ultraleap OpenXR in Unity Editor, the tracking mode of device 0 will be set to HMD until the Unity Editor session ends. This can stop the testing of non-XR scenes until the Unity Editor is re-opened
+
+
+## [6.6.0] - 17/02/23
 
 ### Added
 - Interaction Grab Ball for 3D UI
@@ -20,7 +57,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Reduced performance overhead when using Preview UI Input Cursor
 
 ### Fixed
-- 
+- Preview package example scene referencing a prefab in the non-preview package
 
 ### Known issues 
 - Scenes containing the infrared viewer render incorrectly on Android build targets and in scriptable render pipelines such as URP and HDRP. 

@@ -15,9 +15,9 @@ namespace Leap.Unity.Interaction.PhysicsHands
         private const float RECOMMENDED_GRAVITY = -4.905f;
         private const float RECOMMENDED_SLEEP_THRESHOLD = 0.001f;
 
-        private readonly int[] HAND_SOLVER_ITERATIONS = { 10, 15, 30 };
-        private readonly int[] HAND_SOLVER_VELOCITY_ITERATIONS = { 4, 5, 10 };
-        private readonly string[] HAND_SOLVER_NAMES = { "Low", "Medium", "High", "Custom" };
+        private readonly int[] HAND_SOLVER_ITERATIONS = { 20, 30 };
+        private readonly int[] HAND_SOLVER_VELOCITY_ITERATIONS = { 15, 20 };
+        private readonly string[] HAND_SOLVER_NAMES = { "Standard", "High", "Custom" };
         private int _currentPreset = -1;
 
         PhysicsProvider _physicsProvider;
