@@ -180,6 +180,8 @@ namespace Leap.Unity.Interaction.PhysicsHands
         private PhysicsProvider _provider;
         public PhysicsProvider Provider => _provider;
 
+        private Vector3 _elementScale = Vector3.zero;
+
         #endregion
 
         #region Unity Events
@@ -205,6 +207,11 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 Debug.LogError("The PhysicsButton is missing a PhysicsButtonElement and has been disabled. Please ensure it has been added and assigned.", this);
                 enabled = false;
             }
+        }
+
+        private void OnEnable()
+        {
+            SetupButton();
         }
 
         protected void OnDisable()
@@ -265,9 +272,16 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
         private void ResetOnBadState()
         {
-            if (_buttonElement.transform.localRotation.eulerAngles.magnitude > 0.25f)
+            if (Mathf.Abs(_buttonElement.transform.localRotation.eulerAngles.x) > 0.005f ||
+                Mathf.Abs(_buttonElement.transform.localRotation.eulerAngles.y) > 0.005f ||
+                Mathf.Abs(_buttonElement.transform.localRotation.eulerAngles.z) > 0.005f)
             {
                 _buttonElement.transform.localRotation = Quaternion.identity;
+            }
+            if(_buttonElement.transform.lossyScale != _elementScale)
+            {
+                _elementScale = _buttonElement.transform.lossyScale;
+                SetupButton();
             }
         }
 
@@ -388,8 +402,8 @@ namespace Leap.Unity.Interaction.PhysicsHands
             _buttonElement.Rigid.useGravity = false;
             _buttonElement.Rigid.isKinematic = false;
             _buttonElement.Rigid.collisionDetectionMode = CollisionDetectionMode.ContinuousSpeculative;
-
             SetupJoint(_buttonElement.Joint);
+            _buttonElement.transform.localPosition = new Vector3(0, buttonHeightLimit, 0);
         }
 
         private void SetupJoint(ConfigurableJoint joint)
@@ -516,7 +530,6 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
             if (_buttonElement != null)
             {
-                _buttonElement.transform.localPosition = new Vector3(0, buttonHeightLimit, 0);
                 SetupButton();
             }
         }
