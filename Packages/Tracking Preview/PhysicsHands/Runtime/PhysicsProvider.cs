@@ -330,6 +330,24 @@ namespace Leap.Unity.Interaction.PhysicsHands
         {
             UpdatePhysicsHand(LeftHand, _leftIndex == -1 ? null : _leftOriginalLeap, ref _leftWasNull);
             UpdatePhysicsHand(RightHand, _rightIndex == -1 ? null : _rightOriginalLeap, ref _rightWasNull);
+
+            if (_enableHelpers)
+            {
+                ComputeHelperBones();
+            }
+
+            PhysicsGraspHelper.State oldState, state;
+
+            foreach (var helper in _graspHelpers)
+            {
+                // Removed ignore check here and moved into the helper so we can still get state information
+                oldState = helper.Value.GraspState;
+                state = helper.Value.UpdateHelper();
+                if (state != oldState)
+                {
+                    OnObjectStateChange?.Invoke(helper.Value.Rigidbody, helper.Value);
+                }
+            }
         }
 
         // Happens after the physics simulation
@@ -338,24 +356,6 @@ namespace Leap.Unity.Interaction.PhysicsHands
             yield return null;
             for(; ; )
             {
-                if (_enableHelpers)
-                {
-                    ComputeHelperBones();
-                }
-
-                PhysicsGraspHelper.State oldState, state;
-
-                foreach (var helper in _graspHelpers)
-                {
-                    // Removed ignore check here and moved into the helper so we can still get state information
-                    oldState = helper.Value.GraspState;
-                    state = helper.Value.UpdateHelper();
-                    if (state != oldState)
-                    {
-                        OnObjectStateChange?.Invoke(helper.Value.Rigidbody, helper.Value);
-                    }
-                }
-
                 UpdateHandStates();
 
                 yield return _waitForFixedUpdate;

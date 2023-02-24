@@ -587,8 +587,9 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 PhysicsHand hand = _graspingHands[_graspingHands.Count - 1];
                 if (hand.GetOriginalLeapHand() != null)
                 {
-                    _newPosition = hand.GetPhysicsHand().palmBone.transform.position + (hand.GetPhysicsHand().palmBone.transform.rotation * Quaternion.Inverse(_graspingValues[hand].originalHandRotation) * _graspingValues[hand].offset);
-                    _newRotation = hand.GetPhysicsHand().palmBone.transform.rotation * _graspingValues[hand].rotationOffset;
+                    PhysicsHand.Hand pHand = hand.GetPhysicsHand();
+                    _newPosition = pHand.palmBone.transform.position + (pHand.palmBody.velocity * Time.fixedDeltaTime) + (pHand.palmBone.transform.rotation * Quaternion.Inverse(_graspingValues[hand].originalHandRotation) * _graspingValues[hand].offset);
+                    _newRotation = pHand.palmBone.transform.rotation * _graspingValues[hand].rotationOffset;
                 }
             }
         }
