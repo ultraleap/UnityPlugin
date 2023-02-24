@@ -54,6 +54,8 @@ namespace Leap.Unity.HandsModule
     [CustomEditor(typeof(HandPoseDetector))]
     public class PoseDetectionEditor : Editor
     {
+        Vector2 scrollPosition;
+
         bool _showFineTuningOptions = false;
         public override void OnInspectorGUI()
         {
@@ -69,9 +71,6 @@ namespace Leap.Unity.HandsModule
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("ChiralityToCheck"));
             }
 
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("BoneDirectionTargets"));
-            serializedObject.ApplyModifiedProperties();
-
             if (GUILayout.Button("Show Fine Tuning Options"))
             {
                 _showFineTuningOptions = !_showFineTuningOptions;
@@ -81,16 +80,77 @@ namespace Leap.Unity.HandsModule
             {
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("_leapProvider"));
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("_hysteresisThreshold"));
+                //EditorGUILayout.PropertyField(serializedObject.FindProperty("BoneDirectionTargets"));
+
+                if (GUILayout.Button("Add Bone Direction Target"))
+                {
+                    poseDetectionScript.CreateDefaultFingerDirection();
+                }
+
+                GUILayout.Space(10);
+
+                #region boneDirectionTargets 
+                scrollPosition = EditorGUILayout.BeginScrollView(scrollPosition, GUILayout.Width(Screen.width-20), GUILayout.Height(500));
+
+                var boneDirectionTargets = serializedObject.FindProperty("BoneDirectionTargets");
+
+                for (int i = 0; i < boneDirectionTargets.arraySize; i++)
+                {
+                    var boneDirectionTarget = boneDirectionTargets.GetArrayElementAtIndex(i);
+                    boneDirectionTarget.FindPropertyRelative("enabled").boolValue = EditorGUILayout.BeginToggleGroup("Toggle: "+ 
+                        boneDirectionTarget.FindPropertyRelative("typeOfDirectionCheck").enumNames.GetValue(boneDirectionTarget.FindPropertyRelative("typeOfDirectionCheck").enumValueIndex) +
+                        " Direction " + " " + i.ToString(), boneDirectionTarget.FindPropertyRelative("enabled").boolValue);
+
+                    EditorGUILayout.PropertyField(boneDirectionTarget.FindPropertyRelative("typeOfDirectionCheck"));
+
+                    switch (boneDirectionTarget.FindPropertyRelative("typeOfDirectionCheck").enumValueIndex)
+                    {
+                        case 0: //OBJECT
+                            {
+                                EditorGUILayout.PropertyField(boneDirectionTarget.FindPropertyRelative("poseTarget"));
+                                break;
+                            }
+                        case 1: //WORLD
+                            {
+                                EditorGUILayout.PropertyField(boneDirectionTarget.FindPropertyRelative("axisToFace"));
+                                break;
+                            }
+                        case 2: //CAMERALOCAL
+                            {
+                                EditorGUILayout.PropertyField(boneDirectionTarget.FindPropertyRelative("axisToFace"));
+                                break;
+                            }
+                    }
+
+                    EditorGUILayout.PropertyField(boneDirectionTarget.FindPropertyRelative("isPalmDirection"));
+                    if (!boneDirectionTarget.FindPropertyRelative("isPalmDirection").boolValue)
+                    {
+                        EditorGUILayout.PropertyField(boneDirectionTarget.FindPropertyRelative("fingerTypeForPoint"));
+                        EditorGUILayout.PropertyField(boneDirectionTarget.FindPropertyRelative("boneForPoint"));
+
+                    }
+                    EditorGUILayout.PropertyField(boneDirectionTarget.FindPropertyRelative("rotationThreshold"));
+
+                    if (GUILayout.Button("Remove Bone Direction Target"))
+                    {
+                        poseDetectionScript.RemoveDefaultFingerDirection(i);
+                    }
+
+                    
+                    EditorGUILayout.EndToggleGroup();
+
+
+                }
+                EditorGUILayout.EndScrollView();
+                #endregion
+
             }
+            serializedObject.ApplyModifiedProperties();
+        }
+
+            
 
             //DrawDefaultInspector();
 
-        }
     }
-
-   
-
-
-
-
 }
