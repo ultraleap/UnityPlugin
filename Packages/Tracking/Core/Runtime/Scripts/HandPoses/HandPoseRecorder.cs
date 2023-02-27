@@ -22,7 +22,7 @@ namespace Leap.Unity
         private HandModelBase handToCapture = null;
 
         
-        private Hand hand = new();
+        private Hand hand = new Hand();
 
         public void SaveCurrentHandPose()
         {

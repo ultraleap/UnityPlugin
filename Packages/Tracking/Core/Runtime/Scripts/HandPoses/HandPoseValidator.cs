@@ -11,7 +11,7 @@ public class HandPoseValidator : MonoBehaviour
     /// Which hand would you like to use for gesture recognition?
     /// If this is left blank, It will search for all hands in the scene
     /// </summary>
-    List<CapsuleHand> angleVisualisationHands = new();
+    List<CapsuleHand> angleVisualisationHands = new List<CapsuleHand>();
 
     private Color[] capsuleHandColours = null;
 

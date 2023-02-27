@@ -50,8 +50,8 @@ namespace Leap.Unity
         [SerializeField] int pinkieBonesToMatch = 3;
 
         [SerializeField]
-        private List<int> fingerIndexesToCheck = new();
-        private List<int> bonesPerFingerToMatch = new();
+        private List<int> fingerIndexesToCheck = new List<int>();
+        private List<int> bonesPerFingerToMatch = new List<int>();
 
         public List<int> GetFingerIndexesToCheck()
         {
