@@ -376,8 +376,8 @@ namespace Leap.Unity.Interaction.PhysicsHands
                             _justGrasped = true;
                             GraspState = State.Grasp;
                         }
-                        _graspingValues[hand].offset = _rigid.position - hand.GetPhysicsHand().palmBone.transform.position;
-                        _graspingValues[hand].rotationOffset = Quaternion.Inverse(hand.GetPhysicsHand().palmBone.transform.rotation) * _rigid.rotation;
+                        _graspingValues[hand].offset = _rigid.position - hand.GetPhysicsHand().palmBone.transform.position + (hand.GetPhysicsHand().palmBody.velocity * Time.fixedDeltaTime);
+                        _graspingValues[hand].rotationOffset = Quaternion.Inverse(hand.GetPhysicsHand().palmBone.transform.rotation * Quaternion.Euler(hand.GetPhysicsHand().palmBody.velocity * Time.fixedDeltaTime)) * _rigid.rotation;
                         _graspingValues[hand].originalHandRotation = hand.GetPhysicsHand().palmBone.transform.rotation;
                     }
                 }
@@ -589,7 +589,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 {
                     PhysicsHand.Hand pHand = hand.GetPhysicsHand();
                     _newPosition = pHand.palmBone.transform.position + (pHand.palmBody.velocity * Time.fixedDeltaTime) + (pHand.palmBone.transform.rotation * Quaternion.Inverse(_graspingValues[hand].originalHandRotation) * _graspingValues[hand].offset);
-                    _newRotation = pHand.palmBone.transform.rotation * _graspingValues[hand].rotationOffset;
+                    _newRotation = pHand.palmBone.transform.rotation * Quaternion.Euler(hand.GetPhysicsHand().palmBody.velocity * Time.fixedDeltaTime) *  _graspingValues[hand].rotationOffset;
                 }
             }
         }
