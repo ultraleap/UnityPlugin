@@ -50,7 +50,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             public float currentPalmVelocity = MAXIMUM_PALM_VELOCITY, currentPalmAngularVelocity = MAXIMUM_PALM_ANGULAR_VELOCITY;
             [HideInInspector]
             public float currentPalmVelocityInterp = 0f;
-
+            [HideInInspector]
             public float currentPalmWeightInterp = 0f, currentPalmWeight = 0f;
 
             [HideInInspector]
@@ -690,7 +690,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             // Fix the hand if it gets into a bad situation by teleporting and holding in place until its bad velocities disappear
             if (Vector3.Distance(_originalOldPosition, _originalLeapHand.PalmPosition) > _physicsProvider.HandTeleportDistance ||
                 bonesAreOverRotated ||
-                DistanceFromDataHand > (IsGrasping ? _physicsProvider.HandGraspTeleportDistance : _physicsProvider.HandTeleportDistance) && (IsGrasping ||
+                DistanceFromDataHand > _physicsProvider.HandTeleportDistance && (IsGrasping ||
                 IsCloseToObject))
             {
                 ResetPhysicsHand(true);

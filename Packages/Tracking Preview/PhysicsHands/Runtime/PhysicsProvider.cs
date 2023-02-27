@@ -78,10 +78,6 @@ namespace Leap.Unity.Interaction.PhysicsHands
         [SerializeField, Tooltip("The distance between the physics and original data hand can reach before it snaps back to the original hand position."), Range(0.01f, 0.5f)]
         private float _handTeleportDistance = 0.15f;
 
-        public float HandGraspTeleportDistance => _handGraspTeleportDistance;
-        [SerializeField, Tooltip("The distance between the physics and original data hand can reach before it snaps back to the original hand position. This is used when a hand is reported as grasping."), Range(0.01f, 0.5f)]
-        private float _handGraspTeleportDistance = 0.22f;
-
         public int SolverIterations => _handSolverIterations;
         [SerializeField, Tooltip("The solver iterations used when calculating the hand. This can be different to your overall project iterations. Higher numbers will be more robust, but more expensive to compute."), Min(10f)]
         private int _handSolverIterations = 20;
@@ -99,12 +95,12 @@ namespace Leap.Unity.Interaction.PhysicsHands
         private bool _helperMovesObjects = true;
         public bool HelperMovesObjects => _helperMovesObjects;
 
-        [SerializeField, Tooltip("Enabling this will cause the hand to move more slowly when grasping objects of higher weights.")]
+        [SerializeField, Tooltip("Enabling this will cause the hand to move more slowly when grasping objects of higher weights. This is an experimental feature.")]
         private bool _interpolateMass = true;
         public bool InterpolatingMass => _interpolateMass;
 
         [SerializeField, Tooltip("The maximum weight of the object that a helper can move.")]
-        private float _maxMass = 15f;
+        private float _maxMass = 10f;
         public float MaxMass => _maxMass;
 
         [SerializeField, Tooltip("This option will disable hand collisions and improve forces on the object when it is detected as being thrown.")]

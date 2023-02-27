@@ -569,7 +569,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
             if (isGrasping)
             {
-                physicsHand.currentPalmWeightInterp = Mathf.InverseLerp(Mathf.Min(maximumWeight * 0.2f, 1f), maximumWeight * 0.9f, graspingWeight).EaseOut();
+                physicsHand.currentPalmWeightInterp = Mathf.InverseLerp(Mathf.Min(maximumWeight * 0.2f, 1f), maximumWeight * 0.9f, graspingWeight).Square();
             }
             else
             {
@@ -580,16 +580,19 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
             Vector3 delta = dataPosition - physicsHand.transform.position;
 
-            physicsHand.palmBody.velocity = Vector3.ClampMagnitude(Vector3.MoveTowards(physicsHand.palmBody.velocity, delta * Mathf.Lerp(1.0f, 0.1f, physicsHand.currentPalmWeight) / Time.fixedDeltaTime, 15f), physicsHand.currentPalmVelocity * Time.fixedDeltaTime);
+            physicsHand.palmBody.velocity = Vector3.ClampMagnitude(Vector3.MoveTowards(physicsHand.palmBody.velocity, delta * Mathf.Lerp(1.0f, 0.2f, physicsHand.currentPalmWeight) / Time.fixedDeltaTime, 15f), physicsHand.currentPalmVelocity * Time.fixedDeltaTime);
 
-            Quaternion rotationDelta = dataRotation * Quaternion.Inverse(physicsHand.transform.rotation);
+            Quaternion rotationDelta = Quaternion.Slerp(physicsHand.transform.rotation, dataRotation, Mathf.Lerp(1.0f, 0.2f, physicsHand.currentPalmWeight)) * Quaternion.Inverse(physicsHand.transform.rotation);
 
-            rotationDelta = Quaternion.Slerp(Quaternion.identity, rotationDelta, Mathf.Lerp(1.0f, 0.1f, physicsHand.currentPalmWeight));
-
-            physicsHand.palmBody.angularVelocity = Vector3.ClampMagnitude((new Vector3(
+            Vector3 angularVelocity = Vector3.ClampMagnitude((new Vector3(
                 Mathf.DeltaAngle(0, rotationDelta.eulerAngles.x),
                 Mathf.DeltaAngle(0, rotationDelta.eulerAngles.y),
                 Mathf.DeltaAngle(0, rotationDelta.eulerAngles.z)) / Time.fixedDeltaTime) * Mathf.Deg2Rad, physicsHand.currentPalmAngularVelocity * Time.fixedDeltaTime);
+
+            if (angularVelocity.IsValid())
+            {
+                physicsHand.palmBody.angularVelocity = angularVelocity;
+            }
         }
 
         public static float CalculateXJointAngle(Quaternion previous, Vector3 direction)
@@ -780,6 +783,11 @@ namespace Leap.Unity.Interaction.PhysicsHands
         private static Vector3 InverseTransformPoint(Vector3 transformPos, Quaternion transformRotation, Vector3 pos)
         {
             return InverseTransformPoint(transformPos, transformRotation, Vector3.one, pos);
+        }
+
+        public static bool IsValid(this Vector3 v)
+        {
+            return !(float.IsNaN(v.x) || float.IsNaN(v.y) || float.IsNaN(v.z)) && !(float.IsInfinity(v.x) || float.IsInfinity(v.y) || float.IsInfinity(v.z));
         }
 
         public static float EaseOut(this float input)
