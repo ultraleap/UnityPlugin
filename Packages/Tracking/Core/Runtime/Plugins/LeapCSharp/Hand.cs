@@ -202,7 +202,7 @@ namespace Leap
         public Vector3 Direction;
 
         LeapTransform _basis = new LeapTransform(Vector3.one, Quaternion.identity);
-        
+
         /// <summary>
         /// The transform of the hand.
         /// 
@@ -210,8 +210,8 @@ namespace Leap
         /// @since 3.1
         /// </summary>
         public LeapTransform Basis
-        { 
-            get 
+        {
+            get
             {
                 _basis.translation = PalmPosition;
                 _basis.rotation = Rotation;
