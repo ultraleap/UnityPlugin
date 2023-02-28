@@ -12,64 +12,71 @@ namespace Leap.Unity
         public override Frame CurrentFrame
         { get
             { 
-                return new Frame(0, (long)Time.realtimeSinceStartup, 90, currentHands);
+                List<Hand> hands = new List<Hand>();
+                foreach(var hand in currentHandsAndPosedObjects)
+                {
+                    hands.Add(hand.Item1);
+                }
+
+                return new Frame(0, (long)Time.realtimeSinceStartup, 90, hands);
             }
         }
         [HideInInspector]
-        public Frame TestFrame = null;
-        [HideInInspector]
         public override Frame CurrentFixedFrame => new Frame();
-
-        // Pose to apply to the left hand
+        /// <summary>
+        /// Pose to apply to the left hand
+        /// </summary>
         [SerializeField]
         HandPoseScriptableObject leftHandPoseObject;
-        // Pose to apply to the right hand
+        /// <summary>
+        /// Pose to apply to the right hand
+        /// </summary>
         [SerializeField]
         HandPoseScriptableObject rightHandPoseObject;
 
-        private List<Hand> currentHands = new List<Hand>();
+        private List<Tuple<Hand, HandPoseScriptableObject>> currentHandsAndPosedObjects = new List<Tuple<Hand, HandPoseScriptableObject>>();
 
+        [SerializeField]
         private List<Color> gizmoColours = new List<Color>() { Color.green, Color.yellow, Color.red, Color.blue };
+
+        private const float lineThickness = 4;
 
         // Update is called once per frame
         private void OnValidate()
         {
             Hand PosedHand;
-            currentHands.Clear();
+            currentHandsAndPosedObjects.Clear();
 
             if (leftHandPoseObject != null)
             {
                 PosedHand = leftHandPoseObject.GetSerializedHand();
                 PosedHand.SetTransform(new Vector3(0, 0, 0), PosedHand.Rotation);
-                leftHand = PosedHand;
-                currentHands.Add(PosedHand);
+                currentHandsAndPosedObjects.Add(new Tuple<Hand, HandPoseScriptableObject>(PosedHand, leftHandPoseObject));
             }
             if(rightHandPoseObject != null)
             {
                 PosedHand = rightHandPoseObject.GetSerializedHand();
                 PosedHand.SetTransform(new Vector3(0.5f, 0, 0), PosedHand.Rotation);
-                rightHand = PosedHand;
-                currentHands.Add(PosedHand);
+                currentHandsAndPosedObjects.Add(new Tuple<Hand, HandPoseScriptableObject>(PosedHand, rightHandPoseObject));
             }
-
-            TestFrame = CurrentFrame;
             DispatchUpdateFrameEvent(CurrentFrame);
         }
 
-        Hand rightHand, leftHand;
-
         private void OnDrawGizmos()
         {
-            ShowEditorGizmos(rightHand, rightHandPoseObject);
-            ShowEditorGizmos(leftHand, leftHandPoseObject);
-            
+            foreach(var hand in currentHandsAndPosedObjects)
+            {
+                ShowEditorGizmos(hand.Item1, hand.Item2);
+            }
         }
 
         private void ShowEditorGizmos(Hand hand, HandPoseScriptableObject handPoseScriptableObject)
         {
-            float lineThickness = 4;
+            if(handPoseScriptableObject == null || hand == null)
+            {
+                return;
+            }
 
-            //foreach (var finger in hand.Fingers)
             for (int j = 0; j < hand.Fingers.Count; j++)
             {
                 var finger = hand.Fingers[j];
@@ -80,9 +87,7 @@ namespace Leap.Unity
                         var bone = finger.bones[i];
                         Gizmos.color = gizmoColours[i];
                         Gizmos.matrix = Matrix4x4.identity;
-
                         Handles.color = gizmoColours[i];
-
 
                         DrawWireCone(handPoseScriptableObject.GetBoneRotationthreshold(j, i), 0.02f,
                         bone.Direction.normalized,

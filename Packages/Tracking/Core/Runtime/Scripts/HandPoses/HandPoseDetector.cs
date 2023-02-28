@@ -9,6 +9,9 @@ using UnityEngine.UIElements;
 
 namespace Leap.Unity
 {
+    [Serializable]
+    public class PoseDetectionEvents : UnityEvent<HandPoseScriptableObject> { }
+
     public class HandPoseDetector : MonoBehaviour
     {
         /// <summary>
@@ -28,12 +31,12 @@ namespace Leap.Unity
         /// </summary>
         [SerializeField]
         private List<HandPoseScriptableObject> _posesToDetect;
-        /// <summary>
-        /// OPTIONAL. The object which has the "HandPoseValidator" script on it. This will allow the capsule hands to act as validators
-        /// with the joint spheres changing colour the closer to the pose they get.
-        /// </summary>
-        [SerializeField]
-        private HandPoseValidator _handPoseValidator = null;
+        ///// <summary>
+        ///// OPTIONAL. The object which has the "HandPoseValidator" script on it. This will allow the capsule hands to act as validators
+        ///// with the joint spheres changing colour the closer to the pose they get.
+        ///// </summary>
+        //[SerializeField]
+        //private HandPoseValidator _handPoseValidator = null;
         /// <summary>
         /// OPTIONAL. Specify a particular leap provider. If none is selected, the script will automatically find one in the scene.
         /// </summary>
@@ -55,7 +58,31 @@ namespace Leap.Unity
         /// <summary>
         /// Gives us the pose which has been detected.
         /// </summary>
-        private HandPoseScriptableObject detectedPose = null;
+        private HandPoseScriptableObject _detectedPose = null;
+
+        public PoseDetectionEvents OnPoseDetected;
+        public UnityEvent OnPoseLost;
+
+        public struct ValidationData
+        {
+            public int fingerNum;
+            public int jointNum;
+            public bool withinThreshold;
+            public Chirality chirality;
+            public ValidationData(Chirality _chirality, int _fingerNum, int _boneNum, bool _withinThreshold)
+            {
+                this.chirality = _chirality;
+                this.fingerNum = _fingerNum;
+                this.jointNum = _boneNum;
+                this.withinThreshold = _withinThreshold;
+            }
+        }
+        private List<ValidationData> _validationDatas = new List<ValidationData>();
+
+        public List<ValidationData> GetValidationData()
+        {
+            return _validationDatas;
+        }    
 
 
         #region poseDirectionVariables
@@ -131,23 +158,13 @@ namespace Leap.Unity
             BoneDirectionTargets.RemoveAt(index);
         }
 
-
-
-        public static event Action<HandPoseScriptableObject> PoseHasBeenDetected;
-        public static event Action PoseHasNotBeenDetected;
-
         private void Start()
         {
-            //PoseHasBeenDetected += PoseDetected;
-            //PoseHasNotBeenDetected += PoseNotDetected;
             if(_leapProvider == null)
             {
                 _leapProvider = FindObjectOfType<LeapProvider>();
             }
         }
-        //private void PoseDetected(HandPoseScriptableObject poseScriptableObject) { }
-        //private void PoseNotDetected() { }
-
 
         // Update is called once per frame
         private void Update()
@@ -156,25 +173,22 @@ namespace Leap.Unity
             if (anyHandMatched && !_poseAlreadyDetected)
             {
                 _poseAlreadyDetected = true;
-                PoseHasBeenDetected(detectedPose);
+                OnPoseDetected.Invoke(_detectedPose);
                 Debug.Log("pose Detected");
             }
             else if (!anyHandMatched && _poseAlreadyDetected)
             {
                 _poseAlreadyDetected = false;
-                PoseHasNotBeenDetected();
+                OnPoseLost.Invoke();
                 Debug.Log("pose Un Detected");
             }
         }
-
-
-
 
         private bool CompareAllHandsAndPoses()
         {
             // If the user hasnt specified the hands to detect, check all Hand Model Bases.
             // This will only do this once unless manually cleared.
-            detectedPose = null;
+            _detectedPose = null;
 
             foreach (var activePlayerHand in _leapProvider.CurrentFrame.Hands)
             {
@@ -185,7 +199,7 @@ namespace Leap.Unity
                         bool poseDetectedThisFrame = ComparePoseToHand(pose, activePlayerHand);
                         if(poseDetectedThisFrame) 
                         {
-                            detectedPose = pose;
+                            _detectedPose = pose;
                             return true;
                         }
                     }
@@ -196,6 +210,7 @@ namespace Leap.Unity
 
         private bool ComparePoseToHand(HandPoseScriptableObject pose, Hand activePlayerHand)
         {
+            _validationDatas.Clear();
             // Check any finger directions set up in the pose detector
             if (CheckPoseDirection(pose, activePlayerHand) == false) { return false; }
             
@@ -219,6 +234,7 @@ namespace Leap.Unity
                 // Each bone in the finger 
                 for (int boneNum = 0; boneNum < serializedHand.Fingers[fingerNum].bones.Length; boneNum++)
                 {
+                    bool boneMatched = false;
                     // Get the same bone for both comparison hand and player hand
                     Bone activeHandBone = playerHand.Fingers[fingerNum].bones[boneNum];
                     Bone serializedHandBone = serializedHand.Fingers[fingerNum].bones[boneNum];
@@ -240,18 +256,13 @@ namespace Leap.Unity
                     lastBoneRotation = activeBoneRotation;
                     lastSerializedBoneRotation = serializedBoneRotation;
 
-                    // If there is a pose validator present, show the joint colours.
-                    if(_handPoseValidator != null)
-                    {
-                        _handPoseValidator.ShowJointColour(fingerNum, boneNum, boneDifference, jointRotationThreshold);
-                    }
-
                     // If the pose has been detected, use the Hysteresis value to check if it should be undetected
                     if (_poseAlreadyDetected)
                     {
                         if (boneDifference <= (jointRotationThreshold + _hysteresisThreshold) && boneDifference >= (-jointRotationThreshold - _hysteresisThreshold))
                         {
                             numMatchedBones++;
+                            boneMatched = true;
                         }
                     }
                     // Otherwise, check if the difference between current hand and serialized hand is within the threshold.
@@ -260,8 +271,10 @@ namespace Leap.Unity
                         if (boneDifference <= jointRotationThreshold && boneDifference >= -jointRotationThreshold)
                         {
                             numMatchedBones++;
+                            boneMatched = true;
                         }
                     }
+                    _validationDatas.Add(new ValidationData(serializedHand.GetChirality(), fingerNum, boneNum, boneMatched));
                 }
 
                 if(numMatchedBones >= pose.GetNumBonesForMatch(fingerNum))
@@ -278,8 +291,6 @@ namespace Leap.Unity
                 return false;
             }
         }
-
-
 
         private bool CheckPoseDirection(HandPoseScriptableObject pose, Hand activePlayerHand)
         {
@@ -341,10 +352,7 @@ namespace Leap.Unity
             {
                 Debug.Log("Ignoring Orientation, please assign some finger directions from the inspector.");
                 return true;
-            
             }
-            
-            
         }
 
         #region Helper Functions

@@ -17,7 +17,7 @@ namespace Leap.Unity.HandsModule
             HandPoseRecorder poseRecorderScript = (HandPoseRecorder)target;
             if (GUILayout.Button("Save Current Hand Pose"))
             {
-                poseRecorderScript.SaveCurrentHandPose();
+                poseRecorderScript.StartSaveCountdown();
             }
         }
     }
@@ -26,15 +26,28 @@ namespace Leap.Unity.HandsModule
     public class HandPoseSerializableObjectEditor : Editor
     {
         float _boneThresholdSlider = 15f;
+        float _previousBoneThresholdSlider = 15f;
+        bool _sliderHasChanged = false;
         bool _showFineTuningOptions = false;
+
 
         public override void OnInspectorGUI()
         {
             EditorGUILayout.LabelField("Angle of tolerance for pose");
+            _sliderHasChanged = false;
+            _boneThresholdSlider =  EditorGUILayout.Slider(_previousBoneThresholdSlider, 0f, 90f);
+            if (_boneThresholdSlider != _previousBoneThresholdSlider)
+            {
+                _sliderHasChanged = true;
+                _previousBoneThresholdSlider = _boneThresholdSlider;
+            }
 
-            _boneThresholdSlider =  EditorGUILayout.Slider(_boneThresholdSlider, 0f, 90f);
+
             HandPoseScriptableObject serializedObjectScript = (HandPoseScriptableObject)target;
-            serializedObjectScript.SetAllBoneThresholds(_boneThresholdSlider);
+            if(_sliderHasChanged)
+            {
+                serializedObjectScript.SetAllBoneThresholds(_boneThresholdSlider);
+            }
 
             GUILayout.Space(15);
 
@@ -57,12 +70,14 @@ namespace Leap.Unity.HandsModule
         Vector2 scrollPosition;
 
         bool _showFineTuningOptions = false;
+        string fineTuningOptionsButtonLabel = "Show Fine Tuning Options";
+
         public override void OnInspectorGUI()
         {
             HandPoseDetector poseDetectionScript = (HandPoseDetector)target;
 
             EditorGUILayout.PropertyField(serializedObject.FindProperty("_posesToDetect"));
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("_handPoseValidator"));
+            //EditorGUILayout.PropertyField(serializedObject.FindProperty("_handPoseValidator"));
 
             poseDetectionScript.CheckBothHands = EditorGUILayout.Toggle("Check Both Hands?", poseDetectionScript.CheckBothHands);
 
@@ -71,16 +86,18 @@ namespace Leap.Unity.HandsModule
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("ChiralityToCheck"));
             }
 
-            if (GUILayout.Button("Show Fine Tuning Options"))
+
+
+            if (GUILayout.Button(fineTuningOptionsButtonLabel))
             {
                 _showFineTuningOptions = !_showFineTuningOptions;
             }
 
             if (_showFineTuningOptions)
             {
+                fineTuningOptionsButtonLabel = "Hide Fine Tuning Options";
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("_leapProvider"));
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("_hysteresisThreshold"));
-                //EditorGUILayout.PropertyField(serializedObject.FindProperty("BoneDirectionTargets"));
 
                 if (GUILayout.Button("Add Bone Direction Target"))
                 {
@@ -131,7 +148,7 @@ namespace Leap.Unity.HandsModule
                     }
                     EditorGUILayout.PropertyField(boneDirectionTarget.FindPropertyRelative("rotationThreshold"));
 
-                    if (GUILayout.Button("Remove Bone Direction Target"))
+                    if (GUILayout.Button("Remove", GUILayout.Width(Screen.width * 0.2f), GUILayout.Height(20)))
                     {
                         poseDetectionScript.RemoveDefaultFingerDirection(i);
                     }
@@ -145,6 +162,13 @@ namespace Leap.Unity.HandsModule
                 #endregion
 
             }
+            else
+            {
+                fineTuningOptionsButtonLabel = "Show Fine Tuning Options";
+            }
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("OnPoseDetected"));
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("OnPoseLost"));
+
             serializedObject.ApplyModifiedProperties();
         }
 
