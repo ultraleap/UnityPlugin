@@ -1,12 +1,7 @@
-using Leap;
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
-using UnityEditor.Graphs;
 using UnityEngine;
-using UnityEngine.Rendering;
 
 namespace Leap.Unity
 {
@@ -49,7 +44,6 @@ namespace Leap.Unity
         [SerializeField] int ringBonesToMatch = 3;
         [SerializeField] int pinkieBonesToMatch = 3;
 
-        [SerializeField]
         private List<int> fingerIndexesToCheck = new List<int>();
         private List<int> bonesPerFingerToMatch = new List<int>();
 

@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
@@ -43,6 +42,11 @@ namespace Leap.Unity
         public void SaveCurrentHandPose()
         {
             _handToCapture = _leapProvider.CurrentFrame.GetHand(_chirality);
+            if(_handToCapture == null )
+            {
+                Debug.Log("There is no Ultraleap hand in the scene to capture");
+                return;
+            }
             hand = hand.CopyFrom(_handToCapture);
             if (hand != null)
             {

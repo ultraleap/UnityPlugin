@@ -1,11 +1,7 @@
-using LeapInternal;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.UIElements;
 
 namespace Leap.Unity
 {
@@ -31,12 +27,6 @@ namespace Leap.Unity
         /// </summary>
         [SerializeField]
         private List<HandPoseScriptableObject> _posesToDetect;
-        ///// <summary>
-        ///// OPTIONAL. The object which has the "HandPoseValidator" script on it. This will allow the capsule hands to act as validators
-        ///// with the joint spheres changing colour the closer to the pose they get.
-        ///// </summary>
-        //[SerializeField]
-        //private HandPoseValidator _handPoseValidator = null;
         /// <summary>
         /// OPTIONAL. Specify a particular leap provider. If none is selected, the script will automatically find one in the scene.
         /// </summary>
@@ -83,7 +73,6 @@ namespace Leap.Unity
         {
             return _validationDatas;
         }    
-
 
         #region poseDirectionVariables
         /// <summary>
@@ -162,7 +151,7 @@ namespace Leap.Unity
         {
             if(_leapProvider == null)
             {
-                _leapProvider = FindObjectOfType<LeapProvider>();
+                _leapProvider = Hands.Provider;
             }
         }
 
@@ -174,13 +163,11 @@ namespace Leap.Unity
             {
                 _poseAlreadyDetected = true;
                 OnPoseDetected.Invoke(_detectedPose);
-                Debug.Log("pose Detected");
             }
             else if (!anyHandMatched && _poseAlreadyDetected)
             {
                 _poseAlreadyDetected = false;
                 OnPoseLost.Invoke();
-                Debug.Log("pose Un Detected");
             }
         }
 
@@ -192,7 +179,7 @@ namespace Leap.Unity
 
             foreach (var activePlayerHand in _leapProvider.CurrentFrame.Hands)
             {
-                if ((!CheckBothHands && activePlayerHand.GetChirality() == ChiralityToCheck) || CheckBothHands)
+                if ((CheckBothHands || activePlayerHand.GetChirality() == ChiralityToCheck))
                 {
                     foreach (HandPoseScriptableObject pose in _posesToDetect)
                     {
@@ -212,18 +199,21 @@ namespace Leap.Unity
         {
             _validationDatas.Clear();
             // Check any finger directions set up in the pose detector
-            if (CheckPoseDirection(pose, activePlayerHand) == false) { return false; }
+            if (CheckPoseDirection(pose, activePlayerHand) == false) 
+            {
+                return false; 
+            }
             
             Hand serializedHand = pose.GetSerializedHand();
             Hand playerHand = activePlayerHand;
-            int numMatchedFingers = 0;
-
+            
             if (serializedHand == null || playerHand == null)
             {
                 return false;
             }
 
             List<int> fingerIndexesToCheck = pose.GetFingerIndexesToCheck();
+            int numMatchedFingers = 0;
 
             foreach (int fingerNum in fingerIndexesToCheck)
             {
@@ -350,7 +340,6 @@ namespace Leap.Unity
             }
             else
             {
-                Debug.Log("Ignoring Orientation, please assign some finger directions from the inspector.");
                 return true;
             }
         }

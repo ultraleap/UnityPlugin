@@ -1,7 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEditor;
-using UnityEditor.PackageManager.UI;
 using UnityEngine;
 
 
@@ -74,6 +71,9 @@ namespace Leap.Unity.HandsModule
 
         public override void OnInspectorGUI()
         {
+            EditorGUI.BeginDisabledGroup(true);
+            EditorGUILayout.ObjectField("Script", MonoScript.FromMonoBehaviour((MonoBehaviour)target), GetType(), false);
+            EditorGUI.EndDisabledGroup();
             HandPoseDetector poseDetectionScript = (HandPoseDetector)target;
 
             EditorGUILayout.PropertyField(serializedObject.FindProperty("_posesToDetect"));
