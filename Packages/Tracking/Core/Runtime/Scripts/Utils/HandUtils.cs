@@ -132,7 +132,7 @@ namespace Leap.Unity
             {
                 if (Provider == null) return null;
                 if (Provider.CurrentFrame == null) return null;
-                return Provider.CurrentFrame.Hands.FirstOrDefault(hand => hand.IsLeft);
+                return Provider.CurrentFrame.GetHand(Chirality.Left);
             }
         }
 
@@ -146,7 +146,7 @@ namespace Leap.Unity
             {
                 if (Provider == null) return null;
                 if (Provider.CurrentFrame == null) return null;
-                else return Provider.CurrentFrame.Hands.FirstOrDefault(hand => hand.IsRight);
+                return Provider.CurrentFrame.GetHand(Chirality.Right);
             }
         }
 
@@ -160,7 +160,7 @@ namespace Leap.Unity
             {
                 if (Provider == null) return null;
                 if (Provider.CurrentFixedFrame == null) return null;
-                return Provider.CurrentFixedFrame.Hands.FirstOrDefault(hand => hand.IsLeft);
+                return Provider.CurrentFixedFrame.GetHand(Chirality.Left);
             }
         }
 
@@ -174,7 +174,7 @@ namespace Leap.Unity
             {
                 if (Provider == null) return null;
                 if (Provider.CurrentFixedFrame == null) return null;
-                else return Provider.CurrentFixedFrame.Hands.FirstOrDefault(hand => hand.IsRight);
+                return Provider.CurrentFixedFrame.GetHand(Chirality.Right);
             }
         }
 
@@ -387,6 +387,20 @@ namespace Leap.Unity
             }
 
             return Vector3.Dot(hand.Fingers[finger].Direction, -hand.DistalAxis()).Map(-1, 1, 0, 1);
+        }
+
+        /// <summary>
+        /// Returns the distance between the tip of the finger and the tip of the thumb.
+        /// Finger 0 (thumb) will always return float.MaxValue.
+        /// </summary>
+        public static float GetFingerPinchDistance(this Hand hand, int finger)
+        {
+            if(hand == null || finger == 0)
+            {
+                return float.MaxValue;
+            }
+
+            return Vector3.Distance(hand.Fingers[0].TipPosition, hand.Fingers[finger].TipPosition);
         }
 
         /// <summary>
@@ -622,9 +636,20 @@ namespace Leap.Unity
         /// <returns>The first hand of the argument whichHand found in the argument frame.</returns>
         public static Hand GetHand(this Frame frame, Chirality whichHand)
         {
-            if (frame.Hands == null) { return null; }
-            return frame.Hands.FirstOrDefault(
-              h => h.IsLeft == (whichHand == Chirality.Left));
+            if (frame.Hands == null)
+            {
+                return null;
+            }
+
+            foreach (var hand in frame.Hands)
+            {
+                if (hand.IsLeft && whichHand == Chirality.Left || hand.IsRight && whichHand == Chirality.Right)
+                {
+                    return hand;
+                }
+            }
+
+            return null;
         }
 
         #endregion

@@ -40,7 +40,7 @@ namespace Leap.Unity.Interaction
 #if UNITY_EDITOR
     new
 #endif
-    Rigidbody rigidbody;
+        Rigidbody rigidbody;
 
         /// <summary>
         /// The Collider of this ContactBone. This field must not be null for the ContactBone

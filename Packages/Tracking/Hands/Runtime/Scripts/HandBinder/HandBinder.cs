@@ -244,9 +244,12 @@ namespace Leap.Unity.HandsModule
                 float ratio = leapFingerLength / fingerTipLength;
                 //Adjust the ratio by an offset value exposed in the inspector and the overal scale that has been calculated
                 float adjustedRatio = (ratio * (finger.fingerTipScaleOffset) - BoundHand.scaleOffset);
-
+                //Adjust the ratio to account for service provider scale, assuming the service provider is uniformly scaled
+                var serviceProviderScale = leapProvider?.gameObject.transform.lossyScale.x ?? 1f;
+                adjustedRatio /= serviceProviderScale;
                 //Calculate the direction that goes up the bone towards the next bone
                 Vector3 direction = (intermediateBone.boundTransform.position - distalBone.boundTransform.position).normalized;
+
                 //Calculate which axis to scale along
                 Vector3 axis = CalculateAxis(distalBone.boundTransform, direction);
                 //Calculate the scale by ensuring all axis are 1 apart from the axis to scale along
@@ -435,6 +438,10 @@ namespace Leap.Unity.HandsModule
         Vector3 CalculateAxis(Transform t, Vector3 dir)
         {
             var boneForward = t.InverseTransformDirection(dir.normalized).normalized;
+            // Ensure axes are positive to account for negative model scaling
+            boneForward.x = Mathf.Abs(boneForward.x);
+            boneForward.y = Mathf.Abs(boneForward.y);
+            boneForward.z = Mathf.Abs(boneForward.z);
             return boneForward;
         }
         #endregion
