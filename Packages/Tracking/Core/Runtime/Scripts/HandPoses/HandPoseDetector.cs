@@ -224,13 +224,20 @@ namespace Leap.Unity
                 // Each bone in the finger 
                 for (int boneNum = 0; boneNum < serializedHand.Fingers[fingerNum].bones.Length; boneNum++)
                 {
+                    //Ignore the metacarpal as it will never really change.
+                    if (serializedHand.Fingers[fingerNum].bones[boneNum].Type == Bone.BoneType.TYPE_METACARPAL)
+                    {
+                        continue;
+                    }
+
                     bool boneMatched = false;
+
                     // Get the same bone for both comparison hand and player hand
                     Bone activeHandBone = playerHand.Fingers[fingerNum].bones[boneNum];
                     Bone serializedHandBone = serializedHand.Fingers[fingerNum].bones[boneNum];
 
                     // Get the user defined rotation threshold for the current bone (threshold is defined in the pose scriptable object)
-                    float jointRotationThreshold = GetBoneRotationThreshold(pose, fingerNum, boneNum);
+                    Vector2 jointRotationThresholds = GetBoneRotationThreshold(pose, fingerNum, boneNum);
 
                     // Get hand rotation for both hands
                     Quaternion activeBoneRotation = activeHandBone.Rotation;
@@ -240,8 +247,9 @@ namespace Leap.Unity
                     Vector3 activeRotEuler = (Quaternion.Inverse(lastBoneRotation) * activeBoneRotation).eulerAngles;
                     Vector3 serializedRotEuler = (Quaternion.Inverse(lastSerializedBoneRotation) * serializedBoneRotation).eulerAngles;
 
+                    
                     // Calculate angle difference between the active hand and the serialized hand.
-                    float boneDifference = GetDegreeAngleDifferenceXY(serializedRotEuler, activeRotEuler);
+                    Vector2 boneDifference = GetDegreeAngleDifferenceXY(serializedRotEuler, activeRotEuler);
 
                     lastBoneRotation = activeBoneRotation;
                     lastSerializedBoneRotation = serializedBoneRotation;
@@ -249,7 +257,8 @@ namespace Leap.Unity
                     // If the pose has been detected, use the Hysteresis value to check if it should be undetected
                     if (_poseAlreadyDetected)
                     {
-                        if (boneDifference <= (jointRotationThreshold + _hysteresisThreshold) && boneDifference >= (-jointRotationThreshold - _hysteresisThreshold))
+                        if ((boneDifference.x <= (jointRotationThresholds.x + _hysteresisThreshold) && boneDifference.x >= (-jointRotationThresholds.x - _hysteresisThreshold))
+                            && (boneDifference.y <= (jointRotationThresholds.y + _hysteresisThreshold) && boneDifference.y >= (-jointRotationThresholds.y - _hysteresisThreshold)))
                         {
                             numMatchedBones++;
                             boneMatched = true;
@@ -258,7 +267,8 @@ namespace Leap.Unity
                     // Otherwise, check if the difference between current hand and serialized hand is within the threshold.
                     else
                     {
-                        if (boneDifference <= jointRotationThreshold && boneDifference >= -jointRotationThreshold)
+                        if ((boneDifference.x <= jointRotationThresholds.x && boneDifference.x >= -jointRotationThresholds.x)
+                            && (boneDifference.y <= jointRotationThresholds.y && boneDifference.y >= -jointRotationThresholds.y))
                         {
                             numMatchedBones++;
                             boneMatched = true;
@@ -350,9 +360,18 @@ namespace Leap.Unity
             return Vector3.Dot((comparisonPosition - bonePosition).normalized, boneDirection.normalized) > minAllowedDotProduct;
         }
 
-        private float GetDegreeAngleDifferenceXY(Vector3 a, Vector3 b)
+        private Vector2 GetDegreeAngleDifferenceXY(Vector3 a, Vector3 b)
         {
-            var averageAngle = (Mathf.DeltaAngle(a.x, b.x) + Mathf.DeltaAngle(a.y, b.y))/2;
+            var angleX = Mathf.DeltaAngle(a.x, b.x);
+            var angleY = Mathf.DeltaAngle(a.y, b.y);
+
+            return new Vector2(angleX, angleY);
+        }
+
+        private float GetAverageDegreeAngleDifferenceXY(Vector3 a, Vector3 b)
+        {
+            var averageAngle = (Mathf.DeltaAngle(a.x, b.x) + Mathf.DeltaAngle(a.y, b.y)) / 2;
+
             return averageAngle;
         }
 
@@ -361,7 +380,7 @@ namespace Leap.Unity
             return(Vector3.Angle(boneDirection.normalized, TargetDirectionDirection.normalized) < thresholdInDegrees);
         }
 
-        private float GetBoneRotationThreshold(HandPoseScriptableObject pose, int fingerNum, int boneNum)
+        private Vector2 GetBoneRotationThreshold(HandPoseScriptableObject pose, int fingerNum, int boneNum)
         {
             return pose.GetBoneRotationthreshold(fingerNum, boneNum);
         }

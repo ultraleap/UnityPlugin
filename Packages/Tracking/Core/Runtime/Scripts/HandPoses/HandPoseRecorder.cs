@@ -29,15 +29,31 @@ namespace Leap.Unity
         /// </summary>
         [SerializeField]
         private LeapProvider _leapProvider = null;
+
+        
         /// <summary>
         /// Where should the save path be? this will always be in "Assets/..."
         /// When saved, this will create the folder is one does not exist.
         /// </summary>
-        [SerializeField]
-        private string _savePath = "HandPoses/";
+        [HideInInspector]
+        public string SavePath = "HandPoses/";
 
 
         private Hand hand = new Hand();
+
+        /// <summary>
+        /// How long after pressing the record pose button will the recordere wait before saving the pose (in seconds)
+        /// </summary>
+        [SerializeField]
+        private int countdownInSeconds = 3;
+
+        /// <summary>
+        /// Which text should the countdown be presented on?
+        /// </summary>
+        [SerializeField]
+        private Text countdownText = null;
+
+
 
         public void SaveCurrentHandPose()
         {
@@ -74,22 +90,13 @@ namespace Leap.Unity
             HandPoseScriptableObject newItem = ScriptableObject.CreateInstance<HandPoseScriptableObject>();
             newItem.name = handPoseName;
             newItem.SaveHandPose(handData);
-            if (!Directory.Exists("Assets/" + _savePath))
+            if (!Directory.Exists("Assets/" + SavePath))
             {
-                Directory.CreateDirectory("Assets/" + _savePath);
+                Directory.CreateDirectory("Assets/" + SavePath);
             }
-            AssetDatabase.CreateAsset(newItem, "Assets/" + _savePath + handPoseName + ".asset");
+            AssetDatabase.CreateAsset(newItem, "Assets/" + SavePath + handPoseName + ".asset");
             AssetDatabase.Refresh();
         }
-
-        [SerializeField]
-        Text countdownText = null;
-
-        /// <summary>
-        /// How long after pressing the record pose button will the recordere wait before saving the pose (in seconds)
-        /// </summary>
-        [SerializeField]
-        private int countdownInSeconds = 3;
 
         public void StartSaveCountdown()
         {
@@ -102,13 +109,23 @@ namespace Leap.Unity
             currCountdownValue = countdownInSeconds;
             while (currCountdownValue > 0)
             {
+                if (countdownText != null)
+                {
+                    countdownText.text = currCountdownValue.ToString();
+                }
                 yield return new WaitForSeconds(1.0f);
                 currCountdownValue--;
-                countdownText.text = currCountdownValue.ToString();
+                if (countdownText != null)
+                {
+                    countdownText.text = currCountdownValue.ToString();
+                }
             }
 
             SaveCurrentHandPose();
-            countdownText.text = "Pose Recorded in \n Assets/" + _savePath;
+            if (countdownText != null)
+            {
+                countdownText.text = "Pose Recorded in \n Assets/" + SavePath;
+            }
         }
 
     }

@@ -7,11 +7,22 @@ namespace Leap.Unity.HandsModule
     [CustomEditor(typeof(HandPoseRecorder))]
     public class HandPoseRecoderEditor : Editor
     {
+        private readonly string _assetsPath = "Assets/";
+
         public override void OnInspectorGUI()
         {
-            DrawDefaultInspector();
 
+            DrawDefaultInspector();
             HandPoseRecorder poseRecorderScript = (HandPoseRecorder)target;
+
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("Pose save path: ");
+            GUILayout.FlexibleSpace();
+            EditorGUILayout.LabelField(_assetsPath, GUILayout.Width(50));
+            poseRecorderScript.SavePath = EditorGUILayout.TextField("HandPoses/");
+            EditorGUILayout.EndHorizontal();
+            
+
             if (GUILayout.Button("Save Current Hand Pose"))
             {
                 poseRecorderScript.StartSaveCountdown();

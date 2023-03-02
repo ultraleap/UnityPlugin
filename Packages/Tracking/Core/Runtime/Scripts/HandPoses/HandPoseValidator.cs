@@ -5,41 +5,35 @@ using UnityEngine;
 
 public class HandPoseValidator : MonoBehaviour
 {
-
     /// <summary>
-    /// Which hand would you like to use for gesture recognition?
+    /// Which hand would you like to use for gesture validation?
     /// If this is left blank, It will search for all hands in the scene
     /// </summary>
     public List<CapsuleHand> angleVisualisationHands = new List<CapsuleHand>();
 
-    private Color[] capsuleHandColours = null;
-    private HandPoseDetector detector;
+    private Color[] _capsuleHandColours = new Color[32];
+    private HandPoseDetector _detector;
 
     private void Start()
     {
-        detector = FindObjectOfType<HandPoseDetector>();
-
-
+        _detector = FindObjectOfType<HandPoseDetector>();
     }
 
     private void Update()
     {
-        if (detector != null) 
+        if (_detector != null) 
         {
             angleVisualisationHands = GameObject.FindObjectsOfType<CapsuleHand>().ToList();
 
             var colourCapsuleHand = angleVisualisationHands.FirstOrDefault();
             if (colourCapsuleHand != null)
             {
-                if (capsuleHandColours == null)
-                {
-                    capsuleHandColours = colourCapsuleHand.SphereColors;
-                }
+                Utils.Fill(_capsuleHandColours, Color.grey);
             }
 
             if (angleVisualisationHands.Count > 0)
             {
-                var validationData = detector.GetValidationData();
+                var validationData = _detector.GetValidationData();
 
                 foreach (var visHand in angleVisualisationHands)
                 {
@@ -49,18 +43,18 @@ public class HandPoseValidator : MonoBehaviour
                         {
                             if(data.withinThreshold)
                             {
-                                capsuleHandColours[(data.fingerNum * 4) + data.jointNum] = Color.green;
+                                _capsuleHandColours[(data.fingerNum * 4) + data.jointNum] = Color.green;
                             }
                             else
                             {
-                                capsuleHandColours[(data.fingerNum * 4) + data.jointNum] = Color.red;
+                                _capsuleHandColours[(data.fingerNum * 4) + data.jointNum] = Color.red;
                             }
                         }
                     }
                     if (visHand != null)
                     {
                         visHand.SetIndividualSphereColors = true;
-                        visHand.SphereColors = capsuleHandColours;
+                        visHand.SphereColors = _capsuleHandColours;
                     }
                 }
             }

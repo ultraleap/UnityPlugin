@@ -37,7 +37,7 @@ namespace Leap.Unity
         private List<Tuple<Hand, HandPoseScriptableObject>> currentHandsAndPosedObjects = new List<Tuple<Hand, HandPoseScriptableObject>>();
 
         [SerializeField]
-        private List<Color> gizmoColours = new List<Color>() { Color.green, Color.yellow, Color.red, Color.blue };
+        private Color[] gizmoColours = new Color[2] { Color.red.WithAlpha(0.3f), Color.blue.WithAlpha(0.3f) };
 
         private const float lineThickness = 4;
 
@@ -80,42 +80,65 @@ namespace Leap.Unity
             for (int j = 0; j < hand.Fingers.Count; j++)
             {
                 var finger = hand.Fingers[j];
+                var proximal = hand.Fingers[j].Bone(Bone.BoneType.TYPE_PROXIMAL);
+                var intermediate = hand.Fingers[j].Bone(Bone.BoneType.TYPE_INTERMEDIATE);
+
+                Plane fingerNormalPlane = new Plane(proximal.PrevJoint, proximal.NextJoint, intermediate.NextJoint);
+                var normal = fingerNormalPlane.normal;
+                
+                    
                 if (handPoseScriptableObject.GetFingerIndexesToCheck().Contains(j))
                 {
                     for (int i = 0; i < finger.bones.Length; i++)
                     {
                         var bone = finger.bones[i];
-                        Gizmos.color = gizmoColours[i];
+                        Gizmos.color = gizmoColours[0];
                         Gizmos.matrix = Matrix4x4.identity;
-                        Handles.color = gizmoColours[i];
+                        Handles.color = gizmoColours[0];
 
-                        DrawWireCone(handPoseScriptableObject.GetBoneRotationthreshold(j, i), 0.02f,
+                        //currently only uses x threshold
+                        DrawWireCone(handPoseScriptableObject.GetBoneRotationthreshold(j, i).x,
                         bone.Direction.normalized,
-                        bone.PrevJoint, bone.NextJoint, gizmoColours[i], lineThickness);
+                        bone.PrevJoint, normal);
+
+                        if (finger.bones[i].Type == Bone.BoneType.TYPE_PROXIMAL) 
+                        {
+                            Gizmos.color = gizmoColours[1];
+                            Handles.color = gizmoColours[1];
+                            var proximalNormal = Quaternion.AngleAxis(90, bone.Direction.normalized) * normal;
+                            DrawWireCone(handPoseScriptableObject.GetBoneRotationthreshold(j, i).y,
+                            bone.Direction.normalized,
+                            bone.PrevJoint, proximalNormal);
+                        }
                     }
                 }
             }
         }
 
 
-        private void DrawWireCone(float angle, float coneLength, Vector3 coneDirection, Vector3 pointLocation, Vector3 baseCentrePoint, Color color, float ringThickness)
+        private void DrawWireCone(float angle, Vector3 coneDirection, Vector3 pointLocation, Vector3 normal)
         {
-            float circleRadius = Mathf.Tan((angle * (float)(Math.PI / 180)) * (Vector3.Distance(pointLocation, pointLocation + (coneDirection * coneLength))));
-            Vector3 normal = Vector3.Normalize(baseCentrePoint - pointLocation);
-            Vector3 circleCentrePoint = pointLocation + (coneDirection * coneLength);
+            float circleRadius = 0.02f;
+            var startPoint = coneDirection.normalized * circleRadius;
 
-            var leftPoint = (Vector3.Cross(normal, Vector3.forward).normalized) * circleRadius;
-            var rightPoint = (Vector3.Cross(normal, -Vector3.forward).normalized) * circleRadius;
-            var upPoint = (Vector3.Cross(normal, Vector3.up).normalized) * circleRadius;
-            var downPoint = (Vector3.Cross(normal, -Vector3.up).normalized) * circleRadius;
+            Handles.DrawSolidArc(pointLocation, normal, startPoint, angle, circleRadius);
+            Handles.DrawSolidArc(pointLocation, -normal, startPoint, angle, circleRadius);
 
-            Debug.DrawLine(pointLocation, leftPoint + circleCentrePoint, color);
-            Debug.DrawLine(pointLocation, rightPoint + circleCentrePoint, color);
-            Debug.DrawLine(pointLocation, upPoint + circleCentrePoint, color);
-            Debug.DrawLine(pointLocation, downPoint + circleCentrePoint, color);
+            //Quaternion.AngleAxis(angle, bone.Direction.normalized) * normal
+            //Vector3 lineTo = RotatePointAroundPivot(startPoint, pointLocation, Vector3.up * angle);
+            var lineTo1 = Quaternion.AngleAxis(angle, coneDirection.normalized) * normal.normalized;
+            var lineTo2 = Quaternion.AngleAxis(angle, coneDirection.normalized) * -normal.normalized;
 
+            //Gizmos.DrawLine(pointLocation, lineTo1);
+            //Gizmos.DrawLine(pointLocation, lineTo2);
+        }
 
-            Handles.DrawWireDisc(circleCentrePoint, normal, circleRadius, ringThickness);
+        public Vector3 RotatePointAroundPivot(Vector3 point, Vector3 pivot, Vector3 angles)
+        {
+            Vector3 dir = point - pivot; // get point direction relative to pivot
+            dir = Quaternion.Euler(angles) * dir; // rotate it
+            point = dir + pivot; // calculate rotated point
+            return point; // return it
         }
     }
 }
