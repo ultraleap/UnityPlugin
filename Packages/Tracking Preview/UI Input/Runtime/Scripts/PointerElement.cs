@@ -47,7 +47,7 @@ namespace Leap.Unity.InputModule
         {
             get
             {
-                switch (module.InteractionMode)
+                switch (module?.InteractionMode)
                 {
                     case InteractionCapability.Both:
                         if (PointerStateTactile == PointerStates.OffCanvas)
@@ -134,7 +134,7 @@ namespace Leap.Unity.InputModule
         /// </summary>
         private bool IsTouchingOrNearlyTouchingCanvasOrElement()
         {
-            switch (module.InteractionMode)
+            switch (module?.InteractionMode)
             {
                 case InteractionCapability.Both:
                     return IsTouchingOrNearlyTouchingCanvasOrElement(PointerStateProjective) || IsTouchingOrNearlyTouchingCanvasOrElement(PointerStateTactile);
@@ -164,7 +164,7 @@ namespace Leap.Unity.InputModule
         /// </summary>
         private bool NoLongerInteracting(Hand hand)
         {
-            switch (module.InteractionMode)
+            switch (module?.InteractionMode)
             {
                 case InteractionCapability.Both:
                     return (PrevTriggeringInteraction && (!IsTriggeringInteraction(hand) || 
@@ -188,7 +188,7 @@ namespace Leap.Unity.InputModule
         /// </summary>
         private bool OffCanvas()
         {
-            switch (module.InteractionMode)
+            switch (module?.InteractionMode)
             {
                 case InteractionCapability.Both:
                     return PointerStateTactile == PointerStates.OffCanvas && PointerStateProjective == PointerStates.OffCanvas;
@@ -281,7 +281,7 @@ namespace Leap.Unity.InputModule
             {
                 cursor.gameObject.SetActive(false);
             }
-            else if (disableWhenOffCanvas && PointerStateTactile == PointerStates.OffCanvas && PointerStateProjective == PointerStates.OffCanvas)
+            else if (disableWhenOffCanvas && OffCanvas())
             {
                 if (cursor.gameObject.activeSelf)
                 {
@@ -294,7 +294,7 @@ namespace Leap.Unity.InputModule
             }
 
             //Select interaction
-            switch (module.InteractionMode)
+            switch (module?.InteractionMode)
             {
                 case InteractionCapability.Both:
                     ProcessHybrid(projectionOriginProvider, hand);
@@ -312,11 +312,11 @@ namespace Leap.Unity.InputModule
             if (EventData != null)
                 PrevScreenPosition = EventData.position;
 
-
-            switch (module.InteractionMode)
+            switch (module?.InteractionMode)
             {
                 case InteractionCapability.Both:
 
+                    // Only raise projective events if there are no interesting tactile interactions happening
                     if (PointerStateTactile != PointerStates.OffCanvas && PrevStateTactile != PointerStates.OffCanvas)
                     {
                         RaiseEventsForStateChanges(PointerStateTactile, PrevStateTactile);
@@ -343,9 +343,31 @@ namespace Leap.Unity.InputModule
 
         private void ResetTimeEnteredCanvas()
         {
-            if (PointerStateProjective == PointerStates.OffCanvas && PrevStateProjective == PointerStates.OffCanvas && PointerStateTactile == PointerStates.OffCanvas && PrevStateTactile == PointerStates.OffCanvas)
+            switch (module?.InteractionMode)
             {
-                TimeEnteredCanvas = Time.time;
+                case InteractionCapability.Both:
+                    if (PointerStateProjective == PointerStates.OffCanvas && PrevStateProjective == PointerStates.OffCanvas && PointerStateTactile == PointerStates.OffCanvas && PrevStateTactile == PointerStates.OffCanvas)
+                    {
+                        TimeEnteredCanvas = Time.time;
+                    }
+                    break;
+
+                case InteractionCapability.Direct:
+                    if (PointerStateTactile == PointerStates.OffCanvas && PrevStateTactile == PointerStates.OffCanvas)
+                    {
+                        TimeEnteredCanvas = Time.time;
+                    }
+                    break;
+
+                case InteractionCapability.Indirect:
+                    if (PointerStateProjective == PointerStates.OffCanvas && PrevStateProjective == PointerStates.OffCanvas)
+                    {
+                        TimeEnteredCanvas = Time.time;
+                    }
+
+                    break;
+                default:
+                    break;
             }
         }
 
@@ -353,6 +375,7 @@ namespace Leap.Unity.InputModule
         {
             ProcessTactile(projectionOriginProvider, hand);
 
+            // If nothing interesting is happening in terms of direct/tactile interaction, then process the indirect/projective interaction
             if (PointerStateTactile == PointerStates.OffCanvas)
             {
                 ProcessProjective(projectionOriginProvider, hand);
@@ -446,7 +469,8 @@ namespace Leap.Unity.InputModule
                         CurrentGameObject = CurrentGameObjectUnderPointer;
 
                         //See if this object, or one of its parents, has a pointerDownHandler
-                        var gameObjectJustPressed = ExecuteEvents.ExecuteHierarchy(CurrentGameObject, EventData, ExecuteEvents.pointerDownHandler);
+                        var gameObjectJustPressed = ExecuteEvents.ExecuteHierarchy(CurrentGameObject, EventData, 
+                            ExecuteEvents.pointerDownHandler);
 
                         //If not, see if one has a pointerClickHandler!
                         if (gameObjectJustPressed == null)
@@ -479,8 +503,6 @@ namespace Leap.Unity.InputModule
 
                         // Find something in the hierarchy that implements dragging, starting at this GO and searching up
                         EventData.pointerDrag = ExecuteEvents.GetEventHandler<IDragHandler>(CurrentGameObject);
-
-                        //Debug.Log(PointEvents[whichPointer].pointerDrag.name);
 
                         if (EventData.pointerDrag)
                         {
@@ -584,7 +606,6 @@ namespace Leap.Unity.InputModule
                         ExecuteEvents.Execute(GameObjectBeingDragged, EventData, ExecuteEvents.pointerUpHandler);
                     }
 
-                    //Debug.Log(currentGoing[whichPointer].name);
                     if (CurrentGameObjectUnderPointer != null)
                     {
                         ExecuteEvents.ExecuteHierarchy(CurrentGameObjectUnderPointer, EventData,
