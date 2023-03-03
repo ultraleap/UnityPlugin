@@ -22,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (Physics Hands) Default physics hands solver iterations & presets
 - (Physics Hands) Heuristic calculations moved to WaitForFixedUpdate
 - (Physics Hands) Non-0th joints are now only revolute once again
+- Reordered example assets to make it easier to traverse
 
 ### Fixed
 - (Physics Hands) Bone directions when converting back to Leap Hands
