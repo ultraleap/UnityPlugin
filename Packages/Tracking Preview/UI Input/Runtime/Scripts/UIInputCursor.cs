@@ -56,7 +56,7 @@ namespace Leap.Unity.InputModule
                 ? Vector3.Lerp(initialScale, initialScale * interactionPointerScale, hand.PinchStrength)
                 : Vector3.one;
 
-            switch (element.PointerState)
+            switch (element.AggregatePointerState)  
             {
                 case PointerStates.OnCanvas:
                     spriteRenderer.color = colorBlock.normalColor;
