@@ -56,13 +56,13 @@ namespace Leap.Unity.Interaction.PhysicsHands
         private Rigidbody _rigid;
         public Rigidbody Rigidbody => _rigid;
         private List<Collider> _colliders = new List<Collider>();
-        public Pose previousPose;
-        public Pose previousPalmPose;
 
         private Vector3 _newPosition;
         private Quaternion _newRotation;
 
         private bool _oldKinematic, _oldGravity;
+        private float _originalMass = 1f;
+        public float OriginalMass => _originalMass;
 
         // This means we can have bones stay "attached" for a small amount of time
         private List<PhysicsBone> _boneCooldownItems = new List<PhysicsBone>();
@@ -112,6 +112,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
         public PhysicsGraspHelper(Rigidbody rigid, PhysicsProvider manager)
         {
             _rigid = rigid;
+            _originalMass = _rigid.mass;
             // Doing this prevents objects from misaligning during rotation
             if (_rigid.maxAngularVelocity < 100f)
             {
@@ -236,6 +237,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                     // Only ever unset the rigidbody values here otherwise outside logic will get confused
                     _rigid.isKinematic = _oldKinematic;
                     _rigid.useGravity = _oldGravity;
+                    _rigid.mass = _originalMass;
                 }
                 if (Manager.EnhanceThrowing && !Ignored)
                 {
@@ -374,6 +376,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                         if (_graspingHands.Count > 0)
                         {
                             _justGrasped = true;
+                            _rigid.mass = 1f;
                             GraspState = State.Grasp;
                         }
                         _graspingValues[hand].offset = _rigid.position - hand.GetPhysicsHand().palmBone.transform.position;
@@ -589,7 +592,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 {
                     PhysicsHand.Hand pHand = hand.GetPhysicsHand();
                     _newPosition = pHand.palmBone.transform.position + (pHand.palmBody.velocity * Time.fixedDeltaTime) + (pHand.palmBone.transform.rotation * Quaternion.Inverse(_graspingValues[hand].originalHandRotation) * _graspingValues[hand].offset);
-                    _newRotation = pHand.palmBone.transform.rotation * Quaternion.Euler(pHand.palmBody.velocity * Time.fixedDeltaTime) *  _graspingValues[hand].rotationOffset;
+                    _newRotation = pHand.palmBone.transform.rotation * Quaternion.Euler(pHand.palmBody.angularVelocity * Time.fixedDeltaTime) *  _graspingValues[hand].rotationOffset;
                 }
             }
         }

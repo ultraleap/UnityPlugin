@@ -743,7 +743,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 if (item.Value.GraspingHands.Contains(hand))
                 {
                     found = true;
-                    mass += item.Value.Rigidbody.mass;
+                    mass += item.Value.OriginalMass;
                     break;
                 }
             }
