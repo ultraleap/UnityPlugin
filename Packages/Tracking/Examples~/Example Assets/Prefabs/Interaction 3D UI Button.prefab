@@ -109,7 +109,7 @@ GameObject:
   - component: {fileID: 114193398573130750}
   - component: {fileID: 114700673106479202}
   m_Layer: 0
-  m_Name: Cube UI Button
+  m_Name: Interaction 3D UI Button
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
