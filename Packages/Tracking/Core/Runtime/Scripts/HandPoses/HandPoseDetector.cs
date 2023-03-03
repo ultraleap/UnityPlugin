@@ -227,6 +227,10 @@ namespace Leap.Unity
                     //Ignore the metacarpal as it will never really change.
                     if (serializedHand.Fingers[fingerNum].bones[boneNum].Type == Bone.BoneType.TYPE_METACARPAL)
                     {
+                        Bone activeMetacarpalBone = playerHand.Fingers[fingerNum].bones[boneNum]; 
+                        Bone serializedMetacarpalBone = serializedHand.Fingers[fingerNum].bones[boneNum];
+                        lastBoneRotation = activeMetacarpalBone.Rotation;
+                        lastSerializedBoneRotation = serializedMetacarpalBone.Rotation;
                         continue;
                     }
 
@@ -262,6 +266,11 @@ namespace Leap.Unity
                         {
                             numMatchedBones++;
                             boneMatched = true;
+
+                            if (numMatchedBones >= pose.GetNumBonesForMatch(fingerNum))
+                            {
+                                break;
+                            }
                         }
                     }
                     // Otherwise, check if the difference between current hand and serialized hand is within the threshold.
@@ -272,6 +281,11 @@ namespace Leap.Unity
                         {
                             numMatchedBones++;
                             boneMatched = true;
+
+                            if (numMatchedBones >= pose.GetNumBonesForMatch(fingerNum))
+                            {
+                                break;
+                            }
                         }
                     }
                     _validationDatas.Add(new ValidationData(serializedHand.GetChirality(), fingerNum, boneNum, boneMatched));

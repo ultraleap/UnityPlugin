@@ -34,29 +34,44 @@ namespace Leap.Unity
         [SerializeField]
         HandPoseScriptableObject rightHandPoseObject;
 
+        [SerializeField]
+        Transform handsLocation;
+
         private List<Tuple<Hand, HandPoseScriptableObject>> currentHandsAndPosedObjects = new List<Tuple<Hand, HandPoseScriptableObject>>();
 
         [SerializeField]
         private Color[] gizmoColours = new Color[2] { Color.red.WithAlpha(0.3f), Color.blue.WithAlpha(0.3f) };
 
-        private const float lineThickness = 4;
+        private void Update()
+        {
+            UpdateHands();
+        }
 
-        // Update is called once per frame
         private void OnValidate()
+        {
+            UpdateHands();
+        }
+
+        private void UpdateHands()
         {
             Hand PosedHand;
             currentHandsAndPosedObjects.Clear();
+            Vector3 handPosition = Vector3.zero;
+            if (handsLocation != null)
+            {
+                handPosition = handsLocation.position;
+            }
 
             if (leftHandPoseObject != null)
             {
                 PosedHand = leftHandPoseObject.GetSerializedHand();
-                PosedHand.SetTransform(new Vector3(0, 0, 0), PosedHand.Rotation);
+                PosedHand.SetTransform((handPosition + new Vector3(-0.25f, 0, 0)), PosedHand.Rotation);
                 currentHandsAndPosedObjects.Add(new Tuple<Hand, HandPoseScriptableObject>(PosedHand, leftHandPoseObject));
             }
-            if(rightHandPoseObject != null)
+            if (rightHandPoseObject != null)
             {
                 PosedHand = rightHandPoseObject.GetSerializedHand();
-                PosedHand.SetTransform(new Vector3(0.5f, 0, 0), PosedHand.Rotation);
+                PosedHand.SetTransform((handPosition + new Vector3(0.25f, 0, 0)), PosedHand.Rotation);
                 currentHandsAndPosedObjects.Add(new Tuple<Hand, HandPoseScriptableObject>(PosedHand, rightHandPoseObject));
             }
             DispatchUpdateFrameEvent(CurrentFrame);
@@ -123,14 +138,6 @@ namespace Leap.Unity
 
             Handles.DrawSolidArc(pointLocation, normal, startPoint, angle, circleRadius);
             Handles.DrawSolidArc(pointLocation, -normal, startPoint, angle, circleRadius);
-
-            //Quaternion.AngleAxis(angle, bone.Direction.normalized) * normal
-            //Vector3 lineTo = RotatePointAroundPivot(startPoint, pointLocation, Vector3.up * angle);
-            var lineTo1 = Quaternion.AngleAxis(angle, coneDirection.normalized) * normal.normalized;
-            var lineTo2 = Quaternion.AngleAxis(angle, coneDirection.normalized) * -normal.normalized;
-
-            //Gizmos.DrawLine(pointLocation, lineTo1);
-            //Gizmos.DrawLine(pointLocation, lineTo2);
         }
 
         public Vector3 RotatePointAroundPivot(Vector3 point, Vector3 pivot, Vector3 angles)
