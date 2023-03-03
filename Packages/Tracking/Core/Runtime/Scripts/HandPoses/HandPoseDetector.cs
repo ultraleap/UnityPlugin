@@ -266,11 +266,6 @@ namespace Leap.Unity
                         {
                             numMatchedBones++;
                             boneMatched = true;
-
-                            if (numMatchedBones >= pose.GetNumBonesForMatch(fingerNum))
-                            {
-                                break;
-                            }
                         }
                     }
                     // Otherwise, check if the difference between current hand and serialized hand is within the threshold.
@@ -281,29 +276,23 @@ namespace Leap.Unity
                         {
                             numMatchedBones++;
                             boneMatched = true;
-
-                            if (numMatchedBones >= pose.GetNumBonesForMatch(fingerNum))
-                            {
-                                break;
-                            }
                         }
                     }
+
                     _validationDatas.Add(new ValidationData(serializedHand.GetChirality(), fingerNum, boneNum, boneMatched));
                 }
 
                 if(numMatchedBones >= pose.GetNumBonesForMatch(fingerNum))
                 {
                     ++numMatchedFingers;
+                    if (numMatchedFingers >= fingerIndexesToCheck.Count)
+                    {
+                        return true;
+                    }
                 }
             }
-            if (numMatchedFingers >= fingerIndexesToCheck.Count)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+
+            return false;
         }
 
         private bool CheckPoseDirection(HandPoseScriptableObject pose, Hand activePlayerHand)
