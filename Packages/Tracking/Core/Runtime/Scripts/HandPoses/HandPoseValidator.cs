@@ -60,7 +60,6 @@ public class HandPoseValidator : MonoBehaviour
             }
             else
             {
-                Debug.Log("Skipping pose validation, there are no Leap hands in the scene");
                 return;
             }
         }

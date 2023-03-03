@@ -32,47 +32,51 @@ namespace Leap.Unity
     [CreateAssetMenu(fileName = "HandPose", menuName = "ScriptableObjects/HandPose")]
     public class HandPoseScriptableObject : ScriptableObject
     {
+        [HideInInspector]
         public bool DetectThumb = true;
+        [HideInInspector]
         public bool DetectIndex = true;
+        [HideInInspector]
         public bool DetectMiddle = true;
+        [HideInInspector]
         public bool DetectRing = true;
-        public bool DetectPinkie = true;
-
-        [SerializeField] int thumbBonesToMatch = 3;
-        [SerializeField] int indexBonesToMatch = 3;
-        [SerializeField] int middleBonesToMatch = 3;
-        [SerializeField] int ringBonesToMatch = 3;
-        [SerializeField] int pinkieBonesToMatch = 3;
+        [HideInInspector]
+        public bool DetectPinky = true;
 
         private List<int> fingerIndexesToCheck = new List<int>();
-        private List<int> bonesPerFingerToMatch = new List<int>();
 
         public List<int> GetFingerIndexesToCheck()
         {
             ApplyFingersToUse();
             return fingerIndexesToCheck;
         }
-        public List<int> GetNumBonesForMatch()
+
+        [SerializeField]
+        private Hand serializedHand;
+        public Hand GetSerializedHand()
         {
-            ApplyNumBonesToMatch();
-            return bonesPerFingerToMatch;
-        }
-        public int GetNumBonesForMatch(int fingerNum)
-        {
-            ApplyNumBonesToMatch();
-            return bonesPerFingerToMatch[fingerNum];
+            return serializedHand;
         }
 
         [SerializeField]
-        private Hand serialisedHand;
-        public Hand GetSerializedHand()
+        private Hand mirroredHand;
+        public Hand GetMirroredHand()
         {
-            return serialisedHand;
+            if(mirroredHand == null || mirroredHand.PalmPosition == Vector3.zero)
+            {
+                mirroredHand = mirroredHand.CopyFrom(serializedHand);
+                MirrorHand(ref mirroredHand);
+            }
+
+            return mirroredHand;
         }
 
         #region Finger Thresholds
 
-        private static Vector2 defaultRotation = new Vector2(15,15);
+        private static Vector2 defaultRotation = new Vector2(15, 15);
+
+        [HideInInspector]
+        public Vector2 globalRotation = new Vector2(15,15);
         public List<Vector2>[] fingerRotationThresholds = new List<Vector2>[5];
 
         [Header("Finger Rotational Thresholds")]
@@ -100,9 +104,16 @@ namespace Leap.Unity
 
         public void SaveHandPose(Hand handToSerialise)
         {
-            serialisedHand = handToSerialise;
-
+            serializedHand = handToSerialise;
             ApplyThresholds();
+        }
+
+        void MirrorHand(ref Hand hand)
+        {
+            LeapTransform leapTransform = new LeapTransform(hand.PalmPosition, hand.Rotation);
+            leapTransform.MirrorX();
+            hand.Transform(leapTransform);
+            return;
         }
 
         public Vector2 GetBoneRotationthreshold(int fingerNum, int boneNum)
@@ -112,13 +123,13 @@ namespace Leap.Unity
             if (fingerRotationThresholds.Count() > 0)
             {
                 return fingerRotationThresholds[fingerNum].ElementAt(boneNum);
-                
             }
             else
             {
                 return new Vector3 ( 0f, 0f );
             }
         }
+
         private void ApplyThresholds()
         {
             fingerRotationThresholds[0] = ThumbJointRotation;
@@ -132,7 +143,6 @@ namespace Leap.Unity
         {
             ApplyFingersToUse();
             ApplyThresholds();
-            ApplyNumBonesToMatch();
         }
 
         private void ApplyFingersToUse()
@@ -142,33 +152,18 @@ namespace Leap.Unity
             if (DetectIndex) { fingerIndexesToCheck.Add(1); }
             if (DetectMiddle) { fingerIndexesToCheck.Add(2); }
             if (DetectRing) { fingerIndexesToCheck.Add(3); }
-            if (DetectPinkie) { fingerIndexesToCheck.Add(4); }
-
-        }
-
-        private void ApplyNumBonesToMatch()
-        {
-            bonesPerFingerToMatch.Clear();
-            bonesPerFingerToMatch.Add(thumbBonesToMatch);
-            bonesPerFingerToMatch.Add(indexBonesToMatch);
-            bonesPerFingerToMatch.Add(middleBonesToMatch);
-            bonesPerFingerToMatch.Add(ringBonesToMatch);
-            bonesPerFingerToMatch.Add(pinkieBonesToMatch);
+            if (DetectPinky) { fingerIndexesToCheck.Add(4); }
         }
 
         public void SetAllBoneThresholds(float threshold)
         {
-            Vector2 thresholdVector = new Vector2(threshold, threshold);
+            Vector2 newRotation = new Vector2(threshold, threshold);
 
-            ThumbJointRotation = new List<Vector2>() { thresholdVector, thresholdVector, thresholdVector, thresholdVector };
-
-            IndexJointRotataion = new List<Vector2>() { thresholdVector, thresholdVector, thresholdVector, thresholdVector };
-
-            MiddleJointRotaion = new List<Vector2>() { thresholdVector, thresholdVector, thresholdVector, thresholdVector };
-
-            RingJointRotaion = new List<Vector2>() { thresholdVector, thresholdVector, thresholdVector, thresholdVector };
-
-            PinkieJointRotaion = new List<Vector2>() { thresholdVector, thresholdVector, thresholdVector, thresholdVector };
+            ThumbJointRotation = new List<Vector2>() { newRotation, newRotation, newRotation, newRotation };
+            IndexJointRotataion = new List<Vector2>() { newRotation, newRotation, newRotation, newRotation };
+            MiddleJointRotaion = new List<Vector2>() { newRotation, newRotation, newRotation, newRotation };
+            RingJointRotaion = new List<Vector2>() { newRotation, newRotation, newRotation, newRotation };
+            PinkieJointRotaion = new List<Vector2>() { newRotation, newRotation, newRotation, newRotation };
 
             ApplyThresholds();
         }

@@ -31,31 +31,44 @@ namespace Leap.Unity.HandsModule
     }
 
     [CustomEditor(typeof(HandPoseScriptableObject))]
-    public class HandPoseSerializableObjectEditor : Editor
+    public class HandPoseSerializableObjectEditor : CustomEditorBase<HandPoseScriptableObject>
     {
+        const float TOGGLE_SIZE = 15.0F;
+
+        Texture _handTex;
+        Rect _handTexRect;
+
         float _boneThresholdSlider = 15f;
-        float _previousBoneThresholdSlider = 15f;
         bool _sliderHasChanged = false;
         bool _showFineTuningOptions = false;
 
+        protected override void OnEnable()
+        {
+            base.OnEnable();
+            _handTex = Resources.Load<Texture2D>("HandTex");
+        }
 
         public override void OnInspectorGUI()
         {
             EditorGUILayout.LabelField("Angle of tolerance for pose");
             _sliderHasChanged = false;
-            _boneThresholdSlider =  EditorGUILayout.Slider(_previousBoneThresholdSlider, 0f, 90f);
-            if (_boneThresholdSlider != _previousBoneThresholdSlider)
+
+            _boneThresholdSlider = target.globalRotation.x;
+            target.globalRotation.x =  EditorGUILayout.Slider(target.globalRotation.x, 0f, 90f);
+
+            if (_boneThresholdSlider != target.globalRotation.x)
             {
                 _sliderHasChanged = true;
-                _previousBoneThresholdSlider = _boneThresholdSlider;
+                _boneThresholdSlider = target.globalRotation.x;
             }
-
 
             HandPoseScriptableObject serializedObjectScript = (HandPoseScriptableObject)target;
             if(_sliderHasChanged)
             {
-                serializedObjectScript.SetAllBoneThresholds(_boneThresholdSlider);
+                serializedObjectScript.SetAllBoneThresholds(target.globalRotation.x);
             }
+
+            DrawAttachmentPointsEditor();
 
             GUILayout.Space(15);
 
@@ -68,7 +81,65 @@ namespace Leap.Unity.HandsModule
             {
                 DrawDefaultInspector();
             }
-            
+        }
+
+        private void DrawAttachmentPointsEditor()
+        {
+            // Set up the draw rect space based on the image and available editor space.
+            EditorGUILayout.Space();
+            EditorGUILayout.LabelField("Fingers to detect", EditorStyles.boldLabel);
+
+            _handTexRect = EditorGUILayout.BeginVertical(GUILayout.MinWidth(EditorGUIUtility.currentViewWidth),
+                                                         GUILayout.MinHeight(EditorGUIUtility.currentViewWidth * (_handTex.height / (float)_handTex.width)),
+                                                         GUILayout.MaxWidth(_handTex.width),
+                                                         GUILayout.MaxHeight(_handTex.height));
+
+            Rect imageContainerRect = _handTexRect; imageContainerRect.width = EditorGUIUtility.currentViewWidth - 30F;
+            EditorGUI.DrawRect(imageContainerRect, new Color(0.2F, 0.2F, 0.2F));
+            imageContainerRect.x += 1; imageContainerRect.y += 1; imageContainerRect.width -= 2; imageContainerRect.height -= 2;
+            EditorGUI.DrawRect(imageContainerRect, new Color(0.6F, 0.6F, 0.6F));
+            imageContainerRect.x += 1; imageContainerRect.y += 1; imageContainerRect.width -= 2; imageContainerRect.height -= 2;
+            EditorGUI.DrawRect(imageContainerRect, new Color(0.2F, 0.2F, 0.2F));
+
+            _handTexRect = new Rect(_handTexRect.x + (imageContainerRect.center.x - _handTexRect.center.x),
+                                    _handTexRect.y,
+                                    _handTexRect.width,
+                                    _handTexRect.height);
+            EditorGUI.DrawTextureTransparent(_handTexRect, _handTex);
+            EditorGUILayout.Space();
+
+            // Draw the toggles
+            EditorGUI.BeginDisabledGroup(false);
+
+            MakeToggle(new Vector2(-0.310F, 0.170F), ref target.DetectThumb); // thumb
+            MakeToggle(new Vector2(-0.060F, -0.170F), ref target.DetectIndex); // index
+            MakeToggle(new Vector2(0.080F, -0.190F), ref target.DetectMiddle); // middle
+            MakeToggle(new Vector2(0.220F, -0.150F), ref target.DetectRing); // ring
+            MakeToggle(new Vector2(0.340F, -0.050F), ref target.DetectPinky); // pinky
+
+            EditorGUI.EndDisabledGroup();
+
+            EditorGUILayout.EndVertical();
+        }
+
+        private void MakeToggle(Vector2 offCenterPosImgSpace, ref bool boolToChange)
+        {
+            if (EditorGUI.Toggle(MakeToggleRect(_handTexRect.center
+                                                + new Vector2(offCenterPosImgSpace.x * _handTexRect.width,
+                                                              offCenterPosImgSpace.y * _handTexRect.height)),
+                                 boolToChange))
+            {
+                boolToChange = true;
+            }
+            else
+            {
+                boolToChange = false;
+            }
+
+        }
+        private Rect MakeToggleRect(Vector2 centerPos)
+        {
+            return new Rect(centerPos.x - TOGGLE_SIZE / 2F, centerPos.y - TOGGLE_SIZE / 2F, TOGGLE_SIZE, TOGGLE_SIZE);
         }
     }
 

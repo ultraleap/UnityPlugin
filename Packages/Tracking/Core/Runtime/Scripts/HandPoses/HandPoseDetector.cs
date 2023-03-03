@@ -206,7 +206,12 @@ namespace Leap.Unity
             
             Hand serializedHand = pose.GetSerializedHand();
             Hand playerHand = activePlayerHand;
-            
+
+            if(serializedHand.GetChirality() != playerHand.GetChirality())
+            {
+                serializedHand = pose.GetMirroredHand();
+            }
+
             if (serializedHand == null || playerHand == null)
             {
                 return false;
@@ -282,7 +287,7 @@ namespace Leap.Unity
                     _validationDatas.Add(new ValidationData(serializedHand.GetChirality(), fingerNum, boneNum, boneMatched));
                 }
 
-                if(numMatchedBones >= pose.GetNumBonesForMatch(fingerNum))
+                if(numMatchedBones >= 3)
                 {
                     ++numMatchedFingers;
                     if (numMatchedFingers >= fingerIndexesToCheck.Count)
