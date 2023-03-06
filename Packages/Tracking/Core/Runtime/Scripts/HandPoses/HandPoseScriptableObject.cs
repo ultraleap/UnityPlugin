@@ -118,7 +118,7 @@ namespace Leap.Unity
             if (fingerRotationThresholds.Count() > 0)
             {
                 // if there is no metacarpal, reduce the index
-                if(fingerRotationThresholds.Count() == 3)
+                if(fingerRotationThresholds[fingerNum].Count == 3)
                 {
                     boneNum -= 1;
                 }
