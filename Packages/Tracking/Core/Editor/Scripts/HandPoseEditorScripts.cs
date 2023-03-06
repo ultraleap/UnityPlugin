@@ -1,5 +1,8 @@
+using System.Collections.Generic;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
+using static UnityEngine.GraphicsBuffer;
 
 
 namespace Leap.Unity.HandsModule
@@ -30,7 +33,7 @@ namespace Leap.Unity.HandsModule
         }
     }
 
-    [CustomEditor(typeof(HandPoseScriptableObject))]
+[CustomEditor(typeof(HandPoseScriptableObject))]
     public class HandPoseSerializableObjectEditor : CustomEditorBase<HandPoseScriptableObject>
     {
         const float TOGGLE_SIZE = 15.0F;
@@ -188,10 +191,12 @@ namespace Leap.Unity.HandsModule
 
                 GUILayout.Space(10);
 
-                #region boneDirectionTargets 
-                scrollPosition = EditorGUILayout.BeginScrollView(scrollPosition, GUILayout.Width(Screen.width-20), GUILayout.Height(500));
-
                 var boneDirectionTargets = serializedObject.FindProperty("BoneDirectionTargets");
+
+                #region boneDirectionTargets 
+                scrollPosition = EditorGUILayout.BeginScrollView(scrollPosition, GUILayout.Width(Screen.width-20), GUILayout.Height(Mathf.Min(500, boneDirectionTargets.arraySize * 180)));
+
+                
 
                 for (int i = 0; i < boneDirectionTargets.arraySize; i++)
                 {
@@ -223,7 +228,7 @@ namespace Leap.Unity.HandsModule
 
                     EditorGUILayout.PropertyField(boneDirectionTarget.FindPropertyRelative("isPalmDirection"));
                     if (!boneDirectionTarget.FindPropertyRelative("isPalmDirection").boolValue)
-                    {
+                    { 
                         EditorGUILayout.PropertyField(boneDirectionTarget.FindPropertyRelative("fingerTypeForPoint"));
                         EditorGUILayout.PropertyField(boneDirectionTarget.FindPropertyRelative("boneForPoint"));
 
@@ -258,6 +263,9 @@ namespace Leap.Unity.HandsModule
     [CustomEditor(typeof(HandPoseEditor), editorForChildClasses: true)]
     public class HandPoseEditorEditor : CustomEditorBase<HandPoseEditor>
     {
+        int _selected = 0;
+        Dictionary<int, string> _poseScritableIntName = new Dictionary<int, string>();
+
         protected override void OnEnable()
         {
             base.OnEnable();
@@ -269,6 +277,30 @@ namespace Leap.Unity.HandsModule
 
         public override void OnInspectorGUI()
         {
+            
+            _poseScritableIntName.Clear();
+            var handPoses = (HandPoseScriptableObject[])(Resources.FindObjectsOfTypeAll(typeof(HandPoseScriptableObject)));
+
+            for (int i = 0; i < handPoses.Length; i++)
+            {
+                var scriptableObject = handPoses[i];
+
+                _poseScritableIntName.Add(i, scriptableObject.name);
+            }
+
+            if (_poseScritableIntName.Count > 0)
+            {
+                EditorGUILayout.LabelField("Pose to view");
+                _selected = EditorGUILayout.Popup(_selected, _poseScritableIntName.Values.ToArray());
+                target.handPose = handPoses[_selected];
+                EditorGUILayout.Space(10);
+            }
+            else
+            {
+                EditorGUILayout.LabelField("No poses found, please record a pose using the pose recorder in order to view a pose.");
+                EditorGUILayout.Space(10);
+            }
+
             base.OnInspectorGUI();
         }
     }

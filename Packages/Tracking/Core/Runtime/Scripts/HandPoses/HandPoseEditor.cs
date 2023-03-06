@@ -27,8 +27,9 @@ namespace Leap.Unity
         /// <summary>
         /// Pose to use
         /// </summary>
-        [SerializeField]
-        HandPoseScriptableObject handPose;
+        /// 
+        [HideInInspector]
+        public HandPoseScriptableObject handPose;
 
         [SerializeField]
         Transform handsLocation;

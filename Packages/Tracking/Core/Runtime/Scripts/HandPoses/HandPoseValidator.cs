@@ -9,7 +9,7 @@ public class HandPoseValidator : MonoBehaviour
     /// Which hand would you like to use for gesture validation?
     /// If this is left blank, It will search for all hands in the scene
     /// </summary>
-    public List<CapsuleHand> angleVisualisationHands = new List<CapsuleHand>();
+    private List<CapsuleHand> angleVisualisationHands = new List<CapsuleHand>();
 
     private Color[] _capsuleHandColours = new Color[32];
     private HandPoseDetector _detector;
@@ -17,14 +17,14 @@ public class HandPoseValidator : MonoBehaviour
     private void Start()
     {
         _detector = FindObjectOfType<HandPoseDetector>();
+        angleVisualisationHands = GameObject.FindObjectsOfType<CapsuleHand>().ToList();
     }
+
 
     private void Update()
     {
         if (_detector != null) 
         {
-            angleVisualisationHands = GameObject.FindObjectsOfType<CapsuleHand>().ToList();
-
             var colourCapsuleHand = angleVisualisationHands.FirstOrDefault();
             if (colourCapsuleHand != null)
             {
