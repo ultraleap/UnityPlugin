@@ -253,10 +253,23 @@ namespace Leap.Unity.HandsModule
 
             serializedObject.ApplyModifiedProperties();
         }
+    }
 
-            
+    [CustomEditor(typeof(HandPoseEditor), editorForChildClasses: true)]
+    public class HandPoseEditorEditor : CustomEditorBase<HandPoseEditor>
+    {
+        protected override void OnEnable()
+        {
+            base.OnEnable();
 
-            //DrawDefaultInspector();
+            // Edit-time pose is only relevant for providers that generate hands.
+            // Post-process Providers are a special case and don't generate their own hands.
+            specifyConditionalDrawing(() => false, "editTimePose");
+        }
 
+        public override void OnInspectorGUI()
+        {
+            base.OnInspectorGUI();
+        }
     }
 }

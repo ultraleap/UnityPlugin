@@ -62,12 +62,6 @@ namespace Leap.Unity
         private Hand mirroredHand;
         public Hand GetMirroredHand()
         {
-            if(mirroredHand == null || mirroredHand.PalmPosition == Vector3.zero)
-            {
-                mirroredHand = mirroredHand.CopyFrom(serializedHand);
-                MirrorHand(ref mirroredHand);
-            }
-
             return mirroredHand;
         }
 
@@ -81,24 +75,24 @@ namespace Leap.Unity
 
         [Header("Finger Rotational Thresholds")]
         [SerializeField]
-        [NamedListAttribute(new string[] { "Metacarpal", "Proximal", "Intermediate", "Distal" })]
-        private List<Vector2> ThumbJointRotation = new List<Vector2>() { defaultRotation, defaultRotation, defaultRotation, defaultRotation };
+        [NamedListAttribute(new string[] { "Proximal", "Intermediate", "Distal" })]
+        private List<Vector2> ThumbJointRotation = new List<Vector2>() { defaultRotation, defaultRotation, defaultRotation };
 
         [SerializeField]
-        [NamedListAttribute(new string[] { "Metacarpal", "Proximal", "Intermediate", "Distal" })]
-        private List<Vector2> IndexJointRotataion = new List<Vector2>() { defaultRotation, defaultRotation, defaultRotation, defaultRotation };
+        [NamedListAttribute(new string[] { "Proximal", "Intermediate", "Distal" })]
+        private List<Vector2> IndexJointRotataion = new List<Vector2>() { defaultRotation, defaultRotation, defaultRotation };
 
         [SerializeField]
-        [NamedListAttribute(new string[] { "Metacarpal", "Proximal", "Intermediate", "Distal" })]
-        private List<Vector2> MiddleJointRotaion = new List<Vector2>() { defaultRotation, defaultRotation, defaultRotation, defaultRotation };
+        [NamedListAttribute(new string[] { "Proximal", "Intermediate", "Distal" })]
+        private List<Vector2> MiddleJointRotaion = new List<Vector2>() { defaultRotation, defaultRotation, defaultRotation };
 
         [SerializeField]
-        [NamedListAttribute(new string[] { "Metacarpal", "Proximal", "Intermediate", "Distal" })]
-        private List<Vector2> RingJointRotaion = new List<Vector2>() { defaultRotation, defaultRotation, defaultRotation, defaultRotation };
+        [NamedListAttribute(new string[] { "Proximal", "Intermediate", "Distal" })]
+        private List<Vector2> RingJointRotaion = new List<Vector2>() { defaultRotation, defaultRotation, defaultRotation };
 
         [SerializeField]
-        [NamedListAttribute(new string[] { "Metacarpal", "Proximal", "Intermediate", "Distal" })]
-        private List<Vector2> PinkieJointRotaion = new List<Vector2>() { defaultRotation, defaultRotation, defaultRotation, defaultRotation };
+        [NamedListAttribute(new string[] { "Proximal", "Intermediate", "Distal" })]
+        private List<Vector2> PinkieJointRotaion = new List<Vector2>() { defaultRotation, defaultRotation, defaultRotation };
 
         #endregion
 
@@ -110,9 +104,10 @@ namespace Leap.Unity
 
         void MirrorHand(ref Hand hand)
         {
-            LeapTransform leapTransform = new LeapTransform(hand.PalmPosition, hand.Rotation);
+            LeapTransform leapTransform = new LeapTransform(Vector3.zero, Quaternion.Euler(Vector3.zero));
             leapTransform.MirrorX();
             hand.Transform(leapTransform);
+            hand.IsLeft = !hand.IsLeft;
             return;
         }
 
@@ -122,6 +117,12 @@ namespace Leap.Unity
 
             if (fingerRotationThresholds.Count() > 0)
             {
+                // if there is no metacarpal, reduce the index
+                if(fingerRotationThresholds.Count() == 3)
+                {
+                    boneNum -= 1;
+                }
+
                 return fingerRotationThresholds[fingerNum].ElementAt(boneNum);
             }
             else
@@ -141,6 +142,9 @@ namespace Leap.Unity
 
         private void OnValidate()
         {
+            mirroredHand = mirroredHand.CopyFrom(serializedHand);
+            MirrorHand(ref mirroredHand);
+
             ApplyFingersToUse();
             ApplyThresholds();
         }
@@ -159,11 +163,11 @@ namespace Leap.Unity
         {
             Vector2 newRotation = new Vector2(threshold, threshold);
 
-            ThumbJointRotation = new List<Vector2>() { newRotation, newRotation, newRotation, newRotation };
-            IndexJointRotataion = new List<Vector2>() { newRotation, newRotation, newRotation, newRotation };
-            MiddleJointRotaion = new List<Vector2>() { newRotation, newRotation, newRotation, newRotation };
-            RingJointRotaion = new List<Vector2>() { newRotation, newRotation, newRotation, newRotation };
-            PinkieJointRotaion = new List<Vector2>() { newRotation, newRotation, newRotation, newRotation };
+            ThumbJointRotation = new List<Vector2>() { newRotation, newRotation, newRotation };
+            IndexJointRotataion = new List<Vector2>() { newRotation, newRotation, newRotation };
+            MiddleJointRotaion = new List<Vector2>() { newRotation, newRotation, newRotation };
+            RingJointRotaion = new List<Vector2>() { newRotation, newRotation, newRotation };
+            PinkieJointRotaion = new List<Vector2>() { newRotation, newRotation, newRotation };
 
             ApplyThresholds();
         }

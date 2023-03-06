@@ -6,7 +6,7 @@ using System;
 namespace Leap.Unity
 {
     [ExecuteInEditMode]
-    public class PoseDetectionEditor : LeapProvider
+    public class HandPoseEditor : LeapProvider
     {
         [HideInInspector]
         public override Frame CurrentFrame
@@ -23,57 +23,63 @@ namespace Leap.Unity
         }
         [HideInInspector]
         public override Frame CurrentFixedFrame => new Frame();
+
         /// <summary>
-        /// Pose to apply to the left hand
+        /// Pose to use
         /// </summary>
         [SerializeField]
-        HandPoseScriptableObject leftHandPoseObject;
-        /// <summary>
-        /// Pose to apply to the right hand
-        /// </summary>
-        [SerializeField]
-        HandPoseScriptableObject rightHandPoseObject;
+        HandPoseScriptableObject handPose;
 
         [SerializeField]
         Transform handsLocation;
 
         private List<Tuple<Hand, HandPoseScriptableObject>> currentHandsAndPosedObjects = new List<Tuple<Hand, HandPoseScriptableObject>>();
 
-        [SerializeField]
-        private Color[] gizmoColours = new Color[2] { Color.red.WithAlpha(0.3f), Color.blue.WithAlpha(0.3f) };
+        [SerializeField, Tooltip("Sets the colors of the gizmos that represent the rotation thresholds for each joint")]
+        private Color[] gizmoColors = new Color[2] { Color.red.WithAlpha(0.3f), Color.blue.WithAlpha(0.3f) };
 
         private void Update()
         {
             UpdateHands();
         }
 
-        private void OnValidate()
-        {
-            UpdateHands();
-        }
-
         private void UpdateHands()
         {
-            Hand PosedHand;
             currentHandsAndPosedObjects.Clear();
-            Vector3 handPosition = Vector3.zero;
+
+            if (handPose == null)
+            {
+                return;
+            }
+
+            Hand posedHand = handPose.GetSerializedHand();
+            Hand mirroredHand = handPose.GetMirroredHand();
+
+            Vector3 handPosition = Camera.main.transform.position + (Camera.main.transform.forward * 0.5f);
+
             if (handsLocation != null)
             {
                 handPosition = handsLocation.position;
             }
 
-            if (leftHandPoseObject != null)
+            if(posedHand.IsLeft)
             {
-                PosedHand = leftHandPoseObject.GetSerializedHand();
-                PosedHand.SetTransform((handPosition + new Vector3(-0.25f, 0, 0)), PosedHand.Rotation);
-                currentHandsAndPosedObjects.Add(new Tuple<Hand, HandPoseScriptableObject>(PosedHand, leftHandPoseObject));
+                posedHand.SetTransform((handPosition + new Vector3(-0.15f, 0, 0)), posedHand.Rotation);
+                mirroredHand.SetTransform((handPosition + new Vector3(0.15f, 0, 0)), mirroredHand.Rotation);
+
+                mirroredHand.IsLeft = false;
             }
-            if (rightHandPoseObject != null)
+            else
             {
-                PosedHand = rightHandPoseObject.GetSerializedHand();
-                PosedHand.SetTransform((handPosition + new Vector3(0.25f, 0, 0)), PosedHand.Rotation);
-                currentHandsAndPosedObjects.Add(new Tuple<Hand, HandPoseScriptableObject>(PosedHand, rightHandPoseObject));
+                posedHand.SetTransform((handPosition + new Vector3(0.15f, 0, 0)), posedHand.Rotation);
+                mirroredHand.SetTransform((handPosition + new Vector3(-0.15f, 0, 0)), mirroredHand.Rotation);
+
+                mirroredHand.IsLeft = true;
             }
+
+            currentHandsAndPosedObjects.Add(new Tuple<Hand, HandPoseScriptableObject>(posedHand, handPose));
+            currentHandsAndPosedObjects.Add(new Tuple<Hand, HandPoseScriptableObject>(mirroredHand, handPose));
+
             DispatchUpdateFrameEvent(CurrentFrame);
         }
 
@@ -95,35 +101,30 @@ namespace Leap.Unity
             for (int j = 0; j < hand.Fingers.Count; j++)
             {
                 var finger = hand.Fingers[j];
-                var proximal = hand.Fingers[j].Bone(Bone.BoneType.TYPE_PROXIMAL);
-                var intermediate = hand.Fingers[j].Bone(Bone.BoneType.TYPE_INTERMEDIATE);
+                var proximal = finger.Bone(Bone.BoneType.TYPE_PROXIMAL);
+                var intermediate = finger.Bone(Bone.BoneType.TYPE_INTERMEDIATE);
 
                 Plane fingerNormalPlane = new Plane(proximal.PrevJoint, proximal.NextJoint, intermediate.NextJoint);
                 var normal = fingerNormalPlane.normal;
                 
-                    
                 if (handPoseScriptableObject.GetFingerIndexesToCheck().Contains(j))
                 {
-                    for (int i = 0; i < finger.bones.Length; i++)
+                    for (int i = 1; i < finger.bones.Length; i++)
                     {
                         var bone = finger.bones[i];
-                        Gizmos.color = gizmoColours[0];
                         Gizmos.matrix = Matrix4x4.identity;
-                        Handles.color = gizmoColours[0];
 
                         //currently only uses x threshold
-                        DrawWireCone(handPoseScriptableObject.GetBoneRotationthreshold(j, i).x,
+                        DrawThresholdGizmo(handPoseScriptableObject.GetBoneRotationthreshold(j, i).x,
                         bone.Direction.normalized,
-                        bone.PrevJoint, normal);
+                        bone.PrevJoint, normal, gizmoColors[0], bone.Length);
 
                         if (finger.bones[i].Type == Bone.BoneType.TYPE_PROXIMAL) 
                         {
-                            Gizmos.color = gizmoColours[1];
-                            Handles.color = gizmoColours[1];
                             var proximalNormal = Quaternion.AngleAxis(90, bone.Direction.normalized) * normal;
-                            DrawWireCone(handPoseScriptableObject.GetBoneRotationthreshold(j, i).y,
+                            DrawThresholdGizmo(handPoseScriptableObject.GetBoneRotationthreshold(j, i).y,
                             bone.Direction.normalized,
-                            bone.PrevJoint, proximalNormal);
+                            bone.PrevJoint, proximalNormal, gizmoColors[1], bone.Length);
                         }
                     }
                 }
@@ -131,13 +132,27 @@ namespace Leap.Unity
         }
 
 
-        private void DrawWireCone(float angle, Vector3 coneDirection, Vector3 pointLocation, Vector3 normal)
+        private void DrawThresholdGizmo(float angle, Vector3 direction, Vector3 pointLocation, Vector3 normal, Color color, float radius = 0.02f)
         {
-            float circleRadius = 0.02f;
-            var startPoint = coneDirection.normalized * circleRadius;
+            Gizmos.color = color;
+            Handles.color = color;
 
-            Handles.DrawSolidArc(pointLocation, normal, startPoint, angle, circleRadius);
-            Handles.DrawSolidArc(pointLocation, -normal, startPoint, angle, circleRadius);
+            var startPoint = direction.normalized * radius;
+
+            Handles.DrawSolidArc(pointLocation, normal, startPoint, angle, radius);
+            Handles.DrawSolidArc(pointLocation, -normal, startPoint, angle, radius);
+
+            Gizmos.color = Color.white;
+            Handles.color = Color.white;
+
+           // Handles.DrawWireArc(pointLocation, normal, startPoint, angle, radius);
+           // Handles.DrawWireArc(pointLocation, -normal, startPoint, angle, radius);
+
+            if (radius > 0.02f)
+            {
+                Handles.DrawWireArc(pointLocation, normal, startPoint, angle, 0.02f);
+                Handles.DrawWireArc(pointLocation, -normal, startPoint, angle, 0.02f);
+            }
         }
 
         public Vector3 RotatePointAroundPivot(Vector3 point, Vector3 pivot, Vector3 angles)
