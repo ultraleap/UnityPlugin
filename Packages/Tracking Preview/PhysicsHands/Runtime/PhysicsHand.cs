@@ -81,6 +81,8 @@ namespace Leap.Unity.Interaction.PhysicsHands
             [HideInInspector]
             public Quaternion[] defaultRotations;
 
+            public bool justGhosted = false;
+
             public float strength;
             public float stiffness, forceLimit;
             public float boneMass;
@@ -161,7 +163,6 @@ namespace Leap.Unity.Interaction.PhysicsHands
         private int[] _graspingFingers = new int[5];
         private bool[] _wasGraspingBones = new bool[Hand.BONES * Hand.FINGERS];
         private bool[] _justGraspedBone = new bool[Hand.BONES * Hand.FINGERS];
-        private float[] _upperLimits = new float[Hand.BONES * Hand.FINGERS];
         private float[] _graspingXDrives = new float[Hand.BONES * Hand.FINGERS];
         private float[] _graspingFingerDistance = new float[5];
         private float[] _xForceLimits = new float[Hand.BONES * Hand.FINGERS];
@@ -689,6 +690,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
         private void HandleTeleportingHands(bool bonesAreOverRotated)
         {
+            _physicsHand.justGhosted = false;
             // Fix the hand if it gets into a bad situation by teleporting and holding in place until its bad velocities disappear
             if (Vector3.Distance(_originalOldPosition, _originalLeapHand.PalmPosition) > _physicsProvider.HandTeleportDistance ||
                 bonesAreOverRotated ||
@@ -700,6 +702,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 _teleportFrameCount = 5;
 
                 _ghosted = true;
+                _physicsHand.justGhosted = true;
             }
 
             if (Time.frameCount - _lastFrameTeleport >= _teleportFrameCount && _ghosted && !IsCloseToObject)

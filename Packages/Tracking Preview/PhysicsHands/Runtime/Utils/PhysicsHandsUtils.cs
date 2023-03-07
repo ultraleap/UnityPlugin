@@ -641,26 +641,29 @@ namespace Leap.Unity.Interaction.PhysicsHands
             Vector3 posA, posB;
 
             float r;
-            for (int i = 0; i < leapHand.Fingers.Count; i++)
+            if (!physicsHand.justGhosted)
             {
-                Bone b = leapHand.Fingers[i].bones[0];
-                PhysExts.ToWorldSpaceCapsule(physicsHand.jointColliders[boneInd], out posA, out posB, out r);
-                b.NextJoint = posB;
-
-                for (int j = 1; j < leapHand.Fingers[i].bones.Length; j++)
+                for (int i = 0; i < leapHand.Fingers.Count; i++)
                 {
-                    b = leapHand.Fingers[i].bones[j];
+                    Bone b = leapHand.Fingers[i].bones[0];
                     PhysExts.ToWorldSpaceCapsule(physicsHand.jointColliders[boneInd], out posA, out posB, out r);
-                    b.PrevJoint = posB;
-                    b.NextJoint = posA;
-                    b.Width = r;
-                    b.Center = (b.PrevJoint + b.NextJoint) / 2f;
-                    b.Direction = (b.NextJoint - b.PrevJoint).normalized;
-                    b.Length = Vector3.Distance(posA, posB);
-                    b.Rotation = physicsHand.jointColliders[boneInd].transform.rotation;
-                    boneInd++;
+                    b.NextJoint = posB;
+
+                    for (int j = 1; j < leapHand.Fingers[i].bones.Length; j++)
+                    {
+                        b = leapHand.Fingers[i].bones[j];
+                        PhysExts.ToWorldSpaceCapsule(physicsHand.jointColliders[boneInd], out posA, out posB, out r);
+                        b.PrevJoint = posB;
+                        b.NextJoint = posA;
+                        b.Width = r;
+                        b.Center = (b.PrevJoint + b.NextJoint) / 2f;
+                        b.Direction = (b.NextJoint - b.PrevJoint).normalized;
+                        b.Length = Vector3.Distance(posA, posB);
+                        b.Rotation = physicsHand.jointColliders[boneInd].transform.rotation;
+                        boneInd++;
+                    }
+                    leapHand.Fingers[i].TipPosition = physicsHand.GetTipPosition(i);
                 }
-                leapHand.Fingers[i].TipPosition = physicsHand.GetTipPosition(i);
             }
             leapHand.Arm.CopyFrom(originalHand.Arm);
 
