@@ -38,6 +38,13 @@ namespace Leap.Unity.InputModule
 
         public InteractionCapability InteractionMode => interactionMode;
 
+        //Should the pointer cursor be shown for direct interaction
+        [Tooltip("Show pointer cursor for direct interaction")]
+        [SerializeField]
+        private bool showDirectPointerCursor = true;
+
+        public bool ShowDirectPointerCursor => showDirectPointerCursor;
+
         //The LeapProvider providing tracking data to the scene.
         [Tooltip("The main camera used for calculating interactions.")]
         [SerializeField]

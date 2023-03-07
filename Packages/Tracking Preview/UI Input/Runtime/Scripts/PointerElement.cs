@@ -106,6 +106,46 @@ namespace Leap.Unity.InputModule
             {(PointerStates.TouchingElement, PointerStates.NearCanvas), ("OnClickUp", (module, pointerElement) => module.OnClickUp.Invoke(module, pointerElement.transform.position)) }
         };
 
+        /// <summary>
+        /// Returns true if the user is interacting directly with the user interface (tactile mode)
+        /// </summary>
+        public bool IsUserInteractingDirectly
+        {
+            get
+            { 
+                switch (module?.InteractionMode)
+                {
+                    case InteractionCapability.Both:
+                    case InteractionCapability.Direct:
+
+                        return (PointerStateTactile == PointerStates.OnCanvas ||
+                            PointerStateTactile == PointerStates.OnElement ||
+                            PointerStateTactile == PointerStates.NearCanvas ||
+                            PointerStateTactile == PointerStates.TouchingCanvas ||
+                            PointerStateTactile == PointerStates.TouchingElement);
+
+                    case InteractionCapability.Indirect:
+                        return false;
+
+                    default:
+                        break;
+                }
+
+                throw new Exception("Unknown interaction mode");
+            }
+        }
+
+        /// <summary>
+        /// Should the cursor be shown when the user is interacting directly with the canvas/elements
+        /// </summary>
+        public bool ShowDirectPointerCursor
+        {
+            get
+            {
+                return module.ShowDirectPointerCursor;
+            }
+        }
+
         #endregion
 
         private void Start()
