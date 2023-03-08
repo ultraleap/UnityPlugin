@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (Physics Hands) Dynamically adjusting fingers when grabbing objects
 - (Physics Hands) Distance calculations and values for each bone
 - Per finger pinch distances in HandUtils
+- Added advanced option to LeapXRServiceProvider to avoid adding TrackedPoseDrivers to MainCamera 
 
 ### Changed
 - (Physics Hands) Reduced hand to object collision radius when throwing and testing overlaps
@@ -31,6 +32,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - "Pullcord" jitters when being interacted with
 - Hand Binder finger tip scale disproportionately when LeapProvider Transform is scaled
 - Creating objects from GameObject/Ultraleap/ menu makes more than just prefabs - Ghost Hands (with Arms)
+- Incorrect warning of duplicate InteractionHands in InteractionManager
 
 ### Known issues 
 - Scenes containing the infrared viewer render incorrectly on Android build targets and in scriptable render pipelines such as URP and HDRP. 
