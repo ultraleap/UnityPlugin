@@ -74,6 +74,16 @@ namespace Leap.Unity
             return _validationDatas;
         }    
 
+        public List<HandPoseScriptableObject> GetPosesToDetect()
+        {
+            return _posesToDetect;
+        }
+
+        public void SetPosesToDetect(List<HandPoseScriptableObject> posesToDetect)
+        {
+            _posesToDetect = posesToDetect;
+        }
+
         #region poseDirectionVariables
         /// <summary>
         /// What type of directionality is this check? e.g. pointing towards and object or a world direction.
@@ -147,6 +157,13 @@ namespace Leap.Unity
             BoneDirectionTargets.RemoveAt(index);
         }
 
+
+
+        public HandPoseScriptableObject GetCurrentlyDetectedPose()
+        {
+            return _detectedPose;
+        }
+
         private void Start()
         {
             if(_leapProvider == null)
@@ -168,6 +185,7 @@ namespace Leap.Unity
             {
                 _poseAlreadyDetected = false;
                 OnPoseLost.Invoke();
+                _detectedPose = null;
             }
         }
 
@@ -175,7 +193,7 @@ namespace Leap.Unity
         {
             // If the user hasnt specified the hands to detect, check all Hand Model Bases.
             // This will only do this once unless manually cleared.
-            _detectedPose = null;
+            
 
             foreach (var activePlayerHand in _leapProvider.CurrentFrame.Hands)
             {

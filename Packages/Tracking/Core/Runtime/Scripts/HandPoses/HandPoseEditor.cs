@@ -31,6 +31,11 @@ namespace Leap.Unity
         [HideInInspector]
         public HandPoseScriptableObject handPose;
 
+        public void SetHandPose(HandPoseScriptableObject poseToSet)
+        {
+            handPose = poseToSet;
+        }
+
         [SerializeField]
         Transform handsLocation;
 
@@ -57,23 +62,25 @@ namespace Leap.Unity
             Hand mirroredHand = handPose.GetMirroredHand();
 
             Vector3 handPosition = Camera.main.transform.position + (Camera.main.transform.forward * 0.5f);
+            Quaternion handRotation = posedHand.Rotation;
 
             if (handsLocation != null)
             {
-                handPosition = handsLocation.position;
+                handPosition = handsLocation.position; 
+                handRotation = handsLocation.rotation;
             }
 
             if(posedHand.IsLeft)
             {
-                posedHand.SetTransform((handPosition + new Vector3(-0.15f, 0, 0)), posedHand.Rotation);
-                mirroredHand.SetTransform((handPosition + new Vector3(0.15f, 0, 0)), mirroredHand.Rotation);
+                posedHand.SetTransform((handPosition + new Vector3(-0.15f, 0, 0)), handRotation);
+                mirroredHand.SetTransform((handPosition + new Vector3(0.15f, 0, 0)), handRotation);
 
                 mirroredHand.IsLeft = false;
             }
             else
             {
-                posedHand.SetTransform((handPosition + new Vector3(0.15f, 0, 0)), posedHand.Rotation);
-                mirroredHand.SetTransform((handPosition + new Vector3(-0.15f, 0, 0)), mirroredHand.Rotation);
+                posedHand.SetTransform((handPosition + new Vector3(0.15f, 0, 0)), handRotation);
+                mirroredHand.SetTransform((handPosition + new Vector3(-0.15f, 0, 0)), handRotation);
 
                 mirroredHand.IsLeft = true;
             }
