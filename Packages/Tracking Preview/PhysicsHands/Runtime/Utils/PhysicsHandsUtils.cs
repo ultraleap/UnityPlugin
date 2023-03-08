@@ -665,6 +665,9 @@ namespace Leap.Unity.Interaction.PhysicsHands
                     leapHand.Fingers[i].TipPosition = physicsHand.GetTipPosition(i);
                 }
             }
+
+            leapHand.WristPosition = physicsHand.transform.position - (physicsHand.transform.rotation * Quaternion.Inverse(originalHand.Rotation) * (originalHand.PalmPosition - originalHand.WristPosition));
+
             leapHand.Arm.CopyFrom(originalHand.Arm);
 
             leapHand.Arm.NextJoint = leapHand.WristPosition;
