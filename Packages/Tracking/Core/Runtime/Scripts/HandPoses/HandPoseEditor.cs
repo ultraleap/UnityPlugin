@@ -31,6 +31,17 @@ namespace Leap.Unity
         [HideInInspector]
         public HandPoseScriptableObject handPose;
 
+        /// <summary>
+        /// Selected hand pose for viewing
+        /// </summary>
+        [HideInInspector]
+        public int Selected = 0;
+        /// <summary>
+        /// List for pose scriptable objects in the editor
+        /// </summary>
+        [HideInInspector]
+        public Dictionary<int, string> PoseScritableIntName = new Dictionary<int, string>();
+
         public void SetHandPose(HandPoseScriptableObject poseToSet)
         {
             handPose = poseToSet;
