@@ -349,7 +349,9 @@ namespace Leap.Unity.InputModule
             }
 
             if (EventData != null)
+            {
                 PrevScreenPosition = EventData.position;
+            }
 
             switch (module?.InteractionMode)
             {
@@ -370,9 +372,6 @@ namespace Leap.Unity.InputModule
 
                 case InteractionCapability.Indirect:
                     RaiseEventsForStateChanges(PointerStateProjective, PrevStateProjective);
-                    break;
-
-                default:
                     break;
             }
 
@@ -403,9 +402,6 @@ namespace Leap.Unity.InputModule
                     {
                         TimeEnteredCanvas = Time.time;
                     }
-
-                    break;
-                default:
                     break;
             }
         }
@@ -682,7 +678,9 @@ namespace Leap.Unity.InputModule
             var tipRaycast = false;
 
             if (EventData == null)
+            {
                 return false;
+            }
 
             EventData.Reset();
 
@@ -741,7 +739,9 @@ namespace Leap.Unity.InputModule
         private PointerStates ProcessState(Hand hand, bool tipRaycastUsed, PointerStates PointerState)
         {
             if (EventData == null)
+            {
                 return PointerState;
+            }
 
             if (EventData.pointerCurrentRaycast.gameObject != null)
             {
@@ -795,7 +795,9 @@ namespace Leap.Unity.InputModule
         private void UpdatePointer(PointerEventData pointData)
         {
             if (EventData == null)
+            {
                 return;
+            }
 
             var element = EventData.pointerCurrentRaycast.gameObject;
             if (element != null)

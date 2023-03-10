@@ -330,7 +330,8 @@ namespace Leap.Unity.Interaction
                 {
                     if (controller.intHand.leapProvider != null &&
                         controller.intHand.handDataMode == intHand.handDataMode &&
-                        controller.intHand.leapProvider == intHand.leapProvider)
+                        controller.intHand.leapProvider == intHand.leapProvider &&
+                        controller.intHand != intHand)
                     {
                         messages.Add(new ControllerStatusMessage()
                         {

@@ -274,6 +274,9 @@ namespace Leap.Unity
             }
         }
 
+        [Tooltip("Automatically adds a TrackedPoseDriver to the MainCamera if there is not one already")]
+        public bool _autoCreateTrackedPoseDriver = true;
+
         #endregion
 
         #region Internal Memory
@@ -314,7 +317,7 @@ namespace Leap.Unity
             resetShaderTransforms();
 
 #if XR_MANAGEMENT_AVAILABLE
-            if (mainCamera.GetComponent<UnityEngine.SpatialTracking.TrackedPoseDriver>() == null)
+            if (mainCamera.GetComponent<UnityEngine.SpatialTracking.TrackedPoseDriver>() == null && _autoCreateTrackedPoseDriver)
             {
                 mainCamera.gameObject.AddComponent<UnityEngine.SpatialTracking.TrackedPoseDriver>().UseRelativeTransform = true;
             }
