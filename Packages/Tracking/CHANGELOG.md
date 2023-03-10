@@ -17,6 +17,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Per finger pinch distances in HandUtils
 - Added advanced option to LeapXRServiceProvider to avoid adding TrackedPoseDrivers to MainCamera
 - Ability to clear all attachments on AttachmentHands component
+- (UIInput) Added an option to hide the pointer cursor when hands are interacting with UI elements in direct/tactile mode
+- Added advanced option to LeapXRServiceProvider to avoid adding TrackedPoseDrivers to MainCamera
 
 ### Changed
 - (Physics Hands) Reduced hand to object collision radius when throwing and testing overlaps
@@ -32,6 +34,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - "Pullcord" jitters when being interacted with
 - Hand Binder finger tip scale disproportionately when LeapProvider Transform is scaled
 - Creating objects from GameObject/Ultraleap/ menu makes more than just prefabs - Ghost Hands (with Arms)
+- (UIInput) several interaction events not firing when both direct and indirect interaction is enabled 
 - Incorrect warning of duplicate InteractionHands in InteractionManager
 
 ### Known issues 
