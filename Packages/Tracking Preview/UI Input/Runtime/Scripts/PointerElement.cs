@@ -36,14 +36,51 @@ namespace Leap.Unity.InputModule
         public Chirality Chirality { get; private set; }
 
         private PointerEventData EventData { get; set; }
-        public PointerStates PointerState { get; private set; }
+        public PointerStates PointerStateTactile { get; private set; }
+        public PointerStates PointerStateProjective { get; private set; }
 
-        private PointerStates PrevState { get; set; }
+        /// <summary>
+        /// Gets the aggregated pointer state, based on the interaction mode and the projective and tactile states
+        /// </summary>
+        public PointerStates AggregatePointerState
+        {
+            get
+            {
+                switch (module?.InteractionMode)
+                {
+                    case InteractionCapability.Both:
+                        if (PointerStateTactile == PointerStates.OffCanvas)
+                        {
+                            return PointerStateProjective;
+                        }
+                        else
+                        {
+                            return PointerStateTactile;
+                        }
+
+                    case InteractionCapability.Direct:
+                        return PointerStateTactile;
+
+                    case InteractionCapability.Indirect:
+                        return PointerStateProjective;
+
+                    default:
+                        Debug.LogWarning($"Unknown interaction mode");
+                        break;
+                }
+
+                throw new Exception("Unknown interaction mode");
+            }
+        }
+
+        private PointerStates PrevStateTactile { get; set; }
+        private PointerStates PrevStateProjective { get; set; }
         private Vector2 PrevScreenPosition { get; set; }
         private Vector2 DragStartPosition { get; set; }
 
         private GameObject PreviousGameObjectUnderPointer { get; set; }
         private GameObject CurrentGameObject { get; set; }
+
         private GameObject GameObjectBeingDragged { get; set; }
         private GameObject CurrentGameObjectUnderPointer { get; set; }
 
@@ -52,22 +89,62 @@ namespace Leap.Unity.InputModule
 
         private List<RaycastResult> _raycastResultCache = new List<RaycastResult>();
 
-        private static readonly Dictionary<(PointerStates from, PointerStates to), Action<IInputModuleEventHandler, PointerElement>> StateChangeActionMap
-            = new Dictionary<(PointerStates prev, PointerStates pointer), Action<IInputModuleEventHandler, PointerElement>>()
+        private static readonly Dictionary<(PointerStates from, PointerStates to), (string ActionName, Action<IInputModuleEventHandler, PointerElement> Action)> StateChangeActionMap
+            = new Dictionary<(PointerStates prev, PointerStates pointer), (string, Action<IInputModuleEventHandler, PointerElement>)>
         {
-            {(PointerStates.OnCanvas, PointerStates.OnElement), (module, pointerElement) => module.OnBeginHover.Invoke(module, pointerElement.transform.position) },
-            {(PointerStates.OnCanvas, PointerStates.PinchingToCanvas), (module, pointerElement) => module.OnBeginMissed.Invoke(module, pointerElement.transform.position) },
-            {(PointerStates.PinchingToCanvas, PointerStates.OnCanvas), (module, pointerElement) => module.OnEndMissed.Invoke(module, pointerElement.transform.position) },
-            {(PointerStates.OnElement, PointerStates.OnCanvas), (module, pointerElement) => module.OnEndHover.Invoke(module, pointerElement.transform.position) },
-            {(PointerStates.OnElement, PointerStates.PinchingToElement), (module, pointerElement) => module.OnClickDown.Invoke(module, pointerElement.transform.position) },
-            {(PointerStates.PinchingToElement, PointerStates.OnElement), (module, pointerElement) => module.OnClickUp.Invoke(module, pointerElement.transform.position) },
-            {(PointerStates.PinchingToElement, PointerStates.OnCanvas), (module, pointerElement) => module.OnClickUp.Invoke(module, pointerElement.transform.position) },
-            {(PointerStates.NearCanvas, PointerStates.TouchingElement), (module, pointerElement) => module.OnClickDown.Invoke(module, pointerElement.transform.position) },
-            {(PointerStates.NearCanvas, PointerStates.TouchingCanvas), (module, pointerElement) => module.OnBeginMissed.Invoke(module, pointerElement.transform.position) },
-            {(PointerStates.TouchingCanvas, PointerStates.NearCanvas), (module, pointerElement) => module.OnEndMissed.Invoke(module, pointerElement.transform.position) },
-            {(PointerStates.TouchingElement, PointerStates.NearCanvas), (module, pointerElement) => module.OnClickUp.Invoke(module, pointerElement.transform.position) },
-            {(PointerStates.OffCanvas, PointerStates.OffCanvas), (module, pointerElement) => pointerElement.TimeEnteredCanvas = Time.time },
+            {(PointerStates.OnCanvas, PointerStates.OnElement), ("OnBeginHover", (module, pointerElement) => module.OnBeginHover.Invoke(module, pointerElement.transform.position)) },
+            {(PointerStates.OnCanvas, PointerStates.PinchingToCanvas), ("OnBeginMissed", (module, pointerElement) => module.OnBeginMissed.Invoke(module, pointerElement.transform.position)) },
+            {(PointerStates.PinchingToCanvas, PointerStates.OnCanvas), ("OnEndMissed", (module, pointerElement) => module.OnEndMissed.Invoke(module, pointerElement.transform.position)) },
+            {(PointerStates.OnElement, PointerStates.OnCanvas), ("OnEndHover", (module, pointerElement) => module.OnEndHover.Invoke(module, pointerElement.transform.position)) },
+            {(PointerStates.OnElement, PointerStates.PinchingToElement), ("OnClickDown", (module, pointerElement) => module.OnClickDown.Invoke(module, pointerElement.transform.position)) },
+            {(PointerStates.PinchingToElement, PointerStates.OnElement), ("OnClickUp", (module, pointerElement) => module.OnClickUp.Invoke(module, pointerElement.transform.position)) },
+            {(PointerStates.PinchingToElement, PointerStates.OnCanvas), ("OnClickUp", (module, pointerElement) => module.OnClickUp.Invoke(module, pointerElement.transform.position)) },
+
+            {(PointerStates.NearCanvas, PointerStates.TouchingElement), ("OnClickDown", (module, pointerElement) => module.OnClickDown.Invoke(module, pointerElement.transform.position)) },
+            {(PointerStates.NearCanvas, PointerStates.TouchingCanvas), ("OnBeginMissed", (module, pointerElement) => module.OnBeginMissed.Invoke(module, pointerElement.transform.position)) },
+            {(PointerStates.TouchingCanvas, PointerStates.NearCanvas), ("OnEndMissed", (module, pointerElement) => module.OnEndMissed.Invoke(module, pointerElement.transform.position)) },
+            {(PointerStates.TouchingElement, PointerStates.NearCanvas), ("OnClickUp", (module, pointerElement) => module.OnClickUp.Invoke(module, pointerElement.transform.position)) }
         };
+
+        /// <summary>
+        /// Returns true if the user is interacting directly with the user interface (tactile mode)
+        /// </summary>
+        public bool IsUserInteractingDirectly
+        {
+            get
+            { 
+                switch (module?.InteractionMode)
+                {
+                    case InteractionCapability.Both:
+                    case InteractionCapability.Direct:
+
+                        return (PointerStateTactile == PointerStates.OnCanvas ||
+                            PointerStateTactile == PointerStates.OnElement ||
+                            PointerStateTactile == PointerStates.NearCanvas ||
+                            PointerStateTactile == PointerStates.TouchingCanvas ||
+                            PointerStateTactile == PointerStates.TouchingElement);
+
+                    case InteractionCapability.Indirect:
+                        return false;
+
+                    default:
+                        break;
+                }
+
+                throw new Exception("Unknown interaction mode");
+            }
+        }
+
+        /// <summary>
+        /// Should the cursor be shown when the user is interacting directly with the canvas/elements
+        /// </summary>
+        public bool ShowDirectPointerCursor
+        {
+            get
+            {
+                return module.ShowDirectPointerCursor;
+            }
+        }
 
         #endregion
 
@@ -94,16 +171,80 @@ namespace Leap.Unity.InputModule
         /// <summary>
         /// Returns true if the specified pointer is in the "touching" interaction mode, i.e, whether it is touching or nearly touching a canvas or control.
         /// </summary>
-        private bool IsTouchingOrNearlyTouchingCanvasOrElement =>
-            PointerState == PointerStates.NearCanvas ||
-            PointerState == PointerStates.TouchingCanvas ||
-            PointerState == PointerStates.TouchingElement;
+        private bool IsTouchingOrNearlyTouchingCanvasOrElement()
+        {
+            switch (module?.InteractionMode)
+            {
+                case InteractionCapability.Both:
+                    return IsTouchingOrNearlyTouchingCanvasOrElement(PointerStateProjective) || IsTouchingOrNearlyTouchingCanvasOrElement(PointerStateTactile);
+
+                case InteractionCapability.Direct:
+                    return IsTouchingOrNearlyTouchingCanvasOrElement(PointerStateTactile);
+
+                case InteractionCapability.Indirect:
+                    return IsTouchingOrNearlyTouchingCanvasOrElement(PointerStateProjective);
+
+                default:
+                    break;
+            }
+
+            throw new Exception("Unknown interaction mode");
+        }
+
+        private bool IsTouchingOrNearlyTouchingCanvasOrElement(PointerStates pointerState)
+        {
+            return pointerState == PointerStates.NearCanvas ||
+                   pointerState == PointerStates.TouchingCanvas ||
+                   pointerState == PointerStates.TouchingElement;
+        }
 
         /// <summary>
         /// Returns true if the pointer was interacting previously, but no longer is
         /// </summary>
-        private bool NoLongerInteracting(Hand hand) =>
-            PrevTriggeringInteraction && (!IsTriggeringInteraction(hand) || PointerState == PointerStates.OffCanvas);
+        private bool NoLongerInteracting(Hand hand)
+        {
+            switch (module?.InteractionMode)
+            {
+                case InteractionCapability.Both:
+                    return (PrevTriggeringInteraction && (!IsTriggeringInteraction(hand) || 
+                        (PointerStateTactile == PointerStates.OffCanvas && PointerStateProjective == PointerStates.OffCanvas)));
+
+                case InteractionCapability.Direct:
+                    return (PrevTriggeringInteraction && (!IsTriggeringInteraction(hand) || PointerStateTactile == PointerStates.OffCanvas));
+
+                case InteractionCapability.Indirect:
+                    return (PrevTriggeringInteraction && (!IsTriggeringInteraction(hand) || PointerStateProjective == PointerStates.OffCanvas));
+
+                default:
+                    break;
+            }
+
+            throw new Exception("Unknown interaction mode");
+        }
+
+        /// <summary>
+        /// Returns true if the pointer was interacting previously, but no longer is
+        /// </summary>
+        private bool OffCanvas()
+        {
+            switch (module?.InteractionMode)
+            {
+                case InteractionCapability.Both:
+                    return PointerStateTactile == PointerStates.OffCanvas && PointerStateProjective == PointerStates.OffCanvas;
+
+                case InteractionCapability.Direct:
+                    return PointerStateTactile == PointerStates.OffCanvas;
+
+                case InteractionCapability.Indirect:
+                    return PointerStateProjective == PointerStates.OffCanvas;
+
+                default:
+                    break;
+            }
+
+            throw new Exception("Unknown interaction mode");
+        }
+
 
         /// <summary>
         /// Returns true if a "click" is being triggered during the current frame.
@@ -112,9 +253,11 @@ namespace Leap.Unity.InputModule
         {
             if (module.InteractionMode != InteractionCapability.Indirect)
             {
-                if (IsTouchingOrNearlyTouchingCanvasOrElement)
+                if (IsTouchingOrNearlyTouchingCanvasOrElement())
                 {
-                    return DistanceOfTipToPointer(hand) < 0f;
+                    // Is fingertip beyond the pointer - e.g. pushed past the button surface?
+                    var val = DistanceOfTipToPointer(hand) < 0f;
+                    return val;
                 }
             }
 
@@ -177,7 +320,7 @@ namespace Leap.Unity.InputModule
             {
                 cursor.gameObject.SetActive(false);
             }
-            else if (disableWhenOffCanvas && PointerState == PointerStates.OffCanvas)
+            else if (disableWhenOffCanvas && OffCanvas())
             {
                 if (cursor.gameObject.activeSelf)
                 {
@@ -190,7 +333,7 @@ namespace Leap.Unity.InputModule
             }
 
             //Select interaction
-            switch (module.InteractionMode)
+            switch (module?.InteractionMode)
             {
                 case InteractionCapability.Both:
                     ProcessHybrid(projectionOriginProvider, hand);
@@ -205,16 +348,70 @@ namespace Leap.Unity.InputModule
                     throw new ArgumentOutOfRangeException();
             }
 
-            PrevScreenPosition = EventData.position;
-            RaiseEventsForStateChanges();
+            if (EventData != null)
+            {
+                PrevScreenPosition = EventData.position;
+            }
+
+            switch (module?.InteractionMode)
+            {
+                case InteractionCapability.Both:
+
+                    // Only raise projective events if there are no interesting tactile interactions happening
+                    if (PointerStateTactile != PointerStates.OffCanvas && PrevStateTactile != PointerStates.OffCanvas)
+                    {
+                        RaiseEventsForStateChanges(PointerStateTactile, PrevStateTactile);
+                    }
+
+                    RaiseEventsForStateChanges(PointerStateProjective, PrevStateProjective);
+                    break;
+
+                case InteractionCapability.Direct:
+                    RaiseEventsForStateChanges(PointerStateTactile, PrevStateTactile);
+                    break;
+
+                case InteractionCapability.Indirect:
+                    RaiseEventsForStateChanges(PointerStateProjective, PrevStateProjective);
+                    break;
+            }
+
+            ResetTimeEnteredCanvas();
             ProcessUnityEvents(hand);
+        }
+
+        private void ResetTimeEnteredCanvas()
+        {
+            switch (module?.InteractionMode)
+            {
+                case InteractionCapability.Both:
+                    if (PointerStateProjective == PointerStates.OffCanvas && PrevStateProjective == PointerStates.OffCanvas && PointerStateTactile == PointerStates.OffCanvas && PrevStateTactile == PointerStates.OffCanvas)
+                    {
+                        TimeEnteredCanvas = Time.time;
+                    }
+                    break;
+
+                case InteractionCapability.Direct:
+                    if (PointerStateTactile == PointerStates.OffCanvas && PrevStateTactile == PointerStates.OffCanvas)
+                    {
+                        TimeEnteredCanvas = Time.time;
+                    }
+                    break;
+
+                case InteractionCapability.Indirect:
+                    if (PointerStateProjective == PointerStates.OffCanvas && PrevStateProjective == PointerStates.OffCanvas)
+                    {
+                        TimeEnteredCanvas = Time.time;
+                    }
+                    break;
+            }
         }
 
         private void ProcessHybrid(IProjectionOriginProvider projectionOriginProvider, Hand hand)
         {
             ProcessTactile(projectionOriginProvider, hand);
 
-            if (PointerState == PointerStates.OffCanvas)
+            // If nothing interesting is happening in terms of direct/tactile interaction, then process the indirect/projective interaction
+            if (PointerStateTactile == PointerStates.OffCanvas)
             {
                 ProcessProjective(projectionOriginProvider, hand);
             }
@@ -228,9 +425,10 @@ namespace Leap.Unity.InputModule
                 projectionOriginProvider.ProjectionOriginForHand(hand),
                 forceTipRaycast: true);
 
-            PrevState = PointerState;
+            PrevStateTactile = PointerStateTactile;
             UpdatePointer(EventData);
-            ProcessState(hand, tipRaycastUsed);
+            PointerStateTactile = ProcessState(hand, tipRaycastUsed, PointerStateTactile);
+            OnPointerStateChanged?.Invoke(this, hand);
         }
 
         private void ProcessProjective(IProjectionOriginProvider projectionOriginProvider, Hand hand)
@@ -241,9 +439,10 @@ namespace Leap.Unity.InputModule
                 projectionOriginProvider.ProjectionOriginForHand(hand),
                 forceTipRaycast: false);
 
-            PrevState = PointerState;
+            PrevStateProjective = PointerStateProjective;
             UpdatePointer(EventData);
-            ProcessState(hand, tipRaycastUsed);
+            PointerStateProjective = ProcessState(hand, tipRaycastUsed, PointerStateProjective);
+            OnPointerStateChanged?.Invoke(this, hand);
         }
 
         #region Raise Unity Events
@@ -270,7 +469,7 @@ namespace Leap.Unity.InputModule
         private void ProcessUnityEvents_HandleRaycast(Hand hand)
         {
             //If we hit something with our Raycast, let's see if we should interact with it
-            if (EventData.pointerCurrentRaycast.gameObject == null || PointerState == PointerStates.OffCanvas)
+            if (EventData.pointerCurrentRaycast.gameObject == null || OffCanvas())
             {
                 return;
             }
@@ -305,7 +504,7 @@ namespace Leap.Unity.InputModule
                         CurrentGameObject = CurrentGameObjectUnderPointer;
 
                         //See if this object, or one of its parents, has a pointerDownHandler
-                        var gameObjectJustPressed = ExecuteEvents.ExecuteHierarchy(CurrentGameObject, EventData,
+                        var gameObjectJustPressed = ExecuteEvents.ExecuteHierarchy(CurrentGameObject, EventData, 
                             ExecuteEvents.pointerDownHandler);
 
                         //If not, see if one has a pointerClickHandler!
@@ -337,12 +536,8 @@ namespace Leap.Unity.InputModule
                             }
                         }
 
-                        //Debug.Log(currentGo[whichPointer].name);
-
                         // Find something in the hierarchy that implements dragging, starting at this GO and searching up
                         EventData.pointerDrag = ExecuteEvents.GetEventHandler<IDragHandler>(CurrentGameObject);
-
-                        //Debug.Log(PointEvents[whichPointer].pointerDrag.name);
 
                         if (EventData.pointerDrag)
                         {
@@ -446,7 +641,6 @@ namespace Leap.Unity.InputModule
                         ExecuteEvents.Execute(GameObjectBeingDragged, EventData, ExecuteEvents.pointerUpHandler);
                     }
 
-                    //Debug.Log(currentGoing[whichPointer].name);
                     if (CurrentGameObjectUnderPointer != null)
                     {
                         ExecuteEvents.ExecuteHierarchy(CurrentGameObjectUnderPointer, EventData,
@@ -483,6 +677,11 @@ namespace Leap.Unity.InputModule
             // Whether or not this will be a raycast through the finger tip
             var tipRaycast = false;
 
+            if (EventData == null)
+            {
+                return false;
+            }
+
             EventData.Reset();
 
             //We're always going to assume we're "Left Clicking", for the benefit of uGUI
@@ -490,7 +689,7 @@ namespace Leap.Unity.InputModule
 
             //If we're in "Touching Mode", Raycast through the fingers
             Vector3 pointerPosition;
-            if (IsTouchingOrNearlyTouchingCanvasOrElement || forceTipRaycast)
+            if (IsTouchingOrNearlyTouchingCanvasOrElement() || forceTipRaycast)
             {
                 tipRaycast = true;
 
@@ -537,8 +736,13 @@ namespace Leap.Unity.InputModule
         /// </summary>
         /// <param name="hand"></param>
         /// <param name="tipRaycastUsed"></param>
-        private void ProcessState(Hand hand, bool tipRaycastUsed)
+        private PointerStates ProcessState(Hand hand, bool tipRaycastUsed, PointerStates PointerState)
         {
+            if (EventData == null)
+            {
+                return PointerState;
+            }
+
             if (EventData.pointerCurrentRaycast.gameObject != null)
             {
                 if (IsPermittedTactileInteraction(hand))
@@ -572,14 +776,16 @@ namespace Leap.Unity.InputModule
                 else
                 {
                     PointerState = PointerStates.OffCanvas;
+                    return PointerState;
                 }
             }
             else
             {
                 PointerState = PointerStates.OffCanvas;
+                return PointerState;
             }
 
-            OnPointerStateChanged?.Invoke(this, hand);
+            return PointerState;
         }
 
         /// <summary>
@@ -588,6 +794,11 @@ namespace Leap.Unity.InputModule
         /// <param name="pointData">Pointer event data</param>
         private void UpdatePointer(PointerEventData pointData)
         {
+            if (EventData == null)
+            {
+                return;
+            }
+
             var element = EventData.pointerCurrentRaycast.gameObject;
             if (element != null)
             {
@@ -614,11 +825,11 @@ namespace Leap.Unity.InputModule
             }
         }
 
-        private void RaiseEventsForStateChanges()
+        private void RaiseEventsForStateChanges(PointerStates pointerState, PointerStates prevState)
         {
             if (module.TriggerHoverOnElementSwitch)
             {
-                if (PrevState != PointerStates.OffCanvas && PointerState != PointerStates.OffCanvas)
+                if (prevState != PointerStates.OffCanvas && pointerState != PointerStates.OffCanvas)
                 {
                     if (CurrentGameObjectUnderPointer != PreviousGameObjectUnderPointer)
                     {
@@ -630,9 +841,11 @@ namespace Leap.Unity.InputModule
                     }
                 }
             }
-
-            StateChangeActionMap.TryGetValue((PrevState, PointerState), out var result);
-            result?.Invoke(module, this);
+            
+            if (StateChangeActionMap.TryGetValue((prevState, pointerState), out var result))
+            {
+                result.Action.Invoke(module, this);
+            }
         }
     }
 }
