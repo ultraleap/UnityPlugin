@@ -31,6 +31,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - "Pullcord" jitters when being interacted with
 - Hand Binder finger tip scale disproportionately when LeapProvider Transform is scaled
 - Creating objects from GameObject/Ultraleap/ menu makes more than just prefabs - Ghost Hands (with Arms)
+- (UIInput) several interaction events not firing when both direct and indirect interaction is enabled 
 - Incorrect warning of duplicate InteractionHands in InteractionManager
 
 ### Known issues 
