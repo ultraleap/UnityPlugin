@@ -48,7 +48,7 @@ float2 LeapGetUndistortedUVWithOffset(float4 screenPos, float2 uvOffset) {
   // Flip vertically.
   // Multiplication by _ProjectionParams.x is here for the case where this is negative
 	projection.y = -projection.y;
-	projection.w = -projection.w * _ProjectionParams.x;
+	projection.w = -projection.w;
 #endif
 
 	float2 tangent = (screenUV + projection.xy) / projection.zw;

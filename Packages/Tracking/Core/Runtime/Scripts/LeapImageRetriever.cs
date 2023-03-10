@@ -388,6 +388,19 @@ namespace Leap.Unity
             }
         }
 
+        public void Reconstruct()
+        {
+            if (_currentImage != null)
+            {
+                if (_eyeTextureData.CheckStale(_currentImage))
+                {
+                    _eyeTextureData.Reconstruct(_currentImage);
+                }
+
+                _eyeTextureData.UpdateTextures(_currentImage);
+            }
+        }
+
         private void OnCameraPreRender(Camera cam)
         {
             if (_currentImage != null)
