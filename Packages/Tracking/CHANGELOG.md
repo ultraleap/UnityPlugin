@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (Physics Hands) Dynamically adjusting fingers when grabbing objects
 - (Physics Hands) Distance calculations and values for each bone
 - Per finger pinch distances in HandUtils
+- (UIInput) Added an option to hide the pointer cursor when hands are interacting with UI elements in direct/tactile mode
 - Added advanced option to LeapXRServiceProvider to avoid adding TrackedPoseDrivers to MainCamera 
 
 ### Changed

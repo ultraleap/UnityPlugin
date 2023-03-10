@@ -52,6 +52,15 @@ namespace Leap.Unity.InputModule
                 return;
             }
 
+            if (element.IsUserInteractingDirectly && !element.ShowDirectPointerCursor)
+            {
+                spriteRenderer.enabled = false;
+            }
+            else
+            {
+                spriteRenderer.enabled = true;
+            }
+
             spriteRenderer.transform.localScale = hand != null
                 ? Vector3.Lerp(initialScale, initialScale * interactionPointerScale, hand.PinchStrength)
                 : Vector3.one;
