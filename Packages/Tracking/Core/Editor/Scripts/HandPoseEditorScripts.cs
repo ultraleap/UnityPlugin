@@ -184,7 +184,6 @@ namespace Leap.Unity.HandsModule
             {
                 fineTuningOptionsButtonLabel = "Hide Fine Tuning Options";
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("_leapProvider"));
-                EditorGUILayout.PropertyField(serializedObject.FindProperty("_hysteresisThreshold"));
 
                 if (GUILayout.Button("Add Bone Direction Target"))
                 {
@@ -237,15 +236,12 @@ namespace Leap.Unity.HandsModule
                     }
                     EditorGUILayout.PropertyField(boneDirectionTarget.FindPropertyRelative("rotationThreshold"));
 
+                    EditorGUILayout.EndToggleGroup();
+
                     if (GUILayout.Button("Remove", GUILayout.Width(Screen.width * 0.2f), GUILayout.Height(20)))
                     {
                         poseDetectionScript.RemoveDefaultFingerDirection(i);
                     }
-
-                    
-                    EditorGUILayout.EndToggleGroup();
-
-
                 }
                 EditorGUILayout.EndScrollView();
                 #endregion
