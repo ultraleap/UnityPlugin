@@ -51,20 +51,6 @@ namespace Leap.Unity
             return fingerIndexesToCheck;
         }
 
-        [SerializeField]
-        private Hand serializedHand;
-        public Hand GetSerializedHand()
-        {
-            return serializedHand;
-        }
-
-        [SerializeField]
-        private Hand mirroredHand;
-        public Hand GetMirroredHand()
-        {
-            return mirroredHand;
-        }
-
         #region Finger Thresholds
 
         private static Vector2 defaultRotation = new Vector2(15, 15);
@@ -95,6 +81,20 @@ namespace Leap.Unity
         private List<Vector2> PinkieJointRotaion = new List<Vector2>() { defaultRotation, defaultRotation, defaultRotation };
 
         #endregion
+
+        [SerializeField, Attributes.Disable]
+        private Hand serializedHand;
+        public Hand GetSerializedHand()
+        {
+            return serializedHand;
+        }
+
+        [SerializeField, Attributes.Disable]
+        private Hand mirroredHand;
+        public Hand GetMirroredHand()
+        {
+            return mirroredHand;
+        }
 
         public void SaveHandPose(Hand handToSerialise)
         {
