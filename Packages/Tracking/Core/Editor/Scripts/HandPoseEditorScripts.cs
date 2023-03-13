@@ -55,29 +55,11 @@ namespace Leap.Unity.HandsModule
 
         public override void OnInspectorGUI()
         {
-            EditorGUILayout.LabelField("Angle of tolerance for pose");
-            _sliderHasChanged = false;
+            DrawFingerPointsEditor();
 
-            _boneThresholdSlider = target.globalRotation.x;
-            target.globalRotation.x =  EditorGUILayout.Slider(target.globalRotation.x, 0f, 90f);
+            DrawJointRotationThresholds();
 
-            if (_boneThresholdSlider != target.globalRotation.x)
-            {
-                _sliderHasChanged = true;
-                _boneThresholdSlider = target.globalRotation.x;
-            }
-
-            HandPoseScriptableObject serializedObjectScript = (HandPoseScriptableObject)target;
-            if(_sliderHasChanged)
-            {
-                serializedObjectScript.SetAllBoneThresholds(target.globalRotation.x);
-            }
-
-            DrawAttachmentPointsEditor();
-
-            GUILayout.Space(15);
-
-            if (GUILayout.Button("Show Fine Tuning Options"))
+            if (GUILayout.Button("Show Extra Options"))
             {
                 _showFineTuningOptions = !_showFineTuningOptions;
             }
@@ -88,7 +70,111 @@ namespace Leap.Unity.HandsModule
             }
         }
 
-        private void DrawAttachmentPointsEditor()
+        private void DrawJointRotationThresholds()
+        {
+            GUILayout.Space(15);
+            EditorGUILayout.LabelField("Finger Joint Rotation Thresholds", EditorStyles.boldLabel);
+
+            EditorGUILayout.LabelField("Global Joint Rotation Threshold");
+            _sliderHasChanged = false;
+
+            _boneThresholdSlider = target.globalRotation;
+            target.globalRotation = EditorGUILayout.Slider(target.globalRotation, 0f, 90f);
+
+            if (_boneThresholdSlider != target.globalRotation)
+            {
+                _sliderHasChanged = true;
+                _boneThresholdSlider = target.globalRotation;
+            }
+
+            if (_sliderHasChanged)
+            {
+                target.SetAllBoneThresholds(target.globalRotation);
+            }
+
+            GUILayout.Space(15);
+
+            for (int fingerID = 0; fingerID < target.fingerJointRotationThresholds.Length; fingerID++)
+            {
+                if(!ShouldShowFinger(fingerID))
+                {
+                    continue;
+                }
+
+                EditorGUILayout.LabelField(GetFingerName(fingerID) + " Joint Thresholds", EditorStyles.boldLabel);
+
+                for (int jointID = 0; jointID < target.fingerJointRotationThresholds[fingerID].jointThresholds.Length; jointID++)
+                {
+                    if (jointID == 0)
+                    {
+                        target.fingerJointRotationThresholds[fingerID].jointThresholds[jointID] = EditorGUILayout.Vector2Field(GetJointName(jointID), target.fingerJointRotationThresholds[fingerID].jointThresholds[jointID]);
+                    }
+                    else
+                    {
+                        float value = EditorGUILayout.FloatField(GetJointName(jointID), target.fingerJointRotationThresholds[fingerID].jointThresholds[jointID].x);
+                        target.fingerJointRotationThresholds[fingerID].jointThresholds[jointID] = Vector2.one * value;
+                    }
+                }
+
+                GUILayout.Space(15);
+            }
+            GUILayout.Space(15);
+        }
+
+        string GetJointName(int jointID)
+        {
+            switch(jointID)
+            {
+                case 0:
+                    return "Proximal Joint";
+                case 1:
+                    return "Intermediate Joint";
+                case 2:
+                    return "Distal Joint";
+            }
+
+            return "Joint " + jointID;
+        }
+
+        string GetFingerName(int fingerID)
+        {
+            switch (fingerID)
+            {
+                case 0:
+                    return "Thumb";
+                case 1:
+                    return "Index";
+                case 2:
+                    return "Middle";
+                case 3:
+                    return "Ring";
+                case 4:
+                    return "Pinky";
+            }
+
+            return "Finger " + fingerID;
+        }
+
+        bool ShouldShowFinger(int fingerID)
+        {
+            switch (fingerID)
+            {
+                case 0:
+                    return target.DetectThumb;
+                case 1:
+                    return target.DetectIndex;
+                case 2:
+                    return target.DetectMiddle;
+                case 3:
+                    return target.DetectRing;
+                case 4:
+                    return target.DetectPinky;
+            }
+
+            return true;
+        }
+
+        private void DrawFingerPointsEditor()
         {
             // Set up the draw rect space based on the image and available editor space.
             EditorGUILayout.Space();
