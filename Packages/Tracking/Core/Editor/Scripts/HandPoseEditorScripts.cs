@@ -257,6 +257,7 @@ namespace Leap.Unity.HandsModule
             }
             EditorGUILayout.PropertyField(serializedObject.FindProperty("OnPoseDetected"));
             EditorGUILayout.PropertyField(serializedObject.FindProperty("OnPoseLost"));
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("WhilePoseDetected"));
 
             serializedObject.ApplyModifiedProperties();
         }

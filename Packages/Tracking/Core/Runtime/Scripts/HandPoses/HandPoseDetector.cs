@@ -51,6 +51,7 @@ namespace Leap.Unity
         private HandPoseScriptableObject _detectedPose = null;
 
         public PoseDetectionEvents OnPoseDetected;
+        public PoseDetectionEvents WhilePoseDetected;
         public UnityEvent OnPoseLost;
 
         public struct ValidationData
@@ -106,8 +107,7 @@ namespace Leap.Unity
             Vector3.forward,
             Vector3.left,
             Vector3.right,
-            Vector3.up,
-            Vector3.zero
+            Vector3.up
         };
         public Vector3 GetAxis(AxisToFace axis)
         {
@@ -158,7 +158,12 @@ namespace Leap.Unity
         }
 
 
-
+        /// <summary>
+        /// This function determines whether a pose is currently detected or not.
+        /// If a pose is currently detected, it will return the pose
+        /// If a pose is not detected then this will return null
+        /// </summary>
+        /// <returns> currently detected pose (will be null if no pose is currently detected)</returns>
         public HandPoseScriptableObject GetCurrentlyDetectedPose()
         {
             return _detectedPose;
@@ -186,6 +191,11 @@ namespace Leap.Unity
                 _poseAlreadyDetected = false;
                 OnPoseLost.Invoke();
                 _detectedPose = null;
+            }
+
+            while(_detectedPose != null)
+            {
+                WhilePoseDetected.Invoke(_detectedPose);
             }
         }
 
