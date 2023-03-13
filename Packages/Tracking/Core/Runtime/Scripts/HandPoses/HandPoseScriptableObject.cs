@@ -104,6 +104,7 @@ namespace Leap.Unity
 
         void MirrorHand(ref Hand hand)
         {
+            mirroredHand = mirroredHand.CopyFrom(serializedHand);
             LeapTransform leapTransform = new LeapTransform(Vector3.zero, Quaternion.Euler(Vector3.zero));
             leapTransform.MirrorX();
             hand.Transform(leapTransform);
@@ -142,7 +143,6 @@ namespace Leap.Unity
 
         private void OnValidate()
         {
-            mirroredHand = mirroredHand.CopyFrom(serializedHand);
             MirrorHand(ref mirroredHand);
 
             ApplyFingersToUse();

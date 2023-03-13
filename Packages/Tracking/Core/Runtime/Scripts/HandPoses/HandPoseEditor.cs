@@ -84,14 +84,14 @@ namespace Leap.Unity
             if(posedHand.IsLeft)
             {
                 posedHand.SetTransform((handPosition + new Vector3(-0.15f, 0, 0)), handRotation);
-                mirroredHand.SetTransform((handPosition + new Vector3(0.15f, 0, 0)), handRotation);
+                mirroredHand.SetTransform((handPosition + new Vector3(0.15f, 0, 0)), mirroredHand.Rotation);
 
                 mirroredHand.IsLeft = false;
             }
             else
             {
                 posedHand.SetTransform((handPosition + new Vector3(0.15f, 0, 0)), handRotation);
-                mirroredHand.SetTransform((handPosition + new Vector3(-0.15f, 0, 0)), handRotation);
+                mirroredHand.SetTransform((handPosition + new Vector3(-0.15f, 0, 0)), mirroredHand.Rotation);
 
                 mirroredHand.IsLeft = true;
             }
