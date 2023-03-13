@@ -32,14 +32,7 @@ namespace Leap.Unity
         /// </summary>
         [SerializeField]
         private LeapProvider _leapProvider = null;
-        /// <summary>
-        /// The distance a bone must move away from being detected before the pose is no longer enabled.
-        /// This means that users cannot hover just on the edge of a detection and cause it to send rapid detections while straying still.
-        /// E.g. Detection threshold is 15 degrees, so when the user gets within 15 degrees, detection will occur.
-        /// Hysteresis threshold is 5 so the user need to move 20 degrees from the pose before the detection will drop.
-        /// </summary>
-        [SerializeField]
-        private float _hysteresisThreshold = 5;
+
 
         /// <summary>
         /// Has a pose been detected since last time there was no pose was detected? 
@@ -294,8 +287,8 @@ namespace Leap.Unity
                     // If the pose has been detected, use the Hysteresis value to check if it should be undetected
                     if (_poseAlreadyDetected)
                     {
-                        if ((boneDifference.x <= (jointRotationThresholds.x + _hysteresisThreshold) && boneDifference.x >= (-jointRotationThresholds.x - _hysteresisThreshold))
-                            && (boneDifference.y <= (jointRotationThresholds.y + _hysteresisThreshold) && boneDifference.y >= (-jointRotationThresholds.y - _hysteresisThreshold)))
+                        if ((boneDifference.x <= (jointRotationThresholds.x + pose.GetHysteresisThreshold()) && boneDifference.x >= (-jointRotationThresholds.x - pose.GetHysteresisThreshold()))
+                            && (boneDifference.y <= (jointRotationThresholds.y + pose.GetHysteresisThreshold()) && boneDifference.y >= (-jointRotationThresholds.y - pose.GetHysteresisThreshold())))
                         {
                             numMatchedBones++;
                             boneMatched = true;

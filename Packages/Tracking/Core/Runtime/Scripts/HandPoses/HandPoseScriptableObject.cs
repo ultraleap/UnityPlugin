@@ -80,19 +80,33 @@ namespace Leap.Unity
 
         [SerializeField]
         [NamedListAttribute(new string[] { "Proximal", "Intermediate", "Distal" })]
-        private List<Vector2> IndexJointRotataion = new List<Vector2>() { defaultRotation, defaultRotation, defaultRotation };
+        private List<Vector2> IndexJointRotation = new List<Vector2>() { defaultRotation, defaultRotation, defaultRotation };
 
         [SerializeField]
         [NamedListAttribute(new string[] { "Proximal", "Intermediate", "Distal" })]
-        private List<Vector2> MiddleJointRotaion = new List<Vector2>() { defaultRotation, defaultRotation, defaultRotation };
+        private List<Vector2> MiddleJointRotation = new List<Vector2>() { defaultRotation, defaultRotation, defaultRotation };
 
         [SerializeField]
         [NamedListAttribute(new string[] { "Proximal", "Intermediate", "Distal" })]
-        private List<Vector2> RingJointRotaion = new List<Vector2>() { defaultRotation, defaultRotation, defaultRotation };
+        private List<Vector2> RingJointRotation = new List<Vector2>() { defaultRotation, defaultRotation, defaultRotation };
 
         [SerializeField]
         [NamedListAttribute(new string[] { "Proximal", "Intermediate", "Distal" })]
-        private List<Vector2> PinkieJointRotaion = new List<Vector2>() { defaultRotation, defaultRotation, defaultRotation };
+        private List<Vector2> PinkieJointRotation = new List<Vector2>() { defaultRotation, defaultRotation, defaultRotation };
+
+        /// <summary>
+        /// The distance a bone must move away from being detected before the pose is no longer enabled.
+        /// This means that users cannot hover just on the edge of a detection and cause it to send rapid detections while straying still.
+        /// E.g. Detection threshold is 15 degrees, so when the user gets within 15 degrees, detection will occur.
+        /// Hysteresis threshold is 5 so the user need to move 20 degrees from the pose before the detection will drop.
+        /// </summary>
+        [SerializeField]
+        private float _hysteresisThreshold = 5;
+
+        public float GetHysteresisThreshold()
+        {
+            return _hysteresisThreshold;
+        }
 
         #endregion
 
@@ -134,10 +148,10 @@ namespace Leap.Unity
         private void ApplyThresholds()
         {
             fingerRotationThresholds[0] = ThumbJointRotation;
-            fingerRotationThresholds[1] = IndexJointRotataion;
-            fingerRotationThresholds[2] = MiddleJointRotaion;
-            fingerRotationThresholds[3] = RingJointRotaion;
-            fingerRotationThresholds[4] = PinkieJointRotaion;
+            fingerRotationThresholds[1] = IndexJointRotation;
+            fingerRotationThresholds[2] = MiddleJointRotation;
+            fingerRotationThresholds[3] = RingJointRotation;
+            fingerRotationThresholds[4] = PinkieJointRotation;
         }
 
         private void OnValidate()
@@ -164,10 +178,10 @@ namespace Leap.Unity
             Vector2 newRotation = new Vector2(threshold, threshold);
 
             ThumbJointRotation = new List<Vector2>() { newRotation, newRotation, newRotation };
-            IndexJointRotataion = new List<Vector2>() { newRotation, newRotation, newRotation };
-            MiddleJointRotaion = new List<Vector2>() { newRotation, newRotation, newRotation };
-            RingJointRotaion = new List<Vector2>() { newRotation, newRotation, newRotation };
-            PinkieJointRotaion = new List<Vector2>() { newRotation, newRotation, newRotation };
+            IndexJointRotation = new List<Vector2>() { newRotation, newRotation, newRotation };
+            MiddleJointRotation = new List<Vector2>() { newRotation, newRotation, newRotation };
+            RingJointRotation = new List<Vector2>() { newRotation, newRotation, newRotation };
+            PinkieJointRotation = new List<Vector2>() { newRotation, newRotation, newRotation };
 
             ApplyThresholds();
         }
