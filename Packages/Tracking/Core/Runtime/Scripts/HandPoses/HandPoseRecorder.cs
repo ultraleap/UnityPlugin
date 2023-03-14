@@ -94,7 +94,29 @@ namespace Leap.Unity
             {
                 Directory.CreateDirectory("Assets/" + SavePath);
             }
-            AssetDatabase.CreateAsset(newItem, "Assets/" + SavePath + handPoseName + ".asset");
+
+            bool fileSaved = false;
+            if (File.Exists("Assets/" + SavePath + handPoseName + ".asset"))
+            {
+                Debug.Log("1");
+                int fileNum = 0;
+                while(!fileSaved)
+                {
+                    Debug.Log("2");
+                    fileNum++;
+                    if (!File.Exists("Assets/" + SavePath + handPoseName + " (" + fileNum + ")" + ".asset"))
+                    {
+                        Debug.Log("3");
+                        AssetDatabase.CreateAsset(newItem, "Assets/" + SavePath + handPoseName + " (" + fileNum + ")" + ".asset");
+                        fileSaved = true;
+                    }
+                }
+            }
+            if (!fileSaved)
+            {
+                Debug.Log("4");
+                AssetDatabase.CreateAsset(newItem, "Assets/" + SavePath + handPoseName + ".asset");
+            }
             AssetDatabase.Refresh();
         }
 

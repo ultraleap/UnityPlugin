@@ -42,6 +42,10 @@ namespace Leap.Unity
         /// Gives us the pose which has been detected.
         /// </summary>
         private HandPoseScriptableObject _detectedPose = null;
+        /// <summary>
+        /// did all of the bone directions match last frame? (For hysteresis)
+        /// </summary>
+        private bool _directionTargetsMatchedLastFrame = false;
 
         public PoseDetectionEvents OnPoseDetected;
         public PoseDetectionEvents WhilePoseDetected;
@@ -194,9 +198,6 @@ namespace Leap.Unity
 
         private bool CompareAllHandsAndPoses()
         {
-            // If the user hasnt specified the hands to detect, check all Hand Model Bases.
-            // This will only do this once unless manually cleared.
-
             _validationDatas.Clear();
             foreach (var activePlayerHand in _leapProvider.CurrentFrame.Hands)
             {
@@ -218,11 +219,14 @@ namespace Leap.Unity
 
         private bool ComparePoseToHand(HandPoseScriptableObject pose, Hand activePlayerHand)
         {
-            
+
             // Check any finger directions set up in the pose detector
-            if (CheckPoseDirection(pose, activePlayerHand) == false) 
+            if (BoneDirectionTargets.Count > 0)
             {
-                return false; 
+                if (CheckPoseDirection(pose, activePlayerHand) == false)
+                {
+                    return false;
+                }
             }
             
             Hand serializedHand = pose.GetSerializedHand();
@@ -324,63 +328,71 @@ namespace Leap.Unity
         private bool CheckPoseDirection(HandPoseScriptableObject pose, Hand activePlayerHand)
         {
             bool allBonesInCorrectDirection = true;
-            if (BoneDirectionTargets.Count > 0)
+
+            foreach (var boneDirectionTarget in BoneDirectionTargets)
             {
-                foreach (var boneDirectionTarget in BoneDirectionTargets)
+                if (boneDirectionTarget.enabled == true)
                 {
-                    if (boneDirectionTarget.enabled == true)
+                    Vector3 pointDirection;
+                    Vector3 pointPosition;
+
+                    if (boneDirectionTarget.isPalmDirection)
                     {
-                        Vector3 pointDirection;
-                        Vector3 pointPosition;
-
-                        if (boneDirectionTarget.isPalmDirection)
-                        {
-                            pointDirection = activePlayerHand.PalmNormal.normalized;
-                            pointPosition = activePlayerHand.PalmPosition;
-                        }
-                        else
-                        {
-                            pointDirection = activePlayerHand.Fingers[(int)boneDirectionTarget.fingerTypeForPoint].Bone(boneDirectionTarget.boneForPoint).Direction.normalized;
-                            pointPosition = activePlayerHand.Fingers[(int)boneDirectionTarget.fingerTypeForPoint].Bone(boneDirectionTarget.boneForPoint).NextJoint;
-                        }
-                        switch (boneDirectionTarget.typeOfDirectionCheck)
-                        {
-                            case TypeOfDirectionCheck.OBJECT:
-                                {
-                                    if (!GetIsFacingObject(pointPosition, boneDirectionTarget.poseTarget.position, pointDirection))
-                                    {
-                                        allBonesInCorrectDirection = false;
-                                    }
-                                    break;
-                                }
-                            case TypeOfDirectionCheck.WORLD:
-                                {
-                                    if (!GetIsFacingDirection(pointDirection, GetAxis(boneDirectionTarget.axisToFace), boneDirectionTarget.rotationThreshold))
-                                    {
-                                        allBonesInCorrectDirection = false;
-                                    }
-                                    break;
-                                }
-                            case TypeOfDirectionCheck.CAMERALOCAL:
-                                {
-                                    if (!GetIsFacingDirection(pointDirection,
-                                        (Camera.main.transform.rotation.normalized * GetAxis(boneDirectionTarget.axisToFace).normalized).normalized, boneDirectionTarget.rotationThreshold))
-                                    {
-                                        allBonesInCorrectDirection = false;
-                                    }
-                                    break;
-                                }
-                        }
+                        pointDirection = activePlayerHand.PalmNormal.normalized;
+                        pointPosition = activePlayerHand.PalmPosition;
                     }
+                    else
+                    {
+                        pointDirection = activePlayerHand.Fingers[(int)boneDirectionTarget.fingerTypeForPoint].Bone(boneDirectionTarget.boneForPoint).Direction.normalized;
+                        pointPosition = activePlayerHand.Fingers[(int)boneDirectionTarget.fingerTypeForPoint].Bone(boneDirectionTarget.boneForPoint).NextJoint;
+                    }
+                    float hysteresisToAdd = 0;
 
+                    switch (boneDirectionTarget.typeOfDirectionCheck)
+                    {
+                        case TypeOfDirectionCheck.OBJECT:
+                            {
+                                if (_directionTargetsMatchedLastFrame)
+                                {
+                                    hysteresisToAdd = -0.03f;
+                                }
+                                if (!GetIsFacingObject(pointPosition, boneDirectionTarget.poseTarget.position, pointDirection, 0.8f + hysteresisToAdd))
+                                {
+                                    allBonesInCorrectDirection = false;
+                                }
+                                break;
+                            }
+                        case TypeOfDirectionCheck.WORLD:
+                            {
+                                if (_directionTargetsMatchedLastFrame)
+                                {
+                                    hysteresisToAdd = 5f;
+                                }
+                                if (!GetIsFacingDirection(pointDirection, GetAxis(boneDirectionTarget.axisToFace), boneDirectionTarget.rotationThreshold + hysteresisToAdd))
+                                {
+                                    allBonesInCorrectDirection = false;
+                                }
+                                break;
+                            }
+                        case TypeOfDirectionCheck.CAMERALOCAL:
+                            {
+                                if (_directionTargetsMatchedLastFrame)
+                                {
+                                    hysteresisToAdd = 5f;
+                                }
+                                if (!GetIsFacingDirection(pointDirection,
+                                    (Camera.main.transform.rotation.normalized * GetAxis(boneDirectionTarget.axisToFace).normalized).normalized, boneDirectionTarget.rotationThreshold + hysteresisToAdd))
+                                {
+                                    allBonesInCorrectDirection = false;
+                                }
+                                break;
+                            }
+                    }
                 }
-                return allBonesInCorrectDirection;
 
             }
-            else
-            {
-                return true;
-            }
+            _directionTargetsMatchedLastFrame = allBonesInCorrectDirection;
+            return allBonesInCorrectDirection;
         }
 
         #region Helper Functions
