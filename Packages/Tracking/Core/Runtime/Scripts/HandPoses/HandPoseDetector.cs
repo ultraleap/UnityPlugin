@@ -32,14 +32,7 @@ namespace Leap.Unity
         /// </summary>
         [SerializeField]
         private LeapProvider _leapProvider = null;
-        /// <summary>
-        /// The distance a bone must move away from being detected before the pose is no longer enabled.
-        /// This means that users cannot hover just on the edge of a detection and cause it to send rapid detections while straying still.
-        /// E.g. Detection threshold is 15 degrees, so when the user gets within 15 degrees, detection will occur.
-        /// Hysteresis threshold is 5 so the user need to move 20 degrees from the pose before the detection will drop.
-        /// </summary>
-        [SerializeField]
-        private float _hysteresisThreshold = 5;
+
 
         /// <summary>
         /// Has a pose been detected since last time there was no pose was detected? 
@@ -51,6 +44,7 @@ namespace Leap.Unity
         private HandPoseScriptableObject _detectedPose = null;
 
         public PoseDetectionEvents OnPoseDetected;
+        public PoseDetectionEvents WhilePoseDetected;
         public UnityEvent OnPoseLost;
 
         public struct ValidationData
@@ -106,8 +100,7 @@ namespace Leap.Unity
             Vector3.forward,
             Vector3.left,
             Vector3.right,
-            Vector3.up,
-            Vector3.zero
+            Vector3.up
         };
         public Vector3 GetAxis(AxisToFace axis)
         {
@@ -158,7 +151,12 @@ namespace Leap.Unity
         }
 
 
-
+        /// <summary>
+        /// This function determines whether a pose is currently detected or not.
+        /// If a pose is currently detected, it will return the pose
+        /// If a pose is not detected then this will return null
+        /// </summary>
+        /// <returns> currently detected pose (will be null if no pose is currently detected)</returns>
         public HandPoseScriptableObject GetCurrentlyDetectedPose()
         {
             return _detectedPose;
@@ -187,14 +185,19 @@ namespace Leap.Unity
                 OnPoseLost.Invoke();
                 _detectedPose = null;
             }
+
+            if(_detectedPose != null)
+            {
+                WhilePoseDetected.Invoke(_detectedPose);
+            }
         }
 
         private bool CompareAllHandsAndPoses()
         {
             // If the user hasnt specified the hands to detect, check all Hand Model Bases.
             // This will only do this once unless manually cleared.
-            
 
+            _validationDatas.Clear();
             foreach (var activePlayerHand in _leapProvider.CurrentFrame.Hands)
             {
                 if ((CheckBothHands || activePlayerHand.GetChirality() == ChiralityToCheck))
@@ -215,7 +218,7 @@ namespace Leap.Unity
 
         private bool ComparePoseToHand(HandPoseScriptableObject pose, Hand activePlayerHand)
         {
-            _validationDatas.Clear();
+            
             // Check any finger directions set up in the pose detector
             if (CheckPoseDirection(pose, activePlayerHand) == false) 
             {
@@ -284,8 +287,8 @@ namespace Leap.Unity
                     // If the pose has been detected, use the Hysteresis value to check if it should be undetected
                     if (_poseAlreadyDetected)
                     {
-                        if ((boneDifference.x <= (jointRotationThresholds.x + _hysteresisThreshold) && boneDifference.x >= (-jointRotationThresholds.x - _hysteresisThreshold))
-                            && (boneDifference.y <= (jointRotationThresholds.y + _hysteresisThreshold) && boneDifference.y >= (-jointRotationThresholds.y - _hysteresisThreshold)))
+                        if ((boneDifference.x <= (jointRotationThresholds.x + pose.GetHysteresisThreshold()) && boneDifference.x >= (-jointRotationThresholds.x - pose.GetHysteresisThreshold()))
+                            && (boneDifference.y <= (jointRotationThresholds.y + pose.GetHysteresisThreshold()) && boneDifference.y >= (-jointRotationThresholds.y - pose.GetHysteresisThreshold())))
                         {
                             numMatchedBones++;
                             boneMatched = true;
@@ -378,6 +381,11 @@ namespace Leap.Unity
             {
                 return true;
             }
+        }
+
+        public bool IsPoseCurrentlyDetected()
+        {
+            return _poseAlreadyDetected;
         }
 
         #region Helper Functions

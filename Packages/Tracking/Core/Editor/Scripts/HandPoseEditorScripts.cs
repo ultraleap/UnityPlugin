@@ -59,6 +59,11 @@ namespace Leap.Unity.HandsModule
 
             DrawJointRotationThresholds();
 
+            string hysterisisTooltp = "How many degrees away from the original threshold must the user move to " +
+                "stop the detection of each joint for the pose. This helps to avoid flickering detection when on the boundaries of thresholds";
+
+            target.hysteresisThreshold = EditorGUILayout.FloatField(new GUIContent("Hysteresis Threshold:", hysterisisTooltp), target.hysteresisThreshold);
+
             if (GUILayout.Button("Show Extra Options"))
             {
                 _showFineTuningOptions = !_showFineTuningOptions;
@@ -293,7 +298,6 @@ namespace Leap.Unity.HandsModule
             {
                 fineTuningOptionsButtonLabel = "Hide Fine Tuning Options";
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("_leapProvider"));
-                EditorGUILayout.PropertyField(serializedObject.FindProperty("_hysteresisThreshold"));
 
                 if (GUILayout.Button("Add Bone Direction Target"))
                 {
@@ -346,15 +350,12 @@ namespace Leap.Unity.HandsModule
                     }
                     EditorGUILayout.PropertyField(boneDirectionTarget.FindPropertyRelative("rotationThreshold"));
 
+                    EditorGUILayout.EndToggleGroup();
+
                     if (GUILayout.Button("Remove", GUILayout.Width(Screen.width * 0.2f), GUILayout.Height(20)))
                     {
                         poseDetectionScript.RemoveDefaultFingerDirection(i);
                     }
-
-                    
-                    EditorGUILayout.EndToggleGroup();
-
-
                 }
                 EditorGUILayout.EndScrollView();
                 #endregion
@@ -365,6 +366,7 @@ namespace Leap.Unity.HandsModule
                 fineTuningOptionsButtonLabel = "Show Fine Tuning Options";
             }
             EditorGUILayout.PropertyField(serializedObject.FindProperty("OnPoseDetected"));
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("WhilePoseDetected"));
             EditorGUILayout.PropertyField(serializedObject.FindProperty("OnPoseLost"));
 
             serializedObject.ApplyModifiedProperties();
