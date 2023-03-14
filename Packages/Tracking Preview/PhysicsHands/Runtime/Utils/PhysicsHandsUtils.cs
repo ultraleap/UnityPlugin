@@ -548,11 +548,11 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 Mathf.DeltaAngle(0, rotationDelta.eulerAngles.z)) / Time.fixedDeltaTime) * Mathf.Deg2Rad, 45f * physicsHand.strength);
         }
 
-        public static void UpdatePhysicsPalm2(ref PhysicsHand.Hand physicsHand, Vector3 dataPosition, Quaternion dataRotation, float maximumDistance, bool isContacting, bool isGrasping, float graspingWeight, float maximumWeight)
+        public static void UpdatePhysicsPalm2(ref PhysicsHand.Hand physicsHand, Leap.Hand dataHand, float maximumDistance, bool isContacting, bool isGrasping, float graspingWeight, float maximumWeight)
         {
             if (isContacting || isGrasping)
             {
-                physicsHand.currentPalmVelocityInterp = Mathf.InverseLerp(maximumDistance * 0.2f, maximumDistance * 0.9f, physicsHand.computedHandDistance).EaseOut();
+                physicsHand.currentPalmVelocityInterp = Mathf.InverseLerp(maximumDistance * 0.2f, maximumDistance * 0.95f, physicsHand.computedHandDistance).EaseOut();
                 physicsHand.currentPalmVelocity = Mathf.Lerp(physicsHand.currentPalmVelocity,
                     Mathf.Lerp(physicsHand.maximumPalmVelocity, physicsHand.minimumPalmVelocity, physicsHand.currentPalmVelocityInterp),
                     Time.fixedDeltaTime * (1.0f / 0.05f));
@@ -578,11 +578,11 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
             physicsHand.currentPalmWeight = Mathf.Lerp(physicsHand.currentPalmWeight, physicsHand.currentPalmWeightInterp, Time.fixedDeltaTime * (1.0f / 0.15f));
 
-            Vector3 delta = dataPosition - physicsHand.transform.position;
+            Vector3 delta = dataHand.PalmPosition - physicsHand.transform.position;
 
             physicsHand.palmBody.velocity = Vector3.ClampMagnitude(Vector3.MoveTowards(physicsHand.palmBody.velocity, delta * Mathf.Lerp(1.0f, 0.08f, physicsHand.currentPalmWeight) / Time.fixedDeltaTime, 15f), physicsHand.currentPalmVelocity * Time.fixedDeltaTime);
 
-            Quaternion rotationDelta = Quaternion.Slerp(physicsHand.transform.rotation, dataRotation, Mathf.Lerp(1.0f, 0.08f, physicsHand.currentPalmWeight)) * Quaternion.Inverse(physicsHand.transform.rotation);
+            Quaternion rotationDelta = Quaternion.Slerp(physicsHand.transform.rotation, dataHand.Rotation, Mathf.Lerp(1.0f, 0.08f, physicsHand.currentPalmWeight)) * Quaternion.Inverse(physicsHand.transform.rotation);
 
             Vector3 angularVelocity = Vector3.ClampMagnitude((new Vector3(
                 Mathf.DeltaAngle(0, rotationDelta.eulerAngles.x),

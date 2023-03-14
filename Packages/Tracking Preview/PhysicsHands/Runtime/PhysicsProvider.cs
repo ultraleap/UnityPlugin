@@ -655,14 +655,14 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 {
                     _tempVector.x = -pH.triggerDistance / 2f;
                     _tempVector.z = pH.triggerDistance / 2f;
-                    radius *= 0.4f;
+                    radius *= 0.3f;
                 }
                 else
                 {
                     // Inflate the bones slightly
                     _tempVector.x = 0;
                     _tempVector.z = 0;
-                    radius *= 0.1f;
+                    radius *= 0.12f;
                 }
                 // Move the finger tips forward a tad
                 if (pH.jointBones[i].Joint == 2)

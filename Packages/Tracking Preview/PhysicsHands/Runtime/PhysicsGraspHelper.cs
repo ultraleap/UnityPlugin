@@ -78,9 +78,9 @@ namespace Leap.Unity.Interaction.PhysicsHands
             {
                 // These values are limited by the EligibleBones
                 return (bones[0].Count > 0 || bones[5].Count > 0) && // A thumb or palm bone
-                    ((bones[1].Count > 0) || // The intermediate or distal of the index
-                    (bones[2].Count > 0) || // The intermediate or distal of the middle
-                    (bones[3].Count > 0) || // The distal of the ring
+                    ((bones[1].Count > 0 && bones[1].Any(x => x.Joint != 0)) || // The intermediate or distal of the index
+                    (bones[2].Count > 0 && bones[2].Any(x => x.Joint != 0)) || // The intermediate or distal of the middle
+                    (bones[3].Count > 0 && bones[3].Any(x => x.Joint != 0)) || // The distal of the ring
                     (bones[4].Count > 0 && bones[4].Any(x => x.Joint == 2))); // The distal of the pinky
             }
             return false;
@@ -177,7 +177,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             foreach (var bone in bones)
             {
                 // Gate the bones coming in and don't dupe the events for boneHash
-                if (EligibleBone(bone) && !_boneHash.Contains(bone))
+                if (!_boneHash.Contains(bone))
                 {
                     _boneHash.Add(bone);
                     bone.AddContacting(_rigid);
@@ -199,11 +199,6 @@ namespace Leap.Unity.Interaction.PhysicsHands
                     }
                 }
             }
-        }
-
-        private bool EligibleBone(PhysicsBone bone)
-        {
-            return bone.Finger == 5 || bone.Joint > 0;
         }
 
         private bool RemoveOldBones(PhysicsBone bone, HashSet<PhysicsBone> bones)

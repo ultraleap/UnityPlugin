@@ -29,9 +29,9 @@ namespace Leap.Unity.Interaction.PhysicsHands
             public const float CONTACT_ENTER_DISTANCE = 0.0015f, CONTACT_EXIT_DISTANCE = 0.01f;
             public const float CONTACT_THUMB_ENTER_DISTANCE = 0.0035f, CONTACT_THUMB_EXIT_DISTANCE = 0.018f;
             // Used as velocity * fixedDeltaTime
-            public const float MAXIMUM_PALM_VELOCITY = 150f, MINIMUM_PALM_VELOCITY = 35f, MAXIMUM_FINGER_VELOCITY = 60f, MINIMUM_FINGER_VELOCITY = 10f;
+            public const float MAXIMUM_PALM_VELOCITY = 300f, MINIMUM_PALM_VELOCITY = 50f, MAXIMUM_FINGER_VELOCITY = 200f, MINIMUM_FINGER_VELOCITY = 50f;
             // Used as angularVelocity * fixedDeltaTime
-            public const float MAXIMUM_PALM_ANGULAR_VELOCITY = 8000f, MINIMUM_PALM_ANGULAR_VELOCITY = 1000f;
+            public const float MAXIMUM_PALM_ANGULAR_VELOCITY = 8000f, MINIMUM_PALM_ANGULAR_VELOCITY = 6000f;
 
             [Tooltip("The distance that bones will have their radius inflated by when calculating if an object is grabbed.")]
             public float triggerDistance = TRIGGER_DISTANCE;
@@ -81,6 +81,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             [HideInInspector]
             public Quaternion[] defaultRotations;
 
+            [HideInInspector]
             public bool justGhosted = false;
 
             public float strength;
@@ -167,6 +168,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
         private float[] _graspingFingerDistance = new float[5];
         private float[] _xForceLimits = new float[Hand.BONES * Hand.FINGERS];
         private float[] _xDampening = new float[Hand.BONES * Hand.FINGERS];
+        private bool[] _fingerContacting = new bool[5];
 
         private WaitForFixedUpdate _waitForFixedUpdate;
 
@@ -413,7 +415,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             }
             else
             {
-                PhysicsHandsUtils.UpdatePhysicsPalm2(ref _physicsHand, _originalLeapHand.PalmPosition, _originalLeapHand.Rotation, _physicsProvider.HandTeleportDistance, IsContacting, IsGrasping, _physicsProvider.InterpolatingMass ? _graspMass : 1f, _physicsProvider.MaxMass);
+                PhysicsHandsUtils.UpdatePhysicsPalm2(ref _physicsHand, _originalLeapHand,  _physicsProvider.HandTeleportDistance, IsContacting, IsGrasping, _physicsProvider.InterpolatingMass ? _graspMass : 1f, _physicsProvider.MaxMass);
             }
 
             // Fix the hand if it gets into a bad situation by teleporting and holding in place until its bad velocities disappear
@@ -477,7 +479,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                             _physicsHand.jointBones[boneArrayIndex].OriginalXDriveLower, _physicsHand.jointBones[boneArrayIndex].OriginalXDriveUpper);
                     }
 
-                    if (_physicsHand.currentPalmVelocityInterp > 0)
+                    if (_physicsHand.currentPalmVelocityInterp > 0 && _fingerContacting[fingerIndex])
                     {
                         _xForceLimits[boneArrayIndex] = Mathf.Lerp(_xForceLimits[boneArrayIndex],
                             Mathf.Lerp(_physicsHand.maximumFingerVelocity, _physicsHand.minimumFingerVelocity, _physicsHand.currentPalmVelocityInterp),
@@ -541,9 +543,16 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
                     bool hasFingerGrasped = false;
 
+                    _fingerContacting[fingerIndex] = false;
+
                     for (int jointIndex = Hand.BONES - 1; jointIndex >= 0; jointIndex--)
                     {
                         int boneArrayIndex = fingerIndex * Hand.BONES + jointIndex;
+                     
+                        if (_physicsHand.jointBones[boneArrayIndex].IsContacting || _physicsHand.jointBones[boneArrayIndex].IsGrasping || _physicsHand.jointBones[boneArrayIndex].IsObjectNearBone)
+                        {
+                            _fingerContacting[fingerIndex] = true;
+                        }
 
                         float distanceCheck;
                         if (_wasGraspingBones[boneArrayIndex])
@@ -694,7 +703,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             // Fix the hand if it gets into a bad situation by teleporting and holding in place until its bad velocities disappear
             if (Vector3.Distance(_originalOldPosition, _originalLeapHand.PalmPosition) > _physicsProvider.HandTeleportDistance ||
                 bonesAreOverRotated ||
-                DistanceFromDataHand > _physicsProvider.HandTeleportDistance && (IsGrasping ||
+                (!IsGrasping && DistanceFromDataHand > _physicsProvider.HandTeleportDistance) && (IsGrasping ||
                 IsCloseToObject))
             {
                 ResetPhysicsHand(true);
