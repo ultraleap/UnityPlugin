@@ -84,7 +84,7 @@ namespace Leap.Unity
         public void SaveHandPose(Hand handToSerialise)
         {
             serializedHand = handToSerialise;
-            SetAllBoneThresholds(globalRotation);
+            SetAllBoneThresholds(globalRotation, true);
         }
 
         void MirrorHand(ref Hand hand)
@@ -125,14 +125,34 @@ namespace Leap.Unity
             if (DetectPinky) { fingerIndexesToCheck.Add(4); }
         }
 
-        public void SetAllBoneThresholds(float threshold)
+        public void SetAllBoneThresholds(float threshold, bool forceAll = false)
         {
             Vector2 newRotation = new Vector2(threshold, threshold);
 
             for(int fingerIndex = 0; fingerIndex < fingerJointRotationThresholds.Length; fingerIndex++)
             {
-                fingerJointRotationThresholds[fingerIndex].jointThresholds = new Vector2[] { newRotation, newRotation, newRotation };
+                if (forceAll)
+                {
+                    fingerJointRotationThresholds[fingerIndex].jointThresholds = new Vector2[] { newRotation, newRotation, newRotation };
+                }
+                else
+                {
+                    for(int jointIndex = 0; jointIndex < fingerJointRotationThresholds[fingerIndex].jointThresholds.Length; jointIndex++)
+                    {
+                        if(fingerJointRotationThresholds[fingerIndex].jointThresholds[jointIndex].x == globalRotation)
+                        {
+                            fingerJointRotationThresholds[fingerIndex].jointThresholds[jointIndex].x = threshold;
+                        }
+
+                        if (fingerJointRotationThresholds[fingerIndex].jointThresholds[jointIndex].y == globalRotation)
+                        {
+                            fingerJointRotationThresholds[fingerIndex].jointThresholds[jointIndex].y = threshold;
+                        }
+                    }
+                }
             }
+
+            globalRotation = threshold;
         }
     }
 }

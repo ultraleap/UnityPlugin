@@ -72,27 +72,30 @@ namespace Leap.Unity.HandsModule
 
         private void DrawJointRotationThresholds()
         {
-            GUILayout.Space(15);
-            EditorGUILayout.LabelField("Finger Joint Rotation Thresholds", EditorStyles.boldLabel);
+            string thresholdTooltip = "Rotation thresholds relate to how close in degrees the joint's rotation must be to the pose before it will be considered detected.";
 
-            EditorGUILayout.LabelField("Global Joint Rotation Threshold");
+            GUILayout.Space(15);
+            EditorGUILayout.LabelField(new GUIContent("Finger Joint Rotation Thresholds", thresholdTooltip), EditorStyles.boldLabel);
+            EditorGUILayout.LabelField(new GUIContent("Global Joint Rotation Threshold", thresholdTooltip));
+
             _sliderHasChanged = false;
 
-            _boneThresholdSlider = target.globalRotation;
-            target.globalRotation = EditorGUILayout.Slider(target.globalRotation, 0f, 90f);
+            _boneThresholdSlider = EditorGUILayout.Slider(target.globalRotation, 0f, 90f);
 
             if (_boneThresholdSlider != target.globalRotation)
             {
                 _sliderHasChanged = true;
-                _boneThresholdSlider = target.globalRotation;
             }
 
             if (_sliderHasChanged)
             {
-                target.SetAllBoneThresholds(target.globalRotation);
+                target.SetAllBoneThresholds(_boneThresholdSlider);
             }
 
-            GUILayout.Space(15);
+            EditorGUILayout.LabelField("Key:");
+            EditorGUILayout.LabelField("Flex = Flexion/Curl, Abd = Abduction/Splay");
+
+            GUILayout.Space(5);
 
             for (int fingerID = 0; fingerID < target.fingerJointRotationThresholds.Length; fingerID++)
             {
@@ -101,20 +104,41 @@ namespace Leap.Unity.HandsModule
                     continue;
                 }
 
-                EditorGUILayout.LabelField(GetFingerName(fingerID) + " Joint Thresholds", EditorStyles.boldLabel);
+                EditorGUILayout.LabelField(new GUIContent(GetFingerName(fingerID) + " Joint Thresholds", thresholdTooltip), EditorStyles.boldLabel);
+
+                float labelWidth = EditorGUIUtility.labelWidth;
 
                 for (int jointID = 0; jointID < target.fingerJointRotationThresholds[fingerID].jointThresholds.Length; jointID++)
                 {
                     if (jointID == 0)
                     {
-                        target.fingerJointRotationThresholds[fingerID].jointThresholds[jointID] = EditorGUILayout.Vector2Field(GetJointName(jointID), target.fingerJointRotationThresholds[fingerID].jointThresholds[jointID]);
+                        EditorGUIUtility.labelWidth = 30;
+
+                        EditorGUILayout.BeginHorizontal();
+                        EditorGUILayout.LabelField(new GUIContent(GetJointName(jointID), thresholdTooltip), GUILayout.Width(120));
+                        GUILayout.FlexibleSpace();
+                        var flex = EditorGUILayout.FloatField(new GUIContent("Flex:", thresholdTooltip), target.fingerJointRotationThresholds[fingerID].jointThresholds[jointID].x, GUILayout.Width(80));
+                        var abd = EditorGUILayout.FloatField(new GUIContent("Abd:", thresholdTooltip), target.fingerJointRotationThresholds[fingerID].jointThresholds[jointID].y, GUILayout.Width(80));
+                        EditorGUILayout.EndHorizontal();
+
+                        target.fingerJointRotationThresholds[fingerID].jointThresholds[jointID] = new Vector2(flex, abd);
                     }
                     else
                     {
-                        float value = EditorGUILayout.FloatField(GetJointName(jointID), target.fingerJointRotationThresholds[fingerID].jointThresholds[jointID].x);
-                        target.fingerJointRotationThresholds[fingerID].jointThresholds[jointID] = Vector2.one * value;
+                        EditorGUIUtility.labelWidth = 30;
+
+                        EditorGUILayout.BeginHorizontal();
+                        EditorGUILayout.LabelField(new GUIContent(GetJointName(jointID), thresholdTooltip), GUILayout.Width(120));
+                        GUILayout.FlexibleSpace();
+                        var flex = EditorGUILayout.FloatField(new GUIContent("Flex:", thresholdTooltip), target.fingerJointRotationThresholds[fingerID].jointThresholds[jointID].x, GUILayout.Width(80));
+                        GUILayout.Space(83);
+                        EditorGUILayout.EndHorizontal();
+
+                        target.fingerJointRotationThresholds[fingerID].jointThresholds[jointID] = Vector2.one * flex;
                     }
                 }
+
+                EditorGUIUtility.labelWidth = labelWidth;
 
                 GUILayout.Space(15);
             }
@@ -177,7 +201,6 @@ namespace Leap.Unity.HandsModule
         private void DrawFingerPointsEditor()
         {
             // Set up the draw rect space based on the image and available editor space.
-            EditorGUILayout.Space();
             EditorGUILayout.LabelField("Fingers to detect", EditorStyles.boldLabel);
 
             _handTexRect = EditorGUILayout.BeginVertical(GUILayout.MinWidth(EditorGUIUtility.currentViewWidth),
