@@ -128,20 +128,20 @@ namespace Leap.Unity
                 
                 if (handPoseScriptableObject.GetFingerIndexesToCheck().Contains(j))
                 {
-                    for (int i = 1; i < finger.bones.Length; i++)
+                    for (int i = 1; i < finger.bones.Length; i++) // start i at 1 to ignore metacarpal
                     {
                         var bone = finger.bones[i];
                         Gizmos.matrix = Matrix4x4.identity;
 
                         //currently only uses x threshold
-                        DrawThresholdGizmo(handPoseScriptableObject.GetBoneRotationthreshold(j, i).x,
+                        DrawThresholdGizmo(handPoseScriptableObject.GetBoneRotationthreshold(j, i - 1).x, // i-1 to ignore metacarpal
                         bone.Direction.normalized,
                         bone.PrevJoint, normal, gizmoColors[0], bone.Length);
 
                         if (finger.bones[i].Type == Bone.BoneType.TYPE_PROXIMAL) 
                         {
                             var proximalNormal = Quaternion.AngleAxis(90, bone.Direction.normalized) * normal;
-                            DrawThresholdGizmo(handPoseScriptableObject.GetBoneRotationthreshold(j, i).y,
+                            DrawThresholdGizmo(handPoseScriptableObject.GetBoneRotationthreshold(j, i - 1).y, // i-1 to ignore metacarpal
                             bone.Direction.normalized,
                             bone.PrevJoint, proximalNormal, gizmoColors[1], bone.Length);
                         }
