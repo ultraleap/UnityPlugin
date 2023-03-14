@@ -186,7 +186,7 @@ namespace Leap.Unity
                 _detectedPose = null;
             }
 
-            while(_detectedPose != null)
+            if(_detectedPose != null)
             {
                 WhilePoseDetected.Invoke(_detectedPose);
             }
@@ -196,8 +196,8 @@ namespace Leap.Unity
         {
             // If the user hasnt specified the hands to detect, check all Hand Model Bases.
             // This will only do this once unless manually cleared.
-            
 
+            _validationDatas.Clear();
             foreach (var activePlayerHand in _leapProvider.CurrentFrame.Hands)
             {
                 if ((CheckBothHands || activePlayerHand.GetChirality() == ChiralityToCheck))
@@ -218,7 +218,7 @@ namespace Leap.Unity
 
         private bool ComparePoseToHand(HandPoseScriptableObject pose, Hand activePlayerHand)
         {
-            _validationDatas.Clear();
+            
             // Check any finger directions set up in the pose detector
             if (CheckPoseDirection(pose, activePlayerHand) == false) 
             {
