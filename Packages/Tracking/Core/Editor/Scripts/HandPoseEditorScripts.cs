@@ -64,6 +64,8 @@ namespace Leap.Unity.HandsModule
 
             target.hysteresisThreshold = EditorGUILayout.FloatField(new GUIContent("Hysteresis Threshold:", hysterisisTooltp), target.hysteresisThreshold);
 
+            EditorGUILayout.Space();
+
             if (GUILayout.Button("Show Extra Options"))
             {
                 _showFineTuningOptions = !_showFineTuningOptions;
@@ -73,6 +75,8 @@ namespace Leap.Unity.HandsModule
             {
                 DrawDefaultInspector();
             }
+
+            EditorUtility.SetDirty(target);
         }
 
         private void DrawJointRotationThresholds()
@@ -147,7 +151,6 @@ namespace Leap.Unity.HandsModule
 
                 GUILayout.Space(15);
             }
-            GUILayout.Space(15);
         }
 
         string GetJointName(int jointID)
@@ -379,6 +382,8 @@ namespace Leap.Unity.HandsModule
 
         List<HandPoseScriptableObject> handPoses = new List<HandPoseScriptableObject>();
 
+        bool _showFineTuningOptions = false;
+
         protected override void OnEnable()
         {
             base.OnEnable();
@@ -388,12 +393,7 @@ namespace Leap.Unity.HandsModule
             specifyConditionalDrawing(() => false, "editTimePose");
         }
 
-        private void OnSceneGUI()
-        {
-            UpdatePoseEditor();
-        }
-
-        private void UpdatePoseEditor()
+        private void UpdatedPoseDropdown()
         {
             var handPoseEditor = (HandPoseEditor)target;
             var handPoseGuids = AssetDatabase.FindAssets("t:HandPoseScriptableObject");
@@ -415,10 +415,9 @@ namespace Leap.Unity.HandsModule
                 }
             }
 
-
             if (handPoseEditor.PoseScritableIntName.Count > 0)
             {
-                EditorGUILayout.LabelField("Pose to view");
+                EditorGUILayout.LabelField("Select Pose");
                 handPoseEditor.Selected = EditorGUILayout.Popup(handPoseEditor.Selected, handPoseEditor.PoseScritableIntName.Values.ToArray());
                 target.handPose = handPoses.ElementAt(handPoseEditor.Selected);
                 EditorGUILayout.Space(10);
@@ -428,14 +427,43 @@ namespace Leap.Unity.HandsModule
                 EditorGUILayout.LabelField("No poses found, please record a pose using the pose recorder in order to view a pose.");
                 EditorGUILayout.Space(10);
             }
+
             EditorUtility.SetDirty(target);
         }
 
         public override void OnInspectorGUI()
         {
-            UpdatePoseEditor();
+            EditorGUI.BeginDisabledGroup(true);
+            EditorGUILayout.ObjectField("Script", MonoScript.FromMonoBehaviour((MonoBehaviour)target), GetType(), false);
+            EditorGUI.EndDisabledGroup();
 
-            base.OnInspectorGUI();
+            UpdatedPoseDropdown();
+
+            EditorGUILayout.BeginHorizontal();
+
+            GUILayout.FlexibleSpace();
+
+            if (GUILayout.Button("Edit Pose", GUILayout.Width(Screen.width/2), GUILayout.Height(30)))
+            {
+                EditorGUIUtility.PingObject(target.handPose);
+                Selection.SetActiveObjectWithContext(target.handPose, target.handPose);
+            }
+
+            GUILayout.FlexibleSpace();
+
+            EditorGUILayout.EndHorizontal();
+
+            EditorGUILayout.Space(10);
+
+            if (GUILayout.Button("Show Extra Options"))
+            {
+                _showFineTuningOptions = !_showFineTuningOptions;
+            }
+
+            if (_showFineTuningOptions)
+            {
+                base.OnInspectorGUI();
+            }
         }
     }
 }

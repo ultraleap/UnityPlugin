@@ -47,13 +47,12 @@ namespace Leap.Unity
             handPose = poseToSet;
         }
 
-        [SerializeField]
-        Transform handsLocation;
+        public Transform handsLocation;
 
         private List<Tuple<Hand, HandPoseScriptableObject>> currentHandsAndPosedObjects = new List<Tuple<Hand, HandPoseScriptableObject>>();
 
         [SerializeField, Tooltip("Sets the colors of the gizmos that represent the rotation thresholds for each joint")]
-        private Color[] gizmoColors = new Color[2] { Color.red.WithAlpha(0.3f), Color.blue.WithAlpha(0.3f) };
+        private Color[] gizmoColors = new Color[2] { Color.red, Color.blue };
 
         private void Update()
         {
@@ -69,8 +68,11 @@ namespace Leap.Unity
                 return;
             }
 
-            Hand posedHand = handPose.GetSerializedHand();
-            Hand mirroredHand = handPose.GetMirroredHand();
+            Hand posedHand = new Hand();
+            Hand mirroredHand = new Hand();
+
+            posedHand.CopyFrom(handPose.GetSerializedHand());
+            mirroredHand.CopyFrom(handPose.GetMirroredHand());
 
             Vector3 handPosition = Camera.main.transform.position + (Camera.main.transform.forward * 0.5f);
             Quaternion handRotation = posedHand.Rotation;
@@ -150,36 +152,34 @@ namespace Leap.Unity
             }
         }
 
-
-        private void DrawThresholdGizmo(float angle, Vector3 direction, Vector3 pointLocation, Vector3 normal, Color color, float radius = 0.02f)
+        private void DrawThresholdGizmo(float angle, Vector3 direction, Vector3 pointLocation, Vector3 normal, Color color, float radius = 0.02f, float thickness = 2)
         {
             Gizmos.color = color;
             Handles.color = color;
 
-            var startPoint = direction.normalized * radius;
+            var pointDiff = direction.normalized * radius;
 
-            Handles.DrawSolidArc(pointLocation, normal, startPoint, angle, radius);
-            Handles.DrawSolidArc(pointLocation, -normal, startPoint, angle, radius);
+            Handles.DrawWireArc(pointLocation, normal, pointDiff, angle, radius, thickness);
+            Handles.DrawWireArc(pointLocation, -normal, pointDiff, angle, radius, thickness);
 
-            Gizmos.color = Color.white;
-            Handles.color = Color.white;
+            var arcRotation = Quaternion.AngleAxis(angle, normal);
+            var arcEnd = RotatePointAroundPivot(pointLocation + pointDiff, pointLocation, arcRotation);
 
-           // Handles.DrawWireArc(pointLocation, normal, startPoint, angle, radius);
-           // Handles.DrawWireArc(pointLocation, -normal, startPoint, angle, radius);
+            Handles.DrawLine(pointLocation, arcEnd, thickness);
 
-            if (radius > 0.02f)
-            {
-                Handles.DrawWireArc(pointLocation, normal, startPoint, angle, 0.02f);
-                Handles.DrawWireArc(pointLocation, -normal, startPoint, angle, 0.02f);
-            }
+            arcRotation = Quaternion.AngleAxis(angle, -normal);
+            arcEnd = RotatePointAroundPivot(pointLocation + pointDiff, pointLocation, arcRotation);
+
+            Handles.DrawLine(pointLocation, arcEnd, thickness);
         }
 
-        public Vector3 RotatePointAroundPivot(Vector3 point, Vector3 pivot, Vector3 angles)
+        Vector3 RotatePointAroundPivot(Vector3 point, Vector3 pivot, Quaternion rotation)
         {
-            Vector3 dir = point - pivot; // get point direction relative to pivot
-            dir = Quaternion.Euler(angles) * dir; // rotate it
-            point = dir + pivot; // calculate rotated point
-            return point; // return it
+            Vector3 result = point - pivot; //the relative vector from pivot to point.
+            result = rotation * result; //rotate
+            result = pivot + result; //bring back to world space
+
+            return result;
         }
     }
 }
