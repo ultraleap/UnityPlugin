@@ -316,7 +316,7 @@ namespace Leap.Unity
                     Bone serializedHandBone = serializedHand.Fingers[fingerNum].bones[boneNum];
 
                     // Get the user defined rotation threshold for the current bone (threshold is defined in the pose scriptable object)
-                    Vector2 jointRotationThresholds = GetBoneRotationThreshold(pose, fingerNum, boneNum);
+                    Vector2 jointRotationThresholds = GetBoneRotationThreshold(pose, fingerNum, boneNum-1); //i - 1 to ignore metacarpal
 
                     // Get hand rotation for both hands
                     Quaternion activeBoneRotation = activeHandBone.Rotation;
