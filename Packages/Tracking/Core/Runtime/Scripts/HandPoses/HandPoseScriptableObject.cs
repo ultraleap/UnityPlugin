@@ -100,7 +100,8 @@ namespace Leap.Unity
         /// E.g. Detection threshold is 15 degrees, so when the user gets within 15 degrees, detection will occur.
         /// Hysteresis threshold is 5 so the user need to move 20 degrees from the pose before the detection will drop.
         /// </summary>
-        [SerializeField]
+        [SerializeField, Tooltip("When a joint is within the rotation threshold, how many degrees away from the original threshold " +
+            "must the user move to stop the detection of each joint for the pose. This helps to avoid flickering detection when on the boundaries of thresholds")]
         private float _hysteresisThreshold = 5;
 
         public float GetHysteresisThreshold()

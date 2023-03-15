@@ -343,8 +343,8 @@ namespace Leap.Unity.HandsModule
                 fineTuningOptionsButtonLabel = "Show Fine Tuning Options";
             }
             EditorGUILayout.PropertyField(serializedObject.FindProperty("OnPoseDetected"));
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("OnPoseLost"));
             EditorGUILayout.PropertyField(serializedObject.FindProperty("WhilePoseDetected"));
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("OnPoseLost"));
 
             serializedObject.ApplyModifiedProperties();
         }

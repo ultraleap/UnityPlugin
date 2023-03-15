@@ -456,6 +456,11 @@ namespace Leap.Unity
             return allBonesInCorrectDirection;
         }
 
+        public bool IsPoseCurrentlyDetected()
+        {
+            return _poseAlreadyDetected;
+        }
+
         #region Helper Functions
         private static bool GetIsFacingObject(Vector3 bonePosition, Vector3 comparisonPosition, Vector3 boneDirection, float minAllowedDotProduct = 0.8F)
         {
