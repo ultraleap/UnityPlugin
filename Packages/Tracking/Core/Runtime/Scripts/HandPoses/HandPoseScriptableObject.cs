@@ -32,6 +32,12 @@ namespace Leap.Unity
     [CreateAssetMenu(fileName = "HandPose", menuName = "ScriptableObjects/HandPose")]
     public class HandPoseScriptableObject : ScriptableObject
     {
+        [System.Serializable]
+        public struct FingerJointThresholds
+        {
+            public Vector2[] jointThresholds;
+        }
+
         [HideInInspector]
         public bool DetectThumb = true;
         [HideInInspector]
@@ -51,48 +57,29 @@ namespace Leap.Unity
             return fingerIndexesToCheck;
         }
 
-        [SerializeField]
+        #region Finger Thresholds
+
+        [HideInInspector]
+        public float globalRotation = 15;
+
+        [HideInInspector]
+        public FingerJointThresholds[] fingerJointRotationThresholds = new FingerJointThresholds[5];
+
+        #endregion
+
+        [SerializeField, Attributes.Disable]
         private Hand serializedHand;
         public Hand GetSerializedHand()
         {
             return serializedHand;
         }
 
-        [SerializeField]
+        [SerializeField, Attributes.Disable]
         private Hand mirroredHand;
         public Hand GetMirroredHand()
         {
             return mirroredHand;
         }
-
-        #region Finger Thresholds
-
-        private static Vector2 defaultRotation = new Vector2(15, 15);
-
-        [HideInInspector]
-        public Vector2 globalRotation = new Vector2(15,15);
-        public List<Vector2>[] fingerRotationThresholds = new List<Vector2>[5];
-
-        [Header("Finger Rotational Thresholds")]
-        [SerializeField]
-        [NamedListAttribute(new string[] { "Proximal", "Intermediate", "Distal" })]
-        private List<Vector2> ThumbJointRotation = new List<Vector2>() { defaultRotation, defaultRotation, defaultRotation };
-
-        [SerializeField]
-        [NamedListAttribute(new string[] { "Proximal", "Intermediate", "Distal" })]
-        private List<Vector2> IndexJointRotation = new List<Vector2>() { defaultRotation, defaultRotation, defaultRotation };
-
-        [SerializeField]
-        [NamedListAttribute(new string[] { "Proximal", "Intermediate", "Distal" })]
-        private List<Vector2> MiddleJointRotation = new List<Vector2>() { defaultRotation, defaultRotation, defaultRotation };
-
-        [SerializeField]
-        [NamedListAttribute(new string[] { "Proximal", "Intermediate", "Distal" })]
-        private List<Vector2> RingJointRotation = new List<Vector2>() { defaultRotation, defaultRotation, defaultRotation };
-
-        [SerializeField]
-        [NamedListAttribute(new string[] { "Proximal", "Intermediate", "Distal" })]
-        private List<Vector2> PinkieJointRotation = new List<Vector2>() { defaultRotation, defaultRotation, defaultRotation };
 
         /// <summary>
         /// The distance a bone must move away from being detected before the pose is no longer enabled.
@@ -102,23 +89,24 @@ namespace Leap.Unity
         /// </summary>
         [SerializeField, Tooltip("When a joint is within the rotation threshold, how many degrees away from the original threshold " +
             "must the user move to stop the detection of each joint for the pose. This helps to avoid flickering detection when on the boundaries of thresholds")]
-        private float _hysteresisThreshold = 5;
+
+        [HideInInspector]
+        public float hysteresisThreshold = 5;
 
         public float GetHysteresisThreshold()
         {
-            return _hysteresisThreshold;
+            return hysteresisThreshold;
         }
-
-        #endregion
 
         public void SaveHandPose(Hand handToSerialise)
         {
             serializedHand = handToSerialise;
-            ApplyThresholds();
+            SetAllBoneThresholds(globalRotation, true);
         }
 
         void MirrorHand(ref Hand hand)
         {
+            mirroredHand = mirroredHand.CopyFrom(serializedHand);
             LeapTransform leapTransform = new LeapTransform(Vector3.zero, Quaternion.Euler(Vector3.zero));
             leapTransform.MirrorX();
             hand.Transform(leapTransform);
@@ -128,40 +116,20 @@ namespace Leap.Unity
 
         public Vector2 GetBoneRotationthreshold(int fingerNum, int boneNum)
         {
-            ApplyThresholds();
-
-            if (fingerRotationThresholds.Count() > 0)
+            if(fingerJointRotationThresholds.Length > 0)
             {
-                // if there is no metacarpal, reduce the index
-                if(fingerRotationThresholds[fingerNum].Count == 3)
-                {
-                    boneNum -= 1;
-                }
-
-                return fingerRotationThresholds[fingerNum].ElementAt(boneNum);
+                return fingerJointRotationThresholds[fingerNum].jointThresholds[boneNum];
             }
             else
             {
-                return new Vector3 ( 0f, 0f );
+                return Vector2.zero;
             }
-        }
-
-        private void ApplyThresholds()
-        {
-            fingerRotationThresholds[0] = ThumbJointRotation;
-            fingerRotationThresholds[1] = IndexJointRotation;
-            fingerRotationThresholds[2] = MiddleJointRotation;
-            fingerRotationThresholds[3] = RingJointRotation;
-            fingerRotationThresholds[4] = PinkieJointRotation;
         }
 
         private void OnValidate()
         {
-            mirroredHand = mirroredHand.CopyFrom(serializedHand);
             MirrorHand(ref mirroredHand);
-
             ApplyFingersToUse();
-            ApplyThresholds();
         }
 
         private void ApplyFingersToUse()
@@ -174,17 +142,34 @@ namespace Leap.Unity
             if (DetectPinky) { fingerIndexesToCheck.Add(4); }
         }
 
-        public void SetAllBoneThresholds(float threshold)
+        public void SetAllBoneThresholds(float threshold, bool forceAll = false)
         {
             Vector2 newRotation = new Vector2(threshold, threshold);
 
-            ThumbJointRotation = new List<Vector2>() { newRotation, newRotation, newRotation };
-            IndexJointRotation = new List<Vector2>() { newRotation, newRotation, newRotation };
-            MiddleJointRotation = new List<Vector2>() { newRotation, newRotation, newRotation };
-            RingJointRotation = new List<Vector2>() { newRotation, newRotation, newRotation };
-            PinkieJointRotation = new List<Vector2>() { newRotation, newRotation, newRotation };
+            for(int fingerIndex = 0; fingerIndex < fingerJointRotationThresholds.Length; fingerIndex++)
+            {
+                if (forceAll)
+                {
+                    fingerJointRotationThresholds[fingerIndex].jointThresholds = new Vector2[] { newRotation, newRotation, newRotation };
+                }
+                else
+                {
+                    for(int jointIndex = 0; jointIndex < fingerJointRotationThresholds[fingerIndex].jointThresholds.Length; jointIndex++)
+                    {
+                        if(fingerJointRotationThresholds[fingerIndex].jointThresholds[jointIndex].x == globalRotation)
+                        {
+                            fingerJointRotationThresholds[fingerIndex].jointThresholds[jointIndex].x = threshold;
+                        }
 
-            ApplyThresholds();
+                        if (fingerJointRotationThresholds[fingerIndex].jointThresholds[jointIndex].y == globalRotation)
+                        {
+                            fingerJointRotationThresholds[fingerIndex].jointThresholds[jointIndex].y = threshold;
+                        }
+                    }
+                }
+            }
+
+            globalRotation = threshold;
         }
     }
 }

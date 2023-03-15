@@ -56,29 +56,16 @@ namespace Leap.Unity.HandsModule
 
         public override void OnInspectorGUI()
         {
-            EditorGUILayout.LabelField("Angle of tolerance for pose");
-            _sliderHasChanged = false;
+            DrawFingerPointsEditor();
 
-            _boneThresholdSlider = target.globalRotation.x;
-            target.globalRotation.x =  EditorGUILayout.Slider(target.globalRotation.x, 0f, 90f);
+            DrawJointRotationThresholds();
 
-            if (_boneThresholdSlider != target.globalRotation.x)
-            {
-                _sliderHasChanged = true;
-                _boneThresholdSlider = target.globalRotation.x;
-            }
+            string hysterisisTooltp = "How many degrees away from the original threshold must the user move to " +
+                "stop the detection of each joint for the pose. This helps to avoid flickering detection when on the boundaries of thresholds";
 
-            HandPoseScriptableObject serializedObjectScript = (HandPoseScriptableObject)target;
-            if(_sliderHasChanged)
-            {
-                serializedObjectScript.SetAllBoneThresholds(target.globalRotation.x);
-            }
+            target.hysteresisThreshold = EditorGUILayout.FloatField(new GUIContent("Hysteresis Threshold:", hysterisisTooltp), target.hysteresisThreshold);
 
-            DrawAttachmentPointsEditor();
-
-            GUILayout.Space(15);
-
-            if (GUILayout.Button("Show Fine Tuning Options"))
+            if (GUILayout.Button("Show Extra Options"))
             {
                 _showFineTuningOptions = !_showFineTuningOptions;
             }
@@ -89,10 +76,137 @@ namespace Leap.Unity.HandsModule
             }
         }
 
-        private void DrawAttachmentPointsEditor()
+        private void DrawJointRotationThresholds()
+        {
+            string thresholdTooltip = "Rotation thresholds relate to how close in degrees the joint's rotation must be to the pose before it will be considered detected.";
+
+            GUILayout.Space(15);
+            EditorGUILayout.LabelField(new GUIContent("Finger Joint Rotation Thresholds", thresholdTooltip), EditorStyles.boldLabel);
+            EditorGUILayout.LabelField(new GUIContent("Global Joint Rotation Threshold", thresholdTooltip));
+
+            _sliderHasChanged = false;
+
+            _boneThresholdSlider = EditorGUILayout.Slider(target.globalRotation, 0f, 90f);
+
+            if (_boneThresholdSlider != target.globalRotation)
+            {
+                _sliderHasChanged = true;
+            }
+
+            if (_sliderHasChanged)
+            {
+                target.SetAllBoneThresholds(_boneThresholdSlider);
+            }
+
+            EditorGUILayout.LabelField("Key:");
+            EditorGUILayout.LabelField("Flex = Flexion/Curl, Abd = Abduction/Splay");
+
+            GUILayout.Space(5);
+
+            for (int fingerID = 0; fingerID < target.fingerJointRotationThresholds.Length; fingerID++)
+            {
+                if(!ShouldShowFinger(fingerID))
+                {
+                    continue;
+                }
+
+                EditorGUILayout.LabelField(new GUIContent(GetFingerName(fingerID) + " Joint Thresholds", thresholdTooltip), EditorStyles.boldLabel);
+
+                float labelWidth = EditorGUIUtility.labelWidth;
+
+                for (int jointID = 0; jointID < target.fingerJointRotationThresholds[fingerID].jointThresholds.Length; jointID++)
+                {
+                    if (jointID == 0)
+                    {
+                        EditorGUIUtility.labelWidth = 30;
+
+                        EditorGUILayout.BeginHorizontal();
+                        EditorGUILayout.LabelField(new GUIContent(GetJointName(jointID), thresholdTooltip), GUILayout.Width(120));
+                        GUILayout.FlexibleSpace();
+                        var flex = EditorGUILayout.FloatField(new GUIContent("Flex:", thresholdTooltip), target.fingerJointRotationThresholds[fingerID].jointThresholds[jointID].x, GUILayout.Width(80));
+                        var abd = EditorGUILayout.FloatField(new GUIContent("Abd:", thresholdTooltip), target.fingerJointRotationThresholds[fingerID].jointThresholds[jointID].y, GUILayout.Width(80));
+                        EditorGUILayout.EndHorizontal();
+
+                        target.fingerJointRotationThresholds[fingerID].jointThresholds[jointID] = new Vector2(flex, abd);
+                    }
+                    else
+                    {
+                        EditorGUIUtility.labelWidth = 30;
+
+                        EditorGUILayout.BeginHorizontal();
+                        EditorGUILayout.LabelField(new GUIContent(GetJointName(jointID), thresholdTooltip), GUILayout.Width(120));
+                        GUILayout.FlexibleSpace();
+                        var flex = EditorGUILayout.FloatField(new GUIContent("Flex:", thresholdTooltip), target.fingerJointRotationThresholds[fingerID].jointThresholds[jointID].x, GUILayout.Width(80));
+                        GUILayout.Space(83);
+                        EditorGUILayout.EndHorizontal();
+
+                        target.fingerJointRotationThresholds[fingerID].jointThresholds[jointID] = Vector2.one * flex;
+                    }
+                }
+
+                EditorGUIUtility.labelWidth = labelWidth;
+
+                GUILayout.Space(15);
+            }
+            GUILayout.Space(15);
+        }
+
+        string GetJointName(int jointID)
+        {
+            switch(jointID)
+            {
+                case 0:
+                    return "Proximal Joint";
+                case 1:
+                    return "Intermediate Joint";
+                case 2:
+                    return "Distal Joint";
+            }
+
+            return "Joint " + jointID;
+        }
+
+        string GetFingerName(int fingerID)
+        {
+            switch (fingerID)
+            {
+                case 0:
+                    return "Thumb";
+                case 1:
+                    return "Index";
+                case 2:
+                    return "Middle";
+                case 3:
+                    return "Ring";
+                case 4:
+                    return "Pinky";
+            }
+
+            return "Finger " + fingerID;
+        }
+
+        bool ShouldShowFinger(int fingerID)
+        {
+            switch (fingerID)
+            {
+                case 0:
+                    return target.DetectThumb;
+                case 1:
+                    return target.DetectIndex;
+                case 2:
+                    return target.DetectMiddle;
+                case 3:
+                    return target.DetectRing;
+                case 4:
+                    return target.DetectPinky;
+            }
+
+            return true;
+        }
+
+        private void DrawFingerPointsEditor()
         {
             // Set up the draw rect space based on the image and available editor space.
-            EditorGUILayout.Space();
             EditorGUILayout.LabelField("Fingers to detect", EditorStyles.boldLabel);
 
             _handTexRect = EditorGUILayout.BeginVertical(GUILayout.MinWidth(EditorGUIUtility.currentViewWidth),
