@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
+using static Leap.Unity.HandPoseDetector;
 using static UnityEngine.GraphicsBuffer;
 
 
@@ -209,6 +210,7 @@ namespace Leap.Unity.HandsModule
         private void DrawFingerPointsEditor()
         {
             // Set up the draw rect space based on the image and available editor space.
+            EditorGUILayout.Space();
             EditorGUILayout.LabelField("Fingers to detect", EditorStyles.boldLabel);
 
             _handTexRect = EditorGUILayout.BeginVertical(GUILayout.MinWidth(EditorGUIUtility.currentViewWidth),
@@ -273,6 +275,29 @@ namespace Leap.Unity.HandsModule
         bool _showFineTuningOptions = false;
         string fineTuningOptionsButtonLabel = "Show Fine Tuning Options";
 
+        private enum FingerName
+        {
+            Thumb = 0,
+            Index = 1,
+            Middle = 2,
+            Ring = 3,
+            Pinky = 4,
+            Palm = 5
+        }
+        FingerName fingerName = FingerName.Index;
+        private enum BoneName
+        {
+            Proximal = 1,
+            Intermediate = 2,
+            Distal = 3
+        }
+        BoneName boneName = BoneName.Distal;
+
+        List<bool> directionFoldOuts = new List<bool>();
+        List<Vector2> scrollBarProgress = new List<Vector2>();
+
+        
+
         public override void OnInspectorGUI()
         {
             EditorGUI.BeginDisabledGroup(true);
@@ -290,7 +315,160 @@ namespace Leap.Unity.HandsModule
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("ChiralityToCheck"));
             }
 
+            GUILayout.Space(15);
+            EditorGUILayout.BeginHorizontal();
+            GUILayout.FlexibleSpace();
+            if (GUILayout.Button("Add a new rule", GUILayout.Width(Screen.width /2), GUILayout.Height(40)))
+            {
+                directionFoldOuts.Add(true);
+                poseDetectionScript.CreateDirectionSource();
+            }
+            GUILayout.FlexibleSpace();
+            EditorGUILayout.EndHorizontal();
 
+            GUILayout.Space(10);
+
+            var sources = serializedObject.FindProperty("Sources");
+
+            #region boneDirectionTargets 
+
+            var rect = EditorGUILayout.GetControlRect(false, GUILayout.Height(2), GUILayout.Width(Screen.width));
+            EditorGUI.DrawRect(rect, Color.grey);
+
+            for (int i = 0; i < sources.arraySize; i++)
+            {
+
+                var headerRect = EditorGUILayout.GetControlRect(false, GUILayout.Height(35), GUILayout.Width(Screen.width));
+                EditorGUI.DrawRect(headerRect, new Color(0.1f, 0.1f, 0.1f));
+
+                GUI.Label(headerRect, "Rules for " + fingerName.ToString());
+                GUILayout.BeginVertical("box");
+                EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.LabelField("Finger/Palm: ");
+                //GUILayout.FlexibleSpace();
+
+                var source = sources.GetArrayElementAtIndex(i);
+
+                fingerName = (FingerName)source.FindPropertyRelative("finger").intValue;
+                source.FindPropertyRelative("finger").intValue = (int)(FingerName)EditorGUILayout.EnumPopup(fingerName);
+
+
+
+
+
+                int boneNumber = (int)boneName;
+                EditorGUILayout.EndHorizontal();
+
+                EditorGUILayout.Space(10);
+                //if (fingerNumber != 5)
+                //{
+                //    EditorGUILayout.BeginHorizontal();
+                //    EditorGUILayout.LabelField("Bone: ");
+                //    boneName = (BoneName)EditorGUILayout.EnumPopup(boneName);
+                //    boneNumber = (int)boneName;
+                //    EditorGUILayout.EndHorizontal();
+                //}
+                if (GUILayout.Button("Add Target", GUILayout.Width(Screen.width * 0.2f), GUILayout.Height(20)))
+                {
+                    directionFoldOuts.Add(true);
+                    scrollBarProgress.Add(new Vector2(0,0));
+                    poseDetectionScript.CreateSourceDirection(i);
+                }
+
+                var directionList = source.FindPropertyRelative("direction");
+
+                if (directionFoldOuts.Count != sources.arraySize)
+                {
+                    directionFoldOuts.Clear();
+                    for (int k = 0; k < sources.arraySize; k++)
+                    {
+                        directionFoldOuts.Add(true);
+                        scrollBarProgress.Add(new Vector2(0, 0));
+                    }
+                }
+                EditorGUI.indentLevel = 1;
+
+                GUIStyle style = GUI.skin.box;
+                style.border = new RectOffset(5, 5, 5, 5);
+                style.padding = new RectOffset(15, 15, 15, 15);
+                GUILayout.BeginVertical(style);
+                directionFoldOuts[i] = EditorGUILayout.BeginFoldoutHeaderGroup(directionFoldOuts.ElementAt(i), "Directions");
+                if (directionFoldOuts.ElementAt(i))
+                {
+
+                    scrollBarProgress[i] = EditorGUILayout.BeginScrollView(scrollBarProgress[i], GUILayout.Width(Screen.width - 100), GUILayout.Height(Mathf.Min(500, directionList.arraySize * 110)));
+                    for (int j = 0; j < directionList.arraySize; j++)
+                    {
+                        EditorGUI.indentLevel = 2;
+                        var direction = directionList.GetArrayElementAtIndex(j);
+
+                        direction.FindPropertyRelative("enabled").boolValue = EditorGUILayout.BeginToggleGroup("Toggle: " +
+                            direction.FindPropertyRelative("typeOfDirectionCheck").enumNames.GetValue(direction.FindPropertyRelative("typeOfDirectionCheck").enumValueIndex) +
+                            " Direction " + " " + j.ToString(), direction.FindPropertyRelative("enabled").boolValue);
+
+                        //source.FindPropertyRelative("finger").enumValueIndex = fingerNumber;
+                        source.FindPropertyRelative("bone").intValue = boneNumber;
+                        
+                        EditorGUI.indentLevel = 3;
+                        
+                        EditorGUILayout.PropertyField(direction.FindPropertyRelative("typeOfDirectionCheck"));
+
+                        switch (direction.FindPropertyRelative("typeOfDirectionCheck").enumValueIndex)
+                        {
+                            case 0: //OBJECT
+                                {
+                                    EditorGUILayout.PropertyField(direction.FindPropertyRelative("poseTarget"));
+                                    break;
+                                }
+                            case 1: //WORLD
+                                {
+                                    EditorGUILayout.PropertyField(direction.FindPropertyRelative("axisToFace"));
+                                    break;
+                                }
+                            case 2: //CAMERALOCAL
+                                {
+                                    EditorGUILayout.PropertyField(direction.FindPropertyRelative("axisToFace"));
+                                    break;
+                                }
+                        }
+
+                        EditorGUILayout.PropertyField(direction.FindPropertyRelative("rotationThreshold"));
+                        EditorGUILayout.EndToggleGroup();
+
+                        if (GUILayout.Button("Remove Target", GUILayout.Width(Screen.width * 0.2f), GUILayout.Height(20)))
+                        {
+                            directionFoldOuts.RemoveAt(i);
+                            scrollBarProgress.RemoveAt(i);
+                            poseDetectionScript.RemoveDirection(i, j);
+                        }
+                    }
+                    EditorGUILayout.EndScrollView();
+                }
+                EditorGUILayout.EndFoldoutHeaderGroup();
+                GUILayout.EndVertical();
+                GUILayout.EndVertical();
+
+                EditorGUILayout.BeginHorizontal();
+                GUILayout.FlexibleSpace();
+                if (GUILayout.Button("Remove Direction", GUILayout.Width(Screen.width * 0.2f), GUILayout.Height(20)))
+                {
+                    poseDetectionScript.RemoveSource(i);
+                }
+                EditorGUILayout.EndHorizontal();
+                GUILayout.Space(30);
+
+                var r = EditorGUILayout.GetControlRect(false, GUILayout.Height(2), GUILayout.Width(Screen.width));
+                EditorGUI.DrawRect(r, Color.grey);
+
+            }
+
+
+
+            #endregion
+
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("OnPoseDetected"));
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("WhilePoseDetected"));
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("OnPoseLost"));
 
             if (GUILayout.Button(fineTuningOptionsButtonLabel))
             {
@@ -301,76 +479,12 @@ namespace Leap.Unity.HandsModule
             {
                 fineTuningOptionsButtonLabel = "Hide Fine Tuning Options";
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("_leapProvider"));
-
-                if (GUILayout.Button("Add Bone Direction Target"))
-                {
-                    poseDetectionScript.CreateDefaultFingerDirection();
-                }
-
-                GUILayout.Space(10);
-
-                var boneDirectionTargets = serializedObject.FindProperty("BoneDirectionTargets");
-
-                #region boneDirectionTargets 
-                scrollPosition = EditorGUILayout.BeginScrollView(scrollPosition, GUILayout.Width(Screen.width-20), GUILayout.Height(Mathf.Min(500, boneDirectionTargets.arraySize * 180)));
-
-                
-
-                for (int i = 0; i < boneDirectionTargets.arraySize; i++)
-                {
-                    var boneDirectionTarget = boneDirectionTargets.GetArrayElementAtIndex(i);
-                    boneDirectionTarget.FindPropertyRelative("enabled").boolValue = EditorGUILayout.BeginToggleGroup("Toggle: "+ 
-                        boneDirectionTarget.FindPropertyRelative("typeOfDirectionCheck").enumNames.GetValue(boneDirectionTarget.FindPropertyRelative("typeOfDirectionCheck").enumValueIndex) +
-                        " Direction " + " " + i.ToString(), boneDirectionTarget.FindPropertyRelative("enabled").boolValue);
-
-                    EditorGUILayout.PropertyField(boneDirectionTarget.FindPropertyRelative("typeOfDirectionCheck"));
-
-                    switch (boneDirectionTarget.FindPropertyRelative("typeOfDirectionCheck").enumValueIndex)
-                    {
-                        case 0: //OBJECT
-                            {
-                                EditorGUILayout.PropertyField(boneDirectionTarget.FindPropertyRelative("poseTarget"));
-                                break;
-                            }
-                        case 1: //WORLD
-                            {
-                                EditorGUILayout.PropertyField(boneDirectionTarget.FindPropertyRelative("axisToFace"));
-                                break;
-                            }
-                        case 2: //CAMERALOCAL
-                            {
-                                EditorGUILayout.PropertyField(boneDirectionTarget.FindPropertyRelative("axisToFace"));
-                                break;
-                            }
-                    }
-
-                    EditorGUILayout.PropertyField(boneDirectionTarget.FindPropertyRelative("isPalmDirection"));
-                    if (!boneDirectionTarget.FindPropertyRelative("isPalmDirection").boolValue)
-                    { 
-                        EditorGUILayout.PropertyField(boneDirectionTarget.FindPropertyRelative("fingerTypeForPoint"));
-                        EditorGUILayout.PropertyField(boneDirectionTarget.FindPropertyRelative("boneForPoint"));
-
-                    }
-                    EditorGUILayout.PropertyField(boneDirectionTarget.FindPropertyRelative("rotationThreshold"));
-
-                    EditorGUILayout.EndToggleGroup();
-
-                    if (GUILayout.Button("Remove", GUILayout.Width(Screen.width * 0.2f), GUILayout.Height(20)))
-                    {
-                        poseDetectionScript.RemoveDefaultFingerDirection(i);
-                    }
-                }
-                EditorGUILayout.EndScrollView();
-                #endregion
-
             }
             else
             {
                 fineTuningOptionsButtonLabel = "Show Fine Tuning Options";
             }
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("OnPoseDetected"));
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("WhilePoseDetected"));
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("OnPoseLost"));
+
 
             serializedObject.ApplyModifiedProperties();
         }

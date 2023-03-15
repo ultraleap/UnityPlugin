@@ -1,5 +1,7 @@
+using Leap.Unity.Attributes;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -42,6 +44,13 @@ namespace Leap.Unity
         /// Gives us the pose which has been detected.
         /// </summary>
         private HandPoseScriptableObject _detectedPose = null;
+        /// <summary>
+        /// did all of the bone directions match last frame? (For hysteresis)
+        /// </summary>
+        private bool _directionTargetsMatchedLastFrame = false;
+
+
+        private bool cacheValidationData = false;
 
         public PoseDetectionEvents OnPoseDetected;
         public PoseDetectionEvents WhilePoseDetected;
@@ -78,6 +87,11 @@ namespace Leap.Unity
             _posesToDetect = posesToDetect;
         }
 
+        public void EnablePoseCaching()
+        {
+            cacheValidationData = true;
+        }
+
         #region poseDirectionVariables
         /// <summary>
         /// What type of directionality is this check? e.g. pointing towards and object or a world direction.
@@ -112,44 +126,77 @@ namespace Leap.Unity
         /// E.g. if the user needs to point at an object with their index finger for the pose to be considered detected"
         /// </summary>
         [SerializeField]
-        public List<FingerDirection> BoneDirectionTargets;
+        public List<DirectionSource> Sources;
+        //public List<FingerDirection> BoneDirectionTargets;
 
+        [Serializable]
+        public struct DirectionSource
+        {
+            public bool enabled;
+            public int finger;
+            public int bone;
+            public List<SourceDirection> direction;
+        }
         /// <summary>
         /// Holds information about different fingers, bones and their directional targets.
         /// </summary>
         [Serializable]
-        public struct FingerDirection
+        public struct SourceDirection
         {
             public bool enabled;
             public TypeOfDirectionCheck typeOfDirectionCheck;
             public bool isPalmDirection;
             public Transform poseTarget;
             public AxisToFace axisToFace;
-            public Finger.FingerType fingerTypeForPoint;
-            public Bone.BoneType boneForPoint;
             public float rotationThreshold;
         }
-        #endregion
+        
 
-        public void CreateDefaultFingerDirection()
+        public void CreateDirectionSource()
         {
-            FingerDirection fingerDirection= new FingerDirection();
+            DirectionSource directionSource = new DirectionSource();
+            directionSource.enabled = true;
+            directionSource.finger = (int)Finger.FingerType.TYPE_INDEX;
+            directionSource.bone = (int)Bone.BoneType.TYPE_DISTAL;
+            directionSource.direction = new List<SourceDirection>();
+
+            SourceDirection sourceDirection = new SourceDirection();
+
+            sourceDirection.typeOfDirectionCheck = TypeOfDirectionCheck.CAMERALOCAL;
+            sourceDirection.isPalmDirection = false;
+            sourceDirection.poseTarget = null;
+            sourceDirection.axisToFace = AxisToFace.Forward;
+            sourceDirection.rotationThreshold = 15;
+            sourceDirection.enabled = true;
+
+            directionSource.direction.Add(sourceDirection);
+            Sources.Add(directionSource);
+        }
+
+        public void CreateSourceDirection(int sourceIndex)
+        {
+            SourceDirection fingerDirection = new SourceDirection();
             fingerDirection.typeOfDirectionCheck = TypeOfDirectionCheck.CAMERALOCAL;
             fingerDirection.isPalmDirection = false;
             fingerDirection.poseTarget = null;
             fingerDirection.axisToFace = AxisToFace.Forward;
-            fingerDirection.fingerTypeForPoint = Finger.FingerType.TYPE_INDEX;
-            fingerDirection.boneForPoint = Bone.BoneType.TYPE_DISTAL;
             fingerDirection.rotationThreshold = 15;
             fingerDirection.enabled = true;
 
-            BoneDirectionTargets.Add(fingerDirection);
+            Sources.ElementAt(sourceIndex).direction.Add(fingerDirection);
         }
-        public void RemoveDefaultFingerDirection(int index)
+        
+        public void RemoveSource(int index)
         {
-            BoneDirectionTargets.RemoveAt(index);
+            Sources.RemoveAt(index);
+        }
+        public void RemoveDirection(int sourceIndex, int directionIndex)
+        {
+            Sources[sourceIndex].direction.RemoveAt(directionIndex);
         }
 
+
+        #endregion
 
         /// <summary>
         /// This function determines whether a pose is currently detected or not.
@@ -192,11 +239,10 @@ namespace Leap.Unity
             }
         }
 
+
+
         private bool CompareAllHandsAndPoses()
         {
-            // If the user hasnt specified the hands to detect, check all Hand Model Bases.
-            // This will only do this once unless manually cleared.
-
             _validationDatas.Clear();
             foreach (var activePlayerHand in _leapProvider.CurrentFrame.Hands)
             {
@@ -218,11 +264,14 @@ namespace Leap.Unity
 
         private bool ComparePoseToHand(HandPoseScriptableObject pose, Hand activePlayerHand)
         {
-            
+
             // Check any finger directions set up in the pose detector
-            if (CheckPoseDirection(pose, activePlayerHand) == false) 
+            if (Sources.Count > 0)
             {
-                return false; 
+                if (CheckPoseDirection(pose, activePlayerHand) == false)
+                {
+                    return false;
+                }
             }
             
             Hand serializedHand = pose.GetSerializedHand();
@@ -267,7 +316,7 @@ namespace Leap.Unity
                     Bone serializedHandBone = serializedHand.Fingers[fingerNum].bones[boneNum];
 
                     // Get the user defined rotation threshold for the current bone (threshold is defined in the pose scriptable object)
-                    Vector2 jointRotationThresholds = GetBoneRotationThreshold(pose, fingerNum, boneNum);
+                    Vector2 jointRotationThresholds = GetBoneRotationThreshold(pose, fingerNum, boneNum-1); //i - 1 to ignore metacarpal
 
                     // Get hand rotation for both hands
                     Quaternion activeBoneRotation = activeHandBone.Rotation;
@@ -305,7 +354,11 @@ namespace Leap.Unity
                         }
                     }
 
-                    _validationDatas.Add(new ValidationData(serializedHand.GetChirality(), fingerNum, boneNum, boneMatched));
+                    if(cacheValidationData)
+                    {
+                        _validationDatas.Add(new ValidationData(serializedHand.GetChirality(), fingerNum, boneNum, boneMatched));
+                    }
+
                 }
 
                 if(numMatchedBones >= 3)
@@ -321,52 +374,72 @@ namespace Leap.Unity
             return false;
         }
 
+
         private bool CheckPoseDirection(HandPoseScriptableObject pose, Hand activePlayerHand)
         {
             bool allBonesInCorrectDirection = true;
-            if (BoneDirectionTargets.Count > 0)
+            foreach (var source in Sources)
             {
-                foreach (var boneDirectionTarget in BoneDirectionTargets)
+                bool oneDirectionCorrectInSource = false;
+                if(source.direction.Count <= 0) 
                 {
-                    if (boneDirectionTarget.enabled == true)
+                    oneDirectionCorrectInSource = true;
+                }
+                foreach (var direction in source.direction)
+                {
+                    if (direction.enabled == true)
                     {
                         Vector3 pointDirection;
                         Vector3 pointPosition;
 
-                        if (boneDirectionTarget.isPalmDirection)
+                        if ((int)source.finger == 5)
                         {
                             pointDirection = activePlayerHand.PalmNormal.normalized;
                             pointPosition = activePlayerHand.PalmPosition;
                         }
                         else
                         {
-                            pointDirection = activePlayerHand.Fingers[(int)boneDirectionTarget.fingerTypeForPoint].Bone(boneDirectionTarget.boneForPoint).Direction.normalized;
-                            pointPosition = activePlayerHand.Fingers[(int)boneDirectionTarget.fingerTypeForPoint].Bone(boneDirectionTarget.boneForPoint).NextJoint;
+                            pointDirection = activePlayerHand.Fingers[(int)source.finger].bones[source.bone].Direction.normalized;
+                            pointPosition = activePlayerHand.Fingers[(int)source.finger].bones[source.bone].NextJoint;
                         }
-                        switch (boneDirectionTarget.typeOfDirectionCheck)
+                        float hysteresisToAdd = 0;
+
+                        switch (direction.typeOfDirectionCheck)
                         {
                             case TypeOfDirectionCheck.OBJECT:
                                 {
-                                    if (!GetIsFacingObject(pointPosition, boneDirectionTarget.poseTarget.position, pointDirection))
+                                    if (_directionTargetsMatchedLastFrame)
                                     {
-                                        allBonesInCorrectDirection = false;
+                                        hysteresisToAdd = -0.03f;
+                                    }
+                                    if (GetIsFacingObject(pointPosition, direction.poseTarget.position, pointDirection, 0.8f + hysteresisToAdd))
+                                    {
+                                        oneDirectionCorrectInSource = true;
                                     }
                                     break;
                                 }
                             case TypeOfDirectionCheck.WORLD:
                                 {
-                                    if (!GetIsFacingDirection(pointDirection, GetAxis(boneDirectionTarget.axisToFace), boneDirectionTarget.rotationThreshold))
+                                    if (_directionTargetsMatchedLastFrame)
                                     {
-                                        allBonesInCorrectDirection = false;
+                                        hysteresisToAdd = 5f;
+                                    }
+                                    if (GetIsFacingDirection(pointDirection, GetAxis(direction.axisToFace), direction.rotationThreshold + hysteresisToAdd))
+                                    {
+                                        oneDirectionCorrectInSource = true;
                                     }
                                     break;
                                 }
                             case TypeOfDirectionCheck.CAMERALOCAL:
                                 {
-                                    if (!GetIsFacingDirection(pointDirection,
-                                        (Camera.main.transform.rotation.normalized * GetAxis(boneDirectionTarget.axisToFace).normalized).normalized, boneDirectionTarget.rotationThreshold))
+                                    if (_directionTargetsMatchedLastFrame)
                                     {
-                                        allBonesInCorrectDirection = false;
+                                        hysteresisToAdd = 5f;
+                                    }
+                                    if (GetIsFacingDirection(pointDirection,
+                                        (Camera.main.transform.rotation.normalized * GetAxis(direction.axisToFace).normalized).normalized, direction.rotationThreshold + hysteresisToAdd))
+                                    {
+                                        oneDirectionCorrectInSource = true;
                                     }
                                     break;
                                 }
@@ -374,13 +447,13 @@ namespace Leap.Unity
                     }
 
                 }
-                return allBonesInCorrectDirection;
-
+                if(oneDirectionCorrectInSource == false)
+                {
+                    allBonesInCorrectDirection = false;
+                }
             }
-            else
-            {
-                return true;
-            }
+            _directionTargetsMatchedLastFrame = allBonesInCorrectDirection;
+            return allBonesInCorrectDirection;
         }
 
         public bool IsPoseCurrentlyDetected()
