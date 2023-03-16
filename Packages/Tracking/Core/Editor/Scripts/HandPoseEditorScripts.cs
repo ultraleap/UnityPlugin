@@ -34,7 +34,7 @@ namespace Leap.Unity.HandsModule
 
             if (GUILayout.Button("Save Current Hand Pose"))
             {
-                poseRecorderScript.StartSaveCountdown();
+                poseRecorderScript.SaveCurrentHandPose();
             }
         }
     }

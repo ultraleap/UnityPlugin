@@ -80,6 +80,12 @@ namespace Leap
             CreatePrefab("SkeletonHands");
         }
 
+        [MenuItem("GameObject/Ultraleap/Hands/Attachment Hands", false, 26)]
+        public static void CreateAttachmentHands()
+        {
+            CreatePrefab("Attachment Hands");
+        }
+
         public static void CreatePrefab(string prefabName)
         {
             var guids = AssetDatabase.FindAssets(prefabName);
@@ -91,7 +97,7 @@ namespace Leap
 
                 string[] assetPathSplit = assetPath.Split('/', '\\', '.');
 
-                if (assetPathSplit[assetPathSplit.Length - 2] == prefabName)
+                if (assetPathSplit[assetPathSplit.Length - 2] == prefabName && assetPathSplit[assetPathSplit.Length - 1] == "prefab")
                 {
                     GameObject newObject = (GameObject)AssetDatabase.LoadAssetAtPath(assetPath, typeof(GameObject));
 

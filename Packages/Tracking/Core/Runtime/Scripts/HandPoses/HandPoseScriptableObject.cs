@@ -101,16 +101,18 @@ namespace Leap.Unity
         public void SaveHandPose(Hand handToSerialise)
         {
             serializedHand = handToSerialise;
+            MirrorHand(handToSerialise);
             SetAllBoneThresholds(globalRotation, true);
         }
 
-        void MirrorHand(ref Hand hand)
+        void MirrorHand(Hand handSource)
         {
-            mirroredHand = mirroredHand.CopyFrom(serializedHand);
+            mirroredHand = new Hand();
+            mirroredHand = mirroredHand.CopyFrom(handSource);
             LeapTransform leapTransform = new LeapTransform(Vector3.zero, Quaternion.Euler(Vector3.zero));
             leapTransform.MirrorX();
-            hand.Transform(leapTransform);
-            hand.IsLeft = !hand.IsLeft;
+            mirroredHand.Transform(leapTransform);
+            mirroredHand.IsLeft = !mirroredHand.IsLeft;
             return;
         }
 
@@ -128,7 +130,7 @@ namespace Leap.Unity
 
         private void OnValidate()
         {
-            MirrorHand(ref mirroredHand);
+            MirrorHand(serializedHand);
             ApplyFingersToUse();
         }
 
