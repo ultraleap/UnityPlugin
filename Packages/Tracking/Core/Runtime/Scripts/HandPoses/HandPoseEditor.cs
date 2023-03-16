@@ -75,27 +75,21 @@ namespace Leap.Unity
             mirroredHand.CopyFrom(handPose.GetMirroredHand());
 
             Vector3 handPosition = Camera.main.transform.position + (Camera.main.transform.forward * 0.5f);
-            Quaternion handRotation = posedHand.Rotation;
 
             if (handsLocation != null)
             {
-                handPosition = handsLocation.position; 
-                handRotation = handsLocation.rotation;
+                handPosition = handsLocation.position;
             }
 
             if(posedHand.IsLeft)
             {
-                posedHand.SetTransform((handPosition + new Vector3(-0.15f, 0, 0)), handRotation);
+                posedHand.SetTransform((handPosition + new Vector3(-0.15f, 0, 0)), posedHand.Rotation);
                 mirroredHand.SetTransform((handPosition + new Vector3(0.15f, 0, 0)), mirroredHand.Rotation);
-
-                mirroredHand.IsLeft = false;
             }
             else
             {
-                posedHand.SetTransform((handPosition + new Vector3(0.15f, 0, 0)), handRotation);
+                posedHand.SetTransform((handPosition + new Vector3(0.15f, 0, 0)), posedHand.Rotation);
                 mirroredHand.SetTransform((handPosition + new Vector3(-0.15f, 0, 0)), mirroredHand.Rotation);
-
-                mirroredHand.IsLeft = true;
             }
 
             currentHandsAndPosedObjects.Add(new Tuple<Hand, HandPoseScriptableObject>(posedHand, handPose));
