@@ -655,13 +655,31 @@ namespace Leap.Unity.Interaction
 
             if (preferredAnchor != null)
             {
-                _preferredAnchor = preferredAnchor;
-                anchor = preferredAnchor;
-                isAttached = true;
+                AttachToNearestAnchor(preferredAnchor);
                 return true;
             }
 
             return false;
+        }
+
+        public void AttachToNearestAnchor()
+        {
+            AttachToNearestAnchor(null);
+        }
+
+        private void AttachToNearestAnchor(Anchor preferredAnchor)
+        {
+            if (preferredAnchor == null)
+            {
+                preferredAnchor = FindPreferredAnchor();
+            }
+
+            if (preferredAnchor != null)
+            {
+                _preferredAnchor = preferredAnchor;
+                anchor = preferredAnchor;
+                isAttached = true;
+            }
         }
 
         /// <summary> Score an anchor based on its proximity and this object's trajectory relative to it. </summary>

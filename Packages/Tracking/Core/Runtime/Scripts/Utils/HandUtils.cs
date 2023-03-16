@@ -390,6 +390,20 @@ namespace Leap.Unity
         }
 
         /// <summary>
+        /// Returns the distance between the tip of the finger and the tip of the thumb.
+        /// Finger 0 (thumb) will always return float.MaxValue.
+        /// </summary>
+        public static float GetFingerPinchDistance(this Hand hand, int finger)
+        {
+            if(hand == null || finger == 0)
+            {
+                return float.MaxValue;
+            }
+
+            return Vector3.Distance(hand.Fingers[0].TipPosition, hand.Fingers[finger].TipPosition);
+        }
+
+        /// <summary>
         /// Returns the Chirality of the hand
         /// </summary>
         public static Chirality GetChirality(this Hand hand)

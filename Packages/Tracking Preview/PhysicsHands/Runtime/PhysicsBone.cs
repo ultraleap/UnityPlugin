@@ -30,10 +30,10 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
         [SerializeField, HideInInspector]
         private ArticulationBody _body;
-        [SerializeField, HideInInspector]
-        private float _origXDriveLimit = float.MaxValue, _currentXDriveLimit = float.MaxValue;
-        public float OriginalXDriveLimit => _origXDriveLimit;
-        public float XDriveLimit => _currentXDriveLimit;
+
+        private float _origXDriveLower = float.MinValue, _origXDriveUpper = float.MaxValue;
+        public float OriginalXDriveLower => _origXDriveLower;
+        public float OriginalXDriveUpper => _origXDriveUpper;
 
         public int Finger => _finger;
         [SerializeField, HideInInspector]
@@ -43,8 +43,32 @@ namespace Leap.Unity.Interaction.PhysicsHands
         [SerializeField, HideInInspector]
         private int _joint;
 
+        /// <summary>
+        /// Reports whether any object is near to the bone
+        /// </summary>
+        public bool IsObjectNearBone => _isObjectNearBone;
+        /// <summary>
+        /// Reports whether any of the currently grasped objects are near to the bone
+        /// </summary>
+        public bool IsGraspedObjectNearBone => _isGraspedObjectNearBone;
+
+        private bool _isObjectNearBone = false, _isGraspedObjectNearBone = false;
+
+        /// <summary>
+        /// Will report float.MaxValue if IsObjectNearBone is false
+        /// </summary>
+        public float ObjectDistance => _objectDistance;
+        /// <summary>
+        /// Will report float.MaxValue if IsGraspedObjectNearBone is false
+        /// </summary>
+        public float GraspedObjectDistance => _graspedObjectDistance;
+        private float _objectDistance = -1f, _graspedObjectDistance = -1f;
+
         public Collider Collider => _collider;
         private Collider _collider;
+
+        private RaycastHit[] _rayCache = new RaycastHit[6];
+        private Ray _graspRay = new Ray();
 
         public bool IsContacting
         {
@@ -61,7 +85,6 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 return _graspingObjects.Count > 0;
             }
         }
-
 
         public void Awake()
         {
@@ -85,7 +108,8 @@ namespace Leap.Unity.Interaction.PhysicsHands
             }
             if (_body != null)
             {
-                _origXDriveLimit = _body.xDrive.upperLimit;
+                _origXDriveLower = _body.xDrive.lowerLimit;
+                _origXDriveUpper = _body.xDrive.upperLimit;
             }
         }
 
@@ -101,16 +125,128 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
         public void AddGrasping(Rigidbody rigid)
         {
-            if (_graspingObjects.Count == 0 && _body != null && _body.jointPosition.dofCount > 0)
-            {
-                _currentXDriveLimit = _body.jointPosition[0] * Mathf.Rad2Deg;
-            }
             _graspingObjects.Add(rigid);
         }
 
         public void RemoveGrasping(Rigidbody rigid)
         {
             _graspingObjects.Remove(rigid);
+        }
+
+        public void UpdateBoneDistances()
+        {
+            _objectDistance = float.MaxValue;
+            _graspedObjectDistance = float.MaxValue;
+            _isObjectNearBone = false;
+            _isGraspedObjectNearBone = false;
+
+            float height, radius;
+
+            if (Finger == 5)
+            {
+                BoxCollider palm = (BoxCollider)_collider;
+                height = palm.size.z;
+                radius = palm.size.y / 2f;
+            }
+            else
+            {
+                CapsuleCollider capsule = (CapsuleCollider)_collider;
+                height = capsule.height;
+                radius = capsule.radius;
+            }
+
+            // Move forward from center by 25% of the finger so that we're not off the very tip
+            Vector3 position = _collider.bounds.center + transform.rotation * new Vector3(0, 0, height * .25f);
+
+            // If we're on the thumb we want to tilt slightly towards the other fingers
+            Vector3 upDirection = Finger == 0 ? Vector3.Lerp(-transform.up, _hand.Handedness == Chirality.Left ? -transform.right : transform.right, 0.3f) :
+                Vector3.Lerp(-transform.up, _hand.Handedness == Chirality.Left ? transform.right : -transform.right, 0.1f);
+
+            CalculateJointDistance(position, upDirection, radius, height * 2f, true);
+
+            if (Joint == 2)
+            {
+                // Run a second test pointing forward a bit for the tip
+                CalculateJointDistance(position + transform.rotation * new Vector3(0, radius * .2f, height * .15f), Vector3.Lerp(upDirection, transform.forward, 0.6f), radius, height * 2f);
+            }
+
+            if (Joint > 0)
+            {
+                // Second set of distance checks closer to the center of the bone
+                CalculateJointDistance(_collider.bounds.center + transform.rotation * new Vector3(0, 0, -height * .15f), upDirection, radius, height * 2f);
+            }
+
+            if (Finger == 0)
+            {
+                // Thumb distances closer towards the object, pointing down a bit
+                Vector3 direction = Vector3.Lerp(-transform.up, _hand.Handedness == Chirality.Left ? transform.right : -transform.right, 0.6f);
+                position = _collider.bounds.center + transform.rotation * new Vector3(0, 0, height * .25f);
+                CalculateJointDistance(position, direction, radius, height * 2f, debug: true);
+            }
+        }
+
+        private void CalculateJointDistance(Vector3 origin, Vector3 direction, float radius, float length, bool forceUpdate = false, bool debug = false)
+        {
+            DistanceCalculation(origin, direction, radius, length, out bool anyFound, out float objectDistance, out bool graspFound, out float graspDistance);
+
+            if (anyFound)
+            {
+                _isObjectNearBone = true;
+                if (objectDistance < _objectDistance || forceUpdate)
+                {
+                    _objectDistance = objectDistance;
+                }
+                Debug.DrawLine(origin, origin + (direction * _objectDistance), Color.yellow, Time.fixedDeltaTime);
+            }
+
+            if (graspFound)
+            {
+                _isGraspedObjectNearBone = true;
+                if (graspDistance < _graspedObjectDistance || forceUpdate)
+                {
+                    _graspedObjectDistance = graspDistance;
+                }
+            }
+        }
+
+        private void DistanceCalculation(Vector3 origin, Vector3 direction, float radius, float length, out bool anyFound, out float anyDistance, out bool graspFound, out float graspDistance)
+        {
+            anyDistance = 0f;
+            graspDistance = 0f;
+
+            _graspRay.origin = origin;
+            _graspRay.direction = direction;
+
+            // Using a sphere cast here will result in more reliable contact checks
+            int cols = Physics.SphereCastNonAlloc(_graspRay, radius, _rayCache, length, _hand.Provider.InteractionMask, QueryTriggerInteraction.Ignore);
+
+            anyFound = false;
+            graspFound = false;
+
+            for (int i = 0; i < cols; i++)
+            {
+                if (!anyFound)
+                {
+                    anyDistance = _rayCache[i].distance;
+                    anyFound = true;
+                }
+                else if (_rayCache[i].distance < anyDistance)
+                {
+                    anyDistance = _rayCache[i].distance;
+                }
+                if (_graspingObjects.Contains(_rayCache[i].rigidbody))
+                {
+                    if (!graspFound)
+                    {
+                        graspDistance = _rayCache[i].distance;
+                        graspFound = true;
+                    }
+                    else if (_rayCache[i].distance < graspDistance)
+                    {
+                        graspDistance = _rayCache[i].distance;
+                    }
+                }
+            }
         }
 
     }
