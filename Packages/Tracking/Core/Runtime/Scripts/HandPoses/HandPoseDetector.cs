@@ -87,6 +87,11 @@ namespace Leap.Unity
             _posesToDetect = posesToDetect;
         }
 
+        public void AddPoseToDetect(HandPoseScriptableObject poseToAdd)
+        {
+            _posesToDetect.Add(poseToAdd);
+        }
+
         public void EnablePoseCaching()
         {
             cacheValidationData = true;

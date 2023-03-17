@@ -43,7 +43,7 @@ namespace Leap.Unity
             }
         }
 
-        private void CreateScriptableObject(string handPoseName, Hand handData)
+        private HandPoseScriptableObject CreateScriptableObject(string handPoseName, Hand handData)
         {
             HandPoseScriptableObject newItem = ScriptableObject.CreateInstance<HandPoseScriptableObject>();
             newItem.name = handPoseName;
@@ -67,22 +67,26 @@ namespace Leap.Unity
             AssetDatabase.Refresh();
 
             OnPoseSaved?.Invoke(newItem);
+
+
             Debug.Log("New pose saved to: " + fullPath, AssetDatabase.LoadMainAssetAtPath(fullPath));
+            return newItem;
         }
 
-        public void SaveCurrentHandPose()
+        public HandPoseScriptableObject SaveCurrentHandPose()
         {
             Hand handToCapture = leapProvider.CurrentFrame.GetHand(handToRecord);
 
             if (handToCapture == null)
             {
                 Debug.Log("There is no Ultraleap hand in the scene to capture");
-                return;
+                return null;
             }
 
             hand = hand.CopyFrom(handToCapture);
 
-            CreateScriptableObject(handPoseName, hand);
+            HandPoseScriptableObject savedScriptable = CreateScriptableObject(handPoseName, hand);
+            return savedScriptable;
         }
     }
 }
