@@ -29,6 +29,25 @@ namespace Leap.Unity.Examples
             recorder.OnPoseSaved += OnPoseSaved;
         }
 
+        void Update()
+        {
+            if (!capturing)
+            {
+                HandPoseScriptableObject detectedPose = detector.GetCurrentlyDetectedPose();
+                if (detectedPose != null)
+                {
+                    countDownGO.SetActive(true);
+                    countDownText.text = "Detected pose: " + detectedPose.name;
+                }
+                else
+                {
+
+                    countDownGO.SetActive(false);
+                    countDownText.text = "No pose detected";
+                }
+            }
+        }
+
         public void OnPoseSaved(HandPoseScriptableObject pose)
         {
             editor.handPose = pose;
@@ -63,7 +82,7 @@ namespace Leap.Unity.Examples
             HandPoseScriptableObject savedPose = recorder.SaveCurrentHandPose();
             posesRecordedThisSession.Add(savedPose);
             capturing = false;
-            detector.SetPosesToDetect(posesRecordedThisSession);
+            detector.SetPosesToDetect(posesRecordedThisSession); 
         }
     }
 }
