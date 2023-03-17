@@ -321,7 +321,7 @@ namespace Leap.Unity.HandsModule
 
             string poseDirectionExplanationText = "By default, a pose is recognized in any orientation. " +
                 "However, you can set a pose to be recognized only in certain directions relative to self, " +
-                "world or an object in the scene. This happens by setting direction rules" + "\n \n" +
+                "world or an object in the scene. This happens by setting direction rules." + "\n \n" +
                 "The direction rules are tied to the direction of specific parts of a hand, e.g. in the direction of your index finger.";
             GUILayout.BeginVertical();
             EditorStyles.textField.clipping = TextClipping.Overflow;
@@ -333,7 +333,7 @@ namespace Leap.Unity.HandsModule
             GUILayout.Space(10);
 
             EditorGUILayout.BeginHorizontal();
-            if (GUILayout.Button(" + Add a new ruleset for finger/palm"))
+            if (GUILayout.Button(" + Add a new rules for finger/palm"))
             {
                 poseDetectionScript.CreateDirectionSource();
             }
@@ -379,12 +379,14 @@ namespace Leap.Unity.HandsModule
                     GUILayout.Label("At least one of the following targets need to be met for the event to activate.", EditorStyles.miniLabel);
                     GUILayout.Space(5);
 
+                    GUILayout.Space(5);
+                    var thinnerGreyLine = EditorGUILayout.GetControlRect(false, GUILayout.Height(1), GUILayout.Width(Screen.width));
+                    EditorGUI.DrawRect(thinnerGreyLine, Color.grey);
+
                     var directionList = source.FindPropertyRelative("direction");
                     for (int j = 0; j < directionList.arraySize; j++)
                     {
-
-                        var thinnerGreyLine = EditorGUILayout.GetControlRect(false, GUILayout.Height(1), GUILayout.Width(Screen.width));
-                        EditorGUI.DrawRect(thinnerGreyLine, Color.grey);
+                        EditorGUI.indentLevel = 0;
                         var direction = directionList.GetArrayElementAtIndex(j);
 
                         direction.FindPropertyRelative("enabled").boolValue = EditorGUILayout.BeginToggleGroup(direction.FindPropertyRelative("typeOfDirectionCheck").enumNames.GetValue(direction.FindPropertyRelative("typeOfDirectionCheck").enumValueIndex) +
@@ -420,20 +422,24 @@ namespace Leap.Unity.HandsModule
                         EditorGUILayout.EndToggleGroup();
 
                         EditorGUILayout.BeginHorizontal();
-                        if (GUILayout.Button("- Remove Target"))
+                        GUILayout.Space(15);
+                        if (GUILayout.Button("Remove target"))
                         {
 
                             poseDetectionScript.RemoveDirection(i, j);
                         }
                         GUILayout.FlexibleSpace();
                         EditorGUILayout.EndHorizontal();
+                        GUILayout.Space(5);
 
                         var thinnerGreyLine2 = EditorGUILayout.GetControlRect(false, GUILayout.Height(1), GUILayout.Width(Screen.width));
                         EditorGUI.DrawRect(thinnerGreyLine2, Color.grey);
+                        GUILayout.Space(5);
                     }
+                    GUILayout.Space(5);
                     EditorGUILayout.BeginHorizontal();
                     GUILayout.FlexibleSpace();
-                    if (GUILayout.Button("+ Add Target"))
+                    if (GUILayout.Button("+ Add target"))
                     {
                         poseDetectionScript.CreateSourceDirection(i);
                     }
@@ -445,7 +451,7 @@ namespace Leap.Unity.HandsModule
 
                     EditorGUILayout.BeginHorizontal();
                     GUILayout.FlexibleSpace();
-                    if (GUILayout.Button("- Remove Direction"))
+                    if (GUILayout.Button("Remove rules"))
                     {
                         poseDetectionScript.RemoveSource(i);
                     }
