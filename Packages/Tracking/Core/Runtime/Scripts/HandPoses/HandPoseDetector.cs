@@ -385,13 +385,22 @@ namespace Leap.Unity
             bool allBonesInCorrectDirection = true;
             foreach (var source in Sources)
             {
+                
                 bool oneDirectionCorrectInSource = false;
                 if(source.direction.Count <= 0) 
                 {
                     oneDirectionCorrectInSource = true;
+                    continue;
                 }
+                
                 foreach (var direction in source.direction)
                 {
+                    if(direction.enabled == false)
+                    {
+                        oneDirectionCorrectInSource = true;
+                        continue;
+                    }
+
                     if (direction.enabled == true)
                     {
                         Vector3 pointDirection;

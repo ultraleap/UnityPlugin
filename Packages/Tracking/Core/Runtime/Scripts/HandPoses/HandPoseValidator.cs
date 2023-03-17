@@ -115,58 +115,70 @@ public class HandPoseValidator : MonoBehaviour
 
                 if (boneDirectionTarget.enabled)
                 {
-                    var capsuleHand = angleVisualisationHands.ElementAt(j);
-
-                    if (lineRenderers.ElementAtOrDefault(lineRenderCount) == null)
+                    bool AtleastOneDirectionActive = false;
+                    foreach (var direction in boneDirectionTarget.direction)
                     {
-                        var lineRendChild = new GameObject();
-                        lineRendChild.transform.SetParent(capsuleHand.gameObject.transform);
-                        lineRendChild.AddComponent<LineRenderer>();
-                        lineRenderers.Add(lineRendChild);
+                        if(direction.enabled)
+                        {
+                            AtleastOneDirectionActive = true;
+                        }
                     }
 
-                    var lineRend = lineRenderers.ElementAt(lineRenderCount).GetComponent<LineRenderer>();
-                    if (lineRend)
+                    if (AtleastOneDirectionActive)
                     {
-                        lineRend.material = new Material(Shader.Find("Legacy Shaders/Particles/Alpha Blended Premultiply"));
-                        lineRend.startWidth = 0.005f;
-                        lineRend.endWidth = 0.005f;
-                        lineRend.material.color = new Color(0, 235, 133, 0.7f);
+                        var capsuleHand = angleVisualisationHands.ElementAt(j);
 
-                        if (capsuleHand != null && capsuleHand.enabled)
+                        if (lineRenderers.ElementAtOrDefault(lineRenderCount) == null)
                         {
-                            if ((int)boneDirectionTarget.finger != 5 &&
-                                boneDirectionTarget.finger != (int)Leap.Finger.FingerType.TYPE_UNKNOWN &&
-                                boneDirectionTarget.bone != (int)Leap.Bone.BoneType.TYPE_INVALID)
-                            {
-                                int fingNum = (int)boneDirectionTarget.finger;
-                                int boneNum = (int)boneDirectionTarget.bone;
-                                if (capsuleHand.GetLeapHand() != null)
-                                {
-                                    var directionBone = capsuleHand.GetLeapHand().Fingers[fingNum].bones[boneNum];
-                                    if (directionBone.PrevJoint != null)
-                                    {
-                                        Ray ray = new Ray(directionBone.PrevJoint, directionBone.Direction);
+                            var lineRendChild = new GameObject();
+                            lineRendChild.transform.SetParent(capsuleHand.gameObject.transform);
+                            lineRendChild.AddComponent<LineRenderer>();
+                            lineRenderers.Add(lineRendChild);
+                        }
 
-                                        lineRend.SetPosition(0, directionBone.PrevJoint);
-                                        lineRend.SetPosition(1, ray.GetPoint(10));
+                        var lineRend = lineRenderers.ElementAt(lineRenderCount).GetComponent<LineRenderer>();
+                        if (lineRend)
+                        {
+                            lineRend.material = new Material(Shader.Find("Legacy Shaders/Particles/Alpha Blended Premultiply"));
+                            lineRend.startWidth = 0.005f;
+                            lineRend.endWidth = 0.005f;
+                            lineRend.material.color = new Color(0, 235, 133, 0.7f);
+
+                            if (capsuleHand != null && capsuleHand.enabled)
+                            {
+                                if ((int)boneDirectionTarget.finger != 5 &&
+                                    boneDirectionTarget.finger != (int)Leap.Finger.FingerType.TYPE_UNKNOWN &&
+                                    boneDirectionTarget.bone != (int)Leap.Bone.BoneType.TYPE_INVALID)
+                                {
+                                    int fingNum = (int)boneDirectionTarget.finger;
+                                    int boneNum = (int)boneDirectionTarget.bone;
+                                    if (capsuleHand.GetLeapHand() != null)
+                                    {
+                                        var directionBone = capsuleHand.GetLeapHand().Fingers[fingNum].bones[boneNum];
+                                        if (directionBone.PrevJoint != null)
+                                        {
+                                            Ray ray = new Ray(directionBone.PrevJoint, directionBone.Direction);
+
+                                            lineRend.SetPosition(0, directionBone.PrevJoint);
+                                            lineRend.SetPosition(1, ray.GetPoint(10));
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    if (capsuleHand.GetLeapHand() != null &&
+                                        capsuleHand.GetLeapHand().PalmPosition != null &&
+                                        capsuleHand.GetLeapHand().PalmNormal != null)
+                                    {
+                                        Ray ray = new Ray(capsuleHand.GetLeapHand().PalmPosition, capsuleHand.GetLeapHand().PalmNormal);
+                                        lineRend.SetPosition(0, capsuleHand.GetLeapHand().PalmPosition);
+                                        lineRend.SetPosition(1, ray.GetPoint(100));
                                     }
                                 }
                             }
-                            else
-                            {
-                                if (capsuleHand.GetLeapHand() != null &&
-                                    capsuleHand.GetLeapHand().PalmPosition != null &&
-                                    capsuleHand.GetLeapHand().PalmNormal != null)
-                                {
-                                    Ray ray = new Ray(capsuleHand.GetLeapHand().PalmPosition, capsuleHand.GetLeapHand().PalmNormal);
-                                    lineRend.SetPosition(0, capsuleHand.GetLeapHand().PalmPosition);
-                                    lineRend.SetPosition(1, ray.GetPoint(100));
-                                }
-                            }
                         }
+                        lineRenderCount++;
                     }
-                    lineRenderCount++;
                 }
             }
         }
