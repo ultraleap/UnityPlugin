@@ -63,6 +63,8 @@ namespace Leap.Unity.Interaction.PhysicsHands
             [HideInInspector]
             public Vector3 previousDataPosition, computedPhysicsPosition;
             [HideInInspector]
+            public Vector3 elbowPosition;
+            [HideInInspector]
             public float computedHandDistance;
             [HideInInspector]
             public Quaternion previousDataRotation, computedPhysicsRotation;
@@ -84,7 +86,6 @@ namespace Leap.Unity.Interaction.PhysicsHands
             [HideInInspector]
             public bool justGhosted = false;
 
-            public float strength;
             public float stiffness, forceLimit;
             public float boneMass;
 
@@ -158,8 +159,6 @@ namespace Leap.Unity.Interaction.PhysicsHands
         private Collider[] _colliderCache = new Collider[10];
 
         private Vector3 _originalOldPosition = Vector3.zero;
-        private float _graspingDelta = 0;
-        private float _graspingDeltaCurrent = 0;
 
         private int[] _graspingFingers = new int[5];
         private bool[] _wasGraspingBones = new bool[Hand.BONES * Hand.FINGERS];
@@ -290,6 +289,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 _physicsHand.computedHandDistance = 0f;
 
                 _physicsHand.currentPalmVelocity = _physicsHand.maximumPalmVelocity;
+                _physicsHand.elbowPosition = _originalLeapHand.Arm.PrevJoint;
 
                 PhysicsHandsUtils.ResetPhysicsHandSizes(_physicsHand, _originalLeapHand);
 
@@ -309,8 +309,8 @@ namespace Leap.Unity.Interaction.PhysicsHands
                         float xTargetAngle = PhysicsHandsUtils.CalculateXJointAngle(prevBone.Rotation, bone.Direction);
                         body.xDrive = new ArticulationDrive()
                         {
-                            stiffness = _physicsHand.stiffness * _physicsHand.strength,
-                            forceLimit = _wasGraspingBones[boneArrayIndex] ? 0.1f / Time.fixedDeltaTime : _physicsHand.forceLimit * _physicsHand.strength / Time.fixedDeltaTime,
+                            stiffness = _physicsHand.stiffness,
+                            forceLimit = _xForceLimits[boneArrayIndex] * Time.fixedDeltaTime,
                             damping = body.xDrive.damping,
                             lowerLimit = body.xDrive.lowerLimit,
                             upperLimit = _graspingFingers[fingerIndex] > jointIndex ? body.xDrive.target : _physicsHand.jointBones[boneArrayIndex].OriginalXDriveUpper,
@@ -320,8 +320,8 @@ namespace Leap.Unity.Interaction.PhysicsHands
                         float yTargetAngle = PhysicsHandsUtils.CalculateYJointAngle(prevBone.Rotation, bone.Rotation);
                         body.yDrive = new ArticulationDrive()
                         {
-                            stiffness = _physicsHand.stiffness * _physicsHand.strength,
-                            forceLimit = _physicsHand.forceLimit * _physicsHand.strength / Time.fixedDeltaTime,
+                            stiffness = _physicsHand.stiffness,
+                            forceLimit = _physicsHand.maximumPalmVelocity * Time.fixedDeltaTime,
                             damping = body.yDrive.damping,
                             upperLimit = body.yDrive.upperLimit,
                             lowerLimit = body.yDrive.lowerLimit,
@@ -391,32 +391,13 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
             CalculateContacts();
 
-            if (!IsGrasping && _graspingDeltaCurrent > 0)
-            {
-                _graspingDeltaCurrent -= Vector3.Distance(_originalOldPosition, _originalLeapHand.PalmPosition);
-            }
-
             // Reset timer on hand release so hands quickly restore size
             if (!IsGrasping && _wasGrasping)
             {
                 _timeOnReset = Time.time;
             }
 
-            if (_physicsProvider.oldPalmMethod)
-            {
-                PhysicsHandsUtils.UpdatePhysicsPalm(ref _physicsHand,
-                // If the hand was grasping then we want to smoothly interpolate back to where it was based on distance
-                !IsGrasping && _graspingDeltaCurrent > 0 ? Vector3.Lerp(_physicsHand.transform.position, _originalLeapHand.PalmPosition, Mathf.InverseLerp(_graspingDelta, 0, _graspingDeltaCurrent)) : _originalLeapHand.PalmPosition,
-                !IsGrasping && _graspingDeltaCurrent > 0 ? Quaternion.Slerp(_physicsHand.transform.rotation, _originalLeapHand.Rotation, Mathf.InverseLerp(_graspingDelta, 0, _graspingDeltaCurrent)) : _originalLeapHand.Rotation,
-                // Interpolate the object if it's heavier
-                _isGrasping && _physicsProvider.InterpolatingMass && _graspMass > 1 ? Mathf.InverseLerp(0.001f, _physicsProvider.MaxMass, _graspMass).EaseOut() : 0f,
-                // Reduce force of hand as it gets further from the original data hand
-                !_ghosted && !_isGrasping && _graspingDeltaCurrent > 0 ? Mathf.InverseLerp(_physicsProvider.HandTeleportDistance * 0.5f, _physicsProvider.HandTeleportDistance, DistanceFromDataHand).EaseOut() : 0f);
-            }
-            else
-            {
-                PhysicsHandsUtils.UpdatePhysicsPalm2(ref _physicsHand, _originalLeapHand,  _physicsProvider.HandTeleportDistance, IsContacting, IsGrasping, _physicsProvider.InterpolatingMass ? _graspMass : 1f, _physicsProvider.MaxMass);
-            }
+            PhysicsHandsUtils.UpdatePhysicsPalm(ref _physicsHand, _originalLeapHand,  _physicsProvider.HandTeleportDistance, IsContacting, IsGrasping, _physicsProvider.InterpolatingMass ? _graspMass : 1f, _physicsProvider.MaxMass);
 
             // Fix the hand if it gets into a bad situation by teleporting and holding in place until its bad velocities disappear
             HandleTeleportingHands(AreBonesRotatedBeyondThreshold());
@@ -491,7 +472,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                     }
 
                     ArticulationDrive xDrive = body.xDrive;
-                    xDrive.stiffness = _physicsHand.stiffness * _physicsHand.strength;
+                    xDrive.stiffness = _physicsHand.stiffness;
                     xDrive.damping = _xDampening[boneArrayIndex];
                     xDrive.forceLimit = _xForceLimits[boneArrayIndex] * Time.fixedDeltaTime;
                     xDrive.upperLimit = _graspingFingers[fingerIndex] >= jointIndex ? _graspingXDrives[boneArrayIndex] : _physicsHand.jointBones[boneArrayIndex].OriginalXDriveUpper;
@@ -504,7 +485,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
                         ArticulationDrive yDrive = body.yDrive;
                         yDrive.damping = _xDampening[boneArrayIndex] * .75f;
-                        yDrive.stiffness = _physicsHand.stiffness * _physicsHand.strength;
+                        yDrive.stiffness = _physicsHand.stiffness;
                         yDrive.forceLimit = _physicsHand.maximumPalmVelocity * Time.fixedDeltaTime;
                         yDrive.target = yTargetAngle;
                         body.yDrive = yDrive;
@@ -516,14 +497,9 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
             _wasGrasping = IsGrasping;
 
-            if (IsGrasping)
-            {
-                // Makes the hands a bit smoother when we release
-                _graspingDelta = DistanceFromDataHand * 1.5f;
-                _graspingDeltaCurrent = _graspingDelta;
-            }
-
             PhysicsHandsUtils.ConvertPhysicsToLeapHand(_physicsHand, ref _leapHand, _originalLeapHand, Time.fixedDeltaTime);
+
+            _physicsHand.elbowPosition = _leapHand.Arm.PrevJoint;
 
             OnUpdatePhysics?.Invoke();
 
@@ -645,7 +621,6 @@ namespace Leap.Unity.Interaction.PhysicsHands
             {
                 return;
             }
-            _physicsHand.strength = _physicsProvider.Strength;
             _physicsHand.boneMass = _physicsProvider.PerBoneMass;
         }
 

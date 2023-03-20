@@ -63,12 +63,9 @@ namespace Leap.Unity.Interaction.PhysicsHands
         // Hand Settings
         [SerializeField, Tooltip("Allows the hands to collide with one another.")]
         private bool _interHandCollisions = false;
-        public float Strength => _strength;
-        [SerializeField, Range(0.1f, 2f)]
-        private float _strength = 2f;
 
         private float _forceLimit = 1000f;
-        private float _stiffness = 100f;
+        private float _stiffness = 200f;
 
         public float PerBoneMass => _perBoneMass;
         [SerializeField, Tooltip("The mass of each finger bone; the palm will be 3x this.")]
@@ -279,8 +276,8 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
         public void GenerateHands()
         {
-            LeftHand = PhysicsHandsUtils.GenerateHand(Chirality.Left, _perBoneMass, _strength, _forceLimit, _stiffness, _handsLayer, gameObject);
-            RightHand = PhysicsHandsUtils.GenerateHand(Chirality.Right, _perBoneMass, _strength, _forceLimit, _stiffness, _handsLayer, gameObject);
+            LeftHand = PhysicsHandsUtils.GenerateHand(Chirality.Left, _perBoneMass, _forceLimit, _stiffness, _handsLayer, gameObject);
+            RightHand = PhysicsHandsUtils.GenerateHand(Chirality.Right, _perBoneMass, _forceLimit, _stiffness, _handsLayer, gameObject);
         }
 
         #endregion

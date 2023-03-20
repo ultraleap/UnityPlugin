@@ -34,7 +34,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
         SerializedProperty _handsLayer, _handsResetLayer;
 
         SerializedProperty _interHandCollisions;
-        SerializedProperty _strength, _perBoneMass;
+        SerializedProperty _perBoneMass;
         SerializedProperty _handTeleportDistance;
         SerializedProperty _handSolverIterations, _handSolverVelocityIterations;
 
@@ -69,7 +69,6 @@ namespace Leap.Unity.Interaction.PhysicsHands
             _handsResetLayer = serializedObject.FindProperty("_handsResetLayer");
 
             _interHandCollisions = serializedObject.FindProperty("_interHandCollisions");
-            _strength = serializedObject.FindProperty("_strength");
             _perBoneMass = serializedObject.FindProperty("_perBoneMass");
             _handTeleportDistance = serializedObject.FindProperty("_handTeleportDistance");
             _handSolverIterations = serializedObject.FindProperty("_handSolverIterations");
@@ -286,7 +285,6 @@ namespace Leap.Unity.Interaction.PhysicsHands
             {
                 EditorGUILayout.BeginVertical(EditorStyles.helpBox);
                 EditorGUILayout.PropertyField(_interHandCollisions);
-                EditorGUILayout.PropertyField(_strength);
                 EditorGUILayout.PropertyField(_perBoneMass);
                 EditorGUILayout.PropertyField(_handTeleportDistance);
                 EditorGUILayout.EndVertical();
