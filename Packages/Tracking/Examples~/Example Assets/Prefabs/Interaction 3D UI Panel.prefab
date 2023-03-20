@@ -329,7 +329,7 @@ GameObject:
   - component: {fileID: 4488903540828124099}
   - component: {fileID: 4488903540828124098}
   m_Layer: 0
-  m_Name: Cube UI Panel
+  m_Name: Interaction 3D UI Panel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
