@@ -38,7 +38,6 @@ namespace Leap.Unity
         [SerializeField]
         private LeapProvider _leapProvider = null;
 
-
         /// <summary>
         /// Has a pose been detected since last time there was no pose was detected? 
         /// </summary>
@@ -52,12 +51,11 @@ namespace Leap.Unity
         /// </summary>
         private bool _directionTargetsMatchedLastFrame = false;
 
-
         private bool cacheValidationData = false;
 
         public PoseDetectionEvents OnPoseDetected;
         public PoseDetectionEvents WhilePoseDetected;
-        public UnityEvent OnPoseLost;
+        public PoseDetectionEvents OnPoseLost;
 
         public struct ValidationData
         {
@@ -106,15 +104,24 @@ namespace Leap.Unity
         /// </summary>
         public enum TypeOfDirectionCheck
         {
-            OBJECT = 0,
-            WORLD = 1,
-            CAMERALOCAL = 2
+            TowardsObject = 0,
+            WorldDirection = 1,
+            CameraDirection = 2
         };
 
         /// <summary>
         /// Adding the ablility of enum style direction selection in the Inspector.
         /// </summary>
-        public enum AxisToFace { Back, Down, Forward, Left, Right, Up, Zero };
+        public enum AxisToFace
+        { 
+            Back,
+            Down,
+            Forward,
+            Left,
+            Right,
+            Up
+        };
+
         private static readonly Vector3[] vectorAxes = new Vector3[]
         {
             Vector3.back,
@@ -124,6 +131,7 @@ namespace Leap.Unity
             Vector3.right,
             Vector3.up
         };
+
         public Vector3 GetAxis(AxisToFace axis)
         {
             return vectorAxes[(int)axis];
@@ -135,7 +143,6 @@ namespace Leap.Unity
         /// </summary>
         [SerializeField]
         public List<DirectionSource> Sources;
-        //public List<FingerDirection> BoneDirectionTargets;
 
         [Serializable]
         public struct DirectionSource
@@ -170,7 +177,7 @@ namespace Leap.Unity
 
             SourceDirection sourceDirection = new SourceDirection();
 
-            sourceDirection.typeOfDirectionCheck = TypeOfDirectionCheck.CAMERALOCAL;
+            sourceDirection.typeOfDirectionCheck = TypeOfDirectionCheck.CameraDirection;
             sourceDirection.isPalmDirection = false;
             sourceDirection.poseTarget = null;
             sourceDirection.axisToFace = AxisToFace.Forward;
@@ -184,7 +191,7 @@ namespace Leap.Unity
         public void CreateSourceDirection(int sourceIndex)
         {
             SourceDirection fingerDirection = new SourceDirection();
-            fingerDirection.typeOfDirectionCheck = TypeOfDirectionCheck.CAMERALOCAL;
+            fingerDirection.typeOfDirectionCheck = TypeOfDirectionCheck.CameraDirection;
             fingerDirection.isPalmDirection = false;
             fingerDirection.poseTarget = null;
             fingerDirection.axisToFace = AxisToFace.Forward;
@@ -202,7 +209,6 @@ namespace Leap.Unity
         {
             Sources[sourceIndex].direction.RemoveAt(directionIndex);
         }
-
 
         #endregion
 
@@ -231,7 +237,6 @@ namespace Leap.Unity
             }
         }
 
-        // Update is called once per frame
         private void Update()
         {
             bool anyHandMatched = CompareAllHandsAndPoses();
@@ -243,7 +248,7 @@ namespace Leap.Unity
             else if (!anyHandMatched && _poseAlreadyDetected)
             {
                 _poseAlreadyDetected = false;
-                OnPoseLost.Invoke();
+                OnPoseLost.Invoke(_detectedPose);
                 _detectedPose = null;
             }
 
@@ -252,8 +257,6 @@ namespace Leap.Unity
                 WhilePoseDetected.Invoke(_detectedPose);
             }
         }
-
-
 
         private bool CompareAllHandsAndPoses()
         {
@@ -278,11 +281,10 @@ namespace Leap.Unity
 
         private bool ComparePoseToHand(HandPoseScriptableObject pose, Hand activePlayerHand)
         {
-
             // Check any finger directions set up in the pose detector
             if (Sources.Count > 0)
             {
-                if (CheckPoseDirection(pose, activePlayerHand) == false)
+                if (CheckPoseDirection(activePlayerHand) == false)
                 {
                     return false;
                 }
@@ -291,43 +293,40 @@ namespace Leap.Unity
             Hand serializedHand = pose.GetSerializedHand();
             Hand playerHand = activePlayerHand;
 
-            if(serializedHand.GetChirality() != playerHand.GetChirality())
-            {
-                serializedHand = pose.GetMirroredHand();
-            }
-
             if (serializedHand == null || playerHand == null)
             {
                 return false;
             }
 
+            if (serializedHand.GetChirality() != playerHand.GetChirality())
+            {
+                serializedHand = pose.GetMirroredHand();
+            }
+
+            bool allFingersMatched = true;
             List<int> fingerIndexesToCheck = pose.GetFingerIndexesToCheck();
-            int numMatchedFingers = 0;
 
             foreach (int fingerNum in fingerIndexesToCheck)
             {
-                int numMatchedBones = 0;
                 Quaternion lastBoneRotation = playerHand.Rotation;
                 Quaternion lastSerializedBoneRotation = serializedHand.Rotation;
 
                 // Each bone in the finger 
                 for (int boneNum = 0; boneNum < serializedHand.Fingers[fingerNum].bones.Length; boneNum++)
                 {
+                    // Get the same bone for both comparison hand and player hand
+                    Bone activeHandBone = playerHand.Fingers[fingerNum].bones[boneNum];
+                    Bone serializedHandBone = serializedHand.Fingers[fingerNum].bones[boneNum];
+
                     //Ignore the metacarpal as it will never really change.
-                    if (serializedHand.Fingers[fingerNum].bones[boneNum].Type == Bone.BoneType.TYPE_METACARPAL)
+                    if (serializedHandBone.Type == Bone.BoneType.TYPE_METACARPAL)
                     {
-                        Bone activeMetacarpalBone = playerHand.Fingers[fingerNum].bones[boneNum]; 
-                        Bone serializedMetacarpalBone = serializedHand.Fingers[fingerNum].bones[boneNum];
-                        lastBoneRotation = activeMetacarpalBone.Rotation;
-                        lastSerializedBoneRotation = serializedMetacarpalBone.Rotation;
+                        lastBoneRotation = activeHandBone.Rotation;
+                        lastSerializedBoneRotation = serializedHandBone.Rotation;
                         continue;
                     }
 
                     bool boneMatched = false;
-
-                    // Get the same bone for both comparison hand and player hand
-                    Bone activeHandBone = playerHand.Fingers[fingerNum].bones[boneNum];
-                    Bone serializedHandBone = serializedHand.Fingers[fingerNum].bones[boneNum];
 
                     // Get the user defined rotation threshold for the current bone (threshold is defined in the pose scriptable object)
                     Vector2 jointRotationThresholds = GetBoneRotationThreshold(pose, fingerNum, boneNum-1); //i - 1 to ignore metacarpal
@@ -340,7 +339,6 @@ namespace Leap.Unity
                     Vector3 activeRotEuler = (Quaternion.Inverse(lastBoneRotation) * activeBoneRotation).eulerAngles;
                     Vector3 serializedRotEuler = (Quaternion.Inverse(lastSerializedBoneRotation) * serializedBoneRotation).eulerAngles;
 
-                    
                     // Calculate angle difference between the active hand and the serialized hand.
                     Vector2 boneDifference = GetDegreeAngleDifferenceXY(serializedRotEuler, activeRotEuler);
 
@@ -350,21 +348,37 @@ namespace Leap.Unity
                     // If the pose has been detected, use the Hysteresis value to check if it should be undetected
                     if (_poseAlreadyDetected)
                     {
-                        if ((boneDifference.x <= (jointRotationThresholds.x + pose.GetHysteresisThreshold()) && boneDifference.x >= (-jointRotationThresholds.x - pose.GetHysteresisThreshold()))
-                            && (boneDifference.y <= (jointRotationThresholds.y + pose.GetHysteresisThreshold()) && boneDifference.y >= (-jointRotationThresholds.y - pose.GetHysteresisThreshold())))
+                        if (boneDifference.x <= (jointRotationThresholds.x + pose.GetHysteresisThreshold()) && boneDifference.x >= (-jointRotationThresholds.x - pose.GetHysteresisThreshold()))
                         {
-                            numMatchedBones++;
-                            boneMatched = true;
+                            if(serializedHandBone.Type == Bone.BoneType.TYPE_PROXIMAL) // Proximal also uses Y rotation for Abduction/Splay
+                            {
+                                if (boneDifference.y <= (jointRotationThresholds.y + pose.GetHysteresisThreshold()) && boneDifference.y >= (-jointRotationThresholds.y - pose.GetHysteresisThreshold()))
+                                {
+                                    boneMatched = true;
+                                }
+                            }
+                            else
+                            {
+                                boneMatched = true;
+                            }
                         }
                     }
                     // Otherwise, check if the difference between current hand and serialized hand is within the threshold.
                     else
                     {
-                        if ((boneDifference.x <= jointRotationThresholds.x && boneDifference.x >= -jointRotationThresholds.x)
-                            && (boneDifference.y <= jointRotationThresholds.y && boneDifference.y >= -jointRotationThresholds.y))
+                        if (boneDifference.x <= jointRotationThresholds.x && boneDifference.x >= -jointRotationThresholds.x)
                         {
-                            numMatchedBones++;
-                            boneMatched = true;
+                            if (serializedHandBone.Type == Bone.BoneType.TYPE_PROXIMAL) // Proximal also uses Y rotation for Abduction/Splay
+                            {
+                                if (boneDifference.y <= jointRotationThresholds.y && boneDifference.y >= -jointRotationThresholds.y)
+                                {
+                                    boneMatched = true;
+                                }
+                            }
+                            else
+                            {
+                                boneMatched = true;
+                            }
                         }
                     }
 
@@ -373,28 +387,26 @@ namespace Leap.Unity
                         _validationDatas.Add(new ValidationData(serializedHand.GetChirality(), fingerNum, boneNum, boneMatched));
                     }
 
-                }
-
-                if(numMatchedBones >= 3)
-                {
-                    ++numMatchedFingers;
-                    if (numMatchedFingers >= fingerIndexesToCheck.Count)
+                    if(!boneMatched)
                     {
-                        return true;
+                        allFingersMatched = false;
                     }
                 }
+            }
+
+            if(allFingersMatched)
+            {
+                return true;
             }
 
             return false;
         }
 
-
-        private bool CheckPoseDirection(HandPoseScriptableObject pose, Hand activePlayerHand)
+        private bool CheckPoseDirection(Hand activePlayerHand)
         {
             bool allBonesInCorrectDirection = true;
             foreach (var source in Sources)
             {
-                
                 bool oneDirectionCorrectInSource = false;
                 if(source.direction.Count <= 0) 
                 {
@@ -429,47 +441,48 @@ namespace Leap.Unity
 
                         switch (direction.typeOfDirectionCheck)
                         {
-                            case TypeOfDirectionCheck.OBJECT:
+                            case TypeOfDirectionCheck.TowardsObject:
+                            {
+                                if (_directionTargetsMatchedLastFrame)
                                 {
-                                    if (_directionTargetsMatchedLastFrame)
-                                    {
-                                        hysteresisToAdd = -0.03f;
-                                    }
-                                    if (GetIsFacingObject(pointPosition, direction.poseTarget.position, pointDirection, 0.8f + hysteresisToAdd))
-                                    {
-                                        oneDirectionCorrectInSource = true;
-                                    }
-                                    break;
+                                    hysteresisToAdd = -0.03f;
                                 }
-                            case TypeOfDirectionCheck.WORLD:
+                                if (GetIsFacingObject(pointPosition, direction.poseTarget.position, pointDirection, 0.8f + hysteresisToAdd))
                                 {
-                                    if (_directionTargetsMatchedLastFrame)
-                                    {
-                                        hysteresisToAdd = 5f;
-                                    }
-                                    if (GetIsFacingDirection(pointDirection, GetAxis(direction.axisToFace), direction.rotationThreshold + hysteresisToAdd))
-                                    {
-                                        oneDirectionCorrectInSource = true;
-                                    }
-                                    break;
+                                    oneDirectionCorrectInSource = true;
                                 }
-                            case TypeOfDirectionCheck.CAMERALOCAL:
+                                break;
+                            }
+                            case TypeOfDirectionCheck.WorldDirection:
+                            {
+                                if (_directionTargetsMatchedLastFrame)
                                 {
-                                    if (_directionTargetsMatchedLastFrame)
-                                    {
-                                        hysteresisToAdd = 5f;
-                                    }
-                                    if (GetIsFacingDirection(pointDirection,
-                                        (Camera.main.transform.rotation.normalized * GetAxis(direction.axisToFace).normalized).normalized, direction.rotationThreshold + hysteresisToAdd))
-                                    {
-                                        oneDirectionCorrectInSource = true;
-                                    }
-                                    break;
+                                    hysteresisToAdd = 5f;
                                 }
+                                if (GetIsFacingDirection(pointDirection, GetAxis(direction.axisToFace), direction.rotationThreshold + hysteresisToAdd))
+                                {
+                                    oneDirectionCorrectInSource = true;
+                                }
+                                break;
+                            }
+                            case TypeOfDirectionCheck.CameraDirection:
+                            {
+                                if (_directionTargetsMatchedLastFrame)
+                                {
+                                    hysteresisToAdd = 5f;
+                                }
+                                if (GetIsFacingDirection(pointDirection,
+                                    (Camera.main.transform.rotation.normalized * GetAxis(direction.axisToFace).normalized).normalized, direction.rotationThreshold + hysteresisToAdd))
+                                {
+                                    oneDirectionCorrectInSource = true;
+                                }
+                                break;
+                            }
                         }
                     }
 
                 }
+
                 if(oneDirectionCorrectInSource == false)
                 {
                     allBonesInCorrectDirection = false;
@@ -496,13 +509,6 @@ namespace Leap.Unity
             var angleY = Mathf.DeltaAngle(a.y, b.y);
 
             return new Vector2(angleX, angleY);
-        }
-
-        private float GetAverageDegreeAngleDifferenceXY(Vector3 a, Vector3 b)
-        {
-            var averageAngle = (Mathf.DeltaAngle(a.x, b.x) + Mathf.DeltaAngle(a.y, b.y)) / 2;
-
-            return averageAngle;
         }
 
         private bool GetIsFacingDirection(Vector3 boneDirection, Vector3 TargetDirectionDirection, float thresholdInDegrees)

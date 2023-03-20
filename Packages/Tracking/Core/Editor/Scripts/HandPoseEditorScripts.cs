@@ -1,17 +1,10 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.UI;
-using static Leap.Unity.HandPoseDetector;
-using static System.Net.Mime.MediaTypeNames;
-using static UnityEditor.Progress;
-using static UnityEngine.GraphicsBuffer;
 
-
-namespace Leap.Unity.HandsModule
+namespace Leap.Unity
 {
     [CustomEditor(typeof(HandPoseRecorder))]
     public class HandPoseRecoderEditor : Editor
@@ -20,7 +13,6 @@ namespace Leap.Unity.HandsModule
 
         public override void OnInspectorGUI()
         {
-
             DrawDefaultInspector();
             HandPoseRecorder poseRecorderScript = (HandPoseRecorder)target;
 
@@ -31,7 +23,6 @@ namespace Leap.Unity.HandsModule
             poseRecorderScript.SavePath = EditorGUILayout.TextField("HandPoses/");
             EditorGUILayout.EndHorizontal();
             
-
             if (GUILayout.Button("Save Current Hand Pose"))
             {
                 poseRecorderScript.SaveCurrentHandPose();
@@ -39,7 +30,7 @@ namespace Leap.Unity.HandsModule
         }
     }
 
-[CustomEditor(typeof(HandPoseScriptableObject))]
+    [CustomEditor(typeof(HandPoseScriptableObject))]
     public class HandPoseSerializableObjectEditor : CustomEditorBase<HandPoseScriptableObject>
     {
         const float TOGGLE_SIZE = 15.0F;
@@ -150,9 +141,7 @@ namespace Leap.Unity.HandsModule
                         target.fingerJointRotationThresholds[fingerID].jointThresholds[jointID] = Vector2.one * flex;
                     }
                 }
-
                 EditorGUIUtility.labelWidth = labelWidth;
-
                 GUILayout.Space(15);
             }
         }
@@ -273,21 +262,19 @@ namespace Leap.Unity.HandsModule
     [CustomEditor(typeof(HandPoseDetector))]
     public class PoseDetectionEditor : Editor
     {
-        Vector2 scrollPosition;
-
         bool _showFineTuningOptions = false;
         string fineTuningOptionsButtonLabel = "Show Fine Tuning Options";
 
         private enum FingerName
         {
             Thumb = 0,
-            Index_Finger = 1,
-            Middle_Finger = 2,
-            Ring_Finger = 3,
-            Pinky_Finger = 4,
+            IndexFinger = 1,
+            MiddleFinger = 2,
+            RingFinger = 3,
+            PinkyFinger = 4,
             Palm = 5
         }
-        FingerName fingerName = FingerName.Index_Finger;
+        FingerName fingerName = FingerName.IndexFinger;
         private enum BoneName
         {
             Proximal = 1,
@@ -303,40 +290,35 @@ namespace Leap.Unity.HandsModule
             EditorGUI.BeginDisabledGroup(true);
             EditorGUILayout.ObjectField("Script", MonoScript.FromMonoBehaviour((MonoBehaviour)target), GetType(), false);
             EditorGUI.EndDisabledGroup();
+
             HandPoseDetector poseDetectionScript = (HandPoseDetector)target;
 
-            GUILayout.Space(10);
-            var thinGreyLine3 = EditorGUILayout.GetControlRect(false, GUILayout.Height(2), GUILayout.Width(Screen.width));
-            EditorGUI.DrawRect(thinGreyLine3, Color.grey);
-            GUILayout.Space(5);
             EditorGUILayout.LabelField("Pose to detect: ", EditorStyles.boldLabel);
             EditorGUILayout.PropertyField(serializedObject.FindProperty("_poseToDetect"), GUIContent.none);
 
             EditorGUI.indentLevel = 2;
             EditorGUILayout.PropertyField(serializedObject.FindProperty("_posesToDetect"), new GUIContent("Pose variations: "));
             EditorGUI.indentLevel = 0;
-            GUILayout.Space(5);
-            var thinGreyLine4 = EditorGUILayout.GetControlRect(false, GUILayout.Height(2), GUILayout.Width(Screen.width));
-            EditorGUI.DrawRect(thinGreyLine4, Color.grey);
-            GUILayout.Space(5);
+
+            GUILayout.Space(10);
+
             poseDetectionScript.CheckBothHands = EditorGUILayout.Toggle("Detect both hands?", poseDetectionScript.CheckBothHands);
             
             if (!poseDetectionScript.CheckBothHands)
             {
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("ChiralityToCheck"));
             }
-            GUILayout.Space(15);
+            GUILayout.Space(10);
 
-            #region boneDirectionTargets 
+            #region Bone Directions 
 
-            EditorGUILayout.LabelField("Pose direction options");
+            EditorGUILayout.LabelField("Pose Rules", EditorStyles.boldLabel);
             var thinGreyLine = EditorGUILayout.GetControlRect(false, GUILayout.Height(2), GUILayout.Width(Screen.width));
             EditorGUI.DrawRect(thinGreyLine, Color.grey);
 
-            string poseDirectionExplanationText = "By default, a pose is recognized in any orientation. " +
-                "However, you can set a pose to be recognized only in certain directions relative to self, " +
-                "world or an object in the scene. This happens by setting direction rules." + "\n \n" +
-                "The direction rules are tied to the direction of specific parts of a hand, e.g. in the direction of your index finger.";
+            string poseDirectionExplanationText = "Rules allow you to create a more specific pose. \n\n" +
+                "These rules can be made up of many optional targets and are tied to the direction of specific parts of a hand, \ne.g. in the direction of your index finger.";
+
             GUILayout.BeginVertical();
             EditorStyles.textField.clipping = TextClipping.Overflow;
             var textArea = EditorStyles.textArea.CalcHeight(new GUIContent(poseDirectionExplanationText), Screen.width);
@@ -347,7 +329,7 @@ namespace Leap.Unity.HandsModule
             GUILayout.Space(10);
 
             EditorGUILayout.BeginHorizontal();
-            if (GUILayout.Button(" + Add a new rules for finger/palm"))
+            if (GUILayout.Button(" + Add a new rule for finger/palm"))
             {
                 poseDetectionScript.CreateDirectionSource();
             }
@@ -372,7 +354,7 @@ namespace Leap.Unity.HandsModule
                 fingerName = (FingerName)source.FindPropertyRelative("finger").intValue;
 
                 sourceFoldout[i] = EditorGUILayout.BeginFoldoutHeaderGroup(sourceFoldout.ElementAt(i),
-                "Rules for " + fingerName.ToString() + " direction");
+                "Rule for " + fingerName.ToString() + " direction");
 
                 if (sourceFoldout[i])
                 {
@@ -403,10 +385,8 @@ namespace Leap.Unity.HandsModule
                         EditorGUI.indentLevel = 0;
                         var direction = directionList.GetArrayElementAtIndex(j);
 
-                        direction.FindPropertyRelative("enabled").boolValue = EditorGUILayout.BeginToggleGroup(direction.FindPropertyRelative("typeOfDirectionCheck").enumNames.GetValue(direction.FindPropertyRelative("typeOfDirectionCheck").enumValueIndex) +
-                            " Direction " + " " + j.ToString(), direction.FindPropertyRelative("enabled").boolValue);
+                        direction.FindPropertyRelative("enabled").boolValue = EditorGUILayout.BeginToggleGroup(GetTargetName(direction), direction.FindPropertyRelative("enabled").boolValue);
 
-                        //source.FindPropertyRelative("finger").enumValueIndex = fingerNumber;
                         source.FindPropertyRelative("bone").intValue = boneNumber;
 
                         EditorGUI.indentLevel = 1;
@@ -416,20 +396,20 @@ namespace Leap.Unity.HandsModule
                         switch (direction.FindPropertyRelative("typeOfDirectionCheck").enumValueIndex)
                         {
                             case 0: //OBJECT
-                                {
-                                    EditorGUILayout.PropertyField(direction.FindPropertyRelative("poseTarget"), new GUIContent("Object to face:"));
-                                    break;
-                                }
+                            {
+                                EditorGUILayout.PropertyField(direction.FindPropertyRelative("poseTarget"), new GUIContent("Object to face:"));
+                                break;
+                            }
                             case 1: //WORLD
-                                {
-                                    EditorGUILayout.PropertyField(direction.FindPropertyRelative("axisToFace"), new GUIContent("Axis to face:"));
-                                    break;
-                                }
+                            {
+                                EditorGUILayout.PropertyField(direction.FindPropertyRelative("axisToFace"), new GUIContent("Axis to face:"));
+                                break;
+                            }
                             case 2: //CAMERALOCAL
-                                {
-                                    EditorGUILayout.PropertyField(direction.FindPropertyRelative("axisToFace"), new GUIContent("Axis to face:"));
-                                    break;
-                                }
+                            {
+                                EditorGUILayout.PropertyField(direction.FindPropertyRelative("axisToFace"), new GUIContent("Axis to face:"));
+                                break;
+                            }
                         }
 
                         EditorGUILayout.PropertyField(direction.FindPropertyRelative("rotationThreshold"), new GUIContent("Rotation threshold:"));
@@ -437,11 +417,12 @@ namespace Leap.Unity.HandsModule
 
                         EditorGUILayout.BeginHorizontal();
                         GUILayout.Space(15);
+
                         if (GUILayout.Button("Remove target"))
                         {
-
                             poseDetectionScript.RemoveDirection(i, j);
                         }
+
                         GUILayout.FlexibleSpace();
                         EditorGUILayout.EndHorizontal();
                         GUILayout.Space(5);
@@ -465,7 +446,7 @@ namespace Leap.Unity.HandsModule
 
                     EditorGUILayout.BeginHorizontal();
                     GUILayout.FlexibleSpace();
-                    if (GUILayout.Button("Remove rules"))
+                    if (GUILayout.Button("Remove rule"))
                     {
                         poseDetectionScript.RemoveSource(i);
                     }
@@ -479,6 +460,7 @@ namespace Leap.Unity.HandsModule
             GUILayout.Space(20);
             #endregion
 
+            EditorGUILayout.LabelField("Pose Events", EditorStyles.boldLabel);
             var thinGreyLine2 = EditorGUILayout.GetControlRect(false, GUILayout.Height(2), GUILayout.Width(Screen.width));
             EditorGUI.DrawRect(thinGreyLine2, Color.grey);
 
@@ -502,12 +484,33 @@ namespace Leap.Unity.HandsModule
             }
             serializedObject.ApplyModifiedProperties();
         }
+        string GetTargetName(SerializedProperty direction)
+        {
+            HandPoseDetector.TypeOfDirectionCheck dir = (HandPoseDetector.TypeOfDirectionCheck)direction.FindPropertyRelative("typeOfDirectionCheck").enumValueIndex;
+
+            string name = "";
+
+            name += dir.ToString() + " ";
+
+            switch (dir)
+            {
+                case HandPoseDetector.TypeOfDirectionCheck.TowardsObject:
+                    break;
+                case HandPoseDetector.TypeOfDirectionCheck.WorldDirection:
+                    name += (HandPoseDetector.AxisToFace)direction.FindPropertyRelative("axisToFace").enumValueIndex;
+                    break;
+                case HandPoseDetector.TypeOfDirectionCheck.CameraDirection:
+                    name += (HandPoseDetector.AxisToFace)direction.FindPropertyRelative("axisToFace").enumValueIndex;
+                    break;
+            }
+
+            return name;
+        }
     }
 
     [CustomEditor(typeof(HandPoseEditor), editorForChildClasses: true)]
     public class HandPoseEditorEditor : CustomEditorBase<HandPoseEditor>
     {
-
         List<HandPoseScriptableObject> handPoses = new List<HandPoseScriptableObject>();
 
         bool _showFineTuningOptions = false;
@@ -568,7 +571,6 @@ namespace Leap.Unity.HandsModule
             UpdatedPoseDropdown();
 
             EditorGUILayout.BeginHorizontal();
-
             GUILayout.FlexibleSpace();
 
             if (GUILayout.Button("Edit Pose", GUILayout.Width(Screen.width/2), GUILayout.Height(30)))
@@ -578,9 +580,7 @@ namespace Leap.Unity.HandsModule
             }
 
             GUILayout.FlexibleSpace();
-
             EditorGUILayout.EndHorizontal();
-
             EditorGUILayout.Space(10);
 
             if (GUILayout.Button("Show Extra Options"))
