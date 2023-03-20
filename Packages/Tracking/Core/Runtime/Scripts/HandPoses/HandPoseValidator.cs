@@ -9,7 +9,18 @@ public class HandPoseValidator : MonoBehaviour
     /// Which hand would you like to use for gesture validation?
     /// If this is left blank, It will search for all hands in the scene
     /// </summary>
-    private List<CapsuleHand> angleVisualisationHands = new List<CapsuleHand>();
+    [SerializeField]
+    private List<CapsuleHand> validationHands = new List<CapsuleHand>();
+
+    private List<CapsuleHand> storedValidationHands = new List<CapsuleHand>();
+    private int validationHandsActive = 0;
+    private int validationHandsActivePrevFrame = 0;
+
+    [SerializeField]
+    private LeapProvider leapProvider = null;
+
+    [SerializeField]
+    private GameObject capsuleHands;
 
     private Color[] _leftCapsuleHandColours = new Color[32];
     private Color[] _rightCapsuleHandColours = new Color[32];
@@ -19,21 +30,44 @@ public class HandPoseValidator : MonoBehaviour
     {
         _detector = FindObjectOfType<HandPoseDetector>();
         _detector.EnablePoseCaching();
+        if(validationHands.Count == 0 )
+        {
+            var instCapsuleHands = Instantiate(capsuleHands);
+
+            var capsuleHandScript = instCapsuleHands.GetComponentsInChildren<CapsuleHand>(true);
+            foreach (var script in capsuleHandScript)
+            {
+                script.leapProvider = leapProvider;
+                storedValidationHands.Add(script);
+                validationHandsActive++;
+            }
+        }
+        else
+        {
+            storedValidationHands = validationHands;
+        }
         
     }
     List<GameObject> lineRenderers = new List<GameObject>();
 
     private void Update()
     {
-        if(angleVisualisationHands.Count != GameObject.FindObjectsOfType<CapsuleHand>().ToList().Count)
+        foreach (var hand in storedValidationHands)
         {
+            if(!hand.isActiveAndEnabled)
+            {
+                validationHandsActive--;
+            }
+        }
+        if(validationHandsActive != validationHandsActivePrevFrame)
+        {
+            validationHandsActivePrevFrame = validationHandsActive;
             foreach (var lineRenderer in lineRenderers)
             {
                 DestroyImmediate(lineRenderer);
             }
             lineRenderers.Clear();
         }
-        angleVisualisationHands = GameObject.FindObjectsOfType<CapsuleHand>().ToList();
 
         if (_detector != null) 
         {
@@ -44,18 +78,18 @@ public class HandPoseValidator : MonoBehaviour
 
     private void ColorHandJoints()
     {
-        var colourCapsuleHand = angleVisualisationHands.FirstOrDefault();
+        var colourCapsuleHand = storedValidationHands.FirstOrDefault();
         if (colourCapsuleHand != null)
         {
             Utils.Fill(_leftCapsuleHandColours, Color.grey);
             Utils.Fill(_rightCapsuleHandColours, Color.grey);
         }
 
-        if (angleVisualisationHands.Count > 0)
+        if (storedValidationHands.Count > 0)
         {
             var validationData = _detector.GetValidationData();
 
-            foreach (var visHand in angleVisualisationHands)
+            foreach (var visHand in storedValidationHands)
             {
                 foreach (var data in validationData)
                 {
@@ -107,77 +141,80 @@ public class HandPoseValidator : MonoBehaviour
     private void RenderDirectionRays()
     {
         var lineRenderCount = 0;
-        for (int j = 0; j < angleVisualisationHands.Count; j++)
+        for (int j = 0; j < storedValidationHands.Count; j++)
         {
-            for (int i = 0; i < _detector.Sources.Count; i++)
+            if (storedValidationHands.ElementAt(j).enabled)
             {
-                var boneDirectionTarget = _detector.Sources.ElementAt(i);
-
-                if (boneDirectionTarget.enabled)
+                for (int i = 0; i < _detector.Sources.Count; i++)
                 {
-                    bool AtleastOneDirectionActive = false;
-                    foreach (var direction in boneDirectionTarget.direction)
+                    var boneDirectionTarget = _detector.Sources.ElementAt(i);
+
+                    if (boneDirectionTarget.enabled)
                     {
-                        if(direction.enabled)
+                        bool AtleastOneDirectionActive = false;
+                        foreach (var direction in boneDirectionTarget.direction)
                         {
-                            AtleastOneDirectionActive = true;
-                        }
-                    }
-
-                    if (AtleastOneDirectionActive)
-                    {
-                        var capsuleHand = angleVisualisationHands.ElementAt(j);
-
-                        if (lineRenderers.ElementAtOrDefault(lineRenderCount) == null)
-                        {
-                            var lineRendChild = new GameObject();
-                            lineRendChild.transform.SetParent(capsuleHand.gameObject.transform);
-                            lineRendChild.AddComponent<LineRenderer>();
-                            lineRenderers.Add(lineRendChild);
-                        }
-
-                        var lineRend = lineRenderers.ElementAt(lineRenderCount).GetComponent<LineRenderer>();
-                        if (lineRend)
-                        {
-                            lineRend.material = new Material(Shader.Find("Legacy Shaders/Particles/Alpha Blended Premultiply"));
-                            lineRend.startWidth = 0.005f;
-                            lineRend.endWidth = 0.005f;
-                            lineRend.material.color = new Color(0, 235, 133, 0.7f);
-
-                            if (capsuleHand != null && capsuleHand.enabled)
+                            if (direction.enabled)
                             {
-                                if ((int)boneDirectionTarget.finger != 5 &&
-                                    boneDirectionTarget.finger != (int)Leap.Finger.FingerType.TYPE_UNKNOWN &&
-                                    boneDirectionTarget.bone != (int)Leap.Bone.BoneType.TYPE_INVALID)
-                                {
-                                    int fingNum = (int)boneDirectionTarget.finger;
-                                    int boneNum = (int)boneDirectionTarget.bone;
-                                    if (capsuleHand.GetLeapHand() != null)
-                                    {
-                                        var directionBone = capsuleHand.GetLeapHand().Fingers[fingNum].bones[boneNum];
-                                        if (directionBone.PrevJoint != null)
-                                        {
-                                            Ray ray = new Ray(directionBone.PrevJoint, directionBone.Direction);
+                                AtleastOneDirectionActive = true;
+                            }
+                        }
 
-                                            lineRend.SetPosition(0, directionBone.PrevJoint);
-                                            lineRend.SetPosition(1, ray.GetPoint(10));
+                        if (AtleastOneDirectionActive)
+                        {
+                            var capsuleHand = storedValidationHands.ElementAt(j);
+
+                            if (lineRenderers.ElementAtOrDefault(lineRenderCount) == null)
+                            {
+                                var lineRendChild = new GameObject();
+                                lineRendChild.transform.SetParent(capsuleHand.gameObject.transform);
+                                lineRendChild.AddComponent<LineRenderer>();
+                                lineRenderers.Add(lineRendChild);
+                            }
+
+                            var lineRend = lineRenderers.ElementAt(lineRenderCount).GetComponent<LineRenderer>();
+                            if (lineRend)
+                            {
+                                lineRend.material = new Material(Shader.Find("Legacy Shaders/Particles/Alpha Blended Premultiply"));
+                                lineRend.startWidth = 0.005f;
+                                lineRend.endWidth = 0.005f;
+                                lineRend.material.color = new Color(0, 235, 133, 0.7f);
+
+                                if (capsuleHand != null && capsuleHand.enabled)
+                                {
+                                    if ((int)boneDirectionTarget.finger != 5 &&
+                                        boneDirectionTarget.finger != (int)Leap.Finger.FingerType.TYPE_UNKNOWN &&
+                                        boneDirectionTarget.bone != (int)Leap.Bone.BoneType.TYPE_INVALID)
+                                    {
+                                        int fingNum = (int)boneDirectionTarget.finger;
+                                        int boneNum = (int)boneDirectionTarget.bone;
+                                        if (capsuleHand.GetLeapHand() != null)
+                                        {
+                                            var directionBone = capsuleHand.GetLeapHand().Fingers[fingNum].bones[boneNum];
+                                            if (directionBone.PrevJoint != null)
+                                            {
+                                                Ray ray = new Ray(directionBone.PrevJoint, directionBone.Direction);
+
+                                                lineRend.SetPosition(0, directionBone.PrevJoint);
+                                                lineRend.SetPosition(1, ray.GetPoint(10));
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        if (capsuleHand.GetLeapHand() != null &&
+                                            capsuleHand.GetLeapHand().PalmPosition != null &&
+                                            capsuleHand.GetLeapHand().PalmNormal != null)
+                                        {
+                                            Ray ray = new Ray(capsuleHand.GetLeapHand().PalmPosition, capsuleHand.GetLeapHand().PalmNormal);
+                                            lineRend.SetPosition(0, capsuleHand.GetLeapHand().PalmPosition);
+                                            lineRend.SetPosition(1, ray.GetPoint(100));
                                         }
                                     }
                                 }
-                                else
-                                {
-                                    if (capsuleHand.GetLeapHand() != null &&
-                                        capsuleHand.GetLeapHand().PalmPosition != null &&
-                                        capsuleHand.GetLeapHand().PalmNormal != null)
-                                    {
-                                        Ray ray = new Ray(capsuleHand.GetLeapHand().PalmPosition, capsuleHand.GetLeapHand().PalmNormal);
-                                        lineRend.SetPosition(0, capsuleHand.GetLeapHand().PalmPosition);
-                                        lineRend.SetPosition(1, ray.GetPoint(100));
-                                    }
-                                }
                             }
+                            lineRenderCount++;
                         }
-                        lineRenderCount++;
                     }
                 }
             }
