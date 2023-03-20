@@ -2,7 +2,6 @@ using Leap.Unity;
 using LeapInternal;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEditor;
 using UnityEngine;
 
 public class HandPoseValidator : MonoBehaviour
@@ -25,18 +24,20 @@ public class HandPoseValidator : MonoBehaviour
     private Color[] _rightCapsuleHandColours = new Color[32];
     private HandPoseDetector _detector;
 
+    public Transform validatorHandPrefab;
+
     private void Start()
     {
         _detector = FindObjectOfType<HandPoseDetector>();
         _detector.EnablePoseCaching();
-        if(validationHands.Count == 0 )
+        if(validationHands.Count == 0)
         {
-            var instCapsuleHands = Instantiate(CreateCapsuleHands());
+            var instCapsuleHands = Instantiate(validatorHandPrefab);
             var capsuleHandScript = instCapsuleHands.GetComponentsInChildren<CapsuleHand>(true);
-            foreach (var script in capsuleHandScript)
+            foreach (var capHand in capsuleHandScript)
             {
-                script.leapProvider = leapProvider;
-                storedValidationHands.Add(script);
+                capHand.leapProvider = leapProvider;
+                storedValidationHands.Add(capHand);
                 validationHandsActive++;
             }
         }
@@ -46,43 +47,6 @@ public class HandPoseValidator : MonoBehaviour
         }
         
     }
-    public static GameObject CreateCapsuleHands()
-    {
-        string prefabName = "CapsuleHands";
-        var guids = AssetDatabase.FindAssets(prefabName);
-
-        // look for exact matched first
-        foreach (var guid in guids)
-        {
-            string assetPath = AssetDatabase.GUIDToAssetPath(guid);
-
-            string[] assetPathSplit = assetPath.Split('/', '\\', '.');
-
-            if (assetPathSplit[assetPathSplit.Length - 2] == prefabName && assetPathSplit[assetPathSplit.Length - 1] == "prefab")
-            {
-                GameObject newObject = (GameObject)AssetDatabase.LoadAssetAtPath(assetPath, typeof(GameObject));
-
-                if (newObject != null)
-                {
-                    return newObject;
-                }
-            }
-        }
-
-        // fallback to near-matches
-        foreach (var guid in guids)
-        {
-            string assetPath = AssetDatabase.GUIDToAssetPath(guid);
-            GameObject newObject = (GameObject)AssetDatabase.LoadAssetAtPath(assetPath, typeof(GameObject));
-
-            if (newObject != null)
-            {
-                return newObject;
-            }
-        }
-        return null;
-    }
-
 
     List<GameObject> lineRenderers = new List<GameObject>();
 
