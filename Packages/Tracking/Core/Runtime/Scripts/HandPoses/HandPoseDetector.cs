@@ -23,8 +23,11 @@ namespace Leap.Unity
         /// </summary>
         [HideInInspector]
         public Chirality ChiralityToCheck;
+
+        [SerializeField]
+        private HandPoseScriptableObject _poseToDetect;
         /// <summary>
-        /// List of poses that the detector will check through. This list can be filled with different poses or variations of the same pose.
+        /// List of poses that the detector will check through. This list can be filled with different variations of the same pose.
         /// Once one of these poses is found, the class will call the "Pose Detected event"
         /// </summary>
         [SerializeField]
@@ -219,6 +222,12 @@ namespace Leap.Unity
             if(_leapProvider == null)
             {
                 _leapProvider = Hands.Provider;
+            }
+
+            //add the primary pose to the list of poses to be used
+            if(_poseToDetect != null)
+            {
+                _posesToDetect.Add(_poseToDetect);
             }
         }
 

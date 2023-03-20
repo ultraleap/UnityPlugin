@@ -281,13 +281,13 @@ namespace Leap.Unity.HandsModule
         private enum FingerName
         {
             Thumb = 0,
-            Index = 1,
-            Middle = 2,
-            Ring = 3,
-            Pinky = 4,
+            Index_Finger = 1,
+            Middle_Finger = 2,
+            Ring_Finger = 3,
+            Pinky_Finger = 4,
             Palm = 5
         }
-        FingerName fingerName = FingerName.Index;
+        FingerName fingerName = FingerName.Index_Finger;
         private enum BoneName
         {
             Proximal = 1,
@@ -304,9 +304,23 @@ namespace Leap.Unity.HandsModule
             EditorGUILayout.ObjectField("Script", MonoScript.FromMonoBehaviour((MonoBehaviour)target), GetType(), false);
             EditorGUI.EndDisabledGroup();
             HandPoseDetector poseDetectionScript = (HandPoseDetector)target;
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("_posesToDetect"));
 
+            GUILayout.Space(10);
+            var thinGreyLine3 = EditorGUILayout.GetControlRect(false, GUILayout.Height(2), GUILayout.Width(Screen.width));
+            EditorGUI.DrawRect(thinGreyLine3, Color.grey);
+            GUILayout.Space(5);
+            EditorGUILayout.LabelField("Pose to detect: ", EditorStyles.boldLabel);
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("_poseToDetect"), GUIContent.none);
+
+            EditorGUI.indentLevel = 2;
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("_posesToDetect"), new GUIContent("Pose variations: "));
+            EditorGUI.indentLevel = 0;
+            GUILayout.Space(5);
+            var thinGreyLine4 = EditorGUILayout.GetControlRect(false, GUILayout.Height(2), GUILayout.Width(Screen.width));
+            EditorGUI.DrawRect(thinGreyLine4, Color.grey);
+            GUILayout.Space(5);
             poseDetectionScript.CheckBothHands = EditorGUILayout.Toggle("Detect both hands?", poseDetectionScript.CheckBothHands);
+            
             if (!poseDetectionScript.CheckBothHands)
             {
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("ChiralityToCheck"));
