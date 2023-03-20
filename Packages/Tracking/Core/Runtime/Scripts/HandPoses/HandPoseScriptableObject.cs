@@ -16,7 +16,6 @@ namespace Leap.Unity
     {
         public override void OnGUI(Rect rect, SerializedProperty property, GUIContent label)
         {
-            
             try
             {
                 int pos = int.Parse(property.propertyPath.Split('[', ']')[1]);
@@ -50,7 +49,7 @@ namespace Leap.Unity
         public bool DetectPinky = true;
 
         private List<int> fingerIndexesToCheck = new List<int>();
-
+        
         public List<int> GetFingerIndexesToCheck()
         {
             ApplyFingersToUse();

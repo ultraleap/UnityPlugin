@@ -10,7 +10,8 @@ namespace Leap.Unity
     {
         [HideInInspector]
         public override Frame CurrentFrame
-        { get
+        {
+            get
             { 
                 List<Hand> hands = new List<Hand>();
                 foreach(var hand in currentHandsAndPosedObjects)
@@ -21,6 +22,7 @@ namespace Leap.Unity
                 return new Frame(0, (long)Time.realtimeSinceStartup, 90, hands);
             }
         }
+
         [HideInInspector]
         public override Frame CurrentFixedFrame => new Frame();
 

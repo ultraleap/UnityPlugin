@@ -68,7 +68,6 @@ namespace Leap.Unity
 
             OnPoseSaved?.Invoke(newItem);
 
-
             Debug.Log("New pose saved to: " + fullPath, AssetDatabase.LoadMainAssetAtPath(fullPath));
             return newItem;
         }

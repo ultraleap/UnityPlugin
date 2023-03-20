@@ -1,5 +1,4 @@
 using Leap.Unity;
-using LeapInternal;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -59,13 +58,16 @@ public class HandPoseValidator : MonoBehaviour
                 validationHandsActive--;
             }
         }
+
         if(validationHandsActive != validationHandsActivePrevFrame)
         {
             validationHandsActivePrevFrame = validationHandsActive;
+
             foreach (var lineRenderer in lineRenderers)
             {
                 DestroyImmediate(lineRenderer);
             }
+
             lineRenderers.Clear();
         }
 
@@ -79,6 +81,7 @@ public class HandPoseValidator : MonoBehaviour
     private void ColorHandJoints()
     {
         var colourCapsuleHand = storedValidationHands.FirstOrDefault();
+
         if (colourCapsuleHand != null)
         {
             Utils.Fill(_leftCapsuleHandColours, Color.grey);
@@ -116,19 +119,19 @@ public class HandPoseValidator : MonoBehaviour
                         }
                     }
                 }
+
                 if (visHand != null)
                 {
                     visHand.SetIndividualSphereColors = true;
+
                     if (visHand.Handedness == Chirality.Left)
                     {
                         visHand.SphereColors = _leftCapsuleHandColours;
                     }
-                    if (visHand.Handedness == Chirality.Right)
+                    else
                     {
                         visHand.SphereColors = _rightCapsuleHandColours;
                     }
-
-
                 }
             }
         }
@@ -152,6 +155,7 @@ public class HandPoseValidator : MonoBehaviour
                     if (boneDirectionTarget.enabled)
                     {
                         bool AtleastOneDirectionActive = false;
+
                         foreach (var direction in boneDirectionTarget.direction)
                         {
                             if (direction.enabled)
@@ -173,6 +177,7 @@ public class HandPoseValidator : MonoBehaviour
                             }
 
                             var lineRend = lineRenderers.ElementAt(lineRenderCount).GetComponent<LineRenderer>();
+
                             if (lineRend)
                             {
                                 lineRend.material = new Material(Shader.Find("Legacy Shaders/Particles/Alpha Blended Premultiply"));
@@ -188,15 +193,17 @@ public class HandPoseValidator : MonoBehaviour
                                     {
                                         int fingNum = (int)boneDirectionTarget.finger;
                                         int boneNum = (int)boneDirectionTarget.bone;
+
                                         if (capsuleHand.GetLeapHand() != null)
                                         {
                                             var directionBone = capsuleHand.GetLeapHand().Fingers[fingNum].bones[boneNum];
+
                                             if (directionBone.PrevJoint != null)
                                             {
                                                 Ray ray = new Ray(directionBone.PrevJoint, directionBone.Direction);
 
                                                 lineRend.SetPosition(0, directionBone.PrevJoint);
-                                                lineRend.SetPosition(1, ray.GetPoint(10));
+                                                lineRend.SetPosition(1, ray.GetPoint(0.1f));
                                             }
                                         }
                                     }
@@ -207,8 +214,9 @@ public class HandPoseValidator : MonoBehaviour
                                             capsuleHand.GetLeapHand().PalmNormal != null)
                                         {
                                             Ray ray = new Ray(capsuleHand.GetLeapHand().PalmPosition, capsuleHand.GetLeapHand().PalmNormal);
+
                                             lineRend.SetPosition(0, capsuleHand.GetLeapHand().PalmPosition);
-                                            lineRend.SetPosition(1, ray.GetPoint(100));
+                                            lineRend.SetPosition(1, ray.GetPoint(0.1f));
                                         }
                                     }
                                 }

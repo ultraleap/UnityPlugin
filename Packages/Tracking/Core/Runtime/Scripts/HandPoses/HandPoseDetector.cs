@@ -165,7 +165,6 @@ namespace Leap.Unity
             public AxisToFace axisToFace;
             public float rotationThreshold;
         }
-        
 
         public void CreateDirectionSource()
         {
@@ -480,7 +479,6 @@ namespace Leap.Unity
                             }
                         }
                     }
-
                 }
 
                 if(oneDirectionCorrectInSource == false)
@@ -488,6 +486,7 @@ namespace Leap.Unity
                     allBonesInCorrectDirection = false;
                 }
             }
+
             _directionTargetsMatchedLastFrame = allBonesInCorrectDirection;
             return allBonesInCorrectDirection;
         }
