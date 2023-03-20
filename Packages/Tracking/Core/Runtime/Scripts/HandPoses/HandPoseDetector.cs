@@ -76,7 +76,7 @@ namespace Leap.Unity
         public List<ValidationData> GetValidationData()
         {
             return _validationDatas;
-        }    
+        }
 
         public List<HandPoseScriptableObject> GetPosesToDetect()
         {
@@ -113,7 +113,7 @@ namespace Leap.Unity
         /// Adding the ablility of enum style direction selection in the Inspector.
         /// </summary>
         public enum AxisToFace
-        { 
+        {
             Back,
             Down,
             Forward,
@@ -199,7 +199,7 @@ namespace Leap.Unity
 
             Sources.ElementAt(sourceIndex).direction.Add(fingerDirection);
         }
-        
+
         public void RemoveSource(int index)
         {
             Sources.RemoveAt(index);
@@ -207,6 +207,19 @@ namespace Leap.Unity
         public void RemoveDirection(int sourceIndex, int directionIndex)
         {
             Sources[sourceIndex].direction.RemoveAt(directionIndex);
+        }
+
+        public List<PoseDirectionCache> poseDirectionsForValidator = new List<PoseDirectionCache>();
+        public struct PoseDirectionCache
+        {
+            public Chirality chirality;
+            public Tuple<DirectionSource, bool> sourceDirectionAndStatus;
+            public PoseDirectionCache(Chirality _chirality, Tuple<DirectionSource, bool> _sourceDirectionAndStatus)
+            {
+                this.chirality = _chirality;
+                this.sourceDirectionAndStatus = _sourceDirectionAndStatus;
+            }
+
         }
 
         #endregion
@@ -224,13 +237,13 @@ namespace Leap.Unity
 
         private void Start()
         {
-            if(_leapProvider == null)
+            if (_leapProvider == null)
             {
                 _leapProvider = Hands.Provider;
             }
 
             //add the primary pose to the list of poses to be used
-            if(_poseToDetect != null)
+            if (_poseToDetect != null)
             {
                 _posesToDetect.Add(_poseToDetect);
             }
@@ -251,7 +264,7 @@ namespace Leap.Unity
                 _detectedPose = null;
             }
 
-            if(_detectedPose != null)
+            if (_detectedPose != null)
             {
                 WhilePoseDetected.Invoke(_detectedPose);
             }
@@ -267,7 +280,7 @@ namespace Leap.Unity
                     foreach (HandPoseScriptableObject pose in _posesToDetect)
                     {
                         bool poseDetectedThisFrame = ComparePoseToHand(pose, activePlayerHand);
-                        if(poseDetectedThisFrame) 
+                        if (poseDetectedThisFrame)
                         {
                             _detectedPose = pose;
                             return true;
@@ -280,6 +293,7 @@ namespace Leap.Unity
 
         private bool ComparePoseToHand(HandPoseScriptableObject pose, Hand activePlayerHand)
         {
+            poseDirectionsForValidator.Clear();
             // Check any finger directions set up in the pose detector
             if (Sources.Count > 0)
             {
@@ -288,7 +302,7 @@ namespace Leap.Unity
                     return false;
                 }
             }
-            
+
             Hand serializedHand = pose.GetSerializedHand();
             Hand playerHand = activePlayerHand;
 
@@ -328,7 +342,7 @@ namespace Leap.Unity
                     bool boneMatched = false;
 
                     // Get the user defined rotation threshold for the current bone (threshold is defined in the pose scriptable object)
-                    Vector2 jointRotationThresholds = GetBoneRotationThreshold(pose, fingerNum, boneNum-1); //i - 1 to ignore metacarpal
+                    Vector2 jointRotationThresholds = GetBoneRotationThreshold(pose, fingerNum, boneNum - 1); //i - 1 to ignore metacarpal
 
                     // Get hand rotation for both hands
                     Quaternion activeBoneRotation = activeHandBone.Rotation;
@@ -349,7 +363,7 @@ namespace Leap.Unity
                     {
                         if (boneDifference.x <= (jointRotationThresholds.x + pose.GetHysteresisThreshold()) && boneDifference.x >= (-jointRotationThresholds.x - pose.GetHysteresisThreshold()))
                         {
-                            if(serializedHandBone.Type == Bone.BoneType.TYPE_PROXIMAL) // Proximal also uses Y rotation for Abduction/Splay
+                            if (serializedHandBone.Type == Bone.BoneType.TYPE_PROXIMAL) // Proximal also uses Y rotation for Abduction/Splay
                             {
                                 if (boneDifference.y <= (jointRotationThresholds.y + pose.GetHysteresisThreshold()) && boneDifference.y >= (-jointRotationThresholds.y - pose.GetHysteresisThreshold()))
                                 {
@@ -381,25 +395,27 @@ namespace Leap.Unity
                         }
                     }
 
-                    if(cacheValidationData)
+                    if (cacheValidationData)
                     {
                         _validationDatas.Add(new ValidationData(serializedHand.GetChirality(), fingerNum, boneNum, boneMatched));
                     }
 
-                    if(!boneMatched)
+                    if (!boneMatched)
                     {
                         allFingersMatched = false;
                     }
                 }
             }
 
-            if(allFingersMatched)
+            if (allFingersMatched)
             {
                 return true;
             }
 
             return false;
         }
+
+
 
         private bool CheckPoseDirection(Hand activePlayerHand)
         {
@@ -478,6 +494,8 @@ namespace Leap.Unity
                                 break;
                             }
                         }
+                        poseDirectionsForValidator.Add(new PoseDirectionCache(activePlayerHand.GetChirality(),
+                            new Tuple<DirectionSource, bool>(source, oneDirectionCorrectInSource)));
                     }
                 }
 

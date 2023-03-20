@@ -166,7 +166,23 @@ public class HandPoseValidator : MonoBehaviour
 
                         if (AtleastOneDirectionActive)
                         {
+                            Color lineColor = Color.gray;
                             var capsuleHand = storedValidationHands.ElementAt(j);
+                            foreach (var directionForValidator in _detector.poseDirectionsForValidator)
+                            {
+                                if (directionForValidator.chirality == capsuleHand.Handedness &&
+                                    directionForValidator.sourceDirectionAndStatus.Item1.finger == boneDirectionTarget.finger)
+                                {
+                                    if (directionForValidator.sourceDirectionAndStatus.Item2)
+                                    {
+                                        lineColor = Color.green;
+                                    }
+                                    else
+                                    {
+                                        lineColor = Color.red;
+                                    }
+                                }
+                            }
 
                             if (lineRenderers.ElementAtOrDefault(lineRenderCount) == null)
                             {
@@ -180,10 +196,10 @@ public class HandPoseValidator : MonoBehaviour
 
                             if (lineRend)
                             {
-                                lineRend.material = new Material(Shader.Find("Legacy Shaders/Particles/Alpha Blended Premultiply"));
+                                lineRend.material = new Material(Shader.Find("Particles/Standard Unlit"));
                                 lineRend.startWidth = 0.005f;
                                 lineRend.endWidth = 0.005f;
-                                lineRend.material.color = new Color(0, 235, 133, 0.7f);
+                                lineRend.material.color = lineColor;
 
                                 if (capsuleHand != null && capsuleHand.enabled)
                                 {
