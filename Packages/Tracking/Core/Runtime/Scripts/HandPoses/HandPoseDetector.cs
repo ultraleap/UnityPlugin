@@ -272,6 +272,7 @@ namespace Leap.Unity
 
         private bool CompareAllHandsAndPoses()
         {
+            bool poseDetectedOnEitherHand = false;
             _validationDatas.Clear();
             foreach (var activePlayerHand in _leapProvider.CurrentFrame.Hands)
             {
@@ -283,12 +284,12 @@ namespace Leap.Unity
                         if (poseDetectedThisFrame)
                         {
                             _detectedPose = pose;
-                            return true;
+                            poseDetectedOnEitherHand = true;
                         }
                     }
                 }
             }
-            return false;
+            return poseDetectedOnEitherHand;
         }
 
         private bool ComparePoseToHand(HandPoseScriptableObject pose, Hand activePlayerHand)
