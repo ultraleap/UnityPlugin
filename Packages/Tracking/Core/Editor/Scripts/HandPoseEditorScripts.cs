@@ -550,7 +550,11 @@ namespace Leap.Unity
             {
                 EditorGUILayout.LabelField("Select Pose");
                 handPoseEditor.Selected = EditorGUILayout.Popup(handPoseEditor.Selected, handPoseEditor.PoseScritableIntName.Values.ToArray());
-                target.handPose = handPoses.ElementAt(handPoseEditor.Selected);
+
+                if (handPoses.Count > handPoseEditor.Selected)
+                {
+                    target.handPose = handPoses.ElementAt(handPoseEditor.Selected);
+                }
                 EditorGUILayout.Space(10);
             }
             else
