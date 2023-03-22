@@ -10,39 +10,45 @@ public class HandPoseValidator : MonoBehaviour
     /// If this is left blank, It will search for all hands in the scene
     /// </summary>
     [SerializeField]
-    private List<CapsuleHand> validationHands = new List<CapsuleHand>();
+    private List<CapsuleHand> _validationHands = new List<CapsuleHand>();
 
-    private List<CapsuleHand> storedValidationHands = new List<CapsuleHand>();
-    private int validationHandsActive = 0;
-    private int validationHandsActivePrevFrame = 0;
+    private List<CapsuleHand> _storedValidationHands = new List<CapsuleHand>();
+    private int _validationHandsActive = 0;
+    private int _validationHandsActivePrevFrame = 0;
 
     [SerializeField]
-    private LeapProvider leapProvider = null;
+    private HandPoseDetector _poseDetector;
+
+    [SerializeField]
+    private LeapProvider _leapProvider = null;
 
     private Color[] _leftCapsuleHandColours = new Color[32];
     private Color[] _rightCapsuleHandColours = new Color[32];
-    private HandPoseDetector _detector;
+
 
     public Transform validatorHandPrefab;
 
     private void Start()
     {
-        _detector = FindObjectOfType<HandPoseDetector>();
-        _detector.EnablePoseCaching();
-        if(validationHands.Count == 0)
+        if (_poseDetector == null)
+        {
+            _poseDetector = FindObjectOfType<HandPoseDetector>();
+        }
+        _poseDetector.EnablePoseCaching();
+        if(_validationHands.Count == 0)
         {
             var instCapsuleHands = Instantiate(validatorHandPrefab);
             var capsuleHandScript = instCapsuleHands.GetComponentsInChildren<CapsuleHand>(true);
             foreach (var capHand in capsuleHandScript)
             {
-                capHand.leapProvider = leapProvider;
-                storedValidationHands.Add(capHand);
-                validationHandsActive++;
+                capHand.leapProvider = _leapProvider;
+                _storedValidationHands.Add(capHand);
+                _validationHandsActive++;
             }
         }
         else
         {
-            storedValidationHands = validationHands;
+            _storedValidationHands = _validationHands;
         }
         
     }
@@ -51,17 +57,17 @@ public class HandPoseValidator : MonoBehaviour
 
     private void Update()
     {
-        foreach (var hand in storedValidationHands)
+        foreach (var hand in _storedValidationHands)
         {
             if(!hand.isActiveAndEnabled)
             {
-                validationHandsActive--;
+                _validationHandsActive--;
             }
         }
 
-        if(validationHandsActive != validationHandsActivePrevFrame)
+        if(_validationHandsActive != _validationHandsActivePrevFrame)
         {
-            validationHandsActivePrevFrame = validationHandsActive;
+            _validationHandsActivePrevFrame = _validationHandsActive;
 
             foreach (var lineRenderer in lineRenderers)
             {
@@ -71,7 +77,7 @@ public class HandPoseValidator : MonoBehaviour
             lineRenderers.Clear();
         }
 
-        if (_detector != null) 
+        if (_poseDetector != null) 
         {
             ColorHandJoints();
             RenderDirectionRays();
@@ -80,7 +86,7 @@ public class HandPoseValidator : MonoBehaviour
 
     private void ColorHandJoints()
     {
-        var colourCapsuleHand = storedValidationHands.FirstOrDefault();
+        var colourCapsuleHand = _storedValidationHands.FirstOrDefault();
 
         if (colourCapsuleHand != null)
         {
@@ -88,11 +94,11 @@ public class HandPoseValidator : MonoBehaviour
             Utils.Fill(_rightCapsuleHandColours, Color.grey);
         }
 
-        if (storedValidationHands.Count > 0)
+        if (_storedValidationHands.Count > 0)
         {
-            var validationData = _detector.GetValidationData();
+            var validationData = _poseDetector.GetValidationData();
 
-            foreach (var visHand in storedValidationHands)
+            foreach (var visHand in _storedValidationHands)
             {
                 foreach (var data in validationData)
                 {
@@ -144,13 +150,13 @@ public class HandPoseValidator : MonoBehaviour
     private void RenderDirectionRays()
     {
         var lineRenderCount = 0;
-        for (int j = 0; j < storedValidationHands.Count; j++)
+        for (int j = 0; j < _storedValidationHands.Count; j++)
         {
-            if (storedValidationHands.ElementAt(j).enabled)
+            if (_storedValidationHands.ElementAt(j).enabled)
             {
-                for (int i = 0; i < _detector.Sources.Count; i++)
+                for (int i = 0; i < _poseDetector.Sources.Count; i++)
                 {
-                    var boneDirectionTarget = _detector.Sources.ElementAt(i);
+                    var boneDirectionTarget = _poseDetector.Sources.ElementAt(i);
 
                     if (boneDirectionTarget.enabled)
                     {
@@ -167,8 +173,8 @@ public class HandPoseValidator : MonoBehaviour
                         if (AtleastOneDirectionActive)
                         {
                             Color lineColor = Color.gray;
-                            var capsuleHand = storedValidationHands.ElementAt(j);
-                            foreach (var directionForValidator in _detector.poseDirectionsForValidator)
+                            var capsuleHand = _storedValidationHands.ElementAt(j);
+                            foreach (var directionForValidator in _poseDetector.poseDirectionsForValidator)
                             {
                                 if (directionForValidator.chirality == capsuleHand.Handedness &&
                                     directionForValidator.sourceDirectionAndStatus.Item1.finger == boneDirectionTarget.finger)
