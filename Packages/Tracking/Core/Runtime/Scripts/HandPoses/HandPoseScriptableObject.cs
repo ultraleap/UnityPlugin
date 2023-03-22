@@ -59,7 +59,7 @@ namespace Leap.Unity
         #region Finger Thresholds
 
         [HideInInspector]
-        public float globalRotation = 15;
+        public float globalRotation = 20;
 
         [HideInInspector]
         public FingerJointThresholds[] fingerJointRotationThresholds = new FingerJointThresholds[5];
