@@ -5879,8 +5879,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _validationHands: []
-  _poseDetector: {fileID: 0}
-  _leapProvider: {fileID: 0}
+  _poseDetector: {fileID: 1394001907}
+  _leapProvider: {fileID: 372027660}
   validatorHandPrefab: {fileID: 5426335549932055306, guid: 0880ec87e75460d4abf639011f301cf4, type: 3}
 --- !u!4 &2127817534
 Transform:

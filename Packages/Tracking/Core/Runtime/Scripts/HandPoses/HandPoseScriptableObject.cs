@@ -99,7 +99,7 @@ namespace Leap.Unity
 
         public void SaveHandPose(Hand handToSerialise)
         {
-            serializedHand = handToSerialise;
+            serializedHand = serializedHand.CopyFrom(handToSerialise);
             MirrorHand(handToSerialise);
             SetAllBoneThresholds(globalRotation, true);
         }
