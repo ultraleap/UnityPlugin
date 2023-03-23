@@ -598,4 +598,70 @@ namespace Leap.Unity
             }
         }
     }
+
+    [CustomEditor(typeof(HandPoseViewer), editorForChildClasses: true)]
+    public class HandPoseViewerEditor : CustomEditorBase<HandPoseViewer>
+    {
+        List<HandPoseScriptableObject> handPoses = new List<HandPoseScriptableObject>();
+
+        bool _showFineTuningOptions = false;
+
+        protected override void OnEnable()
+        {
+            base.OnEnable();
+
+            // Edit-time pose is only relevant for providers that generate hands.
+            // Post-process Providers are a special case and don't generate their own hands.
+            specifyConditionalDrawing(() => false, "editTimePose");
+        }
+
+        private void UpdatedPoseDropdown()
+        {
+            var handPoseViewer = (HandPoseViewer)target;
+            var handPoseGuids = AssetDatabase.FindAssets("t:HandPoseScriptableObject");
+            handPoses.Clear();
+            foreach (var guid in handPoseGuids)
+            {
+                var path = AssetDatabase.GUIDToAssetPath(guid);
+                handPoses.Add(AssetDatabase.LoadAssetAtPath<HandPoseScriptableObject>(path));
+            }
+
+            if (handPoseViewer.PoseScritableIntName.Count != handPoses.Count)
+            {
+                handPoseViewer.PoseScritableIntName.Clear();
+
+                for (int i = 0; i < handPoses.Count; i++)
+                {
+                    var scriptableObject = handPoses.ElementAt(i);
+                    handPoseViewer.PoseScritableIntName.Add(i, scriptableObject.name);
+                }
+            }
+
+            if (handPoseViewer.PoseScritableIntName.Count > 0)
+            {
+                EditorGUILayout.LabelField("Select Pose");
+                handPoseViewer.Selected = EditorGUILayout.Popup(handPoseViewer.Selected, handPoseViewer.PoseScritableIntName.Values.ToArray());
+
+                if (handPoses.Count > handPoseViewer.Selected)
+                {
+                    target.handPose = handPoses.ElementAt(handPoseViewer.Selected);
+                }
+                EditorGUILayout.Space(10);
+            }
+            else
+            {
+                EditorGUILayout.LabelField("No poses found, please record a pose using the pose recorder in order to view a pose.");
+                EditorGUILayout.Space(10);
+            }
+
+            EditorUtility.SetDirty(target);
+        }
+
+        public override void OnInspectorGUI()
+        {
+            base.OnInspectorGUI();
+            UpdatedPoseDropdown();
+
+        }
+    }
 }
