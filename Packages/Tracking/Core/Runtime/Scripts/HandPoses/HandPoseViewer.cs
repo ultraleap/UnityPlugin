@@ -54,8 +54,6 @@ namespace Leap.Unity
 
         [SerializeField]
         public Transform handLocation = null;
-        [SerializeField]
-        public Transform unusedHandLocation = null;
 
         private List<Tuple<Hand, HandPoseScriptableObject>> currentHandsAndPosedObjects = new List<Tuple<Hand, HandPoseScriptableObject>>();
 
@@ -88,20 +86,16 @@ namespace Leap.Unity
             {
                 handPosition = handLocation.position;
             }
-            if (unusedHandLocation != null)
-            {
-                unusedHandPosition = unusedHandLocation.position;
-            }
 
             if (posedHand.IsLeft)
             {
                 posedHand.SetTransform(handPosition, (posedHand.Rotation * handLocation.rotation));
-                mirroredHand.SetTransform(unusedHandPosition, (posedHand.Rotation * handLocation.rotation));
+                mirroredHand.SetTransform(handPosition, (posedHand.Rotation * handLocation.rotation));
             }
             else
             {
                 posedHand.SetTransform(handPosition, (posedHand.Rotation * handLocation.rotation));
-                mirroredHand.SetTransform(unusedHandPosition, (posedHand.Rotation * handLocation.rotation));
+                mirroredHand.SetTransform(handPosition, (posedHand.Rotation * handLocation.rotation));
             }
 
             currentHandsAndPosedObjects.Add(new Tuple<Hand, HandPoseScriptableObject>(posedHand, handPose));
