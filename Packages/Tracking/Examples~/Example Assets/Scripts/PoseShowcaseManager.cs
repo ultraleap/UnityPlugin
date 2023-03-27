@@ -2,12 +2,16 @@ using Leap.Unity;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Experimental.GlobalIllumination;
 using UnityEngine.XR.OpenXR.Input;
 
 public class PoseShowcaseManager : MonoBehaviour
 {
+    [SerializeField]
+    TextMeshProUGUI detectionText;
+
     [Serializable]
     struct ShowCasePose
     {
@@ -53,6 +57,7 @@ public class PoseShowcaseManager : MonoBehaviour
                 }
             }
         }
+        detectionText.text = inputString;
 
     }
 
@@ -73,6 +78,7 @@ public class PoseShowcaseManager : MonoBehaviour
                 }
             }
         }
+        detectionText.text = "No pose detected";
 
     }
 
