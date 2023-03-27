@@ -28,15 +28,15 @@ MonoBehaviour:
     - {x: 20, y: 20}
     - {x: 20, y: 20}
   - jointThresholds:
-    - {x: 20, y: 40}
+    - {x: 40, y: 40}
     - {x: 20, y: 20}
     - {x: 20, y: 20}
   - jointThresholds:
-    - {x: 20, y: 40}
+    - {x: 40, y: 40}
     - {x: 20, y: 20}
     - {x: 20, y: 20}
   - jointThresholds:
-    - {x: 20, y: 40}
+    - {x: 40, y: 40}
     - {x: 20, y: 20}
     - {x: 20, y: 20}
   serializedHand:

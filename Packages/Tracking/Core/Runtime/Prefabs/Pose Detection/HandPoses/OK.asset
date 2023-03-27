@@ -20,25 +20,25 @@ MonoBehaviour:
   globalRotation: 20
   fingerJointRotationThresholds:
   - jointThresholds:
-    - {x: 20, y: 40}
+    - {x: 30, y: 40}
     - {x: 20, y: 20}
-    - {x: 20, y: 20}
+    - {x: 30, y: 30}
   - jointThresholds:
-    - {x: 20, y: 40}
-    - {x: 20, y: 20}
-    - {x: 20, y: 20}
+    - {x: 30, y: 40}
+    - {x: 30, y: 30}
+    - {x: 30, y: 30}
   - jointThresholds:
-    - {x: 20, y: 40}
-    - {x: 20, y: 20}
-    - {x: 20, y: 20}
+    - {x: 40, y: 40}
+    - {x: 50, y: 50}
+    - {x: 50, y: 50}
   - jointThresholds:
-    - {x: 20, y: 40}
-    - {x: 20, y: 20}
-    - {x: 20, y: 20}
+    - {x: 40, y: 40}
+    - {x: 50, y: 50}
+    - {x: 50, y: 50}
   - jointThresholds:
-    - {x: 20, y: 40}
-    - {x: 20, y: 20}
-    - {x: 20, y: 20}
+    - {x: 40, y: 40}
+    - {x: 50, y: 50}
+    - {x: 50, y: 50}
   serializedHand:
     FrameId: 0
     Id: 43
