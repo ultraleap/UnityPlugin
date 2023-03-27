@@ -4,59 +4,68 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Experimental.GlobalIllumination;
+using UnityEngine.XR.OpenXR.Input;
 
 public class PoseShowcaseManager : MonoBehaviour
 {
-    [SerializeField]
-    List<HandPoseViewer> poseViewers = new List<HandPoseViewer>();
-    
+    [Serializable]
     struct ShowCasePose
     {
         public HandPoseViewer poseViewer;
-        [HideInInspector]
         public Light spotlight;
-        [HideInInspector]
-        public HandPoseDetector detector;
+        public string poseName;
     }
+    [SerializeField]
     List<ShowCasePose> poseList = new List<ShowCasePose>();
 
-    // Start is called before the first frame update
-    void Start()
+    private void Start()
     {
-        for (int i = 0; i < poseViewers.Count; i++)
+        for (int i = 0; i < poseList.Count; i++)
         {
-            ShowCasePose showCasePose = new ShowCasePose();
-            showCasePose.poseViewer = poseViewers[i];
+            var pose = poseList[i];
 
-            if(showCasePose.detector == null)
+            if(pose.spotlight == null)
             {
-                showCasePose.detector = showCasePose.poseViewer.GetComponentInChildren<HandPoseDetector>();
+                pose.spotlight = pose.poseViewer.GetComponentInChildren<Light>();
             }
-            if(showCasePose.spotlight == null)
+
+            if(pose.poseName == null)
             {
-                showCasePose.spotlight = showCasePose.poseViewer.GetComponentInChildren<Light>();
+                pose.poseName = pose.poseViewer.name;
             }
-            if (showCasePose.detector.GetPosesToDetect().Count <= 0)
-            {
-                showCasePose.detector.AddPoseToDetect(showCasePose.poseViewer.handPose);
-            }
-            poseList.Add(showCasePose);
         }
     }
 
-    // Update is called once per frame
-    void Update()
+    public void PoseDetected(string inputString)
+    {
+        TurnOnGreenLight(inputString);
+    }
+
+    private void TurnOnGreenLight(string inputString)
     {
         foreach (var pose in poseList)
         {
-            if(pose.detector.GetCurrentlyDetectedPose() != null)
+            if (string.Equals(inputString, pose.poseName, StringComparison.OrdinalIgnoreCase))
             {
                 if (pose.spotlight.color != Color.green)
                 {
                     pose.spotlight.color = Color.green;
                 }
             }
-            else
+        }
+
+    }
+
+    public void PoseLost(string inputString)
+    {
+        TurnOffGreenLight(inputString);
+    }
+
+    private void TurnOffGreenLight(string inputString)
+    {
+        foreach (var pose in poseList)
+        {
+            if (string.Equals(inputString, pose.poseName, StringComparison.OrdinalIgnoreCase))
             {
                 if (pose.spotlight.color != Color.white)
                 {
@@ -64,10 +73,6 @@ public class PoseShowcaseManager : MonoBehaviour
                 }
             }
         }
-    }
-
-    void PoseDetected()
-    {
 
     }
 

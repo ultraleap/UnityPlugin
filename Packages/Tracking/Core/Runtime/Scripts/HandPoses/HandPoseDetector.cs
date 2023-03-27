@@ -8,7 +8,7 @@ using UnityEngine.Events;
 namespace Leap.Unity
 {
     [Serializable]
-    public class PoseDetectionEvents : UnityEvent<HandPoseScriptableObject, HandPoseDetector> { }
+    public class PoseDetectionEvents : UnityEvent { }
 
     public class HandPoseDetector : MonoBehaviour
     {
@@ -53,9 +53,9 @@ namespace Leap.Unity
 
         private bool cacheValidationData = false;
 
-        public PoseDetectionEvents OnPoseDetected;
-        public PoseDetectionEvents WhilePoseDetected;
-        public PoseDetectionEvents OnPoseLost;
+        public UnityEvent OnPoseDetected;
+        public UnityEvent WhilePoseDetected;
+        public UnityEvent OnPoseLost;
 
         public struct ValidationData
         {
@@ -255,18 +255,18 @@ namespace Leap.Unity
             if (anyHandMatched && !_poseAlreadyDetected)
             {
                 _poseAlreadyDetected = true;
-                OnPoseDetected.Invoke(_detectedPose, this);
+                OnPoseDetected.Invoke();
             }
             else if (!anyHandMatched && _poseAlreadyDetected)
             {
                 _poseAlreadyDetected = false;
-                OnPoseLost.Invoke(_detectedPose, this);
+                OnPoseLost.Invoke();
                 _detectedPose = null;
             }
 
             if (_detectedPose != null)
             {
-                WhilePoseDetected.Invoke(_detectedPose, this);
+                WhilePoseDetected.Invoke();
             }
         }
 
